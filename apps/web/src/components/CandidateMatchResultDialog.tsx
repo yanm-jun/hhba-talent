@@ -17,6 +17,11 @@ const translatedTitles:[RegExp,string][]=[
  [/^back.?end\s+(?:developer|engineer)$/i,'后端开发工程师'],
  [/^full.?stack\s+(?:developer|engineer)$/i,'全栈开发工程师'],
  [/^product manager$/i,'产品经理'],
+ [/^(?:ai|人工智能)\s+product\s+(?:manager|owner)$/i,'AI产品经理'],
+ [/^(?:associate|assistant|junior)\s+product\s+manager$/i,'初级产品经理'],
+ [/^product\s+(?:operations|specialist)$/i,'产品运营专员'],
+ [/^product\s+owner$/i,'产品负责人'],
+ [/^business\s+operations\s+analyst$/i,'业务运营分析师'],
  [/^(?:ui\/ux designer|ux designer)$/i,'用户体验设计师'],
  [/^business analyst$/i,'业务分析师'],
  [/^operations specialist$/i,'运营专员'],
@@ -60,21 +65,30 @@ function officialLink(item:MatchedJob){
   company:item.company,title:item.title,url:item.official_url,location:item.location,remote:item.remote});
 }
 function Row({item,onOpen}:{item:MatchedJob;onOpen:()=>void}){
- return <button type="button" className="hhba-match-job" onClick={onOpen}
-   aria-label={'查看'+item.company+'的'+chineseJobTitle(item)+'岗位详情'}>
-  <span className="hhba-match-job-company-mark" aria-hidden="true"><Building2 size={19}/></span>
-  <span className="hhba-match-job-main">
-   <strong className="hhba-match-job-company">{item.company}</strong>
-   <span className="hhba-match-job-role">{chineseJobTitle(item)}</span>
-   <span className="hhba-match-job-facts">
-    <span><MapPin size={13}/>{chineseLocation(item.location)||'地点待确认'}</span>
-    <span><Wallet size={13}/>{item.salary||'薪资未公布'}</span>
-    <span><BriefcaseBusiness size={13}/>{item.experience_requirement||'经验未注明'}</span>
+ const link=officialLink(item);
+ return <div className="hhba-match-job-entry">
+  <button type="button" className="hhba-match-job" onClick={onOpen}
+   aria-label={'查看'+item.company+'的'+chineseJobTitle(item)+'推荐理由和职位要求'}>
+   <span className="hhba-match-job-company-mark" aria-hidden="true"><Building2 size={19}/></span>
+   <span className="hhba-match-job-main">
+    <strong className="hhba-match-job-company">{item.company}</strong>
+    <span className="hhba-match-job-role">{chineseJobTitle(item)}</span>
+    <span className="hhba-match-job-facts">
+     <span><MapPin size={13}/>{chineseLocation(item.location)||'地点待确认'}</span>
+     <span><Wallet size={13}/>{item.salary||'薪资未公布'}</span>
+     <span><BriefcaseBusiness size={13}/>{item.experience_requirement||'经验未注明'}</span>
+    </span>
    </span>
-  </span>
-  <span className="hhba-match-job-score"><strong>{item.reference_score}<small>分</small></strong><span>参考匹配度</span></span>
-  <ArrowUpRight className="hhba-match-job-arrow" size={17} aria-hidden="true"/>
- </button>;
+   <span className="hhba-match-job-score"><strong>{item.reference_score}<small>分</small></strong><span>参考匹配度</span></span>
+   <ArrowUpRight className="hhba-match-job-arrow" size={17} aria-hidden="true"/>
+  </button>
+  <div className="hhba-match-job-recommendation">
+   <p><strong>推荐理由：</strong>{item.recommendation_reason||item.matched?.find(x=>!x.startsWith('匹配参考分 '))||'岗位方向与简历中的部分经历相关，请核对任职要求。'}</p>
+   {link?<a href={link} target="_blank" rel="noopener noreferrer"
+      data-hhba-recruitment-outbound="true">直接查看官方岗位 <ArrowUpRight size={14}/></a>:
+     <span>官方岗位链接暂不可用</span>}
+  </div>
+ </div>;
 }
 export function CandidateMatchResultDialog({result,onClose}:{result:MatchResponse;onClose:()=>void}){
  const dialogRef=useRef<HTMLDivElement|null>(null);
