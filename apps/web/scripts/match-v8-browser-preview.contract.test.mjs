@@ -177,6 +177,7 @@ test('Public Feishu ATS job may render, but only verified employer backlink esta
 test('Genuine employer recruiting homepage can be Browser Run corroborated after DeepSeek corporate Fetch failure',async()=>{
  const url='https://careers.tencent.com/jobdesc.html?postId=2100785142443454464';
  const corporate='https://careers.tencent.com/';
+ const localized='https://careers.tencent.com/zh-cn';
  const md=[
   '# 内容运营','工作地点：上海','岗位职责',
   '负责官方内容运营、直播活动策划和传播项目管理。'.repeat(5),
@@ -209,7 +210,7 @@ test('Genuine employer recruiting homepage can be Browser Run corroborated after
  const rendered=async target=>{
   renderUrls.push(target);
   if(target===url)return {title:'岗位详情 | 腾讯招聘',content:md};
-  if(target===corporate)return {title:'腾讯招聘',
+  if(target===localized)return {title:'首页 | 腾讯招聘',
    content:('# 腾讯招聘\n欢迎来到腾讯官方招聘网站，职位查询及企业信息。').repeat(8)};
   throw Error('Browser must only read company-owned HTTPS');
  };
@@ -218,9 +219,9 @@ test('Genuine employer recruiting homepage can be Browser Run corroborated after
  assert.equal(got.quality_status,'VERIFIED_JOBS_FOUND');
  assert.equal(got.candidates[0].company,'腾讯');
  assert.equal(got.candidates[0].location,'上海');
- assert.equal(got.candidates[0].employer_site,corporate);
+ assert.equal(got.candidates[0].employer_site,localized);
  assert.equal(got.candidates[0].source_verification,'CORPORATE_DOMAIN_AND_BRAND');
- assert.deepEqual(renderUrls,[url,corporate]);
+ assert.deepEqual(renderUrls,[url,localized]);
  assert.deepEqual(got.stats.browser_render,{attempts:2,recovered:2,failures:0});
  assert.equal(got.accounting.complete,false);
  assert.ok(got.usage.model<=4&&got.usage.search<=8&&got.usage.fetch<=20);
