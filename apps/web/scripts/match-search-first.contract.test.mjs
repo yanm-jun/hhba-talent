@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from '../functions/_lib/match-job-quality.js';
+import {explicitPreferredCity,supplementalQueries,mergeCandidateHits,combineRecommended} from '../functions/_lib/match-search-growth.js';
 import {searchQueries,normalizeHits,selectedJobs,searchPublicJobs,
  enrichCandidateDetails,reasonAboutJobs,runSearchFirstMatch} from '../functions/_lib/deepseek-search-match.js';
 
@@ -220,4 +221,94 @@ test('Score and recruitment status appear in compact modal, not admission probab
  assert.match(jsx,/投递状态未确认/);
  assert.match(jsx,/网页显示在招/);
  assert.match(css,/hhba-native-score-basis/);
+});
+
+test('city-aware supplemental searches only use explicit location preferences',()=>{
+ const text='工作经历在山东聊城，意向城市：杭州、宁波。希望从事AI产品经理。';
+ assert.equal(explicitPreferredCity(text),'杭州');
+ const q=supplementalQueries(text,'AI产品经理',searchQueries(text,'AI产品经理'));
+ assert.equal(q.length,2);
+ assert.ok(q.every(x=>x.includes('杭州')&&x.length<=128));
+ assert.equal(explicitPreferredCity('曾在聊城管理门店和培训顾问。'),'');
+});
+test('supplemental candidate merge keeps original IDs and drops repeated URLs',()=>{
+ const main=normalizeHits([{results:posts.slice(0,4)}]);
+ const supplement=normalizeHits([{results:[posts[1],...posts.slice(4,9)]}]);
+ const merged=mergeCandidateHits(main,supplement);
+ assert.equal(merged.length,9);
+ assert.equal(merged[0].id,'j1');
+ assert.equal(merged[4].id,'j5');
+ assert.equal(merged[4].url,posts[4].url);
+ const jobs=combineRecommended([
+  {company:'甲公司',title:'产品经理',official_url:posts[0].url,match_score:78},
+  {company:'乙公司',title:'分析师',official_url:posts[1].url,match_score:90}
+ ],[
+  {company:'甲公司',title:'产品经理',official_url:posts[2].url,match_score:88},
+  {company:'丙公司',title:'运营经理',official_url:posts[3].url,match_score:84}
+ ],10);
+ assert.deepEqual(jobs.map(j=>j.company),['乙公司','丙公司','甲公司']);
+});
+test('5 shortlisted roles are shown before supplemental search, then 10 roles and longer reasons appear',async()=>{
+ const stages=[],seen=[],urls=[],allResults=[...posts.slice(0,5),...posts.slice(5,10)];
+ let shortlist=0,details=0,searches=0;
+ const fetcher=async(url,options)=>{
+  urls.push(url);
+  const payload=JSON.parse(options.body);
+  if(url.endsWith('/v1/tools/search')){
+   searches++;
+   const extra=payload.query.includes('2026 社会招聘')||payload.query.includes('企业招聘 申请职位');
+   return new Response(JSON.stringify({results:extra?allResults.slice(5):allResults.slice(0,5)}),{status:200});
+  }
+  if(url.endsWith('/v1/tools/fetch')){
+   return new Response(JSON.stringify({content:'岗位信息：实际工作地上海，进行产品协调与团队沟通，公开招聘信息没有显示职位已关闭。'.repeat(4)}),{status:200});
+  }
+  if(url.endsWith('/responses')){
+   if(payload.stream===false){
+    details++;
+    const batch=JSON.parse(payload.input.split('已选真实岗位：\n')[1]);
+    return new Response(JSON.stringify(response({jobs:batch.map(item=>({
+     id:item.id,reason:'这份简历体现出岗位需要的真实业务沟通和数字产品规划经历，可以把已有的实际项目推进和客户需求梳理成果用于新职位；对应上海的企业数字化产品工作，需要将项目目标转换为落地方案，也应注意企业可能额外要求行业资历与技术背景，应对照岗位详情核验。'
+    }))})),{status:200});
+   }
+   shortlist++;
+   assert.ok(payload.instructions.includes('先快速生成岗位名单'));
+   assert.ok(payload.max_output_tokens<=3500);
+   const candidates=JSON.parse(payload.input.split('可选真实职位：\n')[1]);
+   const roles=candidates.map((h,i)=>({
+    id:h.id,company:'模拟雇主'+h.id,title:'产品职位'+h.id,
+    location:'上海',match_score:90-i,
+    score_basis:'简历中的真实项目策划、门店业务分析以及数字产品执行经验与岗位要求相关，但需确认特定行业资质。',
+    reason:'简历中的项目协调和产品设计经验与这类岗位职责相关，建议重点核对企业要求。',
+    job_basis:'数字产品、业务沟通与协调'
+   }));
+   const raw=JSON.stringify({jobs:roles});
+   const events=[
+    {type:'response.output_text.delta',delta:raw},
+    {type:'response.completed',response:response({jobs:roles})}
+   ].map(x=>'event: '+x.type+'\ndata: '+JSON.stringify(x)+'\n\n').join('');
+   return new Response(events,{status:200,headers:{'Content-Type':'text/event-stream'}});
+  }
+  throw Error('unexpected '+url);
+ };
+ const result=await runSearchFirstMatch('synthetic-secret-not-real',cv,'AI产品经理',10,{
+  fetcher,onProgress:x=>stages.push(x),onPartial:jobs=>seen.push({
+   count:jobs.length,expanded:jobs.filter(j=>j.reason_detail_complete).length,
+   urls:jobs.map(j=>j.official_url)
+  })
+ });
+ assert.equal(searches,searchQueries(cv,'AI产品经理').length+2);
+ assert.equal(shortlist,2);
+ assert.equal(details,2);
+ assert.equal(result.matches.length,10);
+ assert.equal(result.diagnostic.initial_visible,5);
+ assert.equal(result.diagnostic.final_shortlisted,10);
+ assert.equal(result.diagnostic.supplement_queries,2);
+ assert.equal(result.diagnostic.details_expanded,10);
+ assert.ok(result.diagnostic.primary_raw_hits>=5);
+ assert.ok(result.diagnostic.primary_filtered_links>=0);
+ assert.ok(seen.some(x=>x.count===5&&x.expanded===0),'initial 5 jobs are immediately available');
+ assert.ok(seen.some(x=>x.count===10&&x.expanded===0),'supplement arrives without waiting for detailed prose');
+ assert.ok(seen.some(x=>x.count===10&&x.expanded>0),'detailed reasons update asynchronously');
+ assert.ok(result.matches.every(j=>j.match_score!==null&&j.reason_detail_complete));
+ assert.ok(result.matches.every(j=>allResults.some(x=>x.url===j.official_url)),'no fabricated job URL');
 });
