@@ -3,7 +3,7 @@
 // No internal job index, no ATS whitelists, no separate search/fetch passes, no self scoring.
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
-import {parseJobAnswer,wasWebSearched} from '../../_lib/deepseek-native-match.js';
+import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
@@ -21,6 +21,8 @@ const prompt=[
  '按简历目标城市、方向、经历优先搜索，也考虑合理转岗；尽量提供10条不同企业及职位；不足如实输出。',
  '必须是公开搜索得到的单个招聘职位详情/投递 HTTPS URL，不能猜链接或用列表主页代替。',
  '每条写针对简历真实项目/工作经历的简明推荐理由；岗位是否在招以实际页面为准。不泄露简历隐私。',
+ '为了尽快返回：最多进行1至2轮联网搜索；不必逐页读取十个网页，优先使用搜索结果里明确的职位详情直链与工作城市。没有证据的内容不编造。',
+ '先写最确定的岗位，逐条输出完整 JSON 对象，不要等全部搜索完成后才开始写。每条推荐理由控制在45至75字。',
  '尽快完成，不要冗长说明。只返回 JSON，无 markdown：',
  '{"jobs":[{"company":"公司","title":"岗位","location":"实际工作城市","salary":"有则写薪资否则空","reason":"简历依据及匹配理由","url":"具体职位详情链接"}]}'
 ].join('\n');
@@ -49,12 +51,12 @@ async function providerCheck(key){
 }
 // DeepSeek Responses emits semantic SSE rather than a single blocking JSON body.
 // We listen to search progress and only trust its terminal response.completed event.
-async function readProviderEvents(response,onProgress=()=>{}){
+async function readProviderEvents(response,onProgress=()=>{},onPartial=()=>{},limit=10){
  const ct=(response.headers.get('content-type')||'').toLowerCase();
  if(!ct.includes('text/event-stream'))return await response.json();
  if(!response.body)throw Error('AI_PROVIDER_RESPONSE_INVALID');
  const reader=response.body.getReader(),decoder=new TextDecoder();
- let buffer='',completed=null,receivedSearch=false;
+ let buffer='',completed=null,receivedSearch=false,streamedText='',partialCount=0;
  const eventOf=chunk=>{
   if(!chunk.trim())return;
   const lines=chunk.split('\n');
@@ -70,6 +72,19 @@ async function readProviderEvents(response,onProgress=()=>{}){
   }
   if(type==='response.web_search_call.completed'){
    receivedSearch=true;onProgress('writing');
+  }
+  if(type==='response.output_item.done'&&obj.item?.type==='web_search_call'&&obj.item.status==='completed'){
+   receivedSearch=true;onProgress('writing');
+  }
+  if(type==='response.output_text.delta'&&typeof obj.delta==='string'){
+   if(streamedText.length<50000)streamedText+=obj.delta;
+   if(receivedSearch&&streamedText.length<50000){
+    const matches=partialJobMatchesFromText(streamedText,limit);
+    if(matches.length>partialCount){
+     partialCount=matches.length;
+     onPartial(matches);
+    }
+   }
   }
   if(type==='response.completed')completed=obj.response;
   if(type==='response.failed'||type==='response.incomplete'){
@@ -110,7 +125,7 @@ function nativeResponsePayload(result){
  };
 }
 
-export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetch,onProgress=()=>{}}={}){
+export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetch,onProgress=()=>{},onPartial=()=>{}}={}){
  const start=Date.now();
  const body={
   model:'deepseek-v4-pro',
@@ -118,7 +133,7 @@ export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetc
   tools:[{type:'web_search'}],
   tool_choice:'required',
   text:{format:{type:'json_object'}},
-  max_output_tokens:2600,
+  max_output_tokens:2300,
   stream:true,
   instructions:prompt,
   input:'请自行联网搜索真实职位，再给出推荐，不用先让我确认。\n'+
@@ -127,7 +142,7 @@ export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetc
  let response;
  try{
   response=await fetcher('https://api.deepseek.com/responses',{
-   method:'POST',redirect:'manual',signal:AbortSignal.timeout(95000),
+   method:'POST',redirect:'manual',signal:AbortSignal.timeout(65000),
    headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
    body:JSON.stringify(body)
   });
@@ -139,7 +154,7 @@ export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetc
   const err=new Error(providerError(response.status));err.code=err.message;throw err;
  }
  let data;
- try{data=await readProviderEvents(response,onProgress);}catch(e){
+ try{data=await readProviderEvents(response,onProgress,onPartial,limit);}catch(e){
   if(e?.name==='TimeoutError'||e?.name==='AbortError'){
    const err=new Error('AI_PROVIDER_TIMEOUT');err.code=err.message;throw err;
   }
@@ -223,7 +238,7 @@ export async function onRequest({request,env}){
       const result=await runNativeJobMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
        options.role_hint,options.limit,{onProgress:stage=>{
         phase=stage;send('progress',{stage});
-       }});
+       },onPartial:matches=>send('partial',{matches})});
       console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
       send('complete',nativeResponsePayload(result));
      }catch(e){
@@ -231,7 +246,7 @@ export async function onRequest({request,env}){
       console.warn('HHBA_MATCH_NATIVE_ERROR',JSON.stringify({
        code,phase,elapsed_ms:Date.now()-started
       }));
-      send('failure',{error:code});
+      send('failure',{error:code,phase,elapsed_ms:Date.now()-started});
      }finally{
       clearInterval(heartbeat);
       if(!ended){ended=true;try{controller.close()}catch{}}
