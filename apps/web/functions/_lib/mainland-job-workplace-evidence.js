@@ -159,10 +159,23 @@ export function extractMainlandWorkplaceFromJob({raw='',lines=[],role=''}={}){
    citiesInValue(inline).length===1&&findMainlandCity(inline))cities.push(findMainlandCity(inline));
   for(const candidate of after){
    const word=candidate.replace(/^中国大陆[\s｜|—-]*/,'').trim();
-   if(word.length>14||!QUOTED_CITY.test(word)||
-    /(?:招聘|公司|集团|工作|办公|岗位|职责|要求|地址|实习|专员|运营|经理|不限)/.test(word))continue;
-   const city=findMainlandCity(word);
-   if(city&&citiesInValue(word).length===1)cities.push(city);
+   if(word.length<=14&&QUOTED_CITY.test(word)&&
+     !/(?:招聘|公司|集团|工作|办公|岗位|职责|要求|地址|实习|专员|运营|经理|不限)/.test(word)){
+    const city=findMainlandCity(word);
+    if(city&&citiesInValue(word).length===1)cities.push(city);
+   }
+   // Many employer-owned career sites have a header after the exact role:
+   // "产品规划中心｜全职｜科研通道｜上海". Only the final standalone city
+   // with explicit employment mode within the same single-job header counts.
+   // Do not mine ordinary prose, office addresses, or related-job listings.
+   const parts=candidate.split(/[｜|]/).map(x=>x.trim()).filter(Boolean);
+   if(parts.length>=3&&parts.length<=6&&candidate.length<105&&
+     parts.some(x=>/^(?:全职|兼职|实习|社会招聘|校园招聘|正式|社招|校招)$/u.test(x))){
+    const place=parts.at(-1);
+    if(place&&place.length<=14&&QUOTED_CITY.test(place)&&
+       citiesInValue(place).length===1&&findMainlandCity(place))
+     cities.push(findMainlandCity(place));
+   }
   }
   if(new Set(cities).size>1)return {reason:'AMBIGUOUS_WORKPLACE'};
   if(cities.length)return {city:cities[0],evidence_type:'JOB_HEADER_CITY'};
