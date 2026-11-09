@@ -128,13 +128,13 @@ test('end-to-end: Search then V4 Pro selects actual URLs, logs stage timing and 
   throw Error('Unexpected network call: '+url);
  };
  const result=await runSearchFirstMatch('synthetic-secret-not-real',cv,'AI产品经理',10,{
-  fetcher,onProgress:s=>stages.push(s),onPartial:jobs=>partials.push(jobs.length)
+  fetcher,onProgress:s=>stages.push(s),onPartial:jobs=>partials.push(jobs.length),supplementalLimit:0,expandDetailed:false
  });
  assert.ok(stages.includes('searching')&&stages.includes('writing'));
  assert.equal(calls.filter(x=>x.endsWith('/search')).length,searchQueries(cv,'AI产品经理').length);
  assert.equal(calls.filter(x=>x.endsWith('/responses')).length,1);
  assert.equal(result.matches.length,2);
- assert.equal(result.diagnostic.mode,'search-first');
+ assert.equal(result.diagnostic.mode,'search-first-staged');
  assert.ok(Number.isFinite(result.diagnostic.search_ms));
  assert.ok(Number.isFinite(result.diagnostic.model_ms));
  assert.ok(partials.length>=1);
