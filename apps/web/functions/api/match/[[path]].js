@@ -2,8 +2,7 @@
 // Keep this endpoint disabled until an audited Preview migration and keys exist.
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../../_lib/real-auth.js';
 import {redactForModel,verifiedProfile,selectAuditedMatches,countVerifiedMainlandJobs} from '../../_lib/resume-match-core.js';
-import {fuseDomesticJobRecommendations} from '../../_lib/domestic-match-fusion.js';
-import {discoverExternalOfficialJobs,sanitizedJobIntent} from '../../_lib/domestic-search-fetch.js';
+import {simpleJobDirections,discoverSimpleJobs,rankSimpleShortlist} from '../../_lib/match-simple-live-discovery.js';
 import {explainRecommendedJobsWithDeepSeek} from '../../_lib/match-ai-explanations.js';
 import {findMainlandCity} from '../../_lib/mainland-job-location.js';
 
@@ -103,8 +102,8 @@ async function reserveBudget(db,identity){
  const reserved=await db.prepare(
   'INSERT INTO hhba_resume_match_requests(request_id,day_utc,account_hash,created_at) '+
   'SELECT ?,?,?,? WHERE '+
-  '(SELECT COUNT(*) FROM hhba_resume_match_requests WHERE day_utc=?)<60 AND '+
-  '(SELECT COUNT(*) FROM hhba_resume_match_requests WHERE day_utc=? AND account_hash=?)<2'
+  '(SELECT COUNT(*) FROM hhba_resume_match_requests WHERE day_utc=?)<240 AND '+
+  '(SELECT COUNT(*) FROM hhba_resume_match_requests WHERE day_utc=? AND account_hash=?)<8'
  ).bind(id,day,identity,now.toISOString(),day,day,identity).run();
  return reserved?.success===true&&reserved?.meta?.changes===1?{id,day}:null;
 }
@@ -114,32 +113,32 @@ function autoDiscoveryEnabled(env){
  return env.HHBA_MATCH_EXTERNAL_SEARCH_ENABLED==='1'&&
   (env.HHBA_AUTH_ROLLOUT==='preview'||env.HHBA_MATCH_RUNTIME_MODE==='production');
 }
-async function autoDiscoveryCandidates(env,db,phone,profile,opts){
- if(!autoDiscoveryEnabled(env))return {candidates:[],status:'DISABLED'};
- const intent=[...new Set([opts.role_hint,...profile.target_roles]
-  .map(sanitizedJobIntent).filter(Boolean))].slice(0,3);
- if(!intent.length)return {candidates:[],status:'NO_ROLE'};
+async function autoDiscoveryCandidates(env,db,phone,profile,opts,resume,preferredCities=[]){
+ if(!autoDiscoveryEnabled(env))return {candidates:[],status:'DISABLED',meta:null};
+ const directions=simpleJobDirections(opts.role_hint,profile,resume);
  try{
   const table=await db.prepare(
    "SELECT name FROM sqlite_master WHERE type='table' AND name='hhba_external_search_requests'"
   ).first();
-  if(table?.name!=='hhba_external_search_requests')return {candidates:[],status:'NOT_READY'};
+  if(table?.name!=='hhba_external_search_requests')
+   return {candidates:[],status:'SEARCH_DATABASE_NOT_READY',meta:null};
   const day=new Date().toISOString().slice(0,10),id=crypto.randomUUID();
   const hash=await sha256Hex(env.HHBA_MATCH_LIMIT_PEPPER+':search:'+phone);
   const reserved=await db.prepare(
    'INSERT INTO hhba_external_search_requests(request_id,day_utc,account_hash,created_at) SELECT ?,?,?,? WHERE '+
-   '(SELECT COUNT(*) FROM hhba_external_search_requests WHERE day_utc=?)<12 AND '+
-   '(SELECT COUNT(*) FROM hhba_external_search_requests WHERE day_utc=? AND account_hash=?)<2'
+   '(SELECT COUNT(*) FROM hhba_external_search_requests WHERE day_utc=?)<240 AND '+
+   '(SELECT COUNT(*) FROM hhba_external_search_requests WHERE day_utc=? AND account_hash=?)<8'
   ).bind(id,day,hash,new Date().toISOString(),day,day,hash).run();
   if(reserved?.success!==true||reserved?.meta?.changes!==1)
-   return {candidates:[],status:'LIMITED'};
-  const data=await discoverExternalOfficialJobs(intent,env.HHBA_MATCH_DEEPSEEK_KEY,{expanded:true});
-  return {candidates:data.candidates,status:'COMPLETE'};
+   return {candidates:[],status:'SEARCH_DAILY_LIMIT',meta:null};
+  // DeepSeek sees only short occupational directions (plus preferred city
+  // names). It never receives the applicant's name, phone or raw resume via Search.
+  const data=await discoverSimpleJobs(env.HHBA_MATCH_DEEPSEEK_KEY,directions,preferredCities);
+  return {candidates:data.jobs,status:data.status,meta:data.meta,directions};
  }catch(e){
-  // A partial upstream request could have consumed credits, so the reservation
-  // is intentionally retained. Never log a query, URL, resume or model content.
-  console.warn('HHBA_MATCH_DISCOVERY_FAILURE',typeof e?.code==='string'?e.code:'UNAVAILABLE');
-  return {candidates:[],status:'UNAVAILABLE'};
+  const code=typeof e?.code==='string'?e.code:'SEARCH_PROVIDER_ERROR';
+  console.warn('HHBA_MATCH_DISCOVERY_FAILURE',code);
+  return {candidates:[],status:code,meta:null,directions};
  }
 }
 async function aiExtract(key,text,roleHint){
@@ -184,7 +183,7 @@ export async function onRequest({request,env}){
  if(tail==='/status'&&request.method==='GET'){
   const active=enabled(env);
   return json({kind:KIND,enabled:active&&await quotaReady(env),
-   formats:['pdf','docx'],scope:'CN_MAINLAND_ONLY',per_account_daily_limit:2,global_daily_limit:60});
+   formats:['pdf','docx'],scope:'CN_MAINLAND_ONLY',per_account_daily_limit:8,global_daily_limit:240});
  }
 
  // Preview-only diagnostic: candidate authentication, no tokens or resume sent,
@@ -269,7 +268,7 @@ export async function onRequest({request,env}){
   try{
    const row=await db.prepare('SELECT COUNT(*) AS n FROM hhba_resume_match_requests WHERE day_utc=?')
     .bind(new Date().toISOString().slice(0,10)).first();
-   if(Number(row?.n)>=60)return fail('MATCH_GLOBAL_LIMIT',429);
+   if(Number(row?.n)>=240)return fail('MATCH_GLOBAL_LIMIT',429);
   }catch{return fail('MATCH_DATABASE_NOT_READY',503);}
   return fail('MATCH_PERSONAL_LIMIT',429);
  }
@@ -296,18 +295,26 @@ export async function onRequest({request,env}){
   sources.snapshot,sources.audit,sources.facets,profile,
   {...matchOptions,candidate_pool_limit:1200},Date.now()
  ):{matches:[],matched_official_jobs:0};
- const discovered=await autoDiscoveryCandidates(env,db,session.phone,profile,options);
- const merged=fuseDomesticJobRecommendations(
-  recommended.matches,discovered.candidates,profile,matchOptions,Date.now()
+ const discovered=await autoDiscoveryCandidates(
+  env,db,session.phone,profile,options,cleaned,preferredCities
  );
- // DeepSeek writes only the grounded explanation, never job links or eligibility.
- // Even if this optional second call fails, retain the verified shortlist.
+ const directions=discovered.directions||simpleJobDirections(options.role_hint,profile,cleaned);
+ const shortlist=rankSimpleShortlist(
+  recommended.matches,discovered.candidates,directions,preferredCities,options.limit
+ );
+ // Do not confuse a failed search with an applicant who has no suitable work.
+ if(!shortlist.length&&
+  ['SEARCH_PROVIDER_ERROR','SEARCH_NETWORK_ERROR','SEARCH_TIMEOUT',
+   'SEARCH_KEY_REJECTED','SEARCH_BALANCE_INSUFFICIENT','SEARCH_RATE_LIMIT',
+   'SEARCH_REQUEST_REJECTED','SEARCH_BAD_RESPONSE','SEARCH_DAILY_LIMIT',
+   'SEARCH_DATABASE_NOT_READY'].includes(discovered.status))
+  return fail('JOB_SEARCH_UNAVAILABLE',502);
  const explained=await explainRecommendedJobsWithDeepSeek(
-  env.HHBA_MATCH_DEEPSEEK_KEY,cleaned,merged.matches
+  env.HHBA_MATCH_DEEPSEEK_KEY,cleaned,shortlist
  );
  return json({status:'COMPLETE',profile,matches:explained,
-  matched_official_jobs:merged.counts.distinct_verified_sources,
-  discovery_status:discovered.status,
+  matched_official_jobs:explained.length,
+  discovery_status:discovered.status,discovery_meta:discovered.meta,
   source:'中国大陆境内岗位（官方 ATS 审核与自动检索合并）',
   scoring:'严格筛选已明确的学历、工作年限与工作地点要求后进行参考评分；不代表录用概率',
   privacy:'本次脱敏简历文本仅用于已授权的 AI 分析；联网招聘搜索只传岗位方向，不发送姓名、电话或简历',
