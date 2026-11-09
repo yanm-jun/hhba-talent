@@ -288,8 +288,8 @@ export async function onRequest({request,env}){
  }
  // Respect cities explicitly listed as preferences in the resume; never infer
  // a destination from schools, employers or arbitrary city mentions.
- const preference=cleaned.match(/(?:意向城市|期望城市|求职城市|目标城市|期望工作地点)\\s*[:：]\\s*([^\\r\\n，,；;]{2,65})/);
- const preferredCities=preference?[...new Set(preference[1].split(/[、/|]/)
+ const preference=cleaned.match(/(?:意向城市|期望城市|求职城市|目标城市|期望工作地点)\s*[:：]\s*([^\r\n，,；;]{2,65})/);
+ const preferredCities=preference?[...new Set(preference[1].split(/[、\/|]/)
   .map(value=>findMainlandCity(value.trim())).filter(Boolean))].slice(0,5):[];
  const matchOptions={...options,preferred_cities:preferredCities};
  const recommended=sources?selectAuditedMatches(
