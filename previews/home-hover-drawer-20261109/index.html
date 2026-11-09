@@ -78,7 +78,7 @@ let closeTimer=0; const rnd=(a,b)=>Math.floor(a+Math.random()*(b-a+1)), fmt=n=>n
 function enter(){clearTimeout(closeTimer);rail.classList.add('open');handle.setAttribute('aria-expanded','true');panel.setAttribute('aria-hidden','false')}
 function hide(){rail.classList.remove('open');handle.setAttribute('aria-expanded','false');panel.setAttribute('aria-hidden','true')}
 function leave(){clearTimeout(closeTimer);closeTimer=setTimeout(hide,230)}
-function toggle(){rail.classList.contains('open')?hide():enter()}
+function toggle(){enter()}
 document.addEventListener('pointerdown',e=>{if(!rail.contains(e.target))hide()});document.addEventListener('keydown',e=>{if(e.key==='Escape')hide()});
 const curve=[[0,152000],[120,122000],[240,108000],[360,138000],[480,242000],[600,355000],[720,309000],[840,414000],[960,462000],[1080,423000],[1200,373000],[1320,258000],[1440,152000]];
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
