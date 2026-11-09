@@ -86,7 +86,7 @@
 .hhba-native-heading h3{font-size:17px;color:#1a3323;line-height:1.35;margin:6px 0}
 .hhba-native-meta{display:flex;flex-wrap:wrap;gap:16px;color:#748479;font-size:12px}
 .hhba-native-meta>span{display:inline-flex;align-items:center;gap:4px}
-.hhba-native-reason{margin:15px 0 12px;font-size:13px;line-height:1.75;color:#4b5f50}
+.hhba-native-reason{margin:15px 0 12px;font-size:14px;line-height:1.85;color:#405549;white-space:pre-line}
 .hhba-native-reason strong{color:#214e31}
 .hhba-native-apply{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:650;text-decoration:none;color:#267045}
 .hhba-native-apply:hover{text-decoration:underline}
