@@ -23,6 +23,9 @@ export type MatchedJob = {
   professional_credential_review?:{kind:string;likely_credential:string;warning:string}|null;
   score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
   recommendation_reason?:string;source_status?:'MODEL_SEARCH_REPORTED';
+  match_score?:number|null;score_basis?:string;
+  availability_status?:'OPEN_LISTED'|'CLOSED_LISTED'|'POSSIBLY_CLOSED'|'UNKNOWN';
+  availability_note?:string;availability_checked_at?:string|null;
   score_reasoning?:string;
   evidence_quality?:{skills:string;experience:string;education:string};
   ranking_version?:'HHBA_MATCH_RANKING_V2';
