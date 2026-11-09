@@ -552,9 +552,36 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
   for(const site of sites.values()){
    if(site.domain===link.domain)addSite(site);
   }
+  // The actual careers subdomain may be independently readable even when
+  // its corporate apex domain cannot be fetched.
+  addSite('https://'+link.hostname+'/');
   addSite('https://'+link.domain+'/');
   let lastReason='COMPANY_PAGE_UNOBSERVED';
   const visited=new Set();
+  // A missing employer homepage is a distinct fetch limitation, not proof
+  // the employer is invalid. Use the remaining TWO-call browser quota only
+  // for a same-corporate-domain homepage; never use a shared ATS homepage.
+  async function renderCorporateOnFailure(site){
+   if(typeof browserRenderer!=='function'||browserAttempts>=2||
+      site.domain!==link.domain||isSharedAtsDomain(site.domain))return null;
+   browserAttempts++;
+   try{
+    const rendered=await browserRenderer(site.url);
+    if(!rendered)return null;
+    const checked=inspectPublicEmployer(job,rendered,site.url);
+    if(checked.job){
+     browserRecovered++;
+     websiteCache.set(site.url,rendered);
+     sites.set(site.url,site);
+     return checked.job;
+    }
+    lastReason=checked.reason;
+   }catch{
+    browserFailures++;
+    rejections.BROWSER_UNAVAILABLE=(rejections.BROWSER_UNAVAILABLE||0)+1;
+   }
+   return null;
+  }
   async function tryPages(list,maxPages){
    let considered=0;
    for(const site of list){
@@ -574,8 +601,15 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
      const checked=inspectPublicEmployer(job,doc,site.url);
      if(checked.job){sites.set(site.url,site);return checked.job;}
      lastReason=checked.reason;
+     // Do not override an explicit brand mismatch or unproven backlink.
+     if(checked.reason==='COMPANY_PAGE_UNREADABLE'){
+      const recovered=await renderCorporateOnFailure(site);
+      if(recovered)return recovered;
+     }
     }catch{
      failures++;uncertainProviderFailure=true;lastReason='COMPANY_PAGE_UNREADABLE';
+     const recovered=await renderCorporateOnFailure(site);
+     if(recovered)return recovered;
     }
    }
    return null;
