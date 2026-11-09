@@ -4,6 +4,7 @@ import {sessionOfBearer,getUserByPhone,sha256Hex} from '../../_lib/real-auth.js'
 import {redactForModel,verifiedProfile,selectAuditedMatches,countVerifiedMainlandJobs} from '../../_lib/resume-match-core.js';
 import {fuseDomesticJobRecommendations} from '../../_lib/domestic-match-fusion.js';
 import {discoverExternalOfficialJobs,sanitizedJobIntent} from '../../_lib/domestic-search-fetch.js';
+import {explainRecommendedJobsWithDeepSeek} from '../../_lib/match-ai-explanations.js';
 
 const KIND='HHBA_RESUME_MATCH_CLOUDFLARE_V1';
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
@@ -292,7 +293,12 @@ export async function onRequest({request,env}){
  const merged=fuseDomesticJobRecommendations(
   recommended.matches,discovered.candidates,profile,options,Date.now()
  );
- return json({status:'COMPLETE',profile,matches:merged.matches,
+ // DeepSeek writes only the grounded explanation, never job links or eligibility.
+ // Even if this optional second call fails, retain the verified shortlist.
+ const explained=await explainRecommendedJobsWithDeepSeek(
+  env.HHBA_MATCH_DEEPSEEK_KEY,cleaned,merged.matches
+ );
+ return json({status:'COMPLETE',profile,matches:explained,
   matched_official_jobs:merged.counts.distinct_verified_sources,
   discovery_status:discovered.status,
   source:'中国大陆境内岗位（官方 ATS 审核与自动检索合并）',
