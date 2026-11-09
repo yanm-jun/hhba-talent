@@ -1,8 +1,8 @@
-// HHBA V4 Pro native-web experience:
-// resume -> two parallel DeepSeek Responses searches -> up to Top10 with richer reasons.
-// No internal job index, no ATS whitelists, no separate search/fetch passes, no self scoring.
+// HHBA search-first experience: DeepSeek Search -> optional Fetch -> V4 Pro ranking.
+// No ATS API, no company whitelist, no invented job links.
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
+import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -122,10 +122,10 @@ function nativeResponsePayload(result){
   matches:result.matches,
   matched_official_jobs:result.matches.length,
   native_search:result.diagnostic,
-  source:'DeepSeek V4 Pro 自主联网搜索',
+  source:'DeepSeek Search 官方接口检索 + V4 Pro 简历匹配',
   scoring:'AI 根据简历和招聘信息推荐；不代表录用概率',
   privacy:'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
-  disclaimer:(result.incomplete?'部分联网搜索未能在时间内结束，已保留找到的职位（尚未达到目标数量）；':'')+'仅中国大陆工作城市；职位开放状态、薪资、要求以原招聘网页为准。'
+  disclaimer:(result.incomplete?'本轮未达到10条或生成未完全结束，已保留有原始网址的匹配结果。':'')+'职位链接来自 DeepSeek Search 返回的公开页面；工作城市和任职资格仍应以招聘官网为准。'
  };
 }
 
@@ -271,7 +271,7 @@ export async function onRequest({request,env}){
  const url=new URL(request.url);
  const tail=url.pathname.slice('/api/match-native'.length).replace(/\/$/,'')||'/';
  if(tail==='/status'&&request.method==='GET')
-  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',formats:['pdf','docx']});
+  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'SEARCH_FIRST_V1',formats:['pdf','docx']});
  if(!enabled(env))return fail('MATCH_NOT_ENABLED',503);
  if(tail==='/provider-check'&&request.method==='GET'){
   try{
@@ -306,6 +306,7 @@ export async function onRequest({request,env}){
  if(streaming){
   const encoder=new TextEncoder();
   let ended=false;
+  const abort=new AbortController();
   const readable=new ReadableStream({
    start(controller){
     const send=(type,data)=>{
@@ -323,8 +324,8 @@ export async function onRequest({request,env}){
       if(!ended)send('progress',{stage:'waiting'});
      },12000);
      try{
-      const result=await runNativeDualMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-       options.role_hint,options.limit,{onProgress:stage=>{
+      const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
+       options.role_hint,options.limit,{signal:abort.signal,onProgress:stage=>{
         phase=stage;send('progress',{stage});
        },onPartial:matches=>send('partial',{matches})});
       console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
@@ -340,7 +341,8 @@ export async function onRequest({request,env}){
       if(!ended){ended=true;try{controller.close()}catch{}}
      }
     })();
-   }
+   },
+   cancel(){ended=true;abort.abort();}
   });
   return new Response(readable,{status:200,headers:{
    'Content-Type':'text/event-stream; charset=utf-8','Cache-Control':'private, no-store, no-transform',
@@ -350,7 +352,7 @@ export async function onRequest({request,env}){
  }
 
  try{
-  const result=await runNativeDualMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
+  const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
    options.role_hint,options.limit);
   console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
   return json(nativeResponsePayload(result));
