@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from '../functions/_lib/match-job-quality.js';
 import {searchQueries,normalizeHits,selectedJobs,searchPublicJobs,
  enrichCandidateDetails,reasonAboutJobs,runSearchFirstMatch} from '../functions/_lib/deepseek-search-match.js';
 
@@ -63,7 +64,9 @@ test('real Search API shape: parallel queries with query/count/need_content and 
  assert.equal(results.hits.length,7);
  const fetched=await enrichCandidateDetails('synthetic-secret-not-real',
   results.hits,{fetcher,maxFetch:2});
- assert.equal(fetched.fetches,0,'summary-rich jobs should never trigger unnecessary Fetch requests');
+ assert.ok(fetched.fetches>0&&fetched.fetches<=8,'sample early candidate pages without unbounded reads');
+ assert.ok(fetched.hits.every(h=>h.availability?.status==='UNKNOWN'));
+ assert.equal(fetched.excluded_closed,0);
 });
 test('short Search summaries trigger bounded Fetch API only for candidate detail URLs',async()=>{
  let fetched=0;
@@ -142,4 +145,79 @@ test('failing Search API never continues to model, so key/balance errors surface
   fetcher:async()=>{calls++;return new Response('no balance',{status:402});}
  }),/AI_PROVIDER_BALANCE_INSUFFICIENT/);
  assert.ok(calls>=2);
+});
+
+test('job availability remains unknown on Search results or on generic apply buttons',()=>{
+ const search=classifyJobAvailability({summary:'上海岗位招聘，该公司显示立即申请招聘详情。'});
+ assert.equal(search.status,'UNKNOWN');
+ const html=classifyJobAvailability({content:'职位详情、工资、工作城市等信息。申请按钮可在页面中点击。'.repeat(5)},{
+  fetched:true,checkedAt:'2026-11-10T00:00:00Z'});
+ assert.equal(html.status,'UNKNOWN','generic Apply buttons are not proof that application works');
+ assert.equal(html.checked_at,'2026-11-10T00:00:00Z');
+});
+test('explicit closed job on fetched page is rejected, but unknown job remains eligible',()=>{
+ const closed=classifyJobAvailability({content:'该职位已关闭，不再接受申请。其他招聘页面内容仅供参考。'.repeat(6)},{
+  fetched:true});
+ const open=classifyJobAvailability({content:'本职位正在招聘，可在官网查看要求。此岗位目前正在招聘，实际投递以官网为准。'.repeat(5)},{
+  fetched:true});
+ assert.equal(closed.status,'CLOSED_LISTED');
+ assert.equal(open.status,'OPEN_LISTED');
+ assert.ok(!isRecommendationEligible({availability:closed}));
+ assert.ok(isRecommendationEligible({availability:open}));
+ assert.ok(isRecommendationEligible({availability:{status:'UNKNOWN'}}));
+ const suspect=classifyJobAvailability({summary:'该职位已关闭。'});
+ assert.equal(suspect.status,'POSSIBLY_CLOSED');
+ assert.ok(!isRecommendationEligible({availability:suspect}));
+});
+test('bounded parallel Fetch verifies status, removes known closed postings, keeps unknowns',async()=>{
+ const hits=normalizeHits([searchResults]);
+ let calls=0,parallel=0,peak=0;
+ const fetcher=async(url,opts)=>{
+  assert.ok(url.endsWith('/v1/tools/fetch'));
+  const id=Number(JSON.parse(opts.body).url.match(/-(\d+)-2026$/)?.[1]);
+  calls++;parallel++;peak=Math.max(peak,parallel);
+  await new Promise(resolve=>setTimeout(resolve,6));parallel--;
+  const content=id===1?'该职位已关闭，招聘结束，不再接受申请。'.repeat(7):
+    id===2?'本职位正在招聘，我们接受投递，具体岗位要求以官网为准。'.repeat(8):
+    '有关上海招聘岗位的职责、经验和待遇介绍，但未显示正式申请状态。'.repeat(8);
+  return new Response(JSON.stringify({content}),{status:200});
+ };
+ const result=await enrichCandidateDetails('synthetic-secret-not-real',hits,{fetcher,maxFetch:4});
+ assert.equal(calls,4);assert.equal(peak,4);
+ assert.equal(result.excluded_closed,1);
+ assert.equal(result.hits.length,11);
+ assert.equal(result.hits[0].availability.status,'OPEN_LISTED');
+ assert.equal(result.hits[1].availability.status,'UNKNOWN');
+ assert.ok(!result.hits.some(h=>h.url===posts[0].url));
+});
+test('availability filtering is applied even if model mentions a closed candidate ID',()=>{
+ const hits=normalizeHits([searchResults]);
+ hits[0].availability={status:'CLOSED_LISTED',evidence:'职位已关闭',checked_at:null};
+ const rows=resultRows(['j1','j2']);
+ rows.jobs[0].match_score=95;rows.jobs[0].score_basis='简历对应目标岗位职责，有项目执行经验，工作城市匹配，但需要确认技术要求。';
+ rows.jobs[1].match_score=80;rows.jobs[1].score_basis='有项目分析和业务培训的经历，符合岗位需求，但行业知识仍须加强。';
+ const picked=selectedJobs(JSON.stringify(rows),hits,10);
+ assert.equal(picked.length,1);assert.equal(picked[0].id,'search-j2');
+ assert.equal(picked[0].match_score,80);
+ assert.equal(picked[0].availability_status,'UNKNOWN');
+});
+test('score is model-reported fit, never an Offer probability, and must include explanation',()=>{
+ assert.equal(normalizeMatchScore(86,'对应企业经营和岗位职责经历，专业方向较为匹配。'),86);
+ assert.equal(normalizeMatchScore('75','有门店管理与区域业务培训履历，地点符合要求。'),75);
+ assert.equal(normalizeMatchScore(102,'证据充足且工作经验相符，但分数越界不能展示。'),null);
+ assert.equal(normalizeMatchScore(88,''),null);
+ assert.equal(normalizeMatchScore('80%','很多经验与要求契合，但需要新的岗位资格核验。'),null);
+ assert.equal(normalizeMatchScore(88.5,'技能与岗位要求相符，有真实经历证据可以支持。'),null);
+ const ranked=sortByMatchScore([{match_score:63},{match_score:null},{match_score:91}]);
+ assert.deepEqual(ranked.map(j=>j.match_score),[91,63,null]);
+});
+test('Score and recruitment status appear in compact modal, not admission probability',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const jsx=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
+ const css=await readFile(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
+ assert.match(jsx,/简历适配分/);
+ assert.match(jsx,/不是录用概率/);
+ assert.match(jsx,/投递状态未确认/);
+ assert.match(jsx,/网页显示在招/);
+ assert.match(css,/hhba-native-score-basis/);
 });
