@@ -190,3 +190,35 @@ test('Realistic Tencent, Xiaomi, Anker career subpages reveal only fetched same-
  assert.ok(!result.opportunities.some(x=>x.url.includes('jobspam')||x.url.includes('zhipin.com')));
  assert.ok(mock.calls.filter(x=>x.endpoint==='fetch').length<=6);
 });
+
+test('Direct employer recruitment subpages are fetched and kept as useful navigation links',async()=>{
+ const paths=[
+  ['https://careers.tencent.com/jobopportunity.html','腾讯'],
+  ['https://hr.xiaomi.com/website/campus.html','小米'],
+  ['https://career.anker.com.cn/universities/recruitment/','安克创新']
+ ];
+ const pages=Object.fromEntries(paths.map(([url,brand])=>[url,homepage(brand)]));
+ const mock=makeProvider({results:paths.map(([url,brand])=>({
+  url,title:brand+' 招聘官网',snippet:'内容运营方向 企业招聘入口'
+ })),pages});
+ const r=await discoverOfficialRecruitmentLinks('内容运营',key,{fetcher:mock.fetcher,now});
+ assert.equal(r.opportunities.length,3);
+ assert.deepEqual(new Set(r.opportunities.map(x=>x.url)),
+  new Set(paths.map(x=>x[0])));
+ assert.ok(r.opportunities.every(x=>x.kind==='CAREERS_ENTRY'&&x.reference_score===undefined));
+ assert.ok(mock.calls.filter(x=>x.endpoint==='fetch').length<=6);
+});
+test('Real title format strips recruiting portal boilerplate from employer names',async()=>{
+ const url='https://hr.game.163.com/';
+ const mock=makeProvider({results:[{url,title:'网易游戏 . 招聘门户',
+  snippet:'内容运营 招聘 企业官网'}],pages:{[url]:{
+  title:'网易游戏 . 招聘门户',
+  content:'# 网易游戏\n社会招聘｜校园招聘｜岗位\n'+
+   ('欢迎加入网易游戏，了解公开招聘岗位和申请入口。').repeat(12)
+ }}});
+ const result=await discoverOfficialRecruitmentLinks('内容运营',key,{fetcher:mock.fetcher,now});
+ assert.equal(result.opportunities.length,1);
+ assert.equal(result.opportunities[0].company,'网易游戏');
+ assert.equal(result.opportunities[0].kind,'CAREERS_ENTRY');
+ assert.equal(result.opportunities[0].hiring_status,'UNCONFIRMED');
+});
