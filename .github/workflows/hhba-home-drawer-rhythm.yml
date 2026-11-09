@@ -23,6 +23,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install frontend dependencies for actual TypeScript build check
+        working-directory: apps/web
+        run: npm ci
+      - name: Verify frontend compiles
+        working-directory: apps/web
+        run: npx tsc -b
       - name: Verify homepage hover panel and uninterrupted Beijing-time counts
         run: |
           node --test apps/web/scripts/home-hover-drawer.contract.test.mjs

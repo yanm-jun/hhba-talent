@@ -3,6 +3,8 @@ import { Activity, Award, ChevronLeft, Clock3, Send, UsersRound, X } from 'lucid
 import { previewMetricsAt } from './homeLiveMetricsPreview';
 import '../styles/home-live-drawer.css';
 
+const show = (value: number): string => value.toLocaleString('en-US');
+
 function usePreviewMetrics() {
   const [metrics,setMetrics]=useState(()=>previewMetricsAt(Date.now()));
   useEffect(()=>{
