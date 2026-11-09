@@ -16,43 +16,48 @@ const jd=(city='')=>[
 ].join('\n');
 const tool=(name,args,id)=>({type:'function_call',name,arguments:JSON.stringify(args),call_id:id});
 
-test('Browser fallback disabled by default and requires preview-specific credentials',()=>{
- const vars={HHBA_AUTH_ROLLOUT:'preview',
-  HHBA_BROWSER_ACCOUNT_ID:'0123456789abcdef0123456789abcdef',
-  HHBA_BROWSER_RENDER_TOKEN:'synthetic-token-for-unit-test'};
+test('Browser Run is never used outside explicit preview and a real binding',()=>{
+ const browserBinding={quickAction:async()=>Response.json({})};
+ const vars={HHBA_AUTH_ROLLOUT:'preview',BROWSER:browserBinding};
  assert.equal(previewJobBrowserRenderer(vars),null);
  assert.equal(previewJobBrowserRenderer({...vars,HHBA_AUTH_ROLLOUT:'production',
   HHBA_MATCH_V8_BROWSER_FALLBACK_ENABLED:'1'}),null);
  assert.equal(previewJobBrowserRenderer({...vars,HHBA_MATCH_V8_BROWSER_FALLBACK_ENABLED:'1',
-  HHBA_BROWSER_RENDER_TOKEN:''}),null);
+  BROWSER:{}}),null);
  assert.equal(typeof previewJobBrowserRenderer({...vars,
   HHBA_MATCH_V8_BROWSER_FALLBACK_ENABLED:'1'}),'function');
 });
 
-test('Preview browser reader only calls the fixed Cloudflare endpoint with safe bounded URL and no cookies',async()=>{
- const calls=[],env={HHBA_AUTH_ROLLOUT:'preview',HHBA_MATCH_V8_BROWSER_FALLBACK_ENABLED:'1',
-  HHBA_BROWSER_ACCOUNT_ID:'0123456789abcdef0123456789abcdef',
-  HHBA_BROWSER_RENDER_TOKEN:'synthetic-token-for-unit-test'};
- const fetcher=async(endpoint,options)=>{
-  calls.push({endpoint,method:options.method,redirect:options.redirect,
-   headers:options.headers,body:JSON.parse(options.body)});
-  return Response.json({success:true,result:{markdown:'---\ntitle: "内容运营 | 云禾文化有限公司"\n---\n'+jd('北京'),
-   content:'<html><main>职位信息</main></html>'}});
- };
- const browser=previewJobBrowserRenderer(env,{fetcher});
+test('Native binding receives bounded public URL and no credentials or executable script',async()=>{
+ const calls=[];
+ const env={HHBA_AUTH_ROLLOUT:'preview',HHBA_MATCH_V8_BROWSER_FALLBACK_ENABLED:'1',
+  BROWSER:{quickAction:async(action,options)=>{
+   calls.push({action,options});
+   return Response.json({success:true,result:{
+    markdown:'---\ntitle: "内容运营 | 云禾文化有限公司"\n---\n'+jd('北京'),
+    content:'<html><main>职位信息</main></html>'
+   }});
+  }}};
+ const browser=previewJobBrowserRenderer(env);
  await assert.rejects(()=>browser('http://localhost/jobs/1234'),/BROWSER_BAD_URL/);
  await assert.rejects(()=>browser('https://127.0.0.1/jobs/1234'),/BROWSER_BAD_URL/);
+ await assert.rejects(()=>browser('https://careers.yunhe.cn:8443/jobs/1234'),/BROWSER_BAD_URL/);
  const result=await browser(job);
  assert.equal(result.title,'内容运营 | 云禾文化有限公司');
  assert.match(result.content,/工作地点：北京/);
  assert.equal(calls.length,1);
- assert.equal(calls[0].endpoint,
-  'https://api.cloudflare.com/client/v4/accounts/0123456789abcdef0123456789abcdef/browser-rendering/snapshot?cacheTTL=0');
- assert.equal(calls[0].method,'POST');
- assert.equal(calls[0].redirect,'manual');
- assert.deepEqual(calls[0].body.formats,['content','markdown']);
- assert.equal(calls[0].body.url,job);
- assert.equal(calls[0].body.cookies,undefined);
+ assert.equal(calls[0].action,'snapshot');
+ assert.deepEqual(calls[0].options.formats,['content','markdown']);
+ assert.equal(calls[0].options.url,job);
+ assert.equal(calls[0].options.cookies,undefined);
+ assert.equal(calls[0].options.addScriptTag,undefined);
+ assert.equal(calls[0].options.authenticate,undefined);
+});
+
+test('Native binding returns empty only for insufficient rendered page text',async()=>{
+ const env={HHBA_AUTH_ROLLOUT:'preview',HHBA_MATCH_V8_BROWSER_FALLBACK_ENABLED:'1',
+  BROWSER:{quickAction:async()=>({result:{markdown:'Empty',content:''},success:true})}};
+ assert.equal(await previewJobBrowserRenderer(env)(job),null);
 });
 
 test('One-render preview rescues only independently fetched role-city evidence and flags unknown browser cost',async()=>{
