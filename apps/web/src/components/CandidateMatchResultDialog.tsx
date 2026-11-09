@@ -3,7 +3,7 @@ import {createPortal} from 'react-dom';
 import {ArrowLeft,ArrowUpRight,BriefcaseBusiness,Building2,MapPin,Wallet,CheckCircle2,X} from 'lucide-react';
 import {Link} from '../router';
 import {safeOfficialJobUrl} from '../services/liveRecruitment';
-import {safeExternalJobApplicationUrl,type MatchResponse,type MatchedJob} from '../services/resumeMatch';
+import {safeExternalJobApplicationUrl,safeOfficialNavigationUrl,type MatchResponse,type MatchedJob,type OfficialNavigationOpportunity} from '../services/resumeMatch';
 import '../styles/resume-match-dialog.css';
 
 // Chinese labels are presentation-only: never replace or invent the official job title.
@@ -83,10 +83,32 @@ function Row({item,onOpen}:{item:MatchedJob;onOpen:()=>void}){
   <ArrowUpRight className="hhba-match-job-arrow" size={17} aria-hidden="true"/>
  </button>;
 }
+function OfficialLinkRow({item,url}:{item:OfficialNavigationOpportunity;url:string}){
+ const direct=item.kind==='JOB_DETAIL';
+ return <a className="hhba-match-job hhba-match-navigation-row" href={url}
+  target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true"
+  aria-label={'前往'+item.company+(direct?'相关岗位链接':'招聘入口')+'，在企业网站核实'}>
+  <span className="hhba-match-job-company-mark" aria-hidden="true"><Building2 size={19}/></span>
+  <span className="hhba-match-job-main">
+   <strong className="hhba-match-job-company">{item.company}</strong>
+   <span className="hhba-match-job-role">{direct?('相关岗位 · '+item.role):'企业官方招聘入口'}</span>
+   <span className="hhba-match-job-facts">
+    <span>{direct?'具体岗位链接':'招聘入口'}</span>
+    <span>{item.workplace}</span>
+    <span>资格及在招状态待官网确认</span>
+   </span>
+  </span>
+  <span className="hhba-match-navigation-action">直达官网</span>
+  <ArrowUpRight className="hhba-match-job-arrow" size={17} aria-hidden="true"/>
+ </a>;
+}
 export function CandidateMatchResultDialog({result,onClose}:{result:MatchResponse;onClose:()=>void}){
  const dialogRef=useRef<HTMLDivElement|null>(null);
  const [selectedId,setSelectedId]=useState<string|null>(null);
  const visibleMatches=result.matches.filter(job=>chineseJobTitle(job)!==null);
+ const officialLinks=(result.opportunities||[]).map(item=>({
+  item,url:safeOfficialNavigationUrl(item)
+ })).filter((entry):entry is {item:OfficialNavigationOpportunity;url:string}=>Boolean(entry.url));
  const selected=visibleMatches.find(x=>x.id===selectedId)||null;
  useEffect(()=>{
   const previous=document.body.style.overflow;
@@ -115,7 +137,7 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
     aria-labelledby="hhba-match-dialog-title" ref={dialogRef} tabIndex={-1} onKeyDown={onKeyDown}>
     <header className="hhba-match-modal-head">
      <div className="hhba-match-modal-brand"><span className="hhba-match-modal-symbol"><BriefcaseBusiness size={19}/></span>
-      <div><strong>HHBA 智能岗位匹配</strong><small>让合适的机会，与你更近一步</small></div>
+      <div><strong>HHBA 智能招聘导航</strong><small>发现机会，直达企业招聘官网</small></div>
      </div>
      <button type="button" className="hhba-match-modal-close" aria-label="关闭岗位推荐" onClick={onClose}><X size={19}/></button>
     </header>
@@ -147,15 +169,24 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
       </section>
      </>:<>
       <div className="hhba-match-intro">
-       <span className="hhba-match-eyebrow">为您精选的岗位机会</span>
-       <h2 id="hhba-match-dialog-title">根据您的简历，为您匹配合适的工作</h2>
-       <p>综合您的学历、工作经验、专业技能与求职方向，筛选中国大陆境内的招聘岗位。</p>
+       <span className="hhba-match-eyebrow">招聘机会 · 官方链接直达</span>
+       <h2 id="hhba-match-dialog-title">找到相关企业，直接去官网查看</h2>
+       <p>优先展示与你的求职方向相关的企业招聘入口和岗位链接。公开招聘链接不是已确认符合资格的职位，具体要求请在官网查看。</p>
       </div>
-      <div className="hhba-match-list-heading"><strong>推荐岗位 <span>{visibleMatches.length?('Top '+visibleMatches.length):'暂无'}</span></strong><small>按参考匹配度排序</small></div>
-      {visibleMatches.length?<div className="hhba-match-job-list">
+      {officialLinks.length>0&&<>
+       <div className="hhba-match-list-heading"><strong>企业招聘链接 <span>{officialLinks.length} 个</span></strong><small>点击直接前往官网</small></div>
+       <div className="hhba-match-job-list" aria-label="企业官方招聘链接">
+        {officialLinks.map(({item,url})=><OfficialLinkRow key={url} item={item} url={url}/>)}
+       </div>
+       <p className="hhba-match-link-notice">这些是招聘导航链接，不代表该企业当前有与你完全符合的在招职位；点击后请筛选中国大陆岗位并核实学历、经验、城市和申请要求。</p>
+      </>}
+      {visibleMatches.length>0&&
+       <div className="hhba-match-list-heading hhba-match-verified-heading"><strong>已核验岗位 <span>{visibleMatches.length} 个</span></strong><small>按参考相关度排序</small></div>}
+      {visibleMatches.length>0&&<div className="hhba-match-job-list">
        {visibleMatches.map(job=><Row key={job.id} item={job} onOpen={()=>setSelectedId(job.id)}/>)}
-      </div>:<div className="hhba-match-empty"><Building2 size={23}/><h3>目前没有通过岗位条件核验的推荐</h3>
-       <p>不会用境外岗位、经验要求不符或无法核验的职位凑满十条。您可以返回调整求职方向。</p></div>}
+      </div>}
+      {!officialLinks.length&&!visibleMatches.length&&<div className="hhba-match-empty"><Building2 size={23}/><h3>暂未找到可核验的企业招聘入口</h3>
+       <p>不会用招聘聚合站、境外工作或未经确认的链接凑满十条。你可以修改岗位方向再次查找。</p></div>}
       {Boolean(result.qualification_reviews?.length)&&<section className="hhba-match-review" aria-label="需要补充资料的岗位">
        <h3>另外 {result.qualification_reviews?.length} 个岗位需要补充资料</h3>
        <p>这些不是已确认符合条件的推荐，不计入 Top 10。简历没有写明的条件不代表您一定不符合。</p>
@@ -166,7 +197,7 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
         </div>)}</div>
        <button type="button" onClick={onClose}>返回补充简历信息</button>
       </section>}
-      <p className="hhba-match-disclaimer">仅推荐中国大陆岗位。匹配分数是参考相关度，不是录用成功率；实际招聘状态以企业官网为准。</p>
+      <p className="hhba-match-disclaimer">仅提供公开企业招聘导航与独立核验的国内岗位。招聘入口不代表职位符合资格，也不显示匹配分数或录用概率；实际情况请以企业官方页面为准。</p>
      </>}
     </div>
     <footer className="hhba-match-modal-foot">
