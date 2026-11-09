@@ -204,23 +204,39 @@ export async function onRequest({request,env}){
   const encoder=new TextEncoder();
   let ended=false;
   const readable=new ReadableStream({
-   async start(controller){
+   start(controller){
     const send=(type,data)=>{
      if(ended)return;
      try{controller.enqueue(encoder.encode('event: '+type+'\ndata: '+JSON.stringify(data)+'\n\n'))}
      catch{ended=true;}
     };
     send('progress',{stage:'preparing'});
-    try{
-     const result=await runNativeJobMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-      options.role_hint,options.limit,{onProgress:stage=>send('progress',{stage})});
-     console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
-     send('complete',nativeResponsePayload(result));
-    }catch(e){
-     const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
-     console.warn('HHBA_MATCH_NATIVE_ERROR',code);
-     send('failure',{error:code});
-    }finally{if(!ended){ended=true;try{controller.close()}catch{}}}
+    // The stream starts immediately; do not make ReadableStream.start await
+    // the full DeepSeek model/search result before the browser can read.
+    void (async()=>{
+     const started=Date.now();
+     let phase='preparing';
+     const heartbeat=setInterval(()=>{
+      if(!ended)send('progress',{stage:'waiting'});
+     },12000);
+     try{
+      const result=await runNativeJobMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
+       options.role_hint,options.limit,{onProgress:stage=>{
+        phase=stage;send('progress',{stage});
+       }});
+      console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
+      send('complete',nativeResponsePayload(result));
+     }catch(e){
+      const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
+      console.warn('HHBA_MATCH_NATIVE_ERROR',JSON.stringify({
+       code,phase,elapsed_ms:Date.now()-started
+      }));
+      send('failure',{error:code});
+     }finally{
+      clearInterval(heartbeat);
+      if(!ended){ended=true;try{controller.close()}catch{}}
+     }
+    })();
    }
   });
   return new Response(readable,{status:200,headers:{
