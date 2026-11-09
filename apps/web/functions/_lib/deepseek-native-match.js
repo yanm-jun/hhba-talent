@@ -3,7 +3,19 @@ import {isMainlandJobLocation} from './mainland-job-location.js';
 const DIRECT_JOB=/(?:job|jobs|position|career|recruit|vacanc|apply|detail|post|advertisement|talent|jobid|job_id|positionid|jobadid|jobunionid|职位|招聘)/i;
 const FOREIGN_TITLES=/(?:驻外|海外岗位|境外工作|赴日|赴美|海外派驻|global remote|work abroad|overseas position)/i;
 const FORBIDDEN_HOST=/(?:^|\.)(?:localhost|local|internal|example|invalid|test)$/i;
-const trim=(v,max)=>typeof v==='string'?v.replace(/[\u0000-\u001f]/g,' ').trim().slice(0,max):'';
+// Search snippets sometimes contain encoded numeric entities such as &#x610F;.
+// Decode them as plain text, NEVER as HTML; React handles output escaping.
+export function decodeSearchText(value){
+ if(typeof value!=='string')return '';
+ return value.replace(/&(?:#x([0-9a-f]{1,7})|#([0-9]{1,8})|(amp|lt|gt|quot|apos|nbsp));/gi,
+  (whole,hex,dec,named)=>{
+   if(named)return ({amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",nbsp:' '})[named.toLowerCase()]||whole;
+   const cp=Number.parseInt(hex||dec,hex?16:10);
+   return cp>0&&cp<=0x10ffff&&(cp<0xd800||cp>0xdfff)?
+    String.fromCodePoint(cp):whole;
+  });
+}
+const trim=(v,max)=>decodeSearchText(v).replace(/[\u0000-\u001f]/g,' ').replace(/\s+/g,' ').trim().slice(0,max);
 export function safeJobDetailLink(raw){
  if(typeof raw!=='string'||raw.length>1400)return null;
  try{
