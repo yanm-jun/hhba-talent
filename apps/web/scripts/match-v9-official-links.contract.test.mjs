@@ -155,3 +155,38 @@ test('All three career intents get a fair Search and company Fetch opportunity',
  assert.ok(result.opportunities.every(x=>
   x.qualification_status==='NOT_CHECKED'&&x.hiring_status==='UNCONFIRMED'));
 });
+
+test('Realistic Tencent, Xiaomi, Anker career subpages reveal only fetched same-host homepages',async()=>{
+ const sourceLinks=[
+  'https://careers.tencent.com/jobopportunity.html',
+  'https://hr.xiaomi.com/website/campus.html',
+  'https://career.anker.com.cn/universities/recruitment/'
+ ];
+ const pages={
+  'https://careers.tencent.com/':homepage('腾讯'),
+  'https://hr.xiaomi.com/':homepage('小米'),
+  'https://career.anker.com.cn/':homepage('安克创新')
+ };
+ const mock=makeProvider({results:[
+  {url:sourceLinks[0],title:'社会招聘 | 腾讯招聘',snippet:'公开社会招聘'},
+  {url:sourceLinks[1],title:'校园招聘 | 小米招聘',snippet:'企业招聘项目'},
+  {url:sourceLinks[2],title:'安克创新招聘项目',snippet:'加入安克创新'},
+  {url:'https://www.zhipin.com/job_detail/123.html',title:'内容运营 招聘',snippet:'聚合职位'},
+  {url:'https://jobspam.cn/careers',title:'招聘网站 全职找工作',snippet:'全国招聘平台'}
+ ],pages:{
+  ...pages,
+  'https://jobspam.cn/':{title:'全国求职招聘网站',
+   content:('找工作、附近工作、招聘平台、求职招聘平台。').repeat(12)}
+ }});
+ const result=await discoverOfficialRecruitmentLinks('内容运营',key,{
+  fetcher:mock.fetcher,now});
+ const links=result.opportunities.filter(x=>x.kind==='CAREERS_ENTRY');
+ assert.deepEqual(new Set(links.map(x=>x.url)),
+  new Set(Object.keys(pages)));
+ assert.equal(links.length,3);
+ assert.equal(result.quality_status,'VERIFIED_SOURCE_LINKS');
+ assert.ok(links.every(x=>x.qualification_status==='NOT_CHECKED'));
+ assert.ok(!result.opportunities.some(x=>sourceLinks.includes(x.url)));
+ assert.ok(!result.opportunities.some(x=>x.url.includes('jobspam')||x.url.includes('zhipin.com')));
+ assert.ok(mock.calls.filter(x=>x.endpoint==='fetch').length<=6);
+});
