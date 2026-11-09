@@ -4,6 +4,7 @@
 // 3) DeepSeek V4 Pro selects/justifies linked candidates, never invents links.
 import {safeJobDetailLink,decodeSearchText} from './deepseek-native-match.js';
 import {isMainlandJobLocation} from './mainland-job-location.js';
+import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from './match-job-quality.js';
 
 const BASE='https://api.deepseek.com';
 const foreign=/(?:香港|澳门|澳門|台湾|臺灣|日本|东京|大阪|新加坡|美国|英国|越南|海外|境外|驻外|overseas|hong kong|tokyo|singapore|remote overseas)/i;
@@ -41,7 +42,8 @@ export function normalizeHits(searchResponses,max=28){
    const key=url.replace(/[?&](?:utm_[^=&]+|from|source)=[^&]*/gi,'').replace(/[?&]$/,'');
    const prev=byUrl.get(key);
    const row={id:'j'+(byUrl.size+1),title,url,summary,snippet,
-    source:clean(hit?.site_name,80),date:hit?.date||null,content:''};
+    source:clean(hit?.site_name,80),date:hit?.date||null,content:'',
+    availability:classifyJobAvailability({summary,snippet})};
    if(!prev||summary.length>prev.summary.length)byUrl.set(key,{...row,id:prev?.id||row.id});
   }
  }
@@ -93,22 +95,34 @@ export async function searchPublicJobs(key,text,roleHint,{
   candidate_links:hits.length,search_failures:errors.length}};
 }
 export async function enrichCandidateDetails(key,hits,{
- fetcher=fetch,signal=null,onProgress=()=>{},maxFetch=4,fetchTimeoutMs=6500
+ fetcher=fetch,signal=null,onProgress=()=>{},maxFetch=8,fetchTimeoutMs=3200
 }={}){
- const needs=hits.filter(h=>h.summary.length<130).slice(0,maxFetch);
- if(!needs.length)return {hits,fetches:0,fetch_ms:0};
+ // Eight bounded parallel Fetch calls. Prioritize any Search result explicitly
+ // suggesting closure; then earliest candidates the model is most likely to rank.
+ // Do not make unknown Search snippets appear "confirmed open".
+ const suspicious=hits.filter(h=>h.availability?.status==='POSSIBLY_CLOSED');
+ const short=hits.filter(h=>h.summary.length<130);
+ const needs=[...new Set([...suspicious,...short,...hits].map(h=>h.id))]
+  .map(id=>hits.find(h=>h.id===id)).filter(Boolean).slice(0,maxFetch);
+ if(!needs.length)return {hits,fetches:0,fetch_ms:0,excluded_closed:0};
  const start=Date.now();onProgress('reading');
  let success=0;
  const detail=await Promise.all(needs.map(async hit=>{
   try{
    const d=await providerJson(fetcher,key,'/v1/tools/fetch',{url:hit.url},fetchTimeoutMs,signal);
-   const content=clean(d?.content,1800);
-   if(content.length>80){success++;return {...hit,content};}
-  }catch{/* The Search result is still usable without a Fetch response. */}
+   const content=clean(d?.content,2600);
+   if(content.length>80){
+    success++;
+    return {...hit,content,availability:classifyJobAvailability({content},{fetched:true})};
+   }
+  }catch{/* Missing Fetch result is unknown, not a negative conclusion. */}
   return hit;
  }));
  const map=new Map(detail.map(hit=>[hit.id,hit]));
- return {hits:hits.map(hit=>map.get(hit.id)||hit),fetches:success,fetch_ms:Date.now()-start};
+ const checked=hits.map(hit=>map.get(hit.id)||hit);
+ const eligible=checked.filter(isRecommendationEligible);
+ return {hits:eligible,fetches:success,fetch_ms:Date.now()-start,
+  excluded_closed:checked.length-eligible.length};
 }
 function closedRows(text){
  const ix=text.search(/"jobs"\s*:/),start=ix<0?-1:text.indexOf('[',ix);
@@ -138,11 +152,17 @@ export function selectedJobs(text,hits,limit=10){
   const location=clean(row.location,90),reason=clean(row.reason,650),
    title=clean(row.title,110),company=clean(row.company,100);
   if(!isMainlandJobLocation(location)||!reason||!company||!title||foreign.test(title))continue;
+  if(!isRecommendationEligible(evidence))continue;
   const signature=(company+'|'+title).toLowerCase().replace(/\s/g,'');
   if(seen.has(signature)||seen.has(evidence.url))continue;
   seen.add(signature);seen.add(evidence.url);
   const url=evidence.url; // CRITICAL: source URL comes from Search, NEVER model text.
+  const match_score=normalizeMatchScore(row.match_score??row.score,row.score_basis);
   found.push({id:'search-'+evidence.id,company,title,title_zh:title,location,
+   match_score,score_basis:match_score===null?'':clean(row.score_basis,240),
+   availability_status:evidence.availability?.status||'UNKNOWN',
+   availability_note:evidence.availability?.evidence||'投递状态待确认',
+   availability_checked_at:evidence.availability?.checked_at||null,
    official_url:url,platform:'deepseek-search',source:new URL(url).hostname,
    source_type:'站外官方招聘',source_status:'MODEL_SEARCH_REPORTED',
    application_status:'NEEDS_OFFICIAL_CONFIRMATION',remote:false,reference_score:0,
@@ -154,7 +174,7 @@ export function selectedJobs(text,hits,limit=10){
   });
   if(found.length>=limit)break;
  }
- return found;
+ return sortByMatchScore(found);
 }
 function outputFromResponse(data){
  return (data?.output||[]).filter(v=>v?.type==='message').flatMap(v=>
@@ -165,15 +185,18 @@ export async function reasonAboutJobs(key,resume,hits,limit,{
 }={}){
  const start=Date.now();onProgress('writing');
  const cards=hits.slice(0,24).map(h=>({
-  id:h.id,title:h.title,url:h.url,description:(h.content||h.summary||h.snippet).slice(0,800)
+  id:h.id,title:h.title,url:h.url,description:(h.content||h.summary||h.snippet).slice(0,800),
+  availability:h.availability?.status||'UNKNOWN',
+  availability_note:h.availability?.evidence||'投递状态待确认'
  }));
  const instructions=[
   '你是 HHBA 求职匹配助手。你只能从提供的真实网页搜索候选中推荐职位，绝不能添加新的网页、编造候选 ID。',
   '认真阅读脱敏简历和每条候选职位的摘要。选择实际工作城市位于中国大陆且能合理匹配的最多'+limit+'条不同企业、不同岗位。',
   '若搜索结果没有明确工作地点或职位内容，只能不选该条。不要猜城市、公司或岗位硬性要求；不可虚构学历或经历。',
-  '尽可能返回十个真实职位，但不为凑数捏造；按照你认为的适合程度排序。',
+  '优先选择网页有明确招聘开放证据的岗位；UNKNOWN不能写成可投递，CLOSED_LISTED和POSSIBLY_CLOSED不得推荐。尽可能返回十个真实职位，不为凑数捏造。',
+  '为每条岗位给出0～100整数的「简历适配分」match_score，依据已有简历和招聘内容评估岗位方向、工作经验、技能与城市偏好，不代表录用概率。分数需有独立的score_basis（至少30字）解释具体加分与不足；证据不充分时match_score填null、score_basis为空。',
   '每个为什么推荐的理由写120～180字，结合简历的真实经历成果与职位内容、岗位职责映射、必要的差距提示；避免套话，不能保证录用。',
-  '输出 JSON 对象，结构：{"jobs":[{"id":"候选id，如j1","company":"岗位原网页中企业","title":"岗位","location":"中国大陆实际工作城市","reason":"120-180字的真实解释","job_basis":"网页明确的岗位职责要点","salary":""}]}。',
+  '输出 JSON 对象，结构：{"jobs":[{"id":"候选id，如j1","company":"岗位原网页中企业","title":"岗位","location":"中国大陆实际工作城市","match_score":85,"score_basis":"根据真实经历和明确职位要求的简明评分解释","reason":"120-180字的真实解释","job_basis":"网页明确的岗位职责要点","salary":""}]}。',
   '优先把最有把握的一条完整对象尽早输出，后续逐条补齐。不得在JSON以外输出文字。'
  ].join('\n');
  const payload={
@@ -248,5 +271,6 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
    visible_jobs:ranked.matches.length,discarded:search.diagnostic.candidate_links-ranked.matches.length,
    elapsed_ms:Date.now()-start,search_ms:search.diagnostic.search_ms,
    fetch_ms:enriched.fetch_ms,model_ms:ranked.model_ms,
-   candidate_links:search.diagnostic.candidate_links,mode:'search-first'}};
+   candidate_links:search.diagnostic.candidate_links,
+   excluded_closed:enriched.excluded_closed,checked_pages:enriched.fetches,mode:'search-first'}};
 }
