@@ -34,9 +34,10 @@ test('remove only the redundant home company discovery banner, without deleting 
  const market=home.indexOf('<UnifiedJobMarket compact/>');
  const talent=home.indexOf('className="home-talent-service-link"');
  const marquee=home.indexOf('<HomeCompanyMarquee/>');
- const banner=home.indexOf('<HomePeopleBanner/>');
- assert(market>=0&&talent>market&&marquee>talent&&banner>marquee,
-  'After banner removal, the market must flow directly into talent service, followed by the domestic company marquee');
+ assert(market>=0&&talent>market&&marquee>talent,
+  'Market must flow to talent service and the domestic company marquee');
+ assert.equal(home.includes('HomePeopleBanner'),false,
+  'The unrelated lower-right photo banner was intentionally removed');
  assert.match(home,/to="\/talent-service"/);
  assert.match(home,/className="home-match-promo"/);
  assert.match(home,/title="我要应聘"/);
