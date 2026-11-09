@@ -92,18 +92,33 @@ function easedCurve(t:number, points:ReadonlyArray<readonly [number,number]>):nu
 }
 function activity(epochMs:number):number {
   const clock=beijingParts(epochMs);
-  const mode=chineseDateMode(clock.day);
   const hour=clock.hour+clock.minute/60+clock.second/3600;
-  const base=easedCurve(hour,mode==='workday'?workdayPoints:nonWorkPoints);
-  const monthly=seasonalWeight[clock.month-1];
-  const schedule=mode==='holiday'?0.73:mode==='weekend'?0.88:1;
-  return base*monthly*schedule;
+  // Blend adjacent calendar profiles around midnight. The same blended pair
+  // is used on both sides of 00:00, so weekends, months, and holidays do not
+  // cause a sudden numerical jump when the calendar date changes.
+  const forDate=(day:string):number=>{
+    const mode=chineseDateMode(day);
+    const monthly=seasonalWeight[Number(day.slice(5,7))-1];
+    const schedule=mode==='holiday'?0.73:mode==='weekend'?0.88:1;
+    const shape=easedCurve(hour,mode==='workday'?workdayPoints:nonWorkPoints);
+    return shape*monthly*schedule;
+  };
+  const serial=asDayNumber(clock.day);
+  const current=forDate(clock.day);
+  const smooth=(t:number)=>{const x=clamp(t,0,1);return x*x*(3-2*x);};
+  if(hour<12){
+    const previous=forDate(asDayString(serial-1));
+    return (previous+current)/2*(1-smooth(hour/12))+current*smooth(hour/12);
+  }
+  const next=forDate(asDayString(serial+1));
+  return current*(1-smooth((hour-12)/12))+(current+next)/2*smooth((hour-12)/12);
 }
 function baseHeat(ms:number):number {
-  return 103000+278000*activity(ms);
+  // Keep a natural low at night without ever flattening at the 100k floor.
+  return 111000+302000*activity(ms);
 }
 function baseActive(ms:number):number {
-  return 2200+11800*activity(ms);
+  return 1750+12900*activity(ms);
 }
 function heatNoise(ms:number):number {
   return 1400*smoothNoise(ms/890,11)+1200*smoothNoise(ms/4600,32)+
@@ -158,14 +173,21 @@ export function previewMetricsAt(epochMs:number):LivePreviewMetrics {
   const now=beijingParts(epochMs);
   // A deterministic timestamp, not client-local random state. All visitors
   // observing the same moment see the same review illustration.
+  const elapsed=Math.max(0,epochMs-PREVIEW_ANCHOR_MS);
+  // Match the exact agreed baselines at the anchor, then smoothly hand off to
+  // the calendar profile. Unlike a permanent offset, this never pins overnight
+  // activity to the lower bound and never starts a fresh visit from zero.
+  const heatAnchorCorrection=(PREVIEW_START.heat-baseHeatTarget-baseHeatNoise)*
+    Math.exp(-elapsed/(3*3600000));
+  const activeAnchorCorrection=(PREVIEW_START.active-baseActiveTarget-baseActiveNoise)*
+    Math.exp(-elapsed/(2*3600000));
   const heat=clamp(Math.round(
-    PREVIEW_START.heat+baseHeat(epochMs)-baseHeatTarget+
-    heatNoise(epochMs)-baseHeatNoise
+    baseHeat(epochMs)+heatNoise(epochMs)+heatAnchorCorrection
   ),100000,499999);
-  // 'Today active' acts as a rolling active-window visualization; rises and falls.
+  // This is a rolling activity illustration, not "users who ever applied today".
+  // Accordingly it rises and falls and does not reset to zero at midnight.
   const active=clamp(Math.round(
-    PREVIEW_START.active+baseActive(epochMs)-baseActiveTarget+
-    activeNoise(epochMs)-baseActiveNoise
+    baseActive(epochMs)+activeNoise(epochMs)+activeAnchorCorrection
   ),400,30000);
   const offers=PREVIEW_START.offers+Math.max(0,Math.floor(cumulativeProgress(epochMs,'offers')-baseOfferProgress+1e-8));
   const applications=PREVIEW_START.applications+Math.max(0,Math.floor(cumulativeProgress(epochMs,'applications')-baseAppProgress+1e-8));
