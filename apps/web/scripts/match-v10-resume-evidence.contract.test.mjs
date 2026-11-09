@@ -5,6 +5,7 @@ import {verifiedWorkEvidence,relevantWorkEvidence} from '../functions/_lib/resum
 import {sanitizedJobIntent} from '../functions/_lib/domestic-search-fetch.js';
 import {classifyOccupation,scoreCandidateFit} from '../functions/_lib/match-ranking.js';
 import {whyThisJob} from '../functions/_lib/match-explanation.js';
+import {fuseDomesticJobRecommendations} from '../functions/_lib/domestic-match-fusion.js';
 
 const governmentText=[
  '求职意向：政府关系 / 政府事务',
@@ -105,4 +106,37 @@ test('AI may omit optional project evidence: exact-text fallback still works',()
  const why=whyThisJob(p,{title:'政府事务专员'},{
   breakdown:{role:13},matched_required_skills:[]});
  assert.match(why.summary,/政府调研/);
+});
+
+test('actual-style GR and regional operations resumes rank related domestic jobs above unrelated titles',()=>{
+ const gr=governmentProfile();
+ const ops=verifiedProfile({
+  education:'BACHELOR',education_evidence:'本科学历',
+  target_roles:['区域运营'],skills:[],
+  work_evidence:['负责多家门店运营与销售过程管理，建立从线索到成交的销售漏斗。']
+ },operationsText);
+ const create=(id,company,title)=>({
+  id,company,title,location:'杭州',source_type:'HHBA站内岗位',
+  official_url:'https://jobs.ashbyhq.com/example/'+id,
+  platform:'ashby',source:'example',remote:false,
+  reference_score:60,matched:[],not_evidenced:[],needs_verification:[],
+  requirements_basis:'仅供自动化测试的虚构岗位，不代表真实在招',
+  required_skills:[],mandatory_skills:[],preferred_skills:[],
+  unclassified_skills:[],minimum_education:'BACHELOR',
+  min_experience_years:null,experience_requirement:'经验未注明'
+ });
+ const jobA=create('gr-1','虚构企业甲','政府关系专员');
+ const jobB=create('ops-1','虚构企业乙','区域运营专员');
+ const jobC=create('content-1','虚构企业丙','内容运营专员');
+ const grResult=fuseDomesticJobRecommendations([jobC,jobB,jobA],[],gr,{
+  role_hint:'政府关系',limit:10},new Date('2026-11-09T00:00:00Z'));
+ assert.equal(grResult.matches.length,1);
+ assert.equal(grResult.matches[0].title,'政府关系专员');
+ assert.match(grResult.matches[0].why_recommended.summary,/项目申报|政策研究/);
+ const opsResult=fuseDomesticJobRecommendations([jobA,jobC,jobB],[],ops,{
+  role_hint:'区域运营',limit:10},new Date('2026-11-09T00:00:00Z'));
+ assert.equal(opsResult.matches.length,1);
+ assert.equal(opsResult.matches[0].title,'区域运营专员');
+ assert.match(opsResult.matches[0].why_recommended.summary,/销售漏斗/);
+ assert.ok(!opsResult.matches.some(x=>x.title==='内容运营专员'));
 });
