@@ -4,6 +4,8 @@
  * text supports it; isolated skill words and a person's name never suffice.
  */
 const CANDIDATE_DIRECTIONS=[
+ {canonical:'政府事务专员',kind:'government-affairs',evidence:/(?:(?:负责|参与|协调|推动|建立|统筹|完成|开展)[^\n。]{0,100}(?:政府事务|政府项目|项目申报|政策研究|政企|政府调研|行政审批|政策项目)|(?:政府事务|政府项目|项目申报|政策研究|政企)[^\n。]{0,100}(?:协同|协调|申报|研究|落实|推进|推动|整理|完成|建立|参与))/i},
+ {canonical:'区域运营',kind:'regional-operations',evidence:/(?:(?:负责|推动|优化|管理|建立|培训|复盘)[^\n。]{0,90}(?:门店运营|销售漏斗|终端运营|区域运营|经销商|门店|销售过程|DCC|成交率)|(?:区域运营|终端运营|门店督导)[^\n。]{0,90}(?:负责|管理|指标|改善|辅导|执行))/i},
  {canonical:'Python 开发工程师',kind:'backend',evidence:/(?:\bpython\b[\s\S]{0,55}(?:接口开发|后端开发|服务端开发|系统开发|平台开发|软件开发)|(?:接口开发|后端开发|服务端开发|系统开发)[\s\S]{0,55}\bpython\b)/i},
  {canonical:'Java 开发工程师',kind:'backend',evidence:/(?:\bjava\b[\s\S]{0,55}(?:后端开发|接口开发|系统开发|软件开发)|(?:后端开发|接口开发|系统开发)[\s\S]{0,55}\bjava\b)/i},
  {canonical:'前端开发工程师',kind:'frontend',evidence:/(?:前端(?:页面|开发|项目)|(?:vue|react)[\s\S]{0,55}(?:页面|前端|开发)|(?:开发|搭建|实现)[\s\S]{0,55}(?:vue|react))/i},
@@ -72,7 +74,7 @@ function explicitHeldOccupations(lines){
  // Job titles actually held are stronger than skills used in another career.
  return [...new Set(direct)].slice(0,6);
 }
-const OCCUPATION_WORD=/(?:开发|工程师|经理|顾问|分析师|设计师|教师|老师|编导|剪辑|销售|运营|护士|医生|律师|会计|审计|翻译|法务|外贸|技师|产品|研发)/i;
+const OCCUPATION_WORD=/(?:开发|工程师|经理|顾问|分析师|设计师|教师|老师|编导|剪辑|销售|运营|护士|医生|律师|会计|审计|翻译|法务|外贸|技师|产品|研发|政府关系|政府事务|公共事务|政企|政策研究|项目申报)/i;
 export function separateCareerIntentAndExperience(proposed,source){
  const raw=typeof source==='string'?source.slice(0,20000):'';
  const originalLines=raw.replace(/\r/g,'').split('\n');
