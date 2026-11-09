@@ -572,24 +572,36 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
   async function renderCorporateOnFailure(site){
    if(typeof browserRenderer!=='function'||browserAttempts>=2||
       site.domain!==link.domain||isSharedAtsDomain(site.domain)||
-      // Prefer a recruitment-subdomain browser proof if the bare apex
-      // was not fetched. This also prevents wasting the second render.
       (site.host!==link.hostname&&link.hostname!==link.domain))return null;
-   browserAttempts++;
-   try{
-    const rendered=await browserRenderer(site.url);
-    if(!rendered)return null;
-    const checked=inspectPublicEmployer(job,rendered,site.url);
-    if(checked.job){
-     browserRecovered++;
-     websiteCache.set(site.url,rendered);
-     sites.set(site.url,site);
-     return checked.job;
+   // Browser Run may geographically select an English corporate homepage
+   // even for a real Chinese vacancy. Only for a Chinese job-side employer
+   // claim on a first-party careers host, first try a PUBLIC zh-cn landing.
+   // This is a same-domain alternative page, NOT a model translation or
+   // permission to accept an English name as proof of a Chinese employer.
+   const localized=typeof job.company_claim==='string'&&
+    /[\p{Script=Han}]/u.test(job.company_claim)&&
+    /^(?:careers?|hr|recruit|jobs)\./i.test(link.hostname)&&
+    site.host===link.hostname?
+     publicCorporatePage('https://'+link.hostname+'/zh-cn'):null;
+   const pagesToTry=localized?[localized,site]:[site];
+   for(const target of pagesToTry){
+    if(browserAttempts>=2)break;
+    browserAttempts++;
+    try{
+     const rendered=await browserRenderer(target.url);
+     if(!rendered)continue;
+     const checked=inspectPublicEmployer(job,rendered,target.url);
+     if(checked.job){
+      browserRecovered++;
+      websiteCache.set(target.url,rendered);
+      sites.set(target.url,target);
+      return checked.job;
+     }
+     lastReason=checked.reason;
+    }catch{
+     browserFailures++;
+     rejections.BROWSER_UNAVAILABLE=(rejections.BROWSER_UNAVAILABLE||0)+1;
     }
-    lastReason=checked.reason;
-   }catch{
-    browserFailures++;
-    rejections.BROWSER_UNAVAILABLE=(rejections.BROWSER_UNAVAILABLE||0)+1;
    }
    return null;
   }
@@ -613,7 +625,12 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
      if(checked.job){sites.set(site.url,site);return checked.job;}
      lastReason=checked.reason;
      // Do not override an explicit brand mismatch or unproven backlink.
-     if(checked.reason==='COMPANY_PAGE_UNREADABLE'){
+     if(checked.reason==='COMPANY_PAGE_UNREADABLE'||
+       checked.reason==='COMPANY_BRAND_MISMATCH'&&site.host===link.hostname&&
+       /[\p{Script=Han}]/u.test(job.company_claim||'')&&
+       !/[\p{Script=Han}]/u.test(String(doc?.title||'').slice(0,120))){
+      // An English-only page is not proof of a mismatched Chinese employer:
+      // explicitly seek its Chinese same-domain career landing instead.
       const recovered=await renderCorporateOnFailure(site);
       if(recovered)return recovered;
      }
