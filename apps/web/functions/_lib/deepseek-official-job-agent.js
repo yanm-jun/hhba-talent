@@ -558,7 +558,12 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
   // charging an extra Fetch for a careers-subdomain homepage unnecessarily.
   // On failure, the second attempt checks the source recruiting subdomain.
   addSite('https://'+link.domain+'/');
-  addSite('https://'+link.hostname+'/');
+  // A /companies/{tenant}/jobs/... path is a shared-hosted recruiting
+  // board. Its portal subdomain cannot independently prove that employer,
+  // so do not spend a second Fetch on the vendor's generic homepage.
+  const vendorTenantBoard=/\/companies\/[^/]+\/(?:jobs?|positions?)(?:\/|$)/i
+   .test(new URL(link.url).pathname);
+  if(!vendorTenantBoard)addSite('https://'+link.hostname+'/');
   let lastReason='COMPANY_PAGE_UNOBSERVED';
   const visited=new Set();
   // A missing employer homepage is a distinct fetch limitation, not proof
