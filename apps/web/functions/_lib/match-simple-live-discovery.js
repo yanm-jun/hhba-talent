@@ -6,7 +6,7 @@ const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|日本|新加坡|美国|英
 const CLOSED=/(?:职位已关闭|职位已下线|岗位已下线|已停止招聘|停止招聘|招聘已结束|不再接受申请|no longer accepting|position closed)/i;
 const NOISE=/(?:新闻|攻略|面经|求职指南|职位列表|岗位列表|招聘信息汇总|薪资报告|招聘会|论坛|百科|校园招聘官网|招聘首页)/i;
 const JOB=/((?:ai\s*)?(?:产品经理|产品专员|产品运营|需求分析师|业务分析师|数据分析师|运营(?:经理|专员)?|设计师|研发工程师|软件工程师|工程师|销售(?:经理|顾问)?|客户经理|项目经理|人力资源|市场营销|管培生|实习生|顾问|岗位|职位))|(?:product\s+(?:manager|owner|specialist)|business\s+analyst|data\s+analyst|software\s+engineer|operations\s+(?:manager|specialist)|designer|internship)/i;
-const BAD_DOMAIN=/(?:^|\.)(?:google|bing|baidu|so|sogou|zhihu|weibo|douyin|xiaohongshu|bilibili|reddit|youtube|facebook|twitter|x|linkedin|indeed|glassdoor|zhipin|51job|liepin|lagou|jobui|kanzhun|job5156|juejin|csdn|github|medium|wikipedia)\.(?:com|cn|org|net|io)$/i;
+const BAD_DOMAIN=/(?:^|\.)(?:so|sogou|zhihu|weibo|douyin|xiaohongshu|bilibili|reddit|youtube|facebook|twitter|x|linkedin|indeed|glassdoor|zhipin|51job|liepin|lagou|jobui|kanzhun|job5156|juejin|csdn|github|medium|wikipedia)\.(?:com|cn|org|net|io)$/i;
 const JOB_PATH=/(?:job|jobs|position|career|recruit|talent|campus|hiring|vacanc|advertisement|detail|post|offer|opportunit)/i;
 const ID_QUERY=/(?:jobid|job_id|jobcode|postid|positionid|position_id|jobunionid|requementid|advertisementid|id)/i;
 const clean=(v,n=180)=>typeof v==='string'?v.replace(/[\u0000-\u001f]/g,' ').trim().slice(0,n):'';
@@ -18,7 +18,8 @@ export function safePublicJobUrl(raw){
   const u=new URL(raw);
   if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash)return null;
   const host=u.hostname.toLowerCase();
-  if(!host.includes('.')||host.length>150||BAD_DOMAIN.test(host)||host==='localhost'||
+  if(!host.includes('.')||host.length>150||BAD_DOMAIN.test(host)||
+     ['google.com','www.google.com','bing.com','www.bing.com','baidu.com','www.baidu.com','m.baidu.com'].includes(host)||host==='localhost'||
      /(?:^|\.)localhost$/.test(host)||/^\d+\.\d+\.\d+\.\d+$/.test(host)||host.endsWith('.local'))return null;
   if(/\/(?:search|list|filter|browse|login|signup|register)(?:\/|$)/i.test(u.pathname)&&
      !/(?:job|position|career)/i.test(u.pathname))return null;
@@ -73,13 +74,13 @@ export function simpleJobQueries(directions,preferredCities=[]){
   queries.push([role,'2026 2027 校招 社招','职位详情','申请'].join(' '));
  }
  if(roles[2])queries.push([roles[2],city||'中国大陆','官方招聘','职位详情'].join(' '));
- return [...new Set(queries)].slice(0,5).map(q=>q.slice(0,128));
+ return [...new Set(queries)].slice(0,4).map(q=>q.slice(0,128));
 }
 function candidateFromSearch(item){
  const url=safePublicJobUrl(item?.url);
  if(!url)return null;
  const title=clean(item?.title,180),snippet=clean(item?.summary||item?.snippet,650);
- if(!title||NOISE.test(title)&&!JOB.test(title))return null;
+ if(!title||(NOISE.test(title)&&!/(?:产品经理|运营专员|数据分析师|工程师|设计师|销售经理|管培生|intern|product manager)/i.test(title)))return null;
  if(!JOB.test(title+' '+snippet))return null;
  // Search is only a discovery hint, not proof of title, location or vacancy state.
  return {url,search_title:title,summary:snippet};
@@ -159,7 +160,7 @@ export async function discoverSimpleJobs(key,directions,preferredCities=[],{fetc
   const candidate=candidateFromSearch(item);
   if(candidate&&!pool.has(candidate.url))pool.set(candidate.url,candidate);
  }
- const candidates=[...pool.values()].slice(0,18);
+ const candidates=[...pool.values()].slice(0,12);
  const fetched=[];
  for(let i=0;i<candidates.length;i+=4){
   const chunk=await Promise.allSettled(candidates.slice(i,i+4).map(row=>
