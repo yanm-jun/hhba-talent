@@ -99,11 +99,22 @@ function companyFrom(pageTitle,searchTitle,hostname){
  const host=hostname.replace(/^(?:www|job|jobs|careers?|recruit|zhaopin|talent)\./,'').split('.')[0];
  return clean(host,50)||'招聘企业';
 }
+function extractCity(text){
+ const source=typeof text==='string'?text.slice(0,14000):'';
+ for(const match of source.matchAll(/(?:工作地点|工作城市|工作地|办公地点|办公城市|work location|location)\s*[：:\-]?\s*([^\n,，；;|｜]{2,80})/gi)){
+  const city=findMainlandCity(match[1].slice(0,120));if(city)return city;
+ }
+ // Search snippets and rendered headings sometimes omit an explicit label.
+ for(const part of source.slice(0,900).split(/[\n,，；;|｜]/)){
+  const city=findMainlandCity(part.slice(0,120));if(city)return city;
+ }
+ return null;
+}
 function fetchedEvidence(candidate,page){
- const content=clean(page?.content,60000);
+ const content=typeof page?.content==='string'?page.content.replace(/\r/g,'').slice(0,60000):'';
  const full=clean(page?.title,150)+'\n'+content;
  const title=deriveTitle(content,clean(page?.title)||candidate.search_title);
- const location=findMainlandCity(full.slice(0,13000))||findMainlandCity(candidate.search_title+' '+candidate.summary);
+ const location=extractCity(content)||extractCity(candidate.search_title+' '+candidate.summary);
  if(!location||OUTSIDE.test((candidate.search_title+' '+full.slice(0,1500))))return null;
  if(CLOSED.test(full.slice(0,15000)))return null;
  if(!JOB.test(title))return null;
@@ -163,7 +174,7 @@ export async function discoverSimpleJobs(key,directions,preferredCities=[],{fetc
   const fact=page?fetchedEvidence(item,page):null;
   // Search-only results remain usable ONLY when a concrete Mainland work city
   // is visible; label them unverified, never as a confirmed open vacancy.
-  const city=findMainlandCity(item.search_title+' '+item.summary);
+  const city=extractCity(item.search_title+'\n'+item.summary);
   const fallback=city&&!OUTSIDE.test(item.search_title+' '+item.summary)?{
    company:companyFrom('',item.search_title,new URL(item.url).hostname),
    title:deriveTitle('',item.search_title),location:city,requirement:'',
