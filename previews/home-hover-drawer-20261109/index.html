@@ -126,10 +126,17 @@ function easedCurve(time,points){
  if(time<=b){let u=clamp((time-a)/(b-a),0,1),s=u*u*(3-2*u);return v+(w-v)*s}}
  return points[points.length-1][1];
 }
-function activity(ms){let c=bj(ms),mode=dayMode(c.day),h=c.hour+c.minute/60+c.second/3600;
- return easedCurve(h,mode==='workday'?curves.workday:curves.weekend)*months[c.month-1]*(mode==='holiday'?.73:mode==='weekend'?.88:1)}
-function heatBase(t){return 103000+278000*activity(t)}
-function activeBase(t){return 2200+11800*activity(t)}
+function activity(ms){
+ const c=bj(ms),h=c.hour+c.minute/60+c.second/3600,n=dayNo(c.day);
+ const forDay=day=>{const mode=dayMode(day);return easedCurve(h,mode==='workday'?curves.workday:curves.weekend)*months[+day.slice(5,7)-1]*(mode==='holiday'?.73:mode==='weekend'?.88:1)};
+ const easing=t=>{const x=clamp(t,0,1);return x*x*(3-2*x)};
+ const cur=forDay(c.day);
+ if(h<12){const p=forDay(dayText(n-1));const f=easing(h/12);return (p+cur)/2*(1-f)+cur*f}
+ const next=forDay(dayText(n+1)),f=easing((h-12)/12);
+ return cur*(1-f)+(cur+next)/2*f
+}
+function heatBase(t){return 111000+302000*activity(t)}
+function activeBase(t){return 1750+12900*activity(t)}
 function heatNoise(t){return 1400*smoothNoise(t/890,11)+1200*smoothNoise(t/4600,32)+1900*smoothNoise(t/26000,43)}
 function activeNoise(t){return 95*smoothNoise(t/2200,21)+145*smoothNoise(t/14500,27)}
 function share(c,mode){let weights=mode==='workday'?wday:wend,sum=weights.reduce((a,v)=>a+v,0),prior=weights.slice(0,c.hour).reduce((a,v)=>a+v,0);
@@ -143,8 +150,11 @@ const baseHeat=heatBase(anchor),baseActive=activeBase(anchor),baseHeatNoise=heat
 const els={heat:document.getElementById('heat'),offers:document.getElementById('offers'),active:document.getElementById('active'),apps:document.getElementById('apps')};
 function draw(){
  const t=Date.now(),c=bj(t);
- const heat=clamp(Math.round(startValues.heat+heatBase(t)-baseHeat+heatNoise(t)-baseHeatNoise),100000,499999);
- const active=clamp(Math.round(startValues.active+activeBase(t)-baseActive+activeNoise(t)-baseActiveNoise),400,30000);
+ const elapsed=Math.max(0,t-anchor);
+ const heatCorrection=(startValues.heat-baseHeat-baseHeatNoise)*Math.exp(-elapsed/(3*3600000));
+ const activeCorrection=(startValues.active-baseActive-baseActiveNoise)*Math.exp(-elapsed/(2*3600000));
+ const heat=clamp(Math.round(heatBase(t)+heatNoise(t)+heatCorrection),100000,499999);
+ const active=clamp(Math.round(activeBase(t)+activeNoise(t)+activeCorrection),400,30000);
  const offers=startValues.offers+Math.max(0,Math.floor(cum(t,'offers')-baseOffers+1e-8));
  const apps=startValues.apps+Math.max(0,Math.floor(cum(t,'apps')-baseApps+1e-8));
  els.heat.textContent=fmt(heat);els.offers.textContent=fmt(offers);
