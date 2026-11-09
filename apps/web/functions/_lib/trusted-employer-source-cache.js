@@ -24,6 +24,13 @@ function sourceUrl(s){
   return u;
  }catch{return null;}
 }
+function companyRoot(host){
+ const p=String(host||'').toLowerCase().split('.');
+ if(p.length<2)return null;
+ const suffix=p.slice(-2).join('.');
+ return ['com.cn','net.cn','org.cn'].includes(suffix)&&p.length>=3?
+  p.slice(-3).join('.'):suffix;
+}
 export function validSourceProof(row,job,now=new Date()){
  if(!row||!job||job.source_status!=='PUBLIC_JOB_UNCONFIRMED'||
   job.has_application_cta!==true||typeof job.company_claim!=='string'||
@@ -39,7 +46,8 @@ export function validSourceProof(row,job,now=new Date()){
   link.hostname!==row.job_hostname||row.employer_claim.length>65)return null;
  if(row.proof_method==='CORPORATE_DOMAIN_AND_BRAND'){
   if(scope.href!=='https://'+link.hostname+'/'||
-    !link.hostname.endsWith('.'+source.hostname)&&link.hostname!==source.hostname)
+    !companyRoot(link.hostname)||
+    companyRoot(link.hostname)!==companyRoot(source.hostname))
    return null;
  }else{
   // Shared ATS: never trust the vendor's domain; trust ONLY the exact
