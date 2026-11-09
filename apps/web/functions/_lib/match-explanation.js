@@ -5,6 +5,7 @@
  * Human-readable reasons do not independently change scores or eligibility.
  */
 import {credentialLabel,professionalPracticeReview} from './professional-credentials.js';
+import {relevantWorkEvidence} from './resume-work-evidence.js';
 const DEGREE={HIGH_SCHOOL:'高中',ASSOCIATE:'专科',BACHELOR:'本科',MASTER:'硕士',PHD:'博士'};
 const SHORT_MAX=6;
 const safe=(s,max=55)=>typeof s==='string'?s.slice(0,max).trim():'';
@@ -101,6 +102,8 @@ export function whyThisJob(profile={},job={},fit={}){
   if(skillNames.length>=3)break;
  }
  if(skillNames.length)reasons.push('你的简历明确记录「'+skillNames.join('、')+'」，与岗位公开技能要求对应');
+ const examples=relevantWorkEvidence(profile.work_evidence,job,2);
+ for(const example of examples)reasons.push('简历原文：「'+example.quote+'」；'+example.rationale);
  const education=DEGREE[profile.education],minimum=DEGREE[job.minimum_education];
  if(education&&minimum&&fit.breakdown?.education>0)
   reasons.push('简历记录'+education+'学历，达到岗位已明确的'+minimum+'最低学历要求');
@@ -120,7 +123,8 @@ export function whyThisJob(profile={},job={},fit={}){
  // A shortlist card has room for one line: lead with verifiable,
  // specific fit evidence before generic direction similarity.
  const ordered=[...reasons].sort((a,b)=>{
-  const importance=v=>v.startsWith('你的简历明确记录')?4:
+  const importance=v=>v.startsWith('简历原文：')?5:
+   v.startsWith('你的简历明确记录')?4:
    v.startsWith('简历记录的「')?3:
    v.startsWith('简历记录')?2:
    v.startsWith('你希望从事')?1:0;
