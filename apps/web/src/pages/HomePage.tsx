@@ -3,7 +3,6 @@ import { Link, navigate } from '../router';
 import { Shell } from '../components/Shell';
 import { UnifiedJobMarket } from '../components/UnifiedJobMarket';
 import { HomeCompanyMarquee } from '../components/HomeCompanyMarquee';
-import { HomePeopleBanner } from '../components/HomePeopleBanner';
 import { WinterInternshipPopup } from '../components/WinterInternshipPopup';
 import { HomeOpenLetter } from '../components/HomeOpenLetter';
 import { BrandMark } from '../components/BrandMark';
@@ -54,7 +53,6 @@ export function HomePage({user}:{user:User|null}){
    <Link to="/talent-service" style={{display:'inline-flex',alignItems:'center',gap:7,color:'#28674d',fontSize:13,fontWeight:700,textDecoration:'none'}}>了解人才服务 <ArrowUpRight size={15}/></Link>
   </section>
   <HomeCompanyMarquee/>
-  <HomePeopleBanner/>
   <footer className="hhba-brand-home-footer"><BrandMark variant="signature" size="small"/><p>Human Capability Network · HHBA</p></footer>
   <HomeOpenLetter autoOpen={false}/>
   <WinterInternshipPopup/>

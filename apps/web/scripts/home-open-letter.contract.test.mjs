@@ -2,20 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const home = fs.readFileSync('src/pages/HomePage.tsx', 'utf8');
-const banner = fs.readFileSync('src/components/HomePeopleBanner.tsx', 'utf8');
 const modal = fs.readFileSync('src/components/HomeOpenLetter.tsx', 'utf8');
 const css = fs.readFileSync('src/styles/home-open-letter.css', 'utf8');
 const letter = fs.readFileSync('src/data/publicLetter.ts', 'utf8');
 const html = fs.readFileSync('public/letter/index.html', 'utf8');
-test('the existing HHBA homepage and people banner are preserved', () => {
-  assert.match(home, /<HomePeopleBanner\/>/);
+test('the existing HHBA homepage and public letter remain; unwanted banner stays removed', () => {
+  assert.doesNotMatch(home, /HomePeopleBanner|hhba-people-banner/);
   assert.match(home, /<HomeCompanyMarquee\/>/);
   assert.match(home, /<UnifiedJobMarket compact\/>/);
   assert.match(home, /<HomeOpenLetter autoOpen=\{false\}\/>/);
   assert.match(home, /我要应聘/);
   assert.match(home, /我要招人/);
   assert.match(home, /hhba:open-letter/);
-  assert.match(banner, /hhba-people-group-hd\.avif/);
 });
 test('letter is manually opened on homepage, or explicitly opened from a shared link', () => {
   assert.match(modal, /if \(!autoOpen\) return null/);

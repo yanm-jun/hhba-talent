@@ -12,7 +12,8 @@ test('only the independent drawer is added to the original homepage',()=>{
  assert.equal((home.match(/<HomeLiveDrawer\/>/g)||[]).length,1);
  for (const s of ['让机会与人才，找到彼此。','你来到这里，是为了什么？',
   'title="我要应聘"','title="我要招人"','<UnifiedJobMarket compact/>',
-  '<HomeCompanyMarquee/>','<HomePeopleBanner/>']) assert.ok(home.includes(s),s);
+  '<HomeCompanyMarquee/>']) assert.ok(home.includes(s),s);
+ assert.doesNotMatch(home, /HomePeopleBanner/);
  assert.ok(css.includes('position:absolute')&&css.includes('right:0')&&css.includes('pointer-events:none'));
 });
 test('the right-side panel opens on hover and closes after leaving',()=>{
