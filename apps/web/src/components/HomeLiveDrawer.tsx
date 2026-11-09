@@ -54,11 +54,13 @@ function partOfDay(hour: number) {
 
 function initialMetrics(): PreviewMetrics {
   const c = beijing();
+  let previous: Partial<PreviewMetrics> = {};
+  try { previous = JSON.parse(window.sessionStorage.getItem('hhba-home-drawer-design-preview') || '{}'); } catch { /* Fresh review session. */ }
   return {
     heat: clamp(heatBase(c.minute) + random(-7000, 7000), 100000, 499999),
-    offers: random(18520, 18780),
-    active: Math.floor(c.minute / 1440 * 13500) + random(110, 360),
-    applications: random(325000, 329000),
+    offers: Math.max(random(18520, 18780), previous.offers || 0),
+    active: previous.day === c.day ? Math.max(Math.floor(c.minute / 1440 * 13500) + random(110, 360), previous.active || 0) : random(0, 12),
+    applications: Math.max(random(325000, 329000), previous.applications || 0),
     day: c.day
   };
 }
@@ -71,14 +73,18 @@ function usePreviewMetrics() {
   const [metrics, setMetrics] = useState<PreviewMetrics>(initialMetrics);
   useEffect(() => {
     let mounted = true;
-    const timers: number[] = [];
+    const timers = new Set<number>();
     const loop = (fn: () => void, minMs: number, maxMs: number) => {
-      const tick = () => {
-        if (!mounted) return;
-        fn();
-        timers.push(window.setTimeout(tick, random(minMs, maxMs)));
+      const schedule = () => {
+        const timer = window.setTimeout(() => {
+          timers.delete(timer);
+          if (!mounted) return;
+          fn();
+          schedule();
+        }, random(minMs, maxMs));
+        timers.add(timer);
       };
-      timers.push(window.setTimeout(tick, random(minMs, maxMs)));
+      schedule();
     };
 
     loop(() => {
@@ -111,6 +117,12 @@ function usePreviewMetrics() {
 
     return () => { mounted = false; timers.forEach(timer => window.clearTimeout(timer)); };
   }, []);
+  useEffect(() => {
+    try { window.sessionStorage.setItem('hhba-home-drawer-design-preview', JSON.stringify({
+      day: metrics.day, offers: metrics.offers, active: metrics.active,
+      applications: metrics.applications
+    })); } catch { /* Storage is optional. */ }
+  }, [metrics.day, metrics.offers, metrics.active, metrics.applications]);
   return metrics;
 }
 
