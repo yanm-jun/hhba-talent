@@ -78,13 +78,17 @@ async function readProviderEvents(response,onProgress=()=>{},onPartial=()=>{},li
   }
   if(type==='response.output_text.delta'&&typeof obj.delta==='string'){
    if(streamedText.length<50000)streamedText+=obj.delta;
-   if(receivedSearch&&streamedText.length<50000){
+   if(receivedSearch&&streamedText.length<50000&&obj.delta.includes('}')){
     const matches=partialJobMatchesFromText(streamedText,limit);
     if(matches.length>partialCount){
      partialCount=matches.length;
      onPartial(matches);
     }
    }
+  }
+  if(type==='response.output_text.done'&&receivedSearch&&typeof obj.text==='string'){
+   const matches=partialJobMatchesFromText(obj.text,limit);
+   if(matches.length>partialCount){partialCount=matches.length;onPartial(matches);}
   }
   if(type==='response.completed')completed=obj.response;
   if(type==='response.failed'||type==='response.incomplete'){
@@ -121,7 +125,7 @@ function nativeResponsePayload(result){
   source:'DeepSeek V4 Pro 自主联网搜索',
   scoring:'AI 根据简历和招聘信息推荐；不代表录用概率',
   privacy:'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
-  disclaimer:(result.incomplete?'其中一组联网搜索未完成，已显示找到的职位；':'')+'仅中国大陆工作城市；职位开放状态、薪资、要求以原招聘网页为准。'
+  disclaimer:(result.incomplete?'部分联网搜索未能在时间内结束，已保留找到的职位（尚未达到目标数量）；':'')+'仅中国大陆工作城市；职位开放状态、薪资、要求以原招聘网页为准。'
  };
 }
 
