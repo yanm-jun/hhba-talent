@@ -152,11 +152,12 @@ test('automatic search is server-side and the modal has no extra search toggle',
  assert.match(component,/item\.experience_requirement\|\|'经验未注明'/);
  assert.doesNotMatch(component,/想看看更多国内企业吗|本次已搜索|补充站外官方岗位/);
  assert.doesNotMatch(component,/HHBA 站内|站外官方 · 待核实开放|Search.*Fetch/);
- assert.match(api,/autoDiscoveryCandidates\(env,db,session\.phone,profile,options\)/);
- assert.match(api,/fuseDomesticJobRecommendations\(/);
- assert.match(api,/discoverExternalOfficialJobs\(intent,env\.HHBA_MATCH_DEEPSEEK_KEY,\{expanded:true\}\)/);
- // Only a sanitized job direction goes to external search, not the resume text.
- assert.doesNotMatch(api.slice(api.indexOf('async function autoDiscoveryCandidates'),api.indexOf('async function aiExtract')),/cleaned|input\.text|resume_id/);
+ assert.match(api,/autoDiscoveryCandidates\(\s*env,db,session\.phone,profile,options,cleaned,preferredCities/);
+ assert.match(api,/rankSimpleShortlist\(/);
+ assert.match(api,/discoverSimpleJobs\(env\.HHBA_MATCH_DEEPSEEK_KEY,directions,preferredCities\)/);
+ // Only the short role directions and city preferences reach DeepSeek Search.
+ assert.match(api,/simpleJobDirections\(opts\.role_hint,profile,resume\)/);
+ assert.doesNotMatch(api,/discoverSimpleJobs\([^;]*input\.text/);
 });
 
 test('3 years experience never matches a posting requiring at least 7 years',()=>{
