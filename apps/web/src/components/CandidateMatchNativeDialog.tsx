@@ -5,7 +5,7 @@ import type {MatchResponse} from '../services/resumeMatch';
 import '../styles/resume-match-dialog.css';
 
 // The model researches and ranks; the UI never re-ranks or hides English job titles.
-export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=''}:{result:Pick<MatchResponse,'matches'>;onClose:()=>void;pending?:boolean;notice?:string}){
+export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=''}:{result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,'disclaimer'>>;onClose:()=>void;pending?:boolean;notice?:string}){
  const ref=useRef<HTMLDivElement|null>(null);
  useEffect(()=>{
   const overflow=document.body.style.overflow;
@@ -59,7 +59,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
           </div>
          </div>
          <p className="hhba-native-reason"><strong>为什么推荐：</strong>
-          {job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。'}</p>
+          {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
           data-hhba-recruitment-outbound="true">查看岗位原始链接 <ArrowUpRight size={15}/></a>
         </article>
@@ -69,7 +69,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
        <h3>本轮没有找到符合条件的具体职位链接</h3>
        <p>这不代表你没有合适的工作。返回后可以调整目标岗位，再重新搜索。</p>
       </div>}
-     <p className="hhba-match-disclaimer">职位信息由 DeepSeek 联网检索提供，HHBA 未逐条人工复核。岗位是否仍开放、任职要求及薪资以原始网页为准；不会自动投递。</p>
+     <p className="hhba-match-disclaimer">{result.disclaimer||'职位信息由 DeepSeek 联网检索提供，HHBA 未逐条人工复核。岗位是否仍开放、任职要求及薪资以原始网页为准；不会自动投递。'}</p>
     </div>
     <footer className="hhba-match-modal-foot">
      <span>HHBA · 让机会与人才，找到彼此。</span>
