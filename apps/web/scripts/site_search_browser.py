@@ -50,6 +50,8 @@ with sync_playwright() as p:
 
     # The newly merged winter internship campaign participates in public search.
     page.goto(BASE+"search?q="+quote("寒假"), wait_until="domcontentloaded")
+    # Jobs lead the combined ranking; verify the editorial internship entry in its own category.
+    page.get_by_role("button", name="站内页面", exact=True).click()
     page.get_by_role("heading", name="2027 寒假实习季").wait_for(timeout=60000)
     assert page.get_by_role("heading", name="毕马威中国 · 2026—2027 寒假实习项目").count()>0
 
