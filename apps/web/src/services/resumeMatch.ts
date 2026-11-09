@@ -34,6 +34,7 @@ export type MatchResponse = {
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number};
 const API='/api/match-native';
+const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=3*1024*1024;
 const errorMap:Record<string,string>={
   MATCH_NOT_ENABLED:'智能匹配服务尚未开放，请稍后再试。',
@@ -231,7 +232,7 @@ const externalSearchErrors:Record<string,string>={
 export async function externalDomesticSearchReady(signal?:AbortSignal):Promise<boolean>{
  if(!realAuthReady||!getRealAuthToken())return false;
  try{
-  const response=await fetch(API+'/discover',{method:'GET',credentials:'same-origin',cache:'no-store',signal});
+  const response=await fetch(LEGACY_SEARCH_API+'/discover',{method:'GET',credentials:'same-origin',cache:'no-store',signal});
   if(!response.ok||!(response.headers.get('content-type')||'').includes('json'))return false;
   const data=await response.json() as {kind?:string;scope?:string;enabled?:boolean;integrated_into_top10?:boolean};
   return data.kind==='HHBA_DOMESTIC_DISCOVERY_V1'&&data.scope==='CN_MAINLAND_ONLY'&&data.enabled===true;
@@ -247,7 +248,7 @@ export async function discoverExternalDomesticJobs(roleHint:string,signal?:Abort
   throw new MatchError(400,externalSearchErrors.INVALID_SEARCH_INTENT);
  let response:Response;
  try{
-  response=await fetch(API+'/discover',{
+  response=await fetch(LEGACY_SEARCH_API+'/discover',{
    method:'POST',credentials:'same-origin',cache:'no-store',signal,
    headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
    body:JSON.stringify({role_hint:clean,consent_search:true})
