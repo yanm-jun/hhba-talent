@@ -15,7 +15,7 @@ export const CANDIDATE_ACCOUNT_LINKS=[
  {label:'法律援助',path:'/candidate/account/legal-aid',Icon:Scale,description:'法律服务筹备中'}
 ] as const;
 
-export function CandidateAccountDropdown(){
+export function CandidateAccountDropdown({displayName}:{displayName?:string}){
  const [open,setOpen]=useState(false);
  const root=useRef<HTMLDivElement>(null);
  const trigger=useRef<HTMLButtonElement>(null);
@@ -50,9 +50,9 @@ export function CandidateAccountDropdown(){
    if(!(next instanceof Node)||!event.currentTarget.contains(next))setOpen(false);
   }}>
   <button ref={trigger} type="button" className="auth hhba-account-dropdown-trigger"
-   aria-expanded={open} aria-controls={id}
+   aria-label={(displayName||'个人中心')+'账户导航'} aria-expanded={open} aria-controls={id}
    onClick={event=>setOpen(event.detail>0?!pointerWasOpen.current:true)}>
-   <UserRound size={15} aria-hidden="true"/><span>个人中心</span><ChevronDown size={13} aria-hidden="true"/>
+   <UserRound size={15} aria-hidden="true"/><span>{displayName||'个人中心'}</span><ChevronDown size={13} aria-hidden="true"/>
   </button>
   {open&&<div id={id} role="navigation" className="hhba-account-dropdown-panel" aria-label="个人中心快速导航">
     <div className="hhba-account-dropdown-links">
