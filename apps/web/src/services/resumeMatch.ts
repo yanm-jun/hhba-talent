@@ -36,6 +36,10 @@ export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
   matched_official_jobs:number;source:string;scoring:string;privacy:string;disclaimer:string;
   native_search?:{model:string;searches:number;page_reads:number;provider_items:number;visible_jobs:number;discarded:number;elapsed_ms:number};
+  history_id?:string|null;
+  history_status?:'SAVED'|'EMPTY'|'UNAVAILABLE';
+  new_job_count?:number;
+  improved_job_count?:number;
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number};
 const API='/api/match-native';
