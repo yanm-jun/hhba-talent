@@ -120,12 +120,16 @@ function nativeResponsePayload(result){
   profile:{education:null,education_evidence:null,experience_years:null,
    experience_evidence:null,skills:[],target_roles:[],warnings:[]},
   matches:result.matches,
-  matched_official_jobs:result.matches.length,
+  // Search and domain heuristics cannot independently verify official hiring ownership.
+  matched_official_jobs:0,
+  employer_source_candidates:result.matches.filter(job=>
+   job.recruitment_source_kind==='EMPLOYER_DOMAIN_CANDIDATE'||
+   job.recruitment_source_kind==='EMPLOYER_ATS').length,
   native_search:result.diagnostic,
   source:'DeepSeek Search 官方接口检索 + V4 Pro 简历匹配',
   scoring:'AI 根据简历和招聘信息推荐；不代表录用概率',
   privacy:'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
-  disclaimer:(result.incomplete?'本轮未达到10条或生成未完全结束，已保留有原始网址的匹配结果。':'')+'职位链接来自 DeepSeek Search 返回的公开页面；工作城市和任职资格仍应以招聘官网为准。'
+  disclaimer:(result.incomplete?'本轮未达到10条或生成未完全结束，已保留有原始网址的匹配结果。':'')+'优先推荐企业招聘站候选及企业使用的招聘系统；无法核验官网时可能保留第三方招聘平台。所有来源归属、是否在招和实际投递权限仍须以企业官方公告为准。'
  };
 }
 
