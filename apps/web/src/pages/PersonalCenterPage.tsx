@@ -255,7 +255,6 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
 
    </div>
   </div>
-  <footer className="hhba-account-footer"><CheckCircle2 size={15}/> 当前账户资料与收藏按真实用户归属；未接通功能不显示虚构数据。</footer>
  </section>
  </Shell>;
 }

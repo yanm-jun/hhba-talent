@@ -8,7 +8,7 @@ export type PrivateResume={
 const API='/api/resumes';
 const errors:Record<string,string>={
  SESSION_INVALID:'登录已失效，请重新登录。',
- PRIVATE_STORAGE_NOT_ENABLED:'简历私有存储尚未启用。管理员需先在 Cloudflare 开通 R2。',
+ PRIVATE_STORAGE_NOT_ENABLED:'简历服务暂未启用，请稍后再试。',
  ACCOUNT_DATABASE_NOT_CONNECTED:'账户数据库暂未连接。',
  STORAGE_CONSENT_REQUIRED:'请先确认本次简历私有存储授权。',
  INVALID_FILENAME:'文件名不符合要求，请使用名称正常的 PDF 或 DOCX。',

@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState,type ChangeEvent,type DragEvent} from 'react';
-import {CheckCircle2,ChevronDown,CloudUpload,Download,FileCheck2,FileText,LockKeyhole,ShieldCheck,Trash2,X} from 'lucide-react';
+import {CloudUpload,Download,FileCheck2,FileText,ShieldCheck,Trash2,X} from 'lucide-react';
 import {
  privateResumeAvailable,listPrivateResumes,uploadPrivateResume,
  deletePrivateResume,downloadPrivateResume,PRIVATE_RESUME_LIMIT,
@@ -62,7 +62,7 @@ export function PrivateResumeVault(){
   try{
    await uploadPrivateResume(file,consent);
    setFile(null);setConsent(false);if(input.current)input.current.value='';
-   setNotice('简历已保存到你的私有账户。不会自动发给 DeepSeek 或招聘企业。');
+   setNotice('简历已保存，不会自动向企业投递。');
    await load();
    window.dispatchEvent(new Event('hhba:private-resumes-changed'));
   }catch(e){setError(e instanceof Error?e.message:'上传失败，请稍后重试。');}
@@ -88,15 +88,12 @@ export function PrivateResumeVault(){
  }
  return <section className="hhba-account-panel hhba-private-resumes">
   <div className="hhba-account-section-heading"><div>
-   <h2>我的简历</h2><p>仅供当前登录账户保存、下载和删除。文件不公开展示。</p>
+   <h2>我的简历</h2>
   </div></div>
-  <div className="hhba-resume-private-note">
-   <LockKeyhole size={17}/><span>私有存储 · 仅本人可见。上传不等于同意 AI 分析或向企业投递。</span>
-  </div>
   {loading?<p role="status">正在检查私有简历服务…</p>:!ready?<>
    <div className="hhba-account-upload"><CloudUpload size={29}/>
-    <h3>私有简历服务尚未启用</h3>
-    <p>Cloudflare R2 对象存储尚未开通或绑定；为保护你的资料，当前禁止上传。原有手机号账号不受影响。</p>
+    <h3>简历服务暂未启用</h3>
+    <p>请稍后再试。</p>
    </div>
    {error&&<p className="hhba-personal-error" role="alert">{error}</p>}
    </>:<>
@@ -146,17 +143,12 @@ export function PrivateResumeVault(){
      <div className="hhba-private-resume-consent-panel">
       <label className="hhba-private-resume-consent">
        <input type="checkbox" checked={consent} disabled={busy} onChange={e=>setConsent(e.target.checked)}/>
-       <span>我已知悉并单独同意：本次简历将使用 <strong>Cloudflare R2 亚太区（APAC）</strong>的私有对象存储保存，存储位置可能在<strong>中国大陆境外</strong>，仅供本人登录后管理。</span>
+       <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 保存本次简历。</span>
       </label>
-      <details className="hhba-private-resume-details">
-       <summary><ShieldCheck size={16}/><span>查看完整隐私与存储说明</span><ChevronDown size={15} className="hhba-private-resume-chevron"/></summary>
-       <p>上传不等于授权 DeepSeek 分析或向招聘企业分享。涉及身份证号、住址等非必要敏感信息，请在上传前自行移除。你可在工作台删除已上传的文件；账号注销与历史备份清理规则仍待完善。</p>
-      </details>
      </div>
      <div className="hhba-private-resume-upload-actions">
       <button type="button" className="hhba-private-resume-submit" disabled={!file||!consent||busy}
        onClick={()=>void upload()}><ShieldCheck size={17}/>{operation==='upload'?'正在安全保存…':'确认授权并保存简历'}</button>
-      <small><CheckCircle2 size={14}/>每个账户最多 3 份 · 24 小时内最多上传 15 次</small>
      </div>
     </div>}
    </>}

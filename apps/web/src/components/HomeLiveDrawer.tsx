@@ -95,7 +95,6 @@ export function HomeLiveDrawer() {
           <span className="hhba-metric-copy">累计投递次数<strong>{show(stats.applications)}</strong></span>
         </div>
       </div>
-      <div className="hhba-stats-review-note">设计验收数据 · 不代表真实在线、投递或 Offer 成果</div>
     </section>
   </div>;
 }

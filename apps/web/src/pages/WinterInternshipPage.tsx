@@ -217,7 +217,7 @@ export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
     <h1>寒假实习 · 直接找岗位</h1>
     <p>先看真实企业发布的具体岗位，再了解职位要求、时间和申请入口。</p>
    </div>
-   <div className="hhba-winter-job-hero-stat"><strong>{WINTER_2027_JOBS.length}</strong><span>条公开岗位及招聘批次记录</span>
+   <div className="hhba-winter-job-hero-stat"><span>公开岗位及招聘批次记录</span>
     <small>不等于实时可申请名额</small></div>
   </section>
   <section className="hhba-winter-job-market" id="winter-opportunities" aria-labelledby="winter-opportunities-title">
