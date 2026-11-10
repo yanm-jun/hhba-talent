@@ -45,6 +45,17 @@ with sync_playwright() as p:
     assert '70 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
     assert page.locator('.hhba-winter-role-group-title').count()>=1
     assert page.get_by_label('按行业分组筛选寒假岗位').count()==1
+    # Anonymous visitors may browse/search freely, but external recruiting
+    # destinations must enter REAL HHBA candidate login with the same saved URL.
+    protected=page.locator('[data-winter-job] .hhba-winter-role-apply').first
+    assert protected.get_attribute('data-hhba-recruitment-outbound')=='true'
+    destination=protected.get_attribute('href')
+    protected.click()
+    page.wait_for_url('**/candidate/login?*',timeout=15000)
+    assert page.evaluate("new URLSearchParams(location.search).get('next')")=='/winter-internship?resumeRecruitment=1'
+    assert page.evaluate("(url)=>JSON.parse(sessionStorage.getItem('hhba.recruitment.pending.v1')).url===url",destination)
+    page.go_back()
+    page.get_by_role('heading',name='探索寒假实习机会').wait_for(timeout=15000)
 
     def search(term):
         field=page.get_by_role('searchbox',name='搜索寒假实习具体岗位')
