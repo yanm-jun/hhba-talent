@@ -60,3 +60,16 @@ test('public HTML has unique metadata and private paths never enter sitemap',()=
   assert.match(readFileSync(join(root,'dist/candidate/match/index.html'),'utf8'),/noindex,nofollow/);
  }finally{rmSync(root,{recursive:true,force:true});}
 });
+
+test('mobile home retains real React homepage instead of deferring its key sections',()=>{
+  const main=readFileSync(resolve('src/main.tsx'),'utf8');
+  const home=readFileSync(resolve('src/pages/HomePage.tsx'),'utf8');
+  assert.match(main,/import \{ HomePage \} from '\.\/pages\/HomePage'/);
+  assert.match(main,/function AppLoadingState\(\)/);
+  assert.match(main,/const ResumeUploadPage=lazy\(/);
+  assert.match(main,/const EmployerEvidencePage=lazy\(/);
+  assert.match(home,/<UnifiedJobMarket compact\/>/);
+  assert.match(home,/<HomeCompanyMarquee\/>/);
+  assert.match(home,/<HomeLiveDrawer\/>/);
+  assert.doesNotMatch(home,/DeferredHomeSection/);
+});
