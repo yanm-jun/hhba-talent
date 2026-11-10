@@ -7,6 +7,7 @@ import {listSavedJobs,savedAvailable} from '../services/savedJobs';
 import {listJobs,getJob,safeOfficialJobUrl,officialStatus,type LiveFilters,type LiveJob} from '../services/liveRecruitment';
 import {rankHomeJobs,HOME_RECOMMENDATION_VERSION,type RecommendationStage} from '../services/homeRecommendations';
 import {SaveJobButton} from './SaveJobButton';
+import {getSavedMajor,majorName} from '../services/majorJobMatching';
 import type {User} from '../services/api';
 import '../styles/home-recommended-jobs.css';
 
@@ -46,10 +47,16 @@ export function HomeRecommendedJobs({user}:{user:User|null}){
  const [collab,setCollab]=useState<Map<string,number>>(new Map());
  const [consent,setConsent]=useState<ConsentState>('guest');
  const [stage,setStage]=useState<RecommendationStage>('all');
+ const [major,setMajor]=useState(getSavedMajor);
  const [loading,setLoading]=useState(true);
  const [message,setMessage]=useState('');
  const [version,setVersion]=useState(0);
  const [busy,setBusy]=useState(false);
+ useEffect(()=>{
+  const syncMajor=()=>setMajor(getSavedMajor());
+  window.addEventListener('hhba-major-changed',syncMajor);
+  return()=>window.removeEventListener('hhba-major-changed',syncMajor);
+ },[]);
  useEffect(()=>{
   const onSave=()=>setVersion(v=>v+1);
   window.addEventListener('hhba:saved-changed',onSave);
@@ -112,9 +119,9 @@ export function HomeRecommendedJobs({user}:{user:User|null}){
   // Display historically verified records only with a clear availability warning.
   return officialStatus(j,updated)!=='invalid';
  }),[jobs,updated]);
- const recommendations=useMemo(()=>rankHomeJobs(candidates,profile,saved,collab,stage,8),
-  [candidates,profile,saved,collab,stage]);
- const personalized=!!profile&&(!!profile.preferred_role||!!profile.skills||!!profile.preferred_city);
+ const recommendations=useMemo(()=>rankHomeJobs(candidates,profile,saved,collab,stage,8,major),
+  [candidates,profile,saved,collab,stage,major]);
+ const personalized=!!major||!!profile&&(!!profile.preferred_role||!!profile.skills||!!profile.preferred_city);
  async function changeConsent(){
   if(busy||!signedIn)return;
   setBusy(true);
@@ -137,7 +144,7 @@ export function HomeRecommendedJobs({user}:{user:User|null}){
   <div className="hhba-recommend-heading"><div>
    <span className="hhba-recommend-eyebrow"><Sparkles size={15}/> HHBA · {HOME_RECOMMENDATION_VERSION}</span>
    <h2 id="hhba-recommend-title">{personalized?'为你精选的职业机会':'发现适合你的职业机会'}</h2>
-   <p>{personalized?'根据你填写的求职偏好与可核验的国内岗位排序。':'选择求职阶段；登录并填写求职偏好后，首页将呈现更贴近你的岗位。'}</p>
+   <p>{personalized?'根据'+(major?'「'+majorName(major)+'」专业、':'')+'你的求职偏好与可核验的国内岗位排序。':'选择求职阶段；登录并填写求职偏好后，首页将呈现更贴近你的岗位。'}</p>
   </div><Link to="/candidate/jobs">完整岗位库 <ArrowRight size={16}/></Link></div>
   <div className="hhba-recommend-tabs" role="group" aria-label="按求职阶段浏览">
    {([['all','为你推荐'],['INTERNSHIP','实习'],['CAMPUS','校园招聘'],['SOCIAL','社会招聘']] as [RecommendationStage,string][]).map(([key,label])=>

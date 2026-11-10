@@ -48,3 +48,10 @@ test('Collaborative results require opted-in peer query with a three-peer thresh
  assert.match(sql[2],/COUNT\(DISTINCT peer.phone\)>=3/);
  assert.ok(!('phone' in result.jobs[0]));
 });
+
+test('Selected major ranks documented related roles ahead of unrelated roles',()=>{
+ const jobs=[job('a','通用分析师','A',{majorNames:['金融学']}),job('b','计算机技术专员','B',{majorNames:['计算机科学与技术']})];
+ const ranked=rankHomeJobs(jobs,null,new Set(),new Map(),'all',8,'computer-science');
+ assert.equal(ranked[0].job.id,'b');
+ assert.match(ranked[0].reasons.join(' '),/专业/);
+});

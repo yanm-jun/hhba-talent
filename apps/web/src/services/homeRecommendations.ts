@@ -1,4 +1,5 @@
 import type {LiveJob} from './liveRecruitment';
+import {matchRoleToMajor} from './majorJobMatching';
 export type RecommendationProfile={preferred_role?:string;preferred_city?:string;skills?:string;headline?:string;intro?:string};
 export type RecommendationStage='all'|'INTERNSHIP'|'CAMPUS'|'SOCIAL';
 export type RecommendedJob={job:LiveJob;score:number;reasons:string[];collaborative:boolean};
@@ -10,7 +11,7 @@ function words(s:unknown){
 }
 function hits(text:string,terms:string[]){return terms.filter(t=>text.includes(t));}
 export function rankHomeJobs(jobs:LiveJob[],profile:RecommendationProfile|null,
- savedIds:ReadonlySet<string>,collaboration:ReadonlyMap<string,number>,stage:RecommendationStage='all',limit=8):RecommendedJob[]{
+ savedIds:ReadonlySet<string>,collaboration:ReadonlyMap<string,number>,stage:RecommendationStage='all',limit=8,majorSlug=''):RecommendedJob[]{
  const role=words(profile?.preferred_role),skills=words(profile?.skills),city=norm(profile?.preferred_city);
  const ranked:RecommendedJob[]=[],seen=new Set<string>();
  for(const job of jobs){
@@ -23,9 +24,13 @@ export function rankHomeJobs(jobs:LiveJob[],profile:RecommendationProfile|null,
   const roleHit=hits(title,role),skillHit=hits(evidence,skills);
   const cityHit=!!city&&city.length>1&&location.includes(city);
   const peers=collaboration.get(job.id)||0;
+  const majorMatch=majorSlug?matchRoleToMajor(job,majorSlug):'all';
   const reasons:string[]=[];
   let score=0;
   if(roleHit.length){score+=32;reasons.push('与你关注的岗位方向相关');}
+  if(majorMatch==='related'){score+=34;reasons.push('与所选专业存在已整理的关联');}
+  else if(majorMatch==='unrestricted'){score+=6;reasons.push('已整理为不限制专业');}
+  else if(majorMatch==='other')score-=12;
   if(skillHit.length){score+=Math.min(28,skillHit.length*9);reasons.push('与你填写的技能有交集');}
   if(cityHit){score+=18;reasons.push('符合意向工作城市');}
   if(peers>0){score+=Math.min(25,peers*5);reasons.push('与你兴趣相似的用户也关注');}
