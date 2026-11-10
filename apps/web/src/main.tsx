@@ -4,82 +4,137 @@ import './styles.css';
 import { api, ApiError, type User } from './services/api';
 import { useRoute, navigate } from './router';
 import { HomePage } from './pages/HomePage';
-import { DataUsePage } from './pages/DataUsePage';
-import { StudyAbroadPage } from './pages/StudyAbroadPage';
-import { OverseasDevelopmentPage } from './pages/OverseasDevelopmentPage';
-import { JapanDevelopmentPage } from './pages/JapanDevelopmentPage';
-import { GermanyDevelopmentPage } from './pages/GermanyDevelopmentPage';
-import { CanadaDevelopmentPage } from './pages/CanadaDevelopmentPage';
-import { UnitedKingdomDevelopmentPage } from './pages/UnitedKingdomDevelopmentPage';
-import { SingaporeDevelopmentPage } from './pages/SingaporeDevelopmentPage';
-import { UnitedStatesDevelopmentPage } from './pages/UnitedStatesDevelopmentPage';
+
+
+
+
+
+
+
+
+
 import { CanadaOccupationDetailPage } from './components/CanadaOccupationDirectory';
 import { GermanyOccupationDetailPage } from './components/GermanyOccupationDirectory';
 import { JapanOccupationDetailPage } from './components/JapanOccupationDirectory';
 import { OverseasOccupationDetailPage } from './components/OverseasOccupationDirectory';
-import { AustraliaDevelopmentPage } from './pages/AustraliaDevelopmentPage';
-import { WinterInternshipPage } from './pages/WinterInternshipPage';
-import { JoinUsPage } from './pages/JoinUsPage';
-import { VisionPage } from './pages/VisionPage';
-import { TalentServicePage } from './pages/TalentServicePage';
-import { TalentServiceRoutes } from './pages/TalentServiceRoutes';
+
+
+
+
+
+
 import './styles/join-vision.css';
-import { MajorCompaniesPage } from './pages/MajorCompaniesPage';
-import { DomesticCompanyPage } from './pages/DomesticCompanyPage';
-import { Company200PreviewPage } from './pages/Company200PreviewPage';
-import { DomesticAutumnPage } from './pages/DomesticAutumnPage';
-import { AutumnCompanyProfilePage } from './pages/AutumnCompanyProfilePage';
-import { UnifiedV2CompanyPage } from './pages/UnifiedV2CompanyPage';
+
+
+
+
+
+
 import { employerProfileByRoute } from './services/employerProfiles';
-import { KpmgCompactProfilePage } from './pages/KpmgCompactProfilePage';
-import { SchneiderCompactProfilePage } from './pages/SchneiderCompactProfilePage';
-import { HuayuVisionCompactProfilePage } from './pages/HuayuVisionCompactProfilePage';
-import { HuaanSecuritiesCompactProfilePage } from './pages/HuaanSecuritiesCompactProfilePage';
-import { GuangfaSecuritiesCompactProfilePage } from './pages/GuangfaSecuritiesCompactProfilePage';
-import { CiticsSecuritiesCompactProfilePage } from './pages/CiticsSecuritiesCompactProfilePage';
-import { PfizerCompactProfilePage } from './pages/PfizerCompactProfilePage';
-import { CsairCompactProfilePage } from './pages/CsairCompactProfilePage';
-import { SfExpressCompactProfilePage } from './pages/SfExpressCompactProfilePage';
-import { NeteaseGamesCompactProfilePage } from './pages/NeteaseGamesCompactProfilePage';
-import { HypergryphCompactProfilePage } from './pages/HypergryphCompactProfilePage';
-import { AnkerCompactProfilePage } from './pages/AnkerCompactProfilePage';
-import { LaifenCompactProfilePage } from './pages/LaifenCompactProfilePage';
-import { ShkpCompactProfilePage } from './pages/ShkpCompactProfilePage';
-import { BoyuCompactProfilePage } from './pages/BoyuCompactProfilePage';
-import { CompanyProfilePage } from './pages/CompanyProfilePage';
-import { IndexedCompanyPage } from './pages/IndexedCompanyPage';
-import { CompanyDirectoryPage } from './pages/CompanyDirectoryPage';
-import { CandidateMatchPage } from './pages/CandidateMatchPage';
-import { AuthPage } from './pages/AuthPage';
-import { AuthChoicePage } from './pages/AuthChoicePage';
-import { PhoneAuthPage } from './pages/PhoneAuthPage';
-import { OfficialRecruitmentContinuePage } from './pages/OfficialRecruitmentContinuePage';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { employerApiReady } from './services/api';
 import { ResumeUploadPage, ProfilePage, PublicProfilePage, ResumePage, ReviewPage } from './pages/CandidatePages';
-import { PersonalCenterPage } from './pages/PersonalCenterPage';
-import { LegalAidLandingPage } from './pages/LegalAidLandingPage';
-import { LegalAidInterventionPage } from './pages/LegalAidInterventionPage';
-import { LegalAidTopicPage } from './pages/LegalAidTopicPage';
+
+
+
+
 import { AnonymousTrafficTracker } from './components/AnalyticsConsent';
 import { EmployerStartPage, EmployerOnboardingPreviewPage, EmployerGrowthHubPage } from './pages/EmployerGrowthHubPage';
 import { EmployerEvidencePage, AdminEmployerEvidencePage } from './pages/EmployerEvidencePage';
-import { EmployeeFeedbackPage } from './pages/EmployeeFeedbackPage';
+
 import { EmployerScoringPage, AdminEmployerScoringPage } from './pages/EmployerScoringPage';
 import { EmployerAppealsPage, EmployeePrivacyConcernsPage, AdminAppealsReviewPage } from './pages/EmployerAppealsPage';
 import { EmployerImprovementsPage, PublicEmployerImprovementsPage, AdminEmployerImprovementsPage } from './pages/EmployerImprovementsPage';
 import { EmployerVerifiedProfilePage, AdminEmployerPublicationPage } from './pages/EmployerVerifiedProfilePage';
 import { EmployerAidApplicationPage, EmployerCommercialPage, AdminAidCommercialPage } from './pages/EmployerAidCommercialPage';
-import { EmployerPage } from './pages/EmployerPage';
-import { EmployerWorkspacePage } from './pages/EmployerWorkspacePage';
+
+
 import { EmployerPublicJobsPage, EmployerPublicJobDetail } from './pages/EmployerPublicJobsPage';
-import { MyEmployerApplicationsPage } from './pages/MyEmployerApplicationsPage';
-import { EmployerReviewPage } from './pages/EmployerReviewPage';
-import { AdminRecruitmentPage } from './pages/AdminRecruitmentPage';
+
+
+
 import { CandidateJobsPage, CandidateJobDetailPage } from './pages/CandidateJobsPage';
 import { UnifiedJobMarket, UnifiedJobDetail } from './components/UnifiedJobMarket';
 import { CompanyStepPage, DocumentsStepPage, RecruiterWelcomePage, RepresentativeStepPage, SubmitReviewPage } from './pages/recruiter/RecruiterOnboarding';
-import { WorkspacePage } from './pages/WorkspacePage';
+
 import {realAuth,realAuthReady,getRealAuthToken,clearRealAuthToken,realAuthToUser} from './services/realAuth';
+const DataUsePage=lazy(()=>import('./pages/DataUsePage').then(module=>({default:module.DataUsePage})));
+const StudyAbroadPage=lazy(()=>import('./pages/StudyAbroadPage').then(module=>({default:module.StudyAbroadPage})));
+const OverseasDevelopmentPage=lazy(()=>import('./pages/OverseasDevelopmentPage').then(module=>({default:module.OverseasDevelopmentPage})));
+const JapanDevelopmentPage=lazy(()=>import('./pages/JapanDevelopmentPage').then(module=>({default:module.JapanDevelopmentPage})));
+const GermanyDevelopmentPage=lazy(()=>import('./pages/GermanyDevelopmentPage').then(module=>({default:module.GermanyDevelopmentPage})));
+const CanadaDevelopmentPage=lazy(()=>import('./pages/CanadaDevelopmentPage').then(module=>({default:module.CanadaDevelopmentPage})));
+const UnitedKingdomDevelopmentPage=lazy(()=>import('./pages/UnitedKingdomDevelopmentPage').then(module=>({default:module.UnitedKingdomDevelopmentPage})));
+const SingaporeDevelopmentPage=lazy(()=>import('./pages/SingaporeDevelopmentPage').then(module=>({default:module.SingaporeDevelopmentPage})));
+const UnitedStatesDevelopmentPage=lazy(()=>import('./pages/UnitedStatesDevelopmentPage').then(module=>({default:module.UnitedStatesDevelopmentPage})));
+const AustraliaDevelopmentPage=lazy(()=>import('./pages/AustraliaDevelopmentPage').then(module=>({default:module.AustraliaDevelopmentPage})));
+const WinterInternshipPage=lazy(()=>import('./pages/WinterInternshipPage').then(module=>({default:module.WinterInternshipPage})));
+const JoinUsPage=lazy(()=>import('./pages/JoinUsPage').then(module=>({default:module.JoinUsPage})));
+const VisionPage=lazy(()=>import('./pages/VisionPage').then(module=>({default:module.VisionPage})));
+const TalentServicePage=lazy(()=>import('./pages/TalentServicePage').then(module=>({default:module.TalentServicePage})));
+const TalentServiceRoutes=lazy(()=>import('./pages/TalentServiceRoutes').then(module=>({default:module.TalentServiceRoutes})));
+const MajorCompaniesPage=lazy(()=>import('./pages/MajorCompaniesPage').then(module=>({default:module.MajorCompaniesPage})));
+const DomesticCompanyPage=lazy(()=>import('./pages/DomesticCompanyPage').then(module=>({default:module.DomesticCompanyPage})));
+const Company200PreviewPage=lazy(()=>import('./pages/Company200PreviewPage').then(module=>({default:module.Company200PreviewPage})));
+const DomesticAutumnPage=lazy(()=>import('./pages/DomesticAutumnPage').then(module=>({default:module.DomesticAutumnPage})));
+const AutumnCompanyProfilePage=lazy(()=>import('./pages/AutumnCompanyProfilePage').then(module=>({default:module.AutumnCompanyProfilePage})));
+const UnifiedV2CompanyPage=lazy(()=>import('./pages/UnifiedV2CompanyPage').then(module=>({default:module.UnifiedV2CompanyPage})));
+const KpmgCompactProfilePage=lazy(()=>import('./pages/KpmgCompactProfilePage').then(module=>({default:module.KpmgCompactProfilePage})));
+const SchneiderCompactProfilePage=lazy(()=>import('./pages/SchneiderCompactProfilePage').then(module=>({default:module.SchneiderCompactProfilePage})));
+const HuayuVisionCompactProfilePage=lazy(()=>import('./pages/HuayuVisionCompactProfilePage').then(module=>({default:module.HuayuVisionCompactProfilePage})));
+const HuaanSecuritiesCompactProfilePage=lazy(()=>import('./pages/HuaanSecuritiesCompactProfilePage').then(module=>({default:module.HuaanSecuritiesCompactProfilePage})));
+const GuangfaSecuritiesCompactProfilePage=lazy(()=>import('./pages/GuangfaSecuritiesCompactProfilePage').then(module=>({default:module.GuangfaSecuritiesCompactProfilePage})));
+const CiticsSecuritiesCompactProfilePage=lazy(()=>import('./pages/CiticsSecuritiesCompactProfilePage').then(module=>({default:module.CiticsSecuritiesCompactProfilePage})));
+const PfizerCompactProfilePage=lazy(()=>import('./pages/PfizerCompactProfilePage').then(module=>({default:module.PfizerCompactProfilePage})));
+const CsairCompactProfilePage=lazy(()=>import('./pages/CsairCompactProfilePage').then(module=>({default:module.CsairCompactProfilePage})));
+const SfExpressCompactProfilePage=lazy(()=>import('./pages/SfExpressCompactProfilePage').then(module=>({default:module.SfExpressCompactProfilePage})));
+const NeteaseGamesCompactProfilePage=lazy(()=>import('./pages/NeteaseGamesCompactProfilePage').then(module=>({default:module.NeteaseGamesCompactProfilePage})));
+const HypergryphCompactProfilePage=lazy(()=>import('./pages/HypergryphCompactProfilePage').then(module=>({default:module.HypergryphCompactProfilePage})));
+const AnkerCompactProfilePage=lazy(()=>import('./pages/AnkerCompactProfilePage').then(module=>({default:module.AnkerCompactProfilePage})));
+const LaifenCompactProfilePage=lazy(()=>import('./pages/LaifenCompactProfilePage').then(module=>({default:module.LaifenCompactProfilePage})));
+const ShkpCompactProfilePage=lazy(()=>import('./pages/ShkpCompactProfilePage').then(module=>({default:module.ShkpCompactProfilePage})));
+const BoyuCompactProfilePage=lazy(()=>import('./pages/BoyuCompactProfilePage').then(module=>({default:module.BoyuCompactProfilePage})));
+const CompanyProfilePage=lazy(()=>import('./pages/CompanyProfilePage').then(module=>({default:module.CompanyProfilePage})));
+const IndexedCompanyPage=lazy(()=>import('./pages/IndexedCompanyPage').then(module=>({default:module.IndexedCompanyPage})));
+const CompanyDirectoryPage=lazy(()=>import('./pages/CompanyDirectoryPage').then(module=>({default:module.CompanyDirectoryPage})));
+const CandidateMatchPage=lazy(()=>import('./pages/CandidateMatchPage').then(module=>({default:module.CandidateMatchPage})));
+const AuthPage=lazy(()=>import('./pages/AuthPage').then(module=>({default:module.AuthPage})));
+const AuthChoicePage=lazy(()=>import('./pages/AuthChoicePage').then(module=>({default:module.AuthChoicePage})));
+const PhoneAuthPage=lazy(()=>import('./pages/PhoneAuthPage').then(module=>({default:module.PhoneAuthPage})));
+const OfficialRecruitmentContinuePage=lazy(()=>import('./pages/OfficialRecruitmentContinuePage').then(module=>({default:module.OfficialRecruitmentContinuePage})));
+const PersonalCenterPage=lazy(()=>import('./pages/PersonalCenterPage').then(module=>({default:module.PersonalCenterPage})));
+const LegalAidLandingPage=lazy(()=>import('./pages/LegalAidLandingPage').then(module=>({default:module.LegalAidLandingPage})));
+const LegalAidInterventionPage=lazy(()=>import('./pages/LegalAidInterventionPage').then(module=>({default:module.LegalAidInterventionPage})));
+const LegalAidTopicPage=lazy(()=>import('./pages/LegalAidTopicPage').then(module=>({default:module.LegalAidTopicPage})));
+const EmployeeFeedbackPage=lazy(()=>import('./pages/EmployeeFeedbackPage').then(module=>({default:module.EmployeeFeedbackPage})));
+const EmployerPage=lazy(()=>import('./pages/EmployerPage').then(module=>({default:module.EmployerPage})));
+const EmployerWorkspacePage=lazy(()=>import('./pages/EmployerWorkspacePage').then(module=>({default:module.EmployerWorkspacePage})));
+const MyEmployerApplicationsPage=lazy(()=>import('./pages/MyEmployerApplicationsPage').then(module=>({default:module.MyEmployerApplicationsPage})));
+const EmployerReviewPage=lazy(()=>import('./pages/EmployerReviewPage').then(module=>({default:module.EmployerReviewPage})));
+const AdminRecruitmentPage=lazy(()=>import('./pages/AdminRecruitmentPage').then(module=>({default:module.AdminRecruitmentPage})));
+const WorkspacePage=lazy(()=>import('./pages/WorkspacePage').then(module=>({default:module.WorkspacePage})));
 const SiteSearchPage=lazy(()=>import('./pages/SiteSearchPage').then(module=>({default:module.SiteSearchPage})));
 function App(){const route=useRoute();const [user,setUser]=useState<User|null>(null);const [ready,setReady]=useState(false);
 useEffect(()=>{
@@ -145,4 +200,4 @@ if(route==='/admin/employer-appeals'||route==='/admin/employer-appeals/')return 
 if(route==='/employer/scoring'||route==='/employer/scoring/')return <EmployerScoringPage user={user}/>;
 if(route==='/admin/employer-scoring'||route==='/admin/employer-scoring/')return <AdminEmployerScoringPage user={user}/>;
 if(route==='/employee/feedback'||route==='/employee/feedback/')return <EmployeeFeedbackPage user={user}/>;if(route==='/employer/evidence'||route==='/employer/evidence/')return <EmployerEvidencePage user={user}/>;if(route==='/admin/employer-evidence'||route==='/admin/employer-evidence/')return <AdminEmployerEvidencePage user={user}/>;if(route==='/employer/hub'||route==='/employer/hub/')return <EmployerGrowthHubPage user={user} view="dashboard"/>;if(route==='/employer/growth'||route==='/employer/growth/')return <EmployerGrowthHubPage user={user} view="growth"/>;if(route==='/employer/aid'||route==='/employer/aid/')return <EmployerGrowthHubPage user={user} view="aid"/>;if(route==='/employer/public'||route==='/employer/public/')return <EmployerGrowthHubPage user={user} view="public"/>;if(route==='/employer/workspace'||route==='/employer/workspace/')return <EmployerWorkspacePage user={user}/>;if(route==='/employer')return <EmployerPage user={user}/>;if(route==='/workspace'&&user)return <WorkspacePage user={user} onLogout={logout}/>;navigate('/');return null;}
-createRoot(document.getElementById('root')!).render(<><App/><AnonymousTrafficTracker/></>);
+createRoot(document.getElementById('root')!).render(<><Suspense fallback={<main className="app-shell" aria-busy="true"/>}><App/></Suspense><AnonymousTrafficTracker/></>);
