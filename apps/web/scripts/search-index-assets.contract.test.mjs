@@ -28,16 +28,26 @@ test('public HTML has unique metadata and private paths never enter sitemap',()=
   assert.equal(release.sha,'1234567890123456789012345678901234567890');
   assert.equal(release.publicUrlCount,18);
   assert.match(home,/<h1>汇方职场 HHBA<\/h1>/);
-  // JS-disabled crawlers retain public text; mobile users get a responsive
-  // branded page and an explicit recovery route rather than bare blue links.
-  assert.match(home,/<style id="hhba-seo-fallback-style">/);
-  assert.match(home,/hhba-seo-hero/);
-  assert.match(home,/hhba-seo-action-primary/);
-  assert.match(home,/<nav aria-label="汇方职场公开页面" class="hhba-seo-nav">/);
-  assert.match(home,/hhba:asset-retry:v1/);
-  assert.match(home,/完整网站暂时未加载成功/);
-  assert.match(home,/href="https:\/\/hhba.work\/candidate\/jobs\/"/);
+  // Critical: the temporary SEO navigation must never paint as the homepage
+  // when React is loading on a real iPhone/Android browser.
+  assert.match(home,/<div id="root"><style id="hhba-boot-style">/);
+  assert.match(home,/<div class="hhba-app-boot"/);
+  assert.match(home,/正在打开完整网站/);
+  assert.match(home,/hhba-boot-trouble/);
+  assert.match(home,/reduced-motion/);
+  assert.match(home,/<noscript>/);
+  // A JS-disabled phone must show an explicit error, not another landing page.
+  assert.match(home,/完整的汇方职场网站需要浏览器启用 JavaScript/);
+  assert.doesNotMatch(home,/<nav aria-label="公开页面目录">/);
+  assert.match(co,/<nav aria-label="公开页面目录">/);
+  assert.match(home,/<h1>汇方职场 HHBA<\/h1>/);
   assert.match(home,/<script src="\/assets\/main.js"><\/script>/);
+  assert.doesNotMatch(home,/hhba-seo-entry|hhba-seo-hero|hhba-seo-fallback-style/);
+  assert.doesNotMatch(home,/location\.reload\(\)/);
+  assert.ok(home.indexOf('hhba-app-boot')<home.indexOf('<noscript>'),'Loading shell must precede no-JS content');
+  assert.match(co,/<noscript>/);
+  assert.match(co,/半导体制造与校园招聘信息/);
+  assert.match(co,/href="https:\/\/hhba.work\/companies\/discover\/"/);
   assert.match(directory,/已整理企业档案（1 家）/);
   assert.match(directory,/href="https:\/\/hhba.work\/companies\/autumn\/cn-autumn-034\/"[^>]*>鹏芯微<\/a>/);
   assert.match(cities,/北京人才政策与住房/);
@@ -53,4 +63,17 @@ test('public HTML has unique metadata and private paths never enter sitemap',()=
   assert.doesNotMatch(sitemap,/candidate\/match|admin-preview|api\//);
   assert.match(readFileSync(join(root,'dist/candidate/match/index.html'),'utf8'),/noindex,nofollow/);
  }finally{rmSync(root,{recursive:true,force:true});}
+});
+
+test('mobile home retains real React homepage instead of deferring its key sections',()=>{
+  const main=readFileSync(resolve('src/main.tsx'),'utf8');
+  const home=readFileSync(resolve('src/pages/HomePage.tsx'),'utf8');
+  assert.match(main,/import \{ HomePage \} from '\.\/pages\/HomePage'/);
+  assert.match(main,/function AppLoadingState\(\)/);
+  assert.match(main,/const ResumeUploadPage=lazy\(/);
+  assert.match(main,/const EmployerEvidencePage=lazy\(/);
+  assert.match(home,/<UnifiedJobMarket compact\/>/);
+  assert.match(home,/<HomeCompanyMarquee\/>/);
+  assert.match(home,/<HomeLiveDrawer\/>/);
+  assert.doesNotMatch(home,/DeferredHomeSection/);
 });

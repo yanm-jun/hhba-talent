@@ -137,73 +137,56 @@ function publicHTML(page){
   html=setTag(html,/<meta property="og:title" content="[^"]*" \/>/,'<meta property="og:title" content="'+escapeHTML(page.title)+'" />','og:title');
   html=setTag(html,/<meta property="og:description" content="[^"]*" \/>/,'<meta property="og:description" content="'+escapeHTML(page.description)+'" />','og:description');
   html=setTag(html,/<meta property="og:url" content="[^"]*" \/>/,'<meta property="og:url" content="'+escapeHTML(url)+'" />','og:url');
-  // Render an actual, responsive public entry instead of the raw blue-link
-  // crawler text when a mobile browser cannot fetch/execute the React bundle.
-  // Keep the real H1, links and full public directory in HTML for no-JS crawlers.
-  const navigation=LINKED.map(([path,label])=>'<a class="hhba-seo-link" href="'+escapeHTML(canonical(path))+'">'+escapeHTML(label)+'</a>').join('');
-  const citiesLinks=page.path==='/' ? '<section class="hhba-seo-cities" aria-label="热门城市人才政策"><h2>城市人才政策</h2><div class="hhba-seo-city-links">'
-    +cities.map(city=>'<a href="'+escapeHTML(canonical('/talent-service/city/'+city))+'">'+escapeHTML(city)+'人才政策</a>').join('')
-    +'</div></section>' : '';
-  // Inline minimal fallback CSS: it must work even if Vite's CSS is unreachable.
-  // React replaces this entire fallback on successful bootstrap.
-  const fallbackStyle='<style id="hhba-seo-fallback-style">'
-    +'body:has(.hhba-seo-entry){margin:0;background:#f5f8f7}'
-    +'.hhba-seo-entry,.hhba-seo-entry *{box-sizing:border-box}'
-    +'.hhba-seo-entry{min-height:100vh;padding:0 20px 42px;margin:0 auto;color:#173c33;font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;max-width:1060px}'
-    +'.hhba-seo-entry a{color:inherit;text-decoration:none}'
-    +'.hhba-seo-header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:21px 0 25px}'
-    +'.hhba-seo-brand{display:inline-flex;align-items:center;gap:9px;font-size:17px;font-weight:800;letter-spacing:.01em}'
-    +'.hhba-seo-brand img{width:36px;height:36px;object-fit:contain}'
-    +'.hhba-seo-login{border:1px solid #cbded6;border-radius:999px;padding:7px 15px;font-size:13px;font-weight:700;white-space:nowrap;background:#fff}'
-    +'.hhba-seo-hero{background:linear-gradient(130deg,#e9f4ef 0%,#fff 65%,#f2f7fc 100%);border:1px solid #dfebe5;border-radius:25px;padding:clamp(24px,5vw,60px);box-shadow:0 16px 45px rgba(24,61,47,.05)}'
-    +'.hhba-seo-eyebrow{margin:0 0 12px;font-size:12px;font-weight:800;letter-spacing:.14em;color:#327961}'
-    +'.hhba-seo-hero h1{margin:0;font-size:clamp(28px,5vw,44px);font-weight:800;line-height:1.25;letter-spacing:-.02em;color:#173c33}'
-    +'.hhba-seo-tagline{font-size:clamp(19px,3.2vw,27px);font-weight:750;margin:14px 0 6px;color:#214d42}'
-    +'.hhba-seo-description{color:#546d62;max-width:690px;font-size:15px;margin:10px 0 0}'
-    +'.hhba-seo-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:27px}'
-    +'.hhba-seo-action{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:10px 21px;border-radius:12px;font-size:14px;font-weight:750;background:#fff;border:1px solid #c5d9ce}'
-    +'.hhba-seo-action-primary{background:#205942;color:#fff!important;border-color:#205942}'
-    +'.hhba-seo-section-title{font-size:15px;color:#2d5445;margin:25px 0 12px}'
-    +'.hhba-seo-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}'
-    +'.hhba-seo-nav .hhba-seo-link{display:flex;align-items:center;min-height:54px;padding:12px 15px;background:#fff;border:1px solid #e0ebe5;border-radius:12px;font-size:14px;font-weight:650}'
-    +'.hhba-seo-cities{margin-top:25px}.hhba-seo-cities h2{font-size:15px;margin:0 0 11px}'
-    +'.hhba-seo-city-links{display:flex;flex-wrap:wrap;gap:8px}'
-    +'.hhba-seo-city-links a{display:inline-block;padding:7px 13px;background:#e7f1eb;border-radius:30px;font-size:13px}'
-    +'.hhba-seo-details{background:#fff;border:1px solid #e0ebe5;border-radius:14px;margin-top:22px;padding:14px 22px;font-size:14px;overflow-wrap:anywhere}'
-    +'.hhba-seo-details a{color:#216f52;text-decoration:underline}'
-    +'.hhba-seo-recovery{display:none;padding:13px 16px;margin:20px 0 0;background:#fff6e8;border:1px solid #efdbb5;border-radius:12px;font-size:13px;color:#65502b}'
-    +'.hhba-seo-entry[data-boot="failed"] .hhba-seo-recovery,.hhba-seo-entry[data-boot="slow"] .hhba-seo-recovery{display:block}'
-    +'.hhba-seo-recovery a{text-decoration:underline;font-weight:800}'
-    +'.hhba-seo-footer{font-size:12px;color:#6d8176;padding-top:24px;text-align:center}'
-    +'@media(max-width:560px){.hhba-seo-entry{padding:0 15px 28px}.hhba-seo-header{padding:16px 0 20px}.hhba-seo-brand{font-size:15px}.hhba-seo-brand img{width:31px;height:31px}.hhba-seo-hero{border-radius:18px;padding:25px 20px}.hhba-seo-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.hhba-seo-nav .hhba-seo-link{font-size:13px;padding:11px;min-height:52px}.hhba-seo-actions{gap:8px}.hhba-seo-action{flex:1 1 auto;padding:10px 12px}}'
+  // Do not render an SEO "homepage" while a real browser downloads React.
+  // A slow connection previously exposed the crawler-only text/link directory as
+  // the visible app, and users mistook it for the actual HHBA homepage.
+  const bootCSS='<style id="hhba-boot-style">'
+    +'.hhba-app-boot,.hhba-app-boot *{box-sizing:border-box}'
+    +'.hhba-app-boot{min-height:100vh;display:flex;align-items:center;justify-content:center;'
+    +'padding:32px 20px;background:#f7f9f8;color:#21483b;font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;text-align:center}'
+    +'.hhba-boot-inner{max-width:360px;width:100%}'
+    +'.hhba-boot-brand{display:flex;align-items:center;justify-content:center;gap:10px;font-size:20px;font-weight:750}'
+    +'.hhba-boot-brand img{width:43px;height:43px;object-fit:contain}'
+    +'.hhba-boot-progress{height:3px;background:#dcebe5;border-radius:12px;overflow:hidden;margin:24px auto 13px;max-width:190px}'
+    +'.hhba-boot-progress:after{content:"";display:block;width:40%;height:100%;background:#277252;border-radius:12px;animation:hhbaBootMotion 1.6s ease-in-out infinite}'
+    +'@keyframes hhbaBootMotion{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}'
+    +'@media(prefers-reduced-motion:reduce){.hhba-boot-progress:after{animation:none;width:100%}}'
+    +'.hhba-boot-detail{font-size:13px;color:#658075;margin:0}'
+    +'.hhba-boot-trouble{display:none;margin-top:20px;border-top:1px solid #dfe8e2;padding-top:15px;font-size:13px;color:#526d5e}'
+    +'.hhba-boot-trouble a{color:#236b50;font-weight:750;text-decoration:underline}'
+    +'.hhba-app-boot[data-state="slow"] .hhba-boot-trouble,.hhba-app-boot[data-state="failed"] .hhba-boot-trouble{display:block}'
     +'</style>';
-  const fallback='<main class="hhba-seo-entry" id="hhba-seo-entry">'
-    +'<header class="hhba-seo-header"><a class="hhba-seo-brand" href="'+ORIGIN+'/"><img src="/images/hhba-logo.svg" alt="" width="36" height="36" />汇方职场 · HHBA</a>'
-    +'<a class="hhba-seo-login" href="'+canonical('/candidate/login')+'">登录 / 注册</a></header>'
-    +'<section class="hhba-seo-hero"><p class="hhba-seo-eyebrow">HHBA · HUMAN CAPABILITY NETWORK</p>'
-    +'<h1>'+escapeHTML(page.heading)+'</h1><p class="hhba-seo-tagline">让机会与人才，找到彼此。</p>'
-    +'<p class="hhba-seo-description">'+escapeHTML(page.body)+'</p>'
-    +'<div class="hhba-seo-actions"><a class="hhba-seo-action hhba-seo-action-primary" href="'+canonical('/candidate/jobs')+'">浏览招聘岗位</a>'
-    +'<a class="hhba-seo-action" href="'+canonical('/candidate/match')+'">智能匹配简历</a></div></section>'
-    +'<h2 class="hhba-seo-section-title">探索汇方职场</h2>'
-    +'<nav aria-label="汇方职场公开页面" class="hhba-seo-nav">'+navigation+'</nav>'
-    +citiesLinks
-    +(page.extraHtml ? '<div class="hhba-seo-details">'+page.extraHtml+'</div>' : '')
-    +'<aside class="hhba-seo-recovery" role="status">完整网站暂时未加载成功，可能是网络或浏览器资源加载异常。'
-    +'<a href="'+escapeHTML(url)+'">点此重新打开完整页面</a>。若仍无法恢复，请尝试切换网络。</aside>'
-    +'<footer class="hhba-seo-footer">汇方职场 HHBA · 让机会与人才，找到彼此。</footer></main>';
-  // A verified failed JS/CSS asset gets one automatic retry per tab/path.
-  // If it still fails, keep the real, usable static navigation and explain it.
-  // Slow connections are never reloaded by a timer, so progress is not lost.
-  const recoveryScript='<script>(function(){'
-    +'function mark(status){var el=document.getElementById("hhba-seo-entry");if(el)el.setAttribute("data-boot",status)}'
-    +'function assetFailed(){if(!document.getElementById("hhba-seo-entry"))return;'
-    +'try{var key="hhba:asset-retry:v1:"+location.pathname;if(!sessionStorage.getItem(key)){sessionStorage.setItem(key,"1");location.reload();return}}catch(e){}mark("failed")}'
-    +'window.addEventListener("error",function(e){var t=e.target;if(!t||!t.tagName)return;'
-    +'var src=t.src||t.href||"";if((t.tagName==="SCRIPT"||t.tagName==="LINK")&&src.indexOf("/assets/")!==-1)assetFailed()},true);'
-    +'setTimeout(function(){if(document.getElementById("hhba-seo-entry"))mark("slow")},12000)'
+  const initial='<div class="hhba-app-boot" id="hhba-app-boot" role="status" aria-live="polite">'
+    +'<div class="hhba-boot-inner"><div class="hhba-boot-brand">'
+    +'<img src="/images/hhba-logo.svg" width="43" height="43" alt="" />'
+    +'<span>汇方职场 · HHBA</span></div>'
+    +'<div class="hhba-boot-progress" aria-hidden="true"></div>'
+    +'<p class="hhba-boot-detail">正在打开完整网站…</p>'
+    +'<div class="hhba-boot-trouble">完整页面加载较慢或资源未能加载。'
+    +'<a href="'+escapeHTML(url)+'">重新打开</a>，或切换网络后重试。</div>'
+    +'</div></div>';
+  // No automatic reloads: mobile visitors should never get stuck in a loop.
+  const recovery='<script>(function(){'
+    +'function mark(s){var e=document.getElementById("hhba-app-boot");if(e)e.setAttribute("data-state",s)}'
+    +'window.addEventListener("error",function(e){var t=e.target;if(t&&t.tagName){'
+    +'var u=t.src||t.href||"";if((t.tagName==="SCRIPT"||t.tagName==="LINK")&&u.indexOf("/assets/")!==-1)mark("failed")}},true);'
+    +'setTimeout(function(){mark("slow")},12000)'
     +'})();</script>';
-  html=setTag(html,/<div id="root"><\/div>/,'<div id="root">'+fallbackStyle+fallback+recoveryScript+'</div>','root');
+  // Public metadata and sitemap remain in the HTML head. Public deep-link
+  // content is kept in <noscript> for text-only agents without ever flashing
+  // as an interactive lookalike landing page when JavaScript is enabled.
+  const navigation=LINKED.map(([path,label])=>'<a href="'+escapeHTML(canonical(path))+'">'+escapeHTML(label)+'</a>').join(' · ');
+  const citiesLinks=page.path==='/' ? '' : '<p>'+cities.map(city=>'<a href="'+escapeHTML(canonical('/talent-service/city/'+city))+'">'+escapeHTML(city)+'人才政策</a>').join(' · ')+'</p>';
+  const noScript='<noscript><style>#root{display:none!important}'
+    +'.hhba-nojs{max-width:900px;margin:40px auto;padding:24px;font:16px/1.8 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#203e32}'
+    +'.hhba-nojs a{color:#236b50}.hhba-nojs nav{line-height:2.5}'
+    +'</style><main class="hhba-nojs"><h1>'+escapeHTML(page.heading)+'</h1>'
+    +'<p>完整的汇方职场网站需要浏览器启用 JavaScript。请检查浏览器设置或切换网络后重新打开。</p>'
+    +(page.path==='/' ? '<p><a href="'+ORIGIN+'/">重新打开完整网站</a></p>' :
+       '<p>'+escapeHTML(page.body)+'</p>'
+       +'<nav aria-label="公开页面目录">'+navigation+'</nav>'+citiesLinks+(page.extraHtml||''))
+    +'</main></noscript>';
+  html=setTag(html,/<div id="root"><\/div>/,'<div id="root">'+bootCSS+initial+recovery+'</div>'+noScript,'root');
   return html;
 }
 for (const page of pages){
