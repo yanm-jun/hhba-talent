@@ -1,0 +1,57 @@
+name: HHBA public search-index SEO checks and IndexNow
+on:
+  push:
+    branches:
+      - main
+      - feature/search-engine-discovery-20261110
+    paths:
+      - 'apps/web/index.html'
+      - 'apps/web/public/robots.txt'
+      - 'apps/web/public/_headers'
+      - 'apps/web/scripts/build-search-index-assets.mjs'
+      - 'apps/web/scripts/search-index-assets.contract.test.mjs'
+      - 'apps/web/scripts/cloudflare-pages-build.py'
+      - '.github/workflows/hhba-search-index-assets.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  seo-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate public crawling and sitemap generation
+        working-directory: apps/web
+        run: |
+          node --check scripts/build-search-index-assets.mjs
+          node --test scripts/search-index-assets.contract.test.mjs
+  notify-indexnow:
+    if: github.ref == 'refs/heads/main'
+    needs: seo-contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for published ownership key and sitemap
+        shell: bash
+        run: |
+          set -euo pipefail
+          key='9a3c3cf5a998f8d7e916078a3e4255efee04cc25'
+          for attempt in $(seq 1 24); do
+            published=$(curl -fsSL --max-time 12 "https://hhba.work/$key.txt" || true)
+            map=$(curl -fsSL --max-time 12 https://hhba.work/sitemap.xml || true)
+            if [[ "$published" == "$key" && "$map" == *'<urlset'* ]]; then
+              echo 'Production IndexNow key and XML sitemap available'
+              exit 0
+            fi
+            sleep 15
+          done
+          echo 'Production SEO artifacts not yet deployed'; exit 1
+      - name: Notify participating engines of changed public entry pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload='{"host":"hhba.work","key":"9a3c3cf5a998f8d7e916078a3e4255efee04cc25","keyLocation":"https://hhba.work/9a3c3cf5a998f8d7e916078a3e4255efee04cc25.txt","urlList":["https://hhba.work/","https://hhba.work/candidate/jobs/","https://hhba.work/winter-internship/","https://hhba.work/talent-service/","https://hhba.work/companies/discover/"]}'
+          curl --fail-with-body --show-error --silent --max-time 30 -X POST https://api.indexnow.org/indexnow -H 'Content-Type: application/json; charset=utf-8' --data-binary "$payload"
+          echo 'IndexNow submission sent; search engines decide whether/when to index'

@@ -101,6 +101,10 @@ def main() -> None:
     run(["node", "scripts/materialize-company-route-entries.mjs"], cwd=WEB,
         env={**os.environ, "HHBA_CLOUDFLARE_PAGES": "1"})
 
+    # Pre-render only public discovery routes, create genuine XML sitemap, and
+    # keep account/resume/admin surfaces outside the searchable catalogue.
+    run(["node", "scripts/build-search-index-assets.mjs"], cwd=WEB)
+
     # Locally host the licensed font used by the brand slogan.
     run(["python3", "scripts/prepare-home-xingshu-font.py"], cwd=WEB)
 

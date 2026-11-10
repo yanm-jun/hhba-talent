@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin-preview/
+Disallow: /preview-admin/
+Disallow: /candidate/resume/
+Disallow: /employer/workspace/
+Sitemap: https://hhba.work/sitemap.xml
