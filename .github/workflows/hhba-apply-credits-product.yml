@@ -12,6 +12,10 @@ on:
       - 'apps/web/functions/_lib/apply-credit-ledger.js'
       - 'apps/web/functions/_lib/apply-payment-reconciliation.js'
       - 'apps/web/functions/_lib/apply-ai-suggest.js'
+      - 'apps/web/functions/_lib/apply-ai-runtime.js'
+      - 'apps/web/functions/_lib/apply-ai-usage.js'
+      - 'apps/web/d1/0013_apply_ai_usage_audit.sql'
+      - 'apps/web/scripts/apply-ai-v06.contract.test.mjs'
       - 'apps/web/functions/_lib/apply-extension-pairing.js'
       - 'apps/web/d1/0012_apply_extension_pairing.sql'
       - 'apps/web/scripts/apply-pairing.contract.test.mjs'
@@ -49,9 +53,11 @@ jobs:
           node --check 'functions/_lib/apply-credit-ledger.js'
           node --check 'functions/_lib/apply-payment-reconciliation.js'
           node --check 'functions/_lib/apply-ai-suggest.js'
+          node --check 'functions/_lib/apply-ai-runtime.js'
+          node --check 'functions/_lib/apply-ai-usage.js'
           node --check 'functions/_lib/apply-extension-pairing.js'
           node --check 'functions/api/apply/[[path]].js'
-          node --test scripts/apply-credits.contract.test.mjs scripts/apply-payments-v2.contract.test.mjs scripts/apply-ai-v05.contract.test.mjs scripts/apply-pairing.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
+          node --test scripts/apply-credits.contract.test.mjs scripts/apply-payments-v2.contract.test.mjs scripts/apply-ai-v05.contract.test.mjs scripts/apply-ai-v06.contract.test.mjs scripts/apply-pairing.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
       - name: Verify the additive D1 schema with SQLite
         working-directory: apps/web
         run: python3 scripts/apply_credits_schema_test.py
@@ -74,7 +80,7 @@ jobs:
           node --check popup.js
           node --check account.mjs
           node --check core.mjs
-          node --test tests/core.test.mjs tests/quickfill.contract.test.mjs tests/account.contract.test.mjs tests/ai-map.contract.test.mjs
+          node --test tests/core.test.mjs tests/quickfill.contract.test.mjs tests/account.contract.test.mjs tests/ai-map.contract.test.mjs tests/resume-gr-synthetic.contract.test.mjs
       - name: Install Chromium and Playwright for actual DOM acceptance
         run: |
           python3 -m pip install --quiet --disable-pip-version-check 'playwright>=1.55,<2'

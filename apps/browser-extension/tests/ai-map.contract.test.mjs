@@ -62,3 +62,13 @@ test('V0.5 UI requires per-call opt-in and does NOT silently AI-fill or charge',
  assert.ok(!popup.includes('AI_DEDUCT_CREDIT'));
  assert.ok(!popup.includes(".submit("));
 });
+
+test('V0.6 private AI disclosure is explicit and refreshed on every call',()=>{
+ const html=readFileSync(new URL('../popup.html',import.meta.url),'utf8');
+ const js=readFileSync(new URL('../popup.js',import.meta.url),'utf8');
+ assert.ok(html.includes('ai-privacy-disclosure'));
+ assert.ok(html.includes('服务商隐私政策'));
+ assert.ok(html.includes('deepseek-privacy-policy.html'));
+ assert.ok(html.includes('不会发送姓名、手机号、邮箱值、完整简历正文'));
+ assert.ok(js.includes('$("ai-consent").checked=false'));
+});

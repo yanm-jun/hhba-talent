@@ -2,7 +2,7 @@ import {useEffect,useMemo,useState} from 'react';
 import {ArrowRight,BadgeCheck,CheckCircle2,ChevronRight,Clock3,FileCheck2,LockKeyhole,MousePointerClick,PlayCircle,RefreshCcw,ReceiptText,ShieldCheck,Sparkles,Wallet} from 'lucide-react';
 import {Link} from '../router';
 import {qrcodegen} from '../vendor/qrcodegen';
-import {applyAccountAvailable,createApplyOrder,closeApplyOrder,getApplyConfig,queryApplyOrderStatus,getApplyOrders,getApplyTasks,getApplyWallet,listApplyRefundRequests,requestApplyRefund,getApplyPairStatus,startApplyPair,revokeApplyPairs,type ApplyConfig,type ApplyOrder,type ApplyTask,type ApplyWallet,type ApplyRefundRequest,type ApplyPairCode} from '../services/applyCredits';
+import {applyAccountAvailable,createApplyOrder,closeApplyOrder,getApplyConfig,queryApplyOrderStatus,getApplyOrders,getApplyTasks,getApplyWallet,listApplyRefundRequests,requestApplyRefund,getApplyPairStatus,startApplyPair,revokeApplyPairs,getApplyAIStatus,getApplyAIUsage,type ApplyAIStatus,type ApplyAIUsage,type ApplyConfig,type ApplyOrder,type ApplyTask,type ApplyWallet,type ApplyRefundRequest,type ApplyPairCode} from '../services/applyCredits';
 import '../styles/apply-assistant-product.css';
 
 const fallbackPackages=[{uses:10,amountFen:300},{uses:20,amountFen:600},{uses:50,amountFen:1500},{uses:100,amountFen:3000}];
@@ -36,6 +36,8 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
  const [pairedDevices,setPairedDevices]=useState<number|null>(null);
  const [pairBusy,setPairBusy]=useState(false);
  const [pairNotice,setPairNotice]=useState('');
+ const [aiStatus,setAIStatus]=useState<ApplyAIStatus|null>(null);
+ const [aiUsage,setAIUsage]=useState<ApplyAIUsage|null>(null);
  const [loading,setLoading]=useState(true);
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
@@ -56,6 +58,8 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
      if(!active)return;
      setWallet(nextWallet);setOrders(nextOrders);setTasks(nextTasks);setRefunds(nextRefunds);
      if(data.pairingEnabled)try{const status=await getApplyPairStatus();if(active)setPairedDevices(status.connectedDevices)}catch{if(active)setPairNotice('暂时无法查询插件连接状态。')}
+     const ai=[await getApplyAIStatus().catch(()=>null),await getApplyAIUsage().catch(()=>null)] as const;
+     if(active){setAIStatus(ai[0]);setAIUsage(ai[1])}
     }
    }catch(e){if(active)setNotice(e instanceof Error?e.message:'次数账户暂时不可用。')}
    finally{if(active)setLoading(false)}
@@ -210,6 +214,11 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
    </div>}
    {pairNotice&&<p className="hhba-apply-safety-note" role="status"><ShieldCheck size={15}/>{pairNotice}</p>}
    <p className="hhba-apply-safety-note"><ShieldCheck size={15}/>只读连接，不会付款、扣次、上传简历或自动投递。待完成扩展安全验收后开放。</p>
+   <p className="hhba-apply-safety-note"><Sparkles size={15}/>
+    AI 字段识别：{aiStatus?.ready?'已具备请求条件':'目前未开放'}。
+    {aiUsage?(' 今日已尝试 '+aiUsage.todayCalls+' 次，当前小时剩余 '+aiUsage.remainingThisHour+' 次。'):''}
+    每次都需要本人授权；AI 建议必须手动确认，不会自动投递或扣费。
+   </p>
   </section>
   <section className="hhba-apply-history">
    <div className="hhba-apply-headline"><div><h3>使用与购买记录</h3><p>同一账号独立归属；不使用演示数据冒充真实记录。</p></div></div>

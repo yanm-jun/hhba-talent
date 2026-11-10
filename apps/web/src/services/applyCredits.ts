@@ -6,6 +6,8 @@ export type ApplyWallet={purchased:number;consumed:number;reserved:number;availa
 export type ApplyOrder={id:string;uses:number;amountFen:number;status:'pending'|'paid'|'closed'|'refunded';createdAt:string;paidAt:string|null;qrCode?:string};
 export type ApplyTask={id:string;status:'reserved'|'completed'|'released';createdAt:string;finishedAt:string|null};
 export type ApplyRefundRequest={orderId:string;reason:string;status:'requested'|'reviewing'|'rejected'|'completed';createdAt:string};
+export type ApplyAIStatus={ok:true;ready:boolean;providerConfigured:boolean;pairingEnabled:boolean;disclosureApproved:boolean;aiFeatureEnabled:boolean};
+export type ApplyAIUsage={todayCalls:number;todaySuccess:number;todayPromptTokens:number;todayCachedTokens:number;todayCompletionTokens:number;estimatedPeakCostUpperMicroUsd:number;remainingThisHour:number};
 export const applyAccountAvailable=realAuthReady&&import.meta.env.BASE_URL!=='/hhba-talent/';
 const errors:Record<string,string>={
  SESSION_INVALID:'登录已失效，请重新登录。',
@@ -62,3 +64,6 @@ export type ApplyPairCode={ok:true;code:string;expiresAt:string};
 export const getApplyPairStatus=()=>request<ApplyPairStatus>('/pair/status');
 export const startApplyPair=()=>request<ApplyPairCode>('/pair/start','POST');
 export const revokeApplyPairs=()=>request<ApplyPairStatus>('/pair/revoke','POST');
+
+export const getApplyAIStatus=()=>request<ApplyAIStatus>('/ai/status');
+export const getApplyAIUsage=()=>request<{ok:true;usage:ApplyAIUsage}>('/ai/usage').then(x=>x.usage);

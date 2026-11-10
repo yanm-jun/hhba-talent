@@ -6,7 +6,13 @@
 <div class="ai-assist-panel">
  <strong>AI 辅助识别陌生字段 <small>V0.5 内测 · 默认关闭</small></strong>
  <p>仅发送当前网页的非敏感字段名称、你档案中已有的字段类型；不发送姓名、手机号、简历内容和填写值。AI 只推荐匹配关系，建议默认不勾选，你核对后才能填入。</p>
- <label class="ai-consent"><input id="ai-consent" type="checkbox">我同意本次将上述字段标签和资料类型发送给外部 AI 服务进行字段分析。尚未开启服务时不会发送数据。</label>
+ <details class="ai-privacy-disclosure"><summary>查看 AI 字段识别的数据处理说明</summary>
+  <p><strong>处理目的：</strong>辅助判断当前招聘页面的普通字段与求职档案字段类型的对应关系。提供方为 HHBA，第三方模型接口服务商为<strong>杭州深度求索人工智能基础技术研究有限公司（DeepSeek）</strong>。</p>
+  <p><strong>发送内容：</strong>用户本次选中的、经过安全过滤的招聘表单普通字段标签与控件类型，以及本地档案中已有资料的字段名称；<strong>不会发送姓名、手机号、邮箱值、完整简历正文、已填写答案、登录凭据</strong>。请勿在表单标签中写入私人信息。</p>
+  <p><strong>数据留存：</strong>HHBA 不保存本次字段标签或模型原始回答，仅记录账号标识、调用状态、Token 用量、时间与费用估计。第三方可能依据其自身规则处理 API 请求内容，详情见 <a href="https://cdn.deepseek.com/policies/zh-CN/deepseek-privacy-policy.html" target="_blank" rel="noopener noreferrer">服务商隐私政策</a>。正式使用前须阅读并确认。</p>
+  <p><strong>你的选择：</strong>勾选仅针对本次请求，结束后自动清除。不同意仍可使用离线本地预填；AI 结果不自动投递或收费，仍需你勾选核对。</p>
+ </details>
+ <label class="ai-consent"><input id="ai-consent" type="checkbox">我已阅读数据处理说明，并仅同意本次将非敏感字段标签和资料类型发送给 HHBA 的外部 AI 服务进行分析。</label>
  <button type="button" id="ai-map" class="secondary">AI 分析未识别字段（需已连接账号）</button>
 </div><div class="actions"><button id="quickfill" class="primary" type="button">一键预填安全字段</button><button id="scan" class="secondary" type="button">先预览填写方案</button><button id="undo" class="secondary">撤销本次填写</button><button id="sidepanel" class="secondary" type="button">在侧边栏查看</button></div>
 <div id="counts" class="counts hidden"></div><div id="plan" class="plan" aria-live="polite"></div>
