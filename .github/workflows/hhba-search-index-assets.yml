@@ -7,6 +7,7 @@ on:
     paths:
       - 'README.md'
       - 'apps/web/index.html'
+      - 'apps/web/src/main.tsx'
       - 'apps/web/public/robots.txt'
       - 'apps/web/public/_headers'
       - 'apps/web/scripts/build-search-index-assets.mjs'
@@ -17,6 +18,13 @@ on:
       - 'apps/web/src/data/employerProfiles/**'
       - 'apps/web/src/data/talent**'
       - 'apps/web/scripts/cloudflare-pages-build.py'
+      - '.github/workflows/hhba-search-index-assets.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/scripts/build-search-index-assets.mjs'
+      - 'apps/web/scripts/search-index-assets.contract.test.mjs'
       - '.github/workflows/hhba-search-index-assets.yml'
   workflow_dispatch:
 permissions:
