@@ -78,7 +78,7 @@ export function HomeRecommendedJobs({user}:{user:User|null}){
      listJobs(mainland,30,controller.signal)
    ]);
    if(controller.signal.aborted||!active)return;
-   const pages=baseline.filter((r):r is PromiseFulfilledResult<Awaited<ReturnType<typeof listJobs>>=>r.status==='fulfilled').map(r=>r.value);
+   const pages=baseline.filter((r):r is PromiseFulfilledResult<Awaited<ReturnType<typeof listJobs>>>=>r.status==='fulfilled').map(r=>r.value);
    const data=pages.flatMap(p=>p.jobs).filter(j=>j.domestic&&!!safeOfficialJobUrl(j));
    const p=await personal,items=await bookmarks;
    if(controller.signal.aborted||!active)return;
