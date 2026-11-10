@@ -3,10 +3,10 @@ import {ArrowLeft,ArrowRight,BriefcaseBusiness,FileText,FileUp,LockKeyhole,Loade
 import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
 import {Link} from '../router';
-import {CandidateMatchResultDialog} from '../components/CandidateMatchResultDialog';
+import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDialog';
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,type PrivateResume} from '../services/privateResumes';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,checkMatchProviderConnection,type MatchResponse,type MatchOptions,MatchError} from '../services/resumeMatch';
+import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -27,9 +27,10 @@ export function CandidateMatchPage({user}:{user:User|null}){
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
  const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10});
  const [working,setWorking]=useState(false);
+  const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
+  const [stage,setStage]=useState<'preparing'|'connected'|'searching'|'reading'|'writing'|'waiting'>('preparing');
  const [error,setError]=useState('');
- const [providerCheckBusy,setProviderCheckBusy]=useState(false);
- const [providerCheckMessage,setProviderCheckMessage]=useState('');
+
  const [result,setResult]=useState<MatchResponse|null>(null);
  const controller=useRef<AbortController|null>(null);
  useEffect(()=>{
@@ -93,14 +94,14 @@ export function CandidateMatchPage({user}:{user:User|null}){
  }
  async function run(){
   if((!file&&!savedId)||!consent||working||previewBusy||availability!=='ready'||!getRealAuthToken())return;
-  setWorking(true);setError('');setProviderCheckMessage('');setResult(null);
+  setWorking(true);setStage('preparing');setError('');setResult(null);setPartialJobs([]);
   const abort=new AbortController();
   controller.current=abort;
   try{
    let matched:MatchResponse;
    if(previewLoaded){
     // Once the user has reviewed/edited text, NEVER fall back to re-reading the unedited file.
-    matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,savedId||undefined);
+    matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
    }else{
     let selected=file;
     if(!selected&&savedId){
@@ -111,9 +112,9 @@ export function CandidateMatchPage({user}:{user:User|null}){
      selected=new File([bytes],entry.name,{type:entry.type});
     }
     if(!selected)throw new MatchError(400,'请选择简历。');
-    matched=await submitResumeForMatching(selected,options,consent,abort.signal,savedId||undefined);
+    matched=await submitResumeForMatching(selected,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
    }
-   setResult(matched);
+   setResult(matched);setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
    setConsent(false);
   }catch(e){
@@ -127,8 +128,8 @@ export function CandidateMatchPage({user}:{user:User|null}){
     <div className="hhba-ai-hero">
       <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> 汇方职场 · HHBA · AI JOB MATCH</div>
       <h1>上传简历，匹配中国大陆岗位。</h1>
-      <p>根据学历、经历与技能匹配中国大陆的核验职位；结果在独立弹窗中精简展示，可随时关闭返回修改。</p>
-      <div className="hhba-ai-headline-tags"><span>仅中国大陆</span><span>无须自备 API Key</span><span>可返回修改</span></div>
+      <p>DeepSeek Search 只筛选企业招聘站和企业专属招聘系统的具体岗位，V4 Pro 根据简历解释适配原因；不展示第三方招聘平台职位。</p>
+      <div className="hhba-ai-headline-tags"><span>中国大陆工作岗位</span><span>Search 检索 · V4 Pro 匹配</span><span>无需自备 Key</span></div>
     </div>
     {availability==='loading'&&<p className="hhba-ai-service-check"><LoaderCircle size={17} className="spin"/>正在检查平台智能匹配服务…</p>}
     {availability==='disabled'&&<div className="hhba-ai-admin-note" role="status">
@@ -171,7 +172,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
          </div>}
         </div>
         <header className="hhba-ai-section-title"><h2>2. 选择工作方向</h2>
-          <p>匹配范围固定为中国大陆；未填目标时会参考简历技能和经历。</p></header>
+          <p>可选填目标方向；不填时让 DeepSeek 根据简历自主判断。</p></header>
         <div className="hhba-ai-mainland-only"><span>工作区域</span><strong>中国大陆</strong><small>不推荐港澳台或境外岗位</small></div>
         <div className="hhba-ai-fields hhba-ai-fields-one">
          <label>目标岗位方向<input value={options.role_hint} maxLength={80} placeholder="例如：软件开发、数据分析、销售、视觉设计"
@@ -180,41 +181,29 @@ export function CandidateMatchPage({user}:{user:User|null}){
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我同意 HHBA 提取简历文本，尽可能隐藏邮箱、电话等直接标识后，发送给 DeepSeek 分析能力和匹配岗位；平台还会仅使用岗位方向联网搜索中国大陆公开招聘信息，不向搜索接口传送姓名、电话或简历原文。脱敏可能不完整，请自行检查；不会公开简历或自动投递。</span>
+          <span>我同意 HHBA 提取简历文本，尽可能隐藏联系方式后，发送给 DeepSeek V4 Pro，由 Search 接口搜索中国大陆公开招聘页面，再由 V4 Pro 生成岗位推荐。脱敏可能不完整，可先预览编辑；不会公开简历或自动投递。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/> 本功能仅供已登录的求职者使用。简历原件在当前浏览器读取，最多取前 2 万字文字分析；分析需单独同意，结果仅在本次页面中展示，不会自动公开或向企业投递。</p>
-        {(error||availability==='ready')&&<div>
-          {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
-          {availability==='ready'&&getRealAuthToken()&&
-           <div className="hhba-ai-review-tools">
-            <button type="button" disabled={providerCheckBusy||working}
-             onClick={()=>{setProviderCheckBusy(true);setProviderCheckMessage('');
-              void checkMatchProviderConnection().then(setProviderCheckMessage)
-               .catch(e=>setProviderCheckMessage(e instanceof Error?e.message:'检测失败，请稍后重试。'))
-               .finally(()=>setProviderCheckBusy(false));}}>
-              {providerCheckBusy?'正在检查 AI 服务…':'检测 AI 密钥及余额（不消耗匹配次数）'}
-            </button>
-            {providerCheckMessage&&<p role="status">{providerCheckMessage}</p>}
-           </div>}
-        </div>}
+        {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
           disabled={(!file&&!savedId)||!consent||working||previewBusy||(previewLoaded&&previewText.replace(/\s/g,'').length<30)||availability!=='ready'||!getRealAuthToken()}>
           {working?<><LoaderCircle className="spin" size={18}/> 正在提取简历并匹配岗位…</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>
-        {working&&<p className="hhba-ai-processing" role="status">正在分析简历、搜索国内公开职位并核验岗位要求。请保持页面打开，完成后将自动展示推荐。</p>}
+        {working&&<p className="hhba-ai-processing" role="status">{stage==='preparing'?'正在安全提交简历并启动 DeepSeek…':stage==='connected'?'DeepSeek 已连接，正在准备联网搜索…':stage==='searching'?'DeepSeek Search 正在寻找中国大陆具体招聘岗位…':stage==='reading'?'正在读取部分候选岗位描述…':stage==='waiting'?'DeepSeek 仍在处理，连接保持正常…':'候选岗位已找到，V4 Pro 正在分析简历并撰写推荐理由…'}</p>}
       </section>
       <aside className="hhba-ai-aside">
-        <div className="hhba-ai-aside-card"><h3>我们会怎样匹配？</h3>
-          <ol><li>解析你的学历、技能、经验和目标方向</li>
-            <li>读取当前官方岗位和核验过的任职要求</li>
-            <li>按真实岗位条件排序并说明依据</li>
-            <li>由你自行判断和前往企业官网投递</li></ol>
-        </div>
-        <p className="hhba-ai-aside-footnote">相关度分数只是搜索排序参考，不是获得面试、录用或签证的概率。任何“未披露”条件都需要官网确认。</p>
+        <div className="hhba-ai-aside-card"><h3>只需三步</h3>
+           <ol><li>上传简历</li><li>DeepSeek Search 查找岗位，V4 Pro 判断适配程度</li>
+             <li>直接查看 Top 10 推荐理由与岗位链接</li></ol>
+         </div>
+         <p className="hhba-ai-aside-footnote">工作地点仅限中国大陆；招聘状态请以岗位原始网页为准。</p>
       </aside>
     </div>
-    {result&&<CandidateMatchResultDialog result={result} onClose={()=>setResult(null)}/>}
+    {(result||partialJobs.length>0)&&<CandidateMatchNativeDialog
+      result={result||{matches:partialJobs}}
+      pending={working&&!result} notice={working?'':error}
+      onClose={()=>{if(working)controller.current?.abort();setPartialJobs([]);setResult(null);setWorking(false);}}/>}
      <div className="hhba-ai-footer"><Link to="/candidate/jobs">不上传简历，直接搜索公开岗位 <ArrowRight size={15}/></Link></div>
   </section>
  </Shell>;

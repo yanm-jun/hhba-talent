@@ -151,13 +151,13 @@ test('Top 10 never repeats company+title just because an ATS job has more locati
 });
 
 
-test('free provider diagnostic button is visible before any chargeable resume match',async()=>{
+test('native match has one upload action and retains separate explicit AI consent',async()=>{
  const {readFile}=await import('node:fs/promises');
  const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
- assert.match(page,/\(error\|\|availability==='ready'\)/);
- assert.match(page,/检测 AI 密钥及余额（不消耗匹配次数）/);
- assert.match(page,/checkMatchProviderConnection\(\)/);
- assert.match(page,/availability==='ready'&&getRealAuthToken\(\)/);
+ assert.match(page,/我同意 HHBA 提取简历文本/);
+ assert.match(page,/开始智能匹配/);
+ assert.match(page,/CandidateMatchNativeDialog/);
+ assert.doesNotMatch(page,/检测 AI 密钥及余额（不消耗匹配次数）/);
 });
 
 test('even a forged overseas preference cannot force foreign jobs into Top 10',()=>{
@@ -180,23 +180,21 @@ test('even a forged overseas preference cannot force foreign jobs into Top 10',(
 });
 
 
-test('results use a focus-managed modal rather than a long inline page',async()=>{
+test('native Top10 is in a focus-managed single dialog with reasons and direct URLs',async()=>{
  const {readFile}=await import('node:fs/promises');
  const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
- const dialog=await readFile(new URL('../src/components/CandidateMatchResultDialog.tsx',import.meta.url),'utf8');
- assert.match(page,/result&&<CandidateMatchResultDialog/);
+ const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
+ assert.match(page,/result\|\|partialJobs\.length>0/);
  assert.doesNotMatch(page,/hhba-ai-results/);
- assert.doesNotMatch(page,/不限国家|希望工作的国家|countryOptions/);
  assert.match(page,/country:'CN'/);
  assert.match(dialog,/createPortal/);
  assert.match(dialog,/role="dialog"/);
  assert.match(dialog,/aria-modal="true"/);
  assert.match(dialog,/event\.key==='Escape'/);
  assert.match(dialog,/onMouseDown/);
- assert.match(dialog,/onClick=\{onOpen\}/);
- assert.match(dialog,/setSelectedId\(null\)/);
- assert.match(dialog,/返回岗位列表/);
  assert.match(dialog,/document\.body\.style\.overflow='hidden'/);
+ assert.match(dialog,/job\.recommendation_reason/);
+ assert.match(dialog,/href=\{job\.official_url\}/);
 });
 
 test('same-version audited internal job with minimum 7 years is rejected for 3-year applicant',()=>{
