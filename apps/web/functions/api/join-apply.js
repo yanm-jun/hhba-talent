@@ -98,7 +98,6 @@ export async function onRequest({ request, env }) {
   const ownerEmail = String(env.JOIN_OWNER_EMAIL || '').trim();
   const apiKey = String(env.RESEND_API_KEY || '').trim();
   if (!ownerEmail || !apiKey) return bad('EMAIL_NOT_CONFIGURED', 503);
-  const from = String(env.JOIN_FROM_EMAIL || 'onboarding@resend.dev').trim();
   const rawFrom = String(env.JOIN_FROM_EMAIL || 'onboarding@resend.dev').trim();
   const from = rawFrom.includes('<') ? rawFrom : '汇方职场 HHBA <' + rawFrom + '>';
   const messageData = {
