@@ -80,10 +80,12 @@ export async function saveMatchHistory(db,phone,resumeId,roleHint,modelMatches){
  const data=JSON.stringify(jobs);
  if(data.length>75000)throw Error('MATCH_HISTORY_TOO_LARGE');
  const id=crypto.randomUUID(),created=new Date().toISOString();
- await db.prepare('INSERT INTO hhba_ai_match_history(id,phone,resume_id,resume_label,role_hint,created_at,job_count,best_score,new_job_count,improved_job_count,jobs_json) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
+ const inserted=await db.prepare('INSERT INTO hhba_ai_match_history(id,phone,resume_id,resume_label,role_hint,created_at,job_count,best_score,new_job_count,improved_job_count,jobs_json) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
   .bind(id,phone,resume?.id||null,resume?text(resume.filename,150):'本次上传的简历（未保存）',
    text(roleHint,80),created,jobs.length,best<0?null:best,
    delta.new_job_count,delta.improved_job_count,data).run();
+ if(inserted?.success!==true||Number(inserted?.meta?.changes)!==1)
+  throw Error('MATCH_HISTORY_WRITE_FAILED');
  return {id,...delta};
 }
 export async function listMatchHistory(db,phone){
@@ -96,7 +98,13 @@ export async function getMatchHistory(db,phone,id){
  const row=await db.prepare('SELECT * FROM hhba_ai_match_history WHERE phone=? AND id=?')
   .bind(phone,id).first();
  if(!row)return null;
- return {...summary(row),matches:safeHistoryJobs(parsedJobs(row.jobs_json))};
+ let resumeId=row.resume_id||null;
+ if(resumeId){
+  const stillOwned=await db.prepare('SELECT id FROM hhba_candidate_resumes WHERE phone=? AND id=?')
+   .bind(phone,resumeId).first();
+  if(!stillOwned)resumeId=null; // Deleted private resume does not invalidate the historic job list.
+ }
+ return {...summary(row),resume_id:resumeId,matches:safeHistoryJobs(parsedJobs(row.jobs_json))};
 }
 export async function deleteMatchHistory(db,phone,id){
  if(!rowId.test(id))return false;
