@@ -2,10 +2,17 @@ import {useEffect,useRef,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,BriefcaseBusiness,MapPin,Wallet,X,Search} from 'lucide-react';
 import type {MatchResponse} from '../services/resumeMatch';
+import {Link} from '../router';
 import '../styles/resume-match-dialog.css';
 
 // Search-first evidence governs links; server scores and ranks. Never present a score as an offer probability.
-export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=''}:{result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,'disclaimer'>>;onClose:()=>void;pending?:boolean;notice?:string}){
+type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
+ notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
+export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage}:{
+ result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
+  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'>>;
+ onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction
+}){
  const ref=useRef<HTMLDivElement|null>(null);
  useEffect(()=>{
   const overflow=document.body.style.overflow;
@@ -45,6 +52,13 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
       <p>适配分仅供比较，不是录用概率。只展示中国大陆企业招聘岗位，不提供第三方招聘平台链接。{pending?'结果正在陆续生成，下方岗位可先查看。':'以下岗位网址来自 DeepSeek Search 结果，推荐原因由 V4 Pro 根据简历生成。'}</p>
      </div>
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
+     {!pending&&result.history_status==='SAVED'&&<div className="hhba-match-history-confirm">
+      <span>这次的真实推荐结果已保存到你账户的「匹配历史」，下次登录可以继续查看。</span>
+      <Link to="/candidate/account/applications" onClick={onClose}>查看匹配历史</Link>
+      {Number(result.new_job_count||0)>0&&<small>相较之前的记录，新发现 {result.new_job_count} 个未推荐过的岗位。</small>}
+     </div>}
+     {!pending&&result.history_status==='UNAVAILABLE'&&
+      <p className="hhba-match-history-warning" role="status">本次岗位推荐已完成，但账户匹配历史暂未保存成功，请保留当前结果并稍后重试。</p>}
      {result.matches.length?
       <div className="hhba-native-list">
        {result.matches.map((job,i)=>(
@@ -87,6 +101,17 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
        <h3>本轮没有找到符合条件的具体职位链接</h3>
        <p>本轮未找到符合条件的企业招聘站岗位。已排除第三方招聘平台，数量不足也不会用它们补齐。</p>
       </div>}
+     {!pending&&resumeStorage?.available&&<div className="hhba-match-save-resume">
+       <strong>把这份简历保存到「我的简历」</strong>
+       <p>原文件仅写入你的私有简历库，方便下次复用；不会因保存而再次调用 AI 或向企业投递。</p>
+       <label><input type="checkbox" checked={resumeStorage.consent} disabled={resumeStorage.saving}
+        onChange={e=>resumeStorage.onConsent(e.target.checked)}/>
+        我同意将这份 PDF/DOCX 原文件保存到当前账户的私有简历库（与本次 AI 分析授权分开）。</label>
+       <button type="button" disabled={!resumeStorage.consent||resumeStorage.saving}
+        onClick={resumeStorage.onSave}>{resumeStorage.saving?'正在私有保存…':'保存到我的简历'}</button>
+      </div>}
+     {!pending&&resumeStorage?.saved&&<p className="hhba-match-saved-resume">已选择账户中保存的简历，可在「我的简历」中继续管理。</p>}
+     {resumeStorage?.notice&&<p className="hhba-match-saved-resume" role="status">{resumeStorage.notice}</p>}
      <p className="hhba-match-disclaimer">{result.disclaimer||'职位信息由 DeepSeek 联网检索提供，HHBA 未逐条人工复核。岗位是否仍开放、任职要求及薪资以原始网页为准；不会自动投递。'}</p>
     </div>
     <footer className="hhba-match-modal-foot">
