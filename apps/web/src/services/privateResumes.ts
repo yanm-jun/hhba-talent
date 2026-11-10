@@ -56,11 +56,15 @@ export async function listPrivateResumes():Promise<PrivateResume[]>{
   throw Error('简历列表响应异常。');
  return data.items;
 }
-export async function uploadPrivateResume(file:File,consent:boolean):Promise<void>{
+export async function uploadPrivateResume(file:File,consent:boolean):Promise<PrivateResume>{
  if(!consent)throw Error('请先确认本次简历私有存储授权。');
  if(!/\.(pdf|docx)$/i.test(file.name)||file.size<30||file.size>PRIVATE_RESUME_LIMIT)
   throw Error('请使用 3 MB 以内的 PDF 或 DOCX 简历。');
- await request('','POST',file,true);
+ const res=await request('','POST',file,true);
+ const body=await res.json() as {kind?:string;item?:PrivateResume};
+ if(body.kind!=='HHBA_PRIVATE_RESUME_VAULT_V1'||!body.item?.id)
+  throw Error('简历已提交，但没有收到有效保存凭证；请在「我的简历」中核对。');
+ return body.item;
 }
 export async function deletePrivateResume(id:string):Promise<void>{
  if(!/^[0-9a-f-]{36}$/.test(id))throw Error('简历标识无效。');
