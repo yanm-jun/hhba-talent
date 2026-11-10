@@ -68,7 +68,12 @@ export function Shell({ user, children }: { user: User | null; children: React.R
   event.stopPropagation();
   rememberRecruitment(destination,anchor.textContent||anchor.getAttribute('aria-label')||'官方招聘渠道',
    route+location.search);
-  navigate('/candidate/register?next=%2Fcandidate%2Fofficial-outbound');
+  if(/^\/winter-internship(?:\/[a-z0-9-]{3,100})?$/.test(route)){
+   const next=route+'?resumeRecruitment=1';
+   navigate('/candidate/login?next='+encodeURIComponent(next));
+  }else{
+   navigate('/candidate/register?next=%2Fcandidate%2Fofficial-outbound');
+  }
  }
  function guardRecruitmentContextMenu(event:MouseEvent<HTMLElement>){
   if(verifiedCandidate||route.startsWith('/admin')||route.startsWith('/employer')||route.startsWith('/recruiter'))return;
