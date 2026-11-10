@@ -410,8 +410,8 @@ test('native cards show only employer career pages or dedicated ATS without fall
  const {readFile}=await import('node:fs/promises');
  const jsx=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(jsx,/recruitment_source_note/);
- assert.match(jsx,/THIRD_PARTY_BOARD/);
- assert.match(jsx,/企业使用的招聘系统/);
+ assert.doesNotMatch(jsx,/THIRD_PARTY_BOARD/);
+ assert.match(jsx,/企业专属招聘系统/);
  assert.doesNotMatch(jsx,/查看第三方平台职位/);
  assert.match(jsx,/不提供第三方招聘平台链接/);
 });
