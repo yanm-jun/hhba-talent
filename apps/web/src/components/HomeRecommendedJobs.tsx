@@ -4,7 +4,7 @@ import {Link} from '../router';
 import {getCandidateWorkspaceProfile,realWorkspaceAvailable,type CandidateWorkspaceProfile} from '../services/candidateWorkspace';
 import {getRealAuthToken} from '../services/realAuth';
 import {listSavedJobs,savedAvailable} from '../services/savedJobs';
-import {listJobs,safeOfficialJobUrl,officialStatus,type LiveFilters,type LiveJob} from '../services/liveRecruitment';
+import {listJobs,getJob,safeOfficialJobUrl,officialStatus,type LiveFilters,type LiveJob} from '../services/liveRecruitment';
 import {rankHomeJobs,HOME_RECOMMENDATION_VERSION,type RecommendationStage} from '../services/homeRecommendations';
 import {SaveJobButton} from './SaveJobButton';
 import type {User} from '../services/api';
@@ -23,6 +23,19 @@ async function privateFetch(path:string,method='GET'){
  });
  if(!res.ok)throw Error('RECOMMENDATION_UNAVAILABLE');
  return res.json();
+}
+// Co-save suggestions may lie outside the first catalogue pages.
+async function hydrateSimilarJobs(rows:Array<{id:string;score:number}>,signal:AbortSignal){
+ const found:LiveJob[]=[];
+ for(let i=0;i<Math.min(8,rows.length);i+=4){
+  const batch=await Promise.allSettled(rows.slice(i,i+4).map(row=>getJob(row.id,signal)));
+  if(signal.aborted)break;
+  for(const result of batch){
+   if(result.status==='fulfilled'&&result.value.job.domestic&&safeOfficialJobUrl(result.value.job))
+    found.push(result.value.job);
+  }
+ }
+ return found;
 }
 export function HomeRecommendedJobs({user}:{user:User|null}){
  const signedIn=Boolean(user?.account_types?.includes('candidate'))&&realWorkspaceAvailable;
@@ -81,8 +94,11 @@ export function HomeRecommendedJobs({user}:{user:User|null}){
      setConsent(c.enabled?'enabled':'inactive');
      if(c.enabled){
       const similar=await privateFetch('similar') as Collaborative;
-      if(active&&!controller.signal.aborted&&similar.kind==='HHBA_HOME_COLLABORATIVE_V1')
+      if(active&&!controller.signal.aborted&&similar.kind==='HHBA_HOME_COLLABORATIVE_V1'){
        setCollab(new Map(similar.jobs.map(j=>[j.id,j.score])));
+       const extraJobs=await hydrateSimilarJobs(similar.jobs,controller.signal);
+       if(active&&!controller.signal.aborted)setJobs(existing=>[...existing,...extraJobs]);
+      }
      }
     }catch{if(active&&!controller.signal.aborted)setConsent('unavailable');}
    }
@@ -108,7 +124,11 @@ export function HomeRecommendedJobs({user}:{user:User|null}){
    setConsent(enable?'enabled':'inactive');setCollab(new Map());
    if(enable){
     const similar=await privateFetch('similar') as Collaborative;
-    if(similar.kind==='HHBA_HOME_COLLABORATIVE_V1')setCollab(new Map(similar.jobs.map(j=>[j.id,j.score])));
+    if(similar.kind==='HHBA_HOME_COLLABORATIVE_V1'){
+     setCollab(new Map(similar.jobs.map(j=>[j.id,j.score])));
+     const extra=await hydrateSimilarJobs(similar.jobs,new AbortController().signal);
+     setJobs(existing=>[...existing,...extra]);
+    }
    }
   }catch{setMessage('授权状态更新失败，请稍后重试。');}
   finally{setBusy(false);}

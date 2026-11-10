@@ -23,7 +23,7 @@ export async function coSavedJobs(db,phone){
  GROUP BY other.job_id HAVING COUNT(DISTINCT peer.phone)>=3
  ORDER BY supporters DESC, other.job_id ASC LIMIT 30`;
  const results=await db.prepare(query).bind(...ids,phone,...ids).all();
- return {mode:'COLLABORATIVE_READY',jobs:(results.results||[])
+ return {mode:(results.results||[]).length?'COLLABORATIVE_READY':'CONTENT_ONLY',jobs:(results.results||[])
    .filter(row=>validId(row.jobId)&&Number.isSafeInteger(row.supporters)&&row.supporters>=3)
    .map(row=>({id:row.jobId,score:Math.min(10,Number(row.supporters))}))};
 }

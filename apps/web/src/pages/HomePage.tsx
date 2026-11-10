@@ -72,7 +72,7 @@ export function HomePage({user}:{user:User|null}){
    </button>
    </section>
   <DeferredHomeSection label="岗位市场" placeholderHeight={320}><HomeRecommendedJobs user={user}/>
-  <UnifiedJobMarket compact user={user}/></DeferredHomeSection>
+  <UnifiedJobMarket compact/></DeferredHomeSection>
   <section className="home-talent-service-link" style={{maxWidth:1120,margin:'0 auto 32px',padding:'22px',background:'linear-gradient(110deg,#eef6f1,#fff)',border:'1px solid #dfece2',borderRadius:14,display:'flex',flexWrap:'wrap',alignItems:'center',justifyContent:'space-between',gap:14}}>
    <div><strong>人才服务 · 从工作机会到城市生活</strong><p style={{color:'#648071',fontSize:13,margin:'7px 0 0'}}>看看人才公寓、城市人才政策、住房与生活补贴，以及申请指南（静态预览）。</p></div>
    <Link to="/talent-service" style={{display:'inline-flex',alignItems:'center',gap:7,color:'#28674d',fontSize:13,fontWeight:700,textDecoration:'none'}}>了解人才服务 <ArrowUpRight size={15}/></Link>
