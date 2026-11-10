@@ -60,6 +60,8 @@ function hhbaLooksAutomated(message) {
   const subject = message.getSubject() || '';
   if (/(?:no[-_.]?reply|auto[-_.]?reply|mailer[-_.]?daemon|postmaster|do-not-reply)@/i.test(from)) return true;
   if (/(?:自动回复|外出自动回复|delivery status|undeliverable|mail delivery|退信|验证码|verification code)/i.test(subject)) return true;
+  // A reply to the website's Resend acknowledgment is human correspondence; do not start another automated response.
+  if (/(?:已收到你的合作申请|已收到你的来信|感谢你愿意认识 HHBA)/i.test(subject)) return true;
   if (/@(?:notify\.hhba\.work|resend\.dev|resend\.com)>?$/i.test(from)) return true;
   // Inspect headers only; do not process attachments or quoted personal messages.
   const header = String(message.getRawContent() || '').split(/\r?\n\r?\n/, 1)[0].slice(0, 20000);
