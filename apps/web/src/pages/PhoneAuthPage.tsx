@@ -39,12 +39,15 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
   const candidate = accountType === 'candidate';
   const stem = candidate ? '/candidate' : '/recruiter';
   const requested = new URLSearchParams(location.search).get('next');
-  const safeNext = candidate && requested === '/candidate/official-outbound'
+  const winterReturn = candidate && requested && /^\/winter-internship(?:\/[a-z0-9-]{3,100})?\?resumeRecruitment=1$/.test(requested)
+    ? requested : null;
+  const safeNext = winterReturn || (candidate && requested === '/candidate/official-outbound'
     ? '/candidate/official-outbound'
     : !candidate && requested === '/recruiter/onboarding'
       ? '/recruiter/onboarding'
-      : candidate ? '/candidate/account' : '/employer/hub';
-  const suffix = safeNext === '/candidate/official-outbound' ? '?next=%2Fcandidate%2Fofficial-outbound'
+      : candidate ? '/candidate/account' : '/employer/hub');
+  const suffix = winterReturn ? '?next='+encodeURIComponent(winterReturn)
+    : safeNext === '/candidate/official-outbound' ? '?next=%2Fcandidate%2Fofficial-outbound'
     : safeNext === '/recruiter/onboarding' ? '?next=%2Frecruiter%2Fonboarding' : '';
   const title = candidate ? '求职者' : '招聘方';
   const mobileValid = /^1[3-9]\d{9}$/.test(phone);

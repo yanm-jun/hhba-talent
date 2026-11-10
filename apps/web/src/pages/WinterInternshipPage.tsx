@@ -1,10 +1,12 @@
-import {useMemo,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
 import {ArrowLeft,ArrowRight,ArrowUpRight,CalendarDays,CheckCircle2,ExternalLink,MapPin,Search,ShieldCheck,BriefcaseBusiness,ChevronDown,Filter,Building2} from 'lucide-react';
 import {Link} from '../router';
 import {Shell} from '../components/Shell';
 import {WINTER_2027_PROGRAMS,winterProgramById,type WinterProgram} from '../data/winter2027Programs';
 import {WINTER_2027_JOBS,winterJobById,winterJobSafeUrl,winterJobStatusLabel,type WinterJob} from '../data/winter2027Jobs';
-import type {User} from '../services/api';
+import {employerApiReady,type User} from '../services/api';
+import {realAuthReady} from '../services/realAuth';
+import {clearPendingRecruitment,pendingRecruitment} from '../services/recruitmentOutbound';
 import '../styles/winter-internship.css';
 
 /**
@@ -49,7 +51,7 @@ function safeOfficialHref(p:WinterProgram){
 }
 function SourceButton({program}:{program:WinterProgram}){
  const href=safeOfficialHref(program);
- return href?<a className="hhba-winter-official" href={href} target="_blank" rel="noopener noreferrer">前往企业官方招聘页面 <ExternalLink size={15}/></a>:null;
+ return href?<a className="hhba-winter-official" data-hhba-recruitment-outbound="true" href={href} target="_blank" rel="noopener noreferrer">前往企业官方招聘页面 <ExternalLink size={15}/></a>:null;
 }
 /** Programme-only results remain readable; they are NOT counted as concrete jobs. */
 function WinterCard({program}:{program:WinterProgram}){
@@ -85,8 +87,8 @@ function WinterDetail({user,id}:{user:User|null;id:string}){
    <section className="hhba-winter-detail-info"><h2>谁适合申请？</h2>
     <ul>{p.requirements.map((x,i)=><li key={i}>{x}</li>)}</ul>
     <h2>官方来源与报名</h2><p>HHBA 仅整理公开招聘信息，不收取报名费、不承诺录取。请在企业官网核对最新职位、地点、专业和截止日期。</p>
-    <a href={p.sourceUrl} target="_blank" rel="noopener noreferrer" className="hhba-winter-source-link">查看企业官方项目说明 <ExternalLink size={15}/></a>
-    {p.evidenceUrl&&<a href={p.evidenceUrl} target="_blank" rel="noopener noreferrer" className="hhba-winter-source-link">查看补充招聘证据 <ExternalLink size={15}/></a>}
+    <a data-hhba-recruitment-outbound="true" href={p.sourceUrl} target="_blank" rel="noopener noreferrer" className="hhba-winter-source-link">查看企业官方项目说明 <ExternalLink size={15}/></a>
+    {p.evidenceUrl&&<a data-hhba-recruitment-outbound="true" href={p.evidenceUrl} target="_blank" rel="noopener noreferrer" className="hhba-winter-source-link">查看补充招聘证据 <ExternalLink size={15}/></a>}
     <SourceButton program={p}/>
     {p.verificationLevel==='date-conflict'&&<p className="hhba-winter-warning" role="note">这条项目的官方截止日期出现不一致的公开页面版本，HHBA 不将其标为已确认可申请。请直接在企业招聘系统验证申请按钮及日期。</p>}
     <p className="hhba-winter-verified">资料核对日期：{p.checkedOn}。{p.statusNote}。</p>
@@ -110,7 +112,7 @@ function WinterRoleRow({job}:{job:WinterJob}){
   </div>
   <div className="hhba-winter-role-actions">
    <Link to={'/winter-internship/'+job.id} className="hhba-winter-role-detail">岗位详情 <ArrowRight size={15}/></Link>
-   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-role-apply">{job.status==='filled'?'查看已招满公告':job.id==='bcg-china-pta-winter-spring-2027-closed'?'查看BCG官网（本批已截止）':job.status==='closed'?'查看已截止公告':job.id==='publicis-sh-alpha-pi-2027-jan-start'?'查看平台岗位（截止日冲突）':job.status==='campus-limited'?'企业官网（非直投）':job.status==='platform-posting'?'查看平台岗位（申请需核实）':job.id==='roys-hz-2027winter-class-assistant-source-review'?'查看招聘线索（非直投）':job.status==='source-verify'?'企业招聘首页（非直投）':'官网核实'} <ExternalLink size={14}/></a>}
+   {url&&<a data-hhba-recruitment-outbound="true" href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-role-apply">{job.status==='filled'?'查看已招满公告':job.id==='bcg-china-pta-winter-spring-2027-closed'?'查看BCG官网（本批已截止）':job.status==='closed'?'查看已截止公告':job.id==='publicis-sh-alpha-pi-2027-jan-start'?'查看平台岗位（截止日冲突）':job.status==='campus-limited'?'企业官网（非直投）':job.status==='platform-posting'?'查看平台岗位（申请需核实）':job.id==='roys-hz-2027winter-class-assistant-source-review'?'查看招聘线索（非直投）':job.status==='source-verify'?'企业招聘首页（非直投）':'官网核实'} <ExternalLink size={14}/></a>}
    <small>核对：{job.checkedOn}</small>
   </div>
  </article>;
@@ -139,14 +141,30 @@ function WinterJobDetail({user,job}:{user:User|null;job:WinterJob}){
    {job.salaryNote&&<><h2>薪酬备注</h2><p>{job.salaryNote}</p></>}
    {(job.status==='deadline-conflict'||job.status==='year-conflict')&&<p className="hhba-winter-warning" role="note">{job.reviewWarning||'官方截止日期出现不一致的公开页面版本，HHBA 无法确认当前可申请。请以雇主申请系统最新页面为准。'}</p>}
    {job.reviewWarning&&job.status!=='deadline-conflict'&&job.status!=='year-conflict'&&<p className="hhba-winter-warning" role="note">{job.reviewWarning}</p>}
-   {job.evidenceUrl&&<a href={job.evidenceUrl} target="_blank" rel="noopener noreferrer" className="hhba-winter-source-link">{job.status==='campus-limited'?'查看高校公开职位与截止日':job.status==='source-verify'?'查看招聘平台原始记录':'查看补充招聘时间证据'} <ExternalLink size={15}/></a>}
+   {job.evidenceUrl&&<a data-hhba-recruitment-outbound="true" href={job.evidenceUrl} target="_blank" rel="noopener noreferrer" className="hhba-winter-source-link">{job.status==='campus-limited'?'查看高校公开职位与截止日':job.status==='source-verify'?'查看招聘平台原始记录':'查看补充招聘时间证据'} <ExternalLink size={15}/></a>}
    <h2>职位来源与申请核实</h2><p>本站整理有出处的公开职位和招聘批次信息；部分仅见于高校或第三方招聘平台。已过截止日或已被雇主宣布招满的岗位仅保留历史资料与官方公告链接，不代表可投递；企业招聘首页不等于具体岗位直投入口。HHBA 不代收申请材料，也不承诺名额或录取结果。</p>
-   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-official">{job.status==='filled'?'查看雇主已招满岗位公告':job.id==='bcg-china-pta-winter-spring-2027-closed'?'前往BCG官方招聘首页（此批已截止）':job.status==='closed'?'查看雇主已截止岗位公告':job.id==='publicis-sh-alpha-pi-2027-jan-start'?'查看第三方招聘平台的独立岗位（截止日冲突）':job.status==='campus-limited'?'企业官网（非岗位直投）':job.status==='platform-posting'?'查看第三方招聘平台的独立岗位':job.id==='roys-hz-2027winter-class-assistant-source-review'?'查看2027招聘汇总（非寒假直投）':job.status==='source-verify'?'企业招聘首页（非岗位直投）':'前往企业官方岗位核实及申请'} <ExternalLink size={16}/></a>}
+   {url&&<a data-hhba-recruitment-outbound="true" href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-official">{job.status==='filled'?'查看雇主已招满岗位公告':job.id==='bcg-china-pta-winter-spring-2027-closed'?'前往BCG官方招聘首页（此批已截止）':job.status==='closed'?'查看雇主已截止岗位公告':job.id==='publicis-sh-alpha-pi-2027-jan-start'?'查看第三方招聘平台的独立岗位（截止日冲突）':job.status==='campus-limited'?'企业官网（非岗位直投）':job.status==='platform-posting'?'查看第三方招聘平台的独立岗位':job.id==='roys-hz-2027winter-class-assistant-source-review'?'查看2027招聘汇总（非寒假直投）':job.status==='source-verify'?'企业招聘首页（非岗位直投）':'前往企业官方岗位核实及申请'} <ExternalLink size={16}/></a>}
    <p className="hhba-winter-verified">资料核对日期：{job.checkedOn}。{job.statusNote}。</p>
   </section>
  </main></Shell>;
 }
 export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
+ // Login returns to the original winter route before continuing the exact HTTPS
+ // recruitment destination saved by Shell. Never accept an external URL from
+ // the query string; the session-scoped outbound policy validates it.
+ useEffect(()=>{
+  if(!(employerApiReady||realAuthReady)||!user?.account_types?.includes('candidate'))return;
+  const query=new URLSearchParams(window.location.search);
+  if(query.get('resumeRecruitment')!=='1')return;
+  query.delete('resumeRecruitment');
+  const clean=window.location.pathname+(query.toString()?'?'+query.toString():'')+window.location.hash;
+  window.history.replaceState(window.history.state,'',clean);
+  const saved=pendingRecruitment();
+  const origin=slug?'/winter-internship/'+slug:'/winter-internship';
+  if(!saved||saved.origin.split(/[?#]/,1)[0]!==origin)return;
+  clearPendingRecruitment();
+  window.location.assign(saved.url);
+ },[slug,user]);
  const [draft,setDraft]=useState('');
  const [keyword,setKeyword]=useState('');
  const [region,setRegion]=useState('全部地区');

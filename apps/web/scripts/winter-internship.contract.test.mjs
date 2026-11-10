@@ -357,3 +357,39 @@ test('batch14 includes 2027 winter-specific schedule for 3 unique mainland-locat
  assert.ok(page.includes("job.id==='publicis-sh-alpha-pi-2027-jan-start'?'查看第三方招聘平台的独立岗位（截止日冲突）'"),'publicis third-party CTA must be honest');
  assert.ok(page.includes('visibleGroups.map')&&page.includes('setKeyword(e.target.value)'),'grouped live search remains functional');
 });
+
+test('winter recruiting links require real login and resume the original destination',()=>{
+ const shell=read('src/components/Shell.tsx');
+ const login=read('src/pages/PhoneAuthPage.tsx');
+ const outbound=read('src/services/recruitmentOutbound.ts');
+ assert.equal((page.match(/data-hhba-recruitment-outbound="true"/g)||[]).length,6,
+  'all winter external recruitment links in directory and detail must be marked');
+ for(const expected of ['href={url}','href={href}','href={p.sourceUrl}','href={p.evidenceUrl}','href={job.evidenceUrl}'])
+  assert.ok(page.includes(expected),expected+' missing');
+ assert.ok(shell.includes('onClickCapture={guardRecruitmentClick}'));
+ assert.ok(shell.includes("const destination=recruitmentTarget(anchor)"));
+ assert.ok(shell.includes("if(!destination||verifiedCandidate)return"));
+ assert.ok(shell.includes("navigate('/candidate/login?next='+encodeURIComponent(next))"),
+  'winter must enter existing candidate login');
+ assert.ok(shell.includes("navigate('/candidate/register?next=%2Fcandidate%2Fofficial-outbound')"),
+  'other recruitment flows must stay unchanged');
+ assert.ok(shell.includes('rememberRecruitment(destination'),'store the validated selected URL per tab');
+ assert.ok(login.includes('const winterReturn = candidate && requested &&'),
+  'candidate-only winter return target required');
+ assert.ok(login.includes('resumeRecruitment=1$/.test(requested)'),
+  'winter return URL must be narrowly allowlisted');
+ assert.ok(login.includes("const suffix = winterReturn ? '?next='+encodeURIComponent(winterReturn)"),
+  'switching login and registration must preserve the pending referral');
+ assert.ok(page.includes("user?.account_types?.includes('candidate')"),
+  'resume only for verified signed-in candidate');
+ assert.ok(page.includes("saved.origin.split(/[?#]/,1)[0]!==origin"),
+  'never continue a stale link from another page');
+ assert.ok(page.includes('window.location.assign(saved.url)'),
+  'continue the previously selected recruitment URL after successful sign in');
+ assert.ok(outbound.includes('safeHttps(url)')&&outbound.includes('30*60*1000'),
+  'selected recruitment URL must pass HTTPS validation and expire');
+ assert.ok(!shell.includes("navigate('/candidate/login?next='+encodeURIComponent(destination))"),
+  'never place an external recruiting URL into next parameter');
+ assert.ok(main.includes("route==='/winter-internship'"),
+  'public listings must remain accessible without authentication');
+});
