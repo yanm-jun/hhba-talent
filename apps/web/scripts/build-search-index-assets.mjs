@@ -182,9 +182,9 @@ function publicHTML(page){
     +'.hhba-nojs a{color:#236b50}.hhba-nojs nav{line-height:2.5}'
     +'</style><main class="hhba-nojs"><h1>'+escapeHTML(page.heading)+'</h1>'
     +'<p>完整的汇方职场网站需要浏览器启用 JavaScript。请检查浏览器设置或切换网络后重新打开。</p>'
-    +'<p>'+escapeHTML(page.body)+'</p>'
-    +'<nav aria-label="公开页面目录">'+navigation+'</nav>'+citiesLinks
-    +(page.extraHtml||'')
+    +(page.path==='/' ? '<p><a href="'+ORIGIN+'/">重新打开完整网站</a></p>' :
+       '<p>'+escapeHTML(page.body)+'</p>'
+       +'<nav aria-label="公开页面目录">'+navigation+'</nav>'+citiesLinks+(page.extraHtml||''))
     +'</main></noscript>';
   html=setTag(html,/<div id="root"><\/div>/,'<div id="root">'+bootCSS+initial+recovery+'</div>'+noScript,'root');
   return html;
