@@ -23,7 +23,7 @@ function inMemoryDB(){
  const records={
   [phoneA]:{phone:phoneA,role:'candidate'},[phoneB]:{phone:phoneB,role:'candidate'}
  };
- const db={runs,prepare(sql){
+ const db={runs,resumes,prepare(sql){
   let params=[];
   return {bind(...values){params=values;return this},
    async first(){
@@ -102,6 +102,10 @@ test('persist results per real account, resume reference must be owned',async()=
  assert.equal(found.resume_label,'本次上传的简历（未保存）');
  assert.equal(await linkSavedResumeToHistory(db,phoneA,first.id,owned),true);
  assert.equal((await getMatchHistory(db,phoneA,first.id)).resume_id,owned);
+ db.resumes.delete(owned);
+ assert.equal((await getMatchHistory(db,phoneA,first.id)).resume_id,null,
+  'deleted R2 resume must not offer a dead re-match deep link');
+ db.resumes.set(owned,{id:owned,filename:'个人简历.pdf',phone:phoneA});
  await assert.rejects(linkSavedResumeToHistory(db,phoneB,first.id,owned),/RESUME_NOT_OWNED/);
  const second=await saveMatchHistory(db,phoneA,owned,'产品运营',[job,{
   ...job,id:'search-j2',title:'数字产品主管',
