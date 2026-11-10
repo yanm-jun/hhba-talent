@@ -106,3 +106,5 @@
 .hhba-native-state-unknown{color:#87633c;background:#fbf4e8}
 .hhba-native-availability small{font-size:11px;line-height:1.5;color:#77877c}
 @media(max-width:640px){.hhba-native-score{min-width:65px;flex-basis:65px}.hhba-native-score strong{font-size:20px}.hhba-native-score-basis{font-size:12px}}
+
+.hhba-native-source{font-size:11px;line-height:1.6;margin-top:8px;color:#51735d;font-weight:650}
