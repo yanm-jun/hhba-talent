@@ -11,16 +11,18 @@
     },
     {
       "file": "photo1.jpg",
-      "type": "photo from actual corporate-affiliated news activity, exact original URL logged during CI",
-      "realPhoto": true,
+      "alternative": "photo1.svg",
+      "type": "Build-time: source-validated Chengda activity photograph ONLY if downloaded; else explicitly labeled HHBA nonreal editorial SVG",
+      "realPhoto": "conditional, verified by generated media-sources.json",
       "republicationLicenseVerified": false
     },
     {
       "file": "photo2.jpg",
-      "type": "photo from actual corporate-affiliated news activity, exact original URL logged during CI",
-      "realPhoto": true,
+      "alternative": "photo2.svg",
+      "type": "Build-time: source-validated Chengda activity photograph ONLY if downloaded; else explicitly labeled HHBA nonreal editorial SVG",
+      "realPhoto": "conditional, verified by generated media-sources.json",
       "republicationLicenseVerified": false
     }
   ],
-  "notes": "Logo is NOT official. 069/070 real images must be found on grounded company or affiliated institutional news pages; 071 editorial illustrations are not actual product or office photographs."
+  "notes": "No claim that unverified images are corporate premises. Build may use clearly marked nonreal HHBA editorial SVG when news-source photos are unavailable; actual photo count and source SHA256 are reported in generated media-sources.json."
 }
