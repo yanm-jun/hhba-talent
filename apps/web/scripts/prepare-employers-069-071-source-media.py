@@ -63,6 +63,36 @@ for page in PAGES:
    except Exception as exc:print("HHBA_CHENGDA_SKIP",url,str(exc)[:140])
  except Exception as exc:print("HHBA_CHENGDA_SOURCE_ERROR",page,str(exc)[:200])
  if len(found)>=2:break
-if len(found)!=2:raise RuntimeError(f"Chengda actual news images verified: {len(found)}/2; fake photos forbidden")
+# A third-party photo host must not be a single point of failure for the entire
+# jobs site. Use verified, sourced real images when accessible. When unavailable,
+# explicitly label the replacement as non-real HHBA editorial artwork, NEVER as a
+# photographed dealership, and record the missing evidence in the build audit.
+sourced_count=len(found)
+profile_file=Path("src/data/employerProfiles/cn-autumn-070.json")
+profile=json.loads(profile_file.read_text(encoding="utf8"))
+for slot in range(1,3):
+ photo=profile["media"]["photos"][slot-1]
+ if slot<=sourced_count:
+  record=found[slot-1]
+  record["status"]="verified_source_image_no_commercial_reuse_rights_confirmed"
+  photo["path"]="images/employer-profiles/cn-autumn-070/photo"+str(slot)+".jpg"
+  photo["note"]="来源为青岛新闻网实际成达相关活动照片："+record["pageEvidence"]+"；原图SHA256="+record["sha256"]+"。未经验证商用转载许可。"
+  continue
+ path=ROOT/"cn-autumn-070"/("photo"+str(slot)+".svg")
+ if not path.is_file() or path.stat().st_size<750:
+  raise RuntimeError("Missing explicitly marked Chengda nonreal SVG fallback: "+str(path))
+ (ROOT/"cn-autumn-070"/("photo"+str(slot)+".jpg")).unlink(missing_ok=True)
+ photo["path"]="images/employer-profiles/cn-autumn-070/photo"+str(slot)+".svg"
+ photo["caption"]="青岛成达集团 · HHBA原创业务示意（非企业实景）"
+ photo["alt"]="汽车零售及人才培养的概念示意，非青岛成达集团真实现场照片"
+ photo["note"]="青岛新闻网实际活动图片在本次构建时未能取回。此图为HHBA原创业务概念示意，不代表企业工作环境、门店或活动实景。"
+ found.append({"filename":path.name,"status":"HHBA_nonreal_editorial_fallback",
+   "sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
+   "sourceDescription":"Original HHBA editorial SVG, not actual company photo",
+   "evidencePages":PAGES,"rights":"HHBA editorial drawing; no photo reuse implied"})
+profile["photoNote"]=("本次构建获取"+str(sourced_count)+"/2张来源可追溯的成达实际活动图片。"
+  +"取回失败的图片槽已替换为明确标注非企业实景的HHBA原创业务示意；"
+  +"任何第三方报道照片的商用转载授权均未确认。")
+profile_file.write_text(json.dumps(profile,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
 (ROOT/"cn-autumn-070"/"media-sources.json").write_text(json.dumps(found,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
-print("HHBA_069_070_SOURCE_MEDIA_OK")
+print("HHBA_069_070_SOURCE_MEDIA_OK",sourced_count,"/2 verified Chengda photos, rest explicit editorial SVG")
