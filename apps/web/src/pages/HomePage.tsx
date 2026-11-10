@@ -1,13 +1,36 @@
 import { ArrowUpRight, BriefcaseBusiness, Search, Sparkles, UsersRound } from 'lucide-react';
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, navigate } from '../router';
 import { Shell } from '../components/Shell';
-import { UnifiedJobMarket } from '../components/UnifiedJobMarket';
-import { HomeCompanyMarquee } from '../components/HomeCompanyMarquee';
+
+
 import { WinterInternshipPopup } from '../components/WinterInternshipPopup';
 import { HomeOpenLetter } from '../components/HomeOpenLetter';
 import { BrandMark } from '../components/BrandMark';
 import { HomeLiveDrawer } from '../components/HomeLiveDrawer';
 import type { User } from '../services/api';
+
+// Home-first loading: keep the brand, entry actions and campaign visible immediately.
+// The full recruitment catalogue and employer data load only as visitors approach them.
+const UnifiedJobMarket=lazy(()=>import('../components/UnifiedJobMarket').then(module=>({default:module.UnifiedJobMarket})));
+const HomeCompanyMarquee=lazy(()=>import('../components/HomeCompanyMarquee').then(module=>({default:module.HomeCompanyMarquee})));
+function DeferredHomeSection({children,label,placeholderHeight}:{children:ReactNode;label:string;placeholderHeight:number}){
+ const anchor=useRef<HTMLDivElement>(null);
+ const [near,setNear]=useState(false);
+ useEffect(()=>{
+  const element=anchor.current;
+  if(!element)return;
+  if(typeof IntersectionObserver==='undefined'){setNear(true);return;}
+  const observer=new IntersectionObserver(entries=>{
+   if(entries.some(entry=>entry.isIntersecting)){setNear(true);observer.disconnect();}
+  },{rootMargin:'380px 0px'});
+  observer.observe(element);
+  return ()=>observer.disconnect();
+ },[]);
+ return <div ref={anchor} style={!near?{minHeight:placeholderHeight}:undefined}>
+  {near?<Suspense fallback={<div role="status" aria-live="polite" style={{minHeight:placeholderHeight,padding:'32px 20px',textAlign:'center',color:'#63786d'}}>正在加载{label}…</div>}>{children}</Suspense>:null}
+ </div>;
+}
 
 function EntryCard({kind,title,body,footer,candidateSignedIn=false}:{kind:'candidate'|'employer';title:string;body:string;footer:string;candidateSignedIn?:boolean}){
  const Icon=kind==='candidate'?BriefcaseBusiness:UsersRound;
@@ -48,12 +71,13 @@ export function HomePage({user}:{user:User|null}){
     <span>开始智能匹配</span><ArrowUpRight size={17}/>
    </button>
    </section>
-  <UnifiedJobMarket compact/>
+  <DeferredHomeSection label="岗位市场" placeholderHeight={320}><HomeRecommendedJobs user={user}/>
+  <UnifiedJobMarket compact user={user}/></DeferredHomeSection>
   <section className="home-talent-service-link" style={{maxWidth:1120,margin:'0 auto 32px',padding:'22px',background:'linear-gradient(110deg,#eef6f1,#fff)',border:'1px solid #dfece2',borderRadius:14,display:'flex',flexWrap:'wrap',alignItems:'center',justifyContent:'space-between',gap:14}}>
    <div><strong>人才服务 · 从工作机会到城市生活</strong><p style={{color:'#648071',fontSize:13,margin:'7px 0 0'}}>看看人才公寓、城市人才政策、住房与生活补贴，以及申请指南（静态预览）。</p></div>
    <Link to="/talent-service" style={{display:'inline-flex',alignItems:'center',gap:7,color:'#28674d',fontSize:13,fontWeight:700,textDecoration:'none'}}>了解人才服务 <ArrowUpRight size={15}/></Link>
   </section>
-  <HomeCompanyMarquee/>
+  <DeferredHomeSection label="企业资料" placeholderHeight={190}><HomeCompanyMarquee/></DeferredHomeSection>
   <footer className="hhba-brand-home-footer"><BrandMark variant="signature" size="small"/><p>汇方职场 · Human Capability Network · HHBA</p></footer>
   <HomeOpenLetter autoOpen={false}/>
   <WinterInternshipPopup/>
