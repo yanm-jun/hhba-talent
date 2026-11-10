@@ -91,10 +91,13 @@ for(const filename of readdirSync(companyDir).filter(n=>/^cn-autumn-\d{3}\.json$
   const jobs=[...new Set((Array.isArray(profile.jobs)?profile.jobs:[])
     .map(j=>clip(j?.title||'',90)).filter(Boolean))].slice(0,8);
   const recruitUrl=String(profile.recruitment?.url||'');
-  const officialUrl=/^https:\/\/[a-z0-9.-]+(?:[:/??#]|$)/i.test(recruitUrl) ? recruitUrl : '';
+  // University bulletins and archived-source links are NOT company-owned portals.
+  // Never present those as a direct official application URL in search results.
+  const officialUrl=profile.recruitment?.status==='official_portal'
+    &&/^https:\/\/[a-z0-9.-]+(?:[:/??#]|$)/i.test(recruitUrl) ? recruitUrl : '';
   const verifiedSource=officialUrl
     ? '<p><a href="'+escapeHTML(officialUrl)+'" rel="noopener noreferrer">访问企业官方招聘入口</a></p>'
-    : '<p>招聘信息与申请渠道请以企业官方公告为准。</p>';
+    : '<p>当前档案未核验企业官方在线投递入口。招聘信息与申请渠道请以企业官方公告为准。</p>';
   const extra='<section aria-label="企业公开招聘资料">'
     +(subtitle?'<h2>企业背景</h2><p>'+escapeHTML(subtitle)+'</p>':'')
     +(industry?'<p>行业方向：'+escapeHTML(industry)+'</p>':'')
