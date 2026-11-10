@@ -128,7 +128,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
     <div className="hhba-ai-hero">
       <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> 汇方职场 · HHBA · AI JOB MATCH</div>
       <h1>上传简历，匹配中国大陆岗位。</h1>
-      <p>DeepSeek Search 搜索真实招聘页面，V4 Pro 阅读简历并解释岗位适配原因。</p>
+      <p>DeepSeek Search 只筛选企业招聘站和企业专属招聘系统的具体岗位，V4 Pro 根据简历解释适配原因；不展示第三方招聘平台职位。</p>
       <div className="hhba-ai-headline-tags"><span>中国大陆工作岗位</span><span>Search 检索 · V4 Pro 匹配</span><span>无需自备 Key</span></div>
     </div>
     {availability==='loading'&&<p className="hhba-ai-service-check"><LoaderCircle size={17} className="spin"/>正在检查平台智能匹配服务…</p>}
