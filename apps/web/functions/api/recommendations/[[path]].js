@@ -26,6 +26,7 @@ export async function onRequest({request,env}){
    }
    if(!(request.headers.get('content-type')||'').includes('application/json')||
      Number(request.headers.get('content-length')||0)>128)return bad('INVALID_BODY',400);
+   if(request.headers.get('sec-gpc')==='1'||request.headers.get('dnt')==='1')return bad('PRIVACY_SIGNAL_PREVENTS_OPT_IN',403);
    const data=await request.json().catch(()=>null);
    if(!data||Object.keys(data).length!==1||data.enabled!==true)return bad('EXPLICIT_OPT_IN_REQUIRED',400);
    await db.prepare('INSERT INTO hhba_recommendation_consents(phone,enabled,updated_at) VALUES(?,1,?) ON CONFLICT(phone) DO UPDATE SET enabled=1,updated_at=excluded.updated_at')

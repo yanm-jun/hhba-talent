@@ -160,7 +160,31 @@ async function refreshGrowth(){
  if(requestId===growthRequestId)updateGrowth();
 }
 
-const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',operations:'运营监控',
+// Recommendation telemetry is intentionally aggregate only, with no fabricated engagement metrics.
+async function refreshRecommendations(){
+ const ids=['rec-consents','rec-participants','rec-saves','rec-conversions'];
+ for(const id of ids){const node=byId(id);if(node)node.textContent='—';}
+ const status=byId('rec-status'),version=byId('rec-version');
+ if(version)version.textContent='—';
+ if(!status)return;
+ status.textContent='正在检查管理员权限与推荐数据…';
+ if(!cloudflareMode){status.textContent='本地预览：真实 Cloudflare 推荐数据库未连接。';return;}
+ try{
+  const response=await fetch('/admin-preview/api/recommendations',{cache:'no-store',credentials:'same-origin',headers:{Accept:'application/json'}});
+  if(!response.ok)throw Error([401,403].includes(response.status)?'需要 Cloudflare Access 管理员授权':'推荐表或数据库未连接');
+  const data=await response.json();
+  if(data.kind!=='HHBA_RECOMMENDATION_ADMIN_V1')throw Error('推荐统计响应格式不正确');
+  setMetric('rec-consents',data.optedInAccounts);
+  setMetric('rec-participants',data.optedInAccountsWithSaves);
+  setMetric('rec-saves',data.existingAccountSaves);
+  version.textContent=data.version||'—';
+  status.textContent=data.optedInAccountsWithSaves>=4
+   ?'协同过滤数据已接入。实际推荐仍需至少三名相似账号共同收藏同一相关岗位。'
+   :'基础个性化可独立运行；已授权的相似兴趣样本尚不足，协同过滤将自动回退。';
+ }catch(error){status.textContent=error instanceof Error?error.message:'推荐统计暂不可用';}
+}
+
+const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',recommendations:'智能推荐',operations:'运营监控',
  finance:'财务成本',investor:'融资展示',settings:'系统设置'};
 const details={
  users:['真实用户注册与业务操作','账号级行为追踪已停止；注册和收藏来自真实数据库，页面事件仅计次数。'],
@@ -172,8 +196,9 @@ const details={
 function setView(view){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
+ if(view==='recommendations')void refreshRecommendations();
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(['investor','overview','users'].includes(view)?view:'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users','recommendations'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -356,6 +381,7 @@ function applyCustomDateRange(prefix){
 byId('apply-custom').addEventListener('click',()=>applyCustomDateRange(''));
 byId('users-apply-custom').addEventListener('click',()=>applyCustomDateRange('users-'));
 byId('refresh').addEventListener('click',()=>{void refresh();void refreshGrowth()});
+byId('recommendations-refresh').addEventListener('click',()=>void refreshRecommendations());
 byId('top-investor').addEventListener('click',()=>setView('investor'));
 byId('show-investor').addEventListener('click',()=>setView('investor'));
 byId('leave-investor').addEventListener('click',()=>setView('overview'));

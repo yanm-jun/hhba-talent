@@ -1,5 +1,5 @@
 // Cloudflare Access protected, aggregate-only recommendation diagnostics.
-import {verifyAdmin} from '../../../_lib/admin-access.js';
+import {verifyAdmin} from '../../_lib/admin-access.js';
 import {bad,json} from '../../../_lib/metric-utils.js';
 import {RECOMMENDATION_VERSION} from '../../../_lib/recommendation-collab.js';
 export async function onRequestGet({request,env}){
