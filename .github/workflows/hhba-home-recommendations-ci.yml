@@ -1,0 +1,40 @@
+name: HHBA Home Recommendations QA
+on:
+  pull_request:
+    paths:
+      - 'apps/web/src/services/homeRecommendations.ts'
+      - 'apps/web/src/components/HomeRecommendedJobs.tsx'
+      - 'apps/web/src/pages/HomePage.tsx'
+      - 'apps/web/tests/home-recommendations.test.mjs'
+      - 'apps/web/functions/**recommendation**'
+      - 'apps/web/functions/admin-preview/api/recommendations.js'
+      - 'apps/admin-preview/**'
+      - '.github/workflows/hhba-home-recommendations-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+        working-directory: apps/web
+      - name: Compile React and TypeScript
+        run: npm run build
+        working-directory: apps/web
+      - name: Validate recommendation tests
+        run: node --experimental-strip-types --test apps/web/tests/home-recommendations.test.mjs
+      - name: Validate JS syntax
+        run: |
+          node --check apps/admin-preview/dashboard.js
+          node --check apps/web/functions/_lib/recommendation-collab.js
+          node --check apps/web/functions/api/recommendations/'[[path]].js'
+          node --check apps/web/functions/admin-preview/api/recommendations.js

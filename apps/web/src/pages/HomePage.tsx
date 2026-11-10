@@ -14,6 +14,7 @@ import type { User } from '../services/api';
 // The full recruitment catalogue and employer data load only as visitors approach them.
 const UnifiedJobMarket=lazy(()=>import('../components/UnifiedJobMarket').then(module=>({default:module.UnifiedJobMarket})));
 const HomeCompanyMarquee=lazy(()=>import('../components/HomeCompanyMarquee').then(module=>({default:module.HomeCompanyMarquee})));
+const HomeRecommendedJobs=lazy(()=>import('../components/HomeRecommendedJobs').then(module=>({default:module.HomeRecommendedJobs})));
 function DeferredHomeSection({children,label,placeholderHeight}:{children:ReactNode;label:string;placeholderHeight:number}){
  const anchor=useRef<HTMLDivElement>(null);
  const [near,setNear]=useState(false);
@@ -71,7 +72,7 @@ export function HomePage({user}:{user:User|null}){
     <span>开始智能匹配</span><ArrowUpRight size={17}/>
    </button>
    </section>
-  <DeferredHomeSection label="岗位市场" placeholderHeight={320}><UnifiedJobMarket compact/></DeferredHomeSection>
+  <DeferredHomeSection label="岗位推荐与市场" placeholderHeight={540}><HomeRecommendedJobs user={user}/><UnifiedJobMarket compact/></DeferredHomeSection>
   <section className="home-talent-service-link" style={{maxWidth:1120,margin:'0 auto 32px',padding:'22px',background:'linear-gradient(110deg,#eef6f1,#fff)',border:'1px solid #dfece2',borderRadius:14,display:'flex',flexWrap:'wrap',alignItems:'center',justifyContent:'space-between',gap:14}}>
    <div><strong>人才服务 · 从工作机会到城市生活</strong><p style={{color:'#648071',fontSize:13,margin:'7px 0 0'}}>看看人才公寓、城市人才政策、住房与生活补贴，以及申请指南（静态预览）。</p></div>
    <Link to="/talent-service" style={{display:'inline-flex',alignItems:'center',gap:7,color:'#28674d',fontSize:13,fontWeight:700,textDecoration:'none'}}>了解人才服务 <ArrowUpRight size={15}/></Link>
