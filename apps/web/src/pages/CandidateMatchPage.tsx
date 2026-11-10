@@ -152,7 +152,6 @@ export function CandidateMatchPage({user}:{user:User|null}){
       <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> 汇方职场 · HHBA · AI JOB MATCH</div>
       <h1>上传简历，寻找合适岗位。</h1>
       <p>HHBA 将结合你的简历与公开岗位，为你生成个性化推荐。</p>
-      <div className="hhba-ai-headline-tags"><span>中国大陆工作岗位</span><span>智能岗位匹配</span><span>无需额外配置</span></div>
     </div>
     {availability==='loading'&&<p className="hhba-ai-service-check"><LoaderCircle size={17} className="spin"/>正在检查平台智能匹配服务…</p>}
     {availability==='disabled'&&<div className="hhba-ai-admin-note" role="status">
