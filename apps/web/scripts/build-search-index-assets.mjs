@@ -140,4 +140,9 @@ for(const asset of ['robots.txt','_headers']){
 }
 assert(readFileSync(join(dist,'robots.txt'),'utf8').includes('https://hhba.work/sitemap.xml'));
 assert(!sitemap.includes('/candidate/match'));
+const releaseSha=process.env.CF_PAGES_COMMIT_SHA || process.env.GITHUB_SHA || '';
+if(releaseSha){
+  assert(/^[a-f0-9]{40}$/.test(releaseSha), 'Expected exact deployment git commit');
+  writeFileSync(join(dist,'seo-release.json'),JSON.stringify({sha:releaseSha,site:ORIGIN,publicUrlCount:pages.length})+'\n');
+}
 console.log('HHBA_PUBLIC_SEARCH_INDEX_READY',JSON.stringify({pages:pages.length,companies:companyCount,cities:cities.length,sitemap:'https://hhba.work/sitemap.xml'}));

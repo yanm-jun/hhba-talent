@@ -18,10 +18,13 @@ test('public HTML has unique metadata and private paths never enter sitemap',()=
   writeFileSync(join(root,'dist/robots.txt'),'User-agent: *\nSitemap: https://hhba.work/sitemap.xml\n');
   writeFileSync(join(root,'dist/_headers'),'');
   writeFileSync(join(root,'src/data/employerProfiles/cn-autumn-034.json'),JSON.stringify({id:'cn-autumn-034',displayName:'鹏芯微',overview:'半导体制造与校园招聘信息',lastReviewed:'2026-10-31'}));
-  execFileSync(process.execPath,[script],{cwd:root,encoding:'utf8'});
+  execFileSync(process.execPath,[script],{cwd:root,encoding:'utf8',env:{...process.env,CF_PAGES_COMMIT_SHA:'1234567890123456789012345678901234567890'}});
   const home=readFileSync(join(root,'dist/index.html'),'utf8');
   const co=readFileSync(join(root,'dist/companies/autumn/cn-autumn-034/index.html'),'utf8');
   const sitemap=readFileSync(join(root,'dist/sitemap.xml'),'utf8');
+  const release=JSON.parse(readFileSync(join(root,'dist/seo-release.json'),'utf8'));
+  assert.equal(release.sha,'1234567890123456789012345678901234567890');
+  assert.equal(release.publicUrlCount,18);
   assert.match(home,/<h1>汇方职场 HHBA<\/h1>/);
   assert.match(co,/<title>鹏芯微企业档案/);
   assert.match(co,/companies\/autumn\/cn-autumn-034\/"/);

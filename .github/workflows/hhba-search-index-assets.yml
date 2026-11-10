@@ -39,16 +39,21 @@ jobs:
     needs: seo-contract
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for published ownership key and sitemap
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Wait for the exact production commit and published sitemap
         shell: bash
         run: |
           set -euo pipefail
           key='9a3c3cf5a998f8d7e916078a3e4255efee04cc25'
-          for attempt in $(seq 1 24); do
+          for attempt in $(seq 1 60); do
             published=$(curl -fsSL --max-time 12 "https://hhba.work/$key.txt" || true)
             map=$(curl -fsSL --max-time 12 https://hhba.work/sitemap.xml || true)
-            if [[ "$published" == "$key" && "$map" == *'<urlset'* ]]; then
-              echo 'Production IndexNow key and XML sitemap available'
+            release=$(curl -fsSL --max-time 12 https://hhba.work/seo-release.json || true)
+            if [[ "$published" == "$key" && "$map" == *'<urlset'* && "$release" == *"$GITHUB_SHA"* ]]; then
+              echo "Production $GITHUB_SHA and XML sitemap confirmed"
               exit 0
             fi
             sleep 15
