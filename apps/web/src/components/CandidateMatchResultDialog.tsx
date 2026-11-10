@@ -149,6 +149,16 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
        {visibleMatches.map(job=><Row key={job.id} item={job} onOpen={()=>setSelectedId(job.id)}/>)}
       </div>:<div className="hhba-match-empty"><Building2 size={23}/><h3>目前没有通过岗位条件核验的推荐</h3>
        <p>不会用境外岗位、经验要求不符或无法核验的职位凑满十条。您可以返回调整求职方向。</p></div>}
+      {Boolean(result.qualification_reviews?.length)&&<section className="hhba-match-review" aria-label="需要补充资料的岗位">
+       <h3>另外 {result.qualification_reviews?.length} 个岗位需要补充资料</h3>
+       <p>这些不是已确认符合条件的推荐，不计入 Top 10。简历没有写明的条件不代表您一定不符合。</p>
+       <div className="hhba-match-review-rows">{result.qualification_reviews?.map(review=>
+        <div className="hhba-match-review-row" key={review.id}>
+         <strong>{review.company} · {review.title}</strong>
+         <span>{review.missing.slice(0,2).map(x=>x.label).join('；')}</span>
+        </div>)}</div>
+       <button type="button" onClick={onClose}>返回补充简历信息</button>
+      </section>}
       <p className="hhba-match-disclaimer">仅推荐中国大陆岗位。匹配分数是参考相关度，不是录用成功率；实际招聘状态以企业官网为准。</p>
      </>}
     </div>

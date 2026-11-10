@@ -171,7 +171,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
          </div>}
         </div>
         <header className="hhba-ai-section-title"><h2>2. 选择工作方向</h2>
-          <p>匹配范围固定为中国大陆；未填目标时会参考简历技能和经历。</p></header>
+          <p>匹配范围固定为中国大陆；目标是您的求职意向，不会被当成已有工作经验或专业资格。</p></header>
         <div className="hhba-ai-mainland-only"><span>工作区域</span><strong>中国大陆</strong><small>不推荐港澳台或境外岗位</small></div>
         <div className="hhba-ai-fields hhba-ai-fields-one">
          <label>目标岗位方向<input value={options.role_hint} maxLength={80} placeholder="例如：软件开发、数据分析、销售、视觉设计"

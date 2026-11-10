@@ -60,3 +60,38 @@ export function groundedCareerDirections(proposed,source,{limit=6}={}){
   candidates.push(...documented.slice(0,3).map(x=>x.canonical));
  return [...new Set(candidates)].slice(0,Math.min(6,Math.max(1,limit))) ;
 }
+
+const INTENT_LINE=/(?:求职意向|应聘岗位|目标岗位|目标职位|期望职位|期望岗位|意向职位|职业目标|未来希望|希望从事|希望转岗|计划转行|想从事)/i;
+const OCCUPATION_WORD=/(?:开发|工程师|经理|顾问|分析师|设计师|教师|老师|编导|剪辑|销售|运营|护士|医生|律师|会计|审计|翻译|法务|外贸|技师|产品|研发)/i;
+export function separateCareerIntentAndExperience(proposed,source){
+ const raw=typeof source==='string'?source.slice(0,20000):'';
+ const originalLines=raw.replace(/\r/g,'').split('\n');
+ const intentLines=originalLines.filter(line=>INTENT_LINE.test(line)&&line.length<=220);
+ // Intent lines cannot establish prior occupation experience.
+ const experienceText=originalLines.filter(line=>!INTENT_LINE.test(line)).join('\n');
+ // Mere mention of a job title (e.g. '协助产品经理') is NOT evidence of
+ // having performed that occupation; require task-action evidence instead.
+ const demonstrated=groundedCareerDirections([],experienceText,{limit:6});
+ const intents=[];
+ for(const line of intentLines){
+  const cleaned=line.replace(/^[^：:]{0,35}[：:]/,'').trim();
+  const suggested=(Array.isArray(proposed)?proposed:[])
+   .filter(s=>typeof s==='string'&&s.length>=2&&s.length<=55&&
+     cleaned.toLowerCase().includes(s.toLowerCase()));
+  if(suggested.length){intents.push(...suggested);continue;}
+  // Pure user-supplied goal phrases are accepted as preferences only,
+  // never as skill/experience certificates or employment history.
+  for(const part of cleaned.split(/[，,、/；;]|\s+(?:和|或)\s+/).slice(0,5)){
+   const name=part.trim().replace(/^(?:希望|期望|目标|从事|应聘|转岗|转行|成为|到|做)+/,'').trim();
+   if(name.length>=2&&name.length<=32&&OCCUPATION_WORD.test(name)&&
+    !/(?:手机号|姓名|微信|邮箱|@|身份证)/i.test(name))intents.push(name);
+  }
+ }
+ return {
+  career_intents:[...new Set(intents)].slice(0,6),
+  demonstrated_roles:demonstrated,
+  // Backwards compatible search broadening: preference and proven duties
+  // remain separate metadata even when both feed initial job discovery.
+  target_roles:[...new Set([...intents,...demonstrated])].slice(0,6)
+ };
+}

@@ -11,7 +11,8 @@
  */
 import {extractSkillRequirements} from './job-skill-evidence.js';
 import {isMainlandJobLocation} from './mainland-job-location.js';
-import {credentialLabel} from './professional-credentials.js';
+import {assessJobQualification} from './job-qualification-evidence.js';
+export {assessJobQualification} from './job-qualification-evidence.js';
 export const RANKING_VERSION='HHBA_MATCH_RANKING_V2';
 export const DEFAULT_RANKING_WEIGHTS=Object.freeze({
  role:30,skills:30,experience:20,education:10,location:10
@@ -136,28 +137,16 @@ function minDegree(value){
  if(typeof value!=='string'||!value.trim()||value==='UNRESTRICTED')return null;
  return Object.hasOwn(DEGREE_RANK,value)?value:null;
 }
+// Compatibility facade: existing callers get the prior boolean contract;
+// the new assessor below returns the explicit tri-state and safe questions.
+function legacyReason(report){
+ if(report.reason==='EXPERIENCE_NOT_EVIDENCED')return 'EXPERIENCE_NOT_MET';
+ if(report.reason==='DEGREE_NOT_EVIDENCED')return 'DEGREE_NOT_MET';
+ return report.reason;
+}
 export function evaluateJobEligibility(profile={},job={}){
- if(!isMainlandWorkCity(job.location))return {eligible:false,reason:'NOT_MAINLAND_JOB'};
- const years=tenuredYears(profile.experience_years),minYears=int(job.min_experience_years);
- if(minYears!==null&&minYears>0&&(years===null||years<minYears))
-  return {eligible:false,reason:'EXPERIENCE_NOT_MET'};
- const education=minDegree(job.minimum_education);
- if(education&&(!DEGREE_RANK[profile.education]||DEGREE_RANK[profile.education]<DEGREE_RANK[education]))
-  return {eligible:false,reason:'DEGREE_NOT_MET'};
- // High-confidence mandatory skills from verified JD clauses are a gate.
- // An absent resume mention means unproven, not proof of incompetence.
- const mandatory=Array.isArray(job.mandatory_skills)?job.mandatory_skills:[];
- const proven=new Set((Array.isArray(profile.skills)?profile.skills:[])
-  .map(s=>norm(typeof s==='string'?s:s?.name)).filter(Boolean));
- if(mandatory.some(s=>typeof s==='string'&&!proven.has(norm(s))))
-  return {eligible:false,reason:'MANDATORY_SKILL_NOT_EVIDENCED'};
- const requiredCredentials=Array.isArray(job.professional_credential_requirements)?
-  job.professional_credential_requirements:[];
- const statedCredentials=new Set(Array.isArray(profile.professional_credentials)?
-  profile.professional_credentials:[]);
- if(requiredCredentials.some(id=>credentialLabel(id)&&!statedCredentials.has(id)))
-  return {eligible:false,reason:'PROFESSIONAL_CREDENTIAL_NOT_EVIDENCED'};
- return {eligible:true,reason:null};
+ const report=assessJobQualification(profile,job);
+ return {eligible:report.eligible,reason:legacyReason(report)};
 }
 // The fourth argument is SERVER-SUPPLIED after a human-approved experiment.
 // Never forward browser options as a weight policy.
@@ -173,17 +162,29 @@ function approvedPolicy(policy){
  return {weights:Object.fromEntries(DIMENSIONS.map(k=>[k,input[k]])),version:policy.version};
 }
 export function scoreCandidateFit(profile={},job={},options={},serverApprovedPolicy=null){
- const gate=evaluateJobEligibility(profile,job);
- if(!gate.eligible)return {eligible:false,reason:gate.reason,score:null,breakdown:null};
- const roles=[typeof options.role_hint==='string'?options.role_hint:'',
-  ...(Array.isArray(profile.target_roles)?profile.target_roles:[])]
+ const gate=assessJobQualification(profile,job);
+ if(!gate.eligible)return {eligible:false,reason:legacyReason(gate),
+  qualification_status:gate.status,qualification_missing:gate.missing,
+  score:null,breakdown:null};
+ const separated=Array.isArray(profile.demonstrated_roles);
+ const intentions=[typeof options.role_hint==='string'?options.role_hint:'',
+  ...(Array.isArray(profile.career_intents)?profile.career_intents:[])]
   .filter(x=>typeof x==='string'&&x.length>=2).slice(0,7);
- const affinity=roleAffinity(job.title,roles);
+ const evidence=(separated?profile.demonstrated_roles:profile.target_roles)||[];
+ const roles=[...intentions,...(Array.isArray(evidence)?evidence:[])]
+  .filter(x=>typeof x==='string'&&x.length>=2).slice(0,9);
+ const intentAffinity=roleAffinity(job.title,intentions);
+ const evidenceAffinity=roleAffinity(job.title,Array.isArray(evidence)?evidence:[]);
+ // Aspirational role is an interest, not proof of relevant duties.
+ const affinity=separated?Math.max(
+  intentions.length?intentAffinity*.78:0,
+  intentions.length?evidenceAffinity*.62:evidenceAffinity
+ ):roleAffinity(job.title,roles);
  const occupation=classifyOccupation(job.title);
  const desired=roles.map(classifyOccupation).filter(Boolean);
- // Explicitly different occupations are not rescued by a generic skill.
  if(occupation&&desired.length&&affinity===0)
-  return {eligible:false,reason:'ROLE_DIRECTION_MISMATCH',score:null,breakdown:null};
+  return {eligible:false,reason:'ROLE_DIRECTION_MISMATCH',
+   qualification_status:'ELIGIBLE',score:null,breakdown:null};
  const cleanTags=values=>[...new Set((Array.isArray(values)?values:[])
   .filter(x=>typeof x==='string'&&x.length<60).map(norm).filter(Boolean))].slice(0,20);
  const wanted=cleanTags(job.required_skills);
@@ -239,7 +240,13 @@ export function scoreCandidateFit(profile={},job={},options={},serverApprovedPol
  // Skill-only candidates with no occupation evidence may be exploratory,
  // but should never outrank a directly relevant role on generic tools alone.
  const score=affinity===0?Math.min(rawScore,55):rawScore;
- return {eligible:true,reason:null,score,breakdown,score_adjustment:score-rawScore,
+ return {eligible:true,reason:null,score,breakdown,qualification_status:'ELIGIBLE',
+  career_alignment:{
+   interest:Math.round(intentAffinity*100)/100,
+   demonstrated:Math.round(evidenceAffinity*100)/100,
+   transition:separated&&intentions.length>0&&intentAffinity>.5&&evidenceAffinity<.4
+  },
+  score_adjustment:score-rawScore,
   score_cap_applied:score<rawScore,
   role_affinity:affinity,seniority_alignment:levelFactor,
   skill_evidence_status:skillEvidence,

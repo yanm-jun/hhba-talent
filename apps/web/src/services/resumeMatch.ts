@@ -7,6 +7,7 @@ export type MatchProfile = {
   education:string|null;education_evidence:string|null;
   experience_years:number|null;experience_evidence:string|null;
   skills:{name:string;evidence:string}[];target_roles:string[];
+  career_intents?:string[];demonstrated_roles?:string[];
   professional_credentials?:string[];warnings:string[];
 };
 export type MatchedJob = {
@@ -26,9 +27,16 @@ export type MatchedJob = {
   evidence_quality?:{skills:string;experience:string;education:string};
   ranking_version?:'HHBA_MATCH_RANKING_V2';
 };
+export type QualificationReview = {
+  id:string;company:string;title:string;location:string;
+  source_type:'HHBA站内岗位'|'站外官方招聘';
+  status:'NEEDS_INFORMATION';
+  missing:{code:string;label:string;field:string}[];
+};
 export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
   matched_official_jobs:number;source:string;scoring:string;privacy:string;disclaimer:string;
+  qualification_reviews?:QualificationReview[];
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number};
 const API='/api/match';

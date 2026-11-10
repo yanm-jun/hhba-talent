@@ -19,7 +19,11 @@ test('AI cannot invent degrees, skills, work years or target roles',()=>{
  assert.equal(p.education,null);
  assert.equal(p.experience_years,null);
  assert.deepEqual(p.skills.map(x=>x.name),['Python']);
- assert.deepEqual(p.target_roles,['数据分析']);
+ // Explicitly documented data-analysis work normalizes to the canonical
+ // occupation label; the fabricated '互联网大厂CEO' is still rejected.
+ assert.deepEqual(p.target_roles,['数据分析师']);
+ assert.deepEqual(p.demonstrated_roles,['数据分析师']);
+ assert.deepEqual(p.career_intents,[]);
 });
 test('only same-snapshot audit, exact JD hash and secure official ATS can rank',()=>{
  const iso=new Date().toISOString();
