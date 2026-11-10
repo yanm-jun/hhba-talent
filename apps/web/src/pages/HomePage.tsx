@@ -9,6 +9,7 @@ import { HomeOpenLetter } from '../components/HomeOpenLetter';
 import { BrandMark } from '../components/BrandMark';
 import { HomeLiveDrawer } from '../components/HomeLiveDrawer';
 import type { User } from '../services/api';
+import '../styles/home-match-promo.css';
 
 // Home-first loading: keep the brand, entry actions and campaign visible immediately.
 // The full recruitment catalogue and employer data load only as visitors approach them.
