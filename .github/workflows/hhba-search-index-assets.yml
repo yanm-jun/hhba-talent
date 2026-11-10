@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-      - "feature/search-index-*"
+      - "feature/search-*"
     paths:
       - 'README.md'
       - 'apps/web/index.html'
@@ -11,6 +11,7 @@ on:
       - 'apps/web/public/_headers'
       - 'apps/web/scripts/build-search-index-assets.mjs'
       - 'apps/web/scripts/search-index-assets.contract.test.mjs'
+      - 'apps/web/scripts/audit-live-search-crawlers.mjs'
       - 'apps/web/scripts/submit-indexnow-from-sitemap.mjs'
       - 'apps/web/scripts/submit-indexnow-from-sitemap.contract.test.mjs'
       - 'apps/web/src/data/employerProfiles/**'

@@ -77,6 +77,7 @@ for (const city of cities) {
   });
 }
 const companyDir = resolve('src/data/employerProfiles');
+const directoryEntries=[];
 let companyCount=0;
 for(const filename of readdirSync(companyDir).filter(n=>/^cn-autumn-\d{3}\.json$/.test(n)).sort()){
   const profile=JSON.parse(readFileSync(join(companyDir,filename),'utf8'));
@@ -84,13 +85,42 @@ for(const filename of readdirSync(companyDir).filter(n=>/^cn-autumn-\d{3}\.json$
   const path='/companies/autumn/'+profile.id;
   const name=clip(profile.displayName || profile.name,80);
   assert(name.length>0, 'Missing company name: '+filename);
-  const overview=clip(profile.overview || profile.subtitle || '企业业务与招聘方向',330);
+  const overview=clip(profile.overview || profile.subtitle || '企业业务与招聘方向',550);
+  const industry=clip(profile.industry || '',120);
+  const subtitle=clip(profile.subtitle || '',170);
+  const jobs=[...new Set((Array.isArray(profile.jobs)?profile.jobs:[])
+    .map(j=>clip(j?.title||'',90)).filter(Boolean))].slice(0,8);
+  const recruitUrl=String(profile.recruitment?.url||'');
+  const officialUrl=/^https:\/\/[a-z0-9.-]+(?:[:/??#]|$)/i.test(recruitUrl) ? recruitUrl : '';
+  const verifiedSource=officialUrl
+    ? '<p><a href="'+escapeHTML(officialUrl)+'" rel="noopener noreferrer">访问企业官方招聘入口</a></p>'
+    : '<p>招聘信息与申请渠道请以企业官方公告为准。</p>';
+  const extra='<section aria-label="企业公开招聘资料">'
+    +(subtitle?'<h2>企业背景</h2><p>'+escapeHTML(subtitle)+'</p>':'')
+    +(industry?'<p>行业方向：'+escapeHTML(industry)+'</p>':'')
+    +(jobs.length?'<h2>公开资料中的招聘方向</h2><ul>'+jobs.map(job=>'<li>'+escapeHTML(job)+'</li>').join('')+'</ul>':'')
+    +verifiedSource
+    +'<p>以上岗位方向来自已有公开招聘资料，不表示当前均可投递；是否在招及任职条件以招聘企业官网为准。</p>'
+    +'<p><a href="'+canonical('/companies/discover')+'">返回汇方职场企业目录</a></p></section>';
   pages.push({path,title:name+'企业档案与招聘方向｜汇方职场 HHBA',
     description:clip(name+'：'+overview+' 招聘信息与投递状态请以企业官网为准。',160),
-    heading:name+'企业档案',body:overview,
+    heading:name+'企业档案',body:overview,extraHtml:extra,
     lastmod:/^\d{4}-\d{2}-\d{2}$/.test(profile.lastReviewed || '') ? profile.lastReviewed : null});
+  directoryEntries.push({path,name,industry});
   companyCount++;
 }
+// Expose actual links in the server-returned HTML for crawlers that do not
+// execute React. This is a public directory, not a new enterprise API.
+const directoryPage=pages.find(p=>p.path==='/companies/discover');
+assert(directoryPage,'Public company directory is required');
+directoryPage.extraHtml='<section aria-label="国内企业档案目录"><h2>已整理企业档案（'+directoryEntries.length+' 家）</h2>'
+  +'<ul>'+directoryEntries.map(({path,name,industry})=>'<li><a href="'+escapeHTML(canonical(path))+'">'+escapeHTML(name)+'</a>'
+     +(industry?' · '+escapeHTML(industry):'')+'</li>').join('')+'</ul></section>';
+const cityDirectory=pages.find(p=>p.path==='/talent-service/cities');
+assert(cityDirectory,'Public city directory is required');
+cityDirectory.extraHtml='<section aria-label="可浏览城市人才政策"><h2>可浏览城市</h2><ul>'
+  +cities.map(city=>'<li><a href="'+escapeHTML(canonical('/talent-service/city/'+city))+'">'+escapeHTML(city)+'人才政策与住房</a></li>').join('')
+  +'</ul><p>以上为当前已生成搜索入口的城市，不代表已经覆盖全部城市。</p></section>';
 function setTag(html, regex, replacement, name){
   assert(regex.test(html),'Missing expected SEO shell tag: '+name);
   return html.replace(regex,replacement);
@@ -109,6 +139,7 @@ function publicHTML(page){
   const fallback='<main class="hhba-seo-entry" style="max-width:900px;margin:52px auto;padding:24px;font:16px/1.8 system-ui,sans-serif;color:#223c31">'
     +'<h1>'+escapeHTML(page.heading)+'</h1><p>'+escapeHTML(page.body)+'</p>'
     +'<nav aria-label="汇方职场公开页面">'+navigation+'</nav>'+citiesLinks
+    +(page.extraHtml || '')
     +'<p><a href="'+ORIGIN+'/">汇方职场 HHBA 官网</a></p></main>';
   html=setTag(html,/<div id="root"><\/div>/,'<div id="root">'+fallback+'</div>','root');
   return html;
