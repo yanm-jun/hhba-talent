@@ -1,6 +1,7 @@
 // Search-first coverage extension. No saved job index, guessed URLs or ATS APIs.
 import {MAINLAND_CITIES} from './mainland-job-location.js';
 import {sortByMatchScore} from './match-job-quality.js';
+import {allowedEmployerJobLink} from './match-employer-source.js';
 const plain=s=>String(s||'').replace(/[\r\n<>\"']/g,' ').replace(/\s+/g,' ').trim();
 export function explicitPreferredCity(resume){
  const s=String(resume||'').slice(0,12000);
@@ -23,15 +24,15 @@ export function supplementalQueries(resume,roleHint,primaryQueries=[]){
   /(?:经销商|汽车|区域|渠道|销售|督导)/i.test(direct)?'区域运营 渠道管理':'业务运营 项目运营';
  const suffix=city?city+' 工作地点':'中国大陆 工作地点';
  const candidates=[
-  (direct+' '+suffix+' 2026 社会招聘 职位详情').slice(0,128),
-  (adjacent+' '+suffix+' 企业招聘 申请职位').slice(0,128)
+  (direct+' '+suffix+' 2026 社会招聘 职位详情 企业官网').slice(0,128),
+  (adjacent+' '+suffix+' 企业招聘 申请职位 官方招聘官网').slice(0,128)
  ];
  return [...new Set(candidates)].filter(q=>!primaryQueries.includes(q)).slice(0,2);
 }
 export function mergeCandidateHits(initial,additional,max=48){
  const normalized=new Set(),merged=[];
  for(const hit of [...initial,...additional]){
-  if(!hit?.url||normalized.has(hit.url))continue;
+  if(!hit?.url||!allowedEmployerJobLink(hit.url)||normalized.has(hit.url))continue;
   normalized.add(hit.url);
   merged.push({...hit,id:'j'+(merged.length+1)});
   if(merged.length>=max)break;
@@ -43,7 +44,7 @@ export function combineRecommended(initial,next,limit=10){
  for(const job of [...initial,...next]){
   const companyRole=(String(job.company||'')+'|'+String(job.title||'')).toLowerCase().replace(/\s+/g,'');
   const url=job.official_url;
-  if(!url||keys.has(companyRole)||keys.has(url))continue;
+  if(!url||!allowedEmployerJobLink(url)||keys.has(companyRole)||keys.has(url))continue;
   keys.add(companyRole);keys.add(url);merged.push(job);
   if(merged.length>=limit)break;
  }
