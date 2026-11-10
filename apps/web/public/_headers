@@ -1,0 +1,28 @@
+# The public market and policy catalogue must remain indexable.
+# Restrict indexing of private application surfaces, not access control.
+/admin-preview/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/preview-admin/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/api/*
+  X-Robots-Tag: noindex, nofollow
+
+/candidate/login*
+  X-Robots-Tag: noindex, nofollow
+
+/candidate/register*
+  X-Robots-Tag: noindex, nofollow
+
+/candidate/match*
+  X-Robots-Tag: noindex, nofollow
+
+/candidate/resume*
+  X-Robots-Tag: noindex, nofollow
+
+/candidate/profile*
+  X-Robots-Tag: noindex, nofollow
+
+/employer/workspace*
+  X-Robots-Tag: noindex, nofollow
