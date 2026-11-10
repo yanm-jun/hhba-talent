@@ -8,6 +8,7 @@ import { HomeOpenLetter } from '../components/HomeOpenLetter';
 import { BrandMark } from '../components/BrandMark';
 import { HomeLiveDrawer } from '../components/HomeLiveDrawer';
 import type { User } from '../services/api';
+import '../styles/home-match-promo.css';
 
 function EntryCard({kind,title,body,footer,candidateSignedIn=false}:{kind:'candidate'|'employer';title:string;body:string;footer:string;candidateSignedIn?:boolean}){
  const Icon=kind==='candidate'?BriefcaseBusiness:UsersRound;
