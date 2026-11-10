@@ -13,10 +13,10 @@ import { HomePage } from './pages/HomePage';
 
 
 
-import { CanadaOccupationDetailPage } from './components/CanadaOccupationDirectory';
-import { GermanyOccupationDetailPage } from './components/GermanyOccupationDirectory';
-import { JapanOccupationDetailPage } from './components/JapanOccupationDirectory';
-import { OverseasOccupationDetailPage } from './components/OverseasOccupationDirectory';
+
+
+
+
 
 
 
@@ -30,7 +30,7 @@ import './styles/join-vision.css';
 
 
 
-import { employerProfileByRoute } from './services/employerProfiles';
+
 
 
 
@@ -55,31 +55,73 @@ import { employerProfileByRoute } from './services/employerProfiles';
 
 
 import { employerApiReady } from './services/api';
-import { ResumeUploadPage, ProfilePage, PublicProfilePage, ResumePage, ReviewPage } from './pages/CandidatePages';
 
 
 
 
-import { AnonymousTrafficTracker } from './components/AnalyticsConsent';
-import { EmployerStartPage, EmployerOnboardingPreviewPage, EmployerGrowthHubPage } from './pages/EmployerGrowthHubPage';
-import { EmployerEvidencePage, AdminEmployerEvidencePage } from './pages/EmployerEvidencePage';
-
-import { EmployerScoringPage, AdminEmployerScoringPage } from './pages/EmployerScoringPage';
-import { EmployerAppealsPage, EmployeePrivacyConcernsPage, AdminAppealsReviewPage } from './pages/EmployerAppealsPage';
-import { EmployerImprovementsPage, PublicEmployerImprovementsPage, AdminEmployerImprovementsPage } from './pages/EmployerImprovementsPage';
-import { EmployerVerifiedProfilePage, AdminEmployerPublicationPage } from './pages/EmployerVerifiedProfilePage';
-import { EmployerAidApplicationPage, EmployerCommercialPage, AdminAidCommercialPage } from './pages/EmployerAidCommercialPage';
-
-
-import { EmployerPublicJobsPage, EmployerPublicJobDetail } from './pages/EmployerPublicJobsPage';
 
 
 
-import { CandidateJobsPage, CandidateJobDetailPage } from './pages/CandidateJobsPage';
-import { UnifiedJobMarket, UnifiedJobDetail } from './components/UnifiedJobMarket';
-import { CompanyStepPage, DocumentsStepPage, RecruiterWelcomePage, RepresentativeStepPage, SubmitReviewPage } from './pages/recruiter/RecruiterOnboarding';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 import {realAuth,realAuthReady,getRealAuthToken,clearRealAuthToken,realAuthToUser} from './services/realAuth';
+// Route discovery uses filenames only. Do not eagerly import every employer profile on the homepage.
+const factoryEmployerRoutes=new Set(Object.keys(import.meta.glob('./data/employerProfiles/cn-autumn-*.json'))
+  .map(file=>'/companies/autumn/'+file.slice(file.lastIndexOf('/')+1).replace(/\.json$/,'')));
+const CanadaOccupationDetailPage=lazy(()=>import('./components/CanadaOccupationDirectory').then(module=>({default:module.CanadaOccupationDetailPage})));
+const GermanyOccupationDetailPage=lazy(()=>import('./components/GermanyOccupationDirectory').then(module=>({default:module.GermanyOccupationDetailPage})));
+const JapanOccupationDetailPage=lazy(()=>import('./components/JapanOccupationDirectory').then(module=>({default:module.JapanOccupationDetailPage})));
+const OverseasOccupationDetailPage=lazy(()=>import('./components/OverseasOccupationDirectory').then(module=>({default:module.OverseasOccupationDetailPage})));
+const ResumeUploadPage=lazy(()=>import('./pages/CandidatePages').then(module=>({default:module.ResumeUploadPage})));
+const ProfilePage=lazy(()=>import('./pages/CandidatePages').then(module=>({default:module.ProfilePage})));
+const PublicProfilePage=lazy(()=>import('./pages/CandidatePages').then(module=>({default:module.PublicProfilePage})));
+const ResumePage=lazy(()=>import('./pages/CandidatePages').then(module=>({default:module.ResumePage})));
+const ReviewPage=lazy(()=>import('./pages/CandidatePages').then(module=>({default:module.ReviewPage})));
+const AnonymousTrafficTracker=lazy(()=>import('./components/AnalyticsConsent').then(module=>({default:module.AnonymousTrafficTracker})));
+const EmployerStartPage=lazy(()=>import('./pages/EmployerGrowthHubPage').then(module=>({default:module.EmployerStartPage})));
+const EmployerOnboardingPreviewPage=lazy(()=>import('./pages/EmployerGrowthHubPage').then(module=>({default:module.EmployerOnboardingPreviewPage})));
+const EmployerGrowthHubPage=lazy(()=>import('./pages/EmployerGrowthHubPage').then(module=>({default:module.EmployerGrowthHubPage})));
+const EmployerEvidencePage=lazy(()=>import('./pages/EmployerEvidencePage').then(module=>({default:module.EmployerEvidencePage})));
+const AdminEmployerEvidencePage=lazy(()=>import('./pages/EmployerEvidencePage').then(module=>({default:module.AdminEmployerEvidencePage})));
+const EmployerScoringPage=lazy(()=>import('./pages/EmployerScoringPage').then(module=>({default:module.EmployerScoringPage})));
+const AdminEmployerScoringPage=lazy(()=>import('./pages/EmployerScoringPage').then(module=>({default:module.AdminEmployerScoringPage})));
+const EmployerAppealsPage=lazy(()=>import('./pages/EmployerAppealsPage').then(module=>({default:module.EmployerAppealsPage})));
+const EmployeePrivacyConcernsPage=lazy(()=>import('./pages/EmployerAppealsPage').then(module=>({default:module.EmployeePrivacyConcernsPage})));
+const AdminAppealsReviewPage=lazy(()=>import('./pages/EmployerAppealsPage').then(module=>({default:module.AdminAppealsReviewPage})));
+const EmployerImprovementsPage=lazy(()=>import('./pages/EmployerImprovementsPage').then(module=>({default:module.EmployerImprovementsPage})));
+const PublicEmployerImprovementsPage=lazy(()=>import('./pages/EmployerImprovementsPage').then(module=>({default:module.PublicEmployerImprovementsPage})));
+const AdminEmployerImprovementsPage=lazy(()=>import('./pages/EmployerImprovementsPage').then(module=>({default:module.AdminEmployerImprovementsPage})));
+const EmployerVerifiedProfilePage=lazy(()=>import('./pages/EmployerVerifiedProfilePage').then(module=>({default:module.EmployerVerifiedProfilePage})));
+const AdminEmployerPublicationPage=lazy(()=>import('./pages/EmployerVerifiedProfilePage').then(module=>({default:module.AdminEmployerPublicationPage})));
+const EmployerAidApplicationPage=lazy(()=>import('./pages/EmployerAidCommercialPage').then(module=>({default:module.EmployerAidApplicationPage})));
+const EmployerCommercialPage=lazy(()=>import('./pages/EmployerAidCommercialPage').then(module=>({default:module.EmployerCommercialPage})));
+const AdminAidCommercialPage=lazy(()=>import('./pages/EmployerAidCommercialPage').then(module=>({default:module.AdminAidCommercialPage})));
+const EmployerPublicJobsPage=lazy(()=>import('./pages/EmployerPublicJobsPage').then(module=>({default:module.EmployerPublicJobsPage})));
+const EmployerPublicJobDetail=lazy(()=>import('./pages/EmployerPublicJobsPage').then(module=>({default:module.EmployerPublicJobDetail})));
+const CandidateJobsPage=lazy(()=>import('./pages/CandidateJobsPage').then(module=>({default:module.CandidateJobsPage})));
+const CandidateJobDetailPage=lazy(()=>import('./pages/CandidateJobsPage').then(module=>({default:module.CandidateJobDetailPage})));
+const UnifiedJobMarket=lazy(()=>import('./components/UnifiedJobMarket').then(module=>({default:module.UnifiedJobMarket})));
+const UnifiedJobDetail=lazy(()=>import('./components/UnifiedJobMarket').then(module=>({default:module.UnifiedJobDetail})));
+const CompanyStepPage=lazy(()=>import('./pages/recruiter/RecruiterOnboarding').then(module=>({default:module.CompanyStepPage})));
+const DocumentsStepPage=lazy(()=>import('./pages/recruiter/RecruiterOnboarding').then(module=>({default:module.DocumentsStepPage})));
+const RecruiterWelcomePage=lazy(()=>import('./pages/recruiter/RecruiterOnboarding').then(module=>({default:module.RecruiterWelcomePage})));
+const RepresentativeStepPage=lazy(()=>import('./pages/recruiter/RecruiterOnboarding').then(module=>({default:module.RepresentativeStepPage})));
+const SubmitReviewPage=lazy(()=>import('./pages/recruiter/RecruiterOnboarding').then(module=>({default:module.SubmitReviewPage})));
 const DataUsePage=lazy(()=>import('./pages/DataUsePage').then(module=>({default:module.DataUsePage})));
 const StudyAbroadPage=lazy(()=>import('./pages/StudyAbroadPage').then(module=>({default:module.StudyAbroadPage})));
 const OverseasDevelopmentPage=lazy(()=>import('./pages/OverseasDevelopmentPage').then(module=>({default:module.OverseasDevelopmentPage})));
@@ -136,6 +178,14 @@ const EmployerReviewPage=lazy(()=>import('./pages/EmployerReviewPage').then(modu
 const AdminRecruitmentPage=lazy(()=>import('./pages/AdminRecruitmentPage').then(module=>({default:module.AdminRecruitmentPage})));
 const WorkspacePage=lazy(()=>import('./pages/WorkspacePage').then(module=>({default:module.WorkspacePage})));
 const SiteSearchPage=lazy(()=>import('./pages/SiteSearchPage').then(module=>({default:module.SiteSearchPage})));
+function AppLoadingState(){
+ return <main className="app-shell" role="status" aria-busy="true" aria-label="正在加载汇方职场">
+  <div style={{maxWidth:600,margin:'min(20vh,120px) auto',padding:'28px 24px',textAlign:'center'}}>
+   <div style={{fontSize:20,fontWeight:700,letterSpacing:'.04em',color:'#256a55'}}>汇方职场 · HHBA</div>
+   <p style={{marginTop:18,color:'#62766e',fontSize:14}}>正在加载页面，或恢复你的登录状态…</p>
+  </div>
+ </main>;
+}
 function App(){const route=useRoute();const [user,setUser]=useState<User|null>(null);const [ready,setReady]=useState(false);
 useEffect(()=>{
  let mounted=true;
@@ -163,7 +213,7 @@ const logout=async()=>{
   if(realAuthReady&&getRealAuthToken())await realAuth.logout();
   else if(employerApiReady)await api.logout();
  }finally{clearRealAuthToken();setUser(null);navigate('/candidate/login');}
-};if(!ready)return <main className="app-shell" aria-busy="true"/>;if(route==='/search')return <Suspense fallback={<main className="app-shell" aria-busy="true"/>}><SiteSearchPage user={user}/></Suspense>;if(route==='/data-use')return <DataUsePage user={user}/>;if(route==='/')return <HomePage user={user}/>;if(route==='/winter-internship')return <WinterInternshipPage user={user}/>;if(/^\/winter-internship\/[a-z0-9-]{3,100}$/.test(route))return <WinterInternshipPage user={user} slug={route.slice('/winter-internship/'.length)}/>;if(route==='/study-abroad')return <OverseasDevelopmentPage user={user}/>;if(route==='/study-abroad/legacy')return <StudyAbroadPage user={user}/>;if(route==='/study-abroad/country/new-zealand')return <OverseasDevelopmentPage user={user} view="country"/>;if(route.startsWith('/study-abroad/nz/occupation/'))return <OverseasOccupationDetailPage user={user} country="nz" id={route.slice('/study-abroad/nz/occupation/'.length)}/>;if(route==='/study-abroad/saved')return <OverseasDevelopmentPage user={user} view="saved"/>;if(route==='/study-abroad/compare')return <OverseasDevelopmentPage user={user} view="compare"/>;if(route==='/study-abroad/match')return <OverseasDevelopmentPage user={user} view="match"/>;if(route.startsWith('/study-abroad/pathway/'))return <OverseasDevelopmentPage user={user} view="pathway" pathwayId={route.slice('/study-abroad/pathway/'.length)}/>;if(route==='/study-abroad/country/united-states')return <UnitedStatesDevelopmentPage user={user}/>;if(route==='/study-abroad/united-states/saved')return <UnitedStatesDevelopmentPage user={user} view="saved"/>;if(route==='/study-abroad/united-states/compare')return <UnitedStatesDevelopmentPage user={user} view="compare"/>;if(route==='/study-abroad/united-states/match')return <UnitedStatesDevelopmentPage user={user} view="match"/>;if(route.startsWith('/study-abroad/united-states/pathway/'))return <UnitedStatesDevelopmentPage user={user} view="pathway" pathwayId={route.slice('/study-abroad/united-states/pathway/'.length)}/>;if(route==='/study-abroad/country/singapore')return <SingaporeDevelopmentPage user={user}/>;if(route==='/study-abroad/singapore/saved')return <SingaporeDevelopmentPage user={user} view="saved"/>;if(route==='/study-abroad/singapore/compare')return <SingaporeDevelopmentPage user={user} view="compare"/>;if(route==='/study-abroad/singapore/match')return <SingaporeDevelopmentPage user={user} view="match"/>;if(route.startsWith('/study-abroad/singapore/pathway/'))return <SingaporeDevelopmentPage user={user} view="pathway" pathwayId={route.slice('/study-abroad/singapore/pathway/'.length)}/>;if(route==='/study-abroad/country/united-kingdom')return <UnitedKingdomDevelopmentPage user={user}/>;if(route==='/study-abroad/united-kingdom/saved')return <UnitedKingdomDevelopmentPage user={user} view="saved"/>;if(route==='/study-abroad/united-kingdom/compare')return <UnitedKingdomDevelopmentPage user={user} view="compare"/>;if(route==='/study-abroad/united-kingdom/match')return <UnitedKingdomDevelopmentPage user={user} view="match"/>;if(route.startsWith('/study-abroad/united-kingdom/pathway/'))return <UnitedKingdomDevelopmentPage user={user} view="pathway" pathwayId={route.slice('/study-abroad/united-kingdom/pathway/'.length)}/>;if(route==='/study-abroad/country/canada')return <CanadaDevelopmentPage user={user}/>;
+};if(!ready)return <AppLoadingState/>;if(route==='/search')return <Suspense fallback={<AppLoadingState/>}><SiteSearchPage user={user}/></Suspense>;if(route==='/data-use')return <DataUsePage user={user}/>;if(route==='/')return <HomePage user={user}/>;if(route==='/winter-internship')return <WinterInternshipPage user={user}/>;if(/^\/winter-internship\/[a-z0-9-]{3,100}$/.test(route))return <WinterInternshipPage user={user} slug={route.slice('/winter-internship/'.length)}/>;if(route==='/study-abroad')return <OverseasDevelopmentPage user={user}/>;if(route==='/study-abroad/legacy')return <StudyAbroadPage user={user}/>;if(route==='/study-abroad/country/new-zealand')return <OverseasDevelopmentPage user={user} view="country"/>;if(route.startsWith('/study-abroad/nz/occupation/'))return <OverseasOccupationDetailPage user={user} country="nz" id={route.slice('/study-abroad/nz/occupation/'.length)}/>;if(route==='/study-abroad/saved')return <OverseasDevelopmentPage user={user} view="saved"/>;if(route==='/study-abroad/compare')return <OverseasDevelopmentPage user={user} view="compare"/>;if(route==='/study-abroad/match')return <OverseasDevelopmentPage user={user} view="match"/>;if(route.startsWith('/study-abroad/pathway/'))return <OverseasDevelopmentPage user={user} view="pathway" pathwayId={route.slice('/study-abroad/pathway/'.length)}/>;if(route==='/study-abroad/country/united-states')return <UnitedStatesDevelopmentPage user={user}/>;if(route==='/study-abroad/united-states/saved')return <UnitedStatesDevelopmentPage user={user} view="saved"/>;if(route==='/study-abroad/united-states/compare')return <UnitedStatesDevelopmentPage user={user} view="compare"/>;if(route==='/study-abroad/united-states/match')return <UnitedStatesDevelopmentPage user={user} view="match"/>;if(route.startsWith('/study-abroad/united-states/pathway/'))return <UnitedStatesDevelopmentPage user={user} view="pathway" pathwayId={route.slice('/study-abroad/united-states/pathway/'.length)}/>;if(route==='/study-abroad/country/singapore')return <SingaporeDevelopmentPage user={user}/>;if(route==='/study-abroad/singapore/saved')return <SingaporeDevelopmentPage user={user} view="saved"/>;if(route==='/study-abroad/singapore/compare')return <SingaporeDevelopmentPage user={user} view="compare"/>;if(route==='/study-abroad/singapore/match')return <SingaporeDevelopmentPage user={user} view="match"/>;if(route.startsWith('/study-abroad/singapore/pathway/'))return <SingaporeDevelopmentPage user={user} view="pathway" pathwayId={route.slice('/study-abroad/singapore/pathway/'.length)}/>;if(route==='/study-abroad/country/united-kingdom')return <UnitedKingdomDevelopmentPage user={user}/>;if(route==='/study-abroad/united-kingdom/saved')return <UnitedKingdomDevelopmentPage user={user} view="saved"/>;if(route==='/study-abroad/united-kingdom/compare')return <UnitedKingdomDevelopmentPage user={user} view="compare"/>;if(route==='/study-abroad/united-kingdom/match')return <UnitedKingdomDevelopmentPage user={user} view="match"/>;if(route.startsWith('/study-abroad/united-kingdom/pathway/'))return <UnitedKingdomDevelopmentPage user={user} view="pathway" pathwayId={route.slice('/study-abroad/united-kingdom/pathway/'.length)}/>;if(route==='/study-abroad/country/canada')return <CanadaDevelopmentPage user={user}/>;
  if(route==='/study-abroad/canada/saved')return <CanadaDevelopmentPage user={user} view="saved"/>;
  if(route==='/study-abroad/canada/compare')return <CanadaDevelopmentPage user={user} view="compare"/>;
  if(route==='/study-abroad/canada/match')return <CanadaDevelopmentPage user={user} view="match"/>;
@@ -184,7 +234,7 @@ const logout=async()=>{
  if(route==='/study-abroad/country/australia')return <AustraliaDevelopmentPage user={user}/>;if(route.startsWith('/study-abroad/australia/occupation/'))return <OverseasOccupationDetailPage user={user} country="au" id={route.slice('/study-abroad/australia/occupation/'.length)}/>;if(route==='/study-abroad/australia/saved')return <AustraliaDevelopmentPage user={user} view="saved"/>;if(route==='/study-abroad/australia/compare')return <AustraliaDevelopmentPage user={user} view="compare"/>;if(route==='/study-abroad/australia/match')return <AustraliaDevelopmentPage user={user} view="match"/>;if(route.startsWith('/study-abroad/australia/pathway/'))return <AustraliaDevelopmentPage user={user} view="pathway" pathwayId={route.slice('/study-abroad/australia/pathway/'.length)}/>;if(route.startsWith('/study-abroad/'))return <StudyAbroadPage user={user} slug={route.slice('/study-abroad/'.length)}/>;if(route==='/join')return <JoinUsPage user={user}/>;if(route==='/vision')return <VisionPage user={user}/>;if(route==='/talent-service')return <TalentServicePage user={user}/>;if(route.startsWith('/talent-service/'))return <TalentServiceRoutes key={route} user={user} route={route}/>;if(route==='/companies/discover')return <Company200PreviewPage user={user}/>;if(route==='/candidate/domestic-autumn')return <DomesticAutumnPage user={user}/>;if(route==='/companies/autumn/cn-autumn-001')return <KpmgCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-002')return <SchneiderCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-003')return <PfizerCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-004')return <CsairCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-005')return <SfExpressCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-006')return <NeteaseGamesCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-007')return <HypergryphCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-008')return <AnkerCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-009')return <LaifenCompactProfilePage user={user}/>;
  if(route==='/companies/autumn/cn-autumn-010')return <ShkpCompactProfilePage user={user}/>;
  if(route==='/companies/autumn/cn-autumn-011')return <BoyuCompactProfilePage user={user}/>;
- if(employerProfileByRoute.has(route))return <UnifiedV2CompanyPage user={user} id={route.split('/').pop()!}/>;if(/^\/companies\/autumn\/cn-autumn-[0-9]{3}$/.test(route))return <AutumnCompanyProfilePage user={user} id={route.split('/').pop()!}/>;if(route==='/companies/domestic/rel-huayu-004')return <HuayuVisionCompactProfilePage user={user}/>;if(route==='/companies/domestic/a-600909')return <HuaanSecuritiesCompactProfilePage user={user}/>;if(route==='/companies/domestic/a-000776')return <GuangfaSecuritiesCompactProfilePage user={user}/>;if(route==='/companies/domestic/a-600030')return <CiticsSecuritiesCompactProfilePage user={user}/>;if(/^\/companies\/domestic\/(?:a-[0-9]{6}|cn-B1-[0-9]{3}|spot-[^/]{2,100}|rel-[a-z]+-[0-9]{3}|group-geely|profile-[a-z0-9-]{3,150})$/.test(route))return <DomesticCompanyPage user={user} id={decodeURIComponent(route.split('/').pop()!)}/>;if(/^\/majors\/[a-z-]{3,80}$/.test(route))return <MajorCompaniesPage user={user} slug={route.split('/').pop()!}/>;if(route==='/companies')return <CompanyDirectoryPage user={user}/>;
+ if(factoryEmployerRoutes.has(route))return <UnifiedV2CompanyPage user={user} id={route.split('/').pop()!}/>;if(/^\/companies\/autumn\/cn-autumn-[0-9]{3}$/.test(route))return <AutumnCompanyProfilePage user={user} id={route.split('/').pop()!}/>;if(route==='/companies/domestic/rel-huayu-004')return <HuayuVisionCompactProfilePage user={user}/>;if(route==='/companies/domestic/a-600909')return <HuaanSecuritiesCompactProfilePage user={user}/>;if(route==='/companies/domestic/a-000776')return <GuangfaSecuritiesCompactProfilePage user={user}/>;if(route==='/companies/domestic/a-600030')return <CiticsSecuritiesCompactProfilePage user={user}/>;if(/^\/companies\/domestic\/(?:a-[0-9]{6}|cn-B1-[0-9]{3}|spot-[^/]{2,100}|rel-[a-z]+-[0-9]{3}|group-geely|profile-[a-z0-9-]{3,150})$/.test(route))return <DomesticCompanyPage user={user} id={decodeURIComponent(route.split('/').pop()!)}/>;if(/^\/majors\/[a-z-]{3,80}$/.test(route))return <MajorCompaniesPage user={user} slug={route.split('/').pop()!}/>;if(route==='/companies')return <CompanyDirectoryPage user={user}/>;
   if(/^\/companies\/id\/[A-Za-z0-9_-]{12,600}$/.test(route))return <IndexedCompanyPage user={user} encodedId={route.split('/').pop()!}/>;
   if(/^\/companies\/[a-z-]{2,60}$/.test(route))return <CompanyProfilePage user={user} slug={route.split('/').pop()!}/>;if(route==='/auth')return <AuthChoicePage/>;if(route==='/candidate/login'||route==='/candidate/register')return <PhoneAuthPage user={user} onUser={setUser} accountType="candidate" initialMode={route.endsWith('/register')?'register':'login'}/>;if(route==='/recruiter/login'||route==='/recruiter/register'||route==='/recruiter')return <PhoneAuthPage user={user} onUser={setUser} accountType="recruiter" initialMode={route.endsWith('/register')?'register':'login'}/>;if(route==='/candidate/email-login'||route==='/candidate/email-register')return <AuthPage user={user} onUser={setUser} accountType="candidate" initialMode={route.endsWith('register')?'register':'login'}/>;if(route==='/recruiter/email-login'||route==='/recruiter/email-register')return <AuthPage user={user} onUser={setUser} accountType="recruiter" initialMode={route.endsWith('register')?'register':'login'}/>;if(route==='/recruiter/onboarding')return <RecruiterWelcomePage user={user}/>;if(route==='/recruiter/onboarding/company')return <CompanyStepPage user={user}/>;if(route==='/recruiter/onboarding/documents')return <DocumentsStepPage user={user}/>;if(route==='/recruiter/onboarding/representative')return <RepresentativeStepPage user={user}/>;if(route==='/recruiter/onboarding/submit')return <SubmitReviewPage user={user}/>;if(route==='/candidate/official-outbound')return <OfficialRecruitmentContinuePage user={user}/>;if(route==='/candidate')return user?.account_types?.includes('candidate')?<PersonalCenterPage user={user} onLogout={logout}/>:<UnifiedJobMarket user={user}/>;if(route==='/candidate/account')return <PersonalCenterPage user={user} onLogout={logout}/>;if(/^\/candidate\/account\/(profile|preferences|resume|applications|privacy|apply-assistant)$/.test(route))return <PersonalCenterPage user={user} onLogout={logout} section={route.split('/').pop() as 'profile'|'preferences'|'resume'|'applications'|'privacy'|'apply-assistant'}/>;if(route==='/candidate/saved')return <PersonalCenterPage user={user} onLogout={logout} onlySaved/>;if(route==='/candidate/account/legal-aid')return <LegalAidLandingPage user={user}/>;if(route==='/candidate/account/legal-aid/intervention')return <LegalAidInterventionPage user={user}/>;if(/^\/candidate\/account\/legal-aid\/[a-z-]{5,60}$/.test(route))return <LegalAidTopicPage user={user} slug={route.split('/').pop()!}/>;if(route==='/candidate/resume/new')return <ResumeUploadPage user={user}/>;if(route==='/candidate/match')return <CandidateMatchPage user={user}/>;if(route==='/candidate/jobs')return <UnifiedJobMarket user={user}/>;if(route==='/candidate/jobs/archive')return <CandidateJobsPage user={user}/>;if(/^\/candidate\/jobs\/[A-Za-z0-9_-]{1,180}$/.test(route)){const id=route.split('/').pop()!;return /^(JOB-|ATS-)/.test(id)?<CandidateJobDetailPage user={user} jobId={id}/>:<UnifiedJobDetail user={user} jobId={id}/>;}if(route.startsWith('/candidate/resume/'))return <ResumePage user={user} resumeId={route.split('/').pop()!}/>;if(route==='/candidate/review')return <ReviewPage user={user}/>;if(route==='/candidate/profile')return <ProfilePage user={user}/>;if(route.startsWith('/public/'))return <PublicProfilePage slug={route.split('/').pop()!}/>;if(route==='/admin/recruitment')return <AdminRecruitmentPage user={user}/>;if(route==='/candidate/employer-jobs')return <EmployerPublicJobsPage user={user}/>;if(route==='/candidate/my-applications')return <MyEmployerApplicationsPage user={user}/>;if(/^\/candidate\/employer-jobs\/[a-fA-F0-9-]{36}$/.test(route))return <EmployerPublicJobDetail user={user} id={route.split('/').pop()!}/>;if(route==='/admin/employer-review')return <EmployerReviewPage user={user}/>;if(route==='/employer/start'||route==='/employer/start/')return <EmployerStartPage user={user}/>;if(route==='/employer/onboarding-preview'||route==='/employer/onboarding-preview/')return <EmployerOnboardingPreviewPage user={user}/>;if(route==='/employer/aid/apply'||route==='/employer/aid/apply/')return <EmployerAidApplicationPage user={user}/>;
 if(route==='/employer/commercial'||route==='/employer/commercial/')return <EmployerCommercialPage user={user}/>;
