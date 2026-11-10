@@ -42,7 +42,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
      <div className="hhba-match-intro">
       <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> AI 搜索真实岗位并匹配简历</span>
       <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
-      <p>适配分仅供比较，不是录用概率。只展示中国大陆工作岗位。{pending?'结果正在陆续生成，下方岗位可先查看。':'以下岗位网址来自 DeepSeek Search 结果，推荐原因由 V4 Pro 根据简历生成。'}</p>
+      <p>适配分仅供比较，不是录用概率。只展示中国大陆企业招聘岗位，不提供第三方招聘平台链接。{pending?'结果正在陆续生成，下方岗位可先查看。':'以下岗位网址来自 DeepSeek Search 结果，推荐原因由 V4 Pro 根据简历生成。'}</p>
      </div>
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {result.matches.length?
@@ -78,15 +78,14 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
          <p className="hhba-native-reason"><strong>为什么推荐：</strong>
           {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
-          data-hhba-recruitment-outbound="true">{job.recruitment_source_kind==='THIRD_PARTY_BOARD'?
-            '查看第三方平台职位（请核验）':job.recruitment_source_kind==='EMPLOYER_ATS'?
-            '查看企业使用的招聘系统（请核验）':'优先查看企业招聘岗位页面（请核验）'} <ArrowUpRight size={15}/></a>
+          data-hhba-recruitment-outbound="true">{job.recruitment_source_kind==='EMPLOYER_ATS'?
+            '查看企业专属招聘系统岗位（请核验）':'查看企业招聘岗位页面（请核验）'} <ArrowUpRight size={15}/></a>
         </article>
        ))}
       </div>:
       <div className="hhba-match-empty"><BriefcaseBusiness size={23}/>
        <h3>本轮没有找到符合条件的具体职位链接</h3>
-       <p>这不代表你没有合适的工作。返回后可以调整目标岗位，再重新搜索。</p>
+       <p>本轮未找到符合条件的企业招聘站岗位。已排除第三方招聘平台，数量不足也不会用它们补齐。</p>
       </div>}
      <p className="hhba-match-disclaimer">{result.disclaimer||'职位信息由 DeepSeek 联网检索提供，HHBA 未逐条人工复核。岗位是否仍开放、任职要求及薪资以原始网页为准；不会自动投递。'}</p>
     </div>
