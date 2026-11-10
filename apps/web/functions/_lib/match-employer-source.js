@@ -31,6 +31,15 @@ export function recruitmentSourceKind(url){
   return 'EMPLOYER_DOMAIN_CANDIDATE';
  return 'UNVERIFIED';
 }
+// HHBA strictly forbids consumer job boards and unknown aggregators in results.
+// Employer-branded career sites and dedicated employer ATS positions may be considered.
+// Domain shape is a candidate signal, not proof of corporate authorization.
+export function isEmployerDirectedSource(kind){
+ return kind==='EMPLOYER_DOMAIN_CANDIDATE'||kind==='EMPLOYER_ATS';
+}
+export function allowedEmployerJobLink(raw){
+ return isEmployerDirectedSource(recruitmentSourceKind(raw));
+}
 export function sourcePriority(kind){
  return kind==='EMPLOYER_DOMAIN_CANDIDATE'?0:kind==='EMPLOYER_ATS'?1:
   kind==='UNVERIFIED'?2:3;
@@ -43,10 +52,10 @@ export function sortEmployerFirst(hits,max=48){
  }).slice(0,max).map(x=>x.hit);
 }
 export function sourceDisplay(kind){
- if(kind==='THIRD_PARTY_BOARD')return '第三方招聘平台 · 优先寻找企业官网';
+ if(kind==='THIRD_PARTY_BOARD')return '已排除 · 第三方招聘平台';
  if(kind==='EMPLOYER_ATS')return '企业招聘系统候选 · 来源待核验';
  if(kind==='EMPLOYER_DOMAIN_CANDIDATE')return '疑似企业招聘站 · 来源待核验';
- return '招聘来源待确认';
+ return '来源不明 · 不参与推荐';
 }
 export function employerLookupQuery(job){
  const company=String(job.company||'').replace(/[\r\n<>]/g,' ').slice(0,45);
