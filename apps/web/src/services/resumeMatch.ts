@@ -14,7 +14,9 @@ export type MatchedJob = {
   official_url:string;platform:string;source:string;remote:boolean;
   reference_score:number;matched:string[];not_evidenced:string[];
   needs_verification:string[];requirements_basis:string;
-  source_type?:'HHBA站内岗位'|'站外官方招聘';
+  source_type?:'HHBA站内岗位'|'站外官方招聘'|'站外招聘职位';
+  recruitment_source_kind?:'EMPLOYER_DOMAIN_CANDIDATE'|'EMPLOYER_ATS'|'THIRD_PARTY_BOARD'|'UNVERIFIED';
+  recruitment_source_note?:string;
   application_status?:'NEEDS_OFFICIAL_CONFIRMATION';checked_at?:string;
   salary?:string|null;experience_requirement?:string|null;
   required_skills?:string[];mandatory_skills?:string[];preferred_skills?:string[];unclassified_skills?:string[];
