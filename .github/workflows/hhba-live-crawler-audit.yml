@@ -1,0 +1,23 @@
+name: HHBA live search crawler diagnostics
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - feature/search-crawlable-content-20261110
+    paths:
+      - 'apps/web/scripts/audit-live-search-crawlers.mjs'
+      - '.github/workflows/hhba-live-crawler-audit.yml'
+permissions:
+  contents: read
+jobs:
+  crawl-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check published public HTML, robots and simulated search bot user-agents
+        working-directory: apps/web
+        run: node scripts/audit-live-search-crawlers.mjs
