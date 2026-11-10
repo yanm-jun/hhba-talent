@@ -9,9 +9,9 @@ import { BrandMark } from '../components/BrandMark';
 import { HomeLiveDrawer } from '../components/HomeLiveDrawer';
 import type { User } from '../services/api';
 
-function EntryCard({kind,title,body,footer}:{kind:'candidate'|'employer';title:string;body:string;footer:string}){
+function EntryCard({kind,title,body,footer,candidateSignedIn=false}:{kind:'candidate'|'employer';title:string;body:string;footer:string;candidateSignedIn?:boolean}){
  const Icon=kind==='candidate'?BriefcaseBusiness:UsersRound;
- const target=kind==='candidate'?'/candidate/register':'/employer/start';
+ const target=kind==='candidate'?(candidateSignedIn?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'):'/employer/start';
  return <Link to={target} className={'entry-card hhba-entry-card hhba-entry-'+kind}
    aria-label={title+'，'+footer}>
    <span className="entry-icon"><Icon size={23}/></span>
@@ -31,9 +31,9 @@ export function HomePage({user}:{user:User|null}){
    <button type="button" className="hhba-letter-revisit" onClick={()=>window.dispatchEvent(new Event('hhba:open-letter'))}><span aria-hidden="true">✉</span> 读一封来自 HHBA 的信</button>
   </section>
   <section className="entry-grid hhba-public-entry-grid" aria-label="选择使用入口">
-   <EntryCard kind="candidate" title="我要应聘"
-    body="我是求职者，希望建立个人账户，找到适合自己的工作。"
-    footer="进入求职者注册 / 登录"/>
+   <EntryCard kind="candidate" title="我要应聘" candidateSignedIn={Boolean(user?.account_types?.includes('candidate'))}
+    body="登录后上传或使用已保存简历，让 AI 推荐适合你的企业招聘岗位。"
+    footer={user?.account_types?.includes('candidate')?'上传简历 · AI 智能匹配':'登录 / 注册后开始智能匹配'}/>
    <EntryCard kind="employer" title="我要招人"
     body="我是企业招聘负责人，想了解 HHBA 的招聘、企业信誉与治理服务。"
     footer="了解企业招聘与治理"/>

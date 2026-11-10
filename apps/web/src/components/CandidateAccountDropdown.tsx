@@ -11,7 +11,7 @@ export const CANDIDATE_ACCOUNT_LINKS=[
  {label:'个人资料',path:'/candidate/account/profile',Icon:UserRound},
  {label:'求职偏好',path:'/candidate/account/preferences',Icon:SlidersHorizontal},
  {label:'我的简历',path:'/candidate/account/resume',Icon:FileUser},
- {label:'求职记录',path:'/candidate/account/applications',Icon:ClipboardList},
+ {label:'匹配历史',path:'/candidate/account/applications',Icon:ClipboardList},
  {label:'法律援助',path:'/candidate/account/legal-aid',Icon:Scale,description:'法律服务筹备中'}
 ] as const;
 

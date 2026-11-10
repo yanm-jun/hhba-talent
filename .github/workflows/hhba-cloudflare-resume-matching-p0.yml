@@ -34,9 +34,11 @@ jobs:
           node --check functions/_lib/deepseek-search-match.js
           node --check functions/_lib/match-job-quality.js
           node --check functions/_lib/match-employer-source.js
+          node --check functions/_lib/match-history.js
+          node --check 'functions/api/match-history/[[path]].js'
           node --check functions/_lib/resume-role-evidence.js
           node --check functions/_lib/professional-credentials.js
-          node --test scripts/match-v5-credentials.contract.test.mjs scripts/match-audit-hardgates.contract.test.mjs scripts/resume-tenure.contract.test.mjs scripts/resume-match-cloudflare.contract.test.mjs scripts/resume-match-endtoend.test.mjs scripts/match-native-web.contract.test.mjs scripts/match-search-first.contract.test.mjs
+          node --test scripts/match-v5-credentials.contract.test.mjs scripts/match-audit-hardgates.contract.test.mjs scripts/resume-tenure.contract.test.mjs scripts/resume-match-cloudflare.contract.test.mjs scripts/resume-match-endtoend.test.mjs scripts/match-native-web.contract.test.mjs scripts/match-search-first.contract.test.mjs scripts/match-history.contract.test.mjs scripts/demo-account.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
       - name: TypeScript and Vite bundle
         working-directory: apps/web
         run: npm run build

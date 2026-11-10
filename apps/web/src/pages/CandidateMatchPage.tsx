@@ -4,7 +4,8 @@ import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
 import {Link} from '../router';
 import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDialog';
-import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,type PrivateResume} from '../services/privateResumes';
+import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
+import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
 import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
@@ -22,6 +23,9 @@ export function CandidateMatchPage({user}:{user:User|null}){
  const [previewBusy,setPreviewBusy]=useState(false);
  const previewController=useRef<AbortController|null>(null);
  const [vaultError,setVaultError]=useState('');
+ const [saveConsent,setSaveConsent]=useState(false);
+ const [saveBusy,setSaveBusy]=useState(false);
+ const [saveNotice,setSaveNotice]=useState('');
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
@@ -65,7 +69,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
  },[user?.id]);
  function choose(candidate:File|null){
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);
-  setError('');setResult(null);
+  setError('');setResult(null);setSaveConsent(false);setSaveNotice('');
   if(!candidate){setFile(null);return}
   if(!/\.(pdf|docx)$/i.test(candidate.name)||!candidate.size||candidate.size>maxResumeSize){
     setFile(null);setError('请选择不超过 3 MB 的 PDF 或 DOCX 文件。');return;
@@ -91,6 +95,25 @@ export function CandidateMatchPage({user}:{user:User|null}){
   }catch(e){
    if((e as Error)?.name!=='AbortError')setError(e instanceof Error?e.message:'无法读取简历文字。');
   }finally{setPreviewBusy(false);previewController.current=null;}
+ }
+ async function saveResume(){
+  if(!file||savedId||!saveConsent||saveBusy||!user||!getRealAuthToken())return;
+  setSaveBusy(true);setSaveNotice('');
+  try{
+   const item=await uploadPrivateResume(file,true);
+   setSavedId(item.id);setSavedFiles(all=>all.some(x=>x.id===item.id)?all:[item,...all]);
+   window.dispatchEvent(new Event('hhba:private-resumes-changed'));
+   setSaveConsent(false);
+   if(result?.history_id){
+    try{
+     await linkMatchHistoryResume(result.history_id,item.id);
+     setSaveNotice('简历已保存到「我的简历」，并关联到本次 AI 匹配历史。');
+    }catch{
+     setSaveNotice('简历已保存到「我的简历」，但与匹配历史的关联暂未完成；历史推荐内容仍可单独查看。');
+    }
+   }else setSaveNotice('简历已保存到「我的简历」，下次可以直接选择使用，不必重复上传。');
+  }catch(e){setSaveNotice(e instanceof Error?e.message:'简历保存失败，请稍后重试。')}
+  finally{setSaveBusy(false)}
  }
  async function run(){
   if((!file&&!savedId)||!consent||working||previewBusy||availability!=='ready'||!getRealAuthToken())return;
@@ -183,7 +206,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
           onChange={e=>setConsent(e.target.checked)}/>
           <span>我同意 HHBA 提取简历文本，尽可能隐藏联系方式后，发送给 DeepSeek V4 Pro，由 Search 接口搜索中国大陆公开招聘页面，再由 V4 Pro 生成岗位推荐。脱敏可能不完整，可先预览编辑；不会公开简历或自动投递。</span>
         </label>
-        <p className="hhba-ai-notice"><ShieldCheck size={15}/> 本功能仅供已登录的求职者使用。简历原件在当前浏览器读取，最多取前 2 万字文字分析；分析需单独同意，结果仅在本次页面中展示，不会自动公开或向企业投递。</p>
+        <p className="hhba-ai-notice"><ShieldCheck size={15}/> AI 分析与简历私有存储是两种独立操作：只有同意 AI 分析才会发送脱敏文字；只有你主动选择保存，原文件才会进入私有 R2 简历库。匹配结果会保存至当前账户的「匹配历史」，不会公开或自动投递。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
           disabled={(!file&&!savedId)||!consent||working||previewBusy||(previewLoaded&&previewText.replace(/\s/g,'').length<30)||availability!=='ready'||!getRealAuthToken()}>
@@ -203,6 +226,11 @@ export function CandidateMatchPage({user}:{user:User|null}){
     {(result||partialJobs.length>0)&&<CandidateMatchNativeDialog
       result={result||{matches:partialJobs}}
       pending={working&&!result} notice={working?'':error}
+      resumeStorage={result&&file&&!savedId?{
+        available:true,saved:false,consent:saveConsent,saving:saveBusy,
+        notice:saveNotice,onConsent:setSaveConsent,onSave:()=>void saveResume()
+       }:result&&savedId?{available:false,saved:true,consent:false,saving:false,
+        notice:saveNotice,onConsent:()=>{},onSave:()=>{}}:undefined}
       onClose={()=>{if(working)controller.current?.abort();setPartialJobs([]);setResult(null);setWorking(false);}}/>}
      <div className="hhba-ai-footer"><Link to="/candidate/jobs">不上传简历，直接搜索公开岗位 <ArrowRight size={15}/></Link></div>
   </section>

@@ -3,6 +3,7 @@
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
+import {saveMatchHistory} from '../../_lib/match-history.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -131,6 +132,26 @@ function nativeResponsePayload(result){
   privacy:'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
   disclaimer:(result.incomplete?'本轮未达到10条或生成未完全结束，仅保留已找到的企业招聘入口。':'')+'严格不推荐第三方公开招聘平台；仅展示企业招聘站候选或企业专属招聘系统具体岗位。实际招聘归属、是否在招和投递资格仍须以企业官方公告为准。'
  };
+}
+
+// The live Search-first model owns the job list. Only server-completed
+// matches may create durable personal history; clients cannot submit fake jobs.
+async function withSavedHistory(env,session,input,result){
+ const response=nativeResponsePayload(result);
+ try{
+  const item=await saveMatchHistory(env.HHBA_PNVS_AUTH_DB,session.phone,
+   input.resume_id??null,input.options.role_hint,result.matches);
+  response.history_id=item?.id||null;
+  response.history_status=item?'SAVED':'EMPTY';
+  response.new_job_count=item?.new_job_count||0;
+  response.improved_job_count=item?.improved_job_count||0;
+ }catch(e){
+  // Recommendation display must not disappear when a migration is pending.
+  response.history_id=null;response.history_status='UNAVAILABLE';
+  response.new_job_count=0;response.improved_job_count=0;
+  console.warn('HHBA_MATCH_HISTORY_SAVE_UNAVAILABLE',e?.name||'Error');
+ }
+ return response;
 }
 
 export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetch,onProgress=()=>{},onPartial=()=>{},direction='direct',signal=null}={}){
@@ -287,7 +308,8 @@ export async function onRequest({request,env}){
  if(tail!=='/resume'||request.method!=='POST')return fail('NOT_FOUND',404);
  if(request.headers.get('Origin')!==url.origin||request.headers.get('Sec-Fetch-Site')==='cross-site')
   return fail('ORIGIN_REQUIRED',403);
- try{if(!(await candidateSession(env,request)))return fail('SESSION_INVALID',401);}
+ let candidate;
+ try{candidate=await candidateSession(env,request);if(!candidate)return fail('SESSION_INVALID',401);}
  catch{return fail('SESSION_INVALID',401);}
  let input;
  try{
@@ -303,6 +325,16 @@ export async function onRequest({request,env}){
     typeof options.role_hint!=='string'||options.role_hint.length>80||
     !Number.isInteger(options.limit)||options.limit<1||options.limit>10)
   return fail('INVALID_RESUME_TEXT',400);
+ if(input.resume_id!==null&&input.resume_id!==undefined&&input.resume_id!==''){
+  if(typeof input.resume_id!=='string'||!/^[0-9a-f-]{36}$/i.test(input.resume_id))
+   return fail('RESUME_NOT_FOUND',404);
+  try{
+   const own=await env.HHBA_PNVS_AUTH_DB.prepare(
+    'SELECT id FROM hhba_candidate_resumes WHERE phone=? AND id=?'
+   ).bind(candidate.phone,input.resume_id).first();
+   if(!own)return fail('RESUME_NOT_FOUND',404);
+  }catch{return fail('MATCH_HISTORY_DB_UNAVAILABLE',503);}
+ }
  const redacted=redactForModel(input.text);
  if(redacted.replace(/\s/g,'').length<30)return fail('INVALID_RESUME_TEXT',400);
  // Same-origin, authorized one-shot call. No raw resume stored in HHBA database.
@@ -333,7 +365,7 @@ export async function onRequest({request,env}){
         phase=stage;send('progress',{stage});
        },onPartial:matches=>send('partial',{matches})});
       console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
-      send('complete',nativeResponsePayload(result));
+      send('complete',await withSavedHistory(env,candidate,input,result));
      }catch(e){
       const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
       console.warn('HHBA_MATCH_NATIVE_ERROR',JSON.stringify({
@@ -359,7 +391,7 @@ export async function onRequest({request,env}){
   const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
    options.role_hint,options.limit);
   console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
-  return json(nativeResponsePayload(result));
+  return json(await withSavedHistory(env,candidate,input,result));
  }catch(e){
   const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
   console.warn('HHBA_MATCH_NATIVE_ERROR',code);
