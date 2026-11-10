@@ -7,7 +7,7 @@ import {BrandMark} from '../components/BrandMark';
 /** Public identity choice never grants authorization. */
 export function AuthChoicePage(){
  const requested=new URLSearchParams(location.search).get('next');
- const candidateSuffix=requested==='/candidate/official-outbound'?'?next=%2Fcandidate%2Fofficial-outbound':'';
+ const candidateSuffix=requested==='/candidate/match'?'?next=%2Fcandidate%2Fmatch':requested==='/candidate/official-outbound'?'?next=%2Fcandidate%2Fofficial-outbound':'';
  return <Shell user={null}>
   <section className="hhba-role-auth" aria-labelledby="role-auth-title">
    <div className="hhba-role-frame">
