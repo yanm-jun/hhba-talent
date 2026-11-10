@@ -1,46 +1,38 @@
-# HHBA — AI 时代的人类能力搜索与连接平台
+# 汇方职场 HHBA
 
-> 当前阶段：**Phase 0 — 开发环境审计、基础设施准备与项目初始化**（2026-10）
-> 本阶段只做准备工作，不开发正式业务功能。
+**让机会与人才，找到彼此。**
 
-## 产品定义
+**正式官网：<https://hhba.work/>**  
+**公开岗位：<https://hhba.work/candidate/jobs/>**  
+**人才政策与城市安居：<https://hhba.work/talent-service/>**  
+**寒假实习：<https://hhba.work/winter-internship/>**
 
-1. **个人端**：用户注册、上传简历，AI 解析经历与技能，生成可分享、可搜索、可控制公开范围的个人 AI 能力名片。
-2. **企业端**：企业用自然语言描述人才需求，搜索符合要求的人才，在获得授权后发起联系。
-3. **第三方 Agent 接入端**：标准化 API 与 MCP Server，授权的外部 Agent 可搜索人类能力档案、读取允许公开的信息、发起联系申请。
+汇方职场（HHBA）是面向求职者的职业机会与人才服务平台。当前重点围绕**中国大陆招聘岗位、企业信息、简历智能匹配、国内实习以及各地人才政策**提供公开浏览和求职辅助能力；留学与海外发展内容是独立的信息板块。
 
-三个端口共享同一套人才能力数据模型、身份认证、访问控制和搜索服务。
+平台展示企业招聘资料时，优先引导用户前往企业自己的招聘官网或官方申请系统。是否正在招聘、招聘条件、政策有效期等，始终以企业和主管部门的官方公告为准。
 
-## 目录结构
+## 网站与搜索引擎
 
-```
-HHBA/
-  apps/web/          前端（React + TypeScript + Vite，Phase 0 仅做最小骨架）
-  apps/api/          后端 API（FastAPI，Phase 0 仅健康检查）
-  packages/shared/   共享数据模型（JSON Resume 扩展结构）
-  infra/             基础设施（Docker Compose：PostgreSQL + pgvector）
-  docs/              文档（审计 / 选型 / 指南 / 风险 / 就绪状态）
-  scripts/           脚本（含可移植的环境审计脚本 audit.sh）
-  tests/             测试
-  references/        第三方资料与许可证记录
-```
+- 官方域名：<https://hhba.work/>
+- 站点地图：<https://hhba.work/sitemap.xml>
+- 搜索引擎规则：<https://hhba.work/robots.txt>
+- 公开品牌：**汇方职场 HHBA**（网站与项目均使用此名称）
 
-## 文档索引
+本仓库是汇方职场 HHBA 的开发代码库，并非第三方招聘网站或政府政策发布机构。站点公开内容可供搜索引擎发现；账号、个人简历与后台内容不作为公开搜索资源。
 
-- `docs/ENVIRONMENT_AUDIT.md` — 环境体检结果
-- `docs/TECH_STACK_DECISION.md` — 技术选型决策
-- `docs/DEPENDENCY_LICENSES.md` — 开源依赖与许可证审计
-- `docs/SETUP_GUIDE.md` — 从零启动指南
-- `docs/PROJECT_READINESS.md` — 项目就绪状态报告（供审阅）
-- `docs/INITIAL_RISKS.md` — 初始风险清单
+## 技术结构
 
-## 本阶段终止条件
+- `apps/web/`：React + TypeScript + Vite 网站及 Cloudflare Pages 构建入口
+- `apps/web/functions/`：Cloudflare Pages Functions
+- `apps/web/scripts/`：数据发布、招聘资料核验、静态页面及搜索引擎索引构建
+- `apps/browser-extension/`：浏览器网申助手相关代码
+- `apps/admin-preview/`：后台管理预览
+- `docs/`：开发记录、设计和验收文档
 
-完成环境审计、开源项目核查、技术选型建议、工作区创建、必要环境配置和基础验证后，
-输出 `docs/PROJECT_READINESS.md` 供审阅。V0.1 的产品目标与里程碑另行制定。
+## 项目说明
 
-## 说明
+功能以 **<https://hhba.work/>** 实际上线版本为准。仓库包含部分尚在开发或测试阶段的能力，不能将代码存在等同于产品正式上线。用户隐私、简历数据、账号与权限不应暴露在公开网页或搜索索引中。
 
-- 本工作区为 2026-10 新立的 Phase 0 独立工作区（本地 Git 仓库，未推送远程）。
-  历史 HHBA 代码仓库（yanm-jun/HHBA，"AI 当包工头"方向）未做任何改动。
-- 真实密钥一律不进仓库：`.env` 已加入 `.gitignore`，仅保留 `.env.example` 占位符。
+---
+
+汇方职场 · HHBA · 让机会与人才，找到彼此。

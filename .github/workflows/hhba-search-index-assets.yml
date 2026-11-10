@@ -3,13 +3,18 @@ on:
   push:
     branches:
       - main
-      - feature/search-engine-discovery-20261110
+      - "feature/search-index-*"
     paths:
+      - 'README.md'
       - 'apps/web/index.html'
       - 'apps/web/public/robots.txt'
       - 'apps/web/public/_headers'
       - 'apps/web/scripts/build-search-index-assets.mjs'
       - 'apps/web/scripts/search-index-assets.contract.test.mjs'
+      - 'apps/web/scripts/submit-indexnow-from-sitemap.mjs'
+      - 'apps/web/scripts/submit-indexnow-from-sitemap.contract.test.mjs'
+      - 'apps/web/src/data/employerProfiles/**'
+      - 'apps/web/src/data/talent**'
       - 'apps/web/scripts/cloudflare-pages-build.py'
       - '.github/workflows/hhba-search-index-assets.yml'
   workflow_dispatch:
@@ -27,7 +32,8 @@ jobs:
         working-directory: apps/web
         run: |
           node --check scripts/build-search-index-assets.mjs
-          node --test scripts/search-index-assets.contract.test.mjs
+          node --check scripts/submit-indexnow-from-sitemap.mjs
+          node --test scripts/search-index-assets.contract.test.mjs scripts/submit-indexnow-from-sitemap.contract.test.mjs
   notify-indexnow:
     if: github.ref == 'refs/heads/main'
     needs: seo-contract
@@ -48,10 +54,6 @@ jobs:
             sleep 15
           done
           echo 'Production SEO artifacts not yet deployed'; exit 1
-      - name: Notify participating engines of changed public entry pages
-        shell: bash
-        run: |
-          set -euo pipefail
-          payload='{"host":"hhba.work","key":"9a3c3cf5a998f8d7e916078a3e4255efee04cc25","keyLocation":"https://hhba.work/9a3c3cf5a998f8d7e916078a3e4255efee04cc25.txt","urlList":["https://hhba.work/","https://hhba.work/candidate/jobs/","https://hhba.work/winter-internship/","https://hhba.work/talent-service/","https://hhba.work/companies/discover/"]}'
-          curl --fail-with-body --show-error --silent --max-time 30 -X POST https://api.indexnow.org/indexnow -H 'Content-Type: application/json; charset=utf-8' --data-binary "$payload"
-          echo 'IndexNow submission sent; search engines decide whether/when to index'
+      - name: Notify IndexNow with every deployed public sitemap URL
+        working-directory: apps/web
+        run: node scripts/submit-indexnow-from-sitemap.mjs
