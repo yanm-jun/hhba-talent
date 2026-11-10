@@ -337,10 +337,9 @@ test('employer site results survive limited search candidate slots even after ma
   summary:'星云科技有限公司招聘产品运营，地点上海，负责数字产品运营管理'.repeat(3)
  };
  const found=normalizeHits([{results:[...boards,employer]}],20);
- assert.equal(found.length,20);
+ assert.equal(found.length,1,'all 34 public job board results are removed before model ranking');
  assert.equal(found[0].url,employer.url);
  assert.equal(found[0].recruitment_source_kind,'EMPLOYER_DOMAIN_CANDIDATE');
- assert.ok(found.slice(1).every(h=>h.recruitment_source_kind==='THIRD_PARTY_BOARD'));
  assert.equal(sortEmployerFirst(found,8)[0].url,employer.url);
 });
 test('Search-backed employer link replacement requires matching employer, role and Mainland city',async()=>{
@@ -407,11 +406,93 @@ test('official company links are left untouched and never cost an extra Search r
  assert.equal(res.replaced,0);
  assert.equal(res.matches[0].official_url,job.official_url);
 });
-test('native cards distinguish employer candidate, hosted ATS and a fallback third-party platform',async()=>{
+test('native cards show only employer career pages or dedicated ATS without fallback to a third-party platform',async()=>{
  const {readFile}=await import('node:fs/promises');
  const jsx=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(jsx,/recruitment_source_note/);
  assert.match(jsx,/THIRD_PARTY_BOARD/);
  assert.match(jsx,/企业使用的招聘系统/);
- assert.match(jsx,/第三方平台职位/);
+ assert.doesNotMatch(jsx,/查看第三方平台职位/);
+ assert.match(jsx,/不提供第三方招聘平台链接/);
+});
+
+test('strict employer-only: no popular third-party job board or unknown source reaches selectedJobs',()=>{
+ const publicSites=[
+  'https://www.zhipin.com/job_detail/abc123-2026.html',
+  'https://jobs.51job.com/shanghai/jb-765432.html',
+  'https://www.liepin.com/job/abc123-2026.shtml',
+  'https://www.zhaopin.com/job_detail/test-123.html',
+  'https://www.lagou.com/jobs/764321.html',
+  'https://www.unidentified-careers-board.com/job_detail/abc123.html'
+ ];
+ const matches=publicSites.map((url,i)=>({
+  url,title:'上海 产品经理岗位招聘',summary:'上海招聘产品经理，具体职位职责和任职要求。'.repeat(4)
+ }));
+ const hits=normalizeHits([{results:matches}]);
+ assert.equal(hits.length,0,'only source forms classified as employer-directed may enter the model shortlist');
+ const raw={jobs:[{id:'j1',company:'示例科技',title:'产品经理',location:'上海',reason:'真实岗位推荐理由'}]};
+ const manual=[{id:'j1',url:publicSites[0],recruitment_source_kind:'EMPLOYER_DOMAIN_CANDIDATE',
+  availability:{status:'UNKNOWN'},summary:'上海职位招聘'}];
+ assert.equal(selectedJobs(JSON.stringify(raw),manual,10).length,0,
+  'forged kind must never bypass URL-based checks');
+});
+test('only third-party sites: automatically searches employer domains, then shows no fabricated fallback',async()=>{
+ const calls=[],platformHits={results:[{
+  url:'https://www.zhipin.com/job_detail/brand-role-2026.html',
+  title:'上海招聘品牌督导',summary:'品牌督导，工作地点上海，招聘中'.repeat(5)
+ }]};
+ const fetcher=async(url,options)=>{
+  calls.push(url);
+  if(url.endsWith('/v1/tools/search'))return new Response(JSON.stringify(platformHits),{status:200});
+  throw Error('Model and Fetch must never be called when only job boards exist: '+url);
+ };
+ await assert.rejects(
+  runSearchFirstMatch('synthetic-secret-not-real',cv,'品牌督导',10,{fetcher}),
+  /AI_EMPLOYER_JOBS_NOT_FOUND/
+ );
+ assert.equal(calls.length,searchQueries(cv,'品牌督导').length+2);
+ assert.ok(calls.every(u=>u.endsWith('/v1/tools/search')));
+});
+test('first Search is third-party only: official supplemental results can still return employer jobs, never board URLs',async()=>{
+ const board={url:'https://www.zhipin.com/job_detail/brand-role-2026.html',
+  title:'招聘产品经理',summary:'上海招聘具体岗位，属于招聘平台。'.repeat(5)};
+ const corporate={url:'https://careers.orbit-cn.com/jobs/brand-role-2026',
+  title:'星云科技 品牌督导 上海 招聘',
+  summary:'星云科技招聘上海品牌督导，负责渠道营销、终端门店管理及团队协调。'.repeat(5)};
+ let calls=0;
+ const mock=async(url,options)=>{
+  if(url.endsWith('/v1/tools/search')){
+   calls++;
+   const q=JSON.parse(options.body).query;
+   return new Response(JSON.stringify({results:q.includes('2026 社会招聘')||q.includes('企业招聘 申请职位')?[corporate]:[board]}),{status:200});
+  }
+  if(url.endsWith('/v1/tools/fetch'))return new Response(JSON.stringify({content:
+   '上海品牌督导招聘，负责经销商门店业务督导、跨部门培训、项目执行等。'.repeat(8)}),{status:200});
+  if(url.endsWith('/responses')){
+   const req=JSON.parse(options.body);
+   if(req.stream===false)return new Response(JSON.stringify(response({jobs:[{
+    id:'search-j1',reason:'简历包括实际参与经销商门店销售渠道、团队培训和业务运营管理的工作，掌握销售线索转化及日常执行流程，对企业招聘的品牌督导职位有直接相关经历；但还需要对照官网判断具体学历、工作年限及岗位技术能力是否达标。'
+   }]})),{status:200});
+   const rows={jobs:[{id:'j1',company:'星云科技',title:'品牌督导',location:'上海',
+    match_score:83,score_basis:'既有经销商督导、团队培训和终端运营经验，符合岗位相关的实践要求。',
+    reason:'简历包含经销商督导和销售团队运营经历，与该岗位要求存在关联。'}]};
+   const payload=[
+    {type:'response.output_text.delta',delta:JSON.stringify(rows)},
+    {type:'response.completed',response:response(rows)}
+   ].map(x=>'event: '+x.type+'\ndata: '+JSON.stringify(x)+'\n\n').join('');
+   return new Response(payload,{status:200,headers:{'Content-Type':'text/event-stream'}});
+  }
+  throw Error('Unexpected '+url);
+ };
+ const partial=[];
+ const result=await runSearchFirstMatch('synthetic-secret-not-real',cv,'品牌督导',10,{
+  fetcher:mock,onPartial:jobs=>partial.push(jobs.map(j=>j.official_url))
+ });
+ assert.equal(result.matches.length,1);
+ assert.equal(result.matches[0].official_url,corporate.url);
+ assert.ok(calls>=3);
+ assert.ok(partial.length>=1);
+ assert.ok(partial.flat().every(url=>url===corporate.url));
+ assert.equal(result.diagnostic.source_after.third_party_board,0);
+ assert.equal(result.diagnostic.third_party_results_shown,0);
 });
