@@ -8,6 +8,8 @@ import {eraseAccountAnalytics,getMyActivityCheck,type MyActivityCheck,type Accou
 import {getCandidateWorkspaceProfile,saveCandidateWorkspaceProfile,saveCandidateWorkspacePreferences,realWorkspaceAvailable,type CandidateWorkspaceProfile} from '../services/candidateWorkspace';
 import {type User} from '../services/api';
 import {PrivateResumeVault} from '../components/PrivateResumeVault';
+import {CandidateMatchHistory} from '../components/CandidateMatchHistory';
+import {listMatchHistory} from '../services/matchHistory';
 import {ApplyAssistantProduct} from '../components/ApplyAssistantProduct';
 import {listPrivateResumes,privateResumeAvailable} from '../services/privateResumes';
 import '../styles/personal-center.css';
@@ -22,7 +24,7 @@ const pages:{id:Section;label:string;icon:typeof UserRound;description:string}[]
  {id:'profile',label:'个人资料',icon:UserRound,description:'填写真实个人资料'},
  {id:'preferences',label:'求职偏好',icon:SlidersHorizontal,description:'地点、职位和工作方式'},
  {id:'resume',label:'我的简历',icon:FileUser,description:'账户私有简历管理'},
- {id:'applications',label:'求职记录',icon:BriefcaseBusiness,description:'真实投递记录待接入'},
+ {id:'applications',label:'匹配历史',icon:BriefcaseBusiness,description:'AI 推荐的岗位及适配理由'},
  {id:'privacy',label:'账户与隐私',icon:ShieldCheck,description:'账户安全与历史数据管理'},
 ];
 function routeFor(id:Section){return id==='overview'?'/candidate/account':id==='saved'?'/candidate/saved':'/candidate/account/'+id;}
@@ -33,6 +35,8 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
  const [rows,setRows]=useState<RecordRow[]>([]),[savedCount,setSavedCount]=useState(0);
  const [visibleSaved,setVisibleSaved]=useState(40);
  const [resumeCount,setResumeCount]=useState<number|null>(null);
+ const [historyCount,setHistoryCount]=useState<number|null>(null);
+ const [newOpportunityCount,setNewOpportunityCount]=useState(0);
  const [loading,setLoading]=useState(false),[error,setError]=useState('');
  const [busy,setBusy]=useState('');
  const [myActivity,setMyActivity]=useState<MyActivityCheck|null>(null);
@@ -92,6 +96,19 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
   refresh();
   window.addEventListener('hhba:private-resumes-changed',refresh);
   return()=>{active=false;window.removeEventListener('hhba:private-resumes-changed',refresh);};
+ },[user?.id]);
+ useEffect(()=>{
+  if(!user?.account_types?.includes('candidate'))return;
+  let active=true;
+  const refresh=()=>{void listMatchHistory().then(rows=>{
+    if(!active)return;
+    setHistoryCount(rows.length);
+    setNewOpportunityCount(rows[0]?.new_job_count||0);
+   }).catch(()=>{if(active)setHistoryCount(null)});
+  };
+  refresh();
+  window.addEventListener('hhba:match-history-changed',refresh);
+  return()=>{active=false;window.removeEventListener('hhba:match-history-changed',refresh)};
  },[user?.id]);
  const cancel=async(id:string)=>{
   setBusy(id);setError('');
@@ -156,7 +173,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
       <div className="hhba-account-section-heading"><div><h2>个人工作台</h2><p>你的职业探索，从这里开始。</p></div><Link to="/candidate/jobs">探索职位 <ArrowRight size={15}/></Link></div>
       <div className="hhba-account-stat-grid">
        <Link to="/candidate/saved"><Bookmark size={21}/><span>已收藏岗位</span><strong>{!savedAvailable?'—':loading?'…':error?'—':savedCount}</strong><small>真实账户专属收藏</small></Link>
-       <Link to="/candidate/account/applications"><BriefcaseBusiness size={21}/><span>求职申请</span><strong>—</strong><small>真实投递服务尚未接通</small></Link>
+       <Link to="/candidate/account/applications"><BriefcaseBusiness size={21}/><span>AI 匹配历史</span><strong>{historyCount===null?'—':historyCount}</strong><small>{newOpportunityCount>0?'最近一次新增 '+newOpportunityCount+' 个未推荐岗位':'保存真实推荐 · 不等于已投递'}</small></Link>
        <Link to="/candidate/account/resume"><FileUser size={21}/><span>我的简历</span><strong>{resumeCount===null?'—':resumeCount}</strong><small>{resumeCount===null?'私有存储尚未开通':'仅本人可访问'}</small></Link>
        <Link to="/candidate/account/apply-assistant"><MousePointerClick size={21}/><span>一键网申</span><strong className="hhba-account-stat-plugin-version">¥0.30</strong><small>AI 辅助填写 · 次数套餐</small></Link>
       </div>
@@ -204,10 +221,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
      </form>}{notice&&<p className="hhba-account-notice" role="status">{notice}</p>}
     </section>}
     {current==='resume'&&<PrivateResumeVault/>}
-    {current==='applications'&&<section className="hhba-account-panel">
-     <div className="hhba-account-section-heading"><div><h2>求职记录</h2><p>实际申请状态必须由真实投递接口提供。</p></div></div>
-     <div className="hhba-account-empty"><BriefcaseBusiness size={27}/><strong>真实投递接口尚未接通</strong><p>仅浏览外部岗位不会被记成“已投递”。</p><Link to="/candidate/jobs">浏览招聘岗位</Link></div>
-    </section>}
+    {current==='applications'&&<CandidateMatchHistory/>}
     {current==='privacy'&&<section className="hhba-account-panel">
      <div className="hhba-account-section-heading"><div><h2>账户与隐私</h2><p>查看账户安全、数据使用说明和历史记录清理。</p></div></div>
      <div className="hhba-account-privacy-row"><div><strong><ChartNoAxesCombined size={18}/>运营数据的使用范围</strong>
