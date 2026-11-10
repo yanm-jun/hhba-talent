@@ -56,6 +56,9 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
            <h3>{job.title_zh||job.title}</h3>
            <div className="hhba-native-meta"><span><MapPin size={13}/>{job.location}</span>
             {job.salary&&<span><Wallet size={13}/>{job.salary}</span>}</div>
+           <div className="hhba-native-source" role="note">
+            {job.recruitment_source_note||'招聘来源待确认'}
+           </div>
            <div className="hhba-native-availability" role="note">
             <span className={job.availability_status==='OPEN_LISTED'?'hhba-native-state-open':'hhba-native-state-unknown'}>
              {job.availability_status==='OPEN_LISTED'?'网页显示在招 · 仍需确认':'投递状态未确认'}
@@ -75,7 +78,9 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
          <p className="hhba-native-reason"><strong>为什么推荐：</strong>
           {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
-          data-hhba-recruitment-outbound="true">查看招聘原始页面并确认能否投递 <ArrowUpRight size={15}/></a>
+          data-hhba-recruitment-outbound="true">{job.recruitment_source_kind==='THIRD_PARTY_BOARD'?
+            '查看第三方平台职位（请核验）':job.recruitment_source_kind==='EMPLOYER_ATS'?
+            '查看企业使用的招聘系统（请核验）':'优先查看企业招聘岗位页面（请核验）'} <ArrowUpRight size={15}/></a>
         </article>
        ))}
       </div>:
