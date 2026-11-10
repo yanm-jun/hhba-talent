@@ -323,6 +323,9 @@ test('recruitment sources distinguish mass boards, hosted employer ATS, and unce
  assert.equal(recruitmentSourceKind('https://jobs.ashbyhq.com/example/abc'),'EMPLOYER_ATS');
  assert.equal(recruitmentSourceKind('https://boards.greenhouse.io/example/jobs/789'),'EMPLOYER_ATS');
  assert.equal(recruitmentSourceKind('https://company.example.org/about'),'UNVERIFIED');
+ assert.equal(recruitmentSourceKind('https://www.unknown-board.cn/jobs/position-999'),'UNVERIFIED',
+  'a generic /jobs URL on an unknown domain is not proof of official employer ownership');
+ assert.equal(recruitmentSourceKind('https://www.unknown-board.cn/positions/position-999'),'UNVERIFIED');
  assert.match(sourceDisplay('EMPLOYER_DOMAIN_CANDIDATE'),/待核验/);
  assert.doesNotMatch(sourceDisplay('EMPLOYER_ATS'),/已认证|已确认官网/);
 });
