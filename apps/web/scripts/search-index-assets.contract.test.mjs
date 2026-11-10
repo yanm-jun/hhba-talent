@@ -36,6 +36,10 @@ test('public HTML has unique metadata and private paths never enter sitemap',()=
   assert.match(home,/hhba-boot-trouble/);
   assert.match(home,/reduced-motion/);
   assert.match(home,/<noscript>/);
+  // A JS-disabled phone must show an explicit error, not another landing page.
+  assert.match(home,/完整的汇方职场网站需要浏览器启用 JavaScript/);
+  assert.doesNotMatch(home,/<nav aria-label="公开页面目录">/);
+  assert.match(co,/<nav aria-label="公开页面目录">/);
   assert.match(home,/<h1>汇方职场 HHBA<\/h1>/);
   assert.match(home,/<script src="\/assets\/main.js"><\/script>/);
   assert.doesNotMatch(home,/hhba-seo-entry|hhba-seo-hero|hhba-seo-fallback-style/);
