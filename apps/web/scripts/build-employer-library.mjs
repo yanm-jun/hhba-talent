@@ -131,6 +131,43 @@ const targetTotal=Object.values(collectionTargets).reduce((a,b)=>a+b,0);
 const importedTotal=Object.values(totals).reduce((a,b)=>a+b,0);
 const missingByHall=Object.fromEntries(
  Object.entries(collectionTargets).map(([id,target])=>[id,target-totals[id]]));
+// Recover historical Preview D1 audit sheets B04/B05/B06.
+// These 150 source records are NOT part of the 3,800 chat-batch ledger;
+// importing their recorded URLs does not certify current recruitment or jobs.
+const prior=load('employerLibraryPriorAudit150.json');
+if(prior.schema_version!==1||prior.records?.length!==150)throw Error('INVALID_PRIOR_AUDIT_150');
+const auditKeys=new Set();
+for(const rec of prior.records){
+ if(!['B04','B05','B06'].includes(rec.batch)||!Number.isInteger(rec.sequence)||
+    rec.sequence<1||rec.sequence>50||!rec.name||!/^https:\/\//.test(rec.url)||
+    !halls.some(([id])=>id===rec.industry_id))throw Error('INVALID_AUDIT_RECORD');
+ const reference=rec.batch+'-'+rec.sequence;
+ if(auditKeys.has(reference))throw Error('DUPLICATE_AUDIT_RECORD');
+ auditKeys.add(reference);
+ const id=key(rec.name);
+ const row=entries.get(id)||{id,name:rec.name,industry_id:rec.industry_id,
+  parent_name:null,relation:null,aliases:[],portals:[],source_datasets:[]};
+ if(row.industry_id!==rec.industry_id){
+  row.related_hall_ids=row.related_hall_ids||[];
+  if(!row.related_hall_ids.includes(rec.industry_id))row.related_hall_ids.push(rec.industry_id);
+ }
+ if(!row.source_datasets.includes('preview_audit_'+rec.batch))row.source_datasets.push('preview_audit_'+rec.batch);
+ row.audit_references=row.audit_references||[];
+ if(!row.audit_references.some(a=>a.batch===rec.batch&&a.sequence===rec.sequence))
+  row.audit_references.push({batch:rec.batch,sequence:rec.sequence,
+   preview_status:rec.status,source:'HHBA_20261111_Preview_D1_audit'});
+ // Generic jobs boards can never be treated as employer-owned search scopes.
+ const host=new URL(rec.url).hostname.toLowerCase();
+ const externalBoard=/(?:^|\.)(?:zhaopin\.com|51job\.com|zhipin\.com|liepin\.com|lagou\.com)$/.test(host);
+ if(!row.portals.some(p=>p.url===rec.url)){
+  row.portals.push({url:rec.url,label:'历史Preview企业来源记录',
+   scope:externalBoard||rec.status==='pending'?'discovery_candidate':'search_candidate',
+   status:'collected_unverified',reviewed_on:null,
+   historical_preview_status:rec.status,source_batch:rec.batch,
+   notes:String(rec.notes||'').slice(0,230)});
+ }
+ entries.set(id,row);
+}
 const items=[...entries.values()].sort((a,b)=>a.name.localeCompare(b.name,'zh-CN'));
 const unknown=items.filter(e=>e.industry_id==='uncategorized').map(e=>e.name);
 const output={schema_version:1,
@@ -142,7 +179,7 @@ const output={schema_version:1,
   unimported_batch_records:targetTotal-importedTotal,
   target_by_hall:collectionTargets,imported_by_hall:totals,unimported_by_hall:missingByHall
  },items,
- statistics:{entities:items.length,legacy_portals:items.reduce((n,e)=>n+e.portals.filter(p=>p.status==='legacy_reviewed').length,0),
+ statistics:{prior_audit_source_rows:prior.records.length,entities:items.length,legacy_portals:items.reduce((n,e)=>n+e.portals.filter(p=>p.status==='legacy_reviewed').length,0),
   candidate_portals:items.reduce((n,e)=>n+e.portals.filter(p=>p.status!=='legacy_reviewed').length,0),
   group_relations:items.filter(e=>e.parent_name).length,unclassified:unknown.length,
   by_hall:Object.fromEntries(halls.map(([id])=>[id,items.filter(e=>e.industry_id===id).length]))}};
