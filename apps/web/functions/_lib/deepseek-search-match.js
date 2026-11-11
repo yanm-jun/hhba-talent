@@ -373,7 +373,12 @@ export async function expandDetailedReasons(key,resume,matches,hits,{
 }
 export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  const start=Date.now(),onProgress=opts.onProgress||(()=>{}),onPartial=opts.onPartial||(()=>{});
- const search=await searchPublicJobs(key,resume,roleHint,{...opts,allowEmpty:true});
+ // Directory leads help Search find employer pages, but do not replace real job evidence.
+ // At least two generic open-web searches remain; the query count never increases.
+ const ordinary=searchQueries(resume,roleHint);
+ const hints=Array.isArray(opts.portalHints)?opts.portalHints.filter(x=>typeof x==='string'&&x.length<250).slice(0,2):[];
+ const queries=[...new Set([...hints,...ordinary.slice(0,Math.max(2,4-hints.length))])].slice(0,4);
+ const search=await searchPublicJobs(key,resume,roleHint,{...opts,queriesOverride:queries,allowEmpty:true});
  const enriched=await enrichCandidateDetails(key,search.hits,opts);
  let pool=enriched.hits;
  let visible=[],firstModelMs=0,secondModelMs=0,firstRows=0,secondRows=0;
