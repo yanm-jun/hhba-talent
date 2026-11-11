@@ -11,10 +11,12 @@ const RAILWAY_PREVIEW_HOST=/^[a-z0-9-]+\.up\.railway\.app(?::\d{2,5})?$/;
 const FILES=new Map([
  ['/','index.html'],['/index.html','index.html'],
  ['/styles.css','styles.css'],['/dashboard.js','dashboard.js'],
+ ['/library.css','library.css'],['/library.js','library.js'],
+ ['/data/employer-library.json','../web/public/data/employer-library.json'],
  ['/favicon.svg','favicon.svg']
 ]);
 const MIME={'html':'text/html; charset=utf-8','css':'text/css; charset=utf-8',
- 'js':'text/javascript; charset=utf-8','svg':'image/svg+xml'};
+ 'js':'text/javascript; charset=utf-8','svg':'image/svg+xml','json':'application/json; charset=utf-8'};
 const COMMON={
  'X-Content-Type-Options':'nosniff',
  'X-Frame-Options':'DENY',
