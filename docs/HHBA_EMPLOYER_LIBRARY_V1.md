@@ -17,13 +17,13 @@
 - \`src/data/employerLibraryCandidateBatches.json\` 保存700条草稿 PR 来源，带每批次原始 tuple / PR 编号。
 - \`public/data/employer-library.json\` 前后台共用的轻量检索索引（构建时产生）。
 - \`scripts/build-employer-library.mjs\` 从原仓库两份招聘 registry + 90关系 + 700候选批次重建索引，不再手工改 JSON。
-- \`functions/_lib/employer-library.js\` 合并只读索引和 D1 管理员补充，给 DeepSeek 输出有限数量的 HTTPS 官方来源搜索线索。
+- \`functions/_lib/employer-library.js\` 合并只读索引和 D1 管理员补充，给 DeepSeek 输出有限数量的 HTTPS 官方来源搜索线索。 同名企业跨馆导入只增加 related_hall_ids，并保留原主馆、原审核来源与全部招聘入口；拒绝普通第三方招聘平台作为来源。
 - \`functions/admin-preview/api/library.js\` 沿用 Cloudflare Access 已签名 JWT / 管理员允许名单；POST 仅同源、最多100条、D1审计入库。
 - \`apps/admin-preview\` 原管理后台新“企业资源图书馆”页面，支持17馆切换、集团子公司搜索、分页浏览、批量复制粘贴添加。
 
 ## DeepSeek 搜索策略
 
-新索引仅改变搜索查询的 **最多两个站点提示**，保留至少两个普通全网查询，每次总数不超过4次；必须依赖 DeepSeek Search 返回真实单岗位详情 URL 及证据，不能把门户首页当成岗位。无索引、目录请求失败或匹配不到行业时，继续普通全网搜索。仅 \`employer_portal\` / \`search_candidate\` HTTPS 可作为提示，\`group_shared_candidate\` / \`discovery_candidate\` 不得当作某个子公司的独立招聘入口。
+新索引优先匹配岗位方向、简历中明确的企业及历史审过的站点，选取不同域名；只改变搜索查询的 **最多两个站点提示**，保留至少两个普通全网查询，每次总数不超过4次；必须依赖 DeepSeek Search 返回真实单岗位详情 URL 及证据，不能把门户首页当成岗位。无索引、目录请求失败或匹配不到行业时，继续普通全网搜索。仅 \`employer_portal\` / \`search_candidate\` HTTPS 可作为提示，\`group_shared_candidate\` / \`discovery_candidate\` 不得当作某个子公司的独立招聘入口。
 
 ## 部署前必须完成
 
