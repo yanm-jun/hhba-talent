@@ -12,9 +12,9 @@ export async function getEnergyCandidateSourceHints(env,{sections=[],limit=40}={
    typeof env?.HHBA_PNVS_AUTH_DB?.prepare!=='function')return [];
  const selected=Array.isArray(sections)?
    [...new Set(sections.filter(s=>typeof s==='string'&&VALID_SECTIONS.has(s)))]:[];
- const capped=Number.isInteger(limit)?Math.max(1,Math.min(100,limit)):40;
+ const capped=Number.isInteger(limit)?Math.max(1,Math.min(200,limit)):40;
  const clause=selected.length?' AND section_id IN ('+selected.map(()=>'?').join(',')+')':'';
- const sql='SELECT id,collection_sequence,employer_display_name,candidate_url,section_id,entry_kind,parent_group '+
+ const sql='SELECT id,collection_sequence,employer_display_name,candidate_url,section_id,entry_kind,parent_group,batch_id '+
   'FROM hhba_library_energy_recruitment_candidates '+
   "WHERE source_status='UNVERIFIED'"+clause+' ORDER BY collection_sequence LIMIT ?';
  try{
@@ -24,7 +24,7 @@ export async function getEnergyCandidateSourceHints(env,{sections=[],limit=40}={
    recruitment_candidate_url:row.candidate_url,primary_hall:'energy',
    energy_section:row.section_id,entry_kind:row.entry_kind,
    parent_group:row.parent_group,collection_sequence:row.collection_sequence,
-   batch_id:'ENERGY_BATCH_001_100',source_status:'UNVERIFIED',
+   batch_id:row.batch_id||'ENERGY_BATCH_001_100',source_status:'UNVERIFIED',
    is_reviewed_whitelist_source:false,
    intended_use:'DEEPSEEK_OFFICIAL_SOURCE_DISCOVERY_HINT_ONLY'
   }));
