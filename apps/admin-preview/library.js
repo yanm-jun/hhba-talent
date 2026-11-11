@@ -9,14 +9,15 @@ const button=(label,onClick,extra='')=>{
 const safeLink=(url)=>{
  try{const u=new URL(url);return u.protocol==='https:'&&!u.username&&!u.password?u.href:null}catch{return null}
 };
-const count=id=>state.items.filter(x=>x.industry_id===id).length;
+const belongs=(x,id)=>x.industry_id===id||x.related_hall_ids?.includes(id);
+const count=id=>state.items.filter(x=>belongs(x,id)).length;
 const showMessage=(txt)=>{dom('library-message').textContent=txt;};
 function selectHall(hall){
  state.hall=hall;state.page=0;render();
 }
 function filtered(){
  const q=state.term.toLocaleLowerCase('zh-CN').replace(/\s/g,'');
- return state.items.filter(x=>(state.hall==='all'||x.industry_id===state.hall)&&
+ return state.items.filter(x=>(state.hall==='all'||belongs(x,state.hall))&&
   (!q||[x.name,x.parent_name,...(x.aliases||[])].filter(Boolean)
    .some(s=>String(s).toLocaleLowerCase('zh-CN').replace(/\s/g,'').includes(q))));
 }
@@ -37,15 +38,19 @@ function render(){
   const name=document.createElement('td');
   const strong=document.createElement('strong');strong.textContent=e.name;name.append(strong);
   if(e.parent_name){const small=document.createElement('small');small.textContent='上级：'+e.parent_name+(e.relation?' · '+e.relation:'');name.append(small);}
-  const type=document.createElement('td');type.textContent=state.halls.find(h=>h.id===e.industry_id)?.name||'待分类';
+  const type=document.createElement('td');type.textContent=[e.industry_id,...(e.related_hall_ids||[])]
+   .map(id=>state.halls.find(h=>h.id===id)?.name||'待分类').join(' / ');
   const site=document.createElement('td');const verified=(e.portals||[]).filter(p=>p.status==='legacy_reviewed').length;
   const pending=(e.portals||[]).filter(p=>p.status==='collected_unverified').length;
   if(!e.portals?.length){const span=document.createElement('span');span.textContent='暂无企业独立招聘入口';span.className='library-muted';site.append(span);}
   else{
    for(const p of e.portals.slice(0,3)){
-    const url=safeLink(p.url);if(!url)continue;
+    const url=safeLink(p.url);
+    if(!url){const note=document.createElement('small');note.textContent='非HTTPS来源 · 待复核';site.append(note);continue;}
     const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';
-    a.textContent=(p.status==='legacy_reviewed'?'历史已审 · ':'待复核 · ')+new URL(url).hostname;
+    const label=p.scope==='group_shared_candidate'?'集团共用线索':p.scope==='discovery_candidate'?'公告/检索线索':
+     p.status==='legacy_reviewed'?'历史已审':'待复核线索';
+    a.textContent=label+' · '+new URL(url).hostname;
     site.append(a);
    }
   }
