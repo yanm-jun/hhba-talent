@@ -293,7 +293,8 @@ export async function runNativeDualMatch(key,text,roleHint,limit=10,{
  }};
 }
 
-export async function onRequest({request,env,waitUntil}){
+export async function onRequest(context){
+ const {request,env}=context;
  const url=new URL(request.url);
  const tail=url.pathname.slice('/api/match-native'.length).replace(/\/$/,'')||'/';
  if(tail==='/status'&&request.method==='GET')
@@ -339,7 +340,8 @@ export async function onRequest({request,env,waitUntil}){
  const redacted=redactForModel(input.text);
  if(redacted.replace(/\s/g,'').length<30)return fail('INVALID_RESUME_TEXT',400);
  // Internal, public-source-only capture; OFF by default and not user-facing.
- const knowledge=knowledgeCaptureCallbacks(env,waitUntil);
+ const knowledge=knowledgeCaptureCallbacks(env,
+  typeof context.waitUntil==='function'?promise=>context.waitUntil(promise):undefined);
  // Same-origin, authorized one-shot call. No raw resume stored in HHBA database.
  const streaming=request.headers.get('Accept')?.includes('text/event-stream');
  if(streaming){
