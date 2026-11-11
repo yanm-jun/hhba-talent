@@ -121,7 +121,7 @@ test('DeepSeek-first planner receives primary and cross-industry hall metadata f
   review_status:'VERIFIED',industry_tags_json:'["software-internet"]',business_tags_json:'["consumer-products"]'
  });
  const sources=[
-  row('xiaomi-official','小米','https://www.mi.com/','https://hr.xiaomi.com/'),
+  row('xiaomi-official','小米','https://www.xiaomi.com/','https://hr.xiaomi.com/'),
   row('huawei-official','华为','https://www.huawei.com/','https://career.huawei.com/')
  ];
  const membership=[
