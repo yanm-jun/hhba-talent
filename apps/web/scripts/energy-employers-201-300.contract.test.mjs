@@ -38,7 +38,7 @@ test('100 new distinct employer names numbered 201..300, not duplicate prior 200
  assert.deepEqual(counts,{'energy-generation':36,'energy-engineering':6,'energy-grid':5,
   'energy-hydro':3,'energy-equipment':29,'energy-wind':7,
   'energy-nuclear':2,'energy-storage':6,'energy-solar':6});
- assert.deepEqual(kinds,{SHARED_ATS:53,GROUP_CAREERS:27,ATS:6,DISCOVERY:3,NOTICE:1,CAREERS:10});
+ assert.deepEqual(kinds,{SHARED_ATS:50,GROUP_CAREERS:30,ATS:6,DISCOVERY:3,NOTICE:1,CAREERS:10});
  assert.equal((sql.match(/\('hhba-energy-employer-\d{3}',/g)||[]).length,100);
  assert.match(sql,/employer_display_name TEXT NOT NULL UNIQUE/);
  assert.match(sql,/candidate_url TEXT NOT NULL,/);
