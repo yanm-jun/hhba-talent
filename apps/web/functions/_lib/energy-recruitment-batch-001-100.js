@@ -693,17 +693,17 @@ export const ENERGY_BATCH_001_100 = Object.freeze([
   [
     87,
     "鹏辉能源",
-    "http://www.greatpower.net/",
+    "https://www.greatpower.net/about/join.html",
     "energy-storage",
-    "DISCOVERY",
+    "CAREERS",
     "鹏辉能源"
   ],
   [
     88,
     "双登集团",
-    "https://www.shuangdeng.com.cn/",
+    "https://www.shuangdeng.com.cn/list-7.html",
     "energy-storage",
-    "DISCOVERY",
+    "CAREERS",
     "双登集团"
   ],
   [
