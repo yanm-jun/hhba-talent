@@ -137,6 +137,37 @@
   },
   "items": [
     {
+      "id": "360集团",
+      "name": "360集团",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://hr.360.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 2,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "阿里巴巴",
       "name": "阿里巴巴",
       "industry_id": "internet-ai",
@@ -153,7 +184,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 1,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -338,7 +378,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 34,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -773,10 +822,29 @@
           "scope": "employer_portal",
           "status": "legacy_reviewed",
           "reviewed_on": "2026-10-24"
+        },
+        {
+          "url": "https://career.anker.com.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 8,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -896,6 +964,37 @@
       ]
     },
     {
+      "id": "安踏集团",
+      "name": "安踏集团",
+      "industry_id": "retail",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://jobs.anta.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 10,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "奥迪一汽新能源汽车",
       "name": "奥迪一汽新能源汽车",
       "industry_id": "automotive",
@@ -921,6 +1020,37 @@
         {
           "hall_id": "automotive",
           "code": "auto-ev"
+        }
+      ]
+    },
+    {
+      "id": "奥克斯集团",
+      "name": "奥克斯集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.auxgroup.com/careers",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 13,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -1088,17 +1218,36 @@
           "reviewed_on": null,
           "section_code": "semi-equipment",
           "source_pr": 336
+        },
+        {
+          "url": "https://career.naura.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
         }
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "draft_pr_336"
+        "draft_pr_336",
+        "preview_audit_B04"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-equipment"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 29,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -1161,6 +1310,37 @@
       ]
     },
     {
+      "id": "北京建工集团",
+      "name": "北京建工集团",
+      "industry_id": "construction",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://bcegc.zhaopin.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "pending",
+          "source_batch": "B05",
+          "notes": "北京建工专题入口需核实官网关联和当前可用性"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 50,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "北京君正",
       "name": "北京君正",
       "industry_id": "semiconductor",
@@ -1215,6 +1395,37 @@
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ]
+    },
+    {
+      "id": "北京首旅集团",
+      "name": "北京首旅集团",
+      "industry_id": "retail",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.btg.com.cn/newsList/31/1.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 26,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -1392,6 +1603,37 @@
       ]
     },
     {
+      "id": "哔哩哔哩",
+      "name": "哔哩哔哩",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://jobs.bilibili.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 3,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "壁仞科技",
       "name": "壁仞科技",
       "industry_id": "semiconductor",
@@ -1537,6 +1779,37 @@
       ]
     },
     {
+      "id": "渤海银行",
+      "name": "渤海银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.cbhb.com.cn/cbhbank/jrwm/zpxx/index.shtml",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 16,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "采埃孚中国",
       "name": "采埃孚中国",
       "industry_id": "automotive",
@@ -1562,6 +1835,37 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "菜鸟集团",
+      "name": "菜鸟集团",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://jobs.cainiao.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 11,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -1731,6 +2035,37 @@
       ]
     },
     {
+      "id": "重庆渝富控股集团",
+      "name": "重庆渝富控股集团",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.cqyfkgjt.com/join-us/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 30,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "重庆骓驰汽车技术",
       "name": "重庆骓驰汽车技术",
       "industry_id": "automotive",
@@ -1814,6 +2149,37 @@
         {
           "hall_id": "energy",
           "code": "energy-storage"
+        }
+      ]
+    },
+    {
+      "id": "传音控股",
+      "name": "传音控股",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://transsion.zhiye.com/jobs",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "pending",
+          "source_batch": "B06",
+          "notes": "已发现专属北森站，但缺独立官网反链"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 4,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -1950,6 +2316,37 @@
         {
           "hall_id": "automotive",
           "code": "auto-electronics"
+        }
+      ]
+    },
+    {
+      "id": "得物",
+      "name": "得物",
+      "industry_id": "retail",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://careers.dewu.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 10,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -2096,13 +2493,22 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B04"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-electronics"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 22,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -3062,7 +3468,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 6,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -3081,16 +3496,35 @@
           "reviewed_on": null,
           "section_code": "auto-whole",
           "source_pr": 333
+        },
+        {
+          "url": "https://www.dongfeng-nissan.com.cn/about/recruit/social",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
         }
       ],
       "source_datasets": [
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B06"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 8,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -3393,6 +3827,37 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-analog"
+        }
+      ]
+    },
+    {
+      "id": "分众传媒",
+      "name": "分众传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.focusmedia.cn/join/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 16,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -3753,16 +4218,35 @@
           "reviewed_on": null,
           "section_code": "auto-parts",
           "source_pr": 333
+        },
+        {
+          "url": "https://job.fuyaogroup.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
         }
       ],
       "source_datasets": [
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B04"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 21,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -3899,7 +4383,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 23,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -3977,7 +4470,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 20,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -4226,6 +4728,37 @@
       ]
     },
     {
+      "id": "广东粤海控股集团",
+      "name": "广东粤海控股集团",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.gdh.com.cn/joinus/index.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 25,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "广发证券",
       "name": "广发证券",
       "industry_id": "finance",
@@ -4242,7 +4775,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 42,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -4377,16 +4919,35 @@
           "reviewed_on": null,
           "section_code": "auto-whole",
           "source_pr": 333
+        },
+        {
+          "url": "https://gac-toyota.zhiye.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "pending",
+          "source_batch": "B06",
+          "notes": "专属北森站，公司主体归属需进一步证明"
         }
       ],
       "source_datasets": [
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B06"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 9,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -4446,13 +5007,22 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B04"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 15,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -4930,6 +5500,37 @@
         {
           "hall_id": "energy",
           "code": "energy-nuclear"
+        }
+      ]
+    },
+    {
+      "id": "国家电力投资集团",
+      "name": "国家电力投资集团",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.spic.com.cn/spicm/jrwm/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 39,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -5427,6 +6028,37 @@
       ]
     },
     {
+      "id": "国信证券",
+      "name": "国信证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://guosen.zhiye.com/campus/jobs",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "已找到国信证券官方子公司招聘反链"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 27,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "国轩高科",
       "name": "国轩高科",
       "industry_id": "automotive",
@@ -5468,6 +6100,37 @@
         {
           "hall_id": "energy",
           "code": "energy-storage"
+        }
+      ]
+    },
+    {
+      "id": "国药集团",
+      "name": "国药集团",
+      "industry_id": "biomed",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.sinopharm.com/recruitment.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 32,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -5680,7 +6343,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 31,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -5807,7 +6479,47 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 47,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "海信集团",
+      "name": "海信集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://jobs.hisense.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 5,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -5931,10 +6643,29 @@
           "scope": "employer_portal",
           "status": "legacy_reviewed",
           "reviewed_on": "2026-10-24"
+        },
+        {
+          "url": "https://myjob.hzbank.com.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "企业子域来源属官方；招聘网站曾提示维护，需以后复查可用性"
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 20,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -6233,10 +6964,29 @@
           "scope": "employer_portal",
           "status": "legacy_reviewed",
           "reviewed_on": "2026-10-24"
+        },
+        {
+          "url": "https://www.hengrui.com/development/recruit.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 12,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -7538,6 +8288,68 @@
       ]
     },
     {
+      "id": "华润集团",
+      "name": "华润集团",
+      "industry_id": "retail",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://runjob.crc.com.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 40,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "华润三九",
+      "name": "华润三九",
+      "industry_id": "biomed",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.999.com.cn/applicationGuideInfo/index.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 35,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "华润微电子",
       "name": "华润微电子",
       "industry_id": "semiconductor",
@@ -7633,6 +8445,37 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "华夏银行",
+      "name": "华夏银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.hxb.com.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "pending",
+          "source_batch": "B06",
+          "notes": "旧候选仅为银行主页，不是已确认投递入口"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 21,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -7807,6 +8650,37 @@
       ]
     },
     {
+      "id": "华域汽车集团",
+      "name": "华域汽车集团",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.hasco-group.com/join/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 35,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "华域赛科利车身",
       "name": "华域赛科利车身",
       "industry_id": "automotive",
@@ -7958,6 +8832,37 @@
       ]
     },
     {
+      "id": "徽商银行",
+      "name": "徽商银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://rczp.hsbank.com.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 19,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "汇川技术",
       "name": "汇川技术",
       "industry_id": "manufacturing",
@@ -7974,7 +8879,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 30,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -8180,6 +9094,37 @@
       ]
     },
     {
+      "id": "吉利汽车集团",
+      "name": "吉利汽车集团",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.geelyautogroup.com/recruitment",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 18,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "吉利汽车控股有限公司",
       "name": "吉利汽车控股有限公司",
       "industry_id": "automotive",
@@ -8265,7 +9210,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 36,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -8353,13 +9307,22 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B05"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 42,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -8480,6 +9443,37 @@
       ]
     },
     {
+      "id": "江苏交通控股",
+      "name": "江苏交通控股",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://jchctalent.jchc.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 27,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "江苏芯德半导体",
       "name": "江苏芯德半导体",
       "industry_id": "semiconductor",
@@ -8505,6 +9499,37 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-packaging"
+        }
+      ]
+    },
+    {
+      "id": "江苏银行",
+      "name": "江苏银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://hr.jsbchina.cn/zp",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 23,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -8551,10 +9576,29 @@
           "scope": "employer_portal",
           "status": "legacy_reviewed",
           "reviewed_on": "2026-10-24"
+        },
+        {
+          "url": "https://job.bankcomm.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 38,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -8629,10 +9673,29 @@
           "scope": "employer_portal",
           "status": "legacy_reviewed",
           "reviewed_on": "2026-10-24"
+        },
+        {
+          "url": "https://www.kingdee.com/sg/zh-hans/careers/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "链接为官方国际招聘栏目；仅推荐中国大陆实际岗位"
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 29,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -9454,10 +10517,29 @@
           "scope": "employer_portal",
           "status": "legacy_reviewed",
           "reviewed_on": "2026-10-24"
+        },
+        {
+          "url": "https://iflytek.zhiye.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 7,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -9587,6 +10669,37 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-global"
+        }
+      ]
+    },
+    {
+      "id": "快手",
+      "name": "快手",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zhaopin.kuaishou.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 45,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -9756,6 +10869,37 @@
       ]
     },
     {
+      "id": "老板电器",
+      "name": "老板电器",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://igw.robam.com/recruit.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 15,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "乐鑫科技",
       "name": "乐鑫科技",
       "industry_id": "semiconductor",
@@ -9830,7 +10974,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 33,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -9892,6 +11045,37 @@
       ]
     },
     {
+      "id": "李宁集团",
+      "name": "李宁集团",
+      "industry_id": "retail",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://lining.hotjob.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官网“加入我们”明确跳转专属招聘站"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 11,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "理想汽车",
       "name": "理想汽车",
       "industry_id": "automotive",
@@ -9914,17 +11098,36 @@
           "reviewed_on": null,
           "section_code": "auto-ev",
           "source_pr": 333
+        },
+        {
+          "url": "https://www.lixiang.com/employ/campus.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
         }
       ],
       "source_datasets": [
         "domesticRecruitment200Registry",
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B05"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-ev"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 19,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -9974,7 +11177,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 24,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -10073,10 +11285,29 @@
           "scope": "employer_portal",
           "status": "legacy_reviewed",
           "reviewed_on": "2026-10-24"
+        },
+        {
+          "url": "https://talent.lenovo.com.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 2,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -10209,17 +11440,36 @@
           "reviewed_on": null,
           "section_code": "auto-ev",
           "source_pr": 333
+        },
+        {
+          "url": "https://www-app.leapmotor.com/join/societyRecruitment.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
         }
       ],
       "source_datasets": [
         "domesticRecruitment200Registry",
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B05"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-ev"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 44,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -10395,13 +11645,22 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "draft_pr_335"
+        "draft_pr_335",
+        "preview_audit_B04"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 25,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -10493,6 +11752,37 @@
       ]
     },
     {
+      "id": "蚂蚁集团",
+      "name": "蚂蚁集团",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://talent.antgroup.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 5,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "迈瑞医疗",
       "name": "迈瑞医疗",
       "industry_id": "biomed",
@@ -10538,6 +11828,37 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "茅台集团",
+      "name": "茅台集团",
+      "industry_id": "agri-food",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zp.moutai.com.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 45,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -10851,13 +12172,22 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_336"
+        "draft_pr_336",
+        "preview_audit_B06"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 30,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -10907,7 +12237,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 48,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -11406,7 +12745,47 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 24,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "南瑞集团",
+      "name": "南瑞集团",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.sgepri.sgcc.com.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 41,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -11671,6 +13050,37 @@
       ]
     },
     {
+      "id": "宁波银行",
+      "name": "宁波银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zhaopin.nbcb.com.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 22,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "宁德时代",
       "name": "宁德时代",
       "industry_id": "energy",
@@ -11725,6 +13135,37 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "欧派家居",
+      "name": "欧派家居",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://app.mokahr.com/social-recruitment/oppein/78239",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "由官网首页官方招聘链接修正为 Moka 专属租户"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 12,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -11852,13 +13293,22 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "draft_pr_335"
+        "draft_pr_335",
+        "preview_audit_B05"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "energy",
           "code": "energy-equipment"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 36,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -11936,10 +13386,29 @@
           "scope": "employer_portal",
           "status": "legacy_reviewed",
           "reviewed_on": "2026-10-23"
+        },
+        {
+          "url": "https://job.spdb.com.cn/notices",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 41,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -12027,13 +13496,22 @@
       ],
       "source_datasets": [
         "domesticRecruitment200Registry",
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B05"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 47,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -12372,7 +13850,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 1,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -12768,6 +14255,37 @@
       ]
     },
     {
+      "id": "三一集团",
+      "name": "三一集团",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://sany.zhiye.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 18,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "三一重工",
       "name": "三一重工",
       "industry_id": "manufacturing",
@@ -13020,6 +14538,37 @@
       ]
     },
     {
+      "id": "山东高速集团",
+      "name": "山东高速集团",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zhaopin.sdhsg.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 29,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "山东国研自动化有限公司",
       "name": "山东国研自动化有限公司",
       "industry_id": "energy",
@@ -13161,6 +14710,37 @@
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ]
+    },
+    {
+      "id": "商汤科技",
+      "name": "商汤科技",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://hr-jobs.sensetime.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 3,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -13400,6 +14980,37 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "上海机场集团",
+      "name": "上海机场集团",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.shanghaiairport.com/shzp/index.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 23,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -13850,13 +15461,22 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B04"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 14,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -14277,6 +15897,37 @@
       ]
     },
     {
+      "id": "深圳地铁集团",
+      "name": "深圳地铁集团",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.szmc.net/rl",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 24,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "深圳方正微电子",
       "name": "深圳方正微电子",
       "industry_id": "semiconductor",
@@ -14654,6 +16305,37 @@
       ]
     },
     {
+      "id": "深圳市投资控股",
+      "name": "深圳市投资控股",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.sihc.com.cn/sihc/contact/recruitment/index.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 31,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "圣邦微电子",
       "name": "圣邦微电子",
       "industry_id": "semiconductor",
@@ -14964,6 +16646,37 @@
       ]
     },
     {
+      "id": "首都机场集团",
+      "name": "首都机场集团",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.cah.com.cn/Information/Recruit/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 43,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "双登集团",
       "name": "双登集团",
       "industry_id": "energy",
@@ -15146,13 +16859,22 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "draft_pr_335"
+        "draft_pr_335",
+        "preview_audit_B05"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "energy",
           "code": "energy-equipment"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 32,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -15269,6 +16991,37 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "苏泊尔",
+      "name": "苏泊尔",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.supor.com.cn/culture/joinus.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 14,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -15407,7 +17160,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 39,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -15857,6 +17619,37 @@
       ]
     },
     {
+      "id": "通用技术集团",
+      "name": "通用技术集团",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://genertec.zhiye.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "pending",
+          "source_batch": "B06",
+          "notes": "专属北森站待官网反链"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 41,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "图达通(seyond)",
       "name": "图达通（Seyond）",
       "industry_id": "automotive",
@@ -15973,6 +17766,37 @@
       ]
     },
     {
+      "id": "万科集团",
+      "name": "万科集团",
+      "industry_id": "construction",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.vanke.com/join/talent",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 13,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "万向集团",
       "name": "万向集团",
       "industry_id": "automotive",
@@ -15998,6 +17822,37 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "网易",
+      "name": "网易",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://hr.163.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 1,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -16182,16 +18037,35 @@
           "reviewed_on": null,
           "section_code": "auto-parts",
           "source_pr": 333
+        },
+        {
+          "url": "https://weichai.zhiye.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
         }
       ],
       "source_datasets": [
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B04"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 19,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -16305,17 +18179,36 @@
           "reviewed_on": null,
           "section_code": "auto-ev",
           "source_pr": 333
+        },
+        {
+          "url": "https://www.nio.cn/careers",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
         }
       ],
       "source_datasets": [
         "domesticRecruitment200Registry",
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B05"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-ev"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 20,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -16526,6 +18419,37 @@
       ]
     },
     {
+      "id": "五粮液集团",
+      "name": "五粮液集团",
+      "industry_id": "agri-food",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.wuliangye.com.cn/zhaopin/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 17,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "武汉芯源半导体",
       "name": "武汉芯源半导体",
       "industry_id": "semiconductor",
@@ -16700,6 +18624,37 @@
       ]
     },
     {
+      "id": "小红书",
+      "name": "小红书",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.xiaohongshu.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 6,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "小马智行",
       "name": "小马智行",
       "industry_id": "automotive",
@@ -16762,17 +18717,36 @@
           "scope": "employer_portal",
           "status": "legacy_reviewed",
           "reviewed_on": "2026-10-24"
+        },
+        {
+          "url": "https://www.xiaopeng.com/join.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
         }
       ],
       "source_datasets": [
         "domesticRecruitment200Registry",
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B05"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-ev"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 21,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -16819,10 +18793,29 @@
           "scope": "employer_portal",
           "status": "legacy_reviewed",
           "reviewed_on": "2026-10-24"
+        },
+        {
+          "url": "https://careers.ctrip.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 4,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -17196,12 +19189,23 @@
           "reviewed_on": null,
           "section_code": "auto-battery",
           "source_pr": 333
+        },
+        {
+          "url": "https://sunwoda.zhiye.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
         }
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
         "draft_pr_333",
-        "draft_pr_335"
+        "draft_pr_335",
+        "preview_audit_B04"
       ],
       "related_hall_ids": [
         "automotive"
@@ -17214,6 +19218,14 @@
         {
           "hall_id": "energy",
           "code": "energy-storage"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 28,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -17466,7 +19478,47 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 39,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "徐工集团",
+      "name": "徐工集团",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://app.mokahr.com/social-recruitment/xcmg/148090/",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "pending",
+          "source_batch": "B05",
+          "notes": "徐工 Moka 专属租户待取得官方招聘反链或确认授权关系"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 46,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -17483,10 +19535,29 @@
           "scope": "official_announcement",
           "status": "legacy_reviewed",
           "reviewed_on": "2026-10-23"
+        },
+        {
+          "url": "https://www.xjec.com/contact/campus/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 37,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -17966,6 +20037,37 @@
       ]
     },
     {
+      "id": "扬子江药业集团",
+      "name": "扬子江药业集团",
+      "industry_id": "biomed",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.yangzijiang.com/Career",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 33,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "阳光电动力",
       "name": "阳光电动力",
       "industry_id": "energy",
@@ -18003,13 +20105,22 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "draft_pr_335"
+        "draft_pr_335",
+        "preview_audit_B04"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 26,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -18030,7 +20141,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 33,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -18141,6 +20261,37 @@
       ]
     },
     {
+      "id": "伊利集团",
+      "name": "伊利集团",
+      "industry_id": "agri-food",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.yili.com/joinus",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 46,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "亿华通",
       "name": "亿华通",
       "industry_id": "automotive",
@@ -18235,7 +20386,8 @@
       "source_datasets": [
         "domesticRecruitmentRegistry",
         "draft_pr_333",
-        "draft_pr_335"
+        "draft_pr_335",
+        "preview_audit_B04"
       ],
       "related_hall_ids": [
         "automotive"
@@ -18248,6 +20400,14 @@
         {
           "hall_id": "energy",
           "code": "energy-storage"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 27,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -18704,7 +20864,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 34,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -18779,10 +20948,29 @@
           "scope": "employer_portal",
           "status": "legacy_reviewed",
           "reviewed_on": "2026-10-24"
+        },
+        {
+          "url": "https://career.yonyou.com/SU67ac41886202cc7916ae3029/pb/index.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 5,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -19086,6 +21274,37 @@
       ]
     },
     {
+      "id": "月之暗面",
+      "name": "月之暗面",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://careers.kimi.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 8,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "粤芯半导体",
       "name": "粤芯半导体",
       "industry_id": "semiconductor",
@@ -19173,6 +21392,37 @@
       ]
     },
     {
+      "id": "韵达股份",
+      "name": "韵达股份",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.yundaex.com/cn/hr_online.php",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 14,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "长安汽车",
       "name": "长安汽车",
       "industry_id": "automotive",
@@ -19199,13 +21449,22 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "draft_pr_333"
+        "draft_pr_333",
+        "preview_audit_B04"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 16,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -19223,10 +21482,29 @@
           "scope": "employer_portal",
           "status": "legacy_reviewed",
           "reviewed_on": "2026-10-24"
+        },
+        {
+          "url": "https://zhaopin.gwm.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 17,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -19433,6 +21711,37 @@
       ]
     },
     {
+      "id": "招商局集团",
+      "name": "招商局集团",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://cmhk.zhiye.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "pending",
+          "source_batch": "B05",
+          "notes": "招商局北森租户可见企业标识，但缺少集团官网直链作为独立证据"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 48,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "招商银行",
       "name": "招商银行",
       "industry_id": "finance",
@@ -19450,6 +21759,37 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "招商证券",
+      "name": "招商证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://cms.hotjob.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "pending",
+          "source_batch": "B06",
+          "notes": "有高校引用官方系统，尚待公司官网反链"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 28,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -19499,13 +21839,22 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "draft_pr_336"
+        "draft_pr_336",
+        "preview_audit_B04"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 32,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -19626,6 +21975,37 @@
       ]
     },
     {
+      "id": "浙江省交通投资集团",
+      "name": "浙江省交通投资集团",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://dhr.cncico.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 28,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "浙江天成自控",
       "name": "浙江天成自控",
       "industry_id": "automotive",
@@ -19738,6 +22118,68 @@
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ]
+    },
+    {
+      "id": "浙商银行",
+      "name": "浙商银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zp.czbank.com.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "已找到本行官网跨域招聘反链（czbank.com → zp.czbank.com.cn）"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 18,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "正大天晴",
+      "name": "正大天晴",
+      "industry_id": "biomed",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://cttq.zhiye.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "pending",
+          "source_batch": "B06",
+          "notes": "专属北森站待官网反链"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 34,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -19894,7 +22336,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 38,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -20948,6 +23399,37 @@
       ]
     },
     {
+      "id": "中国宝武集团(宝钢股份专场)",
+      "name": "中国宝武集团（宝钢股份专场）",
+      "industry_id": "chem-materials",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://baosteel.zhaopin.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 50,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "中国大唐集团",
       "name": "中国大唐集团",
       "industry_id": "energy",
@@ -20966,13 +23448,22 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_335"
+        "draft_pr_335",
+        "preview_audit_B06"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 37,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -21316,6 +23807,68 @@
       ]
     },
     {
+      "id": "中国电子科技集团",
+      "name": "中国电子科技集团",
+      "industry_id": "semiconductor",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://cetccq.cetc.com.cn/zgdk/1593037/zpjgg/index.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 49,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国电子信息产业集团",
+      "name": "中国电子信息产业集团",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://career.cec.com.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 47,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "中国广核集团",
       "name": "中国广核集团",
       "industry_id": "energy",
@@ -21365,6 +23918,37 @@
       ]
     },
     {
+      "id": "中国国家铁路集团",
+      "name": "中国国家铁路集团",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://rczp.china-railway.com.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 46,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "中国海油",
       "name": "中国海油",
       "industry_id": "energy",
@@ -21381,7 +23965,47 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 11,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国航空发动机集团",
+      "name": "中国航空发动机集团",
+      "industry_id": "aerospace",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.aecc.cn/aecc/gggs/index.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方信息公开栏目含招聘公告，尚非独立职位系统"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 44,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -21400,16 +24024,35 @@
           "reviewed_on": null,
           "section_code": "energy-nuclear",
           "source_pr": 335
+        },
+        {
+          "url": "https://cnnc.zhiye.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "pending",
+          "source_batch": "B05",
+          "notes": "中核集团北森招聘租户，官网反链尚未充分确认"
         }
       ],
       "source_datasets": [
-        "draft_pr_335"
+        "draft_pr_335",
+        "preview_audit_B05"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "energy",
           "code": "energy-nuclear"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 49,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -21432,13 +24075,22 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_335"
+        "draft_pr_335",
+        "preview_audit_B06"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 38,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -21461,13 +24113,22 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_335"
+        "draft_pr_335",
+        "preview_audit_B06"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 36,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -21492,6 +24153,68 @@
       ]
     },
     {
+      "id": "中国建筑集团",
+      "name": "中国建筑集团",
+      "industry_id": "construction",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.cscec.com/rlzy_new/rczp/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 12,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国交通建设集团",
+      "name": "中国交通建设集团",
+      "industry_id": "construction",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://recruit.ccccltd.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "由企业信息页修正为招聘域名"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 45,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "中国联通",
       "name": "中国联通",
       "industry_id": "telecom",
@@ -21508,7 +24231,47 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 4,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国南方电网",
+      "name": "中国南方电网",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zhaopin.csg.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 40,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -21976,6 +24739,37 @@
       ]
     },
     {
+      "id": "中国农业银行",
+      "name": "中国农业银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://career.abchina.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 35,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "中国平安",
       "name": "中国平安",
       "industry_id": "finance",
@@ -22016,6 +24810,37 @@
       ]
     },
     {
+      "id": "中国人寿集团",
+      "name": "中国人寿集团",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.chinalife.com.cn/chinalife/zhaopin",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 44,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "中国三峡新能源(集团)股份有限公司",
       "name": "中国三峡新能源（集团）股份有限公司",
       "industry_id": "energy",
@@ -22041,6 +24866,37 @@
         {
           "hall_id": "energy",
           "code": "energy-wind"
+        }
+      ]
+    },
+    {
+      "id": "中国商飞",
+      "name": "中国商飞",
+      "industry_id": "aerospace",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zhaopin.comac.cc/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 22,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -22081,7 +24937,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 10,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -22101,7 +24966,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 9,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -22279,6 +25153,37 @@
       ]
     },
     {
+      "id": "中国铁建重工",
+      "name": "中国铁建重工",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://crchi.zhiye.com/home",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "pending",
+          "source_batch": "B06",
+          "notes": "专属北森站待官网反链"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 50,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "中国西电集团",
       "name": "中国西电集团",
       "industry_id": "energy",
@@ -22382,7 +25287,47 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 3,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国银河证券",
+      "name": "中国银河证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.chinastock.com.cn/newsite/join-us.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 26,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -22402,7 +25347,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 37,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -22423,6 +25377,68 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国邮政储蓄银行",
+      "name": "中国邮政储蓄银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.psbc.com/cn/gyyc/rczp/shzp/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 17,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国邮政集团",
+      "name": "中国邮政集团",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://chinapost2027.zhaopin.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 49,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -22501,6 +25517,130 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国中车集团",
+      "name": "中国中车集团",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://crrc.hotjob.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 13,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国中化集团",
+      "name": "中国中化集团",
+      "industry_id": "chem-materials",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://sinochem.hotjob.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "pending",
+          "source_batch": "B06",
+          "notes": "专属Hotjob站待官网反链"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 42,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国中免",
+      "name": "中国中免",
+      "industry_id": "retail",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.cdfg.com.cn/shehuizhaopin.html",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 15,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国中铁集团",
+      "name": "中国中铁集团",
+      "industry_id": "construction",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.crecg.com/web/rlzy65/rczp11/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 48,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -22649,6 +25789,37 @@
       ]
     },
     {
+      "id": "中集集团",
+      "name": "中集集团",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.cimc.com/hr/recruit-search2.php",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B06",
+          "notes": "官方招聘入口／公开企业信息核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 7,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "中交海峰风电",
       "name": "中交海峰风电",
       "industry_id": "energy",
@@ -22703,6 +25874,37 @@
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ]
+    },
+    {
+      "id": "中金公司",
+      "name": "中金公司",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://cicc.zhiye.com/szzw",
+          "label": "历史Preview企业来源记录",
+          "scope": "discovery_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "pending",
+          "source_batch": "B06",
+          "notes": "专属北森站可读，但尚无独立官网授权反链"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B06"
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 25,
+          "preview_status": "pending",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -22930,6 +26132,37 @@
       ]
     },
     {
+      "id": "中通快递",
+      "name": "中通快递",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://hr.zto.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 2,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "中微半导(mcu)",
       "name": "中微半导（MCU）",
       "industry_id": "semiconductor",
@@ -23003,16 +26236,35 @@
           "reviewed_on": null,
           "section_code": "semi-fab",
           "source_pr": 336
+        },
+        {
+          "url": "https://careers.smics.com/Recruitment/job/searchJob.action",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
         }
       ],
       "source_datasets": [
-        "draft_pr_336"
+        "draft_pr_336",
+        "preview_audit_B05"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-fab"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 43,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -23033,7 +26285,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 40,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -23053,7 +26314,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 43,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -23288,13 +26558,22 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_336"
+        "draft_pr_336",
+        "preview_audit_B06"
       ],
       "related_hall_ids": [],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ],
+      "audit_references": [
+        {
+          "batch": "B06",
+          "sequence": 31,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
         }
       ]
     },
@@ -23406,6 +26685,37 @@
       ]
     },
     {
+      "id": "minimax",
+      "name": "MiniMax",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.minimax.io/careers",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 9,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "momenta",
       "name": "Momenta",
       "industry_id": "automotive",
@@ -23481,6 +26791,37 @@
       ],
       "source_datasets": [
         "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "shein",
+      "name": "SHEIN",
+      "industry_id": "retail",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://careers.shein.cn/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B05",
+          "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B05"
+      ],
+      "audit_references": [
+        {
+          "batch": "B05",
+          "sequence": 7,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
       ]
     },
     {
@@ -23571,6 +26912,37 @@
       ]
     },
     {
+      "id": "tcl集团招聘体系",
+      "name": "TCL集团招聘体系",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://campus.tcl.com/",
+          "label": "历史Preview企业来源记录",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "historical_preview_status": "preview_verified",
+          "source_batch": "B04",
+          "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+        }
+      ],
+      "source_datasets": [
+        "preview_audit_B04"
+      ],
+      "audit_references": [
+        {
+          "batch": "B04",
+          "sequence": 6,
+          "preview_status": "preview_verified",
+          "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
       "id": "tcl科技",
       "name": "TCL科技",
       "industry_id": "consumer-hardware",
@@ -23641,28 +27013,29 @@
     }
   ],
   "statistics": {
-    "entities": 882,
+    "prior_audit_source_rows": 150,
+    "entities": 963,
     "legacy_portals": 130,
-    "candidate_portals": 685,
+    "candidate_portals": 790,
     "group_relations": 354,
     "unclassified": 0,
     "by_hall": {
-      "automotive": 236,
-      "semiconductor": 203,
-      "internet-ai": 11,
-      "energy": 308,
-      "manufacturing": 12,
-      "finance": 23,
+      "automotive": 238,
+      "semiconductor": 204,
+      "internet-ai": 20,
+      "energy": 312,
+      "manufacturing": 16,
+      "finance": 38,
       "telecom": 5,
-      "biomed": 8,
-      "aerospace": 1,
-      "logistics": 52,
-      "construction": 1,
-      "consumer-hardware": 13,
-      "chem-materials": 1,
-      "retail": 2,
-      "agri-food": 6,
-      "culture-media": 0,
+      "biomed": 12,
+      "aerospace": 3,
+      "logistics": 66,
+      "construction": 6,
+      "consumer-hardware": 20,
+      "chem-materials": 3,
+      "retail": 9,
+      "agri-food": 9,
+      "culture-media": 2,
       "education-research": 0
     }
   }
