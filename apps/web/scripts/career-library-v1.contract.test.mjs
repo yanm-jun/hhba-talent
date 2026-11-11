@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import {proposeEmployerHallClassification,HALL_IDS} from '../functions/_lib/hhba-library-classification-v1.js';
 import {automotiveLibrary,careerLibraryIndex,libraryReadable} from '../functions/_lib/hhba-career-library-v1.js';
 import {onRequest} from '../functions/api/career-library/[[path]].js';
+import {getReviewedDeepSeekSearchScope,deepseekWhitelistTargets} from '../functions/_lib/deepseek-reviewed-scope-v1.js';
 
 const snapshot=JSON.parse(readFileSync(new URL('../src/data/hhbaLibraryCompanyMapV1.json',import.meta.url),'utf8'));
 const sql24=readFileSync(new URL('../d1/0024_major_industry_library_v1.sql',import.meta.url),'utf8');
@@ -109,4 +110,57 @@ test('career-library route is preview-only, read-only and 404 outside preview',a
  assert.equal(data.selected_role,'accounting');
  const denied=await onRequest({request:new Request('https://preview.example.com/api/career-library/automotive',{method:'POST'}),env:{HHBA_AUTH_ROLLOUT:'preview',HHBA_PNVS_AUTH_DB:db}});
  assert.equal(denied.status,405);
+});
+
+test('DeepSeek-first planner receives primary and cross-industry hall metadata for a verified employer',async()=>{
+ const now=new Date('2026-11-11T11:00:00Z');
+ const row=(id,name,company,career)=>({
+  id,display_name:name,official_company_url:company,recruitment_base_url:career,
+  ownership_evidence_url:company,reviewer:'hhba-editorial-reviewed',
+  reviewed_at:'2026-11-11T10:00:00Z',expires_at:'2027-02-06T10:00:00Z',
+  review_status:'VERIFIED',industry_tags_json:'["software-internet"]',business_tags_json:'["consumer-products"]'
+ });
+ const sources=[
+  row('xiaomi-official','小米','https://www.mi.com/','https://hr.xiaomi.com/'),
+  row('huawei-official','华为','https://www.huawei.com/','https://career.huawei.com/')
+ ];
+ const membership=[
+  {employer_source_id:'xiaomi-official',hall_id:'electronics',membership_type:'PRIMARY'},
+  {employer_source_id:'xiaomi-official',hall_id:'automotive',membership_type:'SECONDARY'},
+  {employer_source_id:'xiaomi-official',hall_id:'internet',membership_type:'SECONDARY'},
+  {employer_source_id:'huawei-official',hall_id:'electronics',membership_type:'PRIMARY'}
+ ];
+ const env={HHBA_DEEPSEEK_WHITELIST_SEARCH_ENABLED:'1',HHBA_AUTH_ROLLOUT:'preview',
+  HHBA_PNVS_AUTH_DB:{prepare(sql){return {bind(...args){return {all:async()=>({
+   results:sql.includes('FROM hhba_library_employer_halls')?membership:sources
+  })};}};}}};
+ const reviewed=await getReviewedDeepSeekSearchScope(env,{now,limit:16});
+ assert.equal(reviewed.length,2);
+ const x=reviewed.find(s=>s.display_name==='小米');
+ assert.equal(x.primary_hall,'electronics');
+ assert.deepEqual(x.additional_halls,['automotive','internet']);
+ let modelInput=null;
+ const fetcher=async(_url,opts)=>{modelInput=JSON.parse(opts.body);return {ok:false};};
+ const fallback=await deepseekWhitelistTargets('test-key','会计专业，做过汽车财务分析项目','财务分析师',reviewed,{fetcher,maxTargets:1});
+ assert.equal(fallback.length,1);
+ assert.ok(modelInput?.input.includes('"primary_hall":"electronics"'));
+ assert.ok(modelInput?.input.includes('"additional_halls":["automotive","internet"]'));
+ assert.match(modelInput?.instructions,/不能将专业导航当作任职门槛/);
+});
+test('if library taxonomy migration is missing, DeepSeek keeps verified sources',async()=>{
+ const now=new Date('2026-11-11T11:00:00Z');
+ const row={id:'huawei-2026',display_name:'华为',official_company_url:'https://www.huawei.com/',
+  recruitment_base_url:'https://career.huawei.com/',ownership_evidence_url:'https://www.huawei.com/cn/contact-us',
+  reviewer:'hhba-editorial-reviewed',reviewed_at:'2026-11-11T10:00:00Z',
+  expires_at:'2027-02-05T10:00:00Z',review_status:'VERIFIED',
+  industry_tags_json:'["software-internet"]',business_tags_json:'["hardware-rd"]'};
+ const env={HHBA_DEEPSEEK_WHITELIST_SEARCH_ENABLED:'1',HHBA_AUTH_ROLLOUT:'preview',
+  HHBA_PNVS_AUTH_DB:{prepare(sql){
+   if(sql.includes('hhba_library_employer_halls'))throw new Error('no table');
+   return {bind(){return {all:async()=>({results:[row]})};}};
+  }}};
+ const result=await getReviewedDeepSeekSearchScope(env,{now});
+ assert.equal(result.length,1);
+ assert.equal(result[0].display_name,'华为');
+ assert.equal(result[0].primary_hall,undefined);
 });
