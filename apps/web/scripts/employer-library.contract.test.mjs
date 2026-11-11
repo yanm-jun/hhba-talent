@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {resolve,dirname,join} from 'node:path';
-import {employerSearchHints,normalizeEmployerInput} from '../functions/_lib/employer-library.js';
+import {employerSearchHints,normalizeEmployerInput,mergeEmployerRecord} from '../functions/_lib/employer-library.js';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const indexPath=join(root,'public/data/employer-library.json');
 const read=name=>JSON.parse(readFileSync(join(root,'src/data',name),'utf8'));
@@ -59,6 +59,36 @@ test('admin input enforces sector and https with no invented verification',()=>{
   parent_name:'上汽集团',portals:[{url:'https://careers.example.com/'}]});
  assert.equal(row.portals[0].status,'collected_unverified');
  assert.equal(row.parent_name,'上汽集团');
+});
+test('same company imported into another hall keeps its original hall and audited portals',()=>{
+ const first=normalizeEmployerInput({name:'汇方测试科技',industry_id:'automotive',
+  portals:[{url:'https://careers.example.cn/openings'}]});
+ first.portals[0].status='legacy_reviewed';first.portals[0].reviewed_on='2026-10-21';
+ const other=normalizeEmployerInput({name:'汇方测试科技',industry_id:'semiconductor',
+  portals:[{url:'https://jobs.example.cn/'}]});
+ const merged=mergeEmployerRecord(first,other);
+ assert.equal(merged.industry_id,'automotive');
+ assert.deepEqual(merged.related_hall_ids,['semiconductor']);
+ assert.equal(merged.portals.length,2);
+ assert.equal(merged.portals[0].status,'legacy_reviewed');
+ const again=mergeEmployerRecord(merged,other);
+ assert.deepEqual(again.related_hall_ids,['semiconductor']);
+ assert.equal(again.portals.length,2);
+ assert.deepEqual(again.source_datasets,['admin_import']);
+});
+test('source hints prefer matching employers and reject normal third-party job boards',()=>{
+ const base=name=>({name,industry_id:'automotive',aliases:[],portals:[{
+  url:'https://careers.example.com/jobs',scope:'search_candidate',status:'collected_unverified'}]});
+ const rows=[base('其他车企'),{...base('比亚迪'),portals:[{
+  url:'https://job.byd.com/',scope:'employer_portal',status:'legacy_reviewed'}]},
+  {...base('无效来源'),portals:[{
+  url:'https://www.zhipin.com/abc',scope:'employer_portal',status:'legacy_reviewed'}]}];
+ const hints=employerSearchHints(rows,'曾在比亚迪任职','汽车运营',2);
+ assert.ok(hints.length>=1);
+ assert.match(hints[0],/比亚迪/);
+ assert.ok(hints.every(x=>!x.includes('zhipin.com')));
+ assert.throws(()=>normalizeEmployerInput({name:'招聘站公司',industry_id:'automotive',
+  portals:['https://www.zhipin.com/jobs/']}),/INVALID_EMPLOYER_PORTAL_URL/);
 });
 test('build script regenerates checked-in 882 company catalog exactly',()=>{
  const before=readFileSync(indexPath,'utf8');
