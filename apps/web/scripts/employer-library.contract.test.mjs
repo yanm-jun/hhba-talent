@@ -125,6 +125,38 @@ test('source hints prefer matching employers and reject normal third-party job b
  assert.throws(()=>normalizeEmployerInput({name:'招聘站公司',industry_id:'automotive',
   portals:['https://www.zhipin.com/jobs/']}),/INVALID_EMPLOYER_PORTAL_URL/);
 });
+test('266 automotive research nodes preserve brand-vs-employer identities',()=>{
+ const research=read('employerLibraryAutomotiveResearch266.json');
+ assert.equal(research.nodes.length,266);
+ assert.equal(seed.statistics.automotive_research_nodes,266);
+ assert.equal(seed.statistics.automotive_research_brands,36);
+ assert.equal(seed.research_brand_index.length,36);
+ assert.ok(seed.research_brand_index.every(x=>x.is_employer===false));
+ for(const node of research.nodes.filter(x=>x.entity_type!=='品牌/产品线')){
+  const company=seed.items.find(e=>e.id===norm(node.name));
+  assert.ok(company,node.name);
+  assert.ok(company.research_relationships?.some(x=>x.sequence===node.sequence),node.name);
+ }
+ assert.equal(seed.collection_coverage.imported_batch_records,700);
+});
+test('named subsidiary falls back to parent careers as a search hint only',()=>{
+ const parent={id:'集团',name:'集团',industry_id:'automotive',aliases:[],portals:[{
+  url:'https://careers.example.com/jobs',scope:'employer_portal',status:'legacy_reviewed'}]};
+ const child={id:'集团子公司',name:'集团子公司',parent_name:'集团',industry_id:'automotive',
+  aliases:[],portals:[],research_relationships:[{parent_name:'集团',group_name:'集团'}]};
+ const hints=employerSearchHints([parent,child],'在集团子公司任职','汽车项目运营',2);
+ assert.ok(hints.some(x=>x.includes('集团子公司')&&x.includes('site:careers.example.com')));
+ assert.ok(hints.every(x=>!x.includes('http://')));
+});
+test('automotive brand is only an evidence-backed search alias, never its own employer',()=>{
+ const parent={id:'汽车集团',name:'汽车集团',industry_id:'automotive',aliases:[],portals:[{
+  url:'https://careers.example.com/',scope:'employer_portal',status:'legacy_reviewed'}]};
+ const hints=employerSearchHints([parent],'从事坦克品牌营销','市场运营',2,[{
+  name:'坦克',parent_name:'汽车集团',group_name:'汽车集团',is_employer:false}]);
+ assert.equal(hints.length,1);
+ assert.match(hints[0],/品牌坦克/);
+ assert.match(hints[0],/用人主体待核/);
+});
 test('build script regenerates checked-in company catalog exactly',()=>{
  const before=readFileSync(indexPath,'utf8');
  execFileSync(process.execPath,[join(root,'scripts/build-employer-library.mjs')],{cwd:root,stdio:'pipe'});
