@@ -121,6 +121,7 @@ export function employerSearchHints(library,resume,roleHint='',max=2){
  const hall=roleHalls.find(([,re])=>re.test(wanted))?.[0]||
   roleHalls.find(([,re])=>re.test(experience))?.[0];
  const usable=p=>(p.scope==='employer_portal'||p.scope==='search_candidate')&&portalUrl(p.url);
+ const lookup=new Map(library.filter(x=>x?.name).map(x=>[employerKey(x.name),x]));
  const ranked=[];
  for(const item of library){
   if(!item?.name||!Array.isArray(item.portals))continue;
@@ -133,24 +134,39 @@ export function employerSearchHints(library,resume,roleHint='',max=2){
    Number(b.status==='legacy_reviewed')-Number(a.status==='legacy_reviewed'));
   // A shared group portal helps find a named subsidiary only when the user's
   // resume or request actually names that company. It is NOT the child's own ATS.
-  const shared=(!options.length&&(inHint||inResume))?
+  const explicitlyNamed=inHint||inResume;
+  const shared=(!options.length&&explicitlyNamed)?
    item.portals.find(p=>p.scope==='group_shared_candidate'&&portalUrl(p.url)):null;
-  const portal=options[0]||shared;
+  // Source-backed subsidiary research can point DeepSeek at the group's known
+  // recruitment portal, even when the child has no individual recruitment URL.
+  // This is a SEARCH HINT only; the job's actual employer must be checked later.
+  let inherited=null,groupName='';
+  if(!options.length&&!shared&&explicitlyNamed&&item.parent_name){
+   const groups=[item.parent_name,
+    ...(item.research_relationships||[]).flatMap(x=>[x.parent_name,x.group_name])];
+   for(const name of [...new Set(groups.filter(Boolean))]){
+    const group=lookup.get(employerKey(name));
+    if(!group||group.id===item.id)continue;
+    const portal=group.portals?.find(usable);
+    if(!portal)continue;
+    inherited=portal;groupName=group.name;break;
+   }
+  }
+  const portal=options[0]||shared||inherited;
   if(!portal)continue;
-  ranked.push({item,portal,
+  ranked.push({item,portal,groupName:inherited?groupName:shared?(item.parent_name||'集团'):'',
    score:(inHint?200:0)+(inResume?80:0)+(inHall?40:0)+
-    (portal.status==='legacy_reviewed'?20:0)-(shared?15:0)});
+    (portal.status==='legacy_reviewed'?20:0)-(shared||inherited?15:0)});
  }
  ranked.sort((a,b)=>b.score-a.score||a.item.name.localeCompare(b.item.name,'zh-CN'));
  const hints=[],domains=new Set();
- for(const {item,portal} of ranked){
+ for(const {item,portal,groupName} of ranked){
   const hostname=new URL(portal.url).hostname;
   if(domains.has(hostname))continue;
   domains.add(hostname);
   // Search hint only: Search and subsequent JD checking establish the vacancy.
   // Never output this portal as a job link or a verified job opening.
-  const groupNote=portal.scope==='group_shared_candidate'?
-   ' '+(item.parent_name||'集团')+' 集团招聘平台 子公司岗位':''; 
+  const groupNote=groupName?' '+groupName+' 集团招聘范围（需核实子公司主体）':'';
   hints.push(((clean(roleHint,50)||'招聘岗位')+' '+item.name+groupNote+
    ' site:'+hostname+' 岗位 职位 中国大陆').slice(0,180));
   if(hints.length>=max)break;
