@@ -135,6 +135,296 @@
       "education-research": 200
     }
   },
+  "research_brand_index": [
+    {
+      "name": "东风奕派",
+      "parent_name": "东风集团",
+      "group_name": "东风汽车集团",
+      "evidence_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "东风风神",
+      "parent_name": "东风集团",
+      "group_name": "东风汽车集团",
+      "evidence_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "东风纳米",
+      "parent_name": "东风集团",
+      "group_name": "东风汽车集团",
+      "evidence_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "北京汽车",
+      "parent_name": "北京汽车集团有限公司",
+      "group_name": "北汽集团",
+      "evidence_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "北汽极狐",
+      "parent_name": "北京汽车集团有限公司",
+      "group_name": "北汽集团",
+      "evidence_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "北京越野",
+      "parent_name": "北京汽车集团有限公司",
+      "group_name": "北汽集团",
+      "evidence_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "享界汽车",
+      "parent_name": "北京汽车集团有限公司",
+      "group_name": "北汽集团",
+      "evidence_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "北汽福田",
+      "parent_name": "北京汽车集团有限公司",
+      "group_name": "北汽集团",
+      "evidence_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "北京重卡",
+      "parent_name": "北京汽车集团有限公司",
+      "group_name": "北汽集团",
+      "evidence_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "长安汽车",
+      "parent_name": "中国长安汽车集团有限公司",
+      "group_name": "中国长安汽车集团",
+      "evidence_url": "https://www.ccag.cn/about/introduce",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "长安启源",
+      "parent_name": "中国长安汽车集团有限公司",
+      "group_name": "中国长安汽车集团",
+      "evidence_url": "https://www.ccag.cn/about/introduce",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "深蓝汽车",
+      "parent_name": "中国长安汽车集团有限公司",
+      "group_name": "中国长安汽车集团",
+      "evidence_url": "https://www.ccag.cn/about/introduce",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "阿维塔",
+      "parent_name": "中国长安汽车集团有限公司",
+      "group_name": "中国长安汽车集团",
+      "evidence_url": "https://www.ccag.cn/about/introduce",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "长安凯程",
+      "parent_name": "中国长安汽车集团有限公司",
+      "group_name": "中国长安汽车集团",
+      "evidence_url": "https://www.ccag.cn/about/introduce",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "吉利汽车",
+      "parent_name": "浙江吉利控股集团",
+      "group_name": "吉利控股集团",
+      "evidence_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "吉利银河",
+      "parent_name": "浙江吉利控股集团",
+      "group_name": "吉利控股集团",
+      "evidence_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "领克汽车",
+      "parent_name": "浙江吉利控股集团",
+      "group_name": "吉利控股集团",
+      "evidence_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "极氪汽车",
+      "parent_name": "浙江吉利控股集团",
+      "group_name": "吉利控股集团",
+      "evidence_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "沃尔沃汽车",
+      "parent_name": "浙江吉利控股集团",
+      "group_name": "吉利控股集团",
+      "evidence_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "极星汽车",
+      "parent_name": "浙江吉利控股集团",
+      "group_name": "吉利控股集团",
+      "evidence_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "路特斯汽车",
+      "parent_name": "浙江吉利控股集团",
+      "group_name": "吉利控股集团",
+      "evidence_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "远程新能源商用车",
+      "parent_name": "浙江吉利控股集团",
+      "group_name": "吉利控股集团",
+      "evidence_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "奇瑞",
+      "parent_name": "奇瑞汽车/奇瑞商用车体系",
+      "group_name": "奇瑞控股集团",
+      "evidence_url": "https://www.cheryholding.com/article/category/plate.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "星途",
+      "parent_name": "奇瑞汽车/奇瑞商用车体系",
+      "group_name": "奇瑞控股集团",
+      "evidence_url": "https://www.cheryholding.com/article/category/plate.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "捷途",
+      "parent_name": "奇瑞汽车/奇瑞商用车体系",
+      "group_name": "奇瑞控股集团",
+      "evidence_url": "https://www.cheryholding.com/article/category/plate.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "iCAR",
+      "parent_name": "奇瑞汽车/奇瑞商用车体系",
+      "group_name": "奇瑞控股集团",
+      "evidence_url": "https://www.cheryholding.com/article/category/plate.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "凯翼",
+      "parent_name": "奇瑞汽车/奇瑞商用车体系",
+      "group_name": "奇瑞控股集团",
+      "evidence_url": "https://www.cheryholding.com/article/category/plate.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "奇瑞捷豹",
+      "parent_name": "奇瑞汽车/奇瑞商用车体系",
+      "group_name": "奇瑞控股集团",
+      "evidence_url": "https://www.cheryholding.com/article/category/plate.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "奇瑞路虎",
+      "parent_name": "奇瑞汽车/奇瑞商用车体系",
+      "group_name": "奇瑞控股集团",
+      "evidence_url": "https://www.cheryholding.com/article/category/plate.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "瑞虎",
+      "parent_name": "奇瑞汽车/奇瑞商用车体系",
+      "group_name": "奇瑞控股集团",
+      "evidence_url": "https://www.cheryholding.com/article/category/plate.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "艾瑞泽",
+      "parent_name": "奇瑞汽车/奇瑞商用车体系",
+      "group_name": "奇瑞控股集团",
+      "evidence_url": "https://www.cheryholding.com/article/category/plate.html",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "哈弗",
+      "parent_name": "长城汽车股份有限公司",
+      "group_name": "长城汽车体系",
+      "evidence_url": "https://www.gwm-global.com/",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "魏牌",
+      "parent_name": "长城汽车股份有限公司",
+      "group_name": "长城汽车体系",
+      "evidence_url": "https://www.gwm-global.com/",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "欧拉",
+      "parent_name": "长城汽车股份有限公司",
+      "group_name": "长城汽车体系",
+      "evidence_url": "https://www.gwm-global.com/",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "坦克",
+      "parent_name": "长城汽车股份有限公司",
+      "group_name": "长城汽车体系",
+      "evidence_url": "https://www.gwm-global.com/",
+      "status": "research_unverified",
+      "is_employer": false
+    },
+    {
+      "name": "长城炮",
+      "parent_name": "长城汽车股份有限公司",
+      "group_name": "长城汽车体系",
+      "evidence_url": "https://www.gwm-global.com/",
+      "status": "research_unverified",
+      "is_employer": false
+    }
+  ],
   "items": [
     {
       "id": "360集团",
@@ -1281,6 +1571,144 @@
       ]
     },
     {
+      "id": "北京安道拓汽车有限公司",
+      "name": "北京安道拓汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 206,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京北汽李尔汽车系统有限公司",
+      "name": "北京北汽李尔汽车系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 205,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京北汽模塑科技有限公司",
+      "name": "北京北汽模塑科技有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 211,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京北汽延锋汽车部件有限公司",
+      "name": "北京北汽延锋汽车部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 204,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京奔驰汽车有限公司",
+      "name": "北京奔驰汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "北京汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 193,
+          "parent_name": "北京汽车集团有限公司",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽集团主要汽车及零部件企业",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京彼欧英瑞杰汽车系统有限公司",
+      "name": "北京彼欧英瑞杰汽车系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 202,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "北京东方京海电子科技有限公司",
       "name": "北京东方京海电子科技有限公司",
       "industry_id": "energy",
@@ -1306,6 +1734,121 @@
         {
           "hall_id": "energy",
           "code": "energy-equipment"
+        }
+      ]
+    },
+    {
+      "id": "北京福田戴姆勒汽车有限公司",
+      "name": "北京福田戴姆勒汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 213,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京福田康明斯发动机有限公司",
+      "name": "北京福田康明斯发动机有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 212,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京海纳川汽车部件股份有限公司",
+      "name": "北京海纳川汽车部件股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "北京汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 196,
+          "parent_name": "北京汽车集团有限公司",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽集团主要汽车及零部件企业",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京海纳川汽车底盘系统有限公司",
+      "name": "北京海纳川汽车底盘系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 199,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京海纳川延锋汽车部件有限公司",
+      "name": "北京海纳川延锋汽车部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 207,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
         }
       ]
     },
@@ -1399,6 +1942,98 @@
       ]
     },
     {
+      "id": "北京汽车股份有限公司",
+      "name": "北京汽车股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "北京汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 190,
+          "parent_name": "北京汽车集团有限公司",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽集团主要汽车及零部件企业",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京汽车集团越野车有限公司",
+      "name": "北京汽车集团越野车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "北京汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 195,
+          "parent_name": "北京汽车集团有限公司",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽集团主要汽车及零部件企业",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京汽车研究总院有限公司",
+      "name": "北京汽车研究总院有限公司",
+      "industry_id": "automotive",
+      "parent_name": "北京汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 197,
+          "parent_name": "北京汽车集团有限公司",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽集团主要汽车及零部件企业",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京三立车灯有限公司",
+      "name": "北京三立车灯有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 203,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "北京首旅集团",
       "name": "北京首旅集团",
       "industry_id": "retail",
@@ -1459,6 +2094,75 @@
       ]
     },
     {
+      "id": "北京现代汽车有限公司",
+      "name": "北京现代汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "北京汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 194,
+          "parent_name": "北京汽车集团有限公司",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽集团主要汽车及零部件企业",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京新能源汽车股份有限公司",
+      "name": "北京新能源汽车股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "北京汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 191,
+          "parent_name": "北京汽车集团有限公司",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽集团主要汽车及零部件企业",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京延锋北汽汽车内饰件有限公司",
+      "name": "北京延锋北汽汽车内饰件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 208,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "北京银行",
       "name": "北京银行",
       "industry_id": "finance",
@@ -1476,6 +2180,29 @@
       ],
       "source_datasets": [
         "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "北汽福田汽车股份有限公司",
+      "name": "北汽福田汽车股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "北京汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 192,
+          "parent_name": "北京汽车集团有限公司",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽集团主要汽车及零部件企业",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -1504,6 +2231,29 @@
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ]
+    },
+    {
+      "id": "北汽鹏龙汽车服务贸易股份有限公司",
+      "name": "北汽鹏龙汽车服务贸易股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "北京汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 198,
+          "parent_name": "北京汽车集团有限公司",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽集团主要汽车及零部件企业",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
+          "status": "research_unverified"
         }
       ]
     },
@@ -1717,6 +2467,29 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "博世华域转向系统有限公司",
+      "name": "博世华域转向系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 35,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
         }
       ]
     },
@@ -2015,6 +2788,29 @@
       ]
     },
     {
+      "id": "辰致汽车科技集团有限公司",
+      "name": "辰致汽车科技集团有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国长安汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 215,
+          "parent_name": "中国长安汽车集团有限公司",
+          "group_name": "中国长安汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "中国长安集团2026年官方介绍的主要上市及金融物流主体",
+          "source_url": "https://www.ccag.cn/about/introduce",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "成都银行",
       "name": "成都银行",
       "industry_id": "finance",
@@ -2032,6 +2828,29 @@
       ],
       "source_datasets": [
         "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "重庆江津延锋汽车零部件有限公司",
+      "name": "重庆江津延锋汽车零部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车/延锋体系",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 86,
+          "parent_name": "华域汽车/延锋体系",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "上汽集团2025年度新纳入合并范围（核最新持股链）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12055328&stockid=600104",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -2316,6 +3135,52 @@
         {
           "hall_id": "automotive",
           "code": "auto-electronics"
+        }
+      ]
+    },
+    {
+      "id": "大圣科技股份有限公司",
+      "name": "大圣科技股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 131,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：三电、充电能源",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "大众一汽发动机(大连)有限公司",
+      "name": "大众一汽发动机（大连）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 183,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "合资/参股",
+          "relationship_hint": "集团合资体系关联；非全部为控股子公司",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
         }
       ]
     },
@@ -2741,6 +3606,29 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-material"
+        }
+      ]
+    },
+    {
+      "id": "东安动力股份有限公司",
+      "name": "东安动力股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国长安汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 217,
+          "parent_name": "中国长安汽车集团有限公司",
+          "group_name": "中国长安汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "中国长安集团2026年官方介绍的主要上市及金融物流主体",
+          "source_url": "https://www.ccag.cn/about/introduce",
+          "status": "research_unverified"
         }
       ]
     },
@@ -3365,6 +4253,29 @@
       ]
     },
     {
+      "id": "东风本田汽车有限公司",
+      "name": "东风本田汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 147,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "东风集团",
       "name": "东风集团",
       "industry_id": "automotive",
@@ -3423,6 +4334,75 @@
       ]
     },
     {
+      "id": "东风柳州汽车有限公司",
+      "name": "东风柳州汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 148,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "东风启辰汽车公司",
+      "name": "东风启辰汽车公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 149,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "东风汽车财务有限公司",
+      "name": "东风汽车财务有限公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 157,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "东风汽车股份",
       "name": "东风汽车股份",
       "industry_id": "automotive",
@@ -3452,6 +4432,29 @@
       ]
     },
     {
+      "id": "东风汽车股份有限公司",
+      "name": "东风汽车股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 153,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "东风汽车集团",
       "name": "东风汽车集团",
       "industry_id": "automotive",
@@ -3477,6 +4480,29 @@
           "sequence": 6,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "东风汽车有限公司",
+      "name": "东风汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 143,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
         }
       ]
     },
@@ -3529,6 +4555,29 @@
       ]
     },
     {
+      "id": "东风日产乘用车公司",
+      "name": "东风日产乘用车公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 146,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "东风商用车",
       "name": "东风商用车",
       "industry_id": "automotive",
@@ -3558,6 +4607,98 @@
       ]
     },
     {
+      "id": "东风商用车有限公司",
+      "name": "东风商用车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 152,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "东风特种商用车有限公司",
+      "name": "东风特种商用车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 154,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "东风物流集团股份有限公司",
+      "name": "东风物流集团股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 156,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "东风英菲尼迪汽车有限公司",
+      "name": "东风英菲尼迪汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 151,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "东莞深能源樟洋电力有限公司",
       "name": "东莞深能源樟洋电力有限公司",
       "industry_id": "energy",
@@ -3583,6 +4724,29 @@
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ]
+    },
+    {
+      "id": "东华汽车实业有限公司",
+      "name": "东华汽车实业有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 30,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "出行物流与服务所属企业",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
         }
       ]
     },
@@ -3769,7 +4933,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 4,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业或业务单位",
+          "relationship_hint": "集团整车业务（具体股权/合作类型按逐家核实）",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -3945,6 +5121,29 @@
         {
           "hall_id": "automotive",
           "code": "auto-battery"
+        }
+      ]
+    },
+    {
+      "id": "蜂巢汽车科技集团有限公司",
+      "name": "蜂巢汽车科技集团有限公司",
+      "industry_id": "automotive",
+      "parent_name": "长城汽车股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 258,
+          "parent_name": "长城汽车股份有限公司",
+          "group_name": "长城汽车体系",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "公开产业企业目录，需进一步与最新集团披露核对股权",
+          "source_url": "https://changlianlian.cn/cluster/L-EXTRA-009?lang=en",
+          "status": "research_unverified"
         }
       ]
     },
@@ -4670,6 +5869,29 @@
       ]
     },
     {
+      "id": "广爱保险经纪有限公司",
+      "name": "广爱保险经纪有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 134,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：金融与数字化",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "广东深能绿燃动力科技有限公司",
       "name": "广东深能绿燃动力科技有限公司",
       "industry_id": "energy",
@@ -4724,6 +5946,29 @@
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ]
+    },
+    {
+      "id": "广东省智能网联汽车创新中心有限公司",
+      "name": "广东省智能网联汽车创新中心有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 94,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
         }
       ]
     },
@@ -4846,6 +6091,29 @@
       ]
     },
     {
+      "id": "广汽埃安新能源汽车股份有限公司",
+      "name": "广汽埃安新能源汽车股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 124,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：汽车生产与销售",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "广汽本田",
       "name": "广汽本田",
       "industry_id": "automotive",
@@ -4875,6 +6143,98 @@
       ]
     },
     {
+      "id": "广汽本田汽车有限公司",
+      "name": "广汽本田汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 123,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：汽车生产与销售",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广汽乘用车(杭州)有限公司",
+      "name": "广汽乘用车（杭州）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 120,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：汽车生产与销售",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广汽传祺汽车销售有限公司",
+      "name": "广汽传祺汽车销售有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 121,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：汽车生产与销售",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广汽传祺汽车有限公司",
+      "name": "广汽传祺汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 119,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：汽车生产与销售",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "广汽传祺bu",
       "name": "广汽传祺BU",
       "industry_id": "automotive",
@@ -4900,6 +6260,29 @@
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ]
+    },
+    {
+      "id": "广汽菲亚特克莱斯勒汽车有限公司",
+      "name": "广汽菲亚特克莱斯勒汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 142,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "历史/合资需核实",
+          "relationship_hint": "广汽集团名录（历史存续及招聘主体须单独核实）",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
         }
       ]
     },
@@ -4952,6 +6335,52 @@
       ]
     },
     {
+      "id": "广汽丰田汽车有限公司",
+      "name": "广汽丰田汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 118,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：汽车生产与销售",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广汽丰通物流有限公司",
+      "name": "广汽丰通物流有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 98,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：商贸出行服务",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "广汽国际",
       "name": "广汽国际",
       "industry_id": "automotive",
@@ -4977,6 +6406,52 @@
         {
           "hall_id": "automotive",
           "code": "auto-business"
+        }
+      ]
+    },
+    {
+      "id": "广汽国际汽车销售服务有限公司",
+      "name": "广汽国际汽车销售服务有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 101,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：商贸出行服务",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广汽汇理汽车金融有限公司",
+      "name": "广汽汇理汽车金融有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 132,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：金融与数字化",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
         }
       ]
     },
@@ -5023,6 +6498,190 @@
           "sequence": 15,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "广汽零部件(广州)产业园有限公司",
+      "name": "广汽零部件（广州）产业园有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 115,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广汽零部件有限公司",
+      "name": "广汽零部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 117,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：汽车生产与销售",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广汽能源科技有限公司",
+      "name": "广汽能源科技有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 128,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：三电、充电能源",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广汽日野(沈阳)汽车有限公司",
+      "name": "广汽日野（沈阳）汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 141,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "历史/合资需核实",
+          "relationship_hint": "广汽集团名录（历史存续及招聘主体须单独核实）",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广汽商贸有限公司",
+      "name": "广汽商贸有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 96,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：商贸出行服务",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广汽时代动力电池系统有限公司",
+      "name": "广汽时代动力电池系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 127,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：三电、充电能源",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广汽长丰汽车有限公司",
+      "name": "广汽长丰汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 140,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "历史/合资需核实",
+          "relationship_hint": "广汽集团名录（历史存续及招聘主体须单独核实）",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广汽资本有限公司",
+      "name": "广汽资本有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 136,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：金融与数字化",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
         }
       ]
     },
@@ -5226,6 +6885,406 @@
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ]
+    },
+    {
+      "id": "广州广爱数字科技有限公司",
+      "name": "广州广爱数字科技有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 135,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：金融与数字化",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州广汽荻原模具冲压有限公司",
+      "name": "广州广汽荻原模具冲压有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 104,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州广汽商贸物流有限公司",
+      "name": "广州广汽商贸物流有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 97,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：商贸出行服务",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州广汽租赁有限公司",
+      "name": "广州广汽租赁有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 100,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：商贸出行服务",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州华德汽车弹簧有限公司",
+      "name": "广州华德汽车弹簧有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 105,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州华望汽车电子有限公司",
+      "name": "广州华望汽车电子有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 107,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州华智汽车部件有限公司",
+      "name": "广州华智汽车部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 108,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州骏达汽车集团有限公司",
+      "name": "广州骏达汽车集团有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 126,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：汽车生产与销售",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州帕卡汽车零部件有限公司",
+      "name": "广州帕卡汽车零部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 106,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州祺盛动力总成有限公司",
+      "name": "广州祺盛动力总成有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 122,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：汽车生产与销售",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州汽车工业集团有限公司",
+      "name": "广州汽车工业集团有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 90,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州汽车集团财务有限公司",
+      "name": "广州汽车集团财务有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 137,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：金融与数字化",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州汽车集团股份有限公司",
+      "name": "广州汽车集团股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.gacgroup.com/cn/talent",
+          "label": "汽车集团研究招聘入口线索",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "source": "automotive_research_266"
+        }
+      ],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 91,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州汽车集团进出口贸易有限公司",
+      "name": "广州汽车集团进出口贸易有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 99,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：商贸出行服务",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州汽车集团科技有限公司",
+      "name": "广州汽车集团科技有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 93,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州汽车集团客车有限公司",
+      "name": "广州汽车集团客车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 125,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：汽车生产与销售",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广州青蓝半导体有限公司",
+      "name": "广州青蓝半导体有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 116,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
         }
       ]
     },
@@ -6463,6 +8522,52 @@
       ]
     },
     {
+      "id": "海斯坦普汽车组件(北京)有限公司",
+      "name": "海斯坦普汽车组件（北京）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 200,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "海斯坦普新能源汽车组件(北京)有限公司",
+      "name": "海斯坦普新能源汽车组件（北京）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 210,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "海天味业",
       "name": "海天味业",
       "industry_id": "agri-food",
@@ -7106,6 +9211,29 @@
       ]
     },
     {
+      "id": "湖南天雁机械股份有限公司",
+      "name": "湖南天雁机械股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国长安汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 218,
+          "parent_name": "中国长安汽车集团有限公司",
+          "group_name": "中国长安汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "中国长安集团2026年官方介绍的主要上市及金融物流主体",
+          "source_url": "https://www.ccag.cn/about/introduce",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "华安证券",
       "name": "华安证券",
       "industry_id": "finance",
@@ -7211,6 +9339,29 @@
         {
           "hall_id": "energy",
           "code": "energy-engineering"
+        }
+      ]
+    },
+    {
+      "id": "华东泰克西汽车铸造有限公司",
+      "name": "华东泰克西汽车铸造有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 53,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
         }
       ]
     },
@@ -8595,6 +10746,144 @@
       ]
     },
     {
+      "id": "华域大陆汽车制动系统(重庆)有限公司",
+      "name": "华域大陆汽车制动系统（重庆）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 38,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "华域动力总成部件系统(上海)有限公司",
+      "name": "华域动力总成部件系统（上海）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 49,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "华域科尔本施密特活塞有限公司",
+      "name": "华域科尔本施密特活塞有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 50,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "华域麦格纳电驱动系统有限公司",
+      "name": "华域麦格纳电驱动系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 45,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "华域皮尔博格泵技术有限公司",
+      "name": "华域皮尔博格泵技术有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 47,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "华域皮尔博格有色零部件(上海)有限公司",
+      "name": "华域皮尔博格有色零部件（上海）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 51,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "华域汽车",
       "name": "华域汽车",
       "industry_id": "automotive",
@@ -8634,7 +10923,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 43,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -8646,7 +10947,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 44,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -8677,6 +10990,61 @@
           "sequence": 35,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "华域汽车系统(上海)有限公司",
+      "name": "华域汽车系统（上海）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 60,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "华域汽车系统股份有限公司",
+      "name": "华域汽车系统股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.hasco-group.com/join/",
+          "label": "汽车集团研究招聘入口线索",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "source": "automotive_research_266"
+        }
+      ],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 14,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "集团零部件业务",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
         }
       ]
     },
@@ -8718,7 +11086,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 46,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -8751,6 +11131,75 @@
       ]
     },
     {
+      "id": "华域视觉科技(常熟)有限公司",
+      "name": "华域视觉科技（常熟）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域视觉科技（上海）有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 69,
+          "parent_name": "华域视觉科技（上海）有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "华域视觉官网所属企业（境内）",
+          "source_url": "https://www.hascovision.com/disclosure-of-information",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "华域视觉科技(重庆)有限公司",
+      "name": "华域视觉科技（重庆）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域视觉科技（上海）有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 64,
+          "parent_name": "华域视觉科技（上海）有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "华域视觉官网所属企业（境内）",
+          "source_url": "https://www.hascovision.com/disclosure-of-information",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "华域视觉科技(德国)有限公司",
+      "name": "华域视觉科技（德国）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域视觉科技（上海）有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 71,
+          "parent_name": "华域视觉科技（上海）有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "官网列示的海外实体",
+          "relationship_hint": "华域视觉官网所属企业（境外）",
+          "source_url": "https://www.hascovision.com/disclosure-of-information",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "华域视觉科技(上海)有限公司",
       "name": "华域视觉科技（上海）有限公司",
       "industry_id": "automotive",
@@ -8770,7 +11219,134 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 33,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "华域视觉科技(武汉)有限公司",
+      "name": "华域视觉科技（武汉）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域视觉科技（上海）有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 67,
+          "parent_name": "华域视觉科技（上海）有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "华域视觉官网所属企业（境内）",
+          "source_url": "https://www.hascovision.com/disclosure-of-information",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "华域视觉科技(烟台)有限公司",
+      "name": "华域视觉科技（烟台）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域视觉科技（上海）有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 66,
+          "parent_name": "华域视觉科技（上海）有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "华域视觉官网所属企业（境内）",
+          "source_url": "https://www.hascovision.com/disclosure-of-information",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "华域视觉科技(长沙)有限公司",
+      "name": "华域视觉科技（长沙）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域视觉科技（上海）有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 68,
+          "parent_name": "华域视觉科技（上海）有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "华域视觉官网所属企业（境内）",
+          "source_url": "https://www.hascovision.com/disclosure-of-information",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "华域视觉科技日本株式会社",
+      "name": "华域视觉科技日本株式会社",
+      "industry_id": "automotive",
+      "parent_name": "华域视觉科技（上海）有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 70,
+          "parent_name": "华域视觉科技（上海）有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "官网列示的海外实体",
+          "relationship_hint": "华域视觉官网所属企业（境外）",
+          "source_url": "https://www.hascovision.com/disclosure-of-information",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "华域正大有限公司",
+      "name": "华域正大有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 59,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -8828,6 +11404,29 @@
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ]
+    },
+    {
+      "id": "环球车享汽车租赁有限公司",
+      "name": "环球车享汽车租赁有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 22,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "出行物流与服务所属企业",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
         }
       ]
     },
@@ -9113,7 +11712,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "automotive_research_266"
       ],
       "audit_references": [
         {
@@ -9121,6 +11721,17 @@
           "sequence": 18,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "research_relationships": [
+        {
+          "sequence": 228,
+          "parent_name": "浙江吉利控股集团",
+          "group_name": "吉利控股集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "吉利官方披露持股及品牌体系，不等于全部控股子公司",
+          "source_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+          "status": "research_unverified"
         }
       ]
     },
@@ -9137,6 +11748,29 @@
       "portals": [],
       "source_datasets": [
         "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "吉林富晟车灯有限公司",
+      "name": "吉林富晟车灯有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域视觉科技（上海）有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 65,
+          "parent_name": "华域视觉科技（上海）有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "华域视觉官网所属企业（境内）",
+          "source_url": "https://www.hascovision.com/disclosure-of-information",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -9176,7 +11810,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 229,
+          "parent_name": "浙江吉利控股集团",
+          "group_name": "吉利控股集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "吉利官方披露持股及品牌体系，不等于全部控股子公司",
+          "source_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -9188,7 +11834,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 231,
+          "parent_name": "浙江吉利控股集团",
+          "group_name": "吉利控股集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "吉利官方披露持股及品牌体系，不等于全部控股子公司",
+          "source_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -9385,6 +12043,29 @@
       ]
     },
     {
+      "id": "江铃汽车股份有限公司",
+      "name": "江铃汽车股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国长安汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 219,
+          "parent_name": "中国长安汽车集团有限公司",
+          "group_name": "中国长安汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "中国长安集团2026年官方介绍的主要上市及金融物流主体",
+          "source_url": "https://www.ccag.cn/about/introduce",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "江苏德福来汽车部件",
       "name": "江苏德福来汽车部件",
       "industry_id": "automotive",
@@ -9470,6 +12151,29 @@
           "sequence": 27,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "江苏天宝汽车电子有限公司",
+      "name": "江苏天宝汽车电子有限公司",
+      "industry_id": "automotive",
+      "parent_name": "延锋汽车饰件系统有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 77,
+          "parent_name": "延锋汽车饰件系统有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "延锋官网所属企业信息（部分经历股权重组）",
+          "source_url": "https://www.yanfeng.com/cn/xinxigongkai",
+          "status": "research_unverified"
         }
       ]
     },
@@ -10185,6 +12889,29 @@
       ]
     },
     {
+      "id": "精诚工科汽车系统有限公司",
+      "name": "精诚工科汽车系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "长城汽车股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 261,
+          "parent_name": "长城汽车股份有限公司",
+          "group_name": "长城汽车体系",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "公开产业企业目录，需进一步与最新集团披露核对股权",
+          "source_url": "https://changlianlian.cn/cluster/L-EXTRA-009?lang=en",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "精智达",
       "name": "精智达",
       "industry_id": "semiconductor",
@@ -10355,6 +13082,29 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-equipment"
+        }
+      ]
+    },
+    {
+      "id": "恺博座椅机械部件有限公司",
+      "name": "恺博座椅机械部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "延锋汽车饰件系统有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 82,
+          "parent_name": "延锋汽车饰件系统有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "延锋官网所属企业信息（部分经历股权重组）",
+          "source_url": "https://www.yanfeng.com/cn/xinxigongkai",
+          "status": "research_unverified"
         }
       ]
     },
@@ -10791,6 +13541,29 @@
       ]
     },
     {
+      "id": "岚图汽车科技股份有限公司",
+      "name": "岚图汽车科技股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 145,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "蓝箭电子",
       "name": "蓝箭电子",
       "industry_id": "semiconductor",
@@ -11198,7 +13971,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 232,
+          "parent_name": "浙江吉利控股集团",
+          "group_name": "吉利控股集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "吉利官方披露持股及品牌体系，不等于全部控股子公司",
+          "source_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -11268,7 +14053,42 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 13,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "集团零部件业务",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "联合重卡",
+      "name": "联合重卡",
+      "industry_id": "automotive",
+      "parent_name": "奇瑞控股集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 248,
+          "parent_name": "奇瑞控股集团",
+          "group_name": "奇瑞控股集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "奇瑞集团官方业务板块",
+          "source_url": "https://www.cheryholding.com/article/category/%E9%9B%86%E5%9B%A2%E4%BB%8B%E7%BB%8D.html",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -11832,6 +14652,29 @@
       ]
     },
     {
+      "id": "曼德电子电器有限公司",
+      "name": "曼德电子电器有限公司",
+      "industry_id": "automotive",
+      "parent_name": "长城汽车股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 260,
+          "parent_name": "长城汽车股份有限公司",
+          "group_name": "长城汽车体系",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "公开产业企业目录，需进一步与最新集团披露核对股权",
+          "source_url": "https://changlianlian.cn/cluster/L-EXTRA-009?lang=en",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "茅台集团",
       "name": "茅台集团",
       "industry_id": "agri-food",
@@ -11888,6 +14731,98 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-analog"
+        }
+      ]
+    },
+    {
+      "id": "梅州广汽部件汽车系统有限公司",
+      "name": "梅州广汽部件汽车系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 110,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "梅州广汽华德汽车零部件有限公司",
+      "name": "梅州广汽华德汽车零部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 109,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "梅州广汽零部件产业有限公司",
+      "name": "梅州广汽零部件产业有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 111,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "梅州广汽汽车弹簧有限公司",
+      "name": "梅州广汽汽车弹簧有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 112,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
         }
       ]
     },
@@ -11989,6 +14924,29 @@
       ]
     },
     {
+      "id": "美国华美汽车系统有限公司",
+      "name": "美国华美汽车系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域视觉科技（上海）有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 72,
+          "parent_name": "华域视觉科技（上海）有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "官网列示的海外实体",
+          "relationship_hint": "华域视觉官网所属企业（境外）",
+          "source_url": "https://www.hascovision.com/disclosure-of-information",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "美满电子(marvell)",
       "name": "美满电子（Marvell）",
       "industry_id": "semiconductor",
@@ -12063,6 +15021,29 @@
         {
           "hall_id": "automotive",
           "code": "auto-ev"
+        }
+      ]
+    },
+    {
+      "id": "猛士汽车科技公司",
+      "name": "猛士汽车科技公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 144,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
         }
       ]
     },
@@ -12188,6 +15169,29 @@
           "sequence": 30,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "摩捷智行有限责任公司",
+      "name": "摩捷智行有限责任公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 176,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
         }
       ]
     },
@@ -12391,6 +15395,29 @@
         {
           "hall_id": "energy",
           "code": "energy-storage"
+        }
+      ]
+    },
+    {
+      "id": "南方(韶关)智能网联新能源汽车试验检测中心有限公司",
+      "name": "南方（韶关）智能网联新能源汽车试验检测中心有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 95,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
         }
       ]
     },
@@ -12713,7 +15740,42 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 8,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业或业务单位",
+          "relationship_hint": "集团整车业务（具体股权/合作类型按逐家核实）",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "南京延锋东华汽车部件系统有限公司",
+      "name": "南京延锋东华汽车部件系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "延锋汽车饰件系统有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 81,
+          "parent_name": "延锋汽车饰件系统有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "延锋官网所属企业信息（部分经历股权重组）",
+          "source_url": "https://www.yanfeng.com/cn/xinxigongkai",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -12725,7 +15787,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 9,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业或业务单位",
+          "relationship_hint": "集团整车业务（具体股权/合作类型按逐家核实）",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -13138,6 +16212,29 @@
       ]
     },
     {
+      "id": "诺博汽车系统有限公司",
+      "name": "诺博汽车系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "长城汽车股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 259,
+          "parent_name": "长城汽车股份有限公司",
+          "group_name": "长城汽车体系",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "公开产业企业目录，需进一步与最新集团披露核对股权",
+          "source_url": "https://changlianlian.cn/cluster/L-EXTRA-009?lang=en",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "欧派家居",
       "name": "欧派家居",
       "industry_id": "consumer-hardware",
@@ -13441,6 +16538,52 @@
       ]
     },
     {
+      "id": "奇瑞捷豹路虎",
+      "name": "奇瑞捷豹路虎",
+      "industry_id": "automotive",
+      "parent_name": "奇瑞控股集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 246,
+          "parent_name": "奇瑞控股集团",
+          "group_name": "奇瑞控股集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "奇瑞集团官方业务板块",
+          "source_url": "https://www.cheryholding.com/article/category/%E9%9B%86%E5%9B%A2%E4%BB%8B%E7%BB%8D.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "奇瑞科技",
+      "name": "奇瑞科技",
+      "industry_id": "automotive",
+      "parent_name": "奇瑞控股集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 244,
+          "parent_name": "奇瑞控股集团",
+          "group_name": "奇瑞控股集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "奇瑞集团官方业务板块",
+          "source_url": "https://www.cheryholding.com/article/category/%E9%9B%86%E5%9B%A2%E4%BB%8B%E7%BB%8D.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "奇瑞控股",
       "name": "奇瑞控股",
       "industry_id": "automotive",
@@ -13497,7 +16640,8 @@
       "source_datasets": [
         "domesticRecruitment200Registry",
         "draft_pr_333",
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "automotive_research_266"
       ],
       "related_hall_ids": [],
       "sections": [
@@ -13512,6 +16656,86 @@
           "sequence": 47,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "research_relationships": [
+        {
+          "sequence": 242,
+          "parent_name": "奇瑞控股集团",
+          "group_name": "奇瑞控股集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "奇瑞集团官方业务板块",
+          "source_url": "https://www.cheryholding.com/article/category/%E9%9B%86%E5%9B%A2%E4%BB%8B%E7%BB%8D.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "奇瑞汽金",
+      "name": "奇瑞汽金",
+      "industry_id": "automotive",
+      "parent_name": "奇瑞控股集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 245,
+          "parent_name": "奇瑞控股集团",
+          "group_name": "奇瑞控股集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "奇瑞集团官方业务板块",
+          "source_url": "https://www.cheryholding.com/article/category/%E9%9B%86%E5%9B%A2%E4%BB%8B%E7%BB%8D.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "奇瑞瑞弗",
+      "name": "奇瑞瑞弗",
+      "industry_id": "automotive",
+      "parent_name": "奇瑞控股集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 247,
+          "parent_name": "奇瑞控股集团",
+          "group_name": "奇瑞控股集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "奇瑞集团官方业务板块",
+          "source_url": "https://www.cheryholding.com/article/category/%E9%9B%86%E5%9B%A2%E4%BB%8B%E7%BB%8D.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "奇瑞商用车",
+      "name": "奇瑞商用车",
+      "industry_id": "automotive",
+      "parent_name": "奇瑞控股集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 243,
+          "parent_name": "奇瑞控股集团",
+          "group_name": "奇瑞控股集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "奇瑞集团官方业务板块",
+          "source_url": "https://www.cheryholding.com/article/category/%E9%9B%86%E5%9B%A2%E4%BB%8B%E7%BB%8D.html",
+          "status": "research_unverified"
         }
       ]
     },
@@ -13859,6 +17083,29 @@
           "sequence": 1,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "锐湃动力科技有限公司",
+      "name": "锐湃动力科技有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 130,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：三电、充电能源",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
         }
       ]
     },
@@ -14774,6 +18021,75 @@
       ]
     },
     {
+      "id": "上海博泽汽车部件有限公司",
+      "name": "上海博泽汽车部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 62,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海车享科技产业有限公司",
+      "name": "上海车享科技产业有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 25,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "出行物流与服务所属企业",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海大陆汽车制动系统销售有限公司",
+      "name": "上海大陆汽车制动系统销售有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 37,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "上海电气",
       "name": "上海电气",
       "industry_id": "manufacturing",
@@ -14852,6 +18168,29 @@
       ]
     },
     {
+      "id": "上海恩坦华汽车门系统有限公司",
+      "name": "上海恩坦华汽车门系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 63,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "上海法雷奥汽车电器系统有限公司",
       "name": "上海法雷奥汽车电器系统有限公司",
       "industry_id": "automotive",
@@ -14860,7 +18199,65 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 48,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海菲特尔莫古复合材料有限公司",
+      "name": "上海菲特尔莫古复合材料有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 56,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海菲特尔莫古轴瓦有限公司",
+      "name": "上海菲特尔莫古轴瓦有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 55,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -14959,7 +18356,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 34,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -15014,6 +18423,52 @@
       ]
     },
     {
+      "id": "上海科德汽车部件有限公司",
+      "name": "上海科德汽车部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 61,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海纳铁福传动系统有限公司",
+      "name": "上海纳铁福传动系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 39,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "上海纳铁福传动轴有限公司",
       "name": "上海纳铁福传动轴有限公司",
       "industry_id": "automotive",
@@ -15046,7 +18501,295 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 12,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "集团零部件业务",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海汽车粉末冶金有限公司",
+      "name": "上海汽车粉末冶金有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 54,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海汽车工业活动中心有限公司",
+      "name": "上海汽车工业活动中心有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 28,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "出行物流与服务所属企业",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海汽车工业销售有限公司",
+      "name": "上海汽车工业销售有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 26,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "出行物流与服务所属企业",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海汽车集团(北京)有限公司",
+      "name": "上海汽车集团（北京）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 29,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "出行物流与服务所属企业",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海汽车集团保险有限公司",
+      "name": "上海汽车集团保险有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 32,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "2025年报新设子公司",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12055328&stockid=600104",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海汽车集团股份有限公司乘用车分公司",
+      "name": "上海汽车集团股份有限公司乘用车分公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 1,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业或业务单位",
+          "relationship_hint": "集团整车业务（具体股权/合作类型按逐家核实）",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海汽车集团股份有限公司乘用车福建分公司",
+      "name": "上海汽车集团股份有限公司乘用车福建分公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 16,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "分公司/研发中心",
+          "relationship_hint": "集团分支机构/研发组织",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海汽车集团股份有限公司乘用车郑州分公司",
+      "name": "上海汽车集团股份有限公司乘用车郑州分公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 15,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "分公司/研发中心",
+          "relationship_hint": "集团分支机构/研发组织",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海汽车集团股份有限公司创新研究开发院",
+      "name": "上海汽车集团股份有限公司创新研究开发院",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 18,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "分公司/研发中心",
+          "relationship_hint": "集团分支机构/研发组织",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海汽车集团股份有限公司技术中心",
+      "name": "上海汽车集团股份有限公司技术中心",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 19,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "分公司/研发中心",
+          "relationship_hint": "集团分支机构/研发组织",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海汽车集团股份有限公司商用车技术中心",
+      "name": "上海汽车集团股份有限公司商用车技术中心",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 20,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "分公司/研发中心",
+          "relationship_hint": "集团分支机构/研发组织",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海汽车集团股份有限公司郑州发动机分公司",
+      "name": "上海汽车集团股份有限公司郑州发动机分公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 17,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "分公司/研发中心",
+          "relationship_hint": "集团分支机构/研发组织",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -15108,6 +18851,52 @@
       ]
     },
     {
+      "id": "上海汽车制动系统有限公司",
+      "name": "上海汽车制动系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 36,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海汽车资产经营有限公司",
+      "name": "上海汽车资产经营有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 27,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "出行物流与服务所属企业",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "上海乾通汽车附件有限公司",
       "name": "上海乾通汽车附件有限公司",
       "industry_id": "automotive",
@@ -15128,7 +18917,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 42,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -15140,7 +18941,42 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 11,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业或业务单位",
+          "relationship_hint": "集团整车业务（具体股权/合作类型按逐家核实）",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海圣德曼铸造有限公司",
+      "name": "上海圣德曼铸造有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 52,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -15152,7 +18988,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 41,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -15181,6 +19029,29 @@
         {
           "hall_id": "energy",
           "code": "energy-storage"
+        }
+      ]
+    },
+    {
+      "id": "上海随申行智慧交通科技有限公司",
+      "name": "上海随申行智慧交通科技有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 23,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "出行物流与服务所属企业",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
         }
       ]
     },
@@ -15272,6 +19143,75 @@
       ]
     },
     {
+      "id": "上海延锋汽车外饰系统有限公司",
+      "name": "上海延锋汽车外饰系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "延锋汽车饰件系统有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 80,
+          "parent_name": "延锋汽车饰件系统有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "延锋官网所属企业信息（部分经历股权重组）",
+          "source_url": "https://www.yanfeng.com/cn/xinxigongkai",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海延锋座椅有限公司",
+      "name": "上海延锋座椅有限公司",
+      "industry_id": "automotive",
+      "parent_name": "延锋汽车饰件系统有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 75,
+          "parent_name": "延锋汽车饰件系统有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "延锋官网所属企业信息（部分经历股权重组）",
+          "source_url": "https://www.yanfeng.com/cn/xinxigongkai",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海延康汽车零部件有限公司",
+      "name": "上海延康汽车零部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "延锋汽车饰件系统有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 84,
+          "parent_name": "延锋汽车饰件系统有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "延锋官网所属企业信息（部分经历股权重组）",
+          "source_url": "https://www.yanfeng.com/cn/xinxigongkai",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "上海银行",
       "name": "上海银行",
       "industry_id": "finance",
@@ -15321,6 +19261,29 @@
       ]
     },
     {
+      "id": "上海中国弹簧制造有限公司",
+      "name": "上海中国弹簧制造有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 57,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "上能电气",
       "name": "上能电气",
       "industry_id": "energy",
@@ -15346,6 +19309,29 @@
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ]
+    },
+    {
+      "id": "上汽安吉物流股份有限公司",
+      "name": "上汽安吉物流股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 24,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "出行物流与服务所属企业",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
         }
       ]
     },
@@ -15387,7 +19373,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 2,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业或业务单位",
+          "relationship_hint": "集团整车业务（具体股权/合作类型按逐家核实）",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -15428,7 +19426,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 5,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业或业务单位",
+          "relationship_hint": "集团整车业务（具体股权/合作类型按逐家核实）",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -15440,7 +19450,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 10,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业或业务单位",
+          "relationship_hint": "集团整车业务（具体股权/合作类型按逐家核实）",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -15496,6 +19518,29 @@
       ]
     },
     {
+      "id": "上汽前行汽车科技(上海)有限公司",
+      "name": "上汽前行汽车科技（上海）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 31,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "2025年报新设子公司",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12055328&stockid=600104",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "上汽通用",
       "name": "上汽通用",
       "industry_id": "automotive",
@@ -15533,7 +19578,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 6,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业或业务单位",
+          "relationship_hint": "集团整车业务（具体股权/合作类型按逐家核实）",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -15574,7 +19631,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 7,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业或业务单位",
+          "relationship_hint": "集团整车业务（具体股权/合作类型按逐家核实）",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -16332,6 +20401,29 @@
           "sequence": 31,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "神龙汽车有限公司",
+      "name": "神龙汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 150,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
         }
       ]
     },
@@ -18299,7 +22391,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 230,
+          "parent_name": "浙江吉利控股集团",
+          "group_name": "吉利控股集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "吉利官方披露持股及品牌体系，不等于全部控股子公司",
+          "source_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -18446,6 +22550,29 @@
           "sequence": 17,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "五羊-本田摩托(广州)有限公司",
+      "name": "五羊－本田摩托（广州）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 139,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "历史/合资需核实",
+          "relationship_hint": "广汽集团名录（历史存续及招聘主体须单独核实）",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
         }
       ]
     },
@@ -18620,6 +22747,29 @@
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ]
+    },
+    {
+      "id": "享道出行(上海)科技股份有限公司",
+      "name": "享道出行（上海）科技股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 21,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "出行物流与服务所属企业",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
         }
       ]
     },
@@ -19648,6 +23798,29 @@
       ]
     },
     {
+      "id": "亚普汽车部件股份有限公司",
+      "name": "亚普汽车部件股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车系统股份有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 58,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "烟台东方电子科技发展有限公司",
       "name": "烟台东方电子科技发展有限公司",
       "industry_id": "energy",
@@ -19967,6 +24140,121 @@
       ]
     },
     {
+      "id": "延锋(北京)汽车座椅有限公司",
+      "name": "延锋（北京）汽车座椅有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车/延锋体系",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 85,
+          "parent_name": "华域汽车/延锋体系",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "上汽集团2025年度新纳入合并范围（核最新持股链）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12055328&stockid=600104",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "延锋(宁波鄞州)汽车零部件有限公司",
+      "name": "延锋（宁波鄞州）汽车零部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车/延锋体系",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 87,
+          "parent_name": "华域汽车/延锋体系",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "上汽集团2025年度新纳入合并范围（核最新持股链）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12055328&stockid=600104",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "延锋国际汽车技术有限公司",
+      "name": "延锋国际汽车技术有限公司",
+      "industry_id": "automotive",
+      "parent_name": "延锋汽车饰件系统有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 74,
+          "parent_name": "延锋汽车饰件系统有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "延锋官网所属企业信息（部分经历股权重组）",
+          "source_url": "https://www.yanfeng.com/cn/xinxigongkai",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "延锋国际座椅系统有限公司",
+      "name": "延锋国际座椅系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "延锋汽车饰件系统有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 76,
+          "parent_name": "延锋汽车饰件系统有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "延锋官网所属企业信息（部分经历股权重组）",
+          "source_url": "https://www.yanfeng.com/cn/xinxigongkai",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "延锋海纳川汽车饰件系统有限公司",
+      "name": "延锋海纳川汽车饰件系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 201,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "延锋汽车",
       "name": "延锋汽车",
       "industry_id": "automotive",
@@ -19996,15 +24284,151 @@
       ]
     },
     {
+      "id": "延锋汽车饰件(常州)有限公司",
+      "name": "延锋汽车饰件（常州）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车/延锋体系",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 88,
+          "parent_name": "华域汽车/延锋体系",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "上汽集团2025年度新纳入合并范围（核最新持股链）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12055328&stockid=600104",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "延锋汽车饰件系统有限公司",
       "name": "延锋汽车饰件系统有限公司",
       "industry_id": "automotive",
       "parent_name": "华域汽车",
       "relation": "投资企业",
       "aliases": [],
+      "portals": [
+        {
+          "url": "https://app.mokahr.com/social-recruitment/yanfeng/45085",
+          "label": "汽车集团研究招聘入口线索",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "source": "automotive_research_266"
+        }
+      ],
+      "source_datasets": [
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 40,
+          "parent_name": "华域汽车系统股份有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
+          "source_url": "https://www.hasco-group.com/about/company.html/1000",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "延锋汽车智能安全系统(仪征)有限公司",
+      "name": "延锋汽车智能安全系统（仪征）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车/延锋体系",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 89,
+          "parent_name": "华域汽车/延锋体系",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "上汽集团2025年度新纳入合并范围（核最新持股链）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12055328&stockid=600104",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "延锋汽车智能安全系统有限责任公司",
+      "name": "延锋汽车智能安全系统有限责任公司",
+      "industry_id": "automotive",
+      "parent_name": "延锋汽车饰件系统有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 78,
+          "parent_name": "延锋汽车饰件系统有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "延锋官网所属企业信息（部分经历股权重组）",
+          "source_url": "https://www.yanfeng.com/cn/xinxigongkai",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "延锋轻质复合材料(常州)有限公司",
+      "name": "延锋轻质复合材料（常州）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "延锋汽车饰件系统有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 83,
+          "parent_name": "延锋汽车饰件系统有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "延锋官网所属企业信息（部分经历股权重组）",
+          "source_url": "https://www.yanfeng.com/cn/xinxigongkai",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "延锋伟世通投资有限公司",
+      "name": "延锋伟世通投资有限公司",
+      "industry_id": "automotive",
+      "parent_name": "延锋汽车饰件系统有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 79,
+          "parent_name": "延锋汽车饰件系统有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "延锋官网所属企业信息（部分经历股权重组）",
+          "source_url": "https://www.yanfeng.com/cn/xinxigongkai",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -20212,6 +24636,190 @@
       ]
     },
     {
+      "id": "一汽奔腾汽车股份有限公司",
+      "name": "一汽奔腾汽车股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 162,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽财务有限公司",
+      "name": "一汽财务有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 170,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽出行科技有限公司",
+      "name": "一汽出行科技有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 175,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽大众动力科技有限公司",
+      "name": "一汽大众动力科技有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 171,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽大众汽车有限公司",
+      "name": "一汽大众汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 179,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "合资/参股",
+          "relationship_hint": "集团合资体系关联；非全部为控股子公司",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽丰田发动机(天津)有限公司",
+      "name": "一汽丰田发动机（天津）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 181,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "合资/参股",
+          "relationship_hint": "集团合资体系关联；非全部为控股子公司",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽丰田汽车(成都)有限公司",
+      "name": "一汽丰田汽车（成都）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 182,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "合资/参股",
+          "relationship_hint": "集团合资体系关联；非全部为控股子公司",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽丰田汽车有限公司",
+      "name": "一汽丰田汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 180,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "合资/参股",
+          "relationship_hint": "集团合资体系关联；非全部为控股子公司",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "一汽富晟",
       "name": "一汽富晟",
       "industry_id": "automotive",
@@ -20237,6 +24845,259 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "一汽富华生态有限公司",
+      "name": "一汽富华生态有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 173,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽股权投资(天津)有限公司",
+      "name": "一汽股权投资（天津）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 177,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽红旗汽车销售有限公司",
+      "name": "一汽红旗汽车销售有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 169,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽华翔轻量化科技(长春)有限公司",
+      "name": "一汽华翔轻量化科技（长春）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 178,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽解放集团国际汽车有限公司",
+      "name": "一汽解放集团国际汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 167,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽解放汽车销售有限公司",
+      "name": "一汽解放汽车销售有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 166,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽解放青岛汽车有限公司",
+      "name": "一汽解放青岛汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 165,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽模具制造有限公司",
+      "name": "一汽模具制造有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 163,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽旗新动力(长春)科技有限公司",
+      "name": "一汽旗新动力（长春）科技有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 172,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽铸造有限公司",
+      "name": "一汽铸造有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 164,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "一汽资产经营管理有限公司",
+      "name": "一汽资产经营管理有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 174,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
         }
       ]
     },
@@ -20288,6 +25149,29 @@
           "sequence": 46,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "宜昌广汽零部件车身系统有限公司",
+      "name": "宜昌广汽零部件车身系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 113,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
         }
       ]
     },
@@ -20703,6 +25587,29 @@
       ]
     },
     {
+      "id": "因湃电池科技有限公司",
+      "name": "因湃电池科技有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 129,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：三电、充电能源",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "银轮股份",
       "name": "银轮股份",
       "industry_id": "automotive",
@@ -20786,6 +25693,29 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-global"
+        }
+      ]
+    },
+    {
+      "id": "英纳法汽车天窗系统(北京)有限公司",
+      "name": "英纳法汽车天窗系统（北京）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "海纳川/北汽零部件业务",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 209,
+          "parent_name": "海纳川/北汽零部件业务",
+          "group_name": "北汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
+          "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
+          "status": "research_unverified"
         }
       ]
     },
@@ -21003,6 +25933,29 @@
       ]
     },
     {
+      "id": "优湃能源科技(广州)有限公司",
+      "name": "优湃能源科技（广州）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 92,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "邮储银行",
       "name": "邮储银行",
       "industry_id": "finance",
@@ -21138,7 +26091,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 233,
+          "parent_name": "浙江吉利控股集团",
+          "group_name": "吉利控股集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "吉利官方披露持股及品牌体系，不等于全部控股子公司",
+          "source_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -21423,6 +26388,75 @@
       ]
     },
     {
+      "id": "长安福特",
+      "name": "长安福特",
+      "industry_id": "automotive",
+      "parent_name": "长安汽车体系",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 226,
+          "parent_name": "长安汽车体系",
+          "group_name": "中国长安汽车集团",
+          "entity_type": "合资/参股",
+          "relationship_hint": "长安合资合作汽车品牌",
+          "source_url": "https://www.globalchangan.com/cn/aboutus.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "长安马自达",
+      "name": "长安马自达",
+      "industry_id": "automotive",
+      "parent_name": "长安汽车体系",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 227,
+          "parent_name": "长安汽车体系",
+          "group_name": "中国长安汽车集团",
+          "entity_type": "合资/参股",
+          "relationship_hint": "长安合资合作汽车品牌",
+          "source_url": "https://www.globalchangan.com/cn/aboutus.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "长安民生物流股份有限公司",
+      "name": "长安民生物流股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国长安汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 216,
+          "parent_name": "中国长安汽车集团有限公司",
+          "group_name": "中国长安汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "中国长安集团2026年官方介绍的主要上市及金融物流主体",
+          "source_url": "https://www.ccag.cn/about/introduce",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "长安汽车",
       "name": "长安汽车",
       "industry_id": "automotive",
@@ -21465,6 +26499,52 @@
           "sequence": 16,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "长安汽车股份有限公司",
+      "name": "长安汽车股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国长安汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 214,
+          "parent_name": "中国长安汽车集团有限公司",
+          "group_name": "中国长安汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "中国长安集团2026年官方介绍的主要上市及金融物流主体",
+          "source_url": "https://www.ccag.cn/about/introduce",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "长安汽车金融有限公司",
+      "name": "长安汽车金融有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国长安汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 220,
+          "parent_name": "中国长安汽车集团有限公司",
+          "group_name": "中国长安汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "中国长安集团2026年官方介绍的主要上市及金融物流主体",
+          "source_url": "https://www.ccag.cn/about/introduce",
+          "status": "research_unverified"
         }
       ]
     },
@@ -21649,6 +26729,75 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-fab"
+        }
+      ]
+    },
+    {
+      "id": "长沙安道拓汽车部件有限公司",
+      "name": "长沙安道拓汽车部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 103,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "长沙广汽东阳汽车零部件有限公司",
+      "name": "长沙广汽东阳汽车零部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 102,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "长沙林骏汽车内饰系统有限公司",
+      "name": "长沙林骏汽车内饰系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽零部件有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 114,
+          "parent_name": "广汽零部件有限公司",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
         }
       ]
     },
@@ -22262,6 +27411,29 @@
       ]
     },
     {
+      "id": "郑州日产汽车有限公司",
+      "name": "郑州日产汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 155,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "至纯科技",
       "name": "至纯科技",
       "industry_id": "semiconductor",
@@ -22386,7 +27558,19 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "domesticCompanyRelations"
+        "domesticCompanyRelations",
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 3,
+          "parent_name": "上汽集团",
+          "group_name": "上汽集团",
+          "entity_type": "独立企业或业务单位",
+          "relationship_hint": "集团整车业务（具体股权/合作类型按逐家核实）",
+          "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -23468,6 +28652,29 @@
       ]
     },
     {
+      "id": "中国第一汽车集团进出口有限公司",
+      "name": "中国第一汽车集团进出口有限公司",
+      "industry_id": "automotive",
+      "parent_name": "中国第一汽车集团有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 168,
+          "parent_name": "中国第一汽车集团有限公司",
+          "group_name": "中国一汽集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
+          "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "中国电建北京勘测设计院",
       "name": "中国电建北京勘测设计院",
       "industry_id": "energy",
@@ -23865,6 +29072,29 @@
           "sequence": 47,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国东风汽车工业进出口有限公司",
+      "name": "中国东风汽车工业进出口有限公司",
+      "industry_id": "automotive",
+      "parent_name": "东风集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 158,
+          "parent_name": "东风集团",
+          "group_name": "东风汽车集团",
+          "entity_type": "独立企业/投资关联",
+          "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
+          "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
+          "status": "research_unverified"
         }
       ]
     },
@@ -26045,6 +31275,29 @@
       ]
     },
     {
+      "id": "中隆投资有限公司",
+      "name": "中隆投资有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 138,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：金融与数字化",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "中能建建筑集团",
       "name": "中能建建筑集团",
       "industry_id": "energy",
@@ -26344,6 +31597,29 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "众诚汽车保险股份有限公司",
+      "name": "众诚汽车保险股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "广汽集团",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 133,
+          "parent_name": "广汽集团",
+          "group_name": "广汽集团",
+          "entity_type": "独立企业",
+          "relationship_hint": "广汽集团官网企业名录：金融与数字化",
+          "source_url": "https://www.gacgroup.com/cn/companies",
+          "status": "research_unverified"
+        }
       ]
     },
     {
@@ -26685,6 +31961,29 @@
       ]
     },
     {
+      "id": "hva电子有限公司",
+      "name": "HVA电子有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域视觉科技（上海）有限公司",
+      "relation": "关联研究线索（待核）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "automotive_research_266"
+      ],
+      "research_relationships": [
+        {
+          "sequence": 73,
+          "parent_name": "华域视觉科技（上海）有限公司",
+          "group_name": "上汽集团",
+          "entity_type": "官网列示的海外实体",
+          "relationship_hint": "华域视觉官网所属企业（境外）",
+          "source_url": "https://www.hascovision.com/disclosure-of-information",
+          "status": "research_unverified"
+        }
+      ]
+    },
+    {
       "id": "minimax",
       "name": "MiniMax",
       "industry_id": "internet-ai",
@@ -27013,14 +32312,16 @@
     }
   ],
   "statistics": {
+    "automotive_research_nodes": 266,
+    "automotive_research_brands": 36,
     "prior_audit_source_rows": 150,
-    "entities": 963,
+    "entities": 1165,
     "legacy_portals": 130,
-    "candidate_portals": 790,
-    "group_relations": 354,
+    "candidate_portals": 793,
+    "group_relations": 556,
     "unclassified": 0,
     "by_hall": {
-      "automotive": 238,
+      "automotive": 440,
       "semiconductor": 204,
       "internet-ai": 20,
       "energy": 312,
