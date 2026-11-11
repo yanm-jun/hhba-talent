@@ -30,6 +30,17 @@ const parseURL=v=>{
  }catch{return null}
 };
 const scopePath=pathname=>pathname.endsWith('/')?pathname:pathname+'/';
+/**
+ * One precisely evidenced first-party→separate-root recruitment relation:
+ * https://www.haier.com/careers/ links maker.haier.net, whose own page
+ * contains recruitment links. No general permission for cross-domain ATS.
+ */
+const reviewedHaierCrossDomain=(company,careers,proof,displayName)=>
+ company.hostname.replace(/^www\./,'')==='haier.com'&&
+ careers.hostname==='maker.haier.net'&&careers.pathname==='/client/job/'&&
+ proof.hostname==='www.haier.com'&&proof.pathname==='/careers/'&&
+ /^(?:海尔|海尔集团)$/.test(displayName);
+
 const nameSafe=name=>name.length>=2&&!/@|https?:\/\/|(?:\d[\s-]?){9,}/.test(name);
 const idSafe=id=>/^[a-zA-Z0-9_-]{2,80}$/.test(id);
 const tagArray=raw=>{
@@ -63,8 +74,9 @@ export function normalizeReviewedSource(row,{now=new Date()}={}){
  if(tenant&&(careers.pathname==='/'||careers.pathname.split('/').filter(Boolean).length<1))
   return null;
  if(careers.search||companySite.search||companySite.hash)return null;
- if(!tenant&&!sameOrChild(recruitmentHost,companyHost))return null;
- return {id,display_name:company,company_host:companyHost,
+ const crossDomain=reviewedHaierCrossDomain(companySite,careers,proof,company);
+ if(!tenant&&!sameOrChild(recruitmentHost,companyHost)&&!crossDomain)return null;
+ return {id,display_name:company,company_host:companyHost,haier_verified_chain:crossDomain,
   recruitment_base_url:careers.href,career_host:recruitmentHost,
   recruitment_prefix:scopePath(careers.pathname),shared_ats:tenant,
   industry_tags:tagArray(row.industry_tags_json),
@@ -75,7 +87,12 @@ export function whitelistJobSource(hitUrl,reviewed){
  const job=parseURL(hitUrl);
  if(!job||!isEmployerDirectedSource(recruitmentSourceKind(job.href)))return null;
  for(const item of reviewed||[]){
-  if(job.hostname!==item?.career_host)continue;
+  const exact=job.hostname===item?.career_host;
+  // Only the proven Haier subsidiary recruiting host is an alias, and only
+  // inside its /client/job/ scope. No wildcard DNS or hostname substring.
+  const haierAlias=item?.haier_verified_chain===true&&
+   job.hostname==='vta.maker.haier.net'&&job.pathname.startsWith('/client/job/');
+  if(!exact&&!haierAlias)continue;
   if(item.shared_ats){
    const prefix=item.recruitment_prefix;
    // Protect tenant boundary: jobs.lever.co/acme must not match /acme-impersonator.

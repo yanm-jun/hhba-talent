@@ -26,6 +26,12 @@ export function recruitmentSourceKind(url){
  const host=u.hostname.toLowerCase();
  if(BOARD_HOSTS.some(d=>sameOrChild(host,d)))return 'THIRD_PARTY_BOARD';
  if(ATS_HOSTS.some(d=>sameOrChild(host,d)))return 'EMPLOYER_ATS';
+ // Narrow evidence-reviewed Haier recruitment hosts, not generic "maker" or
+ // arbitrary .haier.net subdomains. Domain shape remains a candidate signal,
+ // while S4 separately checks first-party proof before trusting ownership.
+ if((host==='maker.haier.net'||host==='vta.maker.haier.net')&&
+    /^\/client\/job(?:\/|$)/.test(u.pathname))
+   return 'EMPLOYER_DOMAIN_CANDIDATE';
  // A generic /jobs or /positions URL is not enough: public boards also use them.
  // Prefer explicit careers-domain branding or dedicated recruitment paths.
  if(/^(careers?|jobs?|recruit(?:ment)?|zhaopin|join|talent|hr|campus)\./.test(host)

@@ -21,6 +21,13 @@ test('multi-label employer classification from public editorial, no automatic tr
  assert.equal(result.needs_human_review,true);
  assert.deepEqual(result.evidence_fields,['industry','overview','business']);
 });
+test('telecommunications does not collapse into software-only industry',()=>{
+ const result=classifyEmployerDraft({overview:'中国电信通信网络运营商提供5G基站与光通信和企业服务'});
+ assert.ok(result.industry_tags.includes('telecommunications'));
+ assert.ok(result.business_tags.includes('telecom-networks'));
+ assert.ok(result.business_tags.includes('enterprise-services'));
+ assert.equal(result.review_status,'PROPOSED');
+});
 test('missing employer evidence cannot fabricate tags',()=>{
  const r=classifyEmployerDraft({name:'不存在的示例企业'});
  assert.deepEqual(r.industry_tags,[]);
