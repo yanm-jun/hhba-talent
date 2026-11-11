@@ -236,7 +236,7 @@
             <label>企业自己的招聘入口（可空）<input id="library-url" type="url" placeholder="https://企业招聘官网"/></label>
           </div><button type="button" class="button-primary" id="library-save">保存企业</button>
           <h2>批量收录（最多100家 / 次）</h2>
-          <p>每行格式：企业名称,招聘网址,行业馆,上级集团（可空）。可分馆分批导入；同一企业在不同馆出现会合并为多标签。没有独立招聘网址的子公司，第二列留空。</p>
+          <p>支持两种简单方式：① 先点击某个行业馆，直接粘贴100行企业名称（可带001.编号）；② 每行“企业名称,招聘网址,行业馆,上级集团（可空）”。无招聘网址的名称仅作为待补资料，不伪造官方链接；跨馆同名企业会自动合并。</p>
           <textarea id="library-bulk" spellcheck="false" placeholder="企业A,https://careers.example.com,汽车馆,某集团&#10;企业B,,汽车馆,某集团" aria-label="批量导入企业名单"></textarea>
           <button type="button" class="button-primary" id="library-import">批量入库</button>
         </div>
