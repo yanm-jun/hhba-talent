@@ -1,0 +1,24 @@
+name: HHBA V1 Stage 3 employer enrichment (isolated)
+on:
+  pull_request:
+    paths:
+      - 'apps/web/functions/_lib/dual-classification-v1.js'
+      - 'apps/web/functions/_lib/knowledge-capture-v1.js'
+      - 'apps/web/functions/_lib/employer-enrichment-v1.js'
+      - 'apps/web/d1/0022_employer_enrichment_v1.sql'
+      - 'apps/web/scripts/employer-enrichment-v1.contract.test.mjs'
+      - '.github/workflows/hhba-v1-employer-enrichment-stage3.yml'
+  workflow_dispatch:
+jobs:
+  employer-enrichment-contract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: S1+S2+S3 offline contract tests; no API key
+        run: node --test apps/web/scripts/dual-classification-v1.contract.test.mjs apps/web/scripts/knowledge-capture-v1.contract.test.mjs apps/web/scripts/employer-enrichment-v1.contract.test.mjs
