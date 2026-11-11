@@ -37,7 +37,14 @@ function render(){
   const tr=document.createElement('tr');
   const name=document.createElement('td');
   const strong=document.createElement('strong');strong.textContent=e.name;name.append(strong);
-  if(e.parent_name){const small=document.createElement('small');small.textContent='上级：'+e.parent_name+(e.relation?' · '+e.relation:'');name.append(small);}
+  if(e.parent_name){
+   const small=document.createElement('small');small.textContent='上级：'+e.parent_name+(e.relation?' · '+e.relation:'');
+   name.append(small);
+   name.append(button('查看同集团',()=>{
+    state.term=e.parent_name;dom('library-search').value=e.parent_name;
+    selectHall('all');
+   },'library-edit'));
+  }
   const type=document.createElement('td');type.textContent=[e.industry_id,...(e.related_hall_ids||[])]
    .map(id=>state.halls.find(h=>h.id===id)?.name||'待分类').join(' / ');
   const site=document.createElement('td');const verified=(e.portals||[]).filter(p=>p.status==='legacy_reviewed').length;
