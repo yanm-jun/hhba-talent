@@ -93,7 +93,8 @@ export async function readEmployerLibrary(env,request){
    editable=true;
   }catch{/* Migration not applied: keep read-only seed, do not silently accept writes. */}
  }
- return {halls:seed.halls,items:overlay(seed.items,custom),editable,seed_count:seed.items.length};
+ return {halls:seed.halls,items:overlay(seed.items,custom),editable,seed_count:seed.items.length,
+  collection_coverage:seed.collection_coverage||null};
 }
 const roleHalls=[
  ['automotive',/汽车|新能源车|整车|车载|智能驾驶|4S店|DCC|销售督导|经销商/i],
