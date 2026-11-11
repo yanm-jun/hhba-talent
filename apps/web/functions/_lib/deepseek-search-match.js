@@ -164,6 +164,15 @@ export function selectedJobs(text,hits,limit=10){
   // Defense in depth: never let model output or an alternate code path leak a job-board link.
   const verifiedKind=recruitmentSourceKind(evidence.url);
   if(!isEmployerDirectedSource(verifiedKind))continue;
+  // The reviewed recruitment domain belongs to the reviewed employer.
+  // Never allow DeepSeek to relabel this trusted source as another company.
+  if(evidence.reviewed_employer){
+   const normalizeEmployer=value=>String(value||'').normalize('NFKC').toLowerCase()
+    .replace(/[\s·・（）()\[\]【】,，.。\-_—–]+/g,'')
+    .replace(/(?:股份有限公司|有限责任公司|有限公司|集团公司|集团|公司)$/,'');
+   const claimed=normalizeEmployer(company),reviewed=normalizeEmployer(evidence.reviewed_employer);
+   if(!claimed||!reviewed||(!claimed.includes(reviewed)&&!reviewed.includes(claimed)))continue;
+  }
   const signature=(company+'|'+title).toLowerCase().replace(/\s/g,'');
   if(seen.has(signature)||seen.has(evidence.url))continue;
   seen.add(signature);seen.add(evidence.url);
@@ -199,6 +208,7 @@ export async function reasonAboutJobs(key,resume,hits,limit,{
  const start=Date.now();onProgress('writing');
  const cards=hits.slice(0,32).map(h=>({
   id:h.id,title:h.title,url:h.url,description:(h.content||h.summary||h.snippet).slice(0,800),
+  reviewed_employer:h.reviewed_employer||null,
   recruitment_source:h.recruitment_source_kind||recruitmentSourceKind(h.url),
   availability:h.availability?.status||'UNKNOWN',
   availability_note:h.availability?.evidence||'投递状态待确认'
