@@ -66,7 +66,11 @@ test('B06 preview reader does not silently lose sources #161–#175',async()=>{
  let boundLimit;
  const env={HHBA_DEEPSEEK_WHITELIST_SEARCH_ENABLED:'1',
   HHBA_AUTH_ROLLOUT:'preview',
-  HHBA_PNVS_AUTH_DB:{prepare:()=>({bind:(_date,n)=>{boundLimit=n;return {all:async()=>({results:items})};}})}};
+  HHBA_PNVS_AUTH_DB:{prepare:(sql)=>({bind:(...args)=>{
+   if(sql.includes('FROM hhba_reviewed_recruitment_sources'))boundLimit=args[1];
+   return {all:async()=>({results:
+    sql.includes('FROM hhba_library_employer_halls')?[]:items})};
+  }})}};
  const result=await getReviewedDeepSeekSearchScope(env,{now});
  assert.equal(boundLimit,256);
  assert.equal(result.length,175);
