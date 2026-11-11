@@ -103,4 +103,4 @@ VALUES
 ('hhba-energy-candidate-197',197,'特变电工2027校招','http://tbea.hotjob.cn','energy-equipment','ATS','特变电工','ENERGY_BATCH_101_200'),
 ('hhba-energy-candidate-198',198,'海兴电力2027校招','https://wecruit.hotjob.cn/SU678f4e116202cc5bfb83d72e/pb/school.html','energy-equipment','ATS','海兴电力','ENERGY_BATCH_101_200'),
 ('hhba-energy-candidate-199',199,'施耐德电气星熠培养计划','https://www.zhipin.com/zt/schneider/xingyipeixunsheng.html','energy-equipment','ATS','施耐德电气','ENERGY_BATCH_101_200'),
-('hhba-energy-candidate-200',200,'晶盛机电光伏装备校招','https://app.mokahr.com/campus-recruitment/jsjd/118048#/','energy-equipment','ATS','晶盛机电','ENERGY_BATCH_101_200');
+('hhba-energy-candidate-200',200,'长园科技集团2027校招','https://www.cyg.com/campus.html','energy-equipment','CAREERS','长园科技','ENERGY_BATCH_101_200');
