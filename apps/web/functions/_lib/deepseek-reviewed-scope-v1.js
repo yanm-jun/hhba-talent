@@ -32,7 +32,7 @@ const userApprovedRecruitmentTenant=u=>{
  if(h.endsWith('.hotjob.cn')&&h!=='wecruit.hotjob.cn'&&h!=='www.hotjob.cn')return true;
  if(h==='wecruit.hotjob.cn')return /^\/SU[a-z0-9]{12,}\/pb\//i.test(p);
  if(h.endsWith('.zhaopin.com')&&h!=='www.zhaopin.com'&&h!=='zhaopin.com'&&h!=='campus.zhaopin.com')return true;
- if(h==='xyzp.51job.com')return /^\/[a-z0-9_-]{6,}\/?$/i.test(p);
+ if(h==='xyzp.51job.com')return /^\/[a-z0-9_-]{6,}(?:\/[a-z0-9._-]+)*\/?$/i.test(p);
  if(h==='app.mokahr.com')return /^\/(?:m\/)?(?:campus-recruitment|social-recruitment|apply)\/[a-z0-9_-]{3,}\//i.test(p);
  if(h==='zhaopin.greeyun.com')return true;
  return false;
