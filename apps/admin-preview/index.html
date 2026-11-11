@@ -227,15 +227,15 @@
         </table></div><div id="library-pager" class="library-pager"></div>
         <div id="library-editor" class="library-editor" hidden>
           <h2>添加或补充企业</h2>
-          <p>同名企业合并；只填企业自己的招聘入口。集团共用招聘站请留在集团条目；新链接标记待复核。</p>
+          <p>同一企业只建立一份档案。再次选择其他行业馆录入会自动增加行业标签，不会覆盖原分类或已审核链接。集团共用招聘站请留在集团条目；新链接标记待复核。</p>
           <div class="library-edit-form">
             <label>企业名称<input id="library-name" maxlength="90" placeholder="某某科技有限公司"/></label>
-            <label>所属行业馆<select id="library-hall-select"></select></label>
+            <label>本次归属行业馆<select id="library-hall-select"></select></label>
             <label>上级集团（可空）<input id="library-parent" maxlength="90" placeholder="例如：上汽集团"/></label>
             <label>企业自己的招聘入口（可空）<input id="library-url" type="url" placeholder="https://企业招聘官网"/></label>
           </div><button type="button" class="button-primary" id="library-save">保存企业</button>
           <h2>批量收录（最多100家 / 次）</h2>
-          <p>每行格式：企业名称,招聘网址,行业馆,上级集团（可空）。没有独立招聘网址的子公司，第二列留空。</p>
+          <p>每行格式：企业名称,招聘网址,行业馆,上级集团（可空）。可分馆分批导入；同一企业在不同馆出现会合并为多标签。没有独立招聘网址的子公司，第二列留空。</p>
           <textarea id="library-bulk" spellcheck="false" placeholder="企业A,https://careers.example.com,汽车馆,某集团&#10;企业B,,汽车馆,某集团" aria-label="批量导入企业名单"></textarea>
           <button type="button" class="button-primary" id="library-import">批量入库</button>
         </div>
