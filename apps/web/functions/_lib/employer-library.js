@@ -24,6 +24,10 @@ export function normalizeEmployerInput(raw){
  if(parent_name&&employerKey(parent_name)===employerKey(name))throw Error('INVALID_EMPLOYER_PARENT');
  const aliases=Array.isArray(raw.aliases)?[...new Set(raw.aliases.map(x=>clean(x,90)).filter(Boolean))].slice(0,10):[];
  if(raw.aliases!==undefined&&!Array.isArray(raw.aliases))throw Error('INVALID_EMPLOYER_ALIASES');
+ const related_hall_ids=raw.related_hall_ids===undefined?[]:raw.related_hall_ids;
+ if(!Array.isArray(related_hall_ids)||related_hall_ids.length>16||
+    related_hall_ids.some(id=>typeof id!=='string'||!HALL_IDS.has(id)))
+  throw Error('INVALID_RELATED_HALLS');
  const portals=[];
  const sources=Array.isArray(raw.portals)?raw.portals:[];
  if(!Array.isArray(raw.portals)&&raw.portals!==undefined)throw Error('INVALID_EMPLOYER_PORTALS');
@@ -36,23 +40,36 @@ export function normalizeEmployerInput(raw){
    scope:'employer_portal',status:'collected_unverified',reviewed_on:null
   });
  }
- return {id:employerKey(name),name,industry_id,parent_name,relation:clean(raw.relation,60)||null,
+ return {id:employerKey(name),name,industry_id,
+  related_hall_ids:[...new Set(related_hall_ids)].filter(id=>id!==industry_id),
+  parent_name,relation:clean(raw.relation,60)||null,
   aliases,portals,source_datasets:['admin_import'],updated_at:new Date().toISOString()};
+}
+// Importing a company again under another hall ADDS a classification; it must
+// never destroy its original hall, previously audited URLs or prior import batch.
+// Primary-hall reassignment is a separate audited operation, not an implicit upsert.
+export function mergeEmployerRecord(former,item){
+ if(!former)return item;
+ if(employerKey(former.name)!==item.id)throw Error('EMPLOYER_ID_MISMATCH');
+ const primary=HALL_IDS.has(former.industry_id)?former.industry_id:item.industry_id;
+ const related=[former.industry_id,item.industry_id,...(former.related_hall_ids||[]),...(item.related_hall_ids||[])]
+  .filter(id=>id!==primary&&HALL_IDS.has(id));
+ const portals=[...(former.portals||[])];
+ for(const portal of item.portals||[]){
+  // Preserve verified review and exact source evidence on URL collisions.
+  if(!portals.some(p=>p.url===portal.url))portals.push(portal);
+ }
+ return {...former,...item,id:former.id||item.id,name:former.name,
+  industry_id:primary,related_hall_ids:[...new Set(related)],
+  parent_name:item.parent_name||former.parent_name||null,
+  relation:item.relation||former.relation||null,
+  aliases:[...new Set([...(former.aliases||[]),...(item.aliases||[])])],
+  portals,source_datasets:[...new Set([...(former.source_datasets||[]),...(item.source_datasets||[])])] };
 }
 function overlay(base,custom){
  const map=new Map(base.map(x=>[employerKey(x.name),x]));
  for(const item of custom){
-  const former=map.get(item.id);
-  if(!former){map.set(item.id,item);continue;}
-  const portals=[...former.portals||[]];
-  for(const portal of item.portals||[]){
-   if(!portals.some(p=>p.url===portal.url))portals.push(portal);
-  }
-  map.set(item.id,{...former,...item,
-   parent_name:item.parent_name||former.parent_name||null,
-   relation:item.relation||former.relation||null,
-   aliases:[...new Set([...(former.aliases||[]),...(item.aliases||[])])],
-   portals,source_datasets:[...new Set([...(former.source_datasets||[]),...(item.source_datasets||[])])]});
+  map.set(item.id,mergeEmployerRecord(map.get(item.id),item));
  }
  return [...map.values()].filter(x=>!x.archived).sort((a,b)=>a.name.localeCompare(b.name,'zh-CN'));
 }
@@ -95,26 +112,36 @@ const roleHalls=[
  ['education-research',/培训|教育机构|教育科技|教研/i]
 ];
 export function employerSearchHints(library,resume,roleHint='',max=2){
- if(!Array.isArray(library)||!library.length)return [];
- const context=clean(roleHint,90)+' '+clean(resume,1800);
+ if(!Array.isArray(library)||!library.length||!Number.isInteger(max)||max<1)return [];
+ const wanted=clean(roleHint,90).toLowerCase(),experience=clean(resume,1800).toLowerCase();
+ const hall=roleHalls.find(([,re])=>re.test(wanted))?.[0]||
+  roleHalls.find(([,re])=>re.test(experience))?.[0];
  const usable=p=>(p.scope==='employer_portal'||p.scope==='search_candidate')&&portalUrl(p.url);
- const eligible=x=>x.portals?.some(usable);
- const explicit=library.filter(x=>[x.name,...(x.aliases||[])].some(n=>n.length>=3&&context.includes(n)))
-  .filter(eligible);
- const hall=roleHalls.find(([,pattern])=>pattern.test(clean(roleHint,90)))?.[0]||
-  roleHalls.find(([,pattern])=>pattern.test(clean(resume,700)))?.[0];
- const sector=hall?library.filter(x=>(x.industry_id===hall||x.related_hall_ids?.includes(hall))&&eligible(x)):[];
- const candidates=[...explicit,...sector];
- const result=[],seen=new Set();
- for(const item of candidates){
-  const p=item.portals.find(usable);
-  if(!p||seen.has(item.id))continue;
-  seen.add(item.id);
-  const hostname=new URL(p.url).hostname;
-  // A candidate portal is a domain search hint ONLY, not a trusted employer or vacancy.
-  // Group-shared candidate / discovery-only URLs are never selected here.
-  result.push((clean(roleHint,50)||'招聘岗位')+' '+item.name+' site:'+hostname+' 岗位 职位 中国大陆');
-  if(result.length>=max)break;
+ const ranked=[];
+ for(const item of library){
+  if(!item?.name||!Array.isArray(item.portals))continue;
+  const options=item.portals.filter(usable).sort((a,b)=>
+   Number(b.status==='legacy_reviewed')-Number(a.status==='legacy_reviewed'));
+  if(!options.length)continue;
+  const names=[item.name,...(item.aliases||[])].map(x=>String(x).toLowerCase());
+  const inHint=names.some(n=>n.length>=2&&wanted.includes(n));
+  const inResume=names.some(n=>n.length>=3&&experience.includes(n));
+  const inHall=hall&&(item.industry_id===hall||item.related_hall_ids?.includes(hall));
+  if(!inHint&&!inResume&&!inHall)continue;
+  ranked.push({item,portal:options[0],
+   score:(inHint?200:0)+(inResume?80:0)+(inHall?40:0)+
+    (options[0].status==='legacy_reviewed'?20:0)});
  }
- return result;
+ ranked.sort((a,b)=>b.score-a.score||a.item.name.localeCompare(b.item.name,'zh-CN'));
+ const hints=[],domains=new Set();
+ for(const {item,portal} of ranked){
+  const hostname=new URL(portal.url).hostname;
+  if(domains.has(hostname))continue;
+  domains.add(hostname);
+  // Search hint only: Search and subsequent JD checking establish the vacancy.
+  // Never output this portal as a job link or a verified job opening.
+  hints.push((clean(roleHint,50)||'招聘岗位')+' '+item.name+' site:'+hostname+' 岗位 职位 中国大陆');
+  if(hints.length>=max)break;
+ }
+ return hints;
 }
