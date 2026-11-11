@@ -23,7 +23,7 @@
 
 ## DeepSeek 搜索策略
 
-新索引优先匹配岗位方向、简历中明确的企业及历史审过的站点，选取不同域名；只改变搜索查询的 **最多两个站点提示**，保留至少两个普通全网查询，每次总数不超过4次；必须依赖 DeepSeek Search 返回真实单岗位详情 URL 及证据，不能把门户首页当成岗位。无索引、目录请求失败或匹配不到行业时，继续普通全网搜索。仅 \`employer_portal\` / \`search_candidate\` HTTPS 可作为提示，\`group_shared_candidate\` / \`discovery_candidate\` 不得当作某个子公司的独立招聘入口。
+新索引优先匹配岗位方向、简历中明确的企业及历史审过的站点，选取不同域名；只改变搜索查询的 **最多两个站点提示**，保留至少两个普通全网查询，每次总数不超过4次；必须依赖 DeepSeek Search 返回真实单岗位详情 URL 及证据，不能把门户首页当成岗位。无索引、目录请求失败或匹配不到行业时，继续普通全网搜索。仅 \`employer_portal\` / \`search_candidate\` HTTPS 可作为提示，\`group_shared_candidate\` / \`discovery_candidate\` 只可在简历明确提到该子公司时作为集团招聘平台搜索提示，不得宣称是子公司独立入口。
 
 ## 部署前必须完成
 
