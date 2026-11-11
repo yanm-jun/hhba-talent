@@ -1,0 +1,2929 @@
+{
+  "schema": "HHBA_CAREER_LIBRARY_V1",
+  "versionDate": "2026-11-11T10:52:59.639Z",
+  "majorCatalog": "MOE-2026_PARTIAL_56",
+  "disclaimer": "行业馆和关联专业只是搜索导航，不证明实时岗位在招，也不代替岗位准入条件审查",
+  "employers": [
+    {
+      "id": "hhba-official-b02-01-20261111",
+      "name": "比亚迪",
+      "primary": "automotive",
+      "additional": [
+        "energy",
+        "electronics"
+      ],
+      "auto_section": "auto-whole",
+      "industry_tags": [
+        "automotive",
+        "energy",
+        "semiconductors",
+        "industrial-manufacturing"
+      ],
+      "business_tags": [
+        "automotive-electronics",
+        "hardware-rd",
+        "industrial-control",
+        "ai-data"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b02-02-20261111",
+      "name": "小米",
+      "primary": "electronics",
+      "additional": [
+        "automotive",
+        "internet"
+      ],
+      "auto_section": "auto-ev",
+      "industry_tags": [
+        "consumer-retail",
+        "automotive",
+        "software-internet",
+        "industrial-manufacturing",
+        "semiconductors"
+      ],
+      "business_tags": [
+        "consumer-products",
+        "ai-data",
+        "hardware-rd"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b02-03-20261111",
+      "name": "京东",
+      "primary": "internet",
+      "additional": [
+        "consumer",
+        "logistics"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "consumer-retail",
+        "logistics",
+        "software-internet"
+      ],
+      "business_tags": [
+        "consumer-products",
+        "enterprise-services",
+        "ai-data"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b02-04-20261111",
+      "name": "百度",
+      "primary": "internet",
+      "additional": [
+        "automotive"
+      ],
+      "auto_section": "auto-adas",
+      "industry_tags": [
+        "software-internet",
+        "automotive"
+      ],
+      "business_tags": [
+        "ai-data",
+        "enterprise-services"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b02-05-20261111",
+      "name": "字节跳动",
+      "primary": "internet",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "software-internet",
+        "media-content"
+      ],
+      "business_tags": [
+        "ai-data",
+        "digital-marketing"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b02-06-20261111",
+      "name": "宁德时代",
+      "primary": "energy",
+      "additional": [
+        "automotive"
+      ],
+      "auto_section": "auto-battery",
+      "industry_tags": [
+        "energy",
+        "automotive",
+        "industrial-manufacturing"
+      ],
+      "business_tags": [
+        "research",
+        "hardware-rd"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b02-07-20261111",
+      "name": "大疆创新",
+      "primary": "machinery",
+      "additional": [
+        "electronics",
+        "internet"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "industrial-manufacturing",
+        "consumer-retail",
+        "software-internet"
+      ],
+      "business_tags": [
+        "hardware-rd",
+        "ai-data",
+        "research"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b02-08-20261111",
+      "name": "美的集团",
+      "primary": "electronics",
+      "additional": [
+        "machinery",
+        "consumer"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "industrial-manufacturing",
+        "consumer-retail"
+      ],
+      "business_tags": [
+        "consumer-products",
+        "industrial-control"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b02-09-20261111",
+      "name": "顺丰",
+      "primary": "logistics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "logistics"
+      ],
+      "business_tags": [
+        "ai-data",
+        "enterprise-services"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b02-10-20261111",
+      "name": "中国平安",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "finance"
+      ],
+      "business_tags": [
+        "financial-services",
+        "ai-data"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b02-11-20261111",
+      "name": "中国工商银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "finance"
+      ],
+      "business_tags": [
+        "financial-services"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b02-12-20261111",
+      "name": "国家电网",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "energy"
+      ],
+      "business_tags": [
+        "research"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b02-13-20261111",
+      "name": "京东方",
+      "primary": "semiconductors",
+      "additional": [
+        "electronics"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "semiconductors",
+        "industrial-manufacturing"
+      ],
+      "business_tags": [
+        "hardware-rd",
+        "research"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b02-14-20261111",
+      "name": "迈瑞医疗",
+      "primary": "healthcare",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "healthcare",
+        "industrial-manufacturing"
+      ],
+      "business_tags": [
+        "hardware-rd",
+        "research"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b03-01-20261111",
+      "name": "OPPO",
+      "primary": "electronics",
+      "additional": [
+        "internet"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "consumer-retail",
+        "industrial-manufacturing",
+        "software-internet"
+      ],
+      "business_tags": [
+        "consumer-products",
+        "hardware-rd",
+        "ai-data",
+        "research"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b03-02-20261111",
+      "name": "vivo",
+      "primary": "electronics",
+      "additional": [
+        "internet"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "consumer-retail",
+        "industrial-manufacturing",
+        "software-internet"
+      ],
+      "business_tags": [
+        "consumer-products",
+        "hardware-rd",
+        "research"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b03-03-20261111",
+      "name": "中兴通讯",
+      "primary": "electronics",
+      "additional": [
+        "semiconductors"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "telecommunications",
+        "software-internet",
+        "semiconductors"
+      ],
+      "business_tags": [
+        "telecom-networks",
+        "ai-data",
+        "hardware-rd",
+        "research"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b03-04-20261111",
+      "name": "海康威视",
+      "primary": "electronics",
+      "additional": [
+        "internet",
+        "automotive"
+      ],
+      "auto_section": "auto-adas",
+      "industry_tags": [
+        "industrial-manufacturing",
+        "software-internet",
+        "automotive"
+      ],
+      "business_tags": [
+        "industrial-control",
+        "hardware-rd",
+        "ai-data"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b03-05-20261111",
+      "name": "招商银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "finance"
+      ],
+      "business_tags": [
+        "financial-services",
+        "ai-data"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b03-06-20261111",
+      "name": "中国电信",
+      "primary": "electronics",
+      "additional": [
+        "internet"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "telecommunications",
+        "software-internet"
+      ],
+      "business_tags": [
+        "telecom-networks",
+        "enterprise-services",
+        "ai-data"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b03-07-20261111",
+      "name": "国家能源集团",
+      "primary": "energy",
+      "additional": [
+        "logistics"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "energy",
+        "industrial-manufacturing",
+        "logistics"
+      ],
+      "business_tags": [
+        "research",
+        "financial-services"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-01-20261111",
+      "name": "阿里巴巴",
+      "primary": "internet",
+      "additional": [
+        "consumer"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "互联网与云计算",
+        "互联网",
+        "云计算"
+      ],
+      "business_tags": [
+        "电商",
+        "人工智能",
+        "本地生活"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-02-20261111",
+      "name": "联想集团",
+      "primary": "electronics",
+      "additional": [
+        "internet"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "计算机及智能设备",
+        "计算机硬件",
+        "科技制造"
+      ],
+      "business_tags": [
+        "PC",
+        "服务器",
+        "人工智能"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-03-20261111",
+      "name": "中国移动",
+      "primary": "electronics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "通信运营",
+        "通信"
+      ],
+      "business_tags": [
+        "移动通信",
+        "算力",
+        "云服务"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-04-20261111",
+      "name": "中国联通",
+      "primary": "electronics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "通信"
+      ],
+      "business_tags": [
+        "宽带网络",
+        "云计算"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-05-20261111",
+      "name": "海信集团",
+      "primary": "electronics",
+      "additional": [
+        "automotive"
+      ],
+      "auto_section": "auto-electronics",
+      "industry_tags": [
+        "智能制造与消费电子",
+        "消费电子",
+        "智能制造"
+      ],
+      "business_tags": [
+        "显示",
+        "家电",
+        "汽车电子"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-06-20261111",
+      "name": "TCL集团招聘体系",
+      "primary": "electronics",
+      "additional": [
+        "energy"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "消费电子与显示",
+        "消费电子",
+        "半导体显示"
+      ],
+      "business_tags": [
+        "光伏",
+        "智能终端",
+        "智能制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-07-20261111",
+      "name": "科大讯飞",
+      "primary": "internet",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "人工智能"
+      ],
+      "business_tags": [
+        "智能语音",
+        "大模型",
+        "教育科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-08-20261111",
+      "name": "安克创新",
+      "primary": "electronics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "消费电子",
+        "消费电子"
+      ],
+      "business_tags": [
+        "智能硬件",
+        "充电设备",
+        "跨境品牌"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-09-20261111",
+      "name": "中国石油",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "能源与石油化工",
+        "能源",
+        "石油化工"
+      ],
+      "business_tags": [
+        "油气勘探",
+        "炼化",
+        "能源工程"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-10-20261111",
+      "name": "中国石化",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "能源与石油化工",
+        "能源",
+        "石油化工"
+      ],
+      "business_tags": [
+        "炼油",
+        "化工",
+        "新能源"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-11-20261111",
+      "name": "中国海油",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "能源"
+      ],
+      "business_tags": [
+        "海洋油气",
+        "油气开发"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-12-20261111",
+      "name": "中国建筑集团",
+      "primary": "construction",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "建筑工程"
+      ],
+      "business_tags": [
+        "基建",
+        "工程设计",
+        "地产"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-13-20261111",
+      "name": "中国中车集团",
+      "primary": "aerospace",
+      "additional": [
+        "machinery"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "轨道交通"
+      ],
+      "business_tags": [
+        "轨道车辆",
+        "高端制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-14-20261111",
+      "name": "上汽集团",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-whole",
+      "industry_tags": [
+        "汽车制造"
+      ],
+      "business_tags": [
+        "整车",
+        "零部件",
+        "智能网联"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-15-20261111",
+      "name": "广汽集团",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-whole",
+      "industry_tags": [
+        "汽车制造"
+      ],
+      "business_tags": [
+        "整车",
+        "新能源",
+        "产业金融"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-16-20261111",
+      "name": "长安汽车",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-ev",
+      "industry_tags": [
+        "汽车制造"
+      ],
+      "business_tags": [
+        "智能驾驶",
+        "新能源"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-17-20261111",
+      "name": "长城汽车",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-whole",
+      "industry_tags": [
+        "汽车制造",
+        "汽车"
+      ],
+      "business_tags": [
+        "整车",
+        "新能源",
+        "智能驾驶"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-18-20261111",
+      "name": "三一集团",
+      "primary": "machinery",
+      "additional": [
+        "energy"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "工程机械"
+      ],
+      "business_tags": [
+        "高端装备",
+        "新能源",
+        "风电"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-19-20261111",
+      "name": "潍柴集团",
+      "primary": "machinery",
+      "additional": [
+        "automotive"
+      ],
+      "auto_section": "auto-parts",
+      "industry_tags": [
+        "高端制造"
+      ],
+      "business_tags": [
+        "动力系统",
+        "重卡",
+        "农机"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-20-20261111",
+      "name": "格力电器",
+      "primary": "electronics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "家电制造"
+      ],
+      "business_tags": [
+        "空调",
+        "智能制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-21-20261111",
+      "name": "福耀集团",
+      "primary": "automotive",
+      "additional": [
+        "machinery"
+      ],
+      "auto_section": "auto-parts",
+      "industry_tags": [
+        "汽车零部件",
+        "汽车零部件"
+      ],
+      "business_tags": [
+        "汽车玻璃",
+        "制造",
+        "材料"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-22-20261111",
+      "name": "德赛西威",
+      "primary": "automotive",
+      "additional": [
+        "electronics"
+      ],
+      "auto_section": "auto-electronics",
+      "industry_tags": [
+        "汽车电子"
+      ],
+      "business_tags": [
+        "智能座舱",
+        "智能驾驶"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-23-20261111",
+      "name": "歌尔股份",
+      "primary": "electronics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "消费电子"
+      ],
+      "business_tags": [
+        "声学",
+        "VR",
+        "精密制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-24-20261111",
+      "name": "立讯精密",
+      "primary": "electronics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "电子制造"
+      ],
+      "business_tags": [
+        "精密连接",
+        "智能终端"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-25-20261111",
+      "name": "隆基绿能",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "新能源"
+      ],
+      "business_tags": [
+        "光伏",
+        "硅片",
+        "储能"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-26-20261111",
+      "name": "阳光电源",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "新能源与电力电子",
+        "新能源",
+        "电力电子"
+      ],
+      "business_tags": [
+        "光伏逆变器",
+        "储能"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-27-20261111",
+      "name": "亿纬锂能",
+      "primary": "energy",
+      "additional": [
+        "automotive"
+      ],
+      "auto_section": "auto-battery",
+      "industry_tags": [
+        "新能源"
+      ],
+      "business_tags": [
+        "锂电池",
+        "储能"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-28-20261111",
+      "name": "欣旺达",
+      "primary": "energy",
+      "additional": [
+        "automotive"
+      ],
+      "auto_section": "auto-battery",
+      "industry_tags": [
+        "新能源"
+      ],
+      "business_tags": [
+        "电池",
+        "储能",
+        "智能制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-29-20261111",
+      "name": "北方华创",
+      "primary": "semiconductors",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "半导体设备",
+        "半导体",
+        "高端制造"
+      ],
+      "business_tags": [
+        "半导体设备",
+        "刻蚀",
+        "薄膜沉积"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-30-20261111",
+      "name": "汇川技术",
+      "primary": "machinery",
+      "additional": [
+        "automotive",
+        "internet"
+      ],
+      "auto_section": "auto-manufacturing",
+      "industry_tags": [
+        "工业自动化",
+        "智能制造",
+        "工业自动化"
+      ],
+      "business_tags": [
+        "运动控制",
+        "工业软件",
+        "人工智能"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-31-20261111",
+      "name": "海康机器人",
+      "primary": "machinery",
+      "additional": [
+        "electronics"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "机器人与机器视觉",
+        "机器人",
+        "智能制造"
+      ],
+      "business_tags": [
+        "机器视觉",
+        "移动机器人",
+        "工业自动化"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-32-20261111",
+      "name": "兆易创新",
+      "primary": "semiconductors",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "半导体"
+      ],
+      "business_tags": [
+        "存储芯片",
+        "微控制器"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-33-20261111",
+      "name": "药明康德",
+      "primary": "healthcare",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "医药研发"
+      ],
+      "business_tags": [
+        "CRDMO",
+        "药物研发"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-34-20261111",
+      "name": "爱尔眼科",
+      "primary": "healthcare",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "医疗服务",
+        "医疗健康"
+      ],
+      "business_tags": [
+        "眼科医疗",
+        "医院管理"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-35-20261111",
+      "name": "中国农业银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融",
+        "银行金融"
+      ],
+      "business_tags": [
+        "零售银行",
+        "企业金融",
+        "金融科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-36-20261111",
+      "name": "中国建设银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融",
+        "银行金融"
+      ],
+      "business_tags": [
+        "零售银行",
+        "企业金融",
+        "金融科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-37-20261111",
+      "name": "中国银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融"
+      ],
+      "business_tags": [
+        "商业银行",
+        "国际金融"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-38-20261111",
+      "name": "交通银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融",
+        "银行金融"
+      ],
+      "business_tags": [
+        "零售银行",
+        "企业金融",
+        "金融科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-39-20261111",
+      "name": "兴业银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融",
+        "银行金融"
+      ],
+      "business_tags": [
+        "商业银行",
+        "金融科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-40-20261111",
+      "name": "中信银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融",
+        "银行金融"
+      ],
+      "business_tags": [
+        "零售银行",
+        "企业金融"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-41-20261111",
+      "name": "浦发银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融",
+        "银行金融"
+      ],
+      "business_tags": [
+        "商业银行",
+        "金融科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-42-20261111",
+      "name": "广发证券",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "证券金融",
+        "证券金融"
+      ],
+      "business_tags": [
+        "财富管理",
+        "投行业务"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-43-20261111",
+      "name": "中信证券",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "证券金融",
+        "证券金融"
+      ],
+      "business_tags": [
+        "投资银行",
+        "财富管理",
+        "金融科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-44-20261111",
+      "name": "中国人寿集团",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "保险金融"
+      ],
+      "business_tags": [
+        "寿险",
+        "财险",
+        "资管"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-45-20261111",
+      "name": "茅台集团",
+      "primary": "consumer",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "食品饮料"
+      ],
+      "business_tags": [
+        "白酒",
+        "制造",
+        "营销"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-46-20261111",
+      "name": "伊利集团",
+      "primary": "consumer",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "食品饮料"
+      ],
+      "business_tags": [
+        "乳品",
+        "食品制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-47-20261111",
+      "name": "海天味业",
+      "primary": "consumer",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "食品制造"
+      ],
+      "business_tags": [
+        "调味品",
+        "品牌营销"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-48-20261111",
+      "name": "牧原股份",
+      "primary": "agriculture",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "农业食品"
+      ],
+      "business_tags": [
+        "生猪养殖",
+        "数字农业"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-49-20261111",
+      "name": "中国邮政集团",
+      "primary": "logistics",
+      "additional": [
+        "finance"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "物流快递"
+      ],
+      "business_tags": [
+        "邮政",
+        "快递",
+        "邮政金融"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b04-50-20261111",
+      "name": "中国宝武集团（宝钢股份专场）",
+      "primary": "machinery",
+      "additional": [
+        "automotive"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "钢铁冶金"
+      ],
+      "business_tags": [
+        "宝钢股份",
+        "钢铁制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-01-20261111",
+      "name": "网易",
+      "primary": "internet",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "互联网服务"
+      ],
+      "business_tags": [
+        "游戏",
+        "内容",
+        "互联网技术"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-02-20261111",
+      "name": "中通快递",
+      "primary": "logistics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "物流快递"
+      ],
+      "business_tags": [
+        "快递网络",
+        "智能物流",
+        "供应链"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-03-20261111",
+      "name": "哔哩哔哩",
+      "primary": "media",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "互联网内容"
+      ],
+      "business_tags": [
+        "视频社区",
+        "游戏",
+        "广告"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-04-20261111",
+      "name": "携程集团",
+      "primary": "media",
+      "additional": [
+        "internet"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "旅游科技"
+      ],
+      "business_tags": [
+        "旅行服务",
+        "酒店",
+        "机票"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-05-20261111",
+      "name": "蚂蚁集团",
+      "primary": "finance",
+      "additional": [
+        "internet"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "金融科技"
+      ],
+      "business_tags": [
+        "数字支付",
+        "信贷科技",
+        "AI"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-06-20261111",
+      "name": "小红书",
+      "primary": "internet",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "互联网平台"
+      ],
+      "business_tags": [
+        "社区",
+        "内容",
+        "电商"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-07-20261111",
+      "name": "SHEIN",
+      "primary": "consumer",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "跨境电商"
+      ],
+      "business_tags": [
+        "快时尚",
+        "全球电商",
+        "供应链"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-08-20261111",
+      "name": "月之暗面",
+      "primary": "internet",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "人工智能"
+      ],
+      "business_tags": [
+        "大模型",
+        "AI助手",
+        "AI产品"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-09-20261111",
+      "name": "MiniMax",
+      "primary": "internet",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "人工智能"
+      ],
+      "business_tags": [
+        "大模型",
+        "多模态",
+        "AI产品"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-10-20261111",
+      "name": "得物",
+      "primary": "consumer",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "互联网零售"
+      ],
+      "business_tags": [
+        "消费平台",
+        "商品鉴别",
+        "电商"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-11-20261111",
+      "name": "菜鸟集团",
+      "primary": "logistics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "物流科技"
+      ],
+      "business_tags": [
+        "仓储",
+        "跨境物流",
+        "供应链"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-12-20261111",
+      "name": "恒瑞医药",
+      "primary": "healthcare",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "生物医药"
+      ],
+      "business_tags": [
+        "创新药",
+        "临床研究",
+        "药品研发"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-13-20261111",
+      "name": "万科集团",
+      "primary": "construction",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "地产与城市服务"
+      ],
+      "business_tags": [
+        "物业",
+        "开发",
+        "城市服务"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-14-20261111",
+      "name": "韵达股份",
+      "primary": "logistics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "物流快递"
+      ],
+      "business_tags": [
+        "快递网络",
+        "供应链"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-15-20261111",
+      "name": "中国中免",
+      "primary": "consumer",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "免税零售"
+      ],
+      "business_tags": [
+        "免税",
+        "零售",
+        "旅游商业"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-16-20261111",
+      "name": "分众传媒",
+      "primary": "media",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "广告传媒"
+      ],
+      "business_tags": [
+        "数字广告",
+        "品牌营销"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-17-20261111",
+      "name": "五粮液集团",
+      "primary": "consumer",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "食品饮料"
+      ],
+      "business_tags": [
+        "白酒",
+        "食品制造",
+        "供应链"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-18-20261111",
+      "name": "吉利汽车集团",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-ev",
+      "industry_tags": [
+        "汽车制造"
+      ],
+      "business_tags": [
+        "新能源车",
+        "研发",
+        "智能驾驶"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-19-20261111",
+      "name": "理想汽车",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-ev",
+      "industry_tags": [
+        "新能源汽车"
+      ],
+      "business_tags": [
+        "整车",
+        "智能驾驶",
+        "研发"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-20-20261111",
+      "name": "蔚来汽车",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-ev",
+      "industry_tags": [
+        "新能源汽车"
+      ],
+      "business_tags": [
+        "整车",
+        "智能驾驶",
+        "能源服务"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-21-20261111",
+      "name": "小鹏汽车",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-adas",
+      "industry_tags": [
+        "新能源汽车"
+      ],
+      "business_tags": [
+        "智能驾驶",
+        "整车",
+        "AI"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-22-20261111",
+      "name": "中国商飞",
+      "primary": "aerospace",
+      "additional": [
+        "machinery"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "航空航天"
+      ],
+      "business_tags": [
+        "民用飞机",
+        "航空研发",
+        "制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-23-20261111",
+      "name": "上海机场集团",
+      "primary": "logistics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "交通运输"
+      ],
+      "business_tags": [
+        "机场运营",
+        "物流",
+        "航空服务"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-24-20261111",
+      "name": "深圳地铁集团",
+      "primary": "logistics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "轨道交通"
+      ],
+      "business_tags": [
+        "地铁",
+        "城市运营",
+        "工程建设"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-25-20261111",
+      "name": "广东粤海控股集团",
+      "primary": "diversified",
+      "additional": [
+        "energy",
+        "construction"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "综合国企"
+      ],
+      "business_tags": [
+        "水务",
+        "地产",
+        "基础设施"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-26-20261111",
+      "name": "北京首旅集团",
+      "primary": "media",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "旅游酒店"
+      ],
+      "business_tags": [
+        "酒店",
+        "文旅",
+        "零售"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-27-20261111",
+      "name": "江苏交通控股",
+      "primary": "logistics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "交通基础设施"
+      ],
+      "business_tags": [
+        "高速公路",
+        "交通科技",
+        "投资"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-28-20261111",
+      "name": "浙江省交通投资集团",
+      "primary": "logistics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "交通基础设施"
+      ],
+      "business_tags": [
+        "道路",
+        "物流",
+        "金融"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-29-20261111",
+      "name": "山东高速集团",
+      "primary": "logistics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "交通基础设施"
+      ],
+      "business_tags": [
+        "高速公路",
+        "物流",
+        "工程"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-30-20261111",
+      "name": "重庆渝富控股集团",
+      "primary": "diversified",
+      "additional": [
+        "finance"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "地方国企"
+      ],
+      "business_tags": [
+        "投资控股",
+        "产业金融"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-31-20261111",
+      "name": "深圳市投资控股",
+      "primary": "diversified",
+      "additional": [
+        "finance"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "地方国企"
+      ],
+      "business_tags": [
+        "产业投资",
+        "园区",
+        "科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-32-20261111",
+      "name": "思源电气",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "电力设备"
+      ],
+      "business_tags": [
+        "输配电",
+        "新能源",
+        "智能电网"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-33-20261111",
+      "name": "雷赛智能",
+      "primary": "machinery",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "工业自动化"
+      ],
+      "business_tags": [
+        "运动控制",
+        "机器人",
+        "驱动"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-34-20261111",
+      "name": "英威腾",
+      "primary": "machinery",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "工业自动化"
+      ],
+      "business_tags": [
+        "变频器",
+        "新能源",
+        "工控"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-35-20261111",
+      "name": "华域汽车集团",
+      "primary": "automotive",
+      "additional": [
+        "machinery"
+      ],
+      "auto_section": "auto-parts",
+      "industry_tags": [
+        "汽车零部件"
+      ],
+      "business_tags": [
+        "车身",
+        "底盘",
+        "智能汽车"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-36-20261111",
+      "name": "平高电气",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "电力设备"
+      ],
+      "business_tags": [
+        "输配电",
+        "开关电器"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-37-20261111",
+      "name": "许继电气",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "电力设备"
+      ],
+      "business_tags": [
+        "智能电网",
+        "能源控制"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-38-20261111",
+      "name": "智飞生物",
+      "primary": "healthcare",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "生物医药"
+      ],
+      "business_tags": [
+        "疫苗",
+        "研发",
+        "生产"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-39-20261111",
+      "name": "拓斯达",
+      "primary": "machinery",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "智能制造"
+      ],
+      "business_tags": [
+        "工业机器人",
+        "自动化",
+        "设备"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-40-20261111",
+      "name": "华润集团",
+      "primary": "diversified",
+      "additional": [
+        "healthcare",
+        "consumer",
+        "energy",
+        "construction"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "综合央企"
+      ],
+      "business_tags": [
+        "医药",
+        "消费",
+        "能源",
+        "地产"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-41-20261111",
+      "name": "南瑞集团",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "电力科技"
+      ],
+      "business_tags": [
+        "电力系统",
+        "储能",
+        "工控"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-42-20261111",
+      "name": "江淮汽车",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-whole",
+      "industry_tags": [
+        "汽车制造"
+      ],
+      "business_tags": [
+        "整车",
+        "商用车",
+        "新能源"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-43-20261111",
+      "name": "中芯国际",
+      "primary": "semiconductors",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "半导体制造"
+      ],
+      "business_tags": [
+        "晶圆代工",
+        "芯片",
+        "工艺研发"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-44-20261111",
+      "name": "零跑汽车",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-ev",
+      "industry_tags": [
+        "新能源汽车"
+      ],
+      "business_tags": [
+        "整车",
+        "智能驾驶",
+        "研发"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-45-20261111",
+      "name": "快手",
+      "primary": "media",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "互联网内容"
+      ],
+      "business_tags": [
+        "短视频",
+        "直播",
+        "电商"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-46-20261111",
+      "name": "徐工集团",
+      "primary": "machinery",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "工程机械"
+      ],
+      "business_tags": [
+        "高端装备",
+        "机械研发"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-47-20261111",
+      "name": "奇瑞汽车",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-whole",
+      "industry_tags": [
+        "汽车制造"
+      ],
+      "business_tags": [
+        "整车",
+        "新能源",
+        "智能驾驶"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-48-20261111",
+      "name": "招商局集团",
+      "primary": "diversified",
+      "additional": [
+        "logistics",
+        "finance"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "综合央企"
+      ],
+      "business_tags": [
+        "交通物流",
+        "金融",
+        "产业园区"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-49-20261111",
+      "name": "中国核工业集团",
+      "primary": "energy",
+      "additional": [
+        "machinery"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "核能与工程"
+      ],
+      "business_tags": [
+        "核电",
+        "核工程",
+        "新能源"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b05-50-20261111",
+      "name": "北京建工集团",
+      "primary": "construction",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "建筑工程"
+      ],
+      "business_tags": [
+        "城市建设",
+        "基建",
+        "工程"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-01-20261111",
+      "name": "荣耀",
+      "primary": "electronics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "消费电子"
+      ],
+      "business_tags": [
+        "智能手机",
+        "AI终端"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-02-20261111",
+      "name": "360集团",
+      "primary": "internet",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "互联网安全"
+      ],
+      "business_tags": [
+        "网络安全",
+        "人工智能"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-03-20261111",
+      "name": "商汤科技",
+      "primary": "internet",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "人工智能"
+      ],
+      "business_tags": [
+        "计算机视觉",
+        "大模型"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-04-20261111",
+      "name": "传音控股",
+      "primary": "electronics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "消费电子"
+      ],
+      "business_tags": [
+        "智能终端",
+        "全球移动设备"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-05-20261111",
+      "name": "用友网络",
+      "primary": "internet",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "企业软件"
+      ],
+      "business_tags": [
+        "ERP",
+        "SaaS",
+        "企业数字化"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-06-20261111",
+      "name": "东风汽车集团",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-whole",
+      "industry_tags": [
+        "汽车制造"
+      ],
+      "business_tags": [
+        "整车",
+        "新能源车"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-07-20261111",
+      "name": "中集集团",
+      "primary": "machinery",
+      "additional": [
+        "logistics"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "高端制造"
+      ],
+      "business_tags": [
+        "物流装备",
+        "智能制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-08-20261111",
+      "name": "东风日产",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-whole",
+      "industry_tags": [
+        "汽车制造"
+      ],
+      "business_tags": [
+        "整车",
+        "汽车电子"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-09-20261111",
+      "name": "广汽丰田",
+      "primary": "automotive",
+      "additional": [],
+      "auto_section": "auto-whole",
+      "industry_tags": [
+        "汽车制造"
+      ],
+      "business_tags": [
+        "整车",
+        "汽车零部件"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-10-20261111",
+      "name": "安踏集团",
+      "primary": "consumer",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "体育服饰"
+      ],
+      "business_tags": [
+        "体育用品",
+        "零售"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-11-20261111",
+      "name": "李宁集团",
+      "primary": "consumer",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "体育服饰"
+      ],
+      "business_tags": [
+        "体育用品",
+        "零售"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-12-20261111",
+      "name": "欧派家居",
+      "primary": "consumer",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "家居制造"
+      ],
+      "business_tags": [
+        "定制家居",
+        "零售"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-13-20261111",
+      "name": "奥克斯集团",
+      "primary": "electronics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "智能制造"
+      ],
+      "business_tags": [
+        "空调",
+        "新能源",
+        "医疗"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-14-20261111",
+      "name": "苏泊尔",
+      "primary": "electronics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "家电制造"
+      ],
+      "business_tags": [
+        "厨具",
+        "小家电"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-15-20261111",
+      "name": "老板电器",
+      "primary": "electronics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "家电制造"
+      ],
+      "business_tags": [
+        "厨房电器",
+        "智能家居"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-16-20261111",
+      "name": "渤海银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融"
+      ],
+      "business_tags": [
+        "商业银行",
+        "金融科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-17-20261111",
+      "name": "中国邮政储蓄银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融"
+      ],
+      "business_tags": [
+        "商业银行",
+        "数字金融"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-18-20261111",
+      "name": "浙商银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融"
+      ],
+      "business_tags": [
+        "商业银行",
+        "公司金融"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-19-20261111",
+      "name": "徽商银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融"
+      ],
+      "business_tags": [
+        "商业银行",
+        "地方金融"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-20-20261111",
+      "name": "杭州银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融"
+      ],
+      "business_tags": [
+        "商业银行",
+        "数字金融"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-21-20261111",
+      "name": "华夏银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融"
+      ],
+      "business_tags": [
+        "商业银行",
+        "金融科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-22-20261111",
+      "name": "宁波银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融"
+      ],
+      "business_tags": [
+        "商业银行",
+        "金融科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-23-20261111",
+      "name": "江苏银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融"
+      ],
+      "business_tags": [
+        "商业银行",
+        "金融科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-24-20261111",
+      "name": "南京银行",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "银行金融"
+      ],
+      "business_tags": [
+        "商业银行",
+        "财富管理"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-25-20261111",
+      "name": "中金公司",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "证券金融"
+      ],
+      "business_tags": [
+        "投资银行",
+        "资产管理"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-26-20261111",
+      "name": "中国银河证券",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "证券金融"
+      ],
+      "business_tags": [
+        "券商",
+        "投行业务"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-27-20261111",
+      "name": "国信证券",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "证券金融"
+      ],
+      "business_tags": [
+        "券商",
+        "金融科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-28-20261111",
+      "name": "招商证券",
+      "primary": "finance",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "证券金融"
+      ],
+      "business_tags": [
+        "券商",
+        "财富管理"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-29-20261111",
+      "name": "金蝶国际",
+      "primary": "internet",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "企业软件"
+      ],
+      "business_tags": [
+        "ERP",
+        "云服务"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-30-20261111",
+      "name": "摩尔线程",
+      "primary": "semiconductors",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "半导体芯片"
+      ],
+      "business_tags": [
+        "GPU",
+        "AI算力"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-31-20261111",
+      "name": "紫光展锐",
+      "primary": "semiconductors",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "半导体芯片"
+      ],
+      "business_tags": [
+        "移动通信芯片",
+        "SoC"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-32-20261111",
+      "name": "国药集团",
+      "primary": "healthcare",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "医药医疗"
+      ],
+      "business_tags": [
+        "医药流通",
+        "生物医药"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-33-20261111",
+      "name": "扬子江药业集团",
+      "primary": "healthcare",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "医药制造"
+      ],
+      "business_tags": [
+        "药品研发",
+        "医药制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-34-20261111",
+      "name": "正大天晴",
+      "primary": "healthcare",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "医药制造"
+      ],
+      "business_tags": [
+        "创新药",
+        "药物研发"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-35-20261111",
+      "name": "华润三九",
+      "primary": "healthcare",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "医药制造"
+      ],
+      "business_tags": [
+        "中药",
+        "OTC",
+        "医药制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-36-20261111",
+      "name": "中国华能集团",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "电力能源"
+      ],
+      "business_tags": [
+        "发电",
+        "能源",
+        "新能源"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-37-20261111",
+      "name": "中国大唐集团",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "电力能源"
+      ],
+      "business_tags": [
+        "发电",
+        "新能源"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-38-20261111",
+      "name": "中国华电集团",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "电力能源"
+      ],
+      "business_tags": [
+        "发电",
+        "能源转型"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-39-20261111",
+      "name": "国家电力投资集团",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "电力能源"
+      ],
+      "business_tags": [
+        "能源投资",
+        "核电",
+        "新能源"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-40-20261111",
+      "name": "中国南方电网",
+      "primary": "energy",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "电力电网"
+      ],
+      "business_tags": [
+        "输配电",
+        "电网",
+        "数字电力"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-41-20261111",
+      "name": "通用技术集团",
+      "primary": "diversified",
+      "additional": [
+        "healthcare",
+        "machinery"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "综合央企"
+      ],
+      "business_tags": [
+        "先进制造",
+        "医疗",
+        "工程贸易"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-42-20261111",
+      "name": "中国中化集团",
+      "primary": "diversified",
+      "additional": [
+        "energy",
+        "agriculture"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "综合央企"
+      ],
+      "business_tags": [
+        "化工",
+        "农业",
+        "材料"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-43-20261111",
+      "name": "首都机场集团",
+      "primary": "logistics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "机场交通"
+      ],
+      "business_tags": [
+        "机场运营",
+        "航空服务"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-44-20261111",
+      "name": "中国航空发动机集团",
+      "primary": "aerospace",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "航空航天"
+      ],
+      "business_tags": [
+        "航空发动机",
+        "高端制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-45-20261111",
+      "name": "中国交通建设集团",
+      "primary": "construction",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "基建工程"
+      ],
+      "business_tags": [
+        "交通基建",
+        "港航工程"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-46-20261111",
+      "name": "中国国家铁路集团",
+      "primary": "logistics",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "铁路运输"
+      ],
+      "business_tags": [
+        "铁路运营",
+        "铁路建设"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-47-20261111",
+      "name": "中国电子信息产业集团",
+      "primary": "electronics",
+      "additional": [
+        "semiconductors"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "电子信息"
+      ],
+      "business_tags": [
+        "网络安全",
+        "半导体",
+        "数字科技"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-48-20261111",
+      "name": "中国中铁集团",
+      "primary": "construction",
+      "additional": [],
+      "auto_section": null,
+      "industry_tags": [
+        "基建工程"
+      ],
+      "business_tags": [
+        "铁路工程",
+        "城市建设"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-49-20261111",
+      "name": "中国电子科技集团",
+      "primary": "electronics",
+      "additional": [
+        "semiconductors"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "电子信息"
+      ],
+      "business_tags": [
+        "电子系统",
+        "软件",
+        "高端制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-official-b06-50-20261111",
+      "name": "中国铁建重工",
+      "primary": "aerospace",
+      "additional": [
+        "machinery"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "轨道装备"
+      ],
+      "business_tags": [
+        "隧道装备",
+        "高端制造"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-pending-crossdomain-haier-20261111",
+      "name": "海尔集团",
+      "primary": "electronics",
+      "additional": [
+        "machinery",
+        "healthcare",
+        "energy"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "industrial-manufacturing",
+        "consumer-retail",
+        "software-internet",
+        "healthcare",
+        "energy"
+      ],
+      "business_tags": [
+        "consumer-products",
+        "industrial-control",
+        "enterprise-services",
+        "research"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-verified-huawei-20261111",
+      "name": "华为",
+      "primary": "electronics",
+      "additional": [
+        "internet",
+        "semiconductors",
+        "automotive",
+        "energy"
+      ],
+      "auto_section": "auto-adas",
+      "industry_tags": [
+        "software-internet",
+        "semiconductors",
+        "automotive",
+        "energy",
+        "consumer-retail"
+      ],
+      "business_tags": [
+        "ai-data",
+        "enterprise-services",
+        "hardware-rd",
+        "automotive-electronics",
+        "consumer-products"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-verified-meituan-20261111",
+      "name": "美团",
+      "primary": "internet",
+      "additional": [
+        "consumer",
+        "logistics"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "consumer-retail",
+        "logistics",
+        "software-internet"
+      ],
+      "business_tags": [
+        "consumer-products",
+        "enterprise-services"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    },
+    {
+      "id": "hhba-verified-tencent-20261111",
+      "name": "腾讯",
+      "primary": "internet",
+      "additional": [
+        "media",
+        "finance"
+      ],
+      "auto_section": null,
+      "industry_tags": [
+        "software-internet",
+        "games",
+        "finance",
+        "media-content"
+      ],
+      "business_tags": [
+        "enterprise-services",
+        "ai-data",
+        "digital-marketing",
+        "financial-services",
+        "consumer-products"
+      ],
+      "classification_status": "EDITORIAL_PROPOSAL_NOT_JOB_VERIFIED"
+    }
+  ]
+}
