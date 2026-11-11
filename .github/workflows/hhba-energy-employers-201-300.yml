@@ -1,0 +1,43 @@
+name: HHBA Energy third batch 100 distinct employers
+on:
+  pull_request:
+    paths:
+      - 'apps/web/d1/0031_energy_employer_candidates_201_300_v1.sql'
+      - 'apps/web/functions/_lib/energy-employer-candidates-201-300.js'
+      - 'apps/web/functions/_lib/energy-employer-candidate-scope-v1.js'
+      - 'apps/web/scripts/energy-employers-201-300.contract.test.mjs'
+      - '.github/workflows/hhba-energy-employers-201-300.yml'
+  workflow_dispatch:
+jobs:
+  energy-employer-identity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Distinct employer identity and preview-only access contract
+        run: node --test apps/web/scripts/energy-employers-201-300.contract.test.mjs
+      - name: SQLite source migration 0031 is idempotent and does not fake 100 distinct URLs
+        run: |
+          python3 - <<'PY'
+          import sqlite3
+          from pathlib import Path
+          conn=sqlite3.connect(':memory:')
+          conn.execute('PRAGMA foreign_keys=ON')
+          conn.execute('CREATE TABLE hhba_library_hall_sections(section_id TEXT PRIMARY KEY)')
+          sections=['energy-grid','energy-generation','energy-nuclear','energy-hydro','energy-engineering','energy-solar','energy-wind','energy-storage','energy-equipment']
+          conn.executemany('INSERT INTO hhba_library_hall_sections VALUES(?)',[(x,) for x in sections])
+          sql=Path('apps/web/d1/0031_energy_employer_candidates_201_300_v1.sql').read_text()
+          conn.executescript(sql)
+          conn.executescript(sql)
+          counts=conn.execute('SELECT COUNT(*),COUNT(DISTINCT employer_display_name),COUNT(DISTINCT candidate_url) FROM hhba_library_energy_employer_candidates').fetchone()
+          assert counts==(100,100,26),counts
+          assert conn.execute("SELECT COUNT(*) FROM hhba_library_energy_employer_candidates WHERE source_status='UNVERIFIED'").fetchone()[0]==100
+          assert conn.execute('SELECT MIN(collection_sequence),MAX(collection_sequence) FROM hhba_library_energy_employer_candidates').fetchone()==(201,300)
+          assert len(dict(conn.execute('SELECT section_id,COUNT(*) FROM hhba_library_energy_employer_candidates GROUP BY section_id').fetchall()))==9
+          print('HHBA energy third batch OK:',counts)
+          PY
