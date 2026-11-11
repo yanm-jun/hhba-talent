@@ -16,7 +16,7 @@ test('17 stable industry halls and unique cross-hall employer identities',()=>{
  assert.equal(seed.schema_version,1);
  assert.equal(seed.halls.length,17);
  assert.equal(new Set(seed.halls.map(x=>x.id)).size,17);
- assert.equal(seed.items.length,882);
+ assert.ok(seed.items.length>=882);
  assert.equal(new Set(seed.items.map(e=>norm(e.name))).size,seed.items.length);
  assert.equal(seed.statistics.entities,seed.items.length);
  for(const item of seed.items){
@@ -24,11 +24,23 @@ test('17 stable industry halls and unique cross-hall employer identities',()=>{
   assert.ok((item.related_hall_ids||[]).every(id=>seed.halls.some(h=>h.id===id)),item.name);
  }
 });
-test('700 draft PR records are present as unverified search hints, not approved vacancies',()=>{
- assert.equal(batches.batches.reduce((n,b)=>n+b.entries.length,0),700);
+test('collected draft PR records are present as unverified search hints, not approved vacancies',()=>{
+ const imported=batches.batches.reduce((n,b)=>n+b.entries.length,0);
+ assert.ok(imported>=700);
+ assert.equal(seed.collection_coverage.target_total,3800);
+ assert.equal(seed.collection_coverage.imported_batch_records,imported);
+ assert.equal(seed.collection_coverage.unimported_batch_records,3800-imported);
+ assert.equal(Object.values(seed.collection_coverage.imported_by_hall).reduce((a,b)=>a+b,0),imported);
+ assert.equal(Object.values(seed.collection_coverage.target_by_hall).reduce((a,b)=>a+b,0),3800);
+ for(const hall of seed.halls){
+  const id=hall.id;
+  assert.ok(seed.collection_coverage.imported_by_hall[id]<=seed.collection_coverage.target_by_hall[id],id);
+  assert.equal(seed.collection_coverage.unimported_by_hall[id],
+   seed.collection_coverage.target_by_hall[id]-seed.collection_coverage.imported_by_hall[id]);
+ }
  assert.equal(seed.statistics.legacy_portals,130);
- assert.equal(seed.statistics.candidate_portals,685);
- assert.equal(seed.items.reduce((n,e)=>n+e.portals.length,0),815);
+ assert.ok(seed.statistics.candidate_portals>=685);
+ assert.ok(seed.items.reduce((n,e)=>n+e.portals.length,0)>=815);
  for(const b of batches.batches){
   for(const tuple of b.entries){
    const item=seed.items.find(e=>e.id===norm(tuple[1]));
@@ -94,7 +106,7 @@ test('source hints prefer matching employers and reject normal third-party job b
  assert.throws(()=>normalizeEmployerInput({name:'招聘站公司',industry_id:'automotive',
   portals:['https://www.zhipin.com/jobs/']}),/INVALID_EMPLOYER_PORTAL_URL/);
 });
-test('build script regenerates checked-in 882 company catalog exactly',()=>{
+test('build script regenerates checked-in company catalog exactly',()=>{
  const before=readFileSync(indexPath,'utf8');
  execFileSync(process.execPath,[join(root,'scripts/build-employer-library.mjs')],{cwd:root,stdio:'pipe'});
  assert.equal(readFileSync(indexPath,'utf8'),before,
