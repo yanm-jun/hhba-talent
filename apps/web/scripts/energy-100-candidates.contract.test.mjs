@@ -95,6 +95,6 @@ test('combined 200 energy candidate links are continuously numbered and URL-dist
   'energy-engineering':38,'energy-solar':24,'energy-wind':13,
   'energy-storage':22,'energy-equipment':21
  });
- assert.deepEqual(kinds,{ATS:74,CAREERS:39,NOTICE:81,DISCOVERY:6});
+ assert.deepEqual(kinds,{ATS:73,CAREERS:40,NOTICE:81,DISCOVERY:6});
  assert.doesNotMatch(secondMigration,/INSERT\s+(?:OR IGNORE\s+)?INTO\s+hhba_reviewed_recruitment_sources/i);
 });
