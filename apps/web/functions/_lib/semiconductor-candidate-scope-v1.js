@@ -4,7 +4,7 @@ const valid=new Set(SEMICONDUCTOR_CANDIDATE_SECTIONS);
 export async function getSemiconductorCandidateSourceHints(env,{sections=[],limit=40}={}){
  if(env?.HHBA_AUTH_ROLLOUT!=='preview'||typeof env?.HHBA_PNVS_AUTH_DB?.prepare!=='function')return [];
  const selected=Array.isArray(sections)?[...new Set(sections.filter(s=>typeof s==='string'&&valid.has(s)))]:[];
- const cap=Number.isInteger(limit)?Math.max(1,Math.min(100,limit)):40;
+ const cap=Number.isInteger(limit)?Math.max(1,Math.min(200,limit)):40;
  const clause=selected.length?' AND section_id IN ('+selected.map(()=>'?').join(',')+')':'';
  const sql="SELECT id,collection_sequence,employer_display_name,candidate_url,section_id,batch_id FROM hhba_library_semiconductor_recruitment_candidates WHERE source_status='UNVERIFIED'"+clause+' ORDER BY collection_sequence LIMIT ?';
  try{const data=await env.HHBA_PNVS_AUTH_DB.prepare(sql).bind(...selected,cap).all();
