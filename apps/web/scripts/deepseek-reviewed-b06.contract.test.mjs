@@ -72,6 +72,39 @@ test('B06 preview reader does not silently lose sources #161–#175',async()=>{
  assert.equal(result.length,175);
 });
 
+test('B06 Zhejiang Zheshang Bank company-domain backlink authorizes only its single exact recruitment host',()=>{
+ const s=normalizeReviewedSource(source({
+  display_name:'浙商银行',
+  official_company_url:'https://www.czbank.com/',
+  recruitment_base_url:'https://zp.czbank.com.cn/',
+  ownership_evidence_url:'https://www.czbank.com/cn/',
+  reviewer:'hhba-corporate-crossdomain-review-20261111'
+ }),{now});
+ assert.ok(s);
+ assert.ok(whitelistJobSource('https://zp.czbank.com.cn/zpweb/commonController/main.mvc',[s]));
+ assert.equal(whitelistJobSource('https://zp.czbank.com.cn.evil.com/fake',[s]),null);
+ assert.equal(normalizeReviewedSource(source({
+  display_name:'其他银行',
+  official_company_url:'https://www.czbank.com/',
+  recruitment_base_url:'https://zp.czbank.com.cn/',
+  ownership_evidence_url:'https://www.czbank.com/cn/',
+  reviewer:'hhba-corporate-crossdomain-review-20261111'
+ }),{now}),null);
+});
+
+test('B06 Guosen Securities corporate-subsidiary backlink approves only Guosen ATS tenant',()=>{
+ const s=normalizeReviewedSource(source({
+  display_name:'国信证券',official_company_url:'https://www.guosen.com.cn/',
+  recruitment_base_url:'https://guosen.zhiye.com/campus/jobs',
+  ownership_evidence_url:'https://hs.guosen.com.cn/hs/contactus_job.html',
+  reviewer:'hhba-corporate-backlink-review-20261111'
+ }),{now});
+ assert.ok(s);
+ assert.ok(whitelistJobSource('https://guosen.zhiye.com/campus/jobs',[s]));
+ assert.equal(whitelistJobSource('https://guosen.zhiye.com/campus/jobs2',[s]),null);
+ assert.equal(whitelistJobSource('https://stranger.zhiye.com/campus/jobs',[s]),null);
+});
+
 test('B06 unreviewed recruitment tenant is refused even when branded',()=>{
  const s=normalizeReviewedSource(source({
   display_name:'传音控股',
