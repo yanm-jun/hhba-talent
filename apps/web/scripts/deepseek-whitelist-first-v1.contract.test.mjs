@@ -4,7 +4,7 @@ import {
  WHITE_SEARCH_VERSION,normalizeReviewedSource,whitelistJobSource,onlyWhitelistHits,
  whitelistSearchQueries,deepseekWhitelistTargets,getReviewedDeepSeekSearchScope
 } from '../functions/_lib/deepseek-reviewed-scope-v1.js';
-import {runSearchFirstMatch} from '../functions/_lib/deepseek-search-match.js';
+import {runSearchFirstMatch,selectedJobs} from '../functions/_lib/deepseek-search-match.js';
 
 const now=new Date('2026-11-11T08:00:00.000Z');
 const reviewed=(overrides={})=>({
@@ -61,6 +61,19 @@ test('only reviewed employer URLs survive scope filter even if DeepSeek Search r
  ],[s]);
  assert.equal(jobs.length,1);
  assert.ok(jobs[0].url.includes('huawei'));
+});
+test('DeepSeek cannot rename a verified Huawei recruitment URL to a different employer',()=>{
+ const hits=onlyWhitelistHits([{
+  id:'j1',url:'https://career.huawei.com/cn/job-details?advertisementId=333333',
+  title:'华为 数据分析师 招聘',summary:'上海 数据分析师 岗位职责'
+ }],[norm()]);
+ const bad={jobs:[{
+  id:'j1',company:'腾讯',title:'数据分析师',location:'上海',
+  reason:'这是模型生成的简历与招聘岗位匹配理由，证据需要核对。'
+ }]};
+ const good={jobs:[{...bad.jobs[0],company:'华为'}]};
+ assert.equal(selectedJobs(JSON.stringify(bad),hits,1).length,0);
+ assert.equal(selectedJobs(JSON.stringify(good),hits,1).length,1);
 });
 test('Search query prioritizes company name plus site domain, no third-party boards',()=>{
  const q=whitelistSearchQueries('数据分析师 招聘 职位 工作地点 中国大陆 企业官网',[
