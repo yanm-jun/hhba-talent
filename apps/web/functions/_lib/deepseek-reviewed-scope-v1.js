@@ -118,9 +118,14 @@ export function normalizeReviewedSource(row,{now=new Date()}={}){
  const crossDomain=haierCrossDomain||kuaishouCrossDomain;
  if(!tenant&&!sameOrChild(recruitmentHost,companyHost)&&!crossDomain&&
   !(userConfirmed&&approvedTenant))return null;
+ // Hotjob's /SU.../pb/ segment is the employer-tenant boundary:
+ // the reviewed /school.html page and public /posDetail.html jobs share it.
+ const recruitmentPrefix=tenant&&recruitmentHost==='wecruit.hotjob.cn'?
+  '/'+careers.pathname.split('/').filter(Boolean).slice(0,2).join('/')+'/':
+  scopePath(careers.pathname);
  return {id,display_name:company,company_host:companyHost,haier_verified_chain:haierCrossDomain,
   recruitment_base_url:careers.href,career_host:recruitmentHost,
-  recruitment_prefix:scopePath(careers.pathname),shared_ats:tenant,
+  recruitment_prefix:recruitmentPrefix,shared_ats:tenant,
   industry_tags:tagArray(row.industry_tags_json),
   business_tags:tagArray(row.business_tags_json)};
 }
