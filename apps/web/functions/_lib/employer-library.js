@@ -134,7 +134,7 @@ export function employerSearchHints(library,resume,roleHint='',max=2,brandIndex=
  }
  const ranked=[];
  for(const item of library){
-  if(!item?.name||!Array.isArray(item.portals))continue;
+  if(!item?.name||!Array.isArray(item.portals)||item.research_scope==='overseas_entity_not_mainland_search')continue;
   const names=[item.name,...(item.aliases||[])].map(x=>String(x).toLowerCase());
   const inHint=names.some(n=>n.length>=2&&wanted.includes(n));
   const inResume=names.some(n=>n.length>=3&&experience.includes(n));
