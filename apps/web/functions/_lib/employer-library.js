@@ -1,3 +1,4 @@
+import {recruitmentSourceKind} from './match-employer-source.js';
 // Public employer source index + authenticated D1 changes.
 // Recruitment portals are search hints, NEVER a substitute for a real vacancy URL.
 const HALL_IDS=new Set([
@@ -12,6 +13,8 @@ function portalUrl(raw){
  try{
   const url=new URL(raw);
   if(url.protocol!=='https:'||url.username||url.password||!url.hostname.includes('.'))return null;
+  // Ordinary third-party job boards are not official enterprise search entrances.
+  if(recruitmentSourceKind(url.href)==='THIRD_PARTY_BOARD')return null;
   if(/^(?:localhost|127\.|10\.|192\.168\.|0\.)/i.test(url.hostname))return null;
   return url.href;
  }catch{return null;}
