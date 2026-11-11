@@ -7,7 +7,6 @@
  * here without separate ownership review. No employer/ATS private APIs.
  */
 import {recruitmentSourceKind,isEmployerDirectedSource} from './match-employer-source.js';
-import {searchQueries} from './deepseek-search-match.js';
 
 export const WHITE_SEARCH_VERSION='HHBA_DEEPSEEK_OFFICIAL_SCOPE_S4';
 const SHARED_ATS=['lever.co','greenhouse.io','myworkdayjobs.com','workdayjobs.com',
@@ -93,8 +92,8 @@ export function onlyWhitelistHits(hits,reviewed){
 }
 
 /** A DeepSeek Search query constrained by one reviewed company source. */
-export function whitelistSearchQueries(resume,roleHint,reviewed){
- const intent=(searchQueries(resume,roleHint)?.[0]||'职位 招聘')
+export function whitelistSearchQueries(baseRoleQuery,reviewed){
+ const intent=(String(baseRoleQuery||'职位 招聘'))
   .split(' 招聘 ')[0].slice(0,42).replace(/[<>"']/g,' ');
  const queries=[];
  for(const s of (Array.isArray(reviewed)?reviewed:[]).slice(0,4)){
