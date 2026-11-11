@@ -76,7 +76,7 @@ async function providerJson(fetcher,key,path,body,timeoutMs,signal){
 }
 export async function searchPublicJobs(key,text,roleHint,{
  fetcher=fetch,signal=null,onProgress=()=>{},queryTimeoutMs=14000,
- queriesOverride=null,maxHits=28,allowEmpty=false
+ queriesOverride=null,maxHits=28,allowEmpty=false,onDiscoveredCandidates=()=>{}
 }={}){
  const start=Date.now(),queries=queriesOverride||searchQueries(text,roleHint),errors=[];
  onProgress('searching');
@@ -89,6 +89,8 @@ export async function searchPublicJobs(key,text,roleHint,{
   }catch(e){errors.push(e.code||'AI_PROVIDER_UNAVAILABLE');return {results:[]};}
  }));
  const hits=normalizeHits(responses,maxHits);
+ // Passive internal observation only. Search candidates are not official or open.
+ try{onDiscoveredCandidates(hits);}catch{/* knowledge capture cannot break job search */}
  if(!hits.length&&(!allowEmpty||errors.length===queries.length))throw codeError(errors.includes('AI_PROVIDER_KEY_REJECTED')?'AI_PROVIDER_KEY_REJECTED':
   errors.includes('AI_PROVIDER_BALANCE_INSUFFICIENT')?'AI_PROVIDER_BALANCE_INSUFFICIENT':
   errors.includes('AI_PROVIDER_RATE_LIMITED')?'AI_PROVIDER_RATE_LIMITED':
@@ -435,6 +437,8 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  const detail=opts.expandDetailed===false?{matches:visible,expanded:0,detail_ms:0,detail_failures:0}:
   await expandDetailedReasons(key,resume,visible,pool,{...opts,onProgress,onPartial:show});
  visible=detail.matches;
+ // Never persist user-specific rank/reason or raw resume in the public ledger.
+ try{opts.onDiscoveredMatches?.(visible);}catch{/* optional callback isolation */}
  return {matches:visible,incomplete:visible.length<limit||detail.detail_failures>0,diagnostic:{
   model:'deepseek-v4-pro',searches:search.diagnostic.successful_searches+additionalQueries,
   page_reads:enriched.fetches+additionalFetches,
