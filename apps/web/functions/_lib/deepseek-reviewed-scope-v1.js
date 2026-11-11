@@ -30,10 +30,10 @@ const userApprovedRecruitmentTenant=u=>{
  const h=u.hostname,p=u.pathname;
  if(h.endsWith('.zhiye.com')&&!['www.zhiye.com','app.zhiye.com'].includes(h))return true;
  if(h.endsWith('.hotjob.cn')&&h!=='wecruit.hotjob.cn'&&h!=='www.hotjob.cn')return true;
- if(h==='wecruit.hotjob.cn')return /^\\/SU[a-z0-9]{12,}\\/pb\\//i.test(p);
+ if(h==='wecruit.hotjob.cn')return /^\/SU[a-z0-9]{12,}\/pb\//i.test(p);
  if(h.endsWith('.zhaopin.com')&&h!=='www.zhaopin.com'&&h!=='zhaopin.com'&&h!=='campus.zhaopin.com')return true;
- if(h==='xyzp.51job.com')return /^\\/[a-z0-9_-]{6,}\\/?$/i.test(p);
- if(h==='app.mokahr.com')return /^\\/(?:m\\/)?(?:campus-recruitment|social-recruitment|apply)\\/[a-z0-9_-]{3,}\\//i.test(p);
+ if(h==='xyzp.51job.com')return /^\/[a-z0-9_-]{6,}\/?$/i.test(p);
+ if(h==='app.mokahr.com')return /^\/(?:m\/)?(?:campus-recruitment|social-recruitment|apply)\/[a-z0-9_-]{3,}\//i.test(p);
  if(h==='zhaopin.greeyun.com')return true;
  return false;
 };
@@ -60,12 +60,12 @@ const reviewedHaierCrossDomain=(company,careers,proof,displayName)=>
 // First-party Kuaishou homepage publicly links zhaopin.kuaishou.com,
 // which redirects to zhaopin.kuaishou.cn. This is a single reviewed chain.
 const reviewedKuaishouCrossDomain=(company,careers,proof,displayName)=>
- company.hostname.replace(/^www\\./,'')==='kuaishou.com'&&
+ company.hostname.replace(/^www\./,'')==='kuaishou.com'&&
  careers.hostname==='zhaopin.kuaishou.cn'&&careers.pathname==='/'&&
  proof.hostname==='www.kuaishou.com'&&proof.pathname==='/cn'&&
  displayName==='快手';
 
-const nameSafe=name=>name.length>=2&&!/@|https?:\\/\\/|(?:\\d[\\s-]?){9,}/.test(name);
+const nameSafe=name=>name.length>=2&&!/@|https?:\/\/|(?:\d[\s-]?){9,}/.test(name);
 const idSafe=id=>/^[a-zA-Z0-9_-]{2,80}$/.test(id);
 const tagArray=raw=>{
  try{
@@ -94,7 +94,7 @@ export function normalizeReviewedSource(row,{now=new Date()}={}){
  const userConfirmed=reviewer===USER_REVIEW;
  const corporateBacklink=reviewer===CORPORATE_BACKLINK_REVIEW;
  const officialSameRoot=careers.hostname===companySite.hostname||
-  sameOrChild(careers.hostname,companySite.hostname.replace(/^www\\./,''));
+  sameOrChild(careers.hostname,companySite.hostname.replace(/^www\./,''));
  // Historical corporate recruitment notices and company-specific pages may lack
  // a /careers/ token; verified source identity, not URL spelling, is decisive.
  if(!employerDirected&&!approvedTenant&&!officialSameRoot)return null;
