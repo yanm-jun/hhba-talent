@@ -64,7 +64,7 @@ function mockDb(){
     {id:'xiaomi',name:'小米',official_company_url:'https://www.mi.com/',recruitment_base_url:'https://hr.xiaomi.com/',membership_type:'SECONDARY',section_id:'auto-ev',section_name:'新能源汽车',documented_business_role_scope:values[0]==='accounting'?1:0}]};
    return {results:[]};
   }};
- }}};
+ }}}};
  return {db,seen};
 }
 test('accounting candidate can find Xiaomi automotive hall via finance role, not just electronics',async()=>{
