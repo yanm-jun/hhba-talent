@@ -105,8 +105,13 @@ export function normalizeReviewedSource(row,{now=new Date()}={}){
  if(!sameOrChild(proof.hostname,companyHost)&&!(userConfirmed&&
   proof.hostname===careers.hostname&&proof.pathname.startsWith(careers.pathname)))return null;
  const recruitmentHost=careers.hostname,tenant=isSharedATS(recruitmentHost);
- if(tenant&&(careers.pathname==='/'||careers.pathname.split('/').filter(Boolean).length<1)&&
-  ['wecruit.hotjob.cn','xyzp.51job.com','app.mokahr.com'].includes(recruitmentHost))return null;
+ // Legacy multi-employer ATS roots must never be trusted as a whole.
+ // A reviewed, company-specific subdomain can use / only after user or
+ // corporate-backlink verification. Generic vendor roots still need tenant paths.
+ const dedicatedSubdomain=approvedTenant&&
+  !['wecruit.hotjob.cn','xyzp.51job.com','app.mokahr.com'].includes(recruitmentHost)&&
+  (userConfirmed||corporateBacklink);
+ if(tenant&&careers.pathname==='/'&&!dedicatedSubdomain)return null;
  if(careers.search||companySite.search||companySite.hash)return null;
  const haierCrossDomain=reviewedHaierCrossDomain(companySite,careers,proof,company);
  const kuaishouCrossDomain=reviewedKuaishouCrossDomain(companySite,careers,proof,company);
