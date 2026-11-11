@@ -84,7 +84,7 @@ INSERT OR IGNORE INTO hhba_library_semiconductor_recruitment_candidates (id,coll
  ('hhba-semi-candidate-181',181,'沛顿科技','https://www.payton.com.cn/zpgw/list_38.aspx','semi-packaging','SEMICONDUCTOR_101_200'),
  ('hhba-semi-candidate-182',182,'日月光半导体（ASE）','https://ase.aseglobal.com/ch/about-ase/careers/','semi-packaging','SEMICONDUCTOR_101_200'),
  ('hhba-semi-candidate-183',183,'宏茂微电子','https://www.unimos.com.cn/lists/13.html','semi-packaging','SEMICONDUCTOR_101_200'),
- ('hhba-semi-candidate-184',184,'通富微电','https://www.tfme.com/','semi-packaging','SEMICONDUCTOR_101_200'),
+ ('hhba-semi-candidate-184',184,'通富微电','https://www.tfme.com/news/4/','semi-packaging','SEMICONDUCTOR_101_200'),
  ('hhba-semi-candidate-185',185,'龙腾光电','https://www.ivo.com.cn/cnsite/branch?s=join','semi-display','SEMICONDUCTOR_101_200'),
  ('hhba-semi-candidate-186',186,'友达光电','https://auo.com/zh-CN/be_one_of_us/index','semi-display','SEMICONDUCTOR_101_200'),
  ('hhba-semi-candidate-187',187,'群创光电','https://hrrecruit.innolux.com/globalweb_s/cn/index.html','semi-display','SEMICONDUCTOR_101_200'),
