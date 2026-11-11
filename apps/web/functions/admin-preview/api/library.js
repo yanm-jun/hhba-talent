@@ -46,7 +46,7 @@ export async function onRequestPost({request,env}){
  let library;
  try{library=await readEmployerLibrary(env,request);}catch{return fail('LIBRARY_SOURCE_UNAVAILABLE',503);}
  if(!library.editable||!env.HHBA_METRICS_DB?.batch)return fail('LIBRARY_D1_MIGRATION_REQUIRED',503);
- const actor=a.actor.actor.email;
+ const actor=a.actor.email;
  const now=new Date().toISOString(),batchId=crypto.randomUUID();
  const db=env.HHBA_METRICS_DB;
  const queries=entries.map(item=>db.prepare(
