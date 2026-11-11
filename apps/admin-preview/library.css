@@ -1,6 +1,6 @@
 .library-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}
 .library-stat{border:1px solid var(--border);border-radius:11px;padding:16px;background:#fff}
-.library-stat span{display:block;color:var(--muted);font-size:11px}.library-stat strong{font-size:25px;display:block;margin-top:8px}
+.library-stat span{display:block;color:var(--muted);font-size:11px}.library-stat strong{font-size:25px;display:block;margin-top:8px}.library-stat small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
 .library-halls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:16px 0 24px}
 .library-hall{background:white;border:1px solid var(--border);border-radius:10px;min-height:49px;text-align:left;padding:12px;font-size:12px;color:#45604e}
 .library-hall.active{background:#eaf4ed;border-color:#5c9270;color:#235b40;font-weight:750}
