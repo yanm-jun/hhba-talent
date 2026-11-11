@@ -1,6 +1,6 @@
 // Original HHBA administrator console: employer resource library.
 const dom=id=>document.getElementById(id);
-const state={items:[],halls:[],hall:'all',term:'',page:0,editable:false,loaded:false};
+const state={items:[],halls:[],hall:'all',term:'',page:0,editable:false,loaded:false,coverage:null};
 const PAGE_SIZE=40,api='/admin-preview/api/library';
 const button=(label,onClick,extra='')=>{
  const b=document.createElement('button');b.type='button';b.textContent=label;
@@ -25,8 +25,20 @@ function renderHalls(){
  const root=dom('library-halls');root.replaceChildren();
  root.append(button('全部企业 · '+state.items.length,()=>selectHall('all'),
   'library-hall'+(state.hall==='all'?' active':'')));
- for(const hall of state.halls)root.append(button(hall.name+' · '+count(hall.id),
-  ()=>selectHall(hall.id),'library-hall'+(state.hall===hall.id?' active':'')));
+ for(const hall of state.halls){
+  const b=button(hall.name+' · '+count(hall.id)+' 家',
+   ()=>selectHall(hall.id),'library-hall'+(state.hall===hall.id?' active':''));
+  const progress=state.coverage;
+  if(progress){
+   const imported=progress.imported_by_hall?.[hall.id]??0;
+   const target=progress.target_by_hall?.[hall.id]??0;
+   const note=document.createElement('small');
+   note.className='library-hall-sub';
+   note.textContent='聊天批次入库 '+imported+' / '+target+' 条';
+   b.append(note);
+  }
+  root.append(b);
+ }
 }
 function render(){
  renderHalls();
@@ -80,6 +92,13 @@ function render(){
  dom('library-portals').textContent=String(state.items.reduce((n,x)=>n+(x.portals?.length||0),0));
  dom('library-groups').textContent=String(state.items.filter(x=>x.parent_name).length);
  dom('library-review').textContent=String(state.items.reduce((n,x)=>n+(x.portals||[]).filter(p=>p.status==='collected_unverified').length,0));
+ const coverage=state.coverage;
+ dom('library-collection-status').textContent=coverage?
+  '历史聊天收集清单：'+coverage.target_total.toLocaleString('zh-CN')+
+  ' 条 · 已完整导入原始批次 '+coverage.imported_batch_records.toLocaleString('zh-CN')+
+  ' 条 · 待补录 '+coverage.unimported_batch_records.toLocaleString('zh-CN')+
+  ' 条。企业实体和招聘网址的去重、审核另行统计。':
+  '历史批次导入进度暂不可用；不将当前企业数量冒充全部收集记录。';
  dom('library-write-state').textContent=state.editable?'管理员可修改 · 批量最多100家':
    '只读 · 未接通管理员数据库或未授权';
  dom('library-editor').hidden=!state.editable;
@@ -101,7 +120,9 @@ const dataSet=async()=>{
  const obj=await r.json();
  const loaded=local?obj:obj.ok?obj:null;
  if(!loaded||!Array.isArray(loaded.items)||loaded.halls?.length!==17)throw Error('企业目录格式不正确');
- state.items=loaded.items;state.halls=loaded.halls;state.editable=!local&&loaded.editable===true;state.loaded=true;
+ state.items=loaded.items;state.halls=loaded.halls;
+ state.coverage=loaded.collection_coverage||null;
+ state.editable=!local&&loaded.editable===true;state.loaded=true;
 };
 async function refresh(){
  showMessage('正在读取企业资源目录…');
