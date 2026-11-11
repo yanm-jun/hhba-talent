@@ -1,0 +1,1506 @@
+{
+  "schema_version": 1,
+  "source": "HHBA B04 B05 B06 Preview D1 audit workbooks, 2026-11-11; provenance only, not current live vacancy validation",
+  "records": [
+    {
+      "batch": "B04",
+      "sequence": 1,
+      "name": "阿里巴巴",
+      "industry_id": "internet-ai",
+      "industry_label": "互联网与云计算",
+      "url": "https://talent.alibaba.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 2,
+      "name": "联想集团",
+      "industry_id": "consumer-hardware",
+      "industry_label": "计算机及智能设备",
+      "url": "https://talent.lenovo.com.cn/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 3,
+      "name": "中国移动",
+      "industry_id": "telecom",
+      "industry_label": "通信运营",
+      "url": "https://job.10086.cn/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 4,
+      "name": "中国联通",
+      "industry_id": "telecom",
+      "industry_label": "通信运营",
+      "url": "https://zglt.zhaopin.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 5,
+      "name": "海信集团",
+      "industry_id": "consumer-hardware",
+      "industry_label": "智能制造与消费电子",
+      "url": "https://jobs.hisense.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 6,
+      "name": "TCL集团招聘体系",
+      "industry_id": "consumer-hardware",
+      "industry_label": "消费电子与显示",
+      "url": "https://campus.tcl.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 7,
+      "name": "科大讯飞",
+      "industry_id": "internet-ai",
+      "industry_label": "人工智能软件",
+      "url": "https://iflytek.zhiye.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 8,
+      "name": "安克创新",
+      "industry_id": "consumer-hardware",
+      "industry_label": "消费电子",
+      "url": "https://career.anker.com.cn/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 9,
+      "name": "中国石油",
+      "industry_id": "energy",
+      "industry_label": "能源与石油化工",
+      "url": "https://zhaopin.cnpc.com.cn/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 10,
+      "name": "中国石化",
+      "industry_id": "energy",
+      "industry_label": "能源与石油化工",
+      "url": "https://job.sinopec.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 11,
+      "name": "中国海油",
+      "industry_id": "energy",
+      "industry_label": "能源与油气",
+      "url": "https://cnooc.zhaopin.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 12,
+      "name": "中国建筑集团",
+      "industry_id": "construction",
+      "industry_label": "建筑与工程",
+      "url": "https://www.cscec.com/rlzy_new/rczp/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 13,
+      "name": "中国中车集团",
+      "industry_id": "logistics",
+      "industry_label": "轨道交通装备",
+      "url": "https://crrc.hotjob.cn/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 14,
+      "name": "上汽集团",
+      "industry_id": "automotive",
+      "industry_label": "汽车与智能出行",
+      "url": "https://saic-recruit.saicmotor.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 15,
+      "name": "广汽集团",
+      "industry_id": "automotive",
+      "industry_label": "汽车与智能出行",
+      "url": "https://xyzp.51job.com/gacgroup2027/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 16,
+      "name": "长安汽车",
+      "industry_id": "automotive",
+      "industry_label": "汽车与智能出行",
+      "url": "https://changan.zhiye.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 17,
+      "name": "长城汽车",
+      "industry_id": "automotive",
+      "industry_label": "汽车与智能出行",
+      "url": "https://zhaopin.gwm.cn/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 18,
+      "name": "三一集团",
+      "industry_id": "manufacturing",
+      "industry_label": "工程机械",
+      "url": "https://sany.zhiye.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 19,
+      "name": "潍柴集团",
+      "industry_id": "automotive",
+      "industry_label": "动力装备与汽车零部件",
+      "url": "https://weichai.zhiye.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 20,
+      "name": "格力电器",
+      "industry_id": "consumer-hardware",
+      "industry_label": "家电与智能制造",
+      "url": "https://zhaopin.greeyun.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 21,
+      "name": "福耀集团",
+      "industry_id": "automotive",
+      "industry_label": "汽车零部件",
+      "url": "https://job.fuyaogroup.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 22,
+      "name": "德赛西威",
+      "industry_id": "automotive",
+      "industry_label": "汽车电子",
+      "url": "https://www.desaysv.com/jobList.html",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 23,
+      "name": "歌尔股份",
+      "industry_id": "semiconductor",
+      "industry_label": "消费电子与电子制造",
+      "url": "https://www.goertek.com/join/recruitcategory144.html",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 24,
+      "name": "立讯精密",
+      "industry_id": "semiconductor",
+      "industry_label": "电子制造",
+      "url": "https://wecruit.hotjob.cn/SU601778b25d83dc072073230a/pb/school.html",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 25,
+      "name": "隆基绿能",
+      "industry_id": "energy",
+      "industry_label": "光伏与新能源",
+      "url": "https://longi.hotjob.cn/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 26,
+      "name": "阳光电源",
+      "industry_id": "energy",
+      "industry_label": "储能与光伏",
+      "url": "https://jobs.sungrowpower.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 27,
+      "name": "亿纬锂能",
+      "industry_id": "energy",
+      "industry_label": "锂电池与新能源",
+      "url": "https://wecruit.hotjob.cn/SU630487ca0dcad45aa7768a79/pb/social.html",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 28,
+      "name": "欣旺达",
+      "industry_id": "energy",
+      "industry_label": "锂电池与新能源",
+      "url": "https://sunwoda.zhiye.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 29,
+      "name": "北方华创",
+      "industry_id": "semiconductor",
+      "industry_label": "半导体设备",
+      "url": "https://career.naura.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 30,
+      "name": "汇川技术",
+      "industry_id": "manufacturing",
+      "industry_label": "工业自动化",
+      "url": "https://recruit.inovance.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 31,
+      "name": "海康机器人",
+      "industry_id": "manufacturing",
+      "industry_label": "机器视觉与机器人",
+      "url": "https://job.hikrobotics.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 32,
+      "name": "兆易创新",
+      "industry_id": "semiconductor",
+      "industry_label": "半导体与集成电路",
+      "url": "https://www.gigadevice.com.cn/about/career",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 33,
+      "name": "药明康德",
+      "industry_id": "biomed",
+      "industry_label": "医药研发服务",
+      "url": "https://wuxiapptec.zhiye.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 34,
+      "name": "爱尔眼科",
+      "industry_id": "biomed",
+      "industry_label": "医疗服务",
+      "url": "https://zhaopin.aierchina.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 35,
+      "name": "中国农业银行",
+      "industry_id": "finance",
+      "industry_label": "银行与金融服务",
+      "url": "https://career.abchina.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 36,
+      "name": "建设银行",
+      "industry_id": "finance",
+      "industry_label": "银行与金融服务",
+      "url": "https://job.ccb.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 37,
+      "name": "中国银行",
+      "industry_id": "finance",
+      "industry_label": "银行与金融服务",
+      "url": "https://www.boc.cn/aboutboc/bi4/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 38,
+      "name": "交通银行",
+      "industry_id": "finance",
+      "industry_label": "银行与金融服务",
+      "url": "https://job.bankcomm.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 39,
+      "name": "兴业银行",
+      "industry_id": "finance",
+      "industry_label": "银行与金融服务",
+      "url": "https://job.cib.com.cn/portal/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 40,
+      "name": "中信银行",
+      "industry_id": "finance",
+      "industry_label": "银行与金融服务",
+      "url": "https://job.citicbank.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 41,
+      "name": "浦发银行",
+      "industry_id": "finance",
+      "industry_label": "银行与金融服务",
+      "url": "https://job.spdb.com.cn/notices",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 42,
+      "name": "广发证券",
+      "industry_id": "finance",
+      "industry_label": "证券与资本市场",
+      "url": "https://job.gf.com.cn/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 43,
+      "name": "中信证券",
+      "industry_id": "finance",
+      "industry_label": "证券与资本市场",
+      "url": "https://careers.citics.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 44,
+      "name": "中国人寿集团",
+      "industry_id": "finance",
+      "industry_label": "保险与金融服务",
+      "url": "https://www.chinalife.com.cn/chinalife/zhaopin",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 45,
+      "name": "茅台集团",
+      "industry_id": "agri-food",
+      "industry_label": "食品饮料",
+      "url": "https://zp.moutai.com.cn/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 46,
+      "name": "伊利集团",
+      "industry_id": "agri-food",
+      "industry_label": "食品饮料",
+      "url": "https://www.yili.com/joinus",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 47,
+      "name": "海天味业",
+      "industry_id": "agri-food",
+      "industry_label": "食品饮料",
+      "url": "https://haday.hotjob.cn/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 48,
+      "name": "牧原股份",
+      "industry_id": "agri-food",
+      "industry_label": "农牧与食品",
+      "url": "https://app.mokahr.com/m/campus-recruitment/muyuan/70116",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 49,
+      "name": "中国邮政集团",
+      "industry_id": "logistics",
+      "industry_label": "邮政与物流",
+      "url": "https://chinapost2027.zhaopin.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B04",
+      "sequence": 50,
+      "name": "中国宝武集团（宝钢股份专场）",
+      "industry_id": "chem-materials",
+      "industry_label": "钢铁与材料",
+      "url": "https://baosteel.zhaopin.com/",
+      "status": "preview_verified",
+      "notes": "企业招聘入口已登记；具体岗位时效单独核验"
+    },
+    {
+      "batch": "B05",
+      "sequence": 1,
+      "name": "网易",
+      "industry_id": "internet-ai",
+      "industry_label": "互联网服务",
+      "url": "https://hr.163.com/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 2,
+      "name": "中通快递",
+      "industry_id": "logistics",
+      "industry_label": "物流快递",
+      "url": "https://hr.zto.com/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 3,
+      "name": "哔哩哔哩",
+      "industry_id": "culture-media",
+      "industry_label": "互联网内容",
+      "url": "https://jobs.bilibili.com/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 4,
+      "name": "携程集团",
+      "industry_id": "internet-ai",
+      "industry_label": "旅游科技",
+      "url": "https://careers.ctrip.com/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 5,
+      "name": "蚂蚁集团",
+      "industry_id": "internet-ai",
+      "industry_label": "金融科技",
+      "url": "https://talent.antgroup.com/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 6,
+      "name": "小红书",
+      "industry_id": "internet-ai",
+      "industry_label": "互联网平台",
+      "url": "https://job.xiaohongshu.com/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 7,
+      "name": "SHEIN",
+      "industry_id": "retail",
+      "industry_label": "跨境电商",
+      "url": "https://careers.shein.cn/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 8,
+      "name": "月之暗面",
+      "industry_id": "internet-ai",
+      "industry_label": "人工智能",
+      "url": "https://careers.kimi.com/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 9,
+      "name": "MiniMax",
+      "industry_id": "internet-ai",
+      "industry_label": "人工智能",
+      "url": "https://www.minimax.io/careers",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 10,
+      "name": "得物",
+      "industry_id": "retail",
+      "industry_label": "互联网零售",
+      "url": "https://careers.dewu.com/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 11,
+      "name": "菜鸟集团",
+      "industry_id": "logistics",
+      "industry_label": "物流科技",
+      "url": "https://jobs.cainiao.com/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 12,
+      "name": "恒瑞医药",
+      "industry_id": "biomed",
+      "industry_label": "生物医药",
+      "url": "https://www.hengrui.com/development/recruit.html",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 13,
+      "name": "万科集团",
+      "industry_id": "construction",
+      "industry_label": "地产与城市服务",
+      "url": "https://www.vanke.com/join/talent",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 14,
+      "name": "韵达股份",
+      "industry_id": "logistics",
+      "industry_label": "物流快递",
+      "url": "https://www.yundaex.com/cn/hr_online.php",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 15,
+      "name": "中国中免",
+      "industry_id": "retail",
+      "industry_label": "免税零售",
+      "url": "https://www.cdfg.com.cn/shehuizhaopin.html",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 16,
+      "name": "分众传媒",
+      "industry_id": "culture-media",
+      "industry_label": "广告传媒",
+      "url": "https://www.focusmedia.cn/join/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 17,
+      "name": "五粮液集团",
+      "industry_id": "agri-food",
+      "industry_label": "食品饮料",
+      "url": "https://www.wuliangye.com.cn/zhaopin/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 18,
+      "name": "吉利汽车集团",
+      "industry_id": "automotive",
+      "industry_label": "汽车制造",
+      "url": "https://www.geelyautogroup.com/recruitment",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 19,
+      "name": "理想汽车",
+      "industry_id": "automotive",
+      "industry_label": "新能源汽车",
+      "url": "https://www.lixiang.com/employ/campus.html",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 20,
+      "name": "蔚来汽车",
+      "industry_id": "automotive",
+      "industry_label": "新能源汽车",
+      "url": "https://www.nio.cn/careers",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 21,
+      "name": "小鹏汽车",
+      "industry_id": "automotive",
+      "industry_label": "新能源汽车",
+      "url": "https://www.xiaopeng.com/join.html",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 22,
+      "name": "中国商飞",
+      "industry_id": "aerospace",
+      "industry_label": "航空航天",
+      "url": "https://zhaopin.comac.cc/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 23,
+      "name": "上海机场集团",
+      "industry_id": "logistics",
+      "industry_label": "交通运输",
+      "url": "https://www.shanghaiairport.com/shzp/index.html",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 24,
+      "name": "深圳地铁集团",
+      "industry_id": "logistics",
+      "industry_label": "轨道交通",
+      "url": "https://www.szmc.net/rl",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 25,
+      "name": "广东粤海控股集团",
+      "industry_id": "energy",
+      "industry_label": "综合国企",
+      "url": "https://www.gdh.com.cn/joinus/index.html",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 26,
+      "name": "北京首旅集团",
+      "industry_id": "retail",
+      "industry_label": "旅游酒店",
+      "url": "https://www.btg.com.cn/newsList/31/1.html",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 27,
+      "name": "江苏交通控股",
+      "industry_id": "logistics",
+      "industry_label": "交通基础设施",
+      "url": "https://jchctalent.jchc.cn/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 28,
+      "name": "浙江省交通投资集团",
+      "industry_id": "logistics",
+      "industry_label": "交通基础设施",
+      "url": "https://dhr.cncico.com/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 29,
+      "name": "山东高速集团",
+      "industry_id": "logistics",
+      "industry_label": "交通基础设施",
+      "url": "https://zhaopin.sdhsg.com/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 30,
+      "name": "重庆渝富控股集团",
+      "industry_id": "finance",
+      "industry_label": "地方国企",
+      "url": "https://www.cqyfkgjt.com/join-us/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 31,
+      "name": "深圳市投资控股",
+      "industry_id": "finance",
+      "industry_label": "地方国企",
+      "url": "https://www.sihc.com.cn/sihc/contact/recruitment/index.html",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 32,
+      "name": "思源电气",
+      "industry_id": "energy",
+      "industry_label": "电力设备",
+      "url": "https://www.sieyuan.com/join",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 33,
+      "name": "雷赛智能",
+      "industry_id": "manufacturing",
+      "industry_label": "工业自动化",
+      "url": "https://www.leisai.com/recruitment/index.html",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 34,
+      "name": "英威腾",
+      "industry_id": "manufacturing",
+      "industry_label": "工业自动化",
+      "url": "https://www.invt.com.cn/careers",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 35,
+      "name": "华域汽车集团",
+      "industry_id": "automotive",
+      "industry_label": "汽车零部件",
+      "url": "https://www.hasco-group.com/join/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 36,
+      "name": "平高电气",
+      "industry_id": "energy",
+      "industry_label": "电力设备",
+      "url": "https://www.pinggao.com/contact/jobSociety.html",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 37,
+      "name": "许继电气",
+      "industry_id": "energy",
+      "industry_label": "电力设备",
+      "url": "https://www.xjec.com/contact/campus/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 38,
+      "name": "智飞生物",
+      "industry_id": "biomed",
+      "industry_label": "生物医药",
+      "url": "https://www.zhifeishengwu.com/zh_CN/recruitment/42.html",
+      "status": "pending",
+      "notes": "历史记录显示招聘栏目存在，但当前页面可用性和具体招聘入口尚未核实"
+    },
+    {
+      "batch": "B05",
+      "sequence": 39,
+      "name": "拓斯达",
+      "industry_id": "manufacturing",
+      "industry_label": "智能制造",
+      "url": "https://www.topstarltd.com/lang-cn/recruitinglist/006002003.html",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 40,
+      "name": "华润集团",
+      "industry_id": "retail",
+      "industry_label": "综合央企",
+      "url": "https://runjob.crc.com.cn/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 41,
+      "name": "南瑞集团",
+      "industry_id": "energy",
+      "industry_label": "电力科技",
+      "url": "https://job.sgepri.sgcc.com.cn/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 42,
+      "name": "江淮汽车",
+      "industry_id": "automotive",
+      "industry_label": "汽车制造",
+      "url": "https://www.jac.com.cn/zhuantinews/20260911/10715.html",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 43,
+      "name": "中芯国际",
+      "industry_id": "semiconductor",
+      "industry_label": "半导体制造",
+      "url": "https://careers.smics.com/Recruitment/job/searchJob.action",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 44,
+      "name": "零跑汽车",
+      "industry_id": "automotive",
+      "industry_label": "新能源汽车",
+      "url": "https://www-app.leapmotor.com/join/societyRecruitment.html",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 45,
+      "name": "快手",
+      "industry_id": "internet-ai",
+      "industry_label": "互联网内容",
+      "url": "https://zhaopin.kuaishou.cn/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 46,
+      "name": "徐工集团",
+      "industry_id": "manufacturing",
+      "industry_label": "工程机械",
+      "url": "https://app.mokahr.com/social-recruitment/xcmg/148090/",
+      "status": "pending",
+      "notes": "徐工 Moka 专属租户待取得官方招聘反链或确认授权关系"
+    },
+    {
+      "batch": "B05",
+      "sequence": 47,
+      "name": "奇瑞汽车",
+      "industry_id": "automotive",
+      "industry_label": "汽车制造",
+      "url": "https://chery.zhiye.com/",
+      "status": "preview_verified",
+      "notes": "招聘入口已记录；岗位是否在招由 DeepSeek 另行核对"
+    },
+    {
+      "batch": "B05",
+      "sequence": 48,
+      "name": "招商局集团",
+      "industry_id": "logistics",
+      "industry_label": "综合央企",
+      "url": "https://cmhk.zhiye.com/",
+      "status": "pending",
+      "notes": "招商局北森租户可见企业标识，但缺少集团官网直链作为独立证据"
+    },
+    {
+      "batch": "B05",
+      "sequence": 49,
+      "name": "中国核工业集团",
+      "industry_id": "energy",
+      "industry_label": "核能与工程",
+      "url": "https://cnnc.zhiye.com/",
+      "status": "pending",
+      "notes": "中核集团北森招聘租户，官网反链尚未充分确认"
+    },
+    {
+      "batch": "B05",
+      "sequence": 50,
+      "name": "北京建工集团",
+      "industry_id": "construction",
+      "industry_label": "建筑工程",
+      "url": "https://bcegc.zhaopin.com/",
+      "status": "pending",
+      "notes": "北京建工专题入口需核实官网关联和当前可用性"
+    },
+    {
+      "batch": "B06",
+      "sequence": 1,
+      "name": "荣耀",
+      "industry_id": "consumer-hardware",
+      "industry_label": "",
+      "url": "https://www.honor.com/cn/career/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 2,
+      "name": "360集团",
+      "industry_id": "internet-ai",
+      "industry_label": "",
+      "url": "https://hr.360.cn/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 3,
+      "name": "商汤科技",
+      "industry_id": "internet-ai",
+      "industry_label": "",
+      "url": "https://hr-jobs.sensetime.com/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 4,
+      "name": "传音控股",
+      "industry_id": "consumer-hardware",
+      "industry_label": "",
+      "url": "https://transsion.zhiye.com/jobs",
+      "status": "pending",
+      "notes": "已发现专属北森站，但缺独立官网反链"
+    },
+    {
+      "batch": "B06",
+      "sequence": 5,
+      "name": "用友网络",
+      "industry_id": "internet-ai",
+      "industry_label": "",
+      "url": "https://career.yonyou.com/SU67ac41886202cc7916ae3029/pb/index.html",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 6,
+      "name": "东风汽车集团",
+      "industry_id": "automotive",
+      "industry_label": "",
+      "url": "https://www.dfmc.com.cn/zhaopin/zhaopin.html",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 7,
+      "name": "中集集团",
+      "industry_id": "logistics",
+      "industry_label": "",
+      "url": "https://www.cimc.com/hr/recruit-search2.php",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 8,
+      "name": "东风日产",
+      "industry_id": "automotive",
+      "industry_label": "",
+      "url": "https://www.dongfeng-nissan.com.cn/about/recruit/social",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 9,
+      "name": "广汽丰田",
+      "industry_id": "automotive",
+      "industry_label": "",
+      "url": "https://gac-toyota.zhiye.com/",
+      "status": "pending",
+      "notes": "专属北森站，公司主体归属需进一步证明"
+    },
+    {
+      "batch": "B06",
+      "sequence": 10,
+      "name": "安踏集团",
+      "industry_id": "retail",
+      "industry_label": "",
+      "url": "https://jobs.anta.com/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 11,
+      "name": "李宁集团",
+      "industry_id": "retail",
+      "industry_label": "",
+      "url": "https://lining.hotjob.cn/",
+      "status": "preview_verified",
+      "notes": "官网“加入我们”明确跳转专属招聘站"
+    },
+    {
+      "batch": "B06",
+      "sequence": 12,
+      "name": "欧派家居",
+      "industry_id": "consumer-hardware",
+      "industry_label": "",
+      "url": "https://app.mokahr.com/social-recruitment/oppein/78239",
+      "status": "preview_verified",
+      "notes": "由官网首页官方招聘链接修正为 Moka 专属租户"
+    },
+    {
+      "batch": "B06",
+      "sequence": 13,
+      "name": "奥克斯集团",
+      "industry_id": "consumer-hardware",
+      "industry_label": "",
+      "url": "https://www.auxgroup.com/careers",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 14,
+      "name": "苏泊尔",
+      "industry_id": "consumer-hardware",
+      "industry_label": "",
+      "url": "https://www.supor.com.cn/culture/joinus.html",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 15,
+      "name": "老板电器",
+      "industry_id": "consumer-hardware",
+      "industry_label": "",
+      "url": "https://igw.robam.com/recruit.html",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 16,
+      "name": "渤海银行",
+      "industry_id": "finance",
+      "industry_label": "",
+      "url": "https://www.cbhb.com.cn/cbhbank/jrwm/zpxx/index.shtml",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 17,
+      "name": "中国邮政储蓄银行",
+      "industry_id": "finance",
+      "industry_label": "",
+      "url": "https://www.psbc.com/cn/gyyc/rczp/shzp/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 18,
+      "name": "浙商银行",
+      "industry_id": "finance",
+      "industry_label": "",
+      "url": "https://zp.czbank.com.cn/",
+      "status": "preview_verified",
+      "notes": "已找到本行官网跨域招聘反链（czbank.com → zp.czbank.com.cn）"
+    },
+    {
+      "batch": "B06",
+      "sequence": 19,
+      "name": "徽商银行",
+      "industry_id": "finance",
+      "industry_label": "",
+      "url": "https://rczp.hsbank.com.cn/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 20,
+      "name": "杭州银行",
+      "industry_id": "finance",
+      "industry_label": "",
+      "url": "https://myjob.hzbank.com.cn/",
+      "status": "preview_verified",
+      "notes": "企业子域来源属官方；招聘网站曾提示维护，需以后复查可用性"
+    },
+    {
+      "batch": "B06",
+      "sequence": 21,
+      "name": "华夏银行",
+      "industry_id": "finance",
+      "industry_label": "",
+      "url": "https://www.hxb.com.cn/",
+      "status": "pending",
+      "notes": "旧候选仅为银行主页，不是已确认投递入口"
+    },
+    {
+      "batch": "B06",
+      "sequence": 22,
+      "name": "宁波银行",
+      "industry_id": "finance",
+      "industry_label": "",
+      "url": "https://zhaopin.nbcb.com.cn/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 23,
+      "name": "江苏银行",
+      "industry_id": "finance",
+      "industry_label": "",
+      "url": "https://hr.jsbchina.cn/zp",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 24,
+      "name": "南京银行",
+      "industry_id": "finance",
+      "industry_label": "",
+      "url": "https://job.njcb.com.cn/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 25,
+      "name": "中金公司",
+      "industry_id": "finance",
+      "industry_label": "",
+      "url": "https://cicc.zhiye.com/szzw",
+      "status": "pending",
+      "notes": "专属北森站可读，但尚无独立官网授权反链"
+    },
+    {
+      "batch": "B06",
+      "sequence": 26,
+      "name": "中国银河证券",
+      "industry_id": "finance",
+      "industry_label": "",
+      "url": "https://www.chinastock.com.cn/newsite/join-us.html",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 27,
+      "name": "国信证券",
+      "industry_id": "finance",
+      "industry_label": "",
+      "url": "https://guosen.zhiye.com/campus/jobs",
+      "status": "preview_verified",
+      "notes": "已找到国信证券官方子公司招聘反链"
+    },
+    {
+      "batch": "B06",
+      "sequence": 28,
+      "name": "招商证券",
+      "industry_id": "finance",
+      "industry_label": "",
+      "url": "https://cms.hotjob.cn/",
+      "status": "pending",
+      "notes": "有高校引用官方系统，尚待公司官网反链"
+    },
+    {
+      "batch": "B06",
+      "sequence": 29,
+      "name": "金蝶国际",
+      "industry_id": "internet-ai",
+      "industry_label": "",
+      "url": "https://www.kingdee.com/sg/zh-hans/careers/",
+      "status": "preview_verified",
+      "notes": "链接为官方国际招聘栏目；仅推荐中国大陆实际岗位"
+    },
+    {
+      "batch": "B06",
+      "sequence": 30,
+      "name": "摩尔线程",
+      "industry_id": "semiconductor",
+      "industry_label": "",
+      "url": "https://www.mthreads.com/jobs",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 31,
+      "name": "紫光展锐",
+      "industry_id": "semiconductor",
+      "industry_label": "",
+      "url": "https://www.unisoc.com/cn/about/join-us",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 32,
+      "name": "国药集团",
+      "industry_id": "biomed",
+      "industry_label": "",
+      "url": "https://www.sinopharm.com/recruitment.html",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 33,
+      "name": "扬子江药业集团",
+      "industry_id": "biomed",
+      "industry_label": "",
+      "url": "https://www.yangzijiang.com/Career",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 34,
+      "name": "正大天晴",
+      "industry_id": "biomed",
+      "industry_label": "",
+      "url": "https://cttq.zhiye.com/",
+      "status": "pending",
+      "notes": "专属北森站待官网反链"
+    },
+    {
+      "batch": "B06",
+      "sequence": 35,
+      "name": "华润三九",
+      "industry_id": "biomed",
+      "industry_label": "",
+      "url": "https://www.999.com.cn/applicationGuideInfo/index.html",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 36,
+      "name": "中国华能集团",
+      "industry_id": "energy",
+      "industry_label": "",
+      "url": "https://zhaopin.chng.com.cn/Home/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 37,
+      "name": "中国大唐集团",
+      "industry_id": "energy",
+      "industry_label": "",
+      "url": "https://zhaopin.china-cdt.com/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 38,
+      "name": "中国华电集团",
+      "industry_id": "energy",
+      "industry_label": "",
+      "url": "https://rencaishichang.chd.com.cn/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 39,
+      "name": "国家电力投资集团",
+      "industry_id": "energy",
+      "industry_label": "",
+      "url": "https://www.spic.com.cn/spicm/jrwm/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 40,
+      "name": "中国南方电网",
+      "industry_id": "energy",
+      "industry_label": "",
+      "url": "https://zhaopin.csg.cn/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 41,
+      "name": "通用技术集团",
+      "industry_id": "manufacturing",
+      "industry_label": "",
+      "url": "https://genertec.zhiye.com/",
+      "status": "pending",
+      "notes": "专属北森站待官网反链"
+    },
+    {
+      "batch": "B06",
+      "sequence": 42,
+      "name": "中国中化集团",
+      "industry_id": "chem-materials",
+      "industry_label": "",
+      "url": "https://sinochem.hotjob.cn/",
+      "status": "pending",
+      "notes": "专属Hotjob站待官网反链"
+    },
+    {
+      "batch": "B06",
+      "sequence": 43,
+      "name": "首都机场集团",
+      "industry_id": "logistics",
+      "industry_label": "",
+      "url": "https://www.cah.com.cn/Information/Recruit/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 44,
+      "name": "中国航空发动机集团",
+      "industry_id": "aerospace",
+      "industry_label": "",
+      "url": "https://www.aecc.cn/aecc/gggs/index.html",
+      "status": "preview_verified",
+      "notes": "官方信息公开栏目含招聘公告，尚非独立职位系统"
+    },
+    {
+      "batch": "B06",
+      "sequence": 45,
+      "name": "中国交通建设集团",
+      "industry_id": "construction",
+      "industry_label": "",
+      "url": "https://recruit.ccccltd.cn/",
+      "status": "preview_verified",
+      "notes": "由企业信息页修正为招聘域名"
+    },
+    {
+      "batch": "B06",
+      "sequence": 46,
+      "name": "中国国家铁路集团",
+      "industry_id": "logistics",
+      "industry_label": "",
+      "url": "https://rczp.china-railway.com.cn/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 47,
+      "name": "中国电子信息产业集团",
+      "industry_id": "internet-ai",
+      "industry_label": "",
+      "url": "https://career.cec.com.cn/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 48,
+      "name": "中国中铁集团",
+      "industry_id": "construction",
+      "industry_label": "",
+      "url": "https://www.crecg.com/web/rlzy65/rczp11/",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 49,
+      "name": "中国电子科技集团",
+      "industry_id": "semiconductor",
+      "industry_label": "",
+      "url": "https://cetccq.cetc.com.cn/zgdk/1593037/zpjgg/index.html",
+      "status": "preview_verified",
+      "notes": "官方招聘入口／公开企业信息核对"
+    },
+    {
+      "batch": "B06",
+      "sequence": 50,
+      "name": "中国铁建重工",
+      "industry_id": "manufacturing",
+      "industry_label": "",
+      "url": "https://crchi.zhiye.com/home",
+      "status": "pending",
+      "notes": "专属北森站待官网反链"
+    }
+  ]
+}
