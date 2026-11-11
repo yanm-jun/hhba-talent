@@ -51,6 +51,25 @@ test('collected draft PR records are present as unverified search hints, not app
   }
  }
 });
+test('150 prior Preview audit rows are preserved separately from chat collection targets',()=>{
+ const audits=read('employerLibraryPriorAudit150.json');
+ assert.equal(audits.records.length,150);
+ assert.equal(new Set(audits.records.map(r=>r.batch+'-'+r.sequence)).size,150);
+ assert.equal(audits.records.filter(r=>r.status==='preview_verified').length,136);
+ assert.equal(audits.records.filter(r=>r.status==='pending').length,14);
+ assert.equal(seed.statistics.prior_audit_source_rows,150);
+ assert.equal(seed.collection_coverage.imported_batch_records,700);
+ for(const row of audits.records){
+  const company=seed.items.find(e=>e.id===norm(row.name));
+  assert.ok(company,row.name);
+  const source=company.portals.find(p=>p.url===row.url);
+  assert.ok(source,row.name+': '+row.url);
+  if(source.source_batch===row.batch){
+   assert.equal(source.status,'collected_unverified');
+   assert.equal(source.historical_preview_status,row.status);
+  }
+ }
+});
 test('group-shared and HTTP candidates never become DeepSeek trusted job links',()=>{
  const shared={name:'国网子公司',industry_id:'energy',aliases:[],portals:[
   {url:'https://zhaopin.sgcc.com.cn/',scope:'group_shared_candidate',status:'collected_unverified'}]};
