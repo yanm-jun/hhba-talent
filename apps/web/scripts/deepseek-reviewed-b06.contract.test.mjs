@@ -105,6 +105,31 @@ test('B06 Guosen Securities corporate-subsidiary backlink approves only Guosen A
  assert.equal(whitelistJobSource('https://stranger.zhiye.com/campus/jobs',[s]),null);
 });
 
+test('B06 official CCCC recruitment site beats investor info landing',()=>{
+ const s=normalizeReviewedSource(source({
+  display_name:'中国交通建设集团',
+  official_company_url:'https://www.ccccltd.cn/',
+  recruitment_base_url:'https://recruit.ccccltd.cn/',
+  ownership_evidence_url:'https://recruit.ccccltd.cn/'
+ }),{now});
+ assert.ok(s);
+ assert.ok(whitelistJobSource('https://recruit.ccccltd.cn/jobs',[s]));
+ assert.equal(whitelistJobSource('https://www.ccccltd.cn/tzzgx/',[s]),null);
+});
+
+test('B06 Oppein Moka URL is exact corporate-linked tenant, not Moka platform-wide',()=>{
+ const s=normalizeReviewedSource(source({
+  display_name:'欧派家居',
+  official_company_url:'https://www.oppein.com/',
+  recruitment_base_url:'https://app.mokahr.com/social-recruitment/oppein/78239',
+  ownership_evidence_url:'https://www.oppein.com/index.html',
+  reviewer:'hhba-corporate-backlink-review-20261111'
+ }),{now});
+ assert.ok(s);
+ assert.ok(whitelistJobSource('https://app.mokahr.com/social-recruitment/oppein/78239',[s]));
+ assert.equal(whitelistJobSource('https://app.mokahr.com/social-recruitment/other/78239',[s]),null);
+});
+
 test('B06 unreviewed recruitment tenant is refused even when branded',()=>{
  const s=normalizeReviewedSource(source({
   display_name:'传音控股',
