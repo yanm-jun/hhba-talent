@@ -4,6 +4,8 @@
 .library-halls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:16px 0 24px}
 .library-hall{background:white;border:1px solid var(--border);border-radius:10px;min-height:49px;text-align:left;padding:12px;font-size:12px;color:#45604e}
 .library-hall.active{background:#eaf4ed;border-color:#5c9270;color:#235b40;font-weight:750}
+.library-hall-sub{display:block;margin-top:5px;font-size:10px;font-weight:400;color:#7b8a81;line-height:1.5}
+.library-collection-status{padding:13px 15px;border:1px solid #dde9df;border-radius:10px;background:#f6faf7;font-size:12px;line-height:1.8;color:#456b51;margin:5px 0 12px}
 .library-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
 .library-toolbar input,.library-edit-form input,.library-edit-form select,.library-editor textarea{border:1px solid #d9e3dc;border-radius:8px;background:white;padding:11px;color:var(--ink);width:100%;font-size:12px}
 .library-toolbar input{max-width:360px}
