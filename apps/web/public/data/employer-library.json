@@ -1,0 +1,3879 @@
+{
+  "schema_version": 1,
+  "description": "HHBA 已有仓库企业招聘入口与集团关系的分类索引；不是实时岗位数据库；legacy_reviewed 为历史审核状态，不代表当前有效。集团招聘链接不自动视为子公司独立招聘网站。",
+  "source_revision": "2026-11-12",
+  "halls": [
+    {
+      "id": "automotive",
+      "name": "汽车馆"
+    },
+    {
+      "id": "semiconductor",
+      "name": "电子半导体馆"
+    },
+    {
+      "id": "internet-ai",
+      "name": "互联网与AI馆"
+    },
+    {
+      "id": "energy",
+      "name": "能源电力馆"
+    },
+    {
+      "id": "manufacturing",
+      "name": "智能制造馆"
+    },
+    {
+      "id": "finance",
+      "name": "金融馆"
+    },
+    {
+      "id": "telecom",
+      "name": "通信馆"
+    },
+    {
+      "id": "biomed",
+      "name": "医药生物馆"
+    },
+    {
+      "id": "aerospace",
+      "name": "航空航天馆"
+    },
+    {
+      "id": "logistics",
+      "name": "交通物流馆"
+    },
+    {
+      "id": "construction",
+      "name": "建筑工程馆"
+    },
+    {
+      "id": "consumer-hardware",
+      "name": "家电与智能硬件馆"
+    },
+    {
+      "id": "chem-materials",
+      "name": "化工新材料馆"
+    },
+    {
+      "id": "retail",
+      "name": "商贸零售馆"
+    },
+    {
+      "id": "agri-food",
+      "name": "农业食品馆"
+    },
+    {
+      "id": "culture-media",
+      "name": "文化传媒馆"
+    },
+    {
+      "id": "education-research",
+      "name": "教育科研馆"
+    }
+  ],
+  "items": [
+    {
+      "id": "阿里巴巴",
+      "name": "阿里巴巴",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://talent.alibaba.com/",
+          "label": "阿里巴巴官方招聘入口（集团平台）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "埃斯顿",
+      "name": "埃斯顿",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://estun1.zhiye.com/",
+          "label": "埃斯顿岗位招聘系统",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "爱尔眼科",
+      "name": "爱尔眼科",
+      "industry_id": "biomed",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zhaopin.aierchina.com/",
+          "label": "爱尔眼科招聘渠道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "安得智联",
+      "name": "安得智联",
+      "industry_id": "logistics",
+      "parent_name": "美的集团",
+      "relation": "业务板块",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "安克创新",
+      "name": "安克创新",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://career.anker.com.cn/universities/recruitment/",
+          "label": "安克创新招聘渠道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "百度",
+      "name": "百度",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://talent.baidu.com/jobs/",
+          "label": "百度校园与实习招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "宝钢股份",
+      "name": "宝钢股份",
+      "industry_id": "chem-materials",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://baosteel.zhaopin.com/",
+          "label": "宝钢股份官方招聘渠道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "宝鸡中车时代工程机械有限公司",
+      "name": "宝鸡中车时代工程机械有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车宝鸡时代"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "北方华创",
+      "name": "北方华创",
+      "industry_id": "semiconductor",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://career.naura.com/social",
+          "label": "北方华创半导体装备社会招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "北京银行",
+      "name": "北京银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://bankofbeijing.zhiye.com/",
+          "label": "北京银行官方招聘（社招／校招）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "比亚迪",
+      "name": "比亚迪",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.byd.com/portal/pc/#/home",
+          "label": "比亚迪招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "成都银行",
+      "name": "成都银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.bocd.com.cn/zyxxfb/rczp/zhaopingonggao/list1.html",
+          "label": "成都银行官方招聘公告",
+          "scope": "official_announcement",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "大疆创新",
+      "name": "大疆创新",
+      "industry_id": "aerospace",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://careers.dji.com/zh-CN/",
+          "label": "大疆创新招聘网站",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "德赛西威",
+      "name": "德赛西威",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.desaysv.com/jobList.html",
+          "label": "德赛西威岗位招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "东方航空",
+      "name": "东方航空",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.ceair.com/",
+          "label": "东方航空招聘官网",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "东方证券",
+      "name": "东方证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://app.mokahr.com/apply/dfzq/4927",
+          "label": "东方证券社会招聘（官网指向 Moka）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "东风汽车集团",
+      "name": "东风汽车集团",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.dfmc.com.cn/zhaopin/zhaopin.html",
+          "label": "东风集团总部与所属单位招聘导览",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "飞凡汽车科技有限公司",
+      "name": "飞凡汽车科技有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "集团整车业务成员",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "弗迪电池有限公司",
+      "name": "弗迪电池有限公司",
+      "industry_id": "energy",
+      "parent_name": "比亚迪",
+      "relation": "集团旗下企业（官方报道）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "弗迪动力有限公司",
+      "name": "弗迪动力有限公司",
+      "industry_id": "automotive",
+      "parent_name": "比亚迪",
+      "relation": "集团旗下企业（官方报道）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "弗迪科技有限公司",
+      "name": "弗迪科技有限公司",
+      "industry_id": "automotive",
+      "parent_name": "比亚迪",
+      "relation": "集团旗下企业（官方报道）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "弗迪模具有限公司",
+      "name": "弗迪模具有限公司",
+      "industry_id": "automotive",
+      "parent_name": "比亚迪",
+      "relation": "集团旗下企业（官方报道）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "弗迪视觉有限公司",
+      "name": "弗迪视觉有限公司",
+      "industry_id": "automotive",
+      "parent_name": "比亚迪",
+      "relation": "集团旗下企业（官方报道）",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "福耀玻璃",
+      "name": "福耀玻璃",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.fuyaogroup.com/fuyao",
+          "label": "福耀集团官方网申（校园招聘入口）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "歌尔股份",
+      "name": "歌尔股份",
+      "industry_id": "semiconductor",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.goertek.com/join/recruitcategory144.html",
+          "label": "歌尔股份官方招聘栏目",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "格力电器",
+      "name": "格力电器",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zhaopin.greeyun.com/",
+          "label": "珠海格力电器招聘系统（已确认校园招聘）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "工商银行",
+      "name": "工商银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [
+        "中国工商银行"
+      ],
+      "portals": [
+        {
+          "url": "https://job.icbc.com.cn/",
+          "label": "中国工商银行人才招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "光大证券",
+      "name": "光大证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://ebscn.zhiye.com/",
+          "label": "光大证券招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "广发证券",
+      "name": "广发证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.gf.com.cn/",
+          "label": "广发证券人才招聘网",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "广汽集团",
+      "name": "广汽集团",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://xyzp.51job.com/gacgroup2027/",
+          "label": "广汽集团官方招聘入口（专用网申）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "贵州茅台",
+      "name": "贵州茅台",
+      "industry_id": "agri-food",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zp.moutai.com.cn/outhome",
+          "label": "贵州茅台人事招聘系统",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "国电南瑞",
+      "name": "国电南瑞",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [
+        "国电南瑞科技股份有限公司"
+      ],
+      "portals": [
+        {
+          "url": "https://job.sgepri.sgcc.com.cn/",
+          "label": "南瑞集团官方招聘系统（筛选国电南瑞用人主体）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "海大集团",
+      "name": "海大集团",
+      "industry_id": "agri-food",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://haid1.zhiye.com/campus/jobs",
+          "label": "海大集团官方招聘渠道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "海尔智家",
+      "name": "海尔智家",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://maker.haier.net/smart_home/customizedjobs.html",
+          "label": "海尔智家招聘（独立业务分区）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "海康机器人",
+      "name": "海康机器人",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.hikrobotics.com/",
+          "label": "海康机器人社会招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "海康威视",
+      "name": "海康威视",
+      "industry_id": "semiconductor",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://talent.hikvision.com/",
+          "label": "海康威视招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "海天味业",
+      "name": "海天味业",
+      "industry_id": "agri-food",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://haday.hotjob.cn/",
+          "label": "海天味业招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "海信视像",
+      "name": "海信视像",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://jobs.hisense.com/",
+          "label": "海信视像招聘渠道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "杭州银行",
+      "name": "杭州银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://myjob.hzbank.com.cn/hzzp-apply-web/static/index.html",
+          "label": "杭州银行招聘（社招／校招）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "合康新能",
+      "name": "合康新能",
+      "industry_id": "energy",
+      "parent_name": "美的集团",
+      "relation": "旗下上市企业",
+      "aliases": [
+        "北京合康新能科技股份有限公司"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "恒瑞医药",
+      "name": "恒瑞医药",
+      "industry_id": "biomed",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://app.mokahr.com/campus-recruitment/hengrui/145997",
+          "label": "恒瑞医药招聘 Moka 校招入口",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "华安证券",
+      "name": "华安证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [
+        "华安证券股份有限公司"
+      ],
+      "portals": [
+        {
+          "url": "https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment",
+          "label": "华安证券官方招聘报名系统",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "华泰证券",
+      "name": "华泰证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://wecruit.hotjob.cn/SU6419745cbef57c635fe10142/pb/index.html?channelId=61d886b0bef57c659fd91ea8",
+          "label": "华泰证券校招及集团招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "华为",
+      "name": "华为",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://career.huawei.com/cn",
+          "label": "华为官方招聘入口（专用网申）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "华域汽车",
+      "name": "华域汽车",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "集团零部件业务成员",
+      "aliases": [
+        "华域汽车系统股份有限公司"
+      ],
+      "portals": [
+        {
+          "url": "https://www.hasco-group.com/join/",
+          "label": "华域汽车工作与职业",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry",
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "华域汽车车身零件(上海)有限公司",
+      "name": "华域汽车车身零件（上海）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车",
+      "relation": "投资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "华域汽车电动系统有限公司",
+      "name": "华域汽车电动系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车",
+      "relation": "投资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "华域三电汽车空调有限公司",
+      "name": "华域三电汽车空调有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车",
+      "relation": "投资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "华域视觉科技(上海)有限公司",
+      "name": "华域视觉科技（上海）有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车",
+      "relation": "投资企业",
+      "aliases": [
+        "华域视觉"
+      ],
+      "portals": [
+        {
+          "url": "https://hascovision.zhiye.com/social",
+          "label": "华域视觉社会招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry",
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "汇川技术",
+      "name": "汇川技术",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://recruit.inovance.com/",
+          "label": "汇川技术招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "汇顶科技",
+      "name": "汇顶科技",
+      "industry_id": "semiconductor",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://goodix.zhiye.com/",
+          "label": "汇顶科技招聘渠道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "机器人与自动化",
+      "name": "机器人与自动化",
+      "industry_id": "manufacturing",
+      "parent_name": "美的集团",
+      "relation": "业务板块",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "吉利汽车",
+      "name": "吉利汽车",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.geelyautogroup.com/recruitment",
+          "label": "吉利汽车集团官网招聘（社招／校招）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "吉利汽车控股有限公司",
+      "name": "吉利汽车控股有限公司",
+      "industry_id": "automotive",
+      "parent_name": "浙江吉利控股集团",
+      "relation": "控股企业",
+      "aliases": [
+        "吉利汽车",
+        "吉利汽车集团"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "极氪",
+      "name": "极氪",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.zeekrgroup.com/join-us",
+          "label": "极氪科技集团招聘（非单一法人）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "极氪科技集团",
+      "name": "极氪科技集团",
+      "industry_id": "automotive",
+      "parent_name": "浙江吉利控股集团",
+      "relation": "集团业务板块",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "极星集团",
+      "name": "极星集团",
+      "industry_id": "automotive",
+      "parent_name": "浙江吉利控股集团",
+      "relation": "集团业务板块",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "建设银行",
+      "name": "建设银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [
+        "中国建设银行"
+      ],
+      "portals": [
+        {
+          "url": "https://job.ccb.com/",
+          "label": "中国建设银行人才招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "江淮汽车",
+      "name": "江淮汽车",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.jac.com.cn/zhuantinews/20260911/10715.html",
+          "label": "江淮汽车官方招聘入口（招聘公告）",
+          "scope": "official_announcement",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "交通银行",
+      "name": "交通银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.bankcomm.com/queryPosition.do",
+          "label": "交通银行官方招聘入口（专用网申）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "金蝶国际",
+      "name": "金蝶国际",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.kingdee.com/job",
+          "label": "金蝶招聘频道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "京东方a",
+      "name": "京东方Ａ",
+      "industry_id": "semiconductor",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [
+        "京东方A",
+        "京东方"
+      ],
+      "portals": [
+        {
+          "url": "https://campus.boe.com/custom/professionals?hideMenu=1",
+          "label": "京东方社会招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "京东集团",
+      "name": "京东集团",
+      "industry_id": "retail",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://campus.jd.com/",
+          "label": "京东集团官方招聘入口（集团平台）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "晶科能源",
+      "name": "晶科能源",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://app.mokahr.com/campus-recruitment/jinkosolar/41896",
+          "label": "晶科能源校园招聘官方投递入口",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "科大讯飞",
+      "name": "科大讯飞",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://iflytek.zhiye.com/campus/jobs",
+          "label": "科大讯飞2027校园招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "科陆电子",
+      "name": "科陆电子",
+      "industry_id": "energy",
+      "parent_name": "美的集团",
+      "relation": "旗下上市企业",
+      "aliases": [
+        "深圳市科陆电子科技股份有限公司"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "浪潮信息",
+      "name": "浪潮信息",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://inspur.hcmcloud.cn/recruit#/campus_category?type=campus",
+          "label": "浪潮集团2027校招线索（浪潮信息具体岗位未核实）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "雷赛智能",
+      "name": "雷赛智能",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.leisai.com/recruitment/index.html",
+          "label": "雷赛智能官方招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "理想汽车",
+      "name": "理想汽车",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.lixiang.com/employ/campus/list.html?fromJob=1&employchannelcode=H56UNDK&job_mode=1",
+          "label": "理想汽车2027校园招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "立讯精密",
+      "name": "立讯精密",
+      "industry_id": "semiconductor",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://wecruit.hotjob.cn/SU601778b25d83dc072073230a/pb/school.html",
+          "label": "立讯精密校园招聘（高校发布的招聘官网）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "莲花集团",
+      "name": "莲花集团",
+      "industry_id": "uncategorized",
+      "parent_name": "浙江吉利控股集团",
+      "relation": "集团业务板块",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "联合汽车电子有限公司",
+      "name": "联合汽车电子有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "集团零部件业务成员",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "联想集团",
+      "name": "联想集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://talent.lenovo.com.cn/position",
+          "label": "联想集团官方招聘入口（集团平台）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "联影医疗",
+      "name": "联影医疗",
+      "industry_id": "biomed",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://global.united-imaging.com/zh-cn/careers",
+          "label": "联影集团招聘导航",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "零跑汽车",
+      "name": "零跑汽车",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://leapmotor.zhiye.com/",
+          "label": "零跑汽车校招／社招／实习",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "隆基绿能",
+      "name": "隆基绿能",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://longi.hotjob.cn/",
+          "label": "隆基绿能招聘（访问状态待复核）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "迈瑞医疗",
+      "name": "迈瑞医疗",
+      "industry_id": "biomed",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.mindray.com/cn/career",
+          "label": "迈瑞医疗官方招聘入口（专用网申）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "美的工业技术",
+      "name": "美的工业技术",
+      "industry_id": "manufacturing",
+      "parent_name": "美的集团",
+      "relation": "业务板块",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "美的集团",
+      "name": "美的集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://recruit.midea.com/recruitOut/ihr/social",
+          "label": "美的集团社会招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "美的楼宇科技",
+      "name": "美的楼宇科技",
+      "industry_id": "uncategorized",
+      "parent_name": "美的集团",
+      "relation": "业务板块",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "美的能源",
+      "name": "美的能源",
+      "industry_id": "energy",
+      "parent_name": "美的集团",
+      "relation": "业务板块",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "美的医疗",
+      "name": "美的医疗",
+      "industry_id": "biomed",
+      "parent_name": "美的集团",
+      "relation": "业务板块",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "美团",
+      "name": "美团",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://careers.meituan.com/web/home",
+          "label": "美团招聘网站",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "牧原股份",
+      "name": "牧原股份",
+      "industry_id": "agri-food",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://app.mokahr.com/m/campus-recruitment/muyuan/70116",
+          "label": "牧原股份官方招聘渠道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "南方航空",
+      "name": "南方航空",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.csair.cn/global",
+          "label": "南方航空招聘网",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "南京汽车集团有限公司",
+      "name": "南京汽车集团有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "集团整车业务成员",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "南京依维柯汽车有限公司",
+      "name": "南京依维柯汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "集团整车业务成员",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "南京银行",
+      "name": "南京银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.njcb.com.cn/",
+          "label": "南京银行招聘官网",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "宁德时代",
+      "name": "宁德时代",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://talent.catl.com/social-recruitment/catlhr/96144/",
+          "label": "宁德时代招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "农业银行",
+      "name": "农业银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [
+        "中国农业银行"
+      ],
+      "portals": [
+        {
+          "url": "https://career.abchina.com/build/index.html#/",
+          "label": "中国农业银行招聘网站",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "泡泡玛特",
+      "name": "泡泡玛特",
+      "industry_id": "retail",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://popmart.zhiye.com/",
+          "label": "泡泡玛特官方招聘（社招／校招／实习）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "平高电气",
+      "name": "平高电气",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.pinggao.com/contact/jobSociety.html",
+          "label": "平高电气官网社会招聘公告",
+          "scope": "official_announcement",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "浦发银行",
+      "name": "浦发银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [
+        "上海浦东发展银行"
+      ],
+      "portals": [
+        {
+          "url": "https://job.spdb.com.cn/",
+          "label": "浦发银行招聘（官网目前维护中）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "奇瑞汽车",
+      "name": "奇瑞汽车",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://chery1.zhiye.com/",
+          "label": "奇瑞汽车股份有限公司招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "青岛四方阿尔斯通铁路运输设备有限公司",
+      "name": "青岛四方阿尔斯通铁路运输设备有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "四方阿尔斯通"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "青岛中车四方轨道车辆有限公司",
+      "name": "青岛中车四方轨道车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "青岛中车四方"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "荣耀",
+      "name": "荣耀",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.honor.com/cn/career/",
+          "label": "荣耀招聘官网",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "赛力斯",
+      "name": "赛力斯",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://sokon.zhiye.com/campus/jobs",
+          "label": "赛力斯官方招聘渠道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "三一重工",
+      "name": "三一重工",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://sany.zhiye.com/campus/jobs",
+          "label": "三一集团2027校园招聘（核对三一重工用人主体）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "上海电气",
+      "name": "上海电气",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.hotjob.cn/wt/SEC/mobweb/v8/index",
+          "label": "上海电气微招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "上海法雷奥汽车电器系统有限公司",
+      "name": "上海法雷奥汽车电器系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车",
+      "relation": "投资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上海汇众汽车制造有限公司",
+      "name": "上海汇众汽车制造有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车",
+      "relation": "投资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上海机场",
+      "name": "上海机场",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.shanghaiairport.com/shzp/index.html",
+          "label": "上海机场集团社会招聘信息（非上市主体独立投递站）",
+          "scope": "official_announcement",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "上海纳铁福传动轴有限公司",
+      "name": "上海纳铁福传动轴有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车",
+      "relation": "投资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上海皮尔博格有色零部件有限公司",
+      "name": "上海皮尔博格有色零部件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车",
+      "relation": "投资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上海汽车变速器有限公司",
+      "name": "上海汽车变速器有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "集团零部件业务成员",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上海乾通汽车附件有限公司",
+      "name": "上海乾通汽车附件有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车",
+      "relation": "投资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上海赛科利汽车模具技术应用有限公司",
+      "name": "上海赛科利汽车模具技术应用有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车",
+      "relation": "投资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上海申沃客车有限公司",
+      "name": "上海申沃客车有限公司",
+      "industry_id": "uncategorized",
+      "parent_name": "上汽集团",
+      "relation": "集团整车业务成员",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上海实业交通电器有限公司",
+      "name": "上海实业交通电器有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车",
+      "relation": "投资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上海银行",
+      "name": "上海银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://bosc.zhiye.com/",
+          "label": "上海银行官方招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "上汽大通汽车有限公司",
+      "name": "上汽大通汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "全资子公司",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上汽大众汽车有限公司",
+      "name": "上汽大众汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "合资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上汽红岩汽车有限公司",
+      "name": "上汽红岩汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "集团整车业务成员",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上汽集团",
+      "name": "上汽集团",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://saic-recruit.saicmotor.com/",
+          "label": "上汽集团统一招聘系统",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "上汽集团乘用车分公司",
+      "name": "上汽集团乘用车分公司",
+      "industry_id": "uncategorized",
+      "parent_name": "上汽集团",
+      "relation": "分公司",
+      "aliases": [
+        "上汽乘用车",
+        "上汽大乘用车"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上汽通用汽车有限公司",
+      "name": "上汽通用汽车有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "合资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "上汽通用五菱汽车股份有限公司",
+      "name": "上汽通用五菱汽车股份有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "合资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "石头科技",
+      "name": "石头科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://roborock.zhiye.com/campus/jobs",
+          "label": "石头科技官方招聘渠道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "顺丰控股",
+      "name": "顺丰控股",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://campus.sf-express.com/",
+          "label": "顺丰校园招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "思源电气",
+      "name": "思源电气",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.sieyuan.com/join",
+          "label": "思源电气加入我们",
+          "scope": "official_announcement",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "拓斯达",
+      "name": "拓斯达",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [
+        "广东拓斯达科技股份有限公司"
+      ],
+      "portals": [
+        {
+          "url": "https://www.topstarltd.com/lang-cn/recruitinglist/006002003.html",
+          "label": "拓斯达官网校园招聘岗位列表",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "泰格医药",
+      "name": "泰格医药",
+      "industry_id": "biomed",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://tigermed.zhiye.com/",
+          "label": "泰格医药官方招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "腾讯",
+      "name": "腾讯",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://careers.tencent.com/",
+          "label": "腾讯官方招聘入口（专用网申）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "潍柴动力",
+      "name": "潍柴动力",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://weichai.zhiye.com/",
+          "label": "潍柴集团招聘平台（需确认潍柴动力岗位）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "蔚来汽车",
+      "name": "蔚来汽车",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://campus.nio.com/",
+          "label": "蔚来校园招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "温氏股份",
+      "name": "温氏股份",
+      "industry_id": "agri-food",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.wens.com.cn/groupnews/info.aspx?itemid=2479&parent=",
+          "label": "温氏股份官方招聘渠道",
+          "scope": "official_announcement",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "沃尔沃汽车集团",
+      "name": "沃尔沃汽车集团",
+      "industry_id": "automotive",
+      "parent_name": "浙江吉利控股集团",
+      "relation": "集团业务板块",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "小米集团",
+      "name": "小米集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://hr.xiaomi.com/",
+          "label": "小米集团官方招聘入口（集团平台）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "小鹏汽车",
+      "name": "小鹏汽车",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://xiaopeng.jobs.feishu.cn/",
+          "label": "小鹏集团招聘网站（需核对实际招聘法人）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "携程集团",
+      "name": "携程集团",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.ctrip.com/",
+          "label": "携程集团招聘网站",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "欣旺达",
+      "name": "欣旺达",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://sunwoda.zhiye.com/jobs",
+          "label": "欣旺达招聘系统（总部及业务板块）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "兴业银行",
+      "name": "兴业银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.cib.com.cn/portal/",
+          "label": "兴业银行官方招聘入口（专用网申）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "许继电气",
+      "name": "许继电气",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://xjec.com/contact/campus/",
+          "label": "许继电气官网校园招聘公告",
+          "scope": "official_announcement",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "延锋汽车饰件系统有限公司",
+      "name": "延锋汽车饰件系统有限公司",
+      "industry_id": "automotive",
+      "parent_name": "华域汽车",
+      "relation": "投资企业",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "阳光电动力",
+      "name": "阳光电动力",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.sungrowev.com/cn/contact-us/join-us",
+          "label": "阳光电动力官网工作机会与投递方式",
+          "scope": "official_announcement",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "阳光电源",
+      "name": "阳光电源",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://jobs.sungrowpower.com/",
+          "label": "阳光电源招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "药明康德",
+      "name": "药明康德",
+      "industry_id": "biomed",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://wuxiapptec.zhiye.com/",
+          "label": "药明康德招聘渠道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "伊利股份",
+      "name": "伊利股份",
+      "industry_id": "agri-food",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.yili.com/joinus",
+          "label": "伊利招聘与岗位筛选",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "亿纬锂能",
+      "name": "亿纬锂能",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://wecruit.hotjob.cn/SU630487ca0dcad45aa7768a79/pb/social.html",
+          "label": "亿纬锂能招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "亿纬氢能",
+      "name": "亿纬氢能",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.evehydrogen.com/contact/contact1.html",
+          "label": "亿纬氢能官网校园招聘页面（数据待复核）",
+          "scope": "official_announcement",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "英威腾",
+      "name": "英威腾",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.invt.com.cn/careers",
+          "label": "英威腾校园／社会招聘入口",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "用友网络",
+      "name": "用友网络",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://career.yonyou.com/",
+          "label": "用友集团校园招聘线索（需核对运行状态）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "邮储银行",
+      "name": "邮储银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.psbc.com/cn/gyyc/rczp/shzp/",
+          "label": "邮储银行官方网站人才招聘公告",
+          "scope": "official_announcement",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "宇通客车",
+      "name": "宇通客车",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://app.mokahr.com/m/campus-recruitment/yutong/172567",
+          "label": "宇通客车官方招聘入口（集团平台）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "远程新能源商用车集团",
+      "name": "远程新能源商用车集团",
+      "industry_id": "automotive",
+      "parent_name": "浙江吉利控股集团",
+      "relation": "集团业务板块",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "长安汽车",
+      "name": "长安汽车",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://changan.zhiye.com/",
+          "label": "长安汽车官方招聘入口（专用网申）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "长城汽车",
+      "name": "长城汽车",
+      "industry_id": "automotive",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zhaopin.gwm.cn/SU692d3058ea11b01b6c54d0ea/pb/index.html",
+          "label": "长城汽车官网招聘系统（按股份公司与零部件主体区分）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "招商银行",
+      "name": "招商银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://career.cmbchina.com/home",
+          "label": "招商银行招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "兆易创新",
+      "name": "兆易创新",
+      "industry_id": "semiconductor",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.gigadevice.com.cn/about/career",
+          "label": "兆易创新官方招聘栏目",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "正泰电器",
+      "name": "正泰电器",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://app.mokahr.com/campus-recruitment/chint/40745",
+          "label": "正泰集团校园招聘（电器主体需核对）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "智飞生物",
+      "name": "智飞生物",
+      "industry_id": "biomed",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.zhifeishengwu.com/zh_CN/recruitment/42.html",
+          "label": "智飞生物官网招聘岗位栏目",
+          "scope": "official_announcement",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "智己汽车科技有限公司",
+      "name": "智己汽车科技有限公司",
+      "industry_id": "automotive",
+      "parent_name": "上汽集团",
+      "relation": "集团整车业务成员",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "智能家居",
+      "name": "智能家居",
+      "industry_id": "consumer-hardware",
+      "parent_name": "美的集团",
+      "relation": "业务板块",
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车北京南口机械有限公司",
+      "name": "中车北京南口机械有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车南口"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车常州车辆有限公司",
+      "name": "中车常州车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车常州"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车成都机车车辆有限公司",
+      "name": "中车成都机车车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车成都"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车大连电力牵引研发中心有限公司",
+      "name": "中车大连电力牵引研发中心有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车大连电牵"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车大连机车车辆有限公司",
+      "name": "中车大连机车车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车大连"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车大连机车研究所有限公司",
+      "name": "中车大连机车研究所有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车大连所"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车大同电力机车有限公司",
+      "name": "中车大同电力机车有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车大同"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车广东轨道交通车辆有限公司",
+      "name": "中车广东轨道交通车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车广东"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车贵阳车辆有限公司",
+      "name": "中车贵阳车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车贵阳"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车哈尔滨车辆有限公司",
+      "name": "中车哈尔滨车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车哈尔滨"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车兰州机车有限公司",
+      "name": "中车兰州机车有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车兰州"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车洛阳机车有限公司",
+      "name": "中车洛阳机车有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车洛阳"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车眉山车辆有限公司",
+      "name": "中车眉山车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车眉山"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车南京浦镇车辆有限公司",
+      "name": "中车南京浦镇车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车浦镇"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车戚墅堰机车车辆工艺研究所股份有限公司",
+      "name": "中车戚墅堰机车车辆工艺研究所股份有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车戚墅堰所"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车戚墅堰机车有限公司",
+      "name": "中车戚墅堰机车有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车戚墅堰"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车齐车集团有限公司",
+      "name": "中车齐车集团有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车齐车集团"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车齐齐哈尔车辆有限公司",
+      "name": "中车齐齐哈尔车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车齐齐哈尔"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车青岛四方车辆研究所有限公司",
+      "name": "中车青岛四方车辆研究所有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车四方所"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车青岛四方机车车辆股份有限公司",
+      "name": "中车青岛四方机车车辆股份有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车四方"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车山东风电有限公司",
+      "name": "中车山东风电有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车山东风电"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车山东机车车辆有限公司",
+      "name": "中车山东机车车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车山东"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车沈阳机车车辆有限公司",
+      "name": "中车沈阳机车车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车沈阳"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车石家庄车辆有限公司",
+      "name": "中车石家庄车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车石家庄"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车太原机车车辆有限公司",
+      "name": "中车太原机车车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车太原"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车唐山机车车辆有限公司",
+      "name": "中车唐山机车车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车唐山"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车物流有限公司",
+      "name": "中车物流有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车物流"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车西安车辆有限公司",
+      "name": "中车西安车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车西安"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车永济电机有限公司",
+      "name": "中车永济电机有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车永济电机"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车长春轨道客车股份有限公司",
+      "name": "中车长春轨道客车股份有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车长客"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车长江车辆有限公司",
+      "name": "中车长江车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车长江"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车长江铜陵车辆有限公司",
+      "name": "中车长江铜陵车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车铜陵"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车长江运输设备集团有限公司",
+      "name": "中车长江运输设备集团有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车长江集团"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车制动系统有限公司",
+      "name": "中车制动系统有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车制动"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车株洲车辆有限公司",
+      "name": "中车株洲车辆有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车株洲车辆"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车株洲电机有限公司",
+      "name": "中车株洲电机有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车株洲电机"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车株洲电力机车研究所有限公司",
+      "name": "中车株洲电力机车研究所有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车株洲所"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车株洲电力机车有限公司",
+      "name": "中车株洲电力机车有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车株机"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中车资阳机车有限公司",
+      "name": "中车资阳机车有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车资阳"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "中国电信",
+      "name": "中国电信",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index",
+          "label": "中国电信校招（集团各单位）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国国航",
+      "name": "中国国航",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zhaopin.airchina.com.cn/",
+          "label": "中国航空集团招聘（含国航股份）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "中国海油",
+      "name": "中国海油",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://cnooc.zhaopin.com/",
+          "label": "中国海油官方招聘入口（集团平台）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国建筑",
+      "name": "中国建筑",
+      "industry_id": "construction",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.cscec.com/rlzy_new/rczp/",
+          "label": "中国建筑招聘栏目（含股份公司）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国联通",
+      "name": "中国联通",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zglt.zhaopin.com/",
+          "label": "中国联通招聘渠道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国平安",
+      "name": "中国平安",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://campus.pingan.com/",
+          "label": "中国平安校园招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国人寿",
+      "name": "中国人寿",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.chinalife.com.cn/chinalife/zhaopin",
+          "label": "中国人寿官方招聘入口（集团平台）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国神华",
+      "name": "中国神华",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zhaopin.chnenergy.com.cn/",
+          "label": "中国神华官方招聘入口（集团平台）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国石化",
+      "name": "中国石化",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.sinopec.com/",
+          "label": "中国石化官方招聘入口（集团平台）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国石油",
+      "name": "中国石油",
+      "industry_id": "energy",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://zhaopin.cnpc.com.cn/",
+          "label": "中国石油官方招聘入口（集团平台）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国移动",
+      "name": "中国移动",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.10086.cn/",
+          "label": "中国移动招聘网站",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国银行",
+      "name": "中国银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://www.boc.cn/aboutboc/bi4/",
+          "label": "中国银行官方招聘公告栏目",
+          "scope": "official_announcement",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国邮政",
+      "name": "中国邮政",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://chinapost2027.zhaopin.com/",
+          "label": "中国邮政官方招聘入口（集团平台）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国中车",
+      "name": "中国中车",
+      "industry_id": "logistics",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://crrc.hotjob.cn/",
+          "label": "中国中车招聘云平台",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中控技术",
+      "name": "中控技术",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://app.mokahr.com/campus-recruitment/supcon/172631",
+          "label": "中控技术招聘渠道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中信银行",
+      "name": "中信银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.citicbank.com/",
+          "label": "中信银行官方招聘入口（专用网申）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中信证券",
+      "name": "中信证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://careers.citics.com/",
+          "label": "中信证券招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中兴通讯",
+      "name": "中兴通讯",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://job.zte.com.cn/cn/",
+          "label": "中兴通讯招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "株洲时代新材料科技股份有限公司",
+      "name": "株洲时代新材料科技股份有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车时代新材"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "株洲中车时代电气股份有限公司",
+      "name": "株洲中车时代电气股份有限公司",
+      "industry_id": "logistics",
+      "parent_name": "中国中车",
+      "relation": "集团成员（含一级与重点二级）",
+      "aliases": [
+        "中车时代电气"
+      ],
+      "portals": [],
+      "source_datasets": [
+        "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "紫光股份",
+      "name": "紫光股份",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://unigroup.zhaopin.com/",
+          "label": "新紫光集团2027校园招聘（须筛选紫光股份实际用人主体）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-23"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "字节跳动",
+      "name": "字节跳动",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://jobs.bytedance.com/",
+          "label": "字节跳动官方招聘入口（专用网申）",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "oppo",
+      "name": "OPPO",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://careers.oppo.com/",
+          "label": "OPPO社会招聘／校园招聘",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "tcl科技",
+      "name": "TCL科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://campus.tcl.com/campus/recruiting.html?id=65",
+          "label": "TCL科技招聘渠道",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "vivo",
+      "name": "vivo",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [
+        {
+          "url": "https://hr.vivo.com/",
+          "label": "vivo官方招聘网站",
+          "scope": "employer_portal",
+          "status": "legacy_reviewed",
+          "reviewed_on": "2026-10-24"
+        }
+      ],
+      "source_datasets": [
+        "domesticRecruitment200Registry"
+      ]
+    }
+  ],
+  "statistics": {
+    "entities": 218,
+    "legacy_portals": 130,
+    "group_relations": 90,
+    "unclassified": 4,
+    "by_hall": {
+      "automotive": 52,
+      "semiconductor": 7,
+      "internet-ai": 11,
+      "energy": 21,
+      "manufacturing": 11,
+      "finance": 23,
+      "telecom": 5,
+      "biomed": 8,
+      "aerospace": 1,
+      "logistics": 52,
+      "construction": 1,
+      "consumer-hardware": 13,
+      "chem-materials": 1,
+      "retail": 2,
+      "agri-food": 6,
+      "culture-media": 0,
+      "education-research": 0
+    }
+  }
+}
