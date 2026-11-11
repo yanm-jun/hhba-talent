@@ -797,10 +797,10 @@ export const ENERGY_BATCH_101_200 = Object.freeze([
   ],
   [
     200,
-    "晶盛机电光伏装备校招",
-    "https://app.mokahr.com/campus-recruitment/jsjd/118048#/",
+    "长园科技集团2027校招",
+    "https://www.cyg.com/campus.html",
     "energy-equipment",
-    "ATS",
-    "晶盛机电"
+    "CAREERS",
+    "长园科技"
   ]
 ]);
