@@ -1,6 +1,6 @@
 -- HHBA energy electricity second batch 101-200 (100 additional URLs).
 -- Run after amended 0029 in a fresh preview DB. Internal UNVERIFIED discovery hints only.
--- Never insert into hhba_reviewed_recruitment_sources or allow unreviewed links in production recommendations.
+-- Never promote candidate links to the trusted recruitment whitelist or production recommendations.
 INSERT OR IGNORE INTO hhba_library_energy_recruitment_candidates
 (id,collection_sequence,employer_display_name,candidate_url,section_id,entry_kind,parent_group,batch_id)
 VALUES
