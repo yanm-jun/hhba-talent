@@ -36,6 +36,8 @@ export async function automotiveLibrary(db,{major='',role='',now=new Date()}={})
  const sections=await all(db,
   'SELECT section_id,display_name,sort_order FROM hhba_library_hall_sections '+
   'WHERE hall_id=? ORDER BY sort_order',['automotive']);
+ const majorOptions=await all(db,
+  'SELECT major_code,display_name FROM hhba_library_majors ORDER BY display_name LIMIT 200');
  let majorInfo=null,rolePaths=[];
  if(inputMajor){
   const [m]=await all(db,
@@ -94,7 +96,7 @@ export async function automotiveLibrary(db,{major='',role='',now=new Date()}={})
   'ORDER BY documented_business_role_scope DESC,CASE h.membership_type WHEN \'PRIMARY\' THEN 0 ELSE 1 END,s.display_name LIMIT 100',
   [effectiveRole,'automotive',now.toISOString()]);
  return {kind:LIBRARY_KIND,hall:{...hall,development_status:'PILOT'},
-  major:majorInfo,roles:rolePaths,
+  major:majorInfo,major_options:majorOptions,roles:rolePaths,
   selected_role:effectiveRole,
   sections,employers:employers.map(e=>({...e,
    documented_business_role_scope:Boolean(e.documented_business_role_scope),
