@@ -163,7 +163,7 @@ function submitBulk(){
    // Never invent an official URL just to accept a name-only import.
    if(parts.length===1){
     if(state.hall==='all')throw Error('仅粘贴企业名称时，请先选择左侧对应行业馆');
-    const name=parts[0].replace(/^\\d{1,4}\\s*[.．、)）]\\s*/,'').trim();
+    const name=parts[0].replace(/^\d{1,4}\s*[.．、)）]\s*/,'').trim();
     if(name.length<2)throw Error('第'+(i+1)+'行企业名称无效');
     rows.push({name,industry_id:state.hall,portals:[]});
     continue;
@@ -179,7 +179,7 @@ function submitBulk(){
   // than rejecting all 100 lines or overwriting a verified prior portal.
   const byEntity=new Map();
   for(const row of rows){
-   const id=row.name.normalize('NFKC').replace(/[\\s·•]/g,'').toLowerCase();
+   const id=row.name.normalize('NFKC').replace(/[\s·•]/g,'').toLowerCase();
    const old=byEntity.get(id);
    if(!old){byEntity.set(id,row);continue;}
    old.related_hall_ids=[...new Set([...(old.related_hall_ids||[]),
