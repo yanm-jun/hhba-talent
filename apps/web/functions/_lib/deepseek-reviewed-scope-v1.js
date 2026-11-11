@@ -88,7 +88,13 @@ export function whitelistJobSource(hitUrl,reviewed){
 }
 
 export function onlyWhitelistHits(hits,reviewed){
- return (Array.isArray(hits)?hits:[]).filter(h=>whitelistJobSource(h?.url,reviewed));
+ return (Array.isArray(hits)?hits:[]).flatMap(hit=>{
+  const source=whitelistJobSource(hit?.url,reviewed);
+  // Attach only public editorial ownership for a strict output cross-check.
+  // This is NOT verification of a specific job's open/eligible status.
+  return source?[{...hit,reviewed_employer:source.display_name,
+   reviewed_source_id:source.id}]:[];
+ });
 }
 
 /** A DeepSeek Search query constrained by one reviewed company source. */
