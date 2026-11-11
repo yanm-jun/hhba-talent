@@ -9,7 +9,8 @@
 import {recruitmentSourceKind,isEmployerDirectedSource} from './match-employer-source.js';
 
 export const WHITE_SEARCH_VERSION='HHBA_DEEPSEEK_OFFICIAL_SCOPE_S4';
-const SHARED_ATS=['lever.co','greenhouse.io','myworkdayjobs.com','workdayjobs.com',
+const SHARED_ATS=['zhiye.com','mokahr.com','hotjob.cn','zhaopin.com','51job.com',
+ 'lever.co','greenhouse.io','myworkdayjobs.com','workdayjobs.com',
  'smartrecruiters.com','icims.com','ashbyhq.com','recruitee.com','taleo.net',
  'oraclecloud.com','successfactors.com','jobvite.com','teamtailor.com'];
 const THIRD_PARTY=['zhipin.com','51job.com','zhaopin.com','liepin.com','lagou.com',
@@ -21,11 +22,25 @@ const domainOK=host=>/^(?=.{4,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[
  !/(?:\.local|\.internal|\.invalid|\.example|\.test)$/i.test(host);
 const isSharedATS=host=>SHARED_ATS.some(d=>sameOrChild(host,d));
 const blocked=host=>THIRD_PARTY.some(d=>sameOrChild(host,d));
+// The user explicitly verified individual employer-owned ATS tenants in B04;
+// never trust a generic job board host or a neighbouring tenant.
+const USER_REVIEW='hhba-user-confirmed-official-20261111';
+const userApprovedRecruitmentTenant=u=>{
+ const h=u.hostname,p=u.pathname;
+ if(h.endsWith('.zhiye.com')&&!['www.zhiye.com','app.zhiye.com'].includes(h))return true;
+ if(h.endsWith('.hotjob.cn')&&h!=='wecruit.hotjob.cn'&&h!=='www.hotjob.cn')return true;
+ if(h==='wecruit.hotjob.cn')return /^\\/SU[a-z0-9]{12,}\\/pb\\//i.test(p);
+ if(h.endsWith('.zhaopin.com')&&h!=='www.zhaopin.com'&&h!=='zhaopin.com'&&h!=='campus.zhaopin.com')return true;
+ if(h==='xyzp.51job.com')return /^\\/[a-z0-9_-]{6,}\\/?$/i.test(p);
+ if(h==='app.mokahr.com')return /^\\/(?:m\\/)?(?:campus-recruitment|social-recruitment|apply)\\/[a-z0-9_-]{3,}\\//i.test(p);
+ if(h==='zhaopin.greeyun.com')return true;
+ return false;
+};
 const parseURL=v=>{
  try{
   const u=new URL(v);
   if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash||
-   !domainOK(u.hostname)||blocked(u.hostname))return null;
+   !domainOK(u.hostname)||(blocked(u.hostname)&&!userApprovedRecruitmentTenant(u)))return null;
   return u;
  }catch{return null}
 };
@@ -64,18 +79,28 @@ export function normalizeReviewedSource(row,{now=new Date()}={}){
  if(!idSafe(id)||!nameSafe(company)||reviewer.length<3||!companySite||!careers||!proof||
   !Number.isFinite(checked.getTime())||!Number.isFinite(expires.getTime())||
   checked.getTime()>now.getTime()+60000||expires.getTime()<=now.getTime()||
-  expires.getTime()-checked.getTime()>370*86400000||
-  !isEmployerDirectedSource(recruitmentSourceKind(careers.href)))return null;
+  expires.getTime()-checked.getTime()>370*86400000)return null;
+ const employerDirected=isEmployerDirectedSource(recruitmentSourceKind(careers.href));
+ const approvedTenant=userApprovedRecruitmentTenant(careers);
+ const userConfirmed=reviewer===USER_REVIEW;
+ const officialSameRoot=careers.hostname===companySite.hostname||
+  sameOrChild(careers.hostname,companySite.hostname.replace(/^www\\./,''));
+ // Historical corporate recruitment notices and company-specific pages may lack
+ // a /careers/ token; verified source identity, not URL spelling, is decisive.
+ if(!employerDirected&&!approvedTenant&&!officialSameRoot)return null;
+ if(approvedTenant&&!userConfirmed&&!officialSameRoot)return null;
  // The proof must come from the official company domain (not a job board or
  // someone else's shared ATS tenant), as independently checked by a reviewer.
  const companyHost=companySite.hostname.replace(/^www\./,'');
- if(!sameOrChild(proof.hostname,companyHost))return null;
- const recruitmentHost=careers.hostname,tenant=isSharedATS(recruitmentHost);
- if(tenant&&(careers.pathname==='/'||careers.pathname.split('/').filter(Boolean).length<1))
-  return null;
+ if(!sameOrChild(proof.hostname,companyHost)&&!(userConfirmed&&
+  proof.hostname===careers.hostname&&proof.pathname.startsWith(careers.pathname)))return null;
+ const recruitmentHost=careers.hostname,tenant=isSharedATS(recruitmentHost)&&approvedTenant;
+ if(tenant&&(careers.pathname==='/'||careers.pathname.split('/').filter(Boolean).length<1)&&
+  ['wecruit.hotjob.cn','xyzp.51job.com','app.mokahr.com'].includes(recruitmentHost))return null;
  if(careers.search||companySite.search||companySite.hash)return null;
  const crossDomain=reviewedHaierCrossDomain(companySite,careers,proof,company);
- if(!tenant&&!sameOrChild(recruitmentHost,companyHost)&&!crossDomain)return null;
+ if(!tenant&&!sameOrChild(recruitmentHost,companyHost)&&!crossDomain&&
+  !(userConfirmed&&approvedTenant))return null;
  return {id,display_name:company,company_host:companyHost,haier_verified_chain:crossDomain,
   recruitment_base_url:careers.href,career_host:recruitmentHost,
   recruitment_prefix:scopePath(careers.pathname),shared_ats:tenant,
@@ -85,7 +110,7 @@ export function normalizeReviewedSource(row,{now=new Date()}={}){
 
 export function whitelistJobSource(hitUrl,reviewed){
  const job=parseURL(hitUrl);
- if(!job||!isEmployerDirectedSource(recruitmentSourceKind(job.href)))return null;
+ if(!job)return null;
  for(const item of reviewed||[]){
   const exact=job.hostname===item?.career_host;
   // Only the proven Haier subsidiary recruiting host is an alias, and only
@@ -147,7 +172,7 @@ function textFromResponse(obj){
 export async function deepseekWhitelistTargets(key,redactedResume,roleHint,reviewed,{
  fetcher=fetch,signal=null,timeoutMs=8500,maxTargets=4
 }={}){
- const available=(Array.isArray(reviewed)?reviewed:[]).slice(0,48);
+ const available=(Array.isArray(reviewed)?reviewed:[]).slice(0,160);
  if(available.length<=maxTargets)return available;
  const choices=available.map(s=>({id:s.id,employer:s.display_name,
   industry:s.industry_tags,business:s.business_tags,careers:s.career_host}));
@@ -178,7 +203,7 @@ export async function deepseekWhitelistTargets(key,redactedResume,roleHint,revie
  }catch{return available.slice(0,maxTargets)}
 }
 
-export async function getReviewedDeepSeekSearchScope(env,{now=new Date(),limit=48}={}){
+export async function getReviewedDeepSeekSearchScope(env,{now=new Date(),limit=160}={}){
  if(env?.HHBA_DEEPSEEK_WHITELIST_SEARCH_ENABLED!=='1'||
   env?.HHBA_AUTH_ROLLOUT!=='preview'||typeof env?.HHBA_PNVS_AUTH_DB?.prepare!=='function')
   return [];
@@ -189,7 +214,7 @@ export async function getReviewedDeepSeekSearchScope(env,{now=new Date(),limit=4
    'industry_tags_json,business_tags_json FROM hhba_reviewed_recruitment_sources '+
    "WHERE review_status='VERIFIED' AND expires_at>? "+
    'ORDER BY reviewed_at DESC LIMIT ?'
-  ).bind(now.toISOString(),Math.min(48,Math.max(1,limit))).all();
+  ).bind(now.toISOString(),Math.min(160,Math.max(1,limit))).all();
   return (result?.results||[]).map(row=>normalizeReviewedSource(row,{now})).filter(Boolean);
  }catch{
   console.warn('HHBA_REVIEWED_SCOPE_UNAVAILABLE');
