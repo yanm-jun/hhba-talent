@@ -119,7 +119,7 @@ test('queue receives only normalized public company+host keys, not user text',as
 test('one queued candidate uses a daily budget and never upgrades source ownership',async()=>{
  const log=[];let attempts=0;
  const db={
-  prepare(sql){return {bind(...params){return {
+  prepare(sql){return {bind(...params){return {sql,params,
    async first(){
     if(sql.includes('SELECT q.employer_observation_id'))return {id:'emp-demo',company};
     if(sql.includes('SELECT attempts'))return {attempts};
