@@ -11187,6 +11187,7 @@
       "source_datasets": [
         "automotive_research_266"
       ],
+      "research_scope": "overseas_entity_not_mainland_search",
       "research_relationships": [
         {
           "sequence": 71,
@@ -11314,6 +11315,7 @@
       "source_datasets": [
         "automotive_research_266"
       ],
+      "research_scope": "overseas_entity_not_mainland_search",
       "research_relationships": [
         {
           "sequence": 70,
@@ -14934,6 +14936,7 @@
       "source_datasets": [
         "automotive_research_266"
       ],
+      "research_scope": "overseas_entity_not_mainland_search",
       "research_relationships": [
         {
           "sequence": 72,
@@ -31971,6 +31974,7 @@
       "source_datasets": [
         "automotive_research_266"
       ],
+      "research_scope": "overseas_entity_not_mainland_search",
       "research_relationships": [
         {
           "sequence": 73,
