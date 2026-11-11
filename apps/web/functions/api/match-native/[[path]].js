@@ -4,6 +4,7 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
+import {readEmployerLibrary,employerSearchHints} from '../../_lib/employer-library.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -338,6 +339,12 @@ export async function onRequest({request,env}){
  const redacted=redactForModel(input.text);
  if(redacted.replace(/\s/g,'').length<30)return fail('INVALID_RESUME_TEXT',400);
  // Same-origin, authorized one-shot call. No raw resume stored in HHBA database.
+ // Search leads are public directories, not verified job URLs.
+ let portalHints=[];
+ try{
+  const directory=await readEmployerLibrary(env,request);
+  portalHints=employerSearchHints(directory.items,redacted,options.role_hint,2);
+ }catch{/* Continue with ordinary DeepSeek Search. */}
  const streaming=request.headers.get('Accept')?.includes('text/event-stream');
  if(streaming){
   const encoder=new TextEncoder();
@@ -361,7 +368,7 @@ export async function onRequest({request,env}){
      },12000);
      try{
       const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-       options.role_hint,options.limit,{signal:abort.signal,onProgress:stage=>{
+       options.role_hint,options.limit,{portalHints,signal:abort.signal,onProgress:stage=>{
         phase=stage;send('progress',{stage});
        },onPartial:matches=>send('partial',{matches})});
       console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
@@ -389,7 +396,7 @@ export async function onRequest({request,env}){
 
  try{
   const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-   options.role_hint,options.limit);
+   options.role_hint,options.limit,{portalHints});
   console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
   return json(await withSavedHistory(env,candidate,input,result));
  }catch(e){
