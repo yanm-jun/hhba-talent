@@ -197,6 +197,7 @@ for(const node of automotiveResearch.nodes){
   row.related_hall_ids=row.related_hall_ids||[];
   if(!row.related_hall_ids.includes('automotive'))row.related_hall_ids.push('automotive');
  }
+ if(node.entity_type==='官网列示的海外实体')row.research_scope='overseas_entity_not_mainland_search';
  if(!row.source_datasets.includes('automotive_research_266'))
   row.source_datasets.push('automotive_research_266');
  row.research_relationships=row.research_relationships||[];
