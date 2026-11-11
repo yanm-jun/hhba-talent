@@ -106,6 +106,31 @@ test('official employer proof on its own recruitment subdomain is valid when sam
   ownership_evidence_url:'https://zhaopin.meituan.com/web/question/social'});
  assert.equal(norm(mt)?.career_host,'zhaopin.meituan.com');
 });
+test('Haier: independently linked external career root only, no broad cross-domain trust',()=>{
+ const t=reviewed({id:'hhba-haier-group',display_name:'海尔集团',
+  official_company_url:'https://www.haier.com/',
+  recruitment_base_url:'https://maker.haier.net/client/job/',
+  ownership_evidence_url:'https://www.haier.com/careers/',
+  industry_tags_json:'["industrial-manufacturing","consumer-retail","healthcare","energy","software-internet"]',
+  business_tags_json:'["consumer-products","industrial-control","enterprise-services"]'});
+ const verified=norm(t);
+ assert.ok(verified);
+ assert.equal(verified.haier_verified_chain,true);
+ assert.equal(whitelistJobSource('https://maker.haier.net/client/job/details/123',[verified])?.id,t.id);
+ assert.equal(whitelistJobSource('https://vta.maker.haier.net/client/job/detail?id=123',[verified])?.id,t.id);
+ assert.equal(whitelistJobSource('https://vta.maker.haier.net/private/applicant',[verified]),null);
+ assert.equal(whitelistJobSource('https://bad.maker.haier.net/client/job/details',[verified]),null);
+ assert.equal(whitelistJobSource('https://maker.haier.net.attacker.com/client/job/details',[verified]),null);
+ assert.equal(whitelistJobSource('https://www.zhipin.com/jobs/123',[verified]),null);
+ assert.equal(norm({...t,official_company_url:'https://www.other-brand.com/'}),null);
+ assert.equal(norm({...t,ownership_evidence_url:'https://attacker.com/careers/'}),null);
+ assert.equal(norm({...t,ownership_evidence_url:'https://www.haier.com/some-article'}),null);
+ assert.equal(norm({...t,recruitment_base_url:'https://fake.maker.haier.net/client/job/'}),null);
+ assert.equal(norm({...t,display_name:'恶意冒用企业'}),null);
+ assert.equal(norm({...t,recruitment_base_url:'https://maker.haier.net/'}),null);
+ const query=whitelistSearchQueries('软件开发 工作地点 中国大陆 企业官网',[verified]);
+ assert.ok(query[0].startsWith('site:maker.haier.net '));
+});
 test('no whitelist when flag is absent, env not Preview or table unavailable',async()=>{
  const db={prepare(){return {bind(){return {async all(){return {results:[reviewed()]}}}}}}};
  assert.deepEqual(await getReviewedDeepSeekSearchScope({HHBA_PNVS_AUTH_DB:db}),[]);
