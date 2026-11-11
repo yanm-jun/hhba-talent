@@ -25,6 +25,7 @@ const blocked=host=>THIRD_PARTY.some(d=>sameOrChild(host,d));
 // The user explicitly verified individual employer-owned ATS tenants in B04;
 // never trust a generic job board host or a neighbouring tenant.
 const USER_REVIEW='hhba-user-confirmed-official-20261111';
+const CORPORATE_BACKLINK_REVIEW='hhba-corporate-backlink-review-20261111';
 const userApprovedRecruitmentTenant=u=>{
  const h=u.hostname,p=u.pathname;
  if(h.endsWith('.zhiye.com')&&!['www.zhiye.com','app.zhiye.com'].includes(h))return true;
@@ -56,7 +57,15 @@ const reviewedHaierCrossDomain=(company,careers,proof,displayName)=>
  proof.hostname==='www.haier.com'&&proof.pathname==='/careers/'&&
  /^(?:海尔|海尔集团)$/.test(displayName);
 
-const nameSafe=name=>name.length>=2&&!/@|https?:\/\/|(?:\d[\s-]?){9,}/.test(name);
+// First-party Kuaishou homepage publicly links zhaopin.kuaishou.com,
+// which redirects to zhaopin.kuaishou.cn. This is a single reviewed chain.
+const reviewedKuaishouCrossDomain=(company,careers,proof,displayName)=>
+ company.hostname.replace(/^www\\./,'')==='kuaishou.com'&&
+ careers.hostname==='zhaopin.kuaishou.cn'&&careers.pathname==='/'&&
+ proof.hostname==='www.kuaishou.com'&&proof.pathname==='/cn'&&
+ displayName==='快手';
+
+const nameSafe=name=>name.length>=2&&!/@|https?:\\/\\/|(?:\\d[\\s-]?){9,}/.test(name);
 const idSafe=id=>/^[a-zA-Z0-9_-]{2,80}$/.test(id);
 const tagArray=raw=>{
  try{
@@ -83,12 +92,13 @@ export function normalizeReviewedSource(row,{now=new Date()}={}){
  const employerDirected=isEmployerDirectedSource(recruitmentSourceKind(careers.href));
  const approvedTenant=userApprovedRecruitmentTenant(careers);
  const userConfirmed=reviewer===USER_REVIEW;
+ const corporateBacklink=reviewer===CORPORATE_BACKLINK_REVIEW;
  const officialSameRoot=careers.hostname===companySite.hostname||
   sameOrChild(careers.hostname,companySite.hostname.replace(/^www\\./,''));
  // Historical corporate recruitment notices and company-specific pages may lack
  // a /careers/ token; verified source identity, not URL spelling, is decisive.
  if(!employerDirected&&!approvedTenant&&!officialSameRoot)return null;
- if(approvedTenant&&!userConfirmed&&!officialSameRoot)return null;
+ if(approvedTenant&&!userConfirmed&&!corporateBacklink&&!officialSameRoot)return null;
  // The proof must come from the official company domain (not a job board or
  // someone else's shared ATS tenant), as independently checked by a reviewer.
  const companyHost=companySite.hostname.replace(/^www\./,'');
@@ -98,10 +108,12 @@ export function normalizeReviewedSource(row,{now=new Date()}={}){
  if(tenant&&(careers.pathname==='/'||careers.pathname.split('/').filter(Boolean).length<1)&&
   ['wecruit.hotjob.cn','xyzp.51job.com','app.mokahr.com'].includes(recruitmentHost))return null;
  if(careers.search||companySite.search||companySite.hash)return null;
- const crossDomain=reviewedHaierCrossDomain(companySite,careers,proof,company);
+ const haierCrossDomain=reviewedHaierCrossDomain(companySite,careers,proof,company);
+ const kuaishouCrossDomain=reviewedKuaishouCrossDomain(companySite,careers,proof,company);
+ const crossDomain=haierCrossDomain||kuaishouCrossDomain;
  if(!tenant&&!sameOrChild(recruitmentHost,companyHost)&&!crossDomain&&
   !(userConfirmed&&approvedTenant))return null;
- return {id,display_name:company,company_host:companyHost,haier_verified_chain:crossDomain,
+ return {id,display_name:company,company_host:companyHost,haier_verified_chain:haierCrossDomain,
   recruitment_base_url:careers.href,career_host:recruitmentHost,
   recruitment_prefix:scopePath(careers.pathname),shared_ats:tenant,
   industry_tags:tagArray(row.industry_tags_json),
