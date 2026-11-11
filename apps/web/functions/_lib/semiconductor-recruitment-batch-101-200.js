@@ -83,7 +83,7 @@ export const SEMICONDUCTOR_BATCH_101_200=Object.freeze([
  [181,"沛顿科技","https://www.payton.com.cn/zpgw/list_38.aspx","semi-packaging"],
  [182,"日月光半导体（ASE）","https://ase.aseglobal.com/ch/about-ase/careers/","semi-packaging"],
  [183,"宏茂微电子","https://www.unimos.com.cn/lists/13.html","semi-packaging"],
- [184,"通富微电","https://www.tfme.com/","semi-packaging"],
+ [184,"通富微电","https://www.tfme.com/news/4/","semi-packaging"],
  [185,"龙腾光电","https://www.ivo.com.cn/cnsite/branch?s=join","semi-display"],
  [186,"友达光电","https://auo.com/zh-CN/be_one_of_us/index","semi-display"],
  [187,"群创光电","https://hrrecruit.innolux.com/globalweb_s/cn/index.html","semi-display"],
