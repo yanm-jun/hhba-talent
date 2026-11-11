@@ -1,7 +1,7 @@
 // Protected HHBA original admin console: one endpoint for library browse + <=100 upserts.
 // D1 writes are disabled until explicit migration; never expose open public write routes.
 import {verifyAdmin} from '../../../_lib/admin-access.js';
-import {readEmployerLibrary,normalizeEmployerInput} from '../../../_lib/employer-library.js';
+import {readEmployerLibrary,normalizeEmployerInput,mergeEmployerRecord} from '../../../_lib/employer-library.js';
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store',
  'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'
@@ -46,6 +46,10 @@ export async function onRequestPost({request,env}){
  let library;
  try{library=await readEmployerLibrary(env,request);}catch{return fail('LIBRARY_SOURCE_UNAVAILABLE',503);}
  if(!library.editable||!env.HHBA_METRICS_DB?.batch)return fail('LIBRARY_D1_MIGRATION_REQUIRED',503);
+ // Idempotent batch upsert: another hall is an extra tag, not a duplicate company.
+ // Keep reviewed links, earlier imports, and the original primary classification.
+ const originals=new Map(library.items.map(x=>[x.id,x]));
+ entries=entries.map(item=>mergeEmployerRecord(originals.get(item.id),item));
  const actor=a.actor.email;
  const now=new Date().toISOString(),batchId=crypto.randomUUID();
  const db=env.HHBA_METRICS_DB;
