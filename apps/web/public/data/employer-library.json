@@ -1366,7 +1366,7 @@
     {
       "id": "莲花集团",
       "name": "莲花集团",
-      "industry_id": "uncategorized",
+      "industry_id": "automotive",
       "parent_name": "浙江吉利控股集团",
       "relation": "集团业务板块",
       "aliases": [],
@@ -1522,7 +1522,7 @@
     {
       "id": "美的楼宇科技",
       "name": "美的楼宇科技",
-      "industry_id": "uncategorized",
+      "industry_id": "manufacturing",
       "parent_name": "美的集团",
       "relation": "业务板块",
       "aliases": [],
@@ -1998,7 +1998,7 @@
     {
       "id": "上海申沃客车有限公司",
       "name": "上海申沃客车有限公司",
-      "industry_id": "uncategorized",
+      "industry_id": "automotive",
       "parent_name": "上汽集团",
       "relation": "集团整车业务成员",
       "aliases": [],
@@ -2098,7 +2098,7 @@
     {
       "id": "上汽集团乘用车分公司",
       "name": "上汽集团乘用车分公司",
-      "industry_id": "uncategorized",
+      "industry_id": "automotive",
       "parent_name": "上汽集团",
       "relation": "分公司",
       "aliases": [
@@ -3855,13 +3855,13 @@
     "entities": 218,
     "legacy_portals": 130,
     "group_relations": 90,
-    "unclassified": 4,
+    "unclassified": 0,
     "by_hall": {
-      "automotive": 52,
+      "automotive": 55,
       "semiconductor": 7,
       "internet-ai": 11,
       "energy": 21,
-      "manufacturing": 11,
+      "manufacturing": 12,
       "finance": 23,
       "telecom": 5,
       "biomed": 8,
