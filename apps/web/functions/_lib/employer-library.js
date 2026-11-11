@@ -123,17 +123,22 @@ export function employerSearchHints(library,resume,roleHint='',max=2){
  const ranked=[];
  for(const item of library){
   if(!item?.name||!Array.isArray(item.portals))continue;
-  const options=item.portals.filter(usable).sort((a,b)=>
-   Number(b.status==='legacy_reviewed')-Number(a.status==='legacy_reviewed'));
-  if(!options.length)continue;
   const names=[item.name,...(item.aliases||[])].map(x=>String(x).toLowerCase());
   const inHint=names.some(n=>n.length>=2&&wanted.includes(n));
   const inResume=names.some(n=>n.length>=3&&experience.includes(n));
   const inHall=hall&&(item.industry_id===hall||item.related_hall_ids?.includes(hall));
   if(!inHint&&!inResume&&!inHall)continue;
-  ranked.push({item,portal:options[0],
+  const options=item.portals.filter(usable).sort((a,b)=>
+   Number(b.status==='legacy_reviewed')-Number(a.status==='legacy_reviewed'));
+  // A shared group portal helps find a named subsidiary only when the user's
+  // resume or request actually names that company. It is NOT the child's own ATS.
+  const shared=(!options.length&&(inHint||inResume))?
+   item.portals.find(p=>p.scope==='group_shared_candidate'&&portalUrl(p.url)):null;
+  const portal=options[0]||shared;
+  if(!portal)continue;
+  ranked.push({item,portal,
    score:(inHint?200:0)+(inResume?80:0)+(inHall?40:0)+
-    (options[0].status==='legacy_reviewed'?20:0)});
+    (portal.status==='legacy_reviewed'?20:0)-(shared?15:0)});
  }
  ranked.sort((a,b)=>b.score-a.score||a.item.name.localeCompare(b.item.name,'zh-CN'));
  const hints=[],domains=new Set();
@@ -143,7 +148,10 @@ export function employerSearchHints(library,resume,roleHint='',max=2){
   domains.add(hostname);
   // Search hint only: Search and subsequent JD checking establish the vacancy.
   // Never output this portal as a job link or a verified job opening.
-  hints.push((clean(roleHint,50)||'招聘岗位')+' '+item.name+' site:'+hostname+' 岗位 职位 中国大陆');
+  const groupNote=portal.scope==='group_shared_candidate'?
+   ' '+(item.parent_name||'集团')+' 集团招聘平台 子公司岗位':''; 
+  hints.push(((clean(roleHint,50)||'招聘岗位')+' '+item.name+groupNote+
+   ' site:'+hostname+' 岗位 职位 中国大陆').slice(0,180));
   if(hints.length>=max)break;
  }
  return hints;
