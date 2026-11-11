@@ -555,7 +555,7 @@ export const BATCH_001_100=[
  [
   93,
   "地平线",
-  "https://www.hotjob.cn/wt/Horizon/mobweb/v8/position/list?brandCode=1&openid=oTKPH1DpuwPdAKvn9q-HTA3pCBNg&recruitType=1&request_locale=zh_CN",
+  "https://www.hotjob.cn/wt/Horizon/mobweb/v8/position/list?brandCode=1&recruitType=1&request_locale=zh_CN",
   "auto-adas"
  ],
  [
