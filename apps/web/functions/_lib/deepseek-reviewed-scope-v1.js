@@ -104,8 +104,13 @@ export function whitelistSearchQueries(baseRoleQuery,reviewed){
  const queries=[];
  for(const s of (Array.isArray(reviewed)?reviewed:[]).slice(0,4)){
   if(!s||!s.career_host||!nameSafe(s.display_name))continue;
-  const site=s.shared_ats?'site:'+s.career_host+s.recruitment_prefix.slice(0,-1):'site:'+s.career_host;
-  const q=[intent,s.display_name,site,'中国大陆 招聘 职位详情'].join(' ').slice(0,128);
+  // Keep site: at the very beginning: long employer names must not
+  // truncate away the actual reviewed recruitment-domain constraint.
+  const site='site:'+s.career_host;
+  if(site.length>84)continue;
+  const tenant=s.shared_ats?s.recruitment_prefix.slice(0,28):'';
+  const q=[site,intent.slice(0,32),s.display_name.slice(0,28),tenant,
+   '中国大陆 招聘 职位详情'].filter(Boolean).join(' ').slice(0,128);
   if(!queries.includes(q))queries.push(q);
  }
  return queries;
