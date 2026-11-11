@@ -91,7 +91,9 @@ function render(){
  controls[0].disabled=state.page<=0;
  controls[1].disabled=start+PAGE_SIZE>=list.length;
  dom('library-total').textContent=String(state.items.length);
- dom('library-portals').textContent=String(state.items.reduce((n,x)=>n+(x.portals?.length||0),0));
+ const associations=state.items.reduce((n,x)=>n+(x.portals?.length||0),0);
+ dom('library-portals').textContent=String(new Set(state.items.flatMap(x=>(x.portals||[]).map(p=>p.url))).size);
+ dom('library-link-associations').textContent=associations+' 条企业-网址关联';
  dom('library-groups').textContent=String(state.items.filter(x=>x.parent_name).length);
  dom('library-review').textContent=String(state.items.reduce((n,x)=>n+(x.portals||[]).filter(p=>p.status==='collected_unverified').length,0));
  const coverage=state.coverage;
