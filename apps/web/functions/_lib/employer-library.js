@@ -166,7 +166,7 @@ export function employerSearchHints(library,resume,roleHint='',max=2){
   domains.add(hostname);
   // Search hint only: Search and subsequent JD checking establish the vacancy.
   // Never output this portal as a job link or a verified job opening.
-  const groupNote=groupName?' '+groupName+' 集团招聘范围（需核实子公司主体）':'';
+  const groupNote=groupName?' '+groupName+' 集团招聘平台范围（需核实子公司主体）':'';
   hints.push(((clean(roleHint,50)||'招聘岗位')+' '+item.name+groupNote+
    ' site:'+hostname+' 岗位 职位 中国大陆').slice(0,180));
   if(hints.length>=max)break;
