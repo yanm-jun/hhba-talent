@@ -11,6 +11,7 @@ export const HALL_IDS=Object.freeze([
 ]);
 const PRIMARY_OVERRIDES=Object.freeze({
  '小米':'electronics','京东':'internet','大疆创新':'machinery',
+ '华为':'electronics','海尔集团':'electronics','美团':'internet','腾讯':'internet',
  '美的集团':'electronics','京东方':'semiconductors','OPPO':'electronics',
  'vivo':'electronics','海康威视':'electronics','哔哩哔哩':'media',
  '快手':'media','得物':'consumer','中集集团':'machinery',
@@ -23,6 +24,9 @@ const PRIMARY_OVERRIDES=Object.freeze({
 });
 const SECONDARY_OVERRIDES=Object.freeze({
  '比亚迪':['energy','electronics'],'小米':['automotive','internet'],
+ '华为':['internet','semiconductors','automotive','energy'],
+ '海尔集团':['machinery','healthcare','energy'],
+ '美团':['consumer','logistics'],'腾讯':['media','finance'],
  '京东':['consumer','logistics'],'百度':['automotive'],
  '宁德时代':['automotive'],'大疆创新':['electronics','internet'],
  '美的集团':['machinery','consumer'],'京东方':['electronics'],
@@ -49,7 +53,7 @@ const SECONDARY_OVERRIDES=Object.freeze({
  '中国宝武集团（宝钢股份专场）':['automotive']
 });
 const AUTOMOTIVE_SECTION=Object.freeze({
- '比亚迪':'auto-whole','小米':'auto-ev','百度':'auto-adas','宁德时代':'auto-battery',
+ '比亚迪':'auto-whole','小米':'auto-ev','华为':'auto-adas','百度':'auto-adas','宁德时代':'auto-battery',
  '海康威视':'auto-adas','上汽集团':'auto-whole','广汽集团':'auto-whole',
  '长安汽车':'auto-ev','长城汽车':'auto-whole','吉利汽车集团':'auto-ev',
  '理想汽车':'auto-ev','蔚来汽车':'auto-ev','小鹏汽车':'auto-adas',
@@ -86,7 +90,7 @@ const tagPrimary=tag=>{
 };
 /** Returns a PROPOSAL; only an editorial-controlled write may persist it. */
 export function proposeEmployerHallClassification(row){
- if(!row||typeof row.id!=='string'||!/^hhba-official-[a-z0-9_-]{5,}$/.test(row.id)||
+ if(!row||typeof row.id!=='string'||!/^hhba-(?:official|verified|pending-crossdomain)-[a-z0-9_-]{5,}$/.test(row.id)||
   typeof row.display_name!=='string')return null;
  const industryTags=parseTags(row.industry_tags_json),businessTags=parseTags(row.business_tags_json);
  if(!industryTags?.length||!businessTags?.length)return null;
