@@ -135,13 +135,13 @@ const items=[...entries.values()].sort((a,b)=>a.name.localeCompare(b.name,'zh-CN
 const unknown=items.filter(e=>e.industry_id==='uncategorized').map(e=>e.name);
 const output={schema_version:1,
  description:'HHBA 历史已审招聘入口 + 未核验草稿PR批次的企业资源索引；不代表在招岗位，不把集团入口视为子公司独立入口。候选 URL 必须经 DeepSeek 公开网页搜索与职位证据核验。',
- source_revision:'2026-11-12',halls:halls.map(([id,name])=>({id,name})),items,
+ source_revision:'2026-11-12',halls:halls.map(([id,name])=>({id,name})),
  collection_coverage:{
   definition:'历史聊天行业馆收集记录数。不是企业唯一实体数，也不是有效官方招聘链接数。',
   target_total:targetTotal,imported_batch_records:importedTotal,
   unimported_batch_records:targetTotal-importedTotal,
   target_by_hall:collectionTargets,imported_by_hall:totals,unimported_by_hall:missingByHall
- },
+ },items,
  statistics:{entities:items.length,legacy_portals:items.reduce((n,e)=>n+e.portals.filter(p=>p.status==='legacy_reviewed').length,0),
   candidate_portals:items.reduce((n,e)=>n+e.portals.filter(p=>p.status!=='legacy_reviewed').length,0),
   group_relations:items.filter(e=>e.parent_name).length,unclassified:unknown.length,
