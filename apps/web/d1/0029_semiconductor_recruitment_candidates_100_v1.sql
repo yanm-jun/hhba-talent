@@ -11,7 +11,7 @@ INSERT OR IGNORE INTO hhba_library_hall_sections(section_id,hall_id,display_name
 INSERT OR IGNORE INTO hhba_library_hall_sections(section_id,hall_id,display_name,sort_order) VALUES ('semi-global','semiconductors','国际半导体在华招聘',9);
 CREATE TABLE IF NOT EXISTS hhba_library_semiconductor_recruitment_candidates (
  id TEXT PRIMARY KEY,
- collection_sequence INTEGER NOT NULL UNIQUE CHECK(collection_sequence BETWEEN 1 AND 100),
+ collection_sequence INTEGER NOT NULL UNIQUE CHECK(collection_sequence BETWEEN 1 AND 200),
  employer_display_name TEXT NOT NULL,
  candidate_url TEXT NOT NULL UNIQUE,
  section_id TEXT NOT NULL REFERENCES hhba_library_hall_sections(section_id),

@@ -22,5 +22,5 @@ test('non-preview cannot expose candidate hints and Preview hints remain unverif
  assert.deepEqual(await getSemiconductorCandidateSourceHints({HHBA_AUTH_ROLLOUT:'production',HHBA_PNVS_AUTH_DB:db}),[]);
  const res=await getSemiconductorCandidateSourceHints({HHBA_AUTH_ROLLOUT:'preview',HHBA_PNVS_AUTH_DB:db},{sections:['semi-fab','invalid','semi-fab'],limit:300});
  assert.equal(res[0].source_status,'UNVERIFIED');assert.equal(res[0].is_reviewed_whitelist_source,false);
- assert.equal(res[0].primary_hall,'semiconductors');assert.deepEqual(calls[0][1],['semi-fab',100]);
+ assert.equal(res[0].primary_hall,'semiconductors');assert.deepEqual(calls[0][1],['semi-fab',200]);
 });
