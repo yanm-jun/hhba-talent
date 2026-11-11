@@ -77,12 +77,50 @@ for(const rel of relations.relations){
  // Never turn an inherited group portal into an independent child-company portal.
  entries.set(id,row);
 }
+// Merge already-collected draft PR source batches WITHOUT claiming the links are vetted.
+const draft=load('employerLibraryCandidateBatches.json');
+if(draft.schema_version!==1||!Array.isArray(draft.batches))throw Error('INVALID_DRAFT_CANDIDATES');
+const expected={automotive:200,semiconductor:200,energy:300};
+const totals={automotive:0,semiconductor:0,energy:0};
+for(const batch of draft.batches){
+ if(!Object.hasOwn(expected,batch.hall_id)||!Array.isArray(batch.entries))throw Error('INVALID_DRAFT_HALL');
+ totals[batch.hall_id]+=batch.entries.length;
+ for(const tuple of batch.entries){
+  const [seq,name,url,section,kind=null,parent=null]=tuple;
+  if(!Number.isInteger(seq)||!name||typeof url!=='string'||!section)throw Error('INVALID_DRAFT_ROW');
+  const id=key(name);
+  const row=entries.get(id)||{id,name,industry_id:batch.hall_id,parent_name:null,relation:null,
+   aliases:[],portals:[],source_datasets:[]};
+  row.related_hall_ids=row.related_hall_ids||[];
+  if(row.industry_id!==batch.hall_id&&!row.related_hall_ids.includes(batch.hall_id))
+   row.related_hall_ids.push(batch.hall_id);
+  row.sections=row.sections||[];
+  if(!row.sections.some(x=>x.hall_id===batch.hall_id&&x.code===section))
+   row.sections.push({hall_id:batch.hall_id,code:section});
+  const sourceName='draft_pr_'+batch.source_pr;
+  if(!row.source_datasets.includes(sourceName))row.source_datasets.push(sourceName);
+  const parentName=typeof parent==='string'?parent.trim():'';
+  if(parentName&&key(parentName)!==id&&!row.parent_name){
+   row.parent_name=parentName;row.relation='同集团招聘体系（待核）';
+  }
+  const shared=/SHARED_ATS|GROUP_CAREERS/.test(String(kind));
+  const discovery=/NOTICE|DISCOVERY/.test(String(kind));
+  if(!row.portals.some(p=>p.url===url))
+   row.portals.push({url,label:shared?'集团共用招聘候选':discovery?'招聘公告/检索线索':'招聘入口候选',
+    scope:shared?'group_shared_candidate':discovery?'discovery_candidate':'search_candidate',
+    status:'collected_unverified',reviewed_on:null,section_code:section,source_pr:batch.source_pr});
+  entries.set(id,row);
+ }
+}
+for(const [sector,expectedCount] of Object.entries(expected))
+ if(totals[sector]!==expectedCount)throw Error('INCOMPLETE_DRAFT_HALL_'+sector);
 const items=[...entries.values()].sort((a,b)=>a.name.localeCompare(b.name,'zh-CN'));
 const unknown=items.filter(e=>e.industry_id==='uncategorized').map(e=>e.name);
 const output={schema_version:1,
- description:'HHBA 历史招聘入口及集团关系分类索引；不是实时岗位库。legacy_reviewed 为历史审核，不保证今日仍在招。集团入口不等于子公司独立入口。',
+ description:'HHBA 历史已审招聘入口 + 未核验草稿PR批次的企业资源索引；不代表在招岗位，不把集团入口视为子公司独立入口。候选 URL 必须经 DeepSeek 公开网页搜索与职位证据核验。',
  source_revision:'2026-11-12',halls:halls.map(([id,name])=>({id,name})),items,
- statistics:{entities:items.length,legacy_portals:items.reduce((n,e)=>n+e.portals.length,0),
+ statistics:{entities:items.length,legacy_portals:items.reduce((n,e)=>n+e.portals.filter(p=>p.status==='legacy_reviewed').length,0),
+  candidate_portals:items.reduce((n,e)=>n+e.portals.filter(p=>p.status!=='legacy_reviewed').length,0),
   group_relations:items.filter(e=>e.parent_name).length,unclassified:unknown.length,
   by_hall:Object.fromEntries(halls.map(([id])=>[id,items.filter(e=>e.industry_id===id).length]))}};
 writeFileSync(join(root,'public/data/employer-library.json'),JSON.stringify(output,null,2)+'\n');
