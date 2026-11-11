@@ -187,6 +187,7 @@ function setView(view){
   byId('placeholder-subtitle').textContent=details[view][0];
   byId('placeholder-description').textContent=details[view][1];
  }
+ if(view==='library')window.HHBA_LIBRARY_OPEN?.();
  closeMenu();
  window.scrollTo(0,0);
 }
