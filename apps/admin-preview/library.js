@@ -159,6 +159,15 @@ function submitBulk(){
  try{
   for(const [i,line] of lines.entries()){
    const parts=line.split(/\t|,|，/).map(s=>s.trim());
+   // Historical chat batches often only contain numbered company names.
+   // Never invent an official URL just to accept a name-only import.
+   if(parts.length===1){
+    if(state.hall==='all')throw Error('仅粘贴企业名称时，请先选择左侧对应行业馆');
+    const name=parts[0].replace(/^\\d{1,4}\\s*[.．、)）]\\s*/,'').trim();
+    if(name.length<2)throw Error('第'+(i+1)+'行企业名称无效');
+    rows.push({name,industry_id:state.hall,portals:[]});
+    continue;
+   }
    if(parts.length<3||parts.length>4)throw Error('第'+(i+1)+'行格式错误');
    const [name,url,hall,parent_name='']=parts;
    const industry_id=byName.get(hall)|| (state.halls.some(h=>h.id===hall)?hall:null);
@@ -166,7 +175,20 @@ function submitBulk(){
    rows.push({name,industry_id,parent_name,portals:url?[{url}]:[]});
   }
   if(!rows.length)throw Error('请先粘贴企业名单');
-  void submit(rows);
+  // Duplicated entries in the same pasted chat batch merge locally rather
+  // than rejecting all 100 lines or overwriting a verified prior portal.
+  const byEntity=new Map();
+  for(const row of rows){
+   const id=row.name.normalize('NFKC').replace(/[\\s·•]/g,'').toLowerCase();
+   const old=byEntity.get(id);
+   if(!old){byEntity.set(id,row);continue;}
+   old.related_hall_ids=[...new Set([...(old.related_hall_ids||[]),
+    ...(row.related_hall_ids||[]),row.industry_id])]
+    .filter(h=>h!==old.industry_id);
+   for(const p of row.portals||[])
+    if(!old.portals.some(x=>x.url===p.url))old.portals.push(p);
+  }
+  void submit([...byEntity.values()]);
  }catch(e){showMessage(e.message);}
 }
 dom('library-search').addEventListener('input',e=>{state.term=e.target.value;state.page=0;render()});
