@@ -19,7 +19,7 @@ export async function onRequestGet({request,env}){
    entities:lib.items.length,
    portals:lib.items.reduce((n,x)=>n+(x.portals?.length||0),0),
    unique_urls:new Set(lib.items.flatMap(x=>(x.portals||[]).map(p=>p.url))).size,
-   automotive_research_nodes:266,
+   automotive_research_nodes:lib.source_statistics?.automotive_research_nodes??null,
    automotive_research_brands:lib.brand_index?.length||0,
    groups:lib.items.filter(x=>x.parent_name).length,
    pending:lib.items.filter(x=>x.portals?.some(p=>p.status==='collected_unverified')).length
