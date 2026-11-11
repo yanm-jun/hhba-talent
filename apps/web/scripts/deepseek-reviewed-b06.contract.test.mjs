@@ -130,6 +130,18 @@ test('B06 Oppein Moka URL is exact corporate-linked tenant, not Moka platform-wi
  assert.equal(whitelistJobSource('https://app.mokahr.com/social-recruitment/other/78239',[s]),null);
 });
 
+test('B06 Li Ning official website recruitment backlink verifies company Hotjob subdomain',()=>{
+ const s=normalizeReviewedSource(source({
+  display_name:'李宁集团',official_company_url:'https://lining.com/',
+  recruitment_base_url:'https://lining.hotjob.cn/',
+  ownership_evidence_url:'https://lining.com/',
+  reviewer:'hhba-corporate-backlink-review-20261111'
+ }),{now});
+ assert.ok(s);
+ assert.ok(whitelistJobSource('https://lining.hotjob.cn/position/list',[s]));
+ assert.equal(whitelistJobSource('https://another.hotjob.cn/position/list',[s]),null);
+});
+
 test('B06 unreviewed recruitment tenant is refused even when branded',()=>{
  const s=normalizeReviewedSource(source({
   display_name:'传音控股',
