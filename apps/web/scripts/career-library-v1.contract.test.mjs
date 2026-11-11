@@ -10,6 +10,7 @@ const snapshot=JSON.parse(readFileSync(new URL('../src/data/hhbaLibraryCompanyMa
 const sql24=readFileSync(new URL('../d1/0024_major_industry_library_v1.sql',import.meta.url),'utf8');
 const sql25=readFileSync(new URL('../d1/0025_major_industry_library_employers_v1.sql',import.meta.url),'utf8');
 const sql26=readFileSync(new URL('../d1/0026_major_specific_automotive_paths_v1.sql',import.meta.url),'utf8');
+const sql27=readFileSync(new URL('../d1/0027_library_classification_ingest_guard_v1.sql',import.meta.url),'utf8');
 
 test('library has 175 distinct reviewed employers and one primary hall each',()=>{
  const rows=snapshot.employers;
@@ -28,6 +29,13 @@ test('library has 175 distinct reviewed employers and one primary hall each',()=
  assert.equal(rows.find(x=>x.name==='小米')?.primary,'electronics');
  assert.deepEqual(rows.find(x=>x.name==='小米')?.additional,['automotive','internet']);
  assert.ok(sql25.includes('BUSINESS_POSSIBILITY'));
+});
+test('new verified recruitment sources cannot bypass the primary industry hall',()=>{
+ assert.match(sql27,/hhba_library_no_direct_verified_insert/);
+ assert.match(sql27,/HHBA_LIBRARY_INSERT_PENDING_THEN_CLASSIFY/);
+ assert.match(sql27,/hhba_library_require_primary_before_verification/);
+ assert.match(sql27,/HHBA_LIBRARY_PRIMARY_HALL_REQUIRED/);
+ assert.match(sql27,/hhba_library_unclassified_verified/);
 });
 test('existing official source reviews remain separate from classification proposals',()=>{
  const x=proposeEmployerHallClassification({
