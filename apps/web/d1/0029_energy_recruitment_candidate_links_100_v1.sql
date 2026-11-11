@@ -1,4 +1,4 @@
--- Energy-electricity first batch 100 candidates, 2026-11-11. Preview-only; not a verified whitelist.
+-- Energy-electricity first batch 100 candidates (200-row capacity), 2026-11-11. Preview-only; not a verified whitelist.
 -- NOTICE is an employer-hosted announcement, DISCOVERY an employer homepage with HR navigation.
 INSERT OR IGNORE INTO hhba_library_hall_sections(section_id,hall_id,display_name,sort_order) VALUES
 ('energy-grid','energy','电网运营与输配电',1),
@@ -12,7 +12,7 @@ INSERT OR IGNORE INTO hhba_library_hall_sections(section_id,hall_id,display_name
 ('energy-equipment','energy','电力装备与自动化',9);
 CREATE TABLE IF NOT EXISTS hhba_library_energy_recruitment_candidates (
  id TEXT PRIMARY KEY,
- collection_sequence INTEGER NOT NULL UNIQUE CHECK(collection_sequence BETWEEN 1 AND 100),
+ collection_sequence INTEGER NOT NULL UNIQUE CHECK(collection_sequence BETWEEN 1 AND 200),
  employer_display_name TEXT NOT NULL,
  candidate_url TEXT NOT NULL UNIQUE,
  section_id TEXT NOT NULL REFERENCES hhba_library_hall_sections(section_id),
