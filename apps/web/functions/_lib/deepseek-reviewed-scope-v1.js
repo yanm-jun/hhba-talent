@@ -120,9 +120,18 @@ export function normalizeReviewedSource(row,{now=new Date()}={}){
   !(userConfirmed&&approvedTenant))return null;
  // Hotjob's /SU.../pb/ segment is the employer-tenant boundary:
  // the reviewed /school.html page and public /posDetail.html jobs share it.
- const recruitmentPrefix=tenant&&recruitmentHost==='wecruit.hotjob.cn'?
-  '/'+careers.pathname.split('/').filter(Boolean).slice(0,2).join('/')+'/':
-  scopePath(careers.pathname);
+ const parts=careers.pathname.split('/').filter(Boolean);
+ const tenantPrefix=tenant&&recruitmentHost==='wecruit.hotjob.cn';
+ // The official Yonyou careers host groups listing pages and job details
+ // under the same SU.../pb/ folder. Never widen to a neighbouring employer.
+ const yonyouPrefix=recruitmentHost==='career.yonyou.com'&&
+  /^SU[a-z0-9]+$/i.test(parts[0]||'')&&parts[1]==='pb';
+ const last=parts.at(-1)||'';
+ const sharedCareerFolder=!tenant&&/^(?:hr|recruitment|recruit|careers?|jobs?|zhaopin|rczp|zpjgg)$/i
+  .test(parts.at(-2)||'')&&/\\.(?:html?|shtml|php)$/i.test(last);
+ const recruitmentPrefix=tenantPrefix||yonyouPrefix?
+  '/'+parts.slice(0,2).join('/')+'/':
+  sharedCareerFolder?('/'+parts.slice(0,-1).join('/')+'/'):scopePath(careers.pathname);
  return {id,display_name:company,company_host:companyHost,haier_verified_chain:haierCrossDomain,
   recruitment_base_url:careers.href,career_host:recruitmentHost,
   recruitment_prefix:recruitmentPrefix,shared_ats:tenant,
@@ -194,7 +203,7 @@ function textFromResponse(obj){
 export async function deepseekWhitelistTargets(key,redactedResume,roleHint,reviewed,{
  fetcher=fetch,signal=null,timeoutMs=8500,maxTargets=4
 }={}){
- const available=(Array.isArray(reviewed)?reviewed:[]).slice(0,160);
+ const available=(Array.isArray(reviewed)?reviewed:[]).slice(0,256);
  if(available.length<=maxTargets)return available;
  const choices=available.map(s=>({id:s.id,employer:s.display_name,
   industry:s.industry_tags,business:s.business_tags,careers:s.career_host}));
@@ -225,7 +234,7 @@ export async function deepseekWhitelistTargets(key,redactedResume,roleHint,revie
  }catch{return available.slice(0,maxTargets)}
 }
 
-export async function getReviewedDeepSeekSearchScope(env,{now=new Date(),limit=160}={}){
+export async function getReviewedDeepSeekSearchScope(env,{now=new Date(),limit=256}={}){
  if(env?.HHBA_DEEPSEEK_WHITELIST_SEARCH_ENABLED!=='1'||
   env?.HHBA_AUTH_ROLLOUT!=='preview'||typeof env?.HHBA_PNVS_AUTH_DB?.prepare!=='function')
   return [];
@@ -236,7 +245,7 @@ export async function getReviewedDeepSeekSearchScope(env,{now=new Date(),limit=1
    'industry_tags_json,business_tags_json FROM hhba_reviewed_recruitment_sources '+
    "WHERE review_status='VERIFIED' AND expires_at>? "+
    'ORDER BY reviewed_at DESC LIMIT ?'
-  ).bind(now.toISOString(),Math.min(160,Math.max(1,limit))).all();
+  ).bind(now.toISOString(),Math.min(256,Math.max(1,limit))).all();
   return (result?.results||[]).map(row=>normalizeReviewedSource(row,{now})).filter(Boolean);
  }catch{
   console.warn('HHBA_REVIEWED_SCOPE_UNAVAILABLE');
