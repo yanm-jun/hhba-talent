@@ -81,7 +81,10 @@ S2 异步记录新发现网址/企业/岗位为 PENDING
 
 - CI: `HHBA S4 DeepSeek official whitelist-first search (isolated)` 同时运行 S1/S2/S3/S4 的离线合成测试，不需要 API Key，也不使用真实个人简历。
 - D1: `0023` 只迁入独立 Preview DB；Preview 中测试白名单查询与合法性过滤，检查旧 S2/S3 仍能保存新发现为候选。
-- 实际 DeepSeek 在线搜索、全网补充、SSE 端到端时延与浏览器可见结果，必须在 Preview 构建成功且明确开关之后单独复核；测试通过前不能宣称已经生产运行。
+- Preview 的实际白名单新表已经迁移并写入华为、腾讯、美团 3 个公开证据核对的官方来源；`review_status=VERIFIED` 是企业招聘来源审核，而非岗位仍在招的证明。
+- Cloudflare Pages Preview **只启用** `HHBA_DEEPSEEK_WHITELIST_SEARCH_ENABLED=1` 和 `HHBA_KNOWLEDGE_CAPTURE_ENABLED=1`；所有原 Preview env keys、原有 Secret 引用及生产环境 keys 已比对保留。S3 自动业务补全开关仍为 OFF，避免用户浏览时增加额外的背景模型调用。
+- DeepSeek 官方 API 文档（https://api-docs.deepseek.com/zh-cn/guides/search/）确认 Search 为 `POST /v1/tools/search`，Fetch 为 `POST /v1/tools/fetch`，查询语法支持 `site:`。实际 DeepSeek 在线搜索、全网补充、SSE 端到端时延与浏览器可见结果，仍需在当前 Preview 完成构建后用获授权的非个人测试资料验收；**不能把离线模拟测试误报为线上 DeepSeek 调用成功**。
+- 目前仓库另外两组历史 CI 的失败出现在简历页、首页文案断言，和本分支新增的白名单函数无关。
 - 现有 `main`、`hhba.work`、生产 D1 均不改动。PR 先作为 Draft，S1→S2→S3→S4 按顺序验收后才能合并。
 
 ## 六、后续扩大规模
