@@ -105,9 +105,10 @@ test('B05 whitelist reader supports 100+ reviewed sources instead of truncating 
     HHBA_DEEPSEEK_WHITELIST_SEARCH_ENABLED:'1',
     HHBA_AUTH_ROLLOUT:'preview',
     HHBA_PNVS_AUTH_DB:{
-      prepare:()=>({bind:(_time,limit)=>{
-        boundLimit=limit;
-        return {all:async()=>({results:rows})};
+      prepare:(sql)=>({bind:(...args)=>{
+        if(sql.includes('FROM hhba_reviewed_recruitment_sources'))boundLimit=args[1];
+        return {all:async()=>({results:
+          sql.includes('FROM hhba_library_employer_halls')?[]:rows})};
       }})
     }
   };
