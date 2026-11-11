@@ -1,0 +1,25 @@
+name: HHBA V1 Stage 2 knowledge capture (isolated)
+on:
+  pull_request:
+    paths:
+      - 'apps/web/functions/_lib/dual-classification-v1.js'
+      - 'apps/web/functions/_lib/knowledge-capture-v1.js'
+      - 'apps/web/functions/_lib/deepseek-search-match.js'
+      - 'apps/web/functions/api/match-native/**'
+      - 'apps/web/d1/0021_knowledge_capture_v1.sql'
+      - 'apps/web/scripts/knowledge-capture-v1.contract.test.mjs'
+      - '.github/workflows/hhba-v1-knowledge-capture-stage2.yml'
+  workflow_dispatch:
+jobs:
+  knowledge-capture-contract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Knowledge capture + previous classification regression
+        run: node --test apps/web/scripts/knowledge-capture-v1.contract.test.mjs apps/web/scripts/dual-classification-v1.contract.test.mjs
