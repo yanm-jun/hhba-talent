@@ -156,7 +156,7 @@ INSERT OR IGNORE INTO hhba_library_majors (major_code,display_name,major_group_i
 ('130205','舞蹈学','media','https://www.moe.gov.cn/srcsite/A08/moe_1034/s3882/202604/t20260427_1434931.html'),
 ('100201K','临床医学','health','https://www.moe.gov.cn/srcsite/A08/moe_1034/s3882/202604/t20260427_1434931.html'),
 ('100701','药学','health','https://www.moe.gov.cn/srcsite/A08/moe_1034/s3882/202604/t20260427_1434931.html'),
-('101101','护理学','health','https://www.moe.gov.cn/srcsite/A08/moe_1034/s3882/202604/t20260427_1434931.html'),
+('101101K','护理学','health','https://www.moe.gov.cn/srcsite/A08/moe_1034/s3882/202604/t20260427_1434931.html'),
 ('082601','生物医学工程','health','https://www.moe.gov.cn/srcsite/A08/moe_1034/s3882/202604/t20260427_1434931.html'),
 ('083001','生物工程','chemistry','https://www.moe.gov.cn/srcsite/A08/moe_1034/s3882/202604/t20260427_1434931.html'),
 ('081301','化学工程与工艺','chemistry','https://www.moe.gov.cn/srcsite/A08/moe_1034/s3882/202604/t20260427_1434931.html'),
