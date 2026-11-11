@@ -137,6 +137,11 @@ test('266 automotive research nodes preserve brand-vs-employer identities',()=>{
   assert.ok(company,node.name);
   assert.ok(company.research_relationships?.some(x=>x.sequence===node.sequence),node.name);
  }
+ const foreign=seed.items.filter(e=>e.research_scope==='overseas_entity_not_mainland_search');
+ assert.equal(foreign.length,4);
+ assert.equal(employerSearchHints([{
+  ...foreign[0],portals:[{url:'https://careers.example.com/',scope:'search_candidate',status:'collected_unverified'}]
+ }],foreign[0].name,'汽车研发'),[]);
  assert.equal(seed.collection_coverage.imported_batch_records,700);
 });
 test('named subsidiary falls back to parent careers as a search hint only',()=>{
