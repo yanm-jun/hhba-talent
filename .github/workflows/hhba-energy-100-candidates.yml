@@ -1,9 +1,10 @@
-name: HHBA Energy 100 candidate recruitment sources
+name: HHBA Energy 200 candidate recruitment sources
 on:
   pull_request:
     paths:
       - 'apps/web/d1/0029_energy_recruitment_candidate_links_100_v1.sql'
-      - 'apps/web/functions/_lib/energy-recruitment-batch-001-100.js'
+      - 'apps/web/d1/0030_energy_recruitment_candidate_links_101_200_v1.sql'
+      - 'apps/web/functions/_lib/energy-recruitment-batch-*.js'
       - 'apps/web/functions/_lib/energy-candidate-scope-v1.js'
       - 'apps/web/scripts/energy-100-candidates.contract.test.mjs'
       - '.github/workflows/hhba-energy-100-candidates.yml'
@@ -19,9 +20,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate 100 links, classification and preview isolation
+      - name: Validate 200 URLs, nine categories, batch consistency and preview isolation
         run: node --test apps/web/scripts/energy-100-candidates.contract.test.mjs
-      - name: Check SQLite migration, nine categories and idempotence
+      - name: Verify SQLite migration 0029 + 0030 and idempotence
         run: |
           python3 - <<'PY'
           import sqlite3
@@ -30,17 +31,22 @@ jobs:
           con.execute('PRAGMA foreign_keys=ON')
           con.execute('CREATE TABLE hhba_library_halls(hall_id TEXT PRIMARY KEY)')
           con.execute("INSERT INTO hhba_library_halls VALUES('energy')")
-          con.execute('CREATE TABLE hhba_library_hall_sections(section_id TEXT PRIMARY KEY, hall_id TEXT NOT NULL REFERENCES hhba_library_halls(hall_id), display_name TEXT NOT NULL, sort_order INTEGER NOT NULL)')
-          migration=Path('apps/web/d1/0029_energy_recruitment_candidate_links_100_v1.sql').read_text()
-          con.executescript(migration)
-          con.executescript(migration)
+          con.execute('CREATE TABLE hhba_library_hall_sections(section_id TEXT PRIMARY KEY,hall_id TEXT NOT NULL REFERENCES hhba_library_halls(hall_id),display_name TEXT NOT NULL,sort_order INTEGER NOT NULL)')
+          m1=Path('apps/web/d1/0029_energy_recruitment_candidate_links_100_v1.sql').read_text()
+          m2=Path('apps/web/d1/0030_energy_recruitment_candidate_links_101_200_v1.sql').read_text()
+          con.executescript(m1)
+          con.executescript(m2)
+          con.executescript(m1)
+          con.executescript(m2)
           count=con.execute('SELECT COUNT(*) FROM hhba_library_energy_recruitment_candidates').fetchone()[0]
           distinct=con.execute('SELECT COUNT(DISTINCT candidate_url) FROM hhba_library_energy_recruitment_candidates').fetchone()[0]
-          remaining=con.execute("SELECT COUNT(*) FROM hhba_library_energy_recruitment_candidates WHERE source_status='UNVERIFIED'").fetchone()[0]
+          unverified=con.execute("SELECT COUNT(*) FROM hhba_library_energy_recruitment_candidates WHERE source_status='UNVERIFIED'").fetchone()[0]
           groups=dict(con.execute('SELECT section_id,COUNT(*) FROM hhba_library_energy_recruitment_candidates GROUP BY section_id').fetchall())
-          expected={'energy-grid':3,'energy-generation':12,'energy-nuclear':5,'energy-hydro':5,'energy-engineering':20,'energy-solar':18,'energy-wind':10,'energy-storage':15,'energy-equipment':12}
-          assert (count,distinct,remaining)==(100,100,100),(count,distinct,remaining)
+          expected={'energy-grid':15,'energy-generation':47,'energy-nuclear':11,'energy-hydro':9,'energy-engineering':38,'energy-solar':24,'energy-wind':13,'energy-storage':22,'energy-equipment':21}
+          batches=dict(con.execute('SELECT batch_id,COUNT(*) FROM hhba_library_energy_recruitment_candidates GROUP BY batch_id').fetchall())
+          assert (count,distinct,unverified)==(200,200,200),(count,distinct,unverified)
           assert groups==expected,(groups,expected)
+          assert batches=={'ENERGY_BATCH_001_100':100,'ENERGY_BATCH_101_200':100},batches
           assert con.execute("SELECT COUNT(*) FROM hhba_library_hall_sections WHERE hall_id='energy'").fetchone()[0]==9
-          print('HHBA energy source migration OK:',count,groups)
+          print('HHBA energy registry 200 rows OK:',groups,batches)
           PY
