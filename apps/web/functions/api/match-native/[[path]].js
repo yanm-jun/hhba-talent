@@ -5,6 +5,7 @@ import {redactForModel} from '../../_lib/resume-match-core.js';
 import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {knowledgeCaptureCallbacks} from '../../_lib/knowledge-capture-v1.js';
+import {getReviewedDeepSeekSearchScope} from '../../_lib/deepseek-reviewed-scope-v1.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -342,6 +343,10 @@ export async function onRequest(context){
  // Internal, public-source-only capture; OFF by default and not user-facing.
  const knowledge=knowledgeCaptureCallbacks(env,
   typeof context.waitUntil==='function'?promise=>context.waitUntil(promise):undefined);
+ // Reviewed whitelist ONLY guides DeepSeek Search; no local database matching.
+ // Missing migration, absent rollout flag or no approved companies => broad DeepSeek Search.
+ const reviewedWhitelist=await getReviewedDeepSeekSearchScope(env);
+ const matchOptions={...knowledge,reviewedWhitelist};
  // Same-origin, authorized one-shot call. No raw resume stored in HHBA database.
  const streaming=request.headers.get('Accept')?.includes('text/event-stream');
  if(streaming){
@@ -366,7 +371,7 @@ export async function onRequest(context){
      },12000);
      try{
       const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-       options.role_hint,options.limit,{...knowledge,signal:abort.signal,onProgress:stage=>{
+       options.role_hint,options.limit,{...matchOptions,signal:abort.signal,onProgress:stage=>{
         phase=stage;send('progress',{stage});
        },onPartial:matches=>send('partial',{matches})});
       console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
@@ -394,7 +399,7 @@ export async function onRequest(context){
 
  try{
   const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-   options.role_hint,options.limit,knowledge);
+   options.role_hint,options.limit,matchOptions);
   console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
   return json(await withSavedHistory(env,candidate,input,result));
  }catch(e){
