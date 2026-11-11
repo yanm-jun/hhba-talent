@@ -11,6 +11,7 @@ import {recruitmentSourceCandidate} from './dual-classification-v1.js';
 import {isEmployerDirectedSource} from './match-employer-source.js';
 import {classifyOccupation} from './match-ranking.js';
 import {isMainlandJobLocation} from './mainland-job-location.js';
+import {enqueueAndProcessMatch} from './employer-enrichment-v1.js';
 
 export const KNOWLEDGE_CAPTURE_VERSION='HHBA_KNOWLEDGE_CAPTURE_V1_STAGE2';
 const SAFE_JOB_IDS=new Set([
@@ -138,14 +139,19 @@ export async function persistKnowledgeCapture(db,data,{now=new Date()}={}){
  */
 export function knowledgeCaptureCallbacks(env,waitUntil){
  if(!knowledgeCaptureEnabled(env,waitUntil))return {};
- const submit=batch=>{
+ const submit=(batch,mayEnrich=false)=>{
   try{
-   waitUntil(persistKnowledgeCapture(env.HHBA_PNVS_AUTH_DB,batch)
-    .catch(()=>{console.warn('HHBA_KNOWLEDGE_CAPTURE_UNAVAILABLE');}));
+   const task=persistKnowledgeCapture(env.HHBA_PNVS_AUTH_DB,batch)
+    .then(async()=>{
+     // Company enrichment is independent, Preview-only and disabled by default.
+     // Await the Stage2 company FK write before submitting an S3 queue entry.
+     if(mayEnrich)await enqueueAndProcessMatch(env,batch.matches);
+    }).catch(()=>{console.warn('HHBA_KNOWLEDGE_CAPTURE_OR_ENRICH_UNAVAILABLE');});
+   waitUntil(task);
   }catch{console.warn('HHBA_KNOWLEDGE_CAPTURE_UNAVAILABLE');}
  };
  return {
   onDiscoveredCandidates:hits=>submit({hits}),
-  onDiscoveredMatches:matches=>submit({matches})
+  onDiscoveredMatches:matches=>submit({matches},true)
  };
 }
