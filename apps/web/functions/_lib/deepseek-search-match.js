@@ -7,6 +7,7 @@ import {isMainlandJobLocation} from './mainland-job-location.js';
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from './match-job-quality.js';
 import {supplementalQueries,mergeCandidateHits,combineRecommended} from './match-search-growth.js';
 import {recruitmentSourceKind,isEmployerDirectedSource,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting,sourceCounts} from './match-employer-source.js';
+import {deepseekWhitelistTargets,whitelistSearchQueries,onlyWhitelistHits} from './deepseek-reviewed-scope-v1.js';
 
 const BASE='https://api.deepseek.com';
 const foreign=/(?:香港|澳门|澳門|台湾|臺灣|日本|东京|大阪|新加坡|美国|英国|越南|海外|境外|驻外|overseas|hong kong|tokyo|singapore|remote overseas)/i;
@@ -163,6 +164,15 @@ export function selectedJobs(text,hits,limit=10){
   // Defense in depth: never let model output or an alternate code path leak a job-board link.
   const verifiedKind=recruitmentSourceKind(evidence.url);
   if(!isEmployerDirectedSource(verifiedKind))continue;
+  // The reviewed recruitment domain belongs to the reviewed employer.
+  // Never allow DeepSeek to relabel this trusted source as another company.
+  if(evidence.reviewed_employer){
+   const normalizeEmployer=value=>String(value||'').normalize('NFKC').toLowerCase()
+    .replace(/[\s·・（）()\[\]【】,，.。\-_—–]+/g,'')
+    .replace(/(?:股份有限公司|有限责任公司|有限公司|集团公司|集团|公司)$/,'');
+   const claimed=normalizeEmployer(company),reviewed=normalizeEmployer(evidence.reviewed_employer);
+   if(!claimed||!reviewed||(!claimed.includes(reviewed)&&!reviewed.includes(claimed)))continue;
+  }
   const signature=(company+'|'+title).toLowerCase().replace(/\s/g,'');
   if(seen.has(signature)||seen.has(evidence.url))continue;
   seen.add(signature);seen.add(evidence.url);
@@ -198,6 +208,7 @@ export async function reasonAboutJobs(key,resume,hits,limit,{
  const start=Date.now();onProgress('writing');
  const cards=hits.slice(0,32).map(h=>({
   id:h.id,title:h.title,url:h.url,description:(h.content||h.summary||h.snippet).slice(0,800),
+  reviewed_employer:h.reviewed_employer||null,
   recruitment_source:h.recruitment_source_kind||recruitmentSourceKind(h.url),
   availability:h.availability?.status||'UNKNOWN',
   availability_note:h.availability?.evidence||'投递状态待确认'
@@ -375,7 +386,32 @@ export async function expandDetailedReasons(key,resume,matches,hits,{
 }
 export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  const start=Date.now(),onProgress=opts.onProgress||(()=>{}),onPartial=opts.onPartial||(()=>{});
- const search=await searchPublicJobs(key,resume,roleHint,{...opts,allowEmpty:true});
+ // DeepSeek owns search and scoring; HHBA only supplies reviewed official
+ // search scopes. No matching against stored company records occurs here.
+ const reviewed=Array.isArray(opts.reviewedWhitelist)?opts.reviewedWhitelist:[];
+ const targets=reviewed.length?await deepseekWhitelistTargets(key,resume,roleHint,reviewed,opts):[];
+ const scopeQueries=whitelistSearchQueries(searchQueries(resume,roleHint)[0],targets);
+ let search=null,whitelistPhaseUsed=false,whitelistCandidates=0;
+ let whitelistQueries=0,webExpansionQueries=0,webExpansionCandidates=0;
+ if(scopeQueries.length){
+  try{
+   const scoped=await searchPublicJobs(key,resume,roleHint,{
+    ...opts,queriesOverride:scopeQueries,maxHits:16,allowEmpty:true
+   });
+   // Search-site constraints are hints; shared ATS hosts have many tenants.
+   // Reject hits outside the independently reviewed employer/tenant scope.
+   const accepted=onlyWhitelistHits(scoped.hits,targets);
+   search={...scoped,hits:accepted};
+   whitelistPhaseUsed=true;
+   whitelistCandidates=accepted.length;
+   whitelistQueries=scoped.diagnostic.successful_searches;
+  }catch(e){
+   if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+     'AI_PROVIDER_RATE_LIMITED'].includes(e?.code))throw e;
+   console.warn('HHBA_WHITELIST_SEARCH_FALLBACK',String(e?.code||'UNAVAILABLE'));
+  }
+ }
+ if(!search)search=await searchPublicJobs(key,resume,roleHint,{...opts,allowEmpty:true});
  const enriched=await enrichCandidateDetails(key,search.hits,opts);
  let pool=enriched.hits;
  let visible=[],firstModelMs=0,secondModelMs=0,firstRows=0,secondRows=0;
@@ -385,40 +421,80 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  const show=jobs=>{visible=jobs;onPartial(jobs);};
  // Short first pass: return the ranked shortlist, scoring and brief explanations
  // before any further search or the full prose pass.
- const first=pool.length?await reasonAboutJobs(key,resume,pool,limit,{
-  ...opts,shortlistOnly:true,modelTimeoutMs:opts.modelTimeoutMs??26000,
-  onProgress,onPartial:show
- }):{matches:[],model_ms:0,provider_rows:0};
+ let first={matches:[],model_ms:0,provider_rows:0};
+ if(pool.length){
+  try{
+   first=await reasonAboutJobs(key,resume,pool,limit,{
+    ...opts,shortlistOnly:true,modelTimeoutMs:opts.modelTimeoutMs??26000,
+    onProgress,onPartial:show
+   });
+  }catch(e){
+   // The reviewed site may have jobs but none appropriate for this resume.
+   if(!whitelistPhaseUsed||e?.code!=='AI_MATCH_NO_VALID_JOBS')throw e;
+  }
+ }
  firstModelMs=first.model_ms;firstRows=first.provider_rows;
  visible=combineRecommended(visible,first.matches,limit);
  if(visible.length)show(visible);
+ // If DeepSeek judges that the reviewed-site shortlist is not good enough,
+ // broaden search. It must rank the COMBINED results again (not HHBA DB scores).
+ const goodFit=visible.filter(j=>Number.isFinite(j.match_score)&&j.match_score>=65).length;
+ if(whitelistPhaseUsed&&goodFit<limit){
+  try{
+   const wide=await searchPublicJobs(key,resume,roleHint,{
+    ...opts,queriesOverride:searchQueries(resume,roleHint).slice(0,4),
+    maxHits:28,allowEmpty:true
+   });
+   webExpansionQueries=wide.diagnostic.successful_searches;
+   webExpansionCandidates=wide.hits.length;
+   const checked=await enrichCandidateDetails(key,wide.hits,{
+    ...opts,maxFetch:6,fetchTimeoutMs:opts.fetchTimeoutMs??3200
+   });
+   additionalQueries+=wide.diagnostic.successful_searches;
+   additionalCandidates+=wide.hits.length;
+   additionalFiltered+=wide.diagnostic.rejected_links;
+   additionalFetches+=checked.fetches;
+   pool=mergeCandidateHits(pool,checked.hits,32);
+   if(pool.length){
+    const unified=await reasonAboutJobs(key,resume,pool,limit,{
+     ...opts,shortlistOnly:true,modelTimeoutMs:opts.unifiedTimeoutMs??26000,
+     onProgress,onPartial:show
+    });
+    secondModelMs+=unified.model_ms;secondRows+=unified.provider_rows;
+    visible=unified.matches;show(visible);
+   }
+  }catch(e){
+   if(!visible.length)throw e;
+   console.warn('HHBA_WHITELIST_WEB_EXPANSION_UNAVAILABLE',String(e?.code||'UNAVAILABLE'));
+  }
+ }
  // Search another two complementary directions ONLY if there is room. Existing
  // results remain on screen; no repeat resume upload or fictitious fill-ins.
  if(visible.length<limit&&opts.supplementalLimit!==0){
   const queries=supplementalQueries(resume,roleHint,searchQueries(resume,roleHint))
    .slice(0,opts.supplementalLimit??2);
   if(queries.length){
-   additionalQueries=queries.length;
+   additionalQueries+=queries.length;
    try{
     const supplemental=await searchPublicJobs(key,resume,roleHint,{
      ...opts,queriesOverride:queries,maxHits:28,allowEmpty:true,queryTimeoutMs:opts.supplementalTimeoutMs??9000
     });
     supplementSearchMs=supplemental.diagnostic.search_ms;
-    additionalCandidates=supplemental.hits.length;
-    additionalFiltered=supplemental.diagnostic.rejected_links;
+    additionalCandidates+=supplemental.hits.length;
+    additionalFiltered+=supplemental.diagnostic.rejected_links;
     const earlier=new Set(pool.map(h=>h.url));
     const combined=mergeCandidateHits(pool,supplemental.hits,48);
     const fresh=combined.filter(h=>!earlier.has(h.url));
     // Only four extra Fetch calls, all parallel. Keep the initial searchable list.
     const checked=await enrichCandidateDetails(key,fresh,{...opts,maxFetch:4,fetchTimeoutMs:2400});
-    additionalFetches=checked.fetches;pool=mergeCandidateHits(pool,checked.hits,48);
+    additionalFetches+=checked.fetches;pool=mergeCandidateHits(pool,checked.hits,48);
     const unselected=pool.filter(h=>!visible.some(j=>j.official_url===h.url));
     if(unselected.length){
      const extra=await reasonAboutJobs(key,resume,unselected,limit-visible.length,{
       ...opts,shortlistOnly:true,modelTimeoutMs:opts.supplementalModelTimeoutMs??18000,
       onProgress,onPartial:jobs=>show(combineRecommended(visible,jobs,limit))
      });
-     secondModelMs=extra.model_ms;secondRows=extra.provider_rows;
+     secondModelMs+=extra.model_ms;secondRows+=extra.provider_rows;
      visible=combineRecommended(visible,extra.matches,limit);show(visible);
     }
    }catch(e){
@@ -462,6 +538,10 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
   final_shortlisted:visible.length,details_expanded:detail.expanded,
   details_failed_batches:detail.detail_failures,detail_ms:detail.detail_ms,
   source_before:beforeSource,source_after:sourceCounts(visible),
-  employer_lookups:prefer.lookups,employer_replacements:prefer.replaced,employer_lookup_ms:prefer.lookup_ms
+  employer_lookups:prefer.lookups,employer_replacements:prefer.replaced,employer_lookup_ms:prefer.lookup_ms,
+  deepseek_whitelist_phase:whitelistPhaseUsed,reviewed_sources_considered:targets.length,
+  deepseek_whitelist_queries:whitelistQueries,deepseek_whitelist_candidates:whitelistCandidates,
+  deepseek_global_expansion_queries:webExpansionQueries,
+  deepseek_global_expansion_candidates:webExpansionCandidates
  }};
 }
