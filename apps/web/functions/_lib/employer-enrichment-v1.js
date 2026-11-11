@@ -84,10 +84,22 @@ function cleanQuote(raw,source){
  return q.length>=3&&normalized.includes(q)?excerpt:null;
 }
 
+/** S1 classification truncates each field; scan bounded public company pages in
+ * overlapping windows so secondary business lines at the bottom aren't lost. */
+export function taxonomyForCompanyPage(text){
+ const industry=new Set(),business=new Set(),source=short(text,8500);
+ for(let start=0;start<source.length;start+=1500){
+  const proposed=classifyEmployerDraft({overview:source.slice(start,start+1700)});
+  for(const tag of proposed.industry_tags)industry.add(tag);
+  for(const tag of proposed.business_tags)business.add(tag);
+ }
+ return {industry_tags:[...industry],business_tags:[...business]};
+}
+
 /** Strict schema+taxonomy+verbatim evidence; never auto-promote AI proposals. */
 export function validateBusinessProposals(data,evidence){
  if(!evidence||!Array.isArray(data)&&(!data||typeof data!=='object'))return [];
- const inferred=classifyEmployerDraft({industry:evidence.public_text,overview:evidence.public_text});
+ const inferred=taxonomyForCompanyPage(evidence.public_text);
  const allowedIndustry=new Set(inferred.industry_tags),allowedBusiness=new Set(inferred.business_tags);
  const proposals=[],seen=new Set();
  for(const [field,dimension] of TAG_DIMENSIONS){
@@ -149,7 +161,7 @@ export async function enrichPublicCompany(company,key,{fetcher=fetch}={}){
   if(evidence)break;
  }
  if(!evidence)throw err('ENRICH_NO_COMPANY_EVIDENCE');
- const allowed=classifyEmployerDraft({industry:evidence.public_text,overview:evidence.public_text});
+ const allowed=taxonomyForCompanyPage(evidence.public_text);
  if(!allowed.industry_tags.length&&!allowed.business_tags.length)
   throw err('ENRICH_NOT_ENOUGH_BUSINESS_TEXT');
  const instructions=[
