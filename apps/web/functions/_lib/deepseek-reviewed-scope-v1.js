@@ -65,6 +65,15 @@ const reviewedKuaishouCrossDomain=(company,careers,proof,displayName)=>
  proof.hostname==='www.kuaishou.com'&&proof.pathname==='/cn'&&
  displayName==='快手';
 
+// Verified cross-root corporate ownership link: czbank.com/cn/ explicitly links
+// zp.czbank.com.cn as the bank recruitment portal. Never generalize .com/.com.cn.
+const reviewedZheshangCrossDomain=(company,careers,proof,name,reviewer)=>
+ reviewer==='hhba-corporate-crossdomain-review-20261111'&&
+ company.hostname==='www.czbank.com'&&
+ careers.hostname==='zp.czbank.com.cn'&&careers.pathname==='/'&&
+ proof.hostname==='www.czbank.com'&&proof.pathname==='/cn/'&&
+ name==='浙商银行';
+
 const nameSafe=name=>name.length>=2&&!/@|https?:\/\/|(?:\d[\s-]?){9,}/.test(name);
 const idSafe=id=>/^[a-zA-Z0-9_-]{2,80}$/.test(id);
 const tagArray=raw=>{
@@ -95,9 +104,10 @@ export function normalizeReviewedSource(row,{now=new Date()}={}){
  const corporateBacklink=reviewer===CORPORATE_BACKLINK_REVIEW;
  const officialSameRoot=careers.hostname===companySite.hostname||
   sameOrChild(careers.hostname,companySite.hostname.replace(/^www\./,''));
+ const zheshangCrossDomain=reviewedZheshangCrossDomain(companySite,careers,proof,company,reviewer);
  // Historical corporate recruitment notices and company-specific pages may lack
  // a /careers/ token; verified source identity, not URL spelling, is decisive.
- if(!employerDirected&&!approvedTenant&&!officialSameRoot)return null;
+ if(!employerDirected&&!approvedTenant&&!officialSameRoot&&!zheshangCrossDomain)return null;
  if(approvedTenant&&!userConfirmed&&!corporateBacklink&&!officialSameRoot)return null;
  // The proof must come from the official company domain (not a job board or
  // someone else's shared ATS tenant), as independently checked by a reviewer.
@@ -115,7 +125,7 @@ export function normalizeReviewedSource(row,{now=new Date()}={}){
  if(careers.search||companySite.search||companySite.hash)return null;
  const haierCrossDomain=reviewedHaierCrossDomain(companySite,careers,proof,company);
  const kuaishouCrossDomain=reviewedKuaishouCrossDomain(companySite,careers,proof,company);
- const crossDomain=haierCrossDomain||kuaishouCrossDomain;
+ const crossDomain=haierCrossDomain||kuaishouCrossDomain||zheshangCrossDomain;
  if(!tenant&&!sameOrChild(recruitmentHost,companyHost)&&!crossDomain&&
   !(userConfirmed&&approvedTenant))return null;
  // Hotjob's /SU.../pb/ segment is the employer-tenant boundary:
