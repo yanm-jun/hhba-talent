@@ -95,7 +95,7 @@ export async function readEmployerLibrary(env,request){
  }
  return {halls:seed.halls,items:overlay(seed.items,custom),editable,seed_count:seed.items.length,
   collection_coverage:seed.collection_coverage||null,
-  brand_index:seed.research_brand_index||[]};
+  brand_index:seed.research_brand_index||[],source_statistics:seed.statistics||null};
 }
 const roleHalls=[
  ['automotive',/汽车|新能源车|整车|车载|智能驾驶|4S店|DCC|销售督导|经销商/i],
