@@ -1,6 +1,6 @@
 // Original HHBA administrator console: employer resource library.
 const dom=id=>document.getElementById(id);
-const state={items:[],halls:[],hall:'all',term:'',page:0,editable:false,loaded:false,coverage:null};
+const state={items:[],halls:[],hall:'all',term:'',page:0,editable:false,loaded:false,coverage:null,brandIndex:[],stats:null};
 const PAGE_SIZE=40,api='/admin-preview/api/library';
 const button=(label,onClick,extra='')=>{
  const b=document.createElement('button');b.type='button';b.textContent=label;
@@ -17,8 +17,10 @@ function selectHall(hall){
 }
 function filtered(){
  const q=state.term.toLocaleLowerCase('zh-CN').replace(/\s/g,'');
+ const matchingBrands=!q?[]:state.brandIndex.filter(b=>String(b.name||'').toLocaleLowerCase('zh-CN').includes(q));
+ const relatedNames=new Set(matchingBrands.flatMap(b=>[b.parent_name,b.group_name]).filter(Boolean));
  return state.items.filter(x=>(state.hall==='all'||belongs(x,state.hall))&&
-  (!q||[x.name,x.parent_name,...(x.aliases||[])].filter(Boolean)
+  (!q||relatedNames.has(x.name)||[x.name,x.parent_name,...(x.aliases||[])].filter(Boolean)
    .some(s=>String(s).toLocaleLowerCase('zh-CN').replace(/\s/g,'').includes(q))));
 }
 function renderHalls(){
@@ -74,7 +76,7 @@ function render(){
    }
   }
   const status=document.createElement('td');status.textContent=verified?'历史已审 '+verified+(pending?' / 待复核 '+pending:''):
-    pending?'待复核 '+pending:'仅集团关系';
+    pending?'待复核 '+pending:e.research_relationships?.length?'集团研究线索 · 待补招聘官网':'暂无独立招聘入口';
   const action=document.createElement('td');
   if(state.editable)action.append(button('补充/修改',()=>editEmployer(e),'library-edit'));
   else action.textContent='只读';
@@ -93,11 +95,13 @@ function render(){
  dom('library-groups').textContent=String(state.items.filter(x=>x.parent_name).length);
  dom('library-review').textContent=String(state.items.reduce((n,x)=>n+(x.portals||[]).filter(p=>p.status==='collected_unverified').length,0));
  const coverage=state.coverage;
+ const research=state.stats?.automotive_research_nodes;
+ const researchNote=research?' · 另有汽车集团研究节点 '+research+' 条（品牌 '+state.brandIndex.length+' 个，不按企业计）':'';
  dom('library-collection-status').textContent=coverage?
   '历史聊天收集清单：'+coverage.target_total.toLocaleString('zh-CN')+
   ' 条 · 已完整导入原始批次 '+coverage.imported_batch_records.toLocaleString('zh-CN')+
   ' 条 · 待补录 '+coverage.unimported_batch_records.toLocaleString('zh-CN')+
-  ' 条。企业实体和招聘网址的去重、审核另行统计。':
+  ' 条。企业实体和招聘网址的去重、审核另行统计。'+researchNote:
   '历史批次导入进度暂不可用；不将当前企业数量冒充全部收集记录。';
  dom('library-write-state').textContent=state.editable?'管理员可修改 · 批量最多100家':
    '只读 · 未接通管理员数据库或未授权';
@@ -122,6 +126,8 @@ const dataSet=async()=>{
  if(!loaded||!Array.isArray(loaded.items)||loaded.halls?.length!==17)throw Error('企业目录格式不正确');
  state.items=loaded.items;state.halls=loaded.halls;
  state.coverage=loaded.collection_coverage||null;
+ state.brandIndex=loaded.brand_index||loaded.research_brand_index||[];
+ state.stats=loaded.stats||loaded.statistics||null;
  state.editable=!local&&loaded.editable===true;state.loaded=true;
 };
 async function refresh(){
