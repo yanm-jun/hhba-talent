@@ -104,7 +104,7 @@ export function normalizeReviewedSource(row,{now=new Date()}={}){
  const companyHost=companySite.hostname.replace(/^www\./,'');
  if(!sameOrChild(proof.hostname,companyHost)&&!(userConfirmed&&
   proof.hostname===careers.hostname&&proof.pathname.startsWith(careers.pathname)))return null;
- const recruitmentHost=careers.hostname,tenant=isSharedATS(recruitmentHost)&&approvedTenant;
+ const recruitmentHost=careers.hostname,tenant=isSharedATS(recruitmentHost);
  if(tenant&&(careers.pathname==='/'||careers.pathname.split('/').filter(Boolean).length<1)&&
   ['wecruit.hotjob.cn','xyzp.51job.com','app.mokahr.com'].includes(recruitmentHost))return null;
  if(careers.search||companySite.search||companySite.hash)return null;
