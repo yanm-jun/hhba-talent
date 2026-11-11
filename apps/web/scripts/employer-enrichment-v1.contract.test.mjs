@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
  EMPLOYER_ENRICH_VERSION,selectCompanyEvidenceResults,companyPageEvidence,
- validateBusinessProposals,enrichPublicCompany,stage3Enabled,
+ validateBusinessProposals,taxonomyForCompanyPage,enrichPublicCompany,stage3Enabled,
  queueEmployerCandidates,processOneEnrichment
 } from '../functions/_lib/employer-enrichment-v1.js';
 import {knowledgeCaptureCallbacks} from '../functions/_lib/knowledge-capture-v1.js';
@@ -61,6 +61,13 @@ test('industry, additional businesses, technology remain distinct and source-quo
  assert.ok(tags.some(t=>t.dimension==='TECHNOLOGY'&&t.tag_id==='industrial-control'));
  assert.ok(tags.every(t=>t.review_status==='PROPOSED'));
  assert.ok(tags.every(t=>page.includes(t.evidence_excerpt)));
+});
+test('later company business lines are classified beyond the first 1800 chars',()=>{
+ const longPage='南芯科技公司介绍主营芯片。'+('企业公开介绍资料。'.repeat(240))+
+  '另外提供工业控制与工业自动化和储能技术方案。';
+ const tags=taxonomyForCompanyPage(longPage);
+ assert.ok(tags.industry_tags.includes('energy'));
+ assert.ok(tags.business_tags.includes('industrial-control'));
 });
 test('unknown tags, model hallucinations and nonverbatim references are discarded',()=>{
  const evidence=companyPageEvidence(company,source,page);
