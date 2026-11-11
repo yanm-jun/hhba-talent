@@ -128,7 +128,7 @@ export function normalizeReviewedSource(row,{now=new Date()}={}){
   /^SU[a-z0-9]+$/i.test(parts[0]||'')&&parts[1]==='pb';
  const last=parts.at(-1)||'';
  const sharedCareerFolder=!tenant&&/^(?:hr|recruitment|recruit|careers?|jobs?|zhaopin|rczp|zpjgg)$/i
-  .test(parts.at(-2)||'')&&/\\.(?:html?|shtml|php)$/i.test(last);
+  .test(parts.at(-2)||'')&&/\.(?:html?|shtml|php)$/i.test(last);
  const recruitmentPrefix=tenantPrefix||yonyouPrefix?
   '/'+parts.slice(0,2).join('/')+'/':
   sharedCareerFolder?('/'+parts.slice(0,-1).join('/')+'/'):scopePath(careers.pathname);
