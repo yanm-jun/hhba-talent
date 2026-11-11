@@ -45,6 +45,10 @@ test('group-shared and HTTP candidates never become DeepSeek trusted job links',
  const forbidden={name:'某企业',industry_id:'energy',aliases:[],portals:[
   {url:'http://example.com/careers',scope:'search_candidate',status:'collected_unverified'}]};
  assert.deepEqual(employerSearchHints([shared,forbidden],'电力工程师','电力工程师'),[]);
+ const named=employerSearchHints([shared],'曾在国网子公司从事电力项目','电力工程师');
+ assert.equal(named.length,1);
+ assert.match(named[0],/国网子公司/);
+ assert.match(named[0],/集团招聘平台/);
  const safe={name:'电力设备制造公司',industry_id:'energy',aliases:[],portals:[
   {url:'https://careers.example.com/',scope:'search_candidate',status:'collected_unverified'}]};
  const hints=employerSearchHints([shared,forbidden,safe],'电力设备制造','电力工程师');
