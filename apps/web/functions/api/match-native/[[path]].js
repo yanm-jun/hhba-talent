@@ -343,7 +343,7 @@ export async function onRequest({request,env}){
  let portalHints=[];
  try{
   const directory=await readEmployerLibrary(env,request);
-  portalHints=employerSearchHints(directory.items,redacted,options.role_hint,2);
+  portalHints=employerSearchHints(directory.items,redacted,options.role_hint,2,directory.brand_index);
  }catch{/* Continue with ordinary DeepSeek Search. */}
  const streaming=request.headers.get('Accept')?.includes('text/event-stream');
  if(streaming){
