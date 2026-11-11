@@ -80,10 +80,19 @@ for(const rel of relations.relations){
 // Merge already-collected draft PR source batches WITHOUT claiming the links are vetted.
 const draft=load('employerLibraryCandidateBatches.json');
 if(draft.schema_version!==1||!Array.isArray(draft.batches))throw Error('INVALID_DRAFT_CANDIDATES');
-const expected={automotive:200,semiconductor:200,energy:300};
-const totals={automotive:0,semiconductor:0,energy:0};
+// The user's 17-hall collection ledger is the target for recovering previous
+// conversations. These are historical collection counts, NOT verified links.
+const collectionTargets={
+ automotive:200,semiconductor:200,'internet-ai':200,energy:300,
+ manufacturing:400,finance:100,telecom:100,biomed:300,
+ aerospace:300,logistics:300,construction:200,'consumer-hardware':200,
+ 'chem-materials':200,retail:200,'agri-food':200,'culture-media':200,
+ 'education-research':200
+};
+const baseline={automotive:200,semiconductor:200,energy:300};
+const totals=Object.fromEntries(halls.map(([id])=>[id,0]));
 for(const batch of draft.batches){
- if(!Object.hasOwn(expected,batch.hall_id)||!Array.isArray(batch.entries))throw Error('INVALID_DRAFT_HALL');
+ if(!Object.hasOwn(collectionTargets,batch.hall_id)||!Array.isArray(batch.entries))throw Error('INVALID_DRAFT_HALL');
  totals[batch.hall_id]+=batch.entries.length;
  for(const tuple of batch.entries){
   const [seq,name,url,section,kind=null,parent=null]=tuple;
@@ -112,13 +121,27 @@ for(const batch of draft.batches){
   entries.set(id,row);
  }
 }
-for(const [sector,expectedCount] of Object.entries(expected))
- if(totals[sector]!==expectedCount)throw Error('INCOMPLETE_DRAFT_HALL_'+sector);
+// Do not lose the 700 already-recovered candidate records when adding more
+// historical batches. New galleries may be imported incrementally.
+for(const [sector,requiredCount] of Object.entries(baseline))
+ if(totals[sector]<requiredCount)throw Error('INCOMPLETE_DRAFT_HALL_'+sector);
+for(const [sector,targetCount] of Object.entries(collectionTargets))
+ if(totals[sector]>targetCount)throw Error('COLLECTION_HALL_OVER_TARGET_'+sector);
+const targetTotal=Object.values(collectionTargets).reduce((a,b)=>a+b,0);
+const importedTotal=Object.values(totals).reduce((a,b)=>a+b,0);
+const missingByHall=Object.fromEntries(
+ Object.entries(collectionTargets).map(([id,target])=>[id,target-totals[id]]));
 const items=[...entries.values()].sort((a,b)=>a.name.localeCompare(b.name,'zh-CN'));
 const unknown=items.filter(e=>e.industry_id==='uncategorized').map(e=>e.name);
 const output={schema_version:1,
  description:'HHBA 历史已审招聘入口 + 未核验草稿PR批次的企业资源索引；不代表在招岗位，不把集团入口视为子公司独立入口。候选 URL 必须经 DeepSeek 公开网页搜索与职位证据核验。',
  source_revision:'2026-11-12',halls:halls.map(([id,name])=>({id,name})),items,
+ collection_coverage:{
+  definition:'历史聊天行业馆收集记录数。不是企业唯一实体数，也不是有效官方招聘链接数。',
+  target_total:targetTotal,imported_batch_records:importedTotal,
+  unimported_batch_records:targetTotal-importedTotal,
+  target_by_hall:collectionTargets,imported_by_hall:totals,unimported_by_hall:missingByHall
+ },
  statistics:{entities:items.length,legacy_portals:items.reduce((n,e)=>n+e.portals.filter(p=>p.status==='legacy_reviewed').length,0),
   candidate_portals:items.reduce((n,e)=>n+e.portals.filter(p=>p.status!=='legacy_reviewed').length,0),
   group_relations:items.filter(e=>e.parent_name).length,unclassified:unknown.length,
