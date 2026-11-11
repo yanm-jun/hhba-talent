@@ -136,14 +136,14 @@ export async function enrichPublicCompany(company,key,{fetcher=fetch}={}){
  if(name.length<2||/@|https?:|\d{8,}/.test(name))throw err('ENRICH_BAD_COMPANY');
  const search=await provider(key,'/v1/tools/search',{
   query:(name+' 官网 公司介绍 主营业务 产品 业务领域').slice(0,110),
-  count:8,need_content:false},fetcher,8000);
+  count:8,need_content:false},fetcher,7000);
  if(!Array.isArray(search?.results))throw err('ENRICH_INVALID_SEARCH');
  const urls=selectCompanyEvidenceResults(name,search.results);
  if(!urls.length)throw err('ENRICH_NO_COMPANY_EVIDENCE');
  let evidence=null;
  for(const url of urls){
   let fetched;
-  try{fetched=await provider(key,'/v1/tools/fetch',{url},fetcher,7000)}
+  try{fetched=await provider(key,'/v1/tools/fetch',{url},fetcher,6000)}
   catch{continue}
   evidence=companyPageEvidence(name,url,fetched?.content);
   if(evidence)break;
@@ -164,7 +164,7 @@ export async function enrichPublicCompany(company,key,{fetcher=fetch}={}){
   text:{format:{type:'json_object'}},max_output_tokens:900,stream:false,
   instructions,input:JSON.stringify({company:name,
    allowed_industries:allowed.industry_tags,allowed_businesses:allowed.business_tags,
-   page:evidence.public_text})},fetcher,9000);
+   page:evidence.public_text})},fetcher,7000);
  let raw;
  try{raw=JSON.parse(modelOutput(response))}catch{throw err('ENRICH_INVALID_MODEL_RESULT')}
  const proposals=validateBusinessProposals(raw,evidence);
