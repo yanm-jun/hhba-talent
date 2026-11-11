@@ -26,7 +26,7 @@ const TAG_DIMENSIONS=new Map([
 const industryDims=new Set(['PRIMARY_INDUSTRY','ADDITIONAL_INDUSTRY']);
 const short=(v,max)=>typeof v==='string'?v.normalize('NFKC').replace(/[\u0000-\u001f\u007f<>]/g,' ').replace(/\s+/g,' ').trim().slice(0,max):'';
 const identical=(a,b)=>a===b||a.endsWith('.'+b);
-const plain=v=>short(v,120).toLowerCase().replace(/[\s·・（）()\[\]【】,，.。\-_—–]+/g,'');
+const plain=(v,max=10000)=>short(v,max).toLowerCase().replace(/[\s·・（）()\[\]【】,，.。\-_—–]+/g,'');
 function err(code){return Object.assign(new Error(code),{code});}
 async function digest(v){
  const b=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)));
