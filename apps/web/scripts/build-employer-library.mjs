@@ -168,6 +168,52 @@ for(const rec of prior.records){
  }
  entries.set(id,row);
 }
+// Supplementary automotive corporate-tree research is NEVER part of the
+// 3,800 chat-source count. Company status is a research lead, not legal proof.
+const automotiveResearch=load('employerLibraryAutomotiveResearch266.json');
+if(automotiveResearch.schema_version!==1||automotiveResearch.nodes?.length!==266)
+ throw Error('INVALID_AUTOMOTIVE_RESEARCH');
+const researchSequences=new Set();
+const researchBrandIndex=[];
+let researchNonbrandCount=0;
+for(const node of automotiveResearch.nodes){
+ if(!Number.isInteger(node.sequence)||node.sequence<1||node.sequence>266||
+    !node.name||!node.group||!node.source_url||!/^https:\/\//.test(node.source_url))
+  throw Error('INVALID_AUTOMOTIVE_NODE');
+ if(researchSequences.has(node.sequence))throw Error('DUPLICATE_AUTOMOTIVE_NODE');
+ researchSequences.add(node.sequence);
+ if(node.entity_type==='品牌/产品线'){
+  researchBrandIndex.push({name:node.name,parent_name:node.parent,
+   group_name:node.group,evidence_url:node.source_url,
+   status:'research_unverified',is_employer:false});
+  continue; // Do not turn vehicle brands into separate hiring/legal entities.
+ }
+ researchNonbrandCount++;
+ const id=key(node.name);
+ const row=entries.get(id)||{id,name:node.name,industry_id:'automotive',
+  parent_name:node.parent||node.group,relation:'关联研究线索（待核）',
+  aliases:[],portals:[],source_datasets:[]};
+ if(row.industry_id!=='automotive'){
+  row.related_hall_ids=row.related_hall_ids||[];
+  if(!row.related_hall_ids.includes('automotive'))row.related_hall_ids.push('automotive');
+ }
+ if(!row.source_datasets.includes('automotive_research_266'))
+  row.source_datasets.push('automotive_research_266');
+ row.research_relationships=row.research_relationships||[];
+ if(!row.research_relationships.some(x=>x.sequence===node.sequence))
+  row.research_relationships.push({sequence:node.sequence,
+   parent_name:node.parent,group_name:node.group,
+   entity_type:node.entity_type,relationship_hint:node.relationship,
+   source_url:node.source_url,status:'research_unverified'});
+ if(node.career_url&&/^https:\/\//.test(node.career_url)&&
+    !row.portals.some(p=>p.url===node.career_url))
+  row.portals.push({url:node.career_url,label:'汽车集团研究招聘入口线索',
+   scope:'search_candidate',status:'collected_unverified',
+   reviewed_on:null,source:'automotive_research_266'});
+ entries.set(id,row);
+}
+if(researchNonbrandCount!==230||researchBrandIndex.length!==36)
+ throw Error('INVALID_AUTOMOTIVE_TYPE_TOTALS');
 const items=[...entries.values()].sort((a,b)=>a.name.localeCompare(b.name,'zh-CN'));
 const unknown=items.filter(e=>e.industry_id==='uncategorized').map(e=>e.name);
 const output={schema_version:1,
@@ -178,8 +224,9 @@ const output={schema_version:1,
   target_total:targetTotal,imported_batch_records:importedTotal,
   unimported_batch_records:targetTotal-importedTotal,
   target_by_hall:collectionTargets,imported_by_hall:totals,unimported_by_hall:missingByHall
- },items,
- statistics:{prior_audit_source_rows:prior.records.length,entities:items.length,legacy_portals:items.reduce((n,e)=>n+e.portals.filter(p=>p.status==='legacy_reviewed').length,0),
+ },research_brand_index:researchBrandIndex,items,
+ statistics:{automotive_research_nodes:automotiveResearch.nodes.length,automotive_research_brands:researchBrandIndex.length,
+  prior_audit_source_rows:prior.records.length,entities:items.length,legacy_portals:items.reduce((n,e)=>n+e.portals.filter(p=>p.status==='legacy_reviewed').length,0),
   candidate_portals:items.reduce((n,e)=>n+e.portals.filter(p=>p.status!=='legacy_reviewed').length,0),
   group_relations:items.filter(e=>e.parent_name).length,unclassified:unknown.length,
   by_hall:Object.fromEntries(halls.map(([id])=>[id,items.filter(e=>e.industry_id===id).length]))}};
