@@ -50,6 +50,20 @@ test('B04 exact 51job sub-board scope cannot escape to another event',()=>{
   assert.equal(whitelistJobSource('https://xyzp.51job.com/othercompany/jobs', [source]),null);
 });
 
+test('B04 Hotjob employer SU tenant includes exact-position pages but excludes adjacent tenants',()=>{
+  const source=normalizeReviewedSource(make({
+    display_name:'立讯精密',
+    official_company_url:'https://www.luxshare-ict.com/',
+    recruitment_base_url:'https://wecruit.hotjob.cn/SU601778b25d83dc072073230a/pb/school.html',
+    ownership_evidence_url:'https://wecruit.hotjob.cn/SU601778b25d83dc072073230a/pb/school.html',
+    reviewer:USER
+  }),{now});
+  assert.ok(source);
+  assert.equal(source.recruitment_prefix,'/SU601778b25d83dc072073230a/pb/');
+  assert.ok(whitelistJobSource('https://wecruit.hotjob.cn/SU601778b25d83dc072073230a/pb/posDetail.html?postId=6aa26eea5e0f494d82a70f3f&postType=campus',[source]));
+  assert.equal(whitelistJobSource('https://wecruit.hotjob.cn/SU601778b25d83dc072073230b/pb/posDetail.html?postId=777',[source]),null);
+});
+
 test('B04 group corporate notices accepted without pretending current opening',()=>{
   const source=normalizeReviewedSource(make({
     display_name:'中国建筑集团',
