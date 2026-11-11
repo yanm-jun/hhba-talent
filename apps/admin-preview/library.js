@@ -88,7 +88,7 @@ function editEmployer(e){
 const dataSet=async()=>{
  const local=!['hhba.work','hhba-talent.pages.dev'].includes(location.hostname)&&
   !location.hostname.endsWith('.hhba-talent.pages.dev');
- const url=local?'/data/employer-library.json':api;
+ const url=local?(location.hostname.endsWith('.github.io')?'/hhba-talent/data/employer-library.json':'/data/employer-library.json'):api;
  const r=await fetch(url,{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
  if(!r.ok)throw Error(r.status===403?'无管理员访问权限（Cloudflare Access）':'企业目录暂不可用 · HTTP '+r.status);
  const obj=await r.json();
