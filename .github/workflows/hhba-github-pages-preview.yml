@@ -772,6 +772,8 @@ jobs:
       - name: Check admin static preview security and functional contracts
         run: |
           node --check apps/admin-preview/dashboard.js
+          node --check apps/admin-preview/library.js
+          node --test apps/web/scripts/employer-library.contract.test.mjs
           node --check apps/admin-preview/metrics.mjs
           node --check apps/admin-preview/phase2-metrics.mjs
           node --test apps/admin-preview/tests/*.test.mjs
@@ -781,6 +783,8 @@ jobs:
           cp apps/admin-preview/index.html \
              apps/admin-preview/styles.css \
              apps/admin-preview/dashboard.js \
+             apps/admin-preview/library.js \
+             apps/admin-preview/library.css \
              apps/admin-preview/favicon.svg \
              apps/web/dist/admin-preview/
           node --input-type=module <<'NODE'
@@ -789,6 +793,8 @@ jobs:
           let html=readFileSync(root+'index.html','utf8');
           for(const [oldPath,newPath] of [
             ['href="/styles.css"','href="./styles.css"'],
+            ['href="/library.css"','href="./library.css"'],
+            ['src="/library.js"','src="./library.js"'],
             ['src="/dashboard.js"','src="./dashboard.js"'],
             ['href="/favicon.svg"','href="./favicon.svg"']
           ]){
