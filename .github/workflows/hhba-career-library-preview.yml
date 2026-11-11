@@ -5,8 +5,10 @@ on:
       - 'apps/web/d1/0024_major_industry_library_v1.sql'
       - 'apps/web/d1/0025_major_industry_library_employers_v1.sql'
       - 'apps/web/d1/0026_major_specific_automotive_paths_v1.sql'
+      - 'apps/web/d1/0027_library_classification_ingest_guard_v1.sql'
       - 'apps/web/functions/_lib/hhba-library-classification-v1.js'
       - 'apps/web/functions/_lib/hhba-career-library-v1.js'
+      - 'apps/web/functions/_lib/deepseek-reviewed-scope-v1.js'
       - 'apps/web/functions/api/career-library/**'
       - 'apps/web/scripts/career-library-v1.contract.test.mjs'
       - 'apps/web/src/data/hhbaLibraryCompanyMapV1.json'
@@ -14,6 +16,7 @@ on:
       - 'apps/web/src/styles/career-library-preview.css'
       - 'apps/web/src/main.tsx'
       - 'apps/web/src/router.tsx'
+      - 'apps/web/docs/career-library-v1-implementation.md'
       - '.github/workflows/hhba-career-library-preview.yml'
   workflow_dispatch:
 jobs:
