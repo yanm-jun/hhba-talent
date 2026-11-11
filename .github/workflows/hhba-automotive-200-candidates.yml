@@ -1,0 +1,45 @@
+name: HHBA Automotive 200 candidate recruitment sources
+on:
+  pull_request:
+    paths:
+      - 'apps/web/d1/0028_automotive_recruitment_candidate_links_200_v1.sql'
+      - 'apps/web/functions/_lib/automotive-recruitment-batch-*.js'
+      - 'apps/web/functions/_lib/automotive-candidate-scope-v1.js'
+      - 'apps/web/scripts/automotive-200-candidates.contract.test.mjs'
+      - '.github/workflows/hhba-automotive-200-candidates.yml'
+  workflow_dispatch:
+jobs:
+  automotive-candidate-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Candidate source de-duplication and read-scope tests
+        run: node --test apps/web/scripts/automotive-200-candidates.contract.test.mjs
+      - name: Verify SQLite schema, count and idempotent seed
+        run: |
+          python3 - <<'PY'
+          import sqlite3
+          from pathlib import Path
+          con=sqlite3.connect(':memory:')
+          con.execute('PRAGMA foreign_keys=ON')
+          con.execute('CREATE TABLE hhba_library_hall_sections(section_id TEXT PRIMARY KEY)')
+          names=('auto-whole','auto-ev','auto-parts','auto-adas','auto-electronics','auto-battery','auto-manufacturing','auto-business')
+          con.executemany('INSERT INTO hhba_library_hall_sections VALUES (?)',[(n,) for n in names])
+          migration=Path('apps/web/d1/0028_automotive_recruitment_candidate_links_200_v1.sql').read_text()
+          con.executescript(migration)
+          con.executescript(migration)
+          count=con.execute('SELECT COUNT(*) FROM hhba_library_automotive_recruitment_candidates').fetchone()[0]
+          distinct=con.execute('SELECT COUNT(DISTINCT candidate_url) FROM hhba_library_automotive_recruitment_candidates').fetchone()[0]
+          unverified=con.execute("SELECT COUNT(*) FROM hhba_library_automotive_recruitment_candidates WHERE source_status='UNVERIFIED'").fetchone()[0]
+          distribution=dict(con.execute('SELECT section_id,COUNT(*) FROM hhba_library_automotive_recruitment_candidates GROUP BY section_id').fetchall())
+          expected={'auto-whole':47,'auto-ev':23,'auto-parts':66,'auto-adas':20,'auto-electronics':23,'auto-battery':16,'auto-manufacturing':2,'auto-business':3}
+          assert count==200 and distinct==200 and unverified==200, (count,distinct,unverified)
+          assert distribution==expected,(distribution,expected)
+          print('HHBA automotive source seed OK:',count,distribution)
+          PY
