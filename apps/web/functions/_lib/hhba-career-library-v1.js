@@ -80,7 +80,7 @@ export async function automotiveLibrary(db,{major='',role='',now=new Date()}={})
   if(!entry)return {error:'UNKNOWN_HALL_ROLE',status:404};
   rolePaths.push({...entry,route_type:'USER_CHOSEN',match_basis:'EXPLICIT_EXPLORATION',requires_skill_evidence:true});
  }
- const effectiveRole=inputRole||rolePaths[0]?.role_id||'';
+ const effectiveRole=inputRole||(majorInfo?rolePaths[0]?.role_id:'')||'';
  const employers=await all(db,
   'SELECT s.id,s.display_name AS name,s.official_company_url,s.recruitment_base_url,'+
   'h.membership_type,h.section_id,sec.display_name AS section_name,'+
