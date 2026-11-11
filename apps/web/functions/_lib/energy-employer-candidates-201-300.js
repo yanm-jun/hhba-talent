@@ -730,7 +730,7 @@ export const ENERGY_EMPLOYERS_201_300=Object.freeze([
     "中材科技（酒泉）风电叶片有限公司",
     "https://yp.sinomatech.com/campus/index.html",
     "energy-wind",
-    "SHARED_ATS",
+    "GROUP_CAREERS",
     "中材科技风电叶片"
   ],
   [
@@ -738,7 +738,7 @@ export const ENERGY_EMPLOYERS_201_300=Object.freeze([
     "中材科技（汕头）风电叶片有限公司",
     "https://yp.sinomatech.com/campus/index.html",
     "energy-wind",
-    "SHARED_ATS",
+    "GROUP_CAREERS",
     "中材科技风电叶片"
   ],
   [
@@ -746,7 +746,7 @@ export const ENERGY_EMPLOYERS_201_300=Object.freeze([
     "中材科技（邯郸）风电叶片有限公司",
     "https://yp.sinomatech.com/campus/index.html",
     "energy-wind",
-    "SHARED_ATS",
+    "GROUP_CAREERS",
     "中材科技风电叶片"
   ],
   [
