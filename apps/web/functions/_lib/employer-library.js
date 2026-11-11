@@ -97,19 +97,22 @@ const roleHalls=[
 export function employerSearchHints(library,resume,roleHint='',max=2){
  if(!Array.isArray(library)||!library.length)return [];
  const context=clean(roleHint,90)+' '+clean(resume,1800);
+ const usable=p=>(p.scope==='employer_portal'||p.scope==='search_candidate')&&portalUrl(p.url);
+ const eligible=x=>x.portals?.some(usable);
  const explicit=library.filter(x=>[x.name,...(x.aliases||[])].some(n=>n.length>=3&&context.includes(n)))
-  .filter(x=>x.portals?.some(p=>p.scope==='employer_portal'));
+  .filter(eligible);
  const hall=roleHalls.find(([,pattern])=>pattern.test(clean(roleHint,90)))?.[0]||
   roleHalls.find(([,pattern])=>pattern.test(clean(resume,700)))?.[0];
- const sector=hall?library.filter(x=>x.industry_id===hall&&x.portals?.some(p=>p.scope==='employer_portal')):[];
+ const sector=hall?library.filter(x=>(x.industry_id===hall||x.related_hall_ids?.includes(hall))&&eligible(x)):[];
  const candidates=[...explicit,...sector];
  const result=[],seen=new Set();
  for(const item of candidates){
-  const p=item.portals.find(x=>x.scope==='employer_portal'&&portalUrl(x.url));
+  const p=item.portals.find(usable);
   if(!p||seen.has(item.id))continue;
   seen.add(item.id);
   const hostname=new URL(p.url).hostname;
-  // Use only publicly supplied recruitment hosts. The provider must still search and verify actual job pages.
+  // A candidate portal is a domain search hint ONLY, not a trusted employer or vacancy.
+  // Group-shared candidate / discovery-only URLs are never selected here.
   result.push((clean(roleHint,50)||'招聘岗位')+' '+item.name+' site:'+hostname+' 岗位 职位 中国大陆');
   if(result.length>=max)break;
  }
