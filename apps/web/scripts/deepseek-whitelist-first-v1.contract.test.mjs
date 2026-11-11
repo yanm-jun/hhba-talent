@@ -87,6 +87,25 @@ test('Search query prioritizes company name plus site domain, no third-party boa
  assert.ok(q[1].includes('site:careers.tencent.com'));
  assert.ok(q.every(x=>x.length<=128&&!x.includes('zhipin')));
 });
+test('long company names must not push site: out of the 128-character search',()=>{
+ const long={...norm(),display_name:'超大型新能源汽车研发与制造集团综合技术研究中心有限公司'.repeat(3)};
+ const queries=whitelistSearchQueries('市场运营 产品运营 人工智能工程师 招聘 职位 经验 中国大陆',[long]);
+ assert.equal(queries.length,1);
+ assert.ok(queries[0].startsWith('site:career.huawei.com '));
+ assert.ok(queries[0].length<=128);
+});
+test('official employer proof on its own recruitment subdomain is valid when same first-party root',()=>{
+ const t=reviewed({id:'tencent-source',display_name:'腾讯',
+  official_company_url:'https://www.tencent.com/',
+  recruitment_base_url:'https://careers.tencent.com/',
+  ownership_evidence_url:'https://careers.tencent.com/m/zh-cn/termsservice.html'});
+ assert.equal(norm(t)?.career_host,'careers.tencent.com');
+ const mt=reviewed({id:'meituan-source',display_name:'美团',
+  official_company_url:'https://www.meituan.com/',
+  recruitment_base_url:'https://zhaopin.meituan.com/',
+  ownership_evidence_url:'https://zhaopin.meituan.com/web/question/social'});
+ assert.equal(norm(mt)?.career_host,'zhaopin.meituan.com');
+});
 test('no whitelist when flag is absent, env not Preview or table unavailable',async()=>{
  const db={prepare(){return {bind(){return {async all(){return {results:[reviewed()]}}}}}}};
  assert.deepEqual(await getReviewedDeepSeekSearchScope({HHBA_PNVS_AUTH_DB:db}),[]);
