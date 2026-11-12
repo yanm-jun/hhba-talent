@@ -1,0 +1,116 @@
+name: HHBA Join review on GitHub Pages
+on:
+  push:
+    branches: [feature/join-zero-cash-partners-20261112]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-github-pages-join-review
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify updated recruitment directions and UI
+        run: |
+          node --test apps/web/scripts/hhba-join-zero-cash.contract.test.mjs
+          node --test apps/web/scripts/hhba-email-templates.test.mjs
+          node --test apps/web/scripts/hhba-join-email-fallback.test.mjs
+      - name: Build static GitHub Pages review without backend or mail submission
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_JOIN_STATIC_PREVIEW: '1'
+          VITE_HHBA_REAL_AUTH_ENABLED: '0'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          VITE_HHBA_RECRUITMENT_RESPONSIBILITY_API_ENABLED: '0'
+          VITE_HHBA_EVIDENCE_API_ENABLED: '0'
+          VITE_HHBA_EMPLOYEE_FEEDBACK_API_ENABLED: '0'
+          VITE_HHBA_SCORING_API_ENABLED: '0'
+          VITE_HHBA_APPEALS_API_ENABLED: '0'
+          VITE_HHBA_IMPROVEMENTS_API_ENABLED: '0'
+          VITE_HHBA_PUBLICATION_API_ENABLED: '0'
+          VITE_HHBA_AID_COMMERCIAL_API_ENABLED: '0'
+        run: |
+          npm run build
+          mkdir -p dist/join
+          cp dist/index.html dist/join/index.html
+          cp dist/index.html dist/404.html
+          test -s dist/join/index.html
+          test -s dist/images/hhba-join-team.webp
+          node --input-type=module <<'NODE'
+          import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+          const source = readFileSync('src/pages/JoinUsPage.tsx', 'utf8');
+          const dist = readdirSync('dist/assets').filter(x => x.endsWith('.js'))
+            .map(x => readFileSync('dist/assets/' + x,'utf8')).join('');
+          for (const phrase of ['零现金创业伙伴招募', 'AI 匹配与推荐算法工程师',
+            '新媒体内容与用户增长伙伴', 'Edge 网申插件工程师',
+            '没有现成福利', '静态验收预览']) {
+            if(!source.includes(phrase) || !dist.includes(phrase))
+              throw Error('MISSING_REVIEW_CONTENT: ' + phrase);
+          }
+          if (!dist.includes('GitHub Pages 静态预览'))
+            throw Error('STATIC_FORM_GUARD_NOT_BUILT');
+          const meta = { review: 'HHBA join zero-cash recruitment',
+            sha: process.env.GITHUB_SHA, branch: process.env.GITHUB_REF_NAME,
+            form_mode: 'static-no-submission' };
+          writeFileSync('dist/join-preview-meta.json', JSON.stringify(meta, null, 2));
+          console.log('HHBA_JOIN_GITHUB_STATIC_REVIEW_READY', JSON.stringify(meta));
+          NODE
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}join/
+    steps:
+      - name: Publish review to existing GitHub Pages preview site
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Confirm exact review content is live
+        run: |
+          python - <<'PY'
+          import json, os, time, urllib.request
+          base='https://yanm-jun.github.io/hhba-talent/'
+          expected=os.environ['GITHUB_SHA']
+          last=''
+          for attempt in range(12):
+              try:
+                  req=urllib.request.Request(base+'join-preview-meta.json?sha='+expected+'&attempt='+str(attempt),
+                      headers={'Cache-Control':'no-cache','User-Agent':'HHBA-Join-Preview-Check/1.0'})
+                  with urllib.request.urlopen(req, timeout=20) as response:
+                      doc=json.load(response)
+                      if response.status!=200 or doc.get('sha')!=expected:
+                          raise AssertionError('stale preview manifest')
+                  with urllib.request.urlopen(base+'join/?sha='+expected,timeout=20) as response:
+                      html=response.read(20000).decode('utf8')
+                      if response.status!=200 or '/hhba-talent/assets/' not in html:
+                          raise AssertionError('join deep link unavailable')
+                  print('HHBA_JOIN_PREVIEW_LIVE', base+'join/', expected)
+                  break
+              except Exception as exc:
+                  last=str(exc)
+                  print('PAGE_PROPAGATING',attempt,last[:140])
+                  if attempt==11: raise
+                  time.sleep(10)
+          PY
