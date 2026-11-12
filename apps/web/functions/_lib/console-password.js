@@ -173,6 +173,7 @@ export async function handleConsoleAuth({request,env},action){
  }catch(e){
   if(e instanceof SyntaxError||String(e).includes('BODY_TOO_LARGE'))return authError('INVALID_REQUEST_BODY',400);
   console.error('HHBA_ADMIN_AUTH_BACKEND_UNAVAILABLE',e?.name||'Error');
+  if(/quota|row read limit|exceeded|7500/i.test(String(e?.message||'')))return authError('D1_DAILY_LIMIT_REACHED',503);
   return authError('ADMIN_AUTH_SERVICE_UNAVAILABLE',503);
  }
 }
