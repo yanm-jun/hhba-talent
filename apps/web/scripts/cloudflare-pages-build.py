@@ -33,7 +33,53 @@ def run(args: list[str] | str, *, cwd: Path, env: dict[str, str] | None = None) 
     subprocess.run(cmd, check=True, cwd=cwd, env=env)
 
 
+def build_admin_library_preview() -> bool:
+    """Isolated feature-branch UI preview; does not replace the production site build.
+
+    The complete production build depends on external historical company images.
+    To review admin design without changing a public employer page, only this
+    explicitly named development branch serves the existing admin console.
+    Pages Functions still apply Cloudflare Access verification to all data.
+    """
+    if os.environ.get("CF_PAGES_BRANCH", "") != "feat/admin-recruitment-library-20261112":
+        return False
+    source = REPO / "apps" / "admin-preview"
+    target = WEB / "dist" / "admin-preview"
+    target.mkdir(parents=True, exist_ok=True)
+    filenames = ("index.html", "dashboard.js", "styles.css", "library.js",
+                 "library.css", "library-file-ui.js", "library-file-import.js",
+                 "favicon.svg")
+    for name in filenames:
+        shutil.copy2(source / name, target / name)
+    page = (target / "index.html").read_text(encoding="utf-8")
+    rewrites = [
+        ('href="/styles.css"', 'href="./styles.css"'),
+        ('src="/dashboard.js"', 'src="./dashboard.js"'),
+        ('src="/library.js"', 'src="./library.js"'),
+        ('src="/library-file-ui.js"', 'src="./library-file-ui.js"'),
+        ('href="/library.css"', 'href="./library.css"'),
+        ('href="/favicon.svg"', 'href="./favicon.svg"'),
+    ]
+    for before, after in rewrites:
+        if before not in page:
+            raise SystemExit("Admin preview asset changed: " + before)
+        page = page.replace(before, after)
+    (target / "index.html").write_text(page, encoding="utf-8")
+    (WEB / "dist" / "index.html").write_text(
+        '<!doctype html><html lang="zh-CN"><meta charset="utf-8">'
+        '<meta http-equiv="refresh" content="0;url=/admin-preview/">'
+        '<title>HHBA 后台预览</title>'
+        '<p><a href="/admin-preview/">进入 HHBA 管理后台预览</a></p></html>',
+        encoding="utf-8",
+    )
+    assert all((target / name).is_file() for name in filenames)
+    print("HHBA_ADMIN_LIBRARY_ISOLATED_PREVIEW_READY=/admin-preview/", flush=True)
+    return True
+
+
 def main() -> None:
+    if build_admin_library_preview():
+        return
     if not WORKFLOW.exists():
         raise SystemExit("Missing canonical GitHub Pages workflow")
     wf = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
