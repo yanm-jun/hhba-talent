@@ -1,0 +1,1619 @@
+{
+  "schema_version": 1,
+  "description": "从2026-11-11家电与智能硬件馆两批独立聊天逐项恢复的200条历史名称。无逐项招聘URL；品牌/业务线不自动视为独立法人。历史源记录≠已审招聘网址。",
+  "hall_id": "consumer-hardware",
+  "batches": [
+    {
+      "batch_key": "consumer-hardware-001-100",
+      "source_title": "家电与智能硬件馆100个",
+      "entries": [
+        {
+          "sequence": 1,
+          "name": "海尔集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 2,
+          "name": "海尔智家",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 3,
+          "name": "美的集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 4,
+          "name": "格力电器",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 5,
+          "name": "海信集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 6,
+          "name": "TCL实业",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 7,
+          "name": "长虹控股集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 8,
+          "name": "创维集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 9,
+          "name": "创维数字",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 10,
+          "name": "长虹佳华",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 11,
+          "name": "TCL泛智屏事业部",
+          "record_type": "business_unit",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 12,
+          "name": "TCL空调事业部",
+          "record_type": "business_unit",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 13,
+          "name": "TCL白家电事业部",
+          "record_type": "business_unit",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 14,
+          "name": "海信显示事业部",
+          "record_type": "business_unit",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 15,
+          "name": "海信空气事业部",
+          "record_type": "business_unit",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 16,
+          "name": "海信冰冷事业部",
+          "record_type": "business_unit",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 17,
+          "name": "海信洗护事业部",
+          "record_type": "business_unit",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 18,
+          "name": "海信厨电事业部",
+          "record_type": "business_unit",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 19,
+          "name": "德业环境电器",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 20,
+          "name": "格力博",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 21,
+          "name": "方太集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 22,
+          "name": "老板电器",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 23,
+          "name": "九阳股份",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 24,
+          "name": "苏泊尔",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 25,
+          "name": "小熊电器",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 26,
+          "name": "华帝股份",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 27,
+          "name": "新宝股份",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 28,
+          "name": "北鼎股份",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 29,
+          "name": "莱克电气",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 30,
+          "name": "利仁科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 31,
+          "name": "奥佳华",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 32,
+          "name": "奥克斯集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 33,
+          "name": "康佳集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 34,
+          "name": "追觅科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 35,
+          "name": "石头科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 36,
+          "name": "科沃斯机器人",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 37,
+          "name": "云鲸智能",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 38,
+          "name": "添可智能",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 39,
+          "name": "公牛集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 40,
+          "name": "绿联科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 41,
+          "name": "涂鸦智能",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 42,
+          "name": "绿米联创（Aqara）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 43,
+          "name": "欧瑞博",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 44,
+          "name": "乐橙（华橙网络）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 45,
+          "name": "萤石网络",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 46,
+          "name": "德施曼",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 47,
+          "name": "鹿客科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 48,
+          "name": "海康威视",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 49,
+          "name": "海康微影",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 50,
+          "name": "三雄极光",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 51,
+          "name": "德力西集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 52,
+          "name": "正泰居家",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 53,
+          "name": "欧普照明",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 54,
+          "name": "雷士照明",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 55,
+          "name": "施耐德电气中国",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 56,
+          "name": "立达信物联科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 57,
+          "name": "七十迈科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 58,
+          "name": "亿联网络",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 59,
+          "name": "OPPO",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 60,
+          "name": "小米集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 61,
+          "name": "安克创新（Anker）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 62,
+          "name": "影石创新（Insta360）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 63,
+          "name": "大疆创新（DJI）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 64,
+          "name": "歌尔股份",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 65,
+          "name": "雷鸟创新（RayNeo）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 66,
+          "name": "XREAL",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 67,
+          "name": "灵伴科技（Rokid）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 68,
+          "name": "飞傲电子（FiiO）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 69,
+          "name": "光峰科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 70,
+          "name": "漫步者（Edifier）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 71,
+          "name": "韶音科技（Shokz）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 72,
+          "name": "万魔声学（1MORE）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 73,
+          "name": "荣耀终端",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 74,
+          "name": "vivo",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 75,
+          "name": "华为终端业务",
+          "record_type": "business_unit",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 76,
+          "name": "联想集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 77,
+          "name": "雷柏科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 78,
+          "name": "瑞声科技（AAC）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 79,
+          "name": "松下中国",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 80,
+          "name": "海思半导体",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 81,
+          "name": "倍思科技（Baseus）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 82,
+          "name": "华勤",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 83,
+          "name": "龙旗科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 84,
+          "name": "当贝网络",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 85,
+          "name": "传音控股",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 86,
+          "name": "华米科技（Zepp）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 87,
+          "name": "创想三维（Creality）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 88,
+          "name": "联发科技中国（MediaTek）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 89,
+          "name": "拓邦股份",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 90,
+          "name": "和而泰",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 91,
+          "name": "奋达科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 92,
+          "name": "共达电声",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 93,
+          "name": "美格智能",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 94,
+          "name": "亿道信息",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 95,
+          "name": "欣旺达电子",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 96,
+          "name": "珠海冠宇",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 97,
+          "name": "比亚迪电子",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 98,
+          "name": "朗科智能",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 99,
+          "name": "中科创达",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 100,
+          "name": "乐鑫科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        }
+      ]
+    },
+    {
+      "batch_key": "consumer-hardware-101-200",
+      "source_title": "继续家电与智能硬件馆100家",
+      "entries": [
+        {
+          "sequence": 101,
+          "name": "澳柯玛股份",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 102,
+          "name": "广东奥马冰箱",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 103,
+          "name": "博西家电中国",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 104,
+          "name": "惠而浦中国",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 105,
+          "name": "格兰仕集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 106,
+          "name": "德意智家",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 107,
+          "name": "亿田智能厨电",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 108,
+          "name": "帅丰电器",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 109,
+          "name": "森歌电器",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 110,
+          "name": "凯度电器",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 111,
+          "name": "艾美特电器",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 112,
+          "name": "倍轻松科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 113,
+          "name": "未来穿戴（SKG）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 114,
+          "name": "纯米科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 115,
+          "name": "博联智能（BroadLink）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 116,
+          "name": "广联智通（GL.iNet）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 117,
+          "name": "欧琳厨具",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 118,
+          "name": "大金空调中国",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 119,
+          "name": "开利空调中国",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 120,
+          "name": "麦克维尔空调",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 121,
+          "name": "火星人厨具",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 122,
+          "name": "浙江美大",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 123,
+          "name": "万和电气",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 124,
+          "name": "安吉尔集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 125,
+          "name": "沁园集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 126,
+          "name": "芬尼科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 127,
+          "name": "纽恩泰",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 128,
+          "name": "日出东方控股",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 129,
+          "name": "四季沐歌",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 130,
+          "name": "A.O.史密斯中国",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 131,
+          "name": "阿里斯顿中国",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 132,
+          "name": "立升净水",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 133,
+          "name": "艾格斯特",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 134,
+          "name": "王力安防",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 135,
+          "name": "好太太集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 136,
+          "name": "视源股份（CVTE）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 137,
+          "name": "鸿合科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 138,
+          "name": "汉王科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 139,
+          "name": "科大讯飞",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 140,
+          "name": "普渡机器人",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 141,
+          "name": "高仙机器人（Gausium）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 142,
+          "name": "宇树科技（Unitree）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 143,
+          "name": "越疆机器人（DOBOT）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 144,
+          "name": "优必选科技（UBTECH）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 145,
+          "name": "云深处科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 146,
+          "name": "思岚科技（SLAMTEC）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 147,
+          "name": "仙工智能（SEER）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 148,
+          "name": "灵动科技（ForwardX）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 149,
+          "name": "强脑科技（BrainCo）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 150,
+          "name": "智元机器人",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 151,
+          "name": "逐际动力",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 152,
+          "name": "智平方科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 153,
+          "name": "星际元机器人",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 154,
+          "name": "极智嘉（Geek+）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 155,
+          "name": "本末科技（Direct Drive）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 156,
+          "name": "乐动机器人（LDROBOT）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 157,
+          "name": "兆威机电",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 158,
+          "name": "乐森机器人（Robosen）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 159,
+          "name": "海柔创新（HAI ROBOTICS）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 160,
+          "name": "高擎动力",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 161,
+          "name": "极米科技（XGIMI）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 162,
+          "name": "坚果投影（火乐科技）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 163,
+          "name": "峰米科技（Formovie）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 164,
+          "name": "京东方（BOE）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 165,
+          "name": "康冠科技（KTC）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 166,
+          "name": "天马微电子",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 167,
+          "name": "维信诺（Visionox）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 168,
+          "name": "洲明科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 169,
+          "name": "艾比森（Absen）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 170,
+          "name": "奥拓电子",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 171,
+          "name": "舜宇光学科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 172,
+          "name": "丘钛科技（Q Technology）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 173,
+          "name": "水晶光电",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 174,
+          "name": "聚飞光电",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 175,
+          "name": "国星光电",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 176,
+          "name": "瑞芯微电子（Rockchip）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 177,
+          "name": "全志科技（Allwinner）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 178,
+          "name": "晶晨半导体（Amlogic）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 179,
+          "name": "富瀚微电子",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 180,
+          "name": "傅里叶半导体",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 181,
+          "name": "立讯精密",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 182,
+          "name": "富士康科技集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 183,
+          "name": "蓝思科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 184,
+          "name": "领益智造",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 185,
+          "name": "长盈精密",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 186,
+          "name": "闻泰科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 187,
+          "name": "欧菲光（OFILM）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 188,
+          "name": "鹏鼎控股",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 189,
+          "name": "东山精密",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 190,
+          "name": "信维通信",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 191,
+          "name": "佳禾智能",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 192,
+          "name": "国光电器",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 193,
+          "name": "瀛通通讯",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 194,
+          "name": "春秋电子",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 195,
+          "name": "卓翼科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 196,
+          "name": "飞荣达",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 197,
+          "name": "天键电声",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 198,
+          "name": "品胜电子（PISEN）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 199,
+          "name": "紫米电子（ZMI）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 200,
+          "name": "正崴精密（Foxlink）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        }
+      ]
+    }
+  ]
+}
