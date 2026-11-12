@@ -8,7 +8,7 @@ const formatTime=value=>{
    hour:'2-digit',minute:'2-digit',hour12:false
  })+'（北京时间）'}catch{return '—'}
 };
-const cloudflareMode=location.hostname==='hhba-talent.pages.dev'||location.hostname.endsWith('.hhba-talent.pages.dev')||location.hostname==='hhba.work';
+const cloudflareMode=location.hostname==='hhba-talent.pages.dev'||location.hostname.endsWith('.hhba-talent.pages.dev')||location.hostname==='hhba.work'||location.hostname==='admin.hhba.work';
 let snapshot=null,growth=null,growthError=null,selectedPeriod='30d',customRange=null,activeView='overview',growthRequestId=0;
 function normalizeCloudflarePublic(raw){
  if(raw?.kind!=='HHBA_CLOUDFLARE_PUBLIC_METRICS_V1'||!raw.counts)throw Error('INVALID_CLOUDFLARE_JOB_DATA');
@@ -41,7 +41,7 @@ function renderTraffic(target,items){
 function percent(value){return typeof value==='number'&&Number.isFinite(value)?value.toFixed(1)+'%':'—'}
 function accountValue(n){return integer(n)===null?'—':fmt.format(n)}
 function showRealDataStatus(){
- const liveHost=location.hostname==='hhba.work'||location.hostname==='hhba-talent.pages.dev';
+ const liveHost=location.hostname==='hhba.work'||location.hostname==='admin.hhba.work'||location.hostname==='hhba-talent.pages.dev';
  const source=liveHost?'正式网站数据':'独立预览数据库';
  byId('workspace-mode').textContent=liveHost?'正式管理后台':'开发预览';
  byId('sidebar-environment').textContent=source;
