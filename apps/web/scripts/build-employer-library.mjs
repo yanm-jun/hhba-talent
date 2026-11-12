@@ -212,10 +212,21 @@ if(historicalNames.schema_version!==1||!Array.isArray(historicalNames.batches))
  throw Error('INVALID_RECOVERED_CHAT_NAMES');
 const historicalNonEmployerIndex=[];
 let recoveredNameRows=0;
+const seenChatBatchKeys=new Set();
 for(const group of historicalNames.batches){
  const hall=group.hall_id||historicalNames.hall_id;
  if(!Object.hasOwn(totals,hall)||!Array.isArray(group.entries)||!group.batch_key)
   throw Error('INVALID_RECOVERED_CHAT_BATCH');
+ // Duplicate historical batches would inflate the 3,800-row progress counter.
+ if(seenChatBatchKeys.has(group.batch_key))throw Error('DUPLICATE_RECOVERED_CHAT_BATCH_'+group.batch_key);
+ seenChatBatchKeys.add(group.batch_key);
+ if(!/^[-a-z0-9]+-\d{3}-\d{3}$/.test(group.batch_key)||!group.batch_key.startsWith(hall+'-'))
+  throw Error('INVALID_RECOVERED_CHAT_BATCH_KEY_'+group.batch_key);
+ const range=group.batch_key.match(/-(\d{3})-(\d{3})$/);
+ const from=Number(range[1]),to=Number(range[2]);
+ if(to-from!==99||group.entries.length!==100||
+    group.entries.some((r,i)=>r.sequence!==from+i))
+  throw Error('INVALID_RECOVERED_CHAT_SEQUENCE_'+group.batch_key);
  const sourceLabel='historic_chat_'+group.batch_key;
  const seenSeq=new Set();
  for(const rec of group.entries){
