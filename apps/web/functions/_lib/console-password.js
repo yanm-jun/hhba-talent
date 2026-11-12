@@ -50,12 +50,18 @@ async function verifyPassword(owner,password){
  const expected=await derive(password,from64(owner.salt_b64),Number(owner.iterations));
  return equalConstantTime(expected,owner.hash_b64);
 }
-function dbOf(env){return env.HHBA_ADMIN_AUTH_DB}
+function dbOf(env){return env.HHBA_ADMIN_AUTH_KV||env.HHBA_ADMIN_AUTH_DB}
+function isKv(db){return typeof db?.get==='function'&&typeof db?.put==='function'}
 function configured(env){return env.HHBA_ADMIN_CONSOLE_ENABLED==='1'&&!!dbOf(env)}
-async function generateSession(db,ownerId='owner'){
+async function generateSession(db,ownerId='owner',authVersion=null){
  const token=base64url(bytes(32)),hash=await sha256(token),issued=now(),expires=issued+SESSION_SECONDS;
- await db.prepare('INSERT INTO hhba_console_sessions(token_hash,owner_id,expires_at,issued_at) VALUES(?,?,?,?)')
-  .bind(hash,ownerId,expires,issued).run();
+ if(isKv(db)){
+  if(!authVersion)throw Error('KV_SESSION_REQUIRES_AUTH_VERSION');
+  await db.put('session:'+hash,JSON.stringify({owner_id:ownerId,expires_at:expires,auth_version:authVersion}),{expirationTtl:SESSION_SECONDS});
+ }else{
+  await db.prepare('INSERT INTO hhba_console_sessions(token_hash,owner_id,expires_at,issued_at) VALUES(?,?,?,?)')
+   .bind(hash,ownerId,expires,issued).run();
+ }
  return token;
 }
 async function sessionRecord(request,env){
@@ -64,10 +70,18 @@ async function sessionRecord(request,env){
  const token=header.split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE+'='))?.slice(COOKIE.length+1)||'';
  if(!/^[a-zA-Z0-9_-]{43}$/.test(token))return null;
  const hash=await sha256(token);
- const record=await dbOf(env).prepare('SELECT s.owner_id,s.expires_at,o.email FROM hhba_console_sessions s JOIN hhba_console_owner o ON o.id=s.owner_id WHERE s.token_hash=? LIMIT 1').bind(hash).first();
+ const db=dbOf(env),expected=(env.HHBA_METRICS_ADMIN_EMAIL||'').trim().toLowerCase();
+ if(!expected)return null;
+ if(isKv(db)){
+  const [record,current]=await Promise.all([db.get('session:'+hash,'json'),db.get('admin:owner','json')]);
+  if(!record||!current||record.expires_at<=now()||record.owner_id!=='owner'||
+     !record.auth_version||record.auth_version!==current.auth_version||
+     String(current.email||'').toLowerCase()!==expected)return null;
+  return {owner:'owner',email:expected,hash};
+ }
+ const record=await db.prepare('SELECT s.owner_id,s.expires_at,o.email FROM hhba_console_sessions s JOIN hhba_console_owner o ON o.id=s.owner_id WHERE s.token_hash=? LIMIT 1').bind(hash).first();
  if(!record||record.expires_at<=now()||record.owner_id!=='owner')return null;
- const expected=(env.HHBA_METRICS_ADMIN_EMAIL||'').trim().toLowerCase();
- if(!expected||String(record.email).toLowerCase()!==expected)return null;
+ if(String(record.email).toLowerCase()!==expected)return null;
  return {owner:'owner',email:expected,hash};
 }
 export async function verifyPasswordAdmin(request,env){
@@ -76,11 +90,14 @@ export async function verifyPasswordAdmin(request,env){
   return record?{ok:true,email:record.email,provider:'password'}:
    {ok:false,code:'ADMIN_PASSWORD_LOGIN_REQUIRED',status:401};
  }catch(e){
-  console.error('ADMIN_SESSION_CHECK_UNAVAILABLE',e?.name);
+  console.error('ADMIN_SESSION_CHECK_UNAVAILABLE',e?.name, /quota|7500/i.test(String(e?.message||''))?'quota':'' );
   return {ok:false,code:'ADMIN_SESSION_STORE_UNAVAILABLE',status:503};
  }
 }
-async function owner(db){return db.prepare('SELECT * FROM hhba_console_owner WHERE id=? LIMIT 1').bind('owner').first()}
+async function owner(db){
+ return isKv(db)?db.get('admin:owner','json'):
+  db.prepare('SELECT * FROM hhba_console_owner WHERE id=? LIMIT 1').bind('owner').first();
+}
 async function bodyOf(request){
  const contentLength=Number(request.headers.get('content-length')||0);
  if(contentLength>5000)throw Error('BODY_TOO_LARGE');
@@ -93,18 +110,28 @@ async function throttleKey(request,env){
  return sha256((env.HHBA_ADMIN_THROTTLE_PEPPER||'')+'|'+ip);
 }
 async function getThrottle(db,key){
- const rec=await db.prepare('SELECT failures,lock_until,updated_at FROM hhba_console_login_limits WHERE identity_hash=?').bind(key).first();
+ const rec=isKv(db)?await db.get('limit:'+key,'json'):
+  await db.prepare('SELECT failures,lock_until,updated_at FROM hhba_console_login_limits WHERE identity_hash=?').bind(key).first();
  return rec&&rec.lock_until>now()?{locked:true,until:rec.lock_until}:{locked:false,failures:rec?.failures||0,updated:rec?.updated_at||0};
 }
 async function failedLogin(db,key){
  const t=now();
+ if(isKv(db)){
+  const prior=await db.get('limit:'+key,'json');
+  const failures=prior?.updated_at>=t-900?(prior.failures||0)+1:1;
+  await db.put('limit:'+key,JSON.stringify({failures,lock_until:failures>=7?t+900:0,updated_at:t}),{expirationTtl:900});
+  return;
+ }
  const sql='INSERT INTO hhba_console_login_limits(identity_hash,failures,lock_until,updated_at) VALUES(?,1,0,?) '+
   'ON CONFLICT(identity_hash) DO UPDATE SET '+
   'failures=CASE WHEN updated_at<? THEN 1 ELSE failures+1 END, '+
   'lock_until=CASE WHEN updated_at>=? AND failures>=6 THEN ? ELSE 0 END, updated_at=?';
  await db.prepare(sql).bind(key,t,t-900,t-900,t+900,t).run();
 }
-async function clearThrottle(db,key){await db.prepare('DELETE FROM hhba_console_login_limits WHERE identity_hash=?').bind(key).run()}
+async function clearThrottle(db,key){
+ if(isKv(db))await db.delete('limit:'+key);
+ else await db.prepare('DELETE FROM hhba_console_login_limits WHERE identity_hash=?').bind(key).run();
+}
 function privateResponse(result,session){
  const headers=session?{'Set-Cookie':tokenCookie(session)}:{};
  return authJson(result,200,headers);
@@ -122,7 +149,10 @@ export async function handleConsoleAuth({request,env},action){
   if(action==='logout'&&request.method==='POST'){
    if(!hasOrigin(request))return authError('INVALID_ORIGIN',403);
    const s=await sessionRecord(request,env);
-   if(s)await db.prepare('DELETE FROM hhba_console_sessions WHERE token_hash=?').bind(s.hash).run();
+   if(s){
+    if(isKv(db))await db.delete('session:'+s.hash);
+    else await db.prepare('DELETE FROM hhba_console_sessions WHERE token_hash=?').bind(s.hash).run();
+   }
    return authJson({ok:true},200,{'Set-Cookie':clearCookie()});
   }
   if(!['setup','login','change'].includes(action)||request.method!=='POST')return authError('NOT_FOUND',404);
@@ -141,10 +171,18 @@ export async function handleConsoleAuth({request,env},action){
    const salt=bytes(16),hash=await derive(password,salt),t=now();
    const email=String(env.HHBA_METRICS_ADMIN_EMAIL||'').trim().toLowerCase();
    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return authError('ADMIN_EMAIL_NOT_CONFIGURED',503);
-   const inserted=await db.prepare('INSERT OR IGNORE INTO hhba_console_owner(id,email,salt_b64,hash_b64,iterations,created_at,updated_at) VALUES(?,?,?,?,?,?,?)')
-    .bind('owner',email,base64url(salt),hash,PASSWORD_ITERATIONS,t,t).run();
-   if(inserted.meta?.changes!==1)return authError('ADMIN_ALREADY_CONFIGURED',409);
-   const token=await generateSession(db);
+   const authVersion=base64url(bytes(16));
+   if(isKv(db)){
+    await db.put('admin:owner',JSON.stringify({
+     id:'owner',username:'huifanghhba001',email,salt_b64:base64url(salt),
+     hash_b64:hash,iterations:PASSWORD_ITERATIONS,created_at:t,updated_at:t,auth_version:authVersion
+    }));
+   }else{
+    const inserted=await db.prepare('INSERT OR IGNORE INTO hhba_console_owner(id,email,salt_b64,hash_b64,iterations,created_at,updated_at) VALUES(?,?,?,?,?,?,?)')
+     .bind('owner',email,base64url(salt),hash,PASSWORD_ITERATIONS,t,t).run();
+    if(inserted.meta?.changes!==1)return authError('ADMIN_ALREADY_CONFIGURED',409);
+   }
+   const token=await generateSession(db,'owner',authVersion);
    return privateResponse({ok:true,message:'PASSWORD_CONFIGURED'},token);
   }
   const session=action==='change'?await sessionRecord(request,env):null;
@@ -162,14 +200,21 @@ export async function handleConsoleAuth({request,env},action){
    const next=data.newPassword;
    if(!strongPassword(next)||equalConstantTime(data.password,next))return authError('INVALID_NEW_PASSWORD',400);
    const salt=bytes(16),hash=await derive(next,salt),t=now();
-   await db.batch([
-    db.prepare('UPDATE hhba_console_owner SET salt_b64=?,hash_b64=?,iterations=?,updated_at=? WHERE id=?')
-     .bind(base64url(salt),hash,PASSWORD_ITERATIONS,t,'owner'),
-    db.prepare('DELETE FROM hhba_console_sessions WHERE owner_id=?').bind('owner')
-   ]);
+   if(isKv(db)){
+    account.salt_b64=base64url(salt);account.hash_b64=hash;
+    account.iterations=PASSWORD_ITERATIONS;account.updated_at=t;
+    account.auth_version=base64url(bytes(16));
+    await db.put('admin:owner',JSON.stringify(account));
+   }else{
+    await db.batch([
+     db.prepare('UPDATE hhba_console_owner SET salt_b64=?,hash_b64=?,iterations=?,updated_at=? WHERE id=?')
+      .bind(base64url(salt),hash,PASSWORD_ITERATIONS,t,'owner'),
+     db.prepare('DELETE FROM hhba_console_sessions WHERE owner_id=?').bind('owner')
+    ]);
+   }
   }
   await clearThrottle(db,key);
-  const token=await generateSession(db);
+  const token=await generateSession(db,'owner',account.auth_version||null);
   return privateResponse({ok:true,message:action==='change'?'PASSWORD_CHANGED':'LOGIN_OK'},token);
  }catch(e){
   if(e instanceof SyntaxError||String(e).includes('BODY_TOO_LARGE'))return authError('INVALID_REQUEST_BODY',400);
