@@ -9,7 +9,9 @@
   <title>数据总览 · 汇方职场 HHBA 管理中心</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
   <link rel="stylesheet" href="/styles.css"/>
+  <link rel="stylesheet" href="/library.css"/>
   <script type="module" src="/dashboard.js"></script>
+  <script type="module" src="/library.js"></script>
 </head>
 <body>
 <div class="app-shell" id="app">
@@ -24,6 +26,7 @@
       <button type="button" class="nav-link is-active" data-view="overview" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.4"/><rect x="13" y="3" width="8" height="8" rx="1.4"/><rect x="3" y="13" width="8" height="8" rx="1.4"/><rect x="13" y="13" width="8" height="8" rx="1.4"/></svg> 数据总览</button>
       <button type="button" class="nav-link" data-view="users"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2.1c0-2.4 2.4-4.2 5.5-4.2s5.5 1.8 5.5 4.2V19M16 5.5a3 3 0 0 1 0 5.4M17 13c2.3.3 3.5 1.7 3.5 3.9V19"/></svg> 用户分析</button>
       <button type="button" class="nav-link" data-view="market"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7" width="17" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3.5 12h17"/></svg> 岗位与企业</button>
+      <button type="button" class="nav-link" data-view="library"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5h7a2 2 0 0 1 2 2V21a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2V6.5a2 2 0 0 1 2-2ZM20 4.5h-5a2 2 0 0 0-2 2V21a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2V6.5a2 2 0 0 0-2-2Z"/></svg> 企业招聘图书馆</button>
       <button type="button" class="nav-link" data-view="operations"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4l3-7 4 12 3-5h4"/></svg> 运营监控 <span class="nav-soon">规划中</span></button>
       <button type="button" class="nav-link" data-view="finance"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 9h18M15 15h3"/></svg> 财务成本 <span class="nav-soon">规划中</span></button>
       <p class="nav-caption nav-caption-secondary">PRESENTATION</p>
@@ -201,6 +204,72 @@
             </div>
           </article>
         </div>
+      </section>
+      <section class="page-view" id="view-library" hidden aria-labelledby="lib-heading">
+        <div class="lib-intro">
+          <div><p class="eyebrow">HHBA · EMPLOYER RECRUITMENT LIBRARY</p>
+            <h1 id="lib-heading">企业招聘资源图书馆</h1>
+            <p class="page-subtitle">按 17 个行业馆管理企业与招聘入口。网址数量以正式 D1 数据库去重结果为准；候选入口不等于当前岗位已开放。</p></div>
+          <button class="button-outline" id="lib-refresh" type="button">刷新资源库</button>
+        </div>
+        <div class="lib-summary">
+          <article class="lib-stat"><span>全库不同招聘网址</span><strong id="lib-total-urls">—</strong><small>跨行业统一去重</small></article>
+          <article class="lib-stat"><span>已收录的记录</span><strong id="lib-total-rows">—</strong><small>企业与招聘来源记录</small></article>
+          <article class="lib-stat"><span>已有网址的记录</span><strong id="lib-total-linked">—</strong><small>可继续复核的候选入口</small></article>
+          <article class="lib-stat"><span>待补网址的记录</span><strong id="lib-total-missing">—</strong><small>仅记录名称，不伪造网址</small></article>
+        </div>
+        <div class="lib-notice" id="lib-message" role="status">正在等待管理员授权连接资源库；本页面不会填充演示数据。</div>
+        <div class="lib-board-top"><div><p class="lib-section-label">INDUSTRY COLLECTIONS</p><h2>17 个行业馆</h2></div><span class="lib-updated" id="lib-updated">尚未连接</span></div>
+        <div class="lib-halls" id="lib-halls" aria-label="行业馆目录"></div>
+        <section class="lib-entry-panel" id="lib-entry-panel" aria-label="企业招聘网址目录" hidden>
+          <div class="lib-entry-head"><div><p class="lib-section-label">ENTERPRISE CATALOGUE</p>
+            <h2 id="lib-current-hall">企业目录</h2><p>支持按企业名称、网址查找；分页查询不会一次读取全部企业记录。</p></div>
+            <div class="lib-entry-actions">
+              <button class="button-outline" type="button" id="lib-import" disabled>批量导入（≤100 条）</button>
+              <button class="button-primary" type="button" id="lib-add" disabled>+ 新增招聘入口</button>
+            </div>
+          </div>
+          <div class="lib-controls">
+            <form id="lib-search-form"><label for="lib-query" class="sr-only">搜索企业或网址</label>
+              <input id="lib-query" type="search" maxlength="80" placeholder="搜索企业名称或招聘网址"/>
+              <button class="button-outline" type="submit">搜索</button></form>
+            <label for="lib-filter" class="sr-only">招聘网址状态</label>
+            <select id="lib-filter"><option value="all">全部记录</option><option value="linked">已有网址</option><option value="missing">缺少网址</option></select>
+          </div>
+          <div class="lib-table-wrap"><table class="lib-table">
+            <thead><tr><th scope="col">企业名称</th><th scope="col">招聘网址</th><th scope="col">状态</th><th scope="col">资料来源</th><th scope="col">操作</th></tr></thead>
+            <tbody id="lib-rows"><tr><td colspan="5">点击行业馆以查看真实记录</td></tr></tbody>
+          </table></div>
+          <div class="lib-pagination"><span id="lib-list-status">请先选择行业馆</span>
+            <div><button class="button-outline" id="lib-prev" type="button" disabled>上一页</button>
+              <button class="button-outline" id="lib-next" type="button" disabled>下一页</button></div>
+          </div>
+        </section>
+        <p class="hhba-private-quality">仅授权管理员可修改内容。删除需要二次确认，并记录管理员审计日志；维护操作不自动重新验证官网有效性。</p>
+        <dialog class="lib-dialog" id="lib-edit-dialog" aria-labelledby="lib-edit-title">
+          <div class="lib-dialog-head"><h2 id="lib-edit-title">新增企业招聘入口</h2><button type="button" id="lib-edit-close" aria-label="关闭窗口">×</button></div>
+          <form id="lib-edit-form" class="lib-form">
+            <input id="lib-key" type="hidden"/>
+            <label>行业馆<select id="lib-industry" required></select></label>
+            <label>企业名称<input id="lib-name" type="text" maxlength="120" required placeholder="企业真实名称"/></label>
+            <label>招聘网址<input id="lib-url" type="url" required maxlength="1500" placeholder="https://企业官方招聘入口"/></label>
+            <label class="lib-check"><input id="lib-verified" type="checkbox"/>我已人工核实该网址对应企业招聘入口</label>
+            <p class="lib-form-tip">未勾选时按「待复核」保存。集团与子公司应保留真实招聘主体，不自行推测岗位信息。</p>
+            <p id="lib-edit-error" class="lib-form-error" role="alert"></p>
+            <div class="lib-form-actions"><button class="button-outline" type="button" id="lib-edit-cancel">取消</button>
+              <button class="button-primary" type="submit" id="lib-save">保存到资源库</button></div>
+          </form>
+        </dialog>
+        <dialog class="lib-dialog" id="lib-import-dialog" aria-labelledby="lib-import-title">
+          <div class="lib-dialog-head"><h2 id="lib-import-title">批量导入招聘网址</h2><button type="button" id="lib-import-close" aria-label="关闭窗口">×</button></div>
+          <form id="lib-import-form" class="lib-form">
+            <p class="lib-form-tip">从表格复制并粘贴，每行一个企业。推荐两列：<strong>企业名称 Tab 招聘网址</strong>；如需跨馆导入，可使用三列：<strong>行业 ID Tab 企业名称 Tab 招聘网址</strong>。每次最多 100 行。自动检查同行业重复网址。</p>
+            <label>招聘网址清单<textarea id="lib-import-text" required spellcheck="false" placeholder="示例企业&#9;https://careers.example.com&#10;另一企业&#9;https://jobs.example.cn"></textarea></label>
+            <p id="lib-import-error" class="lib-form-error" role="alert"></p>
+            <div class="lib-form-actions"><button class="button-outline" type="button" id="lib-import-cancel">取消</button>
+              <button class="button-primary" type="submit" id="lib-import-submit">核对去重并导入</button></div>
+          </form>
+        </dialog>
       </section>
       <section class="page-view" id="view-investor" hidden aria-labelledby="investor-heading">
         <div class="page-heading investor-heading"><div><p class="eyebrow">INVESTOR DATA ROOM · PREVIEW</p><h1 id="investor-heading">汇方职场 · HHBA · 融资数据展示</h1><p class="page-subtitle">可核验的平台基础建设进度，尚未接入的经营指标明确留空。</p></div><div class="heading-actions"><button type="button" class="button-outline" id="export-csv">导出已核验 CSV</button><button type="button" class="button-primary" id="leave-investor">返回管理后台</button></div></div>
