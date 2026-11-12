@@ -116,10 +116,14 @@ function libRenderRows(){
   const tr=document.createElement('tr');
   const company=libCell(tr,record.enterprise);company.className='lib-company';
   const urlCell=document.createElement('td');
+  let safeUrl=null;
   if(record.recruitment_url){
-   const a=document.createElement('a');a.href=record.recruitment_url;a.target='_blank';a.rel='noopener noreferrer';
+   try{const candidate=new URL(record.recruitment_url);if(candidate.protocol==='https:'&&!candidate.username&&!candidate.password)safeUrl=candidate.href}catch{/* keep unsafe values non-clickable */}
+  }
+  if(safeUrl){
+   const a=document.createElement('a');a.href=safeUrl;a.target='_blank';a.rel='noopener noreferrer';
    a.textContent=record.recruitment_url;a.title=record.recruitment_url;urlCell.append(a);
-  }else urlCell.textContent='尚未补录';
+  }else urlCell.textContent=record.recruitment_url||'尚未补录';
   urlCell.className='lib-url';tr.append(urlCell);
   const s=libStatus(record),td=document.createElement('td');const tag=document.createElement('span');
   tag.className='lib-tag '+s[1];tag.textContent=s[0];td.append(tag);tr.append(td);
