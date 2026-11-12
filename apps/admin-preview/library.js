@@ -1,6 +1,27 @@
 // HHBA enterprise recruitment library. All values are live, protected D1 responses.
 // The standalone localhost preview deliberately shows unavailable (never demo counts).
 const LIB_API='/admin-preview/api/library';
+// Read-only LAST VERIFIED production counters from 2026-11-12.
+// Used ONLY on the isolated library preview when D1 returns quota error.
+// Never represent these as live, and never invent employer-detail records.
+const LIB_VERIFIED_SNAPSHOT={
+ kind:'HHBA_RECRUITMENT_LIBRARY_V1',mode:'snapshot',asOf:'2026-11-12',
+ total:{records:5288,linked:2573,unique_urls:1900,missing:2715},
+ industries:[
+  ['automotive',318,0],['semiconductor',278,0],['internet-ai',342,142],
+  ['energy',299,0],['manufacturing',113,366],['finance',163,66],
+  ['telecom',42,95],['biomed',54,275],['aerospace',20,298],
+  ['logistics',42,286],['construction',24,194],
+  ['consumer-hardware',76,171],['chem-materials',28,183],
+  ['retail',70,182],['agri-food',34,187],
+  ['culture-media',56,181],['education-research',13,89]
+ ].map(([id,unique_urls,missing])=>({id,unique_urls,missing}))
+};
+function libIsDesignPreview(){
+ return location.hostname==='feat-admin-recruitment-libra.hhba-talent.pages.dev'||
+  /^([a-f0-9]{8})\.hhba-talent\.pages\.dev$/.test(location.hostname);
+}
+
 const LIB_HALLS=[
  ['automotive','汽车馆','🚗'],['semiconductor','电子半导体馆','💻'],['internet-ai','互联网与AI馆','🧠'],
  ['energy','能源电力馆','⚡'],['manufacturing','智能制造馆','🏭'],['finance','金融馆','🏦'],
@@ -13,7 +34,7 @@ const LIB_HALLS=[
 const libEl=id=>document.getElementById(id);
 const libFmt=new Intl.NumberFormat('zh-CN');
 const libState={started:false,summary:null,industry:null,page:1,hasMore:false,
- rows:[],controller:null,dirty:false};
+ rows:[],controller:null,dirty:false,lastListError:null};
 function libCount(v){return Number.isSafeInteger(v)&&v>=0?libFmt.format(v):'—'}
 function libMessage(text,tone=''){const e=libEl('lib-message');e.textContent=text;e.dataset.tone=tone}
 function libErrorMessage(status,body){
@@ -70,7 +91,11 @@ function libRenderSummary(){
   btn.append(head,value,foot);btn.addEventListener('click',()=>{void libSelect(id)});
   root.append(btn);
  }
- if(s?.asOf)libEl('lib-updated').textContent='本次查询：'+new Date(s.asOf).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'})+'（北京）';
+ if(s?.mode==='snapshot'){
+  libEl('lib-updated').textContent='历史快照 · 截至 2026-11-12（非实时）';
+ }else if(s?.asOf){
+  libEl('lib-updated').textContent='实时查询：'+new Date(s.asOf).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'})+'（北京）';
+ }else libEl('lib-updated').textContent='尚未连接';
 }
 async function libRefreshSummary(force=false){
  if(libState.summary&&!force){libRenderSummary();return}
@@ -78,8 +103,15 @@ async function libRefreshSummary(force=false){
  try{
   const result=await libRequest({mode:'summary'});
   libState.summary=result;libRenderSummary();
-  libMessage('已连接受保护的正式数据。各馆去重数相加不等于全库去重数。','ok');
- }catch(e){libState.summary=null;libRenderSummary();libMessage(libErrorMessage(e.status,e.body),'error')}
+  libMessage('已从受保护数据库读取行业统计。各馆去重数相加不等于全库去重数。','ok');
+ }catch(e){
+  if(e.body?.error==='D1_DAILY_LIMIT_REACHED'&&libIsDesignPreview()){
+   libState.summary=LIB_VERIFIED_SNAPSHOT;libRenderSummary();
+   libMessage('Cloudflare D1 今日读取额度已满。这里显示 2026-11-12 最后核实的生产库统计快照（非实时）；企业明细和写入暂不可用，正式数据未清空。','error');
+   return;
+  }
+  libState.summary=null;libRenderSummary();libMessage(libErrorMessage(e.status,e.body),'error');
+ }
 }
 async function libSelect(industry){
  if(!LIB_HALLS.some(x=>x[0]===industry))return;
@@ -87,11 +119,24 @@ async function libSelect(industry){
  libEl('lib-query').value='';libEl('lib-filter').value='all';
  libEl('lib-entry-panel').hidden=false;
  libEl('lib-current-hall').textContent=LIB_HALLS.find(x=>x[0]===industry)[1];
- libEl('lib-add').disabled=false;libEl('lib-import').disabled=false;
- libRenderSummary();await libFetchList();
+ const offline=libState.summary?.mode==='snapshot';
+ libEl('lib-add').disabled=offline;libEl('lib-import').disabled=offline;
+ libRenderSummary();
+ if(offline){
+  libState.rows=[];libState.hasMore=false;libState.lastListError='数据库限额已满，当前仅能查看截至 2026-11-12 的行业数量快照。企业名称和网址明细无法读取，并非没有企业。';
+  libRenderRows();
+  libMessage('当前显示历史数量快照；企业明细、搜索与修改必须在 D1 额度恢复后从真实数据库读取。','error');
+  return;
+ }
+ await libFetchList();
 }
 async function libFetchList(){
  if(!libState.industry)return;
+ if(libState.summary?.mode==='snapshot'){
+  libState.rows=[];libState.hasMore=false;
+  libState.lastListError='Cloudflare D1 暂不可读取企业明细。本馆数字为历史快照，不是空馆。';
+  libRenderRows();return;
+ }
  libState.controller?.abort();
  const controller=new AbortController();libState.controller=controller;
  const tbody=libEl('lib-rows');tbody.replaceChildren();
@@ -103,11 +148,12 @@ async function libFetchList(){
    {signal:controller.signal});
   if(libState.controller!==controller)return;
   libState.rows=data.rows;libState.hasMore=data.hasMore;
-  libRenderRows();libMessage('列表已更新，每页最多 25 条，不进行整库下载。','ok');
+  libState.lastListError=null;libRenderRows();libMessage('列表已更新，每页最多 25 条，不进行整库下载。','ok');
  }catch(e){
   if(controller.signal.aborted)return;
-  libState.rows=[];libState.hasMore=false;libRenderRows();
-  libMessage(libErrorMessage(e.status,e.body),'error');
+  libState.rows=[];libState.hasMore=false;
+  libState.lastListError=libErrorMessage(e.status,e.body);
+  libRenderRows();libMessage(libState.lastListError,'error');
  }
 }
 function libRenderRows(){
@@ -133,8 +179,9 @@ function libRenderRows(){
   tr.append(actions);root.append(tr);
  }
  if(!libState.rows.length){const tr=document.createElement('tr'),td=document.createElement('td');
-  td.colSpan=5;td.className='lib-empty';td.textContent='本页没有记录。尝试更改筛选条件，或在本行业馆新增招聘网址。';tr.append(td);root.append(tr)}
- libEl('lib-list-status').textContent='第 '+libState.page+' 页 · '+libState.rows.length+' 条'+(libState.hasMore?' · 还有下一页':'');
+  td.colSpan=5;td.className='lib-empty';td.textContent=libState.lastListError||'当前筛选条件下没有记录，请更改筛选条件。';tr.append(td);root.append(tr)}
+ libEl('lib-list-status').textContent=libState.lastListError?
+  '查询不可用 · 未返回企业明细':'第 '+libState.page+' 页 · '+libState.rows.length+' 条'+(libState.hasMore?' · 还有下一页':'');
  libEl('lib-prev').disabled=libState.page<=1;
  libEl('lib-next').disabled=!libState.hasMore;
 }
