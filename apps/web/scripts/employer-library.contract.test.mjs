@@ -119,6 +119,15 @@ test('group-shared and HTTP candidates never become DeepSeek trusted job links',
  assert.match(hints[0],/site:careers\.example\.com/);
  assert.doesNotMatch(hints[0],/http:\/\//);
 });
+test('missing career URL is searchable by an explicitly named employer only',()=>{
+ const item={id:'测试培训企业',name:'测试培训企业',industry_id:'education-research',
+  aliases:[],portals:[],historical_source_records:[{batch_key:'education-research-001-100',sequence:9,has_original_url:false}]};
+ const named=employerSearchHints([item],'曾在测试培训企业任职','教育运营',2);
+ assert.equal(named.length,1);
+ assert.match(named[0],/测试培训企业.*企业官网 官方招聘/);
+ assert.doesNotMatch(named[0],/site:/);
+ assert.deepEqual(employerSearchHints([item],'教育培训行业从业','教育运营',2),[]);
+});
 test('admin input enforces sector and https with no invented verification',()=>{
  assert.throws(()=>normalizeEmployerInput({name:'示例公司',industry_id:'other'}),/INVALID/);
  assert.throws(()=>normalizeEmployerInput({name:'示例公司',industry_id:'automotive',portals:[{url:'http://example.com/jobs'}]}),/INVALID/);
