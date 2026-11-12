@@ -398,6 +398,26 @@ for(const source of careersBackfill.records){
  }else backfillExisting++;
  entries.set(id,row);
 }
+// Preserve two original company editorial recruitment links (not generic homepages).
+const editorialCareers=load('domesticCompanyEditorial.json');
+let editorialCareersAdded=0;
+for(const [name,profile] of Object.entries(editorialCareers)){
+ if(!profile?.careers)continue;
+ if(!/^https:\/\//.test(profile.careers)||!/^https:\/\//.test(profile.sourceUrl||''))
+  throw Error('INVALID_EDITORIAL_CAREERS_'+name);
+ const id=key(name);
+ const row=entries.get(id)||{id,name,industry_id:'manufacturing',
+  parent_name:null,relation:null,aliases:[],portals:[],source_datasets:[]};
+ if(!row.source_datasets.includes('domesticCompanyEditorial'))
+  row.source_datasets.push('domesticCompanyEditorial');
+ if(!row.portals.some(p=>p.url===profile.careers)){
+  row.portals.push({url:profile.careers,label:'历史企业资料已记录招聘页（待复核）',
+   scope:'search_candidate',status:'collected_unverified',
+   reviewed_on:null,evidence_url:profile.sourceUrl,source:'domesticCompanyEditorial'});
+  editorialCareersAdded++;
+ }
+ entries.set(id,row);
+}
 // Recover already-existing 2026-10 careersUrl fields, which were previously
 // shown on employer profile pages but omitted from the unified library.
 // These are historical candidates, NOT live-validated or model-invented URLs.
@@ -482,7 +502,8 @@ const output={schema_version:1,
   unimported_batch_records:targetTotal-importedTotal,
   target_by_hall:collectionTargets,imported_by_hall:totals,unimported_by_hall:missingByHall
  },research_brand_index:researchBrandIndex,historical_non_employer_index:historicalNonEmployerIndex,items,
- statistics:{legacy_profile_source_rows:legacyProfileSourceRows,legacy_profile_urls_added:legacyProfileAdded,
+ statistics:{editorial_career_sources:2,editorial_careers_added:editorialCareersAdded,
+  legacy_profile_source_rows:legacyProfileSourceRows,legacy_profile_urls_added:legacyProfileAdded,
   legacy_profile_urls_existing:legacyProfileExisting,legacy_profile_unclassified:legacyProfileUnclassified.length,
   existing_group_link_associations:items.reduce((n,e)=>n+e.portals.filter(p=>p.scope==='group_shared_candidate'&&p.source_relation).length,0),
   previous_official_evidence_added:previousEvidencePortalsAdded,previous_official_evidence_existing:previousEvidencePortalsExisting,
