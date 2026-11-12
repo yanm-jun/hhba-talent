@@ -10,7 +10,9 @@ const indexPath=join(root,'public/data/employer-library.json');
 const read=name=>JSON.parse(readFileSync(join(root,'src/data',name),'utf8'));
 const seed=JSON.parse(readFileSync(indexPath,'utf8'));
 const batches=read('employerLibraryCandidateBatches.json');
-const recovered=read('employerLibraryRecoveredChatNames.json');
+const baseRecovered=read('employerLibraryRecoveredChatNames.json');
+const supplementalRecovered=read('employerLibraryRecoveredChatNamesSupplement.json');
+const recovered={...baseRecovered,batches:[...baseRecovered.batches,...supplementalRecovered.batches]};
 const restoredCount=recovered.batches.reduce((n,b)=>n+b.entries.length,0);
 const norm=s=>String(s).normalize('NFKC').replace(/[\s·•]/g,'').toLowerCase();
 
@@ -73,15 +75,15 @@ test('150 prior Preview audit rows are preserved separately from chat collection
  }
 });
 test('recovered chat names preserve original 900 slots without inventing official portals',()=>{
- assert.equal(restoredCount,900);
- assert.equal(recovered.batches.length,9);
- assert.equal(seed.statistics.recovered_name_rows,900);
+ assert.equal(restoredCount,1000);
+ assert.equal(recovered.batches.length,10);
+ assert.equal(seed.statistics.recovered_name_rows,1000);
  const units=recovered.batches.flatMap(b=>b.entries).filter(x=>x.record_type==='business_unit');
  assert.equal(units.length,28);
  assert.equal(seed.historical_non_employer_index.length,28);
  assert.equal(seed.collection_coverage.imported_by_hall['consumer-hardware'],200);
  assert.equal(seed.collection_coverage.unimported_by_hall['consumer-hardware'],0);
- assert.equal(seed.collection_coverage.imported_by_hall['internet-ai'],100);
+ assert.equal(seed.collection_coverage.imported_by_hall['internet-ai'],200);
  assert.equal(seed.collection_coverage.imported_by_hall['manufacturing'],100);
  assert.equal(seed.collection_coverage.imported_by_hall['education-research'],100);
  assert.equal(seed.collection_coverage.imported_by_hall['finance'],100);
