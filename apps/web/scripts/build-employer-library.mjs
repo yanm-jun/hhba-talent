@@ -304,6 +304,38 @@ for(const source of found.records){
  }
  entries.set(id,row);
 }
+// New public-source research is NOT historical chat recovery and must not
+// increase collection_coverage.imported_batch_records. Brands are only
+// candidate search aliases until a specific employing legal entity is known.
+const educationResearch=load('employerLibraryEducationResearch100.json');
+if(educationResearch.schema_version!==1||
+   educationResearch.source_kind!=='new_public_research_not_historical_chat_recovery'||
+   educationResearch.hall_id!=='education-research'||
+   educationResearch.entries?.length!==100)throw Error('INVALID_EDUCATION_PUBLIC_RESEARCH');
+const researchNames=new Set();
+let newlyIndexedEducation=0;
+for(const candidate of educationResearch.entries){
+ if(!candidate.name||candidate.url!==null||candidate.status!=='new_research_candidate'||
+    candidate.record_type!=='organization_or_brand_candidate')throw Error('INVALID_EDUCATION_CANDIDATE');
+ const id=key(candidate.name);
+ if(researchNames.has(id))throw Error('DUPLICATE_EDUCATION_RESEARCH_NAME');
+ researchNames.add(id);
+ const row=entries.get(id)||{id,name:candidate.name,industry_id:'education-research',
+  parent_name:null,relation:null,aliases:[],portals:[],source_datasets:[]};
+ if(!entries.has(id))newlyIndexedEducation++;
+ if(row.industry_id!=='education-research'){
+  row.related_hall_ids=row.related_hall_ids||[];
+  if(!row.related_hall_ids.includes('education-research'))row.related_hall_ids.push('education-research');
+ }
+ if(!row.source_datasets.includes('education_public_research_20261112'))
+  row.source_datasets.push('education_public_research_20261112');
+ row.public_research_evidence=row.public_research_evidence||[];
+ if(!row.public_research_evidence.some(x=>x.batch_key===educationResearch.batch_key))
+  row.public_research_evidence.push({batch_key:educationResearch.batch_key,
+   sequence:candidate.sequence,category:candidate.section,
+   source_url:educationResearch.source_url,status:'new_unverified_employer_candidate'});
+ entries.set(id,row);
+}
 const items=[...entries.values()].sort((a,b)=>a.name.localeCompare(b.name,'zh-CN'));
 const unknown=items.filter(e=>e.industry_id==='uncategorized').map(e=>e.name);
 const output={schema_version:1,
@@ -315,7 +347,8 @@ const output={schema_version:1,
   unimported_batch_records:targetTotal-importedTotal,
   target_by_hall:collectionTargets,imported_by_hall:totals,unimported_by_hall:missingByHall
  },research_brand_index:researchBrandIndex,historical_non_employer_index:historicalNonEmployerIndex,items,
- statistics:{recovered_name_rows:recoveredNameRows,recovered_business_units:historicalNonEmployerIndex.length,
+ statistics:{education_public_research_candidates:educationResearch.entries.length,education_new_distinct_indexed:newlyIndexedEducation,
+  recovered_name_rows:recoveredNameRows,recovered_business_units:historicalNonEmployerIndex.length,
   web_found_portals:webFoundCount,
   automotive_research_nodes:automotiveResearch.nodes.length,automotive_research_brands:researchBrandIndex.length,
   prior_audit_source_rows:prior.records.length,entities:items.length,
