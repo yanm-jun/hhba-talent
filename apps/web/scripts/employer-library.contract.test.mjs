@@ -10,6 +10,8 @@ const indexPath=join(root,'public/data/employer-library.json');
 const read=name=>JSON.parse(readFileSync(join(root,'src/data',name),'utf8'));
 const seed=JSON.parse(readFileSync(indexPath,'utf8'));
 const batches=read('employerLibraryCandidateBatches.json');
+const recovered=read('employerLibraryRecoveredChatNames.json');
+const restoredCount=recovered.batches.reduce((n,b)=>n+b.entries.length,0);
 const norm=s=>String(s).normalize('NFKC').replace(/[\s·•]/g,'').toLowerCase();
 
 test('17 stable industry halls and unique cross-hall employer identities',()=>{
@@ -28,9 +30,9 @@ test('collected draft PR records are present as unverified search hints, not app
  const imported=batches.batches.reduce((n,b)=>n+b.entries.length,0);
  assert.ok(imported>=700);
  assert.equal(seed.collection_coverage.target_total,3800);
- assert.equal(seed.collection_coverage.imported_batch_records,imported);
- assert.equal(seed.collection_coverage.unimported_batch_records,3800-imported);
- assert.equal(Object.values(seed.collection_coverage.imported_by_hall).reduce((a,b)=>a+b,0),imported);
+ assert.equal(seed.collection_coverage.imported_batch_records,imported+restoredCount);
+ assert.equal(seed.collection_coverage.unimported_batch_records,3800-imported-restoredCount);
+ assert.equal(Object.values(seed.collection_coverage.imported_by_hall).reduce((a,b)=>a+b,0),imported+restoredCount);
  assert.equal(Object.values(seed.collection_coverage.target_by_hall).reduce((a,b)=>a+b,0),3800);
  for(const hall of seed.halls){
   const id=hall.id;
@@ -58,7 +60,7 @@ test('150 prior Preview audit rows are preserved separately from chat collection
  assert.equal(audits.records.filter(r=>r.status==='preview_verified').length,136);
  assert.equal(audits.records.filter(r=>r.status==='pending').length,14);
  assert.equal(seed.statistics.prior_audit_source_rows,150);
- assert.equal(seed.collection_coverage.imported_batch_records,700);
+ assert.equal(seed.collection_coverage.imported_batch_records,700+restoredCount);
  for(const row of audits.records){
   const company=seed.items.find(e=>e.id===norm(row.name));
   assert.ok(company,row.name);
@@ -67,6 +69,33 @@ test('150 prior Preview audit rows are preserved separately from chat collection
   if(source.source_batch===row.batch){
    assert.equal(source.status,'collected_unverified');
    assert.equal(source.historical_preview_status,row.status);
+  }
+ }
+});
+test('recovered chat names preserve original 200 slots without inventing official portals',()=>{
+ assert.equal(restoredCount,200);
+ assert.equal(recovered.batches.length,2);
+ assert.equal(seed.statistics.recovered_name_rows,200);
+ const units=recovered.batches.flatMap(b=>b.entries).filter(x=>x.record_type==='business_unit');
+ assert.equal(units.length,9);
+ assert.equal(seed.historical_non_employer_index.length,9);
+ assert.equal(seed.collection_coverage.imported_by_hall['consumer-hardware'],200);
+ assert.equal(seed.collection_coverage.unimported_by_hall['consumer-hardware'],0);
+ const seqs=recovered.batches.flatMap(b=>b.entries.map(x=>x.sequence));
+ assert.equal(new Set(seqs).size,200);
+ for(const group of recovered.batches){
+  assert.equal(group.entries.length,100);
+  for(const item of group.entries){
+   assert.equal(item.url,null);
+   assert.equal(item.url_status,'not_recorded');
+   if(item.record_type==='business_unit'){
+    assert.ok(seed.historical_non_employer_index.some(x=>x.sequence===item.sequence),item.name);
+   }else{
+    const row=seed.items.find(x=>x.historical_source_records?.some(z=>
+     z.batch_key===group.batch_key&&z.sequence===item.sequence));
+    assert.ok(row,item.name);
+    assert.ok(row.historical_source_records.every(x=>x.has_original_url===false));
+   }
   }
  }
 });
@@ -142,7 +171,7 @@ test('266 automotive research nodes preserve brand-vs-employer identities',()=>{
  assert.deepEqual(employerSearchHints([{
   ...foreign[0],portals:[{url:'https://careers.example.com/',scope:'search_candidate',status:'collected_unverified'}]
  }],foreign[0].name,'汽车研发'),[]);
- assert.equal(seed.collection_coverage.imported_batch_records,700);
+ assert.equal(seed.collection_coverage.imported_batch_records,700+restoredCount);
 });
 test('named subsidiary falls back to parent careers as a search hint only',()=>{
  const parent={id:'集团',name:'集团',industry_id:'automotive',aliases:[],portals:[{
