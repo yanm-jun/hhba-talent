@@ -1,0 +1,27 @@
+name: HHBA join form D1 quota fallback regression
+on:
+  push:
+    branches: [fix/join-email-d1-quota-fallback-20261112]
+  pull_request:
+    paths:
+      - 'apps/web/functions/api/join-apply.js'
+      - 'apps/web/src/pages/JoinUsPage.tsx'
+      - 'apps/web/scripts/hhba-join-email-fallback.test.mjs'
+jobs:
+  join-email-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Test D1 quota fallback without sending live mail
+        run: node --test apps/web/scripts/hhba-join-email-fallback.test.mjs
+      - name: Type check HHBA website
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          npx tsc -b --pretty false
