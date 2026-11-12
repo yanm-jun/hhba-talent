@@ -3,6 +3,7 @@
 CREATE TABLE IF NOT EXISTS hhba_console_owner (
  id TEXT PRIMARY KEY CHECK(id='owner'),
  email TEXT NOT NULL,
+ username TEXT NOT NULL DEFAULT 'huifanghhba001',
  salt_b64 TEXT NOT NULL,
  hash_b64 TEXT NOT NULL,
  iterations INTEGER NOT NULL CHECK(iterations >= 100000),
