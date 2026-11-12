@@ -339,6 +339,10 @@ export function JoinUsPage({ user }: { user: User | null }) {
   };
   const submitApplication = async () => {
     setError('');
+    if (import.meta.env.VITE_HHBA_JOIN_STATIC_PREVIEW === '1') {
+      setError('这是 GitHub Pages 静态预览，仅用于检查页面样式和填写流程。请勿在预览环境提交真实个人资料。');
+      return;
+    }
     if (submitting) return;
     setSubmitting(true);
     try {
@@ -393,6 +397,7 @@ export function JoinUsPage({ user }: { user: User | null }) {
             <JumpButton onClick={() => jump(rolesRef)}>了解合作机会</JumpButton>
             <Link className="join-btn join-btn-light" to="/vision">了解我们的理念 <ArrowUpRight size={16} aria-hidden="true" /></Link>
           </div>
+          {import.meta.env.VITE_HHBA_JOIN_STATIC_PREVIEW === '1' && <div className="join-stage-banner" role="status"><Info size={16} aria-hidden="true" /><span><strong>静态验收预览：</strong>此版本仅供查看招募文案、岗位和表单外观，未连接邮件发送及申请存库，请勿填写真实隐私资料。</span></div>}
           <div className="join-stage-banner"><Info size={16} aria-hidden="true" /><span><strong>真实进展：</strong>HHBA 尚在筹备阶段，目前没有稳定工资和福利预算。我们只开放创业共建意向沟通；未来股权、拟议分红和收益分配均须具备条件并书面约定，不承诺现成股份或收入。</span></div>
         </div>
         <figure className="join-hero-photo">
