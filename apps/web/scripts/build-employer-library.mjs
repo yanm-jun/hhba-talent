@@ -313,9 +313,12 @@ for(const [sourceName,rec] of Object.entries(previousAutumnEvidence.entries)){
   throw Error('INVALID_PREVIOUS_CAREERS_EVIDENCE_'+sourceName);
  const companyName=sourceName==='顺丰'&&entries.has(key('顺丰控股'))?'顺丰控股':sourceName;
  const id=key(companyName);
- const hall=classify(companyName,rec.industry);
+ const evidenceHalls={'毕马威':'finance','施耐德电气':'manufacturing',
+  '鹰角网络':'culture-media','中国南方航空':'logistics',
+  '顺丰':'logistics','中国华能':'energy','中国大唐集团':'energy'};
+ const hall=evidenceHalls[sourceName];
  const row=entries.get(id)||{id,name:companyName,
-  industry_id:hall==='uncategorized'?'internet-ai':hall,
+  industry_id:hall,
   parent_name:null,relation:null,aliases:[],portals:[],source_datasets:[]};
  // The source document is authoritative for this link's provenance only;
  // it is not sufficient to reclassify unrelated existing employers.
