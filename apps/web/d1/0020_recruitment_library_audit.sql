@@ -16,3 +16,9 @@ CREATE INDEX IF NOT EXISTS idx_hhba_library_audit_by_key
 -- Reduce browse queries to the selected industry without changing existing rows.
 CREATE INDEX IF NOT EXISTS idx_hhba_library_industry_enterprise
   ON hhba_industry_employer_links(industry_id,enterprise,source_key);
+
+-- Exact case-insensitive URL equality lookup for each batch of <=100 URLs.
+-- Non-UNIQUE because historical records may intentionally share a parent-group URL.
+CREATE INDEX IF NOT EXISTS idx_hhba_library_normalized_url
+  ON hhba_industry_employer_links(industry_id,lower(rtrim(recruitment_url,'/')))
+  WHERE recruitment_url IS NOT NULL;
