@@ -16,7 +16,7 @@ export async function hmac(secret,value){
  return hex(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(value)));
 }
 export const cookie=(name,value)=>name+'='+value+'; Path=/; Max-Age=7776000; Secure; HttpOnly; SameSite=Lax';
-export const metricDb=env=>env.HHBA_METRICS_DB&&typeof env.HHBA_METRICS_SECRET==='string'&&env.HHBA_METRICS_SECRET.length>=32?env.HHBA_METRICS_DB:null;
+export const metricDb=env=>env.HHBA_METRICS_DB&&((typeof env.HHBA_METRICS_SECRET==='string'&&env.HHBA_METRICS_SECRET.length>=32)||(env.HHBA_ADMIN_CONSOLE_ENABLED==='1'&&!!env.HHBA_ADMIN_AUTH_DB))?env.HHBA_METRICS_DB:null;
 export async function assetJson(env,request,path){
  if(!env.ASSETS)throw Error('STATIC_ASSETS_MISSING');
  const res=await env.ASSETS.fetch(new Request(new URL(path,request.url),{headers:{Accept:'application/json'}}));
