@@ -261,3 +261,17 @@ test('historical-chat batch provenance and numbering cannot silently double-coun
   assert.deepEqual(batch.entries.map(r=>r.sequence),Array.from({length:100},(_,i)=>first+i).filter(n=>!missing.includes(n)));
  }
 });
+
+test('publicly researched education brands are indexed without inflating chat recovery',()=>{
+ const research=read('employerLibraryEducationResearch100.json');
+ assert.equal(research.entries.length,100);
+ assert.equal(research.source_kind,'new_public_research_not_historical_chat_recovery');
+ assert.equal(seed.statistics.education_public_research_candidates,100);
+ assert.equal(seed.collection_coverage.imported_batch_records,700+restoredCount);
+ for(const candidate of research.entries){
+  assert.equal(candidate.url,null);
+  const entry=seed.items.find(e=>norm(e.name)===norm(candidate.name));
+  assert.ok(entry,'education brand missing from discovery '+candidate.name);
+  assert.ok(entry.public_research_evidence?.some(x=>x.batch_key===research.batch_key&&x.sequence===candidate.sequence));
+ }
+});
