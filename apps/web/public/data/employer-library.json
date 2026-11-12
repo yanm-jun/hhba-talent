@@ -75,8 +75,8 @@
   "collection_coverage": {
     "definition": "历史聊天行业馆收集记录数。不是企业唯一实体数，也不是有效官方招聘链接数。",
     "target_total": 3800,
-    "imported_batch_records": 1300,
-    "unimported_batch_records": 2500,
+    "imported_batch_records": 1400,
+    "unimported_batch_records": 2400,
     "target_by_hall": {
       "automotive": 200,
       "semiconductor": 200,
@@ -103,7 +103,7 @@
       "energy": 300,
       "manufacturing": 100,
       "finance": 100,
-      "telecom": 0,
+      "telecom": 100,
       "biomed": 0,
       "aerospace": 0,
       "logistics": 0,
@@ -122,7 +122,7 @@
       "energy": 0,
       "manufacturing": 300,
       "finance": 0,
-      "telecom": 100,
+      "telecom": 0,
       "biomed": 300,
       "aerospace": 300,
       "logistics": 300,
@@ -1089,6 +1089,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "爱立信中国",
+      "name": "爱立信中国",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 79,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -2336,6 +2356,26 @@
       ]
     },
     {
+      "id": "北斗星通",
+      "name": "北斗星通",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 96,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "北方华创",
       "name": "北方华创",
       "industry_id": "semiconductor",
@@ -2555,6 +2595,26 @@
           "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
           "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京辰安科技",
+      "name": "北京辰安科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 48,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -6650,12 +6710,42 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_consumer-hardware-101-200"
+        "historic_chat_consumer-hardware-101-200",
+        "historic_chat_telecom-001-100"
       ],
       "historical_source_records": [
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 189,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 92,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ],
+      "related_hall_ids": [
+        "telecom"
+      ]
+    },
+    {
+      "id": "东土科技",
+      "name": "东土科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 78,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -7263,6 +7353,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 163,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "烽火通信",
+      "name": "烽火通信",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 72,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -8337,6 +8447,26 @@
       ]
     },
     {
+      "id": "光库科技",
+      "name": "光库科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 91,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "光力半导体adt",
       "name": "光力半导体ADT",
       "industry_id": "semiconductor",
@@ -8424,6 +8554,26 @@
       ]
     },
     {
+      "id": "光迅科技",
+      "name": "光迅科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 83,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "广爱保险经纪有限公司",
       "name": "广爱保险经纪有限公司",
       "industry_id": "automotive",
@@ -8461,6 +8611,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 102,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "广东广电网络",
+      "name": "广东广电网络",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 67,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -8651,6 +8821,26 @@
         {
           "batch_key": "finance-001-100",
           "sequence": 34,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "广和通",
+      "name": "广和通",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 94,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -11239,6 +11429,26 @@
       ]
     },
     {
+      "id": "海格通信",
+      "name": "海格通信",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 80,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "海光信息",
       "name": "海光信息",
       "industry_id": "semiconductor",
@@ -11452,6 +11662,26 @@
         {
           "hall_id": "energy",
           "code": "energy-grid"
+        }
+      ]
+    },
+    {
+      "id": "海能达通信",
+      "name": "海能达通信",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 75,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -12865,7 +13095,8 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_manufacturing-001-100"
+        "historic_chat_manufacturing-001-100",
+        "historic_chat_telecom-001-100"
       ],
       "historical_source_records": [
         {
@@ -12873,7 +13104,16 @@
           "sequence": 43,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 87,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "telecom"
       ]
     },
     {
@@ -14167,6 +14407,26 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "华为技术",
+      "name": "华为技术",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 69,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -15846,6 +16106,26 @@
         {
           "batch_key": "finance-001-100",
           "sequence": 65,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "剑桥科技",
+      "name": "剑桥科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 86,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -19143,6 +19423,86 @@
       ]
     },
     {
+      "id": "联通软件研究院",
+      "name": "联通软件研究院",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 65,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "联通数字科技",
+      "name": "联通数字科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 61,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "联通在线信息科技",
+      "name": "联通在线信息科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 63,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "联通智网科技",
+      "name": "联通智网科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 64,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "联想集团",
       "name": "联想集团",
       "industry_id": "consumer-hardware",
@@ -20412,7 +20772,8 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_consumer-hardware-001-100"
+        "historic_chat_consumer-hardware-001-100",
+        "historic_chat_telecom-001-100"
       ],
       "historical_source_records": [
         {
@@ -20420,7 +20781,16 @@
           "sequence": 93,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 95,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "telecom"
       ]
     },
     {
@@ -20578,6 +20948,26 @@
       ]
     },
     {
+      "id": "咪咕公司",
+      "name": "咪咕公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 23,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "米哈游",
       "name": "米哈游",
       "industry_id": "internet-ai",
@@ -20721,6 +21111,26 @@
         {
           "hall_id": "energy",
           "code": "energy-wind"
+        }
+      ]
+    },
+    {
+      "id": "铭普光磁",
+      "name": "铭普光磁",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 90,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -23516,6 +23926,26 @@
       ]
     },
     {
+      "id": "锐捷网络",
+      "name": "锐捷网络",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 73,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "锐湃动力科技有限公司",
       "name": "锐湃动力科技有限公司",
       "industry_id": "automotive",
@@ -24047,6 +24477,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 33,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "三维通信",
+      "name": "三维通信",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 98,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -27667,6 +28117,26 @@
       ]
     },
     {
+      "id": "仕佳光子",
+      "name": "仕佳光子",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 88,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "视涯科技",
       "name": "视涯科技",
       "industry_id": "semiconductor",
@@ -29020,6 +29490,126 @@
       ]
     },
     {
+      "id": "天翼爱音乐文化科技",
+      "name": "天翼爱音乐文化科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 47,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "天翼安全科技",
+      "name": "天翼安全科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 39,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "天翼电信终端",
+      "name": "天翼电信终端",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 46,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "天翼视联科技",
+      "name": "天翼视联科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 40,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "天翼数字生活科技",
+      "name": "天翼数字生活科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 38,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "天翼物联科技",
+      "name": "天翼物联科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 37,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "天岳先进",
       "name": "天岳先进",
       "industry_id": "semiconductor",
@@ -29183,6 +29773,26 @@
           "sequence": 41,
           "preview_status": "pending",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "通宇通讯",
+      "name": "通宇通讯",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 76,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -31734,6 +32344,26 @@
       ]
     },
     {
+      "id": "新华三集团",
+      "name": "新华三集团",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 71,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "新疆大全新能源股份有限公司",
       "name": "新疆大全新能源股份有限公司",
       "industry_id": "energy",
@@ -31912,6 +32542,26 @@
       ]
     },
     {
+      "id": "新易盛通信",
+      "name": "新易盛通信",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 85,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "信维通信",
       "name": "信维通信",
       "industry_id": "consumer-hardware",
@@ -31920,7 +32570,8 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_consumer-hardware-101-200"
+        "historic_chat_consumer-hardware-101-200",
+        "historic_chat_telecom-001-100"
       ],
       "historical_source_records": [
         {
@@ -31928,7 +32579,16 @@
           "sequence": 190,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 99,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "telecom"
       ]
     },
     {
@@ -32075,6 +32735,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-ev"
+        }
+      ]
+    },
+    {
+      "id": "星网锐捷",
+      "name": "星网锐捷",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 74,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -33959,6 +34639,26 @@
       ]
     },
     {
+      "id": "移远通信",
+      "name": "移远通信",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 93,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "亿道信息",
       "name": "亿道信息",
       "industry_id": "consumer-hardware",
@@ -34051,6 +34751,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 58,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "亿联无限科技",
+      "name": "亿联无限科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 100,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -36128,6 +36848,26 @@
       ]
     },
     {
+      "id": "长飞光纤",
+      "name": "长飞光纤",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 81,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "长工微电子",
       "name": "长工微电子",
       "industry_id": "semiconductor",
@@ -36153,6 +36893,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-analog"
+        }
+      ]
+    },
+    {
+      "id": "长光华芯",
+      "name": "长光华芯",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 89,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -38405,6 +39165,86 @@
       ]
     },
     {
+      "id": "中电信量子信息科技集团",
+      "name": "中电信量子信息科技集团",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 44,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中电信人工智能科技",
+      "name": "中电信人工智能科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 43,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中电信数智科技",
+      "name": "中电信数智科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 42,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中电信无人科技(江苏)",
+      "name": "中电信无人科技（江苏）",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 50,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中鼎集团",
       "name": "中鼎集团",
       "industry_id": "automotive",
@@ -38911,6 +39751,266 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国电信安徽公司",
+      "name": "中国电信安徽公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 32,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国电信北京公司",
+      "name": "中国电信北京公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 27,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国电信重庆公司",
+      "name": "中国电信重庆公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 36,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国电信广东公司",
+      "name": "中国电信广东公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 34,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国电信广西公司",
+      "name": "中国电信广西公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 35,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国电信国际公司",
+      "name": "中国电信国际公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 45,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国电信河北公司",
+      "name": "中国电信河北公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 28,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国电信黑龙江公司",
+      "name": "中国电信黑龙江公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 30,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国电信吉林公司",
+      "name": "中国电信吉林公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 29,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国电信集团",
+      "name": "中国电信集团",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 26,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国电信江西公司",
+      "name": "中国电信江西公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 33,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国电信上海公司",
+      "name": "中国电信上海公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 31,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国电信卫星公司",
+      "name": "中国电信卫星公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 41,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -39450,6 +40550,226 @@
           "sequence": 4,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国联通北京公司",
+      "name": "中国联通北京公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 52,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国联通广东公司",
+      "name": "中国联通广东公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 59,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国联通河北公司",
+      "name": "中国联通河北公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 54,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国联通集团",
+      "name": "中国联通集团",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 51,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国联通江苏公司",
+      "name": "中国联通江苏公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 57,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国联通山东公司",
+      "name": "中国联通山东公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 56,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国联通山西公司",
+      "name": "中国联通山西公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 55,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国联通四川公司",
+      "name": "中国联通四川公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 60,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国联通天津公司",
+      "name": "中国联通天津公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 53,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国联通研究院",
+      "name": "中国联通研究院",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 62,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国联通浙江公司",
+      "name": "中国联通浙江公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 58,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -40552,6 +41872,46 @@
       ]
     },
     {
+      "id": "中国铁塔",
+      "name": "中国铁塔",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 66,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国通信服务股份有限公司",
+      "name": "中国通信服务股份有限公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 49,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中国外汇交易中心",
       "name": "中国外汇交易中心",
       "industry_id": "finance",
@@ -40566,6 +41926,26 @@
         {
           "batch_key": "finance-001-100",
           "sequence": 98,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国卫星网络集团",
+      "name": "中国卫星网络集团",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 97,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -40650,6 +42030,26 @@
       ]
     },
     {
+      "id": "中国信息通信科技集团",
+      "name": "中国信息通信科技集团",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 68,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中国一汽",
       "name": "中国一汽",
       "industry_id": "automotive",
@@ -40724,6 +42124,426 @@
           "sequence": 3,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国移动北京公司",
+      "name": "中国移动北京公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 2,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动福建公司",
+      "name": "中国移动福建公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 10,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动广东公司",
+      "name": "中国移动广东公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 14,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动国际公司",
+      "name": "中国移动国际公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 19,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动杭州研发中心",
+      "name": "中国移动杭州研发中心",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 25,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动河北公司",
+      "name": "中国移动河北公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 4,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动河南公司",
+      "name": "中国移动河南公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 12,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动湖北公司",
+      "name": "中国移动湖北公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 13,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动集团",
+      "name": "中国移动集团",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 1,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动江苏公司",
+      "name": "中国移动江苏公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 8,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动辽宁公司",
+      "name": "中国移动辽宁公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 6,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动山东公司",
+      "name": "中国移动山东公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 11,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动山西公司",
+      "name": "中国移动山西公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 5,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动陕西公司",
+      "name": "中国移动陕西公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 16,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动上海公司",
+      "name": "中国移动上海公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 7,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动设计院",
+      "name": "中国移动设计院",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 18,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动四川公司",
+      "name": "中国移动四川公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 15,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动天津公司",
+      "name": "中国移动天津公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 3,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动云公司",
+      "name": "中国移动云公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 22,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动浙江公司",
+      "name": "中国移动浙江公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 9,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国移动终端公司",
+      "name": "中国移动终端公司",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 20,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -41355,6 +43175,26 @@
       ]
     },
     {
+      "id": "中际旭创",
+      "name": "中际旭创",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 84,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中交海峰风电",
       "name": "中交海峰风电",
       "industry_id": "energy",
@@ -41839,6 +43679,26 @@
       ]
     },
     {
+      "id": "中天科技",
+      "name": "中天科技",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 82,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中铁工程装备集团",
       "name": "中铁工程装备集团",
       "industry_id": "manufacturing",
@@ -41853,6 +43713,26 @@
         {
           "batch_key": "manufacturing-001-100",
           "sequence": 76,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中通服咨询设计研究院",
+      "name": "中通服咨询设计研究院",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 77,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -42128,7 +44008,76 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 70,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中移互联网",
+      "name": "中移互联网",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 24,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中移铁通",
+      "name": "中移铁通",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 17,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中移物联网",
+      "name": "中移物联网",
+      "industry_id": "telecom",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_telecom-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "telecom-001-100",
+          "sequence": 21,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -43301,13 +45250,13 @@
     }
   ],
   "statistics": {
-    "recovered_name_rows": 600,
+    "recovered_name_rows": 700,
     "recovered_business_units": 16,
     "web_found_portals": 4,
     "automotive_research_nodes": 266,
     "automotive_research_brands": 36,
     "prior_audit_source_rows": 150,
-    "entities": 1667,
+    "entities": 1762,
     "unique_portal_urls": 830,
     "legacy_portals": 130,
     "candidate_portals": 797,
@@ -43320,7 +45269,7 @@
       "energy": 312,
       "manufacturing": 103,
       "finance": 113,
-      "telecom": 5,
+      "telecom": 100,
       "biomed": 12,
       "aerospace": 3,
       "logistics": 66,
