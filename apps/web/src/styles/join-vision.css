@@ -452,3 +452,8 @@
  .join-role-group-heading h3{font-size:15px}
  .join-role-group-heading p{font-size:12px}
 }
+
+/* Shared-equity invitation V3: stage note appears once, near the application. */
+.join-disclosure-final{margin:42px 4px 0;padding:24px 26px;background:#f8fafc;border-color:#e1e8f0}
+.join-disclosure-final p{font-size:12.5px;line-height:2}
+@media(max-width:560px){.join-disclosure-final{margin:28px 0 0;padding:18px 16px}}
