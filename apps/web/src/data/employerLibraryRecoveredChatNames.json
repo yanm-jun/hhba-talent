@@ -4842,6 +4842,813 @@
           "url_status": "not_recorded"
         }
       ]
+    },
+    {
+      "batch_key": "telecom-001-100",
+      "hall_id": "telecom",
+      "source_title": "通信馆100家",
+      "entries": [
+        {
+          "sequence": 1,
+          "name": "中国移动集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 2,
+          "name": "中国移动北京公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 3,
+          "name": "中国移动天津公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 4,
+          "name": "中国移动河北公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 5,
+          "name": "中国移动山西公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 6,
+          "name": "中国移动辽宁公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 7,
+          "name": "中国移动上海公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 8,
+          "name": "中国移动江苏公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 9,
+          "name": "中国移动浙江公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 10,
+          "name": "中国移动福建公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 11,
+          "name": "中国移动山东公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 12,
+          "name": "中国移动河南公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 13,
+          "name": "中国移动湖北公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 14,
+          "name": "中国移动广东公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 15,
+          "name": "中国移动四川公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 16,
+          "name": "中国移动陕西公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 17,
+          "name": "中移铁通",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 18,
+          "name": "中国移动设计院",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 19,
+          "name": "中国移动国际公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 20,
+          "name": "中国移动终端公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 21,
+          "name": "中移物联网",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 22,
+          "name": "中国移动云公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 23,
+          "name": "咪咕公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 24,
+          "name": "中移互联网",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 25,
+          "name": "中国移动杭州研发中心",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 26,
+          "name": "中国电信集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 27,
+          "name": "中国电信北京公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 28,
+          "name": "中国电信河北公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 29,
+          "name": "中国电信吉林公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 30,
+          "name": "中国电信黑龙江公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 31,
+          "name": "中国电信上海公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 32,
+          "name": "中国电信安徽公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 33,
+          "name": "中国电信江西公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 34,
+          "name": "中国电信广东公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 35,
+          "name": "中国电信广西公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 36,
+          "name": "中国电信重庆公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 37,
+          "name": "天翼物联科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 38,
+          "name": "天翼数字生活科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 39,
+          "name": "天翼安全科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 40,
+          "name": "天翼视联科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 41,
+          "name": "中国电信卫星公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 42,
+          "name": "中电信数智科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 43,
+          "name": "中电信人工智能科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 44,
+          "name": "中电信量子信息科技集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 45,
+          "name": "中国电信国际公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 46,
+          "name": "天翼电信终端",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 47,
+          "name": "天翼爱音乐文化科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 48,
+          "name": "北京辰安科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 49,
+          "name": "中国通信服务股份有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 50,
+          "name": "中电信无人科技（江苏）",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 51,
+          "name": "中国联通集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 52,
+          "name": "中国联通北京公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 53,
+          "name": "中国联通天津公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 54,
+          "name": "中国联通河北公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 55,
+          "name": "中国联通山西公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 56,
+          "name": "中国联通山东公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 57,
+          "name": "中国联通江苏公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 58,
+          "name": "中国联通浙江公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 59,
+          "name": "中国联通广东公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 60,
+          "name": "中国联通四川公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 61,
+          "name": "联通数字科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 62,
+          "name": "中国联通研究院",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 63,
+          "name": "联通在线信息科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 64,
+          "name": "联通智网科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 65,
+          "name": "联通软件研究院",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 66,
+          "name": "中国铁塔",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 67,
+          "name": "广东广电网络",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 68,
+          "name": "中国信息通信科技集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 69,
+          "name": "华为技术",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 70,
+          "name": "中兴通讯",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 71,
+          "name": "新华三集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 72,
+          "name": "烽火通信",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 73,
+          "name": "锐捷网络",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 74,
+          "name": "星网锐捷",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 75,
+          "name": "海能达通信",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 76,
+          "name": "通宇通讯",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 77,
+          "name": "中通服咨询设计研究院",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 78,
+          "name": "东土科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 79,
+          "name": "爱立信中国",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 80,
+          "name": "海格通信",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 81,
+          "name": "长飞光纤",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 82,
+          "name": "中天科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 83,
+          "name": "光迅科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 84,
+          "name": "中际旭创",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 85,
+          "name": "新易盛通信",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 86,
+          "name": "剑桥科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 87,
+          "name": "华工科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 88,
+          "name": "仕佳光子",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 89,
+          "name": "长光华芯",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 90,
+          "name": "铭普光磁",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 91,
+          "name": "光库科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 92,
+          "name": "东山精密",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 93,
+          "name": "移远通信",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 94,
+          "name": "广和通",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 95,
+          "name": "美格智能",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 96,
+          "name": "北斗星通",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 97,
+          "name": "中国卫星网络集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 98,
+          "name": "三维通信",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 99,
+          "name": "信维通信",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 100,
+          "name": "亿联无限科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        }
+      ]
     }
   ]
 }
