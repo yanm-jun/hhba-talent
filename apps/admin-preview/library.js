@@ -31,23 +31,20 @@ function filtered(){
 }
 function renderHalls(){
  const root=dom('library-halls');root.replaceChildren();
- root.append(button('全部企业 · '+state.items.length,()=>selectHall('all'),
-  'library-hall'+(state.hall==='all'?' active':'')));
- for(const hall of state.halls){
-  const b=button(hall.name+' · '+count(hall.id)+' 家',
-   ()=>selectHall(hall.id),'library-hall'+(state.hall===hall.id?' active':''));
-  const progress=state.coverage;
-  if(progress){
-   const imported=progress.imported_by_hall?.[hall.id]??0;
-   const target=progress.target_by_hall?.[hall.id]??0;
-   const note=document.createElement('small');
-   note.className='library-hall-sub';
-   note.textContent='聊天批次入库 '+imported+' / '+target+' 条';
-   b.append(note);
-  }
-  root.append(b);
+ const label=document.createElement('label');label.className='library-single-filter';
+ label.textContent='行业分类';
+ const select=document.createElement('select');
+ select.id='library-hall-filter';select.setAttribute('aria-label','按行业筛选统一企业库');
+ const options=[{id:'all',name:'全部行业（统一企业库）'},...state.halls];
+ for(const hall of options){
+  const option=document.createElement('option');option.value=hall.id;
+  option.textContent=hall.name+' · '+(hall.id==='all'?state.items.length:count(hall.id))+' 家';
+  option.selected=state.hall===hall.id;select.append(option);
  }
+ select.addEventListener('change',()=>selectHall(select.value));
+ label.append(select);root.append(label);
 }
+
 function render(){
  renderHalls();
  const list=filtered(),rows=dom('library-rows');rows.replaceChildren();
@@ -100,7 +97,10 @@ function render(){
  const associations=state.items.reduce((n,x)=>n+(x.portals?.length||0),0);
  dom('library-portals').textContent=String(new Set(state.items.flatMap(x=>(x.portals||[]).map(p=>p.url))).size);
  dom('library-link-associations').textContent=associations+' 条企业-网址关联';
- dom('library-groups').textContent=String(state.items.filter(x=>x.parent_name).length);
+ const withPortal=state.items.filter(x=>(x.portals||[]).some(p=>safeLink(p.url))).length;
+ const withoutPortal=state.items.length-withPortal;
+ dom('library-missing-portals').textContent=String(withoutPortal);
+ dom('library-coverage-note').textContent=withPortal+' 家有网址 / '+withoutPortal+' 家缺网址';
  dom('library-review').textContent=String(state.items.reduce((n,x)=>n+(x.portals||[]).filter(p=>p.status==='collected_unverified').length,0));
  const coverage=state.coverage;
  const research=state.stats?.automotive_research_nodes;
@@ -109,7 +109,7 @@ function render(){
   '历史聊天收集清单：'+coverage.target_total.toLocaleString('zh-CN')+
   ' 条 · 已完整导入原始批次 '+coverage.imported_batch_records.toLocaleString('zh-CN')+
   ' 条 · 待补录 '+coverage.unimported_batch_records.toLocaleString('zh-CN')+
-  ' 条。企业实体和招聘网址的去重、审核另行统计。'+researchNote:
+  ' 条原始记录未恢复。注意：记录数量不是网址数量；当前 '+withoutPortal+' 家候选企业没有招聘网址。'+researchNote:
   '历史批次导入进度暂不可用；不将当前企业数量冒充全部收集记录。';
  dom('library-write-state').textContent=state.editable?'管理员可修改 · 批量最多100家':
    '只读 · 未接通管理员数据库或未授权';
