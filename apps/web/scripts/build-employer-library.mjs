@@ -304,6 +304,44 @@ for(const source of found.records){
  }
  entries.set(id,row);
 }
+// Backfill explicit source-backed careers portals from public research.
+// Missing URLs are only added when an actual HTTPS entry + evidence URL exist;
+// multiple subsidiaries may share a legitimate company recruiting domain.
+const careersBackfill=load('employerLibraryRecruitmentBackfill20261112.json');
+if(careersBackfill.schema_version!==1||!Array.isArray(careersBackfill.records))
+ throw Error('INVALID_RECRUITMENT_BACKFILL');
+let backfillAdded=0,backfillExisting=0;
+const observedPairs=new Set();
+for(const source of careersBackfill.records){
+ if(!source.name||!halls.some(([id])=>id===source.hall_id)||
+    typeof source.url!=='string'||!/^https:\/\//.test(source.url)||
+    typeof source.evidence_url!=='string'||!/^https:\/\//.test(source.evidence_url)||
+    !['employer_careers','institution_job_announcement','group_shared_careers'].includes(source.source_kind))
+  throw Error('INVALID_BACKFILL_SOURCE');
+ const id=key(source.name),pair=id+'|'+source.url;
+ if(observedPairs.has(pair))throw Error('DUPLICATE_BACKFILL_PAIR');
+ observedPairs.add(pair);
+ const row=entries.get(id)||{id,name:source.name,industry_id:source.hall_id,
+  parent_name:null,relation:null,aliases:[],portals:[],source_datasets:[]};
+ if(row.industry_id!==source.hall_id){
+  row.related_hall_ids=row.related_hall_ids||[];
+  if(!row.related_hall_ids.includes(source.hall_id))row.related_hall_ids.push(source.hall_id);
+ }
+ if(!row.source_datasets.includes('source_backfill_20261112'))row.source_datasets.push('source_backfill_20261112');
+ row.source_backfill_evidence=row.source_backfill_evidence||[];
+ if(!row.source_backfill_evidence.some(e=>e.url===source.url))
+  row.source_backfill_evidence.push({url:source.url,evidence_url:source.evidence_url,
+   observed_on:source.observed_on,source_kind:source.source_kind,notes:source.notes});
+ if(!row.portals.some(p=>p.url===source.url)){
+  row.portals.push({url:source.url,label:'公开检索招聘入口（待复核）',
+   scope:source.source_kind==='group_shared_careers'?'group_shared_candidate':'search_candidate',
+   status:'collected_unverified',reviewed_on:null,
+   evidence_url:source.evidence_url,observed_on:source.observed_on,
+   source_kind:source.source_kind,notes:source.notes});
+  backfillAdded++;
+ }else backfillExisting++;
+ entries.set(id,row);
+}
 // New public-source research is NOT historical chat recovery and must not
 // increase collection_coverage.imported_batch_records. Brands are only
 // candidate search aliases until a specific employing legal entity is known.
@@ -347,7 +385,8 @@ const output={schema_version:1,
   unimported_batch_records:targetTotal-importedTotal,
   target_by_hall:collectionTargets,imported_by_hall:totals,unimported_by_hall:missingByHall
  },research_brand_index:researchBrandIndex,historical_non_employer_index:historicalNonEmployerIndex,items,
- statistics:{education_public_research_candidates:educationResearch.entries.length,education_new_distinct_indexed:newlyIndexedEducation,
+ statistics:{source_backfill_rows:careersBackfill.records.length,source_backfill_added:backfillAdded,source_backfill_existing:backfillExisting,
+  education_public_research_candidates:educationResearch.entries.length,education_new_distinct_indexed:newlyIndexedEducation,
   recovered_name_rows:recoveredNameRows,recovered_business_units:historicalNonEmployerIndex.length,
   web_found_portals:webFoundCount,
   automotive_research_nodes:automotiveResearch.nodes.length,automotive_research_brands:researchBrandIndex.length,
