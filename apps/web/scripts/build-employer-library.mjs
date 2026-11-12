@@ -227,8 +227,12 @@ for(const group of historicalNames.batches){
   throw Error('INVALID_RECOVERED_CHAT_BATCH_KEY_'+group.batch_key);
  const range=group.batch_key.match(/-(\d{3})-(\d{3})$/);
  const from=Number(range[1]),to=Number(range[2]);
- if(to-from!==99||group.entries.length!==100||
-    group.entries.some((r,i)=>r.sequence!==from+i))
+ const missing=group.missing_sequences||[];
+ const expected=Array.from({length:100},(_,i)=>from+i).filter(n=>!missing.includes(n));
+ if(to-from!==99||missing.length>0&&!group.incomplete_source||
+    new Set(missing).size!==missing.length||missing.some(n=>n<from||n>to)||
+    group.entries.length!==expected.length||
+    group.entries.some((r,i)=>r.sequence!==expected[i]))
   throw Error('INVALID_RECOVERED_CHAT_SEQUENCE_'+group.batch_key);
  const sourceLabel='historic_chat_'+group.batch_key;
  const seenSeq=new Set();
