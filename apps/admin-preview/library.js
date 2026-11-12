@@ -18,7 +18,8 @@ const LIB_VERIFIED_SNAPSHOT={
  ].map(([id,unique_urls,missing])=>({id,unique_urls,missing}))
 };
 function libIsDesignPreview(){
- return location.hostname==='feat-admin-recruitment-libra.hhba-talent.pages.dev'||
+ return location.hostname==='admin.hhba.work'||
+  location.hostname==='feat-admin-recruitment-libra.hhba-talent.pages.dev'||
   /^([a-f0-9]{8})\.hhba-talent\.pages\.dev$/.test(location.hostname);
 }
 
