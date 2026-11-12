@@ -210,7 +210,7 @@
           <div><p class="eyebrow">HHBA · EMPLOYER RECRUITMENT LIBRARY</p>
             <h1 id="lib-heading">企业招聘资源图书馆</h1>
             <p class="page-subtitle">按 17 个行业馆管理企业与招聘入口。网址数量以正式 D1 数据库去重结果为准；候选入口不等于当前岗位已开放。</p></div>
-          <button class="button-outline" id="lib-refresh" type="button">刷新资源库</button>
+          <div class="lib-entry-actions"><button class="button-primary" id="lib-upload-all" type="button">上传 Excel / CSV</button><button class="button-outline" id="lib-refresh" type="button">刷新资源库</button></div>
         </div>
         <div class="lib-summary">
           <article class="lib-stat"><span>全库不同招聘网址</span><strong id="lib-total-urls">—</strong><small>跨行业统一去重</small></article>
@@ -225,7 +225,7 @@
           <div class="lib-entry-head"><div><p class="lib-section-label">ENTERPRISE CATALOGUE</p>
             <h2 id="lib-current-hall">企业目录</h2><p>支持按企业名称、网址查找；分页查询不会一次读取全部企业记录。</p></div>
             <div class="lib-entry-actions">
-              <button class="button-outline" type="button" id="lib-import" disabled>批量导入（≤100 条）</button>
+              <button class="button-outline" type="button" id="lib-import" disabled>Excel 批量导入</button>
               <button class="button-primary" type="button" id="lib-add" disabled>+ 新增招聘入口</button>
             </div>
           </div>
@@ -260,14 +260,43 @@
               <button class="button-primary" type="submit" id="lib-save">保存到资源库</button></div>
           </form>
         </dialog>
-        <dialog class="lib-dialog" id="lib-import-dialog" aria-labelledby="lib-import-title">
-          <div class="lib-dialog-head"><h2 id="lib-import-title">批量导入招聘网址</h2><button type="button" id="lib-import-close" aria-label="关闭窗口">×</button></div>
+        <dialog class="lib-dialog lib-import-dialog" id="lib-import-dialog" aria-labelledby="lib-import-title">
+          <div class="lib-dialog-head"><h2 id="lib-import-title">Excel 一键批量导入</h2>
+            <button type="button" id="lib-import-close" aria-label="关闭窗口">×</button></div>
           <form id="lib-import-form" class="lib-form">
-            <p class="lib-form-tip">从表格复制并粘贴，每行一个企业。推荐两列：<strong>企业名称 Tab 招聘网址</strong>；如需跨馆导入，可使用三列：<strong>行业 ID Tab 企业名称 Tab 招聘网址</strong>。每次最多 100 行。自动检查同行业重复网址。</p>
-            <label>招聘网址清单<textarea id="lib-import-text" required spellcheck="false" placeholder="示例企业&#9;https://careers.example.com&#10;另一企业&#9;https://jobs.example.cn"></textarea></label>
+            <p class="lib-form-tip">一次选择整个 .xlsx 或 .csv 文件，不用自己拆分。系统会自动识别列名，在浏览器检查格式、去重，并按<strong>每批 100 条</strong>依次写入。文件本身不会上传服务器。</p>
+            <label>选择 Excel / CSV 文件
+              <input type="file" id="lib-import-file" accept=".xlsx,.csv" aria-describedby="lib-import-help"/>
+            </label>
+            <p class="lib-form-tip" id="lib-import-help">推荐表头：<strong>行业馆｜企业名称｜招聘网址</strong>。支持中文行业馆名称或行业 ID；单文件不超过 10 MB、50,000 条。</p>
+            <label>没有行业列时，统一归入
+              <select id="lib-import-default-industry"><option value="">请在 Excel 填写行业馆列</option></select>
+            </label>
+            <details class="lib-paste-alternative"><summary>或直接粘贴 Excel 表格内容（可超过 100 条）</summary>
+              <label>从 Excel 复制的表格数据<textarea id="lib-import-text" spellcheck="false" placeholder="行业馆&#9;企业名称&#9;招聘网址&#10;汽车馆&#9;示例汽车企业&#9;https://jobs.example.com"></textarea></label>
+            </details>
+            <div class="lib-upload-preview" id="lib-import-preview" hidden>
+              <p id="lib-import-file-name">待导入文件</p>
+              <div class="lib-upload-metrics">
+                <span>总记录 <strong id="lib-import-total">0</strong></span>
+                <span>成功 <strong id="lib-import-success">0</strong></span>
+                <span>重复 <strong id="lib-import-duplicate">0</strong></span>
+                <span>失败 <strong id="lib-import-failed">0</strong></span>
+                <span>待处理 <strong id="lib-import-remaining">0</strong></span>
+              </div>
+              <progress id="lib-import-progress" value="0" max="1" aria-label="批量导入进度"></progress>
+              <p id="lib-import-state" aria-live="polite">已准备就绪</p>
+            </div>
             <p id="lib-import-error" class="lib-form-error" role="alert"></p>
-            <div class="lib-form-actions"><button class="button-outline" type="button" id="lib-import-cancel">取消</button>
-              <button class="button-primary" type="submit" id="lib-import-submit">核对去重并导入</button></div>
+            <div class="lib-form-actions lib-import-actions">
+              <button class="button-outline" type="button" id="lib-template-download">下载 CSV 模板</button>
+              <button class="button-outline" type="button" id="lib-import-export-errors" hidden>导出失败清单</button>
+              <button class="button-outline" type="button" id="lib-import-cancel">关闭</button>
+              <button class="button-outline" type="button" id="lib-import-pause" hidden>暂停</button>
+              <button class="button-outline" type="button" id="lib-import-skip" hidden>跳过失败批次</button>
+              <button class="button-primary" type="button" id="lib-import-resume" hidden>重试并继续</button>
+              <button class="button-primary" type="submit" id="lib-import-submit">开始自动分批导入</button>
+            </div>
           </form>
         </dialog>
       </section>
