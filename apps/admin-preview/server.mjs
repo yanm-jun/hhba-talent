@@ -12,6 +12,7 @@ const FILES=new Map([
  ['/','index.html'],['/index.html','index.html'],
  ['/styles.css','styles.css'],['/dashboard.js','dashboard.js'],
  ['/library.css','library.css'],['/library.js','library.js'],
+ ['/library-file-ui.js','library-file-ui.js'],['/library-file-import.js','library-file-import.js'],
  ['/favicon.svg','favicon.svg']
 ]);
 const MIME={'html':'text/html; charset=utf-8','css':'text/css; charset=utf-8',
