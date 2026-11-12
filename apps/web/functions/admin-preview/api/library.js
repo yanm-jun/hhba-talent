@@ -83,23 +83,26 @@ async function audit(db,action,actor,before,after,sourceKey){
    before?JSON.stringify(before):null,after?JSON.stringify(after):null);
 }
 async function collectExisting(db,rows){
- // One indexed, targeted SELECT for only the 100 requested URLs, not a full industry scan.
- // The optional 0020 migration adds (industry_id,lower(rtrim(recruitment_url,'/'))).
- if(!rows.length)return new Set();
- const byIndustry=new Map();
- for(const row of rows){
-  if(!byIndustry.has(row.industry_id))byIndustry.set(row.industry_id,new Set());
-  byIndustry.get(row.industry_id).add(canonical(row.recruitment_url));
- }
- const where=[],params=[];
- for(const [industry,urls] of byIndustry){
-  where.push("(industry_id=? AND lower(rtrim(recruitment_url,'/')) IN ("+[...urls].map(()=>'?').join(',')+"))");
-  params.push(industry,...urls);
- }
- const res=await db.prepare("SELECT industry_id,lower(rtrim(recruitment_url,'/')) AS normalized,source_batch FROM hhba_industry_employer_links WHERE recruitment_url IS NOT NULL AND ("+where.join(' OR ')+")")
-  .bind(...params).all();
+ // D1 currently limits bound parameters to 100 per SQL statement. Lookup at
+ // most 60 URLs + 17 possible industry IDs in each indexed query (<=77 binds).
+ // At 100 submitted rows this is only two targeted SELECTs, not full scans.
  const found=new Map();
- for(const row of res.results||[])found.set(row.industry_id+'|'+row.normalized,row.source_batch||'');
+ for(let i=0;i<rows.length;i+=60){
+  const slice=rows.slice(i,i+60),byIndustry=new Map();
+  for(const row of slice){
+   if(!byIndustry.has(row.industry_id))byIndustry.set(row.industry_id,new Set());
+   byIndustry.get(row.industry_id).add(canonical(row.recruitment_url));
+  }
+  if(!byIndustry.size)continue;
+  const where=[],params=[];
+  for(const [industry,urls] of byIndustry){
+   where.push("(industry_id=? AND lower(rtrim(recruitment_url,'/')) IN ("+[...urls].map(()=>'?').join(',')+"))");
+   params.push(industry,...urls);
+  }
+  const res=await db.prepare("SELECT industry_id,lower(rtrim(recruitment_url,'/')) AS normalized,source_batch FROM hhba_industry_employer_links WHERE recruitment_url IS NOT NULL AND ("+where.join(' OR ')+")")
+   .bind(...params).all();
+  for(const row of res.results||[])found.set(row.industry_id+'|'+row.normalized,row.source_batch||'');
+ }
  return found;
 }
 function invalidate(db){summaryCache.delete(db)}
@@ -158,25 +161,23 @@ async function createRows(db,actor,values,action,uploadId=null){
  const replayed=accepted.filter(r=>existing.get(r.industry_id+'|'+canonical(r.recruitment_url))===batchTag&&uploadId).length;
  const pending=accepted.filter(r=>!existing.has(r.industry_id+'|'+canonical(r.recruitment_url)));
  if(!pending.length)return json({kind:API_KIND,inserted:0,skipped:values.length,replayed,duplicates:values.length-replayed});
- // D1 Free has a limited number of queries per Worker invocation. Inserting 100
- // rows and 100 audit rows with per-item statements would exhaust that budget.
- // Two multi-row statements per 50 entries: 4 writes + one targeted SELECT.
- // If the second group fails, retry is safe: the next call deduplicates the first.
+ // D1 permits <=100 bound values per SQL statement. Use small statements
+ // in four atomic db.batch() groups (25 entries = 50 statements per group).
+ // A db.batch counts as one Worker database subrequest, so 100 rows take
+ // at most 2 targeted reads and 4 batch subrequests, within the Free tier.
+ // Upload ID preserves exact success counts if a network error occurs
+ // after an earlier group was committed.
  let inserted=0;
- for(let i=0;i<pending.length;i+=50){
-  const group=pending.slice(i,i+50);
-  const insertArgs=[],auditArgs=[];
+ for(let i=0;i<pending.length;i+=25){
+  const group=pending.slice(i,i+25),statements=[];
   for(const row of group){
    const sourceKey='admin:'+crypto.randomUUID();
    const after={...row,source_key:sourceKey,source_batch:batchTag};
-   insertArgs.push(sourceKey,row.industry_id,row.enterprise,row.recruitment_url,row.source_kind,batchTag);
-   auditArgs.push(crypto.randomUUID(),action,actor.email,sourceKey,row.industry_id,row.enterprise,null,JSON.stringify(after));
+   statements.push(db.prepare("INSERT INTO hhba_industry_employer_links(source_key,industry_id,enterprise,recruitment_url,source_kind,source_batch) VALUES(?,?,?,?,?,?)")
+    .bind(sourceKey,row.industry_id,row.enterprise,row.recruitment_url,row.source_kind,batchTag));
+   statements.push(await audit(db,action,actor,null,after,sourceKey));
   }
-  const ins="INSERT INTO hhba_industry_employer_links(source_key,industry_id,enterprise,recruitment_url,source_kind,source_batch) VALUES "+
-   group.map(()=>"(?,?,?,?,?,?)").join(',');
-  const log="INSERT INTO hhba_library_admin_audit(id,action,actor_email,source_key,industry_id,enterprise,before_json,after_json) VALUES "+
-   group.map(()=>"(?,?,?,?,?,?,?,?)").join(',');
-  await db.batch([db.prepare(ins).bind(...insertArgs),db.prepare(log).bind(...auditArgs)]);
+  await db.batch(statements);
   inserted+=group.length;
  }
  invalidate(db);
