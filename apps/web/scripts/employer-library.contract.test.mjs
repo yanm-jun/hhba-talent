@@ -102,6 +102,20 @@ test('recovered chat names preserve original 500 slots without inventing officia
   }
  }
 });
+test('first-party careers evidence is preserved but never marked as real vacancy',()=>{
+ const sites=read('employerLibraryWebFoundPortals.json');
+ assert.equal(sites.records.length,4);
+ assert.equal(seed.statistics.web_found_portals,4);
+ for(const item of sites.records){
+  const employer=seed.items.find(e=>e.id===norm(item.name));
+  assert.ok(employer,item.name);
+  const portal=employer.portals.find(p=>p.url===item.url);
+  assert.ok(portal,item.url);
+  assert.equal(portal.status,'collected_unverified');
+  assert.equal(portal.scope,'search_candidate');
+  assert.equal(portal.evidence_url,item.evidence_url);
+ }
+});
 test('group-shared and HTTP candidates never become DeepSeek trusted job links',()=>{
  const shared={name:'国网子公司',industry_id:'energy',aliases:[],portals:[
   {url:'https://zhaopin.sgcc.com.cn/',scope:'group_shared_candidate',status:'collected_unverified'}]};
