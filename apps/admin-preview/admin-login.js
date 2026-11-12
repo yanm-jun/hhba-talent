@@ -8,6 +8,7 @@ const errors={
  SETUP_NOT_AUTHORIZED:'设置链接无效，请使用最新的管理员设置链接。',
  INVALID_SETUP_INPUT:'密码需要至少 14 位，且不能使用过于简单的密码。',
  ADMIN_ALREADY_CONFIGURED:'密码已设置，请返回登录页面。',
+ D1_DAILY_LIMIT_REACHED:'Cloudflare 数据库今日额度已满，密码尚未设置成功。请在额度恢复后重试。',
  INVALID_NEW_PASSWORD:'新密码格式不符合安全要求。',ADMIN_AUTH_SERVICE_UNAVAILABLE:'验证服务暂时不可用，请稍后再试。',
  ADMIN_HOST_NOT_CONFIGURED:'管理员独立域名尚未配置完成。',INVALID_ORIGIN:'请求没有通过安全验证，请刷新页面。'
 };
