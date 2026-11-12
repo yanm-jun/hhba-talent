@@ -25,10 +25,13 @@ EXPECTED = {
 }
 
 def main():
-    if os.environ.get("CF_PAGES_BRANCH") != "feat/admin-recruitment-library-20261112":
-        raise SystemExit("Private snapshot build is allowed only on the isolated library preview branch.")
+    branch = os.environ.get("CF_PAGES_BRANCH")
+    if branch not in ("feat/admin-recruitment-library-20261112","feat/admin-password-console-20261112"):
+        raise SystemExit("Private snapshot build is allowed only on isolated authenticated admin branches.")
+    if branch == "feat/admin-password-console-20261112" and os.environ.get("CF_PAGES_PROJECT_NAME") != "hhba-admin-console":
+        raise SystemExit("Never embed the catalog on the public HHBA project.")
     url = os.environ.get("HHBA_LIBRARY_EXPORT_SNAPSHOT_URL", "").strip()
-    if not url.startswith("https://") or "X-Amz-Signature=" not in url:
+    if not url.startswith("https://") or "X-Amz-Signature=" not in url or "/d1-sqlio-outgoing-prod/" not in url:
         raise SystemExit("Missing private D1 export snapshot URL for preview build.")
     try:
         req = Request(url, headers={"User-Agent": "HHBA-Private-Admin-Export/1.0"})
