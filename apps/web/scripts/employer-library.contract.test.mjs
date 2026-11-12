@@ -74,16 +74,20 @@ test('150 prior Preview audit rows are preserved separately from chat collection
   }
  }
 });
-test('recovered chat names preserve original 900 slots without inventing official portals',()=>{
- assert.equal(restoredCount,1000);
- assert.equal(recovered.batches.length,10);
- assert.equal(seed.statistics.recovered_name_rows,1000);
+test('recovered chat names preserve original 1400 slots without inventing official portals',()=>{
+ assert.equal(restoredCount,1400);
+ assert.equal(recovered.batches.length,14);
+ assert.equal(seed.statistics.recovered_name_rows,1400);
  const units=recovered.batches.flatMap(b=>b.entries).filter(x=>x.record_type==='business_unit');
  assert.equal(units.length,28);
  assert.equal(seed.historical_non_employer_index.length,28);
  assert.equal(seed.collection_coverage.imported_by_hall['consumer-hardware'],200);
  assert.equal(seed.collection_coverage.unimported_by_hall['consumer-hardware'],0);
  assert.equal(seed.collection_coverage.imported_by_hall['internet-ai'],200);
+ assert.equal(seed.collection_coverage.imported_by_hall['manufacturing'],200);
+ assert.equal(seed.collection_coverage.imported_by_hall['chem-materials'],100);
+ assert.equal(seed.collection_coverage.imported_by_hall['biomed'],100);
+ assert.equal(seed.collection_coverage.imported_by_hall['retail'],100);
  assert.equal(seed.collection_coverage.imported_by_hall['manufacturing'],100);
  assert.equal(seed.collection_coverage.imported_by_hall['education-research'],100);
  assert.equal(seed.collection_coverage.imported_by_hall['finance'],100);
