@@ -220,6 +220,12 @@
         <div id="library-halls" class="library-halls" aria-label="行业馆"></div>
         <div class="library-toolbar">
           <input id="library-search" type="search" placeholder="搜索企业、子公司、集团、别名" maxlength="100"/>
+          <select id="library-source-filter" aria-label="筛选企业招聘入口状态">
+            <option value="all">全部状态</option>
+            <option value="missing">缺少招聘网址</option>
+            <option value="pending">仅待复核链接</option>
+            <option value="reviewed">包含历史已审入口</option>
+          </select>
           <div><strong id="library-result-count">—</strong> <span id="library-write-state" class="library-muted"></span></div>
         </div>
         <div class="library-table-wrap"><table class="library-table">
