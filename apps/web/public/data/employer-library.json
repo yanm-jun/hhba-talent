@@ -7658,9 +7658,21 @@
       "parent_name": null,
       "relation": null,
       "aliases": [],
-      "portals": [],
+      "portals": [
+        {
+          "url": "https://job.gaotu.cn/",
+          "label": "企业官网招聘入口（需持续复核）",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "evidence_url": "https://job.gaotu.cn/",
+          "observed_on": "2026-11-12",
+          "source_kind": "first_party_careers_page"
+        }
+      ],
       "source_datasets": [
-        "historic_chat_education-research-001-100"
+        "historic_chat_education-research-001-100",
+        "web_found_careers_2026-11-12"
       ],
       "historical_source_records": [
         {
@@ -19080,9 +19092,21 @@
       "parent_name": null,
       "relation": null,
       "aliases": [],
-      "portals": [],
+      "portals": [
+        {
+          "url": "https://careers.lulian.cn/",
+          "label": "企业官网招聘入口（需持续复核）",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "evidence_url": "https://careers.lulian.cn/",
+          "observed_on": "2026-11-12",
+          "source_kind": "first_party_careers_page"
+        }
+      ],
       "source_datasets": [
-        "historic_chat_consumer-hardware-001-100"
+        "historic_chat_consumer-hardware-001-100",
+        "web_found_careers_2026-11-12"
       ],
       "historical_source_records": [
         {
@@ -30717,9 +30741,21 @@
       "parent_name": null,
       "relation": null,
       "aliases": [],
-      "portals": [],
+      "portals": [
+        {
+          "url": "https://zhaopin.xdf.cn/",
+          "label": "企业官网招聘入口（需持续复核）",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "evidence_url": "https://zhaopin.xdf.cn/",
+          "observed_on": "2026-11-12",
+          "source_kind": "first_party_careers_page"
+        }
+      ],
       "source_datasets": [
-        "historic_chat_education-research-001-100"
+        "historic_chat_education-research-001-100",
+        "web_found_careers_2026-11-12"
       ],
       "historical_source_records": [
         {
@@ -34080,9 +34116,21 @@
       "parent_name": null,
       "relation": null,
       "aliases": [],
-      "portals": [],
+      "portals": [
+        {
+          "url": "https://www.unitree.com/cn/position/",
+          "label": "企业官网招聘入口（需持续复核）",
+          "scope": "search_candidate",
+          "status": "collected_unverified",
+          "reviewed_on": null,
+          "evidence_url": "https://www.unitree.com/cn/position/",
+          "observed_on": "2026-11-12",
+          "source_kind": "first_party_careers_page"
+        }
+      ],
       "source_datasets": [
-        "historic_chat_consumer-hardware-101-200"
+        "historic_chat_consumer-hardware-101-200",
+        "web_found_careers_2026-11-12"
       ],
       "historical_source_records": [
         {
@@ -41529,13 +41577,14 @@
   "statistics": {
     "recovered_name_rows": 500,
     "recovered_business_units": 16,
+    "web_found_portals": 4,
     "automotive_research_nodes": 266,
     "automotive_research_brands": 36,
     "prior_audit_source_rows": 150,
     "entities": 1592,
-    "unique_portal_urls": 826,
+    "unique_portal_urls": 830,
     "legacy_portals": 130,
-    "candidate_portals": 793,
+    "candidate_portals": 797,
     "group_relations": 556,
     "unclassified": 0,
     "by_hall": {
