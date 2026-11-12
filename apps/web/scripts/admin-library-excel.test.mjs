@@ -58,11 +58,11 @@ test('CSV parser preserves quoted commas, newlines and Excel industry names',()=
  const rows=parseDelimited(raw);
  assert.equal(rows.length,3);
  const result=prepareImport(rows);
- assert.equal(result.valid.length,2);
+ assert.equal(rows[2].cells[1],'银行\n创新部','CSV 解析应保留引号内换行');
+ assert.equal(result.valid.length,1);
+ assert.equal(result.invalid.length,1,'企业名称包含换行，应在安全校验时拒绝');
  assert.equal(result.valid[0].industry_id,'internet-ai');
  assert.equal(result.valid[0].enterprise,'北京,研发公司');
- assert.equal(result.valid[1].industry_id,'finance');
- assert.equal(result.valid[1].enterprise,'银行\n创新部');
 });
 test('2-column spreadsheets use selected shelf; no guessing without industry',()=>{
  const raw=parseDelimited('企业名称,招聘网址\n小型制造商,https://careers.factory.example/');
