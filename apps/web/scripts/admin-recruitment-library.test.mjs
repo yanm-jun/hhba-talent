@@ -30,7 +30,7 @@ function mockDb({quota=false}={}){
    }};
  },async batch(statements){batches.push(statements);return statements.map(()=>({success:true,meta:{changes:1}}))}};
 }
-function env(db){return {HHBA_ACCESS_TEAM_DOMAIN:team,HHBA_ACCESS_CONSOLE_AUD:aud,
+function env(db){return {HHBA_ACCESS_TEAM_DOMAIN:team,HHBA_ACCESS_CONSOLE_AUD:aud,HHBA_ACCESS_WORK_ADMIN_AUD:aud,
  HHBA_METRICS_ADMIN_EMAIL:email,HHBA_METRICS_SECRET:'a-real-secret-at-least-32-characters-long',HHBA_METRICS_DB:db}}
 async function signed(action){
  const prior=globalThis.fetch;globalThis.fetch=async()=>new Response(JSON.stringify({keys:[jwk]}),{status:200});
@@ -47,7 +47,7 @@ test('17 halls are correctly named and no production numbers are hardcoded in st
  assert.equal(INDUSTRIES.length,17);
  assert.equal(INDUSTRIES[0][1],'汽车馆');
  assert.equal(INDUSTRIES.at(-1)[1],'教育科研馆');
- const ui=readFileSync(new URL('../../../admin-preview/library.js',import.meta.url),'utf8');
+ const ui=readFileSync(new URL('../../admin-preview/library.js',import.meta.url),'utf8');
  assert.match(ui,/mode:'summary'/);
  assert.match(ui,/mode:'list'/);
  assert.doesNotMatch(ui,/1,900|1900|318|2,715/);
