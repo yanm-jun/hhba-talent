@@ -99,3 +99,12 @@
  .lib-import-actions button{width:100%}
  .lib-import-actions button:last-child{margin-left:0}
 }
+
+/* Open a shelf as a separate, visible directory view. */
+#lib-board-top[hidden],#lib-halls[hidden],#lib-entry-panel[hidden] {display:none !important}
+#lib-entry-panel {scroll-margin-top:76px}
+.lib-back-halls {display:inline-flex;align-items:center;margin:0 0 16px;padding:7px 12px;
+ border-radius:8px;background:#f2f7f3;border:1px solid #dce8e0;color:#2c6545;
+ font-size:12px;font-weight:650;cursor:pointer}
+.lib-back-halls:hover {background:#e5f1e8;border-color:#b5d1bc}
+.lib-back-halls:focus-visible {outline:3px solid #74ae88;outline-offset:2px}
