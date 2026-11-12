@@ -23,6 +23,13 @@ const json = (data, status = 200) =>
 const bad = (code, status = 400) => json({ ok: false, error: code }, status);
 const iso = (ms) => new Date(ms).toISOString();
 
+// D1 daily read quota exhaustion must not block a validated application from
+// reaching the owner mailbox. Other database errors remain fail-closed.
+function isD1DailyReadLimit(error) {
+  const message = String(error?.message || error || '');
+  return /(?:\b7500\b|daily.{0,40}rows?.{0,5}reads?|rows?.{0,5}reads?.{0,30}limit|exceeded.{0,100}rows?.{0,5}reads?|D1.{0,100}(?:read limit|quota))/i.test(message);
+}
+
 function extOf(name) {
   const parts = String(name || '').toLowerCase().split('.');
   return parts.length > 1 ? parts[parts.length - 1] : '';
@@ -80,20 +87,31 @@ export async function onRequest({ request, env }) {
   }
 
   const hash = await ipHash(request);
-  if (hash) {
-    const row = await db
-      .prepare("SELECT COUNT(*) AS n FROM hhba_join_applications WHERE ip_hash=? AND created_at>=?")
-      .bind(hash, iso(nowMs - 60 * 60 * 1000))
-      .first();
-    if (Number(row?.n || 0) >= IP_MAX_PER_HOUR) return bad('RATE_LIMITED', 429);
-  }
+  let applicationId = null;
+  let recordSaved = false;
+  try {
+    if (hash) {
+      const row = await db
+        .prepare("SELECT COUNT(*) AS n FROM hhba_join_applications WHERE ip_hash=? AND created_at>=?")
+        .bind(hash, iso(nowMs - 60 * 60 * 1000))
+        .first();
+      if (Number(row?.n || 0) >= IP_MAX_PER_HOUR) return bad('RATE_LIMITED', 429);
+    }
 
-  // 先存库，再发品牌通知与申请人确认：邮件失败时申请仍可找回。
-  const idRow = await db
-    .prepare('INSERT INTO hhba_join_applications(name,email,direction,experience,strength,portfolio,weekly_time,mode,note,resume_filename,resume_size,ip_hash,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)')
-    .bind(name, email, direction, experience, strength, portfolio, weeklyTime, mode, note, resumeName, resumeSize, hash, iso(nowMs))
-    .run();
-  const applicationId = idRow?.meta?.last_row_id || null;
+    const idRow = await db
+      .prepare('INSERT INTO hhba_join_applications(name,email,direction,experience,strength,portfolio,weekly_time,mode,note,resume_filename,resume_size,ip_hash,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)')
+      .bind(name, email, direction, experience, strength, portfolio, weeklyTime, mode, note, resumeName, resumeSize, hash, iso(nowMs))
+      .run();
+    applicationId = idRow?.meta?.last_row_id || null;
+    recordSaved = true;
+  } catch (error) {
+    if (!isD1DailyReadLimit(error)) {
+      console.error('HHBA join storage failed', { reason: 'D1_QUERY_ERROR' });
+      return bad('STORAGE_UNAVAILABLE', 503);
+    }
+    // Email becomes the recovery record until Cloudflare's D1 quota resets.
+    console.error('HHBA join D1 daily read quota reached; email-only fallback');
+  }
 
   const ownerEmail = String(env.JOIN_OWNER_EMAIL || '').trim();
   const apiKey = String(env.RESEND_API_KEY || '').trim();
@@ -104,6 +122,13 @@ export async function onRequest({ request, env }) {
     name, email, direction, experience, strength, portfolio, weeklyTime,
     mode, note, resumeName, resumeSize, applicationId, createdAt: iso(nowMs),
   };
+  const submissionId = get('submissionId');
+  let deliveryKey = String(applicationId || nowMs);
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(submissionId)) {
+    // Stable across retries, distinct for each applicant; do not log email.
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email + ':' + submissionId));
+    deliveryKey = Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 40);
+  }
   const ownerMessage = renderJoinOwnerEmail(messageData);
   const receiptMessage = renderJoinReceiptEmail(messageData);
   const attachments = [];
@@ -122,7 +147,7 @@ export async function onRequest({ request, env }) {
         headers: {
           Authorization: 'Bearer ' + apiKey,
           'Content-Type': 'application/json',
-          'Idempotency-Key': 'hhba-join-' + suffix + '-' + String(applicationId || nowMs),
+          'Idempotency-Key': 'hhba-join-' + suffix + '-' + deliveryKey,
         },
         body: JSON.stringify({
           from,
@@ -148,7 +173,7 @@ export async function onRequest({ request, env }) {
   // Owner notification is necessary to process a real application.
   const ownerSent = await deliver({ message: ownerMessage, recipient: ownerEmail,
     replyTo: email, suffix: 'owner', withResume: true });
-  if (!ownerSent) return bad('EMAIL_SEND_FAILED', 502);
+  if (!ownerSent) return bad(recordSaved ? 'EMAIL_SEND_FAILED' : 'EMAIL_DELIVERY_FAILED_UNSAVED', 502);
 
   // Candidate confirmation is informational only; failures must not make a
   // successfully stored/notified application appear unsuccessful to the user.
@@ -158,5 +183,5 @@ export async function onRequest({ request, env }) {
   if (!receiptSent) {
     console.error('HHBA join candidate receipt not delivered', { applicationId });
   }
-  return json({ ok: true, application_id: applicationId, confirmation_sent: receiptSent });
+  return json({ ok: true, application_id: applicationId, record_saved: recordSaved, confirmation_sent: receiptSent });
 }

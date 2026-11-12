@@ -249,6 +249,7 @@ function BrandManifesto() {
 export function JoinUsPage({ user }: { user: User | null }) {
   const rolesRef = useRef<HTMLElement | null>(null);
   const formRef = useRef<HTMLElement | null>(null);
+  const submissionIdRef = useRef<string | null>(null);
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormData>(blank);
   const [resume, setResume] = useState<File | null>(null);
@@ -259,6 +260,7 @@ export function JoinUsPage({ user }: { user: User | null }) {
   useEffect(() => { window.scrollTo(0, 0); }, []);
   const update = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setForm(old => ({ ...old, [key]: value }));
+    submissionIdRef.current = null;
     setError('');
     setPreview(false);
   };
@@ -312,6 +314,8 @@ export function JoinUsPage({ user }: { user: User | null }) {
       body.append('mode', form.mode);
       body.append('note', form.note.trim());
       body.append('acknowledged', form.acknowledged ? 'true' : 'false');
+      if (!submissionIdRef.current) submissionIdRef.current = crypto.randomUUID();
+      body.append('submissionId', submissionIdRef.current);
       if (resume) body.append('resume', resume);
       const res = await fetch('/api/join-apply', { method: 'POST', body });
       const data = await res.json().catch(() => null) as { ok?: boolean; error?: string } | null;
@@ -325,6 +329,8 @@ export function JoinUsPage({ user }: { user: User | null }) {
           RATE_LIMITED: '操作太频繁，请稍后再试。',
           EMAIL_NOT_CONFIGURED: '申请通道尚未完成邮箱配置，请稍后再试。',
           EMAIL_SEND_FAILED: '申请已保存，但邮件发送失败，请稍后再试或换个时间提交。',
+          EMAIL_DELIVERY_FAILED_UNSAVED: '申请尚未发送成功，请稍后重试，填写内容已保留。',
+          STORAGE_UNAVAILABLE: '申请保存服务暂时不可用，请稍后再试，填写内容已保留。',
         };
         setError(messages[code] || '提交失败，请稍后再试。');
         return;
@@ -462,7 +468,7 @@ export function JoinUsPage({ user }: { user: User | null }) {
             <span className="join-icon"><CheckCircle2 size={23}/></span>
             <h3>已收到你的合作意向</h3>
             <p className="join-preview-warning">申请已发送到 HHBA 邮箱，我们会通过你填写的邮箱与你联系，请留意收件箱。</p>
-            <div className="join-form-actions"><button type="button" className="join-btn join-btn-light" onClick={() => {setSubmitted(false);setPreview(false);setStep(0);setForm(blank);setResume(null)}}>再填一份 <ArrowLeft size={16}/></button></div>
+            <div className="join-form-actions"><button type="button" className="join-btn join-btn-light" onClick={() => {setSubmitted(false);setPreview(false);setStep(0);setForm(blank);setResume(null);submissionIdRef.current=null}}>再填一份 <ArrowLeft size={16}/></button></div>
           </div> : preview ? <div className="join-form-body join-form-preview">
             <span className="join-icon"><CheckCircle2 size={23}/></span>
             <h3>合作意向预览</h3>
