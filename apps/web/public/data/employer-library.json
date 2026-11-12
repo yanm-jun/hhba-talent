@@ -75,8 +75,8 @@
   "collection_coverage": {
     "definition": "历史聊天行业馆收集记录数。不是企业唯一实体数，也不是有效官方招聘链接数。",
     "target_total": 3800,
-    "imported_batch_records": 900,
-    "unimported_batch_records": 2900,
+    "imported_batch_records": 1000,
+    "unimported_batch_records": 2800,
     "target_by_hall": {
       "automotive": 200,
       "semiconductor": 200,
@@ -99,7 +99,7 @@
     "imported_by_hall": {
       "automotive": 200,
       "semiconductor": 200,
-      "internet-ai": 0,
+      "internet-ai": 100,
       "energy": 300,
       "manufacturing": 0,
       "finance": 0,
@@ -118,7 +118,7 @@
     "unimported_by_hall": {
       "automotive": 0,
       "semiconductor": 0,
-      "internet-ai": 200,
+      "internet-ai": 100,
       "energy": 0,
       "manufacturing": 400,
       "finance": 100,
@@ -488,6 +488,27 @@
       "sequence": 75,
       "batch_key": "consumer-hardware-001-100",
       "record_type": "business_unit"
+    },
+    {
+      "name": "字节 Seed",
+      "hall_id": "internet-ai",
+      "sequence": 49,
+      "batch_key": "internet-ai-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "阿里云",
+      "hall_id": "internet-ai",
+      "sequence": 65,
+      "batch_key": "internet-ai-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "泛微契约锁",
+      "hall_id": "internet-ai",
+      "sequence": 76,
+      "batch_key": "internet-ai-001-100",
+      "record_type": "business_unit"
     }
   ],
   "items": [
@@ -523,6 +544,26 @@
       ]
     },
     {
+      "id": "58同城集团",
+      "name": "58同城集团",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 24,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "阿里巴巴",
       "name": "阿里巴巴",
       "industry_id": "internet-ai",
@@ -540,7 +581,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_internet-ai-001-100"
       ],
       "audit_references": [
         {
@@ -548,6 +590,14 @@
           "sequence": 1,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 3,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -855,6 +905,26 @@
       ]
     },
     {
+      "id": "爱奇艺",
+      "name": "爱奇艺",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 22,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "爱旭股份",
       "name": "爱旭股份",
       "industry_id": "energy",
@@ -922,6 +992,26 @@
       "portals": [],
       "source_datasets": [
         "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "安恒信息",
+      "name": "安恒信息",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 89,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -1617,6 +1707,46 @@
       ]
     },
     {
+      "id": "白山云",
+      "name": "白山云",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 62,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "百川智能",
+      "name": "百川智能",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 42,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "百度",
       "name": "百度",
       "industry_id": "internet-ai",
@@ -1633,7 +1763,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 4,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -2521,6 +2660,46 @@
       ]
     },
     {
+      "id": "北森",
+      "name": "北森",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 68,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "贝壳找房",
+      "name": "贝壳找房",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 23,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "倍轻松科技",
       "name": "倍轻松科技",
       "industry_id": "consumer-hardware",
@@ -2715,7 +2894,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "historic_chat_internet-ai-001-100"
       ],
       "audit_references": [
         {
@@ -2723,6 +2903,17 @@
           "sequence": 3,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "related_hall_ids": [
+        "internet-ai"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 11,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -3553,6 +3744,46 @@
       ]
     },
     {
+      "id": "达观数据",
+      "name": "达观数据",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 52,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "达梦数据库",
+      "name": "达梦数据库",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 98,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "大道芯半导体设备",
       "name": "大道芯半导体设备",
       "industry_id": "semiconductor",
@@ -3748,7 +3979,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "historic_chat_internet-ai-001-100"
       ],
       "audit_references": [
         {
@@ -3756,6 +3988,17 @@
           "sequence": 10,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "related_hall_ids": [
+        "internet-ai"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 20,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -4109,6 +4352,66 @@
       ]
     },
     {
+      "id": "滴滴",
+      "name": "滴滴",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 12,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "迪普科技",
+      "name": "迪普科技",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 91,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "第四范式",
+      "name": "第四范式",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 55,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "电力规划设计总院",
       "name": "电力规划设计总院",
       "industry_id": "energy",
@@ -4192,6 +4495,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-electronics"
+        }
+      ]
+    },
+    {
+      "id": "叠纸游戏",
+      "name": "叠纸游戏",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 30,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -5424,6 +5747,26 @@
       ]
     },
     {
+      "id": "东软集团",
+      "name": "东软集团",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 78,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "东山精密",
       "name": "东山精密",
       "industry_id": "consumer-hardware",
@@ -5438,6 +5781,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 189,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "斗鱼",
+      "name": "斗鱼",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 26,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -5498,6 +5861,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "帆软",
+      "name": "帆软",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 67,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -5729,6 +6112,26 @@
           "sequence": 16,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "纷享销客",
+      "name": "纷享销客",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 70,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -7054,6 +7457,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-eda"
+        }
+      ]
+    },
+    {
+      "id": "广联达",
+      "name": "广联达",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 82,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -10312,6 +10735,26 @@
       ]
     },
     {
+      "id": "恒生电子",
+      "name": "恒生电子",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 99,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "恒玄科技",
       "name": "恒玄科技",
       "industry_id": "semiconductor",
@@ -10467,6 +10910,26 @@
           "relationship_hint": "中国长安集团2026年官方介绍的主要上市及金融物流主体",
           "source_url": "https://www.ccag.cn/about/introduce",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "虎牙",
+      "name": "虎牙",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 15,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -12707,6 +13170,26 @@
       ]
     },
     {
+      "id": "欢聚集团yy",
+      "name": "欢聚集团 YY",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 27,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "环球车享汽车租赁有限公司",
       "name": "环球车享汽车租赁有限公司",
       "industry_id": "automotive",
@@ -12954,6 +13437,26 @@
       ]
     },
     {
+      "id": "货拉拉",
+      "name": "货拉拉",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 21,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "机器人与自动化",
       "name": "机器人与自动化",
       "industry_id": "manufacturing",
@@ -12991,6 +13494,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-fab"
+        }
+      ]
+    },
+    {
+      "id": "吉比特",
+      "name": "吉比特",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 35,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -13725,6 +14248,26 @@
       ]
     },
     {
+      "id": "阶跃星辰",
+      "name": "阶跃星辰",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 43,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "捷佳伟创(光伏设备)",
       "name": "捷佳伟创（光伏设备）",
       "industry_id": "energy",
@@ -13779,6 +14322,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ]
+    },
+    {
+      "id": "金蝶",
+      "name": "金蝶",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 69,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -13909,6 +14472,26 @@
       ]
     },
     {
+      "id": "金山办公wps",
+      "name": "金山办公 WPS",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 77,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "锦浪科技",
       "name": "锦浪科技",
       "industry_id": "energy",
@@ -13934,6 +14517,26 @@
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ]
+    },
+    {
+      "id": "京东",
+      "name": "京东",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 5,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -14440,6 +15043,46 @@
       ]
     },
     {
+      "id": "巨人网络",
+      "name": "巨人网络",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 34,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "巨杉数据库",
+      "name": "巨杉数据库",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 94,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "钜泉科技",
       "name": "钜泉科技",
       "industry_id": "semiconductor",
@@ -14852,7 +15495,8 @@
       "source_datasets": [
         "domesticRecruitmentRegistry",
         "preview_audit_B04",
-        "historic_chat_consumer-hardware-101-200"
+        "historic_chat_consumer-hardware-101-200",
+        "historic_chat_internet-ai-001-100"
       ],
       "audit_references": [
         {
@@ -14869,6 +15513,12 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 139,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 47,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -15044,7 +15694,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "historic_chat_internet-ai-001-100"
       ],
       "audit_references": [
         {
@@ -15052,6 +15703,14 @@
           "sequence": 45,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 8,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -15278,6 +15937,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 98,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "浪潮集团",
+      "name": "浪潮集团",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 66,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -15837,6 +16516,26 @@
       ]
     },
     {
+      "id": "莉莉丝游戏",
+      "name": "莉莉丝游戏",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 29,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "莲花集团",
       "name": "莲花集团",
       "industry_id": "automotive",
@@ -16266,6 +16965,26 @@
       ]
     },
     {
+      "id": "零一万物",
+      "name": "零一万物",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 45,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "领益智造",
       "name": "领益智造",
       "industry_id": "consumer-hardware",
@@ -16508,6 +17227,26 @@
       ]
     },
     {
+      "id": "绿盟科技",
+      "name": "绿盟科技",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 86,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "绿米联创(aqara)",
       "name": "绿米联创（Aqara）",
       "industry_id": "consumer-hardware",
@@ -16634,7 +17373,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "historic_chat_internet-ai-001-100"
       ],
       "audit_references": [
         {
@@ -16642,6 +17382,14 @@
           "sequence": 5,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 13,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -17105,7 +17853,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 6,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -17161,6 +17918,26 @@
       ]
     },
     {
+      "id": "米哈游",
+      "name": "米哈游",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 28,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "幂波隧力",
       "name": "幂波隧力",
       "industry_id": "semiconductor",
@@ -17186,6 +17963,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "面壁智能",
+      "name": "面壁智能",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 44,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -17219,6 +18016,26 @@
       ]
     },
     {
+      "id": "明略科技",
+      "name": "明略科技",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 54,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "明阳智能",
       "name": "明阳智能",
       "industry_id": "energy",
@@ -17244,6 +18061,26 @@
         {
           "hall_id": "energy",
           "code": "energy-wind"
+        }
+      ]
+    },
+    {
+      "id": "模态跃迁",
+      "name": "模态跃迁",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 50,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -17479,6 +18316,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-material"
+        }
+      ]
+    },
+    {
+      "id": "南大通用gbase",
+      "name": "南大通用 GBase",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 100,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -18606,6 +19463,26 @@
       ]
     },
     {
+      "id": "拼多多",
+      "name": "拼多多",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 9,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "品胜电子(pisen)",
       "name": "品胜电子（PISEN）",
       "industry_id": "consumer-hardware",
@@ -18811,6 +19688,26 @@
       ]
     },
     {
+      "id": "七牛云",
+      "name": "七牛云",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 60,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "七十迈科技",
       "name": "七十迈科技",
       "industry_id": "consumer-hardware",
@@ -18825,6 +19722,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 57,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "奇安信",
+      "name": "奇安信",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 84,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -19091,6 +20008,26 @@
       ]
     },
     {
+      "id": "启明星辰",
+      "name": "启明星辰",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 90,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "汽车之家",
       "name": "汽车之家",
       "industry_id": "automotive",
@@ -19214,6 +20151,26 @@
       "portals": [],
       "source_datasets": [
         "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "青云qingcloud",
+      "name": "青云 QingCloud",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 58,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -19393,6 +20350,26 @@
       ]
     },
     {
+      "id": "人大金仓",
+      "name": "人大金仓",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 97,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "日出东方控股",
       "name": "日出东方控股",
       "industry_id": "consumer-hardware",
@@ -19485,6 +20462,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 73,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "软通动力",
+      "name": "软通动力",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 79,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -19913,6 +20910,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "三七互娱",
+      "name": "三七互娱",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 33,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -20416,6 +21433,26 @@
       ]
     },
     {
+      "id": "山石网科",
+      "name": "山石网科",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 92,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "陕汽集团",
       "name": "陕汽集团",
       "industry_id": "automotive",
@@ -20464,7 +21501,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_internet-ai-001-100"
       ],
       "audit_references": [
         {
@@ -20472,6 +21510,14 @@
           "sequence": 3,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 46,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -22470,6 +23516,46 @@
       ]
     },
     {
+      "id": "深信服",
+      "name": "深信服",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 88,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "深言科技",
+      "name": "深言科技",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 48,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "深圳地铁集团",
       "name": "深圳地铁集团",
       "industry_id": "logistics",
@@ -23213,6 +24299,26 @@
       ]
     },
     {
+      "id": "世纪互联",
+      "name": "世纪互联",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 61,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "视涯科技",
       "name": "视涯科技",
       "industry_id": "semiconductor",
@@ -23489,6 +24595,26 @@
       ]
     },
     {
+      "id": "思必驰",
+      "name": "思必驰",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 53,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "思岚科技(slamtec)",
       "name": "思岚科技（SLAMTEC）",
       "industry_id": "consumer-hardware",
@@ -23756,6 +24882,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "搜狐",
+      "name": "搜狐",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 19,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -24045,6 +25191,26 @@
       ]
     },
     {
+      "id": "涛思数据",
+      "name": "涛思数据",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 95,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "特变电工",
       "name": "特变电工",
       "industry_id": "energy",
@@ -24177,7 +25343,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 2,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -24322,6 +25497,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 166,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "天融信",
+      "name": "天融信",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 93,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -24495,6 +25690,26 @@
       ]
     },
     {
+      "id": "同程旅行",
+      "name": "同程旅行",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 25,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "图达通(seyond)",
       "name": "图达通（Seyond）",
       "industry_id": "automotive",
@@ -24532,12 +25747,42 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_consumer-hardware-001-100"
+        "historic_chat_consumer-hardware-001-100",
+        "historic_chat_internet-ai-001-100"
       ],
       "historical_source_records": [
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 41,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 74,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ],
+      "related_hall_ids": [
+        "internet-ai"
+      ]
+    },
+    {
+      "id": "完美世界",
+      "name": "完美世界",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 32,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -24627,6 +25872,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "万国数据",
+      "name": "万国数据",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 64,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -24770,7 +26035,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "historic_chat_internet-ai-001-100"
       ],
       "audit_references": [
         {
@@ -24778,6 +26044,34 @@
           "sequence": 1,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 7,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "网易有道",
+      "name": "网易有道",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 37,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -25678,6 +26972,26 @@
       ]
     },
     {
+      "id": "销售易",
+      "name": "销售易",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 73,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "小红书",
       "name": "小红书",
       "industry_id": "internet-ai",
@@ -25697,7 +27011,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "historic_chat_internet-ai-001-100"
       ],
       "audit_references": [
         {
@@ -25705,6 +27020,14 @@
           "sequence": 6,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 10,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -25859,6 +27182,26 @@
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ]
+    },
+    {
+      "id": "携程",
+      "name": "携程",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 14,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -26411,6 +27754,26 @@
       ]
     },
     {
+      "id": "新浪集团",
+      "name": "新浪集团",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 18,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "新思科技(synopsys)",
       "name": "新思科技（Synopsys）",
       "industry_id": "semiconductor",
@@ -26514,6 +27877,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "星环科技",
+      "name": "星环科技",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 96,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -26782,6 +28165,26 @@
       ]
     },
     {
+      "id": "玄武云",
+      "name": "玄武云",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 81,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "亚德诺(adi)",
       "name": "亚德诺（ADI）",
       "industry_id": "semiconductor",
@@ -26830,6 +28233,46 @@
           "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
           "source_url": "https://www.hasco-group.com/about/company.html/1000",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "亚信安全",
+      "name": "亚信安全",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 87,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "亚信科技",
+      "name": "亚信科技",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 83,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -28909,6 +30352,26 @@
       ]
     },
     {
+      "id": "鹰角网络",
+      "name": "鹰角网络",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 31,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "萤石网络",
       "name": "萤石网络",
       "industry_id": "consumer-hardware",
@@ -29025,7 +30488,8 @@
       ],
       "source_datasets": [
         "domesticRecruitment200Registry",
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_internet-ai-001-100"
       ],
       "audit_references": [
         {
@@ -29033,6 +30497,14 @@
           "sequence": 5,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 71,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -29129,6 +30601,26 @@
       ]
     },
     {
+      "id": "游族网络",
+      "name": "游族网络",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 36,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "友达光电",
       "name": "友达光电",
       "industry_id": "semiconductor",
@@ -29154,6 +30646,46 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-display"
+        }
+      ]
+    },
+    {
+      "id": "有赞",
+      "name": "有赞",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 75,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "又拍云",
+      "name": "又拍云",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 63,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -29443,6 +30975,46 @@
       ]
     },
     {
+      "id": "月之暗面kimi",
+      "name": "月之暗面 Kimi",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 39,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "阅文集团",
+      "name": "阅文集团",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 16,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "粤芯半导体",
       "name": "粤芯半导体",
       "industry_id": "semiconductor",
@@ -29555,6 +31127,46 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 145,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "云天励飞",
+      "name": "云天励飞",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 57,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "云知声",
+      "name": "云知声",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 56,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -30071,6 +31683,26 @@
           "relationship_hint": "官网零部件名录集中分区；具体直接持股关系待核",
           "source_url": "https://www.gacgroup.com/cn/companies",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "长亭科技",
+      "name": "长亭科技",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 85,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -30807,6 +32439,26 @@
       ]
     },
     {
+      "id": "知乎",
+      "name": "知乎",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 17,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "至纯科技",
       "name": "至纯科技",
       "industry_id": "semiconductor",
@@ -30832,6 +32484,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-equipment"
+        }
+      ]
+    },
+    {
+      "id": "致远互联",
+      "name": "致远互联",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 72,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -30973,6 +32645,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 152,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "智谱ai",
+      "name": "智谱 AI",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 40,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -34809,6 +36501,26 @@
       ]
     },
     {
+      "id": "中软国际",
+      "name": "中软国际",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 80,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中通快递",
       "name": "中通快递",
       "industry_id": "logistics",
@@ -35414,7 +37126,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 1,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -35432,6 +37153,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 130,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "agtcloud",
+      "name": "AGTCloud",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 51,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -35492,6 +37233,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-adas"
+        }
+      ]
+    },
+    {
+      "id": "deepseek",
+      "name": "DeepSeek",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 38,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -35568,7 +37329,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "historic_chat_internet-ai-001-100"
       ],
       "audit_references": [
         {
@@ -35576,6 +37338,14 @@
           "sequence": 9,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 41,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -35885,6 +37655,26 @@
       ]
     },
     {
+      "id": "ucloud优刻得",
+      "name": "UCloud 优刻得",
+      "industry_id": "internet-ai",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_internet-ai-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "internet-ai-001-100",
+          "sequence": 59,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "vivo",
       "name": "vivo",
       "industry_id": "consumer-hardware",
@@ -35935,12 +37725,12 @@
     }
   ],
   "statistics": {
-    "recovered_name_rows": 200,
-    "recovered_business_units": 9,
+    "recovered_name_rows": 300,
+    "recovered_business_units": 12,
     "automotive_research_nodes": 266,
     "automotive_research_brands": 36,
     "prior_audit_source_rows": 150,
-    "entities": 1329,
+    "entities": 1410,
     "unique_portal_urls": 826,
     "legacy_portals": 130,
     "candidate_portals": 793,
@@ -35949,7 +37739,7 @@
     "by_hall": {
       "automotive": 440,
       "semiconductor": 204,
-      "internet-ai": 20,
+      "internet-ai": 101,
       "energy": 312,
       "manufacturing": 16,
       "finance": 38,
