@@ -237,3 +237,83 @@ body.investor-mode .top-env{display:none}
 .hhba-daily-table td{white-space:nowrap}
 .hhba-daily-operations .hhba-private-quality{margin:12px 0 0}
 @media(max-width:680px){.hhba-user-range-toolbar{align-items:flex-start}.hhba-daily-operations{padding:16px 13px}.hhba-daily-operations .panel-heading{flex-wrap:wrap}}
+
+
+/* Official HHBA brand system for the standalone management workspace.
+   The real blue-orange connecting-bridge logo is served as favicon.svg.
+   Keep content surfaces calm; gradients belong in the surrounding canvas. */
+:root{
+ --ink:#1d304d;
+ --muted:#7b8a9e;
+ --soft:#9caabd;
+ --border:#e5eaf4;
+ --fill:#f5f8ff;
+ --canvas:#f7f9fe;
+ --green:#236fdc;
+ --green-faint:#ebf3ff;
+ --sidebar:#fff;
+}
+html,body{background:var(--canvas)}
+.main-column{
+ background:radial-gradient(ellipse at 98% 2%,rgba(255,162,53,.055),transparent 28%),
+            radial-gradient(ellipse at 3% 3%,rgba(33,112,236,.067),transparent 32%),
+            linear-gradient(180deg,#f9fbff 0%,#f6f8fd 100%);
+ min-height:100vh;
+}
+.sidebar{border-right:1px solid #e4eaf5;background:linear-gradient(180deg,#fff,#fbfcff);box-shadow:3px 0 22px #2c5b9210}
+.brand{gap:10px;margin-bottom:29px;align-items:center}
+.brand-mark{
+ width:41px;height:41px;padding:3px;flex-shrink:0;
+ border-radius:12px;background:#fff;border:1px solid #e4eaf5;
+ box-shadow:0 5px 16px #1d69e016;color:inherit;
+}
+.brand-mark img{width:100%;height:100%;object-fit:contain;display:block}
+.brand-wordmark strong{font-size:16px;color:#1c3150;line-height:1.25;letter-spacing:.02em}
+.brand-wordmark small{font-size:10px;color:#7590b1;letter-spacing:.02em;margin-top:2px}
+.workspace-identity{background:#f6f9ff;border-color:#e2e9f5;border-radius:11px}
+.workspace-icon{background:linear-gradient(140deg,#e5f0ff,#fff2e7);color:#1a68cc;border-radius:8px}
+.workspace-identity strong{color:#244362}
+.workspace-identity small{color:#8498ae}
+.nav-caption{color:#8c9db2}
+.nav-link{color:#6d7d92}
+.nav-link:hover{background:#eef4ff;color:#2366c7}
+.nav-link.is-active{
+ color:#145bc4;font-weight:740;
+ background:linear-gradient(96deg,#e9f2ff,#f5f9ff 72%);
+ box-shadow:inset 3px 0 #287bf1;
+}
+.nav-view{color:#366ec2}
+.sidebar-separator{background:#e5eaf3}
+.safety-note{color:#316899}
+.safety-dot{background:#3286eb}
+.sidebar-bottom>p{color:#8a9aae}
+.avatar{background:#eaf3ff;color:#2566ae;border-color:#d9e6f7}
+.topbar{background:#ffffffed;border-color:#e5eaf4;backdrop-filter:blur(8px)}
+.top-workspace{color:#7489a4}
+.top-env{color:#69819e}
+.ghost-btn{color:#356db5}
+.ghost-btn:hover{color:#165bca}
+.content-wrap{max-width:1460px}
+.page-heading h1{color:#1c3150}
+.eyebrow{color:#4d83c6}
+.page-subtitle{color:#788a9f}
+.button-outline{color:#406184;border-color:#dbe5f4;background:#fff}
+.button-outline:hover{border-color:#9dbdec;background:#f5f9ff}
+.button-primary{background:#176bdc;border-color:#176bdc}
+.button-primary:hover{background:#0f59bf;border-color:#0f59bf}
+button:focus-visible,a:focus-visible,input:focus-visible{outline-color:#3b87ec}
+.kpi-card,.panel,.investor-kpis article{border-color:#e4eaf4;box-shadow:0 6px 22px #2f5d9a09}
+.metric-icon{background:#eff5ff;color:#6096dc}
+.metric-number{color:#1d3f68}
+.range-group button.selected{background:#eaf3ff;color:#165ec6}
+.investor-statement{background:linear-gradient(115deg,#123d78 0%,#226fd7 68%,#cf8739 130%);border:1px solid #6192d2}
+.investor-statement p{color:#dbe9fa}
+.statement-symbol{border-color:#87b6ec;background:#ffffff17}
+.data-table th{background:#f9fbff;border-color:#e5eaf4;color:#8696aa}
+.data-table td{border-color:#ebeff7;color:#73849c}
+.page-footer{color:#8b9bb1}
+@media(max-width:780px){
+ .sidebar{box-shadow:8px 0 35px #17395c23}
+ .mobile-dim:not([hidden]){background:#152b4f7f}
+ .topbar{background:#fff}
+}
