@@ -3,6 +3,7 @@
 import {verifyAdmin} from '../../_lib/admin-access.js';
 import {json,bad,metricDb,sameOrigin} from '../../_lib/metric-utils.js';
 import {LIBRARY_PRIVATE_SNAPSHOT} from '../../_lib/library-private-snapshot.js';
+import {mergedCatalog,appendCatalogDelta,calculateCatalogSummary} from '../../_lib/library-snapshot-cache.js';
 
 export const INDUSTRIES=[
  ['automotive','汽车馆'],['semiconductor','电子半导体馆'],['internet-ai','互联网与AI馆'],
@@ -198,22 +199,45 @@ function archivedList(archive,url){
  );
  const offset=(page-1)*LIST_MAX;
  return json({kind:API_KIND,mode:'list',industry,q,status,page,pageSize:LIST_MAX,
-  readonly:true,archived:true,source:'production-d1-export',
-  hasMore:rows.length>offset+LIST_MAX,rows:rows.slice(offset,offset+LIST_MAX)});
+  readonly:!archive.canWrite,archived:true,source:'production-d1-export+KV',
+  hasMore:rows.length>offset+LIST_MAX,total:rows.length,rows:rows.slice(offset,offset+LIST_MAX)});
 }
 function archiveForRequest(request,env){
- // Production and other previews never receive snapshot mode.
+ // The complete directory is stored only inside protected Pages Functions.
+ // The existing admin hostname is password-protected; previews retain Access.
  if(env.HHBA_LIBRARY_SNAPSHOT_FIRST!=='1')return null;
  const host=new URL(request.url).hostname;
- if(host!=='feat-admin-recruitment-libra.hhba-talent.pages.dev')return null;
+ if(host!=='admin.hhba.work'&&host!=='feat-admin-recruitment-libra.hhba-talent.pages.dev')return null;
  return loadArchivedLibrary();
+}
+async function viewArchived(request,env){
+ const baseline=archiveForRequest(request,env);
+ if(!baseline)return null;
+ const isAdmin=new URL(request.url).hostname==='admin.hhba.work';
+ let current,warning=null;
+ try{
+  current=await mergedCatalog(baseline.rows,env.HHBA_LIBRARY_CACHE_KV);
+ }catch(e){
+  warning='CACHE_OVERLAY_UNAVAILABLE';
+  console.error('HHBA_LIBRARY_CACHE_OVERLAY_UNAVAILABLE',e?.name||'Error');
+  current={rows:baseline.rows,overlayCount:0};
+ }
+ const writable=isAdmin&&!!env.HHBA_LIBRARY_CACHE_KV&&!warning;
+ const counts=current.overlayCount?
+  calculateCatalogSummary(current.rows,INDUSTRIES,{asOf:baseline.data.asOf,overlayCount:current.overlayCount}):
+  {total:baseline.data.total,industries:baseline.data.industries};
+ const data={...baseline.data,...counts,readonly:!writable,archived:true,
+  source:'production-d1-export+KV',syncWarning:warning,overlayCount:current.overlayCount,
+  note:warning?'历史企业记录可查看；最近修改暂不可确认，请稍后再试。':
+  '管理员受保护的真实企业目录。查询不消耗 D1 读取额度；修改操作仍写入 D1 并同步缓存。'};
+ return {rows:current.rows,data,canWrite:writable};
 }
 export async function onRequestGet({request,env}){
  const g=await gate(request,env);if(g.response)return g.response;
  const url=new URL(request.url),mode=url.searchParams.get('mode');
  if(mode!=='summary'&&mode!=='list')return failed('INVALID_LIBRARY_MODE');
  try{
-  const archive=archiveForRequest(request,env);
+  const archive=await viewArchived(request,env);
   if(archive){
    return mode==='summary'?json(archive.data):archivedList(archive,url);
   }
@@ -227,14 +251,14 @@ export async function onRequestGet({request,env}){
   // serve the true employer listings after Access validation, with a date label.
   if(/quota|row read limit|7500|exceeded/i.test(String(e?.message||''))){
    try{
-    const archive=archiveForRequest(request,env);
+    const archive=await viewArchived(request,env);
     if(archive)return mode==='summary'?json(archive.data):archivedList(archive,url);
    }catch{/* fall back to explicit error */}
   }
   return dbError(e);
  }
 }
-async function createRows(db,actor,values,action,uploadId=null){
+async function createRows(db,actor,values,action,uploadId=null,env=null){
  const incoming=new Set(),accepted=[];
  for(const raw of values){
   const row=validatedRow(raw);
@@ -255,15 +279,20 @@ async function createRows(db,actor,values,action,uploadId=null){
  // after an earlier group was committed.
  let inserted=0;
  for(let i=0;i<pending.length;i+=25){
-  const group=pending.slice(i,i+25),statements=[];
+  const group=pending.slice(i,i+25),statements=[],upserts=[];
   for(const row of group){
    const sourceKey='admin:'+crypto.randomUUID();
-   const after={...row,source_key:sourceKey,source_batch:batchTag};
+   const after={...row,source_key:sourceKey,source_batch:batchTag,
+    source_sequence:null,updated_at:new Date().toISOString()};
+   upserts.push(publicRow(after));
    statements.push(db.prepare("INSERT INTO hhba_industry_employer_links(source_key,industry_id,enterprise,recruitment_url,source_kind,source_batch) VALUES(?,?,?,?,?,?)")
     .bind(sourceKey,row.industry_id,row.enterprise,row.recruitment_url,row.source_kind,batchTag));
    statements.push(await audit(db,action,actor,null,after,sourceKey));
   }
   await db.batch(statements);
+  // An immutable KV delta is committed after every successful D1 transaction,
+  // so partial imports remain browsable even if the next D1 batch is quota-limited.
+  if(env?.HHBA_LIBRARY_CACHE_KV)await appendCatalogDelta(env.HHBA_LIBRARY_CACHE_KV,{upserts});
   inserted+=group.length;
  }
  invalidate(db);
@@ -275,12 +304,12 @@ export async function onRequestPost({request,env}){
  if(!isMutationSafe(request))return failed('MUTATION_ORIGIN_DENIED',403);
  try{
   const payload=await bodyJson(request);
-  if(payload?.action==='add')return await createRows(g.db,g.actor,[payload.row],'add');
+  if(payload?.action==='add')return await createRows(g.db,g.actor,[payload.row],'add',null,env);
   if(payload?.action==='import'&&Array.isArray(payload.rows)&&payload.rows.length>=1&&payload.rows.length<=IMPORT_MAX){
    const uploadId=payload.upload_id===undefined?null:clean(payload.upload_id);
    if(uploadId!==null&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uploadId))
     return failed('INVALID_UPLOAD_ID');
-   return await createRows(g.db,g.actor,payload.rows,'import',uploadId);
+   return await createRows(g.db,g.actor,payload.rows,'import',uploadId,env);
   }
   return failed('INVALID_LIBRARY_ACTION');
  }catch(e){return /BODY_TOO_LARGE|SyntaxError/.test(String(e))?failed('INVALID_REQUEST_BODY'):dbError(e)}
@@ -306,6 +335,7 @@ export async function onRequestPatch({request,env}){
     .bind(next.industry_id,next.enterprise,next.recruitment_url,next.source_kind,key),
    await audit(g.db,'edit',g.actor,before,after,key)
   ]);
+  if(env.HHBA_LIBRARY_CACHE_KV)await appendCatalogDelta(env.HHBA_LIBRARY_CACHE_KV,{upserts:[publicRow({...after,updated_at:new Date().toISOString()})]});
   invalidate(g.db);return json({kind:API_KIND,updated:1});
  }catch(e){return /BODY_TOO_LARGE|SyntaxError/.test(String(e))?failed('INVALID_REQUEST_BODY'):dbError(e)}
 }
@@ -321,6 +351,7 @@ export async function onRequestDelete({request,env}){
    g.db.prepare('DELETE FROM hhba_industry_employer_links WHERE source_key=?').bind(key),
    await audit(g.db,'delete',g.actor,before,null,key)
   ]);
+  if(env.HHBA_LIBRARY_CACHE_KV)await appendCatalogDelta(env.HHBA_LIBRARY_CACHE_KV,{deletes:[key]});
   invalidate(g.db);return json({kind:API_KIND,deleted:1});
  }catch(e){return /BODY_TOO_LARGE|SyntaxError/.test(String(e))?failed('INVALID_REQUEST_BODY'):dbError(e)}
 }
