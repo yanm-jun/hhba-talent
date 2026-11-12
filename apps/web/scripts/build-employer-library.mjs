@@ -398,6 +398,47 @@ for(const source of careersBackfill.records){
  }else backfillExisting++;
  entries.set(id,row);
 }
+// Recover already-existing 2026-10 careersUrl fields, which were previously
+// shown on employer profile pages but omitted from the unified library.
+// These are historical candidates, NOT live-validated or model-invented URLs.
+const legacyProfileSources=[
+ ['domesticCareerProfiles.json','domesticCareerProfiles'],
+ ['domesticCompanyExpansion200Profiles.json','domesticCompanyExpansion200Profiles']
+];
+let legacyProfileSourceRows=0,legacyProfileAdded=0,legacyProfileExisting=0;
+const legacyProfileUnclassified=[];
+for(const [filename,sourceName] of legacyProfileSources){
+ const profiles=load(filename);
+ for(const [name,profile] of Object.entries(profiles)){
+  const url=profile?.careersUrl;
+  if(!url)continue;
+  legacyProfileSourceRows++;
+  if(typeof url!=='string'||!/^https:\/\//.test(url)||
+     /https?:\/\/(?:www\.)?(?:zhipin|liepin|lagou)\.com\//i.test(url))
+   throw Error('INVALID_LEGACY_PROFILE_URL_'+name);
+  const id=key(name);
+  const known=entries.get(id);
+  const hall=known?.industry_id||classify(name,
+   profile.primaryIndustry||profile.industry||'');
+  if(hall==='uncategorized'){legacyProfileUnclassified.push(name);continue;}
+  const row=known||{id,name,industry_id:hall,parent_name:null,relation:null,
+   aliases:[],portals:[],source_datasets:[]};
+  if(!row.source_datasets.includes(sourceName))row.source_datasets.push(sourceName);
+  row.legacy_profile_careers_sources=row.legacy_profile_careers_sources||[];
+  if(!row.legacy_profile_careers_sources.some(x=>x.url===url))
+   row.legacy_profile_careers_sources.push({url,source_dataset:sourceName,
+    official_source:profile.officialSource||null,review:profile.contentReview||null,
+    status:'previously_recorded_unverified'});
+  if(!row.portals.some(p=>p.url===url)){
+   row.portals.push({url,label:'旧企业资料中已收集的招聘入口（待复核）',
+    scope:'search_candidate',status:'collected_unverified',
+    reviewed_on:null,source:sourceName,
+    evidence_url:profile.officialSource||null});
+   legacyProfileAdded++;
+  }else legacyProfileExisting++;
+  entries.set(id,row);
+ }
+}
 // New public-source research is NOT historical chat recovery and must not
 // increase collection_coverage.imported_batch_records. Brands are only
 // candidate search aliases until a specific employing legal entity is known.
@@ -441,7 +482,9 @@ const output={schema_version:1,
   unimported_batch_records:targetTotal-importedTotal,
   target_by_hall:collectionTargets,imported_by_hall:totals,unimported_by_hall:missingByHall
  },research_brand_index:researchBrandIndex,historical_non_employer_index:historicalNonEmployerIndex,items,
- statistics:{existing_group_link_associations:items.reduce((n,e)=>n+e.portals.filter(p=>p.scope==='group_shared_candidate'&&p.source_relation).length,0),
+ statistics:{legacy_profile_source_rows:legacyProfileSourceRows,legacy_profile_urls_added:legacyProfileAdded,
+  legacy_profile_urls_existing:legacyProfileExisting,legacy_profile_unclassified:legacyProfileUnclassified.length,
+  existing_group_link_associations:items.reduce((n,e)=>n+e.portals.filter(p=>p.scope==='group_shared_candidate'&&p.source_relation).length,0),
   previous_official_evidence_added:previousEvidencePortalsAdded,previous_official_evidence_existing:previousEvidencePortalsExisting,
   source_backfill_rows:careersBackfill.records.length,source_backfill_added:backfillAdded,source_backfill_existing:backfillExisting,
   education_public_research_candidates:educationResearch.entries.length,education_new_distinct_indexed:newlyIndexedEducation,
