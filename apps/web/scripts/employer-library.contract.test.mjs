@@ -289,3 +289,34 @@ test('career URL backfill is indexed with evidence and never claims real-time jo
   assert.ok(item.source_backfill_evidence?.some(x=>x.url===row.url&&x.evidence_url===row.evidence_url));
  }
 });
+
+test('reuses existing group portals as shared sources, not subsidiary-owned careers',()=>{
+ const relations=read('domesticCompanyRelations.json').relations.filter(r=>r.groupRecruitmentPortalUrl);
+ assert.equal(relations.length,9);
+ for(const rel of relations){
+  const item=seed.items.find(e=>e.id===norm(rel.child));
+  assert.ok(item,'missing subsidiary '+rel.child);
+  assert.ok(item.group_careers_sources?.some(e=>e.url===rel.groupRecruitmentPortalUrl
+   &&e.parent===rel.parent&&e.status==='group_shared_unverified_for_child'),rel.child);
+  const link=item.portals.find(p=>p.url===rel.groupRecruitmentPortalUrl);
+  assert.ok(link,rel.child);
+  if(link.source_relation)assert.equal(link.scope,'group_shared_candidate');
+ }
+ assert.ok(seed.statistics.existing_group_link_associations>=1);
+});
+
+test('restores already-reviewed mainland careers sources without inventing empty portals',()=>{
+ const evidence=read('domesticAutumnOfficialEvidence20261028.json');
+ const eligible=new Set(['毕马威','施耐德电气','鹰角网络','中国南方航空','顺丰','中国华能','中国大唐集团']);
+ assert.equal(seed.statistics.previous_official_evidence_added+
+  seed.statistics.previous_official_evidence_existing,eligible.size);
+ for(const [name,rec] of Object.entries(evidence.entries)){
+  if(!eligible.has(name))continue;
+  const target=name==='顺丰'&&seed.items.some(e=>e.id===norm('顺丰控股'))?'顺丰控股':name;
+  const item=seed.items.find(e=>e.id===norm(target));
+  assert.ok(item,name);
+  assert.ok(item.portals.some(p=>p.url===rec.officialRecruitment),name);
+  assert.ok(item.prior_careers_evidence.some(x=>x.url===rec.officialRecruitment&&
+   x.evidence_url===rec.source),name);
+ }
+});
