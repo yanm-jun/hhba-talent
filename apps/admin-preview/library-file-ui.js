@@ -15,6 +15,14 @@ function render(){
  const box=el('lib-import-preview');box.hidden=!job;
  const state=el('lib-import-state'),fileName=el('lib-import-file-name');
  if(!job){
+  el('lib-import-submit').hidden=false;
+  el('lib-import-pause').hidden=true;
+  el('lib-import-resume').hidden=true;
+  el('lib-import-skip').hidden=true;
+  el('lib-import-export-errors').hidden=true;
+  el('lib-import-file').disabled=false;
+  el('lib-import-text').disabled=false;
+  el('lib-import-default-industry').disabled=false;
   el('lib-import-submit').disabled=busyReading;
   el('lib-import-submit').textContent=busyReading?'正在读取文件…':'开始自动分批导入';
   fileName.textContent='尚未选择文件';state.textContent='';return;
@@ -28,16 +36,15 @@ function render(){
  el('lib-import-remaining').textContent=counter(Math.max(0,job.total-done));
  const progress=el('lib-import-progress');progress.max=Math.max(1,job.total);progress.value=Math.min(job.total,done);
  if(running)state.textContent='正在导入第 '+(job.cursor+1)+' / '+job.batches.length+' 批；已处理 '+counter(done)+' / '+counter(job.total)+' 条。';
- else if(job.error)state.textContent='已暂停在第 '+(job.cursor+1)+' 批。已完成的结果保留，点击「重试并继续」会自动去重。';
+ else if(job.error||job.paused)state.textContent='已暂停在第 '+(job.cursor+1)+' 批。已完成的结果保留，点击「重试并继续」会自动去重。';
  else if(job.cursor===job.batches.length)state.textContent='全部批次处理完毕：成功 '+counter(job.success)+'、重复 '+counter(job.duplicate)+'、失败 '+counter(job.failed.length)+' 条。';
  else state.textContent='已检查 '+counter(job.total)+' 行，准备分批导入。';
  el('lib-import-export-errors').hidden=job.failed.length===0;
  el('lib-import-pause').hidden=!running;
- el('lib-import-resume').hidden=running||!job.error;
+ el('lib-import-resume').hidden=running||!(job.error||job.paused);
  el('lib-import-skip').hidden=running||!job.error||job.error?.body?.error!=='INVALID_LIBRARY_RECORD';
- el('lib-import-submit').hidden=running||job.cursor<job.batches.length||job.cursor===0&&!job.error?false:true;
  // A job can only be started from a fresh file. Retrying its interrupted batch uses the resume button.
- if(job.cursor>0||job.error||job.cursor===job.batches.length)el('lib-import-submit').hidden=true;
+ if(job.cursor>0||job.error||job.paused||job.cursor===job.batches.length)el('lib-import-submit').hidden=true;
  else el('lib-import-submit').hidden=running;
  el('lib-import-file').disabled=running;
  el('lib-import-text').disabled=running;
@@ -68,7 +75,7 @@ async function submitBatch(upload,rows){
 }
 async function run(){
  if(!job||running)return;
- running=true;pauseWanted=false;job.error=null;setError();render();
+ running=true;pauseWanted=false;job.paused=false;job.error=null;setError();render();
  while(job.cursor<job.batches.length&&!pauseWanted){
   const batch=job.batches[job.cursor];
   try{
@@ -79,13 +86,13 @@ async function run(){
   }catch(e){job.error=e;setError(errorMessage(e));break}
   render();
  }
- running=false;render();
+ running=false;if(pauseWanted&&!job.error&&job.cursor<job.batches.length)job.paused=true;render();
  if(job.cursor===job.batches.length&&!job.error){
   setError(job.failed.length?'有格式错误记录未导入，可以下载失败清单。':'导入完成，原始 Excel 不会保存在服务器。');
   // Once at the end, refresh counters and current shelf; never repeat a full
   // summary and list query 38 times for a 3,800-row import.
   try{await window.hhbaLibrary?.refresh()}catch{/* counts remain read-only unavailable */}
- }else if(pauseWanted&&!job.error){setError('已暂停；关闭后可以重新选择同一份 Excel，已有记录将自动跳过。')}
+ }else if(pauseWanted&&!job.error){setError('已暂停；点击「重试并继续」即可接着导入下一批。')}
 }
 function init(){
  if(loaded)return;loaded=true;
@@ -103,7 +110,7 @@ function init(){
    if(!data.total)throw Error('文件中没有可导入的数据行。');
    job={filename:file?file.name:'粘贴的表格',total:data.total,batches:planImportBatches(data.valid),
     success:0,duplicate:data.duplicate.length,failed:[...data.invalid],cursor:0,
-    upload_id:crypto.randomUUID(),error:null};
+    upload_id:crypto.randomUUID(),error:null,paused:false};
    if(!job.batches.length){setError('没有可写入的有效网址；请下载失败清单修正。')}
   }catch(e){setError(e?.message||'文件无法解析，请检查 Excel 表头与格式。')}
   finally{busyReading=false;render()}
@@ -133,7 +140,7 @@ function init(){
 }
 window.hhbaImport={
  open(defaultHall=''){
-  init();if(running){dialog().showModal();return}
+  init();if(running){if(!dialog().open)dialog().showModal();return}
   job=null;pauseWanted=false;busyReading=false;
   const form=el('lib-import-form');form.reset();
   el('lib-import-default-industry').value=defaultHall||'';
