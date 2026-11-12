@@ -82,13 +82,14 @@ def main() -> None:
     original_admin = REPO / "apps" / "admin-preview"
     cloudflare_admin = WEB / "dist" / "admin-preview"
     cloudflare_admin.mkdir(parents=True, exist_ok=True)
-    for filename in ("index.html", "dashboard.js", "styles.css", "library.js", "library.css", "favicon.svg"):
+    for filename in ("index.html", "dashboard.js", "styles.css", "library.js", "library.css", "library-file-ui.js", "library-file-import.js", "favicon.svg"):
         shutil.copy2(original_admin / filename, cloudflare_admin / filename)
     admin_html = (cloudflare_admin / "index.html").read_text(encoding="utf-8")
     for old, new in (
         ('href="/styles.css"', 'href="./styles.css"'),
         ('src="/dashboard.js"', 'src="./dashboard.js"'),
         ('src="/library.js"', 'src="./library.js"'),
+        ('src="/library-file-ui.js"', 'src="./library-file-ui.js"'),
         ('href="/library.css"', 'href="./library.css"'),
         ('href="/favicon.svg"', 'href="./favicon.svg"'),
     ):
@@ -142,6 +143,8 @@ def main() -> None:
         "admin-preview/dashboard.js",
         "admin-preview/library.js",
         "admin-preview/library.css",
+        "admin-preview/library-file-ui.js",
+        "admin-preview/library-file-import.js",
         "companies/autumn/cn-autumn-034/index.html",
         "companies/autumn/cn-autumn-093/index.html",
         "companies/autumn/cn-autumn-119/index.html",
