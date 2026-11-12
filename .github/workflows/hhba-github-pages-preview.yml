@@ -773,6 +773,8 @@ jobs:
         run: |
           node --check apps/admin-preview/dashboard.js
           node --check apps/admin-preview/library.js
+          node --check apps/admin-preview/library-file-ui.js
+          node --check apps/admin-preview/library-file-import.js
           node --check apps/admin-preview/metrics.mjs
           node --check apps/admin-preview/phase2-metrics.mjs
           node --test apps/admin-preview/tests/*.test.mjs
@@ -784,6 +786,8 @@ jobs:
              apps/admin-preview/dashboard.js \
              apps/admin-preview/library.css \
              apps/admin-preview/library.js \
+             apps/admin-preview/library-file-ui.js \
+             apps/admin-preview/library-file-import.js \
              apps/admin-preview/favicon.svg \
              apps/web/dist/admin-preview/
           node --input-type=module <<'NODE'
@@ -794,6 +798,7 @@ jobs:
             ['href="/styles.css"','href="./styles.css"'],
             ['src="/dashboard.js"','src="./dashboard.js"'],
             ['src="/library.js"','src="./library.js"'],
+            ['src="/library-file-ui.js"','src="./library-file-ui.js"'],
             ['href="/library.css"','href="./library.css"'],
             ['href="/favicon.svg"','href="./favicon.svg"']
           ]){
