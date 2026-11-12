@@ -50,7 +50,7 @@ async function verifyPassword(owner,password){
  const expected=await derive(password,from64(owner.salt_b64),Number(owner.iterations));
  return equalConstantTime(expected,owner.hash_b64);
 }
-function dbOf(env){return env.HHBA_ADMIN_AUTH_KV||env.HHBA_ADMIN_AUTH_DB}
+function dbOf(env){return env.HHBA_ADMIN_AUTH_MODE==='kv'?env.HHBA_ADMIN_AUTH_KV:(env.HHBA_ADMIN_AUTH_KV||env.HHBA_ADMIN_AUTH_DB)}
 function isKv(db){return typeof db?.get==='function'&&typeof db?.put==='function'}
 function configured(env){return env.HHBA_ADMIN_CONSOLE_ENABLED==='1'&&!!dbOf(env)}
 async function generateSession(db,ownerId='owner',authVersion=null){
