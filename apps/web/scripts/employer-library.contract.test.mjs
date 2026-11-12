@@ -194,6 +194,15 @@ test('automotive brand is only an evidence-backed search alias, never its own em
 test('build script regenerates checked-in company catalog exactly',()=>{
  const before=readFileSync(indexPath,'utf8');
  execFileSync(process.execPath,[join(root,'scripts/build-employer-library.mjs')],{cwd:root,stdio:'pipe'});
- assert.equal(readFileSync(indexPath,'utf8'),before,
-  'Index drift: run node apps/web/scripts/build-employer-library.mjs and commit the result');
+ const after=readFileSync(indexPath,'utf8');
+ if(before!==after){
+  const b=JSON.parse(before),a=JSON.parse(after);
+  const oldItems=new Map(b.items.map(x=>[x.id,x])),newItems=new Map(a.items.map(x=>[x.id,x]));
+  const added=[...newItems.keys()].filter(x=>!oldItems.has(x)),removed=[...oldItems.keys()].filter(x=>!newItems.has(x));
+  const changed=[...oldItems.keys()].filter(x=>newItems.has(x)&&JSON.stringify(oldItems.get(x))!==JSON.stringify(newItems.get(x)));
+  console.error('HHBA_INDEX_DRIFT_DETAIL',JSON.stringify({added:added.slice(0,20),removed:removed.slice(0,20),changed:changed.slice(0,20),
+   expectedCount:b.items.length,actualCount:a.items.length,statsExpected:b.statistics,statsActual:a.statistics,
+   firstChanged:changed.length?{old:oldItems.get(changed[0]),new:newItems.get(changed[0])}:null}).slice(0,5000));
+ }
+ assert.equal(after,before,'Index drift: builder output differs from committed source');
 });
