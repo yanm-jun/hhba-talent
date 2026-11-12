@@ -13579,28 +13579,13 @@
     {
       "hall_id": "aerospace",
       "batch_key": "aerospace-201-300",
-      "source_title": "航空航天馆第三批100家（部分历史编号原文未恢复）",
-      "incomplete_source": true,
-      "missing_sequences": [
-        220,
-        221,
-        222,
-        223,
-        224,
-        225,
-        278,
-        279,
-        280,
-        281,
-        282,
-        283,
-        284,
-        285
-      ],
+      "source_title": "航空航天馆第三批100家（原文编号201纠正为航天八院八〇八所）",
+      "incomplete_source": false,
+      "missing_sequences": [],
       "entries": [
         {
           "sequence": 201,
-          "name": "首都航天机械有限公司（二一一厂）",
+          "name": "航天八院八〇八所",
           "record_type": "company_candidate",
           "url": null,
           "source": "historical_conversation_2026-11-11",
@@ -13745,6 +13730,54 @@
         {
           "sequence": 219,
           "name": "四川航天烽火伺服控制技术有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 220,
+          "name": "四川航天川南火工技术有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 221,
+          "name": "四川航天中天动力装备有限责任公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 222,
+          "name": "重庆航天机电设计院",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 223,
+          "name": "四川航天计量测试研究所",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 224,
+          "name": "成都航天模塑有限责任公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 225,
+          "name": "四川乐凯新材料有限公司",
           "record_type": "company_candidate",
           "url": null,
           "source": "historical_conversation_2026-11-11",
@@ -14161,6 +14194,70 @@
         {
           "sequence": 277,
           "name": "航天新气象科技有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 278,
+          "name": "航天行云科技有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 279,
+          "name": "航天银山电气有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 280,
+          "name": "河南航天液压气动技术有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 281,
+          "name": "长光卫星技术股份有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 282,
+          "name": "星际荣耀航天科技集团",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 283,
+          "name": "箭元科技",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 284,
+          "name": "银河航天",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 285,
+          "name": "天仪空间科技股份有限公司",
           "record_type": "company_candidate",
           "url": null,
           "source": "historical_conversation_2026-11-11",
