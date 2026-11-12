@@ -43,6 +43,9 @@ def build_admin_library_preview() -> bool:
     """
     if os.environ.get("CF_PAGES_BRANCH", "") != "feat/admin-recruitment-library-20261112":
         return False
+    # Bundle the actual D1 employer table as a private Pages Function module.
+    # Never write employer-list snapshots into /dist (public static assets).
+    run(["python3", "scripts/build-private-library-snapshot.py"], cwd=WEB)
     source = REPO / "apps" / "admin-preview"
     target = WEB / "dist" / "admin-preview"
     target.mkdir(parents=True, exist_ok=True)
