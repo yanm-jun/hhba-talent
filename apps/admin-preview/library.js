@@ -9,6 +9,11 @@ const button=(label,onClick,extra='')=>{
 const safeLink=(url)=>{
  try{const u=new URL(url);return u.protocol==='https:'&&!u.username&&!u.password?u.href:null}catch{return null}
 };
+// A source/announcement is not automatically a recruiting website.
+const isDirectRecruitment=p=>['employer_portal','search_candidate','official_announcement'].includes(p.scope)&&!!safeLink(p.url);
+const isSharedRecruitment=p=>p.scope==='group_shared_candidate'&&!!safeLink(p.url);
+const linkedRecruitment=e=>(e.portals||[]).some(p=>isDirectRecruitment(p)||isSharedRecruitment(p));
+const rankPortal=p=>isDirectRecruitment(p)?0:isSharedRecruitment(p)?1:2;
 const belongs=(x,id)=>x.industry_id===id||x.related_hall_ids?.includes(id);
 const count=id=>state.items.filter(x=>belongs(x,id)).length;
 const showMessage=(txt)=>{dom('library-message').textContent=txt;};
@@ -22,7 +27,7 @@ function filtered(){
  return state.items.filter(x=>{
   if(state.hall!=='all'&&!belongs(x,state.hall))return false;
   const portals=x.portals||[];
-  if(state.status==='missing'&&portals.length>0)return false;
+  if(state.status==='missing'&&linkedRecruitment(x))return false;
   if(state.status==='pending'&&!portals.some(p=>p.status==='collected_unverified'))return false;
   if(state.status==='reviewed'&&!portals.some(p=>p.status==='legacy_reviewed'))return false;
   return !q||relatedNames.has(x.name)||[x.name,x.parent_name,...(x.aliases||[])].filter(Boolean)
@@ -66,20 +71,23 @@ function render(){
    .map(id=>state.halls.find(h=>h.id===id)?.name||'待分类').join(' / ');
   const site=document.createElement('td');const verified=(e.portals||[]).filter(p=>p.status==='legacy_reviewed').length;
   const pending=(e.portals||[]).filter(p=>p.status==='collected_unverified').length;
-  if(!e.portals?.length){const span=document.createElement('span');span.textContent='暂无企业独立招聘入口';span.className='library-muted';site.append(span);}
+  if(!e.portals?.length){const span=document.createElement('span');span.textContent='招聘网址待补';span.className='library-muted';site.append(span);}
   else{
-   for(const p of e.portals.slice(0,3)){
+   const sorted=[...e.portals].sort((a,b)=>rankPortal(a)-rankPortal(b));
+   for(const p of sorted.slice(0,3)){
     const url=safeLink(p.url);
     if(!url){const note=document.createElement('small');note.textContent='非HTTPS来源 · 待复核';site.append(note);continue;}
     const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';
-    const label=p.scope==='group_shared_candidate'?'集团共用线索':p.scope==='discovery_candidate'?'公告/检索线索':
-     p.status==='legacy_reviewed'?'历史已审':'待复核线索';
+    const label=p.scope==='group_shared_candidate'?'集团共用招聘网址':p.scope==='discovery_candidate'?'仅有公告/检索线索':
+     p.status==='legacy_reviewed'?'招聘网址（历史已审）':'招聘网址（待复核）';
     a.textContent=label+' · '+new URL(url).hostname;
     site.append(a);
    }
   }
-  const status=document.createElement('td');status.textContent=verified?'历史已审 '+verified+(pending?' / 待复核 '+pending:''):
-    pending?'待复核 '+pending:e.research_relationships?.length?'集团研究线索 · 待补招聘官网':'暂无独立招聘入口';
+  const status=document.createElement('td');status.textContent=verified?'已收录招聘网址 · 历史已审 '+verified:
+    (e.portals||[]).some(isDirectRecruitment)?'已收录招聘网址 · 待复核':
+    (e.portals||[]).some(isSharedRecruitment)?'集团共用招聘网址':
+    e.portals?.length?'仅有来源线索 · 招聘网址待补':'招聘网址待补';
   const action=document.createElement('td');
   if(state.editable)action.append(button('补充/修改',()=>editEmployer(e),'library-edit'));
   else action.textContent='只读';
@@ -97,20 +105,19 @@ function render(){
  const associations=state.items.reduce((n,x)=>n+(x.portals?.length||0),0);
  dom('library-portals').textContent=String(new Set(state.items.flatMap(x=>(x.portals||[]).map(p=>p.url))).size);
  dom('library-link-associations').textContent=associations+' 条企业-网址关联';
- const withPortal=state.items.filter(x=>(x.portals||[]).some(p=>safeLink(p.url))).length;
- const withoutPortal=state.items.length-withPortal;
+ const directCount=state.items.filter(x=>(x.portals||[]).some(isDirectRecruitment)).length;
+ const sharedOnlyCount=state.items.filter(x=>!(x.portals||[]).some(isDirectRecruitment)&&
+  (x.portals||[]).some(isSharedRecruitment)).length;
+ const withoutPortal=state.items.length-directCount-sharedOnlyCount;
  dom('library-missing-portals').textContent=String(withoutPortal);
- dom('library-coverage-note').textContent=withPortal+' 家有网址 / '+withoutPortal+' 家缺网址';
+ dom('library-coverage-note').textContent=directCount+' 家直接入口 / '+sharedOnlyCount+' 家集团共用';
  dom('library-review').textContent=String(state.items.reduce((n,x)=>n+(x.portals||[]).filter(p=>p.status==='collected_unverified').length,0));
  const coverage=state.coverage;
  const research=state.stats?.automotive_research_nodes;
  const researchNote=research?' · 另有汽车集团研究节点 '+research+' 条（品牌 '+state.brandIndex.length+' 个，不按企业计）':'';
- dom('library-collection-status').textContent=coverage?
-  '历史聊天收集清单：'+coverage.target_total.toLocaleString('zh-CN')+
-  ' 条 · 已完整导入原始批次 '+coverage.imported_batch_records.toLocaleString('zh-CN')+
-  ' 条 · 待补录 '+coverage.unimported_batch_records.toLocaleString('zh-CN')+
-  ' 条原始记录未恢复。注意：记录数量不是网址数量；当前 '+withoutPortal+' 家候选企业没有招聘网址。'+researchNote:
-  '历史批次导入进度暂不可用；不将当前企业数量冒充全部收集记录。';
+ dom('library-collection-status').textContent='企业招聘网址：'+
+  directCount+' 家有直接入口、'+sharedOnlyCount+' 家有集团共用入口、'+
+  withoutPortal+' 家待补；链接均保留历史来源，具体岗位由 DeepSeek 另行查询。';
  dom('library-write-state').textContent=state.editable?'管理员可修改 · 批量最多100家':
    '只读 · 未接通管理员数据库或未授权';
  dom('library-editor').hidden=!state.editable;
@@ -145,7 +152,7 @@ async function refresh(){
   const options=dom('library-hall-select');
   options.replaceChildren();
   for(const h of state.halls){const o=document.createElement('option');o.value=h.id;o.textContent=h.name;options.append(o);}
-  render();showMessage('已载入 '+state.items.length+' 家企业实体。历史审核不代表实时招聘状态。');
+  render();showMessage('已载入 '+state.items.length+' 条企业/集团候选档案。点击企业招聘网址可以查看原始入口。');
  }catch(e){showMessage(e.message||'读取失败');}
 }
 const textValue=id=>dom(id).value.trim();
