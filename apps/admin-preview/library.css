@@ -32,3 +32,9 @@
 
 #library-source-filter{flex:0 0 174px;width:174px;border:1px solid #d9e3dc;border-radius:8px;background:#fff;color:#45604e;padding:11px;font-size:12px}
 @media(max-width:580px){#library-source-filter{width:100%;flex:auto}}
+
+/* One management library; the seventeen industries are filters, not separate libraries. */
+.library-halls{display:block;margin:12px 0 18px}
+.library-single-filter{display:flex;align-items:center;gap:12px;font-size:12px;color:#536a59;font-weight:650}
+.library-single-filter select{flex:1;max-width:390px;width:100%;padding:11px 12px;border:1px solid #d9e3dc;background:#fff;border-radius:9px;font-size:13px;color:#2e5941}
+@media(max-width:580px){.library-single-filter{align-items:stretch;flex-direction:column}.library-single-filter select{max-width:none}}
