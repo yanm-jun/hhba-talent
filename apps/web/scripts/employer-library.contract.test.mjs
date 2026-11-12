@@ -354,3 +354,15 @@ test('reuses older official company editorial career links',()=>{
   assert.ok(employer.portals.some(portal=>portal.url===v.careers),name);
  }
 });
+
+test('admin has one industry library with company and recruiting URL columns',()=>{
+ const html=readFileSync(join(root,'../admin-preview/index.html'),'utf8');
+ const script=readFileSync(join(root,'../admin-preview/library.js'),'utf8');
+ assert.equal((html.match(/data-view="library"/g)||[]).length,1);
+ assert.match(html,/id="library-heading">行业馆/);
+ assert.match(html,/scope="col">企业 \/ 集团/);
+ assert.match(html,/scope="col">招聘入口/);
+ assert.match(script,/id='library-hall-filter'/);
+ assert.match(script,/linkedRecruitment\(x\)/);
+ assert.match(script,/集团共用招聘网址/);
+});
