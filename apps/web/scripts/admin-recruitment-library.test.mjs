@@ -43,14 +43,19 @@ function request(path,options={}){
 function post(data,{origin='https://hhba-talent.pages.dev',url='' }={}){
  return request(url,{method:'POST',headers:{'content-type':'application/json','x-hhba-library-request':'1',Origin:origin,'sec-fetch-site':'same-origin'},body:JSON.stringify(data)});
 }
-test('17 halls are correctly named and no production numbers are hardcoded in static library',()=>{
+test('17 halls have an explicitly labeled last-verified snapshot only in the isolated design preview',()=>{
  assert.equal(INDUSTRIES.length,17);
  assert.equal(INDUSTRIES[0][1],'汽车馆');
  assert.equal(INDUSTRIES.at(-1)[1],'教育科研馆');
  const ui=readFileSync(new URL('../../admin-preview/library.js',import.meta.url),'utf8');
  assert.match(ui,/mode:'summary'/);
  assert.match(ui,/mode:'list'/);
- assert.doesNotMatch(ui,/1,900|1900|318|2,715/);
+ assert.match(ui,/LIB_VERIFIED_SNAPSHOT/);
+ assert.match(ui,/mode:'snapshot'/);
+ assert.match(ui,/2026-11-12/);
+ assert.match(ui,/libIsDesignPreview/);
+ assert.match(ui,/D1_DAILY_LIMIT_REACHED/);
+ assert.match(ui,/非实时/);
 });
 test('unsigned and invalid-audience requests cannot query D1',async()=>{
  const db=mockDb();
@@ -148,4 +153,22 @@ test('retry of partially written batch reports replayed as successful, never as 
  assert.equal(data.inserted,0);
  assert.equal(data.replayed,1);
  assert.equal(data.duplicates,0);
+}));
+
+test('read-only production preview reads its dedicated binding and cannot write to either D1',()=>signed(async()=>{
+ const staging=mockDb(),production=mockDb();
+ const e={...env(staging),HHBA_LIBRARY_READ_DB:production};
+ const r=await onRequestGet({request:request('?mode=summary'),env:e});
+ assert.equal(r.status,200);
+ const data=await r.json();
+ assert.equal(data.readonly,true);
+ assert.equal(data.source,'production-read-only');
+ assert.equal(staging.calls.length,0);
+ assert.ok(production.calls.length>0);
+ const base={action:'add',row:{industry_id:'automotive',enterprise:'测试公司',recruitment_url:'https://jobs.test.example/'}};
+ const denied=await onRequestPost({request:post(base),env:e});
+ assert.equal(denied.status,403);
+ assert.equal((await denied.json()).error,'LIBRARY_PREVIEW_READ_ONLY');
+ assert.equal(staging.batches.length,0);
+ assert.equal(production.batches.length,0);
 }));
