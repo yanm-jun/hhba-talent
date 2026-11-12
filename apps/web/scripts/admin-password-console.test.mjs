@@ -20,7 +20,7 @@ function database(){
     const a=this.args;
     if(sql.startsWith('INSERT OR IGNORE INTO hhba_console_owner')){
      if(account)return {meta:{changes:0}};
-     account={id:a[0],email:a[1],salt_b64:a[2],hash_b64:a[3],iterations:a[4],created_at:a[5],updated_at:a[6]};return {meta:{changes:1}};
+     account={id:a[0],username:'huifanghhba001',email:a[1],salt_b64:a[2],hash_b64:a[3],iterations:a[4],created_at:a[5],updated_at:a[6]};return {meta:{changes:1}};
     }
     if(sql.startsWith('INSERT INTO hhba_console_sessions')){sessions.set(a[0],{expires_at:a[2],owner_id:a[1]});return {meta:{changes:1}}}
     if(sql.startsWith('DELETE FROM hhba_console_sessions WHERE token_hash')){sessions.delete(a[0]);return {meta:{changes:1}}}
@@ -68,9 +68,9 @@ test('owner setup is one-time, requires secure invite and hashes password before
  assert.equal(logout.status,200);
  assert.match(logout.headers.get('set-cookie'),/Max-Age=0/);
  assert.equal((await verifyPasswordAdmin(req('/admin-preview/', 'GET',undefined,cookie.split(';')[0]),e)).status,401);
- const wrongPass=await handleConsoleAuth({request:req('/api/console-auth/login','POST',{username:'admin',password:'wrong-password'}),env:e},'login');
+ const wrongPass=await handleConsoleAuth({request:req('/api/console-auth/login','POST',{username:'huifanghhba001',password:'wrong-password'}),env:e},'login');
  assert.equal(wrongPass.status,401);
- const login=await handleConsoleAuth({request:req('/api/console-auth/login','POST',{username:'admin',password:'SaferKey#1234Secret'}),env:e},'login');
+ const login=await handleConsoleAuth({request:req('/api/console-auth/login','POST',{username:'huifanghhba001',password:'SaferKey#1234Secret'}),env:e},'login');
  assert.equal(login.status,200);
  const c=login.headers.get('set-cookie').split(';')[0];
  assert.equal((await verifyPasswordAdmin(req('/admin-preview/', 'GET',undefined,c),e)).ok,true);
