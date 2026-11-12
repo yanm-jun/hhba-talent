@@ -108,3 +108,45 @@
  font-size:12px;font-weight:650;cursor:pointer}
 .lib-back-halls:hover {background:#e5f1e8;border-color:#b5d1bc}
 .lib-back-halls:focus-visible {outline:3px solid #74ae88;outline-offset:2px}
+
+
+/* HHBA blue-orange visual language for enterprise-library shelves.
+   The status tags remain semantically distinct; no distracting background photo. */
+#view-library{--lib-line:#e1e9f5;--lib-ink:#1b3d69;--lib-muted:#7389a4}
+.lib-stat,.lib-hall,.lib-entry-panel{border-color:#e1e8f4;box-shadow:0 5px 18px #1d5dab09}
+.lib-stat strong{color:#1d487a}
+.lib-board-top h2,.lib-entry-head h2{color:#1d3453}
+.lib-section-label{color:#427fce}
+.lib-notice{border-color:#dce8f7;background:#f4f8fe;color:#466b9c}
+.lib-notice[data-tone="ok"]{border-color:#d9e8fb;background:#f3f8ff;color:#2e6caf}
+.lib-hall-head strong{color:#274a75}
+.lib-hall-icon{background:#eff5ff}
+.lib-hall-count{color:#1e4d82}
+.lib-hall-foot{color:#7b91ac}
+.lib-hall:hover{border-color:#8eb9f4;box-shadow:0 9px 25px #276edf18}
+.lib-hall.selected{border-color:#4288ea;background:linear-gradient(145deg,#f1f7ff,#fff9f3);box-shadow:inset 3px 0 #2878e8,0 7px 20px #276edf15}
+.lib-hall:focus-visible,.lib-actions button:focus-visible{outline-color:#518dea}
+.lib-back-halls{background:#edf5ff;border-color:#d7e6fa;color:#2569bc}
+.lib-back-halls:hover{background:#e4f0ff;border-color:#9ebfed}
+.lib-table-wrap{border-color:#e5eaf4}
+.lib-table th{background:#f7faff;color:#748ba8}
+.lib-table td{border-color:#eaf0f8;color:#536b85}
+.lib-table .lib-company{color:#254b79}
+.lib-table .lib-url a{color:#176bd5}
+.lib-table tbody tr:hover{background:#f7fbff}
+.lib-actions button{border-color:#deebf9;color:#2368b8}
+.lib-actions button:hover{background:#edf5ff}
+.lib-controls input,.lib-controls select,.lib-form input,.lib-form select,.lib-form textarea{border-color:#d8e5f6;color:#244a79}
+.lib-controls input:focus,.lib-controls select:focus,.lib-form input:focus,.lib-form select:focus,.lib-form textarea:focus{outline-color:#89b4f5}
+.lib-dialog{color:#263e5b}
+.lib-form label{color:#446581}
+.lib-form-tip{color:#8194ad}
+.lib-form input[type=checkbox]{accent-color:#2579e4}
+.lib-import-dialog input[type=file]{background:#f6faff;border-color:#96bde8;color:#476b9a}
+.lib-upload-preview{border-color:#d5e4f8;background:#f4f8ff}
+.lib-upload-metrics strong{color:#1e5fba}
+.lib-upload-metrics span{color:#6587ae;border-color:#e4edfa}
+#lib-import-progress{accent-color:#2577e9}
+#lib-import-state{color:#4e78aa}
+.lib-paste-alternative{border-color:#e3eaf7;background:#fbfdff}
+.lib-paste-alternative summary{color:#2e6cb7}
