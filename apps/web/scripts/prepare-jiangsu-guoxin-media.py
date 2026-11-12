@@ -52,7 +52,31 @@ for name,url,article in photos:
    print('JSGX_MEDIA_RETRY',name,attempt+1,last[:160])
    time.sleep(2)
  else:
-  raise RuntimeError('Officially identified project/event photo unavailable: '+name+' '+str(last))
+  # Source hosts sometimes time out in Cloudflare builds. Reuse only the
+  # original, already-published and previously verified HHBA photograph;
+  # never substitute a placeholder or an unrelated company's image.
+  cache_url='https://hhba.work/images/employer-profiles/cn-autumn-030/'+name
+  try:
+   req=Request(cache_url,headers={'User-Agent':'HHBA-CF-Build/1.0','Accept':'image/jpeg'})
+   with urlopen(req,timeout=20) as resp:
+    data=resp.read(12000001)
+    assert 3000<len(data)<12000001, 'Cached photograph size invalid'
+    assert 'image' in resp.headers.get('Content-Type','image/jpeg').lower(), 'Cached response is not an image'
+   with Image.open(BytesIO(data)) as check:check.verify()
+   im=ImageOps.exif_transpose(Image.open(BytesIO(data))).convert('RGB')
+   assert im.width>=450 and im.height>=280, 'Cached photograph has invalid dimensions'
+   h=sha256(data).hexdigest()
+   assert h not in seen, 'Cached image duplicates another photograph'
+   seen.add(h)
+   im.thumbnail((1600,1200))
+   im.save(root/name,format='JPEG',quality=83,optimize=True)
+   assert (root/name).stat().st_size>5000
+   audit[name]={'verified':True,'source':url,'article':article,'retrievedFrom':cache_url,
+                'cachedProductionAsset':True,'sha256':h,'dimensions':[im.width,im.height]}
+   print('JSGX_REUSED_PREVIOUSLY_PUBLISHED_PHOTO',name,cache_url,im.size)
+  except Exception as cached_error:
+   raise RuntimeError('Official photo and previously published verified copy both unavailable: '
+                      +name+' origin='+str(last)+' cache='+str(cached_error)) from cached_error
 (root/'media-audit.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 assert len(audit)==3 and all(v['verified'] for v in audit.values())
 print('JSGX_THREE_INDEPENDENT_LOCAL_ASSETS_READY')
