@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     environment:
-      name: github-pages
+      name: hhba-join-review
       url: ${{ steps.deployment.outputs.page_url }}join/
     steps:
       - name: Publish review to existing GitHub Pages preview site
