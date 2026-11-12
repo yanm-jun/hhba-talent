@@ -58,15 +58,16 @@ jobs:
           const source = readFileSync('src/pages/JoinUsPage.tsx', 'utf8');
           const dist = readdirSync('dist/assets').filter(x => x.endsWith('.js'))
             .map(x => readFileSync('dist/assets/' + x,'utf8')).join('');
-          for (const phrase of ['零现金创业伙伴招募', 'AI 匹配与推荐算法工程师',
+          for (const phrase of ['创业合伙人招募', '核心合伙人，共同持股',
+            '按双方约定落实实际股权', 'AI 匹配与推荐算法工程师',
             '新媒体内容与用户增长伙伴', 'Edge 网申插件工程师',
-            '没有现成福利', '静态验收预览']) {
+            '关于现在的合作阶段', '静态验收预览']) {
             if(!source.includes(phrase) || !dist.includes(phrase))
               throw Error('MISSING_REVIEW_CONTENT: ' + phrase);
           }
           if (!dist.includes('GitHub Pages 静态预览'))
             throw Error('STATIC_FORM_GUARD_NOT_BUILT');
-          const meta = { review: 'HHBA join zero-cash recruitment',
+          const meta = { review: 'HHBA founding partners shared-equity invitation',
             sha: process.env.GITHUB_SHA, branch: process.env.GITHUB_REF_NAME,
             form_mode: 'static-no-submission' };
           writeFileSync('dist/join-preview-meta.json', JSON.stringify(meta, null, 2));
