@@ -275,3 +275,17 @@ test('publicly researched education brands are indexed without inflating chat re
   assert.ok(entry.public_research_evidence?.some(x=>x.batch_key===research.batch_key&&x.sequence===candidate.sequence));
  }
 });
+
+test('career URL backfill is indexed with evidence and never claims real-time job validation',()=>{
+ const source=read('employerLibraryRecruitmentBackfill20261112.json');
+ assert.equal(source.records.length,12);
+ assert.equal(seed.statistics.source_backfill_rows,12);
+ assert.equal(seed.statistics.source_backfill_added+seed.statistics.source_backfill_existing,12);
+ for(const row of source.records){
+  const name=norm(row.name);
+  const item=seed.items.find(e=>e.id===name);
+  assert.ok(item,'Missing backfilled company '+row.name);
+  assert.ok(item.portals.some(p=>p.url===row.url),'Missing URL for '+row.name);
+  assert.ok(item.source_backfill_evidence?.some(x=>x.url===row.url&&x.evidence_url===row.evidence_url));
+ }
+});
