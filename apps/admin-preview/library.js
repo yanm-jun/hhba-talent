@@ -34,7 +34,7 @@ const LIB_HALLS=[
 const libEl=id=>document.getElementById(id);
 const libFmt=new Intl.NumberFormat('zh-CN');
 const libState={started:false,summary:null,industry:null,page:1,hasMore:false,
- rows:[],controller:null,dirty:false,lastListError:null};
+ rows:[],controller:null,dirty:false,lastListError:null,total:null,archived:false};
 function libCount(v){return Number.isSafeInteger(v)&&v>=0?libFmt.format(v):'—'}
 function libMessage(text,tone=''){const e=libEl('lib-message');e.textContent=text;e.dataset.tone=tone}
 function libErrorMessage(status,body){
@@ -96,7 +96,9 @@ function libRenderSummary(){
   root.append(btn);
  }
  if(s?.mode==='snapshot'){
-  libEl('lib-updated').textContent='历史快照 · 截至 2026-11-12（非实时）';
+  libEl('lib-updated').textContent='历史数量快照 · 截至 2026-11-12（非实时）';
+ }else if(s?.archived){
+  libEl('lib-updated').textContent='真实企业目录快照 · '+new Date(s.asOf).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'})+'（北京，非实时）';
  }else if(s?.asOf){
   libEl('lib-updated').textContent='实时查询：'+new Date(s.asOf).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'})+'（北京）';
  }else libEl('lib-updated').textContent='尚未连接';
@@ -107,9 +109,13 @@ async function libRefreshSummary(force=false){
  try{
   const result=await libRequest({mode:'summary'});
   libState.summary=result;libRenderSummary();
-  libMessage(result.readonly?
-   '正式生产库只读预览：现在展示真实企业数量与资料目录。为保护正式数据，新增、修改和 Excel 导入在预览中暂不开放。':
-   '已从受保护数据库读取行业统计。各馆去重数相加不等于全库去重数。','ok');
+  if(result.archived){
+   libMessage('已加载正式数据库导出的 5,288 条企业记录（只读快照）。点击任意行业馆进入企业与招聘网址目录，可搜索、分页和打开原始链接；这不是实时岗位状态。');
+  }else{
+   libMessage(result.readonly?
+    '正式生产库只读预览：现在展示真实企业数量与资料目录。为保护正式数据，新增、修改和 Excel 导入在预览中暂不开放。':
+    '已从受保护数据库读取行业统计。各馆去重数相加不等于全库去重数。','ok');
+  }
  }catch(e){
   if(e.body?.error==='D1_DAILY_LIMIT_REACHED'&&libIsDesignPreview()){
    libState.summary=LIB_VERIFIED_SNAPSHOT;libRenderSummary();
@@ -121,7 +127,11 @@ async function libRefreshSummary(force=false){
 }
 async function libSelect(industry){
  if(!LIB_HALLS.some(x=>x[0]===industry))return;
- libState.industry=industry;libState.page=1;
+ libState.industry=industry;libState.page=1;libState.total=null;
+ // A shelf opens as a real directory view, not a section hidden below 17 cards.
+ libEl('lib-halls').hidden=true;
+ libEl('lib-board-top').hidden=true;
+ libEl('lib-entry-panel').hidden=false;
  libEl('lib-query').value='';libEl('lib-filter').value='all';
  libEl('lib-entry-panel').hidden=false;
  libEl('lib-current-hall').textContent=LIB_HALLS.find(x=>x[0]===industry)[1];
@@ -129,6 +139,7 @@ async function libSelect(industry){
  const readOnly=offline||libState.summary?.readonly===true;
  libEl('lib-add').disabled=readOnly;libEl('lib-import').disabled=readOnly;
  libRenderSummary();
+ libEl('lib-entry-panel').scrollIntoView({behavior:'smooth',block:'start'});
  if(offline){
   libState.rows=[];libState.hasMore=false;libState.lastListError='数据库限额已满，当前仅能查看截至 2026-11-12 的行业数量快照。企业名称和网址明细无法读取，并非没有企业。';
   libRenderRows();
@@ -155,10 +166,15 @@ async function libFetchList(){
    {signal:controller.signal});
   if(libState.controller!==controller)return;
   libState.rows=data.rows;libState.hasMore=data.hasMore;
-  libState.lastListError=null;libRenderRows();libMessage('列表已更新，每页最多 25 条，不进行整库下载。','ok');
+  libState.total=Number.isSafeInteger(data.total)?data.total:null;
+  libState.archived=data.archived===true;
+  libState.lastListError=null;libRenderRows();
+  libMessage(data.archived?
+   '正在查看真实企业招聘资料的历史快照；每页 25 条，可查找企业与打开招聘网址，不消耗 D1 今日读取额度。':
+   '列表已更新，每页最多 25 条，不进行整库下载。');
  }catch(e){
   if(controller.signal.aborted)return;
-  libState.rows=[];libState.hasMore=false;
+  libState.rows=[];libState.hasMore=false;libState.total=null;
   libState.lastListError=libErrorMessage(e.status,e.body);
   libRenderRows();libMessage(libState.lastListError,'error');
  }
@@ -191,7 +207,9 @@ function libRenderRows(){
  if(!libState.rows.length){const tr=document.createElement('tr'),td=document.createElement('td');
   td.colSpan=5;td.className='lib-empty';td.textContent=libState.lastListError||'当前筛选条件下没有记录，请更改筛选条件。';tr.append(td);root.append(tr)}
  libEl('lib-list-status').textContent=libState.lastListError?
-  '查询不可用 · 未返回企业明细':'第 '+libState.page+' 页 · '+libState.rows.length+' 条'+(libState.hasMore?' · 还有下一页':'');
+  '查询不可用 · 未返回企业明细':
+  (libState.total!==null?'共 '+libFmt.format(libState.total)+' 条 · ':'')+
+  '第 '+libState.page+' 页 · 本页 '+libState.rows.length+' 条'+(libState.hasMore?' · 还有下一页':'');
  libEl('lib-prev').disabled=libState.page<=1;
  libEl('lib-next').disabled=!libState.hasMore;
 }
@@ -217,10 +235,20 @@ async function libRemove(record){
   libMessage('已删除该条记录并写入审计日志。','ok');
  }catch(e){libMessage(libErrorMessage(e.status,e.body),'error')}
 }
+function libBackToHalls(){
+ libState.controller?.abort();
+ libState.industry=null;
+ libEl('lib-entry-panel').hidden=true;
+ libEl('lib-halls').hidden=false;
+ libEl('lib-board-top').hidden=false;
+ libRenderSummary();
+ libEl('lib-board-top').scrollIntoView({behavior:'smooth',block:'start'});
+}
 function libInit(){
  if(libState.started)return;libState.started=true;
  const industrySelect=libEl('lib-industry');
  for(const [id,name] of LIB_HALLS){const opt=document.createElement('option');opt.value=id;opt.textContent=name;industrySelect.append(opt)}
+ libEl('lib-back-halls').addEventListener('click',libBackToHalls);
  libEl('lib-refresh').addEventListener('click',async()=>{await libRefreshSummary(true);if(libState.industry)await libFetchList()});
  libEl('lib-search-form').addEventListener('submit',e=>{e.preventDefault();libState.page=1;void libFetchList()});
  libEl('lib-filter').addEventListener('change',()=>{libState.page=1;void libFetchList()});
