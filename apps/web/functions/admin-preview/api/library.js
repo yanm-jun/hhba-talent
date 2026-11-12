@@ -96,9 +96,11 @@ async function collectExisting(db,rows){
   where.push("(industry_id=? AND lower(rtrim(recruitment_url,'/')) IN ("+[...urls].map(()=>'?').join(',')+"))");
   params.push(industry,...urls);
  }
- const res=await db.prepare("SELECT industry_id,lower(rtrim(recruitment_url,'/')) AS normalized FROM hhba_industry_employer_links WHERE recruitment_url IS NOT NULL AND ("+where.join(' OR ')+")")
+ const res=await db.prepare("SELECT industry_id,lower(rtrim(recruitment_url,'/')) AS normalized,source_batch FROM hhba_industry_employer_links WHERE recruitment_url IS NOT NULL AND ("+where.join(' OR ')+")")
   .bind(...params).all();
- return new Set((res.results||[]).map(r=>r.industry_id+'|'+r.normalized));
+ const found=new Map();
+ for(const row of res.results||[])found.set(row.industry_id+'|'+row.normalized,row.source_batch||'');
+ return found;
 }
 function invalidate(db){summaryCache.delete(db)}
 async function summary(db){
@@ -143,7 +145,7 @@ export async function onRequestGet({request,env}){
   return failed('INVALID_LIBRARY_MODE');
  }catch(e){return dbError(e)}
 }
-async function createRows(db,actor,values,action){
+async function createRows(db,actor,values,action,uploadId=null){
  const incoming=new Set(),accepted=[];
  for(const raw of values){
   const row=validatedRow(raw);
@@ -152,8 +154,10 @@ async function createRows(db,actor,values,action){
   if(!incoming.has(key)){accepted.push(row);incoming.add(key)}
  }
  const existing=await collectExisting(db,accepted);
+ const batchTag=uploadId?'admin-import:'+uploadId:'admin-library';
+ const replayed=accepted.filter(r=>existing.get(r.industry_id+'|'+canonical(r.recruitment_url))===batchTag&&uploadId).length;
  const pending=accepted.filter(r=>!existing.has(r.industry_id+'|'+canonical(r.recruitment_url)));
- if(!pending.length)return json({kind:API_KIND,inserted:0,skipped:values.length});
+ if(!pending.length)return json({kind:API_KIND,inserted:0,skipped:values.length,replayed,duplicates:values.length-replayed});
  // D1 Free has a limited number of queries per Worker invocation. Inserting 100
  // rows and 100 audit rows with per-item statements would exhaust that budget.
  // Two multi-row statements per 50 entries: 4 writes + one targeted SELECT.
@@ -164,19 +168,19 @@ async function createRows(db,actor,values,action){
   const insertArgs=[],auditArgs=[];
   for(const row of group){
    const sourceKey='admin:'+crypto.randomUUID();
-   const after={...row,source_key:sourceKey,source_batch:'admin-library'};
-   insertArgs.push(sourceKey,row.industry_id,row.enterprise,row.recruitment_url,row.source_kind);
+   const after={...row,source_key:sourceKey,source_batch:batchTag};
+   insertArgs.push(sourceKey,row.industry_id,row.enterprise,row.recruitment_url,row.source_kind,batchTag);
    auditArgs.push(crypto.randomUUID(),action,actor.email,sourceKey,row.industry_id,row.enterprise,null,JSON.stringify(after));
   }
   const ins="INSERT INTO hhba_industry_employer_links(source_key,industry_id,enterprise,recruitment_url,source_kind,source_batch) VALUES "+
-   group.map(()=>"(?,?,?,?,?,'admin-library')").join(',');
+   group.map(()=>"(?,?,?,?,?,?)").join(',');
   const log="INSERT INTO hhba_library_admin_audit(id,action,actor_email,source_key,industry_id,enterprise,before_json,after_json) VALUES "+
    group.map(()=>"(?,?,?,?,?,?,?,?)").join(',');
   await db.batch([db.prepare(ins).bind(...insertArgs),db.prepare(log).bind(...auditArgs)]);
   inserted+=group.length;
  }
  invalidate(db);
- return json({kind:API_KIND,inserted,skipped:values.length-inserted});
+ return json({kind:API_KIND,inserted,skipped:values.length-inserted,replayed,duplicates:values.length-inserted-replayed});
 }
 export async function onRequestPost({request,env}){
  const g=await gate(request,env);if(g.response)return g.response;
@@ -184,8 +188,12 @@ export async function onRequestPost({request,env}){
  try{
   const payload=await bodyJson(request);
   if(payload?.action==='add')return await createRows(g.db,g.actor,[payload.row],'add');
-  if(payload?.action==='import'&&Array.isArray(payload.rows)&&payload.rows.length>=1&&payload.rows.length<=IMPORT_MAX)
-   return await createRows(g.db,g.actor,payload.rows,'import');
+  if(payload?.action==='import'&&Array.isArray(payload.rows)&&payload.rows.length>=1&&payload.rows.length<=IMPORT_MAX){
+   const uploadId=payload.upload_id===undefined?null:clean(payload.upload_id);
+   if(uploadId!==null&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uploadId))
+    return failed('INVALID_UPLOAD_ID');
+   return await createRows(g.db,g.actor,payload.rows,'import',uploadId);
+  }
   return failed('INVALID_LIBRARY_ACTION');
  }catch(e){return /BODY_TOO_LARGE|SyntaxError/.test(String(e))?failed('INVALID_REQUEST_BODY'):dbError(e)}
 }
