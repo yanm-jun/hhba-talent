@@ -82,12 +82,23 @@ async function audit(db,action,actor,before,after,sourceKey){
    (after||before).industry_id,(after||before).enterprise,
    before?JSON.stringify(before):null,after?JSON.stringify(after):null);
 }
-async function collectExisting(db,industries){
- // One bounded-table pass per import; do not run one full scan per incoming URL.
- const placeholders=industries.map(()=>'?').join(',');
- const rows=await db.prepare('SELECT industry_id,recruitment_url FROM hhba_industry_employer_links WHERE recruitment_url IS NOT NULL AND industry_id IN ('+placeholders+')')
-  .bind(...industries).all();
- return new Set((rows.results||[]).map(r=>r.industry_id+'|'+canonical(r.recruitment_url)));
+async function collectExisting(db,rows){
+ // One indexed, targeted SELECT for only the 100 requested URLs, not a full industry scan.
+ // The optional 0020 migration adds (industry_id,lower(rtrim(recruitment_url,'/'))).
+ if(!rows.length)return new Set();
+ const byIndustry=new Map();
+ for(const row of rows){
+  if(!byIndustry.has(row.industry_id))byIndustry.set(row.industry_id,new Set());
+  byIndustry.get(row.industry_id).add(canonical(row.recruitment_url));
+ }
+ const where=[],params=[];
+ for(const [industry,urls] of byIndustry){
+  where.push("(industry_id=? AND lower(rtrim(recruitment_url,'/')) IN ("+[...urls].map(()=>'?').join(',')+"))");
+  params.push(industry,...urls);
+ }
+ const res=await db.prepare("SELECT industry_id,lower(rtrim(recruitment_url,'/')) AS normalized FROM hhba_industry_employer_links WHERE recruitment_url IS NOT NULL AND ("+where.join(' OR ')+")")
+  .bind(...params).all();
+ return new Set((res.results||[]).map(r=>r.industry_id+'|'+r.normalized));
 }
 function invalidate(db){summaryCache.delete(db)}
 async function summary(db){
@@ -140,19 +151,32 @@ async function createRows(db,actor,values,action){
   const key=row.industry_id+'|'+canonical(row.recruitment_url);
   if(!incoming.has(key)){accepted.push(row);incoming.add(key)}
  }
- const existing=await collectExisting(db,[...new Set(accepted.map(x=>x.industry_id))]);
+ const existing=await collectExisting(db,accepted);
  const pending=accepted.filter(r=>!existing.has(r.industry_id+'|'+canonical(r.recruitment_url)));
  if(!pending.length)return json({kind:API_KIND,inserted:0,skipped:values.length});
- const statements=[];
- for(const r of pending){
-  const key='admin:'+crypto.randomUUID();
-  const after={...r,source_key:key,source_batch:'admin-library'};
-  statements.push(db.prepare("INSERT INTO hhba_industry_employer_links(source_key,industry_id,enterprise,recruitment_url,source_kind,source_batch) VALUES(?,?,?,?,?,'admin-library')")
-   .bind(key,r.industry_id,r.enterprise,r.recruitment_url,r.source_kind));
-  statements.push(await audit(db,action,actor,null,after,key));
+ // D1 Free has a limited number of queries per Worker invocation. Inserting 100
+ // rows and 100 audit rows with per-item statements would exhaust that budget.
+ // Two multi-row statements per 50 entries: 4 writes + one targeted SELECT.
+ // If the second group fails, retry is safe: the next call deduplicates the first.
+ let inserted=0;
+ for(let i=0;i<pending.length;i+=50){
+  const group=pending.slice(i,i+50);
+  const insertArgs=[],auditArgs=[];
+  for(const row of group){
+   const sourceKey='admin:'+crypto.randomUUID();
+   const after={...row,source_key:sourceKey,source_batch:'admin-library'};
+   insertArgs.push(sourceKey,row.industry_id,row.enterprise,row.recruitment_url,row.source_kind);
+   auditArgs.push(crypto.randomUUID(),action,actor.email,sourceKey,row.industry_id,row.enterprise,null,JSON.stringify(after));
+  }
+  const ins="INSERT INTO hhba_industry_employer_links(source_key,industry_id,enterprise,recruitment_url,source_kind,source_batch) VALUES "+
+   group.map(()=>"(?,?,?,?,?,'admin-library')").join(',');
+  const log="INSERT INTO hhba_library_admin_audit(id,action,actor_email,source_key,industry_id,enterprise,before_json,after_json) VALUES "+
+   group.map(()=>"(?,?,?,?,?,?,?,?)").join(',');
+  await db.batch([db.prepare(ins).bind(...insertArgs),db.prepare(log).bind(...auditArgs)]);
+  inserted+=group.length;
  }
- await db.batch(statements);invalidate(db);
- return json({kind:API_KIND,inserted:pending.length,skipped:values.length-pending.length});
+ invalidate(db);
+ return json({kind:API_KIND,inserted,skipped:values.length-inserted});
 }
 export async function onRequestPost({request,env}){
  const g=await gate(request,env);if(g.response)return g.response;
