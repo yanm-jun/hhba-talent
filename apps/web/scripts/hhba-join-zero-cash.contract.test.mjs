@@ -28,15 +28,20 @@ test('all roles grouped exactly once: core, specialist, flexible', () => {
   assert.deepEqual([...groupIds].sort(), [...expected].sort());
 });
 
-test('public page does not promise unbudgeted salary, benefits or guaranteed returns', () => {
+test('founding partner invitation offers genuine future equity without fictional benefits', () => {
   assert.doesNotMatch(page, /title: '有竞争力的薪资'/);
   assert.doesNotMatch(page, /title: '六险二金的保障目标'/);
   assert.doesNotMatch(page, /title: '更充分的休息'/);
-  assert.match(page, /目前没有稳定工资和福利预算/);
-  assert.match(page, /若实际建立劳动关系，必须依法支付工资/);
-  assert.match(page, /不承诺现成股份或收入/);
-  assert.match(page, /core.*核心共建/);
-  assert.match(page, /零现金创业伙伴招募/);
+  assert.doesNotMatch(page, /零现金创业伙伴招募|没有现成福利|零现金阶段/);
+  assert.match(page, /创业合伙人招募/);
+  assert.match(page, /核心合伙人，共同持股/);
+  assert.match(page, /按双方约定落实实际股权/);
+  assert.match(page, /公司尚未完成设立/);
+  assert.match(page, /若实际形成劳动关系，我们仍会依法支付工资/);
+  assert.match(page, /实际持有公司股权/);
+  assert.equal((page.match(/join-disclosure-final/g) || []).length, 1);
+  assert.doesNotMatch(page, /className="join-role-compensation"/);
+  assert.match(page, /VITE_HHBA_JOIN_STATIC_PREVIEW/);
 });
 
 test('existing application form and receipt wiring remain intact', () => {
