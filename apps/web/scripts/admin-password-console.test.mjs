@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {randomBytes} from 'node:crypto';
-import {sha256,handleConsoleAuth,verifyPasswordAdmin,SESSION_SECONDS} from '../functions/_lib/console-password.js';
+import {sha256,handleConsoleAuth,verifyPasswordAdmin,SESSION_SECONDS,PASSWORD_ITERATIONS} from '../functions/_lib/console-password.js';
 
 const ownerEmail='owner@example.com';
 const b64=b=>Buffer.from(b).toString('base64url');
@@ -91,4 +91,8 @@ test('password session is host-only, never authenticates other HHBA domains',asy
  const e=env(database(),await sha256(token),expiry());
  assert.equal((await verifyPasswordAdmin(new Request('https://hhba.work/admin-preview/'),e)).status,401);
  assert.equal((await verifyPasswordAdmin(new Request('https://hhba-admin-console.pages.dev/admin-preview/'),e)).status,401);
+});
+
+test('Cloudflare Workers PBKDF2 100,000 iteration ceiling is respected during account setup',()=>{
+ assert.equal(PASSWORD_ITERATIONS,100000);
 });
