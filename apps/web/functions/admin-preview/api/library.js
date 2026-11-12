@@ -15,7 +15,7 @@ export const INDUSTRIES=[
 const hallIds=new Set(INDUSTRIES.map(x=>x[0]));
 const URL_MAX=1500,NAME_MAX=120,IMPORT_MAX=100,LIST_MAX=25;
 const API_KIND='HHBA_RECRUITMENT_LIBRARY_V1';
-let summaryCache=null;
+const summaryCache=new WeakMap();
 const number=v=>Number.isSafeInteger(Number(v))&&Number(v)>=0?Number(v):0;
 const clean=v=>typeof v==='string'?v.trim():'';
 const canonical=v=>clean(v).replace(/\/+$/,'').toLowerCase();
@@ -89,9 +89,10 @@ async function collectExisting(db,industries){
   .bind(...industries).all();
  return new Set((rows.results||[]).map(r=>r.industry_id+'|'+canonical(r.recruitment_url)));
 }
-function invalidate(){summaryCache=null}
+function invalidate(db){summaryCache.delete(db)}
 async function summary(db){
- if(summaryCache&&Date.now()<summaryCache.until)return summaryCache.data;
+ const cached=summaryCache.get(db);
+ if(cached&&Date.now()<cached.until)return cached.data;
  const [byIndustry,total]=await Promise.all([
   db.prepare("SELECT industry_id,COUNT(*) records,COUNT(recruitment_url) linked,COUNT(DISTINCT lower(trim(recruitment_url))) unique_urls,SUM(CASE WHEN recruitment_url IS NULL OR trim(recruitment_url)='' THEN 1 ELSE 0 END) missing FROM hhba_industry_employer_links GROUP BY industry_id").all(),
   db.prepare("SELECT COUNT(*) records,COUNT(recruitment_url) linked,COUNT(DISTINCT lower(trim(recruitment_url))) unique_urls,SUM(CASE WHEN recruitment_url IS NULL OR trim(recruitment_url)='' THEN 1 ELSE 0 END) missing FROM hhba_industry_employer_links").first()
@@ -101,7 +102,7 @@ async function summary(db){
   total:{records:number(total?.records),linked:number(total?.linked),unique_urls:number(total?.unique_urls),missing:number(total?.missing)},
   industries:INDUSTRIES.map(([id,label])=>{const r=map.get(id)||{};return {id,label,records:number(r.records),linked:number(r.linked),unique_urls:number(r.unique_urls),missing:number(r.missing)}}),
   note:'全库网址去重数不等于各馆去重数之和；候选网址不代表当前全部有效。'};
- summaryCache={until:Date.now()+300000,data};return data;
+ summaryCache.set(db,{until:Date.now()+300000,data});return data;
 }
 async function list(db,url){
  const industry=clean(url.searchParams.get('industry')||'');
@@ -150,7 +151,7 @@ async function createRows(db,actor,values,action){
    .bind(key,r.industry_id,r.enterprise,r.recruitment_url,r.source_kind));
   statements.push(await audit(db,action,actor,null,after,key));
  }
- await db.batch(statements);invalidate();
+ await db.batch(statements);invalidate(db);
  return json({kind:API_KIND,inserted:pending.length,skipped:values.length-pending.length});
 }
 export async function onRequestPost({request,env}){
@@ -184,7 +185,7 @@ export async function onRequestPatch({request,env}){
     .bind(next.industry_id,next.enterprise,next.recruitment_url,next.source_kind,key),
    await audit(g.db,'edit',g.actor,before,after,key)
   ]);
-  invalidate();return json({kind:API_KIND,updated:1});
+  invalidate(g.db);return json({kind:API_KIND,updated:1});
  }catch(e){return /BODY_TOO_LARGE|SyntaxError/.test(String(e))?failed('INVALID_REQUEST_BODY'):dbError(e)}
 }
 export async function onRequestDelete({request,env}){
@@ -198,6 +199,6 @@ export async function onRequestDelete({request,env}){
    g.db.prepare('DELETE FROM hhba_industry_employer_links WHERE source_key=?').bind(key),
    await audit(g.db,'delete',g.actor,before,null,key)
   ]);
-  invalidate();return json({kind:API_KIND,deleted:1});
+  invalidate(g.db);return json({kind:API_KIND,deleted:1});
  }catch(e){return /BODY_TOO_LARGE|SyntaxError/.test(String(e))?failed('INVALID_REQUEST_BODY'):dbError(e)}
 }
