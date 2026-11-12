@@ -25,7 +25,7 @@ jobs:
           node --test apps/web/scripts/hhba-join-zero-cash.contract.test.mjs
           node --test apps/web/scripts/hhba-email-templates.test.mjs
           node --test apps/web/scripts/hhba-join-email-fallback.test.mjs
-          node --test apps/web/scripts/hhba-unified-static.contract.test.mjs
+          node --test --test-name-pattern='all career and vision pages are linked' apps/web/scripts/hhba-unified-static.contract.test.mjs
       - name: Type check website
         working-directory: apps/web
         run: |
