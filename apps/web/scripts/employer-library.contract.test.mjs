@@ -342,3 +342,15 @@ test('recovers existing employer profile career URLs without fabricating coverag
     x.source_dataset===row.dataset),row.name);
  }
 });
+
+test('reuses older official company editorial career links',()=>{
+ const editorial=read('domesticCompanyEditorial.json');
+ const sources=Object.entries(editorial).filter(([name,v])=>v.careers);
+ assert.equal(sources.length,2);
+ assert.equal(seed.statistics.editorial_career_sources,2);
+ for(const [name,v] of sources){
+  const employer=seed.items.find(item=>item.id===norm(name));
+  assert.ok(employer,name);
+  assert.ok(employer.portals.some(portal=>portal.url===v.careers),name);
+ }
+});
