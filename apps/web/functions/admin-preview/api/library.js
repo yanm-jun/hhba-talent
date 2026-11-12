@@ -2,6 +2,7 @@
 // signed Cloudflare Access and the existing single-admin allowlist.
 import {verifyAdmin} from '../../_lib/admin-access.js';
 import {json,bad,metricDb,sameOrigin} from '../../_lib/metric-utils.js';
+import {LIBRARY_PRIVATE_SNAPSHOT} from '../../_lib/library-private-snapshot.js';
 
 export const INDUSTRIES=[
  ['automotive','汽车馆'],['semiconductor','电子半导体馆'],['internet-ai','互联网与AI馆'],
@@ -139,17 +140,99 @@ async function list(db,url){
  return json({kind:API_KIND,mode:'list',industry,q,status,page,pageSize:LIST_MAX,hasMore:listRows.length>LIST_MAX,
   rows:listRows.slice(0,LIST_MAX).map(publicRow)});
 }
+// Read-only, full historical D1 export compiled inside the Pages Function.
+// The export is never a public /dist asset; requests still pass signed Access.
+let archivedLibrary=null;
+function loadArchivedLibrary(){
+ if(archivedLibrary)return archivedLibrary;
+ const input=LIBRARY_PRIVATE_SNAPSHOT;
+ if(!input?.rows?.length||!input.count||!Array.isArray(input.columns))return null;
+ const columns=input.columns;
+ const rows=input.rows.map(values=>{
+  const record={};
+  for(let i=0;i<columns.length;i++)record[columns[i]]=values[i];
+  return publicRow(record);
+ });
+ if(rows.length!==input.count.records)throw Error('ARCHIVED_LIBRARY_ROW_COUNT_MISMATCH');
+ rows.sort((a,b)=>a.enterprise.localeCompare(b.enterprise,'zh-CN')||a.source_key.localeCompare(b.source_key));
+ const industry=new Map(INDUSTRIES.map(([id])=>[id,{records:0,linked:0,missing:0,urls:new Set()}]));
+ const urlSet=new Set();let linked=0;
+ for(const row of rows){
+  const hall=industry.get(row.industry_id);
+  if(hall){hall.records++}
+  if(row.recruitment_url){
+   linked++;
+   const url=row.recruitment_url.trim().toLowerCase();
+   urlSet.add(url);
+   if(hall){hall.linked++;hall.urls.add(url)}
+  }else if(hall)hall.missing++;
+ }
+ if(linked!==input.count.with_urls||urlSet.size!==input.count.unique_urls)
+  throw Error('ARCHIVED_LIBRARY_LINK_COUNT_MISMATCH');
+ const data={
+  kind:API_KIND,mode:'summary',asOf:input.exported_at,
+  readonly:true,archived:true,source:'production-d1-export',
+  total:{records:rows.length,linked,unique_urls:urlSet.size,missing:rows.length-linked},
+  industries:INDUSTRIES.map(([id,label])=>{
+   const x=industry.get(id);
+   return {id,label,records:x.records,linked:x.linked,unique_urls:x.urls.size,missing:x.missing};
+  }),
+  note:'正式数据库导出的真实企业记录，只读历史快照，非实时岗位信息。'
+ };
+ archivedLibrary={rows,data};
+ return archivedLibrary;
+}
+function archivedList(archive,url){
+ const industry=clean(url.searchParams.get('industry')||'');
+ const q=clean(url.searchParams.get('q')||'').toLowerCase();
+ const status=url.searchParams.get('status')||'all';
+ const page=Number(url.searchParams.get('page')||'1');
+ if((industry&&!hallIds.has(industry))||q.length>80||
+  !['all','linked','missing'].includes(status)||
+  !Number.isInteger(page)||page<1||page>200||(!industry&&q.length<2))
+  return failed('INVALID_LIST_FILTER');
+ const rows=archive.rows.filter(r=>
+  (!industry||r.industry_id===industry)&&
+  (!q||r.enterprise.toLowerCase().includes(q)||(r.recruitment_url||'').toLowerCase().includes(q))&&
+  (status==='all'||(status==='linked'?!!r.recruitment_url:!r.recruitment_url))
+ );
+ const offset=(page-1)*LIST_MAX;
+ return json({kind:API_KIND,mode:'list',industry,q,status,page,pageSize:LIST_MAX,
+  readonly:true,archived:true,source:'production-d1-export',
+  hasMore:rows.length>offset+LIST_MAX,rows:rows.slice(offset,offset+LIST_MAX)});
+}
+function archiveForRequest(request,env){
+ // Production and other previews never receive snapshot mode.
+ if(env.HHBA_LIBRARY_SNAPSHOT_FIRST!=='1')return null;
+ const host=new URL(request.url).hostname;
+ if(host!=='feat-admin-recruitment-libra.hhba-talent.pages.dev')return null;
+ return loadArchivedLibrary();
+}
 export async function onRequestGet({request,env}){
  const g=await gate(request,env);if(g.response)return g.response;
- const url=new URL(request.url);
+ const url=new URL(request.url),mode=url.searchParams.get('mode');
+ if(mode!=='summary'&&mode!=='list')return failed('INVALID_LIBRARY_MODE');
  try{
-  if(url.searchParams.get('mode')==='summary'){
+  const archive=archiveForRequest(request,env);
+  if(archive){
+   return mode==='summary'?json(archive.data):archivedList(archive,url);
+  }
+  if(mode==='summary'){
    const data=await summary(g.readDb);
    return json({...data,readonly:g.previewReadOnly,source:g.previewReadOnly?'production-read-only':'environment'});
   }
-  if(url.searchParams.get('mode')==='list')return await list(g.readDb,url);
-  return failed('INVALID_LIBRARY_MODE');
- }catch(e){return dbError(e)}
+  return await list(g.readDb,url);
+ }catch(e){
+  // If production D1 is quota-blocked, a compiled, verified export may still
+  // serve the true employer listings after Access validation, with a date label.
+  if(/quota|row read limit|7500|exceeded/i.test(String(e?.message||''))){
+   try{
+    const archive=archiveForRequest(request,env);
+    if(archive)return mode==='summary'?json(archive.data):archivedList(archive,url);
+   }catch{/* fall back to explicit error */}
+  }
+  return dbError(e);
+ }
 }
 async function createRows(db,actor,values,action,uploadId=null){
  const incoming=new Set(),accepted=[];
