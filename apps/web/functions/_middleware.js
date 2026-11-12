@@ -13,8 +13,18 @@ export async function onRequest(context){
  const path=u.pathname;
  const open=path==='/login/'||path==='/login/index.html'||
   path==='/setup/'||path==='/setup/index.html'||
-  path==='/admin-login.css'||path==='/admin-login.js'||path==='/favicon.svg';
- if(open||path.startsWith('/api/console-auth/'))return next();
+  path==='/admin-login.css'||path==='/admin-login-brand-v2.css'||
+  path==='/admin-login.js'||path==='/favicon.svg';
+ if(open){
+  // Public login assets must be revalidated so a changed SVG does not load
+  // with an obsolete login stylesheet from the browser cache.
+  const response=await next();
+  const headers=new Headers(response.headers);
+  headers.set('Cache-Control','no-store, max-age=0, must-revalidate');
+  headers.set('X-Content-Type-Options','nosniff');
+  return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+ }
+ if(path.startsWith('/api/console-auth/'))return next();
  if(path==='/')return Response.redirect('https://'+ADMIN_HOST+'/admin-preview/',302);
  const api=path.startsWith('/admin-preview/api/');
  if(path==='/admin-preview'||path.startsWith('/admin-preview/')){
