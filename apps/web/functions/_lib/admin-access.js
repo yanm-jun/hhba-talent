@@ -1,3 +1,4 @@
+import {verifyPasswordAdmin,ADMIN_HOST} from './console-password.js';
 // Validate the cryptographically signed Cloudflare Access identity before reading any private metrics.
 // A spoofed request header is NEVER enough to authenticate an administrator.
 function decode(part){
@@ -5,6 +6,9 @@ function decode(part){
  return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(url.padEnd(Math.ceil(url.length/4)*4,'=')),x=>x.charCodeAt(0))));
 }
 export async function verifyAdmin(request,env){
+ // The dedicated admin subdomain accepts ONLY DB-validated password sessions.
+ // Existing hhba.work / pages.dev consoles continue to require Cloudflare Access.
+ if(new URL(request.url).hostname===ADMIN_HOST)return verifyPasswordAdmin(request,env);
  const team=(env.HHBA_ACCESS_TEAM_DOMAIN||'').trim().toLowerCase();
  // The original dashboard and legacy metrics API have distinct Cloudflare Access applications.
  // Enforce one explicit JWT audience for each route; never accept both audiences everywhere.
