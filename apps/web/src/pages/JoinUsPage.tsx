@@ -30,8 +30,8 @@ const roles = [
     desc:'统筹从 GitHub 静态预览走向可安全运营的 HHBA 正式产品。',
     mission:'为网站、企业端、管理后台建立统一且可维护的生产技术架构，带领团队完成真正可用的产品闭环。',
     responsibilities:[
-      '梳理现有 React 前端、Python / TypeScript 后端、Railway 服务与数据库，制定分阶段上线方案和技术规范。',
-      '打通求职者及企业身份认证、角色权限、企业入驻、岗位管理和审核业务，不让静态演示冒充正式功能。',
+      '梳理现有 React、Cloudflare、D1/R2 与外部 AI 服务，优先保障真实用户流程稳定与成本可控。',
+      '优先修复账号、简历、职位匹配、邮件提交与后台的真实问题，不把未上线功能包装成已实现。',
       '负责技术方案评审、代码治理、自动化测试、部署回滚、生产故障响应和基础信息安全。',
       '评估 Railway 与国内云部署的实际成本、合规边界及运维可行性。'
     ],
@@ -51,10 +51,10 @@ const roles = [
     desc:'先把账号、D1/R2、简历与后台的真实数据链路维护稳定。',
     mission:'把已设计的业务规则实现为可审计、可授权、可恢复的后端服务，而不是只有页面和模拟数据。',
     responsibilities:[
-      '设计企业、招聘经办人、候选人、岗位、申请、证据、申诉、评分和审批记录的数据结构与迁移。',
-      '实现注册登录、权限隔离、审核队列、状态流转、文件上传与对象存储访问控制。',
-      '接通统一管理后台的真实 API，保证重要操作有日志、幂等与权限校验。',
-      '建立接口测试、数据备份和监控告警，避免生产数据丢失或越权访问。'
+      '梳理现有 D1 数据库、表结构与查询成本，降低免费额度被异常读取耗尽的风险。',
+      '维护登录、简历上传、访问权限、历史推荐及后台关键数据的安全与一致性。',
+      '维护真实 API 的权限、幂等、日志和错误处理，让重要操作可排查。',
+      '建立测试、备份与故障告警，在低成本条件下保持必要的可恢复能力。'
     ],
     required:[
       '掌握 Python（FastAPI 等）或 TypeScript（Node.js）至少一种后端技术栈。',
@@ -72,10 +72,10 @@ const roles = [
     desc:'维护企业招聘官网入口分类、岗位真实性、时效与去重。',
     mission:'维护按行业分类的企业招聘入口，让 DeepSeek 优先从可信官网检索，并能在不足时补充搜索。',
     responsibilities:[
-      '改进 Greenhouse、Lever、Ashby 等公开岗位源的数据接入、更新时间记录和异常追踪。',
-      '完成岗位去重、过期下架、原链接核验、结构化字段提取、中英文规范化与数据质量检测。',
-      '建设关键词检索、国家和城市筛选，以及后续语义召回、简历匹配的可解释结果。',
-      '建立采集限速、来源权限和调用成本监控，避免抓取风险、虚假岗位与 AI 无依据生成。'
+      '维护行业馆与企业官方招聘入口，清楚记录企业、所属行业、集团官网与子公司之间的关系。',
+      '建立招聘入口去重、失效标记与岗位来源核对，避免把企业招聘首页当作已确认的具体职位。',
+      '为 DeepSeek 提供轻量、分类清晰的官方入口检索结构，再按简历条件筛选企业与职位。',
+      '监控搜索成本、可追溯性与质量，不依赖对方未开放的招聘 API，不让 AI 编造岗位。'
     ],
     required:[
       '熟悉 Python、SQL、数据清洗与批处理，能够处理多来源、不一致的结构化数据。',
@@ -147,7 +147,7 @@ const roles = [
     desc:'连接优质企业、发展帮扶需求和可验证的商业合作机会。',
     mission:'帮助负责任、愿意持续改善的企业被更多人才和合作方看见，探索 HHBA 可持续的商业模式。',
     responsibilities:[
-      '沟通企业需求，拓展企业入驻、合作伙伴与潜在客户资源。',
+      '从公开招聘信息、园区合作和潜在客户访谈寻找真实商务需求，不预设企业端已经上线。',
       '整理企业发展帮扶申请、客户授权、商机进展与订单证明，推动透明的业务跟进。',
       '基于真实产品能力制定合作方案、服务流程和收入验证方式。',
       '将企业反馈整理给产品团队，不以成交、付费或关系干预企业评分。'
@@ -168,7 +168,7 @@ const roles = [
     desc:'把复杂的招聘、企业端、员工反馈和管理后台做得更清晰易用。',
     mission:'用优秀的产品设计让求职者、企业经办人、员工和审核人员都能顺畅完成各自任务。',
     responsibilities:[
-      '梳理求职、企业入驻、岗位筛选、员工反馈、申诉和后台审核的完整用户流程。',
+      '优先梳理简历匹配、岗位导航、申请历史与管理后台的真实用户流程。',
       '完善 Figma 设计规范、响应式布局、中文优先的信息呈现和可访问性。',
       '优化表单、状态提示、边界场景、错误说明及用户信任感。',
       '与工程师合作落地 React 界面，并通过真实用户反馈迭代。'
@@ -466,7 +466,7 @@ export function JoinUsPage({ user }: { user: User | null }) {
               </div>
               <div className="join-role-sample"><strong>我们会如何了解你的能力</strong><p>{r.challenge}</p><span>以交流、已有项目和作品为主，不要求无偿完成可直接投入生产的试用项目。</span></div>
               <div className="join-role-compensation">
-                <strong>薪酬与权益现状</strong>
+                <strong>合作条件与权益边界</strong>
                 <p>目前无稳定工资预算，也无已授予股份或保底分红。核心共建可讨论未来实际股权；专项与增长可讨论有条件的收益分配。任何实际交付之前须书面明确合作性质、报酬或收益条件、知识产权与退出规则；如形成劳动关系，应依法支付工资并履行法定保障。</p>
               </div>
               <button type="button" onClick={() => applyFor(r.id)}>填写该方向合作意向 <ArrowRight size={16} aria-hidden="true"/></button>
@@ -476,7 +476,7 @@ export function JoinUsPage({ user }: { user: User | null }) {
         </div>)}
         <aside className="join-role-advisor-note" aria-label="外部专业顾问招募说明">
           <strong>此外，我们也需要外部专业顾问</strong>
-          <p>劳动关系与股权激励法律顾问、个人信息与网络安全顾问，将以专项咨询或阶段性合作方式寻找，并非当前承诺的全职职位。法律意见与安全审查应由具备相应专业能力的人员独立完成。</p>
+          <p>劳动关系、股权激励与个人信息保护等方向欢迎专业人士交流。当前没有有偿顾问预算，不承诺正式聘用；若需要实际法律或安全服务，须在具有支付与履约条件时另行协商签署协议。</p>
         </aside>
       </section>
 
@@ -500,7 +500,7 @@ export function JoinUsPage({ user }: { user: User | null }) {
         <div className="join-section-head">
           <p className="join-kicker">SAY HELLO</p>
           <h2 id="join-apply-title">告诉我们，你想一起做什么。</h2>
-          <p>填写并提交后，申请会发送到 HHBA 邮箱，我们会通过你填写的邮箱与你联系。</p>
+          <p>这是零现金创业阶段的合作意向征集，不是正式劳动岗位的录用申请。提交后申请会发送到 HHBA 邮箱，我们会通过你填写的邮箱联系。</p>
         </div>
         <div className="join-form-shell">
           <div className="join-form-progress" aria-label="合作意向步骤">
@@ -552,7 +552,7 @@ export function JoinUsPage({ user }: { user: User | null }) {
               <h3>聊聊你想如何一起参与</h3><p className="join-form-description">合作方式及实际权益必须在正式沟通时另行确认。</p>
               <div className="join-field-row">
                 <div><label htmlFor="join-time">每周预计可以投入多久？ <em>*</em></label><select id="join-time" value={form.weeklyTime} onChange={e=>update('weeklyTime',e.target.value)}><option value="">请选择</option><option>每周 1–5 小时</option><option>每周 6–15 小时</option><option>每周 16–30 小时</option><option>每周 30 小时以上</option><option>待进一步沟通</option></select></div>
-                <div><label htmlFor="join-mode">理想合作方式 <em>*</em></label><select id="join-mode" value={form.mode} onChange={e=>update('mode',e.target.value)}><option value="">请选择</option><option>远程协作</option><option>线上线下结合</option><option>未来正式岗位</option><option>灵活协商</option></select></div>
+                <div><label htmlFor="join-mode">理想合作方式 <em>*</em></label><select id="join-mode" value={form.mode} onChange={e=>update('mode',e.target.value)}><option value="">请选择</option><option>远程协作</option><option>线上线下结合</option><option>灵活协商</option></select></div>
               </div>
               <label htmlFor="join-note">还想告诉我们什么？</label>
               <textarea id="join-note" value={form.note} onChange={e=>update('note',e.target.value)} maxLength={600} rows={3} placeholder="例如协作时间、对项目的想法或想先交流的问题" />
