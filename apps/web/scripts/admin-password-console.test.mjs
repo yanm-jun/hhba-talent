@@ -68,6 +68,8 @@ test('owner setup is one-time, requires secure invite and hashes password before
  assert.equal(logout.status,200);
  assert.match(logout.headers.get('set-cookie'),/Max-Age=0/);
  assert.equal((await verifyPasswordAdmin(req('/admin-preview/', 'GET',undefined,cookie.split(';')[0]),e)).status,401);
+ const wrongUser=await handleConsoleAuth({request:req('/api/console-auth/login','POST',{username:'admin',password:'SaferKey#1234Secret'}),env:e},'login');
+ assert.equal(wrongUser.status,401,'former default admin username must no longer work');
  const wrongPass=await handleConsoleAuth({request:req('/api/console-auth/login','POST',{username:'huifanghhba001',password:'wrong-password'}),env:e},'login');
  assert.equal(wrongPass.status,401);
  const login=await handleConsoleAuth({request:req('/api/console-auth/login','POST',{username:'huifanghhba001',password:'SaferKey#1234Secret'}),env:e},'login');
