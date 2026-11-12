@@ -164,24 +164,29 @@ export function employerSearchHints(library,resume,roleHint='',max=2,brandIndex=
    }
   }
   const portal=options[0]||shared||inherited;
-  if(!portal)continue;
+  // When a company is explicitly named but its historical URL was never
+  // recorded, DeepSeek may SEARCH for its official careers page; this does not
+  // declare the company source verified or fabricate a site: restriction.
+  if(!portal&&!explicitlyNamed)continue;
   ranked.push({item,portal,brandName:inBrand?brandMatches.get(item.id):null,
    groupName:inherited?groupName:shared?(item.parent_name||'集团'):'',
    score:(inHint?200:0)+(inResume?80:0)+(inBrand?100:0)+(inHall?40:0)+
-    (portal.status==='legacy_reviewed'?20:0)-(shared||inherited?15:0)});
+    (portal?.status==='legacy_reviewed'?20:0)-(shared||inherited?15:0)-(portal?0:35)});
  }
  ranked.sort((a,b)=>b.score-a.score||a.item.name.localeCompare(b.item.name,'zh-CN'));
  const hints=[],domains=new Set();
  for(const {item,portal,groupName,brandName} of ranked){
-  const hostname=new URL(portal.url).hostname;
-  if(domains.has(hostname))continue;
-  domains.add(hostname);
-  // Search hint only: Search and subsequent JD checking establish the vacancy.
-  // Never output this portal as a job link or a verified job opening.
+  const hostname=portal?new URL(portal.url).hostname:null;
+  const dedupe=hostname||'name:'+item.id;
+  if(domains.has(dedupe))continue;
+  domains.add(dedupe);
+  // A missing official URL triggers discovery, NEVER an invented site: filter.
+  const base=(clean(roleHint,50)||'招聘岗位')+' '+item.name;
   const groupNote=groupName?' '+groupName+' 集团招聘平台范围（需核实子公司主体）':'';
-  hints.push(((clean(roleHint,50)||'招聘岗位')+' '+item.name+
-   (brandName?' 品牌'+brandName+'（用人主体待核）':'')+groupNote+
-   ' site:'+hostname+' 岗位 职位 中国大陆').slice(0,180));
+  const sourceQuery=hostname?' site:'+hostname+' 岗位 职位 中国大陆':
+   ' 企业官网 官方招聘 职位 中国大陆 -site:zhipin.com -site:51job.com';
+  hints.push((base+(brandName?' 品牌'+brandName+'（用人主体待核）':'')+
+   groupNote+sourceQuery).slice(0,180));
   if(hints.length>=max)break;
  }
  return hints;
