@@ -96,3 +96,49 @@ test('password session is host-only, never authenticates other HHBA domains',asy
 test('Cloudflare Workers PBKDF2 100,000 iteration ceiling is respected during account setup',()=>{
  assert.equal(PASSWORD_ITERATIONS,100000);
 });
+
+
+test('KV administrator login/session survives complete D1 read outage',async()=>{
+ const entries=new Map();
+ const kv={
+  async get(key,type){const x=entries.get(key);return x===undefined?null:(type==='json'?JSON.parse(x):x)},
+  async put(key,value){entries.set(key,value)},
+  async delete(key){entries.delete(key)}
+ };
+ const outage={prepare(){throw Error("Your account has exceeded D1's free tier daily row read limit")}};
+ const freshToken=b64(randomBytes(32));
+ const configuredEnv={...env(outage,await sha256(freshToken),expiry()),
+  HHBA_ADMIN_AUTH_MODE:'kv',HHBA_ADMIN_AUTH_KV:kv};
+ const setup=await handleConsoleAuth({request:req('/api/console-auth/setup','POST',{
+  token:freshToken,password:'SafeOwnPassword#2468'
+ }),env:configuredEnv},'setup');
+ assert.equal(setup.status,200,'password bootstrap must not touch D1');
+ assert.equal((await handleConsoleAuth({request:req('/api/console-auth/status'),env:configuredEnv},'status')).status,200);
+ const firstCookie=setup.headers.get('set-cookie')?.split(';')[0];
+ assert.ok(firstCookie);
+ assert.equal((await verifyPasswordAdmin(req('/admin-preview/','GET',undefined,firstCookie),configuredEnv)).ok,true);
+ assert.equal((await verifyPasswordAdmin(req('/admin-preview/','GET',undefined,'__Host-hhba_admin=bogus'),configuredEnv)).status,401);
+ const exit=await handleConsoleAuth({request:req('/api/console-auth/logout','POST',{},firstCookie),env:configuredEnv},'logout');
+ assert.equal(exit.status,200);
+ assert.equal((await verifyPasswordAdmin(req('/admin-preview/','GET',undefined,firstCookie),configuredEnv)).status,401);
+ const wrong=await handleConsoleAuth({request:req('/api/console-auth/login','POST',{
+  username:'huifanghhba001',password:'wrong'
+ }),env:configuredEnv},'login');
+ assert.equal(wrong.status,401);
+ const login=await handleConsoleAuth({request:req('/api/console-auth/login','POST',{
+  username:'huifanghhba001',password:'SafeOwnPassword#2468'
+ }),env:configuredEnv},'login');
+ assert.equal(login.status,200);
+ const cookie=login.headers.get('set-cookie').split(';')[0];
+ assert.equal((await verifyPasswordAdmin(req('/admin-preview/','GET',undefined,cookie),configuredEnv)).ok,true);
+ const rotate=await handleConsoleAuth({request:req('/api/console-auth/change','POST',{
+  password:'SafeOwnPassword#2468',newPassword:'AnotherSafeSecret#2468'
+ },cookie),env:configuredEnv},'change');
+ assert.equal(rotate.status,200);
+ assert.equal((await verifyPasswordAdmin(req('/admin-preview/','GET',undefined,cookie),configuredEnv)).status,401,'old sessions must be invalidated after password change');
+});
+test('KV-only security mode fails closed instead of silently falling back to D1',async()=>{
+ const e={...env(database(),await sha256(token),expiry()),HHBA_ADMIN_AUTH_MODE:'kv'};
+ const r=await handleConsoleAuth({request:req('/api/console-auth/status'),env:e},'status');
+ assert.equal(r.status,404);
+});
