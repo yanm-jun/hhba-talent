@@ -75,8 +75,8 @@
   "collection_coverage": {
     "definition": "历史聊天行业馆收集记录数。不是企业唯一实体数，也不是有效官方招聘链接数。",
     "target_total": 3800,
-    "imported_batch_records": 700,
-    "unimported_batch_records": 3100,
+    "imported_batch_records": 900,
+    "unimported_batch_records": 2900,
     "target_by_hall": {
       "automotive": 200,
       "semiconductor": 200,
@@ -108,7 +108,7 @@
       "aerospace": 0,
       "logistics": 0,
       "construction": 0,
-      "consumer-hardware": 0,
+      "consumer-hardware": 200,
       "chem-materials": 0,
       "retail": 0,
       "agri-food": 0,
@@ -127,7 +127,7 @@
       "aerospace": 300,
       "logistics": 300,
       "construction": 200,
-      "consumer-hardware": 200,
+      "consumer-hardware": 0,
       "chem-materials": 200,
       "retail": 200,
       "agri-food": 200,
@@ -425,6 +425,71 @@
       "is_employer": false
     }
   ],
+  "historical_non_employer_index": [
+    {
+      "name": "TCL泛智屏事业部",
+      "hall_id": "consumer-hardware",
+      "sequence": 11,
+      "batch_key": "consumer-hardware-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "TCL空调事业部",
+      "hall_id": "consumer-hardware",
+      "sequence": 12,
+      "batch_key": "consumer-hardware-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "TCL白家电事业部",
+      "hall_id": "consumer-hardware",
+      "sequence": 13,
+      "batch_key": "consumer-hardware-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "海信显示事业部",
+      "hall_id": "consumer-hardware",
+      "sequence": 14,
+      "batch_key": "consumer-hardware-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "海信空气事业部",
+      "hall_id": "consumer-hardware",
+      "sequence": 15,
+      "batch_key": "consumer-hardware-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "海信冰冷事业部",
+      "hall_id": "consumer-hardware",
+      "sequence": 16,
+      "batch_key": "consumer-hardware-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "海信洗护事业部",
+      "hall_id": "consumer-hardware",
+      "sequence": 17,
+      "batch_key": "consumer-hardware-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "海信厨电事业部",
+      "hall_id": "consumer-hardware",
+      "sequence": 18,
+      "batch_key": "consumer-hardware-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "华为终端业务",
+      "hall_id": "consumer-hardware",
+      "sequence": 75,
+      "batch_key": "consumer-hardware-001-100",
+      "record_type": "business_unit"
+    }
+  ],
   "items": [
     {
       "id": "360集团",
@@ -483,6 +548,26 @@
           "sequence": 1,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "阿里斯顿中国",
+      "name": "阿里斯顿中国",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 131,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -594,6 +679,46 @@
       ]
     },
     {
+      "id": "艾比森(absen)",
+      "name": "艾比森（Absen）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 169,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "艾格斯特",
+      "name": "艾格斯特",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 133,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "艾迈斯欧司朗(amsosram)",
       "name": "艾迈斯欧司朗（ams OSRAM）",
       "industry_id": "semiconductor",
@@ -619,6 +744,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-global"
+        }
+      ]
+    },
+    {
+      "id": "艾美特电器",
+      "name": "艾美特电器",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 111,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -983,6 +1128,26 @@
       ]
     },
     {
+      "id": "安吉尔集团",
+      "name": "安吉尔集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 124,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "安集微电子",
       "name": "安集微电子",
       "industry_id": "semiconductor",
@@ -1126,7 +1291,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_consumer-hardware-001-100"
       ],
       "audit_references": [
         {
@@ -1134,6 +1300,14 @@
           "sequence": 8,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 61,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -1314,6 +1488,26 @@
       ]
     },
     {
+      "id": "奥佳华",
+      "name": "奥佳华",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 31,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "奥克斯集团",
       "name": "奥克斯集团",
       "industry_id": "consumer-hardware",
@@ -1333,7 +1527,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_consumer-hardware-001-100"
       ],
       "audit_references": [
         {
@@ -1341,6 +1536,34 @@
           "sequence": 13,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 32,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "奥拓电子",
+      "name": "奥拓电子",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 170,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -1370,6 +1593,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "澳柯玛股份",
+      "name": "澳柯玛股份",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 101,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -1482,6 +1725,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "北鼎股份",
+      "name": "北鼎股份",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 28,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -2258,6 +2521,46 @@
       ]
     },
     {
+      "id": "倍轻松科技",
+      "name": "倍轻松科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 112,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "倍思科技(baseus)",
+      "name": "倍思科技（Baseus）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 81,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "奔驰中国",
       "name": "奔驰中国",
       "industry_id": "automotive",
@@ -2283,6 +2586,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ]
+    },
+    {
+      "id": "本末科技(directdrive)",
+      "name": "本末科技（Direct Drive）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 155,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -2349,6 +2672,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-fab"
+        }
+      ]
+    },
+    {
+      "id": "比亚迪电子",
+      "name": "比亚迪电子",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 97,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -2471,6 +2814,26 @@
       ]
     },
     {
+      "id": "博联智能(broadlink)",
+      "name": "博联智能（BroadLink）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 115,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "博世华域转向系统有限公司",
       "name": "博世华域转向系统有限公司",
       "industry_id": "automotive",
@@ -2548,6 +2911,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "博西家电中国",
+      "name": "博西家电中国",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 103,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -2991,7 +3374,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_consumer-hardware-001-100"
       ],
       "audit_references": [
         {
@@ -2999,6 +3383,34 @@
           "sequence": 4,
           "preview_status": "pending",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 85,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "创维集团",
+      "name": "创维集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 8,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -3028,6 +3440,86 @@
         {
           "hall_id": "automotive",
           "code": "auto-ev"
+        }
+      ]
+    },
+    {
+      "id": "创维数字",
+      "name": "创维数字",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 9,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "创想三维(creality)",
+      "name": "创想三维（Creality）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 87,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "春秋电子",
+      "name": "春秋电子",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 194,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "纯米科技",
+      "name": "纯米科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 114,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -3106,7 +3598,39 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "related_hall_ids": [
+        "consumer-hardware"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 63,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "大金空调中国",
+      "name": "大金空调中国",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 118,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -3181,6 +3705,26 @@
           "relationship_hint": "集团合资体系关联；非全部为控股子公司",
           "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "当贝网络",
+      "name": "当贝网络",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 84,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -3321,13 +3865,24 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_335"
+        "draft_pr_335",
+        "historic_chat_consumer-hardware-001-100"
       ],
-      "related_hall_ids": [],
+      "related_hall_ids": [
+        "consumer-hardware"
+      ],
       "sections": [
         {
           "hall_id": "energy",
           "code": "energy-equipment"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 51,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -3378,6 +3933,26 @@
       ]
     },
     {
+      "id": "德施曼",
+      "name": "德施曼",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 46,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "德业股份",
       "name": "德业股份",
       "industry_id": "energy",
@@ -3403,6 +3978,46 @@
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ]
+    },
+    {
+      "id": "德业环境电器",
+      "name": "德业环境电器",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 19,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "德意智家",
+      "name": "德意智家",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 106,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -4809,6 +5424,26 @@
       ]
     },
     {
+      "id": "东山精密",
+      "name": "东山精密",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 189,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "恩智浦(nxp)",
       "name": "恩智浦（NXP）",
       "industry_id": "semiconductor",
@@ -4896,6 +5531,46 @@
       ]
     },
     {
+      "id": "方太集团",
+      "name": "方太集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 21,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "飞傲电子(fiio)",
+      "name": "飞傲电子（FiiO）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 68,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "飞碟汽车",
       "name": "飞碟汽车",
       "industry_id": "automotive",
@@ -4945,6 +5620,26 @@
           "relationship_hint": "集团整车业务（具体股权/合作类型按逐家核实）",
           "source_url": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "飞荣达",
+      "name": "飞荣达",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 196,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -5038,6 +5733,46 @@
       ]
     },
     {
+      "id": "芬尼科技",
+      "name": "芬尼科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 126,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "奋达科技",
+      "name": "奋达科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 91,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "丰田纺织中国",
       "name": "丰田纺织中国",
       "industry_id": "automotive",
@@ -5092,6 +5827,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ]
+    },
+    {
+      "id": "峰米科技(formovie)",
+      "name": "峰米科技（Formovie）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 163,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -5479,6 +6234,26 @@
       ]
     },
     {
+      "id": "傅里叶半导体",
+      "name": "傅里叶半导体",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 180,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "富瀚微",
       "name": "富瀚微",
       "industry_id": "semiconductor",
@@ -5504,6 +6279,46 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "富瀚微电子",
+      "name": "富瀚微电子",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 179,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "富士康科技集团",
+      "name": "富士康科技集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 182,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -5537,6 +6352,26 @@
       ]
     },
     {
+      "id": "高擎动力",
+      "name": "高擎动力",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 160,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "高通(qualcomm)",
       "name": "高通（Qualcomm）",
       "industry_id": "semiconductor",
@@ -5566,6 +6401,26 @@
       ]
     },
     {
+      "id": "高仙机器人(gausium)",
+      "name": "高仙机器人（Gausium）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 141,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "歌尔股份",
       "name": "歌尔股份",
       "industry_id": "semiconductor",
@@ -5583,7 +6438,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_consumer-hardware-001-100"
       ],
       "audit_references": [
         {
@@ -5591,6 +6447,17 @@
           "sequence": 23,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "related_hall_ids": [
+        "consumer-hardware"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 64,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -5624,6 +6491,26 @@
       ]
     },
     {
+      "id": "格兰仕集团",
+      "name": "格兰仕集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 105,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "格雷博智能动力",
       "name": "格雷博智能动力",
       "industry_id": "automotive",
@@ -5653,6 +6540,26 @@
       ]
     },
     {
+      "id": "格力博",
+      "name": "格力博",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 20,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "格力电器",
       "name": "格力电器",
       "industry_id": "consumer-hardware",
@@ -5670,7 +6577,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_consumer-hardware-001-100"
       ],
       "audit_references": [
         {
@@ -5678,6 +6586,14 @@
           "sequence": 20,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 4,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -5701,6 +6617,46 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "公牛集团",
+      "name": "公牛集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 39,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "共达电声",
+      "name": "共达电声",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 92,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -5779,6 +6735,26 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "光峰科技",
+      "name": "光峰科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 69,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -5888,6 +6864,26 @@
           "relationship_hint": "广汽集团官网企业名录：金融与数字化",
           "source_url": "https://www.gacgroup.com/cn/companies",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "广东奥马冰箱",
+      "name": "广东奥马冰箱",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 102,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -6058,6 +7054,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-eda"
+        }
+      ]
+    },
+    {
+      "id": "广联智通(gl.inet)",
+      "name": "广联智通（GL.iNet）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 116,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -7534,6 +8550,26 @@
       ]
     },
     {
+      "id": "国光电器",
+      "name": "国光电器",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 192,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "国核(福建)核电",
       "name": "国核（福建）核电",
       "industry_id": "energy",
@@ -8118,6 +9154,26 @@
       ]
     },
     {
+      "id": "国星光电",
+      "name": "国星光电",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 175,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "国轩高科",
       "name": "国轩高科",
       "industry_id": "automotive",
@@ -8337,6 +9393,26 @@
       ]
     },
     {
+      "id": "海尔集团",
+      "name": "海尔集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 1,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "海尔智家",
       "name": "海尔智家",
       "industry_id": "consumer-hardware",
@@ -8353,7 +9429,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 2,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -8431,7 +9516,39 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "related_hall_ids": [
+        "consumer-hardware"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 48,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "海康微影",
+      "name": "海康微影",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 49,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -8493,6 +9610,26 @@
       ]
     },
     {
+      "id": "海柔创新(hairobotics)",
+      "name": "海柔创新（HAI ROBOTICS）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 159,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "海思半导体",
       "name": "海思半导体",
       "industry_id": "semiconductor",
@@ -8511,13 +9648,24 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_336"
+        "draft_pr_336",
+        "historic_chat_consumer-hardware-001-100"
       ],
-      "related_hall_ids": [],
+      "related_hall_ids": [
+        "consumer-hardware"
+      ],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 80,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -8616,7 +9764,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_consumer-hardware-001-100"
       ],
       "audit_references": [
         {
@@ -8624,6 +9773,14 @@
           "sequence": 5,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 5,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -8735,6 +9892,26 @@
       ]
     },
     {
+      "id": "汉王科技",
+      "name": "汉王科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 138,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "杭州银行",
       "name": "杭州银行",
       "industry_id": "finance",
@@ -8799,6 +9976,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "好太太集团",
+      "name": "好太太集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 135,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -8930,6 +10127,26 @@
       "portals": [],
       "source_datasets": [
         "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "和而泰",
+      "name": "和而泰",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 90,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -9211,6 +10428,26 @@
       ]
     },
     {
+      "id": "鸿合科技",
+      "name": "鸿合科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 137,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "湖南天雁机械股份有限公司",
       "name": "湖南天雁机械股份有限公司",
       "industry_id": "automotive",
@@ -9310,6 +10547,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-eda"
+        }
+      ]
+    },
+    {
+      "id": "华帝股份",
+      "name": "华帝股份",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 26,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -9449,6 +10706,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-fab"
+        }
+      ]
+    },
+    {
+      "id": "华米科技(zepp)",
+      "name": "华米科技（Zepp）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 86,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -10406,6 +11683,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-analog"
+        }
+      ]
+    },
+    {
+      "id": "华勤",
+      "name": "华勤",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 82,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -11530,6 +12827,26 @@
       ]
     },
     {
+      "id": "惠而浦中国",
+      "name": "惠而浦中国",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 104,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "惠科股份",
       "name": "惠科股份",
       "industry_id": "semiconductor",
@@ -11613,6 +12930,26 @@
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ]
+    },
+    {
+      "id": "火星人厨具",
+      "name": "火星人厨具",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 121,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -11828,6 +13165,26 @@
       ]
     },
     {
+      "id": "极米科技(xgimi)",
+      "name": "极米科技（XGIMI）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 161,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "极星集团",
       "name": "极星集团",
       "industry_id": "automotive",
@@ -11848,6 +13205,66 @@
           "relationship_hint": "吉利官方披露持股及品牌体系，不等于全部控股子公司",
           "source_url": "https://global.geely.com/en/news/2026/geely-holding-group-sustainability-report-2025",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "极智嘉(geek+)",
+      "name": "极智嘉（Geek+）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 154,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "佳禾智能",
+      "name": "佳禾智能",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 191,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "坚果投影(火乐科技)",
+      "name": "坚果投影（火乐科技）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 162,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -12539,13 +13956,24 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_336"
+        "draft_pr_336",
+        "historic_chat_consumer-hardware-101-200"
       ],
-      "related_hall_ids": [],
+      "related_hall_ids": [
+        "consumer-hardware"
+      ],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-display"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 164,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -12647,6 +14075,26 @@
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ]
+    },
+    {
+      "id": "晶晨半导体(amlogic)",
+      "name": "晶晨半导体（Amlogic）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 178,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -12972,6 +14420,26 @@
       ]
     },
     {
+      "id": "九阳股份",
+      "name": "九阳股份",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 23,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "钜泉科技",
       "name": "钜泉科技",
       "industry_id": "semiconductor",
@@ -13030,6 +14498,26 @@
       ]
     },
     {
+      "id": "聚飞光电",
+      "name": "聚飞光电",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 174,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "均胜电子",
       "name": "均胜电子",
       "industry_id": "automotive",
@@ -13055,6 +14543,46 @@
         {
           "hall_id": "automotive",
           "code": "auto-electronics"
+        }
+      ]
+    },
+    {
+      "id": "开利空调中国",
+      "name": "开利空调中国",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 119,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "凯度电器",
+      "name": "凯度电器",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 110,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -13136,6 +14664,46 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-eda"
+        }
+      ]
+    },
+    {
+      "id": "康冠科技(ktc)",
+      "name": "康冠科技（KTC）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 165,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "康佳集团",
+      "name": "康佳集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 33,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -13283,7 +14851,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_consumer-hardware-101-200"
       ],
       "audit_references": [
         {
@@ -13291,6 +14860,17 @@
           "sequence": 7,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "related_hall_ids": [
+        "consumer-hardware"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 139,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -13425,6 +15005,26 @@
       ]
     },
     {
+      "id": "科沃斯机器人",
+      "name": "科沃斯机器人",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 36,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "快手",
       "name": "快手",
       "industry_id": "internet-ai",
@@ -13481,6 +15081,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "莱克电气",
+      "name": "莱克电气",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 29,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -13595,6 +15215,26 @@
       ]
     },
     {
+      "id": "蓝思科技",
+      "name": "蓝思科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 183,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "澜起科技",
       "name": "澜起科技",
       "industry_id": "semiconductor",
@@ -13620,6 +15260,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "朗科智能",
+      "name": "朗科智能",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 98,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -13663,7 +15323,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_consumer-hardware-001-100"
       ],
       "audit_references": [
         {
@@ -13671,6 +15332,74 @@
           "sequence": 15,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 22,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "乐橙(华橙网络)",
+      "name": "乐橙（华橙网络）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 44,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "乐动机器人(ldrobot)",
+      "name": "乐动机器人（LDROBOT）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 156,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "乐森机器人(robosen)",
+      "name": "乐森机器人（Robosen）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 158,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -13693,13 +15422,44 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_336"
+        "draft_pr_336",
+        "historic_chat_consumer-hardware-001-100"
       ],
-      "related_hall_ids": [],
+      "related_hall_ids": [
+        "consumer-hardware"
+      ],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 100,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "雷柏科技",
+      "name": "雷柏科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 77,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -13733,6 +15493,26 @@
       ]
     },
     {
+      "id": "雷鸟创新(rayneo)",
+      "name": "雷鸟创新（RayNeo）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 65,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "雷赛智能",
       "name": "雷赛智能",
       "industry_id": "manufacturing",
@@ -13758,6 +15538,26 @@
           "sequence": 33,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "雷士照明",
+      "name": "雷士照明",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 54,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -13936,6 +15736,46 @@
       ]
     },
     {
+      "id": "立达信物联科技",
+      "name": "立达信物联科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 56,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "立升净水",
+      "name": "立升净水",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 132,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "立讯精密",
       "name": "立讯精密",
       "industry_id": "semiconductor",
@@ -13953,7 +15793,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_consumer-hardware-101-200"
       ],
       "audit_references": [
         {
@@ -13961,6 +15802,37 @@
           "sequence": 24,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "related_hall_ids": [
+        "consumer-hardware"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 181,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "利仁科技",
+      "name": "利仁科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 30,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -14014,6 +15886,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-global"
+        }
+      ]
+    },
+    {
+      "id": "联发科技中国(mediatek)",
+      "name": "联发科技中国（MediaTek）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 88,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -14121,7 +16013,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_consumer-hardware-001-100"
       ],
       "audit_references": [
         {
@@ -14129,6 +16022,14 @@
           "sequence": 2,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 76,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -14178,6 +16079,46 @@
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ]
+    },
+    {
+      "id": "灵伴科技(rokid)",
+      "name": "灵伴科技（Rokid）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 67,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "灵动科技(forwardx)",
+      "name": "灵动科技（ForwardX）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 148,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -14325,6 +16266,26 @@
       ]
     },
     {
+      "id": "领益智造",
+      "name": "领益智造",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 184,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "龙口东立电线电缆有限公司",
       "name": "龙口东立电线电缆有限公司",
       "industry_id": "energy",
@@ -14350,6 +16311,26 @@
         {
           "hall_id": "energy",
           "code": "energy-equipment"
+        }
+      ]
+    },
+    {
+      "id": "龙旗科技",
+      "name": "龙旗科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 83,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -14483,6 +16464,66 @@
           "sequence": 25,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "鹿客科技",
+      "name": "鹿客科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 47,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "绿联科技",
+      "name": "绿联科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 40,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "绿米联创(aqara)",
+      "name": "绿米联创（Aqara）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 42,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -14654,6 +16695,26 @@
       ]
     },
     {
+      "id": "麦克维尔空调",
+      "name": "麦克维尔空调",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 120,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "曼德电子电器有限公司",
       "name": "曼德电子电器有限公司",
       "industry_id": "automotive",
@@ -14673,6 +16734,26 @@
           "relationship_hint": "公开产业企业目录，需进一步与最新集团披露核对股权",
           "source_url": "https://changlianlian.cn/cluster/L-EXTRA-009?lang=en",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "漫步者(edifier)",
+      "name": "漫步者（Edifier）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 70,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -14886,7 +16967,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 3,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -14923,6 +17013,26 @@
       "portals": [],
       "source_datasets": [
         "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "美格智能",
+      "name": "美格智能",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 93,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -16193,6 +18303,26 @@
       ]
     },
     {
+      "id": "纽恩泰",
+      "name": "纽恩泰",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 127,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "农业银行",
       "name": "农业银行",
       "industry_id": "finance",
@@ -16238,6 +18368,46 @@
       ]
     },
     {
+      "id": "欧菲光(ofilm)",
+      "name": "欧菲光（OFILM）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 187,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "欧琳厨具",
+      "name": "欧琳厨具",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 117,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "欧派家居",
       "name": "欧派家居",
       "industry_id": "consumer-hardware",
@@ -16265,6 +18435,46 @@
           "sequence": 12,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "欧普照明",
+      "name": "欧普照明",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 53,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "欧瑞博",
+      "name": "欧瑞博",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 43,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -16347,6 +18557,26 @@
       ]
     },
     {
+      "id": "鹏鼎控股",
+      "name": "鹏鼎控股",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 188,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "鹏辉能源",
       "name": "鹏辉能源",
       "industry_id": "energy",
@@ -16372,6 +18602,26 @@
         {
           "hall_id": "energy",
           "code": "energy-storage"
+        }
+      ]
+    },
+    {
+      "id": "品胜电子(pisen)",
+      "name": "品胜电子（PISEN）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 198,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -16512,6 +18762,26 @@
       ]
     },
     {
+      "id": "普渡机器人",
+      "name": "普渡机器人",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 140,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "普朗克半导体",
       "name": "普朗克半导体",
       "industry_id": "semiconductor",
@@ -16537,6 +18807,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-equipment"
+        }
+      ]
+    },
+    {
+      "id": "七十迈科技",
+      "name": "七十迈科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 57,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -16830,6 +19120,46 @@
       ]
     },
     {
+      "id": "强脑科技(brainco)",
+      "name": "强脑科技（BrainCo）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 149,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "沁园集团",
+      "name": "沁园集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 125,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "青岛汉缆股份有限公司",
       "name": "青岛汉缆股份有限公司",
       "industry_id": "energy",
@@ -16945,6 +19275,26 @@
       ]
     },
     {
+      "id": "丘钛科技(qtechnology)",
+      "name": "丘钛科技（Q Technology）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 172,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "全芯智造",
       "name": "全芯智造",
       "industry_id": "semiconductor",
@@ -16992,13 +19342,24 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_336"
+        "draft_pr_336",
+        "historic_chat_consumer-hardware-101-200"
       ],
-      "related_hall_ids": [],
+      "related_hall_ids": [
+        "consumer-hardware"
+      ],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 177,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -17028,6 +19389,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-display"
+        }
+      ]
+    },
+    {
+      "id": "日出东方控股",
+      "name": "日出东方控股",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 128,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -17086,6 +19467,26 @@
           "sequence": 1,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "荣耀终端",
+      "name": "荣耀终端",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 73,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -17178,6 +19579,26 @@
       ]
     },
     {
+      "id": "瑞声科技(aac)",
+      "name": "瑞声科技（AAC）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 78,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "瑞芯微",
       "name": "瑞芯微",
       "industry_id": "semiconductor",
@@ -17203,6 +19624,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "瑞芯微电子(rockchip)",
+      "name": "瑞芯微电子（Rockchip）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 176,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -17505,6 +19946,26 @@
       ]
     },
     {
+      "id": "三雄极光",
+      "name": "三雄极光",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 50,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "三一集团",
       "name": "三一集团",
       "industry_id": "manufacturing",
@@ -17581,6 +20042,26 @@
         {
           "hall_id": "energy",
           "code": "energy-wind"
+        }
+      ]
+    },
+    {
+      "id": "森歌电器",
+      "name": "森歌电器",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 109,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -19650,6 +22131,26 @@
       ]
     },
     {
+      "id": "韶音科技(shokz)",
+      "name": "韶音科技（Shokz）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 71,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "舍弗勒中国",
       "name": "舍弗勒中国",
       "industry_id": "automotive",
@@ -20576,6 +23077,26 @@
       ]
     },
     {
+      "id": "施耐德电气中国",
+      "name": "施耐德电气中国",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 55,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "施耐德电气中国招聘",
       "name": "施耐德电气中国招聘",
       "industry_id": "energy",
@@ -20621,7 +23142,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 35,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -20712,6 +23242,26 @@
       ]
     },
     {
+      "id": "视源股份(cvte)",
+      "name": "视源股份（CVTE）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 136,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "首传微电子",
       "name": "首传微电子",
       "industry_id": "automotive",
@@ -20768,6 +23318,26 @@
           "sequence": 43,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "帅丰电器",
+      "name": "帅丰电器",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 108,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -20830,6 +23400,26 @@
       ]
     },
     {
+      "id": "水晶光电",
+      "name": "水晶光电",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 173,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "顺丰控股",
       "name": "顺丰控股",
       "industry_id": "logistics",
@@ -20875,6 +23465,46 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "舜宇光学科技",
+      "name": "舜宇光学科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 171,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "思岚科技(slamtec)",
+      "name": "思岚科技（SLAMTEC）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 146,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -21061,6 +23691,46 @@
       ]
     },
     {
+      "id": "四季沐歌",
+      "name": "四季沐歌",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 129,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "松下中国",
+      "name": "松下中国",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 79,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "松芝汽车空调",
       "name": "松芝汽车空调",
       "industry_id": "automotive",
@@ -21109,7 +23779,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_consumer-hardware-001-100"
       ],
       "audit_references": [
         {
@@ -21117,6 +23788,14 @@
           "sequence": 14,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 24,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -21175,6 +23854,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "拓邦股份",
+      "name": "拓邦股份",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 89,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -21569,6 +24268,26 @@
       ]
     },
     {
+      "id": "天键电声",
+      "name": "天键电声",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 197,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "天马微电子",
       "name": "天马微电子",
       "industry_id": "semiconductor",
@@ -21587,13 +24306,24 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_336"
+        "draft_pr_336",
+        "historic_chat_consumer-hardware-101-200"
       ],
-      "related_hall_ids": [],
+      "related_hall_ids": [
+        "consumer-hardware"
+      ],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-display"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 166,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -21623,6 +24353,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-material"
+        }
+      ]
+    },
+    {
+      "id": "添可智能",
+      "name": "添可智能",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 38,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -21774,6 +24524,26 @@
       ]
     },
     {
+      "id": "涂鸦智能",
+      "name": "涂鸦智能",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 41,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "皖能合肥发电有限公司",
       "name": "皖能合肥发电有限公司",
       "industry_id": "energy",
@@ -21861,6 +24631,26 @@
       ]
     },
     {
+      "id": "万和电气",
+      "name": "万和电气",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 123,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "万科集团",
       "name": "万科集团",
       "industry_id": "construction",
@@ -21892,6 +24682,26 @@
       ]
     },
     {
+      "id": "万魔声学(1more)",
+      "name": "万魔声学（1MORE）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 72,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "万向集团",
       "name": "万向集团",
       "industry_id": "automotive",
@@ -21917,6 +24727,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "王力安防",
+      "name": "王力安防",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 134,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -22057,13 +24887,24 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_336"
+        "draft_pr_336",
+        "historic_chat_consumer-hardware-101-200"
       ],
-      "related_hall_ids": [],
+      "related_hall_ids": [
+        "consumer-hardware"
+      ],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-display"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 167,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -22252,6 +25093,26 @@
       ]
     },
     {
+      "id": "未来穿戴(skg)",
+      "name": "未来穿戴（SKG）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 113,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "蔚来汽车",
       "name": "蔚来汽车",
       "industry_id": "automotive",
@@ -22353,6 +25214,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-adas"
+        }
+      ]
+    },
+    {
+      "id": "闻泰科技",
+      "name": "闻泰科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 186,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -22725,6 +25606,26 @@
       ]
     },
     {
+      "id": "仙工智能(seer)",
+      "name": "仙工智能（SEER）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 147,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "现代汽车中国",
       "name": "现代汽车中国",
       "industry_id": "automotive",
@@ -22853,7 +25754,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 60,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -22900,6 +25810,26 @@
           "sequence": 21,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "小熊电器",
+      "name": "小熊电器",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 25,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -23383,6 +26313,26 @@
       ]
     },
     {
+      "id": "欣旺达电子",
+      "name": "欣旺达电子",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 95,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "欣旺达动力",
       "name": "欣旺达动力",
       "industry_id": "automotive",
@@ -23408,6 +26358,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-battery"
+        }
+      ]
+    },
+    {
+      "id": "新宝股份",
+      "name": "新宝股份",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 27,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -23470,6 +26440,26 @@
       ]
     },
     {
+      "id": "信维通信",
+      "name": "信维通信",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 190,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "信义玻璃",
       "name": "信义玻璃",
       "industry_id": "automotive",
@@ -23524,6 +26514,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "星际元机器人",
+      "name": "星际元机器人",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 153,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -25179,6 +28189,26 @@
       ]
     },
     {
+      "id": "亿道信息",
+      "name": "亿道信息",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 94,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "亿华通",
       "name": "亿华通",
       "industry_id": "automotive",
@@ -25233,6 +28263,46 @@
         {
           "hall_id": "automotive",
           "code": "auto-adas"
+        }
+      ]
+    },
+    {
+      "id": "亿联网络",
+      "name": "亿联网络",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 58,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "亿田智能厨电",
+      "name": "亿田智能厨电",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 107,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -25839,6 +28909,66 @@
       ]
     },
     {
+      "id": "萤石网络",
+      "name": "萤石网络",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 45,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "瀛通通讯",
+      "name": "瀛通通讯",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 193,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "影石创新(insta360)",
+      "name": "影石创新（Insta360）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 62,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "甬矽电子",
       "name": "甬矽电子",
       "industry_id": "semiconductor",
@@ -25903,6 +29033,26 @@
           "sequence": 5,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "优必选科技(ubtech)",
+      "name": "优必选科技（UBTECH）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 144,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -26004,6 +29154,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-display"
+        }
+      ]
+    },
+    {
+      "id": "宇树科技(unitree)",
+      "name": "宇树科技（Unitree）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 142,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -26302,6 +29472,46 @@
       ]
     },
     {
+      "id": "越疆机器人(dobot)",
+      "name": "越疆机器人（DOBOT）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 143,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "云鲸智能",
+      "name": "云鲸智能",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 37,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "云南电网",
       "name": "云南电网",
       "industry_id": "energy",
@@ -26327,6 +29537,26 @@
         {
           "hall_id": "energy",
           "code": "energy-grid"
+        }
+      ]
+    },
+    {
+      "id": "云深处科技",
+      "name": "云深处科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 145,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -26707,6 +29937,46 @@
       ]
     },
     {
+      "id": "长虹佳华",
+      "name": "长虹佳华",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 10,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "长虹控股集团",
+      "name": "长虹控股集团",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 7,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "长江存储",
       "name": "长江存储",
       "industry_id": "semiconductor",
@@ -26834,6 +30104,26 @@
       ]
     },
     {
+      "id": "长盈精密",
+      "name": "长盈精密",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 185,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "长园科技集团2027校招",
       "name": "长园科技集团2027校招",
       "industry_id": "energy",
@@ -26941,6 +30231,26 @@
           "sequence": 28,
           "preview_status": "pending",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "兆威机电",
+      "name": "兆威机电",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 157,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -27094,6 +30404,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "浙江美大",
+      "name": "浙江美大",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 122,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -27356,6 +30686,26 @@
       ]
     },
     {
+      "id": "正泰居家",
+      "name": "正泰居家",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 52,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "正泰输配电",
       "name": "正泰输配电",
       "industry_id": "energy",
@@ -27410,6 +30760,26 @@
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ]
+    },
+    {
+      "id": "正崴精密(foxlink)",
+      "name": "正崴精密（Foxlink）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 200,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -27586,6 +30956,46 @@
       "portals": [],
       "source_datasets": [
         "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "智平方科技",
+      "name": "智平方科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 152,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "智元机器人",
+      "name": "智元机器人",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 150,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -31160,13 +34570,24 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_333"
+        "draft_pr_333",
+        "historic_chat_consumer-hardware-001-100"
       ],
-      "related_hall_ids": [],
+      "related_hall_ids": [
+        "consumer-hardware"
+      ],
       "sections": [
         {
           "hall_id": "automotive",
           "code": "auto-adas"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 99,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -31626,6 +35047,26 @@
       ]
     },
     {
+      "id": "洲明科技",
+      "name": "洲明科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 168,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "株洲时代新材料科技股份有限公司",
       "name": "株洲时代新材料科技股份有限公司",
       "industry_id": "logistics",
@@ -31651,6 +35092,26 @@
       "portals": [],
       "source_datasets": [
         "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "珠海冠宇",
+      "name": "珠海冠宇",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 96,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -31712,6 +35173,26 @@
       ]
     },
     {
+      "id": "逐际动力",
+      "name": "逐际动力",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 151,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "住理工汽车部件(广州)",
       "name": "住理工汽车部件（广州）",
       "industry_id": "automotive",
@@ -31741,6 +35222,26 @@
       ]
     },
     {
+      "id": "追觅科技",
+      "name": "追觅科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 34,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "卓胜微",
       "name": "卓胜微",
       "industry_id": "semiconductor",
@@ -31766,6 +35267,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-analog"
+        }
+      ]
+    },
+    {
+      "id": "卓翼科技",
+      "name": "卓翼科技",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 195,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -31857,6 +35378,26 @@
       ]
     },
     {
+      "id": "紫米电子(zmi)",
+      "name": "紫米电子（ZMI）",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 199,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "字节跳动",
       "name": "字节跳动",
       "industry_id": "internet-ai",
@@ -31874,6 +35415,26 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "a.o.史密斯中国",
+      "name": "A.O.史密斯中国",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-101-200",
+          "sequence": 130,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -32093,7 +35654,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 59,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -32266,6 +35836,26 @@
       ]
     },
     {
+      "id": "tcl实业",
+      "name": "TCL实业",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 6,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "tcl中环(tcl集团校招)",
       "name": "TCL中环（TCL集团校招）",
       "industry_id": "energy",
@@ -32311,15 +35901,46 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 74,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "xreal",
+      "name": "XREAL",
+      "industry_id": "consumer-hardware",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_consumer-hardware-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "consumer-hardware-001-100",
+          "sequence": 66,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     }
   ],
   "statistics": {
+    "recovered_name_rows": 200,
+    "recovered_business_units": 9,
     "automotive_research_nodes": 266,
     "automotive_research_brands": 36,
     "prior_audit_source_rows": 150,
-    "entities": 1165,
+    "entities": 1329,
     "unique_portal_urls": 826,
     "legacy_portals": 130,
     "candidate_portals": 793,
@@ -32337,7 +35958,7 @@
       "aerospace": 3,
       "logistics": 66,
       "construction": 6,
-      "consumer-hardware": 20,
+      "consumer-hardware": 184,
       "chem-materials": 3,
       "retail": 9,
       "agri-food": 9,
