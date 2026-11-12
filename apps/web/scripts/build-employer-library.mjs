@@ -74,6 +74,23 @@ for(const rel of relations.relations){
  if(row.industry_id==='uncategorized')row.industry_id=classify(rel.child,rel.industry);
  for(const alias of rel.aliases||[])if(alias&&!row.aliases.includes(alias))row.aliases.push(alias);
  if(!row.source_datasets.includes('domesticCompanyRelations'))row.source_datasets.push('domesticCompanyRelations');
+ // Existing, explicitly evidenced group portal belongs to the shared-ATS
+ // category. It is not a child-owned recruitment site or a live vacancy.
+ if(rel.groupRecruitmentPortalUrl){
+  const url=rel.groupRecruitmentPortalUrl,evidenceUrl=rel.groupRecruitmentPortalEvidenceUrl;
+  if(rel.recruitmentAuditStatus!=='GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC'||
+     typeof url!=='string'||!/^https:\/\//.test(url)||
+     typeof evidenceUrl!=='string'||!/^https:\/\//.test(evidenceUrl))
+   throw Error('INVALID_EXISTING_GROUP_CAREERS_EVIDENCE_'+id);
+  row.group_careers_sources=row.group_careers_sources||[];
+  if(!row.group_careers_sources.some(e=>e.url===url))
+   row.group_careers_sources.push({url,parent:rel.parent,evidence_url:evidenceUrl,
+    status:'group_shared_unverified_for_child',source_relation:rel.id});
+  if(!row.portals.some(p=>p.url===url))
+   row.portals.push({url,label:'集团共用招聘入口（非子公司独立官网）',
+    scope:'group_shared_candidate',status:'collected_unverified',
+    reviewed_on:null,evidence_url:evidenceUrl,source_relation:rel.id});
+ }
  // Never turn an inherited group portal into an independent child-company portal.
  entries.set(id,row);
 }
@@ -281,6 +298,42 @@ const targetTotal=Object.values(collectionTargets).reduce((a,b)=>a+b,0);
 const importedTotal=Object.values(totals).reduce((a,b)=>a+b,0);
 const missingByHall=Object.fromEntries(
  Object.entries(collectionTargets).map(([id,target])=>[id,target-totals[id]]));
+// Recover already-collected 2026-10 official recruitment evidence; no web search.
+// Do not import foreign-only destinations or bare company homepages as careers.
+const previousAutumnEvidence=load('domesticAutumnOfficialEvidence20261028.json');
+if(previousAutumnEvidence.version!==1||!previousAutumnEvidence.entries||
+   Object.keys(previousAutumnEvidence.entries).length!==12)
+ throw Error('INVALID_AUTUMN_OFFICIAL_EVIDENCE');
+const mainlandEvidenceNames=new Set(['毕马威','施耐德电气','鹰角网络','中国南方航空','顺丰','中国华能','中国大唐集团']);
+let previousEvidencePortalsAdded=0,previousEvidencePortalsExisting=0;
+for(const [sourceName,rec] of Object.entries(previousAutumnEvidence.entries)){
+ if(!mainlandEvidenceNames.has(sourceName)||!rec.officialRecruitment)continue;
+ const url=rec.officialRecruitment,evidenceUrl=rec.source;
+ if(!/^https:\/\//.test(url)||!/^https:\/\//.test(evidenceUrl))
+  throw Error('INVALID_PREVIOUS_CAREERS_EVIDENCE_'+sourceName);
+ const companyName=sourceName==='顺丰'&&entries.has(key('顺丰控股'))?'顺丰控股':sourceName;
+ const id=key(companyName);
+ const hall=classify(companyName,rec.industry);
+ const row=entries.get(id)||{id,name:companyName,
+  industry_id:hall==='uncategorized'?'internet-ai':hall,
+  parent_name:null,relation:null,aliases:[],portals:[],source_datasets:[]};
+ // The source document is authoritative for this link's provenance only;
+ // it is not sufficient to reclassify unrelated existing employers.
+ if(!row.source_datasets.includes('domesticAutumnOfficialEvidence20261028'))
+  row.source_datasets.push('domesticAutumnOfficialEvidence20261028');
+ row.prior_careers_evidence=row.prior_careers_evidence||[];
+ if(!row.prior_careers_evidence.some(e=>e.url===url))
+  row.prior_careers_evidence.push({url,evidence_url:evidenceUrl,
+   source_name:sourceName,reviewed_on:previousAutumnEvidence.reviewedOn});
+ if(!row.portals.some(p=>p.url===url)){
+  row.portals.push({url,label:'既有企业招聘来源（需复核可用性）',
+   scope:'search_candidate',status:'collected_unverified',
+   reviewed_on:null,evidence_url:evidenceUrl,
+   evidence_reviewed_on:previousAutumnEvidence.reviewedOn});
+  previousEvidencePortalsAdded++;
+ }else previousEvidencePortalsExisting++;
+ entries.set(id,row);
+}
 // Public first-party careers links found while recovering historical chat names.
 // Link ownership is sourced, but individual job availability remains unverified.
 const found=load('employerLibraryWebFoundPortals.json');
@@ -385,7 +438,9 @@ const output={schema_version:1,
   unimported_batch_records:targetTotal-importedTotal,
   target_by_hall:collectionTargets,imported_by_hall:totals,unimported_by_hall:missingByHall
  },research_brand_index:researchBrandIndex,historical_non_employer_index:historicalNonEmployerIndex,items,
- statistics:{source_backfill_rows:careersBackfill.records.length,source_backfill_added:backfillAdded,source_backfill_existing:backfillExisting,
+ statistics:{existing_group_link_associations:items.reduce((n,e)=>n+e.portals.filter(p=>p.scope==='group_shared_candidate'&&p.source_relation).length,0),
+  previous_official_evidence_added:previousEvidencePortalsAdded,previous_official_evidence_existing:previousEvidencePortalsExisting,
+  source_backfill_rows:careersBackfill.records.length,source_backfill_added:backfillAdded,source_backfill_existing:backfillExisting,
   education_public_research_candidates:educationResearch.entries.length,education_new_distinct_indexed:newlyIndexedEducation,
   recovered_name_rows:recoveredNameRows,recovered_business_units:historicalNonEmployerIndex.length,
   web_found_portals:webFoundCount,
