@@ -25,7 +25,7 @@ function mockDb({quota=false}={}){
    },
    async all(){
     if(sql.includes('GROUP BY industry_id'))return {results:[{industry_id:'automotive',records:353,linked:353,unique_urls:318,missing:0}]};
-    if(sql.startsWith('SELECT industry_id,recruitment_url'))return {results:[{industry_id:'automotive',recruitment_url:'https://jobs.existing.example/'}]};
+    if(sql.startsWith('SELECT industry_id,lower'))return {results:[{industry_id:'automotive',normalized:'https://jobs.existing.example',source_batch:'legacy'}]};
     return {results:[]};
    }};
  },async batch(statements){batches.push(statements);return statements.map(()=>({success:true,meta:{changes:1}}))}};
@@ -108,10 +108,43 @@ test('import rejects unsafe URLs and deduplicates current industry URLs in one D
  assert.deepEqual((( {inserted,skipped})=>({inserted,skipped}))(await result.json()),{inserted:1,skipped:2});
  assert.equal(db.batches.length,1);
  assert.equal(db.batches[0].length,2,'insert plus append-only audit');
- assert.equal(db.calls.filter(x=>x.startsWith('SELECT industry_id,recruitment_url')).length,1);
+ assert.equal(db.calls.filter(x=>x.startsWith('SELECT industry_id,lower')).length,1);
 }));
 test('quota errors fail visibly with 503 rather than showing synthetic numbers',()=>signed(async()=>{
  const db=mockDb({quota:true});
  const res=await onRequestGet({request:request('?mode=summary'),env:env(db)});
  assert.equal(res.status,503);assert.equal((await res.json()).error,'D1_DAILY_LIMIT_REACHED');
+}));
+
+test('100-row import uses one targeted read and only four multi-row write statements',()=>signed(async()=>{
+ const db=mockDb();
+ const rows=Array.from({length:100},(_,i)=>({industry_id:'internet-ai',enterprise:'测试'+i,recruitment_url:'https://jobs'+i+'.example.com'}));
+ const result=await onRequestPost({request:post({action:'import',upload_id:'b7e2028f-cc43-402e-9008-35736fa914e2',rows}),env:env(db)});
+ assert.equal(result.status,200);
+ const data=await result.json();
+ assert.equal(data.inserted,100);
+ assert.equal(data.duplicates,0);
+ assert.equal(data.replayed,0);
+ assert.equal(db.batches.length,2,'50 records per transaction');
+ assert.deepEqual(db.batches.map(b=>b.length),[2,2],'one INSERT and one audit statement per 50 rows');
+ assert.equal(db.calls.filter(x=>x.startsWith('SELECT industry_id,lower')).length,1);
+ assert.equal(db.calls.filter(x=>x.startsWith('INSERT INTO')).length,4);
+}));
+test('retry of partially written batch reports replayed as successful, never as duplicates',()=>signed(async()=>{
+ const db=mockDb();
+ const upload='b7e2028f-cc43-402e-9008-35736fa914e2';
+ const prior=db.prepare;
+ db.prepare=function(sql){
+  const stmt=prior.call(this,sql);
+  if(sql.startsWith('SELECT industry_id,lower')){
+   stmt.all=async()=>({results:[{industry_id:'automotive',normalized:'https://jobs.already.example',source_batch:'admin-import:'+upload}]});
+  }
+  return stmt;
+ };
+ const response=await onRequestPost({request:post({action:'import',upload_id:upload,
+  rows:[{industry_id:'automotive',enterprise:'已写入企业',recruitment_url:'https://jobs.already.example/'}]}),env:env(db)});
+ const data=await response.json();
+ assert.equal(data.inserted,0);
+ assert.equal(data.replayed,1);
+ assert.equal(data.duplicates,0);
 }));
