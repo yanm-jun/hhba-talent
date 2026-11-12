@@ -75,8 +75,8 @@
   "collection_coverage": {
     "definition": "历史聊天行业馆收集记录数。不是企业唯一实体数，也不是有效官方招聘链接数。",
     "target_total": 3800,
-    "imported_batch_records": 1400,
-    "unimported_batch_records": 2400,
+    "imported_batch_records": 1600,
+    "unimported_batch_records": 2200,
     "target_by_hall": {
       "automotive": 200,
       "semiconductor": 200,
@@ -112,7 +112,7 @@
       "chem-materials": 0,
       "retail": 0,
       "agri-food": 0,
-      "culture-media": 0,
+      "culture-media": 200,
       "education-research": 100
     },
     "unimported_by_hall": {
@@ -131,7 +131,7 @@
       "chem-materials": 200,
       "retail": 200,
       "agri-food": 200,
-      "culture-media": 200,
+      "culture-media": 0,
       "education-research": 100
     }
   },
@@ -537,6 +537,90 @@
       "sequence": 67,
       "batch_key": "education-research-001-100",
       "record_type": "business_unit"
+    },
+    {
+      "name": "腾讯游戏",
+      "hall_id": "culture-media",
+      "sequence": 1,
+      "batch_key": "culture-media-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "网易游戏",
+      "hall_id": "culture-media",
+      "sequence": 2,
+      "batch_key": "culture-media-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "完美世界游戏",
+      "hall_id": "culture-media",
+      "sequence": 8,
+      "batch_key": "culture-media-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "吉比特／雷霆游戏",
+      "hall_id": "culture-media",
+      "sequence": 10,
+      "batch_key": "culture-media-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "心动网络／TapTap",
+      "hall_id": "culture-media",
+      "sequence": 20,
+      "batch_key": "culture-media-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "优酷／虎鲸文娱",
+      "hall_id": "culture-media",
+      "sequence": 22,
+      "batch_key": "culture-media-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "芒果TV",
+      "hall_id": "culture-media",
+      "sequence": 23,
+      "batch_key": "culture-media-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "抖音／字节跳动",
+      "hall_id": "culture-media",
+      "sequence": 25,
+      "batch_key": "culture-media-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "搜狐视频／搜狐集团",
+      "hall_id": "culture-media",
+      "sequence": 27,
+      "batch_key": "culture-media-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "新浪娱乐／新浪集团",
+      "hall_id": "culture-media",
+      "sequence": 28,
+      "batch_key": "culture-media-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "横店影视／横店集团",
+      "hall_id": "culture-media",
+      "sequence": 35,
+      "batch_key": "culture-media-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "蓝色光标／蓝标传媒",
+      "hall_id": "culture-media",
+      "sequence": 41,
+      "batch_key": "culture-media-001-100",
+      "record_type": "business_unit"
     }
   ],
   "items": [
@@ -588,6 +672,26 @@
           "sequence": 2,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "4399游戏",
+      "name": "4399 游戏",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 106,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -1035,6 +1139,26 @@
       ]
     },
     {
+      "id": "爱德曼中国",
+      "name": "爱德曼中国",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 150,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "爱尔眼科",
       "name": "爱尔眼科",
       "industry_id": "biomed",
@@ -1121,7 +1245,8 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_internet-ai-001-100"
+        "historic_chat_internet-ai-001-100",
+        "historic_chat_culture-media-001-100"
       ],
       "historical_source_records": [
         {
@@ -1129,7 +1254,16 @@
           "sequence": 22,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 21,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "culture-media"
       ]
     },
     {
@@ -1886,6 +2020,26 @@
       ]
     },
     {
+      "id": "奥飞娱乐/奥飞游戏",
+      "name": "奥飞娱乐／奥飞游戏",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 122,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "奥佳华",
       "name": "奥佳华",
       "industry_id": "consumer-hardware",
@@ -1940,6 +2094,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 32,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "奥美中国",
+      "name": "奥美中国",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 52,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -2144,6 +2318,26 @@
       ]
     },
     {
+      "id": "百纳千成影视",
+      "name": "百纳千成影视",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 132,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "百年人寿",
       "name": "百年人寿",
       "industry_id": "finance",
@@ -2281,6 +2475,46 @@
         {
           "batch_key": "manufacturing-001-100",
           "sequence": 96,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "保利文化集团",
+      "name": "保利文化集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 86,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "保利影业",
+      "name": "保利影业",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 37,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -2619,6 +2853,26 @@
       ]
     },
     {
+      "id": "北京出版集团",
+      "name": "北京出版集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 162,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "北京东方京海电子科技有限公司",
       "name": "北京东方京海电子科技有限公司",
       "industry_id": "energy",
@@ -2710,6 +2964,26 @@
           "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
           "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京广播电视台",
+      "name": "北京广播电视台",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 197,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -2937,6 +3211,26 @@
           "relationship_hint": "北汽集团主要汽车及零部件企业",
           "source_url": "https://www.baicgroup.com.cn/baicgroup/ComeIn/Profile/A160002001Gone1.html",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "北京日报社/北京日报报业集团",
+      "name": "北京日报社／北京日报报业集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 181,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -3472,7 +3766,8 @@
       ],
       "source_datasets": [
         "preview_audit_B05",
-        "historic_chat_internet-ai-001-100"
+        "historic_chat_internet-ai-001-100",
+        "historic_chat_culture-media-001-100"
       ],
       "audit_references": [
         {
@@ -3489,6 +3784,12 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 11,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 24,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -3538,6 +3839,46 @@
         {
           "batch_key": "education-research-001-100",
           "sequence": 16,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "冰川网络",
+      "name": "冰川网络",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 109,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "波克城市",
+      "name": "波克城市",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 108,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -3636,6 +3977,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 115,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "博纳影业",
+      "name": "博纳影业",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 36,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -3777,6 +4138,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 103,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "博雅公关burson",
+      "name": "博雅公关 Burson",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 151,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -4111,6 +4492,86 @@
       ]
     },
     {
+      "id": "成都传媒产业集团",
+      "name": "成都传媒产业集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 182,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "成都国际传媒有限公司",
+      "name": "成都国际传媒有限公司",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 183,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "成都每经传媒有限公司",
+      "name": "成都每经传媒有限公司",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 186,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "成都新闻实业有限责任公司",
+      "name": "成都新闻实业有限责任公司",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 185,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "成都银行",
       "name": "成都银行",
       "industry_id": "finance",
@@ -4361,6 +4822,26 @@
       ]
     },
     {
+      "id": "创梦天地",
+      "name": "创梦天地",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 15,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "创维集团",
       "name": "创维集团",
       "industry_id": "consumer-hardware",
@@ -4484,6 +4965,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 114,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "慈文传媒",
+      "name": "慈文传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 32,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -4708,6 +5209,26 @@
           "relationship_hint": "广汽集团官网企业名录：三电、充电能源",
           "source_url": "https://www.gacgroup.com/cn/companies",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "大众报业集团",
+      "name": "大众报业集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 94,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -5287,6 +5808,46 @@
       ]
     },
     {
+      "id": "点点互动centurygames",
+      "name": "点点互动 Century Games",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 103,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "电魂网络",
+      "name": "电魂网络",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 116,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "电力规划设计总院",
       "name": "电力规划设计总院",
       "industry_id": "energy",
@@ -5312,6 +5873,26 @@
         {
           "hall_id": "energy",
           "code": "energy-engineering"
+        }
+      ]
+    },
+    {
+      "id": "电通中国",
+      "name": "电通中国",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 148,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -5374,6 +5955,26 @@
       ]
     },
     {
+      "id": "电子工业出版社",
+      "name": "电子工业出版社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 71,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "叠纸游戏",
       "name": "叠纸游戏",
       "industry_id": "internet-ai",
@@ -5382,7 +5983,8 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_internet-ai-001-100"
+        "historic_chat_internet-ai-001-100",
+        "historic_chat_culture-media-001-100"
       ],
       "historical_source_records": [
         {
@@ -5390,7 +5992,16 @@
           "sequence": 30,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 5,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "culture-media"
       ]
     },
     {
@@ -5500,6 +6111,26 @@
         {
           "batch_key": "finance-001-100",
           "sequence": 49,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "东道品牌创意",
+      "name": "东道品牌创意",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 144,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -6045,6 +6676,26 @@
       ],
       "source_datasets": [
         "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "东方明珠新媒体",
+      "name": "东方明珠新媒体",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 96,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -6792,6 +7443,66 @@
       ]
     },
     {
+      "id": "斗鱼直播",
+      "name": "斗鱼直播",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 40,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "读客文化",
+      "name": "读客文化",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 78,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "读者出版传媒",
+      "name": "读者出版传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 179,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "度小满",
       "name": "度小满",
       "industry_id": "finance",
@@ -6806,6 +7517,26 @@
         {
           "batch_key": "finance-001-100",
           "sequence": 95,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "多益网络",
+      "name": "多益网络",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 16,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -7189,7 +7920,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "historic_chat_culture-media-001-100"
       ],
       "audit_references": [
         {
@@ -7197,6 +7929,14 @@
           "sequence": 16,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 42,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -7431,6 +8171,46 @@
       ]
     },
     {
+      "id": "凤凰出版传媒集团",
+      "name": "凤凰出版传媒集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 63,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "凤凰新华书店集团",
+      "name": "凤凰新华书店集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 75,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "弗迪电池有限公司",
       "name": "弗迪电池有限公司",
       "industry_id": "energy",
@@ -7516,6 +8296,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-battery"
+        }
+      ]
+    },
+    {
+      "id": "福莱国际传播",
+      "name": "福莱国际传播",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 153,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -7661,6 +8461,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "福煦影视",
+      "name": "福煦影视",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 129,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -7916,6 +8736,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-eda"
+        }
+      ]
+    },
+    {
+      "id": "高等教育出版社",
+      "name": "高等教育出版社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 68,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -8550,6 +9390,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-adas"
+        }
+      ]
+    },
+    {
+      "id": "光线传媒",
+      "name": "光线传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 33,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -9540,6 +10400,26 @@
       ]
     },
     {
+      "id": "广西出版传媒集团",
+      "name": "广西出版传媒集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 66,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "广西电网",
       "name": "广西电网",
       "industry_id": "energy",
@@ -10168,6 +11048,26 @@
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ]
+    },
+    {
+      "id": "广州日报报业集团",
+      "name": "广州日报报业集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 187,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -11217,6 +12117,26 @@
       ]
     },
     {
+      "id": "果麦文化",
+      "name": "果麦文化",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 73,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "哈尔滨电气集团",
       "name": "哈尔滨电气集团",
       "industry_id": "energy",
@@ -11881,6 +12801,26 @@
       ]
     },
     {
+      "id": "海峡出版发行集团",
+      "name": "海峡出版发行集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 180,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "海信集团",
       "name": "海信集团",
       "industry_id": "consumer-hardware",
@@ -12062,6 +13002,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 138,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "汉威士中国",
+      "name": "汉威士中国",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 54,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -12755,6 +13715,26 @@
       ]
     },
     {
+      "id": "红星视频(成都)文化传媒有限公司",
+      "name": "红星视频（成都）文化传媒有限公司",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 184,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "宏华集团有限公司",
       "name": "宏华集团有限公司",
       "industry_id": "energy",
@@ -12813,6 +13793,26 @@
       ]
     },
     {
+      "id": "宏盟集团",
+      "name": "宏盟集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 56,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "鸿合科技",
       "name": "鸿合科技",
       "industry_id": "consumer-hardware",
@@ -12840,6 +13840,26 @@
       ],
       "related_hall_ids": [
         "education-research"
+      ]
+    },
+    {
+      "id": "湖北日报传媒集团",
+      "name": "湖北日报传媒集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 93,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -12886,6 +13906,26 @@
       ]
     },
     {
+      "id": "虎牙直播",
+      "name": "虎牙直播",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 39,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "华安基金",
       "name": "华安基金",
       "industry_id": "finance",
@@ -12925,6 +13965,26 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "华策影视",
+      "name": "华策影视",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 29,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -14152,6 +15212,26 @@
       ]
     },
     {
+      "id": "华强方特文化科技集团",
+      "name": "华强方特文化科技集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 121,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "华勤",
       "name": "华勤",
       "industry_id": "consumer-hardware",
@@ -14288,6 +15368,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-fab"
+        }
+      ]
+    },
+    {
+      "id": "华数集团",
+      "name": "华数集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 100,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -14559,6 +15659,26 @@
       ]
     },
     {
+      "id": "华扬联众",
+      "name": "华扬联众",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 45,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "华阳集团",
       "name": "华阳集团",
       "industry_id": "automotive",
@@ -14588,6 +15708,26 @@
       ]
     },
     {
+      "id": "华谊兄弟传媒",
+      "name": "华谊兄弟传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 138,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "华友钴业",
       "name": "华友钴业",
       "industry_id": "automotive",
@@ -14613,6 +15753,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-battery"
+        }
+      ]
+    },
+    {
+      "id": "华娱游戏",
+      "name": "华娱游戏",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 104,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -15281,6 +16441,26 @@
       ]
     },
     {
+      "id": "欢聚集团",
+      "name": "欢聚集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 85,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "欢聚集团yy",
       "name": "欢聚集团 YY",
       "industry_id": "internet-ai",
@@ -15475,6 +16655,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-analog"
+        }
+      ]
+    },
+    {
+      "id": "汇量科技",
+      "name": "汇量科技",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 51,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -16406,6 +17606,26 @@
       ]
     },
     {
+      "id": "江苏省广播电视总台",
+      "name": "江苏省广播电视总台",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 193,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "江苏天宝汽车电子有限公司",
       "name": "江苏天宝汽车电子有限公司",
       "industry_id": "automotive",
@@ -16884,6 +18104,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 77,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "金逸影视",
+      "name": "金逸影视",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 137,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -17520,7 +18760,8 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_internet-ai-001-100"
+        "historic_chat_internet-ai-001-100",
+        "historic_chat_culture-media-001-100"
       ],
       "historical_source_records": [
         {
@@ -17528,7 +18769,16 @@
           "sequence": 34,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 18,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "culture-media"
       ]
     },
     {
@@ -17699,6 +18949,46 @@
       ]
     },
     {
+      "id": "开心麻花",
+      "name": "开心麻花",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 87,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "凯度kantar",
+      "name": "凯度 Kantar",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 160,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "凯度电器",
       "name": "凯度电器",
       "industry_id": "consumer-hardware",
@@ -17767,6 +19057,26 @@
           "relationship_hint": "延锋官网所属企业信息（部分经历股权重组）",
           "source_url": "https://www.yanfeng.com/cn/xinxigongkai",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "恺英网络",
+      "name": "恺英网络",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 14,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -18284,6 +19594,26 @@
       ]
     },
     {
+      "id": "库洛游戏",
+      "name": "库洛游戏",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 7,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "快仓智能",
       "name": "快仓智能",
       "industry_id": "manufacturing",
@@ -18324,7 +19654,8 @@
       ],
       "source_datasets": [
         "preview_audit_B05",
-        "historic_chat_internet-ai-001-100"
+        "historic_chat_internet-ai-001-100",
+        "historic_chat_culture-media-001-100"
       ],
       "audit_references": [
         {
@@ -18338,6 +19669,35 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 8,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 26,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ],
+      "related_hall_ids": [
+        "culture-media"
+      ]
+    },
+    {
+      "id": "昆仑万维",
+      "name": "昆仑万维",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 118,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -19214,6 +20574,26 @@
       ]
     },
     {
+      "id": "利欧数字",
+      "name": "利欧数字",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 43,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "利仁科技",
       "name": "利仁科技",
       "industry_id": "consumer-hardware",
@@ -19262,7 +20642,8 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_internet-ai-001-100"
+        "historic_chat_internet-ai-001-100",
+        "historic_chat_culture-media-001-100"
       ],
       "historical_source_records": [
         {
@@ -19270,7 +20651,16 @@
           "sequence": 29,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 4,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "culture-media"
       ]
     },
     {
@@ -19591,6 +20981,26 @@
       ]
     },
     {
+      "id": "两点十分动漫",
+      "name": "两点十分动漫",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 127,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "临工重机",
       "name": "临工重机",
       "industry_id": "manufacturing",
@@ -19674,6 +21084,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 148,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "灵犀互娱",
+      "name": "灵犀互娱",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 102,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -20177,6 +21607,26 @@
       ]
     },
     {
+      "id": "罗德公关",
+      "name": "罗德公关",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 152,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "罗克韦尔自动化",
       "name": "罗克韦尔自动化",
       "industry_id": "manufacturing",
@@ -20463,6 +21913,26 @@
       ]
     },
     {
+      "id": "麦肯世界集团",
+      "name": "麦肯世界集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 155,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "曼德电子电器有限公司",
       "name": "曼德电子电器有限公司",
       "industry_id": "automotive",
@@ -20500,6 +21970,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 70,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "猫眼娱乐",
+      "name": "猫眼娱乐",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 139,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -20968,6 +22458,26 @@
       ]
     },
     {
+      "id": "咪咕音乐",
+      "name": "咪咕音乐",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 200,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "米哈游",
       "name": "米哈游",
       "industry_id": "internet-ai",
@@ -20976,7 +22486,8 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_internet-ai-001-100"
+        "historic_chat_internet-ai-001-100",
+        "historic_chat_culture-media-001-100"
       ],
       "historical_source_records": [
         {
@@ -20984,7 +22495,16 @@
           "sequence": 28,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 3,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "culture-media"
       ]
     },
     {
@@ -21155,6 +22675,26 @@
       ]
     },
     {
+      "id": "摩登天空",
+      "name": "摩登天空",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 83,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "摩尔线程",
       "name": "摩尔线程",
       "industry_id": "semiconductor",
@@ -21212,6 +22752,46 @@
           "relationship_hint": "富奥2026半年报列示的一汽集团关联主体（逐一核持股）",
           "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "磨铁文化",
+      "name": "磨铁文化",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 72,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "沐瞳科技",
+      "name": "沐瞳科技",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 11,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -21458,6 +23038,46 @@
           "relationship_hint": "广汽集团官网企业名录",
           "source_url": "https://www.gacgroup.com/cn/companies",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "南方报业传媒集团",
+      "name": "南方报业传媒集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 188,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "南方出版传媒",
+      "name": "南方出版传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 76,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -22288,6 +23908,26 @@
       ]
     },
     {
+      "id": "柠萌影视",
+      "name": "柠萌影视",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 30,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "纽恩泰",
       "name": "纽恩泰",
       "industry_id": "consumer-hardware",
@@ -22671,6 +24311,26 @@
       ]
     },
     {
+      "id": "澎湃新闻",
+      "name": "澎湃新闻",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 192,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "拼多多",
       "name": "拼多多",
       "industry_id": "internet-ai",
@@ -22962,6 +24622,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-equipment"
+        }
+      ]
+    },
+    {
+      "id": "七创社",
+      "name": "七创社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 130,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -23435,6 +25115,26 @@
       ]
     },
     {
+      "id": "青瓷游戏",
+      "name": "青瓷游戏",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 112,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "青岛汉缆股份有限公司",
       "name": "青岛汉缆股份有限公司",
       "industry_id": "energy",
@@ -23590,6 +25290,26 @@
       ]
     },
     {
+      "id": "清华大学出版社",
+      "name": "清华大学出版社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 70,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "清研精准",
       "name": "清研精准",
       "industry_id": "manufacturing",
@@ -23624,6 +25344,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 172,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "趣加funplus",
+      "name": "趣加 FunPlus",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 107,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -23748,6 +25488,126 @@
       ]
     },
     {
+      "id": "人民美术出版社",
+      "name": "人民美术出版社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 168,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "人民日报出版社",
+      "name": "人民日报出版社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 74,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "人民日报社",
+      "name": "人民日报社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 88,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "人民文学出版社",
+      "name": "人民文学出版社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 167,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "人民音乐出版社",
+      "name": "人民音乐出版社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 169,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "人民邮电出版社",
+      "name": "人民邮电出版社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 80,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "仁和会计教育",
       "name": "仁和会计教育",
       "industry_id": "education-research",
@@ -23837,6 +25697,26 @@
       ]
     },
     {
+      "id": "荣宝斋",
+      "name": "荣宝斋",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 174,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "荣耀",
       "name": "荣耀",
       "industry_id": "consumer-hardware",
@@ -23900,6 +25780,26 @@
         {
           "batch_key": "education-research-001-100",
           "sequence": 89,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "儒意电影",
+      "name": "儒意电影",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 134,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -24148,6 +26048,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "若森数字",
+      "name": "若森数字",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 125,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -24471,12 +26391,42 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_internet-ai-001-100"
+        "historic_chat_internet-ai-001-100",
+        "historic_chat_culture-media-001-100"
       ],
       "historical_source_records": [
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 33,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 9,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ],
+      "related_hall_ids": [
+        "culture-media"
+      ]
+    },
+    {
+      "id": "三人行传媒集团",
+      "name": "三人行传媒集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 141,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -24661,6 +26611,26 @@
       ]
     },
     {
+      "id": "散爆网络",
+      "name": "散爆网络",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 120,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "森歌电器",
       "name": "森歌电器",
       "industry_id": "consumer-hardware",
@@ -24826,6 +26796,26 @@
       ]
     },
     {
+      "id": "山东出版集团",
+      "name": "山东出版集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 64,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "山东电工电气集团2027校招",
       "name": "山东电工电气集团2027校招",
       "industry_id": "energy",
@@ -24911,6 +26901,26 @@
           "sequence": 29,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "山东广播电视台",
+      "name": "山东广播电视台",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 196,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -25174,6 +27184,46 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 46,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "商务印书馆",
+      "name": "商务印书馆",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 164,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "上海报业集团",
+      "name": "上海报业集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 91,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -25478,6 +27528,26 @@
       ]
     },
     {
+      "id": "上海广播电视台/smg",
+      "name": "上海广播电视台／SMG",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 194,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "上海国微芯芯",
       "name": "上海国微芯芯",
       "industry_id": "semiconductor",
@@ -25650,6 +27720,26 @@
           "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
           "source_url": "https://www.hasco-group.com/about/company.html/1000",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "上海美术电影制片厂",
+      "name": "上海美术电影制片厂",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 128,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -27294,6 +29384,26 @@
       ]
     },
     {
+      "id": "深圳报业集团",
+      "name": "深圳报业集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 190,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "深圳地铁集团",
       "name": "深圳地铁集团",
       "industry_id": "logistics",
@@ -27776,6 +29886,46 @@
       ]
     },
     {
+      "id": "生活读书新知三联书店",
+      "name": "生活·读书·新知三联书店",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 166,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "省广集团",
+      "name": "省广集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 44,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "圣邦微电子",
       "name": "圣邦微电子",
       "industry_id": "semiconductor",
@@ -27888,6 +30038,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-equipment"
+        }
+      ]
+    },
+    {
+      "id": "盛趣游戏",
+      "name": "盛趣游戏",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 12,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -28019,6 +30189,26 @@
       ]
     },
     {
+      "id": "时代出版传媒",
+      "name": "时代出版传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 175,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "时代光华(杭州)",
       "name": "时代光华（杭州）",
       "industry_id": "education-research",
@@ -28033,6 +30223,26 @@
         {
           "batch_key": "education-research-001-100",
           "sequence": 62,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "时趣互动",
+      "name": "时趣互动",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 147,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -28453,6 +30663,26 @@
       ]
     },
     {
+      "id": "思美传媒",
+      "name": "思美传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 146,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "思瑞浦",
       "name": "思瑞浦",
       "industry_id": "semiconductor",
@@ -28646,6 +30876,26 @@
       ]
     },
     {
+      "id": "四川日报报业集团",
+      "name": "四川日报报业集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 92,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "四方继保",
       "name": "四方继保",
       "industry_id": "energy",
@@ -28758,6 +31008,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 19,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "搜狐畅游",
+      "name": "搜狐畅游",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 105,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -29029,6 +31299,26 @@
       ]
     },
     {
+      "id": "太合音乐集团",
+      "name": "太合音乐集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 82,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "太原重工(太重集团)",
       "name": "太原重工（太重集团）",
       "industry_id": "manufacturing",
@@ -29118,6 +31408,26 @@
       ]
     },
     {
+      "id": "唐德影视",
+      "name": "唐德影视",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 31,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "涛思数据",
       "name": "涛思数据",
       "industry_id": "internet-ai",
@@ -29132,6 +31442,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 95,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "淘米网络",
+      "name": "淘米网络",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 115,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -29277,6 +31607,46 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 2,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "腾讯音乐娱乐集团",
+      "name": "腾讯音乐娱乐集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 81,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "梯影传媒",
+      "name": "梯影传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 58,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -29430,6 +31800,26 @@
       ]
     },
     {
+      "id": "天龙集团",
+      "name": "天龙集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 49,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "天马微电子",
       "name": "天马微电子",
       "industry_id": "semiconductor",
@@ -29484,6 +31874,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 93,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "天下秀",
+      "name": "天下秀",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 59,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -29916,6 +32326,46 @@
       ]
     },
     {
+      "id": "途游游戏",
+      "name": "途游游戏",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 110,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "外语教学与研究出版社",
+      "name": "外语教学与研究出版社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 161,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "豌豆思维",
       "name": "豌豆思维",
       "industry_id": "education-research",
@@ -30010,6 +32460,46 @@
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ]
+    },
+    {
+      "id": "万博宣伟",
+      "name": "万博宣伟",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 154,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "万达电影",
+      "name": "万达电影",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 34,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -30197,6 +32687,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 134,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "网龙网络",
+      "name": "网龙网络",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 119,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -31247,6 +33757,26 @@
       ]
     },
     {
+      "id": "西山居游戏",
+      "name": "西山居游戏",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 101,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "希赛网",
       "name": "希赛网",
       "industry_id": "education-research",
@@ -31261,6 +33791,26 @@
         {
           "batch_key": "education-research-001-100",
           "sequence": 94,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "喜马拉雅",
+      "name": "喜马拉雅",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 199,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -31459,7 +34009,8 @@
       ],
       "source_datasets": [
         "preview_audit_B05",
-        "historic_chat_internet-ai-001-100"
+        "historic_chat_internet-ai-001-100",
+        "historic_chat_culture-media-001-100"
       ],
       "audit_references": [
         {
@@ -31475,7 +34026,16 @@
           "sequence": 10,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 97,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "culture-media"
       ]
     },
     {
@@ -32232,6 +34792,26 @@
       ]
     },
     {
+      "id": "新潮传媒",
+      "name": "新潮传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 57,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "新达内教育",
       "name": "新达内教育",
       "industry_id": "education-research",
@@ -32364,6 +34944,86 @@
       ]
     },
     {
+      "id": "新华社",
+      "name": "新华社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 84,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "新华书店总店",
+      "name": "新华书店总店",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 173,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "新华网",
+      "name": "新华网",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 90,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "新华文轩",
+      "name": "新华文轩",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 178,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "新疆大全新能源股份有限公司",
       "name": "新疆大全新能源股份有限公司",
       "industry_id": "energy",
@@ -32389,6 +35049,26 @@
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ]
+    },
+    {
+      "id": "新经典文化",
+      "name": "新经典文化",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 163,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -32670,6 +35350,26 @@
       ]
     },
     {
+      "id": "星辉游戏",
+      "name": "星辉游戏",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 113,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "星火教育",
       "name": "星火教育",
       "industry_id": "education-research",
@@ -32895,6 +35595,26 @@
       ]
     },
     {
+      "id": "幸福蓝海影视",
+      "name": "幸福蓝海影视",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 140,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "徐工集团",
       "name": "徐工集团",
       "industry_id": "manufacturing",
@@ -33028,6 +35748,46 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "宣亚国际",
+      "name": "宣亚国际",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 47,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "玄机科技",
+      "name": "玄机科技",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 123,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -33864,6 +36624,26 @@
       ]
     },
     {
+      "id": "央视网",
+      "name": "央视网",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 38,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "扬子江药业集团",
       "name": "扬子江药业集团",
       "industry_id": "biomed",
@@ -33891,6 +36671,26 @@
           "sequence": 33,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "羊城晚报报业集团",
+      "name": "羊城晚报报业集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 189,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -33972,6 +36772,26 @@
       ]
     },
     {
+      "id": "阳狮集团",
+      "name": "阳狮集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 55,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "洋葱学园",
       "name": "洋葱学园",
       "industry_id": "education-research",
@@ -34017,6 +36837,26 @@
           "sequence": 33,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "耀客传媒",
+      "name": "耀客传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 133,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -34976,6 +37816,26 @@
       ]
     },
     {
+      "id": "艺画开天",
+      "name": "艺画开天",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 126,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "屹唐半导体",
       "name": "屹唐半导体",
       "industry_id": "semiconductor",
@@ -35030,6 +37890,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-electronics"
+        }
+      ]
+    },
+    {
+      "id": "易点天下",
+      "name": "易点天下",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 50,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -35213,6 +38093,26 @@
       ]
     },
     {
+      "id": "因赛集团",
+      "name": "因赛集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 48,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "银华基金",
       "name": "银华基金",
       "industry_id": "finance",
@@ -35298,6 +38198,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "引力传媒",
+      "name": "引力传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 46,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -35528,6 +38448,26 @@
       ]
     },
     {
+      "id": "英雄游戏",
+      "name": "英雄游戏",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 111,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "鹰角网络",
       "name": "鹰角网络",
       "industry_id": "internet-ai",
@@ -35536,7 +38476,8 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_internet-ai-001-100"
+        "historic_chat_internet-ai-001-100",
+        "historic_chat_culture-media-001-100"
       ],
       "historical_source_records": [
         {
@@ -35544,7 +38485,16 @@
           "sequence": 31,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 6,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "culture-media"
       ]
     },
     {
@@ -35653,6 +38603,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-packaging"
+        }
+      ]
+    },
+    {
+      "id": "咏声动漫",
+      "name": "咏声动漫",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 131,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -35817,6 +38787,26 @@
       ]
     },
     {
+      "id": "游卡网络",
+      "name": "游卡网络",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 117,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "游族网络",
       "name": "游族网络",
       "industry_id": "internet-ai",
@@ -35825,7 +38815,8 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_internet-ai-001-100"
+        "historic_chat_internet-ai-001-100",
+        "historic_chat_culture-media-001-100"
       ],
       "historical_source_records": [
         {
@@ -35833,7 +38824,16 @@
           "sequence": 36,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 13,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "culture-media"
       ]
     },
     {
@@ -36007,6 +39007,26 @@
       ]
     },
     {
+      "id": "元隆雅图",
+      "name": "元隆雅图",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 143,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "元戎启行",
       "name": "元戎启行",
       "industry_id": "automotive",
@@ -36032,6 +39052,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-adas"
+        }
+      ]
+    },
+    {
+      "id": "原力数字科技",
+      "name": "原力数字科技",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 124,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -36957,6 +39997,26 @@
       ]
     },
     {
+      "id": "长江出版传媒",
+      "name": "长江出版传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 176,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "长江存储",
       "name": "长江存储",
       "industry_id": "semiconductor",
@@ -36982,6 +40042,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-fab"
+        }
+      ]
+    },
+    {
+      "id": "长江日报报业集团",
+      "name": "长江日报报业集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 191,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -37169,6 +40249,46 @@
         {
           "hall_id": "energy",
           "code": "energy-equipment"
+        }
+      ]
+    },
+    {
+      "id": "掌趣科技",
+      "name": "掌趣科技",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 114,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "掌阅科技",
+      "name": "掌阅科技",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 79,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -37399,6 +40519,26 @@
       ]
     },
     {
+      "id": "浙江出版联合集团",
+      "name": "浙江出版联合集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 65,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "浙江方正电机",
       "name": "浙江方正电机",
       "industry_id": "automotive",
@@ -37424,6 +40564,46 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "浙江广播电视集团",
+      "name": "浙江广播电视集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 195,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "浙江华智数媒传媒股份有限公司",
+      "name": "浙江华智数媒传媒股份有限公司",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 198,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -37500,6 +40680,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 122,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "浙江日报报业集团",
+      "name": "浙江日报报业集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 95,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -37716,6 +40916,26 @@
         {
           "batch_key": "finance-001-100",
           "sequence": 18,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "浙文互联",
+      "name": "浙文互联",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 145,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -37942,7 +41162,8 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_internet-ai-001-100"
+        "historic_chat_internet-ai-001-100",
+        "historic_chat_culture-media-001-100"
       ],
       "historical_source_records": [
         {
@@ -37950,7 +41171,16 @@
           "sequence": 17,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 98,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "culture-media"
       ]
     },
     {
@@ -37979,6 +41209,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-equipment"
+        }
+      ]
+    },
+    {
+      "id": "挚文集团/陌陌",
+      "name": "挚文集团／陌陌",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 99,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -38028,6 +41278,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-fab"
+        }
+      ]
+    },
+    {
+      "id": "智度股份",
+      "name": "智度股份",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 142,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -39354,6 +42624,46 @@
       ]
     },
     {
+      "id": "中国出版集团",
+      "name": "中国出版集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 61,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国大百科全书出版社",
+      "name": "中国大百科全书出版社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 170,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中国大唐集团",
       "name": "中国大唐集团",
       "industry_id": "energy",
@@ -40014,6 +43324,26 @@
       ]
     },
     {
+      "id": "中国电影股份有限公司",
+      "name": "中国电影股份有限公司",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 136,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中国电子科技集团",
       "name": "中国电子科技集团",
       "industry_id": "semiconductor",
@@ -40115,6 +43445,26 @@
           "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
           "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "中国对外翻译有限公司",
+      "name": "中国对外翻译有限公司",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 171,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -40521,6 +43871,46 @@
           "sequence": 45,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国教育出版传媒集团",
+      "name": "中国教育出版传媒集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 67,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国科技出版传媒/科学出版社",
+      "name": "中国科技出版传媒／科学出版社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 69,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -41480,6 +44870,26 @@
       ]
     },
     {
+      "id": "中国日报社",
+      "name": "中国日报社",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 89,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中国三峡新能源(集团)股份有限公司",
       "name": "中国三峡新能源（集团）股份有限公司",
       "industry_id": "energy",
@@ -41906,6 +45316,26 @@
         {
           "batch_key": "telecom-001-100",
           "sequence": 49,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国图书进出口(集团)有限公司",
+      "name": "中国图书进出口（集团）有限公司",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 172,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -43095,6 +46525,26 @@
       ]
     },
     {
+      "id": "中华书局",
+      "name": "中华书局",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 165,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中环领先",
       "name": "中环领先",
       "industry_id": "semiconductor",
@@ -43532,6 +46982,26 @@
       ]
     },
     {
+      "id": "中南出版传媒集团",
+      "name": "中南出版传媒集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 77,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中能建建筑集团",
       "name": "中能建建筑集团",
       "industry_id": "energy",
@@ -43653,6 +47123,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 80,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中手游",
+      "name": "中手游",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 19,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -43848,6 +47338,26 @@
       ]
     },
     {
+      "id": "中文天地出版传媒",
+      "name": "中文天地出版传媒",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 177,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中芯国际",
       "name": "中芯国际",
       "industry_id": "semiconductor",
@@ -43892,6 +47402,26 @@
           "sequence": 43,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中信出版集团",
+      "name": "中信出版集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 62,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -44339,6 +47869,26 @@
       ]
     },
     {
+      "id": "追光动画",
+      "name": "追光动画",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 135,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "追觅科技",
       "name": "追觅科技",
       "industry_id": "consumer-hardware",
@@ -44564,6 +48114,26 @@
       ]
     },
     {
+      "id": "祖龙娱乐",
+      "name": "祖龙娱乐",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 17,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "作业帮",
       "name": "作业帮",
       "industry_id": "education-research",
@@ -44644,6 +48214,26 @@
       ]
     },
     {
+      "id": "akqa",
+      "name": "AKQA",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 157,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "astemo中国",
       "name": "Astemo 中国",
       "industry_id": "automotive",
@@ -44698,6 +48288,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-adas"
+        }
+      ]
+    },
+    {
+      "id": "ddb",
+      "name": "DDB",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 158,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -44791,6 +48401,26 @@
           "relationship_hint": "华域视觉官网所属企业（境外）",
           "source_url": "https://www.hascovision.com/disclosure-of-information",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "landor朗涛",
+      "name": "Landor 朗涛",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 159,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -45051,6 +48681,26 @@
       ]
     },
     {
+      "id": "tbwa腾迈",
+      "name": "TBWA 腾迈",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 156,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "tcl华星光电",
       "name": "TCL华星光电",
       "industry_id": "semiconductor",
@@ -45229,6 +48879,66 @@
       ]
     },
     {
+      "id": "vml伟门智威中国",
+      "name": "VML 伟门智威中国",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-101-200"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-101-200",
+          "sequence": 149,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "wpp集团",
+      "name": "WPP 集团",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 60,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "wppmedia中国",
+      "name": "WPP Media 中国",
+      "industry_id": "culture-media",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_culture-media-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "culture-media-001-100",
+          "sequence": 53,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "xreal",
       "name": "XREAL",
       "industry_id": "consumer-hardware",
@@ -45250,13 +48960,13 @@
     }
   ],
   "statistics": {
-    "recovered_name_rows": 700,
-    "recovered_business_units": 16,
+    "recovered_name_rows": 900,
+    "recovered_business_units": 28,
     "web_found_portals": 4,
     "automotive_research_nodes": 266,
     "automotive_research_brands": 36,
     "prior_audit_source_rows": 150,
-    "entities": 1762,
+    "entities": 1937,
     "unique_portal_urls": 830,
     "legacy_portals": 130,
     "candidate_portals": 797,
@@ -45278,7 +48988,7 @@
       "chem-materials": 3,
       "retail": 9,
       "agri-food": 9,
-      "culture-media": 2,
+      "culture-media": 177,
       "education-research": 95
     }
   }
