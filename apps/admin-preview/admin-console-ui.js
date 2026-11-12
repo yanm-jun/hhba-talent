@@ -36,7 +36,7 @@ if(location.hostname==='admin.hhba.work'){
   });
   actions.prepend(button('修改密码',()=>dialog.showModal()));
   actions.prepend(button('退出登录',async()=>{
-   if(!confirm('确认退出 HHBA 管理后台？'))return;
+   if(!window.confirm('确认退出 HHBA 管理后台？'))return;
    try{await request('logout',{})}catch{/* best-effort clear cookie on server */}
    location.replace('/login/');
   }));
