@@ -1,6 +1,6 @@
 // Original HHBA administrator console: employer resource library.
 const dom=id=>document.getElementById(id);
-const state={items:[],halls:[],hall:'all',term:'',page:0,editable:false,loaded:false,coverage:null,brandIndex:[],stats:null};
+const state={items:[],halls:[],hall:'all',term:'',status:'all',page:0,editable:false,loaded:false,coverage:null,brandIndex:[],stats:null};
 const PAGE_SIZE=40,api='/admin-preview/api/library';
 const button=(label,onClick,extra='')=>{
  const b=document.createElement('button');b.type='button';b.textContent=label;
@@ -19,9 +19,15 @@ function filtered(){
  const q=state.term.toLocaleLowerCase('zh-CN').replace(/\s/g,'');
  const matchingBrands=!q?[]:state.brandIndex.filter(b=>String(b.name||'').toLocaleLowerCase('zh-CN').includes(q));
  const relatedNames=new Set(matchingBrands.flatMap(b=>[b.parent_name,b.group_name]).filter(Boolean));
- return state.items.filter(x=>(state.hall==='all'||belongs(x,state.hall))&&
-  (!q||relatedNames.has(x.name)||[x.name,x.parent_name,...(x.aliases||[])].filter(Boolean)
-   .some(s=>String(s).toLocaleLowerCase('zh-CN').replace(/\s/g,'').includes(q))));
+ return state.items.filter(x=>{
+  if(state.hall!=='all'&&!belongs(x,state.hall))return false;
+  const portals=x.portals||[];
+  if(state.status==='missing'&&portals.length>0)return false;
+  if(state.status==='pending'&&!portals.some(p=>p.status==='collected_unverified'))return false;
+  if(state.status==='reviewed'&&!portals.some(p=>p.status==='legacy_reviewed'))return false;
+  return !q||relatedNames.has(x.name)||[x.name,x.parent_name,...(x.aliases||[])].filter(Boolean)
+   .some(s=>String(s).toLocaleLowerCase('zh-CN').replace(/\s/g,'').includes(q));
+ });
 }
 function renderHalls(){
  const root=dom('library-halls');root.replaceChildren();
@@ -200,6 +206,7 @@ function submitBulk(){
  }catch(e){showMessage(e.message);}
 }
 dom('library-search').addEventListener('input',e=>{state.term=e.target.value;state.page=0;render()});
+dom('library-source-filter').addEventListener('change',e=>{state.status=e.target.value;state.page=0;render()});
 dom('library-save').addEventListener('click',()=>void submit([inputRow()]));
 dom('library-import').addEventListener('click',submitBulk);
 dom('library-reload').addEventListener('click',()=>void refresh());
