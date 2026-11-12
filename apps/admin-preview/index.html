@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <meta name="theme-color" content="#f9faf9"/>
+  <meta name="theme-color" content="#f4f7fe"/>
   <meta name="robots" content="noindex,nofollow,noarchive"/>
   <meta name="description" content="汇方职场 HHBA 内部管理后台第一阶段只读预览：真实数据、统计口径与投资人展示。"/>
   <title>数据总览 · 汇方职场 HHBA 管理中心</title>
@@ -18,10 +18,10 @@
 <div class="app-shell" id="app">
   <aside class="sidebar" id="sidebar" aria-label="主导航">
     <div class="brand">
-      <div class="brand-mark" aria-hidden="true"><span>H</span></div>
-      <div class="brand-wordmark"><strong>HHBA</strong><small>汇方职场 · Management Console</small></div>
+      <div class="brand-mark" aria-hidden="true"><img src="./favicon.svg" alt=""/></div>
+      <div class="brand-wordmark"><strong>汇方职场</strong><small>HHBA · 管理中心</small></div>
     </div>
-    <div class="workspace-identity"><span class="workspace-icon">H</span><div><strong>HHBA Workspace</strong><small id="workspace-mode">开发预览</small></div><span class="workspace-chevron">⌄</span></div>
+    <div class="workspace-identity"><span class="workspace-icon" aria-hidden="true">管</span><div><strong>管理工作台</strong><small id="workspace-mode">开发预览</small></div><span class="workspace-chevron">⌄</span></div>
     <nav class="nav-area" aria-label="管理页面">
       <p class="nav-caption">WORKSPACE</p>
       <button type="button" class="nav-link is-active" data-view="overview" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.4"/><rect x="13" y="3" width="8" height="8" rx="1.4"/><rect x="3" y="13" width="8" height="8" rx="1.4"/><rect x="13" y="13" width="8" height="8" rx="1.4"/></svg> 数据总览</button>
@@ -39,7 +39,7 @@
       <div class="safety-note"><span class="safety-dot"></span><span id="sidebar-environment">独立预览环境</span></div>
       <p id="sidebar-data-state">私有指标需管理员授权<br/>仅展示汇总数据</p>
       <div class="sidebar-separator"></div>
-      <div class="account-row"><span class="avatar">H</span><div><strong>HHBA Team</strong><small id="sidebar-account-state">权限验证中</small></div><span class="account-more">···</span></div>
+      <div class="account-row"><span class="avatar">管</span><div><strong>汇方管理员</strong><small id="sidebar-account-state">权限验证中</small></div><span class="account-more">···</span></div>
     </div>
   </aside>
   <div class="mobile-dim" id="mobile-dim" hidden></div>
@@ -47,13 +47,13 @@
     <header class="topbar">
       <div class="crumb-group">
         <button id="mobile-menu" class="icon-btn mobile-menu" type="button" aria-label="打开导航" aria-expanded="false">☰</button>
-        <span class="top-workspace">HHBA Workspace</span><span class="slash">/</span><strong id="breadcrumb">数据总览</strong>
+        <span class="top-workspace">汇方职场 · 管理中心</span><span class="slash">/</span><strong id="breadcrumb">数据总览</strong>
       </div>
       <div class="top-actions">
         <span class="top-env" id="top-access-state"><span class="safety-dot"></span> 私有数据等待授权</span>
         <span class="top-divider"></span>
         <button type="button" class="ghost-btn" id="top-investor"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="13" rx="2"/><path d="M12 16v5M8 21h8"/></svg> 融资视图</button>
-        <span class="avatar avatar-small" aria-label="只读预览">H</span>
+        <span class="avatar avatar-small" aria-label="管理员">管</span>
       </div>
     </header>
     <main class="content-wrap" id="content">
