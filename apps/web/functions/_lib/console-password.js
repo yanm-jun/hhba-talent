@@ -149,14 +149,13 @@ export async function handleConsoleAuth({request,env},action){
   const session=action==='change'?await sessionRecord(request,env):null;
   if(action==='change'&&!session)return authError('ADMIN_PASSWORD_LOGIN_REQUIRED',401);
   const identifier=String(data.username||'').trim().toLowerCase();
-  if(action==='login'&&identifier!=='admin')return authError('LOGIN_INVALID',401);
   if(typeof data.password!=='string'||data.password.length>128)return authError('LOGIN_INVALID',401);
   const key=await throttleKey(request,env);
   const state=await getThrottle(db,key);
   if(state.locked)return authError('LOGIN_RATE_LIMITED',429);
   const account=await owner(db);
   if(!account)return authError('SETUP_REQUIRED',409);
-  const verified=await verifyPassword(account,data.password);
+  const verified=(action!=='login'||identifier===String(account.username||'').trim().toLowerCase())&&await verifyPassword(account,data.password);
   if(!verified){await failedLogin(db,key);return authError('LOGIN_INVALID',401)}
   if(action==='change'){
    const next=data.newPassword;
