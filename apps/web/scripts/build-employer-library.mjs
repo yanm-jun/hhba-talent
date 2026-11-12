@@ -207,7 +207,10 @@ if(researchNonbrandCount!==230||researchBrandIndex.length!==36)
  throw Error('INVALID_AUTOMOTIVE_TYPE_TOTALS');
 // Restore name-only rows from prior chats. A name-only row MUST NOT invent a
 // recruitment portal, nor count a business division as an independent company.
-const historicalNames=load('employerLibraryRecoveredChatNames.json');
+const baseRecovered=load('employerLibraryRecoveredChatNames.json');
+const supplementalRecovered=load('employerLibraryRecoveredChatNamesSupplement.json');
+if(supplementalRecovered.schema_version!==1||!Array.isArray(supplementalRecovered.batches))throw Error('INVALID_SUPPLEMENTAL_CHAT_NAMES');
+const historicalNames={...baseRecovered,batches:[...baseRecovered.batches,...supplementalRecovered.batches]};
 if(historicalNames.schema_version!==1||!Array.isArray(historicalNames.batches))
  throw Error('INVALID_RECOVERED_CHAT_NAMES');
 const historicalNonEmployerIndex=[];
