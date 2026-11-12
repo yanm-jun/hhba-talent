@@ -263,6 +263,29 @@ const targetTotal=Object.values(collectionTargets).reduce((a,b)=>a+b,0);
 const importedTotal=Object.values(totals).reduce((a,b)=>a+b,0);
 const missingByHall=Object.fromEntries(
  Object.entries(collectionTargets).map(([id,target])=>[id,target-totals[id]]));
+// Public first-party careers links found while recovering historical chat names.
+// Link ownership is sourced, but individual job availability remains unverified.
+const found=load('employerLibraryWebFoundPortals.json');
+if(found.schema_version!==1||!Array.isArray(found.records))throw Error('INVALID_WEB_FOUND_PORTALS');
+let webFoundCount=0;
+for(const source of found.records){
+ if(!source.name||!halls.some(([id])=>id===source.hall_id)||
+    typeof source.url!=='string'||!/^https:\/\//.test(source.url)||
+    typeof source.evidence_url!=='string'||!/^https:\/\//.test(source.evidence_url))
+  throw Error('INVALID_WEB_FOUND_PORTAL_ROW');
+ const id=key(source.name),row=entries.get(id);
+ if(!row)throw Error('WEB_FOUND_UNKNOWN_COMPANY_'+id);
+ const label='web_found_careers_2026-11-12';
+ if(!row.source_datasets.includes(label))row.source_datasets.push(label);
+ if(!row.portals.some(p=>p.url===source.url)){
+  row.portals.push({url:source.url,label:'企业官网招聘入口（需持续复核）',
+   scope:'search_candidate',status:'collected_unverified',reviewed_on:null,
+   evidence_url:source.evidence_url,observed_on:source.observed_on,
+   source_kind:source.source_kind});
+  webFoundCount++;
+ }
+ entries.set(id,row);
+}
 const items=[...entries.values()].sort((a,b)=>a.name.localeCompare(b.name,'zh-CN'));
 const unknown=items.filter(e=>e.industry_id==='uncategorized').map(e=>e.name);
 const output={schema_version:1,
@@ -275,6 +298,7 @@ const output={schema_version:1,
   target_by_hall:collectionTargets,imported_by_hall:totals,unimported_by_hall:missingByHall
  },research_brand_index:researchBrandIndex,historical_non_employer_index:historicalNonEmployerIndex,items,
  statistics:{recovered_name_rows:recoveredNameRows,recovered_business_units:historicalNonEmployerIndex.length,
+  web_found_portals:webFoundCount,
   automotive_research_nodes:automotiveResearch.nodes.length,automotive_research_brands:researchBrandIndex.length,
   prior_audit_source_rows:prior.records.length,entities:items.length,
   unique_portal_urls:new Set(items.flatMap(e=>e.portals.map(p=>p.url))).size,legacy_portals:items.reduce((n,e)=>n+e.portals.filter(p=>p.status==='legacy_reviewed').length,0),
