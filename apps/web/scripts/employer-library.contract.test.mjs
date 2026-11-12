@@ -320,3 +320,25 @@ test('restores already-reviewed mainland careers sources without inventing empty
    x.evidence_url===rec.source),name);
  }
 });
+
+test('recovers existing employer profile career URLs without fabricating coverage',()=>{
+ const profiles=[
+  ['domesticCareerProfiles.json','domesticCareerProfiles'],
+  ['domesticCompanyExpansion200Profiles.json','domesticCompanyExpansion200Profiles']
+ ];
+ const src=profiles.flatMap(([file,dataset])=>Object.entries(read(file))
+  .filter(([name,profile])=>!!profile.careersUrl)
+  .map(([name,profile])=>({name,url:profile.careersUrl,dataset})));
+ assert.equal(src.length,66);
+ assert.equal(seed.statistics.legacy_profile_source_rows,src.length);
+ assert.equal(seed.statistics.legacy_profile_urls_added+
+  seed.statistics.legacy_profile_urls_existing+
+  seed.statistics.legacy_profile_unclassified,src.length);
+ for(const row of src){
+  const employer=seed.items.find(x=>x.id===norm(row.name));
+  if(!employer)continue;
+  assert.ok(employer.portals.some(p=>p.url===row.url),row.name);
+  assert.ok(employer.legacy_profile_careers_sources?.some(x=>x.url===row.url&&
+    x.source_dataset===row.dataset),row.name);
+ }
+});
