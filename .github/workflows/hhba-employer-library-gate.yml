@@ -8,6 +8,7 @@ on:
       - 'apps/web/functions/api/match-native/**'
       - 'apps/web/functions/admin-preview/api/library.js'
       - 'apps/web/src/data/employerLibraryCandidateBatches.json'
+      - 'apps/web/src/data/employerLibraryRecoveredChatNamesSupplement.json'
       - 'apps/web/public/data/employer-library.json'
       - 'apps/web/scripts/build-employer-library.mjs'
       - 'apps/web/scripts/employer-library.contract.test.mjs'
@@ -35,6 +36,8 @@ jobs:
           node --check apps/web/functions/admin-preview/api/library.js
           node --check 'apps/web/functions/api/match-native/[[path]].js'
           python3 -m py_compile apps/web/scripts/cloudflare-pages-build.py
+      - name: Rebuild deterministic employer library index
+        run: node apps/web/scripts/build-employer-library.mjs
       - name: Test classifications and original console
         run: |
           node --test apps/web/scripts/employer-library.contract.test.mjs
