@@ -75,8 +75,8 @@
   "collection_coverage": {
     "definition": "历史聊天行业馆收集记录数。不是企业唯一实体数，也不是有效官方招聘链接数。",
     "target_total": 3800,
-    "imported_batch_records": 1100,
-    "unimported_batch_records": 2700,
+    "imported_batch_records": 1200,
+    "unimported_batch_records": 2600,
     "target_by_hall": {
       "automotive": 200,
       "semiconductor": 200,
@@ -113,7 +113,7 @@
       "retail": 0,
       "agri-food": 0,
       "culture-media": 0,
-      "education-research": 0
+      "education-research": 100
     },
     "unimported_by_hall": {
       "automotive": 0,
@@ -132,7 +132,7 @@
       "retail": 200,
       "agri-food": 200,
       "culture-media": 200,
-      "education-research": 200
+      "education-research": 100
     }
   },
   "research_brand_index": [
@@ -509,9 +509,57 @@
       "sequence": 76,
       "batch_key": "internet-ai-001-100",
       "record_type": "business_unit"
+    },
+    {
+      "name": "学堂在线（雨课堂）",
+      "hall_id": "education-research",
+      "sequence": 63,
+      "batch_key": "education-research-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "智慧树幼教平台",
+      "hall_id": "education-research",
+      "sequence": 65,
+      "batch_key": "education-research-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "魔学院",
+      "hall_id": "education-research",
+      "sequence": 66,
+      "batch_key": "education-research-001-100",
+      "record_type": "business_unit"
+    },
+    {
+      "name": "酷学院",
+      "hall_id": "education-research",
+      "sequence": 67,
+      "batch_key": "education-research-001-100",
+      "record_type": "business_unit"
     }
   ],
   "items": [
+    {
+      "id": "233网校",
+      "name": "233网校",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 42,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
     {
       "id": "360集团",
       "name": "360集团",
@@ -544,6 +592,26 @@
       ]
     },
     {
+      "id": "51talk",
+      "name": "51Talk",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 38,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "58同城集团",
       "name": "58同城集团",
       "industry_id": "internet-ai",
@@ -558,6 +626,46 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 24,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "阿虎医考",
+      "name": "阿虎医考",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 58,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "阿卡索外教网",
+      "name": "阿卡索外教网",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 84,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -1030,6 +1138,26 @@
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ]
+    },
+    {
+      "id": "爱学习教育集团",
+      "name": "爱学习教育集团",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 48,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -1649,6 +1777,26 @@
       ]
     },
     {
+      "id": "昂立教育",
+      "name": "昂立教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 8,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "奥比中光",
       "name": "奥比中光",
       "industry_id": "manufacturing",
@@ -1847,6 +1995,26 @@
       ]
     },
     {
+      "id": "澳际教育",
+      "name": "澳际教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 54,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "澳柯玛股份",
       "name": "澳柯玛股份",
       "industry_id": "consumer-hardware",
@@ -1950,6 +2118,26 @@
         {
           "batch_key": "manufacturing-001-100",
           "sequence": 25,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "伴鱼",
+      "name": "伴鱼",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 36,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -2064,6 +2252,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "北辰教育",
+      "name": "北辰教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 10,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -2900,6 +3108,26 @@
       ]
     },
     {
+      "id": "北森(酷学院所属集团)",
+      "name": "北森（酷学院所属集团）",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 68,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "贝壳找房",
       "name": "贝壳找房",
       "industry_id": "internet-ai",
@@ -3183,6 +3411,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "编程猫(点猫科技)",
+      "name": "编程猫（点猫科技）",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 16,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -3604,6 +3852,26 @@
       ]
     },
     {
+      "id": "超星集团",
+      "name": "超星集团",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 64,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "朝曦时代",
       "name": "朝曦时代",
       "industry_id": "energy",
@@ -3880,6 +4148,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 85,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "传智教育(黑马程序员)",
+      "name": "传智教育（黑马程序员）",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 24,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -4314,6 +4602,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 84,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "得到(思维造物)",
+      "name": "得到（思维造物）",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 29,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -4967,6 +5275,26 @@
           "relationship_hint": "中国长安集团2026年官方介绍的主要上市及金融物流主体",
           "source_url": "https://www.ccag.cn/about/introduce",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "东奥会计在线",
+      "name": "东奥会计在线",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 57,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -6285,6 +6613,26 @@
       ]
     },
     {
+      "id": "帆书(原樊登读书)",
+      "name": "帆书（原樊登读书）",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 28,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "泛林集团(lamresearch)",
       "name": "泛林集团（Lam Research）",
       "industry_id": "semiconductor",
@@ -6328,6 +6676,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 21,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "方田教育",
+      "name": "方田教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 46,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -6590,6 +6958,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 126,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "粉笔教育",
+      "name": "粉笔教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 77,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -7195,6 +7583,26 @@
       ]
     },
     {
+      "id": "高顿教育",
+      "name": "高顿教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 5,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "高擎动力",
       "name": "高擎动力",
       "industry_id": "consumer-hardware",
@@ -7240,6 +7648,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-global"
+        }
+      ]
+    },
+    {
+      "id": "高途教育",
+      "name": "高途教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 3,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -10484,6 +10912,26 @@
       ]
     },
     {
+      "id": "海亮教育科技服务集团",
+      "name": "海亮教育科技服务集团",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 47,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "海目星激光",
       "name": "海目星激光",
       "industry_id": "manufacturing",
@@ -10737,6 +11185,26 @@
       ]
     },
     {
+      "id": "海文考研在线(太原)",
+      "name": "海文考研在线（太原）",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 23,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "海信集团",
       "name": "海信集团",
       "industry_id": "consumer-hardware",
@@ -10944,6 +11412,26 @@
       ]
     },
     {
+      "id": "翰林国际教育",
+      "name": "翰林国际教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 39,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "杭叉集团",
       "name": "杭叉集团",
       "industry_id": "manufacturing",
@@ -11046,6 +11534,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 135,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "好未来(学而思)",
+      "name": "好未来（学而思）",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 2,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -11329,6 +11837,26 @@
       ]
     },
     {
+      "id": "核桃编程",
+      "name": "核桃编程",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 49,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "黑芝麻智能",
       "name": "黑芝麻智能",
       "industry_id": "automotive",
@@ -11379,6 +11907,26 @@
         {
           "batch_key": "manufacturing-001-100",
           "sequence": 59,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "恒企教育",
+      "name": "恒企教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 41,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -11568,7 +12116,8 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_consumer-hardware-101-200"
+        "historic_chat_consumer-hardware-101-200",
+        "historic_chat_education-research-001-100"
       ],
       "historical_source_records": [
         {
@@ -11576,7 +12125,16 @@
           "sequence": 137,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 31,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "education-research"
       ]
     },
     {
@@ -13048,6 +13606,26 @@
       ]
     },
     {
+      "id": "华图教育",
+      "name": "华图教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 4,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "华为",
       "name": "华为",
       "industry_id": "telecom",
@@ -13933,6 +14511,46 @@
       ]
     },
     {
+      "id": "环球教育(雅思培训)",
+      "name": "环球教育（雅思培训）",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 55,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "环球网校",
+      "name": "环球网校",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 11,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "徽商银行",
       "name": "徽商银行",
       "industry_id": "finance",
@@ -14142,6 +14760,26 @@
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ]
+    },
+    {
+      "id": "火花思维",
+      "name": "火花思维",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 71,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -15301,6 +15939,26 @@
       ]
     },
     {
+      "id": "金吉列留学",
+      "name": "金吉列留学",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 78,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "金山办公wps",
       "name": "金山办公 WPS",
       "industry_id": "internet-ai",
@@ -15834,6 +16492,26 @@
       ]
     },
     {
+      "id": "鲸鱼机器人",
+      "name": "鲸鱼机器人",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 50,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "景嘉微",
       "name": "景嘉微",
       "industry_id": "semiconductor",
@@ -16026,6 +16704,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-electronics"
+        }
+      ]
+    },
+    {
+      "id": "开课吧",
+      "name": "开课吧",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 27,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -16575,6 +17273,26 @@
       ]
     },
     {
+      "id": "课题100教育集团",
+      "name": "课题100教育集团",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 86,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "库卡机器人kuka",
       "name": "库卡机器人 KUKA",
       "industry_id": "manufacturing",
@@ -16589,6 +17307,26 @@
         {
           "batch_key": "manufacturing-001-100",
           "sequence": 84,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "库课科技集团",
+      "name": "库课科技集团",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 80,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -16883,6 +17621,26 @@
       ]
     },
     {
+      "id": "朗阁教育集团",
+      "name": "朗阁教育集团",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 90,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "朗科智能",
       "name": "朗科智能",
       "industry_id": "consumer-hardware",
@@ -17023,6 +17781,26 @@
       ]
     },
     {
+      "id": "乐读",
+      "name": "乐读",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 51,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "乐森机器人(robosen)",
       "name": "乐森机器人（Robosen）",
       "industry_id": "consumer-hardware",
@@ -17077,6 +17855,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 100,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "乐学培优",
+      "name": "乐学培优",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 33,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -18405,6 +19203,26 @@
       ]
     },
     {
+      "id": "马哥教育",
+      "name": "马哥教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 25,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "马可迅(maxion)",
       "name": "马可迅（Maxion）",
       "industry_id": "automotive",
@@ -18962,6 +19780,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-global"
+        }
+      ]
+    },
+    {
+      "id": "美术宝1对1",
+      "name": "美术宝1对1",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 72,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -20787,6 +21625,26 @@
       ]
     },
     {
+      "id": "平行线教育",
+      "name": "平行线教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 37,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "浦发银行",
       "name": "浦发银行",
       "industry_id": "finance",
@@ -21178,6 +22036,26 @@
       ]
     },
     {
+      "id": "启德教育",
+      "name": "启德教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 9,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "启境汽车",
       "name": "启境汽车",
       "industry_id": "automotive",
@@ -21252,6 +22130,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-business"
+        }
+      ]
+    },
+    {
+      "id": "牵引力教育",
+      "name": "牵引力教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 76,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -21609,6 +22507,26 @@
       ]
     },
     {
+      "id": "仁和会计教育",
+      "name": "仁和会计教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 99,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "日出东方控股",
       "name": "日出东方控股",
       "industry_id": "consumer-hardware",
@@ -21721,6 +22639,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 73,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "融跃教育",
+      "name": "融跃教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 89,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -22131,6 +23069,26 @@
         {
           "batch_key": "manufacturing-001-100",
           "sequence": 91,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "赛优教育",
+      "name": "赛优教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 97,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -22852,6 +23810,26 @@
       ]
     },
     {
+      "id": "山香教育",
+      "name": "山香教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 93,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "陕汽集团",
       "name": "陕汽集团",
       "industry_id": "automotive",
@@ -23348,6 +24326,26 @@
           "sequence": 23,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "上海交大教育集团",
+      "name": "上海交大教育集团",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 14,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -24576,6 +25574,26 @@
       ]
     },
     {
+      "id": "尚硅谷",
+      "name": "尚硅谷",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 26,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "韶音科技(shokz)",
       "name": "韶音科技（Shokz）",
       "industry_id": "consumer-hardware",
@@ -25680,6 +26698,26 @@
       ]
     },
     {
+      "id": "时代光华(杭州)",
+      "name": "时代光华（杭州）",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 62,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "矢崎中国",
       "name": "矢崎中国",
       "industry_id": "automotive",
@@ -26198,6 +27236,46 @@
       ]
     },
     {
+      "id": "斯尔教育",
+      "name": "斯尔教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 12,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "斯芬克国际艺术教育",
+      "name": "斯芬克国际艺术教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 91,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "四川东树新材料有限公司",
       "name": "四川东树新材料有限公司",
       "industry_id": "energy",
@@ -26410,6 +27488,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ]
+    },
+    {
+      "id": "苏州新汇点教育",
+      "name": "苏州新汇点教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 85,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -26911,6 +28009,26 @@
       ]
     },
     {
+      "id": "天琥设计教育",
+      "name": "天琥设计教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 75,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "天键电声",
       "name": "天键电声",
       "industry_id": "consumer-hardware",
@@ -27178,6 +28296,46 @@
       ]
     },
     {
+      "id": "童程童美",
+      "name": "童程童美",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 74,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "童程在线",
+      "name": "童程在线",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 73,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "图达通(seyond)",
       "name": "图达通（Seyond）",
       "industry_id": "automotive",
@@ -27234,6 +28392,26 @@
       ],
       "related_hall_ids": [
         "internet-ai"
+      ]
+    },
+    {
+      "id": "豌豆思维",
+      "name": "豌豆思维",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 15,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -27464,6 +28642,26 @@
       ]
     },
     {
+      "id": "万学教育集团",
+      "name": "万学教育集团",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 21,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "王力安防",
       "name": "王力安防",
       "industry_id": "consumer-hardware",
@@ -27478,6 +28676,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 134,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "网梯科技",
+      "name": "网梯科技",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 44,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -28011,6 +29229,26 @@
       ]
     },
     {
+      "id": "文都教育集团",
+      "name": "文都教育集团",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 81,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "文远知行",
       "name": "文远知行",
       "industry_id": "automotive",
@@ -28399,6 +29637,26 @@
       ]
     },
     {
+      "id": "西瓜创客",
+      "name": "西瓜创客",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 69,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "西门子(中国)",
       "name": "西门子（中国）",
       "industry_id": "manufacturing",
@@ -28444,6 +29702,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-eda"
+        }
+      ]
+    },
+    {
+      "id": "希赛网",
+      "name": "希赛网",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 94,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -28600,6 +29878,26 @@
       ]
     },
     {
+      "id": "小鹅通",
+      "name": "小鹅通",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 30,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "小红书",
       "name": "小红书",
       "industry_id": "internet-ai",
@@ -28665,6 +29963,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-adas"
+        }
+      ]
+    },
+    {
+      "id": "小码王",
+      "name": "小码王",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 60,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -28759,6 +30077,46 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 25,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "小叶子音乐科技",
+      "name": "小叶子音乐科技",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 17,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "小站教育",
+      "name": "小站教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 92,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -29333,6 +30691,86 @@
       ]
     },
     {
+      "id": "新达内教育",
+      "name": "新达内教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 79,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "新东方教育科技集团",
+      "name": "新东方教育科技集团",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 1,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "新东方前途出国",
+      "name": "新东方前途出国",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 18,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "新航道国际教育",
+      "name": "新航道国际教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 52,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "新疆大全新能源股份有限公司",
       "name": "新疆大全新能源股份有限公司",
       "industry_id": "energy",
@@ -29358,6 +30796,26 @@
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ]
+    },
+    {
+      "id": "新课堂国际教育",
+      "name": "新课堂国际教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 13,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -29445,6 +30903,46 @@
         {
           "batch_key": "manufacturing-001-100",
           "sequence": 2,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "新通教育集团",
+      "name": "新通教育集团",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 20,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "新文道考研",
+      "name": "新文道考研",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 96,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -29543,6 +31041,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 96,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "星火教育",
+      "name": "星火教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 32,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -29836,6 +31354,46 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 81,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "学天教育",
+      "name": "学天教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 56,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "学为贵教育",
+      "name": "学为贵教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 19,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -30565,6 +32123,26 @@
       ]
     },
     {
+      "id": "研途考研",
+      "name": "研途考研",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 22,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "燕东微",
       "name": "燕东微",
       "industry_id": "semiconductor",
@@ -30682,6 +32260,26 @@
       ]
     },
     {
+      "id": "洋葱学园",
+      "name": "洋葱学园",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 35,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "药明康德",
       "name": "药明康德",
       "industry_id": "biomed",
@@ -30707,6 +32305,26 @@
           "sequence": 33,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "一起教育科技",
+      "name": "一起教育科技",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 34,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -31664,6 +33282,26 @@
       ]
     },
     {
+      "id": "易来留学",
+      "name": "易来留学",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 87,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "易事特",
       "name": "易事特",
       "industry_id": "energy",
@@ -31886,6 +33524,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-global"
+        }
+      ]
+    },
+    {
+      "id": "英孚教育",
+      "name": "英孚教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 53,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -32235,6 +33893,26 @@
       ]
     },
     {
+      "id": "优路教育",
+      "name": "优路教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 43,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "优湃能源",
       "name": "优湃能源",
       "industry_id": "automotive",
@@ -32490,6 +34168,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-adas"
+        }
+      ]
+    },
+    {
+      "id": "猿辅导",
+      "name": "猿辅导",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 6,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -32873,6 +34571,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 57,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "云学堂",
+      "name": "云学堂",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 61,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -33593,6 +35311,26 @@
       ]
     },
     {
+      "id": "昭昭医考",
+      "name": "昭昭医考",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 59,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "兆威机电",
       "name": "兆威机电",
       "industry_id": "consumer-hardware",
@@ -33993,6 +35731,26 @@
       ]
     },
     {
+      "id": "正保教育集团",
+      "name": "正保教育集团",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 40,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "正大天晴",
       "name": "正大天晴",
       "industry_id": "biomed",
@@ -34161,6 +35919,26 @@
           "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
           "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "之了集团(之了课堂)",
+      "name": "之了集团（之了课堂）",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 83,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -34411,6 +36189,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 150,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中博教育",
+      "name": "中博教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 100,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -35182,6 +36980,26 @@
       ]
     },
     {
+      "id": "中大网校",
+      "name": "中大网校",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 95,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中电工程华北电力设计院",
       "name": "中电工程华北电力设计院",
       "industry_id": "energy",
@@ -35381,6 +37199,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "中公教育",
+      "name": "中公教育",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 98,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -38155,6 +39993,26 @@
       ]
     },
     {
+      "id": "中联集团教育科技",
+      "name": "中联集团教育科技",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 45,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中联重科",
       "name": "中联重科",
       "industry_id": "manufacturing",
@@ -38827,6 +40685,26 @@
       ]
     },
     {
+      "id": "卓越教育集团",
+      "name": "卓越教育集团",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 82,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "紫光股份",
       "name": "紫光股份",
       "industry_id": "internet-ai",
@@ -38957,6 +40835,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 1,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "作业帮",
+      "name": "作业帮",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 7,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -39095,6 +40993,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 38,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "elic留学中国",
+      "name": "ELIC留学中国",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 88,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -39275,6 +41193,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 59,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "qkids久趣",
+      "name": "Qkids久趣",
+      "industry_id": "education-research",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_education-research-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "education-research-001-100",
+          "sequence": 70,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -39589,12 +41527,12 @@
     }
   ],
   "statistics": {
-    "recovered_name_rows": 400,
-    "recovered_business_units": 12,
+    "recovered_name_rows": 500,
+    "recovered_business_units": 16,
     "automotive_research_nodes": 266,
     "automotive_research_brands": 36,
     "prior_audit_source_rows": 150,
-    "entities": 1497,
+    "entities": 1592,
     "unique_portal_urls": 826,
     "legacy_portals": 130,
     "candidate_portals": 793,
@@ -39617,7 +41555,7 @@
       "retail": 9,
       "agri-food": 9,
       "culture-media": 2,
-      "education-research": 0
+      "education-research": 95
     }
   }
 }
