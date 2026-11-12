@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft, ArrowRight, ArrowUpRight, BadgeCheck, BriefcaseBusiness,
   CheckCircle2, ChevronDown, Clock3, Coins, Handshake,
-  HeartHandshake, Info, ShieldPlus, Sparkles, UsersRound, Wallet
+  HeartHandshake, Info, ShieldPlus, Sparkles, UsersRound
 } from 'lucide-react';
 import { Shell } from '../components/Shell';
 import { Link } from '../router';
@@ -501,7 +501,7 @@ export function JoinUsPage({ user }: { user: User | null }) {
         <div className="join-section-head">
           <p className="join-kicker">SAY HELLO</p>
           <h2 id="join-apply-title">告诉我们，你想一起做什么。</h2>
-          <p>这是零现金创业阶段的合作意向征集，不是正式劳动岗位的录用申请。提交后申请会发送到 HHBA 邮箱，我们会通过你填写的邮箱联系。</p>
+          <p>期待认识有想法、愿意一起做事的你。填写合作意向后，我们可以先通过邮件交流，聊聊彼此擅长什么、想一起完成什么。</p>
         </div>
         <div className="join-form-shell">
           <div className="join-form-progress" aria-label="合作意向步骤">
