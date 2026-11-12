@@ -16,12 +16,12 @@ const values = [
 ];
 
 const benefits = [
-  { icon: Wallet, title: '零现金现状公开', description: '目前没有稳定工资预算，不以未来融资或盈利为由承诺固定收入。请先确认自己是否适合这一阶段。' },
-  { icon: Coins, title: '核心伙伴未来股权探讨', description: '对于长期承担核心责任的伙伴，可讨论未来实际股权或期权；公司设立、比例和归属条件均未确定，不代表已获股份。' },
-  { icon: Handshake, title: '专项成果与收益分享探讨', description: '针对算法、插件、数据与渠道等专项合作，可讨论约定条件下的未来收益分配，但不承诺一定会盈利或分红。' },
-  { icon: Clock3, title: '兼职与远程协作优先', description: '尊重已有工作和学业安排，以协商后的投入时间、目标与交付边界为前提。' },
-  { icon: UsersRound, title: '参与建设和产品讨论', description: '核心参与者有机会讨论路线图、技术取舍和业务方向；参与讨论不等于已拥有公司治理或投票权。' },
-  { icon: ShieldPlus, title: '先约定规则再合作', description: '涉及实际交付时，先明确合作性质、报酬或收益条件、知识产权、保密与退出规则，不拿口头股份当合同。' },
+  { icon: Coins, title: '核心合伙人，共同持股', description: '对于决定长期一起创业、共同承担关键责任的核心伙伴，我们愿意在未来公司依法设立后，按双方约定落实实际股权，而不只是口头上的“干股”。' },
+  { icon: Handshake, title: '专项贡献，也值得分享', description: '算法、网申插件、招聘数据、新媒体和商务等专项建设，可以结合目标、贡献和实际项目成果，商议相应的收益分享方式。' },
+  { icon: UsersRound, title: '一起参与重要决定', description: '不只是执行任务。愿意负责关键方向的伙伴，也可以一起参与产品路线、技术取舍、增长策略与团队建设。' },
+  { icon: Clock3, title: '找到适合彼此的节奏', description: '远程、兼职和长期共建都可以交流。先了解彼此的时间与目标，找到能够持续推进事情的合作方式。' },
+  { icon: Sparkles, title: '把想法做成真正的产品', description: '我们已经开始建设 HHBA，也希望和伙伴一起改善用户体验、解决难题，让共同创造的成果被真正看到。' },
+  { icon: ShieldPlus, title: '让真诚变成明确的约定', description: '重要的股权、收益、责任与退出安排，会在合作共识形成后依法写清楚，让付出与回报都有依据。' },
 ];
 
 const roles = [
@@ -43,7 +43,7 @@ const roles = [
     ],
     preferred:['有从 MVP 到正式上线的技术负责人经历。','了解低成本云架构、国内网站部署与个人信息保护要求。'],
     challenge:'请讲述一个由你主导上线的系统：如何设计权限与数据库、定位一次故障，以及出现问题后如何回滚。',
-    cooperation:'早期核心合作方向；可远程沟通，具体每周投入和负责人职责由双方协商确定。',
+    cooperation:'希望找到真正负责技术方向的长期伙伴。我们愿意围绕未来公司实际股权、技术责任和共同目标展开认真沟通。',
     priorityNote:'首批重点接触；希望优先找到能把整个技术底盘负责起来的人。'
   },
   {
@@ -64,7 +64,7 @@ const roles = [
     ],
     preferred:['熟悉对象存储、验证码接入、异步任务或审计日志。','参与过招聘系统、SaaS 或多组织权限平台开发。'],
     challenge:'说明如何实现一条企业材料审核流程，既支持撤回和申诉，又不能让提交人审核自己的资料。',
-    cooperation:'早期研发合作方向；支持远程协作，具体工时与任务范围需书面确认。',
+    cooperation:'可以先合作解决后端关键问题；愿意长期承担技术责任的伙伴，也欢迎进一步讨论核心共建和股权机会。',
     priorityNote:'与技术负责人协同，但可以由一位有能力的全栈工程师在早期兼任。'
   },
   {
@@ -85,7 +85,7 @@ const roles = [
     ],
     preferred:['接触过公开 ATS Job Board API 与招聘岗位数据。','有跨语言搜索、pgvector、Elasticsearch 或信息抽取项目经验。'],
     challenge:'设计一条官方岗位同步链：同岗位换 ID、岗位下线、JD 缺失和中文搜索时，如何避免展示错误结果。',
-    cooperation:'早期技术合作方向；支持远程协作，可与后端共同约定数据质量目标。',
+    cooperation:'一起完善行业馆和招聘入口数据，以清晰的成果目标推进合作，讨论适合双方的长期回报。',
     priorityNote:'负责企业入口及岗位数据，不要求同时承担简历匹配算法。'
   },
   {
@@ -96,7 +96,7 @@ const roles = [
     required:['有 LLM 应用、推荐排序或检索算法的可演示项目。','熟悉 Python 或 TypeScript，能够进行离线评估和问题定位。','重视简历隐私、模型成本和岗位真实性。'],
     preferred:['实践过 DeepSeek、RAG、招聘推荐或排序评估。'],
     challenge:'说明如何用脱敏简历评价 Top10 推荐质量并降低不相关岗位比例。',
-    cooperation:'核心技术共建意向；可讨论未来股权，但任何权益需具备条件后另行书面约定。',
+    cooperation:'我们很愿意与长期负责匹配算法的伙伴共同创业，围绕算法成果、职责分工和未来实际股权认真协商。',
     priorityNote:'与招聘数据工程师分工：这个方向负责算法质量，不负责逐家归档官网。'
   },
   {
@@ -107,7 +107,7 @@ const roles = [
     required:['有浏览器扩展或自动化工具开发经历。','熟悉 JavaScript/TypeScript、DOM、扩展权限与隐私保护。'],
     preferred:['有 Playwright、网申表单或 Edge 插件上架经验。'],
     challenge:'说明复杂动态表单如何做到可控自动填写而不擅自替用户提交。',
-    cooperation:'按成果里程碑讨论专项共建和未来有条件的收益分配，不承诺固定薪资。',
+    cooperation:'从 Edge 网申插件的可用成果开始，欢迎讨论专项收益分享；长期主导产品线的伙伴也可以进一步谈合伙合作。',
     priorityNote:'先做好 Edge 闭环，不要求一次兼容 Safari 和 Chrome。'
   },
   {
@@ -128,7 +128,7 @@ const roles = [
     ],
     preferred:['参与过劳动争议调解、人力资源合规、员工调查或平台申诉流程。','了解个人信息保护、网络招聘及数据治理的监管要求。'],
     challenge:'面对一份员工投诉和企业不同解释，你会如何补充证据、保护反馈者并给双方公平申诉机会？',
-    cooperation:'早期研究与制度设计合作；独立审核权限须与企业销售职责分离，正式裁决机制另行建立。',
+    cooperation:'欢迎从制度设计和专业交流开始合作，让未来的企业治理机制建立在可靠事实与公平规则上。',
     priorityNote:'建议尽早加入制度设计；涉及正式法律意见的事项仍需由合格专业人士复核。'
   },
   {
@@ -139,7 +139,7 @@ const roles = [
     required:['可独立完成文案、剪辑或账号运营之一，并展示真实作品。','理解内容版权、真实数据与平台规则。'],
     preferred:['熟悉求职内容、校园社群、抖音、小红书或公众号。'],
     challenge:'提出不购买广告的四周内容计划与有效增长指标。',
-    cooperation:'可兼职远程，从可执行的内容计划开始；未来收益分成必须有明确书面条件。',
+    cooperation:'从真实内容和用户增长出发。愿意长期承担增长责任的伙伴，我们也愿意讨论未来公司实际股权。',
     priorityNote:'优先找到能持续运营一个账号的人，不要求所有平台同时日更。'
   },
   {
@@ -160,7 +160,7 @@ const roles = [
     ],
     preferred:['有企业服务、招聘科技、SaaS、HR 服务或商业资源对接经验。','了解合同边界、客户授权与商机跟进管理。'],
     challenge:'如果一家企业希望付费获得更高的善待员工评分，你如何回应，并给出合规且有价值的合作方案？',
-    cooperation:'早期商业探索合作；企业合作条件、费用和可能的绩效安排均需双方另行明确。',
+    cooperation:'欢迎携手探索真实企业合作机会，围绕实际业务成果讨论项目收益分享；长期伙伴可进一步讨论股权。',
     priorityNote:'平台真实能力和规则稳定后逐步拓展；不能向客户保证订单数量。'
   },
   {
@@ -181,7 +181,7 @@ const roles = [
     ],
     preferred:['熟悉 React、TypeScript、CSS，能够与开发高效协同。','曾做过招聘、企业 SaaS、社区或后台产品体验优化。'],
     challenge:'展示一项你改进过的复杂业务流程：怎样降低填表成本，同时保证身份、隐私和流程告知清晰？',
-    cooperation:'早期产品设计合作方向；可远程参加设计评审，交付与投入时间由双方协商。',
+    cooperation:'希望和重视用户体验的伙伴一起打磨产品，可以从具体页面或用户流程开始合作。',
     priorityNote:'优先优化真实业务闭环，而不是只追求展示动效。'
   },
   {
@@ -192,15 +192,15 @@ const roles = [
     required:['能够清楚介绍自己擅长什么、做过什么，以及希望解决的问题。','尊重事实、劳动者权益、信息安全和双方的时间。'],
     preferred:['能够提供作品、项目经验、研究案例或可验证的合作经历。'],
     challenge:'用一个真实项目或明确方案，解释你能帮助 HHBA 在未来三个月完成什么。',
-    cooperation:'不预设职位、固定投入时间或待遇；具体合作以双方讨论及书面协议为准。',
+    cooperation:'不必拘泥于现有方向。只要你愿意把擅长的事情做出成果，我们也愿意认真讨论合伙或专项合作机会。',
     priorityNote:'开放接收早期专业交流和自荐意向。'
   }
 ] as const;
 
 const roleGroups = [
-  { id: 'core', title: '第一组 · 核心共建', description: '先接触 2–3 位能够持续负责关键成果的伙伴，不等于每个方向都招一名全职员工。', ids: ['tech-lead', 'ai-match', 'content-growth'] },
-  { id: 'specialist', title: '第二组 · 专项与增长合作', description: '按阶段目标合作，部分方向可兼任，实际交付之前先谈清楚边界与权益。', ids: ['backend', 'ai-data', 'edge-apply', 'business'] },
-  { id: 'flex', title: '第三组 · 顾问与开放合作', description: '非首批刚需，欢迎提供作品、建议或未来合作意向。', ids: ['product', 'governance', 'other'] },
+  { id: 'core', title: '核心创业合伙人', description: '优先寻找能够长期承担技术、算法或增长关键责任的伙伴，一起讨论未来公司的实际持股安排。', ids: ['tech-lead', 'ai-match', 'content-growth'] },
+  { id: 'specialist', title: '专项共建与业务合作', description: '从清晰的项目和成果开始，让专业能力有发挥空间，也有机会分享共同创造的价值。', ids: ['backend', 'ai-data', 'edge-apply', 'business'] },
+  { id: 'flex', title: '专业顾问与开放加入', description: '不同专业背景也值得被看到。带着你的经验或想法来聊聊，寻找适合双方的合作方式。', ids: ['product', 'governance', 'other'] },
 ] as const;
 
 type Direction = typeof roles[number]['id'];
@@ -390,15 +390,14 @@ export function JoinUsPage({ user }: { user: User | null }) {
     <div className="join-page">
       <section className="join-hero" aria-labelledby="join-title">
         <div className="join-hero-main">
-          <p className="join-kicker"><span className="join-kicker-dot" aria-hidden="true"/> 汇方职场 · HHBA · 零现金创业伙伴招募</p>
-          <h1 id="join-title">我们不只想帮人找到好工作。<br /><span>我们还想创造一家值得工作的公司。</span></h1>
-          <p className="join-hero-desc">从尊重劳动者开始，从认真建设产品开始。我们希望找到愿意了解项目真实情况、先从具体成果谈起的共建伙伴。</p>
+          <p className="join-kicker"><span className="join-kicker-dot" aria-hidden="true"/> 汇方职场 · HHBA · 创业合伙人招募</p>
+          <h1 id="join-title">一起把 HHBA 做成。<br /><span>也一起分享它的未来。</span></h1>
+          <p className="join-hero-desc">HHBA 已经开始做真实的产品，还有很多值得一起攻克的难题。我们想邀请愿意承担责任、创造价值的人同行；对于真正一起建设公司的核心伙伴，我们愿意分享未来公司的实际股权。</p>
           <div className="join-hero-actions">
             <JumpButton onClick={() => jump(rolesRef)}>了解合作机会</JumpButton>
             <Link className="join-btn join-btn-light" to="/vision">了解我们的理念 <ArrowUpRight size={16} aria-hidden="true" /></Link>
           </div>
           {import.meta.env.VITE_HHBA_JOIN_STATIC_PREVIEW === '1' && <div className="join-stage-banner" role="status"><Info size={16} aria-hidden="true" /><span><strong>静态验收预览：</strong>此版本仅供查看招募文案、岗位和表单外观，未连接邮件发送及申请存库，请勿填写真实隐私资料。</span></div>}
-          <div className="join-stage-banner"><Info size={16} aria-hidden="true" /><span><strong>真实进展：</strong>HHBA 尚在筹备阶段，目前没有稳定工资和福利预算。我们只开放创业共建意向沟通；未来股权、拟议分红和收益分配均须具备条件并书面约定，不承诺现成股份或收入。</span></div>
         </div>
         <figure className="join-hero-photo">
           <img src={import.meta.env.BASE_URL + 'images/hhba-join-team.webp'}
@@ -423,8 +422,8 @@ export function JoinUsPage({ user }: { user: User | null }) {
       <section className="join-section join-benefits-section" aria-labelledby="join-benefits-title">
         <div className="join-section-head">
           <p className="join-kicker">PEOPLE FIRST</p>
-          <h2 id="join-benefits-title">没有现成福利，先把合作条件说清楚。</h2>
-          <p>我们不包装高薪、六险二金和带薪休假。当前能公开的，是资金现状、可探讨的合作权益与保护双方的基本原则。</p>
+          <h2 id="join-benefits-title">一起创造价值，也一起分享成果。</h2>
+          <p>我们希望让长期参与核心建设的人，有机会真正成为 HHBA 的股东；让承担专项成果的伙伴，也能参与分享自己创造的价值。</p>
         </div>
         <div className="join-benefits-grid">
           {benefits.map(b => <article key={b.title} className="join-benefit-card">
@@ -432,23 +431,17 @@ export function JoinUsPage({ user }: { user: User | null }) {
             <h3>{b.title}</h3><p>{b.description}</p>
           </article>)}
         </div>
-        <aside className="join-disclosure" aria-labelledby="join-disclosure-title">
-          <ShieldPlus size={21} aria-hidden="true" />
-          <div><h3 id="join-disclosure-title">关于零现金阶段与法律边界</h3>
-            <p>HHBA 尚未完成公司设立和融资，目前没有稳定工资预算。<strong>这里是创业伙伴意向征集，并非已提供有薪职位或已授予股份。</strong>所谓“干股”不一定是真实持股，未来分红或股权都需要明确条件并书面约定。若实际建立劳动关系，必须依法支付工资并履行法定保障，不能用股权或分红代替。</p>
-          </div>
-        </aside>
       </section>
 
       <section className="join-section" ref={rolesRef} id="join-opportunities" aria-labelledby="join-roles-title">
         <div className="join-section-head">
           <p className="join-kicker">WORK WITH US</p>
-          <h2 id="join-roles-title">先找到能把关键事情做成的伙伴。</h2>
-          <p>围绕技术底座、DeepSeek 匹配、Edge 自动网申、官方企业招聘入口与新媒体增长重新排序。以下为合作方向而非已批准的全职编制；欢迎兼任或阶段性共建。</p>
+          <h2 id="join-roles-title">我们想和这些人，一起把事情做成。</h2>
+          <p>围绕技术架构、DeepSeek 智能匹配、Edge 网申、官方招聘信息和用户增长，我们列出了目前最需要一起解决的事情。可以长期加入，也可以先从一个具体方向合作。</p>
         </div>
         <div className="join-role-priority-intro" role="note">
-          <div><strong>首批重点：技术负责人、AI 匹配算法、新媒体增长</strong><p>初期先接触 2–3 位核心建设者。插件、岗位数据和后端可按实际里程碑合作，无须每个方向都设全职岗位。</p></div>
-          <span>零现金阶段 · 先谈清楚条件</span>
+          <div><strong>首批最想认识：技术负责人、AI 匹配算法、新媒体增长</strong><p>希望先找到少量能长期负责关键成果的伙伴。插件、招聘数据与后端等方向，也欢迎有经验的人一起推进。</p></div>
+          <span>共同建设 · 共享成长</span>
         </div>
         {roleGroups.map(group => <div className="join-role-group" key={group.id}>
           <div className="join-role-group-heading"><h3>{group.title}</h3><p>{group.description}</p></div>
@@ -470,10 +463,6 @@ export function JoinUsPage({ user }: { user: User | null }) {
                 <section className="join-role-detail-block"><h4>合作方式与当前阶段</h4><p>{r.cooperation}</p><p>{r.priorityNote}</p></section>
               </div>
               <div className="join-role-sample"><strong>我们会如何了解你的能力</strong><p>{r.challenge}</p><span>以交流、已有项目和作品为主，不要求无偿完成可直接投入生产的试用项目。</span></div>
-              <div className="join-role-compensation">
-                <strong>合作条件与权益边界</strong>
-                <p>目前无稳定工资预算，也无已授予股份或保底分红。核心共建可讨论未来实际股权；专项与增长可讨论有条件的收益分配。任何实际交付之前须书面明确合作性质、报酬或收益条件、知识产权与退出规则；如形成劳动关系，应依法支付工资并履行法定保障。</p>
-              </div>
               <button type="button" onClick={() => applyFor(r.id)}>填写该方向合作意向 <ArrowRight size={16} aria-hidden="true"/></button>
             </div>
           </details>)}
@@ -481,25 +470,32 @@ export function JoinUsPage({ user }: { user: User | null }) {
         </div>)}
         <aside className="join-role-advisor-note" aria-label="外部专业顾问招募说明">
           <strong>此外，我们也需要外部专业顾问</strong>
-          <p>劳动关系、股权激励与个人信息保护等方向欢迎专业人士交流。当前没有有偿顾问预算，不承诺正式聘用；若需要实际法律或安全服务，须在具有支付与履约条件时另行协商签署协议。</p>
+          <p>如果你熟悉劳动关系、股权激励、隐私与网络安全等领域，也欢迎交流。专业服务的具体范围和合作条件由双方另行商议。</p>
         </aside>
       </section>
 
       <section className="join-section join-progress-section" aria-labelledby="join-progress-title">
         <div className="join-section-head">
           <p className="join-kicker">WHERE WE ARE</p>
-          <h2 id="join-progress-title">坦诚告诉你，我们走到了哪里。</h2>
-          <p>我们不把尚未发生的事包装成已经取得的成绩。每一步成长，都希望与你共同见证。</p>
+          <h2 id="join-progress-title">现在的 HHBA，正在向前走。</h2>
+          <p>网站已经上线，产品、算法、数据和增长还需要不断打磨。我们期待有能力、有想法的人加入，一起决定下一步怎么走。</p>
         </div>
         <ol className="join-timeline">
-          <li><span className="join-step-dot join-step-current"><CheckCircle2 size={17}/></span><div><small>正在推进</small><h3>产品建设与系统研发</h3><p>HHBA 招聘市场、企业业务与管理系统正在持续开发和验证。</p></div></li>
-          <li><span className="join-step-dot join-step-current"><UsersRound size={17}/></span><div><small>当前招募</small><h3>寻找早期合作伙伴</h3><p>邀请能独立负责关键方向的建设者，先把合作方式和真实条件说清楚。</p></div></li>
-          <li><span className="join-step-dot"><BriefcaseBusiness size={17}/></span><div><small>未来目标</small><h3>公司设立与融资</h3><p>公司筹备和融资尚未完成。进度将以实际情况为准，不做确定性承诺。</p></div></li>
-          <li><span className="join-step-dot"><BadgeCheck size={17}/></span><div><small>长期目标</small><h3>逐步明确正式合作与权益</h3><p>有真实经营条件后，再依法确定工资福利、股权或收益方案，不以融资必然成功作为承诺。</p></div></li>
+          <li><span className="join-step-dot join-step-current"><CheckCircle2 size={17}/></span><div><small>正在推进</small><h3>产品上线与持续迭代</h3><p>HHBA 网站已上线，智能匹配、招聘官网导航与后台能力仍在不断完善。</p></div></li>
+          <li><span className="join-step-dot join-step-current"><UsersRound size={17}/></span><div><small>当前招募</small><h3>寻找一起承担责任的伙伴</h3><p>优先邀请技术、算法和增长方向的核心建设者，也欢迎各类专项人才。</p></div></li>
+          <li><span className="join-step-dot"><BriefcaseBusiness size={17}/></span><div><small>未来目标</small><h3>推进公司设立与合伙安排</h3><p>随着团队和合作目标逐渐明确，推进公司设立，并认真确定适合双方的实际股权与合作规则。</p></div></li>
+          <li><span className="join-step-dot"><BadgeCheck size={17}/></span><div><small>长期目标</small><h3>一起把产品做出成果</h3><p>用真实用户反馈和产品成长检验合作，让长期贡献成为共享未来成果的基础。</p></div></li>
         </ol>
       </section>
 
       <BrandManifesto />
+
+      <aside className="join-disclosure join-disclosure-final" aria-labelledby="join-disclosure-title">
+        <ShieldPlus size={21} aria-hidden="true" />
+        <div><h3 id="join-disclosure-title">关于现在的合作阶段</h3>
+          <p>HHBA 仍在创业筹备阶段，公司尚未完成设立，目前也没有稳定的薪资预算。这是一份<strong>创业伙伴合作邀请</strong>：我们真诚希望未来让长期承担核心责任的伙伴实际持有公司股权，也愿意和专项伙伴商议成果收益分享。具体持股比例、取得条件、工作范围、知识产权与退出安排，将在合作前充分协商并依法书面落实；协议生效前并不代表已经取得股份。若实际形成劳动关系，我们仍会依法支付工资并履行法定保障。</p>
+        </div>
+      </aside>
 
       <section className="join-section join-apply-section" id="join-apply" ref={formRef} aria-labelledby="join-apply-title">
         <div className="join-section-head">
@@ -554,14 +550,14 @@ export function JoinUsPage({ user }: { user: User | null }) {
               {resume && <p className="join-form-description">已选择：{resume.name}（{Math.ceil(resume.size/1024)} KB）</p>}
             </>}
             {step === 2 && <>
-              <h3>聊聊你想如何一起参与</h3><p className="join-form-description">合作方式及实际权益必须在正式沟通时另行确认。</p>
+              <h3>聊聊你想如何一起参与</h3><p className="join-form-description">我们更想了解你希望怎么参与、可以投入多少时间。合作目标和权益可以在后续交流中认真商量。</p>
               <div className="join-field-row">
                 <div><label htmlFor="join-time">每周预计可以投入多久？ <em>*</em></label><select id="join-time" value={form.weeklyTime} onChange={e=>update('weeklyTime',e.target.value)}><option value="">请选择</option><option>每周 1–5 小时</option><option>每周 6–15 小时</option><option>每周 16–30 小时</option><option>每周 30 小时以上</option><option>待进一步沟通</option></select></div>
                 <div><label htmlFor="join-mode">理想合作方式 <em>*</em></label><select id="join-mode" value={form.mode} onChange={e=>update('mode',e.target.value)}><option value="">请选择</option><option>远程协作</option><option>线上线下结合</option><option>灵活协商</option></select></div>
               </div>
               <label htmlFor="join-note">还想告诉我们什么？</label>
               <textarea id="join-note" value={form.note} onChange={e=>update('note',e.target.value)} maxLength={600} rows={3} placeholder="例如协作时间、对项目的想法或想先交流的问题" />
-              <label className="join-agreement"><input type="checkbox" checked={form.acknowledged} onChange={e=>update('acknowledged',e.target.checked)}/><span>我已了解：HHBA 当前无稳定薪资预算、现成股份或保底分红。本次仅提交合作意向；实际合作、分红和股权条件须另行依法协商并书面明确。<em> *</em></span></label>
+              <label className="join-agreement"><input type="checkbox" checked={form.acknowledged} onChange={e=>update('acknowledged',e.target.checked)}/><span>我已了解 HHBA 当前仍处创业筹备阶段，本次仅表达合作意向，具体股权、收益与合作安排需双方另行协商并依法书面确认。<em> *</em></span></label>
             </>}
             {error && <p className="join-form-error" role="alert">{error}</p>}
             <div className="join-form-actions">
