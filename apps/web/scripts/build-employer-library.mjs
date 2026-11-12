@@ -121,64 +121,6 @@ for(const batch of draft.batches){
   entries.set(id,row);
  }
 }
-// Restore name-only rows from prior chats. A name-only row MUST NOT invent a
-// recruitment portal, nor count a business division as an independent company.
-const historicalNames=load('employerLibraryRecoveredChatNames.json');
-if(historicalNames.schema_version!==1||!Array.isArray(historicalNames.batches))
- throw Error('INVALID_RECOVERED_CHAT_NAMES');
-const historicalNonEmployerIndex=[];
-let recoveredNameRows=0;
-for(const group of historicalNames.batches){
- const hall=group.hall_id||historicalNames.hall_id;
- if(!Object.hasOwn(totals,hall)||!Array.isArray(group.entries)||!group.batch_key)
-  throw Error('INVALID_RECOVERED_CHAT_BATCH');
- const sourceLabel='historic_chat_'+group.batch_key;
- const seenSeq=new Set();
- for(const rec of group.entries){
-  if(!Number.isInteger(rec.sequence)||rec.sequence<1||rec.sequence>5000||
-   seenSeq.has(rec.sequence)||typeof rec.name!=='string'||rec.name.trim().length<2||
-   rec.url!==null||rec.url_status!=='not_recorded'||
-   !['company_candidate','business_unit'].includes(rec.record_type))
-    throw Error('INVALID_RECOVERED_NAME_ROW');
-  seenSeq.add(rec.sequence);
-  recoveredNameRows++;
-  if(rec.record_type==='business_unit'){
-   historicalNonEmployerIndex.push({name:rec.name,hall_id:hall,sequence:rec.sequence,
-    batch_key:group.batch_key,record_type:rec.record_type});
-   continue;
-  }
-  // Preserve exact history text, but recognize an existing Chinese company
-  // when the old list merely adds its English abbreviation in parentheses.
-  const bareName=rec.name.replace(/[（(][A-Za-z0-9 +&.\\-]+[）)]$/,'').trim();
-  const exact=key(rec.name),bare=key(bareName);
-  const id=entries.has(exact)?exact:entries.has(bare)?bare:exact;
-  const row=entries.get(id)||{id,name:rec.name,industry_id:hall,parent_name:null,
-   relation:null,aliases:[],portals:[],source_datasets:[]};
-  if(row.industry_id!==hall){
-   row.related_hall_ids=row.related_hall_ids||[];
-   if(!row.related_hall_ids.includes(hall))row.related_hall_ids.push(hall);
-  }
-  if(!row.source_datasets.includes(sourceLabel))row.source_datasets.push(sourceLabel);
-  row.historical_source_records=row.historical_source_records||[];
-  if(!row.historical_source_records.some(x=>x.batch_key===group.batch_key&&x.sequence===rec.sequence))
-   row.historical_source_records.push({batch_key:group.batch_key,sequence:rec.sequence,
-    has_original_url:false,record_type:'company_candidate'});
-  entries.set(id,row);
- }
- if(seenSeq.size!==group.entries.length||group.entries.length>100)
-  throw Error('INVALID_RECOVERED_CHAT_COUNT');
- totals[hall]+=group.entries.length;
-}
-// Do not lose the 700 already-recovered candidate records when adding more
-// historical batches. New galleries may be imported incrementally.
-for(const [sector,requiredCount] of Object.entries(baseline))
- if(totals[sector]<requiredCount)throw Error('INCOMPLETE_DRAFT_HALL_'+sector);
-for(const [sector,targetCount] of Object.entries(collectionTargets))
- if(totals[sector]>targetCount)throw Error('COLLECTION_HALL_OVER_TARGET_'+sector);
-const targetTotal=Object.values(collectionTargets).reduce((a,b)=>a+b,0);
-const importedTotal=Object.values(totals).reduce((a,b)=>a+b,0);
-const missingByHall=Object.fromEntries(
- Object.entries(collectionTargets).map(([id,target])=>[id,target-totals[id]]));
 // Recover historical Preview D1 audit sheets B04/B05/B06.
 // These 150 source records are NOT part of the 3,800 chat-batch ledger;
 // importing their recorded URLs does not certify current recruitment or jobs.
@@ -263,6 +205,64 @@ for(const node of automotiveResearch.nodes){
 }
 if(researchNonbrandCount!==230||researchBrandIndex.length!==36)
  throw Error('INVALID_AUTOMOTIVE_TYPE_TOTALS');
+// Restore name-only rows from prior chats. A name-only row MUST NOT invent a
+// recruitment portal, nor count a business division as an independent company.
+const historicalNames=load('employerLibraryRecoveredChatNames.json');
+if(historicalNames.schema_version!==1||!Array.isArray(historicalNames.batches))
+ throw Error('INVALID_RECOVERED_CHAT_NAMES');
+const historicalNonEmployerIndex=[];
+let recoveredNameRows=0;
+for(const group of historicalNames.batches){
+ const hall=group.hall_id||historicalNames.hall_id;
+ if(!Object.hasOwn(totals,hall)||!Array.isArray(group.entries)||!group.batch_key)
+  throw Error('INVALID_RECOVERED_CHAT_BATCH');
+ const sourceLabel='historic_chat_'+group.batch_key;
+ const seenSeq=new Set();
+ for(const rec of group.entries){
+  if(!Number.isInteger(rec.sequence)||rec.sequence<1||rec.sequence>5000||
+   seenSeq.has(rec.sequence)||typeof rec.name!=='string'||rec.name.trim().length<2||
+   rec.url!==null||rec.url_status!=='not_recorded'||
+   !['company_candidate','business_unit'].includes(rec.record_type))
+    throw Error('INVALID_RECOVERED_NAME_ROW');
+  seenSeq.add(rec.sequence);
+  recoveredNameRows++;
+  if(rec.record_type==='business_unit'){
+   historicalNonEmployerIndex.push({name:rec.name,hall_id:hall,sequence:rec.sequence,
+    batch_key:group.batch_key,record_type:rec.record_type});
+   continue;
+  }
+  // Preserve exact history text, but recognize an existing Chinese company
+  // when the old list merely adds its English abbreviation in parentheses.
+  const bareName=rec.name.replace(/[（(][A-Za-z0-9 +&.\\-]+[）)]$/,'').trim();
+  const exact=key(rec.name),bare=key(bareName);
+  const id=entries.has(exact)?exact:entries.has(bare)?bare:exact;
+  const row=entries.get(id)||{id,name:rec.name,industry_id:hall,parent_name:null,
+   relation:null,aliases:[],portals:[],source_datasets:[]};
+  if(row.industry_id!==hall){
+   row.related_hall_ids=row.related_hall_ids||[];
+   if(!row.related_hall_ids.includes(hall))row.related_hall_ids.push(hall);
+  }
+  if(!row.source_datasets.includes(sourceLabel))row.source_datasets.push(sourceLabel);
+  row.historical_source_records=row.historical_source_records||[];
+  if(!row.historical_source_records.some(x=>x.batch_key===group.batch_key&&x.sequence===rec.sequence))
+   row.historical_source_records.push({batch_key:group.batch_key,sequence:rec.sequence,
+    has_original_url:false,record_type:'company_candidate'});
+  entries.set(id,row);
+ }
+ if(seenSeq.size!==group.entries.length||group.entries.length>100)
+  throw Error('INVALID_RECOVERED_CHAT_COUNT');
+ totals[hall]+=group.entries.length;
+}
+// Do not lose the 700 already-recovered candidate records when adding more
+// historical batches. New galleries may be imported incrementally.
+for(const [sector,requiredCount] of Object.entries(baseline))
+ if(totals[sector]<requiredCount)throw Error('INCOMPLETE_DRAFT_HALL_'+sector);
+for(const [sector,targetCount] of Object.entries(collectionTargets))
+ if(totals[sector]>targetCount)throw Error('COLLECTION_HALL_OVER_TARGET_'+sector);
+const targetTotal=Object.values(collectionTargets).reduce((a,b)=>a+b,0);
+const importedTotal=Object.values(totals).reduce((a,b)=>a+b,0);
+const missingByHall=Object.fromEntries(
+ Object.entries(collectionTargets).map(([id,target])=>[id,target-totals[id]]));
 const items=[...entries.values()].sort((a,b)=>a.name.localeCompare(b.name,'zh-CN'));
 const unknown=items.filter(e=>e.industry_id==='uncategorized').map(e=>e.name);
 const output={schema_version:1,
