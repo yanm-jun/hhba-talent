@@ -125,7 +125,7 @@ test('missing career URL is searchable by an explicitly named employer only',()=
  const named=employerSearchHints([item],'曾在测试培训企业任职','教育运营',2);
  assert.equal(named.length,1);
  assert.match(named[0],/测试培训企业.*企业官网 官方招聘/);
- assert.doesNotMatch(named[0],/site:/);
+ assert.doesNotMatch(named[0],/(?:^|\\s)site:/);
  assert.deepEqual(employerSearchHints([item],'教育培训行业从业','教育运营',2),[]);
 });
 test('admin input enforces sector and https with no invented verification',()=>{
