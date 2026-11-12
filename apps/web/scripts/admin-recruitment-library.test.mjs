@@ -116,7 +116,7 @@ test('quota errors fail visibly with 503 rather than showing synthetic numbers',
  assert.equal(res.status,503);assert.equal((await res.json()).error,'D1_DAILY_LIMIT_REACHED');
 }));
 
-test('100-row import uses one targeted read and only four multi-row write statements',()=>signed(async()=>{
+test('100-row import uses bounded reads and four atomic batches without >100 binds',()=>signed(async()=>{
  const db=mockDb();
  const rows=Array.from({length:100},(_,i)=>({industry_id:'internet-ai',enterprise:'测试'+i,recruitment_url:'https://jobs'+i+'.example.com'}));
  const result=await onRequestPost({request:post({action:'import',upload_id:'b7e2028f-cc43-402e-9008-35736fa914e2',rows}),env:env(db)});
@@ -125,10 +125,11 @@ test('100-row import uses one targeted read and only four multi-row write statem
  assert.equal(data.inserted,100);
  assert.equal(data.duplicates,0);
  assert.equal(data.replayed,0);
- assert.equal(db.batches.length,2,'50 records per transaction');
- assert.deepEqual(db.batches.map(b=>b.length),[2,2],'one INSERT and one audit statement per 50 rows');
- assert.equal(db.calls.filter(x=>x.startsWith('SELECT industry_id,lower')).length,1);
- assert.equal(db.calls.filter(x=>x.startsWith('INSERT INTO')).length,4);
+ assert.equal(db.batches.length,4,'25 records per transaction');
+ assert.deepEqual(db.batches.map(b=>b.length),[50,50,50,50],'one INSERT and one audit per row, in four batched subrequests');
+ assert.equal(db.calls.filter(x=>x.startsWith('SELECT industry_id,lower')).length,2);
+ assert.equal(db.calls.filter(x=>x.startsWith('INSERT INTO')).length,200);
+ assert.ok(db.batches.flat().every(s=>s.args.length<=100),'each SQL stays within D1 parameter cap');
 }));
 test('retry of partially written batch reports replayed as successful, never as duplicates',()=>signed(async()=>{
  const db=mockDb();
