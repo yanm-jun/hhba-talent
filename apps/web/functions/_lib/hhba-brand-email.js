@@ -7,7 +7,10 @@ const MUTED = '#667a92';
 const DIRECTIONS = Object.freeze({
   'tech-lead': '技术负责人 / 全栈架构工程师',
   backend: '后端与数据库工程师',
-  'ai-data': '招聘数据与 AI 搜索工程师',
+  'ai-data': '官方招聘数据与检索工程师',
+  'ai-match': 'AI 匹配与推荐算法工程师',
+  'edge-apply': 'Edge 网申插件工程师',
+  'content-growth': '新媒体内容与用户增长伙伴',
   governance: '企业治理与劳动权益研究伙伴',
   business: '企业合作与商业发展伙伴',
   product: '产品设计 / 前端体验伙伴',
