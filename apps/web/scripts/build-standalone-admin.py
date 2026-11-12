@@ -60,6 +60,15 @@ def main():
         '<meta http-equiv="refresh" content="0;url=/admin-preview/"/>'
         '<title>HHBA 管理后台</title>'
         '<a href="/admin-preview/">进入管理后台</a></html>',encoding="utf-8")
+    # Invoke the root password middleware for ALL routes, including static files.
+    # This ensures an unauthenticated visitor cannot fetch the raw admin HTML.
+    (DIST / "_routes.json").write_text(
+        '{"version":1,"include":["/*"],"exclude":[]}\n',encoding="utf-8")
+    (DIST / "_headers").write_text(
+        "/*\n  X-Frame-Options: DENY\n  Referrer-Policy: no-referrer\n"
+        "  X-Content-Type-Options: nosniff\n"
+        "  Permissions-Policy: camera=(), microphone=(), geolocation=()\n",
+        encoding="utf-8")
     checks=[admin/f for f in files]+[
         DIST/"login/index.html",DIST/"setup/index.html",
         DIST/"admin-login.css",DIST/"admin-login.js",DIST/"index.html"]
