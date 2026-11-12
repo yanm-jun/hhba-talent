@@ -27,7 +27,7 @@ const iso = (ms) => new Date(ms).toISOString();
 // reaching the owner mailbox. Other database errors remain fail-closed.
 function isD1DailyReadLimit(error) {
   const message = String(error?.message || error || '');
-  return /(?:\b7500\b|daily.{0,30}row.read|row.read.{0,30}limit|exceeded.{0,60}row.read|D1.{0,80}(?:read limit|quota))/i.test(message);
+  return /(?:\b7500\b|daily.{0,40}rows?.{0,5}reads?|rows?.{0,5}reads?.{0,30}limit|exceeded.{0,100}rows?.{0,5}reads?|D1.{0,100}(?:read limit|quota))/i.test(message);
 }
 
 function extOf(name) {
