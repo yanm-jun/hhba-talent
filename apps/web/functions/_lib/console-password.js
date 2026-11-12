@@ -2,7 +2,8 @@
 export const ADMIN_HOST='admin.hhba.work';
 export const COOKIE='__Host-hhba_admin';
 export const SESSION_SECONDS=7*24*60*60;
-export const PASSWORD_ITERATIONS=160000;
+// Workers WebCrypto PBKDF2 deriveBits rejects iteration counts above 100,000.
+export const PASSWORD_ITERATIONS=100000;
 const encoder=new TextEncoder();
 const utf8=v=>encoder.encode(v);
 const now=()=>Math.floor(Date.now()/1000);
