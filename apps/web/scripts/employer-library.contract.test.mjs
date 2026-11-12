@@ -72,15 +72,16 @@ test('150 prior Preview audit rows are preserved separately from chat collection
   }
  }
 });
-test('recovered chat names preserve original 200 slots without inventing official portals',()=>{
- assert.equal(restoredCount,200);
- assert.equal(recovered.batches.length,2);
- assert.equal(seed.statistics.recovered_name_rows,200);
+test('recovered chat names preserve original 300 slots without inventing official portals',()=>{
+ assert.equal(restoredCount,300);
+ assert.equal(recovered.batches.length,3);
+ assert.equal(seed.statistics.recovered_name_rows,300);
  const units=recovered.batches.flatMap(b=>b.entries).filter(x=>x.record_type==='business_unit');
- assert.equal(units.length,9);
- assert.equal(seed.historical_non_employer_index.length,9);
+ assert.equal(units.length,12);
+ assert.equal(seed.historical_non_employer_index.length,12);
  assert.equal(seed.collection_coverage.imported_by_hall['consumer-hardware'],200);
  assert.equal(seed.collection_coverage.unimported_by_hall['consumer-hardware'],0);
+ assert.equal(seed.collection_coverage.imported_by_hall['internet-ai'],100);
  const seqs=recovered.batches.flatMap(b=>b.entries.map(x=>x.sequence));
  assert.equal(new Set(seqs).size,200);
  for(const group of recovered.batches){
