@@ -16,11 +16,12 @@ export async function onRequest(context){
   path==='/admin-login.css'||path==='/admin-login.js'||path==='/favicon.svg';
  if(open||path.startsWith('/api/console-auth/'))return next();
  if(path==='/')return Response.redirect('https://'+ADMIN_HOST+'/admin-preview/',302);
- if(path.startsWith('/admin-preview/api/'))return next(); // functions enforce verifyAdmin independently
+ const api=path.startsWith('/admin-preview/api/');
  if(path==='/admin-preview'||path.startsWith('/admin-preview/')){
   const session=await verifyPasswordAdmin(request,env);
   if(!session.ok){
    if(session.status===503)return authError('ADMIN_SESSION_STORE_UNAVAILABLE',503);
+   if(api)return authError('ADMIN_PASSWORD_LOGIN_REQUIRED',401);
    return new Response(null,{status:303,headers:{Location:'/login/',...noStore}});
   }
   const response=await next();
