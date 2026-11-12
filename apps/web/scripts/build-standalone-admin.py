@@ -29,13 +29,17 @@ def main():
     for f in files:
         shutil.copy2(SOURCE / f, admin / f)
 
+    # Versioned filenames prevent a browser from combining new HTML/logo with
+    # a previously cached stylesheet from earlier production deployments.
+    shutil.copy2(SOURCE / "styles.css", admin / "styles-hhba-v2.css")
+    shutil.copy2(SOURCE / "library.css", admin / "library-hhba-v2.css")
     page = (admin / "index.html").read_text(encoding="utf-8")
     rewrites = [
-        ('href="/styles.css"','href="./styles.css"'),
+        ('href="/styles.css"','href="./styles-hhba-v2.css"'),
         ('src="/dashboard.js"','src="./dashboard.js"'),
         ('src="/library.js"','src="./library.js"'),
         ('src="/library-file-ui.js"','src="./library-file-ui.js"'),
-        ('href="/library.css"','href="./library.css"'),
+        ('href="/library.css"','href="./library-hhba-v2.css"'),
         ('href="/favicon.svg"','href="./favicon.svg"'),
     ]
     for old, new in rewrites:
@@ -53,6 +57,12 @@ def main():
         shutil.copy2(SOURCE / route / "index.html",dest / "index.html")
     for f in ["admin-login.css","admin-login.js","favicon.svg"]:
         shutil.copy2(SOURCE / f, DIST / f)
+    shutil.copy2(SOURCE / "admin-login.css", DIST / "admin-login-brand-v2.css")
+    # Fail a deployment rather than silently shipping HTML whose CSS cannot load.
+    for route in ("login", "setup"):
+        html = (DIST / route / "index.html").read_text(encoding="utf-8")
+        if 'href="/admin-login-brand-v2.css"' not in html or 'width="48" height="48"' not in html:
+            raise SystemExit("Versioned login CSS and bounded logo not linked in "+route)
 
     (DIST / "index.html").write_text(
         '<!doctype html><html lang="zh-CN"><meta charset="utf-8"/>'
@@ -67,11 +77,13 @@ def main():
     (DIST / "_headers").write_text(
         "/*\n  X-Frame-Options: DENY\n  Referrer-Policy: no-referrer\n"
         "  X-Content-Type-Options: nosniff\n"
+        "  Cache-Control: no-cache, max-age=0, must-revalidate\n"
         "  Permissions-Policy: camera=(), microphone=(), geolocation=()\n",
         encoding="utf-8")
     checks=[admin/f for f in files]+[
         DIST/"login/index.html",DIST/"setup/index.html",
-        DIST/"admin-login.css",DIST/"admin-login.js",DIST/"index.html"]
+        DIST/"admin-login.css",DIST/"admin-login-brand-v2.css",DIST/"admin-login.js",DIST/"index.html",
+        admin/"styles-hhba-v2.css",admin/"library-hhba-v2.css"]
     assert all(x.exists() and x.stat().st_size>0 for x in checks)
     print("HHBA_PASSWORD_ADMIN_SITE_BUILD_READY files="+str(len(checks))+" route=/login/",flush=True)
 
