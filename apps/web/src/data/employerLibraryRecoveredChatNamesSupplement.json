@@ -15197,25 +15197,9 @@
     {
       "hall_id": "logistics",
       "batch_key": "logistics-201-300",
-      "source_title": "交通物流馆第三批100家（编号271–285原文待找回）",
-      "incomplete_source": true,
-      "missing_sequences": [
-        271,
-        272,
-        273,
-        274,
-        275,
-        276,
-        277,
-        278,
-        279,
-        280,
-        281,
-        282,
-        283,
-        284,
-        285
-      ],
+      "source_title": "交通物流馆第三批100家",
+      "incomplete_source": false,
+      "missing_sequences": [],
       "entries": [
         {
           "sequence": 201,
@@ -15772,6 +15756,126 @@
         {
           "sequence": 270,
           "name": "广西北港物流有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 271,
+          "name": "中国国际货运航空股份有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 272,
+          "name": "民航快递有限责任公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 273,
+          "name": "东方航空物流股份有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 274,
+          "name": "东部机场集团航空物流有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 275,
+          "name": "商舟航空物流有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 276,
+          "name": "顺丰航空有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 277,
+          "name": "贵州民航产业集团有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 278,
+          "name": "多彩贵州航空有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 279,
+          "name": "内蒙古自治区民航机场集团有限责任公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 280,
+          "name": "新疆机场（集团）有限责任公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 281,
+          "name": "苏南硕放国际机场有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 282,
+          "name": "海南航空控股股份有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 283,
+          "name": "北京首都航空有限公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 284,
+          "name": "天津航空有限责任公司",
+          "record_type": "company_candidate",
+          "url": null,
+          "source": "historical_conversation_2026-11-11",
+          "url_status": "not_recorded"
+        },
+        {
+          "sequence": 285,
+          "name": "云南祥鹏航空有限责任公司",
           "record_type": "company_candidate",
           "url": null,
           "source": "historical_conversation_2026-11-11",
