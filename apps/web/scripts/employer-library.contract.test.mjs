@@ -238,3 +238,18 @@ test('build script regenerates checked-in company catalog exactly',()=>{
  }
  assert.equal(after,before,'Index drift: builder output differs from committed source');
 });
+
+test('historical-chat batch provenance and numbering cannot silently double-count',()=>{
+ const keys=new Set();
+ for(const batch of recovered.batches){
+  assert.match(batch.batch_key,/^[-a-z0-9]+-\d{3}-\d{3}$/);
+  assert.ok(batch.batch_key.startsWith(batch.hall_id+'-'));
+  assert.ok(!keys.has(batch.batch_key),'duplicate source batch '+batch.batch_key);
+  keys.add(batch.batch_key);
+  const matches=batch.batch_key.match(/-(\d{3})-(\d{3})$/);
+  const first=Number(matches[1]),last=Number(matches[2]);
+  assert.equal(last-first,99);
+  assert.equal(batch.entries.length,100);
+  assert.deepEqual(batch.entries.map(r=>r.sequence),Array.from({length:100},(_,i)=>first+i));
+ }
+});
