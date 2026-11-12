@@ -243,7 +243,7 @@ test('historical-chat batch provenance and numbering cannot silently double-coun
  const keys=new Set();
  for(const batch of recovered.batches){
   assert.match(batch.batch_key,/^[-a-z0-9]+-\d{3}-\d{3}$/);
-  assert.ok(batch.batch_key.startsWith(batch.hall_id+'-'));
+  assert.ok(batch.batch_key.startsWith((batch.hall_id||recovered.hall_id)+'-'));
   assert.ok(!keys.has(batch.batch_key),'duplicate source batch '+batch.batch_key);
   keys.add(batch.batch_key);
   const matches=batch.batch_key.match(/-(\d{3})-(\d{3})$/);
