@@ -63,7 +63,7 @@ async function gate(request,env){
  if(!actor.ok)return {response:failed(actor.code,actor.status)};
  const db=metricDb(env);
  if(!db)return {response:failed('LIBRARY_DATABASE_NOT_CONNECTED',503)};
- return {db,actor};
+ return {db,actor,readDb:env.HHBA_LIBRARY_READ_DB||db,previewReadOnly:!!env.HHBA_LIBRARY_READ_DB};
 }
 function isMutationSafe(request){
  return sameOrigin(request)&&request.headers.get('x-hhba-library-request')==='1'
@@ -143,8 +143,11 @@ export async function onRequestGet({request,env}){
  const g=await gate(request,env);if(g.response)return g.response;
  const url=new URL(request.url);
  try{
-  if(url.searchParams.get('mode')==='summary')return json(await summary(g.db));
-  if(url.searchParams.get('mode')==='list')return await list(g.db,url);
+  if(url.searchParams.get('mode')==='summary'){
+   const data=await summary(g.readDb);
+   return json({...data,readonly:g.previewReadOnly,source:g.previewReadOnly?'production-read-only':'environment'});
+  }
+  if(url.searchParams.get('mode')==='list')return await list(g.readDb,url);
   return failed('INVALID_LIBRARY_MODE');
  }catch(e){return dbError(e)}
 }
@@ -185,6 +188,7 @@ async function createRows(db,actor,values,action,uploadId=null){
 }
 export async function onRequestPost({request,env}){
  const g=await gate(request,env);if(g.response)return g.response;
+ if(g.previewReadOnly)return failed('LIBRARY_PREVIEW_READ_ONLY',403);
  if(!isMutationSafe(request))return failed('MUTATION_ORIGIN_DENIED',403);
  try{
   const payload=await bodyJson(request);
@@ -204,6 +208,7 @@ async function existingRecord(db,key){
 }
 export async function onRequestPatch({request,env}){
  const g=await gate(request,env);if(g.response)return g.response;
+ if(g.previewReadOnly)return failed('LIBRARY_PREVIEW_READ_ONLY',403);
  if(!isMutationSafe(request))return failed('MUTATION_ORIGIN_DENIED',403);
  try{
   const payload=await bodyJson(request),key=clean(payload?.source_key);
@@ -223,6 +228,7 @@ export async function onRequestPatch({request,env}){
 }
 export async function onRequestDelete({request,env}){
  const g=await gate(request,env);if(g.response)return g.response;
+ if(g.previewReadOnly)return failed('LIBRARY_PREVIEW_READ_ONLY',403);
  if(!isMutationSafe(request))return failed('MUTATION_ORIGIN_DENIED',403);
  try{
   const payload=await bodyJson(request),key=clean(payload?.source_key);
