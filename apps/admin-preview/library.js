@@ -160,19 +160,6 @@ async function libRemove(record){
   libMessage('已删除该条记录并写入审计日志。','ok');
  }catch(e){libMessage(libErrorMessage(e.status,e.body),'error')}
 }
-function libParseImport(text){
- const lines=text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
- if(!lines.length||lines.length>100)throw Error('一次仅允许导入 1–100 行。');
- return lines.map((line,i)=>{
-  const cols=line.split('\t').map(x=>x.trim());
-  const industry_id=cols.length===3?cols[0]:libState.industry;
-  const enterprise=cols.length===3?cols[1]:cols[0];
-  const recruitment_url=cols.length===3?cols[2]:cols[1];
-  if(!industry_id||!enterprise||!recruitment_url||![2,3].includes(cols.length))
-   throw Error('第 '+(i+1)+' 行格式不正确，按企业名称、网址两列用 Tab 分隔。');
-  return {industry_id,enterprise,recruitment_url,verified:false};
- });
-}
 function libInit(){
  if(libState.started)return;libState.started=true;
  const industrySelect=libEl('lib-industry');
@@ -183,9 +170,10 @@ function libInit(){
  libEl('lib-prev').addEventListener('click',()=>{if(libState.page>1){libState.page--;void libFetchList()}});
  libEl('lib-next').addEventListener('click',()=>{if(libState.hasMore){libState.page++;void libFetchList()}});
  libEl('lib-add').addEventListener('click',()=>libModal());
- libEl('lib-import').addEventListener('click',()=>{libEl('lib-import-form').reset();libEl('lib-import-error').textContent='';libEl('lib-import-dialog').showModal()});
+ libEl('lib-import').addEventListener('click',()=>window.hhbaImport?.open(libState.industry));
+ libEl('lib-upload-all').addEventListener('click',()=>window.hhbaImport?.open(''));
  for(const id of ['lib-edit-close','lib-edit-cancel'])libEl(id).addEventListener('click',()=>libEl('lib-edit-dialog').close());
- for(const id of ['lib-import-close','lib-import-cancel'])libEl(id).addEventListener('click',()=>libEl('lib-import-dialog').close());
+
  libEl('lib-edit-form').addEventListener('submit',async e=>{
   e.preventDefault();const key=libEl('lib-key').value;
   const row={industry_id:libEl('lib-industry').value,enterprise:libEl('lib-name').value.trim(),
@@ -197,16 +185,6 @@ function libInit(){
   }catch(err){libEl('lib-edit-error').textContent=libErrorMessage(err.status,err.body)}
   finally{btn.disabled=false}
  });
- libEl('lib-import-form').addEventListener('submit',async e=>{
-  e.preventDefault();let rows;
-  try{rows=libParseImport(libEl('lib-import-text').value)}catch(err){libEl('lib-import-error').textContent=err.message;return}
-  const btn=libEl('lib-import-submit');btn.disabled=true;libEl('lib-import-error').textContent='';
-  try{
-   const result=await libMutate('POST',{action:'import',rows});
-   libEl('lib-import-dialog').close();
-   libMessage('导入成功 '+result.inserted+' 条，跳过重复 '+result.skipped+' 条（库内按行业和网址去重）。','ok');
-  }catch(err){libEl('lib-import-error').textContent=libErrorMessage(err.status,err.body)}
-  finally{btn.disabled=false}
- });
+
 }
-window.hhbaLibrary={open(){libInit();void libRefreshSummary()},refresh(){void libRefreshSummary(true)}};
+window.hhbaLibrary={open(){libInit();void libRefreshSummary()},async refresh(){await libRefreshSummary(true);if(libState.industry)await libFetchList()}};
