@@ -32,7 +32,7 @@ function goodDb() {
         bind() {
           return {
             async first() { return { n: 0 }; },
-            async run() { return { meta: { last_row_id: 123 }; },
+            async run() { return { meta: { last_row_id: 123 } }; },
           };
         },
       };
