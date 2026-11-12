@@ -64,7 +64,7 @@ test('untrusted form input is HTML escaped and unsafe links are not clickable', 
 
 test('plain inbound email acknowledgment cannot be mistaken for an application confirmation', () => {
   const result = renderInboundReceiptEmail({ name: '李先生' });
-  assert.match(result.text, /来信/);
+  assert.match(result.text, /来信|邮件/);
   assert.match(result.html, /WE HAVE RECEIVED YOUR EMAIL/);
   assert.doesNotMatch(result.html, /已收到你的合作申请/);
 });

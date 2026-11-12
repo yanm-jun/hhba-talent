@@ -1,0 +1,33 @@
+name: HHBA zero-cash partner recruitment review
+on:
+  push:
+    branches: [feature/join-zero-cash-partners-20261112]
+  pull_request:
+    paths:
+      - 'apps/web/src/pages/JoinUsPage.tsx'
+      - 'apps/web/src/styles/join-vision.css'
+      - 'apps/web/functions/api/join-apply.js'
+      - 'apps/web/functions/_lib/hhba-brand-email.js'
+      - 'apps/web/scripts/hhba-join-zero-cash.contract.test.mjs'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Verify recruitment, source contracts, email and D1-safe application flow
+        run: |
+          node --test apps/web/scripts/hhba-join-zero-cash.contract.test.mjs
+          node --test apps/web/scripts/hhba-email-templates.test.mjs
+          node --test apps/web/scripts/hhba-join-email-fallback.test.mjs
+          node --test --test-name-pattern='all career and vision pages are linked' apps/web/scripts/hhba-unified-static.contract.test.mjs
+      - name: Type check website
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          npx tsc -b --pretty false

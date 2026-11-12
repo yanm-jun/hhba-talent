@@ -8,7 +8,7 @@ import { renderJoinOwnerEmail, renderJoinReceiptEmail } from '../_lib/hhba-brand
 //   JOIN_FROM_EMAIL：发件人，默认 onboarding@resend.dev（未做域名验证时的测试发件人）
 // 简历不长期存库：只随邮件发附件，D1 只记文件名与大小；邮件失败时申请记录仍在库里可找回。
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const DIRECTIONS = new Set(['tech-lead', 'backend', 'ai-data', 'governance', 'business', 'product', 'other']);
+const DIRECTIONS = new Set(['tech-lead', 'backend', 'ai-data', 'ai-match', 'edge-apply', 'content-growth', 'governance', 'business', 'product', 'other']);
 const WEEKLY = new Set(['每周 1–5 小时', '每周 6–15 小时', '每周 16–30 小时', '每周 30 小时以上', '待进一步沟通']);
 const MODES = new Set(['远程协作', '线上线下结合', '未来正式岗位', '灵活协商']);
 const RESUME_EXTS = new Set(['pdf', 'doc', 'docx']);
