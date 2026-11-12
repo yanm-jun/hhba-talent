@@ -75,8 +75,8 @@
   "collection_coverage": {
     "definition": "历史聊天行业馆收集记录数。不是企业唯一实体数，也不是有效官方招聘链接数。",
     "target_total": 3800,
-    "imported_batch_records": 1000,
-    "unimported_batch_records": 2800,
+    "imported_batch_records": 1100,
+    "unimported_batch_records": 2700,
     "target_by_hall": {
       "automotive": 200,
       "semiconductor": 200,
@@ -101,7 +101,7 @@
       "semiconductor": 200,
       "internet-ai": 100,
       "energy": 300,
-      "manufacturing": 0,
+      "manufacturing": 100,
       "finance": 0,
       "telecom": 0,
       "biomed": 0,
@@ -120,7 +120,7 @@
       "semiconductor": 0,
       "internet-ai": 100,
       "energy": 0,
-      "manufacturing": 400,
+      "manufacturing": 300,
       "finance": 100,
       "telecom": 100,
       "biomed": 300,
@@ -709,6 +709,26 @@
       ]
     },
     {
+      "id": "埃夫特智能机器人",
+      "name": "埃夫特智能机器人",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 3,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "埃斯顿",
       "name": "埃斯顿",
       "industry_id": "manufacturing",
@@ -726,6 +746,26 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "埃斯顿自动化",
+      "name": "埃斯顿自动化",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 1,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -749,6 +789,26 @@
       ]
     },
     {
+      "id": "艾迪精密",
+      "name": "艾迪精密",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 58,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "艾格斯特",
       "name": "艾格斯特",
       "industry_id": "consumer-hardware",
@@ -763,6 +823,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 133,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "艾利特机器人",
+      "name": "艾利特机器人",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 11,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -1009,6 +1089,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 89,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "安徽合力",
+      "name": "安徽合力",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 69,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -1549,6 +1649,26 @@
       ]
     },
     {
+      "id": "奥比中光",
+      "name": "奥比中光",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 55,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "奥迪一汽新能源汽车",
       "name": "奥迪一汽新能源汽车",
       "industry_id": "automotive",
@@ -1638,6 +1758,26 @@
       ]
     },
     {
+      "id": "奥普特科技",
+      "name": "奥普特科技",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 54,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "奥拓电子",
       "name": "奥拓电子",
       "industry_id": "consumer-hardware",
@@ -1652,6 +1792,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 170,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "奥特维科技",
+      "name": "奥特维科技",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 38,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -1776,6 +1936,26 @@
       ]
     },
     {
+      "id": "柏楚电子",
+      "name": "柏楚电子",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 25,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "宝钢股份",
       "name": "宝钢股份",
       "industry_id": "chem-materials",
@@ -1835,6 +2015,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ]
+    },
+    {
+      "id": "宝信软件",
+      "name": "宝信软件",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 96,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -2136,6 +2336,26 @@
         {
           "hall_id": "energy",
           "code": "energy-equipment"
+        }
+      ]
+    },
+    {
+      "id": "北京发那科fanuc",
+      "name": "北京发那科 FANUC",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 88,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -2700,6 +2920,26 @@
       ]
     },
     {
+      "id": "倍福自动化",
+      "name": "倍福自动化",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 82,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "倍轻松科技",
       "name": "倍轻松科技",
       "industry_id": "consumer-hardware",
@@ -3005,6 +3245,26 @@
       ]
     },
     {
+      "id": "博乐精工",
+      "name": "博乐精工",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 36,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "博联智能(broadlink)",
       "name": "博联智能（BroadLink）",
       "industry_id": "consumer-hardware",
@@ -3044,6 +3304,26 @@
           "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
           "source_url": "https://www.hasco-group.com/about/company.html/1000",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "博世力士乐",
+      "name": "博世力士乐",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 81,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -3153,6 +3433,26 @@
           "sequence": 16,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "步科股份",
+      "name": "步科股份",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 80,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -3813,6 +4113,26 @@
       ]
     },
     {
+      "id": "大恒图像",
+      "name": "大恒图像",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 52,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "大疆创新",
       "name": "大疆创新",
       "industry_id": "aerospace",
@@ -3936,6 +4256,46 @@
           "relationship_hint": "集团合资体系关联；非全部为控股子公司",
           "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561601&stockid=000030",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "大族机器人",
+      "name": "大族机器人",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 10,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "大族激光智能装备",
+      "name": "大族激光智能装备",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 32,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -4392,6 +4752,26 @@
       ]
     },
     {
+      "id": "帝尔激光",
+      "name": "帝尔激光",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 42,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "第四范式",
       "name": "第四范式",
       "industry_id": "internet-ai",
@@ -4513,6 +4893,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 30,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "鼎捷数智",
+      "name": "鼎捷数智",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 93,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -6085,6 +6485,46 @@
       ]
     },
     {
+      "id": "非夕科技",
+      "name": "非夕科技",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 5,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "费斯托festo",
+      "name": "费斯托 Festo",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 83,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "分众传媒",
       "name": "分众传媒",
       "industry_id": "culture-media",
@@ -7088,6 +7528,26 @@
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ]
+    },
+    {
+      "id": "固高科技",
+      "name": "固高科技",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 26,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -9430,6 +9890,26 @@
       ]
     },
     {
+      "id": "国盛智科",
+      "name": "国盛智科",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 56,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "国投电力控股股份有限公司",
       "name": "国投电力控股股份有限公司",
       "industry_id": "energy",
@@ -9816,6 +10296,26 @@
       ]
     },
     {
+      "id": "海德曼智能装备",
+      "name": "海德曼智能装备",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 78,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "海尔集团",
       "name": "海尔集团",
       "industry_id": "consumer-hardware",
@@ -9911,7 +10411,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_manufacturing-001-100"
       ],
       "audit_references": [
         {
@@ -9919,6 +10420,14 @@
           "sequence": 31,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 51,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -9969,6 +10478,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 49,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "海目星激光",
+      "name": "海目星激光",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 33,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -10029,6 +10558,26 @@
         {
           "hall_id": "energy",
           "code": "energy-grid"
+        }
+      ]
+    },
+    {
+      "id": "海柔创新",
+      "name": "海柔创新",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 7,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -10135,6 +10684,26 @@
           "relationship_hint": "北汽官网2026年智能工厂名单，体系关联而非直接控股声明",
           "source_url": "https://www.baicgroup.com.cn/baicgroup/News/NewsShort/2026/1/I1457793774917779457.html",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "海天精工(海天集团)",
+      "name": "海天精工（海天集团）",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 57,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -10286,6 +10855,26 @@
       ]
     },
     {
+      "id": "汉得信息",
+      "name": "汉得信息",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 92,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "汉骅半导体",
       "name": "汉骅半导体",
       "industry_id": "semiconductor",
@@ -10329,6 +10918,46 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 138,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "汉钟精机",
+      "name": "汉钟精机",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 48,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "杭叉集团",
+      "name": "杭叉集团",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 70,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -10417,6 +11046,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 135,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "禾川科技",
+      "name": "禾川科技",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 20,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -10602,6 +11251,26 @@
       ]
     },
     {
+      "id": "和利时",
+      "name": "和利时",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 23,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "河北建设投资集团",
       "name": "河北建设投资集团",
       "industry_id": "energy",
@@ -10692,6 +11361,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "恒立液压",
+      "name": "恒立液压",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 59,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -11111,6 +11800,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-equipment"
+        }
+      ]
+    },
+    {
+      "id": "华工科技",
+      "name": "华工科技",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 43,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -12437,13 +13146,24 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_336"
+        "draft_pr_336",
+        "historic_chat_manufacturing-001-100"
       ],
-      "related_hall_ids": [],
+      "related_hall_ids": [
+        "manufacturing"
+      ],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-equipment"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 44,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -13261,7 +13981,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_manufacturing-001-100"
       ],
       "audit_references": [
         {
@@ -13269,6 +13990,14 @@
           "sequence": 30,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 16,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -13494,6 +14223,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-fab"
+        }
+      ]
+    },
+    {
+      "id": "基恩士keyence",
+      "name": "基恩士 KEYENCE",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 85,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -13746,6 +14495,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 154,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "极智嘉科技",
+      "name": "极智嘉科技",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 8,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -14268,6 +15037,46 @@
       ]
     },
     {
+      "id": "节卡机器人",
+      "name": "节卡机器人",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 14,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "杰普特",
+      "name": "杰普特",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 40,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "捷佳伟创(光伏设备)",
       "name": "捷佳伟创（光伏设备）",
       "industry_id": "energy",
@@ -14322,6 +15131,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ]
+    },
+    {
+      "id": "金辰股份",
+      "name": "金辰股份",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 100,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -14931,13 +15760,24 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_336"
+        "draft_pr_336",
+        "historic_chat_manufacturing-001-100"
       ],
-      "related_hall_ids": [],
+      "related_hall_ids": [
+        "manufacturing"
+      ],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-equipment"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 45,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -15351,6 +16191,26 @@
       ]
     },
     {
+      "id": "康耐视cognex",
+      "name": "康耐视 Cognex",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 86,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "康强电子",
       "name": "康强电子",
       "industry_id": "semiconductor",
@@ -15525,6 +16385,26 @@
       ]
     },
     {
+      "id": "科德数控",
+      "name": "科德数控",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 77,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "科华数据",
       "name": "科华数据",
       "industry_id": "energy",
@@ -15675,6 +16555,66 @@
       ]
     },
     {
+      "id": "科远智慧",
+      "name": "科远智慧",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 97,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "库卡机器人kuka",
+      "name": "库卡机器人 KUKA",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 84,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "快仓智能",
+      "name": "快仓智能",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 12,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "快手",
       "name": "快手",
       "industry_id": "internet-ai",
@@ -15740,6 +16680,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "拉普拉斯新能源科技",
+      "name": "拉普拉斯新能源科技",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 41,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -16209,7 +17169,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "historic_chat_manufacturing-001-100"
       ],
       "audit_references": [
         {
@@ -16217,6 +17178,14 @@
           "sequence": 33,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 17,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -16516,6 +17485,26 @@
       ]
     },
     {
+      "id": "利元亨",
+      "name": "利元亨",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 35,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "莉莉丝游戏",
       "name": "莉莉丝游戏",
       "industry_id": "internet-ai",
@@ -16733,6 +17722,26 @@
       ]
     },
     {
+      "id": "联赢激光",
+      "name": "联赢激光",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 39,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "联影医疗",
       "name": "联影医疗",
       "industry_id": "biomed",
@@ -16750,6 +17759,26 @@
       ],
       "source_datasets": [
         "domesticRecruitment200Registry"
+      ]
+    },
+    {
+      "id": "临工重机",
+      "name": "临工重机",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 67,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -16880,6 +17909,26 @@
       ]
     },
     {
+      "id": "凌云光",
+      "name": "凌云光",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 53,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "零跑汽车",
       "name": "零跑汽车",
       "industry_id": "automotive",
@@ -16999,6 +18048,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 184,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "柳工机械",
+      "name": "柳工机械",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 63,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -17267,6 +18336,26 @@
       ]
     },
     {
+      "id": "罗克韦尔自动化",
+      "name": "罗克韦尔自动化",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 30,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "罗姆半导体(rohm)",
       "name": "罗姆半导体（ROHM）",
       "industry_id": "semiconductor",
@@ -17292,6 +18381,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-global"
+        }
+      ]
+    },
+    {
+      "id": "珞石机器人",
+      "name": "珞石机器人",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 13,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -17411,6 +18520,26 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "麦格米特",
+      "name": "麦格米特",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 79,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -18978,6 +20107,26 @@
       ]
     },
     {
+      "id": "能科科技",
+      "name": "能科科技",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 94,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "尼得科(苏州)",
       "name": "尼得科（苏州）",
       "industry_id": "automotive",
@@ -19225,6 +20374,26 @@
       ]
     },
     {
+      "id": "诺力智能装备",
+      "name": "诺力智能装备",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 71,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "欧菲光(ofilm)",
       "name": "欧菲光（OFILM）",
       "industry_id": "consumer-hardware",
@@ -19259,6 +20428,26 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 117,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "欧姆龙omron",
+      "name": "欧姆龙 OMRON",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 89,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -19647,7 +20836,8 @@
       "aliases": [],
       "portals": [],
       "source_datasets": [
-        "historic_chat_consumer-hardware-101-200"
+        "historic_chat_consumer-hardware-101-200",
+        "historic_chat_manufacturing-001-100"
       ],
       "historical_source_records": [
         {
@@ -19655,7 +20845,16 @@
           "sequence": 140,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 9,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "manufacturing"
       ]
     },
     {
@@ -20077,6 +21276,26 @@
       ]
     },
     {
+      "id": "秦川机床",
+      "name": "秦川机床",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 99,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "沁园集团",
       "name": "沁园集团",
       "industry_id": "consumer-hardware",
@@ -20228,6 +21447,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-analog"
+        }
+      ]
+    },
+    {
+      "id": "清研精准",
+      "name": "清研精准",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 15,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -20390,6 +21629,26 @@
       ]
     },
     {
+      "id": "日发精机",
+      "name": "日发精机",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 50,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "日月光半导体(ase)",
       "name": "日月光半导体（ASE）",
       "industry_id": "semiconductor",
@@ -20507,6 +21766,26 @@
           "relationship_hint": "广汽集团官网企业名录：三电、充电能源",
           "source_url": "https://www.gacgroup.com/cn/companies",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "瑞晟智能",
+      "name": "瑞晟智能",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 22,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -20758,13 +22037,24 @@
         }
       ],
       "source_datasets": [
-        "draft_pr_336"
+        "draft_pr_336",
+        "historic_chat_manufacturing-001-100"
       ],
-      "related_hall_ids": [],
+      "related_hall_ids": [
+        "manufacturing"
+      ],
       "sections": [
         {
           "hall_id": "semiconductor",
           "code": "semi-equipment"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 37,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -20823,6 +22113,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "赛意信息",
+      "name": "赛意信息",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 91,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -20910,6 +22220,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-parts"
+        }
+      ]
+    },
+    {
+      "id": "三菱电机自动化(中国)",
+      "name": "三菱电机自动化（中国）",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 87,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -21002,7 +22332,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_manufacturing-001-100"
       ],
       "audit_references": [
         {
@@ -21010,6 +22341,14 @@
           "sequence": 18,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 61,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -21031,6 +22370,26 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "三一重能",
+      "name": "三一重能",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 75,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -21404,6 +22763,26 @@
       ]
     },
     {
+      "id": "山东临工",
+      "name": "山东临工",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 68,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "山东能源集团有限公司",
       "name": "山东能源集团有限公司",
       "industry_id": "energy",
@@ -21447,6 +22826,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 92,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "山推股份",
+      "name": "山推股份",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 64,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -24018,6 +25417,26 @@
       ]
     },
     {
+      "id": "沈阳机床股份",
+      "name": "沈阳机床股份",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 98,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "圣邦微电子",
       "name": "圣邦微电子",
       "industry_id": "semiconductor",
@@ -24130,6 +25549,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-equipment"
+        }
+      ]
+    },
+    {
+      "id": "施耐德电气(中国)",
+      "name": "施耐德电气（中国）",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 29,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -25101,7 +26540,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "historic_chat_manufacturing-001-100"
       ],
       "audit_references": [
         {
@@ -25109,6 +26549,14 @@
           "sequence": 39,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 46,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -25138,6 +26586,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-fab"
+        }
+      ]
+    },
+    {
+      "id": "太原重工(太重集团)",
+      "name": "太原重工（太重集团）",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 74,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -26163,6 +27631,26 @@
       ]
     },
     {
+      "id": "维宏股份",
+      "name": "维宏股份",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 60,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "维信诺",
       "name": "维信诺",
       "industry_id": "semiconductor",
@@ -26300,6 +27788,26 @@
       ]
     },
     {
+      "id": "潍柴雷沃智慧农业",
+      "name": "潍柴雷沃智慧农业",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 72,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "伟巴斯特(中国业务)",
       "name": "伟巴斯特（中国业务）",
       "industry_id": "automotive",
@@ -26354,6 +27862,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-packaging"
+        }
+      ]
+    },
+    {
+      "id": "伟创电气",
+      "name": "伟创电气",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 19,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -26871,6 +28399,26 @@
       ]
     },
     {
+      "id": "西门子(中国)",
+      "name": "西门子（中国）",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 27,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "西门子eda",
       "name": "西门子EDA",
       "industry_id": "semiconductor",
@@ -26900,6 +28448,26 @@
       ]
     },
     {
+      "id": "仙工智能",
+      "name": "仙工智能",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 6,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "仙工智能(seer)",
       "name": "仙工智能（SEER）",
       "industry_id": "consumer-hardware",
@@ -26914,6 +28482,46 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 147,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "先导智能",
+      "name": "先导智能",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 31,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "先临三维",
+      "name": "先临三维",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 49,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -27774,6 +29382,26 @@
       ]
     },
     {
+      "id": "新时达",
+      "name": "新时达",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 21,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "新思科技(synopsys)",
       "name": "新思科技（Synopsys）",
       "industry_id": "semiconductor",
@@ -27799,6 +29427,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-eda"
+        }
+      ]
+    },
+    {
+      "id": "新松机器人",
+      "name": "新松机器人",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 2,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -28056,7 +29704,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "historic_chat_manufacturing-001-100"
       ],
       "audit_references": [
         {
@@ -28064,6 +29713,14 @@
           "sequence": 46,
           "preview_status": "pending",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 62,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -28233,6 +29890,26 @@
           "relationship_hint": "华域官网列示的业务/投资企业；不推断皆为全资",
           "source_url": "https://www.hasco-group.com/about/company.html/1000",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "亚威股份",
+      "name": "亚威股份",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 47,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -30311,7 +31988,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B05"
+        "preview_audit_B05",
+        "historic_chat_manufacturing-001-100"
       ],
       "audit_references": [
         {
@@ -30319,6 +31997,14 @@
           "sequence": 34,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 18,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -30386,6 +32072,26 @@
         {
           "batch_key": "consumer-hardware-001-100",
           "sequence": 45,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "赢合科技",
+      "name": "赢合科技",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 34,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -31040,6 +32746,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-fab"
+        }
+      ]
+    },
+    {
+      "id": "越疆机器人",
+      "name": "越疆机器人",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 4,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -35507,7 +37233,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_manufacturing-001-100"
       ],
       "audit_references": [
         {
@@ -35515,6 +37242,14 @@
           "sequence": 50,
           "preview_status": "pending",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 66,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -35602,6 +37337,26 @@
         {
           "hall_id": "automotive",
           "code": "auto-whole"
+        }
+      ]
+    },
+    {
+      "id": "中国一重",
+      "name": "中国一重",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 73,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -36387,7 +38142,36 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 24,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中联重科",
+      "name": "中联重科",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 65,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -36521,6 +38305,26 @@
       ]
     },
     {
+      "id": "中铁工程装备集团",
+      "name": "中铁工程装备集团",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 76,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中通快递",
       "name": "中通快递",
       "industry_id": "logistics",
@@ -36548,6 +38352,26 @@
           "sequence": 2,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中望软件",
+      "name": "中望软件",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 95,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -37159,6 +38983,26 @@
       ]
     },
     {
+      "id": "abb(中国)",
+      "name": "ABB（中国）",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 28,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "agtcloud",
       "name": "AGTCloud",
       "industry_id": "internet-ai",
@@ -37497,6 +39341,26 @@
       ]
     },
     {
+      "id": "smc(中国)",
+      "name": "SMC（中国）",
+      "industry_id": "manufacturing",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_manufacturing-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "manufacturing-001-100",
+          "sequence": 90,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "stellantis中国业务",
       "name": "Stellantis 中国业务",
       "industry_id": "automotive",
@@ -37725,12 +39589,12 @@
     }
   ],
   "statistics": {
-    "recovered_name_rows": 300,
+    "recovered_name_rows": 400,
     "recovered_business_units": 12,
     "automotive_research_nodes": 266,
     "automotive_research_brands": 36,
     "prior_audit_source_rows": 150,
-    "entities": 1410,
+    "entities": 1497,
     "unique_portal_urls": 826,
     "legacy_portals": 130,
     "candidate_portals": 793,
@@ -37741,7 +39605,7 @@
       "semiconductor": 204,
       "internet-ai": 101,
       "energy": 312,
-      "manufacturing": 16,
+      "manufacturing": 103,
       "finance": 38,
       "telecom": 5,
       "biomed": 12,
