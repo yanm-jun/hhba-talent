@@ -39,6 +39,7 @@ function libCount(v){return Number.isSafeInteger(v)&&v>=0?libFmt.format(v):'—'
 function libMessage(text,tone=''){const e=libEl('lib-message');e.textContent=text;e.dataset.tone=tone}
 function libErrorMessage(status,body){
  if(body?.error==='D1_DAILY_LIMIT_REACHED')return 'Cloudflare D1 今日读取额度已满。数据未改动，请额度恢复后再刷新。';
+ if(body?.error==='LIBRARY_PREVIEW_READ_ONLY')return '当前为正式库只读预览，Excel 导入与修改将在完成数据库迁移及正式发布后开放。';
  if(status===401||status===403)return '请通过 Cloudflare Access 管理员验证后打开此资源库。';
  if(body?.error==='LIBRARY_DATABASE_NOT_CONNECTED')return '数据库尚未绑定到本预览环境，不能读取生产资料。';
  if(status===404)return '当前是独立静态预览，尚未连接受保护的资源库接口。';
@@ -74,6 +75,9 @@ function libStatus(row){
 }
 function libRenderSummary(){
  const s=libState.summary;
+ const readOnly=s?.mode==='snapshot'||s?.readonly===true;
+ libEl('lib-upload-all').disabled=readOnly;
+ libEl('lib-upload-all').title=readOnly?'当前是只读快照／正式库只读预览；暂不可写入企业数据':'上传 Excel 或 CSV 文件';
  for(const [id,v] of [['lib-total-urls',s?.total?.unique_urls],['lib-total-rows',s?.total?.records],
   ['lib-total-linked',s?.total?.linked],['lib-total-missing',s?.total?.missing]])libEl(id).textContent=libCount(v);
  const root=libEl('lib-halls');root.replaceChildren();
@@ -103,7 +107,9 @@ async function libRefreshSummary(force=false){
  try{
   const result=await libRequest({mode:'summary'});
   libState.summary=result;libRenderSummary();
-  libMessage('已从受保护数据库读取行业统计。各馆去重数相加不等于全库去重数。','ok');
+  libMessage(result.readonly?
+   '正式生产库只读预览：现在展示真实企业数量与资料目录。为保护正式数据，新增、修改和 Excel 导入在预览中暂不开放。':
+   '已从受保护数据库读取行业统计。各馆去重数相加不等于全库去重数。','ok');
  }catch(e){
   if(e.body?.error==='D1_DAILY_LIMIT_REACHED'&&libIsDesignPreview()){
    libState.summary=LIB_VERIFIED_SNAPSHOT;libRenderSummary();
@@ -120,7 +126,8 @@ async function libSelect(industry){
  libEl('lib-entry-panel').hidden=false;
  libEl('lib-current-hall').textContent=LIB_HALLS.find(x=>x[0]===industry)[1];
  const offline=libState.summary?.mode==='snapshot';
- libEl('lib-add').disabled=offline;libEl('lib-import').disabled=offline;
+ const readOnly=offline||libState.summary?.readonly===true;
+ libEl('lib-add').disabled=readOnly;libEl('lib-import').disabled=readOnly;
  libRenderSummary();
  if(offline){
   libState.rows=[];libState.hasMore=false;libState.lastListError='数据库限额已满，当前仅能查看截至 2026-11-12 的行业数量快照。企业名称和网址明细无法读取，并非没有企业。';
@@ -175,7 +182,10 @@ function libRenderRows(){
   tag.className='lib-tag '+s[1];tag.textContent=s[0];td.append(tag);tr.append(td);
   const src=libCell(tr,record.source_batch||record.source_kind||'—');src.className='lib-source';src.title=record.source_kind||'';
   const actions=document.createElement('td');actions.className='lib-actions';
-  actions.append(libButton('编辑',()=>libEdit(record)),libButton('删除',()=>{void libRemove(record)},'lib-danger'));
+  const edit=libButton('编辑',()=>libEdit(record));
+  const del=libButton('删除',()=>{void libRemove(record)},'lib-danger');
+  edit.disabled=libState.summary?.readonly===true;del.disabled=edit.disabled;
+  actions.append(edit,del);
   tr.append(actions);root.append(tr);
  }
  if(!libState.rows.length){const tr=document.createElement('tr'),td=document.createElement('td');
