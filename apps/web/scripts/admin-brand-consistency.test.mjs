@@ -40,3 +40,20 @@ test('Administration colors are consistently blue/orange, with unobtrusive mobil
  assert.match(library,/#4288ea/);
  assert.match(library,/lib-upload-preview/);
 });
+
+test('Fingerprinted CSS and hard-coded SVG dimensions prevent the real-life cached-style logo overlay',()=>{
+ for(const path of ['../../admin-preview/login/index.html','../../admin-preview/setup/index.html']){
+  const html=read(path);
+  assert.match(html,/href="\/admin-login-brand-v2\.css"/);
+  assert.match(html,/width="48" height="48"/);
+  assert.match(html,/style="display:block;width:48px;height:48px;max-width:100%;object-fit:contain;flex:none"/);
+ }
+ const build=read('./build-standalone-admin.py');
+ assert.match(build,/admin-login-brand-v2\.css/);
+ assert.match(build,/styles-hhba-v2\.css/);
+ assert.match(build,/library-hhba-v2\.css/);
+ assert.match(build,/Cache-Control: no-cache/);
+ const middleware=read('../functions/_middleware.js');
+ assert.match(middleware,/path==='\/admin-login-brand-v2\.css'/);
+ assert.match(middleware,/no-store, max-age=0, must-revalidate/);
+});
