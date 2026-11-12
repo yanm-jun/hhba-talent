@@ -75,8 +75,8 @@
   "collection_coverage": {
     "definition": "历史聊天行业馆收集记录数。不是企业唯一实体数，也不是有效官方招聘链接数。",
     "target_total": 3800,
-    "imported_batch_records": 1200,
-    "unimported_batch_records": 2600,
+    "imported_batch_records": 1300,
+    "unimported_batch_records": 2500,
     "target_by_hall": {
       "automotive": 200,
       "semiconductor": 200,
@@ -102,7 +102,7 @@
       "internet-ai": 100,
       "energy": 300,
       "manufacturing": 100,
-      "finance": 0,
+      "finance": 100,
       "telecom": 0,
       "biomed": 0,
       "aerospace": 0,
@@ -121,7 +121,7 @@
       "internet-ai": 100,
       "energy": 0,
       "manufacturing": 300,
-      "finance": 100,
+      "finance": 0,
       "telecom": 100,
       "biomed": 300,
       "aerospace": 300,
@@ -1717,6 +1717,26 @@
       ]
     },
     {
+      "id": "安盛天平保险",
+      "name": "安盛天平保险",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 68,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "安世半导体(nexperia)",
       "name": "安世半导体（Nexperia）",
       "industry_id": "semiconductor",
@@ -2098,6 +2118,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 4,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "百年人寿",
+      "name": "百年人寿",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 69,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -3009,7 +3049,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 21,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -3533,6 +3582,26 @@
       ]
     },
     {
+      "id": "博时基金",
+      "name": "博时基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 75,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "博世华域转向系统有限公司",
       "name": "博世华域转向系统有限公司",
       "industry_id": "automotive",
@@ -3673,7 +3742,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -3681,6 +3751,14 @@
           "sequence": 16,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 20,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -3699,6 +3777,26 @@
         {
           "batch_key": "manufacturing-001-100",
           "sequence": 80,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "财通证券",
+      "name": "财通证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 50,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -3969,7 +4067,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitment200Registry"
+        "domesticRecruitment200Registry",
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 25,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -3992,6 +4099,26 @@
           "relationship_hint": "上汽集团2025年度新纳入合并范围（核最新持股链）",
           "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12055328&stockid=600104",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "重庆银行",
+      "name": "重庆银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 29,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -5299,6 +5426,26 @@
       ]
     },
     {
+      "id": "东北证券",
+      "name": "东北证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 49,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "东方半导体",
       "name": "东方半导体",
       "industry_id": "semiconductor",
@@ -6515,6 +6662,26 @@
       ]
     },
     {
+      "id": "东吴证券",
+      "name": "东吴证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 41,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "斗鱼",
       "name": "斗鱼",
       "industry_id": "internet-ai",
@@ -6529,6 +6696,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 26,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "度小满",
+      "name": "度小满",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 95,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -7485,6 +7672,46 @@
       ]
     },
     {
+      "id": "富达基金(中国)",
+      "name": "富达基金（中国）",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 90,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "富德生命人寿",
+      "name": "富德生命人寿",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 63,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "富瀚微",
       "name": "富瀚微",
       "industry_id": "semiconductor",
@@ -7903,6 +8130,46 @@
       ]
     },
     {
+      "id": "工银安盛人寿",
+      "name": "工银安盛人寿",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 61,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "工银瑞信基金",
+      "name": "工银瑞信基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 81,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "公牛集团",
       "name": "公牛集团",
       "industry_id": "consumer-hardware",
@@ -8037,7 +8304,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 40,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -8303,6 +8579,46 @@
       ]
     },
     {
+      "id": "广发基金",
+      "name": "广发基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 84,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "广发银行",
+      "name": "广发银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 16,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "广发证券",
       "name": "广发证券",
       "industry_id": "finance",
@@ -8320,7 +8636,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -8328,6 +8645,14 @@
           "sequence": 42,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 34,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -10243,6 +10568,26 @@
       ]
     },
     {
+      "id": "国家开发银行",
+      "name": "国家开发银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 7,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "国家能源集团",
       "name": "国家能源集团",
       "industry_id": "energy",
@@ -10268,6 +10613,46 @@
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ]
+    },
+    {
+      "id": "国金证券",
+      "name": "国金证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 42,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "国联民生证券",
+      "name": "国联民生证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 43,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -10344,6 +10729,46 @@
         {
           "batch_key": "manufacturing-001-100",
           "sequence": 56,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "国泰海通证券",
+      "name": "国泰海通证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 47,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "国泰基金",
+      "name": "国泰基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 82,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -10485,7 +10910,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -10493,6 +10919,14 @@
           "sequence": 27,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 38,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -11491,7 +11925,8 @@
       ],
       "source_datasets": [
         "domesticRecruitment200Registry",
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -11499,6 +11934,14 @@
           "sequence": 20,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 24,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -11905,6 +12348,26 @@
       ]
     },
     {
+      "id": "恒丰银行",
+      "name": "恒丰银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 19,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "恒立液压",
       "name": "恒立液压",
       "industry_id": "manufacturing",
@@ -12187,6 +12650,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 15,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "华安基金",
+      "name": "华安基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 76,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -13569,6 +14052,26 @@
       ]
     },
     {
+      "id": "华泰保险集团",
+      "name": "华泰保险集团",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 62,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "华泰证券",
       "name": "华泰证券",
       "industry_id": "finance",
@@ -13585,7 +14088,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 37,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -13658,6 +14170,26 @@
       ]
     },
     {
+      "id": "华夏基金",
+      "name": "华夏基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 71,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "华夏银行",
       "name": "华夏银行",
       "industry_id": "finance",
@@ -13677,7 +14209,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -13685,6 +14218,14 @@
           "sequence": 21,
           "preview_status": "pending",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 15,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -14582,7 +15123,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -14590,6 +15132,14 @@
           "sequence": 19,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 27,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -14665,6 +15215,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-analog"
+        }
+      ]
+    },
+    {
+      "id": "汇添富基金",
+      "name": "汇添富基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 79,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -15191,6 +15761,26 @@
       ]
     },
     {
+      "id": "嘉实基金",
+      "name": "嘉实基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 74,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "坚果投影(火乐科技)",
       "name": "坚果投影（火乐科技）",
       "industry_id": "consumer-hardware",
@@ -15238,6 +15828,26 @@
           "sequence": 36,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "建信人寿",
+      "name": "建信人寿",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 65,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -15655,7 +16265,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -15663,6 +16274,14 @@
           "sequence": 38,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 5,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -16123,6 +16742,26 @@
       ]
     },
     {
+      "id": "京东科技",
+      "name": "京东科技",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 96,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "经纬恒润",
       "name": "经纬恒润",
       "industry_id": "automotive",
@@ -16549,6 +17188,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-design"
+        }
+      ]
+    },
+    {
+      "id": "景顺长城基金",
+      "name": "景顺长城基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 80,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -19325,7 +19984,8 @@
       ],
       "source_datasets": [
         "preview_audit_B05",
-        "historic_chat_internet-ai-001-100"
+        "historic_chat_internet-ai-001-100",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -19341,7 +20001,16 @@
           "sequence": 13,
           "has_original_url": false,
           "record_type": "company_candidate"
+        },
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 94,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
+      ],
+      "related_hall_ids": [
+        "finance"
       ]
     },
     {
@@ -20664,6 +21333,26 @@
       ]
     },
     {
+      "id": "南方基金",
+      "name": "南方基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 73,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "南京峰璟汽车科技",
       "name": "南京峰璟汽车科技",
       "industry_id": "automotive",
@@ -20781,7 +21470,8 @@
       ],
       "source_datasets": [
         "domesticRecruitment200Registry",
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -20789,6 +21479,14 @@
           "sequence": 24,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 22,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -21124,7 +21822,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -21132,6 +21831,14 @@
           "sequence": 22,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 23,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -21210,6 +21917,26 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "农银人寿",
+      "name": "农银人寿",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 70,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -21485,6 +22212,26 @@
       ]
     },
     {
+      "id": "鹏华基金",
+      "name": "鹏华基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 85,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "鹏辉能源",
       "name": "鹏辉能源",
       "industry_id": "energy",
@@ -21548,6 +22295,46 @@
         {
           "batch_key": "consumer-hardware-101-200",
           "sequence": 198,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "平安银行",
+      "name": "平安银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 17,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "平安证券",
+      "name": "平安证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 45,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -22278,6 +23065,26 @@
       "portals": [],
       "source_datasets": [
         "domesticCompanyRelations"
+      ]
+    },
+    {
+      "id": "青岛银行",
+      "name": "青岛银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 28,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -24444,6 +25251,26 @@
       ]
     },
     {
+      "id": "上海浦东发展银行",
+      "name": "上海浦东发展银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 11,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "上海汽车变速器有限公司",
       "name": "上海汽车变速器有限公司",
       "industry_id": "automotive",
@@ -25692,6 +26519,26 @@
         {
           "hall_id": "energy",
           "code": "energy-generation"
+        }
+      ]
+    },
+    {
+      "id": "申万宏源证券",
+      "name": "申万宏源证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 44,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -27752,6 +28599,26 @@
       ]
     },
     {
+      "id": "泰康保险集团",
+      "name": "泰康保险集团",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 56,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "泰胜风能集团股份有限公司",
       "name": "泰胜风能集团股份有限公司",
       "industry_id": "energy",
@@ -28029,6 +28896,26 @@
         {
           "hall_id": "energy",
           "code": "energy-solar"
+        }
+      ]
+    },
+    {
+      "id": "天弘基金",
+      "name": "天弘基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 87,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -28840,6 +29727,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-equipment"
+        }
+      ]
+    },
+    {
+      "id": "微众银行",
+      "name": "微众银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 30,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -30807,6 +31714,26 @@
       ]
     },
     {
+      "id": "新华人寿保险",
+      "name": "新华人寿保险",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 57,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "新疆大全新能源股份有限公司",
       "name": "新疆大全新能源股份有限公司",
       "industry_id": "energy",
@@ -31227,7 +32154,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -31235,6 +32163,54 @@
           "sequence": 39,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 12,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "兴业证券",
+      "name": "兴业证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 46,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "兴证全球基金",
+      "name": "兴证全球基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 83,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -32235,6 +33211,26 @@
           "sequence": 33,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "阳光保险集团",
+      "name": "阳光保险集团",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 58,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -33318,6 +34314,26 @@
       ]
     },
     {
+      "id": "易方达基金",
+      "name": "易方达基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 72,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "易来留学",
       "name": "易来留学",
       "industry_id": "education-research",
@@ -33473,6 +34489,66 @@
           "relationship_hint": "广汽集团官网企业名录：三电、充电能源",
           "source_url": "https://www.gacgroup.com/cn/companies",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "银华基金",
+      "name": "银华基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 86,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "银联商务",
+      "name": "银联商务",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 92,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "银联数据",
+      "name": "银联数据",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 93,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -34035,6 +35111,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 36,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "友邦人寿保险",
+      "name": "友邦人寿保险",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 59,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -34886,6 +35982,26 @@
       ]
     },
     {
+      "id": "长城基金",
+      "name": "长城基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 89,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "长城汽车",
       "name": "长城汽车",
       "industry_id": "automotive",
@@ -35179,6 +36295,26 @@
       ]
     },
     {
+      "id": "长沙银行",
+      "name": "长沙银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 26,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "长亭科技",
       "name": "长亭科技",
       "industry_id": "internet-ai",
@@ -35277,6 +36413,26 @@
       ]
     },
     {
+      "id": "招商基金",
+      "name": "招商基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 78,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "招商局集团",
       "name": "招商局集团",
       "industry_id": "logistics",
@@ -35324,7 +36480,16 @@
         }
       ],
       "source_datasets": [
-        "domesticRecruitmentRegistry"
+        "domesticRecruitmentRegistry",
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 9,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -35347,7 +36512,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -35355,6 +36521,14 @@
           "sequence": 28,
           "preview_status": "pending",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 36,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -35767,7 +36941,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -35775,6 +36950,14 @@
           "sequence": 18,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 18,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -37793,6 +38976,26 @@
       ]
     },
     {
+      "id": "中国东方资产管理",
+      "name": "中国东方资产管理",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 100,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中国东风汽车工业进出口有限公司",
       "name": "中国东风汽车工业进出口有限公司",
       "industry_id": "automotive",
@@ -37812,6 +39015,46 @@
           "relationship_hint": "东风集团官方下属公司及品牌入口（区分合营）",
           "source_url": "https://www.dfmc.com.cn/zoujindf/links.html",
           "status": "research_unverified"
+        }
+      ]
+    },
+    {
+      "id": "中国工商银行",
+      "name": "中国工商银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 1,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国光大银行",
+      "name": "中国光大银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 14,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -38080,6 +39323,26 @@
       ]
     },
     {
+      "id": "中国建设银行",
+      "name": "中国建设银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 4,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中国建筑",
       "name": "中国建筑",
       "industry_id": "construction",
@@ -38187,6 +39450,26 @@
           "sequence": 4,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ]
+    },
+    {
+      "id": "中国民生银行",
+      "name": "中国民生银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 13,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -38686,6 +39969,26 @@
       ]
     },
     {
+      "id": "中国农业发展银行",
+      "name": "中国农业发展银行",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 8,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中国农业银行",
       "name": "中国农业银行",
       "industry_id": "finance",
@@ -38705,7 +40008,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -38713,6 +40017,14 @@
           "sequence": 35,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 2,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -38737,6 +40049,46 @@
       ]
     },
     {
+      "id": "中国平安保险集团",
+      "name": "中国平安保险集团",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 53,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国人民保险集团",
+      "name": "中国人民保险集团",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 52,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中国人寿",
       "name": "中国人寿",
       "industry_id": "finance",
@@ -38754,6 +40106,26 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中国人寿保险集团",
+      "name": "中国人寿保险集团",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 51,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -39100,6 +40472,46 @@
       ]
     },
     {
+      "id": "中国太平保险集团",
+      "name": "中国太平保险集团",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 55,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国太平洋保险集团",
+      "name": "中国太平洋保险集团",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 54,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中国铁建重工",
       "name": "中国铁建重工",
       "industry_id": "manufacturing",
@@ -39134,6 +40546,26 @@
         {
           "batch_key": "manufacturing-001-100",
           "sequence": 66,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国外汇交易中心",
+      "name": "中国外汇交易中心",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 98,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -39194,6 +40626,26 @@
         {
           "hall_id": "energy",
           "code": "energy-equipment"
+        }
+      ]
+    },
+    {
+      "id": "中国信达资产管理",
+      "name": "中国信达资产管理",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 99,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -39295,7 +40747,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -39303,6 +40756,34 @@
           "sequence": 26,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 39,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中国银联",
+      "name": "中国银联",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 91,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -39324,7 +40805,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -39332,6 +40814,14 @@
           "sequence": 37,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 3,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -39375,7 +40865,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -39383,6 +40874,14 @@
           "sequence": 17,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 6,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -39443,6 +40942,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-material"
+        }
+      ]
+    },
+    {
+      "id": "中国再保险集团",
+      "name": "中国再保险集团",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 67,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -39736,6 +41255,26 @@
       ]
     },
     {
+      "id": "中华联合保险集团",
+      "name": "中华联合保险集团",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 60,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中环领先",
       "name": "中环领先",
       "industry_id": "semiconductor",
@@ -39761,6 +41300,26 @@
         {
           "hall_id": "semiconductor",
           "code": "semi-material"
+        }
+      ]
+    },
+    {
+      "id": "中汇信息技术",
+      "name": "中汇信息技术",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 97,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -39854,6 +41413,26 @@
       ]
     },
     {
+      "id": "中金财富证券",
+      "name": "中金财富证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 33,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中金公司",
       "name": "中金公司",
       "industry_id": "finance",
@@ -39873,7 +41452,8 @@
         }
       ],
       "source_datasets": [
-        "preview_audit_B06"
+        "preview_audit_B06",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -39881,6 +41461,14 @@
           "sequence": 25,
           "preview_status": "pending",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 32,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -40133,6 +41721,26 @@
       ]
     },
     {
+      "id": "中欧基金",
+      "name": "中欧基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 77,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中汽研汽车检验中心(宁波)",
       "name": "中汽研汽车检验中心（宁波）",
       "industry_id": "automotive",
@@ -40205,6 +41813,26 @@
         {
           "batch_key": "internet-ai-001-100",
           "sequence": 80,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中泰证券",
+      "name": "中泰证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 48,
           "has_original_url": false,
           "record_type": "company_candidate"
         }
@@ -40388,6 +42016,26 @@
       ]
     },
     {
+      "id": "中信建投证券",
+      "name": "中信建投证券",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 35,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
       "id": "中信银行",
       "name": "中信银行",
       "industry_id": "finance",
@@ -40405,7 +42053,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -40413,6 +42062,14 @@
           "sequence": 40,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 10,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -40434,7 +42091,8 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry",
-        "preview_audit_B04"
+        "preview_audit_B04",
+        "historic_chat_finance-001-100"
       ],
       "audit_references": [
         {
@@ -40442,6 +42100,14 @@
           "sequence": 43,
           "preview_status": "preview_verified",
           "source": "HHBA_20261111_Preview_D1_audit"
+        }
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 31,
+          "has_original_url": false,
+          "record_type": "company_candidate"
         }
       ]
     },
@@ -40463,6 +42129,66 @@
       ],
       "source_datasets": [
         "domesticRecruitmentRegistry"
+      ]
+    },
+    {
+      "id": "中银基金",
+      "name": "中银基金",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 88,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中英人寿",
+      "name": "中英人寿",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 64,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
+      ]
+    },
+    {
+      "id": "中邮人寿",
+      "name": "中邮人寿",
+      "industry_id": "finance",
+      "parent_name": null,
+      "relation": null,
+      "aliases": [],
+      "portals": [],
+      "source_datasets": [
+        "historic_chat_finance-001-100"
+      ],
+      "historical_source_records": [
+        {
+          "batch_key": "finance-001-100",
+          "sequence": 66,
+          "has_original_url": false,
+          "record_type": "company_candidate"
+        }
       ]
     },
     {
@@ -41575,13 +43301,13 @@
     }
   ],
   "statistics": {
-    "recovered_name_rows": 500,
+    "recovered_name_rows": 600,
     "recovered_business_units": 16,
     "web_found_portals": 4,
     "automotive_research_nodes": 266,
     "automotive_research_brands": 36,
     "prior_audit_source_rows": 150,
-    "entities": 1592,
+    "entities": 1667,
     "unique_portal_urls": 830,
     "legacy_portals": 130,
     "candidate_portals": 797,
@@ -41593,7 +43319,7 @@
       "internet-ai": 101,
       "energy": 312,
       "manufacturing": 103,
-      "finance": 38,
+      "finance": 113,
       "telecom": 5,
       "biomed": 12,
       "aerospace": 3,
