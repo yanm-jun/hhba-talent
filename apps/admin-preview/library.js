@@ -99,7 +99,8 @@ function libRenderSummary(){
  if(s?.mode==='snapshot'){
   libEl('lib-updated').textContent='历史数量快照 · 截至 2026-11-12（非实时）';
  }else if(s?.archived){
-  libEl('lib-updated').textContent='真实企业目录快照 · '+new Date(s.asOf).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'})+'（北京，非实时）';
+  const date=s.asOf?new Date(s.asOf).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}):'未知';
+  libEl('lib-updated').textContent='真实企业目录 · 基础数据 '+date+'（北京）'+(s.overlayCount?' · 已同步后台变更':'');
  }else if(s?.asOf){
   libEl('lib-updated').textContent='实时查询：'+new Date(s.asOf).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'})+'（北京）';
  }else libEl('lib-updated').textContent='尚未连接';
@@ -111,7 +112,10 @@ async function libRefreshSummary(force=false){
   const result=await libRequest({mode:'summary'});
   libState.summary=result;libRenderSummary();
   if(result.archived){
-   libMessage('已加载正式数据库导出的 5,288 条企业记录（只读快照）。点击任意行业馆进入企业与招聘网址目录，可搜索、分页和打开原始链接；这不是实时岗位状态。');
+   const total=libFmt.format(result.total?.records||0);
+   const changes=result.overlayCount?('，已同步 '+libFmt.format(result.overlayCount)+' 批后台变更'):'';
+   const warning=result.syncWarning?'；缓存变更暂不可读取，请稍后重试':'';
+   libMessage('已加载 '+total+' 条真实企业招聘资料的受保护目录'+changes+'。点击行业馆可以浏览企业名称、招聘网址和搜索分页，不消耗 D1 每日读取额度'+warning+'。',result.syncWarning?'error':'ok');
   }else{
    libMessage(result.readonly?
     '正式生产库只读预览：现在展示真实企业数量与资料目录。为保护正式数据，新增、修改和 Excel 导入在预览中暂不开放。':
@@ -171,7 +175,7 @@ async function libFetchList(){
   libState.archived=data.archived===true;
   libState.lastListError=null;libRenderRows();
   libMessage(data.archived?
-   '正在查看真实企业招聘资料的历史快照；每页 25 条，可查找企业与打开招聘网址，不消耗 D1 今日读取额度。':
+   '正在查看受保护的真实企业招聘目录；每页 25 条，支持搜索和打开招聘网址，不消耗 D1 今日读取额度。':
    '列表已更新，每页最多 25 条，不进行整库下载。');
  }catch(e){
   if(controller.signal.aborted)return;
