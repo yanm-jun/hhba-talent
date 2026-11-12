@@ -207,17 +207,17 @@
       </section>
       <section class="page-view" id="view-library" hidden aria-labelledby="library-heading">
         <div class="page-heading"><div><p class="eyebrow">EMPLOYER SOURCE LIBRARY</p><h1 id="library-heading">企业资源图书馆</h1>
-          <p class="page-subtitle">17个行业馆 · 集团及子公司 · 官网招聘入口；不把集团招聘链接冒充子公司独立招聘网址。</p></div>
+          <p class="page-subtitle">一个统一行业馆 · 17类筛选 · 优先管理缺招聘网址的企业；集团共用入口单独标记。</p></div>
           <button type="button" class="button-outline" id="library-reload">刷新目录</button></div>
         <div class="library-stats">
           <article class="library-stat"><span>已整理企业实体</span><strong id="library-total">—</strong></article>
           <article class="library-stat"><span>去重招聘网址</span><strong id="library-portals">—</strong><small id="library-link-associations">—</small></article>
-          <article class="library-stat"><span>集团关联（含待核研究）</span><strong id="library-groups">—</strong></article>
-          <article class="library-stat"><span>待复核链接</span><strong id="library-review">—</strong></article>
+          <article class="library-stat"><span>没有招聘网址的企业</span><strong id="library-missing-portals">—</strong><small>优先补录，避免名称冒充网址</small></article>
+          <article class="library-stat"><span>待复核招聘网址</span><strong id="library-review">—</strong><small id="library-coverage-note">—</small></article>
         </div>
         <p id="library-collection-status" class="library-collection-status" aria-live="polite">正在读取17个馆的历史批次导入进度…</p>
         <p id="library-message" role="status" aria-live="polite">点击左侧企业资源图书馆以读取目录。</p>
-        <div id="library-halls" class="library-halls" aria-label="行业馆"></div>
+        <div id="library-halls" class="library-halls" aria-label="统一行业馆筛选"></div>
         <div class="library-toolbar">
           <input id="library-search" type="search" placeholder="搜索企业、子公司、集团、别名" maxlength="100"/>
           <select id="library-source-filter" aria-label="筛选企业招聘入口状态">
