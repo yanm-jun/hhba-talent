@@ -26,7 +26,7 @@
       <button type="button" class="nav-link is-active" data-view="overview" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.4"/><rect x="13" y="3" width="8" height="8" rx="1.4"/><rect x="3" y="13" width="8" height="8" rx="1.4"/><rect x="13" y="13" width="8" height="8" rx="1.4"/></svg> 数据总览</button>
       <button type="button" class="nav-link" data-view="users"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2.1c0-2.4 2.4-4.2 5.5-4.2s5.5 1.8 5.5 4.2V19M16 5.5a3 3 0 0 1 0 5.4M17 13c2.3.3 3.5 1.7 3.5 3.9V19"/></svg> 用户分析</button>
       <button type="button" class="nav-link" data-view="market"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7" width="17" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3.5 12h17"/></svg> 岗位与企业</button>
-      <button type="button" class="nav-link" data-view="library"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4.5c3-1.3 6-1.3 9 .5 3-1.8 6-1.8 9-.5v14c-3-1.3-6-1.3-9 .5-3-1.8-6-1.8-9-.5zM12 5v14"/></svg> 企业资源图书馆</button>
+      <button type="button" class="nav-link" data-view="library"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4.5c3-1.3 6-1.3 9 .5 3-1.8 6-1.8 9-.5v14c-3-1.3-6-1.3-9 .5-3-1.8-6-1.8-9-.5zM12 5v14"/></svg> 行业馆</button>
       <button type="button" class="nav-link" data-view="operations"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4l3-7 4 12 3-5h4"/></svg> 运营监控 <span class="nav-soon">规划中</span></button>
       <button type="button" class="nav-link" data-view="finance"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 9h18M15 15h3"/></svg> 财务成本 <span class="nav-soon">规划中</span></button>
       <p class="nav-caption nav-caption-secondary">PRESENTATION</p>
@@ -206,12 +206,12 @@
         </div>
       </section>
       <section class="page-view" id="view-library" hidden aria-labelledby="library-heading">
-        <div class="page-heading"><div><p class="eyebrow">EMPLOYER SOURCE LIBRARY</p><h1 id="library-heading">企业资源图书馆</h1>
-          <p class="page-subtitle">一个统一行业馆 · 17类筛选 · 优先管理缺招聘网址的企业；集团共用入口单独标记。</p></div>
+        <div class="page-heading"><div><p class="eyebrow">EMPLOYER SOURCE LIBRARY</p><h1 id="library-heading">行业馆</h1>
+          <p class="page-subtitle">行业 → 企业名称 → 招聘网址。17种行业为分类筛选，集团共用入口单独标注。</p></div>
           <button type="button" class="button-outline" id="library-reload">刷新目录</button></div>
         <div class="library-stats">
           <article class="library-stat"><span>已整理企业实体</span><strong id="library-total">—</strong></article>
-          <article class="library-stat"><span>去重招聘网址</span><strong id="library-portals">—</strong><small id="library-link-associations">—</small></article>
+          <article class="library-stat"><span>不同招聘网址（全库去重）</span><strong id="library-portals">—</strong><small id="library-link-associations">—</small></article>
           <article class="library-stat"><span>没有招聘网址的企业</span><strong id="library-missing-portals">—</strong><small>优先补录，避免名称冒充网址</small></article>
           <article class="library-stat"><span>待复核招聘网址</span><strong id="library-review">—</strong><small id="library-coverage-note">—</small></article>
         </div>
