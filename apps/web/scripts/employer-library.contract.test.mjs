@@ -85,7 +85,7 @@ test('recovered historical chat source rows remain traceable without fabricated 
  assert.equal(seed.collection_coverage.unimported_by_hall['consumer-hardware'],0);
  assert.equal(seed.collection_coverage.imported_by_hall['internet-ai'],200);
  assert.equal(seed.collection_coverage.imported_by_hall['manufacturing'],400);
- assert.equal(seed.collection_coverage.imported_by_hall['chem-materials'],100);
+ assert.equal(seed.collection_coverage.imported_by_hall['chem-materials'],200);
  assert.equal(seed.collection_coverage.imported_by_hall['biomed'],300);
  assert.equal(seed.collection_coverage.imported_by_hall['retail'],200);
  assert.equal(seed.collection_coverage.imported_by_hall['manufacturing'],400);
