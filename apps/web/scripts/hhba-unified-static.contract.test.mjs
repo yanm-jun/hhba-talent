@@ -68,7 +68,8 @@ test('all career and vision pages are linked, original four cards are on join pa
  assert.equal((vision.match(/number: '0[1-4]'/g)||[]).length,4);
  for(const text of ['FOR EVERY PERSON','FOR EVERY ORGANIZATION','FOR A BETTER MARKET','FOR THE FUTURE OF SOCIETY','THE WORLD WE ENVISION'])
    assert.ok(vision.includes(text),'missing vision '+text);
- for(const text of ['技术负责人 / 全栈架构工程师','后端与数据库工程师','招聘数据与 AI 搜索工程师',
+ for(const text of ['技术负责人 / 全栈架构工程师','后端与数据库工程师','官方招聘数据与检索工程师',
+ 'AI 匹配与推荐算法工程师','Edge 网申插件工程师','新媒体内容与用户增长伙伴',
  '企业治理与劳动权益研究伙伴','企业合作与商业发展伙伴','产品设计 / 前端体验伙伴','其他专业 / 自荐加入'])
    assert.ok(join.includes(text),'missing recruitment role '+text);
  assert.match(css,/\.join-page\{/);
