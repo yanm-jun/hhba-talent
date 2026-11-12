@@ -220,10 +220,12 @@
           <article class="lib-stat"><span>待补网址的记录</span><strong id="lib-total-missing">—</strong><small>仅记录名称，不伪造网址</small></article>
         </div>
         <div class="lib-notice" id="lib-message" role="status">正在等待管理员授权连接资源库；本页面不会填充演示数据。</div>
-        <div class="lib-board-top"><div><p class="lib-section-label">INDUSTRY COLLECTIONS</p><h2>17 个行业馆</h2></div><span class="lib-updated" id="lib-updated">尚未连接</span></div>
+        <div class="lib-board-top" id="lib-board-top"><div><p class="lib-section-label">INDUSTRY COLLECTIONS</p><h2>17 个行业馆</h2></div><span class="lib-updated" id="lib-updated">尚未连接</span></div>
         <div class="lib-halls" id="lib-halls" aria-label="行业馆目录"></div>
         <section class="lib-entry-panel" id="lib-entry-panel" aria-label="企业招聘网址目录" hidden>
-          <div class="lib-entry-head"><div><p class="lib-section-label">ENTERPRISE CATALOGUE</p>
+          <div class="lib-entry-head"><div>
+            <button class="lib-back-halls" id="lib-back-halls" type="button">← 返回17个行业馆</button>
+            <p class="lib-section-label">ENTERPRISE CATALOGUE</p>
             <h2 id="lib-current-hall">企业目录</h2><p>支持按企业名称、网址查找；分页查询不会一次读取全部企业记录。</p></div>
             <div class="lib-entry-actions">
               <button class="button-outline" type="button" id="lib-import" disabled>Excel 批量导入</button>
