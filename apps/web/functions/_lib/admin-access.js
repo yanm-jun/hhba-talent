@@ -1,3 +1,4 @@
+import {verifyPasswordAdmin,ADMIN_HOST} from './console-password.js';
 // Validate the cryptographically signed Cloudflare Access identity before reading any private metrics.
 // A spoofed request header is NEVER enough to authenticate an administrator.
 function decode(part){
@@ -5,16 +6,27 @@ function decode(part){
  return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(url.padEnd(Math.ceil(url.length/4)*4,'=')),x=>x.charCodeAt(0))));
 }
 export async function verifyAdmin(request,env){
+ // The dedicated admin subdomain accepts ONLY DB-validated password sessions.
+ // Existing hhba.work / pages.dev consoles continue to require Cloudflare Access.
+ if(new URL(request.url).hostname===ADMIN_HOST)return verifyPasswordAdmin(request,env);
  const team=(env.HHBA_ACCESS_TEAM_DOMAIN||'').trim().toLowerCase();
  // The original dashboard and legacy metrics API have distinct Cloudflare Access applications.
  // Enforce one explicit JWT audience for each route; never accept both audiences everywhere.
  const url=new URL(request.url),path=url.pathname;
- const fromOriginalAdmin=path==='/admin-preview/api/metrics';
+ const fromOriginalAdmin=path==='/admin-preview/api/metrics'||path==='/admin-preview/api/library';
  const fromLegacyApi=path==='/api/admin/metrics';
  if(!fromOriginalAdmin&&!fromLegacyApi)return {ok:false,code:'ADMIN_ACCESS_DENIED',status:403};
  // The official hhba.work console and the pages.dev console are separate Access applications.
  // Never accept the pages.dev audience on the official custom domain or vice versa.
- const consoleAud=url.hostname==='hhba.work'?env.HHBA_ACCESS_WORK_ADMIN_AUD:env.HHBA_ACCESS_CONSOLE_AUD;
+ const isLibraryPreviewHost=(
+  url.hostname==='feat-admin-recruitment-libra.hhba-talent.pages.dev' ||
+  url.hostname==='3c143f6f.hhba-talent.pages.dev'
+ );
+ // This preview has its own Access application. Its exact hostname must use
+ // that application's JWT audience, not the old pages.dev console audience.
+ // Other preview domains and production retain their existing requirements.
+ const consoleAud=url.hostname==='hhba.work'?env.HHBA_ACCESS_WORK_ADMIN_AUD:
+  isLibraryPreviewHost?env.HHBA_ACCESS_LIBRARY_PREVIEW_AUD:env.HHBA_ACCESS_CONSOLE_AUD;
  const aud=((fromOriginalAdmin?consoleAud:env.HHBA_ACCESS_AUD)||'').trim();
  const email=(env.HHBA_METRICS_ADMIN_EMAIL||'').trim().toLowerCase();
  if(!/^[a-z0-9.-]+\.cloudflareaccess\.com$/.test(team)||!aud||!email)return {ok:false,code:'ADMIN_ACCESS_NOT_CONFIGURED',status:503};

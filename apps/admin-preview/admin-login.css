@@ -1,0 +1,55 @@
+/* HHBA official identity — blue talent / orange opportunity. */
+:root{color-scheme:light;font-family:Inter,"SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;--blue:#1569de;--blue-dark:#0b4eb5;--orange:#f8a13b;--ink:#172c4b;--muted:#7788a0;--line:#dce6f3}
+*{box-sizing:border-box}
+html{min-height:100%;background:#f5f8fd}
+body{margin:0;min-height:100dvh;color:var(--ink);background:
+ radial-gradient(circle at 9% 20%,rgba(36,123,240,.14),transparent 34%),
+ radial-gradient(circle at 89% 83%,rgba(255,165,62,.14),transparent 32%),
+ linear-gradient(134deg,#f8fbff,#f5f8fd 52%,#fffaf5)}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.36;
+ background-image:linear-gradient(#acc2de22 1px,transparent 1px),linear-gradient(90deg,#acc2de22 1px,transparent 1px);
+ background-size:40px 40px;mask-image:linear-gradient(to bottom,#0008,transparent 88%)}
+main{position:relative;z-index:1;min-height:100dvh;display:grid;place-items:center;padding:48px 18px}
+.wrap{width:min(100%,480px)}
+.top{display:flex;align-items:center;gap:14px;margin:0 0 13px 4px}
+.mark{display:grid;place-items:center;width:57px;height:57px;border-radius:17px;background:#fff;border:1px solid #e4ebf7;box-shadow:0 8px 22px #2466d51a;flex-shrink:0;overflow:hidden}
+.mark img{width:53px;height:53px;object-fit:contain}
+.brand{font-size:22px;font-weight:770;letter-spacing:-.6px;line-height:1.25}
+.brand span{color:var(--blue);font-weight:850;letter-spacing:.2px;margin-left:4px}
+.subtitle{font-size:11px;color:#788da7;letter-spacing:.04em;margin-top:5px}
+.brand-statement{font-size:13px;color:#7b8da9;margin:0 0 29px 5px;line-height:1.5}
+.panel{position:relative;overflow:hidden;background:#fffffff2;border:1px solid #dfe8f4;border-radius:21px;padding:34px 35px 31px;box-shadow:0 22px 75px #1d528a16,0 3px 14px #19487e0b;backdrop-filter:blur(10px)}
+.panel:before{content:"";height:3px;position:absolute;left:0;right:0;top:0;background:linear-gradient(90deg,#237bfa 0%,#3f91fa 34%,#b6bbba 53%,#ffa642 80%,#ff8b24 100%)}
+.eyebrow{color:#477cce;font-size:10px;font-weight:830;letter-spacing:1.4px}
+h1{margin:13px 0 9px;font-size:27px;letter-spacing:-.9px;font-weight:780}
+p{line-height:1.75}
+.desc{margin:0 0 24px;color:var(--muted);font-size:13px}
+label{display:block;font-size:13px;font-weight:680;color:#38516c;margin:17px 0 7px}
+.input-wrap{position:relative}
+input{display:block;width:100%;height:48px;padding:0 14px;border:1px solid #d3e0ef;background:#fff;border-radius:10px;color:#203955;outline:none;font:inherit;font-size:14px}
+input:focus{border-color:#3688eb;box-shadow:0 0 0 3px #dcecff}
+input[readonly]{background:#f5f8fc;color:#4c6080}
+input[type=password]{padding-right:66px}
+.eye{position:absolute;right:9px;top:8px;height:32px;background:none;border:0;color:#587bba;cursor:pointer;font-size:12px;padding:0 9px}
+button[type=submit]{display:block;width:100%;height:48px;margin-top:24px;background:linear-gradient(110deg,#0d5ecf,#257df0);border:1px solid #1769db;color:#fff;border-radius:10px;font-size:14px;font-weight:730;box-shadow:0 6px 16px #1264dc22;cursor:pointer;transition:transform .18s,box-shadow .18s}
+button[type=submit]:hover{transform:translateY(-1px);box-shadow:0 9px 22px #1264dc33}
+button:focus-visible,a:focus-visible{outline:3px solid #68a1f0;outline-offset:3px}
+button:disabled{opacity:.58;cursor:not-allowed;box-shadow:none;transform:none}
+.status{margin:14px 0 0;min-height:20px;font-size:12px;color:#b54e45}
+.status.ok{color:#176f52}
+.foot{text-align:center;color:#7b8da2;font-size:11px;margin:21px 0 0;line-height:1.75}
+.hint{font-size:12px;color:#8697ac;margin:7px 0 0}
+.help{margin-top:23px;padding-top:16px;border-top:1px solid #e5ebf3;text-align:center;color:#8997aa;font-size:12px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+.hidden,[hidden]{display:none!important}
+@media(max-width:480px){
+ main{padding:28px 16px}
+ .mark{width:51px;height:51px;border-radius:14px}
+ .mark img{width:48px;height:48px}
+ .brand{font-size:20px}
+ .panel{padding:28px 24px 26px;border-radius:16px}
+ h1{font-size:24px}
+ .brand-statement{margin-bottom:23px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}

@@ -8,8 +8,8 @@ const formatTime=value=>{
    hour:'2-digit',minute:'2-digit',hour12:false
  })+'（北京时间）'}catch{return '—'}
 };
-const cloudflareMode=location.hostname==='hhba-talent.pages.dev'||location.hostname.endsWith('.hhba-talent.pages.dev')||location.hostname==='hhba.work';
-let snapshot=null,growth=null,growthError=null,selectedPeriod='30d',customRange=null,activeView='overview',growthRequestId=0;
+const cloudflareMode=location.hostname==='hhba-talent.pages.dev'||location.hostname.endsWith('.hhba-talent.pages.dev')||location.hostname==='hhba.work'||location.hostname==='admin.hhba.work';
+let snapshot=null,growth=null,growthError=null,selectedPeriod='30d',customRange=null,activeView='overview',growthRequestId=0,privateMetricsRequested=false;
 function normalizeCloudflarePublic(raw){
  if(raw?.kind!=='HHBA_CLOUDFLARE_PUBLIC_METRICS_V1'||!raw.counts)throw Error('INVALID_CLOUDFLARE_JOB_DATA');
  return {kind:'HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2',quality:raw.quality,asOf:raw.sourceTime,
@@ -27,7 +27,7 @@ function integer(x){return Number.isSafeInteger(x)&&x>=0?x:null}
 function setMetric(id,n){const e=byId(id);if(e)e.textContent=integer(n)===null?'—':fmt.format(n)}
 function renderTraffic(target,items){
  const root=byId(target);if(!root)return;
- if(!Array.isArray(items)){root.textContent='私有统计未授权或尚未采集';return}
+ if(!Array.isArray(items)){root.textContent=privateMetricsRequested?'私有统计未授权或尚未采集':'尚未手动加载私有统计（节省 D1）';return}
  root.replaceChildren();
  const chart=document.createElement('div');chart.className='hhba-real-bars';const max=Math.max(1,...items.map(x=>x.pv||0));
  for(const item of items){
@@ -41,13 +41,13 @@ function renderTraffic(target,items){
 function percent(value){return typeof value==='number'&&Number.isFinite(value)?value.toFixed(1)+'%':'—'}
 function accountValue(n){return integer(n)===null?'—':fmt.format(n)}
 function showRealDataStatus(){
- const liveHost=location.hostname==='hhba.work'||location.hostname==='hhba-talent.pages.dev';
+ const liveHost=location.hostname==='hhba.work'||location.hostname==='admin.hhba.work'||location.hostname==='hhba-talent.pages.dev';
  const source=liveHost?'正式网站数据':'独立预览数据库';
  byId('workspace-mode').textContent=liveHost?'正式管理后台':'开发预览';
  byId('sidebar-environment').textContent=source;
- const state=growth?.account?.quality==='collected'?'管理员已验证 · 真实账号已接通':growth?'管理员已验证 · 部分指标待接入':growthError==='AUTH_REQUIRED'?'管理员尚未授权':growthError==='SERVICE_ERROR'?'私有统计服务不可用':'等待私有数据连接';
- byId('sidebar-account-state').textContent=state;
- byId('sidebar-data-state').textContent=state+'；仅展示汇总数据，不读取个人浏览记录';
+ const state=growth?.account?.quality==='collected'?'真实求职者账户数据已连接':growth?'部分真实数据已连接':growthError==='AUTH_REQUIRED'?'私有指标读取未获授权':growthError==='SERVICE_ERROR'?'私有统计服务不可用':privateMetricsRequested?'已尝试读取；暂无可用统计':'业务统计尚未手动加载（节省 D1）';
+ byId('sidebar-account-state').textContent=location.hostname==='admin.hhba.work'?'密码会话已通过服务端验证':'身份受管理后台保护';
+ byId('sidebar-data-state').textContent=state+'；只展示汇总数据，不读取个人浏览记录';
  byId('top-access-state').textContent=state;
 }
 // Source-backed daily rows. A day before installation is unknown, not zero.
@@ -75,7 +75,7 @@ function renderDailyOperations(report){
  root.replaceChildren();
  if(!rows){
   const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=6;
-  td.textContent='私有汇总数据不可用或未授权，不能显示真实明细';
+  td.textContent=privateMetricsRequested?'私有汇总数据不可用或未授权，不能显示真实明细':'尚未手动加载统计数据；未查询不等于零';
   tr.append(td);root.append(tr);status.textContent='数据不可用';return;
  }
  const display=n=>integer(n)===null?'—':fmt.format(n);
@@ -106,8 +106,8 @@ function updateGrowth(){
  if(changes)changes.textContent=b?.quality==='collected'&&integer(b.added)!==null&&integer(b.removed)!==null?fmt.format(b.added)+' / '+fmt.format(b.removed):'—';
  setMetric('registered-users',a?.quality==='collected'?a.registeredUsers:null);
  byId('active-users').textContent=a?.quality==='collected'&&integer(a.dau)!==null&&integer(a.mau)!==null?fmt.format(a.dau)+' / '+fmt.format(a.mau):'— / —';
- byId('users-interval').textContent=growth?.period?growth.period.start+' 至 '+growth.period.end+' · UTC':'私有数据需要 Cloudflare Access 管理员授权';
- byId('users-data-quality').textContent=a?.quality==='collected'?'注册用户来自 PNVS 身份库；匿名访客和历史设备收藏单独统计，不混同账号人数。':growth?'Cloudflare D1 已接入匿名访问；真实注册库未连接。':growthError==='AUTH_REQUIRED'?'管理员验证未通过；请在受保护的 HHBA 管理域名完成 Cloudflare Access 登录。':growthError==='SERVICE_ERROR'?'统计服务暂不可用，请检查受保护 API、D1 绑定和管理员权限。':'私有数据等待连接；未接入不等于零。';
+ byId('users-interval').textContent=growth?.period?growth.period.start+' 至 '+growth.period.end+' · UTC':'私有统计尚未加载；需要管理员手动读取';
+ byId('users-data-quality').textContent=a?.quality==='collected'?'注册用户来自 PNVS 身份库；匿名访客和历史设备收藏单独统计，不混同账号人数。':growth?'Cloudflare D1 已接入匿名访问；真实注册库未连接。':growthError==='AUTH_REQUIRED'?'管理员登录验证未通过，请重新登录管理后台后刷新数据。':growthError==='SERVICE_ERROR'?'统计服务暂不可用，请检查受保护 API、D1 绑定和管理员权限。':privateMetricsRequested?'私有统计不可用；未接入不等于零。':'尚未查询私有 D1；点击手动加载后才显示实际值。';
   setMetric('users-new-registrations',a?.quality==='collected'?a.newRegistered:null);
   byId('users-dau-wau').textContent=q?.quality==='collected'?accountValue(q.dau)+' / '+accountValue(q.wau):'— / —';
   setMetric('users-mau',q?.quality==='collected'?q.mau:null);
@@ -138,6 +138,7 @@ function updateGrowth(){
  }
 }
 async function refreshGrowth(){
+ privateMetricsRequested=true;
  if(!cloudflareMode){growth=null;growthError='UNAVAILABLE';updateGrowth();return}
  const params=new URLSearchParams();
  if(selectedPeriod==='custom'){
@@ -160,7 +161,7 @@ async function refreshGrowth(){
  if(requestId===growthRequestId)updateGrowth();
 }
 
-const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',operations:'运营监控',
+const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',library:'企业招聘图书馆',operations:'运营监控',
  finance:'财务成本',investor:'融资展示',settings:'系统设置'};
 const details={
  users:['真实用户注册与业务操作','账号级行为追踪已停止；注册和收藏来自真实数据库，页面事件仅计次数。'],
@@ -169,11 +170,11 @@ const details={
  finance:['成本、收入与经营效率','未来接入经核对的收支台账和 API 成本；无记录时不生成模拟营收。'],
  settings:['后台权限和统计配置','接入登录系统后，启用管理员 RBAC、投资人只读访问及指标口径管理。']
 };
-function setView(view){
+function setView(view,options={}){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(['investor','overview','users'].includes(view)?view:'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users','market','library','operations','finance'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -182,6 +183,12 @@ function setView(view){
   node.classList.toggle('is-active',selected);
   if(selected)node.setAttribute('aria-current','page');else node.removeAttribute('aria-current');
  }
+ if(view==='library'){
+  if(options.industry)void window.hhbaLibrary?.openIndustry(options.industry);
+  else window.hhbaLibrary?.open();
+ }
+ if(view==='market')void window.hhbaMarket?.open();
+ if(view==='finance')window.hhbaFinance?.open();
  if(details[view]){
   byId('placeholder-heading').textContent=titles[view];
   byId('placeholder-subtitle').textContent=details[view][0];
@@ -211,7 +218,7 @@ function choosePeriod(value){
  byId('users-period-label').textContent=periodText+'（UTC）';
  byId('period-notice').querySelector('span').textContent='当前岗位指标为最新索引快照，与所选'+text[value]+
   '范围无关；注册新增和无身份运营事件按所选日期查询，账号 DAU/WAU/MAU 已停采。';
- if(value!=='custom'||customRange)void refreshGrowth();
+ if(activeView==='users'&&privateMetricsRequested&&(value!=='custom'||customRange))void refreshGrowth();
 }
 function qualityText(data){
  if(!data)return '暂不可用';
@@ -253,8 +260,9 @@ async function refresh(){
  btn.setAttribute('aria-busy','true');
  btn.lastChild.textContent=' 正在核对…';
  try{
+  const path=location.hostname==='admin.hhba.work'?'/admin-preview/api/public-jobs':'/api/metrics/public';
   const response=cloudflareMode
-   ?await fetch('/api/metrics/public',{method:'GET',cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}})
+   ?await fetch(path,{method:'GET',cache:'no-store',credentials:location.hostname==='admin.hhba.work'?'same-origin':'omit',headers:{Accept:'application/json'}})
    :await fetch('/api/overview',{method:'GET',cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
   if(!response.ok)throw Error('index_not_available');
   const raw=await response.json();const body=cloudflareMode?normalizeCloudflarePublic(raw):raw;
@@ -355,7 +363,70 @@ function applyCustomDateRange(prefix){
 }
 byId('apply-custom').addEventListener('click',()=>applyCustomDateRange(''));
 byId('users-apply-custom').addEventListener('click',()=>applyCustomDateRange('users-'));
-byId('refresh').addEventListener('click',()=>{void refresh();void refreshGrowth()});
+byId('refresh').addEventListener('click',()=>{void refresh()});
+async function manualGrowth(button){
+ if(button.disabled)return;
+ button.disabled=true;
+ const before=button.textContent;
+ button.textContent='读取中…';
+ try {await refreshGrowth()}
+ finally {button.disabled=false;button.textContent=before}
+}
+for(const id of ['refresh-private','users-load-private']){
+ const b=byId(id);
+ b.addEventListener('click',()=>{void manualGrowth(b)});
+}
+async function checkHealth(){
+ const button=byId('health-check'),note=byId('health-message');
+ if(button.disabled)return;
+ button.disabled=true;button.textContent='正在检查…';
+ note.textContent='正在读取经过管理员验证的配置与公开职位快照，不执行 D1 SQL…';
+ for(const id of ['health-admin','health-library','health-library-mode','health-metrics','health-accounts','health-jobs','health-deltas','health-latest'])byId(id).textContent='检查中';
+ try{
+  // The protected health endpoint only lists one exact KV key and reads NO D1 rows.
+  const response=await fetch('/admin-preview/api/health',{cache:'no-store',credentials:'same-origin',headers:{Accept:'application/json'}});
+  if(!response.ok)throw Error('自检服务返回 HTTP '+response.status);
+  const data=await response.json();
+  if(data.kind!=='HHBA_ADMIN_HEALTH_V1'||data.d1QueriesPerformed!==0||!data.sources)throw Error('自检响应无法校验');
+  const sources=data.sources;
+  byId('health-admin').textContent=sources.adminSession?.status==='verified'?'会话已验证':'验证状态未知';
+  byId('health-library').textContent=({
+   present:'KV 历史基线存在（并非网址有效性认证）',missing:'KV 历史基线缺失',
+   unavailable:'KV 检查失败',not_bound:'KV 未绑定'
+  })[sources.employerCatalog?.status]||'检查结果不明确';
+  byId('health-library-mode').textContent=sources.employerCatalog?.snapshotFirst?'KV 快照优先已启用':'未启用 KV 优先（可能读取 D1）';
+  const bindingStatus=x=>x==='bound_not_queried'?'已绑定 · 未执行 SQL，运行状态待确认':'未绑定或配置不可用';
+  byId('health-metrics').textContent=bindingStatus(sources.metricsDatabase?.status);
+  byId('health-accounts').textContent=bindingStatus(sources.identityDatabase?.status);
+  const deltas=sources.catalogDeltas;
+  const count=integer(deltas?.count);
+  const deltaLabel=count===null?'—':(deltas.exact?'':'至少 ')+fmt.format(count)+' / '+fmt.format(deltas.limit||600)+' 批';
+  byId('health-deltas').textContent=({
+    normal:'正常 · ',approaching_limit:'接近合并阈值 · ',
+    at_or_above_limit:'需要合并历史增量 · ',
+    not_bound:'KV 未绑定 · ',unavailable:'KV 列举失败 · '
+  })[deltas?.status]||'未知 · ';
+  byId('health-deltas').textContent+=deltaLabel;
+  byId('health-latest').textContent=deltas?.lastDeltaAt?formatTime(deltas.lastDeltaAt):
+   deltas?.status==='normal'&&count===0?'当前没有增量记录':'最近更新时间尚无法核实';
+  // A public metrics request reads the site's published snapshot, not D1.
+  await refresh();
+  byId('health-jobs').textContent=snapshot?.quality
+   ?({'current':'已获取当前快照','partial':'快照部分可用','stale':'快照过期','unavailable':'快照不可用'}[snapshot.quality]||'状态未知')+
+     ' · '+(snapshot.asOf?formatTime(snapshot.asOf):'时间未知')
+   :'公开职位快照暂不可获取';
+  note.textContent='本次检查：'+formatTime(data.observedAt)+'；D1 SQL 查询次数 0。已绑定不代表当日额度充足，也不代表所有功能可写。';
+ }catch(e){
+  note.textContent='自检失败：'+String(e.message||'连接异常')+'。未将缺失状态冒充运行正常。';
+  for(const id of ['health-admin','health-library','health-library-mode','health-metrics','health-accounts','health-jobs','health-deltas','health-latest']){
+   if(byId(id).textContent==='检查中')byId(id).textContent='无法确认';
+  }
+ }finally{
+  button.disabled=false;button.textContent='重新只读检查';
+ }
+}
+byId('health-check').addEventListener('click',()=>{void checkHealth()});
+window.hhbaAdminNavigation={openLibrary:industry=>setView('library',{industry})};
 byId('top-investor').addEventListener('click',()=>setView('investor'));
 byId('show-investor').addEventListener('click',()=>setView('investor'));
 byId('leave-investor').addEventListener('click',()=>setView('overview'));

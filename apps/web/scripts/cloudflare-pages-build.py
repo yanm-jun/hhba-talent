@@ -33,7 +33,120 @@ def run(args: list[str] | str, *, cwd: Path, env: dict[str, str] | None = None) 
     subprocess.run(cmd, check=True, cwd=cwd, env=env)
 
 
+def build_admin_library_preview() -> bool:
+    """Isolated feature-branch UI preview; does not replace the production site build.
+
+    The complete production build depends on external historical company images.
+    To review admin design without changing a public employer page, only this
+    explicitly named development branch serves the existing admin console.
+    Pages Functions still apply Cloudflare Access verification to all data.
+    """
+    if os.environ.get("CF_PAGES_BRANCH", "") != "feat/admin-recruitment-library-20261112":
+        return False
+    # Bundle the actual D1 employer table as a private Pages Function module.
+    # Never write employer-list snapshots into /dist (public static assets).
+    run(["python3", "scripts/build-private-library-snapshot.py"], cwd=WEB)
+    source = REPO / "apps" / "admin-preview"
+    target = WEB / "dist" / "admin-preview"
+    target.mkdir(parents=True, exist_ok=True)
+    filenames = ("index.html", "dashboard.js", "styles.css", "library.js",
+                 "library.css", "library-file-ui.js", "library-file-import.js",
+                 "favicon.svg")
+    for name in filenames:
+        shutil.copy2(source / name, target / name)
+    page = (target / "index.html").read_text(encoding="utf-8")
+    rewrites = [
+        ('href="/styles.css"', 'href="./styles.css"'),
+        ('src="/dashboard.js"', 'src="./dashboard.js"'),
+        ('src="/library.js"', 'src="./library.js"'),
+        ('src="/library-file-ui.js"', 'src="./library-file-ui.js"'),
+        ('href="/library.css"', 'href="./library.css"'),
+        ('href="/favicon.svg"', 'href="./favicon.svg"'),
+    ]
+    for before, after in rewrites:
+        if before not in page:
+            raise SystemExit("Admin preview asset changed: " + before)
+        page = page.replace(before, after)
+    (target / "index.html").write_text(page, encoding="utf-8")
+    (WEB / "dist" / "index.html").write_text(
+        '<!doctype html><html lang="zh-CN"><meta charset="utf-8">'
+        '<meta http-equiv="refresh" content="0;url=/admin-preview/">'
+        '<title>HHBA 后台预览</title>'
+        '<p><a href="/admin-preview/">进入 HHBA 管理后台预览</a></p></html>',
+        encoding="utf-8",
+    )
+    assert all((target / name).is_file() for name in filenames)
+    print("HHBA_ADMIN_LIBRARY_ISOLATED_PREVIEW_READY=/admin-preview/", flush=True)
+    return True
+
+
+def build_standalone_admin_password_console() -> bool:
+    """Separate Pages project. Only original HHBA admin UI, not the public job site.
+
+    The regular hhba.work production build and existing Access preview are never
+    affected. Functions are deployed alongside this private static console and
+    guard all /admin-preview/ assets and APIs via the new revocable session.
+    """
+    if os.environ.get("CF_PAGES_PROJECT_NAME") != "hhba-admin-console":
+        return False
+    source = REPO / "apps" / "admin-preview"
+    dist = WEB / "dist"
+    target = dist / "admin-preview"
+    target.mkdir(parents=True, exist_ok=True)
+    files = (
+        "index.html", "dashboard.js", "styles.css", "library.js", "library.css",
+        "library-file-ui.js", "library-file-import.js", "admin-console-ui.js",
+        "favicon.svg"
+    )
+    for name in files:
+        shutil.copy2(source / name, target / name)
+
+    html = (target / "index.html").read_text(encoding="utf-8")
+    replacements = (
+        ('href="/styles.css"', 'href="./styles.css"'),
+        ('src="/dashboard.js"', 'src="./dashboard.js"'),
+        ('src="/library.js"', 'src="./library.js"'),
+        ('src="/library-file-ui.js"', 'src="./library-file-ui.js"'),
+        ('href="/library.css"', 'href="./library.css"'),
+        ('href="/favicon.svg"', 'href="./favicon.svg"'),
+    )
+    for before, after in replacements:
+        if before not in html:
+            raise SystemExit("Admin password console asset is missing: "+before)
+        html = html.replace(before, after)
+    if "</body>" not in html:
+        raise SystemExit("Admin HTML has no body closing tag")
+    html = html.replace("</body>", '<script type="module" src="./admin-console-ui.js"></script></body>')
+    (target / "index.html").write_text(html, encoding="utf-8")
+
+    for page in ("login", "setup"):
+        folder = dist / page
+        folder.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source / page / "index.html", folder / "index.html")
+    for name in ("admin-login.css", "admin-login.js", "favicon.svg"):
+        shutil.copy2(source / name, dist / name)
+    (dist / "index.html").write_text(
+        '<!doctype html><html lang="zh-CN"><meta charset="utf-8"/>'
+        '<meta name="robots" content="noindex,nofollow"/>'
+        '<title>HHBA 管理后台</title><meta http-equiv="refresh" '
+        'content="0;url=/admin-preview/"/><a href="/admin-preview/">进入后台</a></html>',
+        encoding="utf-8",
+    )
+    checks = [dist / "admin-preview" / n for n in files] + [
+        dist / "index.html", dist / "login/index.html", dist / "setup/index.html",
+        dist / "admin-login.css", dist / "admin-login.js"
+    ]
+    if any(not path.is_file() or path.stat().st_size == 0 for path in checks):
+        raise SystemExit("Standalone admin console build output incomplete.")
+    print("HHBA_STANDALONE_ADMIN_PASSWORD_CONSOLE_READY=/login/",flush=True)
+    return True
+
+
 def main() -> None:
+    if build_standalone_admin_password_console():
+        return
+    if build_admin_library_preview():
+        return
     if not WORKFLOW.exists():
         raise SystemExit("Missing canonical GitHub Pages workflow")
     wf = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
@@ -82,12 +195,15 @@ def main() -> None:
     original_admin = REPO / "apps" / "admin-preview"
     cloudflare_admin = WEB / "dist" / "admin-preview"
     cloudflare_admin.mkdir(parents=True, exist_ok=True)
-    for filename in ("index.html", "dashboard.js", "styles.css", "favicon.svg"):
+    for filename in ("index.html", "dashboard.js", "styles.css", "library.js", "library.css", "library-file-ui.js", "library-file-import.js", "favicon.svg"):
         shutil.copy2(original_admin / filename, cloudflare_admin / filename)
     admin_html = (cloudflare_admin / "index.html").read_text(encoding="utf-8")
     for old, new in (
         ('href="/styles.css"', 'href="./styles.css"'),
         ('src="/dashboard.js"', 'src="./dashboard.js"'),
+        ('src="/library.js"', 'src="./library.js"'),
+        ('src="/library-file-ui.js"', 'src="./library-file-ui.js"'),
+        ('href="/library.css"', 'href="./library.css"'),
         ('href="/favicon.svg"', 'href="./favicon.svg"'),
     ):
         if old not in admin_html:
@@ -138,6 +254,10 @@ def main() -> None:
         "data/jobs.json",
         "admin-preview/index.html",
         "admin-preview/dashboard.js",
+        "admin-preview/library.js",
+        "admin-preview/library.css",
+        "admin-preview/library-file-ui.js",
+        "admin-preview/library-file-import.js",
         "companies/autumn/cn-autumn-034/index.html",
         "companies/autumn/cn-autumn-093/index.html",
         "companies/autumn/cn-autumn-119/index.html",
