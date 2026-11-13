@@ -1,0 +1,37 @@
+name: HHBA Free Resume Profile Cache
+on:
+  pull_request:
+    paths:
+      - 'apps/web/functions/_lib/free-resume-profile.js'
+      - 'apps/web/functions/api/match-native/**'
+      - 'apps/web/src/pages/CandidateMatchPage.tsx'
+      - 'apps/web/src/services/resumeMatch.ts'
+      - 'apps/web/scripts/free-resume-profile-cache.contract.test.mjs'
+      - 'apps/web/d1/0026_free_resume_profile_cache.sql'
+      - '.github/workflows/hhba-free-resume-profile.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install pinned web dependencies
+        run: npm ci --ignore-scripts
+        working-directory: apps/web
+      - name: Syntax and single-inference contract
+        run: |
+          node --check functions/_lib/free-resume-profile.js
+          node --check 'functions/api/match-native/[[path]].js'
+          node --test scripts/free-resume-profile-cache.contract.test.mjs
+        working-directory: apps/web
+      - name: TypeScript and production bundle
+        run: npm run build
+        working-directory: apps/web
