@@ -7,7 +7,7 @@ import {
 } from '../functions/_lib/free-resume-profile.js';
 
 function harness(){
- const profiles=new Map(),calls=[],usage=[],owner='13800000000';
+ const profiles=new Map(),calls=[],usage=[],freeCalls=[],owner='13800000000';
  let pending=null;
  const db={prepare(sql){return {bind(...args){return {
   async first(){
@@ -29,6 +29,13 @@ function harness(){
      profile_json:null,attempt_id:args[3],lease_until:args[4]});
     return {success:true,meta:{changes:1}};
    }
+   if(sql.startsWith('INSERT INTO hhba_free_ai_provider_calls')){
+    const provider=args[3],unit=args[4];
+    const total=freeCalls.filter(x=>x.provider===provider).reduce((sum,x)=>sum+x.unit,0);
+    const cap=provider==='cloudflare'?7200:provider==='groq'?120000:30;
+    if(total+unit>cap)return {success:true,meta:{changes:0}};
+    freeCalls.push({provider,unit});return {success:true,meta:{changes:1}};
+   }
    if(sql.startsWith('INSERT INTO hhba_resume_profile_ai_calls')){
     if(usage.length>=DAILY_PARSER_CALL_CAP)return {success:true,meta:{changes:0}};
     usage.push(args[0]);return {success:true,meta:{changes:1}};
@@ -47,7 +54,12 @@ function harness(){
    throw Error('Unexpected run: '+sql);
   }
  }}}}};
- const env={HHBA_FREE_RESUME_PARSE_ENABLED:'1',HHBA_PNVS_AUTH_DB:db,
+ const env={
+  HHBA_FREE_RESUME_PARSE_ENABLED:'1',
+  HHBA_ZERO_PAID_AI_ENFORCED:'1',
+  HHBA_FREE_AI_CLOUDFLARE_FREE_PLAN_VERIFIED:'1',
+  HHBA_MATCH_LIMIT_PEPPER:'synthetic-pepper-with-32-chars-123456789',
+  HHBA_PNVS_AUTH_DB:db,
   AI:{async run(model,params){
    assert.equal(model,FREE_MODEL);
    calls.push(params);
@@ -63,7 +75,7 @@ function harness(){
  const text='学历本科，3年工作经验，技能Python数据处理，工作方向数据分析。负责Python数据处理及销售数据分析项目管理工作。电话13812345678，邮箱test@example.com。';
  const opts={phone:owner,resumeId:'12345678-1234-4123-8123-123456789012',
   fileSha256:'a'.repeat(64),text};
- return {env,opts,profiles,calls,usage,setPending:v=>{pending=v}};
+ return {env,opts,profiles,calls,usage,freeCalls,setPending:v=>{pending=v}};
 }
 test('first save parses; re-match returns cached profile with zero additional inference',async()=>{
  const h=harness();
