@@ -170,11 +170,11 @@ const details={
  finance:['成本、收入与经营效率','未来接入经核对的收支台账和 API 成本；无记录时不生成模拟营收。'],
  settings:['后台权限和统计配置','接入登录系统后，启用管理员 RBAC、投资人只读访问及指标口径管理。']
 };
-function setView(view){
+function setView(view,options={}){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(['investor','overview','users','library','operations'].includes(view)?view:'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users','market','library','operations'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -183,7 +183,11 @@ function setView(view){
   node.classList.toggle('is-active',selected);
   if(selected)node.setAttribute('aria-current','page');else node.removeAttribute('aria-current');
  }
- if(view==='library')window.hhbaLibrary?.open();
+ if(view==='library'){
+  if(options.industry)void window.hhbaLibrary?.openIndustry(options.industry);
+  else window.hhbaLibrary?.open();
+ }
+ if(view==='market')void window.hhbaMarket?.open();
  if(details[view]){
   byId('placeholder-heading').textContent=titles[view];
   byId('placeholder-subtitle').textContent=details[view][0];
@@ -409,6 +413,7 @@ async function checkHealth(){
  }
 }
 byId('health-check').addEventListener('click',()=>{void checkHealth()});
+window.hhbaAdminNavigation={openLibrary:industry=>setView('library',{industry})};
 byId('top-investor').addEventListener('click',()=>setView('investor'));
 byId('show-investor').addEventListener('click',()=>setView('investor'));
 byId('leave-investor').addEventListener('click',()=>setView('overview'));
