@@ -13,6 +13,7 @@ const MONTH=/^20\d{2}-(?:0[1-9]|1[0-2])$/;
 const DAY=/^20\d{2}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/;
 const ID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const money=v=>Number.isSafeInteger(v)&&v>0&&v<=1_000_000_000;
+const todayCN=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const text=v=>typeof v==='string'?v.trim():null;
 const clean=(v,max,min=0)=>{
  const s=text(v);
@@ -22,7 +23,7 @@ const validMonth=s=>typeof s==='string'&&MONTH.test(s);
 function validDay(s,month){
  if(typeof s!=='string'||!DAY.test(s)||!s.startsWith(month+'-'))return false;
  const day=new Date(s+'T00:00:00Z');
- return Number.isFinite(day.valueOf())&&day.toISOString().slice(0,10)===s&&s<=new Date().toISOString().slice(0,10);
+ return Number.isFinite(day.valueOf())&&day.toISOString().slice(0,10)===s&&s<=todayCN();
 }
 const prefix=month=>PREFIX+month+':';
 function isEvent(v,month){
@@ -42,10 +43,11 @@ export function aggregateFinance(events,month){
   if(e.kind==='entry')entries.set(e.id,e);
   else voids.set(e.id,e);
  }
- const canceled=new Set();
+ const canceled=new Set(),voidInfo=new Map();
  for(const e of voids.values()){
   if(!entries.has(e.targetId))throw Error('BROKEN_REGISTER_REVERSAL');
   canceled.add(e.targetId);
+  if(!voidInfo.has(e.targetId)||e.at>voidInfo.get(e.targetId).at)voidInfo.set(e.targetId,e);
  }
  const active=[...entries.values()].filter(e=>!canceled.has(e.id));
  let income=0,expense=0;
@@ -62,7 +64,8 @@ export function aggregateFinance(events,month){
   eventsCount:events.length,limit:MAX_EVENTS,
   entries:[...entries.values()].map(e=>({
    id:e.id,day:e.day,direction:e.direction,category:e.category,amountFen:e.amountFen,
-   evidenceRef:e.evidenceRef,note:e.note,at:e.at,voided:canceled.has(e.id)
+   evidenceRef:e.evidenceRef,note:e.note,at:e.at,voided:canceled.has(e.id),
+   voidReason:voidInfo.get(e.id)?.reason||null,voidAt:voidInfo.get(e.id)?.at||null
   })).sort((a,b)=>b.day.localeCompare(a.day)||b.at.localeCompare(a.at))
  };
 }
