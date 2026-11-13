@@ -177,6 +177,7 @@ async function aiExtract(key,text,roleHint){
  try{return verifiedProfile(raw,text);}catch{throw providerFailure('AI_PROFILE_INCOMPLETE');}
 }
 export async function onRequest({request,env}){
+ if(env.HHBA_ZERO_PAID_AI_ENFORCED==='1')return fail('PAID_AI_DISABLED',503);
  const url=new URL(request.url);
  const tail=url.pathname.slice('/api/match'.length).replace(/\/$/,'');
  if(tail==='/status'&&request.method==='GET'){
