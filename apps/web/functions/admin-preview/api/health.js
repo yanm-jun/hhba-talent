@@ -22,7 +22,7 @@ export async function inspectBindings(env) {
    let lastDeltaAt=null;
    // Do not pretend to know the newest update if the KV listing was truncated.
    if(exact)for(const key of deltas){
-    const m=/^catalog:delta:(\\d{13}):/.exec(key);
+    const m=/^catalog:delta:(\d{13}):/.exec(key);
     if(!m)continue;
     const t=Number(m[1]);
     if(!Number.isSafeInteger(t)||t<1577836800000||t>Date.now()+300000)continue;
