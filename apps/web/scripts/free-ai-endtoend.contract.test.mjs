@@ -26,7 +26,10 @@ function harness({stale=false}={}){
  const profileCache=new Map(),recommendCache=new Map(),requests=[],budget=[];
  const used={ai:0,asset:0};
  const db={prepare(sql){
-  return {bind(...a){return {
+  return {async all(){
+   if(sql.includes('sqlite_master'))return {results:['hhba_candidate_resume_profiles','hhba_free_ai_provider_calls','hhba_candidate_free_match_cache'].map(name=>({name}))};
+   throw Error('Unexpected unbound D1 all: '+sql);
+  },bind(...a){return {
    async first(){
     if(sql.includes('FROM hhba_auth_sessions'))return {phone,revoked:0,expires_at:new Date(Date.now()+600000).toISOString()};
     if(sql.includes('FROM hhba_auth_users'))return {phone,role:'candidate'};
