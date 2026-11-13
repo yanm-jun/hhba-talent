@@ -331,3 +331,22 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline-color:#3b87ec}
 #view-market .quality-lines{margin-top:10px}
 #view-market .hhba-private-quality{margin:16px 0 0}
 @media(max-width:680px){.hhba-market-industry-panel{padding:13px}}
+
+
+/* Private manual finance register: no estimate-based KPIs. */
+.hhba-finance-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0 18px}
+.hhba-finance-toolbar label{font-size:13px;color:#51685b;font-weight:650}
+.hhba-finance-toolbar input{padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:#fff}
+.hhba-finance-panel{padding:20px 22px;margin:20px 0}
+.hhba-finance-panel .panel-heading{margin-bottom:18px}
+.hhba-finance-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hhba-finance-form label{display:flex;flex-direction:column;gap:7px;font-size:12px;color:#486454;font-weight:650}
+.hhba-finance-form input,.hhba-finance-form select{width:100%;min-width:0;padding:11px 10px;border:1px solid var(--border);border-radius:9px;background:#fff;color:var(--ink)}
+.hhba-finance-form .hhba-finance-note{grid-column:span 2}
+.hhba-finance-form button{align-self:end;min-height:44px}
+.hhba-finance-table{width:100%;min-width:810px}
+.hhba-finance-table th,.hhba-finance-table td{white-space:nowrap}
+.hhba-finance-table td:nth-child(4){font-variant-numeric:tabular-nums;font-weight:650}
+.hhba-finance-table button{padding:6px 10px;font-size:11px}
+@media(max-width:900px){.hhba-finance-form{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.hhba-finance-panel{padding:14px}.hhba-finance-form{grid-template-columns:1fr}.hhba-finance-form .hhba-finance-note{grid-column:auto}.hhba-finance-form button{width:100%}}
