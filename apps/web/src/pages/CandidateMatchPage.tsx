@@ -7,7 +7,7 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
+import {matchServiceReady,freeResumeParserReady,matchSavedResumeFromProfile,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -124,18 +124,30 @@ export function CandidateMatchPage({user}:{user:User|null}){
    let matched:MatchResponse;
    if(previewLoaded){
     // Once the user has reviewed/edited text, NEVER fall back to re-reading the unedited file.
-    matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
+    matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs,true);
    }else{
-    let selected=file;
-    if(!selected&&savedId){
-     const entry=savedFiles.find(item=>item.id===savedId);
-     if(!entry)throw new MatchError(404,'已保存的简历已改变，请重新选择。');
-     const bytes=await fetchPrivateResumeForLocalReview(entry);
-     if(abort.signal.aborted)throw new DOMException('Cancelled','AbortError');
-     selected=new File([bytes],entry.name,{type:entry.type});
+    // Cache hits never download R2 or run another parser call.
+    let fromCache:MatchResponse|null=null;
+    if(savedId&&await freeResumeParserReady(abort.signal)){
+     try{
+      fromCache=await matchSavedResumeFromProfile(savedId,options,consent,abort.signal,setStage,setPartialJobs);
+     }catch(e){
+      if(!(e instanceof MatchError&&e.status===428))throw e;
+     }
     }
-    if(!selected)throw new MatchError(400,'请选择简历。');
-    matched=await submitResumeForMatching(selected,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
+    if(fromCache)matched=fromCache;
+    else{
+     let selected=file;
+     if(!selected&&savedId){
+      const entry=savedFiles.find(item=>item.id===savedId);
+      if(!entry)throw new MatchError(404,'已保存的简历已改变，请重新选择。');
+      const bytes=await fetchPrivateResumeForLocalReview(entry);
+      if(abort.signal.aborted)throw new DOMException('Cancelled','AbortError');
+      selected=new File([bytes],entry.name,{type:entry.type});
+     }
+     if(!selected)throw new MatchError(400,'请选择简历。');
+     matched=await submitResumeForMatching(selected,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
+    }
    }
    setResult(matched);setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
@@ -169,6 +181,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
            <option value="">不使用已保存文件，改为下面选择新文件</option>
            {savedFiles.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}
           </select>
+          <p>已保存简历的基础 AI 解析结果可重复使用；岗位检索与推荐仍可能产生模型费用。手动编辑文字则需重新解析。</p>
           {!savedFiles.length&&<p>还没有保存的简历。可从 <Link to="/candidate/account/resume">我的简历</Link> 上传。</p>}
           {vaultError&&<p role="status">{vaultError}</p>}
         </div>}
@@ -203,9 +216,9 @@ export function CandidateMatchPage({user}:{user:User|null}){
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 使用我的简历信息进行智能岗位匹配。</span>
+          <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 对简历文字脱敏、使用免费 AI 进行结构化解析和岗位匹配；如启用经审核的第三方免费模型服务，可能涉及境外处理，具体见隐私说明。</span>
         </label>
-        <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
+        <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于已授权的智能匹配，不会自动投递或公开。免费额度用尽会停止新 AI 分析，不自动改用付费模型。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
           disabled={(!file&&!savedId)||!consent||working||previewBusy||(previewLoaded&&previewText.replace(/\s/g,'').length<30)||availability!=='ready'||!getRealAuthToken()}>

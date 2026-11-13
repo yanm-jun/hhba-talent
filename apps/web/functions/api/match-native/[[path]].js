@@ -1,7 +1,9 @@
 // HHBA search-first experience: DeepSeek Search -> optional Fetch -> V4 Pro ranking.
 // No ATS API, no company whitelist, no invented job links.
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
+import {onRequest as onFreeMatchRequest} from '../match-free/[[path]].js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
+import {parserRequested,getOrParseResumeProfile,safeResumeContext} from '../../_lib/free-resume-profile.js';
 import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
@@ -115,11 +117,12 @@ async function readProviderEvents(response,onProgress=()=>{},onPartial=()=>{},li
  if(receivedSearch)onProgress('writing');
  return completed;
 }
-function nativeResponsePayload(result){
+function nativeResponsePayload(result,parsed=null){
  return {
   status:'COMPLETE',
-  profile:{education:null,education_evidence:null,experience_years:null,
+  profile:parsed?.profile||{education:null,education_evidence:null,experience_years:null,
    experience_evidence:null,skills:[],target_roles:[],warnings:[]},
+  resume_profile_source:parsed?.source||'LEGACY_UNCACHED',
   matches:result.matches,
   // Search and domain heuristics cannot independently verify official hiring ownership.
   matched_official_jobs:0,
@@ -127,17 +130,17 @@ function nativeResponsePayload(result){
    job.recruitment_source_kind==='EMPLOYER_DOMAIN_CANDIDATE'||
    job.recruitment_source_kind==='EMPLOYER_ATS').length,
   native_search:result.diagnostic,
-  source:'DeepSeek Search 官方接口检索 + V4 Pro 简历匹配',
+  source:parsed?'Cloudflare Workers AI 基础解析 + DeepSeek Search 岗位匹配':'DeepSeek Search 官方接口检索 + V4 Pro 简历匹配',
   scoring:'AI 根据简历和招聘信息推荐；不代表录用概率',
-  privacy:'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
+  privacy:parsed?'已授权的结构化简历内容由 Cloudflare AI 提取；仅已保存简历的结果私有缓存于 D1。岗位检索使用精简脱敏资料，不转发原始简历文件。':'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
   disclaimer:(result.incomplete?'本轮未达到10条或生成未完全结束，仅保留已找到的企业招聘入口。':'')+'严格不推荐第三方公开招聘平台；仅展示企业招聘站候选或企业专属招聘系统具体岗位。实际招聘归属、是否在招和投递资格仍须以企业官方公告为准。'
  };
 }
 
 // The live Search-first model owns the job list. Only server-completed
 // matches may create durable personal history; clients cannot submit fake jobs.
-async function withSavedHistory(env,session,input,result){
- const response=nativeResponsePayload(result);
+async function withSavedHistory(env,session,input,result,parsed=null){
+ const response=nativeResponsePayload(result,parsed);
  try{
   const item=await saveMatchHistory(env.HHBA_PNVS_AUTH_DB,session.phone,
    input.resume_id??null,input.options.role_hint,result.matches);
@@ -293,10 +296,19 @@ export async function runNativeDualMatch(key,text,roleHint,limit=10,{
 }
 
 export async function onRequest({request,env}){
+ // Strict free-only mode: route the existing frontend endpoint without touching paid DeepSeek.
+ if(env.HHBA_ZERO_PAID_AI_ENFORCED==='1'){
+  if(env.HHBA_FREE_MATCH_ENABLED!=='1')
+   return fail('FREE_AI_NOT_CONFIGURED',503);
+  const target=new URL(request.url);
+  target.pathname=target.pathname.replace(/^\/api\/match-native/,'/api/match-free');
+  return onFreeMatchRequest({request:new Request(target.toString(),request),env});
+ }
  const url=new URL(request.url);
  const tail=url.pathname.slice('/api/match-native'.length).replace(/\/$/,'')||'/';
  if(tail==='/status'&&request.method==='GET')
-  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'SEARCH_FIRST_V1',formats:['pdf','docx']});
+  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'SEARCH_FIRST_V1',formats:['pdf','docx'],
+   free_resume_parser_enabled:parserRequested(env)&&typeof env.AI?.run==='function'});
  if(!enabled(env))return fail('MATCH_NOT_ENABLED',503);
  if(tail==='/provider-check'&&request.method==='GET'){
   try{
@@ -320,24 +332,39 @@ export async function onRequest({request,env}){
  if(input?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',400);
  const options=input?.options;
  if(typeof input?.text!=='string'||input.text.length>20000||
-    input.text.replace(/\s/g,'').length<30||!options||
+    (input.text.replace(/\s/g,'').length<30&&!(parserRequested(env)&&input.resume_id&&!input.preview_edited))||!options||
     options.country!=='CN'||options.remote_only!==false||
     typeof options.role_hint!=='string'||options.role_hint.length>80||
     !Number.isInteger(options.limit)||options.limit<1||options.limit>10)
   return fail('INVALID_RESUME_TEXT',400);
+ let ownedResume=null;
  if(input.resume_id!==null&&input.resume_id!==undefined&&input.resume_id!==''){
   if(typeof input.resume_id!=='string'||!/^[0-9a-f-]{36}$/i.test(input.resume_id))
    return fail('RESUME_NOT_FOUND',404);
   try{
    const own=await env.HHBA_PNVS_AUTH_DB.prepare(
-    'SELECT id FROM hhba_candidate_resumes WHERE phone=? AND id=?'
+    'SELECT id,sha256 FROM hhba_candidate_resumes WHERE phone=? AND id=?'
    ).bind(candidate.phone,input.resume_id).first();
    if(!own)return fail('RESUME_NOT_FOUND',404);
+   ownedResume=own;
   }catch{return fail('MATCH_HISTORY_DB_UNAVAILABLE',503);}
  }
- const redacted=redactForModel(input.text);
+ let redacted=redactForModel(input.text),parsed=null;
+ if(parserRequested(env)){
+  try{
+   parsed=await getOrParseResumeProfile(env,{
+    phone:candidate.phone,resumeId:ownedResume?.id||null,
+    fileSha256:ownedResume?.sha256||null,text:redacted,
+    skipCache:input.preview_edited===true
+   });
+   redacted=safeResumeContext(parsed.profile);
+  }catch(e){
+   const code=typeof e?.code==='string'?e.code:'FREE_RESUME_PARSER_UNAVAILABLE';
+   return fail(code,Number.isInteger(e?.status)?e.status:503);
+  }
+ }
  if(redacted.replace(/\s/g,'').length<30)return fail('INVALID_RESUME_TEXT',400);
- // Same-origin, authorized one-shot call. No raw resume stored in HHBA database.
+ // Same-origin, authorized request. Only opt-in structured profiles are cached in private D1.
  const streaming=request.headers.get('Accept')?.includes('text/event-stream');
  if(streaming){
   const encoder=new TextEncoder();
@@ -365,7 +392,7 @@ export async function onRequest({request,env}){
         phase=stage;send('progress',{stage});
        },onPartial:matches=>send('partial',{matches})});
       console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
-      send('complete',await withSavedHistory(env,candidate,input,result));
+      send('complete',await withSavedHistory(env,candidate,input,result,parsed));
      }catch(e){
       const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
       console.warn('HHBA_MATCH_NATIVE_ERROR',JSON.stringify({
@@ -391,7 +418,7 @@ export async function onRequest({request,env}){
   const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
    options.role_hint,options.limit);
   console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
-  return json(await withSavedHistory(env,candidate,input,result));
+  return json(await withSavedHistory(env,candidate,input,result,parsed));
  }catch(e){
   const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
   console.warn('HHBA_MATCH_NATIVE_ERROR',code);

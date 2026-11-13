@@ -5,7 +5,8 @@
 const FIELDS=['fullName','phone','email','school','major','education','degree','enrollment','graduation','city','skills','experience','projects','summary'];
 const SHORT=new Set(['fullName','phone','email','school','major','education','degree','enrollment','graduation','city']);
 const DANGEROUS=/(验证码|密码|身份证|护照|家庭|亲属|健康|宗教|民族|政治面貌|诚信|隐私|同意|承诺|授权|性别|出生|银行|工资|薪酬|工作单位|当前公司|captcha|otp|passport|consent|password|salary|gender|id.?card|government)/i;
-export const aiConfigured=env=>env?.HHBA_APPLY_AI_ENABLED==='1'&&
+export const aiConfigured=env=>env?.HHBA_ZERO_PAID_AI_ENFORCED!=='1'&&
+ env?.HHBA_APPLY_AI_ENABLED==='1'&&
  env?.HHBA_AI_DISCLOSURE_APPROVED==='1'&&
  typeof env?.HHBA_AI_API_KEY==='string'&&env.HHBA_AI_API_KEY.length>20;
 export function validateAISuggestionRequest(data){

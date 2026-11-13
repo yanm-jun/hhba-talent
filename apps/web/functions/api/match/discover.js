@@ -50,12 +50,14 @@ async function reserve(db,identity){
  return row?.success===true&&row?.meta?.changes===1?{day,id}:null;
 }
 export async function onRequestGet({env}){
+ if(env?.HHBA_ZERO_PAID_AI_ENFORCED==='1')return fail('PAID_AI_DISABLED',503);
  return respond({kind:EXTERNAL_DISCOVERY_VERSION,enabled:enabled(env)&&await dbReady(env.HHBA_PNVS_AUTH_DB),
   scope:'CN_MAINLAND_ONLY',max_search_requests:2,max_fetch_requests:3,
   per_account_daily_limit:2,global_daily_limit:12,integrated_into_top10:false,
   disclaimer:'只做官方招聘详情发现，尚不保证岗位仍开放，也不自动加入 Top 10。'});
 }
 export async function onRequestPost({request,env}){
+ if(env?.HHBA_ZERO_PAID_AI_ENFORCED==='1')return fail('PAID_AI_DISABLED',503);
  const url=new URL(request.url);
  if(request.headers.get('Origin')!==url.origin||request.headers.get('Sec-Fetch-Site')==='cross-site')
   return fail('ORIGIN_REQUIRED',403);
