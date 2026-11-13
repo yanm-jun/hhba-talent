@@ -11,7 +11,7 @@ test('health probe checks only KV key metadata and never executes D1 SQL',async(
   HHBA_METRICS_DB:neverSql,HHBA_PNVS_AUTH_DB:neverSql,
   HHBA_LIBRARY_CACHE_KV:{async list(options){
    listed++;
-   assert.deepEqual(options,{prefix:'catalog:baseline:v1',limit:10});
+   assert.deepEqual(options,{prefix:'catalog:',limit:602});
    return {keys:[{name:'catalog:baseline:v1'}]};
   }}
  };
@@ -20,6 +20,9 @@ test('health probe checks only KV key metadata and never executes D1 SQL',async(
  assert.equal(queried,0);
  assert.equal(result.d1QueriesPerformed,0);
  assert.equal(result.sources.employerCatalog.status,'present');
+ assert.equal(result.sources.catalogDeltas.status,'normal');
+ assert.equal(result.sources.catalogDeltas.count,0);
+ assert.equal(result.sources.catalogDeltas.exact,true);
  assert.equal(result.sources.employerCatalog.snapshotFirst,true);
  assert.equal(result.sources.metricsDatabase.status,'bound_not_queried');
  assert.equal(result.sources.identityDatabase.status,'bound_not_queried');
@@ -55,4 +58,24 @@ test('dashboard loads private D1 metrics only by user action',()=>{
  assert.match(html,/id="users-load-private"/);
  assert.match(html,/id="view-operations"/);
  assert.doesNotMatch(html,/data-view="finance"/);
+});
+
+test('real KV backlog only uses bounded key metadata, with compaction warning',async()=>{
+ const keys=[{name:'catalog:baseline:v1'}];
+ const stamp=String(Date.now());
+ for(let i=0;i<500;i++)keys.push({name:'catalog:delta:'+stamp+':unit-'+i});
+ const mk=(data,complete=true)=>({HHBA_LIBRARY_CACHE_KV:{async list(options){
+  assert.deepEqual(options,{prefix:'catalog:',limit:602});
+  return {keys:data,list_complete:complete};
+ }}});
+ const moderate=await inspectBindings(mk(keys));
+ assert.equal(moderate.sources.catalogDeltas.count,500);
+ assert.equal(moderate.sources.catalogDeltas.status,'approaching_limit');
+ assert.ok(moderate.sources.catalogDeltas.lastDeltaAt);
+ const full=await inspectBindings(mk([...keys,...Array.from({length:100},(_,i)=>({name:'catalog:delta:'+stamp+':next-'+i}))]));
+ assert.equal(full.sources.catalogDeltas.count,600);
+ assert.equal(full.sources.catalogDeltas.status,'at_or_above_limit');
+ const partial=await inspectBindings(mk(keys,false));
+ assert.equal(partial.sources.catalogDeltas.exact,false);
+ assert.equal(partial.sources.catalogDeltas.lastDeltaAt,null);
 });
