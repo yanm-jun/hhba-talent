@@ -21,9 +21,10 @@ def main():
     branch = os.environ.get("CF_PAGES_BRANCH", "")
     if branch != "feat/admin-password-console-20261112":
         raise SystemExit("Refusing standalone admin build on an unapproved branch: " + branch)
-    # Private catalog is compiled inside Pages Functions, never into dist/.
-    # Verify the actual production D1 table before shipping the admin site.
-    subprocess.run([sys.executable,"scripts/build-private-library-snapshot.py"],cwd=WEB,check=True)
+    # The private employer baseline lives in admin-only KV catalog:baseline:v1.
+    # Never download a one-hour D1 export URL at build time: that expiring
+    # dependency previously blocked otherwise-safe production deployments.
+    # Pages Functions read this private baseline only after admin verification.
     admin = DIST / "admin-preview"
     admin.mkdir(parents=True, exist_ok=True)
     files = [
