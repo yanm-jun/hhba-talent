@@ -9,7 +9,7 @@ const formatTime=value=>{
  })+'（北京时间）'}catch{return '—'}
 };
 const cloudflareMode=location.hostname==='hhba-talent.pages.dev'||location.hostname.endsWith('.hhba-talent.pages.dev')||location.hostname==='hhba.work'||location.hostname==='admin.hhba.work';
-let snapshot=null,growth=null,growthError=null,selectedPeriod='30d',customRange=null,activeView='overview',growthRequestId=0;
+let snapshot=null,growth=null,growthError=null,selectedPeriod='30d',customRange=null,activeView='overview',growthRequestId=0,privateMetricsRequested=false;
 function normalizeCloudflarePublic(raw){
  if(raw?.kind!=='HHBA_CLOUDFLARE_PUBLIC_METRICS_V1'||!raw.counts)throw Error('INVALID_CLOUDFLARE_JOB_DATA');
  return {kind:'HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2',quality:raw.quality,asOf:raw.sourceTime,
@@ -138,6 +138,7 @@ function updateGrowth(){
  }
 }
 async function refreshGrowth(){
+ privateMetricsRequested=true;
  if(!cloudflareMode){growth=null;growthError='UNAVAILABLE';updateGrowth();return}
  const params=new URLSearchParams();
  if(selectedPeriod==='custom'){
@@ -173,7 +174,7 @@ function setView(view){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(['investor','overview','users','library'].includes(view)?view:'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users','library','operations'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -212,7 +213,7 @@ function choosePeriod(value){
  byId('users-period-label').textContent=periodText+'（UTC）';
  byId('period-notice').querySelector('span').textContent='当前岗位指标为最新索引快照，与所选'+text[value]+
   '范围无关；注册新增和无身份运营事件按所选日期查询，账号 DAU/WAU/MAU 已停采。';
- if(value!=='custom'||customRange)void refreshGrowth();
+ if(activeView==='users'&&privateMetricsRequested&&(value!=='custom'||customRange))void refreshGrowth();
 }
 function qualityText(data){
  if(!data)return '暂不可用';
@@ -356,7 +357,58 @@ function applyCustomDateRange(prefix){
 }
 byId('apply-custom').addEventListener('click',()=>applyCustomDateRange(''));
 byId('users-apply-custom').addEventListener('click',()=>applyCustomDateRange('users-'));
-byId('refresh').addEventListener('click',()=>{void refresh();void refreshGrowth()});
+byId('refresh').addEventListener('click',()=>{void refresh()});
+async function manualGrowth(button){
+ if(button.disabled)return;
+ button.disabled=true;
+ const before=button.textContent;
+ button.textContent='读取中…';
+ try {await refreshGrowth()}
+ finally {button.disabled=false;button.textContent=before}
+}
+for(const id of ['refresh-private','users-load-private']){
+ const b=byId(id);
+ b.addEventListener('click',()=>{void manualGrowth(b)});
+}
+async function checkHealth(){
+ const button=byId('health-check'),note=byId('health-message');
+ if(button.disabled)return;
+ button.disabled=true;button.textContent='正在检查…';
+ note.textContent='正在读取经过管理员验证的配置与公开职位快照，不执行 D1 SQL…';
+ for(const id of ['health-admin','health-library','health-library-mode','health-metrics','health-accounts','health-jobs'])byId(id).textContent='检查中';
+ try{
+  // The protected health endpoint only lists one exact KV key and reads NO D1 rows.
+  const response=await fetch('/admin-preview/api/health',{cache:'no-store',credentials:'same-origin',headers:{Accept:'application/json'}});
+  if(!response.ok)throw Error('自检服务返回 HTTP '+response.status);
+  const data=await response.json();
+  if(data.kind!=='HHBA_ADMIN_HEALTH_V1'||data.d1QueriesPerformed!==0||!data.sources)throw Error('自检响应无法校验');
+  const sources=data.sources;
+  byId('health-admin').textContent=sources.adminSession?.status==='verified'?'会话已验证':'验证状态未知';
+  byId('health-library').textContent=({
+   present:'KV 历史基线存在（并非网址有效性认证）',missing:'KV 历史基线缺失',
+   unavailable:'KV 检查失败',not_bound:'KV 未绑定'
+  })[sources.employerCatalog?.status]||'检查结果不明确';
+  byId('health-library-mode').textContent=sources.employerCatalog?.snapshotFirst?'KV 快照优先已启用':'未启用 KV 优先（可能读取 D1）';
+  const bindingStatus=x=>x==='bound_not_queried'?'已绑定 · 未执行 SQL，运行状态待确认':'未绑定或配置不可用';
+  byId('health-metrics').textContent=bindingStatus(sources.metricsDatabase?.status);
+  byId('health-accounts').textContent=bindingStatus(sources.identityDatabase?.status);
+  // A public metrics request reads the site's published snapshot, not D1.
+  await refresh();
+  byId('health-jobs').textContent=snapshot?.quality
+   ?({'current':'已获取当前快照','partial':'快照部分可用','stale':'快照过期','unavailable':'快照不可用'}[snapshot.quality]||'状态未知')+
+     ' · '+(snapshot.asOf?formatTime(snapshot.asOf):'时间未知')
+   :'公开职位快照暂不可获取';
+  note.textContent='本次检查：'+formatTime(data.observedAt)+'；D1 SQL 查询次数 0。已绑定不代表当日额度充足，也不代表所有功能可写。';
+ }catch(e){
+  note.textContent='自检失败：'+String(e.message||'连接异常')+'。未将缺失状态冒充运行正常。';
+  for(const id of ['health-admin','health-library','health-library-mode','health-metrics','health-accounts','health-jobs']){
+   if(byId(id).textContent==='检查中')byId(id).textContent='无法确认';
+  }
+ }finally{
+  button.disabled=false;button.textContent='重新只读检查';
+ }
+}
+byId('health-check').addEventListener('click',()=>{void checkHealth()});
 byId('top-investor').addEventListener('click',()=>setView('investor'));
 byId('show-investor').addEventListener('click',()=>setView('investor'));
 byId('leave-investor').addEventListener('click',()=>setView('overview'));
