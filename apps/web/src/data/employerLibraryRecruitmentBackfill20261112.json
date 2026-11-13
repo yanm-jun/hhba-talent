@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "description": "2026-11-12 实际公开检索找到的企业招聘入口。每条保留企业、行业、URL、出处和类型。仅当索引对应企业没有此网址时新增；不作为在招单个岗位证明。",
+  "records": [
+    {
+      "name": "海尔集团",
+      "hall_id": "consumer-hardware",
+      "url": "https://d.maker.haier.net/client/job/index",
+      "evidence_url": "https://d.maker.haier.net/client/job/index",
+      "source_kind": "employer_careers",
+      "notes": "社会招聘",
+      "observed_on": "2026-11-12",
+      "verification": "source_observed_candidate"
+    },
+    {
+      "name": "海尔智家",
+      "hall_id": "consumer-hardware",
+      "url": "https://maker.haier.net/smart_home/customizedjobs.html",
+      "evidence_url": "https://maker.haier.net/smart_home/customizedjobs.html",
+      "source_kind": "employer_careers",
+      "notes": "校园招聘",
+      "observed_on": "2026-11-12",
+      "verification": "source_observed_candidate"
+    },
+    {
+      "name": "美的集团",
+      "hall_id": "consumer-hardware",
+      "url": "https://careers.midea.com/schoolOut",
+      "evidence_url": "https://careers.midea.com/schoolOut",
+      "source_kind": "employer_careers",
+      "notes": "校园招聘",
+      "observed_on": "2026-11-12",
+      "verification": "source_observed_candidate"
+    },
+    {
+      "name": "TCL实业",
+      "hall_id": "consumer-hardware",
+      "url": "https://zhaopin.tcl.com/industries",
+      "evidence_url": "https://zhaopin.tcl.com/industries",
+      "source_kind": "employer_careers",
+      "notes": "集团招聘",
+      "observed_on": "2026-11-12",
+      "verification": "source_observed_candidate"
+    },
+    {
+      "name": "海信集团",
+      "hall_id": "consumer-hardware",
+      "url": "https://jobs.hisense.com/",
+      "evidence_url": "https://career.nankai.edu.cn/correcruit/content/id/117043.html",
+      "source_kind": "institution_job_announcement",
+      "notes": "校园招聘",
+      "observed_on": "2026-11-12",
+      "verification": "source_observed_candidate"
+    },
+    {
+      "name": "创维集团",
+      "hall_id": "consumer-hardware",
+      "url": "https://skyworth.hotjob.cn/",
+      "evidence_url": "https://www.scfai.edu.cn/xsc/info/1015/19512.htm",
+      "source_kind": "institution_job_announcement",
+      "notes": "校园招聘",
+      "observed_on": "2026-11-12",
+      "verification": "source_observed_candidate"
+    },
+    {
+      "name": "创维数字",
+      "hall_id": "consumer-hardware",
+      "url": "https://www.skyworthdigital.com/job.html",
+      "evidence_url": "https://www.skyworthdigital.com/job.html",
+      "source_kind": "employer_careers",
+      "notes": "社会招聘",
+      "observed_on": "2026-11-12",
+      "verification": "source_observed_candidate"
+    },
+    {
+      "name": "宇树科技",
+      "hall_id": "internet-ai",
+      "url": "https://www.unitree.com/cn/position/",
+      "evidence_url": "https://www.unitree.com/cn/position/",
+      "source_kind": "employer_careers",
+      "notes": "公开招聘岗位",
+      "observed_on": "2026-11-12",
+      "verification": "source_observed_candidate"
+    },
+    {
+      "name": "安克创新",
+      "hall_id": "consumer-hardware",
+      "url": "https://career.anker.com.cn/",
+      "evidence_url": "https://career.anker.com.cn/",
+      "source_kind": "employer_careers",
+      "notes": "招聘官网",
+      "observed_on": "2026-11-12",
+      "verification": "source_observed_candidate"
+    },
+    {
+      "name": "高途教育",
+      "hall_id": "education-research",
+      "url": "https://job.gaotu.cn/",
+      "evidence_url": "https://job.gaotu.cn/",
+      "source_kind": "employer_careers",
+      "notes": "招聘官网",
+      "observed_on": "2026-11-12",
+      "verification": "source_observed_candidate"
+    },
+    {
+      "name": "新东方前途出国",
+      "hall_id": "education-research",
+      "url": "https://liuxue.xdf.cn/recruit/",
+      "evidence_url": "https://liuxue.xdf.cn/recruit/",
+      "source_kind": "employer_careers",
+      "notes": "招聘主页（部分旧职位）",
+      "observed_on": "2026-11-12",
+      "verification": "source_observed_candidate"
+    },
+    {
+      "name": "TCL科技",
+      "hall_id": "semiconductor",
+      "url": "https://zhaopin.tcl.com/campus/industry.html",
+      "evidence_url": "https://zhaopin.tcl.com/campus/industry.html",
+      "source_kind": "group_shared_careers",
+      "notes": "集团校招分类入口",
+      "observed_on": "2026-11-12",
+      "verification": "source_observed_candidate"
+    }
+  ]
+}

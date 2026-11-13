@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "description": "2026-11-12从企业自身招聘域名公开页面查得的入口候选。未与求职系统实时职位同步，岗位需DeepSeek另行公开检索核验。",
+  "records": [
+    {
+      "name": "新东方教育科技集团",
+      "url": "https://zhaopin.xdf.cn/",
+      "hall_id": "education-research",
+      "evidence_url": "https://zhaopin.xdf.cn/",
+      "observed_on": "2026-11-12",
+      "source_kind": "first_party_careers_page"
+    },
+    {
+      "name": "高途教育",
+      "url": "https://job.gaotu.cn/",
+      "hall_id": "education-research",
+      "evidence_url": "https://job.gaotu.cn/",
+      "observed_on": "2026-11-12",
+      "source_kind": "first_party_careers_page"
+    },
+    {
+      "name": "宇树科技（Unitree）",
+      "url": "https://www.unitree.com/cn/position/",
+      "hall_id": "consumer-hardware",
+      "evidence_url": "https://www.unitree.com/cn/position/",
+      "observed_on": "2026-11-12",
+      "source_kind": "first_party_careers_page"
+    },
+    {
+      "name": "绿联科技",
+      "url": "https://careers.lulian.cn/",
+      "hall_id": "consumer-hardware",
+      "evidence_url": "https://careers.lulian.cn/",
+      "observed_on": "2026-11-12",
+      "source_kind": "first_party_careers_page"
+    }
+  ]
+}

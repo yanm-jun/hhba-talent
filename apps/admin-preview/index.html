@@ -9,6 +9,8 @@
   <title>数据总览 · 汇方职场 HHBA 管理中心</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
   <link rel="stylesheet" href="/styles.css"/>
+  <link rel="stylesheet" href="/library.css"/>
+  <script type="module" src="/library.js"></script>
   <script type="module" src="/dashboard.js"></script>
 </head>
 <body>
@@ -24,6 +26,7 @@
       <button type="button" class="nav-link is-active" data-view="overview" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.4"/><rect x="13" y="3" width="8" height="8" rx="1.4"/><rect x="3" y="13" width="8" height="8" rx="1.4"/><rect x="13" y="13" width="8" height="8" rx="1.4"/></svg> 数据总览</button>
       <button type="button" class="nav-link" data-view="users"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2.1c0-2.4 2.4-4.2 5.5-4.2s5.5 1.8 5.5 4.2V19M16 5.5a3 3 0 0 1 0 5.4M17 13c2.3.3 3.5 1.7 3.5 3.9V19"/></svg> 用户分析</button>
       <button type="button" class="nav-link" data-view="market"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7" width="17" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3.5 12h17"/></svg> 岗位与企业</button>
+      <button type="button" class="nav-link" data-view="library"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4.5c3-1.3 6-1.3 9 .5 3-1.8 6-1.8 9-.5v14c-3-1.3-6-1.3-9 .5-3-1.8-6-1.8-9-.5zM12 5v14"/></svg> 行业馆</button>
       <button type="button" class="nav-link" data-view="operations"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4l3-7 4 12 3-5h4"/></svg> 运营监控 <span class="nav-soon">规划中</span></button>
       <button type="button" class="nav-link" data-view="finance"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 9h18M15 15h3"/></svg> 财务成本 <span class="nav-soon">规划中</span></button>
       <p class="nav-caption nav-caption-secondary">PRESENTATION</p>
@@ -200,6 +203,48 @@
               <div><span>官方招聘链接点击事件</span><strong id="growth-click">—</strong></div>
             </div>
           </article>
+        </div>
+      </section>
+      <section class="page-view" id="view-library" hidden aria-labelledby="library-heading">
+        <div class="page-heading"><div><p class="eyebrow">EMPLOYER SOURCE LIBRARY</p><h1 id="library-heading">行业馆</h1>
+          <p class="page-subtitle">行业 → 企业名称 → 招聘网址。17种行业为分类筛选，集团共用入口单独标注。</p></div>
+          <button type="button" class="button-outline" id="library-reload">刷新目录</button></div>
+        <div class="library-stats">
+          <article class="library-stat"><span>企业/集团候选档案</span><strong id="library-total">—</strong></article>
+          <article class="library-stat"><span>不同招聘网址（全库去重）</span><strong id="library-portals">—</strong><small id="library-link-associations">—</small></article>
+          <article class="library-stat"><span>没有招聘网址的企业</span><strong id="library-missing-portals">—</strong><small>优先补录，避免名称冒充网址</small></article>
+          <article class="library-stat"><span>待复核招聘网址</span><strong id="library-review">—</strong><small id="library-coverage-note">—</small></article>
+        </div>
+        <p id="library-collection-status" class="library-collection-status" aria-live="polite">正在读取17个馆的历史批次导入进度…</p>
+        <p id="library-message" role="status" aria-live="polite">点击左侧企业资源图书馆以读取目录。</p>
+        <div id="library-halls" class="library-halls" aria-label="统一行业馆筛选"></div>
+        <div class="library-toolbar">
+          <input id="library-search" type="search" placeholder="搜索企业、子公司、集团、别名" maxlength="100"/>
+          <select id="library-source-filter" aria-label="筛选企业招聘入口状态">
+            <option value="all">全部状态</option>
+            <option value="missing">缺少招聘网址</option>
+            <option value="pending">仅待复核链接</option>
+            <option value="reviewed">包含历史已审入口</option>
+          </select>
+          <div><strong id="library-result-count">—</strong> <span id="library-write-state" class="library-muted"></span></div>
+        </div>
+        <div class="library-table-wrap"><table class="library-table">
+          <thead><tr><th scope="col">企业 / 集团</th><th scope="col">所属行业馆</th><th scope="col">招聘入口</th><th scope="col">资料状态</th><th scope="col">管理</th></tr></thead>
+          <tbody id="library-rows"></tbody>
+        </table></div><div id="library-pager" class="library-pager"></div>
+        <div id="library-editor" class="library-editor" hidden>
+          <h2>添加或补充企业</h2>
+          <p>同一企业只建立一份档案。再次选择其他行业馆录入会自动增加行业标签，不会覆盖原分类或已审核链接。集团共用招聘站请留在集团条目；新链接标记待复核。</p>
+          <div class="library-edit-form">
+            <label>企业名称<input id="library-name" maxlength="90" placeholder="某某科技有限公司"/></label>
+            <label>本次归属行业馆<select id="library-hall-select"></select></label>
+            <label>上级集团（可空）<input id="library-parent" maxlength="90" placeholder="例如：上汽集团"/></label>
+            <label>企业自己的招聘入口（可空）<input id="library-url" type="url" placeholder="https://企业招聘官网"/></label>
+          </div><button type="button" class="button-primary" id="library-save">保存企业</button>
+          <h2>批量收录（最多100家 / 次）</h2>
+          <p>支持两种简单方式：① 先点击某个行业馆，直接粘贴100行企业名称（可带001.编号）；② 每行“企业名称,招聘网址,行业馆,上级集团（可空）”。无招聘网址的名称仅作为待补资料，不伪造官方链接；跨馆同名企业会自动合并。</p>
+          <textarea id="library-bulk" spellcheck="false" placeholder="企业A,https://careers.example.com,汽车馆,某集团&#10;企业B,,汽车馆,某集团" aria-label="批量导入企业名单"></textarea>
+          <button type="button" class="button-primary" id="library-import">批量入库</button>
         </div>
       </section>
       <section class="page-view" id="view-investor" hidden aria-labelledby="investor-heading">

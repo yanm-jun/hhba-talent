@@ -1,0 +1,912 @@
+{
+  "schema_version": 1,
+  "source_kind": "new_public_research_not_historical_chat_recovery",
+  "source_title": "网经社2025年度中国数字教育百强榜（2026-04-28发布）",
+  "source_url": "https://www.citmt.cn/news/202604/122926.html",
+  "observed_on": "2026-11-12",
+  "hall_id": "education-research",
+  "batch_key": "education-research-new-research-20261112",
+  "notes": "这100条并非2026-11-11历史聊天的101–200条原文。名单包含教育培训、教育科技、内容品牌与服务商，并非全部为独立用人法人；不得自动标记招聘入口或当前在招。",
+  "entries": [
+    {
+      "sequence": 101,
+      "name": "淘宝教育",
+      "section": "综合教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 102,
+      "name": "高途",
+      "section": "综合教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 103,
+      "name": "十方融海",
+      "section": "综合教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 104,
+      "name": "网易有道",
+      "section": "综合教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 105,
+      "name": "大力教育",
+      "section": "综合教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 106,
+      "name": "学大教育",
+      "section": "综合教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 107,
+      "name": "昂立教育",
+      "section": "综合教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 108,
+      "name": "新东方在线",
+      "section": "综合教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 109,
+      "name": "猿辅导",
+      "section": "K12教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 110,
+      "name": "作业帮",
+      "section": "K12教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 111,
+      "name": "小盒科技",
+      "section": "K12教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 112,
+      "name": "洋葱学园",
+      "section": "K12教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 113,
+      "name": "学科网",
+      "section": "K12教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 114,
+      "name": "豆神教育",
+      "section": "K12教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 115,
+      "name": "希望学",
+      "section": "K12教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 116,
+      "name": "51Talk",
+      "section": "语言培训",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 117,
+      "name": "伴鱼",
+      "section": "语言培训",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 118,
+      "name": "阿卡索",
+      "section": "语言培训",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 119,
+      "name": "VIPKID",
+      "section": "语言培训",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 120,
+      "name": "英语流利说",
+      "section": "语言培训",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 121,
+      "name": "多邻国",
+      "section": "语言培训",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 122,
+      "name": "沪江网校",
+      "section": "语言培训",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 123,
+      "name": "羊驼教育",
+      "section": "语言培训",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 124,
+      "name": "开言英语",
+      "section": "语言培训",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 125,
+      "name": "正保远程教育",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 126,
+      "name": "对啊网",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 127,
+      "name": "尚德机构",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 128,
+      "name": "嗨学网",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 129,
+      "name": "高顿网校",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 130,
+      "name": "中公网校",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 131,
+      "name": "UMU",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 132,
+      "name": "粉笔科技",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 133,
+      "name": "优建教育",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 134,
+      "name": "恒企教育",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 135,
+      "name": "魔学院",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 136,
+      "name": "环球网校",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 137,
+      "name": "潭州教育",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 138,
+      "name": "万学教育",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 139,
+      "name": "传智教育",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 140,
+      "name": "奥鹏教育",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 141,
+      "name": "优路教育",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 142,
+      "name": "华图在线",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 143,
+      "name": "千锋教育",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 144,
+      "name": "春华教育",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 145,
+      "name": "易学仕",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 146,
+      "name": "橙啦",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 147,
+      "name": "赛优教育",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 148,
+      "name": "鲸学教育",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 149,
+      "name": "职学在线",
+      "section": "职业教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 150,
+      "name": "智慧树",
+      "section": "继续教育与学习服务",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 151,
+      "name": "三节课",
+      "section": "继续教育与学习服务",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 152,
+      "name": "学堂在线",
+      "section": "继续教育与学习服务",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 153,
+      "name": "课工场",
+      "section": "继续教育与学习服务",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 154,
+      "name": "启航教育",
+      "section": "继续教育与学习服务",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 155,
+      "name": "清北慕课",
+      "section": "继续教育与学习服务",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 156,
+      "name": "国开在线",
+      "section": "继续教育与学习服务",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 157,
+      "name": "编程猫",
+      "section": "素质教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 158,
+      "name": "火花思维",
+      "section": "素质教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 159,
+      "name": "河小象",
+      "section": "素质教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 160,
+      "name": "小码王",
+      "section": "素质教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 161,
+      "name": "核桃编程",
+      "section": "素质教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 162,
+      "name": "西瓜创客",
+      "section": "素质教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 163,
+      "name": "小叶子智能陪练",
+      "section": "素质教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 164,
+      "name": "学而思网校",
+      "section": "素质教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 165,
+      "name": "豌豆思维",
+      "section": "素质教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 166,
+      "name": "豆包学伴",
+      "section": "素质教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 167,
+      "name": "大咖素质训练营",
+      "section": "素质教育",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 168,
+      "name": "常青藤爸爸",
+      "section": "早教内容",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 169,
+      "name": "凯叔讲故事",
+      "section": "早教内容",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 170,
+      "name": "宝宝巴士",
+      "section": "早教内容",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 171,
+      "name": "小伴龙",
+      "section": "早教内容",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 172,
+      "name": "洪恩",
+      "section": "早教内容",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 173,
+      "name": "叫叫",
+      "section": "早教内容",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 174,
+      "name": "叽里呱啦",
+      "section": "早教内容",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 175,
+      "name": "小小优趣",
+      "section": "早教内容",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 176,
+      "name": "校宝在线",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 177,
+      "name": "飞象星球",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 178,
+      "name": "云思智学",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 179,
+      "name": "云学堂",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 180,
+      "name": "百家云",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 181,
+      "name": "华渔教育",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 182,
+      "name": "极课大数据",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 183,
+      "name": "翼鸥教育",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 184,
+      "name": "掌通家园",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 185,
+      "name": "校管家",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 186,
+      "name": "松鼠AI",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 187,
+      "name": "科骏",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 188,
+      "name": "一起教育",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 189,
+      "name": "问向教育",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 190,
+      "name": "园钉",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 191,
+      "name": "爱学习",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 192,
+      "name": "迈越科技",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 193,
+      "name": "纳米盒",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 194,
+      "name": "金智教育",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 195,
+      "name": "智学网",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 196,
+      "name": "爱学堂",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 197,
+      "name": "精准学",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 198,
+      "name": "希沃",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 199,
+      "name": "佳发教育",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    },
+    {
+      "sequence": 200,
+      "name": "鸿合科技",
+      "section": "教育服务商",
+      "url": null,
+      "url_status": "not_recorded",
+      "status": "new_research_candidate",
+      "record_type": "organization_or_brand_candidate"
+    }
+  ]
+}
