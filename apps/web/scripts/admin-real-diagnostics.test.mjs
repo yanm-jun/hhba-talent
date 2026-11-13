@@ -57,7 +57,9 @@ test('dashboard loads private D1 metrics only by user action',()=>{
  assert.match(html,/id="refresh-private"/);
  assert.match(html,/id="users-load-private"/);
  assert.match(html,/id="view-operations"/);
- assert.doesNotMatch(html,/data-view="finance"/);
+ assert.match(html,/data-view="finance"/);
+ assert.match(html,/id="view-finance"/);
+ assert.match(js,/if\(view==='finance'\)window\.hhbaFinance\?\.open\(\)/);
 });
 
 test('real KV backlog only uses bounded key metadata, with compaction warning',async()=>{
