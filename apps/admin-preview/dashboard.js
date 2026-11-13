@@ -174,7 +174,7 @@ function setView(view,options={}){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(['investor','overview','users','market','library','operations'].includes(view)?view:'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users','market','library','operations','finance'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -188,6 +188,7 @@ function setView(view,options={}){
   else window.hhbaLibrary?.open();
  }
  if(view==='market')void window.hhbaMarket?.open();
+ if(view==='finance')window.hhbaFinance?.open();
  if(details[view]){
   byId('placeholder-heading').textContent=titles[view];
   byId('placeholder-subtitle').textContent=details[view][0];
