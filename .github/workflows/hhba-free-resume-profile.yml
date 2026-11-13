@@ -3,11 +3,16 @@ on:
   pull_request:
     paths:
       - 'apps/web/functions/_lib/free-resume-profile.js'
+      - 'apps/web/functions/_lib/free-ai-provider.js'
+      - 'apps/web/functions/api/match-free/**'
+      - 'apps/web/functions/_lib/apply-ai-suggest.js'
       - 'apps/web/functions/api/match-native/**'
       - 'apps/web/src/pages/CandidateMatchPage.tsx'
       - 'apps/web/src/services/resumeMatch.ts'
       - 'apps/web/scripts/free-resume-profile-cache.contract.test.mjs'
       - 'apps/web/d1/0026_free_resume_profile_cache.sql'
+      - 'apps/web/d1/0027_free_ai_budget_and_recommendation_cache.sql'
+      - 'apps/web/scripts/free-ai-match.contract.test.mjs'
       - '.github/workflows/hhba-free-resume-profile.yml'
   workflow_dispatch:
 permissions:
@@ -29,8 +34,12 @@ jobs:
       - name: Syntax and single-inference contract
         run: |
           node --check functions/_lib/free-resume-profile.js
+          node --check functions/_lib/free-ai-provider.js
+          node --check 'functions/api/match-free/[[path]].js'
           node --check 'functions/api/match-native/[[path]].js'
-          node --test scripts/free-resume-profile-cache.contract.test.mjs
+          node --check functions/api/match/discover.js
+          node --check 'functions/api/match-native/[[path]].js'
+          node --test scripts/free-resume-profile-cache.contract.test.mjs scripts/free-ai-match.contract.test.mjs
         working-directory: apps/web
       - name: TypeScript and production bundle
         run: npm run build
