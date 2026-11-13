@@ -317,3 +317,17 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline-color:#3b87ec}
  .mobile-dim:not([hidden]){background:#152b4f7f}
  .topbar{background:#fff}
 }
+
+
+/* Source-backed recruitment quality, no dummy graphs or synthetic data. */
+.hhba-market-industry-panel{margin:22px 0;padding:20px}
+.hhba-market-industry-panel .panel-heading{margin-bottom:14px}
+.hhba-market-industry-panel .data-table-wrap{overflow-x:auto}
+.hhba-market-table{width:100%;min-width:920px;font-variant-numeric:tabular-nums}
+.hhba-market-table th:not(:first-child),.hhba-market-table td:not(:first-child){text-align:right}
+.hhba-market-table th,.hhba-market-table td{white-space:nowrap}
+.hhba-market-table td:first-child{font-weight:650}
+.hhba-market-table button{padding:6px 10px;font-size:11px}
+#view-market .quality-lines{margin-top:10px}
+#view-market .hhba-private-quality{margin:16px 0 0}
+@media(max-width:680px){.hhba-market-industry-panel{padding:13px}}
