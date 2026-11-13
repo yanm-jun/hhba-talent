@@ -43,19 +43,36 @@ function request(path,options={}){
 function post(data,{origin='https://hhba-talent.pages.dev',url='' }={}){
  return request(url,{method:'POST',headers:{'content-type':'application/json','x-hhba-library-request':'1',Origin:origin,'sec-fetch-site':'same-origin'},body:JSON.stringify(data)});
 }
-test('17 halls have an explicitly labeled last-verified snapshot only in the isolated design preview',()=>{
+test('17 halls never fall back to stale hardcoded counts when live catalog is unavailable',()=>{
  assert.equal(INDUSTRIES.length,17);
  assert.equal(INDUSTRIES[0][1],'汽车馆');
  assert.equal(INDUSTRIES.at(-1)[1],'教育科研馆');
  const ui=readFileSync(new URL('../../admin-preview/library.js',import.meta.url),'utf8');
  assert.match(ui,/mode:'summary'/);
  assert.match(ui,/mode:'list'/);
- assert.match(ui,/LIB_VERIFIED_SNAPSHOT/);
- assert.match(ui,/mode:'snapshot'/);
- assert.match(ui,/2026-11-12/);
- assert.match(ui,/libIsDesignPreview/);
+ assert.doesNotMatch(ui,/LIB_VERIFIED_SNAPSHOT/);
+ assert.doesNotMatch(ui,/mode:'snapshot'/);
  assert.match(ui,/D1_DAILY_LIMIT_REACHED/);
- assert.match(ui,/非实时/);
+ assert.match(ui,/lib-total-candidate/);
+});
+test('verification-state aggregation keeps missing URLs and historical evidence separate',async()=>{
+ const {calculateCatalogSummary}=await import('../functions/_lib/library-snapshot-cache.js');
+ const rows=[
+  {industry_id:'automotive',enterprise:'A',recruitment_url:'https://example.com/a',source_kind:'admin_verified_official'},
+  {industry_id:'automotive',enterprise:'B',recruitment_url:'https://example.com/b',source_kind:'previously_reviewed_official'},
+  {industry_id:'automotive',enterprise:'C',recruitment_url:'https://example.com/c',source_kind:'historical_candidate_url'},
+  {industry_id:'automotive',enterprise:'D',recruitment_url:null,source_kind:'historical_name_only'}
+ ];
+ const result=calculateCatalogSummary(rows,INDUSTRIES);
+ assert.equal(result.total.records,4);
+ assert.equal(result.total.linked,3);
+ assert.equal(result.total.missing,1);
+ assert.equal(result.total.verified,1);
+ assert.equal(result.total.historical_verified,1);
+ assert.equal(result.total.candidate,1);
+ assert.equal(result.industries[0].verified,1);
+ assert.equal(result.industries[0].candidate,1);
+ assert.equal(result.total.verified+result.total.historical_verified+result.total.candidate,result.total.linked);
 });
 test('unsigned and invalid-audience requests cannot query D1',async()=>{
  const db=mockDb();
