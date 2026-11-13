@@ -26,14 +26,10 @@
       <p class="nav-caption">WORKSPACE</p>
       <button type="button" class="nav-link is-active" data-view="overview" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.4"/><rect x="13" y="3" width="8" height="8" rx="1.4"/><rect x="3" y="13" width="8" height="8" rx="1.4"/><rect x="13" y="13" width="8" height="8" rx="1.4"/></svg> 数据总览</button>
       <button type="button" class="nav-link" data-view="users"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2.1c0-2.4 2.4-4.2 5.5-4.2s5.5 1.8 5.5 4.2V19M16 5.5a3 3 0 0 1 0 5.4M17 13c2.3.3 3.5 1.7 3.5 3.9V19"/></svg> 用户分析</button>
-      <button type="button" class="nav-link" data-view="market"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7" width="17" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3.5 12h17"/></svg> 岗位与企业</button>
       <button type="button" class="nav-link" data-view="library"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5h7a2 2 0 0 1 2 2V21a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2V6.5a2 2 0 0 1 2-2ZM20 4.5h-5a2 2 0 0 0-2 2V21a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2V6.5a2 2 0 0 0-2-2Z"/></svg> 企业招聘图书馆</button>
-      <button type="button" class="nav-link" data-view="operations"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4l3-7 4 12 3-5h4"/></svg> 运营监控 <span class="nav-soon">规划中</span></button>
-      <button type="button" class="nav-link" data-view="finance"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 9h18M15 15h3"/></svg> 财务成本 <span class="nav-soon">规划中</span></button>
       <p class="nav-caption nav-caption-secondary">PRESENTATION</p>
       <button type="button" class="nav-link" data-view="investor"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="13" rx="2"/><path d="M12 16v5M8 21h8M8 11l3-3 2 2 3-4"/></svg> 融资展示 <span class="nav-view">查看</span></button>
       <p class="nav-caption nav-caption-secondary">SYSTEM</p>
-      <button type="button" class="nav-link" data-view="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"/></svg> 系统设置 <span class="nav-soon">规划中</span></button>
     </nav>
     <div class="sidebar-bottom">
       <div class="safety-note"><span class="safety-dot"></span><span id="sidebar-environment">独立安全管理站</span></div>
@@ -94,7 +90,7 @@
         <div class="kpi-grid phase2-metrics"><article class="kpi-card"><div class="kpi-head"><span>全部索引记录</span></div><div class="metric-number" id="indexed-count">—</div><p class="kpi-foot">原始索引规模，非全部有效在招</p></article><article class="kpi-card"><div class="kpi-head"><span>官网任职要求已核验</span></div><div class="metric-number" id="requirements-count">—</div><p class="kpi-foot">原文证据已核验，非完整翻译数量</p></article><article class="kpi-card"><div class="kpi-head"><span>去重收录企业</span></div><div class="metric-number" id="companies-count">—</div><p class="kpi-foot">按公司名称去重，非签约企业数</p></article></div>
         <div class="insights-grid">
           <article class="panel panel-trend">
-            <div class="panel-heading"><div><h2>平台增长趋势</h2><p>注册、活跃与岗位增长的历史变化</p></div><span class="small-label" id="trend-range-label">近 30 天</span></div>
+            <div class="panel-heading"><div><h2>页面访问事件趋势</h2><p>仅展示实际采集的无身份页面访问事件；不代表真实用户数或岗位增长</p></div><span class="small-label" id="trend-range-label">近 30 天</span></div>
             <div class="chart-empty" id="trend-chart">
               <div class="chart-grids" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
               <div class="chart-center"><span class="empty-chart-icon"><svg viewBox="0 0 24 24"><path d="M3 18l5-6 4 3 7-10M14 5h5v5"/></svg></span><strong>等待真实历史数据</strong><p>接入用户事件和按日快照后，才会绘制可核验的趋势曲线。</p></div>
@@ -210,7 +206,7 @@
         <div class="lib-intro">
           <div><p class="eyebrow">HHBA · EMPLOYER RECRUITMENT LIBRARY</p>
             <h1 id="lib-heading">企业招聘资源图书馆</h1>
-            <p class="page-subtitle">按 17 个行业馆管理企业与招聘入口。网址数量以正式 D1 数据库去重结果为准；候选入口不等于当前岗位已开放。</p></div>
+            <p class="page-subtitle">按 17 个行业馆管理企业与候选招聘入口。数据来自受保护的 D1 历史基线与 KV 更新；有网址不代表已核实或当前在招。</p></div>
           <div class="lib-entry-actions"><button class="button-primary" id="lib-upload-all" type="button">上传 Excel / CSV</button><button class="button-outline" id="lib-refresh" type="button">刷新资源库</button></div>
         </div>
         <div class="lib-summary">
@@ -220,7 +216,11 @@
           <article class="lib-stat"><span>不同招聘网址</span><strong id="lib-total-urls">—</strong><small>跨行业去重；候选网址仍需核验</small></article>
           <article class="lib-stat"><span>企业记录总数</span><strong id="lib-total-rows">—</strong><small>含多个行业馆中的重复企业</small></article>
           <article class="lib-stat"><span>已填写网址的记录</span><strong id="lib-total-linked">—</strong><small>含复用网址；其余记录待补</small></article>
+          <article class="lib-stat"><span>管理员已核实网址记录</span><strong id="lib-total-verified">—</strong><small>仅经管理员标记并保存；非实时在招认证</small></article>
+          <article class="lib-stat"><span>历史核实网址记录</span><strong id="lib-total-historical-verified">—</strong><small>历史核实状态，仍需定期复验</small></article>
+          <article class="lib-stat"><span>待复核网址记录</span><strong id="lib-total-candidate">—</strong><small>候选入口，不能当作已核实官网</small></article>
         </div>
+        <p class="hhba-private-quality">核验状态按“记录条数”统计，非去重网址数。已收集的网址需要逐条查证；历史核实也不意味着今天仍在招聘。</p>
         <div class="lib-notice" id="lib-message" role="status">正在等待管理员授权连接资源库；本页面不会填充演示数据。</div>
         <div class="lib-board-top" id="lib-board-top"><div><p class="lib-section-label">INDUSTRY COLLECTIONS</p><h2>17 个行业馆</h2></div><span class="lib-updated" id="lib-updated">尚未连接</span></div>
         <div class="lib-halls" id="lib-halls" aria-label="行业馆目录"></div>
