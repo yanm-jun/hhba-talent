@@ -99,13 +99,15 @@ async function externalCall(provider,env,messages,maxTokens){
 }
 // Allows only tightly bounded prompts and hard-whitelisted free models.
 // Fallback is on provider outage/limit only. Never retries paid providers.
-export async function runFreeAIJson(env,{system,user,ownerHash,maxTokens=700,exclude=[]}){
+export async function runFreeAIJson(env,{system,user,ownerHash,maxTokens=700,exclude=[],dataClass='profile'}){
  if(!freeAIReady(env))throw problem('FREE_AI_NOT_CONFIGURED');
  if(typeof system!=='string'||system.length>3600||
     typeof user!=='string'||user.length>13500||
     !Number.isInteger(maxTokens)||maxTokens<50||maxTokens>1250||
     !/^[a-f0-9]{64}$/.test(ownerHash))throw problem('FREE_AI_INPUT_INVALID',400);
- const providers=eligibleProviders(env).filter(p=>!exclude.includes(p));
+ const providers=eligibleProviders(env).filter(p=>!exclude.includes(p)&&
+  (dataClass!=='resume'||p==='cloudflare'||env.HHBA_FREE_AI_RAW_RESUME_EXTERNAL_APPROVED==='1'));
+ if(!['resume','profile'].includes(dataClass))throw problem('FREE_AI_INPUT_INVALID',400);
  if(!providers.length)throw problem('FREE_AI_NOT_CONFIGURED');
  const messages=[{role:'system',content:system},{role:'user',content:user}];
  let finalCode='FREE_AI_BUDGET_EXHAUSTED',finalStatus=429;
