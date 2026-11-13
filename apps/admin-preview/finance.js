@@ -41,7 +41,7 @@
    createCell(tr,categories[e.category]||'未知');
    createCell(tr,moneyFen(e.amountFen));
    createCell(tr,e.evidenceRef);
-   createCell(tr,e.voided?'已冲销（保留原始记录）':'手工登记 · 待核账');
+   createCell(tr,e.voided?'已冲销：'+(e.voidReason||'原因未提供'):'手工登记 · 待核账');
    const action=document.createElement('td');
    if(!e.voided){
     const button=document.createElement('button');button.type='button';
