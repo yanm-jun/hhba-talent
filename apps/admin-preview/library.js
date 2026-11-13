@@ -1,28 +1,6 @@
 // HHBA enterprise recruitment library. All values are live, protected D1 responses.
 // The standalone localhost preview deliberately shows unavailable (never demo counts).
 const LIB_API='/admin-preview/api/library';
-// Read-only LAST VERIFIED production counters from 2026-11-12.
-// Used ONLY on the isolated library preview when D1 returns quota error.
-// Never represent these as live, and never invent employer-detail records.
-const LIB_VERIFIED_SNAPSHOT={
- kind:'HHBA_RECRUITMENT_LIBRARY_V1',mode:'snapshot',asOf:'2026-11-12',
- total:{records:5288,linked:2573,unique_urls:1900,missing:2715},
- industries:[
-  ['automotive',318,0],['semiconductor',278,0],['internet-ai',342,142],
-  ['energy',299,0],['manufacturing',113,366],['finance',163,66],
-  ['telecom',42,95],['biomed',54,275],['aerospace',20,298],
-  ['logistics',42,286],['construction',24,194],
-  ['consumer-hardware',76,171],['chem-materials',28,183],
-  ['retail',70,182],['agri-food',34,187],
-  ['culture-media',56,181],['education-research',13,89]
- ].map(([id,unique_urls,missing])=>({id,unique_urls,missing}))
-};
-function libIsDesignPreview(){
- return location.hostname==='admin.hhba.work'||
-  location.hostname==='feat-admin-recruitment-libra.hhba-talent.pages.dev'||
-  /^([a-f0-9]{8})\.hhba-talent\.pages\.dev$/.test(location.hostname);
-}
-
 const LIB_HALLS=[
  ['automotive','汽车馆','🚗'],['semiconductor','电子半导体馆','💻'],['internet-ai','互联网与AI馆','🧠'],
  ['energy','能源电力馆','⚡'],['manufacturing','智能制造馆','🏭'],['finance','金融馆','🏦'],
@@ -41,7 +19,7 @@ function libMessage(text,tone=''){const e=libEl('lib-message');e.textContent=tex
 function libErrorMessage(status,body){
  if(body?.error==='D1_DAILY_LIMIT_REACHED')return 'Cloudflare D1 今日读取额度已满。数据未改动，请额度恢复后再刷新。';
  if(body?.error==='LIBRARY_PREVIEW_READ_ONLY')return '当前为正式库只读预览，Excel 导入与修改将在完成数据库迁移及正式发布后开放。';
- if(status===401||status===403)return '请通过 Cloudflare Access 管理员验证后打开此资源库。';
+ if(status===401||status===403)return '请重新登录 HHBA 管理后台后查看受保护的资源库。';
  if(body?.error==='LIBRARY_DATABASE_NOT_CONNECTED')return '数据库尚未绑定到本预览环境，不能读取生产资料。';
  if(status===404)return '当前是独立静态预览，尚未连接受保护的资源库接口。';
  const code=body?.error;
@@ -70,20 +48,23 @@ function libCell(tr,value){
 }
 function libStatus(row){
  if(row.status==='missing')return ['缺网址','missing'];
- if(row.status==='verified')return ['管理员确认','verified'];
- if(row.status==='previously_verified')return ['历史核实','historical'];
- return ['待复核','candidate'];
+ if(row.status==='verified')return ['管理员已核实','verified'];
+ if(row.status==='previously_verified')return ['历史核实·待复验','historical'];
+ return ['候选·待复核','candidate'];
 }
 function libRenderSummary(){
  const s=libState.summary;
- const readOnly=s?.mode==='snapshot'||s?.readonly===true;
+ const readOnly=s?.readonly===true;
  libEl('lib-upload-all').disabled=readOnly;
  libEl('lib-upload-all').title=readOnly?'当前是只读快照／正式库只读预览；暂不可写入企业数据':'上传 Excel 或 CSV 文件';
  for(const [id,v] of [['lib-total-companies',s?.total?.enterprises],
   ['lib-total-companies-linked',s?.total?.enterprises_linked],
   ['lib-total-companies-missing',s?.total?.enterprises_missing],
   ['lib-total-urls',s?.total?.unique_urls],['lib-total-rows',s?.total?.records],
-  ['lib-total-linked',s?.total?.linked]])libEl(id).textContent=libCount(v);
+  ['lib-total-linked',s?.total?.linked],
+  ['lib-total-verified',s?.total?.verified],
+  ['lib-total-historical-verified',s?.total?.historical_verified],
+  ['lib-total-candidate',s?.total?.candidate]])libEl(id).textContent=libCount(v);
  const root=libEl('lib-halls');root.replaceChildren();
  for(const [id,name,emoji] of LIB_HALLS){
   const data=s?.industries?.find(x=>x.id===id),btn=document.createElement('button');
@@ -95,13 +76,11 @@ function libRenderSummary(){
   head.append(badge,label);
   const value=document.createElement('span');value.className='lib-hall-count';value.textContent=libCount(data?.unique_urls);
   const foot=document.createElement('span');foot.className='lib-hall-foot';
-  foot.textContent=data?'个去重网址 · 待补 '+libCount(data.missing)+' 条':'待连接数据';
+  foot.textContent=data?'个去重网址 · 候选待复核 '+libCount(data.candidate)+' 条 · 缺网址 '+libCount(data.missing)+' 条':'待连接数据';
   btn.append(head,value,foot);btn.addEventListener('click',()=>{void libSelect(id)});
   root.append(btn);
  }
- if(s?.mode==='snapshot'){
-  libEl('lib-updated').textContent='历史数量快照 · 截至 2026-11-12（非实时）';
- }else if(s?.archived){
+ if(s?.archived){
   const date=s.asOf?new Date(s.asOf).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}):'未知';
   libEl('lib-updated').textContent='真实企业目录 · 基础数据 '+date+'（北京）'+(s.overlayCount?' · 已同步后台变更':'');
  }else if(s?.asOf){
@@ -119,18 +98,13 @@ async function libRefreshSummary(force=false){
    const changes=result.overlayCount?('，已同步 '+libFmt.format(result.overlayCount)+' 批后台变更'):'';
    const warning=result.syncWarning?'；缓存变更暂不可读取，请稍后重试':'';
    const enterprises=libCount(result.total?.enterprises),urls=libCount(result.total?.unique_urls);
-    libMessage('已加载 '+enterprises+' 家去重企业、'+urls+' 条不同招聘网址（共 '+total+' 条原始记录）'+changes+'。点击行业馆即可查看企业和招聘入口；浏览不消耗 D1 每日读取额度'+warning+'。',result.syncWarning?'error':'ok');
+    libMessage('已加载 '+enterprises+' 家去重企业、'+urls+' 条不同招聘网址（共 '+total+' 条原始记录）'+changes+'。其中待复核的候选网址记录 '+libCount(result.total?.candidate)+' 条；浏览不消耗 D1 每日读取额度'+warning+'。',result.syncWarning?'error':'ok');
   }else{
    libMessage(result.readonly?
     '正式生产库只读预览：现在展示真实企业数量与资料目录。为保护正式数据，新增、修改和 Excel 导入在预览中暂不开放。':
     '已从受保护数据库读取行业统计。各馆去重数相加不等于全库去重数。','ok');
   }
  }catch(e){
-  if(e.body?.error==='D1_DAILY_LIMIT_REACHED'&&libIsDesignPreview()){
-   libState.summary=LIB_VERIFIED_SNAPSHOT;libRenderSummary();
-   libMessage('Cloudflare D1 今日读取额度已满。这里显示 2026-11-12 最后核实的生产库统计快照（非实时）；企业明细和写入暂不可用，正式数据未清空。','error');
-   return;
-  }
   libState.summary=null;libRenderSummary();libMessage(libErrorMessage(e.status,e.body),'error');
  }
 }
@@ -144,26 +118,14 @@ async function libSelect(industry){
  libEl('lib-query').value='';libEl('lib-filter').value='all';
  libEl('lib-entry-panel').hidden=false;
  libEl('lib-current-hall').textContent=LIB_HALLS.find(x=>x[0]===industry)[1];
- const offline=libState.summary?.mode==='snapshot';
- const readOnly=offline||libState.summary?.readonly===true;
+ const readOnly=libState.summary?.readonly===true;
  libEl('lib-add').disabled=readOnly;libEl('lib-import').disabled=readOnly;
  libRenderSummary();
  libEl('lib-entry-panel').scrollIntoView({behavior:'smooth',block:'start'});
- if(offline){
-  libState.rows=[];libState.hasMore=false;libState.lastListError='数据库限额已满，当前仅能查看截至 2026-11-12 的行业数量快照。企业名称和网址明细无法读取，并非没有企业。';
-  libRenderRows();
-  libMessage('当前显示历史数量快照；企业明细、搜索与修改必须在 D1 额度恢复后从真实数据库读取。','error');
-  return;
- }
  await libFetchList();
 }
 async function libFetchList(){
  if(!libState.industry)return;
- if(libState.summary?.mode==='snapshot'){
-  libState.rows=[];libState.hasMore=false;
-  libState.lastListError='Cloudflare D1 暂不可读取企业明细。本馆数字为历史快照，不是空馆。';
-  libRenderRows();return;
- }
  libState.controller?.abort();
  const controller=new AbortController();libState.controller=controller;
  const tbody=libEl('lib-rows');tbody.replaceChildren();
