@@ -243,4 +243,15 @@ function libInit(){
  });
 
 }
-window.hhbaLibrary={open(){libInit();void libRefreshSummary()},async refresh(){await libRefreshSummary(true);if(libState.industry)await libFetchList()}};
+window.hhbaLibrary={
+ open(){libInit();void libRefreshSummary()},
+ async openIndustry(industry){
+  if(!LIB_HALLS.some(([id])=>id===industry))return;
+  libInit();
+  await libRefreshSummary();
+  // Never navigate into an invented hall when the protected source is unavailable.
+  if(!libState.summary)return;
+  await libSelect(industry);
+ },
+ async refresh(){await libRefreshSummary(true);if(libState.industry)await libFetchList()}
+};
