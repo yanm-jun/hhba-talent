@@ -13,6 +13,7 @@ on:
       - 'apps/web/d1/0026_free_resume_profile_cache.sql'
       - 'apps/web/d1/0027_free_ai_budget_and_recommendation_cache.sql'
       - 'apps/web/scripts/free-ai-match.contract.test.mjs'
+      - 'apps/web/scripts/free-ai-endtoend.contract.test.mjs'
       - '.github/workflows/hhba-free-resume-profile.yml'
   workflow_dispatch:
 permissions:
@@ -39,7 +40,7 @@ jobs:
           node --check 'functions/api/match-native/[[path]].js'
           node --check functions/api/match/discover.js
           node --check 'functions/api/match-native/[[path]].js'
-          node --test scripts/free-resume-profile-cache.contract.test.mjs scripts/free-ai-match.contract.test.mjs
+          node --test scripts/free-resume-profile-cache.contract.test.mjs scripts/free-ai-match.contract.test.mjs scripts/free-ai-endtoend.contract.test.mjs
         working-directory: apps/web
       - name: TypeScript and production bundle
         run: npm run build
