@@ -79,8 +79,11 @@ function libRenderSummary(){
  const readOnly=s?.mode==='snapshot'||s?.readonly===true;
  libEl('lib-upload-all').disabled=readOnly;
  libEl('lib-upload-all').title=readOnly?'当前是只读快照／正式库只读预览；暂不可写入企业数据':'上传 Excel 或 CSV 文件';
- for(const [id,v] of [['lib-total-urls',s?.total?.unique_urls],['lib-total-rows',s?.total?.records],
-  ['lib-total-linked',s?.total?.linked],['lib-total-missing',s?.total?.missing]])libEl(id).textContent=libCount(v);
+ for(const [id,v] of [['lib-total-companies',s?.total?.enterprises],
+  ['lib-total-companies-linked',s?.total?.enterprises_linked],
+  ['lib-total-companies-missing',s?.total?.enterprises_missing],
+  ['lib-total-urls',s?.total?.unique_urls],['lib-total-rows',s?.total?.records],
+  ['lib-total-linked',s?.total?.linked]])libEl(id).textContent=libCount(v);
  const root=libEl('lib-halls');root.replaceChildren();
  for(const [id,name,emoji] of LIB_HALLS){
   const data=s?.industries?.find(x=>x.id===id),btn=document.createElement('button');
@@ -115,7 +118,8 @@ async function libRefreshSummary(force=false){
    const total=libFmt.format(result.total?.records||0);
    const changes=result.overlayCount?('，已同步 '+libFmt.format(result.overlayCount)+' 批后台变更'):'';
    const warning=result.syncWarning?'；缓存变更暂不可读取，请稍后重试':'';
-   libMessage('已加载 '+total+' 条真实企业招聘资料的受保护目录'+changes+'。点击行业馆可以浏览企业名称、招聘网址和搜索分页，不消耗 D1 每日读取额度'+warning+'。',result.syncWarning?'error':'ok');
+   const enterprises=libCount(result.total?.enterprises),urls=libCount(result.total?.unique_urls);
+    libMessage('已加载 '+enterprises+' 家去重企业、'+urls+' 条不同招聘网址（共 '+total+' 条原始记录）'+changes+'。点击行业馆即可查看企业和招聘入口；浏览不消耗 D1 每日读取额度'+warning+'。',result.syncWarning?'error':'ok');
   }else{
    libMessage(result.readonly?
     '正式生产库只读预览：现在展示真实企业数量与资料目录。为保护正式数据，新增、修改和 Excel 导入在预览中暂不开放。':
