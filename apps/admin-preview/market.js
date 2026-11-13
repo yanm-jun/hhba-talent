@@ -17,11 +17,11 @@ if(typeof window!=='undefined'){
  async function publicSnapshot(){
   const state=$('market-index-status');
   state.textContent='读取官网岗位索引中…';
-  const path=location.hostname==='admin.hhba.work'||location.hostname==='hhba.work'||
-   location.hostname==='hhba-talent.pages.dev'||location.hostname.endsWith('.hhba-talent.pages.dev')
-    ?'/api/metrics/public':'/api/overview';
+  const path=location.hostname==='admin.hhba.work'?'/admin-preview/api/public-jobs':
+    location.hostname==='hhba.work'||location.hostname==='hhba-talent.pages.dev'||
+    location.hostname.endsWith('.hhba-talent.pages.dev')?'/api/metrics/public':'/api/overview';
   try{
-   const res=await fetch(path,{method:'GET',cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
+   const res=await fetch(path,{method:'GET',cache:'no-store',credentials:location.hostname==='admin.hhba.work'?'same-origin':'omit',headers:{Accept:'application/json'}});
    if(!res.ok)throw Error('HTTP '+res.status);
    const x=await res.json();
    const cloud=x?.kind==='HHBA_CLOUDFLARE_PUBLIC_METRICS_V1';
