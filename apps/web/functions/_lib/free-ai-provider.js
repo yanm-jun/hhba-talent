@@ -57,7 +57,7 @@ async function jsonCompletion(response){
  let answer=response?.response??response?.choices?.[0]?.message?.content;
  if(answer&&typeof answer==='object'&&!Array.isArray(answer))return answer;
  if(typeof answer!=='string'||answer.length>24000)throw problem('FREE_AI_RESPONSE_INVALID',502);
- answer=answer.trim().replace(/^``(?:json)?\s*/i,'').replace(/\s*``$/,'').trim();
+ answer=answer.trim().replace(/^\x60{3}(?:json)?\s*/i,'').replace(/\s*\x60{3}$/,'').trim();
  try{
   const obj=JSON.parse(answer);
   if(!obj||typeof obj!=='object'||Array.isArray(obj))throw Error('not object');
