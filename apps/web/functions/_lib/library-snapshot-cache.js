@@ -69,23 +69,30 @@ export async function appendCatalogDelta(kv,{upserts=[],deletes=[]}={}){
  cache.delete(kv);
 }
 export function calculateCatalogSummary(rows,industries,{asOf=null,overlayCount=0}={}){
- const stats=new Map(industries.map(([id])=>[id,{records:0,linked:0,missing:0,urls:new Set()}]));
- const urls=new Set();let linked=0;
+ const stats=new Map(industries.map(([id])=>[id,{records:0,linked:0,missing:0,urls:new Set(),companies:new Map()}]));
+ const urls=new Set(),companies=new Map();let linked=0;
  for(const row of rows){
   const x=stats.get(row.industry_id);
   if(x)x.records++;
-  const url=safe(row.recruitment_url).trim().toLowerCase();
-  if(url){
+  const name=safe(row.enterprise).trim(),url=safe(row.recruitment_url).trim().toLowerCase(),hasUrl=!!url;
+  if(name){
+   companies.set(name,companies.get(name)===true||hasUrl);
+   if(x)x.companies.set(name,x.companies.get(name)===true||hasUrl);
+  }
+  if(hasUrl){
    linked++;urls.add(url);
    if(x){x.linked++;x.urls.add(url)}
   }else if(x)x.missing++;
  }
+ const linkedCompanies=[...companies.values()].filter(Boolean).length;
  return {
   asOf,overlayCount,
-  total:{records:rows.length,linked,missing:rows.length-linked,unique_urls:urls.size},
+  total:{records:rows.length,linked,missing:rows.length-linked,unique_urls:urls.size,
+   enterprises:companies.size,enterprises_linked:linkedCompanies,enterprises_missing:companies.size-linkedCompanies},
   industries:industries.map(([id,label])=>{
-   const s=stats.get(id);
-   return {id,label,records:s.records,linked:s.linked,missing:s.missing,unique_urls:s.urls.size};
+   const s=stats.get(id),companiesLinked=[...s.companies.values()].filter(Boolean).length;
+   return {id,label,records:s.records,linked:s.linked,missing:s.missing,unique_urls:s.urls.size,
+    enterprises:s.companies.size,enterprises_linked:companiesLinked,enterprises_missing:s.companies.size-companiesLinked};
   })
  };
 }
