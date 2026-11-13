@@ -6,6 +6,8 @@ on:
     paths:
       - 'apps/admin-preview/**'
       - 'apps/web/functions/admin-preview/api/library.js'
+      - 'apps/web/functions/admin-preview/api/health.js'
+      - 'apps/web/scripts/admin-real-diagnostics.test.mjs'
       - 'apps/web/functions/_lib/library-snapshot-cache.js'
       - 'apps/web/scripts/admin-recruitment-library.test.mjs'
       - 'apps/web/scripts/admin-library-snapshot-cache.test.mjs'
@@ -27,6 +29,8 @@ jobs:
           node --check apps/web/functions/admin-preview/api/library.js
           node --check apps/web/functions/_lib/library-snapshot-cache.js
           node --check apps/admin-preview/library.js
+          node --check apps/admin-preview/dashboard.js
+          node --check apps/web/functions/admin-preview/api/health.js
           node --check apps/admin-preview/library-file-ui.js
       - name: Admin library behavior and security
         run: |
@@ -34,3 +38,13 @@ jobs:
           node --test apps/web/scripts/admin-library-snapshot-cache.test.mjs
           node --test apps/web/scripts/admin-library-excel.test.mjs
           node --test apps/web/scripts/admin-password-console.test.mjs
+          node --test apps/web/scripts/admin-real-diagnostics.test.mjs
+      - name: Build isolated admin static assets
+        run: |
+          cd apps/web
+          CF_PAGES_BRANCH=feat/admin-password-console-20261112 python3 scripts/build-standalone-admin.py
+          test -s dist/admin-preview/dashboard.js
+          test -s dist/admin-preview/index.html
+          grep -q '数据源自检' dist/admin-preview/index.html
+          grep -q 'users-load-private' dist/admin-preview/index.html
+          test -s dist/_routes.json
