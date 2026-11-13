@@ -67,10 +67,10 @@ async function submitBatch(upload,rows){
  });
  let data=null;try{data=await resp.json()}catch{}
  if(!resp.ok||data?.kind!=='HHBA_RECRUITMENT_LIBRARY_V1')throw {status:resp.status,body:data};
- for(const k of ['inserted','replayed','duplicates']){
+ for(const k of ['inserted','filled','replayed','duplicates']){
   if(!Number.isSafeInteger(data[k])||data[k]<0)throw {status:502,body:{error:'INVALID_BATCH_RESPONSE'}};
  }
- if(data.inserted+data.replayed+data.duplicates!==rows.length)throw {status:502,body:{error:'INCONSISTENT_BATCH_COUNTS'}};
+ if(data.inserted+data.filled+data.replayed+data.duplicates!==rows.length)throw {status:502,body:{error:'INCONSISTENT_BATCH_COUNTS'}};
  return data;
 }
 async function run(){
@@ -80,7 +80,7 @@ async function run(){
   const batch=job.batches[job.cursor];
   try{
    const result=await submitBatch(job.upload_id,batch);
-   job.success+=result.inserted+result.replayed;
+   job.success+=result.inserted+result.filled+result.replayed;
    job.duplicate+=result.duplicates;
    job.cursor++;
   }catch(e){job.error=e;setError(errorMessage(e));break}
@@ -88,7 +88,7 @@ async function run(){
  }
  running=false;if(pauseWanted&&!job.error&&job.cursor<job.batches.length)job.paused=true;render();
  if(job.cursor===job.batches.length&&!job.error){
-  setError(job.failed.length?'有格式错误记录未导入，可以下载失败清单。':'导入完成，原始 Excel 不会保存在服务器。');
+  setError(job.failed.length?'有格式错误记录未导入，可以下载失败清单。':'导入完成；已有的同名同馆缺网址记录优先补齐，原始 Excel 不会保存在服务器。');
   // Once at the end, refresh counters and current shelf; never repeat a full
   // summary and list query 38 times for a 3,800-row import.
   try{await window.hhbaLibrary?.refresh()}catch{/* counts remain read-only unavailable */}

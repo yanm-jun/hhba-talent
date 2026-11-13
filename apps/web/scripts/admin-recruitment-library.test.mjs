@@ -115,6 +115,29 @@ test('import rejects unsafe URLs and deduplicates current industry URLs in one D
  assert.equal(db.batches[0].length,2,'insert plus append-only audit');
  assert.equal(db.calls.filter(x=>x.startsWith('SELECT industry_id,lower')).length,1);
 }));
+test('exact same-industry empty employer is filled with an indexed UPDATE, not duplicated',()=>signed(async()=>{
+ const db=mockDb();
+ const original=db.prepare;
+ db.prepare=function(sql){
+  const stmt=original.call(this,sql);
+  if(sql.startsWith('SELECT source_key,industry_id,enterprise,recruitment_url')&&sql.includes('WHERE (recruitment_url IS NULL')){
+   stmt.all=async()=>({results:[{source_key:'legacy:missing-1',industry_id:'automotive',
+    enterprise:'真实待补企业',recruitment_url:null,source_kind:'historical_name_only',
+    source_batch:'historical-source',source_sequence:12,updated_at:'2026-11-12T00:00:00Z'}]});
+  }
+  return stmt;
+ };
+ const result=await onRequestPost({request:post({action:'import',rows:[
+  {industry_id:'automotive',enterprise:'真实待补企业',recruitment_url:'https://careers.real-company.example'}]}),env:env(db)});
+ assert.equal(result.status,200);
+ const data=await result.json();
+ assert.equal(data.inserted,0);assert.equal(data.filled,1);assert.equal(data.skipped,0);
+ assert.equal(db.batches.length,1);
+ assert.equal(db.batches[0].length,2,'update plus append-only audit');
+ assert.equal(db.calls.filter(x=>x.startsWith('INSERT INTO hhba_industry_employer_links')).length,0);
+ assert.equal(db.calls.filter(x=>x.startsWith('UPDATE hhba_industry_employer_links')).length,1);
+ assert.ok(db.calls.some(x=>x.includes('enterprise IN (')),'lookup uses exact names, no correlated scan');
+}));
 test('quota errors fail visibly with 503 rather than showing synthetic numbers',()=>signed(async()=>{
  const db=mockDb({quota:true});
  const res=await onRequestGet({request:request('?mode=summary'),env:env(db)});

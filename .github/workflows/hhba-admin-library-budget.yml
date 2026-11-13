@@ -1,0 +1,36 @@
+name: HHBA admin library D1 budget checks
+on:
+  pull_request:
+    branches:
+      - feat/admin-password-console-20261112
+    paths:
+      - 'apps/admin-preview/**'
+      - 'apps/web/functions/admin-preview/api/library.js'
+      - 'apps/web/functions/_lib/library-snapshot-cache.js'
+      - 'apps/web/scripts/admin-recruitment-library.test.mjs'
+      - 'apps/web/scripts/admin-library-snapshot-cache.test.mjs'
+      - '.github/workflows/hhba-admin-library-budget.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bounded-library:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax
+        run: |
+          node --check apps/web/functions/admin-preview/api/library.js
+          node --check apps/web/functions/_lib/library-snapshot-cache.js
+          node --check apps/admin-preview/library.js
+          node --check apps/admin-preview/library-file-ui.js
+      - name: Admin library behavior and security
+        run: |
+          node --test apps/web/scripts/admin-recruitment-library.test.mjs
+          node --test apps/web/scripts/admin-library-snapshot-cache.test.mjs
+          node --test apps/web/scripts/admin-library-excel.test.mjs
+          node --test apps/web/scripts/admin-password-console.test.mjs

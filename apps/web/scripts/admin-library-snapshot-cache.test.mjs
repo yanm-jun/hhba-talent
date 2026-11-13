@@ -27,6 +27,9 @@ test('Cloudflare KV catalog serves base directory with no D1 queries or fake com
  assert.equal(summary.total.records,3);
  assert.equal(summary.total.unique_urls,2,'URL with a trailing slash remains distinct by the existing full-DB trim rule');
  assert.equal(summary.total.missing,1);
+ assert.equal(summary.total.enterprises,3);
+ assert.equal(summary.total.enterprises_linked,2);
+ assert.equal(summary.total.enterprises_missing,1);
 });
 test('Immutable KV change batches overlay inserts edits and deletes without altering source baseline',async()=>{
  const kv=mockKV();
@@ -67,4 +70,20 @@ test('Corrupted delta cannot silently erase or impersonate directory entries',as
 });
 test('KV writes are rejected when no authenticated private catalog cache is bound',async()=>{
  await assert.rejects(appendCatalogDelta(null,{upserts:base}),/LIBRARY_KV_NOT_BOUND/);
+});
+
+test('Repeated enterprise names across halls count once, and any URL covers the enterprise',()=>{
+ const rows=[
+  {industry_id:'automotive',enterprise:'同一集团',recruitment_url:null},
+  {industry_id:'manufacturing',enterprise:'同一集团',recruitment_url:'https://careers.group.example'},
+  {industry_id:'manufacturing',enterprise:'无入口企业',recruitment_url:null},
+  {industry_id:'manufacturing',enterprise:'另一集团',recruitment_url:'https://careers.group.example'}
+ ];
+ const r=calculateCatalogSummary(rows,[['automotive','汽车馆'],['manufacturing','制造馆']]);
+ assert.equal(r.total.records,4);
+ assert.equal(r.total.unique_urls,1);
+ assert.equal(r.total.enterprises,3);
+ assert.equal(r.total.enterprises_linked,2);
+ assert.equal(r.total.enterprises_missing,1);
+ assert.equal(r.industries[0].enterprises_missing,1,'single hall remains missing even when another hall has an URL');
 });

@@ -107,18 +107,44 @@ async function collectExisting(db,rows){
  }
  return found;
 }
+// Indexed, bounded lookup. Resolve an exact same-industry employer's empty row
+// rather than inserting a second row that leaves the original marked missing.
+async function collectVacantEmployerRows(db,rows){
+ const found=new Map();
+ for(let i=0;i<rows.length;i+=60){
+  const byIndustry=new Map();
+  for(const row of rows.slice(i,i+60)){
+   if(!byIndustry.has(row.industry_id))byIndustry.set(row.industry_id,new Set());
+   byIndustry.get(row.industry_id).add(row.enterprise);
+  }
+  if(!byIndustry.size)continue;
+  const clauses=[],params=[];
+  for(const [industry,names] of byIndustry){
+   clauses.push('(industry_id=? AND enterprise IN ('+[...names].map(()=>'?').join(',')+'))');
+   params.push(industry,...names);
+  }
+  const result=await db.prepare("SELECT source_key,industry_id,enterprise,recruitment_url,source_kind,source_batch,source_sequence,updated_at FROM hhba_industry_employer_links WHERE (recruitment_url IS NULL OR trim(recruitment_url)='') AND ("+clauses.join(' OR ')+")")
+   .bind(...params).all();
+  for(const record of result.results||[]){
+   const key=record.industry_id+'|'+record.enterprise;
+   const previous=found.get(key);
+   if(!previous||record.source_key<previous.source_key)found.set(key,publicRow(record));
+  }
+ }
+ return found;
+}
 function invalidate(db){summaryCache.delete(db)}
 async function summary(db){
  const cached=summaryCache.get(db);
  if(cached&&Date.now()<cached.until)return cached.data;
  const [byIndustry,total]=await Promise.all([
-  db.prepare("SELECT industry_id,COUNT(*) records,COUNT(recruitment_url) linked,COUNT(DISTINCT lower(trim(recruitment_url))) unique_urls,SUM(CASE WHEN recruitment_url IS NULL OR trim(recruitment_url)='' THEN 1 ELSE 0 END) missing FROM hhba_industry_employer_links GROUP BY industry_id").all(),
-  db.prepare("SELECT COUNT(*) records,COUNT(recruitment_url) linked,COUNT(DISTINCT lower(trim(recruitment_url))) unique_urls,SUM(CASE WHEN recruitment_url IS NULL OR trim(recruitment_url)='' THEN 1 ELSE 0 END) missing FROM hhba_industry_employer_links").first()
+  db.prepare("SELECT industry_id,COUNT(*) records,COUNT(recruitment_url) linked,COUNT(DISTINCT lower(trim(recruitment_url))) unique_urls,SUM(CASE WHEN recruitment_url IS NULL OR trim(recruitment_url)='' THEN 1 ELSE 0 END) missing,COUNT(DISTINCT trim(enterprise)) enterprises,COUNT(DISTINCT CASE WHEN recruitment_url IS NOT NULL AND trim(recruitment_url)<>'' THEN trim(enterprise) END) enterprises_linked FROM hhba_industry_employer_links GROUP BY industry_id").all(),
+  db.prepare("SELECT COUNT(*) records,COUNT(recruitment_url) linked,COUNT(DISTINCT lower(trim(recruitment_url))) unique_urls,SUM(CASE WHEN recruitment_url IS NULL OR trim(recruitment_url)='' THEN 1 ELSE 0 END) missing,COUNT(DISTINCT trim(enterprise)) enterprises,COUNT(DISTINCT CASE WHEN recruitment_url IS NOT NULL AND trim(recruitment_url)<>'' THEN trim(enterprise) END) enterprises_linked FROM hhba_industry_employer_links").first()
  ]);
  const map=new Map((byIndustry.results||[]).map(r=>[r.industry_id,r]));
  const data={kind:API_KIND,mode:'summary',asOf:new Date().toISOString(),
-  total:{records:number(total?.records),linked:number(total?.linked),unique_urls:number(total?.unique_urls),missing:number(total?.missing)},
-  industries:INDUSTRIES.map(([id,label])=>{const r=map.get(id)||{};return {id,label,records:number(r.records),linked:number(r.linked),unique_urls:number(r.unique_urls),missing:number(r.missing)}}),
+  total:{records:number(total?.records),linked:number(total?.linked),unique_urls:number(total?.unique_urls),missing:number(total?.missing),enterprises:number(total?.enterprises),enterprises_linked:number(total?.enterprises_linked),enterprises_missing:Math.max(0,number(total?.enterprises)-number(total?.enterprises_linked))},
+  industries:INDUSTRIES.map(([id,label])=>{const r=map.get(id)||{};return {id,label,records:number(r.records),linked:number(r.linked),unique_urls:number(r.unique_urls),missing:number(r.missing),enterprises:number(r.enterprises),enterprises_linked:number(r.enterprises_linked),enterprises_missing:Math.max(0,number(r.enterprises)-number(r.enterprises_linked))}}),
   note:'全库网址去重数不等于各馆去重数之和；候选网址不代表当前全部有效。'};
  summaryCache.set(db,{until:Date.now()+300000,data});return data;
 }
@@ -156,28 +182,13 @@ function loadArchivedLibrary(){
  });
  if(rows.length!==input.count.records)throw Error('ARCHIVED_LIBRARY_ROW_COUNT_MISMATCH');
  rows.sort((a,b)=>a.enterprise.localeCompare(b.enterprise,'zh-CN')||a.source_key.localeCompare(b.source_key));
- const industry=new Map(INDUSTRIES.map(([id])=>[id,{records:0,linked:0,missing:0,urls:new Set()}]));
- const urlSet=new Set();let linked=0;
- for(const row of rows){
-  const hall=industry.get(row.industry_id);
-  if(hall){hall.records++}
-  if(row.recruitment_url){
-   linked++;
-   const url=row.recruitment_url.trim().toLowerCase();
-   urlSet.add(url);
-   if(hall){hall.linked++;hall.urls.add(url)}
-  }else if(hall)hall.missing++;
- }
- if(linked!==input.count.with_urls||urlSet.size!==input.count.unique_urls)
+ const counts=calculateCatalogSummary(rows,INDUSTRIES,{asOf:input.exported_at});
+ if(counts.total.linked!==input.count.with_urls||counts.total.unique_urls!==input.count.unique_urls)
   throw Error('ARCHIVED_LIBRARY_LINK_COUNT_MISMATCH');
  const data={
   kind:API_KIND,mode:'summary',asOf:input.exported_at,
   readonly:true,archived:true,source:'production-d1-export',
-  total:{records:rows.length,linked,unique_urls:urlSet.size,missing:rows.length-linked},
-  industries:INDUSTRIES.map(([id,label])=>{
-   const x=industry.get(id);
-   return {id,label,records:x.records,linked:x.linked,unique_urls:x.urls.size,missing:x.missing};
-  }),
+  total:counts.total,industries:counts.industries,
   note:'正式数据库导出的真实企业记录，只读历史快照，非实时岗位信息。'
  };
  archivedLibrary={rows,data};
@@ -270,33 +281,47 @@ async function createRows(db,actor,values,action,uploadId=null,env=null){
  const batchTag=uploadId?'admin-import:'+uploadId:'admin-library';
  const replayed=accepted.filter(r=>existing.get(r.industry_id+'|'+canonical(r.recruitment_url))===batchTag&&uploadId).length;
  const pending=accepted.filter(r=>!existing.has(r.industry_id+'|'+canonical(r.recruitment_url)));
- if(!pending.length)return json({kind:API_KIND,inserted:0,skipped:values.length,replayed,duplicates:values.length-replayed});
- // D1 permits <=100 bound values per SQL statement. Use small statements
- // in four atomic db.batch() groups (25 entries = 50 statements per group).
- // A db.batch counts as one Worker database subrequest, so 100 rows take
- // at most 2 targeted reads and 4 batch subrequests, within the Free tier.
- // Upload ID preserves exact success counts if a network error occurs
- // after an earlier group was committed.
- let inserted=0;
+ if(!pending.length)return json({kind:API_KIND,inserted:0,filled:0,skipped:values.length,replayed,duplicates:values.length-replayed});
+ // Each import uses at most two indexed URL lookups and two indexed empty-name
+ // lookups per 100 submitted entries. No correlated full-table subqueries.
+ const vacancies=await collectVacantEmployerRows(db,pending),usedVacancies=new Set();
+ let inserted=0,filled=0;
  for(let i=0;i<pending.length;i+=25){
   const group=pending.slice(i,i+25),statements=[],upserts=[];
+  let insertedInGroup=0,filledInGroup=0;
   for(const row of group){
-   const sourceKey='admin:'+crypto.randomUUID();
-   const after={...row,source_key:sourceKey,source_batch:batchTag,
-    source_sequence:null,updated_at:new Date().toISOString()};
-   upserts.push(publicRow(after));
-   statements.push(db.prepare("INSERT INTO hhba_industry_employer_links(source_key,industry_id,enterprise,recruitment_url,source_kind,source_batch) VALUES(?,?,?,?,?,?)")
-    .bind(sourceKey,row.industry_id,row.enterprise,row.recruitment_url,row.source_kind,batchTag));
-   statements.push(await audit(db,action,actor,null,after,sourceKey));
+   const before=vacancies.get(row.industry_id+'|'+row.enterprise);
+   const fill=before&&!usedVacancies.has(before.source_key);
+   if(fill){
+    usedVacancies.add(before.source_key);
+    const after={...before,...row,source_batch:batchTag,updated_at:new Date().toISOString()};
+    upserts.push(publicRow(after));
+    statements.push(db.prepare("UPDATE hhba_industry_employer_links SET recruitment_url=?,source_kind=?,source_batch=?,updated_at=CURRENT_TIMESTAMP WHERE source_key=? AND (recruitment_url IS NULL OR trim(recruitment_url)='')")
+     .bind(row.recruitment_url,row.source_kind,batchTag,before.source_key));
+    statements.push(await audit(db,'fill',actor,before,after,before.source_key));
+    filledInGroup++;
+   }else{
+    const sourceKey='admin:'+crypto.randomUUID();
+    const after={...row,source_key:sourceKey,source_batch:batchTag,
+     source_sequence:null,updated_at:new Date().toISOString()};
+    upserts.push(publicRow(after));
+    statements.push(db.prepare("INSERT INTO hhba_industry_employer_links(source_key,industry_id,enterprise,recruitment_url,source_kind,source_batch) VALUES(?,?,?,?,?,?)")
+     .bind(sourceKey,row.industry_id,row.enterprise,row.recruitment_url,row.source_kind,batchTag));
+    statements.push(await audit(db,action,actor,null,after,sourceKey));
+    insertedInGroup++;
+   }
   }
-  await db.batch(statements);
-  // An immutable KV delta is committed after every successful D1 transaction,
-  // so partial imports remain browsable even if the next D1 batch is quota-limited.
+  // The updates and append-only audits run in the same atomic D1 batch.
+  const result=await db.batch(statements);
+  for(let k=0;k<result.length;k+=2){
+   if(result[k]?.meta?.changes===0)throw Error('LIBRARY_CONCURRENT_WRITE_CONFLICT');
+  }
   if(env?.HHBA_LIBRARY_CACHE_KV)await appendCatalogDelta(env.HHBA_LIBRARY_CACHE_KV,{upserts});
-  inserted+=group.length;
+  inserted+=insertedInGroup;
+  filled+=filledInGroup;
  }
  invalidate(db);
- return json({kind:API_KIND,inserted,skipped:values.length-inserted,replayed,duplicates:values.length-inserted-replayed});
+ return json({kind:API_KIND,inserted,filled,skipped:values.length-inserted-filled,replayed,duplicates:values.length-inserted-filled-replayed});
 }
 export async function onRequestPost({request,env}){
  const g=await gate(request,env);if(g.response)return g.response;
