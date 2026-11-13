@@ -303,7 +303,7 @@ async function createRows(db,actor,values,action,uploadId=null,env=null){
     upserts.push(publicRow(after));
     statements.push(db.prepare("UPDATE hhba_industry_employer_links SET recruitment_url=?,source_kind=?,source_batch=?,updated_at=CURRENT_TIMESTAMP WHERE source_key=? AND (recruitment_url IS NULL OR trim(recruitment_url)='')")
      .bind(row.recruitment_url,row.source_kind,batchTag,before.source_key));
-    statements.push(await audit(db,'fill',actor,before,after,before.source_key));
+    statements.push(await audit(db,'edit',actor,before,after,before.source_key));
     filledInGroup++;
    }else{
     const sourceKey='admin:'+crypto.randomUUID();
