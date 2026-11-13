@@ -2,6 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
+import {randomBytes} from 'node:crypto';
+import {sha256} from '../functions/_lib/console-password.js';
+import {onRequest as adminMiddleware} from '../functions/_middleware.js';
 import {validateOfficialSnapshot,onRequestGet} from '../functions/admin-preview/api/public-jobs.js';
 
 const now=Date.now();
@@ -96,4 +99,62 @@ test('market never presents a stale snapshot as an active job count',async()=>{
  await new Promise(r=>setImmediate(r));
  assert.equal(x.elements['market-jobs'].textContent,'—');
  assert.match(x.elements['market-index-status'].textContent,/已过期/);
+});
+
+test('source rejects mathematically impossible investor and job counts',()=>{
+ const oversubscribed={...raw,counts:{...count,displayableJobs:100}};
+ assert.throws(()=>validateOfficialSnapshot(oversubscribed,now),/INCONSISTENT_SOURCE_COUNTS/);
+ assert.throws(()=>validateOfficialSnapshot({...raw,counts:{...count,auditedJobRequirements:70}},now),/INCONSISTENT_SOURCE_COUNTS/);
+ assert.throws(()=>validateOfficialSnapshot({...raw,counts:{...count,distinctIndexedCompanies:80}},now),/INCONSISTENT_SOURCE_COUNTS/);
+ assert.throws(()=>validateOfficialSnapshot({...raw,counts:{...count,failedAtsSources:5}},now),/INCONSISTENT_SOURCE_COUNTS/);
+ assert.throws(()=>validateOfficialSnapshot({...raw,counts:{...count,failedAtsSources:1}},now),/INCONSISTENT_SOURCE_COUNTS/);
+});
+test('password-protected official gateway never touches D1 or accepts arbitrary upstream URLs',async()=>{
+ const token=randomBytes(32).toString('base64url'),hashed=await sha256(token),expiry=Math.floor(Date.now()/1000)+1200;
+ const owner={id:'owner',email:'test-owner@example.com',auth_version:'some-random-version'};
+ const record={owner_id:'owner',expires_at:expiry,auth_version:owner.auth_version};
+ let kvReads=0,d1Touches=0,networkCalls=0;
+ const kv={async get(key){
+   kvReads++;
+   if(key==='admin:owner')return owner;
+   if(key==='session:'+hashed)return record;
+   return null;
+ }};
+ const env={HHBA_ADMIN_CONSOLE_ENABLED:'1',HHBA_ADMIN_AUTH_MODE:'kv',
+  HHBA_METRICS_ADMIN_EMAIL:owner.email,HHBA_ADMIN_AUTH_KV:kv,
+  HHBA_METRICS_DB:{prepare(){d1Touches++;throw Error('D1 must not be queried')}},
+  HHBA_PNVS_AUTH_DB:{prepare(){d1Touches++;throw Error('D1 must not be queried')} }};
+ const request=new Request('https://admin.hhba.work/admin-preview/api/public-jobs',{
+  headers:{Cookie:'__Host-hhba_admin='+token}});
+ const previous=globalThis.fetch;
+ globalThis.fetch=async(url,options)=>{
+  networkCalls++;
+  assert.equal(url,'https://hhba.work/api/metrics/public');
+  assert.equal(options.method,'GET');
+  assert.equal(options.credentials,'omit');
+  assert.equal(options.redirect,'error');
+  return new Response(JSON.stringify(raw),{status:200,headers:{'Content-Type':'application/json; charset=utf-8'}});
+ };
+ try{
+  let advanced=false;
+  const response=await adminMiddleware({request,env,next:async()=>{
+   advanced=true;
+   return onRequestGet({request,env});
+  }});
+  assert.equal(response.status,200);
+  assert.equal(advanced,true);
+  const payload=await response.json();
+  assert.equal(payload.counts.displayableJobs,66);
+  assert.equal(payload.counts.distinctIndexedCompanies,14);
+  assert.match(response.headers.get('Cache-Control')||'',/private/);
+  assert.equal(networkCalls,1,'never re-fetch for every field');
+  assert.equal(d1Touches,0);
+  assert.ok(kvReads>=2);
+  let passed=false;
+  const guestRequest=new Request('https://admin.hhba.work/admin-preview/api/public-jobs');
+  const guest=await adminMiddleware({request:guestRequest,env,next:async()=>{passed=true;return new Response('exposed')}});
+  assert.equal(guest.status,401);
+  assert.equal(passed,false,'unsigned user must never enter route handler');
+  assert.equal(networkCalls,1,'unauthorized requests never contact official source');
+ }finally{globalThis.fetch=previous}
 });
