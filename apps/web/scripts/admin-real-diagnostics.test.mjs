@@ -11,7 +11,7 @@ test('health probe checks only KV key metadata and never executes D1 SQL',async(
   HHBA_METRICS_DB:neverSql,HHBA_PNVS_AUTH_DB:neverSql,
   HHBA_LIBRARY_CACHE_KV:{async list(options){
    listed++;
-   assert.deepEqual(options,{prefix:'catalog:baseline:v1',limit:1});
+   assert.deepEqual(options,{prefix:'catalog:baseline:v1',limit:10});
    return {keys:[{name:'catalog:baseline:v1'}]};
   }}
  };
