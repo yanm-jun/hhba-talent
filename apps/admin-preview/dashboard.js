@@ -107,7 +107,7 @@ function updateGrowth(){
  setMetric('registered-users',a?.quality==='collected'?a.registeredUsers:null);
  byId('active-users').textContent=a?.quality==='collected'&&integer(a.dau)!==null&&integer(a.mau)!==null?fmt.format(a.dau)+' / '+fmt.format(a.mau):'— / —';
  byId('users-interval').textContent=growth?.period?growth.period.start+' 至 '+growth.period.end+' · UTC':'私有数据需要 Cloudflare Access 管理员授权';
- byId('users-data-quality').textContent=a?.quality==='collected'?'注册用户来自 PNVS 身份库；匿名访客和历史设备收藏单独统计，不混同账号人数。':growth?'Cloudflare D1 已接入匿名访问；真实注册库未连接。':growthError==='AUTH_REQUIRED'?'管理员验证未通过；请在受保护的 HHBA 管理域名完成 Cloudflare Access 登录。':growthError==='SERVICE_ERROR'?'统计服务暂不可用，请检查受保护 API、D1 绑定和管理员权限。':'私有数据等待连接；未接入不等于零。';
+ byId('users-data-quality').textContent=a?.quality==='collected'?'注册用户来自 PNVS 身份库；匿名访客和历史设备收藏单独统计，不混同账号人数。':growth?'Cloudflare D1 已接入匿名访问；真实注册库未连接。':growthError==='AUTH_REQUIRED'?'管理员登录验证未通过，请重新登录管理后台后刷新数据。':growthError==='SERVICE_ERROR'?'统计服务暂不可用，请检查受保护 API、D1 绑定和管理员权限。':'私有数据等待连接；未接入不等于零。';
   setMetric('users-new-registrations',a?.quality==='collected'?a.newRegistered:null);
   byId('users-dau-wau').textContent=q?.quality==='collected'?accountValue(q.dau)+' / '+accountValue(q.wau):'— / —';
   setMetric('users-mau',q?.quality==='collected'?q.mau:null);
