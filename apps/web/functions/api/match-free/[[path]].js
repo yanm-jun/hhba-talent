@@ -13,7 +13,7 @@ const now=()=>new Date().toISOString();
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function enabled(env){
  return env.HHBA_FREE_MATCH_ENABLED==='1'&&
-  parserRequested(env)&&typeof env.AI?.run==='function'&&
+  parserRequested(env)&&
   freeAIReady(env)&&typeof env.ASSETS?.fetch==='function';
 }
 async function databaseReady(db){
@@ -109,7 +109,7 @@ async function acquireCache(db,key,phone,resume,version){
  const inserted=await db.prepare(
   "INSERT OR IGNORE INTO hhba_candidate_free_match_cache "+
   "(cache_key,phone,resume_id,file_sha256,snapshot_version,state,result_json,attempt_id,lease_until,expires_at,created_at) "+
-  "VALUES(?,?,?,?,?,'RUNNING',NULL,?,?,?,?,?)"
+  "VALUES(?,?,?,?,?,'RUNNING',NULL,?,?,?,?)"
  ).bind(key,phone,resume.id,resume.sha256,version,runId,lease,expiry,current).run();
  if(inserted?.success!==true)throw Error('DB');
  if(inserted.meta?.changes===1)return {key,runId,expiry};
