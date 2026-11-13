@@ -119,7 +119,7 @@ test('password-protected official gateway never touches D1 or accepts arbitrary 
    if(key==='admin:owner')return owner;
    if(key==='session:'+hashed)return record;
    return null;
- }};
+ },async put(){throw Error('auth KV must not be written by a read-only health check') }};
  const env={HHBA_ADMIN_CONSOLE_ENABLED:'1',HHBA_ADMIN_AUTH_MODE:'kv',
   HHBA_METRICS_ADMIN_EMAIL:owner.email,HHBA_ADMIN_AUTH_KV:kv,
   HHBA_METRICS_DB:{prepare(){d1Touches++;throw Error('D1 must not be queried')}},
