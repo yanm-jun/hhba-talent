@@ -56,6 +56,7 @@ async function modelProfile(env,original){
  try{
   result=await env.AI.run(FREE_MODEL,{
    messages,temperature:0,max_completion_tokens:1250,stream:false,
+   chat_template_kwargs:{enable_thinking:false},
    response_format:{type:'json_object'}
   });
  }catch{throw problem('FREE_RESUME_PARSER_UNAVAILABLE',503);}
