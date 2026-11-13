@@ -22,6 +22,13 @@ export function validateOfficialSnapshot(raw,now=Date.now()){
   if(value!==null&&!(Number.isSafeInteger(value)&&value>=0))throw Error('INVALID_SOURCE_COUNTS');
   counts[key]=value;
  }
+ // Public source metrics must be internally consistent before appearing in an investor/manager dashboard.
+ if((counts.indexedJobs!==null&&counts.displayableJobs!==null&&counts.displayableJobs>counts.indexedJobs)||
+    (counts.displayableJobs!==null&&counts.auditedJobRequirements!==null&&counts.auditedJobRequirements>counts.displayableJobs)||
+    (counts.displayableJobs!==null&&counts.distinctIndexedCompanies!==null&&counts.distinctIndexedCompanies>counts.displayableJobs)||
+    (counts.checkedAtsSources!==null&&counts.failedAtsSources!==null&&counts.failedAtsSources>counts.checkedAtsSources)||
+    (raw.quality==='current'&&counts.failedAtsSources!==0))
+    throw Error('INCONSISTENT_SOURCE_COUNTS');
  const stale=raw.quality==='stale'||now-sourceTime>MAX_AGE_MS||now-auditTime>MAX_AGE_MS;
  if(stale)for(const key of REQUIRED_COUNTS){
   if(key!=='failedAtsSources')counts[key]=null;
