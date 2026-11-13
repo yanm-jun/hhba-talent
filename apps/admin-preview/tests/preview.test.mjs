@@ -59,6 +59,9 @@ test('server is localhost only, refuses writes and exposes only vetted paths',as
  assert.match(home.headers.get('content-security-policy'),/default-src 'none'/);
  assert.match(home.headers.get('cache-control'),/no-store/);
  assert.match(await home.text(),/数据总览/);
+ const market=await fetch(origin+'/market.js');
+ assert.equal(market.status,200);
+ assert.match(await market.text(),/HHBA_CLOUDFLARE_PUBLIC_METRICS_V1/);
  const response=await fetch(origin+'/api/overview');
  assert.equal(response.status,200);
  const data=await response.json();
