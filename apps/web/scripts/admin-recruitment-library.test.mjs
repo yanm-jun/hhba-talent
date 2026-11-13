@@ -134,6 +134,7 @@ test('exact same-industry empty employer is filled with an indexed UPDATE, not d
  assert.equal(data.inserted,0);assert.equal(data.filled,1);assert.equal(data.skipped,0);
  assert.equal(db.batches.length,1);
  assert.equal(db.batches[0].length,2,'update plus append-only audit');
+ assert.equal(db.batches[0][1].args[1],'edit','DB audit CHECK only permits add/edit/delete/import');
  assert.equal(db.calls.filter(x=>x.startsWith('INSERT INTO hhba_industry_employer_links')).length,0);
  assert.equal(db.calls.filter(x=>x.startsWith('UPDATE hhba_industry_employer_links')).length,1);
  assert.ok(db.calls.some(x=>x.includes('enterprise IN (')),'lookup uses exact names, no correlated scan');
