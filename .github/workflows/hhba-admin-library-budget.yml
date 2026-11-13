@@ -33,6 +33,7 @@ jobs:
           node --check apps/web/functions/_lib/library-snapshot-cache.js
           node --check apps/admin-preview/library.js
           node --check apps/admin-preview/dashboard.js
+          node --check apps/admin-preview/server.mjs
           node --check apps/admin-preview/market.js
           node --check apps/web/functions/admin-preview/api/health.js
           node --check apps/web/functions/admin-preview/api/public-jobs.js
@@ -45,6 +46,7 @@ jobs:
           node --test apps/web/scripts/admin-password-console.test.mjs
           node --test apps/web/scripts/admin-real-diagnostics.test.mjs
           node --test apps/web/scripts/admin-market-authenticity.test.mjs
+          node --test apps/admin-preview/tests/*.test.mjs
       - name: Build isolated admin static assets
         run: |
           cd apps/web
