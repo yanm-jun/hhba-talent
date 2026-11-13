@@ -10,7 +10,7 @@ export async function inspectBindings(env) {
  if(cache && typeof cache.list==='function'){
   try {
    // Listing the exact baseline key needs no full 800KB catalog download.
-   const result=await cache.list({prefix:'catalog:baseline:v1',limit:1});
+   const result=await cache.list({prefix:'catalog:baseline:v1',limit:10});
    baseline=result?.keys?.some(item=>item.name==='catalog:baseline:v1')?'present':'missing';
   }catch{baseline='unavailable'}
  }
