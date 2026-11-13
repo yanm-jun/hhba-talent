@@ -49,7 +49,8 @@ async function reserve(db,identity){
  ).bind(id,day,identity,created,day,day,identity).run();
  return row?.success===true&&row?.meta?.changes===1?{day,id}:null;
 }
-export async function onRequestGet({env}){
+export async function onRequestGet({
+ if(env?.HHBA_ZERO_PAID_AI_ENFORCED==='1')return new Response(JSON.stringify({ok:false,error:'PAID_AI_DISABLED'}),{status:503,headers:{'Content-Type':'application/json'}});env}){
  return respond({kind:EXTERNAL_DISCOVERY_VERSION,enabled:enabled(env)&&await dbReady(env.HHBA_PNVS_AUTH_DB),
   scope:'CN_MAINLAND_ONLY',max_search_requests:2,max_fetch_requests:3,
   per_account_daily_limit:2,global_daily_limit:12,integrated_into_top10:false,
