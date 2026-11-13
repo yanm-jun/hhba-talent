@@ -170,9 +170,8 @@ async function list(db,url){
 // Read-only, full historical D1 export compiled inside the Pages Function.
 // The export is never a public /dist asset; requests still pass signed Access.
 let archivedLibrary=null;
-function loadArchivedLibrary(){
+function loadArchivedLibrary(input=LIBRARY_PRIVATE_SNAPSHOT){
  if(archivedLibrary)return archivedLibrary;
- const input=LIBRARY_PRIVATE_SNAPSHOT;
  if(!input?.rows?.length||!input.count||!Array.isArray(input.columns))return null;
  const columns=input.columns;
  const rows=input.rows.map(values=>{
@@ -213,16 +212,22 @@ function archivedList(archive,url){
   readonly:!archive.canWrite,archived:true,source:'production-d1-export+KV',
   hasMore:rows.length>offset+LIST_MAX,total:rows.length,rows:rows.slice(offset,offset+LIST_MAX)});
 }
-function archiveForRequest(request,env){
- // The complete directory is stored only inside protected Pages Functions.
- // The existing admin hostname is password-protected; previews retain Access.
+async function archiveForRequest(request,env){
+ // The directory is never a public asset; callers have already passed gate().
+ // Immutable baseline is stored in the admin-only KV binding, rather than a
+ // one-hour D1 export URL; overlays remain separate append-only KV deltas.
  if(env.HHBA_LIBRARY_SNAPSHOT_FIRST!=='1')return null;
  const host=new URL(request.url).hostname;
  if(host!=='admin.hhba.work'&&host!=='feat-admin-recruitment-libra.hhba-talent.pages.dev')return null;
- return loadArchivedLibrary();
+ if(archivedLibrary)return archivedLibrary;
+ const kv=env.HHBA_LIBRARY_CACHE_KV;
+ if(!kv?.get)throw Error('LIBRARY_KV_BASELINE_NOT_CONNECTED');
+ const input=await kv.get('catalog:baseline:v1','json');
+ if(!input?.rows?.length)throw Error('LIBRARY_KV_BASELINE_MISSING');
+ return loadArchivedLibrary(input);
 }
 async function viewArchived(request,env){
- const baseline=archiveForRequest(request,env);
+ const baseline=await archiveForRequest(request,env);
  if(!baseline)return null;
  const isAdmin=new URL(request.url).hostname==='admin.hhba.work';
  let current,warning=null;
