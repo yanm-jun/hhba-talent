@@ -3,7 +3,7 @@
 // Baseline: verified production D1 export bundled into a protected Pages Function.
 // Deltas: immutable KV entries, 1 write per committed SQL group (no hot KV keys).
 const PREFIX='catalog:delta:';
-const MAX_DELTAS=600;
+export const MAX_DELTAS=600;
 const TTL=12_000;
 const cache=new WeakMap();
 const safe=v=>typeof v==='string'?v:'';
