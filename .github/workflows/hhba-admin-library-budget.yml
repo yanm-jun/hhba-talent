@@ -53,6 +53,6 @@ jobs:
           test -s dist/admin-preview/market.js
           grep -q '岗位与企业' dist/admin-preview/index.html
           test -s dist/admin-preview/index.html
-          grep -q '数据源自检' dist/admin-preview/index.html
+          grep -q '运营监控' dist/admin-preview/index.html
           grep -q 'users-load-private' dist/admin-preview/index.html
           test -s dist/_routes.json
