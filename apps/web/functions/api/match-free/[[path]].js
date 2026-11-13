@@ -64,7 +64,7 @@ function candidateInputs(list){
   experience_requirement:j.experience_requirement||'未注明'
  }));
 }
-function safeRankedAI(ai,candidates,limit){
+export function safeRankedAI(ai,candidates,limit){
  const byId=new Map(candidates.map(j=>[j.id,j]));
  const sorted=[],seen=new Set(),counts=new Map();
  const add=id=>{
