@@ -27,7 +27,7 @@ function integer(x){return Number.isSafeInteger(x)&&x>=0?x:null}
 function setMetric(id,n){const e=byId(id);if(e)e.textContent=integer(n)===null?'—':fmt.format(n)}
 function renderTraffic(target,items){
  const root=byId(target);if(!root)return;
- if(!Array.isArray(items)){root.textContent='私有统计未授权或尚未采集';return}
+ if(!Array.isArray(items)){root.textContent=privateMetricsRequested?'私有统计未授权或尚未采集':'尚未手动加载私有统计（节省 D1）';return}
  root.replaceChildren();
  const chart=document.createElement('div');chart.className='hhba-real-bars';const max=Math.max(1,...items.map(x=>x.pv||0));
  for(const item of items){
@@ -45,9 +45,9 @@ function showRealDataStatus(){
  const source=liveHost?'正式网站数据':'独立预览数据库';
  byId('workspace-mode').textContent=liveHost?'正式管理后台':'开发预览';
  byId('sidebar-environment').textContent=source;
- const state=growth?.account?.quality==='collected'?'管理员已验证 · 真实账号已接通':growth?'管理员已验证 · 部分指标待接入':growthError==='AUTH_REQUIRED'?'管理员尚未授权':growthError==='SERVICE_ERROR'?'私有统计服务不可用':'等待私有数据连接';
- byId('sidebar-account-state').textContent=state;
- byId('sidebar-data-state').textContent=state+'；仅展示汇总数据，不读取个人浏览记录';
+ const state=growth?.account?.quality==='collected'?'真实求职者账户数据已连接':growth?'部分真实数据已连接':growthError==='AUTH_REQUIRED'?'私有指标读取未获授权':growthError==='SERVICE_ERROR'?'私有统计服务不可用':privateMetricsRequested?'已尝试读取；暂无可用统计':'业务统计尚未手动加载（节省 D1）';
+ byId('sidebar-account-state').textContent=location.hostname==='admin.hhba.work'?'密码会话已通过服务端验证':'身份受管理后台保护';
+ byId('sidebar-data-state').textContent=state+'；只展示汇总数据，不读取个人浏览记录';
  byId('top-access-state').textContent=state;
 }
 // Source-backed daily rows. A day before installation is unknown, not zero.
@@ -75,7 +75,7 @@ function renderDailyOperations(report){
  root.replaceChildren();
  if(!rows){
   const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=6;
-  td.textContent='私有汇总数据不可用或未授权，不能显示真实明细';
+  td.textContent=privateMetricsRequested?'私有汇总数据不可用或未授权，不能显示真实明细':'尚未手动加载统计数据；未查询不等于零';
   tr.append(td);root.append(tr);status.textContent='数据不可用';return;
  }
  const display=n=>integer(n)===null?'—':fmt.format(n);
@@ -106,8 +106,8 @@ function updateGrowth(){
  if(changes)changes.textContent=b?.quality==='collected'&&integer(b.added)!==null&&integer(b.removed)!==null?fmt.format(b.added)+' / '+fmt.format(b.removed):'—';
  setMetric('registered-users',a?.quality==='collected'?a.registeredUsers:null);
  byId('active-users').textContent=a?.quality==='collected'&&integer(a.dau)!==null&&integer(a.mau)!==null?fmt.format(a.dau)+' / '+fmt.format(a.mau):'— / —';
- byId('users-interval').textContent=growth?.period?growth.period.start+' 至 '+growth.period.end+' · UTC':'私有数据需要 Cloudflare Access 管理员授权';
- byId('users-data-quality').textContent=a?.quality==='collected'?'注册用户来自 PNVS 身份库；匿名访客和历史设备收藏单独统计，不混同账号人数。':growth?'Cloudflare D1 已接入匿名访问；真实注册库未连接。':growthError==='AUTH_REQUIRED'?'管理员登录验证未通过，请重新登录管理后台后刷新数据。':growthError==='SERVICE_ERROR'?'统计服务暂不可用，请检查受保护 API、D1 绑定和管理员权限。':'私有数据等待连接；未接入不等于零。';
+ byId('users-interval').textContent=growth?.period?growth.period.start+' 至 '+growth.period.end+' · UTC':'私有统计尚未加载；需要管理员手动读取';
+ byId('users-data-quality').textContent=a?.quality==='collected'?'注册用户来自 PNVS 身份库；匿名访客和历史设备收藏单独统计，不混同账号人数。':growth?'Cloudflare D1 已接入匿名访问；真实注册库未连接。':growthError==='AUTH_REQUIRED'?'管理员登录验证未通过，请重新登录管理后台后刷新数据。':growthError==='SERVICE_ERROR'?'统计服务暂不可用，请检查受保护 API、D1 绑定和管理员权限。':privateMetricsRequested?'私有统计不可用；未接入不等于零。':'尚未查询私有 D1；点击手动加载后才显示实际值。';
   setMetric('users-new-registrations',a?.quality==='collected'?a.newRegistered:null);
   byId('users-dau-wau').textContent=q?.quality==='collected'?accountValue(q.dau)+' / '+accountValue(q.wau):'— / —';
   setMetric('users-mau',q?.quality==='collected'?q.mau:null);
