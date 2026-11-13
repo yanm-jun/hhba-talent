@@ -69,8 +69,8 @@ export async function appendCatalogDelta(kv,{upserts=[],deletes=[]}={}){
  cache.delete(kv);
 }
 export function calculateCatalogSummary(rows,industries,{asOf=null,overlayCount=0}={}){
- const stats=new Map(industries.map(([id])=>[id,{records:0,linked:0,missing:0,urls:new Set(),companies:new Map()}]));
- const urls=new Set(),companies=new Map();let linked=0;
+ const stats=new Map(industries.map(([id])=>[id,{records:0,linked:0,missing:0,verified:0,historical_verified:0,candidate:0,urls:new Set(),companies:new Map()}]));
+ const urls=new Set(),companies=new Map();let linked=0,verified=0,historicalVerified=0,candidate=0;
  for(const row of rows){
   const x=stats.get(row.industry_id);
   if(x)x.records++;
@@ -82,16 +82,26 @@ export function calculateCatalogSummary(rows,industries,{asOf=null,overlayCount=
   if(hasUrl){
    linked++;urls.add(url);
    if(x){x.linked++;x.urls.add(url)}
+   // 'Collected' is not 'verified': verification is a separately recorded state.
+   if(row.source_kind==='admin_verified_official'){
+    verified++;if(x)x.verified++;
+   }else if(row.source_kind==='previously_reviewed_official'){
+    historicalVerified++;if(x)x.historical_verified++;
+   }else{
+    candidate++;if(x)x.candidate++;
+   }
   }else if(x)x.missing++;
  }
  const linkedCompanies=[...companies.values()].filter(Boolean).length;
  return {
   asOf,overlayCount,
   total:{records:rows.length,linked,missing:rows.length-linked,unique_urls:urls.size,
+   verified,historical_verified:historicalVerified,candidate,
    enterprises:companies.size,enterprises_linked:linkedCompanies,enterprises_missing:companies.size-linkedCompanies},
   industries:industries.map(([id,label])=>{
    const s=stats.get(id),companiesLinked=[...s.companies.values()].filter(Boolean).length;
    return {id,label,records:s.records,linked:s.linked,missing:s.missing,unique_urls:s.urls.size,
+    verified:s.verified,historical_verified:s.historical_verified,candidate:s.candidate,
     enterprises:s.companies.size,enterprises_linked:companiesLinked,enterprises_missing:s.companies.size-companiesLinked};
   })
  };
