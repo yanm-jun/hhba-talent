@@ -379,7 +379,7 @@ async function checkHealth(){
  if(button.disabled)return;
  button.disabled=true;button.textContent='正在检查…';
  note.textContent='正在读取经过管理员验证的配置与公开职位快照，不执行 D1 SQL…';
- for(const id of ['health-admin','health-library','health-library-mode','health-metrics','health-accounts','health-jobs'])byId(id).textContent='检查中';
+ for(const id of ['health-admin','health-library','health-library-mode','health-metrics','health-accounts','health-jobs','health-deltas','health-latest'])byId(id).textContent='检查中';
  try{
   // The protected health endpoint only lists one exact KV key and reads NO D1 rows.
   const response=await fetch('/admin-preview/api/health',{cache:'no-store',credentials:'same-origin',headers:{Accept:'application/json'}});
@@ -396,6 +396,17 @@ async function checkHealth(){
   const bindingStatus=x=>x==='bound_not_queried'?'已绑定 · 未执行 SQL，运行状态待确认':'未绑定或配置不可用';
   byId('health-metrics').textContent=bindingStatus(sources.metricsDatabase?.status);
   byId('health-accounts').textContent=bindingStatus(sources.identityDatabase?.status);
+  const deltas=sources.catalogDeltas;
+  const count=integer(deltas?.count);
+  const deltaLabel=count===null?'—':(deltas.exact?'':'至少 ')+fmt.format(count)+' / '+fmt.format(deltas.limit||600)+' 批';
+  byId('health-deltas').textContent=({
+    normal:'正常 · ',approaching_limit:'接近合并阈值 · ',
+    at_or_above_limit:'需要合并历史增量 · ',
+    not_bound:'KV 未绑定 · ',unavailable:'KV 列举失败 · '
+  })[deltas?.status]||'未知 · ';
+  byId('health-deltas').textContent+=deltaLabel;
+  byId('health-latest').textContent=deltas?.lastDeltaAt?formatTime(deltas.lastDeltaAt):
+   deltas?.status==='normal'&&count===0?'当前没有增量记录':'最近更新时间尚无法核实';
   // A public metrics request reads the site's published snapshot, not D1.
   await refresh();
   byId('health-jobs').textContent=snapshot?.quality
@@ -405,7 +416,7 @@ async function checkHealth(){
   note.textContent='本次检查：'+formatTime(data.observedAt)+'；D1 SQL 查询次数 0。已绑定不代表当日额度充足，也不代表所有功能可写。';
  }catch(e){
   note.textContent='自检失败：'+String(e.message||'连接异常')+'。未将缺失状态冒充运行正常。';
-  for(const id of ['health-admin','health-library','health-library-mode','health-metrics','health-accounts','health-jobs']){
+  for(const id of ['health-admin','health-library','health-library-mode','health-metrics','health-accounts','health-jobs','health-deltas','health-latest']){
    if(byId(id).textContent==='检查中')byId(id).textContent='无法确认';
   }
  }finally{
