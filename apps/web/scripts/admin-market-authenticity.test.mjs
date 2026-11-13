@@ -72,7 +72,7 @@ test('market view does not fetch employer catalog until explicit manual action',
  assert.equal(x.calls[0].uri,'/admin-preview/api/public-jobs');
  assert.equal(x.calls[0].credentials,'same-origin');
  assert.equal(x.elements['market-jobs'].textContent,'66');
- assert.equal(x.elements['market-urls'].textContent,'');
+ assert.ok(!x.calls.some(c=>typeof c.uri==='string'&&c.uri.includes('/api/library')));
  x.elements['market-load'].handlers.click();
  await new Promise(r=>setImmediate(r));
  assert.equal(x.calls.length,2);
