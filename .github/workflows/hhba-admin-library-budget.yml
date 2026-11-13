@@ -8,6 +8,8 @@ on:
       - 'apps/web/functions/admin-preview/api/library.js'
       - 'apps/web/functions/admin-preview/api/health.js'
       - 'apps/web/functions/admin-preview/api/public-jobs.js'
+      - 'apps/web/functions/admin-preview/api/finance.js'
+      - 'apps/web/scripts/admin-finance-register.test.mjs'
       - 'apps/web/scripts/admin-real-diagnostics.test.mjs'
       - 'apps/web/scripts/admin-market-authenticity.test.mjs'
       - 'apps/web/scripts/build-standalone-admin.py'
@@ -35,8 +37,10 @@ jobs:
           node --check apps/admin-preview/dashboard.js
           node --check apps/admin-preview/server.mjs
           node --check apps/admin-preview/market.js
+          node --check apps/admin-preview/finance.js
           node --check apps/web/functions/admin-preview/api/health.js
           node --check apps/web/functions/admin-preview/api/public-jobs.js
+          node --check apps/web/functions/admin-preview/api/finance.js
           node --check apps/admin-preview/library-file-ui.js
       - name: Admin library behavior and security
         run: |
@@ -46,6 +50,7 @@ jobs:
           node --test apps/web/scripts/admin-password-console.test.mjs
           node --test apps/web/scripts/admin-real-diagnostics.test.mjs
           node --test apps/web/scripts/admin-market-authenticity.test.mjs
+          node --test apps/web/scripts/admin-finance-register.test.mjs
           node --test apps/admin-preview/tests/*.test.mjs
       - name: Build isolated admin static assets
         run: |
@@ -53,6 +58,8 @@ jobs:
           CF_PAGES_BRANCH=feat/admin-password-console-20261112 python3 scripts/build-standalone-admin.py
           test -s dist/admin-preview/dashboard.js
           test -s dist/admin-preview/market.js
+          test -s dist/admin-preview/finance.js
+          grep -q '财务成本' dist/admin-preview/index.html
           grep -q '岗位与企业' dist/admin-preview/index.html
           test -s dist/admin-preview/index.html
           grep -q '运营监控' dist/admin-preview/index.html
