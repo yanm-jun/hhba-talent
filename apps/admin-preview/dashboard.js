@@ -259,8 +259,9 @@ async function refresh(){
  btn.setAttribute('aria-busy','true');
  btn.lastChild.textContent=' 正在核对…';
  try{
+  const path=location.hostname==='admin.hhba.work'?'/admin-preview/api/public-jobs':'/api/metrics/public';
   const response=cloudflareMode
-   ?await fetch('/api/metrics/public',{method:'GET',cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}})
+   ?await fetch(path,{method:'GET',cache:'no-store',credentials:location.hostname==='admin.hhba.work'?'same-origin':'omit',headers:{Accept:'application/json'}})
    :await fetch('/api/overview',{method:'GET',cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
   if(!response.ok)throw Error('index_not_available');
   const raw=await response.json();const body=cloudflareMode?normalizeCloudflarePublic(raw):raw;
