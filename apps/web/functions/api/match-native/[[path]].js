@@ -1,6 +1,7 @@
 // HHBA search-first experience: DeepSeek Search -> optional Fetch -> V4 Pro ranking.
 // No ATS API, no company whitelist, no invented job links.
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
+import {onRequest as onFreeMatchRequest} from '../match-free/[[path]].js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {parserRequested,getOrParseResumeProfile,safeResumeContext} from '../../_lib/free-resume-profile.js';
 import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
@@ -295,6 +296,14 @@ export async function runNativeDualMatch(key,text,roleHint,limit=10,{
 }
 
 export async function onRequest({request,env}){
+ // Strict free-only mode: route the existing frontend endpoint without touching paid DeepSeek.
+ if(env.HHBA_ZERO_PAID_AI_ENFORCED==='1'){
+  if(env.HHBA_FREE_MATCH_ENABLED!=='1')
+   return fail('FREE_AI_NOT_CONFIGURED',503);
+  const target=new URL(request.url);
+  target.pathname=target.pathname.replace(/^\/api\/match-native/,'/api/match-free');
+  return onFreeMatchRequest({request:new Request(target.toString(),request),env});
+ }
  const url=new URL(request.url);
  const tail=url.pathname.slice('/api/match-native'.length).replace(/\/$/,'')||'/';
  if(tail==='/status'&&request.method==='GET')
