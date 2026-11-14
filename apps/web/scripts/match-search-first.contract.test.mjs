@@ -322,10 +322,10 @@ test('AI matching privacy disclosure describes DeepSeek data flow and redaction 
  const core=await readFile(new URL('../functions/_lib/resume-match-core.js',import.meta.url),'utf8');
  assert.match(page,/DeepSeek API/);
  assert.match(page,/不保证完全匿名/);
- assert.match(privacy,/DeepSeek Search 接收/);
+ assert.match(privacy,/DeepSeek Flash 深度思考匹配会接收/);
  assert.match(privacy,/不会自动识别并遮盖姓名/);
  assert.match(privacy,/匹配历史会保存岗位推荐结果/);
- assert.match(route,/DeepSeek Search 仅接收生成的检索词/);
+ assert.match(route,/本次深度思考匹配会向 DeepSeek Flash 发送/);
  assert.match(core,/\[邮箱已隐藏\]/);
  assert.match(core,/\[手机号已隐藏\]/);
  assert.match(core,/\[身份证号已隐藏\]/);
