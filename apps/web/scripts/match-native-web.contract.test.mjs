@@ -127,6 +127,7 @@ test('autonomous model candidates without returned web sources produce evidence-
  const response=deepEvidenceResponse([{url:posting,company:'示例汽车中国',
   title:'品牌督导',location:'上海',reason:'管理门店和培训的工作经验适用于区域督导。'}]);
  delete response.output[0].action.sources;
+ response.output=response.output.filter(item=>item.action?.type!=='open_page');
  await assert.rejects(runAutonomousDeepMatch('synthetic-secret-not-real',
   '门店区域督导与经销商管理经历。','督导',10,{
    fetcher:async()=>new Response(JSON.stringify(response),{status:200})
@@ -144,6 +145,7 @@ test('autonomous deep search distinguishes model no-jobs from filtered employer 
  thirdParty.output[0].action.sources=[
   {type:'url',url:'https://www.zhipin.com/job_detail/0123456.html',
    title:'招聘平台 督导岗位 招聘',snippet:'上海督导招聘职位'}];
+ thirdParty.output=thirdParty.output.filter(item=>item.action?.type!=='open_page');
  await assert.rejects(runAutonomousDeepMatch('synthetic-secret-not-real',
   '销售运营区域督导工作经验。','督导',10,{
    fetcher:async()=>new Response(JSON.stringify(thirdParty),{status:200})
