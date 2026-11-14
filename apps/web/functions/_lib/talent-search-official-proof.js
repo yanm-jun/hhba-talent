@@ -154,6 +154,18 @@ function sameTenantReference(officialPage, target) {
   return null;
 }
 
+/**
+ * Preflight link check for preventing unnecessary fetches to unrelated ATS
+ * tenants. The official careers page itself must still be authenticated by
+ * an independent employer proof before this check is called.
+ */
+export function authorizedEmployerAtsLink(officialPage, jobUrl) {
+  const target = normalizeUrl(jobUrl);
+  if (!target || recruitmentSourceKind(target.href) !== 'EMPLOYER_ATS') return null;
+  return exactJobReference(officialPage, target) ||
+    sameTenantReference(officialPage, target);
+}
+
 function hasSpecificJobPath(url) {
   if (!url || GENERIC_ROOT_PATH.test(url.pathname)) {
     if (!url) return false;
@@ -229,8 +241,7 @@ export function verifyOfficialJobEvidence(candidate, evidence = {}, options = {}
       return reject('OFFICIAL_SOURCE_UNCONFIRMED', 'NO_ATTESTED_EMPLOYER_CAREERS_PAGE', checkedAt);
     }
 
-    const authorization = exactJobReference(officialPage, jobUrl) ||
-      sameTenantReference(officialPage, jobUrl);
+    const authorization = authorizedEmployerAtsLink(officialPage, jobUrl.href);
     if (!authorization) {
       return reject('OFFICIAL_SOURCE_UNCONFIRMED', 'ATS_LINK_NOT_AUTHORIZED_BY_EMPLOYER', checkedAt);
     }
