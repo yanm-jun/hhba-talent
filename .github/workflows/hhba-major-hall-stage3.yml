@@ -1,0 +1,40 @@
+name: HHBA Major Cross-Hall Stage 3 Acceptance
+on:
+  push:
+    branches:
+      - feature/hhba-v1-major-cross-hall-stage3-20261114
+  pull_request:
+    branches:
+      - feature/hhba-v1-industry-halls-stage2-20261114
+      - main
+    paths:
+      - 'apps/web/src/data/majorHallGuide.json'
+      - 'apps/web/src/pages/MajorHallExplorer.tsx'
+      - 'apps/web/src/pages/IndustryLibraryPage.tsx'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/router.tsx'
+      - 'apps/web/src/styles/industry-library.css'
+      - 'apps/web/scripts/major-hall-stage3.contract.test.mjs'
+      - '.github/workflows/hhba-major-hall-stage3.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact web dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Validate source-backed directory and 102 major maps
+        working-directory: apps/web
+        run: node --test scripts/industry-library-stage2.contract.test.mjs scripts/major-hall-stage3.contract.test.mjs scripts/home-hero-layout.contract.test.mjs
+      - name: Verify TypeScript and React build types
+        working-directory: apps/web
+        run: npx tsc -b
