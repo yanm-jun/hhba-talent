@@ -51,7 +51,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
       <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
       <p>适配分仅供比较，不是录用概率。只展示中国大陆企业招聘岗位，不提供第三方招聘平台链接。{pending?'结果正在陆续生成，下方岗位可先查看。':'以下岗位网址来自 DeepSeek Search 结果，推荐原因由 V4 Pro 根据简历生成。'}</p>
      </div>
-     {!pending&&result.profile?.skills?.length>0&&<section className="hhba-match-profile-hints">
+     {!pending&&result.profile&&result.profile.skills.length>0&&<section className="hhba-match-profile-hints">
       <strong>本次识别到的简历能力线索</strong>
       <div>{result.profile.skills.map(item=><span key={item.name}>{item.name}</span>)}</div>
       <small>这些线索用于扩展岗位搜索和辅助匹配，不代表额外资质；最终以简历原文和岗位要求为准。</small>
