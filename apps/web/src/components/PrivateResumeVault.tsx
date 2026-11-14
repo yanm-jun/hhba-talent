@@ -146,6 +146,11 @@ export function PrivateResumeVault(){
        <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 保存本次简历。</span>
       </label>
      </div>
+     <details className="hhba-private-resume-details">
+      <summary>简历保存与 AI 分析授权说明</summary>
+      <p>上传不等于授权 DeepSeek 分析。此处授权仅用于将文件保存在你的 HHBA 私有简历空间；只有在智能匹配页面另行勾选 AI 分析授权并提交后，系统才会向 DeepSeek API 发送用于本次匹配的信息。保存简历不会自动公开或向企业投递。</p>
+      <p>简历文件存储于 Cloudflare R2 亚太区（APAC），该存储区域位于中国大陆境外。</p>
+     </details>
      <div className="hhba-private-resume-upload-actions">
       <button type="button" className="hhba-private-resume-submit" disabled={!file||!consent||busy}
        onClick={()=>void upload()}><ShieldCheck size={17}/>{operation==='upload'?'正在安全保存…':'确认授权并保存简历'}</button>
