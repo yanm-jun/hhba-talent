@@ -118,7 +118,7 @@ async function readProviderEvents(response,onProgress=()=>{},onPartial=()=>{},li
 function nativeResponsePayload(result){
  return {
   status:'COMPLETE',
-  profile:{education:null,education_evidence:null,experience_years:null,
+  profile:result.profile||{education:null,education_evidence:null,experience_years:null,
    experience_evidence:null,skills:[],target_roles:[],warnings:[]},
   matches:result.matches,
   // Search and domain heuristics cannot independently verify official hiring ownership.
@@ -322,7 +322,7 @@ export async function onRequest({request,env}){
  if(typeof input?.text!=='string'||input.text.length>20000||
     input.text.replace(/\s/g,'').length<30||!options||
     options.country!=='CN'||options.remote_only!==false||
-    typeof options.role_hint!=='string'||options.role_hint.length>80||
+    typeof options.role_hint!=='string'||options.role_hint.length>240||
     !Number.isInteger(options.limit)||options.limit<1||options.limit>10)
   return fail('INVALID_RESUME_TEXT',400);
  if(input.resume_id!==null&&input.resume_id!==undefined&&input.resume_id!==''){
