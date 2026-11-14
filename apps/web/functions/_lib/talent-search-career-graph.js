@@ -17,7 +17,7 @@ function asText(value, max = 500) {
 }
 
 function normalizeEvidence(value) {
-  return asText(value, 1200)
+  return asText(value, MAX_RESUME_CHARS)
     .normalize('NFKC')
     .toLocaleLowerCase()
     .replace(/[\u200b-\u200f\ufeff]/g, '')
