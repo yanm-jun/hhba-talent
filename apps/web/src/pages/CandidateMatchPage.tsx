@@ -226,7 +226,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
         {user&&privateResumeAvailable&&<div className="hhba-ai-saved-picker">
           <label htmlFor="hhba-ai-existing">使用「我的简历」中已经保存的文件（无需重新上传）</label>
           <select id="hhba-ai-existing" value={savedId} disabled={working}
-           onChange={e=>{previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);setSavedId(e.target.value);setFile(null);setResult(null);setError('');}}>
+           onChange={e=>{previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);setDetectedCapabilityHints([]);setSelectedCapabilityHints([]);updateSearchPreferences({capability_hints:[]});setSavedId(e.target.value);setFile(null);setResult(null);setError('');}}>
            <option value="">不使用已保存文件，改为下面选择新文件</option>
            {savedFiles.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}
           </select>

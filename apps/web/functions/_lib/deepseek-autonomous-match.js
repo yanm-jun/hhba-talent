@@ -158,6 +158,7 @@ export function buildDeepSearchRequest(resume,roleHint,limit=10,searchPreference
   '同时输出 fit_dimensions：role_fit、skill_fit、experience_fit、location_fit 四项0-100整数，并分别用简短证据说明。职位页面没有证据支持的维度不得给高分。match_score按 role_fit*0.30 + skill_fit*0.30 + experience_fit*0.25 + location_fit*0.15 计算并四舍五入。',
   '求职偏好必须按以下规则使用：岗位方向和行业偏好只决定优先级，不能限制其他匹配岗位；企业经营模式只作为优先搜索场景，不能排除其他真实雇主。',
   '地点偏好：'+JSON.stringify(intent.constraints.preferred_cities)+'；地点模式：'+intent.constraints.location_mode+'。PRIORITY 表示优先搜索这些城市，但仍可发现全国其他城市的好岗位；ONLY 表示只推荐这些城市；NATIONWIDE 表示中国大陆不限城市。',
+  '如果没有明确填写优先城市，必须按中国大陆全国范围搜索；不得根据用户当前所在地、简历中的历史工作城市或设备位置猜测求职城市。',
   '出差偏好：'+intent.constraints.travel_preference_label+'。如果明确不接受出差，排除职位详情明确要求出差/驻外的岗位；如果只接受偶尔出差，排除明确要求频繁或长期出差的岗位；没有证据时标记未知，不要推断。',
   '薪资偏好：最低月薪 '+(intent.constraints.salary_min_monthly_cny??'未设置')+' 元，最高月薪 '+(intent.constraints.salary_max_monthly_cny??'未设置')+' 元。已公开薪资要考虑是否符合期望并影响排序；未公开薪资可以推荐，但必须标记未披露，不得猜测。',
   '优先企业经营模式：'+JSON.stringify(intent.constraints.employer_model_labels)+'。这些是搜索重点而非限制；还要继续发现其他行业、其他商业模式中真正需要候选人能力的企业。',
