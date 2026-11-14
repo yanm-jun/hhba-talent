@@ -142,7 +142,7 @@ export function buildDeepSearchRequest(resume,roleHint,limit=10){
   '优先发现真实雇主和具体岗位，不要只追逐知名大公司。每轮主动搜索多个不同企业，避免结果集中在一两家企业；同一集团多条岗位可以保留，但必须是不同真实岗位。',
   '每个最终推荐岗位都必须实际打开具体职位详情页（open_page/find_in_page），不能只凭搜索摘要、搜索结果标题或招聘首页推荐。最终输出的 url 必须与本轮已打开的职位详情 URL 完全一致。',
   '每条岗位必须明确提供最低工作经验年限 minimum_experience_years（只有职位页明确写出数字才填写，否则 null）、experience_requirement、experience_requirement_evidence、education_requirement、education_requirement_evidence。不得从公司或行业惯例推断。候选人经验不足以满足明确最低年限的岗位，不得推荐。',
-  '同时输出 fit_dimensions：role_fit、skill_fit、experience_fit、location_fit 四项0-100整数，并分别用简短证据说明。职位页面没有证据支持的维度不得给高分。match_score按 role_fit*0.30 + skill_fit*0.30 + experience_fit*0.25 + location_fit*0.15 计算并四舍五入。';
+  '同时输出 fit_dimensions：role_fit、skill_fit、experience_fit、location_fit 四项0-100整数，并分别用简短证据说明。职位页面没有证据支持的维度不得给高分。match_score按 role_fit*0.30 + skill_fit*0.30 + experience_fit*0.25 + location_fit*0.15 计算并四舍五入。',
   '只寻找工作地点在中国大陆的真实招聘岗位；不提供港澳台、境外或不明确的海外岗位。允许外资企业在中国大陆招聘。',
   '招聘来源必须是企业自有官网招聘页面，或能从该企业官方官网/官方招聘入口确认归属的企业专属 ATS。严格排除 BOSS、智联、51job、猎聘、拉勾、前程无忧及所有其他第三方招聘平台、招聘聚合页、转载页。ATS 域名本身不等于企业官方，必须核实具体企业归属；无法确认就舍弃。',
   '新闻、社交媒体、企业介绍页只能作为发现企业的线索，不能作为最终岗位来源或投递链接。每个职位必须有本轮搜索/打开页面证据，链接必须指向企业官方具体岗位页；不允许拼接、猜测、补全 URL，也不可把招聘主页冒充具体职位页。',
@@ -199,7 +199,8 @@ export async function runAutonomousDeepMatch(key,resume,roleHint,limit=10,{
  const toolCalls=(data.output||[]).filter(item=>item.type==='web_search_call'&&item.status==='completed');
  const searched=toolCalls.some(item=>item.action?.type==='search');
  if(!searched)throw codeError('AI_DEEP_SEARCH_NO_WEB_EVIDENCE');
- const verified=verifiedDeepSearchMatches(data,limit);
+ const intent=buildRoleIntent(roleHint,resume);
+ const verified=verifiedDeepSearchMatches(data,limit,profile,intent);
  if(!verified.matches.length){
   // Diagnostic counts only. Never log resumes, search queries, model text,
   // job URLs, employer names, or provider payloads.
