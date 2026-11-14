@@ -50,7 +50,6 @@ export function MajorHallExplorer({manifest}:{manifest:Manifest}){
  const [errors,setErrors]=useState<string[]>([]);
  const [loading,setLoading]=useState(false);
  const [search,setSearch]=useState('');
- const [status,setStatus]=useState<'all'|'candidate'|'reviewed_history'>('all');
  const [page,setPage]=useState(1);
  const selectedGroup=majorGuide.groups.find(g=>g.majors.includes(major));
  const hallById=useMemo(()=>new Map(manifest.halls.map(h=>[h.id,h])),[manifest.halls]);
@@ -98,9 +97,8 @@ export function MajorHallExplorer({manifest}:{manifest:Manifest}){
  const rows=useMemo(()=>mergeAcrossHalls(selectedHalls,byHall),[selectedKey,byHall]);
  const matched=useMemo(()=>{
   const q=search.trim().toLocaleLowerCase();
-  return rows.filter(r=>(status==='all'||r.review===status)&&
-   (!q||(r.company+' '+r.url).toLocaleLowerCase().includes(q)));
- },[rows,status,search]);
+  return rows.filter(r=>!q||(r.company+' '+r.url).toLocaleLowerCase().includes(q));
+ },[rows,search]);
  const pageCount=Math.max(1,Math.ceil(matched.length/PAGE_SIZE));
  const currentPage=Math.min(page,pageCount);
  const visible=matched.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);
@@ -108,7 +106,7 @@ export function MajorHallExplorer({manifest}:{manifest:Manifest}){
   const found=majorGuide.groups.find(g=>g.majors.includes(value));
   setMajor(value);
   setSelectedHalls(found?found.halls.slice():[]);
-  setSearch('');setStatus('all');setPage(1);
+  setSearch('');setPage(1);
  };
  const toggleHall=(id:string)=>{
   setSelectedHalls(current=>current.includes(id)?current.filter(x=>x!==id):
@@ -176,13 +174,6 @@ export function MajorHallExplorer({manifest}:{manifest:Manifest}){
       <input type="search" value={search} maxLength={80} onChange={event=>{setSearch(event.target.value);setPage(1)}}
        placeholder="在所选行业馆中搜索企业或招聘网址" aria-label="跨行业搜索企业或招聘网址"/>
      </label>
-     <label className="hhba-library-filter"><span>网址来源状态</span>
-      <select value={status} aria-label="筛选跨行业网址来源" onChange={event=>{setStatus(event.target.value as typeof status);setPage(1)}}>
-       <option value="all">全部记录</option>
-       <option value="reviewed_history">曾有来源核对</option>
-       <option value="candidate">候选·待复核</option>
-      </select>
-     </label>
     </div>
     {loading&&<p className="hhba-library-empty" role="status">正在读取所选行业馆的静态目录…</p>}
     {!loading&&errors.length>0&&<p className="hhba-library-alert" role="alert">
@@ -195,9 +186,6 @@ export function MajorHallExplorer({manifest}:{manifest:Manifest}){
      {visible.map(record=><article className="hhba-library-record" key={record.company+'|'+record.url}>
       <div className="hhba-library-record-info">
        <strong>{record.company}</strong>
-       <span className={record.review==='reviewed_history'?'hhba-library-tag is-reviewed':'hhba-library-tag'}>
-        {record.review==='reviewed_history'?'曾有来源核对':'候选·待复核'}
-       </span>
        <small title={record.url}>{record.url}</small>
        <span className="hhba-major-record-halls">所属行业馆：{record.hallIds.map(id=>hallById.get(id)?.label||id).join('、')}</span>
       </div>
@@ -207,7 +195,7 @@ export function MajorHallExplorer({manifest}:{manifest:Manifest}){
       </a>
      </article>)}
     </div>}
-    {!loading&&!visible.length&&<p className="hhba-library-empty">当前没有符合条件的招聘网址。可以调整行业馆、搜索词或来源状态。</p>}
+    {!loading&&!visible.length&&<p className="hhba-library-empty">当前没有符合条件的招聘网址。可以调整行业馆或搜索词。</p>}
     {!loading&&pageCount>1&&<nav className="hhba-library-pager" aria-label="跨行业搜索分页">
      <button type="button" disabled={currentPage<=1} onClick={()=>setPage(p=>Math.max(1,p-1))}><ArrowLeft size={15}/> 上一页</button>
      <span>第 {currentPage} / {pageCount} 页 · 每页最多 {PAGE_SIZE} 条</span>
