@@ -1,8 +1,8 @@
-// HHBA search-first experience: DeepSeek Search -> optional Fetch -> V4 Pro ranking.
-// No ATS API, no company whitelist, no invented job links.
+// HHBA job matching: provider-managed DeepSeek deep-thinking web search.
+// Independent source validation rejects unsupported, unverified and fabricated job links.
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
-import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
+import {runAutonomousDeepMatch} from '../../_lib/deepseek-autonomous-match.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
@@ -127,9 +127,9 @@ function nativeResponsePayload(result){
    job.recruitment_source_kind==='EMPLOYER_DOMAIN_CANDIDATE'||
    job.recruitment_source_kind==='EMPLOYER_ATS').length,
   native_search:result.diagnostic,
-  source:'DeepSeek Search 官方接口检索 + V4 Pro 简历匹配',
+  source:'DeepSeek Flash 深度思考搜索 · 官方来源候选待核验',
   scoring:'AI 根据简历和招聘信息推荐；不代表录用概率',
-  privacy:'本次匹配会向 DeepSeek API 发送系统尝试遮盖部分标识信息的简历文字、求职偏好及提取出的学历/年限/技能线索；遮盖不保证完全匿名。DeepSeek Search 仅接收生成的检索词。匹配历史不保存简历正文。',
+  privacy:'本次深度思考匹配会向 DeepSeek Flash 发送系统尝试遮盖部分标识信息的简历文字、求职偏好和提取的能力线索；模型自主调用联网工具，搜索查询可能包含岗位、行业、城市等求职信息。遮盖不保证完全匿名。匹配历史不保存简历正文。',
   disclaimer:(result.incomplete?'本轮未达到10条或生成未完全结束，仅保留已找到的企业招聘入口。':'')+'严格不推荐第三方公开招聘平台；仅展示企业招聘站候选或企业专属招聘系统具体岗位。实际招聘归属、是否在招和投递资格仍须以企业官方公告为准。'
  };
 }
@@ -296,7 +296,7 @@ export async function onRequest({request,env}){
  const url=new URL(request.url);
  const tail=url.pathname.slice('/api/match-native'.length).replace(/\/$/,'')||'/';
  if(tail==='/status'&&request.method==='GET')
-  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'SEARCH_FIRST_V1',formats:['pdf','docx']});
+  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'PROVIDER_DEEP_THINKING_V1',formats:['pdf','docx']});
  if(!enabled(env))return fail('MATCH_NOT_ENABLED',503);
  if(tail==='/provider-check'&&request.method==='GET'){
   try{
@@ -360,7 +360,7 @@ export async function onRequest({request,env}){
       if(!ended)send('progress',{stage:'waiting'});
      },12000);
      try{
-      const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
+      const result=await runAutonomousDeepMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
        options.role_hint,options.limit,{signal:abort.signal,onProgress:stage=>{
         phase=stage;send('progress',{stage});
        },onPartial:matches=>send('partial',{matches})});
@@ -388,7 +388,7 @@ export async function onRequest({request,env}){
  }
 
  try{
-  const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
+  const result=await runAutonomousDeepMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
    options.role_hint,options.limit);
   console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
   return json(await withSavedHistory(env,candidate,input,result));
