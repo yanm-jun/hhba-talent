@@ -269,12 +269,15 @@ test('frontend fetches one native SSE stream and maps stages without restarting 
  const {readFile}=await import('node:fs/promises');
  const svc=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
  const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(svc,/'Accept':'text\/event-stream'/);
  assert.match(svc,/consumeNativeMatchStream/);
  assert.match(svc,/event==='complete'/);
  assert.match(svc,/event==='failure'/);
  assert.match(page,/setStage/);
- assert.match(page,/DeepSeek 深度思考搜索正在核实中国大陆招聘岗位/);
+ assert.match(page,/<CandidateMatchNativeDialog/);
+ assert.match(dialog,/DeepSeek 深度思考搜索正在核实中国大陆招聘岗位/);
+ assert.match(dialog,/hhba-match-progress/);
 });
 
 
