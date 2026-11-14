@@ -79,3 +79,16 @@ test('mobile home retains real React homepage instead of deferring its key secti
   assert.match(home,/title="我要应聘"/);
   assert.doesNotMatch(home,/DeferredHomeSection/);
 });
+
+test('loading screens share HHBA logo blue and orange accents without green text',()=>{
+  const main=readFileSync(resolve('src/main.tsx'),'utf8');
+  const builder=readFileSync(resolve('scripts/build-search-index-assets.mjs'),'utf8');
+  assert.match(main,/color:'#1373fa'/);
+  assert.match(main,/color:'#ff9a24'/);
+  assert.match(main,/color:'#7588a1'/);
+  assert.match(builder,/color:#1373fa/);
+  assert.match(builder,/hhba-boot-dot\\{color:#ff9a24\\}/);
+  assert.match(builder,/hhba-boot-detail\\{font-size:13px;color:#7588a1/);
+  assert.doesNotMatch(main,/color:'#244e3c'|color:'#667e71'/);
+  assert.doesNotMatch(builder,/color:#21483b|color:#658075/);
+});
