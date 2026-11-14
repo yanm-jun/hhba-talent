@@ -194,11 +194,13 @@ export function CandidateMatchPage({user}:{user:User|null}){
          </div>}
         </div>
         <header className="hhba-ai-section-title"><h2>2. 选择工作方向</h2>
-          <p>可选填目标方向；不填写时，AI 会根据简历为你推荐。</p></header>
+          <p>可填写岗位、行业、城市或出差偏好；HHBA 会自动扩展相关岗位名称，不必自己罗列关键词。</p></header>
         <div className="hhba-ai-mainland-only"><span>工作区域</span><strong>中国大陆</strong><small>不推荐港澳台或境外岗位</small></div>
         <div className="hhba-ai-fields hhba-ai-fields-one">
-         <label>目标岗位方向<input value={options.role_hint} maxLength={80} placeholder="例如：软件开发、数据分析、销售、视觉设计"
-          onChange={e=>setOptions(x=>({...x,role_hint:e.target.value}))}/></label>
+         <label>目标岗位方向与求职偏好<textarea rows={3} maxLength={240} value={options.role_hint}
+          placeholder="例如：督导，全国范围可出差，汽车零售优先；也考虑区域运营和渠道管理"
+          onChange={e=>setOptions(x=>({...x,role_hint:e.target.value}))}/>
+          <small>只需写你想做什么、偏好什么；岗位关键词由 HHBA 自动扩展。</small></label>
         </div>
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
