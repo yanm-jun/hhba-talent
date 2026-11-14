@@ -53,7 +53,23 @@ The active `deepseek-search-match.js` path currently:
 
 This explains why simply increasing the prompt length or changing the model is unlikely to solve the problem.
 
-### 2.3 Existing code worth reusing
+### 2.3 Additional legacy constraints discovered
+
+The older `domestic-search-fetch.js` path is not a general open-web discovery engine:
+- Its `OFFICIAL` locator map contains only four fixed employers/domains: Tencent, Huawei, Meituan, and JD.
+- The default path is capped at two Search calls and three Fetch calls; the expanded path is capped at four Search calls and eight Fetch calls.
+- `safeOfficialJobLocator` accepts a small set of employer-specific URL paths and ID formats, so unknown companies cannot pass this legacy verifier even if their official job pages are found.
+- `domestic-match-fusion.js` uses that same fixed locator as a gate for external jobs.
+
+The existing `resume-role-evidence.js` also contains a hard-coded list of roughly 29 career directions and returns at most six. This is a useful safety baseline for known examples, but it is not a universal career ontology and cannot be the final career-expansion engine for all occupations.
+
+The new design must replace fixed employer and fixed occupation catalogs with dynamic evidence-based discovery:
+- accept a newly discovered employer when official-domain/ATS evidence is proven;
+- allow new occupations and role families when the resume contains verifiable responsibility evidence;
+- require exact resume evidence snippets for each proposed career direction, rather than relying only on a hard-coded regex catalog;
+- preserve strict source, Mainland location, qualification, and professional-credential gates.
+
+### 2.4 Existing code worth reusing
 
 The repository already contains useful components:
 - `match-ranking.js`: deterministic, provider-independent ranking with fixed baseline weights (role 30, skills 30, experience 20, education 10, location 10). It explicitly requires authenticated official job provenance before ranking.
@@ -61,9 +77,9 @@ The repository already contains useful components:
 - `domestic-search-fetch.js`: an official-source discovery/fetch implementation and safe job locator checks.
 - Existing resume redaction, explicit consent, candidate session checks, match history, and D1/R2 storage infrastructure.
 
-These should be audited and reused where appropriate rather than replaced wholesale.
+These should be audited and reused where appropriate rather than replaced wholesale. Reuse candidates include deterministic hard-gate/score components, Mainland location checks, resume redaction, credential checks, bounded parsing and audit patterns. Do **not** reuse the fixed four-employer locator map or the fixed 29-role career catalog as universal constraints.
 
-### 2.4 Competing/legacy routes
+### 2.5 Competing/legacy routes
 
 The repository also contains:
 - A standalone `/api/match/discover` preview endpoint whose response explicitly says it is not integrated into Top 10.
@@ -72,7 +88,7 @@ The repository also contains:
 
 The new work must converge these capabilities into one authoritative search-and-ranking pipeline. It must not leave a better discovery path disconnected from the user-facing page.
 
-### 2.5 Historical V8 experiment
+### 2.6 Historical V8 experiment
 
 The branch `feature/match-v8-deepseek-dynamic-official-discovery-20261108` was inspected as prior research, not as a merge candidate.
 
@@ -98,7 +114,7 @@ Generate a career graph from evidence, not only from resume job-title strings. S
 2. Adjacent roles: related responsibilities or operating model.
 3. Transferable roles: other industries where the candidate's proven capabilities apply.
 
-The user should not need to type target job keywords to make search work. The UI may let the user edit AI-generated directions, but they are optional suggestions, not a prerequisite.
+The user should not need to type target job keywords to make search work. The UI may let the user edit AI-generated directions, but they are optional suggestions, not a prerequisite. Career directions must be dynamically generated from the candidate's evidence and validated by exact source excerpts, so new or uncommon occupations are not blocked by a static list of 29 roles.
 
 ### 3.2 Search orchestration
 
@@ -158,7 +174,7 @@ Do not browser-render every search result. Do not bypass authentication or anti-
 
 ### 3.5 Official-source proof and job evidence ledger
 
-A URL is not official merely because it contains `career`, `jobs`, or `recruitment`.
+A URL is not official merely because it contains `career`, `jobs`, or `recruitment`. The new verifier must be dynamic and cannot require a company to exist in the four-domain legacy allowlist or the existing enterprise directory.
 
 For each employer and job, store evidence:
 - legal/employer display name and normalized entity
