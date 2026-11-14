@@ -195,6 +195,7 @@ export function selectedJobs(text,hits,limit=10){
    education_requirement:clean(row.education_requirement,100)||null,
    education_requirement_evidence:clean(row.education_requirement_evidence,180)||null,
    fit_dimensions:row.fit_dimensions&&typeof row.fit_dimensions==='object'?row.fit_dimensions:null,
+   fit_dimension_evidence:row.fit_dimension_evidence&&typeof row.fit_dimension_evidence==='object'?row.fit_dimension_evidence:null,
    checked_at:new Date().toISOString()
   });
   if(found.length>=limit)break;
