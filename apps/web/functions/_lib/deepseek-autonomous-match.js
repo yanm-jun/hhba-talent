@@ -84,8 +84,8 @@ export function verifiedDeepSearchMatches(response,limit=10,resumeProfile=null,i
   if(constraints.location_mode==='ONLY'&&preferredCities.length&&
      !preferredCities.some(city=>normalizedLocation.includes(String(city).replace(/市/g,''))))continue;
   const travelEvidence=String(row.travel_requirement||'')+' '+String(row.travel_requirement_evidence||'');
-  if(constraints.travel_preference==='NO'&&/出差|驻外|全国巡店|跨区域巡回|长期外派/.test(travelEvidence))continue;
-  if(constraints.travel_preference==='OCCASIONAL'&&/频繁出差|长期出差|长期驻外|全国巡回|长期外派/.test(travelEvidence))continue;
+  if(constraints.travel_preference_code==='NO'&&/出差|驻外|全国巡店|跨区域巡回|长期外派/.test(travelEvidence))continue;
+  if(constraints.travel_preference_code==='OCCASIONAL'&&/频繁出差|长期出差|长期驻外|全国巡回|长期外派/.test(travelEvidence))continue;
   mapped.push({...row,id:hit.id,url:undefined,official_url:undefined});
  }
  const matches=selectedJobs(JSON.stringify({jobs:mapped}),hits,limit)
