@@ -7,12 +7,12 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
+import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type MatchSearchPreferences,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const maxResumeSize=3*1024*1024;
-const defaultSearchPreferences={
+const defaultSearchPreferences:MatchSearchPreferences={
  industry_hint:'',preferred_cities:'',location_mode:'PRIORITY' as const,
  travel_preference:'UNSPECIFIED' as const,salary_min_k:'',salary_max_k:'',employer_models:[] as string[]
 };
@@ -57,7 +57,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
  });
  const searchPreferences={...defaultSearchPreferences,...options.search_preferences};
  const capabilityHints=previewLoaded?inferResumeCapabilityHints(previewText):[];
- function updateSearchPreferences(patch:Partial<typeof defaultSearchPreferences>){
+ function updateSearchPreferences(patch:Partial<MatchSearchPreferences>){
   setOptions(current=>({...current,search_preferences:{
    ...defaultSearchPreferences,...current.search_preferences,...patch
   }}));
@@ -267,7 +267,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
               </label>
               <label>地点要求
                 <select value={searchPreferences.location_mode}
-                 onChange={e=>updateSearchPreferences({location_mode:e.target.value as typeof defaultSearchPreferences.location_mode})}>
+                 onChange={e=>updateSearchPreferences({location_mode:e.target.value as MatchSearchPreferences['location_mode']})}>
                   <option value="PRIORITY">优先这些城市，也可推荐全国其他城市</option>
                   <option value="ONLY">仅限填写的城市</option>
                   <option value="NATIONWIDE">全国不限城市</option>
@@ -276,7 +276,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
               </label>
               <label>出差接受程度
                 <select value={searchPreferences.travel_preference}
-                 onChange={e=>updateSearchPreferences({travel_preference:e.target.value as typeof defaultSearchPreferences.travel_preference})}>
+                 onChange={e=>updateSearchPreferences({travel_preference:e.target.value as MatchSearchPreferences['travel_preference']})}>
                   <option value="UNSPECIFIED">未限定，按岗位情况推荐</option>
                   <option value="FREQUENT_OK">接受全国出差 / 跨区域工作</option>
                   <option value="OCCASIONAL">可以偶尔出差，不接受长期驻外</option>
