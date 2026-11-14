@@ -106,7 +106,6 @@ export function Shell({ user, children }: { user: User | null; children: React.R
      <Link className="auth" to="/candidate/jobs">招聘市场</Link>
      <Link className="auth" to="/companies/discover">企业招聘导航</Link>
      <Link className="auth" to="/candidate/saved">我的收藏</Link>
-     <Link className="hhba-nav-switch" to="/companies/discover">企业招聘导航 <Building2 size={13}/></Link>
      {candidateSignedIn?<CandidateAccountDropdown displayName={user?.display_name}/>:<Link className="hhba-nav-account" to="/auth">登录 / 注册</Link>}
    </nav>:<nav aria-label="企业招聘与治理导航">
      <HeaderSiteSearch/>
