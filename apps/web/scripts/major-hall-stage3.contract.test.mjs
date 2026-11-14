@@ -46,8 +46,8 @@ test('professional exploration never claims job matching or current openings',()
  assert.match(explorer,/不是企业是否正在招聘该专业的证明/);
  assert.match(explorer,/不一定招聘该专业/);
  assert.match(explorer,/以企业招聘网站为准|请到招聘官网查看/);
- assert.match(explorer,/候选·待复核/);
- assert.match(explorer,/曾有来源核对/);
+ assert.doesNotMatch(explorer,/候选·待复核|曾有来源核对|hhba-library-tag|网址来源状态/);
+ assert.match(explorer,/未经过核验的网址|未经核验的网址|不提供实时职位/);
  assert.match(explorer,/数据可能不完整/);
  assert.ok(explorer.includes('safeUrl(entry.url)'));
  assert.ok(explorer.includes("u.protocol==='https:'"));
@@ -62,7 +62,7 @@ test('search, custom halls, dedupe, partial-load errors and 25-per-page are impl
  assert.ok(explorer.includes('const results=new Map<string,CrossHallRow>()'));
  assert.ok(explorer.includes("previous.hallIds.push(hallId)"));
  assert.ok(explorer.includes('setErrors(failed)'));
- assert.ok(explorer.includes("filter(r=>(status==='all'||r.review===status)"));
+ assert.ok(explorer.includes("rows.filter(r=>!q"));
  assert.ok(explorer.includes('role="alert"'));
  assert.ok(explorer.includes('aria-label="跨行业搜索分页"'));
  assert.ok(css.includes('@media(max-width:620px)'));

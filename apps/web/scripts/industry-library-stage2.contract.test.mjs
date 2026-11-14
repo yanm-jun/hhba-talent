@@ -87,8 +87,8 @@ test('static files load one hall at a time, with search, filters and safe outbou
  assert.ok(src.includes('setPage(1)'));
  assert.ok(src.includes('item.company'));
  assert.ok(src.includes('item.url'));
- assert.ok(src.includes('候选·待复核'));
- assert.ok(src.includes('曾有来源核对'));
+ assert.doesNotMatch(src,/候选·待复核|曾有来源核对|hhba-library-tag|网址来源状态/);
+ assert.ok(src.includes('部分招聘网址仍待复核'));
  assert.ok(src.includes('data-hhba-recruitment-outbound="true"'));
  assert.ok(src.includes('rel="noopener noreferrer"'));
  assert.ok(src.includes("url.protocol!=='https:'"));

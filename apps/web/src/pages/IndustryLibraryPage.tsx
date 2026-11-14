@@ -95,10 +95,9 @@ function HallDetails({manifest,hallId}:{manifest:HallManifest;hallId:string}){
  const [data,setData]=useState<HallFile|null>(null);
  const [error,setError]=useState('');
  const [search,setSearch]=useState('');
- const [filter,setFilter]=useState<'all'|'candidate'|'reviewed_history'>('all');
  const [page,setPage]=useState(1);
  useEffect(()=>{
-  setData(null);setError('');setSearch('');setFilter('all');setPage(1);
+  setData(null);setError('');setSearch('');setPage(1);
   if(!selected)return;
   const controller=new AbortController();
   fetch(ROOT+hallId+'.json',{signal:controller.signal,cache:'force-cache'})
@@ -114,11 +113,8 @@ function HallDetails({manifest,hallId}:{manifest:HallManifest;hallId:string}){
  },[hallId,selected?.published]);
  const matched=useMemo(()=>{
   const q=search.trim().toLocaleLowerCase();
-  return (data?.records||[]).filter(item=>
-   (filter==='all'||item.review===filter)&&
-   (!q||(item.company+' '+item.url).toLocaleLowerCase().includes(q))
-  );
- },[data,search,filter]);
+  return (data?.records||[]).filter(item=>!q||(item.company+' '+item.url).toLocaleLowerCase().includes(q));
+ },[data,search]);
  const pageCount=Math.max(1,Math.ceil(matched.length/PAGE_SIZE));
  const currentPage=Math.min(page,pageCount);
  const visible=matched.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);
@@ -140,14 +136,6 @@ function HallDetails({manifest,hallId}:{manifest:HallManifest;hallId:string}){
     <input type="search" value={search} maxLength={80} onChange={event=>{setSearch(event.target.value);setPage(1)}}
      placeholder="搜索企业名称或招聘网址" aria-label="搜索当前行业馆的企业和网址"/>
    </label>
-   <label className="hhba-library-filter">
-    <span>网址来源状态</span>
-    <select value={filter} aria-label="筛选网址状态" onChange={event=>{setFilter(event.target.value as typeof filter);setPage(1)}}>
-     <option value="all">全部记录</option>
-     <option value="reviewed_history">曾有来源核对</option>
-     <option value="candidate">候选·待复核</option>
-    </select>
-   </label>
   </div>
   {!data&&!error&&<p className="hhba-library-empty" role="status">正在读取本馆的静态目录…</p>}
   {error&&<p className="hhba-library-empty" role="alert">本馆暂时无法加载：{error}。不会用模拟企业填充，请稍后刷新。</p>}
@@ -159,9 +147,6 @@ function HallDetails({manifest,hallId}:{manifest:HallManifest;hallId:string}){
      return <article className="hhba-library-record" key={item.company+'|'+item.url+'|'+index}>
       <div className="hhba-library-record-info">
        <strong>{item.company}</strong>
-       <span className={item.review==='reviewed_history'?'hhba-library-tag is-reviewed':'hhba-library-tag'}>
-        {item.review==='reviewed_history'?'曾有来源核对':'候选·待复核'}
-       </span>
        <small title={item.url}>{item.url}</small>
       </div>
       {url?<a href={url} className="hhba-library-outbound" target="_blank" rel="noopener noreferrer"

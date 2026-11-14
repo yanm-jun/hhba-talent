@@ -114,9 +114,6 @@ export function GlobalCompanySearch({asOf,halls}:{asOf:string;halls:Hall[]}){
       <div className="hhba-company-result-links">
        {links.map(link=><div className="hhba-company-result-url" key={link.url}>
         <span className="hhba-company-result-urltext" title={link.url}>{link.url}</span>
-        <span className={link.review==='reviewed_history'?'hhba-library-tag is-reviewed':'hhba-library-tag'}>
-         {link.review==='reviewed_history'?'曾有来源核对':'候选·待复核'}
-        </span>
         <a href={safeUrl(link.url)} target="_blank" rel="noopener noreferrer"
          data-hhba-recruitment-outbound="true"
          aria-label={'前往'+result.company+'的招聘网址'}>
