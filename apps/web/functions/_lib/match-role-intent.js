@@ -141,8 +141,9 @@ export function buildSupplementalRoleQueries(roleHint='',resume='',city=''){
  const intent=buildRoleIntent(roleHint,resume),c=intent.constraints;
  const location=city||c.preferred_cities[0]||(c.national_scope?'全国':'中国大陆');
  const travel=c.travel_preference.includes('优先')?'全国出差':'';
- const a=query([intent.direct_roles.slice(3,9),location,travel,'招聘 职位详情 企业官网']);
- const b=query([intent.adjacent_roles.slice(0,7),intent.industry_terms.slice(0,2),location,'社会招聘 官方招聘']);
+ const industry=unique([...c.industry_preferences,...intent.industry_terms],4);
+ const a=query([intent.direct_roles.slice(3,9),industry,location,travel,'招聘 职位详情 企业官网']);
+ const b=query([intent.adjacent_roles.slice(0,7),industry,location,'社会招聘 官方招聘']);
  return [...new Set([a,b].filter(Boolean))].slice(0,2);
 }
 function evidence(text,pattern){
