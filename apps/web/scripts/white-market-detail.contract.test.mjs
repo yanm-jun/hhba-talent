@@ -9,7 +9,7 @@ const archive=readFileSync(new URL('../src/pages/CandidateJobsPage.tsx',import.m
 
 test('white HHBA keeps both candidate and employer entrances',()=>{
  assert.ok(home.includes('title="我要应聘"'));
- assert.ok(home.includes('title="我要招人"'));
+ assert.ok(home.includes('title="企业招聘导航"'));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
 });
 test('job cards only link internally to the white detail page',()=>{
