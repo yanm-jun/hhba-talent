@@ -225,7 +225,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
     {current==='privacy'&&<section className="hhba-account-panel">
      <div className="hhba-account-section-heading"><div><h2>账户与隐私</h2><p>查看账户安全、数据使用说明和历史记录清理。</p></div></div>
      <div className="hhba-account-privacy-row"><div><strong><ShieldCheck size={18}/>AI 简历匹配与第三方服务</strong>
-      <p>只有在智能岗位匹配页面勾选单独授权并提交后，HHBA 才会为本次匹配向 DeepSeek API 发送相关信息。DeepSeek Search 接收由求职方向、行业和城市等信息生成的检索词，不接收整份简历；DeepSeek V4 Pro 匹配分析会接收系统处理后的简历文字、求职偏好，以及从简历提取的学历、明确写出的工作年限和技能证据等线索。</p>
+      <p>只有在智能岗位匹配页面勾选单独授权并提交后，HHBA 才会为本次匹配向 DeepSeek API 发送相关信息。DeepSeek Flash 深度思考匹配会接收系统处理后的简历文字、求职偏好，以及从简历提取的学历、明确写出的工作年限和技能证据等线索。模型会自主使用联网搜索和网页阅读工具；搜索查询可能包含岗位、行业、工作城市等信息。HHBA 不保证这些工具只接收到固定数量的查询内容。</p>
       <p>系统目前会尝试遮盖邮箱、手机号、身份证号、个人网址及微信/QQ号，但不会自动识别并遮盖姓名、学校、任职企业、工作经历和项目内容，也不能保证完全匿名。请在提交前预览并编辑简历文字，不要发送不愿提供给第三方服务的信息。自动遮盖可能存在遗漏。</p>
       <p>本次匹配接口不会把简历正文写入匹配历史；匹配历史会保存岗位推荐结果和你填写的求职方向。若你选择使用此前保存的简历，历史记录可能关联该简历 ID，原文件仍按「我的简历」功能的私有存储规则保存；目前生产和预览简历存储桶均位于 Cloudflare R2 亚太区（APAC），即中国大陆境外。</p>
       <p>简历不会因此向招聘企业公开，也不会自动投递。DeepSeek 属于第三方服务，其对收到信息的处理还受其服务条款和隐私规则约束。</p>
