@@ -23,11 +23,11 @@ test('mobile spacing and headline remain readable without horizontal overflow',(
 });
 test('original landing double-entry and real job market are preserved',()=>{
  for(const t of ['让机会与人才，找到彼此。','你来到这里，是为了什么？',
-    'title="我要应聘"','title="我要招人"','<UnifiedJobMarket compact/>']){
+    'title="我要应聘"','title="企业招聘导航"','<UnifiedJobMarket compact/>']){
   assert.ok(home.includes(t),'home content unexpectedly removed: '+t);
  }
  assert.ok(home.includes("candidateSignedIn?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'"),
    'candidate entry must reach AI upload after login');
- assert.ok(home.includes(":'/employer/start'"),'employer entry must stay unchanged');
+ assert.ok(home.includes(":'/companies/discover'"),'company directory entry must lead to an existing browse route');
  assert.ok(home.includes('className="home-match-promo"'),'resume matching link changed');
 });

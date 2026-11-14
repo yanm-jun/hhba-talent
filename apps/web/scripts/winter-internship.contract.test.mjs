@@ -13,7 +13,7 @@ test('winter campaign replaces ONLY original homepage letter auto-popup',()=>{
  assert.ok(letter.includes('if (!autoOpen) return null;'),'letter must never auto-open during a regular visit');
  assert.ok(popup.includes("get('letter')!=='1'"),'explicit letter shares must not be covered by winter popup');
  assert.ok(existsSync(new URL('../src/components/HomeOpenLetter.tsx',import.meta.url)),'public letter source must stay present');
- for(const stable of ['<UnifiedJobMarket compact/>','<HomeCompanyMarquee/>','我要应聘','我要招人'])assert.ok(home.includes(stable),stable+' must remain');
+ for(const stable of ['<UnifiedJobMarket compact/>','<HomeCompanyMarquee/>','我要应聘','企业招聘导航'])assert.ok(home.includes(stable),stable+' must remain');
  assert.ok(!home.includes('HomePeopleBanner'),'removed lower-right photo popup must never reappear');
 });
 test('every homepage visit modal uses accessible close/escape/backdrop and real internal CTA',()=>{

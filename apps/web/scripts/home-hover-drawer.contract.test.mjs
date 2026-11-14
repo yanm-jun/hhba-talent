@@ -8,13 +8,12 @@ const model = read('../src/components/homeLiveMetricsPreview.ts');
 const css = read('../src/styles/home-live-drawer.css');
 const html = read('../../../previews/home-hover-drawer-20261109/index.html');
 
-test('only the independent drawer is added to the original homepage',()=>{
- assert.equal((home.match(/<HomeLiveDrawer\/>/g)||[]).length,1);
+test('stage 1 removes the live drawer and redirects the second entry to the candidate directory',()=>{
+ assert.doesNotMatch(home, /HomeLiveDrawer|hhba-rail-trigger|我要招人/);
  for (const s of ['让机会与人才，找到彼此。','你来到这里，是为了什么？',
-  'title="我要应聘"','title="我要招人"','<UnifiedJobMarket compact/>',
-  '<HomeCompanyMarquee/>']) assert.ok(home.includes(s),s);
+  'title="我要应聘"','title="企业招聘导航"','<UnifiedJobMarket compact/>',
+  '<HomeCompanyMarquee/>',"'/companies/discover'"]) assert.ok(home.includes(s),s);
  assert.doesNotMatch(home, /HomePeopleBanner/);
- assert.ok(css.includes('position:absolute')&&css.includes('right:0')&&css.includes('pointer-events:none'));
 });
 test('the right-side panel opens on hover and closes after leaving',()=>{
  for(const s of ['onMouseEnter','onMouseLeave','aria-expanded={open}',
@@ -40,6 +39,5 @@ test('2026-2027 official holiday and makeup-workday rules are present',()=>{
 });
 test('brand colors and preview-only disclosure are preserved',()=>{
  for(const s of ['#1979ed','#f49c28','#f7a22c'])assert.ok(css.includes(s));
- assert.ok(drawer.includes('不代表真实在线、投递或 Offer 成果'));
  assert.ok(html.includes('不代表真实在线、投递或 Offer 成果'));
 });
