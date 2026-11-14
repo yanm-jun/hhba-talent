@@ -38,7 +38,7 @@ function string(value, max = 512) {
 }
 
 function compact(value) {
-  return string(value, 3000)
+  return string(value, 100000)
     .normalize('NFKC')
     .replace(/[\s\p{P}\p{S}]+/gu, '')
     .toLocaleLowerCase();
@@ -249,6 +249,13 @@ export function verifyOfficialJobEvidence(candidate, evidence = {}, options = {}
   const employer = string(field.company || candidate.company, 150);
   if (!companyMatch(employer, proof)) {
     return reject('OFFICIAL_SOURCE_UNCONFIRMED', 'EMPLOYER_NAME_MISMATCH', checkedAt);
+  }
+  // Employer-hosted ATS tenants are shared infrastructure. Even after a
+  // legitimate cross-domain link, demand the employer brand in the fetched
+  // position page rather than accepting a model-supplied company field.
+  if (!isEmployerDomain && ![proof.company, ...(Array.isArray(proof.aliases) ? proof.aliases : [])]
+    .some(alias => exactQuotedValue(pageText, alias, 2))) {
+    return reject('OFFICIAL_SOURCE_UNCONFIRMED', 'ATS_JOB_EMPLOYER_NOT_GROUNDED', checkedAt);
   }
 
   const title = string(field.title, 140);
