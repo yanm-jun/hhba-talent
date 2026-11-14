@@ -137,7 +137,7 @@ test('real Search API shape: parallel queries with query/count/need_content and 
  const results=await searchPublicJobs('synthetic-secret-not-real',cv,'AI产品经理',{fetcher});
  assert.ok(calls.length>=3);
  assert.ok(calls.every(x=>x.url==='https://api.deepseek.com/v1/tools/search'));
- assert.ok(calls.every(x=>x.body.query.length<=128&&x.body.count===20&&x.body.need_content===false));
+ assert.ok(calls.every(x=>x.body.query.length<=128&&x.body.count===50&&x.body.need_content===false));
  assert.equal(results.hits.length,7);
  const fetched=await enrichCandidateDetails('synthetic-secret-not-real',
   results.hits,{fetcher,maxFetch:2});
