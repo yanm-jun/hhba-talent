@@ -425,7 +425,6 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
     const supplemental=await searchPublicJobs(key,resume,roleHint,{
      ...opts,queriesOverride:queries,maxHits:48,allowEmpty:true,queryTimeoutMs:opts.supplementalTimeoutMs??9000
     });
-    supplemental.diagnostic.queries=Math.min(supplemental.diagnostic.queries,queries.length);
     additionalSuccesses=supplemental.diagnostic.successful_searches;
     supplementSearchMs=supplemental.diagnostic.search_ms;
     additionalCandidates=supplemental.hits.length;
@@ -486,7 +485,7 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
   elapsed_ms:Date.now()-start,search_ms:search.diagnostic.search_ms,
   fetch_ms:enriched.fetch_ms,model_ms:firstModelMs+secondModelMs+detail.detail_ms,
   candidate_links:search.diagnostic.candidate_links,excluded_closed:enriched.excluded_closed,
-  checked_pages:fetchSuccesses,mode:'deep-search-staged',
+  checked_pages:fetchSuccesses,mode:'search-first-staged',search_tier:'deep-search-tool-budget',
   primary_raw_hits:search.diagnostic.raw_results,
   primary_filtered_links:search.diagnostic.rejected_links,
   primary_candidates:search.diagnostic.candidate_links,
@@ -494,7 +493,7 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
   initial_closed:enriched.excluded_closed,
   third_party_results_shown:0,
   initial_model_rows:firstRows,initial_visible:first.matches.length,
-    supplement_queries:additionalQueries,supplement_search_ms:supplementSearchMs,
+  supplement_queries:additionalQueries,supplement_search_ms:supplementSearchMs,
   supplement_failed:supplementalFailed,supplement_found:additionalCandidates,
   supplement_filtered_links:additionalFiltered,supplement_model_rows:secondRows,
   final_shortlisted:visible.length,details_expanded:detail.expanded,
