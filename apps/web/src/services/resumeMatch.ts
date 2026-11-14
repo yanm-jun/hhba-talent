@@ -66,6 +66,7 @@ const errorMap:Record<string,string>={
   RESUME_NOT_FOUND:'这份简历不在当前账户，请重新选择。',
   EXPLICIT_AI_SHARING_CONSENT_REQUIRED:'请先确认本次第三方 AI 分析授权。',
   INVALID_RESUME_TEXT:'简历中没有足够可复制的文字，请使用文字版 PDF 或 DOCX。',
+  INVALID_SEARCH_PREFERENCES:'求职偏好设置不完整，请检查城市、薪资范围和出差要求。',
   OFFICIAL_JOB_INDEX_UNAVAILABLE:'岗位官方审核数据暂时不可用，请稍后再试。',
   NO_VERIFIED_DOMESTIC_JOBS:'目前尚无通过最新审核的中国大陆岗位，本次没有调用 AI，也没有扣匹配次数。我们正在补充国内招聘来源。',
   AI_PROVIDER_UNAVAILABLE:'AI 接口出现异常，请稍后再试。',
