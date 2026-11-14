@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {safeJobDetailLink,parseJobAnswer,wasWebSearched,outputText,partialJobMatchesFromText,decodeSearchText} from '../functions/_lib/deepseek-native-match.js';
 import {runNativeJobMatch,runNativeDualMatch,combineNativeBatches,onRequest} from '../functions/api/match-native/[[path]].js';
 import {buildDeepSearchRequest,verifiedDeepSearchMatches,runAutonomousDeepMatch} from '../functions/_lib/deepseek-autonomous-match.js';
-import {buildResumeProfile} from '../functions/_lib/match-role-intent.js';
+import {buildResumeProfile,buildRoleIntent} from '../functions/_lib/match-role-intent.js';
 const posting='https://careers.examplecorp.com/jobs/brand-supervisor-2026';
 const answer={jobs:[
  {company:'示例汽车中国',title:'品牌督导',location:'上海',salary:'15000-20000 元/月',
