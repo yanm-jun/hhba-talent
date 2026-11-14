@@ -9,7 +9,7 @@ export function explicitPreferredCity(resume,roleHint=''){
 export function supplementalQueries(resume,roleHint,primaryQueries=[]){
  const city=explicitPreferredCity(resume,roleHint);
  return buildSupplementalRoleQueries(roleHint,resume,city)
-  .filter(q=>!primaryQueries.includes(q)).slice(0,2);
+  .filter(q=>!primaryQueries.includes(q)).slice(0,6);
 }
 export function mergeCandidateHits(initial,additional,max=48){
  const normalized=new Set(),merged=[];
