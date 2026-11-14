@@ -127,12 +127,13 @@ export function buildRoleSearchQueries(roleHint='',resume=''){
  const intent=buildRoleIntent(roleHint,resume),c=intent.constraints;
  const travel=c.travel_preference.includes('优先')?'全国出差':'';
  const industry=unique([...intent.constraints.industry_preferences,...intent.industry_terms],4);
+ const location=c.preferred_cities[0]||(c.national_scope?'全国':'中国大陆');
  const common='招聘 职位详情 企业官网 中国大陆';
  const queries=[
-  query([intent.primary_direction,intent.direct_roles.slice(1,5),travel,common]),
-  query([intent.direct_roles.slice(5,10),industry,'社会招聘 官方招聘 中国大陆']),
-  query([intent.adjacent_roles.slice(0,6),industry,'企业招聘 职位详情 中国大陆']),
-  query([intent.primary_direction,intent.resume_related_roles.slice(0,5),travel,industry,'企业官方招聘'])
+  query([intent.primary_direction,intent.direct_roles.slice(1,5),location,travel,common]),
+  query([intent.direct_roles.slice(5,10),industry,location,'社会招聘 官方招聘 中国大陆']),
+  query([intent.adjacent_roles.slice(0,6),industry,location,'企业招聘 职位详情 中国大陆']),
+  query([intent.primary_direction,intent.resume_related_roles.slice(0,5),location,travel,industry,'企业官方招聘'])
  ].filter(Boolean);
  return [...new Set(queries)].slice(0,4);
 }
