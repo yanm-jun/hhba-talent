@@ -230,7 +230,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
          ] as const;
          const rank:Record<typeof stage,number>={preparing:0,connected:0,searching:1,reading:2,writing:3,waiting:1};
          const active=rank[stage],progress=[12,36,62,86][active];
-         const current=stage==='waiting'?'DeepSeek 仍在处理，暂未收到新的阶段事件':stage==='connected'?'已连接搜索服务，正在准备检索':steps[active].label;
+         const current=stage==='waiting'?'DeepSeek 仍在处理，暂未收到新的阶段事件':stage==='connected'?'已连接搜索服务，正在准备检索':stage==='searching'?'DeepSeek 深度思考搜索正在核实中国大陆招聘岗位':steps[active].label;
          return <section className="hhba-ai-progress" role="status" aria-live="polite" aria-label="智能匹配实时进度">
           <div className="hhba-ai-progress-head"><div><strong>正在为你寻找合适的工作</strong><span>{partialJobs.length?'已找到 '+partialJobs.length+' 个候选岗位':'搜索进行中'}</span></div><time>{elapsedSeconds} 秒</time></div>
           <div className="hhba-ai-progress-value"><strong>{progress}%</strong><small>流程阶段</small></div>
