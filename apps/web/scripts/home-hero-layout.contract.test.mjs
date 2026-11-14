@@ -28,6 +28,6 @@ test('original landing double-entry and real job market are preserved',()=>{
  }
  assert.ok(home.includes("candidateSignedIn?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'"),
    'candidate entry must reach AI upload after login');
- assert.ok(home.includes(":'/companies/discover'"),'company directory entry must lead to an existing browse route');
+ assert.ok(home.includes(":'/companies/library'"),'company directory entry must lead to the 17 industry halls');
  assert.ok(home.includes('className="home-match-promo"'),'resume matching link changed');
 });
