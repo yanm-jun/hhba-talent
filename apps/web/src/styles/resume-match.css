@@ -108,3 +108,35 @@
 .hhba-ai-mainland-only small{font-size:11px;color:#7b8c80}
 @media(max-width:580px){.hhba-ai-mainland-only small{width:100%}}
 
+
+
+/* Talent-first search preferences: concise inputs, explicit soft/hard semantics. */
+.hhba-ai-capability-panel{margin:14px 0 18px;padding:15px 16px;border:1px solid #d8e9dd;border-radius:12px;background:#f5faf6}
+.hhba-ai-capability-heading{display:flex;align-items:center;gap:8px;color:#2e6945;font-size:13px}
+.hhba-ai-capability-heading span{margin-left:auto;font-size:11px;color:#65826d;background:#e7f2e9;border-radius:30px;padding:4px 8px}
+.hhba-ai-capability-panel p,.hhba-ai-capability-panel small{display:block;color:#718276;font-size:11px;line-height:1.75;margin:9px 0 0}
+.hhba-ai-capability-tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.hhba-ai-capability-tags span{border:1px solid #cfe2d4;background:white;color:#386c49;border-radius:30px;padding:6px 10px;font-size:11px}
+.hhba-ai-preference-block{display:flex;flex-direction:column;gap:16px}
+.hhba-ai-preference-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.hhba-ai-preference-grid>label,.hhba-ai-salary-row>label{display:flex;flex-direction:column;gap:7px;color:#435b49;font-size:12px;font-weight:680;min-width:0}
+.hhba-ai-preference-grid input,.hhba-ai-preference-grid select,.hhba-ai-preference-grid textarea,.hhba-ai-salary-row input{width:100%;min-width:0;box-sizing:border-box;border:1px solid #d7e2d9;border-radius:9px;background:#fff;color:#253b2c;padding:11px 12px;font:inherit;font-size:13px;outline-color:#79a486}
+.hhba-ai-preference-grid textarea{resize:vertical;line-height:1.6}
+.hhba-ai-preference-grid small,.hhba-ai-preference-section>small,.hhba-ai-preference-section>p{color:#849087;font-size:10px;font-weight:400;line-height:1.7;margin:0}
+.hhba-ai-preference-section{border-top:1px solid #edf0ed;padding-top:15px}
+.hhba-ai-preference-section h3{display:flex;align-items:center;gap:7px;color:#304c38;font-size:13px;margin:0 0 11px}
+.hhba-ai-preference-section h3 svg{color:#548265}
+.hhba-ai-salary-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto;align-items:end;gap:10px;margin-bottom:8px}
+.hhba-ai-salary-row>span{font-size:11px;color:#829086;padding-bottom:12px;white-space:nowrap}
+.hhba-ai-employer-models{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:11px}
+.hhba-ai-employer-models label{display:flex;align-items:center;gap:8px;border:1px solid #e2e9e3;border-radius:9px;padding:10px;background:#fff;color:#526657;font-size:11px;cursor:pointer}
+.hhba-ai-employer-models input{accent-color:#3f7951;flex-shrink:0}
+.hhba-ai-search-promise{display:flex;gap:9px;align-items:flex-start;border:1px solid #dcebe0;border-radius:10px;background:#f7fbf8;padding:12px;color:#5d7664;font-size:11px;line-height:1.75}
+.hhba-ai-search-promise svg{color:#3d8055;flex-shrink:0;margin-top:2px}
+.hhba-ai-search-promise strong{color:#326345}
+@media(max-width:620px){
+ .hhba-ai-preference-grid{grid-template-columns:1fr}
+ .hhba-ai-employer-models{grid-template-columns:1fr}
+ .hhba-ai-salary-row{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
+ .hhba-ai-salary-row>span:last-child{grid-column:1/-1;padding:0}
+}
