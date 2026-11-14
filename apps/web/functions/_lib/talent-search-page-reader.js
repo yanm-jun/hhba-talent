@@ -56,7 +56,7 @@ function decodeEntities(text) {
     if (name.startsWith('#')) {
       const hex = name.startsWith('#x');
       const code = parseInt(name.slice(hex ? 2 : 1), hex ? 16 : 10);
-      return code > 0 && code <= 0x10ffff && ![0xd800, 0xdfff].includes(code)
+      return code > 0 && code <= 0x10ffff && !(code >= 0xd800 && code <= 0xdfff)
         ? String.fromCodePoint(code) : ' ';
     }
     return named[name] ?? ' ';
