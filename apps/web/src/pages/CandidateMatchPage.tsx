@@ -1,5 +1,5 @@
 import {ChangeEvent,DragEvent,useEffect,useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,BriefcaseBusiness,CheckCircle2,Circle,FileText,FileUp,LockKeyhole,LoaderCircle,ShieldCheck,XCircle} from 'lucide-react';
+import {ArrowLeft,ArrowRight,BriefcaseBusiness,FileText,FileUp,LockKeyhole,LoaderCircle,ShieldCheck,XCircle} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
 import {Link} from '../router';
@@ -221,30 +221,6 @@ export function CandidateMatchPage({user}:{user:User|null}){
           {working?<><LoaderCircle className="spin" size={18}/> 正在进行深度岗位研究与匹配…</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>
-        {working&&(()=>{
-         const steps=[
-          {key:'preparing',label:'准备简历与搜索任务',detail:'提取求职方向，准备安全检索'},
-          {key:'searching',label:'搜索企业招聘来源',detail:'优先查找中国大陆企业官网与专属招聘系统'},
-          {key:'reading',label:'读取岗位详情',detail:'核对岗位名称、地点与招聘页面证据'},
-          {key:'writing',label:'分析匹配度并整理推荐',detail:'结合简历经历生成匹配依据与注意事项'}
-         ] as const;
-         const rank:Record<typeof stage,number>={preparing:0,connected:0,searching:1,reading:2,writing:3,waiting:1};
-         const active=rank[stage],progress=[12,36,62,86][active];
-         const current=stage==='waiting'?'DeepSeek 仍在处理，暂未收到新的阶段事件':stage==='connected'?'已连接搜索服务，正在准备检索':stage==='searching'?'DeepSeek 深度思考搜索正在核实中国大陆招聘岗位':steps[active].label;
-         return <section className="hhba-ai-progress" role="status" aria-live="polite" aria-label="智能匹配实时进度">
-          <div className="hhba-ai-progress-head"><div><strong>正在为你寻找合适的工作</strong><span>{partialJobs.length?'已找到 '+partialJobs.length+' 个候选岗位':'搜索进行中'}</span></div><time>{elapsedSeconds} 秒</time></div>
-          <div className="hhba-ai-progress-value"><strong>{progress}%</strong><small>流程阶段</small></div>
-          <div className="hhba-ai-progress-track" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress} aria-valuetext={current}><span style={{width:progress+'%'}}/></div>
-          <p className="hhba-ai-progress-current"><LoaderCircle size={15} className="spin"/>{current}</p>
-          <ol className="hhba-ai-progress-steps">
-           {steps.map((item,index)=><li key={item.key} className={index<active?'done':index===active?'active':''}>
-            {index<active?<CheckCircle2 size={17}/>:index===active?<LoaderCircle size={17} className="spin"/>:<Circle size={17}/>}
-            <div><strong>{item.label}</strong><small>{item.detail}</small></div>
-           </li>)}
-          </ol>
-          <p className="hhba-ai-progress-note">{partialJobs.length?'已取得的岗位会先行展示，后续搜索继续补充。':'进度根据服务端实际返回的阶段事件更新；等待期间不会虚构搜索进度。'}</p>
-         </section>;
-        })()}
       </section>
       <aside className="hhba-ai-aside">
         <div className="hhba-ai-aside-card"><h3>只需三步</h3>
@@ -254,9 +230,9 @@ export function CandidateMatchPage({user}:{user:User|null}){
          <p className="hhba-ai-aside-footnote">工作地点仅限中国大陆；招聘状态请以岗位原始网页为准。</p>
       </aside>
     </div>
-    {(result||partialJobs.length>0)&&<CandidateMatchNativeDialog
+    {(working||result||partialJobs.length>0)&&<CandidateMatchNativeDialog
       result={result||{matches:partialJobs}}
-      pending={working&&!result} notice={working?'':error}
+      pending={working&&!result} notice={working?'':error} stage={stage} elapsedSeconds={elapsedSeconds}
       resumeStorage={result&&file&&!savedId?{
         available:true,saved:false,consent:saveConsent,saving:saveBusy,
         notice:saveNotice,onConsent:setSaveConsent,onSave:()=>void saveResume()
