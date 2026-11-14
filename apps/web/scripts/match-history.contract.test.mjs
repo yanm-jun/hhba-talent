@@ -92,7 +92,7 @@ test('new postings means unseen employer-job URL, never just a changed model sco
 test('persist results per real account, resume reference must be owned',async()=>{
  const db=inMemoryDB();
  const longRoleHint='督导，全国范围可出差，汽车零售优先；也考虑区域运营和渠道管理。'.repeat(4);
- const savedHint=await saveMatchHistory(db,phoneA,null,longRoleHint,[job]);
+ const savedHint=await saveMatchHistory(db,'13700000000',null,longRoleHint,[job]);
  assert.equal(db.runs.get(savedHint.id).role_hint,longRoleHint.slice(0,240));
  const first=await saveMatchHistory(db,phoneA,null,'产品运营',[job]);
  assert.ok(first.id);
