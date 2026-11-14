@@ -137,6 +137,8 @@ export async function runTalentIntelligenceSearch(input = {}) {
   const maxWaves = positiveInt(input.maxWaves, 3, 6);
   const queriesPerWave = positiveInt(input.queriesPerWave, 6, 12);
   const maxVerify = positiveInt(input.maxVerify, 100, 300);
+  const maxProviderCalls = positiveInt(input.maxProviderCalls, 120, 1000);
+  const queryConcurrency = positiveInt(input.queryConcurrency, 2, 6);
   const minVerified = positiveInt(input.minVerified, 10, 50);
   const minRelevant = positiveInt(input.minRelevant, 8, 50);
   const relevanceThreshold = Number.isFinite(input.relevanceThreshold)
@@ -191,8 +193,18 @@ export async function runTalentIntelligenceSearch(input = {}) {
     }
 
     const summaryBefore = emitQuality();
+    // The upper bound prevents runaway paid provider calls, without turning
+    // the cost limit into a fixed low-quality ten-link search cap.
+    const expectedPerQuery = Math.max(1, requestedProviders.length);
+    const providerCallsLeft = maxProviderCalls - counters.search_calls;
+    const querySlots = Math.floor(providerCallsLeft / expectedPerQuery);
+    if (querySlots <= 0) {
+      terminated = 'PROVIDER_BUDGET_REACHED';
+      break;
+    }
     const batch = scheduleWave(
-      allQueries, usedQueryIds, roleHits, summaryBefore, queriesPerWave,
+      allQueries, usedQueryIds, roleHits, summaryBefore,
+      Math.min(queriesPerWave, querySlots),
     );
     if (!batch.length) {
       terminated = 'NO_MORE_UNTRIED_QUERIES';
@@ -210,20 +222,26 @@ export async function runTalentIntelligenceSearch(input = {}) {
     };
 
     emitted('searching', { wave: waveNo, queries: batch.length });
-    const outcomes = await Promise.all(batch.map(async plan => {
-      try {
-        const result = await searchFn(plan.query, providerConfigs, {
-          providers: requestedProviders,
-          signal,
-        });
-        return { plan, result, status: 'fulfilled' };
-      } catch (error) {
-        return {
-          plan, status: 'rejected',
-          error_code: typeof error?.code === 'string' ? error.code : 'SEARCH_FAILED',
-        };
-      }
-    }));
+    const outcomes = [];
+    for (let i = 0; i < batch.length; i += queryConcurrency) {
+      if (signal?.aborted) break;
+      const items = batch.slice(i, i + queryConcurrency);
+      const partial = await Promise.all(items.map(async plan => {
+        try {
+          const result = await searchFn(plan.query, providerConfigs, {
+            providers: requestedProviders,
+            signal,
+          });
+          return { plan, result, status: 'fulfilled' };
+        } catch (error) {
+          return {
+            plan, status: 'rejected',
+            error_code: typeof error?.code === 'string' ? error.code : 'SEARCH_FAILED',
+          };
+        }
+      }));
+      outcomes.push(...partial);
+    }
 
     const toVerify = [];
     for (const outcome of outcomes) {
@@ -337,6 +355,10 @@ export async function runTalentIntelligenceSearch(input = {}) {
     }
     if (counters.verification_attempts >= maxVerify) {
       terminated = 'VERIFICATION_BUDGET_REACHED';
+      break;
+    }
+    if (counters.search_calls >= maxProviderCalls) {
+      terminated = 'PROVIDER_BUDGET_REACHED';
       break;
     }
   }
