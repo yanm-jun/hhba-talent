@@ -157,7 +157,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
  async function run(){
   if((!file&&!savedId)||!consent||working||previewBusy||availability!=='ready'||!getRealAuthToken())return;
   const prefs=options.search_preferences||defaultSearchPreferences;
-  const cityCount=prefs.preferred_cities.split(/[，,、;；\\s]+/).filter(x=>x.trim().length>=2).length;
+  const cityCount=prefs.preferred_cities.split(/[，,、;；\s]+/).filter(x=>x.trim().length>=2).length;
   const salaryMin=Number(prefs.salary_min_k),salaryMax=Number(prefs.salary_max_k);
   if(prefs.location_mode==='ONLY'&&!cityCount){
    setError('选择“仅限填写的城市”时，请至少填写一个工作城市。');return;
