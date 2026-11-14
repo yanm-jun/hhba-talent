@@ -158,6 +158,7 @@ function HallDetails({manifest,hallId}:{manifest:HallManifest;hallId:string}){
   <p className="hhba-library-alert"><ShieldAlert size={17} aria-hidden="true"/>
    以下为截至 {manifest.asOf} 的只读目录。部分属于候选·待复核网址，甚至可能已失效；不提供岗位开放或录用结果保证。
   </p>
+  <Link className="hhba-major-secondary-entry" to="/companies/library/majors"><GraduationCap size={17} aria-hidden="true"/> 按专业跨行业探索企业招聘入口 <ArrowRight size={15} aria-hidden="true"/></Link>
   <div className="hhba-library-controls">
    <label className="hhba-library-search"><Search size={17} aria-hidden="true"/>
     <input type="search" value={search} maxLength={80} onChange={event=>{setSearch(event.target.value);setPage(1)}}
