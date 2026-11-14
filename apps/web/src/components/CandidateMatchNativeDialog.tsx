@@ -39,7 +39,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
     <header className="hhba-match-modal-head">
      <div className="hhba-match-modal-brand">
       <span className="hhba-match-modal-symbol"><BriefcaseBusiness size={19}/></span>
-      <div><strong>汇方职场 · HHBA</strong><small>DeepSeek Flash 深度思考 · 智能岗位推荐</small></div>
+      <div><strong>汇方职场 · HHBA</strong><small>DeepSeek 自主联网深度搜索 · 智能岗位推荐</small></div>
      </div>
      <button type="button" className="hhba-match-modal-close" onClick={onClose} aria-label="关闭推荐">
       <X size={19}/>
