@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {safeJobDetailLink,parseJobAnswer,wasWebSearched,outputText,partialJobMatchesFromText,decodeSearchText} from '../functions/_lib/deepseek-native-match.js';
 import {runNativeJobMatch,runNativeDualMatch,combineNativeBatches,onRequest} from '../functions/api/match-native/[[path]].js';
 import {buildDeepSearchRequest,verifiedDeepSearchMatches,runAutonomousDeepMatch} from '../functions/_lib/deepseek-autonomous-match.js';
+import {buildResumeProfile} from '../functions/_lib/match-role-intent.js';
 const posting='https://careers.examplecorp.com/jobs/brand-supervisor-2026';
 const answer={jobs:[
  {company:'示例汽车中国',title:'品牌督导',location:'上海',salary:'15000-20000 元/月',
@@ -493,4 +494,38 @@ test('when ten distinct job objects have streamed, stop waiting for final provid
  assert.equal(result.incomplete,false);
  assert.ok(snapshots.includes(10));
  assert.equal(result.diagnostic.finished_early,true);
+});
+
+
+test('talent-first deep search uses achievement evidence and does not treat role hints as a hard employer or title whitelist',()=>{
+ const resume=[
+  '负责山东区域8家汽车经销商门店运营督导',
+  '推动销售线索有效率从40%提升至76%',
+  '组织门店培训和暗访整改，推动录音回收率提升至81.44%',
+  '统筹万达快闪活动，建卡550组并促成大定6台'
+ ].join('。');
+ const profile=buildResumeProfile(resume);
+ assert.ok(profile.experience_highlights.some(x=>x.includes('8家汽车经销商')));
+ assert.ok(profile.experience_highlights.some(x=>x.includes('76%')));
+ assert.ok(profile.experience_highlights.some(x=>x.includes('550')));
+ const body=buildDeepSearchRequest(resume,'品牌督导',10);
+ assert.match(body.instructions,/不.*局限于 HHBA 的企业名单/);
+ assert.match(body.instructions,/人才能力反向找企业/);
+ assert.match(body.instructions,/集团子公司、不同业务线和相邻行业/);
+ assert.match(body.instructions,/岗位发现同时覆盖直接同类岗位和能力迁移岗位/);
+ assert.match(body.input,/企业发现不依赖任何预设企业库/);
+ assert.match(body.input,/岗位提示词仅供参考，不是限制/);
+ assert.match(body.input,/76%/);
+});
+
+test('talent-first prompt keeps resume facts separate from inferred adjacent-role hypotheses',()=>{
+ const body=buildDeepSearchRequest(
+  '负责区域门店运营、经销商培训和销售转化',
+  '优先全国出差，可接受渠道运营或区域管理方向',10
+ );
+ assert.match(body.instructions,/区分简历明确事实与合理推断/);
+ assert.match(body.instructions,/不得把推断写成事实/);
+ assert.match(body.instructions,/只是关键词相似但工作内容不匹配，不要推荐/);
+ assert.match(body.instructions,/匹配分是技能与岗位适配度，不代表录用成功率/);
+ assert.match(body.instructions,/严格排除 BOSS、智联、51job、猎聘、拉勾/);
 });
