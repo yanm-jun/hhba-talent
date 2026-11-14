@@ -1,0 +1,284 @@
+{
+  "kind": "HHBA_MAJOR_HALL_GUIDE_V1",
+  "description": "专业到行业的方向性导航规则；并非任何企业的岗位、招聘专业或录用匹配结果。",
+  "groups": [
+    {
+      "id": "computing",
+      "label": "计算机、软件与数据",
+      "halls": [
+        "internet-ai",
+        "telecom",
+        "semiconductor",
+        "finance",
+        "automotive",
+        "manufacturing",
+        "consumer-hardware",
+        "energy"
+      ],
+      "majors": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "数据科学与大数据技术",
+        "网络工程",
+        "信息安全",
+        "物联网工程",
+        "智能科学与技术",
+        "信息管理与信息系统"
+      ]
+    },
+    {
+      "id": "electronics",
+      "label": "电子、通信与芯片",
+      "halls": [
+        "semiconductor",
+        "telecom",
+        "consumer-hardware",
+        "automotive",
+        "manufacturing",
+        "aerospace",
+        "internet-ai"
+      ],
+      "majors": [
+        "电子信息工程",
+        "通信工程",
+        "电子科学与技术",
+        "微电子科学与工程",
+        "集成电路设计与集成系统",
+        "光电信息科学与工程",
+        "测控技术与仪器",
+        "电子信息科学与技术"
+      ]
+    },
+    {
+      "id": "mechanical",
+      "label": "机械、自动化与制造",
+      "halls": [
+        "manufacturing",
+        "automotive",
+        "consumer-hardware",
+        "aerospace",
+        "energy",
+        "semiconductor",
+        "logistics"
+      ],
+      "majors": [
+        "机械设计制造及其自动化",
+        "机械工程",
+        "机械电子工程",
+        "自动化",
+        "机器人工程",
+        "智能制造工程",
+        "工业工程",
+        "车辆工程",
+        "新能源汽车工程",
+        "工业设计"
+      ]
+    },
+    {
+      "id": "materials",
+      "label": "能源、材料与化工",
+      "halls": [
+        "energy",
+        "chem-materials",
+        "manufacturing",
+        "automotive",
+        "semiconductor",
+        "construction",
+        "consumer-hardware"
+      ],
+      "majors": [
+        "新能源科学与工程",
+        "能源与动力工程",
+        "电气工程及其自动化",
+        "材料科学与工程",
+        "材料物理",
+        "材料化学",
+        "高分子材料与工程",
+        "化学工程与工艺",
+        "应用化学",
+        "环境工程"
+      ]
+    },
+    {
+      "id": "engineering",
+      "label": "建筑、土木与交通",
+      "halls": [
+        "construction",
+        "logistics",
+        "manufacturing",
+        "energy",
+        "automotive",
+        "aerospace"
+      ],
+      "majors": [
+        "土木工程",
+        "建筑学",
+        "工程管理",
+        "城乡规划",
+        "交通运输",
+        "交通工程",
+        "轨道交通信号与控制",
+        "道路桥梁与渡河工程"
+      ]
+    },
+    {
+      "id": "finance",
+      "label": "经济、金融与财会",
+      "halls": [
+        "finance",
+        "retail",
+        "internet-ai",
+        "logistics",
+        "automotive",
+        "energy",
+        "manufacturing"
+      ],
+      "majors": [
+        "金融学",
+        "会计学",
+        "财务管理",
+        "经济学",
+        "财政学",
+        "审计学",
+        "金融工程",
+        "税收学"
+      ]
+    },
+    {
+      "id": "business",
+      "label": "市场、运营与管理",
+      "halls": [
+        "retail",
+        "logistics",
+        "internet-ai",
+        "finance",
+        "automotive",
+        "consumer-hardware",
+        "culture-media",
+        "agri-food"
+      ],
+      "majors": [
+        "工商管理",
+        "市场营销",
+        "电子商务",
+        "人力资源管理",
+        "物流管理",
+        "供应链管理",
+        "国际经济与贸易",
+        "国际商务",
+        "旅游管理",
+        "公共事业管理"
+      ]
+    },
+    {
+      "id": "law",
+      "label": "法律、公共事务",
+      "halls": [
+        "finance",
+        "internet-ai",
+        "retail",
+        "energy",
+        "manufacturing",
+        "construction",
+        "logistics"
+      ],
+      "majors": [
+        "法学",
+        "知识产权",
+        "行政管理",
+        "劳动与社会保障"
+      ]
+    },
+    {
+      "id": "culture",
+      "label": "设计、传媒与艺术",
+      "halls": [
+        "culture-media",
+        "internet-ai",
+        "retail",
+        "consumer-hardware",
+        "education-research",
+        "automotive"
+      ],
+      "majors": [
+        "新闻学",
+        "传播学",
+        "广播电视学",
+        "视觉传达设计",
+        "产品设计",
+        "数字媒体技术",
+        "数字媒体艺术",
+        "动画",
+        "广告学",
+        "舞蹈学",
+        "音乐学"
+      ]
+    },
+    {
+      "id": "education",
+      "label": "教育、语言与人文",
+      "halls": [
+        "education-research",
+        "culture-media",
+        "retail",
+        "internet-ai",
+        "consumer-hardware"
+      ],
+      "majors": [
+        "教育学",
+        "学前教育",
+        "小学教育",
+        "汉语言文学",
+        "英语",
+        "翻译",
+        "心理学",
+        "教育技术学"
+      ]
+    },
+    {
+      "id": "health",
+      "label": "医药、健康与生命科学",
+      "halls": [
+        "biomed",
+        "chem-materials",
+        "agri-food",
+        "consumer-hardware",
+        "education-research",
+        "manufacturing"
+      ],
+      "majors": [
+        "药学",
+        "生物科学",
+        "生物技术",
+        "制药工程",
+        "生物医学工程",
+        "护理学",
+        "临床医学",
+        "医学检验技术",
+        "中药学"
+      ]
+    },
+    {
+      "id": "agriculture",
+      "label": "农业、食品与生态",
+      "halls": [
+        "agri-food",
+        "biomed",
+        "retail",
+        "logistics",
+        "chem-materials",
+        "education-research"
+      ],
+      "majors": [
+        "农学",
+        "食品科学与工程",
+        "食品质量与安全",
+        "园艺",
+        "动物科学",
+        "植物保护",
+        "农业资源与环境"
+      ]
+    }
+  ]
+}

@@ -8,6 +8,7 @@ import {Shell} from '../components/Shell';
 import {Link} from '../router';
 import type {User} from '../services/api';
 import '../styles/industry-library.css';
+import {MajorHallExplorer} from './MajorHallExplorer';
 
 type HallSummary={
  id:string;label:string;published:number;enterprises:number;reviewed:number;
@@ -70,7 +71,7 @@ function HallSelection({manifest}:{manifest:HallManifest}){
   <div className="hhba-library-heading">
    <span className="hhba-library-eyebrow">HHBA · ENTERPRISE RECRUITMENT DIRECTORY</span>
    <h1>企业招聘导航</h1>
-   <p>按行业找到企业与招聘网址，进入对应招聘网站自行查看岗位。专业筛选和岗位级推荐将分阶段开放。</p>
+   <p>按行业查看企业招聘网址，或从自己的专业出发跨行业探索。具体岗位条件请以企业招聘网站为准。</p>
   </div>
   <div className="hhba-library-overview">
    <div><strong>17</strong><span>个行业馆</span></div>
@@ -80,6 +81,11 @@ function HallSelection({manifest}:{manifest:HallManifest}){
   <p className="hhba-library-alert"><ShieldAlert size={17} aria-hidden="true"/>
    目录包含尚未完成复核的历史候选网址。收录不代表企业与 HHBA 合作，也不代表当前正在招聘；请在跳转后核对网站主体和岗位状态。
   </p>
+  <Link className="hhba-major-entry" to="/companies/library/majors">
+   <span className="hhba-major-entry-icon"><GraduationCap size={24} aria-hidden="true"/></span>
+   <span><strong>按专业找企业招聘入口</strong><small>选择专业，跨多个行业馆寻找企业网址，不用上传简历</small></span>
+   <ArrowRight size={20} aria-hidden="true"/>
+  </Link>
   <label className="hhba-library-search hhba-library-hall-search">
    <Search size={17} aria-hidden="true"/>
    <input type="search" value={search} maxLength={50} onChange={event=>setSearch(event.target.value)}
@@ -152,6 +158,7 @@ function HallDetails({manifest,hallId}:{manifest:HallManifest;hallId:string}){
   <p className="hhba-library-alert"><ShieldAlert size={17} aria-hidden="true"/>
    以下为截至 {manifest.asOf} 的只读目录。部分属于候选·待复核网址，甚至可能已失效；不提供岗位开放或录用结果保证。
   </p>
+  <Link className="hhba-major-secondary-entry" to="/companies/library/majors"><GraduationCap size={17} aria-hidden="true"/> 按专业跨行业探索企业招聘入口 <ArrowRight size={15} aria-hidden="true"/></Link>
   <div className="hhba-library-controls">
    <label className="hhba-library-search"><Search size={17} aria-hidden="true"/>
     <input type="search" value={search} maxLength={80} onChange={event=>{setSearch(event.target.value);setPage(1)}}
@@ -199,13 +206,13 @@ function HallDetails({manifest,hallId}:{manifest:HallManifest;hallId:string}){
  </section>;
 }
 
-export function IndustryLibraryPage({user,hallId}:{user:User|null;hallId?:string}){
+export function IndustryLibraryPage({user,hallId,view='halls'}:{user:User|null;hallId?:string;view?:'halls'|'majors'}){
  const {data,error}=useManifest();
  const invalid=Boolean(hallId&&!HALL_IDS.includes(hallId));
  return <Shell user={user}>
   {!data&&!error&&!invalid&&<section className="hhba-library-content"><p className="hhba-library-empty" role="status">正在加载行业馆目录…</p></section>}
   {error&&<section className="hhba-library-content"><p className="hhba-library-empty" role="alert">企业招聘导航暂时不可用：{error}。请稍后刷新页面。</p></section>}
   {invalid&&<section className="hhba-library-content"><Link to="/companies/library" className="hhba-library-back"><ArrowLeft size={16}/> 返回行业馆</Link><p className="hhba-library-empty">没有这个行业馆。</p></section>}
-  {data&&!invalid&&(hallId?<HallDetails key={hallId} manifest={data} hallId={hallId}/>:<HallSelection manifest={data}/>)}
+  {data&&!invalid&&(view==='majors'?<MajorHallExplorer manifest={data}/>:hallId?<HallDetails key={hallId} manifest={data} hallId={hallId}/>:<HallSelection manifest={data}/>)}
  </Shell>;
 }
