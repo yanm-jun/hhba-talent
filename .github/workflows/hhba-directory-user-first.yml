@@ -1,0 +1,37 @@
+name: HHBA Candidate Directory User-First Acceptance
+on:
+  push:
+    branches:
+      - feature/hhba-v1-directory-user-first-20261114
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'apps/web/src/pages/IndustryLibraryPage.tsx'
+      - 'apps/web/src/components/GlobalCompanySearch.tsx'
+      - 'apps/web/src/styles/industry-library.css'
+      - 'apps/web/public/recruitment-library/v1/search.json'
+      - 'apps/web/scripts/directory-user-first.contract.test.mjs'
+      - '.github/workflows/hhba-directory-user-first.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact web dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Verify existing 17 halls, majors and new global search
+        working-directory: apps/web
+        run: node --test scripts/industry-library-stage2.contract.test.mjs scripts/major-hall-stage3.contract.test.mjs scripts/directory-user-first.contract.test.mjs
+      - name: Verify TypeScript and React compilation
+        working-directory: apps/web
+        run: npx tsc -b

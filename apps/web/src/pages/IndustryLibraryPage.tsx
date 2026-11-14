@@ -9,6 +9,7 @@ import {Link} from '../router';
 import type {User} from '../services/api';
 import '../styles/industry-library.css';
 import {MajorHallExplorer} from './MajorHallExplorer';
+import {GlobalCompanySearch} from '../components/GlobalCompanySearch';
 
 type HallSummary={
  id:string;label:string;published:number;enterprises:number;reviewed:number;
@@ -62,51 +63,34 @@ function useManifest(){
 }
 
 function HallSelection({manifest}:{manifest:HallManifest}){
- const [search,setSearch]=useState('');
- const matched=useMemo(()=>manifest.halls.filter(item=>
-  (item.label+' '+item.id).toLocaleLowerCase().includes(search.trim().toLocaleLowerCase())
- ),[manifest.halls,search]);
- const total=manifest.halls.reduce((sum,hall)=>sum+hall.published,0);
- return <section className="hhba-library-content" aria-label="17 个行业招聘馆">
-  <div className="hhba-library-heading">
-   <span className="hhba-library-eyebrow">HHBA · ENTERPRISE RECRUITMENT DIRECTORY</span>
-   <h1>企业招聘导航</h1>
-   <p>按行业查看企业招聘网址，或从自己的专业出发跨行业探索。具体岗位条件请以企业招聘网站为准。</p>
+ return <section className="hhba-library-content" aria-label="企业招聘导航">
+  <div className="hhba-library-heading hhba-library-user-heading">
+   <span className="hhba-library-eyebrow">HHBA · 企业招聘导航</span>
+   <h1>寻找你想加入的企业</h1>
+   <p>按专业、企业名称或行业，找到企业招聘入口。</p>
   </div>
-  <div className="hhba-library-overview">
-   <div><strong>17</strong><span>个行业馆</span></div>
-   <div><strong>{total.toLocaleString('zh-CN')}</strong><span>条整理后可浏览的网址记录</span></div>
-   <div><strong>{manifest.asOf}</strong><span>数据快照日期</span></div>
-  </div>
-  <p className="hhba-library-alert"><ShieldAlert size={17} aria-hidden="true"/>
-   目录包含尚未完成复核的历史候选网址。收录不代表企业与 HHBA 合作，也不代表当前正在招聘；请在跳转后核对网站主体和岗位状态。
-  </p>
   <Link className="hhba-major-entry" to="/companies/library/majors">
    <span className="hhba-major-entry-icon"><GraduationCap size={24} aria-hidden="true"/></span>
-   <span><strong>按专业找企业招聘入口</strong><small>选择专业，跨多个行业馆寻找企业网址，不用上传简历</small></span>
+   <span><strong>按专业找企业</strong><small>不知道有哪些企业适合自己的专业？从这里开始探索</small></span>
    <ArrowRight size={20} aria-hidden="true"/>
   </Link>
-  <label className="hhba-library-search hhba-library-hall-search">
-   <Search size={17} aria-hidden="true"/>
-   <input type="search" value={search} maxLength={50} onChange={event=>setSearch(event.target.value)}
-    placeholder="查找行业馆，如汽车、医药、传媒" aria-label="查找行业馆"/>
-  </label>
+  <GlobalCompanySearch asOf={manifest.asOf} halls={manifest.halls}/>
+  <div className="hhba-library-browse-heading">
+   <div><h2>按行业浏览</h2><p>选择感兴趣的行业，查看该行业收录的企业招聘入口。</p></div>
+  </div>
   <div className="hhba-library-grid">
-   {matched.map(item=>{
+   {manifest.halls.map(item=>{
     const Icon=HALL_ICONS[item.id]||Building2;
     return <Link key={item.id} className="hhba-library-hall-card" to={'/companies/library/'+item.id}>
      <div className="hhba-library-hall-icon"><Icon size={23} aria-hidden="true"/></div>
      <strong>{item.label}</strong>
-     <small>{item.enterprises} 个企业名称 · {item.published} 条网址记录</small>
-     <span>进入行业馆 <ArrowRight size={15} aria-hidden="true"/></span>
+     <span>查看企业招聘入口 <ArrowRight size={15} aria-hidden="true"/></span>
     </Link>;
    })}
   </div>
-  {!matched.length&&<p className="hhba-library-empty">没有找到对应行业馆，可以试试其他关键词。</p>}
-  <p className="hhba-library-footnote">同一企业可能出现在多个行业馆，同一企业也可能登记多个招聘入口；数量是目录记录，不是实时招聘职位数量。未附有效安全网址的企业仍保留在后台，未显示为可跳转记录。</p>
+  <p className="hhba-library-footnote">页面展示的是招聘渠道，不代表企业当前一定有岗位，也不代表与 HHBA 存在合作。具体招聘信息请以企业网站为准。</p>
  </section>;
 }
-
 function HallDetails({manifest,hallId}:{manifest:HallManifest;hallId:string}){
  const selected=manifest.halls.find(item=>item.id===hallId);
  const [data,setData]=useState<HallFile|null>(null);
@@ -150,14 +134,7 @@ function HallDetails({manifest,hallId}:{manifest:HallManifest;hallId:string}){
    <h1>{selected.label}</h1>
    <p>从已登记的企业招聘入口中查找网站。点击外部链接后，请以企业公布的最新招聘信息为准。</p>
   </div>
-  <div className="hhba-library-hall-stats">
-   <span><strong>{selected.enterprises}</strong> 个企业名称</span>
-   <span><strong>{selected.published}</strong> 条可浏览网址</span>
-   <span><strong>{selected.unlinked}</strong> 条历史记录尚无招聘网址</span>
-  </div>
-  <p className="hhba-library-alert"><ShieldAlert size={17} aria-hidden="true"/>
-   以下为截至 {manifest.asOf} 的只读目录。部分属于候选·待复核网址，甚至可能已失效；不提供岗位开放或录用结果保证。
-  </p>
+  <p className="hhba-library-inline-notice"><ShieldAlert size={15} aria-hidden="true"/> 部分招聘网址仍待复核，实际岗位与招聘状态请以企业网站为准。</p>
   <Link className="hhba-major-secondary-entry" to="/companies/library/majors"><GraduationCap size={17} aria-hidden="true"/> 按专业跨行业探索企业招聘入口 <ArrowRight size={15} aria-hidden="true"/></Link>
   <div className="hhba-library-controls">
    <label className="hhba-library-search"><Search size={17} aria-hidden="true"/>
@@ -202,7 +179,7 @@ function HallDetails({manifest,hallId}:{manifest:HallManifest;hallId:string}){
     <button type="button" disabled={currentPage>=pageCount} onClick={()=>setPage(Math.min(pageCount,currentPage+1))}>下一页 <ArrowRight size={15}/></button>
    </nav>}
   </>}
-  <p className="hhba-library-footnote">HHBA 只提供招聘渠道导航，不代表与展示企业存在合作关系。使用外部链接时可能需要登录 HHBA 以记录求职来源；具体岗位、投递和个人信息由您在企业网站自行确认。</p>
+  <p className="hhba-library-footnote">HHBA 提供企业招聘渠道导航，不代表与展示企业存在合作。跳转后请自行核对企业主体、招聘岗位及隐私要求。</p>
  </section>;
 }
 
