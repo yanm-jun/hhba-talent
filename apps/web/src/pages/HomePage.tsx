@@ -11,7 +11,7 @@ import '../styles/home-match-promo.css';
 
 function EntryCard({kind,title,body,footer,candidateSignedIn=false}:{kind:'candidate'|'directory';title:string;body:string;footer:string;candidateSignedIn?:boolean}){
  const Icon=kind==='candidate'?BriefcaseBusiness:Building2;
- const target=kind==='candidate'?(candidateSignedIn?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'):'/companies/discover';
+ const target=kind==='candidate'?(candidateSignedIn?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'):'/companies/library';
  return <Link to={target} className={'entry-card hhba-entry-card hhba-entry-'+kind}
    aria-label={title+'，'+footer}>
    <span className="entry-icon"><Icon size={23}/></span>

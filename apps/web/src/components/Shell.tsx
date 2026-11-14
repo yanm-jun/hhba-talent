@@ -94,7 +94,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
      <StudyAbroadNavLink active={route.startsWith('/study-abroad')}/>
      <TalentPolicyNavLink active={route.startsWith('/talent-service')}/>
      <Link className="auth" to="/candidate/jobs">招聘市场</Link>
-     <Link className="auth" to="/companies/discover">企业招聘导航</Link>
+     <Link className="auth" to="/companies/library">企业招聘导航</Link>
      <Link className="join-nav-link" to="/join">加入我们</Link>
      {candidateSignedIn?<Link className="hhba-nav-account" to="/candidate/account">个人中心</Link>:
        recruiterSignedIn?<Link className="hhba-nav-account" to="/employer/hub">企业账户</Link>:
@@ -104,7 +104,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
      <StudyAbroadNavLink active={route.startsWith('/study-abroad')}/>
      <TalentPolicyNavLink active={route.startsWith('/talent-service')}/>
      <Link className="auth" to="/candidate/jobs">招聘市场</Link>
-     <Link className="auth" to="/companies/discover">企业招聘导航</Link>
+     <Link className="auth" to="/companies/library">企业招聘导航</Link>
      <Link className="auth" to="/candidate/saved">我的收藏</Link>
      {candidateSignedIn?<CandidateAccountDropdown displayName={user?.display_name}/>:<Link className="hhba-nav-account" to="/auth">登录 / 注册</Link>}
    </nav>:<nav aria-label="企业招聘与治理导航">

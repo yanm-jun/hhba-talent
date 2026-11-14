@@ -1,0 +1,40 @@
+name: HHBA 17 Industry Halls - Stage 2 Acceptance
+on:
+  push:
+    branches:
+      - feature/hhba-v1-industry-halls-stage2-20261114
+  pull_request:
+    branches:
+      - main
+      - feat/home-candidate-directory-stage1-20261114
+    paths:
+      - 'apps/web/public/recruitment-library/v1/**'
+      - 'apps/web/src/pages/IndustryLibraryPage.tsx'
+      - 'apps/web/src/styles/industry-library.css'
+      - 'apps/web/src/pages/HomePage.tsx'
+      - 'apps/web/src/components/Shell.tsx'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/scripts/industry-library-stage2.contract.test.mjs'
+      - '.github/workflows/hhba-industry-halls-stage2.yml'
+permissions:
+  contents: read
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install pinned web dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Validate all 17 static hall datasets and page routes
+        working-directory: apps/web
+        run: node --test scripts/industry-library-stage2.contract.test.mjs scripts/home-hero-layout.contract.test.mjs
+      - name: Check React / TypeScript compilation
+        working-directory: apps/web
+        run: npx tsc -b
