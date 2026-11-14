@@ -516,7 +516,7 @@ test('talent-first deep search uses achievement evidence and does not treat role
  assert.match(body.instructions,/不.*局限于 HHBA 的企业名单/);
  assert.match(body.instructions,/人才能力反向找企业/);
  assert.match(body.instructions,/集团子公司、不同业务线和相邻行业/);
- assert.match(body.instructions,/岗位发现同时覆盖直接同类岗位和能力迁移岗位/);
+ assert.match(body.instructions,/岗位发现必须分轮进行/);
  assert.match(body.input,/企业发现不依赖任何预设企业库/);
  assert.match(body.input,/岗位提示词仅供参考，不是限制/);
  assert.match(body.input,/76%/);
