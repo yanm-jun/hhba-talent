@@ -1,6 +1,6 @@
 import {useEffect,useRef,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
-import {ArrowUpRight,BriefcaseBusiness,MapPin,Wallet,X,Search} from 'lucide-react';
+import {ArrowUpRight,BriefcaseBusiness,CheckCircle2,Circle,LoaderCircle,MapPin,Wallet,X,Search} from 'lucide-react';
 import type {MatchResponse} from '../services/resumeMatch';
 import {Link} from '../router';
 import '../styles/resume-match-dialog.css';
@@ -8,10 +8,10 @@ import '../styles/resume-match-dialog.css';
 // Search-first evidence governs links; server scores and ranks. Never present a score as an offer probability.
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage}:{
+export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',stage='preparing',elapsedSeconds=0,resumeStorage}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'profile'|'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'>>;
- onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction
+ onClose:()=>void;pending?:boolean;notice?:string;stage?:'preparing'|'connected'|'searching'|'reading'|'writing'|'waiting';elapsedSeconds?:number;resumeStorage?:ResumeStorageAction
 }){
  const ref=useRef<HTMLDivElement|null>(null);
  useEffect(()=>{
@@ -51,6 +51,28 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
       <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
       <p>适配分仅供比较，不是录用概率。只展示中国大陆企业招聘岗位，不提供第三方招聘平台链接。{pending?'结果正在陆续生成，下方岗位可先查看。':'以下岗位网址来自 DeepSeek Search 结果，推荐原因由 V4 Pro 根据简历生成。'}</p>
      </div>
+     {pending&&(()=>{
+      const steps=[
+       {label:'准备简历与搜索任务',detail:'提取求职方向，准备安全检索'},
+       {label:'搜索企业招聘来源',detail:'优先查找中国大陆企业官网与专属招聘系统'},
+       {label:'读取岗位详情',detail:'核对岗位名称、地点与招聘页面证据'},
+       {label:'分析匹配度并整理推荐',detail:'结合简历经历生成匹配依据与注意事项'}
+      ];
+      const rank={preparing:0,connected:0,searching:1,reading:2,writing:3,waiting:1};
+      const active=rank[stage],progress=[12,36,62,86][active];
+      const current=stage==='waiting'?'DeepSeek 仍在处理，暂未收到新的阶段事件':stage==='connected'?'已连接搜索服务，正在准备检索':stage==='searching'?'DeepSeek 深度思考搜索正在核实中国大陆招聘岗位':steps[active].label;
+      return <section className="hhba-match-progress" role="status" aria-live="polite" aria-label="智能匹配实时进度">
+       <div className="hhba-match-progress-head"><div><strong>正在为你寻找合适的工作</strong><span>{result.matches.length?'已找到 '+result.matches.length+' 个候选岗位':'搜索进行中'}</span></div><time>{elapsedSeconds} 秒</time></div>
+       <div className="hhba-match-progress-value"><strong>{progress}%</strong><small>流程阶段</small></div>
+       <div className="hhba-match-progress-track" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress} aria-valuetext={current}><span style={{width:progress+'%'}}/></div>
+       <p className="hhba-match-progress-current"><LoaderCircle size={15} className="spin"/>{current}</p>
+       <ol className="hhba-match-progress-steps">{steps.map((item,index)=><li key={item.label} className={index<active?'done':index===active?'active':''}>
+        {index<active?<CheckCircle2 size={17}/>:index===active?<LoaderCircle size={17} className="spin"/>:<Circle size={17}/>}
+        <div><strong>{item.label}</strong><small>{item.detail}</small></div>
+       </li>)}</ol>
+       <p className="hhba-match-progress-note">{result.matches.length?'已取得的岗位会先行展示，后续搜索继续补充。':'进度根据服务端实际返回的阶段事件更新；等待期间不会虚构搜索进度。'}</p>
+      </section>;
+     })()}
      {!pending&&result.profile&&result.profile.skills.length>0&&<section className="hhba-match-profile-hints">
       <strong>本次识别到的简历能力线索</strong>
       <div>{result.profile.skills.map(item=><span key={item.name}>{item.name}</span>)}</div>
