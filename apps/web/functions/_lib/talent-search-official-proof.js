@@ -91,6 +91,15 @@ function auditIsValid(proof, now) {
     now - date <= MAX_PROOF_AGE_MS;
 }
 
+/**
+ * Server-side trust preflight: call only with an attestation loaded from
+ * HHBA's controlled audit store, never with search/model-provided JSON.
+ */
+export function isAuditedEmployerProof(proof, now = Date.now()) {
+  const timestamp = now instanceof Date ? now.getTime() : Number(now);
+  return Number.isFinite(timestamp) && auditIsValid(proof, timestamp);
+}
+
 function normalizeCompany(value) {
   return compact(value).replace(
     /(?:股份有限公司|有限责任公司|股份公司|有限公司|集团股份公司|集团公司|集团|公司)$/,
