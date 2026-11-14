@@ -69,7 +69,12 @@ const INDUSTRIES=[
  {pattern:/零售|门店|商超|消费品|连锁/i,label:'零售与消费品'},
  {pattern:/设计|视觉|交互|影视|传媒|艺术/i,label:'文化传媒与设计'},
  {pattern:/物流|仓储|供应链|运输/i,label:'交通物流与供应链'},
- {pattern:/教育|培训|课程|教学/i,label:'教育培训'}
+ {pattern:/教育|培训|课程|教学/i,label:'教育培训'},
+ {pattern:/金融|银行|证券|保险|基金|会计|财务|审计/i,label:'金融与财务'},
+ {pattern:/机械|电气|自动化|工艺|设备|制造|生产|质量/i,label:'先进制造与工业'},
+ {pattern:/医疗|医药|医院|护理|护士|药学|生物/i,label:'医疗健康与医药'},
+ {pattern:/建筑|土木|施工|工程造价|房地产/i,label:'建筑工程与地产'},
+ {pattern:/能源|电力|光伏|风电|储能|石油|化工/i,label:'能源电力与化工'}
 ];
 const SKILL_SIGNALS=[
  {name:'区域与渠道管理',pattern:/区域管理|渠道管理|经销商|4S店|DCC|门店运营|终端管理|巡店/i},
@@ -104,6 +109,13 @@ function constraintsFrom(hint,resume){
  const preferenceTerms=[];
  if(/汽车|汽车零售|车企|经销商/.test(hint))preferenceTerms.push('汽车行业优先');
  if(/互联网|AI|人工智能|软件/.test(hint))preferenceTerms.push('互联网与科技行业优先');
+ if(/金融|银行|证券|保险|基金|会计|财务/.test(hint))preferenceTerms.push('金融与财务行业优先');
+ if(/制造|机械|电气|自动化|电子|半导体/.test(hint))preferenceTerms.push('制造与电子行业优先');
+ if(/医疗|医药|医院|护理|药学|生物/.test(hint))preferenceTerms.push('医疗健康行业优先');
+ if(/教育|培训|教学|教研/.test(hint))preferenceTerms.push('教育培训行业优先');
+ if(/物流|供应链|仓储|运输/.test(hint))preferenceTerms.push('物流与供应链行业优先');
+ if(/建筑|土木|施工|造价|房地产/.test(hint))preferenceTerms.push('建筑工程行业优先');
+ if(/能源|电力|光伏|风电|储能|化工/.test(hint))preferenceTerms.push('能源与化工行业优先');
  return {national_scope:national,travel_preference:travel?'优先考虑全国出差或跨区域岗位':'未明确提出出差要求',
   preferred_cities:preferredCities.slice(0,4),industry_preferences:preferenceTerms};
 }
