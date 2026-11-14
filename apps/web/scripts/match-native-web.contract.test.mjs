@@ -618,7 +618,7 @@ test('structured search preferences guide discovery without becoming role or ind
  const intent=buildRoleIntent('',resume,preferences);
  assert.equal(intent.constraints.location_mode,'PRIORITY');
  assert.deepEqual(intent.constraints.preferred_cities,['上海','杭州']);
- assert.equal(intent.constraints.travel_preference,'FREQUENT_OK');
+ assert.equal(intent.constraints.travel_preference_code,'FREQUENT_OK');
  assert.equal(intent.constraints.salary_min_monthly_cny,15000);
  assert.equal(intent.constraints.salary_max_monthly_cny,20000);
  assert.deepEqual(intent.constraints.employer_models,['dealer_network','chain_stores']);
