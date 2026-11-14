@@ -108,27 +108,3 @@
 .hhba-ai-mainland-only small{font-size:11px;color:#7b8c80}
 @media(max-width:580px){.hhba-ai-mainland-only small{width:100%}}
 
-
-/* Real server-stage progress for resume matching */
-.hhba-ai-progress{margin-top:16px;padding:17px;border:1px solid #dce9df;border-radius:12px;background:#fbfdfb}
-.hhba-ai-progress-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.hhba-ai-progress-head>div{display:flex;flex-direction:column;gap:4px}
-.hhba-ai-progress-head strong{font-size:14px;color:#2e5038}
-.hhba-ai-progress-head span,.hhba-ai-progress-head time{font-size:11px;color:#748578}
-.hhba-ai-progress-value{display:flex;align-items:baseline;gap:7px;margin-top:15px}
-.hhba-ai-progress-value strong{font-size:25px;line-height:1.2;color:#32734a;font-variant-numeric:tabular-nums}
-.hhba-ai-progress-value small{font-size:10px;color:#7b8b7e}
-.hhba-ai-progress-track{height:9px;overflow:hidden;border-radius:99px;background:#e8efe9;margin:9px 0 12px}
-.hhba-ai-progress-track span{display:block;height:100%;border-radius:inherit;background:#318451;transition:width .35s ease}
-.hhba-ai-progress-current{display:flex;align-items:center;gap:8px;margin:0 0 13px;color:#426c4d;font-size:12px;line-height:1.6}
-.hhba-ai-progress-current svg{flex-shrink:0}
-.hhba-ai-progress-steps{display:grid;gap:11px;list-style:none;padding:0;margin:0}
-.hhba-ai-progress-steps li{display:flex;align-items:flex-start;gap:9px;color:#a0aaa2}
-.hhba-ai-progress-steps li>svg{flex-shrink:0;margin-top:1px}
-.hhba-ai-progress-steps li div{display:flex;flex-direction:column;gap:3px}
-.hhba-ai-progress-steps li strong{font-size:11px;font-weight:600;color:#849087}
-.hhba-ai-progress-steps li small{font-size:10px;line-height:1.5;color:#9aa49c}
-.hhba-ai-progress-steps li.active>svg,.hhba-ai-progress-steps li.active strong{color:#32734a}
-.hhba-ai-progress-steps li.done>svg,.hhba-ai-progress-steps li.done strong{color:#668d70}
-.hhba-ai-progress-note{margin:13px 0 0;padding-top:10px;border-top:1px solid #e9efea;color:#7b897e;font-size:10px;line-height:1.65}
-@media(max-width:560px){.hhba-ai-progress{padding:14px}.hhba-ai-progress-head strong{font-size:13px}}
