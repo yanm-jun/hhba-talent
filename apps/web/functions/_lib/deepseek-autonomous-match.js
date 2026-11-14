@@ -80,7 +80,7 @@ export function verifiedDeepSearchMatches(response,limit=10,resumeProfile=null,i
      minYears>resumeProfile.experience_years+0.25)continue;
   const constraints=intent?.constraints||{};
   const preferredCities=Array.isArray(constraints.preferred_cities)?constraints.preferred_cities:[];
-  const normalizedLocation=String(row.location||'').replace(/市/g,'').replace(/\\s+/g,'');
+  const normalizedLocation=String(row.location||'').replace(/市/g,'').replace(/\s+/g,'');
   if(constraints.location_mode==='ONLY'&&preferredCities.length&&
      !preferredCities.some(city=>normalizedLocation.includes(String(city).replace(/市/g,''))))continue;
   const travelEvidence=String(row.travel_requirement||'')+' '+String(row.travel_requirement_evidence||'');
