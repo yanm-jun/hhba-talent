@@ -176,6 +176,9 @@ async function requestJson(provider, url, init, options = {}) {
       try {
         payload = JSON.parse(raw);
       } catch {
+        // Non-JSON error bodies are common for gateways. Preserve the HTTP
+        // status classification without echoing the raw body or credentials.
+        if (!response.ok) throw makeProviderError(provider, response.status, {});
         const error = new Error(`${provider.toUpperCase()}_INVALID_JSON`);
         error.provider = provider;
         error.code = 'PROVIDER_INVALID_RESPONSE';
