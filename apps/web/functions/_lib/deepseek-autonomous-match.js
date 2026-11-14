@@ -24,8 +24,10 @@ function toolSources(response){
  for(const item of response?.output||[]){
   if(item?.type!=='web_search_call'||item.status!=='completed')continue;
   const action=item.action||{};
-  const candidates=action.type==='search'?action.sources||[]:
-   action.type==='open_page'&&action.page?[action.page]:[];
+  // DeepSeek Responses API returns search sources and opened-page evidence
+  // on the web_search_call item itself, NOT inside action (action is input only).
+  const candidates=action.type==='search'?(Array.isArray(item.sources)?item.sources:[]):
+   action.type==='open_page'&&item.page?[item.page]:[];
   for(const source of candidates){
    if(source?.type&&source.type!=='url')continue;
    const url=canonicalUrl(source.url);
