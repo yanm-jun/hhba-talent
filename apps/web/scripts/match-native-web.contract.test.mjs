@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {safeJobDetailLink,parseJobAnswer,wasWebSearched,outputText,partialJobMatchesFromText,decodeSearchText} from '../functions/_lib/deepseek-native-match.js';
 import {runNativeJobMatch,runNativeDualMatch,combineNativeBatches,onRequest} from '../functions/api/match-native/[[path]].js';
 import {buildDeepSearchRequest,verifiedDeepSearchMatches,runAutonomousDeepMatch} from '../functions/_lib/deepseek-autonomous-match.js';
-import {buildResumeProfile,buildRoleIntent} from '../functions/_lib/match-role-intent.js';
+import {buildResumeProfile,buildRoleIntent,buildRoleSearchQueries} from '../functions/_lib/match-role-intent.js';
 const posting='https://careers.examplecorp.com/jobs/brand-supervisor-2026';
 const answer={jobs:[
  {company:'示例汽车中国',title:'品牌督导',location:'上海',salary:'15000-20000 元/月',
@@ -602,4 +602,62 @@ test('match score is calculated from four explicit evidence dimensions when avai
  const result=verifiedDeepSearchMatches(response,10,{experience_years:3});
  assert.equal(result.matches.length,1);
  assert.equal(result.matches[0].match_score,84);
+});
+
+
+test('structured search preferences guide discovery without becoming role or industry boundaries',()=>{
+ const resume='上汽MG区域督导，负责经销商管理、门店运营、销售培训和经营复盘；工作时间约2.5年。';
+ const preferences={
+  industry_hint:'消费品、零售',
+  preferred_cities:['上海','杭州'],
+  location_mode:'PRIORITY',
+  travel_preference:'FREQUENT_OK',
+  salary_min_k:15,salary_max_k:20,
+  employer_models:['dealer_network','chain_stores']
+ };
+ const intent=buildRoleIntent('',resume,preferences);
+ assert.equal(intent.constraints.location_mode,'PRIORITY');
+ assert.deepEqual(intent.constraints.preferred_cities,['上海','杭州']);
+ assert.equal(intent.constraints.travel_preference,'FREQUENT_OK');
+ assert.equal(intent.constraints.salary_min_monthly_cny,15000);
+ assert.equal(intent.constraints.salary_max_monthly_cny,20000);
+ assert.deepEqual(intent.constraints.employer_models,['dealer_network','chain_stores']);
+ assert.ok(intent.industry_terms.includes('零售与消费品'));
+ const queries=buildRoleSearchQueries('',resume,preferences);
+ assert.ok(queries.some(q=>q.includes('上海')));
+ assert.ok(queries.some(q=>q.includes('全国')));
+ const body=buildDeepSearchRequest(resume,'',10,preferences);
+ assert.match(body.instructions,/岗位方向和行业偏好只决定优先级/);
+ assert.match(body.instructions,/PRIORITY 表示优先搜索这些城市/);
+ assert.match(body.instructions,/未公开薪资可以推荐/);
+ assert.match(body.instructions,/这些是搜索重点而非限制/);
+ assert.match(body.input,/15000/);
+});
+
+test('strict city and travel preferences are enforced against job detail evidence',()=>{
+ const profile=buildResumeProfile('工作时间约2.5年，负责区域门店运营和经销商管理');
+ const cityOnly=buildRoleIntent('', '工作时间约2.5年', {
+  preferred_cities:['杭州'],location_mode:'ONLY',travel_preference:'UNSPECIFIED'
+ });
+ const wrongCity=deepEvidenceResponse([{
+  url:posting,company:'示例汽车中国',title:'品牌督导',location:'上海',
+  match_score:85,score_basis:'岗位职责与简历的经销商管理和门店运营经验存在对应。',
+  reason:'候选人具备经销商管理、门店运营和销售培训经历。',
+  job_basis:'负责门店运营和经销商管理'
+ }]);
+ assert.equal(verifiedDeepSearchMatches(wrongCity,10,profile,cityOnly).matches.length,0,
+  'ONLY mode must reject a verified posting outside the selected cities');
+ const noTravel=buildRoleIntent('', '工作时间约2.5年', {
+  preferred_cities:['杭州'],location_mode:'ONLY',travel_preference:'NO'
+ });
+ const frequentTravel=deepEvidenceResponse([{
+  url:posting,company:'示例汽车中国',title:'品牌督导',location:'杭州',
+  match_score:85,score_basis:'岗位职责与简历的经销商管理和门店运营经验存在对应。',
+  reason:'候选人具备经销商管理、门店运营和销售培训经历。',
+  job_basis:'负责门店运营和经销商管理',
+  travel_requirement:'每周需要跨省出差',
+  travel_requirement_evidence:'职位详情明确要求每周跨省出差'
+ }]);
+ assert.equal(verifiedDeepSearchMatches(frequentTravel,10,profile,noTravel).matches.length,0,
+  'NO travel preference must reject postings with explicit travel requirements');
 });
