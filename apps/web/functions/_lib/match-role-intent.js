@@ -38,7 +38,7 @@ const FAMILIES=[
  {id:'finance',pattern:/会计|财务|审计|税务|出纳/,
   direct:['会计','财务专员','财务分析','审计专员','税务专员'],
   adjacent:['经营分析','内控专员','成本管理']},
- {id:'human_resources',pattern:/人力资源|\\bHR\\b|招聘|员工关系|薪酬|绩效管理/,
+ {id:'human_resources',pattern:/人力资源|HR|招聘|员工关系|薪酬|绩效管理/,
   direct:['人力资源专员','招聘专员','HRBP','薪酬绩效专员'],
   adjacent:['培训发展','组织发展','行政人事']},
  {id:'engineering',pattern:/机械|电气|自动化|工艺|设备|土木|建筑|施工|工程造价/,
