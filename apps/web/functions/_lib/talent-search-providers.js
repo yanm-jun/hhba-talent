@@ -86,9 +86,10 @@ function normalizeHit(provider, item, index, metadata = {}) {
   const url = safeHttpUrl(item.url || item.link || item.source_url || item.sourceUrl);
   if (!url) return null;
 
-  const snippets = Array.isArray(item.snippets)
-    ? item.snippets.map(text).filter(Boolean)
-    : [];
+  const snippetRows = Array.isArray(item.snippets)
+    ? item.snippets
+    : Array.isArray(item.highlights) ? item.highlights : [];
+  const snippets = snippetRows.map(text).filter(Boolean);
   const snippet = text(item.snippet || item.description || item.summary) || snippets.join('\n');
   const content = text(
     item.content ||
@@ -382,8 +383,8 @@ export async function searchBraveContext(query, options = {}) {
   url.searchParams.set('maximum_number_of_urls', String(boundedInt(options.maxUrls, 50, 1, 50)));
   url.searchParams.set('maximum_number_of_tokens', String(boundedInt(options.maxTokens, 8192, 1024, 32768)));
   url.searchParams.set('enable_source_metadata', 'true');
-  if (text(options.country)) url.searchParams.set('country', text(options.country));
-  if (text(options.searchLang)) url.searchParams.set('search_lang', text(options.searchLang));
+  url.searchParams.set('country', text(options.country) || 'CN');
+  url.searchParams.set('search_lang', text(options.searchLang) || 'zh');
   if (text(options.contextThresholdMode)) {
     url.searchParams.set('context_threshold_mode', text(options.contextThresholdMode));
   }
