@@ -324,3 +324,35 @@ If fewer than ten valid jobs exist, show fewer and explain why. Do not relax sou
 - OpenAI web search guide: https://developers.openai.com/api/docs/guides/tools-web-search
 - OpenAI API pricing: https://developers.openai.com/api/docs/pricing
 - Anthropic web search tool: https://docs.anthropic.com/zh-CN/docs/agents-and-tools/tool-use/web-search-tool
+
+## 9. V1 implementation progress (2026-11-15)
+
+The following source files now exist on the **isolated PR #357 feature branch**, not on production:
+- `apps/web/functions/_lib/talent-search-providers.js`: seven server-side provider adapters (Baidu Agentic, Baidu AI Search v2, DeepSeek, Brave Context, Exa, Tavily, Firecrawl), normalized results, source deduplication, provider failure isolation, bounded responses, manual redirects, and no raw resume submission.
+- `apps/web/functions/_lib/talent-search-career-graph.js`: dynamic, resume-excerpt-grounded career directions and direct/adjacent/transferable query generation without a fixed employer or career allowlist. Later resume pages are included in evidence validation.
+- `apps/web/functions/_lib/talent-search-orchestrator.js`: multiple bounded search waves, query balancing across role groups, verified-job yield and quality-based continuation, provider-call and verification limits, cancellation, diagnostic traces, and no fake fallback jobs.
+- `apps/web/functions/_lib/talent-search-official-proof.js`: independently audited employer-domain attestation checks, first-party versus company-linked ATS states, exact page-quote checks for JD fields, mainland-only location, closed-job rejection, and no false "open now" labels.
+- `apps/web/functions/_lib/talent-search-page-reader.js`: allowlisted HTTPS static HTML reader with manual redirects, content-type checks, byte limits, script removal, and basic visible text/link extraction.
+- `apps/web/functions/_lib/talent-search-verifier-pipeline.js`: server-only coordinator for audited employer lookup, employer careers-page authorization, JD page reading, independently extracted JD fields, and final evidence gate.
+
+The repository's matching CI now has isolated new-engine contract tests. These are mock/synthetic fixtures and **do not prove live search quality**. The pre-existing UI consent and progress-wording contract tests were updated to reflect existing page content without removing the actual consent gate. The new engine is not currently called by `/api/match-native/resume`.
+
+### Hard boundaries for the POC
+- Search model output is only a hint and cannot issue a trusted employer attestation.
+- `getEmployerProof` must load a server-owned audited record (or run a separate independent audit). Its issuer and timestamp are validated; merely including a `verified: true` model field is not enough.
+- No job is eligible until the exact fetched page supports the extracted title, employer, location, duties, requirements, and disclosed salary.
+- ATS tenant authorization requires a vetted employer-owned careers page; a generic link to an ATS vendor homepage is insufficient.
+- Missing real fit scoring leaves relevance as `null`, not a fabricated high match score.
+- The proof module and reader do not yet provide a complete live onboarding/attestation process, OCR, JavaScript rendering, or end-to-end DNS-rebinding-resistant egress. Do not expose the raw reader as a user-input URL proxy.
+- A site that blocks automated fetches is not bypassed. The correct output is unavailable/unverified, with a provider or browser fallback only where permitted.
+- Provider-call budgets prevent runaway billing; these are operational upper bounds, not artificial ten-link quality caps.
+
+### Remaining to qualify for a production rollout
+1. Benchmark actual provider responses with a fixed, privacy-reviewed set of synthetic and de-identified career queries. Confirm provider-specific request schemas, quota, region, authentication, and current pricing before paying.
+2. Build a trusted, auditable dynamic employer-domain/ATS attestation service. Search snippets or career-looking hostnames cannot issue these proofs.
+3. Add reliable official JD extraction for dynamic webpages, including structured metadata and browser/reader fallback where permitted.
+4. Add a calibrated, profile-aware match scorer for all supported professions. Reuse proven hard gates without reintroducing static career restrictions. Human-review real job results.
+5. Add a durable task queue, retry state and user-facing SSE progress for long searches, with privacy-aware retention and cancellation.
+6. Shadow-test the new engine against the existing `/api/match-native/resume` route; only then discuss a preview deployment, canary release, or production switchover.
+
+**Current status**: independent engineering scaffolding and synthetic contract verification; **not** live official-job discovery, and **not** ready to merge or deploy.
