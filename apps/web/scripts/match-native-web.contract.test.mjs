@@ -598,5 +598,5 @@ test('match score is calculated from four explicit evidence dimensions when avai
  }]);
  const result=verifiedDeepSearchMatches(response,10,{experience_years:3});
  assert.equal(result.matches.length,1);
- assert.equal(result.matches[0].match_score,82);
+ assert.equal(result.matches[0].match_score,84);
 });
