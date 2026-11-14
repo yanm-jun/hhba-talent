@@ -1,8 +1,8 @@
 // Deterministic role-intent expansion and resume evidence extraction for HHBA.
 // This module creates search context without another paid model call.
 // Evidence labels are search hints only; they never assert an unverified qualification.
-const clean=(value,max=240)=>String(value||'').replace(/[\\u0000-\\u001f<>]/g,' ')
- .replace(/\\s+/g,' ').trim().slice(0,max);
+const clean=(value,max=240)=>String(value||'').replace(/[\u0000-\u001f<>]/g,' ')
+ .replace(/\s+/g,' ').trim().slice(0,max);
 const unique=(items,max=12)=>[...new Set(items.map(x=>clean(x,36)).filter(Boolean))].slice(0,max);
 const FAMILIES=[
  {id:'supervision',pattern:/(?:区域|渠道|市场|销售|门店|终端)?督导|巡店|稽核|终端管理/,
@@ -56,7 +56,7 @@ const SKILL_SIGNALS=[
 ];
 function matchedFamilies(text){return FAMILIES.filter(f=>f.pattern.test(text));}
 function firstDirection(hint,families){
- const first=hint.split(/[，,；;、|\\n]/)[0]?.trim()||'';
+ const first=hint.split(/[，,；;、|\n]/)[0]?.trim()||'';
  if(first&&!/(全国|出差|出行|优先|接受|不限|可远程|薪资|城市)/.test(first))return first.slice(0,24);
  for(const family of families){const m=hint.match(family.pattern);if(m)return m[0].slice(0,24);}
  return '';
@@ -120,7 +120,7 @@ export function buildResumeProfile(resume='',intent=null){
  const skills=SKILL_SIGNALS.map(signal=>({name:signal.name,evidence:evidence(text,signal.pattern)}))
   .filter(item=>item.evidence).slice(0,8);
  const educationMatch=text.match(/博士研究生|博士|硕士研究生|硕士|研究生|本科|大学专科|大专|专科|高中|中专/);
- const experienceMatch=text.match(/(?:工作经验|从业经验|相关工作经验|工作年限|从业年限)\\s*[:：]?\\s*(\\d+(?:\\.\\d+)?)\\s*年/);
+ const experienceMatch=text.match(/(?:工作经验|从业经验|相关工作经验|工作年限|从业年限)\s*[:：]?\s*(\d+(?:\.\d+)?)\s*年/);
  return {education:educationMatch?.[0]||null,education_evidence:educationMatch?.[0]||null,
   experience_years:experienceMatch?Number(experienceMatch[1]):null,
   experience_evidence:experienceMatch?.[0]||null,skills,
