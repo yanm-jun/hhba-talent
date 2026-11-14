@@ -82,7 +82,7 @@ export async function saveMatchHistory(db,phone,resumeId,roleHint,modelMatches){
  const id=crypto.randomUUID(),created=new Date().toISOString();
  const inserted=await db.prepare('INSERT INTO hhba_ai_match_history(id,phone,resume_id,resume_label,role_hint,created_at,job_count,best_score,new_job_count,improved_job_count,jobs_json) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
   .bind(id,phone,resume?.id||null,resume?text(resume.filename,150):'本次上传的简历（未保存）',
-   text(roleHint,80),created,jobs.length,best<0?null:best,
+   text(roleHint,240),created,jobs.length,best<0?null:best,
    delta.new_job_count,delta.improved_job_count,data).run();
  if(inserted?.success!==true||Number(inserted?.meta?.changes)!==1)
   throw Error('MATCH_HISTORY_WRITE_FAILED');
