@@ -166,7 +166,7 @@ const EMPLOYER_MODEL_LABELS=Object.freeze({
 });
 function preferenceCities(value){
  const rows=Array.isArray(value)?value:
-  typeof value==='string'?value.split(/[，,、;；\\s]+/):[];
+  typeof value==='string'?value.split(/[，,、;；\s]+/):[];
  return unique(rows.filter(x=>typeof x==='string').map(x=>x.replace(/市$/,'')),5)
   .filter(x=>x.length>=2&&x.length<=24);
 }
