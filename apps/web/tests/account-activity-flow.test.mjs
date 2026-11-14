@@ -168,6 +168,6 @@ test('frontend never mounts analytics prompt or sends account bearer events',()=
  assert.match(privacy,/eraseAccountAnalytics/);
  assert.match(privacy,/historicalRecorded/);
  assert.match(privacy,/清除旧版活动记录/);
- assert.match(resume,/我已知悉并单独同意/);
- assert.match(match,/我同意 HHBA 提取简历文本/);
+ assert.match(resume,/我已阅读并同意/);
+ assert.match(match,/单独授权 HHBA 将本次简历文字/);
 });
