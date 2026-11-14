@@ -528,3 +528,31 @@ test('talent-first prompt keeps resume facts separate from inferred adjacent-rol
  assert.match(body.instructions,/匹配分是技能与岗位适配度，不代表录用成功率/);
  assert.match(body.instructions,/严格排除 BOSS、智联、51job、猎聘、拉勾/);
 });
+
+
+test('real resume benchmark: MG regional retail operations extracts evidence for independent talent-first search',()=>{
+ // Sanitized facts transcribed from the user's uploaded resume. No name,
+ // phone, email, photo, or other direct identifier is stored in this fixture.
+ const resume=[
+  '上汽集团 MG 名爵 区域门店督导/终端运营，工作时间约2.5年',
+  '菏泽区域驻店约8个月，参与两家经销商经营改善、人员培养与销售体系搭建',
+  '两家门店成交表现均进入全国TOP20，其中一家区域排名第1，另一家进入区域TOP3',
+  '针对团队经验不足、销售流程不成熟、DCC管理薄弱、试驾及成交链路不完善等问题，推动门店建立完整运营体系并成长为四星级经销商',
+  '负责销售顾问日常培训、产品知识、需求分析、客户接待、试乘试驾、成交推进及复盘辅导，3个月内培养出门店销售冠军',
+  '围绕线索、邀约、到店、试驾、订单、成交建立销售过程管理体系，跟踪线索有效率、邀约到店率、试驾率、订单转化率',
+  '建立15分钟首呼、2天3呼、加微、排程、邀约及录音质检机制',
+  '推动试驾核心话术执行率由76%提升至90%，客户排程履约率由59%提升至67%，交易协助满意度100%，交车满意度95%',
+  '技能：区域运营与门店管理、销售漏斗管理、DCC运营、人员培训与带教、门店SOP与检核、数据分析、营销与获客、汇报与方案能力'
+ ].join('。');
+ const profile=buildResumeProfile(resume);
+ assert.ok(profile.experience_highlights.some(x=>x.includes('全国TOP20')));
+ assert.ok(profile.experience_highlights.some(x=>x.includes('76%')));
+ assert.ok(profile.experience_highlights.some(x=>x.includes('销售冠军')));
+ assert.ok(profile.target_roles.length>0);
+ const body=buildDeepSearchRequest(resume,'上海，品牌督导，期望薪资15000-20000元/月',10);
+ assert.match(body.input,/全国TOP20/);
+ assert.match(body.input,/销售漏斗管理/);
+ assert.match(body.instructions,/人才能力反向找企业/);
+ assert.match(body.instructions,/企业自有官网招聘页面/);
+ assert.match(body.instructions,/严格排除 BOSS、智联、51job、猎聘、拉勾/);
+});
