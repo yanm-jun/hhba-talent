@@ -205,9 +205,9 @@ export function CandidateMatchPage({user}:{user:User|null}){
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 使用我的简历信息进行智能岗位匹配。</span>
+          <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，并单独授权 HHBA 将本次简历文字（系统会尝试遮盖邮箱、手机号、身份证号、个人网址及微信/QQ号，但不保证完全匿名）、求职偏好和提取出的能力线索发送给 DeepSeek API，用于联网搜索与岗位匹配。</span>
         </label>
-        <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
+        <p className="hhba-ai-notice"><ShieldCheck size={15}/>系统仅尝试遮盖部分标识信息，无法保证完全匿名；建议先预览并编辑不愿分享的内容。不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
           disabled={(!file&&!savedId)||!consent||working||previewBusy||(previewLoaded&&previewText.replace(/\s/g,'').length<30)||availability!=='ready'||!getRealAuthToken()}>
