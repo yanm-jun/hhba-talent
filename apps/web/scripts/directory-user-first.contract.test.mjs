@@ -60,7 +60,8 @@ test('candidate directory replaces business metrics with professional and compan
  assert.ok(section.includes('直接搜索目标企业')||section.includes('<GlobalCompanySearch'));
  assert.ok(section.includes('按行业浏览'));
  assert.ok(section.includes('manifest.halls.map'));
- assert.doesNotMatch(section,/hhba-library-overview|数据快照日期|条整理后可浏览的网址记录|item\.enterprises|item\.published/);
+ assert.doesNotMatch(section,/hhba-library-overview|hhba-library-alert|hhba-library-inline-notice|hhba-library-hall-stats|数据快照日期|条整理后可浏览的网址记录|item\.enterprises|item\.published|按专业、企业名称或行业，找到企业招聘入口/);
+ assert.match(section,/<h1>寻找你想加入的企业<\/h1>\s*<\/div>\s*<Link className="hhba-major-entry"/);
  assert.ok(!section.includes('查找行业馆，如汽车'));
  assert.ok(home.includes('候选·待复核'));
  assert.ok(home.includes('曾有来源核对'));
