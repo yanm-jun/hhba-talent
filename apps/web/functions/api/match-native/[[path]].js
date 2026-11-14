@@ -134,7 +134,7 @@ function nativeResponsePayload(result){
  };
 }
 
-// The live Search-first model owns the job list. Only server-completed
+// The live DeepSeek autonomous-search model owns the job list. Only server-verified
 // matches may create durable personal history; clients cannot submit fake jobs.
 async function withSavedHistory(env,session,input,result){
  const response=nativeResponsePayload(result);
