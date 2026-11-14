@@ -46,6 +46,26 @@ test('role intent expands a short job title and preserves travel and industry pr
  assert.ok(queries.some(q=>q.includes('全国出差')));
  assert.ok(queries.some(q=>q.includes('区域运营')));
 });
+test('natural-language job descriptions resolve the actual role instead of retaining the whole sentence',()=>{
+ const resume='有经销商管理、区域门店督导、销售培训和渠道运营经验。';
+ const simple=buildRoleIntent('我想找一份督导岗位，能够接受全国出差，汽车零售优先',resume);
+ assert.equal(simple.primary_direction,'督导');
+ const regional=buildRoleIntent('我希望从事汽车行业的区域督导工作，全国范围可出差',resume);
+ assert.equal(regional.primary_direction,'区域督导');
+ const priority=buildRoleIntent('全国出差，督导优先，汽车零售优先',resume);
+ assert.equal(priority.primary_direction,'督导');
+});
+test('city preferences preserve user priority and never infer from past work locations',()=>{
+ const hint=buildRoleIntent('我想找督导岗位，济南优先、青岛其次，全国范围可出差',
+  '工作经历：曾在上海工作，工作地点为聊城。');
+ assert.deepEqual(hint.constraints.preferred_cities,['济南','青岛']);
+ const historyOnly=buildRoleIntent('督导，全国出差',
+  '工作经历：工作地点山东聊城，曾在上海任职。');
+ assert.deepEqual(historyOnly.constraints.preferred_cities,[]);
+ const resumePreference=buildRoleIntent('督导',
+  '求职意向：区域督导；期望城市：杭州、宁波。工作经历：上海。');
+ assert.deepEqual(resumePreference.constraints.preferred_cities,['杭州','宁波']);
+});
 test('resume evidence profile only emits skills and education supported by resume text',()=>{
  const profile=buildResumeProfile('本科。负责经销商DCC运营、门店培训、线索转化和销售漏斗复盘。工作年限3年。');
  assert.equal(profile.education,'本科');
@@ -259,13 +279,30 @@ test('Score and recruitment status appear in compact modal, not admission probab
  assert.match(css,/hhba-native-score-basis/);
 });
 
-test('city-aware supplemental searches only use explicit location preferences',()=>{
+test('city-aware supplemental searches only use explicit location preferences and prioritize the user hint',()=>{
  const text='工作经历在山东聊城，意向城市：杭州、宁波。希望从事AI产品经理。';
  assert.equal(explicitPreferredCity(text),'杭州');
  const q=supplementalQueries(text,'AI产品经理',searchQueries(text,'AI产品经理'));
  assert.equal(q.length,2);
  assert.ok(q.every(x=>x.includes('杭州')&&x.length<=128));
  assert.equal(explicitPreferredCity('曾在聊城管理门店和培训顾问。'),'');
+ assert.equal(explicitPreferredCity('工作经历：上海；工作地点：聊城。','督导，济南优先、青岛其次'),'济南');
+});
+test('AI matching privacy disclosure describes DeepSeek data flow and redaction limits',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ const privacy=await readFile(new URL('../src/pages/PersonalCenterPage.tsx',import.meta.url),'utf8');
+ const route=await readFile(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
+ const core=await readFile(new URL('../functions/_lib/resume-match-core.js',import.meta.url),'utf8');
+ assert.match(page,/DeepSeek API/);
+ assert.match(page,/不保证完全匿名/);
+ assert.match(privacy,/DeepSeek Search 接收/);
+ assert.match(privacy,/不会自动识别并遮盖姓名/);
+ assert.match(privacy,/匹配历史会保存岗位推荐结果/);
+ assert.match(route,/DeepSeek Search 仅接收生成的检索词/);
+ assert.match(core,/\[邮箱已隐藏\]/);
+ assert.match(core,/\[手机号已隐藏\]/);
+ assert.match(core,/\[身份证号已隐藏\]/);
 });
 test('supplemental candidate merge keeps original IDs and drops repeated URLs',()=>{
  const main=normalizeHits([{results:posts.slice(0,4)}]);
