@@ -62,7 +62,7 @@ test('autonomous deep results require real tool-source URL evidence, reject fabr
  assert.equal(verified.matches[0].official_url,posting);
  assert.equal(verified.matches[0].platform,'deepseek-deep-thinking');
  assert.equal(verified.model_rows,4);
- assert.equal(verified.source_matched_rows,2);
+ assert.equal(verified.source_matched_rows,1,'third-party boards are excluded before source matching');
 });
 test('autonomous deep model records paid usage and exposes soft spending overrun (no pretend hard cap)',async()=>{
  const score='经销商渠道和终端管理经验与岗位职责相关，还需要核查企业招聘资质、正式工作地点及硬性岗位条件。';
