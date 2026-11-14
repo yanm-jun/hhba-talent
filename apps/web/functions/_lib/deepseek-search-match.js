@@ -165,7 +165,16 @@ export function selectedJobs(text,hits,limit=10){
   if(seen.has(signature)||seen.has(evidence.url))continue;
   seen.add(signature);seen.add(evidence.url);
   const url=evidence.url; // CRITICAL: source URL comes from Search, NEVER model text.
-  const match_score=normalizeMatchScore(row.match_score??row.score,row.score_basis);
+  const dimensions=row.fit_dimensions&&typeof row.fit_dimensions==='object'?row.fit_dimensions:null;
+  const dimensionKeys=['role_fit','skill_fit','experience_fit','location_fit'];
+  const hasDimensions=dimensions&&dimensionKeys.every(key=>
+   Number.isInteger(dimensions[key])&&dimensions[key]>=0&&dimensions[key]<=100);
+  const evidenceScore=normalizeMatchScore(row.match_score??row.score,row.score_basis);
+  const weightedScore=hasDimensions?Math.round(
+   dimensions.role_fit*0.30+dimensions.skill_fit*0.30+
+   dimensions.experience_fit*0.25+dimensions.location_fit*0.15
+  ):null;
+  const match_score=weightedScore??evidenceScore;
   const recruitment_source_kind=recruitmentSourceKind(url);
   found.push({id:'search-'+evidence.id,company,title,title_zh:title,location,
    recruitment_source_kind,recruitment_source_note:sourceDisplay(recruitment_source_kind),
