@@ -36,6 +36,7 @@ jobs:
           node --check functions/_lib/talent-search-career-graph.js
           node --check functions/_lib/talent-search-official-proof.js
           node --check functions/_lib/talent-search-orchestrator.js
+          node --check functions/_lib/talent-search-page-reader.js
           node --check functions/_lib/match-job-quality.js
           node --check functions/_lib/match-employer-source.js
           node --check functions/_lib/match-history.js
@@ -64,4 +65,4 @@ jobs:
         working-directory: apps/web
         run: |
           node --check functions/_lib/talent-search-providers.js
-          node --test scripts/talent-search-providers.contract.test.mjs scripts/talent-search-career-graph.contract.test.mjs scripts/talent-search-official-proof.contract.test.mjs scripts/talent-search-orchestrator.contract.test.mjs
+          node --test scripts/talent-search-providers.contract.test.mjs scripts/talent-search-career-graph.contract.test.mjs scripts/talent-search-official-proof.contract.test.mjs scripts/talent-search-orchestrator.contract.test.mjs scripts/talent-search-page-reader.contract.test.mjs
