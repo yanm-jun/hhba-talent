@@ -7,6 +7,7 @@ import {isMainlandJobLocation} from './mainland-job-location.js';
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from './match-job-quality.js';
 import {supplementalQueries,mergeCandidateHits,combineRecommended} from './match-search-growth.js';
 import {recruitmentSourceKind,isEmployerDirectedSource,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting,sourceCounts} from './match-employer-source.js';
+import {buildRoleIntent,buildResumeProfile,buildRoleSearchQueries} from './match-role-intent.js';
 
 const BASE='https://api.deepseek.com';
 const foreign=/(?:香港|澳门|澳門|台湾|臺灣|日本|东京|大阪|新加坡|美国|英国|越南|海外|境外|驻外|overseas|hong kong|tokyo|singapore|remote overseas)/i;
@@ -14,22 +15,9 @@ const roleEvidence=/(?:招聘|岗位|职位|校园招聘|社会招聘|社招|工
 const clean=(s,max=1200)=>decodeSearchText(typeof s==='string'?s:'').replace(/[\u0000-\u001f]/g,' ').replace(/\s+/g,' ').trim().slice(0,max);
 const codeError=(code)=>Object.assign(new Error(code),{code});
 export function searchQueries(resume,roleHint=''){
- const text=String(resume||'').slice(0,13000),hint=clean(roleHint,40).replace(/[|"'<>]/g,' ');
- const categories=[];
- if(hint)categories.push(hint);
- if(/(?:agent|rag|大模型|人工智能|AI产品|产品经理|智能体|工作流|prompt)/i.test(text))
-  categories.push('AI产品经理 Agent 应用','大模型应用 产品运营');
- if(/(?:经销商|4S店|DCC|销售漏斗|区域督导|名爵|汽车销售|门店运营)/i.test(text))
-  categories.push('汽车渠道运营 品牌督导','区域运营 销售管理');
- if(/(?:人才政策|招聘平台|用户增长|产品规划|需求分析|商业化|项目管理)/i.test(text))
-  categories.push('互联网产品运营 项目运营');
- if(/(?:视觉设计|交互设计|UX|UI设计|数字导视|设计作品)/i.test(text))
-  categories.push('用户体验设计 视觉设计');
- if(/(?:Python|SQL|数据分析|算法工程)/i.test(text))
-  categories.push('数据分析 产品分析');
- if(!categories.length)categories.push('项目运营 产品助理','市场运营');
- const uniq=[...new Set(categories)].slice(0,4);
- return uniq.map(x=>(x+' 招聘 职位 工作地点 中国大陆 企业官网 官方招聘').slice(0,128));
+ // Four complementary queries: direct role, alternate titles, transferable roles,
+ // and resume-derived roles. Never send the complete resume to the Search endpoint.
+ return buildRoleSearchQueries(roleHint,resume);
 }
 export function normalizeHits(searchResponses,max=28){
  const byUrl=new Map();
@@ -191,9 +179,15 @@ function outputFromResponse(data){
   (v.content||[]).filter(c=>c?.type==='output_text').map(c=>c.text||'')).join('');
 }
 export async function reasonAboutJobs(key,resume,hits,limit,{
- fetcher=fetch,signal=null,onProgress=()=>{},onPartial=()=>{},modelTimeoutMs=37000,shortlistOnly=false
+ fetcher=fetch,signal=null,onProgress=()=>{},onPartial=()=>{},modelTimeoutMs=37000,shortlistOnly=false,
+ roleHint='',roleIntent=null,resumeProfile=null
 }={}){
  const start=Date.now();onProgress('writing');
+ const intent=roleIntent||buildRoleIntent(roleHint,resume);
+ const profile=resumeProfile||buildResumeProfile(resume,intent);
+ const intentContext={primary_direction:intent.primary_direction,direct_roles:intent.direct_roles,
+  adjacent_roles:intent.adjacent_roles,resume_related_roles:intent.resume_related_roles,
+  industries:intent.industry_terms,constraints:intent.constraints};
  const cards=hits.slice(0,32).map(h=>({
   id:h.id,title:h.title,url:h.url,description:(h.content||h.summary||h.snippet).slice(0,800),
   recruitment_source:h.recruitment_source_kind||recruitmentSourceKind(h.url),
@@ -204,6 +198,8 @@ export async function reasonAboutJobs(key,resume,hits,limit,{
   '你是 HHBA 求职匹配助手。你只能从提供的真实网页搜索候选中推荐职位，绝不能添加新的网页、编造候选 ID。',
   '严格禁止推荐第三方招聘平台，例如BOSS直聘、智联招聘、前程无忧、猎聘、拉勾等；这些即使匹配分很高也不能作为兜底。只能使用企业自有招聘站具体岗位页或企业专属招聘系统候选职位页；企业来源没有证据时不能冒充已核验官方职位。',
   '认真阅读脱敏简历和每条候选职位的摘要。选择实际工作城市位于中国大陆且能合理匹配的最多'+limit+'条不同企业、不同岗位。',
+  '用户目标方向与限制条件：'+JSON.stringify(intentContext)+'。直接岗位优先于相邻迁移岗位；相邻岗位必须说明能力迁移逻辑。用户明确提出全国出差时，优先搜索和排序接受跨区域出差的岗位；没有明确提出时不得自行假设。',
+  '简历能力线索（只允许作为搜索与匹配证据，不得推断未写明的资历）：'+JSON.stringify(profile.skills)+'。优先将真实工作成果映射到岗位职责，而不是只按关键词相似度排序。',
   '若搜索结果没有明确工作地点或职位内容，只能不选该条。不要猜城市、公司或岗位硬性要求；不可虚构学历或经历。',
   '优先选择网页有明确招聘开放证据的岗位；UNKNOWN不能写成可投递，CLOSED_LISTED和POSSIBLY_CLOSED不得推荐。尽可能返回十个真实职位，不为凑数捏造。',
   '为每条岗位给出0～100整数的「简历适配分」match_score，依据已有简历和招聘内容评估岗位方向、工作经验、技能与城市偏好，不代表录用概率。分数需有独立的score_basis（至少30字）解释具体加分与不足；证据不充分时match_score填null、score_basis为空。',
@@ -215,7 +211,7 @@ export async function reasonAboutJobs(key,resume,hits,limit,{
   model:'deepseek-v4-pro',reasoning:{effort:'none'},
   text:{format:{type:'json_object'}},max_output_tokens:shortlistOnly?3500:5600,stream:true,
   instructions,
-  input:'脱敏简历：\n'+String(resume).slice(0,10000)+'\n可选真实职位：\n'+JSON.stringify(cards)
+  input:'用户求职目标：\n'+JSON.stringify(intentContext)+'\n简历能力线索：\n'+JSON.stringify(profile)+'\n脱敏简历：\n'+String(resume).slice(0,10000)+'\n可选真实职位：\n'+JSON.stringify(cards)
  };
  const timeout=AbortSignal.timeout(modelTimeoutMs),sig=signal?AbortSignal.any([signal,timeout]):timeout;
  let response;
@@ -320,9 +316,12 @@ export async function preferEmployerPostingUrls(key,matches,hits,{
 // Expand the shortlist in two small parallel requests. The first-ranked jobs
 // were already sent to the browser; slow prose generation never hides them.
 export async function expandDetailedReasons(key,resume,matches,hits,{
- fetcher=fetch,signal=null,onPartial=()=>{},onProgress=()=>{},detailTimeoutMs=20000
+ fetcher=fetch,signal=null,onPartial=()=>{},onProgress=()=>{},detailTimeoutMs=20000,
+ roleHint='',roleIntent=null,resumeProfile=null
 }={}){
  if(!matches.length)return {matches,expanded:0,detail_ms:0,detail_failures:0};
+ const intent=roleIntent||buildRoleIntent(roleHint,resume);
+ const profile=resumeProfile||buildResumeProfile(resume,intent);
  const started=Date.now(),lookup=new Map(hits.map(h=>[h.url,h]));
  const jobs=[...matches],groups=[];
  for(let i=0;i<jobs.length;i+=5)groups.push(jobs.slice(i,i+5));
@@ -338,6 +337,8 @@ export async function expandDetailedReasons(key,resume,matches,hits,{
   });
   const prompt=[
    '你只负责补充 HHBA 已有岗位的推荐理由。岗位公司、职位、城市、分数已经确定，不得更改、增删岗位或编造任职条件。',
+   '用户目标方向：'+JSON.stringify({primary:intent.primary_direction,direct:intent.direct_roles,adjacent:intent.adjacent_roles,constraints:intent.constraints})+'。优先尊重直接目标；相邻岗位须解释迁移逻辑。',
+   '简历能力线索：'+JSON.stringify(profile.skills)+'。只引用简历实际出现的证据，不推断未出现的资历。',
    '对每条候选撰写120～180字中文具体理由：简历中的真实相关经历和成果、与此职位明确职责的对应、可能的经验差距。',
    '不要输出URL、额外岗位或成功率预测。没有具体职责证据时明确说明不确定。输出JSON：{"jobs":[{"id":"原有id","reason":"具体理由"}]}。'
   ].join('\n');
@@ -348,8 +349,8 @@ export async function expandDetailedReasons(key,resume,matches,hits,{
     headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
     body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'none'},
      text:{format:{type:'json_object'}},max_output_tokens:2200,stream:false,
-     instructions:prompt,input:'脱敏简历：\n'+String(resume).slice(0,7000)+
-      '\n已选真实岗位：\n'+JSON.stringify(description)})
+     instructions:prompt,input:'用户目标：\n'+JSON.stringify(intent)+'\n简历能力线索：\n'+JSON.stringify(profile.skills)+
+      '\n脱敏简历：\n'+String(resume).slice(0,7000)+'\n已选真实岗位：\n'+JSON.stringify(description)})
    });
    if(!response.ok)throw codeError('AI_MATCH_REASON_UNAVAILABLE');
    const data=await response.json(),raw=outputFromResponse(data);
@@ -373,6 +374,8 @@ export async function expandDetailedReasons(key,resume,matches,hits,{
 }
 export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  const start=Date.now(),onProgress=opts.onProgress||(()=>{}),onPartial=opts.onPartial||(()=>{});
+ const roleIntent=buildRoleIntent(roleHint,resume);
+ const resumeProfile=buildResumeProfile(resume,roleIntent);
  const search=await searchPublicJobs(key,resume,roleHint,{...opts,allowEmpty:true});
  const enriched=await enrichCandidateDetails(key,search.hits,opts);
  let pool=enriched.hits;
@@ -384,7 +387,7 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  // Short first pass: return the ranked shortlist, scoring and brief explanations
  // before any further search or the full prose pass.
  const first=pool.length?await reasonAboutJobs(key,resume,pool,limit,{
-  ...opts,shortlistOnly:true,modelTimeoutMs:opts.modelTimeoutMs??26000,
+  ...opts,roleHint,roleIntent,resumeProfile,shortlistOnly:true,modelTimeoutMs:opts.modelTimeoutMs??26000,
   onProgress,onPartial:show
  }):{matches:[],model_ms:0,provider_rows:0};
  firstModelMs=first.model_ms;firstRows=first.provider_rows;
@@ -413,7 +416,7 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
     const unselected=pool.filter(h=>!visible.some(j=>j.official_url===h.url));
     if(unselected.length){
      const extra=await reasonAboutJobs(key,resume,unselected,limit-visible.length,{
-      ...opts,shortlistOnly:true,modelTimeoutMs:opts.supplementalModelTimeoutMs??18000,
+      ...opts,roleHint,roleIntent,resumeProfile,shortlistOnly:true,modelTimeoutMs:opts.supplementalModelTimeoutMs??18000,
       onProgress,onPartial:jobs=>show(combineRecommended(visible,jobs,limit))
      });
      secondModelMs=extra.model_ms;secondRows=extra.provider_rows;
@@ -433,9 +436,9 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  const prefer={matches:visible,hits:pool,lookups:0,replaced:0,lookup_ms:0};
  if(!visible.length)throw codeError('AI_EMPLOYER_JOBS_NOT_FOUND');
  const detail=opts.expandDetailed===false?{matches:visible,expanded:0,detail_ms:0,detail_failures:0}:
-  await expandDetailedReasons(key,resume,visible,pool,{...opts,onProgress,onPartial:show});
+  await expandDetailedReasons(key,resume,visible,pool,{...opts,roleHint,roleIntent,resumeProfile,onProgress,onPartial:show});
  visible=detail.matches;
- return {matches:visible,incomplete:visible.length<limit||detail.detail_failures>0,diagnostic:{
+ return {matches:visible,profile:resumeProfile,incomplete:visible.length<limit||detail.detail_failures>0,diagnostic:{
   model:'deepseek-v4-pro',searches:search.diagnostic.successful_searches+additionalQueries,
   page_reads:enriched.fetches+additionalFetches,
   provider_items:search.diagnostic.raw_results,
