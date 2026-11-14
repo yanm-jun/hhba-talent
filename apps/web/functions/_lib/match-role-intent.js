@@ -158,28 +158,66 @@ function firstDirection(hint,families){
  for(const family of families){const match=String(hint||'').match(family.pattern);if(match)return match[0].slice(0,24);}
  return '';
 }
-function constraintsFrom(hint,resume){
- const travel=/(?:全国[^。；;，,]{0,8}出差|可(?:接受)?(?:全国)?出差|接受(?:全国)?出差|长期出差|经常出差|全国各地|全国范围)/.test(hint);
- const national=/(全国|不限城市|各地均可)/.test(hint);
- const preferredCities=extractPreferredCities(hint,resume);
- const preferenceTerms=[];
- if(/汽车|汽车零售|车企|经销商/.test(hint))preferenceTerms.push('汽车行业优先');
- if(/互联网|AI|人工智能|软件/.test(hint))preferenceTerms.push('互联网与科技行业优先');
- if(/金融|银行|证券|保险|基金|会计|财务/.test(hint))preferenceTerms.push('金融与财务行业优先');
- if(/制造|机械|电气|自动化|电子|半导体/.test(hint))preferenceTerms.push('制造与电子行业优先');
- if(/医疗|医药|医院|护理|药学|生物/.test(hint))preferenceTerms.push('医疗健康行业优先');
- if(/教育|培训|教学|教研/.test(hint))preferenceTerms.push('教育培训行业优先');
- if(/物流|供应链|仓储|运输/.test(hint))preferenceTerms.push('物流与供应链行业优先');
- if(/建筑|土木|施工|造价|房地产/.test(hint))preferenceTerms.push('建筑工程行业优先');
- if(/能源|电力|光伏|风电|储能|化工/.test(hint))preferenceTerms.push('能源与化工行业优先');
- return {national_scope:national,travel_preference:travel?'优先考虑全国出差或跨区域岗位':'未明确提出出差要求',
-  preferred_cities:preferredCities.slice(0,4),industry_preferences:preferenceTerms};
+const EMPLOYER_MODEL_LABELS=Object.freeze({
+ dealer_network:'经销商与代理商网络',
+ chain_stores:'连锁门店与直营网点',
+ regional_teams:'全国或区域运营团队',
+ brand_service_network:'品牌终端与服务网点'
+});
+function preferenceCities(value){
+ const rows=Array.isArray(value)?value:
+  typeof value==='string'?value.split(/[，,、;；\\s]+/):[];
+ return unique(rows.filter(x=>typeof x==='string').map(x=>x.replace(/市$/,'')),5)
+  .filter(x=>x.length>=2&&x.length<=24);
 }
-export function buildRoleIntent(roleHint='',resume=''){
+function constraintsFrom(hint,resume,preferences={}){
+ const p=preferences&&typeof preferences==='object'&&!Array.isArray(preferences)?preferences:{};
+ const cities=preferenceCities(p.preferred_cities);
+ const mode=['PRIORITY','ONLY','NATIONWIDE'].includes(p.location_mode)?p.location_mode:
+  /全国|不限城市|各地均可/.test(hint)?'NATIONWIDE':'PRIORITY';
+ const travelValues=['UNSPECIFIED','FREQUENT_OK','OCCASIONAL','NO'];
+ const travel=p.travel_preference;
+ const detectedTravel=/(?:全国[^。；;，,]{0,8}出差|可(?:接受)?(?:全国)?出差|接受(?:全国)?出差|长期出差|经常出差|全国各地|全国范围)/.test(hint);
+ const travelPreference=travelValues.includes(travel)?travel:
+  detectedTravel?'FREQUENT_OK':'UNSPECIFIED';
+ const industryHint=clean(p.industry_hint,120);
+ const industryText=hint+' '+industryHint;
+ const preferenceTerms=[];
+ if(/汽车|汽车零售|车企|经销商/.test(industryText))preferenceTerms.push('汽车行业优先');
+ if(/互联网|AI|人工智能|软件/.test(industryText))preferenceTerms.push('互联网与科技行业优先');
+ if(/金融|银行|证券|保险|基金|会计|财务/.test(industryText))preferenceTerms.push('金融与财务行业优先');
+ if(/制造|机械|电气|自动化|电子|半导体/.test(industryText))preferenceTerms.push('制造与电子行业优先');
+ if(/医疗|医药|医院|护理|药学|生物/.test(industryText))preferenceTerms.push('医疗健康行业优先');
+ if(/教育|培训|教学|教研/.test(industryText))preferenceTerms.push('教育培训行业优先');
+ if(/物流|供应链|仓储|运输/.test(industryText))preferenceTerms.push('物流与供应链行业优先');
+ if(/建筑|土木|施工|造价|房地产/.test(industryText))preferenceTerms.push('建筑工程行业优先');
+ if(/能源|电力|光伏|风电|储能|化工/.test(industryText))preferenceTerms.push('能源与化工行业优先');
+ const min=Number(p.salary_min_k),max=Number(p.salary_max_k);
+ const salaryMin=Number.isFinite(min)&&min>0&&min<=500?Math.round(min*1000):null;
+ const salaryMax=Number.isFinite(max)&&max>0&&max<=500?Math.round(max*1000):null;
+ const models=Array.isArray(p.employer_models)?
+  [...new Set(p.employer_models.filter(x=>Object.hasOwn(EMPLOYER_MODEL_LABELS,x)))]:[];
+ const effectiveMode=mode==='ONLY'&&!cities.length?'NATIONWIDE':mode;
+ return {
+  national_scope:effectiveMode==='NATIONWIDE'||(!cities.length&&effectiveMode==='PRIORITY'),
+  location_mode:effectiveMode,preferred_cities:cities,
+  travel_preference:travelPreference,
+  travel_preference_label:({
+   UNSPECIFIED:'未明确出差要求',FREQUENT_OK:'接受全国出差或跨区域岗位',
+   OCCASIONAL:'可接受偶尔出差，不优先长期驻外',NO:'不接受需要出差的岗位'
+  })[travelPreference],
+  industry_preferences:preferenceTerms,
+  industry_hint:industryHint,
+  salary_min_monthly_cny:salaryMin,salary_max_monthly_cny:salaryMax,
+  employer_models:models,
+  employer_model_labels:models.map(x=>EMPLOYER_MODEL_LABELS[x])
+ };
+}
+export function buildRoleIntent(roleHint='',resume='',searchPreferences={}){
  const hint=clean(roleHint,240),text=String(resume||'').slice(0,13000);
- const hintFamilies=matchedFamilies(hint),resumeFamilies=matchedFamilies(text);
- // A preferred title is a priority, not a ceiling: preserve transferable
- // capability families found in the actual resume as additional discovery paths.
+ const industryHint=clean(searchPreferences?.industry_hint,120);
+ const hintFamilies=matchedFamilies(hint+' '+industryHint),resumeFamilies=matchedFamilies(text);
+ // A preferred title/industry is a priority, never a ceiling on transferable roles.
  const primaryFamilies=[...new Map([...hintFamilies,...resumeFamilies]
   .map(f=>[f.id,f])).values()].slice(0,5);
  const primaryDirection=firstDirection(hint,primaryFamilies)||primaryFamilies[0]?.direct[0]||'根据简历推荐';
@@ -187,36 +225,42 @@ export function buildRoleIntent(roleHint='',resume=''){
  const adjacentRoles=unique(primaryFamilies.flatMap(f=>f.adjacent),10);
  const resumeRoles=unique([...( /汽车|经销商|DCC|名爵|上汽/i.test(text)?['汽车渠道运营','品牌督导']:[]),
   ...resumeFamilies.flatMap(f=>f.direct)],16);
- const industryTerms=unique(INDUSTRIES.filter(x=>x.pattern.test(text)).map(x=>x.label),5);
- const constraints=constraintsFrom(hint,text);
+ const industryTerms=unique([
+  ...INDUSTRIES.filter(x=>x.pattern.test(text)).map(x=>x.label),
+  ...INDUSTRIES.filter(x=>x.pattern.test(industryHint)).map(x=>x.label)
+ ],8);
+ const constraints=constraintsFrom(hint,text,searchPreferences);
  return {primary_direction:primaryDirection,direct_roles:directRoles,adjacent_roles:adjacentRoles,
-  resume_related_roles:resumeRoles,industry_terms:industryTerms,constraints,
-  matched_families:unique([...primaryFamilies,...resumeFamilies].map(f=>f.id),10)};
+  resume_related_roles:resumeRoles,industry_terms:industryTerms,
+  constraints,matched_families:unique([...primaryFamilies,...resumeFamilies].map(f=>f.id),10)};
 }
 function query(parts){return unique(parts.flatMap(x=>Array.isArray(x)?x:[x]),18).join(' ').slice(0,128);}
-export function buildRoleSearchQueries(roleHint='',resume=''){
- const intent=buildRoleIntent(roleHint,resume),c=intent.constraints;
- const travel=c.travel_preference.includes('优先')?'全国出差':'';
- const industry=unique([...intent.constraints.industry_preferences,...intent.industry_terms],4);
- const location=c.preferred_cities[0]||(c.national_scope?'全国':'中国大陆');
+export function buildRoleSearchQueries(roleHint='',resume='',searchPreferences={}){
+ const intent=buildRoleIntent(roleHint,resume,searchPreferences),c=intent.constraints;
+ const cityTerms=c.preferred_cities.join(' ');
+ const preferredLocation=c.location_mode==='NATIONWIDE'||!cityTerms?'全国':cityTerms;
+ const broaderLocation=c.location_mode==='ONLY'?cityTerms:'全国';
+ const travel=c.travel_preference==='FREQUENT_OK'?'全国出差':
+  c.travel_preference==='NO'?'无需频繁出差':'';
+ const industry=unique([...c.industry_preferences,...intent.industry_terms],5);
+ const businessModels=c.employer_model_labels.slice(0,3);
  const common='招聘 职位详情 企业官网 中国大陆';
  const queries=[
-  query([intent.primary_direction,intent.direct_roles.slice(1,5),location,travel,common]),
-  query([intent.direct_roles.slice(5,10),industry,location,'社会招聘 官方招聘 中国大陆']),
-  query([intent.adjacent_roles.slice(0,6),industry,location,'企业招聘 职位详情 中国大陆']),
-  query([intent.primary_direction,intent.resume_related_roles.slice(0,5),location,travel,industry,'企业官方招聘'])
+  query([intent.primary_direction,intent.direct_roles.slice(1,5),preferredLocation,travel,common]),
+  query([intent.direct_roles.slice(5,10),industry,businessModels,broaderLocation,'社会招聘 官方招聘 中国大陆']),
+  query([intent.adjacent_roles.slice(0,6),industry,businessModels,broaderLocation,'企业招聘 职位详情 中国大陆']),
+  query([intent.primary_direction,intent.resume_related_roles.slice(0,5),industry,businessModels,broaderLocation,travel,'企业官方招聘'])
  ].filter(Boolean);
  return [...new Set(queries)].slice(0,4);
 }
-export function buildSupplementalRoleQueries(roleHint='',resume='',city=''){
- const intent=buildRoleIntent(roleHint,resume),c=intent.constraints;
- const location=city||c.preferred_cities[0]||(c.national_scope?'全国':'中国大陆');
- const travel=c.travel_preference.includes('优先')?'全国出差':'';
- const industry=unique([...c.industry_preferences,...intent.industry_terms],4);
- const a=query([intent.direct_roles.slice(3,9),industry,location,travel,'招聘 职位详情 企业官网']);
- const b=query([intent.adjacent_roles.slice(0,7),industry,location,'社会招聘 官方招聘']);
- // Deep-search coverage: broaden by employer entities, adjacent roles and official JDs.
- // Queries contain only role/industry/location terms; never personal resume text.
+export function buildSupplementalRoleQueries(roleHint='',resume='',city='',searchPreferences={}){
+ const intent=buildRoleIntent(roleHint,resume,searchPreferences),c=intent.constraints;
+ const location=city||c.preferred_cities.join(' ')||(c.location_mode==='NATIONWIDE'?'全国':'中国大陆');
+ const travel=c.travel_preference==='FREQUENT_OK'?'全国出差':'';
+ const industry=unique([...c.industry_preferences,...intent.industry_terms],5);
+ const models=c.employer_model_labels.slice(0,3);
+ const a=query([intent.direct_roles.slice(3,9),industry,models,location,travel,'招聘 职位详情 企业官网']);
+ const b=query([intent.adjacent_roles.slice(0,7),industry,models,location,'社会招聘 官方招聘']);
  const d=query(['集团 子公司 招聘',intent.primary_direction,industry.slice(0,2),location,'官方岗位']);
  const e=query(['官方招聘 职位详情',intent.adjacent_roles.slice(3,10),location,travel]);
  const f=query(['社招 职位职责',intent.direct_roles.slice(0,4),industry.slice(0,2),location]);
