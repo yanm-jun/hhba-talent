@@ -10,6 +10,14 @@ import {recruitmentSourceKind,isEmployerDirectedSource,sourceDisplay,sortEmploye
 import {buildRoleIntent,buildResumeProfile,buildRoleSearchQueries} from './match-role-intent.js';
 
 const BASE='https://api.deepseek.com';
+// One paid match uses the same deep-search tier for every user. These are hard ceilings,
+// not a requirement to spend the entire budget if enough eligible jobs were found.
+export const DEEP_SEARCH_BUDGET=Object.freeze({
+ searchRequests:10,fetchRequests:16,searchResultsPerRequest:50,
+ initialSearchRequests:4,initialFetchRequests:8,
+ supplementalSearchRequests:6,supplementalFetchRequests:8,
+ toolPriceCny:0.005
+});
 const foreign=/(?:香港|澳门|澳門|台湾|臺灣|日本|东京|大阪|新加坡|美国|英国|越南|海外|境外|驻外|overseas|hong kong|tokyo|singapore|remote overseas)/i;
 const roleEvidence=/(?:招聘|岗位|职位|校园招聘|社会招聘|社招|工作地点|岗位职责|任职要求|申请职位|立即申请|job|career|position|apply|vacancy)/i;
 const clean=(s,max=1200)=>decodeSearchText(typeof s==='string'?s:'').replace(/[\u0000-\u001f]/g,' ').replace(/\s+/g,' ').trim().slice(0,max);
@@ -66,12 +74,13 @@ export async function searchPublicJobs(key,text,roleHint,{
  fetcher=fetch,signal=null,onProgress=()=>{},queryTimeoutMs=14000,
  queriesOverride=null,maxHits=28,allowEmpty=false
 }={}){
- const start=Date.now(),queries=queriesOverride||searchQueries(text,roleHint),errors=[];
+ const start=Date.now(),queries=(queriesOverride||searchQueries(text,roleHint))
+  .slice(0,DEEP_SEARCH_BUDGET.searchRequests),errors=[];
  onProgress('searching');
  const responses=await Promise.all(queries.map(async query=>{
   try{
    const data=await providerJson(fetcher,key,'/v1/tools/search',
-    {query,count:20,need_content:false},queryTimeoutMs,signal);
+    {query,count:DEEP_SEARCH_BUDGET.searchResultsPerRequest,need_content:false},queryTimeoutMs,signal);
    if(!Array.isArray(data?.results))throw codeError('AI_SEARCH_RESPONSE_INVALID');
    return data;
   }catch(e){errors.push(e.code||'AI_PROVIDER_UNAVAILABLE');return {results:[]};}
@@ -83,21 +92,24 @@ export async function searchPublicJobs(key,text,roleHint,{
   errors.includes('AI_SEARCH_API_REJECTED')?'AI_SEARCH_API_REJECTED':
   errors.length===queries.length?'AI_SEARCH_UNAVAILABLE':'AI_SEARCH_NO_DETAIL_JOBS');
  return {hits,diagnostic:{search_ms:Date.now()-start,queries:queries.length,
-  successful_searches:queries.length-errors.length,raw_results:responses.reduce((a,x)=>a+x.results.length,0),
+  successful_searches:responses.filter(x=>x.results?.length>0).length,
+  raw_results:responses.reduce((a,x)=>a+x.results.length,0),
   candidate_links:hits.length,search_failures:errors.length,
   rejected_links:responses.reduce((a,x)=>a+x.results.length,0)-hits.length}};
 }
 export async function enrichCandidateDetails(key,hits,{
  fetcher=fetch,signal=null,onProgress=()=>{},maxFetch=8,fetchTimeoutMs=3200
 }={}){
- // Eight bounded parallel Fetch calls. Prioritize any Search result explicitly
- // suggesting closure; then earliest candidates the model is most likely to rank.
+ // Keep a strict request budget even when some requests fail: the provider bills
+ // successful calls, but failed attempts must never permit unlimited retries.
+ // Prioritize candidates showing possible closure, then short evidence snippets.
  // Do not make unknown Search snippets appear "confirmed open".
  const suspicious=hits.filter(h=>h.availability?.status==='POSSIBLY_CLOSED');
  const short=hits.filter(h=>h.summary.length<130);
  const needs=[...new Set([...suspicious,...short,...hits].map(h=>h.id))]
-  .map(id=>hits.find(h=>h.id===id)).filter(Boolean).slice(0,maxFetch);
- if(!needs.length)return {hits,fetches:0,fetch_ms:0,excluded_closed:0};
+  .map(id=>hits.find(h=>h.id===id)).filter(Boolean)
+  .slice(0,Math.max(0,Math.min(DEEP_SEARCH_BUDGET.fetchRequests,Math.floor(maxFetch)||0)));
+ if(!needs.length)return {hits,fetches:0,fetch_attempts:0,fetch_ms:0,excluded_closed:0};
  const start=Date.now();onProgress('reading');
  let success=0;
  const detail=await Promise.all(needs.map(async hit=>{
@@ -114,7 +126,7 @@ export async function enrichCandidateDetails(key,hits,{
  const map=new Map(detail.map(hit=>[hit.id,hit]));
  const checked=hits.map(hit=>map.get(hit.id)||hit);
  const eligible=checked.filter(isRecommendationEligible);
- return {hits:eligible,fetches:success,fetch_ms:Date.now()-start,
+ return {hits:eligible,fetches:success,fetch_attempts:needs.length,fetch_ms:Date.now()-start,
   excluded_closed:checked.length-eligible.length};
 }
 function closedRows(text){
@@ -376,11 +388,15 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  const start=Date.now(),onProgress=opts.onProgress||(()=>{}),onPartial=opts.onPartial||(()=>{});
  const roleIntent=buildRoleIntent(roleHint,resume);
  const resumeProfile=buildResumeProfile(resume,roleIntent);
- const search=await searchPublicJobs(key,resume,roleHint,{...opts,allowEmpty:true});
- const enriched=await enrichCandidateDetails(key,search.hits,opts);
+ const search=await searchPublicJobs(key,resume,roleHint,{...opts,maxHits:64,allowEmpty:true});
+ const enriched=await enrichCandidateDetails(key,search.hits,{
+  ...opts,maxFetch:Math.min(DEEP_SEARCH_BUDGET.initialFetchRequests,
+   opts.maxFetch??DEEP_SEARCH_BUDGET.initialFetchRequests)
+ });
  let pool=enriched.hits;
  let visible=[],firstModelMs=0,secondModelMs=0,firstRows=0,secondRows=0;
- let additionalQueries=0,additionalCandidates=0,additionalFiltered=0,additionalFetches=0;
+ let additionalQueries=0,additionalSuccesses=0,additionalCandidates=0,additionalFiltered=0;
+ let additionalFetches=0,additionalFetchAttempts=0;
  let supplementalFailed=0,supplementSearchMs=0;
 
  const show=jobs=>{visible=jobs;onPartial(jobs);};
@@ -393,26 +409,38 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  firstModelMs=first.model_ms;firstRows=first.provider_rows;
  visible=combineRecommended(visible,first.matches,limit);
  if(visible.length)show(visible);
- // Search another two complementary directions ONLY if there is room. Existing
- // results remain on screen; no repeat resume upload or fictitious fill-ins.
+ // All paid matching requests use the deep tier. Six extra search directions
+ // are allowed only when the validated first shortlist has room. Preserve the
+ // first result on screen and never repeat a resume upload or invent links.
  if(visible.length<limit&&opts.supplementalLimit!==0){
   const queries=supplementalQueries(resume,roleHint,searchQueries(resume,roleHint))
-   .slice(0,opts.supplementalLimit??2);
+   .slice(0,Math.max(0,Math.min(
+    DEEP_SEARCH_BUDGET.supplementalSearchRequests,
+    DEEP_SEARCH_BUDGET.searchRequests-search.diagnostic.queries,
+    opts.supplementalLimit??DEEP_SEARCH_BUDGET.supplementalSearchRequests
+   )));
   if(queries.length){
    additionalQueries=queries.length;
    try{
     const supplemental=await searchPublicJobs(key,resume,roleHint,{
-     ...opts,queriesOverride:queries,maxHits:28,allowEmpty:true,queryTimeoutMs:opts.supplementalTimeoutMs??9000
+     ...opts,queriesOverride:queries,maxHits:48,allowEmpty:true,queryTimeoutMs:opts.supplementalTimeoutMs??9000
     });
+    supplemental.diagnostic.queries=Math.min(supplemental.diagnostic.queries,queries.length);
+    additionalSuccesses=supplemental.diagnostic.successful_searches;
     supplementSearchMs=supplemental.diagnostic.search_ms;
     additionalCandidates=supplemental.hits.length;
     additionalFiltered=supplemental.diagnostic.rejected_links;
     const earlier=new Set(pool.map(h=>h.url));
-    const combined=mergeCandidateHits(pool,supplemental.hits,48);
+    const combined=mergeCandidateHits(pool,supplemental.hits,96);
     const fresh=combined.filter(h=>!earlier.has(h.url));
-    // Only four extra Fetch calls, all parallel. Keep the initial searchable list.
-    const checked=await enrichCandidateDetails(key,fresh,{...opts,maxFetch:4,fetchTimeoutMs:2400});
-    additionalFetches=checked.fetches;pool=mergeCandidateHits(pool,checked.hits,48);
+    // Up to eight additional reads, never exceeding 16 total attempted Fetch calls.
+    const checked=await enrichCandidateDetails(key,fresh,{...opts,maxFetch:Math.min(
+     DEEP_SEARCH_BUDGET.supplementalFetchRequests,
+     DEEP_SEARCH_BUDGET.fetchRequests-enriched.fetch_attempts
+    ),fetchTimeoutMs:opts.supplementalFetchTimeoutMs??3200});
+    additionalFetches=checked.fetches;
+    additionalFetchAttempts=checked.fetch_attempts;
+    pool=mergeCandidateHits(pool,checked.hits,96);
     const unselected=pool.filter(h=>!visible.some(j=>j.official_url===h.url));
     if(unselected.length){
      const extra=await reasonAboutJobs(key,resume,unselected,limit-visible.length,{
@@ -438,16 +466,27 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  const detail=opts.expandDetailed===false?{matches:visible,expanded:0,detail_ms:0,detail_failures:0}:
   await expandDetailedReasons(key,resume,visible,pool,{...opts,roleHint,roleIntent,resumeProfile,onProgress,onPartial:show});
  visible=detail.matches;
+ const searchAttempts=search.diagnostic.queries+additionalQueries;
+ const searchSuccesses=search.diagnostic.successful_searches+additionalSuccesses;
+ const fetchAttempts=enriched.fetch_attempts+additionalFetchAttempts;
+ const fetchSuccesses=enriched.fetches+additionalFetches;
  return {matches:visible,profile:resumeProfile,incomplete:visible.length<limit||detail.detail_failures>0,diagnostic:{
-  model:'deepseek-v4-pro',searches:search.diagnostic.successful_searches+additionalQueries,
-  page_reads:enriched.fetches+additionalFetches,
+  model:'deepseek-v4-pro',searches:searchSuccesses,
+  page_reads:fetchSuccesses,
+  search_attempts:searchAttempts,fetch_attempts:fetchAttempts,
+  max_search_requests:DEEP_SEARCH_BUDGET.searchRequests,
+  max_fetch_requests:DEEP_SEARCH_BUDGET.fetchRequests,
+  estimated_tool_cost_cny:Number(((searchSuccesses+fetchSuccesses)*
+   DEEP_SEARCH_BUDGET.toolPriceCny).toFixed(3)),
+  tool_cost_ceiling_cny:Number(((DEEP_SEARCH_BUDGET.searchRequests+
+   DEEP_SEARCH_BUDGET.fetchRequests)*DEEP_SEARCH_BUDGET.toolPriceCny).toFixed(3)),
   provider_items:search.diagnostic.raw_results,
   visible_jobs:visible.length,
   discarded:Math.max(0,search.diagnostic.candidate_links-visible.length),
   elapsed_ms:Date.now()-start,search_ms:search.diagnostic.search_ms,
   fetch_ms:enriched.fetch_ms,model_ms:firstModelMs+secondModelMs+detail.detail_ms,
   candidate_links:search.diagnostic.candidate_links,excluded_closed:enriched.excluded_closed,
-  checked_pages:enriched.fetches+additionalFetches,mode:'search-first-staged',
+  checked_pages:fetchSuccesses,mode:'deep-search-staged',
   primary_raw_hits:search.diagnostic.raw_results,
   primary_filtered_links:search.diagnostic.rejected_links,
   primary_candidates:search.diagnostic.candidate_links,
@@ -455,7 +494,7 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
   initial_closed:enriched.excluded_closed,
   third_party_results_shown:0,
   initial_model_rows:firstRows,initial_visible:first.matches.length,
-  supplement_queries:additionalQueries,supplement_search_ms:supplementSearchMs,
+    supplement_queries:additionalQueries,supplement_search_ms:supplementSearchMs,
   supplement_failed:supplementalFailed,supplement_found:additionalCandidates,
   supplement_filtered_links:additionalFiltered,supplement_model_rows:secondRows,
   final_shortlisted:visible.length,details_expanded:detail.expanded,
