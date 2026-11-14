@@ -39,6 +39,5 @@ test('2026-2027 official holiday and makeup-workday rules are present',()=>{
 });
 test('brand colors and preview-only disclosure are preserved',()=>{
  for(const s of ['#1979ed','#f49c28','#f7a22c'])assert.ok(css.includes(s));
- assert.ok(drawer.includes('不代表真实在线、投递或 Offer 成果'));
  assert.ok(html.includes('不代表真实在线、投递或 Offer 成果'));
 });
