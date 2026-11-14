@@ -129,3 +129,28 @@
 .hhba-match-profile-hints>div{display:flex;flex-wrap:wrap;gap:7px}
 .hhba-match-profile-hints span{padding:5px 9px;border-radius:7px;background:#edf5ef;color:#3e6a4a;font-size:11px}
 .hhba-match-profile-hints small{display:block;margin-top:9px;color:#829186;font-size:10px;line-height:1.6}
+
+
+/* Progress belongs inside the native results modal, including before the first partial job arrives. */
+.hhba-match-progress{margin:0 0 18px;padding:16px;border:1px solid #dce9df;border-radius:12px;background:#fbfdfb}
+.hhba-match-progress-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hhba-match-progress-head>div{display:flex;flex-direction:column;gap:4px}
+.hhba-match-progress-head strong{font-size:14px;color:#2e5038}
+.hhba-match-progress-head span,.hhba-match-progress-head time{font-size:11px;color:#748578}
+.hhba-match-progress-value{display:flex;align-items:baseline;gap:7px;margin-top:13px}
+.hhba-match-progress-value strong{font-size:25px;line-height:1.2;color:#32734a;font-variant-numeric:tabular-nums}
+.hhba-match-progress-value small{font-size:10px;color:#7b8b7e}
+.hhba-match-progress-track{height:9px;overflow:hidden;border-radius:99px;background:#e8efe9;margin:9px 0 12px}
+.hhba-match-progress-track span{display:block;height:100%;border-radius:inherit;background:#318451;transition:width .35s ease}
+.hhba-match-progress-current{display:flex;align-items:center;gap:8px;margin:0 0 13px;color:#426c4d;font-size:12px;line-height:1.6}
+.hhba-match-progress-current svg{flex-shrink:0}
+.hhba-match-progress-steps{display:grid;gap:10px;list-style:none;padding:0;margin:0}
+.hhba-match-progress-steps li{display:flex;align-items:flex-start;gap:9px;color:#a0aaa2}
+.hhba-match-progress-steps li>svg{flex-shrink:0;margin-top:1px}
+.hhba-match-progress-steps li div{display:flex;flex-direction:column;gap:3px}
+.hhba-match-progress-steps li strong{font-size:11px;font-weight:600;color:#849087}
+.hhba-match-progress-steps li small{font-size:10px;line-height:1.5;color:#9aa49c}
+.hhba-match-progress-steps li.active>svg,.hhba-match-progress-steps li.active strong{color:#32734a}
+.hhba-match-progress-steps li.done>svg,.hhba-match-progress-steps li.done strong{color:#668d70}
+.hhba-match-progress-note{margin:12px 0 0;padding-top:9px;border-top:1px solid #e9efea;color:#7b897e;font-size:10px;line-height:1.65}
+@media(max-width:640px){.hhba-match-progress{padding:13px}}
