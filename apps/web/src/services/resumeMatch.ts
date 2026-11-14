@@ -26,6 +26,9 @@ export type MatchedJob = {
   score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
   recommendation_reason?:string;source_status?:'MODEL_SEARCH_REPORTED';
   match_score?:number|null;score_basis?:string;
+  travel_requirement?:string|null;travel_requirement_evidence?:string|null;
+  fit_dimensions?:{role_fit:number;skill_fit:number;experience_fit:number;location_fit:number}|null;
+  fit_dimension_evidence?:Record<string,string>|null;
   availability_status?:'OPEN_LISTED'|'CLOSED_LISTED'|'POSSIBLY_CLOSED'|'UNKNOWN';
   availability_note?:string;availability_checked_at?:string|null;
   score_reasoning?:string;
@@ -41,7 +44,16 @@ export type MatchResponse = {
   new_job_count?:number;
   improved_job_count?:number;
 };
-export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number};
+export type MatchSearchPreferences = {
+ industry_hint:string;preferred_cities:string;
+ location_mode:'PRIORITY'|'ONLY'|'NATIONWIDE';
+ travel_preference:'UNSPECIFIED'|'FREQUENT_OK'|'OCCASIONAL'|'NO';
+ salary_min_k:string;salary_max_k:string;employer_models:string[];
+};
+export type MatchOptions = {
+ country:string;remote_only:boolean;role_hint:string;limit:number;
+ search_preferences?:MatchSearchPreferences;
+};
 const API='/api/match-native';
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=3*1024*1024;
@@ -189,6 +201,22 @@ async function consumeNativeMatchStream(
  return complete;
 }
 
+function toSearchPreferencesPayload(value?:MatchSearchPreferences){
+ const p=value||{} as MatchSearchPreferences;
+ const cities=String(p.preferred_cities||'').split(/[，,、;；\\s]+/)
+  .map(x=>x.trim().replace(/市$/,'')).filter(x=>x.length>=2&&x.length<=24);
+ const salary=(raw:string)=>{const n=Number(raw);return Number.isFinite(n)&&n>0&&n<=500?n:null};
+ const models=['dealer_network','chain_stores','regional_teams','brand_service_network'];
+ return {
+  industry_hint:String(p.industry_hint||'').trim().slice(0,120),
+  preferred_cities:[...new Set(cities)].slice(0,5),
+  location_mode:p.location_mode||'PRIORITY',
+  travel_preference:p.travel_preference||'UNSPECIFIED',
+  salary_min_k:salary(p.salary_min_k||''),
+  salary_max_k:salary(p.salary_max_k||''),
+  employer_models:Array.isArray(p.employer_models)?[...new Set(p.employer_models.filter(x=>models.includes(x)))]:[]
+ };
+}
 export async function submitExtractedResumeText(
  text:string,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string,
  onProgress?:(stage:NativeMatchProgress)=>void,
@@ -203,7 +231,8 @@ export async function submitExtractedResumeText(
   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
    options:{country:'CN',remote_only:false,
-    role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10))}})
+    role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10)),
+    search_preferences:toSearchPreferencesPayload(opts.search_preferences)}})
  }).catch(e=>{if((e as Error)?.name==='AbortError')throw e;
   throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
  const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
