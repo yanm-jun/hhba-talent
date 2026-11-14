@@ -193,3 +193,17 @@ test('empty or insufficient resume evidence produces no career graph', () => {
   assert.deepEqual(validateCareerGraph([{ role: '运营经理', intent: 'direct', evidence: ['负责区域运营管理。'] }], ''), []);
   assert.deepEqual(validateCareerGraph([{ role: '运营经理', intent: 'direct', evidence: ['负责区域运营管理。'] }], '个人简历'), []);
 });
+
+test('long multi-page CV evidence after character 1200 is not silently lost', () => {
+  const longResume = '工作经历与项目描述。'.repeat(170) +
+    '\n' + '负责全国多家门店的日常运营、巡店检查和整改跟进。';
+  assert.ok(longResume.length > 1200);
+  const graph = validateCareerGraph([
+    {
+      role: '区域零售运营督导',
+      intent: 'direct',
+      evidence: ['负责全国多家门店的日常运营、巡店检查和整改跟进。'],
+    },
+  ], longResume);
+  assert.equal(graph.length, 1);
+});
