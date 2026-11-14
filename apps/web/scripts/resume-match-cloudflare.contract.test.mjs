@@ -154,7 +154,9 @@ test('Top 10 never repeats company+title just because an ATS job has more locati
 test('native match has one upload action and retains separate explicit AI consent',async()=>{
  const {readFile}=await import('node:fs/promises');
  const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
- assert.match(page,/我同意 HHBA 提取简历文本/);
+ assert.match(page,/授权 HHBA 使用我的简历信息进行智能岗位匹配/);
+ assert.match(page,/checked=\\{consent\\}/);
+ assert.match(page,/!consent\\|\\|working/);
  assert.match(page,/开始智能匹配/);
  assert.match(page,/CandidateMatchNativeDialog/);
  assert.doesNotMatch(page,/检测 AI 密钥及余额（不消耗匹配次数）/);
