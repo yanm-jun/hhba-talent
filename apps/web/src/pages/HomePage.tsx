@@ -1,4 +1,4 @@
-import { ArrowUpRight, BriefcaseBusiness, Search, Sparkles, UsersRound } from 'lucide-react';
+import { ArrowUpRight, BriefcaseBusiness, Building2, Sparkles } from 'lucide-react';
 import { Link, navigate } from '../router';
 import { Shell } from '../components/Shell';
 import { UnifiedJobMarket } from '../components/UnifiedJobMarket';
@@ -6,13 +6,12 @@ import { HomeCompanyMarquee } from '../components/HomeCompanyMarquee';
 import { WinterInternshipPopup } from '../components/WinterInternshipPopup';
 import { HomeOpenLetter } from '../components/HomeOpenLetter';
 import { BrandMark } from '../components/BrandMark';
-import { HomeLiveDrawer } from '../components/HomeLiveDrawer';
 import type { User } from '../services/api';
 import '../styles/home-match-promo.css';
 
-function EntryCard({kind,title,body,footer,candidateSignedIn=false}:{kind:'candidate'|'employer';title:string;body:string;footer:string;candidateSignedIn?:boolean}){
- const Icon=kind==='candidate'?BriefcaseBusiness:UsersRound;
- const target=kind==='candidate'?(candidateSignedIn?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'):'/employer/start';
+function EntryCard({kind,title,body,footer,candidateSignedIn=false}:{kind:'candidate'|'directory';title:string;body:string;footer:string;candidateSignedIn?:boolean}){
+ const Icon=kind==='candidate'?BriefcaseBusiness:Building2;
+ const target=kind==='candidate'?(candidateSignedIn?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'):'/companies/discover';
  return <Link to={target} className={'entry-card hhba-entry-card hhba-entry-'+kind}
    aria-label={title+'，'+footer}>
    <span className="entry-icon"><Icon size={23}/></span>
@@ -23,7 +22,6 @@ function EntryCard({kind,title,body,footer,candidateSignedIn=false}:{kind:'candi
 
 export function HomePage({user}:{user:User|null}){
  return <Shell user={user}>
-  <HomeLiveDrawer/>
   <section className="home-hero hhba-public-hero">
    <div className="hhba-public-hero-logo"><BrandMark variant="icon" size="hero"/></div>
    <p className="hhba-public-eyebrow"><span className="hhba-public-brand-cn">汇方职场</span><span>HHBA · HUMAN CAPABILITY NETWORK</span></p>
@@ -35,9 +33,9 @@ export function HomePage({user}:{user:User|null}){
    <EntryCard kind="candidate" title="我要应聘" candidateSignedIn={Boolean(user?.account_types?.includes('candidate'))}
     body="登录后上传或使用已保存简历，让 AI 推荐适合你的企业招聘岗位。"
     footer={user?.account_types?.includes('candidate')?'上传简历 · AI 智能匹配':'登录 / 注册后开始智能匹配'}/>
-   <EntryCard kind="employer" title="我要招人"
-    body="我是企业招聘负责人，想了解 HHBA 的招聘、企业信誉与治理服务。"
-    footer="了解企业招聘与治理"/>
+   <EntryCard kind="directory" title="企业招聘导航"
+    body="按企业名称或所学专业查找招聘渠道；17 个行业馆将分阶段接入。"
+    footer="查看企业与招聘入口"/>
   </section>
   <section className="home-match-promo" aria-labelledby="home-match-promo-title">
    <div className="home-match-promo-copy">
