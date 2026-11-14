@@ -10,7 +10,7 @@ type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
 export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
-  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'>>;
+  'profile'|'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'>>;
  onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction
 }){
  const ref=useRef<HTMLDivElement|null>(null);
@@ -51,6 +51,11 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
       <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
       <p>适配分仅供比较，不是录用概率。只展示中国大陆企业招聘岗位，不提供第三方招聘平台链接。{pending?'结果正在陆续生成，下方岗位可先查看。':'以下岗位网址来自 DeepSeek Search 结果，推荐原因由 V4 Pro 根据简历生成。'}</p>
      </div>
+     {!pending&&result.profile?.skills?.length>0&&<section className="hhba-match-profile-hints">
+      <strong>本次识别到的简历能力线索</strong>
+      <div>{result.profile.skills.map(item=><span key={item.name}>{item.name}</span>)}</div>
+      <small>这些线索用于扩展岗位搜索和辅助匹配，不代表额外资质；最终以简历原文和岗位要求为准。</small>
+     </section>}
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {!pending&&result.history_status==='SAVED'&&<div className="hhba-match-history-confirm">
       <span>这次的真实推荐结果已保存到你账户的「匹配历史」，下次登录可以继续查看。</span>
