@@ -204,7 +204,7 @@ async function consumeNativeMatchStream(
 
 function toSearchPreferencesPayload(value?:MatchSearchPreferences){
  const p=value||{} as MatchSearchPreferences;
- const cities=String(p.preferred_cities||'').split(/[，,、;；\\s]+/)
+ const cities=String(p.preferred_cities||'').split(/[，,、;；\s]+/)
   .map(x=>x.trim().replace(/市$/,'')).filter(x=>x.length>=2&&x.length<=24);
  const salary=(raw:string)=>{const n=Number(raw);return Number.isFinite(n)&&n>0&&n<=500?n:null};
  const models=['dealer_network','chain_stores','regional_teams','brand_service_network'];
