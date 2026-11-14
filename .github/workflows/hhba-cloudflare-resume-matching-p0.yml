@@ -65,4 +65,4 @@ jobs:
         working-directory: apps/web
         run: |
           node --check functions/_lib/talent-search-providers.js
-          node --test scripts/talent-search-providers.contract.test.mjs scripts/talent-search-career-graph.contract.test.mjs scripts/talent-search-official-proof.contract.test.mjs scripts/talent-search-orchestrator.contract.test.mjs scripts/talent-search-page-reader.contract.test.mjs
+          node --test scripts/talent-search-providers.contract.test.mjs scripts/talent-search-career-graph.contract.test.mjs scripts/talent-search-official-proof.contract.test.mjs scripts/talent-search-orchestrator.contract.test.mjs scripts/talent-search-page-reader.contract.test.mjs scripts/talent-search-endtoend.contract.test.mjs
