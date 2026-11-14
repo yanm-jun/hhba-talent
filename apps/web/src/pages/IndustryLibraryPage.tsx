@@ -67,7 +67,6 @@ function HallSelection({manifest}:{manifest:HallManifest}){
   <div className="hhba-library-heading hhba-library-user-heading">
    <span className="hhba-library-eyebrow">HHBA · 企业招聘导航</span>
    <h1>寻找你想加入的企业</h1>
-   <p>按专业、企业名称或行业，找到企业招聘入口。</p>
   </div>
   <Link className="hhba-major-entry" to="/companies/library/majors">
    <span className="hhba-major-entry-icon"><GraduationCap size={24} aria-hidden="true"/></span>
