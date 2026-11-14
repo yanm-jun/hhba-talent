@@ -172,14 +172,19 @@ function preferenceCities(value){
 }
 function constraintsFrom(hint,resume,preferences={}){
  const p=preferences&&typeof preferences==='object'&&!Array.isArray(preferences)?preferences:{};
- const cities=preferenceCities(p.preferred_cities);
+ const cities=unique([...preferenceCities(p.preferred_cities),...extractPreferredCities(hint,resume)],5);
+ const nationwideHint=/全国|不限城市|各地均可/.test(hint);
  const mode=['PRIORITY','ONLY','NATIONWIDE'].includes(p.location_mode)?p.location_mode:
-  /全国|不限城市|各地均可/.test(hint)?'NATIONWIDE':'PRIORITY';
+  nationwideHint&&!cities.length?'NATIONWIDE':'PRIORITY';
  const travelValues=['UNSPECIFIED','FREQUENT_OK','OCCASIONAL','NO'];
  const travel=p.travel_preference;
  const detectedTravel=/(?:全国[^。；;，,]{0,8}出差|可(?:接受)?(?:全国)?出差|接受(?:全国)?出差|长期出差|经常出差|全国各地|全国范围)/.test(hint);
- const travelPreference=travelValues.includes(travel)?travel:
+ const travelCode=travelValues.includes(travel)?travel:
   detectedTravel?'FREQUENT_OK':'UNSPECIFIED';
+ const travelLabel=({
+  UNSPECIFIED:'未明确提出出差要求',FREQUENT_OK:'优先考虑全国出差或跨区域岗位',
+  OCCASIONAL:'可接受偶尔出差，不优先长期驻外',NO:'不接受需要出差的岗位'
+ })[travelCode];
  const industryHint=clean(p.industry_hint,120);
  const industryText=hint+' '+industryHint;
  const preferenceTerms=[];
@@ -199,13 +204,10 @@ function constraintsFrom(hint,resume,preferences={}){
   [...new Set(p.employer_models.filter(x=>Object.hasOwn(EMPLOYER_MODEL_LABELS,x)))]:[];
  const effectiveMode=mode==='ONLY'&&!cities.length?'NATIONWIDE':mode;
  return {
-  national_scope:effectiveMode==='NATIONWIDE'||(!cities.length&&effectiveMode==='PRIORITY'),
+  national_scope:effectiveMode!=='ONLY',
   location_mode:effectiveMode,preferred_cities:cities,
-  travel_preference:travelPreference,
-  travel_preference_label:({
-   UNSPECIFIED:'未明确出差要求',FREQUENT_OK:'接受全国出差或跨区域岗位',
-   OCCASIONAL:'可接受偶尔出差，不优先长期驻外',NO:'不接受需要出差的岗位'
-  })[travelPreference],
+  travel_preference:travelLabel,travel_preference_code:travelCode,
+  travel_preference_label:travelLabel,
   industry_preferences:preferenceTerms,
   industry_hint:industryHint,
   salary_min_monthly_cny:salaryMin,salary_max_monthly_cny:salaryMax,
@@ -240,8 +242,8 @@ export function buildRoleSearchQueries(roleHint='',resume='',searchPreferences={
  const cityTerms=c.preferred_cities.join(' ');
  const preferredLocation=c.location_mode==='NATIONWIDE'||!cityTerms?'全国':cityTerms;
  const broaderLocation=c.location_mode==='ONLY'?cityTerms:'全国';
- const travel=c.travel_preference==='FREQUENT_OK'?'全国出差':
-  c.travel_preference==='NO'?'无需频繁出差':'';
+ const travel=c.travel_preference_code==='FREQUENT_OK'?'全国出差':
+  c.travel_preference_code==='NO'?'无需频繁出差':'';
  const industry=unique([...c.industry_preferences,...intent.industry_terms],5);
  const businessModels=c.employer_model_labels.slice(0,3);
  const common='招聘 职位详情 企业官网 中国大陆';
@@ -256,7 +258,7 @@ export function buildRoleSearchQueries(roleHint='',resume='',searchPreferences={
 export function buildSupplementalRoleQueries(roleHint='',resume='',city='',searchPreferences={}){
  const intent=buildRoleIntent(roleHint,resume,searchPreferences),c=intent.constraints;
  const location=city||c.preferred_cities.join(' ')||(c.location_mode==='NATIONWIDE'?'全国':'中国大陆');
- const travel=c.travel_preference==='FREQUENT_OK'?'全国出差':'';
+ const travel=c.travel_preference_code==='FREQUENT_OK'?'全国出差':'';
  const industry=unique([...c.industry_preferences,...intent.industry_terms],5);
  const models=c.employer_model_labels.slice(0,3);
  const a=query([intent.direct_roles.slice(3,9),industry,models,location,travel,'招聘 职位详情 企业官网']);
