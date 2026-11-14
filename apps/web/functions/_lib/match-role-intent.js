@@ -80,7 +80,8 @@ export function buildRoleIntent(roleHint='',resume=''){
  const primaryDirection=firstDirection(hint,primaryFamilies)||primaryFamilies[0]?.direct[0]||'根据简历推荐';
  const directRoles=unique([primaryDirection,...primaryFamilies.flatMap(f=>f.direct)],10);
  const adjacentRoles=unique(primaryFamilies.flatMap(f=>f.adjacent),10);
- const resumeRoles=unique(resumeFamilies.flatMap(f=>f.direct),12);
+ const resumeRoles=unique([...( /汽车|经销商|DCC|名爵|上汽/i.test(text)?['汽车渠道运营','品牌督导']:[]),
+  ...resumeFamilies.flatMap(f=>f.direct)],16);
  const industryTerms=unique(INDUSTRIES.filter(x=>x.pattern.test(text)).map(x=>x.label),5);
  const constraints=constraintsFrom(hint,text);
  return {primary_direction:primaryDirection,direct_roles:directRoles,adjacent_roles:adjacentRoles,
