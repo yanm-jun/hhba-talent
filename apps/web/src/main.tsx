@@ -161,9 +161,9 @@ const SiteSearchPage=lazy(()=>import('./pages/SiteSearchPage').then(module=>({de
 function AppLoadingState(){
  return <main className="app-shell" role="status" aria-busy="true" aria-label="正在打开汇方职场"
    style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'#f7f9f8'}}>
-   <div style={{textAlign:'center',padding:'30px 22px',color:'#244e3c'}}>
-     <strong style={{fontSize:21}}>汇方职场 · HHBA</strong>
-     <p style={{fontSize:13,marginTop:14,color:'#667e71'}}>正在打开完整网站…</p>
+   <div style={{textAlign:'center',padding:'30px 22px',color:'#1373fa'}}>
+     <strong style={{fontSize:21}}>汇方职场 <span style={{color:'#ff9a24'}}>·</span> HHBA</strong>
+     <p style={{fontSize:13,marginTop:14,color:'#7588a1'}}>正在打开完整网站…</p>
    </div>
  </main>;
 }
