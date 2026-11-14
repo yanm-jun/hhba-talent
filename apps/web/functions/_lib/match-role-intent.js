@@ -56,7 +56,8 @@ const SKILL_SIGNALS=[
 ];
 function matchedFamilies(text){return FAMILIES.filter(f=>f.pattern.test(text));}
 function firstDirection(hint,families){
- const first=hint.split(/[，,；;、|\n]/)[0]?.trim()||'';
+ const first=(hint.split(/[，,；;、|\n]/)[0]||'').trim()
+  .replace(/^(?:目标岗位(?:方向)?|岗位方向|求职方向|希望从事|希望做|想从事|想做)[:：]?\\s*/,'');
  if(first&&!/(全国|出差|出行|优先|接受|不限|可远程|薪资|城市)/.test(first))return first.slice(0,24);
  for(const family of families){const m=hint.match(family.pattern);if(m)return m[0].slice(0,24);}
  return '';
