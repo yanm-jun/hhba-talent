@@ -35,7 +35,7 @@ const deepEvidenceResponse=(jobs,extraSources=[])=>({
 });
 test('DeepSeek autonomous request really enables provider-managed thinking search and risk checks',()=>{
  const body=buildDeepSearchRequest('负责经销商渠道和销售顾问培训。','督导，全国出差',10);
- assert.equal(body.model,'deepseek-flash');
+ assert.equal(body.model,'deepseek-v4-pro');
  assert.equal(body.reasoning.effort,'high');
  assert.deepEqual(body.tools,[{type:'deepseek_web_search'}]);
  assert.equal(body.safety_check.level,'high');
@@ -585,4 +585,18 @@ test('preferred role does not hide adjacent transferable capability families',()
  const intent=buildRoleIntent('品牌督导','负责经销商渠道运营、门店销售管理、销售顾问培训和区域经营复盘');
  assert.ok(intent.direct_roles.includes('品牌督导'));
  assert.ok(intent.adjacent_roles.includes('销售赋能')||intent.adjacent_roles.includes('培训督导')||intent.adjacent_roles.includes('区域运营'));
+});
+
+
+test('match score is calculated from four explicit evidence dimensions when available',()=>{
+ const response=deepEvidenceResponse([{
+  url:posting,company:'示例汽车中国',title:'品牌督导',location:'上海',
+  match_score:99,score_basis:'模型原始分数不能覆盖分项证据，必须根据岗位职责、技能、经验和地点的加权分计算。',
+  fit_dimensions:{role_fit:90,skill_fit:80,experience_fit:70,location_fit:100},
+  reason:'简历里的经销商管理、门店运营和培训成果与岗位职责存在对应。',
+  job_basis:'负责经销商运营、门店巡检和销售培训'
+ }]);
+ const result=verifiedDeepSearchMatches(response,10,{experience_years:3});
+ assert.equal(result.matches.length,1);
+ assert.equal(result.matches[0].match_score,82);
 });
