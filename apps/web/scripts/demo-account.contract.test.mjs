@@ -38,7 +38,7 @@ test('original workbench has real account profile, isolated favorites and transp
  assert.doesNotMatch(account,/真实投递接口尚未接通/);
  assert.match(account,/current==='resume'&&<PrivateResumeVault\/>/);
  const vault=source('components/PrivateResumeVault.tsx');
- assert.match(vault,/私有简历服务尚未启用/);
+ assert.match(vault,/简历服务暂未启用/);
  assert.match(account,/className="hhba-account-tool-card"/);
  assert.match(account,/className="hhba-account-tool-copy"/);
 });
