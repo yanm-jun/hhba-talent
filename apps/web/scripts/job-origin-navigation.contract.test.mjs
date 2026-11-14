@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 const get=p=>readFileSync(new URL(p,import.meta.url),'utf8');
 const router=get('../src/router.tsx'),market=get('../src/components/UnifiedJobMarket.tsx'),home=get('../src/pages/HomePage.tsx');
 test('home remains the dual-entry landing screen after return',()=>{
- assert.ok(home.includes('我要应聘')&&home.includes('我要招人'));
+ assert.ok(home.includes('我要应聘')&&home.includes('企业招聘导航'));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
  assert.ok(router.includes("path==='/'"));
 });
