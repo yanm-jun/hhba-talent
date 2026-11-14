@@ -13,6 +13,26 @@ const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:
  'Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'
 }});
 const fail=(code,status)=>json({ok:false,error:code},status);
+const employerModelKeys=new Set(['dealer_network','chain_stores','regional_teams','brand_service_network']);
+function validSearchPreferences(value){
+ if(value===undefined)return true; // Backward-compatible for older clients.
+ if(!value||typeof value!=='object'||Array.isArray(value))return false;
+ const p=value;
+ if(p.industry_hint!==undefined&&(typeof p.industry_hint!=='string'||p.industry_hint.length>120))return false;
+ if(p.preferred_cities!==undefined&&(!Array.isArray(p.preferred_cities)||p.preferred_cities.length>5||
+  p.preferred_cities.some(city=>typeof city!=='string'||city.length<2||city.length>24)))return false;
+ if(p.location_mode!==undefined&&!['PRIORITY','ONLY','NATIONWIDE'].includes(p.location_mode))return false;
+ if(p.travel_preference!==undefined&&!['UNSPECIFIED','FREQUENT_OK','OCCASIONAL','NO'].includes(p.travel_preference))return false;
+ for(const key of ['salary_min_k','salary_max_k']){
+  if(p[key]!==undefined&&p[key]!==null&&(!Number.isFinite(p[key])||p[key]<0||p[key]>500))return false;
+ }
+ if(p.salary_min_k&&p.salary_max_k&&p.salary_min_k>p.salary_max_k)return false;
+ if(p.employer_models!==undefined&&(!Array.isArray(p.employer_models)||p.employer_models.length>4||
+  p.employer_models.some(key=>!employerModelKeys.has(key))))return false;
+ const cities=Array.isArray(p.preferred_cities)?p.preferred_cities:[];
+ if(p.location_mode==='ONLY'&&!cities.length)return false;
+ return true;
+}
 const enabled=env=>env.HHBA_MATCH_SERVICE_ENABLED==='1'&&
  typeof env.HHBA_MATCH_DEEPSEEK_KEY==='string'&&env.HHBA_MATCH_DEEPSEEK_KEY.length>=16&&
  typeof env.HHBA_PNVS_AUTH_DB?.prepare==='function';
@@ -323,6 +343,7 @@ export async function onRequest({request,env}){
     input.text.replace(/\s/g,'').length<30||!options||
     options.country!=='CN'||options.remote_only!==false||
     typeof options.role_hint!=='string'||options.role_hint.length>240||
+    !validSearchPreferences(options.search_preferences)||
     !Number.isInteger(options.limit)||options.limit<1||options.limit>10)
   return fail('INVALID_RESUME_TEXT',400);
  if(input.resume_id!==null&&input.resume_id!==undefined&&input.resume_id!==''){
@@ -361,7 +382,7 @@ export async function onRequest({request,env}){
      },12000);
      try{
       const result=await runAutonomousDeepMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-       options.role_hint,options.limit,{signal:abort.signal,onProgress:stage=>{
+       options.role_hint,options.limit,{signal:abort.signal,searchPreferences:options.search_preferences||{},onProgress:stage=>{
         phase=stage;send('progress',{stage});
        },onPartial:matches=>send('partial',{matches})});
       console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
@@ -389,7 +410,7 @@ export async function onRequest({request,env}){
 
  try{
   const result=await runAutonomousDeepMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-   options.role_hint,options.limit);
+   options.role_hint,options.limit,{searchPreferences:options.search_preferences||{}});
   console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
   return json(await withSavedHistory(env,candidate,input,result));
  }catch(e){
