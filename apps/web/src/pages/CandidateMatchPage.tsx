@@ -1,5 +1,5 @@
 import {ChangeEvent,DragEvent,useEffect,useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,BriefcaseBusiness,FileText,FileUp,LockKeyhole,LoaderCircle,ShieldCheck,XCircle} from 'lucide-react';
+import {ArrowLeft,ArrowRight,BriefcaseBusiness,Building2,FileText,FileUp,LockKeyhole,LoaderCircle,MapPin,Plane,ShieldCheck,Sparkles,Wallet,XCircle} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
 import {Link} from '../router';
@@ -12,6 +12,28 @@ import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const maxResumeSize=3*1024*1024;
+const defaultSearchPreferences={
+ industry_hint:'',preferred_cities:'',location_mode:'PRIORITY' as const,
+ travel_preference:'UNSPECIFIED' as const,salary_min_k:'',salary_max_k:'',employer_models:[] as string[]
+};
+const employerModelChoices=[
+ {value:'dealer_network',label:'经销商 / 代理商网络'},
+ {value:'chain_stores',label:'连锁门店 / 直营网点'},
+ {value:'regional_teams',label:'全国 / 区域运营团队'},
+ {value:'brand_service_network',label:'品牌终端 / 服务网点'}
+];
+function inferResumeCapabilityHints(text:string){
+ const checks=[
+  ['区域与渠道管理',/区域管理|渠道管理|经销商|4S店|DCC|门店运营|终端管理|巡店/i],
+  ['销售转化与客户运营',/销售漏斗|线索转化|客户管理|成交|试驾|邀约|到店|销售业绩/i],
+  ['团队培训与质量管理',/培训|带教|督导|巡店|考核|质检|团队管理|录音回收/i],
+  ['数据分析与经营复盘',/数据分析|Excel|SQL|指标|转化率|报表|统计|经营分析/i],
+  ['市场与品牌运营',/品牌推广|市场营销|活动策划|新媒体|内容运营|品牌运营/i],
+  ['项目与流程建设',/项目管理|流程建设|SOP|标准化|体系搭建|流程优化/i]
+ ] as const;
+ return checks.filter(([,pattern])=>pattern.test(text)).map(([label])=>label);
+}
+
 
 export function CandidateMatchPage({user}:{user:User|null}){
  const [file,setFile]=useState<File|null>(null);
@@ -29,7 +51,17 @@ export function CandidateMatchPage({user}:{user:User|null}){
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
- const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10});
+ const [options,setOptions]=useState<MatchOptions>({
+  country:'CN',remote_only:false,role_hint:'',limit:10,
+  search_preferences:{...defaultSearchPreferences}
+ });
+ const searchPreferences={...defaultSearchPreferences,...options.search_preferences};
+ const capabilityHints=previewLoaded?inferResumeCapabilityHints(previewText):[];
+ function updateSearchPreferences(patch:Partial<typeof defaultSearchPreferences>){
+  setOptions(current=>({...current,search_preferences:{
+   ...defaultSearchPreferences,...current.search_preferences,...patch
+  }}));
+ }
  const [working,setWorking]=useState(false);
   const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
   const [stage,setStage]=useState<'preparing'|'connected'|'searching'|'reading'|'writing'|'waiting'>('preparing');
@@ -200,14 +232,94 @@ export function CandidateMatchPage({user}:{user:User|null}){
           <small>请先删除不希望用于本次匹配的内容。</small>
          </div>}
         </div>
-        <header className="hhba-ai-section-title"><h2>2. 选择工作方向</h2>
-          <p>可填写岗位、行业、城市或出差偏好；HHBA 会自动扩展相关岗位名称，不必自己罗列关键词。</p></header>
-        <div className="hhba-ai-mainland-only"><span>工作区域</span><strong>中国大陆</strong><small>不推荐港澳台或境外岗位</small></div>
-        <div className="hhba-ai-fields hhba-ai-fields-one">
-         <label>目标岗位方向与求职偏好<textarea rows={3} maxLength={240} value={options.role_hint}
-          placeholder="例如：督导，全国范围可出差，汽车零售优先；也考虑区域运营和渠道管理"
-          onChange={e=>setOptions(x=>({...x,role_hint:e.target.value}))}/>
-          <small>只需写你想做什么、偏好什么；岗位关键词由 HHBA 自动扩展。</small></label>
+        <header className="hhba-ai-section-title"><h2>2. 补充求职画像</h2>
+          <p>这些信息帮助 AI 找到更适合你的企业和岗位。不填写也能匹配，AI 不会只按你填写的职位名称搜索。</p></header>
+        <section className="hhba-ai-capability-panel" aria-label="简历能力自动识别">
+          <div className="hhba-ai-capability-heading"><Sparkles size={17}/><strong>AI 自动识别简历核心能力</strong><span>无需手动填写</span></div>
+          {previewLoaded&&capabilityHints.length>0?
+           <><div className="hhba-ai-capability-tags">{capabilityHints.map(tag=><span key={tag}>{tag}</span>)}</div>
+            <small>以上是根据简历文字初步识别的能力线索；DeepSeek 还会结合完整经历、业绩和岗位职责继续分析。</small></>:
+           <p>开始匹配时，AI 会自动提取你的真实职责、工作成果、专业技能和可迁移能力。点击上方「预览简历文字」可以先检查简历内容。</p>}
+        </section>
+        <div className="hhba-ai-preference-block">
+          <div className="hhba-ai-preference-grid">
+            <label>优先岗位方向（选填）
+              <textarea rows={2} maxLength={240} value={options.role_hint}
+               placeholder="例如：区域督导、渠道运营、零售运营、销售培训；也可以不填"
+               onChange={e=>setOptions(x=>({...x,role_hint:e.target.value}))}/>
+              <small>岗位名称只是搜索起点，AI 会自动拓展相邻岗位和跨行业机会。</small>
+            </label>
+            <label>优先行业（选填）
+              <input type="text" maxLength={120} value={searchPreferences.industry_hint}
+               placeholder="例如：汽车、消费品、零售、智能硬件；不填则不限行业"
+               onChange={e=>updateSearchPreferences({industry_hint:e.target.value})}/>
+              <small>只影响搜索优先级，不会排除其他行业中合适的岗位。</small>
+            </label>
+          </div>
+          <div className="hhba-ai-preference-section">
+            <h3><MapPin size={16}/> 工作地点与出差要求</h3>
+            <div className="hhba-ai-preference-grid">
+              <label>优先城市（选填）
+                <input type="text" maxLength={120} value={searchPreferences.preferred_cities}
+                 placeholder="例如：上海、杭州、苏州"
+                 onChange={e=>updateSearchPreferences({preferred_cities:e.target.value})}/>
+                <small>多个城市可用顿号或逗号分隔。</small>
+              </label>
+              <label>地点要求
+                <select value={searchPreferences.location_mode}
+                 onChange={e=>updateSearchPreferences({location_mode:e.target.value as typeof defaultSearchPreferences.location_mode})}>
+                  <option value="PRIORITY">优先这些城市，也可推荐全国其他城市</option>
+                  <option value="ONLY">仅限填写的城市</option>
+                  <option value="NATIONWIDE">全国不限城市</option>
+                </select>
+                <small>选择“仅限填写的城市”时，请至少填写一个城市。</small>
+              </label>
+              <label>出差接受程度
+                <select value={searchPreferences.travel_preference}
+                 onChange={e=>updateSearchPreferences({travel_preference:e.target.value as typeof defaultSearchPreferences.travel_preference})}>
+                  <option value="UNSPECIFIED">未限定，按岗位情况推荐</option>
+                  <option value="FREQUENT_OK">接受全国出差 / 跨区域工作</option>
+                  <option value="OCCASIONAL">可以偶尔出差，不接受长期驻外</option>
+                  <option value="NO">不接受需要出差的岗位</option>
+                </select>
+                <small>AI 会读取职位详情中的出差要求，不会自行猜测。</small>
+              </label>
+            </div>
+          </div>
+          <div className="hhba-ai-preference-section">
+            <h3><Wallet size={16}/> 期望薪资（选填）</h3>
+            <div className="hhba-ai-salary-row">
+              <label>最低月薪（K）
+                <input type="number" min="0" max="500" step="1" inputMode="decimal"
+                 value={searchPreferences.salary_min_k} placeholder="例如 15"
+                 onChange={e=>updateSearchPreferences({salary_min_k:e.target.value})}/>
+              </label>
+              <span>至</span>
+              <label>最高月薪（K）
+                <input type="number" min="0" max="500" step="1" inputMode="decimal"
+                 value={searchPreferences.salary_max_k} placeholder="例如 20"
+                 onChange={e=>updateSearchPreferences({salary_max_k:e.target.value})}/>
+              </label>
+              <span>元 / 月</span>
+            </div>
+            <small>公开薪资会参与排序；企业未公开薪资的岗位仍可推荐，并明确标注“薪资未披露”。</small>
+          </div>
+          <div className="hhba-ai-preference-section">
+            <h3><Building2 size={16}/> 优先寻找的企业经营模式（选填）</h3>
+            <p>可多选；不选择则不限企业类型。以下只是搜索重点，不会成为企业筛选边界。</p>
+            <div className="hhba-ai-employer-models">
+              {employerModelChoices.map(item=><label key={item.value}>
+                <input type="checkbox" checked={searchPreferences.employer_models.includes(item.value)}
+                 onChange={e=>updateSearchPreferences({employer_models:e.target.checked?
+                  [...searchPreferences.employer_models,item.value]:
+                  searchPreferences.employer_models.filter(x=>x!==item.value)})}/>
+                <span>{item.label}</span>
+              </label>)}
+            </div>
+          </div>
+          <div className="hhba-ai-search-promise"><Sparkles size={16}/>
+            <span><strong>不局限于预设企业名单</strong>：DeepSeek 将从简历能力和企业经营场景自主发现雇主，再核验具体岗位与企业官方投递页面。</span>
+          </div>
         </div>
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
