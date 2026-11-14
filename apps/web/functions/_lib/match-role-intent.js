@@ -178,7 +178,10 @@ function constraintsFrom(hint,resume){
 export function buildRoleIntent(roleHint='',resume=''){
  const hint=clean(roleHint,240),text=String(resume||'').slice(0,13000);
  const hintFamilies=matchedFamilies(hint),resumeFamilies=matchedFamilies(text);
- const primaryFamilies=hintFamilies.length?hintFamilies:resumeFamilies.slice(0,2);
+ // A preferred title is a priority, not a ceiling: preserve transferable
+ // capability families found in the actual resume as additional discovery paths.
+ const primaryFamilies=[...new Map([...hintFamilies,...resumeFamilies]
+  .map(f=>[f.id,f])).values()].slice(0,5);
  const primaryDirection=firstDirection(hint,primaryFamilies)||primaryFamilies[0]?.direct[0]||'根据简历推荐';
  const directRoles=unique([primaryDirection,...primaryFamilies.flatMap(f=>f.direct)],10);
  const adjacentRoles=unique(primaryFamilies.flatMap(f=>f.adjacent),10);
@@ -231,14 +234,21 @@ export function buildResumeProfile(resume='',intent=null){
  const skills=SKILL_SIGNALS.map(signal=>({name:signal.name,evidence:evidence(text,signal.pattern)}))
   .filter(item=>item.evidence).slice(0,8);
  const educationMatch=text.match(/博士研究生|博士|硕士研究生|硕士|研究生|本科|大学专科|大专|专科|高中|中专/);
- const experienceMatch=text.match(/(?:工作经验|从业经验|相关工作经验|工作年限|从业年限)\s*[:：]?\s*(\d+(?:\.\d+)?)\s*年/);
+ const experienceMatch=
+  text.match(/(?:工作经验|从业经验|相关工作经验|工作年限|从业年限|工作时间|从业时间)\s*[:：约]?\s*(\d+(?:\.\d+)?)\s*年/)||
+  text.match(/(\d+(?:\.\d+)?)\s*年(?:工作经验|相关经验|从业经验)/)||
+  text.match(/(\d+)\s*年\s*(\d+)\s*个?月/)||
+  text.match(/(\d+)\s*年半/);
+ const experienceYears=experienceMatch?
+  (experienceMatch[2]!==undefined?Number(experienceMatch[1])+Number(experienceMatch[2])/12:
+   experienceMatch[0].includes('年半')?Number(experienceMatch[1])+0.5:Number(experienceMatch[1])):null;
  // Concise source-backed achievements help the search model understand delivered impact.
  const highlights=[...new Set(text.split(/[\r\n。；;]+/)
   .map(line=>clean(line,150))
   .filter(line=>line.length>=12&&/(?:负责|管理|提升|增长|完成|实现|搭建|优化|统筹|带领|建立|推动|降低|提高|转化|业绩|同比|环比|\d+\s*%|\d+\s*家|\d+\s*人)/i.test(line))
  )].slice(0,8);
  return {education:educationMatch?.[0]||null,education_evidence:educationMatch?.[0]||null,
-  experience_years:experienceMatch?Number(experienceMatch[1]):null,
+  experience_years:experienceYears,
   experience_evidence:experienceMatch?.[0]||null,skills,experience_highlights:highlights,
   target_roles:unique([...roleIntent.direct_roles,...roleIntent.adjacent_roles],12),
   warnings:['能力标签和经历摘要由简历可见文字提取，仅用于搜索与匹配线索；不得推断简历未写明的学历、年限、技能或业绩。']};
