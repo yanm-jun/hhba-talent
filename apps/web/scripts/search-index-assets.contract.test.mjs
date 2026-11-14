@@ -74,6 +74,8 @@ test('mobile home retains real React homepage instead of deferring its key secti
   assert.match(main,/const EmployerEvidencePage=lazy\(/);
   assert.match(home,/<UnifiedJobMarket compact\/>/);
   assert.match(home,/<HomeCompanyMarquee\/>/);
-  assert.match(home,/<HomeLiveDrawer\/>/);
+  assert.doesNotMatch(home,/<HomeLiveDrawer\/>/);
+  assert.match(home,/title="企业招聘导航"/);
+  assert.match(home,/title="我要应聘"/);
   assert.doesNotMatch(home,/DeferredHomeSection/);
 });
