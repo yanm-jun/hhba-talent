@@ -132,19 +132,19 @@ Initial benchmark shortlist:
 
 | Provider | Proposed role | Current published pricing/limits (check before production) |
 |---|---|---|
-| Baidu Qianfan Agentic Search | China-web recall, query rewrite, multi-source fusion and authority signal | Official docs list ¥0.04/call, 50 free calls/day, default 3 QPS; returns page URL/title/snippet/content/date/authority score. |
+| Baidu Qianfan Agentic Search | China-web recall, query rewrite, multi-source fusion and authority signal | Official docs list ¥0.04/call, 50 free calls/day, default 3 QPS; returns URL/title/snippet/page content/date/authority score. Test alongside Baidu Search v2. |
 | Baidu AI Search v2 | China-web search with site/date filters and deeper query decomposition | API docs expose standard/turbo/pro; Pro supports `query_plan_type=deep` (2–3 rounds). Pricing docs list ¥0.036/call for standard and daily free quota; a separate API page states 1,500/month distributed daily, so account quota must be confirmed. A 2026-10-30 to 2026-12-31 campaign advertises enhanced ¥4.9/1,000 and flagship ¥9.9/1,000. |
-| DeepSeek Search + Fetch | Existing baseline and low-cost independent source | Official docs list ¥5 per 1,000 successful Search requests and ¥5 per 1,000 successful Fetch requests. Keep as one provider, not the only provider. |
+| DeepSeek Search + Fetch | Existing baseline and low-cost independent source | Official docs list $0.75 per 1,000 successful Search requests and $0.75 per 1,000 successful Fetch requests; Search supports 1–50 results, `site:`/`-site:`/language/date operators, and optional page content. The active HHBA path currently uses `count=20` and `need_content=false`; benchmark `count=50` and `need_content=true`. Keep as one provider, not the only provider. |
 | Brave LLM Context | Independent global index and pre-extracted page context | Official pricing: $5/1,000 Search requests, $5 monthly free credits, 50 QPS. Test Chinese and mainland-domain coverage before selection. |
 | Exa Search + Contents | Semantic discovery and page contents | Official pricing: Lite Search from $4/1,000 requests; Contents $1/1,000 pages; $10 monthly free credits. Test Chinese long-tail coverage. |
 | Alibaba Cloud Model Studio web_search/web_extractor | High-quality multi-round agent search and extraction benchmark | Official docs list agent search at ¥4/1,000 calls in Beijing/selected regions, but ¥73.392381/1,000 in Singapore region. Region and workspace selection must be confirmed before enabling. |
 | Tavily | Alternative agent search/extract benchmark | Free 1,000 API credits/month; pay-as-you-go $0.008/credit. Credit usage varies by endpoint and search depth. |
-| SearchAPI.io Google Jobs | Optional recall-only signal for discovering employers/job titles | Google Jobs aggregates job boards and recruitment sites; never use its listing as final proof or final application URL. SearchAPI lists 100 free requests and paid plans from $4/1,000 searches (plan minimums apply). |
+| SearchAPI.io Google Search / Google Jobs | Optional recall-only signal for discovering employers/job titles and official career pages | Google Jobs aggregates job boards and recruitment sites; never use its listing as final proof or final application URL. SearchAPI lists 100 free requests; Developer is $40/month for 10,000 searches ($4/1,000), with higher-volume tiers cheaper per request. Use only as a discovery signal, then independently verify on the employer site. |
 | Firecrawl | Crawl/scrape and structured extraction fallback | 1 credit/page for basic scrape/crawl; Search 2 credits per 10 results. Free 1,000 credits/month; Hobby $19/month for 5,000 credits; Standard $99/month for 100,000 credits (monthly billing). |
 | Cloudflare Browser Run | Selective JavaScript-rendered page fallback | Current Cloudflare docs list 10 minutes/day free; Workers Paid includes 10 browser hours/month, then $0.09/hour. Use only when fast HTML/reader extraction fails. |
 | OpenAI / Anthropic web search | High-end model/search quality benchmark, not assumed production dependency | Both publish web-search tool pricing around $10/1,000 search calls plus model/content token charges. Requires separate API credentials and regional/terms review. |
 
-Provider choice is not final. The benchmark must use the same resume, query set, date window, and scoring rubric. A vendor's marketing claims are not acceptance evidence.
+Provider choice is not final. Brave exposes country and search-language parameters, but Mainland-China/Chinese coverage must be verified in a real test rather than assumed. The benchmark must use the same de-identified resume profile, query set, date window, and scoring rubric. A vendor's marketing claims are not acceptance evidence.
 
 ### 3.4 Page extraction and browser fallback
 
@@ -210,7 +210,7 @@ Do not use click-through rate as a substitute for hiring relevance. User feedbac
 ### 4.1 Test set
 
 Build a small, diverse, consented and de-identified benchmark:
-- the existing regional-supervisor / multi-store operations resume as the first case (retrieve the exact prior uploaded file from the Library before running);
+- the latest previously uploaded regional-supervisor / multi-store operations resume has now been located in the Library; use it as the first case after local redaction. Preserve conflicting source fields as explicit profile-conflict evidence rather than silently choosing one value;
 - mechanical/industrial;
 - software/data;
 - finance/accounting;
