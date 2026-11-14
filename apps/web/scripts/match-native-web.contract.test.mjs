@@ -22,11 +22,10 @@ const deepEvidenceResponse=(jobs,extraSources=[])=>({
  status:'completed',
  output:[
   {type:'web_search_call',kind:'deep_search',status:'completed',
-   action:{type:'search',queries:['汽车品牌督导 企业官网 招聘']},
-   sources:[
+   action:{type:'search',queries:['汽车品牌督导 企业官网 招聘'],sources:[
     {type:'url',url:posting,title:'示例汽车中国 品牌督导 招聘职位',
      snippet:'上海品牌督导招聘，要求经销商渠道管理、区域督导、培训。',
-     site_name:'示例汽车中国'},...extraSources]},
+     site_name:'示例汽车中国'},...extraSources]}},
   {type:'message',content:[{type:'output_text',text:JSON.stringify({jobs})}]}
  ],
  usage:{input_tokens:1800,output_tokens:2900,
