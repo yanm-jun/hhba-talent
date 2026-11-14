@@ -63,8 +63,7 @@ test('candidate directory replaces business metrics with professional and compan
  assert.doesNotMatch(section,/hhba-library-overview|hhba-library-alert|hhba-library-inline-notice|hhba-library-hall-stats|数据快照日期|条整理后可浏览的网址记录|item\.enterprises|item\.published|按专业、企业名称或行业，找到企业招聘入口/);
  assert.match(section,/<h1>寻找你想加入的企业<\/h1>\s*<\/div>\s*<Link className="hhba-major-entry"/);
  assert.ok(!section.includes('查找行业馆，如汽车'));
- assert.ok(home.includes('候选·待复核'));
- assert.ok(home.includes('曾有来源核对'));
+ assert.doesNotMatch(home,/候选·待复核|曾有来源核对|hhba-library-tag|网址来源状态/);
  assert.ok(home.includes('部分招聘网址仍待复核'));
 });
 
@@ -79,8 +78,7 @@ test('global search is a single user-triggered static fetch with safe direct lin
  assert.ok(component.includes('rel="noopener noreferrer"'));
  assert.ok(component.includes('data-hhba-recruitment-outbound="true"'));
  assert.ok(component.includes("url.protocol==='https:'"));
- assert.ok(component.includes('候选·待复核'));
- assert.ok(component.includes('曾有来源核对'));
+ assert.doesNotMatch(component,/候选·待复核|曾有来源核对|hhba-library-tag|网址来源状态/);
  assert.ok(component.includes('当前正在招聘'));
  assert.ok(!component.includes('/admin-preview/api/'));
  assert.ok(!component.includes('/api/ai/'));
