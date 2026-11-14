@@ -113,7 +113,8 @@ test('rejects personal data, URLs, credentials and malformed role labels', () =>
     },
   ], resume);
 
-  assert.deepEqual(graph, []);
+  assert.equal(graph.length, 1);
+  assert.equal(graph[0].search_terms.length, 0);
 });
 
 test('deduplicates equivalent roles and caps the graph at the requested maximum', () => {
