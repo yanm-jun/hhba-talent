@@ -287,12 +287,13 @@ test('supplemental candidate merge keeps original IDs and drops repeated URLs',(
 test('5 shortlisted roles are shown before supplemental search, then 10 roles and longer reasons appear',async()=>{
  const stages=[],seen=[],urls=[],allResults=[...posts.slice(0,5),...posts.slice(5,10)];
  let shortlist=0,details=0,searches=0;
+ const supplementalSet=new Set(supplementalQueries(cv,'AI产品经理',searchQueries(cv,'AI产品经理')));
  const fetcher=async(url,options)=>{
   urls.push(url);
   const payload=JSON.parse(options.body);
   if(url.endsWith('/v1/tools/search')){
    searches++;
-   const extra=payload.query.includes('2026 社会招聘')||payload.query.includes('企业招聘 申请职位');
+   const extra=supplementalSet.has(payload.query);
    return new Response(JSON.stringify({results:extra?allResults.slice(5):allResults.slice(0,5)}),{status:200});
   }
   if(url.endsWith('/v1/tools/fetch')){
@@ -498,11 +499,12 @@ test('first Search is third-party only: official supplemental results can still 
   title:'星云科技 品牌督导 上海 招聘',
   summary:'星云科技招聘上海品牌督导，负责渠道营销、终端门店管理及团队协调。'.repeat(5)};
  let calls=0;
+ const supplementalSet=new Set(supplementalQueries(cv,'品牌督导',searchQueries(cv,'品牌督导')));
  const mock=async(url,options)=>{
   if(url.endsWith('/v1/tools/search')){
    calls++;
    const q=JSON.parse(options.body).query;
-   return new Response(JSON.stringify({results:q.includes('2026 社会招聘')||q.includes('企业招聘 申请职位')?[corporate]:[board]}),{status:200});
+   return new Response(JSON.stringify({results:supplementalSet.has(q)?[corporate]:[board]}),{status:200});
   }
   if(url.endsWith('/v1/tools/fetch'))return new Response(JSON.stringify({content:
    '上海品牌督导招聘，负责经销商门店业务督导、跨部门培训、项目执行等。'.repeat(8)}),{status:200});
