@@ -212,7 +212,13 @@ export function buildSupplementalRoleQueries(roleHint='',resume='',city=''){
  const industry=unique([...c.industry_preferences,...intent.industry_terms],4);
  const a=query([intent.direct_roles.slice(3,9),industry,location,travel,'招聘 职位详情 企业官网']);
  const b=query([intent.adjacent_roles.slice(0,7),industry,location,'社会招聘 官方招聘']);
- return [...new Set([a,b].filter(Boolean))].slice(0,2);
+ // Deep-search coverage: broaden by employer entities, adjacent roles and official JDs.
+ // Queries contain only role/industry/location terms; never personal resume text.
+ const d=query(['集团 子公司 招聘',intent.primary_direction,industry.slice(0,2),location,'官方岗位']);
+ const e=query(['官方招聘 职位详情',intent.adjacent_roles.slice(3,10),location,travel]);
+ const f=query(['社招 职位职责',intent.direct_roles.slice(0,4),industry.slice(0,2),location]);
+ const g=query(['企业专属招聘系统',intent.resume_related_roles.slice(0,5),location,'在招职位']);
+ return [...new Set([a,b,d,e,f,g].filter(Boolean))].slice(0,6);
 }
 function evidence(text,pattern){
  const match=pattern.exec(text);if(!match)return '';
