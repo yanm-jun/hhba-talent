@@ -1,5 +1,5 @@
 import {ChangeEvent,DragEvent,useEffect,useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,BriefcaseBusiness,Building2,FileText,FileUp,LockKeyhole,LoaderCircle,MapPin,Plane,ShieldCheck,Sparkles,Wallet,XCircle} from 'lucide-react';
+import {ArrowLeft,ArrowRight,BriefcaseBusiness,Building2,FileText,FileUp,LockKeyhole,LoaderCircle,MapPin,ShieldCheck,Sparkles,Wallet,XCircle} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
 import {Link} from '../router';
