@@ -5,7 +5,7 @@ import {recruitmentSourceKind,sourceDisplay,sortEmployerFirst,employerLookupQuer
 import {explicitPreferredCity,supplementalQueries,mergeCandidateHits,combineRecommended} from '../functions/_lib/match-search-growth.js';
 import {buildRoleIntent,buildRoleSearchQueries,buildResumeProfile} from '../functions/_lib/match-role-intent.js';
 import {searchQueries,normalizeHits,selectedJobs,searchPublicJobs,
- enrichCandidateDetails,reasonAboutJobs,runSearchFirstMatch,preferEmployerPostingUrls} from '../functions/_lib/deepseek-search-match.js';
+ enrichCandidateDetails,reasonAboutJobs,runSearchFirstMatch,preferEmployerPostingUrls,DEEP_SEARCH_BUDGET} from '../functions/_lib/deepseek-search-match.js';
 
 const cv='负责HHBA AI智能体、Agent RAG工作流产品，并管理名爵汽车经销商DCC与销售培训。';
 const posts=Array.from({length:12},(_,i)=>({
@@ -23,6 +23,32 @@ const resultRows=ids=>({jobs:ids.map((id,index)=>({
  }))});
 const response=jobs=>({status:'completed',output:[{type:'message',
  content:[{type:'output_text',text:JSON.stringify(jobs)}]}]});
+test('deep-search tier caps Search/Fetch requests and raises Search result coverage to 50',async()=>{
+ assert.equal(DEEP_SEARCH_BUDGET.searchRequests,10);
+ assert.equal(DEEP_SEARCH_BUDGET.fetchRequests,16);
+ assert.equal(DEEP_SEARCH_BUDGET.searchResultsPerRequest,50);
+ const calls=[];
+ const fetcher=async(url,init)=>{
+  calls.push({url,body:JSON.parse(init.body)});
+  if(url.endsWith('/v1/tools/search'))return new Response(JSON.stringify({results:posts}),{status:200});
+  return new Response(JSON.stringify({content:'本职位招聘中，上海工作，岗位职责包括项目沟通与需求分析。'.repeat(6)}),{status:200});
+ };
+ const repeated=Array.from({length:15},(_,i)=>'岗位 '+i+' 招聘 企业官网');
+ const found=await searchPublicJobs('fake-key-for-test',cv,'AI产品经理',{
+  fetcher,queriesOverride:repeated,allowEmpty:true
+ });
+ assert.equal(calls.filter(x=>x.url.endsWith('/v1/tools/search')).length,10);
+ assert.ok(calls.filter(x=>x.url.endsWith('/v1/tools/search')).every(x=>x.body.count===50));
+ assert.equal(found.diagnostic.queries,10);
+ const hits=Array.from({length:22},(_,i)=>({
+  id:'d'+i,url:'https://careers.chinacorp.cn/jobs/job-'+i,
+  summary:'招聘职位',snippet:'岗位',availability:{status:'UNKNOWN'}
+ }));
+ const checked=await enrichCandidateDetails('fake-key-for-test',hits,{fetcher,maxFetch:100});
+ assert.equal(checked.fetch_attempts,16);
+ assert.equal(checked.fetches,16);
+ assert.equal(calls.filter(x=>x.url.endsWith('/v1/tools/fetch')).length,16);
+});
 test('public API query plan is short, role-aware, and never sends complete resume to search API',()=>{
  const queries=searchQueries(cv,'AI产品经理');
  assert.ok(queries.length>=3&&queries.length<=4);
@@ -283,7 +309,7 @@ test('city-aware supplemental searches only use explicit location preferences an
  const text='工作经历在山东聊城，意向城市：杭州、宁波。希望从事AI产品经理。';
  assert.equal(explicitPreferredCity(text),'杭州');
  const q=supplementalQueries(text,'AI产品经理',searchQueries(text,'AI产品经理'));
- assert.equal(q.length,2);
+ assert.equal(q.length,6);
  assert.ok(q.every(x=>x.includes('杭州')&&x.length<=128));
  assert.equal(explicitPreferredCity('曾在聊城管理门店和培训顾问。'),'');
  assert.equal(explicitPreferredCity('工作经历：上海；工作地点：聊城。','督导，济南优先、青岛其次'),'济南');
@@ -370,13 +396,17 @@ test('5 shortlisted roles are shown before supplemental search, then 10 roles an
    urls:jobs.map(j=>j.official_url)
   })
  });
- assert.equal(searches,searchQueries(cv,'AI产品经理').length+2);
+ assert.equal(searches,DEEP_SEARCH_BUDGET.searchRequests);
  assert.equal(shortlist,2);
  assert.equal(details,2);
  assert.equal(result.matches.length,10);
  assert.equal(result.diagnostic.initial_visible,5);
  assert.equal(result.diagnostic.final_shortlisted,10);
- assert.equal(result.diagnostic.supplement_queries,2);
+ assert.equal(result.diagnostic.supplement_queries,DEEP_SEARCH_BUDGET.supplementalSearchRequests);
+ assert.equal(result.diagnostic.search_attempts,DEEP_SEARCH_BUDGET.searchRequests);
+ assert.ok(result.diagnostic.fetch_attempts<=DEEP_SEARCH_BUDGET.fetchRequests);
+ assert.ok(result.diagnostic.estimated_tool_cost_cny<=0.13);
+ assert.equal(result.diagnostic.tool_cost_ceiling_cny,0.13);
  assert.equal(result.diagnostic.details_expanded,10);
  assert.ok(result.diagnostic.primary_raw_hits>=5);
  assert.ok(result.diagnostic.primary_filtered_links>=0);
@@ -526,7 +556,7 @@ test('only third-party sites: automatically searches employer domains, then show
   runSearchFirstMatch('synthetic-secret-not-real',cv,'品牌督导',10,{fetcher}),
   /AI_EMPLOYER_JOBS_NOT_FOUND/
  );
- assert.equal(calls.length,searchQueries(cv,'品牌督导').length+2);
+ assert.equal(calls.length,DEEP_SEARCH_BUDGET.searchRequests);
  assert.ok(calls.every(u=>u.endsWith('/v1/tools/search')));
 });
 test('first Search is third-party only: official supplemental results can still return employer jobs, never board URLs',async()=>{
