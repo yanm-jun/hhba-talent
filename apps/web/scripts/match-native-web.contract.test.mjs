@@ -120,6 +120,32 @@ test('autonomous deep results fail closed without actual web evidence',async()=>
   fetcher:async()=>new Response(JSON.stringify(response),{status:200})
  }),/AI_DEEP_SEARCH_NO_WEB_EVIDENCE/);
 });
+test('autonomous model candidates without returned web sources produce evidence-specific failure',async()=>{
+ const response=deepEvidenceResponse([{url:posting,company:'示例汽车中国',
+  title:'品牌督导',location:'上海',reason:'管理门店和培训的工作经验适用于区域督导。'}]);
+ delete response.output[0].sources;
+ await assert.rejects(runAutonomousDeepMatch('synthetic-secret-not-real',
+  '门店区域督导与经销商管理经历。','督导',10,{
+   fetcher:async()=>new Response(JSON.stringify(response),{status:200})
+  }),/AI_DEEP_SEARCH_EVIDENCE_MISSING/);
+});
+test('autonomous deep search distinguishes model no-jobs from filtered employer sources',async()=>{
+ const modelEmpty=deepEvidenceResponse([]);
+ await assert.rejects(runAutonomousDeepMatch('synthetic-secret-not-real',
+  '汽车品牌渠道与门店管理经历。','督导',10,{
+   fetcher:async()=>new Response(JSON.stringify(modelEmpty),{status:200})
+  }),/AI_DEEP_SEARCH_NO_MODEL_JOBS/);
+ const thirdParty=deepEvidenceResponse([{company:'招聘平台',title:'督导',location:'上海',
+  reason:'带店管理工作经验符合岗位要求。',
+  url:'https://www.zhipin.com/job_detail/0123456.html'}]);
+ thirdParty.output[0].sources=[
+  {type:'url',url:'https://www.zhipin.com/job_detail/0123456.html',
+   title:'招聘平台 督导岗位 招聘',snippet:'上海督导招聘职位'}];
+ await assert.rejects(runAutonomousDeepMatch('synthetic-secret-not-real',
+  '销售运营区域督导工作经验。','督导',10,{
+   fetcher:async()=>new Response(JSON.stringify(thirdParty),{status:200})
+  }),/AI_DEEP_SEARCH_NO_EMPLOYER_SOURCES/);
+});
 test('autonomous deep search does not fall back to unsafe manually supplied links on provider rejection',async()=>{
  await assert.rejects(runAutonomousDeepMatch('synthetic-secret-not-real','负责渠道管理、门店督导和销售培训。','督导',10,{
   fetcher:async()=>new Response('unsupported tool',{status:400})
