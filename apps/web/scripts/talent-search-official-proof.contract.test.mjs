@@ -25,7 +25,7 @@ const pageBody = [
   '任职要求',
   requirements,
   '薪资：18K-25K',
-  '欢迎关注企业招聘信息，并核实职位投递情况。',
+  '欢迎关注企业招聘信息，并核实职位投递情况。该职位日常工作还涉及区域客户经营指标复盘、协助跨职能团队推进经营改善计划、建立标准化督导工作报告，以及对门店执行流程进行定期抽检和质量评估。投递前请仔细阅读职位要求。',
 ].join('\n');
 
 const employerUrl = 'https://careers.samplecorp.example.cn/jobs/20261115-region-supervisor';
@@ -80,7 +80,7 @@ test('accepts an ATS job when the attested corporate website links directly to t
   const result = check(atsUrl, evidence(atsUrl, {
     official_careers_page: fetched(
       'https://careers.samplecorp.example.cn/careers',
-      '示例科技集团有限公司官网，查看我们的工作机会，欢迎加入我们的团队。',
+      '示例科技集团有限公司官网职业发展页面，查看我们的社会招聘工作机会，欢迎具有区域运营和团队管理经验的求职者加入我们的团队。',
       { links: [{ href: atsUrl, text: '区域运营督导 投递' }] },
     ),
   }));
@@ -93,7 +93,7 @@ test('accepts an ATS tenant when the employer links to the tenant root and the j
   const result = check(atsUrl, evidence(atsUrl, {
     official_careers_page: fetched(
       'https://www.samplecorp.example.cn/careers',
-      '示例科技集团有限公司官方招聘入口，点击查看企业全部岗位信息。',
+      '示例科技集团有限公司官方招聘与人才发展入口，点击查看企业全部岗位信息；岗位职责、工作地点和任职要求以实际详情为准。',
       { links: ['https://jobs.ashbyhq.com/samplecorp'] },
     ),
   }));
@@ -113,7 +113,7 @@ test('blocks unrelated ATS tenants even when the employer links to the legitimat
   const result = check(unrelatedAts, evidence(unrelatedAts, {
     official_careers_page: fetched(
       'https://careers.samplecorp.example.cn/careers',
-      '示例科技集团官方招聘入口，欢迎查询岗位详情。',
+      '示例科技集团官方招聘与人才发展入口，欢迎查询岗位详情；工作地点、薪资和任职资格以具体岗位介绍为准。',
       { links: ['https://jobs.ashbyhq.com/samplecorp'] },
     ),
   }));
@@ -125,7 +125,7 @@ test('a generic ATS homepage link cannot authorize all tenants on a shared vendo
   const result = check(atsUrl, evidence(atsUrl, {
     official_careers_page: fetched(
       'https://careers.samplecorp.example.cn/careers',
-      '示例科技集团官方招聘页面，欢迎查询岗位详情。',
+      '示例科技集团官方招聘与人才发展页面，欢迎查询岗位详情；请根据个人经历选择符合条件的职位并核实申请状态。',
       { links: ['https://jobs.ashbyhq.com/'] },
     ),
   }));
@@ -227,7 +227,7 @@ test('source proof never uses generic jobs navigation instead of exact ATS autho
   const result = check(atsUrl, evidence(atsUrl, {
     official_careers_page: fetched(
       'https://careers.samplecorp.example.cn/careers',
-      '我们的招聘导航，有职位页面及招聘相关资讯。',
+      '这里是示例科技集团官方招聘导航页面，包括职位目录、招聘流程介绍及相关招聘资讯，但没有授权具体的外部托管岗位。',
       { links: [{ href: 'https://www.zhipin.com/' }, { href: 'https://jobs.ashbyhq.com/' }] },
     ),
   }));
