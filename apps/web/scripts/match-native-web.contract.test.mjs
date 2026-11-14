@@ -26,6 +26,8 @@ const deepEvidenceResponse=(jobs,extraSources=[])=>({
     {type:'url',url:posting,title:'示例汽车中国 品牌督导 招聘职位',
      snippet:'上海品牌督导招聘，要求经销商渠道管理、区域督导、培训。',
      site_name:'示例汽车中国'},...extraSources]}},
+  {type:'web_search_call',kind:'deep_search',status:'completed',
+   action:{type:'open_page',url:posting},page:{url:posting,title:'示例汽车中国 品牌督导招聘职位'}},
   {type:'message',content:[{type:'output_text',text:JSON.stringify({jobs})}]}
  ],
  usage:{input_tokens:1800,output_tokens:2900,
@@ -555,4 +557,32 @@ test('real resume benchmark: MG regional retail operations extracts evidence for
  assert.match(body.instructions,/人才能力反向找企业/);
  assert.match(body.instructions,/企业自有官网招聘页面/);
  assert.match(body.instructions,/严格排除 BOSS、智联、51job、猎聘、拉勾/);
+});
+
+
+test('final DeepSeek recommendations require an opened job detail page, not search snippets alone',()=>{
+ const score='简历中的经销商管理、门店运营和培训成果与职位职责存在直接对应，但还要核对页面明确的工作经验和学历要求。';
+ const response=deepEvidenceResponse([{
+  url:posting,company:'示例汽车中国',title:'品牌督导',location:'上海',
+  match_score:86,score_basis:score,reason:score,job_basis:'负责经销商运营、门店巡检和销售培训',
+  minimum_experience_years:3,experience_requirement:'3年以上',experience_requirement_evidence:'岗位要求3年以上汽车渠道管理经验'
+ }]);
+ const opened=verifiedDeepSearchMatches(response,10,{experience_years:2.5});
+ assert.equal(opened.matches.length,0,'explicit 3-year minimum must exclude a 2.5-year candidate');
+ const noOpen=structuredClone(response);
+ noOpen.output=noOpen.output.filter(item=>item.action?.type!=='open_page');
+ assert.equal(verifiedDeepSearchMatches(noOpen,10,{experience_years:4}).matches.length,0,
+  'a search result URL is not enough; the actual job page must be opened');
+});
+
+test('resume experience duration parser understands decimal years and year-month expressions',()=>{
+ assert.equal(buildResumeProfile('工作时间约2.5年').experience_years,2.5);
+ assert.equal(buildResumeProfile('相关工作经验2年6个月').experience_years,2.5);
+ assert.equal(buildResumeProfile('工作年限3年半').experience_years,3.5);
+});
+
+test('preferred role does not hide adjacent transferable capability families',()=>{
+ const intent=buildRoleIntent('品牌督导','负责经销商渠道运营、门店销售管理、销售顾问培训和区域经营复盘');
+ assert.ok(intent.direct_roles.includes('品牌督导'));
+ assert.ok(intent.adjacent_roles.includes('销售赋能')||intent.adjacent_roles.includes('培训督导')||intent.adjacent_roles.includes('区域运营'));
 });
