@@ -56,9 +56,10 @@ This explains why simply increasing the prompt length or changing the model is u
 ### 2.3 Additional legacy constraints discovered
 
 The older `domestic-search-fetch.js` path is not a general open-web discovery engine:
-- Its `OFFICIAL` locator map contains only four fixed employers/domains: Tencent, Huawei, Meituan, and JD.
+- Its `OFFICIAL` map contains four fixed employer domains (Tencent, Huawei, Meituan, and JD); additional hard-coded branches in `safeOfficialJobLocator` accept ByteDance and Baidu. In total, the legacy locator is still limited to six fixed employer domains.
 - The default path is capped at two Search calls and three Fetch calls; the expanded path is capped at four Search calls and eight Fetch calls.
 - `safeOfficialJobLocator` accepts a small set of employer-specific URL paths and ID formats, so unknown companies cannot pass this legacy verifier even if their official job pages are found.
+- `match-employer-source.js` classifies ATS hosts and career-looking domains as source candidates. Its own comments correctly say domain shape is only a signal; the active native route nevertheless treats `EMPLOYER_DOMAIN_CANDIDATE` and `EMPLOYER_ATS` as employer-directed without completing an independent employer-to-ATS authorization proof.
 - `domestic-match-fusion.js` uses that same fixed locator as a gate for external jobs.
 
 The existing `resume-role-evidence.js` also contains a hard-coded list of roughly 29 career directions and returns at most six. This is a useful safety baseline for known examples, but it is not a universal career ontology and cannot be the final career-expansion engine for all occupations.
