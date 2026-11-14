@@ -112,3 +112,6 @@
  .hhba-major-selected-head h2{font-size:20px}
  .hhba-major-start{padding:40px 18px}
 }
+
+.hhba-major-secondary-entry{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;margin:0 0 14px;background:#eef8f3;border:1px solid #d0e7da;border-radius:9px;color:#286b4c;font-weight:700;font-size:12px;text-decoration:none}
+.hhba-major-secondary-entry:hover{border-color:#94c6a8;background:#e5f3e9}
