@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from '../functions/_lib/match-job-quality.js';
 import {recruitmentSourceKind,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting} from '../functions/_lib/match-employer-source.js';
 import {explicitPreferredCity,supplementalQueries,mergeCandidateHits,combineRecommended} from '../functions/_lib/match-search-growth.js';
+import {buildRoleIntent,buildRoleSearchQueries,buildResumeProfile} from '../functions/_lib/match-role-intent.js';
 import {searchQueries,normalizeHits,selectedJobs,searchPublicJobs,
  enrichCandidateDetails,reasonAboutJobs,runSearchFirstMatch,preferEmployerPostingUrls} from '../functions/_lib/deepseek-search-match.js';
 
@@ -29,6 +30,34 @@ test('public API query plan is short, role-aware, and never sends complete resum
  assert.ok(queries.some(q=>q.includes('AI产品经理')));
  assert.ok(queries.some(q=>q.includes('品牌督导')));
  assert.ok(queries.every(q=>!q.includes('负责HHBA')));
+});
+test('role intent expands a short job title and preserves travel and industry preferences',()=>{
+ const resume='负责汽车经销商DCC运营、区域门店督导、销售线索转化、销售顾问培训和AI智能体产品项目。工作年限3年，本科。';
+ const intent=buildRoleIntent('督导，全国范围可出差，汽车零售优先',resume);
+ assert.equal(intent.primary_direction,'督导');
+ assert.ok(intent.direct_roles.includes('区域督导'));
+ assert.ok(intent.direct_roles.includes('渠道督导'));
+ assert.ok(intent.adjacent_roles.includes('区域运营'));
+ assert.match(intent.constraints.travel_preference,/全国出差/);
+ assert.ok(intent.constraints.industry_preferences.includes('汽车行业优先'));
+ const queries=buildRoleSearchQueries('督导，全国范围可出差，汽车零售优先',resume);
+ assert.ok(queries.length>=3&&queries.length<=4);
+ assert.ok(queries.some(q=>q.includes('督导')));
+ assert.ok(queries.some(q=>q.includes('全国出差')));
+ assert.ok(queries.some(q=>q.includes('区域运营')));
+});
+test('resume evidence profile only emits skills and education supported by resume text',()=>{
+ const profile=buildResumeProfile('本科。负责经销商DCC运营、门店培训、线索转化和销售漏斗复盘。工作年限3年。');
+ assert.equal(profile.education,'本科');
+ assert.equal(profile.experience_years,3);
+ assert.ok(profile.skills.some(x=>x.name==='区域与渠道管理'&&/经销商|DCC/.test(x.evidence)));
+ assert.ok(profile.skills.some(x=>x.name==='团队培训与质量管理'));
+ assert.ok(profile.skills.some(x=>x.name==='销售转化与客户运营'));
+ assert.ok(profile.warnings.length>0);
+ const empty=buildResumeProfile('做过一些工作。');
+ assert.equal(empty.education,null);
+ assert.equal(empty.experience_years,null);
+ assert.equal(empty.skills.length,0);
 });
 test('search candidates come from links in Search API, never guesses or homepages',()=>{
  const hits=normalizeHits([{results:[...posts,
@@ -98,6 +127,7 @@ test('V4 Pro reasons only about Search results; no tools are passed to model',as
  ].map(e=>'event: '+e.type+'\ndata: '+JSON.stringify(e)+'\n\n').join('');
  const partial=[];
  const out=await reasonAboutJobs('synthetic-secret-not-real',cv,hits,10,{
+  roleHint:'督导，全国出差，汽车零售优先',
   fetcher:async(url,options)=>{
    called++;
    const body=JSON.parse(options.body);
@@ -106,6 +136,9 @@ test('V4 Pro reasons only about Search results; no tools are passed to model',as
    assert.equal(body.tools,undefined);
    assert.equal(body.text.format.type,'json_object');
    assert.equal(body.reasoning.effort,'none');
+   assert.match(body.instructions,/用户目标方向与限制条件/);
+   assert.match(body.input,/全国出差/);
+   assert.match(body.instructions,/简历能力线索/);
    return new Response(eventStream,{headers:{'Content-Type':'text/event-stream'}});
   },onPartial:x=>partial.push(x.length)
  });
@@ -136,6 +169,8 @@ test('end-to-end: Search then V4 Pro selects actual URLs, logs stage timing and 
  assert.equal(calls.filter(x=>x.endsWith('/search')).length,searchQueries(cv,'AI产品经理').length);
  assert.equal(calls.filter(x=>x.endsWith('/responses')).length,1);
  assert.equal(result.matches.length,2);
+ assert.ok(result.profile.skills.length>0);
+ assert.ok(result.profile.target_roles.length>0);
  assert.equal(result.diagnostic.mode,'search-first-staged');
  assert.ok(Number.isFinite(result.diagnostic.search_ms));
  assert.ok(Number.isFinite(result.diagnostic.model_ms));
