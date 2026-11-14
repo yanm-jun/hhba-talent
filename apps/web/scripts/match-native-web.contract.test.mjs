@@ -21,10 +21,11 @@ const deepEvidenceResponse=(jobs,extraSources=[])=>({
  status:'completed',
  output:[
   {type:'web_search_call',kind:'deep_search',status:'completed',
-   action:{type:'search',queries:['汽车品牌督导 企业官网 招聘'],sources:[
+   action:{type:'search',queries:['汽车品牌督导 企业官网 招聘']},
+   sources:[
     {type:'url',url:posting,title:'示例汽车中国 品牌督导 招聘职位',
      snippet:'上海品牌督导招聘，要求经销商渠道管理、区域督导、培训。',
-     site_name:'示例汽车中国'},...extraSources]}},
+     site_name:'示例汽车中国'},...extraSources]},
   {type:'message',content:[{type:'output_text',text:JSON.stringify({jobs})}]}
  ],
  usage:{input_tokens:1800,output_tokens:2900,
@@ -63,6 +64,32 @@ test('autonomous deep results require real tool-source URL evidence, reject fabr
  assert.equal(verified.matches[0].platform,'deepseek-deep-thinking');
  assert.equal(verified.model_rows,4);
  assert.equal(verified.source_matched_rows,1,'third-party boards are excluded before source matching');
+});
+test('DeepSeek official Responses sources are top-level, not nested under action',()=>{
+ const job={url:posting,company:'示例汽车中国',title:'品牌督导',location:'上海',
+  reason:'求职者有门店巡检与区域管理经历，应核验渠道管理岗位完整的职责说明、实际工作地点及出差要求。',
+  score_basis:'区域管理和培训技能相关，但任职门槛及最新招聘状态仍需核查。',match_score:82};
+ const official=deepEvidenceResponse([job]);
+ assert.deepEqual(official.output[0].action,{type:'search',queries:['汽车品牌督导 企业官网 招聘']});
+ assert.equal(official.output[0].sources[0].url,posting);
+ assert.equal(verifiedDeepSearchMatches(official).matches.length,1);
+ const malformed=structuredClone(official);
+ malformed.output[0].action.sources=malformed.output[0].sources;
+ delete malformed.output[0].sources;
+ assert.equal(verifiedDeepSearchMatches(malformed).matches.length,0,
+  'never use model-provided action text as evidence of actual fetched sources');
+});
+test('DeepSeek official open_page returns page on item, not action',()=>{
+ const job={url:posting,company:'示例汽车中国',title:'品牌督导',location:'上海',
+  reason:'渠道管理经验可以迁移到督导岗位，需核实招聘信息和实际任职要求。'};
+ const data={status:'completed',output:[
+  {type:'web_search_call',kind:'deep_search',status:'completed',action:{type:'open_page',url:posting},
+   page:{url:posting,title:'示例汽车中国 品牌督导 招聘职位',published_at:null}},
+  {type:'message',content:[{type:'output_text',text:JSON.stringify({jobs:[job]})}]}
+ ]};
+ assert.equal(verifiedDeepSearchMatches(data).matches.length,1);
+ data.output[0].page=undefined;
+ assert.equal(verifiedDeepSearchMatches(data).matches.length,0);
 });
 test('autonomous deep model records paid usage and exposes soft spending overrun (no pretend hard cap)',async()=>{
  const score='经销商渠道和终端管理经验与岗位职责相关，还需要核查企业招聘资质、正式工作地点及硬性岗位条件。';
