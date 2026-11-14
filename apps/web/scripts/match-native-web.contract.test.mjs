@@ -193,7 +193,7 @@ test('authenticated route streams Search-first stages and final linked jobs',asy
   assert.doesNotMatch(events,/event: failure/);
   assert.match(events,/示例汽车中国/);
   assert.doesNotMatch(events,/东京/);
-  assert.equal(calls.filter(x=>x.endsWith('/v1/tools/search')).length,queryCount+2,'2 supplemental Search queries when first shortlist is under 10');
+  assert.equal(calls.filter(x=>x.endsWith('/v1/tools/search')).length,queryCount+6,'6 supplemental Search queries when first shortlist is under 10');
   assert.equal(calls.filter(x=>x.endsWith('/responses')).length,2,'one shortlist call and one details pass');
  }finally{globalThis.fetch=realFetch}
 });
