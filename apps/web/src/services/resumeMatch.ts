@@ -45,7 +45,7 @@ export type MatchResponse = {
   improved_job_count?:number;
 };
 export type MatchSearchPreferences = {
- industry_hint:string;preferred_cities:string;
+ industry_hint:string;capability_hints:string[];preferred_cities:string;
  location_mode:'PRIORITY'|'ONLY'|'NATIONWIDE';
  travel_preference:'UNSPECIFIED'|'FREQUENT_OK'|'OCCASIONAL'|'NO';
  salary_min_k:string;salary_max_k:string;employer_models:string[];
@@ -210,6 +210,7 @@ function toSearchPreferencesPayload(value?:MatchSearchPreferences){
  const models=['dealer_network','chain_stores','regional_teams','brand_service_network'];
  return {
   industry_hint:String(p.industry_hint||'').trim().slice(0,120),
+  capability_hints:Array.isArray(p.capability_hints)?[...new Set(p.capability_hints.filter(x=>typeof x==='string'&&x.length>=2&&x.length<=40))].slice(0,12):[],
   preferred_cities:[...new Set(cities)].slice(0,5),
   location_mode:p.location_mode||'PRIORITY',
   travel_preference:p.travel_preference||'UNSPECIFIED',

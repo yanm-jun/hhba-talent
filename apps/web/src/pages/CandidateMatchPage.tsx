@@ -13,7 +13,7 @@ import '../styles/resume-match.css';
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const maxResumeSize=3*1024*1024;
 const defaultSearchPreferences:MatchSearchPreferences={
- industry_hint:'',preferred_cities:'',location_mode:'PRIORITY' as const,
+ industry_hint:'',capability_hints:[],preferred_cities:'',location_mode:'PRIORITY' as const,
  travel_preference:'UNSPECIFIED' as const,salary_min_k:'',salary_max_k:'',employer_models:[] as string[]
 };
 const employerModelChoices=[
@@ -56,11 +56,18 @@ export function CandidateMatchPage({user}:{user:User|null}){
   search_preferences:{...defaultSearchPreferences}
  });
  const searchPreferences={...defaultSearchPreferences,...options.search_preferences};
- const capabilityHints=previewLoaded?inferResumeCapabilityHints(previewText):[];
+ const [detectedCapabilityHints,setDetectedCapabilityHints]=useState<string[]>([]);
+ const [selectedCapabilityHints,setSelectedCapabilityHints]=useState<string[]>([]);
+ const capabilityHints=detectedCapabilityHints;
  function updateSearchPreferences(patch:Partial<MatchSearchPreferences>){
   setOptions(current=>({...current,search_preferences:{
    ...defaultSearchPreferences,...current.search_preferences,...patch
   }}));
+ }
+ function syncCapabilityHints(text:string){
+  const tags=inferResumeCapabilityHints(text);
+  setDetectedCapabilityHints(tags);setSelectedCapabilityHints(tags);
+  updateSearchPreferences({capability_hints:tags});
  }
  const [working,setWorking]=useState(false);
   const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
@@ -108,6 +115,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
  },[user?.id]);
  function choose(candidate:File|null){
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);
+  setDetectedCapabilityHints([]);setSelectedCapabilityHints([]);updateSearchPreferences({capability_hints:[]});
   setError('');setResult(null);setSaveConsent(false);setSaveNotice('');
   if(!candidate){setFile(null);return}
   if(!/\.(pdf|docx)$/i.test(candidate.name)||!candidate.size||candidate.size>maxResumeSize){
@@ -118,6 +126,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
  async function preview(){
   if((!file&&!savedId)||working||previewBusy)return;
   setPreviewBusy(true);setError('');setPreviewText('');setPreviewLoaded(false);
+  setDetectedCapabilityHints([]);setSelectedCapabilityHints([]);updateSearchPreferences({capability_hints:[]});
   const abort=new AbortController();previewController.current=abort;
   try{
    let selected=file;
@@ -130,7 +139,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
    }
    if(!selected)throw new MatchError(400,'请先选择简历。');
    const text=await extractResumeTextLocally(selected,abort.signal);
-   if(!abort.signal.aborted){setPreviewText(text);setPreviewLoaded(true);}
+   if(!abort.signal.aborted){setPreviewText(text);setPreviewLoaded(true);syncCapabilityHints(text);}
   }catch(e){
    if((e as Error)?.name!=='AbortError')setError(e instanceof Error?e.message:'无法读取简历文字。');
   }finally{setPreviewBusy(false);previewController.current=null;}
@@ -241,7 +250,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
          {previewLoaded&&<div className="hhba-ai-text-review">
           <label htmlFor="hhba-ai-text-preview">文字预览（最多 20,000 字）</label>
           <textarea id="hhba-ai-text-preview" rows={6} maxLength={20000} value={previewText}
-           disabled={working} onChange={e=>{setPreviewText(e.target.value);setConsent(false);}}/>
+           disabled={working} onChange={e=>{setPreviewText(e.target.value);setConsent(false);syncCapabilityHints(e.target.value);}}/>
           <small>请先删除不希望用于本次匹配的内容。</small>
          </div>}
         </div>
@@ -250,9 +259,16 @@ export function CandidateMatchPage({user}:{user:User|null}){
         <section className="hhba-ai-capability-panel" aria-label="简历能力自动识别">
           <div className="hhba-ai-capability-heading"><Sparkles size={17}/><strong>AI 自动识别简历核心能力</strong><span>无需手动填写</span></div>
           {previewLoaded&&capabilityHints.length>0?
-           <><div className="hhba-ai-capability-tags">{capabilityHints.map(tag=><span key={tag}>{tag}</span>)}</div>
-            <small>以上是根据简历文字初步识别的能力线索；DeepSeek 还会结合完整经历、业绩和岗位职责继续分析。</small></>:
-           <p>开始匹配时，AI 会自动提取你的真实职责、工作成果、专业技能和可迁移能力。点击上方「预览简历文字」可以先检查简历内容。</p>}
+           <><div className="hhba-ai-capability-tags">{capabilityHints.map(tag=>{
+             const selected=selectedCapabilityHints.includes(tag);
+             return <button type="button" key={tag} className={selected?'selected':''}
+              aria-pressed={selected} onClick={()=>{
+               const next=selected?selectedCapabilityHints.filter(x=>x!==tag):[...selectedCapabilityHints,tag];
+               setSelectedCapabilityHints(next);updateSearchPreferences({capability_hints:next});
+              }}>{selected?'✓ ':'＋ '}{tag}</button>;
+            })}</div>
+            <small>点击标签可调整本次搜索重点。未选中不代表你没有这项能力；AI 仍会以简历原文核验，不会虚构经历。</small></>:
+           <p>开始匹配时，AI 会自动提取你的真实职责、工作成果、专业技能和可迁移能力。点击上方「预览简历文字」可以先检查并调整识别出的能力线索。</p>}
         </section>
         <div className="hhba-ai-preference-block">
           <div className="hhba-ai-preference-grid">

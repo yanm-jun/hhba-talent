@@ -186,6 +186,7 @@ function constraintsFrom(hint,resume,preferences={}){
   OCCASIONAL:'可接受偶尔出差，不优先长期驻外',NO:'不接受需要出差的岗位'
  })[travelCode];
  const industryHint=clean(p.industry_hint,120);
+ const capabilityHints=Array.isArray(p.capability_hints)?unique(p.capability_hints.filter(x=>typeof x==='string'),10):[];
  const industryText=hint+' '+industryHint;
  const preferenceTerms=[];
  if(/汽车|汽车零售|车企|经销商/.test(industryText))preferenceTerms.push('汽车行业优先');
@@ -209,7 +210,7 @@ function constraintsFrom(hint,resume,preferences={}){
   travel_preference:travelLabel,travel_preference_code:travelCode,
   travel_preference_label:travelLabel,
   industry_preferences:preferenceTerms,
-  industry_hint:industryHint,
+  industry_hint:industryHint,capability_hints:capabilityHints,
   salary_min_monthly_cny:salaryMin,salary_max_monthly_cny:salaryMax,
   employer_models:models,
   employer_model_labels:models.map(x=>EMPLOYER_MODEL_LABELS[x])
@@ -218,7 +219,8 @@ function constraintsFrom(hint,resume,preferences={}){
 export function buildRoleIntent(roleHint='',resume='',searchPreferences={}){
  const hint=clean(roleHint,240),text=String(resume||'').slice(0,13000);
  const industryHint=clean(searchPreferences?.industry_hint,120);
- const hintFamilies=matchedFamilies(hint+' '+industryHint),resumeFamilies=matchedFamilies(text);
+ const capabilityHints=Array.isArray(searchPreferences?.capability_hints)?searchPreferences.capability_hints.filter(x=>typeof x==='string').join(' '):'';
+ const hintFamilies=matchedFamilies(hint+' '+industryHint+' '+capabilityHints),resumeFamilies=matchedFamilies(text);
  // A preferred title/industry is a priority, never a ceiling on transferable roles.
  const primaryFamilies=[...new Map([...hintFamilies,...resumeFamilies]
   .map(f=>[f.id,f])).values()].slice(0,5);

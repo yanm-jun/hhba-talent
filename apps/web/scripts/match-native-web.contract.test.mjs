@@ -609,6 +609,7 @@ test('structured search preferences guide discovery without becoming role or ind
  const resume='上汽MG区域督导，负责经销商管理、门店运营、销售培训和经营复盘；工作时间约2.5年。';
  const preferences={
   industry_hint:'消费品、零售',
+  capability_hints:['区域与渠道管理','团队培训与质量管理'],
   preferred_cities:['上海','杭州'],
   location_mode:'PRIORITY',
   travel_preference:'FREQUENT_OK',
@@ -617,6 +618,7 @@ test('structured search preferences guide discovery without becoming role or ind
  };
  const intent=buildRoleIntent('',resume,preferences);
  assert.equal(intent.constraints.location_mode,'PRIORITY');
+ assert.deepEqual(intent.constraints.capability_hints,['区域与渠道管理','团队培训与质量管理']);
  assert.deepEqual(intent.constraints.preferred_cities,['上海','杭州']);
  assert.equal(intent.constraints.travel_preference_code,'FREQUENT_OK');
  assert.equal(intent.constraints.salary_min_monthly_cny,15000);

@@ -116,7 +116,9 @@
 .hhba-ai-capability-heading span{margin-left:auto;font-size:11px;color:#65826d;background:#e7f2e9;border-radius:30px;padding:4px 8px}
 .hhba-ai-capability-panel p,.hhba-ai-capability-panel small{display:block;color:#718276;font-size:11px;line-height:1.75;margin:9px 0 0}
 .hhba-ai-capability-tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
-.hhba-ai-capability-tags span{border:1px solid #cfe2d4;background:white;color:#386c49;border-radius:30px;padding:6px 10px;font-size:11px}
+.hhba-ai-capability-tags button{border:1px solid #cfe2d4;background:white;color:#6c7e70;border-radius:30px;padding:6px 10px;font-size:11px;cursor:pointer}
+.hhba-ai-capability-tags button.selected{border-color:#82b391;background:#eaf5ed;color:#28633d;font-weight:700}
+.hhba-ai-capability-tags button:focus-visible{outline:2px solid #4f8d61;outline-offset:2px}
 .hhba-ai-preference-block{display:flex;flex-direction:column;gap:16px}
 .hhba-ai-preference-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
 .hhba-ai-preference-grid>label,.hhba-ai-salary-row>label{display:flex;flex-direction:column;gap:7px;color:#435b49;font-size:12px;font-weight:680;min-width:0}

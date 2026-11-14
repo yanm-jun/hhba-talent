@@ -19,6 +19,8 @@ function validSearchPreferences(value){
  if(!value||typeof value!=='object'||Array.isArray(value))return false;
  const p=value;
  if(p.industry_hint!==undefined&&(typeof p.industry_hint!=='string'||p.industry_hint.length>120))return false;
+ if(p.capability_hints!==undefined&&(!Array.isArray(p.capability_hints)||p.capability_hints.length>12||
+  p.capability_hints.some(tag=>typeof tag!=='string'||tag.length<2||tag.length>40)))return false;
  if(p.preferred_cities!==undefined&&(!Array.isArray(p.preferred_cities)||p.preferred_cities.length>5||
   p.preferred_cities.some(city=>typeof city!=='string'||city.length<2||city.length>24)))return false;
  if(p.location_mode!==undefined&&!['PRIORITY','ONLY','NATIONWIDE'].includes(p.location_mode))return false;
