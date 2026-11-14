@@ -181,7 +181,7 @@ export function selectedJobs(text,hits,limit=10){
    requirements_basis:clean(row.job_basis||evidence.summary,220),
    salary:clean(row.salary,65)||null,
    experience_requirement:clean(row.experience_requirement,100)||null,
-   minimum_experience_years:Number.isFinite(Number(row.minimum_experience_years))?Number(row.minimum_experience_years):null,
+   minimum_experience_years:row.minimum_experience_years!==null&&row.minimum_experience_years!==undefined&&row.minimum_experience_years!==''&&Number.isFinite(Number(row.minimum_experience_years))?Number(row.minimum_experience_years):null,
    experience_requirement_evidence:clean(row.experience_requirement_evidence,180)||null,
    education_requirement:clean(row.education_requirement,100)||null,
    education_requirement_evidence:clean(row.education_requirement_evidence,180)||null,
