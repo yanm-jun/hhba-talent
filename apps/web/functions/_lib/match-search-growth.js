@@ -2,6 +2,7 @@
 import {MAINLAND_CITIES} from './mainland-job-location.js';
 import {sortByMatchScore} from './match-job-quality.js';
 import {allowedEmployerJobLink} from './match-employer-source.js';
+import {buildSupplementalRoleQueries} from './match-role-intent.js';
 const plain=s=>String(s||'').replace(/[\r\n<>\"']/g,' ').replace(/\s+/g,' ').trim();
 export function explicitPreferredCity(resume){
  const s=String(resume||'').slice(0,12000);
@@ -17,17 +18,8 @@ export function explicitPreferredCity(resume){
 }
 export function supplementalQueries(resume,roleHint,primaryQueries=[]){
  const city=explicitPreferredCity(resume);
- const original=plain(roleHint).slice(0,35);
- const text=String(resume||'').slice(0,10000);
- const direct=original||(/(?:智能体|Agent|RAG|AI产品)/i.test(text)?'AI产品 运营':'区域运营 产品运营');
- const adjacent=/(?:AI|智能|产品)/i.test(direct)?'数字化产品运营 项目协调':
-  /(?:经销商|汽车|区域|渠道|销售|督导)/i.test(direct)?'区域运营 渠道管理':'业务运营 项目运营';
- const suffix=city?city+' 工作地点':'中国大陆 工作地点';
- const candidates=[
-  (direct+' '+suffix+' 2026 社会招聘 职位详情 企业官网').slice(0,128),
-  (adjacent+' '+suffix+' 企业招聘 申请职位 官方招聘官网').slice(0,128)
- ];
- return [...new Set(candidates)].filter(q=>!primaryQueries.includes(q)).slice(0,2);
+ return buildSupplementalRoleQueries(roleHint,resume,city)
+  .filter(q=>!primaryQueries.includes(q)).slice(0,2);
 }
 export function mergeCandidateHits(initial,additional,max=48){
  const normalized=new Set(),merged=[];
