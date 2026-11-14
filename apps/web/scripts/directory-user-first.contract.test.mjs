@@ -14,7 +14,7 @@ test('static global enterprise index covers 17 halls without duplicates or secre
  assert.equal(search.kind,'HHBA_DIRECTORY_GLOBAL_SEARCH_V1');
  assert.equal(search.asOf,manifest.asOf);
  assert.equal(manifest.halls.length,17);
- assert.equal(search.records.length,2888);
+ assert.ok(search.records.length>0);
  const halls=new Set(manifest.halls.map(x=>x.id));
  const index=new Map();
  for(const r of search.records){
@@ -33,17 +33,20 @@ test('static global enterprise index covers 17 halls without duplicates or secre
   index.set(k,r);
  }
  let original=0;
+ const expectedKeys=new Set();
  for(const h of manifest.halls){
   const source=JSON.parse(read('../public/recruitment-library/v1/'+h.id+'.json'));
   assert.equal(source.records.length,h.published);
   for(const entry of source.records){
    original++;
+   expectedKeys.add(key(entry.company,entry.url));
    const r=index.get(key(entry.company,entry.url));
    assert.ok(r,'missing '+h.id+' '+entry.company);
    assert.ok(r.halls.includes(h.id));
   }
  }
- assert.equal(original,2959);
+ assert.equal(original,manifest.halls.reduce((sum,h)=>sum+h.published,0));
+ assert.equal(index.size,expectedKeys.size);
  for(const oldPrivateField of ['source_key','source_batch','source_sequence','actor_email','before_json','after_json'])
   assert.ok(!JSON.stringify(search).includes('"'+oldPrivateField+'"'));
 });
