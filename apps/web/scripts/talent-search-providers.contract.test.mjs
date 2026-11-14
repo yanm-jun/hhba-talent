@@ -366,3 +366,35 @@ test('provider errors never echo API credentials or raw response bodies', async 
     },
   );
 });
+
+test('provider credentials are never forwarded to a redirect destination', async () => {
+  let redirectMode = '';
+  await assert.rejects(
+    searchDeepSeek('区域督导 官方岗位', {
+      apiKey: 'synthetic-secret-not-real',
+      fetcher: async (_url, options) => {
+        redirectMode = options.redirect;
+        return new Response('', {
+          status: 302,
+          headers: { Location: 'https://attacker.example/collect' },
+        });
+      },
+    }),
+    error => error.code === 'PROVIDER_REDIRECT_BLOCKED',
+  );
+  assert.equal(redirectMode, 'manual');
+});
+
+test('provider response size is bounded before reading an oversized body', async () => {
+  const response = new Response(JSON.stringify({ results: [] }), {
+    status: 200,
+    headers: { 'Content-Length': '9000001' },
+  });
+  await assert.rejects(
+    searchDeepSeek('区域督导 官方岗位', {
+      apiKey: 'synthetic-secret-not-real',
+      fetcher: async () => response,
+    }),
+    error => error.code === 'PROVIDER_RESPONSE_TOO_LARGE',
+  );
+});
