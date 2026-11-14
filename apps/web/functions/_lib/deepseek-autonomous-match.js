@@ -26,8 +26,11 @@ function toolSources(response){
   const action=item.action||{};
   // DeepSeek Responses API returns search sources and opened-page evidence
   // on the web_search_call item itself, NOT inside action (action is input only).
-  const candidates=action.type==='search'?(Array.isArray(item.sources)?item.sources:[]):
-   action.type==='open_page'&&item.page?[item.page]:[];
+  // Responses API documents search sources inside action.sources. Keep the
+  // sibling item.sources fallback for early/alternate gateway payloads.
+  const candidates=action.type==='search'?
+   (Array.isArray(action.sources)?action.sources:Array.isArray(item.sources)?item.sources:[]):
+   (action.type==='open_page'||action.type==='find_in_page')&&item.page?[item.page]:[];
   for(const source of candidates){
    if(source?.type&&source.type!=='url')continue;
    const url=canonicalUrl(source.url);
