@@ -81,9 +81,11 @@ test('integrated mocked provider -> safe page reader -> official proof -> multi-
     }
 
     const isAts = hit.url.includes('ashbyhq.com');
-    const host = new URL(hit.url).hostname;
+    // Only audited employer-owned hosts or known ATS vendor hosts enter the
+    // network allowlist. Never derive allowHosts from an arbitrary search hit.
+    const allowedJobHosts = isAts ? ['jobs.ashbyhq.com'] : [employerHost];
     const jobPage = await readPublicEmployerPage(hit.url, {
-      allowHosts: [host],
+      allowHosts: allowedJobHosts,
       now: NOW,
       fetcher: fakeNetwork,
     });
