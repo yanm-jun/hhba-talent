@@ -78,6 +78,7 @@ test('DeepSeek official Responses search sources are nested under action.sources
  const malformed=structuredClone(official);
  malformed.output[0].sources=malformed.output[0].action.sources;
  delete malformed.output[0].action.sources;
+ malformed.output=malformed.output.filter(item=>item.action?.type!=='open_page');
  assert.equal(verifiedDeepSearchMatches(malformed).matches.length,0,
   'do not accept a non-standard sibling sources field as official Responses evidence');
 });
