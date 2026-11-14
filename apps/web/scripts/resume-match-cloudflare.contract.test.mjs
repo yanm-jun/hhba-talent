@@ -110,7 +110,7 @@ test('privacy-reviewed empty text never silently falls back to raw resume',async
  const ui=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  assert.match(ui,/if\(previewLoaded\)/);
  assert.match(ui,/previewLoaded&&previewText\.replace\(\/\\s\/g,''\)\.length<30/);
- assert.match(ui,/setPreviewLoaded\(false\);setConsent\(false\);setSavedId/);
+ assert.match(ui,/setPreviewLoaded\(false\);setConsent\(false\);setDetectedCapabilityHints\(\[\]\);setSelectedCapabilityHints\(\[\]\);updateSearchPreferences\(\{capability_hints:\[\]\}\);setSavedId/);
  assert.match(ui,/Once the user has reviewed\/edited text, NEVER fall back/);
 });
 
