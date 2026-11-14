@@ -179,7 +179,13 @@ export function selectedJobs(text,hits,limit=10){
    matched:[reason],recommendation_reason:reason,not_evidenced:[],
    needs_verification:['根据岗位原始网页核对最新招聘状态与硬性任职条件。'],
    requirements_basis:clean(row.job_basis||evidence.summary,220),
-   salary:clean(row.salary,65)||null,experience_requirement:null,
+   salary:clean(row.salary,65)||null,
+   experience_requirement:clean(row.experience_requirement,100)||null,
+   minimum_experience_years:Number.isFinite(Number(row.minimum_experience_years))?Number(row.minimum_experience_years):null,
+   experience_requirement_evidence:clean(row.experience_requirement_evidence,180)||null,
+   education_requirement:clean(row.education_requirement,100)||null,
+   education_requirement_evidence:clean(row.education_requirement_evidence,180)||null,
+   fit_dimensions:row.fit_dimensions&&typeof row.fit_dimensions==='object'?row.fit_dimensions:null,
    checked_at:new Date().toISOString()
   });
   if(found.length>=limit)break;
