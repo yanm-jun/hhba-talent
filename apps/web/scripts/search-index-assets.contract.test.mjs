@@ -87,8 +87,8 @@ test('loading screens share HHBA logo blue and orange accents without green text
   assert.match(main,/color:'#ff9a24'/);
   assert.match(main,/color:'#7588a1'/);
   assert.match(builder,/color:#1373fa/);
-  assert.match(builder,/hhba-boot-dot\\{color:#ff9a24\\}/);
-  assert.match(builder,/hhba-boot-detail\\{font-size:13px;color:#7588a1/);
+  assert.ok(builder.includes('.hhba-boot-dot{color:#ff9a24}'));
+  assert.ok(builder.includes('.hhba-boot-detail{font-size:13px;color:#7588a1'));
   assert.doesNotMatch(main,/color:'#244e3c'|color:'#667e71'/);
   assert.doesNotMatch(builder,/color:#21483b|color:#658075/);
 });
