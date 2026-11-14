@@ -180,7 +180,24 @@ export async function runAutonomousDeepMatch(key,resume,roleHint,limit=10,{
  const searched=toolCalls.some(item=>item.action?.type==='search');
  if(!searched)throw codeError('AI_DEEP_SEARCH_NO_WEB_EVIDENCE');
  const verified=verifiedDeepSearchMatches(data,limit);
- if(!verified.matches.length)throw codeError('AI_EMPLOYER_JOBS_NOT_FOUND');
+ if(!verified.matches.length){
+  // Diagnostic counts only. Never log resumes, search queries, model text,
+  // job URLs, employer names, or provider payloads.
+  console.warn('HHBA_DEEP_SEARCH_EMPTY_RESULT',JSON.stringify({
+   search_tool_calls:toolCalls.filter(c=>c.action?.type==='search').length,
+   open_page_calls:toolCalls.filter(c=>c.action?.type==='open_page').length,
+   evidence_sources:verified.evidence_count,
+   eligible_sources:verified.eligible_sources,
+   model_rows:verified.model_rows,
+   source_matched_rows:verified.source_matched_rows
+  }));
+  const reason=!verified.model_rows?'AI_DEEP_SEARCH_NO_MODEL_JOBS':
+   !verified.evidence_count?'AI_DEEP_SEARCH_EVIDENCE_MISSING':
+   !verified.eligible_sources?'AI_DEEP_SEARCH_NO_EMPLOYER_SOURCES':
+   !verified.source_matched_rows?'AI_DEEP_SEARCH_SOURCE_MISMATCH':
+   'AI_EMPLOYER_JOBS_NOT_FOUND';
+  throw codeError(reason);
+ }
  onPartial(verified.matches);
  const usage=data.usage||{},tools=usage.server_tool_use||{};
  const searches=Number(tools.tool_search||0),pageReads=Number(tools.tool_fetch||0);
