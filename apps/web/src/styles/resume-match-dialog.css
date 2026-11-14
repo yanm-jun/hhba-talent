@@ -123,3 +123,9 @@
 .hhba-match-save-resume button{display:inline-block;margin-top:10px;border:0;border-radius:9px;background:#27704b;color:white;font-size:12px;font-weight:700;padding:9px 16px;cursor:pointer}
 .hhba-match-save-resume button:disabled{opacity:.48;cursor:not-allowed}
 .hhba-match-saved-resume{margin:9px 0;color:#2d7650;font-size:12px;line-height:1.6}
+
+.hhba-match-profile-hints{margin:-8px 0 22px;padding:13px 15px;border:1px solid #e0ebe2;border-radius:10px;background:#f8fbf8}
+.hhba-match-profile-hints>strong{display:block;margin-bottom:9px;color:#345b40;font-size:12px}
+.hhba-match-profile-hints>div{display:flex;flex-wrap:wrap;gap:7px}
+.hhba-match-profile-hints span{padding:5px 9px;border-radius:7px;background:#edf5ef;color:#3e6a4a;font-size:11px}
+.hhba-match-profile-hints small{display:block;margin-top:9px;color:#829186;font-size:10px;line-height:1.6}
