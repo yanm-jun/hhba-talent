@@ -142,6 +142,7 @@ async function readDeepStream(response,onProgress){
  return final;
 }
 export function buildDeepSearchRequest(resume,roleHint,limit=10,searchPreferences={}){
+ // Structured preferences steer discovery; only explicitly strict city/travel choices are hard gates.
  const intent=buildRoleIntent(roleHint,resume,searchPreferences);
  const profile=buildResumeProfile(resume,intent);
  const instructions=[
