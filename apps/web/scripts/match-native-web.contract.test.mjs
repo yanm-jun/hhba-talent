@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {safeJobDetailLink,parseJobAnswer,wasWebSearched,outputText,partialJobMatchesFromText,decodeSearchText} from '../functions/_lib/deepseek-native-match.js';
 import {runNativeJobMatch,runNativeDualMatch,combineNativeBatches,onRequest} from '../functions/api/match-native/[[path]].js';
+import {buildDeepSearchRequest,verifiedDeepSearchMatches,runAutonomousDeepMatch} from '../functions/_lib/deepseek-autonomous-match.js';
 const posting='https://careers.examplecorp.com/jobs/brand-supervisor-2026';
 const answer={jobs:[
  {company:'示例汽车中国',title:'品牌督导',location:'上海',salary:'15000-20000 元/月',
@@ -14,6 +15,90 @@ const answer={jobs:[
  {company:'示例汽车中国',title:'品牌督导',location:'上海',reason:'重复岗位',url:posting},
  {company:'候选公司',title:'运营',location:'上海',reason:'招聘官网首页不允许',url:'https://companycorp.com/'}
 ]};
+
+// Simulate the *actual server-side tool trace*, not an unverified model URL.
+const deepEvidenceResponse=(jobs,extraSources=[])=>({
+ status:'completed',
+ output:[
+  {type:'web_search_call',kind:'deep_search',status:'completed',
+   action:{type:'search',queries:['汽车品牌督导 企业官网 招聘'],sources:[
+    {type:'url',url:posting,title:'示例汽车中国 品牌督导 招聘职位',
+     snippet:'上海品牌督导招聘，要求经销商渠道管理、区域督导、培训。',
+     site_name:'示例汽车中国'},...extraSources]}},
+  {type:'message',content:[{type:'output_text',text:JSON.stringify({jobs})}]}
+ ],
+ usage:{input_tokens:1800,output_tokens:2900,
+  server_tool_use:{tool_search:3,tool_fetch:2}}
+});
+test('DeepSeek autonomous request really enables provider-managed thinking search and risk checks',()=>{
+ const body=buildDeepSearchRequest('负责经销商渠道和销售顾问培训。','督导，全国出差',10);
+ assert.equal(body.model,'deepseek-flash');
+ assert.equal(body.reasoning.effort,'high');
+ assert.deepEqual(body.tools,[{type:'deepseek_web_search'}]);
+ assert.equal(body.safety_check.level,'high');
+ assert.equal(body.text.format.type,'text');
+ assert.equal(body.stream,true);
+ assert.ok(body.max_output_tokens>=10000);
+ assert.ok(!body.tools.some(x=>x.type==='web_search'));
+});
+test('autonomous deep results require real tool-source URL evidence, reject fabricated, job-board and overseas links',()=>{
+ const score='简历中经销商渠道管理和销售顾问培训经验确有对应之处，但必须进一步确认岗位的城市、具体职责和硬性任职条件。';
+ const jobs=[
+  {url:posting,company:'示例汽车中国',title:'品牌督导',location:'上海',
+   match_score:84,score_basis:score,reason:score,job_basis:'渠道管理'},
+  {url:'https://careers.examplecorp.com/jobs/invented-2',company:'虚构企业',
+   title:'虚构岗位',location:'上海',match_score:96,score_basis:score,reason:score},
+  {url:'https://www.zhipin.com/job_detail/abcd0001.html',
+   company:'第三方来源',title:'督导',location:'北京',reason:score},
+  {url:'https://careers.examplecorp.com/jobs/overseas-8',
+   company:'海外企业',title:'督导',location:'东京',reason:score},
+ ];
+ const response=deepEvidenceResponse(jobs,[
+  {type:'url',url:'https://www.zhipin.com/job_detail/abcd0001.html',title:'BOSS直聘 - 督导招聘',snippet:'北京品牌督导招聘'},
+  {type:'url',url:'https://careers.examplecorp.com/jobs/overseas-8',title:'海外督导招聘',snippet:'日本东京招聘'}
+ ]);
+ const verified=verifiedDeepSearchMatches(response,10);
+ assert.equal(verified.matches.length,1);
+ assert.equal(verified.matches[0].official_url,posting);
+ assert.equal(verified.matches[0].platform,'deepseek-deep-thinking');
+ assert.equal(verified.model_rows,4);
+ assert.equal(verified.source_matched_rows,2);
+});
+test('autonomous deep model records paid usage and exposes soft spending overrun (no pretend hard cap)',async()=>{
+ const score='经销商渠道和终端管理经验与岗位职责相关，还需要核查企业招聘资质、正式工作地点及硬性岗位条件。';
+ const response=deepEvidenceResponse([{
+  url:posting,company:'示例汽车中国',title:'品牌督导',location:'上海',match_score:85,
+  score_basis:score,reason:score,job_basis:'渠道培训',salary:''
+ }]);
+ response.usage.server_tool_use={tool_search:15,tool_fetch:18};
+ const fetcher=async(_url,options)=>{
+  assert.equal(options.method,'POST');
+  return new Response(JSON.stringify(response),{status:200,headers:{'Content-Type':'application/json'}});
+ };
+ const result=await runAutonomousDeepMatch('synthetic-secret-not-real','经销商渠道业务和门店培训。','品牌督导',10,{fetcher});
+ assert.equal(result.matches.length,1);
+ assert.equal(result.diagnostic.mode,'provider-managed-deep-thinking-search');
+ assert.equal(result.diagnostic.searches,15);
+ assert.equal(result.diagnostic.page_reads,18);
+ assert.equal(result.diagnostic.tool_budget_exceeded,true);
+ assert.equal(result.diagnostic.tool_budget_enforcement,'SOFT_PROVIDER_MANAGED');
+ assert.equal(result.diagnostic.estimated_tool_cost_cny,0.165);
+ assert.equal(result.diagnostic.tool_cost_soft_budget_cny,0.13);
+});
+test('autonomous deep results fail closed without actual web evidence',async()=>{
+ const response={status:'completed',output:[{type:'message',content:[{
+  type:'output_text',text:JSON.stringify({jobs:answer.jobs.slice(0,1)})
+ }]}],usage:{}};
+ await assert.rejects(runAutonomousDeepMatch('synthetic-secret-not-real','工作经历中的门店督导与渠道管理。','督导',10,{
+  fetcher:async()=>new Response(JSON.stringify(response),{status:200})
+ }),/AI_DEEP_SEARCH_NO_WEB_EVIDENCE/);
+});
+test('autonomous deep search does not fall back to unsafe manually supplied links on provider rejection',async()=>{
+ await assert.rejects(runAutonomousDeepMatch('synthetic-secret-not-real','负责渠道管理、门店督导和销售培训。','督导',10,{
+  fetcher:async()=>new Response('unsupported tool',{status:400})
+ }),/AI_DEEP_SEARCH_API_REJECTED/);
+});
+
 const deepseek=jobs=>({id:'resp_test',status:'completed',
  output:[{type:'web_search_call',status:'completed',action:{type:'search'}},
   {type:'message',content:[{type:'output_text',text:JSON.stringify({jobs})}]}],
@@ -136,34 +221,34 @@ test('frontend fetches one native SSE stream and maps stages without restarting 
  assert.match(svc,/event==='complete'/);
  assert.match(svc,/event==='failure'/);
  assert.match(page,/setStage/);
- assert.match(page,/DeepSeek Search 正在寻找中国大陆具体招聘岗位/);
+ assert.match(page,/DeepSeek 深度思考搜索正在核实中国大陆招聘岗位/);
 });
 
 
-test('authenticated route streams Search-first stages and final linked jobs',async()=>{
- const realFetch=globalThis.fetch;
- const {searchQueries}=await import('../functions/_lib/deepseek-search-match.js');
- const queryCount=searchQueries('上海经销商运营培训，DCC管理，AI产品设计，还管理团队和渠道经营分析能力。','品牌督导').length;
- let calls=[];
- globalThis.fetch=async (url,options)=>{
-  calls.push(url);
-  if(url.endsWith('/v1/tools/search'))return new Response(JSON.stringify({results:[{
-   title:'示例汽车中国 · 品牌督导招聘',
-   url:posting,summary:'在上海开展经销商督导与培训工作。岗位要求渠道拓展、市场管理、区域团队协同及业务复盘。'.repeat(5),
-   snippet:'上海招聘品牌督导'}]}),{status:200});
-  if(url.endsWith('/responses')){
-   const body=JSON.parse(options.body);
-   assert.equal(body.tools,undefined);
-   const jobs={jobs:[{id:'j1',company:'示例汽车中国',title:'品牌督导',location:'上海',
-    reason:'简历中管理经销商DCC线索、门店培训和区域品牌业务的经历，与负责上海经销商业务协同和渠道培训的岗位较为吻合。可用门店转化率改善等数据证明能力，行业岗位具体资格仍需核对。'}]};
-   const events=[
-    {type:'response.output_text.delta',delta:JSON.stringify(jobs)},
-    {type:'response.completed',response:{status:'completed',output:[
-     {type:'message',content:[{type:'output_text',text:JSON.stringify(jobs)}]}]}}
-   ].map(x=>'event: '+x.type+'\ndata: '+JSON.stringify(x)+'\n\n').join('');
-   return new Response(events,{status:200,headers:{'Content-Type':'text/event-stream'}});
-  }
-  throw Error('Unexpected '+url);
+test('authenticated SSE route uses one autonomous deep-thinking request and validates its sources',async()=>{
+ const realFetch=globalThis.fetch,calls=[];
+ globalThis.fetch=async(url,options)=>{
+  calls.push({url,body:JSON.parse(options.body)});
+  assert.equal(url,'https://api.deepseek.com/responses');
+  const body=JSON.parse(options.body);
+  assert.equal(body.model,'deepseek-flash');
+  assert.equal(body.reasoning.effort,'high');
+  assert.deepEqual(body.tools,[{type:'deepseek_web_search'}]);
+  assert.equal(body.safety_check.level,'high');
+  assert.equal(body.text.format.type,'text');
+  const response=deepEvidenceResponse([{
+   url:posting,company:'示例汽车中国',title:'品牌督导',location:'上海',
+   match_score:88,score_basis:'简历里有真实经销商督导和门店培训经历，能够对应岗位所需的渠道协同和终端运营能力，但仍需现场确认企业的岗位任职门槛。',
+   reason:'简历中的经销商管理和 DCC 培训经历与该品牌督导岗位职责有相关性，建议核对完整招聘公告以及现场出差要求，不能把当前的匹配分当作录用概率。',
+   job_basis:'上海经销商渠道管理与销售培训',salary:''
+  }]);
+  const events=[
+   {type:'response.created',response:{status:'in_progress'}},
+   {type:'response.web_search_call.searching'},
+   {type:'response.output_item.done',item:response.output[0]},
+   {type:'response.completed',response}
+  ].map(e=>'event: '+e.type+'\ndata: '+JSON.stringify(e)+'\n\n').join('');
+  return new Response(events,{status:200,headers:{'Content-Type':'text/event-stream'}});
  };
  const db={prepare(sql){return {bind(){return {
   async first(){
@@ -184,18 +269,17 @@ test('authenticated route streams Search-first stages and final linked jobs',asy
    consent:true,options:{country:'CN',remote_only:false,role_hint:'品牌督导',limit:10}})
  });
  try{
-  const response=await onRequest({request,env});
-  assert.equal(response.status,200);
-  assert.match(response.headers.get('content-type'),/text\/event-stream/);
-  const events=await response.text();
+  const result=await onRequest({request,env});
+  assert.equal(result.status,200);
+  const events=await result.text();
   assert.match(events,/event: progress/);
   assert.match(events,/event: complete/);
   assert.doesNotMatch(events,/event: failure/);
   assert.match(events,/示例汽车中国/);
   assert.doesNotMatch(events,/东京/);
-  assert.equal(calls.filter(x=>x.endsWith('/v1/tools/search')).length,queryCount+6,'6 supplemental Search queries when first shortlist is under 10');
-  assert.equal(calls.filter(x=>x.endsWith('/responses')).length,2,'one shortlist call and one details pass');
- }finally{globalThis.fetch=realFetch}
+  assert.equal(calls.length,1,'one DeepSeek-managed search request, no standalone Search/Fetch');
+  assert.ok(calls.every(x=>!x.url.endsWith('/v1/tools/search')));
+ }finally{globalThis.fetch=realFetch;}
 });
 
 test('streaming JSON returns Mainland jobs as soon as each full object is written',async()=>{
