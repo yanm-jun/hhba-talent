@@ -1,9 +1,48 @@
 // Deterministic role-intent expansion and resume evidence extraction for HHBA.
 // This module creates search context without another paid model call.
 // Evidence labels are search hints only; they never assert an unverified qualification.
+import {MAINLAND_CITIES} from './mainland-job-location.js';
 const clean=(value,max=240)=>String(value||'').replace(/[\u0000-\u001f<>]/g,' ')
  .replace(/\s+/g,' ').trim().slice(0,max);
 const unique=(items,max=12)=>[...new Set(items.map(x=>clean(x,36)).filter(Boolean))].slice(0,max);
+const CITY_NAMES=[...MAINLAND_CITIES].sort((a,b)=>b.length-a.length);
+const RESUME_CITY_LABELS=/(?:求职意向城市|意向工作城市|期望工作城市|求职意向|意向城市|期望城市|目标城市|求职地点|期望工作地点|期望地点|目标地点|意向地区|期望地区|求职地区|工作意向)\s*[:：]?\s*/g;
+function cityMentions(value){
+ const text=String(value||''),found=[];
+ for(const city of CITY_NAMES){
+  let from=0,index;
+  while((index=text.indexOf(city,from))>=0){
+   if(text[index+city.length]==='省'){from=index+city.length;continue;}
+   found.push({city,index});from=index+city.length;
+  }
+ }
+ found.sort((a,b)=>a.index-b.index||b.city.length-a.city.length);
+ const result=[];let lastEnd=-1;
+ for(const item of found){
+  if(item.index<lastEnd)continue;
+  if(!result.includes(item.city))result.push(item.city);
+  lastEnd=item.index+item.city.length;
+ }
+ return result;
+}
+function resumeCityPreferenceSegments(resume){
+ const text=String(resume||'').slice(0,13000),segments=[];
+ for(const match of text.matchAll(RESUME_CITY_LABELS)){
+  const tail=text.slice(match.index+match[0].length);
+  const stop=tail.search(/[\r\n。；;]/);
+  segments.push(tail.slice(0,stop<0?100:stop));
+ }
+ const direct=/(?:希望|期望|意向|计划|打算|想)(?:工作)?(?:在|去|到)\s*([^，,。；;\r\n]{1,36})/g;
+ for(const match of text.matchAll(direct))segments.push(match[1]);
+ return segments;
+}
+export function extractPreferredCities(roleHint='',resume=''){
+ const sources=[clean(roleHint,240),...resumeCityPreferenceSegments(resume)];
+ const cities=[];
+ for(const source of sources)for(const city of cityMentions(source))
+  if(!cities.includes(city))cities.push(city);
+ return cities.slice(0,4);
+}
 const FAMILIES=[
  {id:'supervision',pattern:/(?:区域|渠道|市场|销售|门店|终端)?督导|巡店|稽核|终端管理/,
   direct:['区域督导','渠道督导','市场督导','销售督导','门店督导','终端督导','巡店管理'],
@@ -93,19 +132,36 @@ const SKILL_SIGNALS=[
  {name:'客户服务与售后',pattern:/客服|售后|客户服务|投诉处理|服务顾问/i}
 ];
 function matchedFamilies(text){return FAMILIES.filter(f=>f.pattern.test(text));}
+function cleanRolePhrase(value){
+ return String(value||'').trim()
+  .replace(/^(?:我|本人|目前)\s*/,'')
+  .replace(/^(?:(?:希望|想要|想|计划|准备|考虑|倾向于)\s*)?(?:找|寻找|从事|做|担任|应聘)\s*(?:一份|一个|一类|相关的|偏向)?\s*/,'')
+  .replace(/^(?:目标岗位(?:方向)?|求职岗位(?:方向)?|岗位(?:方向)?|求职方向|工作方向)\s*[:：是]?\s*/,'')
+  .replace(/^(?:一份|一个|一类|偏向|偏|主要做|主要从事)\s*/,'')
+  .replace(/(?:相关的)?(?:岗位|职位|工作|方向)$/,'')
+  .replace(/(?:优先|其次|最好|均可|都可以)$/,'')
+  .replace(/\s+/g,' ').trim();
+}
+const NON_ROLE_PREFERENCE=/(?:全国|出差|出行|接受|不限|可远程|远程|薪资|待遇|行业|城市|地点|周末|社保|公积金|住宿|转岗|异地|优先|其次|最好)/;
 function firstDirection(hint,families){
- const first=(hint.split(/[，,；;、|\n]/)[0]||'').trim()
-  .replace(/^(?:目标岗位(?:方向)?|岗位方向|求职方向|希望从事|希望做|想从事|想做)[:：]?\s*/,'');
- if(first&&!/(全国|出差|出行|优先|接受|不限|可远程|薪资|城市)/.test(first))return first.slice(0,24);
- for(const family of families){const m=hint.match(family.pattern);if(m)return m[0].slice(0,24);}
+ const parts=String(hint||'').split(/[，,；;、。\n|]/)
+  .map(raw=>({raw,phrase:cleanRolePhrase(raw)})).filter(x=>x.phrase);
+ const knownRoles=unique(families.flatMap(f=>[...f.direct,...f.adjacent]),32)
+  .sort((a,b)=>b.length-a.length);
+ for(const {raw,phrase} of parts){
+  const known=knownRoles.find(role=>phrase.includes(role));
+  if(known)return known;
+  const family=families.find(f=>f.pattern.test(phrase));
+  if(family)return phrase.slice(0,24);
+  if(!NON_ROLE_PREFERENCE.test(raw)&&phrase.length<=24)return phrase;
+ }
+ for(const family of families){const match=String(hint||'').match(family.pattern);if(match)return match[0].slice(0,24);}
  return '';
 }
 function constraintsFrom(hint,resume){
- const text=hint+' '+resume;
  const travel=/(?:全国[^。；;，,]{0,8}出差|可(?:接受)?(?:全国)?出差|接受(?:全国)?出差|长期出差|经常出差|全国各地|全国范围)/.test(hint);
  const national=/(全国|不限城市|各地均可)/.test(hint);
- const cities=['北京','上海','广州','深圳','杭州','南京','苏州','成都','重庆','武汉','西安','天津','青岛','济南','郑州','长沙','合肥','宁波','厦门','福州','昆明','贵阳','南宁','哈尔滨','沈阳','长春','大连'];
- const preferredCities=cities.filter(city=>new RegExp('(?:意向|期望|希望|目标|首选|工作地点|工作区域)[^。；;，,]{0,12}'+city).test(text));
+ const preferredCities=extractPreferredCities(hint,resume);
  const preferenceTerms=[];
  if(/汽车|汽车零售|车企|经销商/.test(hint))preferenceTerms.push('汽车行业优先');
  if(/互联网|AI|人工智能|软件/.test(hint))preferenceTerms.push('互联网与科技行业优先');
