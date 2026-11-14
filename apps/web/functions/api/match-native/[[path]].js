@@ -343,9 +343,10 @@ export async function onRequest({request,env}){
     input.text.replace(/\s/g,'').length<30||!options||
     options.country!=='CN'||options.remote_only!==false||
     typeof options.role_hint!=='string'||options.role_hint.length>240||
-    !validSearchPreferences(options.search_preferences)||
     !Number.isInteger(options.limit)||options.limit<1||options.limit>10)
   return fail('INVALID_RESUME_TEXT',400);
+ if(!validSearchPreferences(options.search_preferences))
+  return fail('INVALID_SEARCH_PREFERENCES',400);
  if(input.resume_id!==null&&input.resume_id!==undefined&&input.resume_id!==''){
   if(typeof input.resume_id!=='string'||!/^[0-9a-f-]{36}$/i.test(input.resume_id))
    return fail('RESUME_NOT_FOUND',404);
