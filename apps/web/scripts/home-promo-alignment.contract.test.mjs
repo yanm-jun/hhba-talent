@@ -24,7 +24,7 @@ test('original HHBA home CTA, main dual-entry and shared job marketplace stay un
  assert.ok(home.includes('className="home-match-promo"'));
  assert.ok(home.includes("navigate('/candidate/match')"));
  assert.ok(home.includes('title="我要应聘"'));
- assert.ok(home.includes('title="我要招人"'));
+ assert.ok(home.includes('title="企业招聘导航"'));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
 });
 
@@ -41,5 +41,5 @@ test('remove only the redundant home company discovery banner, without deleting 
  assert.match(home,/to="\/talent-service"/);
  assert.match(home,/className="home-match-promo"/);
  assert.match(home,/title="我要应聘"/);
- assert.match(home,/title="我要招人"/);
+ assert.match(home,/title="企业招聘导航"/);
 });
