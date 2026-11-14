@@ -24,10 +24,9 @@ function toolSources(response){
  for(const item of response?.output||[]){
   if(item?.type!=='web_search_call'||item.status!=='completed')continue;
   const action=item.action||{};
-  // DeepSeek Responses API returns search sources and opened-page evidence
-  // on the web_search_call item itself, NOT inside action (action is input only).
-  // Responses API documents search sources inside action.sources. Keep the
-  // sibling item.sources fallback for early/alternate gateway payloads.
+  // Official Responses API places search evidence in action.sources and
+  // opened-page evidence in item.page. Keep a sibling fallback only for
+  // alternate gateway payloads; it is not accepted by the canonical contract test.
   const candidates=action.type==='search'?
    (Array.isArray(action.sources)?action.sources:Array.isArray(item.sources)?item.sources:[]):
    (action.type==='open_page'||action.type==='find_in_page')&&item.page?[item.page]:[];
