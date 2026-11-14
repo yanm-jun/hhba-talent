@@ -34,7 +34,34 @@ const FAMILIES=[
   adjacent:['区域运营','销售赋能','学习发展']},
  {id:'marketing',pattern:/品牌推广|市场营销|新媒体|内容运营|媒介/,
   direct:['品牌运营','市场推广','市场营销','内容运营'],
-  adjacent:['用户运营','活动运营','商务合作']}
+  adjacent:['用户运营','活动运营','商务合作']},
+ {id:'finance',pattern:/会计|财务|审计|税务|出纳/,
+  direct:['会计','财务专员','财务分析','审计专员','税务专员'],
+  adjacent:['经营分析','内控专员','成本管理']},
+ {id:'human_resources',pattern:/人力资源|\\bHR\\b|招聘|员工关系|薪酬|绩效管理/,
+  direct:['人力资源专员','招聘专员','HRBP','薪酬绩效专员'],
+  adjacent:['培训发展','组织发展','行政人事']},
+ {id:'engineering',pattern:/机械|电气|自动化|工艺|设备|土木|建筑|施工|工程造价/,
+  direct:['机械工程师','电气工程师','自动化工程师','工艺工程师','设备工程师'],
+  adjacent:['工程项目管理','生产管理','质量管理']},
+ {id:'supply_chain',pattern:/采购|供应链|物流|仓储|运输/,
+  direct:['采购专员','供应链管理','物流管理','仓储管理','运输调度'],
+  adjacent:['计划管理','生产计划','运营管理']},
+ {id:'education',pattern:/教师|教学|教研|课程|辅导|班主任/,
+  direct:['教师','教研专员','教学管理','课程研发','班主任'],
+  adjacent:['培训讲师','学习发展','教育产品运营']},
+ {id:'customer_service',pattern:/客服|售后|客户服务|投诉处理|服务顾问/,
+  direct:['客服专员','售后服务管理','客户服务经理','服务顾问'],
+  adjacent:['客户成功','客户运营','服务运营']},
+ {id:'ecommerce',pattern:/电商|直播|短视频|直播带货|店铺运营/,
+  direct:['电商运营','直播运营','店铺运营','新媒体运营'],
+  adjacent:['内容运营','用户运营','市场运营']},
+ {id:'administration',pattern:/行政|文员|秘书|综合管理/,
+  direct:['行政专员','行政主管','综合管理专员','办公室主任'],
+  adjacent:['人事行政','运营支持','项目助理']},
+ {id:'healthcare',pattern:/护士|护理|医疗|药学|临床|检验/,
+  direct:['护士','护理人员','药学专员','医学检验','医疗运营'],
+  adjacent:['医疗质量管理','医务管理','健康管理']}
 ];
 const INDUSTRIES=[
  {pattern:/汽车|4S店|经销商|DCC|名爵|上汽|车企/i,label:'汽车与汽车零售'},
@@ -52,7 +79,13 @@ const SKILL_SIGNALS=[
  {name:'数据分析与经营复盘',pattern:/数据分析|Excel|SQL|指标|转化率|报表|统计|经营分析/i},
  {name:'视觉与交互设计',pattern:/UI设计|UX|视觉设计|交互设计|Figma|Photoshop|数字导视/i},
  {name:'软件与技术应用',pattern:/Python|JavaScript|TypeScript|Java|API|Git|软件开发/i},
- {name:'市场与品牌运营',pattern:/品牌推广|市场营销|活动策划|新媒体|内容运营|品牌运营/i}
+ {name:'市场与品牌运营',pattern:/品牌推广|市场营销|活动策划|新媒体|内容运营|品牌运营/i},
+ {name:'财务与审计',pattern:/会计|财务|审计|税务|出纳/i},
+ {name:'人力资源与招聘',pattern:/人力资源|招聘|员工关系|薪酬|绩效/i},
+ {name:'工程与制造',pattern:/机械|电气|自动化|工艺|设备|生产管理|质量管理/i},
+ {name:'供应链与物流',pattern:/采购|供应链|物流|仓储|运输/i},
+ {name:'教育与教学',pattern:/教师|教学|教研|课程|辅导|班主任/i},
+ {name:'客户服务与售后',pattern:/客服|售后|客户服务|投诉处理|服务顾问/i}
 ];
 function matchedFamilies(text){return FAMILIES.filter(f=>f.pattern.test(text));}
 function firstDirection(hint,families){
