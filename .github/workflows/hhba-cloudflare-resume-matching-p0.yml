@@ -43,3 +43,22 @@ jobs:
       - name: TypeScript and Vite bundle
         working-directory: apps/web
         run: npm run build
+
+  talent-search-provider-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install pinned web dependencies
+        working-directory: apps/web
+        run: npm ci --ignore-scripts
+      - name: Validate provider adapter and isolated contract tests
+        working-directory: apps/web
+        run: |
+          node --check functions/_lib/talent-search-providers.js
+          node --test scripts/talent-search-providers.contract.test.mjs
