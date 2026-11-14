@@ -149,7 +149,7 @@ test('autonomous deep search distinguishes model no-jobs from filtered employer 
  await assert.rejects(runAutonomousDeepMatch('synthetic-secret-not-real',
   '销售运营区域督导工作经验。','督导',10,{
    fetcher:async()=>new Response(JSON.stringify(thirdParty),{status:200})
-  }),/AI_DEEP_SEARCH_NO_EMPLOYER_SOURCES/);
+  }),/AI_DEEP_SEARCH_JOB_PAGES_NOT_OPENED/);
 });
 test('autonomous deep search does not fall back to unsafe manually supplied links on provider rejection',async()=>{
  await assert.rejects(runAutonomousDeepMatch('synthetic-secret-not-real','负责渠道管理、门店督导和销售培训。','督导',10,{
