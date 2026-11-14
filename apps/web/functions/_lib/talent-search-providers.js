@@ -138,7 +138,8 @@ function makeProviderError(provider, status, payload) {
   const error = new Error(`${provider.toUpperCase()}_HTTP_${status}`);
   error.provider = provider;
   error.status = status;
-  error.provider_code = text(payload?.error?.code || payload?.code || payload?.error_code);
+  // Never propagate arbitrary provider error text, which may include request
+  // bodies, credentials or other untrusted details.
   error.retryable = status === 408 || status === 429 || status >= 500;
   if (status === 401 || status === 403) error.code = 'PROVIDER_AUTH_REJECTED';
   else if (status === 402) error.code = 'PROVIDER_BALANCE_INSUFFICIENT';
@@ -162,13 +163,55 @@ async function requestJson(provider, url, init, options = {}) {
 
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const response = await fetcher(url, { ...init, signal: controller.signal });
-    const raw = await response.text();
-    if (raw.length > MAX_RESPONSE_CHARS) {
+    // Never forward bearer/API credentials across a provider redirect.
+    const response = await fetcher(url, {
+      ...init, redirect: 'manual', cache: 'no-store', signal: controller.signal,
+    });
+    if (response.status >= 300 && response.status < 400) {
+      const error = new Error(`${provider.toUpperCase()}_REDIRECT_BLOCKED`);
+      error.provider = provider;
+      error.code = 'PROVIDER_REDIRECT_BLOCKED';
+      throw error;
+    }
+
+    const sizeError = () => {
       const error = new Error(`${provider.toUpperCase()}_RESPONSE_TOO_LARGE`);
       error.provider = provider;
       error.code = 'PROVIDER_RESPONSE_TOO_LARGE';
-      throw error;
+      return error;
+    };
+    const declared = Number(response.headers.get('content-length'));
+    if (declared > MAX_RESPONSE_CHARS) throw sizeError();
+
+    let raw = '';
+    if (!response.body) {
+      raw = await response.text();
+      if (raw.length > MAX_RESPONSE_CHARS) throw sizeError();
+    } else {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8', { fatal: true });
+      let bytes = 0;
+      try {
+        while (true) {
+          const part = await reader.read();
+          if (part.done) break;
+          bytes += part.value.byteLength;
+          if (bytes > MAX_RESPONSE_CHARS) {
+            await reader.cancel();
+            throw sizeError();
+          }
+          raw += decoder.decode(part.value, { stream: true });
+        }
+        raw += decoder.decode();
+      } catch (error) {
+        if (error?.code === 'PROVIDER_RESPONSE_TOO_LARGE') throw error;
+        const invalid = new Error(`${provider.toUpperCase()}_INVALID_RESPONSE_BYTES`);
+        invalid.provider = provider;
+        invalid.code = 'PROVIDER_INVALID_RESPONSE';
+        throw invalid;
+      } finally {
+        reader.releaseLock();
+      }
     }
 
     let payload = {};
