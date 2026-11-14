@@ -25,10 +25,8 @@ function toolSources(response){
   if(item?.type!=='web_search_call'||item.status!=='completed')continue;
   const action=item.action||{};
   // Official Responses API places search evidence in action.sources and
-  // opened-page evidence in item.page. Keep a sibling fallback only for
-  // alternate gateway payloads; it is not accepted by the canonical contract test.
-  const candidates=action.type==='search'?
-   (Array.isArray(action.sources)?action.sources:Array.isArray(item.sources)?item.sources:[]):
+  // opened-page evidence in item.page. Reject non-standard sibling fields.
+  const candidates=action.type==='search'?(Array.isArray(action.sources)?action.sources:[]):
    (action.type==='open_page'||action.type==='find_in_page')&&item.page?[item.page]:[];
   for(const source of candidates){
    if(source?.type&&source.type!=='url')continue;
