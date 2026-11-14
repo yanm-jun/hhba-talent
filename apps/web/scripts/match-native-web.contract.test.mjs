@@ -292,7 +292,7 @@ test('authenticated SSE route uses one autonomous deep-thinking request and vali
   calls.push({url,body:JSON.parse(options.body)});
   assert.equal(url,'https://api.deepseek.com/responses');
   const body=JSON.parse(options.body);
-  assert.equal(body.model,'deepseek-flash');
+  assert.equal(body.model,'deepseek-v4-pro');
   assert.equal(body.reasoning.effort,'high');
   assert.deepEqual(body.tools,[{type:'deepseek_web_search'}]);
   assert.equal(body.safety_check.level,'high');
