@@ -63,7 +63,7 @@ function firstDirection(hint,families){
 }
 function constraintsFrom(hint,resume){
  const text=hint+' '+resume;
- const travel=/(全国(?:范围)?(?:出差|出行)|接受(?:全国)?出差|可接受出差|长期出差|经常出差|全国各地|全国范围)/.test(hint);
+ const travel=/(?:全国[^。；;，,]{0,8}出差|可(?:接受)?(?:全国)?出差|接受(?:全国)?出差|长期出差|经常出差|全国各地|全国范围)/.test(hint);
  const national=/(全国|不限城市|各地均可)/.test(hint);
  const cities=['北京','上海','广州','深圳','杭州','南京','苏州','成都','重庆','武汉','西安','天津','青岛','济南','郑州','长沙','合肥','宁波','厦门','福州','昆明','贵阳','南宁','哈尔滨','沈阳','长春','大连'];
  const preferredCities=cities.filter(city=>new RegExp('(?:意向|期望|希望|目标|首选|工作地点|工作区域)[^。；;，,]{0,12}'+city).test(text));
@@ -91,7 +91,7 @@ function query(parts){return unique(parts.flatMap(x=>Array.isArray(x)?x:[x]),18)
 export function buildRoleSearchQueries(roleHint='',resume=''){
  const intent=buildRoleIntent(roleHint,resume),c=intent.constraints;
  const travel=c.travel_preference.includes('优先')?'全国出差':'';
- const industry=intent.industry_terms.slice(0,2);
+ const industry=unique([...intent.constraints.industry_preferences,...intent.industry_terms],4);
  const common='招聘 职位详情 企业官网 中国大陆';
  const queries=[
   query([intent.primary_direction,intent.direct_roles.slice(1,5),travel,common]),
