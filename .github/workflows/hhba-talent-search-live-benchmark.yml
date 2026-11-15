@@ -1,0 +1,56 @@
+name: HHBA Talent Search Live Provider Benchmark (manual only)
+
+# This workflow is NEVER triggered by push or PR. It makes paid public
+# search API requests only after an explicit GitHub Actions manual dispatch.
+on:
+  workflow_dispatch:
+    inputs:
+      providers:
+        description: 'Comma-separated subset (max 4): deepseek,baidu_web,baidu_agentic,brave_context,exa,tavily,firecrawl'
+        type: string
+        required: true
+        default: 'deepseek,baidu_web'
+
+permissions:
+  contents: read
+
+jobs:
+  discovery-benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install project dependencies
+        working-directory: apps/web
+        run: npm ci --ignore-scripts
+      - name: Verify script and privacy contracts before spending
+        working-directory: apps/web
+        run: |
+          node --check scripts/talent-search-live-benchmark.mjs
+          node --test scripts/talent-search-live-benchmark.contract.test.mjs
+      - name: Run limited public-provider benchmark (no resume text)
+        working-directory: apps/web
+        env:
+          HHBA_TALENT_BENCHMARK_LIVE: '1'
+          HHBA_TALENT_BENCHMARK_REPORT: talent-search-discovery-benchmark.json
+          DEEPSEEK_API_KEY: ${{ secrets.HHBA_MATCH_DEEPSEEK_KEY }}
+          BAIDU_SEARCH_API_KEY: ${{ secrets.HHBA_BAIDU_SEARCH_KEY }}
+          BRAVE_SEARCH_API_KEY: ${{ secrets.HHBA_BRAVE_SEARCH_KEY }}
+          EXA_API_KEY: ${{ secrets.HHBA_EXA_SEARCH_KEY }}
+          TAVILY_API_KEY: ${{ secrets.HHBA_TAVILY_SEARCH_KEY }}
+          FIRECRAWL_API_KEY: ${{ secrets.HHBA_FIRECRAWL_API_KEY }}
+          REQUESTED_PROVIDERS: ${{ inputs.providers }}
+        run: |
+          node scripts/talent-search-live-benchmark.mjs --live --providers="$REQUESTED_PROVIDERS"
+      - name: Upload provider discovery report (public job URLs only)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-talent-search-provider-discovery
+          path: apps/web/talent-search-discovery-benchmark.json
+          retention-days: 7
