@@ -119,6 +119,34 @@ function exactQuotedValue(sourceText, quote, minimumLength = 2) {
   return target.length >= minimumLength && compact(sourceText).includes(target);
 }
 
+function structuredFieldProof(page, jobUrl, fields) {
+  if (fields?.source_kind !== 'jsonld' || !Number.isInteger(fields.source_index)) return null;
+  const rows = Array.isArray(page?.structured_jobs) ? page.structured_jobs : [];
+  const record = rows.find(row => row.index === fields.source_index);
+  if (!record) return null;
+
+  // JobPosting records on a page can describe many unrelated vacancies.
+  // Require the exact URL, or a single JobPosting that omits its URL entirely.
+  if (record.url) {
+    if (normalizeUrl(record.url)?.href !== jobUrl.href) return null;
+  } else if (rows.length !== 1) return null;
+
+  const equal = (left, right) => compact(left).length > 0 && compact(left) === compact(right);
+  if (!equal(record.company, fields.company) || !equal(record.title, fields.title) ||
+      !equal(record.location, fields.location) ||
+      !equal(record.responsibilities, fields.responsibilities) ||
+      !equal(record.requirements, fields.requirements) ||
+      (fields.salary && !equal(record.salary, fields.salary))) return null;
+
+  if (record.valid_through) {
+    const deadline = Date.parse(record.valid_through);
+    if (Number.isFinite(deadline) && deadline < Date.now() - 24 * 60 * 60 * 1000) {
+      return { record, expired: true };
+    }
+  }
+  return { record, expired: false };
+}
+
 function linkTarget(row) {
   return normalizeUrl(typeof row === 'string' ? row : row?.href || row?.url);
 }
@@ -220,8 +248,12 @@ export function verifyOfficialJobEvidence(candidate, evidence = {}, options = {}
   }
 
   const pageText = string(page.text || page.content, 100000);
-  if (pageText.length < 160) {
+  const structured = structuredFieldProof(page, jobUrl, evidence.job_fields);
+  if (pageText.length < 160 && !structured) {
     return reject('FETCH_FAILED', 'JOB_PAGE_HAS_INSUFFICIENT_DETAIL', checkedAt);
+  }
+  if (structured?.expired) {
+    return reject('CLOSED_OR_EXPIRED', 'STRUCTURED_POSTING_EXPIRED', checkedAt);
   }
 
   const isEmployerDomain = sameOrChild(jobUrl.hostname, officialDomain);
@@ -274,7 +306,8 @@ export function verifyOfficialJobEvidence(candidate, evidence = {}, options = {}
   // legitimate cross-domain link, demand the employer brand in the fetched
   // position page rather than accepting a model-supplied company field.
   if (!isEmployerDomain && ![proof.company, ...(Array.isArray(proof.aliases) ? proof.aliases : [])]
-    .some(alias => exactQuotedValue(pageText, alias, 2))) {
+    .some(alias => exactQuotedValue(pageText, alias, 2) ||
+      (structured && exactQuotedValue(structured.record.company, alias, 2)))) {
     return reject('OFFICIAL_SOURCE_UNCONFIRMED', 'ATS_JOB_EMPLOYER_NOT_GROUNDED', checkedAt);
   }
 
@@ -284,12 +317,15 @@ export function verifyOfficialJobEvidence(candidate, evidence = {}, options = {}
   const requirements = string(field.requirements || field.qualifications, 12000);
   const salary = string(field.salary, 160);
 
-  if (!title || !exactQuotedValue(pageText, title, 3) ||
-      !location || !isMainlandJobLocation(location) ||
-      !exactQuotedValue(pageText, location) ||
-      responsibilities.length < 25 || !exactQuotedValue(pageText, responsibilities, 20) ||
-      requirements.length < 25 || !exactQuotedValue(pageText, requirements, 20) ||
-      (salary && !exactQuotedValue(pageText, salary))) {
+  const grounded = structured || (
+    exactQuotedValue(pageText, title, 3) &&
+    exactQuotedValue(pageText, location) &&
+    exactQuotedValue(pageText, responsibilities, 20) &&
+    exactQuotedValue(pageText, requirements, 20) &&
+    (!salary || exactQuotedValue(pageText, salary))
+  );
+  if (!title || !location || !isMainlandJobLocation(location) ||
+      responsibilities.length < 25 || requirements.length < 25 || !grounded) {
     return reject('OFFICIAL_SOURCE_UNCONFIRMED', 'JOB_FIELDS_NOT_GROUNDED_IN_PAGE', checkedAt);
   }
 
@@ -312,6 +348,7 @@ export function verifyOfficialJobEvidence(candidate, evidence = {}, options = {}
     requirements: requirements.slice(0, 1000),
     source_page: jobUrl.href,
     fetched_at: page.fetched_at,
+    evidence_kind: structured ? 'jsonld' : 'visible_page',
   };
 
   return {
