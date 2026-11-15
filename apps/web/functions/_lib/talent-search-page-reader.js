@@ -12,6 +12,8 @@
  * protection boundary when deployed without restricted outbound networking.
  */
 
+import { extractStructuredJobPostings } from './talent-search-jd-extract.js';
+
 const MAX_BYTES = 1_500_000;
 const DEFAULT_TIMEOUT = 12000;
 
@@ -69,6 +71,12 @@ function extractPage(html, baseUrl, allowHosts) {
   const safe = html
     .replace(/<\s*(script|style|svg|iframe|noscript|template)\b[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, ' ')
     .replace(/<!--[\s\S]*?-->/g, ' ');
+  const headings = [];
+  for (const match of safe.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1\s*>/gi)) {
+    const heading = decodeEntities(match[1].replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
+    if (heading.length >= 2 && heading.length <= 160) headings.push(heading);
+    if (headings.length >= 12) break;
+  }
   const links = [];
   const seen = new Set();
   for (const match of safe.matchAll(/<a\b[^>]*\bhref\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>/gi)) {
@@ -87,7 +95,7 @@ function extractPage(html, baseUrl, allowHosts) {
       .replace(/<\s*\/\s*(?:p|div|li|h[1-6]|section|article|tr|table|header|footer)\s*>/gi, '\n')
       .replace(/<[^>]+>/g, ' '),
   ).replace(/[ \t\r\f\v]+/g, ' ').replace(/\n\s*\n+/g, '\n').trim();
-  return { text: text.slice(0, 300000), links };
+  return { text: text.slice(0, 300000), links, headings };
 }
 
 function readerError(code) {
@@ -184,6 +192,7 @@ export async function readPublicEmployerPage(rawUrl, options = {}) {
         throw readerError('JOB_PAGE_INVALID_ENCODING');
       }
       const extracted = extractPage(html, url.href, allowHosts);
+      const structuredJobs = extractStructuredJobPostings(html, url.href);
       const now = options.now instanceof Date ? options.now.toISOString() : new Date().toISOString();
       return {
         url: url.href,
@@ -193,6 +202,8 @@ export async function readPublicEmployerPage(rawUrl, options = {}) {
         content_length: usedBytes,
         text: extracted.text,
         links: extracted.links,
+        headings: extracted.headings,
+        structured_jobs: structuredJobs,
       };
     }
     throw readerError('JOB_PAGE_TOO_MANY_REDIRECTS');
