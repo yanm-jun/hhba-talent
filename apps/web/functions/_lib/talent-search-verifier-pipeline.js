@@ -17,6 +17,7 @@
  */
 
 import { recruitmentSourceKind } from './match-employer-source.js';
+import { extractJobFieldsFromPage } from './talent-search-jd-extract.js';
 import {
   isAuditedEmployerProof,
   authorizedEmployerAtsLink,
@@ -50,14 +51,13 @@ function tryUrl(raw) {
 
 export function createTalentOfficialVerifier(dependencies = {}) {
   const getEmployerProof = dependencies.getEmployerProof;
-  const extractJobFields = dependencies.extractJobFields;
+  const extractJobFields = dependencies.extractJobFields || extractJobFieldsFromPage;
   const getOfficialCareersUrl = dependencies.getOfficialCareersUrl;
   const reader = dependencies.reader || readPublicEmployerPage;
   const fetcher = dependencies.fetcher;
   const now = dependencies.now;
 
   if (typeof getEmployerProof !== 'function') throw new Error('AUDITED_EMPLOYER_LOOKUP_REQUIRED');
-  if (typeof extractJobFields !== 'function') throw new Error('JOB_DETAIL_EXTRACTOR_REQUIRED');
   if (typeof getOfficialCareersUrl !== 'function') throw new Error('OFFICIAL_CAREERS_LOCATOR_REQUIRED');
 
   return async (hit, plan = {}, context = {}) => {
@@ -134,7 +134,7 @@ export function createTalentOfficialVerifier(dependencies = {}) {
     try {
       // HTML text is untrusted data. No instructions from the page are followed
       // by this coordinator. Each extracted field must be an exact page quote.
-      fields = await extractJobFields(jobPage.text, {
+      fields = await extractJobFields(jobPage, {
         job_url: jobPage.url,
         employer: proof.company,
         intent: plan.intent || null,
