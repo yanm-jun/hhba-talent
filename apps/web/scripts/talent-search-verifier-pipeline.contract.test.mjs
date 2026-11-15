@@ -137,7 +137,7 @@ test('missing required server dependencies fails before accepting a search resul
   assert.throws(() => createTalentOfficialVerifier({}), /AUDITED_EMPLOYER_LOOKUP_REQUIRED/);
   assert.throws(
     () => createTalentOfficialVerifier({ getEmployerProof: async () => proof }),
-    /JOB_DETAIL_EXTRACTOR_REQUIRED/,
+    /OFFICIAL_CAREERS_LOCATOR_REQUIRED/,
   );
   assert.throws(
     () => createTalentOfficialVerifier({
