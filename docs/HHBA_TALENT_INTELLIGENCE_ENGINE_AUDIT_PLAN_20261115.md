@@ -356,3 +356,30 @@ The repository's matching CI now has isolated new-engine contract tests. These a
 6. Shadow-test the new engine against the existing `/api/match-native/resume` route; only then discuss a preview deployment, canary release, or production switchover.
 
 **Current status**: independent engineering scaffolding and synthetic contract verification; **not** live official-job discovery, and **not** ready to merge or deploy.
+
+## 10. Second implementation batch (2026-11-15)
+
+### New source files
+
+- talent-search-jd-extract.js — conservative page-only extraction of schema.org JobPosting JSON-LD and labeled visible JD sections. Page reader preserves structured JobPosting records separately from user-facing text and headings. The official proof gate binds JSON-LD to the exact job URL (or one unambiguous URL-less JobPosting), and rejects expired validThrough dates.
+- talent-search-evidence-fit.js — candidate-to-JD evidence-pair validation, generic cross-industry fit scoring (no fixed occupation list), distinct resume/JD excerpts, hard minimum qualification/years/credential gates, separate fit and application-competitiveness indicators. Insufficient evidence returns null, not a fabricated high score. Model proposals remain untrusted until checked against source texts.
+- apps/web/d1/0020_talent_official_source_proofs.sql — opt-in, unapplied additive D1 schema with audited employer records, ATS tenant authorizations, revocation and pending source candidates. The 3800 historical company records are not migrated or used as a search gate.
+- talent-search-employer-store.js — D1 read-only resolver for existing independently audited employer domain or ATS tenant records. No automatic self-attestation or DB writes, and D1 failures return no proof.
+- talent-search-live-benchmark.mjs — separately opted-in provider-recall benchmark using six public, synthetic profession-only search queries. It never sends the raw resume, returns only discovery hints, limits the selected providers to four, and requires double opt-in (command --live plus environment HHBA_TALENT_BENCHMARK_LIVE=1). Its output is not a count of verified official vacancies.
+- .github/workflows/hhba-talent-search-live-benchmark.yml — manual-only workflow; no push or PR trigger. It requires GitHub Actions secrets and is not automatically run.
+
+### Operational warnings
+
+1. The D1 migration has not been applied and no verified employer/ATS records have been loaded. The dynamic resolver cannot yet confirm any real company until a trusted, independently audited record is present.
+2. The source verifier is not ready for production Internet exposure: DNS rebinding protection needs restricted egress networking and a dedicated approved fetching service; JS-only job pages require a permitted rendering fallback.
+3. The evidence fit module validates semantic explanation quotes but cannot guarantee that a reasoning model's semantic interpretation is correct. A second independent reviewer/model and real-world human benchmark remain necessary.
+4. The live discovery workflow only runs with explicit user action and separately configured GitHub Actions secrets; existing Cloudflare Worker secrets are not automatically available in GitHub. A feature-branch-only workflow may also need to be made available through an approved staging/default-branch workflow before manual GitHub Actions dispatch. No live-provider benchmark has been executed in this PR.
+5. All PR CI fixtures remain synthetic. A successful automated test suite is code-contract evidence, not proof that HHBA can find ten matching current official vacancies.
+6. Provider billing and live API schema remain subject to verification by real authenticated calls. In particular, Baidu, DeepSeek and Brave provider references were rechecked against their official documentation on 2026-11-15.
+
+### Next production-oriented implementation gates
+
+- Build a trusted employer-domain/ATS audit process with independent source evidence and reviewer controls; do not accept a model-generated corporate domain as proof.
+- Run real, de-identified search provider tests on fixed role queries via an approved isolated runtime with server-side credentials.
+- Add a sanctioned JS-rendering fallback, robust quote-level JD extraction and a second semantic-quality judge.
+- Wire the provider search, dynamic proof resolver, profile parser and scorer together behind a shadow-only route. Keep the live candidate matcher unchanged until both recall and verified-job quality tests pass.
