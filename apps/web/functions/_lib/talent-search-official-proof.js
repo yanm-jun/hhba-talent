@@ -119,7 +119,7 @@ function exactQuotedValue(sourceText, quote, minimumLength = 2) {
   return target.length >= minimumLength && compact(sourceText).includes(target);
 }
 
-function structuredFieldProof(page, jobUrl, fields) {
+function structuredFieldProof(page, jobUrl, fields, now) {
   if (fields?.source_kind !== 'jsonld' || !Number.isInteger(fields.source_index)) return null;
   const rows = Array.isArray(page?.structured_jobs) ? page.structured_jobs : [];
   const record = rows.find(row => row.index === fields.source_index);
@@ -140,7 +140,7 @@ function structuredFieldProof(page, jobUrl, fields) {
 
   if (record.valid_through) {
     const deadline = Date.parse(record.valid_through);
-    if (Number.isFinite(deadline) && deadline < Date.now() - 24 * 60 * 60 * 1000) {
+    if (Number.isFinite(deadline) && deadline < now - 24 * 60 * 60 * 1000) {
       return { record, expired: true };
     }
   }
@@ -248,7 +248,7 @@ export function verifyOfficialJobEvidence(candidate, evidence = {}, options = {}
   }
 
   const pageText = string(page.text || page.content, 100000);
-  const structured = structuredFieldProof(page, jobUrl, evidence.job_fields);
+  const structured = structuredFieldProof(page, jobUrl, evidence.job_fields, now);
   if (pageText.length < 160 && !structured) {
     return reject('FETCH_FAILED', 'JOB_PAGE_HAS_INSUFFICIENT_DETAIL', checkedAt);
   }
