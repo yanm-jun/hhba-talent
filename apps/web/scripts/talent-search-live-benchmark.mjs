@@ -10,6 +10,7 @@
  */
 import { searchAcrossProviders } from '../functions/_lib/talent-search-providers.js';
 import { recruitmentSourceKind } from '../functions/_lib/match-employer-source.js';
+import { pathToFileURL } from 'node:url';
 
 export const TALENT_BENCHMARK_QUERIES=Object.freeze([
   {id:'regional_operations',query:'全国 区域督导 连锁门店 运营 企业官网 社会招聘'},
@@ -90,7 +91,11 @@ export async function runLiveDiscoveryBenchmark({
     throw Error('BENCHMARK_LIVE_OPT_IN_REQUIRED');
   const selected=normalizedProviderList(providers.join(','));
   if(!selected.length)throw Error('BENCHMARK_NO_VALID_PROVIDERS');
-  const cleanQueries=Array.isArray(queries)?queries.slice(0,MAX_QUERIES):[];
+  // Only the public, committed synthetic benchmark set is permitted. A
+  // caller cannot substitute private applicant data into a paid search run.
+  const publicQueries=new Set(TALENT_BENCHMARK_QUERIES.map(q=>q.id+'|'+q.query));
+  const cleanQueries=Array.isArray(queries)?queries
+    .filter(q=>q&&publicQueries.has(q.id+'|'+q.query)).slice(0,MAX_QUERIES):[];
   if(!cleanQueries.length)throw Error('BENCHMARK_NO_QUERIES');
   const configs={};
   for(const provider of selected){
@@ -133,7 +138,7 @@ async function main(){
   })+'\n');
 }
 
-if(process.argv[1] && import.meta.url===new URL('file://'+process.argv[1]).href){
+if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href){
   main().catch(error=>{
     const code=error?.message?.startsWith('BENCHMARK_')?error.message:'BENCHMARK_FAILED';
     process.stderr.write(code+'\n');
