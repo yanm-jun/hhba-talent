@@ -77,6 +77,8 @@ export function parseExplicitHardRequirements(jdText) {
 function uniquePairs(proposed,resumeText,jdText) {
   const valid=[];
   const seen=new Set();
+  const seenResume=new Set();
+  const seenJob=new Set();
   for(const item of Array.isArray(proposed)?proposed.slice(0,25):[]){
     if(!item||typeof item!=='object')continue;
     const resumeQuote=txt(item.resume_quote,350);
@@ -86,8 +88,9 @@ function uniquePairs(proposed,resumeText,jdText) {
     if(!alignment||explanation.length<12||!matchesEvidence(resumeText,resumeQuote,12)||
        !matchesEvidence(jdText,jobQuote,12))continue;
     const signature=compact(resumeQuote)+'|'+compact(jobQuote);
-    if(seen.has(signature))continue;
-    seen.add(signature);
+    const resumeKey=compact(resumeQuote), jobKey=compact(jobQuote);
+    if(seen.has(signature)||seenResume.has(resumeKey)||seenJob.has(jobKey))continue;
+    seen.add(signature);seenResume.add(resumeKey);seenJob.add(jobKey);
     valid.push({
       resume_quote:resumeQuote,job_quote:jobQuote,
       alignment,explanation,
