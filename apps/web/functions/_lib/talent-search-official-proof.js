@@ -249,7 +249,10 @@ export function verifyOfficialJobEvidence(candidate, evidence = {}, options = {}
 
   const pageText = string(page.text || page.content, 100000);
   const structured = structuredFieldProof(page, jobUrl, evidence.job_fields, now);
-  if (pageText.length < 160 && !structured) {
+  // Short, position-specific static HTML can still contain fully grounded
+  // duties and requirements. Require both exact sections below instead of
+  // rejecting legitimate concise postings solely by document length.
+  if (pageText.length < 100 && !structured) {
     return reject('FETCH_FAILED', 'JOB_PAGE_HAS_INSUFFICIENT_DETAIL', checkedAt);
   }
   if (structured?.expired) {
