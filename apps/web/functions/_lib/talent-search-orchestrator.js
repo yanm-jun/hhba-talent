@@ -292,14 +292,28 @@ export async function runTalentIntelligenceSearch(input = {}) {
         }
 
         let relevance = null;
+        let fitDetails = null;
         if (typeof input.scoreCandidate === 'function') {
           try {
-            relevance = validQuality(await input.scoreCandidate(job, item.plan, result));
+            const scored = await input.scoreCandidate(job, item.plan, result);
+            if (scored && typeof scored === 'object' && scored.eligible === false) {
+              return { ...item, status: 'rejected',
+                reason: typeof scored.reason === 'string' ? scored.reason : 'QUALIFICATION_GATE_FAILED' };
+            }
+            relevance = validQuality(scored);
+            if (scored && typeof scored === 'object' && scored.eligible === true) {
+              fitDetails = {
+                competitiveness: validQuality(scored.competitiveness),
+                matched_evidence: Array.isArray(scored.pairs) ? scored.pairs.slice(0, 8) : [],
+                fit_reason: typeof scored.reason === 'string' ? scored.reason : '',
+                hard_requirements: scored.hard_requirements || null,
+              };
+            }
           } catch {
             relevance = null;
           }
         }
-        return { ...item, status: 'verified', result, relevance };
+        return { ...item, status: 'verified', result, relevance, fitDetails };
       }));
 
       for (let n = 0; n < verified.length; n++) {
@@ -325,6 +339,7 @@ export async function runTalentIntelligenceSearch(input = {}) {
           search_role: value.plan.role,
           source_proof: value.result.source_proof,
           field_evidence: value.result.field_evidence,
+          ...(value.fitDetails || {}),
         };
         const existing = byJobKey.get(identity);
         if (!existing || (next.relevance ?? -1) > (existing.relevance ?? -1)) {
