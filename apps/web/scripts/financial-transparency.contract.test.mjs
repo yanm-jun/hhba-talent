@@ -10,6 +10,7 @@ import {onRequest as publicApi} from '../functions/api/transparency/[[path]].js'
 import {onRequestPost as dispatchApi,sendNextBatch} from '../functions/api/transparency/dispatch.js';
 import {onRequest as financeAdmin,sendFinanceAdminSmoke} from '../functions/api/transparency/admin/[[path]].js';
 import {publishReviewed} from '../functions/_lib/transparency-publish.js';
+import {aggregatePrivateRegister,readPrivateRegister} from '../functions/_lib/finance-register.js';
 import financeCronWorker from '../ops/finance-cron-worker.mjs';
 const read=(path)=>readFileSync(new URL(path,import.meta.url),'utf8');
 const payload=(patch={})=>({
@@ -514,4 +515,60 @@ test('finance confirmation handler separates safe GET from deliberate POST',()=>
  assert.match(src,/if\(!safeOrigin\(request\)\)/);
  assert.match(src,/点击邮件链接不会自动完成订阅/);
  assert.match(src,/application\/x-www-form-urlencoded/);
+});
+
+
+test('existing admin KV expense register is read-only, scoped, reversal-safe and never a published finance report',async()=>{
+ const month='2026-10';
+ const p='finance:entry:v1:'+month+':';
+ const mk=(id,parts)=>({kind:'entry',id,month,at:'2026-10-11T02:30:00Z',actor:'admin@example.com',
+  day:'2026-10-10',direction:'expense',category:'deepseek',amountFen:1300,
+  evidenceRef:'actual-invoice-ref-test-only',note:'',...parts});
+ const a=mk('10000000-0000-4000-8000-000000000001',{});
+ const b=mk('10000000-0000-4000-8000-000000000002',{direction:'income',category:'customer',amountFen:3000});
+ const c=mk('10000000-0000-4000-8000-000000000003',{direction:'expense',category:'cloudflare',amountFen:600});
+ const v={kind:'void',id:'10000000-0000-4000-8000-000000000004',month,at:'2026-10-12T02:30:00Z',actor:'admin@example.com',targetId:c.id,reason:'test-only cancellation'};
+ const source=[a,b,c,v];
+ const actions=[];
+ const kv={
+  async list({prefix,limit}){actions.push({action:'list',prefix,limit});return {keys:source.map(e=>({name:p+e.id})),list_complete:true};},
+  async get(key,type){actions.push({action:'get',key,type});return source.find(e=>p+e.id===key);}
+ };
+ const data=await readPrivateRegister(kv,month);
+ assert.equal(data.ok,true);
+ assert.equal(data.kind,'HHBA_PRIVATE_FINANCE_REGISTER_V1');
+ assert.equal(data.quality,'owner_entered_unreconciled');
+ assert.equal(data.totals.incomeFen,3000);
+ assert.equal(data.totals.expenseFen,1300);
+ assert.equal(data.totals.netFen,1700);
+ assert.equal(data.byCategory['expense:deepseek'],1300);
+ assert.equal(data.byCategory['expense:cloudflare'],undefined,'Voided expense must not count');
+ assert.equal(data.voidedCount,1);
+ assert.deepEqual(actions[0],{action:'list',prefix:p,limit:51});
+ assert.ok(actions.every(x=>x.action==='list'||x.action==='get'));
+ assert.equal(data.entries.find(x=>x.id===c.id).voided,true);
+ const absent=aggregatePrivateRegister([],month);
+ assert.equal(absent.totals,null,'An empty manual register is unknown, not zero finance');
+ assert.equal(absent.quality,'no_records_not_zero');
+ assert.equal((await readPrivateRegister(null,month)).code,'ADMIN_COST_SOURCE_NOT_CONNECTED');
+ await assert.rejects(()=>readPrivateRegister({
+  list:async()=>({keys:[{name:'other-admin:key'}],list_complete:true}),get:async()=>({})
+ },month),/UNSAFE_PRIVATE_REGISTER_KEY/);
+ await assert.rejects(()=>readPrivateRegister({
+  list:async()=>({keys:[],list_complete:false}),get:async()=>({})
+ },month),/INCOMPLETE_PRIVATE_REGISTER/);
+ await assert.rejects(()=>readPrivateRegister({
+  list:async()=>({keys:[{name:p+a.id}],list_complete:true}),
+  get:async()=>({...a,amountFen:-12})
+ },month),/INVALID_FINANCE_REGISTER_EVENT/);
+ const privateHandler=read('../functions/api/transparency/admin/[[path]].js');
+ assert.match(privateHandler,/verifyAdmin\(request,env\)/);
+ assert.match(privateHandler,/readPrivateRegister\(env\.HHBA_FIN_REGISTER_KV,month\)/);
+ assert.match(privateHandler,/path==='\/api\/transparency\/admin\/register'/);
+ const publicHandler=read('../functions/api/transparency/[[path]].js');
+ assert.doesNotMatch(publicHandler,/HHBA_FIN_REGISTER_KV|readPrivateRegister/);
+ const adminUI=read('../src/pages/TransparencyManagePage.tsx');
+ assert.match(adminUI,/旧后台成本登记簿 · 只读核对/);
+ assert.match(adminUI,/不能机械自动换算/);
+ assert.match(adminUI,/尚未自动完成银行、发票或供应商账单对账/);
 });
