@@ -264,19 +264,3 @@
  .hhba-responsibility .hhba-resp-jump,.hhba-responsibility .hhba-resp-support,.hhba-responsibility .hhba-resp-allocation,.hhba-responsibility .hhba-resp-secondary{display:none!important}
  .hhba-responsibility>.hhba-fin-report-section{border:0}
 }
-
-/* Source-labelled external fund logo: hidden unless actual identity, HTTPS asset
-   and mark-use permission are configured. This is not an ESG certification. */
-.hhba-resp-partner-official{display:flex;align-items:center;gap:14px;min-width:0;padding:10px 13px;margin:0 0 12px;border:1px solid #cfe1d4;border-radius:7px;background:#fff;color:#2c5d40;text-decoration:none!important}
-.hhba-resp-partner-official img{display:block;flex:0 0 auto;max-width:130px;max-height:57px;width:auto;height:auto;object-fit:contain}
-.hhba-resp-partner-official span{display:flex;flex-direction:column;flex:1;min-width:0;gap:4px}
-.hhba-resp-partner-official small{font-size:10px;color:#768b7d}
-.hhba-resp-partner-official strong{font-size:13px;font-weight:730;color:#275e44;overflow-wrap:anywhere}
-.hhba-resp-partner-official svg{flex:0 0 auto}
-.hhba-resp-partner-undisclosed{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-bottom:13px}
-.hhba-resp-partner-undisclosed>span:last-child{font-size:10px;color:#84968a}
-@media(max-width:530px){
- .hhba-resp-partner-official{flex-wrap:wrap;gap:9px}
- .hhba-resp-partner-official img{max-width:100px;max-height:49px}
- .hhba-resp-partner-official small{font-size:9px}
-}
