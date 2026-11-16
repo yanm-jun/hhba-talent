@@ -140,14 +140,14 @@ export async function deliverEmail(env,{to,subject,html,idempotencyKey,headers={
  let data;try{data=await response.json();}catch{return {ok:false,code:'MAIL_RESPONSE_ERROR'};}
  return {ok:!!data?.id,id:data?.id||null,code:data?.id?null:'MAIL_RESPONSE_ERROR'};
 }
-export async function checkTurnstile(env,token){
+export async function checkTurnstile(env,token,hostname){
  const secret=String(env.HHBA_FIN_TURNSTILE_SECRET||'');
  if(!secret||typeof token!=='string'||token.length<20||token.length>2048)return false;
  try{
   const params=new URLSearchParams({secret,response:token});
   const r=await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',body:params});
   if(!r.ok)return false;
-  const info=await r.json();return info?.success===true;
+  const info=await r.json();return info?.success===true&&info.hostname===hostname;
  }catch{return false;}
 }
 export function publicUrl(env){
