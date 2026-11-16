@@ -1,0 +1,102 @@
+/* HHBA membership rules v0.1 — scoped public-document layout (no payment or consent controls). */
+.hhba-rules{--hr-ink:#1b362a;--hr-muted:#64796d;--hr-border:#dde9e0;--hr-green:#2e7550;width:calc(100% - 36px);max-width:1210px;margin:0 auto;padding:30px 0 74px;color:var(--hr-ink)}
+.hhba-rules *{box-sizing:border-box}
+.hhba-rules a{color:inherit}
+.hhba-rules-topline{display:flex;align-items:center;justify-content:space-between;gap:16px;color:#708378;font-size:12px;margin-bottom:24px}
+.hhba-rules-back{display:inline-flex;align-items:center;gap:7px;color:#3b7350!important;text-decoration:none;font-weight:650}
+.hhba-rules-back:hover,.hhba-rules-bottom-link:hover{text-decoration:underline}
+.hhba-rules-hero{position:relative;overflow:hidden;padding:39px 44px 35px;border:1px solid #dae9de;border-radius:22px;background:linear-gradient(110deg,#fbfdfb 0%,#f0f7f2 60%,#e7f2ed 100%)}
+.hhba-rules-hero:after{content:'';position:absolute;width:430px;height:430px;border-radius:50%;right:-170px;top:-255px;background:radial-gradient(circle,rgba(167,207,177,.42),transparent 69%);pointer-events:none}
+.hhba-rules-eyebrow{display:flex;align-items:center;gap:8px;color:#4b8862;font-size:11px;letter-spacing:.09em;font-weight:800}
+.hhba-rules-hero h1{position:relative;margin:16px 0 13px;color:#163426;font-size:clamp(28px,3.25vw,41px);line-height:1.24;letter-spacing:-1px}
+.hhba-rules-subtitle{max-width:840px;margin:0;color:#617b69;font-size:15px;line-height:1.85}
+.hhba-rules-meta{display:flex;align-items:center;gap:9px 17px;flex-wrap:wrap;margin-top:21px;color:#708579;font-size:12px}
+.hhba-rules-draft{display:inline-flex;padding:6px 11px;border-radius:999px;border:1px solid #cbdccf;background:#fff;color:#467251;font-size:11px;font-weight:750}
+.hhba-rules-hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:25px}
+.hhba-rules-primary-link,.hhba-rules-print{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:750;line-height:1.4;cursor:pointer;text-decoration:none;transition:background .15s}
+.hhba-rules-primary-link{background:#286e4a;color:#fff!important;border:1px solid #286e4a}
+.hhba-rules-primary-link:hover{background:#1d5b39}
+.hhba-rules-print{border:1px solid #cddfd2;background:#fff;color:#37674a}
+.hhba-rules-print:hover{background:#f3faf5}
+.hhba-rules :is(a,button,summary):focus-visible{outline:3px solid #49996a;outline-offset:3px}
+.hhba-rules-critical{display:flex;align-items:flex-start;gap:17px;margin:18px 0 0;padding:22px 25px;border:1px solid #e9ded0;border-left:4px solid #c19052;border-radius:13px;background:#fffcf8}
+.hhba-rules-critical-icon{flex:0 0 auto;width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:#f9f0e1;color:#986f36}
+.hhba-rules-critical h2{margin:0 0 8px;font-size:17px;color:#59452c}
+.hhba-rules-critical p{margin:8px 0 0;font-size:13px;line-height:1.85;color:#74664f}
+.hhba-rules-critical strong{color:#4c3b24}
+.hhba-rules-snapshot{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0 34px}
+.hhba-rules-snapshot>div{display:flex;flex-direction:column;gap:7px;min-width:0;padding:17px 18px;border-radius:13px;background:#fff;border:1px solid var(--hr-border)}
+.hhba-rules-snapshot span{color:#778b7d;font-size:11px}
+.hhba-rules-snapshot strong{font-size:23px;line-height:1.35;color:#2d714c;letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+.hhba-rules-snapshot small{font-size:11px;color:#829487;line-height:1.5}
+.hhba-rules-layout{display:grid;grid-template-columns:245px minmax(0,1fr);gap:30px;align-items:start}
+.hhba-rules-sidebar{min-width:0}
+.hhba-rules-nav{position:sticky;top:86px;max-height:calc(100vh - 100px);overflow:auto;padding:21px 17px;border:1px solid #e0eae2;border-radius:14px;background:rgba(255,255,255,.91);scrollbar-width:thin}
+.hhba-rules-nav-title{margin:0 0 12px;padding:0 5px;color:#557b60;font-size:11px;font-weight:800;letter-spacing:.12em}
+.hhba-rules-nav ol{display:grid;gap:1px;margin:0;padding:0;list-style:none}
+.hhba-rules-nav li a{display:flex;align-items:center;gap:10px;padding:8px 7px;text-decoration:none;color:#607668;font-size:12px;line-height:1.4;border-radius:7px}
+.hhba-rules-nav li a:hover,.hhba-rules-nav-extra a:hover{background:#edf6ef;color:#285f3e}
+.hhba-rules-nav li span{font-size:10px;flex:0 0 23px;color:#77a188;font-variant-numeric:tabular-nums}
+.hhba-rules-nav-extra{display:grid;gap:3px;margin-top:17px;padding-top:13px;border-top:1px solid #e4ece6}
+.hhba-rules-nav-extra a{padding:7px 9px;font-size:12px;color:#587562;text-decoration:none;border-radius:7px}
+.hhba-rules-document{min-width:0;border-radius:16px;border:1px solid #e3ebe5;background:#fff;padding:0 35px 35px;box-shadow:0 6px 26px rgba(23,71,39,.035)}
+.hhba-rules-doc-intro{padding:36px 0 30px;border-bottom:1px solid #e4ece6}
+.hhba-rules-doc-intro>span{display:inline-flex;align-items:center;gap:8px;color:#4e8964;font-size:11px;font-weight:750}
+.hhba-rules-doc-intro h2{font-size:22px;line-height:1.42;letter-spacing:-.45px;margin:12px 0 8px;color:#213c2d}
+.hhba-rules-doc-intro p{font-size:13px;color:#6e8173;line-height:1.85;margin:0}
+.hhba-rules-chapter{scroll-margin-top:90px;padding:35px 0 32px;border-bottom:1px solid #e7ede8}
+.hhba-rules-chapter-heading{margin-bottom:23px}
+.hhba-rules-chapter-heading>span{font-size:11px;font-weight:780;color:#539169;letter-spacing:.09em}
+.hhba-rules-chapter-heading h2{margin:8px 0 8px;font-size:24px;line-height:1.38;color:#1d3b2a;letter-spacing:-.45px}
+.hhba-rules-chapter-heading>p{margin:0;font-size:13px;line-height:1.65;color:#819084}
+.hhba-rules-clause{margin-top:21px}
+.hhba-rules-clause h3{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin:0 0 10px;font-size:16px;font-weight:760;color:#254735;line-height:1.55}
+.hhba-rules-clause p{margin:0 0 11px;color:#4b6052;font-size:14px;line-height:1.95;text-align:justify;overflow-wrap:anywhere}
+.hhba-rules-clause p:last-child{margin-bottom:0}
+.hhba-rules-clause--critical,.hhba-rules-clause--pending{border-left:3px solid #d3e4d8;padding-left:15px}
+.hhba-rules-clause--critical{border-left-color:#d6af67}
+.hhba-rules-pending,.hhba-rules-important{display:inline-flex;flex:none;padding:4px 7px;font-size:10px;font-weight:700;line-height:1.2;border-radius:5px}
+.hhba-rules-pending{background:#eef5f0;color:#59866b}
+.hhba-rules-important{background:#fcf1e5;color:#9e753c}
+.hhba-rules-faq-list{display:grid;gap:10px}
+.hhba-rules-faq{border:1px solid #e2eae4;border-radius:10px;padding:0 16px;background:#fcfefd}
+.hhba-rules-faq summary{display:flex;gap:12px;align-items:baseline;cursor:pointer;list-style:none;padding:14px 0;color:#294934;font-size:14px;font-weight:700;line-height:1.6}
+.hhba-rules-faq summary::-webkit-details-marker{display:none}
+.hhba-rules-faq summary:after{content:'＋';margin-left:auto;color:#6e977d;font-size:18px;font-weight:400}
+.hhba-rules-faq[open] summary:after{content:'－'}
+.hhba-rules-faq summary span{color:#75a285;font-size:11px;font-variant-numeric:tabular-nums}
+.hhba-rules-faq p{border-top:1px solid #e3ebe5;margin:0;padding:12px 0 16px;color:#586d5f;font-size:13px;line-height:1.85}
+.hhba-rules-source-list{display:grid;gap:9px;margin:0;padding-left:18px}
+.hhba-rules-source-list li{padding-left:3px;color:#5a8869}
+.hhba-rules-source-list a{display:inline-flex;gap:7px;align-items:center;font-size:13px;line-height:1.75;color:#367150;text-decoration:none}
+.hhba-rules-source-list a:hover{text-decoration:underline}
+.hhba-rules-source-list svg{flex:none}
+.hhba-rules-safe-note{display:flex;gap:11px;margin-top:23px;padding:15px 16px;border-radius:10px;background:#f5f8f5;color:#637c6d}
+.hhba-rules-safe-note svg{flex:none;margin-top:3px}
+.hhba-rules-safe-note p{margin:0;font-size:12px;line-height:1.85}
+.hhba-rules-document-footer{scroll-margin-top:90px;padding:31px 0 0}
+.hhba-rules-document-footer h2{font-size:20px;margin:0 0 12px}
+.hhba-rules-document-footer>p{margin:9px 0;color:#697d6e;font-size:13px;line-height:1.85}
+.hhba-rules-document-footer>p:first-of-type{display:flex;align-items:center;gap:8px;color:#41805a;font-weight:750}
+.hhba-rules-bottom-link{display:inline-flex;align-items:center;gap:7px;margin-top:16px;color:#31794e!important;font-size:13px;font-weight:750;text-decoration:none}
+@media(max-width:980px){.hhba-rules-layout{grid-template-columns:205px minmax(0,1fr);gap:16px}.hhba-rules-document{padding:0 22px 27px}.hhba-rules-nav{padding:16px 11px}.hhba-rules-snapshot{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.hhba-rules{width:calc(100% - 24px);padding:18px 0 50px}.hhba-rules-topline>span{display:none}.hhba-rules-hero{padding:26px 20px;border-radius:16px}.hhba-rules-hero h1{font-size:29px}.hhba-rules-subtitle{font-size:13px}.hhba-rules-meta{gap:7px 13px}.hhba-rules-critical{padding:16px 15px;gap:10px}.hhba-rules-critical-icon{width:34px;height:34px}.hhba-rules-snapshot{gap:8px;margin-bottom:16px}.hhba-rules-snapshot>div{padding:13px}.hhba-rules-snapshot strong{font-size:18px}.hhba-rules-layout{display:block}.hhba-rules-sidebar{margin-bottom:14px}.hhba-rules-nav{position:static;max-height:none;padding:16px}.hhba-rules-nav ol{display:grid;grid-template-columns:1fr 1fr;gap:0 6px}.hhba-rules-nav li a{font-size:11px;padding:8px 4px}.hhba-rules-nav li span{flex-basis:20px}.hhba-rules-document{padding:0 18px 23px}.hhba-rules-doc-intro{padding:25px 0 21px}.hhba-rules-doc-intro h2{font-size:19px}.hhba-rules-chapter{padding:27px 0 26px}.hhba-rules-chapter-heading h2{font-size:21px}.hhba-rules-clause p{text-align:left;font-size:13px;line-height:1.9}.hhba-rules-hero-actions{gap:8px}.hhba-rules-primary-link,.hhba-rules-print{font-size:12px}}
+@media(max-width:410px){.hhba-rules-nav ol{grid-template-columns:1fr}.hhba-rules-snapshot{grid-template-columns:1fr 1fr}.hhba-rules-snapshot strong{font-size:17px}.hhba-rules-hero h1{font-size:26px}}
+@media(prefers-reduced-motion:reduce){.hhba-rules *{scroll-behavior:auto!important}}
+@media print{
+ body{background:#fff!important}
+ .hhba-rules{max-width:none;width:100%;margin:0;padding:0;color:#000}
+ .hhba-rules-hero{background:#fff;border:0;padding:0 0 12mm}
+ .hhba-rules-hero:after,.hhba-rules-topline,.hhba-rules-hero-actions,.hhba-rules-sidebar,.hhba-rules-bottom-link{display:none!important}
+ .hhba-rules-layout{display:block}
+ .hhba-rules-document{border:0;box-shadow:none;padding:0}
+ .hhba-rules-snapshot{grid-template-columns:repeat(4,1fr)}
+ .hhba-rules-critical,.hhba-rules-snapshot>div,.hhba-rules-clause{break-inside:avoid}
+ .hhba-rules-chapter{break-before:auto}
+ .hhba-rules-chapter-heading{break-after:avoid}
+ .hhba-rules-faq{break-inside:avoid}
+ .hhba-rules-chapter-heading h2{color:#111;font-size:19pt}
+ .hhba-rules-clause p{color:#222}
+ .hhba-rules-source-list a{color:#222}
+ .hhba-rules-document-footer>p{color:#222}
+}
