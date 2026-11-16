@@ -77,6 +77,10 @@ export async function onRequestPost({request,env}){
  if(!isCurrentPublicationDay())return failure('NOT_MONTHLY_PUBLICATION_WINDOW',409);
  const period=priorMonth(),db=financeDb(env);
  try{
+  // Expired, unverified addresses are not kept forever. Keep a one-week
+  // grace window for mail delivery while retaining no obsolete opt-in PII.
+  const expiredAt=new Date(Date.now()-7*86400000).toISOString();
+  await db.prepare("DELETE FROM hhba_fin_subscribers WHERE status='pending' AND verify_expires_at<?").bind(expiredAt).run();
   let row=await db.prepare('SELECT * FROM hhba_fin_reports WHERE period=?').bind(period).first();
   if(!row)return json({ok:true,code:'NO_APPROVED_REPORT_NO_EMAIL',period,attempted:0});
   if(row.status==='reviewed'&&row.reviewed_json){
