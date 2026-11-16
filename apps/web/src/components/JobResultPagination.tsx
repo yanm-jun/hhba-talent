@@ -4,9 +4,9 @@ import {pageCount,validJumpPage,visiblePageTokens} from '../services/jobPaging.m
 
 type Props={
  page:number;total:number;pageSize:number;loading:boolean;
- onChange:(page:number)=>void;lang:Language;
+ onChange:(page:number)=>void;lang:Language;showJump?:boolean;
 };
-export function JobResultPagination({page,total,pageSize,loading,onChange,lang}:Props){
+export function JobResultPagination({page,total,pageSize,loading,onChange,lang,showJump=true}:Props){
  const [typed,setTyped]=useState('');
  const pages=Math.max(1,pageCount(total));
  const current=Math.min(page+1,pages);
@@ -34,13 +34,13 @@ export function JobResultPagination({page,total,pageSize,loading,onChange,lang}:
     {zh?'下一页':'Next'}
    </button>
   </div>
-  <form className="unified-job-page-jump" onSubmit={submit}>
+  {showJump&&<form className="unified-job-page-jump" onSubmit={submit}>
    <span>{zh?'第 '+current+' / '+pages+' 页':'Page '+current+' / '+pages}</span>
    <label htmlFor="hhba-job-page-jump">{zh?'跳至':'Go to'}</label>
    <input id="hhba-job-page-jump" type="number" inputMode="numeric"
      min={1} max={pages} step={1} value={typed} onChange={e=>setTyped(e.target.value)}
      aria-label={zh?'输入跳转页码':'Enter page number'} placeholder={String(current)} disabled={loading}/>
    <button type="submit" disabled={loading||!valid}>{zh?'跳转':'Go'}</button>
-  </form>
+  </form>}
  </nav>;
 }

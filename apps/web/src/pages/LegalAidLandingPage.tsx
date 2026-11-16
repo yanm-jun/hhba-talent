@@ -7,8 +7,7 @@ import {Link} from '../router';
 import type {User} from '../services/api';
 import '../styles/legal-aid-landing.css';
 
-// Static UI only: the legal assistance service has not launched.
-// No uploads, case intake, submissions, legal advice, or employer data transfer.
+// Public labor-rights knowledge only. Membership purchase, case intake and legal services are not live.
 const legalTopics=[
   {title:'拖欠工资',icon:Wallet,slug:'unpaid-wages'},
   {title:'违法辞退与补偿',icon:BookmarkX,slug:'unlawful-dismissal'},
@@ -28,11 +27,11 @@ export function LegalAidLandingPage({user}:{user:User|null}){
           <div className="hhba-law-brand">
             <span className="hhba-law-brand-logo">HHBA.</span>
             <span className="hhba-law-brand-divider" aria-hidden="true"/>
-            <span className="hhba-law-brand-name">法律援助</span>
+            <span className="hhba-law-brand-name">劳动权益支持</span>
           </div>
           <div className="hhba-law-header-actions">
             <Link to="/candidate/account/legal-aid/intervention" className="hhba-law-intervention-link">
-              <ShieldCheck size={13} aria-hidden="true"/>请求平台介入
+              <ShieldCheck size={13} aria-hidden="true"/>查看服务筹备说明
             </Link>
             <Link to="/candidate/account" className="hhba-law-back">
               返回个人中心 <ArrowUpRight size={12} aria-hidden="true"/>
@@ -44,7 +43,7 @@ export function LegalAidLandingPage({user}:{user:User|null}){
           <div className="hhba-law-intro">
             <Scale size={24} strokeWidth={2.2} aria-hidden="true"/>
             <h1 id="hhba-law-title">遇到劳动问题？</h1>
-            <p>了解自己的合法权益，找到解决问题的方向。</p>
+            <p>了解自己的合法权益、证据准备与处理方向。HHBA 的会员法律服务目前尚未开放。</p>
           </div>
 
           <div className="hhba-law-question-preview" aria-label="未来的问题描述功能，当前尚未开放">
@@ -52,7 +51,7 @@ export function LegalAidLandingPage({user}:{user:User|null}){
             <span className="hhba-law-question-locked"><LockKeyhole size={12} aria-hidden="true"/> 功能筹备中</span>
           </div>
 
-          <section className="hhba-law-topics" aria-label="未来支持的劳动权益问题类型">
+          <section className="hhba-law-topics" aria-label="劳动权益知识专题">
             <h2>劳动权益问题专题 · 8 类</h2>
             <div className="hhba-law-topic-grid">
               {legalTopics.map(({title,icon:Icon,slug})=><Link to={'/candidate/account/legal-aid/'+slug} className="hhba-law-topic" key={slug}>
@@ -65,7 +64,7 @@ export function LegalAidLandingPage({user}:{user:User|null}){
         </div>
 
         <footer className="hhba-law-footer">
-          8 类法律知识与公开案例已开放查询 · 个案受理和证据提交仍未开放
+          8 类劳动权益知识与公开案例已开放查询 · 会员服务、个案受理和证据提交尚未开放
         </footer>
       </section>
     </main>

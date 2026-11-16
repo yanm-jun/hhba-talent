@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "membership": {
+    "status": "planning",
+    "priceCents": 1990,
+    "currency": "CNY",
+    "billingPeriod": "month",
+    "introductoryMonths": 6,
+    "maxServiceMonths": 36,
+    "purchaseEnabled": false,
+    "caseIntakeEnabled": false,
+    "firstStageServices": [
+      "简历诊断与优化建议",
+      "围绕求职目标调整简历内容",
+      "职业档案维护与阶段性更新"
+    ],
+    "rightsStageServices": [
+      "全程劳动法律咨询",
+      "符合受理条件的律师函服务",
+      "线上调解对接",
+      "仲裁材料整理、文书代写与修改、归档",
+      "服务进度跟进"
+    ],
+    "qualificationNotice": "连续缴费满六期后，可按正式服务协议申请劳动权益支持；是否受理及具体服务范围以审核结果和协议约定为准。",
+    "serviceNotice": "当前为服务方案规划展示，暂未开放购买、案件申请或律师委托。正式开放前将明确服务次数、交付标准、资格条件、受理范围、费用承担及终止规则。法律服务由依法执业的律师事务所及律师按规定承接；本方案不提供现金赔付。"
+  },
+  "distribution": {
+    "status": "policy_announced",
+    "companyPercent": 60,
+    "workerSupportPercent": 40,
+    "basis": "依法核算后的可分配利润",
+    "reportStatus": "not_published",
+    "reportNotice": "60/40以依法核算后的可分配利润为基数，不按营业流水直接分配。首期财务公开报告尚未发布；在完成真实核算前，不展示未经核实的收入、支出或帮扶金额。"
+  }
+}

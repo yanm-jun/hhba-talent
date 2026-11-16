@@ -257,3 +257,30 @@ a.unified-company-brand:focus-visible,.unified-detail-company-link:focus-visible
  .unified-job-footer .unified-job-browse-links{margin-left:0}
 }
 @media(prefers-reduced-motion:reduce){.unified-role-list .unified-job-card{transition:none}}
+
+/* Homepage-only list finish: statistics and full-market link on the left,
+   compact pagination on the right. Full /candidate/jobs controls stay intact. */
+.unified-market--home{margin-bottom:0}
+.unified-market--home .unified-job-footer--home{
+ display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;
+ margin-top:16px;padding:12px 0 17px;border-bottom:1px solid rgba(99,137,113,.24)
+}
+.unified-market--home .unified-job-footer-info{
+ display:flex;align-items:center;gap:7px 16px;flex:1 1 590px;min-width:0;flex-wrap:wrap
+}
+.unified-market--home .unified-job-footer-info>span{color:#728498;font-size:11px;line-height:1.65}
+.unified-market--home .unified-job-browse-links{margin:0;flex:0 0 auto}
+.unified-market--home .unified-job-browse-links>a{font-size:12px;white-space:nowrap}
+.unified-market--home .unified-job-footer .unified-job-paging{flex:0 0 auto;width:auto;justify-content:flex-end;gap:5px;margin-left:auto}
+.unified-market--home .unified-job-pages{flex-wrap:nowrap;gap:5px}
+.unified-market--home .unified-job-pages button{min-height:34px}
+@media(max-width:1050px){
+ .unified-market--home .unified-job-footer-info{flex:1 1 100%}
+ .unified-market--home .unified-job-footer .unified-job-paging{margin-left:0}
+}
+@media(max-width:600px){
+ .unified-market--home .unified-job-footer--home{gap:10px}
+ .unified-market--home .unified-job-footer-info{gap:5px 12px}
+ .unified-market--home .unified-job-pages{flex-wrap:wrap}
+ .unified-market--home .unified-job-footer .unified-job-paging{justify-content:flex-start}
+}

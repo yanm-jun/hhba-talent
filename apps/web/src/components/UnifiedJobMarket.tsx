@@ -299,7 +299,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       onChange={e=>{setPage(0);setFilters(f=>({...f,remote:e.target.checked}))}}/>
       {lang==='zh'?'仅远程岗位':'Remote only'}</label>
   </div>;
-  const market=<section className="unified-market" aria-labelledby="unified-market-title">
+  const market=<section className={compact?'unified-market unified-market--home':'unified-market'} aria-labelledby="unified-market-title">
     <div className="unified-market-heading"><div><small>HHBA · RECRUITMENT</small>
       <h2 id="unified-market-title">{lang==='zh'?'招聘市场':'Job market'}</h2>
       <p>{rebuilding?(lang==='zh'?'海外精选岗位与逐家审核通过的国内岗位 · 使用同一套卡片和站内详情':'Overseas curated jobs and individually reviewed China roles in one layout'):curatedHundred?(lang==='zh'?'精选 10 家知名海外企业 · 100 条已存档岗位（状态待核实）':'100 archived roles from 10 companies; current availability unverified.'):officialThree?(lang==='zh'?'OpenAI、Anthropic、SpaceX 官方公开招聘 · 只展示本次从招聘系统核验到的职位，随时可能变化':'OpenAI, Anthropic and SpaceX public ATS listings · Verified at latest sync'):domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
@@ -371,21 +371,19 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       error?<div className="unified-job-state" role="alert">{lang==='zh'?error:'Jobs temporarily unavailable. Please retry.'}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> {lang==='zh'?'重试':'Retry'}</button></div>:
       shown.length?<div className="unified-job-grid unified-role-list" aria-label={selectedMajor?'专业相关的真实岗位':'招聘岗位'}>{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated} majorSlug={selectedMajor}/>)}</div>:
         <div className="unified-job-state">{selectedMajor?(lang==='zh'?'当前没有符合该专业及其他筛选条件的已收录岗位。可尝试调整城市、招聘类型，或主动勾选“专业要求未披露的岗位”进行核验。':'No recorded roles meet this major and your other filters. Try adjusting your criteria.'):domesticOnly?(lang==='zh'?'当前没有符合条件的历史岗位。':'No matching archived jobs.'):v2SearchMatched?(lang==='zh'?'以上已找到匹配的 V2 企业及其岗位方向；当前正式岗位列表未有其他近期核验结果。':'The V2 employer and its archived role directions are shown above; no additional recently verified jobs match.'):lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
-    <div className="unified-job-footer">
-      <span>{snapshot?.sourceTotal!==undefined&&snapshot.sourceTotal!==snapshot.total?
+    <div className={compact?'unified-job-footer unified-job-footer--home':'unified-job-footer'}>
+      <div className="unified-job-footer-info"><span>{snapshot?.sourceTotal!==undefined&&snapshot.sourceTotal!==snapshot.total?
         (lang==='zh'?`共 ${snapshot.sourceTotal.toLocaleString()} 条原始岗位 · 合并展示 ${snapshot.total.toLocaleString()} 组 · 本页 ${!loading&&!error?shown.length:0} 组 · 来源更新时间：${formatDate(snapshot.updated)}`:
          `${snapshot.sourceTotal.toLocaleString()} original roles · ${snapshot.total.toLocaleString()} display groups · ${!loading&&!error?shown.length:0} on this page · Updated ${formatDate(snapshot.updated)}`):
         (lang==='zh'?`共匹配 ${snapshot?.total.toLocaleString()||0} 条 · 本页 ${!loading&&!error?shown.length:0} 条 · 来源更新时间：${formatDate(snapshot?.updated)}`:
          `${snapshot?.total.toLocaleString()||0} matching jobs · ${!loading&&!error?shown.length:0} on this page · Updated ${formatDate(snapshot?.updated)}`)}</span>
+      {compact&&<div className="unified-job-browse-links"><Link to="/candidate/jobs">{lang==='zh'?'查看完整招聘市场':'Browse all jobs'} <ArrowRight size={15}/></Link></div>}</div>
       {!error&&!loading&&snapshot&&<JobResultPagination page={page} total={snapshot.total} pageSize={JOBS_PER_PAGE}
-        loading={loading} lang={lang} onChange={next=>{
+        showJump={!compact} loading={loading} lang={lang} onChange={next=>{
           if(next<0||next===page||next>=pageCount(snapshot.total))return;
           setPage(next);
           requestAnimationFrame(()=>document.getElementById('hhba-job-results')?.scrollIntoView({behavior:'smooth',block:'start'}));
         }}/>}
-      {compact&&<div className="unified-job-browse-links">
-         <Link to="/candidate/jobs">{lang==='zh'?'查看完整招聘市场':'Browse all jobs'} <ArrowRight size={15}/></Link>
-       </div>}
     </div>
     {!compact && <p className="unified-job-history">{lang==='zh'?'了解企业或查阅历史岗位资料：':'Explore companies and historical records: '}
       <Link to="/companies">{lang==='zh'?'企业资料库':'Company directory'}</Link>{' · '}
