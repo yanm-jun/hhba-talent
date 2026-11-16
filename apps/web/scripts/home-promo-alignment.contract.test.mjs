@@ -20,26 +20,22 @@ test('shortened height and mobile stacking retain readable action button',()=>{
  assert.ok(promo.includes('.home-match-promo + .unified-market{margin-top:28px}'));
  assert.ok(promo.includes('.home-match-promo button{justify-content:center}'));
 });
-test('original HHBA home CTA, main dual-entry and shared job marketplace stay untouched',()=>{
+test('AI CTA, three public entrances and shared job marketplace remain available',()=>{
  assert.ok(home.includes('className="home-match-promo"'));
  assert.ok(home.includes("navigate('/candidate/match')"));
- assert.ok(home.includes('title="我要应聘"'));
+ assert.ok(home.includes('title="我要找工作"'));
+ assert.ok(home.includes('title="劳动权益支持"'));
  assert.ok(home.includes('title="企业招聘导航"'));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
 });
-
-test('remove only the redundant home company discovery banner, without deleting destination or later blocks',()=>{
- assert.doesNotMatch(home,/home-company-discover-link/);
- assert.doesNotMatch(home,/企业发现 · 200 家国内企业|探索 200 家企业/);
- const market=home.indexOf('<UnifiedJobMarket compact/>');
+test('marketplace, workplace plan, talent services and company directory remain in the intended order',()=>{
+ const marketIndex=home.indexOf('<UnifiedJobMarket compact/>');
+ const workplace=home.indexOf('<HomeWorkplacePromise/>');
  const talent=home.indexOf('className="home-talent-service-link"');
  const marquee=home.indexOf('<HomeCompanyMarquee/>');
- assert(market>=0&&talent>market&&marquee>talent,
-  'Market must flow to talent service and the domestic company marquee');
- assert.equal(home.includes('HomePeopleBanner'),false,
-  'The unrelated lower-right photo banner was intentionally removed');
+ assert(marketIndex>=0&&workplace>marketIndex&&talent>workplace&&marquee>talent);
+ assert.doesNotMatch(home,/home-company-discover-link/);
+ assert.doesNotMatch(home,/企业发现 · 200 家国内企业|探索 200 家企业/);
+ assert.equal(home.includes('HomePeopleBanner'),false);
  assert.match(home,/to="\/talent-service"/);
- assert.match(home,/className="home-match-promo"/);
- assert.match(home,/title="我要应聘"/);
- assert.match(home,/title="企业招聘导航"/);
 });
