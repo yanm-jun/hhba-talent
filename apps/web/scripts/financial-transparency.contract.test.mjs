@@ -110,14 +110,27 @@ test('front, admin, cron and immutable correction are all wired to same route',(
  assert.match(cron,/HHBA_FIN_DISPATCH_SECRET/);
 });
 
-test('disclosure redesign is report-first, sober and keeps real financial interfaces intact',()=>{
+test('responsibility page is three-part, sober and keeps real finance interfaces',()=>{
  const page=read('../src/pages/TransparencyPage.tsx');
  const css=read('../src/styles/transparency.css');
- assert.match(page,/>财务信息披露中心</);
- assert.match(page,/公开信息 \/ 财务信息披露/);
- assert.match(page,/企业自愿公开/);
+ const home=read('../src/components/HomeWorkplacePromise.tsx');
+ const shell=read('../src/components/Shell.tsx');
+ assert.match(page,/<h1>责任与透明<\/h1>/);
+ assert.match(page,/公开信息 \/ 责任与透明/);
+ assert.match(page,/id="responsibility-support"/);
+ assert.match(page,/id="financial-allocation"/);
+ assert.match(page,/id="fin-latest-title"/);
+ assert.match(page,/¥600,000/);
+ assert.match(page,/企业自主披露/);
+ assert.match(page,/尚未经独立第三方鉴证/);
+ assert.match(page,/不代表获得 ESG 官方认证/);
+ assert.match(page,/投资资金与营业收入、可分配利润分别核算/);
+ assert.match(page,/此处是 HHBA 自有主题文字标识，不是外部机构官方 Logo/);
+ assert.match(page,/60%/);
+ assert.match(page,/40%/);
  assert.match(page,/最新财务报告/);
- assert.match(page,/利润分配制度/);
+ assert.match(page,/首期财务报告尚未发布/);
+ assert.match(page,/未披露的数据不代表零收入、零支出或零帮扶/);
  assert.match(page,/历史披露档案/);
  assert.match(page,/财务报告邮件订阅/);
  assert.match(page,/aria-label="已公开的历史月度财务报告"/);
@@ -131,13 +144,15 @@ test('disclosure redesign is report-first, sober and keeps real financial interf
  assert.match(page,/settings\?\.subscriptionEnabled/);
  assert.match(page,/captchaToken/);
  assert.match(page,/未经独立财务审计/);
- assert.match(page,/未披露的数据不代表零收入、零支出或零帮扶/);
- assert.ok(page.indexOf('id="fin-latest-title"')<page.indexOf('id="financial-allocation"'),'latest report must appear before the 60/40 policy');
- assert.ok(page.indexOf('id="financial-allocation"')<page.indexOf('id="hhba-fin-history-title"'),'allocation must precede archive');
- assert.ok(page.indexOf('id="hhba-fin-history-title"')<page.indexOf('id="fin-subscribe-title"'),'archive must precede email subscription');
- assert.doesNotMatch(css,/linear-gradient\(/,'corporate disclosure must avoid decorative marketing gradients');
- assert.match(css,/\.hhba-fin-disclosure-facts dl>div/);
- assert.match(css,/\.hhba-fin-history-table table/);
+ assert.match(page,/<details className="hhba-resp-disclosure-detail">/);
+ assert.ok(page.indexOf('id="responsibility-support"')<page.indexOf('id="financial-allocation"'),'funding precedes distribution');
+ assert.ok(page.indexOf('id="financial-allocation"')<page.indexOf('id="fin-latest-title"'),'distribution precedes monthly report');
+ assert.ok(page.indexOf('id="fin-latest-title"')<page.indexOf('id="hhba-fin-history-title"'),'report precedes archive');
+ assert.ok(page.indexOf('id="hhba-fin-history-title"')<page.indexOf('id="fin-subscribe-title"'),'archive precedes opt-in');
+ assert.match(home,/查看责任与透明/);
+ assert.match(shell,/财务公开|责任与透明/);
+ assert.doesNotMatch(css,/linear-gradient\(/,'disclosure should not use decorative gradients');
+ assert.match(css,/\.hhba-resp-capital/);
  assert.match(css,/@media\(max-width:530px\)/);
  assert.match(css,/@media print/);
  assert.doesNotMatch(page,/<main className="hhba-transparency"/,'Shell already supplies main landmark');
