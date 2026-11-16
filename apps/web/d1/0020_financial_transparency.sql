@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS hhba_fin_reports(
  prepared_by TEXT NOT NULL,
  reviewed_by TEXT,
  review_note TEXT,
+ correction_reason TEXT,
  reviewed_at TEXT,
  published_at TEXT,
  corrected_at TEXT,
