@@ -179,3 +179,88 @@
  .hhba-fin-empty-document,.hhba-fin-disclosure-facts,.hhba-fin-report,.hhba-fin-allocation-table{border:1px solid #aaa}
  .hhba-fin-panels>section,.hhba-fin-kpis>div,.hhba-fin-allocation-table>div{break-inside:avoid}
 }
+
+
+/* HHBA Responsibility & Transparency — three-section editorial layout.
+ * Keeps existing published-report, finance table, archive and email UI intact.
+ * ESG/Labor Rights wordmark is owned typography, never a certification logo.
+ */
+.hhba-transparency.hhba-responsibility{max-width:1030px;padding:30px 53px 45px;--fin-ink:#1e3127;--fin-brand:#286749}
+.hhba-resp-hero{padding:38px 0 31px}
+.hhba-resp-hero h1{margin:12px 0 10px;font-size:clamp(32px,4.1vw,46px);line-height:1.24;letter-spacing:-1.2px;color:#1f3026;font-weight:790}
+.hhba-resp-hero>p{font-size:15px;color:#67776e;line-height:1.85;margin:0}
+.hhba-resp-hero-meta{display:flex;align-items:center;gap:11px 23px;flex-wrap:wrap;margin-top:21px;color:#7a897e;font-size:12px}
+.hhba-resp-hero-meta span{display:inline-flex;gap:7px;align-items:center}
+.hhba-resp-hero-meta svg{color:#477b5b}
+.hhba-resp-jump{display:flex;flex-wrap:wrap;gap:12px 28px;padding:16px 0;border-top:1px solid var(--fin-line);border-bottom:1px solid var(--fin-line)}
+.hhba-resp-jump a{font-size:12px;font-weight:680;color:#50675a}
+.hhba-resp-support,.hhba-resp-allocation,.hhba-responsibility>.hhba-fin-report-section{padding:37px 0 34px;border-bottom:1px solid var(--fin-line);scroll-margin-top:90px}
+.hhba-resp-support{padding-top:38px}
+.hhba-resp-section-heading h2,.hhba-responsibility .hhba-fin-section-heading h2{margin:6px 0 0;font-size:23px;letter-spacing:-.4px;color:#27392d;line-height:1.45}
+.hhba-resp-heading-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hhba-resp-statement-tag{background:#f3f7f3;color:#527563;border:1px solid #dfebe1;padding:5px 10px;border-radius:4px;font-size:11px;font-weight:600}
+.hhba-resp-capital{margin-top:21px;display:grid;grid-template-columns:minmax(260px,.86fr) minmax(0,1.14fr);border:1px solid #dfe8e1;border-radius:10px;background:#fbfcfb;overflow:hidden}
+.hhba-resp-capital-number{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:10px;padding:31px 30px;border-right:1px solid #e0e9e1}
+.hhba-resp-capital-number>span{font-size:11px;color:#758478;line-height:1.6}
+.hhba-resp-capital-number strong{font-size:clamp(36px,4.8vw,53px);letter-spacing:-1.8px;line-height:1.14;color:#245f45;font-variant-numeric:tabular-nums;font-weight:790;white-space:nowrap}
+.hhba-resp-capital-number small{font-size:12px;color:#75867b}
+.hhba-resp-capital-detail{padding:28px 28px 24px}
+.hhba-resp-theme-mark{display:inline-flex;align-items:center;gap:8px;border:1px solid #bdd8c6;border-radius:4px;color:#356e50;background:#f1f7f2;padding:5px 10px;font-size:10px;letter-spacing:.11em;font-weight:760}
+.hhba-resp-theme-mark i{font-style:normal;color:#90ac9a}
+.hhba-resp-capital-detail h3{font-size:18px;line-height:1.5;color:#28392d;margin:15px 0 10px;font-weight:730}
+.hhba-resp-capital-detail p{font-size:12px;color:#617368;line-height:1.8;margin:0 0 8px}
+.hhba-resp-capital-detail p.hhba-resp-capital-disclosure{font-size:11px;color:#849188}
+.hhba-resp-legal-note{margin:13px 0 0;color:#859088;font-size:11px;line-height:1.85}
+.hhba-responsibility .hhba-fin-split{padding-top:35px}
+.hhba-responsibility .hhba-fin-allocation-body{grid-template-columns:minmax(0,1fr);gap:13px}
+.hhba-responsibility .hhba-fin-allocation-table{max-width:none}
+.hhba-responsibility .hhba-fin-allocation-notes{border:0;padding:0;margin:0;background:transparent}
+.hhba-responsibility .hhba-fin-allocation-notes h3{font-size:12px;margin:4px 0 6px;color:#55745c}
+.hhba-responsibility .hhba-fin-allocation-notes p{font-size:11px;line-height:1.75;color:#77877b;margin:4px 0}
+.hhba-responsibility .hhba-fin-report-section{padding-top:36px}
+.hhba-resp-empty-report{display:flex;align-items:center;gap:19px;min-width:0;padding:23px 25px;background:#fbfcfb;border:1px solid var(--fin-line);border-radius:9px}
+.hhba-resp-empty-icon{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;color:#748a7c;background:#f0f4f0;border-radius:50%}
+.hhba-resp-empty-report>div:nth-child(2){flex:1;min-width:0}
+.hhba-resp-empty-report strong{color:#31483a;font-size:15px}
+.hhba-resp-empty-report p{margin:6px 0;color:#7b887f;font-size:12px;line-height:1.8}
+.hhba-resp-empty-report small{font-size:11px;color:#89948c;line-height:1.7}
+.hhba-resp-awaiting{white-space:nowrap;flex:none;border:1px solid #d7e1d9;color:#728476;background:#f8faf8;border-radius:4px;padding:5px 10px;font-size:11px}
+.hhba-resp-secondary{margin-top:15px;display:grid;gap:0}
+.hhba-resp-disclosure-detail{border-bottom:1px solid var(--fin-line)}
+.hhba-resp-disclosure-detail:first-child{border-top:1px solid var(--fin-line)}
+.hhba-resp-disclosure-detail summary{padding:18px 5px;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:20px;cursor:pointer;font-size:13px;font-weight:680;color:#34493a}
+.hhba-resp-disclosure-detail summary::-webkit-details-marker{display:none}
+.hhba-resp-disclosure-detail summary>span{display:inline-flex;align-items:center;gap:11px}
+.hhba-resp-disclosure-detail summary>span>svg{color:#698778}
+.hhba-resp-disclosure-detail summary .hhba-resp-detail-label{color:#88968b;font-size:11px;font-weight:500;gap:8px}
+.hhba-resp-disclosure-detail[open] summary .hhba-resp-detail-label svg{transform:rotate(90deg)}
+.hhba-resp-disclosure-detail summary:hover{color:#25664a}
+.hhba-resp-disclosure-detail .hhba-fin-history,.hhba-resp-disclosure-detail .hhba-fin-subscribe{padding:4px 0 23px}
+.hhba-resp-disclosure-detail .hhba-fin-section-heading{display:none}
+.hhba-resp-disclosure-detail .hhba-fin-subscribe-body{padding-top:3px}
+.hhba-responsibility .hhba-fin-foot{margin-top:27px}
+@media(max-width:800px){
+ .hhba-transparency.hhba-responsibility{padding:23px 25px 36px}
+ .hhba-resp-capital{grid-template-columns:1fr}
+ .hhba-resp-capital-number{border-right:0;border-bottom:1px solid #e0e9e1;padding:26px}
+ .hhba-resp-capital-detail{padding:23px 26px}
+}
+@media(max-width:530px){
+ .hhba-transparency.hhba-responsibility{width:calc(100% - 14px);padding:18px 16px 30px}
+ .hhba-resp-hero{padding:29px 0 22px}
+ .hhba-resp-hero h1{font-size:34px;letter-spacing:-.8px}
+ .hhba-resp-hero>p{font-size:13px}
+ .hhba-resp-hero-meta{font-size:11px}
+ .hhba-resp-jump{gap:15px}
+ .hhba-resp-support,.hhba-resp-allocation,.hhba-responsibility>.hhba-fin-report-section{padding:27px 0 26px}
+ .hhba-resp-section-heading h2,.hhba-responsibility .hhba-fin-section-heading h2{font-size:21px}
+ .hhba-resp-capital-number strong{font-size:42px}
+ .hhba-resp-empty-report{padding:18px 14px;gap:12px;align-items:flex-start;flex-wrap:wrap}
+ .hhba-resp-empty-icon{width:36px;height:36px;flex-basis:36px}
+ .hhba-resp-awaiting{margin-left:48px}
+ .hhba-resp-disclosure-detail summary{padding:16px 0}
+}
+@media print{
+ .hhba-responsibility .hhba-resp-jump,.hhba-responsibility .hhba-resp-support,.hhba-responsibility .hhba-resp-allocation,.hhba-responsibility .hhba-resp-secondary{display:none!important}
+ .hhba-responsibility>.hhba-fin-report-section{border:0}
+}
