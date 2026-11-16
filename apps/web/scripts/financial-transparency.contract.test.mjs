@@ -468,3 +468,26 @@ test('Cloudflare cron triggers only on the 21st UTC and never exposes a public H
   assert.match(workflow,/workflow_dispatch/);
  }finally{globalThis.fetch=priorFetch;console.log=originalLog;console.error=originalError;}
 });
+
+test('finance dashboard only uses published snapshots and never invents an empty-period balance',()=>{
+ const page=read('../src/pages/TransparencyManagePage.tsx');
+ const css=read('../src/styles/transparency-admin.css');
+ assert.match(page,/const publishedRow=status\?\.reports\.find\(row=>row\.status==='published'&&row\.published\)/);
+ assert.match(page,/const publishedSnapshot=publishedRow\?\.published/);
+ assert.match(page,/const asPublishedFen=\(key:string\)=>/);
+ assert.match(page,/Number\.isSafeInteger\(value\)\?value:null/);
+ assert.match(page,/const money=\(value:number\|null\)=>value===null\?'—'/);
+ assert.match(page,/const totalExpensesFen=expenseValues\.every\(value=>value!==null\)/);
+ assert.match(page,/未扣退款的营业收入/);
+ assert.match(page,/不含退款与调整项/);
+ assert.match(page,/可为亏损，不等同于可分配利润/);
+ assert.match(page,/单独核定，不由月度净利自动推算/);
+ assert.match(page,/制度计提，非实际资金划拨/);
+ assert.match(page,/期初＋实际入池－实际帮扶支出/);
+ assert.match(page,/尚无任何已正式发布且核验的月报/);
+ assert.match(page,/未披露的草稿不进入财务总览/);
+ assert.match(page,/私人投资款与营业收入分别核算/);
+ assert.match(page,/status\.deliveries\?\.pending\|\|0/);
+ assert.match(css,/\.hhba-fin-admin-overview-grid/);
+ assert.match(css,/@media\(max-width:450px\)/);
+});
