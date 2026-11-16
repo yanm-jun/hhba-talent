@@ -7,7 +7,7 @@ on:
       - 'apps/web/src/data/membershipRulesContent.ts'
       - 'apps/web/src/data/membershipCompliance.ts'
       - 'apps/web/src/data/homepagePublicConfig.json'
-      - 'apps/web/functions/api/membership/[[path]].js'
+      - 'apps/web/functions/api/membership/**'
       - 'apps/web/functions/api/public/homepage.js'
       - 'apps/web/src/styles/membership-rules.css'
       - 'apps/web/src/components/HomeWorkplacePromise.tsx'
