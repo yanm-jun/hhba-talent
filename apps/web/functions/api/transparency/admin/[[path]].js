@@ -87,7 +87,7 @@ export async function onRequest({request,env}){
    if(note.length<30||note.length>1500)return failure('REVIEW_NOTE_REQUIRED',400);
    const data=cleanPeriodPayload(safeParse(old.draft_json));
    if(!data)return failure('INVALID_DRAFT',409);
-   if(data.isAudited===true&&body.auditEvidenceConfirmed!==true)return failure('AUDIT_EVIDENCE_NOT_CONFIRMED',400);
+   if(data.isAudited===true)return failure('INDEPENDENT_AUDIT_EVIDENCE_MODULE_NOT_READY',409);
    const updated=await db.prepare(`UPDATE hhba_fin_reports SET status=?,reviewed_json=draft_json,
      reviewed_by=?,review_note=?,reviewed_at=?,updated_at=?
      WHERE period=? AND revision=? AND draft_json=?`)
