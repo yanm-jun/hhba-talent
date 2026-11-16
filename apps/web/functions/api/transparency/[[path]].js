@@ -1,12 +1,13 @@
 import {
  json,failure,financeDb,validPeriod,publicReport,normalizeEmail,randomToken,sha256,
- safeOrigin,readJson,checkTurnstile,deliverEmail,publicUrl,htmlEsc,fromAddress
+ safeOrigin,readJson,checkTurnstile,deliverEmail,publicUrl,htmlEsc,fromAddress,unsubscribeToken
 } from '../../_lib/transparency.js';
 
 const noStoreHeaders={'Cache-Control':'no-store, private','Referrer-Policy':'no-referrer'};
 const subscribeReady=env=>String(env.HHBA_FIN_SUBSCRIPTIONS_ENABLED||'')==='1'&&
  !!financeDb(env)&&!!env.HHBA_FIN_TURNSTILE_SECRET&&
- !!env.HHBA_FIN_TURNSTILE_SITE_KEY&&!!env.RESEND_API_KEY&&!!fromAddress(env);
+ !!env.HHBA_FIN_TURNSTILE_SITE_KEY&&!!env.RESEND_API_KEY&&!!fromAddress(env)&&
+ String(env.HHBA_FIN_UNSUBSCRIBE_SECRET||'').length>=32;
 const sqlFail=()=>failure('TRANSPARENCY_STORAGE_NOT_READY',503);
 const actionPath=request=>new URL(request.url).pathname.replace(/\/+$/,'');
 const days=(n)=>new Date(Date.now()+n*86400000).toISOString();
@@ -61,7 +62,9 @@ export async function onRequest({request,env}){
   try{
    const previous=await db.prepare('SELECT status,last_verification_sent_at FROM hhba_fin_subscribers WHERE email_hash=?').bind(hash).first();
    if(previous?.status==='verified'||previous?.last_verification_sent_at&&Date.now()-Date.parse(previous.last_verification_sent_at)<86400000)return json(generic);
-   const token=randomToken(),tokenHash=await sha256(token),unsubscribeHash=await sha256(randomToken());
+   const token=randomToken(),tokenHash=await sha256(token),unsubscribeRaw=await unsubscribeToken(env,hash);
+   if(!unsubscribeRaw)return failure('SUBSCRIPTIONS_NOT_OPEN',503);
+   const unsubscribeHash=await sha256(unsubscribeRaw);
    await db.prepare(`INSERT INTO hhba_fin_subscribers(email_hash,email,status,verify_token_hash,verify_expires_at,unsubscribe_token_hash,last_verification_sent_at,consent_version,consent_at,created_at,updated_at)
     VALUES(?,?,'pending',?,?,?,?,? ,?,?,?)
     ON CONFLICT(email_hash) DO UPDATE SET email=excluded.email,status='pending',verify_token_hash=excluded.verify_token_hash,verify_expires_at=excluded.verify_expires_at,
