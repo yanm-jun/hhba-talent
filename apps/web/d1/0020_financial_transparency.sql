@@ -70,3 +70,14 @@ CREATE TABLE IF NOT EXISTS hhba_fin_deliveries(
  PRIMARY KEY(period,email_hash)
 );
 CREATE INDEX IF NOT EXISTS hhba_fin_delivery_queue_idx ON hhba_fin_deliveries(period,status,updated_at);
+
+-- Public report history and internal audit records are append-only.
+-- Corrections create a new numbered version, never rewrite the original release.
+CREATE TRIGGER IF NOT EXISTS hhba_fin_revisions_no_update
+ BEFORE UPDATE ON hhba_fin_publication_revisions BEGIN SELECT RAISE(ABORT,'IMMUTABLE_PUBLICATION_HISTORY'); END;
+CREATE TRIGGER IF NOT EXISTS hhba_fin_revisions_no_delete
+ BEFORE DELETE ON hhba_fin_publication_revisions BEGIN SELECT RAISE(ABORT,'IMMUTABLE_PUBLICATION_HISTORY'); END;
+CREATE TRIGGER IF NOT EXISTS hhba_fin_audit_no_update
+ BEFORE UPDATE ON hhba_fin_audit BEGIN SELECT RAISE(ABORT,'IMMUTABLE_FINANCE_AUDIT'); END;
+CREATE TRIGGER IF NOT EXISTS hhba_fin_audit_no_delete
+ BEFORE DELETE ON hhba_fin_audit BEGIN SELECT RAISE(ABORT,'IMMUTABLE_FINANCE_AUDIT'); END;
