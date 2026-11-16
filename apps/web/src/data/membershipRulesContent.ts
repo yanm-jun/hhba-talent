@@ -40,7 +40,7 @@ export const chapters:RuleChapter[]=[
  '具体发票开具主体、类型、申请入口和操作流程尚待经营主体及财税方案确定后公布。'
  ],attention:'pending'},
  {heading:'2.3 自动续费必须单独决定',paragraphs:[
- '本版规划只考虑按月手动购买或续费，不默认授权银行卡、微信、支付宝等渠道的连续扣费。用户不主动支付下一期费用，平台不得自行发起续费扣款；这不影响已经支付月份的合同履行。未来如添加自动续费，必须另设独立、默认未勾选的明确授权，在接受服务前和每次自动续费日前至少五日（法律适用时）显著提醒，并提供显著、便捷的随时取消与变更渠道。',
+ '本版规划只考虑按月手动购买或续费，不默认授权银行卡、微信、支付宝等渠道的连续扣费。用户不主动支付下一期费用，平台不得自行发起续费扣款；这不影响已经支付月份的合同履行。未来如添加自动续费，必须另设独立、默认未勾选的明确授权，在用户接受服务前和每次自动续费日期前以显著方式提醒；如平台另外承诺提前5日提醒，应当如约执行该更严格的内部服务标准，并提供显著、便捷的随时取消与变更渠道。',
  '未经有效授权，不得仅凭访问本页、注册账号或勾选非必需选项扣款；任何价格调整均需依法提前告知，并明确原订单的适用规则。'
  ],attention:'critical'}
 ]},
@@ -273,7 +273,7 @@ export const legalSources=[
  {title:'《中华人民共和国民法典》格式条款（第496—498条）',url:'https://www.cac.gov.cn/2020-06/01/c_15925617772683192.htm'},
  {title:'最高人民法院《合同编通则若干问题的解释》第10条',url:'https://www.court.gov.cn/zixun/xiangqing/419382.html'},
  {title:'《消费者权益保护法实施条例》（第10、22、23条）',url:'https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2024/art_0aea188276a44f0baf940ab95ee00e0a.html'},
- {title:'《网络交易监督管理办法》（第18、21条）',url:'https://www.samr.gov.cn/wljys/gzzd/art/2023/art_09c394cce74f424a8d82dbc4811a11ec.html'},
+ {title:'《网络交易监督管理办法》（第18、21条）',url:'https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/fgs/art/2025/art_4b47c79b8d994a42bba4835997688faa.html'},
  {title:'最高法《预付式消费民事纠纷司法解释》',url:'https://www.court.gov.cn/zixun/xiangqing/459321.html'},
  {title:'《中华人民共和国个人信息保护法》',url:'https://www.miit.gov.cn/jgsj/zfs/fl/art/2022/art_515a4b20c12f430eab54bb4f56d89f56.html'},
  {title:'《网络数据安全管理条例》',url:'https://sdca.miit.gov.cn/zwgk/fgbz/art/2026/art_b6f63ba618e042069a14d1253dbf79e3.html'},
