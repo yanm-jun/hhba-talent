@@ -130,10 +130,10 @@ export function HomeWorkplacePromise(){
     <div><Scale size={15} aria-hidden="true"/><span>以{distribution.basis}为基数，不按营业流水分配。</span></div>
     <span className="hhba-home-report-status">{distribution.reportStatus==='not_published'?'首期财务报告尚未发布':'财务报告已发布'}</span>
    </div>
-   <details className="hhba-home-report-details">
-    <summary>查看分配制度说明</summary>
-    <p>{distribution.reportNotice}</p>
-   </details>
+   <Link className="hhba-home-report-details hhba-home-transparency-link" to="/transparency">
+    <span>查看财务透明中心 · 月度报告与帮扶收支</span>
+    <ArrowRight size={14} aria-hidden="true"/>
+   </Link>
   </aside>
  </section>;
 }
