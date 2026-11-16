@@ -6,7 +6,7 @@ import type {User} from '../services/api';
 import '../styles/transparency-admin.css';
 
 type Row={period:string;status:string;revision:number;reviewedAt?:string|null;publishedAt?:string|null;
- correctionReason?:string|null;draft?:Record<string,string|number|boolean>};
+ correctionReason?:string|null;draft?:Record<string,unknown>;published?:Record<string,unknown>|null};
 type Status={ok:boolean;admin:string;reports:Row[];subscribers:Record<string,number>;deliveries:Record<string,number>;lastTestEmailSentAt:string|null;sendEnabled:boolean;subscriptionsEnabled:boolean};
 const fields=[
  ['营业收入','revenueFen'],['退款及收入冲减','refundFen'],
@@ -110,6 +110,33 @@ export function TransparencyManagePage({user}:{user:User|null}){
   finally{setBusy(false);}
  };
 
+
+ const publishedRow=status?.reports.find(row=>row.status==='published'&&row.published);
+ const publishedSnapshot=publishedRow?.published;
+ // Use only the last explicitly published snapshot. Draft or reviewed amounts are
+ // never treated as confirmed financial results.
+ const asPublishedFen=(key:string)=>{
+  const value=publishedSnapshot?.[key];
+  return typeof value==='number'&&Number.isSafeInteger(value)?value:null;
+ };
+ const money=(value:number|null)=>value===null?'—':new Intl.NumberFormat('zh-CN',{
+  style:'currency',currency:'CNY',minimumFractionDigits:2
+ }).format(value/100);
+ const expenseKeys=['aiCostFen','infrastructureFen','personnelFen','operationsFen','taxesFen','otherCostFen'];
+ const expenseValues=expenseKeys.map(asPublishedFen);
+ const totalExpensesFen=expenseValues.every(value=>value!==null)?
+  expenseValues.reduce<number>((sum,value)=>sum+(value??0),0):null;
+ const overview=[
+  {label:'营业收入',value:money(asPublishedFen('revenueFen')),detail:'未扣退款的营业收入'},
+  {label:'经营费用合计',value:money(totalExpensesFen),detail:'AI、服务器、人员、运营、税费及其他，不含退款与调整项'},
+  {label:'本期经营结果',value:money(asPublishedFen('netResultFen')),detail:'可为亏损，不等同于可分配利润'},
+  {label:'依法确认的可分配利润',value:money(asPublishedFen('distributableProfitFen')),detail:'单独核定，不由月度净利自动推算'},
+  {label:'40%帮扶池计提',value:money(asPublishedFen('poolAccrualFen')),detail:'制度计提，非实际资金划拨'},
+  {label:'帮扶池期末余额',value:money(asPublishedFen('closingPoolFen')),detail:'期初＋实际入池－实际帮扶支出'}
+ ];
+ const draftCount=status?.reports.filter(row=>row.status==='draft').length??0;
+ const reviewCount=status?.reports.filter(row=>row.status==='reviewed').length??0;
+
  return <Shell user={user}>
   <div className="hhba-fin-admin">
    <div className="hhba-fin-admin-crumb"><Link to="/transparency"><ArrowLeft size={14}/>返回公开财务中心</Link></div>
@@ -119,6 +146,30 @@ export function TransparencyManagePage({user}:{user:User|null}){
    {authError?<div className="hhba-fin-admin-locked" role="alert"><ShieldAlert size={20}/><p>{authError}<br/>本页不会提供绕过管理员身份验证的账号密码表单。</p></div>:
     !status?<div className="hhba-fin-admin-locked">正在验证财务后台身份和权限…</div>:
     <>
+     <section className="hhba-fin-admin-overview" aria-labelledby="hhba-fin-admin-overview-title">
+      <div className="hhba-fin-admin-overview-head">
+       <div>
+        <span className="hhba-fin-admin-overview-eyebrow">FINANCIAL OVERVIEW / VERIFIED DISCLOSURE</span>
+        <h2 id="hhba-fin-admin-overview-title">财务总览</h2>
+        <p>{publishedRow?'仅显示 '+publishedRow.period+'（V'+publishedRow.revision+'）已正式发布的月报数据。':'尚无任何已正式发布且核验的月报，以下金额不代表实际为零。'}</p>
+       </div>
+       <span className={'hhba-fin-admin-state'+(publishedRow?' is-published':'')}>
+        {publishedRow?'最近一期已公开':'暂无已发布数据'}
+       </span>
+      </div>
+      <div className="hhba-fin-admin-overview-grid">
+       {overview.map(item=><div className="hhba-fin-admin-overview-metric" key={item.label}>
+        <span>{item.label}</span>
+        <strong>{item.value}</strong>
+        <small>{item.detail}</small>
+       </div>)}
+      </div>
+      <div className="hhba-fin-admin-overview-foot">
+       <p><strong>审核进度：</strong>草稿 {draftCount} 期 · 已审核待公开 {reviewCount} 期 · 已公开 {status.reports.filter(row=>row.status==='published').length} 期</p>
+       <p><strong>邮件状态：</strong>已验证订阅 {status.subscribers.verified||0} 人 · 待发送 {status.deliveries?.pending||0} 封 · 已发出 {status.deliveries?.sent||0} 封 · 失败 {status.deliveries?.failed||0} 封</p>
+      </div>
+      <p className="hhba-fin-admin-overview-note">金额以已发布月报快照为准；私人投资款与营业收入分别核算，帮扶池计提与实际到账严格区分。未披露的草稿不进入财务总览。</p>
+     </section>
      <div className="hhba-fin-admin-cards">
       <div><span>已登录财务管理员</span><strong>{status.admin}</strong></div>
       <div><span>已发布报告</span><strong>{status.reports.filter(r=>r.status==='published').length}</strong></div>
