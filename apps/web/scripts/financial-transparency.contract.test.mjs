@@ -123,7 +123,7 @@ test('responsibility page is three-part, sober and keeps real finance interfaces
  assert.match(page,/¥600,000/);
  assert.match(page,/企业自主披露/);
  assert.match(page,/尚未经独立第三方鉴证/);
- assert.match(page,/不代表获得 ESG 官方认证/);
+ assert.match(page,/不代表任何基金或 ESG 机构的官方认证/);
  assert.match(page,/投资资金与营业收入、可分配利润分别核算/);
  assert.match(page,/个人投资支持/);
  assert.match(page,/INDIVIDUAL BACKING/);
