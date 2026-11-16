@@ -165,7 +165,19 @@
   monthInput.value===todayCN().slice(0,7)?todayCN():monthInput.value+'-01':''});
  byId('finance-form').addEventListener('submit',e=>{void submit(e)});
  byId('finance-export').addEventListener('click',exportCSV);
- window.hhbaFinance={open(){
-  // No automatic KV / D1 reads: operator explicitly chooses a month and clicks Load.
- }};
+ window.hhbaFinance={
+  open(){
+   // No automatic KV / D1 reads: operator explicitly chooses a month and clicks Load.
+  },
+  getLoadedRegister(month){
+   // Same-page, read-only handoff; no background re-query, cross-origin request,
+   // KV mutation or automatic approval of unverified accounting values.
+   if(!validMonth(month)||!data||data.month!==month||monthInput.value!==month||
+    !['owner_entered_unreconciled','no_records_not_zero'].includes(data.quality)||
+    !Array.isArray(data.entries))return null;
+   return {month:data.month,quality:data.quality,eventsCount:data.eventsCount,
+    entries:data.entries.map(e=>({direction:e.direction,category:e.category,
+     amountFen:e.amountFen,voided:e.voided}))};
+  }
+ };
 })();
