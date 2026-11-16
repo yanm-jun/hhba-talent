@@ -3,10 +3,10 @@
 export const VERSION = '2026-11-16-v1';
 const moneyFields=[
   'revenueFen','refundFen','aiCostFen','infrastructureFen','personnelFen',
-  'operationsFen','taxesFen','otherCostFen','netResultFen','distributableProfitFen',
+  'operationsFen','taxesFen','otherCostFen','distributableProfitFen',
   'openingPoolFen','poolReceivedFen','poolSpentFen','closingPoolFen'
 ];
-const extraFields=['adjustmentsFen'];
+const extraFields=['adjustmentsFen','netResultFen'];
 const maxFen=999999999999;
 export const json=(data,status=200)=>new Response(JSON.stringify(data),{
  status,headers:{
