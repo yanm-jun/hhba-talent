@@ -93,7 +93,7 @@ test('front, admin, cron and immutable correction are all wired to same route',(
  const page=read('../src/pages/TransparencyPage.tsx'),admin=read('../src/pages/TransparencyManagePage.tsx');
  const sql=read('../d1/0020_financial_transparency.sql');
  const publish=read('../functions/_lib/transparency-publish.js');
- const cron=read('../../.github/workflows/hhba-finance-monthly-dispatch.yml');
+ const cron=read('../../../.github/workflows/hhba-finance-monthly-dispatch.yml');
  assert.match(main,/if\(route==='\/transparency'\)return <TransparencyPage user=\{user\}\/>/);
  assert.match(main,/if\(route==='\/transparency\/manage'\)return <TransparencyManagePage user=\{user\}\/>/);
  assert.match(shell,/to="\/transparency"/);
