@@ -49,3 +49,26 @@ test('homepage links the approved public plan and preserves the real recruitment
  assert.ok(config.includes('"workerSupportPercent": 40'));
  assert.ok(!home.includes('HomeLiveDrawer'));
 });
+
+test('homepage uses one primary membership card, a light value strip and a subordinate 60/40 pledge',()=>{
+ const component=read('../src/components/HomeWorkplacePromise.tsx');
+ const css=read('../src/styles/home-workplace-promise.css');
+ assert.match(component,/找到好工作，只是开始。/);
+ assert.match(component,/hhba-home-value-strip/);
+ assert.match(component,/hhba-home-membership-card/);
+ assert.match(component,/hhba-home-phase-grid/);
+ assert.match(component,/hhba-home-pledge/);
+ assert.doesNotMatch(component,/hhba-home-business-grid|hhba-home-pillar|hhba-home-distribution-card/);
+ assert.match(component,/membership\.firstStageServices/);
+ assert.match(component,/membership\.rightsStageServices/);
+ assert.match(component,/distribution\.companyPercent/);
+ assert.match(component,/distribution\.workerSupportPercent/);
+ assert.match(component,/membership\.purchaseEnabled/);
+ assert.match(component,/会员服务已开放|暂未开放购买及案件申请/);
+ assert.match(component,/summary>服务资格、范围与开通说明/);
+ assert.match(css,/\.hhba-home-phase-grid\{display:grid;grid-template-columns:/);
+ assert.match(css,/@media\(max-width:680px\)/);
+ assert.match(css,/\.hhba-home-phase-grid\{grid-template-columns:1fr/);
+ assert.match(css,/\.hhba-home-pledge\{display:grid/);
+ assert.match(css,/:focus-visible/);
+});
