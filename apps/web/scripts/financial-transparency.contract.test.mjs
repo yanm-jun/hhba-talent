@@ -10,6 +10,7 @@ import {onRequest as publicApi} from '../functions/api/transparency/[[path]].js'
 import {onRequestPost as dispatchApi,sendNextBatch} from '../functions/api/transparency/dispatch.js';
 import {onRequest as financeAdmin,sendFinanceAdminSmoke} from '../functions/api/transparency/admin/[[path]].js';
 import {publishReviewed} from '../functions/_lib/transparency-publish.js';
+import financeCronWorker from '../ops/finance-cron-worker.mjs';
 const read=(path)=>readFileSync(new URL(path,import.meta.url),'utf8');
 const payload=(patch={})=>({
  period:'2026-10',revenueFen:100000,refundFen:4000,aiCostFen:13000,
@@ -430,4 +431,37 @@ test('finance admin self-only smoke email uses configured Resend, logs success a
  assert.match(adminRoute,/if\(!safeOrigin\(request\)\)/);
  assert.match(adminRoute,/confirmTestEmail!==true/);
  assert.match(read('../src/pages/TransparencyManagePage.tsx'),/向本人邮箱发送一封测试邮件/);
+});
+
+test('Cloudflare cron triggers only on the 21st UTC and never exposes a public HTTP endpoint',async()=>{
+ const priorFetch=globalThis.fetch,originalLog=console.log,originalError=console.error;
+ const calls=[],logs=[];
+ globalThis.fetch=async(url,options)=>{
+  calls.push({url:String(url),authorization:options.headers.Authorization,body:options.body});
+  return new Response(JSON.stringify({ok:true,code:'NO_APPROVED_REPORT_NO_EMAIL',attempted:0}),{
+   status:200,headers:{'Content-Type':'application/json'}
+  });
+ };
+ console.log=(...a)=>logs.push(a);
+ console.error=(...a)=>logs.push(a);
+ try{
+  const urlTest=await financeCronWorker.fetch();
+  assert.equal(urlTest.status,404);
+  const key='mock-test-only-secret-abcdefghijklmnopqrstuvwxyz123456';
+  const event=(ts,cron='*/5 2-15 21 * *')=>({cron,scheduledTime:Date.parse(ts)});
+  await financeCronWorker.scheduled(event('2026-11-20T02:00:00Z'),{HHBA_FIN_DISPATCH_SECRET:key});
+  await financeCronWorker.scheduled(event('2026-11-21T01:55:00Z'),{HHBA_FIN_DISPATCH_SECRET:key});
+  await financeCronWorker.scheduled(event('2026-11-21T02:00:00Z','0 2 21 * *'),{HHBA_FIN_DISPATCH_SECRET:key});
+  await financeCronWorker.scheduled(event('2026-11-21T02:00:00Z'),{HHBA_FIN_DISPATCH_SECRET:''});
+  assert.equal(calls.length,0,'No call may occur outside schedule or without configured secret');
+  await financeCronWorker.scheduled(event('2026-11-21T02:00:00Z'),{HHBA_FIN_DISPATCH_SECRET:key});
+  assert.equal(calls.length,1);
+  assert.equal(calls[0].url,'https://hhba.work/api/transparency/dispatch');
+  assert.equal(calls[0].authorization,'Bearer '+key);
+  assert.equal(calls[0].body,'{}');
+  assert.ok(!JSON.stringify(logs).includes(key),'Never log dispatch bearer tokens');
+  const workflow=read('../../../.github/workflows/hhba-finance-monthly-dispatch.yml');
+  assert.doesNotMatch(workflow,/^\s+schedule:\s*$/m,'GitHub must not run a second automatic scheduler');
+  assert.match(workflow,/workflow_dispatch/);
+ }finally{globalThis.fetch=priorFetch;console.log=originalLog;console.error=originalError;}
 });
