@@ -8,7 +8,8 @@ test('homepage public API exposes the approved service plan without enabling tra
  const body=JSON.parse(read('../src/data/homepagePublicConfig.json'));
  const api=read('../functions/api/public/homepage.js');
  assert.ok(api.includes('import homepagePublicConfig from'));
- assert.ok(api.includes('return json(homepagePublicConfig)'));
+ assert.ok(api.includes('purchaseEnabled:false'));
+ assert.ok(api.includes('return json({'));
  assert.equal(body.schemaVersion,1);
  assert.equal(body.membership.priceCents,1990);
  assert.equal(body.membership.currency,'CNY');
