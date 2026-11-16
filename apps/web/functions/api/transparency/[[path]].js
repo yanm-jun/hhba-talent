@@ -14,6 +14,9 @@ const days=(n)=>new Date(Date.now()+n*86400000).toISOString();
 const renderUnsubscribe=(token)=>new Response(`<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>取消订阅 · HHBA财务透明中心</title></head><body style="background:#f3f8f5;color:#1e3f2b;font:15px/1.8 Arial,sans-serif;max-width:600px;margin:8vh auto;padding:26px"><main style="background:white;border:1px solid #dce9df;border-radius:18px;padding:28px"><h1 style="font-size:24px">取消财务公开邮件订阅</h1><p>此操作仅停止财务报告邮件，不影响您查看公开财务报告，也不影响其他独立服务。</p><form method="POST" action="/api/transparency/unsubscribe"><input type="hidden" name="token" value="${htmlEsc(token)}"><button type="submit" style="border:0;color:white;background:#28714a;padding:10px 22px;border-radius:8px;cursor:pointer">确认退订</button></form><p><a style="color:#28714a" href="/transparency">返回财务透明中心</a></p></main></body></html>`,{
  status:200,headers:{'Content-Type':'text/html; charset=utf-8',...noStoreHeaders,'X-Content-Type-Options':'nosniff'}
 });
+const renderConfirm=(token)=>new Response(`<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>确认订阅 · HHBA财务透明中心</title></head><body style="background:#f3f8f5;color:#1e3f2b;font:15px/1.8 Arial,sans-serif;max-width:600px;margin:8vh auto;padding:26px"><main style="background:white;border:1px solid #dce9df;border-radius:18px;padding:28px"><h1 style="font-size:24px">确认订阅财务公开邮件</h1><p>只有主动点击下方按钮后，才会开始接收 HHBA 财务公开邮件。点击邮件链接不会自动完成订阅。</p><form method="POST" action="/api/transparency/confirm"><input type="hidden" name="token" value="${htmlEsc(token)}"><button type="submit" style="border:0;color:white;background:#28714a;padding:10px 22px;border-radius:8px;cursor:pointer">我确认订阅</button></form><p><a href="/transparency" style="color:#28714a">返回财务透明中心</a></p></main></body></html>`,{
+ status:200,headers:{'Content-Type':'text/html; charset=utf-8',...noStoreHeaders,'X-Content-Type-Options':'nosniff'}
+});
 const donePage=(text)=>new Response(`<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="referrer" content="no-referrer"><title>HHBA 财务透明中心</title></head><body style="font:16px/1.9 Arial,sans-serif;color:#264c34;background:#f4f8f5;padding:60px 12px;text-align:center"><h1>${htmlEsc(text)}</h1><a href="/transparency" style="color:#28714a">返回财务透明中心</a></body></html>`,{status:200,headers:{'Content-Type':'text/html; charset=utf-8',...noStoreHeaders}});
 
 export async function onRequest({request,env}){
@@ -71,7 +74,7 @@ export async function onRequest({request,env}){
      unsubscribe_token_hash=excluded.unsubscribe_token_hash,last_verification_sent_at=excluded.last_verification_sent_at,consent_version=excluded.consent_version,consent_at=excluded.consent_at,updated_at=excluded.updated_at`)
     .bind(hash,email,tokenHash,days(2),unsubscribeHash,now,'transparency-email-v1',now,now,now).run();
    const link=publicUrl(env)+'/api/transparency/confirm?token='+encodeURIComponent(token);
-   const html='<h1>HHBA 财务公开邮件订阅确认</h1><p>您申请订阅每月21日公开的财务报告。请点击以下链接确认邮箱；若非本人申请，请忽略，未确认不会订阅。</p><p><a href="'+htmlEsc(link)+'">确认订阅财务报告</a></p><p>链接48小时内有效。不含招聘营销邮件。</p>';
+   const html='<h1>HHBA 财务公开邮件订阅确认</h1><p>您申请订阅每月21日公开的财务报告。请点击以下链接，并在打开的页面主动确认订阅；若非本人申请，请忽略，未确认不会订阅。</p><p><a href="'+htmlEsc(link)+'">确认订阅财务报告</a></p><p>链接48小时内有效。不含招聘营销邮件。</p>';
    const sent=await deliverEmail(env,{to:email,subject:'请确认 HHBA 财务公开邮件订阅',html,idempotencyKey:'finance-optin-'+tokenHash.slice(0,36)});
    if(!sent.ok)console.error('HHBA_FIN_OPTIN_SEND_FAILED',sent.code);
    return json(generic);
@@ -81,6 +84,20 @@ export async function onRequest({request,env}){
   const token=url.searchParams.get('token');
   if(!/^[a-f0-9]{64}$/.test(token||''))return donePage('确认链接无效或已过期');
   if(!db)return donePage('订阅暂不可用');
+  // Email scanners commonly prefetch GET links. Rendering is read-only.
+  return renderConfirm(token);
+ }
+ if(request.method==='POST'&&path==='/api/transparency/confirm'){
+  if(!db)return donePage('订阅暂不可用');
+  if(!safeOrigin(request))return failure('ORIGIN_NOT_ALLOWED',403);
+  if(!(request.headers.get('Content-Type')||'').includes('application/x-www-form-urlencoded'))
+   return failure('INVALID_CONFIRMATION_FORM',400);
+  let token='';
+  try{
+   const form=await request.formData();
+   token=String(form.get('token')||'');
+  }catch{return failure('INVALID_CONFIRMATION_FORM',400);}
+  if(!/^[a-f0-9]{64}$/.test(token))return donePage('确认链接无效或已过期');
   try{
    const digest=await sha256(token),now=new Date().toISOString();
    const result=await db.prepare("UPDATE hhba_fin_subscribers SET status='verified',verified_at=?,verify_token_hash=NULL,verify_expires_at=NULL,updated_at=? WHERE verify_token_hash=? AND status='pending' AND verify_expires_at>?").bind(now,now,digest,now).run();
