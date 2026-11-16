@@ -20,7 +20,7 @@ function reportEmail({report,unsubscribe,link}){
  const u=htmlEsc(unsubscribe),r=htmlEsc(link),period=htmlEsc(report.period);
  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"></head><body style="margin:0;background:#f1f7f3;padding:28px 12px;font:14px/1.8 Arial,Microsoft YaHei,sans-serif;color:#25432f"><div style="max-width:620px;margin:auto;padding:30px;background:white;border:1px solid #dce9df;border-radius:16px"><div style="font-weight:bold;color:#2e7750">HHBA · 财务透明中心</div><h1 style="font-size:24px"> ${period}月度财务公开报告 </h1><p>这份报告已在 HHBA 公开发布。您收到本邮件是因为此前自主验证了订阅邮箱。</p><p>本期营业收入：<strong>${htmlEsc(money(report.revenueFen))}</strong><br>月度经营结果：<strong>${htmlEsc(money(report.netResultFen))}</strong><br>本期依法确认的可分配利润基数：<strong>${htmlEsc(money(report.distributableProfitFen))}</strong><br>劳动者权益帮扶池本期计提：<strong>${htmlEsc(money(report.poolAccrualFen))}</strong><br>帮扶池期末结余：<strong>${htmlEsc(money(report.closingPoolFen))}</strong></p><p><a href="${r}" style="background:#267247;color:white;border-radius:7px;text-decoration:none;display:inline-block;padding:9px 17px">查看完整报告及计算说明</a></p><hr style="border:0;border-top:1px solid #dce9df"><p style="font-size:12px;color:#728276">60/40分配是依法核算后的可分配利润原则，不是营业流水分成。报告是否审计以文内标识为准。本邮件不包含招募营销。</p><p style="font-size:12px"><a href="${u}" style="color:#377858">不想再收到这类财务公开邮件？点此取消订阅</a></p></div></body></html>`;
 }
-async function sendNextBatch(db,env,period,report){
+export async function sendNextBatch(db,env,period,report){
  const now=new Date().toISOString();
  const unsubSecret=String(env.HHBA_FIN_UNSUBSCRIBE_SECRET||'');
  if(unsubSecret.length<32)return {attempted:0,sent:0,failed:0};
@@ -84,6 +84,10 @@ export async function onRequestPost({request,env}){
   let row=await db.prepare('SELECT * FROM hhba_fin_reports WHERE period=?').bind(period).first();
   if(!row)return json({ok:true,code:'NO_APPROVED_REPORT_NO_EMAIL',period,attempted:0});
   if(row.status==='reviewed'&&row.reviewed_json){
+   // A finance review is not itself consent to public disclosure. Without an
+   // explicitly enabled automatic-release policy, only a human can publish.
+   if(String(env.HHBA_FIN_AUTO_PUBLISH_ENABLED||'')!=='1')
+    return json({ok:true,code:'REVIEWED_PENDING_MANUAL_PUBLICATION_NO_EMAIL',period,attempted:0});
    const published=await publishReviewed(db,{period,actor:'scheduled-dispatch'});
    if(!published.ok)return failure(published.code,409);
   }

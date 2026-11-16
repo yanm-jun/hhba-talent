@@ -94,12 +94,15 @@ export async function onRequest({request,env}){
  }
  if(request.method==='POST'&&path==='/api/transparency/unsubscribe'){
   if(!db)return donePage('退订暂不可用');
-  let token='';
+  // RFC 8058 one-click POST carries List-Unsubscribe=One-Click in the body;
+  // the signed unsubscribe token remains in the URL query parameter.
+  // Keep the same path working for the interactive confirmation form.
+  let token=String(url.searchParams.get('token')||'');
   const type=request.headers.get('Content-Type')||'';
   if(type.includes('application/x-www-form-urlencoded')){
-   const body=await request.formData();token=String(body.get('token')||'');
+   const body=await request.formData();token=String(body.get('token')||token);
   }else if(type.includes('application/json')){
-   const body=await readJson(request,1500);token=String(body?.token||'');
+   const body=await readJson(request,1500);token=String(body?.token||token);
   }
   if(!/^[a-f0-9]{64}$/.test(token))return donePage('退订链接无效');
   try{
