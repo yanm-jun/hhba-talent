@@ -30,3 +30,7 @@
 .hhba-freport-caution{padding:10px 12px;border:1px solid #eee2cb;background:#fffcf5;border-radius:8px;color:#8b724d!important}
 @media(max-width:960px){.hhba-freport-layout{grid-template-columns:1fr}.hhba-freport-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:550px){.hhba-freport-heading{flex-direction:column}.hhba-freport-fields,.hhba-freport-calculated,.hhba-freport-kpis{grid-template-columns:1fr}.hhba-freport-kpis strong{font-size:18px}}
+
+.hhba-freport-source{background:#f4f9fd;border:1px solid #d9e8f6;border-radius:10px;padding:13px 15px;margin:13px 0}
+.hhba-freport-source p{margin:0 0 11px;color:#3f607e;font-size:12px;line-height:1.8}
+.hhba-freport-source button{white-space:normal;text-align:center}
