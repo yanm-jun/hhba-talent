@@ -3,6 +3,7 @@ import {Shell} from '../components/Shell';
 import {Link} from '../router';
 import type {User} from '../services/api';
 import {chapters,faq,legalSources,RULE_STATUS,RULE_UPDATED,RULE_VERSION} from '../data/membershipRulesContent';
+import {complianceAreas,launchChecks,membershipLaunchState} from '../data/membershipCompliance';
 import '../styles/membership-rules.css';
 
 const padNumber=(index:number)=>String(index+1).padStart(2,'0');
@@ -39,6 +40,24 @@ export function MembershipRulesPage({user}:{user:User|null}){
     </div>
    </section>
 
+   <section className="hhba-rules-compliance" id="rules-compliance" aria-labelledby="rules-compliance-title">
+    <div className="hhba-rules-compliance-head">
+     <span>COMPLIANCE SAFEGUARDS · 先合规，再收费</span>
+     <h2 id="rules-compliance-title">四项关键合规规则，分别公开</h2>
+     <p>以下说明用于明确当前保护措施与开售前必须完成的工作。它们不表示监管许可、律师合作或个人信息合规审核已经通过。</p>
+    </div>
+    <div className="hhba-rules-compliance-grid">
+     {complianceAreas.map((area,index)=><section className="hhba-rules-compliance-card" key={area.id} aria-labelledby={'compliance-'+area.id}>
+      <span className="hhba-rules-control-num">0{index+1}</span>
+      <h3 id={'compliance-'+area.id}>{area.title}</h3>
+      <p><strong>当前已采取的限制：</strong>{area.now}</p>
+      <p><strong>开售前必须落实：</strong>{area.required}</p>
+      <small>{area.basis}</small>
+     </section>)}
+    </div>
+    <p className="hhba-rules-blocked-status">会员开售状态：{membershipLaunchState.status==='blocked'?'禁止收款 · 未通过上线核验':'待确认'}。自动续费、预存套餐和案件证据接收均未开放。</p>
+   </section>
+
    <div className="hhba-rules-snapshot" aria-label="已确定的公开规划">
     <div><span>拟议月费</span><strong>¥19.90</strong><small>/ 月 · 尚未收费</small></div>
     <div><span>进阶资格方向</span><strong>连续 6 期</strong><small>具体起算规则待确定</small></div>
@@ -56,6 +75,8 @@ export function MembershipRulesPage({user}:{user:User|null}){
        </li>)}
       </ol>
       <div className="hhba-rules-nav-extra">
+       <a href="#rules-compliance">四项合规防线</a>
+       <a href="#rules-launch">开售前核验清单</a>
        <a href="#rules-faq">常见问题</a>
        <a href="#rules-sources">法规依据</a>
        <a href="#rules-versions">版本与适用说明</a>
@@ -79,6 +100,20 @@ export function MembershipRulesPage({user}:{user:User|null}){
        {clause.paragraphs.map((paragraph,j)=><p key={j}>{paragraph}</p>)}
       </div>)}
      </section>)}
+     <section className="hhba-rules-chapter" id="rules-launch" aria-labelledby="rules-launch-heading">
+      <div className="hhba-rules-chapter-heading">
+       <span>LAUNCH READINESS · 12 REQUIRED CHECKS</span>
+       <h2 id="rules-launch-heading">正式收费前的合规核验清单</h2>
+       <p>以下事项尚未全部完成可验证验收，不能通过发布网页或用户勾选代替。任何一项未完成时，会员购买与劳动争议案件上传必须保持关闭。</p>
+      </div>
+      <ol className="hhba-rules-launch-checks">
+       {launchChecks.map((check,index)=><li key={check.id}>
+        <div className="hhba-rules-check-index">{padNumber(index)}</div>
+        <div><h3>{check.label}</h3><p>{check.detail}</p><small>需提供核验证据的责任方：{check.owner}</small></div>
+        <span className="hhba-rules-unverified">待核验</span>
+       </li>)}
+      </ol>
+     </section>
      <section className="hhba-rules-chapter" id="rules-faq" aria-labelledby="rules-faq-heading">
       <div className="hhba-rules-chapter-heading">
        <span>QUESTIONS & ANSWERS</span><h2 id="rules-faq-heading">常见问题与具体情形</h2>
