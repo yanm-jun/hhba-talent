@@ -270,12 +270,13 @@ export const faq=[
 ];
 
 export const legalSources=[
- {title:'《中华人民共和国民法典》格式条款规定（第496—498条）',url:'https://tjca.miit.gov.cn/zwgk/zcwj/flfg/art/2020/art_20cf1a2e1b854924b5caa744c8045d1f.html1'},
- {title:'《消费者权益保护法实施条例》（第10、12、22条）',url:'https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2024/art_0aea188276a44f0baf940ab95ee00e0a.html'},
- {title:'《中华人民共和国律师法》（2026修正）',url:'https://policy.mofcom.gov.cn/claw/clawContent.shtml?id=107061'},
- {title:'《中华人民共和国保险法》',url:'https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_4c715a53f3d4402c89f62ae77809f638.html'},
- {title:'《中华人民共和国劳动争议调解仲裁法》',url:'https://www.mohrss.gov.cn/SYrlzyhshbzb/ztzl/ldrszytjzc/fgzc/202207/t20220714_457857.html?eqid=bc938ef200175ff90000000264472f66'},
- {title:'《中华人民共和国个人信息保护法》',url:'https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_f374e8245320413181742e6d1baf4366.html'},
- {title:'《中华人民共和国法律援助法》',url:'https://www.moj.gov.cn/pub/sfbgw/zwfw/zwfwbszn/bsznflyz/202112/t20211228_445092.html'},
- {title:'《人力资源服务机构管理规定》',url:'https://www.beijing.gov.cn/zhengce/zhengcefagui/qtwj/202307/t20230714_3162832.html'}
+ {title:'《中华人民共和国民法典》格式条款（第496—498条）',url:'https://www.cac.gov.cn/2020-06/01/c_15925617772683192.htm'},
+ {title:'最高人民法院《合同编通则若干问题的解释》第10条',url:'https://www.court.gov.cn/zixun/xiangqing/419382.html'},
+ {title:'《消费者权益保护法实施条例》（第10、22、23条）',url:'https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2024/art_0aea188276a44f0baf940ab95ee00e0a.html'},
+ {title:'《网络交易监督管理办法》（第18、21条）',url:'https://www.samr.gov.cn/wljys/gzzd/art/2023/art_09c394cce74f424a8d82dbc4811a11ec.html'},
+ {title:'最高法《预付式消费民事纠纷司法解释》',url:'https://www.court.gov.cn/zixun/xiangqing/459321.html'},
+ {title:'《中华人民共和国个人信息保护法》',url:'https://www.miit.gov.cn/jgsj/zfs/fl/art/2022/art_515a4b20c12f430eab54bb4f56d89f56.html'},
+ {title:'《网络数据安全管理条例》',url:'https://sdca.miit.gov.cn/zwgk/fgbz/art/2026/art_b6f63ba618e042069a14d1253dbf79e3.html'},
+ {title:'《个人信息保护合规审计管理办法》',url:'https://www.cac.gov.cn/2025-02/14/c_1741233507681519.htm'},
+ {title:'《中华人民共和国律师法》（2026修正）',url:'https://policy.mofcom.gov.cn/claw/clawContent.shtml?id=107061'}
 ];
