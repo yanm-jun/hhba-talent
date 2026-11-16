@@ -8,6 +8,10 @@ import '../styles/transparency-admin.css';
 type Row={period:string;status:string;revision:number;reviewedAt?:string|null;publishedAt?:string|null;
  correctionReason?:string|null;draft?:Record<string,unknown>;published?:Record<string,unknown>|null};
 type Status={ok:boolean;admin:string;reports:Row[];subscribers:Record<string,number>;deliveries:Record<string,number>;lastTestEmailSentAt:string|null;sendEnabled:boolean;subscriptionsEnabled:boolean};
+type CostEntry={id:string;day:string;direction:'income'|'expense';category:string;amountFen:number;evidenceRef:string;voided:boolean};
+type CostRegister={ok:boolean;kind:string;month:string;quality:string;totals:{incomeFen:number;expenseFen:number;netFen:number}|null;eventsCount:number;recordedCount:number;voidedCount:number;byCategory:Record<string,number>;entries:CostEntry[];caution:string};
+const costCategoryLabels:Record<string,string>={cloudflare:'Cloudflare',deepseek:'DeepSeek / AI',domain:'域名',email:'邮件服务',infrastructure:'服务器与存储',operations:'日常运营',customer:'客户收入',other:'其他'};
+
 const fields=[
  ['营业收入','revenueFen'],['退款及收入冲减','refundFen'],
  ['AI模型调用费用','aiCostFen'],['服务器与存储成本','infrastructureFen'],
@@ -39,6 +43,11 @@ export function TransparencyManagePage({user}:{user:User|null}){
  const [notes,setNotes]=useState({basisNote:'',methodNote:'',poolNote:'',privacyReviewNote:''});
  const [reviewNote,setReviewNote]=useState('');
  const [correctionReason,setCorrectionReason]=useState('');
+ const [costMonth,setCostMonth]=useState('');
+ const [costSnapshot,setCostSnapshot]=useState<CostRegister|null>(null);
+ const [costError,setCostError]=useState('');
+ const [costBusy,setCostBusy]=useState(false);
+
 
  const [confirmations,setConfirmations]=useState({ledgerReconciled:false,privacyReviewed:false,legalDistributionBasisChecked:false,noFabricationAttested:false,auditEvidenceConfirmed:false});
  const [currentRow,setCurrentRow]=useState<Row|null>(null);
@@ -54,6 +63,20 @@ export function TransparencyManagePage({user}:{user:User|null}){
  };
  useEffect(()=>{void refresh();},[]);
 
+ const loadCostRegister=async()=>{
+  if(costBusy)return;
+  if(!/^20\\d{2}-(0[1-9]|1[0-2])$/.test(costMonth)){setCostError('请选择有效的登记月份');return;}
+  setCostBusy(true);setCostError('');setCostSnapshot(null);
+  try{
+   const r=await fetch(endpoint('/register?month='+encodeURIComponent(costMonth)),{cache:'no-store'});
+   const data=await r.json() as CostRegister&{code?:string};
+   if(!r.ok||!data.ok)throw Error(data.code||'PRIVATE_REGISTER_UNAVAILABLE');
+   if(data.kind!=='HHBA_PRIVATE_FINANCE_REGISTER_V1'||data.month!==costMonth||!Array.isArray(data.entries))
+    throw Error('PRIVATE_REGISTER_DATA_INVALID');
+   setCostSnapshot(data);
+  }catch(e){setCostError('旧后台登记簿暂不能读取：'+(e instanceof Error?e.message:'未知错误'));}
+  finally{setCostBusy(false);}
+ };
  const load=(row:Row)=>{
   setCurrentRow(row);setPeriod(row.period);
   setAmounts(Object.fromEntries(fields.map(([,key])=>[key,fmtFen(row.draft?.[key])])));
@@ -178,6 +201,38 @@ export function TransparencyManagePage({user}:{user:User|null}){
       <div><span>月报邮件已发送</span><strong>{status.deliveries?.sent||0}</strong></div>
       <div><span>月报邮件发送失败</span><strong>{status.deliveries?.failed||0}</strong></div>
      </div>
+     <section className="hhba-fin-admin-cost-source" aria-labelledby="finance-cost-source-title">
+      <div className="hhba-fin-admin-cost-source-heading">
+       <div>
+        <span className="hhba-fin-admin-overview-eyebrow">ADMIN.HHBA.WORK / EVIDENCE REGISTER</span>
+        <h2 id="finance-cost-source-title">旧后台成本登记簿 · 只读核对</h2>
+       </div>
+       <a href="https://admin.hhba.work/" target="_blank" rel="noopener noreferrer">打开原登记后台</a>
+      </div>
+      <p className="hhba-fin-admin-help">读取 admin.hhba.work 已有的 Cloudflare KV 凭证记录，自动识别冲销；不另存一份、不修改源账簿。该登记簿尚未自动完成银行、发票或供应商账单对账，不能直接作为正式月报发布依据。</p>
+      <div className="hhba-fin-admin-cost-controls">
+       <label>登记月份 <input type="month" value={costMonth} onChange={e=>{setCostMonth(e.target.value);setCostSnapshot(null);setCostError('');}}/></label>
+       <button type="button" disabled={costBusy||!costMonth} onClick={()=>void loadCostRegister()}>{costBusy?'读取中…':'读取原有成本登记簿'}</button>
+      </div>
+      {costError&&<p className="hhba-fin-admin-cost-error" role="alert">{costError}</p>}
+      {costSnapshot&&<div className="hhba-fin-admin-cost-result">
+       {costSnapshot.totals?<div className="hhba-fin-admin-cost-totals">
+        <div><span>本月登记收入</span><strong>{money(costSnapshot.totals.incomeFen)}</strong></div>
+        <div><span>本月登记支出</span><strong>{money(costSnapshot.totals.expenseFen)}</strong></div>
+        <div><span>登记差额（非净利润）</span><strong>{money(costSnapshot.totals.netFen)}</strong></div>
+       </div>:<p className="hhba-fin-admin-cost-empty">该月未发现已保存的凭证登记，不能据此推断营业收入或成本为零。</p>}
+       <p className="hhba-fin-admin-help">登记事件 {costSnapshot.eventsCount} 条，其中冲销 {costSnapshot.voidedCount} 条。以下均为待核对来源数据，草稿及公开月报不会被自动修改。</p>
+       {costSnapshot.entries.length>0&&<div className="hhba-fin-admin-cost-table-wrap"><table className="hhba-fin-admin-cost-table">
+        <thead><tr><th>日期</th><th>方向</th><th>类别</th><th>金额</th><th>凭证引用</th><th>状态</th></tr></thead>
+        <tbody>{costSnapshot.entries.map(entry=><tr key={entry.id}>
+         <td>{entry.day}</td><td>{entry.direction==='income'?'收入':'支出'}</td>
+         <td>{costCategoryLabels[entry.category]||'未知'}</td><td>{money(entry.amountFen)}</td>
+         <td>{entry.evidenceRef}</td><td>{entry.voided?'已冲销':'待对账'}</td>
+        </tr>)}</tbody>
+       </table></div>}
+       <p className="hhba-fin-admin-overview-note">只读来源：旧管理站「财务成本」模块。请用实际凭证与财务账簿核对后再录入、审核、发布正式月报。原后台成本分类与新月报会计科目不完全相同，不能机械自动换算。</p>
+      </div>}
+     </section>
      <section className="hhba-fin-admin-review" aria-labelledby="finance-mail-smoke-title" style={{marginBottom:24}}>
       <h2 id="finance-mail-smoke-title">邮件通道验收</h2>
       <p className="hhba-fin-admin-help">仅向当前财务管理员本人发送一封测试邮件，不会公开财报、收集订阅或启动群发。每个管理员每 6 小时最多发起一次；真实到达情况需要在收件箱确认。</p>

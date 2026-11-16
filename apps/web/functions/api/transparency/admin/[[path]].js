@@ -4,6 +4,7 @@ import {
  priorMonth,safeParse,publicReport,deliverEmail,fromAddress,sha256
 } from '../../../_lib/transparency.js';
 import {publishReviewed} from '../../../_lib/transparency-publish.js';
+import {readPrivateRegister} from '../../../_lib/finance-register.js';
 
 const pathOf=request=>new URL(request.url).pathname.replace(/\/+$/,'');
 const timestamp=()=>new Date().toISOString();
@@ -48,6 +49,12 @@ export async function onRequest({request,env}){
  const path=pathOf(request),now=timestamp();
  if(request.method==='GET'){
   try{
+   if(path==='/api/transparency/admin/register'){
+    const month=new URL(request.url).searchParams.get('month');
+    if(!validPeriod(month))return failure('INVALID_REGISTER_MONTH',400);
+    const snapshot=await readPrivateRegister(env.HHBA_FIN_REGISTER_KV,month);
+    return snapshot.ok?json(snapshot):failure(snapshot.code,503);
+   }
    if(path==='/api/transparency/admin/status'){
     const rows=await db.prepare('SELECT * FROM hhba_fin_reports ORDER BY period DESC LIMIT 36').all();
     const counts=await db.prepare("SELECT status,COUNT(*) AS n FROM hhba_fin_subscribers GROUP BY status").all();
