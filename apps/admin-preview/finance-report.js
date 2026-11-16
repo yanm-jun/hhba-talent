@@ -52,6 +52,10 @@
    <section class="hhba-freport-editor" aria-label="月报录入和审核">
     <h3>月报草稿与审核</h3>
     <label>报告月份（YYYY-MM）<input id="freport-period" type="month" value="${defaultPeriod}" required></label>
+    <div class="hhba-freport-source">
+     <p><strong>已有成本无需重复登记。</strong>先在本页上方「财务成本」读取相同月份的凭证登记簿，再按需带入未填写的费用参考。来源金额未经对账确认，不会自动保存、审核或公开。</p>
+     <button class="button-outline" type="button" id="freport-prefill-expenses">从已读取的登记簿带入费用参考</button>
+    </div>
     <p>全部金额以人民币元填写，系统转换为整数分。未发生的真实项目可填写 0，但不能用模拟金额代替凭证。</p>
     <div class="hhba-freport-fields">
      ${fields.map(([label,key])=>`<label>${label}<input data-fin-key="${key}"${valAttr}></label>`).join('')}
@@ -102,6 +106,44 @@
   by('freport-net').textContent=currency(net);
   by('freport-pool').textContent=currency(pool);
   return {nums,net};
+ }
+ function prefillExpenses(){
+  const month=by('freport-period').value;
+  if(!/^20\\d{2}-(?:0[1-9]|1[0-2])$/.test(month)||month>lastClosedMonth()){
+   tell('请选择已结束、需要核对的正确月份。');return;
+  }
+  if(current&&current.period===month&&current.status!=='draft'){
+   tell('审核或公开中的月报不能直接带入费用；请先按合法修订流程处理。');return;
+  }
+  const source=window.hhbaFinance?.getLoadedRegister?.(month);
+  if(!source||source.month!==month||source.quality!=='owner_entered_unreconciled'||
+   !Array.isArray(source.entries)||source.entries.length>50){
+   tell('请先在上方「财务成本」点击读取相同月份的真实凭证登记簿。空账簿不能当作零费用。');return;
+  }
+  const categories={deepseek:'aiCostFen',cloudflare:'infrastructureFen',
+   domain:'infrastructureFen',infrastructure:'infrastructureFen',
+   email:'operationsFen',operations:'operationsFen'};
+  const suggested={};
+  for(const entry of source.entries){
+   if(entry.voided||entry.direction!=='expense')continue;
+   const field=Object.hasOwn(categories,entry.category)?categories[entry.category]:null;
+   if(!field)continue; // other / income / taxes are not deterministically categorized.
+   if(!Number.isSafeInteger(entry.amountFen)||entry.amountFen<=0||
+    entry.amountFen>1_000_000_000){tell('登记金额格式不合法，已停止带入。');return;}
+   suggested[field]=(suggested[field]||0)+entry.amountFen;
+   if(!Number.isSafeInteger(suggested[field])){tell('登记金额溢出，已停止带入。');return;}
+  }
+  const blank=Object.entries(suggested).filter(([key])=>{
+   const node=root.querySelector('[data-fin-key="'+key+'"]');
+   return node&&!String(node.value||'').trim();
+  });
+  if(!blank.length){tell('没有可带入的空白费用科目；已有金额不会覆盖，其他类别需要人工核对。');return;}
+  if(!window.confirm('只将相同月份已登记、未冲销的费用参考填入空白字段。不会自动保存、审核或公开；仍须核对原始凭证。继续？'))return;
+  for(const [key,value] of blank){
+   root.querySelector('[data-fin-key="'+key+'"]').value=intoYuan(value);
+  }
+  recalc();
+  tell('已带入 '+blank.length+' 项待核对费用参考（尚未保存）。请核对银行及供应商凭证、会计期间、其他费用、税款、退款及利润后再保存月报草稿。');
  }
  function payload(){
   const period=by('freport-period').value;
@@ -212,6 +254,7 @@
   finally{busy=false;root.querySelectorAll('button').forEach(b=>b.disabled=false);}
   await refresh();
  }
+ by('freport-prefill-expenses').addEventListener('click',prefillExpenses);
  by('freport-reload').addEventListener('click',()=>void refresh());
  by('freport-new').addEventListener('click',()=>{hydrate(null);by('freport-period').value=lastClosedMonth();});
  by('freport-save').addEventListener('click',()=>void act(current?.status==='published'?'correction':'draft'));
