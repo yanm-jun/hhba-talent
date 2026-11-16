@@ -34,7 +34,7 @@ export function HomePage({user}:{user:User|null}){
    <button type="button" className="hhba-letter-revisit" onClick={()=>window.dispatchEvent(new Event('hhba:open-letter'))}><span aria-hidden="true">✉</span> 读一封来自 HHBA 的信</button>
   </section>
   <section className="entry-grid hhba-public-entry-grid hhba-home-entry-grid" aria-label="选择使用入口">
-   <EntryCard kind="candidate" title="我要找工作" candidateSignedIn={Boolean(user?.account_types?.includes('candidate'))}
+   <EntryCard kind="candidate" title="我要应聘" candidateSignedIn={Boolean(user?.account_types?.includes('candidate'))}
     body="上传或使用已保存简历，让 AI 理解你的经历，寻找真实企业的官方招聘岗位。"
     footer={user?.account_types?.includes('candidate')?'上传简历 · AI 智能匹配':'登录 / 注册后开始智能匹配'}/>
    <EntryCard kind="rights" title="劳动权益支持"
