@@ -292,3 +292,94 @@ test('isolated SQLite finance lifecycle preserves first publication, corrections
   assert.equal(JSON.parse(firstHistory.published_json).methodNote,original.methodNote);
  }finally{sqlite.close();}
 });
+
+test('isolated opt-in flow requires Turnstile, email confirmation and honors one-click unsubscribe',async()=>{
+ const sqlite=new DatabaseSync(':memory:');
+ const priorFetch=globalThis.fetch;
+ const email='fixture@example.org';
+ const secret='isolated-unit-test-secret-not-real-123456789012345';
+ const env={
+  HHBA_TRANSPARENCY_DB:null,
+  HHBA_FIN_SUBSCRIPTIONS_ENABLED:'1',
+  HHBA_FIN_TURNSTILE_SECRET:'fake-turnstile-server-secret',
+  HHBA_FIN_TURNSTILE_SITE_KEY:'fake-turnstile-site-key',
+  HHBA_FIN_FROM_EMAIL:'HHBA Finance <finance@notify.hhba.work>',
+  HHBA_FIN_UNSUBSCRIBE_SECRET:secret,
+  RESEND_API_KEY:'mock-resend-key',
+  HHBA_FIN_PUBLIC_BASE_URL:'https://hhba.work'
+ };
+ let countResend=0,verifyLink='';
+ try{
+  sqlite.exec(read('../d1/0020_financial_transparency.sql'));
+  const db={prepare(sql){return {bind(...values){
+   const stmt=sqlite.prepare(sql);
+   return{
+    async first(){return stmt.get(...values)||null;},
+    async all(){return {results:stmt.all(...values)};},
+    async run(){const info=stmt.run(...values);return {meta:{changes:Number(info.changes)}};}
+   };
+  }};}};
+  env.HHBA_TRANSPARENCY_DB=db;
+  globalThis.fetch=async(url,options)=>{
+   const target=String(url);
+   if(target==='https://challenges.cloudflare.com/turnstile/v0/siteverify'){
+    return new Response(JSON.stringify({success:true,hostname:'hhba.work'}),{
+     status:200,headers:{'Content-Type':'application/json'}
+    });
+   }
+   if(target==='https://api.resend.com/emails'){
+    countResend++;
+    const body=JSON.parse(options.body);
+    assert.deepEqual(body.to,[email]);
+    assert.equal(body.subject,'请确认 HHBA 财务公开邮件订阅');
+    const m=body.html.match(/\/api\/transparency\/confirm\?token=([a-f0-9]{64})/);
+    assert.ok(m,'Verification email must include a signed confirmation token');
+    verifyLink='https://hhba.work'+m[0];
+    return new Response(JSON.stringify({id:'mock-transactional-message'}),{
+     status:200,headers:{'Content-Type':'application/json'}
+    });
+   }
+   throw new Error('Unexpected network call from isolated test: '+target);
+  };
+  const request=(address,method='GET',body=null)=>new Request(address,{
+   method,headers:method==='POST'?{'Content-Type':'application/json',Origin:'https://hhba.work'}:undefined,
+   body:body===null?undefined:JSON.stringify(body)
+  });
+  const invalid=await publicApi({request:request('https://hhba.work/api/transparency/subscribe','POST',{
+   email,consent:false,turnstileToken:'mock-turnstile-token-with-adequate-length'
+  }),env});
+  assert.equal(invalid.status,400);
+  assert.equal(countResend,0);
+  const start=await publicApi({request:request('https://hhba.work/api/transparency/subscribe','POST',{
+   email,consent:true,turnstileToken:'mock-turnstile-token-with-adequate-length'
+  }),env});
+  assert.equal(start.status,200);
+  assert.equal((await start.json()).code,'CHECK_EMAIL_IF_ELIGIBLE');
+  assert.equal(countResend,1);
+  const before=sqlite.prepare('SELECT status,email FROM hhba_fin_subscribers').get();
+  assert.equal(before.status,'pending');
+  assert.equal(before.email,email);
+  const confirmed=await publicApi({request:request(verifyLink),env});
+  assert.equal(confirmed.status,200);
+  assert.match(await confirmed.text(),/成功订阅/);
+  assert.equal(sqlite.prepare('SELECT status FROM hhba_fin_subscribers').get().status,'verified');
+  const verifiedRepeat=await publicApi({request:request('https://hhba.work/api/transparency/subscribe','POST',{
+   email,consent:true,turnstileToken:'mock-turnstile-token-with-adequate-length'
+  }),env});
+  assert.equal(verifiedRepeat.status,200);
+  assert.equal(countResend,1,'Already-verified subscribers must not receive duplicate confirmation');
+  const emailHash=await sha256(email);
+  const unsubToken=await unsubscribeToken(env,emailHash);
+  const oneClick=new Request('https://hhba.work/api/transparency/unsubscribe?token='+unsubToken,{
+   method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
+   body:'List-Unsubscribe=One-Click'
+  });
+  const result=await publicApi({request:oneClick,env});
+  assert.equal(result.status,200);
+  assert.match(await result.text(),/已完成退订/);
+  const end=sqlite.prepare('SELECT status,email FROM hhba_fin_subscribers').get();
+  assert.equal(end.status,'unsubscribed');
+  assert.equal(end.email,null);
+  assert.equal(countResend,1,'Unsubscribing must not send any marketing or other messages');
+ }finally{globalThis.fetch=priorFetch;sqlite.close();}
+});
