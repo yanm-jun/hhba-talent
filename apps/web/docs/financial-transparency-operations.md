@@ -129,3 +129,12 @@ GitHub Actions 定时任务并非严格时钟：拥堵或 GitHub 中断时可能
 - 生产发送开关 `HHBA_FIN_SEND_ENABLED=0` 期间，调度即使触发也不会真正发信；`HHBA_FIN_AUTO_PUBLISH_ENABLED=0` 时只审核未发布的报告不能自动公开。
 - GitHub Actions `.github/workflows/hhba-finance-monthly-dispatch.yml` 已取消自动定时，仅保留手动应急路径，避免两套定时任务同时运行。
 - 必须通过管理员邮件内测、真实报表人工发布、真实订阅闭环与退订实测后，由负责人明确决定是否开启公众邮件。
+
+
+## 11. Cloudflare Pages 部署恢复记录（2026-11-17）
+
+- 受影响项目：`hhba-talent`，生产分支 `main`。
+- 提交 `27d2d143` 的 Pages 构建报告 Cloudflare 内部平台错误；提交 `2c2d2f94` 在部署队列中长时间等待，尚未出现代码构建失败日志。
+- 通过 Pages 重试与手动 Git 部署请求均得到 HTTP 304；为触发一次新的可追踪构建，本次仅更新运维说明文档，**不修改财务代码、数据、权限或三个发信开关**。
+- 新构建成功前必须以 Cloudflare 标注 `success` 且绑定 `hhba.work` 的部署版本为线上事实，不凭 Git 合并状态宣称上线。
+- 新构建完成后核查独立 D1、财务 Access、公开状态 API、管理员测试邮件入口和 `HHBA_FIN_SUBSCRIPTIONS_ENABLED=0`、`HHBA_FIN_SEND_ENABLED=0`、`HHBA_FIN_AUTO_PUBLISH_ENABLED=0`。
