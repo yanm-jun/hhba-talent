@@ -1,6 +1,6 @@
 import {useEffect,useState} from 'react';
 import {
-  ArrowRight,BriefcaseBusiness,CheckCircle2,FileText,Scale,ShieldCheck,Wallet
+  ArrowRight,BriefcaseBusiness,CheckCircle2,FileText,Scale,ShieldCheck
 } from 'lucide-react';
 import {Link} from '../router';
 import publicConfigFallback from '../data/homepagePublicConfig.json';
@@ -28,9 +28,15 @@ function isPublicHomepageConfig(value:unknown):value is PublicHomepageConfig{
   &&typeof distribution.basis==='string'&&typeof distribution.reportStatus==='string'&&typeof distribution.reportNotice==='string';
 }
 
+const values=[
+ {title:'真实职业机会',description:'AI 理解经历，优先寻找企业官方岗位',Icon:BriefcaseBusiness},
+ {title:'持续职业成长',description:'把工作经历沉淀为长期职业档案',Icon:FileText},
+ {title:'劳动权益支持',description:'了解权益，按约定获得专业服务',Icon:ShieldCheck}
+];
+
 function ServiceList({items}:{items:string[]}){
  return <ul className="hhba-home-service-list">
-  {items.map(item=><li key={item}><CheckCircle2 size={15} aria-hidden="true"/><span>{item}</span></li>)}
+  {items.map(item=><li key={item}><CheckCircle2 size={16} aria-hidden="true"/><span>{item}</span></li>)}
  </ul>;
 }
 
@@ -38,7 +44,7 @@ export function HomeWorkplacePromise(){
  const [config,setConfig]=useState<PublicHomepageConfig>(publicConfigFallback);
  useEffect(()=>{
   let active=true;
-  const endpoint=`${import.meta.env.BASE_URL}api/public/homepage`;
+  const endpoint=import.meta.env.BASE_URL+'api/public/homepage';
   fetch(endpoint,{headers:{Accept:'application/json'},cache:'no-store'})
    .then(response=>{if(!response.ok)throw new Error('PUBLIC_HOMEPAGE_CONFIG_UNAVAILABLE');return response.json() as Promise<unknown>;})
    .then(value=>{if(active&&isPublicHomepageConfig(value))setConfig(value);})
@@ -51,75 +57,91 @@ export function HomeWorkplacePromise(){
  return <section className="hhba-home-workplace" aria-labelledby="hhba-home-workplace-title">
   <header className="hhba-home-workplace-heading">
    <span className="hhba-home-workplace-kicker">HHBA · CAREER & WORKPLACE SUPPORT</span>
-   <h2 id="hhba-home-workplace-title">不只帮你发现机会，也关注你进入职场之后。</h2>
-   <p>把求职、职业成长与劳动权益支持连接起来，让一次求职不只是一次性的服务。</p>
+   <h2 id="hhba-home-workplace-title">找到好工作，只是开始。</h2>
+   <p>从职业机会，到持续成长，再到劳动权益支持。</p>
   </header>
 
-  <div className="hhba-home-pillars">
-   <article className="hhba-home-pillar">
-    <span className="hhba-home-pillar-icon"><BriefcaseBusiness size={21}/></span>
-    <h3>发现真实机会</h3>
-    <p>理解简历中的经历与能力，帮助你寻找企业官方招聘渠道和适合的岗位。</p>
-   </article>
-   <article className="hhba-home-pillar">
-    <span className="hhba-home-pillar-icon"><FileText size={21}/></span>
-    <h3>持续职业成长</h3>
-    <p>围绕职业目标维护简历与职业档案，让每一次经历都能沉淀为下一次机会。</p>
-   </article>
-   <article className="hhba-home-pillar">
-    <span className="hhba-home-pillar-icon"><ShieldCheck size={21}/></span>
-    <h3>关注劳动权益</h3>
-    <p>通过公开知识、专业咨询与依法承接的法律服务，帮助劳动者了解可行的处理路径。</p>
-   </article>
-  </div>
+  <ul className="hhba-home-value-strip" aria-label="HHBA 三项核心服务">
+   {values.map(({title,description,Icon})=><li className="hhba-home-value" key={title}>
+    <span className="hhba-home-value-icon"><Icon size={21} strokeWidth={1.85} aria-hidden="true"/></span>
+    <div><h3>{title}</h3><p>{description}</p></div>
+   </li>)}
+  </ul>
 
-  <div className="hhba-home-business-grid">
-   <article className="hhba-home-membership-card" aria-labelledby="hhba-home-membership-title">
-    <div className="hhba-home-card-topline">
-     <span className="hhba-home-card-kicker">CAREER SERVICE MEMBERSHIP</span>
-     <span className="hhba-home-status">{membership.status==='planning'?'服务方案规划中':'会员服务'}</span>
+  <article className="hhba-home-membership-card" aria-labelledby="hhba-home-membership-title">
+   <div className="hhba-home-member-head">
+    <div className="hhba-home-member-intro">
+     <div className="hhba-home-member-overline">
+      <span className="hhba-home-card-kicker">HHBA · CAREER MEMBERSHIP</span>
+      <span className="hhba-home-status">{membership.status==='planning'?'方案筹备中':'会员服务'}</span>
+     </div>
+     <h3 id="hhba-home-membership-title">持续职业服务方案</h3>
+     <p>每个月都有实在的职业服务；符合资格后，可按约定申请劳动权益支持。</p>
     </div>
-    <h3 id="hhba-home-membership-title">持续职业服务方案</h3>
-    <div className="hhba-home-price"><strong>¥{price}</strong><span>/ 月</span></div>
-    <p className="hhba-home-membership-lead">前六个月，先把简历和职业档案服务做好；达到连续缴费条件后，再按协议申请劳动权益支持。</p>
-    <div className="hhba-home-stage">
-     <div className="hhba-home-stage-heading"><span>01</span><div><strong>前 {membership.introductoryMonths} 个月</strong><small>职业服务阶段</small></div></div>
+    <div className="hhba-home-price-block" aria-label={'会员规划价格每月'+price+'元'}>
+     <div className="hhba-home-price"><span>¥</span><strong>{price}</strong><small>/ 月</small></div>
+     <p>最长 {membership.maxServiceMonths} 个月 · 固定服务周期规划</p>
+    </div>
+   </div>
+
+   <div className="hhba-home-phase-grid" aria-label="会员服务阶段">
+    <section className="hhba-home-stage" aria-labelledby="hhba-home-stage-career-title">
+     <div className="hhba-home-stage-heading">
+      <span className="hhba-home-stage-index" aria-hidden="true">01</span>
+      <div>
+       <p>第 1 — {membership.introductoryMonths} 个月</p>
+       <h4 id="hhba-home-stage-career-title">持续职业服务</h4>
+      </div>
+     </div>
      <ServiceList items={membership.firstStageServices}/>
-    </div>
-    <div className="hhba-home-stage hhba-home-stage-rights">
-     <div className="hhba-home-stage-heading"><span>02</span><div><strong>连续缴费满 {membership.introductoryMonths} 期后</strong><small>劳动权益支持阶段</small></div></div>
+    </section>
+    <section className="hhba-home-stage hhba-home-stage-rights" aria-labelledby="hhba-home-stage-rights-title">
+     <div className="hhba-home-stage-heading">
+      <span className="hhba-home-stage-index" aria-hidden="true">02</span>
+      <div>
+       <p>连续缴费满 {membership.introductoryMonths} 期后</p>
+       <h4 id="hhba-home-stage-rights-title">劳动权益支持</h4>
+      </div>
+     </div>
      <ServiceList items={membership.rightsStageServices}/>
-     <p className="hhba-home-qualification">{membership.qualificationNotice}</p>
-    </div>
-    <div className="hhba-home-membership-bottom">
-     <span><Wallet size={15}/>最长服务周期规划：{membership.maxServiceMonths}个月</span>
-     <span className="hhba-home-plan-status">{membership.purchaseEnabled?'会员服务开放中':'暂未开放购买'}</span>
-    </div>
-    <p className="hhba-home-disclaimer">{membership.serviceNotice}</p>
-    <Link className="hhba-home-text-link" to="/candidate/account/legal-aid">了解劳动权益支持说明 <ArrowRight size={15}/></Link>
-   </article>
+    </section>
+   </div>
 
-   <article className="hhba-home-distribution-card" aria-labelledby="hhba-home-distribution-title">
-    <div className="hhba-home-card-topline">
-     <span className="hhba-home-card-kicker">TRANSPARENT PROFIT ALLOCATION</span>
-     <span className="hhba-home-status">公开制度</span>
-    </div>
-    <h3 id="hhba-home-distribution-title">让商业创造的价值，也能回到劳动者身边。</h3>
-    <p className="hhba-home-distribution-intro">HHBA 已确定以依法核算后的可分配利润为基础，建立 60/40 公开分配制度。</p>
-    <div className="hhba-home-distribution-bar" role="img" aria-label={`企业发展 ${distribution.companyPercent}%，劳动者权益帮扶池 ${distribution.workerSupportPercent}%`}>
-     <span className="hhba-home-distribution-company" style={{width:`${distribution.companyPercent}%`}}/>
-     <span className="hhba-home-distribution-workers" style={{width:`${distribution.workerSupportPercent}%`}}/>
-    </div>
+   <div className="hhba-home-member-footer">
+    <div className="hhba-home-member-status"><ShieldCheck size={17} aria-hidden="true"/><span>{membership.purchaseEnabled?'会员服务已开放':'服务规划中 · 暂未开放购买及案件申请'}</span></div>
+    <Link className="hhba-home-text-link" to="/candidate/account/legal-aid">了解权益支持 <ArrowRight size={16} aria-hidden="true"/></Link>
+   </div>
+   <details className="hhba-home-service-notes">
+    <summary>服务资格、范围与开通说明</summary>
+    <p>{membership.qualificationNotice}</p>
+    <p>{membership.serviceNotice}</p>
+   </details>
+  </article>
+
+  <aside className="hhba-home-pledge" aria-labelledby="hhba-home-distribution-title">
+   <div className="hhba-home-pledge-intro">
+    <span className="hhba-home-card-kicker">OUR COMMITMENT · 公开分配原则</span>
+    <h3 id="hhba-home-distribution-title">让商业创造的价值，也回到劳动者身边。</h3>
+    <p>可分配利润的公开分配原则，与会员服务费用单独核算。</p>
+   </div>
+   <div className="hhba-home-pledge-visual">
     <div className="hhba-home-distribution-values">
-     <div><strong>{distribution.companyPercent}%</strong><b>企业发展</b><small>经营发展、团队激励及创始人收益</small></div>
-     <div><strong>{distribution.workerSupportPercent}%</strong><b>劳动者权益帮扶池</b><small>专款用于劳动者权益帮扶</small></div>
+     <div><strong>{distribution.companyPercent}%</strong><span>企业发展</span></div>
+     <div><strong>{distribution.workerSupportPercent}%</strong><span>劳动者权益帮扶池</span></div>
     </div>
-    <div className="hhba-home-report-note">
-     <Scale size={18} aria-hidden="true"/>
-     <div><strong>{distribution.reportStatus==='not_published'?'首期财务公开报告尚未发布':'财务公开报告'}</strong><p>{distribution.reportNotice}</p></div>
+    <div className="hhba-home-distribution-bar" role="img" aria-label={'企业发展 '+distribution.companyPercent+'%，劳动者权益帮扶池 '+distribution.workerSupportPercent+'%'}>
+     <span className="hhba-home-distribution-company" style={{width:distribution.companyPercent+'%'}}/>
+     <span className="hhba-home-distribution-workers" style={{width:distribution.workerSupportPercent+'%'}}/>
     </div>
-    <p className="hhba-home-distribution-basis">分配基数：{distribution.basis}。不按营业流水直接分配。</p>
-   </article>
-  </div>
+   </div>
+   <div className="hhba-home-pledge-bottom">
+    <div><Scale size={15} aria-hidden="true"/><span>以{distribution.basis}为基数，不按营业流水分配。</span></div>
+    <span className="hhba-home-report-status">{distribution.reportStatus==='not_published'?'首期财务报告尚未发布':'财务报告已发布'}</span>
+   </div>
+   <details className="hhba-home-report-details">
+    <summary>查看分配制度说明</summary>
+    <p>{distribution.reportNotice}</p>
+   </details>
+  </aside>
  </section>;
 }
