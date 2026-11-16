@@ -20,6 +20,32 @@ const endpoint=(path:string)=>import.meta.env.BASE_URL+'api/transparency'+path;
 const dateLabel=(period:string)=>period.replace('-', '年')+'月';
 const publicDate=(raw:string)=>new Date(raw).toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai'});
 const labelStatus=(report:Report)=>report.isAudited?'已标识审计，需核对证明':'内部编制，未经独立审计';
+
+// Only display an external investor's official mark when the actual organisation,
+// its canonical HTTPS website and a permission-reviewed logo are explicitly configured.
+// ESG is not a single issuer and no PRI / UN / fund logo is bundled as a default.
+type PartnerMark={name:string;website:string;image:string};
+function officialPartnerMark():PartnerMark|null{
+ const env=import.meta.env;
+ if(String(env.VITE_HHBA_PARTNER_LOGO_AUTHORIZED||'')!=='1')return null;
+ const name=String(env.VITE_HHBA_PARTNER_OFFICIAL_NAME||'').trim();
+ const website=String(env.VITE_HHBA_PARTNER_OFFICIAL_WEBSITE||'').trim();
+ const rawLogo=String(env.VITE_HHBA_PARTNER_OFFICIAL_LOGO_URL||'').trim();
+ if(name.length<2||name.length>100||!website||!rawLogo)return null;
+ try{
+  const site=new URL(website),logo=new URL(rawLogo);
+  if(site.protocol!=='https:'||logo.protocol!=='https:'||site.username||site.password||logo.username||logo.password)return null;
+  if(!site.hostname.includes('.')||!logo.hostname.includes('.'))return null;
+  const officialHost=site.hostname.toLowerCase();
+  const logoHost=logo.hostname.toLowerCase();
+  const isOfficialAsset=logoHost===officialHost||logoHost.endsWith('.'+officialHost);
+  const isSiteHostedAsset=logoHost==='hhba.work'||logoHost==='www.hhba.work';
+  if(!isOfficialAsset&&!isSiteHostedAsset)return null;
+  if(!/\.(svg|png|webp|jpe?g)(?:$|\?)/i.test(logo.pathname+logo.search))return null;
+  return {name,website:site.href,image:logo.href};
+ }catch{return null;}
+}
+
 const operations=[
  ['营业收入','revenueFen'],['退款及冲减','refundFen'],
  ['AI模型及调用成本','aiCostFen'],['服务器与存储','infrastructureFen'],
@@ -34,6 +60,7 @@ const poolOperations=[
 
 export function TransparencyPage({user}:{user:User|null}){
  const [settings,setSettings]=useState<PublicSettings|null>(null);
+ const partnerMark=useMemo(()=>officialPartnerMark(),[]);
  const [reports,setReports]=useState<Report[]>([]);
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState(false);
@@ -144,10 +171,19 @@ export function TransparencyPage({user}:{user:User|null}){
       <small>人民币陆拾万元整</small>
      </div>
      <div className="hhba-resp-capital-detail">
-      <span className="hhba-resp-theme-mark">ESG <i aria-hidden="true">/</i> LABOR RIGHTS</span>
+      {partnerMark?
+       <a className="hhba-resp-partner-official" href={partnerMark.website} target="_blank" rel="noopener noreferrer" aria-label={'访问合作机构 '+partnerMark.name+' 的官方网站'}>
+        <img src={partnerMark.image} alt={partnerMark.name+' 官方 Logo'} loading="lazy" decoding="async" referrerPolicy="no-referrer"/>
+        <span><small>责任投资合作机构 · 官方标识</small><strong>{partnerMark.name}</strong></span>
+        <ArrowRight size={16} aria-hidden="true"/>
+       </a>:
+       <div className="hhba-resp-partner-undisclosed">
+        <span className="hhba-resp-theme-mark">ESG <i aria-hidden="true">/</i> LABOR RIGHTS</span>
+        <span>合作机构官方标识暂未公开</span>
+       </div>}
       <h3>聚焦劳动者权益的责任投资合作</h3>
       <p>HHBA 经营方披露：已与聚焦 ESG、劳工权益方向的责任投资方建立合作关系，并获得人民币 60 万元资金支持。</p>
-      <p className="hhba-resp-capital-disclosure">合作机构名称、相关协议及品牌标识目前未对外公开。此处是 HHBA 自有主题文字标识，不是外部机构官方 Logo。</p>
+      <p className="hhba-resp-capital-disclosure">{partnerMark?'合作机构名称及官方标识由 HHBA 提供，外部公开资料不代表独立财务鉴证。':'合作机构名称、相关协议及官方品牌标识目前未对外公开；上方 ESG 文字是议题说明，不是任何机构的官方 Logo。'}</p>
      </div>
     </div>
     <p className="hhba-resp-legal-note">说明：该支持信息为 HHBA 企业自述，尚未经独立第三方鉴证，不代表获得 ESG 官方认证或机构公开背书。投资资金与营业收入、可分配利润分别核算，不直接参与以下 60/40 分配。</p>
