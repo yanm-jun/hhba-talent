@@ -125,8 +125,9 @@ test('disclosure redesign is report-first, sober and keeps real financial interf
  assert.match(page,/reports\.map\(item=><tr/);
  assert.match(page,/yuan\(available\.revenueFen\)/);
  assert.match(page,/yuan\(available\.netResultFen\)/);
- assert.match(page,/yuan\(available\.poolReceivedFen\)/);
- assert.match(page,/yuan\(available\.poolSpentFen\)/);
+ assert.match(page,/\['实际入池','poolReceivedFen'\]/);
+ assert.match(page,/\['实际帮扶支出','poolSpentFen'\]/);
+ assert.match(page,/poolOperations\.map\(/);
  assert.match(page,/settings\?\.subscriptionEnabled/);
  assert.match(page,/captchaToken/);
  assert.match(page,/未经独立财务审计/);
