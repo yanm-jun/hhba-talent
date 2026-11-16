@@ -59,3 +59,27 @@
 .hhba-fin-admin-overview-note{margin:11px 0 0;font-size:11px;line-height:1.8;color:#819184}
 @media(max-width:760px){.hhba-fin-admin-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hhba-fin-admin-overview{padding:16px}.hhba-fin-admin-overview-metric>strong{font-size:18px}}
 @media(max-width:450px){.hhba-fin-admin-overview-head{flex-direction:column}.hhba-fin-admin-overview-grid{grid-template-columns:1fr}.hhba-fin-admin-overview-metric{padding:13px}.hhba-fin-admin-overview-metric>strong{font-size:19px}}
+
+
+.hhba-fin-admin-cost-source{padding:21px;background:#fff;border:1px solid #dbe9df;border-radius:14px;margin:0 0 18px}
+.hhba-fin-admin-cost-source-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:9px}
+.hhba-fin-admin-cost-source-heading h2{font-size:18px;color:#244b35;margin:5px 0 0}
+.hhba-fin-admin-cost-source-heading a{font-size:12px;font-weight:700;color:#36774c;text-decoration:none;white-space:nowrap}
+.hhba-fin-admin-cost-controls{display:flex;align-items:end;gap:11px;flex-wrap:wrap}
+.hhba-fin-admin-cost-controls label{font-size:12px;display:grid;gap:5px;color:#4b7658}
+.hhba-fin-admin-cost-controls input{font:14px/1.4 inherit;border-radius:8px;border:1px solid #d5e5d8;padding:9px;background:#fff;color:#2c4c36}
+.hhba-fin-admin-cost-controls button{font-size:12px;font-weight:750;padding:11px 15px;border-radius:8px;border:1px solid #d5e6da;color:#2c744b;background:#eff8f1;cursor:pointer}
+.hhba-fin-admin-cost-controls button:disabled{opacity:.55;cursor:not-allowed}
+.hhba-fin-admin-cost-result{border-top:1px solid #e6eee8;margin-top:14px;padding-top:14px}
+.hhba-fin-admin-cost-totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-bottom:12px}
+.hhba-fin-admin-cost-totals>div{display:grid;gap:6px;background:#f8fbf8;border:1px solid #e0ebe2;border-radius:9px;padding:12px}
+.hhba-fin-admin-cost-totals span{font-size:11px;color:#647f6c}
+.hhba-fin-admin-cost-totals strong{font-size:17px;color:#2b5c40;font-variant-numeric:tabular-nums}
+.hhba-fin-admin-cost-empty,.hhba-fin-admin-cost-error{padding:11px 13px;border:1px solid #e4e8dc;background:#fafbf6;color:#64745a;font-size:12px;border-radius:8px}
+.hhba-fin-admin-cost-error{color:#8d4b3c;background:#fff6f2;border-color:#efd7ce}
+.hhba-fin-admin-cost-table-wrap{overflow:auto}
+.hhba-fin-admin-cost-table{border-collapse:collapse;width:100%;font-size:12px;text-align:left;white-space:nowrap}
+.hhba-fin-admin-cost-table :is(th,td){padding:10px 12px;border-bottom:1px solid #e5ede6}
+.hhba-fin-admin-cost-table th{color:#4a7558;background:#f7faf7;font-weight:750}
+.hhba-fin-admin-cost-table td{color:#526c58}
+@media(max-width:760px){.hhba-fin-admin-cost-totals{grid-template-columns:1fr}.hhba-fin-admin-cost-source-heading{flex-direction:column}.hhba-fin-admin-cost-controls{align-items:stretch}}
