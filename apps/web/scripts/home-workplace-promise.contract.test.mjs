@@ -50,11 +50,12 @@ test('homepage links the approved public plan and preserves the real recruitment
  assert.ok(!home.includes('HomeLiveDrawer'));
 });
 
-test('homepage uses one primary membership card, a light value strip and a subordinate 60/40 pledge',()=>{
+test('homepage folds compact highlights into one membership card and keeps 60/40 secondary',()=>{
  const component=read('../src/components/HomeWorkplacePromise.tsx');
  const css=read('../src/styles/home-workplace-promise.css');
  assert.match(component,/找到好工作，只是开始。/);
- assert.match(component,/hhba-home-value-strip/);
+ assert.match(component,/hhba-home-member-highlights/);
+ assert.doesNotMatch(component,/hhba-home-value-strip/);
  assert.match(component,/hhba-home-membership-card/);
  assert.match(component,/hhba-home-phase-grid/);
  assert.match(component,/hhba-home-pledge/);
@@ -71,4 +72,22 @@ test('homepage uses one primary membership card, a light value strip and a subor
  assert.match(css,/\.hhba-home-phase-grid\{grid-template-columns:1fr/);
  assert.match(css,/\.hhba-home-pledge\{display:grid/);
  assert.match(css,/:focus-visible/);
+});
+
+test('home job footer is one compact row; full marketplace still supports page jump',()=>{
+ const market=read('../src/components/UnifiedJobMarket.tsx');
+ const pager=read('../src/components/JobResultPagination.tsx');
+ const css=read('../src/styles/unified-jobs.css');
+ const layout=read('../src/styles/home-workplace-promise.css');
+ assert.match(market,/unified-market--home/);
+ assert.match(market,/unified-job-footer--home/);
+ assert.match(market,/unified-job-footer-info/);
+ assert.match(market,/showJump=\{!compact\}/);
+ assert.match(market,/查看完整招聘市场/);
+ assert.match(pager,/showJump\?:boolean/);
+ assert.match(pager,/showJump&&<form className="unified-job-page-jump"/);
+ assert.match(css,/\.unified-market--home \.unified-job-footer-info/);
+ assert.match(css,/\.unified-market--home \.unified-job-footer \.unified-job-paging/);
+ assert.match(css,/@media\(max-width:600px\)/);
+ assert.match(layout,/\.hhba-home-workplace::before/);
 });
