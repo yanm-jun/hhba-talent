@@ -4,7 +4,14 @@ on:
     branches: [main]
     paths:
       - 'apps/web/src/pages/HomePage.tsx'
+      - 'apps/web/src/components/HomeWorkplacePromise.tsx'
+      - 'apps/web/src/data/homepagePublicConfig.json'
+      - 'apps/web/src/styles/home-workplace-promise.css'
+      - 'apps/web/src/pages/LegalAidLandingPage.tsx'
+      - 'apps/web/functions/api/public/homepage.js'
       - 'apps/web/scripts/home-promo-alignment.contract.test.mjs'
+      - 'apps/web/scripts/home-hero-layout.contract.test.mjs'
+      - 'apps/web/scripts/home-workplace-promise.contract.test.mjs'
       - '.github/workflows/hhba-home-discovery-card-removal.yml'
   workflow_dispatch:
 permissions:
@@ -23,9 +30,13 @@ jobs:
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci --no-audit --no-fund
-      - name: Confirm removed card and preserved home sections
+      - name: Verify homepage layout, policy API and existing home modules
         working-directory: apps/web
-        run: node --test scripts/home-promo-alignment.contract.test.mjs scripts/home-company-marquee.contract.test.mjs scripts/home-hero-layout.contract.test.mjs
+        run: |
+          node --test scripts/home-promo-alignment.contract.test.mjs \
+            scripts/home-company-marquee.contract.test.mjs \
+            scripts/home-hero-layout.contract.test.mjs \
+            scripts/home-workplace-promise.contract.test.mjs
       - name: Verify production frontend build
         working-directory: apps/web
         run: npm run build
