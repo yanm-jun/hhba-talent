@@ -105,7 +105,7 @@
  }
  function payload(){
   const period=by('freport-period').value;
-  if(!/^20\\d{2}-(?:0[1-9]|1[0-2])$/.test(period))throw Error('请输入有效的 YYYY-MM 月份');
+  if(!/^20\d{2}-(?:0[1-9]|1[0-2])$/.test(period))throw Error('请输入有效的 YYYY-MM 月份');
   if(period>lastClosedMonth())throw Error('当月或未来月份尚未结账');
   const {nums,net}=recalc();
   if(Object.values(nums).some(x=>x===null)||net===null)throw Error('请逐项填写凭证核实后的金额，含未发生项目的 0');
@@ -206,6 +206,7 @@
   busy=true;root.querySelectorAll('button').forEach(b=>b.disabled=true);
   try{
    await api(action,data);
+   current={period};
    tell(action==='publish'?'已提交公开请求；可到公众透明中心核验。':action==='review'?'已审核但尚未公开。':'草稿已保存，尚未公开。');
   }catch(e){tell('操作未完成：'+e.message+'。请先重新读取，避免重复提交。');}
   finally{busy=false;root.querySelectorAll('button').forEach(b=>b.disabled=false);}
