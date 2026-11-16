@@ -96,6 +96,14 @@ export async function sha256(value){
  const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));
  return Array.from(new Uint8Array(digest),x=>x.toString(16).padStart(2,'0')).join('');
 }
+export async function unsubscribeToken(env,emailHash){
+ const secret=String(env.HHBA_FIN_UNSUBSCRIBE_SECRET||'');
+ if(secret.length<32||!/^[a-f0-9]{64}$/.test(emailHash))return null;
+ const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),
+  {name:'HMAC',hash:'SHA-256'},false,['sign']);
+ const digest=await crypto.subtle.sign('HMAC',key,new TextEncoder().encode('hhba-finance-unsubscribe-v1:'+emailHash));
+ return Array.from(new Uint8Array(digest),x=>x.toString(16).padStart(2,'0')).join('');
+}
 export function safeOrigin(request){
  const origin=request.headers.get('Origin');
  if(!origin)return false;
