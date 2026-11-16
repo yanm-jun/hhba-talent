@@ -100,3 +100,30 @@
  .hhba-rules-source-list a{color:#222}
  .hhba-rules-document-footer>p{color:#222}
 }
+
+
+/* Compliance guardrails: clearly distinguish current stop controls from work awaiting proof. */
+.hhba-rules-compliance{scroll-margin-top:86px;margin:25px 0 21px}
+.hhba-rules-compliance-head{text-align:center;max-width:750px;margin:0 auto 16px}
+.hhba-rules-compliance-head>span{font-size:11px;font-weight:800;letter-spacing:.1em;color:#538265}
+.hhba-rules-compliance-head h2{font-size:25px;line-height:1.4;margin:9px 0;color:#234432}
+.hhba-rules-compliance-head p{font-size:13px;line-height:1.8;color:#697e70;margin:0}
+.hhba-rules-compliance-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.hhba-rules-compliance-card{padding:20px 21px;border:1px solid #dce8df;border-radius:14px;background:#fff}
+.hhba-rules-control-num{display:inline-flex;justify-content:center;align-items:center;width:32px;height:32px;border-radius:9px;background:#edf5ef;color:#407455;font-weight:800;font-size:12px}
+.hhba-rules-compliance-card h3{font-size:17px;margin:10px 0 12px;line-height:1.45;color:#244630}
+.hhba-rules-compliance-card p{margin:0 0 10px;color:#59705e;font-size:13px;line-height:1.85}
+.hhba-rules-compliance-card p strong{color:#335c42}
+.hhba-rules-compliance-card small{display:block;border-top:1px solid #e9efea;padding-top:11px;font-size:11px;color:#799180;line-height:1.6}
+.hhba-rules-blocked-status{margin:15px auto 0;padding:12px 14px;color:#795b37;background:#fffaf2;border:1px solid #eddfc8;border-radius:9px;text-align:center;font-size:12px;font-weight:700;line-height:1.8}
+.hhba-rules-launch-checks{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.hhba-rules-launch-checks li{display:flex;gap:12px;align-items:flex-start;border:1px solid #e0eae4;border-radius:10px;background:#fbfdfb;padding:14px 15px}
+.hhba-rules-check-index{display:grid;place-items:center;flex:0 0 29px;width:29px;height:29px;background:#edf4ee;border-radius:8px;font-size:11px;color:#5a8666;font-weight:750}
+.hhba-rules-launch-checks li>div:nth-child(2){flex:1;min-width:0}
+.hhba-rules-launch-checks h3{font-size:13px;line-height:1.6;margin:0 0 5px;color:#2b5139}
+.hhba-rules-launch-checks p{font-size:12px;line-height:1.8;color:#667e6c;margin:0 0 6px}
+.hhba-rules-launch-checks small{font-size:11px;color:#8a968d}
+.hhba-rules-unverified{flex:none;white-space:nowrap;padding:4px 7px;background:#fff6e8;color:#926d41;border-radius:5px;font-size:10px}
+@media(max-width:720px){.hhba-rules-compliance{margin:19px 0 15px}.hhba-rules-compliance-head h2{font-size:22px}.hhba-rules-compliance-grid{grid-template-columns:1fr;gap:9px}.hhba-rules-compliance-card{padding:17px}.hhba-rules-launch-checks li{padding:12px;gap:8px}.hhba-rules-unverified{font-size:9px}}
+@media(max-width:410px){.hhba-rules-launch-checks li{flex-wrap:wrap}.hhba-rules-unverified{margin-left:37px}}
+@media print{.hhba-rules-compliance-card,.hhba-rules-launch-checks li{break-inside:avoid}.hhba-rules-compliance-grid{grid-template-columns:1fr 1fr}.hhba-rules-blocked-status{color:#000}}
