@@ -11,12 +11,13 @@ export async function verifyAdmin(request,env){
  const url=new URL(request.url),path=url.pathname;
  const fromOriginalAdmin=path==='/admin-preview/api/metrics';
  const fromLegacyApi=path==='/api/admin/metrics';
- if(!fromOriginalAdmin&&!fromLegacyApi)return {ok:false,code:'ADMIN_ACCESS_DENIED',status:403};
+ const fromFinance=path.startsWith('/api/transparency/admin/');
+ if(!fromOriginalAdmin&&!fromLegacyApi&&!fromFinance)return {ok:false,code:'ADMIN_ACCESS_DENIED',status:403};
  // The official hhba.work console and the pages.dev console are separate Access applications.
  // Never accept the pages.dev audience on the official custom domain or vice versa.
  const consoleAud=url.hostname==='hhba.work'?env.HHBA_ACCESS_WORK_ADMIN_AUD:env.HHBA_ACCESS_CONSOLE_AUD;
- const aud=((fromOriginalAdmin?consoleAud:env.HHBA_ACCESS_AUD)||'').trim();
- const email=(env.HHBA_METRICS_ADMIN_EMAIL||'').trim().toLowerCase();
+ const aud=((fromFinance?env.HHBA_FINANCE_ACCESS_AUD:(fromOriginalAdmin?consoleAud:env.HHBA_ACCESS_AUD))||'').trim();
+ const email=((fromFinance?env.HHBA_FINANCE_ADMIN_EMAIL:env.HHBA_METRICS_ADMIN_EMAIL)||'').trim().toLowerCase();
  if(!/^[a-z0-9.-]+\.cloudflareaccess\.com$/.test(team)||!aud||!email)return {ok:false,code:'ADMIN_ACCESS_NOT_CONFIGURED',status:503};
  const jwt=request.headers.get('cf-access-jwt-assertion')||'';
  const parts=jwt.split('.');
