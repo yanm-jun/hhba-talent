@@ -1,0 +1,42 @@
+.hhba-fin-admin{width:calc(100% - 30px);max-width:1230px;margin:0 auto;padding:27px 0 55px;color:#203e2e}
+.hhba-fin-admin *{box-sizing:border-box}
+.hhba-fin-admin :is(a,button,input,textarea):focus-visible{outline:3px solid #57a172;outline-offset:2px}
+.hhba-fin-admin-crumb{font-size:12px;margin-bottom:20px}
+.hhba-fin-admin-crumb a{display:inline-flex;align-items:center;gap:7px;color:#387952;text-decoration:none}
+.hhba-fin-admin header{border:1px solid #dce9df;border-radius:17px;background:#fff;padding:27px 30px}
+.hhba-fin-admin-eyebrow{display:inline-flex;gap:7px;align-items:center;color:#508d65;font-size:11px;letter-spacing:.08em;font-weight:800}
+.hhba-fin-admin header h1{font-size:29px;color:#244a33;margin:10px 0}
+.hhba-fin-admin header p{margin:0;color:#6f8475;font-size:13px;line-height:1.85}
+.hhba-fin-admin-locked{display:flex;gap:10px;align-items:flex-start;background:#fff9f0;border:1px solid #e5d7c3;color:#795c37;border-radius:11px;margin:18px 0;padding:19px;font-size:13px}
+.hhba-fin-admin-locked p{margin:0;line-height:1.9}
+.hhba-fin-admin-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin:17px 0}
+.hhba-fin-admin-cards>div{padding:17px;background:#fff;border:1px solid #deebe1;border-radius:10px;min-width:0;display:grid;gap:9px}
+.hhba-fin-admin-cards span{font-size:11px;color:#728777}
+.hhba-fin-admin-cards strong{font-size:18px;color:#3b7c52;word-break:break-word;font-variant-numeric:tabular-nums}
+.hhba-fin-admin-workspace{display:grid;grid-template-columns:230px minmax(0,1fr);gap:15px;align-items:start}
+.hhba-fin-admin-workspace>aside,.hhba-fin-admin-workspace>section{padding:22px;background:#fff;border:1px solid #dde8e0;border-radius:14px;min-width:0}
+.hhba-fin-admin-workspace>aside{position:sticky;top:85px}
+.hhba-fin-admin-panel-title{display:flex;align-items:center;justify-content:space-between;gap:9px}
+.hhba-fin-admin-panel-title h2,.hhba-fin-admin-workspace>section>h2{font-size:18px;margin:0 0 13px;color:#254b35}
+.hhba-fin-admin-panel-title button{background:transparent;color:#4d8c62;border:0;cursor:pointer}
+.hhba-fin-admin-history{display:grid;gap:5px;padding:11px 10px;width:100%;background:#fbfdfb;border:1px solid transparent;text-align:left;cursor:pointer;color:#526c59;border-radius:7px;margin-top:6px}
+.hhba-fin-admin-history span{font-size:11px;color:#8b9b8f}
+.hhba-fin-admin-history.active{border-color:#93bca0;background:#eff7f1}
+.hhba-fin-admin-empty{font-size:12px;line-height:1.7;color:#86978a}
+.hhba-fin-admin-create{padding:10px 13px;width:100%;background:#eaf4ee;color:#36744f;border:1px solid #d7e7db;border-radius:7px;margin-top:12px;cursor:pointer;font-size:12px;font-weight:720}
+.hhba-fin-admin-help{font-size:12px;color:#708575;line-height:1.8;margin:0 0 17px}
+.hhba-fin-admin-workspace label{display:grid;gap:6px;margin:12px 0;color:#345d42;font-weight:680;font-size:12px}
+.hhba-fin-admin-workspace input:not([type=checkbox]),.hhba-fin-admin-workspace textarea{display:block;width:100%;border:1px solid #d9e5db;border-radius:7px;padding:10px 11px;background:#fff;color:#24412d;font:13px/1.6 inherit}
+.hhba-fin-admin-workspace textarea{font:13px/1.7 Arial,PingFang SC,Microsoft YaHei,sans-serif;resize:vertical}
+.hhba-fin-admin-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 18px;padding:14px 0;border-top:1px solid #eef3ed}
+.hhba-fin-admin-workspace .hhba-fin-admin-checkbox{display:flex;align-items:flex-start;gap:9px;font-weight:480;color:#5c7563;line-height:1.75}
+.hhba-fin-admin-checkbox input{flex:0 0 auto;margin-top:5px;width:16px;height:16px;accent-color:#3e8054}
+.hhba-fin-admin-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.hhba-fin-admin-actions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;background:#eaf4ed;color:#31734d;border:1px solid #d5e6da;border-radius:8px;cursor:pointer;font-size:12px;font-weight:760}
+.hhba-fin-admin-actions button.publish{background:#28754a;color:#fff;border-color:#28754a}
+.hhba-fin-admin-actions button:disabled{opacity:.4;cursor:not-allowed}
+.hhba-fin-admin-review{margin-top:21px;padding-top:17px;border-top:1px solid #e3ebe4}
+.hhba-fin-admin-review h3{font-size:16px;color:#29513a}
+.hhba-fin-admin-message{background:#f4f9f5;border:1px solid #d9eadc;color:#4d7959;padding:12px;border-radius:8px;font-size:13px;line-height:1.7}
+@media(max-width:760px){.hhba-fin-admin-workspace{grid-template-columns:1fr}.hhba-fin-admin-workspace>aside{position:static}.hhba-fin-admin-cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:450px){.hhba-fin-admin{width:calc(100% - 22px)}.hhba-fin-admin header{padding:21px}.hhba-fin-admin-workspace>section{padding:16px}.hhba-fin-admin-fields{grid-template-columns:1fr}.hhba-fin-admin-cards strong{font-size:15px}}
