@@ -5,10 +5,10 @@
 ## 1. 系统边界
 
 - 公开页：`/transparency`。只展示已发布报告，首页60/40模块和全站页脚链接到这里。
-- 财务管理页：`/transparency/manage`。已由独立 Cloudflare Access 应用保护页面与财务后台 API，后端同时校验签名 JWT；未登录访客无法访问财务草稿。
+- **唯一财务管理入口**：`https://admin.hhba.work/admin-preview/` 的「财务成本」工作区（管理员密码会话＋财务邮箱白名单）。`hhba.work/transparency/manage` 退役后返回 307，跳转到唯一后台，原重复管理代码与 API 不再部署。
 - 公开 API：`/api/transparency/status`、`/api/transparency/reports`、`/api/transparency/report?period=YYYY-MM`、邮箱验证与退订。敏感后台数据与订阅邮箱不会由公开API返回。
-- 财务 API：`/api/transparency/admin/*`。必须带有效签名 Access JWT，并匹配专用财务 aud、指定财务管理员邮箱。**不使用普通网站登录绕过此门槛**。
-- 月报定时任务：`.github/workflows/hhba-finance-monthly-dispatch.yml`，北京时间每月21日10:00—23:55分批执行。
+- **唯一财务后台 API**：`https://admin.hhba.work/admin-preview/api/financial/*`，先验证原后台 HttpOnly 密码登录会话，再验证财务管理员邮箱白名单，连接同一独立财务 D1。公开主站不提供财务草稿写入接口。
+- 月报主调度：Cloudflare Worker `hhba-finance-dispatch-scheduler`（北京时间每月21日10:00—23:55，每5分钟检查）；GitHub Actions 仅保留手动应急，不作为第二套自动调度。
 - **当前生产仍安全关闭订阅和群发**：独立数据库与财务 Access 已建立，Turnstile/退订密钥已配置，但启用邮件收集、人工发布和群发仍需要后续验收；正式报告继续由真实账目产生。
 
 ## 2. 独立 D1（避免耗尽岗位及简历数据库额度）
@@ -45,7 +45,7 @@
 | `HHBA_FIN_SEND_ENABLED` | Variable | `1` 才允许月度群发，前提是已批准报告与审阅流程就绪 |
 | `HHBA_FIN_AUTO_PUBLISH_ENABLED` | Variable | 默认关闭，审核本身不等于公开；单独明确授权才能自动公开 |
 
-**Cloudflare Access 已创建** `HHBA Finance Private Workspace`，保护 `hhba.work/transparency/manage` 与 `hhba.work/api/transparency/admin/*`；仅允许指定管理者邮箱与既有身份提供方。公开 `/transparency` 不依赖登录。上线前确认 Pages 自定义域名的 Access JWT audience 与后端变量一致。未通过验证时不应展示任何财务草稿、订阅名单或银行凭据。
+**单后台迁移**：正式私有财务界面已迁入 `admin.hhba.work` 的「财务成本」。使用原后台密码会话和财务邮箱白名单；独立 Cloudflare Access 财务应用是旧入口的历史配置，移除旧路由并验证新入口后应将其停用。公开 `/transparency` 不依赖登录。
 
 **安全原则**：绝不将 Secret 写入 GitHub 源码、浏览器前端、Markdown 报告正文、邮件模板或普通运行日志。
 
@@ -63,7 +63,7 @@
 ## 5. 发布流程
 
 1. 运营人员整理真实账簿与银行/支付平台凭证；不得使用示例账目。
-2. 在 `/transparency/manage` 创建月份草稿，全部填写并附上文字核算口径；仅草稿不公开。
+2. 在 `admin.hhba.work` 的「财务成本 → 月报审核与劳动者帮扶池」创建月份草稿；可以先读取同月手工凭证登记簿，再主动将已登记的 AI、基础设施及运营费用作为**未核对参考**填入空白科目。最终仍须核对并明确保存，不能凭空补零。
 3. 确认每月经营利润与依法确认的利润分配基础的不同；核验退款、支出及帮扶池结余计算。
 4. 逐项检查隐私、商业秘密及法规要求，填写具体审核理由与依据。
 5. 完成“审核但不公开”操作，系统保存审核快照与审核时间。
@@ -83,11 +83,11 @@
 
 ## 7. 每月21日群发
 
-GitHub Actions 定时任务按北京时间21日10:00–23:55每5分钟调用一次受令牌保护的 `POST /api/transparency/dispatch`。需设置 GitHub Actions Secret `HHBA_FIN_DISPATCH_SECRET` 且 Pages 端匹配，同时 Pages 启用 `HHBA_FIN_SEND_ENABLED=1`。
+Cloudflare Cron Worker 在北京时间每月21日10:00–23:55每5分钟调用一次受令牌保护的 `POST /api/transparency/dispatch`。Worker 与 Pages 密钥已加密配置。只有负责人完成实际月报、双重订阅验证和真实发信验收，并显式设置 `HHBA_FIN_SEND_ENABLED=1` 后才允许群发。
 
 每次处理最多30个已验证的收件人，通过 `(月份,邮箱摘要)` 唯一键、发送状态和 Resend Idempotency Key 降低重复发送风险。必须对发送额度、Resend 限速与滞留任务监控；在大用户规模下需要接入 Cloudflare Queues 或专业邮件任务服务，不得承诺无容量限制的当日全量投递。
 
-GitHub Actions 定时任务并非严格时钟：拥堵或 GitHub 中断时可能延迟。应在后台监控成功/失败/待发统计，并保留人工补发方案。
+Cloudflare Cron 也不是精确定时承诺，发生平台延迟应监控成功、失败、待发统计；GitHub Actions 仅保留手动应急，避免双重自动调度。
 
 ## 8. 验收清单
 
@@ -138,3 +138,12 @@ GitHub Actions 定时任务并非严格时钟：拥堵或 GitHub 中断时可能
 - 通过 Pages 重试与手动 Git 部署请求均得到 HTTP 304；为触发一次新的可追踪构建，本次仅更新运维说明文档，**不修改财务代码、数据、权限或三个发信开关**。
 - 新构建成功前必须以 Cloudflare 标注 `success` 且绑定 `hhba.work` 的部署版本为线上事实，不凭 Git 合并状态宣称上线。
 - 新构建完成后核查独立 D1、财务 Access、公开状态 API、管理员测试邮件入口和 `HHBA_FIN_SUBSCRIPTIONS_ENABLED=0`、`HHBA_FIN_SEND_ENABLED=0`、`HHBA_FIN_AUTO_PUBLISH_ENABLED=0`。
+
+## 12. 单一管理后台收口（2026-11-17）
+
+- 原后台 `hhba-admin-console` 使用独立 Pages 项目、独立发布分支 `feat/admin-password-console-20261112`，原有「财务成本」KV 凭证登记与 D1「月报审核与劳动者帮扶池」共用**一个页面与密码会话**。
+- 数据层：原凭证 KV 保持原位；月报继续使用独立 `HHBA_TRANSPARENCY_DB` 正式 D1；公众 D1 报告 API 和订阅验证/退订/调度不变。
+- 只有当前月份已读取、通过字段检查、已冲销条目排除的登记簿可以由管理员**自愿带入同月月报空白费用字段**。费用是待核对参考，不直接存库或公开，不替代独立的税务/利润核算。
+- 旧主站私有界面 `hhba.work/transparency/manage` 退役后使用 307 跳转；主站删除冗余的 React 编辑组件与私有写入 API。公共 `hhba.work/transparency` 保留。
+- 安全发布顺序：**先确认 `admin.hhba.work` 新版本生产部署成功且密码登录有效，再合并主站旧入口退役 PR**；不能让管理者失去唯一可用后台。
+- 生产订阅、群发、自动公开开关继续均为 `0`；禁止在完成真实人工验收前开启。
