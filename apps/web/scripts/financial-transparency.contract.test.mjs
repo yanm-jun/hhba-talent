@@ -363,7 +363,22 @@ test('isolated opt-in flow requires Turnstile, email confirmation and honors one
   const before=sqlite.prepare('SELECT status,email FROM hhba_fin_subscribers').get();
   assert.equal(before.status,'pending');
   assert.equal(before.email,email);
-  const confirmed=await publicApi({request:request(verifyLink),env});
+  const prefetched=await publicApi({request:request(verifyLink),env});
+  assert.equal(prefetched.status,200);
+  assert.match(await prefetched.text(),/我确认订阅/);
+  assert.equal(sqlite.prepare('SELECT status FROM hhba_fin_subscribers').get().status,'pending',
+   'Email-link prefetch MUST NOT activate a subscription');
+  const token=new URL(verifyLink).searchParams.get('token');
+  const blocked=await publicApi({request:new Request('https://hhba.work/api/transparency/confirm',{
+   method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded',Origin:'https://untrusted.example'},
+   body:'token='+token
+  }),env});
+  assert.equal(blocked.status,403,'Cross-origin POST must not confirm email subscription');
+  assert.equal(sqlite.prepare('SELECT status FROM hhba_fin_subscribers').get().status,'pending');
+  const confirmed=await publicApi({request:new Request('https://hhba.work/api/transparency/confirm',{
+   method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded',Origin:'https://hhba.work'},
+   body:'token='+token
+  }),env});
   assert.equal(confirmed.status,200);
   assert.match(await confirmed.text(),/成功订阅/);
   assert.equal(sqlite.prepare('SELECT status FROM hhba_fin_subscribers').get().status,'verified');
@@ -490,4 +505,13 @@ test('finance dashboard only uses published snapshots and never invents an empty
  assert.match(page,/status\.deliveries\?\.pending\|\|0/);
  assert.match(css,/\.hhba-fin-admin-overview-grid/);
  assert.match(css,/@media\(max-width:450px\)/);
+});
+
+test('finance confirmation handler separates safe GET from deliberate POST',()=>{
+ const src=read('../functions/api/transparency/[[path]].js');
+ assert.match(src,/renderConfirm\(token\)/);
+ assert.match(src,/if\(request.method==='POST'&&path==='\/api\/transparency\/confirm'\)/);
+ assert.match(src,/if\(!safeOrigin\(request\)\)/);
+ assert.match(src,/点击邮件链接不会自动完成订阅/);
+ assert.match(src,/application\/x-www-form-urlencoded/);
 });
