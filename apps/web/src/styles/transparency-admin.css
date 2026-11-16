@@ -40,3 +40,22 @@
 .hhba-fin-admin-message{background:#f4f9f5;border:1px solid #d9eadc;color:#4d7959;padding:12px;border-radius:8px;font-size:13px;line-height:1.7}
 @media(max-width:760px){.hhba-fin-admin-workspace{grid-template-columns:1fr}.hhba-fin-admin-workspace>aside{position:static}.hhba-fin-admin-cards{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:450px){.hhba-fin-admin{width:calc(100% - 22px)}.hhba-fin-admin header{padding:21px}.hhba-fin-admin-workspace>section{padding:16px}.hhba-fin-admin-fields{grid-template-columns:1fr}.hhba-fin-admin-cards strong{font-size:15px}}
+
+
+.hhba-fin-admin-overview{margin:18px 0 15px;padding:22px;background:#fff;border:1px solid #dbe9df;border-radius:15px}
+.hhba-fin-admin-overview-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:19px}
+.hhba-fin-admin-overview-eyebrow{font-size:10px;letter-spacing:.09em;color:#53896a;font-weight:800}
+.hhba-fin-admin-overview-head h2{font-size:21px;color:#244b35;margin:7px 0 5px}
+.hhba-fin-admin-overview-head p{font-size:12px;color:#748579;line-height:1.8;margin:0}
+.hhba-fin-admin-state{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border:1px solid #e5dfcf;background:#fcf8ed;color:#8b7349;padding:7px 11px;border-radius:100px;font-size:11px;font-weight:750}
+.hhba-fin-admin-state.is-published{border-color:#c6e1cc;background:#f0f9f1;color:#2e7950}
+.hhba-fin-admin-overview-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.hhba-fin-admin-overview-metric{border:1px solid #e1ece4;background:#fbfdfb;border-radius:11px;padding:16px 15px;display:grid;gap:9px;min-width:0}
+.hhba-fin-admin-overview-metric>span{font-size:12px;color:#4c7359;font-weight:730}
+.hhba-fin-admin-overview-metric>strong{font-size:22px;color:#254d35;line-height:1.2;word-break:break-word;font-variant-numeric:tabular-nums}
+.hhba-fin-admin-overview-metric>small{font-size:11px;color:#84958a;line-height:1.65}
+.hhba-fin-admin-overview-foot{display:flex;flex-wrap:wrap;gap:5px 24px;margin-top:15px;font-size:12px;color:#596f5f}
+.hhba-fin-admin-overview-foot p{margin:2px 0;line-height:1.8}
+.hhba-fin-admin-overview-note{margin:11px 0 0;font-size:11px;line-height:1.8;color:#819184}
+@media(max-width:760px){.hhba-fin-admin-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hhba-fin-admin-overview{padding:16px}.hhba-fin-admin-overview-metric>strong{font-size:18px}}
+@media(max-width:450px){.hhba-fin-admin-overview-head{flex-direction:column}.hhba-fin-admin-overview-grid{grid-template-columns:1fr}.hhba-fin-admin-overview-metric{padding:13px}.hhba-fin-admin-overview-metric>strong{font-size:19px}}
