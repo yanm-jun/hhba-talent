@@ -170,3 +170,32 @@ test('responsibility page is three-part, sober and keeps real finance interfaces
  assert.match(css,/@media print/);
  assert.doesNotMatch(page,/<main className="hhba-transparency"/,'Shell already supplies main landmark');
 });
+
+test('RFC 8058 one-click unsubscribe revokes a verified address without requiring a body token',async()=>{
+ const token='b'.repeat(64);
+ let observed=null;
+ const db={prepare(sql){return {bind(...args){return {async run(){observed={sql,args};return {meta:{changes:1}};}};}};}};
+ const request=new Request('https://hhba.work/api/transparency/unsubscribe?token='+token,{
+  method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
+  body:'List-Unsubscribe=One-Click'
+ });
+ const response=await publicApi({request,env:{HHBA_TRANSPARENCY_DB:db}});
+ assert.equal(response.status,200);
+ assert.match(await response.text(),/已完成退订/);
+ assert.ok(observed,'One-click request must perform an unsubscribe update');
+ assert.match(observed.sql,/status='unsubscribed'/);
+ assert.match(observed.sql,/email=NULL/);
+ assert.equal(observed.args[2],await sha256(token));
+});
+test('monthly dispatch has an explicit human-publication safeguard and bounded batches',()=>{
+ const dispatch=read('../functions/api/transparency/dispatch.js');
+ assert.match(dispatch,/HHBA_FIN_SEND_ENABLED/);
+ assert.match(dispatch,/HHBA_FIN_AUTO_PUBLISH_ENABLED/);
+ assert.match(dispatch,/REVIEWED_PENDING_MANUAL_PUBLICATION_NO_EMAIL/);
+ assert.match(dispatch,/LIMIT 30/);
+ assert.match(dispatch,/d\.attempts<3/);
+ assert.match(dispatch,/s\.status='verified'/);
+ assert.match(dispatch,/List-Unsubscribe-Post/);
+ const publicRoute=read('../functions/api/transparency/[[path]].js');
+ assert.match(publicRoute,/url\.searchParams\.get\('token'\)/);
+});
