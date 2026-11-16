@@ -108,8 +108,11 @@ test('front, admin, cron and immutable correction are all wired to same route',(
  assert.match(sql,/hhba_fin_publication_revisions/);
  assert.match(sql,/hhba_fin_deliveries/);
  assert.match(publish,/INSERT INTO hhba_fin_publication_revisions/);
- assert.match(cron,/\*\/5 2-15 21 \* \*/);
- assert.match(cron,/HHBA_FIN_DISPATCH_SECRET/);
+ const cloudflareCron=read('../ops/finance-cron-worker.mjs');
+ assert.match(cloudflareCron,/\*\/5 2-15 21 \* \*/);
+ assert.match(cloudflareCron,/HHBA_FIN_DISPATCH_SECRET/);
+ assert.doesNotMatch(cron,/^\s+schedule:\s*$/m);
+ assert.match(cron,/workflow_dispatch/);
 });
 
 test('responsibility page is three-part, sober and keeps real finance interfaces',()=>{
