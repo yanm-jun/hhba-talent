@@ -8,9 +8,8 @@ import {
 } from '../functions/_lib/transparency.js';
 import {onRequest as publicApi} from '../functions/api/transparency/[[path]].js';
 import {onRequestPost as dispatchApi,sendNextBatch} from '../functions/api/transparency/dispatch.js';
-import {onRequest as financeAdmin,sendFinanceAdminSmoke} from '../functions/api/transparency/admin/[[path]].js';
+import {onRequest as retiredFinanceUI} from '../functions/transparency/manage.js';
 import {publishReviewed} from '../functions/_lib/transparency-publish.js';
-import {aggregatePrivateRegister,readPrivateRegister} from '../functions/_lib/finance-register.js';
 import financeCronWorker from '../ops/finance-cron-worker.mjs';
 const read=(path)=>readFileSync(new URL(path,import.meta.url),'utf8');
 const payload=(patch={})=>({
@@ -66,8 +65,9 @@ test('no dispatch secret, unapproved report or admin identity can leak financial
  const result=await dispatchApi({request,env:{}});
  assert.equal(result.status,401);
  assert.equal((await result.json()).code,'UNAUTHORIZED');
- const admin=await financeAdmin({request:new Request('https://hhba.work/api/transparency/admin/status'),env:{}});
- assert.notEqual(admin.status,200);
+ const redirect=retiredFinanceUI({request:new Request('https://hhba.work/transparency/manage')});
+ assert.equal(redirect.status,307);
+ assert.equal(redirect.headers.get('Location'),'https://admin.hhba.work/admin-preview/');
  const pub=await publishReviewed({prepare:()=>{throw Error('should not publish');}},{period:'bad',actor:'bot'});
  assert.equal(pub.ok,false);
  assert.match(read('../functions/_lib/admin-access.js'),/HHBA_FINANCE_ACCESS_AUD/);
@@ -93,19 +93,17 @@ test('newsletter email requires explicit opt-in, domain verification and recover
 });
 test('front, admin, cron and immutable correction are all wired to same route',()=>{
  const main=read('../src/main.tsx'),shell=read('../src/components/Shell.tsx'),home=read('../src/components/HomeWorkplacePromise.tsx');
- const page=read('../src/pages/TransparencyPage.tsx'),admin=read('../src/pages/TransparencyManagePage.tsx');
+ const page=read('../src/pages/TransparencyPage.tsx');
  const sql=read('../d1/0020_financial_transparency.sql');
  const publish=read('../functions/_lib/transparency-publish.js');
  const cron=read('../../../.github/workflows/hhba-finance-monthly-dispatch.yml');
  assert.match(main,/if\(route==='\/transparency'\)return <TransparencyPage user=\{user\}\/>/);
- assert.match(main,/if\(route==='\/transparency\/manage'\)return <TransparencyManagePage user=\{user\}\/>/);
+ assert.doesNotMatch(main,/TransparencyManagePage|route==='\/transparency\/manage'/);
  assert.match(shell,/to="\/transparency"/);
  assert.match(home,/className="hhba-home-report-details hhba-home-transparency-link" to="\/transparency"/);
  assert.match(page,/subscriptionEnabled/);
  assert.match(page,/首期财务报告尚未发布/);
  assert.match(page,/reports\.map/);
- assert.match(admin,/财务公开管理/);
- assert.match(admin,/ledgerReconciled/);
  assert.match(sql,/hhba_fin_publication_revisions/);
  assert.match(sql,/hhba_fin_deliveries/);
  assert.match(publish,/INSERT INTO hhba_fin_publication_revisions/);
@@ -404,54 +402,6 @@ test('isolated opt-in flow requires Turnstile, email confirmation and honors one
  }finally{globalThis.fetch=priorFetch;sqlite.close();}
 });
 
-test('finance admin self-only smoke email uses configured Resend, logs success and rate-limits repeated requests',async()=>{
- const actor='test-admin@example.com';
- const calls=[];
- let lastTime=null;
- const db={prepare(sql){return{bind(...values){return{
-  async first(){assert.match(sql,/action='admin_mail_smoke'/);assert.equal(values[0],actor);return lastTime?{created_at:lastTime}:null;},
-  async run(){assert.match(sql,/INSERT INTO hhba_fin_audit/);assert.equal(values[1],'admin_mail_smoke');assert.equal(values[2],actor);lastTime=values[4];return {meta:{changes:1}};}
- };}};}};
- const mockEnv={
-  RESEND_API_KEY:'not-a-real-api-key',
-  HHBA_FIN_FROM_EMAIL:'HHBA Finance <finance@notify.hhba.work>'
- };
- const originalFetch=globalThis.fetch;
- globalThis.fetch=async(url,opts)=>{
-  assert.equal(String(url),'https://api.resend.com/emails');
-  const req=JSON.parse(opts.body);
-  assert.deepEqual(req.to,[actor]);
-  assert.match(req.subject,/测试.*非正式月报/);
-  assert.match(req.html,/不代表任何财务报告已审核、发布或向用户发送/);
-  calls.push({body:req,key:opts.headers['Idempotency-Key']});
-  return new Response(JSON.stringify({id:'mock-test-message'}),{
-   status:200,headers:{'Content-Type':'application/json'}
-  });
- };
- try{
-  const date=new Date('2026-11-17T02:00:00Z');
-  const first=await sendFinanceAdminSmoke(db,mockEnv,actor,date);
-  assert.equal(first.ok,true);
-  assert.equal(first.code,'TEST_MAIL_SUBMITTED');
-  assert.equal(lastTime,date.toISOString());
-  const second=await sendFinanceAdminSmoke(db,mockEnv,actor,new Date(date.getTime()+60000));
-  assert.equal(second.ok,false);
-  assert.equal(second.code,'TEST_EMAIL_RATE_LIMITED');
-  assert.equal(calls.length,1);
-  const third=await sendFinanceAdminSmoke(db,mockEnv,actor,new Date(date.getTime()+6*60*60*1000));
-  assert.equal(third.ok,true);
-  assert.equal(calls.length,2);
-  assert.notEqual(calls[0].key,calls[1].key);
-  const notConfigured=await sendFinanceAdminSmoke(db,{HHBA_FIN_FROM_EMAIL:mockEnv.HHBA_FIN_FROM_EMAIL},actor,date);
-  assert.equal(notConfigured.code,'TEST_MAIL_SENDER_NOT_READY');
- }finally{globalThis.fetch=originalFetch;}
- const adminRoute=read('../functions/api/transparency/admin/[[path]].js');
- assert.ok(adminRoute.indexOf('verifyAdmin(request,env)')<adminRoute.indexOf("path==='/api/transparency/admin/test-email'"));
- assert.match(adminRoute,/if\(!safeOrigin\(request\)\)/);
- assert.match(adminRoute,/confirmTestEmail!==true/);
- assert.match(read('../src/pages/TransparencyManagePage.tsx'),/向本人邮箱发送一封测试邮件/);
-});
-
 test('Cloudflare cron triggers only on the 21st UTC and never exposes a public HTTP endpoint',async()=>{
  const priorFetch=globalThis.fetch,originalLog=console.log,originalError=console.error;
  const calls=[],logs=[];
@@ -485,29 +435,6 @@ test('Cloudflare cron triggers only on the 21st UTC and never exposes a public H
  }finally{globalThis.fetch=priorFetch;console.log=originalLog;console.error=originalError;}
 });
 
-test('finance dashboard only uses published snapshots and never invents an empty-period balance',()=>{
- const page=read('../src/pages/TransparencyManagePage.tsx');
- const css=read('../src/styles/transparency-admin.css');
- assert.match(page,/const publishedRow=status\?\.reports\.find\(row=>row\.status==='published'&&row\.published\)/);
- assert.match(page,/const publishedSnapshot=publishedRow\?\.published/);
- assert.match(page,/const asPublishedFen=\(key:string\)=>/);
- assert.match(page,/Number\.isSafeInteger\(value\)\?value:null/);
- assert.match(page,/const money=\(value:number\|null\)=>value===null\?'—'/);
- assert.match(page,/const totalExpensesFen=expenseValues\.every\(value=>value!==null\)/);
- assert.match(page,/未扣退款的营业收入/);
- assert.match(page,/不含退款与调整项/);
- assert.match(page,/可为亏损，不等同于可分配利润/);
- assert.match(page,/单独核定，不由月度净利自动推算/);
- assert.match(page,/制度计提，非实际资金划拨/);
- assert.match(page,/期初＋实际入池－实际帮扶支出/);
- assert.match(page,/尚无任何已正式发布且核验的月报/);
- assert.match(page,/未披露的草稿不进入财务总览/);
- assert.match(page,/私人投资款与营业收入分别核算/);
- assert.match(page,/status\.deliveries\?\.pending\|\|0/);
- assert.match(css,/\.hhba-fin-admin-overview-grid/);
- assert.match(css,/@media\(max-width:450px\)/);
-});
-
 test('finance confirmation handler separates safe GET from deliberate POST',()=>{
  const src=read('../functions/api/transparency/[[path]].js');
  assert.match(src,/renderConfirm\(token\)/);
@@ -518,75 +445,16 @@ test('finance confirmation handler separates safe GET from deliberate POST',()=>
 });
 
 
-test('existing admin KV expense register is read-only, scoped, reversal-safe and never a published finance report',async()=>{
- const month='2026-10';
- const p='finance:entry:v1:'+month+':';
- const mk=(id,parts)=>({kind:'entry',id,month,at:'2026-10-11T02:30:00Z',actor:'admin@example.com',
-  day:'2026-10-10',direction:'expense',category:'deepseek',amountFen:1300,
-  evidenceRef:'actual-invoice-ref-test-only',note:'',...parts});
- const a=mk('10000000-0000-4000-8000-000000000001',{});
- const b=mk('10000000-0000-4000-8000-000000000002',{direction:'income',category:'customer',amountFen:3000});
- const c=mk('10000000-0000-4000-8000-000000000003',{direction:'expense',category:'cloudflare',amountFen:600});
- const v={kind:'void',id:'10000000-0000-4000-8000-000000000004',month,at:'2026-10-12T02:30:00Z',actor:'admin@example.com',targetId:c.id,reason:'test-only cancellation'};
- const source=[a,b,c,v];
- const actions=[];
- const kv={
-  async list({prefix,limit}){actions.push({action:'list',prefix,limit});return {keys:source.map(e=>({name:p+e.id})),list_complete:true};},
-  async get(key,type){actions.push({action:'get',key,type});return source.find(e=>p+e.id===key);}
- };
- const data=await readPrivateRegister(kv,month);
- assert.equal(data.ok,true);
- assert.equal(data.kind,'HHBA_PRIVATE_FINANCE_REGISTER_V1');
- assert.equal(data.quality,'owner_entered_unreconciled');
- assert.equal(data.totals.incomeFen,3000);
- assert.equal(data.totals.expenseFen,1300);
- assert.equal(data.totals.netFen,1700);
- assert.equal(data.byCategory['expense:deepseek'],1300);
- assert.equal(data.byCategory['expense:cloudflare'],undefined,'Voided expense must not count');
- assert.equal(data.voidedCount,1);
- assert.deepEqual(actions[0],{action:'list',prefix:p,limit:51});
- assert.ok(actions.every(x=>x.action==='list'||x.action==='get'));
- assert.equal(data.entries.find(x=>x.id===c.id).voided,true);
- const absent=aggregatePrivateRegister([],month);
- assert.equal(absent.totals,null,'An empty manual register is unknown, not zero finance');
- assert.equal(absent.quality,'no_records_not_zero');
- assert.equal((await readPrivateRegister(null,month)).code,'ADMIN_COST_SOURCE_NOT_CONNECTED');
- await assert.rejects(()=>readPrivateRegister({
-  list:async()=>({keys:[{name:'other-admin:key'}],list_complete:true}),get:async()=>({})
- },month),/UNSAFE_PRIVATE_REGISTER_KEY/);
- await assert.rejects(()=>readPrivateRegister({
-  list:async()=>({keys:[],list_complete:false}),get:async()=>({})
- },month),/INCOMPLETE_PRIVATE_REGISTER/);
- await assert.rejects(()=>readPrivateRegister({
-  list:async()=>({keys:[{name:p+a.id}],list_complete:true}),
-  get:async()=>({...a,amountFen:-12})
- },month),/INVALID_FINANCE_REGISTER_EVENT/);
- const privateHandler=read('../functions/api/transparency/admin/[[path]].js');
- assert.match(privateHandler,/verifyAdmin\(request,env\)/);
- assert.match(privateHandler,/readPrivateRegister\(env\.HHBA_FIN_REGISTER_KV,month\)/);
- assert.match(privateHandler,/path==='\/api\/transparency\/admin\/register'/);
- const publicHandler=read('../functions/api/transparency/[[path]].js');
- assert.doesNotMatch(publicHandler,/HHBA_FIN_REGISTER_KV|readPrivateRegister/);
- const adminUI=read('../src/pages/TransparencyManagePage.tsx');
- assert.match(adminUI,/旧后台成本登记簿 · 只读核对/);
- assert.match(adminUI,/不能机械自动换算/);
- assert.match(adminUI,/尚未自动完成银行、发票或供应商账单对账/);
-});
 
 
-test('admin expense register reference transfer is voluntary, period-matched and does not write finance records',()=>{
- const ui=read('../src/pages/TransparencyManagePage.tsx');
- assert.match(ui,/const prefillExpenseReferences=\(\)=>/);
- assert.match(ui,/costSnapshot\.month!==period/);
- assert.match(ui,/currentRow\?\.status==='published'/);
- assert.match(ui,/window\.confirm\('仅向本月尚未填写的费用字段带入/);
- assert.match(ui,/!String\(amounts\[key\]\|\|''\)\.trim\(\)/);
- assert.match(ui,/!String\(current\[key\]\|\|''\)\.trim\(\)/);
- for(const mapping of ["'expense:deepseek':'aiCostFen'","'expense:cloudflare':'infrastructureFen'","'expense:domain':'infrastructureFen'","'expense:infrastructure':'infrastructureFen'","'expense:email':'operationsFen'","'expense:operations':'operationsFen'"]){
-  assert.ok(ui.includes(mapping),mapping+' source mapping missing');
- }
- assert.doesNotMatch(ui,/['"]income:customer['"]\s*:\s*['"]revenueFen['"]/);
- assert.match(ui,/此操作不保存财务 D1，也不执行审核或发布/);
- const helper=read('../functions/_lib/finance-register.js');
- assert.doesNotMatch(helper,/\bkv\.put\b|\bkv\.delete\b/);
+test('retired duplicate finance entry never serves private content and never changes public financial disclosure',()=>{
+ const target=retiredFinanceUI({request:new Request('https://hhba.work/transparency/manage')});
+ assert.equal(target.status,307);
+ assert.equal(target.headers.get('Location'),'https://admin.hhba.work/admin-preview/');
+ assert.match(target.headers.get('Cache-Control'),/no-store/);
+ const write=retiredFinanceUI({request:new Request('https://hhba.work/transparency/manage',{method:'POST'})});
+ assert.equal(write.status,405);
+ const app=read('../src/main.tsx');
+ assert.doesNotMatch(app,/TransparencyManagePage/);
+ assert.match(app,/if\(route==='\/transparency'\)return <TransparencyPage user=\{user\}\/>/);
 });
