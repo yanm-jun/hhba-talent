@@ -45,7 +45,7 @@ test('homepage links the approved public plan and preserves the real recruitment
  assert.ok(home.includes('<HomeWorkplacePromise/>'));
  assert.ok(component.includes('api/public/homepage'));
  assert.ok(component.includes('暂未开放购买'));
- assert.ok(component.includes('不提供现金赔付'));
+ assert.ok(config.includes('不提供现金赔付'));
  assert.ok(config.includes('"companyPercent": 60'));
  assert.ok(config.includes('"workerSupportPercent": 40'));
  assert.ok(!home.includes('HomeLiveDrawer'));
