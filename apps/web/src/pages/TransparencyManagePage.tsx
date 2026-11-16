@@ -77,6 +77,43 @@ export function TransparencyManagePage({user}:{user:User|null}){
   }catch(e){setCostError('旧后台登记簿暂不能读取：'+(e instanceof Error?e.message:'未知错误'));}
   finally{setCostBusy(false);}
  };
+ const prefillExpenseReferences=()=>{
+  if(!costSnapshot||costSnapshot.month!==period||!costSnapshot.totals){
+   setCostError('请先选择与月报相同的月份并读取已登记凭证');return;
+  }
+  if(currentRow?.status==='published'){
+   setCostError('已公开月报不能直接用登记簿替换；请先走正式更正流程');return;
+  }
+  // Reference mapping only. Cash-register categories and statutory accounting
+  // periods differ; income, other, refunds, taxes and profit are never inferred.
+  const mapping:Record<string,string>={
+   'expense:deepseek':'aiCostFen',
+   'expense:cloudflare':'infrastructureFen',
+   'expense:domain':'infrastructureFen',
+   'expense:infrastructure':'infrastructureFen',
+   'expense:email':'operationsFen',
+   'expense:operations':'operationsFen'
+  };
+  const suggested:Record<string,number>={};
+  for(const [category,fen] of Object.entries(costSnapshot.byCategory)){
+   const target=mapping[category];
+   if(target&&Number.isSafeInteger(fen)&&fen>0)
+    suggested[target]=(suggested[target]||0)+fen;
+  }
+  const targets=Object.keys(suggested).filter(key=>!String(amounts[key]||'').trim());
+  if(!targets.length){
+   setCostError('没有可填充的空白费用科目；已填写金额不会被覆盖，其他类别需要人工分类');
+   return;
+  }
+  if(!window.confirm('仅向本月尚未填写的费用字段带入旧后台待核对的凭证参考数，不保存数据库、不进行审核或公开。继续？'))return;
+  setAmounts(current=>{
+   const next={...current};
+   for(const key of targets)if(!String(current[key]||'').trim())next[key]=fmtFen(suggested[key]);
+   return next;
+  });
+  setCostError('');
+  setMessage('已从旧后台登记簿填入 '+targets.length+' 项费用参考数（未保存）。请逐笔核对凭证、会计期间和费用口径，并填写所有其他字段后再保存草稿。');
+ };
  const load=(row:Row)=>{
   setCurrentRow(row);setPeriod(row.period);
   setAmounts(Object.fromEntries(fields.map(([,key])=>[key,fmtFen(row.draft?.[key])])));
@@ -230,6 +267,10 @@ export function TransparencyManagePage({user}:{user:User|null}){
          <td>{entry.evidenceRef}</td><td>{entry.voided?'已冲销':'待对账'}</td>
         </tr>)}</tbody>
        </table></div>}
+       <div className="hhba-fin-admin-actions">
+        <button type="button" disabled={!costSnapshot.totals||period!==costSnapshot.month||currentRow?.status==='published'} onClick={prefillExpenseReferences}>把已登记费用作为草稿参考填入空白字段</button>
+       </div>
+       <p className="hhba-fin-admin-overview-note">只对 DeepSeek/AI、Cloudflare/域名/基础设施、邮件/运营等明确类别提出费用参考，不覆盖已填金额；客户收入、其他费用、退款、税费和利润必须人工核定。此操作不保存财务 D1，也不执行审核或发布。</p>
        <p className="hhba-fin-admin-overview-note">只读来源：旧管理站「财务成本」模块。请用实际凭证与财务账簿核对后再录入、审核、发布正式月报。原后台成本分类与新月报会计科目不完全相同，不能机械自动换算。</p>
       </div>}
      </section>
