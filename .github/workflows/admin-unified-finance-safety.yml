@@ -1,0 +1,39 @@
+name: HHBA unified finance admin safety
+on:
+  pull_request:
+    branches:
+      - feat/admin-password-console-20261112
+    paths:
+      - 'apps/admin-preview/finance-report.*'
+      - 'apps/admin-preview/index.html'
+      - 'apps/web/functions/_lib/transparency*'
+      - 'apps/web/functions/admin-preview/api/financial/**'
+      - 'apps/web/scripts/build-standalone-admin.py'
+      - 'apps/web/scripts/admin-unified-finance.contract.test.mjs'
+      - '.github/workflows/admin-unified-finance-safety.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax validation
+        run: |
+          node --check apps/admin-preview/finance-report.js
+          node --check apps/web/functions/admin-preview/api/financial/'[[path]].js'
+          node --check apps/web/functions/_lib/transparency.js
+          node --check apps/web/functions/_lib/transparency-publish.js
+          python3 -m py_compile apps/web/scripts/build-standalone-admin.py
+      - name: Standalone admin build including finance view
+        working-directory: apps/web
+        env:
+          CF_PAGES_BRANCH: feat/admin-password-console-20261112
+        run: python3 scripts/build-standalone-admin.py
+      - name: Unified admin contract and safety tests
+        run: node --test apps/web/scripts/admin-unified-finance.contract.test.mjs
