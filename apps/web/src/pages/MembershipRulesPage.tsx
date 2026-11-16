@@ -9,7 +9,7 @@ const padNumber=(index:number)=>String(index+1).padStart(2,'0');
 
 export function MembershipRulesPage({user}:{user:User|null}){
  return <Shell user={user}>
-  <main className="hhba-rules" id="main-content">
+  <div className="hhba-rules" id="main-content">
    <div className="hhba-rules-topline">
     <Link to="/" className="hhba-rules-back"><ArrowLeft size={15} aria-hidden="true"/>返回 HHBA 首页</Link>
     <span>HHBA · 公开透明 · 职业成长与劳动权益</span>
@@ -110,6 +110,6 @@ export function MembershipRulesPage({user}:{user:User|null}){
      </footer>
     </article>
    </div>
-  </main>
+  </div>
  </Shell>;
 }
