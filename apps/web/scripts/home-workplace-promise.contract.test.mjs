@@ -66,7 +66,8 @@ test('homepage folds compact highlights into one membership card and keeps 60/40
  assert.match(component,/distribution\.workerSupportPercent/);
  assert.match(component,/membership\.purchaseEnabled/);
  assert.match(component,/会员服务已开放|暂未开放购买及案件申请/);
- assert.match(component,/summary>服务资格、范围与开通说明/);
+ assert.match(component,/to="\/membership\/rules"/);
+ assert.match(component,/服务资格、范围与开通说明/);
  assert.match(css,/\.hhba-home-phase-grid\{display:grid;grid-template-columns:/);
  assert.match(css,/@media\(max-width:680px\)/);
  assert.match(css,/\.hhba-home-phase-grid\{grid-template-columns:1fr/);
