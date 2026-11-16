@@ -56,11 +56,12 @@ export function MembershipRulesPage({user}:{user:User|null}){
 
   // Pages are lazy-loaded: direct links to a chapter may arrive before its
   // target exists. Resolve that one initial deep link after the page mounts.
-  const initialHash=decodeURIComponent(window.location.hash.slice(1));
+  let initialHash='';
+  try{initialHash=decodeURIComponent(window.location.hash.slice(1));}catch{/* Ignore malformed URL hashes. */}
   frame=window.requestAnimationFrame(()=>{
    frame=0;
    if(navigationIds.includes(initialHash)){
-    document.getElementById(initialHash)?.scrollIntoView({block:'start',behavior:'instant'});
+    document.getElementById(initialHash)?.scrollIntoView({block:'start',behavior:'auto'});
     setActiveSection(initialHash);
    }else syncFromScroll();
   });
@@ -86,6 +87,26 @@ export function MembershipRulesPage({user}:{user:User|null}){
   if(itemRect.top<upper)nav.scrollTop+=itemRect.top-upper;
   if(itemRect.bottom>lower)nav.scrollTop+=itemRect.bottom-lower;
  },[activeSection]);
+
+ useEffect(()=>{
+  // Printing should include all FAQ answers, even when accordions are closed.
+  // Restore the reader's expanded/collapsed state after the print dialog.
+  let temporarilyOpened:HTMLDetailsElement[]=[];
+  const beforePrint=()=>{
+   temporarilyOpened=Array.from(document.querySelectorAll<HTMLDetailsElement>('.hhba-rules-faq:not([open])'));
+   temporarilyOpened.forEach(detail=>{detail.open=true;});
+  };
+  const afterPrint=()=>{
+   temporarilyOpened.forEach(detail=>{detail.open=false;});
+   temporarilyOpened=[];
+  };
+  window.addEventListener('beforeprint',beforePrint);
+  window.addEventListener('afterprint',afterPrint);
+  return ()=>{
+   window.removeEventListener('beforeprint',beforePrint);
+   window.removeEventListener('afterprint',afterPrint);
+  };
+ },[]);
 
  const onNavigate=(id:string)=>{
   setActiveSection(id);
