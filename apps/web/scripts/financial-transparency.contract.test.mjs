@@ -8,7 +8,7 @@ import {
 } from '../functions/_lib/transparency.js';
 import {onRequest as publicApi} from '../functions/api/transparency/[[path]].js';
 import {onRequestPost as dispatchApi,sendNextBatch} from '../functions/api/transparency/dispatch.js';
-import {onRequest as financeAdmin} from '../functions/api/transparency/admin/[[path]].js';
+import {onRequest as financeAdmin,sendFinanceAdminSmoke} from '../functions/api/transparency/admin/[[path]].js';
 import {publishReviewed} from '../functions/_lib/transparency-publish.js';
 const read=(path)=>readFileSync(new URL(path,import.meta.url),'utf8');
 const payload=(patch={})=>({
@@ -382,4 +382,52 @@ test('isolated opt-in flow requires Turnstile, email confirmation and honors one
   assert.equal(end.email,null);
   assert.equal(countResend,1,'Unsubscribing must not send any marketing or other messages');
  }finally{globalThis.fetch=priorFetch;sqlite.close();}
+});
+
+test('finance admin self-only smoke email uses configured Resend, logs success and rate-limits repeated requests',async()=>{
+ const actor='test-admin@example.com';
+ const calls=[];
+ let lastTime=null;
+ const db={prepare(sql){return{bind(...values){return{
+  async first(){assert.match(sql,/action='admin_mail_smoke'/);assert.equal(values[0],actor);return lastTime?{created_at:lastTime}:null;},
+  async run(){assert.match(sql,/INSERT INTO hhba_fin_audit/);assert.equal(values[1],'admin_mail_smoke');assert.equal(values[2],actor);lastTime=values[4];return {meta:{changes:1}};}
+ };}};}};
+ const mockEnv={
+  RESEND_API_KEY:'not-a-real-api-key',
+  HHBA_FIN_FROM_EMAIL:'HHBA Finance <finance@notify.hhba.work>'
+ };
+ const originalFetch=globalThis.fetch;
+ globalThis.fetch=async(url,opts)=>{
+  assert.equal(String(url),'https://api.resend.com/emails');
+  const req=JSON.parse(opts.body);
+  assert.deepEqual(req.to,[actor]);
+  assert.match(req.subject,/测试.*非正式月报/);
+  assert.match(req.html,/不会.*向用户发送/);
+  calls.push({body:req,key:opts.headers['Idempotency-Key']});
+  return new Response(JSON.stringify({id:'mock-test-message'}),{
+   status:200,headers:{'Content-Type':'application/json'}
+  });
+ };
+ try{
+  const date=new Date('2026-11-17T02:00:00Z');
+  const first=await sendFinanceAdminSmoke(db,mockEnv,actor,date);
+  assert.equal(first.ok,true);
+  assert.equal(first.code,'TEST_MAIL_SUBMITTED');
+  assert.equal(lastTime,date.toISOString());
+  const second=await sendFinanceAdminSmoke(db,mockEnv,actor,new Date(date.getTime()+60000));
+  assert.equal(second.ok,false);
+  assert.equal(second.code,'TEST_EMAIL_RATE_LIMITED');
+  assert.equal(calls.length,1);
+  const third=await sendFinanceAdminSmoke(db,mockEnv,actor,new Date(date.getTime()+6*60*60*1000));
+  assert.equal(third.ok,true);
+  assert.equal(calls.length,2);
+  assert.notEqual(calls[0].key,calls[1].key);
+  const notConfigured=await sendFinanceAdminSmoke(db,{HHBA_FIN_FROM_EMAIL:mockEnv.HHBA_FIN_FROM_EMAIL},actor,date);
+  assert.equal(notConfigured.code,'TEST_MAIL_SENDER_NOT_READY');
+ }finally{globalThis.fetch=originalFetch;}
+ const adminRoute=read('../functions/api/transparency/admin/[[path]].js');
+ assert.ok(adminRoute.indexOf('verifyAdmin(request,env)')<adminRoute.indexOf("path==='/api/transparency/admin/test-email'"));
+ assert.match(adminRoute,/if\(!safeOrigin\(request\)\)/);
+ assert.match(adminRoute,/confirmTestEmail!==true/);
+ assert.match(read('../src/pages/TransparencyManagePage.tsx'),/向本人邮箱发送一封测试邮件/);
 });
