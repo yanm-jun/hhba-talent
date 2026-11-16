@@ -42,6 +42,8 @@ function ServiceList({items}:{items:string[]}){
 
 export function HomeWorkplacePromise(){
  const [config,setConfig]=useState<PublicHomepageConfig>(publicConfigFallback);
+ const [financeReportPeriod,setFinanceReportPeriod]=useState<string|null>(null);
+ const [financeStatusLoaded,setFinanceStatusLoaded]=useState(false);
  useEffect(()=>{
   let active=true;
   const endpoint=import.meta.env.BASE_URL+'api/public/homepage';
@@ -50,6 +52,14 @@ export function HomeWorkplacePromise(){
    .then(value=>{if(active&&isPublicHomepageConfig(value))setConfig(value);})
    .catch(()=>{/* Static preview remains usable with the reviewed fallback configuration. */});
   return ()=>{active=false;};
+ },[]);
+ useEffect(()=>{
+  let active=true;
+  fetch(import.meta.env.BASE_URL+'api/transparency/reports',{cache:'no-store'})
+   .then(r=>{if(!r.ok)throw Error('REPORTS_UNAVAILABLE');return r.json() as Promise<{reports?:Array<{period:string}>}>;})
+   .then(data=>{if(!active)return;setFinanceReportPeriod(data.reports?.[0]?.period||null);setFinanceStatusLoaded(true);})
+   .catch(()=>{if(active)setFinanceStatusLoaded(false);});
+  return()=>{active=false;};
  },[]);
  const membership=config.membership;
  const distribution=config.distribution;
@@ -128,12 +138,12 @@ export function HomeWorkplacePromise(){
    </div>
    <div className="hhba-home-pledge-bottom">
     <div><Scale size={15} aria-hidden="true"/><span>以{distribution.basis}为基数，不按营业流水分配。</span></div>
-    <span className="hhba-home-report-status">{distribution.reportStatus==='not_published'?'首期财务报告尚未发布':'财务报告已发布'}</span>
+    <span className="hhba-home-report-status">{financeReportPeriod?'已公开 '+financeReportPeriod+' 月度报告':financeStatusLoaded?'首期财务报告尚未发布':'财务报告状态以透明中心为准'}</span>
    </div>
-   <details className="hhba-home-report-details">
-    <summary>查看分配制度说明</summary>
-    <p>{distribution.reportNotice}</p>
-   </details>
+   <Link className="hhba-home-report-details hhba-home-transparency-link" to="/transparency">
+    <span>查看财务透明中心 · 月度报告与帮扶收支</span>
+    <ArrowRight size={14} aria-hidden="true"/>
+   </Link>
   </aside>
  </section>;
 }
