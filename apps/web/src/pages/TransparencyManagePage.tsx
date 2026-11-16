@@ -39,7 +39,7 @@ export function TransparencyManagePage({user}:{user:User|null}){
  const [notes,setNotes]=useState({basisNote:'',methodNote:'',poolNote:'',privacyReviewNote:''});
  const [reviewNote,setReviewNote]=useState('');
  const [correctionReason,setCorrectionReason]=useState('');
- const [audit,setAudit]=useState(false);
+
  const [confirmations,setConfirmations]=useState({ledgerReconciled:false,privacyReviewed:false,legalDistributionBasisChecked:false,noFabricationAttested:false,auditEvidenceConfirmed:false});
  const [currentRow,setCurrentRow]=useState<Row|null>(null);
 
@@ -60,7 +60,7 @@ export function TransparencyManagePage({user}:{user:User|null}){
   setBeneficiaries(row.draft?.beneficiaries===undefined?'':String(row.draft.beneficiaries));
   setNotes({basisNote:String(row.draft?.basisNote||''),methodNote:String(row.draft?.methodNote||''),
    poolNote:String(row.draft?.poolNote||''),privacyReviewNote:String(row.draft?.privacyReviewNote||'')});
-  setAudit(row.draft?.isAudited===true);
+
   setMessage('已载入 '+row.period+' 记录。修订已发布数据时必须填写更正理由。');
  };
  const draft=()=>{
@@ -72,7 +72,7 @@ export function TransparencyManagePage({user}:{user:User|null}){
   }
   if(!/^\d{1,7}$/.test(beneficiaries))throw Error('请填写实际帮扶事项数量，尚无帮扶请填0');
   payload.beneficiaries=Number(beneficiaries);
-  Object.assign(payload,notes,{isAudited:audit});
+  Object.assign(payload,notes,{isAudited:false});
   return payload;
  };
  const act=async(action:'draft'|'correction'|'review'|'publish')=>{
@@ -114,7 +114,7 @@ export function TransparencyManagePage({user}:{user:User|null}){
        {status.reports.length?status.reports.map(row=><button type="button" className={'hhba-fin-admin-history'+(currentRow?.period===row.period?' active':'')} key={row.period} onClick={()=>load(row)}>
         <strong>{row.period}</strong><span>{row.status==='published'?'已公开':row.status==='reviewed'?'已审核，待发布':'草稿'} · 第{row.revision}版</span>
        </button>):<p className="hhba-fin-admin-empty">尚无任何真实财务记录。</p>}
-       <button className="hhba-fin-admin-create" type="button" onClick={()=>{setCurrentRow(null);setPeriod('');setAmounts(init());setBeneficiaries('');setNotes({basisNote:'',methodNote:'',poolNote:'',privacyReviewNote:''});setAudit(false);setMessage('新建空白草稿，请全部按真实账目填写。');}}>＋ 新建月度报告</button>
+       <button className="hhba-fin-admin-create" type="button" onClick={()=>{setCurrentRow(null);setPeriod('');setAmounts(init());setBeneficiaries('');setNotes({basisNote:'',methodNote:'',poolNote:'',privacyReviewNote:''});setMessage('新建空白草稿，请全部按真实账目填写。');}}>＋ 新建月度报告</button>
       </aside>
       <section>
        <h2>真实月报录入与核验</h2>
@@ -126,7 +126,7 @@ export function TransparencyManagePage({user}:{user:User|null}){
        <label>本月帮扶事项数量<input inputMode="numeric" placeholder="按照实际记录填写" value={beneficiaries} onChange={e=>setBeneficiaries(e.target.value)}/></label>
        {([['basisNote','依法可分配利润的认定及前期亏损、法定公积金等说明'],['methodNote','收入、成本、退款、费用与账务调整的计算口径'],['poolNote','权益帮扶池的资金流动、支出类别和期末余额说明'],['privacyReviewNote','公开前隐私、敏感案件资料和商业秘密复核结论']] as const).map(([key,title])=>
         <label key={key}>{title}<textarea rows={3} minLength={12} maxLength={3000} value={notes[key]} onChange={e=>setNotes(n=>({...n,[key]:e.target.value}))}/></label>)}
-       <label className="hhba-fin-admin-checkbox"><input type="checkbox" checked={audit} onChange={e=>setAudit(e.target.checked)}/> 本期已取得真实独立审计证据（否则不得勾选）</label>
+       <p className="hhba-fin-admin-help">独立财务审计证明上传和核验模块尚未启用，因此报告统一标记「未经独立审计」。本后台不能自行将报告标为已审计。</p>
        <label>已发布报告的更正理由（至少20字）<textarea rows={2} value={correctionReason} onChange={e=>setCorrectionReason(e.target.value)}/></label>
        <div className="hhba-fin-admin-actions">
         <button disabled={busy} onClick={()=>void act(currentRow?.status==='published'?'correction':'draft')}>保存{currentRow?.status==='published'?'更正':'草稿'}</button>
