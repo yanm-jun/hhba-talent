@@ -7,7 +7,7 @@ import '../styles/transparency-admin.css';
 
 type Row={period:string;status:string;revision:number;reviewedAt?:string|null;publishedAt?:string|null;
  correctionReason?:string|null;draft?:Record<string,string|number|boolean>};
-type Status={ok:boolean;admin:string;reports:Row[];subscribers:Record<string,number>};
+type Status={ok:boolean;admin:string;reports:Row[];subscribers:Record<string,number>;deliveries:Record<string,number>;lastTestEmailSentAt:string|null;sendEnabled:boolean;subscriptionsEnabled:boolean};
 const fields=[
  ['营业收入','revenueFen'],['退款及收入冲减','refundFen'],
  ['AI模型调用费用','aiCostFen'],['服务器与存储成本','infrastructureFen'],
@@ -93,6 +93,23 @@ export function TransparencyManagePage({user}:{user:User|null}){
   finally{setBusy(false);}
  };
 
+
+ const testFinanceEmail=async()=>{
+  if(busy||!window.confirm('确认只向当前财务管理员邮箱发送一封内部测试邮件？这不会向订阅者发送邮件，也不会发布任何报告。'))return;
+  setBusy(true);setMessage('');
+  try{
+   const r=await fetch(endpoint('/test-email'),{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({confirmTestEmail:true})
+   });
+   const data=await r.json() as {ok:boolean;code?:string};
+   if(!r.ok||!data.ok)throw Error(data.code||'TEST_EMAIL_FAILED');
+   setMessage('内部测试邮件已提交至 Resend；请查收管理员收件箱并核对实际投递情况。');
+   await refresh();
+  }catch(e){setMessage('内部测试邮件未完成：'+(e instanceof Error?e.message:'未知错误'));}
+  finally{setBusy(false);}
+ };
+
  return <Shell user={user}>
   <div className="hhba-fin-admin">
    <div className="hhba-fin-admin-crumb"><Link to="/transparency"><ArrowLeft size={14}/>返回公开财务中心</Link></div>
@@ -107,7 +124,17 @@ export function TransparencyManagePage({user}:{user:User|null}){
       <div><span>已发布报告</span><strong>{status.reports.filter(r=>r.status==='published').length}</strong></div>
       <div><span>已验证财报邮件订阅</span><strong>{status.subscribers.verified||0}</strong></div>
       <div><span>邮件订阅待验证</span><strong>{status.subscribers.pending||0}</strong></div>
+      <div><span>月报邮件已发送</span><strong>{status.deliveries?.sent||0}</strong></div>
+      <div><span>月报邮件发送失败</span><strong>{status.deliveries?.failed||0}</strong></div>
      </div>
+     <section className="hhba-fin-admin-review" aria-labelledby="finance-mail-smoke-title" style={{marginBottom:24}}>
+      <h2 id="finance-mail-smoke-title">邮件通道验收</h2>
+      <p className="hhba-fin-admin-help">仅向当前财务管理员本人发送一封测试邮件，不会公开财报、收集订阅或启动群发。每个管理员每 6 小时最多发起一次；真实到达情况需要在收件箱确认。</p>
+      <p className="hhba-fin-admin-help">订阅：{status.subscriptionsEnabled?'已开放':'未开放'} · 月报批量发送：{status.sendEnabled?'已开启':'未开启'} · 上次测试：{status.lastTestEmailSentAt?new Date(status.lastTestEmailSentAt).toLocaleString('zh-CN'):'尚未发送'}</p>
+      <div className="hhba-fin-admin-actions">
+       <button type="button" disabled={busy} onClick={()=>void testFinanceEmail()}>向本人邮箱发送一封测试邮件</button>
+      </div>
+     </section>
      <div className="hhba-fin-admin-workspace">
       <aside>
        <div className="hhba-fin-admin-panel-title"><h2>财务报告记录</h2><button type="button" onClick={()=>{void refresh();}} aria-label="刷新报告"><RefreshCw size={16}/></button></div>
