@@ -1,0 +1,43 @@
+name: HHBA public membership rules preflight
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/pages/MembershipRulesPage.tsx'
+      - 'apps/web/src/data/membershipRulesContent.ts'
+      - 'apps/web/src/data/membershipCompliance.ts'
+      - 'apps/web/src/data/homepagePublicConfig.json'
+      - 'apps/web/functions/api/membership/**'
+      - 'apps/web/functions/api/public/homepage.js'
+      - 'apps/web/src/styles/membership-rules.css'
+      - 'apps/web/src/components/HomeWorkplacePromise.tsx'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/pages/LegalAidLandingPage.tsx'
+      - 'apps/web/scripts/membership-rules.contract.test.mjs'
+      - 'apps/web/scripts/membership-compliance.contract.test.mjs'
+      - 'apps/web/scripts/home-workplace-promise.contract.test.mjs'
+      - '.github/workflows/hhba-public-membership-rules.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-public-rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify 16 chapters, public link and homepage compatibility
+        working-directory: apps/web
+        run: |
+          node --test scripts/membership-rules.contract.test.mjs scripts/membership-compliance.contract.test.mjs scripts/home-workplace-promise.contract.test.mjs
+      - name: Verify TypeScript and frontend build
+        working-directory: apps/web
+        run: npm run build

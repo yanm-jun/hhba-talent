@@ -107,11 +107,7 @@ export function HomeWorkplacePromise(){
     <div className="hhba-home-member-status"><ShieldCheck size={17} aria-hidden="true"/><span>{membership.purchaseEnabled?'会员服务已开放':'服务规划中 · 暂未开放购买及案件申请'}</span></div>
     <Link className="hhba-home-text-link" to="/candidate/account/legal-aid">了解权益支持 <ArrowRight size={16} aria-hidden="true"/></Link>
    </div>
-   <details className="hhba-home-service-notes">
-    <summary>服务资格、范围与开通说明</summary>
-    <p>{membership.qualificationNotice}</p>
-    <p>{membership.serviceNotice}</p>
-   </details>
+   <Link className="hhba-home-rules-link" to="/membership/rules">服务资格、范围与开通说明 <ArrowRight size={14} aria-hidden="true"/></Link>
   </article>
 
   <aside className="hhba-home-pledge" aria-labelledby="hhba-home-distribution-title">

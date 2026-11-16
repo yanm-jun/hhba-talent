@@ -30,6 +30,9 @@ export function LegalAidLandingPage({user}:{user:User|null}){
             <span className="hhba-law-brand-name">劳动权益支持</span>
           </div>
           <div className="hhba-law-header-actions">
+            <Link to="/membership/rules" className="hhba-law-intervention-link">
+              <FileText size={13} aria-hidden="true"/>会员服务完整规则
+            </Link>
             <Link to="/candidate/account/legal-aid/intervention" className="hhba-law-intervention-link">
               <ShieldCheck size={13} aria-hidden="true"/>查看服务筹备说明
             </Link>

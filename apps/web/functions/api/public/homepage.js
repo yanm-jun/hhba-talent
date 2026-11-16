@@ -5,5 +5,19 @@ import {json} from '../../_lib/metric-utils.js';
 // Keep the JSON import attribute-free: Cloudflare Pages Functions bundles JSON imports directly.
 // Purchase and case intake stay disabled until their dedicated backend workflows are implemented.
 export async function onRequestGet(){
- return json(homepagePublicConfig);
+ // Read-only disclosure; public config cannot be used to activate commerce.
+ // A dedicated audited implementation must explicitly remove these safeguards.
+ return json({
+  ...homepagePublicConfig,
+  membership:{
+   ...homepagePublicConfig.membership,
+   purchaseEnabled:false,
+   caseIntakeEnabled:false,
+   autoRenewEnabled:false,
+   multiMonthPrepayEnabled:false,
+   sensitiveCaseUploadEnabled:false,
+   caseAIProcessingEnabled:false,
+   launchApproved:false,
+  },
+ });
 }

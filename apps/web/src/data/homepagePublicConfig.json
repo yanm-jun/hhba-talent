@@ -21,8 +21,15 @@
       "仲裁材料整理、文书代写与修改、归档",
       "服务进度跟进"
     ],
-    "qualificationNotice": "连续缴费满六期后，可按正式服务协议申请劳动权益支持；是否受理及具体服务范围以审核结果和协议约定为准。",
-    "serviceNotice": "当前为服务方案规划展示，暂未开放购买、案件申请或律师委托。正式开放前将明确服务次数、交付标准、资格条件、受理范围、费用承担及终止规则。法律服务由依法执业的律师事务所及律师按规定承接；本方案不提供现金赔付。"
+    "qualificationNotice": "规划为连续完成六期主动月付后，可按最终协议申请进阶劳动权益支持；具体资格起算、已发生争议、律师额度仍待确定，当前不开放收款或案件受理。",
+    "serviceNotice": "当前仅为服务方案规划展示，暂未开放购买、自动扣款、预付套餐、案件申请或律师委托。首版拟由用户主动按月付款；每月交付、合理退费规则、经营主体和律所合同、敏感数据评估等确认前不得开售。该服务不提供现金赔付或胜诉保证。",
+    "billingMode": "manual_only",
+    "autoRenewEnabled": false,
+    "multiMonthPrepayEnabled": false,
+    "sensitiveCaseUploadEnabled": false,
+    "caseAIProcessingEnabled": false,
+    "launchApproved": false,
+    "complianceRulesVersion": "0.2.0"
   },
   "distribution": {
     "status": "policy_announced",
