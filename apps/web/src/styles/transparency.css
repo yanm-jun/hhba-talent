@@ -91,12 +91,17 @@
 .hhba-fin-no-history{display:flex;align-items:center;gap:10px;padding:22px;background:#f9faf9;border:1px solid var(--fin-line);border-radius:7px;color:#748278;font-size:13px;line-height:1.75}
 .hhba-fin-no-history svg{flex:none;color:#91a497}
 .hhba-fin-history-table{border:1px solid var(--fin-line);border-radius:7px;overflow:hidden}
-.hhba-fin-history-head,.hhba-fin-history-item{display:grid;grid-template-columns:1fr 1fr 1.5fr 100px;gap:15px;align-items:center;text-align:left}
-.hhba-fin-history-head{background:#f6f8f6;padding:12px 18px;font-size:11px;color:#66786c;font-weight:760}
-.hhba-fin-history-item{width:100%;padding:16px 18px;border:0;border-top:1px solid var(--fin-line);background:#fff;font-size:12px;color:#53685a;cursor:pointer;line-height:1.6}
-.hhba-fin-history-item:hover,.hhba-fin-history-item.is-current{background:#f7faf8}
-.hhba-fin-history-item>span:first-child{font-weight:720;color:#2c4433}
-.hhba-fin-history-item>span:last-child{display:flex;align-items:center;gap:7px;justify-content:flex-end;color:#326c4b;font-weight:700}
+.hhba-fin-history-table table{border-collapse:collapse;width:100%;font-size:12px;line-height:1.65}
+.hhba-fin-history-table thead{background:#f6f8f6}
+.hhba-fin-history-table th,.hhba-fin-history-table td{padding:14px 18px;text-align:left;vertical-align:middle;border-bottom:1px solid var(--fin-line)}
+.hhba-fin-history-table thead th{font-size:11px;font-weight:760;color:#67786b;white-space:nowrap}
+.hhba-fin-history-table tbody tr:last-child th,.hhba-fin-history-table tbody tr:last-child td{border-bottom:0}
+.hhba-fin-history-table tbody th{font-weight:740;color:#2c4433}
+.hhba-fin-history-table tbody td{color:#56685c}
+.hhba-fin-history-table tbody tr:hover,.hhba-fin-history-table tbody tr.is-current{background:#f7faf8}
+.hhba-fin-history-table td:last-child{text-align:right}
+.hhba-fin-history-table td button{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;background:transparent;border:0;padding:4px 0;color:#326c4b;font-weight:700;font-size:12px;cursor:pointer}
+.hhba-fin-history-table td button:hover{text-decoration:underline;text-underline-offset:3px}
 .hhba-fin-subscribe-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.92fr);gap:37px;align-items:start}
 .hhba-fin-subscribe-description{padding:5px 0}
 .hhba-fin-subscribe-description>svg{color:#5f8b6c}
@@ -160,7 +165,7 @@
  .hhba-fin-report-header h3{font-size:18px}
  .hhba-fin-report-summary,.hhba-fin-panels>section,.hhba-fin-report-notes{padding:17px 16px}
  .hhba-fin-history-table{overflow-x:auto}
- .hhba-fin-history-head,.hhba-fin-history-item{min-width:630px}
+ .hhba-fin-history-table table{min-width:630px}
  .hhba-fin-allocation-table>div{padding:17px}
  .hhba-fin-subscribe-panel{padding:18px 15px}
 }
