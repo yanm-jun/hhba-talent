@@ -84,6 +84,10 @@ export async function onRequestPost({request,env}){
   let row=await db.prepare('SELECT * FROM hhba_fin_reports WHERE period=?').bind(period).first();
   if(!row)return json({ok:true,code:'NO_APPROVED_REPORT_NO_EMAIL',period,attempted:0});
   if(row.status==='reviewed'&&row.reviewed_json){
+   // A finance review is not itself consent to public disclosure. Without an
+   // explicitly enabled automatic-release policy, only a human can publish.
+   if(String(env.HHBA_FIN_AUTO_PUBLISH_ENABLED||'')!=='1')
+    return json({ok:true,code:'REVIEWED_PENDING_MANUAL_PUBLICATION_NO_EMAIL',period,attempted:0});
    const published=await publishReviewed(db,{period,actor:'scheduled-dispatch'});
    if(!published.ok)return failure(published.code,409);
   }
