@@ -4,12 +4,12 @@ on:
     branches: [main]
     paths:
       - 'apps/web/src/pages/TransparencyPage.tsx'
-      - 'apps/web/src/pages/TransparencyManagePage.tsx'
       - 'apps/web/src/styles/transparency*.css'
       - 'apps/web/src/main.tsx'
       - 'apps/web/src/components/HomeWorkplacePromise.tsx'
       - 'apps/web/src/components/Shell.tsx'
       - 'apps/web/functions/api/transparency/**'
+      - 'apps/web/functions/transparency/manage.js'
       - 'apps/web/functions/_lib/transparency*.js'
       - 'apps/web/functions/_lib/admin-access.js'
       - 'apps/web/d1/0020_financial_transparency.sql'
