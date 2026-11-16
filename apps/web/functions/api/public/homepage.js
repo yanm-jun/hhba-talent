@@ -1,4 +1,4 @@
-import homepagePublicConfig from '../../../src/data/homepagePublicConfig.json' with { type: 'json' };
+import homepagePublicConfig from '../../../src/data/homepagePublicConfig.json';
 import {json} from '../../_lib/metric-utils.js';
 
 // Public, read-only homepage configuration. It contains no member, payment or case data.
