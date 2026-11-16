@@ -45,7 +45,7 @@ test('format terms, manual renewal, prepayment refund, sensitive data have concr
  const checks=compliance.match(/export const launchChecks=\[([\s\S]*?)\] as const;/)?.[1]||'';
  assert.equal((areas.match(/\{id:'/g)||[]).length,4);
  assert.equal((checks.match(/\{id:'/g)||[]).length,12);
- for(const word of ['格式条款','续费','退款','敏感','单独','授权','至少5日','同意','版本','退费',
+ for(const word of ['格式条款','续费','退款','敏感','单独','授权','提前5日','同意','版本','退费',
    '存储','经营主体','律所','服务','影响评估']){
   assert.ok(compliance.includes(word),'Missing compliance control: '+word);
  }
