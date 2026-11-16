@@ -132,7 +132,7 @@ test('responsibility page is three-part, sober and keeps real finance interfaces
  assert.match(page,/VITE_HHBA_PARTNER_LOGO_AUTHORIZED/);
  assert.match(page,/officialPartnerMark\(\)/);
  assert.match(page,/if\(String\(env\.VITE_HHBA_PARTNER_LOGO_AUTHORIZED\|\|''\)!=='1'\)return null/);
- assert.match(page,/site\.protocol!=='https:'\|\|logo\.protocol!=='https:'\/); 
+ assert.ok(page.includes("site.protocol!=='https:'||logo.protocol!=='https:'"));
  assert.match(page,/if\(!isOfficialAsset&&!isSiteHostedAsset\)return null/);
  assert.match(page,/referrerPolicy="no-referrer"/);
  assert.match(page,/rel="noopener noreferrer"/);
