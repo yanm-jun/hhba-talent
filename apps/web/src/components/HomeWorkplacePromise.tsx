@@ -29,9 +29,9 @@ function isPublicHomepageConfig(value:unknown):value is PublicHomepageConfig{
 }
 
 const values=[
- {title:'真实职业机会',description:'AI 理解经历，优先寻找企业官方岗位',Icon:BriefcaseBusiness},
- {title:'持续职业成长',description:'把工作经历沉淀为长期职业档案',Icon:FileText},
- {title:'劳动权益支持',description:'了解权益，按约定获得专业服务',Icon:ShieldCheck}
+ {title:'官方岗位优先',Icon:BriefcaseBusiness},
+ {title:'持续职业成长',Icon:FileText},
+ {title:'劳动权益支持',Icon:ShieldCheck}
 ];
 
 function ServiceList({items}:{items:string[]}){
@@ -56,17 +56,10 @@ export function HomeWorkplacePromise(){
  const price=(membership.priceCents/100).toFixed(2);
  return <section className="hhba-home-workplace" aria-labelledby="hhba-home-workplace-title">
   <header className="hhba-home-workplace-heading">
-   <span className="hhba-home-workplace-kicker">HHBA · CAREER & WORKPLACE SUPPORT</span>
+   <span className="hhba-home-workplace-kicker">HHBA · MORE THAN A JOB</span>
    <h2 id="hhba-home-workplace-title">找到好工作，只是开始。</h2>
    <p>从职业机会，到持续成长，再到劳动权益支持。</p>
   </header>
-
-  <ul className="hhba-home-value-strip" aria-label="HHBA 三项核心服务">
-   {values.map(({title,description,Icon})=><li className="hhba-home-value" key={title}>
-    <span className="hhba-home-value-icon"><Icon size={21} strokeWidth={1.85} aria-hidden="true"/></span>
-    <div><h3>{title}</h3><p>{description}</p></div>
-   </li>)}
-  </ul>
 
   <article className="hhba-home-membership-card" aria-labelledby="hhba-home-membership-title">
    <div className="hhba-home-member-head">
@@ -84,6 +77,9 @@ export function HomeWorkplacePromise(){
     </div>
    </div>
 
+   <ul className="hhba-home-member-highlights" aria-label="HHBA 服务特点">
+    {values.map(({title,Icon})=><li key={title}><Icon size={16} strokeWidth={1.9} aria-hidden="true"/><span>{title}</span></li>)}
+   </ul>
    <div className="hhba-home-phase-grid" aria-label="会员服务阶段">
     <section className="hhba-home-stage" aria-labelledby="hhba-home-stage-career-title">
      <div className="hhba-home-stage-heading">
