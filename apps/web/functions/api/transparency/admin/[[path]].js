@@ -1,7 +1,7 @@
 import {verifyAdmin} from '../../../_lib/admin-access.js';
 import {
  json,failure,financeDb,validPeriod,cleanPeriodPayload,readJson,safeOrigin,
- priorMonth,safeParse,publicReport
+ priorMonth,safeParse,publicReport,deliverEmail,fromAddress,sha256
 } from '../../../_lib/transparency.js';
 import {publishReviewed} from '../../../_lib/transparency-publish.js';
 
@@ -13,6 +13,30 @@ const toPrivateReport=row=>row?{
  correctionReason:row.correction_reason||null,reviewNote:row.review_note||null,
  draft:safeParse(row.draft_json),published:row.status==='published'?publicReport(row):null
 }:null;
+
+
+const SIX_HOURS_MS=6*60*60*1000;
+// This test NEVER opts anybody in or touches a published finance report.
+// Caller must already pass both Cloudflare Access JWT verification and origin checks.
+export async function sendFinanceAdminSmoke(db,env,actor,at=new Date()){
+ if(!env.RESEND_API_KEY||!fromAddress(env))return {ok:false,code:'TEST_MAIL_SENDER_NOT_READY',status:503};
+ const now=at.toISOString();
+ const recent=await db.prepare("SELECT created_at FROM hhba_fin_audit WHERE action='admin_mail_smoke' AND actor=? ORDER BY created_at DESC LIMIT 1").bind(actor).first();
+ if(recent?.created_at&&at.getTime()-Date.parse(recent.created_at)<SIX_HOURS_MS)
+  return {ok:false,code:'TEST_EMAIL_RATE_LIMITED',status:429};
+ const hourBlock=Math.floor(at.getTime()/SIX_HOURS_MS);
+ const digest=await sha256(actor);
+ const output=await deliverEmail(env,{
+  to:actor,
+  subject:'HHBA 财务后台 · 发信通道测试（非正式月报）',
+  html:'<html lang="zh-CN"><body style="font-family:Arial,sans-serif;color:#273d30"><h2>HHBA 财务系统发信测试</h2><p>这是一封发送至财务管理员邮箱的内部验收邮件，不代表任何财务报告已审核、发布或向用户发送。</p><p>如果你收到此邮件，说明当前配置的 Resend 发件地址可以受理该次投递请求；最终送达状态仍以邮箱收件及服务商记录为准。</p></body></html>',
+  idempotencyKey:'hhba-fin-admin-smoke-'+digest.slice(0,32)+'-'+hourBlock
+ });
+ if(!output.ok)return {ok:false,code:output.code||'MAIL_DELIVERY_ERROR',status:502};
+ await db.prepare('INSERT INTO hhba_fin_audit(period,action,actor,event_note,created_at) VALUES(?,?,?,?,?)')
+  .bind(null,'admin_mail_smoke',actor,'仅发送管理员内部测试邮件；未启用订阅或群发',now).run();
+ return {ok:true,code:'TEST_MAIL_SUBMITTED',sentAt:now};
+}
 
 export async function onRequest({request,env}){
  // Cloudflare Access identity must be cryptographically verified AND use
@@ -27,10 +51,17 @@ export async function onRequest({request,env}){
    if(path==='/api/transparency/admin/status'){
     const rows=await db.prepare('SELECT * FROM hhba_fin_reports ORDER BY period DESC LIMIT 36').all();
     const counts=await db.prepare("SELECT status,COUNT(*) AS n FROM hhba_fin_subscribers GROUP BY status").all();
+    const deliveries=await db.prepare("SELECT status,COUNT(*) AS n FROM hhba_fin_deliveries GROUP BY status").all();
+    const smoke=await db.prepare("SELECT created_at FROM hhba_fin_audit WHERE action='admin_mail_smoke' AND actor=? ORDER BY created_at DESC LIMIT 1").bind(admin.email).first();
     return json({ok:true,admin:admin.email,checks:{database:true,access:true,
-      financialSource:'MANUAL_DOCUMENTED_INPUT',automation:'APPROVED_REPORTS_ONLY'},
+      financialSource:'MANUAL_DOCUMENTED_INPUT',automation:'PUBLISHED_REPORTS_ONLY'},
       reports:(rows.results||[]).map(toPrivateReport),
-      subscribers:Object.fromEntries((counts.results||[]).map(r=>[r.status,Number(r.n)]))});
+      subscribers:Object.fromEntries((counts.results||[]).map(r=>[r.status,Number(r.n)])),
+      deliveries:Object.fromEntries((deliveries.results||[]).map(r=>[r.status,Number(r.n)])),
+      lastTestEmailSentAt:smoke?.created_at||null,
+      sendEnabled:String(env.HHBA_FIN_SEND_ENABLED||'')==='1',
+      subscriptionsEnabled:String(env.HHBA_FIN_SUBSCRIPTIONS_ENABLED||'')==='1'
+    });
    }
    if(path==='/api/transparency/admin/report'){
     const period=new URL(request.url).searchParams.get('period');
@@ -45,6 +76,15 @@ export async function onRequest({request,env}){
  if(!safeOrigin(request))return failure('ORIGIN_DENIED',403);
  const body=await readJson(request,28000);
  if(!body)return failure('INVALID_JSON',400);
+ // Internal smoke test can run before public subscriptions or batch dispatch.
+ // It is ONLY available to the validated Access administrator on same origin.
+ if(path==='/api/transparency/admin/test-email'){
+  if(body.confirmTestEmail!==true)return failure('TEST_EMAIL_CONFIRMATION_REQUIRED',400);
+  try{
+   const result=await sendFinanceAdminSmoke(db,env,admin.email);
+   return result.ok?json(result):failure(result.code,result.status);
+  }catch(e){console.error('HHBA_FIN_TEST_MAIL_FAILED',e?.name||'error');return failure('TEST_EMAIL_TEMPORARILY_UNAVAILABLE',503);}
+ }
  const period=body.period;
  if(!validPeriod(period))return failure('INVALID_PERIOD',400);
  try{
