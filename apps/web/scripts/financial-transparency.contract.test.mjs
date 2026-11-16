@@ -402,7 +402,7 @@ test('finance admin self-only smoke email uses configured Resend, logs success a
   const req=JSON.parse(opts.body);
   assert.deepEqual(req.to,[actor]);
   assert.match(req.subject,/测试.*非正式月报/);
-  assert.match(req.html,/不会.*向用户发送/);
+  assert.match(req.html,/不代表任何财务报告已审核、发布或向用户发送/);
   calls.push({body:req,key:opts.headers['Idempotency-Key']});
   return new Response(JSON.stringify({id:'mock-test-message'}),{
    status:200,headers:{'Content-Type':'application/json'}
