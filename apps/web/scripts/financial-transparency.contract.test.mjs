@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {DatabaseSync} from 'node:sqlite';
 import {
  cleanPeriodPayload,validPeriod,nowBeijing,priorMonth,isCurrentPublicationDay,
  publicReport,normalizeEmail,randomToken,sha256,unsubscribeToken,fromAddress
@@ -238,4 +239,56 @@ test('isolated batch delivery sends only verified recipients once and records th
   assert.equal(calls[0].payload.headers['List-Unsubscribe-Post'],'List-Unsubscribe=One-Click');
   assert.match(calls[0].payload.headers['List-Unsubscribe'],/\/api\/transparency\/unsubscribe\?token=/);
  }finally{globalThis.fetch=priorFetch;}
+});
+
+test('isolated SQLite finance lifecycle preserves first publication, corrections and immutable audit history',async()=>{
+ const sqlite=new DatabaseSync(':memory:');
+ try{
+  sqlite.exec(read('../d1/0020_financial_transparency.sql'));
+  const db={
+   prepare(sql){return {
+    bind(...values){
+     const stmt=sqlite.prepare(sql);
+     return {
+      async first(){return stmt.get(...values)||null;},
+      async all(){return {results:stmt.all(...values)};},
+      async run(){const info=stmt.run(...values);return {meta:{changes:Number(info.changes)}};}
+     };
+    }
+   };},
+   async batch(queries){
+    const result=[];
+    sqlite.exec('BEGIN');
+    try{
+     for(const q of queries)result.push(await q.run());
+     sqlite.exec('COMMIT');
+     return result;
+    }catch(error){sqlite.exec('ROLLBACK');throw error;}
+   }
+  };
+  const original=cleanPeriodPayload(payload());
+  assert.ok(original,'the fabricated numbers exist only in this in-memory unit-test database');
+  const initialTime='2026-11-21T02:00:00Z';
+  sqlite.prepare("INSERT INTO hhba_fin_reports(period,status,draft_json,reviewed_json,revision,prepared_by,reviewed_by,reviewed_at,created_at,updated_at) VALUES(?,'reviewed',?,?,0,'test-only','test-reviewer',?,?,?)")
+   .run('2026-10',JSON.stringify(original),JSON.stringify(original),initialTime,initialTime,initialTime);
+  const first=await publishReviewed(db,{period:'2026-10',actor:'test-reviewer',at:initialTime});
+  assert.equal(first.ok,true);
+  assert.equal(first.report.revision,1);
+  assert.equal(first.report.netResultFen,40000);
+  const secondTime='2026-11-22T02:00:00Z';
+  const corrected=cleanPeriodPayload(payload({methodNote:'Correction in isolated unit test only, no real financial amount changed.'}));
+  sqlite.prepare("UPDATE hhba_fin_reports SET draft_json=?,reviewed_json=?,reviewed_at=?,reviewed_by='test-reviewer',correction_reason=? WHERE period=?")
+   .run(JSON.stringify(corrected),JSON.stringify(corrected),secondTime,'Unit-test clarification only; not a real financial correction.','2026-10');
+  const second=await publishReviewed(db,{period:'2026-10',actor:'test-reviewer',at:secondTime});
+  assert.equal(second.ok,true);
+  assert.equal(second.report.revision,2);
+  assert.equal(second.report.correctedAt,secondTime);
+  assert.equal(sqlite.prepare("SELECT COUNT(*) AS n FROM hhba_fin_publication_revisions WHERE period=?").get('2026-10').n,2);
+  assert.equal(sqlite.prepare("SELECT COUNT(*) AS n FROM hhba_fin_audit WHERE period=?").get('2026-10').n,2);
+  assert.throws(()=>sqlite.exec("UPDATE hhba_fin_publication_revisions SET correction_reason='tampered' WHERE period='2026-10' AND revision=1"),/IMMUTABLE_PUBLICATION_HISTORY/);
+  assert.throws(()=>sqlite.exec("DELETE FROM hhba_fin_publication_revisions WHERE period='2026-10' AND revision=1"),/IMMUTABLE_PUBLICATION_HISTORY/);
+  assert.throws(()=>sqlite.exec("DELETE FROM hhba_fin_audit WHERE period='2026-10'"),/IMMUTABLE_FINANCE_AUDIT/);
+  const firstHistory=sqlite.prepare('SELECT published_json FROM hhba_fin_publication_revisions WHERE period=? AND revision=1').get('2026-10');
+  assert.equal(JSON.parse(firstHistory.published_json).methodNote,original.methodNote);
+ }finally{sqlite.close();}
 });
