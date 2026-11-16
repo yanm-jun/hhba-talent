@@ -136,7 +136,7 @@ test('frontend fetches one native SSE stream and maps stages without restarting 
  assert.match(svc,/event==='complete'/);
  assert.match(svc,/event==='failure'/);
  assert.match(page,/setStage/);
- assert.match(page,/DeepSeek Search 正在寻找中国大陆具体招聘岗位/);
+ assert.match(page,/正在寻找中国大陆岗位/);
 });
 
 
