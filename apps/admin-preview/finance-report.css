@@ -1,0 +1,32 @@
+/* HHBA monthly reporting within the existing 财务成本 admin workspace. */
+#hhba-fin-report-root{margin-top:20px;background:#fff}
+.hhba-freport-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:16px}
+.hhba-freport-heading h2{font-size:21px;margin:5px 0;color:#21466b}
+.hhba-freport-heading p{font-size:12px;line-height:1.8;color:#607285;margin:4px 0}
+.hhba-freport-alert{font-size:12px;line-height:1.75;border-radius:9px;background:#f5f8ff;color:#405f83;border:1px solid #dce6f5;padding:12px 14px}
+.hhba-freport-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}
+.hhba-freport-kpis>div{display:grid;gap:8px;border:1px solid #e1e8ef;border-radius:11px;padding:15px;background:#fafcfe;min-width:0}
+.hhba-freport-kpis span{color:#617186;font-size:12px}
+.hhba-freport-kpis strong{font-size:21px;color:#193c65;font-variant-numeric:tabular-nums;word-break:break-word}
+.hhba-freport-status{padding:12px 14px;background:#f7fafc;border-radius:8px;font-size:12px;line-height:1.85;color:#5b7187}
+.hhba-freport-layout{display:grid;grid-template-columns:minmax(200px,240px) minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}
+.hhba-freport-history,.hhba-freport-editor{border:1px solid #e2eaf1;border-radius:12px;padding:16px;min-width:0}
+.hhba-freport-history-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:13px}
+.hhba-freport-history h3,.hhba-freport-editor h3{margin:0 0 16px;color:#23496d;font-size:17px}
+.hhba-freport-month{display:block;width:100%;margin:5px 0;text-align:left;white-space:normal;font-size:12px}
+.hhba-freport-editor label{display:grid;gap:7px;margin:12px 0;color:#375674;font-weight:650;font-size:12px;line-height:1.5}
+.hhba-freport-editor input:not([type=checkbox]),.hhba-freport-editor textarea{width:100%;font:13px/1.6 system-ui,sans-serif;padding:10px 11px;border:1px solid #cbd9e5;border-radius:8px;color:#213951;background:#fff}
+.hhba-freport-editor input:focus-visible,.hhba-freport-editor textarea:focus-visible{outline:2px solid #4776ae;outline-offset:2px}
+.hhba-freport-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 15px}
+.hhba-freport-editor p{color:#718396;font-size:12px;line-height:1.85}
+.hhba-freport-calculated{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;background:#f6f9fc;border:1px solid #e1eaf3;padding:13px;border-radius:11px;margin:14px 0}
+.hhba-freport-calculated>div{display:grid;gap:7px}
+.hhba-freport-calculated span{font-size:11px;color:#6a7b8e}
+.hhba-freport-calculated strong{font-size:19px;color:#224c75}
+.hhba-freport-actions{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.hhba-freport-review{border-top:1px solid #e2eaf1;padding-top:17px;margin-top:19px}
+.hhba-freport-editor .hhba-freport-check{display:flex;align-items:flex-start;gap:10px;font-size:12px;font-weight:500}
+.hhba-freport-check input{width:17px;height:17px;flex-shrink:0;accent-color:#236fb0}
+.hhba-freport-caution{padding:10px 12px;border:1px solid #eee2cb;background:#fffcf5;border-radius:8px;color:#8b724d!important}
+@media(max-width:960px){.hhba-freport-layout{grid-template-columns:1fr}.hhba-freport-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:550px){.hhba-freport-heading{flex-direction:column}.hhba-freport-fields,.hhba-freport-calculated,.hhba-freport-kpis{grid-template-columns:1fr}.hhba-freport-kpis strong{font-size:18px}}
