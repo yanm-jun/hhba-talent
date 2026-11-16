@@ -117,3 +117,8 @@
 @media(prefers-reduced-motion:reduce){
  .hhba-home-workplace *{scroll-behavior:auto!important}
 }
+
+/* The concise homepage label now navigates to the full public rules page. */
+.hhba-home-rules-link{display:inline-flex;align-items:center;gap:5px;margin-top:16px;color:#526f5c;font-size:12px;line-height:1.6;text-decoration:underline;text-decoration-color:#c5d3ca;text-underline-offset:3px}
+.hhba-home-rules-link:hover{color:#286b49;text-decoration-color:#286b49}
+.hhba-home-rules-link:focus-visible{outline:2px solid #2d7552;outline-offset:4px;border-radius:4px}
