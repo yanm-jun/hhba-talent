@@ -36,7 +36,7 @@ export function LegalAidInterventionPage({user}:{user:User|null}){
       <span>平台权益支持</span>
      </div>
      <Link to="/candidate/account/legal-aid" className="hhba-intervention-back">
-      <ArrowLeft size={13} aria-hidden="true"/>返回法律援助
+      <ArrowLeft size={13} aria-hidden="true"/>返回劳动权益支持
      </Link>
     </header>
     <div className="hhba-intervention-content">
