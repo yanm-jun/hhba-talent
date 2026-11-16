@@ -70,7 +70,9 @@ test('no dispatch secret, unapproved report or admin identity can leak financial
  assert.equal(redirect.headers.get('Location'),'https://admin.hhba.work/admin-preview/');
  const pub=await publishReviewed({prepare:()=>{throw Error('should not publish');}},{period:'bad',actor:'bot'});
  assert.equal(pub.ok,false);
- assert.match(read('../functions/_lib/admin-access.js'),/HHBA_FINANCE_ACCESS_AUD/);
+ const legacyAccess=read('../functions/_lib/admin-access.js');
+ assert.match(legacyAccess,/if\(!fromOriginalAdmin&&!fromLegacyApi\)return/);
+ assert.doesNotMatch(legacyAccess,/HHBA_FINANCE_ACCESS_AUD|fromFinance/);
 });
 test('newsletter email requires explicit opt-in, domain verification and recoverable HMAC unsubscribe token',async()=>{
  assert.equal(normalizeEmail(' Test@Example.Com '),'test@example.com');
