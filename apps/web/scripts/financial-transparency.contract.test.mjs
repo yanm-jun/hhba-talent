@@ -6,7 +6,7 @@ import {
  publicReport,normalizeEmail,randomToken,sha256,unsubscribeToken,fromAddress
 } from '../functions/_lib/transparency.js';
 import {onRequest as publicApi} from '../functions/api/transparency/[[path]].js';
-import {onRequestPost as dispatchApi} from '../functions/api/transparency/dispatch.js';
+import {onRequestPost as dispatchApi,sendNextBatch} from '../functions/api/transparency/dispatch.js';
 import {onRequest as financeAdmin} from '../functions/api/transparency/admin/[[path]].js';
 import {publishReviewed} from '../functions/_lib/transparency-publish.js';
 const read=(path)=>readFileSync(new URL(path,import.meta.url),'utf8');
@@ -198,4 +198,51 @@ test('monthly dispatch has an explicit human-publication safeguard and bounded b
  assert.match(dispatch,/List-Unsubscribe-Post/);
  const publicRoute=read('../functions/api/transparency/[[path]].js');
  assert.match(publicRoute,/url\.searchParams\.get\('token'\)/);
+});
+
+test('isolated batch delivery sends only verified recipients once and records the provider result',async()=>{
+ const email='fixture@example.org';
+ const hash=await sha256(email);
+ let sent=false,claimed=0,recordedProviderId=null;
+ let calls=[];
+ const db={prepare(sql){return {bind(...params){return {
+  async all(){
+   assert.match(sql,/s\.status='verified'/);
+   assert.match(sql,/LIMIT 30/);
+   return {results:sent?[]:[{email_hash:hash,email,status:'pending',attempts:0}]};
+  },
+  async run(){
+   if(sql.includes("status='sending'")){claimed++;return {meta:{changes:1}};}
+   if(sql.includes("status='sent'")){sent=true;recordedProviderId=params[0];return {meta:{changes:1}};}
+   return {meta:{changes:1}};
+  }
+ };}};}};
+ const env={
+  HHBA_FIN_UNSUBSCRIBE_SECRET:'temporary-unit-test-only-secret-not-for-production-123456789',
+  RESEND_API_KEY:'test-only-not-real',HHBA_FIN_FROM_EMAIL:'HHBA Finance <finance@notify.hhba.work>'
+ };
+ const mockReport={period:'2026-10',revenueFen:0,netResultFen:0,
+  distributableProfitFen:0,poolAccrualFen:0,closingPoolFen:0};
+ const priorFetch=globalThis.fetch;
+ globalThis.fetch=async (url,options)=>{
+  assert.equal(String(url),'https://api.resend.com/emails');
+  assert.equal(options.headers.Authorization,'Bearer test-only-not-real');
+  calls.push({key:options.headers['Idempotency-Key'],payload:JSON.parse(options.body)});
+  return new Response(JSON.stringify({id:'mock-only-resend-message-id'}),{
+   status:200,headers:{'Content-Type':'application/json'}
+  });
+ };
+ try{
+  const first=await sendNextBatch(db,env,'2026-10',mockReport);
+  const second=await sendNextBatch(db,env,'2026-10',mockReport);
+  assert.deepEqual(first,{attempted:1,sent:1,failed:0});
+  assert.deepEqual(second,{attempted:0,sent:0,failed:0});
+  assert.equal(claimed,1);
+  assert.equal(recordedProviderId,'mock-only-resend-message-id');
+  assert.equal(calls.length,1);
+  assert.equal(calls[0].payload.to[0],email);
+  assert.match(calls[0].key,/^hhba-fin-v1-2026-10-/);
+  assert.equal(calls[0].payload.headers['List-Unsubscribe-Post'],'List-Unsubscribe=One-Click');
+  assert.match(calls[0].payload.headers['List-Unsubscribe'],/\/api\/transparency\/unsubscribe\?token=/);
+ }finally{globalThis.fetch=priorFetch;}
 });
