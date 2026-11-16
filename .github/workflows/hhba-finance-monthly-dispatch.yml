@@ -1,8 +1,7 @@
 name: HHBA monthly finance disclosure dispatch
+# Manual fallback only; the Cloudflare Cron Worker is the sole scheduled dispatcher.
+# This workflow safely exits when the optional repository secret is absent.
 on:
-  schedule:
-    # Beijing 21st 10:00–23:55, every five minutes. UTC date is also 21st.
-    - cron: '*/5 2-15 21 * *'
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - name: Dispatch only reviewed real reports, no sample data
+      - name: Manual dispatch of published real reports only (never sample data)
         env:
           HHBA_FIN_DISPATCH_SECRET: ${{ secrets.HHBA_FIN_DISPATCH_SECRET }}
         run: |

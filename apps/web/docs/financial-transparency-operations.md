@@ -118,3 +118,14 @@ GitHub Actions 定时任务并非严格时钟：拥堵或 GitHub 中断时可能
 - [ ] 真实 Turnstile + Resend 收件验证、一次性退订和邮件发送投递验收。
 - [ ] 配置 GitHub Actions 和 Pages 两端的匹配 `HHBA_FIN_DISPATCH_SECRET`，并通过小规模实发测试。
 - [ ] 以上完成后，经负责人明确授权逐项启用订阅和群发。
+
+## 10. Cloudflare Cron 主调度（2026-11-17）
+
+- 主调度 Worker：`hhba-finance-dispatch-scheduler`，源码 `apps/web/ops/finance-cron-worker.mjs`。
+- 触发时间：`*/5 2-15 21 * *` UTC，即北京时间每月21日 10:00—23:55 每五分钟一次。Cloudflare 的定时触发可能出现平台级延迟。
+- 不接受公众 HTTP 触发，HTTP 请求统一返回 404。
+- 每次仅用私密 `HHBA_FIN_DISPATCH_SECRET` 请求正式站 `POST /api/transparency/dispatch`，不自行读财务表、不缓存订阅邮箱、不绕过真实报告审核。
+- Pages 与 Worker 必须配置同一个随机强密钥，均标记为加密 Secret；公开代码、构建日志、前端环境变量和文档均不应包含此值。
+- 生产发送开关 `HHBA_FIN_SEND_ENABLED=0` 期间，调度即使触发也不会真正发信；`HHBA_FIN_AUTO_PUBLISH_ENABLED=0` 时只审核未发布的报告不能自动公开。
+- GitHub Actions `.github/workflows/hhba-finance-monthly-dispatch.yml` 已取消自动定时，仅保留手动应急路径，避免两套定时任务同时运行。
+- 必须通过管理员邮件内测、真实报表人工发布、真实订阅闭环与退订实测后，由负责人明确决定是否开启公众邮件。
