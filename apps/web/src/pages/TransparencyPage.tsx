@@ -112,7 +112,7 @@ export function TransparencyPage({user}:{user:User|null}){
  };
 
  return <Shell user={user}>
-  <main className="hhba-transparency" id="main-content">
+  <div className="hhba-transparency" id="financial-disclosure-content">
    <div className="hhba-transparency-crumb">
     <Link to="/"><ArrowLeft size={14} aria-hidden="true"/>返回 HHBA 首页</Link>
     <span>公开信息 / 财务信息披露</span>
@@ -252,15 +252,16 @@ export function TransparencyPage({user}:{user:User|null}){
      </div>
     </div>
     {!reports.length?<div className="hhba-fin-no-history"><FileText size={18} aria-hidden="true"/>暂无正式公开的月度报告。首期报告发布后，将在这里持续保留历史记录。</div>:
-     <div className="hhba-fin-history-table" role="table" aria-label="已公开历史月度报告">
-      <div className="hhba-fin-history-head" role="row"><span role="columnheader">报告期间</span><span role="columnheader">公开日期</span><span role="columnheader">版本 / 审核属性</span><span role="columnheader">操作</span></div>
-      {reports.map(item=><button key={item.period} type="button" onClick={()=>openReport(item.period)}
-       className={'hhba-fin-history-item'+(available?.period===item.period?' is-current':'')} role="row"
-       aria-label={'查看'+dateLabel(item.period)+'经营报告'}>
-       <span role="cell">{dateLabel(item.period)}</span><span role="cell">{publicDate(item.publishedAt)}</span>
-       <span role="cell">V{item.revision} · {labelStatus(item)}</span>
-       <span role="cell">查看报告 <ArrowRight size={15} aria-hidden="true"/></span>
-      </button>)}
+     <div className="hhba-fin-history-table">
+      <table aria-label="已公开的历史月度财务报告">
+       <thead><tr><th scope="col">报告期间</th><th scope="col">公开日期</th><th scope="col">版本 / 审核属性</th><th scope="col">操作</th></tr></thead>
+       <tbody>{reports.map(item=><tr key={item.period} className={available?.period===item.period?'is-current':undefined}>
+        <th scope="row">{dateLabel(item.period)}</th>
+        <td>{publicDate(item.publishedAt)}</td>
+        <td>V{item.revision} · {labelStatus(item)}</td>
+        <td><button type="button" onClick={()=>openReport(item.period)} aria-label={'查看'+dateLabel(item.period)+'经营报告'}>查看报告 <ArrowRight size={15} aria-hidden="true"/></button></td>
+       </tr>)}</tbody>
+      </table>
      </div>}
    </section>
 
@@ -301,6 +302,6 @@ export function TransparencyPage({user}:{user:User|null}){
     <p>披露说明：本中心提供企业自愿公开的经营及帮扶汇总资料，不代表独立财务审计或证券市场法定披露。为保护员工、消费者及受助劳动者隐私，原始银行流水、个人付款凭据和个案资料不对外公开。报告如有更正，将保留修订记录。</p>
     <Link to="/membership/rules">会员与劳动权益服务规则 <ArrowRight size={14} aria-hidden="true"/></Link>
    </footer>
-  </main>
+  </div>
  </Shell>;
 }
