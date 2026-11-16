@@ -28,7 +28,7 @@ test('mobile spacing and headline remain readable without horizontal overflow',(
 });
 test('home preserves job search, company directory and adds labor-rights support',()=>{
  for(const t of ['让机会与人才，找到彼此。','找工作，不止于找到工作。','你来到这里，是为了什么？',
-    'title="我要找工作"','title="劳动权益支持"','title="企业招聘导航"','<UnifiedJobMarket compact/>']){
+    'title="我要应聘"','title="劳动权益支持"','title="企业招聘导航"','<UnifiedJobMarket compact/>']){
   assert.ok(home.includes(t),'home content unexpectedly removed: '+t);
  }
  assert.ok(home.includes("candidateSignedIn?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'"),
