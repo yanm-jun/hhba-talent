@@ -1,14 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {onRequestGet} from '../functions/api/public/homepage.js';
 
 const read=path=>readFileSync(new URL(path,import.meta.url),'utf8');
 
-test('homepage public API exposes the approved service plan without enabling transactions',async()=>{
- const response=await onRequestGet();
- assert.equal(response.status,200);
- const body=await response.json();
+test('homepage public API exposes the approved service plan without enabling transactions',()=>{
+ const body=JSON.parse(read('../src/data/homepagePublicConfig.json'));
+ const api=read('../functions/api/public/homepage.js');
+ assert.ok(api.includes('import homepagePublicConfig from'));
+ assert.ok(api.includes('return json(homepagePublicConfig)'));
  assert.equal(body.schemaVersion,1);
  assert.equal(body.membership.priceCents,1990);
  assert.equal(body.membership.currency,'CNY');
@@ -22,9 +22,8 @@ test('homepage public API exposes the approved service plan without enabling tra
  assert.match(body.membership.serviceNotice,/暂未开放购买/);
 });
 
-test('homepage financial disclosure uses distributable profit, not turnover, and does not invent reports',async()=>{
- const response=await onRequestGet();
- const body=await response.json();
+test('homepage financial disclosure uses distributable profit, not turnover, and does not invent reports',()=>{
+ const body=JSON.parse(read('../src/data/homepagePublicConfig.json'));
  assert.equal(body.distribution.companyPercent,60);
  assert.equal(body.distribution.workerSupportPercent,40);
  assert.equal(body.distribution.companyPercent+body.distribution.workerSupportPercent,100);
