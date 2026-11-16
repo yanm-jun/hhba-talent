@@ -572,3 +572,21 @@ test('existing admin KV expense register is read-only, scoped, reversal-safe and
  assert.match(adminUI,/不能机械自动换算/);
  assert.match(adminUI,/尚未自动完成银行、发票或供应商账单对账/);
 });
+
+
+test('admin expense register reference transfer is voluntary, period-matched and does not write finance records',()=>{
+ const ui=read('../src/pages/TransparencyManagePage.tsx');
+ assert.match(ui,/const prefillExpenseReferences=\(\)=>/);
+ assert.match(ui,/costSnapshot\.month!==period/);
+ assert.match(ui,/currentRow\?\.status==='published'/);
+ assert.match(ui,/window\.confirm\('仅向本月尚未填写的费用字段带入/);
+ assert.match(ui,/!String\(amounts\[key\]\|\|''\)\.trim\(\)/);
+ assert.match(ui,/!String\(current\[key\]\|\|''\)\.trim\(\)/);
+ for(const mapping of ["'expense:deepseek':'aiCostFen'","'expense:cloudflare':'infrastructureFen'","'expense:domain':'infrastructureFen'","'expense:infrastructure':'infrastructureFen'","'expense:email':'operationsFen'","'expense:operations':'operationsFen'"]){
+  assert.ok(ui.includes(mapping),mapping+' source mapping missing');
+ }
+ assert.doesNotMatch(ui,/['"]income:customer['"]\s*:\s*['"]revenueFen['"]/);
+ assert.match(ui,/此操作不保存财务 D1，也不执行审核或发布/);
+ const helper=read('../functions/_lib/finance-register.js');
+ assert.doesNotMatch(helper,/\bkv\.put\b|\bkv\.delete\b/);
+});
