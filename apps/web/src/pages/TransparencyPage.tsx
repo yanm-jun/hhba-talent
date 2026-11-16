@@ -112,38 +112,73 @@ export function TransparencyPage({user}:{user:User|null}){
  };
 
  return <Shell user={user}>
-  <div className="hhba-transparency" id="financial-disclosure-content">
+  <div className="hhba-transparency hhba-responsibility" id="financial-disclosure-content">
    <div className="hhba-transparency-crumb">
     <Link to="/"><ArrowLeft size={14} aria-hidden="true"/>返回 HHBA 首页</Link>
-    <span>公开信息 / 财务信息披露</span>
+    <span>公开信息 / 责任与透明</span>
    </div>
-
-   <header className="hhba-transparency-hero">
-    <div className="hhba-fin-eyebrow">HHBA <span aria-hidden="true">/</span> PUBLIC DISCLOSURE</div>
-    <div className="hhba-fin-heading-row">
-     <div>
-      <h1>财务信息披露中心</h1>
-      <p>真实记录经营情况，持续公开劳动者权益帮扶资金的使用与管理。</p>
-     </div>
-     <span className="hhba-fin-status">{loading?'正在核验公开状态':error?'公开状态暂不可读取':reports.length?'已有公开报告':'首期报告尚未发布'}</span>
-    </div>
-    <div className="hhba-transparency-metadata">
-     <span><CalendarDays size={14} aria-hidden="true"/>计划每月21日披露上月经营及帮扶情况</span>
-     <span>企业自愿公开 · 不等同法定上市公司信息披露</span>
+   <header className="hhba-resp-hero">
+    <span className="hhba-fin-eyebrow">HHBA <span aria-hidden="true">/</span> RESPONSIBILITY & TRANSPARENCY</span>
+    <h1>责任与透明</h1>
+    <p>公开我们的承诺，也公开承诺如何兑现。</p>
+    <div className="hhba-resp-hero-meta">
+     <span><ShieldCheck size={14} aria-hidden="true"/> 企业自愿公开</span>
+     <span><CalendarDays size={14} aria-hidden="true"/> 月度报告计划每月21日披露</span>
     </div>
    </header>
-
-   <nav className="hhba-fin-local-nav" aria-label="财务信息披露目录">
-    <a href="#fin-latest-title">最新财务报告</a>
-    <a href="#financial-allocation">利润分配制度</a>
-    <a href="#hhba-fin-history-title">历史披露档案</a>
-    <a href="#fin-subscribe-title">邮件订阅</a>
+   <nav className="hhba-resp-jump" aria-label="责任与透明目录">
+    <a href="#responsibility-support">资金支持</a>
+    <a href="#financial-allocation">利润分配</a>
+    <a href="#fin-latest-title">公开报告</a>
    </nav>
+
+   <section className="hhba-resp-support" aria-labelledby="responsibility-support">
+    <div className="hhba-resp-section-heading">
+     <span className="hhba-fin-section-index">01 / RESPONSIBLE CAPITAL</span>
+     <div className="hhba-resp-heading-row"><h2 id="responsibility-support">责任投资支持</h2><span className="hhba-resp-statement-tag">企业自主披露</span></div>
+    </div>
+    <div className="hhba-resp-capital">
+     <div className="hhba-resp-capital-number">
+      <span>HHBA 声明已获得的责任投资支持资金</span>
+      <strong aria-label="人民币六十万元">¥600,000</strong>
+      <small>人民币陆拾万元整</small>
+     </div>
+     <div className="hhba-resp-capital-detail">
+      <span className="hhba-resp-theme-mark">ESG <i aria-hidden="true">/</i> LABOR RIGHTS</span>
+      <h3>聚焦劳动者权益的责任投资合作</h3>
+      <p>HHBA 经营方披露：已与聚焦 ESG、劳工权益方向的责任投资方建立合作关系，并获得人民币 60 万元资金支持。</p>
+      <p className="hhba-resp-capital-disclosure">合作机构名称、相关协议及品牌标识目前未对外公开。此处是 HHBA 自有主题文字标识，不是外部机构官方 Logo。</p>
+     </div>
+    </div>
+    <p className="hhba-resp-legal-note">说明：该支持信息为 HHBA 企业自述，尚未经独立第三方鉴证，不代表获得 ESG 官方认证或机构公开背书。投资资金与营业收入、可分配利润分别核算，不直接参与以下 60/40 分配。</p>
+   </section>
+
+   <section className="hhba-fin-split hhba-resp-allocation" aria-labelledby="financial-allocation">
+    <div className="hhba-fin-section-heading">
+     <div>
+      <span className="hhba-fin-section-index">02 / OUR COMMITMENT</span>
+      <h2 id="financial-allocation">我们的利润分配承诺</h2>
+      <p>让企业发展与劳动者权益支持拥有清晰、可追溯的规则。</p>
+     </div>
+    </div>
+    <div className="hhba-fin-allocation-body">
+     <div className="hhba-fin-allocation-table" role="group" aria-label="依法核算后可分配利润的60/40分配原则">
+      <div><span>企业发展部分</span><strong>60%</strong><small>经营发展、团队激励及依法合规的经营者收益</small></div>
+      <div><span>劳动者权益帮扶池</span><strong>40%</strong><small>按照另行公开的规则，专款用于劳动者权益帮扶</small></div>
+     </div>
+     <div className="hhba-fin-allocation-notes">
+      <h3>计算及适用口径</h3>
+      <p>上述比例以依法核算、履行必要程序后的<strong>可分配利润</strong>为基础，不以营业收入、订单金额或月度流水直接计算。</p>
+      <p>月报会区分「应计提金额」「实际入池金额」「已发生支出」「期末结余」。没有依法确定的可分配利润时，不虚构当期计提。</p>
+      <p>该制度不构成保险赔付承诺，也不是消费者的个人可提现资金账户。</p>
+     </div>
+    </div>
+   </section>
 
    <section className="hhba-fin-report-section" aria-labelledby="fin-latest-title">
     <div className="hhba-fin-section-heading">
      <div>
-      <span className="hhba-fin-section-index">01 / REPORT</span>
+      <span className="hhba-fin-section-index">03 / PUBLIC REPORT</span>
       <h2 id="fin-latest-title">最新财务报告</h2>
       <p>月度经营情况及劳动者权益帮扶资金收支。</p>
      </div>
@@ -152,33 +187,15 @@ export function TransparencyPage({user}:{user:User|null}){
 
     {loading?<div className="hhba-fin-empty" role="status">正在读取公开财务报告…</div>:
      error?<div className="hhba-fin-empty" role="alert">财务公开数据暂时不可读取，请稍后重试。此时不展示未经核实的金额或报告状态。</div>:
-     !available?<div className="hhba-fin-empty-state">
-      <div className="hhba-fin-empty-document">
-       <div className="hhba-fin-empty-document-top">
-        <span><FileClock size={19} aria-hidden="true"/> 报告发布状态</span>
-        <strong>待发布</strong>
-       </div>
-       <div className="hhba-fin-empty-document-body">
-        <div className="hhba-fin-empty-document-icon"><FileText size={29} aria-hidden="true"/></div>
-        <h3>首期财务报告尚未发布</h3>
-        <p>目前尚无经过审核并正式公开的月度经营报告。真实财务数据将在完成核对、必要审批及隐私检查后对外披露。</p>
-        <p className="hhba-fin-empty-note">未披露的数据不代表零收入、零支出或零帮扶。</p>
-       </div>
+     !available?<div className="hhba-resp-empty-report" role="status">
+      <div className="hhba-resp-empty-icon"><FileClock size={21} aria-hidden="true"/></div>
+      <div><strong>首期财务报告尚未发布</strong>
+       <p>完成真实账目核对、必要审批和隐私检查后，将在这里发布月度经营与劳动者权益帮扶收支。</p>
+       <small>未披露的数据不代表零收入、零支出或零帮扶。</small>
       </div>
-      <aside className="hhba-fin-disclosure-facts" aria-label="报告披露规则">
-       <h3>披露安排</h3>
-       <dl>
-        <div><dt>披露性质</dt><dd>企业自愿公开</dd></div>
-        <div><dt>计划披露日</dt><dd>每月21日</dd></div>
-        <div><dt>报告期间</dt><dd>上一自然月</dd></div>
-        <div><dt>披露内容</dt><dd>经营收支、利润口径、帮扶资金</dd></div>
-        <div><dt>首期报告</dt><dd>尚未发布</dd></div>
-        <div><dt>审计情况</dt><dd>尚无公开报告</dd></div>
-       </dl>
-       <p>实际披露以已审核的正式报告为准；如当期未完成审核，发布及邮件发送将顺延或暂停。</p>
-      </aside>
+      <span className="hhba-resp-awaiting">待发布</span>
      </div>:
-     <div className="hhba-fin-report">
+          <div className="hhba-fin-report">
       <header className="hhba-fin-report-header">
        <div>
         <span className="hhba-fin-report-type">HHBA MONTHLY OPERATING REPORT</span>
@@ -221,28 +238,9 @@ export function TransparencyPage({user}:{user:User|null}){
      </div>}
    </section>
 
-   <section className="hhba-fin-split" aria-labelledby="financial-allocation">
-    <div className="hhba-fin-section-heading">
-     <div>
-      <span className="hhba-fin-section-index">02 / ALLOCATION POLICY</span>
-      <h2 id="financial-allocation">利润分配制度</h2>
-      <p>企业发展与劳动者权益帮扶的公开分配原则。</p>
-     </div>
-    </div>
-    <div className="hhba-fin-allocation-body">
-     <div className="hhba-fin-allocation-table" role="group" aria-label="依法核算后可分配利润的60/40分配原则">
-      <div><span>企业发展部分</span><strong>60%</strong><small>经营发展、团队激励及依法合规的经营者收益</small></div>
-      <div><span>劳动者权益帮扶池</span><strong>40%</strong><small>按照另行公开的规则，专款用于劳动者权益帮扶</small></div>
-     </div>
-     <div className="hhba-fin-allocation-notes">
-      <h3>计算及适用口径</h3>
-      <p>上述比例以依法核算、履行必要程序后的<strong>可分配利润</strong>为基础，不以营业收入、订单金额或月度流水直接计算。</p>
-      <p>月报会区分「应计提金额」「实际入池金额」「已发生支出」「期末结余」。没有依法确定的可分配利润时，不虚构当期计提。</p>
-      <p>该制度不构成保险赔付承诺，也不是消费者的个人可提现资金账户。</p>
-     </div>
-    </div>
-   </section>
-
+   <div className="hhba-resp-secondary">
+    <details className="hhba-resp-disclosure-detail">
+     <summary><span><FileText size={18} aria-hidden="true"/>历史披露档案</span><span className="hhba-resp-detail-label">{reports.length?reports.length+' 期报告':'首期待发布'} <ArrowRight size={16} aria-hidden="true"/></span></summary>
    <section className="hhba-fin-history" aria-labelledby="hhba-fin-history-title">
     <div className="hhba-fin-section-heading">
      <div>
@@ -265,6 +263,9 @@ export function TransparencyPage({user}:{user:User|null}){
      </div>}
    </section>
 
+    </details>
+    <details className="hhba-resp-disclosure-detail">
+     <summary><span><Mail size={18} aria-hidden="true"/>财务报告邮件订阅</span><span className="hhba-resp-detail-label">{settings?.subscriptionEnabled?'自愿订阅':'尚未开放'} <ArrowRight size={16} aria-hidden="true"/></span></summary>
    <section className="hhba-fin-subscribe" aria-labelledby="fin-subscribe-title">
     <div className="hhba-fin-section-heading">
      <div>
@@ -298,6 +299,8 @@ export function TransparencyPage({user}:{user:User|null}){
     </div>
    </section>
 
+    </details>
+   </div>
    <footer className="hhba-fin-foot">
     <p>披露说明：本中心提供企业自愿公开的经营及帮扶汇总资料，不代表独立财务审计或证券市场法定披露。为保护员工、消费者及受助劳动者隐私，原始银行流水、个人付款凭据和个案资料不对外公开。报告如有更正，将保留修订记录。</p>
     <Link to="/membership/rules">会员与劳动权益服务规则 <ArrowRight size={14} aria-hidden="true"/></Link>
