@@ -141,7 +141,7 @@ export function HomeWorkplacePromise(){
     <span className="hhba-home-report-status">{financeReportPeriod?'已公开 '+financeReportPeriod+' 月度报告':financeStatusLoaded?'首期财务报告尚未发布':'财务报告状态以透明中心为准'}</span>
    </div>
    <Link className="hhba-home-report-details hhba-home-transparency-link" to="/transparency">
-    <span>查看财务透明中心 · 月度报告与帮扶收支</span>
+    <span>查看责任与透明 · 分配承诺与公开报告</span>
     <ArrowRight size={14} aria-hidden="true"/>
    </Link>
   </aside>
