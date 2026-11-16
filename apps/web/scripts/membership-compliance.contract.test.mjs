@@ -67,7 +67,7 @@ test('public rules page shows high-risk conditions and never presents an active 
  assert.match(page,/membershipLaunchState\.status/);
  assert.doesNotMatch(page,/\b<form\b/);
  assert.doesNotMatch(page,/createCheckout|subscribeNow|payNow/);
- assert.match(css,/hhba-rules-compliance-grid/);
+ assert.match(css,/hhba-rules-compliance-list/);
  assert.match(css,/@media\(max-width:720px\)/);
  assert.match(css,/@media print/);
 });
