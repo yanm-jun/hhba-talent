@@ -9,21 +9,18 @@
 .hhba-home-entry-grid .hhba-entry-rights .entry-icon{background:#eaf4ee;color:#286b49}
 .hhba-home-entry-grid .hhba-entry-rights .entry-footer{color:#286b49}
 
-.hhba-home-workplace{width:calc(100% - 24px);max-width:1096px;margin:50px auto 42px;color:#19352a}
+.hhba-home-workplace{position:relative;isolation:isolate;width:calc(100% - 24px);max-width:1096px;margin:0 auto 36px;padding:44px 0 24px;color:#19352a}
+.hhba-home-workplace::before{content:'';position:absolute;z-index:-1;inset:-8px calc(50% - 50vw) -20px;background:linear-gradient(180deg,rgba(252,253,250,0) 0%,rgba(249,252,249,.58) 28%,rgba(251,252,249,.88) 70%,rgba(252,253,250,.22) 100%);pointer-events:none}
 .hhba-home-workplace *{box-sizing:border-box}
-.hhba-home-workplace-heading{max-width:760px;margin:0 auto 25px;text-align:center}
+.hhba-home-workplace-heading{max-width:760px;margin:0 auto 18px;text-align:center}
 .hhba-home-workplace-kicker,.hhba-home-card-kicker{display:block;color:#527b60;font-size:11px;font-weight:750;letter-spacing:.1em}
 .hhba-home-workplace-kicker{margin-bottom:10px}
 .hhba-home-workplace-heading h2{margin:0;color:#19352a;font-size:clamp(27px,3.2vw,36px);line-height:1.3;letter-spacing:-1px;font-weight:800}
 .hhba-home-workplace-heading>p{margin:10px auto 0;color:#697e74;font-size:14px;line-height:1.75}
 
-.hhba-home-value-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:0 0 18px;padding:18px 8px;list-style:none;border-top:1px solid #d8e5dd;border-bottom:1px solid #d8e5dd;background:rgba(255,255,255,.42);border-radius:12px}
-.hhba-home-value{display:flex;align-items:center;gap:13px;min-width:0;padding:2px 19px}
-.hhba-home-value+.hhba-home-value{border-left:1px solid #dce7e0}
-.hhba-home-value-icon{display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;border-radius:13px;color:#527b60;background:#edf5ef}
-.hhba-home-value h3{margin:0 0 4px;font-size:15px;line-height:1.4;font-weight:750;color:#214333}
-.hhba-home-value p{margin:0;color:#728477;font-size:12px;line-height:1.6}
-
+.hhba-home-member-highlights{display:flex;align-items:center;gap:12px 27px;flex-wrap:wrap;margin:17px 0 0;padding:0;list-style:none}
+.hhba-home-member-highlights li{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;font-size:12px;font-weight:650;color:#527963}
+.hhba-home-member-highlights svg{flex:none;color:#5c9170}
 .hhba-home-membership-card{position:relative;overflow:hidden;isolation:isolate;min-width:0;padding:clamp(24px,3.4vw,38px);border:1px solid #dce8df;border-radius:22px;background:linear-gradient(130deg,#fff 0%,#fff 55%,#f7fbf8 100%);box-shadow:0 14px 42px rgba(30,66,45,.065)}
 .hhba-home-membership-card:before{content:'';position:absolute;z-index:-1;right:-100px;top:-135px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(171,211,184,.2),rgba(171,211,184,0) 67%);pointer-events:none}
 .hhba-home-member-head{display:flex;align-items:flex-start;justify-content:space-between;gap:28px}
@@ -39,7 +36,7 @@
 .hhba-home-price small{padding-left:3px;color:#849389;font-size:13px}
 .hhba-home-price-block>p{margin:10px 0 0;color:#86958b;font-size:12px}
 
-.hhba-home-phase-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:0;margin-top:28px;padding:23px 0;border-top:1px solid #e4ebe5;border-bottom:1px solid #e4ebe5}
+.hhba-home-phase-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:0;margin-top:18px;padding:23px 0;border-top:1px solid #e4ebe5;border-bottom:1px solid #e4ebe5}
 .hhba-home-stage{min-width:0;padding-right:30px}
 .hhba-home-stage-rights{border-left:1px solid #e0e8e2;padding-left:31px;padding-right:0}
 .hhba-home-stage-heading{display:flex;align-items:center;gap:12px}
@@ -81,9 +78,6 @@
 
 @media(max-width:930px){
  .hhba-public-entry-grid.hhba-home-entry-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .hhba-home-value{padding:2px 11px;gap:9px}
- .hhba-home-value-icon{width:38px;height:38px;flex-basis:38px}
- .hhba-home-value p{font-size:12px}
  .hhba-home-pledge{grid-template-columns:1fr;gap:18px}
  .hhba-home-pledge-bottom{margin-top:0}
 }
@@ -91,13 +85,9 @@
  .hhba-public-hero h1{font-size:clamp(27px,7vw,34px);letter-spacing:-.8px}
  .hhba-public-hero .hhba-home-description{font-size:13px;padding:0 8px}
  .hhba-public-entry-grid.hhba-home-entry-grid{grid-template-columns:1fr;gap:11px}
- .hhba-home-workplace{margin:36px auto 30px}
+ .hhba-home-workplace{margin:0 auto 30px;padding:33px 0 16px}
  .hhba-home-workplace-heading{margin-bottom:17px}
  .hhba-home-workplace-heading h2{font-size:28px}
- .hhba-home-value-strip{grid-template-columns:1fr;padding:6px 15px;margin-bottom:13px}
- .hhba-home-value{padding:12px 2px}
- .hhba-home-value+.hhba-home-value{border-left:0;border-top:1px solid #dce7e0}
- .hhba-home-value h3{font-size:14px}
  .hhba-home-membership-card{padding:21px 18px;border-radius:17px}
  .hhba-home-member-head{display:block}
  .hhba-home-member-intro h3{font-size:24px;margin:13px 0 6px}
@@ -106,7 +96,9 @@
  .hhba-home-price{justify-content:flex-start}
  .hhba-home-price strong{font-size:39px}
  .hhba-home-price-block>p{margin-top:4px}
- .hhba-home-phase-grid{grid-template-columns:1fr;margin-top:19px;padding:16px 0}
+ .hhba-home-member-highlights{gap:10px 14px;margin-top:16px}
+ .hhba-home-member-highlights li{font-size:11px}
+ .hhba-home-phase-grid{grid-template-columns:1fr;margin-top:18px;padding:16px 0}
  .hhba-home-stage{padding-right:0}
  .hhba-home-stage-rights{border-left:0;border-top:1px solid #e0e8e2;padding:19px 0 0;margin-top:20px}
  .hhba-home-stage-heading h4{font-size:16px}
