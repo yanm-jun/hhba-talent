@@ -56,7 +56,7 @@ export async function onRequest({request,env}){
   const body=await readJson(request,3500);
   const email=normalizeEmail(body?.email);
   if(!email||body?.consent!==true)return failure('INVALID_SUBSCRIPTION_REQUEST',400);
-  if(!await checkTurnstile(env,body?.turnstileToken))return failure('HUMAN_VERIFICATION_REQUIRED',403);
+  if(!await checkTurnstile(env,body?.turnstileToken,new URL(request.url).hostname))return failure('HUMAN_VERIFICATION_REQUIRED',403);
   const hash=await sha256(email),now=new Date().toISOString();
   const generic={ok:true,code:'CHECK_EMAIL_IF_ELIGIBLE'};
   try{
