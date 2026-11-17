@@ -6,7 +6,7 @@ const read=path=>readFileSync(new URL('../src/'+path,import.meta.url),'utf8');
 test('single C-end login remains and no recruiter admin or B2B page is mounted',()=>{
  const main=read('main.tsx');
  const shell=read('components/Shell.tsx');
- const retired=read('pages/RetiredEnterprisePage.tsx');
+ const notFound=read('pages/SiteNotFoundPage.tsx');
  for(const name of [
    'EmployerWorkspacePage','EmployerPage','AdminRecruitmentPage','EmployerReviewPage',
    'EmployerGrowthHubPage','EmployerPublicJobsPage','EmployerPublicJobDetail',
@@ -16,14 +16,15 @@ test('single C-end login remains and no recruiter admin or B2B page is mounted',
    assert.ok(!main.includes('const '+name+'=lazy'),name+' is bundled');
  }
  assert.ok(main.includes("route==='/auth')return <PhoneAuthPage"));
- assert.match(main,/Legacy B-end is retired/);
- assert.match(main,/return <RetiredEnterprisePage user=\{user\}\/>/);
+ assert.match(main,/Removed routes are indistinguishable/);
+ assert.match(main,/return <SiteNotFoundPage user=\{user\}\/>/);
  assert.doesNotMatch(main,/if\(route==='\/recruiter\/login'/);
  assert.doesNotMatch(main,/if\(route==='\/employer\/hub'/);
  assert.doesNotMatch(shell,/to="\/employer\/|to="\/recruiter\//);
  assert.doesNotMatch(shell,/企业入驻|企业工作台|招聘方身份|企业招聘与治理导航/);
- assert.match(retired,/企业招聘业务已停止提供/);
- assert.match(retired,/旧申请与企业账户资料不会因为页面下线而被擅自清空/);
+ assert.match(notFound,/页面不存在/);
+ assert.doesNotMatch(notFound,/企业招聘|停止提供|业务已停止/);
+ assert.equal(existsSync(new URL('../src/pages/RetiredEnterprisePage.tsx',import.meta.url)),false);
  assert.equal(existsSync(new URL('../src/pages/AuthChoicePage.tsx',import.meta.url)),false);
 });
 test('enterprise recruiting API calls fail closed while C-end login is preserved',()=>{
@@ -59,4 +60,18 @@ test('official employer sources are still C-end resources, not recruitment clien
  const work=read('pages/WorkspacePage.tsx');
  assert.doesNotMatch(work,/to="\/employer"/);
  assert.match(work,/to="\/candidate\/account\/rights"/);
+});
+
+test('legacy B2B paths respond with genuine Pages Functions HTTP 404',()=>{
+ const paths=[
+  '../functions/recruiter/index.js','../functions/recruiter/[[path]].js',
+  '../functions/employer/index.js','../functions/employer/[[path]].js',
+  '../functions/admin/[[path]].js','../functions/candidate/employer-jobs/index.js',
+  '../functions/candidate/employer-jobs/[[path]].js','../functions/candidate/my-applications.js'
+ ];
+ for(const path of paths){
+  const code=readFileSync(new URL(path,import.meta.url),'utf8');
+  assert.match(code,/status:404/,path);
+  assert.doesNotMatch(code,/企业招聘业务已停止提供|RetiredEnterprisePage/,path);
+ }
 });
