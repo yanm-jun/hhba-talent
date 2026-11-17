@@ -43,6 +43,13 @@ with sync_playwright() as p:
         page.locator("#role-auth-title").wait_for()
         assert page.get_by_text("我是个人用户").is_visible()
         assert page.get_by_text("我是招聘方").is_visible()
+        assert page.locator(".hhba-auth-v2-editorial").is_visible()
+        assert page.locator(".hhba-auth-v2-panel").is_visible()
+        assert page.locator(".hhba-auth-v2-milestone").count() == 3
+        assert page.get_by_text("不止于找到工作。").is_visible()
+        assert page.get_by_text("了解服务规划，当前尚未开放购买").is_visible()
+        columns = page.locator(".hhba-auth-v2-layout").evaluate("(el) => getComputedStyle(el).gridTemplateColumns")
+        assert len(columns.split()) == (2 if name == "desktop" else 1), f"Unexpected auth layout: {name} {columns}"
         assert page.locator('a[href*="/candidate/login"]').count() >= 1
         assert page.locator('a[href*="/recruiter/login"]').count() >= 1
         no_horizontal_overflow(page, name + "-auth")
