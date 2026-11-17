@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - 'apps/web/src/pages/AuthChoicePage.tsx'
+      - 'apps/web/src/pages/PhoneAuthPage.tsx'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/styles/unified-login.css'
       - 'apps/web/src/pages/PersonalCenterPage.tsx'
       - 'apps/web/src/pages/WorkplaceRightsPage.tsx'
       - 'apps/web/src/styles/career-refresh.css'
