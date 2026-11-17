@@ -1,4 +1,4 @@
-import {type FormEvent,type ReactNode,useEffect,useState} from 'react';
+import {Suspense,type FormEvent,type ReactNode,useEffect,useState} from 'react';
 import {ArrowRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,History,LockKeyhole,LogOut,MousePointerClick,Scale,Search,ShieldCheck,SlidersHorizontal,UserRound,ChartNoAxesCombined} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
@@ -317,7 +317,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
      const inactive=current!==key;
      if(!hasVisited(key))return null;
      return <div key={key} className="hhba-account-external-stage" aria-hidden={inactive}
-       style={{display:inactive?'none':'block'}}>{element}</div>;
+       style={{display:inactive?'none':'block'}}><Suspense fallback={<section className="hhba-account-panel" role="status">正在加载工作区内容…</section>}>{element}</Suspense></div>;
     })}
 
    </div>
