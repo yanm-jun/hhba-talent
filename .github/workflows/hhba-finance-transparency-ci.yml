@@ -13,6 +13,11 @@ on:
       - 'apps/web/functions/_lib/transparency*.js'
       - 'apps/web/functions/_lib/admin-access.js'
       - 'apps/web/d1/0020_financial_transparency.sql'
+      - 'apps/web/d1/0021_worker_public_archive.sql'
+      - 'apps/web/public/_headers'
+      - 'apps/web/functions/transparency/archive-preview.js'
+      - 'apps/web/src/pages/AidArchiveDemoPage.tsx'
+      - 'apps/web/scripts/public-archive-publication.contract.test.mjs'
       - 'apps/web/scripts/financial-transparency.contract.test.mjs'
       - 'apps/web/scripts/transparency-center-navigation.contract.test.mjs'
       - '.github/workflows/hhba-finance-*.yml'
@@ -36,7 +41,7 @@ jobs:
       - name: Finance API safety, opt-in, revision and homepage tests
         working-directory: apps/web
         run: |
-          node --test scripts/financial-transparency.contract.test.mjs scripts/transparency-center-navigation.contract.test.mjs scripts/home-workplace-promise.contract.test.mjs scripts/admin-access-audiences.test.mjs
+          node --test scripts/financial-transparency.contract.test.mjs scripts/transparency-center-navigation.contract.test.mjs scripts/public-archive-publication.contract.test.mjs scripts/home-workplace-promise.contract.test.mjs scripts/admin-access-audiences.test.mjs
       - name: Verify TypeScript and website build
         working-directory: apps/web
         run: npm run build
