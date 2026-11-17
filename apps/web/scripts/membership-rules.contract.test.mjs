@@ -47,7 +47,7 @@ test('draft does not enable payment or falsely claim a lawyer assignment',()=>{
  assert.match(rules,/正式开售前必须明确/);
  assert.match(rules,/不能使用「售出概不退款」/);
  assert.match(rules,/不包含心理咨询/);
- assert.match(rules,/不是每笔19\.90元付款的40%/);
+ assert.match(rules,/不是每笔24\.90元付款的40%/);
  const config=JSON.parse(read('../src/data/homepagePublicConfig.json'));
  assert.equal(config.membership.purchaseEnabled,false);
  assert.equal(config.membership.caseIntakeEnabled,false);
