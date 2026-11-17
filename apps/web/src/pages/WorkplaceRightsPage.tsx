@@ -58,7 +58,7 @@ export function WorkplaceRightsPage({user}:{user:User|null}){
     </article>
     <article className="hhba-rights-bottom-card">
      <div className="hhba-rights-icon"><CalendarCheck2 size={21}/></div><h3>真正遇到劳动问题时</h3>
-     <p>拟提供资料整理、线上协商与官方调解申请辅助；确有必要且依法受理时，由合作律所决定是否出具律师函。不包括仲裁和诉讼代理，不承诺结果。</p>
+     <p>拟提供资料整理、线上协商与官方调解申请辅助；确有必要且依法受理时，由合作律所决定是否出具律师函。不包含仲裁和诉讼代理，不承诺结果。</p>
     </article>
    </section>
    <section className="hhba-rights-disclosure">
