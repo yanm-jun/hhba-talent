@@ -223,20 +223,20 @@
  --a-blue:#1373FA;--a-blue-dark:#105bce;--a-orange:#ff9625;
  --a-navy:#192c47;--a-ink:#182c49;--a-muted:#6e7c90;
  --a-line:#e7ebf1;--a-soft:#f7f9fc;
- background:#fff;color:var(--a-ink);padding:28px 20px 75px;
+ background:#fff;color:var(--a-ink);padding:16px 20px 64px;
 }
-.hhba-a2-wrap{max-width:1020px;}
-.hhba-a2-crumb{border-bottom:1px solid #f0f2f6;padding-bottom:18px;color:#9aa4b2;font-size:11px;}
+.hhba-a2-wrap{max-width:1120px;}
+.hhba-a2-crumb{border-bottom:1px solid #f0f2f6;padding-bottom:11px;color:#9aa4b2;font-size:11px;}
 .hhba-a2-crumb a{color:#5c6d85;font-weight:550;}
 .hhba-a2-crumb a:hover{color:var(--a-blue);}
 .hhba-a2-demo{
- margin:19px 0 0;padding:11px 15px;gap:10px;
+ margin:10px 0 0;padding:8px 12px;gap:9px;
  border-radius:8px;background:#f6f8fb;border:1px solid #edf0f5;
  color:#6e7c8d;font-size:11px;line-height:1.75;
 }
 .hhba-a2-demo b{color:#415978;font-weight:650;}
 .hhba-a2-demo svg{color:#6e8eb3;}
-.hhba-a2-hero{display:block;padding:62px 2px 48px;max-width:100%;}
+.hhba-a2-hero{display:block;padding:24px 2px 23px;max-width:100%;}
 .hhba-a2-hero-main{max-width:780px;}
 .hhba-a2-brand{margin-bottom:34px;gap:11px;}
 .hhba-a2-brand img{width:34px;height:34px;}
@@ -244,20 +244,20 @@
 .hhba-a2-brand small{font-size:9px;letter-spacing:.17em;color:#99a4b5;}
 .hhba-a2-eyebrow{font-size:10px;color:#1468df;letter-spacing:.13em;font-weight:750;}
 .hhba-a2-hero h1{
- color:#172b48;font-size:clamp(35px,3.65vw,43px);font-weight:680;
- line-height:1.33;letter-spacing:-1.35px;margin:17px 0 18px;
+ color:#172b48;font-size:clamp(33px,3.45vw,42px);font-weight:680;
+ line-height:1.26;letter-spacing:-1.2px;margin:9px 0 10px;
 }
 .hhba-a2-hero h1 em{color:var(--a-blue);font-weight:680;}
-.hhba-a2-hero-main>p{max-width:660px;font-size:14px;color:#687b92;line-height:2.0;}
+.hhba-a2-hero-main>p{max-width:750px;font-size:13px;color:#687b92;line-height:1.7;margin:0;}
 .hhba-a2-hero-aside{display:none!important;}
-.hhba-a2-brandline{height:3px;display:flex;gap:0;border-radius:4px;overflow:hidden;}
+.hhba-a2-brandline{height:2px;display:flex;gap:0;border-radius:4px;overflow:hidden;}
 .hhba-a2-brandline span:first-child{background:#1474fb;flex:5;}
 .hhba-a2-brandline span:last-child{background:#ff9625;flex:1;}
 .hhba-a2-fund{
  display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.95fr);
- align-items:center;gap:40px;background:transparent;color:#172e4a;
+ align-items:center;gap:22px;background:transparent;color:#172e4a;
  border:0;border-radius:0;box-shadow:none;overflow:visible;
- padding:35px 4px 38px;border-bottom:1px solid var(--a-line);
+ padding:18px 4px 20px;border-bottom:1px solid var(--a-line);
 }
 .hhba-a2-fundbalance{background:transparent;padding:0;}
 .hhba-a2-fundheading{
@@ -268,20 +268,20 @@
  border:1px solid #e4eaf4;background:#f6f8fd;color:#6f87a9;
  font-size:10px;padding:4px 9px;border-radius:6px;font-weight:550;
 }
-.hhba-a2-fundbalance>p{font-size:12px;color:#7e8da0;margin:30px 0 9px;}
+.hhba-a2-fundbalance>p{font-size:11px;color:#7e8da0;margin:14px 0 5px;}
 .hhba-a2-fundbalance>strong{
- font-size:clamp(37px,4.5vw,51px);font-weight:670;letter-spacing:-1.6px;
+ font-size:clamp(35px,4.1vw,47px);font-weight:670;letter-spacing:-1.3px;
  color:#1c3554;line-height:1.2;white-space:normal;font-variant-numeric:tabular-nums;
 }
-.hhba-a2-fundbalance>small{font-size:10px;color:#9aa8ba;line-height:1.8;margin-top:12px;}
+.hhba-a2-fundbalance>small{font-size:10px;color:#9aa8ba;line-height:1.7;margin-top:6px;}
 .hhba-a2-fundstats{
  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
- gap:15px 23px;padding:17px 0 0;background:transparent;
+ gap:9px 18px;padding:0;background:transparent;
  align-self:stretch;align-content:center;
 }
 .hhba-a2-fundstats>div{border-bottom:0;padding:0;min-width:0;}
-.hhba-a2-fundstats>div+div{border-left:1px solid #e9edf3;padding-left:22px;}
-.hhba-a2-fundstats small{font-size:11px;color:#8997a9;margin-bottom:11px;}
+.hhba-a2-fundstats>div+div{border-left:1px solid #e9edf3;padding-left:18px;}
+.hhba-a2-fundstats small{font-size:11px;color:#8997a9;margin-bottom:6px;}
 .hhba-a2-fundstats strong{
  font-size:clamp(17px,2.1vw,22px);letter-spacing:-.35px;
  font-weight:630;color:#243e5f;line-height:1.3;
@@ -289,31 +289,31 @@
 .hhba-a2-fundstats button{
  grid-column:1/-1;justify-self:start;min-width:0;align-self:end;
  border:0;border-radius:0;background:transparent;
- color:#1469df;padding:8px 0;font-weight:670;font-size:12px;gap:10px;
+ color:#1469df;padding:5px 0;font-weight:670;font-size:12px;gap:8px;
 }
 .hhba-a2-fundstats button:hover{background:transparent;color:#ee8a1c;border-color:transparent;}
 .hhba-a2-stats{
  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
- gap:0;margin:0 0 72px;padding:28px 4px 0;
+ gap:0;margin:0 0 33px;padding:16px 4px 0;
  border-bottom:0;background:none;
 }
 .hhba-a2-stats>div{
- min-width:0;padding:0 27px 0 0;min-height:85px;
+ min-width:0;padding:0 20px 0 0;min-height:65px;
  border:0;border-radius:0;background:transparent;
 }
-.hhba-a2-stats>div+div{border-left:1px solid var(--a-line);padding-left:28px;}
+.hhba-a2-stats>div+div{border-left:1px solid var(--a-line);padding-left:20px;}
 .hhba-a2-stats small{font-size:11px;color:#7c8c9e;line-height:1.5;}
 .hhba-a2-stats strong{
- margin:10px 0 4px;font-weight:640;font-size:clamp(26px,3vw,34px);
+ margin:6px 0 2px;font-weight:640;font-size:clamp(26px,2.8vw,32px);
  color:#192f4e;line-height:1.2;
 }
 .hhba-a2-stats em{font-size:12px;font-weight:550;color:#7e8ea2;}
 .hhba-a2-stats p{display:block;font-size:10px;color:#9aa8b9;}
-.hhba-a2-archives{margin:0 0 28px;}
-.hhba-a2-sectiontitle{align-items:flex-start;margin-bottom:28px;}
+.hhba-a2-archives{margin:0 0 19px;}
+.hhba-a2-sectiontitle{align-items:flex-start;margin-bottom:15px;}
 .hhba-a2-sectiontitle h2{
  font-size:clamp(25px,3vw,31px);font-weight:680;
- letter-spacing:-.9px;color:#172d4b;margin:14px 0 11px;
+ letter-spacing:-.9px;color:#172d4b;margin:8px 0 6px;
 }
 .hhba-a2-sectiontitle p{font-size:12px;color:#8391a2;line-height:1.85;}
 .hhba-a2-cardgrid{
@@ -322,7 +322,7 @@
 }
 .hhba-a2-entry{
  display:grid;grid-template-columns:38px minmax(0,1fr) auto 24px;
- align-items:center;gap:18px;min-height:106px;padding:18px 6px;
+ align-items:center;gap:14px;min-height:82px;padding:12px 6px;
  width:100%;border:0;border-bottom:1px solid #e9edf3;border-radius:0;
  box-shadow:none;background:white;text-align:left;transform:none;
  transition:background-color .17s,color .17s,padding .17s;
@@ -333,7 +333,7 @@
  transform:none;padding-left:13px;
 }
 .hhba-a2-entry-index{font-size:11px;letter-spacing:.06em;font-weight:640;color:#a0aabb;}
-.hhba-a2-entry-copy{display:flex;flex-direction:column;gap:10px;min-width:0;}
+.hhba-a2-entry-copy{display:flex;flex-direction:column;gap:5px;min-width:0;}
 .hhba-a2-entry-copy strong{font-weight:660;font-size:17px;line-height:1.35;color:#1a334f;}
 .hhba-a2-entry-copy small{font-size:12px;line-height:1.6;color:#8a98aa;}
 .hhba-a2-entry-count{font-size:11px;color:#7f91a7;white-space:nowrap;}
@@ -342,8 +342,8 @@
 .hhba-a2-entrytop,.hhba-a2-entrynote,.hhba-a2-entrybottom{display:none!important;}
 .hhba-a2-rules{
  background:transparent;border:0;border-bottom:1px solid var(--a-line);
- border-radius:0;box-shadow:none;padding:24px 0 29px;
- margin:36px 0 0;align-items:center;
+ border-radius:0;box-shadow:none;padding:18px 0 20px;
+ margin:19px 0 0;align-items:center;
 }
 .hhba-a2-rules>div{align-items:flex-start;gap:15px;}
 .hhba-a2-rules svg{color:#1672ec;}
@@ -354,7 +354,7 @@
  padding:9px 0;font-size:12px;font-weight:660;
 }
 .hhba-a2-rules button:hover{background:transparent;color:#ef921c;}
-.hhba-a2-privacy{margin:30px 0 66px;align-items:center;color:#8492a4;padding:0;}
+.hhba-a2-privacy{margin:19px 0 35px;align-items:center;color:#8492a4;padding:0;}
 .hhba-a2-privacy svg{color:#7c95b6;}
 .hhba-a2-privacy p{font-size:12px;line-height:1.85;}
 .hhba-a2-privacy strong{color:#5a718d;font-weight:650;}
@@ -447,7 +447,7 @@
 /* Explicit mobile editorial scale, maintaining 100dvh popup and scroll. */
 @media(max-width:850px){
  .hhba-a2-wrap{max-width:100%;}
- .hhba-a2-hero{padding-top:45px;}
+ .hhba-a2-hero{padding-top:22px;}
  .hhba-a2-fund{gap:17px;grid-template-columns:1fr;}
  .hhba-a2-fundstats{grid-template-columns:repeat(2,minmax(0,1fr));padding:15px 0 0;}
  .hhba-a2-fundstats button{grid-column:1/-1;}
@@ -456,20 +456,20 @@
  .hhba-a2-documentmetrics strong{font-size:16px;}
 }
 @media(max-width:640px){
- .hhba-a2{padding:17px 15px 57px;}
- .hhba-a2-hero{padding:39px 1px 35px;}
+ .hhba-a2{padding:12px 15px 47px;}
+ .hhba-a2-hero{padding:20px 1px 18px;}
  .hhba-a2-brand{margin-bottom:27px;}
- .hhba-a2-hero h1{font-size:34px;font-weight:670;line-height:1.33;letter-spacing:-.9px;margin:13px 0 16px;}
- .hhba-a2-hero-main>p{font-size:12px;line-height:1.9;}
- .hhba-a2-fund{padding:26px 0 28px;gap:10px;}
+ .hhba-a2-hero h1{font-size:32px;font-weight:670;line-height:1.29;letter-spacing:-.8px;margin:9px 0 10px;}
+ .hhba-a2-hero-main>p{font-size:12px;line-height:1.75;}
+ .hhba-a2-fund{padding:19px 0 20px;gap:10px;}
  .hhba-a2-fundbalance{padding:0;}
- .hhba-a2-fundbalance>p{margin:23px 0 9px;}
+ .hhba-a2-fundbalance>p{margin:15px 0 6px;}
  .hhba-a2-fundbalance>strong{font-size:35px;letter-spacing:-1.1px;}
- .hhba-a2-fundstats{padding:19px 0 0;gap:17px;}
+ .hhba-a2-fundstats{padding:10px 0 0;gap:12px;}
  .hhba-a2-fundstats>div+div{padding-left:15px;}
  .hhba-a2-fundstats strong{font-size:17px;}
- .hhba-a2-stats{grid-template-columns:repeat(3,minmax(0,1fr));padding:25px 0 0;margin:0 0 60px;}
- .hhba-a2-stats>div{min-height:68px;padding-right:8px;}
+ .hhba-a2-stats{grid-template-columns:repeat(3,minmax(0,1fr));padding:15px 0 0;margin:0 0 30px;}
+ .hhba-a2-stats>div{min-height:62px;padding-right:8px;}
  .hhba-a2-stats>div+div{padding-left:14px;}
  .hhba-a2-stats strong{font-size:26px;}
  .hhba-a2-stats small{font-size:10px;line-height:1.4;}
@@ -478,7 +478,7 @@
  .hhba-a2-cardgrid{display:flex;flex-direction:column;gap:0;}
  .hhba-a2-entry{
   display:grid;grid-template-columns:26px minmax(0,1fr) 18px;gap:11px;
-  min-height:92px;padding:15px 1px;
+  min-height:81px;padding:12px 1px;
  }
  .hhba-a2-entry:hover,.hhba-a2-entry:nth-child(even):hover{padding-left:4px;}
  .hhba-a2-entry-copy strong{font-size:15px;}
@@ -486,7 +486,7 @@
  .hhba-a2-entry-count{display:none;}
  .hhba-a2-rules{padding:19px 0;gap:13px;align-items:flex-start;flex-direction:column;}
  .hhba-a2-rules>div{align-items:flex-start;}
- .hhba-a2-privacy{margin:24px 0 48px;}
+ .hhba-a2-privacy{margin:18px 0 30px;}
  .hhba-a2-trend summary{padding:16px 12px;}
  .hhba-a2-trendbody{padding:20px 12px;}
  .hhba-a2-overlay{padding:0;align-items:stretch;}
