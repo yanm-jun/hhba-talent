@@ -156,7 +156,7 @@ test('isolated finance AI Worker rejects public unauthenticated access and sensi
  const url='https://finance-ai.internal/v1/review';
  const secret='c'.repeat(96);
  const env={HHBA_FIN_AI_SERVICE_TOKEN:secret,AI:{async run(model,req){
-  assert.equal(model,'@cf/openai/gpt-oss-20b');
+  assert.equal(model,'@cf/meta/llama-3.3-70b-instruct-fp8-fast');
   const s=JSON.stringify(req);
   assert.doesNotMatch(s,/phone|email|evidenceRef|PrivateInvoiceABC123|CustomerPaymentPrivateABC/);
   return {response:'请补齐实际账单，并核对冲销与税费凭证。'};
