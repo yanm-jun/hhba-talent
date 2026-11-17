@@ -94,15 +94,23 @@ with sync_playwright() as p:
         no_horizontal_overflow(page, name + "-rights")
         page.screenshot(path=str(OUT / f"{name}-rights.png"), full_page=True, animations="disabled")
         # Legacy recruitment URLs must never render login, moderation, hiring forms
-        # or load an authenticated B2B bundle; they show a non-interactive notice.
+        # or load an authenticated B2B bundle. Real Pages Functions emit HTTP 404.
         for old_path in [
             "/recruiter/login", "/recruiter/register", "/recruiter/onboarding",
             "/employer/hub", "/employer/workspace", "/employer",
             "/admin/recruitment", "/admin/employer-review",
-            "/candidate/employer-jobs", "/candidate/my-applications"
+            "/candidate/employer-jobs", "/candidate/my-applications",
+            "/employee/feedback", "/employee/privacy-concerns"
         ]:
             response = page.goto(BASE + old_path, wait_until="domcontentloaded")
-            assert response and response.status == 404, f"Expected HTTP 404 for {old_path}, got {response.status if response else 'no response'}"
+            # Vite preview intentionally uses SPA fallback; Cloudflare Pages Functions
+            # owns the real edge 404. Validate both behaviors without conflating them.
+            assert response
+            if "127.0.0.1" in BASE or "localhost" in BASE:
+                assert response.status == 200
+                page.get_by_role("heading", name="页面不存在").wait_for()
+            else:
+                assert response.status == 404, f"Expected Pages HTTP 404 for {old_path}, got {response.status}"
             assert "企业招聘业务已停止提供" not in page.content()
             assert page.locator('form[action*="/organizations"], form[action*="/recruiter"]').count() == 0
             no_horizontal_overflow(page, name + "-removed-" + old_path)
