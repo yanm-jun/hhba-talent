@@ -87,7 +87,17 @@ export function TransparencyPage({user}:{user:User|null}){
   };
  },[settings?.subscriptionEnabled,settings?.siteKey]);
 
- const available=useMemo(()=>selected?reports.find(r=>r.period===selected)||null:reports[0]||null,[reports,selected]);
+ const selectedReport=useMemo(()=>selected?reports.find(r=>r.period===selected)||null:null,[reports,selected]);
+ const available=selectedReport||reports[0]||null;
+ useEffect(()=>{
+  if(loading||error||!selected||selectedReport)return;
+  // A shared stale/malformed period must not make a non-empty archive look empty.
+  setSelected(null);
+  const url=new URL(window.location.href);
+  url.searchParams.delete('period');
+  window.history.replaceState(window.history.state,'',url.pathname+url.search+url.hash);
+ },[loading,error,selected,selectedReport]);
+
 
  const openReport=(period:string)=>{
   setSelected(period);
