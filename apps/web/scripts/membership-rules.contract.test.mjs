@@ -121,7 +121,7 @@ test('previously excessive hero cards are replaced by a compact note and full co
  assert.match(css,/\.hhba-rules-chapter-switch/);
 });
 
-test('one personal account exposes career stages and an honestly non-live workplace rights preview',()=>{
+test('one career workbench keeps all service entry points without fake member status',()=>{
  const auth=read('../src/pages/PhoneAuthPage.tsx');
  const personal=read('../src/pages/PersonalCenterPage.tsx');
  const rights=read('../src/pages/WorkplaceRightsPage.tsx');
@@ -132,10 +132,12 @@ test('one personal account exposes career stages and an honestly non-live workpl
  assert.match(auth,/欢迎来到汇方职场/);
  assert.match(main,/if\(route==='\/auth'\)return <PhoneAuthPage/);
  assert.doesNotMatch(main,/return <AuthChoicePage/);
- assert.match(personal,/正在求职/);
- assert.match(personal,/已经入职/);
- assert.match(personal,/hhba:career-stage:/);
- assert.match(personal,/职场权益中心/);
+ assert.match(personal,/职业与权益/);
+ assert.match(personal,/职业成长档案/);
+ assert.match(personal,/会员与权益服务/);
+ assert.match(personal,/hhba-workbench-overview/);
+ assert.match(personal,/hhba-workbench-rights/);
+ assert.doesNotMatch(personal,/hhba:career-stage:|hhba-career-switch|¥24\.90/);
  assert.match(rights,/¥24\.90/);
  assert.match(rights,/尚未开放购买/);
  assert.match(rights,/不包含仲裁和诉讼代理/);
