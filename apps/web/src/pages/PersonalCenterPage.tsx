@@ -1,5 +1,5 @@
 import {type FormEvent,useEffect,useState} from 'react';
-import {ArrowRight,ArrowUpRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,History,LockKeyhole,LogOut,MousePointerClick,Scale,Search,ShieldCheck,SlidersHorizontal,UserRound,ChartNoAxesCombined} from 'lucide-react';
+import {ArrowRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,History,LockKeyhole,LogOut,MousePointerClick,Scale,Search,ShieldCheck,SlidersHorizontal,UserRound,ChartNoAxesCombined} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import {getJob,localizedCompany,localizedLocation,localizedTitle,type LiveJob} from '../services/liveRecruitment';
@@ -201,13 +201,6 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
      <div className="hhba-workbench-heading">
       <div><h2>我的工作台</h2><p>职业概览与最近记录</p></div>
      </div>
-     <section className="hhba-workbench-opportunity" aria-labelledby="hhba-workbench-next">
-      <div><span className="hhba-workbench-eyebrow">职业机会</span>
-       <h3 id="hhba-workbench-next">发现适合自己的下一份工作</h3>
-       <p>根据已保存的简历和职业偏好，继续寻找合适的岗位。</p>
-      </div>
-      <Link to="/candidate/match" className="hhba-workbench-opportunity-action" aria-label="开始智能匹配"><ArrowUpRight size={22}/></Link>
-     </section>
      <section className="hhba-workbench-overview" aria-labelledby="hhba-workbench-overview-title">
       <h3 id="hhba-workbench-overview-title">我的职业概览</h3>
       <div className="hhba-workbench-profile-links">
