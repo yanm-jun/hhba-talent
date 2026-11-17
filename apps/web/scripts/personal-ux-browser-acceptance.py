@@ -93,6 +93,20 @@ with sync_playwright() as p:
         assert page.locator('form[action*="checkout"], button:has-text("立即支付")').count() == 0
         no_horizontal_overflow(page, name + "-rights")
         page.screenshot(path=str(OUT / f"{name}-rights.png"), full_page=True, animations="disabled")
+        # Legacy recruitment URLs must never render login, moderation, hiring forms
+        # or load an authenticated B2B bundle; they show a non-interactive notice.
+        for old_path in [
+            "/recruiter/login", "/recruiter/register", "/recruiter/onboarding",
+            "/employer/hub", "/employer/workspace", "/employer",
+            "/admin/recruitment", "/admin/employer-review",
+            "/candidate/employer-jobs", "/candidate/my-applications"
+        ]:
+            page.goto(BASE + old_path, wait_until="domcontentloaded")
+            page.get_by_role("heading", name="企业招聘业务已停止提供").wait_for()
+            assert page.locator('a[href*="/candidate/jobs"]').count() >= 1
+            assert page.locator('form[action*="/organizations"], form[action*="/recruiter"]').count() == 0
+            no_horizontal_overflow(page, name + "-retired-" + old_path)
+        page.screenshot(path=str(OUT / f"{name}-b2b-retired.png"), full_page=True, animations="disabled")
         page.close()
         print(name + ": login/rights text, routes, payment guard, and viewport checks OK", flush=True)
     browser.close()

@@ -1,0 +1,35 @@
+name: HHBA C-End Only - Enterprise Recruitment Retirement
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/components/Shell.tsx'
+      - 'apps/web/src/pages/RetiredEnterprisePage.tsx'
+      - 'apps/web/src/services/api.ts'
+      - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - 'apps/web/scripts/b2b-retirement.contract.test.mjs'
+      - '.github/workflows/hhba-b2b-retirement-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check-retirement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Verify retired B2B routes and preserved C-end journeys
+        working-directory: apps/web
+        run: |
+          node --test scripts/b2b-retirement.contract.test.mjs
+      - name: Verify TypeScript and Vite production bundle
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build

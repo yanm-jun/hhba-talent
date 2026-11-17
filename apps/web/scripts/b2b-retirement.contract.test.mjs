@@ -1,0 +1,57 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync,existsSync} from 'node:fs';
+const read=path=>readFileSync(new URL('../src/'+path,import.meta.url),'utf8');
+
+test('single C-end login remains and no recruiter admin or B2B page is mounted',()=>{
+ const main=read('main.tsx');
+ const shell=read('components/Shell.tsx');
+ const retired=read('pages/RetiredEnterprisePage.tsx');
+ for(const name of [
+   'EmployerWorkspacePage','EmployerPage','AdminRecruitmentPage','EmployerReviewPage',
+   'EmployerGrowthHubPage','EmployerPublicJobsPage','EmployerPublicJobDetail',
+   'AdminEmployerScoringPage','RecruiterWelcomePage','SubmitReviewPage'
+ ]){
+   assert.ok(!main.includes('return <'+name),name+' remains routed');
+   assert.ok(!main.includes('const '+name+'=lazy'),name+' is bundled');
+ }
+ assert.ok(main.includes("route==='/auth')return <PhoneAuthPage"));
+ assert.match(main,/Legacy B-end is retired/);
+ assert.match(main,/return <RetiredEnterprisePage user=\{user\}\/>/);
+ assert.doesNotMatch(main,/if\(route==='\/recruiter\/login'/);
+ assert.doesNotMatch(main,/if\(route==='\/employer\/hub'/);
+ assert.doesNotMatch(shell,/to="\/employer\/|to="\/recruiter\//);
+ assert.doesNotMatch(shell,/企业入驻|企业工作台|招聘方身份|企业招聘与治理导航/);
+ assert.match(retired,/企业招聘业务已停止提供/);
+ assert.match(retired,/旧申请与企业账户资料不会因为页面下线而被擅自清空/);
+ assert.equal(existsSync(new URL('../src/pages/AuthChoicePage.tsx',import.meta.url)),false);
+});
+test('enterprise recruiting API calls fail closed while C-end login is preserved',()=>{
+ const api=read('services/api.ts');
+ assert.match(api,/legacyEnterpriseRecruitmentRetired = true/);
+ assert.match(api,/retiredBusinessEndpoint\(path\)\|\|retiredRecruiterSession\(path,init\.body\)/);
+ assert.match(api,/throw new ApiError\(410/);
+ for(const endpoint of ['/organizations','/recruiter','/public/employer-postings','/admin/verification',
+   '/admin/employer-postings','/me/employer-applications','/admin/recruitment-responsibilities']){
+   assert.ok(api.includes("'"+endpoint+"'"),endpoint);
+ }
+ assert.match(api,/sendPhoneCode:/);
+ assert.match(api,/phoneSession:/);
+ assert.match(api,/\/auth\/me/);
+ const real=read('services/realAuth.ts');
+ assert.match(real,/REAL_AUTH_TOKEN_KEY/);
+});
+test('official employer sources are still C-end resources, not recruitment clients',()=>{
+ const home=read('pages/HomePage.tsx');
+ const market=read('components/UnifiedJobMarket.tsx');
+ const shell=read('components/Shell.tsx');
+ for(const label of ['我要应聘','劳动权益支持','企业招聘导航'])assert.ok(home.includes(label));
+ assert.ok(home.includes('<UnifiedJobMarket compact/>'));
+ assert.ok(shell.includes('to="/companies/library"'));
+ assert.ok(shell.includes('to="/candidate/jobs"'));
+ assert.ok(market.includes('to="/companies"'));
+ assert.doesNotMatch(market,/to="\/candidate\/employer-jobs"/);
+ const work=read('pages/WorkspacePage.tsx');
+ assert.doesNotMatch(work,/to="\/employer"/);
+ assert.match(work,/to="\/candidate\/account\/rights"/);
+});
