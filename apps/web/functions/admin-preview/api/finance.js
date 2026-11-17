@@ -69,7 +69,7 @@ export function aggregateFinance(events,month){
   })).sort((a,b)=>b.day.localeCompare(a.day)||b.at.localeCompare(a.at))
  };
 }
-async function readMonth(kv,month){
+export async function readMonth(kv,month){
  const p=prefix(month);
  const listing=await kv.list({prefix:p,limit:MAX_EVENTS+1});
  if(!listing||!Array.isArray(listing.keys)||listing.list_complete!==true||

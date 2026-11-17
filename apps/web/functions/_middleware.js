@@ -25,6 +25,9 @@ export async function onRequest(context){
   return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
  }
  if(path.startsWith('/api/console-auth/'))return next();
+ // Only the finance AI daily analysis route uses its own dedicated secret.
+ // Every other finance API still requires the password-protected admin session.
+ if(path==='/admin-preview/api/finance-ai-cron'&&request.method==='POST')return next();
  if(path==='/')return Response.redirect('https://'+ADMIN_HOST+'/admin-preview/',302);
  const api=path.startsWith('/admin-preview/api/');
  if(path==='/admin-preview'||path.startsWith('/admin-preview/')){
