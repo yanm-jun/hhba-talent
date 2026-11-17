@@ -41,6 +41,11 @@ with sync_playwright() as p:
         page = browser.new_page(viewport=size, device_scale_factor=1)
         page.goto(BASE + "/auth", wait_until="domcontentloaded")
         page.locator(".hhba-unified-auth").wait_for()
+        assert not page.locator(".hhba-experience-header").is_visible(), "Login view should not include the full site navbar"
+        assert not page.locator(".hhba-site-disclosure").is_visible(), "Login card supplies its own privacy entry"
+        if name == "mobile":
+            card = page.locator(".hhba-phone-card").bounding_box()
+            assert card and card["y"] < 55, f"Mobile login should start in first fold: {card}"
         assert page.get_by_role("heading", name="欢迎来到汇方职场").is_visible()
         assert page.locator('input[id="hhba-auth-phone"]').is_visible()
         assert page.get_by_text("获取验证码").is_visible()
