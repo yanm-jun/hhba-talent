@@ -19,8 +19,8 @@ const legalTopics=[
   {title:'灵活用工争议',icon:BadgeAlert,slug:'flexible-work'}
 ] as const;
 
-export function LegalAidLandingPage({user}:{user:User|null}){
-  return <Shell user={user}>
+export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
+  return <Shell user={user} embedded={embedded}>
     <main className="hhba-law" id="main-content">
       <section className="hhba-law-panel" aria-labelledby="hhba-law-title">
         <header className="hhba-law-header">
