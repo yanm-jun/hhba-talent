@@ -77,14 +77,18 @@ test('publication migration stores no demonstration data and gates release',()=>
  assert.doesNotMatch(schema,/INSERT INTO|HHBA-DEMO-00[1-9]|111350|111,350/i);
 });
 
-test('invalid report period falls back to latest publication and clears stale URL',()=>{
- const page=read('src/pages/TransparencyPage.tsx');
- assert.match(page,/selectedReport\|\|reports\[0\]\|\|null/);
- assert.match(page,/url\.searchParams\.delete\('period'\)/);
- assert.match(page,/if\(loading\|\|error\|\|!selected\|\|selectedReport\)return/);
- assert.match(page,/fetch\(endpoint\('\/cases'\)/);
- assert.match(page,/fetch\(endpoint\('\/ledger'\)/);
- assert.match(page,/暂无通过公开审核的案例档案/);
- assert.match(page,/逐笔资金公开数据库尚未开通/);
- assert.doesNotMatch(page,/HHBA-DEMO-OUT-|111350|111,350/);
+test('invalid report period falls back to latest publication and new pages preserve official separation',()=>{
+ const report=read('src/pages/TransparencyReportsPage.tsx');
+ const cases=read('src/pages/TransparencyCasesPage.tsx');
+ const funds=read('src/pages/TransparencyFundsPage.tsx');
+ const overview=read('src/pages/TransparencyPage.tsx');
+ assert.match(report,/selectedReport\|\|reports\[0\]\|\|null/);
+ assert.match(report,/url\.searchParams\.delete\('period'\)/);
+ assert.match(report,/if\(loading\|\|error\|\|!selected\|\|selectedReport\)return/);
+ assert.match(cases,/fetch\(endpoint,\{cache:'no-store'\}\)/);
+ assert.match(funds,/fetch\(endpoint\('\/ledger'\)/);
+ assert.match(cases,/暂无通过公开审核的真实案例/);
+ assert.match(funds,/逐笔资金公开数据库尚未启用/);
+ assert.match(overview,/<h1>责任与透明<\/h1>/);
+ assert.doesNotMatch(overview+cases+funds+report,/HHBA-DEMO-OUT-|111350|111,350/);
 });
