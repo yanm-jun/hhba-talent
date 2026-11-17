@@ -467,7 +467,37 @@
           </tr></thead><tbody id="finance-rows"><tr><td colspan="7">尚未手动读取；未查询不等于零。</td></tr></tbody></table></div>
           <p class="hhba-private-quality" id="finance-read-quality">登记簿尚未查询；没有完整的官方账单 API 授权，不能对外宣称为完整财报。</p>
         </article>
-        <section class="panel hhba-finance-panel" id="hhba-fin-ai-root" aria-label="AI 财务管家工作台"></section>
+        <section class="panel hhba-finance-panel" id="hhba-fin-ai-root" aria-label="AI 财务管家工作台">
+          <div class="hhba-fin-ai-header">
+            <div><p class="eyebrow">AI FINANCE ASSISTANT · OWNER APPROVAL</p>
+              <h2>AI 财务管家 <span class="hhba-fin-ai-pill">自动整理 · 人工发布</span></h2>
+              <p>自动归集真实登记簿、识别冲销和异常，AI 提出补证建议；你核对凭证并批准正式月报。没有的原始账目不能假设为零。</p></div>
+            <div class="hhba-fin-ai-controls">
+              <label>财务月份 <input id="hhba-fin-ai-month" type="month"></label>
+              <button type="button" id="hhba-fin-ai-load" class="button-outline">查看最近整理</button>
+              <button type="button" id="hhba-fin-ai-run" class="button-primary">立即整理并分析</button>
+            </div>
+          </div>
+          <p id="hhba-fin-ai-status" class="hhba-fin-ai-status" role="status">正在读取内部财务审查记录，未发布的草稿不会自动公开。</p>
+          <div class="hhba-fin-ai-kpis">
+            <div><span>已登记收入参考</span><strong id="hhba-ai-income">—</strong><small>未与收款平台对账</small></div>
+            <div><span>已登记费用参考</span><strong id="hhba-ai-expense">—</strong><small>排除已冲销条目</small></div>
+            <div><span>有效凭证记录</span><strong id="hhba-ai-count">—</strong><small>仅登记簿内</small></div>
+            <div><span>财务审查状态</span><strong id="hhba-ai-readiness">未整理</strong><small>不得自动发布</small></div>
+          </div>
+          <div class="hhba-fin-ai-grid">
+            <section><h3>异常与待核验项目 <small id="hhba-ai-alert-count"></small></h3>
+              <div id="hhba-ai-alerts" class="hhba-fin-ai-empty">尚未取得本期审查结果。</div></section>
+            <section><h3>费用归类建议</h3>
+              <div id="hhba-ai-fields" class="hhba-fin-ai-empty">AI 不会推算没有凭证的费用。</div>
+              <button id="hhba-fin-ai-apply" class="button-outline" type="button" disabled>带入月报空白字段（不保存）</button></section>
+          </div>
+          <section class="hhba-fin-ai-narrative"><h3>AI 审阅意见</h3>
+            <p id="hhba-fin-ai-model">尚未执行模型推理。</p>
+            <small id="hhba-fin-ai-source">登记簿数据尚未自动完成银行、支付平台或供应商账单对账。</small></section>
+          <div class="hhba-fin-ai-footer"><span id="hhba-fin-ai-last">自动整理状态：待读取</span>
+            <a href="https://hhba.work/transparency" rel="noopener noreferrer" target="_blank">公众财务公开</a></div>
+        </section>
         <section class="panel hhba-finance-panel" id="hhba-fin-report-root" aria-label="财务月报与劳动者权益帮扶池"></section>
       </section>
       <section class="page-view" id="view-investor" hidden aria-labelledby="investor-heading">
