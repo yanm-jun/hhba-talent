@@ -81,9 +81,9 @@ export function TransparencyPage({user}:{user:User|null}){
     if(!response.ok)throw new Error('CASES_READ_FAILED');
     const data=await response.json() as {ok?:boolean;state?:string;cases?:PublicCase[]};
     if(!active)return;
-    if(data.ok!==true)throw new Error('CASES_INVALID');
-    setPublicCases(data.state==='ready'&&Array.isArray(data.cases)?data.cases:[]);
-    setCasesState(data.state==='ready'?'ready':'not_ready');
+    if(data.ok!==true||(data.state!=='ready'&&data.state!=='not_ready')||(data.state==='ready'&&!Array.isArray(data.cases)))throw new Error('CASES_INVALID');
+    setPublicCases(data.state==='ready'?data.cases!:[]);
+    setCasesState(data.state);
    }catch{if(active)setCasesState('error');}
   };
   const loadLedger=async()=>{
@@ -92,9 +92,9 @@ export function TransparencyPage({user}:{user:User|null}){
     if(!response.ok)throw new Error('LEDGER_READ_FAILED');
     const data=await response.json() as {ok?:boolean;state?:string;entries?:PublicLedgerEntry[]};
     if(!active)return;
-    if(data.ok!==true)throw new Error('LEDGER_INVALID');
-    setPublishedLedger(data.state==='ready'&&Array.isArray(data.entries)?data.entries:[]);
-    setLedgerState(data.state==='ready'?'ready':'not_ready');
+    if(data.ok!==true||(data.state!=='ready'&&data.state!=='not_ready')||(data.state==='ready'&&!Array.isArray(data.entries)))throw new Error('LEDGER_INVALID');
+    setPublishedLedger(data.state==='ready'?data.entries!:[]);
+    setLedgerState(data.state);
    }catch{if(active)setLedgerState('error');}
   };
   void loadCases();
@@ -190,7 +190,7 @@ export function TransparencyPage({user}:{user:User|null}){
    <nav className="hhba-resp-open-index" aria-label="公开信息中心四大目录">
     <div className="hhba-resp-open-index-heading"><span className="hhba-fin-section-index">PUBLIC RECORDS / 公开中心</span><strong>从这里找到需要查阅的记录</strong><p>正式公开资料与功能演示分开管理；尚未发布的信息不展示模拟数值。</p></div>
     <div className="hhba-resp-open-index-list">
-     <a href="#public-case-register"><span className="hhba-resp-index-number">01</span><span><strong>帮扶案例公开档案</strong><small>授权公开、隐私审核、个案进展</small></span><span className="hhba-resp-index-state">{casesState==='loading'?'读取中':casesState==='error'?'暂不可用':casesState==='not_ready'?'待开放':publicCases.length?publicCases.length+' 份已公开':'暂无正式案例'}</span><ArrowRight size={18} aria-hidden="true"/></a>
+     <a href="#public-case-register"><span className="hhba-resp-index-number">01</span><span><strong>帮扶案例公开档案</strong><small>授权公开、隐私审核、个案进展</small></span><span className="hhba-resp-index-state">{casesState==='loading'?'读取中':casesState==='error'?'暂不可用':casesState==='not_ready'?'待开放':publicCases.length?'展示 '+publicCases.length+' 份已审核记录':'暂无正式案例'}</span><ArrowRight size={18} aria-hidden="true"/></a>
      <a href="#public-fund-register"><span className="hhba-resp-index-number">02</span><span><strong>资金收支档案</strong><small>按已发布报告查询入池与支出</small></span><span className="hhba-resp-index-state">{loading?'读取中':error?'暂不可用':reports.length?reports.length+' 期报告':'尚无报告'}</span><ArrowRight size={18} aria-hidden="true"/></a>
      <a href="#fin-latest-title"><span className="hhba-resp-index-number">03</span><span><strong>月度财务报告</strong><small>经营收支、可分配利润和报告修订</small></span><span className="hhba-resp-index-state">{loading?'读取中':error?'暂不可用':reports.length?reports.length+' 期公开':'待发布'}</span><ArrowRight size={18} aria-hidden="true"/></a>
      <a href="#public-policy-monitor"><span className="hhba-resp-index-number">04</span><span><strong>公开制度与监督</strong><small>60/40 分配原则、信息保护与更正</small></span><span className="hhba-resp-index-state">公开说明</span><ArrowRight size={18} aria-hidden="true"/></a>
