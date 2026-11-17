@@ -92,7 +92,7 @@ export function PrivateResumeVault(){
   </div></div>
   {loading?<p role="status">正在检查私有简历服务…</p>:!ready?<>
    <div className="hhba-account-upload"><CloudUpload size={29}/>
-    <h3>简历服务暂未启用</h3>
+    <h3>私有简历服务尚未启用</h3>
     <p>请稍后再试。</p>
    </div>
    {error&&<p className="hhba-personal-error" role="alert">{error}</p>}
@@ -140,10 +140,14 @@ export function PrivateResumeVault(){
         onClick={clearSelection} aria-label="移除已选择的文件"><X size={15}/>清除</button>}
       </div>
      </div>
+     <details className="hhba-private-resume-details">
+      <summary>了解简历保存及 AI 分析范围</summary>
+      <p>上传不等于授权 DeepSeek 分析。只有本人主动选择 AI 匹配并另外授权后，才会进入相应分析流程。文件存储区域与跨境传输规则需以实际部署及正式隐私告知为准；不应将未核实的区域作为保证。</p>
+     </details>
      <div className="hhba-private-resume-consent-panel">
       <label className="hhba-private-resume-consent">
        <input type="checkbox" checked={consent} disabled={busy} onChange={e=>setConsent(e.target.checked)}/>
-       <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 保存本次简历。</span>
+       <span>我已知悉并单独同意 HHBA 保存本次简历。请先阅读 <Link to="/candidate/account/privacy">《账户与隐私说明》</Link>；此授权不包含向 AI 服务提供文件。</span>
       </label>
      </div>
      <div className="hhba-private-resume-upload-actions">
