@@ -4,8 +4,11 @@
  background:#f5f8fe!important;
  background-image:radial-gradient(ellipse 65% 48% at 50% 15%,#dfeeff 0%,#f5f8fe 75%,#f5f8fe 100%)!important;
 }
-.app-shell:has(.hhba-unified-auth) .hhba-experience-header{
- border-bottom:1px solid rgba(208,224,241,.78);
+/* A one-purpose login view must not waste a mobile screen on the site's public nav.
+   Home and job browsing remain reachable via explicit links below the form. */
+.app-shell:has(.hhba-unified-auth) .hhba-experience-header,
+.app-shell:has(.hhba-unified-auth) .hhba-site-disclosure{
+ display:none;
 }
 .hhba-phone-auth.hhba-unified-auth{
  box-sizing:border-box;
