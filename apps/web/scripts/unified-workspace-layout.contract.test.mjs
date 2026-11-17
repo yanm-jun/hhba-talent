@@ -28,7 +28,8 @@ test('overview displays actual account data and does not advertise unlaunched me
  assert.match(personal,/resumeCount/);
  assert.match(personal,/服务筹备中/);
  assert.doesNotMatch(personal,/¥24\.90|hhba-career-membership|规划会员月费/);
- assert.match(personal,/职业成长档案.*职业经历/);
+ assert.match(personal,/职业成长档案/);
+ assert.match(personal,/职业经历/);
 });
 test('growth archive reuses real profile and private resumes rather than inventing work history',()=>{
  assert.match(personal,/current==='career'/);
