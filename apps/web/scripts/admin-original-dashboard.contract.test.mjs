@@ -10,7 +10,7 @@ test('single admin source retains real data slots and C-end operations navigatio
  for(const x of ['jobs-count','boards-count','registered-users','active-users','ov-pv','ov-saves','view-users','growth-pv','growth-saves','users-chart','investor-jobs'])
   assert(html.includes('id="'+x+'"'),'missing connected original admin slot: '+x);
  assert(js.includes("fetch('/api/overview'"),'GitHub Pages canonical transform anchor lost');
- assert(js.includes("fetch('/api/metrics/public'"),'Cloudflare public API unconnected');
+ assert(js.includes("'/admin-preview/api/public-jobs'")&&js.includes("'/api/metrics/public'"),'admin and public official job snapshot routes must both remain');
  assert(js.includes("fetch('/admin-preview/api/metrics?'"),'Cloudflare protected D1 metrics unconnected');
  assert(js.includes("setView(node.dataset.view)"),'original navigation broken');
  assert(css.includes('.kpi-grid')&&css.includes('.sidebar'),'original stylesheet lost');
