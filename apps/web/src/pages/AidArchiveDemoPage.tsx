@@ -121,7 +121,7 @@ function CaseDocument({record}:{record:AidCase}){
    </section>
    <section id="sec5" className="hhba-a2-doc-section">
     <h3><span>06</span> 帮扶支持事项及边界</h3>
-    <div className="hhba-a2-work"><div><b>01 · 专项材料整理</b><p>{record.service}</p></div><div><b>02 · 问题分析与沟通准备</b><p>针对「{record.category}」这一类别的事实争议，将证据、待确认事项、可能涉及的不同处理路径分开列示，以便当事人进一步咨询适格专业人员或相关主管机构。</p></div><div><b>03 · 阶段总结与归档</b><p>{record.followup}</p></div></div>
+    <div className="hhba-a2-work"><div><b>01 · 专项材料整理</b><p>{record.service}</p></div><div><b>02 · 问题分析与沟通准备</b><p>针对「{record.category}」这一类别的事实争议，将证据、待确认事项、可能涉及的不同处理路径分开列示，以便当事人进一步咨询适格专业人员或相关主管机构。</p></div><div><b>03 · 阶段总结与归档</b><p>模拟服务过程按案件编号汇总，分别记录已完成的资料整理事项、仍有分歧的事实、尚未核实的金额或处理结果，并保留后续更新所需的字段；不把阶段性咨询写成最终维权成功。</p></div></div>
     <p className="hhba-a2-muted">演示内容不构成具体法律意见、代理授权或胜诉保证；正式法律服务如需提供，应由依法有资质的人员审核履行。</p>
    </section>
    <section id="sec6" className="hhba-a2-doc-section">
