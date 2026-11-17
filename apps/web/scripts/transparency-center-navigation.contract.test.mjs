@@ -45,7 +45,7 @@ test('demo deep link opens case directory directly and keeps case-to-fund tracea
  assert.match(demoPage,/view==='cases'\|\|view==='funds'/);
  assert.match(demoPage,/setArchiveUrl\(next\)/);
  assert.match(demoPage,/setArchiveUrl\(null\)/);
- assert.match(demoPage,/onOpenFunds=\{\(\)=>open\('funds'\)\}/);
+ assert.match(demoPage,/setLedgerQuery\(chosen.id\)/);
  assert.match(demoPage,/返回模拟资金流水/);
  assert.match(demoPage,/查看关联案件/);
  assert.match(demoPage,/情景模拟，非真实案例/);
