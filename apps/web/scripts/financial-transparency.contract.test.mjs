@@ -153,7 +153,7 @@ test('V5 overview separates four archives and retains the validated monthly fina
  assert.match(reports,/未经独立财务审计/);
  assert.match(reports,/<details className="hhba-resp-disclosure-detail">/);
  assert.ok(reports.indexOf('id="fin-latest-title"')<reports.indexOf('id="hhba-fin-history-title"'));
- assert.ok(reports.indexOf('id="hhba-fin-history-title"')<reports.indexOf('fin-subscribe-title'));
+ assert.ok(reports.indexOf('id="hhba-fin-history-title"')<reports.indexOf('id="fin-subscribe-title"'));
  assert.match(main,/route==='\/transparency\/reports'/);
  assert.match(home,/查看责任与透明/);
  assert.match(shell,/财务公开|责任与透明/);
