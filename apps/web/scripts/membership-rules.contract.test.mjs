@@ -122,7 +122,7 @@ test('previously excessive hero cards are replaced by a compact note and full co
 });
 
 test('one personal account exposes career stages and an honestly non-live workplace rights preview',()=>{
- const auth=read('../src/pages/AuthChoicePage.tsx');
+ const auth=read('../src/pages/PhoneAuthPage.tsx');
  const personal=read('../src/pages/PersonalCenterPage.tsx');
  const rights=read('../src/pages/WorkplaceRightsPage.tsx');
  const dropdown=read('../src/components/CandidateAccountDropdown.tsx');
