@@ -19,8 +19,8 @@ test('membership product remains explicitly blocked across all public policy fla
   assert.match(api,new RegExp(key+':false'),key+' must be blocked on the server');
  }
  assert.equal(m.billingMode,'manual_only');
- assert.equal(m.priceCents,1990);
- assert.equal(m.complianceRulesVersion,'0.2.0');
+ assert.equal(m.priceCents,2490);
+ assert.equal(m.complianceRulesVersion,'0.2.1');
  assert.equal(config.distribution.reportStatus,'not_published');
  assert.match(compliance,/status:'blocked'/);
  assert.match(compliance,/rulesAreBinding:false/);
@@ -54,7 +54,7 @@ test('format terms, manual renewal, prepayment refund, sensitive data have concr
  assert.match(rules,/未履约退款/);
  assert.match(rules,/不能使用「售出概不退款」/);
  assert.match(rules,/数据/);
- assert.match(rules,/当前公开说明版本为0\.2\.0/);
+ assert.match(rules,/当前公开说明版本为0\.2\.1/);
  assert.doesNotMatch(rules,/html1/);
 });
 
