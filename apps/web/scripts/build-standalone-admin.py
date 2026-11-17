@@ -19,7 +19,7 @@ DIST = WEB / "dist"
 
 def main():
     branch = os.environ.get("CF_PAGES_BRANCH", "")
-    if branch != "feat/admin-password-console-20261112":
+    if branch not in ("feat/admin-password-console-20261112", "feat/admin-cend-console-20261117"):
         raise SystemExit("Refusing standalone admin build on an unapproved branch: " + branch)
     # The private employer baseline lives in admin-only KV catalog:baseline:v1.
     # Never download a one-hour D1 export URL at build time: that expiring
@@ -28,7 +28,7 @@ def main():
     admin = DIST / "admin-preview"
     admin.mkdir(parents=True, exist_ok=True)
     files = [
-        "index.html","dashboard.js","market.js","finance.js","finance-report.js","finance-report.css","finance-ai.js","finance-ai.css","command-center.js","command-center.css","styles.css","library.js","library.css",
+        "index.html","dashboard.js","market.js","finance.js","finance-report.js","finance-report.css","finance-ai.js","finance-ai.css","command-center.js","command-center.css","styles.css","cend-console.css","library.js","library.css",
         "library-file-ui.js","library-file-import.js","admin-console-ui.js",
         "favicon.svg"
     ]
@@ -38,10 +38,12 @@ def main():
     # Versioned filenames prevent a browser from combining new HTML/logo with
     # a previously cached stylesheet from earlier production deployments.
     shutil.copy2(SOURCE / "styles.css", admin / "styles-hhba-v2.css")
+    shutil.copy2(SOURCE / "cend-console.css", admin / "cend-console-hhba-v1.css")
     shutil.copy2(SOURCE / "library.css", admin / "library-hhba-v2.css")
     page = (admin / "index.html").read_text(encoding="utf-8")
     rewrites = [
         ('href="/styles.css"','href="./styles-hhba-v2.css"'),
+        ('href="/cend-console.css"','href="./cend-console-hhba-v1.css"'),
         ('src="/dashboard.js"','src="./dashboard.js"'),
         ('src="/market.js"','src="./market.js"'),
         ('src="/finance.js"','src="./finance.js"'),
@@ -97,7 +99,7 @@ def main():
     checks=[admin/f for f in files]+[
         DIST/"login/index.html",DIST/"setup/index.html",
         DIST/"admin-login.css",DIST/"admin-login-brand-v2.css",DIST/"admin-login.js",DIST/"index.html",
-        admin/"styles-hhba-v2.css",admin/"library-hhba-v2.css"]
+        admin/"styles-hhba-v2.css",admin/"cend-console-hhba-v1.css",admin/"library-hhba-v2.css"]
     assert all(x.exists() and x.stat().st_size>0 for x in checks)
     print("HHBA_PASSWORD_ADMIN_SITE_BUILD_READY files="+str(len(checks))+" route=/login/",flush=True)
 
