@@ -93,7 +93,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
      <Link className="join-nav-link" to="/join">加入我们</Link>
      {candidateSignedIn?<Link className="hhba-nav-account" to="/candidate/account">个人中心</Link>:
        <Link className="hhba-nav-account" to="/auth">登录 / 注册</Link>}
-   </nav>:experience==='candidate'?<nav aria-label="个人职业服务导航">
+   </nav>:<nav aria-label="个人职业服务导航">
      <HeaderSiteSearch/>
      <StudyAbroadNavLink active={route.startsWith('/study-abroad')}/>
      <TalentPolicyNavLink active={route.startsWith('/talent-service')}/>
