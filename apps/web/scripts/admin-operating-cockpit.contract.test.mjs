@@ -75,7 +75,7 @@ test('cockpit UI reuses the ONLY private admin and never invents revenue, succes
  assert.match(js,/fetch\('\/admin-preview\/api\/metrics\?days='/);
  assert.match(js,/fetch\('\/admin-preview\/api\/command-center\?days='/);
  assert.match(js,/r.day>=collector/);
- assert.match(js,/valid<values.length\?' · 缺失日期不补零'/);
+ assert.match(js,/count<values.length\?' · 缺失日期不补零'/);
  assert.match(js,/secondary:monthlySeries\(result.finance.months,'netResultFen'\)/);
  assert.match(js,/仍未接入|尚未完整采集|尚无完整可核验/);
  assert.doesNotMatch(js,/Math.random|demoDataset|fakeRevenue|simulatePurchase/);
