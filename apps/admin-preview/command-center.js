@@ -7,6 +7,7 @@ const formatCount=n=>isCount(n)?num.format(n):'—';
 const formatMoney=n=>Number.isSafeInteger(n)?amount.format(n/100):'—';
 const ns='http://www.w3.org/2000/svg';
 let selectedDays=30,busy=false,sequence=0;
+let lastPVSeries=null,pvDetail=false;
 
 function element(tag,attributes={},value){
  const e=document.createElementNS(ns,tag);
@@ -253,8 +254,13 @@ function parseMetrics(result){
   const map=(field)=>series.map(r=>({label:r.day,
    value:r.day>=collector&&isCount(r[field])?r[field]:null}));
   drawLine('cc-chart-search',map('searches'));
-  drawLine('cc-chart-pv',map('pv'));
+  lastPVSeries=map('pv');
+  const pvButton=q('cc-pv-detail');
+  if(pvButton)pvButton.disabled=false;
+  drawLine('cc-chart-pv',lastPVSeries,{scale:pvDetail?'sqrt':'linear'});
  }else{
+  lastPVSeries=null;
+  const pvButton=q('cc-pv-detail');if(pvButton)pvButton.disabled=true;
   empty('cc-chart-search','尚无可确认采集起点的搜索事件');
   empty('cc-chart-pv','尚无可确认采集起点的访问事件');
  }
@@ -342,6 +348,14 @@ document.querySelectorAll('[data-cc-days]').forEach(btn=>btn.addEventListener('c
  void load();
 }));
 q('cc-load')?.addEventListener('click',()=>void load());
+q('cc-pv-detail')?.addEventListener('click',()=>{
+ if(!lastPVSeries)return;
+ pvDetail=!pvDetail;
+ const button=q('cc-pv-detail');
+ button.setAttribute('aria-pressed',String(pvDetail));
+ button.textContent=pvDetail?'恢复线性刻度':'观察低值细节';
+ drawLine('cc-chart-pv',lastPVSeries,{scale:pvDetail?'sqrt':'linear'});
+});
 q('cc-open-finance')?.addEventListener('click',()=>{
  document.querySelector('[data-view="finance"]')?.click();
 });
