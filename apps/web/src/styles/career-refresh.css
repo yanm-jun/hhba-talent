@@ -70,3 +70,81 @@
 .app-shell:has(.hhba-rights-page) .hhba-site-disclosure a{color:#526d8c;text-decoration:none;font-size:11px;font-weight:600}
 .app-shell:has(.hhba-role-auth) .hhba-site-disclosure a:hover,
 .app-shell:has(.hhba-rights-page) .hhba-site-disclosure a:hover{text-decoration:underline}
+
+
+/* HHBA unified career workbench: deliberately compact; existing account subpages untouched. */
+.hhba-career-revamp .hhba-account-header{padding:19px 24px;margin-bottom:18px;box-shadow:none}
+.hhba-career-revamp .hhba-account-avatar{width:60px;height:60px;border-radius:16px}
+.hhba-career-revamp .hhba-account-identity h1{margin:5px 0;font-size:24px}
+.hhba-career-revamp .hhba-account-identity p{margin:0 0 6px}
+.hhba-career-revamp .hhba-account-sidebar{padding:17px 10px;gap:4px}
+.hhba-career-revamp .hhba-account-sidebar>p{margin:3px 0 7px;color:#8393a6}
+.hhba-career-revamp .hhba-account-sidebar a{min-height:39px;padding:9px 12px;font-size:12px}
+.hhba-career-revamp .hhba-account-nav-home{font-weight:700}
+.hhba-career-revamp .hhba-account-nav-group{display:flex;flex-direction:column;border-top:1px solid #edf1f6;padding-top:11px;margin-top:7px}
+.hhba-career-revamp .hhba-account-nav-group h2{font-size:10px;color:#8b9aab;font-weight:750;margin:0 11px 6px;letter-spacing:.04em}
+.hhba-career-revamp .hhba-account-chevron{margin-left:auto}
+.hhba-workbench-heading{display:flex;align-items:center;justify-content:space-between;margin:1px 0 14px}
+.hhba-workbench-heading h2{margin:0 0 4px;color:#193c61;font-size:21px;letter-spacing:-.35px}
+.hhba-workbench-heading p{margin:0;font-size:11px;color:#8999aa}
+.hhba-workbench-opportunity,.hhba-workbench-overview,.hhba-workbench-rights{background:#fff;border:1px solid #e4eaf3;border-radius:15px;padding:20px 22px;margin-bottom:15px}
+.hhba-workbench-opportunity{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hhba-workbench-eyebrow{font-size:11px;font-weight:700;color:#758ba2}
+.hhba-workbench-opportunity h3{font-size:17px;color:#173f68;line-height:1.4;margin:7px 0 6px}
+.hhba-workbench-opportunity p{font-size:12px;color:#7b8fa3;line-height:1.6;margin:0}
+.hhba-workbench-opportunity-action{flex-shrink:0;display:grid;place-items:center;width:48px;height:48px;background:#245f9f;color:#fff;border-radius:11px;text-decoration:none;transition:background .15s,transform .15s}
+.hhba-workbench-opportunity-action:hover{background:#1b4d86;transform:translateY(-1px)}
+.hhba-workbench-overview h3,.hhba-workbench-rights h3{font-size:15px;color:#1d4268;margin:0 0 16px}
+.hhba-workbench-profile-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-bottom:15px}
+.hhba-workbench-profile-links a{display:flex;flex-direction:column;align-items:flex-start;gap:7px;min-width:0;padding:14px 16px;background:#f4f7fb;border:1px solid #eff3f8;border-radius:10px;color:#285075;text-decoration:none}
+.hhba-workbench-profile-links svg{color:#467fb4}
+.hhba-workbench-profile-links strong{font-size:12px}
+.hhba-workbench-profile-links small{font-size:11px;color:#8293a6;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.hhba-workbench-record-list{border-top:1px solid #edf1f6}
+.hhba-workbench-record-list a{display:grid;grid-template-columns:minmax(0,1fr) auto 16px;align-items:center;gap:12px;min-height:52px;text-decoration:none;color:#526d87;border-bottom:1px solid #edf1f6}
+.hhba-workbench-record-list a:last-child{border-bottom:0}
+.hhba-workbench-record-list span{font-size:12px;font-weight:650}
+.hhba-workbench-record-list small{font-size:11px;color:#8597a9;text-align:right;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hhba-workbench-record-list svg{color:#9aabba}
+.hhba-workbench-rights-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}
+.hhba-workbench-rights-head h3{margin:0}
+.hhba-workbench-rights-head>span{background:#f1f4f8;color:#70849b;font-size:10px;padding:5px 9px;border-radius:99px;white-space:nowrap}
+.hhba-workbench-rights-main{display:flex;align-items:center;gap:12px;margin-bottom:15px}
+.hhba-workbench-rights-icon{display:grid;place-items:center;width:42px;height:42px;flex-shrink:0;border-radius:11px;background:#edf4fc;color:#3b76b0}
+.hhba-workbench-rights-main strong{font-size:12px;color:#264d71}
+.hhba-workbench-rights-main p{font-size:11px;color:#7c8ea2;margin:6px 0 0;line-height:1.6}
+.hhba-workbench-rights-link{border-top:1px solid #edf1f6;padding-top:13px;display:flex;align-items:center;justify-content:space-between;color:#376d9d;text-decoration:none;font-size:12px;font-weight:650}
+.hhba-workbench-signature{font-size:10px;color:#9aa9b9;margin:2px 0 0;text-align:right;letter-spacing:.06em}
+.hhba-workbench-profile-links a:hover,.hhba-workbench-record-list a:hover{background:#eef4fc}
+.hhba-workbench-rights-link:hover{text-decoration:underline}
+.hhba-workbench-opportunity-action:focus-visible,.hhba-workbench-profile-links a:focus-visible,.hhba-workbench-record-list a:focus-visible,.hhba-workbench-rights-link:focus-visible,.hhba-account-nav-group a:focus-visible,.hhba-account-nav-home:focus-visible{outline:2px solid #2f6fae;outline-offset:3px}
+.hhba-career-record-panel{color:#1d3e61}
+.hhba-career-record-list{display:grid;gap:10px}
+.hhba-career-record-list a{display:flex;align-items:center;gap:12px;padding:14px 15px;border-radius:10px;border:1px solid #e6edf5;text-decoration:none;color:#35648f}
+.hhba-career-record-list a span{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.hhba-career-record-list a strong{font-size:13px}
+.hhba-career-record-list a small{font-size:11px;color:#8396a9;line-height:1.6;overflow-wrap:anywhere}
+.hhba-career-record-notice{margin:19px 0 0!important;font-size:11px!important;color:#7f90a2!important}
+@media(max-width:900px){
+ .hhba-career-revamp .hhba-account-sidebar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+ .hhba-career-revamp .hhba-account-sidebar>p{display:none}
+ .hhba-career-revamp .hhba-account-nav-home{grid-column:1/-1}
+ .hhba-career-revamp .hhba-account-nav-group{margin:0;padding-top:9px}
+ .hhba-career-revamp .hhba-account-sidebar a{padding:8px 9px}
+}
+@media(max-width:620px){
+ .hhba-career-revamp .hhba-account-header{padding:16px;gap:10px}
+ .hhba-career-revamp .hhba-account-avatar{width:46px;height:46px}
+ .hhba-career-revamp .hhba-account-identity h1{font-size:19px}
+ .hhba-career-revamp .hhba-account-sidebar{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:12px;scrollbar-width:thin;align-items:flex-start}
+ .hhba-career-revamp .hhba-account-nav-home{flex:0 0 96px}
+ .hhba-career-revamp .hhba-account-nav-group{flex:0 0 175px;border-top:0;border-left:1px solid #eef1f5;padding:0 0 0 10px}
+ .hhba-workbench-opportunity,.hhba-workbench-overview,.hhba-workbench-rights{padding:17px 16px}
+ .hhba-workbench-profile-links{gap:8px}
+ .hhba-workbench-profile-links a{padding:12px}
+ .hhba-workbench-record-list a{grid-template-columns:minmax(0,1fr) 16px;row-gap:4px;padding:11px 0}
+ .hhba-workbench-record-list small{grid-column:1;grid-row:2;max-width:100%;text-align:left}
+ .hhba-workbench-record-list svg{grid-column:2;grid-row:1 / span 2}
+ .hhba-workbench-opportunity h3{font-size:15px}
+}
+@media(prefers-reduced-motion:reduce){.hhba-workbench-opportunity-action{transition:none}}
