@@ -71,7 +71,8 @@ test('mobile home retains real React homepage instead of deferring its key secti
   assert.match(main,/import \{ HomePage \} from '\.\/pages\/HomePage'/);
   assert.match(main,/function AppLoadingState\(\)/);
   assert.match(main,/const ResumeUploadPage=lazy\(/);
-  assert.match(main,/const EmployerEvidencePage=lazy\(/);
+  assert.match(main,/const RetiredEnterprisePage=lazy\(/);
+  assert.doesNotMatch(main,/const EmployerEvidencePage=lazy\(/);
   assert.match(home,/<UnifiedJobMarket compact\/>/);
   assert.match(home,/<HomeCompanyMarquee\/>/);
   assert.doesNotMatch(home,/<HomeLiveDrawer\/>/);
