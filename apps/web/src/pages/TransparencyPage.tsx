@@ -121,16 +121,46 @@ export function TransparencyPage({user}:{user:User|null}){
    <header className="hhba-resp-hero">
     <span className="hhba-fin-eyebrow">HHBA <span aria-hidden="true">/</span> RESPONSIBILITY & TRANSPARENCY</span>
     <h1>责任与透明</h1>
-    <p>公开我们的承诺，也公开承诺如何兑现。</p>
+    <p>资金收支、帮扶案例、月度报告与公开制度，进入同一个公开中心查阅。</p>
     <div className="hhba-resp-hero-meta">
      <span><ShieldCheck size={14} aria-hidden="true"/> 企业自愿公开</span>
      <span><CalendarDays size={14} aria-hidden="true"/> 月度报告计划每月21日披露</span>
     </div>
    </header>
-   <nav className="hhba-resp-jump" aria-label="责任与透明目录">
-    <a href="#responsibility-support">资金支持</a>
-    <a href="#financial-allocation">利润分配</a>
-    <a href="#fin-latest-title">公开报告</a>
+   <nav className="hhba-resp-open-index" aria-label="公开信息中心四大目录">
+    <div className="hhba-resp-open-index-heading"><span className="hhba-fin-section-index">PUBLIC RECORDS / 公开中心</span><strong>从这里找到需要查阅的记录</strong><p>正式公开资料与功能演示分开管理；尚未发布的信息不展示模拟数值。</p></div>
+    <div className="hhba-resp-open-index-list">
+     <a href="#public-case-register"><span className="hhba-resp-index-number">01</span><span><strong>帮扶案例公开档案</strong><small>授权公开、隐私审核、个案进展</small></span><span className="hhba-resp-index-state">暂无正式案例</span><ArrowRight size={18} aria-hidden="true"/></a>
+     <a href="#public-fund-register"><span className="hhba-resp-index-number">02</span><span><strong>资金收支档案</strong><small>按已发布报告查询入池与支出</small></span><span className="hhba-resp-index-state">{loading?'读取中':error?'暂不可用':reports.length?reports.length+' 期报告':'尚无报告'}</span><ArrowRight size={18} aria-hidden="true"/></a>
+     <a href="#fin-latest-title"><span className="hhba-resp-index-number">03</span><span><strong>月度财务报告</strong><small>经营收支、可分配利润和报告修订</small></span><span className="hhba-resp-index-state">{loading?'读取中':error?'暂不可用':reports.length?reports.length+' 期公开':'待发布'}</span><ArrowRight size={18} aria-hidden="true"/></a>
+     <a href="#public-policy-monitor"><span className="hhba-resp-index-number">04</span><span><strong>公开制度与监督</strong><small>60/40 分配原则、信息保护与更正</small></span><span className="hhba-resp-index-state">公开说明</span><ArrowRight size={18} aria-hidden="true"/></a>
+    </div>
+   </nav>
+
+   <section id="public-case-register" className="hhba-resp-public-register" aria-labelledby="public-case-register-title">
+    <div className="hhba-resp-public-register-heading"><span className="hhba-fin-section-index">01 / VERIFIED CASE RECORDS</span><h2 id="public-case-register-title">帮扶案例公开档案</h2><p>这里只收录经事实核对、必要授权和脱敏审核后可对外公开的真实案例，不能用演示情景填充。</p></div>
+    <div className="hhba-resp-case-empty">
+     <div className="hhba-resp-case-empty-icon"><FileClock size={22} aria-hidden="true"/></div>
+     <div><strong>暂无通过公开审核的案例档案</strong><p>本中心目前没有可公开查阅的真实个案。未来开放后，将按案件编号、权益类别和处理状态检索，分别披露受理记录、阶段进展、处理结果及可披露的资金摘要。</p><small>暂无公开记录，不代表企业未接到申请，也不代表已完成任何实际帮扶。</small></div>
+     <span>待公开</span>
+    </div>
+    <div className="hhba-resp-case-taxonomy"><strong>计划使用的案件分类</strong><div><span>工资与薪酬</span><span>劳动合同与用工</span><span>工时休假</span><span>离职与补偿</span><span>社保与工伤</span><span>争议处理与证据</span></div></div>
+    <div className="hhba-resp-demo-direction"><div><span>PRODUCT DEMONSTRATION / 单独演示环境</span><strong>想了解将来正式档案会怎样查阅？</strong><p>可体验 28 份明确标注为虚构的模拟案例，测试分类、搜索、九章节档案及资金关联。所有人员、争议、金额和结果均非真实业务。</p></div><Link to="/transparency/archive-preview?view=cases">查看模拟档案体验 <ArrowRight size={16} aria-hidden="true"/></Link></div>
+   </section>
+
+   <section id="public-fund-register" className="hhba-resp-public-register" aria-labelledby="public-fund-register-title">
+    <div className="hhba-resp-public-register-heading"><span className="hhba-fin-section-index">02 / PUBLISHED FUND RECORDS</span><h2 id="public-fund-register-title">资金收支公开档案</h2><p>按已正式发布的月报追踪权益帮扶池的计提、实际入池、实际支出与期末结余。当前仅披露月报能够支持的数据，不虚构逐笔银行交易。</p></div>
+    {loading?<div className="hhba-fin-empty" role="status">正在读取已公开的资金记录…</div>:error?<div className="hhba-fin-empty" role="alert">目前无法核验资金公开记录，请稍后再试。此处不显示推测金额。</div>:!reports.length?
+     <div className="hhba-resp-case-empty hhba-resp-case-empty-fund"><div className="hhba-resp-case-empty-icon"><FileClock size={22} aria-hidden="true"/></div><div><strong>暂无已发布的资金收支报告</strong><p>首期报告完成真实账目核对、授权审核及发布程序后，此处才会出现对应的资金收支摘要。</p><small>未发布不等于资金池余额为零；演示页面中的模拟金额不会出现在这里。</small></div><span>待发布</span></div>:
+     <div className="hhba-resp-fund-ledger"><table aria-label="正式发布报告中的资金收支摘要"><thead><tr><th>披露月份</th><th>实际入池</th><th>实际支出</th><th>期末结余</th><th>操作</th></tr></thead><tbody>{reports.map(item=><tr key={item.period}><th scope="row">{dateLabel(item.period)}</th><td>{yuan(item.poolReceivedFen)}</td><td>{yuan(item.poolSpentFen)}</td><td>{yuan(item.closingPoolFen)}</td><td><button type="button" onClick={()=>openReport(item.period)}>查看报告 <ArrowRight size={14} aria-hidden="true"/></button></td></tr>)}</tbody></table><p>以上为月度汇总，不是逐笔银行交易清单。每笔正式支出只有经过凭据核对、个人信息保护和公开审批后，才能另行发布可公开的明细。</p></div>}
+    <a className="hhba-resp-fund-textlink" href="#fin-latest-title">查看财务报告中的完整核算依据 <ArrowRight size={15} aria-hidden="true"/></a>
+   </section>
+
+   <nav className="hhba-resp-jump hhba-resp-detail-nav" aria-label="补充公开资料目录">
+    <a href="#responsibility-support">个人资金支持</a>
+    <a href="#financial-allocation">利润分配规则</a>
+    <a href="#fin-latest-title">最新月报</a>
+    <a href="#public-policy-monitor">监督与更正</a>
    </nav>
 
    <section className="hhba-resp-support" aria-labelledby="responsibility-support">
@@ -237,6 +267,16 @@ export function TransparencyPage({user}:{user:User|null}){
        {available.correctedAt&&<p>本报告已有修订版本，原版本保留在历史披露记录中。</p>}
       </section>
      </div>}
+   </section>
+
+   <section id="public-policy-monitor" className="hhba-resp-public-register hhba-resp-policy-section" aria-labelledby="public-policy-monitor-title">
+    <div className="hhba-resp-public-register-heading"><span className="hhba-fin-section-index">04 / DISCLOSURE & SUPERVISION</span><h2 id="public-policy-monitor-title">公开制度与监督</h2><p>公开必须可核验、可解释、可更正；涉及劳动者个人信息时以必要、适度和充分脱敏为前提。</p></div>
+    <div className="hhba-resp-policy-rows">
+     <div><span>01</span><div><strong>资金分配与核算口径</strong><p>企业 60%、权益帮扶池 40% 的分配基础是依法核算后确认的可分配利润，而非订单金额或营业收入。月报分别记录应计提、实际划拨与支出。</p><a href="#financial-allocation">查看利润分配规则 <ArrowRight size={14} aria-hidden="true"/></a></div></div>
+     <div><span>02</span><div><strong>案例公开审核与隐私保护</strong><p>真实案例须经过授权、事实核验和脱敏审核，优先公开问题类别、处理阶段及可核验的支持内容。身份、劳动合同原件、银行账户及律师保密材料不得默认公开。</p></div></div>
+     <div><span>03</span><div><strong>纠错、修订与历史留存</strong><p>公开信息有变化时应标记修改日期、说明更正原因，并保留可追溯的版本信息。尚未完成审核的资料不显示为已发布成果。</p><a href="#fin-latest-title">查看已发布报告与修订信息 <ArrowRight size={14} aria-hidden="true"/></a></div></div>
+    </div>
+    <Link className="hhba-resp-policy-rules-link" to="/membership/rules">查看会员与劳动权益服务规则 <ArrowRight size={16} aria-hidden="true"/></Link>
    </section>
 
    <div className="hhba-resp-secondary">
