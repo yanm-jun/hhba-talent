@@ -104,7 +104,7 @@ test('front, admin, cron and immutable correction are all wired to same route',(
  assert.match(shell,/to="\/transparency"/);
  assert.match(home,/className="hhba-home-report-details hhba-home-transparency-link" to="\/transparency"/);
  assert.match(page,/subscriptionEnabled/);
- assert.match(page,/首期财务报告尚未发布/);
+ assert.match(page,/首期帮扶资金报告尚未发布/);
  assert.match(page,/reports\.map/);
  assert.match(sql,/hhba_fin_publication_revisions/);
  assert.match(sql,/hhba_fin_deliveries/);
@@ -313,7 +313,7 @@ test('isolated opt-in flow requires Turnstile, email confirmation and honors one
     countResend++;
     const body=JSON.parse(options.body);
     assert.deepEqual(body.to,[email]);
-    assert.equal(body.subject,'请确认 HHBA 财务公开邮件订阅');
+    assert.equal(body.subject,'请确认 HHBA 帮扶资金公开邮件订阅');
     const m=body.html.match(/\/api\/transparency\/confirm\?token=([a-f0-9]{64})/);
     assert.ok(m,'Verification email must include a signed confirmation token');
     verifyLink='https://hhba.work'+m[0];
