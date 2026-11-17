@@ -18,7 +18,7 @@ function configured(env){
 const money=n=>'¥'+(Number(n||0)/100).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
 function reportEmail({report,unsubscribe,link}){
  const u=htmlEsc(unsubscribe),r=htmlEsc(link),period=htmlEsc(report.period);
- return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"></head><body style="margin:0;background:#f1f7f3;padding:28px 12px;font:14px/1.8 Arial,Microsoft YaHei,sans-serif;color:#25432f"><div style="max-width:620px;margin:auto;padding:30px;background:white;border:1px solid #dce9df;border-radius:16px"><div style="font-weight:bold;color:#2e7750">HHBA · 财务透明中心</div><h1 style="font-size:24px"> ${period}月度财务公开报告 </h1><p>这份报告已在 HHBA 公开发布。您收到本邮件是因为此前自主验证了订阅邮箱。</p><p>本期营业收入：<strong>${htmlEsc(money(report.revenueFen))}</strong><br>月度经营结果：<strong>${htmlEsc(money(report.netResultFen))}</strong><br>本期依法确认的可分配利润基数：<strong>${htmlEsc(money(report.distributableProfitFen))}</strong><br>劳动者权益帮扶池本期计提：<strong>${htmlEsc(money(report.poolAccrualFen))}</strong><br>帮扶池期末结余：<strong>${htmlEsc(money(report.closingPoolFen))}</strong></p><p><a href="${r}" style="background:#267247;color:white;border-radius:7px;text-decoration:none;display:inline-block;padding:9px 17px">查看完整报告及计算说明</a></p><hr style="border:0;border-top:1px solid #dce9df"><p style="font-size:12px;color:#728276">60/40分配是依法核算后的可分配利润原则，不是营业流水分成。报告是否审计以文内标识为准。本邮件不包含招募营销。</p><p style="font-size:12px"><a href="${u}" style="color:#377858">不想再收到这类财务公开邮件？点此取消订阅</a></p></div></body></html>`;
+ return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"></head><body style="margin:0;background:#f1f7f3;padding:28px 12px;font:14px/1.8 Arial,Microsoft YaHei,sans-serif;color:#25432f"><div style="max-width:620px;margin:auto;padding:30px;background:white;border:1px solid #dce9df;border-radius:16px"><div style="font-weight:bold;color:#2e7750">HHBA · 权益帮扶透明中心</div><h1 style="font-size:24px"> ${period}月度帮扶资金报告 </h1><p>这份报告已在 HHBA 公开发布。您收到本邮件是因为此前自主验证了订阅邮箱。</p><p>本期帮扶池计提：<strong>${htmlEsc(money(report.poolAccrualFen))}</strong><br>实际入池：<strong>${htmlEsc(money(report.poolReceivedFen))}</strong><br>本期支持支出：<strong>${htmlEsc(money(report.poolSpentFen))}</strong><br>帮扶池期末结余：<strong>${htmlEsc(money(report.closingPoolFen))}</strong></p><p><a href="${r}" style="background:#267247;color:white;border-radius:7px;text-decoration:none;display:inline-block;padding:9px 17px">查看帮扶资金报告及计算依据</a></p><hr style="border:0;border-top:1px solid #dce9df"><p style="font-size:12px;color:#728276">60/40分配是依法核算后的可分配利润原则，不是营业流水分成。报告是否审计以文内标识为准。本邮件不包含招募营销。</p><p style="font-size:12px"><a href="${u}" style="color:#377858">不想再收到这类财务公开邮件？点此取消订阅</a></p></div></body></html>`;
 }
 export async function sendNextBatch(db,env,period,report){
  const now=new Date().toISOString();
@@ -44,10 +44,10 @@ export async function sendNextBatch(db,env,period,report){
   const raw=await unsubscribeToken(env,item.email_hash);
   if(!raw){failed++;continue;}
   const unsub=publicUrl(env)+'/api/transparency/unsubscribe?token='+encodeURIComponent(raw);
-  const link=publicUrl(env)+'/transparency?period='+encodeURIComponent(period);
+  const link=publicUrl(env)+'/transparency/reports?period='+encodeURIComponent(period);
   const output=await deliverEmail(env,{
    to:item.email,
-   subject:'HHBA '+period+'月度财务与劳动者权益帮扶报告',
+   subject:'HHBA '+period+'月度劳动者权益帮扶资金报告',
    html:reportEmail({report,unsubscribe:unsub,link}),
    idempotencyKey:'hhba-fin-v1-'+period+'-'+item.email_hash.slice(0,48),
    headers:{'List-Unsubscribe':'<'+unsub+'>','List-Unsubscribe-Post':'List-Unsubscribe=One-Click'}

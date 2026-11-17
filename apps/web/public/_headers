@@ -26,3 +26,7 @@
 
 /employer/workspace*
   X-Robots-Tag: noindex, nofollow
+
+# Fictional labor-assistance casebook is an interactive demonstration, not searchable performance history.
+/transparency/archive-preview*
+  X-Robots-Tag: noindex, nofollow, noarchive
