@@ -101,11 +101,11 @@ with sync_playwright() as p:
             "/admin/recruitment", "/admin/employer-review",
             "/candidate/employer-jobs", "/candidate/my-applications"
         ]:
-            page.goto(BASE + old_path, wait_until="domcontentloaded")
-            page.get_by_role("heading", name="页面不存在").wait_for()
-            assert page.get_by_text("企业招聘业务已停止提供").count() == 0
+            response = page.goto(BASE + old_path, wait_until="domcontentloaded")
+            assert response and response.status == 404, f"Expected HTTP 404 for {old_path}, got {response.status if response else 'no response'}"
+            assert "企业招聘业务已停止提供" not in page.content()
             assert page.locator('form[action*="/organizations"], form[action*="/recruiter"]').count() == 0
-            no_horizontal_overflow(page, name + "-retired-" + old_path)
+            no_horizontal_overflow(page, name + "-removed-" + old_path)
         page.screenshot(path=str(OUT / f"{name}-b2b-retired.png"), full_page=True, animations="disabled")
         page.close()
         print(name + ": login/rights text, routes, payment guard, and viewport checks OK", flush=True)
