@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'apps/web/src/pages/TransparencyPage.tsx'
+      - 'apps/web/src/pages/Transparency*.tsx'
       - 'apps/web/src/styles/transparency*.css'
       - 'apps/web/src/main.tsx'
       - 'apps/web/src/components/HomeWorkplacePromise.tsx'
