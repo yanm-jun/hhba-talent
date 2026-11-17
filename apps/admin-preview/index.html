@@ -82,15 +82,17 @@
                 <button type="button" data-cc-days="30" class="is-selected" aria-pressed="true">30天</button>
                 <button type="button" data-cc-days="90">90天</button>
               </div>
-              <button class="button-primary" type="button" id="cc-load">读取真实统计</button>
+              <button class="button-primary" type="button" id="cc-load">刷新实时数据</button>
             </div>
           </div>
-          <p class="hhba-cc-status" id="cc-state" role="status">尚未查询真实统计。为节省 Cloudflare D1 免费查询额度，打开页面后不会自动扫描数据库。</p>
+          <p class="hhba-cc-status" id="cc-state" role="status">正在自动加载真实运营数据（只读取统计汇总，不修改数据库）……</p>
           <div class="hhba-cc-kpis">
             <article><span>累计注册候选人</span><strong id="cc-registered">—</strong><small>PNVS 账号库 · 非访客</small></article>
             <article><span>区间新增注册</span><strong id="cc-signups">—</strong><small>真实注册日期 · UTC</small></article>
             <article><span>区间岗位搜索事件</span><strong id="cc-searches">—</strong><small>无身份事件次数 · 非 AI 成功次数</small></article>
             <article><span>区间官方链接点击</span><strong id="cc-clicks">—</strong><small>外链点击不等于完成投递</small></article>
+            <article><span>区间页面访问事件</span><strong id="cc-pv">—</strong><small>Cloudflare D1 · PV 事件次数，非独立用户数</small></article>
+            <article><span>区间岗位浏览事件</span><strong id="cc-job-views">—</strong><small>真实页面事件 · 非岗位推荐成功数</small></article>
             <article><span>最近已公开月报收入</span><strong id="cc-revenue">—</strong><small id="cc-revenue-source">未读取已公开财报</small></article>
             <article><span>最近已公开经营结果</span><strong id="cc-profit">—</strong><small id="cc-profit-source">与依法可分配利润不同</small></article>
             <article><span>最近已公开 AI 成本</span><strong id="cc-ai-cost">—</strong><small>财务核算值 · 非 API 估算</small></article>
