@@ -8,6 +8,7 @@ on:
       - "apps/web/functions/admin-preview/api/finance-ai-cron.js"
       - "apps/web/functions/_middleware.js"
       - "apps/web/ops/finance-ai-review-scheduler.mjs"
+      - "apps/web/ops/finance-ai-inference-worker.mjs"
       - "apps/admin-preview/finance-ai.js"
       - "apps/admin-preview/finance-ai.css"
       - "apps/admin-preview/index.html"
@@ -34,6 +35,7 @@ jobs:
           node --check apps/web/functions/admin-preview/api/finance-ai.js
           node --check apps/web/functions/admin-preview/api/finance-ai-cron.js
           node --check apps/web/ops/finance-ai-review-scheduler.mjs
+          node --check apps/web/ops/finance-ai-inference-worker.mjs
           node --test apps/web/scripts/finance-ai-assistant.contract.test.mjs
           node --test apps/web/scripts/admin-finance-unified-entry.contract.test.mjs
       - name: Verify existing password-protected admin build contains AI finance
