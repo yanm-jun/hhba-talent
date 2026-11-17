@@ -161,20 +161,22 @@ async function refreshGrowth(){
  if(requestId===growthRequestId)updateGrowth();
 }
 
-const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',library:'企业招聘图书馆',operations:'运营监控',
- finance:'财务成本',investor:'融资展示',settings:'系统设置'};
+const titles={overview:'运营驾驶舱',users:'个人用户分析',market:'官方岗位索引',library:'17个行业馆',membership:'会员与月度服务',rights:'权益支持案件',operations:'运营运行监测',
+ finance:'财务与透明公开',investor:'历史数据展示',settings:'系统与权限'};
 const details={
  users:['真实用户注册与业务操作','账号级行为追踪已停止；注册和收藏来自真实数据库，页面事件仅计次数。'],
  market:['企业和岗位质量分析','未来接入岗位状态、ATS 来源及招聘质量报表；当前公开索引汇总在数据总览。'],
  operations:['系统运行与数据同步','未来接入有权限的同步队列和异常日志；当前预览不读取服务器私有日志。'],
  finance:['成本、收入与经营效率','未来接入经核对的收支台账和 API 成本；无记录时不生成模拟营收。'],
- settings:['后台权限和统计配置','接入登录系统后，启用管理员 RBAC、投资人只读访问及指标口径管理。']
+ membership:['会员服务尚未开售','请先完成正式资格、支付核验、月度报告和服务追踪后再启用真实会员管理。'],
+ rights:['人工权益支持尚未开放','案件资料、法学生协作、律所签发及权限隔离必须先完成真实业务和审计服务接入。'],
+ settings:['管理员权限与系统安全','当前使用独立密码会话；未来细化最小权限、异常告警与数据保留政策。']
 };
 function setView(view,options={}){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(['investor','overview','users','market','library','operations','finance'].includes(view)?view:'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users','market','library','membership','rights','operations','finance'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -343,6 +345,10 @@ function exportCSV(){
 for(const node of document.querySelectorAll('.nav-link'))node.addEventListener('click',()=>{
  setView(node.dataset.view);
 });
+for(const node of document.querySelectorAll('[data-workspace-target]'))node.addEventListener('click',()=>{
+ setView(node.dataset.workspaceTarget);
+});
+
 for(const node of document.querySelectorAll('[data-period]'))node.addEventListener('click',()=>{
  choosePeriod(node.dataset.period);
 });
@@ -428,7 +434,7 @@ async function checkHealth(){
 byId('health-check').addEventListener('click',()=>{void checkHealth()});
 window.hhbaAdminNavigation={openLibrary:industry=>setView('library',{industry})};
 byId('top-investor').addEventListener('click',()=>setView('investor'));
-byId('show-investor').addEventListener('click',()=>setView('investor'));
+byId('show-investor').addEventListener('click',()=>setView('finance'));
 byId('leave-investor').addEventListener('click',()=>setView('overview'));
 byId('back-overview').addEventListener('click',()=>setView('overview'));
 byId('export-csv').addEventListener('click',exportCSV);
