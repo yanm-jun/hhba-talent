@@ -30,6 +30,7 @@ export function LegalAidLandingPage({user}:{user:User|null}){
             <span className="hhba-law-brand-name">劳动权益支持</span>
           </div>
           <div className="hhba-law-header-actions">
+            <Link to="/candidate/account/rights" className="hhba-law-intervention-link"><ShieldCheck size={13} aria-hidden="true"/>职场权益中心</Link>
             <Link to="/membership/rules" className="hhba-law-intervention-link">
               <FileText size={13} aria-hidden="true"/>会员服务完整规则
             </Link>
@@ -46,7 +47,7 @@ export function LegalAidLandingPage({user}:{user:User|null}){
           <div className="hhba-law-intro">
             <Scale size={24} strokeWidth={2.2} aria-hidden="true"/>
             <h1 id="hhba-law-title">遇到劳动问题？</h1>
-            <p>了解自己的合法权益、证据准备与处理方向。HHBA 的会员法律服务目前尚未开放。</p>
+            <p>了解合法权益、证据准备与处理方向。若希望了解每月企业监测与职业权益服务，可进入职场权益中心；付费会员与个案受理目前尚未开放。</p>
           </div>
 
           <div className="hhba-law-question-preview" aria-label="未来的问题描述功能，当前尚未开放">

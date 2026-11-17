@@ -1,0 +1,48 @@
+name: HHBA Personal User Desktop and Mobile UX Acceptance
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/pages/AuthChoicePage.tsx'
+      - 'apps/web/src/pages/PersonalCenterPage.tsx'
+      - 'apps/web/src/pages/WorkplaceRightsPage.tsx'
+      - 'apps/web/src/styles/career-refresh.css'
+      - 'apps/web/src/components/Shell.tsx'
+      - 'apps/web/scripts/personal-ux-browser-acceptance.py'
+      - '.github/workflows/hhba-personal-ux-browser.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install and build the personal portal
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+      - name: Install Chromium and test harness
+        run: |
+          python3 -m pip install 'playwright>=1.55,<2'
+          python3 -m playwright install --with-deps chromium
+      - name: Check desktop and mobile layouts
+        working-directory: apps/web
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/hhba-personal-vite.log 2>&1 &
+          python3 scripts/personal-ux-browser-acceptance.py
+      - name: Save layout screenshots for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-personal-ux-desktop-mobile
+          path: apps/web/tmp/personal-ux-screens/*.png
+          if-no-files-found: warn
+          retention-days: 7

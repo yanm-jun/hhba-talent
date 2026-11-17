@@ -1,7 +1,8 @@
-import {ArrowRight,BriefcaseBusiness,Building2} from 'lucide-react';
+import {ArrowRight,UserRound,Building2} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link} from '../router';
 import '../styles/role-auth.css';
+import '../styles/career-refresh.css';
 import {BrandMark} from '../components/BrandMark';
 
 /** Public identity choice never grants authorization. */
@@ -14,21 +15,21 @@ export function AuthChoicePage(){
     <div className="hhba-auth-page-logo"><BrandMark variant="icon" size="hero"/></div>
     <div className="hhba-role-intro">
      <h1 id="role-auth-title">欢迎来到汇方职场 HHBA</h1>
-     <p>选择你的使用身份，我们将带你进入相应的账户。</p>
+     <p>一个个人账户，连接求职、职业成长与职场权益。</p>
     </div>
     <div className="hhba-role-options">
      <Link className="hhba-role-option" to={'/candidate/login'+candidateSuffix}>
-      <span className="hhba-role-option-icon"><BriefcaseBusiness size={20} aria-hidden="true"/></span>
-      <span className="hhba-role-option-copy"><strong>我是求职者</strong><small>发现机会 · 收藏职位 · 管理简历</small></span>
+      <span className="hhba-role-option-icon"><UserRound size={20} aria-hidden="true"/></span>
+      <span className="hhba-role-option-copy"><strong>我是个人用户</strong><small>找工作 · 职业档案 · 职场权益支持</small></span>
       <ArrowRight size={18} aria-hidden="true" className="hhba-role-option-arrow"/>
      </Link>
      <Link className="hhba-role-option" to="/recruiter/login">
       <span className="hhba-role-option-icon"><Building2 size={20} aria-hidden="true"/></span>
-      <span className="hhba-role-option-copy"><strong>我是招聘方</strong><small>企业认证 · 招聘管理 · 发展帮扶</small></span>
+      <span className="hhba-role-option-copy"><strong>我是招聘方</strong><small>企业认证 · 招聘管理 · 发展服务</small></span>
       <ArrowRight size={18} aria-hidden="true" className="hhba-role-option-arrow"/>
      </Link>
     </div>
-    <p className="hhba-role-helper">尚未注册？选择身份后可以直接创建账户。</p>
+    <p className="hhba-role-helper">个人用户无论正在求职还是已经入职，都使用同一个账户。首次登录后可选择职业阶段。</p>
     <div className="hhba-role-divider"><span>或</span></div>
     <Link className="hhba-role-browse" to="/candidate/jobs">暂不登录，浏览招聘市场 <ArrowRight size={15}/></Link>
    </div>

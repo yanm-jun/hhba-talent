@@ -11,7 +11,7 @@ test('homepage public API exposes the approved service plan without enabling tra
  assert.ok(api.includes('purchaseEnabled:false'));
  assert.ok(api.includes('return json({'));
  assert.equal(body.schemaVersion,1);
- assert.equal(body.membership.priceCents,1990);
+ assert.equal(body.membership.priceCents,2490);
  assert.equal(body.membership.currency,'CNY');
  assert.equal(body.membership.billingPeriod,'month');
  assert.equal(body.membership.introductoryMonths,6);
@@ -19,7 +19,7 @@ test('homepage public API exposes the approved service plan without enabling tra
  assert.equal(body.membership.purchaseEnabled,false);
  assert.equal(body.membership.caseIntakeEnabled,false);
  assert.ok(body.membership.firstStageServices.some(item=>item.includes('简历')));
- assert.ok(body.membership.rightsStageServices.some(item=>item.includes('仲裁材料')));
+ assert.ok(body.membership.rightsStageServices.some(item=>item.includes('资料整理')));
  assert.match(body.membership.serviceNotice,/暂未开放购买/);
 });
 

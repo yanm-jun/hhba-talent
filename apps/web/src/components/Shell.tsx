@@ -86,7 +86,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
   <header className="topbar hhba-experience-header">
    <div className="hhba-experience-brand">
     <Link className="logo hhba-main-brand-link" to="/" aria-label="汇方职场 HHBA 公共首页"><BrandMark/></Link>
-    {experience==='candidate'&&<span className="hhba-experience-label">求职者端</span>}
+    {experience==='candidate'&&<span className="hhba-experience-label">个人用户端</span>}
     {experience==='employer'&&<span className="hhba-experience-label">企业端</span>}
    </div>
    {experience==='public'?<nav aria-label="公共网站导航">
@@ -99,7 +99,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
      {candidateSignedIn?<Link className="hhba-nav-account" to="/candidate/account">个人中心</Link>:
        recruiterSignedIn?<Link className="hhba-nav-account" to="/employer/hub">企业账户</Link>:
        <Link className="hhba-nav-account" to="/auth">登录 / 注册</Link>}
-   </nav>:experience==='candidate'?<nav aria-label="求职者服务导航">
+   </nav>:experience==='candidate'?<nav aria-label="个人职业服务导航">
      <HeaderSiteSearch/>
      <StudyAbroadNavLink active={route.startsWith('/study-abroad')}/>
      <TalentPolicyNavLink active={route.startsWith('/talent-service')}/>
