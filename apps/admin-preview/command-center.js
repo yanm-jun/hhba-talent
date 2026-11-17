@@ -22,7 +22,7 @@ function empty(id,text){
  const p=document.createElement('p');p.className='hhba-cc-graph-empty';p.textContent=text;
  root.append(p);
 }
-function drawLine(id,values,{suffix='',digits=0,fill=true}={}){
+function drawLine(id,values,{suffix='',digits=0,secondary=null}={}){
  const root=q(id);root.replaceChildren();
  if(!Array.isArray(values)||values.length===0||!values.some(x=>Number.isFinite(x?.value))){
   empty(id,'无可核验的历史数据；不会补造趋势');return;
@@ -30,8 +30,11 @@ function drawLine(id,values,{suffix='',digits=0,fill=true}={}){
  const W=680,H=210,pad={left:55,right:18,top:20,bottom:33};
  const usableW=W-pad.left-pad.right,usableH=H-pad.top-pad.bottom;
  const measured=values.map(x=>Number.isFinite(x?.value)?x.value:null);
- const min=Math.min(0,...measured.filter(x=>x!==null));
- const max=Math.max(1,...measured.filter(x=>x!==null));
+ const companion=Array.isArray(secondary)&&secondary.length===values.length?
+  secondary.map(x=>Number.isFinite(x?.value)?x.value:null):null;
+ const eligible=[...measured,...(companion||[])].filter(x=>x!==null);
+ const min=Math.min(0,...eligible);
+ const max=Math.max(1,...eligible);
  const range=max-min||1;
  const x=i=>pad.left+(values.length===1?usableW/2:usableW*i/(values.length-1));
  const y=v=>pad.top+(max-v)*usableH/range;
@@ -44,14 +47,21 @@ function drawLine(id,values,{suffix='',digits=0,fill=true}={}){
  }
  svg.append(g);
  const line=element('path',{fill:'none',stroke:'#237655','stroke-width':2.6,'stroke-linecap':'round','stroke-linejoin':'round'});
- let path='',open=false;
- for(let i=0;i<measured.length;i++){
-  const v=measured[i];
-  if(v===null){open=false;continue}
-  path+=(open?' L':' M')+x(i).toFixed(2)+' '+y(v).toFixed(2);
-  open=true;
+ const makePath=series=>{
+  let path='',open=false;
+  for(let i=0;i<series.length;i++){
+   const v=series[i];
+   if(v===null){open=false;continue}
+   path+=(open?' L':' M')+x(i).toFixed(2)+' '+y(v).toFixed(2);
+   open=true;
+  }
+  return path.trim();
+ };
+ line.setAttribute('d',makePath(measured));svg.append(line);
+ if(companion){
+  const secondLine=element('path',{d:makePath(companion),fill:'none',stroke:'#d18f45','stroke-width':2.4,'stroke-linecap':'round','stroke-linejoin':'round'});
+  svg.append(secondLine);
  }
- line.setAttribute('d',path.trim());svg.append(line);
  for(let i=0;i<measured.length;i++){
   if(measured[i]===null)continue;
   if(values.length<=32||i===values.length-1){
@@ -65,6 +75,10 @@ function drawLine(id,values,{suffix='',digits=0,fill=true}={}){
   svg.append(element('text',{x:x(i),y:H-8,'text-anchor':i===0?'start':i===values.length-1?'end':'middle',fill:'#819089','font-size':11},values[i].label.slice(5)));
  }
  root.append(svg);
+ if(companion){
+  const legend=document.createElement('p');legend.className='hhba-cc-finance-legend';
+  legend.textContent='● 营业收入（绿色）     ● 经营结果（橙色）';root.append(legend);
+ }
  const foot=document.createElement('p');
  foot.className='hhba-cc-chart-foot';
  const valid=measured.filter(v=>v!==null).length;
@@ -125,7 +139,8 @@ function parseOperations(result){
   setValue('cc-ai-cost',formatMoney(r.aiCostFen));
   setText('cc-revenue-source',r.period+' 已公开的月报收入（非今日实收）');
   setText('cc-profit-source',r.period+' 已公开经营结果（非可分配利润）');
-  drawLine('cc-chart-finance',monthlySeries(result.finance.months,'revenueFen'),{suffix:' 元',digits:2});
+  drawLine('cc-chart-finance',monthlySeries(result.finance.months,'revenueFen'),{suffix:' 元',digits:2,
+   secondary:monthlySeries(result.finance.months,'netResultFen')});
  }else{
   empty('cc-chart-finance',quality==='no_published_report'?
    '目前没有已正式发布的月报；不能把草稿或无记录显示为零收入':
