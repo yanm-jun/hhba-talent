@@ -36,7 +36,6 @@ const staticPages:SiteSearchRecord[]=[
  {id:'bookmarks',kind:'page',title:'我的收藏',description:'登录后查看个人收藏的招聘岗位',path:'/candidate/saved',tags:['收藏','求职','个人中心']},
  {id:'join',kind:'page',title:'加入我们',description:'了解 HHBA 团队及加入方式',path:'/join',tags:['团队','加入','合作']},
  {id:'vision',kind:'page',title:'汇方职场 HHBA 理念',description:'让劳动更有尊严，让商业更有温度',path:'/vision',tags:['理念','使命','价值']},
- {id:'employer',kind:'page',title:'企业服务与治理',description:'了解招聘服务、企业责任与治理机制',path:'/employer/start',tags:['企业','雇主','责任','认证','治理']},
  {id:'login',kind:'page',title:'登录与注册',description:'进入汇方职场 HHBA 求职者或企业账号',path:'/auth',tags:['注册','登录','账户']}
 ];
 let cached:SiteSearchRecord[]|null=null;
