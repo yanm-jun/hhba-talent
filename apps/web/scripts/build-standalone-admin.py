@@ -28,7 +28,7 @@ def main():
     admin = DIST / "admin-preview"
     admin.mkdir(parents=True, exist_ok=True)
     files = [
-        "index.html","dashboard.js","market.js","finance.js","finance-report.js","finance-report.css","styles.css","library.js","library.css",
+        "index.html","dashboard.js","market.js","finance.js","finance-report.js","finance-report.css","command-center.js","command-center.css","styles.css","library.js","library.css",
         "library-file-ui.js","library-file-import.js","admin-console-ui.js",
         "favicon.svg"
     ]
@@ -46,7 +46,9 @@ def main():
         ('src="/market.js"','src="./market.js"'),
         ('src="/finance.js"','src="./finance.js"'),
         ('src="/finance-report.js"','src="./finance-report.js"'),
+        ('src="/command-center.js"','src="./command-center.js"'),
         ('href="/finance-report.css"','href="./finance-report.css"'),
+        ('href="/command-center.css"','href="./command-center.css"'),
         ('src="/library.js"','src="./library.js"'),
         ('src="/library-file-ui.js"','src="./library-file-ui.js"'),
         ('href="/library.css"','href="./library-hhba-v2.css"'),

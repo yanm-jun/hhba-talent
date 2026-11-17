@@ -11,10 +11,12 @@
   <link rel="stylesheet" href="/styles.css"/>
   <link rel="stylesheet" href="/library.css"/>
   <link rel="stylesheet" href="/finance-report.css"/>
+  <link rel="stylesheet" href="/command-center.css"/>
   <script type="module" src="/dashboard.js"></script>
   <script type="module" src="/market.js"></script>
   <script type="module" src="/finance.js"></script>
   <script type="module" src="/finance-report.js"></script>
+  <script type="module" src="/command-center.js"></script>
   <script type="module" src="/library.js"></script>
   <script type="module" src="/library-file-ui.js"></script>
 </head>
@@ -67,6 +69,47 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg> 刷新数据
           </button>
         </div>
+        <section class="hhba-cc" id="hhba-command-center" aria-labelledby="hhba-cc-title">
+          <div class="hhba-cc-head">
+            <div>
+              <p class="hhba-cc-kicker">REAL OPERATING DATA · NO ESTIMATES</p>
+              <h2 id="hhba-cc-title">运营与收益驾驶舱</h2>
+              <p>真实注册、匿名运营事件、已发布财报与有限范围的外部探索记录。不会把访问量当用户、配额请求当成功匹配，或把未公开草稿当收益。</p>
+            </div>
+            <div class="hhba-cc-controls">
+              <div class="hhba-cc-range" role="group" aria-label="驾驶舱查询日期">
+                <button type="button" data-cc-days="7">7天</button>
+                <button type="button" data-cc-days="30" class="is-selected" aria-pressed="true">30天</button>
+                <button type="button" data-cc-days="90">90天</button>
+              </div>
+              <button class="button-primary" type="button" id="cc-load">读取真实统计</button>
+            </div>
+          </div>
+          <p class="hhba-cc-status" id="cc-state" role="status">尚未查询真实统计。为节省 Cloudflare D1 免费查询额度，打开页面后不会自动扫描数据库。</p>
+          <div class="hhba-cc-kpis">
+            <article><span>累计注册候选人</span><strong id="cc-registered">—</strong><small>PNVS 账号库 · 非访客</small></article>
+            <article><span>区间新增注册</span><strong id="cc-signups">—</strong><small>真实注册日期 · UTC</small></article>
+            <article><span>区间岗位搜索事件</span><strong id="cc-searches">—</strong><small>无身份事件次数 · 非 AI 成功次数</small></article>
+            <article><span>区间官方链接点击</span><strong id="cc-clicks">—</strong><small>外链点击不等于完成投递</small></article>
+            <article><span>最近已公开月报收入</span><strong id="cc-revenue">—</strong><small id="cc-revenue-source">未读取已公开财报</small></article>
+            <article><span>最近已公开经营结果</span><strong id="cc-profit">—</strong><small id="cc-profit-source">与依法可分配利润不同</small></article>
+            <article><span>最近已公开 AI 成本</span><strong id="cc-ai-cost">—</strong><small>财务核算值 · 非 API 估算</small></article>
+            <article><span>区间外部探索请求</span><strong id="cc-discoveries">—</strong><small>仅可选外部搜索，不是全部 AI 匹配</small></article>
+          </div>
+          <div class="hhba-cc-graphs">
+            <article class="hhba-cc-graph"><div><h3>每日真实注册</h3><p>候选人账号创建日期</p></div><div id="cc-chart-signups" class="hhba-cc-canvas">等待读取</div></article>
+            <article class="hhba-cc-graph"><div><h3>每日岗位搜索事件</h3><p>匿名运营事件，不代表成功推荐</p></div><div id="cc-chart-search" class="hhba-cc-canvas">等待读取</div></article>
+            <article class="hhba-cc-graph"><div><h3>每日页面访问事件</h3><p>仅自采集开始后的实际 PV 事件</p></div><div id="cc-chart-pv" class="hhba-cc-canvas">等待读取</div></article>
+            <article class="hhba-cc-graph"><div><h3>已公开月报收入与经营结果</h3><p>按月，缺失月份不补零，单位：元</p></div><div id="cc-chart-finance" class="hhba-cc-canvas">等待读取</div></article>
+          </div>
+          <div class="hhba-cc-bottom">
+            <div><h3>AI 搜索质量</h3><p id="cc-ai-quality">尚未接入全部匹配调用的成功率、耗时与实际成本采集，不展示假百分比。可选外部探索请求仅是有限范围的使用记录。</p></div>
+            <div><h3>收益核验状态</h3><p id="cc-payment-quality">月报数据仅从正式公开的快照取得；订单实收需支付回调核验，不能用套餐价格推算营业收入。</p></div>
+            <button class="button-outline" type="button" id="cc-open-finance">打开现有财务成本</button>
+          </div>
+        </section>
+        <details class="hhba-cc-legacy">
+          <summary>查看原岗位索引快照与历史诊断指标（不代表经营收益）</summary>
         <div class="overview-toolbar"><button class="button-outline" type="button" id="refresh-private">手动加载用户/访问统计（使用 D1）</button>
           <div class="range-group" role="group" aria-label="统计时间范围">
             <button type="button" data-period="today">今日</button>
@@ -116,6 +159,7 @@
             <p class="quality-warning"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 16H3l9-16Z"/><path d="M12 9v4M12 16h.01"/></svg> 来源数量不等于签约企业，岗位数量不等于真实投递或收入。</p>
           </article>
         </div>
+        </details>
         <article class="panel provenance">
           <div class="panel-heading"><div><h2>数据来源与统计口径</h2><p>优先展示已采集、可复核的指标，不以预测代替事实。</p></div><button class="link-button" type="button" id="show-investor">融资展示视图 →</button></div>
           <div class="data-table-wrap"><table class="data-table"><thead><tr><th scope="col">统计项目</th><th scope="col">数据来源</th><th scope="col">状态</th></tr></thead><tbody>
