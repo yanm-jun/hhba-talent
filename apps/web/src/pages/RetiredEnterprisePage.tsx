@@ -2,6 +2,7 @@ import {ArrowRight,ShieldCheck} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link} from '../router';
 import type {User} from '../services/api';
+import '../styles/retired-enterprise.css';
 
 /**
  * Preserves a clear, non-interactive notice for bookmarked legacy B-end routes.
