@@ -7,7 +7,7 @@ const source=path=>readFileSync(new URL(path,base),'utf8');
 test('candidate routes only expose genuine PNVS sign-in and authenticated workbench',()=>{
  const main=source('main.tsx');
  const login=source('pages/PhoneAuthPage.tsx');
- assert.ok(main.includes("route==='/auth')return <AuthChoicePage/>"));
+ assert.ok(main.includes("route==='/auth')return <PhoneAuthPage user={user} onUser={setUser} accountType=\"candidate\" initialMode=\"login\"/>"));\n assert.doesNotMatch(main,/return <AuthChoicePage/);
  assert.ok(main.includes('PhoneAuthPage'));
  assert.match(main,/realAuth\.me\(\)/);
  assert.match(main,/realAuthToUser\(me\)/);
