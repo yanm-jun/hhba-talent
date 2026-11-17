@@ -120,3 +120,26 @@ test('previously excessive hero cards are replaced by a compact note and full co
  assert.ok(layout>=0&&compliance>layout,'full compliance must appear inside document layout');
  assert.match(css,/\.hhba-rules-chapter-switch/);
 });
+
+test('one personal account exposes career stages and an honestly non-live workplace rights preview',()=>{
+ const auth=read('../src/pages/AuthChoicePage.tsx');
+ const personal=read('../src/pages/PersonalCenterPage.tsx');
+ const rights=read('../src/pages/WorkplaceRightsPage.tsx');
+ const dropdown=read('../src/components/CandidateAccountDropdown.tsx');
+ const main=read('../src/main.tsx');
+ const config=JSON.parse(read('../src/data/homepagePublicConfig.json'));
+ assert.match(auth,/我是个人用户/);
+ assert.match(auth,/我是招聘方/);
+ assert.match(personal,/正在求职/);
+ assert.match(personal,/已经入职/);
+ assert.match(personal,/hhba:career-stage:/);
+ assert.match(personal,/职场权益中心/);
+ assert.match(rights,/¥24\.90/);
+ assert.match(rights,/尚未开放购买/);
+ assert.match(rights,/不包含仲裁和诉讼代理/);
+ assert.match(dropdown,/\/candidate\/account\/rights/);
+ assert.match(main,/if\(route==='\/candidate\/account\/rights'\)return <WorkplaceRightsPage/);
+ assert.equal(config.membership.priceCents,2490);
+ assert.equal(config.membership.purchaseEnabled,false);
+ assert.equal(config.membership.caseIntakeEnabled,false);
+});
