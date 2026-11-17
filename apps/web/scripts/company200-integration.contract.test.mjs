@@ -45,7 +45,7 @@ assert(app.includes("if(route==='/')return <HomePage user={user}/>"),'Original H
 assert(app.includes("if(route==='/companies/discover')return <Company200PreviewPage"),'200-company page must be additive and separately routed');
 assert(!app.includes("if(route==='/'&&import.meta.env.VITE_COMPANY200_STATIC_PREVIEW"),'Do not replace market homepage with company-only preview');
 assert(home.includes('<UnifiedJobMarket compact/>')&&home.includes('<HomeCompanyMarquee/>'),'Restore official market and original verified brand carousel');
-assert(nav.includes('to="/candidate/jobs"')&&nav.includes('to="/companies/discover"'),'Job and company discovery must both be navigable');
+assert(nav.includes('to="/candidate/jobs"')&&nav.includes('to="/companies/library"')&&app.includes("route==='/companies/discover'"),'Official job market, 17 industry halls and company discovery must remain navigable');
 // The market now loads verified job snapshots through the shared listJobs API.
  // Retain a direct check of live job loading, official job rendering, and company cards.
 assert(
