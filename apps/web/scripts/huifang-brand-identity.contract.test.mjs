@@ -9,7 +9,6 @@ const namedPages = [
   'src/components/BrandMark.tsx',
   'src/components/Shell.tsx',
   'src/pages/HomePage.tsx',
-  'src/pages/AuthChoicePage.tsx',
   'src/pages/PhoneAuthPage.tsx',
   'src/pages/CandidateJobsPage.tsx',
   'src/pages/CandidateMatchPage.tsx',
