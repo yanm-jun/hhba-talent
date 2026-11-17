@@ -388,7 +388,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     {!compact && <p className="unified-job-history">{lang==='zh'?'了解企业或查阅历史岗位资料：':'Explore companies and historical records: '}
       <Link to="/companies">{lang==='zh'?'企业资料库':'Company directory'}</Link>{' · '}
       <Link to="/candidate/jobs/archive">{lang==='zh'?'历史岗位记录':'Historical jobs'}</Link>
-       {' · '}<Link to="/candidate/employer-jobs">{lang==='zh'?'经认证企业自行发布的岗位':'Employer-submitted jobs (separate from official ATS)'}</Link></p>}
+</p>}
   </section>;
   // The existing market is the ONE search surface; never overlay a second AI UI.
   return compact?market:<Shell user={user}>{market}</Shell>;

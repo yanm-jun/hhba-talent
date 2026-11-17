@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - 'apps/web/src/pages/AuthChoicePage.tsx'
+      - 'apps/web/src/pages/PhoneAuthPage.tsx'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/styles/unified-login.css'
       - 'apps/web/src/pages/PersonalCenterPage.tsx'
       - 'apps/web/src/pages/WorkplaceRightsPage.tsx'
       - 'apps/web/src/styles/career-refresh.css'
@@ -26,6 +29,8 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - name: Install and build the personal portal
         working-directory: apps/web
+        env:
+          VITE_HHBA_REAL_AUTH_ENABLED: '1'
         run: |
           npm ci --no-audit --no-fund
           npm run build

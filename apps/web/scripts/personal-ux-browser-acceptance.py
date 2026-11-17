@@ -40,28 +40,48 @@ with sync_playwright() as p:
     ):
         page = browser.new_page(viewport=size, device_scale_factor=1)
         page.goto(BASE + "/auth", wait_until="domcontentloaded")
-        page.locator("#role-auth-title").wait_for()
-        assert page.get_by_text("我是个人用户").is_visible()
-        assert page.get_by_text("我是招聘方").is_visible()
-        assert page.locator(".hhba-auth-v2-editorial").is_visible()
-        assert page.locator(".hhba-auth-v2-panel").is_visible()
-        assert page.locator(".hhba-auth-v2-milestone").count() == 3
-        assert page.get_by_text("不止于找到工作。").is_visible()
-        assert page.get_by_text("了解服务规划，当前尚未开放购买").is_visible()
-        columns = page.locator(".hhba-auth-v2-layout").evaluate("(el) => getComputedStyle(el).gridTemplateColumns")
-        assert len(columns.split()) == (2 if name == "desktop" else 1), f"Unexpected auth layout: {name} {columns}"
+        page.locator(".hhba-unified-auth").wait_for()
+        assert not page.locator(".hhba-experience-header").is_visible(), "Login view should not include the full site navbar"
+        assert not page.locator(".hhba-site-disclosure").is_visible(), "Login card supplies its own privacy entry"
         if name == "mobile":
-            personal = page.locator(".hhba-auth-v2-choice-personal").bounding_box()
-            panel = page.locator(".hhba-auth-v2-panel").bounding_box()
-            story = page.locator(".hhba-auth-v2-editorial").bounding_box()
-            assert personal and panel and story
-            assert personal["y"] < size["height"] - 110, f"Mobile sign-in is below the first screen: {personal}"
-            assert panel["y"] < story["y"], "Mobile must show identity controls before marketing story"
-        assert page.locator('a[href*="/candidate/login"]').count() >= 1
-        assert page.locator('a[href*="/recruiter/login"]').count() >= 1
+            card = page.locator(".hhba-phone-card").bounding_box()
+            assert card and card["y"] < 55, f"Mobile login should start in first fold: {card}"
+        assert page.get_by_role("heading", name="欢迎来到汇方职场").is_visible()
+        assert page.locator('input[id="hhba-auth-phone"]').is_visible()
+        assert page.get_by_text("获取验证码").is_visible()
+        assert page.get_by_text("我是招聘方").count() == 0
+        assert page.get_by_text("我是个人用户").count() == 0
+        assert page.get_by_text("选择你的使用身份").count() == 0
+        assert page.locator(".hhba-phone-identity").count() == 0
+        assert page.locator('.hhba-auth-page-logo .hhba-brand-lockup img').count() == 1
+        assert page.locator('a[href*="/candidate/register"]').count() >= 1
+        assert page.locator('a[href*="/data-use"]').count() >= 1
+        assert page.locator('a[href*="/candidate/jobs"]').count() >= 1
+        assert page.locator('button.hhba-phone-submit[type="submit"]').count() == 1
+        if page.get_by_role("button", name="密码登录").count():
+            page.get_by_role("button", name="密码登录").click()
+            assert page.locator('input[id="hhba-auth-password"]').is_visible()
+            assert page.locator('input[id="hhba-auth-phone"]').count() == 0
+            page.get_by_role("button", name="验证码登录").click()
+            assert page.locator('input[id="hhba-auth-phone"]').is_visible()
         no_horizontal_overflow(page, name + "-auth")
         page.screenshot(path=str(OUT / f"{name}-auth.png"), full_page=True, animations="disabled")
+        
+        page.get_by_text("立即注册").first.click()
+        page.get_by_role("heading", name="创建你的 HHBA 账户").wait_for()
+        assert page.locator('.hhba-unified-auth input[id="hhba-auth-name"]').count() == 1
+        assert page.locator('.hhba-unified-auth input[id="hhba-auth-phone"]').count() == 1
+        assert page.locator(".hhba-phone-identity").count() == 0
+        no_horizontal_overflow(page, name + "-register")
+        page.screenshot(path=str(OUT / f"{name}-register.png"), full_page=True, animations="disabled")
+        page.get_by_text("返回登录").first.click()
+        page.get_by_role("heading", name="欢迎来到汇方职场").wait_for()
+        assert page.url.endswith("/auth")
 
+        page.goto(BASE + "/candidate/login?next=%2Fcandidate%2Fmatch", wait_until="domcontentloaded")
+        page.get_by_role("heading", name="欢迎来到汇方职场").wait_for()
+        assert "/candidate/register?next=%2Fcandidate%2Fmatch" in page.locator('a[href*="/candidate/register"]').first.get_attribute("href")
+        no_horizontal_overflow(page, name + "-legacy-alias")
         page.goto(BASE + "/candidate/account/rights", wait_until="domcontentloaded")
         page.get_by_text("职场权益中心", exact=True).first.wait_for()
         assert page.get_by_text("尚未开放购买").is_visible()
@@ -73,6 +93,20 @@ with sync_playwright() as p:
         assert page.locator('form[action*="checkout"], button:has-text("立即支付")').count() == 0
         no_horizontal_overflow(page, name + "-rights")
         page.screenshot(path=str(OUT / f"{name}-rights.png"), full_page=True, animations="disabled")
+        # Legacy recruitment URLs must never render login, moderation, hiring forms
+        # or load an authenticated B2B bundle; they show a non-interactive notice.
+        for old_path in [
+            "/recruiter/login", "/recruiter/register", "/recruiter/onboarding",
+            "/employer/hub", "/employer/workspace", "/employer",
+            "/admin/recruitment", "/admin/employer-review",
+            "/candidate/employer-jobs", "/candidate/my-applications"
+        ]:
+            page.goto(BASE + old_path, wait_until="domcontentloaded")
+            page.get_by_role("heading", name="企业招聘业务已停止提供").wait_for()
+            assert page.locator('a[href*="/candidate/jobs"]').count() >= 1
+            assert page.locator('form[action*="/organizations"], form[action*="/recruiter"]').count() == 0
+            no_horizontal_overflow(page, name + "-retired-" + old_path)
+        page.screenshot(path=str(OUT / f"{name}-b2b-retired.png"), full_page=True, animations="disabled")
         page.close()
         print(name + ": login/rights text, routes, payment guard, and viewport checks OK", flush=True)
     browser.close()

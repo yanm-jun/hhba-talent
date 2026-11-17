@@ -35,7 +35,35 @@ function errorMessage(detail: unknown) {
 export function setCsrfToken(value: string | null) { csrfToken = value; }
 export function getCsrfToken() { return csrfToken; }
 
+// Enterprise recruitment is no longer a HHBA product. Fail closed before
+// request/CSRF/network handling, including from stale code or bookmarked pages.
+// Do not delete or mutate historical records here; lawful retention is separate.
+export const legacyEnterpriseRecruitmentRetired = true;
+const retiredBusinessEndpoint = (path:string):boolean => {
+  const route=path.split('?',1)[0];
+  const prefixes=[
+    '/organizations','/recruiter','/employer','/public/employer-postings',
+    '/public/organizations','/me/employer-applications','/me/recruitment-responsibilities',
+    '/admin/verification','/admin/employer-postings','/admin/recruitment-responsibilities',
+    '/admin/aid-applications','/admin/client-introductions','/admin/order-proofs',
+    '/admin/evidence','/admin/improvements','/admin/publication',
+    '/admin/scoring','/admin/appeals','/me/profile/enterprise-preview',
+    '/me/consents/enterprise_search'
+  ];
+  return prefixes.some(prefix=>route===prefix||route.startsWith(prefix+'/'));
+};
+const retiredRecruiterSession = (path:string,body:RequestInit['body']):boolean => {
+  if(!['/auth/register','/auth/session','/auth/phone/code','/auth/phone/session'].includes(path))return false;
+  if(typeof body!=='string')return false;
+  try {
+    const value=JSON.parse(body);
+    return value!==null&&typeof value==='object'&&value.account_type==='recruiter';
+  }catch{return false;}
+};
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  if(retiredBusinessEndpoint(path)||retiredRecruiterSession(path,init.body))
+    throw new ApiError(410,'HHBA 企业招聘账户及站内招聘业务已停止服务。');
   if (!employerApiReady) throw new ApiError(503, 'HHBA 企业与个人账户后台尚未完成接入。岗位搜索正常使用，但账户注册、企业认证、职位发布暂不可操作。');
   const controller = new AbortController();
   const timer = window.setTimeout(() => controller.abort(), 20_000);
