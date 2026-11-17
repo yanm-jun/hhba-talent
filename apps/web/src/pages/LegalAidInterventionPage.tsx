@@ -23,10 +23,10 @@ const steps=[
   {heading:'人工评估与资助决定',detail:'由平台按公开的支持规则审核；符合条件时再与具备资质的律师明确服务及费用范围。'}
 ] as const;
 
-export function LegalAidInterventionPage({user}:{user:User|null}){
+export function LegalAidInterventionPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
  const [topicSlug,setTopicSlug]=useState<string|null>(null);
  const topic=categories.find(item=>item.slug===topicSlug);
- return <Shell user={user}>
+ return <Shell user={user} embedded={embedded}>
   <main className="hhba-intervention" id="main-content">
    <section className="hhba-intervention-panel" aria-labelledby="hhba-intervention-title">
     <header className="hhba-intervention-header">
