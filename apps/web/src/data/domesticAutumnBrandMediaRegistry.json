@@ -9,7 +9,7 @@
       "path": "images/autumn-real-logos/cn-autumn-002.svg",
       "sourceType": "wikimedia_build_import",
       "confidence": "brand_identity_matched_not_brand_owner_cleared",
-      "reviewNote": "Source-backed Schneider Electric green wordmark from the Wikimedia logo record originating in Schneider Electric annual report; trademark identification only."
+      "reviewNote": "The Wikimedia 2007 Schneider Electric green wordmark is preferred when fetched and validated. When Wikimedia rate limits builds, the repository's clearly titled Schneider Electric brand icon is used instead (not the full wordmark); trademark identification only."
     },
     "辉瑞": {
       "id": "cn-autumn-003",
