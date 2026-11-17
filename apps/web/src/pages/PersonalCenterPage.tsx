@@ -246,7 +246,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
      </div>
      <p className="hhba-career-record-notice">独立的任职经历、工作成果和阶段性更新记录尚在规划中；目前不将求职偏好当作实际工作经历，也不会生成虚假职业记录。</p>
     </section>}
-    {hasVisited('apply-assistant')&&<div className="hhba-account-cached-stage" aria-hidden={current!=='apply-assistant'} style={{display:current==='apply-assistant'?'block':'none'}}><ApplyAssistantProduct userId={user?.id}/></div>}
+    {hasVisited('apply-assistant')&&<div className="hhba-account-cached-stage" aria-hidden={current!=='apply-assistant'} style={{display:current==='apply-assistant'?'block':'none'}}><ApplyAssistantProduct userId={user?.id} active={current==='apply-assistant'}/></div>}
     {current==='saved'&&<section className="hhba-account-panel">
       <div className="hhba-account-section-heading"><div><h2>我的收藏</h2><p>只展示来自真实职位索引的收藏记录。下架职位不会被伪装成仍在招聘。</p></div><Link to="/candidate/jobs">搜索更多 <ArrowRight size={15}/></Link></div>
       {error&&<p className="hhba-personal-error" role="alert">{error}</p>}
@@ -280,8 +280,8 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
       <div className="hhba-account-form-actions"><button type="submit" disabled={!account||busy==='preferences'}>{busy==='preferences'?'保存中…':'保存求职偏好'}</button><small>重新登录后仍可读取</small></div>
      </form>}{notice&&<p className="hhba-account-notice" role="status">{notice}</p>}
     </section>}
-    {hasVisited('resume')&&<div className="hhba-account-cached-stage" aria-hidden={current!=='resume'} style={{display:current==='resume'?'block':'none'}}><PrivateResumeVault/></div>}
-    {hasVisited('applications')&&<div className="hhba-account-cached-stage" aria-hidden={current!=='applications'} style={{display:current==='applications'?'block':'none'}}><CandidateMatchHistory/></div>}
+    {hasVisited('resume')&&<div className="hhba-account-cached-stage" aria-hidden={current!=='resume'} style={{display:current==='resume'?'block':'none'}}><PrivateResumeVault active={current==='resume'}/></div>}
+    {hasVisited('applications')&&<div className="hhba-account-cached-stage" aria-hidden={current!=='applications'} style={{display:current==='applications'?'block':'none'}}><CandidateMatchHistory active={current==='applications'}/></div>}
     {current==='privacy'&&<section className="hhba-account-panel">
      <div className="hhba-account-section-heading"><div><h2>账户与隐私</h2><p>查看账户安全、数据使用说明和历史记录清理。</p></div></div>
      <div className="hhba-account-privacy-row"><div><strong><ChartNoAxesCombined size={18}/>运营数据的使用范围</strong>
