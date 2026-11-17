@@ -84,6 +84,18 @@ export function publicReport(row){
   ...payload
  };
 }
+/** Public projection. Never expose source financial statements or free-form notes. */
+export function publicFundReport(row){
+ const full=publicReport(row);
+ if(!full)return null;
+ const fields=['openingPoolFen','poolAccrualFen','poolReceivedFen','poolSpentFen','closingPoolFen','beneficiaries'];
+ if(fields.some(key=>!Number.isSafeInteger(full[key])||full[key]<0))return null;
+ return {period:full.period,revision:full.revision,publishedAt:full.publishedAt,
+  correctedAt:full.correctedAt,openingPoolFen:full.openingPoolFen,
+  poolAccrualFen:full.poolAccrualFen,poolReceivedFen:full.poolReceivedFen,
+  poolSpentFen:full.poolSpentFen,closingPoolFen:full.closingPoolFen,
+  beneficiaries:full.beneficiaries,isAudited:full.isAudited===true};
+}
 export function normalizeEmail(email){
  const value=String(email||'').trim().toLowerCase();
  return value.length<=180&&/^[a-z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/.test(value)?value:null;

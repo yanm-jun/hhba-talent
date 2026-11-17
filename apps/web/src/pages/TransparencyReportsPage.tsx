@@ -1,7 +1,7 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {ArrowLeft,ArrowRight,Download,FileClock,FileText,Mail,ShieldCheck} from 'lucide-react';
 import {TransparencyFrame} from './TransparencyFrame';
-import {WORKER_ARCHIVE_DEMO_MODE,workerDemoMonths,workerDemoTotals,workerDemoCurrency,workerDemoLedger} from './transparencyDemoData';
+import {WORKER_ARCHIVE_DEMO_MODE,workerDemoMonths,workerDemoTotals,workerDemoCurrency} from './transparencyDemoData';
 import {Shell} from '../components/Shell';
 import {Link} from '../router';
 import type {User} from '../services/api';
