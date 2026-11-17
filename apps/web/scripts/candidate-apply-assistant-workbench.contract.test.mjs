@@ -21,7 +21,7 @@ test('minimal workbench keeps true resume, saved jobs and matching history',()=>
 test('new link routes to an installation guide and keeps privacy safety disclaimers',()=>{
  assert.ok(entry.includes('privacy|apply-assistant'));
  assert.ok(page.includes("current==='apply-assistant'"));
- assert.ok(page.includes('<ApplyAssistantProduct userId={user?.id}/>'));
+ assert.ok(page.includes("<ApplyAssistantProduct userId={user?.id} active={current==='apply-assistant'}/>"));
  assert.ok(product.includes("BASE_URL+'downloads/hhba-apply-assistant-v0.5.zip'"));
  assert.ok(product.includes('正式申请由你确认'));
  assert.ok(product.includes('尚未开展正式收费网申'));

@@ -8,11 +8,11 @@ import '../styles/legal-aid-landing.css';
 type LaborTopic = (typeof laborRights.topics)[number];
 const topics = laborRights.topics as LaborTopic[];
 export const supportedLaborTopicSlugs=topics.map(t=>t.slug);
-export function LegalAidTopicPage({user,slug}:{user:User|null;slug:string}){
+export function LegalAidTopicPage({user,slug,embedded=false}:{user:User|null;slug:string;embedded?:boolean}){
  const topic=topics.find(t=>t.slug===slug);
- if(!topic)return <Shell user={user}><main className="hhba-law hhba-law-detail"><div className="hhba-law-panel"><div className="hhba-law-missing"><h1>没有找到这个劳动权益专题</h1><Link to="/candidate/account/legal-aid">返回法律援助首页</Link></div></div></main></Shell>;
+ if(!topic)return <Shell user={user} embedded={embedded}><main className="hhba-law hhba-law-detail"><div className="hhba-law-panel"><div className="hhba-law-missing"><h1>没有找到这个劳动权益专题</h1><Link to="/candidate/account/legal-aid">返回法律援助首页</Link></div></div></main></Shell>;
  const index=topics.indexOf(topic);
- return <Shell user={user}>
+ return <Shell user={user} embedded={embedded}>
    <main className="hhba-law hhba-law-detail" id="main-content">
     <div className="hhba-law-panel">
      <header className="hhba-law-header">

@@ -36,7 +36,7 @@ function HeaderSiteSearch(){
    <button type="submit" aria-label="提交全站搜索"><ArrowRight size={15}/></button>
  </form>;
 }
-export function Shell({ user, children }: { user: User | null; children: React.ReactNode }) {
+export function Shell({ user, children, embedded=false }: { user: User | null; children: React.ReactNode; embedded?: boolean }) {
  const navigate=useNavigate();
  const route=useRoute();
  const experience=experienceForRoute(route);
@@ -77,6 +77,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
   const anchor=event.target.closest<HTMLAnchorElement>('a[href]');
   if(anchor&&(recruitmentTarget(anchor)||anchor.dataset.hhbaRecruitmentOutbound==='true'))event.preventDefault();
  }
+ if(embedded)return <>{children}</>;
  return <main onClickCapture={guardRecruitmentClick} onAuxClickCapture={guardRecruitmentClick}
     onContextMenuCapture={guardRecruitmentContextMenu} className={'app-shell hhba-experience-'+experience}>
   <header className="topbar hhba-experience-header">

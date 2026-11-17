@@ -148,3 +148,14 @@
  .hhba-workbench-opportunity h3{font-size:15px}
 }
 @media(prefers-reduced-motion:reduce){.hhba-workbench-opportunity-action{transition:none}}
+
+
+/* Unified candidate workspace: keep the sidebar visible while the right-hand module changes. */
+.hhba-career-revamp .hhba-account-sidebar{position:sticky;top:78px;max-height:calc(100vh - 94px);overflow-y:auto;overscroll-behavior:contain;align-self:start}
+.hhba-account-cached-stage,.hhba-account-external-stage{width:100%;min-width:0}
+.hhba-account-external-stage .hhba-ai-page{width:100%;max-width:none;margin:0;padding:0 0 28px}
+.hhba-account-external-stage .hhba-ai-breadcrumb{margin-top:0;margin-bottom:20px}
+.hhba-account-external-stage .hhba-rights-page{width:100%;max-width:none;margin:0;padding:0 0 32px}
+.hhba-account-external-stage .hhba-law{width:100%;max-width:none;margin:0;padding:0}
+.hhba-account-external-stage .hhba-intervention{width:100%;max-width:none;margin:0;padding:0}
+@media(max-width:900px){.hhba-career-revamp .hhba-account-sidebar{position:static;max-height:none;overflow:visible;overscroll-behavior:auto}}

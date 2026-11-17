@@ -146,7 +146,7 @@ test('UI shows the correct login -> upload -> history navigation and real manual
  assert.match(match,/uploadPrivateResume\(file,true\)/);
  assert.match(match,/linkMatchHistoryResume\(/);
  assert.match(dialog,/匹配历史/);
- assert.match(account,/current==='applications'&&<CandidateMatchHistory\/>/);
+ assert.match(account,/hasVisited\('applications'\).*<CandidateMatchHistory active=\{current==='applications'\}\/>/);
  assert.match(account,/historyCount/);
  assert.match(history,/不会在后台自动搜索/);
  assert.match(history,/重新匹配/);

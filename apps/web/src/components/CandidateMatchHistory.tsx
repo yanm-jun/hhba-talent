@@ -16,18 +16,19 @@ const safeJobUrl=(raw:string)=>{
  catch{return null}
 };
 
-export function CandidateMatchHistory(){
+export function CandidateMatchHistory({active=true}:{active?:boolean}){
  const [items,setItems]=useState<MatchHistorySummary[]>([]);
  const [selected,setSelected]=useState<MatchHistoryDetail|null>(null);
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false);
  const [error,setError]=useState(''),[notice,setNotice]=useState('');
  useEffect(()=>{
-  let mounted=true;
+  if(!active)return;
+  let mounted=true;setLoading(true);setError('');
   void listMatchHistory().then(rows=>{if(mounted)setItems(rows)})
    .catch(e=>{if(mounted)setError(e instanceof Error?e.message:'历史记录读取失败')})
    .finally(()=>{if(mounted)setLoading(false)});
   return()=>{mounted=false};
- },[]);
+ },[active]);
  async function open(id:string){
   if(busy)return;
   setBusy(true);setError('');setNotice('');

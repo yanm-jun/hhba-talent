@@ -8,7 +8,7 @@ import {
 import {Link} from '../router';
 import '../styles/private-resumes.css';
 
-export function PrivateResumeVault(){
+export function PrivateResumeVault({active=true}:{active?:boolean}){
  const [items,setItems]=useState<PrivateResume[]>([]);
  const [ready,setReady]=useState(false),[loading,setLoading]=useState(true);
  const [busy,setBusy]=useState(false),[operation,setOperation]=useState('');
@@ -25,7 +25,7 @@ export function PrivateResumeVault(){
    if(active){setReady(false);setError(e instanceof Error?e.message:'私有简历服务无法连接。');}
   }finally{if(active)setLoading(false);}
  }
- useEffect(()=>{let active=true;void load(active);return()=>{active=false};},[]);
+ useEffect(()=>{if(!active)return;let mounted=true;setLoading(true);void load(mounted);return()=>{mounted=false};},[active]);
  function selectFile(selected:File|null){
   setError('');setNotice('');setConsent(false);
   if(!selected){setFile(null);return;}

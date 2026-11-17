@@ -13,7 +13,7 @@ import '../styles/resume-match.css';
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const maxResumeSize=3*1024*1024;
 
-export function CandidateMatchPage({user}:{user:User|null}){
+export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
  const [file,setFile]=useState<File|null>(null);
  const [savedFiles,setSavedFiles]=useState<PrivateResume[]>([]);
  const [savedId,setSavedId]=useState('');
@@ -144,9 +144,9 @@ export function CandidateMatchPage({user}:{user:User|null}){
    if((e as Error)?.name!=='AbortError')setError(e instanceof MatchError?e.message:'智能匹配暂时失败，请稍后再试。');
   }finally{setWorking(false);controller.current=null}
  }
- return <Shell user={user}>
+ return <Shell user={user} embedded={embedded}>
   <section className="hhba-ai-page">
-    <nav className="hhba-ai-breadcrumb"><Link to="/candidate"><ArrowLeft size={15}/> 我要应聘</Link>
+    <nav className="hhba-ai-breadcrumb"><Link to="/candidate/account"><ArrowLeft size={15}/> 工作台</Link>
      <span>/</span><strong>简历智能匹配</strong></nav>
     <div className="hhba-ai-hero">
       <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> 汇方职场 · HHBA · AI JOB MATCH</div>
