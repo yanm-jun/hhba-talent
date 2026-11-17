@@ -13,6 +13,7 @@ import {
   realAuthUsernameValid,
 } from '../services/realAuth';
 import '../styles/role-auth.css';
+import '../styles/unified-login.css';
 import { BrandMark } from '../components/BrandMark';
 
 type Mode = 'login' | 'register';
@@ -52,7 +53,7 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
     : safeNext === '/candidate/match' ? '?next=%2Fcandidate%2Fmatch'
     : safeNext === '/candidate/official-outbound' ? '?next=%2Fcandidate%2Fofficial-outbound'
     : safeNext === '/recruiter/onboarding' ? '?next=%2Frecruiter%2Fonboarding' : '';
-  const title = candidate ? '求职者' : '招聘方';
+  const title = candidate ? '个人用户' : '招聘方';
   const mobileValid = /^1[3-9]\d{9}$/.test(phone);
   const accountHasRole = !!user?.account_types?.includes(accountType);
   // 真实认证分支只用于求职者：测试后端注册时角色固定为 candidate。
@@ -223,22 +224,23 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
     }
   }
   if (accountHasRole) return null;
-  const modeRoute = stem + (mode === 'login' ? '/register' : '/login') + suffix;
+  const modeRoute = candidate ? (mode === 'login' ? '/candidate/register' : '/auth') + suffix
+    : stem + (mode === 'login' ? '/register' : '/login') + suffix;
   return (
     <Shell user={user}>
-      <section className="hhba-phone-auth" aria-labelledby="hhba-phone-title">
+      <section className={candidate ? "hhba-phone-auth hhba-unified-auth" : "hhba-phone-auth"} aria-labelledby="hhba-phone-title">
         <div className="hhba-phone-card">
-          <div className="hhba-auth-page-logo"><BrandMark variant="icon" size="hero" /></div>
+          <div className="hhba-auth-page-logo">{candidate ? <BrandMark variant="lockup" size="hero" /> : <BrandMark variant="icon" size="hero" />}</div>
           <div className="hhba-phone-heading">
-            <span className="hhba-phone-kicker">汇方职场 · {candidate ? '求职者账户' : '招聘方账户'}</span>
-            <h1 id="hhba-phone-title">{mode === 'login' ? '欢迎回来' : '创建你的账户'}</h1>
-            <p>{mode === 'login' ? realPasswordLogin ? '使用注册称呼和密码登录，继续你在汇方职场 HHBA 的旅程。' : '使用手机号登录，继续你在汇方职场 HHBA 的旅程。' : '只需几步，即可开启你的汇方职场 HHBA 账户。'}</p>
+            <span className="hhba-phone-kicker">{candidate ? 'HHBA · 个人职业服务' : '汇方职场 · 招聘方账户'}</span>
+            <h1 id="hhba-phone-title">{candidate ? mode === 'login' ? '欢迎来到汇方职场' : '创建你的 HHBA 账户' : mode === 'login' ? '欢迎回来' : '创建你的账户'}</h1>
+            <p>{candidate ? mode === 'login' ? '登录账户，继续你的职业旅程。' : '一个账户，连接求职、职业成长与职场权益。' : mode === 'login' ? '使用手机号登录，继续你在汇方职场 HHBA 的旅程。' : '只需几步，即可开启你的汇方职场 HHBA 账户。'}</p>
           </div>
-          <div className="hhba-phone-identity">
-            <span className="hhba-phone-identity-icon" aria-hidden="true">{candidate ? <UserRound size={17} /> : <Building2 size={17} />}</span>
-            <span>{candidate ? '以求职者身份继续' : '以招聘方身份继续'}</span>
-            <Link to="/auth" className="hhba-phone-switch-identity">切换身份 <ArrowRight size={13} /></Link>
-          </div>
+          {!candidate && <div className="hhba-phone-identity">
+            <span className="hhba-phone-identity-icon" aria-hidden="true"><Building2 size={17} /></span>
+            <span>以招聘方身份继续</span>
+            <Link to="/auth" className="hhba-phone-switch-identity">返回统一登录 <ArrowRight size={13} /></Link>
+          </div>}
           <form className="hhba-phone-form" onSubmit={submit}>
             {useRealAuth && mode === 'login' && (
               <div className="hhba-phone-login-methods" role="group" aria-label="选择登录方式">
@@ -324,11 +326,12 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
             <button className="hhba-phone-submit" type="submit" disabled={!canSubmit || busy}>{busy ? '验证中…' : mode === 'login' ? '登录' : '注册并继续'}<ArrowRight size={17} /></button>
           </form>
           <div className="hhba-phone-account-change">{mode === 'login' ? '还没有账户？' : '已经有账户？'} <Link to={modeRoute}>{mode === 'login' ? '立即注册' : '返回登录'}</Link></div>
+          {candidate && <p className="hhba-unified-auth-privacy">你的个人职业数据由同一个账户管理。<Link to="/data-use">了解数据使用说明</Link></p>}
           {employerApiReady && <Link className="hhba-phone-legacy" to={stem + '/email-' + mode + suffix}>已有邮箱密码账户？使用原登录方式</Link>}
           {!phoneAuthReady && !useRealAuth && <div className="hhba-phone-preview-note" role="status"><Info size={15} /><span>当前为页面预览，短信服务暂未接入，无法真实注册或登录。</span></div>}
         </div>
         <div className="hhba-phone-below">
-          <Link to="/auth"><ArrowLeft size={14} /> 返回身份选择</Link>
+          <Link to="/"><ArrowLeft size={14} /> 返回首页</Link>
           <span aria-hidden="true">·</span>
           <Link to={candidate ? '/candidate/jobs' : '/employer/start'}>{candidate ? '先看看招聘市场' : '了解企业服务'} <ArrowRight size={14} /></Link>
         </div>
