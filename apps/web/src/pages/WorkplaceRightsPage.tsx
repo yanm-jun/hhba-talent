@@ -16,8 +16,8 @@ const stages=[
  {num:'36',label:'周期届满',description:'最长36个月，服务依照正式合同到期；不默认自动扣费。'}
 ] as const;
 
-export function WorkplaceRightsPage({user}:{user:User|null}){
- return <Shell user={user}>
+export function WorkplaceRightsPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
+ return <Shell user={user} embedded={embedded}>
   <main className="hhba-rights-page" id="main-content">
    <nav className="hhba-rights-breadcrumb" aria-label="位置"><Link to="/candidate/account">个人工作台</Link><span>/</span><strong>职场权益中心</strong></nav>
    <section className="hhba-rights-hero">
