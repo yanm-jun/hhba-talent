@@ -56,3 +56,16 @@
 @media(prefers-reduced-motion:reduce){
  .hhba-entry-card{transition:none!important;transform:none!important}
 }
+
+
+/* Persistent, understated public transparency entry across visitor/candidate nav. */
+.hhba-experience-header>nav a.hhba-nav-transparency{
+ color:#176bd9;
+ font-weight:710;
+ border-bottom:2px solid transparent;
+}
+.hhba-experience-header>nav a.hhba-nav-transparency:hover,
+.hhba-experience-header>nav a.hhba-nav-transparency[aria-current="page"]{
+ color:#0d59be;
+ border-bottom-color:#ff9625;
+}
