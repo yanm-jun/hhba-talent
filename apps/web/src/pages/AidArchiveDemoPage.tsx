@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useState} from 'react';
-import {ArrowLeft,ArrowRight,ArrowUpRight,Archive,BarChart3,BookOpen,CheckCircle2,ChevronDown,ChevronLeft,ChevronRight,FileText,FolderOpen,Landmark,LockKeyhole,Receipt,Search,ShieldCheck,Wallet,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,ArrowUpRight,BarChart3,CheckCircle2,ChevronDown,ChevronLeft,ChevronRight,Search,ShieldCheck,X} from 'lucide-react';
 import {hhbaLogoUrl} from '../components/BrandMark';
 import {Shell} from '../components/Shell';
 import {Link} from '../router';
@@ -127,10 +127,10 @@ export function AidArchiveDemoPage({user}:{user:User|null}){
   return()=>{document.body.style.overflow=oldOverflow;window.removeEventListener('keydown',onKey);};
  },[layer,chosenId]);
  const cards=[
-  {key:'cases' as const,title:'帮扶案例公开档案',sub:'受理 · 处理 · 结果',note:'28 份完整模拟案卷，逐案可查',icon:FolderOpen,count:'28 份'},
-  {key:'funds' as const,title:'资金收支公开档案',sub:'来源 · 流水 · 支出',note:'逐笔模拟支出关联对应案件',icon:Receipt,count:'21 笔'},
-  {key:'reports' as const,title:'月度财务公开报告',sub:'用户付费 · 核算 · 入池',note:'收入、成本及资金划拨分开披露',icon:FileText,count:'1 期'},
-  {key:'rules' as const,title:'公开制度与监督',sub:'申请 · 审核 · 更正',note:'资金管理、隐私与公开规则',icon:ShieldCheck,count:'制度'}
+  {key:'cases' as const,title:'帮扶案例公开档案',sub:'受理 · 处理 · 结果',note:'28 份模拟案卷，每份都能深入查阅',count:'28 份'},
+  {key:'funds' as const,title:'资金收支档案',sub:'资金来源 · 逐笔流水 · 支出记录',note:'模拟出入池与案件支出相互关联',count:'21 笔'},
+  {key:'reports' as const,title:'月度财务报告',sub:'用户付费收入 · 成本核算 · 入池',note:'营业收入与可分配利润分别核算',count:'1 期'},
+  {key:'rules' as const,title:'公开制度与监督',sub:'申请规则 · 审核标准 · 更正记录',note:'公开流程与隐私保护制度',count:'制度'}
  ];
  let balance=0;
  const trendData=ledger.map(t=>({date:t.date,label:t.name,balance:balance+=t.amount}));
@@ -142,11 +142,45 @@ export function AidArchiveDemoPage({user}:{user:User|null}){
  return <Shell user={user}><main className="hhba-aidarchive hhba-a2">
   <div className="hhba-a2-wrap">
    <div className="hhba-a2-crumb"><Link to="/transparency"><ArrowLeft size={15}/> 返回责任与透明</Link><span>公开信息 / 劳动者权益档案</span></div>
-   <div className="hhba-a2-demo"><ShieldCheck size={17}/><span><b>仅供产品设计验收 · 模拟演示</b>　全部资金、收入、申请、帮扶及支出均属虚构，不代表 HHBA 已真实完成有关业务。</span></div>
-   <header className="hhba-a2-hero"><div className="hhba-a2-hero-main"><div className="hhba-a2-brand"><img src={hhbaLogoUrl} width={40} height={40} alt="HHBA 官方品牌标志"/><span><b>HHBA 汇方职场</b><small>PUBLIC TRANSPARENCY ARCHIVE</small></span></div><span className="hhba-a2-eyebrow">责任与透明 · 劳动者权益支持</span><h1>每一份承诺，<br/><em>都应该有据可查。</em></h1><p>让资金去向清晰，让帮扶过程透明。每一次支持，都应该对应一份可查阅的记录。</p></div><div className="hhba-a2-hero-aside"><BookOpen size={39}/><strong>透明，不止于数字。</strong><span>公开 · 可查 · 可追溯</span></div></header>
-   <section className="hhba-a2-fund" aria-label="模拟资金总览"><div className="hhba-a2-fundbalance"><div className="hhba-a2-fundheading"><Wallet size={19}/> 劳动者权益帮扶池 <span>演示数据</span></div><p>模拟可用资金余额</p><strong>{money(availableFund)}</strong><small>假设截至 2026年11月17日 · 非真实账户余额</small></div><div className="hhba-a2-fundstats"><div><small>模拟累计入池</small><strong>{money(initialCapital+profitReceived)}</strong></div><div><small>模拟累计支出</small><strong>{money(totalSpent)}</strong></div><button type="button" onClick={()=>open('funds')}>查看资金来源与流水 <ArrowRight size={16}/></button></div></section>
-   <section className="hhba-a2-stats"><div><small>模拟已受理申请</small><strong>{records.length}<em>件</em></strong><p>每一条拥有独立档案编号</p></div><div><small>模拟已完成帮扶</small><strong>{finishedCount}<em>件</em></strong><p>包含处理过程及结果记录</p></div><div><small>模拟正在处理中</small><strong>{records.length-finishedCount}<em>件</em></strong><p>展示阶段性进度</p></div></section>
-   <section className="hhba-a2-archives"><div className="hhba-a2-sectiontitle"><div><span className="hhba-a2-eyebrow">OPEN ARCHIVE / 公开档案中心</span><h2>每一项记录，都值得被认真查阅。</h2><p>不在首页堆叠 28 个案件。点击入口后，在弹窗中搜索、筛选和逐案查阅。</p></div><Archive size={29}/></div><div className="hhba-a2-cardgrid">{cards.map((c,i)=>{const Icon=c.icon;return <button type="button" className="hhba-a2-entry" key={c.key} onClick={()=>open(c.key)}><div className="hhba-a2-entrytop"><span><Icon size={23}/></span><small>0{i+1} / ARCHIVE</small></div><h3>{c.title}</h3><p>{c.sub}</p><div className="hhba-a2-entrynote">{c.note}</div><div className="hhba-a2-entrybottom"><span>{c.count} · 虚构演示</span><ArrowUpRight size={19}/></div></button>;})}</div></section>
+   <div className="hhba-a2-demo" role="note"><ShieldCheck size={16}/><span><b>模拟演示页面</b> · 本页资金、案件、收入和结果均为虚构数据，仅供设计验收，不代表 HHBA 实际业务。</span></div>
+   <header className="hhba-a2-hero">
+    <div className="hhba-a2-hero-main">
+     <div className="hhba-a2-brand"><img src={hhbaLogoUrl} width={36} height={36} alt="HHBA 官方品牌标志"/><span><b>HHBA 汇方职场</b><small>PUBLIC TRANSPARENCY</small></span></div>
+     <span className="hhba-a2-eyebrow">PUBLIC TRANSPARENCY / 责任与透明</span>
+     <h1>让每一次帮扶，<br/><em>都有迹可循。</em></h1>
+     <p>我们希望不仅公开资金去向，更完整记录受理、处理和支持结果。每一份责任，都应经得起查阅。</p>
+    </div>
+   </header>
+   <div className="hhba-a2-brandline" aria-hidden="true"><span/><span/></div>
+   <section className="hhba-a2-fund" aria-label="模拟权益帮扶池资金总览">
+    <div className="hhba-a2-fundbalance">
+     <div className="hhba-a2-fundheading">劳动者权益帮扶池 <span>演示数据</span></div>
+     <p>模拟可用资金余额</p>
+     <strong>{money(availableFund)}</strong>
+     <small>假设截至 2026年11月17日 · 非真实资金账户余额</small>
+    </div>
+    <div className="hhba-a2-fundstats">
+     <div><small>模拟累计入池</small><strong>{money(initialCapital+profitReceived)}</strong></div>
+     <div><small>模拟累计支出</small><strong>{money(totalSpent)}</strong></div>
+     <button type="button" onClick={()=>open('funds')}>查看资金来源及流水 <ArrowRight size={16}/></button>
+    </div>
+   </section>
+   <section className="hhba-a2-stats" aria-label="模拟案例工作概况">
+    <div><small>累计受理</small><strong>{records.length}<em>件</em></strong><p>模拟案件</p></div>
+    <div><small>完成帮扶</small><strong>{finishedCount}<em>件</em></strong><p>模拟已完成</p></div>
+    <div><small>正在处理</small><strong>{records.length-finishedCount}<em>件</em></strong><p>模拟处理中</p></div>
+   </section>
+   <section className="hhba-a2-archives" aria-labelledby="hhba-a2-open-archives">
+    <div className="hhba-a2-sectiontitle"><div><span className="hhba-a2-eyebrow">OPEN ARCHIVE / 公开档案</span><h2 id="hhba-a2-open-archives">所有记录，公开可查。</h2><p>从申请到处理，从资金来源到实际支出，每份演示档案都有独立的查询编号。</p></div></div>
+    <div className="hhba-a2-cardgrid">
+     {cards.map((card,index)=><button type="button" className="hhba-a2-entry" key={card.key} onClick={()=>open(card.key)}>
+      <span className="hhba-a2-entry-index">{String(index+1).padStart(2,'0')}</span>
+      <span className="hhba-a2-entry-copy"><strong>{card.title}</strong><small>{card.sub}</small></span>
+      <span className="hhba-a2-entry-count">{card.count}</span>
+      <ArrowUpRight size={20} aria-hidden="true"/>
+     </button>)}
+    </div>
+   </section>
    <section className="hhba-a2-rules"><div><Landmark size={23}/><span><strong>资金管理与 60 / 40 分配制度</strong><p>用户服务收入经过成本、税费及依法核算，确认可分配利润后按企业 60%、帮扶池 40% 的原则分配。</p></span></div><button type="button" onClick={()=>open('rules')}>查看制度 <ArrowRight size={16}/></button></section>
    <section className="hhba-a2-privacy"><LockKeyhole size={21}/><p><strong>公开有边界，透明更要保护劳动者。</strong> 真实案件仅公开授权、审核与脱敏的必要信息，不公开个人隐私及保密法律材料。</p></section>
    <details className="hhba-a2-trend"><summary><span className="hhba-a2-trendicon"><BarChart3 size={21}/></span><span><strong>历史资金流动与趋势分析</strong><small>默认折叠 · 点击查看可交互的模拟资金曲线与明细</small></span><ChevronDown size={20}/></summary><div className="hhba-a2-trendbody"><div className="hhba-a2-trendtop"><span><b>模拟资金余额趋势</b><small>数据由逐笔模拟流水累计生成</small></span><div>{(['全部','近30天'] as const).map(p=><button type="button" key={p} className={p===trendRange?'active':''} onClick={()=>{setTrendRange(p);setHovered(null);}}>{p}</button>)}</div></div><svg viewBox="0 0 720 205" role="img" aria-label="演示资金池余额随日期变化的折线图"><path d="M20 28H700 M20 102H700 M20 173H700" fill="none" stroke="#e3ebf7"/><path d={d} fill="none" stroke="#1474fb" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round"/>{pts.map((p,i)=><circle key={i} cx={p.x} cy={p.y} r={hovered===i?6:4.4} fill="#ff9625" stroke="#fff" strokeWidth="2" tabIndex={0} onMouseEnter={()=>setHovered(i)} onFocus={()=>setHovered(i)} aria-label={p.data.date+'：'+money(p.data.balance)}><title>{p.data.date} · {money(p.data.balance)} · {p.data.label}</title></circle>)}</svg><div className="hhba-a2-chartcaption"><span>{visibleTrend[0]?.date}</span><b>{hovered===null?'期末模拟结余：'+money(availableFund):pts[hovered]?.data.date+' · '+money(pts[hovered]?.data.balance||0)}</b><span>2026-11-17</span></div><p>此趋势仅为演示数据。正式发布必须按实际资金凭据生成并复核。</p><button type="button" className="hhba-a2-linkbutton" onClick={()=>open('funds')}>打开逐笔资金档案 <ArrowRight size={15}/></button></div></details>
