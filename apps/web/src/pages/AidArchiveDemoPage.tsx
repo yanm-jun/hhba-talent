@@ -147,6 +147,18 @@ function CaseDocument({record,onOpenFunds}:{record:AidCase;onOpenFunds:()=>void}
  </div>;
 }
 export function AidArchiveDemoPage({user}:{user:User|null}){
+ // Client-side backup for SPA navigation; edge X-Robots-Tag protects first response.
+ useEffect(()=>{
+  const existing=document.head.querySelector<HTMLMetaElement>('meta[name="robots"]');
+  const previous=existing?.content;
+  const tag=existing||document.createElement('meta');
+  tag.setAttribute('name','robots');
+  tag.setAttribute('content','noindex, nofollow, noarchive');
+  if(!existing)document.head.appendChild(tag);
+  return ()=>{if(existing){if(previous!==undefined)existing.content=previous;}
+   else tag.remove();};
+ },[]);
+
  const [layer,setLayer]=useState<Layer|null>(()=>{
   const params=new URLSearchParams(window.location.search);
   const view=params.get('view');
