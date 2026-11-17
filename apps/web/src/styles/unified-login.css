@@ -1,0 +1,124 @@
+/* HHBA unified C-end login: the only publicly advertised account entry.
+   Scope all visual changes to the personal login form; do not alter employer routes yet. */
+.app-shell:has(.hhba-unified-auth){
+ background:#f5f8fe!important;
+ background-image:radial-gradient(ellipse 65% 48% at 50% 15%,#dfeeff 0%,#f5f8fe 75%,#f5f8fe 100%)!important;
+}
+.app-shell:has(.hhba-unified-auth) .hhba-experience-header{
+ border-bottom:1px solid rgba(208,224,241,.78);
+}
+.hhba-phone-auth.hhba-unified-auth{
+ box-sizing:border-box;
+ max-width:478px;
+ width:calc(100% - 32px);
+ margin:clamp(30px,5vh,58px) auto 58px;
+ padding:0;
+ color:#1b3552;
+}
+.hhba-unified-auth .hhba-phone-card{
+ border:1px solid #e1e9f3;
+ background:#fff;
+ border-radius:21px;
+ padding:34px clamp(24px,5vw,42px) 28px;
+ box-shadow:0 22px 75px rgba(36,76,133,.09),0 3px 12px rgba(36,76,133,.035);
+}
+.hhba-unified-auth .hhba-auth-page-logo{min-height:54px}
+.hhba-unified-auth .hhba-auth-page-logo .hhba-brand-mark{gap:12px;justify-content:center}
+.hhba-unified-auth .hhba-auth-page-logo .hhba-brand-mark img{width:47px;height:47px}
+.hhba-unified-auth .hhba-auth-page-logo .hhba-brand-text{gap:5px}
+.hhba-unified-auth .hhba-auth-page-logo .hhba-brand-text strong{font-size:24px;letter-spacing:-.6px;color:#183e72}
+.hhba-unified-auth .hhba-auth-page-logo .hhba-brand-zh{font-size:11px;color:#6982a2;letter-spacing:.1em}
+.hhba-unified-auth .hhba-phone-heading{margin:28px 0 25px}
+.hhba-unified-auth .hhba-phone-kicker{display:block;color:#4378b8;font-size:11px;font-weight:760;letter-spacing:.08em}
+.hhba-unified-auth .hhba-phone-heading h1{
+ font-size:clamp(25px,5vw,29px);
+ font-weight:820;
+ line-height:1.4;
+ letter-spacing:-.7px;
+ margin:10px 0 9px;
+ color:#163d69;
+}
+.hhba-unified-auth .hhba-phone-heading p{color:#8292a7;font-size:12px;line-height:1.8}
+.hhba-unified-auth .hhba-phone-login-methods{
+ border-color:#e0e9f5;
+ background:#f1f5fb;
+ border-radius:12px;
+ padding:5px;
+ gap:4px;
+}
+.hhba-unified-auth .hhba-phone-login-method{
+ border-radius:9px;
+ color:#6783a5;
+ font-weight:690;
+ font-size:12px;
+ min-height:43px;
+}
+.hhba-unified-auth .hhba-phone-login-method.is-active,
+.hhba-unified-auth .hhba-phone-login-method.is-active:hover{
+ color:#215d9e;
+ border-color:#d9e6f7;
+ box-shadow:0 2px 7px rgba(31,85,149,.09);
+}
+.hhba-unified-auth .hhba-phone-login-method:hover{background:#e5effa;color:#215d9e}
+.hhba-unified-auth .hhba-phone-login-method:focus-visible,
+.hhba-unified-auth .hhba-phone-submit:focus-visible,
+.hhba-unified-auth .hhba-phone-form input:focus-visible{
+ outline:3px solid #f3b56c;
+ outline-offset:2px;
+}
+.hhba-unified-auth .hhba-phone-form{gap:19px}
+.hhba-unified-auth .hhba-phone-form label{font-size:12px;font-weight:730;color:#2f4967;gap:8px}
+.hhba-unified-auth .hhba-phone-form input{height:49px;border-color:#dce6f2;border-radius:10px;color:#1d3d61;background:#fff}
+.hhba-unified-auth .hhba-phone-form input:focus{border-color:#4f8ccc;box-shadow:0 0 0 3px rgba(66,128,200,.12)}
+.hhba-unified-auth .hhba-phone-number{border-color:#dce6f2;border-radius:10px}
+.hhba-unified-auth .hhba-phone-number:focus-within{border-color:#4f8ccc;box-shadow:0 0 0 3px rgba(66,128,200,.12)}
+.hhba-unified-auth .hhba-phone-number>span{color:#3e648d;border-color:#e4ecf7}
+.hhba-unified-auth .hhba-phone-code button{
+ height:49px;
+ border-color:#d9e7f6;
+ background:#edf5ff;
+ color:#2968ae;
+ font-weight:730;
+}
+.hhba-unified-auth .hhba-phone-code button:not(:disabled):hover{background:#dcecff}
+.hhba-unified-auth .hhba-phone-code button:disabled{background:#f3f6fa;color:#93a5ba}
+.hhba-unified-auth .hhba-phone-submit{
+ margin-top:8px;
+ height:51px;
+ border-radius:11px;
+ background:#1e5ca5;
+ border-color:#1e5ca5;
+ color:#fff;
+ font-size:13px;
+ font-weight:800;
+ box-shadow:0 7px 16px rgba(30,92,165,.14);
+}
+.hhba-unified-auth .hhba-phone-submit:not(:disabled):hover{background:#174c89}
+.hhba-unified-auth .hhba-phone-submit:disabled{background:#7a9fc8;border-color:#7a9fc8;box-shadow:none}
+.hhba-unified-auth .hhba-phone-account-change{margin-top:23px;color:#7d8da1}
+.hhba-unified-auth .hhba-phone-account-change a{color:#235fa6}
+.hhba-unified-auth .hhba-phone-legacy{color:#366ca5}
+.hhba-unified-auth .hhba-unified-auth-privacy{
+ text-align:center;
+ color:#93a0b2;
+ font-size:10px;
+ margin:23px 0 0;
+ padding-top:18px;
+ border-top:1px solid #edf1f8;
+ line-height:1.75;
+}
+.hhba-unified-auth .hhba-unified-auth-privacy a{color:#4377ad;text-decoration:none;font-weight:700;margin-left:4px}
+.hhba-unified-auth .hhba-phone-below{color:#a3afbf}
+.hhba-unified-auth .hhba-phone-below a{color:#5b7593}
+.hhba-unified-auth .hhba-phone-footer{color:#95a3b3;line-height:1.7}
+@media(max-width:520px){
+ .hhba-phone-auth.hhba-unified-auth{margin:22px auto 44px;width:calc(100% - 22px)}
+ .hhba-unified-auth .hhba-phone-card{padding:29px 23px 23px;border-radius:16px}
+ .hhba-unified-auth .hhba-phone-heading{margin:22px 0 22px}
+ .hhba-unified-auth .hhba-phone-heading h1{font-size:25px}
+ .hhba-unified-auth .hhba-phone-form{gap:17px}
+ .hhba-unified-auth .hhba-auth-page-logo .hhba-brand-mark img{width:44px;height:44px}
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-unified-auth .hhba-phone-submit,.hhba-unified-auth .hhba-phone-login-method{transition:none}
+}
