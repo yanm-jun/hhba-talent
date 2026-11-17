@@ -386,3 +386,43 @@
  .hhba-responsibility .hhba-resp-open-index,.hhba-responsibility .hhba-resp-demo-direction,
  .hhba-responsibility .hhba-resp-case-taxonomy,.hhba-responsibility .hhba-resp-detail-nav{display:none!important}
 }
+
+
+/* V4.1 verified-only public case list and opt-in individual finance disclosures. */
+.hhba-resp-published-cases{border-top:1px solid #e6ecf4;margin:0 0 20px}
+.hhba-resp-case-filter{display:flex;flex-wrap:wrap;gap:7px;padding:17px 0 11px}
+.hhba-resp-case-filter button{background:#fff;color:#607c9b;border:1px solid #e1e9f4;border-radius:5px;padding:8px 10px;font-size:11px}
+.hhba-resp-case-filter button.active{background:#eff6ff;color:#1169d8;border-color:#aecdf8;font-weight:700}
+.hhba-resp-published-count{font-size:11px;color:#8496ab;line-height:1.7;margin:6px 0 12px}
+.hhba-resp-public-case-item{border-top:1px solid #e6ecf4}
+.hhba-resp-public-case-item:last-of-type{border-bottom:1px solid #e6ecf4}
+.hhba-resp-public-case-item>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:18px 4px}
+.hhba-resp-public-case-item>summary::-webkit-details-marker{display:none}
+.hhba-resp-public-case-item>summary:hover{background:#fafcff}
+.hhba-resp-public-case-id{font-size:10px;color:#2173d7;font-weight:680;flex:0 0 145px;overflow-wrap:anywhere}
+.hhba-resp-public-case-title{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.hhba-resp-public-case-title strong{font-size:13px;color:#29435e;font-weight:720}
+.hhba-resp-public-case-title small{font-size:11px;color:#8294a9;line-height:1.6}
+.hhba-resp-public-case-item>summary>svg{color:#2572ce;transition:transform .16s;flex:none}
+.hhba-resp-public-case-item[open]>summary>svg{transform:rotate(90deg)}
+.hhba-resp-public-case-body{padding:8px 16px 23px 159px;color:#526d8a}
+.hhba-resp-public-case-body h3{font-size:12px;font-weight:720;color:#365676;margin:12px 0 6px}
+.hhba-resp-public-case-body p{font-size:12px;line-height:1.9;margin:0 0 14px;white-space:pre-wrap}
+.hhba-resp-case-ops{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;border-top:1px solid #e9eef5;padding-top:15px;color:#8395a9;font-size:11px}
+.hhba-resp-case-ops button{border:0;background:transparent;color:#1369da;padding:5px 0;font-weight:670;font-size:11px;display:inline-flex;gap:7px;align-items:center}
+.hhba-resp-case-no-match{font-size:12px;padding:20px;color:#8091a7}
+.hhba-resp-line-item-public{margin:25px 0 15px;padding-top:22px;border-top:1px solid #e6edf4}
+.hhba-resp-line-item-public .hhba-resp-public-register-heading h3{font-size:17px;color:#2a4564;margin:0 0 7px}
+.hhba-resp-line-item-public .hhba-resp-public-register-heading p{font-size:11px}
+.hhba-resp-ledger-active-filter{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:10px 13px;background:#f3f8ff;border:1px solid #dce9ff;color:#50779f;border-radius:6px;font-size:11px;margin:12px 0}
+.hhba-resp-ledger-active-filter button{border:0;background:transparent;color:#186bd0;font-weight:700;padding:4px}
+.hhba-resp-ledger-entry-id{display:block;margin-top:5px;color:#9aabbc;font-size:10px;word-break:break-word}
+.hhba-resp-ledger-empty{padding:18px 19px}
+.hhba-resp-line-item-public .hhba-resp-fund-ledger td{white-space:normal;min-width:100px;line-height:1.65}
+.hhba-resp-line-item-public .hhba-resp-fund-ledger td:first-child{min-width:140px}
+@media(max-width:620px){
+ .hhba-resp-public-case-id{flex-basis:82px}
+ .hhba-resp-public-case-item>summary{gap:8px}
+ .hhba-resp-public-case-body{padding:5px 2px 20px 2px}
+ .hhba-resp-case-ops{align-items:flex-start;flex-direction:column}
+}
