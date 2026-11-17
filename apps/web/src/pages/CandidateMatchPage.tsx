@@ -146,7 +146,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  }
  return <Shell user={user} embedded={embedded}>
   <section className="hhba-ai-page">
-    <nav className="hhba-ai-breadcrumb"><Link to="/candidate"><ArrowLeft size={15}/> 我要应聘</Link>
+    <nav className="hhba-ai-breadcrumb"><Link to="/candidate/account"><ArrowLeft size={15}/> 工作台</Link>
      <span>/</span><strong>简历智能匹配</strong></nav>
     <div className="hhba-ai-hero">
       <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> 汇方职场 · HHBA · AI JOB MATCH</div>
