@@ -36,7 +36,7 @@ test('only published real reports feed the official fund register',()=>{
 test('official case register is empty until real anonymized files are published',()=>{
  assert.match(publicPage,/暂无通过公开审核的案例档案/);
  assert.match(publicPage,/本中心目前没有可公开查阅的真实个案/);
- assert.match(publicPage,/模拟情景填充/);
+ assert.match(publicPage,/演示情景填充/);
  assert.match(publicPage,/to="\/transparency\/archive-preview\?view=cases"/);
  assert.match(publicPage,/所有人员、争议、金额和结果均非真实业务/);
 });
