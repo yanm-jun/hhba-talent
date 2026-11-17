@@ -51,7 +51,7 @@ export function EmployeeFeedbackPage({user}:{user:User|null}) {
     finally{setBusy(false)}
   }
   return <Shell user={user}><main className="ef-page">
-    <Link to="/employer/public" className="ef-back"><ArrowLeft size={15}/> 返回企业公开档案</Link>
+    <Link to="/candidate/account/rights" className="ef-back"><ArrowLeft size={15}/> 返回职场权益中心</Link>
     <div className="ef-heading"><p>HHBA · 员工真实反馈</p><h1>让每一份真实的工作体验被尊重。</h1>
       <p>你的反馈将用于了解企业的员工关怀表现。此系统不会把原始个人评分或评价人身份提供给企业，也不会把主观体验直接当作已证实的违法事实。</p></div>
     <div className="ef-safety"><LockKeyhole size={23}/><div><strong>隐私保护说明</strong><p>正式版仅允许经独立核验的在职员工每季度提交一次。评分与身份凭据分开存储，不收集自由文本、姓名、部门或具体工作地点。只有季度结束且符合至少 10 份反馈的门槛，才展示汇总；小样本不公开。技术和运营措施仍无法保证绝对匿名，请勿输入可识别个人的信息。</p></div></div>
