@@ -1,0 +1,48 @@
+name: HHBA private AI finance assistant acceptance
+on:
+  pull_request:
+    paths:
+      - "apps/web/functions/_lib/finance-ai-assistant.js"
+      - "apps/web/functions/admin-preview/api/finance.js"
+      - "apps/web/functions/admin-preview/api/finance-ai.js"
+      - "apps/web/functions/admin-preview/api/finance-ai-cron.js"
+      - "apps/web/functions/_middleware.js"
+      - "apps/web/ops/finance-ai-review-scheduler.mjs"
+      - "apps/admin-preview/finance-ai.js"
+      - "apps/admin-preview/finance-ai.css"
+      - "apps/admin-preview/index.html"
+      - "apps/web/scripts/finance-ai-assistant.contract.test.mjs"
+      - "apps/web/scripts/build-standalone-admin.py"
+      - ".github/workflows/hhba-finance-ai-assistant-ci.yml"
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify finance AI syntax and safety
+        run: |
+          node --check apps/admin-preview/finance-ai.js
+          node --check apps/web/functions/_lib/finance-ai-assistant.js
+          node --check apps/web/functions/admin-preview/api/finance-ai.js
+          node --check apps/web/functions/admin-preview/api/finance-ai-cron.js
+          node --check apps/web/ops/finance-ai-review-scheduler.mjs
+          node --test apps/web/scripts/finance-ai-assistant.contract.test.mjs
+          node --test apps/web/scripts/admin-finance-unified-entry.contract.test.mjs
+      - name: Verify existing password-protected admin build contains AI finance
+        env:
+          CF_PAGES_BRANCH: feat/admin-password-console-20261112
+        run: |
+          python3 apps/web/scripts/build-standalone-admin.py
+          test -s apps/web/dist/admin-preview/finance-ai.js
+          test -s apps/web/dist/admin-preview/finance-ai.css
+          grep -q './finance-ai.js' apps/web/dist/admin-preview/index.html
+          grep -q './finance-ai.css' apps/web/dist/admin-preview/index.html
+          grep -q 'hhba-fin-ai-root' apps/web/dist/admin-preview/index.html
