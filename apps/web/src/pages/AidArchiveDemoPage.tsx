@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useState} from 'react';
-import {ArrowLeft,ArrowRight,ArrowUpRight,BarChart3,CheckCircle2,ChevronDown,ChevronLeft,ChevronRight,Search,ShieldCheck,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,ArrowUpRight,BarChart3,CheckCircle2,ChevronDown,ChevronLeft,ChevronRight,Landmark,LockKeyhole,Search,ShieldCheck,X} from 'lucide-react';
 import {hhbaLogoUrl} from '../components/BrandMark';
 import {Shell} from '../components/Shell';
 import {Link} from '../router';
