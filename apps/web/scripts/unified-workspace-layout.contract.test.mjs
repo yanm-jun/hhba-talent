@@ -65,5 +65,15 @@ test('embedded service modules omit duplicate site shells and retain hidden modu
   const source=read(path);assert.ok(source.includes('embedded=false'));assert.ok(source.includes('embedded={embedded}'));
  }
  assert.ok(css.includes('position:sticky'));
+ for(const [path,signature] of [
+  ['../src/components/PrivateResumeVault.tsx','active?:boolean'],
+  ['../src/components/CandidateMatchHistory.tsx','active?:boolean'],
+  ['../src/components/ApplyAssistantProduct.tsx','active?:boolean']
+ ]){
+  const source=read(path);assert.ok(source.includes(signature),path+' refreshes when shown again');
+ }
+ assert.ok(personal.includes("active={current==='resume'}"));
+ assert.ok(personal.includes("active={current==='applications'}"));
+ assert.ok(personal.includes("active={current==='apply-assistant'}"));
  assert.ok(css.includes('.hhba-account-external-stage .hhba-ai-page'));
 });
