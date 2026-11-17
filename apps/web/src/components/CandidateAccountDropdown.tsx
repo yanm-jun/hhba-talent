@@ -1,10 +1,10 @@
 import {useEffect,useId,useRef,useState} from 'react';
-import {Bookmark,ChevronDown,ChevronRight,ClipboardList,FileUser,LayoutDashboard,Scale,SlidersHorizontal,UserRound} from 'lucide-react';
+import {Bookmark,ChevronDown,ChevronRight,ClipboardList,FileUser,LayoutDashboard,Scale,ShieldCheck,SlidersHorizontal,UserRound} from 'lucide-react';
 import {Link} from '../router';
 import '../styles/candidate-account-dropdown.css';
 
 // The personal center is a navigation disclosure, not a separate candidate account system.
-// Every existing path remains unchanged; legal aid is a clearly labeled, non-collecting placeholder.
+// Existing paths remain available. Membership is a clearly labeled, non-collecting preview.
 export const CANDIDATE_ACCOUNT_LINKS=[
  {label:'工作台',path:'/candidate/account',Icon:LayoutDashboard},
  {label:'我的收藏',path:'/candidate/saved',Icon:Bookmark},
@@ -12,7 +12,8 @@ export const CANDIDATE_ACCOUNT_LINKS=[
  {label:'求职偏好',path:'/candidate/account/preferences',Icon:SlidersHorizontal},
  {label:'我的简历',path:'/candidate/account/resume',Icon:FileUser},
  {label:'匹配历史',path:'/candidate/account/applications',Icon:ClipboardList},
- {label:'法律援助',path:'/candidate/account/legal-aid',Icon:Scale,description:'法律服务筹备中'}
+ {label:'职场权益中心',path:'/candidate/account/rights',Icon:ShieldCheck,description:'¥24.90/月 · 尚未开放购买'},
+ {label:'劳动权益知识',path:'/candidate/account/legal-aid',Icon:Scale,description:'免费知识专题'}
 ] as const;
 
 export function CandidateAccountDropdown({displayName}:{displayName?:string}){
@@ -67,7 +68,7 @@ export function CandidateAccountDropdown({displayName}:{displayName?:string}){
        <ChevronRight size={15} aria-hidden="true" className="hhba-account-dropdown-chevron"/>
       </Link>)}
     </div>
-    <p className="hhba-account-dropdown-footnote">法律援助尚未开放材料提交，切勿上传个人敏感证据。</p>
+    <p className="hhba-account-dropdown-footnote">会员购买与案件材料提交尚未开放，请勿在知识页面上传个人敏感证据。</p>
    </div>}
  </div>;
 }
