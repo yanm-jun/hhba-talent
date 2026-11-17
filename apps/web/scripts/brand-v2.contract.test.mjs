@@ -25,18 +25,20 @@ test('global shell, public hero, letter, vision and footer use same component, n
  const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
  assert.ok(html.includes('%BASE_URL%images/hhba-logo.svg'));
 });
-test('safe cross-identity login selector and consistent centered SVG logo on both account pages',()=>{
- const main=src('main.tsx'),choice=src('pages/AuthChoicePage.tsx'),auth=src('pages/PhoneAuthPage.tsx');
- const api=src('services/api.ts'),style=src('styles/role-auth.css');
- assert.ok(main.includes("route==='/auth')return <AuthChoicePage/>"));
- assert.ok(choice.includes('to="/recruiter/login"'));
- assert.ok(choice.includes('/candidate/login'));
- assert.ok(choice.includes('BrandMark variant="icon"'));
- assert.ok(auth.includes('BrandMark variant="icon"'));
- assert.ok(!auth.includes('hhba-phone-aside'));
- assert.ok(style.includes('.hhba-phone-card'));
- assert.ok(style.includes('.hhba-auth-page-logo'));
+test('single branded personal login contains genuine auth methods without a role picker',()=>{
+ const main=src('main.tsx'),auth=src('pages/PhoneAuthPage.tsx');
+ const api=src('services/api.ts'),style=src('styles/unified-login.css');
+ assert.ok(main.includes("route==='/auth')return <PhoneAuthPage"));
+ assert.ok(main.includes("accountType=\"candidate\" initialMode=\"login\""));
+ assert.ok(!main.includes("return <AuthChoicePage"));
+ assert.ok(auth.includes('BrandMark variant="lockup"'));
+ assert.ok(auth.includes('hhba-unified-auth'));
+ assert.ok(auth.includes('hhba-phone-login-methods'));
+ assert.ok(auth.includes('验证码登录'));
+ assert.ok(auth.includes('密码登录'));
+ assert.ok(auth.includes('disabled={!canSubmit || busy}'));
+ assert.ok(auth.includes('了解数据使用说明'));
+ assert.ok(style.includes('.hhba-unified-auth .hhba-phone-card'));
  assert.ok(api.includes("VITE_HHBA_PHONE_AUTH_ENABLED==='1'"));
- assert.ok(auth.includes('disabled={!phoneAuthReady||!mobileValid||!codeValid||busy}'));
  assert.ok(!auth.includes('enterDemoAccount'));
 });
