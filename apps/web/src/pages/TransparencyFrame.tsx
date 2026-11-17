@@ -4,6 +4,7 @@ import {Shell} from '../components/Shell';
 import {Link} from '../router';
 import type {User} from '../services/api';
 import '../styles/transparency-v5.css';
+import {WORKER_ARCHIVE_DEMO_MODE,WORKER_ARCHIVE_DEMO_NOTICE} from './transparencyDemoData';
 
 export function TransparencyFrame({user,section,title,description,children}:{user:User|null;section:string;title:string;description:string;children:ReactNode}){
  useEffect(()=>{
@@ -21,6 +22,7 @@ export function TransparencyFrame({user,section,title,description,children}:{use
     <span className="hhba-v5-kicker">HHBA / TRANSPARENCY ARCHIVE</span>
     <h1>{title}</h1><p>{description}</p>
    </header>
+   {WORKER_ARCHIVE_DEMO_MODE&&<div className="hhba-v6-demo-note" role="note">{WORKER_ARCHIVE_DEMO_NOTICE}</div>}
    {children}
    <footer className="hhba-v5-foot"><span>汇方职场 · HHBA / 企业自主公开资料</span><Link to="/transparency">返回公开中心</Link></footer>
   </div>
