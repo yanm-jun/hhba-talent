@@ -1,5 +1,6 @@
 import {useEffect,useState} from 'react';
-import {ArrowRight,FileClock,WalletCards} from 'lucide-react';
+import {ArrowRight,FileClock,WalletCards,Search} from 'lucide-react';
+import {WORKER_ARCHIVE_DEMO_MODE,workerDemoLedger,workerDemoTotals,workerDemoMonths,workerDemoCurrency} from './transparencyDemoData';
 import {TransparencyFrame} from './TransparencyFrame';
 import {Link} from '../router';
 import type {User} from '../services/api';
@@ -11,7 +12,7 @@ const endpoint=(path:string)=>import.meta.env.BASE_URL+'api/transparency'+path;
 const yuan=(fen:number)=>new Intl.NumberFormat('zh-CN',{style:'currency',currency:'CNY',minimumFractionDigits:2}).format(fen/100);
 const periodLabel=(period:string)=>period.replace('-','年')+'月';
 
-export function TransparencyFundsPage({user}:{user:User|null}){
+function OfficialTransparencyFundsPage({user}:{user:User|null}){
  const [reports,setReports]=useState<MonthlyReport[]>([]);
  const [reportState,setReportState]=useState<'loading'|'ready'|'error'>('loading');
  const [entries,setEntries]=useState<LedgerEntry[]>([]);
@@ -56,5 +57,48 @@ export function TransparencyFundsPage({user}:{user:User|null}){
     <div className="hhba-v5-table-scroll"><table className="hhba-v5-table" aria-label="经审核允许公开的资金明细"><thead><tr><th>日期 / 编号</th><th>公开用途</th><th>类型</th><th>金额</th><th>关联案例</th></tr></thead><tbody>{displayed.map(item=><tr key={item.id}><td>{item.date}<small className="hhba-v5-table-id">{item.id}</small></td><td>{item.purpose}</td><td>{item.kind==='inflow'?'实际入池':'实际支出'}</td><td>{yuan(item.amountFen)}</td><td>{item.caseId?<Link to={'/transparency/cases?case='+encodeURIComponent(item.caseId)}>查看案例 <ArrowRight size={14}/></Link>:'—'}</td></tr>)}</tbody></table></div>}
    <p className="hhba-v5-slim-note">完整资金汇总以月报为准。本页不发布原始银行流水或未经授权的个人资料；公开交易明细不能替代正式财务账本。</p>
   </section>
+ </TransparencyFrame>;
+}
+export function TransparencyFundsPage({user}:{user:User|null}){
+ return WORKER_ARCHIVE_DEMO_MODE?<DemoTransparencyFundsPage user={user}/>:<OfficialTransparencyFundsPage user={user}/>;
+}
+function DemoTransparencyFundsPage({user}:{user:User|null}){
+ const [kind,setKind]=useState<'全部'|'入池'|'支出'>('全部');
+ const [query,setQuery]=useState('');
+ const [period,setPeriod]=useState('全部月份');
+ const [caseId,setCaseId]=useState<string|null>(()=>new URLSearchParams(window.location.search).get('case'));
+ const filtered=workerDemoLedger.filter(item=>(kind==='全部'||(kind==='入池'?item.amount>0:item.amount<0))&&
+  (period==='全部月份'||item.date.startsWith(period))&&(!caseId||item.caseId===caseId)&&
+  [item.id,item.date,item.name,item.caseId||''].some(v=>v.toLowerCase().includes(query.toLowerCase().trim()))).slice().reverse();
+ const clearCase=()=>{setCaseId(null);const url=new URL(window.location.href);url.searchParams.delete('case');window.history.replaceState(window.history.state,'',url.pathname+url.search+url.hash);};
+ return <TransparencyFrame user={user} section="帮扶资金收支档案" title="帮扶资金收支档案" description="公开资金入池、实际支出、结余变化与对应的权益支持项目，支持按月份和案件编号追溯。">
+  <div className="hhba-v6-kpi-row">
+   <div><small>累计入池</small><strong>{workerDemoCurrency(workerDemoTotals.received)}</strong></div>
+   <div><small>累计支出</small><strong>{workerDemoCurrency(workerDemoTotals.spent)}</strong></div>
+   <div><small>资金结余</small><strong>{workerDemoCurrency(workerDemoTotals.balance)}</strong></div>
+  </div>
+  <section className="hhba-v5-content-section" aria-labelledby="v6-ledger-title">
+   <div className="hhba-v5-section-label"><span>FUND LEDGER / 收支台账</span><h2 id="v6-ledger-title">资金明细查询</h2><p>资金进出逐笔列示，带有案件编号的支出可以直接打开对应的案例档案。</p></div>
+   <div className="hhba-v5-case-controls">
+    <label className="hhba-v5-search"><Search size={17}/><input aria-label="搜索资金记录" value={query} onChange={e=>setQuery(e.target.value)} placeholder="输入用途、编号或关联案件"/></label>
+    <div className="hhba-v5-case-filters" role="group" aria-label="按资金类型筛选">{(['全部','入池','支出'] as const).map(k=><button type="button" key={k} onClick={()=>setKind(k)} className={kind===k?'active':''}>{k}</button>)}</div>
+    <div className="hhba-v5-case-filters" role="group" aria-label="按月份筛选">{['全部月份',...workerDemoMonths.map(m=>m.period)].map(p=><button type="button" key={p} className={period===p?'active':''} onClick={()=>setPeriod(p)}>{p==='全部月份'?p:p.replace('-','年')+'月'}</button>)}</div>
+    {caseId&&<div className="hhba-v5-active-filter"><span>当前仅显示案件 {caseId} 的关联收支</span><button type="button" onClick={clearCase}>清除案件筛选</button></div>}
+   </div>
+   <p className="hhba-v5-result-count">符合条件的资金记录：{filtered.length} 笔</p>
+   <div className="hhba-v5-table-scroll"><table className="hhba-v5-table" aria-label="劳动者权益帮扶池收支明细">
+    <thead><tr><th>资金日期 / 编号</th><th>资金用途</th><th>类型</th><th>金额</th><th>关联案例</th></tr></thead>
+    <tbody>{filtered.map(item=><tr key={item.id}><td>{item.date}<small className="hhba-v5-table-id">{item.id}</small></td><td>{item.name}</td><td>{item.amount>=0?'资金入池':'权益支持支出'}</td><td>{item.amount>0?'+':'−'}{workerDemoCurrency(Math.abs(item.amount))}</td>
+     <td>{item.caseId?<Link to={'/transparency/cases?case='+encodeURIComponent(item.caseId)}>查看案例 <ArrowRight size={14}/></Link>:'—'}</td>
+    </tr>)}
+    {!filtered.length&&<tr><td colSpan={5}>没有符合筛选条件的记录。</td></tr>}</tbody>
+   </table></div>
+  </section>
+  <section className="hhba-v5-content-section" aria-labelledby="v6-funds-monthly-title">
+   <div className="hhba-v5-section-label"><span>MONTHLY SUMMARY / 月度核对</span><h2 id="v6-funds-monthly-title">月度资金归档</h2><p>按月份查阅期初、入池、支出与期末结余，更多说明进入月度帮扶资金报告。</p></div>
+   <div className="hhba-v5-table-scroll"><table className="hhba-v5-table" aria-label="月度资金收支汇总"><thead><tr><th>月份</th><th>资金入池</th><th>资金支出</th><th>期末结余</th><th>查看报告</th></tr></thead>
+    <tbody>{workerDemoMonths.map(m=><tr key={m.period}><th scope="row">{m.period.replace('-','年')+'月'}</th><td>{workerDemoCurrency(m.received)}</td><td>{workerDemoCurrency(m.spent)}</td><td>{workerDemoCurrency(m.closing)}</td><td><Link to={'/transparency/reports?period='+encodeURIComponent(m.period)}>查看明细 <ArrowRight size={14}/></Link></td></tr>)}</tbody></table></div>
+  </section>
+  <p className="hhba-v5-slim-note">资金池的来源、支出和结余与企业经营收入是不同的统计口径；个人身份与原始付款凭据不直接公开。</p>
  </TransparencyFrame>;
 }
