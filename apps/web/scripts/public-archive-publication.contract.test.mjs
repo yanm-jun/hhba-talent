@@ -77,18 +77,41 @@ test('publication migration stores no demonstration data and gates release',()=>
  assert.doesNotMatch(schema,/INSERT INTO|HHBA-DEMO-00[1-9]|111350|111,350/i);
 });
 
-test('invalid report period falls back to latest publication and new pages preserve official separation',()=>{
+test('official and demo data use separate sources and legacy links remain compatible',()=>{
  const report=read('src/pages/TransparencyReportsPage.tsx');
  const cases=read('src/pages/TransparencyCasesPage.tsx');
  const funds=read('src/pages/TransparencyFundsPage.tsx');
  const overview=read('src/pages/TransparencyPage.tsx');
+ const demo=read('src/pages/transparencyDemoData.ts');
  assert.match(report,/selectedReport\|\|reports\[0\]\|\|null/);
  assert.match(report,/url\.searchParams\.delete\('period'\)/);
- assert.match(report,/if\(loading\|\|error\|\|!selected\|\|selectedReport\)return/);
+ assert.match(cases,/OfficialTransparencyCasesPage/);
+ assert.match(funds,/OfficialTransparencyFundsPage/);
  assert.match(cases,/fetch\(endpoint,\{cache:'no-store'\}\)/);
  assert.match(funds,/fetch\(endpoint\('\/ledger'\)/);
- assert.match(cases,/暂无通过公开审核的真实案例/);
- assert.match(funds,/逐笔资金公开数据库尚未启用/);
- assert.match(overview,/<h1>责任与透明<\/h1>/);
- assert.doesNotMatch(overview+cases+funds+report,/HHBA-DEMO-OUT-|111350|111,350/);
+ assert.match(overview,/workerDemoTotals\.balance/);
+ assert.match(demo,/workerDemoCases/);
+ assert.match(demo,/workerDemoMonths/);
+ assert.match(overview,/financial-allocation/);
+ assert.doesNotMatch(read('d1/0021_worker_public_archive.sql'),/HHBA-DEMO-00[1-9]/);
+});
+
+test('public fund reports expose no company operating revenue or profit even when database contains them',async()=>{
+ const published={period:'2026-10',revision:2,published_at:'2026-11-21T02:00:00Z',
+  corrected_at:null,status:'published',published_json:JSON.stringify({
+   revenueFen:999900,refundFen:2000,aiCostFen:33000,netResultFen:700000,
+   distributableProfitFen:200000,companyAllocationFen:120000,
+   openingPoolFen:10000,poolAccrualFen:80000,poolReceivedFen:80000,
+   poolSpentFen:2500,closingPoolFen:87500,beneficiaries:2,
+   basisNote:'CONFIDENTIAL-OPERATING-FIGURES',poolNote:'PRIVATE-NOTES',isAudited:false
+  })};
+ const db={prepare(){return {all:async()=>({results:[published]}),bind(){return {first:async()=>published};}};}};
+ for(const route of ['/api/transparency/reports','/api/transparency/report?period=2026-10','/api/transparency/report?period=2026-10&revision=2']){
+  const response=await archiveApi({request:request(route),env:{HHBA_TRANSPARENCY_DB:db}});
+  assert.equal(response.status,200,route);
+  const content=await response.text();
+  for(const privateValue of ['999900','700000','200000','120000','CONFIDENTIAL-OPERATING-FIGURES','PRIVATE-NOTES','revenueFen','distributableProfitFen','companyAllocationFen','netResultFen'])assert.ok(!content.includes(privateValue),'Leaked financial value '+privateValue);
+  assert.match(content,/poolReceivedFen/);
+  assert.match(content,/87500/);
+ }
 });
