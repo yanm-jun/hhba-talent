@@ -1,4 +1,4 @@
-import {type FormEvent,useEffect,useState} from 'react';
+import {type FormEvent,type ReactNode,useEffect,useState} from 'react';
 import {ArrowRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,History,LockKeyhole,LogOut,MousePointerClick,Scale,Search,ShieldCheck,SlidersHorizontal,UserRound,ChartNoAxesCombined} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
@@ -17,7 +17,8 @@ import '../styles/personal-center.css';
 import '../styles/demo-account.css';
 import '../styles/career-refresh.css';
 
-type Section='overview'|'profile'|'preferences'|'resume'|'applications'|'privacy'|'saved'|'apply-assistant'|'career';
+type EmbeddedSection='match'|'rights'|'legal-aid'|'legal-aid-intervention'|'legal-aid-topic';
+type Section='overview'|'profile'|'preferences'|'resume'|'applications'|'privacy'|'saved'|'apply-assistant'|'career'|EmbeddedSection;
 type RecordRow={record:SavedJob;job:LiveJob|null};
 const pages:{id:Section;label:string;icon:typeof UserRound;description:string}[]=[
  {id:'overview',label:'工作台',icon:Compass,description:'了解你的职业探索进度'},
@@ -49,9 +50,23 @@ const navGroups=[
  ]}
 ] as const;
 function matchDate(raw:string){const time=Date.parse(raw);return Number.isFinite(time)?new Date(time).toLocaleDateString('zh-CN'):'时间待确认';}
-function routeFor(id:Section){return id==='overview'?'/candidate/account':id==='saved'?'/candidate/saved':'/candidate/account/'+id;}
-export function PersonalCenterPage({user,onlySaved=false,section='overview',onLogout}:{user:User|null;onlySaved?:boolean;section?:Section;onLogout:()=>Promise<void>}){
+function routeFor(id:Section,legalAidSlug=''){
+ if(id==='overview')return '/candidate/account';
+ if(id==='saved')return '/candidate/saved';
+ if(id==='match')return '/candidate/match';
+ if(id==='rights')return '/candidate/account/rights';
+ if(id==='legal-aid')return '/candidate/account/legal-aid';
+ if(id==='legal-aid-intervention')return '/candidate/account/legal-aid/intervention';
+ if(id==='legal-aid-topic')return '/candidate/account/legal-aid/'+legalAidSlug;
+ return '/candidate/account/'+id;
+}
+export function PersonalCenterPage({user,onlySaved=false,section='overview',onLogout,externalSections,activePath,legalAidSlug=''}:{user:User|null;onlySaved?:boolean;section?:Section;onLogout:()=>Promise<void>;externalSections?:Partial<Record<EmbeddedSection,ReactNode>>;activePath?:string;legalAidSlug?:string}){
  const current:Section=onlySaved?'saved':section;
+ const [visitedSections,setVisitedSections]=useState<Set<Section>>(()=>new Set([current]));
+ useEffect(()=>{setVisitedSections(previous=>previous.has(current)?previous:new Set([...previous,current]));},[current]);
+ const hasVisited=(id:Section)=>visitedSections.has(id)||current===id;
+ const activeRoute=activePath||routeFor(current,legalAidSlug);
+ const navActive=(path:string)=>activeRoute===path||(path==='/candidate/account/legal-aid'&&(current==='legal-aid-intervention'||current==='legal-aid-topic'));
  const [account,setAccount]=useState<CandidateWorkspaceProfile|null>(null),[profileLoading,setProfileLoading]=useState(true);
  const displayName=account?.display_name||user?.display_name||'求职者';
  const [rows,setRows]=useState<RecordRow[]>([]),[savedCount,setSavedCount]=useState(0);
@@ -169,7 +184,8 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
  }
  const areaLabels:Record<AccountArea,string>={general:'一般访问',jobs:'岗位浏览',companies:'企业资料',policies:'人才政策',tools:'求职工具',job_save:'岗位收藏操作'};
  const trackingPrevented=typeof navigator!=='undefined'&&(navigator.doNotTrack==='1'||(navigator as Navigator & {globalPrivacyControl?:boolean}).globalPrivacyControl===true);
- const sectionTitle=current==='apply-assistant'?'一键网申':pages.find(page=>page.id===current)?.label||'个人中心';
+ const embeddedTitles:Partial<Record<EmbeddedSection,string>>={match:'智能岗位匹配',rights:'会员与权益服务','legal-aid':'劳动权益知识','legal-aid-intervention':'劳动权益知识','legal-aid-topic':'劳动权益知识'};
+ const sectionTitle=current==='apply-assistant'?'一键网申':embeddedTitles[current as EmbeddedSection]||pages.find(page=>page.id===current)?.label||'个人中心';
  if(!user?.account_types?.includes('candidate'))return <Shell user={user}><section className="hhba-personal"><p role="status">请先使用真实求职者账号登录。</p><Link to="/candidate/login">前往登录</Link></section></Shell>;
  return <Shell user={user}>
  <section className="hhba-personal hhba-account-page hhba-career-revamp">
@@ -191,7 +207,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
     {navGroups.map(group=><div className="hhba-account-nav-group" key={group.title}>
      <h2>{group.title}</h2>
      {group.items.map(item=><Link key={item.path} to={item.path}
-       className={routeFor(current)===item.path?'active':''} aria-current={routeFor(current)===item.path?'page':undefined}>
+       className={navActive(item.path)?'active':''} aria-current={navActive(item.path)?'page':undefined}>
       <item.Icon size={17}/><span>{item.label}</span><ArrowRight size={14} className="hhba-account-chevron"/>
      </Link>)}
     </div>)}
@@ -230,7 +246,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
      </div>
      <p className="hhba-career-record-notice">独立的任职经历、工作成果和阶段性更新记录尚在规划中；目前不将求职偏好当作实际工作经历，也不会生成虚假职业记录。</p>
     </section>}
-    {current==='apply-assistant'&&<ApplyAssistantProduct userId={user?.id}/>}
+    {hasVisited('apply-assistant')&&<div className="hhba-account-cached-stage" aria-hidden={current!=='apply-assistant'} style={{display:current==='apply-assistant'?'block':'none'}}><ApplyAssistantProduct userId={user?.id}/></div>}
     {current==='saved'&&<section className="hhba-account-panel">
       <div className="hhba-account-section-heading"><div><h2>我的收藏</h2><p>只展示来自真实职位索引的收藏记录。下架职位不会被伪装成仍在招聘。</p></div><Link to="/candidate/jobs">搜索更多 <ArrowRight size={15}/></Link></div>
       {error&&<p className="hhba-personal-error" role="alert">{error}</p>}
@@ -264,8 +280,8 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
       <div className="hhba-account-form-actions"><button type="submit" disabled={!account||busy==='preferences'}>{busy==='preferences'?'保存中…':'保存求职偏好'}</button><small>重新登录后仍可读取</small></div>
      </form>}{notice&&<p className="hhba-account-notice" role="status">{notice}</p>}
     </section>}
-    {current==='resume'&&<PrivateResumeVault/>}
-    {current==='applications'&&<CandidateMatchHistory/>}
+    {hasVisited('resume')&&<div className="hhba-account-cached-stage" aria-hidden={current!=='resume'} style={{display:current==='resume'?'block':'none'}}><PrivateResumeVault/></div>}
+    {hasVisited('applications')&&<div className="hhba-account-cached-stage" aria-hidden={current!=='applications'} style={{display:current==='applications'?'block':'none'}}><CandidateMatchHistory/></div>}
     {current==='privacy'&&<section className="hhba-account-panel">
      <div className="hhba-account-section-heading"><div><h2>账户与隐私</h2><p>查看账户安全、数据使用说明和历史记录清理。</p></div></div>
      <div className="hhba-account-privacy-row"><div><strong><ChartNoAxesCombined size={18}/>运营数据的使用范围</strong>
@@ -296,6 +312,13 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
      <div className="hhba-account-privacy-row"><div><strong><LockKeyhole size={18}/>账户安全</strong><p>只有当前登录用户可读取其个人资料与收藏。</p></div><span className="hhba-account-chip">真实账户</span></div>
      <div className="hhba-account-privacy-row"><div><strong><LogOut size={18}/>安全退出</strong><p>仅撤销当前会话，不删除账户资料。</p></div><button type="button" className="hhba-account-danger" onClick={()=>void onLogout()}>退出登录</button></div>
     </section>}
+    {externalSections&&Object.entries(externalSections).map(([rawKey,element])=>{
+     const key=rawKey as EmbeddedSection;
+     const inactive=current!==key;
+     if(!hasVisited(key))return null;
+     return <div key={key} className="hhba-account-external-stage" aria-hidden={inactive}
+       style={{display:inactive?'none':'block'}}>{element}</div>;
+    })}
 
    </div>
   </div>
