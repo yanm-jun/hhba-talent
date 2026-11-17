@@ -6,6 +6,7 @@ import {assessFinanceRegister,prepareFinanceAssistant,getFinanceAssistantSnapsho
 import {onRequestGet as getAssistant,onRequestPost as postAssistant} from '../functions/admin-preview/api/finance-ai.js';
 import {onRequestPost as scheduled} from '../functions/admin-preview/api/finance-ai-cron.js';
 import cronWorker from '../ops/finance-ai-review-scheduler.mjs';
+import inferenceWorker from '../ops/finance-ai-inference-worker.mjs';
 const read=p=>readFileSync(new URL(p,import.meta.url),'utf8');
 const month='2026-10';
 const actor='finance-owner@example.test';
@@ -147,4 +148,56 @@ test('AI finance remains embedded in existing admin, uses plain text, never has 
  assert.match(core,/suggestedExpenseFields:fieldTotals/);
  assert.doesNotMatch(core,/publishReviewed|hhba_fin_reports|HHBA_FIN_SEND_ENABLED/);
  assert.doesNotMatch(js,/innerHTML\s*\+=/);
+});
+
+
+
+test('isolated finance AI Worker rejects public unauthenticated access and sensitive payloads',async()=>{
+ const url='https://finance-ai.internal/v1/review';
+ const secret='c'.repeat(96);
+ const env={HHBA_FIN_AI_SERVICE_TOKEN:secret,AI:{async run(model,req){
+  assert.equal(model,'@cf/openai/gpt-oss-20b');
+  const s=JSON.stringify(req);
+  assert.doesNotMatch(s,/phone|email|evidenceRef|PrivateInvoiceABC123|CustomerPaymentPrivateABC/);
+  return {response:'请补齐实际账单，并核对冲销与税费凭证。'};
+ }}};
+ const request=(data,token=secret)=>new Request(url,{
+  method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+  body:JSON.stringify(data)
+ });
+ const input={period:'2026-10',entryCount:5,voidedCount:1,unclassifiedExpenses:1,
+  alertCodes:['NO_PROVIDER_RECONCILIATION','STATUTORY_PROFIT_UNKNOWN'],
+  categoryCoverage:['aiCostFen','infrastructureFen']};
+ assert.equal((await inferenceWorker.fetch(new Request(url),env)).status,404);
+ assert.equal((await inferenceWorker.fetch(request(input,'wrong'),env)).status,403);
+ assert.equal((await inferenceWorker.fetch(request({...input,evidenceRef:'PrivateInvoiceABC123'}),env)).status,400);
+ assert.equal((await inferenceWorker.fetch(request({...input,entryCount:1000}),env)).status,400);
+ const accepted=await inferenceWorker.fetch(request(input),env);
+ assert.equal(accepted.status,200);
+ const json=await accepted.json();
+ assert.equal(json.ok,true);
+ assert.match(json.response,/账单/);
+});
+test('finance assistant calls encrypted service binding with only redacted aggregate, no external API key',async()=>{
+ const store=kv();
+ const requests=[];
+ const env={HHBA_FIN_AI_ENABLED:'1',HHBA_FIN_AI_SERVICE_TOKEN:'d'.repeat(96),
+  HHBA_FIN_AI_SERVICE:{async fetch(url,opts){
+   assert.equal(url,'https://finance-ai.internal/v1/review');
+   assert.equal(opts.headers.Authorization,'Bearer '+'d'.repeat(96));
+   const data=JSON.parse(opts.body);
+   assert.ok(!('evidenceRef' in data));
+   assert.ok(!('amountFen' in data));
+   assert.ok(!('phone' in data));
+   requests.push(data);
+   return new Response(JSON.stringify({ok:true,response:'核对合同与实际支付账单。'}),{status:200});
+  }}};
+ const result=await prepareFinanceAssistant(store,env,month,{mode:'cron',at:new Date('2026-11-18T08:00:00Z')});
+ assert.equal(result.model.state,'completed');
+ assert.equal(result.canPublish,false);
+ assert.equal(requests.length,1);
+ assert.equal(store.puts.length,1);
+ const repeat=await prepareFinanceAssistant(store,env,month,{mode:'cron',at:new Date('2026-11-19T08:00:00Z')});
+ assert.equal(repeat.cached,true);
+ assert.equal(requests.length,1);
 });

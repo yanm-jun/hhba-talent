@@ -27,7 +27,7 @@ export async function onRequestGet({request,env}){
  try{
   const item=await getFinanceAssistantSnapshot(a.kv,month);
   return json({ok:true,found:!!item,report:item||null,
-   modelConfigured:!!env.HHBA_FIN_AI?.run,
+   modelConfigured:!!env.HHBA_FIN_AI?.run||!!env.HHBA_FIN_AI_SERVICE?.fetch,
    modelEnabled:env.HHBA_FIN_AI_ENABLED==='1',
    dailyAutomationEnabled:env.HHBA_FIN_AI_AUTO_ENABLED==='1',
    modelName:financeAiModelName});
