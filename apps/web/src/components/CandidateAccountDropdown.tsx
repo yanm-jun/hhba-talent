@@ -1,5 +1,5 @@
 import {useEffect,useId,useRef,useState} from 'react';
-import {Bookmark,ChevronDown,ChevronRight,ClipboardList,FileUser,LayoutDashboard,Scale,ShieldCheck,SlidersHorizontal,UserRound} from 'lucide-react';
+import {Bookmark,BriefcaseBusiness,ChevronDown,ChevronRight,ClipboardList,FileUser,LayoutDashboard,MousePointerClick,Scale,Search,ShieldCheck,SlidersHorizontal,UserRound} from 'lucide-react';
 import {Link} from '../router';
 import '../styles/candidate-account-dropdown.css';
 
@@ -7,13 +7,16 @@ import '../styles/candidate-account-dropdown.css';
 // Existing paths remain available. Membership is a clearly labeled, non-collecting preview.
 export const CANDIDATE_ACCOUNT_LINKS=[
  {label:'工作台',path:'/candidate/account',Icon:LayoutDashboard},
- {label:'我的收藏',path:'/candidate/saved',Icon:Bookmark},
- {label:'个人资料',path:'/candidate/account/profile',Icon:UserRound},
- {label:'求职偏好',path:'/candidate/account/preferences',Icon:SlidersHorizontal},
+ {label:'智能岗位匹配',path:'/candidate/match',Icon:Search},
  {label:'我的简历',path:'/candidate/account/resume',Icon:FileUser},
+ {label:'我的收藏',path:'/candidate/saved',Icon:Bookmark},
  {label:'匹配历史',path:'/candidate/account/applications',Icon:ClipboardList},
- {label:'职场权益中心',path:'/candidate/account/rights',Icon:ShieldCheck,description:'¥24.90/月 · 尚未开放购买'},
- {label:'劳动权益知识',path:'/candidate/account/legal-aid',Icon:Scale,description:'免费知识专题'}
+ {label:'一键网申',path:'/candidate/account/apply-assistant',Icon:MousePointerClick},
+ {label:'职业成长档案',path:'/candidate/account/career',Icon:BriefcaseBusiness},
+ {label:'会员与权益服务',path:'/candidate/account/rights',Icon:ShieldCheck,description:'服务筹备中'},
+ {label:'劳动权益知识',path:'/candidate/account/legal-aid',Icon:Scale,description:'免费知识专题'},
+ {label:'个人资料',path:'/candidate/account/profile',Icon:UserRound},
+ {label:'求职偏好',path:'/candidate/account/preferences',Icon:SlidersHorizontal}
 ] as const;
 
 export function CandidateAccountDropdown({displayName}:{displayName?:string}){

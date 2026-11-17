@@ -7,15 +7,16 @@ const product=read('../src/components/ApplyAssistantProduct.tsx');
 const service=read('../src/services/applyCredits.ts');
 const css=read('../src/styles/demo-account.css');
 const entry=read('../src/main.tsx');
-test('personal workbench has exactly four cards, preserves original data and adds helper link',()=>{
- const block=page.split('<div className="hhba-account-stat-grid">')[1]?.split('</div>')[0];
- assert.ok(block);
- assert.equal((block.match(/<Link to=/g)||[]).length,4);
- assert.ok(block.includes('已收藏岗位')&&block.includes('AI 匹配历史')&&block.includes('我的简历'));
- assert.ok(block.includes('to="/candidate/account/apply-assistant"'));
- assert.ok(block.includes('一键网申'));
- assert.ok(block.includes('¥0.30'));
- assert.ok(block.includes('savedCount')&&block.includes('resumeCount'));
+test('minimal workbench keeps true resume, saved jobs and matching history',()=>{
+ assert.match(page,/hhba-workbench-overview/);
+ assert.match(page,/resumeCount/);
+ assert.match(page,/savedCount/);
+ assert.match(page,/historyCount/);
+ assert.match(page,/latestMatch/);
+ assert.match(page,/href|to="\/candidate\/match"/);
+ assert.doesNotMatch(page,/hhba-account-stat-grid|hhba-career-membership|hhba:career-stage:/);
+ assert.ok(page.includes("label:'一键网申'"),'apply assistant remains in the grouped navigation');
+ assert.ok(page.includes("to=\"/candidate/account/rights\""));
 });
 test('new link routes to an installation guide and keeps privacy safety disclaimers',()=>{
  assert.ok(entry.includes('privacy|apply-assistant'));
@@ -28,9 +29,12 @@ test('new link routes to an installation guide and keeps privacy safety disclaim
  assert.ok(product.includes('产品演示视频'));
  assert.ok(service.includes("'/api/apply'"));
 });
-test('desktop is four columns; mobile is two columns',()=>{
- assert.ok(css.includes('grid-template-columns:repeat(4,minmax(0,1fr))'));
- assert.ok(css.includes('@media(max-width:620px){.hhba-account-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}'));
+test('original account styling stays available while workbench uses compact cards',()=>{
+ const theme=read('../src/styles/career-refresh.css');
+ assert.match(theme,/\.hhba-workbench-profile-links/);
+ assert.match(theme,/\.hhba-workbench-rights-main/);
+ assert.match(theme,/@media\(max-width:620px\)/);
+ assert.ok(css.includes('.hhba-account-tool-grid'),'original account subpages remain styled');
 });
 test('download archive is an actual ZIP containing extension sources',()=>{
  const zip=readFileSync(new URL('../public/downloads/hhba-apply-assistant-v0.2.zip',import.meta.url));
