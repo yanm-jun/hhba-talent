@@ -1,7 +1,7 @@
 // HHBA finance model inference: isolated Cloudflare Worker + Workers AI binding.
 // This is NOT an accounting/payment/publication API.
 // Public access fails without a dedicated encrypted service secret.
-const MODEL='@cf/openai/gpt-oss-20b';
+const MODEL='@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const allowedAlerts=new Set([
  'POSSIBLE_DUPLICATE_EVIDENCE','NO_ORIGINAL_ENTRIES','UNCLASSIFIED_EXPENSES',
  'NO_PROVIDER_RECONCILIATION','INCOMPLETE_INCOME_COVERAGE','STATUTORY_PROFIT_UNKNOWN'
