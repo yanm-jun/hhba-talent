@@ -1,6 +1,5 @@
 import {useEffect,useMemo,useState} from 'react';
 import {ArrowLeft,ArrowRight,ArrowUpRight,BarChart3,CheckCircle2,ChevronDown,ChevronLeft,ChevronRight,Landmark,LockKeyhole,Search,ShieldCheck,X} from 'lucide-react';
-import {hhbaLogoUrl} from '../components/BrandMark';
 import {Shell} from '../components/Shell';
 import {Link} from '../router';
 import type {User} from '../services/api';
@@ -145,10 +144,9 @@ export function AidArchiveDemoPage({user}:{user:User|null}){
    <div className="hhba-a2-demo" role="note"><ShieldCheck size={16}/><span><b>模拟演示页面</b> · 本页资金、案件、收入和结果均为虚构数据，仅供设计验收，不代表 HHBA 实际业务。</span></div>
    <header className="hhba-a2-hero">
     <div className="hhba-a2-hero-main">
-     <div className="hhba-a2-brand"><img src={hhbaLogoUrl} width={36} height={36} alt="HHBA 官方品牌标志"/><span><b>HHBA 汇方职场</b><small>PUBLIC TRANSPARENCY</small></span></div>
      <span className="hhba-a2-eyebrow">PUBLIC TRANSPARENCY / 责任与透明</span>
-     <h1>让每一次帮扶，<br/><em>都有迹可循。</em></h1>
-     <p>我们希望不仅公开资金去向，更完整记录受理、处理和支持结果。每一份责任，都应经得起查阅。</p>
+     <h1>让每一次帮扶，<em>都有迹可循。</em></h1>
+     <p>资金去向、受理记录、处理过程和帮扶结果，公开可查。</p>
     </div>
    </header>
    <div className="hhba-a2-brandline" aria-hidden="true"><span/><span/></div>
