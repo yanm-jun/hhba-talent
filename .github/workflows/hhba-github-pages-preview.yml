@@ -93,20 +93,36 @@ jobs:
       - name: Import source-backed Schneider Electric complete wordmark
         run: |
           python - <<'PY'
-          import pathlib, re, urllib.request, xml.etree.ElementTree as ET
+          import pathlib, re, urllib.request, urllib.error, xml.etree.ElementTree as ET
           url='https://upload.wikimedia.org/wikipedia/commons/9/95/Schneider_Electric_2007.svg'
-          request=urllib.request.Request(url,headers={'User-Agent':'HHBA-Brand-Reference/1.0 (static enterprise identification)'})
-          with urllib.request.urlopen(request,timeout=45) as resp:
-              svg=resp.read(100000)
-          text=svg.decode('utf-8-sig')
-          assert 8000<len(svg)<60000 and '<svg' in text and '</svg>' in text,'Full Schneider Electric wordmark missing'
-          assert not re.search(r'<script|<foreignObject|onload\s*=|onerror\s*=|javascript:',text,re.I),'Unsafe SVG'
-          tree=ET.fromstring(svg)
-          assert tree.tag.endswith('svg')
           target=pathlib.Path('apps/web/public/images/autumn-real-logos/cn-autumn-002.svg')
-          target.parent.mkdir(parents=True,exist_ok=True)
-          target.write_bytes(svg)
-          print('SCHNEIDER_SOURCE_BACKED_WORDMARK_READY',len(svg))
+          def check_svg(data,full_wordmark):
+              text=data.decode('utf-8-sig')
+              assert '<svg' in text and '</svg>' in text,'Schneider SVG missing'
+              assert not re.search(r'<script|<foreignObject|onload\s*=|onerror\s*=|javascript:',text,re.I),'Unsafe SVG'
+              tree=ET.fromstring(text)
+              assert tree.tag.endswith('svg'),'Schneider SVG root missing'
+              if full_wordmark:
+                  assert 8000<len(data)<60000,'Full Schneider wordmark size invalid'
+              else:
+                  assert 500<=len(data)<60000 and '<title>Schneider Electric</title>' in text, 'Verified local Schneider icon missing'
+          request=urllib.request.Request(url,headers={'User-Agent':'HHBA-Brand-Reference/1.0 (static enterprise identification)'})
+          try:
+              with urllib.request.urlopen(request,timeout=30) as resp:
+                  svg=resp.read(100000)
+          except (urllib.error.URLError, TimeoutError) as exc:
+              # Wikimedia rate limits must not take down unrelated HHBA pages.
+              # This tracked fallback is a Schneider Electric icon, NOT the full 2007 wordmark.
+              if not target.is_file():
+                  raise SystemExit('SCHNEIDER_OFFICIAL_SOURCE_UNAVAILABLE_AND_NO_LOCAL_ICON') from exc
+              cached=target.read_bytes()
+              check_svg(cached,False)
+              print('SCHNEIDER_VERIFIED_LOCAL_ICON_FALLBACK',len(cached),type(exc).__name__)
+          else:
+              check_svg(svg,True)
+              target.parent.mkdir(parents=True,exist_ok=True)
+              target.write_bytes(svg)
+              print('SCHNEIDER_SOURCE_BACKED_WORDMARK_READY',len(svg),url)
           PY
       - uses: actions/setup-node@v4
         with:

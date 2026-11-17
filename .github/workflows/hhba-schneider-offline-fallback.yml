@@ -1,0 +1,25 @@
+name: HHBA Schneider logo offline build fallback
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-github-pages-preview.yml'
+      - 'apps/web/public/images/autumn-real-logos/cn-autumn-002.svg'
+      - 'apps/web/scripts/test_schneider_logo_fallback.py'
+      - '.github/workflows/hhba-schneider-offline-fallback.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check-schneider-fallback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify source logo identity survives Wikimedia 429
+        run: |
+          python -m pip install --quiet pyyaml
+          python apps/web/scripts/test_schneider_logo_fallback.py
