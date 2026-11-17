@@ -29,6 +29,8 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - name: Install and build the personal portal
         working-directory: apps/web
+        env:
+          VITE_HHBA_REAL_AUTH_ENABLED: '1'
         run: |
           npm ci --no-audit --no-fund
           npm run build
