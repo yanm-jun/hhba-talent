@@ -122,14 +122,16 @@ test('previously excessive hero cards are replaced by a compact note and full co
 });
 
 test('one personal account exposes career stages and an honestly non-live workplace rights preview',()=>{
- const auth=read('../src/pages/AuthChoicePage.tsx');
+ const auth=read('../src/pages/PhoneAuthPage.tsx');
  const personal=read('../src/pages/PersonalCenterPage.tsx');
  const rights=read('../src/pages/WorkplaceRightsPage.tsx');
  const dropdown=read('../src/components/CandidateAccountDropdown.tsx');
  const main=read('../src/main.tsx');
  const config=JSON.parse(read('../src/data/homepagePublicConfig.json'));
- assert.match(auth,/我是个人用户/);
- assert.match(auth,/我是招聘方/);
+ assert.match(auth,/hhba-unified-auth/);
+ assert.match(auth,/欢迎来到汇方职场/);
+ assert.match(main,/if\(route==='\/auth'\)return <PhoneAuthPage/);
+ assert.doesNotMatch(main,/return <AuthChoicePage/);
  assert.match(personal,/正在求职/);
  assert.match(personal,/已经入职/);
  assert.match(personal,/hhba:career-stage:/);
