@@ -135,7 +135,14 @@ export async function prepareFinanceAssistant(kv,env,period,{mode='manual',at=ne
  const digest=await fingerprint(ledger);
  const previous=await getFinanceAssistantSnapshot(kv,period);
  // Avoid duplicate generation and repeated AI calls, including daily Cron.
- if(previous?.fingerprint===digest)return {...previous,cached:true};
+ // A previously disabled/unbound model is not permanently cached after a
+ // binding becomes available. Protect transient model failures from tight loops.
+ const aiReady=env.HHBA_FIN_AI_ENABLED==='1'&&typeof env.HHBA_FIN_AI?.run==='function';
+ const modelIncomplete=previous?.model?.state!=='completed';
+ const elapsed=at.getTime()-Date.parse(previous?.generatedAt||'1970-01-01');
+ const shouldRetry=aiReady&&assessment.recorded.entryCount>0&&
+  modelIncomplete&&Number.isFinite(elapsed)&&elapsed>=3600000;
+ if(previous?.fingerprint===digest&&!shouldRetry)return {...previous,cached:true};
  const modelResult=await explainWithAi(env,assessment);
  const result={...assessment,model:modelResult,generatedAt:at.toISOString(),
   fingerprint:digest,sourceEventCount:ledger.eventsCount,
