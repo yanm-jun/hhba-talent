@@ -5,6 +5,9 @@ on:
       - "apps/admin-preview/command-center.js"
       - "apps/admin-preview/command-center.css"
       - "apps/admin-preview/index.html"
+      - "apps/admin-preview/finance-ai.js"
+      - "apps/admin-preview/finance-ai.css"
+      - "apps/web/scripts/finance-ai-assistant.contract.test.mjs"
       - "apps/web/functions/admin-preview/api/command-center.js"
       - "apps/web/scripts/admin-operating-cockpit.contract.test.mjs"
       - "apps/web/scripts/build-standalone-admin.py"
@@ -27,6 +30,11 @@ jobs:
           node --check apps/admin-preview/command-center.js
           node --check apps/web/functions/admin-preview/api/command-center.js
           node --test apps/web/scripts/admin-operating-cockpit.contract.test.mjs
+          node --check apps/admin-preview/finance-ai.js
+          node --check apps/web/functions/_lib/finance-ai-assistant.js
+          node --check apps/web/functions/admin-preview/api/finance-ai.js
+          node --check apps/web/functions/admin-preview/api/finance-ai-cron.js
+          node --test apps/web/scripts/finance-ai-assistant.contract.test.mjs
       - name: Build the existing password-protected admin site only
         env:
           CF_PAGES_BRANCH: feat/admin-password-console-20261112
@@ -34,6 +42,8 @@ jobs:
           python3 apps/web/scripts/build-standalone-admin.py
           test -s apps/web/dist/admin-preview/command-center.js
           test -s apps/web/dist/admin-preview/command-center.css
+          test -s apps/web/dist/admin-preview/finance-ai.js
+          test -s apps/web/dist/admin-preview/finance-ai.css
           grep -q './command-center.js' apps/web/dist/admin-preview/index.html
           grep -q './command-center.css' apps/web/dist/admin-preview/index.html
           grep -q 'hhba-command-center' apps/web/dist/admin-preview/index.html
