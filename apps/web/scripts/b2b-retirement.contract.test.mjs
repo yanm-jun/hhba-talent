@@ -51,6 +51,11 @@ test('official employer sources are still C-end resources, not recruitment clien
  assert.ok(shell.includes('to="/candidate/jobs"'));
  assert.ok(market.includes('to="/companies"'));
  assert.doesNotMatch(market,/to="\/candidate\/employer-jobs"/);
+ const search=read('services/siteSearchIndex.ts');
+ assert.doesNotMatch(search,/path:'\/employer\//);
+ assert.doesNotMatch(search,/title:'企业服务与治理'/);
+ assert.match(search,/path:'\/companies\/discover'/);
+ assert.match(search,/path:'\/companies\/library'/);
  const work=read('pages/WorkspacePage.tsx');
  assert.doesNotMatch(work,/to="\/employer"/);
  assert.match(work,/to="\/candidate\/account\/rights"/);
