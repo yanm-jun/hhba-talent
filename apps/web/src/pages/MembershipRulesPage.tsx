@@ -190,7 +190,7 @@ export function MembershipRulesPage({user}:{user:User|null}){
        <ShieldAlert size={18} aria-hidden="true"/>
        <div>
         <h3>请在购买前充分了解</h3>
-        <p><strong>当前是公开说明草案，不是生效合同。</strong>会员购买、连续扣费、法律案件申请及律所委托均未开放。19.90元/月、连续缴费六期、最长36个月是规划方向；服务次数、律师费用、退款细则及适用争议范围仍需在正式开售前确定。</p>
+        <p><strong>当前是公开说明草案，不是生效合同。</strong>会员购买、连续扣费、法律案件申请及律所委托均未开放。24.90元/月、连续缴费六期、最长36个月是规划方向；服务次数、律师费用、退款细则及适用争议范围仍需在正式开售前确定。</p>
         <p><strong>不得把列出的服务直接理解为已获得的权益。</strong>浏览本页不会产生付款、律师委托或对法定权利的放弃。正式销售必须提供依法有效的协议、重大条款提示及必要授权。</p>
        </div>
       </div>
@@ -209,7 +209,7 @@ export function MembershipRulesPage({user}:{user:User|null}){
      </section>
 
      <div className="hhba-rules-document-overview" aria-label="公开规划摘要">
-      <span>规划月费：<b>¥19.90</b></span>
+      <span>规划月费：<b>¥24.90</b></span>
       <span>进阶资格方向：<b>连续6期</b></span>
       <span>最长服务周期：<b>36个月</b></span>
       <span>可分配利润原则：<b>60 / 40</b></span>

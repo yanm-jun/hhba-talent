@@ -1,5 +1,5 @@
 import {type FormEvent,useEffect,useState} from 'react';
-import {ArrowRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,LockKeyhole,LogOut,MousePointerClick,Scale,ShieldCheck,SlidersHorizontal,UserRound,ChartNoAxesCombined} from 'lucide-react';
+import {ArrowRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,LockKeyhole,LogOut,MousePointerClick,Scale,ShieldCheck,SlidersHorizontal,UserRound,ChartNoAxesCombined,GraduationCap,Building2,ClipboardCheck,FolderOpen,CalendarCheck2} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import {getJob,localizedCompany,localizedLocation,localizedTitle,type LiveJob} from '../services/liveRecruitment';
@@ -15,6 +15,7 @@ import {listPrivateResumes,privateResumeAvailable} from '../services/privateResu
 import '../styles/personal-center.css';
 // Preserve the existing workbench layout styles while deleting the obsolete demo identity logic.
 import '../styles/demo-account.css';
+import '../styles/career-refresh.css';
 
 type Section='overview'|'profile'|'preferences'|'resume'|'applications'|'privacy'|'saved'|'apply-assistant';
 type RecordRow={record:SavedJob;job:LiveJob|null};
@@ -46,6 +47,16 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
  const [nickname,setNickname]=useState(''),[headline,setHeadline]=useState(''),[city,setCity]=useState(''),[intro,setIntro]=useState(''),[skills,setSkills]=useState('');
  const [role,setRole]=useState(''),[targetCity,setTargetCity]=useState(''),[mode,setMode]=useState<'不限'|'远程'|'现场'|'混合办公'>('不限');
  const [notice,setNotice]=useState('');
+ const [careerStage,setCareerStage]=useState<'seeking'|'working'>('seeking');
+ useEffect(()=>{
+  if(!user?.id)return;
+  try{setCareerStage(window.localStorage.getItem('hhba:career-stage:'+user.id)==='working'?'working':'seeking');}
+  catch{setCareerStage('seeking');}
+ },[user?.id]);
+ const selectCareerStage=(stage:'seeking'|'working')=>{
+  setCareerStage(stage);
+  if(user?.id){try{window.localStorage.setItem('hhba:career-stage:'+user.id,stage)}catch{/* Browser preference is optional. */}}
+ };
  useEffect(()=>{
   if(!user?.account_types?.includes('candidate'))navigate('/candidate/login');
  },[user?.id]);
@@ -150,27 +161,59 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
  const sectionTitle=current==='apply-assistant'?'一键网申':pages.find(page=>page.id===current)?.label||'个人中心';
  if(!user?.account_types?.includes('candidate'))return <Shell user={user}><section className="hhba-personal"><p role="status">请先使用真实求职者账号登录。</p><Link to="/candidate/login">前往登录</Link></section></Shell>;
  return <Shell user={user}>
- <section className="hhba-personal hhba-account-page">
+ <section className="hhba-personal hhba-account-page hhba-career-revamp">
   <nav className="hhba-personal-trail"><Link to="/">首页</Link><span>/</span><Link to="/candidate">求职中心</Link><span>/</span><strong>{sectionTitle}</strong></nav>
   <header className="hhba-account-header">
    <div className="hhba-account-avatar"><UserRound size={28}/></div>
-   <div className="hhba-account-identity"><span className="hhba-account-eyebrow">汇方职场 · MY CAREER SPACE</span>
-    <h1>{displayName}，欢迎回来</h1><p>{account?.headline||'把每一份职业机会都整理好，找到更适合自己的方向。'}</p>
-    <span className="hhba-account-chip">真实求职者账户 · {account?'资料已连接':profileLoading?'读取中':'资料连接待确认'}</span>
+   <div className="hhba-account-identity"><span className="hhba-account-eyebrow">汇方职场 · YOUR CAREER, CONTINUED</span>
+    <h1>{displayName}，欢迎回来</h1><p>{account?.headline||'从寻找机会，到进入企业与持续成长，你的职业记录都在这里。'}</p>
+    <span className="hhba-account-chip">个人账户 · {account?'资料已连接':profileLoading?'读取中':'资料连接待确认'}</span>
    </div>
    {user&&<button className="hhba-account-exit" type="button" onClick={()=>void onLogout()}><LogOut size={15}/>退出登录</button>}
   </header>
   <div className="hhba-account-grid">
    <aside className="hhba-account-sidebar" aria-label="个人中心导航">
-    <p>我的空间</p>
+    <p>我的职业空间</p>
     {pages.map(page=><Link key={page.id} to={routeFor(page.id)} className={page.id===current?'active':''} aria-current={page.id===current?'page':undefined}>
       <page.icon size={17}/><span>{page.label}</span><ArrowRight size={14} className="hhba-account-chevron"/>
     </Link>)}
-    <Link to="/candidate/account/legal-aid"><Scale size={17}/><span>法律援助</span><ArrowRight size={14} className="hhba-account-chevron"/></Link>
+    <Link to="/candidate/account/rights"><ShieldCheck size={17}/><span>职场权益中心</span><ArrowRight size={14} className="hhba-account-chevron"/></Link>
+    <Link to="/candidate/account/legal-aid"><Scale size={17}/><span>劳动权益知识</span><ArrowRight size={14} className="hhba-account-chevron"/></Link>
    </aside>
    <div className="hhba-account-content">
     {current==='overview'&&<>
-      <div className="hhba-account-section-heading"><div><h2>个人工作台</h2><p>你的职业探索，从这里开始。</p></div><Link to="/candidate/jobs">探索职位 <ArrowRight size={15}/></Link></div>
+      <div className="hhba-career-switch" aria-label="职业阶段显示偏好">
+       <div className="hhba-career-switch-copy"><strong>你目前处于哪个职业阶段？</strong><small>随时切换展示重点；仅在本设备记住偏好，不影响账号、简历或会员资格。</small></div>
+       <div className="hhba-career-switch-buttons">
+        <button type="button" aria-pressed={careerStage==='seeking'} onClick={()=>selectCareerStage('seeking')}><GraduationCap size={16}/>正在求职</button>
+        <button type="button" aria-pressed={careerStage==='working'} onClick={()=>selectCareerStage('working')}><BriefcaseBusiness size={16}/>已经入职</button>
+       </div>
+      </div>
+      <section className="hhba-career-hero" aria-labelledby="career-home-title">
+       <div>
+        <span className="hhba-career-kicker"><ShieldCheck size={15}/> HHBA · CAREER & RIGHTS</span>
+        <h2 id="career-home-title">{careerStage==='working'?'进入职场以后，HHBA 继续与你同行。':'从找到好工作，到安心开启职业生活。'}</h2>
+        <p>{careerStage==='working'?'已经入职？可以继续完善职业档案、了解企业公开风险信息，以及规划未来的职场权益服务。':'继续使用官方岗位搜索、AI 匹配和个人简历；找到工作后，无需注册新账号，也能继续使用职业成长与权益服务。'}</p>
+        <div className="hhba-career-hero-actions">
+         <Link className="hhba-career-primary" to={careerStage==='working'?'/candidate/account/rights':'/candidate/jobs'}>{careerStage==='working'?'了解职场权益服务':'继续探索真实岗位'} <ArrowRight size={16}/></Link>
+         <Link className="hhba-career-text-link" to={careerStage==='working'?'/candidate/account/resume':'/candidate/account/rights'}>{careerStage==='working'?'维护我的职业档案':'了解入职后的权益服务'} <ArrowRight size={15}/></Link>
+        </div>
+       </div>
+       <aside className="hhba-career-membership">
+        <span>规划中的职业与劳动权益支持会员</span>
+        <strong>¥24.90<small> / 月</small></strong>
+        <p>面向毕业三年内、符合企业准入条件的年轻劳动者。按月服务、最长36个月；当前尚未开放购买或案件受理。</p>
+        <Link to="/candidate/account/rights">查看月度服务与资格说明 <ArrowRight size={15}/></Link>
+       </aside>
+      </section>
+      <div className="hhba-career-section-heading"><div><h3>{careerStage==='working'?'在职阶段 · 计划中的月度服务':'未来入职 · 了解权益支持'}</h3><p>将求职、职业成长与劳动权益支持连接起来；服务尚未开放时如实标注。</p></div><Link to="/candidate/account/rights">查看详情 <ArrowRight size={14}/></Link></div>
+      <div className="hhba-career-feature-grid">
+       <article className="hhba-career-feature-card"><span className="hhba-career-feature-icon"><Building2 size={19}/></span><strong>任职企业公开信息</strong><p>了解企业公开信用与劳动相关处罚信息，按月追踪重要变化。</p><small>月度监测规划中</small></article>
+       <article className="hhba-career-feature-card"><span className="hhba-career-feature-icon"><ClipboardCheck size={19}/></span><strong>个人劳动权益核对</strong><p>根据本人授权资料核对合同、工资、工时和社保，缺失信息不虚构。</p><small>月度检查规划中</small></article>
+       <article className="hhba-career-feature-card"><span className="hhba-career-feature-icon"><FolderOpen size={19}/></span><strong>职业成长档案</strong><p>保存职业经历与工作成果，和原有私有简历管理衔接。</p><small>现有简历功能可使用</small></article>
+      </div>
+      <p className="hhba-career-notice"><CalendarCheck2 size={14} style={{verticalAlign:'middle',marginRight:6}}/>职场权益会员、月度报告和人工法律服务尚未开放。此页面不会显示虚假的付费状态、已完成报告或案件数量。</p>
+      <div className="hhba-account-section-heading"><div><h2>我的求职工具</h2><p>原有收藏、AI 匹配历史、私有简历与一键网申全部保留。</p></div><Link to="/candidate/jobs">探索岗位 <ArrowRight size={15}/></Link></div>
       <div className="hhba-account-stat-grid">
        <Link to="/candidate/saved"><Bookmark size={21}/><span>已收藏岗位</span><strong>{!savedAvailable?'—':loading?'…':error?'—':savedCount}</strong><small>真实账户专属收藏</small></Link>
        <Link to="/candidate/account/applications"><BriefcaseBusiness size={21}/><span>AI 匹配历史</span><strong>{historyCount===null?'—':historyCount}</strong><small>{newOpportunityCount>0?'最近一次新增 '+newOpportunityCount+' 个未推荐岗位':'保存真实推荐 · 不等于已投递'}</small></Link>
@@ -182,9 +225,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
         {pages.filter(x=>['profile','preferences','resume','privacy'].includes(x.id)).map(x=><Link to={routeFor(x.id)} key={x.id} className="hhba-account-tool-card"><x.icon size={20} className="hhba-account-tool-icon"/><span className="hhba-account-tool-copy"><strong>{x.label}</strong><small>{x.description}</small></span><ArrowRight size={15} className="hhba-account-tool-arrow"/></Link>)}
        </div>
       </section>
-      <section className="hhba-account-panel"><div className="hhba-account-section-heading"><div><h3>真实招聘市场</h3><p>收藏后返回这里查看，企业岗位是否仍在招以官网为准。</p></div><Link to="/candidate/jobs">查看全部岗位 <ArrowRight size={15}/></Link></div>
-        {error?<p role="alert">{error}</p>:<p>收藏按当前已登录账户隔离，匿名设备记录不会自动合并。</p>}
-      </section>
+      {error&&<p className="hhba-personal-error" role="alert">{error}</p>}
     </>}
     {current==='apply-assistant'&&<ApplyAssistantProduct userId={user?.id}/>}
     {current==='saved'&&<section className="hhba-account-panel">
