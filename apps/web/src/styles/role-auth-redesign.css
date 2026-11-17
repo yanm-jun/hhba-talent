@@ -297,7 +297,9 @@
  .hhba-auth-v2-milestone small{font-size:10px}
  .hhba-auth-v2-editorial-signature{padding-top:16px;font-size:10px}
  .hhba-auth-v2-signature-en{display:none}
- .hhba-auth-v2-panel{padding:29px 22px 25px}
+ .hhba-auth-v2-panel{padding:26px 22px 23px;order:-1}
+ .hhba-auth-v2-editorial{order:1}
+ .hhba-auth-v2-panel-header{margin:18px 0 18px}
  .hhba-auth-v2-panel-header{margin:20px 0 21px}
  .hhba-auth-v2-panel-header h2{font-size:25px}
  .hhba-auth-v2-choices{grid-template-columns:1fr;gap:11px}
