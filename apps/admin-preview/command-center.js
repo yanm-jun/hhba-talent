@@ -7,6 +7,7 @@ const formatCount=n=>isCount(n)?num.format(n):'—';
 const formatMoney=n=>Number.isSafeInteger(n)?amount.format(n/100):'—';
 const ns='http://www.w3.org/2000/svg';
 let selectedDays=30,busy=false,sequence=0;
+let lastPVSeries=null,pvDetail=false;
 
 function element(tag,attributes={},value){
  const e=document.createElementNS(ns,tag);
@@ -22,67 +23,211 @@ function empty(id,text){
  const p=document.createElement('p');p.className='hhba-cc-graph-empty';p.textContent=text;
  root.append(p);
 }
-function drawLine(id,values,{suffix='',digits=0,secondary=null}={}){
- const root=q(id);root.replaceChildren();
- if(!Array.isArray(values)||values.length===0||!values.some(x=>Number.isFinite(x?.value))){
-  empty(id,'无可核验的历史数据；不会补造趋势');return;
+// Keep the vertical scale honest: count charts must never display 0,0,1,1.
+// For published money, allow decimals and negative operating results.
+function niceTicks(low,high,digits=0){
+ if(low===0&&high===0)return {ticks:[0],low:-1,high:1,zeroOnly:true};
+ const raw=Math.max(0.00000001,(high-low)/4);
+ const pow=Math.pow(10,Math.floor(Math.log10(raw)));
+ let step=([1,2,2.5,5,10].find(v=>v*pow>=raw)||10)*pow;
+ if(digits===0)step=Math.max(1,step);
+ if(digits>0)step=Math.max(0.01,step);
+ let first=Math.floor(low/step)*step,last=Math.ceil(high/step)*step;
+ // Bound SVG gridlines, including when money has negative values.
+ while(Math.round((last-first)/step)>7){
+  step*=2;first=Math.floor(low/step)*step;last=Math.ceil(high/step)*step;
  }
- const W=680,H=210,pad={left:55,right:18,top:20,bottom:33};
+ const n=Math.max(1,Math.min(8,Math.round((last-first)/step)));
+ const ticks=Array.from({length:n+1},(_,i)=>Number((first+i*step).toFixed(8)));
+ return {ticks,low:first,high:last,zeroOnly:false};
+}
+function numberLabel(n,digits=0){
+ return new Intl.NumberFormat('zh-CN',{
+  minimumFractionDigits:0,maximumFractionDigits:digits?2:0
+ }).format(n);
+}
+function fullDate(label){
+ if(/^\d{4}-\d{2}-\d{2}$/.test(label))
+  return label.slice(0,4)+'年'+label.slice(5,7)+'月'+label.slice(8,10)+'日 · UTC';
+ if(/^\d{4}-\d{2}$/.test(label))
+  return label.slice(0,4)+'年'+label.slice(5,7)+'月';
+ return String(label);
+}
+function showNumber(value,digits,unit){
+ if(!Number.isFinite(value))return '未采集';
+ return digits>0?'¥'+numberLabel(value,2):numberLabel(value)+' '+unit;
+}
+function drawLine(id,values,{suffix='',digits=0,secondary=null,unit='次',scale='linear'}={}){
+ const root=q(id);
+ root.replaceChildren();
+ if(!Array.isArray(values)||!values.length||!values.some(v=>Number.isFinite(v?.value))){
+  empty(id,'尚无已核验的历史记录。缺失不等于零。');return;
+ }
+ const W=680,H=220,pad={left:58,right:17,top:19,bottom:34};
  const usableW=W-pad.left-pad.right,usableH=H-pad.top-pad.bottom;
- const measured=values.map(x=>Number.isFinite(x?.value)?x.value:null);
+ const measured=values.map(v=>Number.isFinite(v?.value)?v.value:null);
  const companion=Array.isArray(secondary)&&secondary.length===values.length?
-  secondary.map(x=>Number.isFinite(x?.value)?x.value:null):null;
- const eligible=[...measured,...(companion||[])].filter(x=>x!==null);
- const min=Math.min(0,...eligible);
- const max=Math.max(1,...eligible);
- const range=max-min||1;
+  secondary.map(v=>Number.isFinite(v?.value)?v.value:null):null;
+ const eligible=[...measured,...(companion||[])].filter(v=>v!==null);
+ const lo=Math.min(0,...eligible),hi=Math.max(0,...eligible);
+ const bounds=niceTicks(lo,hi,digits);
+ const transform=v=>scale==='sqrt'&&digits===0?Math.sign(v)*Math.sqrt(Math.abs(v)):v;
+ const tLo=transform(bounds.low),tHi=transform(bounds.high);
+ const tRange=tHi-tLo||1;
  const x=i=>pad.left+(values.length===1?usableW/2:usableW*i/(values.length-1));
- const y=v=>pad.top+(max-v)*usableH/range;
- const svg=element('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'真实业务数据趋势，不展示缺失日期的数据',preserveAspectRatio:'xMidYMid meet'});
- const g=element('g');
- for(let i=0;i<=3;i++){
-  const v=min+range*i/3,yy=y(v);
-  g.append(element('line',{x1:pad.left,y1:yy,x2:W-pad.right,y2:yy,stroke:'#e4ece8','stroke-dasharray':'3 4'}));
-  g.append(element('text',{x:pad.left-8,y:yy+4,'text-anchor':'end',fill:'#7b8e87','font-size':11},digits?String(v.toFixed(digits)):num.format(Math.round(v))));
+ const y=value=>pad.top+(tHi-transform(value))*usableH/tRange;
+ const svg=element('svg',{
+  viewBox:'0 0 '+W+' '+H,role:'img',tabindex:'0',
+  'aria-label':'真实历史数据交互曲线。鼠标移动或键盘左右方向键查看准确日期和数值；未采集日期不补零',
+  preserveAspectRatio:'xMidYMid meet'
+ });
+ const title=element('title',{},'历史趋势图 · '+values.length+'个日期，可用鼠标、触摸或方向键检查');
+ svg.append(title);
+ const grid=element('g');
+ for(const tick of bounds.ticks){
+  const yy=y(tick);
+  grid.append(element('line',{x1:pad.left,y1:yy,x2:W-pad.right,y2:yy,
+   stroke:tick===0?'#c4d6ca':'#e8efea','stroke-width':tick===0?1.2:1,
+   'stroke-dasharray':tick===0?'0':'3 4'}));
+  grid.append(element('text',{x:pad.left-9,y:yy+4,'text-anchor':'end',
+   fill:'#7b8e87','font-size':11},numberLabel(tick,digits)));
  }
- svg.append(g);
- const line=element('path',{fill:'none',stroke:'#237655','stroke-width':2.6,'stroke-linecap':'round','stroke-linejoin':'round'});
+ svg.append(grid);
  const makePath=series=>{
-  let path='',open=false;
+  let d='',open=false;
   for(let i=0;i<series.length;i++){
    const v=series[i];
    if(v===null){open=false;continue}
-   path+=(open?' L':' M')+x(i).toFixed(2)+' '+y(v).toFixed(2);
+   d+=(open?' L':' M')+x(i).toFixed(2)+' '+y(v).toFixed(2);
    open=true;
   }
-  return path.trim();
+  return d.trim();
  };
- line.setAttribute('d',makePath(measured));svg.append(line);
+ // A light gradient adds depth without covering or fabricating data points.
+ const primary=element('path',{d:makePath(measured),fill:'none',
+  stroke:'#23815d','stroke-width':2.6,'stroke-linecap':'round','stroke-linejoin':'round'});
+ svg.append(primary);
  if(companion){
-  const secondLine=element('path',{d:makePath(companion),fill:'none',stroke:'#d18f45','stroke-width':2.4,'stroke-linecap':'round','stroke-linejoin':'round'});
-  svg.append(secondLine);
+  svg.append(element('path',{d:makePath(companion),fill:'none',
+   stroke:'#d18f45','stroke-width':2.4,'stroke-linecap':'round','stroke-linejoin':'round'}));
  }
  for(let i=0;i<measured.length;i++){
-  if(measured[i]===null)continue;
-  if(values.length<=32||i===values.length-1){
-   const c=element('circle',{cx:x(i),cy:y(measured[i]),r:values.length>32?2.3:3,fill:'#237655'});
-   c.append(element('title',{},values[i].label+'：'+(digits?measured[i].toFixed(digits):num.format(measured[i]))+suffix));
-   svg.append(c);
-  }
+  if(measured[i]===null||(values.length>32&&i!==values.length-1))continue;
+  const dot=element('circle',{cx:x(i),cy:y(measured[i]),r:values.length>32?2.5:3.2,
+   fill:'#fff',stroke:'#23815d','stroke-width':2});
+  dot.append(element('title',{},fullDate(values[i].label)+' · '+showNumber(measured[i],digits,unit)));
+  svg.append(dot);
  }
- const indices=[0,Math.floor((values.length-1)/2),values.length-1];
- for(const i of [...new Set(indices)]){
-  svg.append(element('text',{x:x(i),y:H-8,'text-anchor':i===0?'start':i===values.length-1?'end':'middle',fill:'#819089','font-size':11},values[i].label.slice(5)));
+ for(const i of [...new Set([0,Math.floor((values.length-1)/2),values.length-1])]){
+  svg.append(element('text',{x:x(i),y:H-8,
+   'text-anchor':i===0?'start':i===values.length-1?'end':'middle',
+   fill:'#819089','font-size':11},String(values[i].label).slice(5)));
  }
- root.append(svg);
+ const cursor=element('line',{x1:0,y1:pad.top,x2:0,y2:H-pad.bottom,
+  stroke:'#789b88','stroke-width':1.4,'stroke-dasharray':'4 4',visibility:'hidden'});
+ const horizontal=element('line',{x1:pad.left,y1:0,x2:W-pad.right,y2:0,
+  stroke:'#a4bcae','stroke-width':1,'stroke-dasharray':'2 4',visibility:'hidden'});
+ const primaryDot=element('circle',{r:5,fill:'#fff',stroke:'#23815d','stroke-width':2.8,visibility:'hidden'});
+ const secondaryDot=element('circle',{r:5,fill:'#fff',stroke:'#d18f45','stroke-width':2.8,visibility:'hidden'});
+ svg.append(cursor,horizontal,primaryDot,secondaryDot);
+ const stage=document.createElement('div');stage.className='hhba-cc-plot';
+ const tooltip=document.createElement('div');tooltip.className='hhba-cc-tooltip';
+ tooltip.id=id+'-tooltip';tooltip.setAttribute('role','status');tooltip.hidden=true;
+ svg.setAttribute('aria-describedby',tooltip.id);
+ stage.append(svg,tooltip);root.append(stage);
+ const show=i=>{
+  const index=Math.max(0,Math.min(values.length-1,i));
+  const v=measured[index],other=companion?.[index]??null;
+  cursor.setAttribute('x1',x(index));cursor.setAttribute('x2',x(index));
+  cursor.setAttribute('visibility','visible');
+  const mark=(dot,value)=>{
+   dot.setAttribute('visibility',value===null?'hidden':'visible');
+   if(value!==null){dot.setAttribute('cx',x(index));dot.setAttribute('cy',y(value));}
+  };
+  mark(primaryDot,v);
+  mark(secondaryDot,other);
+  const lineY=v!==null?y(v):other!==null?y(other):null;
+  horizontal.setAttribute('visibility',lineY===null?'hidden':'visible');
+  if(lineY!==null){horizontal.setAttribute('y1',lineY);horizontal.setAttribute('y2',lineY);}
+  tooltip.replaceChildren();
+  const date=document.createElement('strong');date.className='hhba-cc-tooltip-date';
+  date.textContent=fullDate(values[index].label);tooltip.append(date);
+  const addRow=(name,value,color)=>{
+   const row=document.createElement('div');row.className='hhba-cc-tooltip-row';
+   const label=document.createElement('span');label.className='hhba-cc-tooltip-label';
+   const dot=document.createElement('i');dot.className='hhba-cc-tooltip-dot';dot.style.backgroundColor=color;
+   label.append(dot,document.createTextNode(name));
+   const number=document.createElement('b');number.textContent=showNumber(value,digits,unit);
+   row.append(label,number);tooltip.append(row);
+  };
+  addRow(companion?'营业收入':'当日数据',v,'#23815d');
+  if(companion)addRow('经营结果',other,'#d18f45');
+  const rect=stage.getBoundingClientRect();
+  const boxW=Math.max(1,rect.width),boxH=Math.max(1,rect.height);
+  tooltip.style.left=Math.min(boxW-75,Math.max(75,(x(index)/W)*boxW))+'px';
+  tooltip.style.top=Math.max(102,Math.min(boxH-8,(lineY===null?pad.top+80:lineY)/H*boxH))+'px';
+  tooltip.hidden=false;
+ };
+ const hide=()=>{
+  tooltip.hidden=true;
+  cursor.setAttribute('visibility','hidden');
+  horizontal.setAttribute('visibility','hidden');
+  primaryDot.setAttribute('visibility','hidden');
+  secondaryDot.setAttribute('visibility','hidden');
+ };
+ const indexForPointer=event=>{
+  const rect=svg.getBoundingClientRect();
+  const px=(event.clientX-rect.left)/Math.max(1,rect.width)*W;
+  return values.length===1?0:Math.round((px-pad.left)/usableW*(values.length-1));
+ };
+ svg.addEventListener('pointermove',event=>show(indexForPointer(event)));
+ svg.addEventListener('pointerdown',event=>show(indexForPointer(event)));
+ svg.addEventListener('pointerleave',event=>{if(event.pointerType!=='touch')hide();});
+ let keyboardIndex=Math.max(0,measured.findLastIndex(v=>v!==null));
+ svg.addEventListener('focus',()=>show(keyboardIndex));
+ svg.addEventListener('blur',hide);
+ svg.addEventListener('keydown',event=>{
+  if(!['ArrowLeft','ArrowRight','Home','End','Escape'].includes(event.key))return;
+  event.preventDefault();
+  if(event.key==='Escape'){hide();return;}
+  if(event.key==='Home')keyboardIndex=0;
+  else if(event.key==='End')keyboardIndex=values.length-1;
+  else keyboardIndex=Math.max(0,Math.min(values.length-1,
+   keyboardIndex+(event.key==='ArrowRight'?1:-1)));
+  show(keyboardIndex);
+ });
  if(companion){
   const legend=document.createElement('p');legend.className='hhba-cc-finance-legend';
-  legend.textContent='● 营业收入（绿色）     ● 经营结果（橙色）';root.append(legend);
+  legend.textContent='● 营业收入（绿色）     ● 经营结果（橙色）';
+  root.append(legend);
  }
- const foot=document.createElement('p');
- foot.className='hhba-cc-chart-foot';
- const valid=measured.filter(v=>v!==null).length;
- foot.textContent='已核验 '+valid+' / '+values.length+' 个时间点'+(valid<values.length?' · 缺失日期不补零':'');
+ const valid=measured.filter(v=>v!==null);
+ const lastIndex=measured.findLastIndex(v=>v!==null);
+ const maxValue=Math.max(...valid);
+ const maxIndex=measured.findIndex(v=>v===maxValue);
+ const stats=document.createElement('div');stats.className='hhba-cc-chart-stats';
+ const metric=(label,value)=>{
+  const item=document.createElement('span');
+  const k=document.createElement('b');k.textContent=label+' ';
+  item.append(k,document.createTextNode(value));stats.append(item);
+ };
+ if(companion){
+  metric('已公布',valid.length+' 期');
+  metric('最新月报',fullDate(values[lastIndex].label));
+  if(Number.isFinite(measured[lastIndex]))metric('本期收入',showNumber(measured[lastIndex],digits,unit));
+ }else{
+  const sum=valid.reduce((a,v)=>a+v,0);
+  metric('区间合计',showNumber(sum,digits,unit));
+  metric('峰值',showNumber(maxValue,digits,unit)+' · '+fullDate(values[maxIndex].label).split(' · ')[0]);
+  metric('日均',numberLabel(sum/valid.length,2)+' '+unit);
+ }
+ root.append(stats);
+ const foot=document.createElement('p');foot.className='hhba-cc-chart-foot';
+ const count=valid.length;
+ foot.textContent='已核验 '+count+' / '+values.length+' 个时间点'+(count<values.length?' · 缺失日期不补零':'')
+  +(bounds.zeroOnly?' · 本区间均为已确认的 0':'')
+  +(scale==='sqrt'?' · 平方根刻度仅压缩高峰视觉高度，提示框始终为原始真实数值':'')
+  +' · 鼠标悬停、触摸或键盘方向键查看明细';
  root.append(foot);
 }
 function parseMetrics(result){
@@ -109,8 +254,13 @@ function parseMetrics(result){
   const map=(field)=>series.map(r=>({label:r.day,
    value:r.day>=collector&&isCount(r[field])?r[field]:null}));
   drawLine('cc-chart-search',map('searches'));
-  drawLine('cc-chart-pv',map('pv'));
+  lastPVSeries=map('pv');
+  const pvButton=q('cc-pv-detail');
+  if(pvButton)pvButton.disabled=false;
+  drawLine('cc-chart-pv',lastPVSeries,{scale:pvDetail?'sqrt':'linear'});
  }else{
+  lastPVSeries=null;
+  const pvButton=q('cc-pv-detail');if(pvButton)pvButton.disabled=true;
   empty('cc-chart-search','尚无可确认采集起点的搜索事件');
   empty('cc-chart-pv','尚无可确认采集起点的访问事件');
  }
@@ -198,6 +348,14 @@ document.querySelectorAll('[data-cc-days]').forEach(btn=>btn.addEventListener('c
  void load();
 }));
 q('cc-load')?.addEventListener('click',()=>void load());
+q('cc-pv-detail')?.addEventListener('click',()=>{
+ if(!lastPVSeries)return;
+ pvDetail=!pvDetail;
+ const button=q('cc-pv-detail');
+ button.setAttribute('aria-pressed',String(pvDetail));
+ button.textContent=pvDetail?'恢复线性刻度':'观察低值细节';
+ drawLine('cc-chart-pv',lastPVSeries,{scale:pvDetail?'sqrt':'linear'});
+});
 q('cc-open-finance')?.addEventListener('click',()=>{
  document.querySelector('[data-view="finance"]')?.click();
 });
