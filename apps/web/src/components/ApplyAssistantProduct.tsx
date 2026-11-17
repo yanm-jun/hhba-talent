@@ -23,7 +23,7 @@ function AlipayPaymentQR({value}:{value:string}){
   </svg>;
 }
 
-export function ApplyAssistantProduct({userId}:{userId:string|number|undefined}){
+export function ApplyAssistantProduct({userId,active=true}:{userId:string|number|undefined;active?:boolean}){
  const [selected,setSelected]=useState(10);
  const [config,setConfig]=useState<ApplyConfig|null>(null);
  const [wallet,setWallet]=useState<ApplyWallet|null>(null);
@@ -45,23 +45,24 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
  const packages=config?.packages?.length?config.packages:fallbackPackages;
  const choice=packages.find(p=>p.uses===selected)||packages[0];
  useEffect(()=>{
-  let active=true;
+  if(!active)return;
+  let mounted=true;setLoading(true);
   (async()=>{
    try{
     const data=await getApplyConfig();
-    if(!active)return;
+    if(!mounted)return;
     setConfig(data);
     if(applyAccountAvailable){
      const [nextWallet,nextOrders,nextTasks,nextRefunds]=await Promise.all([getApplyWallet(),getApplyOrders(),getApplyTasks(),listApplyRefundRequests()]);
-     if(!active)return;
+     if(!mounted)return;
      setWallet(nextWallet);setOrders(nextOrders);setTasks(nextTasks);setRefunds(nextRefunds);
-     if(data.pairingEnabled)try{const status=await getApplyPairStatus();if(active)setPairedDevices(status.connectedDevices)}catch{if(active)setPairNotice('暂时无法查询插件连接状态。')}
+     if(data.pairingEnabled)try{const status=await getApplyPairStatus();if(mounted)setPairedDevices(status.connectedDevices)}catch{if(mounted)setPairNotice('暂时无法查询插件连接状态。')}
     }
-   }catch(e){if(active)setNotice(e instanceof Error?e.message:'次数账户暂时不可用。')}
-   finally{if(active)setLoading(false)}
+   }catch(e){if(mounted)setNotice(e instanceof Error?e.message:'次数账户暂时不可用。')}
+   finally{if(mounted)setLoading(false)}
   })();
-  return()=>{active=false};
- },[userId]);
+  return()=>{mounted=false};
+ },[userId,active]);
  async function refresh(){
   if(!applyAccountAvailable)return;
   setBusy(true);setNotice('');
