@@ -102,8 +102,8 @@ with sync_playwright() as p:
             "/candidate/employer-jobs", "/candidate/my-applications"
         ]:
             page.goto(BASE + old_path, wait_until="domcontentloaded")
-            page.get_by_role("heading", name="企业招聘业务已停止提供").wait_for()
-            assert page.locator('a[href*="/candidate/jobs"]').count() >= 1
+            page.get_by_role("heading", name="页面不存在").wait_for()
+            assert page.get_by_text("企业招聘业务已停止提供").count() == 0
             assert page.locator('form[action*="/organizations"], form[action*="/recruiter"]').count() == 0
             no_horizontal_overflow(page, name + "-retired-" + old_path)
         page.screenshot(path=str(OUT / f"{name}-b2b-retired.png"), full_page=True, animations="disabled")
