@@ -16,7 +16,7 @@ const MAPPINGS=Object.freeze({
 const TTL_SECONDS=365*86400;
 const MAX_ROWS=50;
 const MAX_ASSISTANT_OUTPUT=1100;
-const model='@cf/openai/gpt-oss-20b';
+const model='@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const cnMonth=(date=new Date())=>new Intl.DateTimeFormat('sv-SE',{
  timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit'
 }).format(date);
