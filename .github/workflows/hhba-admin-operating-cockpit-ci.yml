@@ -1,0 +1,40 @@
+name: HHBA real operations cockpit acceptance
+on:
+  pull_request:
+    paths:
+      - "apps/admin-preview/command-center.js"
+      - "apps/admin-preview/command-center.css"
+      - "apps/admin-preview/index.html"
+      - "apps/web/functions/admin-preview/api/command-center.js"
+      - "apps/web/scripts/admin-operating-cockpit.contract.test.mjs"
+      - "apps/web/scripts/build-standalone-admin.py"
+      - ".github/workflows/hhba-admin-operating-cockpit-ci.yml"
+permissions:
+  contents: read
+jobs:
+  cockpit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate syntax and read-only finance / AI sources
+        run: |
+          node --check apps/admin-preview/command-center.js
+          node --check apps/web/functions/admin-preview/api/command-center.js
+          node --test apps/web/scripts/admin-operating-cockpit.contract.test.mjs
+      - name: Build the existing password-protected admin site only
+        env:
+          CF_PAGES_BRANCH: feat/admin-password-console-20261112
+        run: |
+          python3 apps/web/scripts/build-standalone-admin.py
+          test -s apps/web/dist/admin-preview/command-center.js
+          test -s apps/web/dist/admin-preview/command-center.css
+          grep -q './command-center.js' apps/web/dist/admin-preview/index.html
+          grep -q './command-center.css' apps/web/dist/admin-preview/index.html
+          grep -q 'hhba-command-center' apps/web/dist/admin-preview/index.html
+          test -s apps/web/dist/_routes.json
