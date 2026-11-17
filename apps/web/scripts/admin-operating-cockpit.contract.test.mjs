@@ -85,3 +85,25 @@ test('cockpit UI reuses the ONLY private admin and never invents revenue, succes
  assert.match(api,/quality:'not_connected'/);
  assert.match(css,/@media\(max-width:440px\)/);
 });
+
+
+test('authenticated admin landing page automatically reads source-backed KPIs exactly once and keeps user-triggered refresh',()=>{
+ const html=source('../../admin-preview/index.html');
+ const js=source('../../admin-preview/command-center.js');
+ assert.match(html,/id="cc-pv"/);
+ assert.match(html,/id="cc-job-views"/);
+ assert.match(html,/正在自动加载真实运营数据/);
+ assert.doesNotMatch(html,/尚未查询真实统计。为节省 Cloudflare D1/);
+ assert.match(js,/setValue\('cc-pv',formatCount\(tr.pv\)\)/);
+ assert.match(js,/setValue\('cc-job-views',formatCount\(tr.jobViews\)\)/);
+ assert.match(js,/if\(q\('hhba-command-center'\)\)void load\(\)/);
+ assert.match(js,/q\('cc-load'\)\?\.addEventListener\('click',\(\)=>void load\(\)\)/);
+ assert.match(js,/selectedDays=30/);
+ assert.match(js,/const \[metric,financial\]=await Promise\.allSettled/);
+ assert.match(js,/cache:'no-store',credentials:'same-origin'/);
+ assert.match(js,/const timeout=setTimeout\(\(\)=>ac\.abort\(\),20000\)/);
+ assert.doesNotMatch(js,/setInterval\(/,'No expensive repeated polling of D1');
+ const firstLoadIdx=js.indexOf("if(q('hhba-command-center'))void load()");
+ const fetchFunctionIdx=js.indexOf('async function load()');
+ assert.ok(firstLoadIdx>fetchFunctionIdx,'At initial module load the function must already exist');
+});
