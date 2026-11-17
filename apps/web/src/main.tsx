@@ -156,7 +156,7 @@ useEffect(()=>{
       else console.warn('Unable to restore real candidate session',e);}
    }
    if(employerApiReady){
-    try{const me=await api.me();if(mounted)setUser(me);}
+    try{const me=await api.me();if(mounted&&me.account_types?.includes('candidate'))setUser(me);}
     catch(e){if(!(e instanceof ApiError&&e.status===401))console.warn('Unable to restore session',e);}
    }
   }finally{if(mounted)setReady(true);}
