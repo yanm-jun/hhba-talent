@@ -1,5 +1,7 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {ArrowLeft,ArrowRight,Download,FileClock,FileText,Mail,ShieldCheck} from 'lucide-react';
+import {TransparencyFrame} from './TransparencyFrame';
+import {WORKER_ARCHIVE_DEMO_MODE,workerDemoMonths,workerDemoTotals,workerDemoCurrency,workerDemoLedger} from './transparencyDemoData';
 import {Shell} from '../components/Shell';
 import {Link} from '../router';
 import type {User} from '../services/api';
@@ -8,12 +10,8 @@ import '../styles/transparency-v5.css';
 
 type Report={
  period:string;revision:number;publishedAt:string;correctedAt:string|null;
- revenueFen:number;refundFen:number;aiCostFen:number;infrastructureFen:number;
- personnelFen:number;operationsFen:number;taxesFen:number;otherCostFen:number;
- adjustmentsFen:number;netResultFen:number;distributableProfitFen:number;
- companyAllocationFen:number;poolAccrualFen:number;openingPoolFen:number;
- poolReceivedFen:number;poolSpentFen:number;closingPoolFen:number;beneficiaries:number;
- basisNote:string;methodNote:string;poolNote:string;privacyReviewNote:string;isAudited:boolean;
+ openingPoolFen:number;poolAccrualFen:number;poolReceivedFen:number;poolSpentFen:number;closingPoolFen:number;
+ beneficiaries:number;isAudited:boolean;
 };
 type PublicSettings={ok:boolean;subscriptionEnabled:boolean;siteKey:string|null;configured:boolean};
 const yuan=(value:number)=>new Intl.NumberFormat('zh-CN',{style:'currency',currency:'CNY',minimumFractionDigits:2}).format(value/100);
@@ -22,19 +20,12 @@ const dateLabel=(period:string)=>period.replace('-', '年')+'月';
 const publicDate=(raw:string)=>new Date(raw).toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai'});
 const labelStatus=(report:Report)=>report.isAudited?'已标识审计，需核对证明':'内部编制，未经独立审计';
 
-const operations=[
- ['营业收入','revenueFen'],['退款及冲减','refundFen'],
- ['AI模型及调用成本','aiCostFen'],['服务器与存储','infrastructureFen'],
- ['人员成本','personnelFen'],['经营管理费用','operationsFen'],
- ['相关税费','taxesFen'],['其他成本费用','otherCostFen'],
- ['账务调整（可正负）','adjustmentsFen'],['本期经营结果','netResultFen']
-] as const;
 const poolOperations=[
  ['期初结余','openingPoolFen'],['本期计提','poolAccrualFen'],
  ['实际入池','poolReceivedFen'],['实际帮扶支出','poolSpentFen'],['期末结余','closingPoolFen']
 ] as const;
 
-export function TransparencyReportsPage({user}:{user:User|null}){
+function OfficialTransparencyReportsPage({user}:{user:User|null}){
  const [settings,setSettings]=useState<PublicSettings|null>(null);
  const [reports,setReports]=useState<Report[]>([]);
  const [loading,setLoading]=useState(true);
@@ -141,68 +132,60 @@ export function TransparencyReportsPage({user}:{user:User|null}){
    </div>
    <header className="hhba-v5-report-heading">
     <span className="hhba-fin-eyebrow">HHBA / FINANCIAL REPORTS</span>
-    <h1>月度财务报告</h1>
-    <p>仅展示经审核正式发布的经营报告。所有收支金额均来自原有财务公开接口；未发布的数据不会以模拟金额填充。</p>
+    <h1>月度帮扶资金报告</h1>
+    <p>只公开劳动者权益帮扶池的月度入池、支出与结余，不披露企业订单、营业收入、成本或内部利润。</p>
    </header>
    <section className="hhba-fin-report-section" aria-labelledby="fin-latest-title">
     <div className="hhba-fin-section-heading">
      <div>
       <span className="hhba-fin-section-index">03 / PUBLIC REPORT</span>
-      <h2 id="fin-latest-title">最新财务报告</h2>
-      <p>月度经营情况及劳动者权益帮扶资金收支。</p>
+      <h2 id="fin-latest-title">最新帮扶资金报告</h2>
+      <p>月度帮扶池资金变动及其公开依据。</p>
      </div>
      {available&&<button type="button" className="hhba-fin-print" onClick={()=>window.print()}><Download size={15} aria-hidden="true"/>打印或保存 PDF</button>}
     </div>
 
-    {loading?<div className="hhba-fin-empty" role="status">正在读取公开财务报告…</div>:
-     error?<div className="hhba-fin-empty" role="alert">财务公开数据暂时不可读取，请稍后重试。此时不展示未经核实的金额或报告状态。</div>:
+    {loading?<div className="hhba-fin-empty" role="status">正在读取已发布的帮扶资金报告…</div>:
+     error?<div className="hhba-fin-empty" role="alert">帮扶资金公开数据暂时不可读取，请稍后重试。此时不展示未经核实的金额或报告状态。</div>:
      !available?<div className="hhba-resp-empty-report" role="status">
       <div className="hhba-resp-empty-icon"><FileClock size={21} aria-hidden="true"/></div>
-      <div><strong>首期财务报告尚未发布</strong>
-       <p>完成真实账目核对、必要审批和隐私检查后，将在这里发布月度经营与劳动者权益帮扶收支。</p>
-       <small>未披露的数据不代表零收入、零支出或零帮扶。</small>
+      <div><strong>首期帮扶资金报告尚未发布</strong>
+       <p>完成真实账目核对、必要审批及隐私检查后，将在这里公开月度帮扶池收支。</p>
+       <small>未披露的数据不代表没有实际收支或帮扶。</small>
       </div>
       <span className="hhba-resp-awaiting">待发布</span>
      </div>:
           <div className="hhba-fin-report">
       <header className="hhba-fin-report-header">
        <div>
-        <span className="hhba-fin-report-type">HHBA MONTHLY OPERATING REPORT</span>
-        <h3>{dateLabel(available.period)}经营与劳动者权益帮扶报告</h3>
+        <span className="hhba-fin-report-type">HHBA WORKER SUPPORT FUND REPORT</span>
+        <h3>{dateLabel(available.period)}劳动者权益帮扶资金报告</h3>
         <p>公开日期：{publicDate(available.publishedAt)}　版本：V{available.revision}　审核属性：{labelStatus(available)}</p>
        </div>
        <span className="hhba-fin-report-state">已发布</span>
       </header>
-      <section className="hhba-fin-report-summary" aria-label="本期关键财务指标">
-       <h4>报告摘要</h4>
+      <section className="hhba-fin-report-summary" aria-label="本期帮扶池资金指标">
+       <h4>资金摘要</h4>
        <dl className="hhba-fin-kpis">
-        <div><dt>营业收入</dt><dd>{yuan(available.revenueFen)}</dd></div>
-        <div><dt>本期经营结果</dt><dd>{yuan(available.netResultFen)}</dd></div>
-        <div><dt>经确认的可分配利润</dt><dd>{yuan(available.distributableProfitFen)}</dd></div>
-        <div><dt>本期帮扶池计提</dt><dd>{yuan(available.poolAccrualFen)}</dd></div>
+        <div><dt>本期应计提</dt><dd>{yuan(available.poolAccrualFen)}</dd></div>
+        <div><dt>实际入池</dt><dd>{yuan(available.poolReceivedFen)}</dd></div>
+        <div><dt>本期支出</dt><dd>{yuan(available.poolSpentFen)}</dd></div>
+        <div><dt>期末结余</dt><dd>{yuan(available.closingPoolFen)}</dd></div>
        </dl>
       </section>
       <div className="hhba-fin-panels">
        <section>
-        <h4>一、经营收支明细</h4>
-        <table><tbody>{operations.map(([label,key])=><tr key={key}><th scope="row">{label}</th><td>{yuan(available[key])}</td></tr>)}</tbody></table>
-        <p>{available.methodNote}</p>
-       </section>
-       <section>
-        <h4>二、劳动者权益帮扶池</h4>
+        <h4>劳动者权益帮扶池月度收支明细</h4>
         <table><tbody>{poolOperations.map(([label,key])=><tr key={key}><th scope="row">{label}</th><td>{yuan(available[key])}</td></tr>)}
-         <tr><th scope="row">本期帮扶事项</th><td>{available.beneficiaries} 项</td></tr>
+         <tr><th scope="row">本期支持事项</th><td>{available.beneficiaries} 项</td></tr>
         </tbody></table>
-        <p>{available.poolNote}</p>
        </section>
       </div>
       <section className="hhba-fin-report-notes">
-       <h4>三、核算依据与披露说明</h4>
-       <p>{available.basisNote}</p>
-       <p>{available.privacyReviewNote}</p>
-       <p>企业分配部分：{yuan(available.companyAllocationFen)}；权益帮扶池计提：{yuan(available.poolAccrualFen)}。实际划拨与计提金额分别披露，不能混同。</p>
-       <p>{available.isAudited?'本报告标记具有审计确认，相关审计证明仍须单独核实。':'本报告由经营方编制、审核，未经独立财务审计。'}</p>
-       {available.correctedAt&&<p>本报告已有修订版本，原版本保留在历史披露记录中。</p>}
+       <h4>披露口径和审核属性</h4>
+       <p>“应计提”与“实际入池”分别核算，资金池余额并非企业经营收入。比例计算原则及用途审批规则请参阅公开制度。</p>
+       <p>{available.isAudited?'本期标记经审计，相关证明仍须核验。':'由经营方审核发布，未经独立财务审计。'}</p>
+       {available.correctedAt&&<p>本期报告存在修订记录，版本号与更正日期应保留可追溯信息。</p>}
       </section>
      </div>}
    </section>
@@ -234,20 +217,20 @@ export function TransparencyReportsPage({user}:{user:User|null}){
 
     </details>
     <details className="hhba-resp-disclosure-detail">
-     <summary><span><Mail size={18} aria-hidden="true"/>财务报告邮件订阅</span><span className="hhba-resp-detail-label">{settings?.subscriptionEnabled?'自愿订阅':'尚未开放'} <ArrowRight size={16} aria-hidden="true"/></span></summary>
+     <summary><span><Mail size={18} aria-hidden="true"/>帮扶资金报告邮件订阅</span><span className="hhba-resp-detail-label">{settings?.subscriptionEnabled?'自愿订阅':'尚未开放'} <ArrowRight size={16} aria-hidden="true"/></span></summary>
    <section className="hhba-fin-subscribe" aria-labelledby="fin-subscribe-title">
     <div className="hhba-fin-section-heading">
      <div>
       <span className="hhba-fin-section-index">04 / EMAIL UPDATES</span>
       <h2 id="fin-subscribe-title">财务报告邮件订阅</h2>
-      <p>自愿、免费订阅每月财务公开信息。</p>
+      <p>自愿、免费订阅每月帮扶资金公开信息。</p>
      </div>
     </div>
     <div className="hhba-fin-subscribe-body">
      <div className="hhba-fin-subscribe-description">
       <Mail size={22} aria-hidden="true"/>
-      <h3>每月21日 · 财务公开信</h3>
-      <p>完成邮箱验证后，如有审核通过并正式发布的上月经营报告，将向订阅者发送摘要与公开报告链接。</p>
+      <h3>每月21日 · 帮扶资金公开信</h3>
+      <p>完成邮箱验证后，如有审核通过并正式发布的上月帮扶资金报告，将向订阅者发送摘要与公开报告链接。</p>
       <p>未发布或未通过审核的报告不会生成邮件，也不会填充模拟经营数字。</p>
       <p className="hhba-fin-subtle">邮箱仅用于财务报告订阅，不与招聘营销邮件捆绑。可以随时通过邮件退订。</p>
      </div>
@@ -276,4 +259,47 @@ export function TransparencyReportsPage({user}:{user:User|null}){
    </footer>
   </div>
  </Shell>;
+}
+
+export function TransparencyReportsPage({user}:{user:User|null}){
+ return WORKER_ARCHIVE_DEMO_MODE?<DemoTransparencyReportsPage user={user}/>:<OfficialTransparencyReportsPage user={user}/>;
+}
+function DemoTransparencyReportsPage({user}:{user:User|null}){
+ const [selected,setSelected]=useState(()=>new URLSearchParams(window.location.search).get('period')||workerDemoMonths[0].period);
+ const [hovered,setHovered]=useState<number|null>(null);
+ const current=workerDemoMonths.find(m=>m.period===selected)||workerDemoMonths[0];
+ const points=workerDemoMonths.slice().reverse().map((m,i)=>({month:m.period,amount:m.closing,x:30+i*310,y:162-m.closing/Math.max(1,workerDemoTotals.received)*130}));
+ const path=points.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' ');
+ const pick=(period:string)=>{setSelected(period);const u=new URL(window.location.href);u.searchParams.set('period',period);window.history.replaceState(window.history.state,'',u.pathname+u.search+u.hash);};
+ return <TransparencyFrame user={user} section="月度帮扶资金报告" title="月度帮扶资金报告" description="按月查阅资金池的期初结余、当期入池、权益支持支出和期末结余，不展示公司经营账本。">
+  <section className="hhba-v5-content-section" aria-labelledby="fin-latest-title">
+   <div className="hhba-v5-section-label"><span>01 / MONTHLY FUND REPORT</span><h2 id="fin-latest-title">月度资金变动</h2><p>选择月份查看公开明细，汇总与资金收支档案来自同一份记录。</p></div>
+   <div className="hhba-v6-month-list" role="group" aria-label="选择月度报告">{workerDemoMonths.map(m=><button type="button" key={m.period} aria-pressed={current.period===m.period} onClick={()=>pick(m.period)}><span>{m.period.replace('-','年')+'月'} · 帮扶资金报告</span><ArrowRight size={16}/></button>)}</div>
+   <div className="hhba-v6-month-detail">
+    <h3>{current.period.replace('-','年')+'月'} · 资金明细</h3>
+    <dl>
+     <div><dt>期初结余</dt><dd>{workerDemoCurrency(current.opening)}</dd></div>
+     <div><dt>当月入池</dt><dd>{workerDemoCurrency(current.received)}</dd></div>
+     <div><dt>当月支出</dt><dd>{workerDemoCurrency(current.spent)}</dd></div>
+     <div><dt>期末结余</dt><dd>{workerDemoCurrency(current.closing)}</dd></div>
+    </dl>
+    <Link className="hhba-v5-text-link" to={'/transparency/funds'}>查询对应月份的逐笔资金收支 <ArrowRight size={15}/></Link>
+   </div>
+  </section>
+  <section className="hhba-v5-content-section" aria-labelledby="v6-fund-trend-title">
+   <div className="hhba-v5-section-label"><span>02 / FUND TREND</span><h2 id="v6-fund-trend-title">资金结余变化</h2><p>将月度期末结余连成曲线，可悬停查看每个月的余额。</p></div>
+   <div className="hhba-v6-chart"><svg viewBox="0 0 720 190" role="img" aria-label="月度资金结余趋势折线图">
+    <path d="M30 30H690 M30 96H690 M30 162H690" fill="none" stroke="#e4ebf4" strokeWidth="1"/>
+    <path d={path} fill="none" stroke="#176fdc" strokeWidth="3" strokeLinejoin="round"/>
+    {points.map((p,i)=><circle key={p.month} cx={p.x} cy={p.y} r={hovered===i?8:6} fill="#ff9b2f" stroke="#fff" strokeWidth="2" tabIndex={0} onMouseEnter={()=>setHovered(i)} onFocus={()=>setHovered(i)} onMouseLeave={()=>setHovered(null)}><title>{p.month} · {workerDemoCurrency(p.amount)}</title></circle>)}
+   </svg><div className="hhba-v6-chart-caption"><span>2026 年 9 月</span><strong>{hovered===null?'期末结余：'+workerDemoCurrency(workerDemoTotals.balance):points[hovered].month+' · '+workerDemoCurrency(points[hovered].amount)}</strong><span>2026 年 11 月</span></div></div>
+  </section>
+  <section className="hhba-v5-content-section" aria-labelledby="hhba-fin-history-title">
+   <div className="hhba-v5-section-label"><span>03 / FUND HISTORY</span><h2 id="hhba-fin-history-title">历史月份与资金档案</h2><p>每月数据按照同一口径归档。查看具体支出及相应案例，请进入收支档案。</p></div>
+   <div className="hhba-v5-table-scroll"><table className="hhba-v5-table" aria-label="月度帮扶资金历史报告">
+    <thead><tr><th>月份</th><th>当月入池</th><th>当月支出</th><th>期末结余</th></tr></thead>
+    <tbody>{workerDemoMonths.map(m=><tr key={m.period}><th scope="row">{m.period.replace('-','年')+'月'}</th><td>{workerDemoCurrency(m.received)}</td><td>{workerDemoCurrency(m.spent)}</td><td>{workerDemoCurrency(m.closing)}</td></tr>)}</tbody></table></div>
+  </section>
+  <section id="fin-subscribe-title" className="hhba-v5-content-section" aria-label="月度帮扶资金公开信"><h2>公开信与监督</h2><p>正式发布的资金报告可以通过公开档案持续查询；邮件订阅仍按实际服务启用状态开放。</p><Link className="hhba-v5-text-link" to="/transparency/rules">查看审核与公开制度 <ArrowRight size={15}/></Link></section>
+ </TransparencyFrame>;
 }
