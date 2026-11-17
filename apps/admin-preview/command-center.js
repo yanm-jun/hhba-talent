@@ -95,6 +95,8 @@ function parseMetrics(result){
  if(tr?.quality==='collected'){
   setValue('cc-searches',formatCount(tr.searches));
   setValue('cc-clicks',formatCount(tr.outboundClicks));
+  setValue('cc-pv',formatCount(tr.pv));
+  setValue('cc-job-views',formatCount(tr.jobViews));
  }
  if(acc?.quality==='collected'&&Array.isArray(acc.signupSeries)){
   drawLine('cc-chart-signups',acc.signupSeries.map(r=>({
@@ -163,7 +165,7 @@ async function load(){
  if(busy)return;
  busy=true;const requestId=++sequence;
  q('cc-load').disabled=true;setText('cc-state','正在读取受保护的真实统计……');
- for(const id of ['cc-registered','cc-signups','cc-searches','cc-clicks','cc-revenue','cc-profit','cc-ai-cost','cc-discoveries'])setValue(id,'—');
+ for(const id of ['cc-registered','cc-signups','cc-searches','cc-clicks','cc-pv','cc-job-views','cc-revenue','cc-profit','cc-ai-cost','cc-discoveries'])setValue(id,'—');
  const ac=new AbortController();const timeout=setTimeout(()=>ac.abort(),20000);
  try{
   const [metric,financial]=await Promise.allSettled([
@@ -193,9 +195,14 @@ document.querySelectorAll('[data-cc-days]').forEach(btn=>btn.addEventListener('c
  document.querySelectorAll('[data-cc-days]').forEach(x=>{
   const active=x===btn;x.classList.toggle('is-selected',active);x.setAttribute('aria-pressed',String(active));
  });
- setText('cc-state','已选择近 '+days+' 天；点击「读取真实统计」刷新数据。'); 
+ void load();
 }));
 q('cc-load')?.addEventListener('click',()=>void load());
 q('cc-open-finance')?.addEventListener('click',()=>{
  document.querySelector('[data-view="finance"]')?.click();
 });
+
+// The authenticated admin homepage must not open with eight placeholder values.
+// Exactly one bounded 30-day aggregate read runs at initial load; switching date
+// ranges or pressing Refresh is an explicit user action. No polling or background timer.
+if(q('hhba-command-center'))void load();
