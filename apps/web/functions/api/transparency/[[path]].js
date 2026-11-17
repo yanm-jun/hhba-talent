@@ -28,6 +28,53 @@ export async function onRequest({request,env}){
    siteKey:subscribeReady(env)?String(env.HHBA_FIN_TURNSTILE_SITE_KEY):null,
    configured:!!db});
  }
+ // Public-only, already redacted publication tables. Separate from private case intake.
+ // A missing schema is NOT evidence that no cases or payments ever occurred.
+ if(request.method==='GET'&&path==='/api/transparency/cases'){
+  if(!db)return json({ok:true,state:'not_ready',cases:[]});
+  try{
+   const result=await db.prepare(`SELECT id,title,category,case_stage,summary,process_summary,
+    outcome_summary,published_at,revised_at
+    FROM hhba_worker_public_cases
+    WHERE publication_state='published' AND consent_confirmed=1
+     AND fact_reviewed=1 AND privacy_reviewed=1
+     AND approved_by IS NOT NULL AND published_at IS NOT NULL
+    ORDER BY published_at DESC,id DESC LIMIT 60`).all();
+   return json({ok:true,state:'ready',cases:(result.results||[]).map(r=>({
+    id:r.id,title:r.title,category:r.category,stage:r.case_stage,
+    summary:r.summary,processSummary:r.process_summary,outcomeSummary:r.outcome_summary,
+    publishedAt:r.published_at,revisedAt:r.revised_at||null
+   }))});
+  }catch(error){
+   if(/no such table/i.test(String(error?.message||error)))return json({ok:true,state:'not_ready',cases:[]});
+   return failure('PUBLIC_CASES_UNAVAILABLE',503);
+  }
+ }
+ if(request.method==='GET'&&path==='/api/transparency/ledger'){
+  if(!db)return json({ok:true,state:'not_ready',entries:[]});
+  try{
+   const result=await db.prepare(`SELECT e.id,e.period,e.occurred_on,e.entry_kind,e.amount_fen,e.purpose_summary,
+      CASE WHEN c.publication_state='published' AND c.consent_confirmed=1
+       AND c.fact_reviewed=1 AND c.privacy_reviewed=1
+       AND c.approved_by IS NOT NULL AND c.published_at IS NOT NULL
+       THEN c.id ELSE NULL END AS public_case_id
+    FROM hhba_fin_public_entries e
+    JOIN hhba_fin_reports r ON r.period=e.period AND r.status='published'
+    LEFT JOIN hhba_worker_public_cases c ON c.id=e.public_case_id
+    WHERE e.publication_state='published' AND e.source_checked=1
+     AND e.privacy_reviewed=1 AND e.approved_by IS NOT NULL
+     AND e.published_at IS NOT NULL
+    ORDER BY e.occurred_on DESC,e.id DESC LIMIT 100`).all();
+   return json({ok:true,state:'ready',entries:(result.results||[]).map(r=>({
+    id:r.id,period:r.period,date:r.occurred_on,
+    kind:r.entry_kind,amountFen:r.amount_fen,
+    purpose:r.purpose_summary,caseId:r.public_case_id||null
+   }))});
+  }catch(error){
+   if(/no such table/i.test(String(error?.message||error)))return json({ok:true,state:'not_ready',entries:[]});
+   return failure('PUBLIC_LEDGER_UNAVAILABLE',503);
+  }
+ }
  if(request.method==='GET'&&path==='/api/transparency/reports'){
   if(!db)return json({ok:true,reports:[],reason:'NOT_CONFIGURED'});
   try{
