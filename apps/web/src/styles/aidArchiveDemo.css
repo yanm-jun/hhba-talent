@@ -504,3 +504,43 @@
  .hhba-a2-details{grid-template-columns:1fr;}
  .hhba-a2-pages{align-items:flex-start;}
 }
+
+
+/* V3.2 · six worker-rights classifications and distinct dossier narratives */
+.hhba-a2-category-panel{margin:21px 0 13px;display:flex;flex-direction:column;gap:12px}
+.hhba-a2-category-panel>span{font-size:11px;color:#6d7f97;font-weight:690;letter-spacing:.02em}
+.hhba-a2-category-panel>div{display:flex;flex-wrap:wrap;gap:8px}
+.hhba-a2-category-panel button{
+ display:inline-flex;align-items:center;gap:8px;white-space:nowrap;padding:9px 11px;
+ border:1px solid #e3e9f1;border-radius:6px;color:#516a89;font-size:11px;font-weight:570;
+ background:#fff;transition:background .16s,border-color .16s,color .16s
+}
+.hhba-a2-category-panel button:hover{border-color:#9bc5ff;background:#f8fbff;color:#1269db}
+.hhba-a2-category-panel button.active{border-color:#bad4fb;background:#eff6ff;color:#1165cd;font-weight:710}
+.hhba-a2-category-panel button small{font-size:10px;color:#9aa7b8;font-variant-numeric:tabular-nums}
+.hhba-a2-category-panel button.active small{color:#297fdd}
+.hhba-a2-case-tags{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0 20px}
+.hhba-a2-case-tags span{font-size:11px;color:#56799e;background:#f2f6fb;border:1px solid #e9eef5;border-radius:4px;padding:6px 9px}
+.hhba-a2-case-tags span:last-child{color:#a16c2f;background:#fff8ed;border-color:#f6e8d3}
+.hhba-a2-doc-section h4{font-size:13px;color:#2f4b6b;font-weight:700;margin:20px 0 9px}
+.hhba-a2-issue-list{list-style:none;margin:13px 0 18px;padding:0}
+.hhba-a2-issue-list li{display:flex;align-items:baseline;gap:14px;padding:12px 5px;border-bottom:1px solid #eff2f6;font-size:12px;line-height:1.8;color:#516b87}
+.hhba-a2-issue-list li>span{color:#1673ed;font-size:10px;font-weight:750;font-variant-numeric:tabular-nums}
+.hhba-a2-doc-list{list-style:none;padding:0!important;margin:13px 0 22px;border-top:1px solid #e9eef5}
+.hhba-a2-doc-list li{display:flex;align-items:flex-start;gap:13px;border-bottom:1px solid #e9eef5;padding:13px 2px}
+.hhba-a2-doc-list li span{font-size:10px;color:#2073d7;white-space:nowrap;padding-top:2px}
+.hhba-a2-doc-list li strong{font-size:12px;color:#2f4d6e;font-weight:650;flex:1}
+.hhba-a2-doc-list li small{font-size:10px;color:#9eaabd;text-align:right;min-width:120px}
+.hhba-a2-paper-hero .hhba-a2-hint b{color:#345b87}
+.hhba-a2-zero-expense{background:#f7f9fc;border:1px solid #edf0f6;border-radius:6px;padding:18px 19px;margin:14px 0}
+.hhba-a2-zero-expense strong{display:block;font-size:13px;color:#3b5978}
+.hhba-a2-zero-expense p{margin:7px 0 0;font-size:12px;color:#8193a6}
+.hhba-a2-paper .hhba-a2-doc-section>p{margin-bottom:12px}
+.hhba-a2-paper .hhba-a2-doc-section{scroll-margin-top:18px}
+@media(max-width:750px){
+ .hhba-a2-doc-list li{flex-wrap:wrap;column-gap:10px;row-gap:4px}
+ .hhba-a2-doc-list li strong{flex:1 1 calc(100% - 95px)}
+ .hhba-a2-doc-list li small{flex:0 0 100%;margin-left:74px;text-align:left}
+ .hhba-a2-category-panel>div{gap:6px}
+ .hhba-a2-category-panel button{padding:8px 9px;font-size:10px}
+}
