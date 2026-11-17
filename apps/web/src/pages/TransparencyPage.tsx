@@ -15,6 +15,11 @@ type Report={
  basisNote:string;methodNote:string;poolNote:string;privacyReviewNote:string;isAudited:boolean;
 };
 type PublicSettings={ok:boolean;subscriptionEnabled:boolean;siteKey:string|null;configured:boolean};
+type PublicArchiveState='loading'|'ready'|'not_ready'|'error';
+type PublicCase={id:string;title:string;category:string;stage:string;summary:string;processSummary:string;outcomeSummary:string;publishedAt:string;revisedAt:string|null};
+type PublicLedgerEntry={id:string;period:string;date:string;kind:'inflow'|'outflow';amountFen:number;purpose:string;caseId:string|null};
+const officialCategories=['全部类型','工资与薪酬','劳动合同与用工','工时休假','离职与补偿','社保与工伤','争议处理与证据'];
+
 const yuan=(value:number)=>new Intl.NumberFormat('zh-CN',{style:'currency',currency:'CNY',minimumFractionDigits:2}).format(value/100);
 const endpoint=(path:string)=>import.meta.env.BASE_URL+'api/transparency'+path;
 const dateLabel=(period:string)=>period.replace('-', '年')+'月';
@@ -39,6 +44,16 @@ export function TransparencyPage({user}:{user:User|null}){
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState(false);
  const [selected,setSelected]=useState<string|null>(new URLSearchParams(window.location.search).get('period'));
+ const [publicCases,setPublicCases]=useState<PublicCase[]>([]);
+ const [casesState,setCasesState]=useState<PublicArchiveState>('loading');
+ const [caseCategory,setCaseCategory]=useState('全部类型');
+ const [expandedCaseId,setExpandedCaseId]=useState<string|null>(null);
+ const [publishedLedger,setPublishedLedger]=useState<PublicLedgerEntry[]>([]);
+ const [ledgerState,setLedgerState]=useState<PublicArchiveState>('loading');
+ const [ledgerCaseId,setLedgerCaseId]=useState<string|null>(null);
+ const filteredCases=publicCases.filter(item=>caseCategory==='全部类型'||item.category===caseCategory);
+ const visibleEntries=publishedLedger.filter(item=>!ledgerCaseId||item.caseId===ledgerCaseId);
+
  const [email,setEmail]=useState('');
  const [consent,setConsent]=useState(false);
  const [captchaToken,setCaptchaToken]=useState('');
@@ -55,6 +70,35 @@ export function TransparencyPage({user}:{user:User|null}){
    if(!active)return;
    setSettings(config);setReports(Array.isArray(history.reports)?history.reports:[]);
   }).catch(()=>{if(active)setError(true);}).finally(()=>{if(active)setLoading(false);});
+  return()=>{active=false;};
+ },[]);
+
+ useEffect(()=>{
+  let active=true;
+  const loadCases=async()=>{
+   try{
+    const response=await fetch(endpoint('/cases'),{cache:'no-store'});
+    if(!response.ok)throw new Error('CASES_READ_FAILED');
+    const data=await response.json() as {ok?:boolean;state?:string;cases?:PublicCase[]};
+    if(!active)return;
+    if(data.ok!==true)throw new Error('CASES_INVALID');
+    setPublicCases(data.state==='ready'&&Array.isArray(data.cases)?data.cases:[]);
+    setCasesState(data.state==='ready'?'ready':'not_ready');
+   }catch{if(active)setCasesState('error');}
+  };
+  const loadLedger=async()=>{
+   try{
+    const response=await fetch(endpoint('/ledger'),{cache:'no-store'});
+    if(!response.ok)throw new Error('LEDGER_READ_FAILED');
+    const data=await response.json() as {ok?:boolean;state?:string;entries?:PublicLedgerEntry[]};
+    if(!active)return;
+    if(data.ok!==true)throw new Error('LEDGER_INVALID');
+    setPublishedLedger(data.state==='ready'&&Array.isArray(data.entries)?data.entries:[]);
+    setLedgerState(data.state==='ready'?'ready':'not_ready');
+   }catch{if(active)setLedgerState('error');}
+  };
+  void loadCases();
+  void loadLedger();
   return()=>{active=false;};
  },[]);
 
@@ -99,6 +143,12 @@ export function TransparencyPage({user}:{user:User|null}){
  },[loading,error,selected,selectedReport]);
 
 
+ const jumpToPublicCase=(id:string)=>{
+  setCaseCategory('全部类型');
+  setExpandedCaseId(id);
+  document.getElementById('public-case-register')?.scrollIntoView({behavior:'smooth',block:'start'});
+ };
+
  const openReport=(period:string)=>{
   setSelected(period);
   const url=new URL(window.location.href);
@@ -140,7 +190,7 @@ export function TransparencyPage({user}:{user:User|null}){
    <nav className="hhba-resp-open-index" aria-label="公开信息中心四大目录">
     <div className="hhba-resp-open-index-heading"><span className="hhba-fin-section-index">PUBLIC RECORDS / 公开中心</span><strong>从这里找到需要查阅的记录</strong><p>正式公开资料与功能演示分开管理；尚未发布的信息不展示模拟数值。</p></div>
     <div className="hhba-resp-open-index-list">
-     <a href="#public-case-register"><span className="hhba-resp-index-number">01</span><span><strong>帮扶案例公开档案</strong><small>授权公开、隐私审核、个案进展</small></span><span className="hhba-resp-index-state">暂无正式案例</span><ArrowRight size={18} aria-hidden="true"/></a>
+     <a href="#public-case-register"><span className="hhba-resp-index-number">01</span><span><strong>帮扶案例公开档案</strong><small>授权公开、隐私审核、个案进展</small></span><span className="hhba-resp-index-state">{casesState==='loading'?'读取中':casesState==='error'?'暂不可用':casesState==='not_ready'?'待开放':publicCases.length?publicCases.length+' 份已公开':'暂无正式案例'}</span><ArrowRight size={18} aria-hidden="true"/></a>
      <a href="#public-fund-register"><span className="hhba-resp-index-number">02</span><span><strong>资金收支档案</strong><small>按已发布报告查询入池与支出</small></span><span className="hhba-resp-index-state">{loading?'读取中':error?'暂不可用':reports.length?reports.length+' 期报告':'尚无报告'}</span><ArrowRight size={18} aria-hidden="true"/></a>
      <a href="#fin-latest-title"><span className="hhba-resp-index-number">03</span><span><strong>月度财务报告</strong><small>经营收支、可分配利润和报告修订</small></span><span className="hhba-resp-index-state">{loading?'读取中':error?'暂不可用':reports.length?reports.length+' 期公开':'待发布'}</span><ArrowRight size={18} aria-hidden="true"/></a>
      <a href="#public-policy-monitor"><span className="hhba-resp-index-number">04</span><span><strong>公开制度与监督</strong><small>60/40 分配原则、信息保护与更正</small></span><span className="hhba-resp-index-state">公开说明</span><ArrowRight size={18} aria-hidden="true"/></a>
@@ -149,11 +199,34 @@ export function TransparencyPage({user}:{user:User|null}){
 
    <section id="public-case-register" className="hhba-resp-public-register" aria-labelledby="public-case-register-title">
     <div className="hhba-resp-public-register-heading"><span className="hhba-fin-section-index">01 / VERIFIED CASE RECORDS</span><h2 id="public-case-register-title">帮扶案例公开档案</h2><p>这里只收录经事实核对、必要授权和脱敏审核后可对外公开的真实案例，不能用演示情景填充。</p></div>
-    <div className="hhba-resp-case-empty">
-     <div className="hhba-resp-case-empty-icon"><FileClock size={22} aria-hidden="true"/></div>
-     <div><strong>暂无通过公开审核的案例档案</strong><p>本中心目前没有可公开查阅的真实个案。未来开放后，将按案件编号、权益类别和处理状态检索，分别披露受理记录、阶段进展、处理结果及可披露的资金摘要。</p><small>暂无公开记录，不代表企业未接到申请，也不代表已完成任何实际帮扶。</small></div>
-     <span>待公开</span>
-    </div>
+    {casesState==='ready'&&publicCases.length>0?
+     <div className="hhba-resp-published-cases">
+      <div className="hhba-resp-case-filter" role="group" aria-label="筛选真实已公开案例">{officialCategories.map(name=><button key={name} type="button" onClick={()=>setCaseCategory(name)} className={caseCategory===name?'active':''}>{name}{name==='全部类型'?' · '+publicCases.length:''}</button>)}</div>
+      <p className="hhba-resp-published-count">已公开并审核的案例 {filteredCases.length} 件。每份仅展示经确认可公开的脱敏摘要。</p>
+      {filteredCases.map(record=><details key={record.id} id={'public-case-'+record.id} className="hhba-resp-public-case-item" open={expandedCaseId===record.id}>
+       <summary onClick={event=>{event.preventDefault();setExpandedCaseId(current=>current===record.id?null:record.id);}}>
+        <span className="hhba-resp-public-case-id">{record.id}</span>
+        <span className="hhba-resp-public-case-title"><strong>{record.title}</strong><small>{record.category} · {record.stage} · 公开于 {record.publishedAt.slice(0,10)}</small></span>
+        <ArrowRight size={17} aria-hidden="true"/>
+       </summary>
+       <div className="hhba-resp-public-case-body">
+        <h3>案件事实摘要</h3><p>{record.summary}</p>
+        <h3>处理经过与支持事项</h3><p>{record.processSummary}</p>
+        <h3>阶段结果及公开边界</h3><p>{record.outcomeSummary}</p>
+        <div className="hhba-resp-case-ops"><span>{record.revisedAt?'最近修订：'+record.revisedAt.slice(0,10):'原始公开版本'}</span>
+         <button type="button" onClick={()=>{setLedgerCaseId(record.id);document.getElementById('public-fund-register')?.scrollIntoView({behavior:'smooth',block:'start'});}}>核对关联的已公开支出 <ArrowRight size={14}/></button>
+        </div>
+       </div>
+      </details>)}
+      {!filteredCases.length&&<p className="hhba-resp-case-no-match">当前分类没有已公开案例，请选择其他类别。</p>}
+     </div>:
+     <div className="hhba-resp-case-empty">
+      <div className="hhba-resp-case-empty-icon"><FileClock size={22} aria-hidden="true"/></div>
+      <div><strong>{casesState==='ready'?'暂无通过公开审核的案例档案':casesState==='loading'?'正在读取公开案例…':casesState==='not_ready'?'真实案例公开数据库尚未开通':'暂时无法核验公开案例'}</strong>
+       <p>{casesState==='ready'?'本中心目前没有可公开查阅的真实个案。未来开放后，将按案件编号、权益类别和处理状态检索。':casesState==='not_ready'?'该公开数据表尚未完成独立核验与启用，目前不对外展示任何假定数量或案例。':casesState==='error'?'案件目录暂时不可读取。请稍后重试，不能把接口故障解释为零案件。':'仅显示经过授权、事实复核与脱敏审查的真实档案。'}</p>
+       <small>暂无公开记录不代表企业未接到申请，也不代表已完成任何实际帮扶。</small>
+      </div><span>{casesState==='ready'?'待公开':casesState==='loading'?'读取中':'未开放'}</span>
+     </div>}
     <div className="hhba-resp-case-taxonomy"><strong>计划使用的案件分类</strong><div><span>工资与薪酬</span><span>劳动合同与用工</span><span>工时休假</span><span>离职与补偿</span><span>社保与工伤</span><span>争议处理与证据</span></div></div>
     <div className="hhba-resp-demo-direction"><div><span>PRODUCT DEMONSTRATION / 单独演示环境</span><strong>想了解将来正式档案会怎样查阅？</strong><p>可体验 28 份明确标注为虚构的模拟案例，测试分类、搜索、九章节档案及资金关联。所有人员、争议、金额和结果均非真实业务。</p></div><Link to="/transparency/archive-preview?view=cases">查看模拟档案体验 <ArrowRight size={16} aria-hidden="true"/></Link></div>
    </section>
@@ -163,6 +236,23 @@ export function TransparencyPage({user}:{user:User|null}){
     {loading?<div className="hhba-fin-empty" role="status">正在读取已公开的资金记录…</div>:error?<div className="hhba-fin-empty" role="alert">目前无法核验资金公开记录，请稍后再试。此处不显示推测金额。</div>:!reports.length?
      <div className="hhba-resp-case-empty hhba-resp-case-empty-fund"><div className="hhba-resp-case-empty-icon"><FileClock size={22} aria-hidden="true"/></div><div><strong>暂无已发布的资金收支报告</strong><p>首期报告完成真实账目核对、授权审核及发布程序后，此处才会出现对应的资金收支摘要。</p><small>未发布不等于资金池余额为零；演示页面中的模拟金额不会出现在这里。</small></div><span>待发布</span></div>:
      <div className="hhba-resp-fund-ledger"><table aria-label="正式发布报告中的资金收支摘要"><thead><tr><th>披露月份</th><th>实际入池</th><th>实际支出</th><th>期末结余</th><th>操作</th></tr></thead><tbody>{reports.map(item=><tr key={item.period}><th scope="row">{dateLabel(item.period)}</th><td>{yuan(item.poolReceivedFen)}</td><td>{yuan(item.poolSpentFen)}</td><td>{yuan(item.closingPoolFen)}</td><td><button type="button" onClick={()=>openReport(item.period)}>查看报告 <ArrowRight size={14} aria-hidden="true"/></button></td></tr>)}</tbody></table><p>以上为月度汇总，不是逐笔银行交易清单。每笔正式支出只有经过凭据核对、个人信息保护和公开审批后，才能另行发布可公开的明细。</p></div>}
+    <div className="hhba-resp-line-item-public">
+     <div className="hhba-resp-public-register-heading"><h3>逐笔可公开收支明细</h3><p>仅列出另外通过付款核对、个人信息保护及审批的项目；可能只是月度收支的一部分，完整资金汇总始终以已发布月报为准。</p></div>
+     {ledgerCaseId&&<div className="hhba-resp-ledger-active-filter"><span>正在查看关联案件：{ledgerCaseId}</span><button type="button" onClick={()=>setLedgerCaseId(null)}>清除筛选</button></div>}
+     {ledgerState==='ready'&&visibleEntries.length?
+      <div className="hhba-resp-fund-ledger"><table aria-label="经审查允许公开的个别资金记录"><thead><tr><th>记录日期 / 编号</th><th>公开用途</th><th>收支</th><th>金额</th><th>相关案例</th></tr></thead><tbody>{visibleEntries.map(item=><tr key={item.id}>
+       <td>{item.date}<small className="hhba-resp-ledger-entry-id">{item.id}</small></td>
+       <td>{item.purpose}</td><td>{item.kind==='inflow'?'实际入池':'实际支出'}</td>
+       <td>{yuan(item.amountFen)}</td>
+       <td>{item.caseId?<button type="button" onClick={()=>jumpToPublicCase(item.caseId!)}>{item.caseId} <ArrowRight size={13}/></button>:'—'}</td>
+      </tr>)}</tbody></table>
+       <p>逐笔公开为经审查后自愿披露的摘要，不等同于完整银行流水，不能直接将此表求和代替月报。</p>
+      </div>:
+      <div className="hhba-resp-case-empty hhba-resp-ledger-empty">
+       <div className="hhba-resp-case-empty-icon"><FileClock size={19} aria-hidden="true"/></div>
+       <div><strong>{ledgerState==='loading'?'正在核对逐笔公开数据…':ledgerState==='not_ready'?'逐笔资金公开数据库尚未开通':ledgerState==='error'?'逐笔公开数据暂时无法读取':ledgerCaseId?'未找到该案件关联的已公开支出':'暂无通过审核的逐笔公开记录'}</strong><p>该区不展示模拟资金，也不推断尚未公开或未审核的付款记录。</p></div>
+      </div>}
+    </div>
     <a className="hhba-resp-fund-textlink" href="#fin-latest-title">查看财务报告中的完整核算依据 <ArrowRight size={15} aria-hidden="true"/></a>
    </section>
 
