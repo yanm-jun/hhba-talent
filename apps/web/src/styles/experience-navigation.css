@@ -69,3 +69,65 @@
  color:#0d59be;
  border-bottom-color:#ff9625;
 }
+
+
+/* HHBA 2026 navigation refinement: keep only high-value shortcuts above the fold,
+   and move the full service index into an OpenRouter-inspired multi-column footer. */
+.hhba-experience-header{gap:24px;min-height:58px}
+.hhba-experience-header>nav{flex:1;flex-wrap:nowrap;justify-content:flex-end;gap:clamp(10px,1.35vw,20px)}
+.hhba-experience-header>nav .auth,.hhba-experience-header>nav .join-nav-link{padding:7px 1px}
+.hhba-experience-header>nav .hhba-header-site-search{flex:none}
+.hhba-experience-header>nav .join-nav-link{color:#53637a;font-weight:650}
+.hhba-experience-header>nav .join-nav-link:hover{color:#125EBC}
+.hhba-experience-header>nav .hhba-account-dropdown{flex:none}
+.hhba-site-footer{margin-top:52px;border-top:1px solid #e5ebf2;background:rgba(255,255,255,.94);color:#53687d}
+.hhba-site-footer-grid{width:min(1180px,calc(100% - 48px));margin:0 auto;padding:54px 0 44px;display:grid;grid-template-columns:minmax(190px,1.25fr) repeat(5,minmax(105px,1fr));gap:28px}
+.hhba-site-footer-brand{min-width:0;padding-right:12px}
+.hhba-site-footer-brand>a{display:inline-flex;text-decoration:none}
+.hhba-site-footer-brand .hhba-brand-mark{transform-origin:left center}
+.hhba-site-footer-brand p{margin:17px 0 7px;font-size:12px;color:#4e6780;line-height:1.7}
+.hhba-site-footer-brand small{display:block;color:#9aa8b6;font-size:9px;letter-spacing:.08em;line-height:1.6}
+.hhba-site-footer-column{min-width:0}
+.hhba-site-footer-column h2{margin:3px 0 15px;color:#233f5d;font-size:13px;font-weight:760;letter-spacing:.01em}
+.hhba-site-footer-column nav{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.hhba-site-footer-column a{color:#6c7d8f;text-decoration:none;font-size:11px;line-height:1.45;white-space:nowrap}
+.hhba-site-footer-column a:hover{color:#125EBC}
+.hhba-site-footer-bottom{width:min(1180px,calc(100% - 48px));margin:0 auto;border-top:1px solid #edf1f5;padding:18px 0 22px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;color:#9aa8b5;font-size:10px}
+.hhba-site-footer-bottom>span:nth-child(2){color:#aab5c0}
+.hhba-site-footer-bottom>div{margin-left:auto;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.hhba-site-footer-bottom a{color:#8392a0;text-decoration:none}
+.hhba-site-footer-bottom a:hover{color:#125EBC}
+@media(max-width:1080px){
+ .hhba-experience-header{gap:16px}
+ .hhba-experience-header>nav{gap:10px}
+ .hhba-site-footer-grid{grid-template-columns:1.25fr repeat(3,minmax(125px,1fr))}
+ .hhba-site-footer-column:nth-of-type(5){grid-column:2}
+ .hhba-site-footer-column:nth-of-type(6){grid-column:3}
+}
+@media(max-width:820px){
+ .hhba-experience-header>nav{flex-wrap:wrap}
+ .hhba-site-footer-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:30px 24px}
+ .hhba-site-footer-brand{grid-column:1/-1}
+ .hhba-site-footer-column:nth-of-type(5),.hhba-site-footer-column:nth-of-type(6){grid-column:auto}
+}
+@media(max-width:600px){
+ .hhba-experience-header{gap:10px;min-height:52px}
+ .hhba-experience-header>nav{width:100%;justify-content:flex-start;gap:4px 13px}
+ .hhba-experience-header>nav .hhba-header-site-search{width:100%;min-width:100%;order:-1}
+ .hhba-experience-header>nav .auth,.hhba-experience-header>nav .join-nav-link{font-size:11px;padding:5px 1px}
+ .hhba-experience-header>nav .hhba-nav-account{margin-left:auto}
+ .hhba-site-footer{margin-top:36px}
+ .hhba-site-footer-grid{width:min(100% - 30px,560px);grid-template-columns:repeat(2,minmax(0,1fr));padding:38px 0 30px;gap:30px 22px}
+ .hhba-site-footer-brand{grid-column:1/-1}
+ .hhba-site-footer-column h2{font-size:12px;margin-bottom:12px}
+ .hhba-site-footer-column nav{gap:8px}
+ .hhba-site-footer-column a{font-size:11px}
+ .hhba-site-footer-bottom{width:min(100% - 30px,560px);padding:16px 0 20px;display:block}
+ .hhba-site-footer-bottom>span,.hhba-site-footer-bottom>div{display:flex;margin:0 0 9px;gap:12px}
+ .hhba-site-footer-bottom>div{flex-wrap:wrap}
+}
+@media(max-width:390px){
+ .hhba-site-footer-grid{grid-template-columns:1fr}
+ .hhba-site-footer-brand{grid-column:auto}
+ .hhba-site-footer-column:nth-of-type(5),.hhba-site-footer-column:nth-of-type(6){grid-column:auto}
+}

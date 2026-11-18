@@ -48,7 +48,7 @@ test('official employer sources are still C-end resources, not recruitment clien
  const shell=read('components/Shell.tsx');
  for(const label of ['我要应聘','劳动权益支持','企业招聘导航'])assert.ok(home.includes(label));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
- assert.ok(shell.includes('to="/companies/library"'));
+ assert.ok(shell.includes("['企业招聘导航','/companies/library']"));
  assert.ok(shell.includes('to="/candidate/jobs"'));
  assert.ok(market.includes('to="/companies"'));
  assert.doesNotMatch(market,/to="\/candidate\/employer-jobs"/);

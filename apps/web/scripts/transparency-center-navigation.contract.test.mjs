@@ -20,7 +20,9 @@ test('V6 public navigation opens fund and case summary with four concise archive
   assert.ok(overview.includes('to="/transparency/'+p+'"'),p);
   assert.ok(main.includes("route==='/transparency/"+p+"'"),p);
  }
- assert.equal((shell.match(/className="auth hhba-nav-transparency"/g)||[]).length,2);
+ assert.equal((shell.match(/className="auth hhba-nav-transparency"/g)||[]).length,0);
+ assert.ok(shell.includes("['责任与透明','/transparency']"));
+ assert.ok(shell.includes('<SiteFooter/>'));
 });
 test('V6 all direct pages show one conspicuous shared demo disclosure',()=>{
  assert.match(demo,/WORKER_ARCHIVE_DEMO_NOTICE='此页面展示的数据为虚构演示数据。'/);
