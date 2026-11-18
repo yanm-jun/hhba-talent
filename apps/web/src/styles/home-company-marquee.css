@@ -12,14 +12,14 @@
 .home-company-marquee-window:hover .home-company-marquee-track,.home-company-marquee-window:focus-within .home-company-marquee-track{animation-play-state:paused}
 .home-company-marquee-run{display:flex;align-items:center;flex:none;gap:13px;width:max-content;list-style:none;margin:0;padding:0 13px 0 0}
 .home-company-marquee-item{flex:none;margin:0;padding:0}
-.home-company-marquee-link{display:flex;align-items:center;justify-content:flex-start;gap:11px;width:168px;min-height:62px;border:1px solid #E7F0FC;border-radius:11px;background:#fff;padding:8px 11px;text-decoration:none;color:#222a2b;transition:border-color .18s,background-color .18s}
+.home-company-marquee-link{display:flex;align-items:center;justify-content:flex-start;gap:11px;width:168px;min-height:62px;border:1px solid #E7F0FC;border-radius:11px;background:#fff;padding:8px 11px;text-decoration:none;color:#21262C;transition:border-color .18s,background-color .18s}
 .home-company-marquee-link:hover{background:#F7F9FD;border-color:#C5DBF8}
 .home-company-marquee-link:focus-visible{outline:2px solid #1373FA;outline-offset:3px}
-.home-company-marquee-icon{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;overflow:hidden;border:1px solid #eef0f0;border-radius:8px;background:#fff;color:#60758F}
+.home-company-marquee-icon{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;overflow:hidden;border:1px solid #EDEFF1;border-radius:8px;background:#fff;color:#60758F}
 .home-company-marquee-icon img{display:block;max-width:29px;max-height:29px;width:auto;height:auto;object-fit:contain}
 .home-company-marquee-icon.is-wide img{max-width:35px;max-height:19px}
 .home-company-marquee-name{display:block;flex:1;min-width:0;font-size:12px;font-weight:690;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.home-company-marquee-disclaimer{font-size:11px;color:#929a9b;line-height:1.65;text-align:center;margin:15px 0 0}
+.home-company-marquee-disclaimer{font-size:11px;color:#8896A5;line-height:1.65;text-align:center;margin:15px 0 0}
 @keyframes hhba-company-marquee-left{to{transform:translateX(-50%)}}
 @media(max-width:720px){
  .home-match-promo ~ .unified-market{margin-bottom:25px}

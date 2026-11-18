@@ -1,7 +1,7 @@
 /* HHBA Study Abroad / University 01: in-depth clicked-in university profile.
  * Intentionally does NOT change study-abroad homepage, global Shell or existing V1 layout.
  */
-.hhba-minot{color:#213b3b}
+.hhba-minot{color:#252D37}
 .hhba-minot .hhba-study-wrap{max-width:1120px;padding:0 20px}
 .hhba-minot a{text-decoration:none}
 .hhba-minot-breadcrumb{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin:24px 0 19px;color:#6B86A5;font-size:12px}
@@ -9,7 +9,7 @@
 .hhba-minot-hero{position:relative;padding:clamp(24px,4.5vw,46px);border:1px solid #E7F0FC;border-radius:15px;background:radial-gradient(ellipse at 85% 5%,#E7F0FC 0%,transparent 45%),linear-gradient(115deg,#E7F0FC 0%,#F8FAFE 85%)}
 .hhba-minot-hero-title{max-width:840px}
 .hhba-minot-overline{display:flex;align-items:center;gap:7px;color:#125EBC;text-transform:uppercase;letter-spacing:.09em;font-size:10px;font-weight:820;margin:0 0 13px}
-.hhba-minot-hero h1{font-size:clamp(27px,4.7vw,43px);line-height:1.3;color:#1a373b;letter-spacing:-.8px;margin:0 0 3px}
+.hhba-minot-hero h1{font-size:clamp(27px,4.7vw,43px);line-height:1.3;color:#222A33;letter-spacing:-.8px;margin:0 0 3px}
 .hhba-minot-hero-en{font-size:18px;color:#496884;margin:0 0 18px}
 .hhba-minot-hero-copy{font-size:14px;line-height:2;color:#496884;margin:0 0 18px;max-width:850px}
 .hhba-minot-location{display:inline-flex;align-items:center;gap:7px;color:#496884;font-size:12px}
@@ -25,7 +25,7 @@
 .hhba-minot-facts strong{font-size:clamp(12px,1.5vw,16px);color:#174D91;overflow-wrap:anywhere}
 .hhba-minot-section{margin-top:51px;scroll-margin-top:18px}
 .hhba-minot-heading{display:flex;justify-content:space-between;gap:14px;align-items:start;margin:0 0 22px}
-.hhba-minot-heading h2{margin:0 0 8px;color:#203b39;font-size:clamp(19px,2.6vw,26px);letter-spacing:-.4px;line-height:1.4}
+.hhba-minot-heading h2{margin:0 0 8px;color:#242D37;font-size:clamp(19px,2.6vw,26px);letter-spacing:-.4px;line-height:1.4}
 .hhba-minot-heading p:not(.hhba-minot-overline){color:#6B86A5;font-size:12px;line-height:1.9;margin:0;max-width:770px}
 .hhba-minot-heading>span{white-space:nowrap;color:#6B86A5;background:#E7F0FC;padding:6px 11px;border-radius:8px;font-size:11px}
 .hhba-minot-narrative-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}

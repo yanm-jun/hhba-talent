@@ -48,7 +48,7 @@
 .company-profile-sources{display:flex;flex-direction:column;align-items:flex-start;gap:11px}
 .company-profile-sources h2{margin-bottom:0}
 .company-profile-sources p{margin:0 0 6px}
-.company-profile-sources small{font-size:11px;color:#89918d;margin-top:7px}
+.company-profile-sources small{font-size:11px;color:#7D8C9D;margin-top:7px}
 .company-profile-footer{padding:25px 0 5px;display:flex;justify-content:space-between;gap:15px;align-items:center;border-top:1px solid #E7F0FC}
 .company-profile-footer span{color:#6B86A5;font-size:12px;line-height:1.7}
 .unknown-company{display:grid;gap:14px}

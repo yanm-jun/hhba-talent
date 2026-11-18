@@ -59,7 +59,7 @@
 .hhba-uni-program-breadcrumb{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 16px;color:#6B86A5;font-size:11px}
 .hhba-uni-program-breadcrumb a{color:#125EBC}
 .hhba-uni-program-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(245px,1fr);gap:20px;margin-top:25px}
-.hhba-uni-program-layout h2{color:#263f44;font-size:19px;margin:0 0 13px}
+.hhba-uni-program-layout h2{color:#2A3440;font-size:19px;margin:0 0 13px}
 .hhba-uni-info-list{display:flex;flex-direction:column;gap:10px}
 .hhba-uni-info-list>section{background:#fff;border:1px solid #E7F0FC;border-radius:10px;padding:17px 19px}
 .hhba-uni-info-list h3{color:#125EBC;font-size:12px;margin:0 0 8px}

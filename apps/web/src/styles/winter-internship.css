@@ -4,7 +4,7 @@
 .hhba-winter-modal-close{position:absolute;right:13px;top:13px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fffffff0;border:1px solid #e0e8f1;box-shadow:0 2px 14px #00000014;color:#1b365a;z-index:5;cursor:pointer}
 .hhba-winter-modal-close:hover{background:#eff6ff}
 .hhba-winter-modal-close:focus-visible,.hhba-winter-join:focus-visible,.hhba-winter-card-detail:focus-visible{outline:3px solid #ff8a36;outline-offset:3px}
-.hhba-winter-modal-copy{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:25px 23px 20px 29px;background:radial-gradient(ellipse at 100% 10%,#cee8ff 0,transparent 60%),linear-gradient(158deg,#fcffff 0%,#f1f8ff 64%,#ebf6ff 100%);z-index:1}
+.hhba-winter-modal-copy{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:25px 23px 20px 29px;background:radial-gradient(ellipse at 100% 10%,#cee8ff 0,transparent 60%),linear-gradient(158deg,#FDFDFE 0%,#f1f8ff 64%,#ebf6ff 100%);z-index:1}
 .hhba-winter-modal-copy:before{content:"";position:absolute;width:210px;height:210px;border:1px solid #1666bd1c;border-radius:50%;top:-110px;left:-85px;pointer-events:none}
 .hhba-winter-brand{display:flex;align-items:center;flex-wrap:wrap;gap:9px;color:#416b97;font-size:9px;font-weight:800;letter-spacing:.11em}
 .hhba-winter-brand-dot{color:#0e559a;font-size:18px;font-weight:950;letter-spacing:-.05em}

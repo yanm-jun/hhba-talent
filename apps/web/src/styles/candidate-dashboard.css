@@ -15,7 +15,7 @@
 .candidate-dashboard-search:focus-within{border-color:#889BB0;box-shadow:0 0 0 3px #125EBC10}
 .candidate-dashboard-search button{flex-shrink:0;border:0;border-radius:8px;background:#125EBC;color:#fff;min-height:40px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:10px;font-size:13px;font-weight:680}
 .candidate-dashboard-search button:hover{background:#125EBC}
-.candidate-dashboard-profile{background:#fff;border:1px solid #e3e7e8;border-radius:13px;padding:22px 24px;margin:22px 0 14px}
+.candidate-dashboard-profile{background:#fff;border:1px solid #E2E5E9;border-radius:13px;padding:22px 24px;margin:22px 0 14px}
 .candidate-dashboard-profile-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .candidate-dashboard-heading{display:flex;align-items:center;gap:9px}
 .candidate-dashboard-heading>svg{color:#1373FA}
