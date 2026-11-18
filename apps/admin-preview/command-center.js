@@ -87,10 +87,10 @@ function drawLine(id,values,{suffix='',digits=0,secondary=null,unit='次',scale=
  for(const tick of bounds.ticks){
   const yy=y(tick);
   grid.append(element('line',{x1:pad.left,y1:yy,x2:W-pad.right,y2:yy,
-   stroke:tick===0?'#c4d6ca':'#e8efea','stroke-width':tick===0?1.2:1,
+   stroke:tick===0?'#B9D1EF':'#E7F0FC','stroke-width':tick===0?1.2:1,
    'stroke-dasharray':tick===0?'0':'3 4'}));
   grid.append(element('text',{x:pad.left-9,y:yy+4,'text-anchor':'end',
-   fill:'#7b8e87','font-size':11},numberLabel(tick,digits)));
+   fill:'#6B86A5','font-size':11},numberLabel(tick,digits)));
  }
  svg.append(grid);
  const makePath=series=>{
@@ -105,7 +105,7 @@ function drawLine(id,values,{suffix='',digits=0,secondary=null,unit='次',scale=
  };
  // A light gradient adds depth without covering or fabricating data points.
  const primary=element('path',{d:makePath(measured),fill:'none',
-  stroke:'#23815d','stroke-width':2.6,'stroke-linecap':'round','stroke-linejoin':'round'});
+  stroke:'#125EBC','stroke-width':2.6,'stroke-linecap':'round','stroke-linejoin':'round'});
  svg.append(primary);
  if(companion){
   svg.append(element('path',{d:makePath(companion),fill:'none',
@@ -114,20 +114,20 @@ function drawLine(id,values,{suffix='',digits=0,secondary=null,unit='次',scale=
  for(let i=0;i<measured.length;i++){
   if(measured[i]===null||(values.length>32&&i!==values.length-1))continue;
   const dot=element('circle',{cx:x(i),cy:y(measured[i]),r:values.length>32?2.5:3.2,
-   fill:'#fff',stroke:'#23815d','stroke-width':2});
+   fill:'#fff',stroke:'#125EBC','stroke-width':2});
   dot.append(element('title',{},fullDate(values[i].label)+' · '+showNumber(measured[i],digits,unit)));
   svg.append(dot);
  }
  for(const i of [...new Set([0,Math.floor((values.length-1)/2),values.length-1])]){
   svg.append(element('text',{x:x(i),y:H-8,
    'text-anchor':i===0?'start':i===values.length-1?'end':'middle',
-   fill:'#819089','font-size':11},String(values[i].label).slice(5)));
+   fill:'#6B86A5','font-size':11},String(values[i].label).slice(5)));
  }
  const cursor=element('line',{x1:0,y1:pad.top,x2:0,y2:H-pad.bottom,
-  stroke:'#789b88','stroke-width':1.4,'stroke-dasharray':'4 4',visibility:'hidden'});
+  stroke:'#6B86A5','stroke-width':1.4,'stroke-dasharray':'4 4',visibility:'hidden'});
  const horizontal=element('line',{x1:pad.left,y1:0,x2:W-pad.right,y2:0,
-  stroke:'#a4bcae','stroke-width':1,'stroke-dasharray':'2 4',visibility:'hidden'});
- const primaryDot=element('circle',{r:5,fill:'#fff',stroke:'#23815d','stroke-width':2.8,visibility:'hidden'});
+  stroke:'#6B86A5','stroke-width':1,'stroke-dasharray':'2 4',visibility:'hidden'});
+ const primaryDot=element('circle',{r:5,fill:'#fff',stroke:'#125EBC','stroke-width':2.8,visibility:'hidden'});
  const secondaryDot=element('circle',{r:5,fill:'#fff',stroke:'#d18f45','stroke-width':2.8,visibility:'hidden'});
  svg.append(cursor,horizontal,primaryDot,secondaryDot);
  const stage=document.createElement('div');stage.className='hhba-cc-plot';
@@ -160,7 +160,7 @@ function drawLine(id,values,{suffix='',digits=0,secondary=null,unit='次',scale=
    const number=document.createElement('b');number.textContent=showNumber(value,digits,unit);
    row.append(label,number);tooltip.append(row);
   };
-  addRow(companion?'营业收入':'当日数据',v,'#23815d');
+  addRow(companion?'营业收入':'当日数据',v,'#125EBC');
   if(companion)addRow('经营结果',other,'#d18f45');
   const rect=stage.getBoundingClientRect();
   const boxW=Math.max(1,rect.width),boxH=Math.max(1,rect.height);

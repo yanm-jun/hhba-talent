@@ -36,7 +36,7 @@ button[type=submit]:hover{transform:translateY(-1px);box-shadow:0 9px 22px #1264
 button:focus-visible,a:focus-visible{outline:3px solid #68a1f0;outline-offset:3px}
 button:disabled{opacity:.58;cursor:not-allowed;box-shadow:none;transform:none}
 .status{margin:14px 0 0;min-height:20px;font-size:12px;color:#b54e45}
-.status.ok{color:#176f52}
+.status.ok{color:#174D91}
 .foot{text-align:center;color:#7b8da2;font-size:11px;margin:21px 0 0;line-height:1.75}
 .hint{font-size:12px;color:#8697ac;margin:7px 0 0}
 .help{margin-top:23px;padding-top:16px;border-top:1px solid #e5ebf3;text-align:center;color:#8997aa;font-size:12px}
