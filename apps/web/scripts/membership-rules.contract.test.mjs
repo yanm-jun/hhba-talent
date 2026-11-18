@@ -173,6 +173,21 @@ test('public /rights uses the uploaded HHBA photo and an editorial layout, not t
  assert.match(visual,/\.hhba-rights-editorial-cover img/);
  assert.match(visual,/@media\(max-width:740px\)/);
 });
+test('public /rights compact layout preserves full original photo and tightens desktop/mobile whitespace',()=>{
+ const visual=read('../src/styles/rights-editorial.css');
+ const rights=read('../src/pages/WorkplaceRightsPage.tsx');
+ assert.ok(visual.includes('.hhba-rights-editorial-cover{width:min(calc(100% - 48px),900px)'), 'photo should have a compact desktop maximum width');
+ assert.ok(visual.includes('aspect-ratio:1672/941;object-fit:contain'), 'hero must preserve text, worker and full photo composition');
+ assert.ok(visual.includes('.hhba-rights-editorial-intro{max-width:980px;margin:0 auto;padding:42px 24px 45px'), 'intro must not retain excessive 100px padding');
+ assert.ok(visual.includes('font-size:clamp(27px,3.15vw,37px)'), 'intro headline should fit the editorial layout');
+ assert.ok(visual.includes('.hhba-rights-editorial-timeline{background:#0b2444;color:#f6f9fd;padding:46px'), 'service timeline should remain compact');
+ assert.ok(visual.includes('.hhba-rights-editorial-plan{max-width:980px;margin:0 auto;padding:52px'), 'price explanation spacing should be reduced');
+ assert.ok(visual.includes('.hhba-rights-editorial-cover{width:calc(100% - 24px);border-radius:4px}'), 'photo should adapt to small screens without cropping');
+ assert.ok(visual.includes('.hhba-rights-editorial-intro,.hhba-rights-editorial-plan,.hhba-rights-editorial-disclosure{display:block;padding:33px 18px}'), 'mobile sections should use reduced vertical padding');
+ assert.ok(rights.includes('width="1672" height="941"'), 'image aspect ratio and source asset stay unchanged');
+ assert.ok(!visual.includes('width:min(100%,1680px)'), 'oversized cover must not return');
+});
+
 test('existing private member workspace stays embedded and operational',()=>{
  const rights=read('../src/pages/WorkplaceRightsPage.tsx');
  const main=read('../src/main.tsx');
