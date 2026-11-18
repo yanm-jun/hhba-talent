@@ -19,7 +19,7 @@ function AlipayPaymentQR({value}:{value:string}){
  return <svg xmlns="http://www.w3.org/2000/svg" width="210" height="210" viewBox={'0 0 '+edge+' '+edge}
   role="img" aria-label="支付宝付款二维码" shapeRendering="crispEdges">
    <rect width={edge} height={edge} fill="#fff"/>
-   <path d={blocks.join('')} fill="#173e2b"/>
+   <path d={blocks.join('')} fill="#102A5A"/>
   </svg>;
 }
 

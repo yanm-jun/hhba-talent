@@ -45,7 +45,7 @@ export function HuayuVisionCompactProfilePage({user}:{user:User|null}){
      <figure><img src={import.meta.env.BASE_URL+'domestic-media/user-4f0e78c7cb648df8a4cd2fed.webp'} alt="以前保存的企业建筑场景素材，企业归属尚未最终核验" loading="eager"/>
       <figcaption><span>原有建筑场景素材</span><small>归属待核验</small></figcaption></figure>
     </div>
-    <p style={{fontSize:11,color:'#809286',margin:'10px 0 0'}}>Logo 沿用旧版已上传素材，品牌归属仍待最终核验；两张照片均为旧素材，未重新生成。</p>
+    <p style={{fontSize:11,color:'#607F9E',margin:'10px 0 0'}}>Logo 沿用旧版已上传素材，品牌归属仍待最终核验；两张照片均为旧素材，未重新生成。</p>
    </section>
    <CompanyMajorJobs companyRoute="/companies/domestic/rel-huayu-004"/>
 
