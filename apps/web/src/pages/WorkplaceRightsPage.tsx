@@ -3,6 +3,7 @@ import {Shell} from '../components/Shell';
 import {Link} from '../router';
 import type {User} from '../services/api';
 import '../styles/career-refresh.css';
+import '../styles/rights-editorial.css';
 
 /** This is a product introduction, not a subscription, report, verification or case intake screen. */
 const monthlyServices=[
@@ -18,6 +19,99 @@ const stages=[
 
 export function WorkplaceRightsPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
  const knowledgeHref=embedded?'/candidate/account/legal-aid':'/rights/knowledge';
+ // The marketing /rights page is intentionally separate from the private account
+ // workspace. Existing embedded account content remains unchanged below.
+ if(!embedded)return <Shell user={user}>
+  <main className="hhba-rights-editorial" id="main-content">
+   <nav className="hhba-rights-editorial-crumb" aria-label="当前位置">
+    <Link to="/">HHBA 首页</Link><span aria-hidden="true">/</span><span>职业与劳动权益支持</span>
+   </nav>
+   <section className="hhba-rights-editorial-cover" aria-label="让下一份工作，接得住你的成长">
+    <img src="/images/hhba-rights-wind-hero.webp" width="1672" height="941"
+     alt="HHBA 汇方职场宣传照片：蓝天海岸上的风力发电机，一位穿橙色工作服、手持安全帽的劳动者面向远方。画面文字：让下一份工作，接得住你的成长。找工作，不止于找到工作。"
+     fetchPriority="high"/>
+   </section>
+   <p className="hhba-rights-editorial-mobile-caption">让下一份工作，接得住你的成长。<span>找工作，不止于找到工作。</span></p>
+   <div className="hhba-rights-editorial-ribbon">
+    <span>HHBA / WORKPLACE RIGHTS</span>
+    <span>面向劳动者的长期职业服务 · 方案筹备中</span>
+   </div>
+
+   <section className="hhba-rights-editorial-intro" aria-labelledby="rights-editorial-intro-title">
+    <div className="hhba-rights-editorial-eyebrow">我们的出发点 <span>01 / WHY WE CARE</span></div>
+    <div className="hhba-rights-editorial-intro-copy">
+     <h1 id="rights-editorial-intro-title">入职之后，<br/>还有许多事值得认真对待。</h1>
+     <p>找到工作，是职业生活的开始。企业的公开信息、合同与工资、日常积累的工作成果，以及可能遇到的劳动争议，都值得被清楚地理解和记录。</p>
+     <p>HHBA 正在筹备一项持续职业与劳动权益支持服务，希望让求职者在进入职场之后，仍然能够获得长期、可核验的信息与帮助。</p>
+    </div>
+   </section>
+
+   <section className="hhba-rights-editorial-services" aria-labelledby="rights-editorial-services-title">
+    <header className="hhba-rights-editorial-section-heading">
+     <span>02 / WHAT WE PLAN</span>
+     <div>
+      <h2 id="rights-editorial-services-title">不止找到一份工作。<br/>也关注工作之后。</h2>
+      <p>以下是拟建设的月度服务，不代表已经提供。正式上线后，每一项交付都应以实际可核验的记录为准。</p>
+     </div>
+    </header>
+    <div className="hhba-rights-editorial-service-list">
+     {monthlyServices.map((item,index)=><article className="hhba-rights-editorial-service-row" key={item.title}>
+      <span className="hhba-rights-editorial-service-index">{String(index+1).padStart(2,'0')}</span>
+      <h3>{item.title}</h3>
+      <p>{item.description}</p>
+      <span className="hhba-rights-editorial-service-status">筹备中</span>
+     </article>)}
+    </div>
+   </section>
+
+   <section className="hhba-rights-editorial-timeline" aria-labelledby="rights-editorial-timeline-title">
+    <div className="hhba-rights-editorial-timeline-top">
+     <span>03 / HOW IT WORKS</span>
+     <h2 id="rights-editorial-timeline-title">一段最长 36 个月的服务计划。</h2>
+     <p>一个账号，延续职业档案与服务记录。不同阶段的具体资格、次数和服务内容，以未来正式公开的规则与合同为准。</p>
+    </div>
+    <div className="hhba-rights-editorial-timeline-grid">
+     {stages.map((stage,index)=><article key={stage.num}>
+      <span className="hhba-rights-editorial-stage-order">0{index+1}</span>
+      <strong>{stage.num}<small>个月</small></strong>
+      <h3>{stage.label}</h3>
+      <p>{stage.description}</p>
+     </article>)}
+    </div>
+   </section>
+
+   <section className="hhba-rights-editorial-plan" aria-labelledby="rights-editorial-plan-title">
+    <div className="hhba-rights-editorial-plan-label"><span>04 / THE PLAN</span><h2 id="rights-editorial-plan-title">清楚的价格，<br/>清楚的边界。</h2></div>
+    <div className="hhba-rights-editorial-plan-body">
+     <div className="hhba-rights-editorial-plan-price">
+      <span>规划中的会员月费</span>
+      <strong>¥24.90<small> / 月</small></strong>
+      <em>尚未开放购买</em>
+     </div>
+     <div className="hhba-rights-editorial-plan-description">
+      <h3>谁可以申请？</h3>
+      <p>计划面向毕业三年内、入职符合企业准入条件的年轻劳动者。正式资格及企业准入标准仍待公布，目前不采集资格证明。</p>
+      <h3>遇到劳动争议时呢？</h3>
+      <p>未来拟协助整理资料、线上沟通和官方调解申请。若依法受理并确有必要，是否由合作律所出具律师函需专业审核。不包含仲裁和诉讼代理，不承诺结果。</p>
+      <div className="hhba-rights-editorial-plan-links">
+       <Link to="/membership/rules">阅读完整服务规则 <ArrowRight size={16} aria-hidden="true"/></Link>
+       <Link to="/rights/knowledge">浏览免费劳动权益知识 <ArrowRight size={16} aria-hidden="true"/></Link>
+      </div>
+     </div>
+    </div>
+   </section>
+
+   <section className="hhba-rights-editorial-disclosure" aria-labelledby="rights-editorial-disclosure-title">
+    <div><span>05 / OUR COMMITMENT</span><h2 id="rights-editorial-disclosure-title">关于目前的开放状态</h2></div>
+    <div>
+     <p><strong>目前可以使用：</strong>公开劳动权益知识、招聘信息浏览以及现有求职和职业账户工具。</p>
+     <p><strong>目前尚未开放：</strong>付费会员、企业监测月报、案件受理、材料上传及律所委托。注册账户并不意味着已获得会员权益。</p>
+     <p>该产品属于职业与法律支持服务规划，不是保险，也不提供工资损失赔付。请勿向本站公开入口提交身份证明、劳动合同或其他敏感证据。</p>
+     <Link to="/rights/support">了解平台权益支持的筹备进展 <ArrowRight size={16} aria-hidden="true"/></Link>
+    </div>
+   </section>
+  </main>
+ </Shell>;
  return <Shell user={user} embedded={embedded}>
   <main className="hhba-rights-page" id="main-content">
    <nav className="hhba-rights-breadcrumb" aria-label="位置"><Link to={embedded?"/candidate/account":"/"}>{embedded?"个人工作台":"HHBA 首页"}</Link><span>/</span><strong>职场权益中心</strong></nav>

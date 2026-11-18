@@ -147,3 +147,39 @@ test('one career workbench keeps all service entry points without fake member st
  assert.equal(config.membership.purchaseEnabled,false);
  assert.equal(config.membership.caseIntakeEnabled,false);
 });
+
+
+test('public /rights uses the uploaded HHBA photo and an editorial layout, not the account hero',()=>{
+ const rights=read('../src/pages/WorkplaceRightsPage.tsx');
+ const visual=read('../src/styles/rights-editorial.css');
+ const image=readFileSync(new URL('../public/images/hhba-rights-wind-hero.webp',import.meta.url));
+ assert.equal(image.subarray(0,4).toString(),'RIFF','hero must be a real WebP asset');
+ assert.equal(image.subarray(8,12).toString(),'WEBP','hero must be a real WebP asset');
+ assert.ok(image.length>50000,'hero image quality must not be reduced to a thumbnail');
+ assert.match(rights,/if\(!embedded\)return <Shell user=\{user\}>/);
+ assert.match(rights,/src="\/images\/hhba-rights-wind-hero\.webp"/);
+ assert.match(rights,/fetchPriority="high"/);
+ assert.match(rights,/className="hhba-rights-editorial-cover"/);
+ assert.match(rights,/className="hhba-rights-editorial-service-list"/);
+ assert.match(rights,/className="hhba-rights-editorial-timeline"/);
+ assert.match(rights,/className="hhba-rights-editorial-plan-price"/);
+ assert.match(rights,/className="hhba-rights-editorial-disclosure"/);
+ assert.match(rights,/¥24\.90/);
+ assert.match(rights,/最长 36 个月/);
+ assert.match(rights,/尚未开放购买/);
+ assert.match(rights,/不包含仲裁和诉讼代理/);
+ assert.match(rights,/to="\/rights\/knowledge"/);
+ assert.match(rights,/to="\/membership\/rules"/);
+ assert.match(visual,/\.hhba-rights-editorial-cover img/);
+ assert.match(visual,/@media\(max-width:740px\)/);
+});
+test('existing private member workspace stays embedded and operational',()=>{
+ const rights=read('../src/pages/WorkplaceRightsPage.tsx');
+ const main=read('../src/main.tsx');
+ assert.match(rights,/return <Shell user=\{user\} embedded=\{embedded\}>/);
+ assert.match(rights,/className="hhba-rights-page"/);
+ assert.match(rights,/const knowledgeHref=embedded\?'\/candidate\/account\/legal-aid':'\/rights\/knowledge'/);
+ assert.match(main,/rights:<WorkplaceRightsPage user=\{user\} embedded\/>/);
+ assert.match(main,/if\(route==='\/rights'\)return <WorkplaceRightsPage user=\{user\}\/>/);
+ assert.match(main,/route==='\/candidate\/account\/rights'/);
+});
