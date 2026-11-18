@@ -128,7 +128,7 @@
 /* Logo-derived blue/orange roles: company development and worker support stay distinct. */
 .hhba-home-price{color:var(--hhba-navy)}
 .hhba-home-distribution-values>div:first-child strong{color:var(--hhba-blue-deep)}
-.hhba-home-distribution-values>div+div strong{color:var(--hhba-orange)}
+.hhba-home-distribution-values>div+div strong{color:var(--hhba-orange-ink)}
 .hhba-home-distribution-company{background:var(--hhba-blue-deep)}
 .hhba-home-distribution-workers{background:var(--hhba-orange)}
 .hhba-home-stage-rights .hhba-home-stage-index{color:#A85A0A;background:#FFF2DF}
