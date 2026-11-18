@@ -1,5 +1,5 @@
 :root{
- --ink:#102A5A;--muted:#7d8781;--soft:#889BB0;--border:#E7F0FC;--fill:#F7F9FD;
+ --ink:#102A5A;--muted:#718193;--soft:#889BB0;--border:#E7F0FC;--fill:#F7F9FD;
  --canvas:#F7F9FD;--hhba-blue:#1373FA;--hhba-orange:#FF9625;--green:var(--hhba-blue);--green-faint:#EDF4FF;--sidebar:#fff;
  font-family:Inter,"SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
  color:var(--ink);font-synthesis:none;text-rendering:optimizeLegibility;
@@ -20,7 +20,7 @@ svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;strok
 .brand-mark span{transform:translateY(-1px)}
 .brand-wordmark{display:flex;flex-direction:column;gap:1px}
 .brand-wordmark strong{font-size:15px;letter-spacing:-.4px;line-height:1}
-.brand-wordmark small{color:#89938d;font-size:10px;letter-spacing:.005em}
+.brand-wordmark small{color:#7E8D9E;font-size:10px;letter-spacing:.005em}
 .workspace-identity{padding:10px;display:flex;align-items:center;gap:9px;border:1px solid #E7F0FC;border-radius:9px;margin:0 5px 24px;background:#F7F9FD}
 .workspace-icon{display:grid;place-items:center;width:29px;height:29px;flex-shrink:0;background:#E7F0FC;border-radius:7px;font-size:12px;font-weight:800;color:#1373FA}
 .workspace-identity div{display:flex;flex-direction:column;min-width:0;gap:2px}
@@ -34,7 +34,7 @@ svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;strok
 .nav-link svg{height:17px;width:17px;flex-shrink:0;stroke-width:1.65}
 .nav-link:hover{background:#F7F9FD;color:#125EBC}
 .nav-link.is-active{background:#E7F0FC;color:#125EBC;font-weight:700}
-.nav-soon,.nav-view{margin-left:auto;font-size:9px;color:#a4aaa7;font-weight:450}
+.nav-soon,.nav-view{margin-left:auto;font-size:9px;color:#9BA6B3;font-weight:450}
 .nav-view{color:#60758F}
 .sidebar-bottom{margin-top:auto;padding:20px 11px 0}
 .safety-note{display:flex;align-items:center;gap:7px;color:#1373FA;font-size:11px;font-weight:650}
