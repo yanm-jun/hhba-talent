@@ -47,7 +47,7 @@ export function CiticsSecuritiesCompactProfilePage({user}:{user:User|null}){
      <figure><img src={import.meta.env.BASE_URL+'domestic-media/user-f330eee0347f310e7c9fcb2d.webp'} alt="以前保存的中信证券总部或建筑场景素材，企业归属待最终核验" loading="eager"/><figcaption><span>原有总部建筑素材</span><small>归属待核验</small></figcaption></figure>
      <figure><img src={import.meta.env.BASE_URL+'domestic-media/user-f9608fde8808381f0d17894b.webp'} alt="以前保存的中信证券办公场景素材，企业归属待最终核验" loading="eager"/><figcaption><span>原有办公场景素材</span><small>归属待核验</small></figcaption></figure>
     </div>
-    <p style={{fontSize:11,color:'#809286',margin:'10px 0 0'}}>Logo 和两张图片直接复用旧版素材，没有重新生成；图片及品牌归属尚待逐张核验。</p>
+    <p style={{fontSize:11,color:'#607F9E',margin:'10px 0 0'}}>Logo 和两张图片直接复用旧版素材，没有重新生成；图片及品牌归属尚待逐张核验。</p>
    </section>
    <CompanyMajorJobs companyRoute="/companies/domestic/a-600030"/>
 

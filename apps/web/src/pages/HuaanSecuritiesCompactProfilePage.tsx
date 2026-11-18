@@ -46,7 +46,7 @@ export function HuaanSecuritiesCompactProfilePage({user}:{user:User|null}){
      <figure><img src={import.meta.env.BASE_URL+'domestic-media/user-0c1364cd23938f72c131e011.webp'} alt="以前保存的华安证券办公场景素材，企业归属尚未最终核验" loading="eager"/>
       <figcaption><span>原有办公场景素材</span><small>归属待核验</small></figcaption></figure>
     </div>
-    <p style={{fontSize:11,color:'#809286',margin:'10px 0 0'}}>Logo 和两张企业场景照片均沿用以前保存的素材，品牌及照片归属仍待最终核验。</p>
+    <p style={{fontSize:11,color:'#607F9E',margin:'10px 0 0'}}>Logo 和两张企业场景照片均沿用以前保存的素材，品牌及照片归属仍待最终核验。</p>
    </section>
    <CompanyMajorJobs companyRoute="/companies/domestic/a-600909"/>
 

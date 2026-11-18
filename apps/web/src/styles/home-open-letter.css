@@ -3,7 +3,7 @@
 .hhba-letter-revisit:hover{background:#fff3e4;border-color:#c0a78b}
 .hhba-letter-revisit:focus-visible{outline:3px solid #d4b398;outline-offset:2px}
 .hhba-letter-hidden-reopen{display:none}
-.hhba-letter-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px 16px;background:rgba(24,28,27,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hhba-letter-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px 16px;background:rgba(27,46,71,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .hhba-letter-panel{width:100%;max-width:740px;max-height:100%;display:flex;align-items:center;justify-content:center;min-height:0}
 .hhba-letter-intro{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:100%;max-width:560px;max-height:calc(100dvh - 40px);overflow:auto;padding:31px 32px 22px;border-radius:18px;background:#fcfaf4;box-shadow:0 24px 80px #0004;text-align:center;animation:hhba-letter-rise .45s ease both}
 .hhba-letter-kicker{margin:0 0 11px!important;font-size:10px!important;letter-spacing:.14em;color:#96836c!important;font-weight:650}
@@ -27,7 +27,7 @@
 .hhba-letter-intro-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 14px;margin-top:11px}
 .hhba-letter-intro-actions button{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;color:#736557;font-size:12px;cursor:pointer;padding:7px}
 .hhba-letter-intro-actions button:hover{text-decoration:underline}
-.hhba-letter-feedback{min-height:14px;margin:4px 0 0!important;color:#2e6749!important;font-size:11px!important}
+.hhba-letter-feedback{min-height:14px;margin:4px 0 0!important;color:#125EBC!important;font-size:11px!important}
 .hhba-letter-paper{display:flex;flex-direction:column;min-height:0;width:100%;max-width:740px;max-height:min(86dvh,830px);border:1px solid #e9dcca;border-radius:8px;background:#fffcf5;box-shadow:0 30px 88px #0005;animation:hhba-letter-unfold .58s cubic-bezier(.18,.8,.24,1) both;color:#443c33}
 .hhba-letter-paper-head{display:flex;align-items:center;justify-content:space-between;flex:none;padding:16px 27px 0}
 .hhba-letter-paper-head>span{color:#9d896f;font-size:10px;font-weight:650;letter-spacing:.12em}
@@ -44,7 +44,7 @@
 .hhba-letter-paper-footer{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex:none;padding:14px 26px 8px;border-top:1px solid #ece2d6;background:#fffcf5}
 .hhba-letter-outline,.hhba-letter-copy{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:40px;padding:8px 10px;border:1px solid #e7d9c8;border-radius:8px;background:transparent;color:#80543f;font-size:12px;cursor:pointer}
 .hhba-letter-outline:hover,.hhba-letter-copy:hover{background:#f7ecdc}
-.hhba-letter-paper-status{margin:0!important;min-height:20px;padding:0 26px 7px;color:#2e6749!important;font-size:11px!important;text-align:right}
+.hhba-letter-paper-status{margin:0!important;min-height:20px;padding:0 26px 7px;color:#125EBC!important;font-size:11px!important;text-align:right}
 @keyframes hhba-letter-rise{from{opacity:0;transform:translateY(15px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes hhba-letter-unfold{from{opacity:0;transform:translateY(25px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:560px){.hhba-letter-overlay{padding:9px 8px}.hhba-letter-intro{padding:38px 16px 15px;max-height:calc(100dvh - 18px)}.hhba-letter-envelope{width:min(100%,360px)}.hhba-letter-paper{max-height:calc(100dvh - 18px)}.hhba-letter-paper-head{padding:11px 14px 0}.hhba-letter-paper-title{padding:0 12px 11px}.hhba-letter-paper-title h2{font-size:23px}.hhba-letter-paper-scroll{padding:4px 17px 20px}.hhba-letter-line{font-size:14px!important;line-height:1.92!important;margin-bottom:15px!important}.hhba-letter-paper-footer{padding:9px 10px 7px;display:grid;grid-template-columns:1fr 1fr;gap:6px}.hhba-letter-paper-footer .hhba-letter-primary{grid-column:1/-1;order:-1}.hhba-letter-paper-status{padding:0 10px 4px;text-align:center}.hhba-letter-revisit{margin-top:10px}}

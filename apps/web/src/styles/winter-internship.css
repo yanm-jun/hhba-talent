@@ -4,7 +4,7 @@
 .hhba-winter-modal-close{position:absolute;right:13px;top:13px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fffffff0;border:1px solid #e0e8f1;box-shadow:0 2px 14px #00000014;color:#1b365a;z-index:5;cursor:pointer}
 .hhba-winter-modal-close:hover{background:#eff6ff}
 .hhba-winter-modal-close:focus-visible,.hhba-winter-join:focus-visible,.hhba-winter-card-detail:focus-visible{outline:3px solid #ff8a36;outline-offset:3px}
-.hhba-winter-modal-copy{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:25px 23px 20px 29px;background:radial-gradient(ellipse at 100% 10%,#cee8ff 0,transparent 60%),linear-gradient(158deg,#fcffff 0%,#f1f8ff 64%,#ebf6ff 100%);z-index:1}
+.hhba-winter-modal-copy{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:25px 23px 20px 29px;background:radial-gradient(ellipse at 100% 10%,#cee8ff 0,transparent 60%),linear-gradient(158deg,#FDFDFE 0%,#f1f8ff 64%,#ebf6ff 100%);z-index:1}
 .hhba-winter-modal-copy:before{content:"";position:absolute;width:210px;height:210px;border:1px solid #1666bd1c;border-radius:50%;top:-110px;left:-85px;pointer-events:none}
 .hhba-winter-brand{display:flex;align-items:center;flex-wrap:wrap;gap:9px;color:#416b97;font-size:9px;font-weight:800;letter-spacing:.11em}
 .hhba-winter-brand-dot{color:#0e559a;font-size:18px;font-weight:950;letter-spacing:-.05em}
@@ -40,7 +40,7 @@
 .hhba-winter-landing-hero>img{width:100%;height:100%;min-height:365px;object-fit:cover;object-position:center}
 .hhba-winter-page-trust{display:flex;justify-content:space-around;gap:15px;flex-wrap:wrap;background:#fff;padding:20px;margin:17px 0 40px;border:1px solid #e0e9f0;border-radius:14px}
 .hhba-winter-page-trust span{display:flex;align-items:center;gap:7px;color:#496783;font-size:12px;font-weight:700}
-.hhba-winter-page-trust svg{color:#258b65}
+.hhba-winter-page-trust svg{color:#125EBC}
 .hhba-winter-section-title h2{font-size:26px;color:#153755;margin:4px 0 8px}
 .hhba-winter-section-title p{color:#eb7e0d;font-weight:700;font-size:11px;margin:0}
 .hhba-winter-section-title span{font-size:13px;color:#7b8c9f}
@@ -86,7 +86,7 @@
 .hhba-winter-detail-panel h1{font-size:30px;line-height:1.4;color:#19548d;margin:13px 0}
 .hhba-winter-detail-panel>div>p{font-size:13px;line-height:1.85;color:#667e93}
 .hhba-winter-detail-company{font-size:14px!important;font-weight:800;color:#3b75a4!important}
-.hhba-winter-source-tag{display:inline-flex;align-items:center;gap:5px;background:#e2f3eb;padding:7px 11px;color:#277755;font-size:11px;border-radius:6px;font-weight:750}
+.hhba-winter-source-tag{display:inline-flex;align-items:center;gap:5px;background:#E7F0FC;padding:7px 11px;color:#125EBC;font-size:11px;border-radius:6px;font-weight:750}
 .hhba-winter-detail-facts{display:grid;gap:8px}.hhba-winter-detail-facts div{display:grid;gap:6px;border-radius:10px;padding:11px 15px;background:#ffffffcb}
 .hhba-winter-detail-facts small{font-size:11px;color:#718396}.hhba-winter-detail-facts strong{font-size:12px;line-height:1.6;color:#30516e}
 .hhba-winter-detail-info{background:#fff;border:1px solid #e0eaf0;border-radius:15px;padding:30px;margin-top:18px;line-height:1.9;color:#587189;font-size:13px}
@@ -168,7 +168,7 @@
 .hhba-winter-role-flags{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:10px;color:#4d7498;font-weight:750}
 .hhba-winter-role-flags>span{border-radius:5px;background:#eff5fb;padding:4px 7px}
 .hhba-winter-role-flags .hhba-winter-status-caution{background:#fff1dd;color:#996128}
-.hhba-winter-role-flags .hhba-winter-status-neutral{background:#edf5f0;color:#3b8268}
+.hhba-winter-role-flags .hhba-winter-status-neutral{background:#E7F0FC;color:#1373FA}
 .hhba-winter-role-row h3{font-size:16px;line-height:1.4;margin:8px 0 7px}
 .hhba-winter-role-row h3 a{color:#204d75;text-decoration:none}
 .hhba-winter-role-row h3 a:hover{color:#e87a0a;text-decoration:underline}

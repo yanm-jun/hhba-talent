@@ -44,7 +44,7 @@
 .join-benefits-section{background:linear-gradient(180deg,#f6f8fb 0%,#f8f9fa 90%);margin-inline:-18px;padding:73px 22px;border-radius:20px}
 .join-benefits-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
 .join-benefit-card{min-height:205px}
-.join-benefit-icon{background:#edf3ef;color:#315e48}
+.join-benefit-icon{background:#E7F0FC;color:#125EBC}
 .join-disclosure{display:flex;align-items:flex-start;gap:16px;border-radius:12px;border:1px solid #dbe6ee;background:#fff;padding:22px;margin-top:25px}
 .join-disclosure>svg{margin-top:2px;color:#52738b;flex-shrink:0}
 .join-disclosure h3{font-size:13.5px;color:#354962;margin:0 0 9px}
@@ -81,8 +81,8 @@
 .join-form-progress b{background:#f0f2f5;color:#98a3b0;width:27px;height:27px;border-radius:50%;display:grid;place-items:center;font-size:11px}
 .join-form-progress .is-current{color:#2e4766;font-weight:700}
 .join-form-progress .is-current b{background:#263d5c;color:#fff}
-.join-form-progress .is-complete{color:#52715d}
-.join-form-progress .is-complete b{background:#e8f2ea;color:#3e6f50}
+.join-form-progress .is-complete{color:#60758F}
+.join-form-progress .is-complete b{background:#E7F0FC;color:#125EBC}
 .join-form-body{padding:32px 38px}
 .join-form-body h3{font-size:20px;letter-spacing:-.4px;margin:0 0 8px;color:#243348}
 .join-form-description{font-size:12px;line-height:1.9;color:#8390a0;margin:0 0 26px}

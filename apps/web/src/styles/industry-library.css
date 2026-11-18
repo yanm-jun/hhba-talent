@@ -1,7 +1,7 @@
 /* HHBA candidate-only enterprise recruitment library, scoped to the public pages. */
 .hhba-library-content{width:100%;max-width:1120px;margin:34px auto 72px;padding:0 12px;color:#20354c}
 .hhba-library-heading{max-width:850px;margin-bottom:24px}
-.hhba-library-eyebrow{display:block;margin-bottom:9px;font-size:11px;font-weight:800;letter-spacing:.12em;color:#3f886e}
+.hhba-library-eyebrow{display:block;margin-bottom:9px;font-size:11px;font-weight:800;letter-spacing:.12em;color:#1373FA}
 .hhba-library-heading h1{font-size:clamp(26px,3.1vw,38px);letter-spacing:-.05em;line-height:1.3;margin:0 0 10px}
 .hhba-library-heading p{margin:0;color:#65788d;font-size:14px;line-height:1.8}
 .hhba-library-overview{display:flex;align-items:stretch;gap:10px;margin-bottom:18px}
@@ -21,10 +21,10 @@
 .hhba-library-hall-icon{display:grid;place-items:center;width:40px;height:40px;background:#edf5fb;border:1px solid #deecf6;border-radius:11px;color:#3073a1}
 .hhba-library-hall-card strong{font-size:17px;font-weight:800;line-height:1.4}
 .hhba-library-hall-card small{font-size:12px;line-height:1.5;color:#78889a}
-.hhba-library-hall-card>span:last-child{display:inline-flex;align-items:center;gap:6px;margin-top:auto;padding-top:5px;color:#28724d;font-size:12px;font-weight:750}
+.hhba-library-hall-card>span:last-child{display:inline-flex;align-items:center;gap:6px;margin-top:auto;padding-top:5px;color:#125EBC;font-size:12px;font-weight:750}
 .hhba-library-footnote{color:#8090a0;font-size:12px;line-height:1.85;margin:25px 0 0}
 .hhba-library-back{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:#476881;font-size:13px;font-weight:750;margin:0 0 24px}
-.hhba-library-back:hover{color:#26724d}
+.hhba-library-back:hover{color:#125EBC}
 .hhba-library-detail-heading{margin-bottom:20px}
 .hhba-library-hall-stats{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:16px}
 .hhba-library-hall-stats>span{display:inline-flex;align-items:baseline;gap:5px;padding:9px 13px;border-radius:9px;border:1px solid #e0e8ef;background:#fff;color:#6c8090;font-size:12px}
@@ -37,8 +37,8 @@
 .hhba-library-record-info{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;min-width:0;flex:1}
 .hhba-library-record-info strong{color:#1d344d;font-size:15px;overflow-wrap:anywhere}
 .hhba-library-record-info small{display:block;flex-basis:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#7a8da1;font-size:12px;line-height:1.5}
-.hhba-library-outbound{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;background:#eef7f1;border:1px solid #d2e5d7;border-radius:9px;padding:9px 12px;text-decoration:none;color:#276b47;font-size:12px;font-weight:750}
-.hhba-library-outbound:hover{background:#e0f0e6}
+.hhba-library-outbound{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;background:#E7F0FC;border:1px solid #E7F0FC;border-radius:9px;padding:9px 12px;text-decoration:none;color:#125EBC;font-size:12px;font-weight:750}
+.hhba-library-outbound:hover{background:#E7F0FC}
 .hhba-library-unavailable{color:#a0a8b2;font-size:12px}
 .hhba-library-pager{display:flex;justify-content:center;align-items:center;gap:18px;margin:24px 0}
 .hhba-library-pager>span{color:#76889b;font-size:12px}
@@ -64,10 +64,10 @@
 @media(prefers-reduced-motion:reduce){.hhba-library-hall-card{transition:none}.hhba-library-hall-card:hover{transform:none}}
 
 /* Stage 3: professional exploration. All layout scoped to the library. */
-.hhba-major-entry{display:flex;align-items:center;gap:16px;max-width:100%;margin:0 0 20px;padding:18px 20px;background:linear-gradient(100deg,#eff8f4,#f0f6ff);border:1px solid #d8e7e5;border-radius:14px;text-decoration:none;color:#1b4256}
-.hhba-major-entry:hover{border-color:#9ac4b2;box-shadow:0 8px 20px #215b5d10}
-.hhba-major-entry:focus-visible{outline:3px solid #6eacb6;outline-offset:3px}
-.hhba-major-entry-icon{display:grid;place-items:center;flex:0 0 auto;width:48px;height:48px;background:#def0e8;border:1px solid #cce8d9;border-radius:13px;color:#267c5c}
+.hhba-major-entry{display:flex;align-items:center;gap:16px;max-width:100%;margin:0 0 20px;padding:18px 20px;background:linear-gradient(100deg,#E7F0FC,#f0f6ff);border:1px solid #E7F0FC;border-radius:14px;text-decoration:none;color:#1b4256}
+.hhba-major-entry:hover{border-color:#649DE6;box-shadow:0 8px 20px #1373FA10}
+.hhba-major-entry:focus-visible{outline:3px solid #7C91A8;outline-offset:3px}
+.hhba-major-entry-icon{display:grid;place-items:center;flex:0 0 auto;width:48px;height:48px;background:#E7F0FC;border:1px solid #E7F0FC;border-radius:13px;color:#125EBC}
 .hhba-major-entry>span:nth-child(2){display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}
 .hhba-major-entry strong{font-size:17px;font-weight:800}
 .hhba-major-entry small{font-size:12px;color:#657b88;line-height:1.6}
@@ -78,7 +78,7 @@
 .hhba-major-choice-label select:focus-visible{outline:3px solid #a5c9de;outline-offset:2px}
 .hhba-major-search-label .hhba-library-search input{font-weight:400}
 .hhba-major-start{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin:20px 0 4px;padding:54px 18px;border-radius:15px;border:1px dashed #cfdee7;background:#fff;color:#57728b}
-.hhba-major-start svg{color:#268967}
+.hhba-major-start svg{color:#125EBC}
 .hhba-major-start strong{font-size:17px;color:#275169}
 .hhba-major-start p{font-size:12px;margin:0;line-height:1.7}
 .hhba-major-selected{padding:22px 22px 18px;background:#fff;border:1px solid #dde7ec;border-radius:14px}
@@ -89,8 +89,8 @@
 .hhba-major-count{white-space:nowrap;padding:7px 10px;border:1px solid #e1e9ef;border-radius:8px;background:#f8fafb}
 .hhba-major-chips{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
 .hhba-major-chip{display:inline-flex;align-items:center;gap:6px;padding:9px 11px;border:1px solid #d8e5ed;border-radius:9px;background:#f7fafc;color:#517087;font-size:12px;font-weight:700;cursor:pointer}
-.hhba-major-chip:hover,.hhba-major-chip:focus-visible{border-color:#93baa8;background:#ebf6ef;color:#236b4e}
-.hhba-major-chip.is-active{background:#ebf7f0;border-color:#bfe5cc;color:#286a48}
+.hhba-major-chip:hover,.hhba-major-chip:focus-visible{border-color:#649DE6;background:#E7F0FC;color:#125EBC}
+.hhba-major-chip.is-active{background:#E7F0FC;border-color:#C5DBF8;color:#125EBC}
 .hhba-major-extra{margin-top:16px;border-top:1px dashed #e1e9ef;padding-top:15px}
 .hhba-major-extra summary{cursor:pointer;color:#44687b;font-size:12px;font-weight:700}
 .hhba-major-extra .hhba-major-chips{padding-top:13px}
@@ -108,8 +108,8 @@
  .hhba-major-start{padding:40px 18px}
 }
 
-.hhba-major-secondary-entry{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;margin:0 0 14px;background:#eef8f3;border:1px solid #d0e7da;border-radius:9px;color:#286b4c;font-weight:700;font-size:12px;text-decoration:none}
-.hhba-major-secondary-entry:hover{border-color:#94c6a8;background:#e5f3e9}
+.hhba-major-secondary-entry{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;margin:0 0 14px;background:#E7F0FC;border:1px solid #E7F0FC;border-radius:9px;color:#125EBC;font-weight:700;font-size:12px;text-decoration:none}
+.hhba-major-secondary-entry:hover{border-color:#649DE6;background:#E7F0FC}
 
 /* Candidate-first directory: show useful entry points, not administrator inventory metrics. */
 .hhba-library-user-heading{margin:0 0 23px}
