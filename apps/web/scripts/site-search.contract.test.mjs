@@ -10,7 +10,7 @@ const page=read('src/pages/SiteSearchPage.tsx');
 const css=read('src/styles/site-search.css');
 
 test('search stays available to public visitors and C-end members after employer retirement',()=>{
- assert.equal((shell.match(/<HeaderSiteSearch\/>/g)||[]).length,2);
+ assert.equal((shell.match(/<HeaderSiteSearch\/>/g)||[]).length,1);
  assert.doesNotMatch(shell,/企业招聘与治理导航|企业入驻/);
  assert.match(shell,/role="search"/);
  assert.match(shell,/aria-label="搜索汇方职场 HHBA 站内所有公开内容"/);
