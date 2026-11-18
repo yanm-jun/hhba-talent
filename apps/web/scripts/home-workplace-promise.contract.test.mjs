@@ -55,7 +55,7 @@ test('all public rights and legal knowledge URLs render independently, while pri
    "if(route==='/rights')return <WorkplaceRightsPage user={user}/>",
    "if(route==='/rights/knowledge')return <LegalAidLandingPage user={user}/>",
    "if(route==='/rights/support')return <LegalAidInterventionPage user={user}/>",
-   "if(/^\/rights\/knowledge\/[a-z-]{5,60}$/.test(route))return <LegalAidTopicPage"
+   String.raw`if(/^\/rights\/knowledge\/[a-z-]{5,60}$/.test(route))return <LegalAidTopicPage`
  ])assert.ok(routes.includes(route),'public route missing: '+route);
  assert.ok(footer.includes("['会员与权益服务','/rights']"));
  assert.ok(footer.includes("['劳动权益知识','/rights/knowledge']"));
