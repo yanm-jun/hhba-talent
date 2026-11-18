@@ -1,18 +1,18 @@
 .hhba-v2-company-status{max-width:960px;margin:48px auto;padding:20px}
 .hhba-v2-company-chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
-.hhba-v2-company-chips button{border:1px solid #d8e4dd;border-radius:99px;padding:8px 12px;background:#fff;color:#426451;font-size:13px;cursor:pointer}
-.hhba-v2-company-chips button.selected{background:#1f6446;border-color:#1f6446;color:#fff;font-weight:700}
-.hhba-v2-company-note{display:flex;align-items:center;gap:6px;font-size:12px;color:#62776b;line-height:1.6;margin:12px 0 18px}
+.hhba-v2-company-chips button{border:1px solid #E7F0FC;border-radius:99px;padding:8px 12px;background:#fff;color:#365271;font-size:13px;cursor:pointer}
+.hhba-v2-company-chips button.selected{background:#125EBC;border-color:#125EBC;color:#fff;font-weight:700}
+.hhba-v2-company-note{display:flex;align-items:center;gap:6px;font-size:12px;color:#60758F;line-height:1.6;margin:12px 0 18px}
 .hhba-v2-company-role-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.hhba-v2-company-role{padding:18px;border:1px solid #dfe9e3;border-radius:12px;background:white;min-width:0}
-.hhba-v2-company-role[data-focus="true"]{border-color:#397d55;box-shadow:0 0 0 2px #d8ece0}
+.hhba-v2-company-role{padding:18px;border:1px solid #E7F0FC;border-radius:12px;background:white;min-width:0}
+.hhba-v2-company-role[data-focus="true"]{border-color:#1373FA;box-shadow:0 0 0 2px #E7F0FC}
 .hhba-v2-company-role-head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.hhba-v2-company-role h3{font-size:16px;margin:0;color:#263b2f}
-.hhba-v2-company-role-head small,.hhba-v2-company-role>small{font-size:12px;color:#738278}
-.hhba-v2-company-role p{line-height:1.75;font-size:13px;color:#536b5d}
+.hhba-v2-company-role h3{font-size:16px;margin:0;color:#102A5A}
+.hhba-v2-company-role-head small,.hhba-v2-company-role>small{font-size:12px;color:#60758F}
+.hhba-v2-company-role p{line-height:1.75;font-size:13px;color:#60758F}
 .hhba-v2-company-role details{margin-top:12px;font-size:13px}
-.hhba-v2-company-role summary{cursor:pointer;color:#21724a;display:flex;align-items:center;gap:4px}
-.hhba-v2-company-no-roles{font-size:13px;color:#6d8272}
+.hhba-v2-company-role summary{cursor:pointer;color:#125EBC;display:flex;align-items:center;gap:4px}
+.hhba-v2-company-no-roles{font-size:13px;color:#60758F}
 @media(max-width:680px){.hhba-v2-company-role-grid{grid-template-columns:1fr}}
 
 /* Approved shared 4-card V2 layout used by 031 Qizheng and 032 WEIPU; other enterprise templates are unchanged. */
@@ -46,43 +46,43 @@
    No permanent raw browser-blue source links. Other employer styles unchanged. */
 .hhba-v2-weipu .hhba-v2-company-role-grid{align-items:stretch;gap:12px}
 .hhba-v2-weipu .hhba-v2-company-role{
-  min-height:208px;padding:18px 19px 16px;border:1px solid #dfe8e4;border-radius:13px;
+  min-height:208px;padding:18px 19px 16px;border:1px solid #E7F0FC;border-radius:13px;
   background:#fff;display:flex;flex-direction:column;box-shadow:none
 }
 .hhba-v2-weipu .hhba-v2-company-role-head{align-items:flex-start}
 .hhba-v2-weipu .hhba-v2-company-role h3{
-  margin:0;color:#263b33;font-size:16px;line-height:1.5;font-weight:750
+  margin:0;color:#102A5A;font-size:16px;line-height:1.5;font-weight:750
 }
 .hhba-v2-weipu .hhba-v2-weipu-education{
-  margin:4px 0 10px;font-size:12px;line-height:1.65;color:#7f8e8c
+  margin:4px 0 10px;font-size:12px;line-height:1.65;color:#889BB0
 }
 .hhba-v2-weipu .hhba-v2-company-role .hhba-v2-weipu-description{
-  margin:0 0 12px;color:#657f78;font-size:13px;line-height:1.9;
+  margin:0 0 12px;color:#60758F;font-size:13px;line-height:1.9;
   overflow-wrap:anywhere;white-space:normal
 }
 .hhba-v2-weipu .hhba-v2-company-role>small.hhba-v2-weipu-location{
   display:block;color:#82908f;font-size:12px;line-height:1.7;margin:0 0 12px
 }
 .hhba-v2-weipu .hhba-v2-company-role details{
-  margin-top:auto;border:0;padding:0;color:#2b7b51;font-size:13px
+  margin-top:auto;border:0;padding:0;color:#125EBC;font-size:13px
 }
 .hhba-v2-weipu .hhba-v2-company-role details summary{
   display:inline-flex;align-items:center;gap:5px;list-style:none;
-  font-weight:600;color:#298055;line-height:1.6;text-decoration:none;cursor:pointer
+  font-weight:600;color:#125EBC;line-height:1.6;text-decoration:none;cursor:pointer
 }
 .hhba-v2-weipu .hhba-v2-company-role details summary::-webkit-details-marker{display:none}
 .hhba-v2-weipu .hhba-v2-company-role details summary svg{transition:transform .18s ease}
 .hhba-v2-weipu .hhba-v2-company-role details[open] summary svg{transform:rotate(180deg)}
 .hhba-v2-weipu .hhba-v2-company-role details>p{
-  margin:12px 0 4px;padding-top:12px;border-top:1px solid #edf1ef;
-  color:#657b75;font-size:12px;line-height:1.8
+  margin:12px 0 4px;padding-top:12px;border-top:1px solid #E7F0FC;
+  color:#60758F;font-size:12px;line-height:1.8
 }
 .hhba-v2-weipu-detail-links{display:flex;flex-wrap:wrap;gap:15px;margin:9px 0 0}
 .hhba-v2-weipu-detail-links a{display:inline-flex;align-items:center;gap:4px;
-  font-size:12px;font-weight:600;color:#2d7c56;text-decoration:none}
+  font-size:12px;font-weight:600;color:#125EBC;text-decoration:none}
 .hhba-v2-weipu-detail-links a:hover{text-decoration:underline}
 .hhba-v2-weipu .hhba-v2-company-role details summary:focus-visible,
-.hhba-v2-weipu-detail-links a:focus-visible{outline:2px solid #2d8056;outline-offset:3px}
+.hhba-v2-weipu-detail-links a:focus-visible{outline:2px solid #125EBC;outline-offset:3px}
 @media(max-width:760px){.hhba-v2-weipu .hhba-v2-company-role{min-height:0;padding:16px}}
 
 /* BODOR #033: role cards follow the screenshot-approved detailed information template:
@@ -90,59 +90,59 @@
    No permanent raw browser-blue source links. Other employer styles unchanged. */
 .hhba-v2-bodor .hhba-v2-company-role-grid{align-items:stretch;gap:12px}
 .hhba-v2-bodor .hhba-v2-company-role{
-  min-height:208px;padding:18px 19px 16px;border:1px solid #dfe8e4;border-radius:13px;
+  min-height:208px;padding:18px 19px 16px;border:1px solid #E7F0FC;border-radius:13px;
   background:#fff;display:flex;flex-direction:column;box-shadow:none
 }
 .hhba-v2-bodor .hhba-v2-company-role-head{align-items:flex-start}
 .hhba-v2-bodor .hhba-v2-company-role h3{
-  margin:0;color:#263b33;font-size:16px;line-height:1.5;font-weight:750
+  margin:0;color:#102A5A;font-size:16px;line-height:1.5;font-weight:750
 }
 .hhba-v2-bodor .hhba-v2-weipu-education{
-  margin:4px 0 10px;font-size:12px;line-height:1.65;color:#7f8e8c
+  margin:4px 0 10px;font-size:12px;line-height:1.65;color:#889BB0
 }
 .hhba-v2-bodor .hhba-v2-company-role .hhba-v2-weipu-description{
-  margin:0 0 12px;color:#657f78;font-size:13px;line-height:1.9;
+  margin:0 0 12px;color:#60758F;font-size:13px;line-height:1.9;
   overflow-wrap:anywhere;white-space:normal
 }
 .hhba-v2-bodor .hhba-v2-company-role>small.hhba-v2-weipu-location{
   display:block;color:#82908f;font-size:12px;line-height:1.7;margin:0 0 12px
 }
 .hhba-v2-bodor .hhba-v2-company-role details{
-  margin-top:auto;border:0;padding:0;color:#2b7b51;font-size:13px
+  margin-top:auto;border:0;padding:0;color:#125EBC;font-size:13px
 }
 .hhba-v2-bodor .hhba-v2-company-role details summary{
   display:inline-flex;align-items:center;gap:5px;list-style:none;
-  font-weight:600;color:#298055;line-height:1.6;text-decoration:none;cursor:pointer
+  font-weight:600;color:#125EBC;line-height:1.6;text-decoration:none;cursor:pointer
 }
 .hhba-v2-bodor .hhba-v2-company-role details summary::-webkit-details-marker{display:none}
 .hhba-v2-bodor .hhba-v2-company-role details summary svg{transition:transform .18s ease}
 .hhba-v2-bodor .hhba-v2-company-role details[open] summary svg{transform:rotate(180deg)}
 .hhba-v2-bodor .hhba-v2-company-role details>p{
-  margin:12px 0 4px;padding-top:12px;border-top:1px solid #edf1ef;
-  color:#657b75;font-size:12px;line-height:1.8
+  margin:12px 0 4px;padding-top:12px;border-top:1px solid #E7F0FC;
+  color:#60758F;font-size:12px;line-height:1.8
 }
 .hhba-v2-weipu-detail-links{display:flex;flex-wrap:wrap;gap:15px;margin:9px 0 0}
 .hhba-v2-weipu-detail-links a{display:inline-flex;align-items:center;gap:4px;
-  font-size:12px;font-weight:600;color:#2d7c56;text-decoration:none}
+  font-size:12px;font-weight:600;color:#125EBC;text-decoration:none}
 .hhba-v2-weipu-detail-links a:hover{text-decoration:underline}
 .hhba-v2-bodor .hhba-v2-company-role details summary:focus-visible,
-.hhba-v2-weipu-detail-links a:focus-visible{outline:2px solid #2d8056;outline-offset:3px}
+.hhba-v2-weipu-detail-links a:focus-visible{outline:2px solid #125EBC;outline-offset:3px}
 @media(max-width:760px){.hhba-v2-bodor .hhba-v2-company-role{min-height:0;padding:16px}}
 
 /* BODOR 033 branded identity, sourced corporate photos and readable spacing. */
 .hhba-v2-bodor .hhba-kpmg-logo img{max-width:78px;max-height:62px;width:100%;height:auto;object-fit:contain}
 .hhba-v2-bodor .hhba-kpmg-photo-grid figure{min-width:0}
 .hhba-v2-bodor .hhba-kpmg-photo-grid img{object-fit:cover;object-position:center}
-.hhba-v2-bodor .hhba-v2-company-role .hhba-v2-weipu-education{color:#81908e}
-.hhba-v2-bodor .hhba-v2-company-role details summary{color:#298055;text-decoration:none}
+.hhba-v2-bodor .hhba-v2-company-role .hhba-v2-weipu-education{color:#889BB0}
+.hhba-v2-bodor .hhba-v2-company-role details summary{color:#125EBC;text-decoration:none}
 
 /* PXW #034: inherit Bodor's screenshot-approved green detailed-job card style.
    This changes only PXW identity and photo treatment, not previous employers. */
 .hhba-v2-pxw .hhba-kpmg-logo img{max-width:82px;max-height:76px;object-fit:contain}
 .hhba-v2-pxw .hhba-kpmg-photo-grid figure{overflow:hidden}
 .hhba-v2-pxw .hhba-kpmg-photo-grid img{object-fit:cover;object-position:50% 42%}
-.hhba-v2-pxw .hhba-v2-company-role details summary{color:#2d8056}
-.hhba-v2-pxw .hhba-v2-company-role>small.hhba-v2-weipu-location{color:#73817d}
+.hhba-v2-pxw .hhba-v2-company-role details summary{color:#125EBC}
+.hhba-v2-pxw .hhba-v2-company-role>small.hhba-v2-weipu-location{color:#60758F}
 @media(max-width:760px){.hhba-v2-pxw .hhba-kpmg-logo img{max-width:65px}}
 
 /* KEYENCE 157: the exact V2 screenshot-approved four-section template. */
@@ -152,7 +152,7 @@
 .hhba-v2-keyence .hhba-v2-company-role-grid{grid-template-columns:minmax(0,1fr)}
 .hhba-v2-keyence .hhba-v2-company-role{min-height:225px}
 .hhba-v2-keyence .hhba-v2-company-role h3{font-size:18px}
-.hhba-v2-keyence .hhba-v2-company-role details summary{color:#2d8056}
+.hhba-v2-keyence .hhba-v2-company-role details summary{color:#125EBC}
 .hhba-v2-keyence .hhba-v2-qizheng-majors .hhba-v2-company-chips{gap:9px}
 @media(min-width:850px){.hhba-v2-keyence .hhba-v2-company-role-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
@@ -161,6 +161,6 @@
 .hhba-v2-minieye .hhba-kpmg-logo img{max-width:100%;max-height:88px;object-fit:contain}
 .hhba-v2-minieye .hhba-kpmg-photo-grid img{object-fit:cover;object-position:center}
 .hhba-v2-minieye .hhba-v2-company-role h3{font-size:16px;line-height:1.55}
-.hhba-v2-minieye .hhba-v2-company-role details summary{color:#298055;text-decoration:none}
+.hhba-v2-minieye .hhba-v2-company-role details summary{color:#125EBC;text-decoration:none}
 .hhba-v2-minieye .hhba-v2-company-role>small.hhba-v2-weipu-location{color:#82908f}
 @media(max-width:760px){.hhba-v2-minieye .hhba-kpmg-logo img{max-height:66px}}
