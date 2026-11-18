@@ -27,13 +27,62 @@ test('membership details link opens the rights service introduction, including a
  const home=read('../src/components/HomeWorkplacePromise.tsx');
  const routes=read('../src/main.tsx');
  const rights=read('../src/pages/WorkplaceRightsPage.tsx');
- assert.match(home,/<Link className="hhba-home-text-link" to="\/candidate\/account\/rights">了解权益支持/);
+ assert.match(home,/<Link className="hhba-home-text-link" to="\/rights">了解权益支持/);
  assert.doesNotMatch(home,/to="\/candidate\/account\/legal-aid">了解权益支持/);
  assert.match(home,/to="\/membership\/rules">服务资格、范围与开通说明/);
- assert.match(routes,/if\(route==='\/candidate\/account\/rights'\)return <WorkplaceRightsPage user=\{user\}\/>/);
+ assert.match(routes,/if\(route==='\/rights'\)return <WorkplaceRightsPage user=\{user\}\/>/);
  assert.match(rights,/export function WorkplaceRightsPage\(\{user,embedded=false\}/);
  assert.match(rights,/尚未开放购买/);
- assert.match(rights,/to="\/candidate\/account\/legal-aid">先看免费劳动权益知识/);
+ assert.match(rights,/const knowledgeHref=embedded\?'\/candidate\/account\/legal-aid':'\/rights\/knowledge'/);
+});
+
+
+test('all public rights and legal knowledge URLs render independently, while private workspace links remain private',()=>{
+ const routes=read('../src/main.tsx');
+ const footer=read('../src/components/Shell.tsx');
+ const home=read('../src/pages/HomePage.tsx');
+ const rights=read('../src/pages/WorkplaceRightsPage.tsx');
+ const knowledge=read('../src/pages/LegalAidLandingPage.tsx');
+ const article=read('../src/pages/LegalAidTopicPage.tsx');
+ const support=read('../src/pages/LegalAidInterventionPage.tsx');
+ const personal=read('../src/pages/PersonalCenterPage.tsx');
+ const dropdown=read('../src/components/CandidateAccountDropdown.tsx');
+ const search=read('../src/services/siteSearchIndex.ts');
+ const publicRoute=routes.indexOf("if(route==='/rights')");
+ const privateRoute=routes.indexOf('const isCandidateWorkspaceRoute=');
+ assert.ok(publicRoute>0 && privateRoute>publicRoute,'public pages must be routed before account pages');
+ for(const route of [
+   "if(route==='/rights')return <WorkplaceRightsPage user={user}/>",
+   "if(route==='/rights/knowledge')return <LegalAidLandingPage user={user}/>",
+   "if(route==='/rights/support')return <LegalAidInterventionPage user={user}/>",
+   "if(/^\/rights\/knowledge\/[a-z-]{5,60}$/.test(route))return <LegalAidTopicPage"
+ ])assert.ok(routes.includes(route),'public route missing: '+route);
+ assert.ok(footer.includes("['会员与权益服务','/rights']"));
+ assert.ok(footer.includes("['劳动权益知识','/rights/knowledge']"));
+ assert.ok(home.includes("kind==='rights'?'/rights'"));
+ assert.ok(rights.includes('embedded?"个人工作台":"HHBA 首页"'));
+ assert.ok(rights.includes("embedded?'/candidate/account/legal-aid':'/rights/knowledge'"));
+ assert.ok(knowledge.includes("embedded?'/candidate/account/legal-aid':'/rights/knowledge'"));
+ assert.ok(knowledge.includes("embedded?'/candidate/account/rights':'/rights'"));
+ assert.ok(knowledge.includes("embedded?'/candidate/account/legal-aid/intervention':'/rights/support'"));
+ assert.ok(knowledge.includes("knowledgeHref+'/'+slug"),'article links should keep the public context');
+ assert.ok(article.includes("knowledgeHref+'/'+topics[index+1].slug"),'next article should keep the public context');
+ assert.ok(support.includes("knowledgeHref+'/'+topic.slug"),'support guidance should point to public article');
+ for(const path of ["/candidate/account/rights","/candidate/account/legal-aid","/candidate/account/legal-aid/intervention"]){
+   assert.ok(routes.includes("route==='"+path+"'"),'private route missing: '+path);
+ }
+ assert.ok(personal.includes("path:'/candidate/account/rights'"));
+ assert.ok(dropdown.includes("path:'/candidate/account/legal-aid'"));
+ for(const path of ["/rights","/rights/knowledge","/rights/support"])assert.ok(search.includes("path:'"+path+"'"));
+});
+test('public job and company browsing are not marked as private workspaces, and same-label job entries agree',()=>{
+ const home=read('../src/pages/HomePage.tsx');
+ const shell=read('../src/components/Shell.tsx');
+ assert.ok(home.includes("kind==='candidate'?'/candidate/jobs'"));
+ assert.ok(shell.includes("['我要应聘','/candidate/jobs']"));
+ assert.ok(shell.includes("if(route==='/candidate')return signedIn?'candidate':'public'"));
+ assert.ok(shell.includes("return 'public';"));
+ assert.ok(home.includes("onClick={()=>navigate('/candidate/match')}"),'AI matching remains accessible separately');
 });
 
 test('homepage financial disclosure uses distributable profit, not turnover, and does not invent reports',()=>{
