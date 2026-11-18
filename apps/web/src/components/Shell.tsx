@@ -13,10 +13,10 @@ import '../styles/site-search.css';
 // Navigation is contextual: a public landing page is not a candidate account
 // and a recruiter is NEVER granted the internal HHBA reviewer/admin role.
 type Experience='public'|'candidate';
-function experienceForRoute(route:string):Experience {
- if(route==='/')return 'public';
- if(route.startsWith('/candidate')||route.startsWith('/companies')||
-    route.startsWith('/majors')||route.startsWith('/public/'))return 'candidate';
+function experienceForRoute(route:string,signedIn:boolean):Experience {
+ // Public job listings and company directories do not become private workspaces on login.
+ if(route==='/candidate')return signedIn?'candidate':'public';
+ if(/^\/candidate\/(?:account(?:\/|$)|match(?:\/|$)|saved(?:\/|$)|resume(?:\/|$)|review(?:\/|$)|profile(?:\/|$))/.test(route))return 'candidate';
  return 'public';
 }
 // The talent-service entry must be identical in all three navigation contexts.
@@ -54,8 +54,8 @@ export function SiteFooter(){
    ['人才政策','/talent-service'],
   ]},
   {title:'劳动者权益',links:[
-   ['会员与权益服务','/candidate/account/rights'],
-   ['劳动权益知识','/candidate/account/legal-aid'],
+   ['会员与权益服务','/rights'],
+   ['劳动权益知识','/rights/knowledge'],
    ['责任与透明','/transparency'],
   ]},
   {title:'关于汇方',links:[
@@ -98,7 +98,7 @@ export function SiteFooter(){
 export function Shell({ user, children, embedded=false }: { user: User | null; children: React.ReactNode; embedded?: boolean }) {
  const navigate=useNavigate();
  const route=useRoute();
- const experience=experienceForRoute(route);
+ const experience=experienceForRoute(route,!!user?.account_types?.includes('candidate'));
  const hasCandidate=!!user?.account_types?.includes('candidate');
  const candidateSignedIn=hasCandidate;
  // Only a verified HHBA account session may unlock official recruiting outlinks.
