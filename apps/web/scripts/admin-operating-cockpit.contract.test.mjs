@@ -170,7 +170,7 @@ test('hovered SVG point exposes full date, original data, crosshair and keyboard
  assert.equal(tip.hidden,false);
  assert.match(tip.textContent,/2026年11月06日 · UTC/);
  assert.match(tip.textContent,/839 次/);
- const crosshair=svg.children.find(x=>x.tag==='line'&&x.attrs.stroke==='#789b88');
+ const crosshair=svg.children.find(x=>x.tag==='line'&&x.attrs.stroke==='#6B86A5');
  assert.equal(crosshair.attrs.visibility,'visible');
  svg.events.pointerleave({pointerType:'mouse'});
  assert.equal(tip.hidden,true);
