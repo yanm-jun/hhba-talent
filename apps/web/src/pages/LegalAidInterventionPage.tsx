@@ -24,6 +24,7 @@ const steps=[
 ] as const;
 
 export function LegalAidInterventionPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
+ const knowledgeHref=embedded?'/candidate/account/legal-aid':'/rights/knowledge';
  const [topicSlug,setTopicSlug]=useState<string|null>(null);
  const topic=categories.find(item=>item.slug===topicSlug);
  return <Shell user={user} embedded={embedded}>
@@ -31,11 +32,11 @@ export function LegalAidInterventionPage({user,embedded=false}:{user:User|null;e
    <section className="hhba-intervention-panel" aria-labelledby="hhba-intervention-title">
     <header className="hhba-intervention-header">
      <div className="hhba-intervention-brand">
-      <Link to="/candidate/account/legal-aid" className="hhba-intervention-logo">HHBA.</Link>
+      <Link to={knowledgeHref} className="hhba-intervention-logo">HHBA.</Link>
       <span className="hhba-intervention-divider" aria-hidden="true"/>
       <span>平台权益支持</span>
      </div>
-     <Link to="/candidate/account/legal-aid" className="hhba-intervention-back">
+     <Link to={knowledgeHref} className="hhba-intervention-back">
       <ArrowLeft size={13} aria-hidden="true"/>返回劳动权益支持
      </Link>
     </header>
@@ -96,7 +97,7 @@ export function LegalAidInterventionPage({user,embedded=false}:{user:User|null;e
          <p>{item.note}</p>
         </div>)}
        </div>
-       <Link className="hhba-intervention-evidence-link" to={'/candidate/account/legal-aid/'+topic.slug}>
+       <Link className="hhba-intervention-evidence-link" to={knowledgeHref+'/'+topic.slug}>
         查看适用法律、处理办法和真实案例 <ArrowRight size={14} aria-hidden="true"/>
        </Link>
       </div>:<div className="hhba-intervention-pick-hint">
