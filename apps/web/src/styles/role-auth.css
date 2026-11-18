@@ -30,7 +30,7 @@
 .hhba-phone-inline-feedback.is-invalid{color:#a15c34}
 .hhba-phone-form input[aria-invalid="true"]{border-color:#d2a18d}
 .hhba-phone-form input{font:inherit;color:#1B2E47;font-weight:450;font-size:13px;letter-spacing:0;width:100%;height:48px;border:1px solid #E7F0FC;background:#fff;border-radius:10px;outline:none;padding:0 13px;transition:border-color .17s,box-shadow .17s}
-.hhba-phone-form input::placeholder{color:#a2aba4}
+.hhba-phone-form input::placeholder{color:#9AA6B3}
 .hhba-phone-form input:focus{border-color:#60758F;box-shadow:0 0 0 3px rgba(18,94,188,.095)}
 .hhba-phone-number,.hhba-phone-code{display:flex;align-items:center;gap:9px;min-width:0}
 .hhba-phone-number{border:1px solid #E7F0FC;border-radius:10px;transition:border-color .17s,box-shadow .17s}
@@ -44,11 +44,11 @@
 .hhba-phone-submit{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;height:49px;background:#125EBC;border:1px solid #125EBC;border-radius:10px;color:#fff;font-size:13px;font-weight:720;letter-spacing:.02em;margin-top:5px;transition:background .16s,transform .16s}
 .hhba-phone-submit:not(:disabled):hover{background:#102A5A}
 .hhba-phone-submit:disabled{background:#365271;border-color:#365271;color:#fff;opacity:.76;cursor:not-allowed}
-.hhba-phone-account-change{text-align:center;font-size:12px;color:#859187;margin-top:23px}
+.hhba-phone-account-change{text-align:center;font-size:12px;color:#7B8A9B;margin-top:23px}
 .hhba-phone-account-change a{color:#125EBC;text-decoration:none;font-weight:700}
 .hhba-phone-account-change a:hover{text-decoration:underline}
 .hhba-phone-legacy{display:block;text-align:center;margin:12px 0 0;font-size:12px;color:#60758F;text-decoration:none}
-.hhba-phone-preview-note{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:#89958b;line-height:1.65;border-top:1px solid #E7F0FC;padding:17px 0 0;margin:23px 0 0}
+.hhba-phone-preview-note{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:#7F8E9F;line-height:1.65;border-top:1px solid #E7F0FC;padding:17px 0 0;margin:23px 0 0}
 .hhba-phone-preview-note svg{flex:none;margin-top:1px;color:#889BB0}
 .hhba-phone-warning,.hhba-phone-error,.hhba-phone-notice{font-size:12px;line-height:1.6;margin:0;padding:9px 12px;border-radius:8px}
 .hhba-phone-warning{background:#fef8e9;color:#966f2c}
@@ -57,7 +57,7 @@
 .hhba-phone-below{display:flex;align-items:center;justify-content:center;gap:12px;margin:23px 0 0;font-size:12px;color:#C5DBF8}
 .hhba-phone-below a{display:inline-flex;align-items:center;gap:5px;text-decoration:none;color:#60758F}
 .hhba-phone-below a:hover{color:#125EBC}
-.hhba-phone-footer,.hhba-role-footer{text-align:center;font-size:11px;color:#a3aca6;margin:20px 0 0;display:flex;justify-content:center;align-items:center;gap:6px}
+.hhba-phone-footer,.hhba-role-footer{text-align:center;font-size:11px;color:#9BA7B4;margin:20px 0 0;display:flex;justify-content:center;align-items:center;gap:6px}
 /* The public role picker uses the same compact white card and restrained branding. */
 .hhba-role-auth{width:min(100%,520px);margin:clamp(34px,7vh,74px) auto 70px;padding:0 12px}
 .hhba-role-frame{padding:38px clamp(22px,5vw,42px) 32px}
@@ -76,7 +76,7 @@
 .hhba-role-option-arrow{flex:none;color:#889BB0}
 .hhba-role-helper{font-size:11px;text-align:center;color:#889BB0;margin:20px 0 22px}
 .hhba-role-divider{height:1px;background:#E7F0FC;text-align:center;position:relative;margin:0 0 23px}
-.hhba-role-divider span{position:relative;top:-9px;background:#fff;padding:0 13px;color:#a5aea8;font-size:11px}
+.hhba-role-divider span{position:relative;top:-9px;background:#fff;padding:0 13px;color:#9EA9B5;font-size:11px}
 .hhba-role-browse{display:flex;align-items:center;justify-content:center;gap:6px;color:#1373FA;font-weight:650;text-decoration:none;font-size:12px}
 @media(max-width:520px){
  .hhba-phone-auth,.hhba-role-auth{margin:28px auto 48px;padding:0 3px}

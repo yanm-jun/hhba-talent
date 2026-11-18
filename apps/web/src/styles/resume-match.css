@@ -1,6 +1,6 @@
 
 .hhba-ai-page{max-width:1120px;margin:0 auto;padding:25px 24px 70px;color:#102A5A}
-.hhba-ai-breadcrumb{display:flex;align-items:center;gap:9px;color:#8b948d;margin:6px 0 35px;font-size:12px}
+.hhba-ai-breadcrumb{display:flex;align-items:center;gap:9px;color:#808E9F;margin:6px 0 35px;font-size:12px}
 .hhba-ai-breadcrumb a,.hhba-ai-footer a{display:inline-flex;align-items:center;gap:5px;color:#125EBC;text-decoration:none}
 .hhba-ai-hero{max-width:860px;margin-bottom:25px}
 .hhba-ai-kicker{display:flex;align-items:center;gap:8px;letter-spacing:.08em;font-size:11px;color:#60758F;font-weight:750}
@@ -27,7 +27,7 @@
 .hhba-ai-check,.hhba-ai-consent{display:flex;align-items:flex-start;gap:9px;margin-top:15px;font-size:12px;line-height:1.8;color:#365271}
 .hhba-ai-check input,.hhba-ai-consent input{accent-color:#1373FA;flex-shrink:0;margin-top:4px}
 .hhba-ai-consent{border:1px solid #E7F0FC;background:#F7F9FD;border-radius:9px;padding:12px;cursor:pointer}
-.hhba-ai-notice{display:flex;gap:7px;align-items:flex-start;color:#7d887e;font-size:11px;line-height:1.8;margin:13px 0 18px}
+.hhba-ai-notice{display:flex;gap:7px;align-items:flex-start;color:#718194;font-size:11px;line-height:1.8;margin:13px 0 18px}
 .hhba-ai-notice svg{flex-shrink:0;margin-top:3px}
 .hhba-ai-submit{display:flex;justify-content:center;align-items:center;gap:10px;width:100%;border:0;border-radius:10px;background:#125EBC;color:white;font-weight:750;font-size:14px;padding:15px;cursor:pointer}
 .hhba-ai-submit:hover:not(:disabled){background:#125EBC}
@@ -38,11 +38,11 @@
 .hhba-ai-aside h3{font-size:15px;margin:0 0 13px}
 .hhba-ai-aside ol{padding-left:19px;margin:0}
 .hhba-ai-aside li{padding:7px 0;color:#60758F;font-size:12px;line-height:1.7}
-.hhba-ai-aside-footnote{color:#879287;font-size:11px;line-height:1.8;margin:16px 6px}
+.hhba-ai-aside-footnote{color:#7C8B9D;font-size:11px;line-height:1.8;margin:16px 6px}
 .hhba-ai-results{margin-top:38px;max-width:900px}
 .hhba-ai-results-head{display:flex;justify-content:space-between;gap:12px;align-items:start}
 .hhba-ai-results-head h2{font-size:25px;margin:12px 0}
-.hhba-ai-results-head p{color:#738075;font-size:13px}
+.hhba-ai-results-head p{color:#68788B;font-size:13px}
 .hhba-ai-clear{border:1px solid #E7F0FC;border-radius:8px;padding:8px 13px;background:white;color:#60758F;cursor:pointer;white-space:nowrap}
 .hhba-ai-profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:18px}
 .hhba-ai-profile-grid>div{background:#F7F9FD;border-radius:10px;border:1px solid #E7F0FC;padding:17px;min-width:0}

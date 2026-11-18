@@ -1,6 +1,6 @@
 
 .resume-match-page{max-width:1110px;margin:0 auto;padding:26px 28px 86px;color:#102A5A}
-.resume-match-breadcrumb{display:flex;align-items:center;gap:10px;font-size:13px;color:#7a877e;margin-bottom:36px}
+.resume-match-breadcrumb{display:flex;align-items:center;gap:10px;font-size:13px;color:#6F7F92;margin-bottom:36px}
 .resume-match-breadcrumb a{color:#60758F;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
 .resume-match-breadcrumb strong{font-weight:500;color:#365271}
 .resume-match-kicker{color:#125EBC;font-size:13px;font-weight:650;letter-spacing:.02em;display:flex;align-items:center;gap:9px;margin-bottom:15px}
@@ -40,7 +40,7 @@
 .resume-match-guide h2{font-size:16px;letter-spacing:-.02em;margin:0 0 23px}
 .resume-match-guide div{padding-left:12px;border-left:2px solid #C5DBF8;margin:0 0 22px}
 .resume-match-guide b{font-size:13px;color:#365271}
-.resume-match-guide p{color:#7e8b81;line-height:1.75;font-size:12px;margin:5px 0}
+.resume-match-guide p{color:#738396;line-height:1.75;font-size:12px;margin:5px 0}
 .resume-match-guide>a,.resume-match-guide p a{color:#125EBC}
 .resume-match-results{margin-top:42px;padding-top:8px}
 .resume-match-result-heading>span{color:#1373FA;font-size:12px;font-weight:650}

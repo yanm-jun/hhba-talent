@@ -19,7 +19,7 @@
 .unified-company-brand{display:inline-flex;align-items:center;gap:11px;min-width:0}
 .unified-company-brand strong{font-size:13px;font-weight:750;color:var(--ink)}
 .unified-brand-logo{display:inline-flex;flex:0 0 42px;width:42px;height:42px;align-items:center;justify-content:center;
-  border:1px solid #e8eced;border-radius:10px;background:#fff;overflow:hidden}
+  border:1px solid #E8EAED;border-radius:10px;background:#fff;overflow:hidden}
 .unified-brand-logo img{display:block;width:32px;height:32px;object-fit:contain}
 .unified-brand-logo svg{color:#7b8791}
 .unified-brand-logo-wide{width:82px;flex-basis:82px}
@@ -134,7 +134,7 @@ a.unified-company-brand:focus-visible,.unified-detail-company-link:focus-visible
 .unified-major-field{display:flex;align-items:center;min-height:43px;padding:0 9px 0 11px;background:#fff;border:1px solid var(--line);border-radius:9px;color:var(--ink)}
 .unified-major-field:focus-within{outline:2px solid #C5DBF8;outline-offset:1px}
 .unified-major-field input{border:0;outline:0;background:transparent;width:100%;min-width:0;font-size:12px;line-height:1.4;color:var(--ink);padding:11px 0}
-.unified-major-field input::placeholder{color:#717d73}
+.unified-major-field input::placeholder{color:#667688}
 .unified-major-arrow{flex-shrink:0;color:#60758F;margin-left:4px}
 .unified-major-clear{display:grid;place-items:center;border:0;border-radius:6px;background:#F7F9FD;color:#125EBC;padding:5px;cursor:pointer}
 .unified-major-options{position:absolute;z-index:40;top:calc(100% + 6px);left:0;right:0;width:max(100%,260px);max-width:min(360px,calc(100vw - 32px));max-height:310px;overflow-y:auto;background:#fff;border:1px solid #E7F0FC;border-radius:10px;box-shadow:0 8px 25px #102A5A21;padding:8px}

@@ -15,7 +15,7 @@
 .hhba-jobs-form input{background:#fff;border:1px solid #C5DBF8;border-radius:9px;height:43px;color:#102A5A;font-size:13px;min-width:0;padding:0 12px}
 .hhba-jobs-form .primary-button{margin:0;min-height:43px}
 .hhba-jobs-channels{display:flex;gap:9px;flex-wrap:wrap;padding:24px 0 13px;border-bottom:1px solid var(--line)}
-.hhba-jobs-channels button{background:#fff;border:1px solid #d5dede;color:#60758F;border-radius:9px;font-size:12px;font-weight:720;padding:11px 15px}
+.hhba-jobs-channels button{background:#fff;border:1px solid #D4D9DF;color:#60758F;border-radius:9px;font-size:12px;font-weight:720;padding:11px 15px}
 .hhba-jobs-channels button.active{background:#125EBC;color:#fff;border-color:#125EBC}
 .hhba-jobs-count{display:flex;justify-content:space-between;align-items:center;margin:27px 0 12px;gap:13px}
 .hhba-jobs-count h2{font-size:21px;margin:0}.hhba-jobs-count span{font-size:12px;color:#889BB0}

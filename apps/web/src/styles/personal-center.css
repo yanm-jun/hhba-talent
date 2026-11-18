@@ -12,7 +12,7 @@
 .hhba-personal-cards a:hover{border-color:#C5DBF8;background:#F7F9FD}
 .hhba-personal-cards svg{color:#125EBC}
 .hhba-personal-cards strong{font-size:15px}
-.hhba-personal-cards small{font-size:12px;line-height:1.5;color:#7b8880}
+.hhba-personal-cards small{font-size:12px;line-height:1.5;color:#708093}
 .hhba-personal-panel{border:1px solid #E7F0FC;background:#fff;border-radius:14px;padding:23px;margin-bottom:20px}
 .hhba-personal-panel h2{display:flex;align-items:center;gap:9px;margin:0 0 11px;font-size:17px}
 .hhba-personal-panel>p{font-size:13px;color:#60758F;line-height:1.75}
@@ -25,7 +25,7 @@
 .hhba-personal-saved-list article{display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid #E7F0FC;padding:18px 0}
 .hhba-personal-saved-list article>div:first-child{display:flex;flex-direction:column;gap:5px;min-width:0}
 .hhba-personal-saved-list strong{font-size:14px;line-height:1.5}
-.hhba-personal-saved-list small{font-size:12px;line-height:1.5;color:#7b8880}
+.hhba-personal-saved-list small{font-size:12px;line-height:1.5;color:#708093}
 .hhba-personal-actions{display:flex;gap:11px;align-items:center;flex-shrink:0}
 .hhba-personal-error{color:#a33!important}
 .hhba-personal-error button{margin-left:9px}

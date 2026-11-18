@@ -66,7 +66,7 @@
 /* Stage 3: professional exploration. All layout scoped to the library. */
 .hhba-major-entry{display:flex;align-items:center;gap:16px;max-width:100%;margin:0 0 20px;padding:18px 20px;background:linear-gradient(100deg,#E7F0FC,#f0f6ff);border:1px solid #E7F0FC;border-radius:14px;text-decoration:none;color:#1b4256}
 .hhba-major-entry:hover{border-color:#649DE6;box-shadow:0 8px 20px #1373FA10}
-.hhba-major-entry:focus-visible{outline:3px solid #6eacb6;outline-offset:3px}
+.hhba-major-entry:focus-visible{outline:3px solid #7C91A8;outline-offset:3px}
 .hhba-major-entry-icon{display:grid;place-items:center;flex:0 0 auto;width:48px;height:48px;background:#E7F0FC;border:1px solid #E7F0FC;border-radius:13px;color:#125EBC}
 .hhba-major-entry>span:nth-child(2){display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}
 .hhba-major-entry strong{font-size:17px;font-weight:800}
