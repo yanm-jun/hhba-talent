@@ -109,7 +109,7 @@ function drawLine(id,values,{suffix='',digits=0,secondary=null,unit='次',scale=
  svg.append(primary);
  if(companion){
   svg.append(element('path',{d:makePath(companion),fill:'none',
-   stroke:'#d18f45','stroke-width':2.4,'stroke-linecap':'round','stroke-linejoin':'round'}));
+   stroke:'#F58217','stroke-width':2.4,'stroke-linecap':'round','stroke-linejoin':'round'}));
  }
  for(let i=0;i<measured.length;i++){
   if(measured[i]===null||(values.length>32&&i!==values.length-1))continue;
@@ -128,7 +128,7 @@ function drawLine(id,values,{suffix='',digits=0,secondary=null,unit='次',scale=
  const horizontal=element('line',{x1:pad.left,y1:0,x2:W-pad.right,y2:0,
   stroke:'#6B86A5','stroke-width':1,'stroke-dasharray':'2 4',visibility:'hidden'});
  const primaryDot=element('circle',{r:5,fill:'#fff',stroke:'#125EBC','stroke-width':2.8,visibility:'hidden'});
- const secondaryDot=element('circle',{r:5,fill:'#fff',stroke:'#d18f45','stroke-width':2.8,visibility:'hidden'});
+ const secondaryDot=element('circle',{r:5,fill:'#fff',stroke:'#F58217','stroke-width':2.8,visibility:'hidden'});
  svg.append(cursor,horizontal,primaryDot,secondaryDot);
  const stage=document.createElement('div');stage.className='hhba-cc-plot';
  const tooltip=document.createElement('div');tooltip.className='hhba-cc-tooltip';
@@ -161,7 +161,7 @@ function drawLine(id,values,{suffix='',digits=0,secondary=null,unit='次',scale=
    row.append(label,number);tooltip.append(row);
   };
   addRow(companion?'营业收入':'当日数据',v,'#125EBC');
-  if(companion)addRow('经营结果',other,'#d18f45');
+  if(companion)addRow('经营结果',other,'#F58217');
   const rect=stage.getBoundingClientRect();
   const boxW=Math.max(1,rect.width),boxH=Math.max(1,rect.height);
   tooltip.style.left=Math.min(boxW-75,Math.max(75,(x(index)/W)*boxW))+'px';
@@ -198,7 +198,7 @@ function drawLine(id,values,{suffix='',digits=0,secondary=null,unit='次',scale=
  });
  if(companion){
   const legend=document.createElement('p');legend.className='hhba-cc-finance-legend';
-  legend.textContent='● 营业收入（绿色）     ● 经营结果（橙色）';
+  legend.textContent='● 营业收入（蓝色）     ● 经营结果（橙色）';
   root.append(legend);
  }
  const valid=measured.filter(v=>v!==null);
