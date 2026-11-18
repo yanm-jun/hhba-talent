@@ -82,8 +82,13 @@ with sync_playwright() as p:
         page.get_by_role("heading", name="欢迎来到汇方职场").wait_for()
         assert "/candidate/register?next=%2Fcandidate%2Fmatch" in page.locator('a[href*="/candidate/register"]').first.get_attribute("href")
         no_horizontal_overflow(page, name + "-legacy-alias")
-        page.goto(BASE + "/candidate/account/rights", wait_until="domcontentloaded")
-        page.get_by_text("职场权益中心", exact=True).first.wait_for()
+        # Public rights marketing page is independent from the private candidate workbench.
+        page.goto(BASE + "/rights", wait_until="domcontentloaded")
+        photo = page.locator(".hhba-rights-editorial-cover img")
+        photo.wait_for()
+        assert photo.evaluate("(img) => img.complete && img.naturalWidth > 1000"), "The supplied HHBA hero photograph must load"
+        assert page.locator(".hhba-rights-editorial").count() == 1
+        assert page.locator(".hhba-account-sidebar").count() == 0
         assert page.get_by_text("尚未开放购买").is_visible()
         assert page.get_by_text("¥24.90").is_visible()
         assert page.get_by_text("任职企业公开信息月报").is_visible()
