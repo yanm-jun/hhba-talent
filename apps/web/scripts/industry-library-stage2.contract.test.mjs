@@ -71,7 +71,7 @@ test('second-stage navigation uses the new public directory, retains existing re
  const legacyIdx=main.indexOf("route==='/companies/discover'");
  assert.ok(routeIdx>0&&legacyIdx>routeIdx,'new route must precede legacy company routes');
  assert.ok(home.includes(":'/companies/library'"));
- assert.equal(shell.split('to="/companies/library">企业招聘导航</Link>').length-1,2);
+ assert.ok(shell.includes("['企业招聘导航','/companies/library']"));
  assert.ok(home.includes('title="我要应聘"'));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
  assert.ok(home.includes('<HomeCompanyMarquee/>'));
