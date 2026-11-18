@@ -1,39 +1,41 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const shell=readFileSync(new URL('../src/components/Shell.tsx',import.meta.url),'utf8');
-const app=readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8');
-const router=readFileSync(new URL('../src/router.tsx',import.meta.url),'utf8');
 const css=readFileSync(new URL('../src/styles/experience-navigation.css',import.meta.url),'utf8');
 let passed=0;function check(name,fn){fn();passed++;console.log('✓ '+name)}
-function nav(start,end){let i=shell.indexOf(start);assert.ok(i>=0,start);let j=shell.indexOf(end,i+start.length);assert.ok(j>i,end);return shell.slice(i,j)}
-const publicNav=nav("experience==='public'?<nav","</nav>:experience==='candidate'?");
-const candidateNav=nav("experience==='candidate'?<nav",'</nav>:<nav aria-label="企业招聘与治理导航">');
-const employerNav=nav('<nav aria-label="企业招聘与治理导航">','</nav>}');
-check('One canonical talent policy link points to the real talent service route',()=>{
+function nav(){const i=shell.indexOf('<header className="topbar');const j=shell.indexOf('</header>',i);assert.ok(i>=0);assert.ok(j>i);return shell.slice(i,j);}
+const header=nav();
+check('Top navigation keeps only high-value shortcuts',()=>{
+ for(const text of ['海外发展','人才政策','招聘市场','加入我们','个人中心','登录 / 注册'])assert.ok(header.includes(text),text);
+ assert.ok(header.includes('<HeaderSiteSearch/>'));
+ assert.doesNotMatch(header,/企业招聘导航/);
+ assert.doesNotMatch(header,/责任与透明/);
+ assert.doesNotMatch(header,/我的收藏/);
+});
+check('Talent policy and overseas development remain canonical links',()=>{
  assert.equal((shell.match(/function TalentPolicyNavLink\(/g)||[]).length,1);
  assert.ok(shell.includes('to="/talent-service"'));
- assert.ok(shell.includes('>人才政策</Link>'));
- assert.equal((shell.match(/<TalentPolicyNavLink active=/g)||[]).length,3);
+ assert.ok(shell.includes('to="/study-abroad"'));
+ assert.equal((shell.match(/<TalentPolicyNavLink active=/g)||[]).length,1);
 });
-check('Public and candidate headers show talent policy ahead of recruitment market',()=>{
- for(const n of [publicNav,candidateNav])assert.ok(n.indexOf('<TalentPolicyNavLink')<n.indexOf('to="/candidate/jobs"'));
+check('Candidate account remains the personal-center entry',()=>{
+ assert.ok(shell.includes('<CandidateAccountDropdown displayName={user?.display_name}/>'));
+ assert.ok(shell.includes('to="/auth"'));
 });
-check('Employer menu also includes the same link without losing its existing tools',()=>{
- assert.ok(employerNav.includes('<TalentPolicyNavLink'));
- for(const path of ['/employer/start','/employer/hub','/employer/workspace','/employer/growth','/candidate/jobs'])assert.ok(employerNav.includes('to="'+path+'"'));
+check('Footer contains the complete categorized navigation',()=>{
+ for(const group of ['求职服务','职业机会','劳动者权益','关于汇方','服务与帮助'])assert.ok(shell.includes("title:'"+group+"'"),group);
+ for(const path of ['/candidate/match','/candidate/account/resume','/candidate/account/applications','/candidate/account/apply-assistant','/candidate/account/career','/companies/library','/transparency','/vision','/join','/data-use','/membership/rules'])
+  assert.ok(shell.includes("['")&&shell.includes(path),path);
+ assert.ok(shell.includes('<SiteFooter/>'));
 });
-check('Saved jobs, company discovery and candidate sign-in remain intact',()=>{
- for(const path of ['/companies/discover','/candidate/saved','/auth'])assert.ok(candidateNav.includes('to="'+path+'"'));
+check('Footer is not a second product navigation system',()=>{
+ assert.equal((shell.match(/function SiteFooter\(/g)||[]).length,1);
+ assert.equal((shell.match(/<SiteFooter\/>/g)||[]).length,1);
 });
-check('Talent service pages and in-app navigation remain registered',()=>{
- assert.ok(app.includes("route==='/talent-service'"));
- assert.ok(app.includes("route.startsWith('/talent-service/')"));
- assert.ok(shell.includes("aria-current={active?'page':undefined}"));
- assert.ok(router.includes('navigate(to,{scrollY:restoreScrollY,restoreMarketState})'));
-});
-check('Responsive navigation remains visible on mobile',()=>{
- assert.ok(css.includes('flex-wrap:wrap'));
+check('Responsive navigation and footer adapt without hiding the core shortcuts',()=>{
+ assert.ok(css.includes('.hhba-site-footer-grid'));
+ assert.ok(css.includes('@media(max-width:600px)'));
  assert.ok(css.includes('.hhba-experience-header>nav'));
- assert.ok(!css.includes('.hhba-talent-policy-nav{display:none'));
+ assert.ok(css.includes('.hhba-header-site-search'));
 });
-console.log(JSON.stringify({passed,target:'/talent-service',menus:['public','candidate','employer']}));
+console.log(JSON.stringify({passed,target:'HHBA global navigation',top:['search','overseas','talent-policy','job-market','join','personal-center'],footer:['job-services','career-opportunities','worker-rights','about','help']}));
