@@ -9,7 +9,7 @@ test('user-provided SVG is a real checked-in transparent vector asset',()=>{
  for(const token of ['<svg','viewBox="15 3 170 170"','url(#lowerBridge)','url(#bridge)','url(#blueHead)','url(#orangeHead)'])assert.ok(svg.includes(token),token);
  assert.ok(!svg.includes('<image'),'do not swap SVG for embedded bitmap');
 });
-test('global shell, public hero, letter, vision and footer use same component, not copied images',()=>{
+test('global shell owns the single site footer; home keeps its hero brand without a duplicate footer strip',()=>{
  const shell=src('components/Shell.tsx'),home=src('pages/HomePage.tsx');
  const letter=src('components/HomeOpenLetter.tsx'),vision=src('pages/VisionPage.tsx');
  const brand=src('components/BrandMark.tsx');
@@ -17,7 +17,9 @@ test('global shell, public hero, letter, vision and footer use same component, n
  assert.ok(brand.includes('import.meta.env.BASE_URL'));
  assert.ok(shell.includes('<BrandMark/>'));
  assert.ok(home.includes('hhba-public-hero-logo'));
- assert.ok(home.includes('hhba-brand-home-footer'));
+ assert.ok(!home.includes('hhba-brand-home-footer'));
+ assert.ok(!home.includes('BrandMark variant="signature"'));
+ assert.ok(shell.includes('<SiteFooter/>'));
  assert.ok(letter.includes('hhba-letter-footer-logo'));
  assert.ok(letter.includes('hhba-letter-envelope-seal'));
  assert.ok(vision.includes('hhba-vision-brand-intro'));

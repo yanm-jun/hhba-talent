@@ -61,7 +61,6 @@ export function HomePage({user}:{user:User|null}){
    <Link to="/talent-service" style={{display:'inline-flex',alignItems:'center',gap:7,color:'#125EBC',fontSize:13,fontWeight:700,textDecoration:'none'}}>了解人才服务 <ArrowUpRight size={15}/></Link>
   </section>
   <HomeCompanyMarquee/>
-  <footer className="hhba-brand-home-footer"><BrandMark variant="signature" size="small"/><p>汇方职场 · Human Capability Network · HHBA</p></footer>
   <HomeOpenLetter autoOpen={false}/>
   <WinterInternshipPopup/>
  </Shell>;
