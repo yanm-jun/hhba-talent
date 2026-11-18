@@ -9,19 +9,20 @@ type LaborTopic = (typeof laborRights.topics)[number];
 const topics = laborRights.topics as LaborTopic[];
 export const supportedLaborTopicSlugs=topics.map(t=>t.slug);
 export function LegalAidTopicPage({user,slug,embedded=false}:{user:User|null;slug:string;embedded?:boolean}){
+ const knowledgeHref=embedded?'/candidate/account/legal-aid':'/rights/knowledge';
  const topic=topics.find(t=>t.slug===slug);
- if(!topic)return <Shell user={user} embedded={embedded}><main className="hhba-law hhba-law-detail"><div className="hhba-law-panel"><div className="hhba-law-missing"><h1>没有找到这个劳动权益专题</h1><Link to="/candidate/account/legal-aid">返回法律援助首页</Link></div></div></main></Shell>;
+ if(!topic)return <Shell user={user} embedded={embedded}><main className="hhba-law hhba-law-detail"><div className="hhba-law-panel"><div className="hhba-law-missing"><h1>没有找到这个劳动权益专题</h1><Link to={knowledgeHref}>返回法律援助首页</Link></div></div></main></Shell>;
  const index=topics.indexOf(topic);
  return <Shell user={user} embedded={embedded}>
    <main className="hhba-law hhba-law-detail" id="main-content">
     <div className="hhba-law-panel">
      <header className="hhba-law-header">
       <div className="hhba-law-brand">
-       <Link className="hhba-law-brand-logo hhba-law-identity-link" to="/candidate/account/legal-aid">HHBA.</Link>
+       <Link className="hhba-law-brand-logo hhba-law-identity-link" to={knowledgeHref}>HHBA.</Link>
        <span className="hhba-law-brand-divider" aria-hidden="true"/>
        <span className="hhba-law-brand-name">法律援助 · 知识专题</span>
       </div>
-      <Link className="hhba-law-back" to="/candidate/account/legal-aid"><ArrowLeft size={13} aria-hidden="true"/>返回八类问题</Link>
+      <Link className="hhba-law-back" to={knowledgeHref}><ArrowLeft size={13} aria-hidden="true"/>返回八类问题</Link>
      </header>
      <article className="hhba-law-article">
       <div className="hhba-law-article-heading">
@@ -86,8 +87,8 @@ export function LegalAidTopicPage({user,slug,embedded=false}:{user:User|null;slu
        <div className="hhba-law-self-check"><ClipboardList size={16} aria-hidden="true"/><p>建议先整理事实时间线、法律主体、争议金额及相关证据；接下来可依据上述官方来源咨询劳动保障部门、劳动仲裁机构或具备资质的律师。</p></div>
       </section>
       <div className="hhba-law-article-bottom">
-       <Link to="/candidate/account/legal-aid"><ArrowLeft size={15}/> 返回八类劳动权益问题</Link>
-       {index<topics.length-1&&<Link to={'/candidate/account/legal-aid/'+topics[index+1].slug}>下一个专题：{topics[index+1].title}<ChevronRight size={14}/></Link>}
+       <Link to={knowledgeHref}><ArrowLeft size={15}/> 返回八类劳动权益问题</Link>
+       {index<topics.length-1&&<Link to={knowledgeHref+'/'+topics[index+1].slug}>下一个专题：{topics[index+1].title}<ChevronRight size={14}/></Link>}
       </div>
      </article>
      <footer className="hhba-law-footer">
