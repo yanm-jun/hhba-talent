@@ -23,6 +23,19 @@ test('homepage public API exposes the approved service plan without enabling tra
  assert.match(body.membership.serviceNotice,/暂未开放购买/);
 });
 
+test('membership details link opens the rights service introduction, including anonymous visitors',()=>{
+ const home=read('../src/components/HomeWorkplacePromise.tsx');
+ const routes=read('../src/main.tsx');
+ const rights=read('../src/pages/WorkplaceRightsPage.tsx');
+ assert.match(home,/<Link className="hhba-home-text-link" to="\/candidate\/account\/rights">了解权益支持/);
+ assert.doesNotMatch(home,/to="\/candidate\/account\/legal-aid">了解权益支持/);
+ assert.match(home,/to="\/membership\/rules">服务资格、范围与开通说明/);
+ assert.match(routes,/if\(route==='\/candidate\/account\/rights'\)return <WorkplaceRightsPage user=\{user\}\/>/);
+ assert.match(rights,/export function WorkplaceRightsPage\(\{user,embedded=false\}/);
+ assert.match(rights,/尚未开放购买/);
+ assert.match(rights,/to="\/candidate\/account\/legal-aid">先看免费劳动权益知识/);
+});
+
 test('homepage financial disclosure uses distributable profit, not turnover, and does not invent reports',()=>{
  const body=JSON.parse(read('../src/data/homepagePublicConfig.json'));
  assert.equal(body.distribution.companyPercent,60);
