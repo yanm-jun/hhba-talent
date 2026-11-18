@@ -31,8 +31,10 @@ test('home preserves job search, company directory and adds labor-rights support
     'title="我要应聘"','title="劳动权益支持"','title="企业招聘导航"','<UnifiedJobMarket compact/>']){
   assert.ok(home.includes(t),'home content unexpectedly removed: '+t);
  }
- assert.ok(home.includes("candidateSignedIn?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'"),
-   'candidate entry must reach AI matching after login');
+ assert.ok(home.includes("kind==='candidate'?'/candidate/jobs'"),
+   'public 我要应聘 card must consistently open the public job market');
+ assert.ok(home.includes("kind==='rights'?'/rights'"),
+   'public rights card must open a standalone explanation');
  assert.ok(home.includes(":'/companies/library'"),'company directory entry must lead to the 17 industry halls');
  assert.ok(home.includes('className="home-match-promo"'),'resume matching link changed');
  assert.ok(home.includes('<HomeWorkplacePromise/>'));
