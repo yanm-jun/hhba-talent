@@ -88,7 +88,7 @@ with sync_playwright() as p:
         assert page.get_by_text("¥24.90").is_visible()
         assert page.get_by_text("任职企业公开信息月报").is_visible()
         assert page.get_by_text("个人劳动权益核对").is_visible()
-        assert page.get_by_text("职业成长档案").is_visible()
+        assert page.get_by_role("heading", name="职业成长档案").is_visible()
         assert page.get_by_text("不包含仲裁和诉讼代理", exact=False).count() >= 1
         assert page.locator('form[action*="checkout"], button:has-text("立即支付")').count() == 0
         no_horizontal_overflow(page, name + "-rights")
