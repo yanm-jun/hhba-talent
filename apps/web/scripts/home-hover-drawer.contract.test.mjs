@@ -12,7 +12,7 @@ test('stage 1 removes the live drawer and preserves the three public homepage en
  assert.doesNotMatch(home, /HomeLiveDrawer|hhba-rail-trigger|我要招人/);
  for (const s of ['让机会与人才，找到彼此。','你来到这里，是为了什么？',
   'title="我要应聘"','title="劳动权益支持"','title="企业招聘导航"','<UnifiedJobMarket compact/>',
-  '<HomeCompanyMarquee/>',"'/companies/library'","'/candidate/account/legal-aid'"]) assert.ok(home.includes(s),s);
+  '<HomeCompanyMarquee/>',"'/companies/library'","'/rights'"]) assert.ok(home.includes(s),s);
  assert.doesNotMatch(home, /HomePeopleBanner/);
 });
 test('the right-side panel opens on hover and closes after leaving',()=>{

@@ -20,6 +20,9 @@ const legalTopics=[
 ] as const;
 
 export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
+  const knowledgeHref=embedded?'/candidate/account/legal-aid':'/rights/knowledge';
+  const rightsHref=embedded?'/candidate/account/rights':'/rights';
+  const supportHref=embedded?'/candidate/account/legal-aid/intervention':'/rights/support';
   return <Shell user={user} embedded={embedded}>
     <main className="hhba-law" id="main-content">
       <section className="hhba-law-panel" aria-labelledby="hhba-law-title">
@@ -30,15 +33,15 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
             <span className="hhba-law-brand-name">劳动权益支持</span>
           </div>
           <div className="hhba-law-header-actions">
-            <Link to="/candidate/account/rights" className="hhba-law-intervention-link"><ShieldCheck size={13} aria-hidden="true"/>职场权益中心</Link>
+            <Link to={rightsHref} className="hhba-law-intervention-link"><ShieldCheck size={13} aria-hidden="true"/>职场权益中心</Link>
             <Link to="/membership/rules" className="hhba-law-intervention-link">
               <FileText size={13} aria-hidden="true"/>会员服务完整规则
             </Link>
-            <Link to="/candidate/account/legal-aid/intervention" className="hhba-law-intervention-link">
+            <Link to={supportHref} className="hhba-law-intervention-link">
               <ShieldCheck size={13} aria-hidden="true"/>查看服务筹备说明
             </Link>
-            <Link to="/candidate/account" className="hhba-law-back">
-              返回个人中心 <ArrowUpRight size={12} aria-hidden="true"/>
+            <Link to={embedded?"/candidate/account":"/"} className="hhba-law-back">
+              {embedded?"返回个人中心":"返回官网首页"} <ArrowUpRight size={12} aria-hidden="true"/>
             </Link>
           </div>
         </header>
@@ -58,7 +61,7 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
           <section className="hhba-law-topics" aria-label="劳动权益知识专题">
             <h2>劳动权益问题专题 · 8 类</h2>
             <div className="hhba-law-topic-grid">
-              {legalTopics.map(({title,icon:Icon,slug})=><Link to={'/candidate/account/legal-aid/'+slug} className="hhba-law-topic" key={slug}>
+              {legalTopics.map(({title,icon:Icon,slug})=><Link to={knowledgeHref+'/'+slug} className="hhba-law-topic" key={slug}>
                 <Icon className="hhba-law-topic-icon" size={15} strokeWidth={1.65} aria-hidden="true"/>
                 <span>{title}</span>
                 <ArrowUpRight className="hhba-law-topic-arrow" size={12} strokeWidth={1.7} aria-hidden="true"/>

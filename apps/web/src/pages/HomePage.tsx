@@ -10,10 +10,10 @@ import { BrandMark } from '../components/BrandMark';
 import type { User } from '../services/api';
 import '../styles/home-match-promo.css';
 
-function EntryCard({kind,title,body,footer,candidateSignedIn=false}:{kind:'candidate'|'directory'|'rights';title:string;body:string;footer:string;candidateSignedIn?:boolean}){
+function EntryCard({kind,title,body,footer}:{kind:'candidate'|'directory'|'rights';title:string;body:string;footer:string}){
  const Icon=kind==='candidate'?BriefcaseBusiness:kind==='rights'?Scale:Building2;
- const target=kind==='candidate'?(candidateSignedIn?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch')
-  :kind==='rights'?'/candidate/account/legal-aid':'/companies/library';
+ const target=kind==='candidate'?'/candidate/jobs'
+  :kind==='rights'?'/rights':'/companies/library';
  return <Link to={target} className={'entry-card hhba-entry-card hhba-entry-'+kind}
    aria-label={title+'，'+footer}>
    <span className="entry-icon"><Icon size={23}/></span>
@@ -34,9 +34,9 @@ export function HomePage({user}:{user:User|null}){
    <button type="button" className="hhba-letter-revisit" onClick={()=>window.dispatchEvent(new Event('hhba:open-letter'))}><span aria-hidden="true">✉</span> 读一封来自 HHBA 的信</button>
   </section>
   <section className="entry-grid hhba-public-entry-grid hhba-home-entry-grid" aria-label="选择使用入口">
-   <EntryCard kind="candidate" title="我要应聘" candidateSignedIn={Boolean(user?.account_types?.includes('candidate'))}
-    body="上传或使用已保存简历，让 AI 理解你的经历，寻找真实企业的官方招聘岗位。"
-    footer={user?.account_types?.includes('candidate')?'上传简历 · AI 智能匹配':'登录 / 注册后开始智能匹配'}/>
+   <EntryCard kind="candidate" title="我要应聘"
+    body="浏览真实企业招聘岗位和官方投递渠道，也可以使用 AI 简历匹配服务。"
+    footer="查看招聘市场与岗位"/>
    <EntryCard kind="rights" title="劳动权益支持"
     body="了解劳动权益知识与 HHBA 服务规划；会员服务和案件申请尚未开放。"
     footer="查看权益支持说明"/>

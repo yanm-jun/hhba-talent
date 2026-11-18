@@ -17,9 +17,10 @@ const stages=[
 ] as const;
 
 export function WorkplaceRightsPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
+ const knowledgeHref=embedded?'/candidate/account/legal-aid':'/rights/knowledge';
  return <Shell user={user} embedded={embedded}>
   <main className="hhba-rights-page" id="main-content">
-   <nav className="hhba-rights-breadcrumb" aria-label="位置"><Link to="/candidate/account">个人工作台</Link><span>/</span><strong>职场权益中心</strong></nav>
+   <nav className="hhba-rights-breadcrumb" aria-label="位置"><Link to={embedded?"/candidate/account":"/"}>{embedded?"个人工作台":"HHBA 首页"}</Link><span>/</span><strong>职场权益中心</strong></nav>
    <section className="hhba-rights-hero">
     <div className="hhba-rights-hero-copy">
      <span className="hhba-career-kicker"><ShieldCheck size={15}/> HHBA · WORKPLACE RIGHTS</span>
@@ -27,7 +28,7 @@ export function WorkplaceRightsPage({user,embedded=false}:{user:User|null;embedd
      <p>为毕业三年内、符合企业准入条件的年轻劳动者规划的长期职业与劳动权益支持服务。帮助你了解企业公开信息、持续核对职业权益，并在约定条件下获得人工协作支持。</p>
      <div className="hhba-rights-actions">
       <Link className="hhba-career-primary" to="/membership/rules">阅读会员规则 <ArrowRight size={16}/></Link>
-      <Link className="hhba-career-text-link" to="/candidate/account/legal-aid">先看免费劳动权益知识 <ArrowRight size={15}/></Link>
+      <Link className="hhba-career-text-link" to={knowledgeHref}>先看免费劳动权益知识 <ArrowRight size={15}/></Link>
      </div>
     </div>
     <aside className="hhba-rights-price" aria-label="会员价格与开放状态">
@@ -64,7 +65,7 @@ export function WorkplaceRightsPage({user,embedded=false}:{user:User|null;embedd
    <section className="hhba-rights-disclosure">
     <div><CheckCircle2 size={19}/><strong>现在可以使用什么？</strong></div>
     <p>你可以继续免费浏览劳动权益知识、使用现有求职工具和职业账户。付费会员、真实企业监测、案件受理与律所委托均未上线。产品属于职业与法律支持服务规划，不是保险或工资损失赔付。</p>
-    <div className="hhba-rights-actions"><Link to="/candidate/account/legal-aid"><BookOpen size={16}/> 浏览劳动权益知识 <ArrowRight size={15}/></Link><Link to="/candidate/account"><FileText size={16}/> 返回工作台 <ArrowRight size={15}/></Link></div>
+    <div className="hhba-rights-actions"><Link to={knowledgeHref}><BookOpen size={16}/> 浏览劳动权益知识 <ArrowRight size={15}/></Link><Link to={embedded?"/candidate/account":"/rights/support"}><FileText size={16}/>{embedded?"返回工作台":"查看服务筹备说明"} <ArrowRight size={15}/></Link></div>
    </section>
   </main>
  </Shell>;
