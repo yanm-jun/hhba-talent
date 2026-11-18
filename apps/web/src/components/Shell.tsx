@@ -36,6 +36,65 @@ function HeaderSiteSearch(){
    <button type="submit" aria-label="提交全站搜索"><ArrowRight size={15}/></button>
  </form>;
 }
+export function SiteFooter(){
+ const columns=[
+  {title:'求职服务',links:[
+   ['我要应聘','/candidate/jobs'],
+   ['智能岗位匹配','/candidate/match'],
+   ['我的简历','/candidate/account/resume'],
+   ['我的收藏','/candidate/saved'],
+   ['匹配历史','/candidate/account/applications'],
+   ['一键网申','/candidate/account/apply-assistant'],
+   ['职业成长档案','/candidate/account/career'],
+  ]},
+  {title:'职业机会',links:[
+   ['招聘市场','/candidate/jobs'],
+   ['企业招聘导航','/companies/library'],
+   ['海外发展','/study-abroad'],
+   ['人才政策','/talent-service'],
+  ]},
+  {title:'劳动者权益',links:[
+   ['会员与权益服务','/candidate/account/rights'],
+   ['劳动权益知识','/candidate/account/legal-aid'],
+   ['责任与透明','/transparency'],
+  ]},
+  {title:'关于汇方',links:[
+   ['品牌介绍','/vision'],
+   ['加入我们','/join'],
+   ['运营数据说明','/data-use'],
+  ]},
+  {title:'服务与帮助',links:[
+   ['全站搜索','/search'],
+   ['会员服务规则','/membership/rules'],
+   ['责任与透明','/transparency'],
+  ]},
+ ] as const;
+ return <footer className="hhba-site-footer">
+  <div className="hhba-site-footer-grid">
+   <div className="hhba-site-footer-brand">
+    <Link to="/" aria-label="返回汇方职场首页"><BrandMark variant="lockup" size="small"/></Link>
+    <p>让机会与人才，找到彼此。</p>
+    <small>HHBA · Human Capability Network</small>
+   </div>
+   {columns.map(column=><section className="hhba-site-footer-column" key={column.title}>
+    <h2>{column.title}</h2>
+    <nav aria-label={column.title}>
+     {column.links.map(([label,to])=><Link key={to+label} to={to}>{label}</Link>)}
+    </nav>
+   </section>)}
+  </div>
+  <div className="hhba-site-footer-bottom">
+   <span>© {new Date().getFullYear()} 汇方职场 · HHBA</span>
+   <span>让机会与人才，找到彼此。</span>
+   <div>
+    <Link to="/data-use">运营数据说明</Link>
+    <Link to="/transparency">责任与透明</Link>
+    <Link to="/membership/rules">会员服务规则</Link>
+   </div>
+  </div>
+ </footer>;
+}
+
 export function Shell({ user, children, embedded=false }: { user: User | null; children: React.ReactNode; embedded?: boolean }) {
  const navigate=useNavigate();
  const route=useRoute();
@@ -48,14 +107,11 @@ export function Shell({ user, children, embedded=false }: { user: User | null; c
  // Central capture covers all recruiting links across existing company/job pages,
  // not merely the example highlighted by the user.
  function guardRecruitmentClick(event:MouseEvent<HTMLElement>){
-  // Administrative review and employer-side evidence links are not candidate apply actions.
   if(route.startsWith('/admin')||route.startsWith('/employer')||route.startsWith('/recruiter'))return;
   if(event.defaultPrevented||!(event.target instanceof Element))return;
   const anchor=event.target.closest<HTMLAnchorElement>('a[href]');
   if(!anchor)return;
   const destination=recruitmentTarget(anchor);
-  // Explicitly marked application links must NEVER silently bypass the gate when
-  // their URL is invalid or unsupported (e.g. HTTP or unexpected custom ports).
   if(!destination&&anchor.dataset.hhbaRecruitmentOutbound==='true'){
    event.preventDefault();event.stopPropagation();return;
   }
@@ -85,28 +141,16 @@ export function Shell({ user, children, embedded=false }: { user: User | null; c
     <Link className="logo hhba-main-brand-link" to="/" aria-label="汇方职场 HHBA 公共首页"><BrandMark/></Link>
     {experience==='candidate'&&<span className="hhba-experience-label">个人用户端</span>}
    </div>
-   {experience==='public'?<nav aria-label="公共网站导航">
-     <HeaderSiteSearch/>
-     <StudyAbroadNavLink active={route.startsWith('/study-abroad')}/>
-     <TalentPolicyNavLink active={route.startsWith('/talent-service')}/>
-     <Link className="auth" to="/candidate/jobs">招聘市场</Link>
-     <Link className="auth" to="/companies/library">企业招聘导航</Link>
-     <Link className="auth hhba-nav-transparency" to="/transparency" aria-current={route.startsWith('/transparency')?'page':undefined}>责任与透明</Link>
-     <Link className="join-nav-link" to="/join">加入我们</Link>
-     {candidateSignedIn?<Link className="hhba-nav-account" to="/candidate/account">个人中心</Link>:
-       <Link className="hhba-nav-account" to="/auth">登录 / 注册</Link>}
-   </nav>:<nav aria-label="个人职业服务导航">
-     <HeaderSiteSearch/>
-     <StudyAbroadNavLink active={route.startsWith('/study-abroad')}/>
-     <TalentPolicyNavLink active={route.startsWith('/talent-service')}/>
-     <Link className="auth" to="/candidate/jobs">招聘市场</Link>
-     <Link className="auth" to="/companies/library">企业招聘导航</Link>
-     <Link className="auth hhba-nav-transparency" to="/transparency" aria-current={route.startsWith('/transparency')?'page':undefined}>责任与透明</Link>
-     <Link className="auth" to="/candidate/saved">我的收藏</Link>
-     {candidateSignedIn?<CandidateAccountDropdown displayName={user?.display_name}/>:<Link className="hhba-nav-account" to="/auth">登录 / 注册</Link>}
-   </nav>}
+   <nav aria-label={experience==='public'?'公共网站导航':'个人职业服务导航'}>
+    <HeaderSiteSearch/>
+    <StudyAbroadNavLink active={route.startsWith('/study-abroad')}/>
+    <TalentPolicyNavLink active={route.startsWith('/talent-service')}/>
+    <Link className="auth" to="/candidate/jobs">招聘市场</Link>
+    <Link className="join-nav-link" to="/join">加入我们</Link>
+    {candidateSignedIn?<CandidateAccountDropdown displayName={user?.display_name}/>:<Link className="hhba-nav-account" to="/auth">登录 / 注册</Link>}
+   </nav>
   </header>
   {children}
-  <footer className="hhba-site-disclosure"><span className="hhba-site-disclosure-brand">汇方职场 · HHBA</span><Link to="/data-use">运营数据说明</Link><Link to="/transparency" className="hhba-fin-footer-link">责任与透明</Link></footer>
+  <SiteFooter/>
  </main>;
 }
