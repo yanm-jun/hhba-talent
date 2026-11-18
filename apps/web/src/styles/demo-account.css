@@ -28,7 +28,7 @@
 .hhba-account-section-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:2px 0 16px}
 .hhba-account-section-heading h2{margin:0;font-size:21px;letter-spacing:-.35px;color:#102A5A}
 .hhba-account-section-heading h3{margin:0;font-size:17px;color:#102A5A}
-.hhba-account-section-heading p{font-size:12px;line-height:1.7;color:#859185;margin:5px 0 0}
+.hhba-account-section-heading p{font-size:12px;line-height:1.7;color:#7B8A9B;margin:5px 0 0}
 .hhba-account-section-heading a{display:flex;align-items:center;gap:6px;font-size:12px;color:#125EBC;text-decoration:none;flex-shrink:0}
 .hhba-account-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:19px}
 .hhba-account-stat-grid>a{padding:20px 19px;display:flex;flex-direction:column;gap:9px;background:#fff;border:1px solid #E7F0FC;border-radius:13px;text-decoration:none;color:#102A5A}
@@ -55,7 +55,7 @@
 .hhba-account-form-actions{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-top:7px}
 .hhba-account-form-actions button{border:0;border-radius:8px;background:#125EBC;color:#fff;padding:11px 19px;font-size:13px;font-weight:730;cursor:pointer}
 .hhba-account-form-actions button:disabled{background:#C5DBF8;cursor:default}
-.hhba-account-form-actions small{font-size:11px;color:#96a098}
+.hhba-account-form-actions small{font-size:11px;color:#8D9AA9}
 .hhba-account-notice{color:#125EBC!important;background:#E7F0FC;border:1px solid #E7F0FC;padding:10px;border-radius:8px;font-size:12px!important;overflow-wrap:anywhere}
 .hhba-account-muted{font-size:11px!important;color:#889BB0!important;line-height:1.7}
 .hhba-account-empty{padding:35px 14px;text-align:center;display:flex;flex-direction:column;gap:11px;align-items:center;color:#889BB0}

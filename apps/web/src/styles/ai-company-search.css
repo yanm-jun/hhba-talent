@@ -21,14 +21,14 @@
 .ai-company-results{margin-top:19px;padding-top:15px;border-top:1px solid #E7F0FC}
 .ai-company-results-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:0 0 12px}
 .ai-company-results-head strong{font-size:15px}
-.ai-company-results-head small{color:#85918c;font-size:11px}
+.ai-company-results-head small{color:#7B8A9B;font-size:11px}
 .ai-company-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .ai-company-card{background:#fff;border:1px solid #E7F0FC;border-radius:12px;padding:16px;min-width:0}
 .ai-company-card-heading{display:flex;gap:8px;align-items:center;min-width:0}
 .ai-company-card-heading svg{color:#1373FA;flex:none}
 .ai-company-card-heading strong{font-size:14px;font-weight:760}
-.ai-company-card-heading span{font-size:11px;color:#89948c;margin-left:auto;text-align:right}
-.ai-company-card>p{font-size:12px;color:#6d7875;line-height:1.75;margin:10px 0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.ai-company-card-heading span{font-size:11px;color:#7F8D9E;margin-left:auto;text-align:right}
+.ai-company-card>p{font-size:12px;color:#627183;line-height:1.75;margin:10px 0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .ai-company-card>p.ai-company-directions{color:#125EBC}
 .ai-company-card-footer{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .ai-company-card-footer small{margin-right:auto;font-size:10px;color:#889BB0}

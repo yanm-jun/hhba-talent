@@ -134,7 +134,7 @@
 
 
 /* Genuine logo artwork must remain legible, not compressed into a small square. */
-.hhba-autumn-brand-missing{background:#f1f4f5;color:#8b9a9f;border:1px dashed #d6dee0}
+.hhba-autumn-brand-missing{background:#f1f4f5;color:#8b9a9f;border:1px dashed #D6DBE0}
 .hhba-autumn-brand-has-logo{width:76px;flex-basis:76px;padding:4px;background:#fff;border-color:#E7F0FC}
 .hhba-autumn-brand-large.hhba-autumn-brand-has-logo{width:144px;flex-basis:144px;height:76px}
 .hhba-autumn-brand-has-logo img{display:block;width:100%;height:100%;object-fit:contain;background:transparent;padding:0}
@@ -157,7 +157,7 @@
 .hhba-autumn-ref-img>span{position:absolute;right:7px;bottom:7px;background:rgba(27,46,71,.85);color:#fff;font-size:10px;padding:5px 7px;border-radius:5px}
 .hhba-autumn-references figcaption{display:flex;flex-direction:column;gap:5px}
 .hhba-autumn-references figcaption>strong{font-size:12px}
-.hhba-autumn-references figcaption>small{font-size:10px;color:#788477;overflow-wrap:anywhere}
+.hhba-autumn-references figcaption>small{font-size:10px;color:#6C7C8F;overflow-wrap:anywhere}
 .hhba-autumn-ref-links{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .hhba-autumn-ref-links a{display:inline-flex;gap:4px;align-items:center;font-size:11px;color:#125EBC;text-decoration:none}
 @media(max-width:680px){.hhba-autumn-references{grid-template-columns:1fr}}

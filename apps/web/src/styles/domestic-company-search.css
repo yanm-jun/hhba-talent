@@ -40,10 +40,10 @@
 .domestic-major-tag{display:inline-flex!important;align-items:center;gap:7px;padding:8px 10px!important;border:1px solid #E7F0FC!important;border-radius:7px!important;background:#F7F9FD!important;color:#125EBC!important;text-decoration:none!important;font-size:12px!important;font-weight:600}
 .domestic-major-tag:hover{background:#E7F0FC!important;border-color:#889BB0!important}
 .domestic-editorial-panel .domestic-company-note{font-size:11px!important;line-height:1.7!important;margin:11px 0 0!important;color:#60758F!important}
-.domestic-editorial-panel .domestic-editorial-limited{font-size:12px!important;color:#818c86!important;line-height:1.8!important}
+.domestic-editorial-panel .domestic-editorial-limited{font-size:12px!important;color:#768597!important;line-height:1.8!important}
 .domestic-careers-row{display:flex;align-items:center;gap:12px;border:1px solid #E7F0FC;border-radius:11px;padding:13px 15px}
 .domestic-careers-row>div{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
-.domestic-careers-row strong{font-size:13px}.domestic-careers-row small{font-size:10px;color:#8b9790}
+.domestic-careers-row strong{font-size:13px}.domestic-careers-row small{font-size:10px;color:#8290A0}
 .domestic-editorial-panel .domestic-careers-link{font-size:12px!important;white-space:nowrap;background:#1B2E47;padding:9px 12px!important;border-radius:20px}
 .domestic-editorial-panel .domestic-careers>p{font-size:12px!important;margin:0 0 10px!important}
 .domestic-editorial-sources{padding:13px 0!important}
@@ -52,9 +52,9 @@
 .domestic-company-sources[open] summary svg,.domestic-profile-relations details[open] summary svg{transform:rotate(180deg)}
 .domestic-company-sources>div{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .domestic-company-sources>div a{display:inline-flex;align-items:center;gap:5px;font-size:11px}
-.domestic-company-sources>div p{width:100%;font-size:11px!important;color:#8a968e!important}
+.domestic-company-sources>div p{width:100%;font-size:11px!important;color:#808FA0!important}
 .domestic-profile-relations{padding:14px 0!important}
-.domestic-profile-relations summary span{margin-left:auto;color:#89958b;font-size:11px}
+.domestic-profile-relations summary span{margin-left:auto;color:#7F8E9F;font-size:11px}
 .domestic-relations-inside{padding:15px 0 4px}
 .domestic-relations-inside p{font-size:12px!important;color:#60758F!important}
 .domestic-relations-inside p a{display:inline-flex;align-items:center;gap:4px}
@@ -108,8 +108,8 @@
 .domestic-company-result .domestic-company-caution{margin:9px 0 12px}
 @media(max-width:640px){.domestic-major-filter-active{align-items:flex-start}}
 
-.domestic-card-legal{color:#7a827d!important;font-size:10px!important}
-.domestic-media-confidence{display:block;margin-top:6px;font-size:10px;color:#8b968e!important}
+.domestic-card-legal{color:#6C7D90!important;font-size:10px!important}
+.domestic-media-confidence{display:block;margin-top:6px;font-size:10px;color:#818FA0!important}
 
 /* Audited directory identity: never portray a minimally indexed issuer as a verified longform employer. */
 .domestic-directory-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:16px 0 20px}
@@ -118,7 +118,7 @@
 .domestic-directory-facts dd{margin:0;font-size:13px;color:#102A5A;overflow-wrap:anywhere}
 .domestic-directory-only .domestic-company-note{font-size:12px;line-height:1.8;color:#60758F}
 .domestic-directory-website{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:#125EBC}
-.domestic-directory-card-description{color:#748078;font-size:12px!important}
+.domestic-directory-card-description{color:#69798B;font-size:12px!important}
 @media(max-width:540px){.domestic-directory-facts{grid-template-columns:1fr}}
 
 /* Uploaded rectangular logos and screenshots retain their full frame. */

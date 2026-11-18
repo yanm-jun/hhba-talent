@@ -7,11 +7,11 @@
 .hhba-featured-card{display:flex;flex-direction:column;min-width:0;background:#fff;border:1px solid #E7F0FC;border-radius:13px;padding:19px}
 .hhba-featured-company{display:flex;align-items:center;gap:11px;min-width:0}
 .hhba-featured-company h3{font-size:17px;margin:0 0 5px;letter-spacing:-.2px}
-.hhba-featured-company span:not(.hhba-featured-logo){font-size:11px;color:#75807d;line-height:1.5}
+.hhba-featured-company span:not(.hhba-featured-logo){font-size:11px;color:#69798C;line-height:1.5}
 .hhba-featured-logo{height:53px;width:53px;flex:0 0 53px;display:flex;justify-content:center;align-items:center;background:#fff;border:1px solid #E7F0FC;border-radius:11px;overflow:hidden}
 .hhba-featured-logo img{display:block;width:39px;height:39px;object-fit:contain}
 .hhba-featured-summary{font-size:13px;color:#365271;line-height:1.75;min-height:46px;margin:17px 0 5px}
-.hhba-featured-evidence{font-size:11px;line-height:1.5;color:#8d9791;margin:0 0 13px}
+.hhba-featured-evidence{font-size:11px;line-height:1.5;color:#8391A1;margin:0 0 13px}
 .hhba-featured-actions{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:auto;padding-top:14px;border-top:1px solid #E7F0FC}
 .hhba-featured-actions a{display:inline-flex;align-items:center;gap:4px;text-decoration:none;color:#125EBC;font-size:12px;font-weight:650}
 .hhba-featured-actions a:hover{text-decoration:underline}
