@@ -54,7 +54,7 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
    setNotice('请先确认建议内容符合你的真实经历。');return;
   }
   try{
-   setVersion(prev=>applySuggestion(prev,s,confirmed.includes(s.id)));
+   setVersion(applySuggestion(version,s,confirmed.includes(s.id)));
    setNotice('已填充到本次预览，原始简历文件没有被修改。');
   }catch{setNotice('原文已变化或缺乏真实证据，请重新生成建议。');}
  }
@@ -82,7 +82,7 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
    <span>我同意将下方展示的简历证据片段与该岗位要求发送给平台选定的第三方 AI 服务商进行润色。服务器会尽力脱敏常见联系方式，但不能确保移除所有个人信息。建议内容只供本人核实与选择，不会自动投递。</span>
   </label>}
   <div className="targeted-resume-paper">
-   <header><h4>岗位专属简历</h4><p>目标企业：{job.company} · 原始文件保持不变</p></header>
+   <header><h4>岗位定向简历 · 证据预览</h4><p>目标企业：{job.company} · 当前展示 AI 识别出的证据片段，完整排版将在后续阶段接入 · 原始文件保持不变</p></header>
    {version.blocks.map(block=>{
     const s=suggestions.find(x=>x.blockId===block.id);
     const applied=Boolean(s&&version.acceptedSuggestionIds.includes(s.id));
@@ -93,6 +93,7 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
      {s&&!applied&&!dismissed&&<div className="targeted-resume-suggestion">
       <span className="targeted-resume-ai-label"><Sparkles size={13} aria-hidden="true"/> AI 建议 · {s.action==='request_evidence'?'需要补充真实信息':'待用户核实'}</span>
       <p className="targeted-resume-gradient">{s.proposed}</p>
+      <p className="targeted-resume-rationale">对应岗位要求：{s.jobRequirement}</p>
       <p className="targeted-resume-rationale">{s.rationale}</p>
       {s.action!=='request_evidence'&&<label className="targeted-resume-confirm">
        <input type="checkbox" checked={confirmed.includes(s.id)}
