@@ -29,7 +29,8 @@ test('page is readable anonymously and reachable from both home and labor rights
  assert.match(main,/MembershipRulesPage=lazy/);
  assert.match(main,/if\(route==='\/membership\/rules'\)return <MembershipRulesPage user=\{user\}\/>/);
  assert.doesNotMatch(homepage,/to="\/membership\/rules"/);
- assert.match(homepage,/to="\/rights\/knowledge"/);
+ assert.match(homepage,/href:'\/rights\/knowledge'/);
+ assert.match(homepage,/href:'\/rights\/guide'/);
  assert.doesNotMatch(rights,/to="\/membership\/rules"/);
  assert.match(rights,/to="\/rights\/guide"/);
  assert.match(page,/<Shell user=\{user\}>/);
