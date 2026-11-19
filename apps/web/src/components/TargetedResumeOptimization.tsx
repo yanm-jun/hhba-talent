@@ -13,6 +13,7 @@ import {downloadResumeDocx} from '../services/resumeDocx';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
 import {officialJobVerifyStatus,verifyOfficialJob,type OfficialJobVerifyStatus,type OfficialVerifiedJob} from '../services/officialJobVerifyApi';
 import '../styles/targeted-resume-optimization.css';
+import '../styles/siri-edge.css';
 
 export function TargetedResumeOptimization({profile,job,sourceText}:{profile:CandidateProfile;job:JobMatch;sourceText?:string}){
  const blocks=useMemo<ResumeBlock[]>(()=>{
@@ -262,8 +263,9 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
      {applied&&<span className="targeted-resume-applied"><CheckCircle2 size={12} aria-hidden="true"/> 已填充</span>}
     </div>}
    </div>
-   {pending&&s&&openSuggestionId===s.id&&editingBlock!==id&&<div
-    className="targeted-resume-suggestion targeted-resume-popover" role="region"
+   {pending&&s&&openSuggestionId===s.id&&editingBlock!==id&&
+    <div className="targeted-resume-popover-shell hhba-siri-edge hhba-siri-edge-active">
+    <div className="targeted-resume-suggestion targeted-resume-popover" role="region"
     aria-label="当前简历段落的 AI 建议">
     <div className="targeted-resume-popover-head">
      <span className="targeted-resume-ai-label"><Sparkles size={13} aria-hidden="true"/> AI 原位建议 · {s.action==='request_evidence'?'请补充真实信息':'待本人核实'}</span>
@@ -295,6 +297,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
       {editingSuggestionId===s.id?'完成建议修改':'修改建议'}</button>}
      <button type="button" onClick={()=>{setIgnored(v=>[...v,s.id]);setOpenSuggestionId(null)}}>保留原文</button>
     </div>
+   </div>
    </div>}
   </div>;
  }
@@ -351,7 +354,9 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
    <p className="targeted-resume-print-note">可以导出 PDF 或 Word。导出内容不包含修改按钮；复杂的原始排版可能无法完全保留。</p>
    {!canExport&&<p className="targeted-resume-print-note" role="status">请填写真实姓名、确认简历内容完整，并保存正在编辑的段落，才可以导出 PDF 或 Word。</p>}
   </section>
-  <div className="targeted-resume-live-paper" aria-label="可原位编辑的简历预览">
+  <div className={'targeted-resume-live-paper hhba-siri-edge'+
+    ((openSuggestionId||editingBlock)?' hhba-siri-edge-active':'')}
+    aria-label="可原位编辑的简历预览">
    <ResumePrintSheet document={printDocument} renderBlock={renderEditableBlock}/>
   </div>
   {before.score!==null&&<div className="targeted-resume-audit" aria-label="文字证据覆盖变化">
