@@ -234,14 +234,14 @@ try{
  assert.ok(popupPlacement.top<popupPlacement.markerBottom+120,
   'popup must appear near the clicked text: '+JSON.stringify(popupPlacement));
  const field=source.getByRole('textbox',{name:'修改这段内容'});
- await field.fill('EDITED RESUME VIEW');
+ await field.fill('修改后的简历');
  assert.equal(await source.getByRole('button',{name:'保存',exact:true}).isDisabled(),true);
  await source.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
  await source.screenshot({path:output+'/original-pdf-inline-editor.png',fullPage:true});
  await source.getByRole('button',{name:'保存',exact:true}).click();
  const livePatch=source.locator('.hhba-original-resume-edit-patch');
  await livePatch.waitFor({timeout:10000});
- assert.match(await livePatch.textContent(),/EDITED RESUME VIEW/,
+ assert.match(await livePatch.textContent(),/修改后的简历/,
   'saved short text must be visible directly in the ORIGINAL PDF page');
  const verifiedPatch=await livePatch.evaluate(el=>{
   const bounds=el.getBoundingClientRect();
@@ -255,17 +255,19 @@ try{
   'safe replacement must be inside original source page: '+JSON.stringify(verifiedPatch));
  await source.screenshot({path:output+'/original-pdf-edited-preview.png',fullPage:true});
  const reviewDownloadEvent=source.waitForEvent('download');
- await source.getByRole('button',{name:'下载修改预览'}).click();
+ await source.getByRole('button',{name:'下载 PDF'}).click();
  const reviewDownload=await reviewDownloadEvent;
- assert.match(reviewDownload.suggestedFilename(),/修改预览稿\.pdf$/,
-  'modified source PDF must be downloaded as a clearly marked review copy');
- await reviewDownload.saveAs(output+'/edited-original-review.pdf');
- const reviewBytes=await readFile(output+'/edited-original-review.pdf');
+ assert.match(reviewDownload.suggestedFilename(),/已修改\.pdf$/,
+  'source PDF must download as a distinct edited copy');
+ await reviewDownload.saveAs(output+'/edited-original-searchable.pdf');
+ const reviewBytes=await readFile(output+'/edited-original-searchable.pdf');
  assert.ok(reviewBytes.length>500,'visual review PDF should not be empty');
  const reviewPages=await pdfText(reviewBytes);
  assert.equal(reviewPages.length,1,'review PDF must preserve original page count');
- assert.equal(reviewPages[0].trim(),'',
-  'visual review PDF must not silently retain extractable, hidden original text');
+ assert.ok(reviewPages[0].includes('修改后的简历'),
+  'saved Chinese text must be searchable and copyable in exported PDF');
+ assert.equal(reviewPages[0].includes('ORIGINAL RESUME VIEW'),false,
+  'replaced old PDF text must not remain searchable');
  assert.equal(reviewBytes.includes(Buffer.from('ORIGINAL RESUME VIEW')),false,
   'old original string must not be hidden inside exported review PDF');
  await source.screenshot({path:output+'/original-pdf-edited-preview-after-download.png',fullPage:true});
@@ -279,7 +281,7 @@ try{
  await livePatch.waitFor({state:'detached',timeout:10000});
  await source.getByText('其余文字暂时放不下',{exact:false}).waitFor({timeout:10000});
  const failureText=source.getByRole('status').filter({hasText:'有些修改暂时不能安全放进原来的位置'});
- await source.getByRole('button',{name:'下载修改预览'}).click();
+ await source.getByRole('button',{name:'下载 PDF'}).click();
  await failureText.waitFor({timeout:10000});
  await source.getByRole('button',{name:'继续修改这一段'}).click();
  await source.getByRole('button',{name:'撤销',exact:true}).click();
