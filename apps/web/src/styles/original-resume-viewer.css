@@ -102,3 +102,30 @@
   display:none!important;
  }
 }
+
+/* A conservative live preview of confirmed, SHORT native-text PDF edits.
+   Only displayed if page mapping, text length and white paper background
+   are safe. It is not an exported PDF or a destructive redaction. */
+.hhba-original-resume-edit-patch{
+ position:absolute;
+ z-index:1;
+ overflow:hidden;
+ white-space:nowrap;
+ display:flex;
+ align-items:center;
+ justify-content:flex-start;
+ box-sizing:border-box;
+ padding:0 2px;
+ margin:0;
+ background:#fff;
+ color:#242c35;
+ font-family:Arial,"Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+ font-weight:400;
+ letter-spacing:0;
+ line-height:1;
+ pointer-events:none;
+ user-select:text;
+}
+@media print{
+ .hhba-original-resume-edit-patch{display:none!important}
+}
