@@ -14,7 +14,7 @@ const dryRun=process.argv.includes('--dry-run');
 const knownHosts=new Set([
  'www.mohrss.gov.cn','www.samr.gov.cn','www.court.gov.cn',
  'fgk.chinatax.gov.cn','know.12348.gov.cn',
- 'www.beijing.gov.cn','rsj.beijing.gov.cn','shanghai.chinatax.gov.cn',
+ 'www.beijing.gov.cn','rsj.beijing.gov.cn','rsj.wuhan.gov.cn','shanghai.chinatax.gov.cn',
  'chinajob.mohrss.gov.cn','www.nhsa.gov.cn','xzfg.moj.gov.cn'
 ]);
 const records=new Map();
