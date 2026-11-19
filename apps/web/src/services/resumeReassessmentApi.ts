@@ -8,6 +8,7 @@ export type ReassessmentStatus={
 export type ReassessmentResult={
  ok:true;kind:'HHBA_RESUME_REASSESS_V2';job_id:string;verified_job_title:string;
  verified_company:string;job_snapshot_updated_at:string;ranking_version:string;
+ source_label?:string;selected_job_as_target_direction?:boolean;
  supported:boolean;reason?:string;original_score?:number;updated_score?:number;
  delta?:number;before_breakdown?:Record<string,number>;after_breakdown?:Record<string,number>;
  newly_visible_terms?:string[];lost_visible_terms?:string[];important_notice?:string;
