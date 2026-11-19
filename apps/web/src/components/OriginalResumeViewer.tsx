@@ -33,7 +33,7 @@ export function OriginalResumeViewer({resume,onClose}:{
      return;
     }
     const [pdf,worker]=await Promise.all([
-     import('pdfjs-dist/build/pdf.mjs'),import('pdfjs-dist/build/pdf.worker.min.mjs?url')
+     import('pdfjs-dist'),import('pdfjs-dist/build/pdf.worker.min.mjs?url')
     ]);
     if(!active)return;
     pdf.GlobalWorkerOptions.workerSrc=worker.default;
