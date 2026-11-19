@@ -1,0 +1,45 @@
+name: HHBA original labor-rights knowledge and workplace guide
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/pages/LegalAidLandingPage.tsx'
+      - 'apps/web/src/pages/WorkValueGuidePage.tsx'
+      - 'apps/web/src/data/hhbaWorkValueGuide.ts'
+      - 'apps/web/src/styles/hhba-work-value-guide.css'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/components/Shell.tsx'
+      - 'apps/web/src/services/siteSearchIndex.ts'
+      - 'apps/web/scripts/hhba-rights-guide.contract.test.mjs'
+      - 'apps/web/scripts/audit-labor-rights-topics.mjs'
+      - '.github/workflows/hhba-rights-original-guide.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-rights-guide:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Audit existing eight official-source legal topics
+        working-directory: apps/web
+        run: node scripts/audit-labor-rights-topics.mjs
+      - name: Test both independent HHBA rights products
+        working-directory: apps/web
+        run: |
+          node --test scripts/hhba-rights-guide.contract.test.mjs \
+            scripts/home-workplace-promise.contract.test.mjs \
+            scripts/membership-rules.contract.test.mjs \
+            scripts/site-search.contract.test.mjs
+      - name: Verify production TypeScript and Vite build
+        working-directory: apps/web
+        run: npm run build

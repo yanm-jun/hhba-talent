@@ -34,7 +34,8 @@ assert(urls.size>=5,'Insufficient independently checked legal sources');
 const landing=readFileSync('src/pages/LegalAidLandingPage.tsx','utf8');
 const detail=readFileSync('src/pages/LegalAidTopicPage.tsx','utf8');
 const router=readFileSync('src/main.tsx','utf8');
-for(const slug of expected)assert(landing.includes(slug),'Homepage must link '+slug);
+assert(landing.includes('laborRights.topics.filter(topic=>topicMatches(topic,query))'),'Knowledge index must read the real eight-topic dataset');
+assert(landing.includes("knowledgeHref+'/'+topic.slug"),'Knowledge index must link to each official-source detail page');
 assert(router.includes("if(/^\\/candidate\\/account\\/legal-aid\\/"),'Missing guarded deep link route');
 for(const selector of ['topic.laws.map','topic.proof.map','topic.paths.map','topic.case.outcome','topic.case.url'])
  assert(detail.includes(selector),'Legal detail misses '+selector);

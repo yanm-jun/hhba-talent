@@ -56,6 +56,7 @@ export function SiteFooter(){
   {title:'劳动者权益',links:[
    ['会员与权益服务','/rights'],
    ['劳动权益知识','/rights/knowledge'],
+   ['高性价比职场指南','/rights/guide'],
    ['责任与透明','/transparency'],
   ]},
   {title:'关于汇方',links:[

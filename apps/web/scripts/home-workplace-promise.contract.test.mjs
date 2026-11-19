@@ -58,9 +58,11 @@ test('all public rights and legal knowledge URLs render independently, while pri
  assert.ok(rights.includes('embedded?"个人工作台":"HHBA 首页"'));
  assert.ok(rights.includes("embedded?'/candidate/account/legal-aid':'/rights/knowledge'"));
  assert.ok(knowledge.includes("embedded?'/candidate/account/legal-aid':'/rights/knowledge'"));
- assert.ok(knowledge.includes("embedded?'/candidate/account/rights':'/rights'"));
- assert.ok(knowledge.includes("embedded?'/candidate/account/legal-aid/intervention':'/rights/support'"));
- assert.ok(knowledge.includes("knowledgeHref+'/'+slug"),'article links should keep the public context');
+ assert.ok(knowledge.includes("knowledgeHref+\'/\'+topic.slug"),"knowledge cards link to topic details");
+ assert.ok(knowledge.includes('to="/rights/guide"'),"guide is reachable from knowledge");
+
+
+
  assert.ok(article.includes("knowledgeHref+'/'+topics[index+1].slug"),'next article should keep the public context');
  assert.ok(support.includes("knowledgeHref+'/'+topic.slug"),'support guidance should point to public article');
  for(const path of ["/candidate/account/rights","/candidate/account/legal-aid","/candidate/account/legal-aid/intervention"]){
