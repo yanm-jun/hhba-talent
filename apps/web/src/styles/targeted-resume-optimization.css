@@ -73,3 +73,21 @@
 .targeted-resume-inline-editor textarea:focus-visible{outline:2px solid #9b8be9;outline-offset:1px}
 .targeted-resume-inline-editor>div{display:flex;align-items:center;gap:8px}
 .targeted-resume-inline-editor>div button:first-child{background:#27344d;color:#fff}
+
+.targeted-resume-reassess{max-width:800px;margin:16px auto;background:#fff;border:1px solid #e1e6ef;border-radius:12px;padding:20px}
+.targeted-resume-reassess-heading{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.targeted-resume-reassess-heading strong{font-size:16px;color:#27344c}
+.targeted-resume-reassess-heading p,.targeted-resume-reassess-unavailable{font-size:12px;color:#69788e;line-height:1.7;margin:7px 0}
+.targeted-resume-reassess-heading button{background:#283851;border-color:#283851;color:#fff;flex-shrink:0}
+.targeted-resume-score-comparison{margin-top:18px;border-top:1px solid #e9edf3;padding-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.targeted-resume-score-comparison>div{padding:15px 10px;text-align:center;background:#f8f9fc;border-radius:9px;display:flex;flex-direction:column;gap:5px}
+.targeted-resume-score-comparison small{color:#63748b;font-size:11px}
+.targeted-resume-score-comparison strong{font-size:30px;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:#263954}
+.targeted-resume-score-comparison strong span{font-size:13px;color:#758398;font-weight:400}
+.targeted-resume-score-comparison>p,.targeted-resume-score-comparison>details{grid-column:1/-1;font-size:12px;color:#586982;line-height:1.6;margin:0}
+.targeted-resume-score-comparison summary{cursor:pointer;font-weight:600}
+.targeted-resume-score-comparison table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+.targeted-resume-score-comparison th,.targeted-resume-score-comparison td{padding:8px 5px;border-bottom:1px solid #e9edf3;text-align:left}
+.targeted-resume-score-comparison th{font-weight:600;color:#42536b}
+.targeted-resume-score-comparison .targeted-resume-score-disclaimer{font-size:11px;color:#7b8798}
+@media(max-width:650px){.targeted-resume-reassess-heading{flex-direction:column;align-items:stretch}.targeted-resume-reassess-heading button{width:100%}}
