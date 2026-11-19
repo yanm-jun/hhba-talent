@@ -124,11 +124,23 @@ export async function onRequestPost({request,env}){
   console.warn('HHBA_RESUME_VISION_FAILED',code);
   return fail(code,code==='VISION_PROVIDER_RATE_LIMITED'?429:502);
  }
- // Layout results can contain private text. Cache in the same private R2
- // bucket as the source file; delete alongside the original resume.
+ // Analysis is slow enough that a user may delete the source mid-request.
+ // Re-check source ownership before AND after caching to avoid a retained PII
+ // sidecar for a file that no longer belongs to this account.
+ const stillOwned=async()=>{
+  const current=await db.prepare(
+   'SELECT sha256 FROM hhba_candidate_resumes WHERE id=? AND phone=?'
+  ).bind(row.id,session.phone).first();
+  return current?.sha256===row.sha256;
+ };
  try{
+  if(!await stillOwned())return fail('RESUME_NOT_FOUND',404);
   await bucket.put(key,JSON.stringify(layout),{
    httpMetadata:{contentType:'application/json'}});
+  if(!await stillOwned()){
+   await bucket.delete(key).catch(()=>{});
+   return fail('RESUME_NOT_FOUND',404);
+  }
  }catch{return fail('PRIVATE_RESUME_CACHE_UNAVAILABLE',503);}
  return send({ok:true,cached:false,layout});
 }
