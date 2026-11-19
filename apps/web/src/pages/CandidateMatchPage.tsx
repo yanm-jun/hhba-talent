@@ -7,7 +7,7 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
+import {matchServiceReady,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -36,6 +36,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [error,setError]=useState('');
 
  const [result,setResult]=useState<MatchResponse|null>(null);
+ const [optimizationSource,setOptimizationSource]=useState('');
  const controller=useRef<AbortController|null>(null);
  useEffect(()=>{
   const abort=new AbortController();
@@ -69,7 +70,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  },[user?.id]);
  function choose(candidate:File|null){
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);
-  setError('');setResult(null);setSaveConsent(false);setSaveNotice('');
+  setError('');setResult(null);setOptimizationSource('');setSaveConsent(false);setSaveNotice('');
   if(!candidate){setFile(null);return}
   if(!/\.(pdf|docx)$/i.test(candidate.name)||!candidate.size||candidate.size>maxResumeSize){
     setFile(null);setError('请选择不超过 3 MB 的 PDF 或 DOCX 文件。');return;
@@ -121,11 +122,10 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   const abort=new AbortController();
   controller.current=abort;
   try{
-   let matched:MatchResponse;
-   if(previewLoaded){
-    // Once the user has reviewed/edited text, NEVER fall back to re-reading the unedited file.
-    matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
-   }else{
+   // Reuse one local extraction for matching AND later user-controlled editing.
+   // No second AI parse, and no extra file upload is required for optimization.
+   let submittedText=previewLoaded?previewText:'';
+   if(!previewLoaded){
     let selected=file;
     if(!selected&&savedId){
      const entry=savedFiles.find(item=>item.id===savedId);
@@ -135,8 +135,12 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
      selected=new File([bytes],entry.name,{type:entry.type});
     }
     if(!selected)throw new MatchError(400,'请选择简历。');
-    matched=await submitResumeForMatching(selected,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
+    submittedText=await extractResumeTextLocally(selected,abort.signal);
    }
+   const matched:MatchResponse=await submitExtractedResumeText(
+    submittedText,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
+   if(abort.signal.aborted)return;
+   setOptimizationSource(submittedText);
    setResult(matched);setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
    setConsent(false);
@@ -225,6 +229,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     {(result||partialJobs.length>0)&&<CandidateMatchNativeDialog
       result={result||{matches:partialJobs}}
       pending={working&&!result} notice={working?'':error}
+      sourceText={result?optimizationSource:undefined}
       resumeStorage={result&&file&&!savedId?{
         available:true,saved:false,consent:saveConsent,saving:saveBusy,
         notice:saveNotice,onConsent:setSaveConsent,onSave:()=>void saveResume()
