@@ -66,7 +66,7 @@ test('official subtopic references point to the correct published law texts',()=
 
 test('search remains private and selected action opens on exact deep link',()=>{
  assert.match(hub,/matchingIntents\(query\)/);
- assert.match(hub,/matchingIntents\(raw\)/);
+ assert.match(hub,/const matchingIntents=\(raw:string\)=>/);
  assert.match(hub,/intent\.subtopics\.includes\(topic\.slug\)/);
  assert.match(hub,/relatedSlugs\.add\(intent\.primary\)/);
  assert.match(hub,/本页使用关键词和常见说法匹配/);
