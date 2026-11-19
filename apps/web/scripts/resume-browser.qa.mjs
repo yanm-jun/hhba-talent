@@ -160,6 +160,27 @@ try{
  assert.equal(await truncated.getByRole('button',{name:'保存当前版本'}).isDisabled(),true,
   'a truncated source must never be silently persisted as a complete cloud version');
  await truncated.close();
+
+ // Original-file preview must render the actual source PDF via bundled PDF.js,
+ // rather than retyping the content into the HHBA standardized resume sheet.
+ const source=await browser.newPage({viewport:{width:1100,height:900},locale:'zh-CN'});
+ const sourceErrors=[];source.on('pageerror',e=>sourceErrors.push(e.message));
+ await source.goto('http://127.0.0.1:3000/qa/original-resume-viewer.html',
+  {waitUntil:'networkidle',timeout:45000});
+ await source.getByRole('img',{name:'原始 PDF 第 1 页'}).waitFor({timeout:15000});
+ await source.getByText('第 1 / 1 页').waitFor({timeout:15000});
+ await source.waitForFunction(()=>{
+  const c=document.querySelector('.hhba-original-resume-canvas');
+  return c instanceof HTMLCanvasElement&&c.width>400&&c.height>500;
+ },{timeout:15000});
+ const originalMetrics=await source.locator('.hhba-original-resume-canvas')
+  .evaluate(c=>({width:c.width,height:c.height}));
+ assert.ok(originalMetrics.width>400&&originalMetrics.height>500,
+  'original source PDF should render as a full page');
+ await source.screenshot({path:output+'/original-pdf-preview.png',fullPage:true});
+ assert.deepEqual(sourceErrors,[],'original PDF must not cause JS runtime exceptions');
+ await source.close();
+
  console.log(JSON.stringify({result:'PASSED',desktop_pdf_pages:pages.length,
   long_pdf_pages:longPages.length,mobile:metrics,qa_output:output}));
 }finally{await browser.close()}
