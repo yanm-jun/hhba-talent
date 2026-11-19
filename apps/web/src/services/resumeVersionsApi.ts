@@ -1,7 +1,8 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import type {ResumeBlock} from './targetedResumeOptimization';
+import type {ResumeDocumentDetails} from './resumeDocument';
 const PATH='/api/resume-versions';
-type VersionBody={blocks:ResumeBlock[];acceptedSuggestionIds:string[]};
+type VersionBody={blocks:ResumeBlock[];acceptedSuggestionIds:string[];details?:ResumeDocumentDetails};
 export type SavedResumeVersion={
  id:string;job_id:string;job_title:string;company:string;created_at:string;version:VersionBody;
 };
@@ -31,9 +32,9 @@ async function send<T>(method:'GET'|'POST'|'DELETE',params:string,body?:unknown)
 export function listResumeVersions(jobId:string){
  return send<{ok:boolean;items:SavedResumeVersion[]}>('GET','?job_id='+encodeURIComponent(jobId));
 }
-export function saveResumeVersion(job:{id:string;title:string;company:string},blocks:ResumeBlock[],acceptedIds:string[]){
+export function saveResumeVersion(job:{id:string;title:string;company:string},blocks:ResumeBlock[],acceptedIds:string[],details:ResumeDocumentDetails){
  return send<{ok:boolean;id:string;created_at:string}>('POST','',{
-  job_id:job.id,job_title:job.title,company:job.company,blocks,accepted_ids:acceptedIds
+  job_id:job.id,job_title:job.title,company:job.company,blocks,accepted_ids:acceptedIds,details
  });
 }
 export function deleteResumeVersion(id:string){
