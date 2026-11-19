@@ -8,6 +8,7 @@ import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
 import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResumeVersion} from '../services/resumeVersionsApi';
 import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
 import {ResumePrintSheet} from './ResumePrintSheet';
+import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
 import '../styles/targeted-resume-optimization.css';
 
 export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfile;job:JobMatch}){
@@ -25,6 +26,10 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
  const [notice,setNotice]=useState('');
  const [busy,setBusy]=useState(false);
  const [status,setStatus]=useState<ResumeOptimizationStatus|null>(null);
+ const [scoreStatus,setScoreStatus]=useState<ReassessmentStatus|null>(null);
+ const [scoreResult,setScoreResult]=useState<ReassessmentResult|null>(null);
+ const [scoring,setScoring]=useState(false);
+ const [confirmReassessment,setConfirmReassessment]=useState(false);
  const [saved,setSaved]=useState<SavedResumeVersion[]>([]);
  const [storageReady,setStorageReady]=useState(false);
  const [saving,setSaving]=useState(false);
@@ -38,6 +43,7 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
  useEffect(()=>{
   const abort=new AbortController();
   getResumeOptimizationStatus(abort.signal).then(setStatus);
+  reassessmentStatus(abort.signal).then(setScoreStatus);
   return ()=>{abort.abort();active.current?.abort();};
  },[]);
  useEffect(()=>{
@@ -60,6 +66,22 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
  }
  const before=useMemo(()=>evidenceVisibility(criteria,blocks),[criteria,blocks]);
  const after=useMemo(()=>evidenceVisibility(criteria,version.blocks),[criteria,version.blocks]);
+ const hasWordingChanges=useMemo(()=>version.blocks.some(block=>{
+  const original=blocks.find(old=>old.id===block.id);
+  return !original||original.text!==block.text;
+ }),[version.blocks,blocks]);
+ function invalidateScore(){setScoreResult(null);setConfirmReassessment(false);}
+ async function reassess(){
+  if(!scoreStatus?.enabled||scoring||!hasWordingChanges||!confirmReassessment)return;
+  setScoring(true);setNotice('');setScoreResult(null);
+  try{
+   const result=await reassessResume(job.id,profile,blocks,version.blocks);
+   setScoreResult(result);
+   if(!result.supported)setNotice('此岗位未通过当前官方快照复评条件，未生成分数。');
+   else setNotice('已使用同一版本的 V2 评分引擎对两个简历版本完成重新计算。');
+  }catch(e){setNotice(e instanceof Error?e.message:'复评请求失败。');}
+  finally{setScoring(false);}
+ }
  async function persist(){
   if(saving||!confirmReal||!storageReady||!canPrint)return;
   setSaving(true);setNotice('');
@@ -74,7 +96,7 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
  }
  function restore(item:SavedResumeVersion){
   active.current?.abort();setBusy(false);
-  setVersion({id:item.id,targetJobId:job.id,blocks:item.version.blocks,
+  invalidateScore();setVersion({id:item.id,targetJobId:job.id,blocks:item.version.blocks,
    acceptedSuggestionIds:item.version.acceptedSuggestionIds});
   setDetails(normalizeResumeDocumentDetails(item.version.details));setConfirmReal(false);
   setSuggestions([]);setIgnored([]);setConfirmed([]);setNewEvidence({});
@@ -91,7 +113,7 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
  async function generate(){
   if(!consent||!blocks.length||busy||!status?.enabled)return;
   const currentBlocks=version.blocks;
-  setBusy(true);setNotice('');setSuggestions([]);setIgnored([]);setConfirmed([]);setNewEvidence({});
+  invalidateScore();setBusy(true);setNotice('');setSuggestions([]);setIgnored([]);setConfirmed([]);setNewEvidence({});
   const controller=new AbortController();active.current=controller;
   try{
    const incoming=await requestResumeOptimization(currentBlocks,{
@@ -114,7 +136,7 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
    setNotice('请先确认建议内容符合你的真实经历。');return;
   }
   try{
-   setVersion(applySuggestion(version,s,confirmed.includes(s.id)));setConfirmReal(false);
+   setVersion(applySuggestion(version,s,confirmed.includes(s.id)));setConfirmReal(false);invalidateScore();
    setNotice('已填充到本次预览，原始简历文件没有被修改。');
   }catch{setNotice('原文已变化或缺乏真实证据，请重新生成建议。');}
  }
@@ -123,7 +145,7 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
   if(text.length<8){setNotice('请具体描述你的真实经历或成果，至少8个字。');return;}
   if(!confirmed.includes(s.id)){setNotice('请确认补充内容真实、准确后再填充。');return;}
   try{
-   setVersion(applySuggestion(version,{...s,action:'append',proposed:text},true));setConfirmReal(false);
+   setVersion(applySuggestion(version,{...s,action:'append',proposed:text},true));setConfirmReal(false);invalidateScore();
    setNotice('已将你亲自填写的真实信息添加到当前简历预览。');
   }catch{setNotice('原文已经变化，请重新生成补充建议。');}
  }
@@ -133,14 +155,14 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
  function saveEdit(){
   if(!editingBlock)return;
   try{
-   setVersion(editResumeBlock(version,editingBlock,manualText));
+   setVersion(editResumeBlock(version,editingBlock,manualText));invalidateScore();
    setSuggestions(existing=>existing.filter(s=>s.blockId!==editingBlock));
    setEditingBlock(null);setManualText('');setConfirmReal(false);
    setNotice('已更新本次简历的文字内容。所有手动修改须以真实经历为准。');
   }catch{setNotice('请输入有效内容，单个段落最多 1600 字。');}
  }
  function reset(){
-  active.current?.abort();setBusy(false);setVersion(initial());setSuggestions([]);
+  active.current?.abort();setBusy(false);setVersion(initial());setSuggestions([]);invalidateScore();
   setIgnored([]);setConfirmed([]);setNewEvidence({});setConfirmReal(false);setEditingBlock(null);setNotice('已恢复原始预览。');
  }
  const hasSession=realAuthReady&&Boolean(getRealAuthToken());
@@ -245,6 +267,37 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
    {after.missing.length>0&&<details><summary>仍未充分体现的要求（{after.missing.length}）</summary>
     <ul>{after.missing.map((label,index)=><li key={index}>{label}</li>)}</ul></details>}
   </div>}
+  <section className="targeted-resume-reassess" aria-label="岗位匹配评分复评">
+   <div className="targeted-resume-reassess-heading">
+    <div><strong>岗位匹配分重新评估</strong>
+     <p>仅支持具有最新官方审核快照的中国大陆 ATS 岗位。优化前后都使用 HHBA Match Ranking V2，不沿用旧卡片分数。</p></div>
+    {scoreStatus?.enabled&&<button type="button" onClick={reassess} disabled={!hasWordingChanges||!confirmReassessment||scoring}>
+     {scoring?'正在复评…':'重新计算匹配分'}</button>}
+   </div>
+   {!scoreStatus?.enabled&&<p className="targeted-resume-reassess-unavailable">V2 可信复评尚未开放，当前仍可使用文字证据覆盖检查。</p>}
+   {scoreStatus?.enabled&&<label className="targeted-resume-confirm">
+    <input type="checkbox" checked={confirmReassessment} onChange={e=>setConfirmReassessment(e.target.checked)}/>
+    我确认本次简历改写均为真实情况，并同意 HHBA 在站内读取当前简历片段、对照官方岗位快照进行评分。此复评不会调用第三方生成式 AI。
+   </label>}
+   {scoreStatus?.enabled&&!hasWordingChanges&&<p className="targeted-resume-reassess-unavailable">请先编辑或填充一条简历内容，才需要重新评分。</p>}
+   {scoreResult?.supported&&typeof scoreResult.original_score==='number'&&typeof scoreResult.updated_score==='number'&&
+    <div className="targeted-resume-score-comparison">
+     <div><small>修改前 · V2 复评基准</small><strong>{scoreResult.original_score}<span>/100</span></strong></div>
+     <div><small>修改后 · V2 同规则</small><strong>{scoreResult.updated_score}<span>/100</span></strong></div>
+     <p>差值：{scoreResult.delta&&scoreResult.delta>0?'+':''}{scoreResult.delta} 分。岗位：{scoreResult.verified_job_title} · {scoreResult.verified_company}</p>
+     {scoreResult.newly_visible_terms&&scoreResult.newly_visible_terms.length>0&&
+      <p>文字新增体现：{scoreResult.newly_visible_terms.join('、')}。这些技能仍需以你的真实经历为依据。</p>}
+     <details><summary>查看评分维度</summary>
+      <table><thead><tr><th>维度</th><th>修改前</th><th>修改后</th></tr></thead>
+       <tbody>{(['role','skills','experience','education','location'] as const).map(dim=><tr key={dim}>
+        <td>{{role:'岗位方向',skills:'岗位技能',experience:'工作经验',education:'学历',location:'地点'}[dim]}</td>
+        <td>{scoreResult.before_breakdown?.[dim]??'—'}</td><td>{scoreResult.after_breakdown?.[dim]??'—'}</td>
+       </tr>)}</tbody>
+      </table>
+     </details>
+     <p className="targeted-resume-score-disclaimer">{scoreResult.important_notice}</p>
+    </div>}
+  </section>
   <div className="targeted-resume-save">
    <div><strong><FolderOpen size={16} aria-hidden="true"/> 我的岗位简历版本</strong>
     <p>仅在你主动保存后，将当前已确认的文字片段保存在 HHBA 私人账号中；不保存原始 PDF/DOCX。</p></div>
