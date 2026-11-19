@@ -51,7 +51,9 @@ try{
  assert.match(animated.name,/hhba-siri-text-flow/,'AI draft should animate gently');
  assert.match(animated.image,/linear-gradient/,'AI draft should use text gradient');
  assert.equal(animated.text,'rgba(0, 0, 0, 0)','gradient should be clipped to AI text');
- await page.screenshot({path:output+'/siri-ai-suggestion.png',fullPage:true,animations:'disabled'});
+ await tip.first().scrollIntoViewIfNeeded();
+ await tip.first().screenshot({path:output+'/siri-ai-suggestion.png',animations:'disabled'});
+ await page.screenshot({path:output+'/siri-ai-context.png',animations:'disabled'});
  await page.emulateMedia({reducedMotion:'reduce'});
  const still=await siriText.evaluate(el=>getComputedStyle(el).animationName);
  assert.equal(still,'none','reduced-motion readers get a static accessible suggestion');
