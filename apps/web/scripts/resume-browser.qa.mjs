@@ -308,6 +308,8 @@ try{
  assert.ok(mobilePatchBounds.left>=0&&mobilePatchBounds.right<=mobilePatchBounds.viewport+2,
   'saved text must remain visible on mobile original PDF: '+JSON.stringify(mobilePatchBounds));
  await smallSource.screenshot({path:output+'/original-pdf-mobile-edited-preview.png',fullPage:true});
+ // Saving closes the editor; reopen it before testing the editor's bounds.
+ await smallSource.getByRole('button',{name:'继续修改这一段'}).click();
  const sourceMobileWidths=await smallSource.evaluate(()=>({
   client:document.documentElement.clientWidth,
   scroll:document.documentElement.scrollWidth,
