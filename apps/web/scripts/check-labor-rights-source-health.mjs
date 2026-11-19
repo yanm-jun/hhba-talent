@@ -52,14 +52,50 @@ function classify(status,contentType,url){
 async function single(url){
  const controller=new AbortController();
  const timer=setTimeout(()=>controller.abort(),timeoutMs);
+ let current=url;
+ let redirects=0;
  try{
-  const response=await fetch(url,{method:'GET',redirect:'follow',signal:controller.signal,headers:{'User-Agent':'HHBA-Source-Link-Monitor/1.0 (read-only accessibility checks)','Accept':'text/html,application/pdf;q=0.9,*/*;q=0.2'}});
-  const contentType=response.headers.get('content-type')||'';
-  const result={httpStatus:response.status,contentType:contentType.slice(0,100),finalUrl:response.url,classification:classify(response.status,contentType,response.url)};
-  await response.body?.cancel();
-  return result;
+  // Follow only redirects between approved HTTPS authorities; never request
+  // a login/marketing/external host reached from an official reference.
+  for(let attempt=0;attempt<4;attempt++){
+   const response=await fetch(current,{
+    method:'GET',redirect:'manual',signal:controller.signal,
+    headers:{
+     'User-Agent':'HHBA-Source-Link-Monitor/1.0 (read-only accessibility checks)',
+     'Accept':'text/html,application/pdf;q=0.9,*/*;q=0.2'
+    }
+   });
+   if([301,302,303,307,308].includes(response.status)){
+    const location=response.headers.get('location');
+    await response.body?.cancel();
+    if(!location)return {httpStatus:response.status,finalUrl:current,redirects,classification:'review_redirect',note:'Redirect without Location header'};
+    let next;
+    try{next=new URL(location,current)}catch{
+     return {httpStatus:response.status,finalUrl:current,redirects,classification:'review_redirect',note:'Invalid Location header'};
+    }
+    if(next.protocol!=='https:'||!knownHosts.has(next.hostname)){
+     return {httpStatus:response.status,finalUrl:next.href,redirects:redirects+1,classification:'review_redirect',note:'Redirect leaves the approved official HTTPS host list; target not fetched'};
+    }
+    if(attempt===3){
+     return {httpStatus:response.status,finalUrl:next.href,redirects:redirects+1,classification:'review_redirect',note:'More than three official-site redirects'};
+    }
+    current=next.href;
+    redirects++;
+    continue;
+   }
+   const contentType=response.headers.get('content-type')||'';
+   const classification=classify(response.status,contentType,current);
+   await response.body?.cancel();
+   return {
+    httpStatus:response.status,contentType:contentType.slice(0,100),
+    finalUrl:current,redirects,
+    classification:redirects>0&&classification==='reachable'?'review_redirect':classification,
+    ...(redirects>0?{note:'Source redirected to another official URL; requires editorial confirmation of the referenced text'}:{})
+   };
+  }
+  return {finalUrl:current,redirects,classification:'review_redirect',note:'Unexpected redirect loop'};
  }catch(e){
-  return {classification:'transient',error:String(e).slice(0,180)};
+  return {finalUrl:current,redirects,classification:'transient',error:String(e).slice(0,180)};
  }finally{clearTimeout(timer)}
 }
 async function check(entry){

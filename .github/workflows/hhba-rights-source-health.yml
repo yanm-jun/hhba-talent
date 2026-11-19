@@ -4,6 +4,16 @@ on:
     # Monday 08:30 Beijing time (00:30 UTC). No paid API or personal data.
     - cron: '30 0 * * 1'
   workflow_dispatch:
+  # Run one live audit whenever the source list or monitoring code is merged.
+  # This also gives the initial deployment an actual network check, rather than
+  # only a dry-run until the next scheduled Monday.
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/src/data/laborRightsTopics.json'
+      - 'apps/web/src/data/laborRightsSubtopics.json'
+      - 'apps/web/scripts/check-labor-rights-source-health.mjs'
+      - '.github/workflows/hhba-rights-source-health.yml'
   pull_request:
     branches: [main]
     paths:
