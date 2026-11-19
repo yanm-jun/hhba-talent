@@ -319,7 +319,7 @@ export function OriginalResumeViewer({resume,onClose}:{
      <button type="button" disabled={exporting||saving}
       onClick={()=>void downloadReviewPdf()}>
       <Download size={14}/>{exporting?'正在生成…':'下载 PDF'}</button>
-     <span>可搜索和复制文字；复杂排版与招聘系统兼容性仍需核对。</span>
+     <span>可搜索、复制文字。投递前请检查排版。</span>
     </div>
    </>}
    {message&&<p className="hhba-original-resume-note" role="status">{message}</p>}
