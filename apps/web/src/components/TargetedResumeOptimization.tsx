@@ -1,11 +1,13 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen} from 'lucide-react';
+import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen,Printer,Eye} from 'lucide-react';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 import {getRealAuthToken,realAuthReady} from '../services/realAuth';
 import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimizationStatus} from '../services/resumeOptimizationApi';
 import {applySuggestion,validateSuggestion,type ResumeBlock,type ResumeSuggestion,type ResumeVersion} from '../services/targetedResumeOptimization';
 import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
 import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResumeVersion} from '../services/resumeVersionsApi';
+import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
+import {ResumePrintSheet} from './ResumePrintSheet';
 import '../styles/targeted-resume-optimization.css';
 
 export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfile;job:JobMatch}){
@@ -26,6 +28,9 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
  const [saved,setSaved]=useState<SavedResumeVersion[]>([]);
  const [storageReady,setStorageReady]=useState(false);
  const [saving,setSaving]=useState(false);
+ const [details,setDetails]=useState<ResumeDocumentDetails>({...EMPTY_RESUME_DOCUMENT_DETAILS});
+ const [confirmReal,setConfirmReal]=useState(false);
+ const [showPrintPreview,setShowPrintPreview]=useState(false);
  const active=useRef<AbortController|null>(null);
  useEffect(()=>{
   const abort=new AbortController();
@@ -44,14 +49,20 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
   job.requirements_basis,...job.matched,...job.not_evidenced,...job.needs_verification
  ].filter(Boolean).join('\n').slice(0,2500),[job]);
  const criteria=useMemo(()=>[...job.matched,...job.not_evidenced], [job]);
+ const printDocument=useMemo(()=>buildResumeDocument(profile,version.blocks,details),[profile,version.blocks,details]);
+ const canPrint=readableResumeDocument(printDocument);
+ function updateDetail(key:keyof ResumeDocumentDetails,value:string){
+  setDetails(current=>({...current,[key]:value}));
+  setConfirmReal(false);
+ }
  const before=useMemo(()=>evidenceVisibility(criteria,blocks),[criteria,blocks]);
  const after=useMemo(()=>evidenceVisibility(criteria,version.blocks),[criteria,version.blocks]);
  async function persist(){
-  if(saving||version.acceptedSuggestionIds.length===0||!storageReady)return;
+  if(saving||!confirmReal||!storageReady||!canPrint)return;
   setSaving(true);setNotice('');
   try{
    await saveResumeVersion({id:job.id,title:job.title_zh||job.title,company:job.company},
-    version.blocks,version.acceptedSuggestionIds);
+    version.blocks,version.acceptedSuggestionIds,details);
    const data=await listResumeVersions(job.id);
    setSaved(data.items);
    setNotice('已保存本岗位专属简历版本到你的 HHBA 账户。');
@@ -62,6 +73,7 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
   active.current?.abort();setBusy(false);
   setVersion({id:item.id,targetJobId:job.id,blocks:item.version.blocks,
    acceptedSuggestionIds:item.version.acceptedSuggestionIds});
+  setDetails(normalizeResumeDocumentDetails(item.version.details));setConfirmReal(false);
   setSuggestions([]);setIgnored([]);setConfirmed([]);setNewEvidence({});
   setNotice('已载入 '+new Date(item.created_at).toLocaleString()+' 的简历版本；没有修改原始简历。');
  }
@@ -99,7 +111,7 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
    setNotice('请先确认建议内容符合你的真实经历。');return;
   }
   try{
-   setVersion(applySuggestion(version,s,confirmed.includes(s.id)));
+   setVersion(applySuggestion(version,s,confirmed.includes(s.id)));setConfirmReal(false);
    setNotice('已填充到本次预览，原始简历文件没有被修改。');
   }catch{setNotice('原文已变化或缺乏真实证据，请重新生成建议。');}
  }
@@ -108,13 +120,13 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
   if(text.length<8){setNotice('请具体描述你的真实经历或成果，至少8个字。');return;}
   if(!confirmed.includes(s.id)){setNotice('请确认补充内容真实、准确后再填充。');return;}
   try{
-   setVersion(applySuggestion(version,{...s,action:'append',proposed:text},true));
+   setVersion(applySuggestion(version,{...s,action:'append',proposed:text},true));setConfirmReal(false);
    setNotice('已将你亲自填写的真实信息添加到当前简历预览。');
   }catch{setNotice('原文已经变化，请重新生成补充建议。');}
  }
  function reset(){
   active.current?.abort();setBusy(false);setVersion(initial());setSuggestions([]);
-  setIgnored([]);setConfirmed([]);setNewEvidence({});setNotice('已恢复原始预览。');
+  setIgnored([]);setConfirmed([]);setNewEvidence({});setConfirmReal(false);setNotice('已恢复原始预览。');
  }
  const hasSession=realAuthReady&&Boolean(getRealAuthToken());
  return <section className="targeted-resume" aria-label="岗位定向简历优化">
@@ -172,6 +184,35 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
    })}
    {!version.blocks.length&&<p>未提取到可引用的工作或技能证据，请先完善原始简历。</p>}
   </div>
+  <section className="targeted-resume-document-editor" aria-label="正式简历排版与打印">
+   <div className="targeted-resume-document-heading">
+    <div><strong>正式简历排版</strong>
+     <p>用已识别的真实经历生成简洁的 A4 简历；请手动补全姓名等缺失信息，系统不会猜测个人资料。</p>
+    </div>
+    <div className="targeted-resume-document-actions">
+     <button type="button" onClick={()=>setShowPrintPreview(v=>!v)}><Eye size={15}/>{showPrintPreview?'收起预览':'预览 A4'}</button>
+     <button type="button" disabled={!canPrint} onClick={()=>window.print()}><Printer size={15}/> 打印 / 保存 PDF</button>
+    </div>
+   </div>
+   <div className="targeted-resume-document-fields">
+    <label>姓名 <input maxLength={80} value={details.fullName} placeholder="请填写本人真实姓名" onChange={e=>updateDetail('fullName',e.target.value)}/></label>
+    <label>职业标题 <input maxLength={120} value={details.headline} placeholder="例如：区域运营督导" onChange={e=>updateDetail('headline',e.target.value)}/></label>
+    <label>联系邮箱 <input type="email" maxLength={120} value={details.email} placeholder="自行填写" onChange={e=>updateDetail('email',e.target.value)}/></label>
+    <label>联系电话 <input type="tel" maxLength={60} value={details.phone} placeholder="自行填写" onChange={e=>updateDetail('phone',e.target.value)}/></label>
+    <label>所在地区 <input maxLength={120} value={details.location} placeholder="城市 / 地区" onChange={e=>updateDetail('location',e.target.value)}/></label>
+    <label className="wide">教育信息补充 <textarea rows={2} maxLength={600} value={details.educationDetails}
+     placeholder="院校、专业、就读时间等，以真实经历为准"
+     onChange={e=>updateDetail('educationDetails',e.target.value)}/></label>
+    <label className="wide">职业概述 <textarea rows={3} maxLength={800} value={details.summary}
+     placeholder="用自己的真实工作经历和求职方向概括优势"
+     onChange={e=>updateDetail('summary',e.target.value)}/></label>
+   </div>
+   <p className="targeted-resume-print-note">打印功能会调用浏览器的打印对话框，可选择「保存为 PDF」。AI 渐变建议、填充按钮和后台说明不会进入打印文件。生成内容仅覆盖识别到的经历和你填写的信息，不能保证无损还原上传文件。</p>
+   {!canPrint&&<p className="targeted-resume-print-note" role="status">请至少填写真实姓名并确保已有一项简历内容，才能打印。</p>}
+  </section>
+  <div className={showPrintPreview?'targeted-resume-print-preview':'targeted-resume-print-preview is-collapsed'}>
+   <ResumePrintSheet document={printDocument}/>
+  </div>
   {before.score!==null&&<div className="targeted-resume-audit" aria-label="文字证据覆盖变化">
    <div><small>优化前 · 要求文字覆盖</small><strong>{before.score}%</strong></div>
    <span aria-hidden="true">→</span>
@@ -183,10 +224,14 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
   <div className="targeted-resume-save">
    <div><strong><FolderOpen size={16} aria-hidden="true"/> 我的岗位简历版本</strong>
     <p>仅在你主动保存后，将当前已确认的文字片段保存在 HHBA 私人账号中；不保存原始 PDF/DOCX。</p></div>
-   {hasSession&&storageReady&&<button type="button" disabled={saving||version.acceptedSuggestionIds.length===0} onClick={persist}>
+   {hasSession&&storageReady&&<button type="button" disabled={saving||!confirmReal||!canPrint} onClick={persist}>
     <Save size={14} aria-hidden="true"/>{saving?'保存中…':'保存当前版本'}</button>}
    {hasSession&&!storageReady&&<span className="targeted-resume-unavailable">云端版本保存尚未开放或数据库未就绪</span>}
   </div>
+  {hasSession&&storageReady&&<label className="targeted-resume-confirm targeted-resume-save-confirm">
+   <input type="checkbox" checked={confirmReal} onChange={e=>setConfirmReal(e.target.checked)}/>
+   我已核实当前简历的全部文字及个人联系方式真实准确，理解点击保存后这些资料会保存在我的 HHBA 云端账户，直到我主动删除或按平台数据政策处理。
+  </label>}
   {saved.length>0&&<div className="targeted-resume-history">
    {saved.map(item=><div key={item.id}>
     <span>{new Date(item.created_at).toLocaleString()} · {item.version.acceptedSuggestionIds.length} 条已采纳</span>
