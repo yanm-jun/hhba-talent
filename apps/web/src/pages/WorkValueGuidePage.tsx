@@ -52,6 +52,24 @@ export function WorkValueGuidePage({user}:{user:User|null}){
  useEffect(()=>{setVisibleCount(24);},[query,stage,value,maxTime,onlyPending]);
  const visibleTips=filtered.slice(0,visibleCount);
  const selectedTip=GUIDE_TIPS.find(tip=>tip.id===selectedTipId);
+ // A knowledge-card or global-search deep link should land on its actual instructions,
+ // not leave the person at the unrelated top-of-guide hero.
+ useEffect(()=>{
+  if(!selectedTipId||!selectedTip)return;
+  let secondFrame=0;
+  const firstFrame=window.requestAnimationFrame(()=>{
+   secondFrame=window.requestAnimationFrame(()=>{
+    const target=document.getElementById('tip-'+selectedTipId);
+    if(!target)return;
+    target.scrollIntoView({block:'start',behavior:'auto'});
+    target.focus({preventScroll:true});
+   });
+  });
+  return()=>{
+   window.cancelAnimationFrame(firstFrame);
+   window.cancelAnimationFrame(secondFrame);
+  };
+ },[selectedTipId,selectedTip?.id,query]);
  const finished=completed.length;
  const mark=(id:string)=>{
   const next=completed.includes(id)?completed.filter(x=>x!==id):[...completed,id];
@@ -102,7 +120,7 @@ export function WorkValueGuidePage({user}:{user:User|null}){
    {filtered.length?<div className="hhba-vguide-grid">{visibleTips.map(tip=>{
     const label=GUIDE_STAGES.find(s=>s.id===tip.stage)?.label||'职场建议';
     const done=completed.includes(tip.id);
-    return <article className={'hhba-vguide-card'+(done?' is-completed':'')+(tip.id===selectedTipId?' is-targeted':'')} key={tip.id} id={'tip-'+tip.id}>
+    return <article className={'hhba-vguide-card'+(done?' is-completed':'')+(tip.id===selectedTipId?' is-targeted':'')} key={tip.id} id={'tip-'+tip.id} tabIndex={tip.id===selectedTipId?-1:undefined}>
      <div className="hhba-vguide-card-meta"><span className="hhba-vguide-stage-label">{label}</span><span className="hhba-vguide-source-tag">HHBA 原创建议</span></div>
      <h3>{tip.title}</h3><p className="hhba-vguide-summary">{tip.summary}</p>
      <div className="hhba-vguide-tags"><span><Wallet size={13}/>免费阅读</span><span><Clock3 size={13}/>{tip.minutes}</span><span>行动难度：{tip.effort}</span><span>主要帮助：{tip.value}</span></div>
