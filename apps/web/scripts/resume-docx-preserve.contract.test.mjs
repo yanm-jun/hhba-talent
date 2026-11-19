@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {deflateRawSync,inflateRawSync} from 'node:zlib';
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {
- editOriginalDocxStrict,inspectOriginalDocxStrict
+ editOriginalDocxStrict,inspectOriginalDocxStrict,prepareVerifiedOriginalDocxExport
 } from '../src/services/resumeDocxPreserve.mjs';
 const enc=new TextEncoder(),dec=new TextDecoder();
 const crc32=(bytes)=>{
@@ -167,4 +167,33 @@ test('reject malicious/macro-enabled inputs rather than preserve unexpected acti
  await assert.rejects(()=>editOriginalDocxStrict(Uint8Array.from([0,1,2,3]),[
   {original:'原始岗位描述',text:'新的岗位描述'}
  ]),/WORD_FILE_UNSUPPORTED/);
+});
+
+test('production-facing Word export refuses to release files without trusted rendered-page proof',async()=>{
+ const original=fixture({method:8});
+ const edits=[{original:'原始岗位描述',text:'新的岗位描述'}];
+ await assert.rejects(()=>prepareVerifiedOriginalDocxExport({
+  original,edits
+ }),/WORD_RENDERER_REQUIRED/);
+ await assert.rejects(()=>prepareVerifiedOriginalDocxExport({
+  original,edits,verifyLayout:async()=>({passed:false})
+ }),/WORD_LAYOUT_NOT_VERIFIED/);
+ await assert.rejects(()=>prepareVerifiedOriginalDocxExport({
+  original,edits,verifyLayout:async()=>{throw Error('renderer unavailable');}
+ }),/WORD_LAYOUT_NOT_VERIFIED/);
+ let received=false;
+ const approved=await prepareVerifiedOriginalDocxExport({
+  original,edits,verifyLayout:async({original:src,edited,oldText,newText})=>{
+   received=true;assert.deepEqual(Buffer.from(src),Buffer.from(original));
+   assert.ok(edited.length>1000);assert.equal(oldText,'原始岗位描述');
+   assert.equal(newText,'新的岗位描述');
+   return {passed:true,page_count:1,changed_pixels:821,
+    changed_region:{page:1,x:100,y:100,width:80,height:25}};
+  }
+ });
+ assert.equal(received,true);
+ assert.equal(approved.verified,true);
+ assert.equal(approved.pageCount,1);
+ assert.ok(parts(approved.bytes).get('word/document.xml').raw
+  .toString().includes('新的岗位描述'));
 });
