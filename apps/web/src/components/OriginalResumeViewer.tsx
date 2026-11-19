@@ -5,6 +5,7 @@ import {fetchPrivateResumeForLocalReview,downloadPrivateResume} from '../service
 import {extractDocxText} from '../services/docxProfile.mjs';
 import {matchVisualRegionsToPdfPage,type VerifiedResumeAnchor} from '../services/resumeVisualAnchors.mjs';
 import {planInlinePdfPreview,whitePdfPatchBackground} from '../services/resumeInlinePdfPreview.mjs';
+import {createOriginalPdfReviewCopy,downloadOriginalPdfReviewCopy} from '../services/resumePdfReviewCopy.mjs';
 import {visualEditingReady,analyzeVisualResume,listPageResumeEdits,savePageResumeEdits,
  type VisualResumeLayout,type PageResumeEdit} from '../services/resumeVisualEditingApi';
 import '../styles/original-resume-viewer.css';
@@ -28,6 +29,7 @@ export function OriginalResumeViewer({resume,onClose}:{
  const [visionConsent,setVisionConsent]=useState(false);
  const [visionBusy,setVisionBusy]=useState(false);
  const [saving,setSaving]=useState(false);
+ const [exporting,setExporting]=useState(false);
  const [layout,setLayout]=useState<VisualResumeLayout|null>(null);
  const [anchors,setAnchors]=useState<VerifiedResumeAnchor[]>([]);
  const [selectedId,setSelectedId]=useState<string|null>(null);
@@ -197,6 +199,23 @@ export function OriginalResumeViewer({resume,onClose}:{
   }catch(error){setMessage(error instanceof Error?error.message:'撤销失败，请重试。');}
   finally{setSaving(false);}
  }
+ async function downloadReviewPdf(){
+  if(exporting||!layout||!changes.length||!pdfDocument.current)return;
+  setExporting(true);setMessage('');
+  try{
+   const output=await createOriginalPdfReviewCopy({
+    document:pdfDocument.current,layout,changes
+   });
+   downloadOriginalPdfReviewCopy(output,resume.name);
+  }catch(error){
+   const code=error instanceof Error?error.message:'';
+   const notice=code==='REVIEW_PAGE_LIMIT'?'页数较多，暂时不能生成完整修改稿。':
+    code==='REVIEW_TOO_LARGE'?'文件较大，请缩减内容后重试。':
+    code==='REVIEW_EDITS_UNSAFE'?'有些修改暂时不能安全放进原来的位置，请先缩短或调整文字。':
+    '这份简历暂时无法生成修改稿，请保留原件并稍后再试。';
+   setMessage(notice);
+  }finally{setExporting(false);}
+ }
  async function download(){
   try{await downloadPrivateResume(resume);}
   catch(e){setError(e instanceof Error?e.message:'下载原件失败');}
@@ -286,10 +305,18 @@ export function OriginalResumeViewer({resume,onClose}:{
    </div>
    {layout&&anchors.length===0&&<p className="hhba-original-resume-note">
     这页暂时没有找到可以准确修改的位置。你仍然可以查看和下载原件。</p>}
-   {changes.length>0&&<p className="hhba-original-resume-note" role="status">
-    已保存 {changes.length} 处修改，{visibleEditCount} 处已显示在原位置。
-    {changes.length>visibleEditCount?' 其余文字暂时放不下，已保留修改但不遮挡原文。':''}
-    原件保留，原样式导出暂未开放。</p>}
+   {changes.length>0&&<>
+    <p className="hhba-original-resume-note" role="status">
+     已保存 {changes.length} 处修改，{visibleEditCount} 处已显示在原位置。
+     {changes.length>visibleEditCount?' 其余文字暂时放不下，已保留修改但不遮挡原文。':''}
+     原件保留。</p>
+    <div className="hhba-original-resume-review-export">
+     <button type="button" disabled={exporting||saving}
+      onClick={()=>void downloadReviewPdf()}>
+      <Download size={14}/>{exporting?'正在生成…':'下载修改预览'}</button>
+     <span>仅供检查效果，文字无法选中，不建议直接投递。</span>
+    </div>
+   </>}
    {message&&<p className="hhba-original-resume-note" role="status">{message}</p>}
    <nav className="hhba-original-resume-pages" aria-label="原始简历翻页">
     <button type="button" disabled={page<=1}
