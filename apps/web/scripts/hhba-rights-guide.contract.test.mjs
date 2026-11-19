@@ -62,7 +62,7 @@ test('knowledge hub searches the original authoritative eight-topic dataset with
  assert.match(hub,/relatedSlugs\.has\(tip\.topic\)/);
  assert.match(hub,/topicKeywords\[topic\.slug\]/);
  assert.match(hub,/\/rights\/guide\?tip=/);
- assert.match(hub,/本页为关键词检索，不是 AI 自动法律判断/);
+ assert.match(hub,/本页使用关键词和常见说法匹配，只用于查找资料，不会自动判断是否违法/);
  for(const term of ['工资','加班','社保','离职证明','调岗'])assert(hub.includes(term));
  assert.doesNotMatch(hub,/to="\/membership\/rules"|input type="file"|<form|fetch\(|navigator\.sendBeacon/);
 });
