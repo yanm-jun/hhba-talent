@@ -5,6 +5,7 @@ on:
       - 'apps/web/src/components/TargetedResumeOptimization.tsx'
       - 'apps/web/src/services/resumeOptimizationApi.ts'
       - 'apps/web/src/services/resumeReassessmentApi.ts'
+      - 'apps/web/src/services/officialJobVerifyApi.ts'
       - 'apps/web/src/services/targetedResumeOptimization.ts'
       - 'apps/web/src/services/resumeEvidenceVisibility.ts'
       - 'apps/web/src/services/resumeDocument.ts'
@@ -18,12 +19,17 @@ on:
       - 'apps/web/src/styles/targeted-resume-optimization.css'
       - 'apps/web/functions/api/resume-optimize.js'
       - 'apps/web/functions/api/resume-reassess.js'
+      - 'apps/web/functions/api/official-job-verify.js'
+      - 'apps/web/functions/_lib/official-job-evidence.js'
+      - 'apps/web/functions/_lib/domestic-match-fusion.js'
       - 'apps/web/functions/_lib/resume-reassessment.js'
       - 'apps/web/functions/_lib/resume-match-core.js'
       - 'apps/web/functions/api/resume-versions.js'
       - 'apps/web/functions/_lib/resume-ai-provider.js'
       - 'apps/web/scripts/resume-optimization.*'
       - 'apps/web/scripts/resume-reassessment.*'
+      - 'apps/web/scripts/official-job-evidence.*'
+      - 'apps/web/scripts/official-job-verify.*'
       - 'apps/web/scripts/resume-versions.*'
       - 'apps/web/scripts/resume-evidence-visibility.*'
       - 'apps/web/scripts/resume-document.*'
@@ -47,7 +53,7 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - name: Test opt-in, auth, quota, and provider parser
         working-directory: apps/web
-        run: node --test --experimental-strip-types scripts/resume-optimization.provider.test.mjs scripts/resume-optimization.route.test.mjs scripts/resume-optimization.domain.test.mjs scripts/resume-versions.route.test.mjs scripts/resume-evidence-visibility.test.mjs scripts/resume-document.contract.test.mjs scripts/resume-reassessment.domain.test.mjs scripts/resume-reassessment.route.test.mjs scripts/resume-optimization.main-flow.test.mjs
+        run: node --test --experimental-strip-types scripts/resume-optimization.provider.test.mjs scripts/resume-optimization.route.test.mjs scripts/resume-optimization.domain.test.mjs scripts/resume-versions.route.test.mjs scripts/resume-evidence-visibility.test.mjs scripts/resume-document.contract.test.mjs scripts/resume-reassessment.domain.test.mjs scripts/resume-reassessment.route.test.mjs scripts/resume-optimization.main-flow.test.mjs scripts/official-job-evidence.contract.test.mjs scripts/official-job-verify.route.test.mjs
       - name: Install frontend dependencies
         working-directory: apps/web
         run: npm ci
