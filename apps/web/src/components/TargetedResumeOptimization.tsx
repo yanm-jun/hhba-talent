@@ -339,6 +339,8 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
      <div><small>修改前 · V2 复评基准</small><strong>{scoreResult.original_score}<span>/100</span></strong></div>
      <div><small>修改后 · V2 同规则</small><strong>{scoreResult.updated_score}<span>/100</span></strong></div>
      <p>差值：{scoreResult.delta&&scoreResult.delta>0?'+':''}{scoreResult.delta} 分。岗位：{scoreResult.verified_job_title} · {scoreResult.verified_company}</p>
+     {scoreResult.source_label&&<p>官方岗位证据：{scoreResult.source_label}；仍需在官网确认是否继续开放投递。</p>}
+     {scoreResult.selected_job_as_target_direction&&<p>因首次匹配未提供可核实的职业目标，本次将你选定的岗位视为求职意向，不视为已经具备该岗位的任职能力。</p>}
      {scoreResult.newly_visible_terms&&scoreResult.newly_visible_terms.length>0&&
       <p>文字新增体现：{scoreResult.newly_visible_terms.join('、')}。这些技能仍需以你的真实经历为依据。</p>}
      <details><summary>查看评分维度</summary>
