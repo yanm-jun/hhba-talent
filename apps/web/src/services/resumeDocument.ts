@@ -34,14 +34,14 @@ export function buildResumeDocument(
  profile:CandidateProfile,blocks:readonly ResumeBlock[],details:ResumeDocumentDetails
 ):ResumeDocument{
  const byId=new Map(blocks.map(block=>[block.id,block.text]));
- const experiences=profile.experiences.filter(e=>typeof e.evidence==='string'&&e.evidence.trim()).slice(0,12)
+ const experiences=(Array.isArray(profile.experiences)?profile.experiences:[]).filter(e=>typeof e.evidence==='string'&&e.evidence.trim()).slice(0,12)
   .map((item,i)=>({
    id:'experience-'+i,
    title:safe(item.role,160),organization:safe(item.organization,160),
    period:safe(item.period,120),
    details:safe(byId.get('experience-'+i)??item.evidence,1600)
   }));
- const skills=profile.skills.filter(s=>typeof s.evidence==='string'&&s.evidence.trim()).slice(0,12)
+ const skills=(Array.isArray(profile.skills)?profile.skills:[]).filter(s=>typeof s.evidence==='string'&&s.evidence.trim()).slice(0,12)
   .map((item,i)=>({
    name:safe(item.name,120),details:safe(byId.get('skill-'+i)??item.evidence,1600)
   }));
