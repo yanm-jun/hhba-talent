@@ -69,8 +69,12 @@ export function sameEngineReassessment(job,profile,beforeBlocks,afterBlocks){
   return {education:profile.education??null,experience_years:profile.experience_years??null,
    target_roles:profile.target_roles,skills:names.map(name=>({name}))};
  };
- const before=scoreCandidateFit(make(beforeBlocks),job,{});
- const after=scoreCandidateFit(make(afterBlocks),job,{});
+ // Selecting a job is a declared target direction, not a verified work skill.
+ // Search-first profiles may contain no target roles at all; keep the same
+ // explicit intent for both V2 runs, never grant an employment credential.
+ const selectionRoleHint=profile.target_roles.some(t=>typeof t==='string'&&t.trim().length>=2)?'':job.title;
+ const before=scoreCandidateFit(make(beforeBlocks),job,{role_hint:selectionRoleHint});
+ const after=scoreCandidateFit(make(afterBlocks),job,{role_hint:selectionRoleHint});
  if(!before.eligible||!after.eligible)return {
   supported:false,reason:before.reason||after.reason||'SCORING_NOT_ELIGIBLE',ranking_version:RANKING_VERSION
  };
@@ -78,8 +82,9 @@ export function sameEngineReassessment(job,profile,beforeBlocks,afterBlocks){
  const afterTerms=terms.filter(t=>exactTextMention(afterBlocks.map(x=>x.text).join('\n'),t));
  return {supported:true,ranking_version:RANKING_VERSION,
   original_score:before.score,updated_score:after.score,delta:after.score-before.score,
+  selected_job_as_target_direction:Boolean(selectionRoleHint),
   before_breakdown:before.breakdown,after_breakdown:after.breakdown,
   newly_visible_terms:afterTerms.filter(t=>!initialTerms.has(t)),
   lost_visible_terms:[...initialTerms].filter(t=>!afterTerms.includes(t)),
-  important_notice:'两个分数都基于当前官方岗位快照、同一V2规则和用户自述资料重新计算；不等于原历史卡片分数或企业录用概率。新增技能未经第三方核实。'};
+  important_notice:'两个分数都基于当前官方岗位快照、同一V2规则和用户自述资料重新计算；不等于原历史卡片分数或企业录用概率。新增技能未经第三方核实；缺少目标方向时，仅以本人选定岗位作为求职意向，不视为已有任职资格。'};
 }
