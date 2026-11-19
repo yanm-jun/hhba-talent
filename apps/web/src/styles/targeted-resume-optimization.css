@@ -64,3 +64,12 @@
 @media print{
  .targeted-resume-print-preview,.targeted-resume-print-preview.is-collapsed{display:block!important}
 }
+
+.targeted-resume-block-label{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.targeted-resume-block-label small{color:#718099}
+.targeted-resume-block-label button{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;color:#62749e;font-size:11px;padding:4px 7px}
+.targeted-resume-inline-editor{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.targeted-resume-inline-editor textarea{box-sizing:border-box;width:100%;resize:vertical;border:1px solid #d9dfea;border-radius:8px;padding:10px 12px;background:#fff;color:#28364a;line-height:1.7;font-size:13px;font-family:inherit}
+.targeted-resume-inline-editor textarea:focus-visible{outline:2px solid #9b8be9;outline-offset:1px}
+.targeted-resume-inline-editor>div{display:flex;align-items:center;gap:8px}
+.targeted-resume-inline-editor>div button:first-child{background:#27344d;color:#fff}
