@@ -37,3 +37,10 @@ test('print details are bounded and ignore untrusted extra fields',()=>{
  assert.equal(got.email,'a@example.test');
  assert.equal(Object.hasOwn(got,'secret'),false);
 });
+
+test('partial profile never crashes the printable document view',()=>{
+ const doc=buildResumeDocument({...profile,experiences:undefined,skills:undefined},[],fields);
+ assert.equal(doc.experiences.length,0);
+ assert.equal(doc.skills.length,0);
+ assert.equal(doc.education.length,2);
+});
