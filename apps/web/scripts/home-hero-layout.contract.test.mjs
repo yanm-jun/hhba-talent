@@ -27,7 +27,7 @@ test('mobile spacing and headline remain readable without horizontal overflow',(
  assert.ok(homeStyles.includes('.hhba-public-entry-grid.hhba-home-entry-grid{grid-template-columns:1fr;gap:11px}'));
 });
 test('home preserves job search, company directory and adds labor-rights support',()=>{
- for(const t of ['让机会与人才，找到彼此。','找工作，不止于找到工作。','你来到这里，是为了什么？',
+ for(const t of ['让机会与人才，找到彼此。','一份工作，值得认真选择。','你来到这里，是为了什么？',
     'title="求职与机会"','title="劳动权益"','title="企业招聘导航"','<UnifiedJobMarket compact/>']){
   assert.ok(home.includes(t),'home content unexpectedly removed: '+t);
  }
