@@ -34,9 +34,33 @@ const resume:PrivateResume={
 };
 localStorage.setItem(REAL_AUTH_TOKEN_KEY,'synthetic-browser-qa-token');
 const original=window.fetch.bind(window);
+let savedChanges:any[]=[];
+const sampleLayout={
+ schema:'HHBA_RESUME_VISUAL_LAYOUT_V1',
+ source_sha256:'a'.repeat(64),format:'pdf',page_count:1,
+ regions:[{id:'p1-r1',page:1,kind:'experience',
+  text:'ORIGINAL RESUME VIEW',bbox:[55,55,530,80],
+  confidence:.98,placement_verified:false}],
+ reading_order:[0],needs_review:true,editable_in_original:false
+};
+const asJson=(value:unknown)=>Promise.resolve(new Response(JSON.stringify(value),
+ {status:200,headers:{'Content-Type':'application/json'}}));
+
 window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
  const raw=typeof input==='string'?input:input instanceof URL?input.href:input.url;
  const url=new URL(raw,location.origin);
+ if(url.pathname==='/api/resume-layout'){
+  if(init?.method==='POST')return asJson({ok:true,cached:false,layout:sampleLayout});
+  return asJson({kind:'HHBA_RESUME_VISUAL_LAYOUT_V1',enabled:true,formats:['pdf'],word_conversion_ready:false});
+ }
+ if(url.pathname==='/api/resume-page-edits'){
+  if(init?.method==='POST'){
+   const body=JSON.parse(String(init.body||'{}'));
+   savedChanges=(body.changes||[]).map((c:any)=>({...c,page:1}));
+   return asJson({ok:true,changes:savedChanges,updated_at:'2026-11-20T00:00:00Z'});
+  }
+  return asJson({ok:true,changes:savedChanges});
+ }
  if(url.pathname==='/api/resumes/'+resume.id+'/download')
   return Promise.resolve(new Response(bytes,{status:200,headers:{
    'Content-Type':'application/octet-stream','Content-Length':String(bytes.length)
