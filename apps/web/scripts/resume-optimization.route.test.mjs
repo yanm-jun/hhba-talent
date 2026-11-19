@@ -175,3 +175,18 @@ test('repeated provider failures still have an independent six-attempt cap',asyn
   assert.equal(h.records.length,0,'no successful quota used after failure');
  }finally{globalThis.fetch=previous;}
 });
+
+test('no safe AI suggestions leaves successful-generation allowance unused',async()=>{
+ const h=mockEnv(),original=globalThis.fetch;
+ globalThis.fetch=async()=>Response.json({choices:[{
+  finish_reason:'stop',message:{content:'{"suggestions":[]}'}
+ }]});
+ try{
+  const response=await onRequestPost({request:request(),env:h.env});
+  assert.equal(response.status,200);
+  const value=await response.json();
+  assert.deepEqual(value.suggestions,[]);
+  assert.equal(h.records.length,0,'empty output is not a successful generation');
+  assert.equal(h.attempts.length,1,'the provider call still counts toward attempts');
+ }finally{globalThis.fetch=original;}
+});
