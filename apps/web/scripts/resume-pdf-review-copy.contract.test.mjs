@@ -43,3 +43,29 @@ test('invalid/corrupted JPEG, excessive pages and missing edits fail closed',asy
   changes:[{id:'p1-r1',text:'new',original:'old',confirmed:true}]}),
  /REVIEW_LAYOUT_NOT_READY/);
 });
+
+test('searchable edited PDF carries full Unicode ToUnicode layer but never old replaced phrase',()=>{
+ const pdf=buildRasterReviewPdf([{...page(),textRuns:[
+  {text:'已修改简历（中文）',x:65,y:720,fontSize:15},
+  {text:'New role 2026',x:70,y:690,fontSize:12}
+ ]}],{searchable:true});
+ const src=Buffer.from(pdf).toString('latin1');
+ assert.match(src,/\/Subtype \/Type0/);
+ assert.match(src,/\/ToUnicode \d+ 0 R/);
+ assert.match(src,/\/CMapName \/HHBAUnicodeIdentity/);
+ assert.match(src,/3 Tr 1 0 0 1/);
+ assert.match(src,/5DF24FEE65397B805386/,'full UTF-16BE Chinese glyphs must be encoded');
+ assert.equal(src.includes('ORIGINAL RESUME VIEW'),false);
+ const trailer=/startxref\n(\d+)\n%%EOF/.exec(src);
+ assert.ok(trailer,'searchable PDF has xref');
+ assert.ok(src.slice(Number(trailer[1])).startsWith('xref'));
+});
+test('searchable export refuses oversized and invalid text to protect memory and user content',()=>{
+ const row={...page(),textRuns:[{text:'ok',x:10,y:25,fontSize:12}]};
+ assert.throws(()=>buildRasterReviewPdf([{...row,textRuns:[{...row.textRuns[0],fontSize:0}]}],
+  {searchable:true}),/SEARCHABLE_TEXT_INVALID/);
+ assert.throws(()=>buildRasterReviewPdf([{...row,textRuns:[{...row.textRuns[0],text:'x'.repeat(1800)}]}],
+  {searchable:true}),/SEARCHABLE_TEXT_INVALID/);
+ assert.throws(()=>buildRasterReviewPdf([{...row,textRuns:Array(3001).fill(row.textRuns[0])}],
+  {searchable:true}),/SEARCHABLE_TEXT_LIMIT/);
+});
