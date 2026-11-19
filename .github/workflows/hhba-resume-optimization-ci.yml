@@ -1,0 +1,39 @@
+name: HHBA Resume Optimization CI
+on:
+  pull_request:
+    paths:
+      - 'apps/web/src/components/TargetedResumeOptimization.tsx'
+      - 'apps/web/src/services/resumeOptimizationApi.ts'
+      - 'apps/web/src/services/targetedResumeOptimization.ts'
+      - 'apps/web/src/pages/ResumeMatchPage.tsx'
+      - 'apps/web/src/styles/targeted-resume-optimization.css'
+      - 'apps/web/functions/api/resume-optimize.js'
+      - 'apps/web/functions/_lib/resume-ai-provider.js'
+      - 'apps/web/scripts/resume-optimization.*'
+      - '.github/workflows/hhba-resume-optimization-ci.yml'
+  push:
+    branches:
+      - feature/resume-targeted-optimization-foundation-20261119
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Test opt-in, auth, quota, and provider parser
+        working-directory: apps/web
+        run: node --test scripts/resume-optimization.provider.test.mjs scripts/resume-optimization.route.test.mjs
+      - name: Install frontend dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: TypeScript and Vite build
+        working-directory: apps/web
+        run: npm run build
