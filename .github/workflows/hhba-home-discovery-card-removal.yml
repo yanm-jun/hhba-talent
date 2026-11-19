@@ -12,6 +12,7 @@ on:
       - 'apps/web/scripts/home-promo-alignment.contract.test.mjs'
       - 'apps/web/scripts/home-hero-layout.contract.test.mjs'
       - 'apps/web/scripts/home-workplace-promise.contract.test.mjs'
+      - 'apps/web/scripts/home_resources_browser_acceptance.py'
       - '.github/workflows/hhba-home-discovery-card-removal.yml'
   workflow_dispatch:
 permissions:
@@ -19,7 +20,7 @@ permissions:
 jobs:
   home-layout-regression:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -40,3 +41,20 @@ jobs:
       - name: Verify production frontend build
         working-directory: apps/web
         run: npm run build
+      - name: Install Chromium browser for real homepage acceptance
+        run: |
+          python3 -m pip install 'playwright>=1.55,<2'
+          python3 -m playwright install --with-deps chromium
+      - name: Verify homepage resource cards on desktop and mobile
+        working-directory: apps/web
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/hhba-home-resources-preview.log 2>&1 &
+          python3 scripts/home_resources_browser_acceptance.py
+      - name: Save desktop and mobile resource screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-home-editorial-resources
+          path: apps/web/tmp/home-resources-screens/*.png
+          if-no-files-found: warn
+          retention-days: 14

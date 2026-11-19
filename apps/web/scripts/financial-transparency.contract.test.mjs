@@ -102,7 +102,8 @@ test('front, admin, cron and immutable correction are all wired to same route',(
  assert.match(main,/if\(route==='\/transparency'\)return <TransparencyPage user=\{user\}\/>/);
  assert.doesNotMatch(main,/TransparencyManagePage|route==='\/transparency\/manage'/);
  assert.match(shell,/to="\/transparency"/);
- assert.match(home,/className="hhba-home-report-details hhba-home-transparency-link" to="\/transparency"/);
+ assert.match(home,/className="hhba-home-transparency-link" to="\/transparency"/);
+ assert.match(home,/api\/transparency\/reports/);
  assert.match(page,/subscriptionEnabled/);
  assert.match(page,/首期帮扶资金报告尚未发布/);
  assert.match(page,/reports\.map/);
