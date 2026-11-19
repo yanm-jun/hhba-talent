@@ -29,16 +29,36 @@ export function selectProvider(env,task='resume_optimization'){
 }
 export function parseSuggestions(raw,allowedBlockIds){
  if(!raw||!Array.isArray(raw.suggestions))throw new Error('AI_PROVIDER_RESPONSE_INVALID');
- const allowed=new Set(allowedBlockIds);
- return raw.suggestions.slice(0,12).map(s=>{
-  if(!s||!allowed.has(s.blockId)||!['replace','append','request_evidence'].includes(s.action)||
-   !['verified','needs_user_confirmation'].includes(s.evidenceStatus)||
-   !s.id||!s.original||!s.proposed||!s.rationale||!s.jobRequirement)throw new Error('AI_PROVIDER_RESPONSE_INVALID');
-  return {id:clip(s.id,100),blockId:s.blockId,action:s.action,
-   original:clip(s.original,1600),proposed:clip(s.proposed,1600),
-   rationale:clip(s.rationale,600),jobRequirement:clip(s.jobRequirement,600),
-   evidenceStatus:s.evidenceStatus};
- });
+ const allowed=new Set(allowedBlockIds),used=new Set(),accepted=[];
+ for(const [index,s] of raw.suggestions.slice(0,12).entries()){
+  if(!s||typeof s!=='object'||Array.isArray(s))continue;
+  const blockId=typeof s.blockId==='string'?s.blockId:
+   (typeof s.block_id==='string'?s.block_id:'');
+  if(!allowed.has(blockId)||used.has(blockId))continue;
+  if(!['replace','append','request_evidence'].includes(s.action))continue;
+  const isEvidenceRequest=s.action==='request_evidence';
+  let proposed=typeof s.proposed==='string'?s.proposed.trim():'';
+  if(!proposed&&isEvidenceRequest)
+   proposed='请补充你真实参与的相关工作、项目或成果。';
+  if(!proposed||proposed.length>1600)continue;
+  const original=typeof s.original==='string'&&s.original.trim()?s.original:
+   '原始段落内容由服务端核实';
+  const rationale=typeof s.rationale==='string'&&s.rationale.trim()?s.rationale:
+   '请确认建议的每项事实都符合真实经历';
+  const jobRequirement=typeof s.jobRequirement==='string'&&s.jobRequirement.trim()?
+   s.jobRequirement:'岗位相关要求';
+  used.add(blockId);
+  accepted.push({
+   id:clip(typeof s.id==='string'&&s.id.trim()?s.id:'suggestion-'+(index+1)+'-'+blockId,100),
+   blockId,action:s.action,original:clip(original,1600),proposed:clip(proposed,1600),
+   rationale:clip(rationale,600),jobRequirement:clip(jobRequirement,600),
+   // The model is not an authority on the user's employment facts.
+   evidenceStatus:'needs_user_confirmation'
+  });
+ }
+ if(raw.suggestions.length>0&&!accepted.length)
+  throw new Error('AI_PROVIDER_RESPONSE_INVALID');
+ return accepted;
 }
 export async function generateSuggestions({env,blocks,job,signal}){
  const provider=selectProvider(env);
