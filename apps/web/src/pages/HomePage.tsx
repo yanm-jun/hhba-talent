@@ -13,7 +13,7 @@ import '../styles/home-match-promo.css';
 function EntryCard({kind,title,body,footer}:{kind:'candidate'|'directory'|'rights';title:string;body:string;footer:string}){
  const Icon=kind==='candidate'?BriefcaseBusiness:kind==='rights'?Scale:Building2;
  const target=kind==='candidate'?'/candidate/jobs'
-  :kind==='rights'?'/rights':'/companies/library';
+  :kind==='rights'?'/rights/knowledge':'/companies/library';
  return <Link to={target} className={'entry-card hhba-entry-card hhba-entry-'+kind}
    aria-label={title+'，'+footer}>
    <span className="entry-icon"><Icon size={23}/></span>
@@ -29,17 +29,17 @@ export function HomePage({user}:{user:User|null}){
    <p className="hhba-public-eyebrow"><span className="hhba-public-brand-cn">汇方职场</span><span>HHBA · HUMAN CAPABILITY NETWORK</span></p>
    <p className="hhba-home-brand-slogan">让机会与人才，找到彼此。</p>
    <h1>找工作，不止于找到工作。</h1>
-   <p className="hhba-home-description">从发现真实招聘机会，到持续职业服务与劳动权益支持，HHBA 希望陪你走过求职与职场的下一程。</p>
+   <p className="hhba-home-description">从发现真实招聘机会，到了解劳动权益，HHBA 希望陪你走过求职与职场的重要阶段。</p>
    <p className="hhba-home-question">你来到这里，是为了什么？</p>
    <button type="button" className="hhba-letter-revisit" onClick={()=>window.dispatchEvent(new Event('hhba:open-letter'))}><span aria-hidden="true">✉</span> 读一封来自 HHBA 的信</button>
   </section>
   <section className="entry-grid hhba-public-entry-grid hhba-home-entry-grid" aria-label="选择使用入口">
-   <EntryCard kind="candidate" title="我要应聘"
-    body="浏览真实企业招聘岗位和官方投递渠道，也可以使用 AI 简历匹配服务。"
-    footer="查看招聘市场与岗位"/>
-   <EntryCard kind="rights" title="劳动权益支持"
-    body="了解劳动权益知识与 HHBA 服务规划；会员服务和案件申请尚未开放。"
-    footer="查看权益支持说明"/>
+   <EntryCard kind="candidate" title="求职与机会"
+    body="浏览真实招聘机会，使用 AI 简历匹配与优化，前往企业官方渠道投递。"
+    footer="探索求职与机会"/>
+   <EntryCard kind="rights" title="劳动权益"
+    body="免费查阅劳动权益知识、相关法律依据和职场问题自助指引。"
+    footer="查看劳动权益知识"/>
    <EntryCard kind="directory" title="企业招聘导航"
     body="按行业、企业或专业查找招聘渠道，浏览17个行业馆的官方招聘入口。"
     footer="查看企业与招聘入口"/>
