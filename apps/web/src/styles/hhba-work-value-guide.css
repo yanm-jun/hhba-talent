@@ -151,3 +151,64 @@
 
 /* Editorial note on why action suggestions are ordered for a described workplace issue. */
 .hhba-knowledge-priority-note{margin:-3px 0 13px;font-size:11px;line-height:1.8;color:#60758F}
+
+
+/* Knowledge hub: six concise problem groups, with only the selected questions visible.
+   Detail pages and the 200-action career guide remain unchanged. */
+.hhba-rights-knowledge .hhba-law-intro{align-items:flex-start;text-align:left;padding:33px 0 0}
+.hhba-rights-knowledge .hhba-law-intro h1{font-size:clamp(25px,3.2vw,34px);line-height:1.35;margin:0 0 8px;letter-spacing:-.8px}
+.hhba-rights-knowledge .hhba-law-intro p{max-width:100%;font-size:13px;color:#687F99}
+.hhba-rights-knowledge .hhba-knowledge-search{margin:25px 0 8px;min-height:54px;background:#fff}
+.hhba-rights-knowledge .hhba-knowledge-search-help{font-size:10px;color:#8B9CAE}
+.hhba-rights-knowledge .hhba-knowledge-examples{margin-top:12px}
+.hhba-rights-knowledge .hhba-knowledge-examples button{padding:6px 11px}
+.hhba-rights-knowledge .hhba-knowledge-examples .hhba-knowledge-clear{color:#125EBC;background:transparent;border-color:transparent;text-decoration:underline;text-underline-offset:3px}
+.hhba-knowledge-categories{margin-top:30px}
+.hhba-knowledge-section-heading{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.hhba-rights-knowledge .hhba-knowledge-section-heading h2{margin:0;font-size:17px;font-weight:760;line-height:1.45;color:#102A5A}
+.hhba-knowledge-section-heading>span{font-size:11px;color:#8999AE;line-height:1.5}
+.hhba-knowledge-category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.hhba-knowledge-category{min-width:0;min-height:63px;display:flex;align-items:center;gap:12px;border:1px solid #E1EAF5;border-radius:12px;padding:13px 16px;background:#fff;color:#26476D;font:inherit;font-size:13px;font-weight:700;text-align:left;cursor:pointer;transition:background .16s,border-color .16s}
+.hhba-knowledge-category>svg:first-child{flex:none;color:#7691AF}
+.hhba-knowledge-category>span{min-width:0;flex:1}
+.hhba-knowledge-category .hhba-knowledge-category-arrow{flex:none;color:#9AACC0}
+.hhba-knowledge-category:hover{background:#F7FAFF;border-color:#B6D1F1}
+.hhba-knowledge-category.is-active{background:#F0F6FF;color:#125EBC;border-color:#AFCFF2}
+.hhba-knowledge-category.is-active>svg:first-child,.hhba-knowledge-category.is-active .hhba-knowledge-category-arrow{color:#125EBC}
+.hhba-knowledge-category:focus-visible,.hhba-rights-knowledge .hhba-knowledge-result-row:focus-visible,.hhba-knowledge-guide-mini:focus-visible{outline:2px solid #125EBC;outline-offset:3px}
+.hhba-knowledge-results{margin-top:29px}
+.hhba-knowledge-result-list{border:1px solid #E1EAF5;border-radius:13px;background:#fff;overflow:hidden}
+.hhba-rights-knowledge .hhba-knowledge-result-list .hhba-knowledge-result-row{width:100%;min-height:60px;margin:0;padding:14px 17px;display:flex;flex-direction:row;align-items:center;gap:12px;border:0;border-radius:0;background:transparent;cursor:pointer;text-decoration:none}
+.hhba-rights-knowledge .hhba-knowledge-result-row+.hhba-knowledge-result-row{border-top:1px solid #EDF1F7}
+.hhba-rights-knowledge .hhba-knowledge-result-row:hover{background:#F7FAFF}
+.hhba-rights-knowledge .hhba-knowledge-result-row .hhba-knowledge-result-title{min-width:0;flex:1;display:block;font-size:13px;font-weight:700;line-height:1.6;color:#19385F}
+.hhba-rights-knowledge .hhba-knowledge-result-row .hhba-knowledge-result-type{display:inline-flex;flex:0 0 auto;padding:3px 8px;border-radius:5px;background:#F3F7FD;color:#8193A8;font-size:10px;font-weight:550;line-height:1.5}
+.hhba-rights-knowledge .hhba-knowledge-result-row>svg{flex:0 0 auto;color:#9AAFC3}
+.hhba-rights-knowledge .hhba-knowledge-result-row:hover>svg{color:#125EBC}
+.hhba-rights-knowledge .hhba-knowledge-actions{margin:27px 0 0}
+.hhba-rights-knowledge .hhba-knowledge-action-list{display:block;border:1px solid #E1EAF5;border-radius:12px;overflow:hidden;background:#fff}
+.hhba-rights-knowledge .hhba-knowledge-action{width:100%;min-height:55px;display:flex;flex-direction:row;align-items:center;gap:12px;border:0;border-radius:0;padding:13px 16px}
+.hhba-rights-knowledge .hhba-knowledge-action+.hhba-knowledge-action{border-top:1px solid #EDF1F7}
+.hhba-rights-knowledge .hhba-knowledge-action strong{flex:1;min-width:0;font-size:12px;line-height:1.6}
+.hhba-rights-knowledge .hhba-knowledge-action span{flex:0 0 auto;margin:0;font-size:11px;white-space:nowrap}
+.hhba-knowledge-guide-mini{display:flex;align-items:center;gap:10px;margin-top:23px;padding:15px 17px;border-radius:11px;background:#F5F9FF;color:#125EBC;text-decoration:none;font-size:12px;font-weight:700}
+.hhba-knowledge-guide-mini span{flex:1;min-width:0}
+.hhba-knowledge-guide-mini:hover{background:#EAF3FF}
+.hhba-rights-knowledge .hhba-knowledge-notice{margin-top:19px;padding:14px 0 1px;font-size:10px;line-height:1.85;color:#8B9CAE}
+@media(max-width:650px){
+ .hhba-rights-knowledge .hhba-law-intro{padding:24px 0 0}
+ .hhba-rights-knowledge .hhba-law-intro h1{font-size:24px;line-height:1.4}
+ .hhba-rights-knowledge .hhba-knowledge-search{margin-top:19px;min-height:50px;padding:0 13px}
+ .hhba-knowledge-categories{margin-top:25px}
+ .hhba-knowledge-category-grid{grid-template-columns:1fr;gap:8px}
+ .hhba-knowledge-category{min-height:51px;padding:11px 13px;font-size:13px}
+ .hhba-knowledge-results{margin-top:25px}
+ .hhba-rights-knowledge .hhba-knowledge-result-list .hhba-knowledge-result-row{min-height:54px;padding:12px 11px;gap:7px}
+ .hhba-rights-knowledge .hhba-knowledge-result-row .hhba-knowledge-result-title{font-size:12px}
+ .hhba-rights-knowledge .hhba-knowledge-result-row .hhba-knowledge-result-type{font-size:9px;padding:2px 5px}
+ .hhba-rights-knowledge .hhba-knowledge-action{padding:12px 10px;gap:6px}
+ .hhba-rights-knowledge .hhba-knowledge-action strong{font-size:11px}
+ .hhba-rights-knowledge .hhba-knowledge-action span{font-size:10px}
+ .hhba-knowledge-guide-mini{padding:14px 12px;gap:8px;font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){.hhba-knowledge-category{transition:none}}

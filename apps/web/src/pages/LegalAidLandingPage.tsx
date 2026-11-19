@@ -1,16 +1,22 @@
 import {useMemo,useState} from 'react';
-import {ArrowUpRight,BadgeAlert,BookmarkX,Clock3,FileText,HeartPulse,Scale,Search,ShieldCheck,Wallet,Waypoints,BookOpen,ArrowRight} from 'lucide-react';
+import {ArrowUpRight,ArrowRight,BookOpen,BriefcaseBusiness,ChevronRight,Clock3,FileText,Scale,Search,ShieldCheck,Wallet} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link} from '../router';
 import type {User} from '../services/api';
 import laborRights from '../data/laborRightsTopics.json';
 import subtopics from '../data/laborRightsSubtopics.json';
 import intentData from '../data/laborRightsSearchIntents.json';
+import browseData from '../data/laborRightsBrowseGroups.json';
 import {GUIDE_TIPS} from '../data/hhbaWorkValueGuide';
 import '../styles/legal-aid-landing.css';
 import '../styles/hhba-work-value-guide.css';
 
-const topicIcons=[Wallet,BookmarkX,Clock3,FileText,ShieldCheck,HeartPulse,Waypoints,BadgeAlert];
+const categoryIcons=[Wallet,FileText,BriefcaseBusiness,ShieldCheck,Clock3,Scale];
+const browseItems=browseData.groups.flatMap(group=>group.topics.map(item=>{
+ const full=laborRights.topics.find(topic=>topic.slug===item.slug);
+ const detailed=subtopics.topics.find(topic=>topic.slug===item.slug);
+ return {...item,kind:full?'full' as const:'detail' as const,title:full?.title||detailed?.title||item.question};
+}));
 const topicKeywords:Record<string,string[]>={
  'unpaid-wages':['工资','欠薪','少发','没发工资','不发薪','扣钱','提成','奖金','拖欠'],
  'unlawful-dismissal':['辞退','裁员','补偿','赔偿','逼我离职','被优化','解雇','解除'],
@@ -46,10 +52,13 @@ function tipMatches(tip:(typeof GUIDE_TIPS)[number],raw:string){
  const content=normal([tip.title,tip.summary,...tip.steps,...tip.keywords].join(' '));
  return content.includes(query)||tip.keywords.some(tag=>query.includes(tag)||tag.includes(query)&&query.length>=2);
 }
-const examples=['公司不发工资','被辞退怎么办','试用期社保','调岗降薪','加班费','离职证明'];
+const examples=['公司不发工资','试用期不交社保','被辞退怎么办'];
 export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
  const [query,setQuery]=useState('');
+ const [category,setCategory]=useState('salary');
  const knowledgeHref=embedded?'/candidate/account/legal-aid':'/rights/knowledge';
+ const isSearching=normal(query).length>0;
+ const selectedGroup=browseData.groups.find(group=>group.id===category)||browseData.groups[0];
  const matches=useMemo(()=>laborRights.topics.filter(topic=>topicMatches(topic,query)),[query]);
  const subMatches=useMemo(()=>subtopics.topics.filter(topic=>subtopicMatches(topic,query)),[query]);
  const guideMatches=useMemo(()=>{
@@ -78,6 +87,21 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
    .sort((a,b)=>b.score-a.score||a.index-b.index)
    .slice(0,6).map(item=>item.tip);
  },[query,subMatches]);
+ const visibleTopics=useMemo(()=>{
+  if(!isSearching){
+   return selectedGroup.topics.map(item=>browseItems.find(topic=>topic.slug===item.slug)).filter((item):item is (typeof browseItems)[number]=>Boolean(item));
+  }
+  const intents=matchingIntents(query);
+  const specific=new Set(intents.flatMap(intent=>intent.subtopics));
+  const primary=new Set(intents.map(intent=>intent.primary));
+  const q=normal(query);
+  return browseItems.filter(item=>
+   item.kind==='full'
+    ? matches.some(topic=>topic.slug===item.slug)||normal(item.question).includes(q)
+    : subMatches.some(topic=>topic.slug===item.slug)||normal(item.question).includes(q)
+  ).map((item,index)=>({...item,index,rank:specific.has(item.slug)?3:primary.has(item.slug)?2:1}))
+   .sort((a,b)=>b.rank-a.rank||a.index-b.index);
+ },[isSearching,selectedGroup,query,matches,subMatches]);
  return <Shell user={user} embedded={embedded}>
   <main className="hhba-law hhba-rights-knowledge" id="main-content">
    <section className="hhba-law-panel" aria-labelledby="hhba-law-title">
@@ -94,54 +118,71 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
     </header>
     <div className="hhba-law-body">
      <section className="hhba-law-intro">
-      <span className="hhba-knowledge-kicker">HHBA / KNOW YOUR WORKPLACE RIGHTS</span>
-      <Scale size={27} aria-hidden="true"/>
-      <h1 id="hhba-law-title">了解劳动权益，从可靠的依据开始。</h1>
-      <p>劳动合同、工资、加班、辞退、社保和工伤等问题，分为 8 类深度专题和 12 个细分专题，提供证据清单、处理方法及可核对的官方出处。</p>
+      <span className="hhba-knowledge-kicker">HHBA / WORKPLACE RIGHTS</span>
+      <h1 id="hhba-law-title">你遇到了什么职场问题？</h1>
+      <p>直接搜索问题，或者按照分类浏览。</p>
      </section>
-     <label className="hhba-knowledge-search"><Search size={20}/><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="描述你的问题，例如：公司三个月没有发工资…" aria-label="搜索劳动权益知识和职场行动建议"/></label>
-     <div className="hhba-knowledge-search-help"><span>本地关键词与常见说法匹配 · 无需登录 · 不上传你的问题</span><span>资料整理：深度专题 {laborRights.reviewedOn} · 细分专题 {subtopics.reviewedOn}</span></div>
+
+     <label className="hhba-knowledge-search">
+      <Search size={19} aria-hidden="true"/>
+      <input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="例如：公司不发工资、试用期不交社保…" aria-label="搜索劳动权益知识和职场行动建议"/>
+     </label>
+     <div className="hhba-knowledge-search-help"><span>本地检索 · 无需登录 · 不上传你的问题</span></div>
      <div className="hhba-knowledge-examples" aria-label="常见问题示例">
       {examples.map(v=><button type="button" onClick={()=>setQuery(v)} key={v}>{v}</button>)}
-      {query&&<button type="button" onClick={()=>setQuery('')}>清除搜索</button>}
+      {query&&<button type="button" className="hhba-knowledge-clear" onClick={()=>setQuery('')}>清除搜索</button>}
      </div>
-     <Link className="hhba-knowledge-guide" to="/rights/guide">
-      <div><strong>高性价比职场指南</strong><p>由 HHBA 独立编写的 {GUIDE_TIPS.length} 条行动建议。按求职、入职、工作和离职等阶段，找到现在就能执行的步骤。</p></div>
-      <ArrowRight size={23} aria-hidden="true"/>
-     </Link>
-     <section className="hhba-law-topics" aria-labelledby="hhba-law-topics-title">
-      <h2 id="hhba-law-topics-title">劳动权益深度专题 · {matches.length} / {laborRights.topics.length} 类</h2>
-      {matches.length?<div className="hhba-law-topic-grid">
-       {matches.map((topic)=>{
-        const position=laborRights.topics.indexOf(topic);const Icon=topicIcons[position]||Scale;
-        return <Link to={knowledgeHref+'/'+topic.slug} className="hhba-law-topic" key={topic.slug}>
-         <Icon className="hhba-law-topic-icon" size={19} strokeWidth={1.7} aria-hidden="true"/>
-         <span className="hhba-knowledge-topic-copy"><strong>{topic.title}</strong><small>{topic.short}</small></span>
-         <ArrowUpRight className="hhba-law-topic-arrow" size={15} aria-hidden="true"/>
+
+     {!isSearching&&<section className="hhba-knowledge-categories" aria-labelledby="hhba-knowledge-categories-title">
+      <div className="hhba-knowledge-section-heading">
+       <h2 id="hhba-knowledge-categories-title">按问题分类</h2>
+       <span>6 个分类 · 20 个专题</span>
+      </div>
+      <div className="hhba-knowledge-category-grid" role="group" aria-label="选择职场问题分类">
+       {browseData.groups.map((group,index)=>{
+        const Icon=categoryIcons[index]||Scale;
+        return <button type="button" className={'hhba-knowledge-category'+(group.id===selectedGroup.id?' is-active':'')}
+         key={group.id} aria-pressed={group.id===selectedGroup.id} aria-controls="hhba-knowledge-results"
+         onClick={()=>setCategory(group.id)}>
+         <Icon size={19} strokeWidth={1.7} aria-hidden="true"/>
+         <span>{group.label}</span>
+         <ChevronRight size={16} aria-hidden="true" className="hhba-knowledge-category-arrow"/>
+        </button>;
+       })}
+      </div>
+     </section>}
+
+     <section id="hhba-knowledge-results" className="hhba-knowledge-results" aria-labelledby="hhba-knowledge-results-title">
+      <div className="hhba-knowledge-section-heading">
+       <h2 id="hhba-knowledge-results-title">{isSearching?'搜索结果':'相关问题'}</h2>
+       <span aria-live="polite">{isSearching?visibleTopics.length+' 个匹配专题':selectedGroup.label+' · '+visibleTopics.length+' 个问题'}</span>
+      </div>
+      {visibleTopics.length?<div className="hhba-knowledge-result-list">
+       {visibleTopics.map(item=>{
+        const topic=browseItems.find(t=>t.slug===item.slug)||item;
+        return <Link to={knowledgeHref+'/'+topic.slug} key={topic.slug}
+         className={'hhba-knowledge-result-row '+(item.kind==='full'?'hhba-law-topic':'hhba-knowledge-subtopic-card')}
+         aria-label={item.question+'，'+topic.title}>
+         <span className="hhba-knowledge-result-title">{item.question}</span>
+         <span className="hhba-knowledge-result-type">{item.kind==='full'?'深度专题':'细分问题'}</span>
+         <ChevronRight size={17} aria-hidden="true"/>
         </Link>;
        })}
-      </div>:<div className="hhba-knowledge-no-match">未找到完全对应的法律专题。建议换成「工资」「合同」「加班」「社保」等关键词，或者先浏览全部专题。 <button type="button" onClick={()=>setQuery('')}>查看全部</button></div>}
+      </div>:<div className="hhba-knowledge-no-match">没有找到对应专题，可以试试「工资」「合同」「社保」等关键词，或 <button type="button" onClick={()=>setQuery('')}>按分类浏览</button>。</div>}
      </section>
-     <section className="hhba-knowledge-subtopics" aria-labelledby="hhba-knowledge-subtopics-title">
-      <div className="hhba-knowledge-subtopics-head">
-       <h2 id="hhba-knowledge-subtopics-title">劳动权益细分专题 · {subMatches.length} / {subtopics.topics.length} 类</h2>
-       <span>原创问题指引 · 不虚构案例</span>
-      </div>
-      {subMatches.length?<div className="hhba-knowledge-subtopic-grid">{subMatches.map(topic=><Link to={knowledgeHref+'/'+topic.slug} key={topic.slug} className="hhba-knowledge-subtopic-card">
-       <strong>{topic.title}</strong><p>{topic.short}</p>
-       <span>查看法律、证据与处理步骤 <ArrowUpRight size={14}/></span>
-      </Link>)}</div>:<p className="hhba-knowledge-no-match">本次搜索没有匹配的细分专题。可以浏览上方深度专题，或清空搜索。</p>}
-     </section>
-     <section className="hhba-knowledge-actions" aria-labelledby="hhba-knowledge-actions-title">
-      <h2 id="hhba-knowledge-actions-title">{query?'优先推荐的职场行动':'从这些行动开始'}</h2>
-      {query&&matchingIntents(query).length>0&&<p className="hhba-knowledge-priority-note">先看与你描述的情况直接相关的操作步骤。推荐顺序仅帮助查找资料，不代表个案法律判断。</p>}
-      {guideMatches.length?<div className="hhba-knowledge-action-list">
-       {guideMatches.map(tip=><Link to={"/rights/guide?tip="+encodeURIComponent(tip.id)} className="hhba-knowledge-action" key={tip.id}>
-        <strong>{tip.title}</strong><small>{tip.summary}</small><span>查看步骤 · {tip.minutes} <ArrowUpRight size={12} style={{verticalAlign:'middle'}}/></span>
+
+     {isSearching&&guideMatches.length>0&&<section className="hhba-knowledge-actions" aria-labelledby="hhba-knowledge-actions-title">
+      <div className="hhba-knowledge-section-heading"><h2 id="hhba-knowledge-actions-title">建议下一步</h2><span>仅作一般信息参考</span></div>
+      <div className="hhba-knowledge-action-list">
+       {guideMatches.slice(0,3).map(tip=><Link to={"/rights/guide?tip="+encodeURIComponent(tip.id)} className="hhba-knowledge-action" key={tip.id}>
+        <strong>{tip.title}</strong><span>查看步骤 · {tip.minutes} <ArrowUpRight size={12} style={{verticalAlign:'middle'}}/></span>
        </Link>)}
-      </div>:<div className="hhba-knowledge-no-match">暂无匹配的职场建议，可以进入完整指南按阶段查找。</div>}
-     </section>
-     <p className="hhba-knowledge-notice">收录 8 个深度专题及 12 个细分专题。以上内容限于中国大陆劳动权益一般信息，不是个案法律结论，也不代表已经受理案件。官方法律和案例链接均收录在专题详情中；实际适用应结合当地规定、个案事实及法律更新核对。本页使用关键词和常见说法匹配，只用于查找资料，不会自动判断是否违法。</p>
+      </div>
+     </section>}
+     <Link className="hhba-knowledge-guide-mini" to="/rights/guide">
+      <BookOpen size={18} aria-hidden="true"/><span>高性价比职场指南 · {GUIDE_TIPS.length} 条原创建议</span><ArrowRight size={17} aria-hidden="true"/>
+     </Link>
+     <p className="hhba-knowledge-notice">已收录 8 个深度专题与 12 个细分专题。本站仅提供中国大陆劳动权益一般资料，不提供个案法律判断或案件受理；请结合官方现行规定、当地政策及实际情况核对。资料整理：深度专题 {laborRights.reviewedOn} · 细分专题 {subtopics.reviewedOn}。本页使用关键词和常见说法匹配，只用于查找资料，不会自动判断是否违法。</p>
     </div>
    </section>
   </main>

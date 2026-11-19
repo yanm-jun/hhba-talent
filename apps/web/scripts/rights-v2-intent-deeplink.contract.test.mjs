@@ -81,7 +81,7 @@ test('search remains private and selected action opens on exact deep link',()=>{
  assert.match(hub,/matchingIntents\(query\)/);
  assert.match(hub,/featuredActions\.indexOf\(tip\.id\)/);
  assert.match(hub,/\.sort\(\(a,b\)=>b\.score-a\.score/);
- assert.match(hub,/优先推荐的职场行动/);
+ assert.match(hub,/建议下一步/);
  assert.match(hub,/const matchingIntents=\(raw:string\)=>/);
  assert.match(hub,/intent\.subtopics\.includes\(topic\.slug\)/);
  assert.match(hub,/relatedSlugs\.add\(intent\.primary\)/);
