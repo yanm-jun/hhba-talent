@@ -5,8 +5,7 @@ export type ResumeOptimizationStatus={
  kind:'HHBA_RESUME_OPTIMIZATION_V1';enabled:boolean;configured:boolean;
  per_account_daily_limit:number;global_daily_limit:number;
 };
-export class ResumeOptimizationError extends Error{
- constructor(readonly code:string,readonly status:number){super({
+const OPTIMIZATION_ERRORS:Record<string,string>={
   SESSION_INVALID:'当前登录已失效，请重新登录。',
   FORBIDDEN:'当前账户无权使用求职者简历优化。',
   RESUME_OPTIMIZATION_NOT_ENABLED:'简历 AI 润色服务尚未启用。',
@@ -15,7 +14,9 @@ export class ResumeOptimizationError extends Error{
   AI_PROVIDER_NOT_CONFIGURED:'后台尚未配置简历润色 AI 模型。',
   INVALID_OPTIMIZATION_INPUT:'简历证据不完整，请先完成简历解析。',
   AI_OPTIMIZATION_UNAVAILABLE:'AI 润色暂时失败，未修改简历。'
- }[code]||'简历润色请求失败，请稍后再试。')}
+};
+export class ResumeOptimizationError extends Error{
+ constructor(readonly code:string,readonly status:number){super(OPTIMIZATION_ERRORS[code]||'简历润色请求失败，请稍后再试。')}
 }
 const PATH='/api/resume-optimize';
 export async function getResumeOptimizationStatus(signal?:AbortSignal):Promise<ResumeOptimizationStatus|null>{
