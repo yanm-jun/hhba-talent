@@ -13,7 +13,15 @@ const OPTIMIZATION_ERRORS:Record<string,string>={
   RESUME_OPTIMIZATION_LIMIT:'今天的简历优化额度已使用完，请明天再试。',
   AI_PROVIDER_NOT_CONFIGURED:'后台尚未配置简历润色 AI 模型。',
   INVALID_OPTIMIZATION_INPUT:'简历证据不完整，请先完成简历解析。',
-  AI_OPTIMIZATION_UNAVAILABLE:'AI 润色暂时失败，未修改简历。'
+  AI_OPTIMIZATION_UNAVAILABLE:'AI 润色暂时失败，未修改简历。',
+  AI_PROVIDER_KEY_REJECTED:'AI 服务密钥未通过平台验证，请管理员核对 Preview 配置。',
+  AI_PROVIDER_BALANCE_INSUFFICIENT:'AI 服务账户余额不足，尚未取得润色建议。',
+  AI_PROVIDER_RATE_LIMITED:'AI 服务当前触发限速，请稍后再试。',
+  AI_PROVIDER_REQUEST_REJECTED:'AI 模型拒绝了请求格式，请管理员检查接口兼容性。',
+  AI_PROVIDER_UPSTREAM_ERROR:'AI 模型服务器暂时异常，未修改简历。',
+  AI_PROVIDER_NETWORK_ERROR:'服务器暂时无法连接 AI 模型，未修改简历。',
+  AI_PROVIDER_TIMEOUT:'AI 润色等待超时，未修改简历。',
+  AI_PROVIDER_RESPONSE_INVALID:'AI 返回内容格式不符合要求，未修改简历。'
 };
 export class ResumeOptimizationError extends Error{
  constructor(readonly code:string,readonly status:number){super(OPTIMIZATION_ERRORS[code]||'简历润色请求失败，请稍后再试。')}
