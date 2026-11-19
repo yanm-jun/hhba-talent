@@ -9,6 +9,7 @@ import { HomeWorkplacePromise } from '../components/HomeWorkplacePromise';
 import { BrandMark } from '../components/BrandMark';
 import type { User } from '../services/api';
 import '../styles/home-match-promo.css';
+import '../styles/home-hero-refined.css';
 
 function EntryCard({kind,title,body,footer}:{kind:'candidate'|'directory'|'rights';title:string;body:string;footer:string}){
  const Icon=kind==='candidate'?BriefcaseBusiness:kind==='rights'?Scale:Building2;
@@ -24,14 +25,19 @@ function EntryCard({kind,title,body,footer}:{kind:'candidate'|'directory'|'right
 
 export function HomePage({user}:{user:User|null}){
  return <Shell user={user}>
-  <section className="home-hero hhba-public-hero">
+  <section className="home-hero hhba-public-hero hhba-public-hero-refined" aria-labelledby="hhba-home-hero-title">
    <div className="hhba-public-hero-logo"><BrandMark variant="icon" size="hero"/></div>
    <p className="hhba-public-eyebrow"><span className="hhba-public-brand-cn">汇方职场</span><span>HHBA · HUMAN CAPABILITY NETWORK</span></p>
-   <p className="hhba-home-brand-slogan">让机会与人才，找到彼此。</p>
-   <h1>找工作，不止于找到工作。</h1>
-   <p className="hhba-home-description">从发现真实招聘机会，到持续职业服务与劳动权益支持，HHBA 希望陪你走过求职与职场的下一程。</p>
-   <p className="hhba-home-question">你来到这里，是为了什么？</p>
-   <button type="button" className="hhba-letter-revisit" onClick={()=>window.dispatchEvent(new Event('hhba:open-letter'))}><span aria-hidden="true">✉</span> 读一封来自 HHBA 的信</button>
+   <h1 id="hhba-home-hero-title"><span>让机会与人才，</span><span>找到彼此。</span></h1>
+   <p className="hhba-home-description">找到机会，做好准备，做出选择。</p>
+   <div className="hhba-refined-hero-actions">
+    <Link className="hhba-refined-hero-primary" to={user?.account_types?.includes('candidate')?'/candidate/account/resume':'/auth'}>
+     开始求职 <ArrowUpRight size={17} aria-hidden="true"/>
+    </Link>
+    <button type="button" className="hhba-refined-hero-secondary" onClick={()=>window.dispatchEvent(new Event('hhba:open-letter'))}>
+     读一封来自 HHBA 的信 <ArrowUpRight size={15} aria-hidden="true"/>
+    </button>
+   </div>
   </section>
   <section className="entry-grid hhba-public-entry-grid hhba-home-entry-grid" aria-label="选择使用入口">
    <EntryCard kind="candidate" title="我要应聘"
