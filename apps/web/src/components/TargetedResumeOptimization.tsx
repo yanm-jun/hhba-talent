@@ -1,9 +1,9 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen,Printer,Eye} from 'lucide-react';
+import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen,Printer,Eye,PencilLine} from 'lucide-react';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 import {getRealAuthToken,realAuthReady} from '../services/realAuth';
 import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimizationStatus} from '../services/resumeOptimizationApi';
-import {applySuggestion,validateSuggestion,type ResumeBlock,type ResumeSuggestion,type ResumeVersion} from '../services/targetedResumeOptimization';
+import {applySuggestion,validateSuggestion,editResumeBlock,type ResumeBlock,type ResumeSuggestion,type ResumeVersion} from '../services/targetedResumeOptimization';
 import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
 import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResumeVersion} from '../services/resumeVersionsApi';
 import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
@@ -31,6 +31,9 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
  const [details,setDetails]=useState<ResumeDocumentDetails>({...EMPTY_RESUME_DOCUMENT_DETAILS});
  const [confirmReal,setConfirmReal]=useState(false);
  const [showPrintPreview,setShowPrintPreview]=useState(false);
+ const [editingBlock,setEditingBlock]=useState<string|null>(null);
+ const [manualText,setManualText]=useState('');
+ const generation=useRef(0);
  const active=useRef<AbortController|null>(null);
  useEffect(()=>{
   const abort=new AbortController();
@@ -87,18 +90,18 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
  }
  async function generate(){
   if(!consent||!blocks.length||busy||!status?.enabled)return;
-  if(version.acceptedSuggestionIds.length>0&&!window.confirm('重新生成会清除当前尚未保存的填充修改。确定继续吗？'))return;
-  setBusy(true);setNotice('');setSuggestions([]);setIgnored([]);setConfirmed([]);setNewEvidence({});setVersion(initial());
+  const currentBlocks=version.blocks;
+  setBusy(true);setNotice('');setSuggestions([]);setIgnored([]);setConfirmed([]);setNewEvidence({});
   const controller=new AbortController();active.current=controller;
   try{
-   const incoming=await requestResumeOptimization(blocks,{
+   const incoming=await requestResumeOptimization(currentBlocks,{
     title:(job.title_zh||job.title).slice(0,120),requirements
    },controller.signal);
    const unique=new Set<string>(),usedBlocks=new Set<string>();
    const accepted=incoming.filter(s=>{
-    if(unique.has(s.id)||usedBlocks.has(s.blockId)||!validateSuggestion(blocks,s))return false;
+    if(unique.has(s.id)||usedBlocks.has(s.blockId)||!validateSuggestion(currentBlocks,s))return false;
     unique.add(s.id);usedBlocks.add(s.blockId);return true;
-   });
+   }).map((s,i)=>({...s,id:('generation-'+(++generation.current)+'-'+i+'-'+s.id).slice(0,100)}));
    setSuggestions(accepted);
    setNotice(accepted.length?'建议已生成。请逐条核实真实性，再选择填充。':'本次 AI 未发现可以可靠润色的内容。');
   }catch(error){
@@ -124,9 +127,21 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
    setNotice('已将你亲自填写的真实信息添加到当前简历预览。');
   }catch{setNotice('原文已经变化，请重新生成补充建议。');}
  }
+ function startEdit(block:ResumeBlock){
+  setEditingBlock(block.id);setManualText(block.text);
+ }
+ function saveEdit(){
+  if(!editingBlock)return;
+  try{
+   setVersion(editResumeBlock(version,editingBlock,manualText));
+   setSuggestions(existing=>existing.filter(s=>s.blockId!==editingBlock));
+   setEditingBlock(null);setManualText('');setConfirmReal(false);
+   setNotice('已更新本次简历的文字内容。所有手动修改须以真实经历为准。');
+  }catch{setNotice('请输入有效内容，单个段落最多 1600 字。');}
+ }
  function reset(){
   active.current?.abort();setBusy(false);setVersion(initial());setSuggestions([]);
-  setIgnored([]);setConfirmed([]);setNewEvidence({});setConfirmReal(false);setNotice('已恢复原始预览。');
+  setIgnored([]);setConfirmed([]);setNewEvidence({});setConfirmReal(false);setEditingBlock(null);setNotice('已恢复原始预览。');
  }
  const hasSession=realAuthReady&&Boolean(getRealAuthToken());
  return <section className="targeted-resume" aria-label="岗位定向简历优化">
@@ -154,9 +169,18 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
     const applied=Boolean(s&&version.acceptedSuggestionIds.includes(s.id));
     const dismissed=Boolean(s&&ignored.includes(s.id));
     return <div className="targeted-resume-block" key={block.id}>
-     <small>{block.section==='experience'?'工作经历':'专业技能'}</small>
-     <p>{block.text}</p>
-     {s&&!applied&&!dismissed&&<div className="targeted-resume-suggestion">
+     <div className="targeted-resume-block-label">
+      <small>{block.section==='experience'?'工作经历':'专业技能'}</small>
+      <button type="button" onClick={()=>startEdit(block)}><PencilLine size={13}/> 编辑原文</button>
+     </div>
+     {editingBlock===block.id?<div className="targeted-resume-inline-editor">
+      <textarea rows={4} maxLength={1600} value={manualText}
+       onChange={e=>setManualText(e.target.value)}
+       aria-label="编辑当前简历段落"/>
+      <div><button type="button" onClick={saveEdit}>保存本次修改</button>
+       <button type="button" onClick={()=>{setEditingBlock(null);setManualText('')}}>取消</button></div>
+     </div>:<p>{block.text}</p>}
+     {s&&!applied&&!dismissed&&editingBlock!==block.id&&<div className="targeted-resume-suggestion">
       <span className="targeted-resume-ai-label"><Sparkles size={13} aria-hidden="true"/> AI 建议 · {s.action==='request_evidence'?'需要补充真实信息':'待用户核实'}</span>
       <p className="targeted-resume-gradient">{s.proposed}</p>
       <p className="targeted-resume-rationale">对应岗位要求：{s.jobRequirement}</p>
