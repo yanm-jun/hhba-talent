@@ -72,7 +72,7 @@ test('search remains private and selected action opens on exact deep link',()=>{
  assert.match(hub,/本页使用关键词和常见说法匹配/);
  assert.doesNotMatch(hub,/\bfetch\(|navigator\.sendBeacon|<textarea|input type="file"/);
  assert.match(guide,/setSelectedTipId/);
- assert.match(guide,/defaultOpen=\{tip\.id===selectedTipId\}/);
+ assert.match(guide,/open=\{tip\.id===selectedTipId\|\|undefined\}/);
  assert.match(guide,/new URLSearchParams\(window\.location\.search\)\.get\('tip'\)/);
  assert.match(guide,/window\.addEventListener\('popstate',syncTip\)/);
  assert.match(guide,/浏览完整指南/);
