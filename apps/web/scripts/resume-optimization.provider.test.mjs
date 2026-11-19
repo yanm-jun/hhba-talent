@@ -151,3 +151,23 @@ test('DeepSeek request gives the model an exact but nonauthoritative JSON format
   assert.deepEqual(result.suggestions,[]);
  }finally{globalThis.fetch=old;}
 });
+
+
+test('generated AI advice always references actual current paragraph, never model-paraphrased original',async()=>{
+ const original='真实参与区域门店的客户邀约、到店跟进及日常运营记录';
+ const env={HHBA_MATCH_DEEPSEEK_KEY:'fake-secret-for-tests'};
+ const prior=globalThis.fetch;
+ globalThis.fetch=async()=>Response.json({choices:[{finish_reason:'stop',message:{content:JSON.stringify({
+  suggestions:[{id:'s1',blockId:'experience-0',action:'replace',
+   original:'错误的 AI 摘录',proposed:'参与客户邀约及日常运营记录',
+   rationale:'更贴近岗位要求',jobRequirement:'客户管理',evidenceStatus:'needs_user_confirmation'}]
+ })}}]});
+ try{
+  const result=await generateSuggestions({env,
+   blocks:[{id:'experience-0',section:'experience',text:original}],
+   job:{title:'区域督导',requirements:'客户管理'}});
+  assert.equal(result.suggestions.length,1);
+  assert.equal(result.suggestions[0].original,original);
+  assert.equal(result.suggestions[0].proposed,'参与客户邀约及日常运营记录');
+ }finally{globalThis.fetch=prior;}
+});
