@@ -44,7 +44,7 @@ export function parseSuggestions(raw,allowedBlockIds){
  for(const [index,s] of list.slice(0,12).entries()){
   if(!s||typeof s!=='object'||Array.isArray(s))continue;
   const namedId=asText(s.blockId)||asText(s.block_id)||asText(s.targetBlockId)||asText(s.target_block_id);
-  const blockId=allowed.has(namedId)?namedId:(allowed.size===1?[...allowed][0]:'');
+  const blockId=allowed.has(namedId)?namedId:(!namedId&&allowed.size===1?[...allowed][0]:'');
   if(!allowed.has(blockId)||used.has(blockId))continue;
   let action=asText(s.action)||asText(s.type)||asText(s.operation);
   action=synonyms[action.toLowerCase()]||action;
