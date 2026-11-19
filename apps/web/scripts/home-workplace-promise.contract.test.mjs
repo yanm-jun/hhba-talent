@@ -97,7 +97,7 @@ test('homepage financial disclosure uses distributable profit, not turnover, and
 test('homepage promotes free rights, avoids legacy membership marketing and preserves recruitment modules',()=>{
  const home=read('../src/pages/HomePage.tsx');
  const component=read('../src/components/HomeWorkplacePromise.tsx');
- assert.ok(home.includes('找工作，不止于找到工作。'));
+ assert.ok(home.includes('一份工作，值得认真选择。'));
  assert.ok(home.includes('让机会与人才，找到彼此。'));
  for(const entry of ['title="求职与机会"','title="劳动权益"','title="企业招聘导航"'])assert.ok(home.includes(entry));
  assert.ok(home.includes("kind==='rights'?'/rights/knowledge'"));

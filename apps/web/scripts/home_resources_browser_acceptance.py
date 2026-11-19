@@ -24,7 +24,7 @@ else:
 
 with sync_playwright() as playwright:
     browser=playwright.chromium.launch(headless=True)
-    for name,width,height in [("desktop",1440,900),("mobile",390,844)]:
+    for name,width,height in [("desktop",1440,900),("desktop-windows",1536,768),("desktop-wide",1920,1080),("mobile",390,844)]:
         context=browser.new_context(viewport={"width":width,"height":height},device_scale_factor=1,reduced_motion="reduce")
         page=context.new_page()
         page.goto(BASE+"/",wait_until="domcontentloaded")
@@ -32,6 +32,11 @@ with sync_playwright() as playwright:
         # Dismiss it only in the visual test, so the screenshot shows the requested section.
         page.locator("[data-winter-close]").click(timeout=15000)
         assert page.locator("[data-hhba-winter-modal]").count()==0, f"{name}: modal obscures visual acceptance"
+        heading=page.locator(".hhba-public-hero h1")
+        assert heading.inner_text().strip()=="一份工作，值得认真选择。", f"{name}: outdated hero headline"
+        assert "发现真实的职业机会，了解劳动权益" in page.locator(".hhba-home-description").inner_text()
+        # Simulate the gutter used by Windows scrollbars during real desktop browsing.
+        page.evaluate("document.documentElement.style.scrollbarGutter='stable'")
         section=page.locator(".hhba-home-workplace")
         section.wait_for(timeout=30000)
         assert section.locator("h2").inner_text().strip()=="让职业选择更有依据。"
@@ -51,12 +56,17 @@ with sync_playwright() as playwright:
         rects=[cards.nth(i).bounding_box() for i in range(2)]
         assert all(rects),f"{name}: missing card geometry"
         first,second=rects
-        if name=="desktop":
+        if name.startswith("desktop"):
             assert second["x"]>first["x"]+first["width"]-.5,f"{name}: cards should be side-by-side: {rects}"
         else:
             assert second["y"]>first["y"]+first["height"]-.5,f"{name}: cards should stack: {rects}"
-        overflow=page.evaluate("() => ({width:innerWidth,html:document.documentElement.scrollWidth,body:document.body.scrollWidth})")
-        assert overflow["html"]<=overflow["width"]+3 and overflow["body"]<=overflow["width"]+3, f"{name}: horizontal overflow {overflow}"
+        overflow=page.evaluate("""() => ({
+          viewport: innerWidth, content: document.documentElement.clientWidth,
+          html: document.documentElement.scrollWidth, body: document.body.scrollWidth
+        })""")
+        assert overflow["html"]<=overflow["content"]+2 and overflow["body"]<=overflow["content"]+2, f"{name}: horizontal overflow {overflow}"
+        page.evaluate("window.scrollTo(10000,0)")
+        assert page.evaluate("window.scrollX")<=1, f"{name}: page scrolls sideways"
         section.screenshot(path=str(OUT/f"{name}-home-resources.png"),animations="disabled")
         # Route integrity independent from any homepage popup or overlay.
         page.goto(BASE+"/rights/knowledge",wait_until="domcontentloaded")
