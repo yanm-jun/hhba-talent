@@ -70,7 +70,7 @@ export function sourceResumeOmittedCharacters(raw:string,sourceBlocks:readonly R
  * the printable resume template preserves. Never export that partial copy
  * without an explicit warning to the candidate. */
 export function structuredResumeOmittedCharacters(profile:CandidateProfile):number{
- const nonspace=(value:string)=>value.replace(/\\s/gu,'').length;
+ const nonspace=(value:string)=>value.replace(/\s/gu,'').length;
  let omitted=0;
  for(const entries of [profile.experiences,profile.skills]){
   const evidenced=(Array.isArray(entries)?entries:[])
