@@ -24,7 +24,17 @@ function matchesTip(tip:(typeof GUIDE_TIPS)[number],needle:string){
 }
 const values=['全部','钱','时间','岗位','权益','健康','安全'];
 export function WorkValueGuidePage({user}:{user:User|null}){
+ const [selectedTipId,setSelectedTipId]=useState(()=>new URLSearchParams(window.location.search).get('tip')||'');
  const [query,setQuery]=useState(()=>{const id=new URLSearchParams(window.location.search).get('tip');return GUIDE_TIPS.find(t=>t.id===id)?.title||'';});
+ useEffect(()=>{
+  const syncTip=()=>{
+   const id=new URLSearchParams(window.location.search).get('tip')||'';
+   setSelectedTipId(id);
+   setQuery(GUIDE_TIPS.find(t=>t.id===id)?.title||'');
+  };
+  window.addEventListener('popstate',syncTip);
+  return()=>window.removeEventListener('popstate',syncTip);
+ },[]);
  const [stage,setStage]=useState<'all'|GuideStage>('all');
  const [value,setValue]=useState('全部');
  const [maxTime,setMaxTime]=useState('全部');
@@ -41,13 +51,14 @@ export function WorkValueGuidePage({user}:{user:User|null}){
  // Show only 24 cards at a time, even when the full corpus contains 200 actions.
  useEffect(()=>{setVisibleCount(24);},[query,stage,value,maxTime,onlyPending]);
  const visibleTips=filtered.slice(0,visibleCount);
+ const selectedTip=GUIDE_TIPS.find(tip=>tip.id===selectedTipId);
  const finished=completed.length;
  const mark=(id:string)=>{
   const next=completed.includes(id)?completed.filter(x=>x!==id):[...completed,id];
   setCompleted(next);
   try{localStorage.setItem(STORAGE_KEY,JSON.stringify(next));}catch{/* Browsers may disable storage: current visit still works. */}
  };
- const clear=()=>{setQuery('');setStage('all');setValue('全部');setMaxTime('全部');setOnlyPending(false);};
+ const clear=()=>{setSelectedTipId('');setQuery('');setStage('all');setValue('全部');setMaxTime('全部');setOnlyPending(false);};
  return <Shell user={user}>
   <main className="hhba-value-guide" id="main-content">
    <header className="hhba-vguide-hero">
@@ -67,7 +78,7 @@ export function WorkValueGuidePage({user}:{user:User|null}){
      <div><h2>找到你现在最需要的建议</h2><p>根据阶段、关键词和投入时间查找，展开卡片即可查看实际操作步骤。</p></div>
      <span><Filter size={15}/> 本地免费检索</span>
     </div>
-    <label className="hhba-vguide-search"><Search size={19}/><input type="search" value={query} onChange={event=>setQuery(event.target.value)} placeholder="例如：试用期、拖欠工资、离职证明、调岗…" aria-label="搜索职场行动建议"/></label>
+    <label className="hhba-vguide-search"><Search size={19}/><input type="search" value={query} onChange={event=>{setSelectedTipId('');setQuery(event.target.value);}} placeholder="例如：试用期、拖欠工资、离职证明、调岗…" aria-label="搜索职场行动建议"/></label>
     <div className="hhba-vguide-stages" role="group" aria-label="按职场阶段筛选">
      <button type="button" className={stage==='all'?'is-active':''} aria-pressed={stage==='all'} onClick={()=>setStage('all')}>全部阶段</button>
      {GUIDE_STAGES.map(s=><button key={s.id} type="button" className={stage===s.id?'is-active':''} aria-pressed={stage===s.id} onClick={()=>setStage(s.id)}>{s.label}</button>)}
@@ -83,15 +94,19 @@ export function WorkValueGuidePage({user}:{user:User|null}){
      <button type="button" className="hhba-vguide-reset" onClick={clear}>重置条件</button>
     </div>
    </section>
+   {selectedTip&&<div className="hhba-vguide-selected" role="status">
+    <span><CheckCircle2 size={17}/> 已定位到指定建议：<strong>{selectedTip.title}</strong> · 操作步骤已展开</span>
+    <Link to="/rights/guide">浏览完整指南 <ArrowRight size={14}/></Link>
+   </div>}
    <div className="hhba-vguide-result-head"><h2>建议清单 <small>找到 {filtered.length} 条</small></h2><span>资料整理日期：{GUIDE_UPDATED_ON} · 本页显示 {Math.min(visibleCount,filtered.length)} 条</span></div>
    {filtered.length?<div className="hhba-vguide-grid">{visibleTips.map(tip=>{
     const label=GUIDE_STAGES.find(s=>s.id===tip.stage)?.label||'职场建议';
     const done=completed.includes(tip.id);
-    return <article className={'hhba-vguide-card'+(done?' is-completed':'')} key={tip.id} id={'tip-'+tip.id}>
+    return <article className={'hhba-vguide-card'+(done?' is-completed':'')+(tip.id===selectedTipId?' is-targeted':'')} key={tip.id} id={'tip-'+tip.id}>
      <div className="hhba-vguide-card-meta"><span className="hhba-vguide-stage-label">{label}</span><span className="hhba-vguide-source-tag">HHBA 原创建议</span></div>
      <h3>{tip.title}</h3><p className="hhba-vguide-summary">{tip.summary}</p>
      <div className="hhba-vguide-tags"><span><Wallet size={13}/>免费阅读</span><span><Clock3 size={13}/>{tip.minutes}</span><span>行动难度：{tip.effort}</span><span>主要帮助：{tip.value}</span></div>
-     <details className="hhba-vguide-detail">
+     <details className="hhba-vguide-detail" key={tip.id+':'+selectedTipId} defaultOpen={tip.id===selectedTipId}>
       <summary>打开具体行动步骤 <ChevronDown size={17}/></summary>
       <ol>{tip.steps.map(step=><li key={step}>{step}</li>)}</ol>
       <div className="hhba-vguide-detail-footer">
