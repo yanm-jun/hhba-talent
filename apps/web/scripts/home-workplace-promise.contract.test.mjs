@@ -23,20 +23,15 @@ test('homepage public API exposes the approved service plan without enabling tra
  assert.match(body.membership.serviceNotice,/暂未开放购买/);
 });
 
-test('membership details link opens the rights service introduction, including anonymous visitors',()=>{
+test('homepage free rights CTA opens the public knowledge index for anonymous visitors',()=>{
  const home=read('../src/components/HomeWorkplacePromise.tsx');
  const routes=read('../src/main.tsx');
- const rights=read('../src/pages/WorkplaceRightsPage.tsx');
- assert.match(home,/<Link className="hhba-home-text-link" to="\/rights">了解权益支持/);
- assert.doesNotMatch(home,/to="\/candidate\/account\/legal-aid">了解权益支持/);
- assert.match(home,/to="\/membership\/rules">服务资格、范围与开通说明/);
- assert.match(routes,/if\(route==='\/rights'\)return <WorkplaceRightsPage user=\{user\}\/>/);
- assert.match(rights,/export function WorkplaceRightsPage\(\{user,embedded=false\}/);
- assert.match(rights,/尚未开放购买/);
- assert.match(rights,/const knowledgeHref=embedded\?'\/candidate\/account\/legal-aid':'\/rights\/knowledge'/);
+ const rights=read('../src/pages/LegalAidLandingPage.tsx');
+ assert.match(home,/<Link className="hhba-home-text-link" to="\/rights\/knowledge">查看劳动权益知识/);
+ assert.doesNotMatch(home,/to="\/membership\/rules"/);
+ assert.match(routes,/if\(route==='\/rights\/knowledge'\)return <LegalAidLandingPage user=\{user\}\/>/);
+ assert.match(rights,/export function LegalAidLandingPage/);
 });
-
-
 test('all public rights and legal knowledge URLs render independently, while private workspace links remain private',()=>{
  const routes=read('../src/main.tsx');
  const footer=read('../src/components/Shell.tsx');
@@ -59,7 +54,7 @@ test('all public rights and legal knowledge URLs render independently, while pri
  ])assert.ok(routes.includes(route),'public route missing: '+route);
  assert.ok(footer.includes("['会员与权益服务','/rights']"));
  assert.ok(footer.includes("['劳动权益知识','/rights/knowledge']"));
- assert.ok(home.includes("kind==='rights'?'/rights'"));
+ assert.ok(home.includes("kind==='rights'?'/rights/knowledge'"));
  assert.ok(rights.includes('embedded?"个人工作台":"HHBA 首页"'));
  assert.ok(rights.includes("embedded?'/candidate/account/legal-aid':'/rights/knowledge'"));
  assert.ok(knowledge.includes("embedded?'/candidate/account/legal-aid':'/rights/knowledge'"));
@@ -95,49 +90,44 @@ test('homepage financial disclosure uses distributable profit, not turnover, and
  assert.match(body.distribution.reportNotice,/首期财务公开报告尚未发布/);
 });
 
-test('homepage links the approved public plan and preserves the real recruitment market',()=>{
+test('homepage promotes free rights, avoids legacy membership marketing and preserves recruitment modules',()=>{
  const home=read('../src/pages/HomePage.tsx');
  const component=read('../src/components/HomeWorkplacePromise.tsx');
- const config=read('../src/data/homepagePublicConfig.json');
  assert.ok(home.includes('找工作，不止于找到工作。'));
  assert.ok(home.includes('让机会与人才，找到彼此。'));
- assert.ok(home.includes('kind="rights"'));
+ for(const entry of ['title="求职与机会"','title="劳动权益"','title="企业招聘导航"'])assert.ok(home.includes(entry));
+ assert.ok(home.includes("kind==='rights'?'/rights/knowledge'"));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
  assert.ok(home.includes('<HomeCompanyMarquee/>'));
  assert.ok(home.includes('<HomeWorkplacePromise/>'));
- assert.ok(component.includes('api/public/homepage'));
- assert.ok(component.includes('暂未开放购买'));
- assert.ok(config.includes('不提供现金赔付'));
- assert.ok(config.includes('"companyPercent": 60'));
- assert.ok(config.includes('"workerSupportPercent": 40'));
+ assert.ok(component.includes('了解你的劳动权益'));
+ assert.ok(component.includes('免费开放'));
+ assert.ok(component.includes('api/transparency/reports'));
+ for(const removed of ['api/public/homepage','¥24.90','membership.','distribution.','60%','40%','连续缴费','会员服务'])
+  assert.ok(!component.includes(removed),'outdated homepage claim: '+removed);
  assert.ok(!home.includes('HomeLiveDrawer'));
 });
-
-test('homepage folds compact highlights into one membership card and keeps 60/40 secondary',()=>{
+test('homepage keeps original card styling and replaces paid stages with two free rights sections',()=>{
  const component=read('../src/components/HomeWorkplacePromise.tsx');
  const css=read('../src/styles/home-workplace-promise.css');
  assert.match(component,/找到好工作，只是开始。/);
  assert.match(component,/hhba-home-member-highlights/);
- assert.doesNotMatch(component,/hhba-home-value-strip/);
  assert.match(component,/hhba-home-membership-card/);
  assert.match(component,/hhba-home-phase-grid/);
  assert.match(component,/hhba-home-pledge/);
- assert.doesNotMatch(component,/hhba-home-business-grid|hhba-home-pillar|hhba-home-distribution-card/);
- assert.match(component,/membership\.firstStageServices/);
- assert.match(component,/membership\.rightsStageServices/);
- assert.match(component,/distribution\.companyPercent/);
- assert.match(component,/distribution\.workerSupportPercent/);
- assert.match(component,/membership\.purchaseEnabled/);
- assert.match(component,/会员服务已开放|暂未开放购买及案件申请/);
- assert.match(component,/to="\/membership\/rules"/);
- assert.match(component,/服务资格、范围与开通说明/);
+ assert.match(component,/职场权益知识/);
+ assert.match(component,/权益自助指引/);
+ assert.match(component,/每月根据实际经营情况/);
+ assert.match(component,/不承诺固定金额或分配比例/);
+ assert.match(component,/to="\/rights\/knowledge"/);
+ assert.match(component,/to="\/transparency"/);
+ assert.doesNotMatch(component,/hhba-home-distribution-bar|membership\.|distribution\.|to="\/membership\/rules"/);
  assert.match(css,/\.hhba-home-phase-grid\{display:grid;grid-template-columns:/);
  assert.match(css,/@media\(max-width:680px\)/);
  assert.match(css,/\.hhba-home-phase-grid\{grid-template-columns:1fr/);
  assert.match(css,/\.hhba-home-pledge\{display:grid/);
  assert.match(css,/:focus-visible/);
 });
-
 test('home job footer is one compact row; full marketplace still supports page jump',()=>{
  const market=read('../src/components/UnifiedJobMarket.tsx');
  const pager=read('../src/components/JobResultPagination.tsx');
