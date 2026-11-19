@@ -63,8 +63,8 @@ test('official subtopic references point to the correct published law texts',()=
   'implementing regulation should have a readable official full-text page');
  assert(urls.includes('https://shanghai.chinatax.gov.cn/tax/zcfw/zcfgk/sbf/202202/t462174.html'),
   '2018 amended social insurance law should be linked');
- assert(urls.some(u=>u.startsWith('https://rsj.beijing.gov.cn/')&&u.endsWith('.pdf')),
-  'annual leave regulation has an official downloadable full text');
+ assert(urls.includes('https://rsj.wuhan.gov.cn/zwgk_17/zc/qtzdgkwj/zcfg/202001/t20200108_676323.html'),
+  'annual leave regulation must cite the full text published by a government HR authority');
  assert(!urls.some(u=>u.includes('nhsa.gov.cn/art/2010/10/28')||u.includes('/zixun/xiangqing/472691.html')));
  for(const t of subData.topics)for(const law of t.laws)assert(/^https:\/\//.test(law.url),t.slug);
 });
