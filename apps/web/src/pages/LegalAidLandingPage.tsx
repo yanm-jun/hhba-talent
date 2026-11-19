@@ -100,7 +100,7 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
       <p>劳动合同、工资、加班、辞退、社保和工伤等问题，分为 8 类深度专题和 12 个细分专题，提供证据清单、处理方法及可核对的官方出处。</p>
      </section>
      <label className="hhba-knowledge-search"><Search size={20}/><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="描述你的问题，例如：公司三个月没有发工资…" aria-label="搜索劳动权益知识和职场行动建议"/></label>
-     <div className="hhba-knowledge-search-help"><span>本地关键词与常见说法匹配 · 无需登录 · 不上传你的问题</span><span>资料核对：{laborRights.reviewedOn}</span></div>
+     <div className="hhba-knowledge-search-help"><span>本地关键词与常见说法匹配 · 无需登录 · 不上传你的问题</span><span>资料整理：深度专题 {laborRights.reviewedOn} · 细分专题 {subtopics.reviewedOn}</span></div>
      <div className="hhba-knowledge-examples" aria-label="常见问题示例">
       {examples.map(v=><button type="button" onClick={()=>setQuery(v)} key={v}>{v}</button>)}
       {query&&<button type="button" onClick={()=>setQuery('')}>清除搜索</button>}
