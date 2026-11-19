@@ -72,7 +72,7 @@ with sync_playwright() as playwright:
         page.goto(BASE+"/rights/knowledge",wait_until="domcontentloaded")
         page.locator(".hhba-knowledge-search input").wait_for(timeout=20000)
         page.goto(BASE+"/rights/guide",wait_until="domcontentloaded")
-        page.locator(".hhba-vguide-card").first.wait_for(timeout=20000)
+        page.locator(".hhba-edition-cover").wait_for(timeout=20000)
         context.close()
         print(f"{name}: two real resource cards, compact pledge, public routes and responsive layout OK",flush=True)
     browser.close()
