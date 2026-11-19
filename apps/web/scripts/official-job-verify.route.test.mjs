@@ -5,7 +5,7 @@ const origin='https://preview.hhba.example';
 const url='https://careers.tencent.com/jobdesc.html?postId=123456789012345';
 const html=`<!doctype html><html><body>
 <h1>数据分析师</h1><p>工作地点：上海</p><h2>岗位职责</h2>
-<p>负责运营指标分析与跨部门协调，推动经营报表建设和分析业务变化。</p>
+<p>负责运营指标分析与跨部门协调，推动经营报表建设和分析业务变化。日常需要根据经营数据制作分析报告，与部门负责人讨论数据波动的原因，支持产品运营团队分析客户行为、识别需要持续跟进的问题，并维护业务指标口径和报表说明。</p>
 <h2>任职要求</h2><p>熟悉 Python、SQL，善于与业务团队沟通，有一定项目分析和总结能力。</p>
 <button>立即投递</button></body></html>`;
 function harness({enabled=true,role='candidate',migrated=true}={}){
