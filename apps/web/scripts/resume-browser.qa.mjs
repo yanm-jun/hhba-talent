@@ -254,6 +254,21 @@ try{
   verifiedPatch.bottom<=verifiedPatch.pageBottom,
   'safe replacement must be inside original source page: '+JSON.stringify(verifiedPatch));
  await source.screenshot({path:output+'/original-pdf-edited-preview.png',fullPage:true});
+ const reviewDownloadEvent=source.waitForEvent('download');
+ await source.getByRole('button',{name:'下载修改预览'}).click();
+ const reviewDownload=await reviewDownloadEvent;
+ assert.match(reviewDownload.suggestedFilename(),/修改预览稿\.pdf$/,
+  'modified source PDF must be downloaded as a clearly marked review copy');
+ await reviewDownload.saveAs(output+'/edited-original-review.pdf');
+ const reviewBytes=await readFile(output+'/edited-original-review.pdf');
+ assert.ok(reviewBytes.length>500,'visual review PDF should not be empty');
+ const reviewPages=await pdfText(reviewBytes);
+ assert.equal(reviewPages.length,1,'review PDF must preserve original page count');
+ assert.equal(reviewPages[0].trim(),'',
+  'visual review PDF must not silently retain extractable, hidden original text');
+ assert.equal(reviewBytes.includes(Buffer.from('ORIGINAL RESUME VIEW')),false,
+  'old original string must not be hidden inside exported review PDF');
+ await source.screenshot({path:output+'/original-pdf-edited-preview-after-download.png',fullPage:true});
  const edited=source.getByRole('button',{name:'继续修改这一段'});
  await edited.waitFor({timeout:10000});
  await edited.click();
@@ -263,6 +278,9 @@ try{
  await source.getByRole('button',{name:'保存',exact:true}).click();
  await livePatch.waitFor({state:'detached',timeout:10000});
  await source.getByText('其余文字暂时放不下',{exact:false}).waitFor({timeout:10000});
+ const failureText=source.getByRole('status').filter({hasText:'有些修改暂时不能安全放进原来的位置'});
+ await source.getByRole('button',{name:'下载修改预览'}).click();
+ await failureText.waitFor({timeout:10000});
  await source.getByRole('button',{name:'继续修改这一段'}).click();
  await source.getByRole('button',{name:'撤销',exact:true}).click();
  await source.getByRole('button',{name:'修改这段简历'}).waitFor({timeout:10000});
