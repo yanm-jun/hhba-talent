@@ -9,6 +9,7 @@ const send=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:
 }});
 const fail=(code,status)=>send({ok:false,error:code},status);
 const MAX_BODY=96*1024,MAX_BLOCKS=12,MAX_GLOBAL=50,MAX_PERSONAL=3;
+const MAX_GLOBAL_ATTEMPTS=120,MAX_PERSONAL_ATTEMPTS=6;
 function active(env){
  return (env?.HHBA_AUTH_ROLLOUT==='preview'||env?.HHBA_MATCH_RUNTIME_MODE==='production')&&
   env?.HHBA_RESUME_OPTIMIZATION_ENABLED==='1'&&
@@ -16,8 +17,12 @@ function active(env){
   typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 }
 async function dbReady(db){
- try{const row=await db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='hhba_resume_optimization_requests'").first();
- return row?.name==='hhba_resume_optimization_requests';}catch{return false;}
+ try{
+  const result=await db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('hhba_resume_optimization_requests','hhba_resume_optimization_attempts')").all();
+  const names=new Set((result?.results||[]).map(r=>r.name));
+  return names.has('hhba_resume_optimization_requests')&&
+   names.has('hhba_resume_optimization_attempts');
+ }catch{return false;}
 }
 function sameOrigin(request){
  const url=new URL(request.url);
@@ -51,6 +56,15 @@ function redact(text){
   .replace(/(?<!\d)1[3-9]\d{9}(?!\d)/g,'[电话已脱敏]')
   .replace(/(?<!\d)\d{17}[\dXx](?!\d)/g,'[证件号已脱敏]');
 }
+async function reserveAttempt(db,hash){
+ const id=crypto.randomUUID(),time=new Date().toISOString(),day=time.slice(0,10);
+ const result=await db.prepare(
+  'INSERT INTO hhba_resume_optimization_attempts(request_id,day_utc,account_hash,created_at) SELECT ?,?,?,? WHERE '+
+  '(SELECT COUNT(*) FROM hhba_resume_optimization_attempts WHERE day_utc=?)<? AND '+
+  '(SELECT COUNT(*) FROM hhba_resume_optimization_attempts WHERE day_utc=? AND account_hash=?)<?'
+ ).bind(id,day,hash,time,day,MAX_GLOBAL_ATTEMPTS,day,hash,MAX_PERSONAL_ATTEMPTS).run();
+ return result?.success===true&&result?.meta?.changes===1?id:null;
+}
 async function reserve(db,hash){
  const id=crypto.randomUUID(),time=new Date().toISOString(),day=time.slice(0,10);
  const row=await db.prepare(
@@ -69,7 +83,8 @@ export async function onRequestGet({env}){
  let configured=false;
  try{selectProvider(env);configured=true;}catch{}
  return send({kind:'HHBA_RESUME_OPTIMIZATION_V1',enabled:active(env)&&configured&&await dbReady(env.HHBA_PNVS_AUTH_DB),
-  configured,per_account_daily_limit:MAX_PERSONAL,global_daily_limit:MAX_GLOBAL});
+  configured,per_account_daily_limit:MAX_PERSONAL,global_daily_limit:MAX_GLOBAL,
+  per_account_daily_attempt_limit:MAX_PERSONAL_ATTEMPTS,global_daily_attempt_limit:MAX_GLOBAL_ATTEMPTS});
 }
 export async function onRequestPost({request,env}){
  if(!sameOrigin(request))return fail('ORIGIN_REQUIRED',403);
@@ -88,8 +103,11 @@ export async function onRequestPost({request,env}){
  if(!valid(input))return fail('INVALID_OPTIMIZATION_INPUT',400);
  const hash=await sha256Hex(env.HHBA_MATCH_LIMIT_PEPPER+':resume-opt:'+session.phone);
  let requestId;
- try{requestId=await reserve(db,hash);if(!requestId)return fail('RESUME_OPTIMIZATION_LIMIT',429);}
- catch{return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);}
+ try{
+  if(!await reserveAttempt(db,hash))return fail('RESUME_OPTIMIZATION_ATTEMPT_LIMIT',429);
+  requestId=await reserve(db,hash);
+  if(!requestId)return fail('RESUME_OPTIMIZATION_LIMIT',429);
+ }catch{return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);}
  // Mask common contact identifiers before third-party processing.
  const blocks=input.blocks.map(b=>({id:b.id,section:b.section,text:redact(b.text)}));
  const job={title:redact(input.job.title),requirements:redact(input.job.requirements)};
@@ -110,8 +128,8 @@ export async function onRequestPost({request,env}){
    'AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR',
    'AI_PROVIDER_TIMEOUT','AI_PROVIDER_RESPONSE_INVALID']);
   const code=allowed.has(error?.message)?error.message:'AI_OPTIMIZATION_UNAVAILABLE';
-  // A failed model call must not use up a candidate's limited daily
-  // successful-optimization allowance. Keep an atomic reservation until result.
+  // Failed provider calls restore the *successful* daily allowance, while the
+  // separate attempt ledger remains consumed to bound repeated paid retries.
   try{await releaseFailedRequest(db,requestId,hash);}catch{console.warn('HHBA_RESUME_OPT_QUOTA_RELEASE_FAILED');}
   console.warn('HHBA_RESUME_OPTIMIZATION_FAILED',code);
   return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:
