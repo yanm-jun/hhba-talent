@@ -28,8 +28,8 @@ test('public rules page has 16 distinct, detailed chapters and 15 concrete FAQ e
 test('page is readable anonymously and reachable from both home and labor rights',()=>{
  assert.match(main,/MembershipRulesPage=lazy/);
  assert.match(main,/if\(route==='\/membership\/rules'\)return <MembershipRulesPage user=\{user\}\/>/);
- assert.match(homepage,/to="\/membership\/rules"/);
- assert.match(homepage,/服务资格、范围与开通说明/);
+ assert.doesNotMatch(homepage,/to="\/membership\/rules"/);
+ assert.match(homepage,/to="\/rights\/knowledge"/);
  assert.match(rights,/to="\/membership\/rules"/);
  assert.match(page,/<Shell user=\{user\}>/);
  assert.match(page,/chapters\.map\(/);
