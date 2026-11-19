@@ -81,3 +81,21 @@ test('generates suggestions with user confirmation and enforces daily quota',asy
   assert.equal(count,3);
  }finally{globalThis.fetch=previous;}
 });
+
+test('provider never receives contact identifiers in evidence',async()=>{
+ const h=mockEnv();
+ const original=globalThis.fetch;
+ const text='负责门店运营，联系邮箱：tester@example.org';
+ globalThis.fetch=async(_url,options)=>{
+  assert.doesNotMatch(options.body,/tester@example.org/);
+  const submitted=JSON.parse(options.body);
+  assert.match(submitted.messages[1].content,/邮箱已脱敏/);
+  return Response.json({choices:[{message:{content:JSON.stringify({suggestions:[]})}}]});
+ };
+ try{
+  const result=await onRequestPost({request:request({
+   ...base,blocks:[{...base.blocks[0],text}]
+  }),env:h.env});
+  assert.equal(result.status,200);
+ }finally{globalThis.fetch=original;}
+});
