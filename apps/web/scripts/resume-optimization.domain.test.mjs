@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {applySuggestion,compareScores} from '../src/services/targetedResumeOptimization.ts';
+import {applySuggestion,compareScores,editResumeBlock} from '../src/services/targetedResumeOptimization.ts';
 const version={id:'original',targetJobId:'job-1',
  blocks:[{id:'experience-0',section:'experience',text:'负责门店日常运营'}],
  acceptedSuggestionIds:[]};
@@ -31,4 +31,13 @@ test('qualification score increases are flagged without new evidence',()=>{
  const before={presentation:40,evidenceCoverage:30,qualifications:30,missingRequired:[],explanation:'before'};
  const after={...before,presentation:60,evidenceCoverage:55,qualifications:40};
  assert.equal(compareScores(before,after).warning,'QUALIFICATION_CHANGE_REQUIRES_NEW_VERIFIED_EVIDENCE');
+});
+
+test('manual edit is bounded, immutable and may be re-optimized',()=>{
+ const edited=editResumeBlock(version,'experience-0','真实参与门店客户邀约');
+ assert.equal(edited.blocks[0].text,'真实参与门店客户邀约');
+ assert.equal(version.blocks[0].text,'负责门店日常运营');
+ assert.throws(()=>editResumeBlock(version,'invalid-id','测试'),/UNKNOWN_RESUME_BLOCK/);
+ assert.throws(()=>editResumeBlock(version,'experience-0',''),/INVALID_BLOCK_TEXT/);
+ assert.throws(()=>editResumeBlock(version,'experience-0','x'.repeat(1601)),/INVALID_BLOCK_TEXT/);
 });
