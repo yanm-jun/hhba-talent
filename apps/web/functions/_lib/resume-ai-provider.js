@@ -18,8 +18,12 @@ export function selectProvider(env,task='resume_optimization'){
  const requested=clip(env?.['HHBA_AI_'+task.toUpperCase()+'_PROVIDER']||env?.HHBA_AI_DEFAULT_PROVIDER||'deepseek',30).toLowerCase();
  if(!allowedKeys.has(requested))throw new Error('AI_PROVIDER_UNSUPPORTED');
  const prefix='HHBA_AI_'+requested.toUpperCase()+'_';
- const key=env?.[prefix+'API_KEY'];
- const model=env?.[prefix+'MODEL'];
+ // For the existing HHBA DeepSeek integration, reuse the server-side secret
+ // instead of requiring the founder to duplicate sensitive credentials.
+ const key=env?.[prefix+'API_KEY']||(requested==='deepseek'?env?.HHBA_MATCH_DEEPSEEK_KEY:null);
+ // "deepseek-chat"/"deepseek-reasoner" were retired in 2026: use the current
+ // non-thinking Flash model by default, always allowing explicit override.
+ const model=env?.[prefix+'MODEL']||(requested==='deepseek'?'deepseek-flash':null);
  if(typeof key!=='string'||!key.trim()||typeof model!=='string'||!model.trim())throw new Error('AI_PROVIDER_NOT_CONFIGURED');
  return {name:requested,...PROVIDERS[requested],key,model:model.trim()};
 }
@@ -48,7 +52,7 @@ export async function generateSuggestions({env,blocks,job,signal}){
  }else{
   url=provider.baseUrl+'/chat/completions';
   headers={'content-type':'application/json',authorization:'Bearer '+provider.key};
-  body={model:provider.model,messages:[{role:'system',content:system},{role:'user',content:input}],...(provider.name==='openai'?{max_completion_tokens:2200}:{max_tokens:2200})};
+  body={model:provider.model,messages:[{role:'system',content:system},{role:'user',content:input}],...(provider.name==='openai'?{max_completion_tokens:2200}:{max_tokens:2200}),...(provider.name==='deepseek'?{response_format:{type:'json_object'},thinking:{type:'disabled'}}:{})};
  }
  const response=await fetch(url,{method:'POST',headers,body:JSON.stringify(body),signal,redirect:'error'});
  if(!response.ok)throw new Error('AI_PROVIDER_REQUEST_FAILED');
