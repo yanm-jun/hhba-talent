@@ -5,7 +5,7 @@ import {fetchPrivateResumeForLocalReview,downloadPrivateResume} from '../service
 import {extractDocxText} from '../services/docxProfile.mjs';
 import {matchVisualRegionsToPdfPage,type VerifiedResumeAnchor} from '../services/resumeVisualAnchors.mjs';
 import {planInlinePdfPreview,whitePdfPatchBackground} from '../services/resumeInlinePdfPreview.mjs';
-import {createOriginalPdfReviewCopy,downloadOriginalPdfReviewCopy} from '../services/resumePdfReviewCopy.mjs';
+import {createOriginalPdfSearchableCopy,downloadOriginalPdfSearchableCopy} from '../services/resumePdfReviewCopy.mjs';
 import {visualEditingReady,analyzeVisualResume,listPageResumeEdits,savePageResumeEdits,
  type VisualResumeLayout,type PageResumeEdit} from '../services/resumeVisualEditingApi';
 import '../styles/original-resume-viewer.css';
@@ -203,10 +203,10 @@ export function OriginalResumeViewer({resume,onClose}:{
   if(exporting||!layout||!changes.length||!pdfDocument.current)return;
   setExporting(true);setMessage('');
   try{
-   const output=await createOriginalPdfReviewCopy({
+   const output=await createOriginalPdfSearchableCopy({
     document:pdfDocument.current,layout,changes
    });
-   downloadOriginalPdfReviewCopy(output,resume.name);
+   downloadOriginalPdfSearchableCopy(output,resume.name);
   }catch(error){
    const code=error instanceof Error?error.message:'';
    const notice=code==='REVIEW_PAGE_LIMIT'?'页数较多，暂时不能生成完整修改稿。':
@@ -313,8 +313,8 @@ export function OriginalResumeViewer({resume,onClose}:{
     <div className="hhba-original-resume-review-export">
      <button type="button" disabled={exporting||saving}
       onClick={()=>void downloadReviewPdf()}>
-      <Download size={14}/>{exporting?'正在生成…':'下载修改预览'}</button>
-     <span>仅供检查效果，文字无法选中，不建议直接投递。</span>
+      <Download size={14}/>{exporting?'正在生成…':'下载 PDF'}</button>
+     <span>可搜索和复制文字；复杂排版与招聘系统兼容性仍需核对。</span>
     </div>
    </>}
    {message&&<p className="hhba-original-resume-note" role="status">{message}</p>}
