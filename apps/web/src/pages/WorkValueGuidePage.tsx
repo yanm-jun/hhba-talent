@@ -23,7 +23,7 @@ function matchesTip(tip:(typeof GUIDE_TIPS)[number],needle:string){
 }
 const values=['全部','钱','时间','岗位','权益','健康','安全'];
 export function WorkValueGuidePage({user}:{user:User|null}){
- const [query,setQuery]=useState('');
+ const [query,setQuery]=useState(()=>{const id=new URLSearchParams(window.location.search).get('tip');return GUIDE_TIPS.find(t=>t.id===id)?.title||'';});
  const [stage,setStage]=useState<'all'|GuideStage>('all');
  const [value,setValue]=useState('全部');
  const [maxTime,setMaxTime]=useState('全部');
