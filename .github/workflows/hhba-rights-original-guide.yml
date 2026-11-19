@@ -14,6 +14,7 @@ on:
       - 'apps/web/src/components/Shell.tsx'
       - 'apps/web/src/services/siteSearchIndex.ts'
       - 'apps/web/scripts/hhba-rights-guide.contract.test.mjs'
+      - 'apps/web/scripts/hhba-rights-guide-v2.contract.test.mjs'
       - 'apps/web/scripts/audit-labor-rights-topics.mjs'
       - '.github/workflows/hhba-rights-original-guide.yml'
   workflow_dispatch:
@@ -39,7 +40,7 @@ jobs:
       - name: Test 200 guide entries, twenty knowledge topics and safe local search
         working-directory: apps/web
         run: |
-          node --test scripts/hhba-rights-guide.contract.test.mjs \
+          node --test scripts/hhba-rights-guide-v2.contract.test.mjs \
             scripts/home-workplace-promise.contract.test.mjs \
             scripts/membership-rules.contract.test.mjs \
             scripts/site-search.contract.test.mjs
