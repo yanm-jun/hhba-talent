@@ -17,9 +17,7 @@
         "工资拖欠"
       ],
       "primary": "unpaid-wages",
-      "subtopics": [
-        "payroll-deductions"
-      ]
+      "subtopics": []
     },
     {
       "id": "deduction",
