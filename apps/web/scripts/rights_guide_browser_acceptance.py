@@ -183,8 +183,11 @@ with sync_playwright() as playwright:
 
         page.get_by_role("button", name="离职与跳槽", exact=True).click()
         assert "找到 25 条" in page.locator(".hhba-vguide-result-head").inner_text()
-        assert page.locator(".hhba-vguide-card").count() == 24
+        # Filtering updates the results first; the 24-card display cap resets in a React effect.
+        # Wait for that effect rather than testing the transient 25-card render.
+        page.wait_for_function("document.querySelectorAll('.hhba-vguide-card').length === 24", timeout=10000)
         page.get_by_role("button", name="全部阶段", exact=True).click()
+        page.wait_for_function("document.querySelectorAll('.hhba-vguide-card').length === 24", timeout=10000)
 
         checkbox = page.locator(".hhba-vguide-card").first.locator('input[type="checkbox"]')
         checkbox.check()
