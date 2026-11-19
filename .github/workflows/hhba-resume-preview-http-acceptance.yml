@@ -1,0 +1,32 @@
+name: HHBA Resume Preview HTTP Acceptance
+on:
+  push:
+    branches:
+      - feature/resume-targeted-optimization-foundation-20261119
+    paths:
+      - '.github/workflows/hhba-resume-preview-http-acceptance.yml'
+      - 'apps/web/scripts/resume-preview-http.qa.mjs'
+  workflow_dispatch:
+    inputs:
+      preview_url:
+        description: 'Exact immutable successful Cloudflare Pages Preview URL'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  remote-http-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Safe, read-only endpoints and anonymous access control
+        env:
+          HHBA_PREVIEW_URL: ${{ inputs.preview_url || 'https://614a665f.hhba-talent.pages.dev' }}
+        run: node scripts/resume-preview-http.qa.mjs
