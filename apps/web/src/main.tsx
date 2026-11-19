@@ -130,6 +130,7 @@ const PhoneAuthPage=lazy(()=>import('./pages/PhoneAuthPage').then(module=>({defa
 const OfficialRecruitmentContinuePage=lazy(()=>import('./pages/OfficialRecruitmentContinuePage').then(module=>({default:module.OfficialRecruitmentContinuePage})));
 const PersonalCenterPage=lazy(()=>import('./pages/PersonalCenterPage').then(module=>({default:module.PersonalCenterPage})));
 const LegalAidLandingPage=lazy(()=>import('./pages/LegalAidLandingPage').then(module=>({default:module.LegalAidLandingPage})));
+const WorkValueGuidePage=lazy(()=>import('./pages/WorkValueGuidePage').then(module=>({default:module.WorkValueGuidePage})));
 const LegalAidInterventionPage=lazy(()=>import('./pages/LegalAidInterventionPage').then(module=>({default:module.LegalAidInterventionPage})));
 const LegalAidTopicPage=lazy(()=>import('./pages/LegalAidTopicPage').then(module=>({default:module.LegalAidTopicPage})));
 const WorkspacePage=lazy(()=>import('./pages/WorkspacePage').then(module=>({default:module.WorkspacePage})));
@@ -179,6 +180,7 @@ const logout=async()=>{
     /^\/candidate\/employer-jobs\/[a-fA-F0-9-]{36}$/.test(route))
    return <SiteNotFoundPage user={user}/>;
  if(route==='/rights')return <WorkplaceRightsPage user={user}/>;
+ if(route==='/rights/guide')return <WorkValueGuidePage user={user}/>;
  if(route==='/rights/knowledge')return <LegalAidLandingPage user={user}/>;
  if(route==='/rights/support')return <LegalAidInterventionPage user={user}/>;
  if(/^\/rights\/knowledge\/[a-z-]{5,60}$/.test(route))return <LegalAidTopicPage user={user} slug={route.split('/').pop()!}/>;
