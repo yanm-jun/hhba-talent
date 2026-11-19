@@ -216,6 +216,34 @@ export async function editOriginalDocxStrict(raw,edits){
  }
  return bytes;
 }
+// Only this gated entry point may be wired to the user-facing "下载 Word".
+// A trusted server-side Word renderer must confirm that old and new pages
+// have unchanged geometry outside the modified text. DO NOT substitute an
+// optimistic model score, a mocked front-end flag or ZIP validation for proof.
+export async function prepareVerifiedOriginalDocxExport({
+ original,edits,verifyLayout
+}){
+ requireValue(typeof verifyLayout==='function','WORD_RENDERER_REQUIRED');
+ requireValue(Array.isArray(edits)&&edits.length===1,'WORD_LAYOUT_NOT_VERIFIED');
+ const docx=await editOriginalDocxStrict(original,edits);
+ let report;
+ try{
+  report=await verifyLayout({
+   original:u8(original),edited:docx,
+   oldText:edits[0].original,newText:edits[0].text
+  });
+ }catch{fail('WORD_LAYOUT_NOT_VERIFIED');}
+ requireValue(report?.passed===true&&
+  Number.isInteger(report.page_count)&&report.page_count>=1&&
+  report.page_count<=20&&
+  Number.isInteger(report.changed_pixels)&&report.changed_pixels>=5&&
+  Number.isInteger(report.changed_region?.page)&&
+  report.changed_region.page>=1&&
+  report.changed_region.page<=report.page_count,
+  'WORD_LAYOUT_NOT_VERIFIED');
+ return {bytes:docx,verified:true,pageCount:report.page_count};
+}
+
 export async function inspectOriginalDocxStrict(raw){
  const pkg=readPackage(raw),entry=pkg.entries.find(e=>e.name==='word/document.xml');
  const originalXml=dec.decode(await xmlBytes(pkg,entry));
