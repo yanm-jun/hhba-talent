@@ -1,6 +1,7 @@
 // Candidate-only same-JD V2 ranking reassessment. No generative AI calls.
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
 import {validatedAuditedJob,validReassessmentInput,sameEngineReassessment} from '../_lib/resume-reassessment.js';
+import {validatedCachedOfficialJob} from '../_lib/official-job-evidence.js';
 const LIMIT_BYTES=44000,PER_ACCOUNT=12,GLOBAL=400;
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store',
@@ -73,19 +74,26 @@ export async function onRequestPost({request,env}){
  let input;
  try{input=await readBody(request);}catch{return bad('INVALID_REASSESSMENT_INPUT',400);}
  if(!validReassessmentInput(input))return bad('INVALID_REASSESSMENT_INPUT',400);
+ let job;
+ try{
+  if(/^verified-official-[a-f0-9]{32}$/.test(input.job_id)){
+   const row=await db.prepare('SELECT * FROM hhba_official_job_evidence WHERE id=?')
+    .bind(input.job_id).first();
+   job=await validatedCachedOfficialJob(row);
+  }else{
+   const sources=await officialSources(env,new URL(request.url).origin);
+   job=validatedAuditedJob(sources,input.job_id);
+  }
+ }catch{return bad('REASSESSMENT_SOURCE_UNAVAILABLE',503);}
+ if(!job)return bad('AUDITED_JOB_NOT_AVAILABLE',422);
  let identity;
  try{identity=await sha256Hex(env.HHBA_MATCH_LIMIT_PEPPER+':reassess:'+session.phone);
   if(!await reserve(db,identity))return bad('REASSESSMENT_LIMIT',429);
  }catch{return bad('REASSESSMENT_DB_NOT_READY',503);}
  try{
-  const sources=await officialSources(env,new URL(request.url).origin);
-  const job=validatedAuditedJob(sources,input.job_id);
-  if(!job)return bad('AUDITED_JOB_NOT_AVAILABLE',422);
   const result=sameEngineReassessment(job,input.profile,input.before_blocks,input.after_blocks);
   return json({ok:true,kind:'HHBA_RESUME_REASSESS_V2',job_id:job.id,
    verified_job_title:job.title,verified_company:job.company,
-   job_snapshot_updated_at:job.updated_at,...result});
- }catch{
-  return bad('REASSESSMENT_SOURCE_UNAVAILABLE',503);
- }
+   job_snapshot_updated_at:job.updated_at,source_label:job.source_label||'已核验的中国大陆官方 ATS 快照',...result});
+ }catch{return bad('REASSESSMENT_SOURCE_UNAVAILABLE',503);}
 }
