@@ -1,4 +1,4 @@
-/* HHBA homepage section: lightweight value strip, one membership feature card, one compact 60/40 pledge. */
+/* HHBA homepage editorial resources and compact brand commitment. */
 /* Scoped to the existing homepage; original recruitment and navigation modules are unchanged. */
 .hhba-public-hero h1{max-width:900px;margin:0 auto;font-size:clamp(31px,4vw,42px);line-height:1.2;letter-spacing:-1.15px}
 .hhba-home-brand-slogan{font-size:12px!important;line-height:1.5!important;letter-spacing:.08em;color:#60758F!important;margin:0 auto 7px!important}
@@ -18,68 +18,43 @@
 .hhba-home-workplace-heading h2{margin:0;color:#102A5A;font-size:clamp(27px,3.2vw,36px);line-height:1.3;letter-spacing:-1px;font-weight:800}
 .hhba-home-workplace-heading>p{margin:10px auto 0;color:#60758F;font-size:14px;line-height:1.75}
 
-.hhba-home-member-highlights{display:flex;align-items:center;gap:12px 27px;flex-wrap:wrap;margin:17px 0 0;padding:0;list-style:none}
-.hhba-home-member-highlights li{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;font-size:12px;font-weight:650;color:#60758F}
-.hhba-home-member-highlights svg{flex:none;color:#1373FA}
-.hhba-home-membership-card{position:relative;overflow:hidden;isolation:isolate;min-width:0;padding:clamp(24px,3.4vw,38px);border:1px solid #E7F0FC;border-radius:22px;background:linear-gradient(130deg,#fff 0%,#fff 55%,#F7F9FD 100%);box-shadow:0 14px 42px rgba(16,42,90,.065)}
-.hhba-home-membership-card:before{content:'';position:absolute;z-index:-1;right:-100px;top:-135px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(197,219,248,.2),rgba(197,219,248,0) 67%);pointer-events:none}
-.hhba-home-member-head{display:flex;align-items:flex-start;justify-content:space-between;gap:28px}
-.hhba-home-member-intro{min-width:0;flex:1}
-.hhba-home-member-overline{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
-.hhba-home-status{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;padding:5px 10px;border-radius:999px;background:#E7F0FC;color:#60758F;font-size:11px;font-weight:650;letter-spacing:0}
-.hhba-home-member-intro h3{margin:15px 0 9px;color:#102A5A;font-size:clamp(22px,2.35vw,27px);letter-spacing:-.65px;line-height:1.35;font-weight:800}
-.hhba-home-member-intro>p{max-width:520px;margin:0;color:#60758F;font-size:13px;line-height:1.8}
-.hhba-home-price-block{text-align:right;flex:0 0 auto;padding-top:12px}
-.hhba-home-price{display:flex;align-items:baseline;justify-content:flex-end;gap:4px;margin:0;color:#125EBC;white-space:nowrap}
-.hhba-home-price>span{font-size:25px;font-weight:700}
-.hhba-home-price strong{font-size:clamp(34px,4vw,45px);font-weight:820;letter-spacing:-1.5px;line-height:1.1;font-variant-numeric:tabular-nums}
-.hhba-home-price small{padding-left:3px;color:#889BB0;font-size:13px}
-.hhba-home-price-block>p{margin:10px 0 0;color:#889BB0;font-size:12px}
 
-.hhba-home-phase-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:0;margin-top:18px;padding:23px 0;border-top:1px solid #E7F0FC;border-bottom:1px solid #E7F0FC}
-.hhba-home-stage{min-width:0;padding-right:30px}
-.hhba-home-stage-rights{border-left:1px solid #E7F0FC;padding-left:31px;padding-right:0}
-.hhba-home-stage-heading{display:flex;align-items:center;gap:12px}
-.hhba-home-stage-index{display:grid;place-items:center;flex:0 0 35px;width:35px;height:35px;border-radius:11px;background:#E7F0FC;color:#1373FA;font-size:12px;font-weight:800;letter-spacing:.03em}
-.hhba-home-stage-heading p{margin:0 0 3px;color:#889BB0;font-size:12px;line-height:1.4}
-.hhba-home-stage-heading h4{margin:0;font-size:17px;line-height:1.4;color:#125EBC;font-weight:750}
-.hhba-home-service-list{display:grid;gap:10px;margin:18px 0 0;padding:0;list-style:none}
-.hhba-home-service-list li{display:flex;gap:9px;align-items:flex-start;color:#60758F;font-size:13px;line-height:1.7}
-.hhba-home-service-list svg{flex:none;margin-top:3px;color:#1373FA}
-.hhba-home-member-footer{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:20px}
-.hhba-home-member-status{display:flex;align-items:center;gap:8px;color:#60758F;font-size:12px;line-height:1.7}
-.hhba-home-member-status svg{flex:0 0 auto;color:#60758F}
-.hhba-home-text-link{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;color:#125EBC;font-size:13px;font-weight:750;text-decoration:none}
-.hhba-home-text-link:hover{text-decoration:underline}
-.hhba-home-text-link:focus-visible,.hhba-home-service-notes summary:focus-visible,.hhba-home-report-details summary:focus-visible{outline:2px solid #125EBC;outline-offset:4px;border-radius:4px}
-.hhba-home-service-notes{margin-top:16px;color:#60758F}
-.hhba-home-service-notes summary,.hhba-home-report-details summary{display:inline-block;cursor:pointer;color:#60758F;font-size:12px;line-height:1.6;text-decoration:underline;text-decoration-color:#C5DBF8;text-underline-offset:3px}
-.hhba-home-service-notes p,.hhba-home-report-details p{max-width:920px;margin:9px 0 0;color:#60758F;font-size:12px;line-height:1.85}
-.hhba-home-service-notes summary::-webkit-details-marker,.hhba-home-report-details summary::-webkit-details-marker{display:none}
+/* Two meaningful products; each entire card is a focusable, accessible link. */
+.hhba-home-resources-panel{padding:clamp(24px,3.3vw,36px)}
+.hhba-home-resources-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.hhba-home-resources-header h3{margin:9px 0 0;color:#102A5A;font-size:clamp(19px,2.2vw,23px);line-height:1.35;letter-spacing:-.5px;font-weight:750}
+.hhba-home-resources-access{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;padding:7px 12px;border:1px solid #D7E7FA;border-radius:999px;background:#F2F7FF;color:#386B9D;font-size:11px;font-weight:700;white-space:nowrap}
+.hhba-home-resource-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.hhba-home-resource-card{display:flex;flex-direction:column;align-items:stretch;min-width:0;min-height:248px;padding:25px 26px 22px;border:1px solid #E1EAF7;border-radius:16px;background:linear-gradient(145deg,#fff 0%,#fff 57%,#F7FAFF 100%);color:#102A5A;text-decoration:none;transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease}
+.hhba-home-resource-card:hover{border-color:#BDD5F4;box-shadow:0 11px 28px rgba(16,42,90,.075);transform:translateY(-2px)}
+.hhba-home-resource-card:focus-visible{outline:3px solid #125EBC;outline-offset:3px}
+.hhba-home-resource-top{display:flex;align-items:center;justify-content:space-between;gap:15px}
+.hhba-home-resource-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex:0 0 44px;border:1px solid #DDE9F8;border-radius:12px;color:#125EBC;background:#F3F7FE}
+.hhba-home-resource-index{color:#94A6BB;font-size:10px;letter-spacing:.12em;font-weight:750;white-space:nowrap}
+.hhba-home-resource-card h4{margin:20px 0 8px;color:#102A5A;font-size:clamp(19px,2.2vw,22px);line-height:1.38;letter-spacing:-.5px;font-weight:800}
+.hhba-home-resource-card>p{margin:0;color:#60758F;font-size:13px;line-height:1.85}
+.hhba-home-resource-detail{display:block;color:#60758F;font-size:12px;line-height:1.6;margin-top:10px}
+.hhba-home-resource-action{display:inline-flex;align-items:center;align-self:flex-start;gap:7px;margin-top:auto;padding-top:19px;color:#125EBC;font-size:13px;font-weight:750}
+.hhba-home-resource-card:hover .hhba-home-resource-action svg{transform:translate(2px,-2px)}
+.hhba-home-resource-action svg{transition:transform .18s ease}
+.hhba-home-resources-note{display:flex;align-items:flex-start;gap:8px;margin-top:18px;color:#7388A0;font-size:11px;line-height:1.8}
+.hhba-home-resources-note svg{flex:0 0 auto;margin-top:2px;color:#6486B5}
 
-.hhba-home-pledge{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.92fr);gap:19px 34px;align-items:center;margin-top:14px;padding:25px 30px 17px;border:1px solid #E7F0FC;border-radius:17px;background:rgba(255,255,255,.79)}
-.hhba-home-pledge-intro{min-width:0}
-.hhba-home-pledge-intro h3{margin:9px 0 8px;color:#125EBC;font-size:clamp(18px,2vw,21px);line-height:1.45;letter-spacing:-.35px}
-.hhba-home-pledge-intro>p{margin:0;color:#60758F;font-size:12px;line-height:1.7}
-.hhba-home-pledge-visual{min-width:0}
-.hhba-home-distribution-values{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:12px}
-.hhba-home-distribution-values>div{display:flex;align-items:baseline;gap:9px;min-width:0}
-.hhba-home-distribution-values strong{font-size:29px;line-height:1.1;color:#125EBC;font-weight:800;letter-spacing:-.7px;font-variant-numeric:tabular-nums}
-.hhba-home-distribution-values>div+div strong{color:#1373FA}
-.hhba-home-distribution-values span{color:#365271;font-size:12px;line-height:1.5;font-weight:650}
-.hhba-home-distribution-bar{display:flex;overflow:hidden;height:8px;border-radius:999px;background:#E7F0FC}
-.hhba-home-distribution-company{display:block;background:#60758F}
-.hhba-home-distribution-workers{display:block;background:#C5DBF8}
-.hhba-home-pledge-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;grid-column:1/-1;padding-top:14px;border-top:1px solid #E7F0FC;font-size:12px;color:#60758F}
-.hhba-home-pledge-bottom>div{display:flex;align-items:center;gap:7px;min-width:0}
-.hhba-home-pledge-bottom svg{flex:0 0 auto;color:#60758F}
-.hhba-home-report-status{white-space:nowrap;color:#60758F}
-.hhba-home-report-details{grid-column:1/-1;margin-top:-10px}
+/* The pledge is a low-profile brand statement, not a pseudo-financial dashboard. */
+.hhba-home-pledge{display:flex;align-items:center;justify-content:space-between;gap:22px;margin-top:14px;padding:24px 29px;border:1px solid #E7F0FC;border-radius:17px;background:rgba(255,255,255,.81)}
+.hhba-home-pledge-intro{min-width:0;max-width:700px}
+.hhba-home-pledge-intro h3{margin:8px 0 6px;color:#102A5A;font-size:clamp(17px,1.8vw,20px);line-height:1.45;letter-spacing:-.38px}
+.hhba-home-pledge-intro>p{margin:0;color:#60758F;font-size:12px;line-height:1.75}
+.hhba-home-pledge-intro .hhba-home-pledge-meta{margin-top:5px;font-size:10px;color:#8A9BB0;line-height:1.65}
+.hhba-home-report-status{color:inherit}
+.hhba-home-transparency-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:0 0 auto;padding:11px 0;text-decoration:none;font-size:12px;font-weight:750;color:#125EBC;white-space:nowrap}
+.hhba-home-transparency-link:hover{text-decoration:underline;text-underline-offset:4px}
+.hhba-home-transparency-link:focus-visible{outline:2px solid #125EBC;outline-offset:4px;border-radius:4px}
 
 @media(max-width:930px){
  .hhba-public-entry-grid.hhba-home-entry-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .hhba-home-pledge{grid-template-columns:1fr;gap:18px}
- .hhba-home-pledge-bottom{margin-top:0}
+ .hhba-home-pledge{align-items:flex-start;flex-direction:column;gap:10px}
+ .hhba-home-transparency-link{padding:4px 0}
 }
 @media(max-width:680px){
  .hhba-public-hero h1{font-size:clamp(27px,7vw,34px);letter-spacing:-.8px}
@@ -88,47 +63,20 @@
  .hhba-home-workplace{margin:0 auto 30px;padding:33px 0 16px}
  .hhba-home-workplace-heading{margin-bottom:17px}
  .hhba-home-workplace-heading h2{font-size:28px}
- .hhba-home-membership-card{padding:21px 18px;border-radius:17px}
- .hhba-home-member-head{display:block}
- .hhba-home-member-intro h3{font-size:24px;margin:13px 0 6px}
- .hhba-home-member-intro>p{font-size:13px}
- .hhba-home-price-block{text-align:left;padding-top:17px}
- .hhba-home-price{justify-content:flex-start}
- .hhba-home-price strong{font-size:39px}
- .hhba-home-price-block>p{margin-top:4px}
- .hhba-home-member-highlights{gap:10px 14px;margin-top:16px}
- .hhba-home-member-highlights li{font-size:11px}
- .hhba-home-phase-grid{grid-template-columns:1fr;margin-top:18px;padding:16px 0}
- .hhba-home-stage{padding-right:0}
- .hhba-home-stage-rights{border-left:0;border-top:1px solid #E7F0FC;padding:19px 0 0;margin-top:20px}
- .hhba-home-stage-heading h4{font-size:16px}
- .hhba-home-service-list{margin-top:13px;gap:8px}
- .hhba-home-member-footer{align-items:flex-start;flex-direction:column;gap:9px;margin-top:16px}
- .hhba-home-pledge{padding:20px 18px 16px;border-radius:15px;gap:15px}
- .hhba-home-pledge-intro h3{font-size:19px}
- .hhba-home-distribution-values strong{font-size:27px}
- .hhba-home-pledge-bottom{flex-direction:column;align-items:flex-start;gap:6px}
- .hhba-home-report-details{margin-top:-5px}
+ .hhba-home-membership-card.hhba-home-resources-panel{padding:21px 18px;border-radius:17px}
+ .hhba-home-resources-header{align-items:flex-start;margin-bottom:16px}
+ .hhba-home-resources-header h3{font-size:19px}
+ .hhba-home-resources-access{padding:6px 9px;font-size:10px}
+ .hhba-home-resource-grid{grid-template-columns:1fr;gap:11px}
+ .hhba-home-resource-card{min-height:225px;padding:20px 20px 18px;border-radius:13px}
+ .hhba-home-resource-card h4{margin-top:17px;font-size:20px}
+ .hhba-home-resource-card>p{font-size:12px}
+ .hhba-home-pledge{padding:21px 18px;border-radius:15px}
+ .hhba-home-pledge-intro h3{font-size:18px}
 }
 @media(max-width:380px){
- .hhba-home-distribution-values{grid-template-columns:1fr;gap:9px}
- .hhba-home-price strong{font-size:36px}
+ .hhba-home-resources-header{flex-wrap:wrap}
 }
 @media(prefers-reduced-motion:reduce){
- .hhba-home-workplace *{scroll-behavior:auto!important}
+ .hhba-home-workplace *{scroll-behavior:auto!important;transition:none!important;transform:none!important}
 }
-
-/* The concise homepage label now navigates to the full public rules page. */
-.hhba-home-rules-link{display:inline-flex;align-items:center;gap:5px;margin-top:16px;color:#60758F;font-size:12px;line-height:1.6;text-decoration:underline;text-decoration-color:#C5DBF8;text-underline-offset:3px}
-.hhba-home-rules-link:hover{color:#125EBC;text-decoration-color:#125EBC}
-.hhba-home-rules-link:focus-visible{outline:2px solid #125EBC;outline-offset:4px;border-radius:4px}
-
-.hhba-home-transparency-link{display:inline-flex;align-items:center;gap:6px;margin-top:12px;color:#125EBC!important;font-size:12px;text-decoration:underline;text-decoration-color:#C5DBF8;text-underline-offset:4px}.hhba-home-transparency-link:hover{text-decoration-color:#125EBC}.hhba-home-transparency-link:focus-visible{outline:2px solid #1373FA;outline-offset:3px;border-radius:4px}
-
-/* Logo-derived blue/orange roles: company development and worker support stay distinct. */
-.hhba-home-price{color:var(--hhba-navy)}
-.hhba-home-distribution-values>div:first-child strong{color:var(--hhba-blue-deep)}
-.hhba-home-distribution-values>div+div strong{color:var(--hhba-orange-ink)}
-.hhba-home-distribution-company{background:var(--hhba-blue-deep)}
-.hhba-home-distribution-workers{background:var(--hhba-orange)}
-.hhba-home-stage-rights .hhba-home-stage-index{color:#A85A0A;background:#FFF2DF}
