@@ -106,7 +106,7 @@ export function WorkValueGuidePage({user}:{user:User|null}){
      <div className="hhba-vguide-card-meta"><span className="hhba-vguide-stage-label">{label}</span><span className="hhba-vguide-source-tag">HHBA 原创建议</span></div>
      <h3>{tip.title}</h3><p className="hhba-vguide-summary">{tip.summary}</p>
      <div className="hhba-vguide-tags"><span><Wallet size={13}/>免费阅读</span><span><Clock3 size={13}/>{tip.minutes}</span><span>行动难度：{tip.effort}</span><span>主要帮助：{tip.value}</span></div>
-     <details className="hhba-vguide-detail" key={tip.id+':'+selectedTipId} defaultOpen={tip.id===selectedTipId}>
+     <details className="hhba-vguide-detail" key={tip.id+':'+selectedTipId} open={tip.id===selectedTipId||undefined}>
       <summary>打开具体行动步骤 <ChevronDown size={17}/></summary>
       <ol>{tip.steps.map(step=><li key={step}>{step}</li>)}</ol>
       <div className="hhba-vguide-detail-footer">
