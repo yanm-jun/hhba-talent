@@ -41,7 +41,7 @@ export function OriginalResumeViewer({resume,onClose}:{
      data:new Uint8Array(buffer),isEvalSupported:false,
      enableXfa:false,disableAutoFetch:true,disableStream:true,
      stopAtErrors:true,useSystemFonts:false
-    });
+    } as any); // PDF.js v6 runtime safety flags are omitted from its published init typings.
     const doc=await pdfTask.promise;
     if(!active){await pdfTask.destroy();return;}
     pdfDocument.current=doc;setPageCount(doc.numPages);setStatus('ready');
