@@ -4,13 +4,15 @@ import type {ResumeBlock,ResumeSuggestion} from './targetedResumeOptimization';
 export type ResumeOptimizationStatus={
  kind:'HHBA_RESUME_OPTIMIZATION_V1';enabled:boolean;configured:boolean;
  per_account_daily_limit:number;global_daily_limit:number;
+ per_account_daily_attempt_limit?:number;global_daily_attempt_limit?:number;
 };
 const OPTIMIZATION_ERRORS:Record<string,string>={
   SESSION_INVALID:'当前登录已失效，请重新登录。',
   FORBIDDEN:'当前账户无权使用求职者简历优化。',
   RESUME_OPTIMIZATION_NOT_ENABLED:'简历 AI 润色服务尚未启用。',
   RESUME_OPTIMIZATION_DB_NOT_READY:'平台简历优化额度服务尚未准备好。',
-  RESUME_OPTIMIZATION_LIMIT:'今天的简历优化额度已使用完，请明天再试。',
+  RESUME_OPTIMIZATION_LIMIT:'今天成功生成简历建议的次数已达上限。',
+  RESUME_OPTIMIZATION_ATTEMPT_LIMIT:'今天的 AI 润色尝试次数已达安全上限，请明天再试。',
   AI_PROVIDER_NOT_CONFIGURED:'后台尚未配置简历润色 AI 模型。',
   INVALID_OPTIMIZATION_INPUT:'简历证据不完整，请先完成简历解析。',
   AI_OPTIMIZATION_UNAVAILABLE:'AI 润色暂时失败，未修改简历。',
