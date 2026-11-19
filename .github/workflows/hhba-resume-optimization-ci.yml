@@ -47,6 +47,8 @@ on:
       - 'apps/web/scripts/resume-visual-anchors.*'
       - 'apps/web/scripts/resume-inline-pdf-preview.*'
       - 'apps/web/src/services/resumeInlinePdfPreview.*'
+      - 'apps/web/src/services/resumePdfReviewCopy.*'
+      - 'apps/web/scripts/resume-pdf-review-copy.*'
       - 'apps/web/scripts/resume-page-edits.*'
       - 'apps/web/src/services/resumeVisualAnchors.*'
       - 'apps/web/src/services/resumeVisualEditingApi.ts'
@@ -75,7 +77,7 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - name: Test opt-in, auth, quota, and provider parser
         working-directory: apps/web
-        run: node --test --experimental-strip-types scripts/resume-optimization.provider.test.mjs scripts/resume-optimization.route.test.mjs scripts/resume-optimization.domain.test.mjs scripts/resume-versions.route.test.mjs scripts/resume-evidence-visibility.test.mjs scripts/resume-document.contract.test.mjs scripts/resume-docx.contract.test.mjs scripts/resume-vision-layout.contract.test.mjs scripts/resume-layout.route.test.mjs scripts/resume-visual-anchors.contract.test.mjs scripts/resume-inline-pdf-preview.contract.test.mjs scripts/resume-page-edits.route.test.mjs scripts/resume-reassessment.domain.test.mjs scripts/resume-reassessment.route.test.mjs scripts/resume-optimization.main-flow.test.mjs scripts/official-job-evidence.contract.test.mjs scripts/official-job-verify.route.test.mjs
+        run: node --test --experimental-strip-types scripts/resume-optimization.provider.test.mjs scripts/resume-optimization.route.test.mjs scripts/resume-optimization.domain.test.mjs scripts/resume-versions.route.test.mjs scripts/resume-evidence-visibility.test.mjs scripts/resume-document.contract.test.mjs scripts/resume-docx.contract.test.mjs scripts/resume-vision-layout.contract.test.mjs scripts/resume-layout.route.test.mjs scripts/resume-visual-anchors.contract.test.mjs scripts/resume-inline-pdf-preview.contract.test.mjs scripts/resume-pdf-review-copy.contract.test.mjs scripts/resume-page-edits.route.test.mjs scripts/resume-reassessment.domain.test.mjs scripts/resume-reassessment.route.test.mjs scripts/resume-optimization.main-flow.test.mjs scripts/official-job-evidence.contract.test.mjs scripts/official-job-verify.route.test.mjs
       - name: Real login and D1 SQLite authenticated resume integration
         working-directory: apps/web
         run: node --experimental-sqlite --test scripts/resume-authenticated-sqlite.e2e.test.mjs
