@@ -38,7 +38,7 @@ test('HHBA guide V2 has 200 actionable entries evenly distributed across eight s
 test('editorial guide retains full search, advanced filters, deep links and browser-only progress',()=>{
  for(const marker of [
   "matchesTip(tip,query)","maxTime==='全部'","onlyPending",
-  "GUIDE_STAGES.map((s,i)=>","tip.steps.map((step,i)=>",
+  "GUIDE_STAGES.map((s,i)=>","selectedTip.steps.map((step,i)=>",
   "localStorage.setItem(STORAGE_KEY","mark(selectedTip.id)",
   "setVisibleCount(8)","filtered.slice(0,visibleCount)",
   "to={'/rights/knowledge/'+selectedTip.topic}",
