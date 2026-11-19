@@ -1,19 +1,22 @@
-import {useEffect,useRef,type KeyboardEvent} from 'react';
+import {useEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,BriefcaseBusiness,MapPin,Wallet,X,Search} from 'lucide-react';
 import type {MatchResponse} from '../services/resumeMatch';
+import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
+import {TargetedResumeOptimization} from './TargetedResumeOptimization';
 import {Link} from '../router';
 import '../styles/resume-match-dialog.css';
 
 // Search-first evidence governs links; server scores and ranks. Never present a score as an offer probability.
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage}:{
+export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage,sourceText}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
-  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'>>;
- onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction
+  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'|'profile'>>;
+ onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction;sourceText?:string
 }){
  const ref=useRef<HTMLDivElement|null>(null);
+ const [optimizedJobId,setOptimizedJobId]=useState<string|null>(null);
  useEffect(()=>{
   const overflow=document.body.style.overflow;
   const trigger=document.activeElement instanceof HTMLElement?document.activeElement:null;
@@ -24,13 +27,26 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
   if(event.key==='Escape'){event.preventDefault();onClose();return}
   if(event.key!=='Tab'||!ref.current)return;
   const focusable=Array.from(ref.current.querySelectorAll<HTMLElement>(
-   'button:not([disabled]),a[href]'
+   'button:not([disabled]),a[href],input:not([disabled]),textarea:not([disabled]),select:not([disabled])'
   )).filter(el=>el.getClientRects().length>0);
   if(!focusable.length)return;
   const first=focusable[0],last=focusable[focusable.length-1];
   if(event.shiftKey&&(document.activeElement===first||document.activeElement===ref.current)){
    event.preventDefault();last.focus();
   }else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
+ }
+ const parsedProfile=result.profile?({
+  ...result.profile,experiences:[]
+ } as CandidateProfile):null;
+ function asTargetJob(job:MatchResponse['matches'][number]):JobMatch{
+  return {
+   id:job.id,company:job.company,title:job.title,title_zh:job.title_zh||null,
+   location:job.location,official_url:job.official_url,platform:job.platform,
+   remote:job.remote,reference_score:Number.isInteger(job.match_score)?job.match_score!:job.reference_score,
+   matched:job.matched||[],not_evidenced:job.not_evidenced||[],
+   needs_verification:job.needs_verification||[],
+   requirements_basis:job.requirements_basis||job.score_basis||''
+  };
  }
  return createPortal(
   <div className="hhba-match-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)onClose()}}>
@@ -91,6 +107,13 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
           <p className="hhba-native-score-basis"><strong>评分依据：</strong>{job.score_basis}</p>}
          <p className="hhba-native-reason"><strong>为什么推荐：</strong>
           {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
+         {!pending&&parsedProfile&&<div className="hhba-native-optimize-action">
+          <button type="button" onClick={()=>setOptimizedJobId(v=>v===job.id?null:job.id)}>
+           {optimizedJobId===job.id?'收起简历优化':'针对这个岗位优化简历'}
+          </button>
+          {optimizedJobId===job.id&&<TargetedResumeOptimization
+           key={job.id} profile={parsedProfile} job={asTargetJob(job)} sourceText={sourceText}/>}
+         </div>}
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
           data-hhba-recruitment-outbound="true">{job.recruitment_source_kind==='EMPLOYER_ATS'?
             '查看企业专属招聘系统岗位（请核验）':'查看企业招聘岗位页面（请核验）'} <ArrowUpRight size={15}/></a>
