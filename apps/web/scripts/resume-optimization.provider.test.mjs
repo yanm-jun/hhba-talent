@@ -80,3 +80,23 @@ test('DeepSeek HTTP failures are safely classified without exposing upstream bod
   }
  }finally{globalThis.fetch=prior;}
 });
+
+
+test('non-HTTP model failures identify the exact safe output validation stage',async()=>{
+ const env={HHBA_MATCH_DEEPSEEK_KEY:'synthetic-test-key'};
+ const blocks=[{id:'source-0',section:'summary',text:'参与门店工作'}];
+ const job={title:'门店运营',requirements:'日常工作与沟通'};
+ const cases=[
+  [{choices:[{finish_reason:'length',message:{content:'{"suggestions":['}}]},'AI_PROVIDER_RESPONSE_TRUNCATED'],
+  [{choices:[{finish_reason:'stop',message:{content:'    '}}]},'AI_PROVIDER_RESPONSE_EMPTY'],
+  [{choices:[{finish_reason:'stop',message:{content:'some prose instead of json'}}]},'AI_PROVIDER_RESPONSE_JSON_INVALID'],
+  [{choices:[{finish_reason:'stop',message:{content:'{"notSuggestions":[]}'}}]},'AI_PROVIDER_SUGGESTION_SCHEMA_INVALID']
+ ];
+ const original=globalThis.fetch;
+ try{
+  for(const [mock,expected] of cases){
+   globalThis.fetch=async()=>Response.json(mock);
+   await assert.rejects(()=>generateSuggestions({env,blocks,job}),e=>e.message===expected);
+  }
+ }finally{globalThis.fetch=original;}
+});
