@@ -19,7 +19,7 @@ async function reserve(db){
  const row=await db.prepare(
   "INSERT INTO hhba_resume_optimization_attempts(request_id,day_utc,account_hash,created_at) "+
   "SELECT ?,?,?,? WHERE (SELECT COUNT(*) FROM hhba_resume_optimization_attempts "+
-  "WHERE day_utc=? AND account_hash=?)<3"
+  "WHERE day_utc=? AND account_hash=?)<5"
  ).bind(crypto.randomUUID(),new Date().toISOString().slice(0,10),
   'hhba-preview-health-probe',new Date().toISOString(),
   new Date().toISOString().slice(0,10),'hhba-preview-health-probe').run();
@@ -35,7 +35,7 @@ export async function onRequestPost({request,env}){
  try{if(!await reserve(env.HHBA_PNVS_AUTH_DB))return send({ok:false,code:'PROBE_LIMIT'},429);}
  catch{return send({ok:false,code:'PROBE_DB_UNAVAILABLE'},503);}
  // Explicit synthetic-text generation, strictly limited by the same preview
- // global three-call diagnostic budget. No user resume or real job is supplied.
+ // global five-call diagnostic budget. No user resume or real job is supplied.
  if(new URL(request.url).searchParams.get('mode')==='synthetic'){
   try{
    const result=await generateSuggestions({env,
