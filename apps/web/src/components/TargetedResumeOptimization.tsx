@@ -1,9 +1,11 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2} from 'lucide-react';
+import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen} from 'lucide-react';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 import {getRealAuthToken,realAuthReady} from '../services/realAuth';
 import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimizationStatus} from '../services/resumeOptimizationApi';
 import {applySuggestion,validateSuggestion,type ResumeBlock,type ResumeSuggestion,type ResumeVersion} from '../services/targetedResumeOptimization';
+import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
+import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResumeVersion} from '../services/resumeVersionsApi';
 import '../styles/targeted-resume-optimization.css';
 
 export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfile;job:JobMatch}){
@@ -20,15 +22,56 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
  const [notice,setNotice]=useState('');
  const [busy,setBusy]=useState(false);
  const [status,setStatus]=useState<ResumeOptimizationStatus|null>(null);
+ const [saved,setSaved]=useState<SavedResumeVersion[]>([]);
+ const [storageReady,setStorageReady]=useState(false);
+ const [saving,setSaving]=useState(false);
  const active=useRef<AbortController|null>(null);
  useEffect(()=>{
   const abort=new AbortController();
   getResumeOptimizationStatus(abort.signal).then(setStatus);
   return ()=>{abort.abort();active.current?.abort();};
  },[]);
+ useEffect(()=>{
+  if(!realAuthReady||!getRealAuthToken())return;
+  let alive=true;
+  listResumeVersions(job.id).then(data=>{
+   if(alive){setSaved(data.items);setStorageReady(true);}
+  }).catch(()=>{if(alive)setStorageReady(false);});
+  return ()=>{alive=false;};
+ },[job.id]);
  const requirements=useMemo(()=>[
   job.requirements_basis,...job.matched,...job.not_evidenced,...job.needs_verification
  ].filter(Boolean).join('\n').slice(0,2500),[job]);
+ const criteria=useMemo(()=>[...job.matched,...job.not_evidenced], [job]);
+ const before=useMemo(()=>evidenceVisibility(criteria,blocks),[criteria,blocks]);
+ const after=useMemo(()=>evidenceVisibility(criteria,version.blocks),[criteria,version.blocks]);
+ async function persist(){
+  if(saving||version.acceptedSuggestionIds.length===0||!storageReady)return;
+  setSaving(true);setNotice('');
+  try{
+   await saveResumeVersion({id:job.id,title:job.title_zh||job.title,company:job.company},
+    version.blocks,version.acceptedSuggestionIds);
+   const data=await listResumeVersions(job.id);
+   setSaved(data.items);
+   setNotice('已保存本岗位专属简历版本到你的 HHBA 账户。');
+  }catch(err){setNotice(err instanceof Error?err.message:'保存失败，请重试。');}
+  finally{setSaving(false);}
+ }
+ function restore(item:SavedResumeVersion){
+  active.current?.abort();setBusy(false);
+  setVersion({id:item.id,targetJobId:job.id,blocks:item.version.blocks,
+   acceptedSuggestionIds:item.version.acceptedSuggestionIds});
+  setSuggestions([]);setIgnored([]);setConfirmed([]);
+  setNotice('已载入 '+new Date(item.created_at).toLocaleString()+' 的简历版本；没有修改原始简历。');
+ }
+ async function remove(item:SavedResumeVersion){
+  if(!window.confirm('确定删除此岗位的已保存简历版本吗？'))return;
+  try{
+   await deleteResumeVersion(item.id);
+   setSaved(previous=>previous.filter(v=>v.id!==item.id));
+   setNotice('已删除选中的云端简历版本。');
+  }catch(err){setNotice(err instanceof Error?err.message:'删除失败，请重试。');}
+ }
  async function generate(){
   if(!consent||!blocks.length||busy||!status?.enabled)return;
   setBusy(true);setNotice('');setSuggestions([]);setIgnored([]);setConfirmed([]);setVersion(initial());
@@ -110,6 +153,28 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
    })}
    {!version.blocks.length&&<p>未提取到可引用的工作或技能证据，请先完善原始简历。</p>}
   </div>
+  {before.score!==null&&<div className="targeted-resume-audit" aria-label="文字证据覆盖变化">
+   <div><small>优化前 · 要求文字覆盖</small><strong>{before.score}%</strong></div>
+   <span aria-hidden="true">→</span>
+   <div><small>当前版本 · 要求文字覆盖</small><strong>{after.score}%</strong></div>
+   <p>按现有岗位卡片列出的 {before.total} 条要求计算文字相似度，仅用于检查表达是否更清楚；不是岗位匹配分、任职资格判断或录用概率。需人工核实建议的事实依据。</p>
+   {after.missing.length>0&&<details><summary>仍未充分体现的要求（{after.missing.length}）</summary>
+    <ul>{after.missing.map((label,index)=><li key={index}>{label}</li>)}</ul></details>}
+  </div>}
+  <div className="targeted-resume-save">
+   <div><strong><FolderOpen size={16} aria-hidden="true"/> 我的岗位简历版本</strong>
+    <p>仅在你主动保存后，将当前已确认的文字片段保存在 HHBA 私人账号中；不保存原始 PDF/DOCX。</p></div>
+   {hasSession&&storageReady&&<button type="button" disabled={saving||version.acceptedSuggestionIds.length===0} onClick={persist}>
+    <Save size={14} aria-hidden="true"/>{saving?'保存中…':'保存当前版本'}</button>}
+   {hasSession&&!storageReady&&<span className="targeted-resume-unavailable">云端版本保存尚未开放或数据库未就绪</span>}
+  </div>
+  {saved.length>0&&<div className="targeted-resume-history">
+   {saved.map(item=><div key={item.id}>
+    <span>{new Date(item.created_at).toLocaleString()} · {item.version.acceptedSuggestionIds.length} 条已采纳</span>
+    <button type="button" onClick={()=>restore(item)}>载入</button>
+    <button type="button" onClick={()=>remove(item)}>删除</button>
+   </div>)}
+  </div>}
   <div className="targeted-resume-footer">
    <p><ShieldCheck size={14} aria-hidden="true"/> 岗位相关性参考：{job.reference_score}/100。润色后的匹配分须通过同一评分规则重新评估；本预览不虚报分数。</p>
    <button type="button" onClick={reset}><Undo2 size={14}/> 恢复原始预览</button>
