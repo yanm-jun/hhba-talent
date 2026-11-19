@@ -65,7 +65,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
      <div className="hhba-match-intro">
       <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> 智能推荐</span>
       <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
-      <p>分数仅供参考，不代表录用概率。岗位仅限中国大陆。{pending?'结果正在陆续生成，下方岗位可先查看。':'请在企业官网核实岗位是否仍然招聘。'}</p>
+      <p>适配分不是录用概率。只推荐中国大陆企业岗位，不提供第三方招聘平台链接。{pending?'结果正在陆续生成，下方岗位可先查看。':'请在企业官网核实岗位是否仍然招聘。'}</p>
      </div>
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {!pending&&result.history_status==='SAVED'&&<div className="hhba-match-history-confirm">
