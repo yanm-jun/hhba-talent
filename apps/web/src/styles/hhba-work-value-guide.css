@@ -130,3 +130,8 @@
 .hhba-v2-related a{display:inline-flex;gap:5px;align-items:center;text-decoration:none;color:#125EBC;font-size:12px;font-weight:700}
 .hhba-v2-related a:hover{text-decoration:underline}
 @media(max-width:650px){.hhba-knowledge-subtopic-grid,.hhba-v2-checklist{grid-template-columns:1fr}.hhba-knowledge-subtopics{margin-top:23px}}
+
+/* Progressive reading for the 200-article guide: keep the original card language. */
+.hhba-vguide-load-more{display:flex;justify-content:center;margin:26px auto 0}
+.hhba-vguide-load-more button{display:inline-flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;border:1px solid #C5DBF8;border-radius:999px;background:#fff;color:#125EBC;padding:12px 23px;font:inherit;font-size:13px;font-weight:700}
+.hhba-vguide-load-more button:hover,.hhba-vguide-load-more button:focus-visible{background:#EAF3FF;border-color:#125EBC;outline-offset:3px}
