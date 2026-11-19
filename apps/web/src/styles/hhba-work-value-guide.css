@@ -108,3 +108,25 @@
 .hhba-knowledge-no-match button{border:0;background:none;text-decoration:underline;color:#125EBC;cursor:pointer}
 .hhba-knowledge-notice{border-top:1px solid #E0EAF7;margin:24px 0 0;padding:15px 4px 5px;font-size:11px;line-height:1.9;color:#60758F}
 @media(max-width:650px){.hhba-rights-knowledge{padding:0 11px}.hhba-rights-knowledge .hhba-law-panel{padding:0 13px 11px}.hhba-rights-knowledge .hhba-law-topic-grid,.hhba-knowledge-action-list{grid-template-columns:1fr}.hhba-knowledge-guide{padding:17px 15px}.hhba-knowledge-guide strong{font-size:16px}.hhba-rights-knowledge .hhba-law-header{height:auto;min-height:58px;gap:7px;flex-wrap:wrap;padding:8px 0}}
+
+/* HHBA V2 original subtopics: no changes to main HHBA homepage styles. */
+.hhba-knowledge-subtopics{margin:30px 0 4px}
+.hhba-knowledge-subtopics-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.hhba-knowledge-subtopics-head h2{font-size:17px;line-height:1.45;color:#102A5A;margin:0;font-weight:780}
+.hhba-knowledge-subtopics-head>span{font-size:11px;color:#8394A8}
+.hhba-knowledge-subtopic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.hhba-knowledge-subtopic-card{border-radius:12px;border:1px solid #E0EAF7;background:#fff;padding:17px;display:flex;flex-direction:column;gap:8px;text-decoration:none}
+.hhba-knowledge-subtopic-card:hover,.hhba-knowledge-subtopic-card:focus-visible{background:#F7F9FD;border-color:#C5DBF8;outline-offset:2px}
+.hhba-knowledge-subtopic-card strong{color:#102A5A;font-size:13px}
+.hhba-knowledge-subtopic-card p{font-size:11px;color:#60758F;line-height:1.8;margin:0;flex:1}
+.hhba-knowledge-subtopic-card>span{display:inline-flex;gap:5px;align-items:center;color:#125EBC;font-size:11px;font-weight:700}
+.hhba-v2-checklist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.hhba-v2-checklist>div{display:flex;align-items:flex-start;gap:8px;border:1px solid #E0EAF7;border-radius:10px;padding:14px;font-size:12px;color:#365271;line-height:1.8}
+.hhba-v2-checklist svg{flex:none;color:#125EBC;margin-top:2px}
+.hhba-v2-related{border:1px solid #D8E6F9;border-radius:12px;padding:17px;background:#F7F9FD;display:flex;gap:12px;align-items:flex-start}
+.hhba-v2-related>svg{flex:none;color:#125EBC}
+.hhba-v2-related strong{font-size:13px;color:#102A5A}
+.hhba-v2-related p{font-size:12px;line-height:1.85;color:#60758F;margin:8px 0}
+.hhba-v2-related a{display:inline-flex;gap:5px;align-items:center;text-decoration:none;color:#125EBC;font-size:12px;font-weight:700}
+.hhba-v2-related a:hover{text-decoration:underline}
+@media(max-width:650px){.hhba-knowledge-subtopic-grid,.hhba-v2-checklist{grid-template-columns:1fr}.hhba-knowledge-subtopics{margin-top:23px}}
