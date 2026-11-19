@@ -32,52 +32,69 @@
  padding:10px 12px;margin:0 0 12px;border:1px solid #e2e4ed;background:#fff;border-radius:10px}
 .hhba-original-resume-start label{display:flex;align-items:flex-start;gap:7px;line-height:1.6;
  color:#58647a;font-size:12px;flex:1;min-width:0}
-.hhba-original-resume-start label input{margin-top:4px;flex:0 0 auto;accent-color:#6658aa}
+.hhba-original-resume-start label input{margin-top:4px;flex:0 0 auto;accent-color:#27445c}
 .hhba-original-resume-start button{display:inline-flex;align-items:center;gap:6px;border:0;
- background:#473c86;color:#fff;border-radius:8px;padding:9px 12px;white-space:nowrap;
+ background:#253448;color:#fff;border-radius:8px;padding:9px 12px;white-space:nowrap;
  font:inherit;font-size:12px;font-weight:650;cursor:pointer}
 .hhba-original-resume-start button:disabled{opacity:.5;cursor:not-allowed}
 .hhba-original-resume-page-frame{position:relative;flex:0 0 auto;max-width:100%}
-.hhba-original-resume-anchor{position:absolute;z-index:2;border:1px solid rgba(111,85,179,.65);
- background:rgba(145,113,218,.07);padding:0;min-width:20px;
+.hhba-original-resume-anchor{position:absolute;z-index:2;border:1px solid rgba(66,85,103,.5);
+ background:rgba(65,82,101,.065);padding:0;min-width:20px;
  min-height:14px;border-radius:3px;cursor:pointer;transition:border-color .15s ease,background .15s ease}
 .hhba-original-resume-anchor span{position:absolute;top:-20px;right:0;display:inline-flex;gap:3px;
  align-items:center;white-space:nowrap;font:600 10px/1.2 Arial,sans-serif;
- color:#fff;background:#6e5aac;border-radius:5px 5px 0 0;padding:4px 6px;
+ color:#fff;background:#36495c;border-radius:5px 5px 0 0;padding:4px 6px;
  opacity:.82;pointer-events:none}
 .hhba-original-resume-anchor.is-edited{border-color:#34786f;background:rgba(43,132,107,.08)}
 .hhba-original-resume-anchor.is-edited span{background:#34786f}
 .hhba-original-resume-anchor:hover,.hhba-original-resume-anchor:focus-visible{
- border-color:#5c399e;outline:2px solid rgba(121,92,209,.25);outline-offset:1px;
- background:rgba(130,95,210,.15)}
+ border-color:#455e78;outline:2px solid rgba(70,113,145,.22);outline-offset:1px;
+ background:rgba(82,118,146,.13)}
 .hhba-original-resume-anchor:hover span,.hhba-original-resume-anchor:focus-visible span{opacity:1}
-.hhba-original-resume-editbox{position:absolute;z-index:5;width:min(335px,92%);
- padding:14px;border:1px solid #d9d6eb;background:#fff;border-radius:12px;
- box-shadow:0 16px 44px rgba(25,38,70,.22);box-sizing:border-box;
- max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:9px}
+.hhba-original-resume-siri-stage{margin:6px 1px 10px}
+.hhba-original-resume-edit-glow{position:absolute;z-index:5;border-radius:13px;max-width:calc(100% - 18px)}
+.hhba-original-resume-editbox{position:relative;z-index:1;width:100%;
+ padding:11px 12px;border:1px solid #e3e8ee;background:#fff;border-radius:12px;
+ box-shadow:0 8px 23px rgba(29,43,64,.115);box-sizing:border-box;
+ max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:7px}
 .hhba-original-resume-editbox-title{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .hhba-original-resume-editbox-title strong{font-size:13px;color:#27334e}
 .hhba-original-resume-editbox-title button{border:0;background:none;color:#657188;cursor:pointer}
-.hhba-original-resume-editbox p{font-size:11px;color:#627086;margin:0;line-height:1.65;
- max-height:55px;overflow:hidden;overflow-wrap:anywhere}
 .hhba-original-resume-editbox textarea{width:100%;box-sizing:border-box;resize:vertical;
  border:1px solid #d9e0e9;border-radius:7px;padding:9px;font:inherit;
- color:#27334e;font-size:13px;line-height:1.65;min-height:82px}
+ color:#27334e;font-size:13px;line-height:1.55;min-height:70px}
 .hhba-original-resume-editbox label{font-size:11px;display:flex;align-items:center;
  gap:6px;color:#4d596b}
-.hhba-original-resume-editbox label input{accent-color:#6658aa}
+.hhba-original-resume-editbox label input{accent-color:#27445c}
 .hhba-original-resume-editbox-actions{display:flex;gap:8px}
 .hhba-original-resume-editbox-actions button{display:inline-flex;gap:5px;align-items:center;
  padding:8px 12px;background:#fff;color:#38455c;border:1px solid #dee3eb;
  border-radius:7px;font:inherit;font-size:12px;cursor:pointer}
-.hhba-original-resume-editbox-actions button:first-child{background:#473c86;color:#fff;border-color:#473c86}
+.hhba-original-resume-editbox-actions button:first-child{background:#253448;color:#fff;border-color:#253448}
 .hhba-original-resume-editbox-actions button:disabled{opacity:.5;cursor:not-allowed}
 @media(max-width:640px){
  .hhba-original-resume-start{align-items:stretch;flex-direction:column}
  .hhba-original-resume-start button{align-self:flex-end}
- .hhba-original-resume-editbox{padding:10px;max-height:310px}
+ .hhba-original-resume-editbox{padding:10px;max-height:265px}
  .hhba-original-resume-anchor span{font-size:9px;padding:3px 4px}
 }
 @media(prefers-reduced-motion:reduce){
  .hhba-original-resume-anchor{transition:none}
+}
+
+/* Keep interactive borders neutral; rainbow belongs to the Siri ambient
+   frame and popover, never a solid purple panel or filled primary button. */
+.hhba-original-resume-toolbar button:focus-visible,
+.hhba-original-resume-pages button:focus-visible,
+.hhba-original-resume-start button:focus-visible,
+.hhba-original-resume-editbox button:focus-visible,
+.hhba-original-resume-editbox textarea:focus-visible{
+ outline:2px solid #3c84a1;outline-offset:2px;
+}
+.hhba-original-resume-anchor:focus-visible{outline-color:rgba(36,126,161,.38)}
+@media print{
+ .hhba-original-resume-start,.hhba-original-resume-anchor,
+ .hhba-original-resume-edit-glow,.hhba-original-resume-pages{
+  display:none!important;
+ }
 }
