@@ -9,6 +9,7 @@ import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResum
 import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
 import {ResumePrintSheet} from './ResumePrintSheet';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
+import {officialJobVerifyStatus,verifyOfficialJob,type OfficialJobVerifyStatus,type OfficialVerifiedJob} from '../services/officialJobVerifyApi';
 import '../styles/targeted-resume-optimization.css';
 
 export function TargetedResumeOptimization({profile,job,sourceText}:{profile:CandidateProfile;job:JobMatch;sourceText?:string}){
@@ -34,6 +35,11 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
  const [busy,setBusy]=useState(false);
  const [status,setStatus]=useState<ResumeOptimizationStatus|null>(null);
  const [scoreStatus,setScoreStatus]=useState<ReassessmentStatus|null>(null);
+ const [verifyStatus,setVerifyStatus]=useState<OfficialJobVerifyStatus|null>(null);
+ const [verifiedJob,setVerifiedJob]=useState<OfficialVerifiedJob|null>(null);
+ const [consentVerify,setConsentVerify]=useState(false);
+ const [confirmedVerifiedJob,setConfirmedVerifiedJob]=useState(false);
+ const [verifying,setVerifying]=useState(false);
  const [scoreResult,setScoreResult]=useState<ReassessmentResult|null>(null);
  const [scoring,setScoring]=useState(false);
  const [confirmReassessment,setConfirmReassessment]=useState(false);
@@ -51,6 +57,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
   const abort=new AbortController();
   getResumeOptimizationStatus(abort.signal).then(setStatus);
   reassessmentStatus(abort.signal).then(setScoreStatus);
+  officialJobVerifyStatus(abort.signal).then(setVerifyStatus);
   return ()=>{abort.abort();active.current?.abort();};
  },[]);
  useEffect(()=>{
@@ -74,16 +81,30 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
  const before=useMemo(()=>evidenceVisibility(criteria,blocks),[criteria,blocks]);
  const after=useMemo(()=>evidenceVisibility(criteria,version.blocks),[criteria,version.blocks]);
  const hasAuditedAtsIdentity=/^(?:ashby|greenhouse|lever)-/.test(job.id);
+ const scoreJobId=hasAuditedAtsIdentity?job.id:
+  (verifiedJob&&confirmedVerifiedJob?verifiedJob.job_id:null);
+ const hasSupportedJob=Boolean(scoreJobId);
  const hasWordingChanges=useMemo(()=>version.blocks.some(block=>{
   const original=blocks.find(old=>old.id===block.id);
   return !original||original.text!==block.text;
  }),[version.blocks,blocks]);
  function invalidateScore(){setScoreResult(null);setConfirmReassessment(false);}
+ async function verifyEmployer(){
+  if(hasAuditedAtsIdentity||!verifyStatus?.enabled||verifying||!consentVerify)return;
+  setVerifying(true);setNotice('');setVerifiedJob(null);
+  setConfirmedVerifiedJob(false);invalidateScore();
+  try{
+   const verified=await verifyOfficialJob(job.official_url);
+   setVerifiedJob(verified);
+   setNotice('已从受支持的企业官网直接核验岗位详情。请核对下方岗位标题与企业，再确认用于复评。');
+  }catch(e){setNotice(e instanceof Error?e.message:'无法独立核验该岗位页面。');}
+  finally{setVerifying(false);}
+ }
  async function reassess(){
-  if(!scoreStatus?.enabled||!hasAuditedAtsIdentity||scoring||!hasWordingChanges||!confirmReassessment)return;
+  if(!scoreStatus?.enabled||!scoreJobId||scoring||!hasWordingChanges||!confirmReassessment)return;
   setScoring(true);setNotice('');setScoreResult(null);
   try{
-   const result=await reassessResume(job.id,profile,blocks,version.blocks);
+   const result=await reassessResume(scoreJobId,profile,blocks,version.blocks);
    setScoreResult(result);
    if(!result.supported)setNotice('此岗位未通过当前官方快照复评条件，未生成分数。');
    else setNotice('已使用同一版本的 V2 评分引擎对两个简历版本完成重新计算。');
@@ -278,17 +299,41 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
   <section className="targeted-resume-reassess" aria-label="岗位匹配评分复评">
    <div className="targeted-resume-reassess-heading">
     <div><strong>岗位匹配分重新评估</strong>
-     <p>仅支持具有最新官方审核快照的中国大陆 ATS 岗位。优化前后都使用 HHBA Match Ranking V2，不沿用旧卡片分数。</p></div>
-    {scoreStatus?.enabled&&<button type="button" onClick={reassess} disabled={!hasAuditedAtsIdentity||!hasWordingChanges||!confirmReassessment||scoring}>
+     <p>仅支持最新官方审核 ATS 快照，或经服务器直接读取并核验的指定企业官网岗位。前后都采用 HHBA Match Ranking V2，不沿用旧卡片分数。</p></div>
+    {scoreStatus?.enabled&&<button type="button" onClick={reassess} disabled={!hasSupportedJob||!hasWordingChanges||!confirmReassessment||scoring}>
      {scoring?'正在复评…':'重新计算匹配分'}</button>}
    </div>
+   {!hasAuditedAtsIdentity&&verifyStatus?.enabled&&
+    <div className="targeted-resume-verify">
+     <div><strong>独立核验企业官网岗位</strong>
+      <p>搜索式 AI 返回的岗位网址尚未由 HHBA 核实。仅支持严格白名单中的企业招聘详情链接，核验时由服务器访问对应官网，不会向企业发送你的简历。</p>
+     </div>
+     {!verifiedJob&&<label className="targeted-resume-confirm">
+      <input type="checkbox" checked={consentVerify} onChange={e=>setConsentVerify(e.target.checked)}/>
+      我理解此次仅核验公开职位页面，官网可能限制访问；网站无法取得合格任职要求时不会生成分数。
+     </label>}
+     {!verifiedJob&&<button type="button" disabled={!consentVerify||verifying} onClick={verifyEmployer}>
+      {verifying?'正在读取企业岗位…':'核验这个企业岗位'}
+     </button>}
+     {verifiedJob&&<div className="targeted-resume-verified-job">
+      <p><strong>已核验的官网岗位：</strong>{verifiedJob.company} · {verifiedJob.title} · {verifiedJob.location}</p>
+      <a href={verifiedJob.official_url} target="_blank" rel="noopener noreferrer">查看已核验职位详情</a>
+      <p>{verifiedJob.disclaimer}</p>
+      <label className="targeted-resume-confirm">
+       <input type="checkbox" checked={confirmedVerifiedJob}
+        onChange={e=>{setConfirmedVerifiedJob(e.target.checked);invalidateScore();}}/>
+       我确认这就是我要针对的岗位，并已核对企业名称、标题及工作地点。
+      </label>
+     </div>}
+    </div>}
    {!scoreStatus?.enabled&&<p className="targeted-resume-reassess-unavailable">V2 可信复评尚未开放，当前仍可使用文字证据覆盖检查。</p>}
    {scoreStatus?.enabled&&<label className="targeted-resume-confirm">
     <input type="checkbox" checked={confirmReassessment} onChange={e=>setConfirmReassessment(e.target.checked)}/>
     我确认本次简历改写均为真实情况，并同意 HHBA 在站内读取当前简历片段、对照官方岗位快照进行评分。此复评不会调用第三方生成式 AI。
    </label>}
-   {scoreStatus?.enabled&&!hasAuditedAtsIdentity&&<p className="targeted-resume-reassess-unavailable">此岗位来自当前搜索结果，尚未进入受信任的 ATS 审核快照；暂不支持同规则复评。</p>}
-   {scoreStatus?.enabled&&hasAuditedAtsIdentity&&!hasWordingChanges&&<p className="targeted-resume-reassess-unavailable">请先编辑或填充一条简历内容，才需要重新评分。</p>}
+   {scoreStatus?.enabled&&!hasAuditedAtsIdentity&&!hasSupportedJob&&
+    <p className="targeted-resume-reassess-unavailable">此岗位暂未形成可用于复评的可信官网 JD 快照。请先完成受支持企业的独立核验；不支持的招聘站仍只能进行文字润色与证据覆盖比较。</p>}
+   {scoreStatus?.enabled&&hasSupportedJob&&!hasWordingChanges&&<p className="targeted-resume-reassess-unavailable">请先编辑或填充一条简历内容，才需要重新评分。</p>}
    {scoreResult?.supported&&typeof scoreResult.original_score==='number'&&typeof scoreResult.updated_score==='number'&&
     <div className="targeted-resume-score-comparison">
      <div><small>修改前 · V2 复评基准</small><strong>{scoreResult.original_score}<span>/100</span></strong></div>
