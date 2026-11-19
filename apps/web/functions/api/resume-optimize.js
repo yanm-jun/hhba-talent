@@ -58,7 +58,12 @@ async function reserve(db,hash){
   '(SELECT COUNT(*) FROM hhba_resume_optimization_requests WHERE day_utc=?)<? AND '+
   '(SELECT COUNT(*) FROM hhba_resume_optimization_requests WHERE day_utc=? AND account_hash=?)<?'
  ).bind(id,day,hash,time,day,MAX_GLOBAL,day,hash,MAX_PERSONAL).run();
- return row?.success===true&&row?.meta?.changes===1;
+ return row?.success===true&&row?.meta?.changes===1?id:null;
+}
+async function releaseFailedRequest(db,requestId,hash){
+ if(!requestId)return;
+ await db.prepare('DELETE FROM hhba_resume_optimization_requests WHERE request_id=? AND account_hash=?')
+  .bind(requestId,hash).run();
 }
 export async function onRequestGet({env}){
  let configured=false;
@@ -82,7 +87,8 @@ export async function onRequestPost({request,env}){
  try{input=await readSmallJson(request);}catch{return fail('INVALID_REQUEST',400);}
  if(!valid(input))return fail('INVALID_OPTIMIZATION_INPUT',400);
  const hash=await sha256Hex(env.HHBA_MATCH_LIMIT_PEPPER+':resume-opt:'+session.phone);
- try{if(!await reserve(db,hash))return fail('RESUME_OPTIMIZATION_LIMIT',429);}
+ let requestId;
+ try{requestId=await reserve(db,hash);if(!requestId)return fail('RESUME_OPTIMIZATION_LIMIT',429);}
  catch{return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);}
  // Mask common contact identifiers before third-party processing.
  const blocks=input.blocks.map(b=>({id:b.id,section:b.section,text:redact(b.text)}));
@@ -104,6 +110,9 @@ export async function onRequestPost({request,env}){
    'AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR',
    'AI_PROVIDER_TIMEOUT','AI_PROVIDER_RESPONSE_INVALID']);
   const code=allowed.has(error?.message)?error.message:'AI_OPTIMIZATION_UNAVAILABLE';
+  // A failed model call must not use up a candidate's limited daily
+  // successful-optimization allowance. Keep an atomic reservation until result.
+  try{await releaseFailedRequest(db,requestId,hash);}catch{console.warn('HHBA_RESUME_OPT_QUOTA_RELEASE_FAILED');}
   console.warn('HHBA_RESUME_OPTIMIZATION_FAILED',code);
   return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:
    code==='AI_PROVIDER_NOT_CONFIGURED'?503:502);
