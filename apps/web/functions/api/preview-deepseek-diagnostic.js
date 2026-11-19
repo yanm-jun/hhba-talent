@@ -1,7 +1,7 @@
 // Preview-only, opt-in, zero-generation-cost diagnostic. This endpoint is OFF
 // unless the short-lived Preview flag is explicitly enabled by an operator.
 // It never returns API credentials, account balances or upstream response text.
-import {selectProvider} from '../_lib/resume-ai-provider.js';
+import {selectProvider,generateSuggestions} from '../_lib/resume-ai-provider.js';
 const KIND='HHBA_PREVIEW_DEEPSEEK_DIAGNOSTIC_V1';
 const send=(result,status=200)=>new Response(JSON.stringify({kind:KIND,...result}),{
  status,headers:{'Content-Type':'application/json; charset=utf-8',
@@ -34,6 +34,25 @@ export async function onRequestPost({request,env}){
  if(provider.name!=='deepseek')return send({ok:false,code:'PROVIDER_NOT_DEEPSEEK'},409);
  try{if(!await reserve(env.HHBA_PNVS_AUTH_DB))return send({ok:false,code:'PROBE_LIMIT'},429);}
  catch{return send({ok:false,code:'PROBE_DB_UNAVAILABLE'},503);}
+ // Explicit synthetic-text generation, strictly limited by the same preview
+ // global three-call diagnostic budget. No user resume or real job is supplied.
+ if(new URL(request.url).searchParams.get('mode')==='synthetic'){
+  try{
+   const result=await generateSuggestions({env,
+    blocks:[{id:'qa-source',section:'experience',
+     text:'参与某示例门店的客户预约与运营记录整理，不包含任何具体业绩数字。'}],
+    job:{title:'门店运营助理',requirements:'客户沟通、门店运营、记录整理'},
+    signal:AbortSignal.timeout(25000)});
+   return send({ok:true,code:'SYNTHETIC_AI_GENERATION_OK',
+    suggestion_count:result.suggestions.length});
+  }catch(error){
+   const allowed=new Set(['AI_PROVIDER_KEY_REJECTED',
+    'AI_PROVIDER_BALANCE_INSUFFICIENT','AI_PROVIDER_RATE_LIMITED',
+    'AI_PROVIDER_REQUEST_REJECTED','AI_PROVIDER_UPSTREAM_ERROR',
+    'AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RESPONSE_INVALID']);
+   return send({ok:false,code:allowed.has(error?.message)?error.message:'SYNTHETIC_AI_GENERATION_FAILED'},200);
+  }
+ }
  let response;
  try{
   response=await fetch('https://api.deepseek.com/user/balance',{
