@@ -27,29 +27,29 @@
  .hhba-print-experience-top{flex-direction:column;gap:0}
 }
 @page {size:A4;margin:14mm 13mm}
+/* A separate body-level portal is the ONLY element permitted to print.
+   Hidden application/modals must not take up pages or clip the resume. */
+.hhba-print-host{display:none}
 @media print{
- body *{visibility:hidden!important}
- .hhba-print-sheet,.hhba-print-sheet *{visibility:visible!important}
- .hhba-print-sheet{position:absolute;top:0;left:0;width:100%;max-width:none;
-  margin:0;padding:0;border:0;box-shadow:none;font-size:11pt;color:#111}
- .hhba-print-header{break-inside:avoid}
- .hhba-print-header h2{font-size:22pt}
- .hhba-print-section{break-inside:auto;margin-top:14pt}
- .hhba-print-section h3{font-size:12pt}
- .hhba-print-experience,.hhba-print-skill{break-inside:avoid}
-}
-
-/* Search-first results render inside a scrolling portal. Remove clipping for A4 output. */
-@media print{
- .hhba-match-overlay,.hhba-match-modal,.hhba-match-modal-content,
- .hhba-native-list,.hhba-native-job,.hhba-native-optimize-action,
- .targeted-resume,.targeted-resume-print-preview{
-  overflow:visible!important;height:auto!important;max-height:none!important;
-  transform:none!important;box-shadow:none!important;
+ html,body{height:auto!important;overflow:visible!important;background:#fff!important;margin:0!important;padding:0!important}
+ body > :not(.hhba-print-host){display:none!important}
+ body > .hhba-print-host{display:block!important;position:static!important;
+  width:100%!important;height:auto!important;margin:0!important;padding:0!important;
+  overflow:visible!important;visibility:visible!important}
+ .hhba-print-host .hhba-print-sheet,
+ .hhba-print-host .hhba-print-sheet *{visibility:visible!important}
+ .hhba-print-host .hhba-print-sheet{
+  position:static!important;top:auto!important;left:auto!important;
+  width:100%!important;max-width:none!important;display:block!important;
+  margin:0!important;padding:0!important;box-shadow:none!important;
+  border:0!important;color:#111!important;font-size:11pt!important;
+  overflow:visible!important;transform:none!important
  }
- .hhba-match-overlay,.hhba-match-modal{
-  position:static!important;display:block!important;inset:auto!important;
-  width:auto!important;max-width:none!important;
- }
- .targeted-resume-print-preview,.targeted-resume-print-preview.is-collapsed{display:block!important}
+ .hhba-print-host .hhba-print-header{break-inside:avoid}
+ .hhba-print-host .hhba-print-header h2{font-size:22pt}
+ .hhba-print-host .hhba-print-section{break-inside:auto;margin-top:14pt}
+ .hhba-print-host .hhba-print-section h3{font-size:12pt}
+ .hhba-print-host .hhba-print-experience,
+ .hhba-print-host .hhba-print-skill{break-inside:avoid}
+ .hhba-print-host .hhba-print-source{break-inside:auto}
 }
