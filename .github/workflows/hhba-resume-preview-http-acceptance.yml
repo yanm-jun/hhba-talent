@@ -28,5 +28,5 @@ jobs:
           node-version: 22
       - name: Safe, read-only endpoints and anonymous access control
         env:
-          HHBA_PREVIEW_URL: ${{ inputs.preview_url || 'https://f383250f.hhba-talent.pages.dev' }}
+          HHBA_PREVIEW_URL: ${{ inputs.preview_url || 'https://acfe94d6.hhba-talent.pages.dev' }}
         run: node scripts/resume-preview-http.qa.mjs
