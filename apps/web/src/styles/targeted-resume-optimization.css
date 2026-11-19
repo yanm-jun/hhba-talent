@@ -20,12 +20,14 @@
  white-space:pre-wrap;overflow-wrap:anywhere;
  text-wrap:pretty;
 }
+/* Each gradient stop remains readable against the near-white suggestion card;
+   the warm coral is deliberately deeper than decorative Siri colors. */
 /* The fallback above remains readable when gradient text is unsupported. */
 @supports ((-webkit-background-clip:text) or (background-clip:text)){
  .targeted-resume-gradient{
   background-image:linear-gradient(105deg,
-   #1678c1 0%,#5c64d1 19%,#8352c0 36%,#c04c95 52%,
-   #ba527d 67%,#d27a60 82%,#1678c1 100%);
+   #176fae 0%,#5362c4 19%,#7645b4 36%,#b33b88 52%,
+   #ad456f 67%,#a95245 82%,#176fae 100%);
   background-size:215% 100%;background-position:0% 50%;
   -webkit-background-clip:text;background-clip:text;
   -webkit-text-fill-color:transparent;
