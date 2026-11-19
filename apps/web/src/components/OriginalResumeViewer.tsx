@@ -1,8 +1,11 @@
 import {useEffect,useRef,useState} from 'react';
-import {ChevronLeft,ChevronRight,Download,X} from 'lucide-react';
+import {ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,X} from 'lucide-react';
 import type {PrivateResume} from '../services/privateResumes';
 import {fetchPrivateResumeForLocalReview,downloadPrivateResume} from '../services/privateResumes';
 import {extractDocxText} from '../services/docxProfile.mjs';
+import {matchVisualRegionsToPdfPage,type VerifiedResumeAnchor} from '../services/resumeVisualAnchors.mjs';
+import {visualEditingReady,analyzeVisualResume,listPageResumeEdits,savePageResumeEdits,
+ type VisualResumeLayout,type PageResumeEdit} from '../services/resumeVisualEditingApi';
 import '../styles/original-resume-viewer.css';
 
 // The viewer only displays a user's already stored original. The private R2
@@ -18,11 +21,25 @@ export function OriginalResumeViewer({resume,onClose}:{
  const [status,setStatus]=useState<'loading'|'ready'|'error'>('loading');
  const [error,setError]=useState(''),[text,setText]=useState('');
  const [width,setWidth]=useState(700);
+ const [pageSize,setPageSize]=useState({width:0,height:0});
+ const [canStartEdit,setCanStartEdit]=useState(false);
+ const [visionConsent,setVisionConsent]=useState(false);
+ const [visionBusy,setVisionBusy]=useState(false);
+ const [saving,setSaving]=useState(false);
+ const [layout,setLayout]=useState<VisualResumeLayout|null>(null);
+ const [anchors,setAnchors]=useState<VerifiedResumeAnchor[]>([]);
+ const [selectedId,setSelectedId]=useState<string|null>(null);
+ const [draft,setDraft]=useState('');
+ const [confirmed,setConfirmed]=useState(false);
+ const [changes,setChanges]=useState<PageResumeEdit[]>([]);
+ const [message,setMessage]=useState('');
  const isPdf=resume.type==='application/pdf';
  useEffect(()=>{
   let active=true;
   let pdfTask:any=null;
   setPage(1);setPageCount(0);setText('');setError('');setStatus('loading');
+  setAnchors([]);setSelectedId(null);setLayout(null);setChanges([]);setVisionConsent(false);
+  setMessage('');
   void (async()=>{
    try{
     const buffer=await fetchPrivateResumeForLocalReview(resume);
@@ -52,8 +69,17 @@ export function OriginalResumeViewer({resume,onClose}:{
   return()=>{active=false;pdfDocument.current=null;if(pdfTask)void pdfTask.destroy().catch(()=>{});};
  },[resume.id,isPdf]);
  useEffect(()=>{
+  if(!isPdf)return;
+  const abort=new AbortController();setCanStartEdit(false);
+  void visualEditingReady(abort.signal).then(ready=>{
+   if(!abort.signal.aborted)setCanStartEdit(ready);
+  });
+  return()=>abort.abort();
+ },[resume.id,isPdf]);
+ useEffect(()=>{
   if(!isPdf||status!=='ready'||!pdfDocument.current||!canvas.current)return;
   let alive=true,renderTask:any=null;
+  setAnchors([]);
   void (async()=>{
    try{
     const doc=pdfDocument.current;
@@ -64,6 +90,7 @@ export function OriginalResumeViewer({resume,onClose}:{
     const viewport=pageObject.getViewport({scale});
     const pixelRatio=Math.min(1.5,window.devicePixelRatio||1);
     const surface=canvas.current;
+    setPageSize({width:viewport.width,height:viewport.height});
     surface.width=Math.max(1,Math.floor(viewport.width*pixelRatio));
     surface.height=Math.max(1,Math.floor(viewport.height*pixelRatio));
     surface.style.width=viewport.width+'px';
@@ -76,6 +103,13 @@ export function OriginalResumeViewer({resume,onClose}:{
      transform:pixelRatio===1?undefined:[pixelRatio,0,0,pixelRatio,0,0]
     });
     await renderTask.promise;
+    if(alive&&layout){
+     const textContent=await pageObject.getTextContent({includeMarkedContent:false});
+     if(alive)setAnchors(matchVisualRegionsToPdfPage({
+      regions:layout.regions,items:textContent.items.filter((item:any)=>typeof item.str==='string') as any,
+      viewport:viewport as any,page
+     }));
+    }
     if(alive)pageObject.cleanup();
    }catch(e){
     if(alive&&e instanceof Error&&e.name!=='RenderingCancelledException'){
@@ -84,7 +118,7 @@ export function OriginalResumeViewer({resume,onClose}:{
    }
   })();
   return()=>{alive=false;try{renderTask?.cancel();}catch{}};
- },[isPdf,status,page,width,pageCount]);
+ },[isPdf,status,page,width,pageCount,layout]);
  useEffect(()=>{
   const element=paper.current;if(!element)return;
   const update=()=>setWidth(Math.max(260,Math.min(800,element.clientWidth-20)));
