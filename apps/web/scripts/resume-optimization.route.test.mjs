@@ -52,3 +52,32 @@ test('feature status fails closed when disabled',async()=>{
  assert.equal((await (await onRequestGet({env:h.env})).json()).enabled,false);
  assert.equal((await onRequestPost({request:request(),env:h.env})).status,503);
 });
+
+test('generates suggestions with user confirmation and enforces daily quota',async()=>{
+ const h=mockEnv();
+ const previous=globalThis.fetch;
+ let count=0;
+ globalThis.fetch=async (_url,options)=>{
+  count++;
+  const submitted=JSON.parse(options.body);
+  const input=JSON.parse(submitted.messages[1].content);
+  assert.equal(input.blocks[0].text,base.blocks[0].text);
+  return Response.json({choices:[{message:{content:JSON.stringify({suggestions:[{
+   id:'suggestion-0',blockId:'experience-0',action:'replace',
+   original:base.blocks[0].text,proposed:'统筹门店日常运营',
+   rationale:'使用更清晰的动词',jobRequirement:'运营和团队协作',
+   evidenceStatus:'verified'
+  }]})}}]});
+ };
+ try{
+  for(let i=0;i<3;i++){
+   const result=await onRequestPost({request:request(),env:h.env});
+   assert.equal(result.status,200);
+   const output=await result.json();
+   assert.equal(output.suggestions[0].original,base.blocks[0].text);
+   assert.equal(output.suggestions[0].evidenceStatus,'needs_user_confirmation');
+  }
+  assert.equal((await onRequestPost({request:request(),env:h.env})).status,429);
+  assert.equal(count,3);
+ }finally{globalThis.fetch=previous;}
+});
