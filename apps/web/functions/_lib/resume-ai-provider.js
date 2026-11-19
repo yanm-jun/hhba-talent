@@ -75,11 +75,15 @@ export async function generateSuggestions({env,blocks,job,signal}){
   throw new Error('AI_PROVIDER_REQUEST_FAILED');
  }
  let data;
- try{data=await response.json();}catch{throw new Error('AI_PROVIDER_RESPONSE_INVALID');}
+ try{data=await response.json();}catch{throw new Error('AI_PROVIDER_RESPONSE_HTTP_INVALID');}
  const output=provider.protocol==='anthropic'?data?.content?.filter(x=>x.type==='text').map(x=>x.text).join(''):data?.choices?.[0]?.message?.content;
- if(data?.choices?.[0]?.finish_reason==='length')throw new Error('AI_PROVIDER_RESPONSE_INVALID');
- if(typeof output!=='string'||!output.trim())throw new Error('AI_PROVIDER_RESPONSE_INVALID');
+ if(data?.choices?.[0]?.finish_reason==='length')throw new Error('AI_PROVIDER_RESPONSE_TRUNCATED');
+ if(typeof output!=='string'||!output.trim())throw new Error('AI_PROVIDER_RESPONSE_EMPTY');
  let parsed;
- try{parsed=JSON.parse(output.replace(/^\s*```(?:json)?\s*|\s*```\s*$/g,''));}catch{throw new Error('AI_PROVIDER_RESPONSE_INVALID')}
- return {provider:provider.name,suggestions:parseSuggestions(parsed,blocks.map(b=>b.id))};
+ try{parsed=JSON.parse(output.replace(/^\s*```(?:json)?\s*|\s*```\s*$/g,''));}
+ catch{throw new Error('AI_PROVIDER_RESPONSE_JSON_INVALID');}
+ let suggestions;
+ try{suggestions=parseSuggestions(parsed,blocks.map(b=>b.id));}
+ catch{throw new Error('AI_PROVIDER_SUGGESTION_SCHEMA_INVALID');}
+ return {provider:provider.name,suggestions};
 }
