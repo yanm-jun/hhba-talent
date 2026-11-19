@@ -1,30 +1,30 @@
 import {useEffect,useState} from 'react';
-import {ArrowRight,CheckCircle2,FileText,Scale,ShieldCheck} from 'lucide-react';
+import {ArrowRight,ArrowUpRight,BookOpen,BriefcaseBusiness,ShieldCheck} from 'lucide-react';
 import {Link} from '../router';
 import '../styles/home-workplace-promise.css';
 
-// Keep the original homepage card layout while replacing the paid plan with public rights guidance.
-const values=[
- {title:'免费知识查询',Icon:FileText},
- {title:'官方来源优先',Icon:Scale},
- {title:'权益自助指引',Icon:ShieldCheck}
+// Two real, publicly readable HHBA resources. Keep the finance-report state
+// transparent without presenting hypothetical funding as an accomplished result.
+const resources=[
+ {
+  href:'/rights/knowledge',
+  index:'01 / RIGHTS',
+  title:'劳动权益知识库',
+  summary:'从劳动合同、工资和社保，到加班、辞退与争议处理。',
+  detail:'20 个专题 · 法律依据、证据准备与处理步骤',
+  action:'了解劳动权益',
+  Icon:BookOpen
+ },
+ {
+  href:'/rights/guide',
+  index:'02 / CAREER GUIDE',
+  title:'高性价比职场指南',
+  summary:'从准备求职到入职、在职、离职，让每一步更有依据。',
+  detail:'200 条原创建议 · 覆盖 8 个职业阶段',
+  action:'阅读职场指南',
+  Icon:BriefcaseBusiness
+ }
 ];
-const knowledgeItems=[
- '劳动合同、工资与加班等常见问题',
- '社保、休假、工伤与其他劳动保障知识',
- '调岗、辞退、离职与证据保留要点'
-];
-const guidanceItems=[
- '按职场问题分类查找处理方向',
- '了解相关法律依据和官方办理渠道',
- '阅读证据准备建议与一般处理步骤'
-];
-
-function ServiceList({items}:{items:string[]}){
- return <ul className="hhba-home-service-list">
-  {items.map(item=><li key={item}><CheckCircle2 size={16} aria-hidden="true"/><span>{item}</span></li>)}
- </ul>;
-}
 
 export function HomeWorkplacePromise(){
  const [financeReportPeriod,setFinanceReportPeriod]=useState<string|null>(null);
@@ -39,79 +39,43 @@ export function HomeWorkplacePromise(){
  },[]);
  return <section className="hhba-home-workplace" aria-labelledby="hhba-home-workplace-title">
   <header className="hhba-home-workplace-heading">
-   <span className="hhba-home-workplace-kicker">HHBA · MORE THAN A JOB</span>
-   <h2 id="hhba-home-workplace-title">找到好工作，只是开始。</h2>
-   <p>从求职机会，到了解劳动权益，工作中的问题也值得认真对待。</p>
+   <span className="hhba-home-workplace-kicker">HHBA · CAREER RESOURCES</span>
+   <h2 id="hhba-home-workplace-title">让职业选择更有依据。</h2>
+   <p>从职场准备到劳动权益，找到真正有用的信息。</p>
   </header>
 
-  <article className="hhba-home-membership-card" aria-labelledby="hhba-home-rights-title">
-   <div className="hhba-home-member-head">
-    <div className="hhba-home-member-intro">
-     <div className="hhba-home-member-overline">
-      <span className="hhba-home-card-kicker">HHBA · WORKPLACE RIGHTS</span>
-      <span className="hhba-home-status">免费开放</span>
-     </div>
-     <h3 id="hhba-home-rights-title">了解你的劳动权益</h3>
-     <p>工作中的问题，有据可查，有路可循。免费查阅常见职场权益知识与自助指引。</p>
+  <div className="hhba-home-membership-card hhba-home-resources-panel" aria-label="HHBA 免费职场知识产品">
+   <div className="hhba-home-resources-header">
+    <div>
+     <span className="hhba-home-card-kicker">KNOWLEDGE · MADE PRACTICAL</span>
+     <h3>从理解问题，到找到下一步。</h3>
     </div>
-    <div className="hhba-home-price-block" aria-label="劳动权益知识免费阅读">
-     <div className="hhba-home-price"><strong>免费</strong></div>
-     <p>知识查询 · 自助指引</p>
-    </div>
+    <span className="hhba-home-resources-access">免费开放</span>
    </div>
-
-   <ul className="hhba-home-member-highlights" aria-label="劳动权益知识特点">
-    {values.map(({title,Icon})=><li key={title}><Icon size={16} strokeWidth={1.9} aria-hidden="true"/><span>{title}</span></li>)}
-   </ul>
-   <div className="hhba-home-phase-grid" aria-label="劳动权益知识与自助服务">
-    <section className="hhba-home-stage" aria-labelledby="hhba-home-stage-knowledge-title">
-     <div className="hhba-home-stage-heading">
-      <span className="hhba-home-stage-index" aria-hidden="true">01</span>
-      <div>
-       <p>常见职场问题</p>
-       <h4 id="hhba-home-stage-knowledge-title">职场权益知识</h4>
-      </div>
+   <div className="hhba-home-resource-grid">
+    {resources.map(({href,index,title,summary,detail,action,Icon})=><Link className="hhba-home-resource-card" to={href} key={href}>
+     <div className="hhba-home-resource-top">
+      <span className="hhba-home-resource-icon"><Icon size={21} strokeWidth={1.75} aria-hidden="true"/></span>
+      <span className="hhba-home-resource-index">{index}</span>
      </div>
-     <ServiceList items={knowledgeItems}/>
-    </section>
-    <section className="hhba-home-stage hhba-home-stage-rights" aria-labelledby="hhba-home-stage-guidance-title">
-     <div className="hhba-home-stage-heading">
-      <span className="hhba-home-stage-index" aria-hidden="true">02</span>
-      <div>
-       <p>有据可查的处理方向</p>
-       <h4 id="hhba-home-stage-guidance-title">权益自助指引</h4>
-      </div>
-     </div>
-     <ServiceList items={guidanceItems}/>
-    </section>
+     <h4>{title}</h4>
+     <p>{summary}</p>
+     <span className="hhba-home-resource-detail">{detail}</span>
+     <span className="hhba-home-resource-action">{action}<ArrowUpRight size={17} aria-hidden="true"/></span>
+    </Link>)}
    </div>
-
-   <div className="hhba-home-member-footer">
-    <div className="hhba-home-member-status"><ShieldCheck size={17} aria-hidden="true"/><span>免费阅读 · 适用规则以官方发布和实际情况为准</span></div>
-    <Link className="hhba-home-text-link" to="/rights/knowledge">查看劳动权益知识 <ArrowRight size={16} aria-hidden="true"/></Link>
-   </div>
-   <div className="hhba-home-service-notes"><p>内容仅供一般信息参考，不构成针对个案的律师意见；平台不提供律师委托或案件代理。</p></div>
-  </article>
+   <div className="hhba-home-resources-note"><ShieldCheck size={16} aria-hidden="true"/><span>免费阅读 · 法律信息仅供一般参考，具体问题以官方规定及实际情况为准。</span></div>
+  </div>
 
   <aside className="hhba-home-pledge" aria-labelledby="hhba-home-distribution-title">
    <div className="hhba-home-pledge-intro">
     <span className="hhba-home-card-kicker">OUR COMMITMENT · 责任与透明</span>
-    <h3 id="hhba-home-distribution-title">让商业创造的价值，也回到劳动者身边。</h3>
-    <p>HHBA 计划每月根据实际经营情况，安排一部分资金，帮助有需要的劳动者。</p>
+    <h3 id="hhba-home-distribution-title">透明，是我们做事的方式。</h3>
+    <p>HHBA 计划每月根据实际经营情况，安排一部分资金帮助有需要的劳动者。</p>
+    <p className="hhba-home-pledge-meta">不承诺固定金额或分配比例 · <span className="hhba-home-report-status">{financeReportPeriod?'已公开 '+financeReportPeriod+' 月度报告':financeStatusLoaded?'首期资金报告尚未发布':'资金报告状态以透明中心为准'}</span></p>
    </div>
-   <div className="hhba-home-pledge-visual">
-    <div className="hhba-home-distribution-values" aria-label="月度支持与信息公开方向">
-     <div><strong>每月</strong><span>根据实际经营情况安排支持资金</span></div>
-     <div><strong>透明</strong><span>逐步公开审核规则与资金使用情况</span></div>
-    </div>
-   </div>
-   <div className="hhba-home-pledge-bottom">
-    <div><Scale size={15} aria-hidden="true"/><span>根据经营实际安排，不承诺固定金额或分配比例。</span></div>
-    <span className="hhba-home-report-status">{financeReportPeriod?'已公开 '+financeReportPeriod+' 月度报告':financeStatusLoaded?'首期资金报告尚未发布':'资金报告状态以透明中心为准'}</span>
-   </div>
-   <Link className="hhba-home-report-details hhba-home-transparency-link" to="/transparency">
-    <span>了解我们的责任与透明</span>
-    <ArrowRight size={14} aria-hidden="true"/>
+   <Link className="hhba-home-transparency-link" to="/transparency">
+    了解我们的责任与透明 <ArrowRight size={17} aria-hidden="true"/>
    </Link>
   </aside>
  </section>;
