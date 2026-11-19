@@ -28,6 +28,10 @@ with sync_playwright() as playwright:
         context=browser.new_context(viewport={"width":width,"height":height},device_scale_factor=1,reduced_motion="reduce")
         page=context.new_page()
         page.goto(BASE+"/",wait_until="domcontentloaded")
+        # The homepage intentionally displays a winter-internship modal on each visit.
+        # Dismiss it only in the visual test, so the screenshot shows the requested section.
+        page.locator("[data-winter-close]").click(timeout=15000)
+        assert page.locator("[data-hhba-winter-modal]").count()==0, f"{name}: modal obscures visual acceptance"
         section=page.locator(".hhba-home-workplace")
         section.wait_for(timeout=30000)
         assert section.locator("h2").inner_text().strip()=="让职业选择更有依据。"
