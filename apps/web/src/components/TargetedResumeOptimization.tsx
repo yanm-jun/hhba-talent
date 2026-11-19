@@ -12,8 +12,8 @@ import '../styles/targeted-resume-optimization.css';
 
 export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfile;job:JobMatch}){
  const blocks=useMemo<ResumeBlock[]>(()=>[
-  ...profile.experiences.filter(e=>e.evidence?.trim()).map((e,i)=>({id:'experience-'+i,section:'experience' as const,text:e.evidence.slice(0,1600)})),
-  ...profile.skills.filter(s=>s.evidence?.trim()).map((s,i)=>({id:'skill-'+i,section:'skills' as const,text:s.evidence.slice(0,1600)}))
+  ...(Array.isArray(profile.experiences)?profile.experiences:[]).filter(e=>e.evidence?.trim()).map((e,i)=>({id:'experience-'+i,section:'experience' as const,text:e.evidence.slice(0,1600)})),
+  ...(Array.isArray(profile.skills)?profile.skills:[]).filter(s=>s.evidence?.trim()).map((s,i)=>({id:'skill-'+i,section:'skills' as const,text:s.evidence.slice(0,1600)}))
  ].slice(0,12),[profile]);
  const initial=()=>({id:'draft-'+job.id,targetJobId:job.id,blocks,acceptedSuggestionIds:[] as string[]});
  const [version,setVersion]=useState<ResumeVersion>(initial);
