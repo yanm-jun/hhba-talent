@@ -53,6 +53,8 @@ test('knowledge hub searches the original authoritative eight-topic dataset with
  assert.match(hub,/topic\.short/);
  assert.match(hub,/knowledgeHref\+'\/'\+topic\.slug/);
  assert.match(hub,/GUIDE_TIPS\.filter/);
+ assert.match(hub,/relatedSlugs\.has\(tip\.topic\)/);
+ assert.match(hub,/topicKeywords\[topic\.slug\]/);
  assert.match(hub,/\/rights\/guide\?tip=/);
  assert.match(hub,/本页为关键词检索，不是 AI 自动法律判断/);
  for(const term of ['工资','加班','社保','离职证明','调岗'])assert(hub.includes(term));
