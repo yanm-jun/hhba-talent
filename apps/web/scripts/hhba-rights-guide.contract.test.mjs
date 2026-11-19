@@ -19,7 +19,7 @@ const footer=read('../src/components/Shell.tsx');
 
 test('HHBA guide V2 has 200 actionable entries evenly distributed across eight stages',()=>{
  assert.equal(tips.length,200);
- assert.equal(new Set(tips.map(x=>x.id)).size,40);
+ assert.equal(new Set(tips.map(x=>x.id)).size,200);
  const stages=['before','interview','offer','pay','work','change','leave','dispute'];
  for(const stage of stages)assert.equal(tips.filter(x=>x.stage===stage).length,25,stage);
  for(const tip of tips){
