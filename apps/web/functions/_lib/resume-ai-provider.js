@@ -28,42 +28,59 @@ export function selectProvider(env,task='resume_optimization'){
  return {name:requested,...PROVIDERS[requested],key,model:model.trim()};
 }
 export function parseSuggestions(raw,allowedBlockIds){
- if(!raw||!Array.isArray(raw.suggestions))throw new Error('AI_PROVIDER_RESPONSE_INVALID');
+ if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new Error('AI_PROVIDER_RESPONSE_INVALID');
+ const candidates=[
+  raw.suggestions,raw.optimizations,raw.recommendations,raw.changes,
+  raw.result?.suggestions,raw.data?.suggestions
+ ];
+ const first=candidates.find(item=>Array.isArray(item));
+ const list=first||(raw.suggestions&&typeof raw.suggestions==='object'?[raw.suggestions]:null);
+ if(!Array.isArray(list))throw new Error('AI_PROVIDER_RESPONSE_INVALID');
  const allowed=new Set(allowedBlockIds),used=new Set(),accepted=[];
- for(const [index,s] of raw.suggestions.slice(0,12).entries()){
+ const synonyms={rewrite:'replace',revise:'replace',rephrase:'replace',optimize:'replace',
+  modify:'replace',improve:'replace',add:'append',supplement:'append',
+  ask_user:'request_evidence',request_details:'request_evidence'};
+ const asText=value=>typeof value==='string'?value.trim():'';
+ for(const [index,s] of list.slice(0,12).entries()){
   if(!s||typeof s!=='object'||Array.isArray(s))continue;
-  const blockId=typeof s.blockId==='string'?s.blockId:
-   (typeof s.block_id==='string'?s.block_id:'');
+  const namedId=asText(s.blockId)||asText(s.block_id)||asText(s.targetBlockId)||asText(s.target_block_id);
+  const blockId=allowed.has(namedId)?namedId:(allowed.size===1?[...allowed][0]:'');
   if(!allowed.has(blockId)||used.has(blockId))continue;
-  if(!['replace','append','request_evidence'].includes(s.action))continue;
-  const isEvidenceRequest=s.action==='request_evidence';
-  let proposed=typeof s.proposed==='string'?s.proposed.trim():'';
-  if(!proposed&&isEvidenceRequest)
-   proposed='请补充你真实参与的相关工作、项目或成果。';
+  let action=asText(s.action)||asText(s.type)||asText(s.operation);
+  action=synonyms[action.toLowerCase()]||action;
+  const rawProposal=asText(s.proposed)||asText(s.optimizedText)||asText(s.suggestedText)||
+   asText(s.rewritten)||asText(s.rewrite)||asText(s.after)||asText(s.new_text);
+  if(!action&&rawProposal)action='replace';
+  if(!['replace','append','request_evidence'].includes(action))continue;
+  const isEvidenceRequest=action==='request_evidence';
+  const proposed=rawProposal||(isEvidenceRequest?'请补充你真实参与的相关工作、项目或成果。':'');
   if(!proposed||proposed.length>1600)continue;
-  const original=typeof s.original==='string'&&s.original.trim()?s.original:
-   '原始段落内容由服务端核实';
-  const rationale=typeof s.rationale==='string'&&s.rationale.trim()?s.rationale:
-   '请确认建议的每项事实都符合真实经历';
-  const jobRequirement=typeof s.jobRequirement==='string'&&s.jobRequirement.trim()?
-   s.jobRequirement:'岗位相关要求';
+  const original=asText(s.original)||asText(s.before)||'原始段落内容由服务端核实';
+  const rationale=asText(s.rationale)||asText(s.reason)||asText(s.explanation)||
+   '请结合真实经历核实这条表达建议';
+  const jobRequirement=asText(s.jobRequirement)||asText(s.job_requirement)||
+   asText(s.requirement)||'岗位相关要求';
   used.add(blockId);
   accepted.push({
-   id:clip(typeof s.id==='string'&&s.id.trim()?s.id:'suggestion-'+(index+1)+'-'+blockId,100),
-   blockId,action:s.action,original:clip(original,1600),proposed:clip(proposed,1600),
+   id:clip(asText(s.id)||'suggestion-'+(index+1)+'-'+blockId,100),
+   blockId,action,original:clip(original,1600),proposed:clip(proposed,1600),
    rationale:clip(rationale,600),jobRequirement:clip(jobRequirement,600),
-   // The model is not an authority on the user's employment facts.
    evidenceStatus:'needs_user_confirmation'
   });
  }
- if(raw.suggestions.length>0&&!accepted.length)
-  throw new Error('AI_PROVIDER_RESPONSE_INVALID');
+ if(list.length>0&&!accepted.length)throw new Error('AI_PROVIDER_RESPONSE_INVALID');
  return accepted;
 }
 export async function generateSuggestions({env,blocks,job,signal}){
  const provider=selectProvider(env);
  const system='你是HHBA简历优化助手。只使用用户提供的真实证据。不要虚构任职资格、学历、时间、业绩或技能。针对岗位逐条提出建议；缺少事实时使用request_evidence。每次选取最多5处最值得优化的真实表达，每条建议适度精炼，不要重复整份简历；如无可用建议返回空数组。仅返回JSON对象（不要Markdown），字段suggestions数组，每条必须含id,blockId,action,original,proposed,rationale,jobRequirement,evidenceStatus。对于不确定事实一律标注needs_user_confirmation。';
- const input=JSON.stringify({blocks,job:{title:job.title,requirements:job.requirements}});
+ const sample={suggestions:[{id:'s1',blockId:blocks[0]?.id||'source-0',
+  action:'replace',original:blocks[0]?.text||'',proposed:blocks[0]?.text||'',
+  rationale:'仅改善表达，不增加未经核实的事实',jobRequirement:job.requirements||'岗位要求',
+  evidenceStatus:'needs_user_confirmation'}]};
+ const input=JSON.stringify({blocks,job:{title:job.title,requirements:job.requirements},
+  output_format_example:sample,
+  instructions:'严格输出符合示例字段名的JSON对象，不要复制示例建议内容；blockId必须是blocks中的id；一份段落至多一条建议。'});
  let url,headers,body;
  if(provider.protocol==='anthropic'){
   url=provider.baseUrl+'/messages';
