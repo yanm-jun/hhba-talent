@@ -26,7 +26,7 @@ test('complete up-to-date enterprise and admin navigation survives',()=>{
  'EmployerEvidencePage','AdminEmployerEvidencePage','EmployerScoringPage','AdminEmployerScoringPage',
  'EmployerAppealsPage','AdminAppealsReviewPage','EmployerImprovementsPage','AdminEmployerPublicationPage'])
    assert.ok(main.includes(x),'must preserve latest application feature '+x);
- for(const x of ['我要应聘','企业招聘导航','UnifiedJobMarket compact'])
+ for(const x of ['求职与机会','企业招聘导航','UnifiedJobMarket compact'])
    assert.ok(homepage.includes(x),'must preserve homepage '+x);
 });
 test('exact 200 company identities, original 100 and complete profile references preserved',()=>{

@@ -17,7 +17,7 @@ test('removal does not affect the HHBA interactive homepage and letter',()=>{
   '<UnifiedJobMarket compact/>',
   '<HomeOpenLetter autoOpen={false}/>',
   '<WinterInternshipPopup/>',
-  '我要应聘',
+  '求职与机会',
   '企业招聘导航'
  ]) assert.ok(home.includes(expected),expected);
 });

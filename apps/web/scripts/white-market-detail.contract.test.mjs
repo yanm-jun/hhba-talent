@@ -7,8 +7,8 @@ const reader=readFileSync(new URL('../src/services/officialJd.ts',import.meta.ur
 const home=readFileSync(new URL('../src/pages/HomePage.tsx',import.meta.url),'utf8');
 const archive=readFileSync(new URL('../src/pages/CandidateJobsPage.tsx',import.meta.url),'utf8');
 
-test('white HHBA keeps both candidate and employer entrances',()=>{
- assert.ok(home.includes('title="我要应聘"'));
+test('white HHBA keeps job opportunity and enterprise navigation entrances',()=>{
+ assert.ok(home.includes('title="求职与机会"'));
  assert.ok(home.includes('title="企业招聘导航"'));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
 });
