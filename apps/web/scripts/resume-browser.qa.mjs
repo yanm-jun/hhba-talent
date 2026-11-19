@@ -58,7 +58,7 @@ try{
  const pdf=await page.pdf({format:'A4',printBackground:true});
  await writeFile(output+'/desktop-resume.pdf',pdf);
  const pages=await pdfText(pdf);
- const fullText=pages.join(' ').replace(/\\s+/g,'');
+ const fullText=pages.join(' ').normalize('NFKC').replace(/\\s+/g,'');
  console.log('PRINT_DIAGNOSTIC',JSON.stringify({pdf_bytes:pdf.length,page_count:pages.length,
   extracted_chars:fullText.length,containsName:fullText.includes('验收用虚拟姓名'),
   containsEditedExperience:fullText.includes('合成测试门店'),
@@ -104,7 +104,7 @@ try{
  await writeFile(output+'/multipage-resume.pdf',longPdf);
  const longPages=await pdfText(longPdf);
  assert.ok(longPages.length>=2,'long resume must paginate across A4 pages; got '+longPages.length);
- assert.ok(longPages.join(' ').replace(/\\s+/g,'').includes('第12段'),
+ assert.ok(longPages.join(' ').normalize('NFKC').replace(/\\s+/g,'').includes('第12段'),
   'multi-page PDF must include final source paragraph; it must not clip content');
  await long.close();
  console.log(JSON.stringify({result:'PASSED',desktop_pdf_pages:pages.length,
