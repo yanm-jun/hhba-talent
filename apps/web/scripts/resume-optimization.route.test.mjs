@@ -99,3 +99,37 @@ test('provider never receives contact identifiers in evidence',async()=>{
   assert.equal(result.status,200);
  }finally{globalThis.fetch=original;}
 });
+
+
+test('bounded twelve-section Chinese resume passes UTF-8 request limit',async()=>{
+ const h=mockEnv(),prior=globalThis.fetch;
+ let called=false;
+ globalThis.fetch=async (_url,options)=>{
+  called=true;
+  const data=JSON.parse(options.body);
+  const input=JSON.parse(data.messages[1].content);
+  assert.equal(input.blocks.length,12);
+  assert.ok(new TextEncoder().encode(options.body).byteLength>18000);
+  return Response.json({choices:[{message:{content:'{"suggestions":[]}'}}]});
+ };
+ try{
+  const blocks=Array.from({length:12},(_,i)=>({
+   id:'experience-'+i,section:'experience',text:'负责区域门店运营与客户管理工作'.repeat(70)
+  }));
+  const response=await onRequestPost({request:request({...base,blocks}),env:h.env});
+  assert.equal(response.status,200);
+  assert.equal(called,true);
+ }finally{globalThis.fetch=prior;}
+});
+test('very large raw request is rejected before paid provider access',async()=>{
+ const h=mockEnv(),prior=globalThis.fetch;
+ let calls=0;globalThis.fetch=async()=>{calls++;throw Error('must not call provider')};
+ try{
+  const response=await onRequestPost({request:request({...base,
+   blocks:[{...base.blocks[0],text:'中'.repeat(45000)}]
+  }),env:h.env});
+  assert.equal(response.status,400);
+  assert.equal(calls,0);
+  assert.equal(h.records.length,0);
+ }finally{globalThis.fetch=prior;}
+});
