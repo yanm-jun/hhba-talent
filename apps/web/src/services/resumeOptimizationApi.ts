@@ -36,7 +36,7 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
  let response:Response;
  try{
   response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
-   headers:{'Content-Type':'application/json',Origin:location.origin,Authorization:'Bearer '+token},
+   headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
    body:JSON.stringify({consent_ai:true,blocks,job})});
  }catch{throw new ResumeOptimizationError('NETWORK_ERROR',503);}
  const data=await response.json().catch(()=>({})) as {ok?:boolean;error?:string;suggestions?:ResumeSuggestion[]};
