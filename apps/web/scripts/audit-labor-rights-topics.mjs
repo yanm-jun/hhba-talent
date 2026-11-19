@@ -31,6 +31,36 @@ for(const topic of json.topics){
 }
 assert.equal(new Set(json.topics.map(t=>t.slug)).size,8);
 assert(urls.size>=5,'Insufficient independently checked legal sources');
+
+const more=JSON.parse(readFileSync('src/data/laborRightsSubtopics.json','utf8'));
+assert.equal(more.topics.length,12,'V2 contains twelve independently written subtopics');
+const slugs=new Set(expected);
+const allowedHost=new Set(['www.samr.gov.cn','www.nhsa.gov.cn','chinajob.mohrss.gov.cn','xzfg.moj.gov.cn','www.mohrss.gov.cn','www.court.gov.cn']);
+for(const t of more.topics){
+ assert(!slugs.has(t.slug),'duplicate base or subtopic slug: '+t.slug);
+ slugs.add(t.slug);
+ assert(expected.includes(t.parentSlug),'new subtopic must reference an existing full guide');
+ assert.equal(t.situations.length,3,t.slug+' situations');
+ assert.equal(t.laws.length,2,t.slug+' references');
+ for(const law of t.laws){
+  const u=new URL(law.url);
+  assert(u.protocol==='https:'&&allowedHost.has(u.hostname),t.slug+' reference must use official domain '+law.url);
+  assert(/第\d+/.test(law.articles),t.slug+' law article identifiers required');
+  assert(law.summary.length>=20,t.slug+' source-specific summary is incomplete');
+ }
+ assert.equal(t.proof.length,3,t.slug+' evidence checklist');
+ assert.equal(t.paths.length,3,t.slug+' procedure checklist');
+ assert.equal(t.misconceptions.length,2,t.slug+' misconceptions');
+ assert(!('case' in t),'No invented judge or case in '+t.slug);
+ assert(t.special.length>=20,t.slug+' qualification');
+}
+assert.equal(slugs.size,20,'combined legal index should contain 20 unique topics');
+const detailV2=readFileSync('src/pages/LegalAidSubtopicPage.tsx','utf8');
+for(const s of ['topic.laws.map','topic.proof.map','topic.paths.map','topic.misconceptions.map','topic.parentSlug'])
+ assert(detailV2.includes(s),'V2 subtopic detail lacks '+s);
+for(const forbidden of ['input type="file"','<textarea','<form','fetch(','localStorage','sessionStorage'])
+ assert(!detailV2.includes(forbidden),'Subtopics must not accept case materials: '+forbidden);
+
 const landing=readFileSync('src/pages/LegalAidLandingPage.tsx','utf8');
 const detail=readFileSync('src/pages/LegalAidTopicPage.tsx','utf8');
 const router=readFileSync('src/main.tsx','utf8');
@@ -42,7 +72,7 @@ for(const selector of ['topic.laws.map','topic.proof.map','topic.paths.map','top
 for(const forbidden of ['input type="file"','<textarea','<form','fetch(','localStorage','sessionStorage','navigator.sendBeacon'])
  assert(!detail.includes(forbidden),'Case pages must not collect/transmit personal data: '+forbidden);
 console.log('HHBA_LABOR_RIGHTS_GUIDES_OK',JSON.stringify({
- topics:expected.length,lawCitations:json.topics.reduce((n,t)=>n+t.laws.length,0),
+ topics:expected.length,subtopics:more.topics.length,totalTopics:slugs.size,lawCitations:json.topics.reduce((n,t)=>n+t.laws.length,0),
  evidenceObjectives:json.topics.reduce((n,t)=>n+t.proof.length,0),
  realOfficialCases:json.topics.filter(t=>t.case.url.includes('court.gov.cn')).length,
  legalSources:urls.size,liveCaseIntake:false

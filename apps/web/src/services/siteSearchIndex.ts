@@ -14,6 +14,8 @@ import {universities,universityPrograms} from '../data/studyUniversities';
 import {WINTER_2027_PROGRAMS} from '../data/winter2027Programs';
 import {WINTER_2027_JOBS} from '../data/winter2027Jobs';
 import {GUIDE_TIPS} from '../data/hhbaWorkValueGuide';
+import laborRights from '../data/laborRightsTopics.json';
+import subtopics from '../data/laborRightsSubtopics.json';
 
 export type SiteSearchKind='page'|'job'|'company'|'policy'|'housing'|'study';
 export type SiteSearchRecord={
@@ -36,8 +38,8 @@ const staticPages:SiteSearchRecord[]=[
  {id:'study',kind:'page',title:'留学机会',description:'留学国家、大学、研究生课程与海外发展规划',path:'/study-abroad',tags:['留学','海外','出国','学校','签证','大学']},
  {id:'match',kind:'page',title:'简历智能匹配',description:'在私人简历空间分析岗位匹配度（需用户授权）',path:'/candidate/match',tags:['简历','AI','岗位推荐','匹配']},
  {id:'workplace-rights',kind:'page',title:'会员与权益服务介绍',description:'公开阅读持续职业服务与劳动权益支持的规划、价格与资格说明',path:'/rights',tags:['职业','权益','会员','月费','服务介绍']},
- {id:'labor-knowledge',kind:'page',title:'劳动权益知识库',description:'免费浏览工资、辞退、加班、工伤等八类劳动权益知识和官方案例',path:'/rights/knowledge',tags:['劳动法','劳动权益','法规','知识库','维权']},
- {id:'work-value-guide',kind:'page',title:'HHBA 高性价比职场指南',description:'40 条 HHBA 原创实用建议，覆盖八个职场阶段，支持搜索筛选与行动记录',path:'/rights/guide',tags:['高性价比','职场','指南','劳动权益','建议','求职','签约','离职']},
+ {id:'labor-knowledge',kind:'page',title:'劳动权益知识库',description:'免费浏览 8 个深度专题及 12 个细分专题，包含法律依据、证据与处理方向',path:'/rights/knowledge',tags:['劳动法','劳动权益','法规','知识库','维权']},
+ {id:'work-value-guide',kind:'page',title:'HHBA 高性价比职场指南',description:'200 条 HHBA 原创实用建议，覆盖八个职场阶段，支持搜索筛选与行动记录',path:'/rights/guide',tags:['高性价比','职场','指南','劳动权益','建议','求职','签约','离职']},
  {id:'rights-support',kind:'page',title:'平台权益支持筹备说明',description:'了解未来权益协助流程及合法准备证据的方向，当前不受理申请',path:'/rights/support',tags:['平台介入','劳动争议','服务筹备','证据']},
  {id:'bookmarks',kind:'page',title:'我的收藏',description:'登录后查看个人收藏的招聘岗位',path:'/candidate/saved',tags:['收藏','求职','个人中心']},
  {id:'join',kind:'page',title:'加入我们',description:'了解 HHBA 团队及加入方式',path:'/join',tags:['团队','加入','合作']},
@@ -54,6 +56,17 @@ export function buildSiteSearchIndex():SiteSearchRecord[]{
   records.push(item);
  };
  // HHBA's own editorial guidance is searchable alongside existing public legal resources.
+ // Public law topics are discoverable individually through the existing canonical routes.
+ for(const topic of laborRights.topics)add({
+  id:'rights-topic:'+topic.slug,kind:'page',title:topic.title,
+  description:topic.short,tags:[...topic.situations,topic.title,'劳动权益','法律依据'],
+  path:'/rights/knowledge/'+topic.slug,status:'深度专题 · 法律原文及官方案例'
+ });
+ for(const topic of subtopics.topics)add({
+  id:'rights-subtopic:'+topic.slug,kind:'page',title:topic.title,
+  description:topic.short,tags:[...topic.aliases,topic.parentSlug,...topic.situations],
+  path:'/rights/knowledge/'+topic.slug,status:'细分专题 · 法律依据与证据清单'
+ });
  for(const tip of GUIDE_TIPS)add({id:'guide:'+tip.id,kind:'page',title:tip.title,description:tip.summary,
   tags:[tip.value,tip.stage,...tip.keywords],path:'/rights/guide?tip='+encodeURIComponent(tip.id),status:'HHBA 原创职场行动建议'});
  // All public employer profiles, including subsequently added approved JSON.

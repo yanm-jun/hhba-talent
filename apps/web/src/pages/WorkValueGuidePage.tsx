@@ -1,4 +1,4 @@
-import {useMemo,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
 import {ArrowLeft,ArrowRight,BookOpen,CheckCircle2,ChevronDown,Clock3,Filter,Search,ShieldCheck,Wallet,Compass} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link} from '../router';
@@ -19,7 +19,8 @@ function matchesTip(tip:(typeof GUIDE_TIPS)[number],needle:string){
  const q=needle.trim().toLocaleLowerCase();
  if(!q)return true;
  const all=[tip.title,tip.summary,...tip.steps,...tip.keywords,tip.stage,tip.value].join(' ').toLocaleLowerCase();
- return all.includes(q)||tip.keywords.some(k=>q.includes(k.toLocaleLowerCase())||k.toLocaleLowerCase().includes(q));
+ const pieces=q.split(/[\s,，、;；]+/).filter(Boolean);
+ return pieces.every(token=>all.includes(token)||tip.keywords.some(k=>token.includes(k.toLocaleLowerCase())||k.toLocaleLowerCase().includes(token)));
 }
 const values=['全部','钱','时间','岗位','权益','健康','安全'];
 export function WorkValueGuidePage({user}:{user:User|null}){
@@ -29,6 +30,7 @@ export function WorkValueGuidePage({user}:{user:User|null}){
  const [maxTime,setMaxTime]=useState('全部');
  const [completed,setCompleted]=useState<string[]>(readCompleted);
  const [onlyPending,setOnlyPending]=useState(false);
+ const [visibleCount,setVisibleCount]=useState(24);
  const filtered=useMemo(()=>GUIDE_TIPS.filter(tip=>
   (stage==='all'||tip.stage===stage)
   &&(value==='全部'||tip.value===value)
@@ -36,6 +38,9 @@ export function WorkValueGuidePage({user}:{user:User|null}){
   &&(!onlyPending||!completed.includes(tip.id))
   &&matchesTip(tip,query)
  ),[query,stage,value,maxTime,completed,onlyPending]);
+ // Show only 24 cards at a time, even when the full corpus contains 200 actions.
+ useEffect(()=>{setVisibleCount(24);},[query,stage,value,maxTime,onlyPending]);
+ const visibleTips=filtered.slice(0,visibleCount);
  const finished=completed.length;
  const mark=(id:string)=>{
   const next=completed.includes(id)?completed.filter(x=>x!==id):[...completed,id];
@@ -78,8 +83,8 @@ export function WorkValueGuidePage({user}:{user:User|null}){
      <button type="button" className="hhba-vguide-reset" onClick={clear}>重置条件</button>
     </div>
    </section>
-   <div className="hhba-vguide-result-head"><h2>建议清单 <small>找到 {filtered.length} 条</small></h2><span>资料整理日期：{GUIDE_UPDATED_ON}</span></div>
-   {filtered.length?<div className="hhba-vguide-grid">{filtered.map(tip=>{
+   <div className="hhba-vguide-result-head"><h2>建议清单 <small>找到 {filtered.length} 条</small></h2><span>资料整理日期：{GUIDE_UPDATED_ON} · 本页显示 {Math.min(visibleCount,filtered.length)} 条</span></div>
+   {filtered.length?<div className="hhba-vguide-grid">{visibleTips.map(tip=>{
     const label=GUIDE_STAGES.find(s=>s.id===tip.stage)?.label||'职场建议';
     const done=completed.includes(tip.id);
     return <article className={'hhba-vguide-card'+(done?' is-completed':'')} key={tip.id} id={'tip-'+tip.id}>
@@ -96,6 +101,9 @@ export function WorkValueGuidePage({user}:{user:User|null}){
      <label className="hhba-vguide-done"><input type="checkbox" checked={done} onChange={()=>mark(tip.id)}/><span>{done?'已完成这项行动':'完成后标记'}</span>{done&&<CheckCircle2 size={15}/>}</label>
     </article>;
    })}</div>:<div className="hhba-vguide-empty" role="status"><Search size={23}/><strong>没有匹配的建议</strong><p>试试减少关键词、放宽时间限制，或切换到全部阶段。</p><button type="button" onClick={clear}>显示全部建议</button></div>}
+   {filtered.length>visibleCount&&<div className="hhba-vguide-load-more">
+    <button type="button" onClick={()=>setVisibleCount(n=>Math.min(n+24,filtered.length))}>继续查看下一批建议（剩余 {filtered.length-visibleCount} 条） <ArrowRight size={16}/></button>
+   </div>}
    <footer className="hhba-vguide-footer">
     <ShieldCheck size={21}/>
     <div><strong>关于来源与使用范围</strong><p>本指南由 HHBA 独立撰写，依据日常职场决策整理，不能替代劳动法规定或个案法律意见。涉及具体法定义务的卡片已关联劳动权益知识库；法律适用仍取决于地区、事实与现行规定。部分行动可能产生医疗、专业咨询或其他实际费用，办理前请单独核实。完成状态只保存在本浏览器，不上传账户或服务器。参考项目只用于产品组织方式研究，未复用第三方正文。</p>

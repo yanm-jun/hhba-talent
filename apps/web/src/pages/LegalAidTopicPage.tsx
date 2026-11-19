@@ -3,14 +3,18 @@ import {Shell} from '../components/Shell';
 import {Link} from '../router';
 import type {User} from '../services/api';
 import laborRights from '../data/laborRightsTopics.json';
+import subtopics from '../data/laborRightsSubtopics.json';
+import {LegalAidSubtopicPage} from './LegalAidSubtopicPage';
 import '../styles/legal-aid-landing.css';
 
 type LaborTopic = (typeof laborRights.topics)[number];
 const topics = laborRights.topics as LaborTopic[];
-export const supportedLaborTopicSlugs=topics.map(t=>t.slug);
+export const supportedLaborTopicSlugs=[...topics.map(t=>t.slug),...subtopics.topics.map(t=>t.slug)];
 export function LegalAidTopicPage({user,slug,embedded=false}:{user:User|null;slug:string;embedded?:boolean}){
  const knowledgeHref=embedded?'/candidate/account/legal-aid':'/rights/knowledge';
  const topic=topics.find(t=>t.slug===slug);
+ const subtopic=subtopics.topics.find(t=>t.slug===slug);
+ if(subtopic)return <LegalAidSubtopicPage user={user} topic={subtopic} embedded={embedded}/>;
  if(!topic)return <Shell user={user} embedded={embedded}><main className="hhba-law hhba-law-detail"><div className="hhba-law-panel"><div className="hhba-law-missing"><h1>没有找到这个劳动权益专题</h1><Link to={knowledgeHref}>返回法律援助首页</Link></div></div></main></Shell>;
  const index=topics.indexOf(topic);
  return <Shell user={user} embedded={embedded}>
@@ -22,7 +26,7 @@ export function LegalAidTopicPage({user,slug,embedded=false}:{user:User|null;slu
        <span className="hhba-law-brand-divider" aria-hidden="true"/>
        <span className="hhba-law-brand-name">法律援助 · 知识专题</span>
       </div>
-      <Link className="hhba-law-back" to={knowledgeHref}><ArrowLeft size={13} aria-hidden="true"/>返回八类问题</Link>
+      <Link className="hhba-law-back" to={knowledgeHref}><ArrowLeft size={13} aria-hidden="true"/>返回知识库</Link>
      </header>
      <article className="hhba-law-article">
       <div className="hhba-law-article-heading">
