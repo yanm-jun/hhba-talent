@@ -11,7 +11,7 @@ test('the existing HHBA homepage and public letter remain; unwanted banner stays
   assert.match(home, /<HomeCompanyMarquee\/>/);
   assert.match(home, /<UnifiedJobMarket compact\/>/);
   assert.match(home, /<HomeOpenLetter autoOpen=\{false\}\/>/);
-  assert.match(home, /我要应聘/);
+  assert.match(home, /求职与机会/);
   assert.match(home, /企业招聘导航/);
   assert.match(home, /hhba:open-letter/);
 });
