@@ -7,6 +7,7 @@ import {matchVisualRegionsToPdfPage,type VerifiedResumeAnchor} from '../services
 import {visualEditingReady,analyzeVisualResume,listPageResumeEdits,savePageResumeEdits,
  type VisualResumeLayout,type PageResumeEdit} from '../services/resumeVisualEditingApi';
 import '../styles/original-resume-viewer.css';
+import '../styles/siri-edge.css';
 
 // The viewer only displays a user's already stored original. The private R2
 // blob is fetched under that account's bearer session, never via public URL.
@@ -193,7 +194,8 @@ export function OriginalResumeViewer({resume,onClose}:{
      disabled={!visionConsent||visionBusy}>
      <PencilLine size={14}/>{visionBusy?'正在准备…':'开始修改'}</button>
    </div>}
-   <div ref={paper} className="hhba-original-resume-paper">
+   <div className={'hhba-original-resume-siri-stage hhba-siri-edge'+(layout?' hhba-siri-edge-active':'')}>
+    <div ref={paper} className="hhba-original-resume-paper">
     <div className="hhba-original-resume-page-frame" style={{
      width:pageSize.width||undefined,height:pageSize.height||undefined}}>
      <canvas ref={canvas} role="img" aria-label={'原始 PDF 第 '+page+' 页'}
@@ -212,16 +214,20 @@ export function OriginalResumeViewer({resume,onClose}:{
      })}
      {layout&&selectedId&&anchors.filter(a=>a.id===selectedId).map(anchor=>{
       const changed=changes.some(c=>c.id===anchor.id);
-      return <div className="hhba-original-resume-editbox" key={anchor.id}
-       role="region" aria-label="在原文位置修改"
-       style={{left:Math.min(58,anchor.bbox[0]/10)+'%',
+      const popupWidth=Math.min(296,Math.max(220,pageSize.width-24));
+      const suggestedLeft=pageSize.width*anchor.bbox[0]/1000;
+      const safeLeft=Math.max(10,Math.min(suggestedLeft,pageSize.width-popupWidth-10));
+      return <div className="hhba-original-resume-edit-glow hhba-siri-edge hhba-siri-edge-active"
+       key={anchor.id}
+       style={{left:safeLeft+'px',width:popupWidth+'px',
         top:Math.min(72,(anchor.bbox[1]+anchor.bbox[3])/10+1)+'%'}}>
+       <div className="hhba-original-resume-editbox"
+        role="region" aria-label="在原文位置修改">
        <div className="hhba-original-resume-editbox-title">
         <strong>修改这段</strong>
         <button type="button" aria-label="关闭修改" onClick={()=>setSelectedId(null)}><X size={14}/></button>
        </div>
-       <p>{anchor.text}</p>
-       <textarea aria-label="修改这段内容" maxLength={1600} rows={4} value={draft}
+       <textarea aria-label="修改这段内容" maxLength={1600} rows={3} value={draft}
         onChange={e=>{setDraft(e.target.value);setConfirmed(false);}}/>
        <label><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>
         我确认修改内容属实</label>
@@ -231,8 +237,10 @@ export function OriginalResumeViewer({resume,onClose}:{
         {changed&&<button type="button" disabled={saving} onClick={()=>void undoChange(anchor)}>
          <Undo2 size={13}/> 撤销</button>}
        </div>
+       </div>
       </div>;
      })}
+    </div>
     </div>
    </div>
    {layout&&anchors.length===0&&<p className="hhba-original-resume-note">
