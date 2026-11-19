@@ -55,7 +55,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
     <header className="hhba-match-modal-head">
      <div className="hhba-match-modal-brand">
       <span className="hhba-match-modal-symbol"><BriefcaseBusiness size={19}/></span>
-      <div><strong>汇方职场 · HHBA</strong><small>DeepSeek Search + V4 Pro 智能岗位推荐</small></div>
+      <div><strong>汇方职场 · HHBA</strong><small>为你找到的工作</small></div>
      </div>
      <button type="button" className="hhba-match-modal-close" onClick={onClose} aria-label="关闭推荐">
       <X size={19}/>
@@ -63,9 +63,9 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
     </header>
     <div className="hhba-match-modal-content">
      <div className="hhba-match-intro">
-      <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> AI 搜索真实岗位并匹配简历</span>
+      <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> 智能推荐</span>
       <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
-      <p>适配分仅供比较，不是录用概率。只展示中国大陆企业招聘岗位，不提供第三方招聘平台链接。{pending?'结果正在陆续生成，下方岗位可先查看。':'以下岗位网址来自 DeepSeek Search 结果，推荐原因由 V4 Pro 根据简历生成。'}</p>
+      <p>分数仅供参考，不代表录用概率。岗位仅限中国大陆。{pending?'结果正在陆续生成，下方岗位可先查看。':'请在企业官网核实岗位是否仍然招聘。'}</p>
      </div>
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {!pending&&result.history_status==='SAVED'&&<div className="hhba-match-history-confirm">
@@ -91,10 +91,10 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
            </div>
            <div className="hhba-native-availability" role="note">
             <span className={job.availability_status==='OPEN_LISTED'?'hhba-native-state-open':'hhba-native-state-unknown'}>
-             {job.availability_status==='OPEN_LISTED'?'网页显示在招 · 仍需确认':'投递状态未确认'}
+             {job.availability_status==='OPEN_LISTED'?'网页显示招聘中':'请核实是否招聘'}
             </span>
             <small>{job.availability_status==='OPEN_LISTED'?
-             '页面文本提示开放申请，是否可提交仍以招聘官网为准':'链接来自搜索结果，可能已过期或需要登录；请打开官网确认'}</small>
+             '请以企业官网为准':'请打开企业招聘页面确认'}</small>
            </div>
           </div>
           <div className="hhba-native-score" aria-label={Number.isInteger(job.match_score)?'简历适配分 '+job.match_score+' 分':'适配分证据不足'}>
@@ -135,7 +135,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
       </div>}
      {!pending&&resumeStorage?.saved&&<p className="hhba-match-saved-resume">已选择账户中保存的简历，可在「我的简历」中继续管理。</p>}
      {resumeStorage?.notice&&<p className="hhba-match-saved-resume" role="status">{resumeStorage.notice}</p>}
-     <p className="hhba-match-disclaimer">{result.disclaimer||'职位信息由 DeepSeek 联网检索提供，HHBA 未逐条人工复核。岗位是否仍开放、任职要求及薪资以原始网页为准；不会自动投递。'}</p>
+     <p className="hhba-match-disclaimer">{result.disclaimer||'岗位信息可能变化，请以企业招聘页面为准。HHBA 不会自动投递你的简历。'}</p>
     </div>
     <footer className="hhba-match-modal-foot">
      <span>HHBA · 让机会与人才，找到彼此。</span>
