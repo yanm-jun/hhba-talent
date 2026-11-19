@@ -150,6 +150,7 @@ export async function onRequest({request,env}){
    // Both objects reside exclusively in the candidate-owned private R2 bucket.
    await bucket.delete(row.storage_key);
    await bucket.delete(row.storage_key+'.hhba-vision-layout-v1.json').catch(()=>{});
+   await bucket.delete(row.storage_key+'.hhba-page-edits-v1.json').catch(()=>{});
    const deleted=await db.prepare(
     'DELETE FROM hhba_candidate_resumes WHERE phone=? AND id=?'
    ).bind(phone,id).run();
