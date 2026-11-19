@@ -104,3 +104,17 @@ test('oversized or extra document keys are rejected',async()=>{
  const b=await onRequest({request:req('POST','',{...content,details:{...fields,summary:'ok',admin:true}}),env:s.env});
  assert.equal(b.status,400);
 });
+
+
+test('12 Chinese source paragraphs may be explicitly saved without UTF-8 truncation',async()=>{
+ const s=setup(),blocks=Array.from({length:12},(_,i)=>({
+  id:'source-'+i,section:'summary',text:'负责区域门店客户服务与业务分析'.repeat(70)
+ }));
+ const response=await onRequest({request:req('POST','',{...content,accepted_ids:[],blocks}),env:s.env});
+ assert.equal(response.status,201);
+ assert.equal(s.records.length,1);
+ const stored=JSON.parse(s.records[0].content_json);
+ assert.equal(stored.blocks.length,12);
+ assert.equal(stored.blocks[11].text,blocks[11].text);
+ assert.ok(new TextEncoder().encode(JSON.stringify(stored)).byteLength>30000);
+});
