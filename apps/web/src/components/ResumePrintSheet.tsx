@@ -1,7 +1,8 @@
+import type {ReactNode} from 'react';
 import type {ResumeDocument} from '../services/resumeDocument';
 import '../styles/resume-print.css';
 
-export function ResumePrintSheet({document}:{document:ResumeDocument}){
+export function ResumePrintSheet({document,renderBlock}:{document:ResumeDocument;renderBlock?:(id:string,text:string)=>ReactNode}){
  const {details,education,experiences,skills,sourceParagraphs}=document;
  return <article className="hhba-print-sheet" aria-label="可打印的岗位专属简历">
   <header className="hhba-print-header">
@@ -25,7 +26,7 @@ export function ResumePrintSheet({document}:{document:ResumeDocument}){
      {e.period&&<span>{e.period}</span>}
     </div>
     {e.organization&&<p className="hhba-print-organization">{e.organization}</p>}
-    <p className="hhba-print-paragraph">{e.details}</p>
+    {renderBlock?renderBlock(e.id,e.details):<p className="hhba-print-paragraph">{e.details}</p>}
    </div>)}
   </section>}
   {education.length>0&&<section className="hhba-print-section">
@@ -36,12 +37,14 @@ export function ResumePrintSheet({document}:{document:ResumeDocument}){
    <h3>专业技能</h3>
    {skills.map((skill,i)=><div className="hhba-print-skill" key={i}>
     {skill.name&&<strong>{skill.name}</strong>}
-    <p className="hhba-print-paragraph">{skill.details}</p>
+    {renderBlock?renderBlock('skill-'+i,skill.details):<p className="hhba-print-paragraph">{skill.details}</p>}
    </div>)}
   </section>}
   {sourceParagraphs.length>0&&<section className="hhba-print-section">
    <h3>简历原始内容（请检查并整理）</h3>
-   {sourceParagraphs.map((content,i)=><p className="hhba-print-paragraph hhba-print-source" key={i}>{content}</p>)}
+   {sourceParagraphs.map((content,i)=>renderBlock?
+    <div key={i}>{renderBlock('source-'+i,content)}</div>:
+    <p className="hhba-print-paragraph hhba-print-source" key={i}>{content}</p>)}
   </section>}
   {!details.summary&&!experiences.length&&!education.length&&!skills.length&&!sourceParagraphs.length&&
    <p className="hhba-print-placeholder">请先补充真实简历内容。</p>}
