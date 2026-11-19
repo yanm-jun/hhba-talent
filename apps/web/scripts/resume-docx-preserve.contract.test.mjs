@@ -16,24 +16,55 @@ const u32=(d,i,n)=>d.setUint32(i,n,true);
 // Synthetic DOCX with deliberately nontrivial styles, table, header,
 // footer, picture and relationship: all must survive completely unchanged.
 const body='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
- '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'+
- '<w:body><w:tbl><w:tr><w:tc><w:p><w:r><w:rPr><w:b/><w:color w:val="452786"/>'+
+ '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'+
+ ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'+
+ '<w:body><w:p><w:r><w:t>HHBA 测试：保留原始排版</w:t></w:r></w:p>'+
+ '<w:tbl><w:tblPr><w:tblW w:w="4800" w:type="dxa"/></w:tblPr>'+
+ '<w:tblGrid><w:gridCol w:w="4800"/></w:tblGrid>'+
+ '<w:tr><w:tc><w:tcPr><w:tcW w:w="4800" w:type="dxa"/></w:tcPr>'+
+ '<w:p><w:r><w:rPr><w:b/><w:color w:val="452786"/>'+
  '<w:rFonts w:eastAsia="Microsoft YaHei"/></w:rPr><w:t>原始岗位描述</w:t></w:r>'+
  '</w:p></w:tc></w:tr></w:tbl>'+
  '<w:p><w:r><w:t>完整的另一段文字</w:t></w:r></w:p>'+
- '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/></w:sectPr></w:body></w:document>';
+ '<w:sectPr><w:headerReference w:type="default" r:id="rId2"/>'+
+ '<w:footerReference w:type="default" r:id="rId3"/>'+
+ '<w:pgSz w:w="11906" w:h="16838"/>'+
+ '<w:pgMar w:top="850" w:right="850" w:bottom="850" w:left="850"/></w:sectPr>'+
+ '</w:body></w:document>';
 function fixture({method=0,duplicate=false,split=false,macro=false}={}){
  const doc=duplicate?body.replace('</w:body>','<w:p><w:r><w:t>原始岗位描述</w:t></w:r></w:p></w:body>'):
   split?body.replace('<w:t>原始岗位描述</w:t>','<w:t>原始岗位</w:t><w:t>描述</w:t>'):body;
  const parts=[
-  ['[Content_Types].xml','<Types><Default Extension="png" ContentType="image/png"/></Types>'],
-  ['_rels/.rels','<Relationships><Relationship Target="word/document.xml"/></Relationships>'],
+  ['[Content_Types].xml',
+   '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+   '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+   '<Default Extension="xml" ContentType="application/xml"/>'+
+   '<Default Extension="png" ContentType="image/png"/>'+
+   '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'+
+   '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>'+
+   '<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>'+
+   '<Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>'+
+   '</Types>'],
+  ['_rels/.rels','<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+
+   '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>'+
+   '</Relationships>'],
   ['word/document.xml',doc],
-  ['word/styles.xml','<styles><color val="F00"/><font name="Original"/></styles>'],
-  ['word/header1.xml','<header><w:t>页眉保持不变</w:t></header>'],
-  ['word/footer1.xml','<footer><w:t>页脚保持不变</w:t></footer>'],
-  ['word/media/photo.png',Uint8Array.from([137,80,78,71,0,255,1,2,3,4,5,6])],
-  ['word/_rels/document.xml.rels','<Relationships><Relationship Target="media/photo.png"/></Relationships>'],
+  ['word/styles.xml','<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'+
+   '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>'+
+   '</w:styles>'],
+  ['word/header1.xml','<w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'+
+   '<w:p><w:r><w:t>页眉保持不变</w:t></w:r></w:p></w:hdr>'],
+  ['word/footer1.xml','<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'+
+   '<w:p><w:r><w:t>页脚保持不变</w:t></w:r></w:p></w:ftr>'],
+  ['word/media/photo.png',Uint8Array.from(Buffer.from(
+   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAJUbRZkAAAAASUVORK5CYII=','base64'))],
+  ['word/_rels/document.xml.rels',
+   '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+
+   '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'+
+   '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>'+
+   '<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>'+
+   '<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/photo.png"/>'+
+   '</Relationships>'],
   ...(macro?[['word/vbaProject.bin',Uint8Array.of(1,2,3)]]:[])
  ];
  const locals=[],central=[];let at=0;
