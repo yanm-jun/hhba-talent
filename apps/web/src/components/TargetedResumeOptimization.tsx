@@ -107,7 +107,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
   try{
    const verified=await verifyOfficialJob(job.official_url);
    setVerifiedJob(verified);
-   setNotice('已从受支持的企业官网直接核验岗位详情。请核对下方岗位标题与企业，再确认用于复评。');
+   setNotice('已找到企业发布的岗位信息。请确认企业和岗位是否正确。');
   }catch(e){setNotice(e instanceof Error?e.message:'无法独立核验该岗位页面。');}
   finally{setVerifying(false);}
  }
@@ -118,7 +118,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
    const result=await reassessResume(scoreJobId,profile,blocks,version.blocks);
    setScoreResult(result);
    if(!result.supported)setNotice('此岗位未通过当前官方快照复评条件，未生成分数。');
-   else setNotice('已使用同一版本的 V2 评分引擎对两个简历版本完成重新计算。');
+   else setNotice('已用相同标准比较修改前后的简历。');
   }catch(e){setNotice(e instanceof Error?e.message:'复评请求失败。');}
   finally{setScoring(false);}
  }
@@ -233,7 +233,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
   active.current?.abort();setBusy(false);setVersion(initial());setSuggestions([]);invalidateScore();
   setIgnored([]);setConfirmed([]);setNewEvidence({});setConfirmReal(false);setEditingBlock(null);
   setOpenSuggestionId(null);setEditingSuggestionId(null);setSuggestionDrafts({});setUndoStack([]);
-  setNotice('已恢复原始预览。');
+  setNotice('已恢复原稿。');
  }
  function renderEditableBlock(id:string,text:string){
   const block=version.blocks.find(item=>item.id===id);
@@ -302,11 +302,11 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
  return <section className="targeted-resume" aria-label="岗位定向简历优化">
   <div className="targeted-resume-heading">
    <div><small>HHBA / 岗位定向优化</small><h3>{job.title_zh||job.title}</h3>
-    <p>AI 建议原位展示，逐条确认后填充。原始简历文件始终不变。</p></div>
-   <span><Sparkles size={13} aria-hidden="true"/> 原位智能润色</span>
+    <p>直接在简历上修改。原文件不会被覆盖。</p></div>
+   <span><Sparkles size={13} aria-hidden="true"/> 智能修改</span>
   </div>
   <div className="targeted-resume-toolbar">
-   <div><strong>开始为这个岗位润色</strong><p>依据已识别的工作经历、技能证据与岗位要求生成建议，避免凭空编造。</p></div>
+   <div><strong>优化这份简历</strong><p>根据目标岗位提出修改建议，不会凭空添加经历。</p></div>
    {hasSession&&status?.enabled
     ?<button type="button" disabled={!consent||busy||!blocks.length} onClick={generate}>
        {busy?<><LoaderCircle size={15} className="resume-match-spinning"/> 正在生成…</>:<><Sparkles size={15}/> 生成 AI 建议</>}
@@ -314,7 +314,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
     :<span className="targeted-resume-unavailable">{!hasSession?'站内登录后可使用 AI 润色':status?'AI 润色尚未开放':'正在检查服务状态…'}</span>}
   </div>
   {omittedSourceCharacters>0&&<p className="targeted-resume-truncation" role="alert">
-   <strong>原始简历内容未完整载入。</strong>部分文字超出可编辑或可打印容量，
+   <strong>这份简历有部分内容未显示。</strong>部分文字超出可编辑或可打印容量，
    仍有约 {omittedSourceCharacters} 个非空白字符未纳入本次预览。
    为避免遗漏经历，本次暂不允许保存岗位版本或导出 PDF / Word；请先上传精简或分段整理后的原始简历。
    原上传文件不会因此被修改。
@@ -325,8 +325,8 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
   </label>}
   <section className="targeted-resume-document-editor" aria-label="正式简历排版与打印">
    <div className="targeted-resume-document-heading">
-    <div><strong>在简历上直接修改</strong>
-     <p>下方就是你的简历：AI 会在对应段落弹出建议，可填充、修改、忽略或撤销。原始上传文件保持不变。</p>
+    <div><strong>直接修改简历</strong>
+     <p>点选对应段落即可修改，所有变更均可撤销。</p>
     </div>
     <div className="targeted-resume-document-actions">
      <button type="button" disabled={!undoStack.length} onClick={undo}><Undo2 size={15}/> 撤销</button>
@@ -348,7 +348,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
      placeholder="用自己的真实工作经历和求职方向概括优势"
      onChange={e=>updateDetail('summary',e.target.value)}/></label>
    </div>
-   <p className="targeted-resume-print-note">PDF 与可编辑 Word（DOCX）均使用下方已确认的简历内容，不包含 AI 浮层或编辑按钮。PDF 会打开浏览器打印窗口，请选择「保存为 PDF」。上传文件的原始排版不保证无损还原。</p>
+   <p className="targeted-resume-print-note">可以导出 PDF 或 Word。导出内容不包含修改按钮；复杂的原始排版可能无法完全保留。</p>
    {!canExport&&<p className="targeted-resume-print-note" role="status">请填写真实姓名、确认简历内容完整，并保存正在编辑的段落，才可以导出 PDF 或 Word。</p>}
   </section>
   <div className="targeted-resume-live-paper" aria-label="可原位编辑的简历预览">
@@ -364,25 +364,25 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
   </div>}
   <section className="targeted-resume-reassess" aria-label="岗位匹配评分复评">
    <div className="targeted-resume-reassess-heading">
-    <div><strong>岗位匹配分重新评估</strong>
-     <p>仅支持最新官方审核 ATS 快照，或经服务器直接读取并核验的指定企业官网岗位。前后都采用 HHBA Match Ranking V2，不沿用旧卡片分数。</p></div>
+    <div><strong>重新查看匹配分</strong>
+     <p>只有核实了企业发布的岗位要求后，才会比较修改前后的分数。</p></div>
     {scoreStatus?.enabled&&<button type="button" onClick={reassess} disabled={!hasSupportedJob||!hasWordingChanges||!confirmReassessment||scoring}>
      {scoring?'正在复评…':'重新计算匹配分'}</button>}
    </div>
    {!hasAuditedAtsIdentity&&verifyStatus?.enabled&&
     <div className="targeted-resume-verify">
-     <div><strong>独立核验企业官网岗位</strong>
-      <p>搜索式 AI 返回的岗位网址尚未由 HHBA 核实。仅支持严格白名单中的企业招聘详情链接，核验时由服务器访问对应官网，不会向企业发送你的简历。</p>
+     <div><strong>确认目标岗位</strong>
+      <p>先确认企业的真实招聘信息，检查时不会把简历发给企业。</p>
      </div>
      {!verifiedJob&&<label className="targeted-resume-confirm">
       <input type="checkbox" checked={consentVerify} onChange={e=>setConsentVerify(e.target.checked)}/>
-      我理解此次仅核验公开职位页面，官网可能限制访问；网站无法取得合格任职要求时不会生成分数。
+      我同意读取企业公开的岗位要求，用于核对匹配分。
      </label>}
      {!verifiedJob&&<button type="button" disabled={!consentVerify||verifying} onClick={verifyEmployer}>
-      {verifying?'正在读取企业岗位…':'核验这个企业岗位'}
+      {verifying?'正在读取企业岗位…':'确认岗位信息'}
      </button>}
      {verifiedJob&&<div className="targeted-resume-verified-job">
-      <p><strong>已核验的官网岗位：</strong>{verifiedJob.company} · {verifiedJob.title} · {verifiedJob.location}</p>
+      <p><strong>找到的岗位：</strong>{verifiedJob.company} · {verifiedJob.title} · {verifiedJob.location}</p>
       <a href={verifiedJob.official_url} target="_blank" rel="noopener noreferrer">查看已核验职位详情</a>
       <p>{verifiedJob.disclaimer}</p>
       <label className="targeted-resume-confirm">
@@ -392,20 +392,20 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
       </label>
      </div>}
     </div>}
-   {!scoreStatus?.enabled&&<p className="targeted-resume-reassess-unavailable">V2 可信复评尚未开放，当前仍可使用文字证据覆盖检查。</p>}
+   {!scoreStatus?.enabled&&<p className="targeted-resume-reassess-unavailable">暂时无法重新评分，但可以继续修改简历。</p>}
    {scoreStatus?.enabled&&<label className="targeted-resume-confirm">
     <input type="checkbox" checked={confirmReassessment} onChange={e=>setConfirmReassessment(e.target.checked)}/>
-    我确认本次简历改写均为真实情况，并同意 HHBA 在站内读取当前简历片段、对照官方岗位快照进行评分。此复评不会调用第三方生成式 AI。
+    我确认简历内容真实，并同意使用本次修改后的内容重新评分。
    </label>}
    {scoreStatus?.enabled&&!hasAuditedAtsIdentity&&!hasSupportedJob&&
-    <p className="targeted-resume-reassess-unavailable">此岗位暂未形成可用于复评的可信官网 JD 快照。请先完成受支持企业的独立核验；不支持的招聘站仍只能进行文字润色与证据覆盖比较。</p>}
+    <p className="targeted-resume-reassess-unavailable">暂时无法核实这份岗位要求，可以继续修改简历，但不能生成新的匹配分。</p>}
    {scoreStatus?.enabled&&hasSupportedJob&&!hasWordingChanges&&<p className="targeted-resume-reassess-unavailable">请先编辑或填充一条简历内容，才需要重新评分。</p>}
    {scoreResult?.supported&&typeof scoreResult.original_score==='number'&&typeof scoreResult.updated_score==='number'&&
     <div className="targeted-resume-score-comparison">
-     <div><small>修改前 · V2 复评基准</small><strong>{scoreResult.original_score}<span>/100</span></strong></div>
-     <div><small>修改后 · V2 同规则</small><strong>{scoreResult.updated_score}<span>/100</span></strong></div>
+     <div><small>修改前</small><strong>{scoreResult.original_score}<span>/100</span></strong></div>
+     <div><small>修改后</small><strong>{scoreResult.updated_score}<span>/100</span></strong></div>
      <p>差值：{scoreResult.delta&&scoreResult.delta>0?'+':''}{scoreResult.delta} 分。岗位：{scoreResult.verified_job_title} · {scoreResult.verified_company}</p>
-     {scoreResult.source_label&&<p>官方岗位证据：{scoreResult.source_label}；仍需在官网确认是否继续开放投递。</p>}
+     {scoreResult.source_label&&<p>岗位来源：{scoreResult.source_label}；仍需在官网确认是否继续开放投递。</p>}
      {scoreResult.selected_job_as_target_direction&&<p>因首次匹配未提供可核实的职业目标，本次将你选定的岗位视为求职意向，不视为已经具备该岗位的任职能力。</p>}
      {scoreResult.newly_visible_terms&&scoreResult.newly_visible_terms.length>0&&
       <p>文字新增体现：{scoreResult.newly_visible_terms.join('、')}。这些技能仍需以你的真实经历为依据。</p>}
@@ -425,7 +425,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
     <p>仅在你主动保存后，将当前已确认的文字片段保存在 HHBA 私人账号中；不保存原始 PDF/DOCX。</p></div>
    {hasSession&&storageReady&&<button type="button" disabled={saving||!confirmReal||!canPrint} onClick={persist}>
     <Save size={14} aria-hidden="true"/>{saving?'保存中…':'保存当前版本'}</button>}
-   {hasSession&&!storageReady&&<span className="targeted-resume-unavailable">云端版本保存尚未开放或数据库未就绪</span>}
+   {hasSession&&!storageReady&&<span className="targeted-resume-unavailable">暂时无法保存，请稍后再试</span>}
   </div>
   {hasSession&&storageReady&&<label className="targeted-resume-confirm targeted-resume-save-confirm">
    <input type="checkbox" checked={confirmReal} onChange={e=>setConfirmReal(e.target.checked)}/>
@@ -439,8 +439,8 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
    </div>)}
   </div>}
   <div className="targeted-resume-footer">
-   <p><ShieldCheck size={14} aria-hidden="true"/> 原始岗位卡片参考分：{Number.isInteger(job.reference_score)?job.reference_score+'/100':'暂无可靠分数'}。润色后的匹配分须通过同一评分规则重新评估；本预览不虚报分数。</p>
-   <button type="button" onClick={reset}><Undo2 size={14}/> 恢复原始预览</button>
+   <p><ShieldCheck size={14} aria-hidden="true"/> 原来的参考分：{Number.isInteger(job.reference_score)?job.reference_score+'/100':'暂无可靠分数'}。润色后的匹配分须通过同一评分规则重新评估；评分仅供参考。</p>
+   <button type="button" onClick={reset}><Undo2 size={14}/> 恢复原稿</button>
   </div>
   {notice&&<p role="status" className="targeted-resume-notice">{notice}</p>}
   {createPortal(<div className="hhba-print-host" data-hhba-print-host="resume">
