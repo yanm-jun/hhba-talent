@@ -135,3 +135,12 @@
 .hhba-vguide-load-more{display:flex;justify-content:center;margin:26px auto 0}
 .hhba-vguide-load-more button{display:inline-flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;border:1px solid #C5DBF8;border-radius:999px;background:#fff;color:#125EBC;padding:12px 23px;font:inherit;font-size:13px;font-weight:700}
 .hhba-vguide-load-more button:hover,.hhba-vguide-load-more button:focus-visible{background:#EAF3FF;border-color:#125EBC;outline-offset:3px}
+
+/* Deep-link reading state: a specific action opens immediately without changing the guide design. */
+.hhba-vguide-selected{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:#F4F8FE;border:1px solid #C5DBF8;color:#355575;border-radius:12px;padding:14px 18px;margin:23px 0 3px;font-size:12px;line-height:1.8}
+.hhba-vguide-selected>span{display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px}
+.hhba-vguide-selected>span svg{color:#125EBC;flex:none}
+.hhba-vguide-selected strong{color:#102A5A}
+.hhba-vguide-selected>a{display:inline-flex;align-items:center;gap:6px;color:#125EBC;text-decoration:none;font-weight:700}
+.hhba-vguide-selected>a:hover{text-decoration:underline}
+.hhba-vguide-card.is-targeted{border-color:#A9C8EF;box-shadow:0 0 0 2px rgba(18,94,188,.06)}
