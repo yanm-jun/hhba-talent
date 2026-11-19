@@ -103,13 +103,17 @@ export async function matchServiceReady(signal?:AbortSignal):Promise<boolean>{
 }
 /** Best-effort browser redaction before submitting text to HHBA's server. */
 export function redactResumeTextLocally(text:string):string{
- return text
+ const redacted=text
   .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,'[邮箱已隐藏]')
   .replace(/(?<!\d)1[3-9]\d{9}(?!\d)/g,'[手机号已隐藏]')
   .replace(/(?<![0-9A-Za-z])\d{17}[0-9Xx](?![0-9A-Za-z])/g,'[身份证号已隐藏]')
   .replace(/\bhttps?:\/\/[^\s<>]{3,200}/gi,'[个人网址已隐藏]')
   .replace(/(?:微信号|微信|QQ号|QQ)\s*[:：]\s*[A-Za-z0-9_-]{5,32}/gi,'[即时通讯账号已隐藏]')
-  .trim().slice(0,20000);
+  .trim();
+ // Never silently drop the tail of a PDF/DOCX before optimization sees it.
+ // The frontend also enforces this limit for user-reviewed text.
+ if(redacted.length>20000)throw new MatchError(413,'简历可提取文字超过 20,000 字符，为避免遗漏经历已停止分析；请先精简原文件或分段整理后重试。');
+ return redacted;
 }
 export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Promise<string>{
  if(!/\.(pdf|docx)$/i.test(file.name)||file.size<30||file.size>LIMIT)
