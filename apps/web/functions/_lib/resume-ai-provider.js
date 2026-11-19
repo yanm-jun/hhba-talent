@@ -28,12 +28,12 @@ export function selectProvider(env,task='resume_optimization'){
  return {name:requested,...PROVIDERS[requested],key,model:model.trim()};
 }
 export function parseSuggestions(raw,allowedBlockIds){
- if(!raw||!Array.isArray(raw.suggestions))throw new Error('INVALID_AI_RESPONSE');
+ if(!raw||!Array.isArray(raw.suggestions))throw new Error('AI_PROVIDER_RESPONSE_INVALID');
  const allowed=new Set(allowedBlockIds);
  return raw.suggestions.slice(0,12).map(s=>{
   if(!s||!allowed.has(s.blockId)||!['replace','append','request_evidence'].includes(s.action)||
    !['verified','needs_user_confirmation'].includes(s.evidenceStatus)||
-   !s.id||!s.original||!s.proposed||!s.rationale||!s.jobRequirement)throw new Error('INVALID_AI_SUGGESTION');
+   !s.id||!s.original||!s.proposed||!s.rationale||!s.jobRequirement)throw new Error('AI_PROVIDER_RESPONSE_INVALID');
   return {id:clip(s.id,100),blockId:s.blockId,action:s.action,
    original:clip(s.original,1600),proposed:clip(s.proposed,1600),
    rationale:clip(s.rationale,600),jobRequirement:clip(s.jobRequirement,600),
@@ -42,7 +42,7 @@ export function parseSuggestions(raw,allowedBlockIds){
 }
 export async function generateSuggestions({env,blocks,job,signal}){
  const provider=selectProvider(env);
- const system='你是HHBA简历优化助手。只使用用户提供的真实证据。不要虚构任职资格、学历、时间、业绩或技能。针对岗位逐条提出建议；缺少事实时使用request_evidence。最多生成12条，每条不超过1600字；仅返回JSON对象，字段suggestions数组，每条含id,blockId,action,original,proposed,rationale,jobRequirement,evidenceStatus。';
+ const system='你是HHBA简历优化助手。只使用用户提供的真实证据。不要虚构任职资格、学历、时间、业绩或技能。针对岗位逐条提出建议；缺少事实时使用request_evidence。每次选取最多5处最值得优化的真实表达，每条建议适度精炼，不要重复整份简历；如无可用建议返回空数组。仅返回JSON对象（不要Markdown），字段suggestions数组，每条必须含id,blockId,action,original,proposed,rationale,jobRequirement,evidenceStatus。对于不确定事实一律标注needs_user_confirmation。';
  const input=JSON.stringify({blocks,job:{title:job.title,requirements:job.requirements}});
  let url,headers,body;
  if(provider.protocol==='anthropic'){
@@ -52,7 +52,7 @@ export async function generateSuggestions({env,blocks,job,signal}){
  }else{
   url=provider.baseUrl+'/chat/completions';
   headers={'content-type':'application/json',authorization:'Bearer '+provider.key};
-  body={model:provider.model,messages:[{role:'system',content:system},{role:'user',content:input}],...(provider.name==='openai'?{max_completion_tokens:2200}:{max_tokens:2200}),...(provider.name==='deepseek'?{response_format:{type:'json_object'},thinking:{type:'disabled'}}:{})};
+  body={model:provider.model,messages:[{role:'system',content:system},{role:'user',content:input}],...(provider.name==='openai'?{max_completion_tokens:2200}:{max_tokens:3200}),...(provider.name==='deepseek'?{response_format:{type:'json_object'},thinking:{type:'disabled'}}:{})};
  }
  let response;
  try{
@@ -74,6 +74,7 @@ export async function generateSuggestions({env,blocks,job,signal}){
  let data;
  try{data=await response.json();}catch{throw new Error('AI_PROVIDER_RESPONSE_INVALID');}
  const output=provider.protocol==='anthropic'?data?.content?.filter(x=>x.type==='text').map(x=>x.text).join(''):data?.choices?.[0]?.message?.content;
+ if(data?.choices?.[0]?.finish_reason==='length')throw new Error('AI_PROVIDER_RESPONSE_INVALID');
  if(typeof output!=='string'||!output.trim())throw new Error('AI_PROVIDER_RESPONSE_INVALID');
  let parsed;
  try{parsed=JSON.parse(output.replace(/^\s*```(?:json)?\s*|\s*```\s*$/g,''));}catch{throw new Error('AI_PROVIDER_RESPONSE_INVALID')}
