@@ -19,6 +19,7 @@ OUT = Path(os.environ.get("HHBA_SCREENSHOT_DIR", "tmp/rights-guide-screens"))
 OUT.mkdir(parents=True, exist_ok=True)
 ROOT = Path(__file__).resolve().parents[1]
 INTENTS = json.loads((ROOT / "src/data/laborRightsSearchIntents.json").read_text(encoding="utf-8"))
+GROUPS = json.loads((ROOT / "src/data/laborRightsBrowseGroups.json").read_text(encoding="utf-8"))
 REGRESSION = json.loads((ROOT / "src/data/laborRightsQueryFixtures.json").read_text(encoding="utf-8"))
 MAIN_BY_INTENT = {intent["id"]: intent["primary"] for intent in INTENTS["intents"]}
 
@@ -80,12 +81,35 @@ with sync_playwright() as playwright:
         page = context.new_page()
         page.goto(BASE + "/rights/knowledge", wait_until="domcontentloaded")
         page.locator(".hhba-knowledge-search input").wait_for(timeout=20000)
-        assert page.get_by_role("heading", name="了解劳动权益，从可靠的依据开始。").count() == 1
-        assert page.locator(".hhba-law-topic").count() == 8
-        assert page.locator(".hhba-knowledge-subtopic-card").count() == 12
-        assert page.get_by_text("200 条行动建议", exact=False).count() >= 1
+        assert page.get_by_role("heading", name="你遇到了什么职场问题？").count() == 1
+        buttons = page.locator("button.hhba-knowledge-category")
+        assert buttons.count() == 6, f"{name}: category navigation must have six entries"
+        assert page.locator(".hhba-law-topic").count() == 1
+        assert page.locator(".hhba-knowledge-subtopic-card").count() == 2
+        assert page.get_by_text("200 条原创建议", exact=False).count() >= 1
         assert_no_overflow(page, name + ":knowledge")
         page.screenshot(path=str(OUT / f"{name}-knowledge.png"), full_page=False, animations="disabled")
+
+        # All twenty real source-backed topic routes must still be available by
+        # choosing the six categories. No double listing and no missing route.
+        discovered = set()
+        for group in GROUPS["groups"]:
+            button = page.get_by_role("button", name=group["label"], exact=True)
+            button.click()
+            assert button.get_attribute("aria-pressed") == "true"
+            rows = page.locator("a.hhba-knowledge-result-row")
+            assert rows.count() == len(group["topics"]), (
+                f"{name}: {group['label']} has a wrong number of linked questions"
+            )
+            for topic in group["topics"]:
+                href = f"/rights/knowledge/{topic['slug']}"
+                assert page.locator(f'a.hhba-knowledge-result-row[href="{href}"]').count() == 1, (
+                    f"{name}: real article missing: {href}"
+                )
+                discovered.add(topic["slug"])
+        assert len(discovered) == 20, f"{name}: lost or duplicated a real legal article"
+        page.get_by_role("button", name="工资与报酬", exact=True).click()
+        assert_no_overflow(page, name + ":categories")
 
         search = page.locator(".hhba-knowledge-search input")
         for phrase, main_slug, sub_slug in CASES:
