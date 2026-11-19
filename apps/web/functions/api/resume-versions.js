@@ -1,7 +1,7 @@
 // Account-owned job-targeted resume snapshots. Explicit save only; no raw PDF/DOCX storage.
 import {sessionOfBearer,getUserByPhone} from '../_lib/real-auth.js';
 const KIND='HHBA_TARGETED_RESUME_VERSIONS_V1';
-const MAX_BYTES=30000;
+const MAX_BYTES=96*1024;
 const respond=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store',
  'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'
