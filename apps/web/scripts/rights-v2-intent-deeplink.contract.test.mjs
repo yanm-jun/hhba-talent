@@ -10,7 +10,7 @@ const hub=read('src/pages/LegalAidLandingPage.tsx');
 const guide=read('src/pages/WorkValueGuidePage.tsx');
 const css=read('src/styles/hhba-work-value-guide.css');
 const contract=read('src/data/hhbaWorkValueGuide.ts');
-const tips=JSON.parse(contract.match(/export const GUIDE_TIPS:GuideTip\\[\\]=([\\s\\S]*);\\s*$/)?.[1]||'null');
+const tips=JSON.parse(contract.match(/export const GUIDE_TIPS:GuideTip\[\]=([\s\S]*);\s*$/)?.[1]||'null');
 const tipIds=new Set(tips.map(tip=>tip.id));
 
 const normal=(s)=>s.trim().toLocaleLowerCase();
@@ -70,9 +70,9 @@ test('official subtopic references point to the correct published law texts',()=
 });
 
 test('search remains private and selected action opens on exact deep link',()=>{
- assert.match(hub,/matchingIntents\\(query\\)/);
- assert.match(hub,/featuredActions\\.indexOf\\(tip\\.id\\)/);
- assert.match(hub,/\.sort\\(\\(a,b\\)=>b\\.score-a\\.score/);
+ assert.match(hub,/matchingIntents\(query\)/);
+ assert.match(hub,/featuredActions\.indexOf\(tip\.id\)/);
+ assert.match(hub,/\.sort\(\(a,b\)=>b\.score-a\.score/);
  assert.match(hub,/优先推荐的职场行动/);
  assert.match(hub,/const matchingIntents=\(raw:string\)=>/);
  assert.match(hub,/intent\.subtopics\.includes\(topic\.slug\)/);
