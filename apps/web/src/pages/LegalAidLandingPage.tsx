@@ -37,7 +37,11 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
  const [query,setQuery]=useState('');
  const knowledgeHref=embedded?'/candidate/account/legal-aid':'/rights/knowledge';
  const matches=useMemo(()=>laborRights.topics.filter(topic=>topicMatches(topic,query)),[query]);
- const guideMatches=useMemo(()=>query.trim()?GUIDE_TIPS.filter(tip=>tipMatches(tip,query)).slice(0,6):[GUIDE_TIPS[0],GUIDE_TIPS[10],GUIDE_TIPS[15],GUIDE_TIPS[35]],[query]);
+ const guideMatches=useMemo(()=>{
+  if(!query.trim())return [GUIDE_TIPS[0],GUIDE_TIPS[10],GUIDE_TIPS[15],GUIDE_TIPS[35]];
+  const relatedTopics=new Set(matches.map(topic=>topic.slug));
+  return GUIDE_TIPS.filter(tip=>tipMatches(tip,query)||(tip.topic!==null&&relatedTopics.has(tip.topic))).slice(0,6);
+ },[query,matches]);
  return <Shell user={user} embedded={embedded}>
   <main className="hhba-law hhba-rights-knowledge" id="main-content">
    <section className="hhba-law-panel" aria-labelledby="hhba-law-title">
