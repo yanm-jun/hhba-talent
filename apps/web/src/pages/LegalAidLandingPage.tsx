@@ -21,7 +21,8 @@ const topicKeywords:Record<string,string[]>={
  'transfer-paycuts':['调岗','降薪','异地','调动','转岗','工资降低'],
  'flexible-work':['外包','派遣','兼职','实习','零工','劳动关系']
 };
-const normal=(s:string)=>s.trim().toLocaleLowerCase();
+// Treat punctuation and spacing differences as the same local lookup query.
+const normal=(s:string)=>s.normalize('NFKC').toLocaleLowerCase().replace(/[\p{P}\p{Z}\s]+/gu,'');
 const matchingIntents=(raw:string)=>{
  const q=normal(raw);
  if(!q)return [];
@@ -30,19 +31,19 @@ const matchingIntents=(raw:string)=>{
 function topicMatches(topic:(typeof laborRights.topics)[number],raw:string){
  const query=normal(raw);
  if(!query)return true;
- const text=[topic.title,topic.short,...topic.situations,...topic.laws.map(law=>law.name+' '+law.articles),...topic.paths.map(p=>p.title+' '+p.description),topic.case.title].join(' ').toLocaleLowerCase();
+ const text=normal([topic.title,topic.short,...topic.situations,...topic.laws.map(law=>law.name+' '+law.articles),...topic.paths.map(p=>p.title+' '+p.description),topic.case.title].join(' '));
  return text.includes(query)||(topicKeywords[topic.slug]||[]).some(tag=>query.includes(tag)||tag.includes(query)&&query.length>=2)||matchingIntents(query).some(intent=>intent.primary===topic.slug);
 }
 function subtopicMatches(topic:(typeof subtopics.topics)[number],raw:string){
  const query=normal(raw);
  if(!query)return true;
- const words=[topic.title,topic.short,...topic.aliases,...topic.situations,...topic.misconceptions,...topic.laws.map(law=>law.name+' '+law.articles)].join(' ').toLocaleLowerCase();
+ const words=normal([topic.title,topic.short,...topic.aliases,...topic.situations,...topic.misconceptions,...topic.laws.map(law=>law.name+' '+law.articles)].join(' '));
  return words.includes(query)||topic.aliases.some(a=>query.includes(normal(a))||normal(a).includes(query)&&query.length>=2)||matchingIntents(query).some(intent=>intent.subtopics.includes(topic.slug));
 }
 function tipMatches(tip:(typeof GUIDE_TIPS)[number],raw:string){
  const query=normal(raw);
  if(!query)return false;
- const content=[tip.title,tip.summary,...tip.steps,...tip.keywords].join(' ').toLocaleLowerCase();
+ const content=normal([tip.title,tip.summary,...tip.steps,...tip.keywords].join(' '));
  return content.includes(query)||tip.keywords.some(tag=>query.includes(tag)||tag.includes(query)&&query.length>=2);
 }
 const examples=['公司不发工资','被辞退怎么办','试用期社保','调岗降薪','加班费','离职证明'];
@@ -58,7 +59,7 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
   const intents=matchingIntents(query);
   const featuredActions=[...new Set(intents.flatMap(intent=>intent.featuredActions))];
   const relatedSlugs=new Set(laborRights.topics.filter(topic=>
-   (topicKeywords[topic.slug]||[]).some(word=>q.includes(word.toLocaleLowerCase()))
+   (topicKeywords[topic.slug]||[]).some(word=>q.includes(normal(word)))
   ).map(topic=>topic.slug));
   for(const intent of intents){
    relatedSlugs.add(intent.primary);
@@ -99,7 +100,7 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
       <p>劳动合同、工资、加班、辞退、社保和工伤等问题，分为 8 类深度专题和 12 个细分专题，提供证据清单、处理方法及可核对的官方出处。</p>
      </section>
      <label className="hhba-knowledge-search"><Search size={20}/><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="描述你的问题，例如：公司三个月没有发工资…" aria-label="搜索劳动权益知识和职场行动建议"/></label>
-     <div className="hhba-knowledge-search-help"><span>本地关键词与常见说法匹配 · 无需登录 · 不上传你的问题</span><span>资料核对：{laborRights.reviewedOn}</span></div>
+     <div className="hhba-knowledge-search-help"><span>本地关键词与常见说法匹配 · 无需登录 · 不上传你的问题</span><span>资料整理：深度专题 {laborRights.reviewedOn} · 细分专题 {subtopics.reviewedOn}</span></div>
      <div className="hhba-knowledge-examples" aria-label="常见问题示例">
       {examples.map(v=><button type="button" onClick={()=>setQuery(v)} key={v}>{v}</button>)}
       {query&&<button type="button" onClick={()=>setQuery('')}>清除搜索</button>}

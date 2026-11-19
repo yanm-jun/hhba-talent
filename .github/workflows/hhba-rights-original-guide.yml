@@ -8,6 +8,7 @@ on:
       - 'apps/web/src/data/hhbaWorkValueGuide.ts'
       - 'apps/web/src/data/laborRightsSubtopics.json'
       - 'apps/web/src/data/laborRightsSearchIntents.json'
+      - 'apps/web/src/data/laborRightsQueryFixtures.json'
       - 'apps/web/src/pages/LegalAidTopicPage.tsx'
       - 'apps/web/src/pages/LegalAidSubtopicPage.tsx'
       - 'apps/web/src/styles/hhba-work-value-guide.css'
@@ -17,6 +18,7 @@ on:
       - 'apps/web/scripts/hhba-rights-guide.contract.test.mjs'
       - 'apps/web/scripts/hhba-rights-guide-v2.contract.test.mjs'
       - 'apps/web/scripts/rights-v2-intent-deeplink.contract.test.mjs'
+      - 'apps/web/scripts/rights-query-quality.contract.test.mjs'
       - 'apps/web/scripts/rights_guide_browser_acceptance.py'
       - 'apps/web/scripts/audit-labor-rights-topics.mjs'
       - '.github/workflows/hhba-rights-original-guide.yml'
@@ -45,6 +47,7 @@ jobs:
         run: |
           node --test scripts/hhba-rights-guide-v2.contract.test.mjs \
             scripts/rights-v2-intent-deeplink.contract.test.mjs \
+            scripts/rights-query-quality.contract.test.mjs \
             scripts/home-workplace-promise.contract.test.mjs \
             scripts/membership-rules.contract.test.mjs \
             scripts/site-search.contract.test.mjs

@@ -9,6 +9,7 @@ import os
 import re
 import time
 import urllib.request
+import unicodedata
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
@@ -18,6 +19,17 @@ OUT = Path(os.environ.get("HHBA_SCREENSHOT_DIR", "tmp/rights-guide-screens"))
 OUT.mkdir(parents=True, exist_ok=True)
 ROOT = Path(__file__).resolve().parents[1]
 INTENTS = json.loads((ROOT / "src/data/laborRightsSearchIntents.json").read_text(encoding="utf-8"))
+REGRESSION = json.loads((ROOT / "src/data/laborRightsQueryFixtures.json").read_text(encoding="utf-8"))
+MAIN_BY_INTENT = {intent["id"]: intent["primary"] for intent in INTENTS["intents"]}
+
+def normalized(text):
+    return "".join(ch for ch in unicodedata.normalize("NFKC", text).lower()
+                   if not ch.isspace() and not unicodedata.category(ch).startswith("P"))
+
+def matched_intents(query):
+    q = normalized(query)
+    return [intent for intent in INTENTS["intents"]
+            if any(normalized(term) in q for term in intent["phrases"])]
 
 for _ in range(60):
     try:
@@ -95,6 +107,30 @@ with sync_playwright() as playwright:
             assert first_action_href == f"/rights/guide?tip={expected_first_id}", (
                 f"{name}: {phrase} should prioritize a concrete next step {expected_first_id}; got {first_action_href}"
             )
+        # Real regression: 70 independently written workplace questions and 15 unrelated controls.
+        for case in REGRESSION["cases"]:
+            phrase = case["query"]
+            search.fill(phrase)
+            intents_for_case = matched_intents(phrase)
+            expected = case["expectedIntent"]
+            if expected is None:
+                assert not intents_for_case, f"{name}: unrelated phrase unexpectedly has an intent: {phrase}"
+                assert page.locator(".hhba-law-topic").count() == 0, f"{name}: out-of-scope law match: {phrase}"
+                assert page.locator(".hhba-knowledge-subtopic-card").count() == 0, f"{name}: out-of-scope subtopic match: {phrase}"
+                assert page.locator(".hhba-knowledge-action").count() == 0, f"{name}: out-of-scope advice match: {phrase}"
+                continue
+            assert any(item["id"] == expected for item in intents_for_case), (
+                f"{name}: missing intent {expected} for {phrase}"
+            )
+            main_slug = MAIN_BY_INTENT[expected]
+            assert page.locator(f'a.hhba-law-topic[href$="/rights/knowledge/{main_slug}"]').count() > 0, (
+                f"{name}: missing legal topic {main_slug} for {phrase}"
+            )
+            expected_first_id = intents_for_case[0]["featuredActions"][0]
+            first_href = page.locator(".hhba-knowledge-action").first.get_attribute("href")
+            assert first_href == f"/rights/guide?tip={expected_first_id}", (
+                f"{name}: {phrase} should prioritize {expected_first_id}; got {first_href}"
+            )
         search.fill("公司三个月不发工资")
         linked = page.locator(".hhba-knowledge-action").first
         linked.wait_for()
@@ -137,5 +173,5 @@ with sync_playwright() as playwright:
 
         page.close()
         context.close()
-        print(f"{name}: 14 realistic intents, 20 topics, precise jump, mobile layout and local progress OK", flush=True)
+        print(f"{name}: 85 real-world query regressions, 20 topics, precise jump, responsive layout and local progress OK", flush=True)
     browser.close()
