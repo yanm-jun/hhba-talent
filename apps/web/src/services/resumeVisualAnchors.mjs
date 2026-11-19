@@ -66,6 +66,10 @@ export function matchVisualRegionsToPdfPage({regions,items,viewport,page}){
    kind:region.kind||'other',text:region.text,
    source_text:source,
    verified:true, // verified only against PDF native glyphs, NOT writeback safety.
+   native_line_count:near.reduce((rows,item)=>{
+    if(!rows.some(y=>Math.abs(y-item.y)<9))rows.push(item.y);
+    return rows;
+   },[]).length,
    bbox:[x,y,w,h]
   });
  }
