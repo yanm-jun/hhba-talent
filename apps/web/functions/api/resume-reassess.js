@@ -2,7 +2,7 @@
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
 import {validatedAuditedJob,validReassessmentInput,sameEngineReassessment} from '../_lib/resume-reassessment.js';
 import {validatedCachedOfficialJob} from '../_lib/official-job-evidence.js';
-const LIMIT_BYTES=44000,PER_ACCOUNT=12,GLOBAL=400;
+const LIMIT_BYTES=160*1024,PER_ACCOUNT=12,GLOBAL=400;
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store',
  'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'
