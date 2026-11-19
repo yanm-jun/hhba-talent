@@ -7,7 +7,7 @@ const url='https://careers.tencent.com/jobdesc.html?postId=123456789012345';
 const html=`<!doctype html><html lang="zh"><head><title>腾讯校园招聘</title>
 <script>document.write('隐藏岗位职责 任职要求 中国大陆');</script></head><body>
 <h1>数据分析师</h1><p>工作地点：上海</p>
-<h2>岗位职责</h2><p>负责运营指标分析、推动跨团队项目协作、构建业务观察指标和日常报表。</p>
+<h2>岗位职责</h2><p>负责运营指标分析、推动跨团队项目协作、构建业务观察指标和日常报表。定期汇总业务部门提出的数据口径需求，独立完成数据质量核查，并面向业务团队讲解指标变化原因。与产品和运营团队沟通数据指标，持续监测分析结果，为后续业务决策提供经核对的数字信息。</p>
 <h2>任职要求</h2><p>熟悉 Python、SQL，能够独立处理数据分析任务，具有较强的团队沟通能力和项目总结能力。</p>
 <button>立即申请</button></body></html>`;
 function page(body=html,options={}){
