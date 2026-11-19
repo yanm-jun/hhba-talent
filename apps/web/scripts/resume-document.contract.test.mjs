@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {buildResumeDocument,normalizeResumeDocumentDetails,readableResumeDocument,sourceResumeBlocks,sourceResumeOmittedCharacters} from '../src/services/resumeDocument.ts';
+import {buildResumeDocument,normalizeResumeDocumentDetails,readableResumeDocument,sourceResumeBlocks,sourceResumeOmittedCharacters,structuredResumeOmittedCharacters} from '../src/services/resumeDocument.ts';
 
 const profile={
  education:'BACHELOR',education_evidence:'临沂大学 本科',
@@ -73,4 +73,23 @@ test('source extraction reports omitted resume characters rather than silently e
  assert.ok(omitted>0,'truncated source characters must be reported');
  assert.ok(omitted<long.replace(/\s/gu,'').length,'existing excerpts remain available for editing');
  assert.equal(sourceResumeOmittedCharacters('',[]),0);
+});
+
+
+test('structured resumes detect overflow beyond the printable 12 experience rows',()=>{
+ const extensive={...profile,experiences:Array.from({length:13},(_,i)=>({
+  role:'实际工作岗位'+i,organization:'测试单位',period:'2024',evidence:'参与实际门店运营'+i
+ }))};
+ assert.ok(structuredResumeOmittedCharacters(extensive)>0);
+ assert.equal(buildResumeDocument(extensive,[],fields).experiences.length,12);
+ assert.equal(structuredResumeOmittedCharacters(profile),0);
+});
+test('structured resumes detect a cut-off paragraph and education evidence',()=>{
+ const text='真实工作经历'.repeat(280);
+ const extensive={...profile,experiences:[{...profile.experiences[0],evidence:text}],
+  education_evidence:'学历证明'.repeat(90)};
+ const omitted=structuredResumeOmittedCharacters(extensive);
+ assert.ok(omitted>0);
+ assert.ok(omitted>=text.slice(1600).length);
+ assert.ok(omitted<text.length);
 });
