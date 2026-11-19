@@ -123,3 +123,10 @@
 .hhba-match-save-resume button{display:inline-block;margin-top:10px;border:0;border-radius:9px;background:#125EBC;color:white;font-size:12px;font-weight:700;padding:9px 16px;cursor:pointer}
 .hhba-match-save-resume button:disabled{opacity:.48;cursor:not-allowed}
 .hhba-match-saved-resume{margin:9px 0;color:#125EBC;font-size:12px;line-height:1.6}
+
+.hhba-native-optimize-action{margin-top:14px;border-top:1px solid #e6ebf2;padding-top:12px;min-width:0}
+.hhba-native-optimize-action>button{padding:9px 14px;border:1px solid #d9dcea;background:#f8f8fd;border-radius:9px;color:#384b70;font-weight:650;font-size:12px;cursor:pointer}
+.hhba-native-optimize-action>button:hover{background:#efeffb}
+.hhba-native-optimize-action>button:focus-visible{outline:3px solid #9a8bea;outline-offset:2px}
+.hhba-native-optimize-action .targeted-resume{margin-top:12px}
+@media(max-width:650px){.hhba-native-optimize-action .targeted-resume{padding:10px}.hhba-native-optimize-action .targeted-resume-toolbar{padding:12px}}
