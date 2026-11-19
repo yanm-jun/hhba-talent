@@ -1,0 +1,38 @@
+name: HHBA labor-rights source health (read-only)
+on:
+  schedule:
+    # Monday 08:30 Beijing time (00:30 UTC). No paid API or personal data.
+    - cron: '30 0 * * 1'
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/data/laborRightsTopics.json'
+      - 'apps/web/src/data/laborRightsSubtopics.json'
+      - 'apps/web/scripts/check-labor-rights-source-health.mjs'
+      - '.github/workflows/hhba-rights-source-health.yml'
+permissions:
+  contents: read
+jobs:
+  official-source-link-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate official legal source URL metadata without network access
+        if: github.event_name == 'pull_request'
+        run: node apps/web/scripts/check-labor-rights-source-health.mjs --dry-run
+      - name: Check unique official sources and report broken links
+        if: github.event_name != 'pull_request'
+        run: node apps/web/scripts/check-labor-rights-source-health.mjs
+      - name: Upload source-health report (not a legal-validity certificate)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-official-law-source-health
+          path: apps/web/tmp/rights-source-health.json
+          if-no-files-found: warn
+          retention-days: 30
