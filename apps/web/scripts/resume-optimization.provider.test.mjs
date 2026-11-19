@@ -116,3 +116,38 @@ test('slightly incomplete model suggestions are normalized without inventing fac
  assert.ok(safe.every(x=>x.id&&x.original&&x.rationale&&x.jobRequirement));
  assert.throws(()=>parseSuggestions({suggestions:[{blockId:'not-owned',action:'replace',proposed:'无效'}]},['source-0']),/INVALID/);
 });
+
+
+test('DeepSeek JSON variants map safely without accepting invented paragraph references',()=>{
+ const sourceOnly=['qa-source'];
+ const variants=[
+  {recommendations:[{type:'rewrite',optimizedText:'负责真实的日常运营记录',reason:'增强表述'}]},
+  {result:{suggestions:[{block_id:'wrong-id',action:'revise',suggestedText:'负责实际的客户沟通'}]}},
+  {suggestions:[{operation:'add',after:'实际参与工作记录整理'}]}
+ ];
+ for(const item of variants){
+  const normalized=parseSuggestions(item,sourceOnly);
+  assert.equal(normalized.length,1);
+  assert.equal(normalized[0].blockId,'qa-source');
+  assert.equal(normalized[0].evidenceStatus,'needs_user_confirmation');
+ }
+ assert.throws(()=>parseSuggestions({suggestions:[
+  {blockId:'wrong-id',action:'replace',proposed:'不能猜测所在段落'}
+ ]},['source-0','source-1']),/INVALID/);
+});
+test('DeepSeek request gives the model an exact but nonauthoritative JSON format example',async()=>{
+ const env={HHBA_MATCH_DEEPSEEK_KEY:'safe-test-key'};
+ const old=globalThis.fetch;
+ globalThis.fetch=async(_url,options)=>{
+  const prompt=JSON.parse(JSON.parse(options.body).messages[1].content);
+  assert.equal(prompt.output_format_example.suggestions[0].blockId,'source-0');
+  assert.equal(prompt.output_format_example.suggestions[0].proposed,'参与真实的日常运营');
+  assert.match(prompt.instructions,/不要复制示例建议内容/);
+  return Response.json({choices:[{finish_reason:'stop',message:{content:'{"suggestions":[]}'}}]});
+ };
+ try{
+  const result=await generateSuggestions({env,blocks:[{id:'source-0',section:'summary',
+   text:'参与真实的日常运营'}],job:{title:'运营助理',requirements:'客户沟通'}});
+  assert.deepEqual(result.suggestions,[]);
+ }finally{globalThis.fetch=old;}
+});
