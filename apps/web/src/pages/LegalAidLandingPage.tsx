@@ -85,7 +85,7 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
      <section className="hhba-knowledge-actions" aria-labelledby="hhba-knowledge-actions-title">
       <h2 id="hhba-knowledge-actions-title">{query?'相关职场行动建议':'从这些行动开始'}</h2>
       {guideMatches.length?<div className="hhba-knowledge-action-list">
-       {guideMatches.map(tip=><Link to="/rights/guide" className="hhba-knowledge-action" key={tip.id}>
+       {guideMatches.map(tip=><Link to={"/rights/guide?tip="+encodeURIComponent(tip.id)} className="hhba-knowledge-action" key={tip.id}>
         <strong>{tip.title}</strong><small>{tip.summary}</small><span>查看步骤 · {tip.minutes} <ArrowUpRight size={12} style={{verticalAlign:'middle'}}/></span>
        </Link>)}
       </div>:<div className="hhba-knowledge-no-match">暂无匹配的职场建议，可以进入完整指南按阶段查找。</div>}
