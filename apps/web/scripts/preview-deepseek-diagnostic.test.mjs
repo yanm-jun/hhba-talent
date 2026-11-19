@@ -28,7 +28,7 @@ test('balance probe reveals only coarse status, never credentials or balance num
  globalThis.fetch=async(url,options)=>{
   assert.equal(url,'https://api.deepseek.com/user/balance');
   assert.equal(options.headers.Authorization,'Bearer synthetic-test-key');
-  assert.equal(options.redirect,'error');
+  assert.equal(options.redirect,'manual');
   return Response.json({is_available:true,balance_infos:[{total_balance:'9876.54',currency:'CNY'}]});
  };
  try{
