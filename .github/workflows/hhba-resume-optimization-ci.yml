@@ -27,6 +27,7 @@ on:
       - 'apps/web/functions/api/resume-versions.js'
       - 'apps/web/functions/_lib/resume-ai-provider.js'
       - 'apps/web/scripts/resume-optimization.*'
+      - 'apps/web/scripts/resume-authenticated-sqlite.e2e.test.mjs'
       - 'apps/web/scripts/resume-reassessment.*'
       - 'apps/web/scripts/official-job-evidence.*'
       - 'apps/web/scripts/official-job-verify.*'
@@ -57,6 +58,9 @@ jobs:
       - name: Test opt-in, auth, quota, and provider parser
         working-directory: apps/web
         run: node --test --experimental-strip-types scripts/resume-optimization.provider.test.mjs scripts/resume-optimization.route.test.mjs scripts/resume-optimization.domain.test.mjs scripts/resume-versions.route.test.mjs scripts/resume-evidence-visibility.test.mjs scripts/resume-document.contract.test.mjs scripts/resume-reassessment.domain.test.mjs scripts/resume-reassessment.route.test.mjs scripts/resume-optimization.main-flow.test.mjs scripts/official-job-evidence.contract.test.mjs scripts/official-job-verify.route.test.mjs
+      - name: Real login and D1 SQLite authenticated resume integration
+        working-directory: apps/web
+        run: node --experimental-sqlite --test scripts/resume-authenticated-sqlite.e2e.test.mjs
       - name: Verify source-backed KPMG fallback during Wikimedia HTTP 429
         working-directory: apps/web
         run: node --test scripts/kpmg-build-fallback.test.mjs
