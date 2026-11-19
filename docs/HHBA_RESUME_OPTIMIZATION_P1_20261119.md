@@ -98,3 +98,12 @@ HHBA_PNVS_AUTH_DB=<D1 binding>          # 按环境隔离
 - 新单元/路由测试 `scripts/official-job-evidence.contract.test.mjs`、`scripts/official-job-verify.route.test.mjs` 覆盖：严格 URL 白名单、无自动跳转、无完整 JD 必须失败、篡改摘要、过期证据、本人授权、每日额度与缓存复用。追加 CI 后构建。
 - **不能等同人工法务/HR 审核，不保证页面仍允许申请**。该技术核验只证明服务器读取到了满足规则的受支持招聘官网页面；严禁宣传为企业已认证本人的资格。
 - 上线时先执行 `0023` 迁移，再灰度配置 `HHBA_OFFICIAL_JOB_VERIFY_ENABLED=1`；需要同时具备 `HHBA_RESUME_REASSESS_ENABLED=1` 与 0022 复评额度迁移，才能展示更新后的 V2 分数。
+
+## Preview 环境实际验收记录（2026-11-19）
+
+- 确认 Cloudflare Pages `hhba-talent` 生产分支仍为 `main`；`HHBA_PNVS_AUTH_DB` 预览与正式环境分别绑定独立的 D1 数据库，未修改正式数据库。
+- 在预览版的 `HHBA_PNVS_AUTH_DB` 执行了 `0020`—`0023` 四份 `CREATE TABLE IF NOT EXISTS` / 索引迁移。通过 D1 API 返回成功，并再次检查五张新增表均已存在。
+- 发现 Pages 使用自定义预览分支白名单，原先未包含 `feature/resume-targeted-optimization-foundation-20261119`；通过 Cloudflare Pages API **仅追加此分支**，原有 49 条许可和生产分支不变。
+- 当前代码中的四项功能在部署环境仍默认关闭（`HHBA_RESUME_OPTIMIZATION_ENABLED`、`HHBA_RESUME_VERSION_STORAGE_ENABLED`、`HHBA_RESUME_REASSESS_ENABLED`、`HHBA_OFFICIAL_JOB_VERIFY_ENABLED`）；未因 D1 建表而自动向用户开放。真实 AI 模型 Key/型号配置、浏览器打印和官网实时 HTML 拉取仍需单独联调。
+- GitHub 专用 CI 通过不能替代 Cloudflare Pages 构建成功。必须核对**本次提交的实际预览部署状态及可访问 URL**，再进行浏览器与请求级验收。
+- 预览库 ID、服务端密钥、用户简历、手机号等不要写入 PR 或公共验收日志。
