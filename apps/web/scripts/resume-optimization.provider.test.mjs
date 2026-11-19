@@ -122,7 +122,7 @@ test('DeepSeek JSON variants map safely without accepting invented paragraph ref
  const sourceOnly=['qa-source'];
  const variants=[
   {recommendations:[{type:'rewrite',optimizedText:'负责真实的日常运营记录',reason:'增强表述'}]},
-  {result:{suggestions:[{block_id:'wrong-id',action:'revise',suggestedText:'负责实际的客户沟通'}]}},
+  {result:{suggestions:[{action:'revise',suggestedText:'负责实际的客户沟通'}]}},
   {suggestions:[{operation:'add',after:'实际参与工作记录整理'}]}
  ];
  for(const item of variants){
