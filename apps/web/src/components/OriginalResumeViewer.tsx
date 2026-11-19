@@ -38,7 +38,7 @@ export function OriginalResumeViewer({resume,onClose}:{
     if(!active)return;
     pdf.GlobalWorkerOptions.workerSrc=worker.default;
     pdfTask=pdf.getDocument({
-     data:new Uint8Array(buffer),enableScripting:false,isEvalSupported:false,
+     data:new Uint8Array(buffer),isEvalSupported:false,
      enableXfa:false,disableAutoFetch:true,disableStream:true,
      stopAtErrors:true,useSystemFonts:false
     });
