@@ -34,7 +34,7 @@ export function listResumeVersions(jobId:string){
 }
 export function saveResumeVersion(job:{id:string;title:string;company:string},blocks:ResumeBlock[],acceptedIds:string[],details:ResumeDocumentDetails){
  return send<{ok:boolean;id:string;created_at:string}>('POST','',{
-  job_id:job.id,job_title:job.title,company:job.company,blocks,accepted_ids:acceptedIds,details
+  job_id:job.id,job_title:job.title,company:job.company,blocks,accepted_ids:acceptedIds,details,confirmed_real:true
  });
 }
 export function deleteResumeVersion(id:string){
