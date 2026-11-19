@@ -7,6 +7,7 @@ on:
       - '.github/workflows/hhba-resume-browser-qa.yml'
       - 'apps/web/qa/**'
       - 'apps/web/scripts/resume-browser.qa.mjs'
+      - 'apps/web/scripts/resume-preview-browser.qa.mjs'
       - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
       - 'apps/web/src/components/TargetedResumeOptimization.tsx'
       - 'apps/web/src/components/ResumePrintSheet.tsx'
@@ -19,6 +20,7 @@ on:
       - '.github/workflows/hhba-resume-browser-qa.yml'
       - 'apps/web/qa/**'
       - 'apps/web/scripts/resume-browser.qa.mjs'
+      - 'apps/web/scripts/resume-preview-browser.qa.mjs'
       - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
       - 'apps/web/src/components/TargetedResumeOptimization.tsx'
       - 'apps/web/src/components/ResumePrintSheet.tsx'
@@ -65,6 +67,19 @@ jobs:
         env:
           QA_OUTPUT: /tmp/hhba-resume-browser-qa
         run: node scripts/resume-browser.qa.mjs
+      - name: Live Cloudflare Preview Chromium smoke (desktop and mobile, no PII)
+        env:
+          HHBA_PREVIEW_URL: https://a5a230af.hhba-talent.pages.dev
+          QA_OUTPUT: /tmp/hhba-resume-live-preview-qa
+        run: node scripts/resume-preview-browser.qa.mjs
+      - name: Preserve real Preview anonymous screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-resume-live-preview-browser-qa
+          path: /tmp/hhba-resume-live-preview-qa/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Preserve synthetic screenshots and generated PDFs on failure or success
         if: always()
         uses: actions/upload-artifact@v4
