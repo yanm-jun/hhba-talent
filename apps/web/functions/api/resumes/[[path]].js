@@ -146,7 +146,10 @@ export async function onRequest({request,env}){
      }
     });
    }
+   // Remove the consented visual analysis cache with the source file.
+   // Both objects reside exclusively in the candidate-owned private R2 bucket.
    await bucket.delete(row.storage_key);
+   await bucket.delete(row.storage_key+'.hhba-vision-layout-v1.json').catch(()=>{});
    const deleted=await db.prepare(
     'DELETE FROM hhba_candidate_resumes WHERE phone=? AND id=?'
    ).bind(phone,id).run();
