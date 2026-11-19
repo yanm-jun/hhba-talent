@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {deflateRawSync,inflateRawSync} from 'node:zlib';
+import {mkdirSync,writeFileSync} from 'node:fs';
 import {
  editOriginalDocxStrict,inspectOriginalDocxStrict
 } from '../src/services/resumeDocxPreserve.mjs';
@@ -90,6 +91,12 @@ for(const method of [0,8]){
    {original:'原始岗位描述',text:'新的岗位描述'}
   ]);
   const after=parts(output);
+  if(method===8&&process.env.HHBA_WORD_RENDER_QA_OUTPUT){
+   const dir=process.env.HHBA_WORD_RENDER_QA_OUTPUT;
+   mkdirSync(dir,{recursive:true});
+   writeFileSync(dir+'/original-preserved-layout.docx',input);
+   writeFileSync(dir+'/edited-preserved-layout.docx',output);
+  }
   assert.deepEqual([...after.keys()],[...source.keys()]);
   const xml=after.get('word/document.xml').raw.toString();
   assert.ok(xml.includes('<w:t>新的岗位描述</w:t>'));
