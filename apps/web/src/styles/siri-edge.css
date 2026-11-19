@@ -1,0 +1,57 @@
+/* HHBA Siri-inspired ambient edge light. A four-sided, subdued rainbow glow,
+   NOT a large solid-color popup border. Shared by original PDF + AI editing.
+   The glow is visual only: it never affects content, print or PDF exports. */
+@property --hhba-siri-angle {
+ syntax: "<angle>";
+ initial-value: 0deg;
+ inherits: false;
+}
+.hhba-siri-edge {
+ position: relative;
+ isolation: isolate;
+ border-radius: 13px;
+}
+/* Bleed outside all four edges, rather than cover the underlying resume. */
+.hhba-siri-edge.hhba-siri-edge-active::before,
+.hhba-siri-edge.hhba-siri-edge-active::after {
+ content: "";
+ position: absolute;
+ pointer-events: none;
+ border-radius: inherit;
+ background: conic-gradient(from var(--hhba-siri-angle) at 50% 50%,
+  #38cbe8 0deg,#66aafa 45deg,#a67bfa 105deg,
+  #e97dcc 162deg,#ffa26f 225deg,#79d3ef 288deg,#38cbe8 360deg);
+ animation: hhba-siri-edge-flow 18s linear infinite;
+}
+.hhba-siri-edge.hhba-siri-edge-active::before {
+ inset: -6px;
+ z-index: -1;
+ opacity: .66;
+ filter: blur(14px);
+}
+.hhba-siri-edge.hhba-siri-edge-active::after {
+ inset: -2px;
+ z-index: 3;
+ padding: 2px;
+ opacity: .86;
+ -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+ -webkit-mask-composite: xor;
+ mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+ mask-composite: exclude;
+}
+@keyframes hhba-siri-edge-flow {
+ to { --hhba-siri-angle: 360deg; }
+}
+/* No flashing or moving glow when reduced motion is requested. */
+@media (prefers-reduced-motion: reduce) {
+ .hhba-siri-edge.hhba-siri-edge-active::before,
+ .hhba-siri-edge.hhba-siri-edge-active::after {
+  animation: none !important;
+  --hhba-siri-angle: 24deg;
+ }
+}
+/* No AI editing aura in any exported or printed document. */
+@media print {
+ .hhba-siri-edge::before,
+ .hhba-siri-edge::after { display: none !important; }
+}
