@@ -66,6 +66,24 @@ export function sourceResumeOmittedCharacters(raw:string,sourceBlocks:readonly R
  const nonspace=(value:string)=>value.replace(/\s/gu,'').length;
  return Math.max(0,nonspace(original)-nonspace(visible));
 }
+/** Structured ATS profiles can contain more entries or longer evidence than
+ * the printable resume template preserves. Never export that partial copy
+ * without an explicit warning to the candidate. */
+export function structuredResumeOmittedCharacters(profile:CandidateProfile):number{
+ const nonspace=(value:string)=>value.replace(/\\s/gu,'').length;
+ let omitted=0;
+ for(const entries of [profile.experiences,profile.skills]){
+  const evidenced=(Array.isArray(entries)?entries:[])
+   .filter(item=>typeof item.evidence==='string'&&item.evidence.trim());
+  for(let i=0;i<evidenced.length;i++){
+   const text=evidenced[i].evidence as string;
+   omitted+=nonspace(i<12?text.slice(1600):text);
+  }
+ }
+ if(typeof profile.education_evidence==='string')
+  omitted+=nonspace(profile.education_evidence.slice(300));
+ return omitted;
+}
 export function buildResumeDocument(
  profile:CandidateProfile,blocks:readonly ResumeBlock[],details:ResumeDocumentDetails
 ):ResumeDocument{
