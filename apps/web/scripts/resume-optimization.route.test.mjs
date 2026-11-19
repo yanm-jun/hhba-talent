@@ -9,14 +9,19 @@ const base={
  job:{title:'区域督导',requirements:'运营和团队协作'}
 };
 function mockEnv(){
- const records=[];
+ const records=[],attempts=[];
  const db={prepare(sql){return{
+  all:async()=>({results:[{name:'hhba_resume_optimization_requests'},{name:'hhba_resume_optimization_attempts'}]}),
   first:async()=>({name:'hhba_resume_optimization_requests'}),
   bind(...args){return{
    first:async()=>sql.includes('hhba_auth_users')?{role:'candidate'}:{
     phone:'person',revoked:0,expires_at:new Date(Date.now()+60000).toISOString()
    },
    run:async()=>{
+    if(sql.startsWith('INSERT INTO hhba_resume_optimization_attempts')){
+     if(attempts.length>=6)return {success:true,meta:{changes:0}};
+     attempts.push(args);return {success:true,meta:{changes:1}};
+    }
     if(sql.startsWith('INSERT INTO hhba_resume_optimization_requests')){
      if(records.length>=3)return {success:true,meta:{changes:0}};
      records.push(args);return {success:true,meta:{changes:1}};
@@ -37,7 +42,7 @@ function mockEnv(){
   HHBA_AI_DEFAULT_PROVIDER:'openai',
   HHBA_AI_OPENAI_API_KEY:'placeholder',
   HHBA_AI_OPENAI_MODEL:'test-model'
- },records};
+ },records,attempts};
 }
 function request(body=base,origin='https://preview.hhba.example',auth=true){
  return new Request(url,{method:'POST',headers:{
@@ -147,5 +152,26 @@ test('upstream failures refund the candidate optimization allowance',async()=>{
   assert.equal(failed.status,502);
   assert.equal((await failed.json()).error,'AI_PROVIDER_UPSTREAM_ERROR');
   assert.equal(h.records.length,0,'failed provider calls must not spend user daily quota');
+ }finally{globalThis.fetch=previous;}
+});
+
+test('repeated provider failures still have an independent six-attempt cap',async()=>{
+ const h=mockEnv(),previous=globalThis.fetch;
+ let providerCalls=0;
+ globalThis.fetch=async()=>{
+  providerCalls++;
+  return new Response('temporary backend failure',{status:503});
+ };
+ try{
+  for(let i=0;i<6;i++){
+   const r=await onRequestPost({request:request(),env:h.env});
+   assert.equal(r.status,502);
+  }
+  const r=await onRequestPost({request:request(),env:h.env});
+  assert.equal(r.status,429);
+  assert.equal((await r.json()).error,'RESUME_OPTIMIZATION_ATTEMPT_LIMIT');
+  assert.equal(providerCalls,6);
+  assert.equal(h.attempts.length,6);
+  assert.equal(h.records.length,0,'no successful quota used after failure');
  }finally{globalThis.fetch=previous;}
 });
