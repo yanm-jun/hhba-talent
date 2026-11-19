@@ -30,7 +30,8 @@ test('page is readable anonymously and reachable from both home and labor rights
  assert.match(main,/if\(route==='\/membership\/rules'\)return <MembershipRulesPage user=\{user\}\/>/);
  assert.doesNotMatch(homepage,/to="\/membership\/rules"/);
  assert.match(homepage,/to="\/rights\/knowledge"/);
- assert.match(rights,/to="\/membership\/rules"/);
+ assert.doesNotMatch(rights,/to="\/membership\/rules"/);
+ assert.match(rights,/to="\/rights\/guide"/);
  assert.match(page,/<Shell user=\{user\}>/);
  assert.match(page,/chapters\.map\(/);
  assert.match(page,/id=\{'rules-'\+chapter\.id\}/);
