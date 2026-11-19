@@ -6,10 +6,21 @@ if(!root||!/^https:\/\/[a-z0-9-]+\.hhba-talent\.pages\.dev$/i.test(root))
 const origin=new URL(root).origin;
 const checks=[];
 async function call(path,opts={}){
- const r=await fetch(root+path,{redirect:'manual',signal:AbortSignal.timeout(15000),...opts});
+ let address=new URL(path,root),r;
+ for(let i=0;i<3;i++){
+  r=await fetch(address,{redirect:'manual',signal:AbortSignal.timeout(15000),...opts});
+  // Pages may canonicalize SPA paths by adding a trailing slash. Only GET
+  // is permitted to follow redirects, and NEVER outside the immutable Preview.
+  if((opts.method||'GET')!=='GET'||![301,302,307,308].includes(r.status))break;
+  const location=r.headers.get('location');
+  if(!location)break;
+  const next=new URL(location,address);
+  assert.equal(next.origin,origin,'Preview must not redirect to the production website');
+  address=next;
+ }
  const ct=r.headers.get('content-type')||'';
  const data=ct.includes('application/json')?await r.json().catch(()=>({})):null;
- checks.push({path,method:opts.method||'GET',status:r.status,
+ checks.push({path,method:opts.method||'GET',status:r.status,finalPath:address.pathname,
   kind:data?.kind||null,error:data?.error||null});
  return {r,data};
 }
