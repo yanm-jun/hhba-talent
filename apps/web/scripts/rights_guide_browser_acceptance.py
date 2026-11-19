@@ -161,44 +161,59 @@ with sync_playwright() as playwright:
         url = linked.get_attribute("href")
         assert url and url.startswith("/rights/guide?tip=") and re.fullmatch(r"[a-z]+", url.split("tip=", 1)[1]), f"broken guide URL {url}"
         linked.click()
-        page.locator(".hhba-vguide-card.is-targeted details[open]").wait_for(timeout=20000)
-        assert page.get_by_text("已定位到指定建议", exact=False).count() >= 1
-        assert page.evaluate("window.scrollY") > 100, f"{name}: did not scroll to detailed advice"
-        assert_no_overflow(page, name + ":targeted")
-        page.screenshot(path=str(OUT / f"{name}-targeted.png"), full_page=False, animations="disabled")
-
+        page.locator(".hhba-edition-reading").wait_for(timeout=20000)
+        assert page.locator(".hhba-edition-article-header h1").count() == 1
+        assert page.locator(".hhba-edition-practical-steps li").count() == 3
+        assert page.locator(".hhba-edition-next-reads a").count() >= 1
+        assert_no_overflow(page, name + ":reading")
+        page.screenshot(path=str(OUT / f"{name}-reading.png"), full_page=False, animations="disabled")
         page.reload(wait_until="domcontentloaded")
-        page.locator(".hhba-vguide-card.is-targeted details[open]").wait_for(timeout=20000)
-        assert_no_overflow(page, name + ":reload")
+        page.locator(".hhba-edition-practical-steps li").first.wait_for(timeout=20000)
+        assert page.locator(".hhba-edition-practical-steps li").count() == 3
 
         page.goto(BASE + "/rights/guide", wait_until="domcontentloaded")
-        page.locator(".hhba-vguide-card").first.wait_for(timeout=20000)
-        assert page.get_by_role("heading", name="高性价比职场指南").count() == 1
-        assert page.locator(".hhba-vguide-metrics strong").first.inner_text() == "200"
-        assert page.locator(".hhba-vguide-card").count() == 24
-        page.get_by_role("button", name=re.compile("继续查看下一批建议")).click()
-        assert page.locator(".hhba-vguide-card").count() == 48
-        assert_no_overflow(page, name + ":guide")
-        page.screenshot(path=str(OUT / f"{name}-guide.png"), full_page=False, animations="disabled")
+        page.locator(".hhba-edition-cover").wait_for(timeout=20000)
+        assert page.locator(".hhba-edition-cover h1").count() == 1
+        assert "职场这条路" in page.locator(".hhba-edition-cover h1").inner_text()
+        assert "200 条原创建议" in page.locator(".hhba-edition-cover-footer").inner_text()
+        assert page.locator(".hhba-edition-feature").count() == 1
+        assert page.locator(".hhba-edition-result-row").count() == 0, (
+            f"{name}: a visitor should see the editorial cover rather than a card/list wall"
+        )
+        assert_no_overflow(page, name + ":cover")
+        page.screenshot(path=str(OUT / f"{name}-guide-cover.png"), full_page=False, animations="disabled")
 
-        page.get_by_role("button", name="离职与跳槽", exact=True).click()
-        assert "找到 25 条" in page.locator(".hhba-vguide-result-head").inner_text()
-        # Filtering updates the results first; the 24-card display cap resets in a React effect.
-        # Wait for that effect rather than testing the transient 25-card render.
-        page.wait_for_function("document.querySelectorAll('.hhba-vguide-card').length === 24", timeout=10000)
-        page.get_by_role("button", name="全部阶段", exact=True).click()
-        page.wait_for_function("document.querySelectorAll('.hhba-vguide-card').length === 24", timeout=10000)
+        guide_search = page.locator(".hhba-edition-search input")
+        guide_search.fill("工资")
+        results = page.locator(".hhba-edition-result-row")
+        results.first.wait_for(timeout=10000)
+        assert results.count() <= 8, f"{name}: search should paginate cleanly"
+        assert_no_overflow(page, name + ":search")
+        guide_search.fill("")
+        page.get_by_role("button", name="浏览全部章节").click()
+        chapters = page.locator(".hhba-edition-chapters button")
+        assert chapters.count() == 8, f"{name}: all eight chapters must remain available"
+        chapters.filter(has_text="离职与跳槽").click()
+        assert "找到 25 篇" in page.locator(".hhba-edition-results-top").inner_text()
+        page.wait_for_function("document.querySelectorAll('.hhba-edition-result-row').length === 8", timeout=10000)
+        page.get_by_role("button", name=re.compile("继续查看")).click()
+        assert page.locator(".hhba-edition-result-row").count() == 16
+        assert_no_overflow(page, name + ":chapters")
+        page.screenshot(path=str(OUT / f"{name}-chapters.png"), full_page=False, animations="disabled")
 
-        checkbox = page.locator(".hhba-vguide-card").first.locator('input[type="checkbox"]')
-        checkbox.check()
+        page.locator(".hhba-edition-result-row").first.click()
+        page.locator(".hhba-edition-reading-action button").wait_for(timeout=20000)
+        page.get_by_role("button", name="标记已完成").click()
+        assert page.locator(".hhba-edition-reading-action button").get_attribute("aria-pressed") == "true"
         saved = page.evaluate("localStorage.getItem('hhba:guide:completed:v1')")
-        assert saved and json.loads(saved), "Guide progress should be saved to this browser only"
+        assert saved and json.loads(saved), f"{name}: completed reading progress not stored locally"
         page.reload(wait_until="domcontentloaded")
-        page.locator(".hhba-vguide-card").first.wait_for()
-        assert page.locator(".hhba-vguide-card").first.locator('input[type="checkbox"]').is_checked()
-        assert_no_overflow(page, name + ":persisted")
+        page.locator(".hhba-edition-reading-action button").wait_for(timeout=20000)
+        assert page.get_by_role("button", name="已标记完成").get_attribute("aria-pressed") == "true"
+        assert_no_overflow(page, name + ":saved")
+        page.screenshot(path=str(OUT / f"{name}-reader-complete.png"), full_page=False, animations="disabled")
 
         page.close()
         context.close()
-        print(f"{name}: 85 real-world query regressions, 20 topics, precise jump, responsive layout and local progress OK", flush=True)
+        print(f"{name}: 85 rights queries, 20 topics, magazine cover, 8 chapters, article reader and local progress OK", flush=True)
     browser.close()
