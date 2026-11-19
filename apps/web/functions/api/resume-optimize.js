@@ -119,6 +119,12 @@ export async function onRequestPost({request,env}){
    // AI is never authoritative evidence of a new fact. User must explicitly accept.
    evidenceStatus:'needs_user_confirmation'
   }));
+  // An empty or fully rejected suggestion set is not a successful optimization.
+  // Refund only this request's success allocation; preserve attempt accounting.
+  if(suggestions.length===0){
+   try{await releaseFailedRequest(db,requestId,hash);}
+   catch{console.warn('HHBA_RESUME_OPT_EMPTY_REFUND_FAILED');}
+  }
   return send({ok:true,kind:'HHBA_RESUME_OPTIMIZATION_V1',provider:result.provider,suggestions,
    disclaimer:'建议仅用于优化表达，用户须逐条核实；不会修改原始简历或自动提高岗位匹配分。'});
  }catch(error){
