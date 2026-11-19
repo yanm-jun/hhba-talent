@@ -54,3 +54,16 @@
 HHBA_RESUME_VERSION_STORAGE_ENABLED=1   # 仅部署迁移后启用
 HHBA_PNVS_AUTH_DB=<D1 binding>          # 按环境隔离
 ```
+
+## P1.2 增量：可编辑、可打印简历
+- `src/services/resumeDocument.ts`：将现有的学历证据、岗位/企业/时间、工作经历和技能证据组织为结构化简历文档。**无法从来源可靠取得的姓名、联系方式、职业概述、教育细节全部留白**，由用户自行填写。
+- `src/components/ResumePrintSheet.tsx` 与 `styles/resume-print.css`：简洁 A4 单栏、便于 ATS 读取的正式排版。用户通过浏览器「打印／保存为 PDF」，不需要任何额外付费 PDF API。打印稿不含渐变 AI 建议或编辑控件；分页与浏览器样式仍需真实浏览器验收。
+- `TargetedResumeOptimization.tsx`：新增联系信息与个人概述的手动输入、A4 预览切换、打印，以及直接编辑经历/技能段落。AI 再次生成建议将以**当前已编辑版本**为输入，不清空之前的用户修改。
+- 私人版本现在可包含用户明确保存的联系信息、学历细节与概述；后端限制字段、长度、只接受明确 `confirmed_real:true` 的保存请求。用户仅手动修改、未采纳 AI 建议也可以保存。
+- 联系信息会**仅在用户主动保存时**进入 `HHBA_PNVS_AUTH_DB`；不与第三方 AI 润色请求一起自动发送。但其他简历段落可能包含敏感内容，发给第三方 AI 时会尽力脱敏、不能保证完全去识别化。
+- `scripts/resume-document.contract.test.mjs`、`scripts/resume-optimization.domain.test.mjs` 和版本存储测试涵盖不虚构资料、手工编辑、长度限制及云端保存授权。
+
+### 匹配评分的现实限制
+- 现有 V2 `scoreCandidateFit` 必须得到与初次匹配一致且可核验的完整岗位对象（所需技能、学历、地点、工龄等）和重新解析且有证据的求职者资料。
+- 目前 `/candidate/match` 页面收到的 `JobMatch` 只是显示用字段（匹配理由、参考分和部分要求），**不足以安全重算同一岗位的参考分**；不能以词语覆盖率偷换岗位匹配分。
+- 下一阶段需在既有匹配后端增加受信任 JD 快照、版本化简历的证据重提取与同一 V2 评分契约，最后做匹配前后解释。当前页面只显示独立的“文字证据覆盖”指标。
