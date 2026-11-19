@@ -153,3 +153,51 @@
 .targeted-resume-truncation{margin:10px 0 15px;padding:13px 16px;border:1px solid #d7af68;
  border-radius:9px;background:#fffaf0;color:#735228;font-size:12px;line-height:1.8}
 .targeted-resume-truncation strong{font-weight:700;color:#604019}
+
+
+/* P2: the resume sheet is the single interactive document. AI controls sit at
+   their exact paragraph and never appear in the printed portal/DOCX. */
+.targeted-resume-live-paper{max-width:800px;margin:12px auto 22px}
+.targeted-resume-live-paper>.hhba-print-sheet{margin:0 auto;overflow:visible}
+.targeted-resume-inline-region{position:relative;margin:3px -9px 12px;border-radius:10px;padding:8px 9px;
+ border:1px solid transparent;transition:background-color .18s ease,border-color .18s ease}
+.targeted-resume-inline-region:hover,.targeted-resume-inline-region:focus-within{
+ border-color:#e5e5f3;background:#fcfbff}
+.targeted-resume-inline-region.has-ai-suggestion{border-left:3px solid #7564c8}
+.targeted-resume-inline-anchor{display:flex;align-items:flex-start;gap:12px;min-width:0}
+.targeted-resume-inline-anchor>.hhba-print-paragraph{flex:1;min-width:0;margin:0}
+.targeted-resume-inline-controls{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;
+ align-items:center;flex:0 0 auto}
+.targeted-resume .targeted-resume-inline-controls>button{display:inline-flex;align-items:center;
+ gap:5px;border:1px solid transparent;background:transparent;color:#64748b;
+ font-size:11px;line-height:1.2;padding:6px 7px}
+.targeted-resume .targeted-resume-inline-controls>button:hover{border-color:#dfe3ef;background:#fff}
+.targeted-resume .targeted-resume-inline-controls>.targeted-resume-ai-trigger{
+ border-color:#d9d1f5;background:#f3f0ff;color:#594aa0;font-weight:650}
+.targeted-resume .targeted-resume-inline-controls>.targeted-resume-ai-trigger[aria-expanded="true"]{
+ border-color:#a99bdf;background:#eae4fc}
+.targeted-resume-inline-controls .targeted-resume-applied{font-size:10px;white-space:nowrap}
+.targeted-resume-inline-anchor>.targeted-resume-inline-editor{flex:1;min-width:0}
+.targeted-resume-popover{
+ z-index:2;margin:10px 0 4px;max-width:100%;box-sizing:border-box;
+ animation:hhba-resume-pop .23s cubic-bezier(.2,.9,.25,1) both;
+ box-shadow:0 15px 42px rgba(37,35,76,.12),0 2px 7px rgba(28,38,69,.035)}
+.targeted-resume-popover::after{content:"";position:absolute;top:-7px;right:64px;
+ width:12px;height:12px;background:#fff;transform:rotate(45deg);
+ border-top:1px solid #e8e8f1;border-left:1px solid #e8e8f1}
+.targeted-resume-popover-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.targeted-resume .targeted-resume-popover-head>button{padding:4px;border:0;background:transparent;color:#687389}
+.targeted-resume-popover>.targeted-resume-gradient{margin:12px 0 8px}
+@keyframes hhba-resume-pop{from{opacity:0;transform:translateY(-7px) scale(.992)}
+ to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:650px){
+ .targeted-resume-inline-anchor{flex-direction:column;gap:5px}
+ .targeted-resume-inline-controls{align-self:flex-end}
+ .targeted-resume-popover::after{right:24px}
+ .targeted-resume .targeted-resume-document-actions{width:100%}
+ .targeted-resume .targeted-resume-document-actions button{min-width:0}
+}
+@media(prefers-reduced-motion:reduce){
+ .targeted-resume-popover{animation:none}
+ .targeted-resume-inline-region{transition:none}
+}
