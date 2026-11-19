@@ -1,0 +1,28 @@
+.hhba-original-resume{margin:16px 0 22px;padding:16px;background:#f6f8fb;
+ border:1px solid #e0e6ed;border-radius:16px;min-width:0}
+.hhba-original-resume-toolbar{display:flex;justify-content:space-between;align-items:center;gap:16px;
+ flex-wrap:wrap;margin-bottom:12px}
+.hhba-original-resume-toolbar strong{display:block;font-size:13px;font-weight:700;overflow-wrap:anywhere}
+.hhba-original-resume-toolbar p{margin:3px 0 0;font-size:11px;line-height:1.6;color:#64748b}
+.hhba-original-resume-toolbar>div:last-child{display:flex;gap:8px;align-items:center}
+.hhba-original-resume-toolbar button,.hhba-original-resume-pages button{display:inline-flex;gap:5px;
+ align-items:center;justify-content:center;border:1px solid #dce2ea;background:#fff;
+ border-radius:8px;color:#33415b;padding:8px 10px;cursor:pointer;font:inherit;font-size:12px}
+.hhba-original-resume-toolbar button:focus-visible,.hhba-original-resume-pages button:focus-visible{
+ outline:3px solid #8178d3;outline-offset:2px}
+.hhba-original-resume-paper{width:100%;min-width:0;overflow:auto;display:flex;justify-content:center;
+ padding:14px 9px;background:#e9edf3;border-radius:10px;box-sizing:border-box}
+.hhba-original-resume-canvas{display:block;max-width:100%;height:auto!important;
+ box-shadow:0 6px 30px rgba(33,43,63,.12);background:#fff}
+.hhba-original-resume-pages{display:flex;align-items:center;justify-content:center;
+ gap:12px;margin-top:13px}
+.hhba-original-resume-pages span{font-size:12px;color:#536178;font-variant-numeric:tabular-nums}
+.hhba-original-resume-pages button:disabled{opacity:.45;cursor:not-allowed}
+.hhba-original-resume-word{padding:10px 15px;background:#fff;border:1px solid #e2e7ee;border-radius:9px}
+.hhba-original-resume-word>p,.hhba-original-resume-note{font-size:12px;color:#6f5977;line-height:1.7}
+.hhba-original-resume-word pre{white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;
+ line-height:1.8;font-size:13px;color:#28364d;max-height:580px;overflow-y:auto}
+@media(max-width:640px){.hhba-original-resume{padding:10px}
+ .hhba-original-resume-toolbar{align-items:flex-start}
+ .hhba-original-resume-pages{gap:6px}
+}
