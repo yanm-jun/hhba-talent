@@ -85,7 +85,7 @@ export function WorkValueGuidePage({user}:{user:User|null}){
     return <article className={'hhba-vguide-card'+(done?' is-completed':'')} key={tip.id} id={'tip-'+tip.id}>
      <div className="hhba-vguide-card-meta"><span className="hhba-vguide-stage-label">{label}</span><span className="hhba-vguide-source-tag">HHBA 原创建议</span></div>
      <h3>{tip.title}</h3><p className="hhba-vguide-summary">{tip.summary}</p>
-     <div className="hhba-vguide-tags"><span><Wallet size={13}/>无需额外付费</span><span><Clock3 size={13}/>{tip.minutes}</span><span>行动难度：{tip.effort}</span><span>主要帮助：{tip.value}</span></div>
+     <div className="hhba-vguide-tags"><span><Wallet size={13}/>免费阅读</span><span><Clock3 size={13}/>{tip.minutes}</span><span>行动难度：{tip.effort}</span><span>主要帮助：{tip.value}</span></div>
      <details className="hhba-vguide-detail">
       <summary>打开具体行动步骤 <ChevronDown size={17}/></summary>
       <ol>{tip.steps.map(step=><li key={step}>{step}</li>)}</ol>
@@ -98,7 +98,7 @@ export function WorkValueGuidePage({user}:{user:User|null}){
    })}</div>:<div className="hhba-vguide-empty" role="status"><Search size={23}/><strong>没有匹配的建议</strong><p>试试减少关键词、放宽时间限制，或切换到全部阶段。</p><button type="button" onClick={clear}>显示全部建议</button></div>}
    <footer className="hhba-vguide-footer">
     <ShieldCheck size={21}/>
-    <div><strong>关于来源与使用范围</strong><p>本指南由 HHBA 独立撰写，依据日常职场决策整理，不能替代劳动法规定或个案法律意见。涉及具体法定义务的卡片已关联劳动权益知识库；法律适用仍取决于地区、事实与现行规定。完成状态只保存在本浏览器，不上传账户或服务器。参考项目只用于产品组织方式研究，未复用第三方正文。</p>
+    <div><strong>关于来源与使用范围</strong><p>本指南由 HHBA 独立撰写，依据日常职场决策整理，不能替代劳动法规定或个案法律意见。涉及具体法定义务的卡片已关联劳动权益知识库；法律适用仍取决于地区、事实与现行规定。部分行动可能产生医疗、专业咨询或其他实际费用，办理前请单独核实。完成状态只保存在本浏览器，不上传账户或服务器。参考项目只用于产品组织方式研究，未复用第三方正文。</p>
      <Link to="/rights/knowledge">前往劳动权益知识库，查看法律原文与公开案例 <ArrowRight size={15}/></Link>
     </div>
    </footer>
