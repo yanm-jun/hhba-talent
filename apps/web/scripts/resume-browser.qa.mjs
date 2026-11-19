@@ -262,7 +262,7 @@ try{
  await source.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
  await source.getByRole('button',{name:'保存',exact:true}).click();
  await livePatch.waitFor({state:'detached',timeout:10000});
- await source.getByText('其余内容较长或版式复杂',{exact:false}).waitFor({timeout:10000});
+ await source.getByText('其余文字暂时放不下',{exact:false}).waitFor({timeout:10000});
  await source.getByRole('button',{name:'继续修改这一段'}).click();
  await source.getByRole('button',{name:'撤销',exact:true}).click();
  await source.getByRole('button',{name:'修改这段简历'}).waitFor({timeout:10000});
