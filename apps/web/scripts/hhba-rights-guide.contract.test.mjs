@@ -7,6 +7,9 @@ const payload=source.match(/export const GUIDE_TIPS:GuideTip\[\]=([\s\S]+);\s*$/
 if(!payload)throw new Error('Original HHBA guide data is missing');
 const tips=JSON.parse(payload[1]);
 const legal=JSON.parse(read('../src/data/laborRightsTopics.json'));
+const subtopics=JSON.parse(read('../src/data/laborRightsSubtopics.json'));
+const subtopicDetail=read('../src/pages/LegalAidSubtopicPage.tsx');
+const topicDetail=read('../src/pages/LegalAidTopicPage.tsx');
 const guide=read('../src/pages/WorkValueGuidePage.tsx');
 const hub=read('../src/pages/LegalAidLandingPage.tsx');
 const routes=read('../src/main.tsx');
@@ -14,11 +17,11 @@ const css=read('../src/styles/hhba-work-value-guide.css');
 const index=read('../src/services/siteSearchIndex.ts');
 const footer=read('../src/components/Shell.tsx');
 
-test('original HHBA guide has 40 actionable entries evenly distributed across 8 relevant stages',()=>{
- assert.equal(tips.length,40);
+test('HHBA guide V2 has 200 actionable entries evenly distributed across eight stages',()=>{
+ assert.equal(tips.length,200);
  assert.equal(new Set(tips.map(x=>x.id)).size,40);
  const stages=['before','interview','offer','pay','work','change','leave','dispute'];
- for(const stage of stages)assert.equal(tips.filter(x=>x.stage===stage).length,5,stage);
+ for(const stage of stages)assert.equal(tips.filter(x=>x.stage===stage).length,25,stage);
  for(const tip of tips){
   assert.match(tip.id,/^[a-z]+$/);
   assert(tip.title.length>=7&&tip.summary.length>=26,tip.id+' must contain substantive copy');
@@ -28,7 +31,7 @@ test('original HHBA guide has 40 actionable entries evenly distributed across 8 
   assert(/分钟$/.test(tip.minutes),tip.id+' must have a real time budget');
   assert(['低','中'].includes(tip.effort),tip.id);
   assert(tip.keywords.length>0,tip.id+' needs discoverability');
-  if(tip.topic)assert(legal.topics.some(t=>t.slug===tip.topic),tip.id+' must point to an existing legal detail');
+  if(tip.topic)assert([...legal.topics,...subtopics.topics].some(t=>t.slug===tip.topic),tip.id+' must point to an existing legal detail');
  }
 });
 
@@ -38,6 +41,7 @@ test('full value-guide page has functional filtering, real details and locally s
   'maxTime===\'全部\'','onlyPending','onClick={()=>setStage(s.id)}',
   'tip.steps.map','<details','<summary','<ol>',
   'readCompleted','localStorage.setItem(STORAGE_KEY','onChange={()=>mark(tip.id)}',
+  'setVisibleCount(24)','visibleTips.map(tip=>','继续查看下一批建议',
   "to={'/rights/knowledge/'+tip.topic}"
  ])assert(guide.includes(x),'guide lacks '+x);
  assert.match(guide,/return <Shell user=\{user\}>/);
@@ -53,6 +57,8 @@ test('knowledge hub searches the original authoritative eight-topic dataset with
  assert.match(hub,/topic\.short/);
  assert.match(hub,/knowledgeHref\+'\/'\+topic\.slug/);
  assert.match(hub,/GUIDE_TIPS\.filter/);
+ assert.match(hub,/subtopics\.topics\.filter\(topic=>subtopicMatches\(topic,query\)\)/);
+ assert.match(hub,/hhba-knowledge-subtopic-grid/);
  assert.match(hub,/relatedSlugs\.has\(tip\.topic\)/);
  assert.match(hub,/topicKeywords\[topic\.slug\]/);
  assert.match(hub,/\/rights\/guide\?tip=/);
@@ -75,3 +81,25 @@ test('two routes and global search are public, while other HHBA product modules 
  assert.match(routes,/route==='\/companies\/library'/);
  assert.match(routes,/route==='\/transparency'/);
 });
+
+test('twelve new subtopics extend eight full topics to twenty without fake case claims',()=>{
+ assert.equal(legal.topics.length,8);
+ assert.equal(subtopics.topics.length,12);
+ assert.equal(new Set([...legal.topics,...subtopics.topics].map(t=>t.slug)).size,20);
+ for(const topic of subtopics.topics){
+  assert(legal.topics.some(v=>v.slug===topic.parentSlug),topic.slug+' must link to a full source-backed topic');
+  assert.equal(topic.situations.length,3);
+  assert.equal(topic.laws.length,2);
+  assert.equal(topic.proof.length,3);
+  assert.equal(topic.paths.length,3);
+  assert.equal(topic.misconceptions.length,2);
+  assert(topic.laws.every(l=>l.url.startsWith('https://')),topic.slug);
+  assert.equal(topic.contentType,'independently_written_guidance_without_individual_case');
+  assert.equal(Object.hasOwn(topic,'case'),false,'no fake case for '+topic.slug);
+ }
+ assert.match(topicDetail,/subtopics\.topics\.find\(t=>t\.slug===slug\)/);
+ assert.match(topicDetail,/LegalAidSubtopicPage user=\{user\}/);
+ for(const token of ['topic.laws.map','topic.proof.map','topic.paths.map','topic.misconceptions.map','topic.parentSlug','不使用模拟案例'])assert(subtopicDetail.includes(token),token);
+ assert.doesNotMatch(subtopicDetail,/input type="file"|<form|<textarea|fetch\(|localStorage/);
+});
+
