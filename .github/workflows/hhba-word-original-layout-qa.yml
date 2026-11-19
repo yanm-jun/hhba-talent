@@ -1,0 +1,51 @@
+name: HHBA Original Word Layout Fidelity
+on:
+  pull_request:
+    paths:
+      - 'apps/web/src/services/resumeDocxPreserve.mjs'
+      - 'apps/web/scripts/resume-docx-preserve.contract.test.mjs'
+      - 'apps/web/scripts/word-layout-preservation.qa.py'
+      - '.github/workflows/hhba-word-original-layout-qa.yml'
+  push:
+    branches:
+      - feature/resume-targeted-optimization-foundation-20261119
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render-compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact original DOCX ZIP part retention
+        working-directory: apps/web
+        env:
+          HHBA_WORD_RENDER_QA_OUTPUT: /tmp/hhba-docx-preserve-ci
+        run: node --test --experimental-strip-types scripts/resume-docx-preserve.contract.test.mjs
+      - name: Install private Word rendering dependencies for layout comparison
+        run: |
+          if ! command -v libreoffice >/dev/null 2>&1 || ! command -v pdftoppm >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libreoffice-writer poppler-utils fonts-noto-cjk
+          fi
+          python3 -m venv /tmp/hhba-word-parity-venv
+          /tmp/hhba-word-parity-venv/bin/python -m pip install --disable-pip-version-check pillow==11.3.0
+      - name: Compare original and edited Word by rendered pixels
+        working-directory: apps/web
+        run: |
+          /tmp/hhba-word-parity-venv/bin/python scripts/word-layout-preservation.qa.py \
+            /tmp/hhba-docx-preserve-ci/original-preserved-layout.docx \
+            /tmp/hhba-docx-preserve-ci/edited-preserved-layout.docx \
+            '原始岗位描述' '新的岗位描述'
+      - name: Preserve synthetic QA files for inspection
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-original-word-layout-qa
+          path: /tmp/hhba-docx-preserve-ci/*.docx
+          if-no-files-found: warn
+          retention-days: 5
