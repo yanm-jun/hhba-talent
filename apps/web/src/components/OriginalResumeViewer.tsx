@@ -173,9 +173,9 @@ export function OriginalResumeViewer({resume,onClose}:{
   try{await downloadPrivateResume(resume);}
   catch(e){setError(e instanceof Error?e.message:'下载原件失败');}
  }
- return <section className="hhba-original-resume" aria-label="简历原件预览">
+ return <section className="hhba-original-resume" aria-label="查看我的简历">
   <div className="hhba-original-resume-toolbar">
-   <div><strong>{resume.name}</strong><p>原始文件预览 · 不会修改已上传的原件</p></div>
+   <div><strong>{resume.name}</strong><p>原件始终保留</p></div>
    <div>
     <button type="button" onClick={()=>void download()} aria-label="下载简历原件">
      <Download size={15}/> 下载原件</button>
@@ -185,20 +185,73 @@ export function OriginalResumeViewer({resume,onClose}:{
   {status==='loading'&&<p role="status" className="hhba-original-resume-note">正在打开简历…</p>}
   {status==='error'&&<p role="alert" className="hhba-original-resume-note">{error}</p>}
   {status==='ready'&&isPdf&&<>
+   {canStartEdit&&!layout&&<div className="hhba-original-resume-start">
+    <label><input type="checkbox" checked={visionConsent}
+     onChange={e=>setVisionConsent(e.target.checked)}/>
+     我同意将这份简历提供给第三方 AI 帮助查找可修改的位置。不会自动修改简历或投递。</label>
+    <button type="button" onClick={()=>void startEditing()}
+     disabled={!visionConsent||visionBusy}>
+     <PencilLine size={14}/>{visionBusy?'正在准备…':'开始修改'}</button>
+   </div>}
    <div ref={paper} className="hhba-original-resume-paper">
-    <canvas ref={canvas} role="img" aria-label={'原始 PDF 第 '+page+' 页'}
-     className="hhba-original-resume-canvas"/>
+    <div className="hhba-original-resume-page-frame" style={{
+     width:pageSize.width||undefined,height:pageSize.height||undefined}}>
+     <canvas ref={canvas} role="img" aria-label={'原始 PDF 第 '+page+' 页'}
+      className="hhba-original-resume-canvas"/>
+     {layout&&anchors.map(anchor=>{
+      const changed=changes.some(c=>c.id===anchor.id);
+      const [x,y,w,h]=anchor.bbox;
+      return <button type="button" key={anchor.id}
+       className={'hhba-original-resume-anchor'+(changed?' is-edited':'')}
+       title={changed?'查看已保存的修改':'修改这段'}
+       aria-label={changed?'继续修改这一段':'修改这段简历'}
+       onClick={()=>selectAnchor(anchor)}
+       style={{left:x/10+'%',top:y/10+'%',width:w/10+'%',height:h/10+'%'}}>
+       <span><PencilLine size={12}/>{changed?'已修改':'修改'}</span>
+      </button>;
+     })}
+     {layout&&selectedId&&anchors.filter(a=>a.id===selectedId).map(anchor=>{
+      const changed=changes.some(c=>c.id===anchor.id);
+      return <div className="hhba-original-resume-editbox" key={anchor.id}
+       role="region" aria-label="在原文位置修改"
+       style={{left:Math.min(58,anchor.bbox[0]/10)+'%',
+        top:Math.min(72,(anchor.bbox[1]+anchor.bbox[3])/10+1)+'%'}}>
+       <div className="hhba-original-resume-editbox-title">
+        <strong>修改这段</strong>
+        <button type="button" aria-label="关闭修改" onClick={()=>setSelectedId(null)}><X size={14}/></button>
+       </div>
+       <p>{anchor.text}</p>
+       <textarea aria-label="修改这段内容" maxLength={1600} rows={4} value={draft}
+        onChange={e=>{setDraft(e.target.value);setConfirmed(false);}}/>
+       <label><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>
+        我确认修改内容属实</label>
+       <div className="hhba-original-resume-editbox-actions">
+        <button type="button" disabled={!confirmed||!draft.trim()||saving}
+         onClick={()=>void saveChange(anchor)}><Save size={13}/> 保存</button>
+        {changed&&<button type="button" disabled={saving} onClick={()=>void undoChange(anchor)}>
+         <Undo2 size={13}/> 撤销</button>}
+       </div>
+      </div>;
+     })}
+    </div>
    </div>
+   {layout&&anchors.length===0&&<p className="hhba-original-resume-note">
+    这页暂时没有找到可以准确修改的位置。你仍然可以查看和下载原件。</p>}
+   {changes.length>0&&<p className="hhba-original-resume-note">
+    已保存 {changes.length} 处修改，原始文件没有改变。当前还不能按原样式导出修改后的副本。</p>}
+   {message&&<p className="hhba-original-resume-note" role="status">{message}</p>}
    <nav className="hhba-original-resume-pages" aria-label="原始简历翻页">
-    <button type="button" disabled={page<=1} onClick={()=>setPage(n=>n-1)}>
+    <button type="button" disabled={page<=1}
+     onClick={()=>{setSelectedId(null);setPage(n=>n-1)}}>
      <ChevronLeft size={15}/> 上一页</button>
     <span>第 {page} / {pageCount} 页</span>
-    <button type="button" disabled={page>=pageCount} onClick={()=>setPage(n=>n+1)}>
+    <button type="button" disabled={page>=pageCount}
+     onClick={()=>{setSelectedId(null);setPage(n=>n+1)}}>
      下一页 <ChevronRight size={15}/></button>
    </nav>
   </>}
   {status==='ready'&&!isPdf&&<div className="hhba-original-resume-word">
-   <p role="note">这份 Word 的文字可以查看，但原来的表格、字体和分栏尚不能在这里准确呈现。需要核对原始排版时，请下载原件使用 Word 或 WPS 打开。</p>
+   <p role="note">可以先查看文字。要查看 Word 的原始样式，请下载原件打开。</p>
    <pre>{text}</pre>
   </div>}
  </section>;
