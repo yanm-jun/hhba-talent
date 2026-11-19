@@ -28,8 +28,8 @@ export function HomePage({user}:{user:User|null}){
    <div className="hhba-public-hero-logo"><BrandMark variant="icon" size="hero"/></div>
    <p className="hhba-public-eyebrow"><span className="hhba-public-brand-cn">汇方职场</span><span>HHBA · HUMAN CAPABILITY NETWORK</span></p>
    <p className="hhba-home-brand-slogan">让机会与人才，找到彼此。</p>
-   <h1>找工作，不止于找到工作。</h1>
-   <p className="hhba-home-description">从发现真实招聘机会，到了解劳动权益，HHBA 希望陪你走过求职与职场的重要阶段。</p>
+   <h1>一份工作，值得认真选择。</h1>
+   <p className="hhba-home-description">发现真实的职业机会，了解劳动权益，让每一次选择都有更多依据。</p>
    <p className="hhba-home-question">你来到这里，是为了什么？</p>
    <button type="button" className="hhba-letter-revisit" onClick={()=>window.dispatchEvent(new Event('hhba:open-letter'))}><span aria-hidden="true">✉</span> 读一封来自 HHBA 的信</button>
   </section>
