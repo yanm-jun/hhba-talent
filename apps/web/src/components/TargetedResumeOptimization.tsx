@@ -6,7 +6,7 @@ import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimiz
 import {applySuggestion,validateSuggestion,editResumeBlock,type ResumeBlock,type ResumeSuggestion,type ResumeVersion} from '../services/targetedResumeOptimization';
 import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
 import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResumeVersion} from '../services/resumeVersionsApi';
-import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,sourceResumeOmittedCharacters,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
+import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,sourceResumeOmittedCharacters,structuredResumeOmittedCharacters,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
 import {createPortal} from 'react-dom';
 import {ResumePrintSheet} from './ResumePrintSheet';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
@@ -27,8 +27,9 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
  },[profile,sourceText]);
  const omittedSourceCharacters=useMemo(()=>(
   !profile.experiences?.length&&sourceText
-   ?sourceResumeOmittedCharacters(sourceText,blocks):0
- ),[profile.experiences,sourceText,blocks]);
+   ?sourceResumeOmittedCharacters(sourceText,blocks)
+   :structuredResumeOmittedCharacters(profile)
+ ),[profile,sourceText,blocks]);
  const initial=()=>({id:'draft-'+job.id,targetJobId:job.id,blocks,acceptedSuggestionIds:[] as string[]});
  const [version,setVersion]=useState<ResumeVersion>(initial);
  const [suggestions,setSuggestions]=useState<ResumeSuggestion[]>([]);
@@ -215,7 +216,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
     :<span className="targeted-resume-unavailable">{!hasSession?'站内登录后可使用 AI 润色':status?'AI 润色尚未开放':'正在检查服务状态…'}</span>}
   </div>
   {omittedSourceCharacters>0&&<p className="targeted-resume-truncation" role="alert">
-   <strong>原始简历内容未完整载入。</strong>当前最多支持 12 个可编辑片段，
+   <strong>原始简历内容未完整载入。</strong>部分文字超出可编辑或可打印容量，
    仍有约 {omittedSourceCharacters} 个非空白字符未纳入本次预览。
    为避免遗漏经历，本次暂不允许保存岗位版本或导出 PDF；请先上传精简或分段整理后的原始简历。
    原上传文件不会因此被修改。
