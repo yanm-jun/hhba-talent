@@ -57,3 +57,34 @@ test('invalid key, empty funds, missing balance and repeated probes fail safely'
   assert.equal(s.records.length,3);
  }finally{globalThis.fetch=prior;}
 });
+
+test('synthetic generation self-check never forwards client provided content',async()=>{
+ const s=setup(),old=globalThis.fetch;
+ globalThis.fetch=async(url,options)=>{
+  assert.equal(url,'https://api.deepseek.com/chat/completions');
+  const input=JSON.parse(JSON.parse(options.body).messages[1].content);
+  assert.deepEqual(input.blocks.map(b=>b.id),['qa-source']);
+  assert.match(input.blocks[0].text,/示例门店/);
+  assert.doesNotMatch(input.blocks[0].text,/untrusted-client-content/);
+  return Response.json({choices:[{message:{content:'{"suggestions":[]}'}}]});
+ };
+ try{
+  const response=await onRequestPost({env:s.env,
+   request:s.request(host,host+'/api/preview-deepseek-diagnostic?mode=synthetic')});
+  assert.equal(response.status,200);
+  const data=await response.json();
+  assert.equal(data.code,'SYNTHETIC_AI_GENERATION_OK');
+  assert.equal(data.suggestion_count,0);
+ }finally{globalThis.fetch=old;}
+});
+test('synthetic generation errors expose only fixed codes',async()=>{
+ const s=setup(),old=globalThis.fetch;
+ globalThis.fetch=async()=>new Response('provider-private-debug-info',{status:401});
+ try{
+  const r=await onRequestPost({env:s.env,
+   request:s.request(host,host+'/api/preview-deepseek-diagnostic?mode=synthetic')});
+  const data=await r.json();
+  assert.equal(data.code,'AI_PROVIDER_KEY_REJECTED');
+  assert.doesNotMatch(JSON.stringify(data),/provider-private-debug-info/);
+ }finally{globalThis.fetch=old;}
+});
