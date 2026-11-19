@@ -11,6 +11,7 @@ export type ResumeDocumentExperience={
 export type ResumeDocument={
  details:ResumeDocumentDetails;
  education:string[];
+ sourceParagraphs:string[];
  experiences:ResumeDocumentExperience[];
  skills:{name:string;details:string}[];
 };
@@ -29,6 +30,30 @@ export function normalizeResumeDocumentDetails(raw:unknown):ResumeDocumentDetail
   location:safe(input.location,120),summary:safe(input.summary,800),
   educationDetails:safe(input.educationDetails,600)
  };
+}
+/**
+ * Extract text-only source paragraphs without pretending they are verified
+ * positions, educational credentials, or employment achievements.
+ * Never silently invent semantic headings. The original document stays intact.
+ */
+export function sourceResumeBlocks(raw:string):ResumeBlock[]{
+ const source=typeof raw==='string'?raw.replace(/\r\n?/g,'\n').trim().slice(0,19000):'';
+ if(!source)return [];
+ const parts=source.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+ const chunks:string[]=[];
+ let current='';
+ function push(){if(current.trim())chunks.push(current.trim());current='';}
+ for(const part of parts){
+  const segments=part.match(/[\s\S]{1,1400}/g)||[];
+  for(const piece of segments){
+   if(current.length+piece.length+1>1400)push();
+   current=current?current+'\n'+piece:piece;
+   if(chunks.length>=12)break;
+  }
+  if(chunks.length>=12)break;
+ }
+ if(chunks.length<12)push();
+ return chunks.slice(0,12).map((text,i)=>({id:'source-'+i,section:'summary',text}));
 }
 export function buildResumeDocument(
  profile:CandidateProfile,blocks:readonly ResumeBlock[],details:ResumeDocumentDetails
@@ -50,9 +75,10 @@ export function buildResumeDocument(
   (profile.education?DEGREE_NAMES[profile.education]||'':''),
   safe(details.educationDetails,600)
  ].filter(Boolean);
- return {details:normalizeResumeDocumentDetails(details),education,experiences,skills};
+ return {details:normalizeResumeDocumentDetails(details),education,experiences,skills,
+  sourceParagraphs:blocks.filter(b=>b.id.startsWith('source-')).map(b=>b.text)};
 }
 export function readableResumeDocument(doc:ResumeDocument):boolean{
  return doc.details.fullName.length>=2&&doc.details.fullName.length<=80&&
-  Boolean(doc.experiences.length||doc.skills.length||doc.education.length||doc.details.summary);
+  Boolean(doc.experiences.length||doc.skills.length||doc.education.length||doc.details.summary||doc.sourceParagraphs.length);
 }
