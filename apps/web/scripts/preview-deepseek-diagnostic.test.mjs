@@ -6,7 +6,7 @@ function setup(){
  const records=[];
  const db={prepare(sql){return{bind(...args){return{async run(){
   if(!sql.includes('hhba_resume_optimization_attempts'))throw Error('WRONG_TABLE');
-  if(records.length>=3)return {success:true,meta:{changes:0}};
+  if(records.length>=5)return {success:true,meta:{changes:0}};
   records.push(args);return {success:true,meta:{changes:1}};
  }}}}}};
  const env={HHBA_AUTH_ROLLOUT:'preview',HHBA_PREVIEW_AI_DIAG_ENABLED:'1',
@@ -52,9 +52,11 @@ test('invalid key, empty funds, missing balance and repeated probes fail safely'
   globalThis.fetch=async()=>Response.json({is_available:false});
   const empty=await (await onRequestPost({env:s.env,request:s.request()})).json();
   assert.equal(empty.code,'PROVIDER_BALANCE_EMPTY');
+  await onRequestPost({env:s.env,request:s.request()});
+  await onRequestPost({env:s.env,request:s.request()});
   const last=await onRequestPost({env:s.env,request:s.request()});
   assert.equal(last.status,429);
-  assert.equal(s.records.length,3);
+  assert.equal(s.records.length,5);
  }finally{globalThis.fetch=prior;}
 });
 
