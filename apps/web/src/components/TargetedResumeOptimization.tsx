@@ -73,13 +73,14 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
  }
  const before=useMemo(()=>evidenceVisibility(criteria,blocks),[criteria,blocks]);
  const after=useMemo(()=>evidenceVisibility(criteria,version.blocks),[criteria,version.blocks]);
+ const hasAuditedAtsIdentity=/^(?:ashby|greenhouse|lever)-/.test(job.id);
  const hasWordingChanges=useMemo(()=>version.blocks.some(block=>{
   const original=blocks.find(old=>old.id===block.id);
   return !original||original.text!==block.text;
  }),[version.blocks,blocks]);
  function invalidateScore(){setScoreResult(null);setConfirmReassessment(false);}
  async function reassess(){
-  if(!scoreStatus?.enabled||scoring||!hasWordingChanges||!confirmReassessment)return;
+  if(!scoreStatus?.enabled||!hasAuditedAtsIdentity||scoring||!hasWordingChanges||!confirmReassessment)return;
   setScoring(true);setNotice('');setScoreResult(null);
   try{
    const result=await reassessResume(job.id,profile,blocks,version.blocks);
@@ -278,7 +279,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
    <div className="targeted-resume-reassess-heading">
     <div><strong>岗位匹配分重新评估</strong>
      <p>仅支持具有最新官方审核快照的中国大陆 ATS 岗位。优化前后都使用 HHBA Match Ranking V2，不沿用旧卡片分数。</p></div>
-    {scoreStatus?.enabled&&<button type="button" onClick={reassess} disabled={!hasWordingChanges||!confirmReassessment||scoring}>
+    {scoreStatus?.enabled&&<button type="button" onClick={reassess} disabled={!hasAuditedAtsIdentity||!hasWordingChanges||!confirmReassessment||scoring}>
      {scoring?'正在复评…':'重新计算匹配分'}</button>}
    </div>
    {!scoreStatus?.enabled&&<p className="targeted-resume-reassess-unavailable">V2 可信复评尚未开放，当前仍可使用文字证据覆盖检查。</p>}
@@ -286,7 +287,8 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
     <input type="checkbox" checked={confirmReassessment} onChange={e=>setConfirmReassessment(e.target.checked)}/>
     我确认本次简历改写均为真实情况，并同意 HHBA 在站内读取当前简历片段、对照官方岗位快照进行评分。此复评不会调用第三方生成式 AI。
    </label>}
-   {scoreStatus?.enabled&&!hasWordingChanges&&<p className="targeted-resume-reassess-unavailable">请先编辑或填充一条简历内容，才需要重新评分。</p>}
+   {scoreStatus?.enabled&&!hasAuditedAtsIdentity&&<p className="targeted-resume-reassess-unavailable">此岗位来自当前搜索结果，尚未进入受信任的 ATS 审核快照；暂不支持同规则复评。</p>}
+   {scoreStatus?.enabled&&hasAuditedAtsIdentity&&!hasWordingChanges&&<p className="targeted-resume-reassess-unavailable">请先编辑或填充一条简历内容，才需要重新评分。</p>}
    {scoreResult?.supported&&typeof scoreResult.original_score==='number'&&typeof scoreResult.updated_score==='number'&&
     <div className="targeted-resume-score-comparison">
      <div><small>修改前 · V2 复评基准</small><strong>{scoreResult.original_score}<span>/100</span></strong></div>
