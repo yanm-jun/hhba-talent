@@ -3,7 +3,7 @@ import {ArrowRight,CheckCircle2,FileText,Scale,ShieldCheck} from 'lucide-react';
 import {Link} from '../router';
 import '../styles/home-workplace-promise.css';
 
-// The homepage reuses its original card layout, but no longer advertises a paid membership.
+// Keep the original homepage card layout while replacing the paid plan with public rights guidance.
 const values=[
  {title:'免费知识查询',Icon:FileText},
  {title:'官方来源优先',Icon:Scale},
