@@ -1,0 +1,69 @@
+name: HHBA Resume Browser QA
+on:
+  push:
+    branches:
+      - feature/resume-targeted-optimization-foundation-20261119
+    paths:
+      - '.github/workflows/hhba-resume-browser-qa.yml'
+      - 'apps/web/qa/**'
+      - 'apps/web/scripts/resume-browser.qa.mjs'
+      - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
+      - 'apps/web/src/components/TargetedResumeOptimization.tsx'
+      - 'apps/web/src/components/ResumePrintSheet.tsx'
+      - 'apps/web/src/services/resumeDocument.ts'
+      - 'apps/web/src/styles/resume-print.css'
+      - 'apps/web/src/styles/targeted-resume-optimization.css'
+      - 'apps/web/src/styles/resume-match-dialog.css'
+  pull_request:
+    paths:
+      - '.github/workflows/hhba-resume-browser-qa.yml'
+      - 'apps/web/qa/**'
+      - 'apps/web/scripts/resume-browser.qa.mjs'
+      - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
+      - 'apps/web/src/components/TargetedResumeOptimization.tsx'
+      - 'apps/web/src/components/ResumePrintSheet.tsx'
+      - 'apps/web/src/services/resumeDocument.ts'
+      - 'apps/web/src/styles/resume-print.css'
+      - 'apps/web/src/styles/targeted-resume-optimization.css'
+      - 'apps/web/src/styles/resume-match-dialog.css'
+permissions:
+  contents: read
+jobs:
+  ui-regression:
+    name: Real Chromium AI/edit/save/print/mobile
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install locked app dependencies and isolated browser driver
+        run: |
+          npm ci
+          npm install --no-save --package-lock=false playwright-core@1.56.1
+          command -v google-chrome || command -v chromium
+      - name: Start Vite development server with only synthetic QA data
+        run: |
+          VITE_HHBA_REAL_AUTH_ENABLED=1 npm run dev -- --host 127.0.0.1 --port 3000 > /tmp/hhba-resume-qa-vite.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl --silent --fail http://127.0.0.1:3000/qa/resume-flow.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/hhba-resume-qa-vite.log
+          exit 1
+      - name: Run real browser editing and A4 PDF assertions
+        env:
+          QA_OUTPUT: /tmp/hhba-resume-browser-qa
+        run: node scripts/resume-browser.qa.mjs
+      - name: Preserve synthetic screenshots and generated PDFs on failure or success
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-resume-synthetic-browser-qa
+          path: /tmp/hhba-resume-browser-qa/
+          if-no-files-found: ignore
+          retention-days: 7
