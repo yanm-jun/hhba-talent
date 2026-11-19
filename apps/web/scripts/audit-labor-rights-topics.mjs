@@ -35,7 +35,7 @@ assert(urls.size>=5,'Insufficient independently checked legal sources');
 const more=JSON.parse(readFileSync('src/data/laborRightsSubtopics.json','utf8'));
 assert.equal(more.topics.length,12,'V2 contains twelve independently written subtopics');
 const slugs=new Set(expected);
-const allowedHost=new Set(['www.samr.gov.cn','www.nhsa.gov.cn','chinajob.mohrss.gov.cn','xzfg.moj.gov.cn','www.mohrss.gov.cn','www.court.gov.cn']);
+const allowedHost=new Set(['www.samr.gov.cn','www.nhsa.gov.cn','chinajob.mohrss.gov.cn','xzfg.moj.gov.cn','www.mohrss.gov.cn','www.court.gov.cn','www.beijing.gov.cn','rsj.beijing.gov.cn','shanghai.chinatax.gov.cn']);
 for(const t of more.topics){
  assert(!slugs.has(t.slug),'duplicate base or subtopic slug: '+t.slug);
  slugs.add(t.slug);
