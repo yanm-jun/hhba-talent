@@ -56,11 +56,14 @@ export async function generateSuggestions({env,blocks,job,signal}){
  }
  let response;
  try{
-  response=await fetch(url,{method:'POST',headers,body:JSON.stringify(body),signal,redirect:'error'});
+  response=await fetch(url,{method:'POST',headers,body:JSON.stringify(body),signal,redirect:'manual'});
  }catch(e){
   throw new Error(e?.name==='TimeoutError'||e?.name==='AbortError'?
    'AI_PROVIDER_TIMEOUT':'AI_PROVIDER_NETWORK_ERROR');
  }
+ // Workerd does not implement redirect:'error'. Manual redirects must be
+ // rejected explicitly to prevent a provider key ever leaving its origin.
+ if(response.status>=300&&response.status<400)throw new Error('AI_PROVIDER_UNEXPECTED_REDIRECT');
  // No upstream response body or URL (potentially containing PII) is exposed.
  if(!response.ok){
   const status=response.status;
