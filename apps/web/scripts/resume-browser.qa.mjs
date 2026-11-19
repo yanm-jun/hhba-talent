@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
-import {mkdir,writeFile} from 'node:fs/promises';
+import {mkdir,writeFile,readFile} from 'node:fs/promises';
 import {chromium} from 'playwright-core';
 import {getDocument} from 'pdfjs-dist/legacy/build/pdf.mjs';
 
@@ -33,13 +33,15 @@ try{
  const response=await page.goto(url,{waitUntil:'networkidle',timeout:45000});
  assert.equal(response.status(),200);
  await page.getByRole('button',{name:'针对这个岗位优化简历'}).click();
- await page.getByRole('heading',{name:'岗位定向简历 · 证据预览'}).waitFor();
+ await page.getByRole('region',{name:'正式简历排版与打印'}).waitFor();
+ assert.equal(await page.locator('.targeted-resume-live-paper .hhba-print-sheet').count(),1,'one live resume paper, not two separate previews');
  const generate=page.getByRole('button',{name:'生成 AI 建议'});
  assert.equal(await generate.isDisabled(),true,'user consent is mandatory');
  await page.locator('.targeted-resume-consent input[type=checkbox]').check();
  await generate.click();
  const tip=page.locator('.targeted-resume-suggestion');
  await tip.first().waitFor();
+ assert.equal(await page.locator('.targeted-resume-inline-region[data-resume-block-id="source-0"] .targeted-resume-suggestion').count(),1,'Siri popover must be inside the actual resume paragraph');
  const siriText=tip.first().locator('.targeted-resume-gradient');
  await siriText.waitFor();
  await page.emulateMedia({reducedMotion:'no-preference'});
@@ -59,21 +61,38 @@ try{
  assert.equal(still,'none','reduced-motion readers get a static accessible suggestion');
  assert.match(await siriText.textContent(),/同步整理每日服务记录/,'motion setting must not alter draft content');
  await page.emulateMedia({reducedMotion:'no-preference'});
- assert.equal(await page.getByRole('button',{name:'填充此建议'}).isDisabled(),true,
+ assert.equal(await page.getByRole('button',{name:'填充到此处'}).isDisabled(),true,
   'AI suggestion must not auto-fill without truthful confirmation');
+ await tip.first().getByRole('button',{name:'修改建议'}).click();
+ await tip.first().getByRole('textbox',{name:'修改 AI 建议'}).fill('真实参与合成测试项目的记录整理与预约沟通。');
  await tip.first().locator('input[type=checkbox]').check();
- await page.getByRole('button',{name:'填充此建议'}).click();
- assert.match(await page.locator('.targeted-resume-block p').first().textContent(),/同步整理每日服务记录/);
- await page.locator('.targeted-resume-block-label button').first().click();
+ await page.getByRole('button',{name:'填充到此处'}).click();
+ const liveText=page.locator('[data-resume-block-id="source-0"] .hhba-print-paragraph');
+ assert.match(await liveText.textContent(),/合成测试项目/,'modified AI text must replace the exact source paragraph');
+ await page.getByRole('button',{name:'撤销',exact:true}).click();
+ assert.match(await liveText.textContent(),/测试门店的运营记录/,'undo must restore original paragraph');
+ await page.locator('[data-resume-block-id="source-0"] .targeted-resume-ai-trigger').click();
+ await page.getByRole('button',{name:'填充到此处'}).click();
+ assert.match(await liveText.textContent(),/合成测试项目/);
+ await page.locator('[data-resume-block-id="source-0"] button[aria-label="编辑当前简历段落"]').click();
  const edit=page.getByRole('textbox',{name:'编辑当前简历段落'});
  await edit.fill('真实参与合成测试门店运营记录整理与预约协调。');
  await page.getByRole('button',{name:'保存本次修改'}).click();
- assert.match(await page.locator('.targeted-resume-block p').first().textContent(),/合成测试门店/);
+ assert.match(await liveText.textContent(),/合成测试门店/);
  await page.getByPlaceholder('请填写本人真实姓名').fill('验收用虚拟姓名');
  await page.getByPlaceholder('例如：区域运营督导').fill('运营助理');
- await page.getByRole('button',{name:'预览 A4'}).click();
- assert.equal(await page.locator('.targeted-resume-print-preview:not(.is-collapsed)').count(),1);
- assert.equal(await page.getByRole('button',{name:'打印 / 保存 PDF'}).isEnabled(),true);
+ assert.equal(await page.locator('.targeted-resume-live-paper .hhba-print-sheet').count(),1);
+ assert.equal(await page.getByRole('button',{name:'导出 PDF'}).isEnabled(),true);
+ assert.equal(await page.getByRole('button',{name:'导出 Word'}).isEnabled(),true);
+ const downloadEvent=page.waitForEvent('download');
+ await page.getByRole('button',{name:'导出 Word'}).click();
+ const download=await downloadEvent;
+ assert.match(download.suggestedFilename(),/\.docx$/);
+ await download.saveAs(output+'/optimized-resume.docx');
+ const docx=await readFile(output+'/optimized-resume.docx');
+ assert.equal(docx.readUInt32LE(0),0x04034b50,'Word download must be a ZIP-based DOCX');
+ assert.ok(docx.includes(Buffer.from('合成测试门店')),'Word must contain the same edited resume paragraph');
+ assert.ok(!docx.includes(Buffer.from('AI 建议')),'Word must not contain AI editing controls');
  const pdf=await page.pdf({format:'A4',printBackground:true});
  await writeFile(output+'/desktop-resume.pdf',pdf);
  const pages=await pdfText(pdf);
@@ -103,7 +122,7 @@ try{
  await mobile.goto(url,{waitUntil:'networkidle',timeout:45000});
  await mobile.getByRole('button',{name:'针对这个岗位优化简历'}).click();
  await mobile.getByPlaceholder('请填写本人真实姓名').fill('移动端虚拟姓名');
- await mobile.getByRole('button',{name:'预览 A4'}).click();
+ assert.equal(await mobile.locator('.targeted-resume-live-paper .hhba-print-sheet').count(),1);
  const metrics=await mobile.evaluate(()=>({
   viewport:document.documentElement.clientWidth,
   scroll:document.documentElement.scrollWidth,
@@ -133,7 +152,9 @@ try{
  await truncated.getByRole('button',{name:'针对这个岗位优化简历'}).click();
  await truncated.getByRole('alert').filter({hasText:'原始简历内容未完整载入'}).waitFor();
  await truncated.getByPlaceholder('请填写本人真实姓名').fill('截断测试姓名');
- assert.equal(await truncated.getByRole('button',{name:'打印 / 保存 PDF'}).isDisabled(),true,
+ assert.equal(await truncated.getByRole('button',{name:'导出 PDF'}).isDisabled(),true,
+  'a visibly incomplete source resume must not be exported as a complete PDF');
+ assert.equal(await truncated.getByRole('button',{name:'导出 Word'}).isDisabled(),true,
   'a visibly incomplete source resume must not be exported as a complete PDF');
  await truncated.locator('.targeted-resume-save-confirm input[type=checkbox]').check();
  assert.equal(await truncated.getByRole('button',{name:'保存当前版本'}).isDisabled(),true,
