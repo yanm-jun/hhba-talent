@@ -5,7 +5,7 @@ import {fetchPrivateResumeForLocalReview,downloadPrivateResume} from '../service
 import {extractDocxText} from '../services/docxProfile.mjs';
 import {matchVisualRegionsToPdfPage,type VerifiedResumeAnchor} from '../services/resumeVisualAnchors.mjs';
 import {planInlinePdfPreview,whitePdfPatchBackground} from '../services/resumeInlinePdfPreview.mjs';
-import {createOriginalPdfSearchableCopy,downloadOriginalPdfSearchableCopy} from '../services/resumePdfReviewCopy.mjs';
+import {createOriginalPdfSearchableCopy,downloadOriginalPdfSearchableCopy,verifyOriginalPdfSearchableCopy} from '../services/resumePdfReviewCopy.mjs';
 import {visualEditingReady,analyzeVisualResume,listPageResumeEdits,savePageResumeEdits,
  type VisualResumeLayout,type PageResumeEdit} from '../services/resumeVisualEditingApi';
 import '../styles/original-resume-viewer.css';
@@ -206,12 +206,17 @@ export function OriginalResumeViewer({resume,onClose}:{
    const output=await createOriginalPdfSearchableCopy({
     document:pdfDocument.current,layout,changes
    });
+   const {getDocument}=await import('pdfjs-dist');
+   await verifyOriginalPdfSearchableCopy({
+    bytes:output,expectedPages:pdfDocument.current.numPages,changes,getDocument
+   });
    downloadOriginalPdfSearchableCopy(output,resume.name);
   }catch(error){
    const code=error instanceof Error?error.message:'';
    const notice=code==='REVIEW_PAGE_LIMIT'?'页数较多，暂时不能生成完整修改稿。':
     code==='REVIEW_TOO_LARGE'?'文件较大，请缩减内容后重试。':
     code==='REVIEW_EDITS_UNSAFE'?'有些修改暂时不能安全放进原来的位置，请先缩短或调整文字。':
+    code==='SEARCHABLE_VERIFY_FAILED'?'下载文件检查未通过，请重试或重新修改。':
     '这份简历暂时无法生成修改稿，请保留原件并稍后再试。';
    setMessage(notice);
   }finally{setExporting(false);}
