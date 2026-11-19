@@ -126,6 +126,49 @@ export function OriginalResumeViewer({resume,onClose}:{
   const observer=typeof ResizeObserver==='function'?new ResizeObserver(update):null;
   observer?.observe(element);return()=>observer?.disconnect();
  },[isPdf,status]);
+ async function startEditing(){
+  if(visionBusy||!visionConsent||!canStartEdit||!isPdf)return;
+  setVisionBusy(true);setMessage('');setSelectedId(null);setConfirmed(false);
+  try{
+   const data=await analyzeVisualResume(resume.id);
+   if(data.layout.source_sha256.length!==64)throw Error('暂时无法检查这份简历。');
+   const saved=await listPageResumeEdits(resume.id);
+   setLayout(data.layout);setChanges(saved.changes||[]);
+   setMessage('已打开修改功能。选择简历中有标记的文字即可修改。');
+  }catch(error){
+   setMessage(error instanceof Error?error.message:'暂时无法修改，请稍后再试。');
+  }finally{setVisionBusy(false);}
+ }
+ function selectAnchor(anchor:VerifiedResumeAnchor){
+  setSelectedId(current=>current===anchor.id?null:anchor.id);
+  const previous=changes.find(c=>c.id===anchor.id);
+  setDraft(previous?.text??anchor.text);
+  setConfirmed(false);setMessage('');
+ }
+ async function saveChange(anchor:VerifiedResumeAnchor){
+  if(saving||!confirmed||!draft.trim()||draft.length>1600)return;
+  setSaving(true);setMessage('');
+  const updated:PageResumeEdit[]=[
+   ...changes.filter(item=>item.id!==anchor.id),
+   {id:anchor.id,original:anchor.text,text:draft.trim(),confirmed:true}
+  ];
+  try{
+   const response=await savePageResumeEdits(resume.id,updated);
+   setChanges(response.changes);setSelectedId(null);setConfirmed(false);
+   setMessage('修改已保存到你的简历副本。原始文件没有改变。');
+  }catch(error){setMessage(error instanceof Error?error.message:'保存失败，请重试。');}
+  finally{setSaving(false);}
+ }
+ async function undoChange(anchor:VerifiedResumeAnchor){
+  if(saving||!changes.some(item=>item.id===anchor.id))return;
+  setSaving(true);setMessage('');
+  try{
+   const response=await savePageResumeEdits(resume.id,changes.filter(item=>item.id!==anchor.id));
+   setChanges(response.changes);setDraft(anchor.text);setSelectedId(null);
+   setMessage('已撤销这段修改。');
+  }catch(error){setMessage(error instanceof Error?error.message:'撤销失败，请重试。');}
+  finally{setSaving(false);}
+ }
  async function download(){
   try{await downloadPrivateResume(resume);}
   catch(e){setError(e instanceof Error?e.message:'下载原件失败');}
