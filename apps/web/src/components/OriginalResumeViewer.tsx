@@ -1,9 +1,10 @@
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,X} from 'lucide-react';
 import type {PrivateResume} from '../services/privateResumes';
 import {fetchPrivateResumeForLocalReview,downloadPrivateResume} from '../services/privateResumes';
 import {extractDocxText} from '../services/docxProfile.mjs';
 import {matchVisualRegionsToPdfPage,type VerifiedResumeAnchor} from '../services/resumeVisualAnchors.mjs';
+import {planInlinePdfPreview,whitePdfPatchBackground} from '../services/resumeInlinePdfPreview.mjs';
 import {visualEditingReady,analyzeVisualResume,listPageResumeEdits,savePageResumeEdits,
  type VisualResumeLayout,type PageResumeEdit} from '../services/resumeVisualEditingApi';
 import '../styles/original-resume-viewer.css';
@@ -35,6 +36,32 @@ export function OriginalResumeViewer({resume,onClose}:{
  const [changes,setChanges]=useState<PageResumeEdit[]>([]);
  const [message,setMessage]=useState('');
  const isPdf=resume.type==='application/pdf';
+ // A confirmed edit becomes visible on the actual PDF only when conservative
+ // single-line geometry and a white underlying background both permit it.
+ // This is a live editing preview, never a rewrite of original PDF bytes.
+ const previewPlans=useMemo(()=>{
+  const result=new Map<string,ReturnType<typeof planInlinePdfPreview>>();
+  const source=canvas.current;
+  const measureCanvas=document.createElement('canvas');
+  const measureContext=measureCanvas.getContext('2d');
+  if(!source||!measureContext)return result;
+  for(const anchor of anchors){
+   const change=changes.find(item=>item.id===anchor.id);
+   if(!change||change.original!==anchor.text)continue;
+   const plan=planInlinePdfPreview({
+    anchor,replacement:change.text,
+    pageWidth:pageSize.width,pageHeight:pageSize.height,
+    onWhite:whitePdfPatchBackground(source,anchor.bbox),
+    measure:(text:string,fontPx:number)=>{
+     measureContext.font=fontPx+'px Arial, "Noto Sans CJK SC", sans-serif';
+     return measureContext.measureText(text).width;
+    }
+   });
+   result.set(anchor.id,plan);
+  }
+  return result;
+ },[anchors,changes,pageSize]);
+ const visibleEditCount=[...previewPlans.values()].filter(plan=>plan.safe).length;
  useEffect(()=>{
   let active=true;
   let pdfTask:any=null;
@@ -156,7 +183,7 @@ export function OriginalResumeViewer({resume,onClose}:{
   try{
    const response=await savePageResumeEdits(resume.id,updated);
    setChanges(response.changes);setSelectedId(null);setConfirmed(false);
-   setMessage('修改已保存到你的简历副本。原始文件没有改变。');
+   setMessage('已保存修改。能安全放进原位置的文字会立即显示，原文件保持不变。');
   }catch(error){setMessage(error instanceof Error?error.message:'保存失败，请重试。');}
   finally{setSaving(false);}
  }
@@ -200,6 +227,20 @@ export function OriginalResumeViewer({resume,onClose}:{
      width:pageSize.width||undefined,height:pageSize.height||undefined}}>
      <canvas ref={canvas} role="img" aria-label={'原始 PDF 第 '+page+' 页'}
       className="hhba-original-resume-canvas"/>
+     {layout&&anchors.map(anchor=>{
+      const plan=previewPlans.get(anchor.id);
+      if(!plan?.safe)return null;
+      const [x,y,w,h]=anchor.bbox;
+      return <div className="hhba-original-resume-edit-patch" key={'patch-'+anchor.id}
+       role="note" aria-label="已修改内容预览"
+       style={{
+        left:'calc('+x/10+'% - 2px)',top:'calc('+y/10+'% - 2px)',
+        width:'calc('+w/10+'% + 4px)',height:'calc('+h/10+'% + 4px)',
+        fontSize:plan.fontPx+'px'
+       }}>
+       {plan.text}
+      </div>;
+     })}
      {layout&&anchors.map(anchor=>{
       const changed=changes.some(c=>c.id===anchor.id);
       const [x,y,w,h]=anchor.bbox;
@@ -245,8 +286,10 @@ export function OriginalResumeViewer({resume,onClose}:{
    </div>
    {layout&&anchors.length===0&&<p className="hhba-original-resume-note">
     这页暂时没有找到可以准确修改的位置。你仍然可以查看和下载原件。</p>}
-   {changes.length>0&&<p className="hhba-original-resume-note">
-    已保存 {changes.length} 处修改，原始文件没有改变。当前还不能按原样式导出修改后的副本。</p>}
+   {changes.length>0&&<p className="hhba-original-resume-note" role="status">
+    已保存 {changes.length} 处修改，{visibleEditCount} 处可在原位置预览。
+    {changes.length>visibleEditCount?' 其余内容较长或版式复杂，暂不覆盖原文，以免出现遮挡。':''}
+    原文件未改动，目前尚不能按原样式导出修改后的副本。</p>}
    {message&&<p className="hhba-original-resume-note" role="status">{message}</p>}
    <nav className="hhba-original-resume-pages" aria-label="原始简历翻页">
     <button type="button" disabled={page<=1}
