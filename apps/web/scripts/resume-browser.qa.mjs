@@ -234,16 +234,39 @@ try{
  assert.ok(popupPlacement.top<popupPlacement.markerBottom+120,
   'popup must appear near the clicked text: '+JSON.stringify(popupPlacement));
  const field=source.getByRole('textbox',{name:'修改这段内容'});
- await field.fill('This is an edited, fully fictional experience description.');
+ await field.fill('EDITED RESUME VIEW');
  assert.equal(await source.getByRole('button',{name:'保存',exact:true}).isDisabled(),true);
  await source.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
  await source.screenshot({path:output+'/original-pdf-inline-editor.png',fullPage:true});
  await source.getByRole('button',{name:'保存',exact:true}).click();
+ const livePatch=source.locator('.hhba-original-resume-edit-patch');
+ await livePatch.waitFor({timeout:10000});
+ assert.match(await livePatch.textContent(),/EDITED RESUME VIEW/,
+  'saved short text must be visible directly in the ORIGINAL PDF page');
+ const verifiedPatch=await livePatch.evaluate(el=>{
+  const bounds=el.getBoundingClientRect();
+  const canvas=el.parentElement?.querySelector('canvas')?.getBoundingClientRect();
+  const overflow=getComputedStyle(el).overflow;
+  return {top:bounds.top,left:bounds.left,bottom:bounds.bottom,right:bounds.right,
+   pageTop:canvas?.top,pageBottom:canvas?.bottom,overflow};
+ });
+ assert.ok(verifiedPatch.top>=verifiedPatch.pageTop&&
+  verifiedPatch.bottom<=verifiedPatch.pageBottom,
+  'safe replacement must be inside original source page: '+JSON.stringify(verifiedPatch));
+ await source.screenshot({path:output+'/original-pdf-edited-preview.png',fullPage:true});
  const edited=source.getByRole('button',{name:'继续修改这一段'});
  await edited.waitFor({timeout:10000});
  await edited.click();
+ const tooLong='This longer fictional paragraph is intentionally much too long to fit on the original line.';
+ await source.getByRole('textbox',{name:'修改这段内容'}).fill(tooLong);
+ await source.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
+ await source.getByRole('button',{name:'保存',exact:true}).click();
+ await livePatch.waitFor({state:'detached',timeout:10000});
+ await source.getByText('其余内容较长或版式复杂',{exact:false}).waitFor({timeout:10000});
+ await source.getByRole('button',{name:'继续修改这一段'}).click();
  await source.getByRole('button',{name:'撤销',exact:true}).click();
  await source.getByRole('button',{name:'修改这段简历'}).waitFor({timeout:10000});
+ assert.equal(await livePatch.count(),0,'undo must restore underlying original PDF text');
  assert.ok((await source.locator('.hhba-original-resume-anchor').count())>=1,
   'verified editable hotspot remains after undo');
  assert.deepEqual(sourceErrors,[],'original PDF must not cause JS runtime exceptions');
@@ -275,6 +298,16 @@ try{
  assert.equal(mobileStill,'none','mobile reduced-motion users must get static rainbow edges');
  await smallSource.emulateMedia({reducedMotion:'no-preference'});
  await smallSource.getByRole('textbox',{name:'修改这段内容'}).waitFor();
+ await smallSource.getByRole('textbox',{name:'修改这段内容'}).fill('EDITED RESUME VIEW');
+ await smallSource.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
+ await smallSource.getByRole('button',{name:'保存',exact:true}).click();
+ await smallSource.locator('.hhba-original-resume-edit-patch').waitFor({timeout:10000});
+ const mobilePatchBounds=await smallSource.locator('.hhba-original-resume-edit-patch').evaluate(el=>{
+  const a=el.getBoundingClientRect();return {left:a.left,right:a.right,viewport:document.documentElement.clientWidth};
+ });
+ assert.ok(mobilePatchBounds.left>=0&&mobilePatchBounds.right<=mobilePatchBounds.viewport+2,
+  'saved text must remain visible on mobile original PDF: '+JSON.stringify(mobilePatchBounds));
+ await smallSource.screenshot({path:output+'/original-pdf-mobile-edited-preview.png',fullPage:true});
  const sourceMobileWidths=await smallSource.evaluate(()=>({
   client:document.documentElement.clientWidth,
   scroll:document.documentElement.scrollWidth,
