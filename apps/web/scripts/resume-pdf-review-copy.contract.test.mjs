@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
- buildRasterReviewPdf,createOriginalPdfReviewCopy
+ buildRasterReviewPdf,createOriginalPdfReviewCopy,verifyOriginalPdfSearchableCopy
 } from '../src/services/resumePdfReviewCopy.mjs';
 const jpeg=Uint8Array.from(Buffer.from(
  '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAACAAIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6pooooA//2Q==',
@@ -68,4 +68,31 @@ test('searchable export refuses oversized and invalid text to protect memory and
   {searchable:true}),/SEARCHABLE_TEXT_INVALID/);
  assert.throws(()=>buildRasterReviewPdf([{...row,textRuns:Array(3001).fill(row.textRuns[0])}],
   {searchable:true}),/SEARCHABLE_TEXT_LIMIT/);
+});
+
+test('actual downloadable PDF must contain reviewed Unicode edits, reject stale old searchable text',async()=>{
+ const bytes=buildRasterReviewPdf([{...page(),textRuns:[
+  {text:'修改后的简历',x:65,y:720,fontSize:12}
+ ]}],{searchable:true});
+ const change=[{id:'p1-r1',page:1,original:'ORIGINAL RESUME VIEW',
+  text:'修改后的简历',confirmed:true}];
+ function parser(text,pageCount=1){
+  return ()=>({promise:Promise.resolve({
+   numPages:pageCount,
+   getPage:async()=>({getTextContent:async()=>({items:[{str:text}]})}),
+   destroy:async()=>{}
+  }),destroy:async()=>{}});
+ }
+ const args={bytes,expectedPages:1,changes:change};
+ assert.equal(await verifyOriginalPdfSearchableCopy({
+  ...args,getDocument:parser('修改后的简历')}),true);
+ await assert.rejects(()=>verifyOriginalPdfSearchableCopy({
+  ...args,getDocument:parser('ORIGINAL RESUME VIEW')
+ }),/SEARCHABLE_VERIFY_FAILED/);
+ await assert.rejects(()=>verifyOriginalPdfSearchableCopy({
+  ...args,getDocument:parser('修改后的简历 ORIGINAL RESUME VIEW')
+ }),/SEARCHABLE_VERIFY_FAILED/);
+ await assert.rejects(()=>verifyOriginalPdfSearchableCopy({
+  ...args,getDocument:parser('修改后的简历',2)
+ }),/SEARCHABLE_VERIFY_FAILED/);
 });
