@@ -48,6 +48,11 @@ for(const item of [
  assert.equal(x.r.status,401,'unauthenticated POST cannot access '+path);
  assert.equal(x.data?.error,'SESSION_INVALID',path+' must reject anonymous users');
 }
-const old=await call('/api/preview-deepseek-diagnostic',{method:'GET'});
-assert.equal(old.r.status,404,'retired diagnostic route must be absent from Preview');
+const retired=await call('/api/preview-deepseek-diagnostic',{method:'GET'});
+// SPA fallbacks return HTML/200 for unknown routes; neither this nor 404 means
+// the removed API handler exists. An active probe would return structured JSON.
+assert.ok(retired.r.status===404||(retired.r.status===200&&
+ (retired.r.headers.get('content-type')||'').includes('text/html')),
+ 'retired diagnostic API must be absent, not an active JSON endpoint');
+assert.notEqual(retired.data?.kind,'HHBA_PREVIEW_DEEPSEEK_DIAGNOSTIC_V1');
 console.log(JSON.stringify({result:'PASS',preview:origin,checks}));
