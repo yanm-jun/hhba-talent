@@ -1,7 +1,7 @@
 // Account-owned job-targeted resume snapshots. Explicit save only; no raw PDF/DOCX storage.
 import {sessionOfBearer,getUserByPhone} from '../_lib/real-auth.js';
 const KIND='HHBA_TARGETED_RESUME_VERSIONS_V1';
-const MAX_BYTES=24000;
+const MAX_BYTES=30000;
 const respond=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store',
  'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'
@@ -89,7 +89,7 @@ export async function onRequest({request,env}){
   if(!validDraft(payload))return error('INVALID_VERSION',400);
   const version={blocks:payload.blocks,acceptedSuggestionIds:payload.accepted_ids,...(payload.details?{details:payload.details}:{})};
   const serialized=JSON.stringify(version);
-  if(serialized.length>18000)return error('VERSION_TOO_LARGE',400);
+  if(serialized.length>24000)return error('VERSION_TOO_LARGE',400);
   const id=crypto.randomUUID(),created=new Date().toISOString();
   const result=await db.prepare(
    'INSERT INTO hhba_targeted_resume_versions(id,phone,job_id,job_title,company,content_json,created_at) '+
