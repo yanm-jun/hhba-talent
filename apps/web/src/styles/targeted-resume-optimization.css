@@ -1,4 +1,51 @@
-.targeted-resume{margin:18px 0 24px;border:1px solid #e5e7eb;border-radius:18px;padding:20px;background:#f8f9fb;color:#1d2530}.targeted-resume-heading{display:flex;justify-content:space-between;gap:12px;align-items:start}.targeted-resume-heading h3{margin:6px 0}.targeted-resume-heading p,.targeted-resume-footer p{font-size:12px;color:#64748b}.targeted-resume-heading>span{font-size:11px;color:#6b7280;white-space:nowrap}.targeted-resume-paper{max-width:760px;margin:18px auto;background:white;box-shadow:0 8px 32px #1118270d;padding:clamp(18px,4vw,46px);border:1px solid #edf0f3}.targeted-resume-paper header{border-bottom:1px solid #e5e7eb;margin-bottom:20px}.targeted-resume-paper header h4{font-size:22px;margin:0 0 8px}.targeted-resume-paper header p{color:#64748b;font-size:12px}.targeted-resume-block{margin:18px 0 26px}.targeted-resume-block>small{color:#64748b}.targeted-resume-block>p{line-height:1.85;white-space:pre-wrap}.targeted-resume-suggestion{border-radius:12px;background:#faf9ff;border:1px solid #eee9fb;padding:14px;margin-top:12px}.targeted-resume-ai-label{font-size:11px;color:#7465b6}.targeted-resume-gradient{font-weight:550;line-height:1.8;white-space:pre-wrap;background:linear-gradient(100deg,#168ee6,#785de5,#d450ae,#e78c6a);background-clip:text;-webkit-background-clip:text;color:transparent}.targeted-resume-actions{display:flex;gap:8px;flex-wrap:wrap}.targeted-resume button{border:1px solid #d7dbe3;background:white;color:#293448;border-radius:8px;padding:8px 12px;cursor:pointer}.targeted-resume-actions button:first-child{background:#24344c;color:white;border-color:#24344c}.targeted-resume button:focus-visible{outline:3px solid #7b75e7;outline-offset:2px}.targeted-resume-applied{font-size:12px;color:#297d60}.targeted-resume-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.targeted-resume-notice{font-size:12px;color:#325d73}@media(max-width:600px){.targeted-resume{padding:12px}.targeted-resume-heading{flex-direction:column}.targeted-resume-paper{padding:18px}}
+.targeted-resume{margin:18px 0 24px;border:1px solid #e5e7eb;border-radius:18px;padding:20px;background:#f8f9fb;color:#1d2530}.targeted-resume-heading{display:flex;justify-content:space-between;gap:12px;align-items:start}.targeted-resume-heading h3{margin:6px 0}.targeted-resume-heading p,.targeted-resume-footer p{font-size:12px;color:#64748b}.targeted-resume-heading>span{font-size:11px;color:#6b7280;white-space:nowrap}.targeted-resume-paper{max-width:760px;margin:18px auto;background:white;box-shadow:0 8px 32px #1118270d;padding:clamp(18px,4vw,46px);border:1px solid #edf0f3}.targeted-resume-paper header{border-bottom:1px solid #e5e7eb;margin-bottom:20px}.targeted-resume-paper header h4{font-size:22px;margin:0 0 8px}.targeted-resume-paper header p{color:#64748b;font-size:12px}.targeted-resume-block{margin:18px 0 26px}.targeted-resume-block>small{color:#64748b}.targeted-resume-block>p{line-height:1.85;white-space:pre-wrap}/* Siri-inspired typography: color is used only for unconfirmed AI suggestions,
+   never for the user's source text or the exported resume. */
+.targeted-resume-suggestion{
+ position:relative;isolation:isolate;overflow:hidden;
+ margin-top:12px;padding:16px 17px 16px 19px;
+ border:1px solid #e8e8f1;border-radius:14px;
+ background:linear-gradient(130deg,#ffffff 0%,#fcfbff 64%,#fffafc 100%);
+ box-shadow:0 5px 20px rgba(51,46,91,.045);
+}
+.targeted-resume-suggestion::before{
+ content:"";position:absolute;left:0;top:12px;bottom:12px;width:3px;
+ border-radius:0 3px 3px 0;pointer-events:none;
+ background:linear-gradient(180deg,#258bd1,#7662dc 40%,#c8559c 73%,#d78172);
+ opacity:.84;
+}
+.targeted-resume-ai-label{font-size:11px;color:#6559a1;font-weight:650;letter-spacing:.015em}
+.targeted-resume-gradient{
+ color:#5e4dac;font:inherit;font-size:clamp(14px,1.04rem,16px);
+ font-weight:580;letter-spacing:.012em;line-height:1.88;
+ white-space:pre-wrap;overflow-wrap:anywhere;
+ text-wrap:pretty;
+}
+/* The fallback above remains readable when gradient text is unsupported. */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+ .targeted-resume-gradient{
+  background-image:linear-gradient(105deg,
+   #1678c1 0%,#5c64d1 19%,#8352c0 36%,#c04c95 52%,
+   #ba527d 67%,#d27a60 82%,#1678c1 100%);
+  background-size:215% 100%;background-position:0% 50%;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:hhba-siri-text-flow 11s ease-in-out infinite alternate;
+ }
+}
+@keyframes hhba-siri-text-flow{
+ from{background-position:0% 50%}
+ to{background-position:100% 50%}
+}
+/* Respect device power and accessibility preferences. No flashing/glare. */
+@media(prefers-reduced-motion:reduce){
+ .targeted-resume-gradient{animation:none!important;background-position:35% 50%}
+}
+@media print{
+ .targeted-resume-gradient{
+  animation:none!important;background:none!important;
+  color:#1d2530!important;-webkit-text-fill-color:#1d2530!important
+ }
+}.targeted-resume-actions{display:flex;gap:8px;flex-wrap:wrap}.targeted-resume button{border:1px solid #d7dbe3;background:white;color:#293448;border-radius:8px;padding:8px 12px;cursor:pointer}.targeted-resume-actions button:first-child{background:#24344c;color:white;border-color:#24344c}.targeted-resume button:focus-visible{outline:3px solid #7b75e7;outline-offset:2px}.targeted-resume-applied{font-size:12px;color:#297d60}.targeted-resume-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.targeted-resume-notice{font-size:12px;color:#325d73}@media(max-width:600px){.targeted-resume{padding:12px}.targeted-resume-heading{flex-direction:column}.targeted-resume-paper{padding:18px}}
 .targeted-resume-heading>span{display:inline-flex;gap:5px;align-items:center}
 .targeted-resume-toolbar{margin-top:18px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:20px;background:#fff;border:1px solid #e8ebf0;border-radius:12px}
 .targeted-resume-toolbar strong{font-size:14px}
