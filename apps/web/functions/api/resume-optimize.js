@@ -98,9 +98,14 @@ export async function onRequestPost({request,env}){
   return send({ok:true,kind:'HHBA_RESUME_OPTIMIZATION_V1',provider:result.provider,suggestions,
    disclaimer:'建议仅用于优化表达，用户须逐条核实；不会修改原始简历或自动提高岗位匹配分。'});
  }catch(error){
-  const code=['AI_PROVIDER_NOT_CONFIGURED','AI_PROVIDER_UNSUPPORTED'].includes(error?.message)?
-   'AI_PROVIDER_NOT_CONFIGURED':'AI_OPTIMIZATION_UNAVAILABLE';
+  const allowed=new Set(['AI_PROVIDER_NOT_CONFIGURED','AI_PROVIDER_UNSUPPORTED',
+   'AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+   'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED',
+   'AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR',
+   'AI_PROVIDER_TIMEOUT','AI_PROVIDER_RESPONSE_INVALID']);
+  const code=allowed.has(error?.message)?error.message:'AI_OPTIMIZATION_UNAVAILABLE';
   console.warn('HHBA_RESUME_OPTIMIZATION_FAILED',code);
-  return fail(code,502);
+  return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:
+   code==='AI_PROVIDER_NOT_CONFIGURED'?503:502);
  }
 }
