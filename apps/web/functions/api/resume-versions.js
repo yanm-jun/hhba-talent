@@ -28,11 +28,11 @@ async function jsonBody(request){
  catch{throw Error('BAD_BODY');}
 }
 function validDraft(payload){
- if(!payload||Array.isArray(payload)||typeof payload!=='object'||
+ if(!payload||Array.isArray(payload)||typeof payload!=='object'||payload.confirmed_real!==true||
   !allowedText(payload.job_id,1,160)||!allowedText(payload.job_title,2,150)||
   !allowedText(payload.company,1,150)||!Array.isArray(payload.blocks)||
   payload.blocks.length===0||payload.blocks.length>12||!Array.isArray(payload.accepted_ids)||
-  payload.accepted_ids.length===0||payload.accepted_ids.length>12)return false;
+  payload.accepted_ids.length>12)return false;
  const ids=new Set();
  if(!payload.blocks.every(b=>{
   if(!b||!allowedText(b.id,1,64)||!/^[A-Za-z0-9_-]+$/.test(b.id)||
