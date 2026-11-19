@@ -99,3 +99,19 @@ test('unverified job hash returns unsupported rather than made-up scores',async(
  assert.equal(data.error,'AUDITED_JOB_NOT_AVAILABLE');
  assert.equal('updated_score' in data,false);
 });
+
+
+test('large but bounded UTF-8 Chinese evidence can be scored using current V2 engine',async()=>{
+ const h=setup();
+ const before=Array.from({length:12},(_,i)=>({
+  id:'section-'+i,section:'summary',text:'真实参与企业日常经营与运营分析'.repeat(75)
+ }));
+ const after=before.map((x,i)=>({...x,text:i===0?x.text+'，曾经真实使用 Python':x.text}));
+ const data={...h.body,before_blocks:before,after_blocks:after};
+ assert.ok(new TextEncoder().encode(JSON.stringify(data)).byteLength>44000);
+ const r=await onRequestPost({env:h.env,request:h.request(data)});
+ assert.equal(r.status,200);
+ const payload=await r.json();
+ assert.equal(payload.supported,true);
+ assert.equal(payload.ranking_version,'HHBA_MATCH_RANKING_V2');
+});
