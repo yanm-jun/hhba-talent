@@ -40,6 +40,13 @@ function validDraft(payload){
    !allowedText(b.text,1,1600)||ids.has(b.id))return false;
   ids.add(b.id);return true;
  }))return false;
+ const details=payload.details;
+ if(details!==undefined){
+  if(!details||Array.isArray(details)||typeof details!=='object')return false;
+  const limits={fullName:80,headline:120,email:120,phone:60,location:120,summary:800,educationDetails:600};
+  if(Object.keys(details).some(k=>!(k in limits)))return false;
+  if(Object.entries(limits).some(([name,max])=>!allowedText(details[name],0,max)))return false;
+ }
  return new Set(payload.accepted_ids).size===payload.accepted_ids.length&&
   payload.accepted_ids.every(x=>allowedText(x,1,100));
 }
@@ -80,7 +87,7 @@ export async function onRequest({request,env}){
   }
   let payload;try{payload=await jsonBody(request);}catch{return error('INVALID_VERSION',400);}
   if(!validDraft(payload))return error('INVALID_VERSION',400);
-  const version={blocks:payload.blocks,acceptedSuggestionIds:payload.accepted_ids};
+  const version={blocks:payload.blocks,acceptedSuggestionIds:payload.accepted_ids,...(payload.details?{details:payload.details}:{})};
   const serialized=JSON.stringify(version);
   if(serialized.length>18000)return error('VERSION_TOO_LARGE',400);
   const id=crypto.randomUUID(),created=new Date().toISOString();
