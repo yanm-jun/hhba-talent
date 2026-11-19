@@ -21,6 +21,7 @@ const OPTIMIZATION_ERRORS:Record<string,string>={
   AI_PROVIDER_RATE_LIMITED:'AI 服务当前触发限速，请稍后再试。',
   AI_PROVIDER_REQUEST_REJECTED:'AI 模型拒绝了请求格式，请管理员检查接口兼容性。',
   AI_PROVIDER_UPSTREAM_ERROR:'AI 模型服务器暂时异常，未修改简历。',
+  AI_PROVIDER_UNEXPECTED_REDIRECT:'AI 模型返回了不安全的跳转地址，已阻止请求。',
   AI_PROVIDER_NETWORK_ERROR:'服务器暂时无法连接 AI 模型，未修改简历。',
   AI_PROVIDER_TIMEOUT:'AI 润色等待超时，未修改简历。',
   AI_PROVIDER_RESPONSE_INVALID:'AI 返回内容格式不符合要求，未修改简历。'
