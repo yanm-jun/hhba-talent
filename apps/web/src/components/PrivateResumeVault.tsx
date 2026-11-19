@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState,type ChangeEvent,type DragEvent} from 'react';
-import {CloudUpload,Download,FileCheck2,FileText,ShieldCheck,Trash2,X} from 'lucide-react';
+import {CloudUpload,Download,Eye,FileCheck2,FileText,ShieldCheck,Trash2,X} from 'lucide-react';
 import {
  privateResumeAvailable,listPrivateResumes,uploadPrivateResume,
  deletePrivateResume,downloadPrivateResume,PRIVATE_RESUME_LIMIT,
@@ -7,9 +7,11 @@ import {
 } from '../services/privateResumes';
 import {Link} from '../router';
 import '../styles/private-resumes.css';
+import {OriginalResumeViewer} from './OriginalResumeViewer';
 
 export function PrivateResumeVault({active=true}:{active?:boolean}){
  const [items,setItems]=useState<PrivateResume[]>([]);
+ const [previewItem,setPreviewItem]=useState<PrivateResume|null>(null);
  const [ready,setReady]=useState(false),[loading,setLoading]=useState(true);
  const [busy,setBusy]=useState(false),[operation,setOperation]=useState('');
  const [file,setFile]=useState<File|null>(null),[consent,setConsent]=useState(false);
@@ -60,7 +62,8 @@ export function PrivateResumeVault({active=true}:{active?:boolean}){
   if(!file||!ready||!consent||busy)return;
   setBusy(true);setOperation('upload');setError('');setNotice('');
   try{
-   await uploadPrivateResume(file,consent);
+   const saved=await uploadPrivateResume(file,consent);
+   setPreviewItem(saved);
    setFile(null);setConsent(false);if(input.current)input.current.value='';
    setNotice('简历已保存，不会自动向企业投递。');
    await load();
@@ -74,6 +77,7 @@ export function PrivateResumeVault({active=true}:{active?:boolean}){
   try{
    await deletePrivateResume(item.id);
    setItems(all=>all.filter(x=>x.id!==item.id));
+   setPreviewItem(current=>current?.id===item.id?null:current);
    setNotice('已从私有存储删除这份简历及其当前账户记录。');
    window.dispatchEvent(new Event('hhba:private-resumes-changed'));
   }catch(e){setError(e instanceof Error?e.message:'删除失败，请重试。');}
@@ -110,6 +114,8 @@ export function PrivateResumeVault({active=true}:{active?:boolean}){
       <div className="hhba-private-resume-actions">
        <Link to={'/candidate/match?resume='+encodeURIComponent(item.id)}
         className="hhba-private-resume-match" aria-label={'使用 '+item.name+' 进行 AI 智能匹配'}>AI 智能匹配</Link>
+       <button type="button" disabled={busy} onClick={()=>setPreviewItem(current=>current?.id===item.id?null:item)} aria-label={'查看 '+item.name}>
+        <Eye size={15}/>{previewItem?.id===item.id?'收起':'查看'}</button>
        <button type="button" disabled={busy} onClick={()=>void download(item)} aria-label={'下载 '+item.name}>
         <Download size={15}/>{operation===item.id&&busy?'处理中':'下载'}
        </button>
@@ -118,6 +124,8 @@ export function PrivateResumeVault({active=true}:{active?:boolean}){
        </button>
       </div>
      </article>)}</div>}
+    {previewItem&&items.some(x=>x.id===previewItem.id)&&
+     <OriginalResumeViewer key={previewItem.id} resume={previewItem} onClose={()=>setPreviewItem(null)}/>}
     {items.length<3&&<div className="hhba-private-resume-upload">
      <div className="hhba-private-resume-upload-heading">
       <div><h3>添加简历</h3><p>上传后可随时下载或删除</p></div>
