@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {buildResumeDocument,normalizeResumeDocumentDetails,readableResumeDocument} from '../src/services/resumeDocument.ts';
+import {buildResumeDocument,normalizeResumeDocumentDetails,readableResumeDocument,sourceResumeBlocks} from '../src/services/resumeDocument.ts';
 
 const profile={
  education:'BACHELOR',education_evidence:'临沂大学 本科',
@@ -43,4 +43,22 @@ test('partial profile never crashes the printable document view',()=>{
  assert.equal(doc.experiences.length,0);
  assert.equal(doc.skills.length,0);
  assert.equal(doc.education.length,2);
+});
+
+test('source-only search-first resume stays explicitly unstructured without invented job titles',()=>{
+ const raw='个人简介：有多年的真实经历。\n\n工作内容：做过区域运营与客户联络。';
+ const blocks=sourceResumeBlocks(raw);
+ assert.ok(blocks.length>0);
+ assert.equal(blocks[0].section,'summary');
+ assert.equal(blocks[0].id,'source-0');
+ const doc=buildResumeDocument({...profile,experiences:[],skills:[]},blocks,fields);
+ assert.equal(doc.experiences.length,0);
+ assert.ok(doc.sourceParagraphs.join(' ').includes('区域运营'));
+ assert.equal(readableResumeDocument(doc),true);
+});
+test('local source paragraphs are bounded for browser editing',()=>{
+ const chunks=sourceResumeBlocks('真实的简历经历'.repeat(4000));
+ assert.ok(chunks.length<=12);
+ assert.ok(chunks.every(x=>x.text.length<=1400));
+ assert.deepEqual(sourceResumeBlocks(''),[]);
 });
