@@ -37,7 +37,18 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
  const [query,setQuery]=useState('');
  const knowledgeHref=embedded?'/candidate/account/legal-aid':'/rights/knowledge';
  const matches=useMemo(()=>laborRights.topics.filter(topic=>topicMatches(topic,query)),[query]);
- const guideMatches=useMemo(()=>query.trim()?GUIDE_TIPS.filter(tip=>tipMatches(tip,query)).slice(0,6):[GUIDE_TIPS[0],GUIDE_TIPS[10],GUIDE_TIPS[15],GUIDE_TIPS[35]],[query]);
+ const guideMatches=useMemo(()=>{
+  if(!query.trim())return [GUIDE_TIPS[0],GUIDE_TIPS[10],GUIDE_TIPS[15],GUIDE_TIPS[35]];
+  // Relate colloquial questions (e.g. “公司三个月没发工资”) to the corresponding
+  // evidence-based topic without pretending that this is an AI legal judgment.
+  const q=normal(query);
+  const relatedSlugs=new Set(laborRights.topics.filter(topic=>
+   (topicKeywords[topic.slug]||[]).some(word=>q.includes(word.toLocaleLowerCase()))
+  ).map(topic=>topic.slug));
+  return GUIDE_TIPS.filter(tip=>
+   tipMatches(tip,query)||(tip.topic!==null&&relatedSlugs.has(tip.topic))
+  ).slice(0,6);
+ },[query]);
  return <Shell user={user} embedded={embedded}>
   <main className="hhba-law hhba-rights-knowledge" id="main-content">
    <section className="hhba-law-panel" aria-labelledby="hhba-law-title">
