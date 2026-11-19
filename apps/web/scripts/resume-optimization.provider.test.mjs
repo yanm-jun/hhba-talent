@@ -34,7 +34,7 @@ test('existing HHBA DeepSeek server secret works with current Flash JSON mode',a
   requests++;
   assert.equal(url,'https://api.deepseek.com/chat/completions');
   assert.equal(options.headers.authorization,'Bearer backend-only-test-key');
-  assert.equal(options.redirect,'error');
+  assert.equal(options.redirect,'manual');
   const sent=JSON.parse(options.body);
   assert.equal(sent.model,'deepseek-flash');
   assert.deepEqual(sent.response_format,{type:'json_object'});
@@ -65,6 +65,7 @@ test('DeepSeek HTTP failures are safely classified without exposing upstream bod
   [401,'AI_PROVIDER_KEY_REJECTED'],
   [402,'AI_PROVIDER_BALANCE_INSUFFICIENT'],
   [429,'AI_PROVIDER_RATE_LIMITED'],
+  [302,'AI_PROVIDER_UNEXPECTED_REDIRECT'],
   [503,'AI_PROVIDER_UPSTREAM_ERROR']
  ];
  const prior=globalThis.fetch;
