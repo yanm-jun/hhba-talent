@@ -89,7 +89,7 @@ with sync_playwright() as playwright:
         linked = page.locator(".hhba-knowledge-action").first
         linked.wait_for()
         url = linked.get_attribute("href")
-        assert url and re.search(r"/rights/guide\\?tip=[a-z]+", url), f"broken guide URL {url}"
+        assert url and url.startswith("/rights/guide?tip=") and re.fullmatch(r"[a-z]+", url.split("tip=", 1)[1]), f"broken guide URL {url}"
         linked.click()
         page.locator(".hhba-vguide-card.is-targeted details[open]").wait_for(timeout=20000)
         assert page.get_by_text("已定位到指定建议", exact=False).count() >= 1
