@@ -629,6 +629,386 @@ export const GUIDE_TIPS:GuideTip[]=[
     ]
   },
   {
+    "id": "interviewslots",
+    "stage": "interview",
+    "title": "为面试确认时间与实际地点",
+    "summary": "跨城市面试尤其需要明确形式和地址，避免因临时改动产生不必要的交通损失。",
+    "steps": [
+      "确认线上还是现场面试及实际负责人",
+      "核对办公地点门禁与抵达方式",
+      "在交通出票前保存最终约定信息"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "时间",
+    "topic": null,
+    "keywords": [
+      "面试时间",
+      "现场面试"
+    ]
+  },
+  {
+    "id": "videoprivacy",
+    "stage": "interview",
+    "title": "视频面试前检查录制与隐私告知",
+    "summary": "线上面试可能录制音视频，涉及个人信息时应当关注对方的告知和处理范围。",
+    "steps": [
+      "询问是否会录音录像及保存目的",
+      "关闭不必要的桌面通知和共享窗口",
+      "使用个人可控的账号与设备参加面试"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "安全",
+    "topic": null,
+    "keywords": [
+      "视频面试",
+      "面试录制"
+    ]
+  },
+  {
+    "id": "introresults",
+    "stage": "interview",
+    "title": "把自我介绍改成三项可验证成果",
+    "summary": "漫长地讲经历容易模糊贡献，先准备可说明背景、动作和结果的具体事实。",
+    "steps": [
+      "挑选与岗位要求直接相关的三项任务",
+      "分别写清本人行动与团队合作范围",
+      "预想追问并检查指标与证据是否一致"
+    ],
+    "minutes": "20分钟",
+    "effort": "中",
+    "value": "岗位",
+    "topic": null,
+    "keywords": [
+      "自我介绍",
+      "STAR"
+    ]
+  },
+  {
+    "id": "interviewnotes",
+    "stage": "interview",
+    "title": "面试结束立即记录条件变化",
+    "summary": "多轮沟通中不同面试官可能给出不同说法，及时记录能帮助后续书面核对。",
+    "steps": [
+      "会后写下岗位职责与团队预期",
+      "记下待确认的薪酬条件和汇报对象",
+      "通过正常渠道提出三项关键追问"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "岗位",
+    "topic": null,
+    "keywords": [
+      "面试笔记",
+      "招聘沟通"
+    ]
+  },
+  {
+    "id": "salaryhistory",
+    "stage": "interview",
+    "title": "被问上份薪资时先界定信息边界",
+    "summary": "现薪可能不是新岗位价值的可靠标尺，回答前可先讨论当前岗位的合理待遇。",
+    "steps": [
+      "了解对方核实历史薪酬的实际目的",
+      "尽量把讨论落在本岗位职责与市场范围",
+      "不提供未经授权的他人或单位财务资料"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "钱",
+    "topic": null,
+    "keywords": [
+      "薪资证明",
+      "历史薪资"
+    ]
+  },
+  {
+    "id": "marriagequestions",
+    "stage": "interview",
+    "title": "遇到婚育与私人生活追问时记录事实",
+    "summary": "与岗位无关的个人问题可能涉及就业公平和隐私边界，先把问题及场景记清楚。",
+    "steps": [
+      "区分岗位客观要求和私人生活信息",
+      "保留面试公告或后续文字往来",
+      "必要时查询平等就业相关官方救济渠道"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "权益",
+    "topic": null,
+    "keywords": [
+      "婚育歧视",
+      "就业公平"
+    ]
+  },
+  {
+    "id": "interviewfinance",
+    "stage": "interview",
+    "title": "不要为所谓录用名额先行转账",
+    "summary": "即使对方说费用可退，也应确认真实收费主体与法律依据，防止招聘欺诈。",
+    "steps": [
+      "核对对方提供的收款账户与公司主体",
+      "拒绝通过私人账户支付不明保证金",
+      "保留聊天与收费说明并向官方渠道求证"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "安全",
+    "topic": null,
+    "keywords": [
+      "面试收费",
+      "保证金"
+    ]
+  },
+  {
+    "id": "followupemail",
+    "stage": "interview",
+    "title": "给面试反馈设定一次礼貌跟进",
+    "summary": "面试后没有立刻回复并不必然等于失败，明确跟进节奏有助于减少反复催问。",
+    "steps": [
+      "询问预计反馈日期和下一轮安排",
+      "到约定时间后发送简短的进度询问",
+      "记录回复并同时推进其他真实岗位"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "时间",
+    "topic": null,
+    "keywords": [
+      "面试跟进",
+      "招聘回复"
+    ]
+  },
+  {
+    "id": "skillsdemo",
+    "stage": "interview",
+    "title": "用公开或自有素材展示岗位能力",
+    "summary": "作品集能说明能力，但把旧公司资料直接给新单位可能引发保密和知识产权问题。",
+    "steps": [
+      "选取可以公开展示的个人成果",
+      "对内部客户与商业数据进行合法脱敏",
+      "用过程讲清角色而不泄露源文件"
+    ],
+    "minutes": "20分钟",
+    "effort": "中",
+    "value": "安全",
+    "topic": null,
+    "keywords": [
+      "作品集",
+      "商业秘密"
+    ]
+  },
+  {
+    "id": "screeningmethod",
+    "stage": "interview",
+    "title": "问清测评与面试的评价维度",
+    "summary": "不同面试方式衡量的能力不同，提前理解测评范围可以少花时间准备无关内容。",
+    "steps": [
+      "确认是否有笔试业务题或专业操作",
+      "核对测评时间上限与是否需自备工具",
+      "按岗位实际职责准备有证据的实例"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "岗位",
+    "topic": null,
+    "keywords": [
+      "人才测评",
+      "笔试"
+    ]
+  },
+  {
+    "id": "backgroundconsent",
+    "stage": "interview",
+    "title": "背调前确认授权对象和核验范围",
+    "summary": "背景调查会涉及个人信息，候选人应了解授权范围，避免空白授权带来过度收集。",
+    "steps": [
+      "阅读背调授权书所列项目和接收方",
+      "纠正可能产生误解的工作时间记录",
+      "如有异常主动询问更正与申诉途径"
+    ],
+    "minutes": "15分钟",
+    "effort": "低",
+    "value": "权益",
+    "topic": null,
+    "keywords": [
+      "背调",
+      "个人信息"
+    ]
+  },
+  {
+    "id": "managerexpectations",
+    "stage": "interview",
+    "title": "与直属负责人确认前九十天目标",
+    "summary": "岗位名称往往不能反映上手难度，具体目标更有助于判断是否具备必要资源。",
+    "steps": [
+      "询问试用期主要成果与验收标准",
+      "了解已有团队支持和培训安排",
+      "记录关键目标是否与岗位说明一致"
+    ],
+    "minutes": "15分钟",
+    "effort": "低",
+    "value": "岗位",
+    "topic": null,
+    "keywords": [
+      "直属领导",
+      "试用目标"
+    ]
+  },
+  {
+    "id": "travelexpenses",
+    "stage": "interview",
+    "title": "问清外地面试谁承担交通住宿",
+    "summary": "跨城招聘的差旅成本可能不小，口头说报销时也应先确认标准和实际流程。",
+    "steps": [
+      "核对哪些面试轮次要求线下参加",
+      "要求提供报销标准和票据要求",
+      "自行评估没有补贴时能否承担成本"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "钱",
+    "topic": null,
+    "keywords": [
+      "面试报销",
+      "跨城面试"
+    ]
+  },
+  {
+    "id": "workconditions",
+    "stage": "interview",
+    "title": "询问实际工作时段和休息制度",
+    "summary": "同样的薪水在不同工时安排下差异很大，正式录用前就应了解工作强度。",
+    "steps": [
+      "确认班次日常上下班时间与轮休",
+      "询问出差驻场和节假日安排",
+      "将实际工时与薪酬一起比较岗位"
+    ],
+    "minutes": "15分钟",
+    "effort": "低",
+    "value": "时间",
+    "topic": "overtime-leave",
+    "keywords": [
+      "工作时间",
+      "调休"
+    ]
+  },
+  {
+    "id": "recruiteridentity",
+    "stage": "interview",
+    "title": "将第三方猎头与企业直招区分清楚",
+    "summary": "猎头沟通可以提供机会，但对是否取得授权和信息流向应有基本了解。",
+    "steps": [
+      "确认招聘职位所属的实际用人单位",
+      "了解简历会提交给哪些用人主体",
+      "不为未经核验的面试安排支付费用"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "安全",
+    "topic": null,
+    "keywords": [
+      "猎头",
+      "第三方招聘"
+    ]
+  },
+  {
+    "id": "interviewclaims",
+    "stage": "interview",
+    "title": "避免用自己无法解释的数字讲业绩",
+    "summary": "面试官追问数据来源时，诚实解释指标定义往往比夸大数字更能建立信任。",
+    "steps": [
+      "写明数字对应周期和统计口径",
+      "区分个人成绩团队成绩与估算值",
+      "删除受保密限制或没有依据的表达"
+    ],
+    "minutes": "15分钟",
+    "effort": "低",
+    "value": "岗位",
+    "topic": null,
+    "keywords": [
+      "面试业绩",
+      "数据真实性"
+    ]
+  },
+  {
+    "id": "remoteassessment",
+    "stage": "interview",
+    "title": "线上技能测试前明确成果的使用范围",
+    "summary": "测试与商业生产任务存在边界，尤其是完整设计和策划交付应先确认用途。",
+    "steps": [
+      "询问题目预计投入时长和提交格式",
+      "明确提交成果是否用于真实商业活动",
+      "对异常大工作量的无偿要求保留沟通"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "权益",
+    "topic": null,
+    "keywords": [
+      "无薪试岗",
+      "线上笔试"
+    ]
+  },
+  {
+    "id": "questionsorder",
+    "stage": "interview",
+    "title": "把面试追问按必要性排列",
+    "summary": "一次问太多问题容易错失关键条件，按重要程度排序更利于高效沟通。",
+    "steps": [
+      "优先确认职责主体薪酬和工作地点",
+      "其次询问绩效周期培训与团队协作",
+      "最后核对发展规划和可选福利项目"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "岗位",
+    "topic": null,
+    "keywords": [
+      "面试提问",
+      "沟通技巧"
+    ]
+  },
+  {
+    "id": "offersilence",
+    "stage": "interview",
+    "title": "区分口头意向和正式录用文件",
+    "summary": "有入职意向并不等于全部前置条件完成，重要职业决策最好等到关键内容明确。",
+    "steps": [
+      "确认是否完成用人部门最终审批",
+      "核对是否仍有背调体检或预算条件",
+      "记录预计出具书面录用通知的时间"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "岗位",
+    "topic": null,
+    "keywords": [
+      "录用意向",
+      "offer"
+    ]
+  },
+  {
+    "id": "interviewrights",
+    "stage": "interview",
+    "title": "拒绝非法证件扣留及不明押金要求",
+    "summary": "原件核验与扣押证件是不同事情，求职中不应让身份证件长期留在不明主体手中。",
+    "steps": [
+      "了解现场需要查验哪些身份证明",
+      "对提出留存原件的要求索取依据",
+      "涉及争议时查阅劳动合同法相关规定"
+    ],
+    "minutes": "10分钟",
+    "effort": "低",
+    "value": "权益",
+    "topic": "labor-contracts",
+    "keywords": [
+      "扣押身份证",
+      "劳动法"
+    ]
+  },
+  {
     "id": "party",
     "stage": "offer",
     "title": "核对劳动合同甲方和实际工作主体",
