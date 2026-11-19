@@ -35,17 +35,24 @@ test('HHBA guide V2 has 200 actionable entries evenly distributed across eight s
  }
 });
 
-test('full value-guide page has functional filtering, real details and locally saved checkboxes',()=>{
- for(const x of [
-  'useMemo(()=>GUIDE_TIPS.filter','matchesTip(tip,query)',
-  'maxTime===\'全部\'','onlyPending','onClick={()=>setStage(s.id)}',
-  'tip.steps.map','<details','<summary','<ol>',
-  'readCompleted','localStorage.setItem(STORAGE_KEY','onChange={()=>mark(tip.id)}',
-  'setVisibleCount(24)','visibleTips.map(tip=>','继续查看下一批建议',
-  "to={'/rights/knowledge/'+tip.topic}"
- ])assert(guide.includes(x),'guide lacks '+x);
+test('editorial guide retains full search, advanced filters, deep links and browser-only progress',()=>{
+ for(const marker of [
+  "matchesTip(tip,query)","maxTime==='全部'","onlyPending",
+  "GUIDE_STAGES.map((s,i)=>","tip.steps.map((step,i)=>",
+  "localStorage.setItem(STORAGE_KEY","mark(selectedTip.id)",
+  "setVisibleCount(8)","filtered.slice(0,visibleCount)",
+  "to={'/rights/knowledge/'+selectedTip.topic}",
+  "getTipFromUrl","setSelectedTipId(getTipFromUrl())",
+  "window.addEventListener('popstate',syncTip)",
+  "hhba-edition-cover","hhba-edition-search","hhba-edition-directory",
+  "hhba-edition-practical-steps","hhba-edition-next-reads",
+  "hhba-edition-feature","hhba-edition-result-row",
+  "浏览全部章节","继续查看","上一篇","下一篇",
+  "aria-pressed={isComplete}"
+ ])assert(guide.includes(marker),'edition or reader lacks '+marker);
  assert.match(guide,/return <Shell user=\{user\}>/);
  assert.match(guide,/不上传账户或服务器/);
+ assert.doesNotMatch(guide,/hhba-vguide-grid|hhba-vguide-card-meta|打开具体行动步骤/);
  assert.doesNotMatch(guide,/goodseafly\.github\.io|import\([^\n]*goodseafly|fetch\([^\n]*goodseafly/);
 });
 
@@ -74,7 +81,7 @@ test('two routes and global search are public, while other HHBA product modules 
  assert.match(index,/GUIDE_TIPS/);
  assert.match(index,/guide:'\+tip\.id/);
  assert.match(footer,/\['高性价比职场指南','\/rights\/guide'\]/);
- assert.match(css,/\.hhba-vguide-grid\{display:grid/);
+ assert.match(css,/\.hhba-edition-article-layout\{display:grid/);
  assert.match(css,/@media\(max-width:740px\)/);
  assert.match(css,/\.hhba-rights-knowledge/);
  assert.match(css,/:focus-visible/);
