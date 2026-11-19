@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen,Printer,Eye,PencilLine} from 'lucide-react';
+import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen,Printer,FileDown,PencilLine,X} from 'lucide-react';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 import {getRealAuthToken,realAuthReady} from '../services/realAuth';
 import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimizationStatus} from '../services/resumeOptimizationApi';
@@ -9,6 +9,7 @@ import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResum
 import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,sourceResumeOmittedCharacters,structuredResumeOmittedCharacters,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
 import {createPortal} from 'react-dom';
 import {ResumePrintSheet} from './ResumePrintSheet';
+import {downloadResumeDocx} from '../services/resumeDocx';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
 import {officialJobVerifyStatus,verifyOfficialJob,type OfficialJobVerifyStatus,type OfficialVerifiedJob} from '../services/officialJobVerifyApi';
 import '../styles/targeted-resume-optimization.css';
@@ -54,7 +55,10 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
  const [saving,setSaving]=useState(false);
  const [details,setDetails]=useState<ResumeDocumentDetails>({...EMPTY_RESUME_DOCUMENT_DETAILS});
  const [confirmReal,setConfirmReal]=useState(false);
- const [showPrintPreview,setShowPrintPreview]=useState(false);
+ const [openSuggestionId,setOpenSuggestionId]=useState<string|null>(null);
+ const [editingSuggestionId,setEditingSuggestionId]=useState<string|null>(null);
+ const [suggestionDrafts,setSuggestionDrafts]=useState<Record<string,string>>({});
+ const [undoStack,setUndoStack]=useState<ResumeVersion[]>([]);
  const [editingBlock,setEditingBlock]=useState<string|null>(null);
  const [manualText,setManualText]=useState('');
  const generation=useRef(0);
@@ -80,6 +84,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
  const criteria=useMemo(()=>[...job.matched,...job.not_evidenced], [job]);
  const printDocument=useMemo(()=>buildResumeDocument(profile,version.blocks,details),[profile,version.blocks,details]);
  const canPrint=readableResumeDocument(printDocument)&&omittedSourceCharacters===0;
+ const canExport=canPrint&&!editingBlock;
  function updateDetail(key:keyof ResumeDocumentDetails,value:string){
   setDetails(current=>({...current,[key]:value}));
   setConfirmReal(false);
@@ -134,7 +139,8 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
   invalidateScore();setVersion({id:item.id,targetJobId:job.id,blocks:item.version.blocks,
    acceptedSuggestionIds:item.version.acceptedSuggestionIds});
   setDetails(normalizeResumeDocumentDetails(item.version.details));setConfirmReal(false);
-  setSuggestions([]);setIgnored([]);setConfirmed([]);setNewEvidence({});
+  setSuggestions([]);setIgnored([]);setConfirmed([]);setNewEvidence({});setOpenSuggestionId(null);
+  setEditingSuggestionId(null);setSuggestionDrafts({});setUndoStack([]);setEditingBlock(null);
   setNotice('已载入 '+new Date(item.created_at).toLocaleString()+' 的简历版本；没有修改原始简历。');
  }
  async function remove(item:SavedResumeVersion){
@@ -149,6 +155,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
   if(!consent||!blocks.length||busy||!status?.enabled)return;
   const currentBlocks=version.blocks;
   invalidateScore();setBusy(true);setNotice('');setSuggestions([]);setIgnored([]);setConfirmed([]);setNewEvidence({});
+  setOpenSuggestionId(null);setEditingSuggestionId(null);setSuggestionDrafts({});
   const controller=new AbortController();active.current=controller;
   try{
    const incoming=await requestResumeOptimization(currentBlocks,{
@@ -160,45 +167,136 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
     unique.add(s.id);usedBlocks.add(s.blockId);return true;
    }).map((s,i)=>({...s,id:('generation-'+(++generation.current)+'-'+i+'-'+s.id).slice(0,100)}));
    setSuggestions(accepted);
+   setOpenSuggestionId(accepted[0]?.id||null);
    setNotice(accepted.length?'建议已生成。请逐条核实真实性，再选择填充。':'本次 AI 未发现可以可靠润色的内容。');
   }catch(error){
    if(controller.signal.aborted)return;
    setNotice(error instanceof Error?error.message:'AI 润色暂时不可用。');
   }finally{setBusy(false);if(active.current===controller)active.current=null;}
  }
+ function commitVersion(next:ResumeVersion){
+  setUndoStack(stack=>[...stack.slice(-19),version]);
+  setVersion(next);setConfirmReal(false);invalidateScore();
+ }
+ function undo(){
+  const previous=undoStack.at(-1);
+  if(!previous)return;
+  setUndoStack(stack=>stack.slice(0,-1));setVersion(previous);setConfirmReal(false);
+  setEditingBlock(null);setOpenSuggestionId(null);invalidateScore();
+  setNotice('已撤销上一次简历文字修改，原始上传文件保持不变。');
+ }
  function accept(s:ResumeSuggestion){
-  if(s.evidenceStatus==='needs_user_confirmation'&&!confirmed.includes(s.id)){
+  if(!confirmed.includes(s.id)){
    setNotice('请先确认建议内容符合你的真实经历。');return;
   }
+  const proposed=(suggestionDrafts[s.id]??s.proposed).trim();
+  const original=version.blocks.find(b=>b.id===s.blockId)?.text||'';
+  if(!proposed||proposed.length>1600||
+   (s.action==='append'&&original.length+1+proposed.length>1600)){
+   setNotice('建议文本超出单段 1600 字限制，请精简后再填充。');return;
+  }
   try{
-   setVersion(applySuggestion(version,s,confirmed.includes(s.id)));setConfirmReal(false);invalidateScore();
-   setNotice('已填充到本次预览，原始简历文件没有被修改。');
+   commitVersion(applySuggestion(version,{...s,proposed},true));
+   setOpenSuggestionId(null);setEditingSuggestionId(null);
+   setNotice('已在原来的简历段落直接填充。可以撤销，原始简历文件没有被修改。');
   }catch{setNotice('原文已变化或缺乏真实证据，请重新生成建议。');}
  }
  function addFact(s:ResumeSuggestion){
   const text=(newEvidence[s.id]||'').trim();
   if(text.length<8){setNotice('请具体描述你的真实经历或成果，至少8个字。');return;}
   if(!confirmed.includes(s.id)){setNotice('请确认补充内容真实、准确后再填充。');return;}
+  const original=version.blocks.find(b=>b.id===s.blockId)?.text||'';
+  if(original.length+1+text.length>1600){
+   setNotice('原文加补充内容超过单段 1600 字，请精简后重试。');return;
+  }
   try{
-   setVersion(applySuggestion(version,{...s,action:'append',proposed:text},true));setConfirmReal(false);invalidateScore();
-   setNotice('已将你亲自填写的真实信息添加到当前简历预览。');
+   commitVersion(applySuggestion(version,{...s,action:'append',proposed:text},true));
+   setOpenSuggestionId(null);
+   setNotice('已将你亲自填写的真实信息填充到简历对应位置。');
   }catch{setNotice('原文已经变化，请重新生成补充建议。');}
  }
  function startEdit(block:ResumeBlock){
-  setEditingBlock(block.id);setManualText(block.text);
+  setOpenSuggestionId(null);setEditingBlock(block.id);setManualText(block.text);
  }
  function saveEdit(){
   if(!editingBlock)return;
   try{
-   setVersion(editResumeBlock(version,editingBlock,manualText));invalidateScore();
+   const next=editResumeBlock(version,editingBlock,manualText);
+   if(next.blocks.find(b=>b.id===editingBlock)?.text!==version.blocks.find(b=>b.id===editingBlock)?.text)
+    commitVersion(next);
    setSuggestions(existing=>existing.filter(s=>s.blockId!==editingBlock));
-   setEditingBlock(null);setManualText('');setConfirmReal(false);
-   setNotice('已更新本次简历的文字内容。所有手动修改须以真实经历为准。');
+   setEditingBlock(null);setManualText('');
+   setNotice('简历原位置已更新文字。所有手动修改须以真实经历为准。');
   }catch{setNotice('请输入有效内容，单个段落最多 1600 字。');}
  }
  function reset(){
   active.current?.abort();setBusy(false);setVersion(initial());setSuggestions([]);invalidateScore();
-  setIgnored([]);setConfirmed([]);setNewEvidence({});setConfirmReal(false);setEditingBlock(null);setNotice('已恢复原始预览。');
+  setIgnored([]);setConfirmed([]);setNewEvidence({});setConfirmReal(false);setEditingBlock(null);
+  setOpenSuggestionId(null);setEditingSuggestionId(null);setSuggestionDrafts({});setUndoStack([]);
+  setNotice('已恢复原始预览。');
+ }
+ function renderEditableBlock(id:string,text:string){
+  const block=version.blocks.find(item=>item.id===id);
+  if(!block)return <p className="hhba-print-paragraph">{text}</p>;
+  const s=suggestions.find(item=>item.blockId===id);
+  const applied=Boolean(s&&version.acceptedSuggestionIds.includes(s.id));
+  const dismissed=Boolean(s&&ignored.includes(s.id));
+  const pending=Boolean(s&&!applied&&!dismissed);
+  const draft=s?(suggestionDrafts[s.id]??s.proposed):'';
+  return <div className={'targeted-resume-inline-region'+(pending?' has-ai-suggestion':'')} data-resume-block-id={id}>
+   <div className="targeted-resume-inline-anchor">
+    {editingBlock===id?<div className="targeted-resume-inline-editor">
+     <textarea rows={4} maxLength={1600} value={manualText}
+      onChange={e=>setManualText(e.target.value)}
+      aria-label="编辑当前简历段落"/>
+     <div><button type="button" onClick={saveEdit}>保存本次修改</button>
+      <button type="button" onClick={()=>{setEditingBlock(null);setManualText('')}}>取消</button></div>
+    </div>:<p className="hhba-print-paragraph">{text}</p>}
+    {editingBlock!==id&&<div className="targeted-resume-inline-controls">
+     {pending&&s&&<button type="button" className="targeted-resume-ai-trigger"
+      aria-expanded={openSuggestionId===s.id} aria-label="查看此处 AI 修改建议"
+      onClick={()=>{setOpenSuggestionId(openSuggestionId===s.id?null:s.id);setEditingSuggestionId(null)}}>
+      <Sparkles size={14} aria-hidden="true"/> AI 建议</button>}
+     <button type="button" aria-label="编辑当前简历段落" onClick={()=>startEdit(block)}>
+      <PencilLine size={13} aria-hidden="true"/> 修改</button>
+     {applied&&<span className="targeted-resume-applied"><CheckCircle2 size={12} aria-hidden="true"/> 已填充</span>}
+    </div>}
+   </div>
+   {pending&&s&&openSuggestionId===s.id&&editingBlock!==id&&<div
+    className="targeted-resume-suggestion targeted-resume-popover" role="region"
+    aria-label="当前简历段落的 AI 建议">
+    <div className="targeted-resume-popover-head">
+     <span className="targeted-resume-ai-label"><Sparkles size={13} aria-hidden="true"/> AI 原位建议 · {s.action==='request_evidence'?'请补充真实信息':'待本人核实'}</span>
+     <button type="button" aria-label="关闭 AI 建议" onClick={()=>setOpenSuggestionId(null)}><X size={15}/></button>
+    </div>
+    {editingSuggestionId===s.id?<label className="targeted-resume-fact-entry">
+     <span>直接修改 AI 建议文字（填写后仍须确认真实性）</span>
+     <textarea maxLength={1600} rows={4} aria-label="修改 AI 建议"
+      value={draft} onChange={e=>setSuggestionDrafts(old=>({...old,[s.id]:e.target.value}))}/>
+    </label>:<p className="targeted-resume-gradient">{draft}</p>}
+    <p className="targeted-resume-rationale">对应岗位要求：{s.jobRequirement}</p>
+    <p className="targeted-resume-rationale">{s.rationale}</p>
+    {s.action==='request_evidence'&&<label className="targeted-resume-fact-entry">
+     <span>补充自己的真实经历或成果（AI 不会猜测数据）</span>
+     <textarea maxLength={800} rows={3} value={newEvidence[s.id]||''}
+      onChange={e=>setNewEvidence(prev=>({...prev,[s.id]:e.target.value}))}
+      placeholder="例如：你在这个岗位具体做过哪些工作？"/>
+    </label>}
+    <label className="targeted-resume-confirm">
+     <input type="checkbox" checked={confirmed.includes(s.id)}
+      onChange={e=>setConfirmed(v=>e.target.checked?[...v,s.id]:v.filter(key=>key!==s.id))}/>
+     我确认建议及补充内容所描述的经历、能力和数字均属实
+    </label>
+    <div className="targeted-resume-actions">
+     {s.action==='request_evidence'
+      ?<button type="button" disabled={!confirmed.includes(s.id)||!(newEvidence[s.id]||'').trim()} onClick={()=>addFact(s)}>填充我的补充</button>
+      :<button type="button" disabled={!confirmed.includes(s.id)||!draft.trim()} onClick={()=>accept(s)}>填充到此处</button>}
+     {s.action!=='request_evidence'&&<button type="button" onClick={()=>setEditingSuggestionId(editingSuggestionId===s.id?null:s.id)}>
+      {editingSuggestionId===s.id?'完成建议修改':'修改建议'}</button>}
+     <button type="button" onClick={()=>{setIgnored(v=>[...v,s.id]);setOpenSuggestionId(null)}}>保留原文</button>
+    </div>
+   </div>}
+  </div>;
  }
  const hasSession=realAuthReady&&Boolean(getRealAuthToken());
  return <section className="targeted-resume" aria-label="岗位定向简历优化">
@@ -218,67 +316,23 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
   {omittedSourceCharacters>0&&<p className="targeted-resume-truncation" role="alert">
    <strong>原始简历内容未完整载入。</strong>部分文字超出可编辑或可打印容量，
    仍有约 {omittedSourceCharacters} 个非空白字符未纳入本次预览。
-   为避免遗漏经历，本次暂不允许保存岗位版本或导出 PDF；请先上传精简或分段整理后的原始简历。
+   为避免遗漏经历，本次暂不允许保存岗位版本或导出 PDF / Word；请先上传精简或分段整理后的原始简历。
    原上传文件不会因此被修改。
   </p>}
   {hasSession&&status?.enabled&&<label className="targeted-resume-consent">
    <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>
    <span>我同意将下方展示的简历证据片段与该岗位要求发送给平台选定的第三方 AI 服务商进行润色。服务器会尽力脱敏常见联系方式，但不能确保移除所有个人信息。建议内容只供本人核实与选择，不会自动投递。</span>
   </label>}
-  <div className="targeted-resume-paper">
-   <header><h4>岗位定向简历 · 证据预览</h4><p>目标企业：{job.company} · 当前展示已识别的证据或本人确认的原文段落，原始文字可能仍需按经历分类 · 原始文件保持不变</p></header>
-   {version.blocks.map(block=>{
-    const s=suggestions.find(x=>x.blockId===block.id);
-    const applied=Boolean(s&&version.acceptedSuggestionIds.includes(s.id));
-    const dismissed=Boolean(s&&ignored.includes(s.id));
-    return <div className="targeted-resume-block" key={block.id}>
-     <div className="targeted-resume-block-label">
-      <small>{block.section==='experience'?'工作经历':block.section==='skills'?'专业技能':'简历原始文字 · 待结构化'}</small>
-      <button type="button" onClick={()=>startEdit(block)}><PencilLine size={13}/> 编辑原文</button>
-     </div>
-     {editingBlock===block.id?<div className="targeted-resume-inline-editor">
-      <textarea rows={4} maxLength={1600} value={manualText}
-       onChange={e=>setManualText(e.target.value)}
-       aria-label="编辑当前简历段落"/>
-      <div><button type="button" onClick={saveEdit}>保存本次修改</button>
-       <button type="button" onClick={()=>{setEditingBlock(null);setManualText('')}}>取消</button></div>
-     </div>:<p>{block.text}</p>}
-     {s&&!applied&&!dismissed&&editingBlock!==block.id&&<div className="targeted-resume-suggestion">
-      <span className="targeted-resume-ai-label"><Sparkles size={13} aria-hidden="true"/> AI 建议 · {s.action==='request_evidence'?'需要补充真实信息':'待用户核实'}</span>
-      <p className="targeted-resume-gradient">{s.proposed}</p>
-      <p className="targeted-resume-rationale">对应岗位要求：{s.jobRequirement}</p>
-      <p className="targeted-resume-rationale">{s.rationale}</p>
-      {s.action==='request_evidence'&&<label className="targeted-resume-fact-entry">
-       <span>补充你的真实经历或成果（不会使用 AI 猜测的数据）</span>
-       <textarea maxLength={800} rows={3} value={newEvidence[s.id]||''}
-        onChange={e=>setNewEvidence(prev=>({...prev,[s.id]:e.target.value}))}
-        placeholder="例如：在某项工作中具体做了什么、取得了什么可核实的结果"/>
-      </label>}
-      <label className="targeted-resume-confirm">
-       <input type="checkbox" checked={confirmed.includes(s.id)}
-        onChange={e=>setConfirmed(v=>e.target.checked?[...v,s.id]:v.filter(id=>id!==s.id))}/>
-       我已核实建议或补充内容中的经历、能力和数据均属实
-      </label>
-      <div className="targeted-resume-actions">
-       {s.action==='request_evidence'
-        ?<button type="button" disabled={!confirmed.includes(s.id)||!(newEvidence[s.id]||'').trim()} onClick={()=>addFact(s)}>填充我的补充</button>
-        :<button type="button" disabled={!confirmed.includes(s.id)} onClick={()=>accept(s)}>填充此建议</button>}
-       <button type="button" onClick={()=>setIgnored(v=>[...v,s.id])}>保留原文</button>
-      </div>
-     </div>}
-     {applied&&<span className="targeted-resume-applied"><CheckCircle2 size={13} aria-hidden="true"/> 已填充</span>}
-    </div>;
-   })}
-   {!version.blocks.length&&<p>未提取到可引用的工作或技能证据，请先完善原始简历。</p>}
-  </div>
   <section className="targeted-resume-document-editor" aria-label="正式简历排版与打印">
    <div className="targeted-resume-document-heading">
-    <div><strong>正式简历排版</strong>
-     <p>用已识别的真实经历生成简洁的 A4 简历；请手动补全姓名等缺失信息，系统不会猜测个人资料。</p>
+    <div><strong>在简历上直接修改</strong>
+     <p>下方就是你的简历：AI 会在对应段落弹出建议，可填充、修改、忽略或撤销。原始上传文件保持不变。</p>
     </div>
     <div className="targeted-resume-document-actions">
-     <button type="button" onClick={()=>setShowPrintPreview(v=>!v)}><Eye size={15}/>{showPrintPreview?'收起预览':'预览 A4'}</button>
-     <button type="button" disabled={!canPrint} onClick={()=>window.print()}><Printer size={15}/> 打印 / 保存 PDF</button>
+     <button type="button" disabled={!undoStack.length} onClick={undo}><Undo2 size={15}/> 撤销</button>
+     <button type="button" disabled={!canExport} onClick={()=>window.print()}><Printer size={15}/> 导出 PDF</button>
+     <button type="button" disabled={!canExport} onClick={()=>{try{downloadResumeDocx(printDocument,job.title_zh||job.title)}
+      catch{setNotice('Word 导出失败，请稍后再试。')}}}><FileDown size={15}/> 导出 Word</button>
     </div>
    </div>
    <div className="targeted-resume-document-fields">
@@ -294,11 +348,11 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
      placeholder="用自己的真实工作经历和求职方向概括优势"
      onChange={e=>updateDetail('summary',e.target.value)}/></label>
    </div>
-   <p className="targeted-resume-print-note">打印功能会调用浏览器的打印对话框，可选择「保存为 PDF」。AI 渐变建议、填充按钮和后台说明不会进入打印文件。生成内容仅覆盖识别到的经历和你填写的信息，不能保证无损还原上传文件。</p>
-   {!canPrint&&<p className="targeted-resume-print-note" role="status">请至少填写真实姓名并确保已有一项简历内容，才能打印。</p>}
+   <p className="targeted-resume-print-note">PDF 与可编辑 Word（DOCX）均使用下方已确认的简历内容，不包含 AI 浮层或编辑按钮。PDF 会打开浏览器打印窗口，请选择「保存为 PDF」。上传文件的原始排版不保证无损还原。</p>
+   {!canExport&&<p className="targeted-resume-print-note" role="status">请填写真实姓名、确认简历内容完整，并保存正在编辑的段落，才可以导出 PDF 或 Word。</p>}
   </section>
-  <div className={showPrintPreview?'targeted-resume-print-preview':'targeted-resume-print-preview is-collapsed'}>
-   <ResumePrintSheet document={printDocument}/>
+  <div className="targeted-resume-live-paper" aria-label="可原位编辑的简历预览">
+   <ResumePrintSheet document={printDocument} renderBlock={renderEditableBlock}/>
   </div>
   {before.score!==null&&<div className="targeted-resume-audit" aria-label="文字证据覆盖变化">
    <div><small>优化前 · 要求文字覆盖</small><strong>{before.score}%</strong></div>
