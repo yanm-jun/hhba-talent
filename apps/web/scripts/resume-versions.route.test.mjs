@@ -56,7 +56,7 @@ test('storage denies missing activation, cross-origin, unauthenticated and emplo
  const s=setup();
  assert.equal((await onRequest({request:req('POST','',content,'https://elsewhere.example'),env:s.env})).status,403);
  assert.equal((await onRequest({request:req('GET','?job_id=job-42',null,origin,false),env:s.env})).status,401);
- assert.equal((await onRequest({request:req('POST','',{...content,accepted_ids:[]}),env:s.env})).status,400);
+ assert.equal((await onRequest({request:req('POST','',{...content,confirmed_real:false}),env:s.env})).status,400);
  assert.equal(s.records.length,0);
  const b=setup({role:'employer'});
  assert.equal((await onRequest({request:req(),env:b.env})).status,403);
