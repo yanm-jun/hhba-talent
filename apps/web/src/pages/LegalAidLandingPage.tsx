@@ -175,7 +175,7 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
       <div className="hhba-knowledge-section-heading"><h2 id="hhba-knowledge-actions-title">建议下一步</h2><span>仅作一般信息参考</span></div>
       <div className="hhba-knowledge-action-list">
        {guideMatches.slice(0,3).map(tip=><Link to={"/rights/guide?tip="+encodeURIComponent(tip.id)} className="hhba-knowledge-action" key={tip.id}>
-        <strong>{tip.title}</strong><small>{tip.summary}</small><span>查看步骤 · {tip.minutes} <ArrowUpRight size={12} style={{verticalAlign:'middle'}}/></span>
+        <strong>{tip.title}</strong><span>查看步骤 · {tip.minutes} <ArrowUpRight size={12} style={{verticalAlign:'middle'}}/></span>
        </Link>)}
       </div>
      </section>}
