@@ -74,6 +74,7 @@ try{
  await page.getByRole('button',{name:'载入'}).first().waitFor();
  await page.getByRole('button',{name:'载入'}).first().click();
  await page.getByRole('button',{name:'删除'}).first().click();
+ await page.getByRole('button',{name:'载入'}).first().waitFor({state:'detached',timeout:5000});
  assert.equal(await page.getByRole('button',{name:'载入'}).count(),0,'delete must update list');
  assert.deepEqual(errors,[],'no desktop runtime error');
  await page.close();
