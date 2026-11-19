@@ -150,7 +150,7 @@ try{
  const truncated=await browser.newPage({viewport:{width:1365,height:900},locale:'zh-CN'});
  await truncated.goto(url+'?truncated=1',{waitUntil:'networkidle',timeout:45000});
  await truncated.getByRole('button',{name:'针对这个岗位优化简历'}).click();
- await truncated.getByRole('alert').filter({hasText:'原始简历内容未完整载入'}).waitFor();
+ await truncated.getByRole('alert').filter({hasText:'这份简历有部分内容未显示'}).waitFor();
  await truncated.getByPlaceholder('请填写本人真实姓名').fill('截断测试姓名');
  assert.equal(await truncated.getByRole('button',{name:'导出 PDF'}).isDisabled(),true,
   'a visibly incomplete source resume must not be exported as a complete PDF');
@@ -178,6 +178,27 @@ try{
  assert.ok(originalMetrics.width>400&&originalMetrics.height>500,
   'original source PDF should render as a full page');
  await source.screenshot({path:output+'/original-pdf-preview.png',fullPage:true});
+ const editStart=source.getByRole('button',{name:'开始修改'});
+ await editStart.waitFor({timeout:10000});
+ assert.equal(await editStart.isDisabled(),true,'must separately consent before visual analysis');
+ await source.locator('.hhba-original-resume-start input[type=checkbox]').check();
+ await editStart.click();
+ const marker=source.getByRole('button',{name:'修改这段简历'});
+ await marker.waitFor({timeout:10000});
+ await marker.click();
+ const field=source.getByRole('textbox',{name:'修改这段内容'});
+ await field.fill('This is an edited, fully fictional experience description.');
+ assert.equal(await source.getByRole('button',{name:'保存',exact:true}).isDisabled(),true);
+ await source.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
+ await source.screenshot({path:output+'/original-pdf-inline-editor.png',fullPage:true});
+ await source.getByRole('button',{name:'保存',exact:true}).click();
+ const edited=source.getByRole('button',{name:'继续修改这一段'});
+ await edited.waitFor({timeout:10000});
+ await edited.click();
+ await source.getByRole('button',{name:'撤销',exact:true}).click();
+ await source.getByRole('button',{name:'修改这段简历'}).waitFor({timeout:10000});
+ assert.ok((await source.locator('.hhba-original-resume-anchor').count())>=1,
+  'verified editable hotspot remains after undo');
  assert.deepEqual(sourceErrors,[],'original PDF must not cause JS runtime exceptions');
  await source.close();
 
