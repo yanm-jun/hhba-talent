@@ -202,6 +202,28 @@ try{
  assert.deepEqual(sourceErrors,[],'original PDF must not cause JS runtime exceptions');
  await source.close();
 
+ const smallSource=await browser.newPage({viewport:{width:390,height:844},locale:'zh-CN'});
+ const smallSourceErrors=[];smallSource.on('pageerror',e=>smallSourceErrors.push(e.message));
+ await smallSource.goto('http://127.0.0.1:3000/qa/original-resume-viewer.html',
+  {waitUntil:'networkidle',timeout:45000});
+ await smallSource.getByRole('button',{name:'开始修改'}).waitFor();
+ await smallSource.locator('.hhba-original-resume-start input[type=checkbox]').check();
+ await smallSource.getByRole('button',{name:'开始修改'}).click();
+ await smallSource.getByRole('button',{name:'修改这段简历'}).click();
+ await smallSource.getByRole('textbox',{name:'修改这段内容'}).waitFor();
+ const sourceMobileWidths=await smallSource.evaluate(()=>({
+  client:document.documentElement.clientWidth,
+  scroll:document.documentElement.scrollWidth,
+  editor:document.querySelector('.hhba-original-resume-editbox')?.getBoundingClientRect().right
+ }));
+ assert.ok(sourceMobileWidths.scroll<=sourceMobileWidths.client+3,
+  'original PDF editor must not overflow mobile viewport: '+JSON.stringify(sourceMobileWidths));
+ assert.ok(sourceMobileWidths.editor<=sourceMobileWidths.client+2,
+  'in-place editing popup must fit mobile width');
+ await smallSource.screenshot({path:output+'/original-pdf-mobile-editor.png',fullPage:true});
+ assert.deepEqual(smallSourceErrors,[],'no mobile original-PDF runtime errors');
+ await smallSource.close();
+
  console.log(JSON.stringify({result:'PASSED',desktop_pdf_pages:pages.length,
   long_pdf_pages:longPages.length,mobile:metrics,qa_output:output}));
 }finally{await browser.close()}
