@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "description": "HHBA 原创本地问题意图词典，只帮助用户定位知识专题，不自动判断法律责任。",
+  "intents": [
+    {
+      "id": "unpaid",
+      "phrases": [
+        "欠薪",
+        "拖欠工资",
+        "不发工资",
+        "没发工资",
+        "不给工资",
+        "工资没发",
+        "工资不发",
+        "发不出工资",
+        "不发薪",
+        "工资拖欠"
+      ],
+      "primary": "unpaid-wages",
+      "subtopics": [
+        "payroll-deductions"
+      ]
+    },
+    {
+      "id": "deduction",
+      "phrases": [
+        "扣工资",
+        "扣钱",
+        "罚款",
+        "工资扣款",
+        "工资少发",
+        "少发工资"
+      ],
+      "primary": "unpaid-wages",
+      "subtopics": [
+        "payroll-deductions"
+      ]
+    },
+    {
+      "id": "commission",
+      "phrases": [
+        "提成不发",
+        "不发提成",
+        "提成少发",
+        "销售提成",
+        "绩效奖金",
+        "年终奖"
+      ],
+      "primary": "unpaid-wages",
+      "subtopics": [
+        "commissions-bonuses"
+      ]
+    },
+    {
+      "id": "contract",
+      "phrases": [
+        "没签合同",
+        "不签合同",
+        "未签合同",
+        "没有劳动合同",
+        "不给合同",
+        "双倍工资"
+      ],
+      "primary": "labor-contracts",
+      "subtopics": [
+        "written-contract"
+      ]
+    },
+    {
+      "id": "probation",
+      "phrases": [
+        "试用期工资",
+        "试用期被辞退",
+        "试用期解雇",
+        "试用期多长",
+        "转正工资"
+      ],
+      "primary": "labor-contracts",
+      "subtopics": [
+        "probation-rules"
+      ]
+    },
+    {
+      "id": "insurance",
+      "phrases": [
+        "试用期不交社保",
+        "试用期没社保",
+        "试用期社保",
+        "试用不买社保",
+        "试用期不买社保",
+        "没缴社保",
+        "不交社保",
+        "社保断缴"
+      ],
+      "primary": "social-insurance",
+      "subtopics": [
+        "probation-insurance"
+      ]
+    },
+    {
+      "id": "overtime",
+      "phrases": [
+        "加班不给钱",
+        "不付加班费",
+        "没加班费",
+        "不给加班费",
+        "加班费",
+        "强制加班",
+        "加班证据"
+      ],
+      "primary": "overtime-leave",
+      "subtopics": [
+        "overtime-proof"
+      ]
+    },
+    {
+      "id": "leave",
+      "phrases": [
+        "没年假",
+        "不给年假",
+        "年假没休",
+        "未休年假",
+        "带薪年假",
+        "年休假"
+      ],
+      "primary": "overtime-leave",
+      "subtopics": [
+        "annual-leave"
+      ]
+    },
+    {
+      "id": "dismissal",
+      "phrases": [
+        "突然辞退",
+        "违法辞退",
+        "裁员补偿",
+        "赔偿金",
+        "N+1",
+        "2N",
+        "逼我辞职",
+        "经济补偿"
+      ],
+      "primary": "unlawful-dismissal",
+      "subtopics": [
+        "severance-compensation"
+      ]
+    },
+    {
+      "id": "certificate",
+      "phrases": [
+        "离职证明",
+        "不给离职证明",
+        "不出离职证明"
+      ],
+      "primary": "labor-contracts",
+      "subtopics": [
+        "departure-certificate"
+      ]
+    },
+    {
+      "id": "transfer",
+      "phrases": [
+        "调岗降薪",
+        "强制调岗",
+        "强制降薪",
+        "异地调岗",
+        "跨城调动",
+        "工资降低"
+      ],
+      "primary": "transfer-paycuts",
+      "subtopics": [
+        "change-agreement"
+      ]
+    },
+    {
+      "id": "noncompete",
+      "phrases": [
+        "竞业限制",
+        "竞业协议",
+        "竞业补偿",
+        "竞业禁止"
+      ],
+      "primary": "labor-contracts",
+      "subtopics": [
+        "non-compete"
+      ]
+    },
+    {
+      "id": "arbitration",
+      "phrases": [
+        "仲裁时效",
+        "怎么仲裁",
+        "劳动仲裁",
+        "申请仲裁",
+        "仲裁申请"
+      ],
+      "primary": "unlawful-dismissal",
+      "subtopics": [
+        "arbitration-timing"
+      ]
+    },
+    {
+      "id": "injury",
+      "phrases": [
+        "工伤认定",
+        "工伤赔偿",
+        "上班受伤",
+        "工作受伤"
+      ],
+      "primary": "work-injury",
+      "subtopics": []
+    }
+  ]
+}
