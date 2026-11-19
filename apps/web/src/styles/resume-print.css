@@ -38,3 +38,18 @@
  .hhba-print-section h3{font-size:12pt}
  .hhba-print-experience,.hhba-print-skill{break-inside:avoid}
 }
+
+/* Search-first results render inside a scrolling portal. Remove clipping for A4 output. */
+@media print{
+ .hhba-match-overlay,.hhba-match-modal,.hhba-match-modal-content,
+ .hhba-native-list,.hhba-native-job,.hhba-native-optimize-action,
+ .targeted-resume,.targeted-resume-print-preview{
+  overflow:visible!important;height:auto!important;max-height:none!important;
+  transform:none!important;box-shadow:none!important;
+ }
+ .hhba-match-overlay,.hhba-match-modal{
+  position:static!important;display:block!important;inset:auto!important;
+  width:auto!important;max-width:none!important;
+ }
+ .targeted-resume-print-preview,.targeted-resume-print-preview.is-collapsed{display:block!important}
+}
