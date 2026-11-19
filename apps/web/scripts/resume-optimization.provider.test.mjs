@@ -100,3 +100,19 @@ test('non-HTTP model failures identify the exact safe output validation stage',a
   }
  }finally{globalThis.fetch=original;}
 });
+
+
+test('slightly incomplete model suggestions are normalized without inventing factual claims',()=>{
+ const safe=parseSuggestions({suggestions:[
+  {block_id:'source-0',action:'replace',proposed:'参与门店真实日常运营',evidenceStatus:'verified'},
+  {blockId:'source-0',action:'replace',proposed:'不应重复覆盖'},
+  {blockId:'source-1',action:'request_evidence',proposed:null,jobRequirement:'客户沟通'}
+ ]},['source-0','source-1']);
+ assert.equal(safe.length,2);
+ assert.equal(safe[0].blockId,'source-0');
+ assert.equal(safe[0].proposed,'参与门店真实日常运营');
+ assert.equal(safe[0].evidenceStatus,'needs_user_confirmation');
+ assert.match(safe[1].proposed,/补充你真实参与/);
+ assert.ok(safe.every(x=>x.id&&x.original&&x.rationale&&x.jobRequirement));
+ assert.throws(()=>parseSuggestions({suggestions:[{blockId:'not-owned',action:'replace',proposed:'无效'}]},['source-0']),/INVALID/);
+});
