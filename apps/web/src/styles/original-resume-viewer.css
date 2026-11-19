@@ -52,7 +52,11 @@
  background:rgba(82,118,146,.13)}
 .hhba-original-resume-anchor:hover span,.hhba-original-resume-anchor:focus-visible span{opacity:1}
 .hhba-original-resume-siri-stage{margin:6px 1px 10px}
-.hhba-original-resume-edit-glow{position:absolute;z-index:5;border-radius:13px;max-width:calc(100% - 18px)}
+/* The shared Siri wrapper is position:relative. This anchored popup must
+   override it to remain over its actual PDF text, not below the canvas. */
+.hhba-original-resume-page-frame .hhba-original-resume-edit-glow{
+ position:absolute;z-index:5;border-radius:13px;max-width:calc(100% - 18px)
+}
 .hhba-original-resume-editbox{position:relative;z-index:1;width:100%;
  padding:11px 12px;border:1px solid #e3e8ee;background:#fff;border-radius:12px;
  box-shadow:0 8px 23px rgba(29,43,64,.115);box-sizing:border-box;
