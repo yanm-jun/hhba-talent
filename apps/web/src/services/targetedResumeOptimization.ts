@@ -31,7 +31,7 @@ export function applySuggestion(version:ResumeVersion,s:ResumeSuggestion,confirm
  if(s.evidenceStatus==='needs_user_confirmation'&&!confirmedEvidence) throw new Error('USER_CONFIRMATION_REQUIRED');
  if(version.acceptedSuggestionIds.includes(s.id)) return version;
  return {...version,blocks:version.blocks.map(b=>b.id===s.blockId?{
-  ...b,text:s.action==='replace'?s.proposed:b.text+'\\n'+s.proposed
+  ...b,text:s.action==='replace'?s.proposed:b.text+String.fromCharCode(10)+s.proposed
  }:b),acceptedSuggestionIds:[...version.acceptedSuggestionIds,s.id]};
 }
 export function compareScores(before:ScoreBreakdown,after:ScoreBreakdown){
