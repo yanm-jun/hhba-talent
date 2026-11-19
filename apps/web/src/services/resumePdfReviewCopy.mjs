@@ -275,6 +275,47 @@ export async function createOriginalPdfReviewCopy({
 export function createOriginalPdfSearchableCopy(options){
  return createOriginalPdfReviewCopy({...options,searchable:true});
 }
+// Verify the bytes that will actually be downloaded, not only the export
+// command inputs. A viewer/parser mismatch must not create a "successful"
+// download that silently drops any confirmed text edits.
+export async function verifyOriginalPdfSearchableCopy({
+ bytes,expectedPages,changes,getDocument
+}){
+ ensure(bytes instanceof Uint8Array&&bytes.length>=300&&
+  Number.isInteger(expectedPages)&&expectedPages>0&&
+  Array.isArray(changes)&&changes.length>0&&typeof getDocument==='function',
+  'SEARCHABLE_VERIFY_FAILED');
+ const task=getDocument({
+  data:new Uint8Array(bytes),disableFontFace:true,
+  useSystemFonts:false,isEvalSupported:false
+ });
+ let parsed;
+ try{
+  parsed=await task.promise;
+  ensure(parsed.numPages===expectedPages,'SEARCHABLE_VERIFY_FAILED');
+  for(const change of changes){
+   ensure(Number.isInteger(change.page)&&change.page>=1&&
+    change.page<=expectedPages,'SEARCHABLE_VERIFY_FAILED');
+   const page=await parsed.getPage(change.page);
+   const content=await page.getTextContent({includeMarkedContent:false});
+   const texts=content.items.filter(item=>typeof item.str==='string')
+    .map(item=>item.str).join(' ');
+   const clean=text=>String(text||'').normalize('NFKC')
+    .toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
+   const actual=clean(texts),expected=clean(change.text),original=clean(change.original);
+   ensure(expected.length>=2&&actual.includes(expected),'SEARCHABLE_VERIFY_FAILED');
+   // If the replacement changes the original text, old searchable strings
+   // must not remain hidden under the white painted area.
+   ensure(!original||original===expected||!actual.includes(original),
+    'SEARCHABLE_VERIFY_FAILED');
+  }
+  return true;
+ }catch{throw Error('SEARCHABLE_VERIFY_FAILED');}
+ finally{
+  try{if(parsed)await parsed.destroy();else await task.destroy();}
+  catch{}
+ }
+}
 export function downloadOriginalPdfSearchableCopy(bytes,filename){
  const body=new Uint8Array(bytes.byteLength);body.set(bytes);
  const blob=new Blob([body],{type:'application/pdf'});
