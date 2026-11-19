@@ -201,3 +201,47 @@
  .targeted-resume-popover{animation:none}
  .targeted-resume-inline-region{transition:none}
 }
+
+/* Siri ambient light now runs along all four sides of BOTH the main resume
+   and the context popover. Don't repeat the older purple left-edge rail. */
+.targeted-resume-live-paper.hhba-siri-edge{
+ border-radius:14px;
+ margin-top:16px;
+}
+.targeted-resume-popover-shell{
+ margin:11px 0 6px;
+ max-width:100%;
+ border-radius:13px;
+}
+.targeted-resume-popover-shell .targeted-resume-suggestion{
+ margin:0;
+ padding:12px 14px;
+ border-color:#e5eaf0;
+ background:#fff;
+ border-radius:12px;
+ box-shadow:0 6px 20px rgba(30,42,64,.09);
+ overflow:visible;
+}
+.targeted-resume-popover-shell .targeted-resume-suggestion::before,
+.targeted-resume-popover-shell .targeted-resume-suggestion::after{
+ display:none;
+}
+.targeted-resume-popover-shell .targeted-resume-ai-label{color:#385467}
+.targeted-resume-popover-shell .targeted-resume-rationale{margin:5px 0 8px}
+.targeted-resume-popover-shell .targeted-resume-confirm{margin:8px 0}
+.targeted-resume-popover-shell .targeted-resume-gradient{margin:8px 0}
+.targeted-resume .targeted-resume-inline-controls>.targeted-resume-ai-trigger{
+ border-color:#d7e1e8;
+ background:#f3f7f9;
+ color:#365469;
+}
+.targeted-resume .targeted-resume-inline-controls>.targeted-resume-ai-trigger[aria-expanded="true"]{
+ border-color:#b7cbd7;
+ background:#edf4f8;
+ color:#27445c;
+}
+.targeted-resume-consent input,.targeted-resume-confirm input{accent-color:#27445c}
+@media(max-width:650px){
+ .targeted-resume-popover-shell{margin-top:8px}
+ .targeted-resume-popover-shell .targeted-resume-suggestion{padding:10px 11px}
+}
