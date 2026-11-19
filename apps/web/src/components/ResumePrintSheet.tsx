@@ -2,7 +2,7 @@ import type {ResumeDocument} from '../services/resumeDocument';
 import '../styles/resume-print.css';
 
 export function ResumePrintSheet({document}:{document:ResumeDocument}){
- const {details,education,experiences,skills}=document;
+ const {details,education,experiences,skills,sourceParagraphs}=document;
  return <article className="hhba-print-sheet" aria-label="可打印的岗位专属简历">
   <header className="hhba-print-header">
    <div className="hhba-print-identification">
@@ -39,7 +39,11 @@ export function ResumePrintSheet({document}:{document:ResumeDocument}){
     <p className="hhba-print-paragraph">{skill.details}</p>
    </div>)}
   </section>}
-  {!details.summary&&!experiences.length&&!education.length&&!skills.length&&
+  {sourceParagraphs.length>0&&<section className="hhba-print-section">
+   <h3>简历原始内容（请检查并整理）</h3>
+   {sourceParagraphs.map((content,i)=><p className="hhba-print-paragraph hhba-print-source" key={i}>{content}</p>)}
+  </section>}
+  {!details.summary&&!experiences.length&&!education.length&&!skills.length&&!sourceParagraphs.length&&
    <p className="hhba-print-placeholder">请先补充真实简历内容。</p>}
  </article>;
 }
