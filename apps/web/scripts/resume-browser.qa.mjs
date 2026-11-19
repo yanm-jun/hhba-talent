@@ -216,6 +216,23 @@ try{
  await marker.click();
  await assertSiriEdge(source,'.hhba-original-resume-siri-stage.hhba-siri-edge-active','original PDF perimeter');
  await assertSiriEdge(source,'.hhba-original-resume-edit-glow','original PDF edit popup');
+ const popupPlacement=await source.locator('.hhba-original-resume-edit-glow').evaluate(el=>{
+  const rect=el.getBoundingClientRect();
+  const page=el.closest('.hhba-original-resume-page-frame')?.getBoundingClientRect();
+  const marker=el.parentElement?.querySelector('.hhba-original-resume-anchor')?.getBoundingClientRect();
+  return {
+   position:getComputedStyle(el).position,
+   top:rect.top,bottom:rect.bottom,left:rect.left,right:rect.right,
+   pageTop:page?.top,pageBottom:page?.bottom,
+   markerBottom:marker?.bottom
+  };
+ });
+ assert.equal(popupPlacement.position,'absolute','editing popup must overlay the PDF, not flow below it');
+ assert.ok(popupPlacement.top>=popupPlacement.pageTop&&
+  popupPlacement.top<popupPlacement.pageBottom,
+  'popup must appear within the source page: '+JSON.stringify(popupPlacement));
+ assert.ok(popupPlacement.top<popupPlacement.markerBottom+120,
+  'popup must appear near the clicked text: '+JSON.stringify(popupPlacement));
  const field=source.getByRole('textbox',{name:'修改这段内容'});
  await field.fill('This is an edited, fully fictional experience description.');
  assert.equal(await source.getByRole('button',{name:'保存',exact:true}).isDisabled(),true);
@@ -242,6 +259,16 @@ try{
  await smallSource.getByRole('button',{name:'修改这段简历'}).click();
  await assertSiriEdge(smallSource,'.hhba-original-resume-siri-stage.hhba-siri-edge-active','mobile PDF perimeter');
  await assertSiriEdge(smallSource,'.hhba-original-resume-edit-glow','mobile edit popup');
+ const mobilePopup=await smallSource.locator('.hhba-original-resume-edit-glow')
+  .evaluate(el=>{const rect=el.getBoundingClientRect();
+   const page=el.closest('.hhba-original-resume-page-frame')?.getBoundingClientRect();
+   return {position:getComputedStyle(el).position,top:rect.top,
+    pageBottom:page?.bottom,left:rect.left,right:rect.right,viewport:document.documentElement.clientWidth};
+  });
+ assert.equal(mobilePopup.position,'absolute','mobile popup must be anchored to PDF text');
+ assert.ok(mobilePopup.top<mobilePopup.pageBottom&&mobilePopup.left>=0&&
+  mobilePopup.right<=mobilePopup.viewport+2,
+  'mobile popup must be visible next to actual resume text: '+JSON.stringify(mobilePopup));
  await smallSource.emulateMedia({reducedMotion:'reduce'});
  const mobileStill=await smallSource.locator('.hhba-original-resume-edit-glow')
   .evaluate(el=>getComputedStyle(el,'::after').animationName);
