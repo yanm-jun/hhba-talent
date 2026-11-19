@@ -6,16 +6,23 @@ import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimiz
 import {applySuggestion,validateSuggestion,editResumeBlock,type ResumeBlock,type ResumeSuggestion,type ResumeVersion} from '../services/targetedResumeOptimization';
 import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
 import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResumeVersion} from '../services/resumeVersionsApi';
-import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
+import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
 import {ResumePrintSheet} from './ResumePrintSheet';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
 import '../styles/targeted-resume-optimization.css';
 
-export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfile;job:JobMatch}){
- const blocks=useMemo<ResumeBlock[]>(()=>[
+export function TargetedResumeOptimization({profile,job,sourceText}:{profile:CandidateProfile;job:JobMatch;sourceText?:string}){
+ const blocks=useMemo<ResumeBlock[]>(()=>{
+ const originals=[
   ...(Array.isArray(profile.experiences)?profile.experiences:[]).filter(e=>e.evidence?.trim()).map((e,i)=>({id:'experience-'+i,section:'experience' as const,text:e.evidence.slice(0,1600)})),
   ...(Array.isArray(profile.skills)?profile.skills:[]).filter(s=>s.evidence?.trim()).map((s,i)=>({id:'skill-'+i,section:'skills' as const,text:s.evidence.slice(0,1600)}))
- ].slice(0,12),[profile]);
+ ].slice(0,12);
+ // Newer search-first flows preserve local source text, but do not yet expose
+ // verified structured work-history records. Keep raw paragraphs unmistakably
+ // labelled as source text, rather than inventing roles or employers.
+ if(!profile.experiences?.length&&sourceText?.trim())return sourceResumeBlocks(sourceText);
+ return originals;
+ },[profile,sourceText]);
  const initial=()=>({id:'draft-'+job.id,targetJobId:job.id,blocks,acceptedSuggestionIds:[] as string[]});
  const [version,setVersion]=useState<ResumeVersion>(initial);
  const [suggestions,setSuggestions]=useState<ResumeSuggestion[]>([]);
@@ -185,14 +192,14 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
    <span>我同意将下方展示的简历证据片段与该岗位要求发送给平台选定的第三方 AI 服务商进行润色。服务器会尽力脱敏常见联系方式，但不能确保移除所有个人信息。建议内容只供本人核实与选择，不会自动投递。</span>
   </label>}
   <div className="targeted-resume-paper">
-   <header><h4>岗位定向简历 · 证据预览</h4><p>目标企业：{job.company} · 当前展示 AI 识别出的证据片段，完整排版将在后续阶段接入 · 原始文件保持不变</p></header>
+   <header><h4>岗位定向简历 · 证据预览</h4><p>目标企业：{job.company} · 当前展示已识别的证据或本人确认的原文段落，原始文字可能仍需按经历分类 · 原始文件保持不变</p></header>
    {version.blocks.map(block=>{
     const s=suggestions.find(x=>x.blockId===block.id);
     const applied=Boolean(s&&version.acceptedSuggestionIds.includes(s.id));
     const dismissed=Boolean(s&&ignored.includes(s.id));
     return <div className="targeted-resume-block" key={block.id}>
      <div className="targeted-resume-block-label">
-      <small>{block.section==='experience'?'工作经历':'专业技能'}</small>
+      <small>{block.section==='experience'?'工作经历':block.section==='skills'?'专业技能':'简历原始文字 · 待结构化'}</small>
       <button type="button" onClick={()=>startEdit(block)}><PencilLine size={13}/> 编辑原文</button>
      </div>
      {editingBlock===block.id?<div className="targeted-resume-inline-editor">
