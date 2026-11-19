@@ -10,7 +10,8 @@
 .hhba-home-entry-grid .hhba-entry-rights .entry-footer{color:#125EBC}
 
 .hhba-home-workplace{position:relative;isolation:isolate;width:calc(100% - 24px);max-width:1096px;margin:0 auto 36px;padding:44px 0 24px;color:#102A5A}
-.hhba-home-workplace::before{content:'';position:absolute;z-index:-1;inset:-8px calc(50% - 50vw) -20px;background:linear-gradient(180deg,rgba(247,249,253,0) 0%,rgba(247,249,253,.58) 28%,rgba(247,249,253,.88) 70%,rgba(247,249,253,.22) 100%);pointer-events:none}
+/* Prevent decorative overflow: 100vw includes the scrollbar gutter on Windows. */
+.hhba-home-workplace::before{content:'';position:absolute;z-index:-1;inset:-8px -12px -20px;background:linear-gradient(180deg,rgba(247,249,253,0) 0%,rgba(247,249,253,.58) 28%,rgba(247,249,253,.88) 70%,rgba(247,249,253,.22) 100%);pointer-events:none}
 .hhba-home-workplace *{box-sizing:border-box}
 .hhba-home-workplace-heading{max-width:760px;margin:0 auto 18px;text-align:center}
 .hhba-home-workplace-kicker,.hhba-home-card-kicker{display:block;color:#60758F;font-size:11px;font-weight:750;letter-spacing:.1em}
