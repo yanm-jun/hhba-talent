@@ -24,6 +24,29 @@ async function pdfText(buffer){
  }
  return pages;
 }
+// Real computed style checks: the rainbow must surround all four edges,
+ // not be a decorative purple left rail or an image in a screenshot.
+async function assertSiriEdge(page,selector,name){
+ const el=page.locator(selector).first();
+ await el.waitFor({timeout:10000});
+ const values=await el.evaluate(node=>{
+  const outer=getComputedStyle(node,'::before');
+  const rim=getComputedStyle(node,'::after');
+  return {
+   animation:rim.animationName,
+   background:rim.backgroundImage,
+   mask:rim.getPropertyValue('mask-composite')||rim.getPropertyValue('-webkit-mask-composite'),
+   glow:outer.filter,
+   position:getComputedStyle(node).position,
+   borderLeftColor:getComputedStyle(node).borderLeftColor
+  };
+ });
+ assert.match(values.animation,/hhba-siri-edge-flow/,name+' should animate');
+ assert.match(values.background,/conic-gradient/,name+' needs all-around rainbow light');
+ assert.match(values.glow,/blur/,name+' needs diffuse outer glow');
+ assert.match(values.mask,/exclude|xor/,name+' must mask the center and retain four edges');
+ return values;
+}
 const browser=await chromium.launch({executablePath:browserExecutable(),
  headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
 try{
@@ -41,6 +64,8 @@ try{
  await generate.click();
  const tip=page.locator('.targeted-resume-suggestion');
  await tip.first().waitFor();
+ await assertSiriEdge(page,'.targeted-resume-popover-shell','Siri AI suggestion');
+ await assertSiriEdge(page,'.targeted-resume-live-paper.hhba-siri-edge-active','Siri resume paper');
  assert.equal(await page.locator('.targeted-resume-inline-region[data-resume-block-id="source-0"] .targeted-resume-suggestion').count(),1,'Siri popover must be inside the actual resume paragraph');
  const siriText=tip.first().locator('.targeted-resume-gradient');
  await siriText.waitFor();
@@ -58,6 +83,9 @@ try{
  await page.screenshot({path:output+'/siri-ai-context.png',animations:'disabled'});
  await page.emulateMedia({reducedMotion:'reduce'});
  const still=await siriText.evaluate(el=>getComputedStyle(el).animationName);
+ const calmEdge=await page.locator('.targeted-resume-popover-shell')
+  .evaluate(el=>getComputedStyle(el,'::after').animationName);
+ assert.equal(calmEdge,'none','reduced motion must stop rainbow rim animation');
  assert.equal(still,'none','reduced-motion readers get a static accessible suggestion');
  assert.match(await siriText.textContent(),/同步整理每日服务记录/,'motion setting must not alter draft content');
  await page.emulateMedia({reducedMotion:'no-preference'});
@@ -186,6 +214,8 @@ try{
  const marker=source.getByRole('button',{name:'修改这段简历'});
  await marker.waitFor({timeout:10000});
  await marker.click();
+ await assertSiriEdge(source,'.hhba-original-resume-siri-stage.hhba-siri-edge-active','original PDF perimeter');
+ await assertSiriEdge(source,'.hhba-original-resume-edit-glow','original PDF edit popup');
  const field=source.getByRole('textbox',{name:'修改这段内容'});
  await field.fill('This is an edited, fully fictional experience description.');
  assert.equal(await source.getByRole('button',{name:'保存',exact:true}).isDisabled(),true);
@@ -210,6 +240,13 @@ try{
  await smallSource.locator('.hhba-original-resume-start input[type=checkbox]').check();
  await smallSource.getByRole('button',{name:'开始修改'}).click();
  await smallSource.getByRole('button',{name:'修改这段简历'}).click();
+ await assertSiriEdge(smallSource,'.hhba-original-resume-siri-stage.hhba-siri-edge-active','mobile PDF perimeter');
+ await assertSiriEdge(smallSource,'.hhba-original-resume-edit-glow','mobile edit popup');
+ await smallSource.emulateMedia({reducedMotion:'reduce'});
+ const mobileStill=await smallSource.locator('.hhba-original-resume-edit-glow')
+  .evaluate(el=>getComputedStyle(el,'::after').animationName);
+ assert.equal(mobileStill,'none','mobile reduced-motion users must get static rainbow edges');
+ await smallSource.emulateMedia({reducedMotion:'no-preference'});
  await smallSource.getByRole('textbox',{name:'修改这段内容'}).waitFor();
  const sourceMobileWidths=await smallSource.evaluate(()=>({
   client:document.documentElement.clientWidth,
