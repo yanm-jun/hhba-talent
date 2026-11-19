@@ -19,7 +19,7 @@ function matchesTip(tip:(typeof GUIDE_TIPS)[number],needle:string){
  const q=needle.trim().toLocaleLowerCase();
  if(!q)return true;
  const all=[tip.title,tip.summary,...tip.steps,...tip.keywords,tip.stage,tip.value].join(' ').toLocaleLowerCase();
- const pieces=q.split(/[\\s,，、;；]+/).filter(Boolean);
+ const pieces=q.split(/[\s,，、;；]+/).filter(Boolean);
  return pieces.every(token=>all.includes(token)||tip.keywords.some(k=>token.includes(k.toLocaleLowerCase())||k.toLocaleLowerCase().includes(token)));
 }
 const values=['全部','钱','时间','岗位','权益','健康','安全'];
