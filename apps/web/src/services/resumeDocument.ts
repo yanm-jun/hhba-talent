@@ -55,6 +55,17 @@ export function sourceResumeBlocks(raw:string):ResumeBlock[]{
  if(chunks.length<12)push();
  return chunks.slice(0,12).map((text,i)=>({id:'source-'+i,section:'summary',text}));
 }
+/** Keep exports honest: the 12 editable source snippets may omit the end of
+ * a long CV. Compare non-whitespace characters so paragraph wrapping and
+ * leading/trailing whitespace do not create false truncation warnings. */
+export function sourceResumeOmittedCharacters(raw:string,sourceBlocks:readonly ResumeBlock[]):number{
+ const original=typeof raw==='string'?raw.replace(/\r\n?/g,'\n').trim():'';
+ if(!original)return 0;
+ const visible=sourceBlocks.filter(block=>block.id.startsWith('source-'))
+  .map(block=>block.text).join('');
+ const nonspace=(value:string)=>value.replace(/\s/gu,'').length;
+ return Math.max(0,nonspace(original)-nonspace(visible));
+}
 export function buildResumeDocument(
  profile:CandidateProfile,blocks:readonly ResumeBlock[],details:ResumeDocumentDetails
 ):ResumeDocument{
