@@ -9,6 +9,7 @@ const MAX_AGE=24*3600*1000;
 export function validatedAuditedJob(sources,id,now=Date.now()){
  const {snapshot,audit,facets}=sources||{};
  if(!Array.isArray(snapshot?.jobs)||!Array.isArray(audit?.jobs)||!Array.isArray(facets?.jobs)||
+  audit.jobs.length!==snapshot.jobs.length||facets.jobs.length!==snapshot.jobs.length||
   audit?.summary?.kind!=='HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1'||
   audit.summary.indexed_as_of!==snapshot.updated||facets.indexed_as_of!==snapshot.updated)
   return null;
