@@ -6,7 +6,7 @@ import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimiz
 import {applySuggestion,validateSuggestion,editResumeBlock,type ResumeBlock,type ResumeSuggestion,type ResumeVersion} from '../services/targetedResumeOptimization';
 import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
 import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResumeVersion} from '../services/resumeVersionsApi';
-import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
+import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,sourceResumeOmittedCharacters,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
 import {createPortal} from 'react-dom';
 import {ResumePrintSheet} from './ResumePrintSheet';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
@@ -25,6 +25,10 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
  if(!profile.experiences?.length&&sourceText?.trim())return sourceResumeBlocks(sourceText);
  return originals;
  },[profile,sourceText]);
+ const omittedSourceCharacters=useMemo(()=>(
+  !profile.experiences?.length&&sourceText
+   ?sourceResumeOmittedCharacters(sourceText,blocks):0
+ ),[profile.experiences,sourceText,blocks]);
  const initial=()=>({id:'draft-'+job.id,targetJobId:job.id,blocks,acceptedSuggestionIds:[] as string[]});
  const [version,setVersion]=useState<ResumeVersion>(initial);
  const [suggestions,setSuggestions]=useState<ResumeSuggestion[]>([]);
@@ -74,7 +78,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
  ].filter(Boolean).join('\n').slice(0,2500),[job]);
  const criteria=useMemo(()=>[...job.matched,...job.not_evidenced], [job]);
  const printDocument=useMemo(()=>buildResumeDocument(profile,version.blocks,details),[profile,version.blocks,details]);
- const canPrint=readableResumeDocument(printDocument);
+ const canPrint=readableResumeDocument(printDocument)&&omittedSourceCharacters===0;
  function updateDetail(key:keyof ResumeDocumentDetails,value:string){
   setDetails(current=>({...current,[key]:value}));
   setConfirmReal(false);
@@ -210,6 +214,12 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
       </button>
     :<span className="targeted-resume-unavailable">{!hasSession?'站内登录后可使用 AI 润色':status?'AI 润色尚未开放':'正在检查服务状态…'}</span>}
   </div>
+  {omittedSourceCharacters>0&&<p className="targeted-resume-truncation" role="alert">
+   <strong>原始简历内容未完整载入。</strong>当前最多支持 12 个可编辑片段，
+   仍有约 {omittedSourceCharacters} 个非空白字符未纳入本次预览。
+   为避免遗漏经历，本次暂不允许保存岗位版本或导出 PDF；请先上传精简或分段整理后的原始简历。
+   原上传文件不会因此被修改。
+  </p>}
   {hasSession&&status?.enabled&&<label className="targeted-resume-consent">
    <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>
    <span>我同意将下方展示的简历证据片段与该岗位要求发送给平台选定的第三方 AI 服务商进行润色。服务器会尽力脱敏常见联系方式，但不能确保移除所有个人信息。建议内容只供本人核实与选择，不会自动投递。</span>
