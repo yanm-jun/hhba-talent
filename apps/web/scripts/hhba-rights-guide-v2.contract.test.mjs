@@ -56,7 +56,7 @@ test('knowledge hub searches the original authoritative eight-topic dataset with
  assert.match(hub,/setQuery\(e\.target\.value\)/);
  assert.match(hub,/topic\.short/);
  assert.match(hub,/knowledgeHref\+'\/'\+topic\.slug/);
- assert.match(hub,/GUIDE_TIPS\.filter/);
+ assert.match(hub,/GUIDE_TIPS\.map/);
  assert.match(hub,/subtopics\.topics\.filter\(topic=>subtopicMatches\(topic,query\)\)/);
  assert.match(hub,/hhba-knowledge-subtopic-grid/);
  assert.match(hub,/relatedSlugs\.has\(tip\.topic\)/);

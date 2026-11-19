@@ -53,20 +53,29 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
  const subMatches=useMemo(()=>subtopics.topics.filter(topic=>subtopicMatches(topic,query)),[query]);
  const guideMatches=useMemo(()=>{
   if(!query.trim())return [GUIDE_TIPS[0],GUIDE_TIPS[10],GUIDE_TIPS[15],GUIDE_TIPS[35]];
-  // Relate colloquial questions (e.g. “公司三个月没发工资”) to the corresponding
-  // evidence-based topic without pretending that this is an AI legal judgment.
+  // Intents only rank relevant existing articles; they never produce a legal conclusion.
   const q=normal(query);
+  const intents=matchingIntents(query);
+  const featuredActions=[...new Set(intents.flatMap(intent=>intent.featuredActions))];
   const relatedSlugs=new Set(laborRights.topics.filter(topic=>
    (topicKeywords[topic.slug]||[]).some(word=>q.includes(word.toLocaleLowerCase()))
   ).map(topic=>topic.slug));
-  for(const intent of matchingIntents(query)){
+  for(const intent of intents){
    relatedSlugs.add(intent.primary);
    for(const slug of intent.subtopics)relatedSlugs.add(slug);
   }
   for(const topic of subMatches)relatedSlugs.add(topic.slug);
-  return GUIDE_TIPS.filter(tip=>
-   tipMatches(tip,query)||(tip.topic!==null&&relatedSlugs.has(tip.topic))
-  ).slice(0,6);
+  return GUIDE_TIPS.map((tip,index)=>{
+   const curatedPosition=featuredActions.indexOf(tip.id);
+   const direct=tipMatches(tip,query);
+   const related=tip.topic!==null&&relatedSlugs.has(tip.topic);
+   if(curatedPosition<0&&!direct&&!related)return null;
+   const specific=tip.topic!==null&&intents.some(intent=>intent.subtopics.includes(tip.topic!));
+   const score=curatedPosition>=0?1000-curatedPosition:direct?300:specific?140:related?60:0;
+   return {tip,index,score};
+  }).filter((item):item is {tip:(typeof GUIDE_TIPS)[number];index:number;score:number}=>item!==null)
+   .sort((a,b)=>b.score-a.score||a.index-b.index)
+   .slice(0,6).map(item=>item.tip);
  },[query,subMatches]);
  return <Shell user={user} embedded={embedded}>
   <main className="hhba-law hhba-rights-knowledge" id="main-content">
@@ -123,7 +132,8 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
       </Link>)}</div>:<p className="hhba-knowledge-no-match">本次搜索没有匹配的细分专题。可以浏览上方深度专题，或清空搜索。</p>}
      </section>
      <section className="hhba-knowledge-actions" aria-labelledby="hhba-knowledge-actions-title">
-      <h2 id="hhba-knowledge-actions-title">{query?'相关职场行动建议':'从这些行动开始'}</h2>
+      <h2 id="hhba-knowledge-actions-title">{query?'优先推荐的职场行动':'从这些行动开始'}</h2>
+      {query&&matchingIntents(query).length>0&&<p className="hhba-knowledge-priority-note">先看与你描述的情况直接相关的操作步骤。推荐顺序仅帮助查找资料，不代表个案法律判断。</p>}
       {guideMatches.length?<div className="hhba-knowledge-action-list">
        {guideMatches.map(tip=><Link to={"/rights/guide?tip="+encodeURIComponent(tip.id)} className="hhba-knowledge-action" key={tip.id}>
         <strong>{tip.title}</strong><small>{tip.summary}</small><span>查看步骤 · {tip.minutes} <ArrowUpRight size={12} style={{verticalAlign:'middle'}}/></span>

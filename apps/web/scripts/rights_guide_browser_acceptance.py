@@ -85,6 +85,16 @@ with sync_playwright() as playwright:
                 assert page.locator(
                     f'a.hhba-knowledge-subtopic-card[href$="/rights/knowledge/{sub_slug}"]'
                 ).count() > 0, f"{name}: missing detailed topic {sub_slug} for {phrase}"
+            matching_intents = [
+                intent for intent in INTENTS["intents"]
+                if any(term.lower() in phrase.lower() for term in intent["phrases"])
+            ]
+            assert matching_intents, f"{name}: missing intent for {phrase}"
+            expected_first_id = matching_intents[0]["featuredActions"][0]
+            first_action_href = page.locator(".hhba-knowledge-action").first.get_attribute("href")
+            assert first_action_href == f"/rights/guide?tip={expected_first_id}", (
+                f"{name}: {phrase} should prioritize a concrete next step {expected_first_id}; got {first_action_href}"
+            )
         search.fill("公司三个月不发工资")
         linked = page.locator(".hhba-knowledge-action").first
         linked.wait_for()

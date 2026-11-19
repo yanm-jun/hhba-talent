@@ -148,3 +148,6 @@
 /* Keep the linked instruction card visible beneath the sticky site header. */
 .hhba-vguide-card.is-targeted{scroll-margin-top:86px}
 .hhba-vguide-card.is-targeted:focus{outline:2px solid #125EBC;outline-offset:3px}
+
+/* Editorial note on why action suggestions are ordered for a described workplace issue. */
+.hhba-knowledge-priority-note{margin:-3px 0 13px;font-size:11px;line-height:1.8;color:#60758F}

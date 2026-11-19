@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "description": "HHBA 原创本地问题意图词典，只帮助用户定位知识专题，不自动判断法律责任。",
+  "description": "HHBA 原创本地问题意图与优先阅读顺序，只用于定位知识专题和行动建议，不自动判断法律责任。",
   "intents": [
     {
       "id": "unpaid",
@@ -17,7 +17,12 @@
         "工资拖欠"
       ],
       "primary": "unpaid-wages",
-      "subtopics": []
+      "subtopics": [],
+      "featuredActions": [
+        "wageclaimsheet",
+        "paylater",
+        "payoutledger"
+      ]
     },
     {
       "id": "deduction",
@@ -32,6 +37,11 @@
       "primary": "unpaid-wages",
       "subtopics": [
         "payroll-deductions"
+      ],
+      "featuredActions": [
+        "attendanceproof",
+        "payslip",
+        "paystubarchive"
       ]
     },
     {
@@ -47,6 +57,11 @@
       "primary": "unpaid-wages",
       "subtopics": [
         "commissions-bonuses"
+      ],
+      "featuredActions": [
+        "commissionstage",
+        "commission",
+        "bonusafterleave"
       ]
     },
     {
@@ -62,6 +77,11 @@
       "primary": "labor-contracts",
       "subtopics": [
         "written-contract"
+      ],
+      "featuredActions": [
+        "startdate",
+        "contractcopy",
+        "readcontractnotice"
       ]
     },
     {
@@ -76,6 +96,11 @@
       "primary": "labor-contracts",
       "subtopics": [
         "probation-rules"
+      ],
+      "featuredActions": [
+        "wagefloor",
+        "probationtarget",
+        "probation"
       ]
     },
     {
@@ -93,6 +118,11 @@
       "primary": "social-insurance",
       "subtopics": [
         "probation-insurance"
+      ],
+      "featuredActions": [
+        "socialregistration",
+        "socialcheck",
+        "socialdispute"
       ]
     },
     {
@@ -109,6 +139,11 @@
       "primary": "overtime-leave",
       "subtopics": [
         "overtime-proof"
+      ],
+      "featuredActions": [
+        "overtimetable",
+        "hours",
+        "compensatorytime"
       ]
     },
     {
@@ -124,6 +159,11 @@
       "primary": "overtime-leave",
       "subtopics": [
         "annual-leave"
+      ],
+      "featuredActions": [
+        "leavebalance",
+        "unusedleave",
+        "vacation"
       ]
     },
     {
@@ -141,6 +181,11 @@
       "primary": "unlawful-dismissal",
       "subtopics": [
         "severance-compensation"
+      ],
+      "featuredActions": [
+        "terminationreason",
+        "math",
+        "departureagreement"
       ]
     },
     {
@@ -153,6 +198,11 @@
       "primary": "labor-contracts",
       "subtopics": [
         "departure-certificate"
+      ],
+      "featuredActions": [
+        "departureproof",
+        "certificate",
+        "lastworkday"
       ]
     },
     {
@@ -168,6 +218,11 @@
       "primary": "transfer-paycuts",
       "subtopics": [
         "change-agreement"
+      ],
+      "featuredActions": [
+        "paycutbasis",
+        "transfernotice",
+        "adjust"
       ]
     },
     {
@@ -181,6 +236,11 @@
       "primary": "labor-contracts",
       "subtopics": [
         "non-compete"
+      ],
+      "featuredActions": [
+        "noncompeteexit",
+        "noncompetescale",
+        "sidejob"
       ]
     },
     {
@@ -195,6 +255,11 @@
       "primary": "unlawful-dismissal",
       "subtopics": [
         "arbitration-timing"
+      ],
+      "featuredActions": [
+        "casechronology",
+        "jurisdiction",
+        "limitation"
       ]
     },
     {
@@ -206,7 +271,12 @@
         "工作受伤"
       ],
       "primary": "work-injury",
-      "subtopics": []
+      "subtopics": [],
+      "featuredActions": [
+        "workinjurydocs",
+        "injuryroute",
+        "injury"
+      ]
     }
   ]
 }
