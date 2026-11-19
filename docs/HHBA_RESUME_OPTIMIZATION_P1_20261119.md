@@ -78,3 +78,11 @@ HHBA_PNVS_AUTH_DB=<D1 binding>          # 按环境隔离
 - 该复评 **不调用生成式 AI**，不将简历或分数写入额度表。新增 `d1/0022_resume_reassessment_usage.sql`，只存请求 ID、日期和 hash，默认每人每天 12 次、全站每天 400 次。
 - 新增部署开关 `HHBA_RESUME_REASSESS_ENABLED=1`；只有已完成 0022 迁移，且现有候选人登录、官方快照与 ASSETS 绑定可用时才启用。
 - 测试：`scripts/resume-reassessment.domain.test.mjs`、`scripts/resume-reassessment.route.test.mjs`，并纳入独立 CI。尚需真实浏览器与真实官方快照灰度验收。
+
+## P1.4 增量：接入当前搜索式智能匹配入口
+- `src/pages/CandidateMatchPage.tsx` 现在在一次浏览器端 PDF/DOCX 文字提取后，把同一份文字用于现有匹配与后续简历优化；不会因为打开优化器而重新触发整个岗位匹配。若用户已在预览文本框中修改过内容，使用的永远是修改后的文字，绝不无声回退到原始上传文件。
+- `src/components/CandidateMatchNativeDialog.tsx`：在当前搜索式岗位推荐卡片添加「针对这个岗位优化简历」，完成匹配后直接打开同一 `TargetedResumeOptimization` 编辑器；流式未完成的结果不开放完整优化。
+- 现有 `MatchProfile` 暂不提供可核实的结构化雇主/工作经历，所以 `sourceResumeBlocks` 将已脱敏的浏览器本地原文按段落划分供用户亲自整理，并明确标注为「简历原始文字 · 待结构化」，打印稿也标明「原始内容（请检查并整理）」。**不能把尚未解析的原文段落冒称为已验证的工作经历、企业或职务。**
+- 新的可编辑简历打印排版、保存与多模型润色统一复用旧版组件。处理过的原始文本只存在当前浏览器页面状态，不会因开启优化器而自动入库。
+- 官方 ATS 的 V2 重评分目前只覆盖通过 hash 和同版快照校验的中国大陆站内职位；以 DeepSeek Search 联网发现的站外候选岗位暂时只支持润色与文字覆盖提示，**不提供不真实的重新评分**。
+- CI 要覆盖 `CandidateMatchPage.tsx`、`CandidateMatchNativeDialog.tsx`、打印文档原文回填，必须保持原匹配页的隐私与预览文本回退保护。
