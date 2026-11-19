@@ -54,12 +54,28 @@ export async function generateSuggestions({env,blocks,job,signal}){
   headers={'content-type':'application/json',authorization:'Bearer '+provider.key};
   body={model:provider.model,messages:[{role:'system',content:system},{role:'user',content:input}],...(provider.name==='openai'?{max_completion_tokens:2200}:{max_tokens:2200}),...(provider.name==='deepseek'?{response_format:{type:'json_object'},thinking:{type:'disabled'}}:{})};
  }
- const response=await fetch(url,{method:'POST',headers,body:JSON.stringify(body),signal,redirect:'error'});
- if(!response.ok)throw new Error('AI_PROVIDER_REQUEST_FAILED');
- const data=await response.json();
+ let response;
+ try{
+  response=await fetch(url,{method:'POST',headers,body:JSON.stringify(body),signal,redirect:'error'});
+ }catch(e){
+  throw new Error(e?.name==='TimeoutError'||e?.name==='AbortError'?
+   'AI_PROVIDER_TIMEOUT':'AI_PROVIDER_NETWORK_ERROR');
+ }
+ // No upstream response body or URL (potentially containing PII) is exposed.
+ if(!response.ok){
+  const status=response.status;
+  if(status===400||status===422)throw new Error('AI_PROVIDER_REQUEST_REJECTED');
+  if(status===401||status===403)throw new Error('AI_PROVIDER_KEY_REJECTED');
+  if(status===402)throw new Error('AI_PROVIDER_BALANCE_INSUFFICIENT');
+  if(status===429)throw new Error('AI_PROVIDER_RATE_LIMITED');
+  if(status>=500)throw new Error('AI_PROVIDER_UPSTREAM_ERROR');
+  throw new Error('AI_PROVIDER_REQUEST_FAILED');
+ }
+ let data;
+ try{data=await response.json();}catch{throw new Error('AI_PROVIDER_RESPONSE_INVALID');}
  const output=provider.protocol==='anthropic'?data?.content?.filter(x=>x.type==='text').map(x=>x.text).join(''):data?.choices?.[0]?.message?.content;
- if(typeof output!=='string')throw new Error('INVALID_AI_RESPONSE');
+ if(typeof output!=='string'||!output.trim())throw new Error('AI_PROVIDER_RESPONSE_INVALID');
  let parsed;
- try{parsed=JSON.parse(output.replace(/^\s*```(?:json)?\s*|\s*```\s*$/g,''));}catch{throw new Error('INVALID_AI_RESPONSE')}
+ try{parsed=JSON.parse(output.replace(/^\s*```(?:json)?\s*|\s*```\s*$/g,''));}catch{throw new Error('AI_PROVIDER_RESPONSE_INVALID')}
  return {provider:provider.name,suggestions:parseSuggestions(parsed,blocks.map(b=>b.id))};
 }
