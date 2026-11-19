@@ -18,6 +18,7 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
  const [suggestions,setSuggestions]=useState<ResumeSuggestion[]>([]);
  const [ignored,setIgnored]=useState<string[]>([]);
  const [confirmed,setConfirmed]=useState<string[]>([]);
+ const [newEvidence,setNewEvidence]=useState<Record<string,string>>({});
  const [consent,setConsent]=useState(false);
  const [notice,setNotice]=useState('');
  const [busy,setBusy]=useState(false);
@@ -61,7 +62,7 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
   active.current?.abort();setBusy(false);
   setVersion({id:item.id,targetJobId:job.id,blocks:item.version.blocks,
    acceptedSuggestionIds:item.version.acceptedSuggestionIds});
-  setSuggestions([]);setIgnored([]);setConfirmed([]);
+  setSuggestions([]);setIgnored([]);setConfirmed([]);setNewEvidence({});
   setNotice('已载入 '+new Date(item.created_at).toLocaleString()+' 的简历版本；没有修改原始简历。');
  }
  async function remove(item:SavedResumeVersion){
@@ -74,16 +75,17 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
  }
  async function generate(){
   if(!consent||!blocks.length||busy||!status?.enabled)return;
-  setBusy(true);setNotice('');setSuggestions([]);setIgnored([]);setConfirmed([]);setVersion(initial());
+  if(version.acceptedSuggestionIds.length>0&&!window.confirm('重新生成会清除当前尚未保存的填充修改。确定继续吗？'))return;
+  setBusy(true);setNotice('');setSuggestions([]);setIgnored([]);setConfirmed([]);setNewEvidence({});setVersion(initial());
   const controller=new AbortController();active.current=controller;
   try{
    const incoming=await requestResumeOptimization(blocks,{
     title:(job.title_zh||job.title).slice(0,120),requirements
    },controller.signal);
-   const unique=new Set<string>();
+   const unique=new Set<string>(),usedBlocks=new Set<string>();
    const accepted=incoming.filter(s=>{
-    if(unique.has(s.id)||!validateSuggestion(blocks,s))return false;
-    unique.add(s.id);return true;
+    if(unique.has(s.id)||usedBlocks.has(s.blockId)||!validateSuggestion(blocks,s))return false;
+    unique.add(s.id);usedBlocks.add(s.blockId);return true;
    });
    setSuggestions(accepted);
    setNotice(accepted.length?'建议已生成。请逐条核实真实性，再选择填充。':'本次 AI 未发现可以可靠润色的内容。');
@@ -101,9 +103,18 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
    setNotice('已填充到本次预览，原始简历文件没有被修改。');
   }catch{setNotice('原文已变化或缺乏真实证据，请重新生成建议。');}
  }
+ function addFact(s:ResumeSuggestion){
+  const text=(newEvidence[s.id]||'').trim();
+  if(text.length<8){setNotice('请具体描述你的真实经历或成果，至少8个字。');return;}
+  if(!confirmed.includes(s.id)){setNotice('请确认补充内容真实、准确后再填充。');return;}
+  try{
+   setVersion(applySuggestion(version,{...s,action:'append',proposed:text},true));
+   setNotice('已将你亲自填写的真实信息添加到当前简历预览。');
+  }catch{setNotice('原文已经变化，请重新生成补充建议。');}
+ }
  function reset(){
   active.current?.abort();setBusy(false);setVersion(initial());setSuggestions([]);
-  setIgnored([]);setConfirmed([]);setNotice('已恢复原始预览。');
+  setIgnored([]);setConfirmed([]);setNewEvidence({});setNotice('已恢复原始预览。');
  }
  const hasSession=realAuthReady&&Boolean(getRealAuthToken());
  return <section className="targeted-resume" aria-label="岗位定向简历优化">
@@ -138,13 +149,21 @@ export function TargetedResumeOptimization({profile,job}:{profile:CandidateProfi
       <p className="targeted-resume-gradient">{s.proposed}</p>
       <p className="targeted-resume-rationale">对应岗位要求：{s.jobRequirement}</p>
       <p className="targeted-resume-rationale">{s.rationale}</p>
-      {s.action!=='request_evidence'&&<label className="targeted-resume-confirm">
+      {s.action==='request_evidence'&&<label className="targeted-resume-fact-entry">
+       <span>补充你的真实经历或成果（不会使用 AI 猜测的数据）</span>
+       <textarea maxLength={800} rows={3} value={newEvidence[s.id]||''}
+        onChange={e=>setNewEvidence(prev=>({...prev,[s.id]:e.target.value}))}
+        placeholder="例如：在某项工作中具体做了什么、取得了什么可核实的结果"/>
+      </label>}
+      <label className="targeted-resume-confirm">
        <input type="checkbox" checked={confirmed.includes(s.id)}
         onChange={e=>setConfirmed(v=>e.target.checked?[...v,s.id]:v.filter(id=>id!==s.id))}/>
-       我已核实建议中的经历、能力和数据均属实
-      </label>}
+       我已核实建议或补充内容中的经历、能力和数据均属实
+      </label>
       <div className="targeted-resume-actions">
-       {s.action!=='request_evidence'&&<button type="button" disabled={!confirmed.includes(s.id)} onClick={()=>accept(s)}>填充此建议</button>}
+       {s.action==='request_evidence'
+        ?<button type="button" disabled={!confirmed.includes(s.id)||!(newEvidence[s.id]||'').trim()} onClick={()=>addFact(s)}>填充我的补充</button>
+        :<button type="button" disabled={!confirmed.includes(s.id)} onClick={()=>accept(s)}>填充此建议</button>}
        <button type="button" onClick={()=>setIgnored(v=>[...v,s.id])}>保留原文</button>
       </div>
      </div>}
