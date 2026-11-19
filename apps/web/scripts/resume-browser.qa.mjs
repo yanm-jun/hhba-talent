@@ -58,9 +58,14 @@ try{
  const pdf=await page.pdf({format:'A4',printBackground:true});
  await writeFile(output+'/desktop-resume.pdf',pdf);
  const pages=await pdfText(pdf);
- assert.ok(pages.join(' ').includes('验收用虚拟姓名'),'PDF must contain manually entered name');
- assert.ok(pages.join(' ').includes('合成测试门店'),'PDF must contain edited experience');
- assert.ok(!pages.join(' ').includes('生成 AI 建议'),'PDF must not include editor controls');
+ const fullText=pages.join(' ').replace(/\\s+/g,'');
+ console.log('PRINT_DIAGNOSTIC',JSON.stringify({pdf_bytes:pdf.length,page_count:pages.length,
+  extracted_chars:fullText.length,containsName:fullText.includes('验收用虚拟姓名'),
+  containsEditedExperience:fullText.includes('合成测试门店'),
+  contentPreview:fullText.slice(0,110)}));
+ assert.ok(fullText.includes('验收用虚拟姓名'),'PDF must contain manually entered name');
+ assert.ok(fullText.includes('合成测试门店'),'PDF must contain edited experience');
+ assert.ok(!fullText.includes('生成AI建议'),'PDF must not include editor controls');
  await page.screenshot({path:output+'/desktop-editor.png',fullPage:true});
  const save=page.getByRole('button',{name:'保存当前版本'});
  assert.equal(await save.isDisabled(),true,'cloud save must require explicit confirmation');
@@ -99,7 +104,7 @@ try{
  await writeFile(output+'/multipage-resume.pdf',longPdf);
  const longPages=await pdfText(longPdf);
  assert.ok(longPages.length>=2,'long resume must paginate across A4 pages; got '+longPages.length);
- assert.ok(longPages.join(' ').includes('第12段'),
+ assert.ok(longPages.join(' ').replace(/\\s+/g,'').includes('第12段'),
   'multi-page PDF must include final source paragraph; it must not clip content');
  await long.close();
  console.log(JSON.stringify({result:'PASSED',desktop_pdf_pages:pages.length,
