@@ -326,7 +326,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
    </div>)}
   </div>}
   <div className="targeted-resume-footer">
-   <p><ShieldCheck size={14} aria-hidden="true"/> 岗位相关性参考：{job.reference_score}/100。润色后的匹配分须通过同一评分规则重新评估；本预览不虚报分数。</p>
+   <p><ShieldCheck size={14} aria-hidden="true"/> 原始岗位卡片参考分：{Number.isInteger(job.reference_score)?job.reference_score+'/100':'暂无可靠分数'}。润色后的匹配分须通过同一评分规则重新评估；本预览不虚报分数。</p>
    <button type="button" onClick={reset}><Undo2 size={14}/> 恢复原始预览</button>
   </div>
   {notice&&<p role="status" className="targeted-resume-notice">{notice}</p>}
