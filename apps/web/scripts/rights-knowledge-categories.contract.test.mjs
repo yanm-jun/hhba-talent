@@ -56,6 +56,6 @@ test('knowledge landing has searchable issue rows, accessible category buttons a
 test('all twenty detail URLs remain accessible through current public router',()=>{
  const routes=read('src/main.tsx');
  assert.match(routes,/route==='\/rights\/knowledge'/);
- assert.match(routes,/supportedLaborTopicSlugs/);
+ assert.match(routes,/<LegalAidTopicPage user=\{user\} slug=\{route\.split/);
  assert.match(routes,/route==='\/rights\/guide'/);
 });
