@@ -40,6 +40,23 @@ try{
  await generate.click();
  const tip=page.locator('.targeted-resume-suggestion');
  await tip.first().waitFor();
+ const siriText=tip.first().locator('.targeted-resume-gradient');
+ await siriText.waitFor();
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ const animated=await siriText.evaluate(el=>({
+  name:getComputedStyle(el).animationName,
+  image:getComputedStyle(el).backgroundImage,
+  text:getComputedStyle(el).getPropertyValue('-webkit-text-fill-color')
+ }));
+ assert.match(animated.name,/hhba-siri-text-flow/,'AI draft should animate gently');
+ assert.match(animated.image,/linear-gradient/,'AI draft should use text gradient');
+ assert.equal(animated.text,'rgba(0, 0, 0, 0)','gradient should be clipped to AI text');
+ await page.screenshot({path:output+'/siri-ai-suggestion.png',fullPage:true,animations:'disabled'});
+ await page.emulateMedia({reducedMotion:'reduce'});
+ const still=await siriText.evaluate(el=>getComputedStyle(el).animationName);
+ assert.equal(still,'none','reduced-motion readers get a static accessible suggestion');
+ assert.match(await siriText.textContent(),/同步整理每日服务记录/,'motion setting must not alter draft content');
+ await page.emulateMedia({reducedMotion:'no-preference'});
  assert.equal(await page.getByRole('button',{name:'填充此建议'}).isDisabled(),true,
   'AI suggestion must not auto-fill without truthful confirmation');
  await tip.first().locator('input[type=checkbox]').check();
