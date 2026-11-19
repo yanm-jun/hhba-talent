@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "description": "HHBA 劳动权益首页六类导航。问题标题仅作为已有法条专题的阅读入口，不表示法律判断。",
+  "groups": [
+    {
+      "id": "salary",
+      "label": "工资与报酬",
+      "icon": "wallet",
+      "topics": [
+        {
+          "slug": "unpaid-wages",
+          "question": "公司拖欠工资怎么办？"
+        },
+        {
+          "slug": "payroll-deductions",
+          "question": "工资被扣了怎么办？"
+        },
+        {
+          "slug": "commissions-bonuses",
+          "question": "销售提成或绩效奖金没发怎么办？"
+        }
+      ]
+    },
+    {
+      "id": "contract",
+      "label": "劳动合同",
+      "icon": "file-text",
+      "topics": [
+        {
+          "slug": "labor-contracts",
+          "question": "劳动合同发生纠纷怎么办？"
+        },
+        {
+          "slug": "written-contract",
+          "question": "入职后公司不签合同怎么办？"
+        },
+        {
+          "slug": "probation-rules",
+          "question": "试用期工资和期限有什么规定？"
+        },
+        {
+          "slug": "non-compete",
+          "question": "竞业限制条款合理吗？"
+        }
+      ]
+    },
+    {
+      "id": "dismissal",
+      "label": "辞退与离职",
+      "icon": "briefcase-business",
+      "topics": [
+        {
+          "slug": "unlawful-dismissal",
+          "question": "被辞退了，我该怎么办？"
+        },
+        {
+          "slug": "severance-compensation",
+          "question": "经济补偿和赔偿金怎么算？"
+        },
+        {
+          "slug": "departure-certificate",
+          "question": "公司不给离职证明怎么办？"
+        }
+      ]
+    },
+    {
+      "id": "insurance",
+      "label": "社保与工伤",
+      "icon": "shield-check",
+      "topics": [
+        {
+          "slug": "social-insurance",
+          "question": "公司没缴社保怎么办？"
+        },
+        {
+          "slug": "work-injury",
+          "question": "工作受伤后如何申请工伤？"
+        },
+        {
+          "slug": "probation-insurance",
+          "question": "试用期不缴社保合法吗？"
+        }
+      ]
+    },
+    {
+      "id": "time",
+      "label": "加班与休假",
+      "icon": "clock",
+      "topics": [
+        {
+          "slug": "overtime-leave",
+          "question": "加班和休假有哪些权益？"
+        },
+        {
+          "slug": "overtime-proof",
+          "question": "加班费如何取证与核算？"
+        },
+        {
+          "slug": "annual-leave",
+          "question": "公司不给年假怎么办？"
+        }
+      ]
+    },
+    {
+      "id": "change",
+      "label": "调岗与劳动争议",
+      "icon": "scale",
+      "topics": [
+        {
+          "slug": "transfer-paycuts",
+          "question": "公司突然调岗降薪怎么办？"
+        },
+        {
+          "slug": "flexible-work",
+          "question": "劳务派遣、外包等权益怎么认定？"
+        },
+        {
+          "slug": "change-agreement",
+          "question": "调岗降薪需要协商吗？"
+        },
+        {
+          "slug": "arbitration-timing",
+          "question": "劳动仲裁要准备什么、注意哪些期限？"
+        }
+      ]
+    }
+  ]
+}
