@@ -5,6 +5,7 @@ import {Link} from '../router';
 import type {User} from '../services/api';
 import laborRights from '../data/laborRightsTopics.json';
 import subtopics from '../data/laborRightsSubtopics.json';
+import intentData from '../data/laborRightsSearchIntents.json';
 import {GUIDE_TIPS} from '../data/hhbaWorkValueGuide';
 import '../styles/legal-aid-landing.css';
 import '../styles/hhba-work-value-guide.css';
@@ -21,17 +22,22 @@ const topicKeywords:Record<string,string[]>={
  'flexible-work':['外包','派遣','兼职','实习','零工','劳动关系']
 };
 const normal=(s:string)=>s.trim().toLocaleLowerCase();
+const matchingIntents=(raw:string)=>{
+ const q=normal(raw);
+ if(!q)return [];
+ return intentData.intents.filter(intent=>intent.phrases.some(phrase=>q.includes(normal(phrase))));
+};
 function topicMatches(topic:(typeof laborRights.topics)[number],raw:string){
  const query=normal(raw);
  if(!query)return true;
  const text=[topic.title,topic.short,...topic.situations,...topic.laws.map(law=>law.name+' '+law.articles),...topic.paths.map(p=>p.title+' '+p.description),topic.case.title].join(' ').toLocaleLowerCase();
- return text.includes(query)||(topicKeywords[topic.slug]||[]).some(tag=>query.includes(tag)||tag.includes(query)&&query.length>=2);
+ return text.includes(query)||(topicKeywords[topic.slug]||[]).some(tag=>query.includes(tag)||tag.includes(query)&&query.length>=2)||matchingIntents(query).some(intent=>intent.primary===topic.slug);
 }
 function subtopicMatches(topic:(typeof subtopics.topics)[number],raw:string){
  const query=normal(raw);
  if(!query)return true;
  const words=[topic.title,topic.short,...topic.aliases,...topic.situations,...topic.misconceptions,...topic.laws.map(law=>law.name+' '+law.articles)].join(' ').toLocaleLowerCase();
- return words.includes(query)||topic.aliases.some(a=>query.includes(normal(a))||normal(a).includes(query)&&query.length>=2);
+ return words.includes(query)||topic.aliases.some(a=>query.includes(normal(a))||normal(a).includes(query)&&query.length>=2)||matchingIntents(query).some(intent=>intent.subtopics.includes(topic.slug));
 }
 function tipMatches(tip:(typeof GUIDE_TIPS)[number],raw:string){
  const query=normal(raw);
@@ -53,10 +59,15 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
   const relatedSlugs=new Set(laborRights.topics.filter(topic=>
    (topicKeywords[topic.slug]||[]).some(word=>q.includes(word.toLocaleLowerCase()))
   ).map(topic=>topic.slug));
+  for(const intent of matchingIntents(query)){
+   relatedSlugs.add(intent.primary);
+   for(const slug of intent.subtopics)relatedSlugs.add(slug);
+  }
+  for(const topic of subMatches)relatedSlugs.add(topic.slug);
   return GUIDE_TIPS.filter(tip=>
    tipMatches(tip,query)||(tip.topic!==null&&relatedSlugs.has(tip.topic))
   ).slice(0,6);
- },[query]);
+ },[query,subMatches]);
  return <Shell user={user} embedded={embedded}>
   <main className="hhba-law hhba-rights-knowledge" id="main-content">
    <section className="hhba-law-panel" aria-labelledby="hhba-law-title">
@@ -79,7 +90,7 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
       <p>劳动合同、工资、加班、辞退、社保和工伤等问题，分为 8 类深度专题和 12 个细分专题，提供证据清单、处理方法及可核对的官方出处。</p>
      </section>
      <label className="hhba-knowledge-search"><Search size={20}/><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="描述你的问题，例如：公司三个月没有发工资…" aria-label="搜索劳动权益知识和职场行动建议"/></label>
-     <div className="hhba-knowledge-search-help"><span>即时本地检索 · 无需登录 · 不上传你的问题</span><span>资料核对：{laborRights.reviewedOn}</span></div>
+     <div className="hhba-knowledge-search-help"><span>本地关键词与常见说法匹配 · 无需登录 · 不上传你的问题</span><span>资料核对：{laborRights.reviewedOn}</span></div>
      <div className="hhba-knowledge-examples" aria-label="常见问题示例">
       {examples.map(v=><button type="button" onClick={()=>setQuery(v)} key={v}>{v}</button>)}
       {query&&<button type="button" onClick={()=>setQuery('')}>清除搜索</button>}
@@ -119,7 +130,7 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
        </Link>)}
       </div>:<div className="hhba-knowledge-no-match">暂无匹配的职场建议，可以进入完整指南按阶段查找。</div>}
      </section>
-     <p className="hhba-knowledge-notice">收录 8 个深度专题及 12 个细分专题。以上内容限于中国大陆劳动权益一般信息，不是个案法律结论，也不代表已经受理案件。官方法律和案例链接均收录在专题详情中；实际适用应结合当地规定、个案事实及法律更新核对。本页为关键词检索，不是 AI 自动法律判断。</p>
+     <p className="hhba-knowledge-notice">收录 8 个深度专题及 12 个细分专题。以上内容限于中国大陆劳动权益一般信息，不是个案法律结论，也不代表已经受理案件。官方法律和案例链接均收录在专题详情中；实际适用应结合当地规定、个案事实及法律更新核对。本页使用关键词和常见说法匹配，只用于查找资料，不会自动判断是否违法。</p>
     </div>
    </section>
   </main>
