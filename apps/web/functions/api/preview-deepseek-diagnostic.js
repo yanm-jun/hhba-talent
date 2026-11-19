@@ -56,7 +56,7 @@ export async function onRequestPost({request,env}){
  let response;
  try{
   response=await fetch('https://api.deepseek.com/user/balance',{
-   method:'GET',redirect:'error',signal:AbortSignal.timeout(12000),
+   method:'GET',redirect:'manual',signal:AbortSignal.timeout(12000),
    headers:{Authorization:'Bearer '+provider.key,Accept:'application/json'}
   });
  }catch{return send({ok:false,code:'PROVIDER_NETWORK_ERROR'},502);}
