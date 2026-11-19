@@ -46,6 +46,12 @@ jobs:
           npm ci
           npm install --no-save --package-lock=false playwright-core@1.56.1
           command -v google-chrome || command -v chromium
+      - name: Install actual Chinese fonts for Chromium PDF verification
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          fc-match "Noto Sans CJK SC"
       - name: Start Vite development server with only synthetic QA data
         run: |
           VITE_HHBA_REAL_AUTH_ENABLED=1 npm run dev -- --host 127.0.0.1 --port 3000 > /tmp/hhba-resume-qa-vite.log 2>&1 &
