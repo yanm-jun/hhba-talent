@@ -6,6 +6,10 @@ on:
     paths:
       - '.github/workflows/hhba-resume-preview-http-acceptance.yml'
       - 'apps/web/scripts/resume-preview-http.qa.mjs'
+  pull_request:
+    paths:
+      - '.github/workflows/hhba-resume-preview-http-acceptance.yml'
+      - 'apps/web/scripts/resume-preview-http.qa.mjs'
   workflow_dispatch:
     inputs:
       preview_url:
