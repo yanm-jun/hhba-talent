@@ -28,12 +28,12 @@ test('mobile spacing and headline remain readable without horizontal overflow',(
 });
 test('home preserves job search, company directory and adds labor-rights support',()=>{
  for(const t of ['让机会与人才，找到彼此。','找工作，不止于找到工作。','你来到这里，是为了什么？',
-    'title="我要应聘"','title="劳动权益支持"','title="企业招聘导航"','<UnifiedJobMarket compact/>']){
+    'title="求职与机会"','title="劳动权益"','title="企业招聘导航"','<UnifiedJobMarket compact/>']){
   assert.ok(home.includes(t),'home content unexpectedly removed: '+t);
  }
  assert.ok(home.includes("kind==='candidate'?'/candidate/jobs'"),
-   'public 我要应聘 card must consistently open the public job market');
- assert.ok(home.includes("kind==='rights'?'/rights'"),
+   'public 求职与机会 card must consistently open the public job market');
+ assert.ok(home.includes("kind==='rights'?'/rights/knowledge'"),
    'public rights card must open a standalone explanation');
  assert.ok(home.includes(":'/companies/library'"),'company directory entry must lead to the 17 industry halls');
  assert.ok(home.includes('className="home-match-promo"'),'resume matching link changed');
