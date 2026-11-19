@@ -21,7 +21,8 @@ const topicKeywords:Record<string,string[]>={
  'transfer-paycuts':['调岗','降薪','异地','调动','转岗','工资降低'],
  'flexible-work':['外包','派遣','兼职','实习','零工','劳动关系']
 };
-const normal=(s:string)=>s.trim().toLocaleLowerCase();
+// Treat punctuation and spacing differences as the same local lookup query.
+const normal=(s:string)=>s.normalize('NFKC').toLocaleLowerCase().replace(/[\p{P}\p{Z}\s]+/gu,'');
 const matchingIntents=(raw:string)=>{
  const q=normal(raw);
  if(!q)return [];
@@ -30,19 +31,19 @@ const matchingIntents=(raw:string)=>{
 function topicMatches(topic:(typeof laborRights.topics)[number],raw:string){
  const query=normal(raw);
  if(!query)return true;
- const text=[topic.title,topic.short,...topic.situations,...topic.laws.map(law=>law.name+' '+law.articles),...topic.paths.map(p=>p.title+' '+p.description),topic.case.title].join(' ').toLocaleLowerCase();
+ const text=normal([topic.title,topic.short,...topic.situations,...topic.laws.map(law=>law.name+' '+law.articles),...topic.paths.map(p=>p.title+' '+p.description),topic.case.title].join(' '));
  return text.includes(query)||(topicKeywords[topic.slug]||[]).some(tag=>query.includes(tag)||tag.includes(query)&&query.length>=2)||matchingIntents(query).some(intent=>intent.primary===topic.slug);
 }
 function subtopicMatches(topic:(typeof subtopics.topics)[number],raw:string){
  const query=normal(raw);
  if(!query)return true;
- const words=[topic.title,topic.short,...topic.aliases,...topic.situations,...topic.misconceptions,...topic.laws.map(law=>law.name+' '+law.articles)].join(' ').toLocaleLowerCase();
+ const words=normal([topic.title,topic.short,...topic.aliases,...topic.situations,...topic.misconceptions,...topic.laws.map(law=>law.name+' '+law.articles)].join(' '));
  return words.includes(query)||topic.aliases.some(a=>query.includes(normal(a))||normal(a).includes(query)&&query.length>=2)||matchingIntents(query).some(intent=>intent.subtopics.includes(topic.slug));
 }
 function tipMatches(tip:(typeof GUIDE_TIPS)[number],raw:string){
  const query=normal(raw);
  if(!query)return false;
- const content=[tip.title,tip.summary,...tip.steps,...tip.keywords].join(' ').toLocaleLowerCase();
+ const content=normal([tip.title,tip.summary,...tip.steps,...tip.keywords].join(' '));
  return content.includes(query)||tip.keywords.some(tag=>query.includes(tag)||tag.includes(query)&&query.length>=2);
 }
 const examples=['公司不发工资','被辞退怎么办','试用期社保','调岗降薪','加班费','离职证明'];
@@ -58,7 +59,7 @@ export function LegalAidLandingPage({user,embedded=false}:{user:User|null;embedd
   const intents=matchingIntents(query);
   const featuredActions=[...new Set(intents.flatMap(intent=>intent.featuredActions))];
   const relatedSlugs=new Set(laborRights.topics.filter(topic=>
-   (topicKeywords[topic.slug]||[]).some(word=>q.includes(word.toLocaleLowerCase()))
+   (topicKeywords[topic.slug]||[]).some(word=>q.includes(normal(word)))
   ).map(topic=>topic.slug));
   for(const intent of intents){
    relatedSlugs.add(intent.primary);
