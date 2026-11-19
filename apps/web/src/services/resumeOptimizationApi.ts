@@ -24,7 +24,12 @@ const OPTIMIZATION_ERRORS:Record<string,string>={
   AI_PROVIDER_UNEXPECTED_REDIRECT:'AI 模型返回了不安全的跳转地址，已阻止请求。',
   AI_PROVIDER_NETWORK_ERROR:'服务器暂时无法连接 AI 模型，未修改简历。',
   AI_PROVIDER_TIMEOUT:'AI 润色等待超时，未修改简历。',
-  AI_PROVIDER_RESPONSE_INVALID:'AI 返回内容格式不符合要求，未修改简历。'
+  AI_PROVIDER_RESPONSE_INVALID:'AI 返回内容格式不符合要求，未修改简历。',
+  AI_PROVIDER_RESPONSE_HTTP_INVALID:'AI 服务返回非标准数据，未修改简历。',
+  AI_PROVIDER_RESPONSE_TRUNCATED:'AI 建议生成被截断，请缩短简历段落后重试。',
+  AI_PROVIDER_RESPONSE_EMPTY:'AI 没有生成可用文字，请稍后重试。',
+  AI_PROVIDER_RESPONSE_JSON_INVALID:'AI 返回的 JSON 不完整，请稍后重试。',
+  AI_PROVIDER_SUGGESTION_SCHEMA_INVALID:'AI 的建议格式不符合安全要求，请稍后重试。'
 };
 export class ResumeOptimizationError extends Error{
  constructor(readonly code:string,readonly status:number){super(OPTIMIZATION_ERRORS[code]||'简历润色请求失败，请稍后再试。')}
