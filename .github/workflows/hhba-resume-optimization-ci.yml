@@ -60,3 +60,12 @@ jobs:
       - name: TypeScript and Vite build
         working-directory: apps/web
         run: npm run build
+      - name: Ensure synthetic browser fixture is not shipped to production
+        working-directory: apps/web
+        run: |
+          test ! -f dist/qa/resume-flow.html
+          test ! -e dist/qa/resume-flow.tsx
+          if grep -Rql --fixed-strings 'synthetic-browser-qa-token' dist; then
+            echo 'ERROR: QA token fixture leaked into production output'
+            exit 1
+          fi
