@@ -31,11 +31,12 @@ function createD1(){
   sqlite.exec(readFileSync(new URL('../d1/'+file,import.meta.url),'utf8'));
  const d1={prepare(sql){
   const p=sqlite.prepare(sql);
-  return {bind(...args){return {
+  const statement=(args)=>({
    async first(){return p.get(...args)??null},
    async all(){return {success:true,results:p.all(...args)}},
    async run(){const r=p.run(...args);return {success:true,meta:{changes:Number(r.changes)}}}
-  }}};
+  });
+  return {...statement([]),bind(...args){return statement(args)}};
  }};
  return {d1,sqlite};
 }
