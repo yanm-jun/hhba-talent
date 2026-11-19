@@ -101,7 +101,7 @@ export function buildRasterReviewPdf(pages,{searchable=false}={}){
   const pageId=3+3*index,streamId=pageId+1,imageId=pageId+2;
   const pw=Number(item.pageWidth.toFixed(2)),ph=Number(item.pageHeight.toFixed(2));
   object(pageId,['<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+pw+' '+ph+
-   '] /Resources << /XObject << /Im0 '+imageId+' 0 R >> >>'+
+   '] /Resources << /XObject << /Im0 '+imageId+' 0 R >>'+
    (searchable?' /Font << /F1 '+fontId+' 0 R >>':'')+
    ' >> /Contents '+streamId+' 0 R >>']);
   const commands='q\n'+pw+' 0 0 '+ph+' 0 0 cm\n/Im0 Do\nQ\n'+
