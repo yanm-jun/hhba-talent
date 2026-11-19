@@ -39,3 +39,7 @@
 .targeted-resume-history span{font-size:12px;flex:1;color:#54657d}
 .targeted-resume-history button{font-size:12px;padding:5px 9px}
 @media(max-width:650px){.targeted-resume-save{flex-direction:column;align-items:stretch}.targeted-resume-save>button{justify-content:center}.targeted-resume-history>div{flex-wrap:wrap}.targeted-resume-history span{flex-basis:100%}}
+
+.targeted-resume-fact-entry{display:flex;flex-direction:column;gap:8px;margin:12px 0;color:#536278;font-size:12px;font-weight:550}
+.targeted-resume-fact-entry textarea{width:100%;resize:vertical;font:inherit;font-weight:400;font-size:13px;line-height:1.65;border:1px solid #d9dce7;border-radius:9px;padding:10px 12px;background:#fff;color:#24344c;box-sizing:border-box}
+.targeted-resume-fact-entry textarea:focus-visible{outline:2px solid #9082d4;outline-offset:1px}
