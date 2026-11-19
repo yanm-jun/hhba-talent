@@ -31,8 +31,7 @@ function related(requirement:string,resume:string):boolean{
 export function evidenceVisibility(requirements:readonly string[],blocks:readonly ResumeBlock[]):EvidenceVisibility{
  const unique=[...new Set(requirements.map(r=>r.trim()).filter(r=>r.length>=3&&r.length<=160))].slice(0,12);
  if(!unique.length)return {score:null,present:[],missing:[],total:0};
- const original=blocks.map(b=>b.text).join(' ');
- const present=unique.filter(label=>related(label,original));
- const missing=unique.filter(label=>!related(label,original));
+ const present=unique.filter(label=>blocks.some(b=>related(label,b.text)));
+ const missing=unique.filter(label=>!blocks.some(b=>related(label,b.text)));
  return {score:Math.round(present.length/unique.length*100),present,missing,total:unique.length};
 }
