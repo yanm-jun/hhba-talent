@@ -17,3 +17,6 @@
 @media(max-width:680px){.hhba-rebrand-home .hh-home-feature-photo{margin:0 0 24px}}
 
 .hh-home-marksub{display:block}
+.hhba-rebrand-home a.hh-home-action,.hhba-rebrand-home a.hh-home-login,.hhba-rebrand-home a.hh-home-knowledge-cta{color:#fff}
+.hhba-rebrand-home a.hh-home-inline-link{color:var(--hh-navy)}
+.hhba-rebrand-home a.hh-home-inline-link:hover{color:#bf6625}
