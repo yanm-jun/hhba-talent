@@ -21,6 +21,11 @@ function mockEnv(){
      if(records.length>=3)return {success:true,meta:{changes:0}};
      records.push(args);return {success:true,meta:{changes:1}};
     }
+    if(sql.startsWith('DELETE FROM hhba_resume_optimization_requests')){
+     const index=records.findIndex(row=>row[0]===args[0]&&row[2]===args[1]);
+     if(index!==-1)records.splice(index,1);
+     return {success:true,meta:{changes:index===-1?0:1}};
+    }
     return {success:true,meta:{changes:1}};
    }
   }}
@@ -132,4 +137,15 @@ test('very large raw request is rejected before paid provider access',async()=>{
   assert.equal(calls,0);
   assert.equal(h.records.length,0);
  }finally{globalThis.fetch=prior;}
+});
+
+test('upstream failures refund the candidate optimization allowance',async()=>{
+ const h=mockEnv(),previous=globalThis.fetch;
+ globalThis.fetch=async()=>new Response('provider service unavailable',{status:503});
+ try{
+  const failed=await onRequestPost({request:request(),env:h.env});
+  assert.equal(failed.status,502);
+  assert.equal((await failed.json()).error,'AI_PROVIDER_UPSTREAM_ERROR');
+  assert.equal(h.records.length,0,'failed provider calls must not spend user daily quota');
+ }finally{globalThis.fetch=previous;}
 });
