@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {onRequest} from '../functions/api/resume-versions.js';
 const origin='https://preview.hhba.example';
-const content={job_id:'job-42',job_title:'区域运营督导',company:'示例企业',
+const content={job_id:'job-42',job_title:'区域运营督导',company:'示例企业',confirmed_real:true,
  blocks:[{id:'experience-0',section:'experience',text:'负责区域门店运营'}],accepted_ids:['suggest-experience-0']};
 function setup({role='candidate',enabled=true}={}){
  const records=[];
@@ -80,4 +80,27 @@ test('bad document blocks do not persist',async()=>{
  const forged={...content,blocks:[{id:'bad/id',section:'experience',text:'changed'}]};
  assert.equal((await onRequest({request:req('POST','',forged),env:s.env})).status,400);
  assert.equal(s.records.length,0);
+});
+
+test('saving document contact fields requires explicit truthful confirmation',async()=>{
+ const s=setup();
+ const details={fullName:'张示例',headline:'区域运营',email:'sample@example.test',
+  phone:'13000000000',location:'杭州',summary:'负责销售运营',educationDetails:'某高校·某专业'};
+ const denied=await onRequest({request:req('POST','',{...content,details,confirmed_real:false}),env:s.env});
+ assert.equal(denied.status,400);
+ assert.equal(s.records.length,0);
+ const created=await onRequest({request:req('POST','',{...content,details,accepted_ids:[]}),env:s.env});
+ assert.equal(created.status,201);
+ const stored=JSON.parse(s.records[0].content_json);
+ assert.deepEqual(stored.details,details);
+ assert.deepEqual(stored.acceptedSuggestionIds,[]);
+});
+test('oversized or extra document keys are rejected',async()=>{
+ const s=setup();
+ const fields={fullName:'真姓名',headline:'',email:'',phone:'',location:'',
+  summary:'x'.repeat(801),educationDetails:''};
+ const a=await onRequest({request:req('POST','',{...content,details:fields}),env:s.env});
+ assert.equal(a.status,400);
+ const b=await onRequest({request:req('POST','',{...content,details:{...fields,summary:'ok',admin:true}}),env:s.env});
+ assert.equal(b.status,400);
 });
