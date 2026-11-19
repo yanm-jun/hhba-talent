@@ -107,3 +107,11 @@ HHBA_PNVS_AUTH_DB=<D1 binding>          # 按环境隔离
 - 当前代码中的四项功能在部署环境仍默认关闭（`HHBA_RESUME_OPTIMIZATION_ENABLED`、`HHBA_RESUME_VERSION_STORAGE_ENABLED`、`HHBA_RESUME_REASSESS_ENABLED`、`HHBA_OFFICIAL_JOB_VERIFY_ENABLED`）；未因 D1 建表而自动向用户开放。真实 AI 模型 Key/型号配置、浏览器打印和官网实时 HTML 拉取仍需单独联调。
 - GitHub 专用 CI 通过不能替代 Cloudflare Pages 构建成功。必须核对**本次提交的实际预览部署状态及可访问 URL**，再进行浏览器与请求级验收。
 - 预览库 ID、服务端密钥、用户简历、手机号等不要写入 PR 或公共验收日志。
+
+### Preview 环境开关状态补记（2026-11-19）
+
+- Cloudflare Pages `hhba-talent` 的 **Preview 部署配置**现已单独开启 `HHBA_RESUME_OPTIMIZATION_ENABLED=1`、`HHBA_RESUME_VERSION_STORAGE_ENABLED=1`、`HHBA_RESUME_REASSESS_ENABLED=1`、`HHBA_OFFICIAL_JOB_VERIFY_ENABLED=1`。
+- Preview 已明确设置 `HHBA_AI_DEEPSEEK_MODEL=deepseek-flash`；服务端适配器优先读取专用模型密钥，若未设置则安全复用既有 `HHBA_MATCH_DEEPSEEK_KEY`。密钥始终由 Cloudflare 加密保存、不进入前端包或仓库。
+- 通过 Cloudflare Pages API 修改后重新检查：原有预览变量名及类型完整保留；预览 D1 绑定没变；生产环境变量名、生产分支 `main` 未改动。
+- 在隔离 Preview D1 中使用**合成且不含个人数据**的 request ID 对 V2 额度表执行一次条件插入（实际写入 1 行），随后删除同一行成功，确认真实 D1 额度 SQL 可以执行且无测试垃圾记录。
+- 修改 Pages 配置之后仍须以**新的成功部署**为准，旧部署可能使用更早的环境快照。未取得浏览器端真实模型答复前，不得声称完成线上 AI 端到端验收。
