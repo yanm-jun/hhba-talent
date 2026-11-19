@@ -8,7 +8,7 @@ const send=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:
  'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'
 }});
 const fail=(code,status)=>send({ok:false,error:code},status);
-const MAX_BODY=18000,MAX_BLOCKS=12,MAX_GLOBAL=50,MAX_PERSONAL=3;
+const MAX_BODY=96*1024,MAX_BLOCKS=12,MAX_GLOBAL=50,MAX_PERSONAL=3;
 function active(env){
  return (env?.HHBA_AUTH_ROLLOUT==='preview'||env?.HHBA_MATCH_RUNTIME_MODE==='production')&&
   env?.HHBA_RESUME_OPTIMIZATION_ENABLED==='1'&&
