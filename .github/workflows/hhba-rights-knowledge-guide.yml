@@ -1,0 +1,39 @@
+name: HHBA labor rights knowledge and work value guide
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/data/hhbaWorkValueGuide.ts'
+      - 'apps/web/src/data/laborRightsTopics.json'
+      - 'apps/web/src/pages/LegalAidLandingPage.tsx'
+      - 'apps/web/src/pages/WorkValueGuidePage.tsx'
+      - 'apps/web/src/pages/LegalAidTopicPage.tsx'
+      - 'apps/web/src/styles/hhba-work-value-guide.css'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/components/Shell.tsx'
+      - 'apps/web/src/services/siteSearchIndex.ts'
+      - 'apps/web/scripts/rights-knowledge-guide.contract.test.mjs'
+      - '.github/workflows/hhba-rights-knowledge-guide.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rights-guide-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify original practical guide, legal links and route contracts
+        working-directory: apps/web
+        run: node --test scripts/rights-knowledge-guide.contract.test.mjs
+      - name: TypeScript and production frontend build
+        working-directory: apps/web
+        run: npm run build
