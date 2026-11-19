@@ -183,7 +183,7 @@ export function OriginalResumeViewer({resume,onClose}:{
   try{
    const response=await savePageResumeEdits(resume.id,updated);
    setChanges(response.changes);setSelectedId(null);setConfirmed(false);
-   setMessage('已保存修改。能安全放进原位置的文字会立即显示，原文件保持不变。');
+   setMessage('');
   }catch(error){setMessage(error instanceof Error?error.message:'保存失败，请重试。');}
   finally{setSaving(false);}
  }
@@ -287,9 +287,9 @@ export function OriginalResumeViewer({resume,onClose}:{
    {layout&&anchors.length===0&&<p className="hhba-original-resume-note">
     这页暂时没有找到可以准确修改的位置。你仍然可以查看和下载原件。</p>}
    {changes.length>0&&<p className="hhba-original-resume-note" role="status">
-    已保存 {changes.length} 处修改，{visibleEditCount} 处可在原位置预览。
-    {changes.length>visibleEditCount?' 其余内容较长或版式复杂，暂不覆盖原文，以免出现遮挡。':''}
-    原文件未改动，目前尚不能按原样式导出修改后的副本。</p>}
+    已保存 {changes.length} 处修改，{visibleEditCount} 处已显示在原位置。
+    {changes.length>visibleEditCount?' 其余文字暂时放不下，已保留修改但不遮挡原文。':''}
+    原件保留，原样式导出暂未开放。</p>}
    {message&&<p className="hhba-original-resume-note" role="status">{message}</p>}
    <nav className="hhba-original-resume-pages" aria-label="原始简历翻页">
     <button type="button" disabled={page<=1}
