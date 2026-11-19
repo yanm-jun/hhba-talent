@@ -1,0 +1,573 @@
+{
+  "schemaVersion": 1,
+  "reviewedOn": "2026-11-19",
+  "scope": "仅中国大陆劳动权益一般信息；非个案法律意见，无独立案例时不虚构案例。请核对最新法律和地方规定。",
+  "topics": [
+    {
+      "slug": "written-contract",
+      "parentSlug": "labor-contracts",
+      "title": "入职未签书面劳动合同",
+      "short": "已实际工作但迟迟没有签正式合同，先核对时间与劳动关系。",
+      "aliases": [
+        "未签合同",
+        "不签合同",
+        "双倍工资",
+        "入职"
+      ],
+      "situations": [
+        "已经上岗并接受管理，但没有领取书面劳动合同",
+        "公司要求先干几个月再签约",
+        "合同签署时间与实际到岗日期不一致"
+      ],
+      "laws": [
+        {
+          "name": "中华人民共和国劳动合同法",
+          "articles": "第10、82条",
+          "summary": "书面合同订立期限与未依法签订可能涉及的责任",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html"
+        },
+        {
+          "name": "中华人民共和国劳动合同法实施条例",
+          "articles": "第6、7条",
+          "summary": "未订立书面合同的后续订立、处理及时间判断规则",
+          "url": "https://www.mohrss.gov.cn/xxgk2020/fdzdgknr/zcfg/fg/202011/t20201103_394939_wap.html"
+        }
+      ],
+      "proof": [
+        "首次到岗日期及实际任务的合法记录",
+        "工资到账记录及工资发放主体",
+        "工牌、考勤及工作聊天中可合法保存的部分"
+      ],
+      "paths": [
+        "确认实际开始接受用工管理的日期",
+        "向人事确认正式合同与双方留存安排",
+        "核对法定期间及可能适用的救济路径"
+      ],
+      "misconceptions": [
+        "没签合同就一定没有劳动关系",
+        "只凭一张截图就能直接确定双倍工资金额"
+      ],
+      "special": "是否存在劳动关系、用工起始时间、是否拒签以及用工主体需要结合事实判断。",
+      "contentType": "independently_written_guidance_without_individual_case"
+    },
+    {
+      "slug": "probation-rules",
+      "parentSlug": "labor-contracts",
+      "title": "试用期长度与试用期工资",
+      "short": "试用期不是法律真空，期限、工资与解除条件都有适用边界。",
+      "aliases": [
+        "试用期",
+        "转正",
+        "试用工资",
+        "试用被辞退"
+      ],
+      "situations": [
+        "试用期工资和正式工资差距明显",
+        "同一单位反复约定试用期",
+        "试用期被突然口头通知不再录用"
+      ],
+      "laws": [
+        {
+          "name": "中华人民共和国劳动合同法",
+          "articles": "第19、20、21条",
+          "summary": "试用期约定、工资底线与试用期解除理由要求",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html"
+        },
+        {
+          "name": "中华人民共和国劳动合同法实施条例",
+          "articles": "第15、16条",
+          "summary": "试用期工资与培训费用等实施规则可结合具体情形核对",
+          "url": "https://www.mohrss.gov.cn/xxgk2020/fdzdgknr/zcfg/fg/202011/t20201103_394939_wap.html"
+        }
+      ],
+      "proof": [
+        "劳动合同期限及试用期条款",
+        "录用条件、考核指标及告知记录",
+        "每月工资流水和试用期评价资料"
+      ],
+      "paths": [
+        "先核对合同期限和试用期约定是否对应",
+        "记录实际工资与单位公布的工资标准",
+        "被告知解除时索取书面理由并保存沟通记录"
+      ],
+      "misconceptions": [
+        "只要写了试用期，公司就能随时无理由辞退",
+        "试用期可以不发工资或不缴社保"
+      ],
+      "special": "不能只依照口头承诺判断试用期解除是否合法，需核对录用条件与证据。",
+      "contentType": "independently_written_guidance_without_individual_case"
+    },
+    {
+      "slug": "payroll-deductions",
+      "parentSlug": "unpaid-wages",
+      "title": "工资扣款与工资明细",
+      "short": "实发金额变少时，先分清合法代扣、约定扣减与争议性处罚。",
+      "aliases": [
+        "扣工资",
+        "罚款",
+        "工资条",
+        "少发工资"
+      ],
+      "situations": [
+        "工资到账比约定金额少且原因不明",
+        "考勤扣款与实际缺勤不符",
+        "公司对失误直接作大额扣款但不说明依据"
+      ],
+      "laws": [
+        {
+          "name": "中华人民共和国劳动法",
+          "articles": "第50条",
+          "summary": "工资应依法以货币形式支付，不得克扣或无故拖欠",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_d9aa750028b14b99a776cb93726a360d.html"
+        },
+        {
+          "name": "中华人民共和国劳动合同法",
+          "articles": "第30条",
+          "summary": "按劳动合同约定和国家规定及时足额支付劳动报酬",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html"
+        }
+      ],
+      "proof": [
+        "合同薪酬条款和工资条",
+        "对应月份考勤及请假记录",
+        "扣款制度、通知和核算说明"
+      ],
+      "paths": [
+        "制作逐月应发、实发与差额对照表",
+        "要求单位说明具体扣款项目与依据",
+        "根据是否属于工资争议选择协商、监察或仲裁等途径"
+      ],
+      "misconceptions": [
+        "所有扣款都一定违法",
+        "公司在群里发过一条通知，扣款就一定合法"
+      ],
+      "special": "社保、个税及其他合法代扣项目应与争议性扣款区分，适用标准视具体规定而定。",
+      "contentType": "independently_written_guidance_without_individual_case"
+    },
+    {
+      "slug": "commissions-bonuses",
+      "parentSlug": "unpaid-wages",
+      "title": "销售提成与绩效奖金争议",
+      "short": "奖金是否应付，要结合业绩规则、核算周期和约定条件。",
+      "aliases": [
+        "提成",
+        "绩效",
+        "奖金",
+        "绩效扣款"
+      ],
+      "situations": [
+        "完成销售目标但提成迟迟不发",
+        "离职后对既有业绩是否计提发生争议",
+        "绩效制度临时调整导致当期收入下降"
+      ],
+      "laws": [
+        {
+          "name": "中华人民共和国劳动合同法",
+          "articles": "第17、30条",
+          "summary": "劳动报酬条款及按约定支付劳动报酬的要求",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html"
+        },
+        {
+          "name": "中华人民共和国劳动争议调解仲裁法",
+          "articles": "第6、27条",
+          "summary": "举证规则及劳动争议仲裁时效相关事项",
+          "url": "https://chinajob.mohrss.gov.cn/h5/c/2022-07-15/356212.shtml"
+        }
+      ],
+      "proof": [
+        "入职确认的提成方案及变更文件",
+        "本人合法取得的成交、验收或回款记录",
+        "以往支付记录及拒付理由"
+      ],
+      "paths": [
+        "逐条核对提成触发节点及计算公式",
+        "按客户、月份和项目整理合法取得的业绩明细",
+        "对争议项目提出明确书面核算请求"
+      ],
+      "misconceptions": [
+        "公司只要说奖金是自愿给的就一定无需支付",
+        "个人看到的销售金额必然等于应付提成"
+      ],
+      "special": "并非所有绩效奖金都能自动认定为固定工资，需分析约定和实际支付惯例。",
+      "contentType": "independently_written_guidance_without_individual_case"
+    },
+    {
+      "slug": "overtime-proof",
+      "parentSlug": "overtime-leave",
+      "title": "加班事实与加班费证据",
+      "short": "排班、审批、考勤与实际工作需要放到同一时间线上核对。",
+      "aliases": [
+        "加班",
+        "值班",
+        "加班费",
+        "下班工作"
+      ],
+      "situations": [
+        "经常晚间工作但没有加班记录",
+        "安排值班却不确定是否算加班",
+        "考勤记录与任务安排不一致"
+      ],
+      "laws": [
+        {
+          "name": "中华人民共和国劳动法",
+          "articles": "第41、44条",
+          "summary": "延长工作时间条件及依法支付加班工资的一般规定",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_d9aa750028b14b99a776cb93726a360d.html"
+        },
+        {
+          "name": "中华人民共和国劳动争议调解仲裁法",
+          "articles": "第6条",
+          "summary": "劳动争议举证及用人单位掌握管理证据的规则",
+          "url": "https://chinajob.mohrss.gov.cn/h5/c/2022-07-15/356212.shtml"
+        }
+      ],
+      "proof": [
+        "公司依法公布的工时制度和排班",
+        "合法取得的考勤、安排与工作成果记录",
+        "加班工资或调休的实际结算资料"
+      ],
+      "paths": [
+        "按日期记录实际时段与工作任务",
+        "区分值班、加班和依法审批的特殊工时制度",
+        "按适用的法定口径核对待遇并保存书面沟通"
+      ],
+      "misconceptions": [
+        "每天待在办公室超过八小时就一律算加班",
+        "值班、在线待命和加班永远没有区别"
+      ],
+      "special": "综合计算工时、不定时工作制及加班安排是否成立，需要结合审批和具体劳动事实。",
+      "contentType": "independently_written_guidance_without_individual_case"
+    },
+    {
+      "slug": "annual-leave",
+      "parentSlug": "overtime-leave",
+      "title": "带薪年休假与未休假安排",
+      "short": "先核对累计工作年限、实际安排与本人已休天数，再谈结算。",
+      "aliases": [
+        "年假",
+        "带薪年假",
+        "未休年假",
+        "年休假"
+      ],
+      "situations": [
+        "连续工作多年但单位从未安排年假",
+        "工作变动后不知道本年度可休天数",
+        "申请休假长期无人审批，年底被认定自动作废"
+      ],
+      "laws": [
+        {
+          "name": "职工带薪年休假条例",
+          "articles": "第2、3、5条",
+          "summary": "年休假资格、天数和年度安排的基本规则",
+          "url": "https://xzfg.moj.gov.cn/front/law/detail?LawID=208&Query=%E8%96%AA%E5%B9%B4%E4%BC%91%E5%81%87"
+        },
+        {
+          "name": "中华人民共和国劳动法",
+          "articles": "第45条",
+          "summary": "劳动者享有带薪年休假，具体办法由国务院规定",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_d9aa750028b14b99a776cb93726a360d.html"
+        }
+      ],
+      "proof": [
+        "能证明连续工作年限的材料",
+        "年度休假申请及回复记录",
+        "假期台账、考勤和休假工资资料"
+      ],
+      "paths": [
+        "核对累计工作年限及是否满足法定资格",
+        "按年度记录已休、申请未休与单位安排",
+        "向单位询问跨年度或未休假报酬规则"
+      ],
+      "misconceptions": [
+        "刚到新单位就必然没有年休假资格",
+        "所有未休假都自动折算成同一倍数工资"
+      ],
+      "special": "年度天数、折算、未休原因及地方规定均可能影响实际权利，不以简单网上公式替代核算。",
+      "contentType": "independently_written_guidance_without_individual_case"
+    },
+    {
+      "slug": "probation-insurance",
+      "parentSlug": "social-insurance",
+      "title": "试用期社保与参保记录",
+      "short": "从实际用工开始核对参保情况，不用只听口头承诺。",
+      "aliases": [
+        "试用期不交社保",
+        "五险",
+        "社保断缴",
+        "没交社保"
+      ],
+      "situations": [
+        "公司说转正后才办理社保",
+        "工资条显示扣费但官方查询没有记录",
+        "离职或换岗后个人参保连续性存在疑问"
+      ],
+      "laws": [
+        {
+          "name": "中华人民共和国社会保险法",
+          "articles": "第4、58条",
+          "summary": "参保信息查询和用人单位申请办理社会保险登记等要求",
+          "url": "https://www.nhsa.gov.cn/art/2010/10/28/art_53_1184.html"
+        },
+        {
+          "name": "中华人民共和国劳动合同法",
+          "articles": "第38条",
+          "summary": "用人单位未依法缴纳社会保险费与解除劳动合同的相关规定",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html"
+        }
+      ],
+      "proof": [
+        "用工起始日期和劳动关系材料",
+        "当地官方平台查询的参保记录",
+        "工资条中的社保扣费及沟通回复"
+      ],
+      "paths": [
+        "按当地官方渠道查询参保月份与主体",
+        "将缺漏月份同劳动关系起始时间对照",
+        "依法向社保经办或征缴机关咨询具体处理流程"
+      ],
+      "misconceptions": [
+        "试用期员工天然不需要参加社保",
+        "自己签了放弃社保承诺就一定有效"
+      ],
+      "special": "社保登记与具体征缴争议的管辖程序可能不同于一般劳动仲裁，应咨询当地主管机关。",
+      "contentType": "independently_written_guidance_without_individual_case"
+    },
+    {
+      "slug": "departure-certificate",
+      "parentSlug": "labor-contracts",
+      "title": "离职证明与档案社保转移",
+      "short": "离职后保留必要证明，有利于下家入职和手续衔接。",
+      "aliases": [
+        "离职证明",
+        "解除证明",
+        "交接证明",
+        "社保转移"
+      ],
+      "situations": [
+        "离职后单位拒绝出具劳动关系结束证明",
+        "证明上的岗位或日期有明显错误",
+        "个人档案、社保关系转移信息不清晰"
+      ],
+      "laws": [
+        {
+          "name": "中华人民共和国劳动合同法",
+          "articles": "第50条",
+          "summary": "解除或终止劳动合同时的书面证明与办理档案社保关系转移事项",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html"
+        },
+        {
+          "name": "中华人民共和国劳动合同法实施条例",
+          "articles": "第24条",
+          "summary": "解除终止证明依法应包含的必要信息",
+          "url": "https://www.mohrss.gov.cn/xxgk2020/fdzdgknr/zcfg/fg/202011/t20201103_394939_wap.html"
+        }
+      ],
+      "proof": [
+        "原劳动合同及在职时间记录",
+        "解除、终止或辞职的通知材料",
+        "已出具证明与实际交接资料"
+      ],
+      "paths": [
+        "检查合同期限、终止日期、岗位和工作年限",
+        "以正常书面渠道请求更正或补发证明",
+        "按官方程序核对档案及社保转移办理情况"
+      ],
+      "misconceptions": [
+        "只有名称叫离职证明的文件才可能被接受",
+        "离职证明一定能直接证明解除方式合法"
+      ],
+      "special": "不同文件的证明作用可能不同，是否满足法定记载要件应结合具体文本判断。",
+      "contentType": "independently_written_guidance_without_individual_case"
+    },
+    {
+      "slug": "severance-compensation",
+      "parentSlug": "unlawful-dismissal",
+      "title": "经济补偿与违法解除赔偿",
+      "short": "不要直接套 N+1 或 2N，先判断解除情形、基数和工作年限。",
+      "aliases": [
+        "经济补偿",
+        "裁员赔偿",
+        "N+1",
+        "2N",
+        "违法辞退"
+      ],
+      "situations": [
+        "单位提出裁员但补偿计算不明",
+        "要求签协商解除协议却不解释条件",
+        "员工收到解除通知后不确定请求属于补偿还是赔偿"
+      ],
+      "laws": [
+        {
+          "name": "中华人民共和国劳动合同法",
+          "articles": "第40、46、47、48、87条",
+          "summary": "解除情形、补偿计算及违法解除赔偿的法定框架",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html"
+        },
+        {
+          "name": "中华人民共和国劳动争议调解仲裁法",
+          "articles": "第2、6、27条",
+          "summary": "劳动争议范围、举证与仲裁时效的适用条件",
+          "url": "https://chinajob.mohrss.gov.cn/h5/c/2022-07-15/356212.shtml"
+        }
+      ],
+      "proof": [
+        "实际劳动关系年限及工资记录",
+        "解除通知、协商文件与理由说明",
+        "历史合同、考勤及合法取得的相关事实材料"
+      ],
+      "paths": [
+        "首先区分协商解除、劳动者解除与单位解除等情形",
+        "依依法可核对的工资基数和年限整理计算表",
+        "在明确事实和诉求后核对救济期限与路径"
+      ],
+      "misconceptions": [
+        "所有被裁员的人都自动得到 N+1",
+        "N+1、经济补偿和违法解除赔偿是可以随意叠加的款项"
+      ],
+      "special": "经济补偿与违法解除赔偿一般是不同请求基础，不能混同计算；个案争议需具体核验。",
+      "contentType": "independently_written_guidance_without_individual_case"
+    },
+    {
+      "slug": "non-compete",
+      "parentSlug": "labor-contracts",
+      "title": "竞业限制与保密约定",
+      "short": "签署竞业条款前核对适用人员、限制范围和补偿安排。",
+      "aliases": [
+        "竞业限制",
+        "保密协议",
+        "竞业补偿",
+        "离职竞业"
+      ],
+      "situations": [
+        "普通岗位被要求签署极宽泛的竞业限制",
+        "离职后被要求禁止进入整个行业",
+        "协议限制时间、范围和经济补偿不明确"
+      ],
+      "laws": [
+        {
+          "name": "中华人民共和国劳动合同法",
+          "articles": "第23、24条",
+          "summary": "保密义务与竞业限制条款的主体及期限等边界",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html"
+        },
+        {
+          "name": "最高人民法院劳动争议司法解释（二）",
+          "articles": "第13、14、15条",
+          "summary": "2025 年司法解释对竞业限制的效力和范围等问题作出进一步规定",
+          "url": "https://www.court.gov.cn/zixun/xiangqing/472691.html"
+        }
+      ],
+      "proof": [
+        "双方实际签署的保密及竞业文本",
+        "岗位职责及依法接触信息的事实",
+        "补偿支付、通知解除与就业限制的沟通材料"
+      ],
+      "paths": [
+        "核对自己是否属于法律允许约定竞业限制的人员",
+        "检查限制对象、地域、期限和补偿约定",
+        "涉及就业决定时核对新司法解释并及时寻求专业意见"
+      ],
+      "misconceptions": [
+        "任何员工签了竞业限制就必然全部有效",
+        "只要是公司统一模板，所有限制都能被执行"
+      ],
+      "special": "竞业限制的在职与离职后规则不同，法律效力须结合主体、实际接触信息与2025年司法解释判断。",
+      "contentType": "independently_written_guidance_without_individual_case"
+    },
+    {
+      "slug": "change-agreement",
+      "parentSlug": "transfer-paycuts",
+      "title": "调岗降薪与劳动合同变更",
+      "short": "公司调整工作条件时，要区分协商变更、合理管理安排与争议。",
+      "aliases": [
+        "强制调岗",
+        "降薪",
+        "变更合同",
+        "异地调动"
+      ],
+      "situations": [
+        "公司要求立即跨城市转岗且不给明确说明",
+        "岗位调整后固定工资明显减少",
+        "单位称员工不接受调动就视为自动离职"
+      ],
+      "laws": [
+        {
+          "name": "中华人民共和国劳动合同法",
+          "articles": "第35条",
+          "summary": "劳动合同约定内容变更一般应协商一致并采用书面形式",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html"
+        },
+        {
+          "name": "中华人民共和国劳动争议调解仲裁法",
+          "articles": "第2、6条",
+          "summary": "劳动合同履行、变更争议的范围与举证规则",
+          "url": "https://chinajob.mohrss.gov.cn/h5/c/2022-07-15/356212.shtml"
+        }
+      ],
+      "proof": [
+        "原合同中的岗位、地点与工资约定",
+        "岗位或薪酬变更通知与说明",
+        "书面协商记录以及实际履职情况"
+      ],
+      "paths": [
+        "要求确认变更前后岗位、地点和工资条件",
+        "记录收到通知的日期、理由与自身回复",
+        "如有争议核对具体管理权限、协商程序与法定救济"
+      ],
+      "misconceptions": [
+        "公司永远没有任何岗位管理调整权",
+        "员工不回复通知就必然等于合法同意降薪"
+      ],
+      "special": "不能仅凭通知有无签字判断变更是否合法，具体管理合理性、合同约定和地区裁判口径均可能影响。",
+      "contentType": "independently_written_guidance_without_individual_case"
+    },
+    {
+      "slug": "arbitration-timing",
+      "parentSlug": "unlawful-dismissal",
+      "title": "劳动仲裁时效与证据归集",
+      "short": "正式申请前先识别争议类型，确认管辖、时效以及能够证明的事实。",
+      "aliases": [
+        "劳动仲裁",
+        "时效",
+        "举证责任",
+        "证据清单",
+        "拖欠工资仲裁"
+      ],
+      "situations": [
+        "纠纷持续数月但还没有整理申请资料",
+        "不确定仲裁委员会和主管部门该选哪一个",
+        "担心超过期限而迟迟没有核对法条"
+      ],
+      "laws": [
+        {
+          "name": "中华人民共和国劳动争议调解仲裁法",
+          "articles": "第2、5、6、27条",
+          "summary": "争议范围、仲裁衔接、证据责任及通常时效与特殊规则",
+          "url": "https://chinajob.mohrss.gov.cn/h5/c/2022-07-15/356212.shtml"
+        },
+        {
+          "name": "中华人民共和国劳动合同法",
+          "articles": "第77条",
+          "summary": "劳动者合法权益受侵害时依法申请仲裁或提起诉讼等救济",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html"
+        }
+      ],
+      "proof": [
+        "用工主体、工作起止与争议事件时间线",
+        "真实合同、工资、考勤及合法取得的对应资料",
+        "已采取投诉、协商等程序的可证明记录"
+      ],
+      "paths": [
+        "按事实发生日期制作清晰时间轴",
+        "核对该争议究竟属于行政投诉、仲裁或其他途径",
+        "依据法条核对时效起算与中断中止等可能情形"
+      ],
+      "misconceptions": [
+        "所有劳动争议都可以直接起诉且无需仲裁",
+        "所有拖欠工资纠纷的时效计算与一般争议完全相同"
+      ],
+      "special": "多数劳动争议适用仲裁前置，工资追索与行政事项存在特别规则；应尽早核对实际的法定期限。",
+      "contentType": "independently_written_guidance_without_individual_case"
+    }
+  ]
+}
