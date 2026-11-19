@@ -43,3 +43,24 @@
 .targeted-resume-fact-entry{display:flex;flex-direction:column;gap:8px;margin:12px 0;color:#536278;font-size:12px;font-weight:550}
 .targeted-resume-fact-entry textarea{width:100%;resize:vertical;font:inherit;font-weight:400;font-size:13px;line-height:1.65;border:1px solid #d9dce7;border-radius:9px;padding:10px 12px;background:#fff;color:#24344c;box-sizing:border-box}
 .targeted-resume-fact-entry textarea:focus-visible{outline:2px solid #9082d4;outline-offset:1px}
+
+.targeted-resume-document-editor{max-width:800px;margin:20px auto 0;padding:20px;background:#fff;border:1px solid #e5e9f0;border-radius:12px}
+.targeted-resume-document-heading{display:flex;justify-content:space-between;align-items:start;gap:18px}
+.targeted-resume-document-heading strong{font-size:17px;color:#283750}
+.targeted-resume-document-heading p,.targeted-resume-print-note{font-size:12px;line-height:1.7;color:#63718a;margin:6px 0 0}
+.targeted-resume-document-actions{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0}
+.targeted-resume-document-actions button{display:inline-flex;align-items:center;gap:7px}
+.targeted-resume-document-actions button:last-child:not(:disabled){background:#293a52;color:#fff;border-color:#293a52}
+.targeted-resume-document-fields{margin:20px 0 12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.targeted-resume-document-fields label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4f5d73}
+.targeted-resume-document-fields .wide{grid-column:1/-1}
+.targeted-resume-document-fields input,.targeted-resume-document-fields textarea{box-sizing:border-box;border:1px solid #dce2ea;background:#fff;color:#26354c;padding:10px 11px;border-radius:8px;width:100%;font:inherit;font-size:13px;font-weight:400;line-height:1.6}
+.targeted-resume-document-fields input:focus-visible,.targeted-resume-document-fields textarea:focus-visible{outline:2px solid #9b8be9;outline-offset:1px}
+.targeted-resume-document-fields textarea{resize:vertical}
+.targeted-resume-print-preview{max-width:800px;margin:0 auto}
+.targeted-resume-print-preview.is-collapsed{display:none}
+.targeted-resume-save-confirm{max-width:800px;margin:12px auto;display:flex}
+@media(max-width:650px){.targeted-resume-document-heading{flex-direction:column}.targeted-resume-document-actions{width:100%}.targeted-resume-document-actions button{flex:1;justify-content:center}.targeted-resume-document-fields{grid-template-columns:1fr}}
+@media print{
+ .targeted-resume-print-preview,.targeted-resume-print-preview.is-collapsed{display:block!important}
+}
