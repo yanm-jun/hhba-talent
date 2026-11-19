@@ -7,6 +7,7 @@ import {applySuggestion,validateSuggestion,editResumeBlock,type ResumeBlock,type
 import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
 import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResumeVersion} from '../services/resumeVersionsApi';
 import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
+import {createPortal} from 'react-dom';
 import {ResumePrintSheet} from './ResumePrintSheet';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
 import {officialJobVerifyStatus,verifyOfficialJob,type OfficialJobVerifyStatus,type OfficialVerifiedJob} from '../services/officialJobVerifyApi';
@@ -377,5 +378,8 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
    <button type="button" onClick={reset}><Undo2 size={14}/> 恢复原始预览</button>
   </div>
   {notice&&<p role="status" className="targeted-resume-notice">{notice}</p>}
+  {createPortal(<div className="hhba-print-host" data-hhba-print-host="resume">
+    <ResumePrintSheet document={printDocument}/>
+   </div>,document.body)}
  </section>;
 }
