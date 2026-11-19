@@ -45,7 +45,7 @@ for(const t of more.topics){
  for(const law of t.laws){
   const u=new URL(law.url);
   assert(u.protocol==='https:'&&allowedHost.has(u.hostname),t.slug+' reference must use official domain '+law.url);
-  assert(/第\\d+/.test(law.articles),t.slug+' law article identifiers required');
+  assert(/第\d+/.test(law.articles),t.slug+' law article identifiers required');
   assert(law.summary.length>=20,t.slug+' source-specific summary is incomplete');
  }
  assert.equal(t.proof.length,3,t.slug+' evidence checklist');
