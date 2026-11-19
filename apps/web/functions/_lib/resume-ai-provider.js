@@ -122,5 +122,11 @@ export async function generateSuggestions({env,blocks,job,signal}){
  let suggestions;
  try{suggestions=parseSuggestions(parsed,blocks.map(b=>b.id));}
  catch{throw new Error('AI_PROVIDER_SUGGESTION_SCHEMA_INVALID');}
- return {provider:provider.name,suggestions};
+ // The model is not the source of truth for original paragraphs. Its "original"
+ // field is often a shorter excerpt, whereas the UI requires exact block text.
+ // Pin every suggestion to the authoritative, currently supplied candidate block.
+ const byId=new Map(blocks.map(block=>[block.id,block.text]));
+ return {provider:provider.name,suggestions:suggestions.map(s=>({
+  ...s,original:byId.get(s.blockId)
+ }))};
 }
