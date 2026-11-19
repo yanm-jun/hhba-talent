@@ -99,3 +99,8 @@
 .targeted-resume-verified-job{margin:12px 0 0;border-top:1px solid #e2e7f0;padding:11px 0 0}
 .targeted-resume-verified-job a{display:inline-block;font-size:12px;color:#435c96;margin:4px 0;text-decoration:underline;text-underline-offset:3px}
 .targeted-resume-verified-job .targeted-resume-confirm{margin-top:10px}
+
+/* Incomplete source resumes must not be mistaken for complete exportable CVs. */
+.targeted-resume-truncation{margin:10px 0 15px;padding:13px 16px;border:1px solid #d7af68;
+ border-radius:9px;background:#fffaf0;color:#735228;font-size:12px;line-height:1.8}
+.targeted-resume-truncation strong{font-weight:700;color:#604019}
