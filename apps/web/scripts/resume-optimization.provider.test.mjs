@@ -55,3 +55,27 @@ test('existing HHBA DeepSeek server secret works with current Flash JSON mode',a
   assert.equal(requests,1);
  }finally{globalThis.fetch=prior;}
 });
+
+test('DeepSeek HTTP failures are safely classified without exposing upstream body',async()=>{
+ const env={HHBA_MATCH_DEEPSEEK_KEY:'fake-secret-for-tests'};
+ const blocks=[{id:'experience-0',section:'experience',text:'负责门店实际运营'}];
+ const job={title:'门店督导',requirements:'运营和客户管理'};
+ const cases=[
+  [400,'AI_PROVIDER_REQUEST_REJECTED'],
+  [401,'AI_PROVIDER_KEY_REJECTED'],
+  [402,'AI_PROVIDER_BALANCE_INSUFFICIENT'],
+  [429,'AI_PROVIDER_RATE_LIMITED'],
+  [503,'AI_PROVIDER_UPSTREAM_ERROR']
+ ];
+ const prior=globalThis.fetch;
+ try{
+  for(const [status,code] of cases){
+   globalThis.fetch=async()=>new Response('confidential-user-data-must-not-leak',{status});
+   await assert.rejects(()=>generateSuggestions({env,blocks,job}),e=>{
+    assert.equal(e.message,code);
+    assert.doesNotMatch(e.message,/confidential-user-data/);
+    return true;
+   });
+  }
+ }finally{globalThis.fetch=prior;}
+});
