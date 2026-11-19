@@ -14,7 +14,7 @@ async function call(path,opts={}){
  return {r,data};
 }
 const page=await call('/candidate/match');
-assert.equal(page.r.status,200,'matching route must serve the Preview SPA');
+assert.equal(page.r.status,200,`matching route returned ${page.r.status}; redirect=${page.r.headers.get('location')||'none'}`);
 const expected=[
  ['/api/resume-optimize','HHBA_RESUME_OPTIMIZATION_V1'],
  ['/api/resume-reassess','HHBA_RESUME_REASSESS_V2'],
