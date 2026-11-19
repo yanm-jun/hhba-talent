@@ -69,13 +69,13 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    window.removeEventListener('hhba:real-auth-changed',reload);};
  },[user?.id]);
  function choose(candidate:File|null){
-  previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);
+  previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);setSavedId('');
   setError('');setResult(null);setOptimizationSource('');setSaveConsent(false);setSaveNotice('');
   if(!candidate){setFile(null);return}
   if(!/\.(pdf|docx)$/i.test(candidate.name)||!candidate.size||candidate.size>maxResumeSize){
     setFile(null);setError('请选择不超过 3 MB 的 PDF 或 DOCX 文件。');return;
   }
-  setSavedId('');setFile(candidate);
+  setFile(candidate);
  }
  async function preview(){
   if((!file&&!savedId)||working||previewBusy)return;
@@ -124,8 +124,13 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   try{
    // Reuse one local extraction for matching AND later user-controlled editing.
    // No second AI parse, and no extra file upload is required for optimization.
-   let submittedText=previewLoaded?previewText:'';
-   if(!previewLoaded){
+   let submittedText='';
+   if(previewLoaded){
+    // Once the user has reviewed/edited text, NEVER fall back to the raw resume.
+    if(previewLoaded&&previewText.replace(/\s/g,'').length<30)
+     throw new MatchError(400,'已编辑的简历文字为空，请重新核对；不会自动读取原文件。');
+    submittedText=previewText;
+   }else{
     let selected=file;
     if(!selected&&savedId){
      const entry=savedFiles.find(item=>item.id===savedId);
