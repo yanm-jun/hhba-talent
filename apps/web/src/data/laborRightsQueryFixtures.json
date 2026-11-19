@@ -1,0 +1,433 @@
+{
+  "schemaVersion": 1,
+  "purpose": "独立编写的中文口语劳动问题验收语料；只验证资料检索，不验证个案法律结论。",
+  "positive": 70,
+  "negative": 15,
+  "cases": [
+    {
+      "id": "unpaid-1",
+      "query": "公司拖欠工资三个月了",
+      "expectedIntent": "unpaid"
+    },
+    {
+      "id": "unpaid-2",
+      "query": "老板欠我工资一直不给",
+      "expectedIntent": "unpaid"
+    },
+    {
+      "id": "unpaid-3",
+      "query": "工 资 一 直 没 到 账怎么办",
+      "expectedIntent": "unpaid"
+    },
+    {
+      "id": "unpaid-4",
+      "query": "怎么工资迟迟不发",
+      "expectedIntent": "unpaid"
+    },
+    {
+      "id": "unpaid-5",
+      "query": "离职了工资没给",
+      "expectedIntent": "unpaid"
+    },
+    {
+      "id": "deduction-1",
+      "query": "领导今天扣钱了",
+      "expectedIntent": "deduction"
+    },
+    {
+      "id": "deduction-2",
+      "query": "公司突然乱扣工资",
+      "expectedIntent": "deduction"
+    },
+    {
+      "id": "deduction-3",
+      "query": "工 资 无 故 被 扣怎么办",
+      "expectedIntent": "deduction"
+    },
+    {
+      "id": "deduction-4",
+      "query": "绩效被扣，我要问扣绩效工资",
+      "expectedIntent": "deduction"
+    },
+    {
+      "id": "deduction-5",
+      "query": "公司罚我钱合理吗",
+      "expectedIntent": "deduction"
+    },
+    {
+      "id": "commission-1",
+      "query": "我的绩效没发，怎么办",
+      "expectedIntent": "commission"
+    },
+    {
+      "id": "commission-2",
+      "query": "公司年底奖金迟迟未发",
+      "expectedIntent": "commission"
+    },
+    {
+      "id": "commission-3",
+      "query": "销售提成一直没结算",
+      "expectedIntent": "commission"
+    },
+    {
+      "id": "commission-4",
+      "query": "老板说奖金不给了",
+      "expectedIntent": "commission"
+    },
+    {
+      "id": "commission-5",
+      "query": "这月提成没到账",
+      "expectedIntent": "commission"
+    },
+    {
+      "id": "contract-1",
+      "query": "上班三个月没签合同",
+      "expectedIntent": "contract"
+    },
+    {
+      "id": "contract-2",
+      "query": "入职没合同怎么处理",
+      "expectedIntent": "contract"
+    },
+    {
+      "id": "contract-3",
+      "query": "合同不给我签",
+      "expectedIntent": "contract"
+    },
+    {
+      "id": "contract-4",
+      "query": "没给我合同副本",
+      "expectedIntent": "contract"
+    },
+    {
+      "id": "contract-5",
+      "query": "没拿到劳动合同",
+      "expectedIntent": "contract"
+    },
+    {
+      "id": "probation-1",
+      "query": "试用期工资怎么算",
+      "expectedIntent": "probation"
+    },
+    {
+      "id": "probation-2",
+      "query": "试用期被开我该咋办",
+      "expectedIntent": "probation"
+    },
+    {
+      "id": "probation-3",
+      "query": "试用期降薪是合法的吗",
+      "expectedIntent": "probation"
+    },
+    {
+      "id": "probation-4",
+      "query": "试用期不转正",
+      "expectedIntent": "probation"
+    },
+    {
+      "id": "probation-5",
+      "query": "试用期被辞退",
+      "expectedIntent": "probation"
+    },
+    {
+      "id": "insurance-1",
+      "query": "试用期不交社保",
+      "expectedIntent": "insurance"
+    },
+    {
+      "id": "insurance-2",
+      "query": "公司不买社保怎么办",
+      "expectedIntent": "insurance"
+    },
+    {
+      "id": "insurance-3",
+      "query": "社保没交该找谁",
+      "expectedIntent": "insurance"
+    },
+    {
+      "id": "insurance-4",
+      "query": "试用期没交五险",
+      "expectedIntent": "insurance"
+    },
+    {
+      "id": "insurance-5",
+      "query": "单位没买社保",
+      "expectedIntent": "insurance"
+    },
+    {
+      "id": "overtime-1",
+      "query": "加班不给钱怎么办",
+      "expectedIntent": "overtime"
+    },
+    {
+      "id": "overtime-2",
+      "query": "周末加班没钱",
+      "expectedIntent": "overtime"
+    },
+    {
+      "id": "overtime-3",
+      "query": "加班算调休行不行",
+      "expectedIntent": "overtime"
+    },
+    {
+      "id": "overtime-4",
+      "query": "法定节假日加班",
+      "expectedIntent": "overtime"
+    },
+    {
+      "id": "overtime-5",
+      "query": "上个月加班工资没有结算",
+      "expectedIntent": "overtime"
+    },
+    {
+      "id": "leave-1",
+      "query": "年假不给休",
+      "expectedIntent": "leave"
+    },
+    {
+      "id": "leave-2",
+      "query": "离职年假没休怎么办",
+      "expectedIntent": "leave"
+    },
+    {
+      "id": "leave-3",
+      "query": "未休年休假怎么处理",
+      "expectedIntent": "leave"
+    },
+    {
+      "id": "leave-4",
+      "query": "公司说年假不让休",
+      "expectedIntent": "leave"
+    },
+    {
+      "id": "leave-5",
+      "query": "带薪休假不给",
+      "expectedIntent": "leave"
+    },
+    {
+      "id": "dismissal-1",
+      "query": "公司无故辞退我",
+      "expectedIntent": "dismissal"
+    },
+    {
+      "id": "dismissal-2",
+      "query": "被裁了能拿多少补偿",
+      "expectedIntent": "dismissal"
+    },
+    {
+      "id": "dismissal-3",
+      "query": "公司逼辞职",
+      "expectedIntent": "dismissal"
+    },
+    {
+      "id": "dismissal-4",
+      "query": "解雇补偿怎么计算",
+      "expectedIntent": "dismissal"
+    },
+    {
+      "id": "dismissal-5",
+      "query": "突然辞退我没有说明",
+      "expectedIntent": "dismissal"
+    },
+    {
+      "id": "certificate-1",
+      "query": "不给离职证明",
+      "expectedIntent": "certificate"
+    },
+    {
+      "id": "certificate-2",
+      "query": "公司不开离职证明",
+      "expectedIntent": "certificate"
+    },
+    {
+      "id": "certificate-3",
+      "query": "拿不到离职证明怎么办",
+      "expectedIntent": "certificate"
+    },
+    {
+      "id": "certificate-4",
+      "query": "离职证明不给我",
+      "expectedIntent": "certificate"
+    },
+    {
+      "id": "certificate-5",
+      "query": "拒开离职证明",
+      "expectedIntent": "certificate"
+    },
+    {
+      "id": "transfer-1",
+      "query": "强制调岗怎么办",
+      "expectedIntent": "transfer"
+    },
+    {
+      "id": "transfer-2",
+      "query": "公司无故调岗",
+      "expectedIntent": "transfer"
+    },
+    {
+      "id": "transfer-3",
+      "query": "单位说要给我降工资",
+      "expectedIntent": "transfer"
+    },
+    {
+      "id": "transfer-4",
+      "query": "工作地点被调到外省",
+      "expectedIntent": "transfer"
+    },
+    {
+      "id": "transfer-5",
+      "query": "领导强行调岗",
+      "expectedIntent": "transfer"
+    },
+    {
+      "id": "noncompete-1",
+      "query": "竞业限制影响找工作",
+      "expectedIntent": "noncompete"
+    },
+    {
+      "id": "noncompete-2",
+      "query": "离职竞业如何办",
+      "expectedIntent": "noncompete"
+    },
+    {
+      "id": "noncompete-3",
+      "query": "竞业违约金要不要给",
+      "expectedIntent": "noncompete"
+    },
+    {
+      "id": "noncompete-4",
+      "query": "签了竞业条款",
+      "expectedIntent": "noncompete"
+    },
+    {
+      "id": "noncompete-5",
+      "query": "我被竞业限制了",
+      "expectedIntent": "noncompete"
+    },
+    {
+      "id": "arbitration-1",
+      "query": "劳动仲裁怎么申请",
+      "expectedIntent": "arbitration"
+    },
+    {
+      "id": "arbitration-2",
+      "query": "我要了解劳动仲裁流程",
+      "expectedIntent": "arbitration"
+    },
+    {
+      "id": "arbitration-3",
+      "query": "工资仲裁需要什么证据",
+      "expectedIntent": "arbitration"
+    },
+    {
+      "id": "arbitration-4",
+      "query": "仲裁怎么走",
+      "expectedIntent": "arbitration"
+    },
+    {
+      "id": "arbitration-5",
+      "query": "仲裁时效多久",
+      "expectedIntent": "arbitration"
+    },
+    {
+      "id": "injury-1",
+      "query": "上班受伤怎么申请",
+      "expectedIntent": "injury"
+    },
+    {
+      "id": "injury-2",
+      "query": "工地受伤怎么办",
+      "expectedIntent": "injury"
+    },
+    {
+      "id": "injury-3",
+      "query": "员工上班摔伤",
+      "expectedIntent": "injury"
+    },
+    {
+      "id": "injury-4",
+      "query": "工作中受伤后",
+      "expectedIntent": "injury"
+    },
+    {
+      "id": "injury-5",
+      "query": "工伤怎么申请",
+      "expectedIntent": "injury"
+    },
+    {
+      "id": "negative-1",
+      "query": "今天午饭吃什么",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-2",
+      "query": "我想学习前端代码",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-3",
+      "query": "东京今天下雨吗",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-4",
+      "query": "体育新闻有更新吗",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-5",
+      "query": "介绍一下航空母舰",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-6",
+      "query": "我的手机电池不耐用",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-7",
+      "query": "房地产利率是多少",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-8",
+      "query": "孩子的数学题不会做",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-9",
+      "query": "寻找附近的咖啡馆",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-10",
+      "query": "帮我画一个可爱的猫",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-11",
+      "query": "什么时候去日本旅游",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-12",
+      "query": "报名英语考试怎么选",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-13",
+      "query": "怎么做饭味道最好",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-14",
+      "query": "朋友今天过生日",
+      "expectedIntent": null
+    },
+    {
+      "id": "negative-15",
+      "query": "帮我写一首短诗",
+      "expectedIntent": null
+    }
+  ]
+}
