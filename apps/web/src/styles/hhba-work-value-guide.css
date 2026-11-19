@@ -144,3 +144,7 @@
 .hhba-vguide-selected>a{display:inline-flex;align-items:center;gap:6px;color:#125EBC;text-decoration:none;font-weight:700}
 .hhba-vguide-selected>a:hover{text-decoration:underline}
 .hhba-vguide-card.is-targeted{border-color:#A9C8EF;box-shadow:0 0 0 2px rgba(18,94,188,.06)}
+
+/* Keep the linked instruction card visible beneath the sticky site header. */
+.hhba-vguide-card.is-targeted{scroll-margin-top:86px}
+.hhba-vguide-card.is-targeted:focus{outline:2px solid #125EBC;outline-offset:3px}
