@@ -108,6 +108,18 @@ try{
  assert.ok(longPages.join(' ').normalize('NFKC').replace(/[\u2ed4]/g,'门').replace(/\s+/g,'').includes('第12段'),
   'multi-page PDF must include final source paragraph; it must not clip content');
  await long.close();
+
+ const truncated=await browser.newPage({viewport:{width:1365,height:900},locale:'zh-CN'});
+ await truncated.goto(url+'?truncated=1',{waitUntil:'networkidle',timeout:45000});
+ await truncated.getByRole('button',{name:'针对这个岗位优化简历'}).click();
+ await truncated.getByRole('alert').filter({hasText:'原始简历内容未完整载入'}).waitFor();
+ await truncated.getByPlaceholder('请填写本人真实姓名').fill('截断测试姓名');
+ assert.equal(await truncated.getByRole('button',{name:'打印 / 保存 PDF'}).isDisabled(),true,
+  'a visibly incomplete source resume must not be exported as a complete PDF');
+ await truncated.locator('.targeted-resume-save-confirm input[type=checkbox]').check();
+ assert.equal(await truncated.getByRole('button',{name:'保存当前版本'}).isDisabled(),true,
+  'a truncated source must never be silently persisted as a complete cloud version');
+ await truncated.close();
  console.log(JSON.stringify({result:'PASSED',desktop_pdf_pages:pages.length,
   long_pdf_pages:longPages.length,mobile:metrics,qa_output:output}));
 }finally{await browser.close()}
