@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {buildResumeDocument,normalizeResumeDocumentDetails,readableResumeDocument,sourceResumeBlocks} from '../src/services/resumeDocument.ts';
+import {buildResumeDocument,normalizeResumeDocumentDetails,readableResumeDocument,sourceResumeBlocks,sourceResumeOmittedCharacters} from '../src/services/resumeDocument.ts';
 
 const profile={
  education:'BACHELOR',education_evidence:'临沂大学 本科',
@@ -61,4 +61,16 @@ test('local source paragraphs are bounded for browser editing',()=>{
  assert.ok(chunks.length<=12);
  assert.ok(chunks.every(x=>x.text.length<=1400));
  assert.deepEqual(sourceResumeBlocks(''),[]);
+});
+
+test('source extraction reports omitted resume characters rather than silently exporting a partial CV',()=>{
+ const short='真实运营经历。\n\n曾经参与客户沟通。';
+ assert.equal(sourceResumeOmittedCharacters(short,sourceResumeBlocks(short)),0);
+ const long='第十三段及以后不能丢失。'.repeat(2200);
+ const blocks=sourceResumeBlocks(long);
+ assert.equal(blocks.length,12);
+ const omitted=sourceResumeOmittedCharacters(long,blocks);
+ assert.ok(omitted>0,'truncated source characters must be reported');
+ assert.ok(omitted<long.replace(/\s/gu,'').length,'existing excerpts remain available for editing');
+ assert.equal(sourceResumeOmittedCharacters('',[]),0);
 });
