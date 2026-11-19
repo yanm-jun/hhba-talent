@@ -47,7 +47,7 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - name: Test opt-in, auth, quota, and provider parser
         working-directory: apps/web
-        run: node --test --experimental-strip-types scripts/resume-optimization.provider.test.mjs scripts/resume-optimization.route.test.mjs scripts/resume-optimization.domain.test.mjs scripts/resume-versions.route.test.mjs scripts/resume-evidence-visibility.test.mjs scripts/resume-document.contract.test.mjs scripts/resume-reassessment.domain.test.mjs scripts/resume-reassessment.route.test.mjs
+        run: node --test --experimental-strip-types scripts/resume-optimization.provider.test.mjs scripts/resume-optimization.route.test.mjs scripts/resume-optimization.domain.test.mjs scripts/resume-versions.route.test.mjs scripts/resume-evidence-visibility.test.mjs scripts/resume-document.contract.test.mjs scripts/resume-reassessment.domain.test.mjs scripts/resume-reassessment.route.test.mjs scripts/resume-optimization.main-flow.test.mjs
       - name: Install frontend dependencies
         working-directory: apps/web
         run: npm ci
