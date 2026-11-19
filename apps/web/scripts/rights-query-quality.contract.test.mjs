@@ -55,7 +55,7 @@ test('intent targets and all curated action links are live local data, not place
 
 test('spaced queries, punctuation and fullwidth typing normalize consistently',()=>{
  assert.equal(normal('工 资，一 直 没 到 账！'),normal('工资一直没到账'));
- assert.equal(normal('全角ＡＢＣ，试 用 期'),normal('abc试用期'));
+ assert.equal(normal('ＡＢＣ，试 用 期'),normal('abc试用期'));
  assert.equal(normal('（试用期）不交社保'),normal('试用期不交社保'));
  assert(match('工 资，一 直 没 到 账！').some(x=>x.id==='unpaid'));
  assert(match('（试用期）不交社保').some(x=>x.id==='insurance'));
