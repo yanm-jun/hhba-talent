@@ -10,7 +10,7 @@ import {getRealAuthToken} from '../services/realAuth';
 import {matchServiceReady,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
-const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+const supportedTypes='.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const maxResumeSize=3*1024*1024;
 
 export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
@@ -52,11 +52,11 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     if(active){setSavedFiles([]);setSavedId('');}return;
    }
    void listPrivateResumes().then(rows=>{if(active){
-    setSavedFiles(rows);setVaultError('');
+    setSavedFiles(rows.filter(item=>/\.docx$/i.test(item.name)));setVaultError('');
     const requested=deepLinkPending.current;
     if(requested){
      deepLinkPending.current=null;
-     if(/^[0-9a-f-]{36}$/.test(requested)&&rows.some(item=>item.id===requested))setSavedId(requested);
+     if(/^[0-9a-f-]{36}$/.test(requested)&&rows.some(item=>item.id===requested&&/\.docx$/i.test(item.name)))setSavedId(requested);
      else setVaultError('指定的简历不在当前账号，请从列表中选择。');
     }
    }})
@@ -72,8 +72,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);setSavedId('');
   setError('');setResult(null);setOptimizationSource('');setSaveConsent(false);setSaveNotice('');
   if(!candidate){setFile(null);return}
-  if(!/\.(pdf|docx)$/i.test(candidate.name)||!candidate.size||candidate.size>maxResumeSize){
-    setFile(null);setError('请选择不超过 3 MB 的 PDF 或 DOCX 文件。');return;
+  if(!/\.docx$/i.test(candidate.name)||!candidate.size||candidate.size>maxResumeSize){
+    setFile(null);setError('请上传不超过 3 MB 的 Word（.docx）简历。');return;
   }
   setFile(candidate);
  }
@@ -170,7 +170,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
        </div></div>}
     <div className="hhba-ai-layout">
       <section className="hhba-ai-upload">
-        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>PDF 或 DOCX，最大 3 MB。只有点击开始并同意授权后才分析，不会自动向企业投递。</p></header>
+        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>Word（.docx），最大 3 MB。只有点击开始并同意授权后才分析，最终 PDF 可从优化后的 Word 导出。</p></header>
         {user&&privateResumeAvailable&&<div className="hhba-ai-saved-picker">
           <label htmlFor="hhba-ai-existing">使用「我的简历」中已经保存的文件（无需重新上传）</label>
           <select id="hhba-ai-existing" value={savedId} disabled={working}
@@ -190,7 +190,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           onDrop={(e:DragEvent<HTMLLabelElement>)=>{e.preventDefault();setDrag(false);choose(e.dataTransfer.files?.[0]||null)}}>
           <FileText size={26}/>
           <strong>{savedId?'已选择私有简历：'+(savedFiles.find(x=>x.id===savedId)?.name||'') :file?file.name:'点击选择文件，或将简历拖到这里'}</strong>
-          <span>{file?(file.size/1024/1024).toFixed(2)+' MB · 可以分析':'仅支持可提取文字的 PDF / DOCX；扫描图片暂不支持'}</span>
+          <span>{file?(file.size/1024/1024).toFixed(2)+' MB · 可以分析':'仅支持有真实文字的 Word（.docx）；PDF 作为最终导出格式'}</span>
         </label>
         <div className="hhba-ai-review-tools">
          <button type="button" disabled={(!file&&!savedId)||working||previewBusy}
