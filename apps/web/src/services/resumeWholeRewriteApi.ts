@@ -9,6 +9,7 @@ export type ResumeWholeRewriteBlock={
 export type ResumeWholeRewriteResult={
  kind:'HHBA_WHOLE_RESUME_REWRITE_V1';ok:true;
  provider:string;reviewer:string;blocks:ResumeWholeRewriteBlock[];
+ recommended_order?:string[];
  questions:{blockId:string;question:string;reason:string;status:'user_input_needed'}[];
  warnings:{blockId:string;code:string;note:string}[];
  coverage:{source_blocks:number;analyzed_blocks:number;proposed_rewrites:number;held_for_review:number};
