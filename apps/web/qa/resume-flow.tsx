@@ -111,7 +111,9 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
   }));
   return respond({ok:true,kind:'HHBA_WHOLE_RESUME_REWRITE_V1',
    provider:'synthetic-mock',reviewer:'synthetic-review',
-   blocks:rewritten,questions:[{
+   blocks:rewritten,
+   recommended_order:input.blocks.map((b:{id:string})=>b.id).reverse(),
+   questions:[{
     blockId:input.blocks[0].id,question:'是否参与过跨区域门店支持？请提供真实范围。',
     reason:'原简历尚未提供相关事实。',status:'user_input_needed'
    }],warnings:[],
