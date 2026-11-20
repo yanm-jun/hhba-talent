@@ -244,10 +244,11 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  async function changeRevision(action:'undo'|'redo'){
   if(busy||ready!=='available'||action==='undo'&&revision<=0||
    action==='redo'&&revision>=totalRevisions)return;
-  rememberPosition();setBusy(true);setMessage('');setSelected(null);setConfirmed(false);
-  onSessionWordDraftChange?.(null);
+  if(!confirmDiscardText())return;
+  rememberPosition();setBusy(true);setMessage('');
   try{
    const result=await shiftOriginalWordRevision(resume.id,action,revision);
+   onSessionWordDraftChange?.(null);setSelected(null);setConfirmed(false);
    onVersionMoved?.();
    setRevision(result.revision);setTotalRevisions(result.total_revisions);
    setSaved(result.saved);setRefresh(n=>n+1);
