@@ -17,7 +17,7 @@ async function main(){
   getDocument,canvasFactory:()=>document.createElement('canvas')
  });
  if(proof.changedPixels<=8)throw Error('no actual CJK glyph raster change');
- host.dataset.status='passed';host.dataset.font=proof.originalFont;
+ host.dataset.font=proof.originalFont;
  host.dataset.changedPixels=String(proof.changedPixels);
  host.dataset.glyphProof=patch.proof.newGlyphs;
  host.textContent='中文原始字体不变，修改后的文字已经通过逐页校验。';
@@ -45,6 +45,7 @@ async function main(){
   await task.destroy();
  }
  host.append(gallery);
+ host.dataset.status='passed';
 }
 main().catch(e=>{host.dataset.status='failed';host.textContent='中文原字体测试失败：'+
  String(e instanceof Error?e.message:e);});
