@@ -250,3 +250,27 @@
  .hhba-original-resume-review-export>span{display:none}
  .hhba-original-resume-review-export>button:first-child{flex:1;min-height:42px}
 }
+
+
+/* A plain, inspectable timeline: each revision shows exactly what changed. */
+.hhba-original-resume-history{
+ margin:8px 0 12px;padding:9px 12px;border:1px solid #e2e8ef;
+ background:#fff;border-radius:10px;color:#35465b;
+}
+.hhba-original-resume-history summary{cursor:pointer;font-size:12px;font-weight:650;
+ min-height:30px;display:flex;align-items:center}
+.hhba-original-resume-history ol{
+ margin:8px 0 0;padding:0;list-style:none;display:grid;gap:7px;
+ max-height:260px;overflow-y:auto;
+}
+.hhba-original-resume-history li{padding:10px 11px;border:1px solid #e7edf2;border-radius:8px}
+.hhba-original-resume-history li.is-current{border-color:#acc9d8;background:#f6fafd}
+.hhba-original-resume-history li>div{display:flex;justify-content:space-between;gap:8px;
+ flex-wrap:wrap;font-size:12px}
+.hhba-original-resume-history li>div span{color:#748196;font-size:11px}
+.hhba-original-resume-history li p{margin:7px 0 0;font-size:12px;line-height:1.6;
+ overflow-wrap:anywhere;white-space:pre-wrap}
+@media(max-width:700px){
+ .hhba-original-resume-history ol{max-height:170px}
+ .hhba-original-resume-history li{padding:9px}
+}
