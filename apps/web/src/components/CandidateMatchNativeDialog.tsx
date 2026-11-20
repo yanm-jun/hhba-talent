@@ -22,6 +22,13 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
  const [optimizedJobId,setOptimizedJobId]=useState<string|null>(null);
  const [optimizationDirty,setOptimizationDirty]=useState(false);
  const activeJob=result.matches.find(job=>job.id===optimizedJobId);
+ // The result list and document editor share a scrollable dialog. Always
+ // start a newly selected job at its own header and Word canvas rather than
+ // inheriting the prior card-list scroll position (especially on phones).
+ useEffect(()=>{
+  const viewport=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content');
+  if(viewport)viewport.scrollTop=0;
+ },[optimizedJobId]);
  function confirmExitOptimization(){
   return !optimizationDirty||window.confirm('仍有尚未保存的简历文字草稿。退出后这些草稿可能丢失，确定离开吗？');
  }
