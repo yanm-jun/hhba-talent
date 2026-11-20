@@ -6,7 +6,7 @@ import {
  inspectOriginalDocxStrict,prepareVerifiedOriginalDocxExport
 } from '../../src/services/resumeDocxPreserve.mjs';
 
-const ID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+const ID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const DOCX_MIME='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const LIMIT=3072,DAILY={preview:4,export:6};
 const common={
