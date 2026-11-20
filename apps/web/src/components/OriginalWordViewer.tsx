@@ -298,7 +298,8 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
    }}>取消</button>
   </div>
  </div>:null;
- return <section className="hhba-original-resume hhba-original-word-viewer" aria-label="查看我的 Word 简历">
+ return <section className={'hhba-original-resume hhba-original-word-viewer'+
+  (selected&&!editPanelHost?' has-inline-editor':'')} aria-label="查看我的 Word 简历">
   <div className="hhba-original-resume-toolbar">
    <div className="hhba-original-resume-file-heading">
     <strong>{resume.name}</strong>
