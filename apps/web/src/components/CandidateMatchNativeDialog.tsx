@@ -81,6 +81,18 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
        <button type="button" className="hhba-match-workspace-back" onClick={backToMatches}>
         返回岗位结果
        </button>
+       {!sourceResume&&resumeStorage?.available&&<div className="hhba-match-save-resume hhba-match-word-onboarding">
+        <strong>先保存 Word，才能保留原有排版</strong>
+        <p>当前还没有把这份 Word 关联到你的私有简历库。
+         授权保存后，本页会自动切换成原版式 Word 编辑，避免生成另一份不同排版的简历。</p>
+        <label><input type="checkbox" checked={resumeStorage.consent} disabled={resumeStorage.saving}
+         onChange={event=>resumeStorage.onConsent(event.target.checked)}/>
+         我同意将该 Word 文件保存在我的 HHBA 私有简历库，AI 处理仍需另行授权。
+        </label>
+        <button type="button" disabled={!resumeStorage.consent||resumeStorage.saving}
+         onClick={resumeStorage.onSave}>{resumeStorage.saving?'正在保存 Word…':'保存原 Word 并开始优化'}</button>
+        {resumeStorage.notice&&<p role="status">{resumeStorage.notice}</p>}
+       </div>}
        <TargetedResumeOptimization key={activeJob.id} profile={parsedProfile}
         job={asTargetJob(activeJob)} sourceText={sourceText} accountScope={accountScope}
         sourceResume={sourceResume} onDraftDirtyChange={setOptimizationDirty}/>
