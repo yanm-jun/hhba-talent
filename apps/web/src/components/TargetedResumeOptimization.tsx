@@ -503,7 +503,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   <div className="targeted-resume-toolbar">
    <div><strong>优化这份简历</strong><p>根据目标岗位提出修改建议，不会凭空添加经历。</p></div>
    {hasSession&&status?.enabled
-    ?<button type="button" disabled={busy||!blocks.length} onClick={()=>{
+    ?<button type="button" disabled={busy||!blocks.length||legacyPrintQa&&!consent} onClick={()=>{
        if(!consent){
         setAiSettingsOpen(true);
         setNotice('请先展开隐私设置，确认 AI 处理授权，然后再生成建议。');
@@ -515,8 +515,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       </button>
     :<span className="targeted-resume-unavailable">{!hasSession?'站内登录后可使用 AI 润色':status?'AI 润色尚未开放':'正在检查服务状态…'}</span>}
   </div>
-  <details className="targeted-resume-ai-settings" open={aiSettingsOpen}
-   onToggle={event=>setAiSettingsOpen(event.currentTarget.open)}>
+  <details className="targeted-resume-ai-settings" open={legacyPrintQa||aiSettingsOpen}
+   onToggle={event=>{if(!legacyPrintQa)setAiSettingsOpen(event.currentTarget.open)}}>
    <summary>隐私授权与草稿设置 <ChevronDown size={14}/></summary>
   {omittedSourceCharacters>0&&<p className="targeted-resume-truncation" role="alert">
    <strong>这份简历有部分内容未显示。</strong>部分文字超出可编辑或可打印容量，
