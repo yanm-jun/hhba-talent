@@ -62,6 +62,9 @@ test('homepage and workspace use one matching component but distinct presentatio
  assert.match(styles,/\.hhba-ai-page-embedded \.hhba-ai-aside\{display:none\}/);
  assert.match(vault,/\/candidate\/account\/match\?resume=/);
  assert.match(history,/\/candidate\/account\/match/);
+ assert.ok(auth.includes("requested === '/candidate/account/match'"),'phone authentication must accept the exact workspace destination');
+ assert.ok(emailAuth.includes("next==='/candidate/account/match'"),'email authentication must retain the workspace destination');
+ assert.ok(app.includes("navigate('/candidate/login?next=%2Fcandidate%2Faccount%2Fmatch')"),'expired workspace session must return to the match panel after login');
  assert.doesNotMatch(vault,/\/candidate\/match/);
  assert.doesNotMatch(history,/\/candidate\/match/);
 });
