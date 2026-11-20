@@ -7,13 +7,15 @@ import type {ResumeWholeRewriteResult} from '../services/resumeWholeRewriteApi';
  * Approval is a presentation decision only; it NEVER writes a Word file.
  * Real DOCX writes still need explicit per-location renderer validation.
  */
-export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate,onDownload,revealedCount}:{
+export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate,onDownload,revealedCount,documentName,onDocumentNameChange}:{
  result:ResumeWholeRewriteResult;
  approved:boolean;
  onApprove:(approved:boolean)=>void;
  onRegenerate:(answers:Record<string,string>)=>void;
  onDownload:()=>void;
  revealedCount:number;
+ documentName:string;
+ onDocumentNameChange:(name:string)=>void;
 }){
  const [answers,setAnswers]=useState<Record<string,string>>({});
  const changes=result.blocks.filter(b=>b.changed);
@@ -82,6 +84,12 @@ export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate
    </details>)}
   </div>
   <div className="hhba-whole-rewrite-approval">
+   <label className="hhba-whole-rewrite-identity">
+    <span>简历姓名 <small>仅写入下载的 Word，不发送给 AI</small></span>
+    <input type="text" aria-label="岗位简历真实姓名" autoComplete="name"
+     value={documentName} maxLength={80} placeholder="填写你的真实姓名"
+     onChange={e=>onDocumentNameChange(e.target.value)}/>
+   </label>
    <label><input type="checkbox" checked={approved}
     disabled={!complete||!allVisible||!changes.length}
     onChange={e=>onApprove(e.target.checked)}/>
@@ -91,7 +99,7 @@ export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate
     当前确认不等于已经写入原文件。</p>:
     <p>AI 已完成撰写，但所有内容仍是草稿。任何修改写回原 Word 前还需要版式校验。</p>}
    <button type="button" className="hhba-whole-rewrite-download"
-    disabled={!approved||!complete||!allVisible} onClick={onDownload}>
+    disabled={!approved||!complete||!allVisible||documentName.trim().length<2} onClick={onDownload}>
     <Download size={15}/> 下载完整岗位定向 Word（新排版）
    </button>
    <small>这是根据整份 AI 草稿生成的可编辑新版 Word，不是覆盖你上传的原版式文件。原件始终保留。</small>
