@@ -64,6 +64,8 @@ on:
       - 'apps/web/src/services/resumePdfReviewCopy.*'
       - 'apps/web/src/services/resumePdfNativeFont.*'
       - 'apps/web/src/services/resumePdfNativeVerify.*'
+      - 'apps/web/src/services/resumePdfCjkFont.*'
+      - 'apps/web/scripts/resume-pdf-cjk-font.*'
       - 'apps/web/scripts/resume-pdf-native-font.*'
       - 'apps/web/scripts/resume-pdf-review-copy.*'
       - 'apps/web/scripts/resume-page-edits.*'
@@ -96,7 +98,7 @@ jobs:
         working-directory: apps/web
         env:
           HHBA_WORD_RENDER_QA_OUTPUT: /tmp/hhba-docx-preserve-ci
-        run: node --test --experimental-strip-types scripts/resume-optimization.provider.test.mjs scripts/resume-optimization.route.test.mjs scripts/resume-optimization.domain.test.mjs scripts/resume-versions.route.test.mjs scripts/resume-evidence-visibility.test.mjs scripts/resume-document.contract.test.mjs scripts/resume-docx.contract.test.mjs scripts/resume-docx-preserve.contract.test.mjs scripts/resume-word.route.test.mjs scripts/resume-word-anchors.contract.test.mjs scripts/resume-siri-ink.contract.test.mjs scripts/resume-changed-text.contract.test.mjs scripts/resume-vision-layout.contract.test.mjs scripts/resume-layout.route.test.mjs scripts/resume-visual-anchors.contract.test.mjs scripts/resume-inline-pdf-preview.contract.test.mjs scripts/resume-pdf-review-copy.contract.test.mjs scripts/resume-pdf-native-font.contract.test.mjs scripts/resume-page-edits.route.test.mjs scripts/resume-reassessment.domain.test.mjs scripts/resume-reassessment.route.test.mjs scripts/resume-optimization.main-flow.test.mjs scripts/official-job-evidence.contract.test.mjs scripts/official-job-verify.route.test.mjs
+        run: node --test --experimental-strip-types scripts/resume-optimization.provider.test.mjs scripts/resume-optimization.route.test.mjs scripts/resume-optimization.domain.test.mjs scripts/resume-versions.route.test.mjs scripts/resume-evidence-visibility.test.mjs scripts/resume-document.contract.test.mjs scripts/resume-docx.contract.test.mjs scripts/resume-docx-preserve.contract.test.mjs scripts/resume-word.route.test.mjs scripts/resume-word-anchors.contract.test.mjs scripts/resume-siri-ink.contract.test.mjs scripts/resume-changed-text.contract.test.mjs scripts/resume-vision-layout.contract.test.mjs scripts/resume-layout.route.test.mjs scripts/resume-visual-anchors.contract.test.mjs scripts/resume-inline-pdf-preview.contract.test.mjs scripts/resume-pdf-review-copy.contract.test.mjs scripts/resume-pdf-native-font.contract.test.mjs scripts/resume-pdf-cjk-font.contract.test.mjs scripts/resume-page-edits.route.test.mjs scripts/resume-reassessment.domain.test.mjs scripts/resume-reassessment.route.test.mjs scripts/resume-optimization.main-flow.test.mjs scripts/official-job-evidence.contract.test.mjs scripts/official-job-verify.route.test.mjs
       - name: Upload synthetic Word style-preservation render fixtures
         uses: actions/upload-artifact@v4
         if: always()
@@ -123,6 +125,9 @@ jobs:
           test ! -f dist/qa/resume-flow.html
           test ! -f dist/qa/native-pdf-font.html
           test ! -f dist/qa/native-pdf-font.ts
+          test ! -f dist/qa/native-cjk-font.html
+          test ! -f dist/qa/native-cjk-font.ts
+          test ! -f dist/qa/generated-cjk-original.pdf
           test ! -e dist/qa/resume-flow.tsx
           if grep -Rql --fixed-strings 'synthetic-browser-qa-token' dist; then
             echo 'ERROR: QA token fixture leaked into production output'
