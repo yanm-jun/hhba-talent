@@ -50,7 +50,7 @@ export function HomePage({user}:{user:User|null}){
     <div><span className="home-match-promo-kicker">HHBA AI MATCH</span><strong id="home-match-promo-title">让 AI 先理解你，再帮你寻找合适岗位</strong>
      <p>从简历提取职业能力，分析岗位要求与能力差距，优先寻找企业官方招聘信息。</p></div>
    </div>
-   <button type="button" onClick={()=>navigate('/candidate/match')}>
+   <button type="button" onClick={()=>navigate(user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch')}>
     <span>开始智能匹配</span><ArrowUpRight size={17}/>
    </button>
   </section>
