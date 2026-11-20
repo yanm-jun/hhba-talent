@@ -67,6 +67,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [manualText,setManualText]=useState('');
  const [activeSuggestionId,setActiveSuggestionId]=useState<string|null>(null);
  const [mobileSuggestionsOpen,setMobileSuggestionsOpen]=useState(false);
+ const [nativeWordPending,setNativeWordPending]=useState(false);
  // Do not silently keep a resume in localStorage. Optional draft recovery
  // requires a separate, user-checked consent and is tab/session-scoped.
  const draftKey=sourceResume&&accountScope?
@@ -410,7 +411,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  },[draftKey,rememberDraft,draftDirty,recoverableDraft,version,suggestions,ignored,
     suggestionDrafts,newEvidence,details]);
 
- useEffect(()=>{onDraftDirtyChange?.(draftDirty);},[draftDirty,onDraftDirtyChange]);
+ useEffect(()=>{onDraftDirtyChange?.(draftDirty||nativeWordPending);},
+  [draftDirty,nativeWordPending,onDraftDirtyChange]);
  useEffect(()=>{
   if(!draftDirty)return;
   const prevent=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue='';};
@@ -461,7 +463,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   {sourceResume?<section className="targeted-resume-word-workspace" aria-label="原版式 Word 统一编辑工作区">
    <div className="targeted-resume-word-main">
     <OriginalWordViewer resume={sourceResume} suggestedChanges={confirmedWordChanges}
-     onOpenSuggestions={()=>setMobileSuggestionsOpen(true)} pendingSuggestionCount={pendingSuggestions.length}/>
+     onOpenSuggestions={()=>setMobileSuggestionsOpen(true)}
+     onPendingChange={setNativeWordPending} pendingSuggestionCount={pendingSuggestions.length}/>
    </div>
    <aside className={'targeted-resume-word-assistant'+(mobileSuggestionsOpen?' mobile-open':'')}
     aria-label="AI 建议工作台">
