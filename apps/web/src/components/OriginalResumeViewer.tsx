@@ -4,6 +4,7 @@ import type {PrivateResume} from '../services/privateResumes';
 import {fetchPrivateResumeForLocalReview,downloadPrivateResume} from '../services/privateResumes';
 import {extractDocxText} from '../services/docxProfile.mjs';
 import {OriginalWordViewer} from './OriginalWordViewer';
+import {LegacyPdfReadOnlyViewer} from './LegacyPdfReadOnlyViewer';
 import {matchVisualRegionsToPdfPage,type VerifiedResumeAnchor} from '../services/resumeVisualAnchors.mjs';
 import {planInlinePdfPreview,whitePdfPatchBackground} from '../services/resumeInlinePdfPreview.mjs';
 import {splitChangedResumeText} from '../services/resumeChangedText.mjs';
@@ -21,7 +22,11 @@ import '../styles/siri-edge.css';
 export function OriginalResumeViewer(props:{resume:PrivateResume;onClose:()=>void;}){
  if(props.resume.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
   return <OriginalWordViewer {...props}/>;
- return <OriginalPdfViewer {...props}/>;
+ // Keep the historical synthetic PDF editor QA isolated to the local Vite test
+ // harness; real users now receive only the original PDF and its download.
+ if(import.meta.env.DEV&&typeof window!=='undefined'&&
+  window.location.pathname.startsWith('/qa/'))return <OriginalPdfViewer {...props}/>;
+ return <LegacyPdfReadOnlyViewer {...props}/>;
 }
 function OriginalPdfViewer({resume,onClose}:{
  resume:PrivateResume;onClose:()=>void;
