@@ -10,16 +10,16 @@ const fakeEnv={
  HHBA_AI_DEEPSEEK_API_KEY:'qa-only-key',
  HHBA_AI_DEEPSEEK_MODEL:'mock',
  HHBA_PNVS_AUTH_DB:{
-  prepare(){
+  prepare(sql){
    return {
     bind(){
      return {
-      first:async()=>({phone:'candidate',revoked:0,
-       expires_at:new Date(Date.now()+60000).toISOString()}),
+      first:async()=>sql.includes('hhba_auth_users')?
+       {role:'candidate'}:{phone:'candidate',revoked:0,
+        expires_at:new Date(Date.now()+60000).toISOString()},
       run:async()=>({success:true})
      };
-    },
-    first:async()=>({role:'candidate'})
+    }
    };
   }
  }
