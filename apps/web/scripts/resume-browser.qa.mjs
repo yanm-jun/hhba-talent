@@ -241,6 +241,18 @@ try{
  await source.getByRole('button',{name:'保存',exact:true}).click();
  const livePatch=source.locator('.hhba-original-resume-edit-patch');
  await livePatch.waitFor({timeout:10000});
+ const pdfRainbow=source.locator('.hhba-original-resume-edit-patch .hhba-resume-siri-letters');
+ await pdfRainbow.waitFor({timeout:10000});
+ const pdfRainbowStyle=await pdfRainbow.evaluate(el=>{
+  const style=getComputedStyle(el);
+  return {background:style.backgroundImage,
+   animation:style.animationName,
+   textFill:style.getPropertyValue('-webkit-text-fill-color')};
+ });
+ assert.match(pdfRainbowStyle.background,/linear-gradient/,
+  'PDF modified text itself must be rainbow, not just popup frame');
+ assert.match(pdfRainbowStyle.animation,/hhba-resume-siri-letters-flow/);
+ assert.match(pdfRainbowStyle.textFill,/transparent|rgba\(0, 0, 0, 0\)/);
  assert.match(await livePatch.textContent(),/修改后的简历/,
   'saved short text must be visible directly in the ORIGINAL PDF page');
  const verifiedPatch=await livePatch.evaluate(el=>{
@@ -322,6 +334,18 @@ try{
  await smallSource.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
  await smallSource.getByRole('button',{name:'保存',exact:true}).click();
  await smallSource.locator('.hhba-original-resume-edit-patch').waitFor({timeout:10000});
+ const mobileRainbow=smallSource.locator('.hhba-resume-siri-letters');
+ await mobileRainbow.waitFor({timeout:10000});
+ const mobileRainbowCSS=await mobileRainbow.evaluate(el=>({
+  background:getComputedStyle(el).backgroundImage,
+  animation:getComputedStyle(el).animationName
+ }));
+ assert.match(mobileRainbowCSS.background,/linear-gradient/);
+ assert.match(mobileRainbowCSS.animation,/hhba-resume-siri-letters-flow/);
+ await smallSource.emulateMedia({reducedMotion:'reduce'});
+ assert.equal(await mobileRainbow.evaluate(el=>getComputedStyle(el).animationName),'none',
+  'Siri rainbow text must stop moving for reduced-motion mobile users');
+ await smallSource.emulateMedia({reducedMotion:'no-preference'});
  const mobilePatchBounds=await smallSource.locator('.hhba-original-resume-edit-patch').evaluate(el=>{
   const a=el.getBoundingClientRect();return {left:a.left,right:a.right,viewport:document.documentElement.clientWidth};
  });
@@ -367,6 +391,25 @@ try{
    fullPage:true});
   await word.getByRole('button',{name:'保存',exact:true}).click();
   await word.getByRole('button',{name:'下载 Word'}).waitFor({timeout:20000});
+  const wordSiriInk=word.locator('.hhba-original-resume-siri-ink');
+  await wordSiriInk.waitFor({timeout:12000});
+  const inkStyle=await wordSiriInk.evaluate(el=>{
+   const style=getComputedStyle(el);
+   return {mask:style.maskImage||style.webkitMaskImage,
+    blend:style.mixBlendMode,animation:style.animationName,
+    background:style.backgroundImage};
+  });
+  assert.match(inkStyle.mask,/data:image\/png;base64/,
+   'Word changed glyphs must be masked from original rendered pixels');
+  assert.equal(inkStyle.blend,'screen');
+  assert.match(inkStyle.background,/linear-gradient/);
+  assert.match(inkStyle.animation,/hhba-resume-siri-letters-flow/);
+  await word.screenshot({path:output+'/original-word-'+view.name+'-siri-text.png',
+   fullPage:true});
+  await word.emulateMedia({reducedMotion:'reduce'});
+  assert.equal(await wordSiriInk.evaluate(el=>getComputedStyle(el).animationName),'none',
+   'Siri colored Word text must pause for reduced-motion users');
+  await word.emulateMedia({reducedMotion:'no-preference'});
   const downloadEvent=word.waitForEvent('download');
   await word.getByRole('button',{name:'下载 Word'}).click();
   const downloaded=await downloadEvent;
