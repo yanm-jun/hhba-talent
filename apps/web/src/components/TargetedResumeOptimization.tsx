@@ -471,7 +471,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     <p>直接在简历上修改。原文件不会被覆盖。</p></div>
    <span><Sparkles size={13} aria-hidden="true"/> 智能修改</span>
   </div>
-  {!sourceResume&&optimizationControls}
+  {!sourceResume&&legacyPrintQa&&optimizationControls}
   {sourceResume?<section className="targeted-resume-word-workspace" aria-label="原版式 Word 统一编辑工作区">
    <div className="targeted-resume-word-main">
     <OriginalWordViewer resume={sourceResume} suggestedChanges={confirmedWordChanges}
@@ -523,7 +523,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      </p>}
     <p className="targeted-resume-word-privacy">系统不会把 AI 草稿直接覆盖 Word；无法精确对应或会改变字体版式的建议将拒绝自动保存。</p>
    </aside>
-  </section>:<>
+  </section>:legacyPrintQa?<>
   <section className="targeted-resume-document-editor" aria-label="正式简历排版与打印">
    <div className="targeted-resume-document-heading">
     <div><strong>直接修改简历</strong>
@@ -557,8 +557,12 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     aria-label="可原位编辑的简历预览">
    <ResumePrintSheet document={printDocument} renderBlock={renderEditableBlock}/>
   </div>
-  </>}
-  {!sourceResume&&before.score!==null&&<div className="targeted-resume-audit" aria-label="文字证据覆盖变化">
+  </>:<section className="targeted-resume-word-onboarding" role="status">
+   <strong>先使用原 Word，才能保留你的字体和版式</strong>
+   <p>这份简历尚未保存到「我的简历」。请先完成上方私有保存授权，再从原 Word 页面确认 AI 的修改建议。不会生成另一份冒充原排版的简历。</p>
+   <Link to="/candidate/account/resume">前往我的简历</Link>
+  </section>}
+  {!sourceResume&&legacyPrintQa&&before.score!==null&&<div className="targeted-resume-audit" aria-label="文字证据覆盖变化">
    <div><small>优化前 · 要求文字覆盖</small><strong>{before.score}%</strong></div>
    <span aria-hidden="true">→</span>
    <div><small>当前版本 · 要求文字覆盖</small><strong>{after.score}%</strong></div>
@@ -566,7 +570,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    {after.missing.length>0&&<details><summary>仍未充分体现的要求（{after.missing.length}）</summary>
     <ul>{after.missing.map((label,index)=><li key={index}>{label}</li>)}</ul></details>}
   </div>}
-  {!sourceResume&&<section className="targeted-resume-reassess" aria-label="岗位匹配评分复评">
+  {!sourceResume&&legacyPrintQa&&<section className="targeted-resume-reassess" aria-label="岗位匹配评分复评">
    <div className="targeted-resume-reassess-heading">
     <div><strong>重新查看匹配分</strong>
      <p>只有核实了企业发布的岗位要求后，才会比较修改前后的分数。</p></div>
@@ -624,25 +628,25 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      <p className="targeted-resume-score-disclaimer">{scoreResult.important_notice}</p>
     </div>}
   </section>}
-  {!sourceResume&&<div className="targeted-resume-save">
+  {!sourceResume&&legacyPrintQa&&<div className="targeted-resume-save">
    <div><strong><FolderOpen size={16} aria-hidden="true"/> 我的岗位简历版本</strong>
     <p>仅在你主动保存后，将当前已确认的文字片段保存在 HHBA 私人账号中；不保存原始 PDF/DOCX。</p></div>
    {hasSession&&storageReady&&<button type="button" disabled={saving||!confirmReal||!canPrint} onClick={persist}>
     <Save size={14} aria-hidden="true"/>{saving?'保存中…':'保存当前版本'}</button>}
    {hasSession&&!storageReady&&<span className="targeted-resume-unavailable">暂时无法保存，请稍后再试</span>}
   </div>}
-  {!sourceResume&&hasSession&&storageReady&&<label className="targeted-resume-confirm targeted-resume-save-confirm">
+  {!sourceResume&&legacyPrintQa&&hasSession&&storageReady&&<label className="targeted-resume-confirm targeted-resume-save-confirm">
    <input type="checkbox" checked={confirmReal} onChange={e=>setConfirmReal(e.target.checked)}/>
    我已核实当前简历的全部文字及个人联系方式真实准确，理解点击保存后这些资料会保存在我的 HHBA 云端账户，直到我主动删除或按平台数据政策处理。
   </label>}
-  {!sourceResume&&saved.length>0&&<div className="targeted-resume-history">
+  {!sourceResume&&legacyPrintQa&&saved.length>0&&<div className="targeted-resume-history">
    {saved.map(item=><div key={item.id}>
     <span>{new Date(item.created_at).toLocaleString()} · {item.version.acceptedSuggestionIds.length} 条已采纳</span>
     <button type="button" onClick={()=>restore(item)}>载入</button>
     <button type="button" onClick={()=>remove(item)}>删除</button>
    </div>)}
   </div>}
-  {!sourceResume&&<div className="targeted-resume-footer">
+  {!sourceResume&&legacyPrintQa&&<div className="targeted-resume-footer">
    <p><ShieldCheck size={14} aria-hidden="true"/> 原来的参考分：{Number.isInteger(job.reference_score)?job.reference_score+'/100':'暂无可靠分数'}。润色后的匹配分须通过同一评分规则重新评估；评分仅供参考。</p>
    <button type="button" onClick={reset}><Undo2 size={14}/> 恢复原稿</button>
   </div>}
