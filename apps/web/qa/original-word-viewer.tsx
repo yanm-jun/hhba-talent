@@ -30,7 +30,8 @@ const editedPdf=pdfFor('EDITED WORD RESUME');
 const resume:PrivateResume={id,name:'虚构原样式简历.docx',
  type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
  size:2048,createdAt:'2026-11-20T00:00:00Z'};
-let saved=false;
+const revisions=['ORIGINAL WORD RESUME'];
+let active=0;
 localStorage.setItem(REAL_AUTH_TOKEN_KEY,'word-synthetic-qa-token');
 const genuine=window.fetch.bind(window);
 window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
@@ -40,13 +41,19 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
   const action=url.searchParams.get('action');
   if(action==='status')return Promise.resolve(Response.json({ok:true,enabled:true}));
   if(action==='inspect')return Promise.resolve(Response.json({
-   ok:true,editable_text:saved?[]:['ORIGINAL WORD RESUME'],
-   saved:saved?{original:'ORIGINAL WORD RESUME',text:'EDITED WORD RESUME',updated_at:'2026-11-20T00:00:00Z'}:null
+   ok:true,editable_text:[revisions[active]],
+   saved:active?{original:revisions[active-1],text:revisions[active],
+    updated_at:'2026-11-20T00:00:00Z'}:null,
+   revision:active,total_revisions:revisions.length-1,max_revisions:8
   }));
-  if(action==='preview'||action==='edited-preview'||action==='download-pdf')
-   return Promise.resolve(new Response(action==='preview'?originalPdf:editedPdf,{
-    status:200,headers:{'Content-Type':'application/pdf','Content-Length':String(originalPdf.length)}
+  if(action==='preview'||action==='edited-preview'||action==='download-pdf'){
+   if(action!=='preview'&&active===0)
+    return Promise.resolve(Response.json({error:'WORD_NOT_EDITED'},{status:404}));
+   const bytes=action==='preview'?originalPdf:pdfFor(revisions[active]);
+   return Promise.resolve(new Response(bytes,{
+    status:200,headers:{'Content-Type':'application/pdf','Content-Length':String(bytes.length)}
    }));
+  }
   if(action==='download'){
    const simulatedDocx=new Uint8Array(1250);
    simulatedDocx.set([80,75,3,4]); // Synthetic ZIP header for client-side signature guard.
@@ -58,8 +65,22 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
    const request=JSON.parse(String(init.body||'{}'));
    if(request.confirmed_real!==true||request.consent_word_processing!==true)
     return Promise.resolve(Response.json({ok:false,error:'INVALID_REQUEST'},{status:400}));
-   saved=true;
-   return Promise.resolve(Response.json({ok:true,saved:true,page_count:1}));
+   if(request.expected_revision!==active)
+    return Promise.resolve(Response.json({error:'WORD_REVISION_CONFLICT'},{status:409}));
+   if(request.action==='undo'||request.action==='redo'){
+    const next=active+(request.action==='undo'?-1:1);
+    if(next<0||next>=revisions.length)
+     return Promise.resolve(Response.json({error:'WORD_REVISION_CONFLICT'},{status:409}));
+    active=next;
+    return Promise.resolve(Response.json({ok:true,saved:active>0,revision:active,
+     total_revisions:revisions.length-1}));
+   }
+   if(request.original!==revisions[active])
+    return Promise.resolve(Response.json({error:'WORD_EDIT_AMBIGUOUS'},{status:422}));
+   revisions.splice(active+1);
+   revisions.push(request.text);active++;
+   return Promise.resolve(Response.json({ok:true,saved:true,page_count:1,
+    revision:active,total_revisions:revisions.length-1}));
   }
  }
  if(url.pathname==='/api/resumes/'+id+'/download')
