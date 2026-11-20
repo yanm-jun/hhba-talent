@@ -149,18 +149,27 @@ export async function onRequest({request,env}){
      }
     });
    }
-   // Remove the consented visual analysis cache with the source file.
-   // Both objects reside exclusively in the candidate-owned private R2 bucket.
-   await bucket.delete(row.storage_key);
+   // A Word revision may produce multiple immutable private artifacts.
+   // Never remove the original first, or orphan later revisions on a failed
+   // cleanup. R2 listing is mandatory for a complete and bounded removal.
+   if(row.media_type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'){
+    if(typeof bucket.list!=='function')return err('PRIVATE_STORAGE_NOT_ENABLED',503);
+    const wordPrefix=row.storage_key+'.hhba-word-preserved-v1-'+row.sha256;
+    let cursor,passes=0;
+    do{
+     if(++passes>8)throw Error('WORD_ARTIFACT_LIST_TOO_LARGE');
+     const page=await bucket.list({prefix:wordPrefix,limit:1000,...(cursor?{cursor}:{})});
+     if(page.truncated&&!page.cursor)throw Error('WORD_ARTIFACT_LIST_INCOMPLETE');
+     for(const item of page.objects||[]){
+      if(!item.key.startsWith(wordPrefix))throw Error('WORD_ARTIFACT_LIST_INVALID');
+      await bucket.delete(item.key);
+     }
+     cursor=page.truncated?page.cursor:null;
+    }while(cursor);
+   }
    await bucket.delete(row.storage_key+'.hhba-vision-layout-v1.json').catch(()=>{});
    await bucket.delete(row.storage_key+'.hhba-page-edits-v1.json').catch(()=>{});
-   // Word previews and verified editable copies live in the same private vault.
-   // Deleting an original resume must delete every derived Word artifact.
-   if(row.media_type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'){
-    const wordPrefix=row.storage_key+'.hhba-word-preserved-v1-'+row.sha256;
-    for(const ext of ['.source.pdf','.docx','.edited.pdf','.json'])
-     await bucket.delete(wordPrefix+ext).catch(()=>{});
-   }
+   await bucket.delete(row.storage_key);
    const deleted=await db.prepare(
     'DELETE FROM hhba_candidate_resumes WHERE phone=? AND id=?'
    ).bind(phone,id).run();
