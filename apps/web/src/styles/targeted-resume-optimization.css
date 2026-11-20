@@ -860,3 +860,22 @@
  padding:4px 7px;border-radius:6px;background:#f3f6f9;
  font-size:10px;color:#637b8e;
 }
+
+
+/* Long-running AI work is interruptible and reversible. */
+.targeted-resume .hhba-whole-rewrite-cancel,
+.targeted-resume .hhba-whole-rewrite-resume{
+ display:flex;align-items:center;justify-content:center;gap:7px;
+ width:100%;min-height:40px;padding:8px 10px;
+ font-size:12px;font-weight:650;border-radius:8px;cursor:pointer;
+}
+.targeted-resume .hhba-whole-rewrite-cancel{
+ background:#fff;border:1px solid #d7e2ea;color:#56718a;
+}
+.targeted-resume .hhba-whole-rewrite-resume{
+ background:#f3f7fc;border:1px solid #bad0df;color:#285577;
+}
+.targeted-resume .hhba-whole-rewrite-resume:hover,
+.targeted-resume .hhba-whole-rewrite-cancel:hover{
+ background:#edf4fa;
+}
