@@ -129,7 +129,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
        <p>原文件仅写入你的私有简历库，方便下次复用；不会因保存而再次调用 AI 或向企业投递。</p>
        <label><input type="checkbox" checked={resumeStorage.consent} disabled={resumeStorage.saving}
         onChange={e=>resumeStorage.onConsent(e.target.checked)}/>
-        我同意将这份 PDF/DOCX 原文件保存到当前账户的私有简历库（与本次 AI 分析授权分开）。</label>
+        我同意将这份 Word（.docx）原文件保存到当前账户的私有简历库（与本次 AI 分析授权分开）。</label>
        <button type="button" disabled={!resumeStorage.consent||resumeStorage.saving}
         onClick={resumeStorage.onSave}>{resumeStorage.saving?'正在私有保存…':'保存到我的简历'}</button>
       </div>}
