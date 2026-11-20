@@ -4,11 +4,13 @@ import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
 import {Link} from '../router';
 import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDialog';
+import {CandidateJourneySteps} from '../components/CandidateJourneySteps';
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
 import {matchServiceReady,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
+import '../styles/candidate-journey.css';
 
 const supportedTypes='.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const maxResumeSize=3*1024*1024;
@@ -158,10 +160,11 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     <nav className="hhba-ai-breadcrumb"><Link to="/candidate/account"><ArrowLeft size={15}/> 工作台</Link>
      <span>/</span><strong>简历智能匹配</strong></nav>
     <div className="hhba-ai-hero">
-      <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> 汇方职场 · HHBA · AI JOB MATCH</div>
-      <h1>上传简历，寻找合适岗位。</h1>
-      <p>HHBA 将结合你的简历与公开岗位，为你生成个性化推荐。</p>
+      <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> 汇方职场 · HHBA</div>
+      <h1>上传一份简历，找到适合你的工作。</h1>
+      <p>AI 负责寻找企业岗位、分析适配程度，并为你准备针对性的投递简历。</p>
     </div>
+    <CandidateJourneySteps current={working?2:1}/>
     {availability==='loading'&&<p className="hhba-ai-service-check"><LoaderCircle size={17} className="spin"/>正在检查平台智能匹配服务…</p>}
     {availability==='disabled'&&<div className="hhba-ai-admin-note" role="status">
        <LockKeyhole size={19}/><div><strong>智能匹配服务暂未启用。</strong>
@@ -170,7 +173,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
        </div></div>}
     <div className="hhba-ai-layout">
       <section className="hhba-ai-upload">
-        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>Word（.docx），最大 3 MB。只有点击开始并同意授权后才分析，最终 PDF 可从优化后的 Word 导出。</p></header>
+        <header><h2><FileUp size={20}/> 选择你的 Word 简历</h2>
+         <p>上传 .docx，或选择以前保存的简历。AI 会根据真实内容主动寻找岗位，不必先填写求职条件。</p></header>
         {user&&privateResumeAvailable&&<div className="hhba-ai-saved-picker">
           <label htmlFor="hhba-ai-existing">使用「我的简历」中已经保存的文件（无需重新上传）</label>
           <select id="hhba-ai-existing" value={savedId} disabled={working}
@@ -192,24 +196,27 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           <strong>{savedId?'已选择私有简历：'+(savedFiles.find(x=>x.id===savedId)?.name||'') :file?file.name:'点击选择文件，或将简历拖到这里'}</strong>
           <span>{file?(file.size/1024/1024).toFixed(2)+' MB · 可以分析':'仅支持有真实文字的 Word（.docx）；PDF 作为最终导出格式'}</span>
         </label>
-        <div className="hhba-ai-review-tools">
-         <button type="button" disabled={(!file&&!savedId)||working||previewBusy}
-          onClick={()=>void preview()}>{previewBusy?'正在读取简历文字…':'可选：预览并编辑用于匹配的简历文字'}</button>
-         {previewLoaded&&<div className="hhba-ai-text-review">
-          <label htmlFor="hhba-ai-text-preview">文字预览（最多 20,000 字）</label>
-          <textarea id="hhba-ai-text-preview" rows={6} maxLength={20000} value={previewText}
-           disabled={working} onChange={e=>{setPreviewText(e.target.value);setConsent(false);}}/>
-          <small>请先删除不希望用于本次匹配的内容。</small>
-         </div>}
-        </div>
-        <header className="hhba-ai-section-title"><h2>2. 选择工作方向</h2>
-          <p>可选填目标方向；不填写时，AI 会根据简历为你推荐。</p></header>
-        <div className="hhba-ai-mainland-only"><span>工作区域</span><strong>中国大陆</strong><small>不推荐港澳台或境外岗位</small></div>
-        <div className="hhba-ai-fields hhba-ai-fields-one">
-         <label>目标岗位方向<input value={options.role_hint} maxLength={80} placeholder="例如：软件开发、数据分析、销售、视觉设计"
-          onChange={e=>setOptions(x=>({...x,role_hint:e.target.value}))}/></label>
-        </div>
-        <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
+        <details className="hhba-ai-preferences">
+         <summary>可选：指定岗位方向或核对简历文字</summary>
+         <p>不填写岗位方向，AI 也会根据简历寻找适合的真实工作。</p>
+         <div className="hhba-ai-mainland-only"><span>搜索范围</span><strong>中国大陆</strong></div>
+         <div className="hhba-ai-fields hhba-ai-fields-one">
+          <label>希望优先寻找的岗位<input value={options.role_hint} maxLength={80}
+           placeholder="留空，让 AI 判断最适合的方向"
+           onChange={e=>setOptions(x=>({...x,role_hint:e.target.value}))}/></label>
+         </div>
+         <div className="hhba-ai-review-tools">
+          <button type="button" disabled={(!file&&!savedId)||working||previewBusy}
+           onClick={()=>void preview()}>{previewBusy?'正在读取简历文字…':'查看 AI 将分析的简历文字'}</button>
+          {previewLoaded&&<div className="hhba-ai-text-review">
+           <label htmlFor="hhba-ai-text-preview">简历文字核对（最多 20,000 字）</label>
+           <textarea id="hhba-ai-text-preview" rows={6} maxLength={20000}
+            value={previewText} disabled={working}
+            onChange={e=>{setPreviewText(e.target.value);setConsent(false);}}/>
+           <small>可以删除不希望提交给 AI 的内容；修改后需重新确认授权。</small>
+          </div>}
+         </div>
+        </details>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
           <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 使用我的简历信息进行智能岗位匹配。</span>
@@ -218,17 +225,17 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
           disabled={(!file&&!savedId)||!consent||working||previewBusy||(previewLoaded&&previewText.replace(/\s/g,'').length<30)||availability!=='ready'||!getRealAuthToken()}>
-          {working?<><LoaderCircle className="spin" size={18}/> 正在提取简历并匹配岗位…</>:
-           <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
+          {working?<><LoaderCircle className="spin" size={18}/> AI 正在寻找岗位…</>:
+           <><BriefcaseBusiness size={17}/> AI 为我寻找适合的工作 <ArrowRight size={17}/></>}
         </button>
         {working&&<p className="hhba-ai-processing" role="status">{stage==='preparing'?'正在准备智能匹配…':stage==='connected'?'正在连接岗位信息…':stage==='searching'?'正在寻找中国大陆岗位…':stage==='reading'?'正在读取候选岗位信息…':stage==='waiting'?'正在生成推荐，请稍候…':'正在分析简历并生成推荐理由…'}</p>}
       </section>
       <aside className="hhba-ai-aside">
-        <div className="hhba-ai-aside-card"><h3>只需三步</h3>
-           <ol><li>上传简历</li><li>智能匹配为你寻找岗位</li>
-             <li>直接查看 Top 10 推荐理由与岗位链接</li></ol>
-         </div>
-         <p className="hhba-ai-aside-footnote">工作地点仅限中国大陆；招聘状态请以岗位原始网页为准。</p>
+       <div className="hhba-ai-aside-card">
+        <h3>剩下的交给 AI</h3>
+        <p>搜索真实岗位、给出适配分、准备针对岗位的简历。</p>
+        <small>你只需要核实个人经历，决定是否去企业官网投递。</small>
+       </div>
       </aside>
     </div>
     {(result||partialJobs.length>0)&&<CandidateMatchNativeDialog
