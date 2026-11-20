@@ -50,7 +50,7 @@ test('tight right column, clear left groups and responsive mobile nav',()=>{
 
 test('all candidate sidebar destinations render inside one persistent workspace shell',()=>{
  assert.ok(routes.includes('isCandidateWorkspaceRoute'));
- for(const route of ["route==='/candidate/match'","route==='/candidate/account/rights'","route==='/candidate/account/legal-aid'","route==='/candidate/account/legal-aid/intervention'"]) assert.ok(routes.includes(route),route);
+ for(const route of ["route==='/candidate/account/match'","route==='/candidate/account/rights'","route==='/candidate/account/legal-aid'","route==='/candidate/account/legal-aid/intervention'"]) assert.ok(routes.includes(route),route);
  for(const component of ['CandidateMatchPage','WorkplaceRightsPage','LegalAidLandingPage','LegalAidInterventionPage']) assert.ok(routes.includes(component+' user={user} embedded'),component+' must be embedded');
  assert.match(routes,/LegalAidTopicPage user=\{user\} slug=\{[^\n]+ embedded\/>/);
  assert.ok(personal.includes('externalSections&&Object.entries(externalSections)'));

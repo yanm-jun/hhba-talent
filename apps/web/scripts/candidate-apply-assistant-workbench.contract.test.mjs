@@ -13,7 +13,7 @@ test('minimal workbench keeps true resume, saved jobs and matching history',()=>
  assert.match(page,/savedCount/);
  assert.match(page,/historyCount/);
  assert.match(page,/latestMatch/);
- assert.match(page,/label:'智能岗位匹配',path:'\/candidate\/match'/);
+ assert.match(page,/label:'智能岗位匹配',path:'\/candidate\/account\/match'/);
  assert.doesNotMatch(page,/hhba-account-stat-grid|hhba-career-membership|hhba:career-stage:/);
  assert.ok(page.includes("label:'一键网申'"),'apply assistant remains in the grouped navigation');
  assert.ok(page.includes("to=\"/candidate/account/rights\""));
