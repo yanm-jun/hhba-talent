@@ -65,8 +65,8 @@
  background-image:linear-gradient(105deg,
   #009cc2 0%,#3a7fe6 17%,#8351d5 36%,
   #c84f9f 55%,#de7958 74%,#16b5cd 100%);
- background-size:260% 100%;
- background-position:0% 50%;
+ background-size:175% 100%;
+ background-position:6% 50%;
  background-repeat:no-repeat;
  -webkit-background-clip:text;
  background-clip:text;
@@ -84,14 +84,14 @@
  background-image:linear-gradient(105deg,
   #009cc2 0%,#3a7fe6 17%,#8351d5 36%,
   #c84f9f 55%,#de7958 74%,#16b5cd 100%);
- background-size:260% 100%;
- background-position:0% 50%;
+ background-size:175% 100%;
+ background-position:6% 50%;
  mix-blend-mode:screen;
  animation:hhba-resume-siri-letters-flow 11s ease-in-out infinite alternate;
 }
 @keyframes hhba-resume-siri-letters-flow{
- from{background-position:0% 50%}
- to{background-position:100% 50%}
+ from{background-position:6% 50%}
+ to{background-position:94% 50%}
 }
 @media(prefers-reduced-motion:reduce){
  .hhba-resume-siri-letters,.hhba-original-resume-siri-ink{
