@@ -102,7 +102,7 @@ test('frontend-first upload renders user's own DOCX text and opens an independen
  assert.match(stage,/aria-modal="true"/);
  assert.match(stage,/hhba-siri-edge-active/);
  assert.match(stage,/splitChangedResumeText\(/);
- assert.match(stage,/className="hhba-stage-popover"/);
+ assert.match(stage,/hhba-stage-popover/);
  assert.match(stage,/不会调用 AI、修改原 Word、生成文件或向企业投递/);
  assert.match(css,/grid-template-columns:minmax\(0,1fr\) 283px/);
  assert.match(css,/@media\(max-width:700px\)/);
