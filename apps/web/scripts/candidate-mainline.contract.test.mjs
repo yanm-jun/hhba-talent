@@ -89,7 +89,7 @@ test('Siri visual review is accessible only via the isolated feature Preview bui
  assert.match(build,/WEB \/ "dist" \/ "preview" \/ "resume-siri\.html"/);
 });
 
-test('frontend-first upload renders user's own DOCX text and opens an independent Siri modal with a small suggestion popup',async()=>{
+test('frontend-first upload shows the candidate DOCX and an independent Siri modal with a small suggestion popup',async()=>{
  const page=await source('pages/CandidateMatchPage.tsx');
  const stage=await source('components/CandidateResumeStage.tsx');
  const css=await source('styles/candidate-resume-stage.css');
