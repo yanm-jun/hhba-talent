@@ -743,7 +743,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
        </div>}
       </section>
      })}
-    </div>}
+    </div>
     {confirmedWordChanges.length>0&&<p className="targeted-resume-word-next-step">
       {confirmedWordChanges.length} 条建议已准备就绪。请点击 Word 对应文字确认。
      </p>}
