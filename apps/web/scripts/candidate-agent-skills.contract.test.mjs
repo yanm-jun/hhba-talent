@@ -104,6 +104,24 @@ test('agent re-redacts contact information at the final provider boundary',async
   });
 });
 
+test('unsafe streamed partial jobs are never exposed to the applicant',async()=>{
+  const visible=[];
+  const safe=sampleJob();
+  const blocked={...sampleJob(),official_url:'https://www.zhipin.com/job_detail/test-id.html'};
+  const result=await runCandidateAgentMatch({
+    env:preview(),redactedResume:resume,
+    onPartial:jobs=>visible.push(jobs),
+    executeSearch:async(key,text,role,limit,ctx)=>{
+      ctx.onPartial([blocked,safe]);
+      ctx.onPartial([blocked]);
+      return {matches:[safe],diagnostic:{}};
+    }
+  });
+  assert.equal(result.matches.length,1);
+  assert.equal(visible.length,1);
+  assert.deepEqual(visible[0],[safe]);
+});
+
 test('rewrite skill can be disabled without breaking search and scoring',async()=>{
   const env={...preview(),
     HHBA_CANDIDATE_AGENT_SKILLS:'resume_evidence,official_job_search,fit_scoring'};
