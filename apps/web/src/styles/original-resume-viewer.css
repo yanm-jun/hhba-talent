@@ -505,3 +505,65 @@
   max-height:calc(100dvh - 270px);min-height:300px;
  }
 }
+
+
+/* Immersive Word stage. The edge is active ONLY during entrance, analysis
+   or pending review. It is not part of rendered DOCX/PDF bytes. */
+.hhba-original-word-viewer .hhba-original-resume-siri-stage.hhba-siri-edge-active{
+ position:relative;isolation:isolate;overflow:visible;
+ border-radius:12px;background:#fff;
+}
+.hhba-original-word-viewer .hhba-original-resume-siri-stage.hhba-siri-edge-active::before,
+.hhba-original-word-viewer .hhba-original-resume-siri-stage.hhba-siri-edge-active::after{
+ display:block;content:"";
+}
+.hhba-original-word-viewer .hhba-original-resume-siri-stage.hhba-siri-edge-active::before{
+ inset:-6px;z-index:-1;opacity:.69;filter:blur(15px);
+}
+.hhba-original-word-viewer .hhba-original-resume-siri-stage.hhba-siri-edge-active::after{
+ inset:-2px;z-index:2;opacity:.82;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview{
+ border:0;outline:1px solid rgba(107,142,191,.2);background:#fff;
+ border-radius:2px;z-index:2;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview:focus-visible{
+ outline:2px solid #5780b5;outline-offset:2px;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview>.hhba-word-ai-preview{
+ display:flex;align-items:center;position:absolute;
+ inset:0;overflow:hidden;background:#fff;border:0;
+ padding:0 2px;pointer-events:none;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text{
+ display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;
+ white-space:nowrap;text-align:left;line-height:1.2;font-weight:500;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-edit-anchor-label{
+ position:absolute;right:0;top:-22px;z-index:4;white-space:nowrap;
+ padding:3px 6px;color:#fff;pointer-events:none;
+ background:#486881;border-radius:4px;opacity:0;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview:hover
+ .hhba-word-edit-anchor-label,
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview:focus-visible
+ .hhba-word-edit-anchor-label{opacity:1}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview>.hhba-word-ai-preview
+ .hhba-resume-siri-letters{
+ background-image:linear-gradient(100deg,#04aac8 0%,#457ce5 25%,
+ #8657d9 48%,#d85d9f 69%,#e98d5e 84%,#15b5d1 100%);
+ background-size:200% 100%;-webkit-background-clip:text;background-clip:text;
+ -webkit-text-fill-color:transparent;
+ animation:hhba-resume-siri-letters-flow 7s ease-in-out infinite alternate;
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-resume-siri-letters{animation:none!important;background-position:40% 50%}
+}
+@media print{
+ .hhba-original-word-viewer .hhba-word-ai-preview{display:none!important}
+ .hhba-original-word-viewer .hhba-original-resume-siri-stage::before,
+ .hhba-original-word-viewer .hhba-original-resume-siri-stage::after{display:none!important}
+}
