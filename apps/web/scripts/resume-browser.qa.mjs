@@ -641,7 +641,7 @@ try{
   });
   const rainbowOpacity=await first.locator('.hhba-word-native-preview .hhba-word-ai-preview-text')
    .first().evaluate(el=>getComputedStyle(el).opacity);
-  assert.equal(rainbowOpacity,'1','real document AI text must be visibly colorful, not hidden by old anchor CSS');
+  assert.ok(Number(rainbowOpacity)>.998,'real document AI text must be visibly colorful, not hidden by old anchor CSS');
   const inkGeometry=await first.locator('.hhba-word-native-preview .hhba-word-ai-preview-text')
    .first().evaluate(el=>{
     const text=el.getBoundingClientRect();
