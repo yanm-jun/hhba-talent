@@ -37,6 +37,13 @@ on:
       - 'apps/web/scripts/resume-docx.*'
       - 'apps/web/src/services/resumeDocx.ts'
       - 'apps/web/src/services/resumeDocxPreserve.mjs'
+      - 'apps/web/src/services/originalWordApi.ts'
+      - 'apps/web/src/services/resumeWordAnchors.*'
+      - 'apps/web/src/components/OriginalWordViewer.tsx'
+      - 'apps/web/functions/_lib/private-word-service.js'
+      - 'apps/web/functions/api/resume-word.js'
+      - 'apps/web/d1/0026_resume_word_attempts.sql'
+      - 'apps/web/scripts/resume-word.*'
       - 'apps/web/scripts/resume-docx-preserve.*'
       - 'apps/web/src/components/OriginalResumeViewer.tsx'
       - 'apps/web/src/components/PrivateResumeVault.tsx'
@@ -81,7 +88,7 @@ jobs:
         working-directory: apps/web
         env:
           HHBA_WORD_RENDER_QA_OUTPUT: /tmp/hhba-docx-preserve-ci
-        run: node --test --experimental-strip-types scripts/resume-optimization.provider.test.mjs scripts/resume-optimization.route.test.mjs scripts/resume-optimization.domain.test.mjs scripts/resume-versions.route.test.mjs scripts/resume-evidence-visibility.test.mjs scripts/resume-document.contract.test.mjs scripts/resume-docx.contract.test.mjs scripts/resume-docx-preserve.contract.test.mjs scripts/resume-vision-layout.contract.test.mjs scripts/resume-layout.route.test.mjs scripts/resume-visual-anchors.contract.test.mjs scripts/resume-inline-pdf-preview.contract.test.mjs scripts/resume-pdf-review-copy.contract.test.mjs scripts/resume-page-edits.route.test.mjs scripts/resume-reassessment.domain.test.mjs scripts/resume-reassessment.route.test.mjs scripts/resume-optimization.main-flow.test.mjs scripts/official-job-evidence.contract.test.mjs scripts/official-job-verify.route.test.mjs
+        run: node --test --experimental-strip-types scripts/resume-optimization.provider.test.mjs scripts/resume-optimization.route.test.mjs scripts/resume-optimization.domain.test.mjs scripts/resume-versions.route.test.mjs scripts/resume-evidence-visibility.test.mjs scripts/resume-document.contract.test.mjs scripts/resume-docx.contract.test.mjs scripts/resume-docx-preserve.contract.test.mjs scripts/resume-word.route.test.mjs scripts/resume-word-anchors.contract.test.mjs scripts/resume-vision-layout.contract.test.mjs scripts/resume-layout.route.test.mjs scripts/resume-visual-anchors.contract.test.mjs scripts/resume-inline-pdf-preview.contract.test.mjs scripts/resume-pdf-review-copy.contract.test.mjs scripts/resume-page-edits.route.test.mjs scripts/resume-reassessment.domain.test.mjs scripts/resume-reassessment.route.test.mjs scripts/resume-optimization.main-flow.test.mjs scripts/official-job-evidence.contract.test.mjs scripts/official-job-verify.route.test.mjs
       - name: Upload synthetic Word style-preservation render fixtures
         uses: actions/upload-artifact@v4
         if: always()
