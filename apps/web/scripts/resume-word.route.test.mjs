@@ -1,14 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {createResumeDocx} from '../src/services/resumeDocx.ts';
 import {onRequestGet,onRequestPost} from '../functions/api/resume-word.js';
 const origin='https://preview.hhba.example';
 const id='11111111-2222-4333-8444-555555555555';
-const sha='a'.repeat(64),store='candidate/test/'+id+'.docx';
+const store='candidate/test/'+id+'.docx';
 const original=createResumeDocx({
  details:{fullName:'测试用户',headline:'',phone:'',email:'',location:'',summary:''},
  experiences:[],education:[],skills:[],sourceParagraphs:[]
 });
+const sha=createHash('sha256').update(original).digest('hex');
 const pdf=new Uint8Array(600);pdf.set(new TextEncoder().encode('%PDF-1.4'));
 const data=Buffer.from(original).buffer.slice(
  Buffer.from(original).byteOffset,Buffer.from(original).byteOffset+original.length);
@@ -151,6 +153,21 @@ test('only renderer-proven exact Word text is saved for downloadable edits',asyn
   const corrupted=await onRequestGet({request:req('download'),env:x.env});
   assert.equal(corrupted.status,409,'never download a damaged or partially written Word');
  }finally{globalThis.fetch=prior;}
+});
+test('Word route rejects replaced same-length R2 original bytes before private service call',async()=>{
+ const x=fixture();
+ const replaced=new Uint8Array(original);
+ replaced[42]^=1;
+ x.saved.set(store,replaced);
+ const seen=[];
+ const before=globalThis.fetch;
+ globalThis.fetch=async url=>{seen.push(url);throw Error('should not be called');};
+ try{
+  const response=await onRequestGet({request:req('preview'),env:x.env});
+  assert.equal(response.status,409);
+  assert.equal((await response.json()).error,'RESUME_BYTES_MISMATCH');
+  assert.deepEqual(seen,[],'untrusted bytes never reach renderer');
+ }finally{globalThis.fetch=before;}
 });
 test('when renderer cannot verify changed layout the draft is not saved',async()=>{
  const x=fixture(),prior=globalThis.fetch;
