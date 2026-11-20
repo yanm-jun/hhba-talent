@@ -140,7 +140,9 @@ test('UI shows the correct login -> upload -> history navigation and real manual
  const vault=read('components/PrivateResumeVault.tsx');
  const dialog=read('components/CandidateMatchNativeDialog.tsx');
  const history=read('components/CandidateMatchHistory.tsx');
- assert.match(home,/onClick=\{\(\)=>navigate\('\/candidate\/match'\)\}/);
+ assert.ok(home.includes("navigate(user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch')"));
+  assert.ok(login.includes('?next=%2Fcandidate%2Fmatch'));
+  assert.ok(match.includes('to="/candidate/login?next=%2Fcandidate%2Fmatch"'));
  assert.match(home,/kind==='candidate'\?'\/candidate\/jobs'/);
  assert.match(login,/requested === '\/candidate\/match'/);
  assert.match(match,/uploadPrivateResume\(file,true\)/);
