@@ -11,10 +11,10 @@ import '../styles/resume-match-dialog.css';
 // Search-first evidence governs links; server scores and ranks. Never present a score as an offer probability.
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage,sourceText,sourceResume}:{
+export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage,sourceText,sourceResume,accountScope}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'|'profile'>>;
- onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction;sourceText?:string;sourceResume?:PrivateResume
+ onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction;sourceText?:string;sourceResume?:PrivateResume;accountScope?:string
 }){
  const ref=useRef<HTMLDivElement|null>(null);
  const [optimizedJobId,setOptimizedJobId]=useState<string|null>(null);
@@ -82,7 +82,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
         返回岗位结果
        </button>
        <TargetedResumeOptimization key={activeJob.id} profile={parsedProfile}
-        job={asTargetJob(activeJob)} sourceText={sourceText}
+        job={asTargetJob(activeJob)} sourceText={sourceText} accountScope={accountScope}
         sourceResume={sourceResume} onDraftDirtyChange={setOptimizationDirty}/>
       </section>:
      <>
