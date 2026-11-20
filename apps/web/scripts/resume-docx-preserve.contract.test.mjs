@@ -25,7 +25,9 @@ const body='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
  '<w:p><w:r><w:rPr><w:b/><w:color w:val="452786"/>'+
  '<w:rFonts w:eastAsia="Noto Sans CJK SC"/></w:rPr><w:t>原始岗位描述</w:t></w:r>'+
  '</w:p></w:tc></w:tr></w:tbl>'+
- '<w:p><w:r><w:t>完整的另一段文字</w:t></w:r></w:p>'+
+ '<w:p><w:r><w:rPr><w:rFonts w:eastAsia="Noto Serif CJK SC"/>'+
+ '<w:sz w:val="28"/><w:i/><w:color w:val="0C699A"/></w:rPr>'+
+ '<w:t>完整的另一段文字</w:t></w:r></w:p>'+
  '<w:sectPr><w:headerReference w:type="default" r:id="rId2"/>'+
  '<w:footerReference w:type="default" r:id="rId3"/>'+
  '<w:pgSz w:w="11906" w:h="16838"/>'+
@@ -135,6 +137,10 @@ for(const method of [0,8]){
   assert.ok(xml.includes('<w:tbl>'));
   assert.ok(xml.includes('<w:color w:val="452786"/>'));
   assert.ok(xml.includes('<w:rFonts w:eastAsia="Noto Sans CJK SC"/>'));
+  assert.ok(xml.includes('<w:rFonts w:eastAsia="Noto Serif CJK SC"/>'));
+  assert.ok(xml.includes('<w:sz w:val="28"/>'));
+  assert.ok(xml.includes('<w:i/>'));
+  assert.ok(xml.includes('<w:color w:val="0C699A"/>'));
   assert.ok(xml.includes('<w:pgSz w:w="11906" w:h="16838"/>'));
   for(const [name,old] of source){
    if(name==='word/document.xml')continue;
