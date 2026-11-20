@@ -814,6 +814,8 @@ try{
    'whole rewrite should export professionally titled CV sections, not one unsorted text dump');
   assert.match(docxXml,/虚构经历段落8/,
    'the final Word file must include the final paragraph, not just the first five AI tips');
+  assert.ok(docxXml.indexOf('虚构经历段落8')<docxXml.indexOf('REWRITTEN WORD RESUME'),
+   'verified model plan must actually reorder content in new-layout Word, without losing it');
   assert.doesNotMatch(docxXml,/只允许处理五段/);
   await writeFile(output+'/whole-resume-ai-review-export.docx',docx);
   assert.equal(await full.locator('.hhba-original-resume-history-list li').count(),0,
