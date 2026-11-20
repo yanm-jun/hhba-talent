@@ -12,6 +12,8 @@ export type ResumeDocument={
  details:ResumeDocumentDetails;
  education:string[];
  sourceParagraphs:string[];
+ /** Ordered, user-reviewed AI writing with explicit section headings in new-layout DOCX. */
+ structuredSourceParagraphs?:Array<{section:ResumeBlock['section'];text:string}>;
  experiences:ResumeDocumentExperience[];
  skills:{name:string;details:string}[];
 };
