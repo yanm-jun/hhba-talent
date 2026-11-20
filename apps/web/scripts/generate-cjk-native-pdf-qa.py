@@ -11,7 +11,7 @@ import sys
 from fontTools.ttLib import TTFont
 from fontTools import subset
 
-SOURCE = "中国测试"
+SOURCE = "中国测试工作经历"
 FONT = pathlib.Path("/usr/share/fonts/truetype/arphic-gbsn00lp/gbsn00lp.ttf")
 
 def make_fixture(output: pathlib.Path) -> None:
