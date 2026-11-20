@@ -49,7 +49,7 @@ function fixture(){
    if(sql.includes('SELECT COUNT(*) AS n FROM hhba_candidate_resumes'))return {n:[...resumes.values()].filter(r=>r.phone===args[0]).length};
    if(sql.includes('SELECT COUNT(*) AS n FROM hhba_candidate_resume_upload_events'))return {n:events.filter(e=>e.phone===args[0]&&e.created_at>=args[1]).length};
    if(sql.startsWith('SELECT id FROM hhba_candidate_resumes WHERE phone=? AND sha256=?'))return [...resumes.values()].find(r=>r.phone===args[0]&&r.sha256===args[1])||null;
-   if(sql.includes('SELECT id,filename,media_type,size_bytes,storage_key FROM hhba_candidate_resumes'))return [...resumes.values()].find(r=>r.phone===args[0]&&r.id===args[1])||null;
+   if(sql.includes('SELECT id,filename,media_type,size_bytes,storage_key,sha256 FROM hhba_candidate_resumes'))return [...resumes.values()].find(r=>r.phone===args[0]&&r.id===args[1])||null;
    throw Error('Unexpected SELECT '+sql);
   },
   async all(){
