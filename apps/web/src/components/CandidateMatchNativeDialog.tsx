@@ -141,7 +141,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
            {Number.isInteger(job.match_score)?
             <><strong>{job.match_score}<small>/100</small></strong><span>简历适配分</span></>:
             <><strong className="hhba-native-score-na">—</strong><span>待补充证据</span></>}
-           {!pending&&parsedProfile&&<div className="hhba-native-optimize-action">
+           {!pending&&parsedProfile&&(!result.agent||result.agent.next_skill==='targeted_resume_rewrite')&&<div className="hhba-native-optimize-action">
             <button type="button" aria-label={'针对'+(job.title_zh||job.title)+'优化简历，提高分值'}
              onClick={()=>{
               setOptimizationDirty(false);setOptimizedJobId(job.id);

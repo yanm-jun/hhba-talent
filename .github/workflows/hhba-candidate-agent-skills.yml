@@ -3,6 +3,9 @@ on:
   pull_request:
     paths:
       - 'apps/web/functions/_lib/candidate-agent-skills.js'
+      - 'apps/web/functions/_lib/candidate-agent-policy.js'
+      - 'apps/web/d1/0031_candidate_agent_policy.sql'
+      - 'apps/web/scripts/candidate-agent-policy.contract.test.mjs'
       - 'apps/web/functions/api/match-native/**'
       - 'apps/web/scripts/candidate-agent-skills.contract.test.mjs'
       - 'apps/web/src/services/resumeMatch.ts'
@@ -11,6 +14,7 @@ on:
   push:
     branches:
       - feature/candidate-agent-skills-stage1-20261120
+      - feature/candidate-agent-policy-stage2-20261120
   workflow_dispatch:
 permissions:
   contents: read
@@ -27,7 +31,7 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - name: Candidate Agent skill isolation and matching tests
         working-directory: apps/web
-        run: node --test scripts/candidate-agent-skills.contract.test.mjs scripts/match-search-first.contract.test.mjs scripts/match-native-web.contract.test.mjs scripts/resume-rewrite-agent.contract.test.mjs
+        run: node --experimental-sqlite --test scripts/candidate-agent-skills.contract.test.mjs scripts/candidate-agent-policy.contract.test.mjs scripts/match-search-first.contract.test.mjs scripts/match-native-web.contract.test.mjs scripts/resume-rewrite-agent.contract.test.mjs
       - name: Install pinned web dependencies
         working-directory: apps/web
         run: npm ci

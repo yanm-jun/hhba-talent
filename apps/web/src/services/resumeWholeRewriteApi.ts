@@ -29,6 +29,7 @@ export type ResumeWholeRewriteStatus={
 const errorMessage:Record<string,string>={
  INVALID_REWRITE_INPUT:'简历或岗位资料不完整。为避免遗漏，我们没有生成不完整的改写稿。',
  AI_CONSENT_REQUIRED:'请先同意将简历证据发送至所选 AI 服务。',
+ AGENT_REWRITE_SKILL_DISABLED:'后台管理员已暂停 Agent 的简历优化技能，本次未调用模型。',
  SESSION_INVALID:'登录已失效，请重新登录。',
  FORBIDDEN:'当前账号无权使用简历重写。',
  RESUME_REWRITE_NOT_ENABLED:'整份简历 AI 撰写服务还没有在当前环境开启。',
