@@ -323,7 +323,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}
     original.length>1&&original.length<=300&&
     proposed.length>1&&proposed.length<=300&&
     original===original.trim()&&proposed===proposed.trim()&&
-    !/[\\r\\n\\t]/.test(original+proposed));
+    !/[\r\n\t]/.test(original+proposed));
   const occurrences=new Map<string,number>();
   for(const change of candidates)
    occurrences.set(change.original,(occurrences.get(change.original)||0)+1);
