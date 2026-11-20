@@ -5,10 +5,12 @@ import {createRoot} from 'react-dom/client';
 import {CandidateMatchNativeDialog} from '../src/components/CandidateMatchNativeDialog';
 import type {MatchResponse} from '../src/services/resumeMatch';
 import {REAL_AUTH_TOKEN_KEY} from '../src/services/realAuth';
+import type {PrivateResume} from '../src/services/privateResumes';
 
+const nativeWord=new URLSearchParams(location.search).has('word');
 const long=new URLSearchParams(location.search).has('long');
 const truncated=new URLSearchParams(location.search).has('truncated');
-const sourceText=truncated?'这是完全虚构的超长简历测试文字，不能把丢失的内容导出成完整简历。'.repeat(1200):long?Array.from({length:12},(_,i)=>
+const sourceText=nativeWord?'ORIGINAL WORD RESUME':truncated?'这是完全虚构的超长简历测试文字，不能把丢失的内容导出成完整简历。'.repeat(1200):long?Array.from({length:12},(_,i)=>
  '第'+(i+1)+'段：在虚构的测试项目中记录运营流程与客户问题。'.repeat(18)
 ).join('\n\n'):'曾参与测试门店的运营记录整理与客户预约协调。\n\n独立整理每周工作进度并协助团队沟通。';
 const mockJob={
@@ -24,6 +26,27 @@ const profile={
  education:null,education_evidence:null,experience_years:null,experience_evidence:null,
  skills:[],target_roles:['门店运营'],warnings:[]
 };
+const nativeResume:PrivateResume={id:'11111111-2222-4333-8444-555555555555',
+ name:'虚构原样式简历.docx',
+ type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+ size:2048,createdAt:'2026-11-20T00:00:00Z'};
+const wordRevisions=['ORIGINAL WORD RESUME'];
+let wordRevision=0;
+function pdfFor(text:string){
+ const stream='BT /F1 18 Tf 45 760 Td ('+text.replace(/[()\\]/g,'')+') Tj ET';
+ const parts=[
+  '<< /Type /Catalog /Pages 2 0 R >>',
+  '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+  '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>',
+  '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+  '<< /Length '+stream.length+' >>\\nstream\\n'+stream+'\\nendstream'
+ ];
+ let out='%PDF-1.4\\n';const offsets=[0];
+ for(let i=0;i<parts.length;i++){offsets.push(out.length);out+=(i+1)+' 0 obj\\n'+parts[i]+'\\nendobj\\n';}
+ const pointer=out.length;out+='xref\\n0 6\\n0000000000 65535 f \\n';
+ for(const start of offsets.slice(1))out+=String(start).padStart(10,'0')+' 00000 n \\n';
+ return new TextEncoder().encode(out+'trailer\\n<< /Root 1 0 R /Size 6 >>\\nstartxref\\n'+pointer+'\\n%%EOF');
+}
 const result:MatchResponse={status:'COMPLETE',profile,matches:[mockJob],
  matched_official_jobs:0,source:'qa-fixture',scoring:'test-only',privacy:'synthetic',
  disclaimer:'自动化测试用假公司和假岗位，绝不用于实际投递'};
@@ -36,6 +59,32 @@ function respond(data:unknown,status=200){return Promise.resolve(new Response(JS
 window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
  const url=typeof input==='string'?input:input instanceof URL?input.href:input.url;
  const u=new URL(url,location.origin),method=init?.method||'GET';
+ if(u.pathname==='/api/resume-word'&&nativeWord){
+  const action=u.searchParams.get('action');
+  if(method==='POST'){
+   const payload=JSON.parse(String(init?.body||'{}'));
+   if(payload.expected_revision!==wordRevision)
+    return respond({ok:false,error:'WORD_REVISION_CONFLICT'},409);
+   if(payload.action==='edit'){
+    if(payload.original!==wordRevisions[wordRevision])
+     return respond({ok:false,error:'WORD_EDIT_AMBIGUOUS'},422);
+    wordRevisions.splice(wordRevision+1);wordRevisions.push(payload.text);wordRevision++;
+   }else wordRevision+=payload.action==='undo'?-1:1;
+   return respond({ok:true,saved:wordRevision>0,revision:wordRevision,
+    total_revisions:wordRevisions.length-1,page_count:1});
+  }
+  if(action==='status')return respond({ok:true,enabled:true});
+  if(action==='inspect')return respond({ok:true,revision:wordRevision,
+   total_revisions:wordRevisions.length-1,max_revisions:8,
+   editable_text:[wordRevisions[wordRevision]],
+   saved:wordRevision?{original:wordRevisions[wordRevision-1],
+    text:wordRevisions[wordRevision],updated_at:'2026-11-20T00:00:00Z'}:null});
+  if(action==='preview'||action==='edited-preview'||action==='download-pdf'){
+   const bytes=pdfFor(action==='preview'?wordRevisions[0]:wordRevisions[wordRevision]);
+   return Promise.resolve(new Response(bytes,{status:200,
+    headers:{'Content-Type':'application/pdf'}}));
+  }
+ }
  if(u.pathname==='/api/resume-optimize'){
   if(method==='GET')return respond({kind:'HHBA_RESUME_OPTIMIZATION_V1',enabled:true,configured:true,
    per_account_daily_limit:3,global_daily_limit:50});
@@ -74,5 +123,8 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
  return original(input,init);
 }) as typeof window.fetch;
 createRoot(document.getElementById('root')!).render(
- <CandidateMatchNativeDialog result={result} sourceText={sourceText} onClose={()=>{}}/>
+ <CandidateMatchNativeDialog result={result} sourceText={sourceText}
+  sourceResume={nativeWord?nativeResume:undefined}
+  accountScope={nativeWord?'qa-user':undefined}
+  onClose={()=>{}}/>
 );
