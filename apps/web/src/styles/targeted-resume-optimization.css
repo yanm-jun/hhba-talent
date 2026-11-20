@@ -245,3 +245,20 @@
  .targeted-resume-popover-shell{margin-top:8px}
  .targeted-resume-popover-shell .targeted-resume-suggestion{padding:10px 11px}
 }
+
+/* Once an AI suggestion is accepted, keep untouched resume text neutral.
+   Only the inserted / rewritten characters carry the Siri rainbow effect.
+   This editor-only visual never changes generated PDF/Word document content. */
+.targeted-resume-inline-region .hhba-resume-siri-letters{
+ display:inline;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+@media print{
+ .targeted-resume-inline-region .hhba-resume-siri-letters{
+  animation:none!important;
+  background:none!important;
+  color:inherit!important;
+  -webkit-text-fill-color:currentColor!important;
+ }
+}
