@@ -88,3 +88,24 @@ test('Siri visual review is accessible only via the isolated feature Preview bui
  assert.match(build,/WEB \/ "preview-only" \/ "resume-siri\.html"/);
  assert.match(build,/WEB \/ "dist" \/ "preview" \/ "resume-siri\.html"/);
 });
+
+test('frontend-first upload renders user's own DOCX text and opens an independent Siri modal with a small suggestion popup',async()=>{
+ const page=await source('pages/CandidateMatchPage.tsx');
+ const stage=await source('components/CandidateResumeStage.tsx');
+ const css=await source('styles/candidate-resume-stage.css');
+ const vite=await readFile(new URL('../vite.config.ts',import.meta.url),'utf8');
+ const build=await readFile(new URL('./cloudflare-pages-build.py',import.meta.url),'utf8');
+ assert.match(page,/extractDocxText\(await selected\.arrayBuffer\(\)\)/,
+  'resume view must be extracted locally, not sent to AI for reading');
+ assert.match(page,/<CandidateResumeStage text=\{documentText\}/);
+ assert.match(stage,/createPortal\(/);
+ assert.match(stage,/aria-modal="true"/);
+ assert.match(stage,/hhba-siri-edge-active/);
+ assert.match(stage,/splitChangedResumeText\(/);
+ assert.match(stage,/className="hhba-stage-popover"/);
+ assert.match(stage,/不会调用 AI、修改原 Word、生成文件或向企业投递/);
+ assert.match(css,/grid-template-columns:minmax\(0,1fr\) 283px/);
+ assert.match(css,/@media\(max-width:700px\)/);
+ assert.match(vite,/isolatedResumePreview\?{build:/);
+ assert.match(build,/HHBA_PREVIEW_ONLY_SIMPLE_RESUME_READY/);
+});
