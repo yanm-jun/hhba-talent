@@ -23,7 +23,7 @@ const body='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
  '<w:tblGrid><w:gridCol w:w="4800"/></w:tblGrid>'+
  '<w:tr><w:tc><w:tcPr><w:tcW w:w="4800" w:type="dxa"/></w:tcPr>'+
  '<w:p><w:r><w:rPr><w:b/><w:color w:val="452786"/>'+
- '<w:rFonts w:eastAsia="Microsoft YaHei"/></w:rPr><w:t>原始岗位描述</w:t></w:r>'+
+ '<w:rFonts w:eastAsia="Noto Sans CJK SC"/></w:rPr><w:t>原始岗位描述</w:t></w:r>'+
  '</w:p></w:tc></w:tr></w:tbl>'+
  '<w:p><w:r><w:t>完整的另一段文字</w:t></w:r></w:p>'+
  '<w:sectPr><w:headerReference w:type="default" r:id="rId2"/>'+
@@ -134,7 +134,7 @@ for(const method of [0,8]){
   assert.ok(!xml.includes('<w:t>原始岗位描述</w:t>'));
   assert.ok(xml.includes('<w:tbl>'));
   assert.ok(xml.includes('<w:color w:val="452786"/>'));
-  assert.ok(xml.includes('<w:rFonts w:eastAsia="Microsoft YaHei"/>'));
+  assert.ok(xml.includes('<w:rFonts w:eastAsia="Noto Sans CJK SC"/>'));
   assert.ok(xml.includes('<w:pgSz w:w="11906" w:h="16838"/>'));
   for(const [name,old] of source){
    if(name==='word/document.xml')continue;
