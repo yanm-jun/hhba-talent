@@ -625,6 +625,18 @@ try{
   await first.locator('.targeted-resume-draft-recovery input[type=checkbox]').check();
   await first.locator('.targeted-resume-consent input[type=checkbox]').check();
   await first.getByRole('button',{name:'开始 AI 优化'}).click();
+  if(view.name==='mobile'){
+   await assistant.waitFor({state:'hidden'});
+   const status=first.locator('.hhba-word-mobile-ai-status');
+   await status.waitFor();
+   await first.locator('.hhba-word-native-preview .hhba-word-ai-preview-text')
+    .first().waitFor();
+   await first.screenshot({path:output+'/word-first-mobile-live-siri-stage.png',fullPage:true});
+   assert.equal(await assistant.isVisible(),false,
+    'mobile must display the real glowing Word while AI results arrive, not cover it with a drawer');
+   await status.click();
+   await assistant.waitFor({state:'visible'});
+  }
   await assistant.locator('.targeted-resume-word-suggestion-title').first().waitFor();
   assert.equal(await first.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),1,
    'real AI suggestions must illuminate the Word perimeter');
