@@ -130,3 +130,17 @@
 .hhba-ai-mainland-only strong{font-size:13px;color:#125EBC}
 .hhba-ai-mainland-only small{font-size:11px;color:#60758F}
 @media(max-width:580px){.hhba-ai-mainland-only small{width:100%}}
+
+/* Explicit private-storage decision is separate from permission to run AI.
+   The upload remains usable once, even when no original file is retained. */
+.hhba-ai-storage-choice{min-width:0;margin:15px 0 6px;padding:13px 14px 12px;border:1px solid #DFEAF4;border-radius:11px;background:#FAFCFE}
+.hhba-ai-storage-choice legend{padding:0 4px;color:#173C69;font-weight:730;font-size:13px}
+.hhba-ai-storage-choice label{display:flex;align-items:flex-start;gap:10px;padding:11px 10px;margin:6px 0;border-radius:9px;border:1px solid #E2EAF3;background:#fff;cursor:pointer}
+.hhba-ai-storage-choice label.is-selected{border-color:#9CC1E9;background:#F1F7FE}
+.hhba-ai-storage-choice input{accent-color:#125EBC;flex-shrink:0;margin:4px 0 0;width:15px;height:15px}
+.hhba-ai-storage-choice label span{display:grid;gap:4px;min-width:0}
+.hhba-ai-storage-choice label strong{color:#173C69;font-size:12px;font-weight:700}
+.hhba-ai-storage-choice label small{color:#71859B;font-size:11px;line-height:1.7}
+.hhba-ai-storage-choice>p{color:#798BA0;font-size:11px;line-height:1.7;margin:12px 4px 0}
+.hhba-ai-storage-status{margin:10px 0;color:#326B77;background:#EFF8F9;border:1px solid #CCE9EA;padding:10px 12px;border-radius:9px;font-size:11px;line-height:1.75}
+@media(max-width:600px){.hhba-ai-storage-choice{padding:12px 10px}.hhba-ai-storage-choice label{padding:11px 9px}}
