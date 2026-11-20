@@ -45,9 +45,10 @@ function OriginalPdfViewer({resume,onClose}:{
  const [changes,setChanges]=useState<PageResumeEdit[]>([]);
  const [message,setMessage]=useState('');
  const isPdf=resume.type==='application/pdf';
- // A confirmed edit becomes visible on the actual PDF only when conservative
- // single-line geometry and a white underlying background both permit it.
- // This is a live editing preview, never a rewrite of original PDF bytes.
+ // Siri is a PENDING-only visual aid. Never paint a confirmed edit in a
+ // guessed Arial/Noto typeface: original PDF fonts may be embedded/subsetted.
+ // Without an exact native font proof, show the saved edit as a record but
+ // keep the original page untouched, and do NOT issue a mismatched export.
  const previewPlans=useMemo(()=>{
   const result=new Map<string,ReturnType<typeof planInlinePdfPreview>>();
   const source=canvas.current;
@@ -55,10 +56,9 @@ function OriginalPdfViewer({resume,onClose}:{
   const measureContext=measureCanvas.getContext('2d');
   if(!source||!measureContext)return result;
   for(const anchor of anchors){
-   const change=changes.find(item=>item.id===anchor.id);
-   if(!change||change.original!==anchor.text)continue;
+   if(selectedId!==anchor.id||draft.trim()===anchor.text)continue;
    const plan=planInlinePdfPreview({
-    anchor,replacement:change.text,
+    anchor,replacement:draft,
     pageWidth:pageSize.width,pageHeight:pageSize.height,
     onWhite:whitePdfPatchBackground(source,anchor.bbox),
     measure:(text:string,fontPx:number)=>{
@@ -69,8 +69,7 @@ function OriginalPdfViewer({resume,onClose}:{
    result.set(anchor.id,plan);
   }
   return result;
- },[anchors,changes,pageSize]);
- const visibleEditCount=[...previewPlans.values()].filter(plan=>plan.safe).length;
+ },[anchors,selectedId,draft,pageSize]);
  useEffect(()=>{
   let active=true;
   let pdfTask:any=null;
@@ -192,7 +191,7 @@ function OriginalPdfViewer({resume,onClose}:{
   try{
    const response=await savePageResumeEdits(resume.id,updated);
    setChanges(response.changes);setSelectedId(null);setConfirmed(false);
-   setMessage('');
+   setMessage('已保存修改。此 PDF 尚不能确认原字体可被完整复用，原页面不会用其他字体覆盖。');
   }catch(error){setMessage(error instanceof Error?error.message:'保存失败，请重试。');}
   finally{setSaving(false);}
  }
@@ -260,11 +259,11 @@ function OriginalPdfViewer({resume,onClose}:{
       className="hhba-original-resume-canvas"/>
      {layout&&anchors.map(anchor=>{
       const plan=previewPlans.get(anchor.id);
-      if(!plan?.safe)return null;
+      if(!plan?.safe||selectedId!==anchor.id)return null;
       const [x,y,w,h]=anchor.bbox;
       const diff=splitChangedResumeText(anchor.text,plan.text);
-      return <div className="hhba-original-resume-edit-patch" key={'patch-'+anchor.id}
-       role="note" aria-label="已修改内容预览"
+      return <div className="hhba-original-resume-edit-patch hhba-original-resume-draft-patch"
+       key={'patch-'+anchor.id} role="note" aria-label="待确认文字预览"
        style={{
         left:'calc('+x/10+'% - 2px)',top:'calc('+y/10+'% - 2px)',
         width:'calc('+w/10+'% + 4px)',height:'calc('+h/10+'% + 4px)',
@@ -307,6 +306,10 @@ function OriginalPdfViewer({resume,onClose}:{
        </div>
        <textarea aria-label="修改这段内容" maxLength={1600} rows={3} value={draft}
         onChange={e=>{setDraft(e.target.value);setConfirmed(false);}}/>
+       {draft!==anchor.text&&<div className="hhba-resume-pending-text"
+        role="note" aria-label="待确认修改文字">
+        <span className="hhba-resume-siri-letters">{draft}</span>
+       </div>}
        <label><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>
         我确认修改内容属实</label>
        <div className="hhba-original-resume-editbox-actions">
@@ -323,18 +326,10 @@ function OriginalPdfViewer({resume,onClose}:{
    </div>
    {layout&&anchors.length===0&&<p className="hhba-original-resume-note">
     这页暂时没有找到可以准确修改的位置。你仍然可以查看和下载原件。</p>}
-   {changes.length>0&&<>
-    <p className="hhba-original-resume-note" role="status">
-     已保存 {changes.length} 处修改，{visibleEditCount} 处已显示在原位置。
-     {changes.length>visibleEditCount?' 其余文字暂时放不下，已保留修改但不遮挡原文。':''}
-     原件保留。</p>
-    <div className="hhba-original-resume-review-export">
-     <button type="button" disabled={exporting||saving}
-      onClick={()=>void downloadReviewPdf()}>
-      <Download size={14}/>{exporting?'正在生成…':'下载 PDF'}</button>
-     <span>可搜索、复制文字。投递前请检查排版。</span>
-    </div>
-   </>}
+   {changes.length>0&&<p className="hhba-original-resume-note" role="status">
+    已保存 {changes.length} 处修改，原件保留。由于原字体尚未通过保真校验，
+    暂不能覆盖原文或导出声称保留原样式的 PDF。
+   </p>}
    {message&&<p className="hhba-original-resume-note" role="status">{message}</p>}
    <nav className="hhba-original-resume-pages" aria-label="原始简历翻页">
     <button type="button" disabled={page<=1}
