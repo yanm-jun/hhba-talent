@@ -7,6 +7,7 @@ const endpoint=origin+'/api/resume-rewrite';
 const fakeEnv={
  HHBA_AUTH_ROLLOUT:'preview',
  HHBA_RESUME_REWRITE_ENABLED:'1',
+ HHBA_RESUME_AGENT_ENABLED:'0',
  HHBA_AI_DEEPSEEK_API_KEY:'qa-only-key',
  HHBA_AI_DEEPSEEK_MODEL:'mock',
  HHBA_PNVS_AUTH_DB:{
@@ -84,4 +85,61 @@ test('production remains disabled without its own explicit switch',async()=>{
   HHBA_MATCH_RUNTIME_MODE:'production'};
  assert.equal((await (await onRequestGet({env})).json()).enabled,false);
  assert.equal((await onRequestPost({env,request:request()})).status,503);
+});
+
+test('preview opt-in can use model-directed editorial tools and disclose what happened',async()=>{
+ const env={...fakeEnv,HHBA_RESUME_AGENT_ENABLED:'1'};
+ const previous=globalThis.fetch;let calls=0;
+ globalThis.fetch=async(_url,options)=>{
+  calls++;
+  const system=JSON.parse(options.body).messages[0].content;
+  const input=JSON.parse(JSON.parse(options.body).messages[1].content);
+  if(system.includes('内容架构师'))
+   return respond({focus:['真实门店记录'],questions:[]});
+  if(system.includes('专业简历撰写者'))
+   return respond({rewrites:[{blockId:block.id,
+    text:'协同门店运营，开展真实客户沟通与记录。',
+    sourceQuotes:['参与门店运营与真实客户沟通。'],
+    rationale:'事实范围内重组职责',jobRequirements:['门店运营']}]});
+  if(system.includes('事实审查员'))
+   return respond({checks:[{blockId:block.id,safe:true,concern:''}]});
+  if(system.includes('自主简历总编辑')){
+   assert.equal(input.sections[0].blockId,block.id);
+   return respond({action:'finish',reason:'已完成可信的岗位定向版本'});
+  }
+  throw Error('unexpected model call');
+ };
+ try{
+  const res=await onRequestPost({request:request(),env});
+  assert.equal(res.status,200);
+  const body=await res.json();
+  assert.equal(body.autonomy.enabled,true);
+  assert.deepEqual(body.autonomy.tools_used.map(x=>x.action),['finish']);
+  assert.equal(body.coverage.proposed_rewrites,1);
+  assert.equal(calls,4);
+ }finally{globalThis.fetch=previous;}
+});
+test('model-directed quality pass outage does not erase the already audited source-backed draft',async()=>{
+ const env={...fakeEnv,HHBA_RESUME_AGENT_ENABLED:'1'};
+ const previous=globalThis.fetch;
+ globalThis.fetch=async(_url,options)=>{
+  const system=JSON.parse(options.body).messages[0].content;
+  if(system.includes('内容架构师'))
+   return respond({focus:['门店运营'],questions:[]});
+  if(system.includes('专业简历撰写者'))
+   return respond({rewrites:[{blockId:block.id,
+    text:'协助门店运营与真实客户沟通。',
+    sourceQuotes:['参与门店运营与真实客户沟通。']}]});
+  if(system.includes('事实审查员'))
+   return respond({checks:[{blockId:block.id,safe:true,concern:''}]});
+  return new Response('service unavailable',{status:503});
+ };
+ try{
+  const res=await onRequestPost({request:request(),env});
+  assert.equal(res.status,200);
+  const body=await res.json();
+  assert.match(body.blocks[0].proposed,/协助门店运营/);
+  assert.equal(body.autonomy.stop_reason,'tool_unavailable');
+  assert.equal(body.autonomy.needs_more_work,true);
+ }finally{globalThis.fetch=previous;}
 });
