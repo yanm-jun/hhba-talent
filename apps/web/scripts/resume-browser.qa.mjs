@@ -578,6 +578,67 @@ try{
 
 
 
+
+ // Word-first product QA: job optimization is a separate workspace with one
+ // authentic DOCX canvas. AI suggestions are a side rail / mobile drawer.
+ for(const view of [{width:1200,height:900,name:'desktop'},
+                    {width:390,height:844,name:'mobile'}]){
+  const first=await browser.newPage({viewport:{width:view.width,height:view.height},
+   locale:'zh-CN'});
+  const errors=[];first.on('pageerror',e=>errors.push(e.message));
+  await first.goto('http://127.0.0.1:3000/qa/resume-flow.html?word',
+   {waitUntil:'networkidle',timeout:45000});
+  await first.getByRole('button',{name:'针对这个岗位优化简历'}).click();
+  await first.getByRole('region',{name:'独立简历优化工作区'}).waitFor();
+  assert.equal(await first.locator('.targeted-resume-word-workspace').count(),1,
+   'saved DOCX should open one Word-first editor');
+  assert.equal(await first.locator('.targeted-resume-live-paper').count(),0,
+   'do not show re-templated editor beside true native DOCX');
+  assert.equal(await first.locator('.targeted-resume-document-fields').count(),0,
+   'native Word editor must not ask user to retype their identity fields');
+  await first.locator('.hhba-word-native-preview .hhba-original-resume-anchor').first()
+   .waitFor({timeout:20000});
+  await first.getByRole('button',{name:'放大 Word'}).click();
+  assert.match(await first.locator('.hhba-original-resume-word-tools output').textContent(),/125%/);
+  await first.getByRole('button',{name:'适合宽度'}).click();
+  const assistant=first.locator('.targeted-resume-word-assistant');
+  if(view.name==='mobile'){
+   assert.equal(await assistant.isVisible(),false,'suggestions must not cover mobile Word');
+   await first.getByRole('button',{name:'AI 建议'}).click();
+   await assistant.waitFor({state:'visible'});
+  }
+  await first.locator('.targeted-resume-draft-recovery input[type=checkbox]').check();
+  await first.locator('.targeted-resume-consent input[type=checkbox]').check();
+  await first.getByRole('button',{name:'生成 AI 建议'}).click();
+  await assistant.locator('.targeted-resume-word-suggestion-title').first().waitFor();
+  assert.equal(await assistant.locator('.targeted-resume-word-suggestion').count(),1,
+   'AI draft has one navigable original paragraph location');
+  await assistant.locator('.targeted-resume-confirm input[type=checkbox]').check();
+  await assistant.getByRole('button',{name:'填充到此处'}).click();
+  await first.getByText('已有 1 条符合严格文字条件的建议').waitFor();
+  await first.waitForFunction(()=>Object.keys(sessionStorage)
+   .some(k=>k.startsWith('hhba:word-draft-v1:')));
+  if(view.name==='mobile'){
+   await first.getByRole('button',{name:'返回 Word'}).click();
+   assert.equal(await assistant.isVisible(),false);
+  }
+  await first.locator('.hhba-original-resume-anchor').first().click();
+  const nativeText=first.getByRole('textbox',{name:'修改 Word 文字'});
+  assert.match(await nativeText.inputValue(),/同步整理每日服务记录/,
+   'confirmed text can be prefilled only at the exact Word anchor');
+  assert.equal(await first.getByRole('button',{name:'保存',exact:true}).isDisabled(),true,
+   'native source must still require explicit confirmation');
+  await first.screenshot({path:output+'/word-first-'+view.name+'-workspace.png',fullPage:true});
+  const geom=await first.evaluate(()=>({
+   client:document.documentElement.clientWidth,
+   scroll:document.documentElement.scrollWidth
+  }));
+  assert.ok(geom.scroll<=geom.client+3,
+   'Word-first workspace overflows viewport '+view.name+' '+JSON.stringify(geom));
+  assert.deepEqual(errors,[],'Word-first workspace should not crash on '+view.name);
+  await first.close();
+ }
+
  console.log(JSON.stringify({result:'PASSED',desktop_pdf_pages:pages.length,
   long_pdf_pages:longPages.length,mobile:metrics,qa_output:output}));
 }finally{await browser.close()}
