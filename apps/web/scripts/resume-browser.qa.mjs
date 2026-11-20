@@ -778,6 +778,12 @@ try{
   assert.match(await scorePage.locator('.hhba-word-match-after').textContent(),/70/);
   assert.match(await scorePage.locator('.hhba-word-match-score').textContent(),/68/);
   assert.deepEqual(errors,[]);
+  // Wait for native PDF.js repaint after the saved Word revision. The score API
+  // can resolve faster than the visual PDF page and must not produce a blank
+  // "success" screenshot.
+  await scorePage.locator('.hhba-original-resume-canvas').waitFor();
+  await scorePage.waitForFunction(()=>[...document.querySelectorAll('.hhba-original-resume-anchor')]
+   .some(el=>el.getClientRects().length>0),{timeout:15000});
   await scorePage.screenshot({path:output+'/word-first-score-before-after.png',fullPage:true});
   await scorePage.close();
  }
