@@ -149,7 +149,6 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
           <p className="hhba-native-score-basis"><strong>评分依据：</strong>{job.score_basis}</p>}
          <p className="hhba-native-reason"><strong>为什么推荐：</strong>
           {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
-}
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
           data-hhba-recruitment-outbound="true">{job.recruitment_source_kind==='EMPLOYER_ATS'?
             '查看企业专属招聘系统岗位（请核验）':'查看企业招聘岗位页面（请核验）'} <ArrowUpRight size={15}/></a>
