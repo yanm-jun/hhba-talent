@@ -220,7 +220,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
      <section className="hhba-workbench-overview" aria-labelledby="hhba-workbench-overview-title">
       <h3 id="hhba-workbench-overview-title">我的职业概览</h3>
       <div className="hhba-workbench-profile-links">
-       <Link to="/candidate/account/resume"><FileUser size={20}/><strong>个人简历</strong><small>{resumeCount===null?'简历状态待确认':resumeCount===0?'尚未上传简历':'已保存 '+resumeCount+' 份私有简历'}</small></Link>
+       <Link to="/candidate/account/resume"><FileUser size={20}/><strong>个人简历</strong><small>{resumeCount===null?'简历状态待确认':resumeCount===0?(historyCount&&historyCount>0?'有匹配历史 · 原文件尚未保存':'尚未保存简历'):'已保存 '+resumeCount+' 份私有简历'}</small></Link>
        <Link to="/candidate/account/career"><BriefcaseBusiness size={20}/><strong>职业经历</strong><small>{account?.headline||'管理职业介绍与成长资料'}</small></Link>
       </div>
       <div className="hhba-workbench-record-list">
@@ -242,7 +242,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
      <div className="hhba-account-section-heading"><div><h2>职业成长档案</h2><p>沿用同一账户的个人资料和私有简历，不另建第二套职业身份。</p></div></div>
      <div className="hhba-career-record-list">
       <Link to="/candidate/account/profile"><UserRound size={20}/><span><strong>职业介绍与个人资料</strong><small>{profileLoading?'正在读取真实资料…':account?.headline||'可在个人资料中完善职业介绍、技能和所在城市'}</small></span><ArrowRight size={16}/></Link>
-      <Link to="/candidate/account/resume"><FileUser size={20}/><span><strong>我的简历档案</strong><small>{resumeCount===null?'简历状态待确认':resumeCount===0?'还没有保存简历':'已保存 '+resumeCount+' 份私有简历'}</small></span><ArrowRight size={16}/></Link>
+      <Link to="/candidate/account/resume"><FileUser size={20}/><span><strong>我的简历档案</strong><small>{resumeCount===null?'简历状态待确认':resumeCount===0?'尚未保存原文件':'已保存 '+resumeCount+' 份私有简历'}</small></span><ArrowRight size={16}/></Link>
      </div>
      <p className="hhba-career-record-notice">独立的任职经历、工作成果和阶段性更新记录尚在规划中；目前不将求职偏好当作实际工作经历，也不会生成虚假职业记录。</p>
     </section>}
