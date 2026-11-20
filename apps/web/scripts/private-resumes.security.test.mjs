@@ -40,7 +40,14 @@ function fixture(){
  const bucket={
   async put(key,bytes){objects.set(key,Buffer.from(bytes));},
   async get(key){const bytes=objects.get(key);return bytes?{body:new Blob([bytes]).stream()}:null;},
-  async delete(key){objects.delete(key);}
+  async delete(key){objects.delete(key);},
+  async list({prefix,limit=1000,cursor}){
+   const matches=[...objects.keys()].filter(k=>k.startsWith(prefix)).sort();
+   const start=cursor?Number(cursor):0;
+   const entries=matches.slice(start,start+limit);
+   return {objects:entries.map(key=>({key})),truncated:start+limit<matches.length,
+    cursor:start+limit<matches.length?String(start+limit):undefined};
+  }
  };
  const db={prepare(sql){return {bind(...args){return {
   async first(){
@@ -49,7 +56,7 @@ function fixture(){
    if(sql.includes('SELECT COUNT(*) AS n FROM hhba_candidate_resumes'))return {n:[...resumes.values()].filter(r=>r.phone===args[0]).length};
    if(sql.includes('SELECT COUNT(*) AS n FROM hhba_candidate_resume_upload_events'))return {n:events.filter(e=>e.phone===args[0]&&e.created_at>=args[1]).length};
    if(sql.startsWith('SELECT id FROM hhba_candidate_resumes WHERE phone=? AND sha256=?'))return [...resumes.values()].find(r=>r.phone===args[0]&&r.sha256===args[1])||null;
-   if(sql.includes('SELECT id,filename,media_type,size_bytes,storage_key FROM hhba_candidate_resumes'))return [...resumes.values()].find(r=>r.phone===args[0]&&r.id===args[1])||null;
+   if(sql.includes('SELECT id,filename,media_type,size_bytes,storage_key,sha256 FROM hhba_candidate_resumes'))return [...resumes.values()].find(r=>r.phone===args[0]&&r.id===args[1])||null;
    throw Error('Unexpected SELECT '+sql);
   },
   async all(){
@@ -95,6 +102,8 @@ async function invoke(f,path,phone,method='GET',body=null,opts={}){
  const payload=type.includes('json')?await response.json():null;
  return {response,payload};
 }
+const postDocx=(f,phone,body=createDocx(),filename='我的简历.docx',opts={})=>
+ invoke(f,'',phone,'POST',body,{filename,mime:docxMime,...opts});
 test('anonymous, forged and missing-storage calls fail closed',async()=>{
  const f=fixture();
  assert.equal((await invoke(f,'',null)).response.status,401);
@@ -104,16 +113,16 @@ test('anonymous, forged and missing-storage calls fail closed',async()=>{
  assert.equal(r.payload.error,'PRIVATE_STORAGE_NOT_ENABLED');
  assert.equal(f.objects.size,0);
 });
-test('private PDF upload and attachment download are bound to the verified owner',async()=>{
- const f=fixture();
- const a=await invoke(f,'',PHONE_A,'POST',PDF);
+test('private Word upload and attachment download are bound to the verified owner',async()=>{
+ const f=fixture(),source=createDocx();
+ const a=await postDocx(f,PHONE_A,source);
  assert.equal(a.response.status,201);
- assert.equal(a.payload.item.size,PDF.length);
- assert.equal(a.payload.item.name,'我的简历.pdf');
+ assert.equal(a.payload.item.size,source.length);
+ assert.equal(a.payload.item.name,'我的简历.docx');
  assert.equal(f.objects.size,1);
  const key=[...f.objects.keys()][0];
  assert.doesNotMatch(key,/13800138000/);
- assert.equal(f.resumes.values().next().value.sha256,sha(PDF));
+ assert.equal(f.resumes.values().next().value.sha256,sha(source));
  const id=a.payload.item.id;
  const view=await invoke(f,'',PHONE_A);
  assert.equal(view.payload.items.length,1);
@@ -125,23 +134,41 @@ test('private PDF upload and attachment download are bound to the verified owner
  assert.equal(down.response.headers.get('Content-Type'),'application/octet-stream');
  assert.match(down.response.headers.get('Content-Disposition'),/^attachment;/);
  assert.equal(down.response.headers.get('X-Content-Type-Options'),'nosniff');
- assert.equal(Buffer.from(await down.response.arrayBuffer()).toString(),PDF.toString());
+ assert.equal(Buffer.from(await down.response.arrayBuffer()).toString('hex'),source.toString('hex'));
  assert.equal((await invoke(f,'/'+id,PHONE_B,'DELETE')).response.status,404);
  assert.equal(f.objects.size,1);
  assert.equal((await invoke(f,'/'+id,PHONE_A,'DELETE')).response.status,200);
  assert.equal(f.objects.size,0);
  assert.equal((await invoke(f,'',PHONE_A)).payload.items.length,0);
 });
-test('explicit storage consent, same-origin and actual file format are required',async()=>{
- const f=fixture();
- assert.equal((await invoke(f,'',PHONE_A,'POST',PDF,{consent:false})).payload.error,'STORAGE_CONSENT_REQUIRED');
- assert.equal((await invoke(f,'',PHONE_A,'POST',PDF,{origin:'https://evil.example'})).response.status,403);
- assert.equal((await invoke(f,'',PHONE_A,'POST',PDF,{filename:'../../secret.pdf'})).response.status,400);
- assert.equal((await invoke(f,'',PHONE_A,'POST',Buffer.alloc(48,5))).response.status,400);
- assert.equal((await invoke(f,'',PHONE_A,'POST',PDF,{mime:docxMime})).response.status,415);
- assert.equal((await invoke(f,'',PHONE_A,'POST',Buffer.alloc(3*1024*1024+1,5))).response.status,413);
+test('new PDF uploads are disabled while DOCX keeps consent, origin and format guards',async()=>{
+ const f=fixture(),word=createDocx();
+ assert.equal((await postDocx(f,PHONE_A,word,'resume.docx',{consent:false})).payload.error,'STORAGE_CONSENT_REQUIRED');
+ assert.equal((await postDocx(f,PHONE_A,word,'resume.docx',{origin:'https://evil.example'})).response.status,403);
+ assert.equal((await postDocx(f,PHONE_A,word,'../../secret.docx')).response.status,400);
+ assert.equal((await postDocx(f,PHONE_A,Buffer.alloc(48,5))).response.status,400);
+ assert.equal((await postDocx(f,PHONE_A,word,'resume.docx',{mime:'application/pdf'})).response.status,415);
+ assert.equal((await postDocx(f,PHONE_A,Buffer.alloc(3*1024*1024+1,5))).response.status,413);
+ const pdfAttempt=await invoke(f,'',PHONE_A,'POST',PDF);
+ assert.equal(pdfAttempt.response.status,415);
+ assert.equal(pdfAttempt.payload.error,'PDF_UPLOAD_DISABLED');
  assert.equal(f.objects.size,0);
  assert.equal(f.resumes.size,0);
+});
+test('previously stored PDF remains owner-only downloadable and deletable, without new PDF uploads',async()=>{
+ const f=fixture();
+ const id='aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
+ const key='candidates/legacy/'+id+'.pdf';
+ f.resumes.set(id,{id,phone:PHONE_A,storage_key:key,filename:'旧版简历.pdf',
+  media_type:'application/pdf',size_bytes:PDF.length,sha256:sha(PDF),
+  created_at:'2026-11-01T00:00:00Z'});
+ f.objects.set(key,PDF);
+ assert.equal((await invoke(f,'/'+id+'/download',PHONE_B)).response.status,404);
+ const old=await invoke(f,'/'+id+'/download',PHONE_A);
+ assert.equal(old.response.status,200);
+ assert.deepEqual(Buffer.from(await old.response.arrayBuffer()),PDF);
+ assert.equal((await invoke(f,'/'+id,PHONE_A,'DELETE')).response.status,200);
+ assert.equal(f.objects.size,0);
 });
 test('valid document container passes; macros and zip bombs are rejected',()=>{
  const docx=createDocx();
@@ -160,25 +187,43 @@ test('valid document container passes; macros and zip bombs are rejected',()=>{
   e=>e.code==='INVALID_DOCX_CONTAINER');
  assert.equal(normalizeResumeName(encodeURIComponent('个人简历.docx')),'个人简历.docx');
 });
-test('duplicate and quota protection cannot be bypassed by changing file names',async()=>{
- const f=fixture();
- assert.equal((await invoke(f,'',PHONE_A,'POST',PDF)).response.status,201);
- const duplicate=await invoke(f,'',PHONE_A,'POST',PDF,{filename:'other.pdf'});
+test('duplicate and quota protection cannot be bypassed by changing Word file names',async()=>{
+ const f=fixture(),word=createDocx();
+ assert.equal((await postDocx(f,PHONE_A,word)).response.status,201);
+ const duplicate=await postDocx(f,PHONE_A,word,'other.docx');
  assert.equal(duplicate.response.status,409);
  assert.equal(f.objects.size,1);
  for(let i=0;i<2;i++){
-  const unique=Buffer.from(PDF.toString().replace('startxref','startxref'+i));
-  assert.equal((await invoke(f,'',PHONE_A,'POST',unique,{filename:'more'+i+'.pdf'})).response.status,201);
+  const unique=createDocx(['[Content_Types].xml','word/document.xml','word/test'+i+'.xml']);
+  assert.equal((await postDocx(f,PHONE_A,unique,'more'+i+'.docx')).response.status,201);
  }
- const another=Buffer.from(PDF.toString().replace('startxref','startxref3'));
- assert.equal((await invoke(f,'',PHONE_A,'POST',another,{filename:'four.pdf'})).response.status,409);
+ const another=createDocx(['[Content_Types].xml','word/document.xml','word/test3.xml']);
+ assert.equal((await postDocx(f,PHONE_A,another,'four.docx')).response.status,409);
  assert.equal(f.objects.size,3);
  assert.equal((await invoke(f,'',PHONE_B)).payload.items.length,0);
+});
+test('deleting a private Word original also cleans all derived previews and verified copies',async()=>{
+ const f=fixture(),docx=createDocx();
+ const posted=await invoke(f,'',PHONE_A,'POST',docx,{
+  filename:'synthetic.docx',mime:docxMime
+ });
+ assert.equal(posted.response.status,201);
+ const row=f.resumes.get(posted.payload.item.id);
+ const prefix=row.storage_key+'.hhba-word-preserved-v1-'+row.sha256;
+ const assets=['.source.pdf','.docx','.edited.pdf','.json',
+  '.revision-11111111-2222-4333-8444-555555555555.docx',
+  '.revision-11111111-2222-4333-8444-555555555555.pdf'];
+ for(const suffix of assets)f.objects.set(prefix+suffix,Buffer.from('synthetic fixture'));
+ assert.equal(f.objects.size,7);
+ const deleted=await invoke(f,'/'+row.id,PHONE_A,'DELETE');
+ assert.equal(deleted.response.status,200);
+ assert.equal(f.objects.size,0);
+ assert.equal(f.resumes.size,0);
 });
 test('daily upload ledger persists after file removal',async()=>{
  const f=fixture();
  for(let i=0;i<15;i++)f.events.push({phone:PHONE_A,created_at:new Date().toISOString()});
- const r=await invoke(f,'',PHONE_A,'POST',PDF);
+ const r=await postDocx(f,PHONE_A);
  assert.equal(r.response.status,429);
  assert.equal(r.payload.error,'UPLOAD_RATE_LIMITED');
  assert.equal(f.objects.size,0);

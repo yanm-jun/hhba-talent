@@ -121,7 +121,7 @@ test('saved R2 resumes offer direct AI navigation without auto-upload or auto-co
  const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  assert.match(vault,/candidate\/match\?resume=/);
  assert.match(page,/deepLinkPending\.current/);
- assert.match(page,/rows\.some\(item=>item\.id===requested\)/);
+ assert.match(page,/rows\.some\(item=>item\.id===requested&&.*docx/);
  assert.match(page,/setSavedId\(requested\)/);
  assert.doesNotMatch(vault,/submitResumeForMatching/);
 });
@@ -155,7 +155,8 @@ test('native match has one upload action and retains separate explicit AI consen
  const {readFile}=await import('node:fs/promises');
  const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  assert.match(page,/授权 HHBA 使用我的简历信息进行智能岗位匹配/);
- assert.match(page,/开始智能匹配/);
+ assert.match(page,/AI 为我寻找适合的工作/);
+ assert.match(page,/CandidateJourneySteps/);
  assert.match(page,/CandidateMatchNativeDialog/);
  assert.doesNotMatch(page,/检测 AI 密钥及余额（不消耗匹配次数）/);
 });
@@ -194,7 +195,9 @@ test('native Top10 is in a focus-managed single dialog with reasons and direct U
  assert.match(dialog,/onMouseDown/);
  assert.match(dialog,/document\.body\.style\.overflow='hidden'/);
  assert.match(dialog,/job\.recommendation_reason/);
- assert.match(dialog,/href=\{job\.official_url\}/);
+ assert.match(dialog,/href=\{officialApplicationUrl\(job\)!\}/);
+ assert.match(dialog,/data-hhba-recruitment-outbound="true"/);
+ assert.match(dialog,/officialApplicationUrl\(job\)\?/);
 });
 
 test('same-version audited internal job with minimum 7 years is rejected for 3-year applicant',()=>{

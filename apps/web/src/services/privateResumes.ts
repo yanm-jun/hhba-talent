@@ -11,7 +11,8 @@ const errors:Record<string,string>={
  PRIVATE_STORAGE_NOT_ENABLED:'简历服务暂未启用，请稍后再试。',
  ACCOUNT_DATABASE_NOT_CONNECTED:'账户数据库暂未连接。',
  STORAGE_CONSENT_REQUIRED:'请先确认本次简历私有存储授权。',
- INVALID_FILENAME:'文件名不符合要求，请使用名称正常的 PDF 或 DOCX。',
+ INVALID_FILENAME:'文件名不符合要求，请使用名称正常的 DOCX。',
+ PDF_UPLOAD_DISABLED:'目前只支持上传 Word（.docx），PDF 请由优化后的 Word 导出。',
  INVALID_RESUME_SIZE:'文件大小须在 3 MB 以内。',
  INVALID_PDF_CONTAINER:'PDF 文件格式异常，请重新导出后上传。',
  INVALID_DOCX_CONTAINER:'DOCX 文件结构异常，请重新导出后上传。',
@@ -58,8 +59,8 @@ export async function listPrivateResumes():Promise<PrivateResume[]>{
 }
 export async function uploadPrivateResume(file:File,consent:boolean):Promise<PrivateResume>{
  if(!consent)throw Error('请先确认本次简历私有存储授权。');
- if(!/\.(pdf|docx)$/i.test(file.name)||file.size<30||file.size>PRIVATE_RESUME_LIMIT)
-  throw Error('请使用 3 MB 以内的 PDF 或 DOCX 简历。');
+ if(!/\.docx$/i.test(file.name)||file.size<30||file.size>PRIVATE_RESUME_LIMIT)
+  throw Error('请使用 3 MB 以内的 Word（.docx）简历。');
  const res=await request('','POST',file,true);
  const body=await res.json() as {kind?:string;item?:PrivateResume};
  if(body.kind!=='HHBA_PRIVATE_RESUME_VAULT_V1'||!body.item?.id)

@@ -4,13 +4,17 @@ import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
 import {Link} from '../router';
 import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDialog';
+import {CandidateResumeStage} from '../components/CandidateResumeStage';
+import {extractDocxText} from '../services/docxProfile.mjs';
+import {CandidateJourneySteps} from '../components/CandidateJourneySteps';
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
+import {matchServiceReady,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
+import '../styles/candidate-journey.css';
 
-const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+const supportedTypes='.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const maxResumeSize=3*1024*1024;
 
 export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
@@ -21,6 +25,10 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [previewText,setPreviewText]=useState('');
  const [previewLoaded,setPreviewLoaded]=useState(false);
  const [previewBusy,setPreviewBusy]=useState(false);
+ const [documentText,setDocumentText]=useState('');
+ const [documentBusy,setDocumentBusy]=useState(false);
+ const [documentError,setDocumentError]=useState('');
+ const [documentRetry,setDocumentRetry]=useState(0);
  const previewController=useRef<AbortController|null>(null);
  const [vaultError,setVaultError]=useState('');
  const [saveConsent,setSaveConsent]=useState(false);
@@ -36,6 +44,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [error,setError]=useState('');
 
  const [result,setResult]=useState<MatchResponse|null>(null);
+ const [optimizationSource,setOptimizationSource]=useState('');
  const controller=useRef<AbortController|null>(null);
  useEffect(()=>{
   const abort=new AbortController();
@@ -51,11 +60,11 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     if(active){setSavedFiles([]);setSavedId('');}return;
    }
    void listPrivateResumes().then(rows=>{if(active){
-    setSavedFiles(rows);setVaultError('');
+    setSavedFiles(rows.filter(item=>/\.docx$/i.test(item.name)));setVaultError('');
     const requested=deepLinkPending.current;
     if(requested){
      deepLinkPending.current=null;
-     if(/^[0-9a-f-]{36}$/.test(requested)&&rows.some(item=>item.id===requested))setSavedId(requested);
+     if(/^[0-9a-f-]{36}$/.test(requested)&&rows.some(item=>item.id===requested&&/\.docx$/i.test(item.name)))setSavedId(requested);
      else setVaultError('指定的简历不在当前账号，请从列表中选择。');
     }
    }})
@@ -67,14 +76,40 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   return()=>{active=false;window.removeEventListener('hhba:private-resumes-changed',reload);
    window.removeEventListener('hhba:real-auth-changed',reload);};
  },[user?.id]);
+ // Uploading a resume now gives an immediate private reading surface.
+ // No AI call or remote write happens during local DOCX text extraction.
+ useEffect(()=>{
+  const abort=new AbortController();
+  setDocumentText('');setDocumentError('');
+  if(!file&&!savedId){setDocumentBusy(false);return()=>abort.abort();}
+  setDocumentBusy(true);
+  void (async()=>{
+   try{
+    let selected=file;
+    if(!selected&&savedId){
+     const entry=savedFiles.find(item=>item.id===savedId);
+     if(!entry)throw new Error('保存的简历暂时未找到，请重试。');
+     const bytes=await fetchPrivateResumeForLocalReview(entry);
+     if(abort.signal.aborted)return;
+     selected=new File([bytes],entry.name,{type:entry.type});
+    }
+    if(!selected)return;
+    const raw=await extractDocxText(await selected.arrayBuffer());
+    if(!abort.signal.aborted)setDocumentText(raw);
+   }catch(error){
+    if(!abort.signal.aborted)setDocumentError(error instanceof Error?error.message:'暂时无法本地预览此文件。');
+   }finally{if(!abort.signal.aborted)setDocumentBusy(false);}
+  })();
+  return()=>abort.abort();
+ },[file,savedId,savedFiles,documentRetry]);
  function choose(candidate:File|null){
-  previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);
-  setError('');setResult(null);setSaveConsent(false);setSaveNotice('');
+  previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);setSavedId('');
+  setError('');setResult(null);setOptimizationSource('');setSaveConsent(false);setSaveNotice('');
   if(!candidate){setFile(null);return}
-  if(!/\.(pdf|docx)$/i.test(candidate.name)||!candidate.size||candidate.size>maxResumeSize){
-    setFile(null);setError('请选择不超过 3 MB 的 PDF 或 DOCX 文件。');return;
+  if(!/\.docx$/i.test(candidate.name)||!candidate.size||candidate.size>maxResumeSize){
+    setFile(null);setError('请上传不超过 3 MB 的 Word（.docx）简历。');return;
   }
-  setSavedId('');setFile(candidate);
+  setFile(candidate);
  }
  async function preview(){
   if((!file&&!savedId)||working||previewBusy)return;
@@ -121,10 +156,14 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   const abort=new AbortController();
   controller.current=abort;
   try{
-   let matched:MatchResponse;
+   // Reuse one local extraction for matching AND later user-controlled editing.
+   // No second AI parse, and no extra file upload is required for optimization.
+   let submittedText='';
    if(previewLoaded){
-    // Once the user has reviewed/edited text, NEVER fall back to re-reading the unedited file.
-    matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
+    // Once the user has reviewed/edited text, NEVER fall back to the raw resume.
+    if(previewLoaded&&previewText.replace(/\s/g,'').length<30)
+     throw new MatchError(400,'已编辑的简历文字为空，请重新核对；不会自动读取原文件。');
+    submittedText=previewText;
    }else{
     let selected=file;
     if(!selected&&savedId){
@@ -135,8 +174,12 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
      selected=new File([bytes],entry.name,{type:entry.type});
     }
     if(!selected)throw new MatchError(400,'请选择简历。');
-    matched=await submitResumeForMatching(selected,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
+    submittedText=await extractResumeTextLocally(selected,abort.signal);
    }
+   const matched:MatchResponse=await submitExtractedResumeText(
+    submittedText,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
+   if(abort.signal.aborted)return;
+   setOptimizationSource(submittedText);
    setResult(matched);setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
    setConsent(false);
@@ -149,19 +192,21 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     <nav className="hhba-ai-breadcrumb"><Link to="/candidate/account"><ArrowLeft size={15}/> 工作台</Link>
      <span>/</span><strong>简历智能匹配</strong></nav>
     <div className="hhba-ai-hero">
-      <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> 汇方职场 · HHBA · AI JOB MATCH</div>
-      <h1>上传简历，寻找合适岗位。</h1>
-      <p>HHBA 将结合你的简历与公开岗位，为你生成个性化推荐。</p>
+      <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> 汇方职场 · HHBA</div>
+      <h1>上传一份简历，找到适合你的工作。</h1>
+      <p>AI 负责寻找企业岗位、分析适配程度，并为你准备针对性的投递简历。</p>
     </div>
+    <CandidateJourneySteps current={working?2:1}/>
     {availability==='loading'&&<p className="hhba-ai-service-check"><LoaderCircle size={17} className="spin"/>正在检查平台智能匹配服务…</p>}
     {availability==='disabled'&&<div className="hhba-ai-admin-note" role="status">
        <LockKeyhole size={19}/><div><strong>智能匹配服务暂未启用。</strong>
        <p>请稍后再试，或直接浏览公开岗位。</p>
        <button type="button" onClick={()=>{setAvailability('loading');void matchServiceReady().then(ok=>setAvailability(ok?'ready':'disabled'))}}>重新检测服务状态</button>
        </div></div>}
-    <div className="hhba-ai-layout">
+    <div className={"hhba-ai-layout"+((file||savedId)?" hhba-ai-layout-reading":"")}>
       <section className="hhba-ai-upload">
-        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>PDF 或 DOCX，最大 3 MB。只有点击开始并同意授权后才分析，不会自动向企业投递。</p></header>
+        <header><h2><FileUp size={20}/> 选择你的 Word 简历</h2>
+         <p>上传 .docx，或选择以前保存的简历。AI 会根据真实内容主动寻找岗位，不必先填写求职条件。</p></header>
         {user&&privateResumeAvailable&&<div className="hhba-ai-saved-picker">
           <label htmlFor="hhba-ai-existing">使用「我的简历」中已经保存的文件（无需重新上传）</label>
           <select id="hhba-ai-existing" value={savedId} disabled={working}
@@ -172,7 +217,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           {!savedFiles.length&&<p>还没有保存的简历。可从 <Link to="/candidate/account/resume">我的简历</Link> 上传。</p>}
           {vaultError&&<p role="status">{vaultError}</p>}
         </div>}
-        {!getRealAuthToken()&&<p className="hhba-ai-service-check">AI 简历匹配需要先 <Link to="/candidate/login">登录 HHBA 求职账号</Link>。</p>}
+        {!getRealAuthToken()&&<p className="hhba-ai-service-check">AI 简历匹配需要先 <Link to="/candidate/login?next=%2Fcandidate%2Fmatch">登录 HHBA 求职账号</Link>。</p>}
         <input id="hhba-ai-resume" className="sr-only" type="file" accept={supportedTypes}
           onChange={(e:ChangeEvent<HTMLInputElement>)=>choose(e.target.files?.[0]||null)}/>
         <label htmlFor="hhba-ai-resume" className={'hhba-ai-drop '+(drag?'dragging':'')}
@@ -181,26 +226,33 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           onDrop={(e:DragEvent<HTMLLabelElement>)=>{e.preventDefault();setDrag(false);choose(e.dataTransfer.files?.[0]||null)}}>
           <FileText size={26}/>
           <strong>{savedId?'已选择私有简历：'+(savedFiles.find(x=>x.id===savedId)?.name||'') :file?file.name:'点击选择文件，或将简历拖到这里'}</strong>
-          <span>{file?(file.size/1024/1024).toFixed(2)+' MB · 可以分析':'仅支持可提取文字的 PDF / DOCX；扫描图片暂不支持'}</span>
+          <span>{file?(file.size/1024/1024).toFixed(2)+' MB · 可以分析':'仅支持有真实文字的 Word（.docx）；PDF 作为最终导出格式'}</span>
         </label>
-        <div className="hhba-ai-review-tools">
-         <button type="button" disabled={(!file&&!savedId)||working||previewBusy}
-          onClick={()=>void preview()}>{previewBusy?'正在读取简历文字…':'可选：预览并编辑用于匹配的简历文字'}</button>
-         {previewLoaded&&<div className="hhba-ai-text-review">
-          <label htmlFor="hhba-ai-text-preview">文字预览（最多 20,000 字）</label>
-          <textarea id="hhba-ai-text-preview" rows={6} maxLength={20000} value={previewText}
-           disabled={working} onChange={e=>{setPreviewText(e.target.value);setConsent(false);}}/>
-          <small>请先删除不希望用于本次匹配的内容。</small>
-         </div>}
-        </div>
-        <header className="hhba-ai-section-title"><h2>2. 选择工作方向</h2>
-          <p>可选填目标方向；不填写时，AI 会根据简历为你推荐。</p></header>
-        <div className="hhba-ai-mainland-only"><span>工作区域</span><strong>中国大陆</strong><small>不推荐港澳台或境外岗位</small></div>
-        <div className="hhba-ai-fields hhba-ai-fields-one">
-         <label>目标岗位方向<input value={options.role_hint} maxLength={80} placeholder="例如：软件开发、数据分析、销售、视觉设计"
-          onChange={e=>setOptions(x=>({...x,role_hint:e.target.value}))}/></label>
-        </div>
-        <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
+        {(file||savedId)&&<CandidateResumeStage text={documentText}
+         fileName={file?.name||savedFiles.find(item=>item.id===savedId)?.name||'已保存的简历'}
+         loading={documentBusy} error={documentError}
+         onRetry={()=>setDocumentRetry(value=>value+1)}/>}
+        <details className="hhba-ai-preferences">
+         <summary>可选：指定岗位方向或核对简历文字</summary>
+         <p>不填写岗位方向，AI 也会根据简历寻找适合的真实工作。</p>
+         <div className="hhba-ai-mainland-only"><span>搜索范围</span><strong>中国大陆</strong></div>
+         <div className="hhba-ai-fields hhba-ai-fields-one">
+          <label>希望优先寻找的岗位<input value={options.role_hint} maxLength={80}
+           placeholder="留空，让 AI 判断最适合的方向"
+           onChange={e=>setOptions(x=>({...x,role_hint:e.target.value}))}/></label>
+         </div>
+         <div className="hhba-ai-review-tools">
+          <button type="button" disabled={(!file&&!savedId)||working||previewBusy}
+           onClick={()=>void preview()}>{previewBusy?'正在读取简历文字…':'查看 AI 将分析的简历文字'}</button>
+          {previewLoaded&&<div className="hhba-ai-text-review">
+           <label htmlFor="hhba-ai-text-preview">简历文字核对（最多 20,000 字）</label>
+           <textarea id="hhba-ai-text-preview" rows={6} maxLength={20000}
+            value={previewText} disabled={working}
+            onChange={e=>{setPreviewText(e.target.value);setConsent(false);}}/>
+           <small>可以删除不希望提交给 AI 的内容；修改后需重新确认授权。</small>
+          </div>}
+         </div>
+        </details>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
           <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 使用我的简历信息进行智能岗位匹配。</span>
@@ -209,22 +261,25 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
           disabled={(!file&&!savedId)||!consent||working||previewBusy||(previewLoaded&&previewText.replace(/\s/g,'').length<30)||availability!=='ready'||!getRealAuthToken()}>
-          {working?<><LoaderCircle className="spin" size={18}/> 正在提取简历并匹配岗位…</>:
-           <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
+          {working?<><LoaderCircle className="spin" size={18}/> AI 正在寻找岗位…</>:
+           <><BriefcaseBusiness size={17}/> AI 为我寻找适合的工作 <ArrowRight size={17}/></>}
         </button>
         {working&&<p className="hhba-ai-processing" role="status">{stage==='preparing'?'正在准备智能匹配…':stage==='connected'?'正在连接岗位信息…':stage==='searching'?'正在寻找中国大陆岗位…':stage==='reading'?'正在读取候选岗位信息…':stage==='waiting'?'正在生成推荐，请稍候…':'正在分析简历并生成推荐理由…'}</p>}
       </section>
       <aside className="hhba-ai-aside">
-        <div className="hhba-ai-aside-card"><h3>只需三步</h3>
-           <ol><li>上传简历</li><li>智能匹配为你寻找岗位</li>
-             <li>直接查看 Top 10 推荐理由与岗位链接</li></ol>
-         </div>
-         <p className="hhba-ai-aside-footnote">工作地点仅限中国大陆；招聘状态请以岗位原始网页为准。</p>
+       <div className="hhba-ai-aside-card">
+        <h3>剩下的交给 AI</h3>
+        <p>搜索真实岗位、给出适配分、准备针对岗位的简历。</p>
+        <small>你只需要核实个人经历，决定是否去企业官网投递。</small>
+       </div>
       </aside>
     </div>
     {(result||partialJobs.length>0)&&<CandidateMatchNativeDialog
       result={result||{matches:partialJobs}}
       pending={working&&!result} notice={working?'':error}
+      sourceText={result?optimizationSource:undefined}
+      sourceResume={result&&savedId?savedFiles.find(item=>item.id===savedId&&/\.docx$/i.test(item.name)):undefined}
+      accountScope={String(user?.id||'')}
       resumeStorage={result&&file&&!savedId?{
         available:true,saved:false,consent:saveConsent,saving:saveBusy,
         notice:saveNotice,onConsent:setSaveConsent,onSave:()=>void saveResume()

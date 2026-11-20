@@ -1,7 +1,6 @@
 // HHBA same-origin Cloudflare AI matching. No provider key in the browser.
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import {extractDocxText} from './docxProfile.mjs';
-import {extractPdfText} from './pdfProfile.mjs';
 
 export type MatchProfile = {
   education:string|null;education_evidence:string|null;
@@ -53,7 +52,7 @@ const errorMap:Record<string,string>={
   ORIGIN_REQUIRED:'请求来源不符合安全要求，请从 HHBA 网站进入。',
   RESUME_NOT_FOUND:'这份简历不在当前账户，请重新选择。',
   EXPLICIT_AI_SHARING_CONSENT_REQUIRED:'请先确认本次第三方 AI 分析授权。',
-  INVALID_RESUME_TEXT:'简历中没有足够可复制的文字，请使用文字版 PDF 或 DOCX。',
+  INVALID_RESUME_TEXT:'简历中没有足够可复制的文字，请使用 Word（.docx）。',
   OFFICIAL_JOB_INDEX_UNAVAILABLE:'岗位官方审核数据暂时不可用，请稍后再试。',
   NO_VERIFIED_DOMESTIC_JOBS:'目前尚无通过最新审核的中国大陆岗位，本次没有调用 AI，也没有扣匹配次数。我们正在补充国内招聘来源。',
   AI_PROVIDER_UNAVAILABLE:'AI 接口出现异常，请稍后再试。',
@@ -103,23 +102,25 @@ export async function matchServiceReady(signal?:AbortSignal):Promise<boolean>{
 }
 /** Best-effort browser redaction before submitting text to HHBA's server. */
 export function redactResumeTextLocally(text:string):string{
- return text
+ const redacted=text
   .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,'[邮箱已隐藏]')
   .replace(/(?<!\d)1[3-9]\d{9}(?!\d)/g,'[手机号已隐藏]')
   .replace(/(?<![0-9A-Za-z])\d{17}[0-9Xx](?![0-9A-Za-z])/g,'[身份证号已隐藏]')
   .replace(/\bhttps?:\/\/[^\s<>]{3,200}/gi,'[个人网址已隐藏]')
   .replace(/(?:微信号|微信|QQ号|QQ)\s*[:：]\s*[A-Za-z0-9_-]{5,32}/gi,'[即时通讯账号已隐藏]')
-  .trim().slice(0,20000);
+  .trim();
+ // Never silently drop the tail of a PDF/DOCX before optimization sees it.
+ // The frontend also enforces this limit for user-reviewed text.
+ if(redacted.length>20000)throw new MatchError(413,'简历可提取文字超过 20,000 字符，为避免遗漏经历已停止分析；请先精简原文件或分段整理后重试。');
+ return redacted;
 }
 export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Promise<string>{
- if(!/\.(pdf|docx)$/i.test(file.name)||file.size<30||file.size>LIMIT)
-  throw new MatchError(413,'请选择 3 MB 以内的 PDF 或 DOCX 简历。');
+ if(!/\.docx$/i.test(file.name)||file.size<30||file.size>LIMIT)
+  throw new MatchError(413,'请选择 3 MB 以内的 Word（.docx）简历。');
  try{
   const buffer=await file.arrayBuffer();
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
-  const value=/\.pdf$/i.test(file.name)?
-   (await extractPdfText(buffer,{signal})).text:
-   await extractDocxText(buffer);
+  const value=await extractDocxText(buffer);
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
   const text=redactResumeTextLocally(value);
   if(text.replace(/\s/g,'').length<30)throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);

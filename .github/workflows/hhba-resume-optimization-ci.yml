@@ -1,0 +1,154 @@
+name: HHBA Resume Optimization CI
+on:
+  pull_request:
+    paths:
+      - 'apps/web/src/components/TargetedResumeOptimization.tsx'
+      - 'apps/web/src/services/resumeOptimizationApi.ts'
+      - 'apps/web/src/services/resumeReassessmentApi.ts'
+      - 'apps/web/src/services/officialJobVerifyApi.ts'
+      - 'apps/web/src/services/targetedResumeOptimization.ts'
+      - 'apps/web/src/services/resumeEvidenceVisibility.ts'
+      - 'apps/web/src/services/resumeDocument.ts'
+      - 'apps/web/src/services/resumeVersionsApi.ts'
+      - 'apps/web/src/pages/ResumeMatchPage.tsx'
+      - 'apps/web/src/pages/CandidateMatchPage.tsx'
+      - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
+      - 'apps/web/src/components/CandidateJourneySteps.tsx'
+      - 'apps/web/src/styles/candidate-journey.css'
+      - 'apps/web/src/services/officialApplicationUrl.*'
+      - 'apps/web/scripts/candidate-mainline.contract.test.mjs'
+      - 'apps/web/src/styles/resume-match-dialog.css'
+      - 'apps/web/src/components/ResumePrintSheet.tsx'
+      - 'apps/web/src/styles/resume-print.css'
+      - 'apps/web/src/styles/targeted-resume-optimization.css'
+      - 'apps/web/functions/api/resume-optimize.js'
+      - 'apps/web/functions/api/resume-reassess.js'
+      - 'apps/web/functions/api/official-job-verify.js'
+      - 'apps/web/functions/_lib/official-job-evidence.js'
+      - 'apps/web/functions/_lib/domestic-match-fusion.js'
+      - 'apps/web/functions/_lib/resume-reassessment.js'
+      - 'apps/web/functions/_lib/resume-match-core.js'
+      - 'apps/web/functions/api/resume-versions.js'
+      - 'apps/web/functions/_lib/resume-ai-provider.js'
+      - 'apps/web/functions/_lib/resume-rewrite-provider.js'
+      - 'apps/web/functions/_lib/resume-rewrite-agent.js'
+      - 'apps/web/functions/_lib/resume-rewrite-http.js'
+      - 'apps/web/functions/_lib/resume-rewrite-checkpoint.js'
+      - 'apps/web/functions/api/resume-rewrite-step.js'
+      - 'apps/web/functions/api/resume-rewrite.js'
+      - 'apps/web/src/services/resumeWholeRewriteApi.ts'
+      - 'apps/web/src/services/resumeWholeRewriteSource.ts'
+      - 'apps/web/src/components/WholeResumeRewriteReview.tsx'
+      - 'apps/web/scripts/resume-whole-rewrite.*'
+      - 'apps/web/scripts/resume-rewrite-agent.*'
+      - 'apps/web/scripts/resume-rewrite-checkpoint.*'
+      - 'apps/web/scripts/resume-optimization.*'
+      - 'apps/web/scripts/resume-authenticated-sqlite.e2e.test.mjs'
+      - 'apps/web/scripts/resume-reassessment.*'
+      - 'apps/web/scripts/official-job-evidence.*'
+      - 'apps/web/scripts/official-job-verify.*'
+      - 'apps/web/scripts/resume-versions.*'
+      - 'apps/web/scripts/resume-evidence-visibility.*'
+      - 'apps/web/scripts/resume-document.*'
+      - 'apps/web/scripts/resume-docx.*'
+      - 'apps/web/src/services/resumeDocx.ts'
+      - 'apps/web/src/services/resumeDocxPreserve.mjs'
+      - 'apps/web/src/services/originalWordApi.ts'
+      - 'apps/web/src/services/resumeWordAnchors.*'
+      - 'apps/web/src/services/resumeWordScoreBridge.*'
+      - 'apps/web/src/services/resumeSiriInk.mjs'
+      - 'apps/web/src/services/resumeChangedText.mjs'
+      - 'apps/web/scripts/resume-changed-text.*'
+      - 'apps/web/scripts/resume-siri-ink.*'
+      - 'apps/web/src/styles/siri-edge.css'
+      - 'apps/web/src/components/OriginalWordViewer.tsx'
+      - 'apps/web/functions/_lib/private-word-service.js'
+      - 'apps/web/functions/api/resume-word.js'
+      - 'apps/web/d1/0026_resume_word_attempts.sql'
+      - 'apps/web/scripts/resume-word.*'
+      - 'apps/web/scripts/resume-docx-preserve.*'
+      - 'apps/web/src/components/OriginalResumeViewer.tsx'
+      - 'apps/web/src/components/PrivateResumeVault.tsx'
+      - 'apps/web/src/styles/original-resume-viewer.css'
+      - 'apps/web/functions/api/resume-layout.js'
+      - 'apps/web/functions/_lib/resume-visual-layout.js'
+      - 'apps/web/functions/api/resumes/**'
+      - 'apps/web/scripts/resume-vision-layout.*'
+      - 'apps/web/scripts/resume-layout.route.*'
+      - 'apps/web/scripts/resume-visual-anchors.*'
+      - 'apps/web/scripts/resume-inline-pdf-preview.*'
+      - 'apps/web/src/services/resumeInlinePdfPreview.*'
+      - 'apps/web/src/services/resumePdfReviewCopy.*'
+      - 'apps/web/src/services/resumePdfNativeFont.*'
+      - 'apps/web/src/services/resumePdfNativeVerify.*'
+      - 'apps/web/src/services/resumePdfCjkFont.*'
+      - 'apps/web/scripts/resume-pdf-cjk-font.*'
+      - 'apps/web/scripts/resume-pdf-native-font.*'
+      - 'apps/web/scripts/resume-pdf-review-copy.*'
+      - 'apps/web/scripts/resume-page-edits.*'
+      - 'apps/web/src/services/resumeVisualAnchors.*'
+      - 'apps/web/src/services/resumeVisualEditingApi.ts'
+      - 'apps/web/functions/api/resume-page-edits.js'
+      - 'apps/web/d1/0025_resume_visual_attempts.sql'
+      - 'apps/web/scripts/kpmg-build-fallback.test.mjs'
+      - 'apps/web/scripts/cloudflare-pages-build.py'
+      - '.github/workflows/hhba-github-pages-preview.yml'
+      - '.github/workflows/hhba-resume-optimization-ci.yml'
+  push:
+    branches:
+      - feature/resume-targeted-optimization-foundation-20261119
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Test opt-in, auth, quota, and provider parser
+        working-directory: apps/web
+        env:
+          HHBA_WORD_RENDER_QA_OUTPUT: /tmp/hhba-docx-preserve-ci
+        run: node --test --experimental-strip-types scripts/resume-optimization.provider.test.mjs scripts/resume-optimization.route.test.mjs scripts/resume-whole-rewrite.provider.test.mjs scripts/resume-whole-rewrite.route.test.mjs scripts/resume-rewrite-agent.contract.test.mjs scripts/resume-rewrite-checkpoint.contract.test.mjs scripts/resume-whole-rewrite-source.contract.test.mjs scripts/resume-optimization.domain.test.mjs scripts/resume-versions.route.test.mjs scripts/resume-evidence-visibility.test.mjs scripts/resume-document.contract.test.mjs scripts/resume-docx.contract.test.mjs scripts/resume-docx-preserve.contract.test.mjs scripts/resume-word.route.test.mjs scripts/resume-word-anchors.contract.test.mjs scripts/resume-word-score-bridge.contract.test.mjs scripts/resume-siri-ink.contract.test.mjs scripts/resume-changed-text.contract.test.mjs scripts/resume-vision-layout.contract.test.mjs scripts/resume-layout.route.test.mjs scripts/resume-visual-anchors.contract.test.mjs scripts/resume-inline-pdf-preview.contract.test.mjs scripts/resume-pdf-review-copy.contract.test.mjs scripts/resume-pdf-native-font.contract.test.mjs scripts/resume-pdf-cjk-font.contract.test.mjs scripts/resume-page-edits.route.test.mjs scripts/resume-reassessment.domain.test.mjs scripts/resume-reassessment.route.test.mjs scripts/resume-optimization.main-flow.test.mjs scripts/candidate-mainline.contract.test.mjs scripts/official-job-evidence.contract.test.mjs scripts/official-job-verify.route.test.mjs
+      - name: Upload synthetic Word style-preservation render fixtures
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-synthetic-original-word-style-check
+          path: /tmp/hhba-docx-preserve-ci/*.docx
+          if-no-files-found: warn
+          retention-days: 5
+      - name: Real login and D1 SQLite authenticated resume integration
+        working-directory: apps/web
+        run: node --experimental-sqlite --test scripts/resume-authenticated-sqlite.e2e.test.mjs
+      - name: Verify source-backed KPMG fallback during Wikimedia HTTP 429
+        working-directory: apps/web
+        run: node --test scripts/kpmg-build-fallback.test.mjs
+      - name: Install frontend dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: TypeScript and Vite build
+        working-directory: apps/web
+        run: npm run build
+      - name: Ensure synthetic browser fixture is not shipped to production
+        working-directory: apps/web
+        run: |
+          test ! -f dist/qa/resume-flow.html
+          test ! -f dist/qa/native-pdf-font.html
+          test ! -f dist/qa/native-pdf-font.ts
+          test ! -f dist/qa/native-cjk-font.html
+          test ! -f dist/qa/native-cjk-font.ts
+          test ! -f dist/qa/generated-cjk-original.pdf
+          test ! -f dist/qa/original-cjk-resume-viewer.html
+          test ! -f dist/qa/original-cjk-resume-viewer.tsx
+          test ! -e dist/qa/resume-flow.tsx
+          if grep -Rql --fixed-strings 'synthetic-browser-qa-token' dist; then
+            echo 'ERROR: QA token fixture leaked into production output'
+            exit 1
+          fi

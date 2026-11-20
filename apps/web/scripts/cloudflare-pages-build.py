@@ -76,6 +76,27 @@ def main() -> None:
     run(["npm", "run", "build"], cwd=WEB,
         env={**os.environ, "VITE_HHBA_VERIFIED_SNAPSHOT": "1"})
 
+    # Only this draft feature branch may publish a synthetic Siri visual
+    # review. Keep demo markup outside public/ and src/ so normal Vite
+    # builds and the main production branch never contain demo identities.
+    if os.environ.get("CF_PAGES_BRANCH") == "feature/resume-targeted-optimization-foundation-20261119":
+        siri_source = WEB / "preview-only" / "resume-siri.html"
+        if not siri_source.is_file():
+            raise SystemExit("Missing review-only Siri interaction preview")
+        siri_target = WEB / "dist" / "preview" / "resume-siri.html"
+        siri_target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(siri_source, siri_target)
+        print("HHBA_PREVIEW_ONLY_SIRI_DEMO_READY=/preview/resume-siri.html", flush=True)
+
+        # The new simpler experience is the actual React component, not a
+        # duplicated HTML mock. Vite emits it only for this Preview branch.
+        frontend_entry = WEB / "dist" / "preview-only" / "resume-simple.html"
+        if not frontend_entry.is_file():
+            raise SystemExit("The real simplified-resume frontend preview was not bundled")
+        frontend_target = WEB / "dist" / "preview" / "resume-simple.html"
+        shutil.copy2(frontend_entry, frontend_target)
+        print("HHBA_PREVIEW_ONLY_SIMPLE_RESUME_READY=/preview/resume-simple.html", flush=True)
+
     # Cloudflare serves the VERY SAME original admin-preview source as GitHub Pages.
     # Only asset paths differ between the standalone app and the /admin-preview/ subpath.
     # No new admin UI, no new route prefix, no synthetic user or business records.

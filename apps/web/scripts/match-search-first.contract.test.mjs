@@ -219,8 +219,8 @@ test('Score and recruitment status appear in compact modal, not admission probab
  const css=await readFile(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
  assert.match(jsx,/简历适配分/);
  assert.match(jsx,/不是录用概率/);
- assert.match(jsx,/投递状态未确认/);
- assert.match(jsx,/网页显示在招/);
+ assert.match(jsx,/请核实是否招聘/);
+ assert.match(jsx,/网页显示招聘中/);
  assert.match(css,/hhba-native-score-basis/);
 });
 

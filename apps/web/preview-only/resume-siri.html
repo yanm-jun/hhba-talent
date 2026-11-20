@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>HHBA · Siri 彩虹简历优化视觉预览</title>
+<style>
+@property --hhba-siri-angle{syntax:"<angle>";initial-value:0deg;inherits:false}
+:root{color-scheme:light;--ink:#172e41;--sub:#718397;--line:#e5ebf1;--brand:#315b7b;--paper:#fff}
+*{box-sizing:border-box}
+html{background:#f5f7fa;scroll-behavior:smooth}
+body{margin:0;color:var(--ink);font-family:"Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid #7f6acb;outline-offset:3px}
+.shell{max-width:1400px;padding:0 31px 42px;margin:auto}
+.header{height:72px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e8edf2}
+.brand{font-weight:860;font-size:22px;letter-spacing:-.055em;color:#244b69}
+.brand span{font-size:10px;letter-spacing:.09em;font-weight:570;margin-left:11px;color:#7f8e9a}
+.tag{font-size:11px;padding:7px 11px;border:1px solid #dce4ea;background:#fff;border-radius:30px;color:#5d758b;white-space:nowrap}
+.intro{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:30px 0 22px}
+.eyebrow{font-size:11px;letter-spacing:.15em;color:#7a8d9d;font-weight:750}
+h1{font-size:clamp(23px,2.3vw,32px);font-weight:680;line-height:1.25;letter-spacing:-.035em;margin:7px 0}
+.intro p{font-size:12px;color:var(--sub);margin:8px 0 0;line-height:1.7}
+.notice{font-size:11px;line-height:1.7;color:#64788b;text-align:right;max-width:355px}
+.journey{border:1px solid #e5ebf0;background:#fff;border-radius:13px;padding:12px 18px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:17px}
+.step{display:flex;align-items:center;gap:8px;min-width:0;font-size:11px;color:#91a0ad;white-space:nowrap}
+.step b{display:grid;place-items:center;width:25px;height:25px;flex:0 0 25px;border:1px solid #e1e7eb;border-radius:50%;background:#fafbfd;font-size:10px;color:#8595a4}
+.step.done{color:#55728a}.step.done b{background:#f0f5f8;color:#3d6987}
+.step.current{font-weight:760;color:#2c597b}.step.current b{background:#315b7b;border-color:#315b7b;color:#fff}
+.workspace{background:rgba(255,255,255,.84);border:1px solid #e4eaf0;border-radius:16px;padding:19px 22px 26px;box-shadow:0 14px 48px rgba(36,62,92,.055)}
+.job{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding:0 0 15px;margin-bottom:23px}
+.job small{color:#8191a0;font-size:11px}.job h2{font-size:18px;margin:5px 0 3px;letter-spacing:-.02em}.job p{font-size:12px;color:#75899b;margin:0}
+.score{text-align:right;white-space:nowrap}.score strong{font-size:27px;font-weight:750;color:#315b7b;font-variant-numeric:tabular-nums}.score strong span{font-size:12px;color:#8292a2}.score small{display:block;margin-top:1px;font-size:10px;color:#8494a2}
+.editor{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(292px,.83fr);align-items:start;gap:35px}
+.canvas-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}
+.canvas-top strong{font-size:12px;font-weight:700}.canvas-top small{color:#8998a5;font-size:10px}
+.active-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#4a84a8;margin-right:5px;box-shadow:0 0 0 4px #eaf3f8}
+.siri-stage{position:relative;isolation:isolate;border-radius:7px;background:#fff}
+.siri-stage.active::before,.siri-stage.active::after{content:"";position:absolute;pointer-events:none;border-radius:inherit;background:conic-gradient(from var(--hhba-siri-angle) at 50% 50%,#38cbe8 0deg,#66aafa 45deg,#a67bfa 105deg,#e97dcc 162deg,#ffa26f 225deg,#79d3ef 288deg,#38cbe8 360deg);animation:hhba-siri-edge-flow 18s linear infinite}
+.siri-stage.active::before{inset:-6px;z-index:-1;opacity:.68;filter:blur(15px)}
+.siri-stage.active::after{inset:-2px;z-index:3;padding:2px;opacity:.88;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
+@keyframes hhba-siri-edge-flow{to{--hhba-siri-angle:360deg}}
+.paper{background:var(--paper);border:1px solid #e4e8ef;aspect-ratio:210/297;width:100%;min-height:545px;box-shadow:0 3px 14px rgba(21,42,66,.065);padding:8% 10.5%;border-radius:4px;overflow:hidden;font-family:"Microsoft YaHei","PingFang SC",sans-serif}
+.resume-name{font-size:clamp(19px,2.6vw,28px);font-weight:750;letter-spacing:.16em;line-height:1.45;margin:0 0 7px;color:#252f3b}
+.resume-role{font-size:12px;color:#3e4c59;margin:0 0 13px}
+.resume-meta{font-size:10px;color:#778391;border-bottom:1px solid #d3dbe3;padding-bottom:15px;margin-bottom:18px}
+.paper-section{margin-top:18px}.paper-section h3{font-size:12px;letter-spacing:.08em;color:#253b50;padding:0 0 6px;border-bottom:1px solid #cbd7e2;margin:0 0 12px}
+.paper-section .line,.paper-section p{font-size:11px;line-height:1.95;color:#333e49;margin:5px 0}
+.paper-section .role{font-weight:710;font-size:11px;margin-top:10px}
+.rainbow-text{color:#465daa;background-image:linear-gradient(105deg,#009cc2 0%,#3a7fe6 17%,#8351d5 36%,#c84f9f 55%,#de7958 74%,#16b5cd 100%);background-size:175% 100%;background-position:6% 50%;background-repeat:no-repeat;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:hhba-resume-siri-letters-flow 11s ease-in-out infinite alternate;font-weight:650}
+@keyframes hhba-resume-siri-letters-flow{from{background-position:6% 50%}to{background-position:94% 50%}}
+.rainbow-text[hidden],.native-text[hidden]{display:none}
+.native-text{font-weight:inherit;color:#333e49}
+.revision-mark{font-size:10px;color:#8d9eac;margin-left:5px;font-weight:normal;vertical-align:baseline}
+.siri-stage:not(.active) .revision-mark{display:none}
+.edit-caption{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:13px;font-size:11px;color:#698195;line-height:1.6}
+.legend{display:flex;align-items:center;gap:6px}.legend i{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#45b6dd,#9c70e8,#dd7196,#eab272)}
+.panel{border-left:1px solid #e7ebef;padding:1px 0 0 24px;min-width:0}
+.panel-header{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:3px 0 17px}
+.panel-header h3{font-size:17px;font-weight:740;margin:0}.panel-header small{color:#8b9aa7;font-size:10px}
+.ai-chip{font-size:10px;color:#5e668f;background:#f1f1fa;padding:5px 9px;border-radius:99px}
+.panel-note{font-size:11px;color:#8295a4;line-height:1.75;margin:0 0 17px}
+.suggestion{padding:16px;border:1px solid #e6eaf0;border-radius:11px;background:#fbfcfe;margin-bottom:11px}
+.suggestion-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.suggestion-head strong{font-size:12px}.suggestion-head small{font-size:10px;color:#748aa1}
+.suggestion p{font-size:12px;color:#536879;line-height:1.75;margin:7px 0}
+.suggestion .quote{background:#fff;padding:9px 10px;border-left:2px solid #c4d0db;border-radius:3px;color:#4c5e6f}
+.suggestion .proposed{color:#53658d;font-weight:600}
+.panel-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px}
+.panel-actions button,.mobile-toggle{border:1px solid #d6e0e8;background:#fff;color:#3e5870;font-size:12px;font-weight:640;border-radius:8px;min-height:43px;padding:9px 11px}
+.panel-actions .primary{grid-column:1/-1;background:#315b7b;color:#fff;border-color:#315b7b}
+.panel-actions button:hover{filter:brightness(.965)}.panel-actions button:disabled{opacity:.46;cursor:not-allowed}
+.privacy{font-size:10px;line-height:1.85;color:#8a98a5;margin:14px 2px 4px}
+.apply{border-top:1px solid #e8edf1;margin-top:23px;padding-top:15px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.apply strong{font-size:12px}.apply p{font-size:11px;color:#8696a5;line-height:1.6;margin:4px 0}
+.apply span{font-size:10px;background:#f3f6f8;color:#8799a8;padding:7px 10px;border-radius:8px}
+.mobile-toggle,.shade{display:none}
+.footer{font-size:11px;color:#9aa7b2;text-align:center;margin-top:25px}
+@media(max-width:850px){
+ .shell{padding:0 14px 28px}
+ .header{height:57px}.brand{font-size:20px;white-space:nowrap}.brand span{display:none}.brand::after{content:"汇方职场";font-size:10px;font-weight:550;letter-spacing:.035em;color:#8796a5;margin-left:9px}
+ .intro{padding:21px 2px 14px}.intro h1{font-size:23px}.intro .notice{display:none}
+ .journey{padding:9px 4px;gap:0;margin-bottom:11px}
+ .step{flex-direction:column;gap:3px;text-align:center;justify-content:center;font-size:9px;white-space:normal}.step b{width:19px;height:19px;flex:0 0 19px;font-size:9px}
+ .workspace{padding:12px 10px 18px;border-radius:11px}
+ .job{padding:2px 2px 11px;margin-bottom:13px}.job h2{font-size:15px}.job p{font-size:10px}.score strong{font-size:22px}.score small{font-size:9px}
+ .editor{display:block}.canvas-top{margin-bottom:12px}.canvas-top small{font-size:9px}
+ .paper{min-height:0;padding:7.2% 8.5%}.resume-name{font-size:23px}
+ .paper-section .line,.paper-section p{font-size:10px}
+ .panel{position:fixed;inset:auto 0 0;border:0;border-radius:19px 19px 0 0;max-height:min(80dvh,730px);z-index:60;padding:20px 17px calc(23px + env(safe-area-inset-bottom,0px));background:#fff;box-shadow:0 -15px 55px rgba(25,42,60,.2);overflow:auto;transform:translateY(110%);visibility:hidden;transition:transform .22s ease,visibility .22s}
+ .panel.open{transform:none;visibility:visible}.shade.open{position:fixed;inset:0;display:block;background:rgba(23,42,60,.26);z-index:50}
+ .mobile-toggle{display:block;width:100%;margin-top:15px;background:#315b7b;color:#fff;border-color:#315b7b}
+ .edit-caption{margin-top:13px}.apply{align-items:flex-start}.apply span{white-space:nowrap}
+ .panel-actions button{min-height:48px}
+}
+@media(max-width:430px){
+ .paper{padding:7.5% 8.2%}.paper-section{margin-top:13px}.paper-section .line,.paper-section p{line-height:1.8;font-size:9px}
+ .resume-name{font-size:20px}.resume-role{font-size:10px}.resume-meta{font-size:9px;margin-bottom:12px;padding-bottom:10px}
+ .paper-section h3{font-size:10px;margin-bottom:8px}
+ .edit-caption{align-items:flex-start}.revision-mark{font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation:none!important;transition:none!important}
+ .siri-stage.active::before,.siri-stage.active::after{--hhba-siri-angle:24deg}
+ .rainbow-text{background-position:42% 50%}
+}
+@media print{.siri-stage::before,.siri-stage::after{display:none!important}.rainbow-text{-webkit-text-fill-color:#333e49;background:none}.panel,.mobile-toggle,.apply,.notice,.journey,.header{display:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+ <header class="header">
+  <div class="brand">HHBA <span>汇方职场 · HUÍFĀNG CAREERS</span></div>
+  <div class="tag">Siri 彩虹交互 · 视觉预览</div>
+ </header>
+ <div class="intro">
+  <div><div class="eyebrow">CANDIDATE JOURNEY / PREVIEW</div>
+   <h1>选择岗位后，直接优化你的简历。</h1>
+   <p>原 Word 的阅读体验、Siri 四周流光，以及确认后恢复正常字体的交互示意。</p>
+  </div>
+  <div class="notice">本页使用虚构示例，不涉及真实简历、招聘岗位或 AI 接口；仅用于确认设计样式。</div>
+ </div>
+ <nav class="journey" aria-label="HHBA 求职主线">
+  <div class="step done"><b>✓</b><span>上传简历</span></div>
+  <div class="step done"><b>✓</b><span>AI 找岗位</span></div>
+  <div class="step done"><b>✓</b><span>匹配评分</span></div>
+  <div class="step current"><b>04</b><span>定向优化</span></div>
+  <div class="step"><b>05</b><span>官网投递</span></div>
+ </nav>
+ <main class="workspace">
+  <div class="job">
+   <div><small>岗位定向优化 · 虚构演示岗位</small><h2>区域门店运营督导</h2><p>演示企业 · 全国出差 · 本页未核验真实职位</p></div>
+   <div class="score"><strong>78<span>/100</span></strong><small>演示分数，不是实际匹配结果</small></div>
+  </div>
+  <div class="editor">
+   <div>
+    <div class="canvas-top"><strong><span class="active-dot"></span>原 Word 排版交互示意</strong><small id="canvas-status" aria-live="polite">AI 修改建议 · 待确认</small></div>
+    <div class="siri-stage active" id="siri-stage">
+     <article class="paper" aria-label="虚构示例简历预览">
+      <h2 class="resume-name">演 示 用 户</h2>
+      <p class="resume-role">运营支持 / 区域管理方向</p>
+      <p class="resume-meta">示例城市　｜　电话与邮箱不展示　｜　仅供设计预览</p>
+      <section class="paper-section"><h3>个人概述</h3>
+       <p>具有门店基础运营及客户跟进的实践经历，重视沟通协作和日常执行。</p>
+      </section>
+      <section class="paper-section"><h3>工作经历</h3>
+       <p class="role">演示企业 · 门店运营支持</p>
+       <p class="line">负责协助门店日常工作及数据整理。</p>
+       <p class="line">· <span class="native-text" data-original="协助记录到店情况和客户反馈。" hidden>围绕到店预约、客户反馈与日常运营记录进行整理，支持门店复盘。</span><span class="rainbow-text" data-pending>围绕到店预约、客户反馈与日常运营记录进行整理，支持门店复盘。</span><span class="revision-mark" data-mark>✦ AI 修改</span></p>
+       <p class="line">· <span class="native-text" data-original="配合团队完成临时安排。" hidden>协助跨岗位沟通，跟进任务状态并整理执行记录。</span><span class="rainbow-text" data-pending>协助跨岗位沟通，跟进任务状态并整理执行记录。</span><span class="revision-mark" data-mark>✦ AI 补充表达</span></p>
+      </section>
+      <section class="paper-section"><h3>技能与能力</h3>
+       <p class="line">文档整理 · 团队协作 · 日常运营支持 · 信息反馈</p>
+      </section>
+      <section class="paper-section"><h3>教育经历</h3>
+       <p class="line">演示学校 · 演示专业</p>
+      </section>
+     </article>
+    </div>
+    <div class="edit-caption">
+     <span class="legend"><i></i><span id="legend-text">彩虹色仅表示尚未确认的改写内容</span></span>
+     <span>非真实 Word 文件</span>
+    </div>
+    <button class="mobile-toggle" id="mobile-toggle" type="button" aria-controls="review-panel" aria-expanded="false">查看 AI 建议与确认操作</button>
+   </div>
+   <aside class="panel" id="review-panel" aria-label="AI 建议工作台">
+    <div class="panel-header"><div><small>HHBA · AI WORKSPACE</small><h3>AI 修改建议</h3></div><span class="ai-chip" id="state-chip">待本人确认</span></div>
+    <p class="panel-note">AI 修改过的文字以 Siri 彩虹色呈现在原位置。确认后立即回归简历原本的普通文字视觉，不把彩虹色保存进 Word 或 PDF。</p>
+    <div class="suggestion">
+     <div class="suggestion-head"><strong>01　优化经历表达</strong><small>待本人核实</small></div>
+     <p class="quote">原文：协助记录到店情况和客户反馈。</p>
+     <p class="proposed">修改后：围绕到店预约、客户反馈与日常运营记录进行整理，支持门店复盘。</p>
+    </div>
+    <div class="suggestion">
+     <div class="suggestion-head"><strong>02　补充表达方式</strong><small>不新增事实</small></div>
+     <p>仅展示对已有事实的整理方式。实际 AI 生成必须依据用户简历和对应岗位要求，并由本人确认。</p>
+    </div>
+    <div class="panel-actions">
+     <button class="primary" id="accept" type="button">确认这两处修改（演示）</button>
+     <button id="reject" type="button">保留原文</button>
+     <button id="reset" type="button">重新演示彩虹效果</button>
+    </div>
+    <p class="privacy">此为 UI 交互样式演示，未连接真实 AI、数据库、Word 渲染器或投递接口。确认按钮不生成或修改任何文件。</p>
+   </aside>
+  </div>
+  <div class="apply"><div><strong>05 · 企业官网投递</strong><p>正式功能仅在确认官方职位链接后引导用户自行提交，不自动投递。</p></div><span>视觉预览不提供投递链接</span></div>
+ </main>
+ <p class="footer">HHBA · 让机会与人才，找到彼此。 / Preview build only</p>
+</div>
+<div class="shade" id="shade" aria-hidden="true"></div>
+<script>
+(() => {
+ const stage=document.getElementById('siri-stage');
+ const status=document.getElementById('canvas-status');
+ const legend=document.getElementById('legend-text');
+ const chip=document.getElementById('state-chip');
+ const pending=[...document.querySelectorAll('[data-pending]')];
+ const normal=[...document.querySelectorAll('.native-text')];
+ const marks=[...document.querySelectorAll('[data-mark]')];
+ const accept=document.getElementById('accept');
+ const reject=document.getElementById('reject');
+ const panel=document.getElementById('review-panel');
+ const shade=document.getElementById('shade');
+ const toggle=document.getElementById('mobile-toggle');
+ function mode(next){
+  const active=next==='pending';
+  stage.classList.toggle('active',active);
+  pending.forEach(el=>el.hidden=!active);
+  normal.forEach(el=>{el.hidden=active;el.textContent=next==='rejected'?el.dataset.original:el.dataset.proposed;});
+  marks.forEach(el=>el.hidden=!active);
+  status.textContent=active?'AI 修改建议 · 待确认':next==='accepted'?'已确认 · 恢复普通字体':'保留原文 · 未修改';
+  legend.textContent=active?'彩虹色仅表示尚未确认的改写内容':'彩虹特效已结束，正文显示为普通字体';
+  chip.textContent=active?'待本人确认':next==='accepted'?'已确认修改':'已保留原文';
+  accept.disabled=next==='accepted';reject.disabled=next==='rejected';
+ }
+ normal.forEach(el=>el.dataset.proposed=el.textContent);
+ function close(){panel.classList.remove('open');shade.classList.remove('open');toggle.setAttribute('aria-expanded','false');}
+ accept.addEventListener('click',()=>{mode('accepted');close();});
+ reject.addEventListener('click',()=>{mode('rejected');close();});
+ document.getElementById('reset').addEventListener('click',()=>{mode('pending');close();});
+ toggle.addEventListener('click',()=>{panel.classList.add('open');shade.classList.add('open');toggle.setAttribute('aria-expanded','true');});
+ shade.addEventListener('click',close);
+ document.addEventListener('keydown',event=>{if(event.key==='Escape')close();});
+ mode('pending');
+})();
+</script>
+</body>
+</html>

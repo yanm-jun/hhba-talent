@@ -79,8 +79,8 @@ export async function matchResume(file:File,
  const origin=trustedOrigin();
  if(!origin)throw new ResumeMatchError('简历分析服务尚未连接。','SERVICE_NOT_CONNECTED',503);
  if(!options.consent)throw new ResumeMatchError('请先同意第三方 AI 数据处理说明。','CONSENT_REQUIRED',400);
- if(file.size<1||file.size>3*1024*1024||!/\.(pdf|docx)$/i.test(file.name))
-  throw new ResumeMatchError('仅支持 3MB 以内的 PDF 或 DOCX 简历。','INVALID_RESUME',400);
+ if(file.size<1||file.size>3*1024*1024||!/\.docx$/i.test(file.name))
+  throw new ResumeMatchError('仅支持 3MB 以内的 Word（.docx）简历。','INVALID_RESUME',400);
  const form=new FormData();
  form.append('file',file);
  form.append('consent','true');

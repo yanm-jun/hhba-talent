@@ -1,0 +1,934 @@
+.targeted-resume{margin:18px 0 24px;border:1px solid #e5e7eb;border-radius:18px;padding:20px;background:#f8f9fb;color:#1d2530}.targeted-resume-heading{display:flex;justify-content:space-between;gap:12px;align-items:start}.targeted-resume-heading h3{margin:6px 0}.targeted-resume-heading p,.targeted-resume-footer p{font-size:12px;color:#64748b}.targeted-resume-heading>span{font-size:11px;color:#6b7280;white-space:nowrap}.targeted-resume-paper{max-width:760px;margin:18px auto;background:white;box-shadow:0 8px 32px #1118270d;padding:clamp(18px,4vw,46px);border:1px solid #edf0f3}.targeted-resume-paper header{border-bottom:1px solid #e5e7eb;margin-bottom:20px}.targeted-resume-paper header h4{font-size:22px;margin:0 0 8px}.targeted-resume-paper header p{color:#64748b;font-size:12px}.targeted-resume-block{margin:18px 0 26px}.targeted-resume-block>small{color:#64748b}.targeted-resume-block>p{line-height:1.85;white-space:pre-wrap}/* Siri-inspired typography: color is used only for unconfirmed AI suggestions,
+   never for the user's source text or the exported resume. */
+.targeted-resume-suggestion{
+ position:relative;isolation:isolate;overflow:hidden;
+ margin-top:12px;padding:16px 17px 16px 19px;
+ border:1px solid #e8e8f1;border-radius:14px;
+ background:linear-gradient(130deg,#ffffff 0%,#fcfbff 64%,#fffafc 100%);
+ box-shadow:0 5px 20px rgba(51,46,91,.045);
+}
+.targeted-resume-suggestion::before{
+ content:"";position:absolute;left:0;top:12px;bottom:12px;width:3px;
+ border-radius:0 3px 3px 0;pointer-events:none;
+ background:linear-gradient(180deg,#258bd1,#7662dc 40%,#c8559c 73%,#d78172);
+ opacity:.84;
+}
+.targeted-resume-ai-label{font-size:11px;color:#6559a1;font-weight:650;letter-spacing:.015em}
+.targeted-resume-gradient{
+ color:#5e4dac;font:inherit;font-size:clamp(14px,1.04rem,16px);
+ font-weight:580;letter-spacing:.012em;line-height:1.88;
+ white-space:pre-wrap;overflow-wrap:anywhere;
+ text-wrap:pretty;
+}
+/* Each gradient stop remains readable against the near-white suggestion card;
+   the warm coral is deliberately deeper than decorative Siri colors. */
+/* The fallback above remains readable when gradient text is unsupported. */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+ .targeted-resume-gradient{
+  background-image:linear-gradient(105deg,
+   #176fae 0%,#5362c4 19%,#7645b4 36%,#b33b88 52%,
+   #ad456f 67%,#a95245 82%,#176fae 100%);
+  background-size:215% 100%;background-position:0% 50%;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:hhba-siri-text-flow 11s ease-in-out infinite alternate;
+ }
+}
+@keyframes hhba-siri-text-flow{
+ from{background-position:0% 50%}
+ to{background-position:100% 50%}
+}
+/* Respect device power and accessibility preferences. No flashing/glare. */
+@media(prefers-reduced-motion:reduce){
+ .targeted-resume-gradient{animation:none!important;background-position:35% 50%}
+}
+@media print{
+ .targeted-resume-gradient{
+  animation:none!important;background:none!important;
+  color:#1d2530!important;-webkit-text-fill-color:#1d2530!important
+ }
+}.targeted-resume-actions{display:flex;gap:8px;flex-wrap:wrap}.targeted-resume button{border:1px solid #d7dbe3;background:white;color:#293448;border-radius:8px;padding:8px 12px;cursor:pointer}.targeted-resume-actions button:first-child{background:#24344c;color:white;border-color:#24344c}.targeted-resume button:focus-visible{outline:3px solid #7b75e7;outline-offset:2px}.targeted-resume-applied{font-size:12px;color:#297d60}.targeted-resume-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.targeted-resume-notice{font-size:12px;color:#325d73}@media(max-width:600px){.targeted-resume{padding:12px}.targeted-resume-heading{flex-direction:column}.targeted-resume-paper{padding:18px}}
+.targeted-resume-heading>span{display:inline-flex;gap:5px;align-items:center}
+.targeted-resume-toolbar{margin-top:18px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:20px;background:#fff;border:1px solid #e8ebf0;border-radius:12px}
+.targeted-resume-toolbar strong{font-size:14px}
+.targeted-resume-toolbar p{margin:6px 0 0;font-size:12px;line-height:1.6;color:#64748b}
+.targeted-resume-toolbar>button{display:flex;align-items:center;justify-content:center;gap:7px;min-width:148px;background:#27344d;color:#fff;border-color:#27344d}
+.targeted-resume button:disabled{cursor:not-allowed;opacity:.46}
+.targeted-resume-unavailable{font-size:12px;color:#64748b;max-width:200px;line-height:1.5}
+.targeted-resume-consent{display:flex;gap:9px;margin:14px 3px 0;font-size:12px;color:#64748b;line-height:1.7}
+.targeted-resume-consent input,.targeted-resume-confirm input{accent-color:#7361bc;flex-shrink:0;margin-top:4px}
+.targeted-resume-ai-label{display:inline-flex;align-items:center;gap:6px}
+.targeted-resume-confirm{display:flex;align-items:start;gap:7px;color:#5b6480;font-size:12px;line-height:1.6;margin:12px 0}
+.targeted-resume-rationale{font-size:12px;line-height:1.6;color:#667085;margin:8px 0 14px}
+.targeted-resume-applied{display:inline-flex;gap:5px;align-items:center}
+.targeted-resume-footer p{display:flex;align-items:flex-start;gap:6px;line-height:1.6;max-width:550px}
+.targeted-resume-footer p svg{flex-shrink:0;margin-top:1px}
+.targeted-resume-footer>button{display:inline-flex;gap:7px;align-items:center}
+.resume-match-job-actions>button{font:inherit;color:#33436d;background:#f7f5ff;border:1px solid #e9e2ff;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer}
+.resume-match-job-actions>button:hover{background:#eeebfc}
+.resume-match-job-actions>button:focus-visible{outline:3px solid #9e85ff;outline-offset:2px}
+@media(max-width:650px){.targeted-resume-toolbar{align-items:stretch;flex-direction:column}.targeted-resume-toolbar>button{width:100%}.targeted-resume-heading>span{white-space:normal}}
+@media(prefers-reduced-motion:reduce){.targeted-resume .resume-match-spinning{animation:none}}
+
+.targeted-resume-audit{max-width:760px;margin:10px auto 18px;border:1px solid #e4e6ec;background:#fff;border-radius:12px;padding:16px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+.targeted-resume-audit>div{display:flex;flex-direction:column;gap:6px;align-items:center;padding:8px}
+.targeted-resume-audit>div small{font-size:11px;color:#687587}
+.targeted-resume-audit>div strong{font-size:25px;letter-spacing:-.04em;color:#24344c;font-variant-numeric:tabular-nums}
+.targeted-resume-audit>span{font-size:21px;color:#8795a8}
+.targeted-resume-audit>p,.targeted-resume-audit>details{grid-column:1/-1;color:#687587;font-size:12px;line-height:1.7;margin:1px 0}
+.targeted-resume-audit summary{cursor:pointer}
+.targeted-resume-audit ul{margin:8px 0;padding-left:18px}
+.targeted-resume-save{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:16px;margin-top:16px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}
+.targeted-resume-save strong{display:flex;align-items:center;gap:7px;font-size:14px}
+.targeted-resume-save p{font-size:12px;color:#67758a;margin:6px 0 0;line-height:1.6}
+.targeted-resume-save>button{display:inline-flex;gap:7px;align-items:center;flex-shrink:0;background:#27344d;border-color:#27344d;color:#fff}
+.targeted-resume-history{margin:10px 0 20px;border:1px solid #e5e7eb;background:#fff;border-radius:10px;padding:6px 14px}
+.targeted-resume-history>div{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #edf0f3}
+.targeted-resume-history>div:last-child{border-bottom:0}
+.targeted-resume-history span{font-size:12px;flex:1;color:#54657d}
+.targeted-resume-history button{font-size:12px;padding:5px 9px}
+@media(max-width:650px){.targeted-resume-save{flex-direction:column;align-items:stretch}.targeted-resume-save>button{justify-content:center}.targeted-resume-history>div{flex-wrap:wrap}.targeted-resume-history span{flex-basis:100%}}
+
+.targeted-resume-fact-entry{display:flex;flex-direction:column;gap:8px;margin:12px 0;color:#536278;font-size:12px;font-weight:550}
+.targeted-resume-fact-entry textarea{width:100%;resize:vertical;font:inherit;font-weight:400;font-size:13px;line-height:1.65;border:1px solid #d9dce7;border-radius:9px;padding:10px 12px;background:#fff;color:#24344c;box-sizing:border-box}
+.targeted-resume-fact-entry textarea:focus-visible{outline:2px solid #9082d4;outline-offset:1px}
+
+.targeted-resume-document-editor{max-width:800px;margin:20px auto 0;padding:20px;background:#fff;border:1px solid #e5e9f0;border-radius:12px}
+.targeted-resume-document-heading{display:flex;justify-content:space-between;align-items:start;gap:18px}
+.targeted-resume-document-heading strong{font-size:17px;color:#283750}
+.targeted-resume-document-heading p,.targeted-resume-print-note{font-size:12px;line-height:1.7;color:#63718a;margin:6px 0 0}
+.targeted-resume-document-actions{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0}
+.targeted-resume-document-actions button{display:inline-flex;align-items:center;gap:7px}
+.targeted-resume-document-actions button:last-child:not(:disabled){background:#293a52;color:#fff;border-color:#293a52}
+.targeted-resume-document-fields{margin:20px 0 12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.targeted-resume-document-fields label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#4f5d73}
+.targeted-resume-document-fields .wide{grid-column:1/-1}
+.targeted-resume-document-fields input,.targeted-resume-document-fields textarea{box-sizing:border-box;border:1px solid #dce2ea;background:#fff;color:#26354c;padding:10px 11px;border-radius:8px;width:100%;font:inherit;font-size:13px;font-weight:400;line-height:1.6}
+.targeted-resume-document-fields input:focus-visible,.targeted-resume-document-fields textarea:focus-visible{outline:2px solid #9b8be9;outline-offset:1px}
+.targeted-resume-document-fields textarea{resize:vertical}
+.targeted-resume-print-preview{max-width:800px;margin:0 auto}
+.targeted-resume-print-preview.is-collapsed{display:none}
+.targeted-resume-save-confirm{max-width:800px;margin:12px auto;display:flex}
+@media(max-width:650px){.targeted-resume-document-heading{flex-direction:column}.targeted-resume-document-actions{width:100%}.targeted-resume-document-actions button{flex:1;justify-content:center}.targeted-resume-document-fields{grid-template-columns:1fr}}
+@media print{
+ .targeted-resume-print-preview,.targeted-resume-print-preview.is-collapsed{display:block!important}
+}
+
+.targeted-resume-block-label{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.targeted-resume-block-label small{color:#718099}
+.targeted-resume-block-label button{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;color:#62749e;font-size:11px;padding:4px 7px}
+.targeted-resume-inline-editor{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.targeted-resume-inline-editor textarea{box-sizing:border-box;width:100%;resize:vertical;border:1px solid #d9dfea;border-radius:8px;padding:10px 12px;background:#fff;color:#28364a;line-height:1.7;font-size:13px;font-family:inherit}
+.targeted-resume-inline-editor textarea:focus-visible{outline:2px solid #9b8be9;outline-offset:1px}
+.targeted-resume-inline-editor>div{display:flex;align-items:center;gap:8px}
+.targeted-resume-inline-editor>div button:first-child{background:#27344d;color:#fff}
+
+.targeted-resume-reassess{max-width:800px;margin:16px auto;background:#fff;border:1px solid #e1e6ef;border-radius:12px;padding:20px}
+.targeted-resume-reassess-heading{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.targeted-resume-reassess-heading strong{font-size:16px;color:#27344c}
+.targeted-resume-reassess-heading p,.targeted-resume-reassess-unavailable{font-size:12px;color:#69788e;line-height:1.7;margin:7px 0}
+.targeted-resume-reassess-heading button{background:#283851;border-color:#283851;color:#fff;flex-shrink:0}
+.targeted-resume-score-comparison{margin-top:18px;border-top:1px solid #e9edf3;padding-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.targeted-resume-score-comparison>div{padding:15px 10px;text-align:center;background:#f8f9fc;border-radius:9px;display:flex;flex-direction:column;gap:5px}
+.targeted-resume-score-comparison small{color:#63748b;font-size:11px}
+.targeted-resume-score-comparison strong{font-size:30px;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:#263954}
+.targeted-resume-score-comparison strong span{font-size:13px;color:#758398;font-weight:400}
+.targeted-resume-score-comparison>p,.targeted-resume-score-comparison>details{grid-column:1/-1;font-size:12px;color:#586982;line-height:1.6;margin:0}
+.targeted-resume-score-comparison summary{cursor:pointer;font-weight:600}
+.targeted-resume-score-comparison table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+.targeted-resume-score-comparison th,.targeted-resume-score-comparison td{padding:8px 5px;border-bottom:1px solid #e9edf3;text-align:left}
+.targeted-resume-score-comparison th{font-weight:600;color:#42536b}
+.targeted-resume-score-comparison .targeted-resume-score-disclaimer{font-size:11px;color:#7b8798}
+@media(max-width:650px){.targeted-resume-reassess-heading{flex-direction:column;align-items:stretch}.targeted-resume-reassess-heading button{width:100%}}
+
+.targeted-resume-verify{margin:15px 0;padding:15px;border:1px solid #dfe4ee;border-radius:11px;background:#fbfbfe}
+.targeted-resume-verify>div>strong{font-size:13px;color:#283950}
+.targeted-resume-verify p{font-size:12px;line-height:1.65;color:#68768a;margin:7px 0}
+.targeted-resume-verify>button{font-size:12px;padding:9px 13px;background:#293a52;border-color:#293a52;color:#fff}
+.targeted-resume-verified-job{margin:12px 0 0;border-top:1px solid #e2e7f0;padding:11px 0 0}
+.targeted-resume-verified-job a{display:inline-block;font-size:12px;color:#435c96;margin:4px 0;text-decoration:underline;text-underline-offset:3px}
+.targeted-resume-verified-job .targeted-resume-confirm{margin-top:10px}
+
+/* Incomplete source resumes must not be mistaken for complete exportable CVs. */
+.targeted-resume-truncation{margin:10px 0 15px;padding:13px 16px;border:1px solid #d7af68;
+ border-radius:9px;background:#fffaf0;color:#735228;font-size:12px;line-height:1.8}
+.targeted-resume-truncation strong{font-weight:700;color:#604019}
+
+
+/* P2: the resume sheet is the single interactive document. AI controls sit at
+   their exact paragraph and never appear in the printed portal/DOCX. */
+.targeted-resume-live-paper{max-width:800px;margin:12px auto 22px}
+.targeted-resume-live-paper>.hhba-print-sheet{margin:0 auto;overflow:visible}
+.targeted-resume-inline-region{position:relative;margin:3px -9px 12px;border-radius:10px;padding:8px 9px;
+ border:1px solid transparent;transition:background-color .18s ease,border-color .18s ease}
+.targeted-resume-inline-region:hover,.targeted-resume-inline-region:focus-within{
+ border-color:#e5e5f3;background:#fcfbff}
+.targeted-resume-inline-region.has-ai-suggestion{border-left:3px solid #7564c8}
+.targeted-resume-inline-anchor{display:flex;align-items:flex-start;gap:12px;min-width:0}
+.targeted-resume-inline-anchor>.hhba-print-paragraph{flex:1;min-width:0;margin:0}
+.targeted-resume-inline-controls{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;
+ align-items:center;flex:0 0 auto}
+.targeted-resume .targeted-resume-inline-controls>button{display:inline-flex;align-items:center;
+ gap:5px;border:1px solid transparent;background:transparent;color:#64748b;
+ font-size:11px;line-height:1.2;padding:6px 7px}
+.targeted-resume .targeted-resume-inline-controls>button:hover{border-color:#dfe3ef;background:#fff}
+.targeted-resume .targeted-resume-inline-controls>.targeted-resume-ai-trigger{
+ border-color:#d9d1f5;background:#f3f0ff;color:#594aa0;font-weight:650}
+.targeted-resume .targeted-resume-inline-controls>.targeted-resume-ai-trigger[aria-expanded="true"]{
+ border-color:#a99bdf;background:#eae4fc}
+.targeted-resume-inline-controls .targeted-resume-applied{font-size:10px;white-space:nowrap}
+.targeted-resume-inline-anchor>.targeted-resume-inline-editor{flex:1;min-width:0}
+.targeted-resume-popover{
+ z-index:2;margin:10px 0 4px;max-width:100%;box-sizing:border-box;
+ animation:hhba-resume-pop .23s cubic-bezier(.2,.9,.25,1) both;
+ box-shadow:0 15px 42px rgba(37,35,76,.12),0 2px 7px rgba(28,38,69,.035)}
+.targeted-resume-popover::after{content:"";position:absolute;top:-7px;right:64px;
+ width:12px;height:12px;background:#fff;transform:rotate(45deg);
+ border-top:1px solid #e8e8f1;border-left:1px solid #e8e8f1}
+.targeted-resume-popover-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.targeted-resume .targeted-resume-popover-head>button{padding:4px;border:0;background:transparent;color:#687389}
+.targeted-resume-popover>.targeted-resume-gradient{margin:12px 0 8px}
+@keyframes hhba-resume-pop{from{opacity:0;transform:translateY(-7px) scale(.992)}
+ to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:650px){
+ .targeted-resume-inline-anchor{flex-direction:column;gap:5px}
+ .targeted-resume-inline-controls{align-self:flex-end}
+ .targeted-resume-popover::after{right:24px}
+ .targeted-resume .targeted-resume-document-actions{width:100%}
+ .targeted-resume .targeted-resume-document-actions button{min-width:0}
+}
+@media(prefers-reduced-motion:reduce){
+ .targeted-resume-popover{animation:none}
+ .targeted-resume-inline-region{transition:none}
+}
+
+/* Siri ambient light now runs along all four sides of BOTH the main resume
+   and the context popover. Don't repeat the older purple left-edge rail. */
+.targeted-resume-live-paper.hhba-siri-edge{
+ border-radius:14px;
+ margin-top:16px;
+}
+.targeted-resume-popover-shell{
+ margin:11px 0 6px;
+ max-width:100%;
+ border-radius:13px;
+}
+.targeted-resume-popover-shell .targeted-resume-suggestion{
+ margin:0;
+ padding:12px 14px;
+ border-color:#e5eaf0;
+ background:#fff;
+ border-radius:12px;
+ box-shadow:0 6px 20px rgba(30,42,64,.09);
+ overflow:visible;
+}
+.targeted-resume-popover-shell .targeted-resume-suggestion::before,
+.targeted-resume-popover-shell .targeted-resume-suggestion::after{
+ display:none;
+}
+.targeted-resume-popover-shell .targeted-resume-ai-label{color:#385467}
+.targeted-resume-popover-shell .targeted-resume-rationale{margin:5px 0 8px}
+.targeted-resume-popover-shell .targeted-resume-confirm{margin:8px 0}
+.targeted-resume-popover-shell .targeted-resume-gradient{margin:8px 0}
+.targeted-resume .targeted-resume-inline-controls>.targeted-resume-ai-trigger{
+ border-color:#d7e1e8;
+ background:#f3f7f9;
+ color:#365469;
+}
+.targeted-resume .targeted-resume-inline-controls>.targeted-resume-ai-trigger[aria-expanded="true"]{
+ border-color:#b7cbd7;
+ background:#edf4f8;
+ color:#27445c;
+}
+.targeted-resume-consent input,.targeted-resume-confirm input{accent-color:#27445c}
+@media(max-width:650px){
+ .targeted-resume-popover-shell{margin-top:8px}
+ .targeted-resume-popover-shell .targeted-resume-suggestion{padding:10px 11px}
+}
+
+/* Once an AI suggestion is accepted, keep untouched resume text neutral.
+   Only the inserted / rewritten characters carry the Siri rainbow effect.
+   This editor-only visual never changes generated PDF/Word document content. */
+.targeted-resume-inline-region .hhba-resume-siri-letters{
+ display:inline;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+@media print{
+ .targeted-resume-inline-region .hhba-resume-siri-letters{
+  animation:none!important;
+  background:none!important;
+  color:inherit!important;
+  -webkit-text-fill-color:currentColor!important;
+ }
+}
+
+/* Keep the pending Siri text gradient on actual editable glyphs. The generic
+   editor background shorthand must not accidentally erase the gradient. */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+ .targeted-resume .targeted-resume-fact-entry textarea.hhba-siri-typing,
+ .targeted-resume .targeted-resume-inline-editor textarea.hhba-siri-typing{
+  background-image:linear-gradient(105deg,#009cc2 0%,#3a7fe6 17%,
+   #8351d5 36%,#c84f9f 55%,#de7958 74%,#16b5cd 100%);
+  background-size:175% 100%;
+  background-position:6% 50%;
+  background-repeat:no-repeat;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  caret-color:#24344c;
+  animation:hhba-resume-siri-letters-flow 11s ease-in-out infinite alternate;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .targeted-resume .targeted-resume-fact-entry textarea.hhba-siri-typing,
+ .targeted-resume .targeted-resume-inline-editor textarea.hhba-siri-typing{
+  animation:none!important;background-position:42% 50%;
+ }
+}
+@media print{
+ .targeted-resume .targeted-resume-fact-entry textarea.hhba-siri-typing,
+ .targeted-resume .targeted-resume-inline-editor textarea.hhba-siri-typing{
+  animation:none!important;background:none!important;
+  -webkit-text-fill-color:currentColor!important;
+ }
+}
+
+
+/* Word-first product workspace: one true document surface with a contextual
+   suggestion rail, not two competing printable resume editors. */
+.targeted-resume-word-workspace{
+ display:grid;grid-template-columns:minmax(0,1.7fr) minmax(275px,.95fr);
+ gap:18px;align-items:start;max-width:100%;margin:15px 0 22px;
+}
+.targeted-resume-word-main{min-width:0}
+.targeted-resume-word-main>.hhba-original-resume{margin:0;background:#f8f9fb}
+.targeted-resume-word-assistant{
+ min-width:0;border:1px solid #e5e9f0;background:#fff;
+ border-radius:14px;padding:17px;position:sticky;top:12px;
+ max-height:calc(100dvh - 150px);overflow-y:auto;
+ scrollbar-width:thin;
+}
+.targeted-resume-word-assistant-head>strong{
+ display:flex;align-items:center;gap:8px;font-size:14px;color:#24354c;
+}
+.targeted-resume-word-assistant-head>p,.targeted-resume-word-privacy,
+.targeted-resume-word-empty{font-size:12px;line-height:1.75;color:#64748b}
+.targeted-resume-word-counts{display:flex;gap:6px;flex-wrap:wrap;padding:7px 0 12px}
+.targeted-resume-word-counts span{
+ font:600 11px/1.5 inherit;color:#536479;background:#f4f7fa;
+ border:1px solid #e6ebf1;border-radius:7px;padding:5px 7px;
+}
+.targeted-resume-word-suggestion-list{display:grid;gap:8px}
+.targeted-resume-word-suggestion{border:1px solid #e5eaf1;border-radius:10px;overflow:hidden;background:#fff}
+.targeted-resume-word-suggestion.is-active{border-color:#b9c9d9}
+.targeted-resume .targeted-resume-word-suggestion-title{
+ display:flex;justify-content:space-between;align-items:center;gap:10px;
+ width:100%;text-align:left;background:#fff;color:#24354c;
+ border:0;border-radius:0;padding:12px;
+}
+.targeted-resume-word-suggestion-title span{font-weight:600;font-size:12px;line-height:1.5}
+.targeted-resume-word-suggestion-title small{flex:0 0 auto;color:#64748b;font-size:11px}
+.targeted-resume-word-suggestion-detail{padding:0 12px 12px;overflow-wrap:anywhere}
+.targeted-resume-word-original,.targeted-resume-word-status{
+ font-size:12px;line-height:1.7;color:#536479;
+ margin:4px 0 10px;white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.targeted-resume-word-suggestion-detail .targeted-resume-popover-shell{margin:8px 0}
+.targeted-resume-word-suggestion-detail .targeted-resume-popover::after{display:none}
+.targeted-resume-word-suggestion-detail .targeted-resume-suggestion{
+ box-shadow:none;border:1px solid #e5e9f0;padding:12px;
+}
+.targeted-resume-word-next-step{font-size:12px;line-height:1.75;color:#365469;background:#f4f8fb;
+ border:1px solid #e1eaf1;padding:12px;border-radius:8px}
+.targeted-resume-mobile-rail-close,.targeted-resume-mobile-rail-launch{display:none!important}
+@media(max-width:980px){
+ .targeted-resume-word-workspace{grid-template-columns:minmax(0,1fr)}
+ .targeted-resume-word-assistant{position:relative;top:auto;max-height:none;overflow:visible}
+}
+@media(max-width:700px){
+ .targeted-resume{padding:10px;background:#fff;border:none;border-radius:0}
+ .targeted-resume-word-workspace{margin-top:10px}
+ .targeted-resume-word-main>.hhba-original-resume{margin:0;padding:9px}
+ .targeted-resume-word-assistant{
+  display:none;position:fixed;top:auto;left:0;right:0;bottom:0;
+  max-height:min(78dvh,680px);z-index:3100;overflow-y:auto;
+  border-radius:18px 18px 0 0;padding:20px 15px calc(18px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -12px 45px rgba(16,42,70,.16);
+ }
+ .targeted-resume-word-assistant.mobile-open{display:block}
+ .targeted-resume .targeted-resume-mobile-rail-close{
+  display:inline-flex!important;float:right;border:1px solid #d5dfe8;
+  border-radius:8px;padding:8px 12px;background:#fff;color:#355166;font-size:12px;
+ }
+ .targeted-resume-word-assistant-head{clear:both;padding-top:6px}
+ .targeted-resume-word-suggestion-title{min-height:46px}
+ .targeted-resume-word-assistant .targeted-resume-actions button{min-height:40px}
+}
+
+
+/* Optional, explicit opt-in: short-lived resume writing notes in this tab only. */
+.targeted-resume-draft-recovery{
+ margin:12px 0 14px;border:1px solid #e2e9ef;background:#f9fbfd;
+ padding:12px 15px;border-radius:11px;display:flex;flex-direction:column;gap:7px;
+}
+.targeted-resume-draft-recovery>label{
+ display:flex;gap:9px;align-items:flex-start;font-size:12px;
+ color:#364b60;font-weight:650;line-height:1.7;cursor:pointer;
+}
+.targeted-resume-draft-recovery>label input{margin-top:4px;accent-color:#365469;flex:0 0 auto}
+.targeted-resume-draft-recovery>small,.targeted-resume-draft-recovery>p{
+ margin:0;font-size:11px;color:#657588;line-height:1.6;
+}
+.targeted-resume-draft-recovery-actions{
+ display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid #e2e9ef;padding-top:9px;
+}
+.targeted-resume-draft-recovery-actions strong{font-size:12px;color:#324b61;margin-right:auto}
+.targeted-resume .targeted-resume-draft-recovery-actions button{
+ min-height:36px;border:1px solid #cedbe6;border-radius:8px;
+ color:#2f485f;background:#fff;padding:7px 12px;font-weight:600;
+}
+@media(max-width:700px){
+ .targeted-resume-draft-recovery{padding:11px 12px}
+ .targeted-resume-draft-recovery-actions button{flex:1}
+}
+
+
+/* Resume-first: AI permissions, generation and draft settings live in the
+   contextual rail rather than pushing the user's Word under the fold. */
+.targeted-resume.is-word-first{padding:13px;background:#fafbfc}
+.targeted-resume.is-word-first .targeted-resume-heading{padding:4px 4px 8px}
+.targeted-resume.is-word-first .targeted-resume-heading p{margin:3px 0}
+.targeted-resume.is-word-first .targeted-resume-word-workspace{margin-top:6px}
+.targeted-resume-word-assistant .targeted-resume-toolbar{
+ margin:0 0 12px;padding:11px 12px;display:flex;flex-direction:column;
+ align-items:stretch;gap:9px;border-radius:10px;
+}
+.targeted-resume-word-assistant .targeted-resume-toolbar>button{
+ min-width:0;width:100%;min-height:42px;
+}
+.targeted-resume-word-assistant .targeted-resume-consent{
+ display:flex;align-items:flex-start;gap:8px;margin:10px 1px;
+ padding:9px 6px;line-height:1.7;font-size:11px;
+}
+.targeted-resume-word-assistant .targeted-resume-draft-recovery{
+ margin:11px 0;padding:10px 11px;
+}
+.targeted-resume-word-assistant .targeted-resume-truncation{margin:9px 0}
+@media(max-width:700px){
+ .targeted-resume.is-word-first{padding:7px 5px 0}
+ .targeted-resume.is-word-first .targeted-resume-heading{padding:5px 8px 6px}
+ .targeted-resume.is-word-first .targeted-resume-heading h3{font-size:16px;line-height:1.35;margin:3px 0}
+ .targeted-resume.is-word-first .targeted-resume-heading>span{display:none}
+ .targeted-resume.is-word-first .targeted-resume-word-workspace{margin:4px 0 0}
+ .targeted-resume-word-assistant .targeted-resume-toolbar{margin-top:8px}
+}
+
+
+/* Word-first editorial reduction — no test harness layout modifications. */
+.targeted-resume.is-word-first{
+ background:transparent;border:0;border-radius:0;box-shadow:none;
+ padding:0 4px 8px;margin:0;min-width:0;
+}
+.targeted-resume.is-word-first .targeted-resume-heading{
+ display:flex;align-items:center;gap:8px;justify-content:space-between;
+ padding:0 4px 12px;margin:0;border:0;
+}
+.targeted-resume.is-word-first .targeted-resume-heading small{
+ font-size:11px;letter-spacing:.03em;font-weight:500;color:#8b97a5;
+}
+.targeted-resume.is-word-first .targeted-resume-heading h3{
+ font-size:19px;line-height:1.35;margin:5px 0 0;color:#172b3f;letter-spacing:-.01em;
+}
+.targeted-resume.is-word-first .targeted-resume-heading>span{display:none}
+.targeted-resume.is-word-first .targeted-resume-word-workspace{
+ grid-template-columns:minmax(0,1.9fr) minmax(260px,.88fr);
+ gap:22px;margin:0;align-items:start;
+}
+.targeted-resume.is-word-first .targeted-resume-word-main{min-width:0}
+.targeted-resume.is-word-first .targeted-resume-word-main>.hhba-original-resume{
+ background:transparent;border:0;border-radius:0;box-shadow:none;
+ padding:0;margin:0;
+}
+.targeted-resume.is-word-first .targeted-resume-word-assistant{
+ border:0;border-left:1px solid #e9edf1;border-radius:0;
+ background:transparent;box-shadow:none;padding:2px 0 16px 19px;
+ position:sticky;top:8px;max-height:calc(100dvh - 150px);overflow-y:auto;
+}
+.targeted-resume-word-assistant>.targeted-resume-word-review{display:flex;flex-direction:column;gap:10px}
+.targeted-resume-word-assistant>.targeted-resume-word-edit-host{display:none}
+.targeted-resume-word-assistant.is-word-editing>.targeted-resume-word-edit-host{display:block}
+.targeted-resume-word-assistant.is-word-editing>.targeted-resume-word-review{display:none}
+.targeted-resume-word-assistant-head{order:0;margin:0 0 5px}
+.targeted-resume-word-assistant-head>strong{font-size:15px;line-height:1.4;color:#1e3447}
+.targeted-resume-word-assistant-head>p{
+ margin:5px 0 7px;font-size:11px;line-height:1.6;color:#85909d;
+}
+.targeted-resume-word-counts{
+ padding:5px 0;margin:0;display:flex;gap:11px;
+ border-bottom:1px solid #ebeff3;
+}
+.targeted-resume-word-counts span{
+ border:0;background:none;padding:0;border-radius:0;font-size:11px;font-weight:500;
+ color:#778593;
+}
+.targeted-resume-word-suggestion-list{order:1;gap:0}
+.targeted-resume-word-suggestion{
+ border:0;border-bottom:1px solid #edf0f3;border-radius:0;background:transparent;
+}
+.targeted-resume-word-suggestion.is-active{border-color:#d7e2eb}
+.targeted-resume .targeted-resume-word-suggestion-title{
+ background:transparent;border:0;border-radius:0;padding:13px 1px;min-height:44px;
+}
+.targeted-resume-word-suggestion-title span{font-size:13px;font-weight:600;line-height:1.5}
+.targeted-resume-word-suggestion-title small{font-weight:500;color:#83909e}
+.targeted-resume-word-suggestion-detail{padding:0 1px 13px}
+.targeted-resume-word-original{font-size:12px;line-height:1.6}
+.targeted-resume-word-suggestion-detail .targeted-resume-popover-shell{
+ border:0;box-shadow:none;background:transparent;padding:0;margin:8px 0;
+ animation:none;
+}
+.targeted-resume-word-suggestion-detail .targeted-resume-suggestion{
+ border:0;border-radius:0;box-shadow:none;background:transparent;padding:0;
+}
+.targeted-resume-word-suggestion-detail .targeted-resume-suggestion::before,
+.targeted-resume-word-suggestion-detail .targeted-resume-suggestion::after,
+.targeted-resume-word-suggestion-detail .targeted-resume-popover-shell::before,
+.targeted-resume-word-suggestion-detail .targeted-resume-popover-shell::after{display:none}
+.targeted-resume-word-assistant .targeted-resume-toolbar{
+ order:2;border:0;background:transparent;border-radius:0;
+ padding:12px 0 4px;margin:0;display:block;
+}
+.targeted-resume-word-assistant .targeted-resume-toolbar>div{display:none}
+.targeted-resume-word-assistant .targeted-resume-toolbar>button{
+ display:flex;min-width:0;width:100%;min-height:42px;
+ background:#22394f;color:#fff;border-color:#22394f;border-radius:8px;
+ margin:0;font-weight:650;
+}
+.targeted-resume-word-assistant .targeted-resume-toolbar .targeted-resume-unavailable{
+ font-size:12px;color:#8995a1;
+}
+.targeted-resume-word-empty{
+ order:1;padding:16px 0 12px;border-bottom:1px solid #edf0f3;
+ color:#8996a3;font-size:12px;line-height:1.7;
+}
+.targeted-resume-word-next-step{
+ order:3;border:0;border-radius:0;background:transparent;
+ padding:4px 0;margin:0;font-size:11px;color:#647a8f;
+}
+.targeted-resume-word-privacy{
+ order:5;border:0;margin:2px 0;padding:0;
+ font-size:11px;color:#8b97a4;
+}
+.targeted-resume-word-privacy summary{cursor:pointer;line-height:2}
+.targeted-resume-word-privacy p{margin:4px 0 0;line-height:1.7}
+.targeted-resume-word-assistant .targeted-resume-ai-settings{
+ order:4;margin:3px 0;border:0;border-top:1px solid #e9edf1;
+ background:transparent;border-radius:0;padding:0;
+}
+.targeted-resume-ai-settings summary{
+ list-style:none;display:flex;align-items:center;justify-content:space-between;
+ gap:8px;min-height:40px;cursor:pointer;font-size:12px;color:#536779;
+}
+.targeted-resume-ai-settings summary::-webkit-details-marker{display:none}
+.targeted-resume-ai-settings[open] summary svg{transform:rotate(180deg)}
+.targeted-resume-word-assistant .targeted-resume-consent{
+ display:flex;border:0;background:transparent;padding:8px 0;
+ font-size:11px;line-height:1.65;margin:0;
+}
+.targeted-resume-word-assistant .targeted-resume-draft-recovery{
+ border:0;border-top:1px solid #edf0f3;background:transparent;
+ border-radius:0;padding:10px 0;margin:0;
+}
+.targeted-resume-word-assistant.is-word-editing{
+ background:#fff;
+}
+.targeted-resume-word-edit-host .hhba-original-resume-editbox{
+ border:0;background:transparent;border-radius:0;box-shadow:none;
+ padding:4px 0 12px;max-height:none;overflow:visible;
+}
+.targeted-resume-word-edit-host .hhba-original-resume-editbox-title strong{font-size:15px}
+.targeted-resume-word-edit-host .hhba-original-resume-editbox textarea{
+ min-height:118px;font-size:14px;line-height:1.7;resize:vertical;
+}
+.targeted-resume-word-edit-host .hhba-original-resume-editbox-actions{
+ justify-content:stretch;
+}
+.targeted-resume-word-edit-host .hhba-original-resume-editbox-actions button{
+ min-height:42px;justify-content:center;
+}
+.targeted-resume-word-edit-host .hhba-original-resume-editbox-actions button:first-child{
+ flex:1;
+}
+@media(max-width:1000px) and (min-width:701px){
+ .targeted-resume.is-word-first .targeted-resume-word-workspace{
+  grid-template-columns:minmax(0,1fr) minmax(245px,.8fr);gap:12px;
+ }
+ .targeted-resume.is-word-first .targeted-resume-word-assistant{padding-left:12px}
+}
+@media(max-width:700px){
+ .targeted-resume.is-word-first{padding:0 0 5px}
+ /* The selected job and score are already shown above: on phones, do not
+    repeat the job title before the user's actual Word page. */
+ .hhba-match-workspace .targeted-resume.is-word-first .targeted-resume-heading{display:none}
+ .targeted-resume.is-word-first .targeted-resume-heading{padding:4px 8px 9px}
+ .targeted-resume.is-word-first .targeted-resume-heading h3{font-size:17px;margin-top:3px}
+ .targeted-resume.is-word-first .targeted-resume-word-workspace{
+  grid-template-columns:minmax(0,1fr);gap:0;margin:0;
+ }
+ .targeted-resume.is-word-first .targeted-resume-word-assistant{
+  display:none;position:fixed;left:0;right:0;top:auto;bottom:0;
+  background:#fff;max-height:min(78dvh,690px);padding:18px 17px calc(18px + env(safe-area-inset-bottom,0px));
+  overflow-y:auto;border:0;border-radius:18px 18px 0 0;
+  box-shadow:0 -15px 50px rgba(26,43,60,.16);
+  z-index:3150;
+ }
+ .targeted-resume.is-word-first .targeted-resume-word-assistant.mobile-open,
+ .targeted-resume.is-word-first .targeted-resume-word-assistant.is-word-editing{display:block}
+ .targeted-resume-word-assistant.is-word-editing .targeted-resume-word-edit-host{
+  display:block;position:relative;max-height:calc(76dvh - 35px);
+  overflow-y:auto;
+ }
+ .targeted-resume-word-edit-host .hhba-original-resume-editbox{
+  padding:1px 0 9px;max-height:none;
+ }
+ .targeted-resume-word-edit-host .hhba-original-resume-editbox textarea{
+  font-size:16px;min-height:98px;
+ }
+ .targeted-resume-word-assistant .targeted-resume-toolbar>button{min-height:44px}
+ .targeted-resume-word-suggestion-title{min-height:48px}
+}
+
+
+/* Siri optimization journey: original Word enters once, then real AI results
+   illuminate the page one by one. No fabricated live token stream. */
+.targeted-resume.is-word-first .targeted-resume-word-workspace{
+ position:relative;
+}
+.targeted-resume.is-word-first .hhba-word-stage-entering .targeted-resume-word-main{
+ animation:hhba-word-stage-arrive 1.02s cubic-bezier(.18,.8,.23,1) both;
+}
+@keyframes hhba-word-stage-arrive{
+ from{opacity:0;transform:translateY(21px) scale(.972);filter:blur(6px)}
+ 45%{opacity:.75;filter:blur(1px)}
+ to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}
+}
+.hhba-word-arrival-hint{
+ position:absolute;top:10px;left:calc(50% - 85px);z-index:5;
+ color:#6b7c91;font-size:11px;line-height:1.6;letter-spacing:.04em;
+ background:rgba(255,255,255,.86);padding:6px 11px;border-radius:100px;
+ pointer-events:none;animation:hhba-word-arrival-caption 1s ease-out both;
+}
+@keyframes hhba-word-arrival-caption{
+ 0%{opacity:0;transform:translateY(8px)}
+ 40%{opacity:1}80%{opacity:.8}
+ 100%{opacity:0;transform:translateY(-4px)}
+}
+.targeted-resume-word-reveal{
+ font-size:11px;line-height:1.65;color:#6c82a0;
+ margin:7px 0;padding:6px 0;
+}
+.targeted-resume-word-suggestion{
+ animation:hhba-word-suggestion-appear .4s cubic-bezier(.2,.8,.25,1) both;
+}
+@keyframes hhba-word-suggestion-appear{
+ from{opacity:0;transform:translateY(10px)}
+ to{opacity:1;transform:translateY(0)}
+}
+/* Scoring is the narrative thread, not a decorative invented success rate. */
+.targeted-resume-word-assistant .hhba-word-match-score{
+ order:-1;padding:11px 0 15px;margin:0 0 6px;
+ border-bottom:1px solid #e4ebf2;
+}
+.hhba-word-match-score-head{
+ display:flex;align-items:center;justify-content:space-between;gap:11px;
+}
+.hhba-word-match-score-head>div:first-child{min-width:0;display:grid;gap:3px}
+.hhba-word-match-score-head>div:first-child>span{
+ font-size:10px;color:#7c8b9a;line-height:1.5;
+}
+.hhba-word-match-score-head>div:first-child>strong{
+ font-size:14px;line-height:1.45;color:#23374b;font-weight:650;
+ overflow-wrap:anywhere;
+}
+.hhba-word-match-number{display:flex;align-items:baseline;gap:2px;white-space:nowrap}
+.hhba-word-match-number>strong{font-size:33px;font-variant-numeric:tabular-nums;
+ font-weight:730;line-height:1.1;color:#326ca6;letter-spacing:-.045em}
+.hhba-word-match-number>small{font-size:11px;color:#91a0ae}
+.hhba-word-match-score-caption{font-size:10px;color:#8492a0;margin:3px 0 0}
+.hhba-word-match-await,.hhba-word-match-reassess-hint{
+ font-size:11px;line-height:1.65;color:#65788b;margin:12px 0 3px;
+}
+.hhba-word-match-after{
+ border-top:1px solid #edf1f5;padding:12px 0 2px;margin-top:12px;
+ display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+}
+.hhba-word-match-after>span{font-size:11px;color:#526b83}
+.hhba-word-match-after>strong{font-size:29px;line-height:1.1;color:#254d73;font-variant-numeric:tabular-nums}
+.hhba-word-match-after>strong small{font-size:10px;font-weight:500;color:#8a9caf}
+.hhba-word-match-after>p{width:100%;font-size:11px;line-height:1.65;
+ color:#73869a;margin:0}
+.hhba-word-match-confirm{display:flex;align-items:flex-start;gap:8px;
+ font-size:11px;color:#657a8b;line-height:1.65;margin:9px 0}
+.hhba-word-match-confirm input{flex-shrink:0;margin-top:4px;accent-color:#356fa8}
+.targeted-resume .hhba-word-match-reassess{
+ width:100%;min-height:40px;background:transparent;border:1px solid #cbdbe9;
+ border-radius:8px;color:#345875;font-size:12px;font-weight:650;
+ padding:8px 11px;cursor:pointer;
+}
+.targeted-resume .hhba-word-match-reassess:disabled{opacity:.46;cursor:not-allowed}
+@media(prefers-reduced-motion:reduce){
+ .targeted-resume.is-word-first .hhba-word-stage-entering .targeted-resume-word-main,
+ .hhba-word-arrival-hint,.targeted-resume-word-suggestion{
+  animation:none!important;transform:none!important;filter:none!important;opacity:1!important
+ }
+}
+
+
+/* Keep the stage covered until the first PDF.js paint. Slow converters must
+   not show an empty loading card that instantly snaps to the resume later. */
+.targeted-resume.is-word-first .hhba-word-stage-waiting .targeted-resume-word-main{
+ opacity:0;transform:translateY(21px) scale(.972);
+}
+@media(prefers-reduced-motion:reduce){
+ .targeted-resume.is-word-first .hhba-word-stage-waiting .targeted-resume-word-main{
+  opacity:1;transform:none;
+ }
+}
+
+
+/* Mobile AI presentation must put the original Word back on screen.
+   A compact in-context status replaces the full-height assistant drawer. */
+.hhba-word-mobile-ai-status{display:none}
+@media(max-width:700px){
+ .targeted-resume.is-word-first .hhba-word-mobile-ai-status{
+  display:flex;width:100%;min-height:38px;align-items:center;justify-content:flex-start;
+  gap:7px;border:0;border-bottom:1px solid #e8edf3;background:transparent;
+  padding:7px 9px;margin:0 0 8px;text-align:left;
+  color:#506c84;font:600 11px/1.5 inherit;cursor:pointer;
+ }
+ .targeted-resume.is-word-first .hhba-word-mobile-ai-status>span{
+  margin-left:auto;color:#315f83;font-weight:650;white-space:nowrap;
+ }
+ .targeted-resume.is-word-first .hhba-word-mobile-ai-status:focus-visible{
+  outline:2px solid #7e9db7;outline-offset:2px;border-radius:5px;
+ }
+}
+
+
+/* Whole-document AI writer: the first-class action, not a 5-tip editor. */
+.targeted-resume-word-assistant .hhba-whole-rewrite-start{
+ order:1;margin:7px 0 10px;display:grid;gap:5px;
+}
+.targeted-resume .hhba-whole-rewrite-primary{
+ border:0;background:#254664;color:#fff;border-radius:10px;
+ min-height:48px;width:100%;display:flex;justify-content:center;align-items:center;
+ padding:10px 12px;gap:9px;font-size:13px;font-weight:680;
+ box-shadow:0 3px 14px rgba(28,60,87,.12);cursor:pointer;
+}
+.targeted-resume .hhba-whole-rewrite-primary:disabled{opacity:.55;cursor:not-allowed}
+.targeted-resume .hhba-whole-rewrite-primary:not(:disabled):hover{background:#1a3d5f}
+.hhba-whole-rewrite-start p{font-size:11px;color:#7a8d9d;line-height:1.6;margin:3px 0}
+.targeted-resume-word-assistant .targeted-resume-toolbar{
+ order:4;border-top:1px solid #edf1f4;margin-top:8px;padding-top:10px;
+}
+.targeted-resume-word-assistant .targeted-resume-toolbar>button{
+ background:transparent!important;border:1px solid #dae5ed!important;
+ color:#5f7589!important;box-shadow:none!important;font-size:11px!important;
+}
+.targeted-resume-word-assistant .targeted-resume-toolbar>div{display:none}
+.hhba-whole-rewrite{order:2;margin:5px 0 12px;min-width:0}
+.hhba-whole-rewrite-heading{margin:0 0 9px}
+.hhba-whole-rewrite-heading>div{
+ display:flex;align-items:center;gap:7px;font-size:14px;color:#1e364b;
+}
+.hhba-whole-rewrite-heading p{
+ color:#7d8b99;font-size:11px;line-height:1.6;margin:5px 0;
+}
+.hhba-whole-rewrite-metrics{
+ display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+ border-bottom:1px solid #e6ebf1;padding:9px 0 12px;
+}
+.hhba-whole-rewrite-metrics span{font-size:11px;color:#6c8193}
+.hhba-whole-rewrite-metrics strong{color:#284a6e;font-variant-numeric:tabular-nums}
+.hhba-whole-rewrite-blocks{max-height:440px;overflow:auto;scrollbar-width:thin}
+.hhba-whole-rewrite-block{border-bottom:1px solid #e9edf1}
+.hhba-whole-rewrite-block>summary{
+ display:flex;justify-content:space-between;gap:9px;cursor:pointer;
+ padding:12px 1px;align-items:center;list-style:none;
+}
+.hhba-whole-rewrite-block>summary::-webkit-details-marker{display:none}
+.hhba-whole-rewrite-block>summary>span{
+ display:flex;align-items:center;gap:7px;color:#2d4358;font-size:12px;font-weight:650;
+}
+.hhba-whole-rewrite-block>summary small{font-size:10px;color:#788b9d}
+.hhba-whole-rewrite-diff{display:grid;gap:9px;padding:0 1px 14px;overflow-wrap:anywhere}
+.hhba-whole-rewrite-diff>div{background:#f7f9fb;border-radius:8px;padding:9px 10px}
+.hhba-whole-rewrite-diff>div:nth-child(2){background:#f6f8fd}
+.hhba-whole-rewrite-diff strong{font-size:10px;color:#708295;font-weight:650}
+.hhba-whole-rewrite-diff p{
+ font-size:12px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;
+ margin:6px 0;color:#35475a;
+}
+.hhba-whole-rewrite-diff small{font-size:11px;line-height:1.6;color:#7c8e9c}
+.hhba-whole-rewrite-questions{
+ padding:10px 0 13px;border-bottom:1px solid #e9edf1;
+ display:grid;gap:9px;
+}
+.hhba-whole-rewrite-questions h4{
+ display:flex;align-items:center;gap:7px;margin:0;color:#2e485f;font-size:12px;
+}
+.hhba-whole-rewrite-questions p{
+ color:#73879a;margin:0;font-size:11px;line-height:1.6;
+}
+.hhba-whole-rewrite-questions label{display:grid;gap:6px;color:#3f566a;font-size:12px;line-height:1.5}
+.hhba-whole-rewrite-questions textarea{
+ width:100%;min-height:65px;padding:9px 10px;font-size:13px;line-height:1.65;
+ background:#fff;border:1px solid #d9e1eb;border-radius:8px;resize:vertical;
+}
+.hhba-whole-rewrite-questions button{
+ border:1px solid #b5c8da;border-radius:8px;
+ color:#30587a;background:#fff;font-size:12px;font-weight:650;
+ padding:9px 11px;min-height:40px;cursor:pointer;
+}
+.hhba-whole-rewrite-questions button:disabled{opacity:.45;cursor:not-allowed}
+.hhba-whole-rewrite-approval{display:grid;gap:6px;margin:12px 0 0}
+.hhba-whole-rewrite-approval label{
+ display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#2b4e65;line-height:1.7;
+}
+.hhba-whole-rewrite-approval input{margin-top:5px;accent-color:#356a9a}
+.hhba-whole-rewrite-approval label span{display:inline}
+.hhba-whole-rewrite-approval label span svg{vertical-align:middle;margin-right:5px}
+.hhba-whole-rewrite-approval p{display:flex;gap:6px;align-items:flex-start;
+ font-size:11px;line-height:1.7;color:#718296;margin:0}
+.hhba-whole-rewrite-approval svg{flex:none}
+@media(max-width:700px){
+ .hhba-whole-rewrite-blocks{max-height:38dvh}
+ .hhba-whole-rewrite-questions textarea{font-size:16px}
+ .targeted-resume .hhba-whole-rewrite-primary{min-height:46px}
+}
+
+
+.hhba-whole-rewrite-approval .hhba-whole-rewrite-download{
+ display:flex;align-items:center;justify-content:center;gap:9px;
+ width:100%;min-height:43px;padding:9px 12px;
+ border:1px solid #90acc1;border-radius:9px;
+ background:#f6f9fc;color:#264b6b;font-size:12px;font-weight:690;
+ cursor:pointer;
+}
+.hhba-whole-rewrite-approval .hhba-whole-rewrite-download:hover:not(:disabled){
+ border-color:#5582aa;background:#ecf4fb;
+}
+.hhba-whole-rewrite-approval .hhba-whole-rewrite-download:disabled{
+ opacity:.46;cursor:not-allowed;
+}
+.hhba-whole-rewrite-approval>small{
+ font-size:10px;line-height:1.65;color:#7b8b9b;
+}
+
+
+.hhba-whole-rewrite-approval .hhba-whole-rewrite-identity{
+ display:grid;gap:6px;align-items:start;
+}
+.hhba-whole-rewrite-approval .hhba-whole-rewrite-identity>span{
+ font-size:12px;font-weight:650;color:#35536c;
+}
+.hhba-whole-rewrite-approval .hhba-whole-rewrite-identity small{
+ font-size:10px;font-weight:400;color:#81909e;margin-left:5px;
+}
+.hhba-whole-rewrite-approval .hhba-whole-rewrite-identity input{
+ width:100%;min-height:40px;padding:7px 10px;border:1px solid #d7e1ea;
+ border-radius:8px;background:#fff;color:#243b51;font-size:13px;
+}
+.hhba-whole-rewrite-approval .hhba-whole-rewrite-identity input:focus-visible{
+ outline:2px solid #8aabd1;outline-offset:1px;
+}
+
+
+/* Transparent, inspectable record of the tools the AI elected to use. */
+.hhba-whole-rewrite-agent-summary{
+ display:grid;gap:5px;padding:11px 0;
+ border-bottom:1px solid #e5ebf1;color:#445c70;
+}
+.hhba-whole-rewrite-agent-summary>strong{
+ display:flex;align-items:center;gap:7px;font-size:12px;font-weight:670;
+}
+.hhba-whole-rewrite-agent-summary>p{
+ font-size:11px;line-height:1.7;color:#77899a;margin:0;
+}
+.hhba-whole-rewrite-agent-summary>div{
+ display:flex;flex-wrap:wrap;gap:5px;margin-top:2px;
+}
+.hhba-whole-rewrite-agent-summary>div>span{
+ padding:4px 7px;border-radius:6px;background:#f3f6f9;
+ font-size:10px;color:#637b8e;
+}
+
+
+/* Long-running AI work is interruptible and reversible. */
+.targeted-resume .hhba-whole-rewrite-cancel,
+.targeted-resume .hhba-whole-rewrite-resume{
+ display:flex;align-items:center;justify-content:center;gap:7px;
+ width:100%;min-height:40px;padding:8px 10px;
+ font-size:12px;font-weight:650;border-radius:8px;cursor:pointer;
+}
+.targeted-resume .hhba-whole-rewrite-cancel{
+ background:#fff;border:1px solid #d7e2ea;color:#56718a;
+}
+.targeted-resume .hhba-whole-rewrite-resume{
+ background:#f3f7fc;border:1px solid #bad0df;color:#285577;
+}
+.targeted-resume .hhba-whole-rewrite-resume:hover,
+.targeted-resume .hhba-whole-rewrite-cancel:hover{
+ background:#edf4fa;
+}
+
+
+/* Simplified visual hierarchy for the real job-specific Word optimizer.
+   The document remains central. The former full-height right-side workspace
+   is now a small floating advice popover with optional scroll for advanced
+   score/rewrite controls. No AI, Word or scoring behavior is changed. */
+@media(min-width:701px){
+ .hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-word-workspace{
+  grid-template-columns:minmax(0,1fr) 282px;
+  gap:19px;align-items:start;
+ }
+ .hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-word-assistant{
+  width:282px;max-width:282px;box-sizing:border-box;
+  position:sticky;top:11px;align-self:start;
+  max-height:min(480px,calc(100dvh - 195px));overflow-y:auto;
+  border:1px solid #e4eaf0;border-radius:14px;
+  background:#fff;box-shadow:0 13px 34px rgba(30,59,83,.10);
+  padding:15px 14px 18px;
+  scrollbar-width:thin;
+ }
+ .hhba-match-modal-editor .targeted-resume-word-assistant-head{order:0;margin-bottom:0}
+ .hhba-match-modal-editor .targeted-resume-word-assistant .targeted-resume-toolbar{order:1}
+ .hhba-match-modal-editor .targeted-resume-word-assistant .targeted-resume-ai-settings{order:2}
+ .hhba-match-modal-editor .targeted-resume-word-suggestion-list{order:3}
+ .hhba-match-modal-editor .targeted-resume-word-empty,
+ .hhba-match-modal-editor .targeted-resume-word-reveal{order:4}
+ .hhba-match-modal-editor .targeted-resume-word-next-step{order:5}
+ .hhba-match-modal-editor .targeted-resume-word-assistant .hhba-word-match-score{order:9}
+ .hhba-match-modal-editor .targeted-resume-word-assistant .hhba-whole-rewrite-start{order:10}
+ .hhba-match-modal-editor .targeted-resume-word-privacy{order:20}
+ .hhba-match-modal-editor .targeted-resume-word-assistant .targeted-resume-toolbar{
+  margin:7px 0 9px;padding:0;border:0;background:transparent;
+ }
+ .hhba-match-modal-editor .targeted-resume-word-assistant .targeted-resume-toolbar>button{
+  min-height:40px;font-size:11px;
+ }
+ .hhba-match-modal-editor .targeted-resume-word-assistant .hhba-word-match-score{
+  padding:11px 0;border-top:1px solid #edf1f4;border-radius:0;
+  background:transparent;margin-top:8px;
+ }
+}
+@media(max-width:700px){
+ .hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-word-assistant{
+  max-height:min(64dvh,570px);
+  padding:15px 16px calc(15px + env(safe-area-inset-bottom,0px));
+  border-radius:16px 16px 0 0;
+ }
+ .hhba-match-modal-editor .targeted-resume-word-assistant-head>p{font-size:11px}
+ .hhba-match-modal-editor .targeted-resume-word-suggestion-title{min-height:43px}
+}
