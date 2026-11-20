@@ -3,6 +3,9 @@ import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen,Pri
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 import {getRealAuthToken,realAuthReady} from '../services/realAuth';
 import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimizationStatus} from '../services/resumeOptimizationApi';
+import {getWholeRewriteStatus,requestWholeResumeRewrite,type ResumeWholeRewriteResult,type ResumeWholeRewriteStatus} from '../services/resumeWholeRewriteApi';
+import {completeRewriteSource} from '../services/resumeWholeRewriteSource';
+import {WholeResumeRewriteReview} from './WholeResumeRewriteReview';
 import {applySuggestion,validateSuggestion,editResumeBlock,type ResumeBlock,type ResumeSuggestion,type ResumeVersion} from '../services/targetedResumeOptimization';
 import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
 import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResumeVersion} from '../services/resumeVersionsApi';
@@ -31,6 +34,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  if(!profile.experiences?.length&&sourceText?.trim())return sourceResumeBlocks(sourceText);
  return originals;
  },[profile,sourceText]);
+ const wholeSource=useMemo(()=>completeRewriteSource(profile,sourceText),[profile,sourceText]);
+ const [wholeStatus,setWholeStatus]=useState<ResumeWholeRewriteStatus|null>(null);
+ const [wholeDraft,setWholeDraft]=useState<ResumeWholeRewriteResult|null>(null);
+ const [wholeBusy,setWholeBusy]=useState(false);
+ const [wholeApproved,setWholeApproved]=useState(false);
  const omittedSourceCharacters=useMemo(()=>(
   !profile.experiences?.length&&sourceText
    ?sourceResumeOmittedCharacters(sourceText,blocks)
@@ -148,6 +156,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  useEffect(()=>{
   const abort=new AbortController();
   getResumeOptimizationStatus(abort.signal).then(setStatus);
+  getWholeRewriteStatus(abort.signal).then(setWholeStatus);
   reassessmentStatus(abort.signal).then(setScoreStatus);
   officialJobVerifyStatus(abort.signal).then(setVerifyStatus);
   return ()=>{abort.abort();active.current?.abort();};
@@ -250,8 +259,35 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    setNotice('已删除选中的云端简历版本。');
   }catch(err){setNotice(err instanceof Error?err.message:'删除失败，请重试。');}
  }
+ async function generateWholeRewrite(answers:Record<string,string>={}){
+  if(!consent||!sourceResume||!wholeSource.complete||
+   !wholeSource.blocks.length||!wholeStatus?.enabled||
+   wholeBusy||busy)return;
+  const controller=new AbortController();
+  active.current=controller;
+  setWholeBusy(true);setWholeApproved(false);
+  setNotice('');setMobileSuggestionsOpen(false);
+  try{
+   const personalized=wholeSource.blocks.map(b=>{
+    const extra=answers[b.id]?.trim();
+    return extra?{...b,text:b.text+'\n用户本人补充的事实（待核实）：'+extra}:b;
+   });
+   const result=await requestWholeResumeRewrite(personalized,{
+    title:(job.title_zh||job.title).slice(0,180),
+    requirements
+   },controller.signal);
+   if(controller.signal.aborted)return;
+   setWholeDraft(result);
+   setNotice('AI 已处理 '+result.coverage.analyzed_blocks+' 个原始段落，整份岗位定向草稿已生成；请核实个人事实。');
+  }catch(error){
+   if(!controller.signal.aborted)
+    setNotice(error instanceof Error?error.message:'AI 整份简历重写暂时未完成。');
+  }finally{
+   setWholeBusy(false);if(active.current===controller)active.current=null;
+  }
+ }
  async function generate(){
-  if(!consent||!blocks.length||busy||!status?.enabled)return;
+  if(!consent||!blocks.length||busy||wholeBusy||!status?.enabled)return;
   const currentBlocks=version.blocks;
   // Previewing/re-generating AI wording does not change the verified DOCX.
   if(!sourceResume)invalidateScore();
@@ -436,8 +472,17 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   const occurrences=new Map<string,number>();
   for(const change of candidates)
    occurrences.set(change.original,(occurrences.get(change.original)||0)+1);
-  return candidates.filter(change=>occurrences.get(change.original)===1);
- },[suggestions,version.blocks,version.acceptedSuggestionIds]);
+  const approvedWhole=wholeApproved&&wholeDraft?
+   wholeDraft.blocks.filter(b=>b.changed&&b.status==='needs_user_confirmation'&&
+    b.original.length>1&&b.original.length<=300&&
+    b.proposed.length>1&&b.proposed.length<=300&&
+    !/[\r\n\t]/.test(b.original+b.proposed)).map(b=>({
+     original:b.original,proposed:b.proposed
+    })):[];
+  for(const item of approvedWhole)
+   occurrences.set(item.original,(occurrences.get(item.original)||0)+1);
+  return [...candidates,...approvedWhole].filter(change=>occurrences.get(change.original)===1);
+ },[suggestions,version.blocks,version.acceptedSuggestionIds,wholeApproved,wholeDraft]);
  const visualWordSuggestions=useMemo<WordVisualSuggestion[]>(()=>suggestions
   .slice(0,revealedSuggestionCount)
   .filter(s=>s.action==='replace'&&!ignored.includes(s.id))
@@ -452,9 +497,16 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    s.original!==s.proposed&&s.proposed.length<=300&&
    !(wordRevisionSnapshot?.history||[])
     .slice(0,wordRevisionSnapshot?.revision||0)
-    .some(saved=>saved.original===s.original&&saved.text===s.proposed)),
+    .some(saved=>saved.original===s.original&&saved.text===s.proposed))
+  .concat((wholeDraft?.blocks||[])
+   .filter(b=>b.changed&&b.original.length<=300&&b.proposed.length<=300&&
+    b.proposed!==b.original)
+   .map(b=>({
+    id:'whole-'+b.blockId,original:b.original,proposed:b.proposed,
+    state:wholeApproved?'accepted' as const:'pending' as const
+   }))),
  [suggestions,revealedSuggestionCount,ignored,version.acceptedSuggestionIds,
-  version.blocks,suggestionDrafts,wordRevisionSnapshot]);
+  version.blocks,suggestionDrafts,wordRevisionSnapshot,wholeDraft,wholeApproved]);
  const pendingSuggestions=suggestions.filter(s=>!ignored.includes(s.id)&&
   !version.acceptedSuggestionIds.includes(s.id));
  const acceptedCount=suggestions.filter(s=>version.acceptedSuggestionIds.includes(s.id)).length;
@@ -464,7 +516,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   return !sourceResume||!verifiedWordEdits.some(change=>
    change.original===original.text&&change.text===block.text);
  });
- const draftDirty=pendingTextChanges||Boolean(editingBlock)||
+ const draftDirty=pendingTextChanges||Boolean(editingBlock)||Boolean(wholeDraft)||
   Boolean(nativeWordTextDraft&&nativeWordTextDraft.text!==nativeWordTextDraft.original)||
   suggestions.some(item=>!ignored.includes(item.id)&&
    !version.acceptedSuggestionIds.includes(item.id)&&
@@ -569,6 +621,24 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  },[draftDirty,nativeWordPending]);
  const hasSession=realAuthReady&&Boolean(getRealAuthToken());
  const optimizationControls=<>
+  {sourceResume&&<div className="hhba-whole-rewrite-start">
+   <button type="button" className="hhba-whole-rewrite-primary"
+    disabled={wholeBusy||busy||!wholeSource.complete||!wholeStatus?.enabled}
+    onClick={()=>{
+     if(!consent){
+      setAiSettingsOpen(true);
+      setNotice('请先确认第三方 AI 数据处理授权，再进行整份简历撰写。');
+      return;
+     }
+     void generateWholeRewrite();
+    }}>
+    {wholeBusy?<><LoaderCircle size={16} className="resume-match-spinning"/>
+      AI 正在规划并撰写整份简历…</>:<><Sparkles size={16}/>
+      AI 针对岗位重写整份简历</>}
+   </button>
+   {wholeStatus&&!wholeStatus.enabled&&<p>完整撰写服务尚未在当前环境开放，已有局部建议功能不受影响。</p>}
+   {!wholeSource.complete&&<p role="alert">{wholeSource.reason}</p>}
+  </div>}
   <div className="targeted-resume-toolbar">
    <div><strong>优化这份简历</strong><p>根据目标岗位提出修改建议，不会凭空添加经历。</p></div>
    {hasSession&&status?.enabled
@@ -593,7 +663,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    为避免遗漏经历，本次暂不允许保存岗位版本或导出 Word 草稿；请先上传精简或分段整理后的原始简历。
    原上传文件不会因此被修改。
   </p>}
-  {hasSession&&status?.enabled&&<label className="targeted-resume-consent">
+  {hasSession&&(status?.enabled||wholeStatus?.enabled)&&<label className="targeted-resume-consent">
    <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>
    <span>我同意将下方展示的简历证据片段与该岗位要求发送给平台选定的第三方 AI 服务商进行润色。服务器会尽力脱敏常见联系方式，但不能确保移除所有个人信息。建议内容只供本人核实与选择，不会自动投递。</span>
   </label>}
@@ -638,12 +708,16 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      <span>查看建议</span>
     </button>}
     <OriginalWordViewer resume={sourceResume} suggestedChanges={confirmedWordChanges}
-     glowActive={entranceStage==='entering'||busy||wordEditing||
+     glowActive={entranceStage==='entering'||busy||wholeBusy||wordEditing||
       visualWordSuggestions.length>0}
      visualSuggestions={visualWordSuggestions}
      onVisualSuggestionSelect={id=>{
-      setActiveSuggestionId(id);setOpenSuggestionId(id);
-      setEditingSuggestionId(null);setMobileSuggestionsOpen(true);
+      if(id.startsWith('whole-')){
+       setMobileSuggestionsOpen(true);
+      }else{
+       setActiveSuggestionId(id);setOpenSuggestionId(id);
+       setEditingSuggestionId(null);setMobileSuggestionsOpen(true);
+      }
      }}
      onRevisionSnapshot={handleWordRevisionSnapshot}
      onDocumentReady={revealRenderedWord}
@@ -738,6 +812,10 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       </p>}
     </section>
     {optimizationControls}
+    {wholeDraft&&<WholeResumeRewriteReview result={wholeDraft}
+     approved={wholeApproved}
+     onApprove={setWholeApproved}
+     onRegenerate={answers=>void generateWholeRewrite(answers)}/>}
     <div className="targeted-resume-word-assistant-head">
      <strong><Sparkles size={15}/> AI 修改建议</strong>
      <p>逐条核对建议，确认后在原 Word 中应用。</p>
