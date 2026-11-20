@@ -4,6 +4,10 @@ type SavedWord={original:string;text:string;updated_at:string};
 export type WordInspect={ok:boolean;editable_text:string[];saved?:SavedWord|null};
 const messages:Record<string,string>={
  WORD_NOT_READY:'Word 原样式编辑暂未开放。',
+ WORD_FONT_UNAVAILABLE:'原文件使用的字体在处理环境中不可用，为保留原样式，暂不修改这份简历。',
+ WORD_FONT_UNVERIFIED:'无法确认原始字体，为避免改变排版，暂不修改这份简历。',
+ WORD_LAYOUT_MOVED:'修改会影响原来的排版，请缩短文字或保留原文。',
+ WORD_TEXT_NOT_VERIFIED:'暂时无法确认修改后的文字位置，请保留原文。',
  WORD_DB_NOT_READY:'Word 编辑暂时不可用。',
  WORD_DAILY_LIMIT:'今天的操作次数已达到上限。',
  WORD_NOT_EDITED:'请先修改并保存简历。',
