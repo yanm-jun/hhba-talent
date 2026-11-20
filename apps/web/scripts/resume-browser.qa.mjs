@@ -725,6 +725,41 @@ try{
   await first.close();
  }
 
+
+ // A genuine score comparison may be displayed ONLY after saving an original
+ // DOCX and feeding its versioned text through the same audited-JD scorer.
+ // These 68/70 numbers are explicitly synthetic and never shipped.
+ {
+  const scorePage=await browser.newPage({viewport:{width:1200,height:900},
+   locale:'zh-CN'});
+  const errors=[];scorePage.on('pageerror',error=>errors.push(error.message));
+  await scorePage.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&score',
+   {waitUntil:'networkidle',timeout:45000});
+  const entranceCTA=scorePage.getByRole('button',{name:/优化简历，提高分值/}).first();
+  await entranceCTA.waitFor();
+  assert.match(await scorePage.locator('.hhba-native-score').first().textContent(),/68/);
+  await entranceCTA.click();
+  await scorePage.getByRole('region',{name:'原版式 Word 沉浸式 AI 优化舞台'}).waitFor();
+  await scorePage.locator('.hhba-original-resume-anchor').first().waitFor();
+  await scorePage.getByRole('button',{name:'修改这段 Word'}).first().click();
+  const nativeEditor=scorePage.getByRole('textbox',{name:'修改 Word 文字'});
+  await nativeEditor.fill('VERIFIED WORD RESUME');
+  await scorePage.locator('.hhba-original-resume-edit-confirm input[type=checkbox]').check();
+  await scorePage.getByRole('button',{name:'确认保存'}).click();
+  await scorePage.getByText('已检查版式并保存第 1 次修改',{exact:false}).waitFor();
+  await scorePage.getByText('已保存第 1 版 Word，可以按原岗位规则复评。').waitFor();
+  assert.equal(await scorePage.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),0,
+   'confirmed native Word must return to the original font without pending Siri edge');
+  await scorePage.locator('.hhba-word-match-confirm input[type=checkbox]').check();
+  await scorePage.getByRole('button',{name:'重新计算匹配分'}).click();
+  await scorePage.getByText('已保存 Word · 优化后').waitFor();
+  assert.match(await scorePage.locator('.hhba-word-match-after').textContent(),/70/);
+  assert.match(await scorePage.locator('.hhba-word-match-score').textContent(),/68/);
+  assert.deepEqual(errors,[]);
+  await scorePage.screenshot({path:output+'/word-first-score-before-after.png',fullPage:true});
+  await scorePage.close();
+ }
+
  console.log(JSON.stringify({result:'PASSED',desktop_pdf_pages:pages.length,
   long_pdf_pages:longPages.length,mobile:metrics,qa_output:output}));
 }finally{await browser.close()}
