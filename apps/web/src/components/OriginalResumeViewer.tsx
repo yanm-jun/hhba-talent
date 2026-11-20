@@ -7,6 +7,8 @@ import {OriginalWordViewer} from './OriginalWordViewer';
 import {matchVisualRegionsToPdfPage,type VerifiedResumeAnchor} from '../services/resumeVisualAnchors.mjs';
 import {planInlinePdfPreview,whitePdfPatchBackground} from '../services/resumeInlinePdfPreview.mjs';
 import {splitChangedResumeText} from '../services/resumeChangedText.mjs';
+import {patchPdfWithOriginalFont} from '../services/resumePdfNativeFont.mjs';
+import {verifyOriginalFontPdfPatch} from '../services/resumePdfNativeVerify.mjs';
 import {visualEditingReady,analyzeVisualResume,listPageResumeEdits,savePageResumeEdits,
  type VisualResumeLayout,type PageResumeEdit} from '../services/resumeVisualEditingApi';
 import '../styles/original-resume-viewer.css';
@@ -26,6 +28,10 @@ function OriginalPdfViewer({resume,onClose}:{
  const canvas=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
  const pdfDocument=useRef<any>(null);
+ const verifiedDisplayDocument=useRef<any>(null);
+ const nativeRevision=useRef(0);
+ const [nativePdf,setNativePdf]=useState<Uint8Array|null>(null);
+ const [nativeRenderRevision,setNativeRenderRevision]=useState(0);
  const [page,setPage]=useState(1),[pageCount,setPageCount]=useState(0);
  const [status,setStatus]=useState<'loading'|'ready'|'error'>('loading');
  const [error,setError]=useState(''),[text,setText]=useState('');
@@ -50,6 +56,7 @@ function OriginalPdfViewer({resume,onClose}:{
  const previewPlans=useMemo(()=>{
   const result=new Map<string,ReturnType<typeof planInlinePdfPreview>>();
   const source=canvas.current;
+  if(nativePdf)return result;
   const measureCanvas=document.createElement('canvas');
   const measureContext=measureCanvas.getContext('2d');
   if(!source||!measureContext)return result;
@@ -67,12 +74,18 @@ function OriginalPdfViewer({resume,onClose}:{
    result.set(anchor.id,plan);
   }
   return result;
- },[anchors,selectedId,draft,pageSize]);
+ },[anchors,selectedId,draft,pageSize,nativePdf]);
  useEffect(()=>{
   let active=true;
   let pdfTask:any=null;
   setPage(1);setPageCount(0);setText('');setError('');setStatus('loading');
   setAnchors([]);setSelectedId(null);setLayout(null);setChanges([]);setVisionConsent(false);
+  nativeRevision.current++;
+  setNativePdf(null);setNativeRenderRevision(0);
+  if(verifiedDisplayDocument.current){
+   void verifiedDisplayDocument.current.destroy().catch(()=>{});
+   verifiedDisplayDocument.current=null;
+  }
   setMessage('');
   void (async()=>{
    try{
@@ -100,7 +113,13 @@ function OriginalPdfViewer({resume,onClose}:{
     if(active){setError(e instanceof Error?e.message:'原文件无法预览，请下载原件查看。');setStatus('error');}
    }
   })();
-  return()=>{active=false;pdfDocument.current=null;if(pdfTask)void pdfTask.destroy().catch(()=>{});};
+  return()=>{active=false;nativeRevision.current++;
+   pdfDocument.current=null;if(pdfTask)void pdfTask.destroy().catch(()=>{});
+   if(verifiedDisplayDocument.current){
+    void verifiedDisplayDocument.current.destroy().catch(()=>{});
+    verifiedDisplayDocument.current=null;
+   }
+  };
  },[resume.id,isPdf]);
  useEffect(()=>{
   if(!isPdf)return;
@@ -118,6 +137,8 @@ function OriginalPdfViewer({resume,onClose}:{
    try{
     const doc=pdfDocument.current;
     const pageObject=await doc.getPage(page);
+    const displayPage=verifiedDisplayDocument.current?
+     await verifiedDisplayDocument.current.getPage(page):pageObject;
     if(!alive||!canvas.current)return;
     const viewportBase=pageObject.getViewport({scale:1});
     const scale=Math.min(1.6,Math.max(0.55,width/viewportBase.width));
@@ -132,7 +153,7 @@ function OriginalPdfViewer({resume,onClose}:{
     const ctx=surface.getContext('2d');
     if(!ctx)throw Error('PDF_DISPLAY_UNAVAILABLE');
     ctx.clearRect(0,0,surface.width,surface.height);
-    renderTask=pageObject.render({
+    renderTask=displayPage.render({
      canvas:surface,canvasContext:ctx,viewport,
      transform:pixelRatio===1?undefined:[pixelRatio,0,0,pixelRatio,0,0]
     });
@@ -152,7 +173,7 @@ function OriginalPdfViewer({resume,onClose}:{
    }
   })();
   return()=>{alive=false;try{renderTask?.cancel();}catch{}};
- },[isPdf,status,page,width,pageCount,layout]);
+ },[isPdf,status,page,width,pageCount,layout,nativeRenderRevision]);
  useEffect(()=>{
   const element=paper.current;if(!element)return;
   const update=()=>setWidth(Math.max(260,Math.min(800,element.clientWidth-20)));
@@ -160,6 +181,63 @@ function OriginalPdfViewer({resume,onClose}:{
   const observer=typeof ResizeObserver==='function'?new ResizeObserver(update):null;
   observer?.observe(element);return()=>observer?.disconnect();
  },[isPdf,status]);
+ function clearVerifiedNative(){
+  nativeRevision.current++;
+  if(verifiedDisplayDocument.current){
+   void verifiedDisplayDocument.current.destroy().catch(()=>{});
+   verifiedDisplayDocument.current=null;
+  }
+  setNativePdf(null);setNativeRenderRevision(n=>n+1);
+ }
+ async function verifyNativeCandidate(next:PageResumeEdit[]){
+  const token=++nativeRevision.current;
+  if(next.length!==1){
+   clearVerifiedNative();return false;
+  }
+  const change=next[0];
+  try{
+   // Never use the AI's visual guess as the PDF font. Patch only the one
+   // ASCII literal from its actual stream, leaving the existing PDF font
+   // resource and every other byte unchanged.
+   const original=new Uint8Array(await fetchPrivateResumeForLocalReview(resume));
+   const patch=patchPdfWithOriginalFont(original,change.original,change.text);
+   const {getDocument}=await import('pdfjs-dist');
+   await verifyOriginalFontPdfPatch({
+    originalBytes:original,editedBytes:patch.bytes,proof:patch.proof,
+    getDocument,canvasFactory:()=>document.createElement('canvas')
+   });
+   if(token!==nativeRevision.current)return false;
+   const task=getDocument({data:new Uint8Array(patch.bytes),
+    isEvalSupported:false,useSystemFonts:false});
+   const ready=await task.promise;
+   if(token!==nativeRevision.current){await ready.destroy();return false;}
+   const previous=verifiedDisplayDocument.current;
+   verifiedDisplayDocument.current=ready;
+   setNativePdf(patch.bytes);
+   setNativeRenderRevision(n=>n+1);
+   if(previous)void previous.destroy().catch(()=>{});
+   return true;
+  }catch{
+   if(token===nativeRevision.current){
+    const previous=verifiedDisplayDocument.current;
+    verifiedDisplayDocument.current=null;setNativePdf(null);
+    setNativeRenderRevision(n=>n+1);
+    if(previous)void previous.destroy().catch(()=>{});
+   }
+   return false;
+  }
+ }
+ function downloadVerifiedNative(){
+  if(!nativePdf)return;
+  const body=new Uint8Array(nativePdf);
+  const blob=new Blob([body],{type:'application/pdf'});
+  const url=URL.createObjectURL(blob),link=document.createElement('a');
+  link.href=url;link.download=(resume.name.replace(/\.pdf$/i,'')||'我的简历')+'-已修改.pdf';
+  link.hidden=true;document.body.appendChild(link);
+  try{link.click();}finally{
+   link.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
+  }
+ }
  async function startEditing(){
   if(visionBusy||!visionConsent||!canStartEdit||!isPdf)return;
   setVisionBusy(true);setMessage('');setSelectedId(null);setConfirmed(false);
@@ -168,7 +246,9 @@ function OriginalPdfViewer({resume,onClose}:{
    if(data.layout.source_sha256.length!==64)throw Error('暂时无法检查这份简历。');
    const saved=await listPageResumeEdits(resume.id);
    setLayout(data.layout);setChanges(saved.changes||[]);
-   setMessage('已打开修改功能。选择简历中有标记的文字即可修改。');
+   const previouslyVerified=await verifyNativeCandidate(saved.changes||[]);
+   setMessage(previouslyVerified?'已恢复经过原字体检查的 PDF 修改稿。':
+    '已打开修改功能。选择简历中有标记的文字即可修改。');
   }catch(error){
    setMessage(error instanceof Error?error.message:'暂时无法修改，请稍后再试。');
   }finally{setVisionBusy(false);}
@@ -189,7 +269,9 @@ function OriginalPdfViewer({resume,onClose}:{
   try{
    const response=await savePageResumeEdits(resume.id,updated);
    setChanges(response.changes);setSelectedId(null);setConfirmed(false);
-   setMessage('修改已暂存，尚未替换 PDF 原文。原字体未经保真验证，不会用其他字体覆盖。');
+   const accepted=await verifyNativeCandidate(response.changes);
+   setMessage(accepted?'已确认原字体与页面位置，修改已融入 PDF。':
+    '修改已暂存，尚未替换 PDF 原文。原字体未经保真验证，不会用其他字体覆盖。');
   }catch(error){setMessage(error instanceof Error?error.message:'保存失败，请重试。');}
   finally{setSaving(false);}
  }
@@ -199,6 +281,7 @@ function OriginalPdfViewer({resume,onClose}:{
   try{
    const response=await savePageResumeEdits(resume.id,changes.filter(item=>item.id!==anchor.id));
    setChanges(response.changes);setDraft(anchor.text);setSelectedId(null);
+   await verifyNativeCandidate(response.changes);
    setMessage('已撤销这段修改。');
   }catch(error){setMessage(error instanceof Error?error.message:'撤销失败，请重试。');}
   finally{setSaving(false);}
@@ -299,10 +382,15 @@ function OriginalPdfViewer({resume,onClose}:{
    </div>
    {layout&&anchors.length===0&&<p className="hhba-original-resume-note">
     这页暂时没有找到可以准确修改的位置。你仍然可以查看和下载原件。</p>}
-   {changes.length>0&&<p className="hhba-original-resume-note" role="status">
-    已暂存 {changes.length} 处修改，原件保留。这些修改尚未应用到 PDF；原字体未经保真验证，
-    暂不能覆盖原文或导出修改版 PDF。
-   </p>}
+   {changes.length>0&&<>
+    <p className="hhba-original-resume-note" role="status">
+     {nativePdf?'已通过原字体与页面校验。修改版沿用 PDF 原字体，原文件仍保留。':
+      '已暂存 '+changes.length+' 处修改，原件保留。这些修改尚未应用到 PDF；原字体未经保真验证，暂不能覆盖原文或导出修改版 PDF。'}
+    </p>
+    {nativePdf&&<div className="hhba-original-resume-review-export">
+     <button type="button" onClick={downloadVerifiedNative}><Download size={14}/> 下载 PDF</button>
+    </div>}
+   </>}
    {message&&<p className="hhba-original-resume-note" role="status">{message}</p>}
    <nav className="hhba-original-resume-pages" aria-label="原始简历翻页">
     <button type="button" disabled={page<=1}
