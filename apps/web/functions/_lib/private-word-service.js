@@ -45,7 +45,18 @@ export async function wordRequest(env,action,{original,edited,oldText,newText,fe
   });
  }catch{throw Error('WORD_RENDER_FAILED');}
  if(response.status>=300&&response.status<400)throw Error('WORD_RENDER_FAILED');
- if(!response.ok)throw Error('WORD_RENDER_FAILED');
+ if(!response.ok){
+  // Forward only known, non-sensitive format-fidelity error codes.
+  // The renderer must not leak document content, arbitrary network details,
+  // URLs, or internal stack traces into candidate-facing responses.
+  if(response.status===422){
+   const body=await response.json().catch(()=>null);
+   if(['WORD_FONT_UNAVAILABLE','WORD_FONT_UNVERIFIED',
+    'WORD_LAYOUT_MOVED','WORD_TEXT_NOT_VERIFIED'].includes(body?.error))
+    throw Error(body.error);
+  }
+  throw Error('WORD_RENDER_FAILED');
+ }
  if(action==='render'){
   const contentType=response.headers.get('Content-Type')||'';
   if(!contentType.startsWith('application/pdf'))throw Error('WORD_RENDER_FAILED');
