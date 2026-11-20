@@ -59,6 +59,7 @@ try{
  const journeyBefore=page.getByRole('navigation',{name:'求职流程'});
  await journeyBefore.waitFor();
  assert.match(await journeyBefore.locator('[aria-current="step"]').textContent(),/匹配评分/);
+ await page.screenshot({path:output+'/single-journey-job-score.png',fullPage:true});
  await page.getByRole('button',{name:/优化简历，提高分值/}).click();
  await page.getByRole('region',{name:'正式简历排版与打印'}).waitFor();
  const journeyAfter=page.getByRole('navigation',{name:'求职流程'});
@@ -70,6 +71,8 @@ try{
  assert.equal(await official.getAttribute('target'),'_blank');
  assert.match(await official.getAttribute('rel')||'',/noopener/);
  assert.match(await page.locator('.hhba-match-apply-last').textContent(),/官网投递/);
+ await page.screenshot({path:output+'/single-journey-tailored-word-and-apply.png',
+  fullPage:true});
  assert.equal(await page.locator('.targeted-resume-live-paper .hhba-print-sheet').count(),1,'one live resume paper, not two separate previews');
  const generate=page.getByRole('button',{name:'开始 AI 优化'});
  assert.equal(await generate.isDisabled(),true,'user consent is mandatory');
@@ -494,6 +497,34 @@ try{
   assert.deepEqual(issues,[],'Chinese native PDF browser should not crash');
   await cjkUI.close();
  }
+
+ // Mobile mainline: score, selected job, actual Word and safe official link
+ // must work without pushing the body wider than the phone viewport.
+ {
+  const phone=await browser.newPage({viewport:{width:390,height:844},
+   isMobile:true,deviceScaleFactor:1,locale:'zh-CN'});
+  const issues=[];phone.on('pageerror',e=>issues.push(e.message));
+  await phone.goto('http://127.0.0.1:3000/qa/resume-flow.html?word',
+   {waitUntil:'networkidle',timeout:45000});
+  assert.match(await phone.getByRole('navigation',{name:'求职流程'})
+   .locator('[aria-current="step"]').textContent(),/匹配评分/);
+  await phone.getByRole('button',{name:/优化简历，提高分值/}).click();
+  assert.match(await phone.getByRole('navigation',{name:'求职流程'})
+   .locator('[aria-current="step"]').textContent(),/定向优化/);
+  const apply=phone.locator('.hhba-match-final-apply');
+  await apply.waitFor({state:'visible'});
+  assert.equal(await apply.getAttribute('href'),'https://example.test/jobs/qa');
+  const width=await phone.evaluate(()=>({
+   viewport:document.documentElement.clientWidth,
+   scroll:document.documentElement.scrollWidth
+  }));
+  assert.ok(width.scroll<=width.viewport+3,
+   'candidate mainline must not overflow the mobile viewport: '+JSON.stringify(width));
+  await phone.screenshot({path:output+'/single-journey-mobile.png',fullPage:true});
+  assert.deepEqual(issues,[]);
+  await phone.close();
+ }
+
  // True original Word page preview (no HHBA re-template), in-place edit and
  // verified Word download. Fixture uses only synthetic data and fake endpoints.
  for(const view of [{width:1100,height:900,name:'desktop'},
