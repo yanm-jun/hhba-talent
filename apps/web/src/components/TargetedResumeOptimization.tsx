@@ -8,6 +8,7 @@ import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
 import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResumeVersion} from '../services/resumeVersionsApi';
 import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,sourceResumeOmittedCharacters,structuredResumeOmittedCharacters,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
 import {createPortal} from 'react-dom';
+import {Link} from '../router';
 import {ResumePrintSheet} from './ResumePrintSheet';
 import {downloadResumeDocx} from '../services/resumeDocx';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
@@ -304,6 +305,10 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
    </div>}
   </div>;
  }
+ // The legacy browser-print template is retained solely for synthetic QA.
+ // Production PDF must originate from a renderer-verified original DOCX.
+ const legacyPrintQa=import.meta.env.DEV&&typeof window!=='undefined'&&
+  window.location.pathname.startsWith('/qa/');
  const hasSession=realAuthReady&&Boolean(getRealAuthToken());
  return <section className="targeted-resume" aria-label="岗位定向简历优化">
   <div className="targeted-resume-heading">
@@ -322,7 +327,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
   {omittedSourceCharacters>0&&<p className="targeted-resume-truncation" role="alert">
    <strong>这份简历有部分内容未显示。</strong>部分文字超出可编辑或可打印容量，
    仍有约 {omittedSourceCharacters} 个非空白字符未纳入本次预览。
-   为避免遗漏经历，本次暂不允许保存岗位版本或导出 PDF / Word；请先上传精简或分段整理后的原始简历。
+   为避免遗漏经历，本次暂不允许保存岗位版本或导出 Word 草稿；请先上传精简或分段整理后的原始简历。
    原上传文件不会因此被修改。
   </p>}
   {hasSession&&status?.enabled&&<label className="targeted-resume-consent">
@@ -336,9 +341,9 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
     </div>
     <div className="targeted-resume-document-actions">
      <button type="button" disabled={!undoStack.length} onClick={undo}><Undo2 size={15}/> 撤销</button>
-     <button type="button" disabled={!canExport} onClick={()=>window.print()}><Printer size={15}/> 导出 PDF</button>
+     {legacyPrintQa&&<button type="button" disabled={!canExport} onClick={()=>window.print()}><Printer size={15}/> 导出 PDF</button>}
      <button type="button" disabled={!canExport} onClick={()=>{try{downloadResumeDocx(printDocument,job.title_zh||job.title)}
-      catch{setNotice('Word 导出失败，请稍后再试。')}}}><FileDown size={15}/> 导出 Word</button>
+      catch{setNotice('Word 草稿导出失败，请稍后再试。')}}}><FileDown size={15}/> 导出 Word 草稿（新排版）</button>
     </div>
    </div>
    <div className="targeted-resume-document-fields">
@@ -354,8 +359,8 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
      placeholder="用自己的真实工作经历和求职方向概括优势"
      onChange={e=>updateDetail('summary',e.target.value)}/></label>
    </div>
-   <p className="targeted-resume-print-note">可以导出 PDF 或 Word。导出内容不包含修改按钮；复杂的原始排版可能无法完全保留。</p>
-   {!canExport&&<p className="targeted-resume-print-note" role="status">请填写真实姓名、确认简历内容完整，并保存正在编辑的段落，才可以导出 PDF 或 Word。</p>}
+   <p className="targeted-resume-print-note">此处用于核对 AI 文字建议，下载的 Word 草稿会重新排版，并非上传文件的原样式。需要保留字体和版式，请到 <Link to="/candidate/account/resume">我的简历</Link> 编辑原 Word；通过验证后，可下载 Word 和由 Word 转换的 PDF。</p>
+   {!canExport&&<p className="targeted-resume-print-note" role="status">请填写真实姓名、确认简历内容完整，并保存正在编辑的段落，才可以下载 Word 草稿。</p>}
   </section>
   <div className={'targeted-resume-live-paper hhba-siri-edge'+
     ((openSuggestionId||editingBlock)?' hhba-siri-edge-active':'')}
@@ -451,7 +456,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
    <button type="button" onClick={reset}><Undo2 size={14}/> 恢复原稿</button>
   </div>
   {notice&&<p role="status" className="targeted-resume-notice">{notice}</p>}
-  {createPortal(<div className="hhba-print-host" data-hhba-print-host="resume">
+  {legacyPrintQa&&createPortal(<div className="hhba-print-host" data-hhba-print-host="resume">
     <ResumePrintSheet document={printDocument}/>
    </div>,document.body)}
  </section>;
