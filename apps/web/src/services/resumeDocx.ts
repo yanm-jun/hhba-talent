@@ -16,7 +16,7 @@ function para(text:string,style?:string,bold=false):string{
  const styleTag=style?'<w:pPr><w:pStyle w:val="'+style+'"/></w:pPr>':'';
  return '<w:p>'+styleTag+run(text,bold)+'</w:p>';
 }
-function documentXml(doc:ResumeDocument):string{
+function documentXml(doc:ResumeDocument,sourceHeading='简历原始内容（请检查并整理）'):string{
  const lines:string[]=[];
  const addSection=(name:string)=>lines.push(para(name,'Heading1',true));
  lines.push(para(doc.details.fullName,'Title',true));
@@ -40,7 +40,7 @@ function documentXml(doc:ResumeDocument):string{
   }
  }
  if(doc.sourceParagraphs.length){
-  addSection('简历原始内容（请检查并整理）');
+  addSection(sourceHeading);
   for(const value of doc.sourceParagraphs)lines.push(para(value));
  }
  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
@@ -118,17 +118,17 @@ function zipStored(entries:readonly {name:string;content:string}[]):Uint8Array{
  }
  return result;
 }
-export function createResumeDocx(doc:ResumeDocument):Uint8Array{
+export function createResumeDocx(doc:ResumeDocument,sourceHeading?:string):Uint8Array{
  return zipStored([
   {name:'[Content_Types].xml',content:typesXml},
   {name:'_rels/.rels',content:relsXml},
-  {name:'word/document.xml',content:documentXml(doc)},
+  {name:'word/document.xml',content:documentXml(doc,sourceHeading)},
   {name:'word/styles.xml',content:stylesXml},
   {name:'word/_rels/document.xml.rels',content:documentRelsXml}
  ]);
 }
-export function downloadResumeDocx(doc:ResumeDocument,jobTitle:string):void{
- const bytes=createResumeDocx(doc);
+export function downloadResumeDocx(doc:ResumeDocument,jobTitle:string,sourceHeading?:string):void{
+ const bytes=createResumeDocx(doc,sourceHeading);
  const body=new Uint8Array(bytes.length);body.set(bytes);
  const blob=new Blob([body],{type:MIME});
  const safeName=(doc.details.fullName+'-'+jobTitle).replace(/[\\/:*?"<>|\u0000-\u001f]/g,'').trim().slice(0,72)||'HHBA-岗位简历';
