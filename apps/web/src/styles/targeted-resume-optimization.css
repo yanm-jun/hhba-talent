@@ -392,3 +392,34 @@
  .targeted-resume-draft-recovery{padding:11px 12px}
  .targeted-resume-draft-recovery-actions button{flex:1}
 }
+
+
+/* Resume-first: AI permissions, generation and draft settings live in the
+   contextual rail rather than pushing the user's Word under the fold. */
+.targeted-resume.is-word-first{padding:13px;background:#fafbfc}
+.targeted-resume.is-word-first .targeted-resume-heading{padding:4px 4px 8px}
+.targeted-resume.is-word-first .targeted-resume-heading p{margin:3px 0}
+.targeted-resume.is-word-first .targeted-resume-word-workspace{margin-top:6px}
+.targeted-resume-word-assistant .targeted-resume-toolbar{
+ margin:0 0 12px;padding:11px 12px;display:flex;flex-direction:column;
+ align-items:stretch;gap:9px;border-radius:10px;
+}
+.targeted-resume-word-assistant .targeted-resume-toolbar>button{
+ min-width:0;width:100%;min-height:42px;
+}
+.targeted-resume-word-assistant .targeted-resume-consent{
+ display:flex;align-items:flex-start;gap:8px;margin:10px 1px;
+ padding:9px 6px;line-height:1.7;font-size:11px;
+}
+.targeted-resume-word-assistant .targeted-resume-draft-recovery{
+ margin:11px 0;padding:10px 11px;
+}
+.targeted-resume-word-assistant .targeted-resume-truncation{margin:9px 0}
+@media(max-width:700px){
+ .targeted-resume.is-word-first{padding:7px 5px 0}
+ .targeted-resume.is-word-first .targeted-resume-heading{padding:5px 8px 6px}
+ .targeted-resume.is-word-first .targeted-resume-heading h3{font-size:16px;line-height:1.35;margin:3px 0}
+ .targeted-resume.is-word-first .targeted-resume-heading>span{display:none}
+ .targeted-resume.is-word-first .targeted-resume-word-workspace{margin:4px 0 0}
+ .targeted-resume-word-assistant .targeted-resume-toolbar{margin-top:8px}
+}
