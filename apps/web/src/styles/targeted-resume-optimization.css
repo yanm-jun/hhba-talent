@@ -262,3 +262,34 @@
   -webkit-text-fill-color:currentColor!important;
  }
 }
+
+/* Keep the pending Siri text gradient on actual editable glyphs. The generic
+   editor background shorthand must not accidentally erase the gradient. */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+ .targeted-resume .targeted-resume-fact-entry textarea.hhba-siri-typing,
+ .targeted-resume .targeted-resume-inline-editor textarea.hhba-siri-typing{
+  background-image:linear-gradient(105deg,#009cc2 0%,#3a7fe6 17%,
+   #8351d5 36%,#c84f9f 55%,#de7958 74%,#16b5cd 100%);
+  background-size:175% 100%;
+  background-position:6% 50%;
+  background-repeat:no-repeat;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  caret-color:#24344c;
+  animation:hhba-resume-siri-letters-flow 11s ease-in-out infinite alternate;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .targeted-resume .targeted-resume-fact-entry textarea.hhba-siri-typing,
+ .targeted-resume .targeted-resume-inline-editor textarea.hhba-siri-typing{
+  animation:none!important;background-position:42% 50%;
+ }
+}
+@media print{
+ .targeted-resume .targeted-resume-fact-entry textarea.hhba-siri-typing,
+ .targeted-resume .targeted-resume-inline-editor textarea.hhba-siri-typing{
+  animation:none!important;background:none!important;
+  -webkit-text-fill-color:currentColor!important;
+ }
+}
