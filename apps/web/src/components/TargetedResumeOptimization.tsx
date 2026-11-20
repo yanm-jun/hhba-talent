@@ -10,7 +10,8 @@ import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetail
 import {createPortal} from 'react-dom';
 import {Link} from '../router';
 import type {PrivateResume} from '../services/privateResumes';
-import {OriginalWordViewer} from './OriginalWordViewer';
+import {OriginalWordViewer,type WordRevisionSnapshot,type WordVisualSuggestion} from './OriginalWordViewer';
+import {checkedWordScoreBlocks} from '../services/resumeWordScoreBridge.mjs';
 import {ResumePrintSheet} from './ResumePrintSheet';
 import {downloadResumeDocx} from '../services/resumeDocx';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
@@ -68,6 +69,27 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [activeSuggestionId,setActiveSuggestionId]=useState<string|null>(null);
  const [mobileSuggestionsOpen,setMobileSuggestionsOpen]=useState(false);
  const [wordEditing,setWordEditing]=useState(false);
+ const [entranceStage,setEntranceStage]=useState<'entering'|'ready'>('entering');
+ const [revealedSuggestionCount,setRevealedSuggestionCount]=useState(0);
+ const [wordRevisionSnapshot,setWordRevisionSnapshot]=useState<WordRevisionSnapshot|null>(null);
+ const lastWordRevisionKey=useRef('');
+ useEffect(()=>{
+  if(!sourceResume)return;
+  setEntranceStage('entering');
+  const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const timeout=setTimeout(()=>setEntranceStage('ready'),reduced?0:1050);
+  return()=>clearTimeout(timeout);
+ },[sourceResume?.id,job.id]);
+ useEffect(()=>{
+  if(!sourceResume)return;
+  if(!suggestions.length){setRevealedSuggestionCount(0);return;}
+  if(revealedSuggestionCount>=suggestions.length)return;
+  // Provider results have returned; stagger is presentation, never fake streaming.
+  const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const timeout=setTimeout(()=>setRevealedSuggestionCount(n=>Math.min(n+1,suggestions.length)),
+   reduced?0:520);
+  return()=>clearTimeout(timeout);
+ },[sourceResume,suggestions,revealedSuggestionCount]);
  const [wordEditHost,setWordEditHost]=useState<HTMLDivElement|null>(null);
  const [aiSettingsOpen,setAiSettingsOpen]=useState(false);
  useEffect(()=>{
@@ -150,10 +172,25 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const scoreJobId=hasAuditedAtsIdentity?job.id:
   (verifiedJob&&confirmedVerifiedJob?verifiedJob.job_id:null);
  const hasSupportedJob=Boolean(scoreJobId);
+ const verifiedWordScore=useMemo(()=>checkedWordScoreBlocks(blocks,
+  wordRevisionSnapshot?.history||[],wordRevisionSnapshot?.revision||0),
+  [blocks,wordRevisionSnapshot]);
+ const hasVerifiedWordRevision=Boolean(sourceResume&&wordRevisionSnapshot&&
+  wordRevisionSnapshot.revision>0);
+ function handleWordRevisionSnapshot(snapshot:WordRevisionSnapshot){
+  const key=snapshot.revision+':'+snapshot.history.map(x=>
+   x.revision+':'+x.original+':'+x.text).join('|');
+  if(lastWordRevisionKey.current===key)return;
+  lastWordRevisionKey.current=key;
+  setWordRevisionSnapshot(snapshot);
+  setScoreResult(null);setConfirmReassessment(false);
+ }
  const hasWordingChanges=useMemo(()=>version.blocks.some(block=>{
   const original=blocks.find(old=>old.id===block.id);
   return !original||original.text!==block.text;
  }),[version.blocks,blocks]);
+ const scoreSourceReady=!sourceResume?hasWordingChanges:
+  hasVerifiedWordRevision&&verifiedWordScore.ok;
  function invalidateScore(){setScoreResult(null);setConfirmReassessment(false);}
  async function verifyEmployer(){
   if(hasAuditedAtsIdentity||!verifyStatus?.enabled||verifying||!consentVerify)return;
@@ -167,10 +204,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   finally{setVerifying(false);}
  }
  async function reassess(){
-  if(!scoreStatus?.enabled||!scoreJobId||scoring||!hasWordingChanges||!confirmReassessment)return;
+  if(!scoreStatus?.enabled||!scoreJobId||scoring||!scoreSourceReady||!confirmReassessment)return;
   setScoring(true);setNotice('');setScoreResult(null);
   try{
-   const result=await reassessResume(scoreJobId,profile,blocks,version.blocks);
+   const result=await reassessResume(scoreJobId,profile,blocks,
+    sourceResume?verifiedWordScore.blocks:version.blocks);
    setScoreResult(result);
    if(!result.supported)setNotice('此岗位未通过当前官方快照复评条件，未生成分数。');
    else setNotice('已用相同标准比较修改前后的简历。');
