@@ -27,7 +27,7 @@ test('scores must remain evidence-based, not random, exaggerated or admission od
  assert.match(modal,/Number\.isInteger\(job\.match_score\)/);
  assert.match(modal,/job\.score_basis/);
  assert.match(modal,/分数不是录用概率/);
- assert.match(modal,/匹配评分/);
+ assert.match(await source('components/CandidateJourneySteps.tsx'),/匹配评分/);
  assert.doesNotMatch(modal,/Math\.random\(\)/);
 });
 test('only HTTPS employer/ATS posting candidates can be used as apply link',()=>{
