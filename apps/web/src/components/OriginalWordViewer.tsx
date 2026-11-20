@@ -298,7 +298,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
    }}>取消</button>
   </div>
  </div>:null;
- return <section className="hhba-original-resume" aria-label="查看我的 Word 简历">
+ return <section className="hhba-original-resume hhba-original-word-viewer" aria-label="查看我的 Word 简历">
   <div className="hhba-original-resume-toolbar">
    <div className="hhba-original-resume-file-heading">
     <strong>{resume.name}</strong>
@@ -378,7 +378,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
       {anchors.map(anchor=>{
        const [x,y,w,h]=anchor.bbox;
        return <button key={anchor.id} type="button"
-        className="hhba-original-resume-anchor" title="修改这段"
+        className={"hhba-original-resume-anchor"+(selected?.id===anchor.id?" is-selected":"")} title="修改这段"
         aria-label="修改这段 Word"
         style={{left:x/10+'%',top:y/10+'%',width:w/10+'%',height:h/10+'%'}}
         onClick={()=>{
@@ -407,13 +407,6 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
      </div>
     </div>
    </div>
-   {false&&saved&&<div className="hhba-original-resume-review-export">
-    <button type="button" disabled={busy} onClick={()=>void downloadSaved()}>
-     <Download size={14}/> 下载 Word</button>
-    <button type="button" disabled={busy} onClick={()=>void downloadSavedPdf()}>
-     <Download size={14}/> 下载 PDF</button>
-    <span>PDF 与当前已确认的 Word 版本一致；可以继续点选下一段修改、撤销或重做，原始文件始终保留。</span>
-   </div>}
    {editPanel&&(!editPanelHost?
     <aside className="hhba-word-standalone-edit-panel">{editPanel}</aside>:
     createPortal(editPanel,editPanelHost))}
