@@ -353,7 +353,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
      下一页 <ChevronRight size={15}/></button>
    </nav>
   </>}
-  {ready==='available'&&<div className="hhba-original-resume-mobile-dock" role="group" aria-label="手机端 Word 操作">
+  {ready==='available'&&!selected&&<div className="hhba-original-resume-mobile-dock" role="group" aria-label="手机端 Word 操作">
    {onOpenSuggestions&&<button type="button" onClick={onOpenSuggestions}>
     <Sparkles size={15}/> AI 建议{pendingSuggestionCount?' '+pendingSuggestionCount:''}</button>}
    <button type="button" disabled={busy||loading||revision<=0}
