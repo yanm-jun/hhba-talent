@@ -429,12 +429,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   return()=>window.removeEventListener('beforeunload',prevent);
  },[draftDirty]);
  const hasSession=realAuthReady&&Boolean(getRealAuthToken());
- return <section className="targeted-resume" aria-label="岗位定向简历优化">
-  <div className="targeted-resume-heading">
-   <div><small>HHBA / 岗位定向优化</small><h3>{job.title_zh||job.title}</h3>
-    <p>直接在简历上修改。原文件不会被覆盖。</p></div>
-   <span><Sparkles size={13} aria-hidden="true"/> 智能修改</span>
-  </div>
+ const optimizationControls=<>
   <div className="targeted-resume-toolbar">
    <div><strong>优化这份简历</strong><p>根据目标岗位提出修改建议，不会凭空添加经历。</p></div>
    {hasSession&&status?.enabled
@@ -469,6 +464,14 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    </div>}
    {draftStatus&&<p role="status">{draftStatus}</p>}
   </section>}
+ </>;
+ return <section className={'targeted-resume'+(sourceResume?' is-word-first':'')} aria-label="岗位定向简历优化">
+  <div className="targeted-resume-heading">
+   <div><small>HHBA / 岗位定向优化</small><h3>{job.title_zh||job.title}</h3>
+    <p>直接在简历上修改。原文件不会被覆盖。</p></div>
+   <span><Sparkles size={13} aria-hidden="true"/> 智能修改</span>
+  </div>
+  {!sourceResume&&optimizationControls}
   {sourceResume?<section className="targeted-resume-word-workspace" aria-label="原版式 Word 统一编辑工作区">
    <div className="targeted-resume-word-main">
     <OriginalWordViewer resume={sourceResume} suggestedChanges={confirmedWordChanges}
@@ -482,6 +485,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     aria-label="AI 建议工作台">
     <button type="button" className="targeted-resume-mobile-rail-close"
      onClick={()=>setMobileSuggestionsOpen(false)}>返回 Word</button>
+    {optimizationControls}
     <div className="targeted-resume-word-assistant-head">
      <strong><Sparkles size={15}/> AI 修改建议</strong>
      <p>左侧始终是你的原 Word；这里的建议只有经你确认后才会预填。真正保存仍需要在原 Word 再次确认。</p>
