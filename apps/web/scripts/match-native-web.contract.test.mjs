@@ -238,7 +238,8 @@ test('frontend shows partial results without pretending network completion',asyn
  assert.match(svc,/onPartial\?\./);
  assert.match(page,/result\|\|partialJobs\.length>0/);
  assert.match(page,/setPartialJobs/);
- assert.match(dialog,/pending\?'（继续搜索中）'/);
+ assert.match(dialog,/pending\?' · 搜索中'/);
+ assert.match(dialog,/CandidateJourneySteps current=\{activeJob\?4:pending\?2:3\}/);
 });
 
 
