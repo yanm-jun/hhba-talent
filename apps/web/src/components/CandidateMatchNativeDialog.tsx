@@ -75,7 +75,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
       <X size={19}/>
      </button>
     </header>
-    <div className="hhba-match-modal-content">
+    <div className="hhba-match-modal-content" data-hhba-stage={activeJob?'optimization':'matches'}>
      {activeJob&&parsedProfile?
       <section className="hhba-match-workspace" aria-label="独立简历优化工作区">
        <button type="button" className="hhba-match-workspace-back" onClick={backToMatches}>
@@ -144,9 +144,13 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
          <p className="hhba-native-reason"><strong>为什么推荐：</strong>
           {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
          {!pending&&parsedProfile&&<div className="hhba-native-optimize-action">
-          <button type="button" onClick={()=>{
-           setOptimizationDirty(false);setOptimizedJobId(job.id);
-          }}>针对这个岗位优化简历</button>
+          <button type="button" aria-label={'针对'+(job.title_zh||job.title)+'优化简历，提高分值'}
+           onClick={()=>{
+            setOptimizationDirty(false);setOptimizedJobId(job.id);
+           }}>
+           <span>优化简历，提高分值</span><span aria-hidden="true">✦</span>
+          </button>
+          <small>针对这个岗位优化真实经历；分数可能提高、保持或下降，以重新评估为准。</small>
          </div>}
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
           data-hhba-recruitment-outbound="true">{job.recruitment_source_kind==='EMPLOYER_ATS'?
