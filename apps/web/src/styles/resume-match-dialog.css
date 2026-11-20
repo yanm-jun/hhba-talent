@@ -130,3 +130,27 @@
 .hhba-native-optimize-action>button:focus-visible{outline:3px solid #9a8bea;outline-offset:2px}
 .hhba-native-optimize-action .targeted-resume{margin-top:12px}
 @media(max-width:650px){.hhba-native-optimize-action .targeted-resume{padding:10px}.hhba-native-optimize-action .targeted-resume-toolbar{padding:12px}}
+
+
+/* A full workspace replaces a never-ending job-card accordion. */
+.hhba-match-modal.hhba-match-modal-editor{
+ width:min(1220px,100%);height:calc(100dvh - 32px);max-height:calc(100dvh - 16px);
+}
+.hhba-match-modal-editor .hhba-match-modal-content{padding:16px 22px 28px}
+.hhba-match-workspace{min-width:0}
+.hhba-match-workspace-back{
+ display:inline-flex;align-items:center;min-height:38px;gap:6px;
+ background:transparent;border:0;color:#365469;font:600 12px/1.4 inherit;
+ padding:7px 10px;cursor:pointer;border-radius:8px;
+}
+.hhba-match-workspace-back::before{content:'‹';font-size:22px;font-weight:400;line-height:12px}
+.hhba-match-workspace-back:hover{background:#f2f6fa}
+@media(max-width:700px){
+ .hhba-match-modal.hhba-match-modal-editor{width:100%;height:100dvh;max-height:100dvh;border-radius:0}
+ .hhba-match-modal-editor .hhba-match-modal-content{padding:8px 10px 90px}
+ .hhba-match-modal-editor .hhba-match-modal-foot{padding:8px 12px}
+ .hhba-match-modal-editor .hhba-match-modal-foot>span{display:none}
+ .hhba-match-modal-editor .hhba-match-modal-foot .hhba-match-done{
+  width:100%;min-height:42px;
+ }
+}
