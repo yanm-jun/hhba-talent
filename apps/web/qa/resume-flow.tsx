@@ -3,6 +3,7 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {CandidateMatchNativeDialog} from '../src/components/CandidateMatchNativeDialog';
+import {CandidateResumeStage} from '../src/components/CandidateResumeStage';
 import type {MatchResponse} from '../src/services/resumeMatch';
 import {REAL_AUTH_TOKEN_KEY} from '../src/services/realAuth';
 import type {PrivateResume} from '../src/services/privateResumes';
@@ -210,9 +211,15 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
  }
  return original(input,init);
 }) as typeof window.fetch;
+const frontendOnlyQA=new URLSearchParams(location.search).has('simple');
 createRoot(document.getElementById('root')!).render(
- <CandidateMatchNativeDialog result={result} sourceText={sourceText}
-  sourceResume={nativeWord?nativeResume:undefined}
-  accountScope={nativeWord?'qa-user':undefined}
-  onClose={()=>{}}/>
+ frontendOnlyQA?
+  <div style={{maxWidth:840,margin:'28px auto',padding:'0 18px'}}>
+   <CandidateResumeStage fileName="虚构简历样稿.docx"
+    text={'个人信息\n虚构用户\n工作经历\n协助整理门店记录与团队沟通。\n教育经历\n虚构大学·演示专业'}/>
+  </div>:
+  <CandidateMatchNativeDialog result={result} sourceText={sourceText}
+   sourceResume={nativeWord?nativeResume:undefined}
+   accountScope={nativeWord?'qa-user':undefined}
+   onClose={()=>{}}/>
 );
