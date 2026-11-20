@@ -18,6 +18,19 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
 }){
  const ref=useRef<HTMLDivElement|null>(null);
  const [optimizedJobId,setOptimizedJobId]=useState<string|null>(null);
+ const [optimizationDirty,setOptimizationDirty]=useState(false);
+ const activeJob=result.matches.find(job=>job.id===optimizedJobId);
+ function confirmExitOptimization(){
+  return !optimizationDirty||window.confirm('仍有尚未保存的简历文字草稿。退出后这些草稿可能丢失，确定离开吗？');
+ }
+ function backToMatches(){
+  if(!confirmExitOptimization())return;
+  setOptimizedJobId(null);setOptimizationDirty(false);
+ }
+ function requestClose(){
+  if(!confirmExitOptimization())return;
+  onClose();
+ }
  useEffect(()=>{
   const overflow=document.body.style.overflow;
   const trigger=document.activeElement instanceof HTMLElement?document.activeElement:null;
@@ -25,7 +38,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
   return()=>{document.body.style.overflow=overflow;trigger?.focus()};
  },[]);
  function handleKey(event:KeyboardEvent<HTMLDivElement>){
-  if(event.key==='Escape'){event.preventDefault();onClose();return}
+  if(event.key==='Escape'){event.preventDefault();requestClose();return}
   if(event.key!=='Tab'||!ref.current)return;
   const focusable=Array.from(ref.current.querySelectorAll<HTMLElement>(
    'button:not([disabled]),a[href],input:not([disabled]),textarea:not([disabled]),select:not([disabled])'
@@ -50,19 +63,29 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
   };
  }
  return createPortal(
-  <div className="hhba-match-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)onClose()}}>
-   <div className="hhba-match-modal" role="dialog" aria-modal="true" tabIndex={-1}
+  <div className="hhba-match-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)requestClose()}}>
+   <div className={'hhba-match-modal'+(activeJob?' hhba-match-modal-editor':'')} role="dialog" aria-modal="true" tabIndex={-1}
     ref={ref} onKeyDown={handleKey} aria-labelledby="hhba-native-title">
     <header className="hhba-match-modal-head">
      <div className="hhba-match-modal-brand">
       <span className="hhba-match-modal-symbol"><BriefcaseBusiness size={19}/></span>
       <div><strong>汇方职场 · HHBA</strong><small>为你找到的工作</small></div>
      </div>
-     <button type="button" className="hhba-match-modal-close" onClick={onClose} aria-label="关闭推荐">
+     <button type="button" className="hhba-match-modal-close" onClick={requestClose} aria-label="关闭推荐">
       <X size={19}/>
      </button>
     </header>
     <div className="hhba-match-modal-content">
+     {activeJob&&parsedProfile?
+      <section className="hhba-match-workspace" aria-label="独立简历优化工作区">
+       <button type="button" className="hhba-match-workspace-back" onClick={backToMatches}>
+        返回岗位结果
+       </button>
+       <TargetedResumeOptimization key={activeJob.id} profile={parsedProfile}
+        job={asTargetJob(activeJob)} sourceText={sourceText}
+        sourceResume={sourceResume} onDraftDirtyChange={setOptimizationDirty}/>
+      </section>:
+     <>
      <div className="hhba-match-intro">
       <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> 智能推荐</span>
       <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
@@ -109,11 +132,9 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
          <p className="hhba-native-reason"><strong>为什么推荐：</strong>
           {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
          {!pending&&parsedProfile&&<div className="hhba-native-optimize-action">
-          <button type="button" onClick={()=>setOptimizedJobId(v=>v===job.id?null:job.id)}>
-           {optimizedJobId===job.id?'收起简历优化':'针对这个岗位优化简历'}
-          </button>
-          {optimizedJobId===job.id&&<TargetedResumeOptimization
-           key={job.id} profile={parsedProfile} job={asTargetJob(job)} sourceText={sourceText} sourceResume={sourceResume}/>}
+          <button type="button" onClick={()=>{
+           setOptimizationDirty(false);setOptimizedJobId(job.id);
+          }}>针对这个岗位优化简历</button>
          </div>}
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
           data-hhba-recruitment-outbound="true">{job.recruitment_source_kind==='EMPLOYER_ATS'?
@@ -137,10 +158,12 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
      {!pending&&resumeStorage?.saved&&<p className="hhba-match-saved-resume">已选择账户中保存的简历，可在「我的简历」中继续管理。</p>}
      {resumeStorage?.notice&&<p className="hhba-match-saved-resume" role="status">{resumeStorage.notice}</p>}
      <p className="hhba-match-disclaimer">{result.disclaimer||'岗位信息可能变化，请以企业招聘页面为准。HHBA 不会自动投递你的简历。'}</p>
+     </>}
     </div>
     <footer className="hhba-match-modal-foot">
      <span>HHBA · 让机会与人才，找到彼此。</span>
-     <button className="hhba-match-done" type="button" onClick={onClose}>完成查看</button>
+     <button className="hhba-match-done" type="button" onClick={activeJob?backToMatches:requestClose}>
+      {activeJob?'返回推荐列表':'完成查看'}</button>
     </footer>
    </div>
   </div>,document.body);
