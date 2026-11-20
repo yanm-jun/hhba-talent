@@ -73,7 +73,7 @@ export async function verifyOriginalFontPdfPatch({
   return {ok:true,pageCount:1,originalFont:proof.fontName,changedPixels:changed};
  }catch{fail();}
  finally{
-  try{if(oldDoc)await oldDoc.destroy();else await oldTask?.destroy();}catch{}
-  try{if(newDoc)await newDoc.destroy();else await newTask?.destroy();}catch{}
+  try{await oldTask?.destroy();}catch{}
+  try{await newTask?.destroy();}catch{}
  }
 }
