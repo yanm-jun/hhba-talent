@@ -213,13 +213,15 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  }
  async function downloadSaved(){
   setBusy(true);setMessage('');
-  try{await downloadOriginalWordEdited(resume.id);}
+  try{await downloadOriginalWordEdited(resume.id);
+   setMessage('已发起 Word 下载，请在浏览器下载列表查看。');}
   catch(error){setMessage(error instanceof Error?error.message:'下载失败，请重试。');}
   finally{setBusy(false);}
  }
  async function downloadSavedPdf(){
   setBusy(true);setMessage('');
-  try{await downloadOriginalWordPdf(resume.id);}
+  try{await downloadOriginalWordPdf(resume.id);
+   setMessage('已发起当前已确认版本的 PDF 下载。');}
   catch(error){setMessage(error instanceof Error?error.message:'PDF 下载失败，请重试。');}
   finally{setBusy(false);}
  }
@@ -264,6 +266,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
     {onClose&&<button type="button" onClick={closeEditor} aria-label="关闭原件预览"><X size={16}/></button>}
    </div>
   </div>
+  {message&&<p className="hhba-original-resume-word-status" role="status">{message}</p>}
   {ready==='available'&&<p className="hhba-original-resume-note" role="status">
    当前修改进度：{revision} / {totalRevisions} · 最多 {maxRevisions} 个已验证修订版本。
    单日最多 {maxDailyEdits} 次保存验证；撤销和重做不占用该额度。原始 Word 不会被覆盖。
@@ -387,6 +390,5 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
    <button type="button" disabled={busy||loading||!saved}
     onClick={()=>void downloadSavedPdf()}><Download size={15}/> 下载 PDF</button>
   </div>}
-  {message&&<p className="hhba-original-resume-note" role="status">{message}</p>}
  </section>;
 }
