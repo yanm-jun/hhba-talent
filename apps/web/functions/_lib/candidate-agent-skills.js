@@ -6,6 +6,10 @@
  * applicant can never choose tool names, providers, budgets or permissions.
  * This is intentionally NOT a general-purpose shell/browser agent.
  */
+import {safeJobDetailLink} from './deepseek-native-match.js';
+import {allowedEmployerJobLink} from './match-employer-source.js';
+import {isMainlandJobLocation} from './mainland-job-location.js';
+
 export const CANDIDATE_AGENT_SKILLS = Object.freeze([
   Object.freeze({
     id:'resume_evidence',
@@ -111,6 +115,13 @@ export async function runCandidateAgentMatch({
   );
   if(!result||!Array.isArray(result.matches)||result.matches.length>limit)
     throw Error('AGENT_SEARCH_RESULT_INVALID');
+  // A provider-produced candidate is not an automatically verified vacancy.
+  // Reject unsafe/third-party/non-mainland links even if an injected provider
+  // bypasses HHBA's normal Search-first filters.
+  if(result.matches.some(job=>!job||typeof job.company!=='string'||
+    !job.company.trim()||typeof job.title!=='string'||!job.title.trim()||
+    !safeJobDetailLink(job.official_url)||!allowedEmployerJobLink(job.official_url)||
+    !isMainlandJobLocation(job.location)))throw Error('AGENT_UNTRUSTED_JOB');
   steps[steps.length-1]={skill:phases[1],status:'complete'};
   // Existing Search-first step supplies its own evidence-based match scores.
   // Unknown scores remain null; do not manufacture numeric values.
