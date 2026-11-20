@@ -846,6 +846,38 @@ try{
  }
 
 
+
+ // Model-driven long job: browser must follow each new authenticated step,
+ // update actual document previews, and stop at the model's finish decision.
+ {
+  const page=await browser.newPage({viewport:{width:1180,height:850},
+   locale:'zh-CN'});
+  const errors=[];page.on('pageerror',error=>errors.push(error.message));
+  await page.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&full&agent',
+   {waitUntil:'networkidle',timeout:45000});
+  await page.getByRole('button',{name:/优化简历，提高分值/}).first().click();
+  await page.locator('.targeted-resume-ai-settings summary').click();
+  await page.locator('.targeted-resume-consent input[type=checkbox]').check();
+  await page.getByRole('button',{name:'AI 针对岗位重写整份简历'}).click();
+  await page.getByText('已经 AI 第二轮重新整理。',{exact:false}).first()
+   .waitFor({timeout:20000});
+  await page.waitForFunction(()=>{
+   const summary=document.querySelector('.hhba-whole-rewrite-agent-summary');
+   return summary?.textContent?.includes('AI 自主处理了 3 轮')&&
+    !document.querySelector('.hhba-whole-rewrite-cancel');
+  },{timeout:20000});
+  assert.match(await page.locator('.hhba-whole-rewrite-agent-summary').textContent(),
+   /重新撰写 1 段/);
+  assert.equal(await page.locator('.hhba-whole-rewrite-resume').count(),0,
+   'model finish must terminate browser auto-continuation');
+  assert.equal(await page.locator('.hhba-original-resume-history-list li').count(),0,
+   'automatically continued AI tools must NEVER write to source Word');
+  await page.screenshot({path:output+'/whole-resume-signed-agent-autocontinue.png',
+   fullPage:true});
+  assert.deepEqual(errors,[]);
+  await page.close();
+ }
+
  // The entire AI rewrite must also be usable on a narrow phone. The drawer
  // yields to the glowing document during generation and returns on request.
  {
