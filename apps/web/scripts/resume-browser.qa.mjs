@@ -827,6 +827,20 @@ try{
   assert.equal(await full.locator('.hhba-original-resume-history-list li').count(),0,
    'approving the AI text cannot silently create a Word revision');
   await full.screenshot({path:output+'/whole-resume-ai-draft-desktop.png',fullPage:true});
+  // The agent may ask for missing evidence. Once the user supplies actual
+  // details, the new full-document request must include those details and
+  // preserve every section, not merely clear the input field.
+  await full.getByRole('textbox',{name:'补充事实 1'})
+   .fill('确实曾在两个城市的门店协助整理真实运营记录。');
+  await full.getByRole('button',{name:/用已补充的事实重新撰写/}).click();
+  await full.waitForFunction(()=>
+   [...document.querySelectorAll('.hhba-whole-rewrite-block')]
+    .some(el=>el.textContent.includes('两个城市的门店协助整理真实运营记录')),
+   {timeout:20000});
+  await full.waitForFunction(()=>document.querySelectorAll('.hhba-whole-rewrite-block').length===9,
+   {timeout:15000});
+  assert.equal(await full.locator('.hhba-whole-rewrite-block').count(),9,
+   'user-confirmed missing evidence must lead to a new whole-document draft');
   assert.deepEqual(errors,[],'whole-document AI rewrite review must render without runtime errors');
   await full.close();
  }
