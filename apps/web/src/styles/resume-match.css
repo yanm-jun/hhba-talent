@@ -141,3 +141,12 @@
 @media(max-width:800px){.hhba-ai-layout{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:640px){.hhba-ai-upload{padding:17px}.hhba-ai-page{padding:17px 14px 55px}
  .hhba-ai-hero h1{font-size:27px}.hhba-ai-drop{min-height:145px}}
+
+/* Once a resume is selected, its document reading surface becomes the entire
+   work area. Avoid wasting a right column on generic marketing guidance. */
+.hhba-ai-layout.hhba-ai-layout-reading{grid-template-columns:minmax(0,1fr)}
+.hhba-ai-layout-reading .hhba-ai-aside{display:none}
+.hhba-ai-layout-reading .hhba-ai-upload{padding:22px 25px}
+@media(max-width:640px){
+ .hhba-ai-layout-reading .hhba-ai-upload{padding:15px 12px}
+}
