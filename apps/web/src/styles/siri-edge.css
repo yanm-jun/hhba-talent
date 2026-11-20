@@ -56,8 +56,8 @@
  .hhba-siri-edge::after { display: none !important; }
 }
 
-/* Text itself — not only its surrounding glow — carries Siri-inspired color.
-   Only confirmed edited / newly inserted text receives this class. */
+/* Siri-inspired color is ONLY for unconfirmed AI suggestions and in-progress
+   edits. Once a user confirms/saves, remove this class and render native styles. */
 .hhba-resume-siri-letters{
  display:inline-block;
  max-width:100%;
@@ -101,4 +101,28 @@
 }
 @media print{
  .hhba-original-resume-siri-ink{display:none!important}
+}
+
+/* Reuse a quiet, compact draft-preview style in both original-file editing
+   and the normalized job-optimization editor, across desktop and mobile. */
+.hhba-resume-pending-text{
+ margin:6px 0 1px;
+ padding:7px 9px;
+ max-height:95px;
+ overflow-y:auto;
+ background:#fbfcff;
+ border:1px solid #e5e9f1;
+ border-radius:8px;
+ font-size:13px;
+ line-height:1.6;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+.hhba-resume-pending-text .hhba-resume-siri-letters{
+ display:inline;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+@media print{
+ .hhba-resume-pending-text{display:none!important}
 }
