@@ -46,9 +46,19 @@ export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate
      onChange={e=>setAnswers(before=>({...before,[q.blockId+'::'+i]:e.target.value}))}/>
    </label>)}
    <button type="button" disabled={!Object.values(answers).some(x=>x.trim())}
-    onClick={()=>onRegenerate(Object.fromEntries(
-     Object.entries(answers).filter(([,value])=>value.trim()).map(([key,value])=>[key.split('::')[0],value.trim()])
-    ))}><RefreshCcw size={14}/> 用已补充的事实重新撰写</button>
+    onClick={()=>{
+     // The model may ask several separate questions about one source block.
+     // Send ALL real user answers, rather than silently keeping the last.
+     const grouped=new Map<string,string[]>();
+     for(const [key,value] of Object.entries(answers)){
+      const index=key.lastIndexOf('::');
+      const blockId=index<0?key:key.slice(0,index);
+      if(!value.trim())continue;
+      grouped.set(blockId,[...(grouped.get(blockId)||[]),value.trim()]);
+     }
+     onRegenerate(Object.fromEntries([...grouped].map(([id,items])=>
+      [id,items.join('\n')]))); 
+    }}><RefreshCcw size={14}/> 用已补充的事实重新撰写</button>
   </div>}
   <div className="hhba-whole-rewrite-blocks">
    {result.blocks.slice(0,revealedCount).map((block,index)=><details key={block.blockId}
