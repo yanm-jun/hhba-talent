@@ -1,7 +1,7 @@
 // Word text nodes may be edited only when their exact text appears uniquely
 // in the true PDF output produced from the SAME original DOCX.
 const plain=s=>String(s||'').normalize('NFKC').trim();
-export function matchWordAnchors({editableText,items,viewport,page}){
+export function matchWordAnchors({editableText,items,viewport,page,styles={}}){
  if(!Array.isArray(editableText)||!Array.isArray(items)||!viewport||
   !Number.isInteger(page)||page<1)return [];
  const candidates=new Set(editableText.filter(t=>typeof t==='string'&&
@@ -21,7 +21,10 @@ export function matchWordAnchors({editableText,items,viewport,page}){
    bbox[2]<12||bbox[3]<6||bbox[0]+bbox[2]>1000||bbox[1]+bbox[3]>1000)
    continue;
   const key=plain(item.str),matches=seen.get(key)||[];
-  matches.push({id:'word-'+page+'-'+matches.length,text:key,page,bbox});
+  const rawFamily=styles?.[item.fontName]?.fontFamily;
+  const fontFamily=typeof rawFamily==='string'&&
+   rawFamily.length<=100&&!/[;{}<>]/.test(rawFamily)?rawFamily:undefined;
+  matches.push({id:'word-'+page+'-'+matches.length,text:key,page,bbox,fontFamily});
   seen.set(key,matches);
  }
  const result=[];
