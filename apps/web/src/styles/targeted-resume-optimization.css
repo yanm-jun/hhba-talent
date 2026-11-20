@@ -680,3 +680,15 @@
   animation:none!important;transform:none!important;filter:none!important;opacity:1!important
  }
 }
+
+
+/* Keep the stage covered until the first PDF.js paint. Slow converters must
+   not show an empty loading card that instantly snaps to the resume later. */
+.targeted-resume.is-word-first .hhba-word-stage-waiting .targeted-resume-word-main{
+ opacity:0;transform:translateY(21px) scale(.972);
+}
+@media(prefers-reduced-motion:reduce){
+ .targeted-resume.is-word-first .hhba-word-stage-waiting .targeted-resume-word-main{
+  opacity:1;transform:none;
+ }
+}
