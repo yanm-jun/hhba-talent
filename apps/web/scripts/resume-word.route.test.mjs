@@ -148,7 +148,18 @@ test('only renderer-proven exact Word text is saved for downloadable edits',asyn
   assert.ok((await downloaded.arrayBuffer()).byteLength>500);
   const editedPage=await onRequestGet({request:req('edited-preview'),env:x.env});
   assert.equal(editedPage.status,200);
+  const pdfDownload=await onRequestGet({request:req('download-pdf'),env:x.env});
+  assert.equal(pdfDownload.status,200);
+  assert.equal(pdfDownload.headers.get('Content-Type'),'application/pdf');
+  assert.match(pdfDownload.headers.get('Content-Disposition'),/HHBA-resume-edited\\.pdf/);
+  assert.deepEqual(Buffer.from(await pdfDownload.arrayBuffer()),Buffer.from(await editedPage.arrayBuffer()),
+   'PDF download must be the exact bytes of the verified Word-rendered preview');
+  assert.equal((await onRequestGet({request:req('download-pdf'),env:fixture({owner:'other-account'}).env})).status,404,
+   'another account cannot download the PDF derivative');
   const base=store+'.hhba-word-preserved-v1-'+sha;
+  x.saved.set(base+'.edited.pdf',new Uint8Array([37,80,68,70,45,0]));
+  const alteredPdf=await onRequestGet({request:req('download-pdf'),env:x.env});
+  assert.equal(alteredPdf.status,409,'a corrupted PDF derivative must never download');
   x.saved.set(base+'.docx',new Uint8Array([0,1,2]));
   const corrupted=await onRequestGet({request:req('download'),env:x.env});
   assert.equal(corrupted.status,409,'never download a damaged or partially written Word');
