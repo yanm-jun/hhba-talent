@@ -6,6 +6,7 @@ import {extractDocxText} from '../services/docxProfile.mjs';
 import {OriginalWordViewer} from './OriginalWordViewer';
 import {matchVisualRegionsToPdfPage,type VerifiedResumeAnchor} from '../services/resumeVisualAnchors.mjs';
 import {planInlinePdfPreview,whitePdfPatchBackground} from '../services/resumeInlinePdfPreview.mjs';
+import {splitChangedResumeText} from '../services/resumeChangedText.mjs';
 import {createOriginalPdfSearchableCopy,downloadOriginalPdfSearchableCopy,verifyOriginalPdfSearchableCopy} from '../services/resumePdfReviewCopy.mjs';
 import {visualEditingReady,analyzeVisualResume,listPageResumeEdits,savePageResumeEdits,
  type VisualResumeLayout,type PageResumeEdit} from '../services/resumeVisualEditingApi';
@@ -261,6 +262,7 @@ function OriginalPdfViewer({resume,onClose}:{
       const plan=previewPlans.get(anchor.id);
       if(!plan?.safe)return null;
       const [x,y,w,h]=anchor.bbox;
+      const diff=splitChangedResumeText(anchor.text,plan.text);
       return <div className="hhba-original-resume-edit-patch" key={'patch-'+anchor.id}
        role="note" aria-label="已修改内容预览"
        style={{
@@ -268,8 +270,11 @@ function OriginalPdfViewer({resume,onClose}:{
         width:'calc('+w/10+'% + 4px)',height:'calc('+h/10+'% + 4px)',
         fontSize:plan.fontPx+'px'
        }}>
-       <span className="hhba-resume-siri-letters" data-resume-change="modified-or-added">
-        {plan.text}
+       <span className="hhba-original-resume-patch-line">
+        {diff.prefix}
+        {diff.changed&&<span className="hhba-resume-siri-letters"
+         data-resume-change="modified-or-added">{diff.changed}</span>}
+        {diff.suffix}
        </span>
       </div>;
      })}
