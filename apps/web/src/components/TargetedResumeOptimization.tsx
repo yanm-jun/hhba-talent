@@ -170,6 +170,15 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const generation=useRef(0);
  const active=useRef<AbortController|null>(null);
  useEffect(()=>{
+  // A different candidate Word or job must never inherit an earlier job's
+  // signed AI continuation, facts, approval or visible score.
+  active.current?.abort();
+  wholeRunInput.current=null;
+  setWholeDraft(null);setWholeBusy(false);
+  setWholeApproved(false);setWholeDownloaded(false);
+  setRevealedWholeCount(0);
+ },[job.id,sourceResume?.id,sourceText]);
+ useEffect(()=>{
   const abort=new AbortController();
   getResumeOptimizationStatus(abort.signal).then(setStatus);
   getWholeRewriteStatus(abort.signal).then(setWholeStatus);
