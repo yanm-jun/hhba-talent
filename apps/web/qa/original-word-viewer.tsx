@@ -47,9 +47,13 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
    return Promise.resolve(new Response(action==='preview'?originalPdf:editedPdf,{
     status:200,headers:{'Content-Type':'application/pdf','Content-Length':String(originalPdf.length)}
    }));
-  if(action==='download')return Promise.resolve(new Response(new Uint8Array(1250),{
-   status:200,headers:{'Content-Type':'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}
-  }));
+  if(action==='download'){
+   const simulatedDocx=new Uint8Array(1250);
+   simulatedDocx.set([80,75,3,4]); // Synthetic ZIP header for client-side signature guard.
+   return Promise.resolve(new Response(simulatedDocx,{
+    status:200,headers:{'Content-Type':'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}
+   }));
+  }
   if(init?.method==='POST'){
    const request=JSON.parse(String(init.body||'{}'));
    if(request.confirmed_real!==true||request.consent_word_processing!==true)
