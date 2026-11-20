@@ -552,6 +552,10 @@ try{
   assert.equal(await word.getByRole('button',{name:'重做'}).isDisabled(),true);
   await word.getByRole('button',{name:'撤销'}).click();
   await word.getByText('当前修改进度：1 / 2',{exact:false}).waitFor();
+  // Revision status updates immediately; the PDF.js source page must finish
+  // reopening before its editing/undo toolbar is enabled again.
+  await word.waitForFunction(()=>[...document.querySelectorAll('button')]
+   .some(button=>button.textContent?.includes('重做')&&!button.disabled));
   assert.equal(await word.getByRole('button',{name:'重做'}).isEnabled(),true);
   await word.getByRole('button',{name:'重做'}).click();
   await word.getByText('当前修改进度：2 / 2',{exact:false}).waitFor();
