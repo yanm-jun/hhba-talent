@@ -358,8 +358,10 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
     <Sparkles size={15}/> AI 建议{pendingSuggestionCount?' '+pendingSuggestionCount:''}</button>}
    <button type="button" disabled={busy||loading||revision<=0}
     onClick={()=>void changeRevision('undo')}><Undo2 size={15}/> 撤销</button>
+   <button type="button" disabled={busy||loading||revision>=totalRevisions}
+    onClick={()=>void changeRevision('redo')}><Redo2 size={15}/> 重做</button>
    <button type="button" disabled={busy||loading||!saved}
-    onClick={()=>void downloadSavedPdf()}><Download size={15}/> PDF</button>
+    onClick={()=>void downloadSavedPdf()}><Download size={15}/> 下载 PDF</button>
   </div>}
   {message&&<p className="hhba-original-resume-note" role="status">{message}</p>}
  </section>;
