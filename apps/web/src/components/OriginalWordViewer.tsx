@@ -202,7 +202,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
     if(!active)return;
     const items=content.items.filter((x:any)=>typeof x.str==='string') as any;
     setAnchors(matchWordAnchors({
-     editableText:editable,items,viewport:viewport as any,page
+     editableText:editable,items,styles:content.styles,viewport:viewport as any,page
     }));
     if(!renderedEntrance.current){
      renderedEntrance.current=true;
@@ -435,7 +435,8 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
         }}>
         {visual&&<span className="hhba-word-ai-preview" aria-hidden="true">
          <span className="hhba-word-ai-preview-text hhba-resume-siri-letters"
-          style={{fontSize:Math.max(9,Math.min(19,(h/1000*paperSize.height)*.82))+'px'}}>
+          style={{fontSize:Math.max(9,Math.min(19,(h/1000*paperSize.height)*.82))+'px',
+           fontFamily:anchor.fontFamily||undefined}}>
           {activeText}
          </span>
         </span>}
