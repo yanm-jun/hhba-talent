@@ -2,6 +2,7 @@ import {useEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,BriefcaseBusiness,MapPin,Wallet,X,Search} from 'lucide-react';
 import type {MatchResponse} from '../services/resumeMatch';
+import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 import {TargetedResumeOptimization} from './TargetedResumeOptimization';
 import {Link} from '../router';
@@ -10,10 +11,10 @@ import '../styles/resume-match-dialog.css';
 // Search-first evidence governs links; server scores and ranks. Never present a score as an offer probability.
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage,sourceText}:{
+export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage,sourceText,sourceResume}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'|'profile'>>;
- onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction;sourceText?:string
+ onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction;sourceText?:string;sourceResume?:PrivateResume
 }){
  const ref=useRef<HTMLDivElement|null>(null);
  const [optimizedJobId,setOptimizedJobId]=useState<string|null>(null);
@@ -112,7 +113,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
            {optimizedJobId===job.id?'收起简历优化':'针对这个岗位优化简历'}
           </button>
           {optimizedJobId===job.id&&<TargetedResumeOptimization
-           key={job.id} profile={parsedProfile} job={asTargetJob(job)} sourceText={sourceText}/>}
+           key={job.id} profile={parsedProfile} job={asTargetJob(job)} sourceText={sourceText} sourceResume={sourceResume}/>}
          </div>}
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
           data-hhba-recruitment-outbound="true">{job.recruitment_source_kind==='EMPLOYER_ATS'?
