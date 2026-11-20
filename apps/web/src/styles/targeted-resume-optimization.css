@@ -692,3 +692,22 @@
   opacity:1;transform:none;
  }
 }
+
+
+/* Mobile AI presentation must put the original Word back on screen.
+   A compact in-context status replaces the full-height assistant drawer. */
+.hhba-word-mobile-ai-status{display:none}
+@media(max-width:700px){
+ .targeted-resume.is-word-first .hhba-word-mobile-ai-status{
+  display:flex;width:100%;min-height:38px;align-items:center;justify-content:flex-start;
+  gap:7px;border:0;border-bottom:1px solid #e8edf3;background:transparent;
+  padding:7px 9px;margin:0 0 8px;text-align:left;
+  color:#506c84;font:600 11px/1.5 inherit;cursor:pointer;
+ }
+ .targeted-resume.is-word-first .hhba-word-mobile-ai-status>span{
+  margin-left:auto;color:#315f83;font-weight:650;white-space:nowrap;
+ }
+ .targeted-resume.is-word-first .hhba-word-mobile-ai-status:focus-visible{
+  outline:2px solid #7e9db7;outline-offset:2px;border-radius:5px;
+ }
+}
