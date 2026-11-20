@@ -40,7 +40,14 @@ function fixture(){
  const bucket={
   async put(key,bytes){objects.set(key,Buffer.from(bytes));},
   async get(key){const bytes=objects.get(key);return bytes?{body:new Blob([bytes]).stream()}:null;},
-  async delete(key){objects.delete(key);}
+  async delete(key){objects.delete(key);},
+  async list({prefix,limit=1000,cursor}){
+   const matches=[...objects.keys()].filter(k=>k.startsWith(prefix)).sort();
+   const start=cursor?Number(cursor):0;
+   const entries=matches.slice(start,start+limit);
+   return {objects:entries.map(key=>({key})),truncated:start+limit<matches.length,
+    cursor:start+limit<matches.length?String(start+limit):undefined};
+  }
  };
  const db={prepare(sql){return {bind(...args){return {
   async first(){
@@ -203,9 +210,11 @@ test('deleting a private Word original also cleans all derived previews and veri
  assert.equal(posted.response.status,201);
  const row=f.resumes.get(posted.payload.item.id);
  const prefix=row.storage_key+'.hhba-word-preserved-v1-'+row.sha256;
- const assets=['.source.pdf','.docx','.edited.pdf','.json'];
+ const assets=['.source.pdf','.docx','.edited.pdf','.json',
+  '.revision-11111111-2222-4333-8444-555555555555.docx',
+  '.revision-11111111-2222-4333-8444-555555555555.pdf'];
  for(const suffix of assets)f.objects.set(prefix+suffix,Buffer.from('synthetic fixture'));
- assert.equal(f.objects.size,5);
+ assert.equal(f.objects.size,7);
  const deleted=await invoke(f,'/'+row.id,PHONE_A,'DELETE');
  assert.equal(deleted.response.status,200);
  assert.equal(f.objects.size,0);
