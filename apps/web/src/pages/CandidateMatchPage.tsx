@@ -1,5 +1,5 @@
 import {ChangeEvent,DragEvent,useEffect,useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,BriefcaseBusiness,FileText,FileUp,LockKeyhole,LoaderCircle,ShieldCheck,XCircle} from 'lucide-react';
+import {ArrowLeft,ArrowRight,BriefcaseBusiness,ChevronDown,FileText,FileUp,LockKeyhole,LoaderCircle,ShieldCheck,XCircle} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
 import {Link} from '../router';
@@ -17,6 +17,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [file,setFile]=useState<File|null>(null);
  const [savedFiles,setSavedFiles]=useState<PrivateResume[]>([]);
  const [savedId,setSavedId]=useState('');
+ const [savedPickerOpen,setSavedPickerOpen]=useState(false);
  const deepLinkPending=useRef<string|null>(new URLSearchParams(window.location.search).get('resume'));
  const [previewText,setPreviewText]=useState('');
  const [previewLoaded,setPreviewLoaded]=useState(false);
@@ -52,6 +53,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    }
    void listPrivateResumes().then(rows=>{if(active){
     setSavedFiles(rows);setVaultError('');
+    setSavedId(previous=>previous&&rows.some(item=>item.id===previous)?previous:'');
     const requested=deepLinkPending.current;
     if(requested){
      deepLinkPending.current=null;
@@ -67,7 +69,16 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   return()=>{active=false;window.removeEventListener('hhba:private-resumes-changed',reload);
    window.removeEventListener('hhba:real-auth-changed',reload);};
  },[user?.id]);
+ function selectSavedResume(id:string){
+  if(working)return;
+  previewController.current?.abort();
+  setPreviewText('');setPreviewLoaded(false);setConsent(false);
+  setSavedId(id);setFile(null);setResult(null);setPartialJobs([]);
+  setError('');setSaveConsent(false);setSaveNotice('');
+  setSavedPickerOpen(false);
+ }
  function choose(candidate:File|null){
+  setSavedPickerOpen(false);
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);
   setError('');setResult(null);setSaveConsent(false);setSaveNotice('');
   if(!candidate){setFile(null);return}
@@ -162,16 +173,35 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     <div className="hhba-ai-layout">
       <section className="hhba-ai-upload">
         <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>PDF 或 DOCX，最大 3 MB。只有点击开始并同意授权后才分析，不会自动向企业投递。</p></header>
-        {user&&privateResumeAvailable&&<div className="hhba-ai-saved-picker">
-          <label htmlFor="hhba-ai-existing">使用「我的简历」中已经保存的文件（无需重新上传）</label>
-          <select id="hhba-ai-existing" value={savedId} disabled={working}
-           onChange={e=>{previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);setSavedId(e.target.value);setFile(null);setResult(null);setError('');}}>
-           <option value="">不使用已保存文件，改为下面选择新文件</option>
-           {savedFiles.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}
-          </select>
-          {!savedFiles.length&&<p>还没有保存的简历。可从 <Link to="/candidate/account/resume">我的简历</Link> 上传。</p>}
-          {vaultError&&<p role="status">{vaultError}</p>}
+        {user&&privateResumeAvailable&&savedFiles.length>0&&<div className="hhba-ai-saved-picker">
+          <button type="button" className="hhba-ai-saved-picker-trigger"
+           aria-expanded={savedPickerOpen} aria-controls="hhba-ai-existing-options"
+           disabled={working} onClick={()=>setSavedPickerOpen(open=>!open)}>
+           <span className="hhba-ai-saved-picker-heading"><FileText size={18}/>
+            <span><strong>从「我的简历」中选择</strong>
+             <small>{savedId&&savedFiles.some(item=>item.id===savedId)
+              ?'已选择：'+savedFiles.find(item=>item.id===savedId)!.name
+              :'已保存 '+savedFiles.length+' 份简历 · 点击展开'}</small></span>
+           </span>
+           <ChevronDown size={18} className={'hhba-ai-saved-picker-chevron'+(savedPickerOpen?' is-open':'')}/>
+          </button>
+          <div id="hhba-ai-existing-options" className="hhba-ai-saved-picker-content" hidden={!savedPickerOpen}>
+           <div role="radiogroup" aria-label="选择用于本次智能匹配的已保存简历" className="hhba-ai-saved-picker-options">
+            {savedFiles.map(item=><label key={item.id}
+              className={'hhba-ai-saved-picker-option'+(savedId===item.id?' is-selected':'')}>
+             <input type="radio" name="hhba-ai-existing" value={item.id} checked={savedId===item.id}
+              disabled={working} onChange={()=>selectSavedResume(item.id)}/>
+             <span className="hhba-ai-saved-picker-option-text">
+              <strong>{item.name}</strong>
+              <small>{(item.size/1024/1024).toFixed(2)} MB · {item.createdAt.slice(0,10)} 保存</small>
+             </span>
+            </label>)}
+           </div>
+           <button type="button" className="hhba-ai-saved-picker-clear" disabled={working}
+            onClick={()=>selectSavedResume('')}>不使用已保存简历，改为上传新文件</button>
+          </div>
         </div>}
+        {user&&privateResumeAvailable&&vaultError&&<p className="hhba-ai-vault-error" role="status">{vaultError}</p>}
         {!getRealAuthToken()&&<p className="hhba-ai-service-check">AI 简历匹配需要先 <Link to="/candidate/login?next=%2Fcandidate%2Fmatch">登录 HHBA 求职账号</Link>。</p>}
         <input id="hhba-ai-resume" className="sr-only" type="file" accept={supportedTypes}
           onChange={(e:ChangeEvent<HTMLInputElement>)=>choose(e.target.files?.[0]||null)}/>
@@ -180,7 +210,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           onDragLeave={()=>setDrag(false)}
           onDrop={(e:DragEvent<HTMLLabelElement>)=>{e.preventDefault();setDrag(false);choose(e.dataTransfer.files?.[0]||null)}}>
           <FileText size={26}/>
-          <strong>{savedId?'已选择私有简历：'+(savedFiles.find(x=>x.id===savedId)?.name||'') :file?file.name:'点击选择文件，或将简历拖到这里'}</strong>
+          <strong>{file?file.name:savedId?'或上传一份新简历，替换当前选择':'点击选择文件，或将简历拖到这里'}</strong>
           <span>{file?(file.size/1024/1024).toFixed(2)+' MB · 可以分析':'仅支持可提取文字的 PDF / DOCX；扫描图片暂不支持'}</span>
         </label>
         <div className="hhba-ai-review-tools">
