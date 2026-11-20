@@ -70,6 +70,6 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
 }) as typeof window.fetch;
 createRoot(document.getElementById('root')!).render(
  <div style={{maxWidth:760,margin:'18px auto'}}>
-  <OriginalWordViewer resume={resume} onClose={()=>{}}/>
+  <OriginalWordViewer resume={resume} onClose={()=>{}} suggestedChanges={[{original:"ORIGINAL WORD RESUME",proposed:"EDITED WORD RESUME"}]}/>
  </div>
 );
