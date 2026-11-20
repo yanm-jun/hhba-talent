@@ -18,7 +18,7 @@ import {officialJobVerifyStatus,verifyOfficialJob,type OfficialJobVerifyStatus,t
 import '../styles/targeted-resume-optimization.css';
 import '../styles/siri-edge.css';
 
-export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}:{profile:CandidateProfile;job:JobMatch;sourceText?:string;sourceResume?:PrivateResume}){
+export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,onDraftDirtyChange}:{profile:CandidateProfile;job:JobMatch;sourceText?:string;sourceResume?:PrivateResume;onDraftDirtyChange?:(dirty:boolean)=>void}){
  const blocks=useMemo<ResumeBlock[]>(()=>{
  const originals=[
   ...(Array.isArray(profile.experiences)?profile.experiences:[]).filter(e=>e.evidence?.trim()).map((e,i)=>({id:'experience-'+i,section:'experience' as const,text:e.evidence.slice(0,1600)})),
@@ -65,7 +65,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}
  const [undoStack,setUndoStack]=useState<ResumeVersion[]>([]);
  const [editingBlock,setEditingBlock]=useState<string|null>(null);
  const [manualText,setManualText]=useState('');
- const [openOriginalWord,setOpenOriginalWord]=useState(false);
+ const [activeSuggestionId,setActiveSuggestionId]=useState<string|null>(null);
  const generation=useRef(0);
  const active=useRef<AbortController|null>(null);
  useEffect(()=>{
@@ -172,6 +172,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}
     unique.add(s.id);usedBlocks.add(s.blockId);return true;
    }).map((s,i)=>({...s,id:('generation-'+(++generation.current)+'-'+i+'-'+s.id).slice(0,100)}));
    setSuggestions(accepted);
+   setActiveSuggestionId(accepted[0]?.id||null);
    setOpenSuggestionId(accepted[0]?.id||null);
    setNotice(accepted.length?'建议已生成。请逐条核实真实性，再选择填充。':'本次 AI 未发现可以可靠润色的内容。');
   }catch(error){
@@ -203,7 +204,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}
   try{
    commitVersion(applySuggestion(version,{...s,proposed},true));
    setOpenSuggestionId(null);setEditingSuggestionId(null);
-   setNotice('已在原来的简历段落直接填充。可以撤销，原始简历文件没有被修改。');
+   setNotice(sourceResume?'建议已确认。请在原 Word 上点选对应文字并再次确认保存；尚未改动原文件。':
+    '已在简历文字草稿内填充。可以撤销，原始 Word 文件没有被修改。');
   }catch{setNotice('原文已变化或缺乏真实证据，请重新生成建议。');}
  }
  function addFact(s:ResumeSuggestion){
@@ -217,7 +219,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}
   try{
    commitVersion(applySuggestion(version,{...s,action:'append',proposed:text},true));
    setOpenSuggestionId(null);
-   setNotice('已将你亲自填写的真实信息填充到简历对应位置。');
+   setNotice(sourceResume?'真实经历补充已记入建议草稿。复杂的新增段落暂不能安全自动写回原 Word，请自行核对。':
+    '已将你亲自填写的真实信息填充到简历文字草稿。');
   }catch{setNotice('原文已经变化，请重新生成补充建议。');}
  }
  function startEdit(block:ResumeBlock){
@@ -240,36 +243,9 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}
   setOpenSuggestionId(null);setEditingSuggestionId(null);setSuggestionDrafts({});setUndoStack([]);
   setNotice('已恢复原稿。');
  }
- function renderEditableBlock(id:string,text:string){
-  const block=version.blocks.find(item=>item.id===id);
-  if(!block)return <p className="hhba-print-paragraph">{text}</p>;
-  const s=suggestions.find(item=>item.blockId===id);
-  const applied=Boolean(s&&version.acceptedSuggestionIds.includes(s.id));
-  const dismissed=Boolean(s&&ignored.includes(s.id));
-  const pending=Boolean(s&&!applied&&!dismissed);
-  const draft=s?(suggestionDrafts[s.id]??s.proposed):'';
-  return <div className={'targeted-resume-inline-region'+(pending?' has-ai-suggestion':'')} data-resume-block-id={id}>
-   <div className="targeted-resume-inline-anchor">
-    {editingBlock===id?<div className="targeted-resume-inline-editor">
-     <textarea rows={4} maxLength={1600} value={manualText}
-      onChange={e=>setManualText(e.target.value)}
-      className={manualText!==block.text?'hhba-siri-typing':''}
-      aria-label="编辑当前简历段落"/>
-     <div><button type="button" onClick={saveEdit}>保存本次修改</button>
-      <button type="button" onClick={()=>{setEditingBlock(null);setManualText('')}}>取消</button></div>
-    </div>:<p className="hhba-print-paragraph">{text}</p>}
-    {editingBlock!==id&&<div className="targeted-resume-inline-controls">
-     {pending&&s&&<button type="button" className="targeted-resume-ai-trigger"
-      aria-expanded={openSuggestionId===s.id} aria-label="查看此处 AI 修改建议"
-      onClick={()=>{setOpenSuggestionId(openSuggestionId===s.id?null:s.id);setEditingSuggestionId(null)}}>
-      <Sparkles size={14} aria-hidden="true"/> AI 建议</button>}
-     <button type="button" aria-label="编辑当前简历段落" onClick={()=>startEdit(block)}>
-      <PencilLine size={13} aria-hidden="true"/> 修改</button>
-     {applied&&<span className="targeted-resume-applied"><CheckCircle2 size={12} aria-hidden="true"/> 已填充</span>}
-    </div>}
-   </div>
-   {pending&&s&&openSuggestionId===s.id&&editingBlock!==id&&
-    <div className="targeted-resume-popover-shell hhba-siri-edge hhba-siri-edge-active">
+ function renderSuggestionCard(s:ResumeSuggestion){
+  const draft=suggestionDrafts[s.id]??s.proposed;
+  return <div className="targeted-resume-popover-shell hhba-siri-edge hhba-siri-edge-active">
     <div className="targeted-resume-suggestion targeted-resume-popover" role="region"
     aria-label="当前简历段落的 AI 建议">
     <div className="targeted-resume-popover-head">
@@ -305,7 +281,36 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}
      <button type="button" onClick={()=>{setIgnored(v=>[...v,s.id]);setOpenSuggestionId(null)}}>保留原文</button>
     </div>
    </div>
-   </div>}
+   </div>;
+ }
+ function renderEditableBlock(id:string,text:string){
+  const block=version.blocks.find(item=>item.id===id);
+  if(!block)return <p className="hhba-print-paragraph">{text}</p>;
+  const s=suggestions.find(item=>item.blockId===id);
+  const applied=Boolean(s&&version.acceptedSuggestionIds.includes(s.id));
+  const dismissed=Boolean(s&&ignored.includes(s.id));
+  const pending=Boolean(s&&!applied&&!dismissed);
+  return <div className={'targeted-resume-inline-region'+(pending?' has-ai-suggestion':'')} data-resume-block-id={id}>
+   <div className="targeted-resume-inline-anchor">
+    {editingBlock===id?<div className="targeted-resume-inline-editor">
+     <textarea rows={4} maxLength={1600} value={manualText}
+      onChange={e=>setManualText(e.target.value)}
+      className={manualText!==block.text?'hhba-siri-typing':''}
+      aria-label="编辑当前简历段落"/>
+     <div><button type="button" onClick={saveEdit}>保存本次修改</button>
+      <button type="button" onClick={()=>{setEditingBlock(null);setManualText('')}}>取消</button></div>
+    </div>:<p className="hhba-print-paragraph">{text}</p>}
+    {editingBlock!==id&&<div className="targeted-resume-inline-controls">
+     {pending&&s&&<button type="button" className="targeted-resume-ai-trigger"
+      aria-expanded={openSuggestionId===s.id} aria-label="查看此处 AI 修改建议"
+      onClick={()=>{setOpenSuggestionId(openSuggestionId===s.id?null:s.id);setEditingSuggestionId(null)}}>
+      <Sparkles size={14} aria-hidden="true"/> AI 建议</button>}
+     <button type="button" aria-label="编辑当前简历段落" onClick={()=>startEdit(block)}>
+      <PencilLine size={13} aria-hidden="true"/> 修改</button>
+     {applied&&<span className="targeted-resume-applied"><CheckCircle2 size={12} aria-hidden="true"/> 已填充</span>}
+    </div>}
+   </div>
+   {pending&&s&&openSuggestionId===s.id&&editingBlock!==id&&renderSuggestionCard(s)}
   </div>;
  }
  // The legacy browser-print template is retained solely for synthetic QA.
@@ -329,6 +334,20 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}
    occurrences.set(change.original,(occurrences.get(change.original)||0)+1);
   return candidates.filter(change=>occurrences.get(change.original)===1);
  },[suggestions,version.blocks,version.acceptedSuggestionIds]);
+ const pendingSuggestions=suggestions.filter(s=>!ignored.includes(s.id)&&
+  !version.acceptedSuggestionIds.includes(s.id));
+ const acceptedCount=suggestions.filter(s=>version.acceptedSuggestionIds.includes(s.id)).length;
+ const draftDirty=hasWordingChanges||Boolean(editingBlock)||
+  Object.values(suggestionDrafts).some(value=>value.trim().length>0)||
+  Object.values(newEvidence).some(value=>value.trim().length>0)||
+  Object.values(details).some(value=>String(value||'').trim().length>0);
+ useEffect(()=>{onDraftDirtyChange?.(draftDirty);},[draftDirty,onDraftDirtyChange]);
+ useEffect(()=>{
+  if(!draftDirty)return;
+  const prevent=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue='';};
+  window.addEventListener('beforeunload',prevent);
+  return()=>window.removeEventListener('beforeunload',prevent);
+ },[draftDirty]);
  const hasSession=realAuthReady&&Boolean(getRealAuthToken());
  return <section className="targeted-resume" aria-label="岗位定向简历优化">
   <div className="targeted-resume-heading">
@@ -354,6 +373,49 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}
    <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>
    <span>我同意将下方展示的简历证据片段与该岗位要求发送给平台选定的第三方 AI 服务商进行润色。服务器会尽力脱敏常见联系方式，但不能确保移除所有个人信息。建议内容只供本人核实与选择，不会自动投递。</span>
   </label>}
+  {sourceResume?<section className="targeted-resume-word-workspace" aria-label="原版式 Word 统一编辑工作区">
+   <div className="targeted-resume-word-main">
+    <OriginalWordViewer resume={sourceResume!} suggestedChanges={confirmedWordChanges} onClose={()=>{}}/>
+   </div>
+   <aside className="targeted-resume-word-assistant" aria-label="AI 建议工作台">
+    <div className="targeted-resume-word-assistant-head">
+     <strong><Sparkles size={15}/> AI 修改建议</strong>
+     <p>左侧始终是你的原 Word；这里的建议只有经你确认后才会预填。真正保存仍需要在原 Word 再次确认。</p>
+     <div className="targeted-resume-word-counts" role="status">
+      <span>待确认 {pendingSuggestions.length}</span><span>已采纳 {acceptedCount}</span><span>保留原文 {ignored.length}</span>
+     </div>
+    </div>
+    {suggestions.length===0?<p className="targeted-resume-word-empty">
+     {busy?'正在生成建议…':'点击上方「生成 AI 建议」，逐条核对后在原 Word 中应用。'}</p>:
+    <div className="targeted-resume-word-suggestion-list">
+     {suggestions.map((item,i)=>{
+      const applied=version.acceptedSuggestionIds.includes(item.id);
+      const rejected=ignored.includes(item.id);
+      const active=activeSuggestionId===item.id;
+      return <section key={item.id} className={'targeted-resume-word-suggestion'+(active?' is-active':'')}>
+       <button type="button" className="targeted-resume-word-suggestion-title"
+        aria-expanded={active} onClick={()=>{setActiveSuggestionId(active?null:item.id);setOpenSuggestionId(active?null:item.id);setEditingSuggestionId(null);}}>
+        <span>{String(i+1).padStart(2,'0')} · {item.action==='request_evidence'?'补充真实经历':'优化文字表达'}</span>
+        <small>{applied?'已确认':rejected?'保留原文':'待确认'}</small>
+       </button>
+       {active&&<div className="targeted-resume-word-suggestion-detail">
+        <p className="targeted-resume-word-original"><strong>原文：</strong>{item.original}</p>
+        {!applied&&!rejected?renderSuggestionCard(item):
+         <p className="targeted-resume-word-status">
+          {applied?'建议已确认。请在左侧找到对应原文，核对并保存到 Word。':
+           '本条保留原文，不进行修改。'}
+         </p>}
+       </div>}
+      </section>
+     })}
+    </div>}
+    {confirmedWordChanges.length>0&&<p className="targeted-resume-word-next-step">
+      已有 {confirmedWordChanges.length} 条符合严格文字条件的建议可尝试带入原 Word。
+      点击左侧对应文字，最终修改必须再次确认并通过版式校验。
+     </p>}
+    <p className="targeted-resume-word-privacy">系统不会把 AI 草稿直接覆盖 Word；无法精确对应或会改变字体版式的建议将拒绝自动保存。</p>
+   </aside>
+  </section>:<>
   <section className="targeted-resume-document-editor" aria-label="正式简历排版与打印">
    <div className="targeted-resume-document-heading">
     <div><strong>直接修改简历</strong>
@@ -382,25 +444,13 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}
    <p className="targeted-resume-print-note">此处用于核对 AI 文字建议，下载的 Word 草稿会重新排版，并非上传文件的原样式。需要保留字体和版式，请到 <Link to="/candidate/account/resume">我的简历</Link> 编辑原 Word；通过验证后，可下载 Word 和由 Word 转换的 PDF。</p>
    {!canExport&&<p className="targeted-resume-print-note" role="status">请填写真实姓名、确认简历内容完整，并保存正在编辑的段落，才可以下载 Word 草稿。</p>}
   </section>
-  {sourceResume?.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'&&
-   <section className="targeted-resume-document-editor" aria-label="原 Word 编辑和导出">
-    <div className="targeted-resume-document-heading">
-     <div><strong>原版式 Word</strong>
-      <p>已确认的 AI 建议只有与 Word 原文精确对应，才会自动填入待确认编辑框。不会覆盖原件。</p></div>
-     <div className="targeted-resume-document-actions">
-      <button type="button" onClick={()=>setOpenOriginalWord(v=>!v)}>
-       <PencilLine size={15}/>{openOriginalWord?'收起原 Word':'在原 Word 中编辑 / 导出 PDF'}</button>
-     </div>
-    </div>
-    {openOriginalWord&&<OriginalWordViewer resume={sourceResume}
-     suggestedChanges={confirmedWordChanges} onClose={()=>setOpenOriginalWord(false)}/>}
-   </section>}
   <div className={'targeted-resume-live-paper hhba-siri-edge'+
     ((openSuggestionId||editingBlock)?' hhba-siri-edge-active':'')}
     aria-label="可原位编辑的简历预览">
    <ResumePrintSheet document={printDocument} renderBlock={renderEditableBlock}/>
   </div>
-  {before.score!==null&&<div className="targeted-resume-audit" aria-label="文字证据覆盖变化">
+  </>}
+  {!sourceResume&&before.score!==null&&<div className="targeted-resume-audit" aria-label="文字证据覆盖变化">
    <div><small>优化前 · 要求文字覆盖</small><strong>{before.score}%</strong></div>
    <span aria-hidden="true">→</span>
    <div><small>当前版本 · 要求文字覆盖</small><strong>{after.score}%</strong></div>
@@ -408,7 +458,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}
    {after.missing.length>0&&<details><summary>仍未充分体现的要求（{after.missing.length}）</summary>
     <ul>{after.missing.map((label,index)=><li key={index}>{label}</li>)}</ul></details>}
   </div>}
-  <section className="targeted-resume-reassess" aria-label="岗位匹配评分复评">
+  {!sourceResume&&<section className="targeted-resume-reassess" aria-label="岗位匹配评分复评">
    <div className="targeted-resume-reassess-heading">
     <div><strong>重新查看匹配分</strong>
      <p>只有核实了企业发布的岗位要求后，才会比较修改前后的分数。</p></div>
@@ -465,29 +515,29 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}
      </details>
      <p className="targeted-resume-score-disclaimer">{scoreResult.important_notice}</p>
     </div>}
-  </section>
-  <div className="targeted-resume-save">
+  </section>}
+  {!sourceResume&&<div className="targeted-resume-save">
    <div><strong><FolderOpen size={16} aria-hidden="true"/> 我的岗位简历版本</strong>
     <p>仅在你主动保存后，将当前已确认的文字片段保存在 HHBA 私人账号中；不保存原始 PDF/DOCX。</p></div>
    {hasSession&&storageReady&&<button type="button" disabled={saving||!confirmReal||!canPrint} onClick={persist}>
     <Save size={14} aria-hidden="true"/>{saving?'保存中…':'保存当前版本'}</button>}
    {hasSession&&!storageReady&&<span className="targeted-resume-unavailable">暂时无法保存，请稍后再试</span>}
-  </div>
-  {hasSession&&storageReady&&<label className="targeted-resume-confirm targeted-resume-save-confirm">
+  </div>}
+  {!sourceResume&&hasSession&&storageReady&&<label className="targeted-resume-confirm targeted-resume-save-confirm">
    <input type="checkbox" checked={confirmReal} onChange={e=>setConfirmReal(e.target.checked)}/>
    我已核实当前简历的全部文字及个人联系方式真实准确，理解点击保存后这些资料会保存在我的 HHBA 云端账户，直到我主动删除或按平台数据政策处理。
   </label>}
-  {saved.length>0&&<div className="targeted-resume-history">
+  {!sourceResume&&saved.length>0&&<div className="targeted-resume-history">
    {saved.map(item=><div key={item.id}>
     <span>{new Date(item.created_at).toLocaleString()} · {item.version.acceptedSuggestionIds.length} 条已采纳</span>
     <button type="button" onClick={()=>restore(item)}>载入</button>
     <button type="button" onClick={()=>remove(item)}>删除</button>
    </div>)}
   </div>}
-  <div className="targeted-resume-footer">
+  {!sourceResume&&<div className="targeted-resume-footer">
    <p><ShieldCheck size={14} aria-hidden="true"/> 原来的参考分：{Number.isInteger(job.reference_score)?job.reference_score+'/100':'暂无可靠分数'}。润色后的匹配分须通过同一评分规则重新评估；评分仅供参考。</p>
    <button type="button" onClick={reset}><Undo2 size={14}/> 恢复原稿</button>
-  </div>
+  </div>}
   {notice&&<p role="status" className="targeted-resume-notice">{notice}</p>}
   {legacyPrintQa&&createPortal(<div className="hhba-print-host" data-hhba-print-host="resume">
     <ResumePrintSheet document={printDocument}/>
