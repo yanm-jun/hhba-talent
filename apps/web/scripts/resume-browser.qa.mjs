@@ -1012,6 +1012,56 @@ try{
   await scorePage.close();
  }
 
+ // Cloudflare Preview-only synthetic design showcase, in real Chromium.
+ // Never submit a resume or contact external AI from this local fixture.
+ for(const view of [{name:'desktop',width:1250,height:950},
+                    {name:'mobile',width:390,height:844}]){
+  const demo=await browser.newPage({viewport:{width:view.width,height:view.height},
+   isMobile:view.name==='mobile',locale:'zh-CN'});
+  const runtimeErrors=[];
+  demo.on('pageerror',e=>runtimeErrors.push(e.message));
+  const pageUrl=new URL('../preview-only/resume-siri.html',import.meta.url).href;
+  const response=await demo.goto(pageUrl,{waitUntil:'load'});
+  assert.ok(response&&response.ok(),view.name+' local Siri visual preview must load');
+  await assertSiriEdge(demo,'.siri-stage.active',view.name+' isolated Siri preview');
+  assert.equal(await demo.locator('.rainbow-text:visible').count(),2,
+   'changed and expanded lines must have pending Siri ink');
+  const gradient=await demo.locator('.rainbow-text').first().evaluate(el=>({
+   image:getComputedStyle(el).backgroundImage,
+   animation:getComputedStyle(el).animationName,
+   fill:getComputedStyle(el).getPropertyValue('-webkit-text-fill-color')
+  }));
+  assert.match(gradient.image,/linear-gradient/);
+  assert.match(gradient.animation,/hhba-resume-siri-letters-flow/);
+  assert.equal(gradient.fill,'rgba(0, 0, 0, 0)');
+  if(view.name==='mobile'){
+   const dims=await demo.evaluate(()=>({
+    client:document.documentElement.clientWidth,
+    scroll:document.documentElement.scrollWidth
+   }));
+   assert.ok(dims.scroll<=dims.client+2,
+    'Siri mobile preview must not overflow: '+JSON.stringify(dims));
+   await demo.locator('#mobile-toggle').click();
+   await demo.locator('#review-panel.open').waitFor();
+  }
+  await demo.screenshot({path:output+'/siri-review-preview-'+view.name+'-pending.png',
+   fullPage:true});
+  await demo.getByRole('button',{name:'确认这两处修改（演示）'}).click();
+  assert.equal(await demo.locator('.siri-stage.active').count(),0,
+   'confirmed wording must remove Siri perimeter');
+  assert.equal(await demo.locator('.rainbow-text:visible').count(),0,
+   'confirmed wording must remove rainbow ink');
+  assert.equal(await demo.locator('.native-text:visible').count(),2,
+   'confirmed wording must be readable in native typography');
+  await demo.screenshot({path:output+'/siri-review-preview-'+view.name+'-confirmed.png',
+   fullPage:true});
+  if(view.name==='mobile')await demo.locator('#mobile-toggle').click();
+  await demo.getByRole('button',{name:'重新演示彩虹效果'}).click();
+  assert.equal(await demo.locator('.siri-stage.active').count(),1);
+  assert.deepEqual(runtimeErrors,[]);
+  await demo.close();
+ }
+
  console.log(JSON.stringify({result:'PASSED',desktop_pdf_pages:pages.length,
   long_pdf_pages:longPages.length,mobile:metrics,qa_output:output}));
 }finally{await browser.close()}
