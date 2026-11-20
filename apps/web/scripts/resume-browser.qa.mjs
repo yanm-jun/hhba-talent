@@ -3,6 +3,7 @@ import {execFileSync} from 'node:child_process';
 import {mkdir,writeFile,readFile} from 'node:fs/promises';
 import {chromium} from 'playwright-core';
 import {getDocument} from 'pdfjs-dist/legacy/build/pdf.mjs';
+import {patchPdfWithOriginalCjkFont} from '../src/services/resumePdfCjkFont.mjs';
 
 const url='http://127.0.0.1:3000/qa/resume-flow.html';
 const output=process.env.QA_OUTPUT||'/tmp/hhba-resume-browser-qa';
@@ -432,6 +433,55 @@ try{
  assert.deepEqual(authenticErrors,[]);
  await authentic.close();
 
+ // Complete candidate UI path using a real embedded Chinese-font source:
+ // open original, edit in Siri rainbow, confirm, display native font, download.
+ // Run on desktop and mobile with only synthetic credentials and fixture data.
+ for(const view of [{width:1100,height:900,name:'desktop'},
+                    {width:390,height:844,name:'mobile'}]){
+  const cjkUI=await browser.newPage({viewport:{width:view.width,height:view.height},
+   locale:'zh-CN',acceptDownloads:true});
+  const issues=[];cjkUI.on('pageerror',e=>issues.push(e.message));
+  await cjkUI.goto('http://127.0.0.1:3000/qa/original-cjk-resume-viewer.html',
+   {waitUntil:'networkidle',timeout:45000});
+  const begin=cjkUI.getByRole('button',{name:'开始修改'});
+  await begin.waitFor({timeout:15000});
+  await cjkUI.locator('.hhba-original-resume-start input[type=checkbox]').check();
+  await begin.click();
+  await cjkUI.getByRole('button',{name:'修改这段简历'}).waitFor({timeout:18000});
+  await cjkUI.getByRole('button',{name:'修改这段简历'}).click();
+  const input=cjkUI.getByRole('textbox',{name:'修改这段内容'});
+  await input.fill('工作经历中国测试');
+  assert.match(await input.evaluate(el=>getComputedStyle(el).backgroundImage),/linear-gradient/);
+  await cjkUI.screenshot({path:output+'/original-cjk-'+view.name+'-pending-siri.png',
+   fullPage:true});
+  await cjkUI.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
+  await cjkUI.getByRole('button',{name:'保存',exact:true}).click();
+  const download=cjkUI.getByRole('button',{name:'下载 PDF'});
+  await download.waitFor({timeout:20000});
+  assert.equal(await cjkUI.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),0,
+   'saved Chinese edits should immediately remove Siri page glow');
+  assert.equal(await cjkUI.locator('.hhba-siri-typing').count(),0,
+   'real Chinese glyphs, not rainbow draft fonts, must render after confirmation');
+  await cjkUI.screenshot({path:output+'/original-cjk-'+view.name+'-native-font-confirmed.png',
+   fullPage:true});
+  const event=cjkUI.waitForEvent('download');
+  await download.click();
+  const downloaded=await event;
+  const file=output+'/original-cjk-'+view.name+'-native-font-edited.pdf';
+  await downloaded.saveAs(file);
+  const edited=await readFile(file);
+  const source=await readFile('qa/generated-cjk-original.pdf');
+  const native=patchPdfWithOriginalCjkFont(new Uint8Array(source),
+   '中国测试工作经历','工作经历中国测试');
+  assert.deepEqual(new Uint8Array(edited),native.bytes,
+   'all original font bytes, CMap, style, positions, and xref must remain unchanged');
+  const texts=await pdfText(edited);
+  assert.equal(texts.length,1);
+  assert.ok(texts.join(' ').includes('工作经历中国测试'));
+  assert.ok(!texts.join(' ').includes('中国测试工作经历'));
+  assert.deepEqual(issues,[],'Chinese native PDF browser should not crash');
+  await cjkUI.close();
+ }
  // True original Word page preview (no HHBA re-template), in-place edit and
  // verified Word download. Fixture uses only synthetic data and fake endpoints.
  for(const view of [{width:1100,height:900,name:'desktop'},
