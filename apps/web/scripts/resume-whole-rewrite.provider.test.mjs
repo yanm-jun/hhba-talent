@@ -152,7 +152,7 @@ test('full resume planner may prioritize every existing block but may never omit
 });
 test('cannot borrow a genuine numeric achievement from another employer block',async()=>{
  const blocks=[
-  {id:'experience-a',section:'experience',text:'2023 年，负责 A 门店，完成 50 单。'},
+  {id:'experience-a',section:'experience',text:'2023年，负责A门店，完成50单。'},
   {id:'experience-b',section:'experience',text:'2024 年，负责 B 门店客户沟通。'}
  ];
  const original=globalThis.fetch;
@@ -163,7 +163,7 @@ test('cannot borrow a genuine numeric achievement from another employer block',a
   if(system.includes('专业简历撰写者')){
    return fakeResponse({rewrites:input.blocks.map(b=>({
     blockId:b.id,
-    text:b.id==='experience-b'?b.text+'期间完成 50 单。':b.text,
+    text:b.id==='experience-b'?b.text+'期间业绩提升50%。':b.text,
     sourceQuotes:[b.text],
     rationale:'工作成果表达',jobRequirements:[]
    }))});
