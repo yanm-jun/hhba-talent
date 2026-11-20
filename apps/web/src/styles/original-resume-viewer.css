@@ -613,3 +613,34 @@
   animation:none!important;clip-path:none!important;opacity:1!important
  }
 }
+
+
+/* The preview retains source words in neutral ink and colors only the actual
+   Unicode diff; overflow focuses on the real changed fragment, never a fake
+   replacement string. The full suggestion remains in the AI review rail. */
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text>span{
+ position:static;top:auto;left:auto;right:auto;bottom:auto;display:inline;
+ margin:0;padding:0;border:0;border-radius:0;opacity:1;
+ font:inherit;line-height:inherit;white-space:inherit;pointer-events:none;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text>.hhba-word-ai-unchanged{
+ color:#2c3b4a!important;background:none!important;
+ -webkit-text-fill-color:#2c3b4a!important;animation:none!important;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text>.hhba-word-ai-changed{
+ color:#4377d9;background-image:linear-gradient(105deg,
+  #009cc2 0%,#3a7fe6 17%,#8351d5 36%,
+  #c84f9f 55%,#de7958 74%,#16b5cd 100%);
+ background-size:175% 100%;-webkit-background-clip:text;background-clip:text;
+ -webkit-text-fill-color:transparent;
+ animation:hhba-resume-siri-letters-flow 7s ease-in-out infinite alternate;
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text>.hhba-word-ai-changed{
+  animation:none!important;background-position:42% 50%;
+ }
+}
