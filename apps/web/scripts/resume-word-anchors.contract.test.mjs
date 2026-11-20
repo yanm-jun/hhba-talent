@@ -18,3 +18,12 @@ test('duplicate, split, rotated and invented text never becomes editable',()=>{
   transform:[14,1,0,14,70,700]}]),[]);
  assert.deepEqual(anchor(['虚构文字'],[item('原始工作经历描述')]),[]);
 });
+
+test('Siri preview inherits the rendered Word font family only from safe PDF.js style data',()=>{
+ const a=matchWordAnchors({editableText:['岗位经历'],items:[{...item('岗位经历'),fontName:'f1'}],
+  styles:{f1:{fontFamily:'Noto Sans CJK SC'}},viewport,page:1});
+ assert.equal(a[0]?.fontFamily,'Noto Sans CJK SC');
+ const dangerous=matchWordAnchors({editableText:['岗位经历'],items:[{...item('岗位经历'),fontName:'f1'}],
+  styles:{f1:{fontFamily:'bad;url(example.com)'}},viewport,page:1});
+ assert.equal(dangerous[0]?.fontFamily,undefined);
+});
