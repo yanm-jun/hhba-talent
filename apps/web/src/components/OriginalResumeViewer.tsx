@@ -268,7 +268,9 @@ function OriginalPdfViewer({resume,onClose}:{
         width:'calc('+w/10+'% + 4px)',height:'calc('+h/10+'% + 4px)',
         fontSize:plan.fontPx+'px'
        }}>
-       {plan.text}
+       <span className="hhba-resume-siri-letters" data-resume-change="modified-or-added">
+        {plan.text}
+       </span>
       </div>;
      })}
      {layout&&anchors.map(anchor=>{
