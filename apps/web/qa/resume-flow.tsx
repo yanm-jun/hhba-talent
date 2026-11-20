@@ -14,7 +14,7 @@ const long=new URLSearchParams(location.search).has('long');
 const truncated=new URLSearchParams(location.search).has('truncated');
 const sourceText=nativeWord&&fullWriterQA?
  'ORIGINAL WORD RESUME'+Array.from({length:8},(_,i)=>
-  '\\n\\n虚构经历段落'+(i+1)+'：实际参与门店运营记录和日常业务协作。').join(''):
+  '\n\n虚构经历段落'+(i+1)+'：实际参与门店运营记录和日常业务协作。').join(''):
  nativeWord?'ORIGINAL WORD RESUME':truncated?'这是完全虚构的超长简历测试文字，不能把丢失的内容导出成完整简历。'.repeat(1200):long?Array.from({length:12},(_,i)=>
  '第'+(i+1)+'段：在虚构的测试项目中记录运营流程与客户问题。'.repeat(18)
 ).join('\n\n'):'曾参与测试门店的运营记录整理与客户预约协调。\n\n独立整理每周工作进度并协助团队沟通。';
