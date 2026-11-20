@@ -1,14 +1,18 @@
 import {patchPdfWithOriginalFont} from './resumePdfNativeFont.mjs';
+import {patchPdfWithOriginalCjkFont} from './resumePdfCjkFont.mjs';
 const fail=()=>{throw Error('PDF_NATIVE_NOT_VERIFIED')};
 const ensure=condition=>{if(!condition)fail()};
 export async function verifyOriginalFontPdfPatch({
  originalBytes,editedBytes,proof,getDocument,canvasFactory
 }){
- ensure(proof?.schema==='HHBA_PDF_NATIVE_FONT_V1'&&
+ ensure((proof?.schema==='HHBA_PDF_NATIVE_FONT_V1'||
+  proof?.schema==='HHBA_PDF_CJK_CID_V1')&&
   originalBytes instanceof Uint8Array&&editedBytes instanceof Uint8Array&&
   originalBytes.length===editedBytes.length&&
   typeof getDocument==='function'&&typeof canvasFactory==='function');
- const reconstructed=patchPdfWithOriginalFont(originalBytes,proof.oldText,proof.newText);
+ const reconstructed=proof.schema==='HHBA_PDF_CJK_CID_V1'?
+  patchPdfWithOriginalCjkFont(originalBytes,proof.oldText,proof.newText):
+  patchPdfWithOriginalFont(originalBytes,proof.oldText,proof.newText);
  ensure(reconstructed.proof.offset===proof.offset&&
   reconstructed.proof.fontName===proof.fontName&&
   reconstructed.bytes.every((byte,i)=>editedBytes[i]===byte));
