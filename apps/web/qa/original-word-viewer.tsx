@@ -43,7 +43,7 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
    ok:true,editable_text:saved?[]:['ORIGINAL WORD RESUME'],
    saved:saved?{original:'ORIGINAL WORD RESUME',text:'EDITED WORD RESUME',updated_at:'2026-11-20T00:00:00Z'}:null
   }));
-  if(action==='preview'||action==='edited-preview')
+  if(action==='preview'||action==='edited-preview'||action==='download-pdf')
    return Promise.resolve(new Response(action==='preview'?originalPdf:editedPdf,{
     status:200,headers:{'Content-Type':'application/pdf','Content-Length':String(originalPdf.length)}
    }));
