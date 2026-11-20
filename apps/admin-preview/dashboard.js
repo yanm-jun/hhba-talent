@@ -161,7 +161,7 @@ async function refreshGrowth(){
  if(requestId===growthRequestId)updateGrowth();
 }
 
-const titles={overview:'运营驾驶舱',users:'个人用户分析',market:'官方岗位索引',library:'17个行业馆',membership:'会员与月度服务',rights:'权益支持案件',operations:'运营运行监测',
+const titles={agent:'AI 求职 Agent',overview:'运营驾驶舱',users:'个人用户分析',market:'官方岗位索引',library:'17个行业馆',membership:'会员与月度服务',rights:'权益支持案件',operations:'运营运行监测',
  finance:'财务与透明公开',investor:'历史数据展示',settings:'系统与权限'};
 const details={
  users:['真实用户注册与业务操作','账号级行为追踪已停止；注册和收藏来自真实数据库，页面事件仅计次数。'],
@@ -176,7 +176,7 @@ function setView(view,options={}){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(['investor','overview','users','market','library','membership','rights','operations','finance'].includes(view)?view:'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users','market','library','membership','rights','operations','finance','agent'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -191,6 +191,7 @@ function setView(view,options={}){
  }
  if(view==='market')void window.hhbaMarket?.open();
  if(view==='finance')window.hhbaFinance?.open();
+ if(view==='agent')window.hhbaCandidateAgent?.open();
  if(details[view]){
   byId('placeholder-heading').textContent=titles[view];
   byId('placeholder-subtitle').textContent=details[view][0];

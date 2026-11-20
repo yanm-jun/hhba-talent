@@ -19,7 +19,7 @@ DIST = WEB / "dist"
 
 def main():
     branch = os.environ.get("CF_PAGES_BRANCH", "")
-    if branch not in ("feat/admin-password-console-20261112", "feat/admin-cend-console-20261117"):
+    if branch not in ("feat/admin-password-console-20261112", "feat/admin-cend-console-20261117", "feature/admin-agent-skills-center-stage2-20261120"):
         raise SystemExit("Refusing standalone admin build on an unapproved branch: " + branch)
     # The private employer baseline lives in admin-only KV catalog:baseline:v1.
     # Never download a one-hour D1 export URL at build time: that expiring
@@ -30,6 +30,7 @@ def main():
     files = [
         "index.html","dashboard.js","market.js","finance.js","finance-report.js","finance-report.css","finance-ai.js","finance-ai.css","command-center.js","command-center.css","styles.css","cend-console.css","library.js","library.css",
         "library-file-ui.js","library-file-import.js","admin-console-ui.js",
+        "candidate-agent-console.js","candidate-agent-console.css",
         "favicon.svg"
     ]
     for f in files:
@@ -55,6 +56,8 @@ def main():
         ('href="/command-center.css"','href="./command-center.css"'),
         ('src="/library.js"','src="./library.js"'),
         ('src="/library-file-ui.js"','src="./library-file-ui.js"'),
+        ('src="/candidate-agent-console.js"','src="./candidate-agent-console.js"'),
+        ('href="/candidate-agent-console.css"','href="./candidate-agent-console.css"'),
         ('href="/library.css"','href="./library-hhba-v2.css"'),
         ('href="/favicon.svg"','href="./favicon.svg"'),
     ]

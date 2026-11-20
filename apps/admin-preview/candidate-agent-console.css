@@ -1,0 +1,23 @@
+/* HHBA Agent Skills console — compact, native management UI, no third-party assets. */
+.hhba-ag-head{display:flex;align-items:center;justify-content:space-between;gap:15px;background:#f4f8fe;border:1px solid #dce8fa;border-radius:14px;padding:17px 20px;margin:0 0 17px}
+.hhba-ag-head div{display:flex;flex-direction:column;gap:4px}
+.hhba-ag-head span,.hhba-ag-head small{font-size:12px;color:#67809b}
+.hhba-ag-head strong{font-size:17px;color:#203a59}
+.hhba-ag-card{background:#fff;border:1px solid #e3ebf5;border-radius:15px;padding:22px;margin:16px 0}
+.hhba-ag-card-head{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:15px}
+.hhba-ag-card-head h2{font-size:17px;color:#1d395b;margin:0 0 5px}
+.hhba-ag-card-head p{font-size:12px;color:#70849a;line-height:1.8;margin:0}
+.hhba-ag-switch{font-size:13px;font-weight:650;color:#235c9b;white-space:nowrap;display:flex;gap:8px;align-items:center;cursor:pointer}
+.hhba-ag-switch input,.hhba-ag-skill input{accent-color:#2764ae;width:17px;height:17px}
+.hhba-ag-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.hhba-ag-skill{display:flex;gap:10px;align-items:flex-start;padding:14px;border:1px solid #dce8f7;border-radius:10px;background:#fbfdff;min-width:0;cursor:pointer}
+.hhba-ag-skill:has(input:checked){border-color:#8cb8e9;background:#f3f8ff}
+.hhba-ag-skill strong{display:block;color:#254465;font-size:13px;margin:0 0 4px}
+.hhba-ag-skill small{color:#6c8198;font-size:11px;line-height:1.6;display:block}
+.hhba-ag-warning{font-size:12px;line-height:1.8;color:#667d96;border-top:1px solid #e6edf7;padding-top:15px}
+.hhba-ag-actions{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:15px}
+.hhba-ag-actions span,.hhba-ag-run-note{color:#6b7c93;font-size:12px;line-height:1.7}
+.hhba-ag-runs{display:grid;gap:8px;margin-top:12px}
+.hhba-ag-run{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:9px 11px;border:1px solid #e7edf4;border-radius:8px;color:#46617d;font-size:12px}
+.hhba-ag-run strong{color:#234464}
+@media(max-width:730px){.hhba-ag-head,.hhba-ag-card-head,.hhba-ag-actions{align-items:flex-start;flex-direction:column}.hhba-ag-list{grid-template-columns:1fr}.hhba-ag-card{padding:15px}.hhba-ag-run{align-items:flex-start;flex-direction:column;gap:2px}}

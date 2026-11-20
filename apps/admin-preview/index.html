@@ -8,6 +8,8 @@
   <meta name="description" content="HHBA 汇方职场 · C 端个人用户运营管理：真实用户、AI岗位索引、17个行业馆、职场权益、财务与安全。"/>
   <title>数据总览 · 汇方职场 HHBA 管理中心</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  <link rel="stylesheet" href="/candidate-agent-console.css"/>
+  <script type="module" src="/candidate-agent-console.js"></script>
   <link rel="stylesheet" href="/styles.css"/>
   <link rel="stylesheet" href="/cend-console.css"/>
   <link rel="stylesheet" href="/library.css"/>
@@ -38,6 +40,7 @@
       <p class="nav-caption nav-caption-secondary">岗位与资源</p>
       <button type="button" class="nav-link" data-view="market"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M9 7V5h6v2M3 13h18"/></svg><span>官方岗位索引</span></button>
       <button type="button" class="nav-link" data-view="library"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h8v16H3zM13 4h8v16h-8z"/></svg><span>17个行业馆</span></button>
+      <button type="button" class="nav-link" data-view="agent"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="10" r="3"/><path d="M8 17h8M12 3V1M12 23v-2"/></svg><span>AI 求职 Agent</span></button>
       <p class="nav-caption nav-caption-secondary">职业与权益</p>
       <button type="button" class="nav-link" data-view="membership"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 6v6c0 5 3 8 8 10 5-2 8-5 8-10V6z"/><path d="m9 12 2 2 4-4"/></svg><span>会员与月度服务</span> <span class="nav-soon">未开售</span></button>
       <button type="button" class="nav-link" data-view="rights"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v17M4 7h16M6 7 3 12h6zM18 7l-3 5h6zM8 21h8"/></svg><span>权益支持案件</span> <span class="nav-soon">未开放</span></button>
@@ -186,6 +189,40 @@
           </tbody></table></div>
         </article>
         <footer class="page-footer">HHBA Management Console · Phase 2 公开数据看板 · 所有统计数据均须标明来源、口径与时间</footer>
+      </section>
+      <section class="page-view" id="view-agent" hidden aria-labelledby="agent-heading">
+       <div class="page-heading">
+        <div><p class="eyebrow">CANDIDATE AI · OPERATIONS</p>
+         <h1 id="agent-heading">AI 求职 Agent · Skills</h1>
+         <p class="page-subtitle">在后台统一设置技能权限，用户自己确认简历和岗位后才可使用。无自动投递。</p>
+        </div>
+       </div>
+       <div class="hhba-ag-head">
+        <div><span>当前配置</span><strong id="agent-policy-state">尚未读取</strong>
+         <small id="agent-policy-version">需要管理员授权及 D1 迁移</small></div>
+        <button id="agent-policy-load" class="button-outline" type="button">读取后台配置</button>
+       </div>
+       <section class="hhba-ag-card" aria-labelledby="agent-settings-title">
+        <div class="hhba-ag-card-head">
+         <div><h2 id="agent-settings-title">求职 Agent 的执行权限</h2>
+          <p>以下是可调用的 HHBA 真实工具能力，不是直接安装任意第三方脚本。</p></div>
+         <label class="hhba-ag-switch"><input type="checkbox" id="agent-enabled" disabled/> 启用 Agent 许可</label>
+        </div>
+        <div id="agent-skill-list" class="hhba-ag-list" aria-label="Skills 技能清单"></div>
+        <p class="hhba-ag-warning">启用后仍需候选端 Cloudflare 独立开关、密钥、用户明确授权。无原版式 Word 渲染服务时，不应承诺可下载保真 DOCX；本设置不会自动向企业申请职位。</p>
+        <div class="hhba-ag-actions">
+         <span id="agent-policy-feedback" role="status">尚未连接管理员配置</span>
+         <button id="agent-policy-save" type="button" class="button-primary" disabled>保存技能配置</button>
+        </div>
+       </section>
+       <section class="hhba-ag-card" aria-labelledby="agent-activity-title">
+        <div class="hhba-ag-card-head"><div>
+         <h2 id="agent-activity-title">实际执行记录</h2>
+         <p>仅存储成功/失败、调用技能数量、找到岗位数量与耗时；没有简历、手机号、模型提示词或投递链接。</p>
+         </div><button id="agent-runs-load" type="button" class="button-outline">读取最近记录</button></div>
+        <div id="agent-runs-status" role="status" class="hhba-ag-run-note">为节约 D1，不自动读取运行记录。</div>
+        <div id="agent-runs-content" class="hhba-ag-runs"></div>
+       </section>
       </section>
       <section class="page-view" id="view-users" hidden aria-labelledby="users-heading">
         <div class="page-heading"><div><p class="eyebrow">CLOUDFLARE · PRIVATE METRICS</p><h1 id="users-heading">用户增长、回访与功能使用</h1>

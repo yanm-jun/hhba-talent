@@ -96,6 +96,7 @@ def build_standalone_admin_password_console() -> bool:
     files = (
         "index.html", "dashboard.js", "styles.css", "library.js", "library.css",
         "library-file-ui.js", "library-file-import.js", "admin-console-ui.js",
+        "candidate-agent-console.js","candidate-agent-console.css",
         "favicon.svg"
     )
     for name in files:
@@ -107,6 +108,8 @@ def build_standalone_admin_password_console() -> bool:
         ('src="/dashboard.js"', 'src="./dashboard.js"'),
         ('src="/library.js"', 'src="./library.js"'),
         ('src="/library-file-ui.js"', 'src="./library-file-ui.js"'),
+        ('src="/candidate-agent-console.js"', 'src="./candidate-agent-console.js"'),
+        ('href="/candidate-agent-console.css"', 'href="./candidate-agent-console.css"'),
         ('href="/library.css"', 'href="./library.css"'),
         ('href="/favicon.svg"', 'href="./favicon.svg"'),
     )
