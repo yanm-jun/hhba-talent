@@ -13,7 +13,7 @@ type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
 export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage,sourceText,sourceResume,accountScope}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
-  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'|'profile'>>;
+  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'|'profile'|'agent'>>;
  onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction;sourceText?:string;sourceResume?:PrivateResume;accountScope?:string
 }){
  const ref=useRef<HTMLDivElement|null>(null);
@@ -103,6 +103,10 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
       <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
       <p>适配分不是录用概率。只推荐中国大陆企业岗位，不提供第三方招聘平台链接。{pending?'结果正在陆续生成，下方岗位可先查看。':'请在企业官网核实岗位是否仍然招聘。'}</p>
      </div>
+     {result.agent?.kind==='HHBA_CANDIDATE_AGENT_V1'&&
+      <p className="hhba-match-disclaimer" role="status" data-hhba-candidate-agent="completed">
+       后台求职 Agent 已依次调用简历证据、招聘搜索和匹配评分技能。你可以选择具体岗位继续使用简历优化技能；所有修改及投递仍由你确认。
+      </p>}
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {!pending&&result.history_status==='SAVED'&&<div className="hhba-match-history-confirm">
       <span>这次的真实推荐结果已保存到你账户的「匹配历史」，下次登录可以继续查看。</span>
