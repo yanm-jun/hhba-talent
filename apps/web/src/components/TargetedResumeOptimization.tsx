@@ -409,7 +409,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   // Untrusted browser state can restore wording, never approval. All AI
   // recommendations require fresh evidence confirmation after recovery.
   const reviewed=Array.isArray(data.suggestions)?
-   data.suggestions.filter((item:ResumeSuggestion)=>item&&validateSuggestion(blocks,item)).slice(0,12):[];
+   data.suggestions.filter((item:ResumeSuggestion)=>
+    item&&validateSuggestion(data.version.blocks,item)).slice(0,12):[];
   const approvedIds=new Set(reviewed.map((item:ResumeSuggestion)=>item.id));
   const safeFields=(value:unknown,max:number)=>{
    const input=value&&typeof value==='object'&&!Array.isArray(value)?
