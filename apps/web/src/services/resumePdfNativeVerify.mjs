@@ -26,9 +26,17 @@ export async function verifyOriginalFontPdfPatch({
   ]);
   const lines=page=>page.items.filter(item=>typeof item.str==='string'&&item.str.trim());
   const before=lines(a),after=lines(b);
+  // PDF.js generates document-local fontName IDs (g_d0_f1, g_d1_f1);
+  // those differ across documents even when the actual PDF font stays same.
+  // Compare the resolved font family/style and the unchanged source font
+  // object, not PDF.js runtime IDs.
+  const originalFont=a.styles?.[before[0]?.fontName];
+  const revisedFont=b.styles?.[after[0]?.fontName];
   ensure(before.length===1&&after.length===1&&
    before[0].str===proof.oldText&&after[0].str===proof.newText&&
-   before[0].fontName===after[0].fontName&&before[0].height===after[0].height);
+   originalFont?.fontFamily&&originalFont.fontFamily===revisedFont?.fontFamily&&
+   originalFont.vertical===revisedFont.vertical&&
+   before[0].height===after[0].height);
   ensure(before[0].width>10&&after[0].width<=before[0].width*1.01&&
    after[0].width>=before[0].width*.7);
   const vp=oldPage.getViewport({scale:1.5});
