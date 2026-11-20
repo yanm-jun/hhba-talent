@@ -281,11 +281,8 @@ function OriginalPdfViewer({resume,onClose}:{
         <button type="button" aria-label="关闭修改" onClick={()=>setSelectedId(null)}><X size={14}/></button>
        </div>
        <textarea aria-label="修改这段内容" maxLength={1600} rows={3} value={draft}
+        className={draft!==anchor.text?'hhba-siri-typing':''}
         onChange={e=>{setDraft(e.target.value);setConfirmed(false);}}/>
-       {draft!==anchor.text&&<div className="hhba-resume-pending-text"
-        role="note" aria-label="待确认修改文字">
-        <span className="hhba-resume-siri-letters">{draft}</span>
-       </div>}
        <label><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>
         我确认修改内容属实</label>
        <div className="hhba-original-resume-editbox-actions">
