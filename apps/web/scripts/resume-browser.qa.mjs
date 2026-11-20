@@ -405,9 +405,10 @@ try{
  const nativeErrors=[];native.on('pageerror',e=>nativeErrors.push(e.message));
  await native.goto('http://127.0.0.1:3000/qa/native-pdf-font.html',
   {waitUntil:'networkidle',timeout:45000});
- await native.waitForFunction(()=>
-  document.querySelector('#native-pdf-test')?.getAttribute('data-status')!=='',
-  {timeout:15000});
+ await native.waitForFunction(()=>{
+  const status=document.querySelector('#native-pdf-test')?.getAttribute('data-status');
+  return status==='passed'||status==='failed';
+ },{timeout:15000});
  const nativeProof=await native.locator('#native-pdf-test').evaluate(node=>({
   status:node.dataset.status,font:node.dataset.font,
   changedPixels:Number(node.dataset.changedPixels),text:node.textContent
