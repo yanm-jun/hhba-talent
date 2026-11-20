@@ -39,6 +39,57 @@ MAX_TOTAL_EXPANDED = 30 * 1024 * 1024
 MAX_PAGES = 20
 IN_FLIGHT = threading.BoundedSemaphore(2)
 RELS_NS = "{http://schemas.openxmlformats.org/package/2006/relationships}Relationship"
+W_NS = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+FONT_ATTRS = ("ascii", "hAnsi", "eastAsia", "cs")
+
+def require_original_fonts(contents: bytes) -> None:
+    """Never silently substitute explicitly requested Word fonts.
+
+    Fonts embedded in a DOCX are not trusted to be installed or licensed
+    for host rendering; only actual available system families pass.
+    Theme-defined or omitted font attributes still need separate layout
+    verification; this gate only verifies explicitly specified families.
+    """
+    requested = set()
+    with ZipFile(__import__("io").BytesIO(contents)) as doc:
+        for name in doc.namelist():
+            if name not in ("word/document.xml", "word/styles.xml") and not (
+                name.startswith("word/header") or name.startswith("word/footer")
+            ):
+                continue
+            if not name.endswith(".xml"):
+                continue
+            root = ET.fromstring(doc.read(name))
+            for element in root.iter(W_NS + "rFonts"):
+                for attr in FONT_ATTRS:
+                    font = element.attrib.get(W_NS + attr, "").strip()
+                    if font:
+                        requested.add(font)
+                # A theme font is not a reliable explicit family: its actual
+                # name may vary with Office's theme resolution.
+                for key in element.attrib:
+                    if key.startswith(W_NS) and key.endswith("Theme"):
+                        raise ValueError("WORD_FONT_UNVERIFIED")
+    if not requested:
+        # The document relies on an implicit font and the preview renderer
+        # cannot prove that it corresponds to the user's original client.
+        raise ValueError("WORD_FONT_UNVERIFIED")
+    try:
+        result = subprocess.run(
+            ["fc-list", "--format", "%{family}\n"],
+            capture_output=True, text=True, timeout=12, check=True,
+        )
+    except (OSError, subprocess.TimeoutExpired, subprocess.CalledProcessError) as exc:
+        raise ValueError("WORD_FONT_UNVERIFIED") from exc
+    installed = {
+        family.casefold().strip()
+        for line in result.stdout.splitlines()
+        for family in line.split(",")
+        if family.strip()
+    }
+    if any(font.casefold() not in installed for font in requested):
+        raise ValueError("WORD_FONT_UNAVAILABLE")
+
 
 def docx_safe(contents: bytes) -> None:
     if not 100 <= len(contents) <= MAX_FILE or not contents.startswith(b"PK"):
@@ -101,6 +152,7 @@ def source_bytes(value: object) -> bytes:
     except (ValueError, binascii.Error) as exc:
         raise ValueError("WORD_INVALID_FILE") from exc
     docx_safe(data)
+    require_original_fonts(data)
     return data
 
 def render_pdf(docx: bytes) -> bytes:
