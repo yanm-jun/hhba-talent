@@ -293,3 +293,75 @@
   -webkit-text-fill-color:currentColor!important;
  }
 }
+
+
+/* Word-first product workspace: one true document surface with a contextual
+   suggestion rail, not two competing printable resume editors. */
+.targeted-resume-word-workspace{
+ display:grid;grid-template-columns:minmax(0,1.7fr) minmax(275px,.95fr);
+ gap:18px;align-items:start;max-width:100%;margin:15px 0 22px;
+}
+.targeted-resume-word-main{min-width:0}
+.targeted-resume-word-main>.hhba-original-resume{margin:0;background:#f8f9fb}
+.targeted-resume-word-assistant{
+ min-width:0;border:1px solid #e5e9f0;background:#fff;
+ border-radius:14px;padding:17px;position:sticky;top:12px;
+ max-height:calc(100dvh - 150px);overflow-y:auto;
+ scrollbar-width:thin;
+}
+.targeted-resume-word-assistant-head>strong{
+ display:flex;align-items:center;gap:8px;font-size:14px;color:#24354c;
+}
+.targeted-resume-word-assistant-head>p,.targeted-resume-word-privacy,
+.targeted-resume-word-empty{font-size:12px;line-height:1.75;color:#64748b}
+.targeted-resume-word-counts{display:flex;gap:6px;flex-wrap:wrap;padding:7px 0 12px}
+.targeted-resume-word-counts span{
+ font:600 11px/1.5 inherit;color:#536479;background:#f4f7fa;
+ border:1px solid #e6ebf1;border-radius:7px;padding:5px 7px;
+}
+.targeted-resume-word-suggestion-list{display:grid;gap:8px}
+.targeted-resume-word-suggestion{border:1px solid #e5eaf1;border-radius:10px;overflow:hidden;background:#fff}
+.targeted-resume-word-suggestion.is-active{border-color:#b9c9d9}
+.targeted-resume .targeted-resume-word-suggestion-title{
+ display:flex;justify-content:space-between;align-items:center;gap:10px;
+ width:100%;text-align:left;background:#fff;color:#24354c;
+ border:0;border-radius:0;padding:12px;
+}
+.targeted-resume-word-suggestion-title span{font-weight:600;font-size:12px;line-height:1.5}
+.targeted-resume-word-suggestion-title small{flex:0 0 auto;color:#64748b;font-size:11px}
+.targeted-resume-word-suggestion-detail{padding:0 12px 12px;overflow-wrap:anywhere}
+.targeted-resume-word-original,.targeted-resume-word-status{
+ font-size:12px;line-height:1.7;color:#536479;
+ margin:4px 0 10px;white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.targeted-resume-word-suggestion-detail .targeted-resume-popover-shell{margin:8px 0}
+.targeted-resume-word-suggestion-detail .targeted-resume-popover::after{display:none}
+.targeted-resume-word-suggestion-detail .targeted-resume-suggestion{
+ box-shadow:none;border:1px solid #e5e9f0;padding:12px;
+}
+.targeted-resume-word-next-step{font-size:12px;line-height:1.75;color:#365469;background:#f4f8fb;
+ border:1px solid #e1eaf1;padding:12px;border-radius:8px}
+.targeted-resume-mobile-rail-close,.targeted-resume-mobile-rail-launch{display:none!important}
+@media(max-width:980px){
+ .targeted-resume-word-workspace{grid-template-columns:minmax(0,1fr)}
+ .targeted-resume-word-assistant{position:relative;top:auto;max-height:none;overflow:visible}
+}
+@media(max-width:700px){
+ .targeted-resume{padding:10px;background:#fff;border:none;border-radius:0}
+ .targeted-resume-word-workspace{margin-top:10px}
+ .targeted-resume-word-main>.hhba-original-resume{margin:0;padding:9px}
+ .targeted-resume-word-assistant{
+  display:none;position:fixed;top:auto;left:0;right:0;bottom:0;
+  max-height:min(78dvh,680px);z-index:3100;overflow-y:auto;
+  border-radius:18px 18px 0 0;padding:20px 15px calc(18px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -12px 45px rgba(16,42,70,.16);
+ }
+ .targeted-resume-word-assistant.mobile-open{display:block}
+ .targeted-resume .targeted-resume-mobile-rail-close{
+  display:inline-flex!important;float:right;border:1px solid #d5dfe8;
+  border-radius:8px;padding:8px 12px;background:#fff;color:#355166;font-size:12px;
+ }
+ .targeted-resume-word-assistant-head{clear:both;padding-top:6px}
+ .targeted-resume-word-suggestion-title{min-height:46px}
+ .targeted-resume-word-assistant .targeted-resume-actions button{min-height:40px}
+}
