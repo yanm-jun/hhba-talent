@@ -436,9 +436,12 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    state:version.acceptedSuggestionIds.includes(s.id)?'accepted' as const:'pending' as const
   }))
   .filter(s=>s.original.trim()&&s.proposed.trim()&&
-   s.original!==s.proposed&&s.proposed.length<=300),
+   s.original!==s.proposed&&s.proposed.length<=300&&
+   !(wordRevisionSnapshot?.history||[])
+    .slice(0,wordRevisionSnapshot?.revision||0)
+    .some(saved=>saved.original===s.original&&saved.text===s.proposed)),
  [suggestions,revealedSuggestionCount,ignored,version.acceptedSuggestionIds,
-  version.blocks,suggestionDrafts]);
+  version.blocks,suggestionDrafts,wordRevisionSnapshot]);
  const pendingSuggestions=suggestions.filter(s=>!ignored.includes(s.id)&&
   !version.acceptedSuggestionIds.includes(s.id));
  const acceptedCount=suggestions.filter(s=>version.acceptedSuggestionIds.includes(s.id)).length;
@@ -617,7 +620,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     </p>}
     <OriginalWordViewer resume={sourceResume} suggestedChanges={confirmedWordChanges}
      glowActive={entranceStage==='entering'||busy||wordEditing||
-      visualWordSuggestions.length>0&&!(scoreResult?.supported&&pendingSuggestions.length===0)}
+      visualWordSuggestions.length>0}
      visualSuggestions={visualWordSuggestions}
      onVisualSuggestionSelect={id=>{
       setActiveSuggestionId(id);setOpenSuggestionId(id);
