@@ -61,7 +61,9 @@ export function OriginalWordViewer({resume,onClose}:{
     }
     const info=await wordEditableText(resume.id);
     if(!active)return;
-    setEditable(info.editable_text||[]);
+    // Editing is permitted only when the DOCX text is unique not only in
+    // the OOXML body but across every rendered page, including headers.
+    // Otherwise the clicked visible region could be the WRONG occurrence.
     const wasSaved=Boolean(info.saved);
     setSaved(wasSaved);
     const bytes=await wordPreviewBytes(resume.id,wasSaved);
@@ -76,6 +78,21 @@ export function OriginalWordViewer({resume,onClose}:{
      useSystemFonts:false} as any);
     const result=await task.promise;
     if(!active){await task.destroy();return;}
+    const counts=new Map<string,number>();
+    if(!wasSaved&&result.numPages<=20){
+     const candidates=new Set(info.editable_text||[]);
+     for(let current=1;current<=result.numPages;current++){
+      const content=await (await result.getPage(current))
+       .getTextContent({includeMarkedContent:false});
+      for(const item of content.items){
+       if(typeof (item as any).str!=='string')continue;
+       const label=String((item as any).str).normalize('NFKC').trim();
+       if(candidates.has(label))counts.set(label,(counts.get(label)||0)+1);
+      }
+     }
+    }
+    if(!active)return;
+    setEditable(wasSaved?[]:(info.editable_text||[]).filter(t=>counts.get(t)===1));
     doc.current=result;setCount(result.numPages);setLoading(false);
    }catch(error){
     if(active){
