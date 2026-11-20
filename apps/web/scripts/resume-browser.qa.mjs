@@ -798,6 +798,17 @@ try{
   await scorePage.getByText('已保存 Word · 优化后').waitFor();
   assert.match(await scorePage.locator('.hhba-word-match-after').textContent(),/70/);
   assert.match(await scorePage.locator('.hhba-word-match-score').textContent(),/68/);
+  assert.equal(await scorePage.getByRole('button',{name:'本版已完成复评'}).isDisabled(),true,
+   'same Word revision must not be charged again for identical re-scoring');
+  // Preparing more AI suggestions does not rewrite the saved DOCX. Its
+  // already-audited match score must remain visible until a *new* Word save.
+  await scorePage.locator('.targeted-resume-ai-settings summary').click();
+  await scorePage.locator('.targeted-resume-consent input[type=checkbox]').check();
+  await scorePage.getByRole('button',{name:'开始 AI 优化'}).click();
+  await scorePage.locator('.targeted-resume-word-suggestion-title').first().waitFor();
+  assert.match(await scorePage.locator('.hhba-word-match-after').textContent(),/70/,
+   'AI draft review must not erase a score based on the already-saved Word');
+  assert.equal(await scorePage.getByRole('button',{name:'本版已完成复评'}).isDisabled(),true);
   assert.deepEqual(errors,[]);
   // Wait for native PDF.js repaint after the saved Word revision. The score API
   // can resolve faster than the visual PDF page and must not produce a blank
