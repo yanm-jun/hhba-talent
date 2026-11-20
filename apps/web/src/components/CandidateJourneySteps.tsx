@@ -1,3 +1,4 @@
+import '../styles/candidate-journey.css';
 /** One coherent user-visible HHBA job application journey.
  * The AI tools, provider choice and draft internals live behind these stages.
  */
