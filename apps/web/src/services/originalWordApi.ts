@@ -1,7 +1,7 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
 
 type SavedWord={original:string;text:string;updated_at:string};
-export type WordInspect={ok:boolean;editable_text:string[];saved?:SavedWord|null};
+export type WordInspect={ok:boolean;editable_text:string[];saved?:SavedWord|null;revision:number;total_revisions:number;max_revisions:number};
 const messages:Record<string,string>={
  WORD_NOT_READY:'Word 原样式编辑暂未开放。',
  WORD_FONT_UNAVAILABLE:'原文件使用的字体在处理环境中不可用，为保留原样式，暂不修改这份简历。',
@@ -11,6 +11,10 @@ const messages:Record<string,string>={
  WORD_DB_NOT_READY:'Word 编辑暂时不可用。',
  WORD_DAILY_LIMIT:'今天的操作次数已达到上限。',
  WORD_NOT_EDITED:'请先修改并保存简历。',
+ WORD_REVISION_CONFLICT:'这份 Word 已在另一个页面或设备修改，请刷新后再试。',
+ WORD_REVISION_CORRUPT:'已保存版本未通过完整性检查，请保留原件并联系平台。',
+ WORD_REVISION_LIMIT:'这份简历已达到安全修订次数上限，请下载最新 Word 并重新上传。',
+ WORD_REVISION_LOCK_UNAVAILABLE:'暂时无法安全保存，请稍后再试。',
  WORD_LAYOUT_NOT_VERIFIED:'修改后排版发生了变化，未保存此次修改。',
  WORD_EDIT_TOO_LONG:'这段文字放不下，请缩短后再保存。',
  WORD_EDIT_AMBIGUOUS:'无法确定原文位置，请换一段文字。',
@@ -65,11 +69,20 @@ export async function wordPreviewBytes(id:string,edited=false,signal?:AbortSigna
   throw Error('简历预览文件不完整。');
  return buffer;
 }
-export async function saveOriginalWordEdit(id:string,original:string,text:string){
+export type WordMutationResult={ok:true;saved:boolean;revision:number;total_revisions:number;page_count?:number};
+export async function saveOriginalWordEdit(id:string,original:string,text:string,expectedRevision=0):Promise<WordMutationResult>{
  const response=await send('/api/resume-word','POST',{
-  resume_id:id,original,text,confirmed_real:true,consent_word_processing:true
+  action:'edit',resume_id:id,original,text,expected_revision:expectedRevision,
+  confirmed_real:true,consent_word_processing:true
  });
- return response.json() as Promise<{ok:true;saved:true;page_count:number}>;
+ return response.json();
+}
+export async function shiftOriginalWordRevision(id:string,action:'undo'|'redo',expectedRevision:number):Promise<WordMutationResult>{
+ const response=await send('/api/resume-word','POST',{
+  action,resume_id:id,expected_revision:expectedRevision,
+  confirmed_real:true,consent_word_processing:true
+ });
+ return response.json();
 }
 async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf'){
  // Both files originate from the same saved, renderer-verified original DOCX.
