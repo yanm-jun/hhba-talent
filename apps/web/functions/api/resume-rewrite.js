@@ -6,6 +6,7 @@ import {generateTailoredResume,REWRITE_KIND,completeJson,validateAuthoring,numbe
 import {selectProvider} from '../_lib/resume-ai-provider.js';
 import {runResumeEditorialAgent} from '../_lib/resume-rewrite-agent.js';
 import {issueCheckpoint} from '../_lib/resume-rewrite-checkpoint.js';
+import {candidateAgentRewriteAllowed} from '../_lib/candidate-agent-skills.js';
 import {responseJson as json,rejectJson as reject,rewriteActive as active,
  rewriteOriginOK as originOK,rewriteRequestJson as boundedJson,
  candidateIdentity,rewriteContinuationActive} from '../_lib/resume-rewrite-http.js';
@@ -32,6 +33,8 @@ export async function onRequestPost({request,env}){
  try{body=await boundedJson(request);}
  catch{return reject('INVALID_REQUEST',400);}
  if(body?.consent_ai!==true)return reject('AI_CONSENT_REQUIRED',400);
+ if(!(await candidateAgentRewriteAllowed(env)))
+  return reject('AGENT_REWRITE_SKILL_DISABLED',403);
  try{
   // All requests remain explicit-consent, candidate-only and local to this
   // draft. The model may choose further editorial tools, not privileged I/O.
