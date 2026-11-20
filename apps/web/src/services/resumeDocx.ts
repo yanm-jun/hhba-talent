@@ -39,7 +39,25 @@ function documentXml(doc:ResumeDocument,sourceHeading='简历原始内容（请�
    lines.push(para(item.details));
   }
  }
- if(doc.sourceParagraphs.length){
+ if(doc.structuredSourceParagraphs?.length){
+  // The user-approved whole-CV rewrite gets proper section headings. Unlike
+  // the legacy generic text dump, this is an editable job-tailored document.
+  const headings:{[key:string]:string}={
+   summary:'职业概述与个人优势',
+   experience:'工作经历',
+   projects:'项目经历',
+   education:'教育背景',
+   skills:'专业技能'
+  };
+  let lastSection='';
+  for(const item of doc.structuredSourceParagraphs){
+   if(item.section!==lastSection){
+    addSection(headings[item.section]||'相关经历');
+    lastSection=item.section;
+   }
+   lines.push(para(item.text));
+  }
+ }else if(doc.sourceParagraphs.length){
   addSection(sourceHeading);
   for(const value of doc.sourceParagraphs)lines.push(para(value));
  }
