@@ -15,12 +15,15 @@ import '../styles/siri-edge.css';
 // The original DOCX is NEVER converted into an HHBA template. A privately
 // rendered PDF is used only to show the source page. Downloaded edits are
 // the genuine original OOXML with a verified small text change.
-export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved}:{
+type PendingWordTextDraft={original:string;text:string;revision:number;page:number};
+export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange}:{
  resume:PrivateResume;onClose?:()=>void;
  suggestedChanges?:{original:string;proposed:string}[];
  onOpenSuggestions?:()=>void;pendingSuggestionCount?:number;onPendingChange?:(dirty:boolean)=>void;
  onVerifiedSave?:(change:{original:string;text:string})=>void;
  onVersionMoved?:()=>void;
+ sessionWordDraft?:PendingWordTextDraft|null;
+ onSessionWordDraftChange?:(draft:PendingWordTextDraft|null)=>void;
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
@@ -230,6 +233,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   rememberPosition();setBusy(true);setMessage('');
   try{
    const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision);
+   onSessionWordDraftChange?.(null);
    onVerifiedSave?.({original:selected.text,text:draft.trim()});
    setSelected(null);setConfirmed(false);setSaved(true);
    setRevision(result.revision);setTotalRevisions(result.total_revisions);
@@ -241,6 +245,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   if(busy||ready!=='available'||action==='undo'&&revision<=0||
    action==='redo'&&revision>=totalRevisions)return;
   rememberPosition();setBusy(true);setMessage('');setSelected(null);setConfirmed(false);
+  onSessionWordDraftChange?.(null);
   try{
    const result=await shiftOriginalWordRevision(resume.id,action,revision);
    onVersionMoved?.();
@@ -270,6 +275,9 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   {ready==='available'&&<p className="hhba-original-resume-note" role="status">
    当前修改进度：{revision} / {totalRevisions} · 最多 {maxRevisions} 个已验证修订版本。
    单日最多 {maxDailyEdits} 次保存验证；撤销和重做不占用该额度。原始 Word 不会被覆盖。
+  </p>}
+  {sessionWordDraft&&ready==='available'&&<p className="hhba-original-resume-word-status" role="status">
+   找到尚未保存的 Word 文字草稿。请在第 {sessionWordDraft.page} 页点选原段落继续核对；版本或原文不一致时不会自动填入。
   </p>}
   {history.length>0&&ready==='available'&&<details className="hhba-original-resume-history">
    <summary>查看修改历史（{history.length} 次修改）</summary>
@@ -320,14 +328,23 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
         aria-label="修改这段 Word"
         style={{left:x/10+'%',top:y/10+'%',width:w/10+'%',height:h/10+'%'}}
         onClick={()=>{
-         // Never apply a model suggestion unless it was explicitly accepted
-         // and exactly matches this unique, renderer-located Word text node.
+         if(!confirmDiscardText())return;
+         // A restored draft is never accepted automatically. It must be
+         // attached to the identical visible text, page and server revision.
+         const replacing=Boolean(selected&&draft!==selected.text);
+         if(replacing)onSessionWordDraftChange?.(null);
+         const restored=!replacing&&sessionWordDraft&&
+          sessionWordDraft.revision===revision&&sessionWordDraft.page===page&&
+          sessionWordDraft.original===anchor.text&&
+          sessionWordDraft.text.length<=300&&sessionWordDraft.text.trim();
          const matches=suggestedChanges.filter(change=>change.original===anchor.text&&
           change.proposed.trim()&&change.proposed.length<=300);
-         const candidate=matches.length===1?matches[0].proposed:anchor.text;
+         const candidate=restored?sessionWordDraft!.text:
+          matches.length===1?matches[0].proposed:anchor.text;
          setSelected(anchor);setDraft(candidate);
          setConfirmed(false);
-         setMessage(matches.length===1?'已填入本人确认过的建议；请复核事实与原版式后再保存。':'');
+         setMessage(restored?'已恢复未保存的文字草稿，请检查后再次确认。':
+          matches.length===1?'已填入本人确认过的建议；请复核事实与原版式后再保存。':'');
         }}>
         <span><PencilLine size={12}/> 修改</span>
        </button>;
@@ -343,12 +360,19 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
          aria-label="修改 Word 原文">
          <div className="hhba-original-resume-editbox-title">
           <strong>修改这段</strong>
-          <button type="button" aria-label="取消修改" onClick={()=>{if(confirmDiscardText())setSelected(null)}}>
+          <button type="button" aria-label="取消修改" onClick={()=>{
+           if(!confirmDiscardText())return;
+           onSessionWordDraftChange?.(null);setSelected(null);setDraft('');setConfirmed(false);
+          }}>
            <X size={14}/></button>
          </div>
          <textarea aria-label="修改 Word 文字" value={draft} rows={3}
           className={draft!==selected.text?'hhba-siri-typing':''}
-          maxLength={300} onChange={e=>{setDraft(e.target.value);setConfirmed(false);}}/>
+          maxLength={300} onChange={e=>{
+           const value=e.target.value;setDraft(value);setConfirmed(false);
+           onSessionWordDraftChange?.(value!==selected.text?
+            {original:selected.text,text:value,revision,page}:null);
+          }}/>
          <label><input type="checkbox" checked={confirmed}
           onChange={e=>setConfirmed(e.target.checked)}/>我确认内容属实，并同意处理此文件</label>
          <div className="hhba-original-resume-editbox-actions">
