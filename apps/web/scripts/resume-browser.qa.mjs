@@ -112,7 +112,6 @@ try{
  await page.locator('[data-resume-block-id="source-0"] button[aria-label="编辑当前简历段落"]').click();
  const edit=page.getByRole('textbox',{name:'编辑当前简历段落'});
  await edit.fill('真实参与合成测试门店运营记录整理与预约协调。');
- await edit.locator('xpath=.').waitFor();
  assert.match(await edit.evaluate(el=>getComputedStyle(el).animationName),
   /hhba-resume-siri-letters-flow/);
  assert.match(await edit.evaluate(el=>getComputedStyle(el).backgroundImage),
