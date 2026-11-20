@@ -81,6 +81,28 @@ jobs:
         env:
           QA_OUTPUT: /tmp/hhba-resume-browser-qa
         run: node scripts/resume-browser.qa.mjs
+      - name: Render full AI-written Word to real PDF and verify all sections
+        run: |
+          test -s /tmp/hhba-resume-browser-qa/whole-resume-ai-review-export.docx
+          if ! command -v libreoffice >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libreoffice-writer poppler-utils
+          fi
+          mkdir -p /tmp/hhba-resume-browser-qa/word-to-pdf
+          libreoffice -env:UserInstallation=file:///tmp/hhba-whole-resume-lo-profile \\
+            --headless --convert-to pdf \\
+            --outdir /tmp/hhba-resume-browser-qa/word-to-pdf \\
+            /tmp/hhba-resume-browser-qa/whole-resume-ai-review-export.docx
+          test -s /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.pdf
+          pdfinfo /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.pdf | grep 'Pages:'
+          pdftotext -layout /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.pdf \\
+            /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.txt
+          grep -q 'REWRITTEN WORD RESUME' /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.txt
+          grep -q '虚构经历段落8' /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.txt
+          grep -q '职业概述与个人优势' /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.txt
+          pdftoppm -f 1 -l 3 -scale-to 1000 -png \\
+            /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.pdf \\
+            /tmp/hhba-resume-browser-qa/word-to-pdf/page
       - name: Live Cloudflare Preview Chromium smoke (desktop and mobile, no PII)
         env:
           HHBA_PREVIEW_URL: https://a5a230af.hhba-talent.pages.dev
