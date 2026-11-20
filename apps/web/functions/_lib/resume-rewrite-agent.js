@@ -70,15 +70,38 @@ export async function runResumeEditorialAgent({
  draft,blocks,job,env,provider,reviewer,completeJson,
  validateAuthoring,numberTokens,redacted,signal
 }){
- const trace=[];
+ // Previously verified turns are carried across requests only when wrapped
+ // in a server-signed checkpoint. The HTTP route validates that signature.
+ const previous=Array.isArray(draft.autonomy?.tools_used)?
+  draft.autonomy.tools_used.filter(event=>event&&
+   ['inspect_source','rewrite_sections','ask_user','finish'].includes(event.action))
+   .slice(0,64).map(event=>({
+    action:event.action,sections:Array.isArray(event.sections)?
+     event.sections.filter(id=>typeof id==='string').slice(0,96):[],
+    accepted:Number.isInteger(event.accepted)?event.accepted:0
+   })):[];
+ const trace=[...previous];
  const originalById=new Map(blocks.map(b=>[b.id,b]));
  const rewritten=new Map(draft.blocks.map(b=>[b.blockId,{...b}]));
  const questions=[...draft.questions];
  const warnings=[...draft.warnings];
  const maxRounds=Number.isFinite(Number(env?.HHBA_RESUME_AGENT_MAX_PASSES))?
   Math.max(1,Math.min(16,Math.floor(Number(env.HHBA_RESUME_AGENT_MAX_PASSES)))):4;
- let stop='model_finished',previousSignature='';
+ let stop='model_finished';
+ let previousSignature=typeof draft.autonomy?.previous_signature==='string'?
+  draft.autonomy.previous_signature:'';
  const inspected=new Map();
+ for(const id of (Array.isArray(draft.autonomy?.inspected_ids)?
+  draft.autonomy.inspected_ids:[])){
+  if(originalById.has(id))
+   inspected.set(id,redacted(originalById.get(id).text));
+ }
+ if(trace.length>=64){
+  return {...draft,autonomy:{...draft.autonomy,enabled:true,
+   rounds:trace.length,stop_reason:'execution_round_guard',
+   needs_more_work:true,tools_used:trace,
+   inspected_ids:[...inspected.keys()],previous_signature:previousSignature}};
+ }
  // The model is free to finish immediately or choose the next tool. The loop
  // safeguard exists for actual Worker execution time / recursive cost, not for
  // limiting the breadth of writing or number of edited sections.
@@ -99,7 +122,7 @@ export async function runResumeEditorialAgent({
   },signal,4800);
   const decision=modelDecision(decisionRaw,blocks.map(b=>b.id));
   if(decision.questions.length)questions.push(...decision.questions);
-  const event={round:round+1,action:decision.action,
+  const event={round:trace.length+1,action:decision.action,
    sections:decision.sections.map(s=>s.blockId),accepted:0,
    reason:decision.reason||''};
   trace.push(event);
@@ -179,6 +202,8 @@ export async function runResumeEditorialAgent({
    held_for_review:warnings.length},
   autonomy:{enabled:true,rounds:trace.length,stop_reason:stop,
    tools_used:trace.map(x=>({action:x.action,sections:x.sections,
-    accepted:x.accepted})),needs_more_work:stop==='execution_round_guard'}
+    accepted:x.accepted})),
+   inspected_ids:[...inspected.keys()],previous_signature:previousSignature,
+   needs_more_work:stop==='execution_round_guard'}
  };
 }
