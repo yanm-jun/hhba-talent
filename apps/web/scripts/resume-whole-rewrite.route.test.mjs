@@ -7,13 +7,21 @@ const endpoint=origin+'/api/resume-rewrite';
 const fakeEnv={
  HHBA_AUTH_ROLLOUT:'preview',
  HHBA_RESUME_REWRITE_ENABLED:'1',
- HHBA_AI_DEEPSEEK_API_KEY:'qa-only-key',HHBA_AI_DEEPSEEK_MODEL:'mock',
- HHBA_PNVS_AUTH_DB:{prepare(){return {
-  bind(){return {
-   first:async()=>({phone:'candidate',revoked:0,expires_at:new Date(Date.now()+60000).toISOString()})
-  }},
-  first:async()=>({role:'candidate'})
- }};}}
+ HHBA_AI_DEEPSEEK_API_KEY:'qa-only-key',
+ HHBA_AI_DEEPSEEK_MODEL:'mock',
+ HHBA_PNVS_AUTH_DB:{
+  prepare(){
+   return {
+    bind(){
+     return {
+      first:async()=>({phone:'candidate',revoked:0,
+       expires_at:new Date(Date.now()+60000).toISOString()})
+     };
+    },
+    first:async()=>({role:'candidate'})
+   };
+  }
+ }
 };
 const block={id:'experience-0',section:'experience',text:'参与门店运营与真实客户沟通。'};
 const job={title:'门店运营督导',requirements:'负责门店运营与数据复盘'};
