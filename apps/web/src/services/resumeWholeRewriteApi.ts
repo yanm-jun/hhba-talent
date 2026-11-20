@@ -10,6 +10,8 @@ export type ResumeWholeRewriteResult={
  kind:'HHBA_WHOLE_RESUME_REWRITE_V1';ok:true;
  provider:string;reviewer:string;blocks:ResumeWholeRewriteBlock[];
  recommended_order?:string[];
+ autonomy?:{enabled:boolean;rounds:number;stop_reason:string;needs_more_work:boolean;
+  tools_used:Array<{action:string;sections:string[];accepted:number}>;};
  questions:{blockId:string;question:string;reason:string;status:'user_input_needed'}[];
  warnings:{blockId:string;code:string;note:string}[];
  coverage:{source_blocks:number;analyzed_blocks:number;proposed_rewrites:number;held_for_review:number};
@@ -17,7 +19,8 @@ export type ResumeWholeRewriteResult={
 };
 export type ResumeWholeRewriteStatus={
  kind:'HHBA_WHOLE_RESUME_REWRITE_V1';ok:true;
- enabled:boolean;configured:boolean;mode:string;requires_user_approval:boolean;
+ enabled:boolean;configured:boolean;mode:string;autonomy_enabled?:boolean;
+ requires_user_approval:boolean;
 };
 const errorMessage:Record<string,string>={
  INVALID_REWRITE_INPUT:'简历或岗位资料不完整。为避免遗漏，我们没有生成不完整的改写稿。',
