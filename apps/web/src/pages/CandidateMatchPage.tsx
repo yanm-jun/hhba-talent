@@ -172,7 +172,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           {!savedFiles.length&&<p>还没有保存的简历。可从 <Link to="/candidate/account/resume">我的简历</Link> 上传。</p>}
           {vaultError&&<p role="status">{vaultError}</p>}
         </div>}
-        {!getRealAuthToken()&&<p className="hhba-ai-service-check">AI 简历匹配需要先 <Link to="/candidate/login">登录 HHBA 求职账号</Link>。</p>}
+        {!getRealAuthToken()&&<p className="hhba-ai-service-check">AI 简历匹配需要先 <Link to="/candidate/login?next=%2Fcandidate%2Fmatch">登录 HHBA 求职账号</Link>。</p>}
         <input id="hhba-ai-resume" className="sr-only" type="file" accept={supportedTypes}
           onChange={(e:ChangeEvent<HTMLInputElement>)=>choose(e.target.files?.[0]||null)}/>
         <label htmlFor="hhba-ai-resume" className={'hhba-ai-drop '+(drag?'dragging':'')}
