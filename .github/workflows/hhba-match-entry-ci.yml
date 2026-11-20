@@ -1,0 +1,34 @@
+name: HHBA Candidate Match Entry Regression
+
+on:
+  push:
+    branches:
+      - main
+      - fix/candidate-match-direct-entry-20261121
+  pull_request:
+    paths:
+      - apps/web/src/main.tsx
+      - apps/web/src/pages/HomePage.tsx
+      - apps/web/src/pages/PhoneAuthPage.tsx
+      - apps/web/src/pages/AuthPage.tsx
+      - apps/web/src/pages/CandidateMatchPage.tsx
+      - apps/web/scripts/match-entry.contract.test.mjs
+      - .github/workflows/hhba-match-entry-ci.yml
+
+jobs:
+  validate-match-entry:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify match routing and login return destination
+        run: node --test apps/web/scripts/match-entry.contract.test.mjs
+      - name: Build web UI
+        working-directory: apps/web
+        run: |
+          npm ci --ignore-scripts
+          npm run build
