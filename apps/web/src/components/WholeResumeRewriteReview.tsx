@@ -31,6 +31,21 @@ export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate
     'AI 已完成生成，正在逐段展示真正的改写结果：'+
     Math.min(revealedCount,result.blocks.length)+' / '+result.blocks.length+'。'}</p>
   </header>
+  {result.autonomy?.enabled&&<div className="hhba-whole-rewrite-agent-summary" role="status">
+   <strong><Sparkles size={14}/> AI 自主处理了 {result.autonomy.rounds} 轮</strong>
+   <p>{result.autonomy.stop_reason==='user_evidence_requested'?
+    'AI 发现重要信息缺口，已提出需要核实的问题。':
+    result.autonomy.needs_more_work?
+    '本轮执行到达技术运行边界，现有草稿仍可核对，但不是全部优化已经完成。':
+    result.autonomy.stop_reason==='tool_unavailable'?
+    '深度审查暂不可用，已保留基础事实核验的整份草稿。':
+    'AI 根据岗位与真实经历，选择需要检查和再次撰写的章节。'}</p>
+   <div>{result.autonomy.tools_used.map((t,i)=><span key={i}>{
+    t.action==='inspect_source'?'查看原始证据':
+    t.action==='rewrite_sections'?'重新撰写 '+t.sections.length+' 段':
+    t.action==='ask_user'?'询问真实信息':'完成编辑'
+   }</span>)}</div>
+  </div>}
   <div className="hhba-whole-rewrite-metrics" role="status">
    <span>读取段落 <strong>{result.coverage.analyzed_blocks}</strong></span>
    <span>改写段落 <strong>{changes.length}</strong></span>
