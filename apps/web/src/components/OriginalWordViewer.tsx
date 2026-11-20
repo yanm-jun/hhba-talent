@@ -15,10 +15,10 @@ import '../styles/siri-edge.css';
 // The original DOCX is NEVER converted into an HHBA template. A privately
 // rendered PDF is used only to show the source page. Downloaded edits are
 // the genuine original OOXML with a verified small text change.
-export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0}:{
+export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange}:{
  resume:PrivateResume;onClose?:()=>void;
  suggestedChanges?:{original:string;proposed:string}[];
- onOpenSuggestions?:()=>void;pendingSuggestionCount?:number;
+ onOpenSuggestions?:()=>void;pendingSuggestionCount?:number;onPendingChange?:(dirty:boolean)=>void;
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
@@ -54,7 +54,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
    outerTop:outer?.scrollTop||0};
  }
  function confirmDiscardText(){
-  return !selected||!draft.trim()||draft===selected.text||
+  return !selected||draft===selected.text||
    window.confirm('这段文字还没有保存。确定丢弃这次修改吗？');
  }
  function closeEditor(){
@@ -65,7 +65,10 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   setPage(1);setZoom(1);restorePosition.current=null;
  },[resume.id]);
  useEffect(()=>{
-  if(!selected||!draft.trim()||draft===selected.text)return;
+  onPendingChange?.(Boolean(selected&&draft!==selected.text));
+ },[selected,draft,onPendingChange]);
+ useEffect(()=>{
+  if(!selected||draft===selected.text)return;
   const handle=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue='';};
   window.addEventListener('beforeunload',handle);
   return()=>window.removeEventListener('beforeunload',handle);
