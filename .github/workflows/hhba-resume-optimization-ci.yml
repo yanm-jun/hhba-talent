@@ -121,6 +121,8 @@ jobs:
         working-directory: apps/web
         run: |
           test ! -f dist/qa/resume-flow.html
+          test ! -f dist/qa/native-pdf-font.html
+          test ! -f dist/qa/native-pdf-font.ts
           test ! -e dist/qa/resume-flow.tsx
           if grep -Rql --fixed-strings 'synthetic-browser-qa-token' dist; then
             echo 'ERROR: QA token fixture leaked into production output'
