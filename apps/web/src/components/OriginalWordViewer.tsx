@@ -6,7 +6,7 @@ import {extractDocxText} from '../services/docxProfile.mjs';
 import {matchWordAnchors,type WordAnchor} from '../services/resumeWordAnchors.mjs';
 import {
  wordRendererReady,wordEditableText,wordPreviewBytes,saveOriginalWordEdit,
- downloadOriginalWordEdited
+ downloadOriginalWordEdited,downloadOriginalWordPdf
 } from '../services/originalWordApi';
 import '../styles/original-resume-viewer.css';
 import '../styles/siri-edge.css';
@@ -160,6 +160,12 @@ export function OriginalWordViewer({resume,onClose}:{
   catch(error){setMessage(error instanceof Error?error.message:'下载失败，请重试。');}
   finally{setBusy(false);}
  }
+ async function downloadSavedPdf(){
+  setBusy(true);setMessage('');
+  try{await downloadOriginalWordPdf(resume.id);}
+  catch(error){setMessage(error instanceof Error?error.message:'PDF 下载失败，请重试。');}
+  finally{setBusy(false);}
+ }
  async function save(){
   if(!selected||!confirmed||busy||!draft.trim()||draft.length>300)return;
   setBusy(true);setMessage('');
@@ -237,7 +243,9 @@ export function OriginalWordViewer({resume,onClose}:{
    {saved&&<div className="hhba-original-resume-review-export">
     <button type="button" disabled={busy} onClick={()=>void downloadSaved()}>
      <Download size={14}/> 下载 Word</button>
-    <span>已检查原来的样式。需要继续修改可下载后重新上传。</span>
+    <button type="button" disabled={busy} onClick={()=>void downloadSavedPdf()}>
+     <Download size={14}/> 下载 PDF</button>
+    <span>PDF 由这份已验证的 Word 转换生成；原件保留。继续修改可下载 Word 后重新上传。</span>
    </div>}
    {!saved&&anchors.length===0&&<p className="hhba-original-resume-note">
     这页没有找到可以安全修改的位置。</p>}
