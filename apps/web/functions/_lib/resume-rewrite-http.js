@@ -13,6 +13,14 @@ export const rewriteActive=env=>env?.HHBA_RESUME_REWRITE_ENABLED==='1'&&
   (env?.HHBA_MATCH_RUNTIME_MODE==='production'&&
    env?.HHBA_RESUME_REWRITE_PRODUCTION_ALLOWED==='1'))&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
+/** Production continuation remains separately gated until idempotency and
+ * per-account anti-replay accounting are deployed. Preview works on Free. */
+export const rewriteContinuationActive=env=>rewriteActive(env)&&
+ env?.HHBA_RESUME_AGENT_ENABLED!=='0'&&
+ typeof env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET==='string'&&
+ env.HHBA_RESUME_AGENT_CHECKPOINT_SECRET.length>=32&&
+ (env?.HHBA_AUTH_ROLLOUT==='preview'||
+  env?.HHBA_RESUME_AGENT_CONTINUE_PRODUCTION_ALLOWED==='1');
 export function rewriteOriginOK(request){
  const url=new URL(request.url);
  return request.headers.get('Origin')===url.origin&&
