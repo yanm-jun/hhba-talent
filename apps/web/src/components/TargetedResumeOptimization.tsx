@@ -80,6 +80,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [rememberDraft,setRememberDraft]=useState(false);
  const [recoverableDraft,setRecoverableDraft]=useState<any|null>(null);
  const [draftStatus,setDraftStatus]=useState('');
+ const [draftExpiresAt,setDraftExpiresAt]=useState<number|null>(null);
  // A lightweight context check, not an authentication mechanism: drafts
  // are already scoped to the signed-in account, document and target job.
  const sourceSignature=useMemo(()=>{
@@ -106,6 +107,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     sessionStorage.removeItem(draftKey);return;
    }
    setRecoverableDraft(stored);setRememberDraft(true);
+   setDraftExpiresAt(stored.expires_at);
   }catch{setDraftStatus('浏览器会话草稿无法读取，请继续手动编辑。');}
  },[draftKey,sourceSignature,blocks.length]);
  const generation=useRef(0);
@@ -440,10 +442,17 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  function discardSessionDraft(){
   try{if(draftKey)sessionStorage.removeItem(draftKey);}catch{}
   setRecoverableDraft(null);setRememberDraft(false);setNativeWordTextDraft(null);
+  setDraftExpiresAt(null);
   setDraftStatus('已清除本标签页保存的文字草稿。');
  }
  useEffect(()=>{
   if(!rememberDraft||!draftKey||recoverableDraft)return;
+  if(!draftExpiresAt||Date.now()>=draftExpiresAt){
+   try{sessionStorage.removeItem(draftKey);}catch{}
+   setRememberDraft(false);setDraftExpiresAt(null);
+   setDraftStatus('本次草稿保护已到期。尚未保存的文字仍在当前页面，若要继续自动保留，请重新授权。');
+   return;
+  }
   if(!draftDirty){
    try{sessionStorage.removeItem(draftKey);}catch{}
    return;
@@ -452,7 +461,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    try{
     const payload=JSON.stringify({schema:'HHBA_WORD_DRAFT_V2',
      source_signature:sourceSignature,
-     expires_at:Date.now()+6*60*60*1000,
+     expires_at:draftExpiresAt,
      version:{blocks:version.blocks,acceptedSuggestionIds:version.acceptedSuggestionIds},
      suggestions,ignored,suggestionDrafts,newEvidence,details,
      native_word_draft:nativeWordTextDraft});
@@ -462,8 +471,18 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    }catch{setDraftStatus('当前浏览器无法自动保存草稿，请避免关闭页面。');}
   },850);
   return()=>clearTimeout(task);
- },[draftKey,rememberDraft,draftDirty,recoverableDraft,sourceSignature,
+ },[draftKey,rememberDraft,draftDirty,draftExpiresAt,recoverableDraft,sourceSignature,
     nativeWordTextDraft,version,suggestions,ignored,suggestionDrafts,newEvidence,details]);
+ useEffect(()=>{
+  if(!rememberDraft||!draftKey||!draftExpiresAt)return;
+  const remaining=Math.max(0,draftExpiresAt-Date.now());
+  const timer=setTimeout(()=>{
+   try{sessionStorage.removeItem(draftKey);}catch{}
+   setRememberDraft(false);setDraftExpiresAt(null);setRecoverableDraft(null);
+   setDraftStatus('草稿保留时间已结束。请重新授权后再启用自动保留。');
+  },remaining);
+  return()=>clearTimeout(timer);
+ },[rememberDraft,draftKey,draftExpiresAt]);
 
  useEffect(()=>{onDraftDirtyChange?.(draftDirty||nativeWordPending);},
   [draftDirty,nativeWordPending,onDraftDirtyChange]);
@@ -497,7 +516,10 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    <label><input type="checkbox" checked={rememberDraft} onChange={event=>{
     const enabled=event.target.checked;
     if(!enabled)discardSessionDraft();
-    else {setRememberDraft(true);setDraftStatus('已授权在当前浏览器标签页自动保留文字建议草稿。');}
+    else {
+     setDraftExpiresAt(Date.now()+6*60*60*1000);setRememberDraft(true);
+     setDraftStatus('已授权在本标签页保留文字草稿，6 小时后自动失效。');
+    }
    }}/>
     在此标签页自动保留未完成的文字草稿（最多 6 小时）
    </label>
