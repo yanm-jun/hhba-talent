@@ -208,9 +208,9 @@ function OriginalPdfViewer({resume,onClose}:{
    });
    if(token!==nativeRevision.current)return false;
    const task=getDocument({data:new Uint8Array(patch.bytes),
-    isEvalSupported:false,useSystemFonts:false});
+    isEvalSupported:false,useSystemFonts:false} as any);
    const ready=await task.promise;
-   if(token!==nativeRevision.current){await ready.destroy();return false;}
+   if(token!==nativeRevision.current){await task.destroy();return false;}
    const previous=verifiedDisplayDocument.current;
    verifiedDisplayDocument.current=ready;
    setNativePdf(patch.bytes);
