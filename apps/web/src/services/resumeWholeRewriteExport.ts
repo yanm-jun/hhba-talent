@@ -11,8 +11,11 @@ export function wholeRewriteDocument(result:ResumeWholeRewriteResult,
  jobTitle:string,details:ResumeDocumentDetails):ResumeDocument{
  if(result.coverage.source_blocks!==result.coverage.analyzed_blocks||
   result.blocks.length!==result.coverage.analyzed_blocks||
-  !result.blocks.length||result.blocks.some(b=>!b.proposed.trim()))
+  !result.blocks.length||result.blocks.some(b=>!b.proposed.trim())||
+  new Set(result.blocks.map(b=>b.blockId)).size!==result.blocks.length)
   throw new Error('WHOLE_REWRITE_INCOMPLETE');
+ if(details.fullName.trim().length<2)
+  throw new Error('请先填写真实姓名，再生成岗位定向 Word。');
  // The planner can reorder SOURCE IDs only, never drop or invent a block.
  // Group headings to produce a professional CV rather than a raw text dump.
  const validOrder=Array.isArray(result.recommended_order)&&
@@ -32,7 +35,7 @@ export function wholeRewriteDocument(result:ResumeWholeRewriteResult,
   details:{
    ...details,
    // A missing name is a conspicuous placeholder, never a made-up identity.
-   fullName:details.fullName.trim()||'请填写姓名',
+   fullName:details.fullName.trim(),
    headline:details.headline.trim()||jobTitle,
    summary:''
   },
