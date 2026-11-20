@@ -567,3 +567,15 @@
  .hhba-original-word-viewer .hhba-original-resume-siri-stage::before,
  .hhba-original-word-viewer .hhba-original-resume-siri-stage::after{display:none!important}
 }
+
+
+/* The older generic anchor "span" rule hides hover tooltips. A suggestion's
+   nested text spans MUST override that rule or the Siri ink is invisible. */
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ >.hhba-word-ai-preview{
+ opacity:1;background-color:#fff;border-radius:0;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text{
+ opacity:1;background-color:transparent;border-radius:0;pointer-events:none;
+}
