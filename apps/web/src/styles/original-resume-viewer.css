@@ -593,3 +593,23 @@
  line-height:1.18;white-space:nowrap;text-align:left;
  overflow:hidden;text-overflow:ellipsis;
 }
+
+
+/* Each genuinely returned AI recommendation writes into its original
+   on-page line with a brief left-to-right appearance. Animation is a UI
+   replay of an existing response, never a claim of live model streaming. */
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text{
+ animation:hhba-word-ai-ink-arrive .76s cubic-bezier(.2,.7,.3,1) both,
+  hhba-resume-siri-letters-flow 7s ease-in-out .76s infinite alternate;
+}
+@keyframes hhba-word-ai-ink-arrive{
+ from{clip-path:inset(0 100% 0 0);opacity:.85}
+ to{clip-path:inset(0 0 0 0);opacity:1}
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text{
+  animation:none!important;clip-path:none!important;opacity:1!important
+ }
+}
