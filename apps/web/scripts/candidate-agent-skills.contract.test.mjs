@@ -91,6 +91,19 @@ test('candidate match invokes actual search adapter and preserves result, withou
   assert.doesNotMatch(JSON.stringify(value.agent),/本人曾在真实项目/);
 });
 
+test('agent re-redacts contact information at the final provider boundary',async()=>{
+  const source=resume+' 手机号：13800138000，邮箱：candidate@example.com';
+  await runCandidateAgentMatch({
+    env:preview(),redactedResume:source,
+    executeSearch:async(key,sent)=>{
+      assert.doesNotMatch(sent,/13800138000|candidate@example.com/);
+      assert.match(sent,/手机号已隐藏/);
+      assert.match(sent,/邮箱已隐藏/);
+      return {matches:[sampleJob()],diagnostic:{}};
+    }
+  });
+});
+
 test('rewrite skill can be disabled without breaking search and scoring',async()=>{
   const env={...preview(),
     HHBA_CANDIDATE_AGENT_SKILLS:'resume_evidence,official_job_search,fit_scoring'};
