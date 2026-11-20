@@ -275,19 +275,17 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
     {editingSuggestionId===s.id?<label className="targeted-resume-fact-entry">
      <span>直接修改 AI 建议文字（填写后仍须确认真实性）</span>
      <textarea maxLength={1600} rows={4} aria-label="修改 AI 建议"
-      value={draft} onChange={e=>setSuggestionDrafts(old=>({...old,[s.id]:e.target.value}))}/>
-     <span className="targeted-resume-gradient" role="note"
-      aria-label="待确认的 AI 建议文字">{draft}</span>
+      className="hhba-siri-typing" value={draft}
+      onChange={e=>setSuggestionDrafts(old=>({...old,[s.id]:e.target.value}))}/>
     </label>:<p className="targeted-resume-gradient">{draft}</p>}
     <p className="targeted-resume-rationale">对应岗位要求：{s.jobRequirement}</p>
     <p className="targeted-resume-rationale">{s.rationale}</p>
     {s.action==='request_evidence'&&<label className="targeted-resume-fact-entry">
      <span>补充自己的真实经历或成果（AI 不会猜测数据）</span>
      <textarea maxLength={800} rows={3} value={newEvidence[s.id]||''}
+      className={(newEvidence[s.id]||'').trim()?'hhba-siri-typing':''}
       onChange={e=>setNewEvidence(prev=>({...prev,[s.id]:e.target.value}))}
       placeholder="例如：你在这个岗位具体做过哪些工作？"/>
-     {!!newEvidence[s.id]?.trim()&&<span className="targeted-resume-gradient"
-      role="note" aria-label="待确认补充文字">{newEvidence[s.id]}</span>}
     </label>}
     <label className="targeted-resume-confirm">
      <input type="checkbox" checked={confirmed.includes(s.id)}
