@@ -8,7 +8,7 @@ import {runResumeEditorialAgent} from '../_lib/resume-rewrite-agent.js';
 import {issueCheckpoint} from '../_lib/resume-rewrite-checkpoint.js';
 import {responseJson as json,rejectJson as reject,rewriteActive as active,
  rewriteOriginOK as originOK,rewriteRequestJson as boundedJson,
- candidateIdentity} from '../_lib/resume-rewrite-http.js';
+ candidateIdentity,rewriteContinuationActive} from '../_lib/resume-rewrite-http.js';
 export async function onRequestGet({env}){
  let configured=false;
  try{
@@ -18,8 +18,7 @@ export async function onRequestGet({env}){
  return json({ok:true,kind:REWRITE_KIND,enabled:active(env)&&configured,
   configured,mode:env?.HHBA_RESUME_AGENT_ENABLED==='0'?'full_document_draft':'model_directed_editorial_agent',
   autonomy_enabled:env?.HHBA_RESUME_AGENT_ENABLED!=='0',
-  continuation_enabled:typeof env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET==='string'&&
-   env.HHBA_RESUME_AGENT_CHECKPOINT_SECRET.length>=32,
+  continuation_enabled:rewriteContinuationActive(env),
   requires_user_approval:true});
 }
 export async function onRequestPost({request,env}){
@@ -48,8 +47,7 @@ export async function onRequestPost({request,env}){
   try{
    // Signed continuation enables one model-selected tool per HTTP request.
    // Without the secret keep the established bounded legacy mode.
-   const resumable=typeof env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET==='string'&&
-    env.HHBA_RESUME_AGENT_CHECKPOINT_SECRET.length>=32;
+   const resumable=rewriteContinuationActive(env);
    const agentEnv=resumable?{...env,HHBA_RESUME_AGENT_MAX_PASSES:'1'}:env;
    const autonomous=await runResumeEditorialAgent({
     draft:base,blocks:body.blocks,job:body.job,env:agentEnv,
