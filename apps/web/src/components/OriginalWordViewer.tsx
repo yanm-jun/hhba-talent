@@ -6,7 +6,8 @@ import {extractDocxText} from '../services/docxProfile.mjs';
 import {matchWordAnchors,type WordAnchor} from '../services/resumeWordAnchors.mjs';
 import {
  wordRendererReady,wordEditableText,wordPreviewBytes,saveOriginalWordEdit,
- shiftOriginalWordRevision,downloadOriginalWordEdited,downloadOriginalWordPdf
+ shiftOriginalWordRevision,downloadOriginalWordEdited,downloadOriginalWordPdf,
+ type WordHistoryEntry
 } from '../services/originalWordApi';
 import '../styles/original-resume-viewer.css';
 import '../styles/siri-edge.css';
@@ -41,6 +42,8 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  const [revision,setRevision]=useState(0);
  const [totalRevisions,setTotalRevisions]=useState(0);
  const [maxRevisions,setMaxRevisions]=useState(8);
+ const [maxDailyEdits,setMaxDailyEdits]=useState(6);
+ const [history,setHistory]=useState<WordHistoryEntry[]>([]);
  const [refresh,setRefresh]=useState(0);
  const [message,setMessage]=useState('');
  const restorePosition=useRef<{page:number;left:number;top:number;outerTop:number}|null>(null);
@@ -99,6 +102,8 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
     setRevision(Number.isInteger(info.revision)?info.revision:(wasSaved?1:0));
     setTotalRevisions(Number.isInteger(info.total_revisions)?info.total_revisions:(wasSaved?1:0));
     setMaxRevisions(Number.isInteger(info.max_revisions)?info.max_revisions:8);
+    setMaxDailyEdits(Number.isInteger(info.max_daily_edits)?info.max_daily_edits:6);
+    setHistory(Array.isArray(info.history)?info.history:[]);
     const bytes=await wordPreviewBytes(resume.id,wasSaved,undefined,
      Number.isInteger(info.revision)?info.revision:(wasSaved?1:0));
     if(!active)return;
@@ -254,8 +259,20 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   </div>
   {ready==='available'&&<p className="hhba-original-resume-note" role="status">
    当前修改进度：{revision} / {totalRevisions} · 最多 {maxRevisions} 个已验证修订版本。
-   每次修改后都可以继续点选下一段，撤销和重做不会覆盖原始 Word。
+   单日最多 {maxDailyEdits} 次保存验证；撤销和重做不占用该额度。原始 Word 不会被覆盖。
   </p>}
+  {history.length>0&&ready==='available'&&<details className="hhba-original-resume-history">
+   <summary>查看修改历史（{history.length} 次修改）</summary>
+   <ol>{history.map(entry=><li key={entry.revision}
+    className={entry.revision===revision?'is-current':''}>
+    <div><strong>第 {entry.revision} 版</strong>
+     <span>{entry.updated_at?new Date(entry.updated_at).toLocaleString('zh-CN'):'历史记录'}
+      {entry.revision===revision?' · 当前版本':''}</span>
+    </div>
+    <p><strong>修改前：</strong>{entry.original}</p>
+    <p><strong>修改后：</strong>{entry.text}</p>
+   </li>)}</ol>
+  </details>}
   {loading&&<p className="hhba-original-resume-note" role="status">正在打开简历…</p>}
   {busy&&<p className="hhba-original-resume-word-status is-busy" role="status">
    正在校验原 Word 的文字位置、字体与分页，保存后同步准备 PDF；检查不通过不会覆盖原件。
