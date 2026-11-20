@@ -44,7 +44,7 @@ async function main(){
   const canvas=document.createElement('canvas');canvas.width=view.width;canvas.height=view.height;
   canvas.style.cssText='max-width:100%;height:auto;display:block';
   await pg.render({canvas,canvasContext:canvas.getContext('2d')!,viewport:view}).promise;
-  wrap.append(label,canvas);examples.append(wrap);await doc.destroy();
+  wrap.append(label,canvas);examples.append(wrap);await documentTask.destroy();
  }
  host.append(examples);
 }
