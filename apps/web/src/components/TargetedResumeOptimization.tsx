@@ -183,6 +183,9 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const requirements=useMemo(()=>[
   job.requirements_basis,...job.matched,...job.not_evidenced,...job.needs_verification
  ].filter(Boolean).join('\n').slice(0,2500),[job]);
+ const fullJobRequirements=useMemo(()=>[
+  job.requirements_basis,...job.matched,...job.not_evidenced,...job.needs_verification
+ ].filter(Boolean).join('\n').slice(0,16000),[job]);
  const criteria=useMemo(()=>[...job.matched,...job.not_evidenced], [job]);
  const printDocument=useMemo(()=>buildResumeDocument(profile,version.blocks,details),[profile,version.blocks,details]);
  const canPrint=readableResumeDocument(printDocument)&&omittedSourceCharacters===0;
@@ -285,7 +288,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    });
    const result=await requestWholeResumeRewrite(personalized,{
     title:(job.title_zh||job.title).slice(0,180),
-    requirements
+    requirements:fullJobRequirements
    },controller.signal);
    if(controller.signal.aborted)return;
    setWholeDraft(result);
@@ -655,7 +658,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   <div className="targeted-resume-toolbar">
    <div><strong>优化这份简历</strong><p>根据目标岗位提出修改建议，不会凭空添加经历。</p></div>
    {hasSession&&status?.enabled
-    ?<button type="button" disabled={busy||!blocks.length||legacyPrintQa&&!sourceResume&&!consent} onClick={()=>{
+    ?<button type="button" disabled={busy||wholeBusy||!blocks.length||legacyPrintQa&&!sourceResume&&!consent} onClick={()=>{
        if(!consent){
         setAiSettingsOpen(true);
         setNotice('请先展开隐私设置，确认 AI 处理授权，然后再生成建议。');
