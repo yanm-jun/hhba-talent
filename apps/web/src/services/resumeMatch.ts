@@ -39,6 +39,9 @@ export type MatchResponse = {
   history_status?:'SAVED'|'EMPTY'|'UNAVAILABLE';
   new_job_count?:number;
   improved_job_count?:number;
+  agent?:{kind:'HHBA_CANDIDATE_AGENT_V1';status:'awaiting_user_selection';
+    skills_executed:{skill:string;status:string}[];next_skill:string|null;
+    next_requires_user_approval:boolean;applications_submitted:0}|null;
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number};
 const API='/api/match-native';
@@ -46,6 +49,10 @@ const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays 
 const LIMIT=3*1024*1024;
 const errorMap:Record<string,string>={
   MATCH_NOT_ENABLED:'智能匹配服务尚未开放，请稍后再试。',
+  AGENT_SKILLS_INVALID:'后台 Agent 技能配置无效，已停止此次调用。',
+  AGENT_MATCHING_SKILL_DISABLED:'后台 Agent 尚未开放完整求职技能，请联系管理员。',
+  AGENT_SEARCH_RESULT_INVALID:'Agent 未取得有效的岗位搜索结果，请稍后重试。',
+  AGENT_SCORE_INVALID:'Agent 匹配分数据异常，未显示未经核验的结果。',
   MATCH_DATABASE_NOT_READY:'智能匹配额度保护尚未配置，已停止分析以防产生费用。',
   SESSION_INVALID:'请登录 HHBA 求职账户后重试。',
   FORBIDDEN:'当前账户无权使用求职者匹配服务。',
