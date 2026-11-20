@@ -144,7 +144,7 @@ export async function onRequestGet({request,env}){
    return json({ok:true,editable_text:existing?[]:data.editable_text,
     saved:existing?existing.saved:null});
   }
-  if(action==='download'||action==='edited-preview'){
+  if(action==='download'||action==='edited-preview'||action==='download-pdf'){
    const state=await approved(bucket,row);
    if(!state)return fail('WORD_NOT_EDITED',404);
    const item=await bucket.get(state.key+(action==='download'?'.docx':'.edited.pdf'));
@@ -154,7 +154,8 @@ export async function onRequestGet({request,env}){
    if(typeof expected!=='string'||!/^[0-9a-f]{64}$/.test(expected)||
     await shaBytes(bytes)!==expected)return fail('WORD_NOT_EDITED',409);
    return replyFile(bytes,action==='download'?DOCX_MIME:'application/pdf',
-    action==='download'?'HHBA-resume-edited.docx':'HHBA-resume-edited-preview.pdf');
+    action==='download'?'HHBA-resume-edited.docx':
+     action==='download-pdf'?'HHBA-resume-edited.pdf':'HHBA-resume-edited-preview.pdf');
   }
   if(action!=='preview')return fail('INVALID_REQUEST',400);
   const key=prefix(row)+'.source.pdf';
