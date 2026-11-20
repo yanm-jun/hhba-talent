@@ -112,7 +112,10 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
     if(ready==='unavailable'){
      const bytes=await fetchPrivateResumeForLocalReview(resume);
      const content=await extractDocxText(bytes);
-     if(active){setText(content);setLoading(false);}
+     if(active){
+      setText(content);setLoading(false);
+      if(!renderedEntrance.current){renderedEntrance.current=true;onDocumentReady?.();}
+     }
      return;
     }
     const info=await wordEditableText(resume.id);
@@ -164,6 +167,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
     if(active){
      setPreviewError(error instanceof Error?error.message:'无法打开这份 Word。');
      setLoading(false);
+     if(!renderedEntrance.current){renderedEntrance.current=true;onDocumentReady?.();}
     }
    }
   })();
