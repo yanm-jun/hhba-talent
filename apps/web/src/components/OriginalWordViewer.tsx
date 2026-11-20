@@ -4,7 +4,6 @@ import type {PrivateResume} from '../services/privateResumes';
 import {downloadPrivateResume,fetchPrivateResumeForLocalReview} from '../services/privateResumes';
 import {extractDocxText} from '../services/docxProfile.mjs';
 import {matchWordAnchors,type WordAnchor} from '../services/resumeWordAnchors.mjs';
-import {makeWordSiriInkMask} from '../services/resumeSiriInk.mjs';
 import {
  wordRendererReady,wordEditableText,wordPreviewBytes,saveOriginalWordEdit,
  downloadOriginalWordEdited
@@ -36,12 +35,6 @@ export function OriginalWordViewer({resume,onClose}:{
  const [confirmed,setConfirmed]=useState(false);
  const [busy,setBusy]=useState(false);
  const [saved,setSaved]=useState(false);
- // Only the one saved Word text node, verified unique across all rendered pages,
- // may be colored. The real PDF render is untouched underneath.
- const [savedHighlightText,setSavedHighlightText]=useState('');
- const [siriInk,setSiriInk]=useState<{
-  page:number;bbox:number[];maskUrl:string;text:string
- }|null>(null);
  const [refresh,setRefresh]=useState(0);
  const [message,setMessage]=useState('');
 
@@ -58,7 +51,6 @@ export function OriginalWordViewer({resume,onClose}:{
   if(ready==='checking')return;
   let active=true,task:any=null;
   setLoading(true);setPreviewError('');setPage(1);setAnchors([]);setSelected(null);
-  setSiriInk(null);setSavedHighlightText('');
   void(async()=>{
    try{
     if(ready==='unavailable'){
@@ -87,9 +79,8 @@ export function OriginalWordViewer({resume,onClose}:{
     const result=await task.promise;
     if(!active){await task.destroy();return;}
     const counts=new Map<string,number>();
-    if(result.numPages<=20){
-     const candidates=new Set(wasSaved?
-      (info.saved?.text?[info.saved.text]:[]):(info.editable_text||[]));
+    if(result.numPages<=20&&!wasSaved){
+     const candidates=new Set(info.editable_text||[]);
      for(let current=1;current<=result.numPages;current++){
       const content=await (await result.getPage(current))
        .getTextContent({includeMarkedContent:false});
@@ -102,8 +93,6 @@ export function OriginalWordViewer({resume,onClose}:{
     }
     if(!active)return;
     setEditable(wasSaved?[]:(info.editable_text||[]).filter(t=>counts.get(t)===1));
-    setSavedHighlightText(wasSaved&&info.saved?.text&&counts.get(info.saved.text)===1?
-     info.saved.text:'');
     doc.current=result;setCount(result.numPages);setLoading(false);
    }catch(error){
     if(active){
@@ -118,7 +107,7 @@ export function OriginalWordViewer({resume,onClose}:{
  useEffect(()=>{
   if(ready!=='available'||loading||!surface.current||!doc.current)return;
   let active=true,task:any=null;
-  setAnchors([]);setSiriInk(null);
+  setAnchors([]);
   void(async()=>{
    try{
     const source=doc.current,view=await source.getPage(page);
@@ -142,18 +131,7 @@ export function OriginalWordViewer({resume,onClose}:{
     const content=await view.getTextContent({includeMarkedContent:false});
     if(!active)return;
     const items=content.items.filter((x:any)=>typeof x.str==='string') as any;
-    if(saved){
-     if(!savedHighlightText)return;
-     const matches=matchWordAnchors({
-      editableText:[savedHighlightText],items,viewport:viewport as any,page
-     });
-     if(matches.length!==1)return;
-     const mask=makeWordSiriInkMask(canvas,matches[0].bbox);
-     if(active&&mask)setSiriInk({
-      page,bbox:mask.bbox,maskUrl:mask.maskUrl,text:savedHighlightText
-     });
-     return;
-    }
+    if(saved)return;
     setAnchors(matchWordAnchors({
      editableText:editable,items,viewport:viewport as any,page
     }));
@@ -163,7 +141,7 @@ export function OriginalWordViewer({resume,onClose}:{
    }
   })();
   return()=>{active=false;try{task?.cancel();}catch{}};
- },[page,ready,loading,editable,width,saved,refresh,savedHighlightText]);
+ },[page,ready,loading,editable,width,saved,refresh]);
 
  useEffect(()=>{
   const el=paper.current;if(!el)return;
@@ -216,20 +194,6 @@ export function OriginalWordViewer({resume,onClose}:{
      }}>
       <canvas className="hhba-original-resume-canvas" ref={surface}
        role="img" aria-label={'Word 原始页面第 '+page+' 页'}/>
-      {siriInk?.page===page&&<span
-       className="hhba-original-resume-siri-ink"
-       role="note" aria-label={'已修改文字：'+siriInk.text}
-       data-resume-change="modified-or-added"
-       style={{
-        left:siriInk.bbox[0]/10+'%',
-        top:siriInk.bbox[1]/10+'%',
-        width:siriInk.bbox[2]/10+'%',
-        height:siriInk.bbox[3]/10+'%',
-        WebkitMaskImage:'url("'+siriInk.maskUrl+'")',
-        maskImage:'url("'+siriInk.maskUrl+'")',
-        WebkitMaskSize:'100% 100%',maskSize:'100% 100%',
-        WebkitMaskRepeat:'no-repeat',maskRepeat:'no-repeat'
-       }}/>}
       {!saved&&anchors.map(anchor=>{
        const [x,y,w,h]=anchor.bbox;
        return <button key={anchor.id} type="button"
@@ -257,6 +221,10 @@ export function OriginalWordViewer({resume,onClose}:{
          </div>
          <textarea aria-label="修改 Word 文字" value={draft} rows={3}
           maxLength={300} onChange={e=>{setDraft(e.target.value);setConfirmed(false);}}/>
+         {draft!==selected.text&&<div className="hhba-resume-pending-text"
+          role="note" aria-label="待确认修改文字">
+          <span className="hhba-resume-siri-letters">{draft}</span>
+         </div>}
          <label><input type="checkbox" checked={confirmed}
           onChange={e=>setConfirmed(e.target.checked)}/>我确认内容属实，并同意处理此文件</label>
          <div className="hhba-original-resume-editbox-actions">
