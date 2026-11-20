@@ -19,7 +19,7 @@ import '../styles/siri-edge.css';
 type PendingWordTextDraft={original:string;text:string;revision:number;page:number};
 export type WordVisualSuggestion={id:string;original:string;proposed:string;state:'pending'|'accepted'};
 export type WordRevisionSnapshot={revision:number;history:WordHistoryEntry[]};
-export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onRevisionSnapshot}:{
+export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onRevisionSnapshot,onDocumentReady}:{
  resume:PrivateResume;onClose?:()=>void;
  suggestedChanges?:{original:string;proposed:string}[];
  onOpenSuggestions?:()=>void;pendingSuggestionCount?:number;onPendingChange?:(dirty:boolean)=>void;
@@ -33,10 +33,12 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  visualSuggestions?:WordVisualSuggestion[];
  onVisualSuggestionSelect?:(id:string)=>void;
  onRevisionSnapshot?:(snapshot:WordRevisionSnapshot)=>void;
+ onDocumentReady?:()=>void;
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
  const doc=useRef<any>(null);
+ const renderedEntrance=useRef(false);
  const [ready,setReady]=useState<'checking'|'available'|'unavailable'>('checking');
  const [loading,setLoading]=useState(true);
  const [previewError,setPreviewError]=useState('');
@@ -77,6 +79,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  }
  useEffect(()=>{
   setPage(1);setZoom(1);restorePosition.current=null;
+  renderedEntrance.current=false;
  },[resume.id]);
  useEffect(()=>{
   onPendingChange?.(Boolean(selected&&draft!==selected.text));
@@ -197,6 +200,10 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
     setAnchors(matchWordAnchors({
      editableText:editable,items,viewport:viewport as any,page
     }));
+    if(!renderedEntrance.current){
+     renderedEntrance.current=true;
+     onDocumentReady?.();
+    }
    }catch(error){
     if(active&&error instanceof Error&&error.name!=='RenderingCancelledException')
      setPreviewError('这一页暂时无法显示，请下载原件查看。');
