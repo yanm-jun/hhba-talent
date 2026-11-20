@@ -4,7 +4,8 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
-import {candidateAgentEnabled,candidateAgentConfiguration,runCandidateAgentMatch} from '../../_lib/candidate-agent-skills.js';
+import {candidateAgentEnabled,candidateAgentConfiguration,candidateAgentRuntimePolicy,runCandidateAgentMatch} from '../../_lib/candidate-agent-skills.js';
+import {recordAnonymousAgentRun} from '../../_lib/candidate-agent-policy.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -339,6 +340,25 @@ export async function onRequest({request,env}){
  }
  const redacted=redactForModel(input.text);
  if(redacted.replace(/\s/g,'').length<30)return fail('INVALID_RESUME_TEXT',400);
+ // Load an admin-approved policy only AFTER the applicant is authenticated
+ // and has expressly consented. Missing D1 policy keeps legacy matching alive,
+ // but never authorizes the Agent.
+ const runtime=candidateAgentEnabled(env)?
+  await candidateAgentRuntimePolicy(env):{enabled:false,policy:null};
+ const execute=({signal=null,onProgress=()=>{},onPartial=()=>{}}={})=>
+  runtime.enabled?
+   runCandidateAgentMatch({env,policy:runtime.policy,redactedResume:redacted,
+    roleHint:options.role_hint,limit:options.limit,executeSearch:runSearchFirstMatch,
+    signal,onProgress,onPartial}):
+   runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
+    options.role_hint,options.limit,{signal,onProgress,onPartial});
+ const record=async(status,result,elapsedMs)=>{
+  if(!runtime.enabled)return;
+  await recordAnonymousAgentRun(env.HHBA_PNVS_AUTH_DB,{
+   status,skills:result?.agent?.skills_executed?.length??0,
+   matchedCount:result?.matches?.length??0,elapsedMs
+  });
+ };
  // Same-origin, authorized one-shot call. No raw resume stored in HHBA database.
  const streaming=request.headers.get('Accept')?.includes('text/event-stream');
  if(streaming){
@@ -364,15 +384,12 @@ export async function onRequest({request,env}){
      try{
       const onProgress=stage=>{phase=stage;send('progress',{stage});};
       const onPartial=matches=>send('partial',{matches});
-      const result=candidateAgentEnabled(env)?
-       await runCandidateAgentMatch({env,redactedResume:redacted,
-        roleHint:options.role_hint,limit:options.limit,executeSearch:runSearchFirstMatch,
-        signal:abort.signal,onProgress,onPartial}):
-       await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-        options.role_hint,options.limit,{signal:abort.signal,onProgress,onPartial});
+      const result=await execute({signal:abort.signal,onProgress,onPartial});
       console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
+      await record('complete',result,Date.now()-started);
       send('complete',await withSavedHistory(env,candidate,input,result));
      }catch(e){
+      await record('failed',null,Date.now()-started);
       const code=typeof e?.code==='string'?e.code:
        /^AGENT_[A-Z_]+$/.test(e?.message||'')?e.message:'AI_PROVIDER_UNAVAILABLE';
       console.warn('HHBA_MATCH_NATIVE_ERROR',JSON.stringify({
@@ -394,15 +411,14 @@ export async function onRequest({request,env}){
   }});
  }
 
+ const requestStarted=Date.now();
  try{
-  const result=candidateAgentEnabled(env)?
-   await runCandidateAgentMatch({env,redactedResume:redacted,
-    roleHint:options.role_hint,limit:options.limit,executeSearch:runSearchFirstMatch}):
-   await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-    options.role_hint,options.limit);
+  const result=await execute();
   console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
+  await record('complete',result,Date.now()-requestStarted);
   return json(await withSavedHistory(env,candidate,input,result));
  }catch(e){
+  await record('failed',null,Date.now()-requestStarted);
   const code=typeof e?.code==='string'?e.code:
    /^AGENT_[A-Z_]+$/.test(e?.message||'')?e.message:'AI_PROVIDER_UNAVAILABLE';
   console.warn('HHBA_MATCH_NATIVE_ERROR',code);
