@@ -642,6 +642,73 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     <div className="targeted-resume-word-review">
     <button type="button" className="targeted-resume-mobile-rail-close"
      onClick={()=>setMobileSuggestionsOpen(false)}>返回 Word</button>
+    <section className="hhba-word-match-score" aria-label="目标岗位匹配分与复评">
+     <div className="hhba-word-match-score-head">
+      <div>
+       <span>目标岗位 · {job.company}</span>
+       <strong>{job.title_zh||job.title}</strong>
+      </div>
+      <div className="hhba-word-match-number">
+       <strong>{scoreResult?.supported&&Number.isFinite(scoreResult.original_score)?
+        scoreResult.original_score:Number.isInteger(job.reference_score)?job.reference_score:'—'}</strong>
+       <small>/100</small>
+      </div>
+     </div>
+     <p className="hhba-word-match-score-caption">
+      {scoreResult?.supported?'优化前 · 同规则复评':'原始岗位适配分 · 非录用概率'}
+     </p>
+     {scoreResult?.supported&&Number.isFinite(scoreResult.updated_score)?
+      <div className="hhba-word-match-after" role="status">
+       <span>已保存 Word · 优化后</span>
+       <strong>{scoreResult.updated_score}<small>/100</small></strong>
+       <p>{typeof scoreResult.delta==='number'?
+        (scoreResult.delta>0?'提升 +'+scoreResult.delta:
+         scoreResult.delta<0?'变化 '+scoreResult.delta:'分值未变化'):
+        '已按相同岗位规则核验'} · 仅表示岗位文本匹配表现，不代表录用概率。</p>
+      </div>:
+      <p className="hhba-word-match-await">
+       {!hasVerifiedWordRevision?'完成真实 Word 修改并确认保存后，可重新评估匹配分。':
+        !verifiedWordScore.ok?'已保存的修改无法全部对应原始匹配资料，暂不生成不可靠的新分数。':
+        '已保存第 '+wordRevisionSnapshot!.revision+' 版 Word，可以按原岗位规则复评。'}
+      </p>}
+     {hasVerifiedWordRevision&&scoreStatus?.enabled&&<>
+      {!hasAuditedAtsIdentity&&verifyStatus?.enabled&&!verifiedJob&&<>
+       <label className="hhba-word-match-confirm"><input type="checkbox"
+        checked={consentVerify} onChange={e=>setConsentVerify(e.target.checked)}/>
+        同意核对企业公开的岗位要求
+       </label>
+       <button type="button" className="hhba-word-match-reassess"
+        disabled={!consentVerify||verifying} onClick={()=>void verifyEmployer()}>
+        {verifying?'正在核验岗位…':'核验该岗位以计算真实分数'}
+       </button>
+      </>}
+      {verifiedJob&&!confirmedVerifiedJob&&<label className="hhba-word-match-confirm">
+       <input type="checkbox" checked={confirmedVerifiedJob}
+        onChange={e=>setConfirmedVerifiedJob(e.target.checked)}/>
+       我已确认核验到的是 {verifiedJob.company} 的 {verifiedJob.title}
+      </label>}
+      {(hasAuditedAtsIdentity||confirmedVerifiedJob)&&<>
+       <label className="hhba-word-match-confirm">
+        <input type="checkbox" checked={confirmReassessment}
+         onChange={e=>setConfirmReassessment(e.target.checked)}/>
+        我确认已保存的 Word 文字真实，使用同一岗位规则复评
+       </label>
+       <button type="button" className="hhba-word-match-reassess"
+        disabled={!scoreSourceReady||!hasSupportedJob||!confirmReassessment||scoring}
+        onClick={()=>void reassess()}>
+        {scoring?'正在核算…':'重新计算匹配分'}
+       </button>
+      </>}
+     </>}
+     {!scoreStatus?.enabled&&<p className="hhba-word-match-reassess-hint">
+      {scoreStatus?'当前环境暂未开放同规则复评，保留原匹配分，不展示猜测的新分数。':
+       '正在检查岗位复评服务…'}
+     </p>}
+     {scoreStatus?.enabled&&!hasAuditedAtsIdentity&&verifyStatus&&!verifyStatus.enabled&&
+      <p className="hhba-word-match-reassess-hint">
+       此岗位暂无法获得可审核的官方职位快照，不能负责任地给出优化后分数。
+      </p>}
+    </section>
     {optimizationControls}
     <div className="targeted-resume-word-assistant-head">
      <strong><Sparkles size={15}/> AI 修改建议</strong>
@@ -652,9 +719,9 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     </div>
     {suggestions.length===0?<p className="targeted-resume-word-empty">
      {busy?'AI 正在依据目标岗位分析你的真实经历…':'暂无建议，点击「开始 AI 优化」开始。'}</p>:
-    revealedSuggestionCount<suggestions.length&&<p className="targeted-resume-word-reveal" role="status">
-     AI 已完成分析，正在逐条呈现建议 {revealedSuggestionCount}/{suggestions.length}
-    </p>}
+     revealedSuggestionCount<suggestions.length&&<p className="targeted-resume-word-reveal" role="status">
+      AI 已完成分析，正在逐条呈现建议 {revealedSuggestionCount}/{suggestions.length}
+     </p>}
     <div className="targeted-resume-word-suggestion-list">
      {suggestions.slice(0,revealedSuggestionCount).map((item,i)=>{
       const applied=version.acceptedSuggestionIds.includes(item.id);
