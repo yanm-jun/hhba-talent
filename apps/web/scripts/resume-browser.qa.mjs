@@ -795,6 +795,19 @@ try{
   assert.equal(await full.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),1);
   await full.locator('.hhba-whole-rewrite-approval input[type=checkbox]').check();
   await full.getByText('当前确认不等于已经写入原文件',{exact:false}).waitFor();
+  const exported=full.waitForEvent('download');
+  await full.getByRole('button',{name:/下载完整岗位定向 Word/}).click();
+  const generated=await exported;
+  const downloaded=await generated.path();
+  const docx=await readFile(downloaded);
+  assert.equal(docx.subarray(0,2).toString(),'PK',
+   'whole-document AI writing must yield a genuine editable Office ZIP package');
+  const docxXml=execFileSync('unzip',['-p',downloaded,'word/document.xml'],{encoding:'utf8'});
+  assert.match(docxXml,/REWRITTEN WORD RESUME/);
+  assert.match(docxXml,/虚构经历段落8/,
+   'the final Word file must include the final paragraph, not just the first five AI tips');
+  assert.doesNotMatch(docxXml,/只允许处理五段/);
+  await writeFile(output+'/whole-resume-ai-review-export.docx',docx);
   assert.equal(await full.locator('.hhba-original-resume-history-list li').count(),0,
    'approving the AI text cannot silently create a Word revision');
   await full.screenshot({path:output+'/whole-resume-ai-draft-desktop.png',fullPage:true});
