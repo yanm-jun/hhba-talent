@@ -1,0 +1,22 @@
+name: HHBA V1 Stage 1 classification (isolated)
+on:
+  pull_request:
+    paths:
+      - 'apps/web/functions/_lib/dual-classification-v1.js'
+      - 'apps/web/scripts/dual-classification-v1.contract.test.mjs'
+      - 'docs/HHBA_V1_DUAL_CLASSIFICATION_STAGE1_20261111.md'
+      - '.github/workflows/hhba-v1-dual-classification-stage1.yml'
+  workflow_dispatch:
+jobs:
+  stage1-contract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Contract tests - zero external API calls
+        run: node --test apps/web/scripts/dual-classification-v1.contract.test.mjs
