@@ -245,5 +245,8 @@
  }
  .hhba-original-resume-mobile-dock button:disabled{opacity:.48}
  .hhba-original-resume-toolbar .hhba-original-resume-revision-action{display:none}
- .hhba-original-resume-review-export{display:none}
+ .hhba-original-resume-review-export{display:flex;margin:9px 0}
+ .hhba-original-resume-review-export>button:nth-child(2),
+ .hhba-original-resume-review-export>span{display:none}
+ .hhba-original-resume-review-export>button:first-child{flex:1;min-height:42px}
 }
