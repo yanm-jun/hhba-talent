@@ -684,7 +684,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   </p>}
   {hasSession&&(status?.enabled||wholeStatus?.enabled)&&<label className="targeted-resume-consent">
    <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>
-   <span>我同意将下方展示的简历证据片段与该岗位要求发送给平台选定的第三方 AI 服务商进行润色。服务器会尽力脱敏常见联系方式，但不能确保移除所有个人信息。建议内容只供本人核实与选择，不会自动投递。</span>
+   <span>我同意将上传简历中可提取的完整文字（用于整份 AI 撰写），或当前选取的简历证据（用于局部优化），连同目标岗位要求发送给平台选定的第三方 AI 服务商。系统会尽力遮盖常见联系方式，但不能保证移除全部个人信息。结果仅作为待本人核实的草稿，不会自动投递，也不会未经确认覆盖原 Word。</span>
   </label>}
   {sourceResume&&draftKey&&<section className="targeted-resume-draft-recovery" aria-label="当前标签页草稿保护">
    <label><input type="checkbox" checked={rememberDraft} onChange={event=>{
