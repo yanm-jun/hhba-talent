@@ -46,6 +46,15 @@ const DEFAULT_IDS = Object.freeze(CANDIDATE_AGENT_SKILLS.map(x=>x.id));
 const known = new Set(DEFAULT_IDS);
 const matchingIds = Object.freeze(DEFAULT_IDS.filter(id=>id!=='targeted_resume_rewrite'));
 
+function safeCandidateJob(job){
+  return Boolean(job&&typeof job.company==='string'&&job.company.trim()&&
+    typeof job.title==='string'&&job.title.trim()&&
+    safeJobDetailLink(job.official_url)&&allowedEmployerJobLink(job.official_url)&&
+    isMainlandJobLocation(job.location)&&
+    (job.match_score===null||job.match_score===undefined||
+     (Number.isInteger(job.match_score)&&job.match_score>=0&&job.match_score<=100)));
+}
+
 export function candidateAgentEnabled(env) {
   // Never enable in production merely because a key happens to exist.
   return env?.HHBA_CANDIDATE_AGENT_ENABLED==='1' &&
@@ -111,26 +120,26 @@ export async function runCandidateAgentMatch({
   // Only the server may supply executeSearch. Resume content stays in memory;
   // execution traces store skill IDs and statuses, never CV or job-page text.
   report(phases[1],'started');
+  // Streamed preliminary hits must pass the same safety checks as final jobs.
+  // Never expose an invalid URL even for a moment while the model is running.
+  const safePartial=matches=>{
+    if(!Array.isArray(matches))return;
+    const clean=matches.filter(safeCandidateJob).slice(0,limit);
+    if(clean.length)onPartial(clean);
+  };
   const result=await executeSearch(
     env.HHBA_MATCH_DEEPSEEK_KEY,safeResume,String(roleHint).slice(0,80),limit,
-    {signal,onProgress,onPartial}
+    {signal,onProgress,onPartial:safePartial}
   );
   if(!result||!Array.isArray(result.matches)||result.matches.length>limit)
     throw Error('AGENT_SEARCH_RESULT_INVALID');
   // A provider-produced candidate is not an automatically verified vacancy.
   // Reject unsafe/third-party/non-mainland links even if an injected provider
   // bypasses HHBA's normal Search-first filters.
-  if(result.matches.some(job=>!job||typeof job.company!=='string'||
-    !job.company.trim()||typeof job.title!=='string'||!job.title.trim()||
-    !safeJobDetailLink(job.official_url)||!allowedEmployerJobLink(job.official_url)||
-    !isMainlandJobLocation(job.location)))throw Error('AGENT_UNTRUSTED_JOB');
+  if(result.matches.some(job=>!safeCandidateJob(job)))
+    throw Error('AGENT_UNTRUSTED_JOB');
   steps[steps.length-1]={skill:phases[1],status:'complete'};
-  // Existing Search-first step supplies its own evidence-based match scores.
-  // Unknown scores remain null; do not manufacture numeric values.
-  if(result.matches.some(job=>job&&job.match_score!==null&&
-     job.match_score!==undefined&&
-     (!Number.isInteger(job.match_score)||job.match_score<0||job.match_score>100)))
-    throw Error('AGENT_SCORE_INVALID');
+  // The same guard checks source, city and 0–100 score before any display.
   report(phases[2],'complete');
   const canRewrite=new Set(selectedCandidateSkills(env)).has('targeted_resume_rewrite');
   const agent={
