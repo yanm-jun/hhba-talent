@@ -1,0 +1,45 @@
+name: HHBA Employer Resource Library Gate
+on:
+  pull_request:
+    paths:
+      - 'apps/admin-preview/**'
+      - 'apps/web/functions/_lib/employer-library.js'
+      - 'apps/web/functions/_lib/deepseek-search-match.js'
+      - 'apps/web/functions/api/match-native/**'
+      - 'apps/web/functions/admin-preview/api/library.js'
+      - 'apps/web/src/data/employerLibraryCandidateBatches.json'
+      - 'apps/web/src/data/employerLibraryRecoveredChatNamesSupplement.json'
+      - 'apps/web/public/data/employer-library.json'
+      - 'apps/web/scripts/build-employer-library.mjs'
+      - 'apps/web/scripts/employer-library.contract.test.mjs'
+      - 'apps/web/scripts/cloudflare-pages-build.py'
+      - '.github/workflows/hhba-employer-library-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  library:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate runtime files
+        run: |
+          node --check apps/admin-preview/library.js
+          node --check apps/admin-preview/dashboard.js
+          node --check apps/admin-preview/server.mjs
+          node --check apps/web/functions/_lib/employer-library.js
+          node --check apps/web/functions/_lib/deepseek-search-match.js
+          node --check apps/web/functions/admin-preview/api/library.js
+          node --check 'apps/web/functions/api/match-native/[[path]].js'
+          python3 -m py_compile apps/web/scripts/cloudflare-pages-build.py
+      - name: Rebuild deterministic employer library index
+        run: node apps/web/scripts/build-employer-library.mjs
+      - name: Test classifications and original console
+        run: |
+          node --test apps/web/scripts/employer-library.contract.test.mjs
+          node --test apps/web/scripts/admin-original-dashboard.contract.test.mjs
+          node --test apps/admin-preview/tests/preview.test.mjs

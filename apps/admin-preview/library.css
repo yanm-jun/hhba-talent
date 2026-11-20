@@ -1,0 +1,40 @@
+.library-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}
+.library-stat{border:1px solid var(--border);border-radius:11px;padding:16px;background:#fff}
+.library-stat span{display:block;color:var(--muted);font-size:11px}.library-stat strong{font-size:25px;display:block;margin-top:8px}.library-stat small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.library-halls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:16px 0 24px}
+.library-hall{background:white;border:1px solid var(--border);border-radius:10px;min-height:49px;text-align:left;padding:12px;font-size:12px;color:#45604e}
+.library-hall.active{background:#eaf4ed;border-color:#5c9270;color:#235b40;font-weight:750}
+.library-hall-sub{display:block;margin-top:5px;font-size:10px;font-weight:400;color:#7b8a81;line-height:1.5}
+.library-collection-status{padding:13px 15px;border:1px solid #dde9df;border-radius:10px;background:#f6faf7;font-size:12px;line-height:1.8;color:#456b51;margin:5px 0 12px}
+.library-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.library-toolbar input,.library-edit-form input,.library-edit-form select,.library-editor textarea{border:1px solid #d9e3dc;border-radius:8px;background:white;padding:11px;color:var(--ink);width:100%;font-size:12px}
+.library-toolbar input{max-width:360px}
+.library-muted{color:#a4ada8}
+.library-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--border);border-radius:10px}
+.library-table{border-collapse:collapse;width:100%;font-size:12px}
+.library-table th{text-align:left;background:#f6f9f6;color:#728176;font-weight:650;padding:12px;white-space:nowrap}
+.library-table td{padding:13px 12px;border-top:1px solid #ecf0ed;vertical-align:top}
+.library-table td strong,.library-table td small,.library-table td a{display:block}
+.library-table td small{font-size:10px;color:#83938a;margin-top:4px}
+.library-table td a{color:#27724a;font-size:11px;overflow-wrap:anywhere;line-height:1.7}
+.library-edit,.library-page{border:1px solid #d6e4d9;border-radius:7px;background:#f6faf7;padding:7px 12px;color:#2c6144;font-size:11px}
+.library-pager{display:flex;align-items:center;justify-content:flex-end;gap:14px;margin:16px 0;color:var(--muted);font-size:11px}
+.library-editor{margin-top:26px;padding:20px;background:#fff;border:1px solid var(--border);border-radius:12px}
+.library-editor h2{font-size:16px;margin:0 0 9px}
+.library-editor p{font-size:11px;line-height:1.7;color:var(--muted)}
+.library-edit-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.library-edit-form label{font-size:11px;color:#4d6254;display:flex;flex-direction:column;gap:6px}
+.library-editor textarea{min-height:110px;resize:vertical;margin-top:7px}
+.library-editor .button-primary{margin-top:12px}
+#library-message{color:#54765d;font-size:12px;line-height:1.8;padding:8px 0}
+@media(max-width:960px){.library-halls{grid-template-columns:repeat(3,minmax(0,1fr))}.library-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:580px){.library-halls{grid-template-columns:repeat(2,minmax(0,1fr))}.library-edit-form{grid-template-columns:1fr}.library-toolbar{flex-direction:column;align-items:stretch}.library-toolbar input{max-width:none}.library-table{min-width:760px}}
+
+#library-source-filter{flex:0 0 174px;width:174px;border:1px solid #d9e3dc;border-radius:8px;background:#fff;color:#45604e;padding:11px;font-size:12px}
+@media(max-width:580px){#library-source-filter{width:100%;flex:auto}}
+
+/* One management library; the seventeen industries are filters, not separate libraries. */
+.library-halls{display:block;margin:12px 0 18px}
+.library-single-filter{display:flex;align-items:center;gap:12px;font-size:12px;color:#536a59;font-weight:650}
+.library-single-filter select{flex:1;max-width:390px;width:100%;padding:11px 12px;border:1px solid #d9e3dc;background:#fff;border-radius:9px;font-size:13px;color:#2e5941}
+@media(max-width:580px){.library-single-filter{align-items:stretch;flex-direction:column}.library-single-filter select{max-width:none}}

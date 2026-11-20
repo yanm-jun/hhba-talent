@@ -82,11 +82,13 @@ def main() -> None:
     original_admin = REPO / "apps" / "admin-preview"
     cloudflare_admin = WEB / "dist" / "admin-preview"
     cloudflare_admin.mkdir(parents=True, exist_ok=True)
-    for filename in ("index.html", "dashboard.js", "styles.css", "favicon.svg"):
+    for filename in ("index.html", "dashboard.js", "styles.css", "favicon.svg", "library.js", "library.css"):
         shutil.copy2(original_admin / filename, cloudflare_admin / filename)
     admin_html = (cloudflare_admin / "index.html").read_text(encoding="utf-8")
     for old, new in (
         ('href="/styles.css"', 'href="./styles.css"'),
+        ('href="/library.css"', 'href="./library.css"'),
+        ('src="/library.js"', 'src="./library.js"'),
         ('src="/dashboard.js"', 'src="./dashboard.js"'),
         ('href="/favicon.svg"', 'href="./favicon.svg"'),
     ):
@@ -138,6 +140,9 @@ def main() -> None:
         "data/jobs.json",
         "admin-preview/index.html",
         "admin-preview/dashboard.js",
+        "admin-preview/library.js",
+        "admin-preview/library.css",
+        "data/employer-library.json",
         "companies/autumn/cn-autumn-034/index.html",
         "companies/autumn/cn-autumn-093/index.html",
         "companies/autumn/cn-autumn-119/index.html",

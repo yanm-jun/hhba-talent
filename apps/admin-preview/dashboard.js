@@ -160,7 +160,7 @@ async function refreshGrowth(){
  if(requestId===growthRequestId)updateGrowth();
 }
 
-const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',operations:'运营监控',
+const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',library:'企业资源图书馆',operations:'运营监控',
  finance:'财务成本',investor:'融资展示',settings:'系统设置'};
 const details={
  users:['真实用户注册与业务操作','账号级行为追踪已停止；注册和收藏来自真实数据库，页面事件仅计次数。'],
@@ -173,7 +173,7 @@ function setView(view){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(['investor','overview','users'].includes(view)?view:'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users','library'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -187,6 +187,7 @@ function setView(view){
   byId('placeholder-subtitle').textContent=details[view][0];
   byId('placeholder-description').textContent=details[view][1];
  }
+ if(view==='library')window.HHBA_LIBRARY_OPEN?.();
  closeMenu();
  window.scrollTo(0,0);
 }

@@ -9,7 +9,7 @@ export async function verifyAdmin(request,env){
  // The original dashboard and legacy metrics API have distinct Cloudflare Access applications.
  // Enforce one explicit JWT audience for each route; never accept both audiences everywhere.
  const url=new URL(request.url),path=url.pathname;
- const fromOriginalAdmin=path==='/admin-preview/api/metrics';
+ const fromOriginalAdmin=path==='/admin-preview/api/metrics'||path==='/admin-preview/api/library';
  const fromLegacyApi=path==='/api/admin/metrics';
  if(!fromOriginalAdmin&&!fromLegacyApi)return {ok:false,code:'ADMIN_ACCESS_DENIED',status:403};
  // The official hhba.work console and the pages.dev console are separate Access applications.
