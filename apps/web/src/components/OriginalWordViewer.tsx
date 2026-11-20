@@ -15,10 +15,12 @@ import '../styles/siri-edge.css';
 // The original DOCX is NEVER converted into an HHBA template. A privately
 // rendered PDF is used only to show the source page. Downloaded edits are
 // the genuine original OOXML with a verified small text change.
-export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange}:{
+export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved}:{
  resume:PrivateResume;onClose?:()=>void;
  suggestedChanges?:{original:string;proposed:string}[];
  onOpenSuggestions?:()=>void;pendingSuggestionCount?:number;onPendingChange?:(dirty:boolean)=>void;
+ onVerifiedSave?:(change:{original:string;text:string})=>void;
+ onVersionMoved?:()=>void;
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
@@ -226,6 +228,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   rememberPosition();setBusy(true);setMessage('');
   try{
    const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision);
+   onVerifiedSave?.({original:selected.text,text:draft.trim()});
    setSelected(null);setConfirmed(false);setSaved(true);
    setRevision(result.revision);setTotalRevisions(result.total_revisions);
    setRefresh(n=>n+1);setMessage('已检查版式并保存第 '+result.revision+' 次修改。原始 Word 保持不变。');
@@ -238,6 +241,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   rememberPosition();setBusy(true);setMessage('');setSelected(null);setConfirmed(false);
   try{
    const result=await shiftOriginalWordRevision(resume.id,action,revision);
+   onVersionMoved?.();
    setRevision(result.revision);setTotalRevisions(result.total_revisions);
    setSaved(result.saved);setRefresh(n=>n+1);
    setMessage(action==='undo'?'已撤销一处修改，当前文档已恢复对应的原始字体与版式。':
