@@ -40,6 +40,16 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [wholeDraft,setWholeDraft]=useState<ResumeWholeRewriteResult|null>(null);
  const [wholeBusy,setWholeBusy]=useState(false);
  const [wholeApproved,setWholeApproved]=useState(false);
+ const [revealedWholeCount,setRevealedWholeCount]=useState(0);
+ useEffect(()=>{
+  const count=wholeDraft?.blocks.length||0;
+  if(!count||revealedWholeCount>=count)return;
+  // The model response is already complete. Staggered reveal communicates
+  // the confirmed result without pretending tokens are streaming live.
+  const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const t=setTimeout(()=>setRevealedWholeCount(n=>Math.min(n+1,count)),reduced?0:240);
+  return()=>clearTimeout(t);
+ },[wholeDraft,revealedWholeCount]);
  const omittedSourceCharacters=useMemo(()=>(
   !profile.experiences?.length&&sourceText
    ?sourceResumeOmittedCharacters(sourceText,blocks)
@@ -266,7 +276,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    wholeBusy||busy)return;
   const controller=new AbortController();
   active.current=controller;
-  setWholeBusy(true);setWholeApproved(false);
+  setWholeBusy(true);setWholeApproved(false);setRevealedWholeCount(0);
   setNotice('');setMobileSuggestionsOpen(false);
   try{
    const personalized=wholeSource.blocks.map(b=>{
@@ -500,6 +510,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     .slice(0,wordRevisionSnapshot?.revision||0)
     .some(saved=>saved.original===s.original&&saved.text===s.proposed))
   .concat((wholeDraft?.blocks||[])
+   .slice(0,revealedWholeCount)
    .filter(b=>b.changed&&b.original.length<=300&&b.proposed.length<=300&&
     b.proposed!==b.original)
    .map(b=>({
@@ -507,7 +518,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     state:wholeApproved?'accepted' as const:'pending' as const
    }))),
  [suggestions,revealedSuggestionCount,ignored,version.acceptedSuggestionIds,
-  version.blocks,suggestionDrafts,wordRevisionSnapshot,wholeDraft,wholeApproved]);
+  version.blocks,suggestionDrafts,wordRevisionSnapshot,wholeDraft,wholeApproved,
+  revealedWholeCount]);
  const pendingSuggestions=suggestions.filter(s=>!ignored.includes(s.id)&&
   !version.acceptedSuggestionIds.includes(s.id));
  const acceptedCount=suggestions.filter(s=>version.acceptedSuggestionIds.includes(s.id)).length;
@@ -701,10 +713,12 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     {entranceStage==='entering'&&<p className="hhba-word-arrival-hint" role="status">
      正在呈现你的原版式简历…
     </p>}
-    {(busy||revealedSuggestionCount>0)&&<button type="button"
+    {(busy||wholeBusy||revealedSuggestionCount>0||wholeDraft)&&<button type="button"
      className="hhba-word-mobile-ai-status" onClick={()=>setMobileSuggestionsOpen(true)}>
      <Sparkles size={13} aria-hidden="true"/>
-     {busy?'AI 正在分析原简历…':
+     {wholeBusy?'AI 正在撰写整份简历…':
+      wholeDraft?'整份改写：'+revealedWholeCount+' / '+wholeDraft.blocks.length+' 段':
+      busy?'AI 正在分析原简历…':
       '已呈现 '+revealedSuggestionCount+' / '+suggestions.length+' 条建议'}
      <span>查看建议</span>
     </button>}
@@ -814,6 +828,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     </section>
     {optimizationControls}
     {wholeDraft&&<WholeResumeRewriteReview result={wholeDraft}
+     revealedCount={revealedWholeCount}
      approved={wholeApproved}
      onApprove={setWholeApproved}
      onRegenerate={answers=>void generateWholeRewrite(answers)}
