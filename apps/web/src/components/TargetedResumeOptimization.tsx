@@ -247,7 +247,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  async function generate(){
   if(!consent||!blocks.length||busy||!status?.enabled)return;
   const currentBlocks=version.blocks;
-  invalidateScore();setBusy(true);setNotice('');setSuggestions([]);setIgnored([]);setConfirmed([]);setNewEvidence({});
+  invalidateScore();setBusy(true);setNotice('');setSuggestions([]);setRevealedSuggestionCount(0);
+  setIgnored([]);setConfirmed([]);setNewEvidence({});
   setOpenSuggestionId(null);setEditingSuggestionId(null);setSuggestionDrafts({});
   const controller=new AbortController();active.current=controller;
   try{
@@ -424,6 +425,20 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    occurrences.set(change.original,(occurrences.get(change.original)||0)+1);
   return candidates.filter(change=>occurrences.get(change.original)===1);
  },[suggestions,version.blocks,version.acceptedSuggestionIds]);
+ const visualWordSuggestions=useMemo<WordVisualSuggestion[]>(()=>suggestions
+  .slice(0,revealedSuggestionCount)
+  .filter(s=>s.action==='replace'&&!ignored.includes(s.id))
+  .map(s=>({
+   id:s.id,original:s.original,
+   proposed:version.acceptedSuggestionIds.includes(s.id)?
+    (version.blocks.find(b=>b.id===s.blockId)?.text||s.proposed):
+    (suggestionDrafts[s.id]??s.proposed),
+   state:version.acceptedSuggestionIds.includes(s.id)?'accepted' as const:'pending' as const
+  }))
+  .filter(s=>s.original.trim()&&s.proposed.trim()&&
+   s.original!==s.proposed&&s.proposed.length<=300),
+ [suggestions,revealedSuggestionCount,ignored,version.acceptedSuggestionIds,
+  version.blocks,suggestionDrafts]);
  const pendingSuggestions=suggestions.filter(s=>!ignored.includes(s.id)&&
   !version.acceptedSuggestionIds.includes(s.id));
  const acceptedCount=suggestions.filter(s=>version.acceptedSuggestionIds.includes(s.id)).length;
@@ -549,7 +564,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
        }
        void generate();
       }}>
-       {busy?<><LoaderCircle size={15} className="resume-match-spinning"/> 正在生成…</>:<><Sparkles size={15}/> 生成 AI 建议</>}
+       {busy?<><LoaderCircle size={15} className="resume-match-spinning"/> 正在分析简历…</>:<><Sparkles size={15}/> 开始 AI 优化</>}
       </button>
     :<span className="targeted-resume-unavailable">{!hasSession?'站内登录后可使用 AI 润色':status?'AI 润色尚未开放':'正在检查服务状态…'}</span>}
   </div>
@@ -593,9 +608,22 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    <span><Sparkles size={13} aria-hidden="true"/> 智能修改</span>
   </div>
   {!sourceResume&&legacyPrintQa&&optimizationControls}
-  {sourceResume?<section className="targeted-resume-word-workspace" aria-label="原版式 Word 统一编辑工作区">
+  {sourceResume?<section className={'targeted-resume-word-workspace'+
+   (entranceStage==='entering'?' hhba-word-stage-entering':' hhba-word-stage-ready')}
+   aria-label="原版式 Word 沉浸式 AI 优化舞台">
    <div className="targeted-resume-word-main">
+    {entranceStage==='entering'&&<p className="hhba-word-arrival-hint" role="status">
+     正在呈现你的原版式简历…
+    </p>}
     <OriginalWordViewer resume={sourceResume} suggestedChanges={confirmedWordChanges}
+     glowActive={entranceStage==='entering'||busy||wordEditing||
+      visualWordSuggestions.length>0&&!(scoreResult?.supported&&pendingSuggestions.length===0)}
+     visualSuggestions={visualWordSuggestions}
+     onVisualSuggestionSelect={id=>{
+      setActiveSuggestionId(id);setOpenSuggestionId(id);
+      setEditingSuggestionId(null);setMobileSuggestionsOpen(true);
+     }}
+     onRevisionSnapshot={handleWordRevisionSnapshot}
      editPanelHost={wordEditHost} onEditingChange={setWordEditing}
      onOpenSuggestions={()=>setMobileSuggestionsOpen(true)}
      onPendingChange={setNativeWordPending}
@@ -623,9 +651,12 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      </div>
     </div>
     {suggestions.length===0?<p className="targeted-resume-word-empty">
-     {busy?'正在准备建议…':'暂无建议，点击「生成 AI 建议」开始。'}</p>:
+     {busy?'AI 正在依据目标岗位分析你的真实经历…':'暂无建议，点击「开始 AI 优化」开始。'}</p>:
+    revealedSuggestionCount<suggestions.length&&<p className="targeted-resume-word-reveal" role="status">
+     AI 已完成分析，正在逐条呈现建议 {revealedSuggestionCount}/{suggestions.length}
+    </p>}
     <div className="targeted-resume-word-suggestion-list">
-     {suggestions.map((item,i)=>{
+     {suggestions.slice(0,revealedSuggestionCount).map((item,i)=>{
       const applied=version.acceptedSuggestionIds.includes(item.id);
       const rejected=ignored.includes(item.id);
       const active=activeSuggestionId===item.id;
