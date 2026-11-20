@@ -1,7 +1,6 @@
 // HHBA same-origin Cloudflare AI matching. No provider key in the browser.
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import {extractDocxText} from './docxProfile.mjs';
-import {extractPdfText} from './pdfProfile.mjs';
 
 export type MatchProfile = {
   education:string|null;education_evidence:string|null;
@@ -53,7 +52,7 @@ const errorMap:Record<string,string>={
   ORIGIN_REQUIRED:'请求来源不符合安全要求，请从 HHBA 网站进入。',
   RESUME_NOT_FOUND:'这份简历不在当前账户，请重新选择。',
   EXPLICIT_AI_SHARING_CONSENT_REQUIRED:'请先确认本次第三方 AI 分析授权。',
-  INVALID_RESUME_TEXT:'简历中没有足够可复制的文字，请使用文字版 PDF 或 DOCX。',
+  INVALID_RESUME_TEXT:'简历中没有足够可复制的文字，请使用 Word（.docx）。',
   OFFICIAL_JOB_INDEX_UNAVAILABLE:'岗位官方审核数据暂时不可用，请稍后再试。',
   NO_VERIFIED_DOMESTIC_JOBS:'目前尚无通过最新审核的中国大陆岗位，本次没有调用 AI，也没有扣匹配次数。我们正在补充国内招聘来源。',
   AI_PROVIDER_UNAVAILABLE:'AI 接口出现异常，请稍后再试。',
@@ -116,14 +115,12 @@ export function redactResumeTextLocally(text:string):string{
  return redacted;
 }
 export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Promise<string>{
- if(!/\.(pdf|docx)$/i.test(file.name)||file.size<30||file.size>LIMIT)
-  throw new MatchError(413,'请选择 3 MB 以内的 PDF 或 DOCX 简历。');
+ if(!/\.docx$/i.test(file.name)||file.size<30||file.size>LIMIT)
+  throw new MatchError(413,'请选择 3 MB 以内的 Word（.docx）简历。');
  try{
   const buffer=await file.arrayBuffer();
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
-  const value=/\.pdf$/i.test(file.name)?
-   (await extractPdfText(buffer,{signal})).text:
-   await extractDocxText(buffer);
+  const value=await extractDocxText(buffer);
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
   const text=redactResumeTextLocally(value);
   if(text.replace(/\s/g,'').length<30)throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
