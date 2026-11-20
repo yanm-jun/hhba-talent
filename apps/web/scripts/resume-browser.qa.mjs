@@ -97,30 +97,27 @@ try{
  await page.getByRole('button',{name:'填充到此处'}).click();
  const liveText=page.locator('[data-resume-block-id="source-0"] .hhba-print-paragraph');
  assert.match(await liveText.textContent(),/合成测试项目/,'modified AI text must replace the exact source paragraph');
- const changedAIText=liveText.locator('.hhba-resume-siri-letters');
- await changedAIText.waitFor();
- assert.match(await changedAIText.textContent(),/合成测试项目/);
- const appliedStyle=await changedAIText.evaluate(el=>({
-  animation:getComputedStyle(el).animationName,
-  background:getComputedStyle(el).backgroundImage
- }));
- assert.match(appliedStyle.animation,/hhba-resume-siri-letters-flow/,
-  'accepted AI change, not just suggestion, must show animated rainbow text');
- assert.match(appliedStyle.background,/linear-gradient/);
- await page.screenshot({path:output+'/siri-accepted-resume-changes.png',fullPage:true});
+ assert.equal(await liveText.locator('.hhba-resume-siri-letters').count(),0,
+  'accepted AI changes must immediately inherit the resume native typography');
+ await page.screenshot({path:output+'/siri-confirmed-normal-typography.png',fullPage:true});
  await page.getByRole('button',{name:'撤销',exact:true}).click();
  assert.match(await liveText.textContent(),/测试门店的运营记录/,'undo must restore original paragraph');
- assert.equal(await changedAIText.count(),0,'undo must remove Siri changed-text highlighting');
+ assert.equal(await liveText.locator('.hhba-resume-siri-letters').count(),0,'undo keeps original text normal');
  await page.locator('[data-resume-block-id="source-0"] .targeted-resume-ai-trigger').click();
  await page.getByRole('button',{name:'填充到此处'}).click();
  assert.match(await liveText.textContent(),/合成测试项目/);
  await page.locator('[data-resume-block-id="source-0"] button[aria-label="编辑当前简历段落"]').click();
  const edit=page.getByRole('textbox',{name:'编辑当前简历段落'});
  await edit.fill('真实参与合成测试门店运营记录整理与预约协调。');
+ const pendingManual=page.getByRole('note',{name:'待确认修改文字'});
+ await pendingManual.waitFor();
+ assert.match(await pendingManual.locator('.hhba-resume-siri-letters')
+  .evaluate(el=>getComputedStyle(el).animationName),/hhba-resume-siri-letters-flow/);
+ await page.screenshot({path:output+'/siri-pending-manual-edit.png',fullPage:true});
  await page.getByRole('button',{name:'保存本次修改'}).click();
  assert.match(await liveText.textContent(),/合成测试门店/);
- assert.equal(await liveText.locator('.hhba-resume-siri-letters').count(),1,
-  'user-confirmed manual resume edits should also have Siri rainbow text');
+ assert.equal(await liveText.locator('.hhba-resume-siri-letters').count(),0,
+  'confirmed manual changes must inherit normal paragraph styling');
  await page.getByPlaceholder('请填写本人真实姓名').fill('验收用虚拟姓名');
  await page.getByPlaceholder('例如：区域运营督导').fill('运营助理');
  assert.equal(await page.locator('.targeted-resume-live-paper .hhba-print-sheet').count(),1);
@@ -251,52 +248,23 @@ try{
  await field.fill('修改后的简历');
  assert.equal(await source.getByRole('button',{name:'保存',exact:true}).isDisabled(),true);
  await source.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
- await source.screenshot({path:output+'/original-pdf-inline-editor.png',fullPage:true});
+ const pendingPdf=source.getByRole('note',{name:'待确认修改文字'});
+ await pendingPdf.waitFor();
+ const originalPdfDraft=source.locator('.hhba-original-resume-draft-patch');
+ await originalPdfDraft.waitFor();
+ const draftPdfSiri=originalPdfDraft.locator('.hhba-resume-siri-letters');
+ assert.match(await draftPdfSiri.evaluate(el=>getComputedStyle(el).animationName),
+  /hhba-resume-siri-letters-flow/);
+ await source.screenshot({path:output+'/original-pdf-pending-siri-typography.png',fullPage:true});
  await source.getByRole('button',{name:'保存',exact:true}).click();
- const livePatch=source.locator('.hhba-original-resume-edit-patch');
- await livePatch.waitFor({timeout:10000});
- const pdfRainbow=source.locator('.hhba-original-resume-edit-patch .hhba-resume-siri-letters');
- await pdfRainbow.waitFor({timeout:10000});
- const pdfRainbowStyle=await pdfRainbow.evaluate(el=>{
-  const style=getComputedStyle(el);
-  return {background:style.backgroundImage,
-   animation:style.animationName,
-   textFill:style.getPropertyValue('-webkit-text-fill-color')};
- });
- assert.match(pdfRainbowStyle.background,/linear-gradient/,
-  'PDF modified text itself must be rainbow, not just popup frame');
- assert.match(pdfRainbowStyle.animation,/hhba-resume-siri-letters-flow/);
- assert.match(pdfRainbowStyle.textFill,/transparent|rgba\(0, 0, 0, 0\)/);
- assert.match(await livePatch.textContent(),/修改后的简历/,
-  'saved short text must be visible directly in the ORIGINAL PDF page');
- const verifiedPatch=await livePatch.evaluate(el=>{
-  const bounds=el.getBoundingClientRect();
-  const canvas=el.parentElement?.querySelector('canvas')?.getBoundingClientRect();
-  const overflow=getComputedStyle(el).overflow;
-  return {top:bounds.top,left:bounds.left,bottom:bounds.bottom,right:bounds.right,
-   pageTop:canvas?.top,pageBottom:canvas?.bottom,overflow};
- });
- assert.ok(verifiedPatch.top>=verifiedPatch.pageTop&&
-  verifiedPatch.bottom<=verifiedPatch.pageBottom,
-  'safe replacement must be inside original source page: '+JSON.stringify(verifiedPatch));
- await source.screenshot({path:output+'/original-pdf-edited-preview.png',fullPage:true});
- const reviewDownloadEvent=source.waitForEvent('download');
- await source.getByRole('button',{name:'下载 PDF'}).click();
- const reviewDownload=await reviewDownloadEvent;
- assert.match(reviewDownload.suggestedFilename(),/已修改\.pdf$/,
-  'source PDF must download as a distinct edited copy');
- await reviewDownload.saveAs(output+'/edited-original-searchable.pdf');
- const reviewBytes=await readFile(output+'/edited-original-searchable.pdf');
- assert.ok(reviewBytes.length>500,'visual review PDF should not be empty');
- const reviewPages=await pdfText(reviewBytes);
- assert.equal(reviewPages.length,1,'review PDF must preserve original page count');
- assert.ok(reviewPages[0].includes('修改后的简历'),
-  'saved Chinese text must be searchable and copyable in exported PDF');
- assert.equal(reviewPages[0].includes('ORIGINAL RESUME VIEW'),false,
-  'replaced old PDF text must not remain searchable');
- assert.equal(reviewBytes.includes(Buffer.from('ORIGINAL RESUME VIEW')),false,
-  'old original string must not be hidden inside exported review PDF');
- await source.screenshot({path:output+'/original-pdf-edited-preview-after-download.png',fullPage:true});
+ await source.getByRole('button',{name:'继续修改这一段'}).waitFor();
+ assert.equal(await originalPdfDraft.count(),0,
+  'confirmed PDF changes must immediately remove provisional colored text');
+ assert.equal(await source.locator('.hhba-resume-siri-letters').count(),0);
+ assert.equal(await source.getByRole('button',{name:'下载 PDF'}).count(),0,
+  'do not download an original-style PDF with guessed replacement fonts');
+ await source.getByText('原字体尚未通过保真校验',{exact:false}).waitFor();
+ await source.screenshot({path:output+'/original-pdf-confirmed-source-style.png',fullPage:true});
  const edited=source.getByRole('button',{name:'继续修改这一段'});
  await edited.waitFor({timeout:10000});
  await edited.click();
@@ -304,15 +272,12 @@ try{
  await source.getByRole('textbox',{name:'修改这段内容'}).fill(tooLong);
  await source.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
  await source.getByRole('button',{name:'保存',exact:true}).click();
- await livePatch.waitFor({state:'detached',timeout:10000});
- await source.getByText('其余文字暂时放不下',{exact:false}).waitFor({timeout:10000});
- const failureText=source.getByRole('status').filter({hasText:'有些修改暂时不能安全放进原来的位置'});
- await source.getByRole('button',{name:'下载 PDF'}).click();
- await failureText.waitFor({timeout:10000});
+ assert.equal(await originalPdfDraft.count(),0,
+  'long confirmed PDF change must not overlay in a fallback font');
  await source.getByRole('button',{name:'继续修改这一段'}).click();
  await source.getByRole('button',{name:'撤销',exact:true}).click();
  await source.getByRole('button',{name:'修改这段简历'}).waitFor({timeout:10000});
- assert.equal(await livePatch.count(),0,'undo must restore underlying original PDF text');
+ assert.equal(await originalPdfDraft.count(),0,'undo restores the unchanged native PDF page');
  assert.ok((await source.locator('.hhba-original-resume-anchor').count())>=1,
   'verified editable hotspot remains after undo');
  assert.deepEqual(sourceErrors,[],'original PDF must not cause JS runtime exceptions');
@@ -346,26 +311,22 @@ try{
  await smallSource.getByRole('textbox',{name:'修改这段内容'}).waitFor();
  await smallSource.getByRole('textbox',{name:'修改这段内容'}).fill('EDITED RESUME VIEW');
  await smallSource.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
- await smallSource.getByRole('button',{name:'保存',exact:true}).click();
- await smallSource.locator('.hhba-original-resume-edit-patch').waitFor({timeout:10000});
- const mobileRainbow=smallSource.locator('.hhba-resume-siri-letters');
- await mobileRainbow.waitFor({timeout:10000});
- const mobileRainbowCSS=await mobileRainbow.evaluate(el=>({
-  background:getComputedStyle(el).backgroundImage,
-  animation:getComputedStyle(el).animationName
- }));
- assert.match(mobileRainbowCSS.background,/linear-gradient/);
- assert.match(mobileRainbowCSS.animation,/hhba-resume-siri-letters-flow/);
+ const mobileDraft=smallSource.getByRole('note',{name:'待确认修改文字'});
+ await mobileDraft.waitFor();
+ const mobileRainbow=mobileDraft.locator('.hhba-resume-siri-letters');
+ assert.match(await mobileRainbow.evaluate(el=>getComputedStyle(el).backgroundImage),
+  /linear-gradient/);
  await smallSource.emulateMedia({reducedMotion:'reduce'});
- assert.equal(await mobileRainbow.evaluate(el=>getComputedStyle(el).animationName),'none',
-  'Siri rainbow text must stop moving for reduced-motion mobile users');
+ assert.equal(await mobileRainbow.evaluate(el=>getComputedStyle(el).animationName),'none');
  await smallSource.emulateMedia({reducedMotion:'no-preference'});
- const mobilePatchBounds=await smallSource.locator('.hhba-original-resume-edit-patch').evaluate(el=>{
-  const a=el.getBoundingClientRect();return {left:a.left,right:a.right,viewport:document.documentElement.clientWidth};
- });
- assert.ok(mobilePatchBounds.left>=0&&mobilePatchBounds.right<=mobilePatchBounds.viewport+2,
-  'saved text must remain visible on mobile original PDF: '+JSON.stringify(mobilePatchBounds));
- await smallSource.screenshot({path:output+'/original-pdf-mobile-edited-preview.png',fullPage:true});
+ await smallSource.screenshot({path:output+'/original-pdf-mobile-pending-siri.png',
+  fullPage:true});
+ await smallSource.getByRole('button',{name:'保存',exact:true}).click();
+ await smallSource.getByRole('button',{name:'继续修改这一段'}).waitFor();
+ assert.equal(await smallSource.locator('.hhba-original-resume-draft-patch').count(),0);
+ assert.equal(await smallSource.locator('.hhba-resume-siri-letters').count(),0);
+ await smallSource.screenshot({path:output+'/original-pdf-mobile-confirmed-normal.png',
+  fullPage:true});
  // Saving closes the editor; reopen it before testing the editor's bounds.
  await smallSource.getByRole('button',{name:'继续修改这一段'}).click();
  const sourceMobileWidths=await smallSource.evaluate(()=>({
@@ -400,30 +361,25 @@ try{
   await input.fill('EDITED WORD RESUME');
   assert.equal(await word.getByRole('button',{name:'保存',exact:true}).isDisabled(),
    true,'Word change must require confirmation');
+  const wordPending=word.getByRole('note',{name:'待确认修改文字'});
+  await wordPending.waitFor();
+  const wordDraftGlow=wordPending.locator('.hhba-resume-siri-letters');
+  assert.match(await wordDraftGlow.evaluate(el=>getComputedStyle(el).backgroundImage),
+   /linear-gradient/);
+  await word.emulateMedia({reducedMotion:'reduce'});
+  assert.equal(await wordDraftGlow.evaluate(el=>getComputedStyle(el).animationName),'none');
+  await word.emulateMedia({reducedMotion:'no-preference'});
   await word.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
   await word.screenshot({path:output+'/original-word-'+view.name+'-editing.png',
    fullPage:true});
   await word.getByRole('button',{name:'保存',exact:true}).click();
   await word.getByRole('button',{name:'下载 Word'}).waitFor({timeout:20000});
-  const wordSiriInk=word.locator('.hhba-original-resume-siri-ink');
-  await wordSiriInk.waitFor({timeout:12000});
-  const inkStyle=await wordSiriInk.evaluate(el=>{
-   const style=getComputedStyle(el);
-   return {mask:style.maskImage||style.webkitMaskImage,
-    blend:style.mixBlendMode,animation:style.animationName,
-    background:style.backgroundImage};
-  });
-  assert.match(inkStyle.mask,/data:image\/png;base64/,
-   'Word changed glyphs must be masked from original rendered pixels');
-  assert.equal(inkStyle.blend,'screen');
-  assert.match(inkStyle.background,/linear-gradient/);
-  assert.match(inkStyle.animation,/hhba-resume-siri-letters-flow/);
-  await word.screenshot({path:output+'/original-word-'+view.name+'-siri-text.png',
+  assert.equal(await word.locator('.hhba-original-resume-siri-ink').count(),0,
+   'confirmed Word must reveal real native-font pixels, not animated color');
+  assert.equal(await word.locator('.hhba-resume-siri-letters').count(),0,
+   'Siri is removed immediately on Word confirmation');
+  await word.screenshot({path:output+'/original-word-'+view.name+'-native-font-saved.png',
    fullPage:true});
-  await word.emulateMedia({reducedMotion:'reduce'});
-  assert.equal(await wordSiriInk.evaluate(el=>getComputedStyle(el).animationName),'none',
-   'Siri colored Word text must pause for reduced-motion users');
-  await word.emulateMedia({reducedMotion:'no-preference'});
   const downloadEvent=word.waitForEvent('download');
   await word.getByRole('button',{name:'下载 Word'}).click();
   const downloaded=await downloadEvent;
