@@ -6,7 +6,7 @@
  * No Cloudflare containers, queues, paid plans or persistent D1 writes.
  */
 import {responseJson as json,rejectJson as reject,rewriteActive,
- rewriteOriginOK,rewriteRequestJson,candidateIdentity}
+ rewriteOriginOK,rewriteRequestJson,candidateIdentity,rewriteContinuationActive}
  from '../_lib/resume-rewrite-http.js';
 import {REWRITE_KIND,completeJson,validateAuthoring,numberTokens,redacted}
  from '../_lib/resume-rewrite-provider.js';
@@ -52,7 +52,7 @@ function validContinuation(body){
 }
 export async function onRequestPost({request,env}){
  if(!rewriteOriginOK(request))return reject('ORIGIN_REQUIRED',403);
- if(!rewriteActive(env)||env?.HHBA_RESUME_AGENT_ENABLED==='0')
+ if(!rewriteContinuationActive(env))
   return reject('RESUME_REWRITE_NOT_ENABLED',503);
  let account;
  try{account=await candidateIdentity(request,env);}
