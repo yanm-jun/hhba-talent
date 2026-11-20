@@ -131,7 +131,9 @@ export async function onRequestGet({request,env}){
   if(action==='inspect'){
    const original=await loadBytes(bucket,row);
    const data=await inspectOriginalDocxStrict(original);
-   return json({ok:true,editable_text:data.editable_text});
+   const existing=await approved(bucket,row);
+   return json({ok:true,editable_text:existing?[]:data.editable_text,
+    saved:existing?existing.saved:null});
   }
   if(action==='download'||action==='edited-preview'){
    const state=await approved(bucket,row);
