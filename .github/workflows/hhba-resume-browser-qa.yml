@@ -97,9 +97,7 @@ jobs:
           pdfinfo /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.pdf | grep 'Pages:'
           pdftotext -layout /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.pdf \
             /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.txt
-          grep -q 'REWRITTEN WORD RESUME' /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.txt
-          grep -q '虚构经历段落8' /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.txt
-          grep -q '职业概述与个人优势' /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.txt
+          python3 -c 'from pathlib import Path; import re; p=Path("/tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.txt"); text=re.sub(r"\s+","",p.read_text(encoding="utf-8")); expected=["REWRITTENWORDRESUME","虚构经历段落8","职业概述与个人优势"]; missing=[x for x in expected if x not in text]; print("PDF characters:",len(text),"missing:",missing,"text head:",text[:420]); assert not missing, "Word-to-PDF conversion lost expected authored content"'
           pdftoppm -f 1 -l 3 -scale-to 1000 -png \
             /tmp/hhba-resume-browser-qa/word-to-pdf/whole-resume-ai-review-export.pdf \
             /tmp/hhba-resume-browser-qa/word-to-pdf/page
