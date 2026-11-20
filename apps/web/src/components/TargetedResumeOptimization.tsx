@@ -5,6 +5,7 @@ import {getRealAuthToken,realAuthReady} from '../services/realAuth';
 import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimizationStatus} from '../services/resumeOptimizationApi';
 import {applySuggestion,validateSuggestion,editResumeBlock,type ResumeBlock,type ResumeSuggestion,type ResumeVersion} from '../services/targetedResumeOptimization';
 import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
+import {splitChangedResumeText} from '../services/resumeChangedText.mjs';
 import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResumeVersion} from '../services/resumeVersionsApi';
 import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,sourceResumeOmittedCharacters,structuredResumeOmittedCharacters,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
 import {createPortal} from 'react-dom';
@@ -244,6 +245,8 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
   const dismissed=Boolean(s&&ignored.includes(s.id));
   const pending=Boolean(s&&!applied&&!dismissed);
   const draft=s?(suggestionDrafts[s.id]??s.proposed):'';
+  const original=blocks.find(item=>item.id===id)?.text||'';
+  const segments=splitChangedResumeText(original,text);
   return <div className={'targeted-resume-inline-region'+(pending?' has-ai-suggestion':'')} data-resume-block-id={id}>
    <div className="targeted-resume-inline-anchor">
     {editingBlock===id?<div className="targeted-resume-inline-editor">
@@ -252,7 +255,12 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
       aria-label="编辑当前简历段落"/>
      <div><button type="button" onClick={saveEdit}>保存本次修改</button>
       <button type="button" onClick={()=>{setEditingBlock(null);setManualText('')}}>取消</button></div>
-    </div>:<p className="hhba-print-paragraph">{text}</p>}
+    </div>:<p className="hhba-print-paragraph">
+     {segments.hasChange&&segments.changed?<>
+      {segments.prefix}<span className="hhba-resume-siri-letters"
+       data-resume-change="modified-or-added">{segments.changed}</span>{segments.suffix}
+     </>:text}
+    </p>}
     {editingBlock!==id&&<div className="targeted-resume-inline-controls">
      {pending&&s&&<button type="button" className="targeted-resume-ai-trigger"
       aria-expanded={openSuggestionId===s.id} aria-label="查看此处 AI 修改建议"
