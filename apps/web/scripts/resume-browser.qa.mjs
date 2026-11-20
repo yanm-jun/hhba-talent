@@ -364,6 +364,34 @@ try{
  assert.deepEqual(nativeErrors,[],'native-font PDF should render in Chromium');
  await native.screenshot({path:output+'/native-pdf-original-font-compared.png',fullPage:true});
  await native.close();
+ // The original PDF uses a real EMBEDDED Chinese TrueType subset, an
+ // explicit CID ToUnicode mapping and original vector glyph resources.
+ // There is no fallback-font/white-box reconstruction in this test.
+ for(const viewport of [{width:1100,height:900,name:'desktop'},
+                       {width:390,height:844,name:'mobile'}]){
+  const cjk=await browser.newPage({viewport:{width:viewport.width,
+   height:viewport.height},locale:'zh-CN'});
+  const errors=[];cjk.on('pageerror',e=>errors.push(e.message));
+  await cjk.goto('http://127.0.0.1:3000/qa/native-cjk-font.html',
+   {waitUntil:'networkidle',timeout:45000});
+  await cjk.waitForFunction(()=>{
+   const status=document.querySelector('#native-cjk-test')?.getAttribute('data-status');
+   return status==='passed'||status==='failed';
+  },{timeout:30000});
+  const details=await cjk.locator('#native-cjk-test').evaluate(node=>({
+   status:node.dataset.status,font:node.dataset.font,
+   pixels:Number(node.dataset.changedPixels),
+   text:node.textContent
+  }));
+  assert.equal(details.status,'passed',
+   'embedded Chinese font must pass actual PDF renderer and pixel proof '+JSON.stringify(details));
+  assert.equal(details.font,'HHBAChineseFontQA');
+  assert.ok(details.pixels>8);
+  assert.deepEqual(errors,[]);
+  await cjk.screenshot({path:output+'/native-cjk-font-'+viewport.name+'-compared.png',
+   fullPage:true});
+  await cjk.close();
+ }
  // Real UI integration: original source PDF Type1 font bytes are retained
  // throughout confirmation; native font proof is required before downloading.
  const authentic=await browser.newPage({viewport:{width:1100,height:900},
