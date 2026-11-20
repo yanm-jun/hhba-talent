@@ -93,6 +93,9 @@ try{
   'AI suggestion must not auto-fill without truthful confirmation');
  await tip.first().getByRole('button',{name:'修改建议'}).click();
  await tip.first().getByRole('textbox',{name:'修改 AI 建议'}).fill('真实参与合成测试项目的记录整理与预约沟通。');
+ const pendingAiTextarea=tip.first().getByRole('textbox',{name:'修改 AI 建议'});
+ assert.match(await pendingAiTextarea.evaluate(el=>getComputedStyle(el).backgroundImage),
+  /linear-gradient/,'AI suggestion is rainbow in the editable field itself');
  await tip.first().locator('input[type=checkbox]').check();
  await page.getByRole('button',{name:'填充到此处'}).click();
  const liveText=page.locator('[data-resume-block-id="source-0"] .hhba-print-paragraph');
@@ -109,10 +112,11 @@ try{
  await page.locator('[data-resume-block-id="source-0"] button[aria-label="编辑当前简历段落"]').click();
  const edit=page.getByRole('textbox',{name:'编辑当前简历段落'});
  await edit.fill('真实参与合成测试门店运营记录整理与预约协调。');
- const pendingManual=page.getByRole('note',{name:'待确认修改文字'});
- await pendingManual.waitFor();
- assert.match(await pendingManual.locator('.hhba-resume-siri-letters')
-  .evaluate(el=>getComputedStyle(el).animationName),/hhba-resume-siri-letters-flow/);
+ await edit.locator('xpath=.').waitFor();
+ assert.match(await edit.evaluate(el=>getComputedStyle(el).animationName),
+  /hhba-resume-siri-letters-flow/);
+ assert.match(await edit.evaluate(el=>getComputedStyle(el).backgroundImage),
+  /linear-gradient/);
  await page.screenshot({path:output+'/siri-pending-manual-edit.png',fullPage:true});
  await page.getByRole('button',{name:'保存本次修改'}).click();
  assert.match(await liveText.textContent(),/合成测试门店/);
@@ -248,8 +252,8 @@ try{
  await field.fill('修改后的简历');
  assert.equal(await source.getByRole('button',{name:'保存',exact:true}).isDisabled(),true);
  await source.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
- const pendingPdf=source.getByRole('note',{name:'待确认修改文字'});
- await pendingPdf.waitFor();
+ assert.match(await field.evaluate(el=>getComputedStyle(el).animationName),
+  /hhba-resume-siri-letters-flow/);
  const originalPdfDraft=source.locator('.hhba-original-resume-draft-patch');
  await originalPdfDraft.waitFor();
  const draftPdfSiri=originalPdfDraft.locator('.hhba-resume-siri-letters');
@@ -311,9 +315,7 @@ try{
  await smallSource.getByRole('textbox',{name:'修改这段内容'}).waitFor();
  await smallSource.getByRole('textbox',{name:'修改这段内容'}).fill('EDITED RESUME VIEW');
  await smallSource.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
- const mobileDraft=smallSource.getByRole('note',{name:'待确认修改文字'});
- await mobileDraft.waitFor();
- const mobileRainbow=mobileDraft.locator('.hhba-resume-siri-letters');
+ const mobileRainbow=smallSource.getByRole('textbox',{name:'修改这段内容'});
  assert.match(await mobileRainbow.evaluate(el=>getComputedStyle(el).backgroundImage),
   /linear-gradient/);
  await smallSource.emulateMedia({reducedMotion:'reduce'});
@@ -361,9 +363,9 @@ try{
   await input.fill('EDITED WORD RESUME');
   assert.equal(await word.getByRole('button',{name:'保存',exact:true}).isDisabled(),
    true,'Word change must require confirmation');
-  const wordPending=word.getByRole('note',{name:'待确认修改文字'});
-  await wordPending.waitFor();
-  const wordDraftGlow=wordPending.locator('.hhba-resume-siri-letters');
+  const wordDraftGlow=word.getByRole('textbox',{name:'修改 Word 文字'});
+  assert.equal(await word.locator('.hhba-resume-pending-text').count(),0,
+   'the editable Siri text should not be repeated in a second preview card');
   assert.match(await wordDraftGlow.evaluate(el=>getComputedStyle(el).backgroundImage),
    /linear-gradient/);
   await word.emulateMedia({reducedMotion:'reduce'});
