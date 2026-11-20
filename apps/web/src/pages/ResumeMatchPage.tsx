@@ -39,8 +39,8 @@ export function ResumeMatchPage({user}:{user:User|null}){
  function select(value:File|null){
   setNotice('');setResult(null);setOptimizationJobId(null);
   if(!value)return setFile(null);
-  if(!/\.(pdf|docx)$/i.test(value.name)||value.size<1||value.size>MAX_UPLOAD){
-   setFile(null);setNotice('请上传 PDF 或 DOCX，单个文件不超过 3 MB。');
+  if(!/\.docx$/i.test(value.name)||value.size<1||value.size>MAX_UPLOAD){
+   setFile(null);setNotice('请上传 Word（.docx），单个文件不超过 3 MB。');
    return;
   }
   setFile(value);
@@ -80,10 +80,10 @@ export function ResumeMatchPage({user}:{user:User|null}){
     <div className="resume-match-main">
      <section className="resume-match-form">
       <div className="resume-match-step">01 · 上传你的简历</div>
-      <input id="ai-resume-file" type="file" className="resume-match-hidden" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(e:ChangeEvent<HTMLInputElement>)=>select(e.target.files?.[0]||null)}/>
+      <input id="ai-resume-file" type="file" className="resume-match-hidden" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(e:ChangeEvent<HTMLInputElement>)=>select(e.target.files?.[0]||null)}/>
       <label htmlFor="ai-resume-file" className="resume-match-dropzone" onDragOver={e=>e.preventDefault()} onDrop={drop}>
-       <FileUp size={29}/><strong>{file?file.name:'点击选择 PDF / DOCX 简历'}</strong>
-       <small>{file?`${(file.size/1024/1024).toFixed(2)} MB · 可重新选择文件`:'文件不超过 3 MB · PDF 需包含可选中的文字 · 最多 15 页'}</small>
+       <FileUp size={29}/><strong>{file?file.name:'点击选择 Word（.docx）简历'}</strong>
+       <small>{file?`${(file.size/1024/1024).toFixed(2)} MB · 可重新选择文件`:'文件不超过 3 MB · 请上传有文字内容的 DOCX'}</small>
       </label>
       <div className="resume-match-step">02 · 你的求职偏好（可选）</div>
       <div className="resume-match-filters">
