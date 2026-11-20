@@ -222,3 +222,49 @@
  .hhba-match-apply-last{padding:14px 12px}
  .hhba-match-final-apply{width:100%;margin:14px 0 0}
 }
+
+
+/* Phone-first optimizer: the original Word must reach the first screen, not
+   be pushed below navigation chrome. Keep job and score visibly legible. */
+@media(max-width:700px){
+ .hhba-match-modal-editor .hhba-match-modal-content{padding-top:4px}
+ .hhba-match-modal-editor .hhba-journey.is-compact{margin:0 0 4px}
+ .hhba-match-modal-editor .hhba-journey.is-compact ol{
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+ }
+ .hhba-match-modal-editor .hhba-journey.is-compact li{
+  flex-direction:row;justify-content:center;align-items:center;gap:3px;
+  padding:2px 1px;font-size:9px;min-height:24px;
+ }
+ .hhba-match-modal-editor .hhba-journey.is-compact .hhba-journey-index{
+  flex:0 0 15px;width:15px;height:15px;font-size:8px;
+ }
+ .hhba-match-modal-editor .hhba-journey.is-compact .hhba-journey-label{
+  font-size:9px;line-height:1.1;
+ }
+ .hhba-match-modal-editor .hhba-journey.is-compact li:not(:last-child)::after{
+  top:12px;right:-5px;width:9px;
+ }
+ .hhba-match-modal-editor .hhba-match-workspace-back{
+  min-height:26px;padding:3px 6px;font-size:11px;
+ }
+ .hhba-match-modal-editor .hhba-match-workspace-back::before{font-size:18px}
+ .hhba-match-modal-editor .hhba-match-selected-job{
+  gap:8px;margin:0 0 4px;padding:2px 4px 6px;
+  align-items:center;
+ }
+ .hhba-match-modal-editor .hhba-match-selected-job>div:first-child>span{
+  display:none;
+ }
+ .hhba-match-modal-editor .hhba-match-selected-job h2{
+  margin:0 0 2px;font-size:13px;line-height:1.2;
+ }
+ .hhba-match-modal-editor .hhba-match-selected-job p{
+  font-size:10px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;
+  max-width:195px;white-space:nowrap;
+ }
+ .hhba-match-modal-editor .hhba-match-selected-score strong{
+  font-size:18px;line-height:1.1;
+ }
+ .hhba-match-modal-editor .hhba-match-selected-score>span{display:none}
+}
