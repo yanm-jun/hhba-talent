@@ -5,6 +5,7 @@ import type {PrivateResume} from '../services/privateResumes';
 import {downloadPrivateResume,fetchPrivateResumeForLocalReview} from '../services/privateResumes';
 import {extractDocxText} from '../services/docxProfile.mjs';
 import {matchWordAnchors,type WordAnchor} from '../services/resumeWordAnchors.mjs';
+import {splitChangedResumeText} from '../services/resumeChangedText.mjs';
 import {
  wordRendererReady,wordEditableText,wordPreviewBytes,saveOriginalWordEdit,
  shiftOriginalWordRevision,downloadOriginalWordEdited,downloadOriginalWordPdf,
@@ -405,7 +406,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
        const visual=candidates.length===1?candidates[0]:null;
        const textFits=Boolean(visual&&Array.from(visual.proposed).length<=
         Math.max(12,Array.from(anchor.text).length*1.25));
-       const activeText=visual?(textFits?visual.proposed:'✦ AI 建议 · 查看完整文字'):'';
+       const changed=visual?splitChangedResumeText(anchor.text,visual.proposed):null;
        return <button key={anchor.id} type="button"
         className={"hhba-original-resume-anchor"+(selected?.id===anchor.id?" is-selected":"")+
          (visual?' has-ai-preview':'')} title={visual?visual.proposed:'修改这段'}
@@ -434,10 +435,15 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
           matches.length===1?'已填入本人确认过的建议；请复核事实与原版式后再保存。':'');
         }}>
         {visual&&<span className="hhba-word-ai-preview" aria-hidden="true">
-         <span className="hhba-word-ai-preview-text hhba-resume-siri-letters"
+         <span className="hhba-word-ai-preview-text"
           style={{fontSize:Math.max(9,Math.min(19,(h/1000*paperSize.height)*.82))+'px',
            fontFamily:anchor.fontFamily||undefined}}>
-          {activeText}
+          {textFits&&changed?.prefix&&<span className="hhba-word-ai-unchanged">{changed.prefix}</span>}
+          {!textFits&&<span className="hhba-word-ai-unchanged">…</span>}
+          <span className="hhba-word-ai-changed hhba-resume-siri-letters">
+           {changed?.changed||'✦ 精简此处文字'}
+          </span>
+          {textFits&&changed?.suffix&&<span className="hhba-word-ai-unchanged">{changed.suffix}</span>}
          </span>
         </span>}
         <span className="hhba-word-edit-anchor-label"><PencilLine size={12}/> 修改</span>
