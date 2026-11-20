@@ -18,7 +18,7 @@ import {officialJobVerifyStatus,verifyOfficialJob,type OfficialJobVerifyStatus,t
 import '../styles/targeted-resume-optimization.css';
 import '../styles/siri-edge.css';
 
-export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,onDraftDirtyChange}:{profile:CandidateProfile;job:JobMatch;sourceText?:string;sourceResume?:PrivateResume;onDraftDirtyChange?:(dirty:boolean)=>void}){
+export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,onDraftDirtyChange,accountScope}:{profile:CandidateProfile;job:JobMatch;sourceText?:string;sourceResume?:PrivateResume;onDraftDirtyChange?:(dirty:boolean)=>void;accountScope?:string}){
  const blocks=useMemo<ResumeBlock[]>(()=>{
  const originals=[
   ...(Array.isArray(profile.experiences)?profile.experiences:[]).filter(e=>e.evidence?.trim()).map((e,i)=>({id:'experience-'+i,section:'experience' as const,text:e.evidence.slice(0,1600)})),
@@ -67,6 +67,30 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [manualText,setManualText]=useState('');
  const [activeSuggestionId,setActiveSuggestionId]=useState<string|null>(null);
  const [mobileSuggestionsOpen,setMobileSuggestionsOpen]=useState(false);
+ // Do not silently keep a resume in localStorage. Optional draft recovery
+ // requires a separate, user-checked consent and is tab/session-scoped.
+ const draftKey=sourceResume&&accountScope?
+  'hhba:word-draft-v1:'+encodeURIComponent(accountScope).slice(0,96)+
+  ':'+encodeURIComponent(sourceResume.id)+':'+encodeURIComponent(job.id).slice(0,180):'';
+ const [rememberDraft,setRememberDraft]=useState(false);
+ const [recoverableDraft,setRecoverableDraft]=useState<any|null>(null);
+ const [draftStatus,setDraftStatus]=useState('');
+ useEffect(()=>{
+  if(!draftKey)return;
+  try{
+   const raw=sessionStorage.getItem(draftKey);
+   if(!raw)return;
+   const stored=JSON.parse(raw);
+   if(stored?.schema!=='HHBA_WORD_DRAFT_V1'||
+    typeof stored.expires_at!=='number'||stored.expires_at<Date.now()||
+    !stored.version||!Array.isArray(stored.version.blocks)||
+    stored.version.blocks.length<1||stored.version.blocks.length>12||
+    !Array.isArray(stored.version.acceptedSuggestionIds)){
+    sessionStorage.removeItem(draftKey);return;
+   }
+   setRecoverableDraft(stored);setRememberDraft(true);
+  }catch{setDraftStatus('浏览器会话草稿无法读取，请继续手动编辑。');}
+ },[draftKey]);
  const generation=useRef(0);
  const active=useRef<AbortController|null>(null);
  useEffect(()=>{
@@ -243,6 +267,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   setIgnored([]);setConfirmed([]);setNewEvidence({});setConfirmReal(false);setEditingBlock(null);
   setOpenSuggestionId(null);setEditingSuggestionId(null);setSuggestionDrafts({});setUndoStack([]);
   setNotice('已恢复原稿。');
+  try{if(draftKey)sessionStorage.removeItem(draftKey);}catch{}
+  setDraftStatus('已清除本标签页草稿。');
  }
  function renderSuggestionCard(s:ResumeSuggestion){
   const draft=suggestionDrafts[s.id]??s.proposed;
@@ -342,6 +368,48 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   Object.values(suggestionDrafts).some(value=>value.trim().length>0)||
   Object.values(newEvidence).some(value=>value.trim().length>0)||
   Object.values(details).some(value=>String(value||'').trim().length>0);
+
+ function restoreSessionDraft(){
+  const data=recoverableDraft;
+  if(!data||!Array.isArray(data.version?.blocks))return;
+  const currentIds=new Set(blocks.map(b=>b.id));
+  if(data.version.blocks.some((item:ResumeBlock)=>!currentIds.has(item.id)||
+   typeof item.text!=='string'||item.text.length>1600)){
+   setDraftStatus('草稿已与这份简历不匹配，为安全起见未恢复。');return;
+  }
+  setVersion({id:'draft-'+job.id,targetJobId:job.id,
+   blocks:data.version.blocks,acceptedSuggestionIds:data.version.acceptedSuggestionIds||[]});
+  setDetails(normalizeResumeDocumentDetails(data.details));
+  setSuggestions(Array.isArray(data.suggestions)?data.suggestions.slice(0,12):[]);
+  setIgnored(Array.isArray(data.ignored)?data.ignored:[]);
+  setSuggestionDrafts(data.suggestionDrafts||{});
+  setNewEvidence(data.newEvidence||{});
+  setConfirmed([]);setOpenSuggestionId(null);setActiveSuggestionId(null);
+  setEditingSuggestionId(null);setUndoStack([]);setRecoverableDraft(null);
+  setDraftStatus('已恢复本标签页保存的文字草稿，仍需逐项核实和保存原 Word。');
+ }
+ function discardSessionDraft(){
+  try{if(draftKey)sessionStorage.removeItem(draftKey);}catch{}
+  setRecoverableDraft(null);setRememberDraft(false);
+  setDraftStatus('已清除本标签页保存的文字草稿。');
+ }
+ useEffect(()=>{
+  if(!rememberDraft||!draftKey||!draftDirty||recoverableDraft)return;
+  const task=setTimeout(()=>{
+   try{
+    const payload=JSON.stringify({schema:'HHBA_WORD_DRAFT_V1',
+     expires_at:Date.now()+6*60*60*1000,
+     version:{blocks:version.blocks,acceptedSuggestionIds:version.acceptedSuggestionIds},
+     suggestions,ignored,suggestionDrafts,newEvidence,details});
+    if(payload.length>60000)throw Error('TOO_LARGE');
+    sessionStorage.setItem(draftKey,payload);
+    setDraftStatus('文字草稿已保存在当前浏览器标签页（不包含 Word 原文件）。');
+   }catch{setDraftStatus('当前浏览器无法自动保存草稿，请避免关闭页面。');}
+  },850);
+  return()=>clearTimeout(task);
+ },[draftKey,rememberDraft,draftDirty,recoverableDraft,version,suggestions,ignored,
+    suggestionDrafts,newEvidence,details]);
+
  useEffect(()=>{onDraftDirtyChange?.(draftDirty);},[draftDirty,onDraftDirtyChange]);
  useEffect(()=>{
   if(!draftDirty)return;
@@ -374,6 +442,22 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>
    <span>我同意将下方展示的简历证据片段与该岗位要求发送给平台选定的第三方 AI 服务商进行润色。服务器会尽力脱敏常见联系方式，但不能确保移除所有个人信息。建议内容只供本人核实与选择，不会自动投递。</span>
   </label>}
+  {sourceResume&&draftKey&&<section className="targeted-resume-draft-recovery" aria-label="当前标签页草稿保护">
+   <label><input type="checkbox" checked={rememberDraft} onChange={event=>{
+    const enabled=event.target.checked;
+    if(!enabled)discardSessionDraft();
+    else {setRememberDraft(true);setDraftStatus('已授权在当前浏览器标签页自动保留文字建议草稿。');}
+   }}/>
+    在此标签页自动保留未完成的文字草稿（最多 6 小时）
+   </label>
+   <small>仅保存文字建议，不保存 Word 原文件；不会自动上传至其他服务。共享设备请关闭此选项。</small>
+   {recoverableDraft&&<div className="targeted-resume-draft-recovery-actions">
+    <strong>找到上次未完成的草稿</strong>
+    <button type="button" onClick={restoreSessionDraft}>恢复草稿</button>
+    <button type="button" onClick={discardSessionDraft}>删除草稿</button>
+   </div>}
+   {draftStatus&&<p role="status">{draftStatus}</p>}
+  </section>}
   {sourceResume?<section className="targeted-resume-word-workspace" aria-label="原版式 Word 统一编辑工作区">
    <div className="targeted-resume-word-main">
     <OriginalWordViewer resume={sourceResume} suggestedChanges={confirmedWordChanges}
