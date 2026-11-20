@@ -36,7 +36,7 @@ jobs:
             sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libreoffice-writer poppler-utils fonts-noto-cjk
           fi
           python3 -m venv /tmp/hhba-word-parity-venv
-          /tmp/hhba-word-parity-venv/bin/python -m pip install --disable-pip-version-check pillow==11.3.0
+          /tmp/hhba-word-parity-venv/bin/python -m pip install --disable-pip-version-check pillow==11.3.0 python-docx==1.2.0
       - name: Compare original and edited Word by rendered pixels
         working-directory: apps/web
         run: |
@@ -49,6 +49,32 @@ jobs:
         env:
           HHBA_WORD_RENDER_QA_OUTPUT: /tmp/hhba-docx-preserve-ci
         run: /tmp/hhba-word-parity-venv/bin/python -m unittest -v test_server.py
+      - name: Offline HTTP tests with genuine two-page Chinese Word, tables, images and security gates
+        working-directory: services/word-renderer
+        env:
+          HHBA_REAL_WORD_QA_OUTPUT: /tmp/hhba-real-word-ci
+        run: /tmp/hhba-word-parity-venv/bin/python -m unittest -v real_docx_local_qa.py
+      - name: Render genuine anonymized Word fixture as inspectable PDF preview
+        if: always()
+        run: |
+          mkdir -p /tmp/hhba-real-word-ci
+          for name in original-real-cjk edited-real-cjk; do
+            if [ -f "/tmp/hhba-real-word-ci/$name.pdf" ]; then
+              pdftoppm -f 1 -l 2 -scale-to 1050 -png "/tmp/hhba-real-word-ci/$name.pdf" "/tmp/hhba-real-word-ci/$name" >/dev/null 2>&1 || true
+            fi
+          done
+      - name: Upload genuine anonymized DOCX/PDF previews and local HTTP result
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-real-offline-chinese-word-qa
+          path: |
+            /tmp/hhba-real-word-ci/*.docx
+            /tmp/hhba-real-word-ci/*.pdf
+            /tmp/hhba-real-word-ci/*.png
+            /tmp/hhba-real-word-ci/*.json
+          if-no-files-found: warn
+          retention-days: 5
       - name: Preserve synthetic QA files for inspection
         uses: actions/upload-artifact@v4
         if: always()
