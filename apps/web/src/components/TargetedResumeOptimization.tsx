@@ -5,6 +5,7 @@ import {getRealAuthToken,realAuthReady} from '../services/realAuth';
 import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimizationStatus} from '../services/resumeOptimizationApi';
 import {getWholeRewriteStatus,requestWholeResumeRewrite,type ResumeWholeRewriteResult,type ResumeWholeRewriteStatus} from '../services/resumeWholeRewriteApi';
 import {completeRewriteSource} from '../services/resumeWholeRewriteSource';
+import {downloadWholeRewriteDocx} from '../services/resumeWholeRewriteExport';
 import {WholeResumeRewriteReview} from './WholeResumeRewriteReview';
 import {applySuggestion,validateSuggestion,editResumeBlock,type ResumeBlock,type ResumeSuggestion,type ResumeVersion} from '../services/targetedResumeOptimization';
 import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
@@ -815,7 +816,15 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     {wholeDraft&&<WholeResumeRewriteReview result={wholeDraft}
      approved={wholeApproved}
      onApprove={setWholeApproved}
-     onRegenerate={answers=>void generateWholeRewrite(answers)}/>}
+     onRegenerate={answers=>void generateWholeRewrite(answers)}
+     onDownload={()=>{
+      try{
+       downloadWholeRewriteDocx(wholeDraft,job.title_zh||job.title,details);
+       setNotice('已生成可编辑的完整岗位定向 Word（使用新排版）。原上传 Word 未被修改。');
+      }catch(error){
+       setNotice(error instanceof Error?error.message:'完整简历 Word 生成失败，请重试。');
+      }
+     }}/>}
     <div className="targeted-resume-word-assistant-head">
      <strong><Sparkles size={15}/> AI 修改建议</strong>
      <p>逐条核对建议，确认后在原 Word 中应用。</p>
