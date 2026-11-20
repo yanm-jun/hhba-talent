@@ -792,6 +792,12 @@ try{
   assert.equal(await rows.count(),9,
    'full writer must process ALL nine source paragraphs instead of only five tips');
   assert.match(await full.locator('.hhba-whole-rewrite-metrics').textContent(),/读取段落 9/);
+  assert.match(await full.locator('.hhba-whole-rewrite-agent-summary').textContent(),
+   /AI 自主处理了 3 轮/,
+   'whole-resume AI review should visibly explain its actual tool workflow');
+  assert.match(await full.locator('.hhba-whole-rewrite-agent-summary').textContent(),
+   /查看原始证据/,
+   'model tool selection must be inspectable by the user');
   assert.match(await full.locator('.hhba-whole-rewrite-questions').textContent(),/跨区域门店支持/);
   await full.locator('.hhba-word-native-preview .hhba-word-ai-changed').first().waitFor();
   assert.equal(await full.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),1);
