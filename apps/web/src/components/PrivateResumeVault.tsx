@@ -112,7 +112,7 @@ export function PrivateResumeVault({active=true}:{active?:boolean}){
        <small>{(item.size/1024/1024).toFixed(2)} MB · {item.createdAt.slice(0,10)} 保存</small>
       </div>
       <div className="hhba-private-resume-actions">
-       <Link to={'/candidate/match?resume='+encodeURIComponent(item.id)}
+       <Link to={'/candidate/account/match?resume='+encodeURIComponent(item.id)}
         className="hhba-private-resume-match" aria-label={'使用 '+item.name+' 进行 AI 智能匹配'}>AI 智能匹配</Link>
        <button type="button" disabled={busy} onClick={()=>setPreviewItem(current=>current?.id===item.id?null:item)} aria-label={'查看 '+item.name}>
         <Eye size={15}/>{previewItem?.id===item.id?'收起':'查看'}</button>
