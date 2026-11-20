@@ -106,3 +106,38 @@
 .hhba-ai-mainland-only strong{font-size:13px;color:#125EBC}
 .hhba-ai-mainland-only small{font-size:11px;color:#60758F}
 @media(max-width:580px){.hhba-ai-mainland-only small{width:100%}}
+
+
+/* HHBA's single front-door journey: resume → AI jobs → score → tailored Word → employer. */
+.hhba-ai-page{max-width:1020px}
+.hhba-ai-hero{margin-bottom:15px}
+.hhba-ai-hero h1{font-size:clamp(25px,3.6vw,38px);margin:9px 0 10px}
+.hhba-ai-hero p{font-size:13px;line-height:1.7;margin:0}
+.hhba-ai-layout{grid-template-columns:minmax(0,1fr) 236px;gap:20px}
+.hhba-ai-upload{padding:25px 28px}
+.hhba-ai-upload header h2{font-size:16px}
+.hhba-ai-upload header p{margin:0 0 17px}
+.hhba-ai-drop{min-height:155px;background:#fafbfd;border-color:#c8d7e2}
+.hhba-ai-drop>svg{color:#386885}
+.hhba-ai-preferences{margin:15px 0 5px;border-top:1px solid #edf0f4;padding-top:12px}
+.hhba-ai-preferences>summary{list-style:none;cursor:pointer;font-size:12px;
+ color:#607b90;font-weight:620;min-height:27px}
+.hhba-ai-preferences>summary::-webkit-details-marker{display:none}
+.hhba-ai-preferences>summary::after{content:'⌄';float:right;color:#68869f}
+.hhba-ai-preferences[open]>summary::after{content:'⌃'}
+.hhba-ai-preferences>p{font-size:11px;line-height:1.6;color:#8393a1;margin:7px 0 10px}
+.hhba-ai-preferences .hhba-ai-review-tools{margin:12px 0 7px}
+.hhba-ai-preferences .hhba-ai-mainland-only{background:#fafbfd;padding:8px 12px}
+.hhba-ai-preferences .hhba-ai-fields input{padding:10px 11px}
+.hhba-ai-aside-card{border-color:#e6edf2;padding:18px}
+.hhba-ai-aside-card h3{font-size:13px;margin:0 0 9px;color:#274963}
+.hhba-ai-aside-card p{color:#647f90;font-size:12px;line-height:1.8;margin:0 0 12px}
+.hhba-ai-aside-card small{color:#8695a4;font-size:11px;line-height:1.7}
+.hhba-ai-consent{border:0;background:transparent;padding:8px 0;margin-top:13px}
+.hhba-ai-notice{margin:5px 0 13px}
+.hhba-ai-submit{background:#315b7b;font-weight:680}
+.hhba-ai-submit:hover:not(:disabled){background:#264d69}
+.hhba-ai-submit:disabled{background:#c2d2dd}
+@media(max-width:800px){.hhba-ai-layout{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:640px){.hhba-ai-upload{padding:17px}.hhba-ai-page{padding:17px 14px 55px}
+ .hhba-ai-hero h1{font-size:27px}.hhba-ai-drop{min-height:145px}}
