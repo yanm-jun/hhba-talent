@@ -146,6 +146,10 @@ test('only renderer-proven exact Word text is saved for downloadable edits',asyn
   assert.ok((await downloaded.arrayBuffer()).byteLength>500);
   const editedPage=await onRequestGet({request:req('edited-preview'),env:x.env});
   assert.equal(editedPage.status,200);
+  const base=store+'.hhba-word-preserved-v1-'+sha;
+  x.saved.set(base+'.docx',new Uint8Array([0,1,2]));
+  const corrupted=await onRequestGet({request:req('download'),env:x.env});
+  assert.equal(corrupted.status,409,'never download a damaged or partially written Word');
  }finally{globalThis.fetch=prior;}
 });
 test('when renderer cannot verify changed layout the draft is not saved',async()=>{
