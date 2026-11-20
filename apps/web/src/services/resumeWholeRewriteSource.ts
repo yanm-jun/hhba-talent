@@ -10,10 +10,17 @@ export type CompleteRewriteSource={blocks:ResumeBlock[];complete:boolean;reason?
 const MAX_CHARS_PER_BLOCK=4200;
 const MAX_BLOCKS=96;
 function sectionOf(text:string):ResumeSection{
- if(/^(?:教育背景|教育经历|学历|education)\b/i.test(text))return 'education';
- if(/^(?:技能|能力|专业技能|skills?)\b/i.test(text))return 'skills';
- if(/^(?:项目|项目经历|projects?)\b/i.test(text))return 'projects';
- if(/^(?:工作|实习|岗位|任职|经历|experience)\b/i.test(text))return 'experience';
+ // JavaScript \b is an ASCII-oriented word boundary and does not match
+ // headings followed by Chinese punctuation or Chinese body text reliably.
+ const line=text.split('\n',1)[0].trim().slice(0,90);
+ if(/^(?:教育背景|教育经历|学历信息|学历|Education)(?=$|[：:\s])/i.test(line))
+  return 'education';
+ if(/^(?:核心技能|专业技能|技能证书|技能|Skills?)(?=$|[：:\s])/i.test(line))
+  return 'skills';
+ if(/^(?:项目经历|项目经验|项目介绍|Projects?)(?=$|[：:\s])/i.test(line))
+  return 'projects';
+ if(/^(?:工作经历|工作经验|实习经历|任职经历|Experience|Employment)(?=$|[：:\s])/i.test(line))
+  return 'experience';
  return 'summary';
 }
 export function completeRewriteSource(profile:CandidateProfile,sourceText?:string):CompleteRewriteSource{
