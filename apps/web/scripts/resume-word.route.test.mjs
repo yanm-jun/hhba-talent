@@ -24,9 +24,21 @@ function fixture({enabled=true,owner='account-A',role='candidate'}={}){
   HHBA_PRIVATE_RESUMES:{
    async get(key){if(!saved.has(key))return null;
     const bytes=saved.get(key);
-    return {arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.length),
+    return {etag:createHash('sha256').update(bytes).digest('hex'),
+     arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.length),
      json:async()=>JSON.parse(String(bytes))};},
-   async put(key,data){saved.set(key,typeof data==='string'?data:new Uint8Array(data));},
+   async put(key,data,options={}){
+    const prior=saved.get(key);
+    if(options.onlyIf){
+     const expected=options.onlyIf;
+     if(expected.etagMatches&&(!prior||
+       createHash('sha256').update(prior).digest('hex')!==expected.etagMatches))return null;
+     if(expected.etagDoesNotMatch==='*'&&prior)return null;
+    }
+    const bytes=typeof data==='string'?data:new Uint8Array(data);
+    saved.set(key,bytes);
+    return {etag:createHash('sha256').update(bytes).digest('hex')};
+   },
    async delete(key){saved.delete(key);}
   },
   HHBA_PNVS_AUTH_DB:{prepare(sql){return {
@@ -142,7 +154,9 @@ test('only renderer-proven exact Word text is saved for downloadable edits',asyn
   assert.equal(verified,true);
   const state=await (await onRequestGet({request:req('inspect'),env:x.env})).json();
   assert.equal(state.saved.text,'测试名');
-  assert.equal(state.editable_text.length,0);
+  assert.ok(state.editable_text.includes('测试名'));
+  assert.equal(state.revision,1);
+  assert.equal(state.total_revisions,1);
   const downloaded=await onRequestGet({request:req('download'),env:x.env});
   assert.equal(downloaded.status,200);
   assert.ok((await downloaded.arrayBuffer()).byteLength>500);
@@ -156,8 +170,11 @@ test('only renderer-proven exact Word text is saved for downloadable edits',asyn
    'PDF download must be the exact bytes of the verified Word-rendered preview');
   assert.equal((await onRequestGet({request:req('download-pdf'),env:fixture({owner:'other-account'}).env})).status,404,
    'another account cannot download the PDF derivative');
-  const base=store+'.hhba-word-preserved-v1-'+sha;
-  x.saved.set(base+'.edited.pdf',new Uint8Array([37,80,68,70,45,0]));
+  const stateBytes=JSON.parse(x.saved.get(store+'.hhba-word-preserved-v1-'+sha+'.json'));
+  assert.equal(stateBytes.schema,'HHBA_ORIGINAL_WORD_VERSIONS_V2');
+  const base=store+'.hhba-word-preserved-v1-'+sha+
+   '.revision-'+stateBytes.items[0].id;
+  x.saved.set(base+'.pdf',new Uint8Array([37,80,68,70,45,0]));
   const alteredPdf=await onRequestGet({request:req('download-pdf'),env:x.env});
   assert.equal(alteredPdf.status,409,'a corrupted PDF derivative must never download');
   x.saved.set(base+'.docx',new Uint8Array([0,1,2]));
@@ -193,4 +210,72 @@ test('when renderer cannot verify changed layout the draft is not saved',async()
   assert.notEqual(response.status,200);
   assert.equal(x.saved.size,1);
  }finally{globalThis.fetch=prior;}
+});
+
+test('multiple Word edits persist; undo/redo restore every verified DOCX and PDF revision',async()=>{
+ const x=fixture(),previous=globalThis.fetch;
+ const verification=[];
+ globalThis.fetch=async(url,options)=>{
+  if(url.endsWith('/v1/verify')){
+   const request=JSON.parse(options.body);
+   verification.push({oldText:request.old_text,newText:request.new_text});
+   return Response.json({ok:true,verified:true,report:{
+    passed:true,page_count:1,changed_pixels:72,
+    changed_region:{page:1,x:40,y:35,width:100,height:18}
+   }});
+  }
+  return new Response(pdf,{status:200,headers:{'Content-Type':'application/pdf'}});
+ };
+ const write=async(original,text,revision)=>
+  onRequestPost({request:req('export',{method:'POST',body:{
+   resume_id:id,action:'edit',original,text,expected_revision:revision,
+   confirmed_real:true,consent_word_processing:true
+  }}),env:x.env});
+ const shift=async(action,revision)=>
+  onRequestPost({request:req('export',{method:'POST',body:{
+   resume_id:id,action,expected_revision:revision,
+   confirmed_real:true,consent_word_processing:true
+  }}),env:x.env});
+ try{
+  const first=await write('测试用户','测试名',0);
+  assert.equal(first.status,200,await first.clone().text());
+  const second=await write('测试名','新名',1);
+  assert.equal(second.status,200,await second.clone().text());
+  assert.deepEqual(verification,[{oldText:'测试用户',newText:'测试名'},
+   {oldText:'测试名',newText:'新名'}]);
+  const current=await (await onRequestGet({request:req('inspect'),env:x.env})).json();
+  assert.equal(current.revision,2);
+  assert.equal(current.total_revisions,2);
+  assert.ok(current.editable_text.includes('新名'));
+  const latest=Buffer.from(await (await onRequestGet({
+   request:req('download'),env:x.env})).arrayBuffer());
+  assert.ok(latest.includes(Buffer.from('新名')));
+  assert.equal((await write('新名','名字',0)).status,409,'stale browser cannot overwrite revision');
+  assert.equal((await shift('undo',2)).status,200);
+  const firstVersion=await (await onRequestGet({request:req('inspect'),env:x.env})).json();
+  assert.equal(firstVersion.revision,1);
+  assert.equal(firstVersion.total_revisions,2);
+  assert.ok(firstVersion.editable_text.includes('测试名'));
+  assert.equal((await shift('undo',1)).status,200);
+  const initial=await (await onRequestGet({request:req('inspect'),env:x.env})).json();
+  assert.equal(initial.revision,0);
+  assert.equal(initial.total_revisions,2);
+  assert.equal(initial.saved,null);
+  assert.equal((await onRequestGet({request:req('download-pdf'),env:x.env})).status,404);
+  assert.equal((await shift('redo',0)).status,200);
+  assert.equal((await shift('redo',1)).status,200);
+  const restored=Buffer.from(await (await onRequestGet({
+   request:req('download'),env:x.env})).arrayBuffer());
+  assert.deepEqual(restored,latest,'redo must restore identical Word bytes, not rerender a template');
+  const restoredPdf=await onRequestGet({request:req('download-pdf'),env:x.env});
+  assert.equal(restoredPdf.status,200);
+  assert.equal((await restoredPdf.arrayBuffer()).byteLength,600);
+  assert.equal((await shift('redo',2)).status,409);
+  assert.equal((await shift('undo',2)).status,200);
+  const branch=await write('测试名','名号',1);
+  assert.equal(branch.status,200,await branch.clone().text());
+  assert.equal((await shift('redo',2)).status,409,'new edit must discard obsolete redo history');
+  const branched=await (await onRequestGet({request:req('inspect'),env:x.env})).json();
+  assert.ok(branched.editable_text.includes('名号'));
+ }finally{globalThis.fetch=previous;}
 });
