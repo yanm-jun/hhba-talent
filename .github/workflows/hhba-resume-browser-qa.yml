@@ -7,6 +7,9 @@ on:
       - '.github/workflows/hhba-resume-browser-qa.yml'
       - 'apps/web/qa/**'
       - 'apps/web/scripts/resume-browser.qa.mjs'
+      - 'apps/web/scripts/generate-cjk-native-pdf-qa.py'
+      - 'apps/web/src/services/resumePdfCjkFont.*'
+      - 'apps/web/src/services/resumePdfNativeVerify.*'
       - 'apps/web/scripts/resume-preview-browser.qa.mjs'
       - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
       - 'apps/web/src/components/TargetedResumeOptimization.tsx'
@@ -21,6 +24,9 @@ on:
       - '.github/workflows/hhba-resume-browser-qa.yml'
       - 'apps/web/qa/**'
       - 'apps/web/scripts/resume-browser.qa.mjs'
+      - 'apps/web/scripts/generate-cjk-native-pdf-qa.py'
+      - 'apps/web/src/services/resumePdfCjkFont.*'
+      - 'apps/web/src/services/resumePdfNativeVerify.*'
       - 'apps/web/scripts/resume-preview-browser.qa.mjs'
       - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
       - 'apps/web/src/components/TargetedResumeOptimization.tsx'
@@ -53,9 +59,15 @@ jobs:
       - name: Install actual Chinese fonts for Chromium PDF verification
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq fonts-noto-cjk
+          sudo apt-get install -y -qq fonts-noto-cjk fonts-arphic-gbsn00lp
           fc-cache -f
           fc-match "Noto Sans CJK SC"
+      - name: Generate real embedded Chinese font PDF (QA only)
+        run: |
+          python3 -m venv /tmp/hhba-cjk-qa-venv
+          /tmp/hhba-cjk-qa-venv/bin/pip install -q fonttools==4.63.0
+          /tmp/hhba-cjk-qa-venv/bin/python scripts/generate-cjk-native-pdf-qa.py qa/generated-cjk-original.pdf
+          test -s qa/generated-cjk-original.pdf
       - name: Start Vite development server with only synthetic QA data
         run: |
           VITE_HHBA_REAL_AUTH_ENABLED=1 npm run dev -- --host 127.0.0.1 --port 3000 > /tmp/hhba-resume-qa-vite.log 2>&1 &
