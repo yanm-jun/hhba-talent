@@ -274,3 +274,171 @@
  .hhba-original-resume-history ol{max-height:170px}
  .hhba-original-resume-history li{padding:9px}
 }
+
+
+/* Compact Word reader: editing UI is OUTSIDE the rendered document. */
+.hhba-original-word-viewer .hhba-original-resume-toolbar{
+ display:flex;align-items:center;justify-content:space-between;gap:10px;
+ margin:0 0 8px;flex-wrap:wrap;
+}
+.hhba-original-word-viewer .hhba-original-resume-file-heading{min-width:0;flex:1}
+.hhba-original-word-viewer .hhba-original-resume-file-heading strong{
+ display:block;font-weight:650;font-size:13px;color:#24374a;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.hhba-original-word-viewer .hhba-original-resume-file-heading span{
+ display:block;font-size:10px;color:#91a0ae;line-height:1.6;margin-top:2px;
+}
+.hhba-original-word-viewer .hhba-original-resume-toolbar-actions{
+ display:flex;align-items:center;gap:5px;flex:0 0 auto;
+}
+.hhba-original-word-viewer .hhba-original-resume-toolbar-actions>button{
+ background:transparent;border:0;padding:7px 8px;min-height:35px;
+ color:#52667a;border-radius:8px;font-size:12px;
+}
+.hhba-original-word-viewer .hhba-original-resume-toolbar-actions button:disabled{opacity:.35}
+.hhba-original-word-viewer .hhba-original-resume-word-tools{
+ display:flex;justify-content:flex-end;align-items:center;gap:4px;margin:3px 0 8px;
+}
+.hhba-original-word-viewer .hhba-original-resume-word-tools button{
+ min-width:30px;min-height:30px;border:0;color:#64778a;
+ font-size:11px;background:transparent;padding:4px 8px;
+}
+.hhba-original-word-viewer .hhba-original-resume-word-tools output{font-size:11px;color:#8291a0}
+.hhba-original-word-viewer .hhba-original-resume-paper{
+ border:0;border-radius:8px;background:#eef0f3;
+ padding:18px 12px;max-height:calc(100dvh - 300px);min-height:280px;
+}
+.hhba-original-word-viewer .hhba-original-resume-canvas{
+ box-shadow:0 6px 24px rgba(33,43,63,.08);border:0;background:#fff;
+}
+.hhba-original-word-viewer .hhba-original-resume-siri-stage{
+ margin:0;overflow:hidden;border:0;box-shadow:none;animation:none;background:transparent;
+}
+.hhba-original-word-viewer .hhba-original-resume-siri-stage::before,
+.hhba-original-word-viewer .hhba-original-resume-siri-stage::after{display:none}
+.hhba-original-word-viewer .hhba-original-resume-anchor{
+ border:1px solid rgba(57,83,104,.26);background:rgba(75,105,138,.035);
+ border-radius:2px;outline:none;min-height:18px;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor span{
+ opacity:0;background:#344f65;border-radius:4px;pointer-events:none;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor:hover,
+.hhba-original-word-viewer .hhba-original-resume-anchor.is-selected,
+.hhba-original-word-viewer .hhba-original-resume-anchor:focus-visible{
+ background:rgba(63,107,148,.08);border-color:#6789a5;
+ outline:1px solid rgba(64,99,133,.32);
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor:hover span,
+.hhba-original-word-viewer .hhba-original-resume-anchor.is-selected span,
+.hhba-original-word-viewer .hhba-original-resume-anchor:focus-visible span{opacity:1}
+.hhba-original-word-viewer .hhba-original-resume-pages{
+ display:flex;justify-content:center;margin:8px 0 0;gap:10px;
+}
+.hhba-original-word-viewer .hhba-original-resume-pages button{
+ border:0;background:transparent;padding:7px;font-size:11px;
+ color:#687d8f;
+}
+.hhba-original-word-viewer .hhba-original-resume-word-status{
+ border:0;border-left:2px solid #abc5d5;border-radius:0;
+ padding:8px 11px;margin:7px 0;background:#f7f9fb;color:#4e6578;
+ font-size:11px;line-height:1.5;
+}
+.hhba-original-word-viewer .hhba-original-resume-note{
+ margin:8px 0;font-size:11px;line-height:1.55;color:#8b97a5;
+}
+.hhba-original-word-viewer .hhba-word-draft-help{font-size:11px;color:#667b8f;
+ margin:5px 0;padding:4px 0}
+.hhba-word-draft-help summary{cursor:pointer}
+.hhba-word-draft-help p{margin:4px 0}
+.hhba-word-menu{position:relative;z-index:30;font-size:12px}
+.hhba-word-menu summary{
+ list-style:none;display:inline-flex;gap:4px;align-items:center;
+ cursor:pointer;color:#52677a;min-height:36px;padding:6px 9px;
+ border-radius:8px;white-space:nowrap;
+}
+.hhba-word-menu summary::-webkit-details-marker{display:none}
+.hhba-word-menu summary:hover,.hhba-word-menu[open] summary{background:#f1f4f7}
+.hhba-word-menu-content{
+ position:absolute;right:0;top:calc(100% + 4px);z-index:80;
+ min-width:170px;max-width:min(310px,85vw);max-height:min(65dvh,430px);
+ overflow-y:auto;background:#fff;border:1px solid #e5eaef;
+ border-radius:11px;padding:6px;box-shadow:0 14px 35px rgba(27,46,63,.13);
+}
+.hhba-word-menu-content button{
+ display:flex!important;width:100%;border:0!important;background:transparent!important;
+ color:#364b60!important;text-align:left!important;justify-content:flex-start!important;
+ border-radius:7px!important;padding:10px 11px!important;font-size:12px!important;
+}
+.hhba-word-menu-content button:hover:not(:disabled){background:#f4f7f9!important}
+.hhba-word-menu-content p{margin:6px 8px;font-size:11px;line-height:1.65;color:#677a8b}
+.hhba-original-resume-history-list{
+ list-style:none;margin:5px 4px;padding:0;display:grid;gap:7px;
+}
+.hhba-original-resume-history-list li{border-top:1px solid #e9edf1;padding:8px 4px;
+ font-size:11px;overflow-wrap:anywhere}
+.hhba-original-resume-history-list li strong{font-size:11px}
+.hhba-original-resume-history-list li small{font-size:10px;color:#8996a3;margin-left:6px}
+.hhba-original-resume-history-list li>div{margin-top:4px;line-height:1.55;color:#708296}
+.hhba-original-word-viewer .hhba-original-resume-editbox{
+ border:0;box-shadow:none;background:transparent;padding:10px 0;
+ max-height:none;gap:11px;overflow:visible;
+}
+.hhba-original-resume-edit-source{
+ margin:0;padding:9px 11px;color:#6b7c8b;background:#f6f8fa;
+ border-radius:7px;font-size:12px;line-height:1.65;
+ overflow-wrap:anywhere;max-height:95px;overflow-y:auto;
+}
+.hhba-original-resume-edit-source span{
+ display:block;margin-bottom:5px;font-size:10px;font-weight:650;color:#91a0ae;
+}
+.hhba-original-resume-edit-input-label{
+ font-size:12px;font-weight:600;color:#324b60;
+}
+.hhba-original-resume-edit-limit{margin:0;font-size:10px;color:#91a0ae;line-height:1.55}
+.hhba-original-word-viewer .hhba-original-resume-editbox textarea{
+ border:1px solid #dbe4eb;background:#fff;box-shadow:none;
+ border-radius:8px;min-height:110px;line-height:1.7;padding:11px;
+}
+.hhba-original-word-viewer .hhba-original-resume-edit-confirm{
+ align-items:flex-start;font-size:11px;color:#52687a;line-height:1.6;
+}
+.hhba-original-word-viewer .hhba-original-resume-editbox-actions{
+ display:flex;justify-content:flex-start;gap:8px;
+}
+.hhba-original-word-viewer .hhba-original-resume-editbox-actions button{
+ min-height:40px;padding:9px 12px;
+}
+.hhba-word-standalone-edit-panel{
+ margin:14px 0;padding:15px;border:1px solid #e8edf2;
+ background:#fff;border-radius:10px;
+}
+@media(max-width:700px){
+ .hhba-original-word-viewer .hhba-original-resume-toolbar{
+  gap:7px;padding:0 2px;margin-bottom:4px;
+ }
+ .hhba-original-word-viewer .hhba-original-resume-file-heading strong{font-size:12px}
+ .hhba-original-word-viewer .hhba-original-resume-file-heading span{font-size:10px}
+ .hhba-original-word-viewer .hhba-original-resume-toolbar-actions{gap:1px}
+ .hhba-original-word-viewer .hhba-original-resume-toolbar-actions>button{padding:6px}
+ .hhba-original-word-viewer .hhba-original-resume-toolbar-actions>button>span{display:none}
+ .hhba-word-menu summary{padding:5px 6px;font-size:11px}
+ .hhba-original-word-viewer .hhba-original-resume-paper{
+  padding:9px 4px;min-height:310px;max-height:68dvh;
+ }
+ .hhba-original-word-viewer .hhba-original-resume-word-tools{
+  margin:1px 0 5px;
+ }
+ .hhba-original-word-viewer .hhba-original-resume-word-tools button{min-height:38px}
+ .hhba-original-word-viewer .hhba-word-standalone-edit-panel{
+  position:fixed;bottom:0;left:0;right:0;z-index:3200;
+  max-height:77dvh;overflow-y:auto;
+  border:0;border-radius:18px 18px 0 0;padding:20px 16px;
+  padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -15px 50px rgba(30,43,58,.18);
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-original-word-viewer .hhba-original-resume-anchor{transition:none}
+}
