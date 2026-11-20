@@ -1,12 +1,12 @@
 import {useEffect,useRef,useState} from 'react';
-import {ChevronLeft,ChevronRight,Download,PencilLine,Save,X} from 'lucide-react';
+import {ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,Redo2,X} from 'lucide-react';
 import type {PrivateResume} from '../services/privateResumes';
 import {downloadPrivateResume,fetchPrivateResumeForLocalReview} from '../services/privateResumes';
 import {extractDocxText} from '../services/docxProfile.mjs';
 import {matchWordAnchors,type WordAnchor} from '../services/resumeWordAnchors.mjs';
 import {
  wordRendererReady,wordEditableText,wordPreviewBytes,saveOriginalWordEdit,
- downloadOriginalWordEdited,downloadOriginalWordPdf
+ shiftOriginalWordRevision,downloadOriginalWordEdited,downloadOriginalWordPdf
 } from '../services/originalWordApi';
 import '../styles/original-resume-viewer.css';
 import '../styles/siri-edge.css';
@@ -36,6 +36,9 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
  const [confirmed,setConfirmed]=useState(false);
  const [busy,setBusy]=useState(false);
  const [saved,setSaved]=useState(false);
+ const [revision,setRevision]=useState(0);
+ const [totalRevisions,setTotalRevisions]=useState(0);
+ const [maxRevisions,setMaxRevisions]=useState(8);
  const [refresh,setRefresh]=useState(0);
  const [message,setMessage]=useState('');
 
@@ -67,6 +70,9 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
     // Otherwise the clicked visible region could be the WRONG occurrence.
     const wasSaved=Boolean(info.saved);
     setSaved(wasSaved);
+    setRevision(Number.isInteger(info.revision)?info.revision:(wasSaved?1:0));
+    setTotalRevisions(Number.isInteger(info.total_revisions)?info.total_revisions:(wasSaved?1:0));
+    setMaxRevisions(Number.isInteger(info.max_revisions)?info.max_revisions:8);
     const bytes=await wordPreviewBytes(resume.id,wasSaved);
     if(!active)return;
     const [pdf,worker]=await Promise.all([
@@ -80,7 +86,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
     const result=await task.promise;
     if(!active){await task.destroy();return;}
     const counts=new Map<string,number>();
-    if(result.numPages<=20&&!wasSaved){
+    if(result.numPages<=20){
      const candidates=new Set(info.editable_text||[]);
      for(let current=1;current<=result.numPages;current++){
       const content=await (await result.getPage(current))
@@ -93,7 +99,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
      }
     }
     if(!active)return;
-    setEditable(wasSaved?[]:(info.editable_text||[]).filter(t=>counts.get(t)===1));
+    setEditable((info.editable_text||[]).filter(t=>counts.get(t)===1));
     doc.current=result;setCount(result.numPages);setLoading(false);
    }catch(error){
     if(active){
@@ -132,7 +138,6 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
     const content=await view.getTextContent({includeMarkedContent:false});
     if(!active)return;
     const items=content.items.filter((x:any)=>typeof x.str==='string') as any;
-    if(saved)return;
     setAnchors(matchWordAnchors({
      editableText:editable,items,viewport:viewport as any,page
     }));
@@ -171,21 +176,45 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
   if(!selected||!confirmed||busy||!draft.trim()||draft.length>300)return;
   setBusy(true);setMessage('');
   try{
-   await saveOriginalWordEdit(resume.id,selected.text,draft.trim());
+   const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision);
    setSelected(null);setConfirmed(false);setSaved(true);
-   setRefresh(n=>n+1);setMessage('修改已保存，原来的版式没有改变。');
+   setRevision(result.revision);setTotalRevisions(result.total_revisions);
+   setRefresh(n=>n+1);setMessage('已检查版式并保存第 '+result.revision+' 次修改。原始 Word 保持不变。');
   }catch(error){setMessage(error instanceof Error?error.message:'没有保存，请缩短文字后重试。');}
+  finally{setBusy(false);}
+ }
+ async function changeRevision(action:'undo'|'redo'){
+  if(busy||ready!=='available'||action==='undo'&&revision<=0||
+   action==='redo'&&revision>=totalRevisions)return;
+  setBusy(true);setMessage('');setSelected(null);setConfirmed(false);
+  try{
+   const result=await shiftOriginalWordRevision(resume.id,action,revision);
+   setRevision(result.revision);setTotalRevisions(result.total_revisions);
+   setSaved(result.saved);setRefresh(n=>n+1);
+   setMessage(action==='undo'?'已撤销一处修改，当前文档已恢复对应的原始字体与版式。':
+    '已重新应用已验证的 Word 修改。');
+  }catch(error){setMessage(error instanceof Error?error.message:'版本切换失败，请重新打开简历。');}
   finally{setBusy(false);}
  }
  return <section className="hhba-original-resume" aria-label="查看我的 Word 简历">
   <div className="hhba-original-resume-toolbar">
    <div><strong>{resume.name}</strong><p>原件始终保留</p></div>
    <div>
+    {ready==='available'&&<>
+     <button type="button" disabled={busy||loading||revision<=0}
+      onClick={()=>void changeRevision('undo')}><Undo2 size={15}/> 撤销</button>
+     <button type="button" disabled={busy||loading||revision>=totalRevisions}
+      onClick={()=>void changeRevision('redo')}><Redo2 size={15}/> 重做</button>
+    </>}
     <button type="button" onClick={()=>void downloadOriginal()}>
      <Download size={15}/> 下载原件</button>
     <button type="button" onClick={onClose} aria-label="关闭原件预览"><X size={16}/></button>
    </div>
   </div>
+  {ready==='available'&&<p className="hhba-original-resume-note" role="status">
+   当前修改进度：{revision} / {totalRevisions} · 最多 {maxRevisions} 个已验证修订版本。
+   每次修改后都可以继续点选下一段，撤销和重做不会覆盖原始 Word。
+  </p>}
   {loading&&<p className="hhba-original-resume-note" role="status">正在打开简历…</p>}
   {previewError&&<p className="hhba-original-resume-note" role="alert">{previewError}</p>}
   {!loading&&ready==='unavailable'&&<div className="hhba-original-resume-word">
@@ -201,7 +230,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
      }}>
       <canvas className="hhba-original-resume-canvas" ref={surface}
        role="img" aria-label={'Word 原始页面第 '+page+' 页'}/>
-      {!saved&&anchors.map(anchor=>{
+      {anchors.map(anchor=>{
        const [x,y,w,h]=anchor.bbox;
        return <button key={anchor.id} type="button"
         className="hhba-original-resume-anchor" title="修改这段"
@@ -254,9 +283,9 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
      <Download size={14}/> 下载 Word</button>
     <button type="button" disabled={busy} onClick={()=>void downloadSavedPdf()}>
      <Download size={14}/> 下载 PDF</button>
-    <span>PDF 由这份已验证的 Word 转换生成；原件保留。继续修改可下载 Word 后重新上传。</span>
+    <span>PDF 与当前已确认的 Word 版本一致；可以继续点选下一段修改、撤销或重做，原始文件始终保留。</span>
    </div>}
-   {!saved&&anchors.length===0&&<p className="hhba-original-resume-note">
+   {anchors.length===0&&<p className="hhba-original-resume-note">
     这页没有找到可以安全修改的位置。</p>}
    <nav className="hhba-original-resume-pages" aria-label="Word 简历翻页">
     <button type="button" disabled={page<=1}
