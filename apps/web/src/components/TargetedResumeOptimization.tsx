@@ -249,11 +249,8 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
     {editingBlock===id?<div className="targeted-resume-inline-editor">
      <textarea rows={4} maxLength={1600} value={manualText}
       onChange={e=>setManualText(e.target.value)}
+      className={manualText!==block.text?'hhba-siri-typing':''}
       aria-label="编辑当前简历段落"/>
-     {manualText!==block.text&&<div className="hhba-resume-pending-text"
-      role="note" aria-label="待确认修改文字">
-      <span className="hhba-resume-siri-letters">{manualText}</span>
-     </div>}
      <div><button type="button" onClick={saveEdit}>保存本次修改</button>
       <button type="button" onClick={()=>{setEditingBlock(null);setManualText('')}}>取消</button></div>
     </div>:<p className="hhba-print-paragraph">{text}</p>}
