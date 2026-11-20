@@ -5,7 +5,6 @@ import {getRealAuthToken,realAuthReady} from '../services/realAuth';
 import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimizationStatus} from '../services/resumeOptimizationApi';
 import {applySuggestion,validateSuggestion,editResumeBlock,type ResumeBlock,type ResumeSuggestion,type ResumeVersion} from '../services/targetedResumeOptimization';
 import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
-import {splitChangedResumeText} from '../services/resumeChangedText.mjs';
 import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResumeVersion} from '../services/resumeVersionsApi';
 import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,sourceResumeOmittedCharacters,structuredResumeOmittedCharacters,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
 import {createPortal} from 'react-dom';
@@ -245,22 +244,19 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
   const dismissed=Boolean(s&&ignored.includes(s.id));
   const pending=Boolean(s&&!applied&&!dismissed);
   const draft=s?(suggestionDrafts[s.id]??s.proposed):'';
-  const original=blocks.find(item=>item.id===id)?.text||'';
-  const segments=splitChangedResumeText(original,text);
   return <div className={'targeted-resume-inline-region'+(pending?' has-ai-suggestion':'')} data-resume-block-id={id}>
    <div className="targeted-resume-inline-anchor">
     {editingBlock===id?<div className="targeted-resume-inline-editor">
      <textarea rows={4} maxLength={1600} value={manualText}
       onChange={e=>setManualText(e.target.value)}
       aria-label="编辑当前简历段落"/>
+     {manualText!==block.text&&<div className="hhba-resume-pending-text"
+      role="note" aria-label="待确认修改文字">
+      <span className="hhba-resume-siri-letters">{manualText}</span>
+     </div>}
      <div><button type="button" onClick={saveEdit}>保存本次修改</button>
       <button type="button" onClick={()=>{setEditingBlock(null);setManualText('')}}>取消</button></div>
-    </div>:<p className="hhba-print-paragraph">
-     {segments.hasChange&&segments.changed?<>
-      {segments.prefix}<span className="hhba-resume-siri-letters"
-       data-resume-change="modified-or-added">{segments.changed}</span>{segments.suffix}
-     </>:text}
-    </p>}
+    </div>:<p className="hhba-print-paragraph">{text}</p>}
     {editingBlock!==id&&<div className="targeted-resume-inline-controls">
      {pending&&s&&<button type="button" className="targeted-resume-ai-trigger"
       aria-expanded={openSuggestionId===s.id} aria-label="查看此处 AI 修改建议"
@@ -283,6 +279,8 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
      <span>直接修改 AI 建议文字（填写后仍须确认真实性）</span>
      <textarea maxLength={1600} rows={4} aria-label="修改 AI 建议"
       value={draft} onChange={e=>setSuggestionDrafts(old=>({...old,[s.id]:e.target.value}))}/>
+     <span className="targeted-resume-gradient" role="note"
+      aria-label="待确认的 AI 建议文字">{draft}</span>
     </label>:<p className="targeted-resume-gradient">{draft}</p>}
     <p className="targeted-resume-rationale">对应岗位要求：{s.jobRequirement}</p>
     <p className="targeted-resume-rationale">{s.rationale}</p>
@@ -291,6 +289,8 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
      <textarea maxLength={800} rows={3} value={newEvidence[s.id]||''}
       onChange={e=>setNewEvidence(prev=>({...prev,[s.id]:e.target.value}))}
       placeholder="例如：你在这个岗位具体做过哪些工作？"/>
+     {!!newEvidence[s.id]?.trim()&&<span className="targeted-resume-gradient"
+      role="note" aria-label="待确认补充文字">{newEvidence[s.id]}</span>}
     </label>}
     <label className="targeted-resume-confirm">
      <input type="checkbox" checked={confirmed.includes(s.id)}
