@@ -514,6 +514,7 @@ try{
    fullPage:true});
   await word.getByRole('button',{name:'保存',exact:true}).click();
   await word.getByRole('button',{name:'下载 Word'}).waitFor({timeout:20000});
+  await word.getByRole('button',{name:'下载 PDF'}).waitFor({timeout:20000});
   assert.equal(await word.locator('.hhba-original-resume-siri-ink').count(),0,
    'confirmed Word must reveal real native-font pixels, not animated color');
   assert.equal(await word.locator('.hhba-resume-siri-letters').count(),0,
@@ -524,6 +525,16 @@ try{
   await word.getByRole('button',{name:'下载 Word'}).click();
   const downloaded=await downloadEvent;
   assert.match(downloaded.suggestedFilename(),/\.docx$/);
+  const pdfEvent=word.waitForEvent('download');
+  await word.getByRole('button',{name:'下载 PDF'}).click();
+  const exportedPdf=await pdfEvent;
+  assert.match(exportedPdf.suggestedFilename(),/\.pdf$/);
+  const savedPdf=output+'/original-word-'+view.name+'-converted.pdf';
+  await exportedPdf.saveAs(savedPdf);
+  const convertedPages=await pdfText(await readFile(savedPdf));
+  assert.equal(convertedPages.length,1);
+  assert.ok(convertedPages[0].includes('EDITED WORD RESUME'),
+   'PDF must render the verified saved Word content, not the original');
   await word.screenshot({path:output+'/original-word-'+view.name+'-saved.png',
    fullPage:true});
   const geom=await word.evaluate(()=>({
