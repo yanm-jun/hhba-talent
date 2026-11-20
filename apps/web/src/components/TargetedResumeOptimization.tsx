@@ -40,6 +40,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [wholeDraft,setWholeDraft]=useState<ResumeWholeRewriteResult|null>(null);
  const [wholeBusy,setWholeBusy]=useState(false);
  const [wholeApproved,setWholeApproved]=useState(false);
+ const [wholeDownloaded,setWholeDownloaded]=useState(false);
  const [revealedWholeCount,setRevealedWholeCount]=useState(0);
  useEffect(()=>{
   const count=wholeDraft?.blocks.length||0;
@@ -279,7 +280,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    wholeBusy||busy)return;
   const controller=new AbortController();
   active.current=controller;
-  setWholeBusy(true);setWholeApproved(false);setRevealedWholeCount(0);
+  setWholeBusy(true);setWholeApproved(false);setWholeDownloaded(false);
+  setRevealedWholeCount(0);
   setNotice('');setMobileSuggestionsOpen(false);
   try{
    const personalized=wholeSource.blocks.map(b=>{
@@ -532,7 +534,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   return !sourceResume||!verifiedWordEdits.some(change=>
    change.original===original.text&&change.text===block.text);
  });
- const draftDirty=pendingTextChanges||Boolean(editingBlock)||Boolean(wholeDraft)||
+ const draftDirty=pendingTextChanges||Boolean(editingBlock)||
+  Boolean(wholeDraft&&!wholeDownloaded)||
   Boolean(nativeWordTextDraft&&nativeWordTextDraft.text!==nativeWordTextDraft.original)||
   suggestions.some(item=>!ignored.includes(item.id)&&
    !version.acceptedSuggestionIds.includes(item.id)&&
@@ -833,12 +836,15 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     {wholeDraft&&<WholeResumeRewriteReview result={wholeDraft}
      revealedCount={revealedWholeCount}
      approved={wholeApproved}
-     onApprove={setWholeApproved}
+     onApprove={enabled=>{
+      setWholeApproved(enabled);if(!enabled)setWholeDownloaded(false);
+     }}
      onRegenerate={answers=>void generateWholeRewrite(answers)}
      onDownload={()=>{
       try{
        downloadWholeRewriteDocx(wholeDraft,job.title_zh||job.title,details);
-       setNotice('已生成可编辑的完整岗位定向 Word（使用新排版）。原上传 Word 未被修改。');
+       setWholeDownloaded(true);
+       setNotice('已发起完整岗位定向 Word 下载（使用新排版）。原上传 Word 未被修改。');
       }catch(error){
        setNotice(error instanceof Error?error.message:'完整简历 Word 生成失败，请重试。');
       }
