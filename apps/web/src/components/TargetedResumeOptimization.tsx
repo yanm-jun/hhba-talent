@@ -835,6 +835,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     {optimizationControls}
     {wholeDraft&&<WholeResumeRewriteReview result={wholeDraft}
      revealedCount={revealedWholeCount}
+     documentName={details.fullName}
+     onDocumentNameChange={name=>updateDetail('fullName',name)}
      approved={wholeApproved}
      onApprove={enabled=>{
       setWholeApproved(enabled);if(!enabled)setWholeDownloaded(false);
