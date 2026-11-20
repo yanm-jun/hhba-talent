@@ -182,9 +182,9 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   }finally{setWorking(false);controller.current=null}
  }
  return <Shell user={user} embedded={embedded}>
-  <section className="hhba-ai-page">
-    <nav className="hhba-ai-breadcrumb"><Link to="/candidate/account"><ArrowLeft size={15}/> 工作台</Link>
-     <span>/</span><strong>简历智能匹配</strong></nav>
+  <section className={embedded?'hhba-ai-page hhba-ai-page-embedded':'hhba-ai-page'}>
+    {!embedded&&<nav className="hhba-ai-breadcrumb"><Link to="/candidate/account"><ArrowLeft size={15}/> 工作台</Link>
+     <span>/</span><strong>简历智能匹配</strong></nav>}
     <div className="hhba-ai-hero">
       <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> 汇方职场 · HHBA · AI JOB MATCH</div>
       <h1>上传简历，寻找合适岗位。</h1>
