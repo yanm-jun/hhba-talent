@@ -95,8 +95,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   setPreviewBusy(true);setError('');setPreviewText('');setPreviewLoaded(false);
   const abort=new AbortController();previewController.current=abort;
   try{
-   let selected=selectedFile;
-   if(!selected&&matchResumeId){
+   let selected=file;
+   if(!selected&&savedId){
     const entry=savedFiles.find(x=>x.id===savedId);
     if(!entry)throw new MatchError(404,'已保存的简历不存在，请重新选择。');
     const bytes=await fetchPrivateResumeForLocalReview(entry);
@@ -150,6 +150,9 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
      setSavedFiles(all=>all.some(item=>item.id===stored.id)?all:[stored,...all]);
      setSaveNotice('原文件已保存到「我的简历」，本次匹配将自动关联该文件。');
      window.dispatchEvent(new Event('hhba:private-resumes-changed'));
+    }catch(e){
+     setSaveNotice('原文件尚未保存，本次 AI 匹配未启动。可重试，或明确选择「仅用于本次匹配」。');
+     throw e;
     }finally{setSaveBusy(false);}
     // A cancellation during upload may still leave an authorized file saved;
     // in that case do not start the AI request.
@@ -160,8 +163,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     // Once the user has reviewed/edited text, NEVER fall back to re-reading the unedited file.
     matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,matchResumeId||undefined,setStage,setPartialJobs);
    }else{
-    let selected=file;
-    if(!selected&&savedId){
+    let selected=selectedFile;
+    if(!selected&&matchResumeId){
      const entry=savedFiles.find(item=>item.id===matchResumeId);
      if(!entry)throw new MatchError(404,'已保存的简历已改变，请重新选择。');
      const bytes=await fetchPrivateResumeForLocalReview(entry);
