@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 import threading
 import unittest
+import io
+import zipfile
 from http.server import ThreadingHTTPServer
 
 import server
@@ -79,6 +81,21 @@ class WordPrivateServiceTests(unittest.TestCase):
         status, _, data = self.request("/v1/verify", changed, token=self.secret)
         self.assertEqual(status, 422, data[:300])
         self.assertFalse(json.loads(data)["ok"])
+
+    def test_missing_custom_font_is_rejected_not_silently_substituted(self):
+        output = io.BytesIO()
+        with zipfile.ZipFile(io.BytesIO(self.original)) as src:
+            with zipfile.ZipFile(output, "w") as dst:
+                for item in src.infolist():
+                    data = src.read(item.filename)
+                    if item.filename == "word/document.xml":
+                        self.assertIn(b"Noto Sans CJK SC", data)
+                        data = data.replace(b"Noto Sans CJK SC", b"HHBA Nonexistent Typeface 2999")
+                    dst.writestr(item, data)
+        payload = {"original_b64": base64.b64encode(output.getvalue()).decode()}
+        status, _, data = self.request("/v1/render", payload, token=self.secret)
+        self.assertEqual(status, 422, data[:300])
+        self.assertEqual(json.loads(data)["error"], "WORD_FONT_UNAVAILABLE")
 
     def test_reject_invalid_or_active_content(self):
         status, _, data = self.request("/v1/render", {"original_b64": "%%%%"}, token=self.secret)
