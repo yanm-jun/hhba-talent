@@ -29,6 +29,7 @@ function OriginalPdfViewer({resume,onClose}:{
  const paper=useRef<HTMLDivElement>(null);
  const pdfDocument=useRef<any>(null);
  const verifiedDisplayDocument=useRef<any>(null);
+ const verifiedDisplayLoadingTask=useRef<any>(null);
  const nativeRevision=useRef(0);
  const [nativePdf,setNativePdf]=useState<Uint8Array|null>(null);
  const [nativeRenderRevision,setNativeRenderRevision]=useState(0);
@@ -82,10 +83,11 @@ function OriginalPdfViewer({resume,onClose}:{
   setAnchors([]);setSelectedId(null);setLayout(null);setChanges([]);setVisionConsent(false);
   nativeRevision.current++;
   setNativePdf(null);setNativeRenderRevision(0);
-  if(verifiedDisplayDocument.current){
-   void verifiedDisplayDocument.current.destroy().catch(()=>{});
-   verifiedDisplayDocument.current=null;
+  if(verifiedDisplayLoadingTask.current){
+   void verifiedDisplayLoadingTask.current.destroy().catch(()=>{});
+   verifiedDisplayLoadingTask.current=null;
   }
+  verifiedDisplayDocument.current=null;
   setMessage('');
   void (async()=>{
    try{
@@ -115,10 +117,11 @@ function OriginalPdfViewer({resume,onClose}:{
   })();
   return()=>{active=false;nativeRevision.current++;
    pdfDocument.current=null;if(pdfTask)void pdfTask.destroy().catch(()=>{});
-   if(verifiedDisplayDocument.current){
-    void verifiedDisplayDocument.current.destroy().catch(()=>{});
-    verifiedDisplayDocument.current=null;
+   if(verifiedDisplayLoadingTask.current){
+    void verifiedDisplayLoadingTask.current.destroy().catch(()=>{});
+    verifiedDisplayLoadingTask.current=null;
    }
+   verifiedDisplayDocument.current=null;
   };
  },[resume.id,isPdf]);
  useEffect(()=>{
@@ -183,10 +186,11 @@ function OriginalPdfViewer({resume,onClose}:{
  },[isPdf,status]);
  function clearVerifiedNative(){
   nativeRevision.current++;
-  if(verifiedDisplayDocument.current){
-   void verifiedDisplayDocument.current.destroy().catch(()=>{});
-   verifiedDisplayDocument.current=null;
+  if(verifiedDisplayLoadingTask.current){
+   void verifiedDisplayLoadingTask.current.destroy().catch(()=>{});
+   verifiedDisplayLoadingTask.current=null;
   }
+  verifiedDisplayDocument.current=null;
   setNativePdf(null);setNativeRenderRevision(n=>n+1);
  }
  async function verifyNativeCandidate(next:PageResumeEdit[]){
@@ -211,7 +215,8 @@ function OriginalPdfViewer({resume,onClose}:{
     isEvalSupported:false,useSystemFonts:false} as any);
    const ready=await task.promise;
    if(token!==nativeRevision.current){await task.destroy();return false;}
-   const previous=verifiedDisplayDocument.current;
+   const previous=verifiedDisplayLoadingTask.current;
+   verifiedDisplayLoadingTask.current=task;
    verifiedDisplayDocument.current=ready;
    setNativePdf(patch.bytes);
    setNativeRenderRevision(n=>n+1);
@@ -219,7 +224,8 @@ function OriginalPdfViewer({resume,onClose}:{
    return true;
   }catch{
    if(token===nativeRevision.current){
-    const previous=verifiedDisplayDocument.current;
+    const previous=verifiedDisplayLoadingTask.current;
+    verifiedDisplayLoadingTask.current=null;
     verifiedDisplayDocument.current=null;setNativePdf(null);
     setNativeRenderRevision(n=>n+1);
     if(previous)void previous.destroy().catch(()=>{});
