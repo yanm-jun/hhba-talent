@@ -9,6 +9,7 @@
 import {safeJobDetailLink} from './deepseek-native-match.js';
 import {allowedEmployerJobLink} from './match-employer-source.js';
 import {isMainlandJobLocation} from './mainland-job-location.js';
+import {redactForModel} from './resume-match-core.js';
 
 export const CANDIDATE_AGENT_SKILLS = Object.freeze([
   Object.freeze({
@@ -97,9 +98,10 @@ export async function runCandidateAgentMatch({
   executeSearch,signal=null,onProgress=()=>{},onPartial=()=>{}
 }) {
   const phases=requireMatchingSkills(env);
-  if(typeof redactedResume!=='string'||
-    redactedResume.replace(/\s/g,'').length<30||
-    redactedResume.length>20000)throw Error('AGENT_RESUME_INVALID');
+  // Defense in depth: future callers must not accidentally transmit PII.
+  const safeResume=redactForModel(redactedResume);
+  if(typeof redactedResume!=='string'||redactedResume.length>20000||
+    safeResume.replace(/\s/g,'').length<30)throw Error('AGENT_RESUME_INVALID');
   if(typeof executeSearch!=='function'||!Number.isInteger(limit)||limit<1||limit>10)
     throw Error('AGENT_EXECUTION_INVALID');
   const steps=[];
@@ -110,7 +112,7 @@ export async function runCandidateAgentMatch({
   // execution traces store skill IDs and statuses, never CV or job-page text.
   report(phases[1],'started');
   const result=await executeSearch(
-    env.HHBA_MATCH_DEEPSEEK_KEY,redactedResume,String(roleHint).slice(0,80),limit,
+    env.HHBA_MATCH_DEEPSEEK_KEY,safeResume,String(roleHint).slice(0,80),limit,
     {signal,onProgress,onPartial}
   );
   if(!result||!Array.isArray(result.matches)||result.matches.length>limit)
