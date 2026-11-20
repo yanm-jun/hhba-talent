@@ -23,9 +23,15 @@ export function selectProvider(env,task='resume_optimization'){
  const key=env?.[prefix+'API_KEY']||(requested==='deepseek'?env?.HHBA_MATCH_DEEPSEEK_KEY:null);
  // "deepseek-chat"/"deepseek-reasoner" were retired in 2026: use the current
  // non-thinking Flash model by default, always allowing explicit override.
- const model=env?.[prefix+'MODEL']||(requested==='deepseek'?'deepseek-flash':null);
+ const deepseekWriter=['resume_rewrite','resume_reviewer'].includes(task);
+ const model=env?.[prefix+'MODEL']||(requested==='deepseek'?
+  (deepseekWriter?'deepseek-v4-pro':'deepseek-flash'):null);
  if(typeof key!=='string'||!key.trim()||typeof model!=='string'||!model.trim())throw new Error('AI_PROVIDER_NOT_CONFIGURED');
- return {name:requested,...PROVIDERS[requested],key,model:model.trim()};
+ const effort=['low','high','max'].includes(
+  String(env?.HHBA_AI_DEEPSEEK_REASONING_EFFORT||'').toLowerCase())?
+  String(env.HHBA_AI_DEEPSEEK_REASONING_EFFORT).toLowerCase():'max';
+ return {name:requested,...PROVIDERS[requested],key,model:model.trim(),
+  ...(requested==='deepseek'&&deepseekWriter?{reasoningEffort:effort}:{})};
 }
 export function parseSuggestions(raw,allowedBlockIds){
  if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new Error('AI_PROVIDER_RESPONSE_INVALID');
