@@ -189,7 +189,7 @@ function OriginalPdfViewer({resume,onClose}:{
   try{
    const response=await savePageResumeEdits(resume.id,updated);
    setChanges(response.changes);setSelectedId(null);setConfirmed(false);
-   setMessage('已保存修改。此 PDF 尚不能确认原字体可被完整复用，原页面不会用其他字体覆盖。');
+   setMessage('修改已暂存，尚未替换 PDF 原文。原字体未经保真验证，不会用其他字体覆盖。');
   }catch(error){setMessage(error instanceof Error?error.message:'保存失败，请重试。');}
   finally{setSaving(false);}
  }
@@ -258,11 +258,11 @@ function OriginalPdfViewer({resume,onClose}:{
       const [x,y,w,h]=anchor.bbox;
       return <button type="button" key={anchor.id}
        className={'hhba-original-resume-anchor'+(changed?' is-edited':'')}
-       title={changed?'查看已保存的修改':'修改这段'}
+       title={changed?'查看待核验的修改':'修改这段'}
        aria-label={changed?'继续修改这一段':'修改这段简历'}
        onClick={()=>selectAnchor(anchor)}
        style={{left:x/10+'%',top:y/10+'%',width:w/10+'%',height:h/10+'%'}}>
-       <span><PencilLine size={12}/>{changed?'已修改':'修改'}</span>
+       <span><PencilLine size={12}/>{changed?'待核验':'修改'}</span>
       </button>;
      })}
      {layout&&selectedId&&anchors.filter(a=>a.id===selectedId).map(anchor=>{
@@ -303,8 +303,8 @@ function OriginalPdfViewer({resume,onClose}:{
    {layout&&anchors.length===0&&<p className="hhba-original-resume-note">
     这页暂时没有找到可以准确修改的位置。你仍然可以查看和下载原件。</p>}
    {changes.length>0&&<p className="hhba-original-resume-note" role="status">
-    已保存 {changes.length} 处修改，原件保留。由于原字体尚未通过保真校验，
-    暂不能覆盖原文或导出声称保留原样式的 PDF。
+    已暂存 {changes.length} 处修改，原件保留。这些修改尚未应用到 PDF；原字体未经保真验证，
+    暂不能覆盖原文或导出修改版 PDF。
    </p>}
    {message&&<p className="hhba-original-resume-note" role="status">{message}</p>}
    <nav className="hhba-original-resume-pages" aria-label="原始简历翻页">
