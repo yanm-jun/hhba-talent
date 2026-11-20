@@ -11,6 +11,8 @@ export const configured=env=>{
   !(env?.HHBA_AUTH_ROLLOUT==='preview'||env?.HHBA_MATCH_RUNTIME_MODE==='production')||
   typeof env.HHBA_WORD_RENDER_SHARED_SECRET!=='string'||
   env.HHBA_WORD_RENDER_SHARED_SECRET.length<32||
+  typeof env?.HHBA_MATCH_LIMIT_PEPPER!=='string'||
+  env.HHBA_MATCH_LIMIT_PEPPER.length<24||
   typeof env?.HHBA_PNVS_AUTH_DB?.prepare!=='function'||
   typeof env?.HHBA_PRIVATE_RESUMES?.get!=='function'||
   typeof env?.HHBA_PRIVATE_RESUMES?.put!=='function')return false;
