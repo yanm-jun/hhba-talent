@@ -423,3 +423,175 @@
  .targeted-resume.is-word-first .targeted-resume-word-workspace{margin:4px 0 0}
  .targeted-resume-word-assistant .targeted-resume-toolbar{margin-top:8px}
 }
+
+
+/* Word-first editorial reduction — no test harness layout modifications. */
+.targeted-resume.is-word-first{
+ background:transparent;border:0;border-radius:0;box-shadow:none;
+ padding:0 4px 8px;margin:0;min-width:0;
+}
+.targeted-resume.is-word-first .targeted-resume-heading{
+ display:flex;align-items:center;gap:8px;justify-content:space-between;
+ padding:0 4px 12px;margin:0;border:0;
+}
+.targeted-resume.is-word-first .targeted-resume-heading small{
+ font-size:11px;letter-spacing:.03em;font-weight:500;color:#8b97a5;
+}
+.targeted-resume.is-word-first .targeted-resume-heading h3{
+ font-size:19px;line-height:1.35;margin:5px 0 0;color:#172b3f;letter-spacing:-.01em;
+}
+.targeted-resume.is-word-first .targeted-resume-heading>span{display:none}
+.targeted-resume.is-word-first .targeted-resume-word-workspace{
+ grid-template-columns:minmax(0,1.9fr) minmax(260px,.88fr);
+ gap:22px;margin:0;align-items:start;
+}
+.targeted-resume.is-word-first .targeted-resume-word-main{min-width:0}
+.targeted-resume.is-word-first .targeted-resume-word-main>.hhba-original-resume{
+ background:transparent;border:0;border-radius:0;box-shadow:none;
+ padding:0;margin:0;
+}
+.targeted-resume.is-word-first .targeted-resume-word-assistant{
+ border:0;border-left:1px solid #e9edf1;border-radius:0;
+ background:transparent;box-shadow:none;padding:2px 0 16px 19px;
+ position:sticky;top:8px;max-height:calc(100dvh - 150px);overflow-y:auto;
+}
+.targeted-resume-word-assistant>.targeted-resume-word-review{display:flex;flex-direction:column;gap:10px}
+.targeted-resume-word-assistant>.targeted-resume-word-edit-host{display:none}
+.targeted-resume-word-assistant.is-word-editing>.targeted-resume-word-edit-host{display:block}
+.targeted-resume-word-assistant.is-word-editing>.targeted-resume-word-review{display:none}
+.targeted-resume-word-assistant-head{order:0;margin:0 0 5px}
+.targeted-resume-word-assistant-head>strong{font-size:15px;line-height:1.4;color:#1e3447}
+.targeted-resume-word-assistant-head>p{
+ margin:5px 0 7px;font-size:11px;line-height:1.6;color:#85909d;
+}
+.targeted-resume-word-counts{
+ padding:5px 0;margin:0;display:flex;gap:11px;
+ border-bottom:1px solid #ebeff3;
+}
+.targeted-resume-word-counts span{
+ border:0;background:none;padding:0;border-radius:0;font-size:11px;font-weight:500;
+ color:#778593;
+}
+.targeted-resume-word-suggestion-list{order:1;gap:0}
+.targeted-resume-word-suggestion{
+ border:0;border-bottom:1px solid #edf0f3;border-radius:0;background:transparent;
+}
+.targeted-resume-word-suggestion.is-active{border-color:#d7e2eb}
+.targeted-resume .targeted-resume-word-suggestion-title{
+ background:transparent;border:0;border-radius:0;padding:13px 1px;min-height:44px;
+}
+.targeted-resume-word-suggestion-title span{font-size:13px;font-weight:600;line-height:1.5}
+.targeted-resume-word-suggestion-title small{font-weight:500;color:#83909e}
+.targeted-resume-word-suggestion-detail{padding:0 1px 13px}
+.targeted-resume-word-original{font-size:12px;line-height:1.6}
+.targeted-resume-word-suggestion-detail .targeted-resume-popover-shell{
+ border:0;box-shadow:none;background:transparent;padding:0;margin:8px 0;
+ animation:none;
+}
+.targeted-resume-word-suggestion-detail .targeted-resume-suggestion{
+ border:0;border-radius:0;box-shadow:none;background:transparent;padding:0;
+}
+.targeted-resume-word-suggestion-detail .targeted-resume-suggestion::before,
+.targeted-resume-word-suggestion-detail .targeted-resume-suggestion::after,
+.targeted-resume-word-suggestion-detail .targeted-resume-popover-shell::before,
+.targeted-resume-word-suggestion-detail .targeted-resume-popover-shell::after{display:none}
+.targeted-resume-word-assistant .targeted-resume-toolbar{
+ order:2;border:0;background:transparent;border-radius:0;
+ padding:12px 0 4px;margin:0;display:block;
+}
+.targeted-resume-word-assistant .targeted-resume-toolbar>div{display:none}
+.targeted-resume-word-assistant .targeted-resume-toolbar>button{
+ display:flex;min-width:0;width:100%;min-height:42px;
+ background:#22394f;color:#fff;border-color:#22394f;border-radius:8px;
+ margin:0;font-weight:650;
+}
+.targeted-resume-word-assistant .targeted-resume-toolbar .targeted-resume-unavailable{
+ font-size:12px;color:#8995a1;
+}
+.targeted-resume-word-empty{
+ order:1;padding:16px 0 12px;border-bottom:1px solid #edf0f3;
+ color:#8996a3;font-size:12px;line-height:1.7;
+}
+.targeted-resume-word-next-step{
+ order:3;border:0;border-radius:0;background:transparent;
+ padding:4px 0;margin:0;font-size:11px;color:#647a8f;
+}
+.targeted-resume-word-privacy{
+ order:5;border:0;margin:2px 0;padding:0;
+ font-size:11px;color:#8b97a4;
+}
+.targeted-resume-word-privacy summary{cursor:pointer;line-height:2}
+.targeted-resume-word-privacy p{margin:4px 0 0;line-height:1.7}
+.targeted-resume-word-assistant .targeted-resume-ai-settings{
+ order:4;margin:3px 0;border:0;border-top:1px solid #e9edf1;
+ background:transparent;border-radius:0;padding:0;
+}
+.targeted-resume-ai-settings summary{
+ list-style:none;display:flex;align-items:center;justify-content:space-between;
+ gap:8px;min-height:40px;cursor:pointer;font-size:12px;color:#536779;
+}
+.targeted-resume-ai-settings summary::-webkit-details-marker{display:none}
+.targeted-resume-ai-settings[open] summary svg{transform:rotate(180deg)}
+.targeted-resume-word-assistant .targeted-resume-consent{
+ display:flex;border:0;background:transparent;padding:8px 0;
+ font-size:11px;line-height:1.65;margin:0;
+}
+.targeted-resume-word-assistant .targeted-resume-draft-recovery{
+ border:0;border-top:1px solid #edf0f3;background:transparent;
+ border-radius:0;padding:10px 0;margin:0;
+}
+.targeted-resume-word-assistant.is-word-editing{
+ background:#fff;
+}
+.targeted-resume-word-edit-host .hhba-original-resume-editbox{
+ border:0;background:transparent;border-radius:0;box-shadow:none;
+ padding:4px 0 12px;max-height:none;overflow:visible;
+}
+.targeted-resume-word-edit-host .hhba-original-resume-editbox-title strong{font-size:15px}
+.targeted-resume-word-edit-host .hhba-original-resume-editbox textarea{
+ min-height:118px;font-size:14px;line-height:1.7;resize:vertical;
+}
+.targeted-resume-word-edit-host .hhba-original-resume-editbox-actions{
+ justify-content:stretch;
+}
+.targeted-resume-word-edit-host .hhba-original-resume-editbox-actions button{
+ min-height:42px;justify-content:center;
+}
+.targeted-resume-word-edit-host .hhba-original-resume-editbox-actions button:first-child{
+ flex:1;
+}
+@media(max-width:1000px) and (min-width:701px){
+ .targeted-resume.is-word-first .targeted-resume-word-workspace{
+  grid-template-columns:minmax(0,1fr) minmax(245px,.8fr);gap:12px;
+ }
+ .targeted-resume.is-word-first .targeted-resume-word-assistant{padding-left:12px}
+}
+@media(max-width:700px){
+ .targeted-resume.is-word-first{padding:0 0 5px}
+ .targeted-resume.is-word-first .targeted-resume-heading{padding:4px 8px 9px}
+ .targeted-resume.is-word-first .targeted-resume-heading h3{font-size:17px;margin-top:3px}
+ .targeted-resume.is-word-first .targeted-resume-word-workspace{
+  grid-template-columns:minmax(0,1fr);gap:0;margin:0;
+ }
+ .targeted-resume.is-word-first .targeted-resume-word-assistant{
+  display:none;position:fixed;left:0;right:0;top:auto;bottom:0;
+  background:#fff;max-height:min(78dvh,690px);padding:18px 17px calc(18px + env(safe-area-inset-bottom,0px));
+  overflow-y:auto;border:0;border-radius:18px 18px 0 0;
+  box-shadow:0 -15px 50px rgba(26,43,60,.16);
+  z-index:3150;
+ }
+ .targeted-resume.is-word-first .targeted-resume-word-assistant.mobile-open,
+ .targeted-resume.is-word-first .targeted-resume-word-assistant.is-word-editing{display:block}
+ .targeted-resume-word-assistant.is-word-editing .targeted-resume-word-edit-host{
+  display:block;position:relative;max-height:calc(76dvh - 35px);
+  overflow-y:auto;
+ }
+ .targeted-resume-word-edit-host .hhba-original-resume-editbox{
+  padding:1px 0 9px;max-height:none;
+ }
+ .targeted-resume-word-edit-host .hhba-original-resume-editbox textarea{
+  font-size:16px;min-height:98px;
+ }
+ .targeted-resume-word-assistant .targeted-resume-toolbar>button{min-height:44px}
+ .targeted-resume-word-suggestion-title{min-height:48px}
+}
