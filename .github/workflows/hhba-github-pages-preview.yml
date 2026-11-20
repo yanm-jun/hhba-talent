@@ -77,18 +77,26 @@ jobs:
           python - <<'PY'
           import pathlib, re, urllib.request, xml.etree.ElementTree as ET
           url='https://upload.wikimedia.org/wikipedia/commons/d/db/KPMG_blue_logo.svg'
-          req=urllib.request.Request(url, headers={'User-Agent':'HHBA-Brand-Reference/1.0 (static catalog, educational use)'})
-          with urllib.request.urlopen(req,timeout=40) as resp:
-              svg=resp.read(100000)
+          target=pathlib.Path('apps/web/public/images/autumn-real-logos/cn-autumn-001.svg')
+          if target.is_file():
+              # This file was captured from the previously published HHBA site,
+              # originally sourced from Wikimedia. A verified local source
+              # must not become a mandatory external request on every deploy.
+              svg=target.read_bytes()
+              source='verified-local-kpmg-svg'
+          else:
+              req=urllib.request.Request(url, headers={'User-Agent':'HHBA-Brand-Reference/1.0 (static catalog, educational use)'})
+              with urllib.request.urlopen(req,timeout=40) as resp:
+                  svg=resp.read(100000)
+              source=url
           text=svg.decode('utf-8-sig')
           assert len(svg)>1000 and '<svg' in text and '</svg>' in text, 'KPMG SVG not retrieved'
           assert not re.search(r'<script|<foreignObject|onload\\s*=|onerror\\s*=|javascript:',text,re.I), 'Unsafe source SVG'
           root=ET.fromstring(svg)
           assert root.tag.endswith('svg'), 'Incorrect file type for KPMG logo'
-          target=pathlib.Path('apps/web/public/images/autumn-real-logos/cn-autumn-001.svg')
           target.parent.mkdir(parents=True,exist_ok=True)
           target.write_bytes(svg)
-          print('KPMG_SOURCE_BACKED_LOGO_READY',len(svg),url)
+          print('KPMG_SOURCE_BACKED_LOGO_READY',len(svg),source)
           PY
       - name: Import source-backed Schneider Electric complete wordmark
         run: |
