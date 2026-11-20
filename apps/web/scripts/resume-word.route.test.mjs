@@ -1,0 +1,164 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createResumeDocx} from '../src/services/resumeDocx.ts';
+import {onRequestGet,onRequestPost} from '../functions/api/resume-word.js';
+const origin='https://preview.hhba.example';
+const id='11111111-2222-4333-8444-555555555555';
+const sha='a'.repeat(64),store='candidate/test/'+id+'.docx';
+const original=createResumeDocx({
+ details:{fullName:'测试用户',headline:'',phone:'',email:'',location:'',summary:''},
+ experiences:[],education:[],skills:[],sourceParagraphs:[]
+});
+const pdf=new Uint8Array(600);pdf.set(new TextEncoder().encode('%PDF-1.4'));
+const data=Buffer.from(original).buffer.slice(
+ Buffer.from(original).byteOffset,Buffer.from(original).byteOffset+original.length);
+function fixture({enabled=true,owner='account-A',role='candidate'}={}){
+ const saved=new Map([[store,original]]);
+ const env={
+  HHBA_WORD_RENDER_ENABLED:enabled?'1':'0',
+  HHBA_AUTH_ROLLOUT:'preview',HHBA_WORD_RENDER_SHARED_SECRET:'x'.repeat(50),
+  HHBA_WORD_RENDER_ENDPOINT:'https://private-word.hhba.invalid/',
+  HHBA_MATCH_LIMIT_PEPPER:'y'.repeat(30),
+  HHBA_PRIVATE_RESUMES:{
+   async get(key){if(!saved.has(key))return null;
+    const bytes=saved.get(key);
+    return {arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.length),
+     json:async()=>JSON.parse(String(bytes))};},
+   async put(key,data){saved.set(key,typeof data==='string'?data:new Uint8Array(data));},
+   async delete(key){saved.delete(key);}
+  },
+  HHBA_PNVS_AUTH_DB:{prepare(sql){return {
+   async first(){
+    if(sql.includes('sqlite_master'))return {name:'hhba_resume_word_attempts'};
+    throw Error('unbound query: '+sql);
+   },
+   bind(...args){return {
+    async first(){
+     if(sql.includes('FROM hhba_auth_sessions'))return {
+      phone:'account-A',revoked:0,
+      expires_at:new Date(Date.now()+3600000).toISOString()
+     };
+     if(sql.includes('FROM hhba_auth_users'))return {phone:'account-A',role};
+     if(sql.includes('FROM hhba_candidate_resumes')){
+      if(args[0]!==id||args[1]!==owner)return null;
+      return {id,media_type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+       size_bytes:original.byteLength,storage_key:store,sha256:sha};
+     }
+     throw Error('unsupported query '+sql);
+    },
+    async run(){
+     if(sql.includes('hhba_resume_word_attempts'))return {
+      success:true,meta:{changes:1}};
+     if(sql.includes('UPDATE hhba_auth_sessions'))return {
+      success:true,meta:{changes:1}};
+     throw Error('unsupported update '+sql);
+    }
+   };}
+  }}}
+ };
+ return {env,saved};
+}
+const req=(action='status',{auth=true,method='GET',body=null,foreign=false}={})=>
+ new Request(origin+'/api/resume-word?action='+action+'&resume_id='+id,{
+ method,headers:{
+  ...(auth?{Authorization:'Bearer synthetic-session'}:{}),
+  Origin:foreign?'https://malicious.example':origin,
+  ...(body?{'Content-Type':'application/json'}:{})
+ },...(body?{body:JSON.stringify(body)}:{})
+ });
+test('Word render feature defaults disabled and never opens any account file',async()=>{
+ const x=fixture({enabled:false});
+ assert.equal((await (await onRequestGet({request:req(),env:x.env})).json()).enabled,false);
+ assert.equal((await onRequestGet({request:req('preview'),env:x.env})).status,503);
+ assert.equal(x.saved.size,1);
+});
+test('only authenticated candidate owner can inspect original Word run text',async()=>{
+ const x=fixture();
+ const response=await onRequestGet({request:req('inspect'),env:x.env});
+ assert.equal(response.status,200);
+ const result=await response.json();
+ assert.ok(result.editable_text.includes('测试用户'));
+ assert.equal(result.saved,null);
+ assert.equal((await onRequestGet({request:req('inspect',{auth:false}),env:x.env})).status,401);
+ assert.equal((await onRequestGet({request:req('inspect'),env:fixture({owner:'other-account'}).env})).status,404);
+ assert.equal((await onRequestGet({request:req('inspect'),env:fixture({role:'employer'}).env})).status,403);
+});
+test('preview requires private authenticated upstream and is cached in private R2',async()=>{
+ const x=fixture();let calls=0;
+ const old=globalThis.fetch;
+ globalThis.fetch=async(url,options)=>{
+  calls++;
+  assert.equal(url,'https://private-word.hhba.invalid/v1/render');
+  assert.match(options.headers.Authorization,/^Bearer x{50}$/);
+  assert.equal(options.redirect,'manual');
+  const payload=JSON.parse(options.body);
+  assert.equal(Buffer.from(payload.original_b64,'base64').length,original.length);
+  return new Response(pdf,{status:200,headers:{'Content-Type':'application/pdf'}});
+ };
+ try{
+  const a=await onRequestGet({request:req('preview'),env:x.env});
+  assert.equal(a.status,200);
+  assert.equal((await a.arrayBuffer()).byteLength,600);
+  const b=await onRequestGet({request:req('preview'),env:x.env});
+  assert.equal(b.status,200);
+  assert.equal(calls,1);
+ }finally{globalThis.fetch=old;}
+});
+test('Word edit is blocked without explicit consent or if source is not owned',async()=>{
+ const x=fixture(),body={resume_id:id,original:'测试用户',text:'测试名',
+  confirmed_real:true,consent_word_processing:true};
+ assert.equal((await onRequestPost({request:req('export',{method:'POST',
+  body:{...body,confirmed_real:false}}),env:x.env})).status,400);
+ assert.equal((await onRequestPost({request:req('export',{method:'POST',
+  body,foreign:true}),env:x.env})).status,403);
+ assert.equal((await onRequestPost({request:req('export',{method:'POST',
+  body}),env:fixture({owner:'other-account'}).env})).status,404);
+});
+test('only renderer-proven exact Word text is saved for downloadable edits',async()=>{
+ const x=fixture(),body={resume_id:id,original:'测试用户',text:'测试名',
+  confirmed_real:true,consent_word_processing:true};
+ const prior=globalThis.fetch;let verified=false;
+ globalThis.fetch=async(url,options)=>{
+  const payload=JSON.parse(options.body);
+  if(url.endsWith('/v1/verify')){
+   verified=true;
+   assert.equal(payload.old_text,'测试用户');
+   assert.equal(payload.new_text,'测试名');
+   assert.ok(Buffer.from(payload.edited_b64,'base64').length>500);
+   return Response.json({ok:true,verified:true,report:{
+    passed:true,page_count:1,changed_pixels:821,
+    changed_region:{page:1,x:90,y:90,width:80,height:25}
+   }});
+  }
+  return new Response(pdf,{status:200,headers:{'Content-Type':'application/pdf'}});
+ };
+ try{
+  const response=await onRequestPost({
+   request:req('export',{method:'POST',body}),env:x.env
+  });
+  assert.equal(response.status,200,await response.clone().text());
+  assert.equal(verified,true);
+  const state=await (await onRequestGet({request:req('inspect'),env:x.env})).json();
+  assert.equal(state.saved.text,'测试名');
+  assert.equal(state.editable_text.length,0);
+  const downloaded=await onRequestGet({request:req('download'),env:x.env});
+  assert.equal(downloaded.status,200);
+  assert.ok((await downloaded.arrayBuffer()).byteLength>500);
+  const editedPage=await onRequestGet({request:req('edited-preview'),env:x.env});
+  assert.equal(editedPage.status,200);
+ }finally{globalThis.fetch=prior;}
+});
+test('when renderer cannot verify changed layout the draft is not saved',async()=>{
+ const x=fixture(),prior=globalThis.fetch;
+ globalThis.fetch=async()=>Response.json({ok:false,error:'WORD_LAYOUT_MOVED'},{status:422});
+ try{
+  const response=await onRequestPost({
+   request:req('export',{method:'POST',body:{
+    resume_id:id,original:'测试用户',text:'测试名',
+    confirmed_real:true,consent_word_processing:true
+   }}),env:x.env
+  });
+  assert.notEqual(response.status,200);
+  assert.equal(x.saved.size,1);
+ }finally{globalThis.fetch=prior;}
+});
