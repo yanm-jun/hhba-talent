@@ -248,6 +248,9 @@ test('multiple Word edits persist; undo/redo restore every verified DOCX and PDF
   assert.equal(current.revision,2);
   assert.equal(current.total_revisions,2);
   assert.ok(current.editable_text.includes('新名'));
+  assert.equal((await onRequestGet({request:req('edited-preview&revision=1'),env:x.env})).status,409,
+   'old page coordinates must not be combined with newly edited text nodes');
+  assert.equal((await onRequestGet({request:req('edited-preview&revision=2'),env:x.env})).status,200);
   const latest=Buffer.from(await (await onRequestGet({
    request:req('download'),env:x.env})).arrayBuffer());
   assert.ok(latest.includes(Buffer.from('新名')));
