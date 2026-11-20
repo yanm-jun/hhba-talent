@@ -1,5 +1,6 @@
 import {useEffect,useRef,useState} from 'react';
-import {ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,Redo2,ZoomIn,ZoomOut,Sparkles,X} from 'lucide-react';
+import {createPortal} from 'react-dom';
+import {ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,Redo2,ZoomIn,ZoomOut,Sparkles,X,History,ChevronDown} from 'lucide-react';
 import type {PrivateResume} from '../services/privateResumes';
 import {downloadPrivateResume,fetchPrivateResumeForLocalReview} from '../services/privateResumes';
 import {extractDocxText} from '../services/docxProfile.mjs';
@@ -16,7 +17,7 @@ import '../styles/siri-edge.css';
 // rendered PDF is used only to show the source page. Downloaded edits are
 // the genuine original OOXML with a verified small text change.
 type PendingWordTextDraft={original:string;text:string;revision:number;page:number};
-export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange}:{
+export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange}:{
  resume:PrivateResume;onClose?:()=>void;
  suggestedChanges?:{original:string;proposed:string}[];
  onOpenSuggestions?:()=>void;pendingSuggestionCount?:number;onPendingChange?:(dirty:boolean)=>void;
@@ -24,6 +25,8 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  onVersionMoved?:()=>void;
  sessionWordDraft?:PendingWordTextDraft|null;
  onSessionWordDraftChange?:(draft:PendingWordTextDraft|null)=>void;
+ editPanelHost?:HTMLElement|null;
+ onEditingChange?:(editing:boolean)=>void;
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
@@ -72,6 +75,9 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  useEffect(()=>{
   onPendingChange?.(Boolean(selected&&draft!==selected.text));
  },[selected,draft,onPendingChange]);
+ useEffect(()=>{
+  onEditingChange?.(Boolean(selected));
+ },[selected,onEditingChange]);
  useEffect(()=>{
   if(!selected||draft===selected.text)return;
   const handle=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue='';};
@@ -257,40 +263,88 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   }catch(error){setMessage(error instanceof Error?error.message:'版本切换失败，请重新打开简历。');}
   finally{setBusy(false);}
  }
+ const editPanel=selected?<div className="hhba-original-resume-editbox" role="region"
+  aria-label="修改 Word 原文">
+  <div className="hhba-original-resume-editbox-title">
+   <strong>修改这段</strong>
+   <button type="button" aria-label="取消修改" onClick={()=>{
+    if(!confirmDiscardText())return;
+    onSessionWordDraftChange?.(null);setSelected(null);setDraft('');setConfirmed(false);
+   }}><X size={16}/></button>
+  </div>
+  <p className="hhba-original-resume-edit-source"><span>原文</span>{selected.text}</p>
+  <label className="hhba-original-resume-edit-input-label" htmlFor="hhba-word-current-edit">
+   修改后的文字
+  </label>
+  <textarea id="hhba-word-current-edit" aria-label="修改 Word 文字" value={draft} rows={5}
+   className={draft!==selected.text?'hhba-siri-typing':''}
+   maxLength={300} onChange={e=>{
+    const value=e.target.value;setDraft(value);setConfirmed(false);
+    onSessionWordDraftChange?.(value!==selected.text?
+     {original:selected.text,text:value,revision,page}:null);
+   }}/>
+  <p className="hhba-original-resume-edit-limit">{draft.length} / 300 字
+   · 保留原字体、字号和排版；不符合版式要求时不会保存。</p>
+  <label className="hhba-original-resume-edit-confirm"><input type="checkbox" checked={confirmed}
+   onChange={e=>setConfirmed(e.target.checked)}/>
+   我已核实修改后的文字属实
+  </label>
+  <div className="hhba-original-resume-editbox-actions">
+   <button type="button" disabled={!confirmed||!draft.trim()||busy}
+    onClick={()=>void save()}><Save size={14}/> {busy?'正在检查…':'确认保存'}</button>
+   <button type="button" onClick={()=>{
+    if(!confirmDiscardText())return;
+    onSessionWordDraftChange?.(null);setSelected(null);setDraft('');setConfirmed(false);
+   }}>取消</button>
+  </div>
+ </div>:null;
  return <section className="hhba-original-resume" aria-label="查看我的 Word 简历">
   <div className="hhba-original-resume-toolbar">
-   <div><strong>{resume.name}</strong><p>原件始终保留</p></div>
-   <div>
+   <div className="hhba-original-resume-file-heading">
+    <strong>{resume.name}</strong>
+    <span>原版式 Word · 当前修改进度：{revision} / {totalRevisions}</span>
+   </div>
+   <div className="hhba-original-resume-toolbar-actions">
     {ready==='available'&&<>
-     <button type="button" className="hhba-original-resume-revision-action" disabled={busy||loading||revision<=0}
-      onClick={()=>void changeRevision('undo')}><Undo2 size={15}/> 撤销</button>
-     <button type="button" className="hhba-original-resume-revision-action" disabled={busy||loading||revision>=totalRevisions}
-      onClick={()=>void changeRevision('redo')}><Redo2 size={15}/> 重做</button>
+     <button type="button" className="hhba-original-resume-revision-action"
+      disabled={busy||loading||revision<=0} title="撤销上次修改" aria-label="撤销"
+      onClick={()=>void changeRevision('undo')}><Undo2 size={16}/><span>撤销</span></button>
+     <button type="button" className="hhba-original-resume-revision-action"
+      disabled={busy||loading||revision>=totalRevisions} title="重做修改" aria-label="重做"
+      onClick={()=>void changeRevision('redo')}><Redo2 size={16}/><span>重做</span></button>
     </>}
-    <button type="button" onClick={()=>void downloadOriginal()}>
-     <Download size={15}/> 下载原件</button>
+    <details className="hhba-word-menu hhba-original-resume-export-menu">
+     <summary><Download size={16}/> 导出 <ChevronDown size={13}/></summary>
+     <div className="hhba-word-menu-content">
+      <button type="button" onClick={()=>void downloadOriginal()}>下载原件</button>
+      <button type="button" disabled={!saved||busy}
+       onClick={()=>void downloadSaved()}>下载 Word</button>
+      <button type="button" disabled={!saved||busy}
+       onClick={()=>void downloadSavedPdf()}>下载 PDF</button>
+     </div>
+    </details>
+    <details className="hhba-word-menu hhba-original-resume-version-menu">
+     <summary><History size={16}/> 版本</summary>
+     <div className="hhba-word-menu-content">
+      <p>当前版本 {revision} / {totalRevisions} · 最多 {maxRevisions} 次修订</p>
+      <p>单日最多 {maxDailyEdits} 次保存验证，撤销和重做不计入。</p>
+      {history.length>0&&<ol className="hhba-original-resume-history-list">
+       {history.map(entry=><li key={entry.revision}
+        className={entry.revision===revision?'is-current':''}>
+        <strong>第 {entry.revision} 版</strong>
+        <small>{entry.updated_at?new Date(entry.updated_at).toLocaleString('zh-CN'):'历史记录'}</small>
+        <div>原文：{entry.original}</div><div>修改：{entry.text}</div>
+       </li>)}
+      </ol>}
+     </div>
+    </details>
     {onClose&&<button type="button" onClick={closeEditor} aria-label="关闭原件预览"><X size={16}/></button>}
    </div>
   </div>
   {message&&<p className="hhba-original-resume-word-status" role="status">{message}</p>}
-  {ready==='available'&&<p className="hhba-original-resume-note" role="status">
-   当前修改进度：{revision} / {totalRevisions} · 最多 {maxRevisions} 个已验证修订版本。
-   单日最多 {maxDailyEdits} 次保存验证；撤销和重做不占用该额度。原始 Word 不会被覆盖。
-  </p>}
-  {sessionWordDraft&&ready==='available'&&<p className="hhba-original-resume-word-status" role="status">
-   找到尚未保存的 Word 文字草稿。请在第 {sessionWordDraft.page} 页点选原段落继续核对；版本或原文不一致时不会自动填入。
-  </p>}
-  {history.length>0&&ready==='available'&&<details className="hhba-original-resume-history">
-   <summary>查看修改历史（{history.length} 次修改）</summary>
-   <ol>{history.map(entry=><li key={entry.revision}
-    className={entry.revision===revision?'is-current':''}>
-    <div><strong>第 {entry.revision} 版</strong>
-     <span>{entry.updated_at?new Date(entry.updated_at).toLocaleString('zh-CN'):'历史记录'}
-      {entry.revision===revision?' · 当前版本':''}</span>
-    </div>
-    <p><strong>修改前：</strong>{entry.original}</p>
-    <p><strong>修改后：</strong>{entry.text}</p>
-   </li>)}</ol>
+  {sessionWordDraft&&ready==='available'&&<details className="hhba-word-draft-help">
+   <summary>检测到未完成文字草稿</summary>
+   <p>可在第 {sessionWordDraft.page} 页点选相同原文继续核对；修订号或原文不同不会自动填入。</p>
   </details>}
   {loading&&<p className="hhba-original-resume-note" role="status">正在打开简历…</p>}
   {busy&&<p className="hhba-original-resume-word-status is-busy" role="status">
@@ -314,8 +368,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
      disabled={zoom>=2}><ZoomIn size={15}/></button>
     <button type="button" onClick={()=>setZoom(1)} disabled={zoom===1}>适合宽度</button>
    </div>
-   <div className={'hhba-original-resume-siri-stage hhba-siri-edge'+
-    (selected?' hhba-siri-edge-active':'')}>
+   <div className="hhba-original-resume-siri-stage">
     <div className="hhba-original-resume-paper hhba-word-native-preview" ref={paper}>
      <div className="hhba-original-resume-page-frame" style={{
       width:paperSize.width||undefined,height:paperSize.height||undefined
@@ -350,49 +403,20 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
         <span><PencilLine size={12}/> 修改</span>
        </button>;
       })}
-      {selected&&(()=>{
-       const popWidth=Math.min(296,Math.max(205,paperSize.width-24));
-       const x=paperSize.width*selected.bbox[0]/1000;
-       const left=Math.max(9,Math.min(x,paperSize.width-popWidth-9));
-       return <div className="hhba-original-resume-edit-glow hhba-siri-edge hhba-siri-edge-active"
-        style={{left:left+'px',width:popWidth+'px',
-         top:Math.min(69,(selected.bbox[1]+selected.bbox[3])/10+1)+'%'}}>
-        <div className="hhba-original-resume-editbox" role="region"
-         aria-label="修改 Word 原文">
-         <div className="hhba-original-resume-editbox-title">
-          <strong>修改这段</strong>
-          <button type="button" aria-label="取消修改" onClick={()=>{
-           if(!confirmDiscardText())return;
-           onSessionWordDraftChange?.(null);setSelected(null);setDraft('');setConfirmed(false);
-          }}>
-           <X size={14}/></button>
-         </div>
-         <textarea aria-label="修改 Word 文字" value={draft} rows={3}
-          className={draft!==selected.text?'hhba-siri-typing':''}
-          maxLength={300} onChange={e=>{
-           const value=e.target.value;setDraft(value);setConfirmed(false);
-           onSessionWordDraftChange?.(value!==selected.text?
-            {original:selected.text,text:value,revision,page}:null);
-          }}/>
-         <label><input type="checkbox" checked={confirmed}
-          onChange={e=>setConfirmed(e.target.checked)}/>我确认内容属实，并同意处理此文件</label>
-         <div className="hhba-original-resume-editbox-actions">
-          <button type="button" disabled={!confirmed||!draft.trim()||busy}
-           onClick={()=>void save()}><Save size={13}/> {busy?'正在检查…':'保存'}</button>
-         </div>
-        </div>
-       </div>;
-      })()}
+
      </div>
     </div>
    </div>
-   {saved&&<div className="hhba-original-resume-review-export">
+   {false&&saved&&<div className="hhba-original-resume-review-export">
     <button type="button" disabled={busy} onClick={()=>void downloadSaved()}>
      <Download size={14}/> 下载 Word</button>
     <button type="button" disabled={busy} onClick={()=>void downloadSavedPdf()}>
      <Download size={14}/> 下载 PDF</button>
     <span>PDF 与当前已确认的 Word 版本一致；可以继续点选下一段修改、撤销或重做，原始文件始终保留。</span>
    </div>}
+   {editPanel&&(!editPanelHost?
+    <aside className="hhba-word-standalone-edit-panel">{editPanel}</aside>:
+    createPortal(editPanel,editPanelHost))}
    {anchors.length===0&&<p className="hhba-original-resume-note">
     这页没有找到可以安全修改的位置。</p>}
    <nav className="hhba-original-resume-pages" aria-label="Word 简历翻页">
