@@ -644,6 +644,22 @@ try{
      saved.native_word_draft?.revision===0;
    }catch{return false;}
   }));
+  const firstExpiry=await first.evaluate(()=>{
+   const key=Object.keys(sessionStorage).find(k=>k.startsWith('hhba:word-draft-v1:'))!;
+   return JSON.parse(sessionStorage.getItem(key)!).expires_at;
+  });
+  await nativeText.fill('PENDING USER WORD DRAFT UPDATED');
+  await first.waitForFunction(()=>Object.keys(sessionStorage).some(key=>{
+   if(!key.startsWith('hhba:word-draft-v1:'))return false;
+   try{return JSON.parse(sessionStorage.getItem(key)||'{}').native_word_draft?.text===
+    'PENDING USER WORD DRAFT UPDATED'}catch{return false}
+  }));
+  const expiryAfterEdit=await first.evaluate(()=>{
+   const key=Object.keys(sessionStorage).find(k=>k.startsWith('hhba:word-draft-v1:'))!;
+   return JSON.parse(sessionStorage.getItem(key)!).expires_at;
+  });
+  assert.equal(expiryAfterEdit,firstExpiry,
+   'editing repeatedly must not silently extend the six-hour private draft consent');
   first.on('dialog',dialog=>{void dialog.accept()});
   await first.reload({waitUntil:'networkidle',timeout:45000});
   await first.getByRole('button',{name:'针对这个岗位优化简历'}).click();
@@ -659,7 +675,7 @@ try{
   await first.locator('.hhba-original-resume-anchor').first().waitFor();
   await first.locator('.hhba-original-resume-anchor').first().click();
   const pendingText=first.getByRole('textbox',{name:'修改 Word 文字'});
-  assert.equal(await pendingText.inputValue(),'PENDING USER WORD DRAFT',
+  assert.equal(await pendingText.inputValue(),'PENDING USER WORD DRAFT UPDATED',
    'opted-in native Word text must be restored only to the same source anchor and revision');
   assert.equal(await first.getByRole('button',{name:'保存',exact:true}).isDisabled(),true,
    'restored Word text must still require a fresh factual confirmation');
