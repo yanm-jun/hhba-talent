@@ -266,7 +266,7 @@ try{
  assert.equal(await source.locator('.hhba-resume-siri-letters').count(),0);
  assert.equal(await source.getByRole('button',{name:'下载 PDF'}).count(),0,
   'do not download an original-style PDF with guessed replacement fonts');
- await source.getByText('原字体未经保真验证',{exact:false}).first().waitFor();
+ await source.getByText('暂不能保持原样式生成修改版 PDF',{exact:false}).first().waitFor();
  await source.screenshot({path:output+'/original-pdf-confirmed-source-style.png',fullPage:true});
  const edited=source.getByRole('button',{name:'继续修改这一段'});
  await edited.waitFor({timeout:10000});
