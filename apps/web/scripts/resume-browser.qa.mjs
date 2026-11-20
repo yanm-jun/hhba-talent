@@ -1020,9 +1020,9 @@ try{
    isMobile:view.name==='mobile',locale:'zh-CN'});
   const runtimeErrors=[];
   demo.on('pageerror',e=>runtimeErrors.push(e.message));
-  const pageUrl=new URL('../preview-only/resume-siri.html',import.meta.url).href;
-  const response=await demo.goto(pageUrl,{waitUntil:'load'});
-  assert.ok(response&&response.ok(),view.name+' local Siri visual preview must load');
+  const previewHtml=await readFile(new URL('../preview-only/resume-siri.html',import.meta.url),'utf8');
+  await demo.setContent(previewHtml,{waitUntil:'load'});
+  await demo.locator('.siri-stage.active').waitFor();
   await assertSiriEdge(demo,'.siri-stage.active',view.name+' isolated Siri preview');
   assert.equal(await demo.locator('.rainbow-text:visible').count(),2,
    'changed and expanded lines must have pending Siri ink');
