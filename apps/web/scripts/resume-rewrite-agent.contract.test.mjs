@@ -103,13 +103,46 @@ test('enforced execution guard returns honest status, not fabricated final succe
  assert.equal(out.autonomy.needs_more_work,true);
  assert.equal(out.autonomy.stop_reason,'execution_round_guard');
 });
-test('the independent reviewer receives entire revised paragraph, not a truncated preview',async()=>{
- const long=blocks[0].text+'。'.repeat(1850);
- const author=agent([
-  {action:'rewrite_sections',sections:[{blockId:'exp-1',goal:'补充原文表述'}]},
-  {action:'finish'}
- ]);
- const out=await author.execute();
- assert.equal(out.autonomy.rounds,2);
- assert.equal(out.blocks[0].status,'needs_user_confirmation');
+test('the independent reviewer inspects the ENTIRE revised paragraph, not only its visible excerpt',async()=>{
+ const original=blocks[1],long=original.text+'工作过程与客户沟通。'.repeat(220);
+ let audited=null,turn=0;
+ const out=await runResumeEditorialAgent({
+  draft,blocks,job,env:{},provider:{name:'qa'},reviewer:{name:'qa'},
+  validateAuthoring,numberTokens,redacted,
+  completeJson:async(_provider,system,data)=>{
+   if(system.includes('自主简历总编辑')){
+    return turn++===0?
+     {action:'rewrite_sections',sections:[{blockId:original.id,goal:'细化事实描述'}]}:
+     {action:'finish'};
+   }
+   if(system.includes('高级撰写者')){
+    return {rewrites:[{blockId:original.id,text:long,
+     sourceQuotes:[original.text],rationale:'细化已有的协作工作',jobRequirements:[]}]};
+   }
+   audited=data.blocks[0].proposed;
+   return {checks:[{blockId:original.id,safe:true,concern:''}]};
+  }
+ });
+ assert.ok(audited.length>1800,'audit model must get all text, not just the first 1800 characters');
+ assert.equal(audited,long);
+ assert.equal(out.blocks[1].proposed,long);
+});
+test('independent reviewer rejects a hallucination even if source quotes and number checks pass',async()=>{
+ let turn=0;
+ const out=await runResumeEditorialAgent({
+  draft,blocks,job,env:{},provider:{name:'qa'},reviewer:{name:'qa'},
+  validateAuthoring,numberTokens,redacted,
+  completeJson:async(_provider,system)=>{
+   if(system.includes('自主简历总编辑'))
+    return turn++===0?
+     {action:'rewrite_sections',sections:[{blockId:'exp-2',goal:'表现管理范围'}]}:
+     {action:'finish'};
+   if(system.includes('高级撰写者'))
+    return {rewrites:[{blockId:'exp-2',
+     text:'主管 B 店售后团队和客户回访工作。',sourceQuotes:['参与 B 店售后与客户回访。']}]};
+   return {checks:[{blockId:'exp-2',safe:false,concern:'主管一词超出原始证据'}]};
+  }
+ });
+ assert.equal(out.blocks[1].proposed,blocks[1].text);
+ assert.ok(out.warnings.some(x=>x.code==='AI_AGENT_FACT_CHECK_REJECTED'));
 });
