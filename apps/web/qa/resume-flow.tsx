@@ -10,6 +10,7 @@ import type {PrivateResume} from '../src/services/privateResumes';
 const nativeWord=new URLSearchParams(location.search).has('word');
 const scoringFixture=new URLSearchParams(location.search).has('score');
 const fullWriterQA=new URLSearchParams(location.search).has('full');
+const agentLoopQA=new URLSearchParams(location.search).has('agent');
 const long=new URLSearchParams(location.search).has('long');
 const truncated=new URLSearchParams(location.search).has('truncated');
 const sourceText=nativeWord&&fullWriterQA?
@@ -60,6 +61,7 @@ if(import.meta.env.PROD)throw new Error('QA fixture must never be used in produc
 window.localStorage.setItem(REAL_AUTH_TOKEN_KEY,'synthetic-browser-qa-token');
 const original=window.fetch.bind(window);
 const saved:Array<Record<string,unknown>>=[];
+let agentStepNumber=0;
 function respond(data:unknown,status=200){return Promise.resolve(new Response(JSON.stringify(data),
  {status,headers:{'Content-Type':'application/json'}}));}
 window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
@@ -111,12 +113,17 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
   }));
   return respond({ok:true,kind:'HHBA_WHOLE_RESUME_REWRITE_V1',
    provider:'synthetic-mock',reviewer:'synthetic-review',
-   autonomy:{enabled:true,rounds:3,stop_reason:'model_finished',needs_more_work:false,
-    tools_used:[
-     {action:'inspect_source',sections:[input.blocks[0].id],accepted:1},
-     {action:'rewrite_sections',sections:[input.blocks[0].id],accepted:1},
-     {action:'finish',sections:[],accepted:0}
-    ]},
+   autonomy:agentLoopQA?
+    {enabled:true,rounds:1,stop_reason:'execution_round_guard',needs_more_work:true,
+     inspected_ids:[input.blocks[0].id],previous_signature:'',
+     tools_used:[{action:'inspect_source',sections:[input.blocks[0].id],accepted:1}]}:
+    {enabled:true,rounds:3,stop_reason:'model_finished',needs_more_work:false,
+     tools_used:[
+      {action:'inspect_source',sections:[input.blocks[0].id],accepted:1},
+      {action:'rewrite_sections',sections:[input.blocks[0].id],accepted:1},
+      {action:'finish',sections:[],accepted:0}
+     ]},
+   ...(agentLoopQA?{continuation:{enabled:true,checkpoint:'synthetic-qa-step-1'}}:{}),
    blocks:rewritten,
    recommended_order:input.blocks.map((b:{id:string})=>b.id).reverse(),
    questions:[{
@@ -126,6 +133,32 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
    coverage:{source_blocks:input.blocks.length,analyzed_blocks:rewritten.length,
     proposed_rewrites:rewritten.length,held_for_review:0},
    disclaimer:'合成 QA 测试，不代表真实岗位或用户'});
+ }
+ if(u.pathname==='/api/resume-rewrite-step'&&agentLoopQA){
+  const input=JSON.parse(String(init?.body||'{}'));
+  const expected='synthetic-qa-step-'+(agentStepNumber+1);
+  if(input.checkpoint!==expected)return respond({error:'AI_CHECKPOINT_INVALID'},409);
+  agentStepNumber++;
+  const finished=agentStepNumber>=2;
+  const next={
+   ...input.draft,
+   blocks:finished?input.draft.blocks:input.draft.blocks.map((b:{
+    blockId:string;proposed:string;changed:boolean
+   },index:number)=>index===0?{
+    ...b,proposed:b.proposed+' 已经 AI 第二轮重新整理。',
+    changed:true
+   }:b),
+   autonomy:{...input.draft.autonomy,rounds:agentStepNumber+1,
+    stop_reason:finished?'model_finished':'execution_round_guard',
+    needs_more_work:!finished,
+    tools_used:[...input.draft.autonomy.tools_used,{
+     action:finished?'finish':'rewrite_sections',
+     sections:finished?[]:[input.blocks[0].id],accepted:finished?0:1
+    }]},
+   continuation:{enabled:!finished,
+    ...(finished?{}:{checkpoint:'synthetic-qa-step-'+(agentStepNumber+1)})}
+  };
+  return respond(next);
  }
  if(u.pathname==='/api/resume-optimize'){
   if(method==='GET')return respond({kind:'HHBA_RESUME_OPTIMIZATION_V1',enabled:true,configured:true,
