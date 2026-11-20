@@ -15,7 +15,8 @@ const fakeEnv={
     bind(){
      return {
       first:async()=>({phone:'candidate',revoked:0,
-       expires_at:new Date(Date.now()+60000).toISOString()})
+       expires_at:new Date(Date.now()+60000).toISOString()}),
+      run:async()=>({success:true})
      };
     },
     first:async()=>({role:'candidate'})
