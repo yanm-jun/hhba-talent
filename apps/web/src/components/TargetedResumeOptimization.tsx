@@ -66,6 +66,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [editingBlock,setEditingBlock]=useState<string|null>(null);
  const [manualText,setManualText]=useState('');
  const [activeSuggestionId,setActiveSuggestionId]=useState<string|null>(null);
+ const [mobileSuggestionsOpen,setMobileSuggestionsOpen]=useState(false);
  const generation=useRef(0);
  const active=useRef<AbortController|null>(null);
  useEffect(()=>{
@@ -250,7 +251,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     aria-label="当前简历段落的 AI 建议">
     <div className="targeted-resume-popover-head">
      <span className="targeted-resume-ai-label"><Sparkles size={13} aria-hidden="true"/> AI 原位建议 · {s.action==='request_evidence'?'请补充真实信息':'待本人核实'}</span>
-     <button type="button" aria-label="关闭 AI 建议" onClick={()=>setOpenSuggestionId(null)}><X size={15}/></button>
+     <button type="button" aria-label="关闭 AI 建议" onClick={()=>{setOpenSuggestionId(null);setActiveSuggestionId(null)}}><X size={15}/></button>
     </div>
     {editingSuggestionId===s.id?<label className="targeted-resume-fact-entry">
      <span>直接修改 AI 建议文字（填写后仍须确认真实性）</span>
@@ -375,9 +376,13 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   </label>}
   {sourceResume?<section className="targeted-resume-word-workspace" aria-label="原版式 Word 统一编辑工作区">
    <div className="targeted-resume-word-main">
-    <OriginalWordViewer resume={sourceResume!} suggestedChanges={confirmedWordChanges} onClose={()=>{}}/>
+    <OriginalWordViewer resume={sourceResume} suggestedChanges={confirmedWordChanges}
+     onOpenSuggestions={()=>setMobileSuggestionsOpen(true)} pendingSuggestionCount={pendingSuggestions.length}/>
    </div>
-   <aside className="targeted-resume-word-assistant" aria-label="AI 建议工作台">
+   <aside className={'targeted-resume-word-assistant'+(mobileSuggestionsOpen?' mobile-open':'')}
+    aria-label="AI 建议工作台">
+    <button type="button" className="targeted-resume-mobile-rail-close"
+     onClick={()=>setMobileSuggestionsOpen(false)}>返回 Word</button>
     <div className="targeted-resume-word-assistant-head">
      <strong><Sparkles size={15}/> AI 修改建议</strong>
      <p>左侧始终是你的原 Word；这里的建议只有经你确认后才会预填。真正保存仍需要在原 Word 再次确认。</p>
