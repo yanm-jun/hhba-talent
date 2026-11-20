@@ -14,8 +14,9 @@ import '../styles/siri-edge.css';
 // The original DOCX is NEVER converted into an HHBA template. A privately
 // rendered PDF is used only to show the source page. Downloaded edits are
 // the genuine original OOXML with a verified small text change.
-export function OriginalWordViewer({resume,onClose}:{
+export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
  resume:PrivateResume;onClose:()=>void;
+ suggestedChanges?:{original:string;proposed:string}[];
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
@@ -206,8 +207,16 @@ export function OriginalWordViewer({resume,onClose}:{
         className="hhba-original-resume-anchor" title="修改这段"
         aria-label="修改这段 Word"
         style={{left:x/10+'%',top:y/10+'%',width:w/10+'%',height:h/10+'%'}}
-        onClick={()=>{setSelected(anchor);setDraft(anchor.text);
-         setConfirmed(false);setMessage('');}}>
+        onClick={()=>{
+         // Never apply a model suggestion unless it was explicitly accepted
+         // and exactly matches this unique, renderer-located Word text node.
+         const matches=suggestedChanges.filter(change=>change.original===anchor.text&&
+          change.proposed.trim()&&change.proposed.length<=300);
+         const candidate=matches.length===1?matches[0].proposed:anchor.text;
+         setSelected(anchor);setDraft(candidate);
+         setConfirmed(false);
+         setMessage(matches.length===1?'已填入本人确认过的建议；请复核事实与原版式后再保存。':'');
+        }}>
         <span><PencilLine size={12}/> 修改</span>
        </button>;
       })}
