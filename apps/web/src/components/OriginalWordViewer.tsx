@@ -17,7 +17,9 @@ import '../styles/siri-edge.css';
 // rendered PDF is used only to show the source page. Downloaded edits are
 // the genuine original OOXML with a verified small text change.
 type PendingWordTextDraft={original:string;text:string;revision:number;page:number};
-export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange}:{
+export type WordVisualSuggestion={id:string;original:string;proposed:string;state:'pending'|'accepted'};
+export type WordRevisionSnapshot={revision:number;history:WordHistoryEntry[]};
+export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onRevisionSnapshot}:{
  resume:PrivateResume;onClose?:()=>void;
  suggestedChanges?:{original:string;proposed:string}[];
  onOpenSuggestions?:()=>void;pendingSuggestionCount?:number;onPendingChange?:(dirty:boolean)=>void;
@@ -27,6 +29,10 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  onSessionWordDraftChange?:(draft:PendingWordTextDraft|null)=>void;
  editPanelHost?:HTMLElement|null;
  onEditingChange?:(editing:boolean)=>void;
+ glowActive?:boolean;
+ visualSuggestions?:WordVisualSuggestion[];
+ onVisualSuggestionSelect?:(id:string)=>void;
+ onRevisionSnapshot?:(snapshot:WordRevisionSnapshot)=>void;
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
@@ -117,7 +123,10 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
     setTotalRevisions(Number.isInteger(info.total_revisions)?info.total_revisions:(wasSaved?1:0));
     setMaxRevisions(Number.isInteger(info.max_revisions)?info.max_revisions:8);
     setMaxDailyEdits(typeof info.max_daily_edits==='number'&&Number.isInteger(info.max_daily_edits)?info.max_daily_edits:6);
-    setHistory(Array.isArray(info.history)?info.history:[]);
+    const inspectedHistory=Array.isArray(info.history)?info.history:[];
+    setHistory(inspectedHistory);
+    onRevisionSnapshot?.({revision:Number.isInteger(info.revision)?info.revision:(wasSaved?1:0),
+     history:inspectedHistory});
     const bytes=await wordPreviewBytes(resume.id,wasSaved,undefined,
      Number.isInteger(info.revision)?info.revision:(wasSaved?1:0));
     if(!active)return;
@@ -369,7 +378,8 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
      disabled={zoom>=2}><ZoomIn size={15}/></button>
     <button type="button" onClick={()=>setZoom(1)} disabled={zoom===1}>适合宽度</button>
    </div>
-   <div className="hhba-original-resume-siri-stage">
+   <div className={'hhba-original-resume-siri-stage hhba-siri-edge'+
+     (glowActive?' hhba-siri-edge-active':'')}>
     <div className="hhba-original-resume-paper hhba-word-native-preview" ref={paper}>
      <div className="hhba-original-resume-page-frame" style={{
       width:paperSize.width||undefined,height:paperSize.height||undefined
@@ -378,11 +388,22 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
        role="img" aria-label={'Word 原始页面第 '+page+' 页'}/>
       {anchors.map(anchor=>{
        const [x,y,w,h]=anchor.bbox;
+       const candidates=visualSuggestions.filter(change=>
+        change.original===anchor.text&&change.proposed.trim()&&
+        change.proposed!==anchor.text&&change.proposed.length<=300);
+       const visual=candidates.length===1?candidates[0]:null;
+       const textFits=Boolean(visual&&Array.from(visual.proposed).length<=
+        Math.max(12,Array.from(anchor.text).length*1.25));
+       const activeText=visual?(textFits?visual.proposed:'✦ AI 建议 · 查看完整文字'):'';
        return <button key={anchor.id} type="button"
-        className={"hhba-original-resume-anchor"+(selected?.id===anchor.id?" is-selected":"")} title="修改这段"
-        aria-label="修改这段 Word"
+        className={"hhba-original-resume-anchor"+(selected?.id===anchor.id?" is-selected":"")+
+         (visual?' has-ai-preview':'')} title={visual?visual.proposed:'修改这段'}
+        aria-label={visual?visual.state==='pending'?'查看原文对应的 AI 修改建议':'确认并保存此处的 AI 文字':'修改这段 Word'}
         style={{left:x/10+'%',top:y/10+'%',width:w/10+'%',height:h/10+'%'}}
         onClick={()=>{
+         if(visual?.state==='pending'&&onVisualSuggestionSelect){
+          onVisualSuggestionSelect(visual.id);return;
+         }
          if(!confirmDiscardText())return;
          // A restored draft is never accepted automatically. It must be
          // attached to the identical visible text, page and server revision.
@@ -401,7 +422,13 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
          setMessage(restored?'已恢复未保存的文字草稿，请检查后再次确认。':
           matches.length===1?'已填入本人确认过的建议；请复核事实与原版式后再保存。':'');
         }}>
-        <span><PencilLine size={12}/> 修改</span>
+        {visual&&<span className="hhba-word-ai-preview" aria-hidden="true">
+         <span className="hhba-word-ai-preview-text hhba-resume-siri-letters"
+          style={{fontSize:Math.max(9,Math.min(19,(h/1000*paperSize.height)*.82))+'px'}}>
+          {activeText}
+         </span>
+        </span>}
+        <span className="hhba-word-edit-anchor-label"><PencilLine size={12}/> 修改</span>
        </button>;
       })}
 
