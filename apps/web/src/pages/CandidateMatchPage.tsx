@@ -35,6 +35,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [saveConsent,setSaveConsent]=useState(false);
  const [saveBusy,setSaveBusy]=useState(false);
  const [saveNotice,setSaveNotice]=useState('');
+ const [storageChoice,setStorageChoice]=useState<'undecided'|'save'|'once'>('undecided');
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
@@ -111,12 +112,13 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   setPreviewText('');setPreviewLoaded(false);setConsent(false);
   setSavedId(id);setFile(null);setResult(null);setPartialJobs([]);
   setOptimizationSource('');setError('');setSaveConsent(false);setSaveNotice('');
-  setSavedPickerOpen(false);
+  setStorageChoice('undecided');setSavedPickerOpen(false);
  }
  function choose(candidate:File|null){
   setSavedPickerOpen(false);
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);setSavedId('');
   setError('');setResult(null);setOptimizationSource('');setSaveConsent(false);setSaveNotice('');
+  setStorageChoice('undecided');
   if(!candidate){setFile(null);return}
   if(!/\.docx$/i.test(candidate.name)||!candidate.size||candidate.size>maxResumeSize){
     setFile(null);setError('请上传不超过 3 MB 的 Word（.docx）简历。');return;
@@ -163,11 +165,31 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   finally{setSaveBusy(false)}
  }
  async function run(){
-  if((!file&&!savedId)||!consent||working||previewBusy||availability!=='ready'||!getRealAuthToken())return;
+  if((!file&&!savedId)||!consent||working||previewBusy||availability!=='ready'||!getRealAuthToken()||
+   (file&&!savedId&&storageChoice==='undecided'))return;
   setWorking(true);setStage('preparing');setError('');setResult(null);setPartialJobs([]);
   const abort=new AbortController();
   controller.current=abort;
   try{
+   // Private storage is a separate, explicitly chosen action before AI.
+   let matchResumeId=savedId;
+   const selectedFile=file;
+   if(selectedFile&&!matchResumeId&&storageChoice==='save'){
+    if(!privateResumeAvailable)throw new Error('当前环境无法私有保存，请选择仅用于本次匹配。');
+    setSaveBusy(true);setSaveNotice('正在私有保存原文件…');
+    try{
+     const stored=await uploadPrivateResume(selectedFile,true);
+     matchResumeId=stored.id;
+     setSavedId(stored.id);setFile(null);
+     setSavedFiles(all=>all.some(item=>item.id===stored.id)?all:[stored,...all]);
+     setSaveNotice('原文件已保存到「我的简历」，本次匹配将自动关联该文件。');
+     window.dispatchEvent(new Event('hhba:private-resumes-changed'));
+    }catch(e){
+     setSaveNotice('原文件尚未保存，本次 AI 匹配未启动。可重试，或明确选择「仅用于本次匹配」。');
+     throw e;
+    }finally{setSaveBusy(false);}
+    if(abort.signal.aborted)throw new DOMException('Cancelled','AbortError');
+   }
    // Reuse one local extraction for matching AND later user-controlled editing.
    // No second AI parse, and no extra file upload is required for optimization.
    let submittedText='';
@@ -177,9 +199,9 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
      throw new MatchError(400,'已编辑的简历文字为空，请重新核对；不会自动读取原文件。');
     submittedText=previewText;
    }else{
-    let selected=file;
-    if(!selected&&savedId){
-     const entry=savedFiles.find(item=>item.id===savedId);
+    let selected=selectedFile;
+    if(!selected&&matchResumeId){
+     const entry=savedFiles.find(item=>item.id===matchResumeId);
      if(!entry)throw new MatchError(404,'已保存的简历已改变，请重新选择。');
      const bytes=await fetchPrivateResumeForLocalReview(entry);
      if(abort.signal.aborted)throw new DOMException('Cancelled','AbortError');
@@ -189,14 +211,14 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     submittedText=await extractResumeTextLocally(selected,abort.signal);
    }
    const matched:MatchResponse=await submitExtractedResumeText(
-    submittedText,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
+    submittedText,options,consent,abort.signal,matchResumeId||undefined,setStage,setPartialJobs);
    if(abort.signal.aborted)return;
    setOptimizationSource(submittedText);
    setResult(matched);setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
    setConsent(false);
   }catch(e){
-   if((e as Error)?.name!=='AbortError')setError(e instanceof MatchError?e.message:'智能匹配暂时失败，请稍后再试。');
+   if((e as Error)?.name!=='AbortError')setError(e instanceof Error?e.message:'智能匹配暂时失败，请稍后再试。');
   }finally{setWorking(false);controller.current=null}
  }
  return <Shell user={user} embedded={embedded}>
@@ -259,6 +281,21 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           <strong>{file?file.name:savedId?'或上传一份新简历，替换当前选择':'点击选择文件，或将简历拖到这里'}</strong>
           <span>{file?(file.size/1024/1024).toFixed(2)+' MB · 可以分析':'仅支持有真实文字的 Word（.docx）；PDF 作为最终导出格式'}</span>
         </label>
+        {file&&!savedId&&<fieldset className="hhba-ai-storage-choice" disabled={working||saveBusy}>
+         <legend>这份简历，是否保存到「我的简历」？</legend>
+         <label className={storageChoice==='save'?'is-selected':''}>
+          <input type="radio" name="hhba-resume-storage" value="save"
+           checked={storageChoice==='save'} onChange={()=>setStorageChoice('save')}/>
+          <span><strong>保存到我的简历</strong><small>匹配前私有保存原 DOCX，今后可直接选择复用（最多 3 份）。</small></span>
+         </label>
+         <label className={storageChoice==='once'?'is-selected':''}>
+          <input type="radio" name="hhba-resume-storage" value="once"
+           checked={storageChoice==='once'} onChange={()=>setStorageChoice('once')}/>
+          <span><strong>仅用于本次匹配</strong><small>不保存原文件；匹配结果仍可保留在账户历史中。</small></span>
+         </label>
+         <p>请先选择一种方式。保存文件和 AI 分析是两项独立授权；预览文字的编辑不会覆盖原文件。</p>
+        </fieldset>}
+        {saveNotice&&<p className="hhba-ai-storage-status" role="status">{saveNotice}</p>}
         {(file||savedId)&&<CandidateResumeStage text={documentText}
          fileName={file?.name||savedFiles.find(item=>item.id===savedId)?.name||'已保存的简历'}
          loading={documentBusy} error={documentError}
@@ -291,8 +328,10 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
-          disabled={(!file&&!savedId)||!consent||working||previewBusy||(previewLoaded&&previewText.replace(/\s/g,'').length<30)||availability!=='ready'||!getRealAuthToken()}>
-          {working?<><LoaderCircle className="spin" size={18}/> AI 正在寻找岗位…</>:
+          disabled={(!file&&!savedId)||!consent||working||saveBusy||previewBusy||
+            (file&&!savedId&&storageChoice==='undecided')||
+            (previewLoaded&&previewText.replace(/\s/g,'').length<30)||availability!=='ready'||!getRealAuthToken()}>
+          {working?<><LoaderCircle className="spin" size={18}/> {saveBusy?'正在保存简历…':'AI 正在寻找岗位…'}</>:
            <><BriefcaseBusiness size={17}/> AI 为我寻找适合的工作 <ArrowRight size={17}/></>}
         </button>
         {working&&<p className="hhba-ai-processing" role="status">{stage==='preparing'?'正在准备智能匹配…':stage==='connected'?'正在连接岗位信息…':stage==='searching'?'正在寻找中国大陆岗位…':stage==='reading'?'正在读取候选岗位信息…':stage==='waiting'?'正在生成推荐，请稍候…':'正在分析简历并生成推荐理由…'}</p>}
