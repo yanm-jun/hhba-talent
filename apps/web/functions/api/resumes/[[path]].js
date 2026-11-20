@@ -75,6 +75,9 @@ export async function onRequest({request,env}){
    if(request.headers.get('X-HHBA-Storage-Consent')!==STORAGE_CONSENT_VERSION)
     return err('STORAGE_CONSENT_REQUIRED',400);
    const filename=normalizeResumeName(request.headers.get('X-HHBA-Resume-Name'));
+   // New editable resumes are Word-only. Existing private PDF files remain
+   // downloadable and deletable; this restriction never mutates old records.
+   if(/\.pdf$/i.test(filename))return err('PDF_UPLOAD_DISABLED',415);
    const bytes=await boundedBytes(request),format=validateResumeBytes(bytes,filename);
    const inputMime=(request.headers.get('Content-Type')||'').split(';')[0].toLowerCase();
    if(inputMime!==format.mime&&inputMime!=='application/octet-stream')
