@@ -14,6 +14,7 @@ import {selectProvider} from '../_lib/resume-ai-provider.js';
 import {runResumeEditorialAgent} from '../_lib/resume-rewrite-agent.js';
 import {issueCheckpoint,verifyCheckpoint,publicDraft}
  from '../_lib/resume-rewrite-checkpoint.js';
+import {candidateAgentRewriteAllowed} from '../_lib/candidate-agent-skills.js';
 
 const allowedSections=new Set(['summary','experience','skills','education','projects']);
 function validContinuation(body){
@@ -62,6 +63,8 @@ export async function onRequestPost({request,env}){
  try{body=await rewriteRequestJson(request);}
  catch{return reject('INVALID_REQUEST',400);}
  if(body?.consent_ai!==true)return reject('AI_CONSENT_REQUIRED',400);
+ if(!(await candidateAgentRewriteAllowed(env)))
+  return reject('AGENT_REWRITE_SKILL_DISABLED',403);
  if(!validContinuation(body))return reject('INVALID_REWRITE_INPUT',400);
  try{
   await verifyCheckpoint({env,account,blocks:body.blocks,
