@@ -4,6 +4,8 @@ import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
 import {Link} from '../router';
 import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDialog';
+import {CandidateResumeStage} from '../components/CandidateResumeStage';
+import {extractDocxText} from '../services/docxProfile.mjs';
 import {CandidateJourneySteps} from '../components/CandidateJourneySteps';
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
@@ -23,6 +25,10 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [previewText,setPreviewText]=useState('');
  const [previewLoaded,setPreviewLoaded]=useState(false);
  const [previewBusy,setPreviewBusy]=useState(false);
+ const [documentText,setDocumentText]=useState('');
+ const [documentBusy,setDocumentBusy]=useState(false);
+ const [documentError,setDocumentError]=useState('');
+ const [documentRetry,setDocumentRetry]=useState(0);
  const previewController=useRef<AbortController|null>(null);
  const [vaultError,setVaultError]=useState('');
  const [saveConsent,setSaveConsent]=useState(false);
@@ -70,6 +76,32 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   return()=>{active=false;window.removeEventListener('hhba:private-resumes-changed',reload);
    window.removeEventListener('hhba:real-auth-changed',reload);};
  },[user?.id]);
+ // Uploading a resume now gives an immediate private reading surface.
+ // No AI call or remote write happens during local DOCX text extraction.
+ useEffect(()=>{
+  const abort=new AbortController();
+  setDocumentText('');setDocumentError('');
+  if(!file&&!savedId){setDocumentBusy(false);return()=>abort.abort();}
+  setDocumentBusy(true);
+  void (async()=>{
+   try{
+    let selected=file;
+    if(!selected&&savedId){
+     const entry=savedFiles.find(item=>item.id===savedId);
+     if(!entry)throw new Error('保存的简历暂时未找到，请重试。');
+     const bytes=await fetchPrivateResumeForLocalReview(entry);
+     if(abort.signal.aborted)return;
+     selected=new File([bytes],entry.name,{type:entry.type});
+    }
+    if(!selected)return;
+    const raw=await extractDocxText(await selected.arrayBuffer());
+    if(!abort.signal.aborted)setDocumentText(raw);
+   }catch(error){
+    if(!abort.signal.aborted)setDocumentError(error instanceof Error?error.message:'暂时无法本地预览此文件。');
+   }finally{if(!abort.signal.aborted)setDocumentBusy(false);}
+  })();
+  return()=>abort.abort();
+ },[file,savedId,savedFiles,documentRetry]);
  function choose(candidate:File|null){
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);setSavedId('');
   setError('');setResult(null);setOptimizationSource('');setSaveConsent(false);setSaveNotice('');
@@ -196,6 +228,10 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           <strong>{savedId?'已选择私有简历：'+(savedFiles.find(x=>x.id===savedId)?.name||'') :file?file.name:'点击选择文件，或将简历拖到这里'}</strong>
           <span>{file?(file.size/1024/1024).toFixed(2)+' MB · 可以分析':'仅支持有真实文字的 Word（.docx）；PDF 作为最终导出格式'}</span>
         </label>
+        {(file||savedId)&&<CandidateResumeStage text={documentText}
+         fileName={file?.name||savedFiles.find(item=>item.id===savedId)?.name||'已保存的简历'}
+         loading={documentBusy} error={documentError}
+         onRetry={()=>setDocumentRetry(value=>value+1)}/>}
         <details className="hhba-ai-preferences">
          <summary>可选：指定岗位方向或核对简历文字</summary>
          <p>不填写岗位方向，AI 也会根据简历寻找适合的真实工作。</p>
