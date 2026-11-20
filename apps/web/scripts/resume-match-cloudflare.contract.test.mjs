@@ -119,7 +119,7 @@ test('saved R2 resumes offer direct AI navigation without auto-upload or auto-co
  const {readFile}=await import('node:fs/promises');
  const vault=await readFile(new URL('../src/components/PrivateResumeVault.tsx',import.meta.url),'utf8');
  const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
- assert.match(vault,/candidate\/match\?resume=/);
+ assert.match(vault,/candidate\/account\/match\?resume=/);
  assert.match(page,/deepLinkPending\.current/);
  assert.match(page,/rows\.some\(item=>item\.id===requested\)/);
  assert.match(page,/setSavedId\(requested\)/);
