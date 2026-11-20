@@ -68,6 +68,9 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [activeSuggestionId,setActiveSuggestionId]=useState<string|null>(null);
  const [mobileSuggestionsOpen,setMobileSuggestionsOpen]=useState(false);
  const [nativeWordPending,setNativeWordPending]=useState(false);
+ const [nativeWordTextDraft,setNativeWordTextDraft]=useState<{
+  original:string;text:string;revision:number;page:number
+ }|null>(null);
  const [verifiedWordEdits,setVerifiedWordEdits]=useState<Array<{original:string;text:string}>>([]);
  // Do not silently keep a resume in localStorage. Optional draft recovery
  // requires a separate, user-checked consent and is tab/session-scoped.
@@ -77,22 +80,34 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [rememberDraft,setRememberDraft]=useState(false);
  const [recoverableDraft,setRecoverableDraft]=useState<any|null>(null);
  const [draftStatus,setDraftStatus]=useState('');
+ // A lightweight context check, not an authentication mechanism: drafts
+ // are already scoped to the signed-in account, document and target job.
+ const sourceSignature=useMemo(()=>{
+  const source=JSON.stringify(blocks.map(({id,section,text})=>[id,section,text]));
+  let a=2166136261,b=5381;
+  for(let i=0;i<source.length;i++){
+   a=Math.imul(a^source.charCodeAt(i),16777619);
+   b=(Math.imul(b,33)^source.charCodeAt(i))|0;
+  }
+  return source.length+':'+(a>>>0).toString(16)+':'+(b>>>0).toString(16);
+ },[blocks]);
  useEffect(()=>{
   if(!draftKey)return;
   try{
    const raw=sessionStorage.getItem(draftKey);
    if(!raw)return;
    const stored=JSON.parse(raw);
-   if(stored?.schema!=='HHBA_WORD_DRAFT_V1'||
+   if(stored?.schema!=='HHBA_WORD_DRAFT_V2'||
+    stored.source_signature!==sourceSignature||
     typeof stored.expires_at!=='number'||stored.expires_at<Date.now()||
     !stored.version||!Array.isArray(stored.version.blocks)||
-    stored.version.blocks.length<1||stored.version.blocks.length>12||
+    stored.version.blocks.length!==blocks.length||
     !Array.isArray(stored.version.acceptedSuggestionIds)){
     sessionStorage.removeItem(draftKey);return;
    }
    setRecoverableDraft(stored);setRememberDraft(true);
   }catch{setDraftStatus('浏览器会话草稿无法读取，请继续手动编辑。');}
- },[draftKey]);
+ },[draftKey,sourceSignature,blocks.length]);
  const generation=useRef(0);
  const active=useRef<AbortController|null>(null);
  useEffect(()=>{
@@ -373,6 +388,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    change.original===original.text&&change.text===block.text);
  });
  const draftDirty=pendingTextChanges||Boolean(editingBlock)||
+  Boolean(nativeWordTextDraft&&nativeWordTextDraft.text!==nativeWordTextDraft.original)||
   suggestions.some(item=>!ignored.includes(item.id)&&
    !version.acceptedSuggestionIds.includes(item.id)&&
    ((suggestionDrafts[item.id]||'').trim().length>0||
@@ -383,51 +399,76 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   const data=recoverableDraft;
   if(!data||!Array.isArray(data.version?.blocks))return;
   const currentIds=new Set(blocks.map(b=>b.id));
-  if(data.version.blocks.some((item:ResumeBlock)=>!currentIds.has(item.id)||
-   typeof item.text!=='string'||item.text.length>1600)){
-   setDraftStatus('草稿已与这份简历不匹配，为安全起见未恢复。');return;
+  if(data.source_signature!==sourceSignature||
+   data.version.blocks.some((item:ResumeBlock,index:number)=>
+    !currentIds.has(item.id)||item.id!==blocks[index]?.id||
+    item.section!==blocks[index]?.section||
+    typeof item.text!=='string'||item.text.length<1||item.text.length>1600)){
+   setDraftStatus('草稿和当前简历不完全一致，为安全起见未恢复。');return;
   }
+  // Untrusted browser state can restore wording, never approval. All AI
+  // recommendations require fresh evidence confirmation after recovery.
+  const reviewed=Array.isArray(data.suggestions)?
+   data.suggestions.filter((item:ResumeSuggestion)=>item&&validateSuggestion(blocks,item)).slice(0,12):[];
+  const approvedIds=new Set(reviewed.map((item:ResumeSuggestion)=>item.id));
+  const safeFields=(value:unknown,max:number)=>{
+   const input=value&&typeof value==='object'&&!Array.isArray(value)?
+    value as Record<string,unknown>:{};
+   return Object.fromEntries(Object.entries(input).filter(([key,text])=>
+    approvedIds.has(key)&&typeof text==='string'&&text.length<=max));
+  };
+  const native=data.native_word_draft;
+  setNativeWordTextDraft(native&&typeof native.original==='string'&&
+   typeof native.text==='string'&&native.original.length>0&&
+   native.original.length<=300&&native.text.length<=300&&
+   Number.isInteger(native.revision)&&native.revision>=0&&native.revision<=8&&
+   Number.isInteger(native.page)&&native.page>=1&&native.page<=20?
+   {original:native.original,text:native.text,revision:native.revision,page:native.page}:null);
   setVersion({id:'draft-'+job.id,targetJobId:job.id,
-   blocks:data.version.blocks,acceptedSuggestionIds:data.version.acceptedSuggestionIds||[]});
+   blocks:data.version.blocks,acceptedSuggestionIds:[]});
   setDetails(normalizeResumeDocumentDetails(data.details));
-  setSuggestions(Array.isArray(data.suggestions)?data.suggestions.slice(0,12):[]);
-  setIgnored(Array.isArray(data.ignored)?data.ignored:[]);
-  setSuggestionDrafts(data.suggestionDrafts||{});
-  setNewEvidence(data.newEvidence||{});
+  setSuggestions(reviewed);setIgnored([]);setSuggestionDrafts(safeFields(data.suggestionDrafts,1600));
+  setNewEvidence(safeFields(data.newEvidence,800));
   setConfirmed([]);setOpenSuggestionId(null);setActiveSuggestionId(null);
   setEditingSuggestionId(null);setUndoStack([]);setRecoverableDraft(null);
-  setDraftStatus('已恢复本标签页保存的文字草稿，仍需逐项核实和保存原 Word。');
+  setDraftStatus('文字草稿已恢复。AI 建议的确认状态已重置；请重新核实，原 Word 尚未保存。');
  }
  function discardSessionDraft(){
   try{if(draftKey)sessionStorage.removeItem(draftKey);}catch{}
-  setRecoverableDraft(null);setRememberDraft(false);
+  setRecoverableDraft(null);setRememberDraft(false);setNativeWordTextDraft(null);
   setDraftStatus('已清除本标签页保存的文字草稿。');
  }
  useEffect(()=>{
-  if(!rememberDraft||!draftKey||!draftDirty||recoverableDraft)return;
+  if(!rememberDraft||!draftKey||recoverableDraft)return;
+  if(!draftDirty){
+   try{sessionStorage.removeItem(draftKey);}catch{}
+   return;
+  }
   const task=setTimeout(()=>{
    try{
-    const payload=JSON.stringify({schema:'HHBA_WORD_DRAFT_V1',
+    const payload=JSON.stringify({schema:'HHBA_WORD_DRAFT_V2',
+     source_signature:sourceSignature,
      expires_at:Date.now()+6*60*60*1000,
      version:{blocks:version.blocks,acceptedSuggestionIds:version.acceptedSuggestionIds},
-     suggestions,ignored,suggestionDrafts,newEvidence,details});
+     suggestions,ignored,suggestionDrafts,newEvidence,details,
+     native_word_draft:nativeWordTextDraft});
     if(payload.length>60000)throw Error('TOO_LARGE');
     sessionStorage.setItem(draftKey,payload);
     setDraftStatus('文字草稿已保存在当前浏览器标签页（不包含 Word 原文件）。');
    }catch{setDraftStatus('当前浏览器无法自动保存草稿，请避免关闭页面。');}
   },850);
   return()=>clearTimeout(task);
- },[draftKey,rememberDraft,draftDirty,recoverableDraft,version,suggestions,ignored,
-    suggestionDrafts,newEvidence,details]);
+ },[draftKey,rememberDraft,draftDirty,recoverableDraft,sourceSignature,
+    nativeWordTextDraft,version,suggestions,ignored,suggestionDrafts,newEvidence,details]);
 
  useEffect(()=>{onDraftDirtyChange?.(draftDirty||nativeWordPending);},
   [draftDirty,nativeWordPending,onDraftDirtyChange]);
  useEffect(()=>{
-  if(!draftDirty)return;
+  if(!draftDirty&&!nativeWordPending)return;
   const prevent=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue='';};
   window.addEventListener('beforeunload',prevent);
   return()=>window.removeEventListener('beforeunload',prevent);
- },[draftDirty]);
+ },[draftDirty,nativeWordPending]);
  const hasSession=realAuthReady&&Boolean(getRealAuthToken());
  const optimizationControls=<>
   <div className="targeted-resume-toolbar">
@@ -478,7 +519,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      onOpenSuggestions={()=>setMobileSuggestionsOpen(true)}
      onPendingChange={setNativeWordPending}
      onVerifiedSave={change=>setVerifiedWordEdits(prev=>[...prev.filter(item=>item.original!==change.original),change])}
-     onVersionMoved={()=>setVerifiedWordEdits([])}
+     onVersionMoved={()=>{
+      setVerifiedWordEdits([]);setNativeWordTextDraft(null);
+     }}
+     sessionWordDraft={nativeWordTextDraft}
+     onSessionWordDraftChange={setNativeWordTextDraft}
      pendingSuggestionCount={pendingSuggestions.length}/>
    </div>
    <aside className={'targeted-resume-word-assistant'+(mobileSuggestionsOpen?' mobile-open':'')}
