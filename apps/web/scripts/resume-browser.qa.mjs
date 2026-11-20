@@ -604,7 +604,7 @@ try{
   const assistant=first.locator('.targeted-resume-word-assistant');
   if(view.name==='mobile'){
    assert.equal(await assistant.isVisible(),false,'suggestions must not cover mobile Word');
-   await first.getByRole('button',{name:'AI 建议'}).click();
+   await first.getByRole('button',{name:'AI 建议',exact:true}).click();
    await assistant.waitFor({state:'visible'});
   }
   await first.locator('.targeted-resume-draft-recovery input[type=checkbox]').check();
