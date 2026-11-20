@@ -21,6 +21,10 @@ const fail=(code,status)=>json({ok:false,error:code},status);
 const sameOrigin=request=>request.headers.get('Origin')===new URL(request.url).origin&&
  request.headers.get('Sec-Fetch-Site')!=='cross-site';
 const prefix=row=>row.storage_key+'.hhba-word-preserved-v1-'+row.sha256;
+const shaBytes=async bytes=>{
+ const hash=new Uint8Array(await crypto.subtle.digest('SHA-256',bytes));
+ return Array.from(hash,b=>b.toString(16).padStart(2,'0')).join('');
+};
 const validRow=row=>row?.media_type===DOCX_MIME&&
  Number.isInteger(row.size_bytes)&&row.size_bytes>=100&&row.size_bytes<=3*1024*1024&&
  typeof row.sha256==='string'&&/^[0-9a-f]{64}$/.test(row.sha256);
@@ -141,6 +145,9 @@ export async function onRequestGet({request,env}){
    const item=await bucket.get(state.key+(action==='download'?'.docx':'.edited.pdf'));
    if(!item)return fail('WORD_NOT_EDITED',404);
    const bytes=new Uint8Array(await item.arrayBuffer());
+   const expected=action==='download'?state.saved.docx_sha256:state.saved.preview_sha256;
+   if(typeof expected!=='string'||!/^[0-9a-f]{64}$/.test(expected)||
+    await shaBytes(bytes)!==expected)return fail('WORD_NOT_EDITED',409);
    return replyFile(bytes,action==='download'?DOCX_MIME:'application/pdf',
     action==='download'?'HHBA-resume-edited.docx':'HHBA-resume-edited-preview.pdf');
   }
@@ -202,6 +209,7 @@ export async function onRequestPost({request,env}){
   key=prefix(row);
   const meta={schema:'HHBA_ORIGINAL_WORD_EDIT_V1',source_sha256:row.sha256,
    original:body.original,text:body.text,page_count:result.pageCount,
+   docx_sha256:await shaBytes(result.bytes),preview_sha256:await shaBytes(updatedPdf),
    updated_at:new Date().toISOString()};
   await bucket.put(key+'.docx',result.bytes,{httpMetadata:{contentType:DOCX_MIME}});
   await bucket.put(key+'.edited.pdf',updatedPdf,
