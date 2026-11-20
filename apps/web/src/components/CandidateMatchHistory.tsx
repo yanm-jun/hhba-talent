@@ -53,7 +53,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
    <div><h2><History size={21}/> AI 匹配历史</h2>
     <p>记录每次 AI 推荐的企业、岗位、适配分和理由；这里不是已投递申请。</p>
    </div>
-   <Link to="/candidate/match">使用简历找新岗位 <ArrowRight size={15}/></Link>
+   <Link to="/candidate/account/match">使用简历找新岗位 <ArrowRight size={15}/></Link>
   </div>
   {error&&<p className="hhba-personal-error" role="alert">{error}</p>}
   {notice&&<p className="hhba-account-notice" role="status">{notice}</p>}
@@ -61,7 +61,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
    items.length===0?<div className="hhba-account-empty">
     <Search size={29}/><strong>还没有 AI 匹配历史</strong>
     <p>上传简历并完成一次 AI 推荐后，真实的岗位结果会自动保存到你的账户。历史记录不会被算作投递。</p>
-    <Link to="/candidate/match">上传简历开始匹配</Link>
+    <Link to="/candidate/account/match">上传简历开始匹配</Link>
    </div>:<>
     <p className="hhba-match-history-explain">你可以随时查看上一次为什么推荐这些岗位，或使用同一份已保存的简历再次查找。只有重新完成匹配，才会产生新岗位对比；目前不会在后台自动搜索或发送通知。</p>
     {selected&&<div className="hhba-match-history-detail">
@@ -84,8 +84,8 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
       </article>;
      })}
      <div className="hhba-match-history-actions">
-      {selected.resume_id?<Link to={'/candidate/match?resume='+encodeURIComponent(selected.resume_id)}>用这份简历重新匹配</Link>:
-       <Link to="/candidate/match">上传简历重新匹配</Link>}
+      {selected.resume_id?<Link to={'/candidate/account/match?resume='+encodeURIComponent(selected.resume_id)}>用这份简历重新匹配</Link>:
+       <Link to="/candidate/account/match">上传简历重新匹配</Link>}
       <button type="button" disabled={busy} onClick={()=>void erase(selected.id)}><Trash2 size={15}/> 删除本次历史</button>
      </div>
     </div>}
