@@ -1,0 +1,36 @@
+name: HHBA Candidate Agent Skills Stage 1
+on:
+  pull_request:
+    paths:
+      - 'apps/web/functions/_lib/candidate-agent-skills.js'
+      - 'apps/web/functions/api/match-native/**'
+      - 'apps/web/scripts/candidate-agent-skills.contract.test.mjs'
+      - 'apps/web/src/services/resumeMatch.ts'
+      - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
+      - '.github/workflows/hhba-candidate-agent-skills.yml'
+  push:
+    branches:
+      - feature/candidate-agent-skills-stage1-20261120
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Candidate Agent skill isolation and matching tests
+        working-directory: apps/web
+        run: node --test scripts/candidate-agent-skills.contract.test.mjs scripts/match-search-first.contract.test.mjs scripts/match-native-web.contract.test.mjs scripts/resume-rewrite-agent.contract.test.mjs
+      - name: Install pinned web dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Check TypeScript compilation
+        working-directory: apps/web
+        run: npx tsc -b --pretty false
