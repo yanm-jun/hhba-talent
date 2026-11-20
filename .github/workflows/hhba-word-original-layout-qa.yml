@@ -3,6 +3,9 @@ on:
   pull_request:
     paths:
       - 'apps/web/src/services/resumeDocxPreserve.mjs'
+      - 'services/word-renderer/**'
+      - 'apps/web/functions/api/resume-word.js'
+      - 'apps/web/functions/_lib/private-word-service.js'
       - 'apps/web/scripts/resume-docx-preserve.contract.test.mjs'
       - 'apps/web/scripts/word-layout-preservation.qa.py'
       - '.github/workflows/hhba-word-original-layout-qa.yml'
@@ -41,6 +44,11 @@ jobs:
             /tmp/hhba-docx-preserve-ci/original-preserved-layout.docx \
             /tmp/hhba-docx-preserve-ci/edited-preserved-layout.docx \
             '原始岗位描述' '新的岗位描述'
+      - name: Exercise private Word HTTPS service contract with synthetic files
+        working-directory: services/word-renderer
+        env:
+          HHBA_WORD_RENDER_QA_OUTPUT: /tmp/hhba-docx-preserve-ci
+        run: /tmp/hhba-word-parity-venv/bin/python -m unittest -v test_server.py
       - name: Preserve synthetic QA files for inspection
         uses: actions/upload-artifact@v4
         if: always()
