@@ -236,6 +236,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
       pending={working&&!result} notice={working?'':error}
       sourceText={result?optimizationSource:undefined}
       sourceResume={result&&savedId?savedFiles.find(item=>item.id===savedId&&/\.docx$/i.test(item.name)):undefined}
+      accountScope={String(user?.id||'')}
       resumeStorage={result&&file&&!savedId?{
         available:true,saved:false,consent:saveConsent,saving:saveBusy,
         notice:saveNotice,onConsent:setSaveConsent,onSave:()=>void saveResume()
