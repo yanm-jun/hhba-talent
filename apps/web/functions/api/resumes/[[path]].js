@@ -126,7 +126,7 @@ export async function onRequest({request,env}){
   const id=download?.[1]||removal?.[1];
   if(id&&uuidPattern.test(id)&&((download&&method==='GET')||(removal&&method==='DELETE'))){
    const row=await db.prepare(
-    'SELECT id,filename,media_type,size_bytes,storage_key FROM hhba_candidate_resumes WHERE phone=? AND id=?'
+    'SELECT id,filename,media_type,size_bytes,storage_key,sha256 FROM hhba_candidate_resumes WHERE phone=? AND id=?'
    ).bind(phone,id).first();
    if(!row)return err('RESUME_NOT_FOUND',404);
    if(download){
@@ -151,6 +151,13 @@ export async function onRequest({request,env}){
    await bucket.delete(row.storage_key);
    await bucket.delete(row.storage_key+'.hhba-vision-layout-v1.json').catch(()=>{});
    await bucket.delete(row.storage_key+'.hhba-page-edits-v1.json').catch(()=>{});
+   // Word previews and verified editable copies live in the same private vault.
+   // Deleting an original resume must delete every derived Word artifact.
+   if(row.media_type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'){
+    const wordPrefix=row.storage_key+'.hhba-word-preserved-v1-'+row.sha256;
+    for(const ext of ['.source.pdf','.docx','.edited.pdf','.json'])
+     await bucket.delete(wordPrefix+ext).catch(()=>{});
+   }
    const deleted=await db.prepare(
     'DELETE FROM hhba_candidate_resumes WHERE phone=? AND id=?'
    ).bind(phone,id).run();
