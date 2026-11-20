@@ -22,7 +22,8 @@ test('shortened height and mobile stacking retain readable action button',()=>{
 });
 test('AI CTA, three public entrances and shared job marketplace remain available',()=>{
  assert.ok(home.includes('className="home-match-promo"'));
- assert.ok(home.includes("navigate('/candidate/match')"));
+ assert.ok(home.includes("navigate(user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch')"));
+  assert.ok(home.includes('开始智能匹配'));
  assert.ok(home.includes('title="求职与机会"'));
  assert.ok(home.includes('title="劳动权益"'));
  assert.ok(home.includes('title="企业招聘导航"'));
