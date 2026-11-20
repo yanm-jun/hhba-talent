@@ -343,6 +343,47 @@ try{
  assert.deepEqual(smallSourceErrors,[],'no mobile original-PDF runtime errors');
  await smallSource.close();
 
+ // True original Word page preview (no HHBA re-template), in-place edit and
+ // verified Word download. Fixture uses only synthetic data and fake endpoints.
+ for(const view of [{width:1100,height:900,name:'desktop'},
+                    {width:390,height:844,name:'mobile'}]){
+  const word=await browser.newPage({viewport:{width:view.width,height:view.height},
+   acceptDownloads:true,locale:'zh-CN'});
+  const issues=[];word.on('pageerror',err=>issues.push(err.message));
+  await word.goto('http://127.0.0.1:3000/qa/original-word-viewer.html',
+   {waitUntil:'networkidle',timeout:45000});
+  await word.getByRole('img',{name:'Word 原始页面第 1 页'}).waitFor({timeout:18000});
+  const editWord=word.getByRole('button',{name:'修改这段 Word'});
+  await editWord.waitFor({timeout:15000});
+  await editWord.click();
+  await assertSiriEdge(word,'.hhba-original-resume-edit-glow',
+   view.name+' original Word popup');
+  const input=word.getByRole('textbox',{name:'修改 Word 文字'});
+  await input.fill('EDITED WORD RESUME');
+  assert.equal(await word.getByRole('button',{name:'保存',exact:true}).isDisabled(),
+   true,'Word change must require confirmation');
+  await word.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
+  await word.screenshot({path:output+'/original-word-'+view.name+'-editing.png',
+   fullPage:true});
+  await word.getByRole('button',{name:'保存',exact:true}).click();
+  await word.getByRole('button',{name:'下载 Word'}).waitFor({timeout:20000});
+  const downloadEvent=word.waitForEvent('download');
+  await word.getByRole('button',{name:'下载 Word'}).click();
+  const downloaded=await downloadEvent;
+  assert.match(downloaded.suggestedFilename(),/\.docx$/);
+  await word.screenshot({path:output+'/original-word-'+view.name+'-saved.png',
+   fullPage:true});
+  const geom=await word.evaluate(()=>({
+   client:document.documentElement.clientWidth,
+   scroll:document.documentElement.scrollWidth
+  }));
+  assert.ok(geom.scroll<=geom.client+3,
+   'Word page must not horizontally overflow viewport '+JSON.stringify(geom));
+  assert.deepEqual(issues,[],'original Word editor must not crash on '+view.name);
+  await word.close();
+ }
+
+
  console.log(JSON.stringify({result:'PASSED',desktop_pdf_pages:pages.length,
   long_pdf_pages:longPages.length,mobile:metrics,qa_output:output}));
 }finally{await browser.close()}
