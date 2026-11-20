@@ -81,7 +81,7 @@ test('public job and company browsing are not marked as private workspaces, and 
  assert.ok(shell.includes("['我要应聘','/candidate/jobs']"));
  assert.ok(shell.includes("if(route==='/candidate')return signedIn?'candidate':'public'"));
  assert.ok(shell.includes("return 'public';"));
- assert.ok(home.includes("onClick={()=>navigate('/candidate/match')}"),'AI matching remains accessible separately');
+ assert.ok(home.includes("onClick(()=>navigate(user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'))"),'signed-in users go directly to AI matching, others sign in with return destination');
 });
 
 test('homepage financial disclosure uses distributable profit, not turnover, and does not invent reports',()=>{
