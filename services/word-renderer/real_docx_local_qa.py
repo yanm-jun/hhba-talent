@@ -116,7 +116,7 @@ def build_real_docx(root):
     def explicit_font_tag(match):
         tag = match.group(0)
         for attr in ("asciiTheme", "hAnsiTheme", "eastAsiaTheme", "csTheme"):
-            tag = re.sub(r'\\s+w:' + attr + r'="[^"]*"', "", tag)
+            tag = re.sub(r'\s+w:' + attr + r'="[^"]*"', "", tag)
         for attr in ("ascii", "hAnsi", "eastAsia", "cs"):
             pattern = r'w:' + attr + r'="[^"]*"'
             if re.search(pattern, tag):
@@ -134,7 +134,7 @@ def build_real_docx(root):
             if not name.endswith(".xml"):
                 continue
             part = pkg.read(name).decode("utf-8")
-            part = re.sub(r'<w:rFonts\\b[^>]*?/>', explicit_font_tag, part)
+            part = re.sub(r'<w:rFonts\b[^>]*?/>', explicit_font_tag, part)
             updates[name] = part.encode("utf-8")
     explicit = package_rebuild(raw, updates)
     return raw, explicit
