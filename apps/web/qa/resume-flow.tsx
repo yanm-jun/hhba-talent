@@ -39,13 +39,13 @@ function pdfFor(text:string){
   '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
   '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>',
   '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
-  '<< /Length '+stream.length+' >>\\nstream\\n'+stream+'\\nendstream'
+  '<< /Length '+stream.length+' >>\nstream\n'+stream+'\nendstream'
  ];
- let out='%PDF-1.4\\n';const offsets=[0];
- for(let i=0;i<parts.length;i++){offsets.push(out.length);out+=(i+1)+' 0 obj\\n'+parts[i]+'\\nendobj\\n';}
- const pointer=out.length;out+='xref\\n0 6\\n0000000000 65535 f \\n';
- for(const start of offsets.slice(1))out+=String(start).padStart(10,'0')+' 00000 n \\n';
- return new TextEncoder().encode(out+'trailer\\n<< /Root 1 0 R /Size 6 >>\\nstartxref\\n'+pointer+'\\n%%EOF');
+ let out='%PDF-1.4\n';const offsets=[0];
+ for(let i=0;i<parts.length;i++){offsets.push(out.length);out+=(i+1)+' 0 obj\n'+parts[i]+'\nendobj\n';}
+ const pointer=out.length;out+='xref\n0 6\n0000000000 65535 f \n';
+ for(const start of offsets.slice(1))out+=String(start).padStart(10,'0')+' 00000 n \n';
+ return new TextEncoder().encode(out+'trailer\n<< /Root 1 0 R /Size 6 >>\nstartxref\n'+pointer+'\n%%EOF');
 }
 const result:MatchResponse={status:'COMPLETE',profile,matches:[mockJob],
  matched_official_jobs:0,source:'qa-fixture',scoring:'test-only',privacy:'synthetic',
