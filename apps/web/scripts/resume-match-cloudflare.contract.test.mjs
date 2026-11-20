@@ -121,7 +121,7 @@ test('saved R2 resumes offer direct AI navigation without auto-upload or auto-co
  const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  assert.match(vault,/candidate\/match\?resume=/);
  assert.match(page,/deepLinkPending\.current/);
- assert.match(page,/rows\.some\(item=>item\.id===requested\)/);
+ assert.match(page,/rows\.some\(item=>item\.id===requested&&.*docx/);
  assert.match(page,/setSavedId\(requested\)/);
  assert.doesNotMatch(vault,/submitResumeForMatching/);
 });
