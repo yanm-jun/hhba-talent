@@ -253,8 +253,7 @@ function OriginalPdfViewer({resume,onClose}:{
    const saved=await listPageResumeEdits(resume.id);
    setLayout(data.layout);setChanges(saved.changes||[]);
    const previouslyVerified=await verifyNativeCandidate(saved.changes||[]);
-   setMessage(previouslyVerified?'已恢复经过原字体检查的 PDF 修改稿。':
-    '已打开修改功能。选择简历中有标记的文字即可修改。');
+   setMessage(previouslyVerified?'':'已打开简历，点击文字旁的「修改」即可操作。');
   }catch(error){
    setMessage(error instanceof Error?error.message:'暂时无法修改，请稍后再试。');
   }finally{setVisionBusy(false);}
@@ -276,8 +275,7 @@ function OriginalPdfViewer({resume,onClose}:{
    const response=await savePageResumeEdits(resume.id,updated);
    setChanges(response.changes);setSelectedId(null);setConfirmed(false);
    const accepted=await verifyNativeCandidate(response.changes);
-   setMessage(accepted?'已确认原字体与页面位置，修改已融入 PDF。':
-    '修改已暂存，尚未替换 PDF 原文。原字体未经保真验证，不会用其他字体覆盖。');
+   setMessage(accepted?'':'这份 PDF 暂时不能保留原样式完成替换，修改已暂存。');
   }catch(error){setMessage(error instanceof Error?error.message:'保存失败，请重试。');}
   finally{setSaving(false);}
  }
@@ -386,12 +384,12 @@ function OriginalPdfViewer({resume,onClose}:{
     </div>
     </div>
    </div>
-   {layout&&anchors.length===0&&<p className="hhba-original-resume-note">
+   {layout&&!nativePdf&&anchors.length===0&&<p className="hhba-original-resume-note">
     这页暂时没有找到可以准确修改的位置。你仍然可以查看和下载原件。</p>}
    {changes.length>0&&<>
     <p className="hhba-original-resume-note" role="status">
-     {nativePdf?'已通过原字体与页面校验。修改版沿用 PDF 原字体，原文件仍保留。':
-      '已暂存 '+changes.length+' 处修改，原件保留。这些修改尚未应用到 PDF；原字体未经保真验证，暂不能覆盖原文或导出修改版 PDF。'}
+     {nativePdf?'已保存修改。原来排版和字体保持不变，原件也已保留。':
+      '已暂存 '+changes.length+' 处修改。暂不能保持原样式生成修改版 PDF，你仍可下载原件。'}
     </p>
     {nativePdf&&<div className="hhba-original-resume-review-export">
      <button type="button" onClick={downloadVerifiedNative}><Download size={14}/> 下载 PDF</button>
