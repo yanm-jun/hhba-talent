@@ -769,6 +769,39 @@ try{
  }
 
 
+
+ // Full resume AI writer: prove there is no 5-tip or 12-source limitation.
+ // The synthetic writer is a local QA fixture, not an actual provider claim.
+ {
+  const full=await browser.newPage({viewport:{width:1200,height:900},locale:'zh-CN'});
+  const errors=[];full.on('pageerror',error=>errors.push(error.message));
+  await full.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&full',
+   {waitUntil:'networkidle',timeout:45000});
+  await full.getByRole('button',{name:/优化简历，提高分值/}).first().click();
+  await full.getByRole('region',{name:'原版式 Word 沉浸式 AI 优化舞台'}).waitFor();
+  const assistant=full.locator('.targeted-resume-word-assistant');
+  await assistant.locator('.targeted-resume-ai-settings summary').click();
+  await assistant.locator('.targeted-resume-consent input[type=checkbox]').check();
+  const primary=full.getByRole('button',{name:'AI 针对岗位重写整份简历'});
+  await primary.waitFor({state:'visible'});
+  await primary.click();
+  await full.locator('.hhba-whole-rewrite').waitFor({timeout:20000});
+  const rows=full.locator('.hhba-whole-rewrite-block');
+  assert.equal(await rows.count(),9,
+   'full writer must process ALL nine source paragraphs instead of only five tips');
+  assert.match(await full.locator('.hhba-whole-rewrite-metrics').textContent(),/读取段落 9/);
+  assert.match(await full.locator('.hhba-whole-rewrite-questions').textContent(),/跨区域门店支持/);
+  await full.locator('.hhba-word-native-preview .hhba-word-ai-changed').first().waitFor();
+  assert.equal(await full.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),1);
+  await full.locator('.hhba-whole-rewrite-approval input[type=checkbox]').check();
+  await full.getByText('当前确认不等于已经写入原文件',{exact:false}).waitFor();
+  assert.equal(await full.locator('.hhba-original-resume-history-list li').count(),0,
+   'approving the AI text cannot silently create a Word revision');
+  await full.screenshot({path:output+'/whole-resume-ai-draft-desktop.png',fullPage:true});
+  assert.deepEqual(errors,[],'whole-document AI rewrite review must render without runtime errors');
+  await full.close();
+ }
+
  // A genuine score comparison may be displayed ONLY after saving an original
  // DOCX and feeding its versioned text through the same audited-JD scorer.
  // These 68/70 numbers are explicitly synthetic and never shipped.
