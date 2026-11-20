@@ -56,10 +56,10 @@ try{
  await page.addInitScript(()=>{window.confirm=()=>true});
  const response=await page.goto(url,{waitUntil:'networkidle',timeout:45000});
  assert.equal(response.status(),200);
- await page.getByRole('button',{name:'针对这个岗位优化简历'}).click();
+ await page.getByRole('button',{name:/优化简历，提高分值/}).click();
  await page.getByRole('region',{name:'正式简历排版与打印'}).waitFor();
  assert.equal(await page.locator('.targeted-resume-live-paper .hhba-print-sheet').count(),1,'one live resume paper, not two separate previews');
- const generate=page.getByRole('button',{name:'生成 AI 建议'});
+ const generate=page.getByRole('button',{name:'开始 AI 优化'});
  assert.equal(await generate.isDisabled(),true,'user consent is mandatory');
  await page.locator('.targeted-resume-consent input[type=checkbox]').check();
  await generate.click();
@@ -163,7 +163,7 @@ try{
  const mobile=await browser.newPage({viewport:{width:390,height:844},locale:'zh-CN'});
  const mobileErrors=[];mobile.on('pageerror',e=>mobileErrors.push(e.message));
  await mobile.goto(url,{waitUntil:'networkidle',timeout:45000});
- await mobile.getByRole('button',{name:'针对这个岗位优化简历'}).click();
+ await mobile.getByRole('button',{name:/优化简历，提高分值/}).click();
  await mobile.getByPlaceholder('请填写本人真实姓名').fill('移动端虚拟姓名');
  assert.equal(await mobile.locator('.targeted-resume-live-paper .hhba-print-sheet').count(),1);
  const metrics=await mobile.evaluate(()=>({
@@ -180,7 +180,7 @@ try{
 
  const long=await browser.newPage({viewport:{width:1365,height:900},locale:'zh-CN'});
  await long.goto(url+'?long=1',{waitUntil:'networkidle',timeout:45000});
- await long.getByRole('button',{name:'针对这个岗位优化简历'}).click();
+ await long.getByRole('button',{name:/优化简历，提高分值/}).click();
  await long.getByPlaceholder('请填写本人真实姓名').fill('多页测试姓名');
  const longPdf=await long.pdf({format:'A4',printBackground:true});
  await writeFile(output+'/multipage-resume.pdf',longPdf);
@@ -192,7 +192,7 @@ try{
 
  const truncated=await browser.newPage({viewport:{width:1365,height:900},locale:'zh-CN'});
  await truncated.goto(url+'?truncated=1',{waitUntil:'networkidle',timeout:45000});
- await truncated.getByRole('button',{name:'针对这个岗位优化简历'}).click();
+ await truncated.getByRole('button',{name:/优化简历，提高分值/}).click();
  await truncated.getByRole('alert').filter({hasText:'这份简历有部分内容未显示'}).waitFor();
  await truncated.getByPlaceholder('请填写本人真实姓名').fill('截断测试姓名');
  assert.equal(await truncated.getByRole('button',{name:'导出 PDF'}).isDisabled(),true,
@@ -591,7 +591,7 @@ try{
   const errors=[];first.on('pageerror',e=>errors.push(e.message));
   await first.goto('http://127.0.0.1:3000/qa/resume-flow.html?word',
    {waitUntil:'networkidle',timeout:45000});
-  await first.getByRole('button',{name:'针对这个岗位优化简历'}).click();
+  await first.getByRole('button',{name:/优化简历，提高分值/}).click();
   await first.getByRole('region',{name:'独立简历优化工作区'}).waitFor();
   assert.equal(await first.locator('.targeted-resume-word-workspace').count(),1,
    'saved DOCX should open one Word-first editor');
@@ -604,8 +604,11 @@ try{
   await first.getByRole('button',{name:'放大 Word'}).click();
   assert.match(await first.locator('.hhba-original-resume-word-tools output').textContent(),/125%/);
   await first.getByRole('button',{name:'适合宽度'}).click();
-  assert.equal(await first.locator('.hhba-original-resume-siri-stage.hhba-siri-edge').count(),0,
-   'Word paper must have no rainbow perimeter; gradient belongs to pending letters only');
+  // The immersive entrance uses a *real* four-sided Siri edge on the original
+  // Word canvas; once the entrance ends, the edge pauses until AI work begins.
+  await first.locator('.hhba-word-stage-ready').waitFor({timeout:5000});
+  assert.equal(await first.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),0,
+   'Word idle mode should release the Siri perimeter after entrance');
   const assistant=first.locator('.targeted-resume-word-assistant');
   assert.equal(await assistant.locator('.targeted-resume-ai-settings')
    .evaluate(el=>el.open),false,'the optional privacy and draft controls must start folded');
@@ -621,8 +624,14 @@ try{
   await assistant.locator('.targeted-resume-ai-settings summary').click();
   await first.locator('.targeted-resume-draft-recovery input[type=checkbox]').check();
   await first.locator('.targeted-resume-consent input[type=checkbox]').check();
-  await first.getByRole('button',{name:'生成 AI 建议'}).click();
+  await first.getByRole('button',{name:'开始 AI 优化'}).click();
   await assistant.locator('.targeted-resume-word-suggestion-title').first().waitFor();
+  assert.equal(await first.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),1,
+   'real AI suggestions must illuminate the Word perimeter');
+  await first.locator('.hhba-word-native-preview .hhba-word-ai-preview-text').first().waitFor();
+  assert.match(await first.locator('.hhba-word-native-preview .hhba-word-ai-preview-text').first()
+   .evaluate(el=>getComputedStyle(el).backgroundImage),/linear-gradient/,
+   'the suggestion must appear on the original Word line with Siri colors');
   assert.equal(await assistant.locator('.targeted-resume-word-suggestion').count(),1,
    'AI draft has one navigable original paragraph location');
   await assistant.locator('.targeted-resume-confirm input[type=checkbox]').check();
@@ -687,7 +696,7 @@ try{
    'editing repeatedly must not silently extend the six-hour private draft consent');
   first.on('dialog',dialog=>{void dialog.accept()});
   await first.reload({waitUntil:'networkidle',timeout:45000});
-  await first.getByRole('button',{name:'针对这个岗位优化简历'}).click();
+  await first.getByRole('button',{name:/优化简历，提高分值/}).click();
   await first.getByRole('region',{name:'独立简历优化工作区'}).waitFor();
   const recoveredAssistant=first.locator('.targeted-resume-word-assistant');
   if(view.name==='mobile'){
