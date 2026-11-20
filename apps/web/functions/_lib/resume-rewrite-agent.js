@@ -57,7 +57,9 @@ export function modelDecision(raw,validIds){
 }
 const uniqueQuestions=list=>list.filter((q,i,a)=>
  a.findIndex(x=>x.blockId===q.blockId&&x.question===q.question)===i);
-const excerpt=value=>String(value||'').slice(0,1800);
+// The editor receives a compact document map; it can choose inspect_source
+// to read any full source section before making consequential rewrite calls.
+const excerpt=value=>String(value||'').slice(0,750);
 const validRewriteResult=(row,block,validateAuthoring,numberTokens)=>{
  if(!row||typeof row.text!=='string')return 'AI_AGENT_REWRITE_MISSING';
  const quotes=Array.isArray(row.sourceQuotes)?row.sourceQuotes:[];
