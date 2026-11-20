@@ -187,3 +187,63 @@
   display:none!important;
  }
 }
+
+
+/* Native Word canvas controls: revision-aware and touch-friendly. */
+.hhba-original-resume-word-tools{
+ display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:8px 0 12px;
+}
+.hhba-original-resume-word-tools button{
+ display:inline-flex;align-items:center;justify-content:center;min-width:36px;min-height:36px;
+ gap:5px;padding:7px 11px;border:1px solid #dbe4ec;border-radius:8px;background:#fff;
+ color:#35475d;font:600 12px/1.3 inherit;cursor:pointer;
+}
+.hhba-original-resume-word-tools button:disabled{opacity:.45;cursor:not-allowed}
+.hhba-original-resume-word-tools output{
+ font:600 12px/1.4 inherit;color:#5b697a;min-width:42px;text-align:center;
+}
+.hhba-word-native-preview .hhba-original-resume-canvas{max-width:none}
+.hhba-word-native-preview{justify-content:flex-start;overscroll-behavior:contain}
+.hhba-original-resume-word-status{
+ display:flex;align-items:center;gap:7px;font-size:12px;color:#536479;line-height:1.65;
+ padding:9px 11px;border:1px solid #e5eaf0;border-radius:9px;background:#fff;margin:0 0 9px;
+}
+.hhba-original-resume-word-status.is-busy{color:#365469;background:#f5f9fc}
+.hhba-original-resume-mobile-dock{display:none}
+@media(max-width:700px){
+ .hhba-original-resume-toolbar{gap:9px}
+ .hhba-original-resume-toolbar>div:last-child{flex-wrap:wrap}
+ .hhba-original-resume-toolbar>div:last-child button{min-height:40px}
+ .hhba-original-resume-word-tools{justify-content:flex-end}
+ .hhba-original-resume-word-tools button{min-width:44px;min-height:44px}
+ .hhba-original-resume-review-export{justify-content:stretch}
+ .hhba-original-resume-review-export>button{flex:1;min-height:42px}
+ .hhba-word-native-preview{padding:10px;max-height:65dvh}
+ .hhba-word-native-preview .hhba-original-resume-anchor{
+  min-width:26px;min-height:23px;border-width:1.5px;
+ }
+ .hhba-original-resume-page-frame .hhba-original-resume-edit-glow{
+  position:fixed!important;top:auto!important;left:0!important;right:0!important;
+  bottom:0!important;width:100vw!important;max-width:100vw!important;
+  border-radius:18px 18px 0 0;z-index:3250;
+  box-shadow:0 -14px 60px rgba(18,33,54,.18);
+ }
+ .hhba-original-resume-editbox{
+  border-radius:18px 18px 0 0;max-height:64dvh;overflow-y:auto;
+  padding:17px 16px calc(16px + env(safe-area-inset-bottom,0px));
+ }
+ .hhba-original-resume-editbox textarea{min-height:100px;font-size:16px}
+ .hhba-original-resume-editbox-actions>button{min-height:44px;min-width:100px}
+ .hhba-original-resume-mobile-dock{
+  display:flex;position:sticky;bottom:0;z-index:20;
+  margin:10px -9px -9px;padding:9px 10px calc(9px + env(safe-area-inset-bottom,0px));
+  background:rgba(255,255,255,.97);border-top:1px solid #e5eaf1;gap:8px;
+ }
+ .hhba-original-resume-mobile-dock button{
+  flex:1;min-width:0;min-height:44px;border:1px solid #dbe4ec;border-radius:9px;
+  background:#fff;color:#2d455d;font:600 12px/1.3 inherit;cursor:pointer;
+ }
+ .hhba-original-resume-mobile-dock button:disabled{opacity:.48}
+ .hhba-original-resume-toolbar .hhba-original-resume-revision-action{display:none}
+ .hhba-original-resume-review-export{display:none}
+}
