@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState} from 'react';
-import {ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,Redo2,X} from 'lucide-react';
+import {ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,Redo2,ZoomIn,ZoomOut,Sparkles,X} from 'lucide-react';
 import type {PrivateResume} from '../services/privateResumes';
 import {downloadPrivateResume,fetchPrivateResumeForLocalReview} from '../services/privateResumes';
 import {extractDocxText} from '../services/docxProfile.mjs';
@@ -14,9 +14,10 @@ import '../styles/siri-edge.css';
 // The original DOCX is NEVER converted into an HHBA template. A privately
 // rendered PDF is used only to show the source page. Downloaded edits are
 // the genuine original OOXML with a verified small text change.
-export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
- resume:PrivateResume;onClose:()=>void;
+export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0}:{
+ resume:PrivateResume;onClose?:()=>void;
  suggestedChanges?:{original:string;proposed:string}[];
+ onOpenSuggestions?:()=>void;pendingSuggestionCount?:number;
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
@@ -28,6 +29,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
  const [page,setPage]=useState(1);
  const [count,setCount]=useState(0);
  const [width,setWidth]=useState(680);
+ const [zoom,setZoom]=useState(1);
  const [paperSize,setPaperSize]=useState({width:0,height:0});
  const [editable,setEditable]=useState<string[]>([]);
  const [anchors,setAnchors]=useState<WordAnchor[]>([]);
@@ -41,6 +43,30 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
  const [maxRevisions,setMaxRevisions]=useState(8);
  const [refresh,setRefresh]=useState(0);
  const [message,setMessage]=useState('');
+ const restorePosition=useRef<{page:number;left:number;top:number;outerTop:number}|null>(null);
+ function rememberPosition(){
+  const node=paper.current;
+  const outer=node?.closest('.hhba-match-modal-content') as HTMLElement|null;
+  restorePosition.current={page,left:node?.scrollLeft||0,top:node?.scrollTop||0,
+   outerTop:outer?.scrollTop||0};
+ }
+ function confirmDiscardText(){
+  return !selected||!draft.trim()||draft===selected.text||
+   window.confirm('这段文字还没有保存。确定丢弃这次修改吗？');
+ }
+ function closeEditor(){
+  if(!confirmDiscardText())return;
+  onClose?.();
+ }
+ useEffect(()=>{
+  setPage(1);setZoom(1);restorePosition.current=null;
+ },[resume.id]);
+ useEffect(()=>{
+  if(!selected||!draft.trim()||draft===selected.text)return;
+  const handle=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue='';};
+  window.addEventListener('beforeunload',handle);
+  return()=>window.removeEventListener('beforeunload',handle);
+ },[selected,draft]);
 
  useEffect(()=>{
   const controller=new AbortController();
@@ -54,7 +80,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
  useEffect(()=>{
   if(ready==='checking')return;
   let active=true,task:any=null;
-  setLoading(true);setPreviewError('');setPage(1);setAnchors([]);setSelected(null);
+  setLoading(true);setPreviewError('');setAnchors([]);setSelected(null);
   void(async()=>{
    try{
     if(ready==='unavailable'){
@@ -101,7 +127,8 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
     }
     if(!active)return;
     setEditable((info.editable_text||[]).filter(t=>counts.get(t)===1));
-    doc.current=result;setCount(result.numPages);setLoading(false);
+    doc.current=result;setCount(result.numPages);
+    setPage(current=>Math.min(Math.max(1,current),result.numPages));setLoading(false);
    }catch(error){
     if(active){
      setPreviewError(error instanceof Error?error.message:'无法打开这份 Word。');
@@ -121,7 +148,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
     const source=doc.current,view=await source.getPage(page);
     if(!active||!surface.current)return;
     const base=view.getViewport({scale:1});
-    const scale=Math.min(1.65,Math.max(.5,width/base.width));
+    const scale=Math.min(3.2,Math.max(.5,width/base.width))*zoom;
     const viewport=view.getViewport({scale});
     const ratio=Math.min(1.5,window.devicePixelRatio||1);
     const canvas=surface.current;
@@ -148,7 +175,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
    }
   })();
   return()=>{active=false;try{task?.cancel();}catch{}};
- },[page,ready,loading,editable,width,saved,refresh]);
+ },[page,ready,loading,editable,width,zoom,saved,refresh]);
 
  useEffect(()=>{
   const el=paper.current;if(!el)return;
@@ -156,7 +183,20 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
   update();const observer=new ResizeObserver(update);observer.observe(el);
   return()=>observer.disconnect();
  },[ready,loading]);
-
+ useEffect(()=>{
+  const position=restorePosition.current;
+  if(loading||!position||page!==position.page||!paper.current)return;
+  const node=paper.current;
+  const outer=node.closest('.hhba-match-modal-content') as HTMLElement|null;
+  const id=requestAnimationFrame(()=>{
+   requestAnimationFrame(()=>{
+    node.scrollLeft=position.left;node.scrollTop=position.top;
+    if(outer)outer.scrollTop=position.outerTop;
+    restorePosition.current=null;
+   });
+  });
+  return()=>cancelAnimationFrame(id);
+ },[loading,page,paperSize.width,paperSize.height,refresh]);
  async function downloadOriginal(){
   try{await downloadPrivateResume(resume);}
   catch(error){setMessage(error instanceof Error?error.message:'下载失败，请重试。');}
@@ -175,7 +215,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
  }
  async function save(){
   if(!selected||!confirmed||busy||!draft.trim()||draft.length>300)return;
-  setBusy(true);setMessage('');
+  rememberPosition();setBusy(true);setMessage('');
   try{
    const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision);
    setSelected(null);setConfirmed(false);setSaved(true);
@@ -187,7 +227,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
  async function changeRevision(action:'undo'|'redo'){
   if(busy||ready!=='available'||action==='undo'&&revision<=0||
    action==='redo'&&revision>=totalRevisions)return;
-  setBusy(true);setMessage('');setSelected(null);setConfirmed(false);
+  rememberPosition();setBusy(true);setMessage('');setSelected(null);setConfirmed(false);
   try{
    const result=await shiftOriginalWordRevision(resume.id,action,revision);
    setRevision(result.revision);setTotalRevisions(result.total_revisions);
@@ -202,14 +242,14 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
    <div><strong>{resume.name}</strong><p>原件始终保留</p></div>
    <div>
     {ready==='available'&&<>
-     <button type="button" disabled={busy||loading||revision<=0}
+     <button type="button" className="hhba-original-resume-revision-action" disabled={busy||loading||revision<=0}
       onClick={()=>void changeRevision('undo')}><Undo2 size={15}/> 撤销</button>
-     <button type="button" disabled={busy||loading||revision>=totalRevisions}
+     <button type="button" className="hhba-original-resume-revision-action" disabled={busy||loading||revision>=totalRevisions}
       onClick={()=>void changeRevision('redo')}><Redo2 size={15}/> 重做</button>
     </>}
     <button type="button" onClick={()=>void downloadOriginal()}>
      <Download size={15}/> 下载原件</button>
-    <button type="button" onClick={onClose} aria-label="关闭原件预览"><X size={16}/></button>
+    {onClose&&<button type="button" onClick={closeEditor} aria-label="关闭原件预览"><X size={16}/></button>}
    </div>
   </div>
   {ready==='available'&&<p className="hhba-original-resume-note" role="status">
@@ -217,6 +257,9 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
    每次修改后都可以继续点选下一段，撤销和重做不会覆盖原始 Word。
   </p>}
   {loading&&<p className="hhba-original-resume-note" role="status">正在打开简历…</p>}
+  {busy&&<p className="hhba-original-resume-word-status is-busy" role="status">
+   正在校验原 Word 的文字位置、字体与分页，保存后同步准备 PDF；检查不通过不会覆盖原件。
+  </p>}
   {previewError&&<div className="hhba-original-resume-note" role="alert">
    <p>{previewError}</p>
    {ready==='available'&&<button type="button" disabled={busy}
@@ -227,9 +270,17 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
    <pre>{text}</pre>
   </div>}
   {!loading&&ready==='available'&&!previewError&&<>
+   <div className="hhba-original-resume-word-tools" role="group" aria-label="Word 预览缩放">
+    <button type="button" aria-label="缩小 Word" onClick={()=>setZoom(value=>Math.max(.75,Math.round((value-.25)*100)/100))}
+     disabled={zoom<=.75}><ZoomOut size={15}/></button>
+    <output aria-live="polite">{Math.round(zoom*100)}%</output>
+    <button type="button" aria-label="放大 Word" onClick={()=>setZoom(value=>Math.min(2,Math.round((value+.25)*100)/100))}
+     disabled={zoom>=2}><ZoomIn size={15}/></button>
+    <button type="button" onClick={()=>setZoom(1)} disabled={zoom===1}>适合宽度</button>
+   </div>
    <div className={'hhba-original-resume-siri-stage hhba-siri-edge'+
     (selected?' hhba-siri-edge-active':'')}>
-    <div className="hhba-original-resume-paper" ref={paper}>
+    <div className="hhba-original-resume-paper hhba-word-native-preview" ref={paper}>
      <div className="hhba-original-resume-page-frame" style={{
       width:paperSize.width||undefined,height:paperSize.height||undefined
      }}>
@@ -265,7 +316,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
          aria-label="修改 Word 原文">
          <div className="hhba-original-resume-editbox-title">
           <strong>修改这段</strong>
-          <button type="button" aria-label="取消修改" onClick={()=>setSelected(null)}>
+          <button type="button" aria-label="取消修改" onClick={()=>{if(confirmDiscardText())setSelected(null)}}>
            <X size={14}/></button>
          </div>
          <textarea aria-label="修改 Word 文字" value={draft} rows={3}
@@ -302,6 +353,14 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
      下一页 <ChevronRight size={15}/></button>
    </nav>
   </>}
+  {ready==='available'&&<div className="hhba-original-resume-mobile-dock" role="group" aria-label="手机端 Word 操作">
+   {onOpenSuggestions&&<button type="button" onClick={onOpenSuggestions}>
+    <Sparkles size={15}/> AI 建议{pendingSuggestionCount?' '+pendingSuggestionCount:''}</button>}
+   <button type="button" disabled={busy||loading||revision<=0}
+    onClick={()=>void changeRevision('undo')}><Undo2 size={15}/> 撤销</button>
+   <button type="button" disabled={busy||loading||!saved}
+    onClick={()=>void downloadSavedPdf()}><Download size={15}/> PDF</button>
+  </div>}
   {message&&<p className="hhba-original-resume-note" role="status">{message}</p>}
  </section>;
 }
