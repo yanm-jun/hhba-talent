@@ -262,7 +262,10 @@ export async function onRequestPost({request,env}){
    const next=state.revision+(action==='undo'?-1:1);
    if(next<0||next>state.items.length)return fail('WORD_REVISION_CONFLICT',409);
    await commitManifest(bucket,state,row,next,state.items);
-   if(!await stillOwned(db,row,candidate.phone))return fail('RESUME_NOT_FOUND',404);
+   if(!await stillOwned(db,row,candidate.phone)){
+    await bucket.delete(state.key+'.json').catch(()=>{});
+    return fail('RESUME_NOT_FOUND',404);
+   }
    return json({ok:true,saved:next>0,revision:next,total_revisions:state.items.length});
   }
   if(state.revision>=MAX_REVISIONS) return fail('WORD_REVISION_LIMIT',422);
@@ -300,7 +303,11 @@ export async function onRequestPost({request,env}){
    await bucket.delete(revisionKey(state.key,item,'docx')).catch(()=>{});
    await bucket.delete(revisionKey(state.key,item,'pdf')).catch(()=>{});
   }
-  if(!await stillOwned(db,row,candidate.phone))return fail('RESUME_NOT_FOUND',404);
+  if(!await stillOwned(db,row,candidate.phone)){
+   await Promise.all([wordKey,pdfKey,state.key+'.json'].map(key=>
+    bucket.delete(key).catch(()=>{})));
+   return fail('RESUME_NOT_FOUND',404);
+  }
   return json({ok:true,saved:true,revision:items.length,
    total_revisions:items.length,page_count:result.pageCount});
  }catch(error){
