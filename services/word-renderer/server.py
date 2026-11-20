@@ -23,6 +23,8 @@ from zipfile import ZipFile, BadZipFile
 import xml.etree.ElementTree as ET
 
 QA_PATH = Path(__file__).with_name("word_layout.py")
+if not QA_PATH.exists():
+    QA_PATH = Path(__file__).resolve().parents[2] / "apps/web/scripts/word-layout-preservation.qa.py"
 spec = importlib.util.spec_from_file_location("word_layout", QA_PATH)
 assert spec and spec.loader
 qa = importlib.util.module_from_spec(spec)
