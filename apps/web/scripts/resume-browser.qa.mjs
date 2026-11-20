@@ -795,6 +795,8 @@ try{
   assert.match(await full.locator('.hhba-whole-rewrite-questions').textContent(),/跨区域门店支持/);
   await full.locator('.hhba-word-native-preview .hhba-word-ai-changed').first().waitFor();
   assert.equal(await full.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),1);
+  const realName=full.getByRole('textbox',{name:'岗位简历真实姓名'});
+  await realName.fill('虚构测试用户');
   await full.locator('.hhba-whole-rewrite-approval input[type=checkbox]').check();
   await full.getByText('当前确认不等于已经写入原文件',{exact:false}).waitFor();
   const exported=full.waitForEvent('download');
@@ -806,6 +808,10 @@ try{
    'whole-document AI writing must yield a genuine editable Office ZIP package');
   const docxXml=execFileSync('unzip',['-p',downloaded,'word/document.xml'],{encoding:'utf8'});
   assert.match(docxXml,/REWRITTEN WORD RESUME/);
+  assert.match(docxXml,/虚构测试用户/,
+   'downloaded Word must contain the user-supplied actual document name, not a placeholder');
+  assert.match(docxXml,/职业概述与个人优势/,
+   'whole rewrite should export professionally titled CV sections, not one unsorted text dump');
   assert.match(docxXml,/虚构经历段落8/,
    'the final Word file must include the final paragraph, not just the first five AI tips');
   assert.doesNotMatch(docxXml,/只允许处理五段/);
