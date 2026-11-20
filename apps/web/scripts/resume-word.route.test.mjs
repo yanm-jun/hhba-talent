@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createResumeDocx} from '../src/services/resumeDocx.ts';
+import {editOriginalDocxStrict} from '../src/services/resumeDocxPreserve.mjs';
 import {onRequestGet,onRequestPost} from '../functions/api/resume-word.js';
 const origin='https://preview.hhba.example';
 const id='11111111-2222-4333-8444-555555555555';
@@ -278,4 +279,81 @@ test('multiple Word edits persist; undo/redo restore every verified DOCX and PDF
   const branched=await (await onRequestGet({request:req('inspect'),env:x.env})).json();
   assert.ok(branched.editable_text.includes('名号'));
  }finally{globalThis.fetch=previous;}
+});
+
+test('legacy V1 verified Word files remain readable, editable and reversible',async()=>{
+ const x=fixture();
+ const base=store+'.hhba-word-preserved-v1-'+sha;
+ const legacy=await editOriginalDocxStrict(original,[
+  {original:'测试用户',text:'测试名'}
+ ]);
+ x.saved.set(base+'.docx',legacy);
+ x.saved.set(base+'.edited.pdf',pdf);
+ x.saved.set(base+'.json',JSON.stringify({
+  schema:'HHBA_ORIGINAL_WORD_EDIT_V1',source_sha256:sha,
+  original:'测试用户',text:'测试名',page_count:1,
+  docx_sha256:createHash('sha256').update(legacy).digest('hex'),
+  preview_sha256:createHash('sha256').update(pdf).digest('hex'),
+  updated_at:'2026-11-19T00:00:00Z'
+ }));
+ const before=await (await onRequestGet({request:req('inspect'),env:x.env})).json();
+ assert.equal(before.revision,1);
+ assert.ok(before.editable_text.includes('测试名'));
+ const old=globalThis.fetch;
+ globalThis.fetch=async url=>url.endsWith('/v1/verify')?
+  Response.json({ok:true,verified:true,report:{
+   passed:true,page_count:1,changed_pixels:25,
+   changed_region:{page:1,x:40,y:40,width:80,height:20}
+  }}):new Response(pdf,{status:200,headers:{'Content-Type':'application/pdf'}});
+ try{
+  const next=await onRequestPost({request:req('export',{method:'POST',body:{
+   resume_id:id,action:'edit',original:'测试名',text:'新名',expected_revision:1,
+   confirmed_real:true,consent_word_processing:true
+  }}),env:x.env});
+  assert.equal(next.status,200,await next.clone().text());
+  const state=await (await onRequestGet({request:req('inspect'),env:x.env})).json();
+  assert.equal(state.revision,2);
+  assert.equal(state.total_revisions,2);
+  assert.ok(state.editable_text.includes('新名'));
+  const undo=await onRequestPost({request:req('export',{method:'POST',body:{
+   resume_id:id,action:'undo',expected_revision:2,
+   confirmed_real:true,consent_word_processing:true
+  }}),env:x.env});
+  assert.equal(undo.status,200);
+  const restored=Buffer.from(await (await onRequestGet({
+   request:req('download'),env:x.env})).arrayBuffer());
+  assert.deepEqual(restored,Buffer.from(legacy));
+ }finally{globalThis.fetch=old;}
+});
+
+test('competing edits use compare-and-swap; one writer wins and the other is rejected',async()=>{
+ const x=fixture();
+ const prior=globalThis.fetch;
+ let ready=0,release;
+ const barrier=new Promise(resolve=>{release=resolve;});
+ globalThis.fetch=async url=>{
+  if(url.endsWith('/v1/verify')){
+   if(++ready===2)release();
+   await barrier;
+   return Response.json({ok:true,verified:true,report:{
+    passed:true,page_count:1,changed_pixels:25,
+    changed_region:{page:1,x:50,y:40,width:80,height:20}
+   }});
+  }
+  return new Response(pdf,{status:200,headers:{'Content-Type':'application/pdf'}});
+ };
+ try{
+  const make=text=>onRequestPost({request:req('export',{method:'POST',body:{
+   resume_id:id,action:'edit',original:'测试用户',text,
+   expected_revision:0,confirmed_real:true,consent_word_processing:true
+  }}),env:x.env});
+  const responses=await Promise.all([make('测试名'),make('测试人')]);
+  assert.deepEqual(responses.map(r=>r.status).sort(),[200,409]);
+  const current=await (await onRequestGet({request:req('inspect'),env:x.env})).json();
+  assert.equal(current.revision,1);
+  assert.equal(current.total_revisions,1);
+  const manifest=JSON.parse(x.saved.get(store+'.hhba-word-preserved-v1-'+sha+'.json'));
+  assert.equal(manifest.items.length,1);
+  assert.equal(x.saved.size,4,'losing writer must remove its unused Word/PDF revision');
+ }finally{globalThis.fetch=prior;}
 });
