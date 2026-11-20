@@ -39,7 +39,7 @@ function indexClassicPdf(bytes){
   const line=entries[i]?.match(/^(\d{10})\s+00000\s+n\s*$/);
   check(Boolean(line));
   const offset=Number(line[1]);
-  check(offset>9&&offset<xrefAt);
+  check(offset>=9&&offset<xrefAt);
   positions.push({id:i,offset});
  }
  const sorted=positions.slice().sort((a,b)=>a.offset-b.offset);
