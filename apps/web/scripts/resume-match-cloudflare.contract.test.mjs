@@ -195,7 +195,9 @@ test('native Top10 is in a focus-managed single dialog with reasons and direct U
  assert.match(dialog,/onMouseDown/);
  assert.match(dialog,/document\.body\.style\.overflow='hidden'/);
  assert.match(dialog,/job\.recommendation_reason/);
- assert.match(dialog,/href=\{job\.official_url\}/);
+ assert.match(dialog,/href=\{officialApplicationUrl\(job\)!\}/);
+ assert.match(dialog,/data-hhba-recruitment-outbound="true"/);
+ assert.match(dialog,/officialApplicationUrl\(job\)\?/);
 });
 
 test('same-version audited internal job with minimum 7 years is rejected for 3-year applicant',()=>{
