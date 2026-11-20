@@ -498,6 +498,10 @@ try{
   await assertSiriEdge(word,'.hhba-original-resume-edit-glow',
    view.name+' original Word popup');
   const input=word.getByRole('textbox',{name:'修改 Word 文字'});
+  assert.equal(await input.inputValue(),'EDITED WORD RESUME',
+   'a confirmed exact AI suggestion should prefill only the clicked native Word anchor');
+  assert.equal(await word.getByRole('button',{name:'保存',exact:true}).isDisabled(),true,
+   'pre-filled AI text must never be saved before the user confirms');
   await input.fill('EDITED WORD RESUME');
   assert.equal(await word.getByRole('button',{name:'保存',exact:true}).isDisabled(),
    true,'Word change must require confirmation');
