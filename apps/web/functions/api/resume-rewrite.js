@@ -3,7 +3,9 @@
 // No artificial 5-suggestion/3-per-day product cap. External abuse controls
 // and authenticated access remain mandatory before any production rollout.
 import {sessionOfBearer,getUserByPhone} from '../_lib/real-auth.js';
-import {generateTailoredResume,REWRITE_KIND} from '../_lib/resume-rewrite-provider.js';
+import {generateTailoredResume,REWRITE_KIND,completeJson,validateAuthoring,numberTokens,redacted} from '../_lib/resume-rewrite-provider.js';
+import {selectProvider} from '../_lib/resume-ai-provider.js';
+import {runResumeEditorialAgent} from '../_lib/resume-rewrite-agent.js';
 const MAX_BODY=1024*1024;
 const json=(payload,status=200)=>new Response(JSON.stringify(payload),{
  status,headers:{'Content-Type':'application/json; charset=utf-8',
@@ -47,7 +49,9 @@ export async function onRequestGet({env}){
   selectProvider(env,'resume_rewrite');configured=true;
  }catch{}
  return json({ok:true,kind:REWRITE_KIND,enabled:active(env)&&configured,
-  configured,mode:'full_document_draft',requires_user_approval:true});
+  configured,mode:env?.HHBA_RESUME_AGENT_ENABLED==='0'?'full_document_draft':'model_directed_editorial_agent',
+  autonomy_enabled:env?.HHBA_RESUME_AGENT_ENABLED!=='0',
+  requires_user_approval:true});
 }
 export async function onRequestPost({request,env}){
  if(!originOK(request))return reject('ORIGIN_REQUIRED',403);
@@ -64,11 +68,22 @@ export async function onRequestPost({request,env}){
  catch{return reject('INVALID_REQUEST',400);}
  if(body?.consent_ai!==true)return reject('AI_CONSENT_REQUIRED',400);
  try{
-  const result=await generateTailoredResume({
-   env,blocks:body.blocks,job:body.job,
-   signal:AbortSignal.timeout(150000)
+  // All requests remain explicit-consent, candidate-only and local to this
+  // draft. The model may choose further editorial tools, not privileged I/O.
+  const signal=AbortSignal.timeout(150000);
+  const base=await generateTailoredResume({
+   env,blocks:body.blocks,job:body.job,signal
   });
-  return json(result);
+  if(env?.HHBA_RESUME_AGENT_ENABLED==='0')return json(base);
+  const author=selectProvider(env,'resume_rewrite');
+  let reviewer;
+  try{reviewer=selectProvider(env,'resume_reviewer');}
+  catch(e){if(e.message!=='AI_PROVIDER_NOT_CONFIGURED')throw e;reviewer=author;}
+  const autonomous=await runResumeEditorialAgent({
+   draft:base,blocks:body.blocks,job:body.job,env,provider:author,reviewer,
+   completeJson,validateAuthoring,numberTokens,redacted,signal
+  });
+  return json(autonomous);
  }catch(e){
   const allowed=new Set(['INVALID_REWRITE_INPUT','AI_PROVIDER_NOT_CONFIGURED',
    'AI_PROVIDER_UNSUPPORTED','AI_PROVIDER_RATE_LIMITED',
