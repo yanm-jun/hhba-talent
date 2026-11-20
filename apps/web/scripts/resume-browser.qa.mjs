@@ -655,9 +655,14 @@ try{
    inkGeometry.textBottom<=inkGeometry.anchorBottom+4,
    'colored Word words must be INSIDE the exact source-line box, not clipped above it');
   await first.screenshot({path:output+'/word-first-'+view.name+'-siri-on-document.png',fullPage:true});
-  assert.match(await first.locator('.hhba-word-native-preview .hhba-word-ai-preview-text').first()
+  assert.match(await first.locator('.hhba-word-native-preview .hhba-word-ai-changed').first()
    .evaluate(el=>getComputedStyle(el).backgroundImage),/linear-gradient/,
-   'the suggestion must appear on the original Word line with Siri colors');
+   'actual changed glyphs must appear on the original Word line with Siri colors');
+  const changedText=await first.locator('.hhba-word-native-preview .hhba-word-ai-changed').first().textContent();
+  assert.match(changedText||'',/同步整理每日服务记录/,
+   'in-document preview must show the real added Word text, not a generic AI placeholder');
+  const unchangedText=await first.locator('.hhba-word-native-preview .hhba-word-ai-unchanged').first().textContent();
+  assert.equal(unchangedText,'…','oversized Word suggestions show actual change with an honest overflow marker');
   assert.equal(await assistant.locator('.targeted-resume-word-suggestion').count(),1,
    'AI draft has one navigable original paragraph location');
   await assistant.locator('.targeted-resume-confirm input[type=checkbox]').check();
