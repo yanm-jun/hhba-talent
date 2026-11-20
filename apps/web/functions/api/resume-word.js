@@ -200,6 +200,10 @@ export async function onRequestGet({request,env}){
   if(action==='download'||action==='edited-preview'||action==='download-pdf'){
    await loadBytes(bucket,row);
    const state=await approved(bucket,row);
+   const requested=new URL(request.url).searchParams.get('revision');
+   if(requested!==null&&(!/^(?:0|[1-9][0-9]?)$/.test(requested)||
+    Number(requested)!==state.revision))
+    return fail('WORD_REVISION_CONFLICT',409);
    if(!state.saved)return fail('WORD_NOT_EDITED',404);
    const word=action==='download';
    const bytes=await versionBytes(bucket,state.key,state.saved,word?'docx':'pdf');
