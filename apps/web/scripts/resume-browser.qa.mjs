@@ -645,8 +645,9 @@ try{
    }catch{return false;}
   }));
   const firstExpiry=await first.evaluate(()=>{
-   const key=Object.keys(sessionStorage).find(k=>k.startsWith('hhba:word-draft-v1:'))!;
-   return JSON.parse(sessionStorage.getItem(key)!).expires_at;
+   const key=Object.keys(sessionStorage).find(k=>k.startsWith('hhba:word-draft-v1:'));
+   if(!key)throw Error('missing session draft key');
+   return JSON.parse(sessionStorage.getItem(key)||'{}').expires_at;
   });
   await nativeText.fill('PENDING USER WORD DRAFT UPDATED');
   await first.waitForFunction(()=>Object.keys(sessionStorage).some(key=>{
@@ -655,8 +656,9 @@ try{
     'PENDING USER WORD DRAFT UPDATED'}catch{return false}
   }));
   const expiryAfterEdit=await first.evaluate(()=>{
-   const key=Object.keys(sessionStorage).find(k=>k.startsWith('hhba:word-draft-v1:'))!;
-   return JSON.parse(sessionStorage.getItem(key)!).expires_at;
+   const key=Object.keys(sessionStorage).find(k=>k.startsWith('hhba:word-draft-v1:'));
+   if(!key)throw Error('missing session draft key');
+   return JSON.parse(sessionStorage.getItem(key)||'{}').expires_at;
   });
   assert.equal(expiryAfterEdit,firstExpiry,
    'editing repeatedly must not silently extend the six-hour private draft consent');
