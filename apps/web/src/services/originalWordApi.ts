@@ -62,8 +62,10 @@ export async function wordEditableText(id:string,signal?:AbortSignal):Promise<Wo
  const response=await send(url(id,'inspect'),'GET',undefined,signal);
  return response.json();
 }
-export async function wordPreviewBytes(id:string,edited=false,signal?:AbortSignal){
- const response=await send(url(id,edited?'edited-preview':'preview'),'GET',undefined,signal);
+export async function wordPreviewBytes(id:string,edited=false,signal?:AbortSignal,revision?:number){
+ const path=url(id,edited?'edited-preview':'preview')+
+  (edited&&revision!==undefined?'&revision='+revision:'');
+ const response=await send(path,'GET',undefined,signal);
  const buffer=await response.arrayBuffer();
  if(buffer.byteLength<500||buffer.byteLength>12*1024*1024)
   throw Error('简历预览文件不完整。');
