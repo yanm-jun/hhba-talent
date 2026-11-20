@@ -347,7 +347,7 @@ try{
  // throughout confirmation; native font proof is required before downloading.
  const authentic=await browser.newPage({viewport:{width:1100,height:900},
   locale:'zh-CN',acceptDownloads:true});
- const nativeErrors=[];authentic.on('pageerror',e=>nativeErrors.push(e.message));
+ const authenticErrors=[];authentic.on('pageerror',e=>authenticErrors.push(e.message));
  await authentic.goto('http://127.0.0.1:3000/qa/original-resume-viewer.html',
   {waitUntil:'networkidle',timeout:45000});
  const startNative=authentic.getByRole('button',{name:'开始修改'});
@@ -380,7 +380,7 @@ try{
  assert.ok(!nativePages.join(' ').includes('ORIGINAL RESUME VIEW'));
  assert.ok(nativeData.toString('latin1').includes('/BaseFont /Helvetica'),
   'source Type1 Helvetica resource must survive unmodified');
- assert.deepEqual(nativeErrors,[]);
+ assert.deepEqual(authenticErrors,[]);
  await authentic.close();
 
  // True original Word page preview (no HHBA re-template), in-place edit and
