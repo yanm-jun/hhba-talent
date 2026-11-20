@@ -568,6 +568,9 @@
 }
 @media(max-width:700px){
  .targeted-resume.is-word-first{padding:0 0 5px}
+ /* The selected job and score are already shown above: on phones, do not
+    repeat the job title before the user's actual Word page. */
+ .hhba-match-workspace .targeted-resume.is-word-first .targeted-resume-heading{display:none}
  .targeted-resume.is-word-first .targeted-resume-heading{padding:4px 8px 9px}
  .targeted-resume.is-word-first .targeted-resume-heading h3{font-size:17px;margin-top:3px}
  .targeted-resume.is-word-first .targeted-resume-word-workspace{
