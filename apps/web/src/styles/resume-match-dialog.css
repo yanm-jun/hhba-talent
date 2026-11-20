@@ -154,3 +154,25 @@
   width:100%;min-height:42px;
  }
 }
+
+
+/* Match score is the beginning of the optimization journey. */
+.hhba-native-score{min-width:165px;flex:0 0 165px;align-items:flex-end}
+.hhba-native-optimize-action{width:100%;border:0;margin:10px 0 0;padding:0}
+.hhba-native-optimize-action>button{
+ width:100%;min-height:43px;display:flex;align-items:center;justify-content:center;gap:8px;
+ padding:10px 12px;border:1px solid #4a799d;border-radius:9px;
+ background:#315b7b;color:#fff;font-size:12px;font-weight:680;
+ cursor:pointer;line-height:1.5;box-shadow:0 3px 10px rgba(46,87,123,.1);
+}
+.hhba-native-optimize-action>button:hover{background:#254d6d;color:#fff}
+.hhba-native-optimize-action>button:focus-visible{outline:3px solid #9fbada;outline-offset:2px}
+.hhba-native-optimize-action>button span{color:#dfeaf6}
+@media(max-width:650px){
+ .hhba-native-score{min-width:132px;flex-basis:132px}
+ .hhba-native-optimize-action>button{font-size:11px;padding:8px;min-height:42px}
+}
+@media(max-width:375px){
+ .hhba-native-score{min-width:113px;flex-basis:113px}
+ .hhba-native-optimize-action>button{font-size:10px}
+}
