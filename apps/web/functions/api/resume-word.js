@@ -51,7 +51,10 @@ async function loadBytes(bucket,row){
  const item=await bucket.get(row.storage_key);
  if(!item)throw Error('RESUME_NOT_FOUND');
  const bytes=new Uint8Array(await item.arrayBuffer());
- if(bytes.length!==row.size_bytes)throw Error('RESUME_BYTES_MISMATCH');
+ // The owner-scoped DB SHA is authoritative. A same-size but tampered R2
+ // object must never be rendered or used to create a downloadable resume.
+ if(bytes.length!==row.size_bytes||await shaBytes(bytes)!==row.sha256)
+  throw Error('RESUME_BYTES_MISMATCH');
  return bytes;
 }
 async function quotaReady(db){
