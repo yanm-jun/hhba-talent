@@ -7,23 +7,27 @@ import type {ResumeWholeRewriteResult} from '../services/resumeWholeRewriteApi';
  * Approval is a presentation decision only; it NEVER writes a Word file.
  * Real DOCX writes still need explicit per-location renderer validation.
  */
-export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate,onDownload}:{
+export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate,onDownload,revealedCount}:{
  result:ResumeWholeRewriteResult;
  approved:boolean;
  onApprove:(approved:boolean)=>void;
  onRegenerate:(answers:Record<string,string>)=>void;
  onDownload:()=>void;
+ revealedCount:number;
 }){
  const [answers,setAnswers]=useState<Record<string,string>>({});
  const changes=result.blocks.filter(b=>b.changed);
  const blocked=result.blocks.filter(b=>b.status==='kept_original');
  const complete=result.coverage.source_blocks===result.coverage.analyzed_blocks&&
   result.coverage.analyzed_blocks===result.blocks.length;
+ const allVisible=revealedCount>=result.blocks.length;
  return <section className="hhba-whole-rewrite" aria-label="AI 整份岗位定向简历重写稿">
   <header className="hhba-whole-rewrite-heading">
    <div><Sparkles size={17} aria-hidden="true"/>
     <strong>岗位定向整份简历</strong></div>
-   <p>AI 已根据真实岗位要求主动重写，不只是几条润色建议。</p>
+   <p>{allVisible?'已完成整份改写，请核对所有真实事实。':
+    'AI 已完成生成，正在逐段展示真正的改写结果：'+
+    Math.min(revealedCount,result.blocks.length)+' / '+result.blocks.length+'。'}</p>
   </header>
   <div className="hhba-whole-rewrite-metrics" role="status">
    <span>读取段落 <strong>{result.coverage.analyzed_blocks}</strong></span>
@@ -47,7 +51,7 @@ export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate
     ))}><RefreshCcw size={14}/> 用已补充的事实重新撰写</button>
   </div>}
   <div className="hhba-whole-rewrite-blocks">
-   {result.blocks.map((block,index)=><details key={block.blockId}
+   {result.blocks.slice(0,revealedCount).map((block,index)=><details key={block.blockId}
     className={'hhba-whole-rewrite-block'+(block.changed?' is-changed':'')}>
     <summary>
      <span><FileText size={14}/>{String(index+1).padStart(2,'0')} · {
@@ -69,7 +73,7 @@ export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate
   </div>
   <div className="hhba-whole-rewrite-approval">
    <label><input type="checkbox" checked={approved}
-    disabled={!complete||!changes.length}
+    disabled={!complete||!allVisible||!changes.length}
     onChange={e=>onApprove(e.target.checked)}/>
     <span><ShieldCheck size={15}/> 我已整体核对这份 AI 改写稿，确认其中的个人事实属实。</span>
    </label>
@@ -77,7 +81,7 @@ export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate
     当前确认不等于已经写入原文件。</p>:
     <p>AI 已完成撰写，但所有内容仍是草稿。任何修改写回原 Word 前还需要版式校验。</p>}
    <button type="button" className="hhba-whole-rewrite-download"
-    disabled={!approved||!complete} onClick={onDownload}>
+    disabled={!approved||!complete||!allVisible} onClick={onDownload}>
     <Download size={15}/> 下载完整岗位定向 Word（新排版）
    </button>
    <small>这是根据整份 AI 草稿生成的可编辑新版 Word，不是覆盖你上传的原版式文件。原件始终保留。</small>
