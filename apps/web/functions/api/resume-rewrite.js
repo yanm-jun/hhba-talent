@@ -2,46 +2,13 @@
 // consent, never stores source documents or model responses in D1/R2.
 // No artificial 5-suggestion/3-per-day product cap. External abuse controls
 // and authenticated access remain mandatory before any production rollout.
-import {sessionOfBearer,getUserByPhone} from '../_lib/real-auth.js';
 import {generateTailoredResume,REWRITE_KIND,completeJson,validateAuthoring,numberTokens,redacted} from '../_lib/resume-rewrite-provider.js';
 import {selectProvider} from '../_lib/resume-ai-provider.js';
 import {runResumeEditorialAgent} from '../_lib/resume-rewrite-agent.js';
-const MAX_BODY=1024*1024;
-const json=(payload,status=200)=>new Response(JSON.stringify(payload),{
- status,headers:{'Content-Type':'application/json; charset=utf-8',
-  'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff',
-  'Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'}
-});
-const reject=(error,status)=>json({ok:false,error},status);
-const active=env=>env?.HHBA_RESUME_REWRITE_ENABLED==='1'&&
- ((env?.HHBA_AUTH_ROLLOUT==='preview')||
-  (env?.HHBA_MATCH_RUNTIME_MODE==='production'&&
-   env?.HHBA_RESUME_REWRITE_PRODUCTION_ALLOWED==='1'))&&
- typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
-function originOK(request){
- const url=new URL(request.url);
- return request.headers.get('Origin')===url.origin&&
-  request.headers.get('Sec-Fetch-Site')!=='cross-site';
-}
-async function boundedJson(request){
- if(!/^application\/json(?:;|$)/i.test(request.headers.get('Content-Type')||''))
-  throw Error('INVALID_REQUEST');
- const declared=request.headers.get('Content-Length');
- if(!request.body||declared!==null&&
-  (!/^\d+$/.test(declared)||Number(declared)>MAX_BODY))
-  throw Error('INVALID_REQUEST');
- const reader=request.body.getReader(),chunks=[];let total=0;
- try{for(;;){
-  const chunk=await reader.read();if(chunk.done)break;
-  total+=chunk.value.byteLength;
-  if(total>MAX_BODY){await reader.cancel();throw Error('INVALID_REQUEST');}
-  chunks.push(chunk.value);
- }}finally{reader.releaseLock();}
- const bytes=new Uint8Array(total);let offset=0;
- for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
- try{return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));}
- catch{throw Error('INVALID_REQUEST');}
-}
+import {issueCheckpoint} from '../_lib/resume-rewrite-checkpoint.js';
+import {responseJson as json,rejectJson as reject,rewriteActive as active,
+ rewriteOriginOK as originOK,rewriteRequestJson as boundedJson,
+ candidateIdentity} from '../_lib/resume-rewrite-http.js';
 export async function onRequestGet({env}){
  let configured=false;
  try{
@@ -51,18 +18,17 @@ export async function onRequestGet({env}){
  return json({ok:true,kind:REWRITE_KIND,enabled:active(env)&&configured,
   configured,mode:env?.HHBA_RESUME_AGENT_ENABLED==='0'?'full_document_draft':'model_directed_editorial_agent',
   autonomy_enabled:env?.HHBA_RESUME_AGENT_ENABLED!=='0',
+  continuation_enabled:typeof env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET==='string'&&
+   env.HHBA_RESUME_AGENT_CHECKPOINT_SECRET.length>=32,
   requires_user_approval:true});
 }
 export async function onRequestPost({request,env}){
  if(!originOK(request))return reject('ORIGIN_REQUIRED',403);
  if(!active(env))return reject('RESUME_REWRITE_NOT_ENABLED',503);
- let session;
- try{
-  session=await sessionOfBearer(env.HHBA_PNVS_AUTH_DB,request,Date.now());
-  if(!session)return reject('SESSION_INVALID',401);
-  const user=await getUserByPhone(env.HHBA_PNVS_AUTH_DB,session.phone);
-  if(user?.role!=='candidate')return reject('FORBIDDEN',403);
- }catch{return reject('SESSION_INVALID',401);}
+ let account;
+ try{account=await candidateIdentity(request,env);}
+ catch(e){return reject(e?.message==='FORBIDDEN'?'FORBIDDEN':'SESSION_INVALID',
+  e?.message==='FORBIDDEN'?403:401);}
  let body;
  try{body=await boundedJson(request);}
  catch{return reject('INVALID_REQUEST',400);}
@@ -80,10 +46,21 @@ export async function onRequestPost({request,env}){
   try{reviewer=selectProvider(env,'resume_reviewer');}
   catch(e){if(e.message!=='AI_PROVIDER_NOT_CONFIGURED')throw e;reviewer=author;}
   try{
+   // Signed continuation enables one model-selected tool per HTTP request.
+   // Without the secret keep the established bounded legacy mode.
+   const resumable=typeof env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET==='string'&&
+    env.HHBA_RESUME_AGENT_CHECKPOINT_SECRET.length>=32;
+   const agentEnv=resumable?{...env,HHBA_RESUME_AGENT_MAX_PASSES:'1'}:env;
    const autonomous=await runResumeEditorialAgent({
-    draft:base,blocks:body.blocks,job:body.job,env,provider:author,reviewer,
+    draft:base,blocks:body.blocks,job:body.job,env:agentEnv,
+    provider:author,reviewer,
     completeJson,validateAuthoring,numberTokens,redacted,signal
    });
+   if(resumable&&autonomous.autonomy?.needs_more_work){
+    const token=await issueCheckpoint({env,account,blocks:body.blocks,
+     job:body.job,draft:autonomous});
+    return json({...autonomous,continuation:{enabled:true,checkpoint:token}});
+   }
    return json(autonomous);
   }catch(e){
    // The independent initial writer+reviewer may already have produced a
