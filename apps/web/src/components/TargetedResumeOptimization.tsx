@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen,Printer,FileDown,PencilLine,X} from 'lucide-react';
+import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen,Printer,FileDown,PencilLine,X ,ChevronDown} from 'lucide-react';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 import {getRealAuthToken,realAuthReady} from '../services/realAuth';
 import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimizationStatus} from '../services/resumeOptimizationApi';
@@ -67,6 +67,12 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [manualText,setManualText]=useState('');
  const [activeSuggestionId,setActiveSuggestionId]=useState<string|null>(null);
  const [mobileSuggestionsOpen,setMobileSuggestionsOpen]=useState(false);
+ const [wordEditing,setWordEditing]=useState(false);
+ const [wordEditHost,setWordEditHost]=useState<HTMLDivElement|null>(null);
+ const [aiSettingsOpen,setAiSettingsOpen]=useState(false);
+ useEffect(()=>{
+  if(wordEditing)setMobileSuggestionsOpen(false);
+ },[wordEditing]);
  const [nativeWordPending,setNativeWordPending]=useState(false);
  const [nativeWordTextDraft,setNativeWordTextDraft]=useState<{
   original:string;text:string;revision:number;page:number
@@ -497,11 +503,21 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   <div className="targeted-resume-toolbar">
    <div><strong>优化这份简历</strong><p>根据目标岗位提出修改建议，不会凭空添加经历。</p></div>
    {hasSession&&status?.enabled
-    ?<button type="button" disabled={!consent||busy||!blocks.length} onClick={generate}>
+    ?<button type="button" disabled={busy||!blocks.length} onClick={()=>{
+       if(!consent){
+        setAiSettingsOpen(true);
+        setNotice('请先展开隐私设置，确认 AI 处理授权，然后再生成建议。');
+        return;
+       }
+       void generate();
+      }}>
        {busy?<><LoaderCircle size={15} className="resume-match-spinning"/> 正在生成…</>:<><Sparkles size={15}/> 生成 AI 建议</>}
       </button>
     :<span className="targeted-resume-unavailable">{!hasSession?'站内登录后可使用 AI 润色':status?'AI 润色尚未开放':'正在检查服务状态…'}</span>}
   </div>
+  <details className="targeted-resume-ai-settings" open={aiSettingsOpen}
+   onToggle={event=>setAiSettingsOpen(event.currentTarget.open)}>
+   <summary>隐私授权与草稿设置 <ChevronDown size={14}/></summary>
   {omittedSourceCharacters>0&&<p className="targeted-resume-truncation" role="alert">
    <strong>这份简历有部分内容未显示。</strong>部分文字超出可编辑或可打印容量，
    仍有约 {omittedSourceCharacters} 个非空白字符未纳入本次预览。
@@ -531,17 +547,18 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    </div>}
    {draftStatus&&<p role="status">{draftStatus}</p>}
   </section>}
+  </details>
  </>;
  return <section className={'targeted-resume'+(sourceResume?' is-word-first':'')} aria-label="岗位定向简历优化">
   <div className="targeted-resume-heading">
-   <div><small>HHBA / 岗位定向优化</small><h3>{job.title_zh||job.title}</h3>
-    <p>直接在简历上修改。原文件不会被覆盖。</p></div>
+   <div><small>简历优化 / 原 Word</small><h3>{job.title_zh||job.title}</h3></div>
    <span><Sparkles size={13} aria-hidden="true"/> 智能修改</span>
   </div>
   {!sourceResume&&legacyPrintQa&&optimizationControls}
   {sourceResume?<section className="targeted-resume-word-workspace" aria-label="原版式 Word 统一编辑工作区">
    <div className="targeted-resume-word-main">
     <OriginalWordViewer resume={sourceResume} suggestedChanges={confirmedWordChanges}
+     editPanelHost={wordEditHost} onEditingChange={setWordEditing}
      onOpenSuggestions={()=>setMobileSuggestionsOpen(true)}
      onPendingChange={setNativeWordPending}
      onVerifiedSave={change=>setVerifiedWordEdits(prev=>[...prev.filter(item=>item.original!==change.original),change])}
@@ -552,20 +569,23 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      onSessionWordDraftChange={setNativeWordTextDraft}
      pendingSuggestionCount={pendingSuggestions.length}/>
    </div>
-   <aside className={'targeted-resume-word-assistant'+(mobileSuggestionsOpen?' mobile-open':'')}
-    aria-label="AI 建议工作台">
+   <aside className={'targeted-resume-word-assistant'+
+    (mobileSuggestionsOpen?' mobile-open':'')+(wordEditing?' is-word-editing':'')}
+    aria-label={wordEditing?'Word 文字编辑':'AI 建议工作台'}>
+    <div className="targeted-resume-word-edit-host" ref={setWordEditHost}/>
+    <div className="targeted-resume-word-review">
     <button type="button" className="targeted-resume-mobile-rail-close"
      onClick={()=>setMobileSuggestionsOpen(false)}>返回 Word</button>
     {optimizationControls}
     <div className="targeted-resume-word-assistant-head">
      <strong><Sparkles size={15}/> AI 修改建议</strong>
-     <p>左侧始终是你的原 Word；这里的建议只有经你确认后才会预填。真正保存仍需要在原 Word 再次确认。</p>
+     <p>逐条核对建议，确认后在原 Word 中应用。</p>
      <div className="targeted-resume-word-counts" role="status">
       <span>待确认 {pendingSuggestions.length}</span><span>已采纳 {acceptedCount}</span><span>保留原文 {ignored.length}</span>
      </div>
     </div>
     {suggestions.length===0?<p className="targeted-resume-word-empty">
-     {busy?'正在生成建议…':'点击上方「生成 AI 建议」，逐条核对后在原 Word 中应用。'}</p>:
+     {busy?'正在准备建议…':'暂无建议，点击「生成 AI 建议」开始。'}</p>:
     <div className="targeted-resume-word-suggestion-list">
      {suggestions.map((item,i)=>{
       const applied=version.acceptedSuggestionIds.includes(item.id);
@@ -589,10 +609,13 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      })}
     </div>}
     {confirmedWordChanges.length>0&&<p className="targeted-resume-word-next-step">
-      已有 {confirmedWordChanges.length} 条符合严格文字条件的建议可尝试带入原 Word。
-      点击左侧对应文字，最终修改必须再次确认并通过版式校验。
+      {confirmedWordChanges.length} 条建议已准备就绪。请点击 Word 对应文字确认。
      </p>}
-    <p className="targeted-resume-word-privacy">系统不会把 AI 草稿直接覆盖 Word；无法精确对应或会改变字体版式的建议将拒绝自动保存。</p>
+    <details className="targeted-resume-word-privacy">
+     <summary>修改与隐私说明</summary>
+     <p>AI 草稿不会直接覆盖 Word；不能唯一定位的文字或会改变原排版的建议会拒绝保存。</p>
+    </details>
+    </div>
    </aside>
   </section>:legacyPrintQa?<>
   <section className="targeted-resume-document-editor" aria-label="正式简历排版与打印">
