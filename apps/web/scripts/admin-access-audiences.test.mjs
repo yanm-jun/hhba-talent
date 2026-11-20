@@ -50,3 +50,19 @@ test('original admin and legacy API require route-specific, signed Cloudflare Ac
   assert.equal((await verifyAdmin(request('/candidate/jobs',token(consoleAud)),env)).status,403);
  }finally{globalThis.fetch=priorFetch;}
 });
+
+test('library preview host requires its dedicated Access audience and not production or generic preview audiences',async()=>{
+ const priorFetch=globalThis.fetch;
+ globalThis.fetch=async()=>new Response(JSON.stringify({keys:[jwk]}),{status:200});
+ try{
+  const previewEnv={...env,HHBA_ACCESS_LIBRARY_PREVIEW_AUD:'library-preview-aud'};
+  for(const host of ['feat-admin-recruitment-libra.hhba-talent.pages.dev','3c143f6f.hhba-talent.pages.dev']){
+   const requestFor=aud=>new Request('https://'+host+'/admin-preview/api/library?mode=summary',
+    {headers:{'cf-access-jwt-assertion':token(aud)}});
+   assert.equal((await verifyAdmin(requestFor('library-preview-aud'),previewEnv)).ok,true);
+   assert.equal((await verifyAdmin(requestFor(consoleAud),previewEnv)).status,403);
+   assert.equal((await verifyAdmin(requestFor('library-preview-aud'),{...previewEnv,HHBA_ACCESS_LIBRARY_PREVIEW_AUD:''})).status,503);
+  }
+  assert.equal((await verifyAdmin(request('/admin-preview/api/metrics',token(consoleAud)),previewEnv)).ok,true);
+ }finally{globalThis.fetch=priorFetch}
+});

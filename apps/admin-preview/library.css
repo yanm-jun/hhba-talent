@@ -1,0 +1,110 @@
+/* HHBA recruitment library — scoped to the ORIGINAL management console. */
+#view-library{--lib-line:#e5ece8;--lib-ink:#193b30;--lib-muted:#71877c}
+.lib-intro{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:22px}
+.lib-intro .page-subtitle{max-width:700px;line-height:1.8}
+.lib-section-label{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:#5f9079;font-weight:800;margin:0 0 7px}
+.lib-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.lib-stat{padding:18px 20px;background:#fff;border:1px solid var(--lib-line);border-radius:13px;min-width:0;box-shadow:0 5px 19px #163d2808}
+.lib-stat span{display:block;color:var(--lib-muted);font-size:12px;margin-bottom:10px}
+.lib-stat strong{font-size:28px;font-weight:750;letter-spacing:-1.1px;font-variant-numeric:tabular-nums;color:var(--lib-ink)}
+.lib-stat small{display:block;color:#8b9d93;font-size:10px;margin-top:5px}
+.lib-notice{margin:0 0 18px;padding:13px 16px;border:1px solid #e0eae5;background:#f6faf7;border-radius:10px;color:#567867;font-size:12px;line-height:1.75}
+.lib-notice[data-tone="error"]{border-color:#f0d0cd;background:#fff8f6;color:#ae504b}
+.lib-notice[data-tone="ok"]{border-color:#dceadf;background:#f7fbf7;color:#4c7659}
+.lib-board-top{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:12px 0 15px}
+.lib-board-top h2{margin:0;color:#243e32;font-size:18px}
+.lib-updated{color:#85978c;font-size:11px}
+.lib-halls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:25px}
+.lib-hall{appearance:none;text-align:left;background:white;border:1px solid var(--lib-line);border-radius:12px;padding:17px 17px 14px;min-height:141px;display:flex;flex-direction:column;gap:11px;cursor:pointer;box-shadow:0 3px 12px #152b1d05;transition:box-shadow .14s,border-color .14s,transform .14s}
+.lib-hall:hover{border-color:#8ab39a;box-shadow:0 8px 20px #1d544015;transform:translateY(-1px)}
+.lib-hall:focus-visible,.lib-actions button:focus-visible{outline:3px solid #87a99c;outline-offset:2px}
+.lib-hall.selected{border-color:#629b7e;background:#f3faf5;box-shadow:inset 0 0 0 1px #92b7a0}
+.lib-hall-head{display:flex;align-items:center;gap:8px;min-height:25px}
+.lib-hall-head strong{font-size:12px;color:#315345;font-weight:670;line-height:1.4}
+.lib-hall-icon{width:29px;height:29px;border-radius:9px;background:#f0f6f1;display:grid;place-items:center;font-size:16px}
+.lib-hall-count{font-size:26px;font-weight:770;color:#264d3d;font-variant-numeric:tabular-nums;line-height:1.1}
+.lib-hall-foot{font-size:11px;color:#889b8e;line-height:1.5}
+.lib-entry-panel{border-radius:15px;border:1px solid var(--lib-line);background:#fff;padding:20px 20px 16px;box-shadow:0 5px 19px #163d2808}
+.lib-entry-head{display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:17px;flex-wrap:wrap}
+.lib-entry-head h2{font-size:19px;color:#243e32;margin:0 0 5px}
+.lib-entry-head p{font-size:11px;color:#8d9f93;margin:0}
+.lib-entry-actions{display:flex;gap:8px;flex-wrap:wrap}
+.lib-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.lib-controls form{display:flex;gap:8px;flex:1 1 340px;align-items:center}
+.lib-controls input{flex:1;min-width:140px}
+.lib-controls input,.lib-controls select,.lib-form input,.lib-form select,.lib-form textarea{border:1px solid #d9e4dc;border-radius:8px;padding:10px 11px;background:white;font-size:13px;color:#244b36;font:inherit}
+.lib-controls input:focus,.lib-controls select:focus,.lib-form input:focus,.lib-form select:focus,.lib-form textarea:focus{outline:2px solid #93bd9f;outline-offset:1px}
+.lib-table-wrap{overflow-x:auto;border:1px solid #ebf0ed;border-radius:10px}
+.lib-table{border-collapse:collapse;min-width:760px;width:100%}
+.lib-table th{background:#f8faf8;color:#72877b;text-align:left;font-size:11px;font-weight:700;padding:13px 12px}
+.lib-table td{font-size:12px;padding:12px;border-top:1px solid #edf1ed;color:#435b4e;vertical-align:middle}
+.lib-table tbody tr:hover{background:#fbfdfb}
+.lib-table .lib-company{font-weight:670;color:#264636;min-width:120px}
+.lib-table .lib-url{max-width:340px}
+.lib-table .lib-url a{display:block;max-width:320px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;color:#387d5d}
+.lib-table .lib-url a:hover{text-decoration:underline}
+.lib-table .lib-source{max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#94a399}
+.lib-table .lib-empty{text-align:center;color:#9aaa9d;padding:25px 10px}
+.lib-tag{display:inline-block;font-size:10px;font-weight:600;border-radius:99px;padding:5px 9px;white-space:nowrap}
+.lib-tag.candidate{background:#fff6e8;color:#98713a}
+.lib-tag.historical{background:#eaf3ff;color:#5a7791}
+.lib-tag.verified{background:#e9f6ed;color:#408156}
+.lib-tag.missing{background:#f6e9e8;color:#9c605e}
+.lib-actions{white-space:nowrap}
+.lib-actions button{border:1px solid #dfe9e2;background:#fff;color:#42775a;border-radius:7px;font-size:11px;cursor:pointer;padding:7px 9px;margin-right:5px}
+.lib-actions button:hover{background:#f0f7f2}
+.lib-actions button.lib-danger{color:#aa6261;border-color:#efdddd}
+.lib-pagination{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;color:#82988a;font-size:12px}
+.lib-pagination>div{display:flex;gap:8px}
+.lib-pagination button:disabled{opacity:.42;cursor:not-allowed}
+.lib-dialog{border:0;border-radius:15px;box-shadow:0 24px 80px #091e1b55;background:#fff;color:#294837;width:min(570px,calc(100vw - 28px));max-height:92vh;overflow-y:auto;padding:25px}
+.lib-dialog::backdrop{background:#0c302c88}
+.lib-dialog-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}
+.lib-dialog-head h2{font-size:20px;margin:0}
+.lib-dialog-head button{font-size:22px;border:0;background:transparent;color:#6f8a79;cursor:pointer}
+.lib-form{display:flex;flex-direction:column;gap:14px}
+.lib-form label{display:flex;flex-direction:column;gap:6px;color:#496855;font-size:12px;font-weight:600}
+.lib-form label.lib-check{flex-direction:row;align-items:center;font-size:12px}
+.lib-form input[type=checkbox]{accent-color:#529671;width:16px;height:16px}
+.lib-form textarea{min-height:180px;resize:vertical;font-family:ui-monospace,monospace;line-height:1.6}
+.lib-form-tip{color:#899e90;font-size:11px;line-height:1.7;margin:0}
+.lib-form-error{color:#a34e49;font-size:12px;min-height:17px;margin:0}
+.lib-form-actions{display:flex;justify-content:flex-end;gap:9px}
+@media(max-width:1300px){.lib-halls{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){.lib-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.lib-halls{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.lib-halls{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.lib-hall{padding:12px;min-height:130px}.lib-hall-head strong{font-size:11px}.lib-hall-count{font-size:23px}.lib-summary{gap:8px}.lib-stat{padding:13px}.lib-stat strong{font-size:24px}.lib-entry-panel{padding:14px}.lib-controls{align-items:stretch}.lib-controls form{flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){.lib-hall{transition:none}}
+
+/* Offline Excel/CSV import progress; only in the existing protected admin UI. */
+.lib-import-dialog{width:min(690px,calc(100vw - 24px))}
+.lib-import-dialog .lib-form{gap:12px}
+.lib-import-dialog input[type=file]{display:block;width:100%;padding:12px;background:#f8fbf8;border:1px dashed #9ab5a3;border-radius:10px;color:#415949;cursor:pointer}
+.lib-import-dialog .lib-form select{min-height:41px}
+.lib-paste-alternative{border:1px solid #e5ece7;background:#fcfdfc;border-radius:10px;padding:11px 13px}
+.lib-paste-alternative summary{font-size:12px;color:#4a745d;font-weight:600;cursor:pointer}
+.lib-paste-alternative label{margin-top:10px}
+.lib-upload-preview{border:1px solid #dfeee3;border-radius:12px;padding:14px;background:#f5faf6}
+.lib-upload-preview>p:first-child{margin:0 0 12px;color:#587d63;font-size:12px;font-weight:650;overflow-wrap:anywhere}
+.lib-upload-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.lib-upload-metrics span{font-size:11px;color:#6b8774;background:#fff;border:1px solid #e7eee9;border-radius:9px;text-align:center;padding:8px 3px}
+.lib-upload-metrics strong{display:block;color:#285940;font-size:20px;font-weight:750;margin-top:4px;font-variant-numeric:tabular-nums}
+#lib-import-progress{width:100%;height:10px;margin-top:15px;accent-color:#519b71}
+#lib-import-state{font-size:12px;color:#527565;line-height:1.7;margin:6px 0 0}
+.lib-import-actions{flex-wrap:wrap;justify-content:flex-start}
+.lib-import-actions button:last-child{margin-left:auto}
+#lib-import-submit[hidden],#lib-import-resume[hidden],#lib-import-skip[hidden],#lib-import-pause[hidden],#lib-import-export-errors[hidden]{display:none}
+@media(max-width:640px){
+ .lib-upload-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .lib-import-actions{flex-direction:column}
+ .lib-import-actions button{width:100%}
+ .lib-import-actions button:last-child{margin-left:0}
+}
+
+/* Open a shelf as a separate, visible directory view. */
+#lib-board-top[hidden],#lib-halls[hidden],#lib-entry-panel[hidden] {display:none !important}
+#lib-entry-panel {scroll-margin-top:76px}
+.lib-back-halls {display:inline-flex;align-items:center;margin:0 0 16px;padding:7px 12px;
+ border-radius:8px;background:#f2f7f3;border:1px solid #dce8e0;color:#2c6545;
+ font-size:12px;font-weight:650;cursor:pointer}
+.lib-back-halls:hover {background:#e5f1e8;border-color:#b5d1bc}
+.lib-back-halls:focus-visible {outline:3px solid #74ae88;outline-offset:2px}
