@@ -69,17 +69,22 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [activeSuggestionId,setActiveSuggestionId]=useState<string|null>(null);
  const [mobileSuggestionsOpen,setMobileSuggestionsOpen]=useState(false);
  const [wordEditing,setWordEditing]=useState(false);
- const [entranceStage,setEntranceStage]=useState<'entering'|'ready'>('entering');
+ const [entranceStage,setEntranceStage]=useState<'waiting'|'entering'|'ready'>('waiting');
  const [revealedSuggestionCount,setRevealedSuggestionCount]=useState(0);
  const [wordRevisionSnapshot,setWordRevisionSnapshot]=useState<WordRevisionSnapshot|null>(null);
  const lastWordRevisionKey=useRef('');
  useEffect(()=>{
-  if(!sourceResume)return;
-  setEntranceStage('entering');
+  if(sourceResume)setEntranceStage('waiting');
+ },[sourceResume?.id,job.id]);
+ useEffect(()=>{
+  if(entranceStage!=='entering')return;
   const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const timeout=setTimeout(()=>setEntranceStage('ready'),reduced?0:1050);
   return()=>clearTimeout(timeout);
- },[sourceResume?.id,job.id]);
+ },[entranceStage]);
+ function revealRenderedWord(){
+  setEntranceStage(stage=>stage==='waiting'?'entering':stage);
+ }
  useEffect(()=>{
   if(!sourceResume)return;
   if(!suggestions.length){setRevealedSuggestionCount(0);return;}
@@ -611,8 +616,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    <span><Sparkles size={13} aria-hidden="true"/> 智能修改</span>
   </div>
   {!sourceResume&&legacyPrintQa&&optimizationControls}
-  {sourceResume?<section className={'targeted-resume-word-workspace'+
-   (entranceStage==='entering'?' hhba-word-stage-entering':' hhba-word-stage-ready')}
+  {sourceResume?<section className={'targeted-resume-word-workspace hhba-word-stage-'+entranceStage}
    aria-label="原版式 Word 沉浸式 AI 优化舞台">
    <div className="targeted-resume-word-main">
     {entranceStage==='entering'&&<p className="hhba-word-arrival-hint" role="status">
@@ -627,6 +631,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       setEditingSuggestionId(null);setMobileSuggestionsOpen(true);
      }}
      onRevisionSnapshot={handleWordRevisionSnapshot}
+     onDocumentReady={revealRenderedWord}
      editPanelHost={wordEditHost} onEditingChange={setWordEditing}
      onOpenSuggestions={()=>setMobileSuggestionsOpen(true)}
      onPendingChange={setNativeWordPending}
