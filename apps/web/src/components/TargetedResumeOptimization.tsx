@@ -3,7 +3,7 @@ import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen,Pri
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 import {getRealAuthToken,realAuthReady} from '../services/realAuth';
 import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimizationStatus} from '../services/resumeOptimizationApi';
-import {getWholeRewriteStatus,requestWholeResumeRewrite,type ResumeWholeRewriteResult,type ResumeWholeRewriteStatus} from '../services/resumeWholeRewriteApi';
+import {getWholeRewriteStatus,requestWholeResumeRewrite,continueWholeResumeRewrite,type ResumeWholeRewriteResult,type ResumeWholeRewriteStatus} from '../services/resumeWholeRewriteApi';
 import {completeRewriteSource} from '../services/resumeWholeRewriteSource';
 import {downloadWholeRewriteDocx} from '../services/resumeWholeRewriteExport';
 import {WholeResumeRewriteReview} from './WholeResumeRewriteReview';
@@ -41,6 +41,10 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [wholeBusy,setWholeBusy]=useState(false);
  const [wholeApproved,setWholeApproved]=useState(false);
  const [wholeDownloaded,setWholeDownloaded]=useState(false);
+ // The current candidate's consented text is held only in this open tab.
+ // No new public storage or automatic D1 writes for AI checkpoints.
+ const wholeRunInput=useRef<{blocks:ResumeBlock[];
+  job:{title:string;requirements:string}}|null>(null);
  const [revealedWholeCount,setRevealedWholeCount]=useState(0);
  useEffect(()=>{
   const count=wholeDraft?.blocks.length||0;
@@ -274,6 +278,48 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    setNotice('已删除选中的云端简历版本。');
   }catch(err){setNotice(err instanceof Error?err.message:'删除失败，请重试。');}
  }
+ async function runWholeContinuation(
+  initial:ResumeWholeRewriteResult,
+  input:{blocks:ResumeBlock[];job:{title:string;requirements:string}},
+  controller:AbortController
+ ){
+  let latest=initial;
+  // Each awaited call executes just one model-selected tool. The signed
+  // checkpoint must verify again on the server before that tool can run.
+  while(!controller.signal.aborted&&latest.autonomy?.needs_more_work&&
+   latest.continuation?.enabled&&latest.continuation.checkpoint){
+   if((latest.autonomy.tools_used?.length||0)>=64){
+    setNotice('本轮已到达技术保护边界。当前完整草稿已保留，可先审阅。');
+    break;
+   }
+   latest=await continueWholeResumeRewrite(
+    input.blocks,input.job,latest,controller.signal);
+   if(controller.signal.aborted)return latest;
+   setWholeDraft(latest);
+  }
+  return latest;
+ }
+ async function resumeWholeRewrite(){
+  const draft=wholeDraft,input=wholeRunInput.current;
+  if(!draft||!input||wholeBusy||busy||!consent||
+   !draft.autonomy?.needs_more_work||!draft.continuation?.enabled)return;
+  const controller=new AbortController();active.current=controller;
+  setWholeBusy(true);setWholeApproved(false);setWholeDownloaded(false);
+  setMobileSuggestionsOpen(false);setNotice('AI 正在继续核查并优化简历…');
+  try{
+   const result=await runWholeContinuation(draft,input,controller);
+   if(!controller.signal.aborted)
+    setNotice(result.autonomy?.needs_more_work?
+     '已保留目前完成的修改，仍可选择继续优化或先核实草稿。':
+     'AI 已结束本轮自主优化，请核对个人事实。');
+  }catch(error){
+   if(!controller.signal.aborted)
+    setNotice('本轮 AI 后续优化暂停，已保留上一步结果。'+
+     (error instanceof Error?error.message:''));
+  }finally{
+   setWholeBusy(false);if(active.current===controller)active.current=null;
+  }
+ }
  async function generateWholeRewrite(answers:Record<string,string>={}){
   if(!consent||!sourceResume||!wholeSource.complete||
    !wholeSource.blocks.length||!wholeStatus?.enabled||
@@ -282,22 +328,32 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   active.current=controller;
   setWholeBusy(true);setWholeApproved(false);setWholeDownloaded(false);
   setRevealedWholeCount(0);
+  setWholeDraft(null);
   setNotice('');setMobileSuggestionsOpen(false);
   try{
    const personalized=wholeSource.blocks.map(b=>{
     const extra=answers[b.id]?.trim();
     return extra?{...b,text:b.text+'\n用户本人补充的事实（待核实）：'+extra}:b;
    });
-   const result=await requestWholeResumeRewrite(personalized,{
+   const input={blocks:personalized,job:{
     title:(job.title_zh||job.title).slice(0,180),
     requirements:fullJobRequirements
-   },controller.signal);
+   }};
+   wholeRunInput.current=input;
+   const first=await requestWholeResumeRewrite(
+    input.blocks,input.job,controller.signal);
    if(controller.signal.aborted)return;
-   setWholeDraft(result);
-   setNotice('AI 已处理 '+result.coverage.analyzed_blocks+' 个原始段落，整份岗位定向草稿已生成；请核实个人事实。');
+   setWholeDraft(first);
+   setNotice('已生成并复核完整初稿，AI 正在按需要继续查看证据和优化章节…');
+   const result=await runWholeContinuation(first,input,controller);
+   if(controller.signal.aborted)return;
+   setNotice(result.autonomy?.needs_more_work?
+    '已保留全部当前成果，后续修改可继续执行；请核实已有内容。':
+    'AI 已完成本轮自主优化。请核实个人事实并确认下载。');
   }catch(error){
    if(!controller.signal.aborted)
-    setNotice(error instanceof Error?error.message:'AI 整份简历重写暂时未完成。');
+    setNotice('已保留最后一份完整草稿。'+
+     (error instanceof Error?error.message:'AI 整份简历重写暂时未完成。'));
   }finally{
    setWholeBusy(false);if(active.current===controller)active.current=null;
   }
@@ -655,6 +711,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       AI 正在规划并撰写整份简历…</>:<><Sparkles size={16}/>
       AI 针对岗位重写整份简历</>}
    </button>
+   {wholeBusy&&<button type="button" className="hhba-whole-rewrite-cancel"
+    onClick={()=>{
+     active.current?.abort();setWholeBusy(false);
+     setNotice('已停止后续 AI 优化；已生成的草稿仍然保留，原 Word 没有修改。');
+    }}>停止 AI 继续处理</button>}
    {wholeStatus&&!wholeStatus.enabled&&<p>完整撰写服务尚未在当前环境开放，已有局部建议功能不受影响。</p>}
    {!wholeSource.complete&&<p role="alert">{wholeSource.reason}</p>}
   </div>}
@@ -838,6 +899,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      documentName={details.fullName}
      onDocumentNameChange={name=>updateDetail('fullName',name)}
      approved={wholeApproved}
+     processing={wholeBusy}
+     onResume={()=>void resumeWholeRewrite()}
      onApprove={enabled=>{
       setWholeApproved(enabled);if(!enabled)setWholeDownloaded(false);
      }}
