@@ -144,3 +144,23 @@
 .hhba-ai-storage-choice>p{color:#798BA0;font-size:11px;line-height:1.7;margin:12px 4px 0}
 .hhba-ai-storage-status{margin:10px 0;color:#326B77;background:#EFF8F9;border:1px solid #CCE9EA;padding:10px 12px;border-radius:9px;font-size:11px;line-height:1.75}
 @media(max-width:600px){.hhba-ai-storage-choice{padding:12px 10px}.hhba-ai-storage-choice label{padding:11px 9px}}
+
+/* The same candidate matching engine can be mounted in the personal
+   workspace's right panel. Only its container/layout changes: the homepage
+   standalone route keeps its existing design and data contracts unchanged. */
+.hhba-account-external-stage .hhba-ai-page-embedded{width:100%;max-width:none;margin:0;padding:0 0 22px;min-width:0}
+.hhba-ai-page-embedded .hhba-ai-hero{margin:0 0 19px;max-width:none}
+.hhba-ai-page-embedded .hhba-ai-hero h1{font-size:clamp(22px,2.6vw,29px);line-height:1.35;margin:8px 0 7px}
+.hhba-ai-page-embedded .hhba-ai-hero p{font-size:12px;line-height:1.75;margin:0}
+.hhba-ai-page-embedded .hhba-ai-layout{grid-template-columns:minmax(0,1fr);gap:0}
+.hhba-ai-page-embedded .hhba-ai-aside{display:none}
+.hhba-ai-page-embedded .hhba-ai-upload{padding:23px 25px;min-width:0}
+.hhba-ai-page-embedded .hhba-ai-drop{min-height:142px}
+.hhba-ai-page-embedded .hhba-ai-footer{margin-top:18px}
+@media(max-width:620px){
+ .hhba-account-external-stage .hhba-ai-page-embedded{padding:0 0 20px}
+ .hhba-ai-page-embedded .hhba-ai-hero{margin-bottom:15px}
+ .hhba-ai-page-embedded .hhba-ai-hero h1{font-size:23px}
+ .hhba-ai-page-embedded .hhba-ai-upload{padding:16px 13px}
+ .hhba-ai-page-embedded .hhba-ai-drop{min-height:125px;padding:17px 11px}
+}
