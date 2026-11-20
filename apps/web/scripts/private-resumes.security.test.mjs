@@ -175,6 +175,22 @@ test('duplicate and quota protection cannot be bypassed by changing file names',
  assert.equal(f.objects.size,3);
  assert.equal((await invoke(f,'',PHONE_B)).payload.items.length,0);
 });
+test('deleting a private Word original also cleans all derived previews and verified copies',async()=>{
+ const f=fixture(),docx=createDocx();
+ const posted=await invoke(f,'',PHONE_A,'POST',docx,{
+  filename:'synthetic.docx',mime:docxMime
+ });
+ assert.equal(posted.response.status,201);
+ const row=f.resumes.get(posted.payload.item.id);
+ const prefix=row.storage_key+'.hhba-word-preserved-v1-'+row.sha256;
+ const assets=['.source.pdf','.docx','.edited.pdf','.json'];
+ for(const suffix of assets)f.objects.set(prefix+suffix,Buffer.from('synthetic fixture'));
+ assert.equal(f.objects.size,5);
+ const deleted=await invoke(f,'/'+row.id,PHONE_A,'DELETE');
+ assert.equal(deleted.response.status,200);
+ assert.equal(f.objects.size,0);
+ assert.equal(f.resumes.size,0);
+});
 test('daily upload ledger persists after file removal',async()=>{
  const f=fixture();
  for(let i=0;i<15;i++)f.events.push({phone:PHONE_A,created_at:new Date().toISOString()});
