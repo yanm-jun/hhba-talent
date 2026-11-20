@@ -595,3 +595,88 @@
  .targeted-resume-word-assistant .targeted-resume-toolbar>button{min-height:44px}
  .targeted-resume-word-suggestion-title{min-height:48px}
 }
+
+
+/* Siri optimization journey: original Word enters once, then real AI results
+   illuminate the page one by one. No fabricated live token stream. */
+.targeted-resume.is-word-first .targeted-resume-word-workspace{
+ position:relative;
+}
+.targeted-resume.is-word-first .hhba-word-stage-entering .targeted-resume-word-main{
+ animation:hhba-word-stage-arrive 1.02s cubic-bezier(.18,.8,.23,1) both;
+}
+@keyframes hhba-word-stage-arrive{
+ from{opacity:0;transform:translateY(21px) scale(.972);filter:blur(6px)}
+ 45%{opacity:.75;filter:blur(1px)}
+ to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}
+}
+.hhba-word-arrival-hint{
+ position:absolute;top:10px;left:calc(50% - 85px);z-index:5;
+ color:#6b7c91;font-size:11px;line-height:1.6;letter-spacing:.04em;
+ background:rgba(255,255,255,.86);padding:6px 11px;border-radius:100px;
+ pointer-events:none;animation:hhba-word-arrival-caption 1s ease-out both;
+}
+@keyframes hhba-word-arrival-caption{
+ 0%{opacity:0;transform:translateY(8px)}
+ 40%{opacity:1}80%{opacity:.8}
+ 100%{opacity:0;transform:translateY(-4px)}
+}
+.targeted-resume-word-reveal{
+ font-size:11px;line-height:1.65;color:#6c82a0;
+ margin:7px 0;padding:6px 0;
+}
+.targeted-resume-word-suggestion{
+ animation:hhba-word-suggestion-appear .4s cubic-bezier(.2,.8,.25,1) both;
+}
+@keyframes hhba-word-suggestion-appear{
+ from{opacity:0;transform:translateY(10px)}
+ to{opacity:1;transform:translateY(0)}
+}
+/* Scoring is the narrative thread, not a decorative invented success rate. */
+.targeted-resume-word-assistant .hhba-word-match-score{
+ order:-1;padding:11px 0 15px;margin:0 0 6px;
+ border-bottom:1px solid #e4ebf2;
+}
+.hhba-word-match-score-head{
+ display:flex;align-items:center;justify-content:space-between;gap:11px;
+}
+.hhba-word-match-score-head>div:first-child{min-width:0;display:grid;gap:3px}
+.hhba-word-match-score-head>div:first-child>span{
+ font-size:10px;color:#7c8b9a;line-height:1.5;
+}
+.hhba-word-match-score-head>div:first-child>strong{
+ font-size:14px;line-height:1.45;color:#23374b;font-weight:650;
+ overflow-wrap:anywhere;
+}
+.hhba-word-match-number{display:flex;align-items:baseline;gap:2px;white-space:nowrap}
+.hhba-word-match-number>strong{font-size:33px;font-variant-numeric:tabular-nums;
+ font-weight:730;line-height:1.1;color:#326ca6;letter-spacing:-.045em}
+.hhba-word-match-number>small{font-size:11px;color:#91a0ae}
+.hhba-word-match-score-caption{font-size:10px;color:#8492a0;margin:3px 0 0}
+.hhba-word-match-await,.hhba-word-match-reassess-hint{
+ font-size:11px;line-height:1.65;color:#65788b;margin:12px 0 3px;
+}
+.hhba-word-match-after{
+ border-top:1px solid #edf1f5;padding:12px 0 2px;margin-top:12px;
+ display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+}
+.hhba-word-match-after>span{font-size:11px;color:#526b83}
+.hhba-word-match-after>strong{font-size:29px;line-height:1.1;color:#254d73;font-variant-numeric:tabular-nums}
+.hhba-word-match-after>strong small{font-size:10px;font-weight:500;color:#8a9caf}
+.hhba-word-match-after>p{width:100%;font-size:11px;line-height:1.65;
+ color:#73869a;margin:0}
+.hhba-word-match-confirm{display:flex;align-items:flex-start;gap:8px;
+ font-size:11px;color:#657a8b;line-height:1.65;margin:9px 0}
+.hhba-word-match-confirm input{flex-shrink:0;margin-top:4px;accent-color:#356fa8}
+.targeted-resume .hhba-word-match-reassess{
+ width:100%;min-height:40px;background:transparent;border:1px solid #cbdbe9;
+ border-radius:8px;color:#345875;font-size:12px;font-weight:650;
+ padding:8px 11px;cursor:pointer;
+}
+.targeted-resume .hhba-word-match-reassess:disabled{opacity:.46;cursor:not-allowed}
+@media(prefers-reduced-motion:reduce){
+ .targeted-resume.is-word-first .hhba-word-stage-entering .targeted-resume-word-main,
+ .hhba-word-arrival-hint,.targeted-resume-word-suggestion{
+  animation:none!important;transform:none!important;filter:none!important;opacity:1!important
+ }
+}
