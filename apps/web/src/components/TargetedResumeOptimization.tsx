@@ -209,7 +209,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   finally{setVerifying(false);}
  }
  async function reassess(){
-  if(!scoreStatus?.enabled||!scoreJobId||scoring||!scoreSourceReady||!confirmReassessment)return;
+  if(!scoreStatus?.enabled||!scoreJobId||scoring||!scoreSourceReady||
+   !confirmReassessment||scoreResult?.supported)return;
   setScoring(true);setNotice('');setScoreResult(null);
   try{
    const result=await reassessResume(scoreJobId,profile,blocks,
@@ -252,7 +253,9 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  async function generate(){
   if(!consent||!blocks.length||busy||!status?.enabled)return;
   const currentBlocks=version.blocks;
-  invalidateScore();setBusy(true);setNotice('');setSuggestions([]);setRevealedSuggestionCount(0);
+  // Previewing/re-generating AI wording does not change the verified DOCX.
+  if(!sourceResume)invalidateScore();
+  setBusy(true);setNotice('');setSuggestions([]);setRevealedSuggestionCount(0);
   // On mobile the AI drawer must release the document while the model works.
   // The real PDF remains visible during analysis and staged suggestion reveal.
   if(sourceResume)setMobileSuggestionsOpen(false);
@@ -279,13 +282,15 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  }
  function commitVersion(next:ResumeVersion){
   setUndoStack(stack=>[...stack.slice(-19),version]);
-  setVersion(next);setConfirmReal(false);invalidateScore();
+  setVersion(next);setConfirmReal(false);
+  if(!sourceResume)invalidateScore();
  }
  function undo(){
   const previous=undoStack.at(-1);
   if(!previous)return;
   setUndoStack(stack=>stack.slice(0,-1));setVersion(previous);setConfirmReal(false);
-  setEditingBlock(null);setOpenSuggestionId(null);invalidateScore();
+  setEditingBlock(null);setOpenSuggestionId(null);
+  if(!sourceResume)invalidateScore();
   setNotice('已撤销上一次简历文字修改，原始上传文件保持不变。');
  }
  function accept(s:ResumeSuggestion){
@@ -645,7 +650,10 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      editPanelHost={wordEditHost} onEditingChange={setWordEditing}
      onOpenSuggestions={()=>setMobileSuggestionsOpen(true)}
      onPendingChange={setNativeWordPending}
-     onVerifiedSave={change=>setVerifiedWordEdits(prev=>[...prev.filter(item=>item.original!==change.original),change])}
+     onVerifiedSave={change=>{
+      setVerifiedWordEdits(prev=>[...prev.filter(item=>item.original!==change.original),change]);
+      invalidateScore();
+     }}
      onVersionMoved={()=>{
       setVerifiedWordEdits([]);setNativeWordTextDraft(null);
      }}
@@ -706,15 +714,17 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
        我已确认核验到的是 {verifiedJob.company} 的 {verifiedJob.title}
       </label>}
       {(hasAuditedAtsIdentity||confirmedVerifiedJob)&&<>
-       <label className="hhba-word-match-confirm">
+       {!scoreResult?.supported&&<label className="hhba-word-match-confirm">
         <input type="checkbox" checked={confirmReassessment}
          onChange={e=>setConfirmReassessment(e.target.checked)}/>
         我确认已保存的 Word 文字真实，使用同一岗位规则复评
-       </label>
+       </label>}
        <button type="button" className="hhba-word-match-reassess"
-        disabled={!scoreSourceReady||!hasSupportedJob||!confirmReassessment||scoring}
+        disabled={!scoreSourceReady||!hasSupportedJob||!confirmReassessment||scoring||
+         Boolean(scoreResult?.supported)}
         onClick={()=>void reassess()}>
-        {scoring?'正在核算…':'重新计算匹配分'}
+        {scoreResult?.supported?'本版已完成复评':
+         scoring?'正在核算…':'重新计算匹配分'}
        </button>
       </>}
      </>}
