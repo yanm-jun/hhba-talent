@@ -146,3 +146,32 @@ test('independent reviewer rejects a hallucination even if source quotes and num
  assert.equal(out.blocks[1].proposed,blocks[1].text);
  assert.ok(out.warnings.some(x=>x.code==='AI_AGENT_FACT_CHECK_REJECTED'));
 });
+
+test('large source remains fully accessible through AI-selected inspect_source, not an arbitrary snippet ceiling',async()=>{
+ const source={id:'long-experience',section:'experience',
+  text:'负责真实业务资料归档。'+'已有工作记录。'.repeat(220)};
+ const originalBlocks=[source];
+ const base={...draft,blocks:[{
+  ...draft.blocks[0],blockId:source.id,original:source.text,
+  proposed:source.text,changed:false
+ }],coverage:{source_blocks:1,analyzed_blocks:1,proposed_rewrites:0,held_for_review:0}};
+ let turn=0;
+ const out=await runResumeEditorialAgent({
+  draft:base,blocks:originalBlocks,job,env:{},provider:{name:'qa'},
+  reviewer:{name:'qa'},validateAuthoring,numberTokens,redacted,
+  completeJson:async(_provider,system,data)=>{
+   assert.match(system,/自主简历总编辑/);
+   if(turn++===0){
+    assert.ok(data.sections[0].source.length<=750,
+     'the overview must be compact to avoid overflowing long model contexts');
+    return {action:'inspect_source',
+     sections:[{blockId:source.id,goal:'理解该段完整工作记录'}]};
+   }
+   assert.equal(data.inspectedSections[0].source,source.text);
+   return {action:'finish'};
+  }
+ });
+ assert.equal(out.autonomy.stop_reason,'model_finished');
+ assert.equal(out.autonomy.tools_used[0].action,'inspect_source');
+ assert.equal(out.blocks[0].proposed,source.text);
+});
