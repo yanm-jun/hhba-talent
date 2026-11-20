@@ -27,7 +27,10 @@ export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate
   <header className="hhba-whole-rewrite-heading">
    <div><Sparkles size={17} aria-hidden="true"/>
     <strong>岗位定向整份简历</strong></div>
-   <p>{allVisible?'已完成整份改写，请核对所有真实事实。':
+   <p>{allVisible?
+    (result.autonomy?.needs_more_work?
+     '已生成整份草稿，但自主深度审查尚未全部完成；请仔细核对。':
+     'AI 已完成本轮整份改写，请核对所有真实事实。'):
     'AI 已完成生成，正在逐段展示真正的改写结果：'+
     Math.min(revealedCount,result.blocks.length)+' / '+result.blocks.length+'。'}</p>
   </header>
