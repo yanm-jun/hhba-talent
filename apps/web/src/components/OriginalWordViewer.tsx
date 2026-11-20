@@ -220,11 +220,8 @@ export function OriginalWordViewer({resume,onClose}:{
            <X size={14}/></button>
          </div>
          <textarea aria-label="修改 Word 文字" value={draft} rows={3}
+          className={draft!==selected.text?'hhba-siri-typing':''}
           maxLength={300} onChange={e=>{setDraft(e.target.value);setConfirmed(false);}}/>
-         {draft!==selected.text&&<div className="hhba-resume-pending-text"
-          role="note" aria-label="待确认修改文字">
-          <span className="hhba-resume-siri-letters">{draft}</span>
-         </div>}
          <label><input type="checkbox" checked={confirmed}
           onChange={e=>setConfirmed(e.target.checked)}/>我确认内容属实，并同意处理此文件</label>
          <div className="hhba-original-resume-editbox-actions">
