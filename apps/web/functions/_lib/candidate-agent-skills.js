@@ -80,6 +80,18 @@ export async function candidateAgentRuntimePolicy(env){
   return {enabled:candidateAgentEnabled(env)&&policy.configured&&policy.enabled,policy};
 }
 
+/**
+ * Enforce the optional editing Skill at the actual paid rewrite endpoint,
+ * not just by hiding a button. Existing non-Agent Word editing is independent.
+ */
+export async function candidateAgentRewriteAllowed(env){
+  if(!candidateAgentEnabled(env))return true;
+  const runtime=await candidateAgentRuntimePolicy(env);
+  if(!runtime.enabled)return true;
+  return runtime.policy.skills.includes('targeted_resume_rewrite')&&
+    selectedCandidateSkills(env).includes('targeted_resume_rewrite');
+}
+
 export function candidateAgentConfiguration(env,policy=null) {
   const enabled=candidateAgentEnabled(env)&&policy?.configured===true&&policy?.enabled===true;
   let allowed,configurationError=null;
