@@ -111,6 +111,12 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
   }));
   return respond({ok:true,kind:'HHBA_WHOLE_RESUME_REWRITE_V1',
    provider:'synthetic-mock',reviewer:'synthetic-review',
+   autonomy:{enabled:true,rounds:3,stop_reason:'model_finished',needs_more_work:false,
+    tools_used:[
+     {action:'inspect_source',sections:[input.blocks[0].id],accepted:1},
+     {action:'rewrite_sections',sections:[input.blocks[0].id],accepted:1},
+     {action:'finish',sections:[],accepted:0}
+    ]},
    blocks:rewritten,
    recommended_order:input.blocks.map((b:{id:string})=>b.id).reverse(),
    questions:[{
