@@ -12,6 +12,7 @@ import http.client
 import io
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import tempfile
@@ -109,6 +110,20 @@ def build_real_docx(root):
     # The default python-docx template uses Office theme family attributes,
     # which the production renderer intentionally fails closed on. Build a
     # deliberate explicit-font fixture without silently substituting fonts.
+    # Preserve every other OOXML prefix and metadata byte, including
+    # mc:Ignorable declarations. Full ElementTree reserialization can drop
+    # namespace declarations that Office still uses in mc:Ignorable.
+    def explicit_font_tag(match):
+        tag = match.group(0)
+        for attr in ("asciiTheme", "hAnsiTheme", "eastAsiaTheme", "csTheme"):
+            tag = re.sub(r'\\s+w:' + attr + r'="[^"]*"', "", tag)
+        for attr in ("ascii", "hAnsi", "eastAsia", "cs"):
+            pattern = r'w:' + attr + r'="[^"]*"'
+            if re.search(pattern, tag):
+                tag = re.sub(pattern, 'w:' + attr + '="' + FONT + '"', tag)
+            else:
+                tag = tag.replace("/>", ' w:' + attr + '="' + FONT + '"/>')
+        return tag
     updates = {}
     with ZipFile(io.BytesIO(raw)) as pkg:
         for name in pkg.namelist():
@@ -118,14 +133,9 @@ def build_real_docx(root):
                 continue
             if not name.endswith(".xml"):
                 continue
-            root_el = ET.fromstring(pkg.read(name))
-            for fonts in root_el.iter(W + "rFonts"):
-                for k in list(fonts.attrib):
-                    if k.startswith(W) and k.endswith("Theme"):
-                        del fonts.attrib[k]
-                for attr in ("ascii", "hAnsi", "eastAsia", "cs"):
-                    fonts.set(W + attr, FONT)
-            updates[name] = ET.tostring(root_el, encoding="utf-8", xml_declaration=True)
+            part = pkg.read(name).decode("utf-8")
+            part = re.sub(r'<w:rFonts\\b[^>]*?/>', explicit_font_tag, part)
+            updates[name] = part.encode("utf-8")
     explicit = package_rebuild(raw, updates)
     return raw, explicit
 
