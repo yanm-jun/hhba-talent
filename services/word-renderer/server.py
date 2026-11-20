@@ -69,7 +69,17 @@ def docx_safe(contents: bytes) -> None:
                         if rel.attrib.get("TargetMode", "").lower() == "external":
                             raise ValueError("WORD_EXTERNAL_RESOURCE")
             body = z.read("word/document.xml")
-            if b"<!DOCTYPE" in body or b"<!ENTITY" in body:
+            upper = body.upper()
+            if b"<!DOCTYPE" in upper or b"<!ENTITY" in upper or \
+               b"<W:INSTRTEXT" in upper or b"<W:FLDSIMPLE" in upper or \
+               b"<W:ALTCHUNK" in upper or \
+               any(marker in upper for marker in (
+                   b"INCLUDEPICTURE", b"INCLUDETEXT", b"DDEAUTO",
+                   b" HYPERLINK ", b" LINK "
+               )):
+                # Field instructions can refer to external URLs even when
+                # all OOXML relationships look local. Never let LibreOffice
+                # resolve an external file while rendering private resumes.
                 raise ValueError("WORD_UNSAFE_FILE")
     except (BadZipFile, ET.ParseError, OSError, RuntimeError, KeyError) as exc:
         raise ValueError("WORD_INVALID_FILE") from exc
