@@ -804,3 +804,21 @@
  .hhba-whole-rewrite-questions textarea{font-size:16px}
  .targeted-resume .hhba-whole-rewrite-primary{min-height:46px}
 }
+
+
+.hhba-whole-rewrite-approval .hhba-whole-rewrite-download{
+ display:flex;align-items:center;justify-content:center;gap:9px;
+ width:100%;min-height:43px;padding:9px 12px;
+ border:1px solid #90acc1;border-radius:9px;
+ background:#f6f9fc;color:#264b6b;font-size:12px;font-weight:690;
+ cursor:pointer;
+}
+.hhba-whole-rewrite-approval .hhba-whole-rewrite-download:hover:not(:disabled){
+ border-color:#5582aa;background:#ecf4fb;
+}
+.hhba-whole-rewrite-approval .hhba-whole-rewrite-download:disabled{
+ opacity:.46;cursor:not-allowed;
+}
+.hhba-whole-rewrite-approval>small{
+ font-size:10px;line-height:1.65;color:#7b8b9b;
+}
