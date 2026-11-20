@@ -67,3 +67,24 @@ test('job-specific Word editing is separate for each selected JD and original re
  assert.match(modal,/confirmExitOptimization/);
  assert.match(modal,/HHBA 不会替你提交/);
 });
+
+test('Siri visual review is accessible only via the isolated feature Preview build, never the production bundle',async()=>{
+ const html=await readFile(new URL('../preview-only/resume-siri.html',import.meta.url),'utf8');
+ const build=await readFile(new URL('./cloudflare-pages-build.py',import.meta.url),'utf8');
+ const siri=await source('styles/siri-edge.css');
+ assert.match(html,/Siri 彩虹交互 · 视觉预览/);
+ assert.match(html,/siri-stage active/);
+ assert.match(html,/hhba-siri-edge-flow 18s linear infinite/);
+ assert.match(siri,/hhba-siri-edge-flow 18s linear infinite/);
+ assert.match(html,/hhba-resume-siri-letters-flow 11s ease-in-out infinite alternate/);
+ assert.match(siri,/hhba-resume-siri-letters-flow 11s ease-in-out infinite alternate/);
+ assert.match(html,/data-pending/);
+ assert.match(html,/确认这两处修改（演示）/);
+ assert.match(html,/normal\.forEach\(el=>\{el\.hidden=active/);
+ assert.match(html,/stage\.classList\.toggle\('active',active\)/);
+ assert.match(html,/未连接真实 AI、数据库、Word 渲染器或投递接口/);
+ assert.doesNotMatch(html,/<script[^>]+src=|fetch\(|XMLHttpRequest|localStorage|sessionStorage/);
+ assert.match(build,/os\.environ\.get\("CF_PAGES_BRANCH"\) == "feature\/resume-targeted-optimization-foundation-20261119"/);
+ assert.match(build,/WEB \/ "preview-only" \/ "resume-siri\.html"/);
+ assert.match(build,/WEB \/ "dist" \/ "preview" \/ "resume-siri\.html"/);
+});
