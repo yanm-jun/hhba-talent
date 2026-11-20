@@ -398,6 +398,27 @@ try{
  }
 
 
+
+ // Actual Chromium PDF.js re-parsing plus pixel-diff proof of same PDF font.
+ // This is deliberately a tiny original-font subset, not general PDF editing.
+ const native=await browser.newPage({viewport:{width:1100,height:900},locale:'zh-CN'});
+ const nativeErrors=[];native.on('pageerror',e=>nativeErrors.push(e.message));
+ await native.goto('http://127.0.0.1:3000/qa/native-pdf-font.html',
+  {waitUntil:'networkidle',timeout:45000});
+ await native.waitForFunction(()=>
+  document.querySelector('#native-pdf-test')?.getAttribute('data-status')!=='',
+  {timeout:15000});
+ const nativeProof=await native.locator('#native-pdf-test').evaluate(node=>({
+  status:node.dataset.status,font:node.dataset.font,
+  changedPixels:Number(node.dataset.changedPixels),text:node.textContent
+ }));
+ assert.equal(nativeProof.status,'passed','native-font PDF patch must pass renderer proof: '+
+  JSON.stringify(nativeProof));
+ assert.equal(nativeProof.font,'Helvetica');
+ assert.ok(nativeProof.changedPixels>8);
+ assert.deepEqual(nativeErrors,[],'native-font PDF should render in Chromium');
+ await native.screenshot({path:output+'/native-pdf-original-font-compared.png',fullPage:true});
+ await native.close();
  console.log(JSON.stringify({result:'PASSED',desktop_pdf_pages:pages.length,
   long_pdf_pages:longPages.length,mobile:metrics,qa_output:output}));
 }finally{await browser.close()}
