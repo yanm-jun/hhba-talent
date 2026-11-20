@@ -541,6 +541,27 @@ try{
    'PDF must render the verified saved Word content, not the original');
   await word.screenshot({path:output+'/original-word-'+view.name+'-saved.png',
    fullPage:true});
+  // Another native Word revision must remain editable without re-uploading.
+  await word.getByRole('button',{name:'修改这段 Word'}).first().click();
+  const nextInput=word.getByRole('textbox',{name:'修改 Word 文字'});
+  assert.equal(await nextInput.inputValue(),'EDITED WORD RESUME');
+  await nextInput.fill('FINAL WORD RESUME');
+  await word.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
+  await word.getByRole('button',{name:'保存',exact:true}).click();
+  await word.getByText('当前修改进度：2 / 2',{exact:false}).waitFor();
+  assert.equal(await word.getByRole('button',{name:'重做'}).isDisabled(),true);
+  await word.getByRole('button',{name:'撤销'}).click();
+  await word.getByText('当前修改进度：1 / 2',{exact:false}).waitFor();
+  assert.equal(await word.getByRole('button',{name:'重做'}).isEnabled(),true);
+  await word.getByRole('button',{name:'重做'}).click();
+  await word.getByText('当前修改进度：2 / 2',{exact:false}).waitFor();
+  const finalPdfEvent=word.waitForEvent('download');
+  await word.getByRole('button',{name:'下载 PDF'}).click();
+  const finalPdf=await finalPdfEvent;
+  const finalFile=output+'/original-word-'+view.name+'-after-redo.pdf';
+  await finalPdf.saveAs(finalFile);
+  assert.ok((await pdfText(await readFile(finalFile)))[0].includes('FINAL WORD RESUME'),
+   'redo must deliver the latest Word-derived PDF, not the previous revision');
   const geom=await word.evaluate(()=>({
    client:document.documentElement.clientWidth,
    scroll:document.documentElement.scrollWidth
