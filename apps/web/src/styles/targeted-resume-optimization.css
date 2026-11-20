@@ -882,3 +882,53 @@
 .targeted-resume .hhba-whole-rewrite-cancel:hover{
  background:#edf4fa;
 }
+
+
+/* Simplified visual hierarchy for the real job-specific Word optimizer.
+   The document remains central. The former full-height right-side workspace
+   is now a small floating advice popover with optional scroll for advanced
+   score/rewrite controls. No AI, Word or scoring behavior is changed. */
+@media(min-width:701px){
+ .hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-word-workspace{
+  grid-template-columns:minmax(0,1fr) 282px;
+  gap:19px;align-items:start;
+ }
+ .hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-word-assistant{
+  width:282px;max-width:282px;box-sizing:border-box;
+  position:sticky;top:11px;align-self:start;
+  max-height:min(480px,calc(100dvh - 195px));overflow-y:auto;
+  border:1px solid #e4eaf0;border-radius:14px;
+  background:#fff;box-shadow:0 13px 34px rgba(30,59,83,.10);
+  padding:15px 14px 18px;
+  scrollbar-width:thin;
+ }
+ .hhba-match-modal-editor .targeted-resume-word-assistant-head{order:0;margin-bottom:0}
+ .hhba-match-modal-editor .targeted-resume-word-assistant .targeted-resume-toolbar{order:1}
+ .hhba-match-modal-editor .targeted-resume-word-assistant .targeted-resume-ai-settings{order:2}
+ .hhba-match-modal-editor .targeted-resume-word-suggestion-list{order:3}
+ .hhba-match-modal-editor .targeted-resume-word-empty,
+ .hhba-match-modal-editor .targeted-resume-word-reveal{order:4}
+ .hhba-match-modal-editor .targeted-resume-word-next-step{order:5}
+ .hhba-match-modal-editor .targeted-resume-word-assistant .hhba-word-match-score{order:9}
+ .hhba-match-modal-editor .targeted-resume-word-assistant .hhba-whole-rewrite-start{order:10}
+ .hhba-match-modal-editor .targeted-resume-word-privacy{order:20}
+ .hhba-match-modal-editor .targeted-resume-word-assistant .targeted-resume-toolbar{
+  margin:7px 0 9px;padding:0;border:0;background:transparent;
+ }
+ .hhba-match-modal-editor .targeted-resume-word-assistant .targeted-resume-toolbar>button{
+  min-height:40px;font-size:11px;
+ }
+ .hhba-match-modal-editor .targeted-resume-word-assistant .hhba-word-match-score{
+  padding:11px 0;border-top:1px solid #edf1f4;border-radius:0;
+  background:transparent;margin-top:8px;
+ }
+}
+@media(max-width:700px){
+ .hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-word-assistant{
+  max-height:min(64dvh,570px);
+  padding:15px 16px calc(15px + env(safe-area-inset-bottom,0px));
+  border-radius:16px 16px 0 0;
+ }
+ .hhba-match-modal-editor .targeted-resume-word-assistant-head>p{font-size:11px}
+ .hhba-match-modal-editor .targeted-resume-word-suggestion-title{min-height:43px}
+}
