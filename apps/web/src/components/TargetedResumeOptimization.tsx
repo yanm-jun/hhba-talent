@@ -68,6 +68,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [activeSuggestionId,setActiveSuggestionId]=useState<string|null>(null);
  const [mobileSuggestionsOpen,setMobileSuggestionsOpen]=useState(false);
  const [nativeWordPending,setNativeWordPending]=useState(false);
+ const [verifiedWordEdits,setVerifiedWordEdits]=useState<Array<{original:string;text:string}>>([]);
  // Do not silently keep a resume in localStorage. Optional draft recovery
  // requires a separate, user-checked consent and is tab/session-scoped.
  const draftKey=sourceResume&&accountScope?
@@ -230,6 +231,9 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   try{
    commitVersion(applySuggestion(version,{...s,proposed},true));
    setOpenSuggestionId(null);setEditingSuggestionId(null);
+   setSuggestionDrafts(previous=>{
+    const next={...previous};delete next[s.id];return next;
+   });
    setNotice(sourceResume?'建议已确认。请在原 Word 上点选对应文字并再次确认保存；尚未改动原文件。':
     '已在简历文字草稿内填充。可以撤销，原始 Word 文件没有被修改。');
   }catch{setNotice('原文已变化或缺乏真实证据，请重新生成建议。');}
@@ -245,6 +249,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   try{
    commitVersion(applySuggestion(version,{...s,action:'append',proposed:text},true));
    setOpenSuggestionId(null);
+   setNewEvidence(previous=>{const next={...previous};delete next[s.id];return next;});
    setNotice(sourceResume?'真实经历补充已记入建议草稿。复杂的新增段落暂不能安全自动写回原 Word，请自行核对。':
     '已将你亲自填写的真实信息填充到简历文字草稿。');
   }catch{setNotice('原文已经变化，请重新生成补充建议。');}
@@ -365,9 +370,17 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const pendingSuggestions=suggestions.filter(s=>!ignored.includes(s.id)&&
   !version.acceptedSuggestionIds.includes(s.id));
  const acceptedCount=suggestions.filter(s=>version.acceptedSuggestionIds.includes(s.id)).length;
- const draftDirty=hasWordingChanges||Boolean(editingBlock)||
-  Object.values(suggestionDrafts).some(value=>value.trim().length>0)||
-  Object.values(newEvidence).some(value=>value.trim().length>0)||
+ const pendingTextChanges=version.blocks.some(block=>{
+  const original=blocks.find(item=>item.id===block.id);
+  if(!original||original.text===block.text)return false;
+  return !sourceResume||!verifiedWordEdits.some(change=>
+   change.original===original.text&&change.text===block.text);
+ });
+ const draftDirty=pendingTextChanges||Boolean(editingBlock)||
+  suggestions.some(item=>!ignored.includes(item.id)&&
+   !version.acceptedSuggestionIds.includes(item.id)&&
+   ((suggestionDrafts[item.id]||'').trim().length>0||
+    (newEvidence[item.id]||'').trim().length>0))||
   Object.values(details).some(value=>String(value||'').trim().length>0);
 
  function restoreSessionDraft(){
@@ -464,7 +477,10 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    <div className="targeted-resume-word-main">
     <OriginalWordViewer resume={sourceResume} suggestedChanges={confirmedWordChanges}
      onOpenSuggestions={()=>setMobileSuggestionsOpen(true)}
-     onPendingChange={setNativeWordPending} pendingSuggestionCount={pendingSuggestions.length}/>
+     onPendingChange={setNativeWordPending}
+     onVerifiedSave={change=>setVerifiedWordEdits(prev=>[...prev.filter(item=>item.original!==change.original),change])}
+     onVersionMoved={()=>setVerifiedWordEdits([])}
+     pendingSuggestionCount={pendingSuggestions.length}/>
    </div>
    <aside className={'targeted-resume-word-assistant'+(mobileSuggestionsOpen?' mobile-open':'')}
     aria-label="AI 建议工作台">
