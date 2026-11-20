@@ -203,7 +203,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
        <p>请稍后再试，或直接浏览公开岗位。</p>
        <button type="button" onClick={()=>{setAvailability('loading');void matchServiceReady().then(ok=>setAvailability(ok?'ready':'disabled'))}}>重新检测服务状态</button>
        </div></div>}
-    <div className="hhba-ai-layout">
+    <div className={"hhba-ai-layout"+((file||savedId)?" hhba-ai-layout-reading":"")}>
       <section className="hhba-ai-upload">
         <header><h2><FileUp size={20}/> 选择你的 Word 简历</h2>
          <p>上传 .docx，或选择以前保存的简历。AI 会根据真实内容主动寻找岗位，不必先填写求职条件。</p></header>
