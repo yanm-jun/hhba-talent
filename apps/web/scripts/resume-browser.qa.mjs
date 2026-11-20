@@ -787,6 +787,8 @@ try{
   await primary.click();
   await full.locator('.hhba-whole-rewrite').waitFor({timeout:20000});
   const rows=full.locator('.hhba-whole-rewrite-block');
+  await full.waitForFunction(()=>
+   document.querySelectorAll('.hhba-whole-rewrite-block').length===9,{timeout:15000});
   assert.equal(await rows.count(),9,
    'full writer must process ALL nine source paragraphs instead of only five tips');
   assert.match(await full.locator('.hhba-whole-rewrite-metrics').textContent(),/读取段落 9/);
