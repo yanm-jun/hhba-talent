@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {onRequestGet,onRequestPost} from '../functions/api/resume-rewrite.js';
+import {onRequestPost as onContinuationStep} from '../functions/api/resume-rewrite-step.js';
 
 const origin='https://preview.hhba.example';
 const endpoint=origin+'/api/resume-rewrite';
@@ -142,4 +143,57 @@ test('model-directed quality pass outage does not erase the already audited sour
   assert.equal(body.autonomy.stop_reason,'tool_unavailable');
   assert.equal(body.autonomy.needs_more_work,true);
  }finally{globalThis.fetch=previous;}
+});
+
+test('initial signed AI draft automatically continues through an actual second authenticated HTTP request',async()=>{
+ const env={...fakeEnv,HHBA_RESUME_AGENT_ENABLED:'1',
+  HHBA_RESUME_AGENT_CHECKPOINT_SECRET:'local-preview-only-'+ 'v'.repeat(70)};
+ const before=globalThis.fetch;let controllerCalls=0;
+ globalThis.fetch=async(_url,init)=>{
+  const packet=JSON.parse(init.body);
+  const system=packet.messages[0].content;
+  const data=JSON.parse(packet.messages[1].content);
+  if(system.includes('内容架构师'))return respond({focus:['运营'],questions:[]});
+  if(system.includes('专业简历撰写者'))return respond({rewrites:[{
+   blockId:block.id,text:'协助门店运营与真实客户沟通。',
+   sourceQuotes:[block.text],rationale:'澄清已有职责',jobRequirements:[]
+  }]});
+  if(system.includes('事实审查员'))
+   return respond({checks:[{blockId:block.id,safe:true,concern:''}]});
+  if(system.includes('自主简历总编辑')){
+   if(controllerCalls++===0)
+    return respond({action:'inspect_source',
+     sections:[{blockId:block.id,goal:'检查完整原文'}]});
+   assert.equal(data.inspectedSections[0].source,block.text);
+   assert.equal(data.previousActions[0].action,'inspect_source');
+   return respond({action:'finish',reason:'本轮已完成'});
+  }
+  throw Error('unknown model prompt');
+ };
+ try{
+  const initial=await onRequestPost({env,request:request()});
+  assert.equal(initial.status,200);
+  const first=await initial.json();
+  assert.equal(first.autonomy.rounds,1);
+  assert.equal(first.autonomy.needs_more_work,true);
+  assert.equal(first.continuation.enabled,true);
+  assert.match(first.continuation.checkpoint,/^h1\./);
+  const followUp=new Request(endpoint.replace('resume-rewrite','resume-rewrite-step'),{
+   method:'POST',headers:{Origin:origin,'Content-Type':'application/json',
+    Authorization:'Bearer qa-token'},
+   body:JSON.stringify({
+    consent_ai:true,blocks:[block],job,draft:first,
+    checkpoint:first.continuation.checkpoint
+   })
+  });
+  const response=await onContinuationStep({env,request:followUp});
+  assert.equal(response.status,200);
+  const second=await response.json();
+  assert.equal(second.autonomy.rounds,2);
+  assert.deepEqual(second.autonomy.tools_used.map(x=>x.action),[
+   'inspect_source','finish']);
+  assert.equal(second.autonomy.needs_more_work,false);
+  assert.equal(second.continuation.enabled,false);
+  assert.equal(controllerCalls,2);
+ }finally{globalThis.fetch=before;}
 });
