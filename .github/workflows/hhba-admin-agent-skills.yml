@@ -1,0 +1,47 @@
+name: HHBA Admin Candidate Agent Center Stage 2
+on:
+  pull_request:
+    paths:
+      - 'apps/admin-preview/candidate-agent-*'
+      - 'apps/admin-preview/index.html'
+      - 'apps/admin-preview/dashboard.js'
+      - 'apps/web/functions/admin-preview/api/candidate-agent.js'
+      - 'apps/web/functions/_lib/candidate-agent-policy.js'
+      - 'apps/web/d1/0031_candidate_agent_policy.sql'
+      - 'apps/web/scripts/admin-agent-skills.api.test.mjs'
+      - 'apps/web/scripts/candidate-agent-policy.contract.test.mjs'
+      - 'apps/web/scripts/build-standalone-admin.py'
+      - 'apps/web/scripts/cloudflare-pages-build.py'
+      - '.github/workflows/hhba-admin-agent-skills.yml'
+  push:
+    branches:
+      - feature/admin-agent-skills-center-stage2-20261120
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Real SQLite and authenticated route tests
+        working-directory: apps/web
+        run: node --experimental-sqlite --test scripts/candidate-agent-policy.contract.test.mjs scripts/admin-agent-skills.api.test.mjs
+      - name: Verify browser console JavaScript syntax
+        run: node --check apps/admin-preview/candidate-agent-console.js
+      - name: Build the real password-admin asset bundle without deploying
+        working-directory: apps/web
+        env:
+          CF_PAGES_BRANCH: feature/admin-agent-skills-center-stage2-20261120
+        run: |
+          python3 scripts/build-standalone-admin.py
+          test -s dist/admin-preview/candidate-agent-console.js
+          test -s dist/admin-preview/candidate-agent-console.css
+          grep -q 'id="view-agent"' dist/admin-preview/index.html
+          grep -q './candidate-agent-console.js' dist/admin-preview/index.html
+          grep -q './candidate-agent-console.css' dist/admin-preview/index.html
+          test -s dist/_routes.json
