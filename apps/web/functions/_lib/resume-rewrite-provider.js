@@ -13,7 +13,7 @@ export const REWRITE_KIND='HHBA_WHOLE_RESUME_REWRITE_V1';
 const GROUP_CHARS=8000,MAX_BLOCKS=96,MAX_TEXT_PER_BLOCK=8000;
 const compact=x=>String(x??'').trim();
 function error(code){throw new Error(code);}
-function redacted(text){
+export function redacted(text){
  return text.replace(/[a-z\d._%+-]+@[a-z\d.-]+\.[a-z]{2,}/gi,'[EMAIL_REDACTED]')
   .replace(/(?<!\d)1[3-9]\d{9}(?!\d)/g,'[PHONE_REDACTED]')
   .replace(/(?<!\d)\d{17}[\dXx](?!\d)/g,'[ID_REDACTED]');
@@ -42,7 +42,7 @@ function balancedGroups(blocks){
  if(group.length)groups.push(group);
  return groups;
 }
-function numberTokens(text){
+export function numberTokens(text){
  return new Set((text.match(/(?<!\d)\d+(?:[.,]\d+)*%?/gu)||[])
   .map(x=>x.replaceAll(',','')));
 }
@@ -69,7 +69,7 @@ function safeQuestions(value,blocks){
  }
  return out;
 }
-function validateAuthoring(block,proposal,quotes,numbers){
+export function validateAuthoring(block,proposal,quotes,numbers){
  if(typeof proposal!=='string'||!proposal.trim()||
   proposal.length>Math.max(12000,block.text.length*4))
   return 'INVALID_REWRITE_TEXT';
@@ -85,7 +85,7 @@ function validateAuthoring(block,proposal,quotes,numbers){
  }
  return null;
 }
-async function completeJson(provider,system,user,signal,maxTokens=9000){
+export async function completeJson(provider,system,user,signal,maxTokens=9000){
  const headers={'content-type':'application/json'},url=provider.baseUrl+
   (provider.protocol==='anthropic'?'/messages':'/chat/completions');
  let body;
