@@ -53,3 +53,22 @@ HHBA_AI_ANTHROPIC_MODEL=(管理员选择的审查模型)
 5. **长任务可靠性**：多模型分组撰写可能超过单次 Cloudflare Free 请求的墙钟时间；需要分段继续执行与私有进度持久化，不能保证目前单一 HTTP 请求适用于所有极长简历。
 
 当前仅提交 Draft PR #405，不合并 `main`，不修改正式 `hhba.work` 的数据库、R2、模型密钥或服务计费开关。
+
+
+## 2026-11-20 第二阶段：AI 主动选择工具与深度改写
+
+在 `resume-rewrite-provider.js` 原有完整撰写与独立事实审核之上，新建 `resume-rewrite-agent.js`。用户仍然只需上传 Word、选岗位和明确同意第三方处理；AI 在基础稿生成之后依据实际内容选择动作：
+- `inspect_source`：主动读取指定段落完整原始证据，避免单靠摘要断章取义；
+- `rewrite_sections`：自主挑选需要再改写的章节并写出改写目标，程序调用可配置大模型进行整段撰写；
+- `ask_user`：主动提出缺少的真实事实问题，阻止模型把岗位需求擅自写成个人经历；
+- `finish`：认为当前版本足够好时主动结束，不为凑数量强制改写。
+
+**决策交给模型，执行交给可信工具**：模型不得直接调用未审核的外部网址、操作 D1/R2 或覆盖 Word 文件。每次 `rewrite_sections` 都要经过引用原文、段落级数字校验以及独立事实审查；被拒绝的内容保留上一份可信版本。前端显示实际发生过的工具动作和轮数，并区别「模型已完成」「需要用户补充」「执行时达到技术边界」「模型深度复核不可用」。
+
+`/api/resume-rewrite` 的 `HHBA_RESUME_AGENT_ENABLED` **默认启用**，可在隔离 Preview 配置为 `0` 回滚到旧稳定流程。原有用户会话权限、明确授权、匿名防刷限制、生产环境单独开启要求保持不变。每次 Cloudflare Worker 请求需要执行时间保护：`HHBA_RESUME_AGENT_MAX_PASSES` 默认四轮，管理员可配置 1–16 轮；这是现有同步 HTTP 执行的**技术护栏**，并非每份简历最多只能改几条。到达边界时必须明确声明尚可继续改进，不能谎称所有目标已完成。后续仍需要设计可以安全继续长任务的多请求状态方案。
+
+**DeepSeek 推理模式**：旧请求携带 `thinking.type=disabled`，现改为 `thinking.type=enabled` 并可通过 `HHBA_AI_DEEPSEEK_REASONING_EFFORT` 调节低/高/最大推理强度；默认整份写作任务使用 `deepseek-v4-pro`（如管理员已配置具体模型则优先使用现有配置）。完整写作、审查与模型任务决策均调用这一思考能力；结构化输出仍使用官方 JSON response format。DeepSeek 官方参考：https://api-docs.deepseek.com/guides/thinking_mode/ 、https://api-docs.deepseek.com/guides/json_mode/ 。
+
+**技术验收**：新增模型自主读取原文→再写→完成、无需改写时直接结束、主动向用户追问、未知工具拒绝、原文数字造假阻断、独立审核拒绝虚构职责、长段落完整审核、模型接口不可用时保留已核实完整草稿、前端展示真实任务记录。测试使用虚构简历及模拟模型响应；真实第三方模型账户仍需要独立 Preview 验收，不能直接宣称线上效果已经实现。
+
+此版本仍属于 Draft PR #405，不合并、不修改正式 HHBA 网站或生产费用设置。Cloudflare Free、无 Railway 的原则不变。
