@@ -34,6 +34,7 @@ export type MatchedJob = {
 };
 export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
+  resume_profile_source?:'CACHED'|'NEW'|'EPHEMERAL'|'LEGACY_UNCACHED';
   matched_official_jobs:number;source:string;scoring:string;privacy:string;disclaimer:string;
   native_search?:{model:string;searches:number;page_reads:number;provider_items:number;visible_jobs:number;discarded:number;elapsed_ms:number};
   history_id?:string|null;
@@ -47,6 +48,17 @@ const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays 
 const LIMIT=3*1024*1024;
 const errorMap:Record<string,string>={
   MATCH_NOT_ENABLED:'智能匹配服务尚未开放，请稍后再试。',
+  PAID_AI_DISABLED:'平台已停用付费 AI，请使用免费智能匹配通道。',
+  FREE_AI_NOT_CONFIGURED:'免费 AI 尚未完成安全配置，目前不会调用付费 AI。',
+  FREE_AI_LEDGER_UNAVAILABLE:'免费 AI 调用额度保护不可用，已停止新分析。',
+  FREE_AI_BUDGET_EXHAUSTED:'今天的免费 AI 名额已用完，已停止新模型调用。',
+  FREE_AI_IN_PROGRESS:'这份简历与条件正在匹配中，请稍后重试。',
+  FREE_AI_PROVIDER_LIMIT:'免费模型临时达到调用上限，请稍后再试。',
+  FREE_AI_PROVIDER_ACCOUNT_NOT_FREE:'免费模型账户状态未通过核验，已停止以避免计费。',
+  FREE_AI_PROVIDER_UNAVAILABLE:'免费 AI 模型暂不可用，不会切换到付费模型。',
+  FREE_AI_RESPONSE_INVALID:'免费 AI 的结果校验未通过，请稍后重试。',
+  FREE_AI_INPUT_INVALID:'免费 AI 请求不符合安全输入要求。',
+
   MATCH_DATABASE_NOT_READY:'智能匹配额度保护尚未配置，已停止分析以防产生费用。',
   SESSION_INVALID:'请登录 HHBA 求职账户后重试。',
   FORBIDDEN:'当前账户无权使用求职者匹配服务。',
@@ -54,6 +66,13 @@ const errorMap:Record<string,string>={
   RESUME_NOT_FOUND:'这份简历不在当前账户，请重新选择。',
   EXPLICIT_AI_SHARING_CONSENT_REQUIRED:'请先确认本次第三方 AI 分析授权。',
   INVALID_RESUME_TEXT:'简历中没有足够可复制的文字，请使用文字版 PDF 或 DOCX。',
+  FREE_RESUME_PARSER_TEXT_REQUIRED:'首次解析这份已保存简历，需要从本地安全读取其文字。',
+  FREE_RESUME_PARSER_NOT_CONFIGURED:'免费简历解析服务尚未配置完成。',
+  FREE_RESUME_PARSER_DATABASE_UNAVAILABLE:'简历解析缓存数据库暂不可用，请稍后再试。',
+  FREE_RESUME_PARSER_DAILY_LIMIT:'今天的平台免费简历解析名额已用完，请明天再试。',
+  FREE_RESUME_PARSER_IN_PROGRESS:'这份简历正在解析中，请稍后再试，不会再次调用 AI。',
+  FREE_RESUME_PARSER_BAD_RESPONSE:'简历解析结果暂时不完整，请稍后重试。',
+  FREE_RESUME_PARSER_UNAVAILABLE:'免费简历解析服务暂时不可用，请稍后再试。',
   OFFICIAL_JOB_INDEX_UNAVAILABLE:'岗位官方审核数据暂时不可用，请稍后再试。',
   NO_VERIFIED_DOMESTIC_JOBS:'目前尚无通过最新审核的中国大陆岗位，本次没有调用 AI，也没有扣匹配次数。我们正在补充国内招聘来源。',
   AI_PROVIDER_UNAVAILABLE:'AI 接口出现异常，请稍后再试。',
@@ -102,6 +121,15 @@ export async function matchServiceReady(signal?:AbortSignal):Promise<boolean>{
  }catch{return false}
 }
 /** Best-effort browser redaction before submitting text to HHBA's server. */
+/** Only a server flag permits the cache-only fast path; old deployments keep working. */
+export async function freeResumeParserReady(signal?:AbortSignal):Promise<boolean>{
+ try{
+  const response=await fetch(API+'/status',{credentials:'same-origin',cache:'no-store',signal});
+  if(!response.ok)return false;
+  const data=await response.json() as {kind?:string;free_resume_parser_enabled?:boolean};
+  return data.kind==='HHBA_NATIVE_WEB_MATCH_V1'&&data.free_resume_parser_enabled===true;
+ }catch{return false}
+}
 export function redactResumeTextLocally(text:string):string{
  return text
   .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,'[邮箱已隐藏]')
@@ -188,16 +216,16 @@ async function consumeNativeMatchStream(
 export async function submitExtractedResumeText(
  text:string,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string,
  onProgress?:(stage:NativeMatchProgress)=>void,
- onPartial?:(jobs:MatchedJob[])=>void
+ onPartial?:(jobs:MatchedJob[])=>void,previewEdited=false,cacheOnly=false
 ):Promise<MatchResponse>{
  if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
  const token=session();
  const cleaned=redactResumeTextLocally(text);
- if(cleaned.replace(/\s/g,'').length<30)throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
+ if(cleaned.replace(/\s/g,'').length<30&&!(cacheOnly&&resumeId))throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
  const response=await fetch(API+'/resume',{
   method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
-  body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
+  body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,preview_edited:previewEdited,
    options:{country:'CN',remote_only:false,
     role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10))}})
  }).catch(e=>{if((e as Error)?.name==='AbortError')throw e;
@@ -210,6 +238,18 @@ export async function submitExtractedResumeText(
  if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||data.matches.length>10)
   throw new MatchError(502,errorMap.BAD_RESPONSE);
  return data as MatchResponse;
+}
+
+/** Reuse the server-owned profile without downloading the R2 file or invoking the parser.
+ * A 428 response means the first extraction is required; caller may then read the file
+ * locally after the already-given consent and retry once with text.
+ */
+export async function matchSavedResumeFromProfile(
+ resumeId:string,opts:MatchOptions,consent:boolean,signal?:AbortSignal,
+ onProgress?:(stage:NativeMatchProgress)=>void,onPartial?:(jobs:MatchedJob[])=>void
+):Promise<MatchResponse>{
+ if(!/^[0-9a-f-]{36}$/i.test(resumeId))throw new MatchError(404,errorMap.RESUME_NOT_FOUND);
+ return submitExtractedResumeText('',opts,consent,signal,resumeId,onProgress,onPartial,false,true);
 }
 
 export async function submitResumeForMatching(
@@ -235,11 +275,11 @@ export async function checkMatchProviderConnection(signal?:AbortSignal):Promise<
   if((e as Error)?.name==='AbortError')throw e;
   throw new MatchError(503,'AI 服务连接检测失败，请稍后重试。');
  }
- const data=await response.json().catch(()=>({})) as {ok?:boolean;status?:string;error?:string};
+ const data=await response.json().catch(()=>({})) as {ok?:boolean;status?:string;error?:string;mode?:string};
  if(!response.ok)throw new MatchError(response.status,
   errorMap[data.error||'']||'AI 服务检测暂时不可用。');
  if(data.ok!==true||data.status!=='READY')throw new MatchError(502,'AI 服务检测返回异常结果。');
- return 'AI 密钥验证成功、余额可用。没有发送简历，也没有消耗匹配次数。';
+ return data.mode==='FREE_ONLY_NO_PAID_PROVIDERS'?'已确认免费 AI 模式配置有效；本次检测没有消耗模型调用次数。':'AI 密钥验证成功、余额可用。没有发送简历，也没有消耗匹配次数。';
 }
 
 /** Safe outbound detail URL for a fetched and independently reviewed mainland
