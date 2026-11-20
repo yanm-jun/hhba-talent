@@ -482,3 +482,26 @@
 .hhba-original-word-viewer .hhba-word-native-preview .hhba-original-resume-page-frame{
  max-width:none;
 }
+
+
+/* The standalone "My Resume" viewer uses the same off-page editorial
+   treatment: document on the left, editing on the right, never a popup on top. */
+@media(min-width:951px){
+ .hhba-original-word-viewer.has-inline-editor{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,300px);
+  align-items:start;column-gap:18px;row-gap:8px;
+ }
+ .hhba-original-word-viewer.has-inline-editor>*:not(.hhba-word-standalone-edit-panel){
+  grid-column:1;min-width:0;
+ }
+ .hhba-original-word-viewer.has-inline-editor>.hhba-word-standalone-edit-panel{
+  grid-column:2;grid-row:1/span 12;
+  position:sticky;top:12px;align-self:start;
+  margin:0;border:0;border-left:1px solid #e9edf2;
+  border-radius:0;padding:9px 0 12px 18px;
+  background:transparent;box-shadow:none;min-width:0;
+ }
+ .hhba-original-word-viewer.has-inline-editor .hhba-original-resume-paper{
+  max-height:calc(100dvh - 270px);min-height:300px;
+ }
+}
