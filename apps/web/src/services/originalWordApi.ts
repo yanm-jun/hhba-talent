@@ -71,12 +71,29 @@ export async function saveOriginalWordEdit(id:string,original:string,text:string
  });
  return response.json() as Promise<{ok:true;saved:true;page_count:number}>;
 }
-export async function downloadOriginalWordEdited(id:string){
- const response=await send(url(id,'download'));
+async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf'){
+ // Both files originate from the same saved, renderer-verified original DOCX.
+ // A PDF is never edited in-place and no browser print-template is substituted.
+ const response=await send(url(id,format==='pdf'?'download-pdf':'download'));
+ const expected=format==='pdf'?'application/pdf':
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+ if((response.headers.get('Content-Type')||'').split(';')[0].toLowerCase()!==expected)
+  throw Error('下载格式不正确，请稍后重试。');
  const blob=await response.blob();
- if(blob.size<100||blob.size>4*1024*1024)throw Error('下载文件不完整。');
+ if(blob.size<(format==='pdf'?500:100)||blob.size>(format==='pdf'?12:4)*1024*1024)
+  throw Error('下载文件不完整。');
+ const first=new Uint8Array(await blob.slice(0,8).arrayBuffer());
+ const signature=format==='pdf'?[37,80,68,70,45]:[80,75,3,4];
+ if(signature.some((byte,index)=>first[index]!==byte))
+  throw Error('下载文件校验失败，请稍后重试。');
  const object=URL.createObjectURL(blob),link=document.createElement('a');
- link.href=object;link.download='我的简历-已修改.docx';
+ link.href=object;link.download='我的简历-已修改.'+format;
  link.hidden=true;document.body.appendChild(link);
  try{link.click();}finally{link.remove();setTimeout(()=>URL.revokeObjectURL(object),10000);}
+}
+export async function downloadOriginalWordEdited(id:string){
+ return downloadVerifiedWordResult(id,'docx');
+}
+export async function downloadOriginalWordPdf(id:string){
+ return downloadVerifiedWordResult(id,'pdf');
 }
