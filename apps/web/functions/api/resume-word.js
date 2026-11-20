@@ -195,7 +195,11 @@ export async function onRequestGet({request,env}){
     saved:state.saved?{original:state.saved.original,text:state.saved.text,
      updated_at:state.saved.updated_at}:null,
     revision:state.revision,total_revisions:state.items.length,
-    max_revisions:MAX_REVISIONS});
+    max_revisions:MAX_REVISIONS,max_daily_edits:DAILY.export,
+    history:state.items.map((entry,index)=>({
+     revision:index+1,original:entry.original,text:entry.text,
+     updated_at:entry.updated_at||'',page_count:entry.page_count
+    }))});
   }
   if(action==='download'||action==='edited-preview'||action==='download-pdf'){
    await loadBytes(bucket,row);
