@@ -137,21 +137,19 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
            {Number.isInteger(job.match_score)?
             <><strong>{job.match_score}<small>/100</small></strong><span>简历适配分</span></>:
             <><strong className="hhba-native-score-na">—</strong><span>待补充证据</span></>}
+           {!pending&&parsedProfile&&<div className="hhba-native-optimize-action">
+            <button type="button" aria-label={'针对'+(job.title_zh||job.title)+'优化简历，提高分值'}
+             onClick={()=>{
+              setOptimizationDirty(false);setOptimizedJobId(job.id);
+             }}>优化简历，提高分值 <span aria-hidden="true">✦</span></button>
+           </div>}
           </div>
          </div>
          {job.score_basis&&Number.isInteger(job.match_score)&&
           <p className="hhba-native-score-basis"><strong>评分依据：</strong>{job.score_basis}</p>}
          <p className="hhba-native-reason"><strong>为什么推荐：</strong>
           {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
-         {!pending&&parsedProfile&&<div className="hhba-native-optimize-action">
-          <button type="button" aria-label={'针对'+(job.title_zh||job.title)+'优化简历，提高分值'}
-           onClick={()=>{
-            setOptimizationDirty(false);setOptimizedJobId(job.id);
-           }}>
-           <span>优化简历，提高分值</span><span aria-hidden="true">✦</span>
-          </button>
-          <small>针对这个岗位优化真实经历；分数可能提高、保持或下降，以重新评估为准。</small>
-         </div>}
+}
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
           data-hhba-recruitment-outbound="true">{job.recruitment_source_kind==='EMPLOYER_ATS'?
             '查看企业专属招聘系统岗位（请核验）':'查看企业招聘岗位页面（请核验）'} <ArrowUpRight size={15}/></a>
