@@ -653,6 +653,11 @@ try{
   assert.equal(await first.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),0,
    'Word idle mode should release the Siri perimeter after entrance');
   const assistant=first.locator('.targeted-resume-word-assistant');
+  if(view.name==='desktop'){
+   const popup=await assistant.boundingBox();
+   assert.ok(popup&&popup.width<=305&&popup.height<=510,
+    'desktop Word advice must stay a compact floating popup, not a tall rail');
+  }
   assert.equal(await assistant.locator('.targeted-resume-ai-settings')
    .evaluate(el=>el.open),false,'the optional privacy and draft controls must start folded');
   await first.screenshot({path:output+'/word-first-'+view.name+'-read-mode.png',fullPage:true});
