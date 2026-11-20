@@ -632,6 +632,38 @@ try{
   assert.equal(await first.getByRole('button',{name:'保存',exact:true}).isDisabled(),true,
    'native source must still require explicit confirmation');
   await first.screenshot({path:output+'/word-first-'+view.name+'-workspace.png',fullPage:true});
+  // An unsaved native Word edit must survive an explicitly opted-in reload,
+  // but it must NEVER come back as already fact-checked or auto-saved.
+  await nativeText.fill('PENDING USER WORD DRAFT');
+  await first.waitForFunction(()=>Object.keys(sessionStorage).some(key=>{
+   if(!key.startsWith('hhba:word-draft-v1:'))return false;
+   try{
+    const saved=JSON.parse(sessionStorage.getItem(key)||'{}');
+    return saved.schema==='HHBA_WORD_DRAFT_V2'&&
+     saved.native_word_draft?.text==='PENDING USER WORD DRAFT'&&
+     saved.native_word_draft?.revision===0;
+   }catch{return false;}
+  }));
+  first.on('dialog',dialog=>{void dialog.accept()});
+  await first.reload({waitUntil:'networkidle',timeout:45000});
+  await first.getByRole('button',{name:'针对这个岗位优化简历'}).click();
+  await first.getByRole('region',{name:'独立简历优化工作区'}).waitFor();
+  const recoveredAssistant=first.locator('.targeted-resume-word-assistant');
+  if(view.name==='mobile'){
+   await first.getByRole('button',{name:'AI 建议',exact:true}).click();
+   await recoveredAssistant.waitFor({state:'visible'});
+  }
+  await recoveredAssistant.getByRole('button',{name:'恢复草稿'}).waitFor();
+  await recoveredAssistant.getByRole('button',{name:'恢复草稿'}).click();
+  if(view.name==='mobile')await first.getByRole('button',{name:'返回 Word'}).click();
+  await first.locator('.hhba-original-resume-anchor').first().waitFor();
+  await first.locator('.hhba-original-resume-anchor').first().click();
+  const pendingText=first.getByRole('textbox',{name:'修改 Word 文字'});
+  assert.equal(await pendingText.inputValue(),'PENDING USER WORD DRAFT',
+   'opted-in native Word text must be restored only to the same source anchor and revision');
+  assert.equal(await first.getByRole('button',{name:'保存',exact:true}).isDisabled(),true,
+   'restored Word text must still require a fresh factual confirmation');
+  await first.screenshot({path:output+'/word-first-'+view.name+'-recovered-draft.png',fullPage:true});
   const geom=await first.evaluate(()=>({
    client:document.documentElement.clientWidth,
    scroll:document.documentElement.scrollWidth
