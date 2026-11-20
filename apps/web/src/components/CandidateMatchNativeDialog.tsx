@@ -130,7 +130,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
      <div className="hhba-match-intro">
       <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> 智能推荐</span>
       <h2 id="hhba-native-title">为你找到 {result.matches.length} 个适合评估的岗位{pending?' · 搜索中':''}</h2>
-      <p>AI 已根据简历分析每个岗位的适配分。选择感兴趣的岗位，接着定向优化简历，再到企业招聘页投递。分数不是录用概率。</p>
+      <p>AI 已根据简历分析每个岗位的适配分。选择岗位，定向优化后可到企业招聘页投递。分数不是录用概率，不提供第三方招聘平台链接。</p>
      </div>
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {!pending&&result.history_status==='SAVED'&&<div className="hhba-match-history-confirm">
@@ -152,7 +152,8 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
            <div className="hhba-native-meta"><span><MapPin size={13}/>{job.location}</span>
             {job.salary&&<span><Wallet size={13}/>{job.salary}</span>}</div>
            <div className="hhba-native-source" role="note">
-            {job.recruitment_source_note||'招聘来源待确认'}
+            {job.recruitment_source_kind==='EMPLOYER_ATS'?
+             '企业专属招聘系统 · 请核实':job.recruitment_source_note||'招聘来源待确认'}
            </div>
            <div className="hhba-native-availability" role="note">
             <span className={job.availability_status==='OPEN_LISTED'?'hhba-native-state-open':'hhba-native-state-unknown'}>
