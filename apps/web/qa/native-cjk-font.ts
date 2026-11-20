@@ -11,7 +11,7 @@ async function main(){
  const response=await fetch('/qa/generated-cjk-original.pdf',{cache:'no-store'});
  if(!response.ok)throw Error('synthetic CJK font fixture was not generated');
  const original=new Uint8Array(await response.arrayBuffer());
- const patch=patchPdfWithOriginalCjkFont(original,'中国测试','测试中国');
+ const patch=patchPdfWithOriginalCjkFont(original,'中国测试工作经历','工作经历中国测试');
  const proof=await verifyOriginalFontPdfPatch({
   originalBytes:original,editedBytes:patch.bytes,proof:patch.proof,
   getDocument,canvasFactory:()=>document.createElement('canvas')
@@ -31,7 +31,7 @@ async function main(){
   const text=await page.getTextContent({includeMarkedContent:false});
   const content=text.items.filter((x:any)=>typeof x.str==='string')
    .map((x:any)=>x.str).join('');
-  if(content!==(title==='原始中文 PDF'?'中国测试':'测试中国'))
+  if(content!==(title==='原始中文 PDF'?'中国测试工作经历':'工作经历中国测试'))
    throw Error('unicode glyph extraction mismatch: '+content);
   const viewport=page.getViewport({scale:.7});
   const fig=document.createElement('figure');
