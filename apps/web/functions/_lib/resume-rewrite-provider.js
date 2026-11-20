@@ -97,8 +97,13 @@ export async function completeJson(provider,system,user,signal,maxTokens=9000){
   headers.authorization='Bearer '+provider.key;
   body={model:provider.model,
    messages:[{role:'system',content:system},{role:'user',content:JSON.stringify(user)}],
-   ...(provider.name==='openai'?{max_completion_tokens:maxTokens}:{max_tokens:maxTokens}),
-   ...(provider.name==='deepseek'?{response_format:{type:'json_object'},thinking:{type:'disabled'}}:{})};
+   ...(provider.name==='openai'?{max_completion_tokens:maxTokens}:{
+    max_tokens:provider.name==='deepseek'?Math.max(maxTokens,16000):maxTokens}),
+   ...(provider.name==='deepseek'?{
+    response_format:{type:'json_object'},
+    thinking:{type:'enabled'},
+    reasoning_effort:provider.reasoningEffort||'max'
+   }:{})};
  }
  let response;
  try{response=await fetch(url,{method:'POST',headers,body:JSON.stringify(body),
