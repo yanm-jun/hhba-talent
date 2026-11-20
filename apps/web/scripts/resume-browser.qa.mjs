@@ -884,7 +884,7 @@ try{
   const mobile=await browser.newPage({viewport:{width:390,height:844},
    isMobile:true,deviceScaleFactor:1,locale:'zh-CN'});
   const errors=[];mobile.on('pageerror',error=>errors.push(error.message));
-  await mobile.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&full',
+  await mobile.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&full&agent',
    {waitUntil:'networkidle',timeout:45000});
   await mobile.getByRole('button',{name:/优化简历，提高分值/}).first().click();
   await mobile.getByRole('button',{name:'AI 建议',exact:true}).click();
@@ -900,8 +900,12 @@ try{
   await mobile.screenshot({path:output+'/whole-resume-ai-mobile-live-word.png',fullPage:true});
   await progress.click();
   await assistant.waitFor({state:'visible'});
-  await mobile.waitForFunction(()=>document.querySelectorAll('.hhba-whole-rewrite-block').length===9,
-   {timeout:15000});
+  await mobile.waitForFunction(()=>
+   document.querySelectorAll('.hhba-whole-rewrite-block').length===9&&
+   document.querySelector('.hhba-whole-rewrite-agent-summary')?.textContent
+    ?.includes('AI 自主处理了 3 轮'),{timeout:20000});
+  assert.equal(await mobile.locator('.hhba-whole-rewrite-resume').count(),0,
+   'after model finishes the mobile resume action must disappear');
   const geom=await mobile.evaluate(()=>({
    width:document.documentElement.clientWidth,
    scroll:document.documentElement.scrollWidth
