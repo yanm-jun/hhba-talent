@@ -579,3 +579,17 @@
  .hhba-word-ai-preview-text{
  opacity:1;background-color:transparent;border-radius:0;pointer-events:none;
 }
+
+
+/* Critical: the old anchor tooltip styles every nested <span> as an
+   absolute label above the page. Reset the AI ink itself to normal text
+   geometry, otherwise color exists in CSS but is clipped outside the line. */
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text{
+ position:static;top:auto;right:auto;left:auto;bottom:auto;
+ display:block;box-sizing:border-box;min-width:0;width:100%;max-width:100%;
+ margin:0;padding:0;border:0;border-radius:0;
+ font-family:inherit;font-style:normal;font-weight:500;
+ line-height:1.18;white-space:nowrap;text-align:left;
+ overflow:hidden;text-overflow:ellipsis;
+}
