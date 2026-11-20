@@ -343,6 +343,46 @@ try{
  assert.deepEqual(smallSourceErrors,[],'no mobile original-PDF runtime errors');
  await smallSource.close();
 
+ // Real UI integration: original source PDF Type1 font bytes are retained
+ // throughout confirmation; native font proof is required before downloading.
+ const authentic=await browser.newPage({viewport:{width:1100,height:900},
+  locale:'zh-CN',acceptDownloads:true});
+ const nativeErrors=[];authentic.on('pageerror',e=>nativeErrors.push(e.message));
+ await authentic.goto('http://127.0.0.1:3000/qa/original-resume-viewer.html',
+  {waitUntil:'networkidle',timeout:45000});
+ const startNative=authentic.getByRole('button',{name:'开始修改'});
+ await startNative.waitFor();
+ await authentic.locator('.hhba-original-resume-start input[type=checkbox]').check();
+ await startNative.click();
+ await authentic.getByRole('button',{name:'修改这段简历'}).click();
+ const pendingOriginal=authentic.getByRole('textbox',{name:'修改这段内容'});
+ await pendingOriginal.fill('ORIGINAL RESUME TEST');
+ assert.match(await pendingOriginal.evaluate(el=>getComputedStyle(el).animationName),
+  /hhba-resume-siri-letters-flow/);
+ await authentic.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
+ await authentic.getByRole('button',{name:'保存',exact:true}).click();
+ const nativeDownload=authentic.getByRole('button',{name:'下载 PDF'});
+ await nativeDownload.waitFor({timeout:20000});
+ assert.equal(await authentic.locator('.hhba-resume-siri-letters').count(),0,
+  'confirmed native PDF text must remove all Siri editing effects');
+ assert.equal(await authentic.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),0,
+  'confirmed native PDF no longer has Siri perimeter glow');
+ await authentic.screenshot({path:output+'/original-pdf-native-font-confirmed.png',
+  fullPage:true});
+ const nativeDownloadEvent=authentic.waitForEvent('download');
+ await nativeDownload.click();
+ const nativeFile=await nativeDownloadEvent;
+ await nativeFile.saveAs(output+'/original-pdf-native-font-edited.pdf');
+ const nativeData=await readFile(output+'/original-pdf-native-font-edited.pdf');
+ const nativePages=await pdfText(nativeData);
+ assert.equal(nativePages.length,1);
+ assert.ok(nativePages.join(' ').includes('ORIGINAL RESUME TEST'));
+ assert.ok(!nativePages.join(' ').includes('ORIGINAL RESUME VIEW'));
+ assert.ok(nativeData.toString('latin1').includes('/BaseFont /Helvetica'),
+  'source Type1 Helvetica resource must survive unmodified');
+ assert.deepEqual(nativeErrors,[]);
+ await authentic.close();
+
  // True original Word page preview (no HHBA re-template), in-place edit and
  // verified Word download. Fixture uses only synthetic data and fake endpoints.
  for(const view of [{width:1100,height:900,name:'desktop'},
