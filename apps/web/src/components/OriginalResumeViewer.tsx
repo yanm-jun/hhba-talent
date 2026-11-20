@@ -8,6 +8,7 @@ import {matchVisualRegionsToPdfPage,type VerifiedResumeAnchor} from '../services
 import {planInlinePdfPreview,whitePdfPatchBackground} from '../services/resumeInlinePdfPreview.mjs';
 import {splitChangedResumeText} from '../services/resumeChangedText.mjs';
 import {patchPdfWithOriginalFont} from '../services/resumePdfNativeFont.mjs';
+import {patchPdfWithOriginalCjkFont} from '../services/resumePdfCjkFont.mjs';
 import {verifyOriginalFontPdfPatch} from '../services/resumePdfNativeVerify.mjs';
 import {visualEditingReady,analyzeVisualResume,listPageResumeEdits,savePageResumeEdits,
  type VisualResumeLayout,type PageResumeEdit} from '../services/resumeVisualEditingApi';
@@ -200,11 +201,17 @@ function OriginalPdfViewer({resume,onClose}:{
   }
   const change=next[0];
   try{
-   // Never use the AI's visual guess as the PDF font. Patch only the one
-   // ASCII literal from its actual stream, leaving the existing PDF font
-   // resource and every other byte unchanged.
+   // Never use an AI guess for fonts. Patch existing English or Chinese
+   // glyph codes only, leaving embedded font data and other PDF bytes intact.
    const original=new Uint8Array(await fetchPrivateResumeForLocalReview(resume));
-   const patch=patchPdfWithOriginalFont(original,change.original,change.text);
+   let patch;
+   try{
+    patch=patchPdfWithOriginalFont(original,change.original,change.text);
+   }catch{
+    // Only when the actual embedded font and its ToUnicode map prove that
+    // every Chinese glyph is already present. No font substitutions.
+    patch=patchPdfWithOriginalCjkFont(original,change.original,change.text);
+   }
    const {getDocument}=await import('pdfjs-dist');
    await verifyOriginalFontPdfPatch({
     originalBytes:original,editedBytes:patch.bytes,proof:patch.proof,
