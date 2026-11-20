@@ -604,7 +604,12 @@ try{
   await first.getByRole('button',{name:'放大 Word'}).click();
   assert.match(await first.locator('.hhba-original-resume-word-tools output').textContent(),/125%/);
   await first.getByRole('button',{name:'适合宽度'}).click();
+  assert.equal(await first.locator('.hhba-original-resume-siri-stage.hhba-siri-edge').count(),0,
+   'Word paper must have no rainbow perimeter; gradient belongs to pending letters only');
   const assistant=first.locator('.targeted-resume-word-assistant');
+  assert.equal(await assistant.locator('.targeted-resume-ai-settings')
+   .evaluate(el=>el.open),false,'the optional privacy and draft controls must start folded');
+  await first.screenshot({path:output+'/word-first-'+view.name+'-read-mode.png',fullPage:true});
   if(view.name==='mobile'){
    const wordPosition=await first.locator('.targeted-resume-word-main').boundingBox();
    assert.ok(wordPosition&&wordPosition.y<330,
@@ -632,6 +637,16 @@ try{
   await first.locator('.hhba-original-resume-anchor').first().click();
   const nativePane=first.locator('.targeted-resume-word-edit-host .hhba-original-resume-editbox');
   await nativePane.waitFor();
+  if(view.name==='desktop'){
+   const sheet=await first.locator('.hhba-word-native-preview').boundingBox();
+   const edit=await nativePane.boundingBox();
+   assert.ok(sheet&&edit&&edit.x>=sheet.x+sheet.width-6,
+    'desktop edit pane must be to the RIGHT of Word, not on top of the document');
+  }else{
+   const edit=await nativePane.boundingBox();
+   assert.ok(edit&&edit.y>=view.height*.35,
+    'phone editor must open as a bottom sheet instead of a popup on Word');
+  }
   assert.equal(await first.locator('.hhba-original-resume-edit-glow').count(),0,
    'the Word paper must not be obscured by an edit popup');
   const nativeText=first.getByRole('textbox',{name:'修改 Word 文字'});
