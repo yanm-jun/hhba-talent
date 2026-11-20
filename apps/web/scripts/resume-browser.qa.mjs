@@ -825,6 +825,43 @@ try{
   await full.close();
  }
 
+
+ // The entire AI rewrite must also be usable on a narrow phone. The drawer
+ // yields to the glowing document during generation and returns on request.
+ {
+  const mobile=await browser.newPage({viewport:{width:390,height:844},
+   isMobile:true,deviceScaleFactor:1,locale:'zh-CN'});
+  const errors=[];mobile.on('pageerror',error=>errors.push(error.message));
+  await mobile.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&full',
+   {waitUntil:'networkidle',timeout:45000});
+  await mobile.getByRole('button',{name:/优化简历，提高分值/}).first().click();
+  await mobile.getByRole('button',{name:'AI 建议',exact:true}).click();
+  const assistant=mobile.locator('.targeted-resume-word-assistant');
+  await assistant.waitFor({state:'visible'});
+  await assistant.locator('.targeted-resume-ai-settings summary').click();
+  await assistant.locator('.targeted-resume-consent input[type=checkbox]').check();
+  await assistant.getByRole('button',{name:'AI 针对岗位重写整份简历'}).click();
+  await assistant.waitFor({state:'hidden'});
+  const progress=mobile.locator('.hhba-word-mobile-ai-status');
+  await progress.waitFor({state:'visible'});
+  await mobile.locator('.hhba-word-ai-changed').first().waitFor({timeout:20000});
+  await mobile.screenshot({path:output+'/whole-resume-ai-mobile-live-word.png',fullPage:true});
+  await progress.click();
+  await assistant.waitFor({state:'visible'});
+  await mobile.waitForFunction(()=>document.querySelectorAll('.hhba-whole-rewrite-block').length===9,
+   {timeout:15000});
+  const geom=await mobile.evaluate(()=>({
+   width:document.documentElement.clientWidth,
+   scroll:document.documentElement.scrollWidth
+  }));
+  assert.ok(geom.scroll<=geom.width+3,
+   'whole-resume AI mobile reviewer cannot cause horizontal page scrolling: '+JSON.stringify(geom));
+  assert.match(await assistant.locator('.hhba-whole-rewrite-metrics').textContent(),/读取段落 9/);
+  await mobile.screenshot({path:output+'/whole-resume-ai-mobile-review.png',fullPage:true});
+  assert.deepEqual(errors,[],'whole AI writer mobile UI must not crash');
+  await mobile.close();
+ }
+
  // A genuine score comparison may be displayed ONLY after saving an original
  // DOCX and feeding its versioned text through the same audited-JD scorer.
  // These 68/70 numbers are explicitly synthetic and never shipped.
