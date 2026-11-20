@@ -8,13 +8,15 @@ import {REAL_AUTH_TOKEN_KEY} from '../src/services/realAuth';
 import type {PrivateResume} from '../src/services/privateResumes';
 
 const nativeWord=new URLSearchParams(location.search).has('word');
+const scoringFixture=new URLSearchParams(location.search).has('score');
 const long=new URLSearchParams(location.search).has('long');
 const truncated=new URLSearchParams(location.search).has('truncated');
 const sourceText=nativeWord?'ORIGINAL WORD RESUME':truncated?'这是完全虚构的超长简历测试文字，不能把丢失的内容导出成完整简历。'.repeat(1200):long?Array.from({length:12},(_,i)=>
  '第'+(i+1)+'段：在虚构的测试项目中记录运营流程与客户问题。'.repeat(18)
 ).join('\n\n'):'曾参与测试门店的运营记录整理与客户预约协调。\n\n独立整理每周工作进度并协助团队沟通。';
 const mockJob={
- id:'qa-search-fixture-1',company:'虚构测试企业',title:'门店运营助理',
+ id:scoringFixture?'lever-qa-synthetic':'qa-search-fixture-1',
+ company:'虚构测试企业',title:'门店运营助理',
  title_zh:'门店运营助理',location:'中国大陆·上海',official_url:'https://example.test/jobs/qa',
  platform:'employer',source:'employer',remote:false,reference_score:68,match_score:68,
  matched:['日常运营记录'],not_evidenced:['流程分析'],needs_verification:[],
@@ -77,6 +79,10 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
   if(action==='inspect')return respond({ok:true,revision:wordRevision,
    total_revisions:wordRevisions.length-1,max_revisions:8,
    editable_text:[wordRevisions[wordRevision]],
+   history:wordRevisions.slice(1).map((text,i)=>({
+    revision:i+1,original:wordRevisions[i],text,
+    updated_at:'2026-11-20T00:00:00Z',page_count:1
+   })),
    saved:wordRevision?{original:wordRevisions[wordRevision-1],
     text:wordRevisions[wordRevision],updated_at:'2026-11-20T00:00:00Z'}:null});
   if(action==='preview'||action==='edited-preview'||action==='download-pdf'){
@@ -96,10 +102,23 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
     proposed:block.text+'；同步整理每日服务记录。',rationale:'提升工作过程的清晰度',
     jobRequirement:'运营流程记录',evidenceStatus:'needs_user_confirmation'}]});
  }
- if(u.pathname==='/api/resume-reassess')
-  return method==='GET'?respond({kind:'HHBA_RESUME_REASSESS_V2',enabled:false,
-   ranking_version:'HHBA_MATCH_RANKING_V2',scope:'AUDITED_MAINLAND_ATS_ONLY'}):
-   respond({error:'AUDITED_JOB_NOT_AVAILABLE'},422);
+ if(u.pathname==='/api/resume-reassess'){
+  if(method==='GET')return respond({kind:'HHBA_RESUME_REASSESS_V2',enabled:scoringFixture,
+   ranking_version:'HHBA_MATCH_RANKING_V2',scope:'AUDITED_MAINLAND_ATS_ONLY'});
+  if(!scoringFixture)return respond({error:'AUDITED_JOB_NOT_AVAILABLE'},422);
+  const body=JSON.parse(String(init?.body||'{}'));
+  const oldText=body.before_blocks?.map((x:{text:string})=>x.text).join(' ');
+  const savedText=body.after_blocks?.map((x:{text:string})=>x.text).join(' ');
+  if(oldText!=='ORIGINAL WORD RESUME'||savedText!==wordRevisions[wordRevision]||
+   wordRevision<1||!body.confirm_real||!body.consent_reassessment)
+   return respond({error:'INVALID_REASSESSMENT_INPUT'},400);
+  return respond({ok:true,kind:'HHBA_RESUME_REASSESS_V2',
+   job_id:'lever-qa-synthetic',verified_job_title:'门店运营助理',
+   verified_company:'虚构测试企业',job_snapshot_updated_at:'2026-11-20',
+   ranking_version:'HHBA_MATCH_RANKING_V2',supported:true,
+   original_score:68,updated_score:70,delta:2,
+   important_notice:'此评分为自动化验收的虚构结果，不代表真实职位'});
+ }
  if(u.pathname==='/api/official-job-verify')
   return method==='GET'?respond({kind:'HHBA_OFFICIAL_JOB_VERIFY_V1',enabled:false,
    daily_account_cap:4,scope:'STRICT_OFFICIAL_EMPLOYER_DETAIL_ONLY'}):
