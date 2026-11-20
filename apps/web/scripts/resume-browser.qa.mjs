@@ -1062,6 +1062,69 @@ try{
   await demo.close();
  }
 
+ // Simplified uploaded-resume journey: reading first, then one immersive
+ // Siri modal with a small per-paragraph popover. Entirely frontend-only,
+ // synthetic content. Covers desktop and 390px mobile layout and approval.
+ for(const view of [{name:'desktop',width:1240,height:900},
+                    {name:'mobile',width:390,height:844}]){
+  const stage=await browser.newPage({viewport:{width:view.width,height:view.height},
+   isMobile:view.name==='mobile',locale:'zh-CN'});
+  const stageErrors=[];
+  stage.on('pageerror',e=>stageErrors.push(e.message));
+  await stage.addInitScript(()=>{window.confirm=()=>true});
+  await stage.goto('http://127.0.0.1:3000/qa/resume-flow.html?simple',
+   {waitUntil:'networkidle',timeout:45000});
+  assert.equal(await stage.locator('.hhba-reading-card').count(),1,
+   'synthetic uploaded resume must be readable directly on the page');
+  assert.equal(await stage.locator('.hhba-stage-overlay').count(),0,
+   'Siri editor must not appear before explicit click');
+  await stage.getByRole('button',{name:'开始优化简历'}).click();
+  await stage.getByRole('dialog',{name:/直接在简历里/}).waitFor();
+  await assertSiriEdge(stage,'.hhba-stage-siri.hhba-siri-edge-active',
+   'uploaded-resume '+view.name+' Siri modal');
+  assert.equal(await stage.locator('.hhba-stage-paper').count(),1,
+   'editor must show a single document, not an additional dashboard');
+  if(view.name==='desktop'){
+   assert.equal(await stage.locator('.hhba-stage-popover.is-open').count(),1);
+   const rect=await stage.locator('.hhba-stage-popover').boundingBox();
+   assert.ok(rect&&rect.width<340&&rect.height<600,
+    'AI suggestion must be a compact popup, not a full-height side rail');
+  }else{
+   assert.equal(await stage.locator('.hhba-stage-popover.is-open').count(),0);
+  }
+  await stage.locator('.hhba-stage-paragraph').nth(3).click();
+  await stage.locator('.hhba-stage-popover.is-open').waitFor();
+  const editor=stage.getByRole('textbox',{name:'修改内容（前端交互）'});
+  const updated='协助整理门店记录，并及时同步团队反馈。';
+  await editor.fill(updated);
+  const colored=stage.locator('.hhba-stage-paragraph.is-pending .hhba-resume-siri-letters');
+  await colored.waitFor();
+  const styles=await colored.evaluate(el=>({
+   gradient:getComputedStyle(el).backgroundImage,
+   animation:getComputedStyle(el).animationName
+  }));
+  assert.match(styles.gradient,/linear-gradient/);
+  assert.match(styles.animation,/hhba-resume-siri-letters-flow/);
+  const widths=await stage.evaluate(()=>({
+   client:document.documentElement.clientWidth,
+   scroll:document.documentElement.scrollWidth
+  }));
+  assert.ok(widths.scroll<=widths.client+3,
+   view.name+' simple frontend must not overflow: '+JSON.stringify(widths));
+  await stage.screenshot({path:output+'/simple-frontend-'+view.name+'-siri-edit.png',
+   fullPage:true});
+  await stage.getByRole('button',{name:'确认本段'}).click();
+  assert.equal(await stage.locator('.hhba-resume-siri-letters').count(),0,
+   'confirmed edit must regain normal document glyph color');
+  assert.match(await stage.locator('.hhba-stage-paragraph').nth(3).textContent(),/及时同步团队反馈/);
+  await stage.screenshot({path:output+'/simple-frontend-'+view.name+'-confirmed.png',
+   fullPage:true});
+  await stage.getByRole('button',{name:'保留原文'}).click();
+  assert.match(await stage.locator('.hhba-stage-paragraph').nth(3).textContent(),/协助整理门店记录与团队沟通/);
+  assert.deepEqual(stageErrors,[]);
+  await stage.close();
+ }
+ 
  console.log(JSON.stringify({result:'PASSED',desktop_pdf_pages:pages.length,
   long_pdf_pages:longPages.length,mobile:metrics,qa_output:output}));
 }finally{await browser.close()}
