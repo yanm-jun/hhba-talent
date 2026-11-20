@@ -495,15 +495,17 @@ try{
   const editWord=word.getByRole('button',{name:'修改这段 Word'});
   await editWord.waitFor({timeout:15000});
   await editWord.click();
-  await assertSiriEdge(word,'.hhba-original-resume-edit-glow',
-   view.name+' original Word popup');
+  assert.equal(await word.locator('.hhba-original-resume-edit-glow').count(),0,
+   'Word edit controls must not float over the original paper');
+  await word.locator('.hhba-word-standalone-edit-panel .hhba-original-resume-editbox')
+   .waitFor();
   const input=word.getByRole('textbox',{name:'修改 Word 文字'});
   assert.equal(await input.inputValue(),'EDITED WORD RESUME',
    'a confirmed exact AI suggestion should prefill only the clicked native Word anchor');
-  assert.equal(await word.getByRole('button',{name:'保存',exact:true}).isDisabled(),true,
+  assert.equal(await word.getByRole('button',{name:'确认保存',exact:true}).isDisabled(),true,
    'pre-filled AI text must never be saved before the user confirms');
   await input.fill('EDITED WORD RESUME');
-  assert.equal(await word.getByRole('button',{name:'保存',exact:true}).isDisabled(),
+  assert.equal(await word.getByRole('button',{name:'确认保存',exact:true}).isDisabled(),
    true,'Word change must require confirmation');
   const wordDraftGlow=word.getByRole('textbox',{name:'修改 Word 文字'});
   assert.equal(await word.locator('.hhba-resume-pending-text').count(),0,
@@ -516,7 +518,8 @@ try{
   await word.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
   await word.screenshot({path:output+'/original-word-'+view.name+'-editing.png',
    fullPage:true});
-  await word.getByRole('button',{name:'保存',exact:true}).click();
+  await word.getByRole('button',{name:'确认保存',exact:true}).click();
+  await word.locator('.hhba-original-resume-export-menu summary').click();
   await word.getByRole('button',{name:'下载 Word'}).waitFor({timeout:20000});
   await word.getByRole('button',{name:'下载 PDF'}).waitFor({timeout:20000});
   assert.equal(await word.locator('.hhba-original-resume-siri-ink').count(),0,
@@ -547,7 +550,7 @@ try{
   assert.equal(await nextInput.inputValue(),'EDITED WORD RESUME');
   await nextInput.fill('FINAL WORD RESUME');
   await word.locator('.hhba-original-resume-editbox input[type=checkbox]').check();
-  await word.getByRole('button',{name:'保存',exact:true}).click();
+  await word.getByRole('button',{name:'确认保存',exact:true}).click();
   await word.getByText('当前修改进度：2 / 2',{exact:false}).waitFor();
   assert.equal(await word.getByRole('button',{name:'重做'}).isDisabled(),true);
   await word.getByRole('button',{name:'撤销'}).click();
@@ -610,6 +613,7 @@ try{
    await first.getByRole('button',{name:'AI 建议',exact:true}).click();
    await assistant.waitFor({state:'visible'});
   }
+  await assistant.locator('.targeted-resume-ai-settings summary').click();
   await first.locator('.targeted-resume-draft-recovery input[type=checkbox]').check();
   await first.locator('.targeted-resume-consent input[type=checkbox]').check();
   await first.getByRole('button',{name:'生成 AI 建议'}).click();
@@ -618,7 +622,7 @@ try{
    'AI draft has one navigable original paragraph location');
   await assistant.locator('.targeted-resume-confirm input[type=checkbox]').check();
   await assistant.getByRole('button',{name:'填充到此处'}).click();
-  await first.getByText('已有 1 条符合严格文字条件的建议').waitFor();
+  await first.getByText('1 条建议已准备就绪',{exact:false}).waitFor();
   await first.waitForFunction(()=>Object.keys(sessionStorage)
    .some(k=>k.startsWith('hhba:word-draft-v1:')));
   if(view.name==='mobile'){
@@ -626,10 +630,14 @@ try{
    assert.equal(await assistant.isVisible(),false);
   }
   await first.locator('.hhba-original-resume-anchor').first().click();
+  const nativePane=first.locator('.targeted-resume-word-edit-host .hhba-original-resume-editbox');
+  await nativePane.waitFor();
+  assert.equal(await first.locator('.hhba-original-resume-edit-glow').count(),0,
+   'the Word paper must not be obscured by an edit popup');
   const nativeText=first.getByRole('textbox',{name:'修改 Word 文字'});
   assert.match(await nativeText.inputValue(),/同步整理每日服务记录/,
    'confirmed text can be prefilled only at the exact Word anchor');
-  assert.equal(await first.getByRole('button',{name:'保存',exact:true}).isDisabled(),true,
+  assert.equal(await first.getByRole('button',{name:'确认保存',exact:true}).isDisabled(),true,
    'native source must still require explicit confirmation');
   await first.screenshot({path:output+'/word-first-'+view.name+'-workspace.png',fullPage:true});
   // An unsaved native Word edit must survive an explicitly opted-in reload,
@@ -671,6 +679,7 @@ try{
    await first.getByRole('button',{name:'AI 建议',exact:true}).click();
    await recoveredAssistant.waitFor({state:'visible'});
   }
+  await recoveredAssistant.locator('.targeted-resume-ai-settings summary').click();
   await recoveredAssistant.getByRole('button',{name:'恢复草稿'}).waitFor();
   await recoveredAssistant.getByRole('button',{name:'恢复草稿'}).click();
   if(view.name==='mobile')await first.getByRole('button',{name:'返回 Word'}).click();
@@ -679,7 +688,7 @@ try{
   const pendingText=first.getByRole('textbox',{name:'修改 Word 文字'});
   assert.equal(await pendingText.inputValue(),'PENDING USER WORD DRAFT UPDATED',
    'opted-in native Word text must be restored only to the same source anchor and revision');
-  assert.equal(await first.getByRole('button',{name:'保存',exact:true}).isDisabled(),true,
+  assert.equal(await first.getByRole('button',{name:'确认保存',exact:true}).isDisabled(),true,
    'restored Word text must still require a fresh factual confirmation');
   await first.screenshot({path:output+'/word-first-'+view.name+'-recovered-draft.png',fullPage:true});
   const geom=await first.evaluate(()=>({
