@@ -3,6 +3,7 @@ import {ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,X} from 'lucide-
 import type {PrivateResume} from '../services/privateResumes';
 import {fetchPrivateResumeForLocalReview,downloadPrivateResume} from '../services/privateResumes';
 import {extractDocxText} from '../services/docxProfile.mjs';
+import {OriginalWordViewer} from './OriginalWordViewer';
 import {matchVisualRegionsToPdfPage,type VerifiedResumeAnchor} from '../services/resumeVisualAnchors.mjs';
 import {planInlinePdfPreview,whitePdfPatchBackground} from '../services/resumeInlinePdfPreview.mjs';
 import {createOriginalPdfSearchableCopy,downloadOriginalPdfSearchableCopy,verifyOriginalPdfSearchableCopy} from '../services/resumePdfReviewCopy.mjs';
@@ -14,7 +15,12 @@ import '../styles/siri-edge.css';
 // The viewer only displays a user's already stored original. The private R2
 // blob is fetched under that account's bearer session, never via public URL.
 // PDF canvas renders the actual original page instead of regenerating HTML.
-export function OriginalResumeViewer({resume,onClose}:{
+export function OriginalResumeViewer(props:{resume:PrivateResume;onClose:()=>void;}){
+ if(props.resume.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+  return <OriginalWordViewer {...props}/>;
+ return <OriginalPdfViewer {...props}/>;
+}
+function OriginalPdfViewer({resume,onClose}:{
  resume:PrivateResume;onClose:()=>void;
 }){
  const canvas=useRef<HTMLCanvasElement>(null);
