@@ -156,3 +156,34 @@
 @media print{
  .hhba-original-resume-review-export{display:none!important}
 }
+
+/* Siri typography is temporary; the real source font is restored on confirm.
+   In the popup we explicitly call this a pending preview — never a saved
+   replacement with a guessed fallback typeface. */
+.hhba-resume-pending-text{
+ padding:7px 9px;
+ border:1px solid #e7eaf1;
+ background:#fbfcff;
+ border-radius:7px;
+ font-size:13px;
+ line-height:1.65;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+ max-height:94px;
+ overflow-y:auto;
+}
+.hhba-resume-pending-text .hhba-resume-siri-letters{
+ display:inline;
+ max-width:none;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+.hhba-original-resume-draft-patch{
+ /* Only a *temporary* edited-text suggestion; never saved native PDF text. */
+ background:#fff;
+}
+@media print{
+ .hhba-resume-pending-text,.hhba-original-resume-draft-patch{
+  display:none!important;
+ }
+}
