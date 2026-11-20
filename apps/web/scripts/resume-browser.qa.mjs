@@ -520,8 +520,8 @@ try{
    fullPage:true});
   await word.getByRole('button',{name:'确认保存',exact:true}).click();
   await word.locator('.hhba-original-resume-export-menu summary').click();
-  await word.getByRole('button',{name:'下载 Word'}).waitFor({timeout:20000});
-  await word.getByRole('button',{name:'下载 PDF'}).waitFor({timeout:20000});
+  await word.locator('.hhba-original-resume-export-menu').getByRole('button',{name:'下载 Word'}).waitFor({timeout:20000});
+  await word.locator('.hhba-original-resume-export-menu').getByRole('button',{name:'下载 PDF'}).waitFor({timeout:20000});
   assert.equal(await word.locator('.hhba-original-resume-siri-ink').count(),0,
    'confirmed Word must reveal real native-font pixels, not animated color');
   assert.equal(await word.locator('.hhba-resume-siri-letters').count(),0,
@@ -529,11 +529,11 @@ try{
   await word.screenshot({path:output+'/original-word-'+view.name+'-native-font-saved.png',
    fullPage:true});
   const downloadEvent=word.waitForEvent('download');
-  await word.getByRole('button',{name:'下载 Word'}).click();
+  await word.locator('.hhba-original-resume-export-menu').getByRole('button',{name:'下载 Word'}).click();
   const downloaded=await downloadEvent;
   assert.match(downloaded.suggestedFilename(),/\.docx$/);
   const pdfEvent=word.waitForEvent('download');
-  await word.getByRole('button',{name:'下载 PDF'}).click();
+  await word.locator('.hhba-original-resume-export-menu').getByRole('button',{name:'下载 PDF'}).click();
   const exportedPdf=await pdfEvent;
   assert.match(exportedPdf.suggestedFilename(),/\.pdf$/);
   const savedPdf=output+'/original-word-'+view.name+'-converted.pdf';
@@ -563,7 +563,7 @@ try{
   await word.getByRole('button',{name:'重做'}).click();
   await word.getByText('当前修改进度：2 / 2',{exact:false}).waitFor();
   const finalPdfEvent=word.waitForEvent('download');
-  await word.getByRole('button',{name:'下载 PDF'}).click();
+  await word.locator('.hhba-original-resume-export-menu').getByRole('button',{name:'下载 PDF'}).click();
   const finalPdf=await finalPdfEvent;
   const finalFile=output+'/original-word-'+view.name+'-after-redo.pdf';
   await finalPdf.saveAs(finalFile);
