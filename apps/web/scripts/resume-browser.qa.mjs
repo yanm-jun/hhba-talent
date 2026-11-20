@@ -628,7 +628,16 @@ try{
   await assistant.locator('.targeted-resume-word-suggestion-title').first().waitFor();
   assert.equal(await first.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),1,
    'real AI suggestions must illuminate the Word perimeter');
+  const actualGlow=await first.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active')
+   .evaluate(el=>({display:getComputedStyle(el,'::after').display,
+    animation:getComputedStyle(el,'::after').animationName}));
+  assert.notEqual(actualGlow.display,'none','Siri must genuinely surround all four sides of Word');
+  assert.match(actualGlow.animation,/hhba-siri-edge-flow/,
+   'immersive Word perimeter must animate');
   await first.locator('.hhba-word-native-preview .hhba-word-ai-preview-text').first().waitFor();
+  const rainbowOpacity=await first.locator('.hhba-word-native-preview .hhba-word-ai-preview-text')
+   .first().evaluate(el=>getComputedStyle(el).opacity);
+  assert.equal(rainbowOpacity,'1','real document AI text must be visibly colorful, not hidden by old anchor CSS');
   assert.match(await first.locator('.hhba-word-native-preview .hhba-word-ai-preview-text').first()
    .evaluate(el=>getComputedStyle(el).backgroundImage),/linear-gradient/,
    'the suggestion must appear on the original Word line with Siri colors');
