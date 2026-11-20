@@ -253,6 +253,9 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   if(!consent||!blocks.length||busy||!status?.enabled)return;
   const currentBlocks=version.blocks;
   invalidateScore();setBusy(true);setNotice('');setSuggestions([]);setRevealedSuggestionCount(0);
+  // On mobile the AI drawer must release the document while the model works.
+  // The real PDF remains visible during analysis and staged suggestion reveal.
+  if(sourceResume)setMobileSuggestionsOpen(false);
   setIgnored([]);setConfirmed([]);setNewEvidence({});
   setOpenSuggestionId(null);setEditingSuggestionId(null);setSuggestionDrafts({});
   const controller=new AbortController();active.current=controller;
@@ -622,6 +625,13 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     {entranceStage==='entering'&&<p className="hhba-word-arrival-hint" role="status">
      正在呈现你的原版式简历…
     </p>}
+    {(busy||revealedSuggestionCount>0)&&<button type="button"
+     className="hhba-word-mobile-ai-status" onClick={()=>setMobileSuggestionsOpen(true)}>
+     <Sparkles size={13} aria-hidden="true"/>
+     {busy?'AI 正在分析原简历…':
+      '已呈现 '+revealedSuggestionCount+' / '+suggestions.length+' 条建议'}
+     <span>查看建议</span>
+    </button>}
     <OriginalWordViewer resume={sourceResume} suggestedChanges={confirmedWordChanges}
      glowActive={entranceStage==='entering'||busy||wordEditing||
       visualWordSuggestions.length>0}
