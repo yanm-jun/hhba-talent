@@ -227,7 +227,7 @@ function OriginalPdfViewer({resume,onClose}:{
      disabled={!visionConsent||visionBusy}>
      <PencilLine size={14}/>{visionBusy?'正在准备…':'开始修改'}</button>
    </div>}
-   <div className={'hhba-original-resume-siri-stage hhba-siri-edge'+(layout?' hhba-siri-edge-active':'')}>
+   <div className={'hhba-original-resume-siri-stage hhba-siri-edge'+(selectedId?' hhba-siri-edge-active':'')}>
     <div ref={paper} className="hhba-original-resume-paper">
     <div className="hhba-original-resume-page-frame" style={{
      width:pageSize.width||undefined,height:pageSize.height||undefined}}>
