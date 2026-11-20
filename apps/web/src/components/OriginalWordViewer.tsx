@@ -73,7 +73,8 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
     setRevision(Number.isInteger(info.revision)?info.revision:(wasSaved?1:0));
     setTotalRevisions(Number.isInteger(info.total_revisions)?info.total_revisions:(wasSaved?1:0));
     setMaxRevisions(Number.isInteger(info.max_revisions)?info.max_revisions:8);
-    const bytes=await wordPreviewBytes(resume.id,wasSaved);
+    const bytes=await wordPreviewBytes(resume.id,wasSaved,undefined,
+     Number.isInteger(info.revision)?info.revision:(wasSaved?1:0));
     if(!active)return;
     const [pdf,worker]=await Promise.all([
      import('pdfjs-dist'),import('pdfjs-dist/build/pdf.worker.min.mjs?url')
