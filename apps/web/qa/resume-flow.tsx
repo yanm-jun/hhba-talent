@@ -9,9 +9,13 @@ import type {PrivateResume} from '../src/services/privateResumes';
 
 const nativeWord=new URLSearchParams(location.search).has('word');
 const scoringFixture=new URLSearchParams(location.search).has('score');
+const fullWriterQA=new URLSearchParams(location.search).has('full');
 const long=new URLSearchParams(location.search).has('long');
 const truncated=new URLSearchParams(location.search).has('truncated');
-const sourceText=nativeWord?'ORIGINAL WORD RESUME':truncated?'这是完全虚构的超长简历测试文字，不能把丢失的内容导出成完整简历。'.repeat(1200):long?Array.from({length:12},(_,i)=>
+const sourceText=nativeWord&&fullWriterQA?
+ 'ORIGINAL WORD RESUME'+Array.from({length:8},(_,i)=>
+  '\\n\\n虚构经历段落'+(i+1)+'：实际参与门店运营记录和日常业务协作。').join(''):
+ nativeWord?'ORIGINAL WORD RESUME':truncated?'这是完全虚构的超长简历测试文字，不能把丢失的内容导出成完整简历。'.repeat(1200):long?Array.from({length:12},(_,i)=>
  '第'+(i+1)+'段：在虚构的测试项目中记录运营流程与客户问题。'.repeat(18)
 ).join('\n\n'):'曾参与测试门店的运营记录整理与客户预约协调。\n\n独立整理每周工作进度并协助团队沟通。';
 const mockJob={
@@ -90,6 +94,30 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
    return Promise.resolve(new Response(bytes,{status:200,
     headers:{'Content-Type':'application/pdf'}}));
   }
+ }
+ if(u.pathname==='/api/resume-rewrite'){
+  if(method==='GET')return respond({ok:true,kind:'HHBA_WHOLE_RESUME_REWRITE_V1',
+   enabled:true,configured:true,mode:'full_document_draft',requires_user_approval:true});
+  const input=JSON.parse(String(init?.body||'{}'));
+  if(!input.consent_ai)return respond({error:'AI_CONSENT_REQUIRED'},400);
+  const rewritten=input.blocks.map((b:{id:string;section:string;text:string})=>({
+   blockId:b.id,section:b.section,original:b.text,
+   proposed:b.text==='ORIGINAL WORD RESUME'?'REWRITTEN WORD RESUME':
+    b.text+' 已明确工作过程与业务协作。',
+   changed:true,evidenceQuotes:[b.text.slice(0,Math.min(20,b.text.length))],
+   rationale:'合成岗位定向改写，仅用于本地测试。',
+   jobRequirements:['运营过程记录'],
+   status:'needs_user_confirmation'
+  }));
+  return respond({ok:true,kind:'HHBA_WHOLE_RESUME_REWRITE_V1',
+   provider:'synthetic-mock',reviewer:'synthetic-review',
+   blocks:rewritten,questions:[{
+    blockId:input.blocks[0].id,question:'是否参与过跨区域门店支持？请提供真实范围。',
+    reason:'原简历尚未提供相关事实。',status:'user_input_needed'
+   }],warnings:[],
+   coverage:{source_blocks:input.blocks.length,analyzed_blocks:rewritten.length,
+    proposed_rewrites:rewritten.length,held_for_review:0},
+   disclaimer:'合成 QA 测试，不代表真实岗位或用户'});
  }
  if(u.pathname==='/api/resume-optimize'){
   if(method==='GET')return respond({kind:'HHBA_RESUME_OPTIMIZATION_V1',enabled:true,configured:true,
