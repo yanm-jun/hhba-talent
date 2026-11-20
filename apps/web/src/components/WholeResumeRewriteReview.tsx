@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {CheckCircle2,FileText,MessageCircleQuestion,RefreshCcw,ShieldCheck,Sparkles} from 'lucide-react';
+import {CheckCircle2,Download,FileText,MessageCircleQuestion,RefreshCcw,ShieldCheck,Sparkles} from 'lucide-react';
 import type {ResumeWholeRewriteResult} from '../services/resumeWholeRewriteApi';
 
 /**
@@ -7,11 +7,12 @@ import type {ResumeWholeRewriteResult} from '../services/resumeWholeRewriteApi';
  * Approval is a presentation decision only; it NEVER writes a Word file.
  * Real DOCX writes still need explicit per-location renderer validation.
  */
-export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate}:{
+export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate,onDownload}:{
  result:ResumeWholeRewriteResult;
  approved:boolean;
  onApprove:(approved:boolean)=>void;
  onRegenerate:(answers:Record<string,string>)=>void;
+ onDownload:()=>void;
 }){
  const [answers,setAnswers]=useState<Record<string,string>>({});
  const changes=result.blocks.filter(b=>b.changed);
@@ -75,6 +76,11 @@ export function WholeResumeRewriteReview({result,approved,onApprove,onRegenerate
    {approved?<p><CheckCircle2 size={14}/> 已确认草稿；可精确定位的短段落可以在原 Word 中逐处保存。
     当前确认不等于已经写入原文件。</p>:
     <p>AI 已完成撰写，但所有内容仍是草稿。任何修改写回原 Word 前还需要版式校验。</p>}
+   <button type="button" className="hhba-whole-rewrite-download"
+    disabled={!approved||!complete} onClick={onDownload}>
+    <Download size={15}/> 下载完整岗位定向 Word（新排版）
+   </button>
+   <small>这是根据整份 AI 草稿生成的可编辑新版 Word，不是覆盖你上传的原版式文件。原件始终保留。</small>
   </div>
  </section>;
 }
