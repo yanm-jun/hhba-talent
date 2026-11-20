@@ -412,11 +412,14 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    data.suggestions.filter((item:ResumeSuggestion)=>
     item&&validateSuggestion(data.version.blocks,item)).slice(0,12):[];
   const approvedIds=new Set(reviewed.map((item:ResumeSuggestion)=>item.id));
-  const safeFields=(value:unknown,max:number)=>{
+  const safeFields=(value:unknown,max:number):Record<string,string>=>{
    const input=value&&typeof value==='object'&&!Array.isArray(value)?
     value as Record<string,unknown>:{};
-   return Object.fromEntries(Object.entries(input).filter(([key,text])=>
-    approvedIds.has(key)&&typeof text==='string'&&text.length<=max));
+   const cleaned:Record<string,string>={};
+   for(const [key,text] of Object.entries(input))
+    if(approvedIds.has(key)&&typeof text==='string'&&text.length<=max)
+     cleaned[key]=text;
+   return cleaned;
   };
   const native=data.native_word_draft;
   setNativeWordTextDraft(native&&typeof native.original==='string'&&
