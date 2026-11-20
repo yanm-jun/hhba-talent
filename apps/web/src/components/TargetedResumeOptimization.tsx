@@ -231,9 +231,6 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   try{
    commitVersion(applySuggestion(version,{...s,proposed},true));
    setOpenSuggestionId(null);setEditingSuggestionId(null);
-   setSuggestionDrafts(previous=>{
-    const next={...previous};delete next[s.id];return next;
-   });
    setNotice(sourceResume?'建议已确认。请在原 Word 上点选对应文字并再次确认保存；尚未改动原文件。':
     '已在简历文字草稿内填充。可以撤销，原始 Word 文件没有被修改。');
   }catch{setNotice('原文已变化或缺乏真实证据，请重新生成建议。');}
@@ -249,7 +246,6 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   try{
    commitVersion(applySuggestion(version,{...s,action:'append',proposed:text},true));
    setOpenSuggestionId(null);
-   setNewEvidence(previous=>{const next={...previous};delete next[s.id];return next;});
    setNotice(sourceResume?'真实经历补充已记入建议草稿。复杂的新增段落暂不能安全自动写回原 Word，请自行核对。':
     '已将你亲自填写的真实信息填充到简历文字草稿。');
   }catch{setNotice('原文已经变化，请重新生成补充建议。');}
