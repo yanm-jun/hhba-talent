@@ -32,7 +32,7 @@ const pages:{id:Section;label:string;icon:typeof UserRound;description:string}[]
 ];
 const navGroups=[
  {title:'求职服务',items:[
-  {label:'智能岗位匹配',path:'/candidate/match',Icon:Search},
+  {label:'智能岗位匹配',path:'/candidate/account/match',Icon:Search},
   {label:'我的简历',path:'/candidate/account/resume',Icon:FileUser},
   {label:'我的收藏',path:'/candidate/saved',Icon:Bookmark},
   {label:'匹配历史',path:'/candidate/account/applications',Icon:History},
@@ -53,7 +53,7 @@ function matchDate(raw:string){const time=Date.parse(raw);return Number.isFinite
 function routeFor(id:Section,legalAidSlug=''){
  if(id==='overview')return '/candidate/account';
  if(id==='saved')return '/candidate/saved';
- if(id==='match')return '/candidate/match';
+ if(id==='match')return '/candidate/account/match';
  if(id==='rights')return '/candidate/account/rights';
  if(id==='legal-aid')return '/candidate/account/legal-aid';
  if(id==='legal-aid-intervention')return '/candidate/account/legal-aid/intervention';
