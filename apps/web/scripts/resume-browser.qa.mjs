@@ -603,6 +603,9 @@ try{
   await first.getByRole('button',{name:'适合宽度'}).click();
   const assistant=first.locator('.targeted-resume-word-assistant');
   if(view.name==='mobile'){
+   const wordPosition=await first.locator('.targeted-resume-word-main').boundingBox();
+   assert.ok(wordPosition&&wordPosition.y<330,
+    'mobile must show the Word document near the top, not below AI permissions and settings');
    assert.equal(await assistant.isVisible(),false,'suggestions must not cover mobile Word');
    await first.getByRole('button',{name:'AI 建议',exact:true}).click();
    await assistant.waitFor({state:'visible'});
