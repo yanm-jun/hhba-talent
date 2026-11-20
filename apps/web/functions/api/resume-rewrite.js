@@ -79,11 +79,22 @@ export async function onRequestPost({request,env}){
   let reviewer;
   try{reviewer=selectProvider(env,'resume_reviewer');}
   catch(e){if(e.message!=='AI_PROVIDER_NOT_CONFIGURED')throw e;reviewer=author;}
-  const autonomous=await runResumeEditorialAgent({
-   draft:base,blocks:body.blocks,job:body.job,env,provider:author,reviewer,
-   completeJson,validateAuthoring,numberTokens,redacted,signal
-  });
-  return json(autonomous);
+  try{
+   const autonomous=await runResumeEditorialAgent({
+    draft:base,blocks:body.blocks,job:body.job,env,provider:author,reviewer,
+    completeJson,validateAuthoring,numberTokens,redacted,signal
+   });
+   return json(autonomous);
+  }catch(e){
+   // The independent initial writer+reviewer may already have produced a
+   // trustworthy draft. Keep it, but never claim the autonomous passes ran.
+   // No private resume, prompt or provider payload enters logs.
+   const code=typeof e?.message==='string'&&e.message.startsWith('AI_PROVIDER_')?
+    e.message:'AI_AGENT_REVIEW_UNAVAILABLE';
+   console.warn('HHBA_AI_AGENT_REVIEW_INCOMPLETE',code);
+   return json({...base,autonomy:{enabled:true,rounds:0,stop_reason:'tool_unavailable',
+    needs_more_work:true,tools_used:[]}});
+  }
  }catch(e){
   const allowed=new Set(['INVALID_REWRITE_INPUT','AI_PROVIDER_NOT_CONFIGURED',
    'AI_PROVIDER_UNSUPPORTED','AI_PROVIDER_RATE_LIMITED',
