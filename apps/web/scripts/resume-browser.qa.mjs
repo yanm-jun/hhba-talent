@@ -97,8 +97,20 @@ try{
  await page.getByRole('button',{name:'填充到此处'}).click();
  const liveText=page.locator('[data-resume-block-id="source-0"] .hhba-print-paragraph');
  assert.match(await liveText.textContent(),/合成测试项目/,'modified AI text must replace the exact source paragraph');
+ const changedAIText=liveText.locator('.hhba-resume-siri-letters');
+ await changedAIText.waitFor();
+ assert.match(await changedAIText.textContent(),/合成测试项目/);
+ const appliedStyle=await changedAIText.evaluate(el=>({
+  animation:getComputedStyle(el).animationName,
+  background:getComputedStyle(el).backgroundImage
+ }));
+ assert.match(appliedStyle.animation,/hhba-resume-siri-letters-flow/,
+  'accepted AI change, not just suggestion, must show animated rainbow text');
+ assert.match(appliedStyle.background,/linear-gradient/);
+ await page.screenshot({path:output+'/siri-accepted-resume-changes.png',fullPage:true});
  await page.getByRole('button',{name:'撤销',exact:true}).click();
  assert.match(await liveText.textContent(),/测试门店的运营记录/,'undo must restore original paragraph');
+ assert.equal(await changedAIText.count(),0,'undo must remove Siri changed-text highlighting');
  await page.locator('[data-resume-block-id="source-0"] .targeted-resume-ai-trigger').click();
  await page.getByRole('button',{name:'填充到此处'}).click();
  assert.match(await liveText.textContent(),/合成测试项目/);
@@ -107,6 +119,8 @@ try{
  await edit.fill('真实参与合成测试门店运营记录整理与预约协调。');
  await page.getByRole('button',{name:'保存本次修改'}).click();
  assert.match(await liveText.textContent(),/合成测试门店/);
+ assert.equal(await liveText.locator('.hhba-resume-siri-letters').count(),1,
+  'user-confirmed manual resume edits should also have Siri rainbow text');
  await page.getByPlaceholder('请填写本人真实姓名').fill('验收用虚拟姓名');
  await page.getByPlaceholder('例如：区域运营督导').fill('运营助理');
  assert.equal(await page.locator('.targeted-resume-live-paper .hhba-print-sheet').count(),1);
