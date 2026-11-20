@@ -23,6 +23,11 @@ function mockProvider(blocks,{inventMetrics=false,rejectBlockId=null,planOrder=n
   assert.equal(init.headers.authorization,'Bearer local-mock-credential');
   assert.equal(init.redirect,'manual');
   const packet=JSON.parse(init.body);
+  assert.equal(packet.thinking?.type,'enabled',
+   'full-document writer must never disable DeepSeek reasoning');
+  assert.equal(packet.reasoning_effort,'max');
+  assert.ok(packet.max_tokens>=16000,
+   'the provider must leave room for genuine model reasoning and whole-section output');
   const system=packet.messages[0].content;
   const input=JSON.parse(packet.messages[1].content);
   calls.push({system,blocks:input.blocks?.length});
@@ -179,4 +184,15 @@ test('cannot borrow a genuine numeric achievement from another employer block',a
   assert.equal(result.warnings[0].blockId,'experience-b');
   assert.equal(result.warnings[0].code,'UNSUPPORTED_NUMERIC_CLAIM');
  }finally{globalThis.fetch=original;}
+});
+
+test('selectProvider defaults job-tailored DeepSeek writer to current V4 Pro and preserves explicit model override',async()=>{
+ const {selectProvider}=await import('../functions/_lib/resume-ai-provider.js');
+ const basic={HHBA_AI_DEFAULT_PROVIDER:'deepseek',HHBA_AI_DEEPSEEK_API_KEY:'qa'};
+ const pro=selectProvider(basic,'resume_rewrite');
+ assert.equal(pro.model,'deepseek-v4-pro');
+ assert.equal(pro.reasoningEffort,'max');
+ assert.equal(selectProvider({...basic,HHBA_AI_DEEPSEEK_MODEL:'custom-ai'},'resume_rewrite').model,'custom-ai');
+ assert.equal(selectProvider({...basic,HHBA_AI_DEEPSEEK_REASONING_EFFORT:'high'},'resume_reviewer').reasoningEffort,'high');
+ assert.equal(selectProvider(basic,'resume_optimization').model,'deepseek-flash');
 });
