@@ -229,7 +229,7 @@ export function OriginalWordViewer({resume,onClose}:{
         maskImage:'url("'+siriInk.maskUrl+'")',
         WebkitMaskSize:'100% 100%',maskSize:'100% 100%',
         WebkitMaskRepeat:'no-repeat',maskRepeat:'no-repeat'
-       }}/>
+       }}/>}
       {!saved&&anchors.map(anchor=>{
        const [x,y,w,h]=anchor.bbox;
        return <button key={anchor.id} type="button"
