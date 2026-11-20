@@ -9,6 +9,8 @@ import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResum
 import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,sourceResumeOmittedCharacters,structuredResumeOmittedCharacters,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
 import {createPortal} from 'react-dom';
 import {Link} from '../router';
+import type {PrivateResume} from '../services/privateResumes';
+import {OriginalWordViewer} from './OriginalWordViewer';
 import {ResumePrintSheet} from './ResumePrintSheet';
 import {downloadResumeDocx} from '../services/resumeDocx';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
@@ -16,7 +18,7 @@ import {officialJobVerifyStatus,verifyOfficialJob,type OfficialJobVerifyStatus,t
 import '../styles/targeted-resume-optimization.css';
 import '../styles/siri-edge.css';
 
-export function TargetedResumeOptimization({profile,job,sourceText}:{profile:CandidateProfile;job:JobMatch;sourceText?:string}){
+export function TargetedResumeOptimization({profile,job,sourceText,sourceResume}:{profile:CandidateProfile;job:JobMatch;sourceText?:string;sourceResume?:PrivateResume}){
  const blocks=useMemo<ResumeBlock[]>(()=>{
  const originals=[
   ...(Array.isArray(profile.experiences)?profile.experiences:[]).filter(e=>e.evidence?.trim()).map((e,i)=>({id:'experience-'+i,section:'experience' as const,text:e.evidence.slice(0,1600)})),
@@ -63,6 +65,7 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
  const [undoStack,setUndoStack]=useState<ResumeVersion[]>([]);
  const [editingBlock,setEditingBlock]=useState<string|null>(null);
  const [manualText,setManualText]=useState('');
+ const [openOriginalWord,setOpenOriginalWord]=useState(false);
  const generation=useRef(0);
  const active=useRef<AbortController|null>(null);
  useEffect(()=>{
@@ -309,6 +312,23 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
  // Production PDF must originate from a renderer-verified original DOCX.
  const legacyPrintQa=import.meta.env.DEV&&typeof window!=='undefined'&&
   window.location.pathname.startsWith('/qa/');
+ const confirmedWordChanges=useMemo(()=>{
+  const accepted=new Set(version.acceptedSuggestionIds);
+  // Use final, user-confirmed text only. Appending paragraphs, AI unconfirmed
+  // suggestions, and non-exact source blocks must never silently patch Word.
+  const candidates=suggestions.filter(item=>accepted.has(item.id)&&item.action==='replace')
+   .map(item=>({
+    original:item.original,proposed:version.blocks.find(b=>b.id===item.blockId)?.text||''
+   })).filter(({original,proposed})=>original!==proposed&&
+    original.length>1&&original.length<=300&&
+    proposed.length>1&&proposed.length<=300&&
+    original===original.trim()&&proposed===proposed.trim()&&
+    !/[\\r\\n\\t]/.test(original+proposed));
+  const occurrences=new Map<string,number>();
+  for(const change of candidates)
+   occurrences.set(change.original,(occurrences.get(change.original)||0)+1);
+  return candidates.filter(change=>occurrences.get(change.original)===1);
+ },[suggestions,version.blocks,version.acceptedSuggestionIds]);
  const hasSession=realAuthReady&&Boolean(getRealAuthToken());
  return <section className="targeted-resume" aria-label="岗位定向简历优化">
   <div className="targeted-resume-heading">
@@ -362,6 +382,19 @@ export function TargetedResumeOptimization({profile,job,sourceText}:{profile:Can
    <p className="targeted-resume-print-note">此处用于核对 AI 文字建议，下载的 Word 草稿会重新排版，并非上传文件的原样式。需要保留字体和版式，请到 <Link to="/candidate/account/resume">我的简历</Link> 编辑原 Word；通过验证后，可下载 Word 和由 Word 转换的 PDF。</p>
    {!canExport&&<p className="targeted-resume-print-note" role="status">请填写真实姓名、确认简历内容完整，并保存正在编辑的段落，才可以下载 Word 草稿。</p>}
   </section>
+  {sourceResume?.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'&&
+   <section className="targeted-resume-document-editor" aria-label="原 Word 编辑和导出">
+    <div className="targeted-resume-document-heading">
+     <div><strong>原版式 Word</strong>
+      <p>已确认的 AI 建议只有与 Word 原文精确对应，才会自动填入待确认编辑框。不会覆盖原件。</p></div>
+     <div className="targeted-resume-document-actions">
+      <button type="button" onClick={()=>setOpenOriginalWord(v=>!v)}>
+       <PencilLine size={15}/>{openOriginalWord?'收起原 Word':'在原 Word 中编辑 / 导出 PDF'}</button>
+     </div>
+    </div>
+    {openOriginalWord&&<OriginalWordViewer resume={sourceResume}
+     suggestedChanges={confirmedWordChanges} onClose={()=>setOpenOriginalWord(false)}/>}
+   </section>}
   <div className={'targeted-resume-live-paper hhba-siri-edge'+
     ((openSuggestionId||editingBlock)?' hhba-siri-edge-active':'')}
     aria-label="可原位编辑的简历预览">
