@@ -475,3 +475,10 @@
   -webkit-text-fill-color:currentColor!important;
  }
 }
+
+
+/* An enlarged Word page must not be constrained independently of its text
+   anchors: PDF.js viewport coordinates and click regions use the same width. */
+.hhba-original-word-viewer .hhba-word-native-preview .hhba-original-resume-page-frame{
+ max-width:none;
+}
