@@ -43,7 +43,7 @@ function balancedGroups(blocks){
  return groups;
 }
 function numberTokens(text){
- return new Set((text.match(/(?<![\p{L}\d])\d+(?:[.,]\d+)*%?/gu)||[])
+ return new Set((text.match(/(?<!\d)\d+(?:[.,]\d+)*%?/gu)||[])
   .map(x=>x.replaceAll(',','')));
 }
 /** Never transplant an achievement or date from one employer's paragraph into another. */
