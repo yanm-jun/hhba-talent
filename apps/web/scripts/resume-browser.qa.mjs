@@ -638,6 +638,19 @@ try{
   const rainbowOpacity=await first.locator('.hhba-word-native-preview .hhba-word-ai-preview-text')
    .first().evaluate(el=>getComputedStyle(el).opacity);
   assert.equal(rainbowOpacity,'1','real document AI text must be visibly colorful, not hidden by old anchor CSS');
+  const inkGeometry=await first.locator('.hhba-word-native-preview .hhba-word-ai-preview-text')
+   .first().evaluate(el=>{
+    const text=el.getBoundingClientRect();
+    const anchor=el.closest('button')?.getBoundingClientRect();
+    return {textY:text.y,textBottom:text.bottom,anchorY:anchor?.y,
+     anchorBottom:anchor?.bottom,position:getComputedStyle(el).position};
+   });
+  assert.equal(inkGeometry.position,'static','Siri letters must not inherit absolute tooltip layout');
+  assert.ok(inkGeometry.anchorY!==undefined&&inkGeometry.anchorBottom!==undefined&&
+   inkGeometry.textY>=inkGeometry.anchorY-3&&
+   inkGeometry.textBottom<=inkGeometry.anchorBottom+4,
+   'colored Word words must be INSIDE the exact source-line box, not clipped above it');
+  await first.screenshot({path:output+'/word-first-'+view.name+'-siri-on-document.png',fullPage:true});
   assert.match(await first.locator('.hhba-word-native-preview .hhba-word-ai-preview-text').first()
    .evaluate(el=>getComputedStyle(el).backgroundImage),/linear-gradient/,
    'the suggestion must appear on the original Word line with Siri colors');
