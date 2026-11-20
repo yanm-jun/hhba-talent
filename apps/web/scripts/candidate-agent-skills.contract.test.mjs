@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   CANDIDATE_AGENT_SKILLS,candidateAgentEnabled,
   candidateAgentConfiguration,selectedCandidateSkills,requireMatchingSkills,
-  runCandidateAgentMatch
+  runCandidateAgentMatch,candidateAgentRewriteAllowed
 } from '../functions/_lib/candidate-agent-skills.js';
 
 const preview=()=>({
@@ -121,6 +121,25 @@ test('unsafe streamed partial jobs are never exposed to the applicant',async()=>
   assert.equal(result.matches.length,1);
   assert.equal(visible.length,1);
   assert.deepEqual(visible[0],[safe]);
+});
+
+test('admin-disabled rewrite is blocked in backend, not merely hidden in UI',async()=>{
+  const policyRow=skills=>({
+    enabled:1,revision:2,updated_at:'2026-11-20T00:00:00Z',
+    skills_json:JSON.stringify(skills)
+  });
+  const withSkills=skills=>({
+    ...preview(),HHBA_PNVS_AUTH_DB:{
+      prepare:()=>({first:async()=>policyRow(skills)})
+    }
+  });
+  assert.equal(await candidateAgentRewriteAllowed(
+    withSkills(['resume_evidence','official_job_search','fit_scoring'])),false);
+  assert.equal(await candidateAgentRewriteAllowed(withSkills([...approved.skills])),true);
+  assert.equal(await candidateAgentRewriteAllowed({
+    ...withSkills(['resume_evidence','official_job_search','fit_scoring']),
+    HHBA_CANDIDATE_AGENT_ENABLED:'0'
+  }),true,'independent legacy editing is unaffected when Agent is off');
 });
 
 test('rewrite skill can be disabled without breaking search and scoring',async()=>{
