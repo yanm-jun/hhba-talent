@@ -5,6 +5,8 @@ import type {MatchResponse} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 import {TargetedResumeOptimization} from './TargetedResumeOptimization';
+import {CandidateJourneySteps} from './CandidateJourneySteps';
+import {officialApplicationUrl,officialLinkLabel} from '../services/officialApplicationUrl.mjs';
 import {Link} from '../router';
 import '../styles/resume-match-dialog.css';
 
@@ -76,11 +78,23 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
      </button>
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={activeJob?'optimization':'matches'}>
+     <CandidateJourneySteps current={activeJob?4:pending?2:3} compact/>
      {activeJob&&parsedProfile?
       <section className="hhba-match-workspace" aria-label="独立简历优化工作区">
        <button type="button" className="hhba-match-workspace-back" onClick={backToMatches}>
-        返回岗位结果
+        返回岗位评分
        </button>
+       <div className="hhba-match-selected-job">
+        <div>
+         <span>针对这个岗位优化简历</span>
+         <h2>{activeJob.title_zh||activeJob.title}</h2>
+         <p>{activeJob.company} · {activeJob.location}</p>
+        </div>
+        <div className="hhba-match-selected-score">
+         <strong>{Number.isInteger(activeJob.match_score)?activeJob.match_score:'—'}<small>/100</small></strong>
+         <span>原简历适配分 · 不是录用概率</span>
+        </div>
+       </div>
        {!sourceResume&&resumeStorage?.available&&<div className="hhba-match-save-resume hhba-match-word-onboarding">
         <strong>先保存 Word，才能保留原有排版</strong>
         <p>当前还没有把这份 Word 关联到你的私有简历库。
@@ -96,12 +110,27 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
        <TargetedResumeOptimization key={activeJob.id} profile={parsedProfile}
         job={asTargetJob(activeJob)} sourceText={sourceText} accountScope={accountScope}
         sourceResume={sourceResume} onDraftDirtyChange={setOptimizationDirty}/>
+       <section className="hhba-match-apply-last" aria-label="最后一步：企业官网投递">
+        <div className="hhba-match-apply-last-head">
+         <span className="hhba-match-final-index">05</span>
+         <div><h3>准备好简历后，前往企业官网投递</h3>
+          <p>确认并下载针对该岗位的 Word。投递由你在企业招聘页面自行完成，HHBA 不会替你提交。</p></div>
+        </div>
+        {officialApplicationUrl(activeJob)?
+         <a className="hhba-match-final-apply" href={officialApplicationUrl(activeJob)!}
+          target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">
+          {officialLinkLabel(activeJob)} <ArrowUpRight size={16}/>
+         </a>:
+         <p className="hhba-match-apply-unverified" role="status">
+          这个岗位尚未提供可核验的企业招聘链接，暂不提供投递按钮，避免误入第三方招聘平台。
+         </p>}
+       </section>
       </section>:
      <>
      <div className="hhba-match-intro">
       <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> 智能推荐</span>
-      <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
-      <p>适配分不是录用概率。只推荐中国大陆企业岗位，不提供第三方招聘平台链接。{pending?'结果正在陆续生成，下方岗位可先查看。':'请在企业官网核实岗位是否仍然招聘。'}</p>
+      <h2 id="hhba-native-title">为你找到 {result.matches.length} 个适合评估的岗位{pending?' · 搜索中':''}</h2>
+      <p>AI 已根据简历分析每个岗位的适配分。选择感兴趣的岗位，接着定向优化简历，再到企业招聘页投递。分数不是录用概率。</p>
      </div>
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {!pending&&result.history_status==='SAVED'&&<div className="hhba-match-history-confirm">
@@ -145,13 +174,24 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
            </div>}
           </div>
          </div>
-         {job.score_basis&&Number.isInteger(job.match_score)&&
-          <p className="hhba-native-score-basis"><strong>评分依据：</strong>{job.score_basis}</p>}
-         <p className="hhba-native-reason"><strong>为什么推荐：</strong>
-          {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
-         <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
-          data-hhba-recruitment-outbound="true">{job.recruitment_source_kind==='EMPLOYER_ATS'?
-            '查看企业专属招聘系统岗位（请核验）':'查看企业招聘岗位页面（请核验）'} <ArrowUpRight size={15}/></a>
+         <p className="hhba-native-reason"><strong>为什么适合：</strong>{
+          (job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').slice(0,170)
+         }{(job.recommendation_reason||'').length>170?'…':''}</p>
+         {(job.score_basis||(job.recommendation_reason||'').length>170)&&
+          <details className="hhba-native-job-more">
+           <summary>查看完整评分依据和推荐分析</summary>
+           {job.score_basis&&<p><strong>评分依据：</strong>{job.score_basis}</p>}
+           {job.recommendation_reason&&<p>{job.recommendation_reason}</p>}
+          </details>}
+         {officialApplicationUrl(job)?
+          <a className="hhba-native-apply" href={officialApplicationUrl(job)!}
+           target="_blank" rel="noopener noreferrer"
+           data-hhba-recruitment-outbound="true">
+           不优化，直接查看企业招聘页 <ArrowUpRight size={15}/>
+          </a>:
+          <p className="hhba-native-no-official" role="note">
+           暂未取得可核验的企业招聘链接，不提供第三方投递入口。
+          </p>}
         </article>
        ))}
       </div>:
