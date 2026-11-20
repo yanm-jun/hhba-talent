@@ -217,7 +217,11 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[]}:{
    每次修改后都可以继续点选下一段，撤销和重做不会覆盖原始 Word。
   </p>}
   {loading&&<p className="hhba-original-resume-note" role="status">正在打开简历…</p>}
-  {previewError&&<p className="hhba-original-resume-note" role="alert">{previewError}</p>}
+  {previewError&&<div className="hhba-original-resume-note" role="alert">
+   <p>{previewError}</p>
+   {ready==='available'&&<button type="button" disabled={busy}
+    onClick={()=>{setPreviewError('');setRefresh(n=>n+1);}}>重新载入最新版</button>}
+  </div>}
   {!loading&&ready==='unavailable'&&<div className="hhba-original-resume-word">
    <p>当前只能查看文字。要查看原来的样式，请下载原件打开。</p>
    <pre>{text}</pre>
