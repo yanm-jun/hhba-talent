@@ -38,7 +38,12 @@ function toOptimizerJob(job:HistoryMatchedJob,historyId:string,index:number):Mat
   recruitment_source_note:job.recruitment_source_note,
   recruitment_source_kind:job.recruitment_source_kind==='EMPLOYER_ATS'?'EMPLOYER_ATS':
    job.recruitment_source_kind==='EMPLOYER_DOMAIN_CANDIDATE'?'EMPLOYER_DOMAIN_CANDIDATE':'UNVERIFIED',
-  availability_status:job.availability_status
+  availability_status:job.availability_status,
+  jd_version_id:job.jd_version_id,
+  jd_sha256:job.jd_sha256,jd_checked_at:job.jd_checked_at,
+  jd_source_status:job.jd_source_status,
+  jd_score_status:job.jd_score_status,
+  jd_proof_method:job.jd_proof_method||undefined
  };
 }
 type HistoryView='details'|'optimize';
@@ -153,7 +158,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
         <Link to="/candidate/account/resume">去「我的简历」上传原 Word <ArrowRight size={14}/></Link>
        </div>}
       {original&&wordNotice&&<small role="status">{wordNotice}</small>}
-      <small>仅使用这次历史记录中的推荐理由和评分依据，不重新搜索岗位。原招聘要求及是否在招，请以企业官网当前信息为准；历史分数不是录用概率。</small>
+      <small>已核验 JD 的历史岗位会复用对应原文版本；其他岗位仅保留当时的搜索摘要。岗位是否仍在招聘以企业官网为准，分数不代表录用概率。</small>
      </div>}
      {selected.new_job_count>0&&<p className="hhba-match-history-new">{'相较之前已保存的记录，本次新发现 '+selected.new_job_count+' 个未推荐过的岗位。'}</p>}
      {selected.matches.map((job,i)=>{
