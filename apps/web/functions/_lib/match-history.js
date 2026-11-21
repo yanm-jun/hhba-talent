@@ -5,6 +5,21 @@ import {allowedEmployerJobLink} from './match-employer-source.js';
 
 const text=(v,n)=>typeof v==='string'?v.replace(/[\u0000-\u001f]/g,' ').trim().slice(0,n):'';
 const score=v=>Number.isInteger(v)&&v>=0&&v<=100?v:null;
+const verifiedJdMeta=item=>{
+ if(!/^jd_[a-f0-9]{32}$/.test(item?.jd_version_id||'')||
+  !/^[a-f0-9]{64}$/.test(item?.jd_sha256||'')||
+  !Number.isFinite(Date.parse(item?.jd_checked_at||''))||
+  item?.jd_source_status!=='VERIFIED_JD')return {};
+ return {
+  jd_version_id:item.jd_version_id,jd_sha256:item.jd_sha256,
+  jd_checked_at:item.jd_checked_at,
+  jd_source_status:'VERIFIED_JD',
+  jd_score_status:['V2_JD_EVIDENCE_SCORED','INSUFFICIENT_RESUME_EVIDENCE']
+   .includes(item.jd_score_status)?item.jd_score_status:'INSUFFICIENT_RESUME_EVIDENCE',
+  jd_proof_method:['PUBLIC_EMPLOYER_ATS_V1','DIRECT_EMPLOYER_HTML_V1']
+   .includes(item.jd_proof_method)?item.jd_proof_method:null
+ };
+};
 const rowId=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const maxHistory=30;
 const isValidUrl=value=>{
@@ -30,7 +45,8 @@ export function safeHistoryJobs(matches){
    availability_status:['OPEN_LISTED','UNKNOWN'].includes(item.availability_status)?
     item.availability_status:'UNKNOWN',
    recruitment_source_kind:text(item.recruitment_source_kind,35),
-   recruitment_source_note:text(item.recruitment_source_note,130)});
+   recruitment_source_note:text(item.recruitment_source_note,130),
+   ...verifiedJdMeta(item)});
   if(out.length===10)break;
  }
  return out;
