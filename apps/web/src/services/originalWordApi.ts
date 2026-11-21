@@ -103,7 +103,7 @@ export async function shiftOriginalWordRevision(id:string,action:'undo'|'redo',e
  });
  return response.json();
 }
-async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf',jobId?:string){
+async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf',jobId?:string,jobLabel?:string){
  // Both files originate from the same saved, renderer-verified original DOCX.
  // A PDF is never edited in-place and no browser print-template is substituted.
  const response=await send(url(id,format==='pdf'?'download-pdf':'download',jobId));
@@ -119,13 +119,16 @@ async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf',jobId?:s
  if(signature.some((byte,index)=>first[index]!==byte))
   throw Error('下载文件校验失败，请稍后重试。');
  const object=URL.createObjectURL(blob),link=document.createElement('a');
- link.href=object;link.download=(jobId===undefined?'我的简历-已修改':'我的简历-岗位专属版')+'.'+format;
+ const safeJob=(jobLabel||'岗位专属版').replace(/[<>:"/\\|?*\u0000-\u001f]/g,'')
+  .replace(/\s+/g,' ').trim().slice(0,64)||'岗位专属版';
+ link.href=object;link.download=(jobId===undefined?'我的简历-已修改':
+  '我的简历-'+safeJob+'-已优化')+'.'+format;
  link.hidden=true;document.body.appendChild(link);
  try{link.click();}finally{link.remove();setTimeout(()=>URL.revokeObjectURL(object),10000);}
 }
-export async function downloadOriginalWordEdited(id:string,jobId?:string){
- return downloadVerifiedWordResult(id,'docx',jobId);
+export async function downloadOriginalWordEdited(id:string,jobId?:string,jobLabel?:string){
+ return downloadVerifiedWordResult(id,'docx',jobId,jobLabel);
 }
-export async function downloadOriginalWordPdf(id:string,jobId?:string){
- return downloadVerifiedWordResult(id,'pdf',jobId);
+export async function downloadOriginalWordPdf(id:string,jobId?:string,jobLabel?:string){
+ return downloadVerifiedWordResult(id,'pdf',jobId,jobLabel);
 }
