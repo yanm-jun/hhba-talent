@@ -169,13 +169,14 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
            {visibleMatchScore(job)!==null?
             <><strong>{visibleMatchScore(job)}<small>/100</small></strong><span>简历适配分 · AI 参考</span></>:
             <><strong className="hhba-native-score-na">—</strong><span>暂无可靠分数</span></>}
-           {!pending&&<button type="button"
+           <button type="button" disabled={pending}
+             title={pending?'搜索完成后即可针对这个岗位优化简历':'针对所选岗位优化简历'}
              className="hhba-native-optimize" onClick={()=>{
               matchListScroll.current=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content')?.scrollTop||0;
               setOptimizationDirty(false);setOptimizedJobId(job.id);
              }} aria-label={'针对'+(job.title_zh||job.title)+'优化简历'}>
              <Sparkles size={13} aria-hidden="true"/> 优化简历
-            </button>}
+            </button>
           </div>
          </div>
          {job.score_basis&&visibleMatchScore(job)!==null&&
