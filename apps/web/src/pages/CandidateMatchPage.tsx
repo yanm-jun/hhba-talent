@@ -7,7 +7,7 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
+import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -159,11 +159,12 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     // in that case do not start the AI request.
     if(abort.signal.aborted)throw new DOMException('Cancelled','AbortError');
    }
-   // Resume matching and targeted optimization consume exactly the same
-   // locally reviewed text. No additional AI parse or new search occurs.
-   // Both PDF and DOCX upload paths remain supported.
-   let submittedText=previewLoaded?previewText:'';
-   if(!previewLoaded){
+   let matched:MatchResponse;
+   if(previewLoaded){
+    // Once the user has reviewed/edited text, NEVER fall back to re-reading the unedited file.
+    matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,matchResumeId||undefined,setStage,setPartialJobs);
+    setOptimizationSource(previewText);
+   }else{
     let selected=selectedFile;
     if(!selected&&matchResumeId){
      const entry=savedFiles.find(item=>item.id===matchResumeId);
@@ -173,12 +174,11 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
      selected=new File([bytes],entry.name,{type:entry.type});
     }
     if(!selected)throw new MatchError(400,'请选择简历。');
-    submittedText=await extractResumeTextLocally(selected,abort.signal);
+    // Preserve existing match flow and avoid a second extraction:
+    // the existing service exposes the exact locally reviewed text only to
+    // this session through a new optional callback, never to a new page.
+    matched=await submitResumeForMatching(selected,options,consent,abort.signal,matchResumeId||undefined,setStage,setPartialJobs,setOptimizationSource);
    }
-   const matched:MatchResponse=await submitExtractedResumeText(
-    submittedText,options,consent,abort.signal,matchResumeId||undefined,setStage,setPartialJobs);
-   if(abort.signal.aborted)return;
-   setOptimizationSource(submittedText);
    setResult(matched);setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
    setConsent(false);
