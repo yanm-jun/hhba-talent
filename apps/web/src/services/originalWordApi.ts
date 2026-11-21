@@ -49,9 +49,25 @@ async function send(path:string,method:'GET'|'POST'='GET',data?:unknown,signal?:
  }
  return response;
 }
-function url(resumeId:string,action:string){
+function scopedJobId(jobId?:string){
+ if(jobId===undefined)return undefined;
+ // Job IDs are never used directly as object keys; the server derives a
+ // SHA-256 scope from exactly this value. Never silently fall back to the
+ // unscoped vault when the selected job ID is invalid.
+ if(typeof jobId!=='string'||jobId.length<1||jobId.length>512||
+  jobId!==jobId.trim()||/[\u0000-\u001f\u007f]/.test(jobId))
+  throw Error('目标岗位标识无效，请返回岗位列表重新选择。');
+ return jobId;
+}
+function url(resumeId:string,action:string,jobId?:string){
  if(!uid.test(resumeId))throw Error('简历文件无效。');
- return '/api/resume-word?action='+action+'&resume_id='+encodeURIComponent(resumeId);
+ const job=scopedJobId(jobId);
+ return '/api/resume-word?action='+action+'&resume_id='+encodeURIComponent(resumeId)+
+  (job===undefined?'':'&job_id='+encodeURIComponent(job));
+}
+function jobPayload(jobId?:string){
+ const id=scopedJobId(jobId);
+ return id===undefined?{}:{job_id:id};
 }
 export async function wordRendererReady(signal?:AbortSignal){
  try{
@@ -59,12 +75,12 @@ export async function wordRendererReady(signal?:AbortSignal){
   return (await response.json()).enabled===true;
  }catch{return false;}
 }
-export async function wordEditableText(id:string,signal?:AbortSignal):Promise<WordInspect>{
- const response=await send(url(id,'inspect'),'GET',undefined,signal);
+export async function wordEditableText(id:string,signal?:AbortSignal,jobId?:string):Promise<WordInspect>{
+ const response=await send(url(id,'inspect',jobId),'GET',undefined,signal);
  return response.json();
 }
-export async function wordPreviewBytes(id:string,edited=false,signal?:AbortSignal,revision?:number){
- const path=url(id,edited?'edited-preview':'preview')+
+export async function wordPreviewBytes(id:string,edited=false,signal?:AbortSignal,revision?:number,jobId?:string){
+ const path=url(id,edited?'edited-preview':'preview',jobId)+
   (edited&&revision!==undefined?'&revision='+revision:'');
  const response=await send(path,'GET',undefined,signal);
  const buffer=await response.arrayBuffer();
@@ -73,24 +89,24 @@ export async function wordPreviewBytes(id:string,edited=false,signal?:AbortSigna
  return buffer;
 }
 export type WordMutationResult={ok:true;saved:boolean;revision:number;total_revisions:number;page_count?:number};
-export async function saveOriginalWordEdit(id:string,original:string,text:string,expectedRevision=0):Promise<WordMutationResult>{
+export async function saveOriginalWordEdit(id:string,original:string,text:string,expectedRevision=0,jobId?:string):Promise<WordMutationResult>{
  const response=await send('/api/resume-word','POST',{
-  action:'edit',resume_id:id,original,text,expected_revision:expectedRevision,
+  action:'edit',resume_id:id,...jobPayload(jobId),original,text,expected_revision:expectedRevision,
   confirmed_real:true,consent_word_processing:true
  });
  return response.json();
 }
-export async function shiftOriginalWordRevision(id:string,action:'undo'|'redo',expectedRevision:number):Promise<WordMutationResult>{
+export async function shiftOriginalWordRevision(id:string,action:'undo'|'redo',expectedRevision:number,jobId?:string):Promise<WordMutationResult>{
  const response=await send('/api/resume-word','POST',{
-  action,resume_id:id,expected_revision:expectedRevision,
+  action,resume_id:id,...jobPayload(jobId),expected_revision:expectedRevision,
   confirmed_real:true,consent_word_processing:true
  });
  return response.json();
 }
-async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf'){
+async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf',jobId?:string){
  // Both files originate from the same saved, renderer-verified original DOCX.
  // A PDF is never edited in-place and no browser print-template is substituted.
- const response=await send(url(id,format==='pdf'?'download-pdf':'download'));
+ const response=await send(url(id,format==='pdf'?'download-pdf':'download',jobId));
  const expected=format==='pdf'?'application/pdf':
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
  if((response.headers.get('Content-Type')||'').split(';')[0].toLowerCase()!==expected)
@@ -103,13 +119,13 @@ async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf'){
  if(signature.some((byte,index)=>first[index]!==byte))
   throw Error('下载文件校验失败，请稍后重试。');
  const object=URL.createObjectURL(blob),link=document.createElement('a');
- link.href=object;link.download='我的简历-已修改.'+format;
+ link.href=object;link.download=(jobId===undefined?'我的简历-已修改':'我的简历-岗位专属版')+'.'+format;
  link.hidden=true;document.body.appendChild(link);
  try{link.click();}finally{link.remove();setTimeout(()=>URL.revokeObjectURL(object),10000);}
 }
-export async function downloadOriginalWordEdited(id:string){
- return downloadVerifiedWordResult(id,'docx');
+export async function downloadOriginalWordEdited(id:string,jobId?:string){
+ return downloadVerifiedWordResult(id,'docx',jobId);
 }
-export async function downloadOriginalWordPdf(id:string){
- return downloadVerifiedWordResult(id,'pdf');
+export async function downloadOriginalWordPdf(id:string,jobId?:string){
+ return downloadVerifiedWordResult(id,'pdf',jobId);
 }
