@@ -89,10 +89,10 @@ test('official and demo data use separate sources and legacy links remain compat
  assert.match(funds,/OfficialTransparencyFundsPage/);
  assert.match(cases,/fetch\(endpoint,\{cache:'no-store'\}\)/);
  assert.match(funds,/fetch\(endpoint\('\/ledger'\)/);
- assert.match(overview,/workerDemoTotals\.balance/);
+ assert.match(overview,/commitmentGallery\.map/);
  assert.match(demo,/workerDemoCases/);
  assert.match(demo,/workerDemoMonths/);
- assert.match(overview,/financial-allocation/);
+ assert.match(overview,/navigate\('\/commitment'\)/);
  assert.doesNotMatch(read('d1/0021_worker_public_archive.sql'),/HHBA-DEMO-00[1-9]/);
 });
 
