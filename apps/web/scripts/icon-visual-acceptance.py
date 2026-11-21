@@ -91,29 +91,26 @@ with sync_playwright() as p:
                 assert not errors, f"{device}-{label} browser errors: {errors[:3]}"
                 reports.append({"device":device,"page":label,**result})
                 if label == "jobs":
-                    buttons = page.locator(".hhba-filter-pill")
-                    if buttons.count() >= 2:
-                        region = buttons.first
-                        region.click(timeout=10000)
-                        page.locator(".hhba-filter-dropdown").wait_for(timeout=5000)
-                        audit(page,device+"-job-region-open")
-                        page.screenshot(path=str(OUT/f"{device}-job-region-open.png"),
-                                        full_page=True, animations="disabled")
-                        page.get_by_role("button",name="关闭地区选项").click()
-                        assert page.locator(".hhba-filter-dropdown").count() == 0
-                        occupation = buttons.nth(1)
-                        occupation.click(timeout=10000)
-                        page.locator(".hhba-filter-dropdown").wait_for(timeout=5000)
-                        audit(page,device+"-job-occupation-open")
-                        page.get_by_role("button",name="关闭职位类型").click()
-                        assert page.locator(".hhba-filter-dropdown").count() == 0
-                        if device == "desktop":
-                            submit = page.locator(".hhba-filter-keyword button[type=submit]")
-                            submit.hover()
-                            page.wait_for_timeout(280)
-                            transform = submit.locator("svg.lucide").evaluate(
-                                "(svg) => getComputedStyle(svg).transform")
-                            assert transform != "none", "desktop actionable icon hover must respond"
+                    # This is the *actual* market widget: its specialty selector is
+                    # a custom listbox, unlike browser-native country selects.
+                    major = page.get_by_role("combobox",name="搜索或选择所学专业")
+                    assert major.count() == 1, "Actual recruitment market major filter missing"
+                    major.click(timeout=10000)
+                    options = page.locator(".unified-major-options")
+                    options.wait_for(timeout=5000)
+                    assert options.is_visible(), "Major menu must be visible after focus"
+                    audit(page,device+"-job-major-open")
+                    page.screenshot(path=str(OUT/f"{device}-job-major-open.png"),
+                                    full_page=True,animations="disabled")
+                    major.fill("市场营销")
+                    assert page.locator(".unified-major-options [role=option]").count() > 0, "Expected real matching options"
+                    major.press("Escape")
+                    assert options.count() == 0, "Escape must close major listbox"
+                    if device == "desktop":
+                        icon_control = page.locator(".unified-job-search")
+                        icon_control.hover()
+                        page.wait_for_timeout(260)
+                        assert icon_control.locator("svg.lucide").count() == 1
                 if label == "membership":
                     details = page.locator("details")
                     if details.count():
@@ -128,6 +125,15 @@ with sync_playwright() as p:
                     # loading states without invoking paid AI or modifying backend data.
                     assert page.locator(".hhba-ai-page").count() == 1
                 if label == "home":
+                    dialog = page.get_by_role("dialog")
+                    assert dialog.count() == 1, "Winter popup should open on homepage visit"
+                    close = dialog.get_by_role("button",name="关闭寒假实习广告")
+                    assert close.is_visible()
+                    audit(page,device+"-winter-popup-open")
+                    close.click()
+                    assert dialog.count() == 0, "Winter popup should close without trapping the interface"
+                    page.screenshot(path=str(OUT/f"{device}-winter-popup-closed.png"),
+                                    full_page=True,animations="disabled")
                     page.emulate_media(reduced_motion="reduce")
                     motion = page.locator("svg.lucide").first.evaluate(
                         "(svg) => ({animation:getComputedStyle(svg).animationName,"
