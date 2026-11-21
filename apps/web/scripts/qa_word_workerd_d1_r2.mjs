@@ -81,18 +81,18 @@ try{
  // Mirror the actual Cloudflare Preview D1 SQL constraints rather than using
  // permissive fake tables. An earlier real Preview QA fixture was rejected by
  // storage_consent_version's CHECK despite passing this local test.
- await db.exec(`CREATE TABLE hhba_auth_users (
+ await db.prepare(`CREATE TABLE hhba_auth_users (
   phone TEXT PRIMARY KEY, username TEXT UNIQUE, password_hash TEXT,
   role TEXT NOT NULL DEFAULT 'candidate' CHECK (role IN ('candidate')),
   created_at TEXT NOT NULL, last_login_at TEXT,
   failed_pw_attempts INTEGER NOT NULL DEFAULT 0, pw_locked_until TEXT
- )`);
- await db.exec(`CREATE TABLE hhba_auth_sessions (
+ )`).run();
+ await db.prepare(`CREATE TABLE hhba_auth_sessions (
   id INTEGER PRIMARY KEY AUTOINCREMENT, token_hash TEXT UNIQUE NOT NULL,
   phone TEXT NOT NULL, created_at TEXT NOT NULL, expires_at TEXT NOT NULL,
   last_seen_at TEXT, revoked INTEGER NOT NULL DEFAULT 0
- )`);
- await db.exec(`CREATE TABLE hhba_candidate_resumes (
+ )`).run();
+ await db.prepare(`CREATE TABLE hhba_candidate_resumes (
   id TEXT PRIMARY KEY,
   phone TEXT NOT NULL REFERENCES hhba_auth_users(phone) ON DELETE CASCADE,
   storage_key TEXT NOT NULL UNIQUE, filename TEXT NOT NULL,
@@ -103,7 +103,7 @@ try{
   storage_consent_version TEXT NOT NULL CHECK(storage_consent_version='private-resume-storage-v1'),
   storage_consent_at TEXT NOT NULL, created_at TEXT NOT NULL,
   UNIQUE(phone,sha256)
- )`);
+ )`).run();
  await db.exec('CREATE TABLE hhba_resume_word_attempts (request_id TEXT PRIMARY KEY,day_utc TEXT,account_hash TEXT,action TEXT,created_at TEXT)');
  const now=new Date(),date=now.toISOString();
  await db.prepare('INSERT INTO hhba_auth_users(phone,role,created_at) VALUES(?,?,?)')
