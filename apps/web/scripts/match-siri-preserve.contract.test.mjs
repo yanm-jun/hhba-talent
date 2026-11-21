@@ -55,9 +55,9 @@ test('homepage & candidate workbench keep original matcher route and PDF/DOCX fl
  assert.match(page,/checked=\{storageChoice==='save'\}/);
  assert.match(page,/checked=\{storageChoice==='once'\}/);
  assert.match(page,/AI 为我寻找适合的工作|开始智能匹配/);
- assert.match(page,/const matched:MatchResponse=await submitExtractedResumeText\(/);
- assert.match(page,/submittedText=await extractResumeTextLocally\(selected,abort\.signal\)/);
- assert.match(page,/setOptimizationSource\(submittedText\)/);
+ assert.match(page,/let matched:MatchResponse;/);
+ assert.match(page,/matched=await submitResumeForMatching\(selected,options,consent,abort\.signal,matchResumeId\|\|undefined,setStage,setPartialJobs,setOptimizationSource\)/);
+ assert.match(page,/setOptimizationSource\(previewText\)/);
  assert.match(page,/sourceText=\{result\?optimizationSource:undefined\}/);
  assert.match(page,/sourceResume=\{result&&savedId\?savedFiles\.find/);
  assert.match(page,/embedded=\{embedded\}/);
