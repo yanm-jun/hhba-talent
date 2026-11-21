@@ -1207,6 +1207,78 @@ try{
   await context.close();
  }
  
+
+ // Same real React Word workspace, identical uploaded resume, TWO different
+ // scored jobs. The mock persists revisions per job_id, like private R2.
+ for(const view of [{name:'desktop',width:1190,height:900},
+                    {name:'mobile',width:390,height:844}]){
+  const page=await browser.newPage({viewport:{width:view.width,height:view.height},
+   locale:'zh-CN'});
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  const jobRequests=[];page.on('request',request=>{
+   if(!request.url().includes('/api/resume-word'))return;
+   if(request.method()==='POST'){
+    try{jobRequests.push({action:request.postDataJSON()?.action,
+     jobId:request.postDataJSON()?.job_id})}catch{}
+   }else{
+    const url=new URL(request.url());
+    if(url.searchParams.get('action')==='inspect')
+     jobRequests.push({action:'inspect',jobId:url.searchParams.get('job_id')});
+   }
+  });
+  await page.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&jobs',
+   {waitUntil:'networkidle',timeout:45000});
+  assert.equal(await page.getByRole('button',{name:/优化简历/}).count(),2,
+   'two different target jobs share the original Word');
+  const editForJob=async(index,wording,jobId)=>{
+   await page.getByRole('button',{name:/优化简历/}).nth(index).click();
+   await page.locator('.hhba-original-resume-anchor').first().waitFor({timeout:18000});
+   assert.match(await page.locator('.hhba-original-resume-file-heading').textContent(),
+    /岗位专属 Word · 当前修改进度：0 \/ 0/,
+    'a fresh job must not inherit another job’s Word revisions');
+   await page.getByRole('button',{name:'修改这段 Word'}).first().click();
+   await page.getByRole('textbox',{name:'修改 Word 文字'}).fill(wording);
+   await page.locator('.hhba-original-resume-edit-confirm input[type=checkbox]').check();
+   await page.getByRole('button',{name:'确认保存',exact:true}).click();
+   await page.getByText('当前修改进度：1 / 1',{exact:false}).waitFor({timeout:18000});
+   assert.ok(jobRequests.some(req=>req.action==='edit'&&req.jobId===jobId),
+    'the real Word API must send selected job identity on save');
+   await page.screenshot({path:output+'/word-job-'+view.name+'-'+index+'-saved.png',
+    fullPage:true});
+   await page.getByRole('button',{name:'返回岗位评分'}).click();
+   await page.getByRole('button',{name:/优化简历/}).first().waitFor();
+  };
+  await editForJob(0,'JOB A RESUME','qa-search-fixture-1');
+  await editForJob(1,'JOB B RESUME','qa-second-independent-job-2');
+  assert.ok(jobRequests.some(req=>req.action==='inspect'&&req.jobId==='qa-search-fixture-1'));
+  assert.ok(jobRequests.some(req=>req.action==='inspect'&&req.jobId==='qa-second-independent-job-2'));
+  await page.getByRole('button',{name:/优化简历/}).first().click();
+  await page.getByText('当前修改进度：1 / 1',{exact:false}).waitFor({timeout:18000});
+  await page.getByRole('button',{name:'修改这段 Word'}).first().click();
+  assert.equal(await page.getByRole('textbox',{name:'修改 Word 文字'}).inputValue(),'JOB A RESUME',
+   'reopening A restores A-only saved DOCX, not job B');
+  await page.getByRole('button',{name:'取消',exact:true}).first().click();
+  await page.getByRole('button',{name:'撤销',exact:true}).first().click();
+  await page.getByText('当前修改进度：0 / 1',{exact:false}).waitFor({timeout:18000});
+  assert.ok(jobRequests.some(req=>req.action==='undo'&&req.jobId==='qa-search-fixture-1'),
+   'undo must be scoped only to A');
+  const states=await page.evaluate(async()=>{
+   const base='/api/resume-word?action=inspect&resume_id=11111111-2222-4333-8444-555555555555';
+   const read=async job=>(await fetch(base+(job?'&job_id='+encodeURIComponent(job):''))).json();
+   return {a:await read('qa-search-fixture-1'),
+    b:await read('qa-second-independent-job-2'),vault:await read('')};
+  });
+  assert.equal(states.a.revision,0);
+  assert.equal(states.b.revision,1,'undo A must not affect B');
+  assert.deepEqual(states.b.editable_text,['JOB B RESUME']);
+  assert.deepEqual(states.vault.editable_text,['ORIGINAL WORD RESUME'],
+   'private-vault Word remains original');
+  assert.deepEqual(errors,[],'multi-job editor should not crash '+view.name);
+  await page.screenshot({path:output+'/word-two-job-'+view.name+'-isolated.png',
+   fullPage:true});
+  await page.close();
+ }
+ 
  console.log(JSON.stringify({result:'PASSED',desktop_pdf_pages:pages.length,
   long_pdf_pages:longPages.length,mobile:metrics,qa_output:output}));
 }finally{await browser.close()}
