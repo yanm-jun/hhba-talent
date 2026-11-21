@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
-import {ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,Redo2,ZoomIn,ZoomOut,Sparkles,X,History,ChevronDown} from 'lucide-react';
+import {Check,ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,Redo2,ZoomIn,ZoomOut,Sparkles,X,History,ChevronDown} from 'lucide-react';
 import type {PrivateResume} from '../services/privateResumes';
 import {downloadPrivateResume,fetchPrivateResumeForLocalReview} from '../services/privateResumes';
 import {extractDocxText} from '../services/docxProfile.mjs';
@@ -20,7 +20,7 @@ import '../styles/siri-edge.css';
 type PendingWordTextDraft={original:string;text:string;revision:number;page:number};
 export type WordVisualSuggestion={id:string;original:string;proposed:string;state:'pending'|'accepted'};
 export type WordRevisionSnapshot={revision:number;history:WordHistoryEntry[]};
-export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onRevisionSnapshot,onDocumentReady}:{
+export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onVisualSuggestionAction,onRevisionSnapshot,onDocumentReady}:{
  resume:PrivateResume;onClose?:()=>void;
  suggestedChanges?:{original:string;proposed:string}[];
  onOpenSuggestions?:()=>void;pendingSuggestionCount?:number;onPendingChange?:(dirty:boolean)=>void;
@@ -33,6 +33,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  glowActive?:boolean;
  visualSuggestions?:WordVisualSuggestion[];
  onVisualSuggestionSelect?:(id:string)=>void;
+ onVisualSuggestionAction?:(id:string,action:'accepted'|'ignored')=>void;
  onRevisionSnapshot?:(snapshot:WordRevisionSnapshot)=>void;
  onDocumentReady?:()=>void;
 }){
@@ -63,6 +64,8 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  const [history,setHistory]=useState<WordHistoryEntry[]>([]);
  const [refresh,setRefresh]=useState(0);
  const [message,setMessage]=useState('');
+ const [activeVisualId,setActiveVisualId]=useState<string|null>(null);
+ const [inlineVisualEditor,setInlineVisualEditor]=useState<string|null>(null);
  const restorePosition=useRef<{page:number;left:number;top:number;outerTop:number}|null>(null);
  function rememberPosition(){
   const node=paper.current;
@@ -79,7 +82,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   onClose?.();
  }
  useEffect(()=>{
-  setPage(1);setZoom(1);restorePosition.current=null;
+  setPage(1);setZoom(1);setActiveVisualId(null);setInlineVisualEditor(null);restorePosition.current=null;
   renderedEntrance.current=false;
  },[resume.id]);
  useEffect(()=>{
@@ -107,7 +110,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  useEffect(()=>{
   if(ready==='checking')return;
   let active=true,task:any=null;
-  setLoading(true);setPreviewError('');setAnchors([]);setSelected(null);
+  setLoading(true);setPreviewError('');setAnchors([]);setSelected(null);setInlineVisualEditor(null);
   void(async()=>{
    try{
     if(ready==='unavailable'){
@@ -237,6 +240,34 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   });
   return()=>cancelAnimationFrame(id);
  },[loading,page,paperSize.width,paperSize.height,refresh]);
+ // Explicit candidate confirmation and verified private Word revision are
+ // mandatory before any rainbow suggestion becomes actual document text.
+ async function acceptVisualWord(anchor:WordAnchor,visual:WordVisualSuggestion){
+  if(ready!=='available'||busy||loading||visual.state!=='pending'||
+   !editable.includes(anchor.text)||!visual.proposed.trim()||
+   visual.proposed.length>300||visual.proposed===anchor.text)return;
+  if(!confirmDiscardText())return;
+  if(!window.confirm('请先核实这段文字符合真实经历。确认采纳并保存岗位专属 Word 修改？原上传文件不会被覆盖。'))return;
+  rememberPosition();setBusy(true);setMessage('');
+  try{
+   const result=await saveOriginalWordEdit(resume.id,anchor.text,visual.proposed.trim(),revision);
+   onSessionWordDraftChange?.(null);
+   onVerifiedSave?.({original:anchor.text,text:visual.proposed.trim()});
+   onVisualSuggestionAction?.(visual.id,'accepted');
+   setSelected(null);setConfirmed(false);setInlineVisualEditor(null);setActiveVisualId(null);
+   setSaved(true);setRevision(result.revision);setTotalRevisions(result.total_revisions);
+   setRefresh(n=>n+1);
+   setMessage('已采纳并完成 Word 原版式核验。确认后的文字恢复原有字体；原上传文件保持不变。');
+  }catch(error){
+   setMessage(error instanceof Error?error.message:'未保存成功，请检查此处原文后重试。');
+  }finally{setBusy(false);}
+ }
+ function editVisualWord(anchor:WordAnchor,visual:WordVisualSuggestion){
+  if(busy||!confirmDiscardText())return;
+  setSelected(anchor);setDraft(visual.proposed);setConfirmed(false);
+  setInlineVisualEditor(anchor.id);setActiveVisualId(null);
+  setMessage('请核实和编辑真实内容，确认后才会保存岗位专属 Word。');
+ }
  async function downloadOriginal(){
   try{await downloadPrivateResume(resume);}
   catch(error){setMessage(error instanceof Error?error.message:'下载失败，请重试。');}
@@ -407,14 +438,17 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
        const textFits=Boolean(visual&&Array.from(visual.proposed).length<=
         Math.max(12,Array.from(anchor.text).length*1.25));
        const changed=visual?splitChangedResumeText(anchor.text,visual.proposed):null;
-       return <button key={anchor.id} type="button"
+       return <div key={anchor.id}
+        className={'hhba-word-siri-anchor-shell'+(visual?.state==='pending'?' has-siri-wording':'')+
+         (activeVisualId===visual?.id?' is-open':'')}
+        style={{left:x/10+'%',top:y/10+'%',width:w/10+'%',height:h/10+'%'}}>
+        <button type="button"
         className={"hhba-original-resume-anchor"+(selected?.id===anchor.id?" is-selected":"")+
-         (visual?' has-ai-preview':'')} title={visual?visual.proposed:'修改这段'}
-        aria-label={visual?visual.state==='pending'?'查看原文对应的 AI 修改建议':'确认并保存此处的 AI 文字':'修改这段 Word'}
-        style={{left:x/10+'%',top:y/10+'%',width:w/10+'%',height:h/10+'%'}}
+         (visual?' has-ai-preview':'')} title={visual?'点击查看操作':'修改这段'}
+        aria-label={visual?.state==='pending'?'查看此处文字操作':'修改这段 Word'}
         onClick={()=>{
-         if(visual?.state==='pending'&&onVisualSuggestionSelect){
-          onVisualSuggestionSelect(visual.id);return;
+         if(visual?.state==='pending'){
+          setActiveVisualId(current=>current===visual.id?null:visual.id);return;
          }
          if(!confirmDiscardText())return;
          // A restored draft is never accepted automatically. It must be
@@ -429,7 +463,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
           change.proposed.trim()&&change.proposed.length<=300);
          const candidate=restored?sessionWordDraft!.text:
           matches.length===1?matches[0].proposed:anchor.text;
-         setSelected(anchor);setDraft(candidate);
+         setSelected(anchor);setDraft(candidate);setInlineVisualEditor(null);
          setConfirmed(false);
          setMessage(restored?'已恢复未保存的文字草稿，请检查后再次确认。':
           matches.length===1?'已填入本人确认过的建议；请复核事实与原版式后再保存。':'');
@@ -446,14 +480,33 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
           {textFits&&changed?.suffix&&<span className="hhba-word-ai-unchanged">{changed.suffix}</span>}
          </span>
         </span>}
-        <span className="hhba-word-edit-anchor-label"><PencilLine size={12}/> 修改</span>
-       </button>;
+        {!visual&&<span className="hhba-word-edit-anchor-label"><PencilLine size={12}/> 修改</span>}
+       </button>
+       {visual?.state==='pending'&&<div className="hhba-word-siri-inline-actions"
+        role="group" aria-label="当前彩虹文字操作"
+        style={y>710?{bottom:'calc(100% + 7px)'}:{top:'calc(100% + 7px)'}}>
+        <button type="button" className="is-accept" disabled={busy}
+         onClick={()=>void acceptVisualWord(anchor,visual)}><Check size={13}/> 采纳</button>
+        <button type="button" disabled={busy}
+         onClick={()=>editVisualWord(anchor,visual)}><PencilLine size={13}/> 编辑</button>
+        <button type="button" disabled={busy} onClick={()=>{
+         onVisualSuggestionAction?.(visual.id,'ignored');setActiveVisualId(null);
+         setMessage('已忽略此处彩虹文字，保留原文。');
+        }}><X size={13}/> 忽略</button>
+       </div>}
+       </div>;
       })}
-
+      {editPanel&&inlineVisualEditor&&selected&&<div
+       className="hhba-word-siri-edit-float" role="region" aria-label="原位置文字编辑"
+       style={{left:Math.min(55,selected.bbox[0]/10)+'%',
+        top:selected.bbox[1]>640?undefined:(selected.bbox[1]+selected.bbox[3])/10+'%',
+        bottom:selected.bbox[1]>640?(100-selected.bbox[1]/10)+'%':undefined}}>
+       {editPanel}
+      </div>}
      </div>
     </div>
    </div>
-   {editPanel&&(!editPanelHost?
+   {editPanel&&!inlineVisualEditor&&(!editPanelHost?
     <aside className="hhba-word-standalone-edit-panel">{editPanel}</aside>:
     createPortal(editPanel,editPanelHost))}
    {anchors.length===0&&<p className="hhba-original-resume-note">
