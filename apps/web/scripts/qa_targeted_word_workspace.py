@@ -53,7 +53,7 @@ def exercise(browser,name,viewport):
             assert text=='负责门店运营及日常数据整理工作',('AI received wrong original text',text)
             edits.append({'job':payload['job']['title'],'blocks':len(payload['blocks'])})
             suggestion={'id':'siri-qa-1','blockId':'word-0','action':'replace',
-                        'original':text,'proposed':'负责门店运营与业务数据整理',
+                        'original':text,'proposed':'负责门店运营与业务数据整理，协助跟进区域经营数据与工作计划，围绕人员培养、客户沟通和门店运营提出改善建议，及时整理阶段性运营结果并进行内部汇报。',
                         'rationale':'只调整措辞，不增加经历或业绩',
                         'jobRequirement':'门店运营管理与数据分析',
                         'evidenceStatus':'needs_user_confirmation'}
@@ -137,10 +137,40 @@ def exercise(browser,name,viewport):
     # controls, not merely stored in an unavailable bottom list.
     siri=page.get_by_role('button',name='查看此处文字操作')
     siri.first.wait_for(state='visible',timeout=18000)
+    # The Word page (not the entire blank workspace) always has a quiet
+    # perimeter glow, with one slow orbiting beam even before AI is enabled.
+    ring=word.evaluate('el=>({before:getComputedStyle(el,"::before").content,'
+        'beam:getComputedStyle(el,"::after").animationDuration,'
+        'breath:getComputedStyle(el,"::before").animationDuration})')
+    assert ring['before']!='none' and '36s' in ring['beam'] and '10.5s' in ring['breath'],(
+        name,'missing slow, always-on Siri border beam',ring)
     assert page.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count()==0,(
-        name,'entire Word workspace glows; only changed text may have Siri colors')
-    text_siri=page.locator('.hhba-original-resume-anchor.has-ai-preview .hhba-word-ai-changed')
-    assert text_siri.count()>0,(name,'missing actual colorful suggestion glyphs')
+        name,'entire blank workspace must not glow')
+    assert page.locator('.hhba-browser-word-overlay .hhba-word-ai-preview').count()==0,(
+        name,'a second absolute text layer obscures the original Word')
+    native=word.locator('span.hhba-word-inline-suggestion').first
+    assert native.count()==1,(name,'AI suggestion not inline in original DOCX run')
+    changed=native.locator('.hhba-word-ai-changed')
+    assert changed.count()==1,(name,'missing Siri gradient on native Word glyphs')
+    style=native.evaluate('(node)=>({parentFont:getComputedStyle(node).fontSize,'
+       'changedFont:getComputedStyle(node.querySelector(".hhba-word-ai-changed")).fontSize,'
+       'parentWeight:getComputedStyle(node).fontWeight,'
+       'changedWeight:getComputedStyle(node.querySelector(".hhba-word-ai-changed")).fontWeight,'
+       'display:getComputedStyle(node.querySelector(".hhba-word-ai-changed")).display,'
+       'lineHeight:getComputedStyle(node).lineHeight,'
+       'changedLineHeight:getComputedStyle(node.querySelector(".hhba-word-ai-changed")).lineHeight})')
+    assert style['parentFont']==style['changedFont'] and style['parentWeight']==style['changedWeight'],(
+        name,'inline AI text must inherit original run font',style)
+    assert style['lineHeight']==style['changedLineHeight'] and style['display']=='inline',(
+        name,'AI text must wrap naturally with the native paragraph',style)
+    text_content=word.inner_text()
+    assert '协助跟进区域经营数据与工作计划' in text_content,(name,'proposed wording not in native document')
+    assert '负责门店运营及日常数据整理工作' not in text_content,(
+        name,'source and proposed text are duplicated on page')
+    box_style=siri.first.evaluate('(el)=>({background:getComputedStyle(el).backgroundColor,'
+      'border:getComputedStyle(el).borderTopColor})')
+    assert box_style['background'] in ('rgba(0, 0, 0, 0)','transparent'),(
+        name,'colored covering rectangle still present',box_style)
     # A successful AI generation should not add an extra status panel
     # beneath the deliberately minimal bottom toolbar.
     success_message=page.locator('.hhba-word-minimal-message:not(.is-error)')
