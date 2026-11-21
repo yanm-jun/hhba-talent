@@ -15,10 +15,11 @@ const sha=createHash('sha256').update(original).digest('hex');
 const pdf=new Uint8Array(600);pdf.set(new TextEncoder().encode('%PDF-1.4'));
 const data=Buffer.from(original).buffer.slice(
  Buffer.from(original).byteOffset,Buffer.from(original).byteOffset+original.length);
-function fixture({enabled=true,owner='account-A',role='candidate'}={}){
+function fixture({enabled=true,docxOnly=false,owner='account-A',role='candidate'}={}){
  const saved=new Map([[store,original]]);
  const env={
   HHBA_WORD_RENDER_ENABLED:enabled?'1':'0',
+  HHBA_WORD_DOCX_ONLY_ENABLED:docxOnly?'1':'0',
   HHBA_AUTH_ROLLOUT:'preview',HHBA_WORD_RENDER_SHARED_SECRET:'x'.repeat(50),
   HHBA_WORD_RENDER_ENDPOINT:'https://private-word.hhba.invalid/',
   HHBA_MATCH_LIMIT_PEPPER:'y'.repeat(30),
@@ -88,6 +89,62 @@ test('Word render feature defaults disabled and never opens any account file',as
  assert.equal((await onRequestGet({request:req('preview'),env:x.env})).status,503);
  assert.equal(x.saved.size,1);
 });
+
+test('opt-in renderer-free flow saves original DOCX structure without inventing PDF or verified pages',async()=>{
+ const x=fixture({enabled:false,docxOnly:true});
+ const status=await (await onRequestGet({request:req(),env:x.env})).json();
+ assert.equal(status.enabled,true);
+ assert.equal(status.renderer_enabled,false);
+ assert.equal(status.docx_only_enabled,true);
+ assert.equal((await onRequestGet({request:req('preview'),env:x.env})).status,422);
+ const initial=await onRequestGet({request:req('source-docx',{jobId:'role-A'}),env:x.env});
+ assert.equal(initial.status,200);
+ assert.deepEqual(new Uint8Array(await initial.arrayBuffer()),original);
+ assert.equal((await onRequestGet({request:req('source-docx',{auth:false}),env:x.env})).status,401);
+ assert.equal((await onRequestGet({request:req('source-docx'),env:fixture({
+  enabled:false,docxOnly:true,owner:'other'
+ }).env})).status,404);
+ const post=async(job,oldText,text,rev=0,digest)=>onRequestPost({
+  request:req('export',{method:'POST',jobId:job,body:{
+   resume_id:id,job_id:job,action:'edit',original:oldText,text,
+   expected_revision:rev,client_docx_sha256:digest,
+   confirmed_real:true,consent_word_processing:true
+  }}),env:x.env
+ });
+ const a='role-A',b='role-B';
+ const aBytes=await editOriginalDocxStrict(original,[{original:'测试用户',text:'岗位甲'}]);
+ const aHash=createHash('sha256').update(aBytes).digest('hex');
+ assert.equal((await post(a,'测试用户','岗位甲',0)).status,400,
+  'the browser must prove it ran the patcher before publishing');
+ assert.equal((await post(a,'测试用户','岗位甲',0,'a'.repeat(64))).status,409,
+  'a mismatching proposed DOCX hash is never saved');
+ assert.equal((await post(a,'测试用户','岗位甲',0,aHash)).status,200);
+ const bBytes=await editOriginalDocxStrict(original,[{original:'测试用户',text:'岗位乙'}]);
+ const bHash=createHash('sha256').update(bBytes).digest('hex');
+ assert.equal((await post(b,'测试用户','岗位乙',0,bHash)).status,200);
+ const infoA=await (await onRequestGet({request:req('inspect',{jobId:a}),env:x.env})).json();
+ const infoB=await (await onRequestGet({request:req('inspect',{jobId:b}),env:x.env})).json();
+ assert.equal(infoA.revision,1);assert.equal(infoB.revision,1);
+ assert.equal(infoA.layout_verified,false);
+ assert.equal(infoA.pdf_available,false);
+ assert.equal(infoA.history[0].layout_verified,false);
+ assert.equal(infoA.history[0].page_count,null);
+ assert.equal((await onRequestGet({request:req('download-pdf',{jobId:a}),env:x.env})).status,422);
+ const wordA=new Uint8Array(await (await onRequestGet({request:req('download',{jobId:a}),env:x.env})).arrayBuffer());
+ const wordB=new Uint8Array(await (await onRequestGet({request:req('download',{jobId:b}),env:x.env})).arrayBuffer());
+ assert.deepEqual(wordA,aBytes);assert.deepEqual(wordB,bBytes);
+ assert.notDeepEqual(wordA,wordB);
+ assert.equal((await onRequestGet({request:req('source-docx',{jobId:a}),env:x.env})).status,200);
+ assert.equal((await onRequestPost({request:req('export',{method:'POST',body:{
+  resume_id:id,job_id:a,action:'undo',expected_revision:1,
+  confirmed_real:true,consent_word_processing:true
+ }}),env:x.env})).status,200);
+ assert.equal((await (await onRequestGet({request:req('inspect',{jobId:a}),env:x.env})).json()).revision,0);
+ assert.equal((await (await onRequestGet({request:req('inspect',{jobId:b}),env:x.env})).json()).revision,1);
+ assert.deepEqual(new Uint8Array(await (await onRequestGet({request:req('source-docx',{jobId:a}),env:x.env})).arrayBuffer()),original);
+ assert.deepEqual(x.saved.get(store),original,'original private R2 object is untouched');
+});
+
 test('only authenticated candidate owner can inspect original Word run text',async()=>{
  const x=fixture();
  const response=await onRequestGet({request:req('inspect'),env:x.env});
