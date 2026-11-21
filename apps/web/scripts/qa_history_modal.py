@@ -79,9 +79,11 @@ def scenario(browser,label,size):
     page.get_by_role('button',name='优化简历',exact=True).click()
     optimizer=page.get_by_role('dialog',name='选择要优化的历史岗位')
     optimizer.wait_for(state='visible',timeout=20000)
+    optimizer.locator('.hhba-match-history-job').last.wait_for(state='visible',timeout=12000)
+    page.wait_for_function("document.querySelectorAll('.hhba-match-history-dialog .hhba-match-history-job').length===17")
     assert optimizer.locator('.hhba-match-history-job').count()==17
     assert optimizer.locator('.hhba-match-history-job-actions button').count()==17
-    assert optimizer.get_by_text('当前原 Word').is_visible()
+    optimizer.get_by_text('当前原 Word').wait_for(state='visible',timeout=12000)
     assert page.locator('.hhba-match-history-overlay').count()==1
     assert page.evaluate("document.body.style.overflow")=='hidden'
     optimizer.locator('.hhba-match-history-modal-body').evaluate('(el)=>{el.scrollTop=el.scrollHeight}')
