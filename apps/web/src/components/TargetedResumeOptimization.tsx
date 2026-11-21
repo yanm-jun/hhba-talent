@@ -126,9 +126,6 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   requestAnimationFrame(()=>requestAnimationFrame(()=>toolsRef.current?.scrollIntoView({behavior:'smooth',block:'start'})));
  }
  const [aiSettingsOpen,setAiSettingsOpen]=useState(false);
- useEffect(()=>{
-  if(wordEditing)setMobileSuggestionsOpen(false);
- },[wordEditing]);
  const [nativeWordPending,setNativeWordPending]=useState(false);
  const [nativeWordTextDraft,setNativeWordTextDraft]=useState<{
   original:string;text:string;revision:number;page:number
