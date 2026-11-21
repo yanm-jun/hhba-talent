@@ -4,7 +4,7 @@ export type ArchivedOfficialJd={
  ok:true;kind:'HHBA_VERIFIED_JOB_JD_V1';verified:true;job_id:string;
  company:string;title:string;location:string;canonical_url:string;
  jd_sha256:string;checked_at:string;fresh:boolean;
- content_status:'VERIFIED_SECTIONS';proof_method:'DIRECT_EMPLOYER_HTML_V1';
+ content_status:'VERIFIED_SECTIONS';proof_method:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1';
  full_jd:string;sections:{id:string;kind:'responsibilities'|'requirements'|'other';text:string}[];
  disclaimer:string;from_cache?:boolean;
 };
@@ -51,6 +51,15 @@ export async function jobJdArchiveStatus(signal?:AbortSignal):Promise<boolean>{
   const status=await response.json() as {kind?:string;enabled?:boolean};
   return status.kind==='HHBA_VERIFIED_JOB_JD_V1'&&status.enabled===true;
  }catch{return false}
+}
+/** Read a Search-verified JD by immutable version ID; never re-fetch the employer. */
+export async function getArchivedJobJdVersion(id:string,signal?:AbortSignal):Promise<ArchivedOfficialJd>{
+ if(!/^jd_[a-f0-9]{32}$/.test(id))throw new JobJdArchiveError('JD_VERSION_NOT_AVAILABLE',400);
+ const result=await request(PATH+'?jd_id='+encodeURIComponent(id),{method:'GET'},signal) as ArchivedOfficialJd;
+ if(result.ok!==true||result.verified!==true||result.job_id!==id||
+  typeof result.full_jd!=='string'||!Array.isArray(result.sections))
+  throw new JobJdArchiveError('JD_VERSION_NOT_AVAILABLE',503);
+ return result;
 }
 /** Triggered only after the candidate's existing AI/verification consent. */
 export async function ensureArchivedJobJd(officialUrl:string,signal?:AbortSignal):Promise<ArchivedOfficialJd>{

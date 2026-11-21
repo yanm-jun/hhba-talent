@@ -48,7 +48,8 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
    remote:job.remote,reference_score:visibleMatchScore(job)??0,
    matched:job.matched||[],not_evidenced:job.not_evidenced||[],
    needs_verification:job.needs_verification||[],
-   requirements_basis:job.requirements_basis||job.score_basis||''
+   requirements_basis:job.requirements_basis||job.score_basis||'',
+   jd_version_id:job.jd_version_id
   };
  }
  // The result list is never searched again on return. Preserve scroll and
@@ -175,19 +176,19 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
            <div className="hhba-native-meta"><span><MapPin size={13}/>{job.location}</span>
             {job.salary&&<span><Wallet size={13}/>{job.salary}</span>}</div>
            <div className="hhba-native-source" role="note">
-            {job.recruitment_source_note||'招聘来源待确认'}
+            {job.jd_source_status==='VERIFIED_JD'?'已核验岗位 JD 原文 · '+(job.jd_score_status==='V2_JD_EVIDENCE_SCORED'?'按岗位要求评分':'简历证据仍需补充'):job.recruitment_source_note||'招聘来源待确认'}
            </div>
            <div className="hhba-native-availability" role="note">
             <span className={job.availability_status==='OPEN_LISTED'?'hhba-native-state-open':'hhba-native-state-unknown'}>
              {job.availability_status==='OPEN_LISTED'?'网页显示在招 · 仍需确认':'投递状态未确认'}
             </span>
             <small>{job.availability_status==='OPEN_LISTED'?
-             '页面文本提示开放申请，是否可提交仍以招聘官网为准':'链接来自搜索结果，可能已过期或需要登录；请打开官网确认'}</small>
+             '页面文本提示开放申请，是否可提交仍以招聘官网为准':job.jd_source_status==='VERIFIED_JD'?'已核验岗位详情原文，但投递资格和是否仍开放申请仍需到官网确认':'链接来自搜索结果，可能已过期或需要登录；请打开官网确认'}</small>
            </div>
           </div>
           <div className="hhba-native-score" aria-label={visibleMatchScore(job)!==null?'简历适配分 '+visibleMatchScore(job)+' 分（AI 参考）':'暂无可靠适配分'}>
            {visibleMatchScore(job)!==null?
-            <><strong>{visibleMatchScore(job)}<small>/100</small></strong><span>简历适配分 · AI 参考</span></>:
+            <><strong>{visibleMatchScore(job)}<small>/100</small></strong><span>{job.jd_score_status==='V2_JD_EVIDENCE_SCORED'?'JD 证据适配分':'简历适配分 · AI 参考'}</span></>:
             <><strong className="hhba-native-score-na">—</strong><span>暂无可靠分数</span></>}
            <button type="button" disabled={pending}
              title={pending?'搜索完成后即可针对这个岗位优化简历':'针对所选岗位优化简历'}

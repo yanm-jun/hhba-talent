@@ -21,6 +21,15 @@ on:
       - 'apps/web/functions/_lib/resume-reassessment.js'
       - 'apps/web/functions/api/resume-reassess.js'
       - 'apps/web/scripts/verified-jd-reassessment.contract.test.mjs'
+      - 'apps/web/functions/_lib/match-jd-enrichment.js'
+      - 'apps/web/functions/_lib/match-history.js'
+      - 'apps/web/functions/api/match-native/**'
+      - 'apps/web/src/services/resumeMatch.ts'
+      - 'apps/web/src/services/resumeMatching.ts'
+      - 'apps/web/src/services/matchHistory.ts'
+      - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
+      - 'apps/web/src/components/CandidateMatchHistory.tsx'
+      - 'apps/web/scripts/match-jd-enrichment.contract.test.mjs'
   workflow_dispatch:
 permissions:
   contents: read
@@ -42,6 +51,9 @@ jobs:
           node --test scripts/job-jd-archive.contract.test.mjs
           node --test scripts/public-ats-jd.contract.test.mjs
           node --test scripts/verified-jd-reassessment.contract.test.mjs
+          node --test scripts/match-jd-enrichment.contract.test.mjs
+          node --test scripts/match-history.contract.test.mjs
+          node --test scripts/match-native-web.contract.test.mjs
           node --test scripts/official-jd-extraction.route.test.mjs || test ! -f scripts/official-jd-extraction.route.test.mjs
       - name: Full frontend TypeScript and Vite build
         working-directory: apps/web
