@@ -801,7 +801,9 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       '已呈现 '+revealedSuggestionCount+' / '+suggestions.length+' 处文字'}
      <span>查看进度</span>
     </button>}
-    <OriginalWordViewer key={sourceResume.id+':'+job.id} resume={sourceResume} jobId={job.id} suggestedChanges={confirmedWordChanges}
+    <OriginalWordViewer key={sourceResume.id+':'+job.id} resume={sourceResume}
+     jobId={job.id} jobTitle={job.company+'-'+(job.title_zh||job.title)}
+     suggestedChanges={confirmedWordChanges}
      glowActive={entranceStage==='entering'||busy||wholeBusy||wordEditing||
       visualWordSuggestions.length>0}
      visualSuggestions={visualWordSuggestions}
