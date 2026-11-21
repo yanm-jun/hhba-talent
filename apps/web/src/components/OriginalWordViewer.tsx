@@ -7,11 +7,13 @@ import {extractDocxText} from '../services/docxProfile.mjs';
 import {matchWordAnchors,type WordAnchor} from '../services/resumeWordAnchors.mjs';
 import {splitChangedResumeText} from '../services/resumeChangedText.mjs';
 import {
- wordRendererReady,wordEditableText,wordPreviewBytes,saveOriginalWordEdit,
+ wordEditingCapabilities,wordEditableText,wordPreviewBytes,wordSourceBytes,saveOriginalWordEdit,
  shiftOriginalWordRevision,downloadOriginalWordEdited,downloadOriginalWordPdf,
  type WordHistoryEntry
 } from '../services/originalWordApi';
+import {renderBrowserWord,browserWordAnchors} from '../services/browserWordPreview';
 import '../styles/original-resume-viewer.css';
+import '../styles/browser-word-preview.css';
 import '../styles/siri-edge.css';
 
 // The original DOCX is NEVER converted into an HHBA template. A privately
@@ -39,9 +41,13 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
+ const browserMount=useRef<HTMLDivElement>(null);
  const doc=useRef<any>(null);
  const renderedEntrance=useRef(false);
  const [ready,setReady]=useState<'checking'|'available'|'unavailable'>('checking');
+ const [rendererEnabled,setRendererEnabled]=useState(false);
+ const [pdfAvailable,setPdfAvailable]=useState(false);
+ const [layoutVerified,setLayoutVerified]=useState(false);
  const [loading,setLoading]=useState(true);
  const [previewError,setPreviewError]=useState('');
  const [text,setText]=useState('');
@@ -102,8 +108,10 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  useEffect(()=>{
   const controller=new AbortController();
   setReady('checking');
-  void wordRendererReady(controller.signal).then(ok=>{
-   if(!controller.signal.aborted)setReady(ok?'available':'unavailable');
+  void wordEditingCapabilities(controller.signal).then(capabilities=>{
+   if(controller.signal.aborted)return;
+   setRendererEnabled(capabilities.rendererEnabled);
+   setReady(capabilities.enabled?'available':'unavailable');
   });
   return()=>controller.abort();
  },[resume.id,jobId]);
@@ -136,8 +144,25 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     setMaxDailyEdits(typeof info.max_daily_edits==='number'&&Number.isInteger(info.max_daily_edits)?info.max_daily_edits:6);
     const inspectedHistory=Array.isArray(info.history)?info.history:[];
     setHistory(inspectedHistory);
+    setPdfAvailable(info.pdf_available===true);
+    setLayoutVerified(info.layout_verified===true);
     onRevisionSnapshot?.({revision:Number.isInteger(info.revision)?info.revision:(wasSaved?1:0),
      history:inspectedHistory});
+    if(!rendererEnabled){
+     const currentRevision=Number.isInteger(info.revision)?info.revision:(wasSaved?1:0);
+     const raw=await wordSourceBytes(resume.id,currentRevision,jobId);
+     if(!active||!browserMount.current)return;
+     const mount=browserMount.current;
+     await renderBrowserWord(raw,mount);
+     if(!active)return;
+     setEditable(info.editable_text||[]);
+     setAnchors(browserWordAnchors(mount,info.editable_text||[]));
+     setCount(1);setPage(1);
+     setPaperSize({width:mount.scrollWidth,height:mount.scrollHeight});
+     setLoading(false);
+     if(!renderedEntrance.current){renderedEntrance.current=true;onDocumentReady?.();}
+     return;
+    }
     const bytes=await wordPreviewBytes(resume.id,wasSaved,undefined,
      Number.isInteger(info.revision)?info.revision:(wasSaved?1:0),jobId);
     if(!active)return;
@@ -177,10 +202,10 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    }
   })();
   return()=>{active=false;doc.current=null;void task?.destroy().catch(()=>{});};
- },[resume.id,jobId,ready,refresh]);
+ },[resume.id,jobId,ready,rendererEnabled,refresh]);
 
  useEffect(()=>{
-  if(ready!=='available'||loading||!surface.current||!doc.current)return;
+  if(ready!=='available'||!rendererEnabled||loading||!surface.current||!doc.current)return;
   let active=true,task:any=null;
   setAnchors([]);
   void(async()=>{
@@ -219,7 +244,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    }
   })();
   return()=>{active=false;try{task?.cancel();}catch{}};
- },[page,ready,loading,editable,width,zoom,saved,refresh]);
+ },[page,ready,rendererEnabled,loading,editable,width,zoom,saved,refresh]);
 
  useEffect(()=>{
   const el=paper.current;if(!el)return;
