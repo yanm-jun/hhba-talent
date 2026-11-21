@@ -62,7 +62,7 @@ function mockEnv(){const db=new StubDB(),r2=new StubR2();
  return {HHBA_JOB_JD_ARCHIVE_ENABLED:'1',HHBA_JOB_JD_DB:db,HHBA_JOB_JD_R2:r2,db,r2};}
 
 test('official text keeps multiple source sections, not a one-line Search snippet',()=>{
- const htmlText='企业招聘\n区域运营经理\n工作地点：上海\n岗位职责\n1. 经营分析\n2. 客户服务\n任职要求\n1. 管理经验\n2. 数据分析\n立即申请\n更多职位\n职位列表';
+ const htmlText='企业招聘中心公开招募区域运营经理，长期负责连锁门店运营管理和数据报告。平台将为候选人提供招聘信息，仅通过官网进行直接申请。\n区域运营经理\n工作地点：上海\n岗位职责\n1. 经营分析与区域门店目标拆解\n2. 客户服务和门店销售流程分析\n任职要求\n1. 熟悉区域门店日常运营管理经验\n2. 具备门店经营数据分析能力\n立即申请\n更多职位\n职位列表';
  const parsed=extractOfficialJdSections(htmlText);
  assert.ok(parsed);
  assert.equal(parsed.content_status,'VERIFIED_SECTIONS');
@@ -76,8 +76,8 @@ test('official text keeps multiple source sections, not a one-line Search snippe
 test('JD archive deduplicates same exact employer text for any number of users',async()=>{
  const env=mockEnv();
  assert.equal(await jdArchiveReady(env),true);
- const first=await saveVerifiedJobJd(env,baseline(),{now:new Date('2026-11-21T05:00:00.000Z')});
- const same=await saveVerifiedJobJd(env,baseline(),{now:new Date('2026-11-21T06:00:00.000Z')});
+ const first=await saveVerifiedJobJd(env,baseline(),{now:new Date('2026-10-01T05:00:00.000Z')});
+ const same=await saveVerifiedJobJd(env,baseline(),{now:new Date('2026-10-01T06:00:00.000Z')});
  assert.equal(first.id,same.id);
  assert.equal(env.db.rows.size,1);
  assert.equal(env.r2.writes,1);
@@ -89,7 +89,7 @@ test('JD archive deduplicates same exact employer text for any number of users',
  const altered=baseline();
  altered.full_jd+='\n3. 要求独立汇报运营总结。';
  altered.sections.push({id:'JD-007',kind:'requirements',text:'3. 要求独立汇报运营总结。'});
- const newer=await saveVerifiedJobJd(env,altered,{now:new Date('2026-11-21T07:00:00.000Z')});
+ const newer=await saveVerifiedJobJd(env,altered,{now:new Date('2026-10-01T07:00:00.000Z')});
  assert.notEqual(first.id,newer.id);
  assert.equal(env.db.rows.size,2);
  assert.equal(env.r2.writes,2);
