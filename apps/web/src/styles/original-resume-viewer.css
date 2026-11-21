@@ -1,0 +1,730 @@
+.hhba-original-resume{margin:16px 0 22px;padding:16px;background:#f6f8fb;
+ border:1px solid #e0e6ed;border-radius:16px;min-width:0}
+.hhba-original-resume-toolbar{display:flex;justify-content:space-between;align-items:center;gap:16px;
+ flex-wrap:wrap;margin-bottom:12px}
+.hhba-original-resume-toolbar strong{display:block;font-size:13px;font-weight:700;overflow-wrap:anywhere}
+.hhba-original-resume-toolbar p{margin:3px 0 0;font-size:11px;line-height:1.6;color:#64748b}
+.hhba-original-resume-toolbar>div:last-child{display:flex;gap:8px;align-items:center}
+.hhba-original-resume-toolbar button,.hhba-original-resume-pages button{display:inline-flex;gap:5px;
+ align-items:center;justify-content:center;border:1px solid #dce2ea;background:#fff;
+ border-radius:8px;color:#33415b;padding:8px 10px;cursor:pointer;font:inherit;font-size:12px}
+.hhba-original-resume-toolbar button:focus-visible,.hhba-original-resume-pages button:focus-visible{
+ outline:3px solid #8178d3;outline-offset:2px}
+.hhba-original-resume-paper{width:100%;min-width:0;overflow:auto;display:flex;justify-content:center;
+ padding:14px 9px;background:#e9edf3;border-radius:10px;box-sizing:border-box}
+.hhba-original-resume-canvas{display:block;max-width:100%;height:auto!important;
+ box-shadow:0 6px 30px rgba(33,43,63,.12);background:#fff}
+.hhba-original-resume-pages{display:flex;align-items:center;justify-content:center;
+ gap:12px;margin-top:13px}
+.hhba-original-resume-pages span{font-size:12px;color:#536178;font-variant-numeric:tabular-nums}
+.hhba-original-resume-pages button:disabled{opacity:.45;cursor:not-allowed}
+.hhba-original-resume-word{padding:10px 15px;background:#fff;border:1px solid #e2e7ee;border-radius:9px}
+.hhba-original-resume-word>p,.hhba-original-resume-note{font-size:12px;color:#6f5977;line-height:1.7}
+.hhba-original-resume-word pre{white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;
+ line-height:1.8;font-size:13px;color:#28364d;max-height:580px;overflow-y:auto}
+@media(max-width:640px){.hhba-original-resume{padding:10px}
+ .hhba-original-resume-toolbar{align-items:flex-start}
+ .hhba-original-resume-pages{gap:6px}
+}
+/* Editable markers are pinned only to verified native PDF text. The original
+   canvas remains untouched and all interactions live outside print output. */
+.hhba-original-resume-start{display:flex;align-items:center;justify-content:space-between;gap:12px;
+ padding:10px 12px;margin:0 0 12px;border:1px solid #e2e4ed;background:#fff;border-radius:10px}
+.hhba-original-resume-start label{display:flex;align-items:flex-start;gap:7px;line-height:1.6;
+ color:#58647a;font-size:12px;flex:1;min-width:0}
+.hhba-original-resume-start label input{margin-top:4px;flex:0 0 auto;accent-color:#27445c}
+.hhba-original-resume-start button{display:inline-flex;align-items:center;gap:6px;border:0;
+ background:#253448;color:#fff;border-radius:8px;padding:9px 12px;white-space:nowrap;
+ font:inherit;font-size:12px;font-weight:650;cursor:pointer}
+.hhba-original-resume-start button:disabled{opacity:.5;cursor:not-allowed}
+.hhba-original-resume-page-frame{position:relative;flex:0 0 auto;max-width:100%}
+.hhba-original-resume-anchor{position:absolute;z-index:2;border:1px solid rgba(66,85,103,.5);
+ background:rgba(65,82,101,.065);padding:0;min-width:20px;
+ min-height:14px;border-radius:3px;cursor:pointer;transition:border-color .15s ease,background .15s ease}
+.hhba-original-resume-anchor span{position:absolute;top:-20px;right:0;display:inline-flex;gap:3px;
+ align-items:center;white-space:nowrap;font:600 10px/1.2 Arial,sans-serif;
+ color:#fff;background:#36495c;border-radius:5px 5px 0 0;padding:4px 6px;
+ opacity:.82;pointer-events:none}
+.hhba-original-resume-anchor.is-edited{border-color:#41647d;background:rgba(65,100,125,.075)}
+.hhba-original-resume-anchor.is-edited span{background:#41647d}
+.hhba-original-resume-anchor:hover,.hhba-original-resume-anchor:focus-visible{
+ border-color:#455e78;outline:2px solid rgba(70,113,145,.22);outline-offset:1px;
+ background:rgba(82,118,146,.13)}
+.hhba-original-resume-anchor:hover span,.hhba-original-resume-anchor:focus-visible span{opacity:1}
+.hhba-original-resume-siri-stage{margin:6px 1px 10px}
+/* The shared Siri wrapper is position:relative. This anchored popup must
+   override it to remain over its actual PDF text, not below the canvas. */
+.hhba-original-resume-page-frame .hhba-original-resume-edit-glow{
+ position:absolute;z-index:5;border-radius:13px;max-width:calc(100% - 18px)
+}
+.hhba-original-resume-editbox{position:relative;z-index:1;width:100%;
+ padding:11px 12px;border:1px solid #e3e8ee;background:#fff;border-radius:12px;
+ box-shadow:0 8px 23px rgba(29,43,64,.115);box-sizing:border-box;
+ max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:7px}
+.hhba-original-resume-editbox-title{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hhba-original-resume-editbox-title strong{font-size:13px;color:#27334e}
+.hhba-original-resume-editbox-title button{border:0;background:none;color:#657188;cursor:pointer}
+.hhba-original-resume-editbox textarea{width:100%;box-sizing:border-box;resize:vertical;
+ border:1px solid #d9e0e9;border-radius:7px;padding:9px;font:inherit;
+ color:#27334e;font-size:13px;line-height:1.55;min-height:70px}
+.hhba-original-resume-editbox label{font-size:11px;display:flex;align-items:center;
+ gap:6px;color:#4d596b}
+.hhba-original-resume-editbox label input{accent-color:#27445c}
+.hhba-original-resume-editbox-actions{display:flex;gap:8px}
+.hhba-original-resume-editbox-actions button{display:inline-flex;gap:5px;align-items:center;
+ padding:8px 12px;background:#fff;color:#38455c;border:1px solid #dee3eb;
+ border-radius:7px;font:inherit;font-size:12px;cursor:pointer}
+.hhba-original-resume-editbox-actions button:first-child{background:#253448;color:#fff;border-color:#253448}
+.hhba-original-resume-editbox-actions button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:640px){
+ .hhba-original-resume-start{align-items:stretch;flex-direction:column}
+ .hhba-original-resume-start button{align-self:flex-end}
+ .hhba-original-resume-editbox{padding:10px;max-height:265px}
+ .hhba-original-resume-anchor span{font-size:9px;padding:3px 4px}
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-original-resume-anchor{transition:none}
+}
+
+/* Keep interactive borders neutral; rainbow belongs to the Siri ambient
+   frame and popover, never a solid purple panel or filled primary button. */
+.hhba-original-resume-toolbar button:focus-visible,
+.hhba-original-resume-pages button:focus-visible,
+.hhba-original-resume-start button:focus-visible,
+.hhba-original-resume-editbox button:focus-visible,
+.hhba-original-resume-editbox textarea:focus-visible{
+ outline:2px solid #3c84a1;outline-offset:2px;
+}
+.hhba-original-resume-anchor:focus-visible{outline-color:rgba(36,126,161,.38)}
+@media print{
+ .hhba-original-resume-start,.hhba-original-resume-anchor,
+ .hhba-original-resume-edit-glow,.hhba-original-resume-pages{
+  display:none!important;
+ }
+}
+
+/* A conservative live preview of confirmed, SHORT native-text PDF edits.
+   Only displayed if page mapping, text length and white paper background
+   are safe. It is not an exported PDF or a destructive redaction. */
+.hhba-original-resume-patch-line{
+ display:inline;
+ white-space:nowrap;
+ color:#242c35;
+}
+.hhba-original-resume-edit-patch{
+ position:absolute;
+ z-index:1;
+ overflow:hidden;
+ white-space:nowrap;
+ display:flex;
+ align-items:center;
+ justify-content:flex-start;
+ box-sizing:border-box;
+ padding:0 2px;
+ margin:0;
+ background:#fff;
+ color:#242c35;
+ font-family:Arial,"Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+ font-weight:400;
+ letter-spacing:0;
+ line-height:1;
+ pointer-events:none;
+ user-select:text;
+}
+@media print{
+ .hhba-original-resume-edit-patch{display:none!important}
+}
+
+/* One compact download action, no extra export wizard or technical vocabulary. */
+.hhba-original-resume-review-export{
+ display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+ margin:12px 2px 4px;
+}
+.hhba-original-resume-review-export>button{
+ display:inline-flex;align-items:center;gap:6px;
+ border:1px solid #ccd6e0;background:#fff;color:#253448;
+ border-radius:8px;padding:9px 12px;
+ font:600 12px/1.3 inherit;cursor:pointer;
+}
+.hhba-original-resume-review-export>button:disabled{opacity:.48;cursor:not-allowed}
+.hhba-original-resume-review-export>button:focus-visible{
+ outline:2px solid #3c84a1;outline-offset:2px;
+}
+.hhba-original-resume-review-export>span{
+ font-size:11px;color:#64748b;line-height:1.5;
+}
+@media print{
+ .hhba-original-resume-review-export{display:none!important}
+}
+
+/* Siri typography is temporary; the real source font is restored on confirm.
+   In the popup we explicitly call this a pending preview — never a saved
+   replacement with a guessed fallback typeface. */
+.hhba-resume-pending-text{
+ padding:7px 9px;
+ border:1px solid #e7eaf1;
+ background:#fbfcff;
+ border-radius:7px;
+ font-size:13px;
+ line-height:1.65;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+ max-height:94px;
+ overflow-y:auto;
+}
+.hhba-resume-pending-text .hhba-resume-siri-letters{
+ display:inline;
+ max-width:none;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+.hhba-original-resume-draft-patch{
+ /* Only a *temporary* edited-text suggestion; never saved native PDF text. */
+ background:#fff;
+}
+@media print{
+ .hhba-resume-pending-text,.hhba-original-resume-draft-patch{
+  display:none!important;
+ }
+}
+
+
+/* Native Word canvas controls: revision-aware and touch-friendly. */
+.hhba-original-resume-word-tools{
+ display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:8px 0 12px;
+}
+.hhba-original-resume-word-tools button{
+ display:inline-flex;align-items:center;justify-content:center;min-width:36px;min-height:36px;
+ gap:5px;padding:7px 11px;border:1px solid #dbe4ec;border-radius:8px;background:#fff;
+ color:#35475d;font:600 12px/1.3 inherit;cursor:pointer;
+}
+.hhba-original-resume-word-tools button:disabled{opacity:.45;cursor:not-allowed}
+.hhba-original-resume-word-tools output{
+ font:600 12px/1.4 inherit;color:#5b697a;min-width:42px;text-align:center;
+}
+.hhba-word-native-preview .hhba-original-resume-canvas{max-width:none}
+.hhba-word-native-preview{justify-content:flex-start;overscroll-behavior:contain}
+.hhba-original-resume-word-status{
+ display:flex;align-items:center;gap:7px;font-size:12px;color:#536479;line-height:1.65;
+ padding:9px 11px;border:1px solid #e5eaf0;border-radius:9px;background:#fff;margin:0 0 9px;
+}
+.hhba-original-resume-word-status.is-busy{color:#365469;background:#f5f9fc}
+.hhba-original-resume-mobile-dock{display:none}
+@media(max-width:700px){
+ .hhba-original-resume-toolbar{gap:9px}
+ .hhba-original-resume-toolbar>div:last-child{flex-wrap:wrap}
+ .hhba-original-resume-toolbar>div:last-child button{min-height:40px}
+ .hhba-original-resume-word-tools{justify-content:flex-end}
+ .hhba-original-resume-word-tools button{min-width:44px;min-height:44px}
+ .hhba-original-resume-review-export{justify-content:stretch}
+ .hhba-original-resume-review-export>button{flex:1;min-height:42px}
+ .hhba-word-native-preview{padding:10px;max-height:65dvh}
+ .hhba-word-native-preview .hhba-original-resume-anchor{
+  min-width:26px;min-height:23px;border-width:1.5px;
+ }
+ .hhba-word-native-preview .hhba-original-resume-page-frame .hhba-original-resume-edit-glow{
+  position:fixed!important;top:auto!important;left:0!important;right:0!important;
+  bottom:0!important;width:100vw!important;max-width:100vw!important;
+  border-radius:18px 18px 0 0;z-index:3250;
+  box-shadow:0 -14px 60px rgba(18,33,54,.18);
+ }
+ .hhba-original-resume-editbox{
+  border-radius:18px 18px 0 0;max-height:64dvh;overflow-y:auto;
+  padding:17px 16px calc(16px + env(safe-area-inset-bottom,0px));
+ }
+ .hhba-original-resume-editbox textarea{min-height:100px;font-size:16px}
+ .hhba-original-resume-editbox-actions>button{min-height:44px;min-width:100px}
+ .hhba-original-resume-mobile-dock{
+  display:flex;position:sticky;bottom:0;z-index:20;
+  margin:10px -9px -9px;padding:9px 10px calc(9px + env(safe-area-inset-bottom,0px));
+  background:rgba(255,255,255,.97);border-top:1px solid #e5eaf1;gap:8px;
+ }
+ .hhba-original-resume-mobile-dock button{
+  flex:1;min-width:0;min-height:44px;border:1px solid #dbe4ec;border-radius:9px;
+  background:#fff;color:#2d455d;font:600 12px/1.3 inherit;cursor:pointer;
+ }
+ .hhba-original-resume-mobile-dock button:disabled{opacity:.48}
+ .hhba-original-resume-toolbar .hhba-original-resume-revision-action{display:none}
+ .hhba-original-resume-review-export{display:flex;margin:9px 0}
+ .hhba-original-resume-review-export>button:nth-child(2),
+ .hhba-original-resume-review-export>span{display:none}
+ .hhba-original-resume-review-export>button:first-child{flex:1;min-height:42px}
+}
+
+
+/* A plain, inspectable timeline: each revision shows exactly what changed. */
+.hhba-original-resume-history{
+ margin:8px 0 12px;padding:9px 12px;border:1px solid #e2e8ef;
+ background:#fff;border-radius:10px;color:#35465b;
+}
+.hhba-original-resume-history summary{cursor:pointer;font-size:12px;font-weight:650;
+ min-height:30px;display:flex;align-items:center}
+.hhba-original-resume-history ol{
+ margin:8px 0 0;padding:0;list-style:none;display:grid;gap:7px;
+ max-height:260px;overflow-y:auto;
+}
+.hhba-original-resume-history li{padding:10px 11px;border:1px solid #e7edf2;border-radius:8px}
+.hhba-original-resume-history li.is-current{border-color:#acc9d8;background:#f6fafd}
+.hhba-original-resume-history li>div{display:flex;justify-content:space-between;gap:8px;
+ flex-wrap:wrap;font-size:12px}
+.hhba-original-resume-history li>div span{color:#748196;font-size:11px}
+.hhba-original-resume-history li p{margin:7px 0 0;font-size:12px;line-height:1.6;
+ overflow-wrap:anywhere;white-space:pre-wrap}
+@media(max-width:700px){
+ .hhba-original-resume-history ol{max-height:170px}
+ .hhba-original-resume-history li{padding:9px}
+}
+
+
+/* Compact Word reader: editing UI is OUTSIDE the rendered document. */
+.hhba-original-word-viewer .hhba-original-resume-toolbar{
+ display:flex;align-items:center;justify-content:space-between;gap:10px;
+ margin:0 0 8px;flex-wrap:wrap;
+}
+.hhba-original-word-viewer .hhba-original-resume-file-heading{min-width:0;flex:1}
+.hhba-original-word-viewer .hhba-original-resume-file-heading strong{
+ display:block;font-weight:650;font-size:13px;color:#24374a;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.hhba-original-word-viewer .hhba-original-resume-file-heading span{
+ display:block;font-size:10px;color:#91a0ae;line-height:1.6;margin-top:2px;
+}
+.hhba-original-word-viewer .hhba-original-resume-toolbar-actions{
+ display:flex;align-items:center;gap:5px;flex:0 0 auto;
+}
+.hhba-original-word-viewer .hhba-original-resume-toolbar-actions>button{
+ background:transparent;border:0;padding:7px 8px;min-height:35px;
+ color:#52667a;border-radius:8px;font-size:12px;
+}
+.hhba-original-word-viewer .hhba-original-resume-toolbar-actions button:disabled{opacity:.35}
+.hhba-original-word-viewer .hhba-original-resume-word-tools{
+ display:flex;justify-content:flex-end;align-items:center;gap:4px;margin:3px 0 8px;
+}
+.hhba-original-word-viewer .hhba-original-resume-word-tools button{
+ min-width:30px;min-height:30px;border:0;color:#64778a;
+ font-size:11px;background:transparent;padding:4px 8px;
+}
+.hhba-original-word-viewer .hhba-original-resume-word-tools output{font-size:11px;color:#8291a0}
+.hhba-original-word-viewer .hhba-original-resume-paper{
+ border:0;border-radius:8px;background:#eef0f3;
+ padding:18px 12px;max-height:calc(100dvh - 300px);min-height:280px;
+}
+.hhba-original-word-viewer .hhba-original-resume-canvas{
+ box-shadow:0 6px 24px rgba(33,43,63,.08);border:0;background:#fff;
+}
+.hhba-original-word-viewer .hhba-original-resume-siri-stage{
+ margin:0;overflow:hidden;border:0;box-shadow:none;animation:none;background:transparent;
+}
+.hhba-original-word-viewer .hhba-original-resume-siri-stage::before,
+.hhba-original-word-viewer .hhba-original-resume-siri-stage::after{display:none}
+.hhba-original-word-viewer .hhba-original-resume-anchor{
+ border:1px solid rgba(57,83,104,.26);background:rgba(75,105,138,.035);
+ border-radius:2px;outline:none;min-height:18px;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor span{
+ opacity:0;background:#344f65;border-radius:4px;pointer-events:none;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor:hover,
+.hhba-original-word-viewer .hhba-original-resume-anchor.is-selected,
+.hhba-original-word-viewer .hhba-original-resume-anchor:focus-visible{
+ background:rgba(63,107,148,.08);border-color:#6789a5;
+ outline:1px solid rgba(64,99,133,.32);
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor:hover span,
+.hhba-original-word-viewer .hhba-original-resume-anchor.is-selected span,
+.hhba-original-word-viewer .hhba-original-resume-anchor:focus-visible span{opacity:1}
+.hhba-original-word-viewer .hhba-original-resume-pages{
+ display:flex;justify-content:center;margin:8px 0 0;gap:10px;
+}
+.hhba-original-word-viewer .hhba-original-resume-pages button{
+ border:0;background:transparent;padding:7px;font-size:11px;
+ color:#687d8f;
+}
+.hhba-original-word-viewer .hhba-original-resume-word-status{
+ border:0;border-left:2px solid #abc5d5;border-radius:0;
+ padding:8px 11px;margin:7px 0;background:#f7f9fb;color:#4e6578;
+ font-size:11px;line-height:1.5;
+}
+.hhba-original-word-viewer .hhba-original-resume-note{
+ margin:8px 0;font-size:11px;line-height:1.55;color:#8b97a5;
+}
+.hhba-original-word-viewer .hhba-word-draft-help{font-size:11px;color:#667b8f;
+ margin:5px 0;padding:4px 0}
+.hhba-word-draft-help summary{cursor:pointer}
+.hhba-word-draft-help p{margin:4px 0}
+.hhba-word-menu{position:relative;z-index:30;font-size:12px}
+.hhba-word-menu summary{
+ list-style:none;display:inline-flex;gap:4px;align-items:center;
+ cursor:pointer;color:#52677a;min-height:36px;padding:6px 9px;
+ border-radius:8px;white-space:nowrap;
+}
+.hhba-word-menu summary::-webkit-details-marker{display:none}
+.hhba-word-menu summary:hover,.hhba-word-menu[open] summary{background:#f1f4f7}
+.hhba-word-menu-content{
+ position:absolute;right:0;top:calc(100% + 4px);z-index:80;
+ min-width:170px;max-width:min(310px,85vw);max-height:min(65dvh,430px);
+ overflow-y:auto;background:#fff;border:1px solid #e5eaef;
+ border-radius:11px;padding:6px;box-shadow:0 14px 35px rgba(27,46,63,.13);
+}
+.hhba-word-menu-content button{
+ display:flex!important;width:100%;border:0!important;background:transparent!important;
+ color:#364b60!important;text-align:left!important;justify-content:flex-start!important;
+ border-radius:7px!important;padding:10px 11px!important;font-size:12px!important;
+}
+.hhba-word-menu-content button:hover:not(:disabled){background:#f4f7f9!important}
+.hhba-word-menu-content p{margin:6px 8px;font-size:11px;line-height:1.65;color:#677a8b}
+.hhba-original-resume-history-list{
+ list-style:none;margin:5px 4px;padding:0;display:grid;gap:7px;
+}
+.hhba-original-resume-history-list li{border-top:1px solid #e9edf1;padding:8px 4px;
+ font-size:11px;overflow-wrap:anywhere}
+.hhba-original-resume-history-list li strong{font-size:11px}
+.hhba-original-resume-history-list li small{font-size:10px;color:#8996a3;margin-left:6px}
+.hhba-original-resume-history-list li>div{margin-top:4px;line-height:1.55;color:#708296}
+.hhba-original-word-viewer .hhba-original-resume-editbox{
+ border:0;box-shadow:none;background:transparent;padding:10px 0;
+ max-height:none;gap:11px;overflow:visible;
+}
+.hhba-original-resume-edit-source{
+ margin:0;padding:9px 11px;color:#6b7c8b;background:#f6f8fa;
+ border-radius:7px;font-size:12px;line-height:1.65;
+ overflow-wrap:anywhere;max-height:95px;overflow-y:auto;
+}
+.hhba-original-resume-edit-source span{
+ display:block;margin-bottom:5px;font-size:10px;font-weight:650;color:#91a0ae;
+}
+.hhba-original-resume-edit-input-label{
+ font-size:12px;font-weight:600;color:#324b60;
+}
+.hhba-original-resume-edit-limit{margin:0;font-size:10px;color:#91a0ae;line-height:1.55}
+.hhba-original-word-viewer .hhba-original-resume-editbox textarea{
+ border:1px solid #dbe4eb;background:#fff;box-shadow:none;
+ border-radius:8px;min-height:110px;line-height:1.7;padding:11px;
+}
+.hhba-original-word-viewer .hhba-original-resume-edit-confirm{
+ align-items:flex-start;font-size:11px;color:#52687a;line-height:1.6;
+}
+.hhba-original-word-viewer .hhba-original-resume-editbox-actions{
+ display:flex;justify-content:flex-start;gap:8px;
+}
+.hhba-original-word-viewer .hhba-original-resume-editbox-actions button{
+ min-height:40px;padding:9px 12px;
+}
+.hhba-word-standalone-edit-panel{
+ margin:14px 0;padding:15px;border:1px solid #e8edf2;
+ background:#fff;border-radius:10px;
+}
+@media(max-width:700px){
+ .hhba-original-word-viewer .hhba-original-resume-toolbar{
+  gap:7px;padding:0 2px;margin-bottom:4px;
+ }
+ .hhba-original-word-viewer .hhba-original-resume-file-heading strong{font-size:12px}
+ .hhba-original-word-viewer .hhba-original-resume-file-heading span{font-size:10px}
+ .hhba-original-word-viewer .hhba-original-resume-toolbar-actions{gap:1px}
+ .hhba-original-word-viewer .hhba-original-resume-toolbar-actions>button{padding:6px}
+ .hhba-original-word-viewer .hhba-original-resume-toolbar-actions>button>span{display:none}
+ .hhba-word-menu summary{padding:5px 6px;font-size:11px}
+ .hhba-original-word-viewer .hhba-original-resume-paper{
+  padding:9px 4px;min-height:310px;max-height:68dvh;
+ }
+ .hhba-original-word-viewer .hhba-original-resume-word-tools{
+  margin:1px 0 5px;
+ }
+ .hhba-original-word-viewer .hhba-original-resume-word-tools button{min-height:38px}
+ .hhba-original-word-viewer .hhba-word-standalone-edit-panel{
+  position:fixed;bottom:0;left:0;right:0;z-index:3200;
+  max-height:77dvh;overflow-y:auto;
+  border:0;border-radius:18px 18px 0 0;padding:20px 16px;
+  padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -15px 50px rgba(30,43,58,.18);
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-original-word-viewer .hhba-original-resume-anchor{transition:none}
+}
+
+
+/* Pending AI/user text is the only Siri-colored element. The redesigned
+   white editor surface must not reset background-image on the textarea. */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+ .hhba-original-word-viewer .hhba-original-resume-editbox textarea.hhba-siri-typing,
+ .targeted-resume-word-edit-host .hhba-original-resume-editbox textarea.hhba-siri-typing{
+  background-color:#fff;
+  background-image:linear-gradient(105deg,#009cc2 0%,#3a7fe6 17%,
+   #8351d5 36%,#c84f9f 55%,#de7958 74%,#16b5cd 100%);
+  background-size:175% 100%;
+  background-position:6% 50%;
+  background-repeat:no-repeat;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  caret-color:#24344c;
+  animation:hhba-resume-siri-letters-flow 11s ease-in-out infinite alternate;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-original-word-viewer .hhba-original-resume-editbox textarea.hhba-siri-typing,
+ .targeted-resume-word-edit-host .hhba-original-resume-editbox textarea.hhba-siri-typing{
+  animation:none!important;background-position:42% 50%;
+ }
+}
+@media print{
+ .hhba-original-word-viewer .hhba-original-resume-editbox textarea.hhba-siri-typing,
+ .targeted-resume-word-edit-host .hhba-original-resume-editbox textarea.hhba-siri-typing{
+  animation:none!important;background:none!important;
+  -webkit-text-fill-color:currentColor!important;
+ }
+}
+
+
+/* An enlarged Word page must not be constrained independently of its text
+   anchors: PDF.js viewport coordinates and click regions use the same width. */
+.hhba-original-word-viewer .hhba-word-native-preview .hhba-original-resume-page-frame{
+ max-width:none;
+}
+
+
+/* The standalone "My Resume" viewer uses the same off-page editorial
+   treatment: document on the left, editing on the right, never a popup on top. */
+@media(min-width:951px){
+ .hhba-original-word-viewer.has-inline-editor{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,300px);
+  align-items:start;column-gap:18px;row-gap:8px;
+ }
+ .hhba-original-word-viewer.has-inline-editor>*:not(.hhba-word-standalone-edit-panel){
+  grid-column:1;min-width:0;
+ }
+ .hhba-original-word-viewer.has-inline-editor>.hhba-word-standalone-edit-panel{
+  grid-column:2;grid-row:1/span 12;
+  position:sticky;top:12px;align-self:start;
+  margin:0;border:0;border-left:1px solid #e9edf2;
+  border-radius:0;padding:9px 0 12px 18px;
+  background:transparent;box-shadow:none;min-width:0;
+ }
+ .hhba-original-word-viewer.has-inline-editor .hhba-original-resume-paper{
+  max-height:calc(100dvh - 270px);min-height:300px;
+ }
+}
+
+
+/* Immersive Word stage. The edge is active ONLY during entrance, analysis
+   or pending review. It is not part of rendered DOCX/PDF bytes. */
+.hhba-original-word-viewer .hhba-original-resume-siri-stage.hhba-siri-edge-active{
+ position:relative;isolation:isolate;overflow:visible;
+ border-radius:12px;background:#fff;
+}
+.hhba-original-word-viewer .hhba-original-resume-siri-stage.hhba-siri-edge-active::before,
+.hhba-original-word-viewer .hhba-original-resume-siri-stage.hhba-siri-edge-active::after{
+ display:block;content:"";
+}
+.hhba-original-word-viewer .hhba-original-resume-siri-stage.hhba-siri-edge-active::before{
+ inset:-6px;z-index:-1;opacity:.69;filter:blur(15px);
+}
+.hhba-original-word-viewer .hhba-original-resume-siri-stage.hhba-siri-edge-active::after{
+ inset:-2px;z-index:2;opacity:.82;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview{
+ border:0;outline:1px solid rgba(107,142,191,.2);background:#fff;
+ border-radius:2px;z-index:2;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview:focus-visible{
+ outline:2px solid #5780b5;outline-offset:2px;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview>.hhba-word-ai-preview{
+ display:flex;align-items:center;position:absolute;
+ inset:0;overflow:hidden;background:#fff;border:0;
+ padding:0 2px;pointer-events:none;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text{
+ display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;
+ white-space:nowrap;text-align:left;line-height:1.2;font-weight:500;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-edit-anchor-label{
+ position:absolute;right:0;top:-22px;z-index:4;white-space:nowrap;
+ padding:3px 6px;color:#fff;pointer-events:none;
+ background:#486881;border-radius:4px;opacity:0;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview:hover
+ .hhba-word-edit-anchor-label,
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview:focus-visible
+ .hhba-word-edit-anchor-label{opacity:1}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview>.hhba-word-ai-preview
+ .hhba-resume-siri-letters{
+ background-image:linear-gradient(100deg,#04aac8 0%,#457ce5 25%,
+ #8657d9 48%,#d85d9f 69%,#e98d5e 84%,#15b5d1 100%);
+ background-size:200% 100%;-webkit-background-clip:text;background-clip:text;
+ -webkit-text-fill-color:transparent;
+ animation:hhba-resume-siri-letters-flow 7s ease-in-out infinite alternate;
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-resume-siri-letters{animation:none!important;background-position:40% 50%}
+}
+@media print{
+ .hhba-original-word-viewer .hhba-word-ai-preview{display:none!important}
+ .hhba-original-word-viewer .hhba-original-resume-siri-stage::before,
+ .hhba-original-word-viewer .hhba-original-resume-siri-stage::after{display:none!important}
+}
+
+
+/* The older generic anchor "span" rule hides hover tooltips. A suggestion's
+   nested text spans MUST override that rule or the Siri ink is invisible. */
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ >.hhba-word-ai-preview{
+ opacity:1;background-color:#fff;border-radius:0;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text{
+ opacity:1;background-color:transparent;border-radius:0;pointer-events:none;
+}
+
+
+/* Critical: the old anchor tooltip styles every nested <span> as an
+   absolute label above the page. Reset the AI ink itself to normal text
+   geometry, otherwise color exists in CSS but is clipped outside the line. */
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text{
+ position:static;top:auto;right:auto;left:auto;bottom:auto;
+ display:block;box-sizing:border-box;min-width:0;width:100%;max-width:100%;
+ margin:0;padding:0;border:0;border-radius:0;
+ font-family:inherit;font-style:normal;font-weight:500;
+ line-height:1.18;white-space:nowrap;text-align:left;
+ overflow:hidden;text-overflow:ellipsis;
+}
+
+
+/* Each genuinely returned AI recommendation writes into its original
+   on-page line with a brief left-to-right appearance. Animation is a UI
+   replay of an existing response, never a claim of live model streaming. */
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text{
+ animation:hhba-word-ai-ink-arrive .76s cubic-bezier(.2,.7,.3,1) both,
+  hhba-resume-siri-letters-flow 7s ease-in-out .76s infinite alternate;
+}
+@keyframes hhba-word-ai-ink-arrive{
+ from{clip-path:inset(0 100% 0 0);opacity:.85}
+ to{clip-path:inset(0 0 0 0);opacity:1}
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text{
+  animation:none!important;clip-path:none!important;opacity:1!important
+ }
+}
+
+
+/* The preview retains source words in neutral ink and colors only the actual
+   Unicode diff; overflow focuses on the real changed fragment, never a fake
+   replacement string. The full suggestion remains in the AI review rail. */
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text>span{
+ position:static;top:auto;left:auto;right:auto;bottom:auto;display:inline;
+ margin:0;padding:0;border:0;border-radius:0;opacity:1;
+ font:inherit;line-height:inherit;white-space:inherit;pointer-events:none;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text>.hhba-word-ai-unchanged{
+ color:#2c3b4a!important;background:none!important;
+ -webkit-text-fill-color:#2c3b4a!important;animation:none!important;
+}
+.hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text>.hhba-word-ai-changed{
+ color:#4377d9;background-image:linear-gradient(105deg,
+  #009cc2 0%,#3a7fe6 17%,#8351d5 36%,
+  #c84f9f 55%,#de7958 74%,#16b5cd 100%);
+ background-size:175% 100%;-webkit-background-clip:text;background-clip:text;
+ -webkit-text-fill-color:transparent;
+ animation:hhba-resume-siri-letters-flow 7s ease-in-out infinite alternate;
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-original-word-viewer .hhba-original-resume-anchor.has-ai-preview
+ .hhba-word-ai-preview-text>.hhba-word-ai-changed{
+  animation:none!important;background-position:42% 50%;
+ }
+}
+
+
+/* SIRI / Real Word. The colored wording itself is the entry point. A small
+   toolstrip appears on hover/focus, or after tapping the wording on touch.
+   No explanatory "AI suggested change" label is drawn onto the document. */
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell{
+ position:absolute;z-index:7;min-height:18px;isolation:isolate;
+}
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell:has(.hhba-original-resume-anchor:focus-visible),
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell:hover,
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell.is-open{z-index:65}
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell>.hhba-original-resume-anchor{
+ position:absolute;inset:0;left:0;top:0;right:0;bottom:0;
+ width:100%;height:100%;min-height:18px;max-width:none;
+}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions{
+ position:absolute;left:0;z-index:70;
+ display:flex;align-items:center;gap:3px;padding:5px;
+ min-width:max-content;max-width:min(94vw,320px);
+ border:1px solid #dee7ef;border-radius:10px;
+ background:rgba(255,255,255,.98);
+ box-shadow:0 10px 30px rgba(26,50,76,.18);
+ opacity:0;visibility:hidden;pointer-events:none;
+ transform:translateY(3px);transition:opacity .13s ease,transform .13s ease,visibility .13s;
+}
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell:hover .hhba-word-siri-inline-actions,
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell:focus-within .hhba-word-siri-inline-actions,
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell.is-open .hhba-word-siri-inline-actions{
+ opacity:1;visibility:visible;pointer-events:auto;transform:none;
+}
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell.is-editing .hhba-word-siri-inline-actions{display:none}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions button{
+ display:inline-flex;align-items:center;justify-content:center;gap:4px;
+ background:#fff;color:#3a5b71;border:0;border-radius:7px;
+ min-height:32px;padding:7px 10px;white-space:nowrap;
+ font-family:inherit;font-size:11px;font-weight:600;line-height:1.25;cursor:pointer;
+}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions button.is-accept{
+ background:#315b7b;color:white;
+}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions button:hover{
+ background:#edf4fa;color:#315b7b;
+}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions button.is-accept:hover{
+ background:#254b6c;color:#fff;
+}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions button:focus-visible{
+ outline:2px solid #4089cf;outline-offset:1px;
+}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions button:disabled{
+ opacity:.5;cursor:not-allowed;
+}
+.hhba-original-word-viewer .hhba-word-siri-edit-float{
+ position:absolute;z-index:80;width:min(310px,90vw);max-height:min(460px,72dvh);
+ overflow-y:auto;box-shadow:0 18px 52px rgba(27,52,72,.20);
+ border-radius:12px;background:#fff;
+}
+.hhba-original-word-viewer .hhba-word-siri-edit-float .hhba-original-resume-editbox{
+ margin:0;width:100%;max-width:none;
+}
+@media(hover:none), (pointer:coarse){
+ .hhba-original-word-viewer .hhba-word-siri-inline-actions button{
+  min-height:42px;padding:9px 12px;font-size:12px;
+ }
+ .hhba-original-word-viewer .hhba-word-siri-inline-actions{
+  left:auto;right:0;max-width:min(94vw,325px);
+ }
+}
+@media(max-width:700px){
+ .hhba-original-word-viewer .hhba-word-siri-edit-float{
+  position:fixed;left:0!important;right:0;bottom:0!important;top:auto!important;
+  width:100%;max-height:70dvh;z-index:3600;
+  padding:14px 14px calc(17px + env(safe-area-inset-bottom,0px));
+  border-radius:16px 16px 0 0;
+ }
+ .hhba-original-word-viewer .hhba-word-siri-inline-actions{right:0;left:auto}
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-original-word-viewer .hhba-word-siri-inline-actions{transition:none}
+}
+@media print{
+ .hhba-original-word-viewer .hhba-word-siri-inline-actions,
+ .hhba-original-word-viewer .hhba-word-siri-edit-float{display:none!important}
+}
