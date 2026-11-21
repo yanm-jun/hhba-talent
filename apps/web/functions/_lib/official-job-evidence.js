@@ -36,7 +36,7 @@ export function htmlToText(html){
  * pass into the shared archive.
  */
 export function extractOfficialJdSections(plain){
- if(typeof plain!=='string'||plain.length<150)return null;
+ if(typeof plain!=='string'||plain.length<80)return null;
  // Literal headings from public ATS posts, not LLM-guessed section labels.
  const duty=/^(?:岗位职责|工作职责|职位职责|主要职责|工作内容|岗位描述|职位描述|responsibilities|what you(?:'|’)ll do|what you will do|the role|about the role|your impact|key responsibilities|job responsibilities|duties)[：:\s]*/i;
  const req=/^(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求|职责要求|requirements|qualifications|what we(?:'|’)re looking for|what you bring|who you are|skills and experience|your qualifications|basic qualifications|minimum qualifications)[：:\s]*/i;
@@ -58,7 +58,7 @@ export function extractOfficialJdSections(plain){
  }
  if(!seenDuty||!seenReq||blocks.length<4)return null;
  const full_jd=blocks.map(b=>b.text).join('\n');
- if(full_jd.length<100||full_jd.length>24000)return null;
+ if(full_jd.length<80||full_jd.length>24000)return null;
  return {full_jd,sections:blocks,content_status:'VERIFIED_SECTIONS'};
 }
 
