@@ -365,7 +365,7 @@ test('competing edits use compare-and-swap; one writer wins and the other is rej
 
 test('one owned Word is isolated into independent per-job DOCX/PDF revisions, including undo/redo and legacy vault',async()=>{
  const x=fixture(),beforeFetch=globalThis.fetch;
- const jobA='greenhouse-test-job-A',jobB='lever-test-job-B';
+ const jobA='greenhouse-test-job-A',jobB='lever-test-job-B',jobC='supervisor-test-job-C';
  const renderCalls=[];
  globalThis.fetch=async(url,options)=>{
   const body=JSON.parse(options.body);
@@ -397,7 +397,7 @@ test('one owned Word is isolated into independent per-job DOCX/PDF revisions, in
   assert.equal((await edit(undefined,'测试用户','旧版',0)).status,200);
   const old=await inspect();assert.equal(old.revision,1);
   assert.ok(old.editable_text.includes('旧版'));
-  for(const job of [jobA,jobB]){
+  for(const job of [jobA,jobB,jobC]){
    const fresh=await inspect(job);
    assert.equal(fresh.revision,0,'new job starts from ORIGINAL, not the older vault revision');
    assert.equal(fresh.saved,null);
@@ -408,17 +408,21 @@ test('one owned Word is isolated into independent per-job DOCX/PDF revisions, in
   assert.equal(a.status,200,await a.clone().text());
   const b=await edit(jobB,'测试用户','岗位乙',0);
   assert.equal(b.status,200,await b.clone().text());
+  const c=await edit(jobC,'测试用户','岗位丁',0);
+  assert.equal(c.status,200,await c.clone().text());
   assert.ok((await inspect(jobA)).editable_text.includes('岗位甲'));
   assert.ok((await inspect(jobB)).editable_text.includes('岗位乙'));
+  assert.ok((await inspect(jobC)).editable_text.includes('岗位丁'));
   assert.equal((await inspect(jobA)).revision,1);
   assert.equal((await inspect(jobB)).revision,1);
+  assert.equal((await inspect(jobC)).revision,1);
   assert.ok((await inspect()).editable_text.includes('旧版'));
   const base=store+'.hhba-word-preserved-v1-'+sha;
   const manifests=[...x.saved.keys()].filter(k=>k.startsWith(base+'.job-')&&k.endsWith('.json'));
-  assert.equal(manifests.length,2,'separate target jobs need separate private manifests');
+  assert.equal(manifests.length,3,'three target jobs need three private manifests');
   const uniqueScopes=new Set(manifests.map(k=>JSON.parse(x.saved.get(k)).job_scope_sha256));
-  assert.equal(uniqueScopes.size,2);
-  for(const job of [jobA,jobB]){
+  assert.equal(uniqueScopes.size,3);
+  for(const job of [jobA,jobB,jobC]){
    assert.equal((await onRequestGet({request:req('download',{jobId:job}),env:x.env})).status,200);
    assert.equal((await onRequestGet({request:req('download-pdf',{jobId:job}),env:x.env})).status,200);
   }
@@ -426,14 +430,21 @@ test('one owned Word is isolated into independent per-job DOCX/PDF revisions, in
    request:req('download',{jobId:jobA}),env:x.env})).arrayBuffer());
   const wordB=Buffer.from(await (await onRequestGet({
    request:req('download',{jobId:jobB}),env:x.env})).arrayBuffer());
+  const wordC=Buffer.from(await (await onRequestGet({
+   request:req('download',{jobId:jobC}),env:x.env})).arrayBuffer());
   assert.notDeepEqual(wordA,wordB,'each job exports its own reviewed DOCX bytes');
+  assert.notDeepEqual(wordA,wordC);
+  assert.notDeepEqual(wordB,wordC);
   assert.ok(wordA.includes(Buffer.from('岗位甲')));
   assert.ok(wordB.includes(Buffer.from('岗位乙')));
+  assert.ok(wordC.includes(Buffer.from('岗位丁')));
   assert.equal((await shift(jobA,'undo',1)).status,200);
   assert.equal((await inspect(jobA)).revision,0);
   assert.equal((await onRequestGet({request:req('download',{jobId:jobA}),env:x.env})).status,404);
   assert.equal((await inspect(jobB)).revision,1,'undo in A must not affect B');
   assert.ok((await inspect(jobB)).editable_text.includes('岗位乙'));
+  assert.equal((await inspect(jobC)).revision,1,'undo in A must not affect C');
+  assert.ok((await inspect(jobC)).editable_text.includes('岗位丁'));
   assert.equal((await shift(jobA,'redo',0)).status,200);
   assert.equal((await inspect(jobA)).revision,1);
   assert.equal((await edit(jobA,'测试用户','覆盖',0)).status,409,
@@ -442,11 +453,13 @@ test('one owned Word is isolated into independent per-job DOCX/PDF revisions, in
   assert.ok((await inspect(jobB)).editable_text.includes('岗位丙'));
   assert.ok((await inspect(jobA)).editable_text.includes('岗位甲'),
    'continued edits in B must never update A');
+  assert.ok((await inspect(jobC)).editable_text.includes('岗位丁'),
+   'continued edits in B must never update C');
   assert.ok((await inspect()).editable_text.includes('旧版'),
    'legacy vault remains an independent document branch');
   assert.equal((await onRequestGet({request:req('inspect',{jobId:jobA}),
    env:fixture({owner:'not-account-A'}).env})).status,404);
-  assert.equal(renderCalls.length,4);
+  assert.equal(renderCalls.length,5);
  }finally{globalThis.fetch=beforeFetch;}
 });
 
