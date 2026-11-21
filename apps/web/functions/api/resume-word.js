@@ -1,7 +1,7 @@
 // Private original DOCX display, exact-node editing, verified Word downloads.
 // No public source URLs, no "template rebuild" and no unchecked format exports.
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
-import {configured,docxOnlyConfigured,wordRequest} from '../_lib/private-word-service.js';
+import {configured,docxOnlyConfigured,wordLimitPepper,wordRequest} from '../_lib/private-word-service.js';
 import {
  inspectOriginalDocxStrict,editOriginalDocxStrict,prepareVerifiedOriginalDocxExport
 } from '../../src/services/resumeDocxPreserve.mjs';
@@ -70,9 +70,9 @@ async function quotaReady(db){
 }
 async function reserve(db,env,phone,action){
  const now=new Date(),date=now.toISOString().slice(0,10);
- if(typeof env.HHBA_MATCH_LIMIT_PEPPER!=='string'||env.HHBA_MATCH_LIMIT_PEPPER.length<24)
-  return false;
- const hash=await sha256Hex(env.HHBA_MATCH_LIMIT_PEPPER+':word-layout:'+phone);
+ const secret=wordLimitPepper(env);
+ if(typeof secret!=='string'||secret.length<24)return false;
+ const hash=await sha256Hex(secret+':word-layout:'+phone);
  const result=await db.prepare(
   'INSERT INTO hhba_resume_word_attempts(request_id,day_utc,account_hash,action,created_at) '+
   'SELECT ?,?,?,?,? WHERE (SELECT COUNT(*) FROM hhba_resume_word_attempts '+
