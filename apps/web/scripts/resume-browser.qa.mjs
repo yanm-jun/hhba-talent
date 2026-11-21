@@ -841,10 +841,18 @@ try{
   const primary=full.getByRole('button',{name:'AI 针对岗位重写整份简历'});
   await primary.waitFor({state:'visible'});
   await primary.click();
-  await full.locator('.hhba-whole-rewrite').waitFor({timeout:20000});
+  // Starting an AI run deliberately closes the optional tools drawer so the
+  // original Word document stays visible. Wait for the result in the DOM,
+  // then explicitly reopen the drawer to inspect the generated draft.
   const rows=full.locator('.hhba-whole-rewrite-block');
   await full.waitForFunction(()=>
-   document.querySelectorAll('.hhba-whole-rewrite-block').length===9,{timeout:15000});
+   document.querySelectorAll('.hhba-whole-rewrite-block').length===9,
+   null,{timeout:30000});
+  const wholePanel=full.locator('.hhba-whole-rewrite');
+  if(!await wholePanel.isVisible()){
+   await full.locator('.hhba-word-quick-actions').click();
+  }
+  await wholePanel.waitFor({state:'visible',timeout:10000});
   assert.equal(await rows.count(),9,
    'full writer must process ALL nine source paragraphs instead of only five tips');
   assert.match(await full.locator('.hhba-whole-rewrite-metrics').textContent(),/读取段落 9/);
