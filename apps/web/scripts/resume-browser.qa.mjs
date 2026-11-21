@@ -685,6 +685,7 @@ try{
    await status.click();
    await assistant.waitFor({state:'visible'});
   }
+  await assistant.locator('.hhba-word-suggestion-archive summary').click();
   await assistant.locator('.targeted-resume-word-suggestion-title').first().waitFor();
   assert.equal(await first.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),1,
    'real AI suggestions must illuminate the Word perimeter');
@@ -1002,6 +1003,7 @@ try{
   await scorePage.locator('.targeted-resume-ai-settings summary').click();
   await scorePage.locator('.targeted-resume-consent input[type=checkbox]').check();
   await scorePage.getByRole('button',{name:'开始 AI 优化'}).click();
+  await scorePage.locator('.hhba-word-suggestion-archive summary').click();
   await scorePage.locator('.targeted-resume-word-suggestion-title').first().waitFor();
   assert.match(await scorePage.locator('.hhba-word-match-after').textContent(),/70/,
    'AI draft review must not erase a score based on the already-saved Word');
