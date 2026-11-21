@@ -11,7 +11,16 @@ const TargetedResumeOptimization=lazy(()=>import('./TargetedResumeOptimization')
 import {Link} from '../router';
 import '../styles/resume-match-dialog.css';
 
-// Search-first evidence governs links; server scores and ranks. Never present a score as an offer probability.
+// Search-first evidence governs links; scores are reference estimates, not offer probabilities.
+// The native-search adapter historically used reference_score=0 to signal
+// "no score". Never print that placeholder as a measured 0/100.
+function visibleMatchScore(job:{match_score?:number|null;reference_score?:number}):number|null{
+ if(Number.isInteger(job.match_score)&&job.match_score!>=0&&job.match_score!<=100)
+  return job.match_score!;
+ if(Number.isInteger(job.reference_score)&&job.reference_score!>0&&job.reference_score!<=100)
+  return job.reference_score!;
+ return null;
+}
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
 export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage,sourceText,sourceResume,accountScope}:{
@@ -30,7 +39,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
   return {
    id:job.id,company:job.company,title:job.title,title_zh:job.title_zh||null,
    location:job.location,official_url:job.official_url,platform:job.platform,
-   remote:job.remote,reference_score:Number.isInteger(job.match_score)?job.match_score!:job.reference_score,
+   remote:job.remote,reference_score:visibleMatchScore(job)??0,
    matched:job.matched||[],not_evidenced:job.not_evidenced||[],
    needs_verification:job.needs_verification||[],
    requirements_basis:job.requirements_basis||job.score_basis||''
@@ -93,8 +102,8 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
          <p>{activeJob.company} · {activeJob.location}</p>
         </div>
         <div className="hhba-match-selected-score">
-         <strong>{Number.isInteger(activeJob.match_score)?activeJob.match_score:'—'}<small>/100</small></strong>
-         <span>原简历适配分 · 非录用概率</span>
+         <strong>{visibleMatchScore(activeJob)??'—'}<small>/100</small></strong>
+         <span>原简历 AI 适配参考分 · 非录用概率</span>
         </div>
        </div>
        {!sourceResume&&<div className="hhba-match-word-note" role="note">
@@ -154,11 +163,11 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
              '页面文本提示开放申请，是否可提交仍以招聘官网为准':'链接来自搜索结果，可能已过期或需要登录；请打开官网确认'}</small>
            </div>
           </div>
-          <div className="hhba-native-score" aria-label={Number.isInteger(job.match_score)?'简历适配分 '+job.match_score+' 分':'适配分证据不足'}>
-           {Number.isInteger(job.match_score)?
-            <><strong>{job.match_score}<small>/100</small></strong><span>简历适配分</span></>:
-            <><strong className="hhba-native-score-na">—</strong><span>待补充证据</span></>}
-           {!pending&&Number.isInteger(job.match_score)&&<button type="button"
+          <div className="hhba-native-score" aria-label={visibleMatchScore(job)!==null?'简历适配参考分 '+visibleMatchScore(job)+' 分':'暂无可靠适配分'}>
+           {visibleMatchScore(job)!==null?
+            <><strong>{visibleMatchScore(job)}<small>/100</small></strong><span>AI 适配参考分</span></>:
+            <><strong className="hhba-native-score-na">—</strong><span>暂无可靠分数</span></>}
+           {!pending&&<button type="button"
              className="hhba-native-optimize" onClick={()=>{
               matchListScroll.current=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content')?.scrollTop||0;
               setOptimizationDirty(false);setOptimizedJobId(job.id);
@@ -167,7 +176,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
             </button>}
           </div>
          </div>
-         {job.score_basis&&Number.isInteger(job.match_score)&&
+         {job.score_basis&&visibleMatchScore(job)!==null&&
           <p className="hhba-native-score-basis"><strong>评分依据：</strong>{job.score_basis}</p>}
          <p className="hhba-native-reason"><strong>为什么推荐：</strong>
           {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
