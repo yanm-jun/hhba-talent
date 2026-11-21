@@ -143,3 +143,31 @@ test('Siri in-document changes expose adopt edit ignore only on hover/tap and re
  assert.match(css,/hhba-word-siri-anchor-shell\.is-open \.hhba-word-siri-inline-actions/);
  assert.match(css,/@media\(hover:none\)/);
 });
+
+
+test('same original Word has isolated job-scoped revision and download entry points',async()=>{
+ const viewer=await source('components/OriginalWordViewer.tsx');
+ const targeted=await source('components/TargetedResumeOptimization.tsx');
+ const api=await source('services/originalWordApi.ts');
+ const server=await readFile(new URL('../functions/api/resume-word.js',import.meta.url),'utf8');
+ const vault=await source('components/PrivateResumeVault.tsx');
+ assert.match(targeted,/jobId=\{job\.id\}/);
+ assert.match(targeted,/jobTitle=\{job\.company\+'-'\+\(job\.title_zh\|\|job\.title\)\}/);
+ assert.match(viewer,/jobId\?:string/);
+ assert.match(viewer,/wordEditableText\(resume\.id,undefined,jobId\)/);
+ assert.match(viewer,/wordPreviewBytes\(resume\.id,wasSaved,undefined,/);
+ assert.match(viewer,/saveOriginalWordEdit\(resume\.id,selected\.text,draft\.trim\(\),revision,jobId\)/);
+ assert.match(viewer,/saveOriginalWordEdit\(resume\.id,anchor\.text,visual\.proposed\.trim\(\),revision,jobId\)/);
+ assert.match(viewer,/shiftOriginalWordRevision\(resume\.id,action,revision,jobId\)/);
+ assert.match(viewer,/downloadOriginalWordEdited\(resume\.id,jobId,jobTitle\)/);
+ assert.match(viewer,/downloadOriginalWordPdf\(resume\.id,jobId,jobTitle\)/);
+ assert.match(api,/job_id=.*encodeURIComponent\(job\)/);
+ assert.match(api,/job_id:id/);
+ assert.match(api,/function scopedJobId\(/);
+ assert.match(server,/hhba-word-target-job-v1:/);
+ assert.match(server,/job_scope_sha256/);
+ assert.match(server,/approved\(bucket,row,jobId\)/);
+ // The old private-vault reader intentionally omits the selected job.
+ assert.match(vault,/<OriginalResumeViewer key=\{previewItem.id\} resume=\{previewItem\}/);
+ assert.doesNotMatch(vault,/<OriginalWordViewer[^>]*jobId/);
+});
