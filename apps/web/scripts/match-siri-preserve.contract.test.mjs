@@ -36,7 +36,8 @@ test('the original ten-job native matching popup is NOT replaced or redesigned',
  for(const value of preserved)assert.ok(dialog.includes(value),'preserve old native result UI: '+value);
  assert.match(dialog,/className=\{'hhba-match-modal'\+\(optimizedJobId\?' hhba-match-modal-editor':''\)\}/);
  assert.match(dialog,/result\.matches\.find\(job=>job\.id===optimizedJobId\)/);
- assert.match(dialog,/!pending&&Number\.isInteger\(job\.match_score\)&&<button/);
+ assert.match(dialog,/<button type="button" disabled=\{pending\}/);
+ assert.doesNotMatch(dialog,/!pending&&Number\.isInteger\(job\.match_score\)&&<button/);
  assert.match(dialog,/className="hhba-native-optimize"/);
  assert.match(dialog,/> 优化简历/);
  assert.match(dialog,/<TargetedResumeOptimization key=\{activeJob\.id\}/);

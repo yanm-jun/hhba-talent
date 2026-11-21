@@ -165,17 +165,25 @@ export function selectedJobs(text,hits,limit=10){
   if(seen.has(signature)||seen.has(evidence.url))continue;
   seen.add(signature);seen.add(evidence.url);
   const url=evidence.url; // CRITICAL: source URL comes from Search, NEVER model text.
-  const match_score=normalizeMatchScore(row.match_score??row.score,row.score_basis);
+  // Keep the AI's reported numeric reference score when there is real
+  // candidate-to-role evidence in its explanation. Shortlist mode sometimes
+  // omits score_basis even while returning a sufficiently specific reason.
+  // Never create a numeric score if the model gave none.
+  const primaryBasis=clean(row.score_basis,240);
+  const fallbackBasis=reason.length>=45&&/(简历|经历|工作经验|负责|技能|曾经|曾在)/.test(reason)?
+   reason.slice(0,220):'';
+  const scoreBasis=primaryBasis.length>=14?primaryBasis:fallbackBasis;
+  const match_score=normalizeMatchScore(row.match_score??row.score,scoreBasis);
   const recruitment_source_kind=recruitmentSourceKind(url);
   found.push({id:'search-'+evidence.id,company,title,title_zh:title,location,
    recruitment_source_kind,recruitment_source_note:sourceDisplay(recruitment_source_kind),
-   match_score,score_basis:match_score===null?'':clean(row.score_basis,240),
+   match_score,score_basis:match_score===null?'':scoreBasis,
    availability_status:evidence.availability?.status||'UNKNOWN',
    availability_note:evidence.availability?.evidence||'投递状态待确认',
    availability_checked_at:evidence.availability?.checked_at||null,
    official_url:url,platform:'deepseek-search',source:new URL(url).hostname,
    source_type:'站外招聘职位',source_status:'MODEL_SEARCH_REPORTED',
-   application_status:'NEEDS_OFFICIAL_CONFIRMATION',remote:false,reference_score:0,
+   application_status:'NEEDS_OFFICIAL_CONFIRMATION',remote:false,reference_score:match_score??0,
    matched:[reason],recommendation_reason:reason,not_evidenced:[],
    needs_verification:['根据岗位原始网页核对最新招聘状态与硬性任职条件。'],
    requirements_basis:clean(row.job_basis||evidence.summary,220),
@@ -207,7 +215,7 @@ export async function reasonAboutJobs(key,resume,hits,limit,{
   '若搜索结果没有明确工作地点或职位内容，只能不选该条。不要猜城市、公司或岗位硬性要求；不可虚构学历或经历。',
   '优先选择网页有明确招聘开放证据的岗位；UNKNOWN不能写成可投递，CLOSED_LISTED和POSSIBLY_CLOSED不得推荐。尽可能返回十个真实职位，不为凑数捏造。',
   '为每条岗位给出0～100整数的「简历适配分」match_score，依据已有简历和招聘内容评估岗位方向、工作经验、技能与城市偏好，不代表录用概率。分数需有独立的score_basis（至少30字）解释具体加分与不足；证据不充分时match_score填null、score_basis为空。',
-  shortlistOnly?'先快速生成岗位名单，理由仅写45～70字，详细分析将由下一阶段补充。请优先列满符合条件的候选，避免在首轮输出中消耗太多文字。':'每个为什么推荐的理由写120～180字，结合简历的真实经历成果与职位内容、岗位职责映射、必要的差距提示；避免套话，不能保证录用。',
+  shortlistOnly?'先快速生成岗位名单。每个候选先完整输出 match_score 与独立 score_basis（至少30字，写出具体简历依据和职位要求），不得省略；无法判断则明确写 null。理由再写45～70字，详细分析将由下一阶段补充。请优先列满符合条件的候选。':'每个为什么推荐的理由写120～180字，结合简历的真实经历成果与职位内容、岗位职责映射、必要的差距提示；避免套话，不能保证录用。',
   '输出 JSON 对象，结构：{"jobs":[{"id":"候选id，如j1","company":"岗位原网页中企业","title":"岗位","location":"中国大陆实际工作城市","match_score":85,"score_basis":"岗位与简历实际技能或职责吻合的证据，至少25字","reason":"初步推荐理由，后续补充详细说明","job_basis":"网页明确的岗位职责要点","salary":""}]}。',
   '优先把最有把握的一条完整对象尽早输出，后续逐条补齐。不得在JSON以外输出文字。'
  ].join('\n');

@@ -203,6 +203,31 @@ test('availability filtering is applied even if model mentions a closed candidat
  assert.equal(picked[0].match_score,80);
  assert.equal(picked[0].availability_status,'UNKNOWN');
 });
+test('actual Search-first API retains evidence-backed scores and legacy reference field',()=>{
+ const hits=normalizeHits([searchResults]);
+ const scoreRows=resultRows(['j1','j2']);
+ scoreRows.jobs[0].match_score=84;
+ scoreRows.jobs[0].score_basis='简历中真实的产品需求梳理和业务协作工作经验，对应岗位产品规划职责，但行业专业深度需核实。';
+ scoreRows.jobs[1].match_score=77;
+ // The fast shortlist can omit score_basis. A long specific recommendation
+ // that refers to candidate evidence is an acceptable fallback explanation.
+ delete scoreRows.jobs[1].score_basis;
+ const scored=selectedJobs(JSON.stringify(scoreRows),hits,10);
+ assert.equal(scored.length,2);
+ assert.equal(scored[0].match_score,84);
+ assert.equal(scored[0].reference_score,84);
+ assert.equal(scored[1].match_score,77);
+ assert.equal(scored[1].reference_score,77);
+ assert.match(scored[1].score_basis,/简历中的HHBA智能体产品/);
+ const unknown=resultRows(['j3']);
+ delete unknown.jobs[0].match_score;
+ assert.equal(selectedJobs(JSON.stringify(unknown),hits,1)[0].match_score,null);
+ const generic=resultRows(['j4']);
+ generic.jobs[0].match_score=99;
+ generic.jobs[0].reason='此公司非常优秀，岗位非常适合你，未来发展空间非常大，有很多潜力，发展前景非常不错，非常值得试试。';
+ assert.equal(selectedJobs(JSON.stringify(generic),hits,1)[0].match_score,null);
+});
+
 test('score is model-reported fit, never an Offer probability, and must include explanation',()=>{
  assert.equal(normalizeMatchScore(86,'对应企业经营和岗位职责经历，专业方向较为匹配。'),86);
  assert.equal(normalizeMatchScore('75','有门店管理与区域业务培训履历，地点符合要求。'),75);

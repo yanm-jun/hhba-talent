@@ -61,6 +61,12 @@ export function parseJobAnswer(response,limit=10){
    !isMainlandJobLocation(location)||FOREIGN_TITLES.test(title))continue;
   const key=(company+'|'+title+'|'+location).toLowerCase().replace(/\s/g,'');
   if(seen.has(key))continue;seen.add(key);
+  // A reported score is an AI reference estimate, never an employment
+  // probability. Missing, out-of-range or unsupported scores stay unknown.
+  const proposed=Number.isInteger(row.match_score)&&row.match_score>=0&&row.match_score<=100?
+   row.match_score:null;
+  const scoreBasis=trim(row.score_basis||row.job_basis||'',220);
+  const matchScore=proposed!==null&&scoreBasis?proposed:null;
   const domain=new URL(url).hostname;
   matches.push({
    id:'native-web-'+matches.length+'-'+domain.replace(/[^a-z0-9]/ig,'-'),
@@ -68,7 +74,8 @@ export function parseJobAnswer(response,limit=10){
    official_url:url,platform:'deepseek-native-web',source:domain,
    source_type:'站外官方招聘',source_status:'MODEL_SEARCH_REPORTED',
    application_status:'NEEDS_OFFICIAL_CONFIRMATION',
-   remote:false,reference_score:0,
+   remote:false,reference_score:matchScore??0,
+   match_score:matchScore,score_basis:scoreBasis,
    matched:[reason],recommendation_reason:reason,not_evidenced:[],
    needs_verification:['请在岗位原始页面核实目前是否开放申请。'],
    requirements_basis:trim(row.job_basis||'',220),
