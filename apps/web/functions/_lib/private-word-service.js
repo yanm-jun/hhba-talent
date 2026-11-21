@@ -84,11 +84,16 @@ export async function wordRequest(env,action,{original,edited,oldText,newText,fe
  * No LibreOffice process, public document URL, or renderer credentials needed.
  * Production remains off until explicitly enabled by the operator.
  */
+// A dedicated private Word salt avoids enabling unrelated job-search routes
+// when only DOCX editing is being rolled out. Preview retains the existing
+// shared pepper as a backward-compatible fallback.
+export const wordLimitPepper=env=>
+ typeof env?.HHBA_WORD_LIMIT_PEPPER==='string'&&env.HHBA_WORD_LIMIT_PEPPER.length>=24
+  ?env.HHBA_WORD_LIMIT_PEPPER:env?.HHBA_MATCH_LIMIT_PEPPER;
 export const docxOnlyConfigured=env=>
  env?.HHBA_WORD_DOCX_ONLY_ENABLED==='1'&&
  (env?.HHBA_AUTH_ROLLOUT==='preview'||env?.HHBA_MATCH_RUNTIME_MODE==='production')&&
- typeof env?.HHBA_MATCH_LIMIT_PEPPER==='string'&&
- env.HHBA_MATCH_LIMIT_PEPPER.length>=24&&
+ typeof wordLimitPepper(env)==='string'&&wordLimitPepper(env).length>=24&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function'&&
  typeof env?.HHBA_PRIVATE_RESUMES?.get==='function'&&
  typeof env?.HHBA_PRIVATE_RESUMES?.put==='function';
