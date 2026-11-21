@@ -728,3 +728,61 @@
  .hhba-original-word-viewer .hhba-word-siri-inline-actions,
  .hhba-original-word-viewer .hhba-word-siri-edit-float{display:none!important}
 }
+
+
+/* Word-first is a clean document reader: unselected text hitboxes are
+   invisible and never draw the hundreds of rectangles visible in the old UI. */
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-original-resume-anchor:not(.has-ai-preview){
+ border-color:transparent!important;outline:0!important;
+ background:transparent!important;box-shadow:none!important;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-original-resume-anchor:not(.has-ai-preview):is(:hover,:focus-visible,.is-selected){
+ border-color:#6d9bc1!important;
+ background:rgba(49,106,159,.075)!important;
+ outline:1px solid rgba(73,132,181,.22)!important;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-original-resume-anchor:not(.has-ai-preview) .hhba-word-edit-anchor-label{
+ opacity:0;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-original-resume-anchor:not(.has-ai-preview):is(:hover,:focus-visible,.is-selected) .hhba-word-edit-anchor-label{
+ opacity:1;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-original-resume-paper{
+ width:100%;max-height:calc(100dvh - 205px)!important;
+ min-height:280px;background:#f4f6f8;
+ border-radius:8px;padding:8px 10px;
+ scroll-behavior:smooth;overscroll-behavior:contain;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-original-resume-word-tools{
+ justify-content:flex-end;flex-wrap:wrap;gap:5px;margin:5px 0 8px;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-original-resume-word-tools button.is-active{
+ background:#eaf1f8;border-radius:7px;color:#1d4b74;font-weight:700;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer.has-inline-editor{
+ display:block!important;grid-template-columns:none!important;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer.has-inline-editor>*{
+ grid-column:auto!important;grid-row:auto!important;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-word-standalone-edit-panel{
+ position:relative!important;inset:auto!important;
+ float:none;display:block;width:100%;max-width:none;box-sizing:border-box;
+ margin:8px 0 12px;padding:13px 14px;
+ border:1px solid #d6e4ef;border-radius:10px;
+ background:#f9fbfd;box-shadow:none;min-width:0;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-original-resume-toolbar{
+ padding:0 2px 6px;margin-bottom:5px;border-bottom:1px solid #eef2f6;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-original-resume-siri-stage{
+ overflow:visible;
+}
+@media(max-width:700px){
+ .targeted-resume.is-word-first .hhba-original-word-viewer .hhba-original-resume-paper{
+  max-height:calc(100dvh - 230px)!important;min-height:240px;padding:5px;
+ }
+ .targeted-resume.is-word-first .hhba-original-word-viewer .hhba-word-standalone-edit-panel{
+  position:relative!important;inset:auto!important;padding:12px!important;
+ }
+}
