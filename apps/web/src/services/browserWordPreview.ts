@@ -78,6 +78,64 @@ export async function renderBrowserWord(bytes:Uint8Array,mount:HTMLElement){
  }
  return mount.querySelectorAll('section.hhba-native-docx').length;
 }
+/**
+ * Pending AI wording lives IN the locally rendered DOCX span, rather than
+ * a second text layer with a guessed font size and one-line clipping.
+ *
+ * This is a reversible, browser-only preview: the source DOCX bytes never
+ * change and the candidate must still explicitly confirm a server-side edit.
+ * Only unique editable leaf runs may be touched. Original run styling,
+ * paragraph wrapping and the actual Word sheet layout remain authoritative.
+ */
+export function paintBrowserWordSuggestions(
+ mount:HTMLElement,editableText:string[],
+ suggestions:readonly {original:string;proposed:string;state:'pending'|'accepted'}[]
+):void{
+ const attribute='data-hhba-original-run';
+ for(const node of mount.querySelectorAll<HTMLElement>('span[data-hhba-original-run]')){
+  const original=node.getAttribute(attribute);
+  if(original===null)continue;
+  node.replaceChildren(document.createTextNode(original));
+  node.removeAttribute(attribute);
+  node.classList.remove('hhba-word-inline-suggestion');
+ }
+ const allowed=new Set(editableText);
+ const grouped=new Map<string,HTMLElement[]>();
+ for(const node of mount.querySelectorAll<HTMLElement>('section.hhba-native-docx span')){
+  if(node.querySelector('span'))continue;
+  const source=node.textContent||'';
+  if(!allowed.has(source))continue;
+  grouped.set(source,[...(grouped.get(source)||[]),node]);
+ }
+ const proposals=new Map<string,string[]>();
+ for(const suggestion of suggestions){
+  if(suggestion.state!=='pending'||!allowed.has(suggestion.original)||
+   suggestion.proposed===suggestion.original||!suggestion.proposed.trim()||
+   suggestion.proposed.length>300)continue;
+  proposals.set(suggestion.original,[...(proposals.get(suggestion.original)||[]),
+   suggestion.proposed]);
+ }
+ for(const [original,values] of proposals){
+  const nodes=grouped.get(original);
+  if(values.length!==1||nodes?.length!==1)continue;
+  const node=nodes[0],proposal=values[0];
+  const before=Array.from(original),after=Array.from(proposal);
+  let start=0,end=0;
+  while(start<before.length&&start<after.length&&before[start]===after[start])start++;
+  while(end<before.length-start&&end<after.length-start&&
+   before[before.length-1-end]===after[after.length-1-end])end++;
+  const prefix=after.slice(0,start).join('');
+  const changed=after.slice(start,after.length-end).join('');
+  const suffix=after.slice(after.length-end).join('');
+  const mark=document.createElement('span');
+  mark.className='hhba-word-ai-changed hhba-resume-siri-letters';
+  mark.textContent=changed||'\u200b';
+  node.setAttribute(attribute,original);
+  node.classList.add('hhba-word-inline-suggestion');
+  node.replaceChildren(document.createTextNode(prefix),mark,document.createTextNode(suffix));
+ }
+}
+
 export function browserWordAnchors(mount:HTMLElement,editableText:string[]):WordAnchor[]{
  const pages=[...mount.querySelectorAll<HTMLElement>('section.hhba-native-docx')];
  if(!pages.length)return [];
@@ -93,8 +151,11 @@ export function browserWordAnchors(mount:HTMLElement,editableText:string[]):Word
  // Only leaf spans with exactly one matching run may be edited. Ambiguous or
  // duplicated text (including repeated headers) is never clickable.
  for(const span of mount.querySelectorAll<HTMLElement>('section.hhba-native-docx span')){
-  if(span.querySelector('span'))continue;
-  const value=span.textContent||'';
+  // A painted run has a nested gradient span; still anchor it by its
+  // authenticated ORIGINAL, never by the AI-proposed display text.
+  const original=span.getAttribute('data-hhba-original-run');
+  if(span.querySelector('span')&&original===null)continue;
+  const value=original??span.textContent??'';
   if(!safe.has(value))continue;
   const entries=found.get(value)||[];entries.push(span);found.set(value,entries);
  }
