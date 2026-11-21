@@ -48,7 +48,8 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
    remote:job.remote,reference_score:visibleMatchScore(job)??0,
    matched:job.matched||[],not_evidenced:job.not_evidenced||[],
    needs_verification:job.needs_verification||[],
-   requirements_basis:job.requirements_basis||job.score_basis||''
+   requirements_basis:job.requirements_basis||job.score_basis||'',
+   jd_version_id:job.jd_version_id
   };
  }
  // The result list is never searched again on return. Preserve scroll and
