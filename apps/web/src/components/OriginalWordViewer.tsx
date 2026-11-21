@@ -215,7 +215,11 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     const source=doc.current,view=await source.getPage(page);
     if(!active||!surface.current)return;
     const base=view.getViewport({scale:1});
-    const availableHeight=Math.max(280,Math.min(window.innerHeight-205,window.innerHeight*.72));
+    const body=paper.current?.closest('.hhba-match-modal-content');
+    const pageTop=paper.current?.getBoundingClientRect().top??0;
+    const visibleBottom=body?.getBoundingClientRect().bottom??window.innerHeight;
+    const availableHeight=Math.max(230,Math.min(window.innerHeight*.77,
+     visibleBottom-pageTop-32));
     const fitPage=fitMode==='page'?Math.min(width/base.width,availableHeight/base.height):width/base.width;
     const scale=Math.min(3.2,Math.max(.35,fitPage))*zoom;
     const viewport=view.getViewport({scale});
@@ -267,7 +271,14 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    const pageWidth=documentPage.offsetWidth+24,pageHeight=documentPage.offsetHeight+24;
    if(!pageWidth||!pageHeight)return;
    const availableWidth=Math.max(240,container.clientWidth-34);
-   const availableHeight=Math.max(270,Math.min(window.innerHeight-205,window.innerHeight*.72));
+   // Measure the actual visible modal content area, not just window height.
+   // Header/toolbars consume real vertical room; size the first page to the
+   // remaining viewport rather than hiding its bottom under the dialog.
+   const content=container.closest('.hhba-match-modal-content');
+   const visibleBottom=content?.getBoundingClientRect().bottom??window.innerHeight;
+   const pageTop=container.getBoundingClientRect().top;
+   const availableHeight=Math.max(230,Math.min(window.innerHeight*.77,
+    visibleBottom-pageTop-32));
    const factor=fitMode==='page'?
     Math.min(availableWidth/pageWidth,availableHeight/pageHeight):
     availableWidth/pageWidth;
