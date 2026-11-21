@@ -25,14 +25,18 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 }
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage,sourceText,sourceResume,accountScope}:{
+export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'|'profile'>>;
  onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction;
- sourceText?:string;sourceResume?:PrivateResume;accountScope?:string
+ sourceText?:string;sourceResume?:PrivateResume;accountScope?:string;
+ // Match-history handoff enters the same existing editor without rerunning a search.
+ initialOptimizedJobId?:string;
 }){
  const ref=useRef<HTMLDivElement|null>(null);
- const [optimizedJobId,setOptimizedJobId]=useState<string|null>(null);
+ const [optimizedJobId,setOptimizedJobId]=useState<string|null>(()=>
+  initialOptimizedJobId&&result.matches.some(job=>job.id===initialOptimizedJobId)
+   ?initialOptimizedJobId:null);
  const [optimizationDirty,setOptimizationDirty]=useState(false);
  const matchListScroll=useRef(0);
  const activeJob=result.matches.find(job=>job.id===optimizedJobId);
