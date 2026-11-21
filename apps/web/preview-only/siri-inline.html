@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover"/>
+<meta name="robots" content="noindex,nofollow,noarchive"/><meta name="color-scheme" content="light"/>
+<title>HHBA · Siri 原位采纳、编辑与忽略交互预览</title>
+<style>
+@property --siri-angle{syntax:"<angle>";initial-value:0deg;inherits:false}
+*{box-sizing:border-box}body{margin:0;background:#f5f8fb;color:#18354b;font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button,textarea{font:inherit}button{cursor:pointer}button:focus-visible,textarea:focus-visible{outline:3px solid #679ac9;outline-offset:2px}
+.wrap{max-width:1100px;margin:auto;padding:0 23px 45px}
+.header{height:70px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #dfe7ef}
+.logo{font-weight:850;font-size:22px;letter-spacing:-.05em;color:#315b7b}.logo span{font-size:12px;color:#71879b;margin-left:9px;font-weight:560;letter-spacing:0}
+.flag{font-size:11px;color:#7290a3;background:white;border:1px solid #dfe8ef;padding:8px 12px;border-radius:40px}
+.intro{padding:28px 0 20px}.intro>small{font-size:10px;letter-spacing:.16em;font-weight:750;color:#8396a7}
+h1{font-size:clamp(23px,3vw,35px);letter-spacing:-.04em;margin:9px 0 8px;line-height:1.25}
+.intro p{font-size:12px;color:#698399;line-height:1.9;margin:0}
+.job{background:#fff;border:1px solid #e4ebf1;border-radius:14px;padding:17px 22px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.job-label{color:#7792a3;font-size:10px;font-weight:720;letter-spacing:.09em}.job h2{font-size:16px;margin:7px 0 3px;color:#24445b}.job p{font-size:11px;color:#8899a7;margin:0}
+.job-right{display:flex;align-items:center;gap:18px;flex-shrink:0}.score{text-align:right}.score strong{font-size:29px;color:#285c80;font-weight:800;letter-spacing:-.04em}.score small{font-size:11px;color:#90a0ac}.score span{display:block;font-size:10px;color:#889cab}
+.primary{border:0;border-radius:9px;background:#315b7b;color:#fff;padding:12px 17px;font-weight:670;font-size:12px;white-space:nowrap}
+.primary:hover{background:#244961}
+.fineprint{font-size:11px;line-height:1.85;color:#8b9eac;margin:15px 0}
+.overlay{position:fixed;inset:0;z-index:100;background:rgba(16,34,50,.5);display:flex;align-items:center;justify-content:center;padding:15px}
+.overlay[hidden]{display:none}
+.dialog{background:#f7fafc;width:min(1070px,100%);height:min(94dvh,860px);display:flex;flex-direction:column;border-radius:17px;box-shadow:0 40px 110px rgba(8,23,37,.28);overflow:hidden}
+.dialog-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 21px;background:#fff;border-bottom:1px solid #e5edf2}
+.dialog-head small{color:#8a9aa8;font-size:10px}.dialog-head h2{font-size:16px;margin:4px 0 0}.close{background:#fff;border:1px solid #e4ebf0;border-radius:8px;width:33px;height:33px;font-size:21px;color:#6b8190}
+.dialog-body{flex:1;min-height:0;overflow:auto;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) 205px;gap:21px;align-items:start}
+.canvas-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;color:#63849a;margin-bottom:13px}
+.canvas-head strong{font-size:12px;color:#355a74}
+.glow{position:relative;isolation:isolate;border-radius:6px}
+.glow.active:before,.glow.active:after{content:"";position:absolute;pointer-events:none;border-radius:inherit;background:conic-gradient(from var(--siri-angle),#30b5dd,#5799f0,#af69ef,#ea74bd,#fba26d,#4ac8db,#30b5dd);animation:edge 15s linear infinite}
+.glow.active:before{inset:-8px;z-index:-1;opacity:.6;filter:blur(17px)}.glow.active:after{inset:-2px;z-index:2;padding:2px;opacity:.8;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
+@keyframes edge{to{--siri-angle:360deg}}
+.paper{background:#fff;border:1px solid #e5ebef;box-shadow:0 8px 24px #1e39510c;aspect-ratio:210/297;min-height:620px;padding:9% 11%;border-radius:4px}
+.person{font-size:26px;font-weight:750;letter-spacing:.15em;margin:0 0 5px}.role{font-size:12px;color:#576a7a;margin:0 0 14px}.meta{font-size:10px;color:#8296a6;padding-bottom:12px;border-bottom:1px solid #d9e2e8}
+.paper h3{font-size:12px;letter-spacing:.075em;border-bottom:1px solid #cbdbe5;padding-bottom:7px;margin:23px 0 10px}.paper p{font-size:11px;line-height:1.9;color:#344653;margin:6px 0 11px}
+.changed-line{position:relative;min-width:0;padding:2px 0;margin:6px 0 15px}
+.ink{display:inline;cursor:pointer;border-radius:3px;background:#f5f9fd;padding:3px 2px;line-height:2;overflow-wrap:anywhere}
+.ink:hover,.ink:focus-visible{outline:1px solid #b7d6ea}
+.rainbow{background-image:linear-gradient(100deg,#08a5ca,#457de6,#8b5cdb,#d764a5,#e39567,#08a5ca);background-size:230% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:ink 7s ease-in-out infinite alternate;font-weight:650}
+@keyframes ink{to{background-position:100% 50%}}
+.unchanged{color:#31485a}
+.actions{position:absolute;top:100%;left:0;z-index:30;display:flex;gap:3px;align-items:center;border:1px solid #dfebf1;background:#fff;padding:5px;border-radius:9px;box-shadow:0 12px 32px #1b41552e;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(3px);transition:opacity .12s,transform .12s,visibility .12s;white-space:nowrap}
+.changed-line:hover .actions,.changed-line:focus-within .actions,.changed-line.open .actions{opacity:1;visibility:visible;pointer-events:auto;transform:none}
+.actions button{border:0;background:#fff;border-radius:6px;padding:8px 10px;font-size:11px;font-weight:670;color:#4d6475;white-space:nowrap;min-height:32px}.actions button.is-accept{background:#315b7b;color:#fff}
+.actions button:hover:not(.is-accept){background:#edf4fa}
+.editor{position:absolute;z-index:35;top:calc(100% + 5px);left:0;width:min(320px,87vw);border:1px solid #dbe7ed;padding:14px;background:#fff;border-radius:11px;box-shadow:0 15px 40px #1a3e5b34}
+.editor[hidden]{display:none}.editor label{font-size:11px;font-weight:700;color:#3b5871}
+.editor textarea{display:block;width:100%;resize:vertical;min-height:95px;margin:8px 0;border:1px solid #cbdce9;border-radius:8px;padding:9px;font-size:13px;color:#244158}
+.editor .editor-controls{display:flex;gap:8px;justify-content:flex-end}.editor-controls button{border:1px solid #d4e1eb;border-radius:7px;padding:8px 11px;background:#fff;color:#44627b;font-size:11px}
+.editor-controls button.is-accept{background:#315b7b;color:#fff;border-color:#315b7b}
+.side{background:#fff;border:1px solid #e8eef2;border-radius:11px;padding:15px;position:sticky;top:0}
+.side strong{font-size:13px}.side p{font-size:11px;line-height:1.9;color:#7a8e9d}
+.side hr{border:0;border-top:1px solid #ebeff2;margin:14px 0}.counter{font-size:11px;color:#6d8293}
+.status{font-size:10px;color:#7892a4;margin:12px 0;line-height:1.7}
+.dialog-foot{background:#fff;border-top:1px solid #e5edf2;padding:11px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.dialog-foot span{font-size:10px;color:#8495a3}.dialog-foot button{border:1px solid #d7e3eb;background:#fff;border-radius:8px;padding:9px 12px;color:#375b74;font-size:12px}
+@media(max-width:700px){.wrap{padding:0 14px 28px}.header{height:59px}.logo{font-size:19px}.logo span{font-size:11px}.flag{font-size:10px}.intro{padding:19px 0}.job{padding:14px;align-items:flex-start;gap:12px;flex-direction:column}.job-right{width:100%;justify-content:space-between}.score strong{font-size:23px}.dialog{height:100dvh;width:100%;border-radius:0}.overlay{padding:0}.dialog-head{padding:12px}.dialog-body{display:block;padding:15px}.paper{min-height:550px}.side{margin-top:18px}.editor{position:fixed;left:12px;right:12px;top:auto;bottom:12px;width:auto;max-height:55dvh;overflow:auto}.actions button{min-height:42px;font-size:12px}.dialog-foot{padding:10px 12px}.dialog-foot span{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.glow.active:before,.glow.active:after,.rainbow{animation:none!important}.actions{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="header"><div class="logo">HHBA <span>汇方职场</span></div><span class="flag">岗位定向 · Siri 交互预览</span></header>
+<section class="intro"><small>RESUME OPTIMIZATION / PREVIEW ONLY</small><h1>找到岗位后，直接在简历里优化。</h1><p>彩虹文字即修改位置。电脑悬停，手机轻点，选择采纳、编辑或忽略。</p></section>
+<article class="job"><div><small class="job-label">MATCHED POSITION · 虚构演示</small><h2>区域门店运营督导</h2><p>示例企业 · 上海 / 全国出差 · 仅作交互验证</p></div><div class="job-right"><div class="score"><strong>75<small>/100</small></strong><span>原始文本适配分</span></div><button id="launch" class="primary">优化简历 ✦</button></div></article>
+<p class="fineprint">这是一份独立的、无须登录的前端交互样稿。所有职位、姓名、经历和评分都是虚构示例；不会连接真实 AI、存储服务或修改 Word。</p>
+</div>
+<div class="overlay" id="overlay" hidden>
+<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title" tabindex="-1" id="dialog">
+<header class="dialog-head"><div><small>HHBA · AI / RESUME</small><h2 id="dlg-title">针对「区域门店运营督导」优化简历</h2></div><button id="close" class="close" type="button" aria-label="关闭优化弹窗">×</button></header>
+<div class="dialog-body"><div>
+<div class="canvas-head"><strong>虚构简历样稿.docx</strong><span>悬停或点选彩虹文字</span></div>
+<div class="glow active" id="glow"><article class="paper">
+<h2 class="person">演 示 用 户</h2><p class="role">门店运营与客户服务支持</p><div class="meta">示例城市　|　联系方式不展示　|　仅用于视觉验收</div>
+<h3>个人简介</h3><p>具备门店日常事务协作、文档整理与团队沟通的示例经历。</p>
+<h3>工作经历</h3><p><strong>门店运营协助</strong>　示例企业</p>
+<div class="changed-line" data-index="0"><span class="ink" role="button" tabindex="0" aria-label="查看第 1 处彩虹文字操作"><span class="rainbow" data-proposal>整理客户反馈及运营记录，协助团队同步门店日常进展。</span><span data-native hidden>协助整理客户反馈。</span></span><div class="actions" role="group" aria-label="第 1 处修改操作"><button class="is-accept" data-action="accept">✓ 采纳</button><button data-action="edit">✎ 编辑</button><button data-action="ignore">× 忽略</button></div><div class="editor" hidden><label>编辑这段文字<textarea maxlength="300"></textarea></label><div class="editor-controls"><button data-action="cancel">取消</button><button data-action="confirm" class="is-accept">确认编辑</button></div></div></div>
+<div class="changed-line" data-index="1"><span class="ink" role="button" tabindex="0" aria-label="查看第 2 处彩虹文字操作"><span class="rainbow" data-proposal>跟进工作记录与任务进度，支持团队日常沟通与信息汇总。</span><span data-native hidden>协助团队沟通。</span></span><div class="actions" role="group" aria-label="第 2 处修改操作"><button class="is-accept" data-action="accept">✓ 采纳</button><button data-action="edit">✎ 编辑</button><button data-action="ignore">× 忽略</button></div><div class="editor" hidden><label>编辑这段文字<textarea maxlength="300"></textarea></label><div class="editor-controls"><button data-action="cancel">取消</button><button data-action="confirm" class="is-accept">确认编辑</button></div></div></div>
+<h3>技能与能力</h3><p>文档整理 · 团队协作 · 客户信息记录</p><h3>教育背景</h3><p>示例学校 · 示例专业</p>
+</article></div><p class="status" id="status">两处待确认的彩虹文字，仅是视觉预览。</p></div>
+<aside class="side"><strong>修改进度</strong><p>建议已直接显示在原文位置，不需要左右对照。事实必须由本人核实，采纳后恢复普通字体。</p><hr/><div class="counter" id="count">待确认 2　已采纳 0　已忽略 0</div><hr/><p>真正的 HHBA 会在用户选定岗位后，使用对应的招聘要求生成内容；只有本人确认且通过原 Word 版式校验，才会保存到岗位修改版本。</p></aside>
+</div>
+<footer class="dialog-foot"><span>前端视觉演示 · 原始简历不会被修改或上传</span><button type="button" id="reset">重新演示</button></footer>
+</div></div>
+<script>
+(()=>{'use strict';
+ const overlay=document.getElementById('overlay'),glow=document.getElementById('glow'),
+ rows=[...document.querySelectorAll('.changed-line')], count=document.getElementById('count'),
+ status=document.getElementById('status'), dialog=document.getElementById('dialog');
+ let previousFocus=null,oldOverflow='';
+ function update(){
+  let pending=0,accepted=0,ignored=0;
+  rows.forEach(row=>{switch(row.dataset.state){case 'accept':accepted++;break;case 'ignore':ignored++;break;default:pending++;}});
+  count.textContent='待确认 '+pending+'　已采纳 '+accepted+'　已忽略 '+ignored;
+  status.textContent=pending?'还有 '+pending+' 处待本人确认。':'此轮文字已处理完毕。';
+  glow.classList.toggle('active',pending>0);
+ }
+ function setState(row,next,text){
+  const proposal=row.querySelector('[data-proposal]'),native=row.querySelector('[data-native]');
+  const edited=row.querySelector('textarea');
+  if(next==='accept'){native.textContent=text||proposal.textContent;proposal.hidden=true;native.hidden=false;}
+  else if(next==='ignore'){proposal.hidden=true;native.hidden=false;}
+  else{proposal.hidden=false;native.hidden=true;edited.value=proposal.textContent;}
+  row.dataset.state=next;row.classList.remove('open');
+  row.querySelector('.editor').hidden=true;
+  update();
+ }
+ function close(){overlay.hidden=true;document.body.style.overflow=oldOverflow;previousFocus?.focus();}
+ function reset(){rows.forEach(row=>{const proposal=row.querySelector('[data-proposal]');proposal.hidden=false;row.querySelector('[data-native]').hidden=true;row.querySelector('.editor').hidden=true;row.dataset.state='pending';row.classList.remove('open')});update()}
+ document.getElementById('launch').addEventListener('click',()=>{previousFocus=document.activeElement;oldOverflow=document.body.style.overflow;document.body.style.overflow='hidden';overlay.hidden=false;dialog.focus()});
+ document.getElementById('close').addEventListener('click',close);
+ document.getElementById('reset').addEventListener('click',reset);
+ overlay.addEventListener('mousedown',e=>{if(e.target===overlay)close()});
+ rows.forEach(row=>{
+  row.dataset.state='pending';
+  const ink=row.querySelector('.ink'),editor=row.querySelector('.editor'),proposal=row.querySelector('[data-proposal]');
+  const show=()=>{if(row.dataset.state==='pending')row.classList.toggle('open')};
+  ink.addEventListener('click',show);
+  ink.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}});
+  row.addEventListener('click',e=>{
+   const button=e.target.closest('[data-action]');if(!button)return;
+   const action=button.dataset.action;
+   if(action==='accept')setState(row,'accept');
+   if(action==='ignore')setState(row,'ignore');
+   if(action==='edit'){
+    editor.hidden=false;editor.querySelector('textarea').value=proposal.textContent;
+    row.classList.remove('open');editor.querySelector('textarea').focus();
+   }
+   if(action==='cancel'){editor.hidden=true;ink.focus();}
+   if(action==='confirm'){
+    const value=editor.querySelector('textarea').value.trim();
+    if(!value){editor.querySelector('textarea').focus();return}
+    setState(row,'accept',value);
+   }
+  });
+ });
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden){if(rows.some(row=>!row.querySelector('.editor').hidden))rows.forEach(row=>row.querySelector('.editor').hidden=true);else close()}});
+ reset();
+})();
+</script>
+</body>
+</html>
