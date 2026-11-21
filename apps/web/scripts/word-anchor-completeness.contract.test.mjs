@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {browserWordAnchors} from '../src/services/browserWordPreview.ts';
 import {matchWordAnchors} from '../src/services/resumeWordAnchors.mjs';
 
@@ -70,4 +71,22 @@ test('renderer/PDF mode also keeps 72 uniquely positioned runs',()=>{
   items:[...items,{...items[60]}],viewport,page:1});
  assert.equal(ambiguous.length,71);
  assert.ok(!ambiguous.some(x=>x.text===text[60]));
+});
+
+test('PDF comparison normalizes Chinese punctuation but preserves the Word original',()=>{
+ const original='工作职责：持续改善门店运营';
+ const normalized='工作职责:持续改善门店运营';
+ const viewport={width:820,height:1100,transform:[1,0,0,1,0,0],
+  convertToViewportPoint:(x,y)=>[x,1100-y]};
+ const item={str:normalized,transform:[1,0,0,1,50,900],
+  width:320,height:16,fontName:'F1'};
+ const matches=matchWordAnchors({editableText:[original],items:[item],viewport,page:1});
+ assert.equal(matches.length,1);
+ assert.equal(matches[0].text,original,'save must use original DOCX text, not PDF-normalized text');
+ const collision=matchWordAnchors({editableText:[original,normalized],
+  items:[item],viewport,page:1});
+ assert.equal(collision.length,0,'NFKC collision must not be treated as uniquely editable');
+ const viewer=readFileSync(new URL('../src/components/OriginalWordViewer.tsx',import.meta.url),'utf8');
+ assert.match(viewer,/original\.normalize\('NFKC'\)/);
+ assert.match(viewer,/counts\.get\(key\)===1/);
 });
