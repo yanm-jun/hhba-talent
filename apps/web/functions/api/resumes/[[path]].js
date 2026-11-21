@@ -126,7 +126,7 @@ export async function onRequest({request,env}){
   const id=download?.[1]||removal?.[1];
   if(id&&uuidPattern.test(id)&&((download&&method==='GET')||(removal&&method==='DELETE'))){
    const row=await db.prepare(
-    'SELECT id,filename,media_type,size_bytes,storage_key,sha256 FROM hhba_candidate_resumes WHERE phone=? AND id=?'
+    'SELECT id,filename,media_type,size_bytes,storage_key FROM hhba_candidate_resumes WHERE phone=? AND id=?'
    ).bind(phone,id).first();
    if(!row)return err('RESUME_NOT_FOUND',404);
    if(download){
@@ -149,7 +149,11 @@ export async function onRequest({request,env}){
    // Erase all user-owned original and job-specific Word revisions together.
    if(row.media_type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'){
     if(typeof bucket.list!=='function')return err('PRIVATE_STORAGE_NOT_ENABLED',503);
-    const wordPrefix=row.storage_key+'.hhba-word-preserved-v1-'+row.sha256;
+    const storedHash=await db.prepare(
+     'SELECT sha256 FROM hhba_candidate_resumes WHERE phone=? AND id=?'
+    ).bind(phone,id).first();
+    if(!storedHash?.sha256)return err('RESUME_DELETE_UNAVAILABLE',503);
+    const wordPrefix=row.storage_key+'.hhba-word-preserved-v1-'+storedHash.sha256;
     let cursor,passes=0;
     do{
      if(++passes>8)throw Error('WORD_ARTIFACT_LIST_TOO_LARGE');
