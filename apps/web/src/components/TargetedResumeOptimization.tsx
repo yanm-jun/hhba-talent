@@ -79,6 +79,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [busy,setBusy]=useState(false);
  const [status,setStatus]=useState<ResumeOptimizationStatus|null>(null);
  const [scoreStatus,setScoreStatus]=useState<ReassessmentStatus|null>(null);
+ const [archivedJdId,setArchivedJdId]=useState<string|null>(null);
  const [verifyStatus,setVerifyStatus]=useState<OfficialJobVerifyStatus|null>(null);
  const [verifiedJob,setVerifiedJob]=useState<OfficialVerifiedJob|null>(null);
  const [consentVerify,setConsentVerify]=useState(false);
@@ -176,6 +177,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   // signed AI continuation, facts, approval or visible score.
   active.current?.abort();
   wholeRunInput.current=null;
+  setArchivedJdId(null);setScoreResult(null);setConfirmReassessment(false);
   setWholeDraft(null);setWholeBusy(false);
   setWholeApproved(false);setWholeDownloaded(false);
   setRevealedWholeCount(0);
@@ -213,8 +215,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const before=useMemo(()=>evidenceVisibility(criteria,blocks),[criteria,blocks]);
  const after=useMemo(()=>evidenceVisibility(criteria,version.blocks),[criteria,version.blocks]);
  const hasAuditedAtsIdentity=/^(?:ashby|greenhouse|lever)-/.test(job.id);
- const scoreJobId=hasAuditedAtsIdentity?job.id:
-  (verifiedJob&&confirmedVerifiedJob?verifiedJob.job_id:null);
+ const scoreJobId=archivedJdId||(hasAuditedAtsIdentity?job.id:
+  (verifiedJob&&confirmedVerifiedJob?verifiedJob.job_id:null));
  const hasSupportedJob=Boolean(scoreJobId);
  const verifiedWordScore=useMemo(()=>checkedWordScoreBlocks(blocks,
   wordRevisionSnapshot?.history||[],wordRevisionSnapshot?.revision||0),
@@ -343,6 +345,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    return {title,requirements:fullJobRequirements,
     official_url:job.official_url};
   const official=await ensureArchivedJobJd(job.official_url,signal);
+  if(!signal.aborted)setArchivedJdId(official.job_id);
   return {title:official.title,requirements:official.full_jd,
    official_url:official.canonical_url,jd_version_id:official.job_id};
  }
