@@ -644,3 +644,86 @@
   animation:none!important;background-position:42% 50%;
  }
 }
+
+
+/* SIRI / Real Word. The colored wording itself is the entry point. A small
+   toolstrip appears on hover/focus, or after tapping the wording on touch.
+   No explanatory "AI suggested change" label is drawn onto the document. */
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell{
+ position:absolute;z-index:7;min-height:18px;isolation:visible;
+}
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell:has(.hhba-original-resume-anchor:focus-visible),
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell:hover,
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell.is-open{z-index:65}
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell>.hhba-original-resume-anchor{
+ position:absolute;inset:0;left:0;top:0;right:0;bottom:0;
+ width:100%;height:100%;min-height:18px;max-width:none;
+}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions{
+ position:absolute;left:0;z-index:70;
+ display:flex;align-items:center;gap:3px;padding:5px;
+ min-width:max-content;max-width:min(94vw,320px);
+ border:1px solid #dee7ef;border-radius:10px;
+ background:rgba(255,255,255,.98);
+ box-shadow:0 10px 30px rgba(26,50,76,.18);
+ opacity:0;visibility:hidden;pointer-events:none;
+ transform:translateY(3px);transition:opacity .13s ease,transform .13s ease,visibility .13s;
+}
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell:hover .hhba-word-siri-inline-actions,
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell:focus-within .hhba-word-siri-inline-actions,
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell.is-open .hhba-word-siri-inline-actions{
+ opacity:1;visibility:visible;pointer-events:auto;transform:none;
+}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions button{
+ display:inline-flex;align-items:center;justify-content:center;gap:4px;
+ background:#fff;color:#3a5b71;border:0;border-radius:7px;
+ min-height:32px;padding:7px 10px;white-space:nowrap;
+ font:600 11px/1.25 inherit;cursor:pointer;
+}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions button.is-accept{
+ background:#315b7b;color:white;
+}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions button:hover{
+ background:#edf4fa;color:#315b7b;
+}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions button.is-accept:hover{
+ background:#254b6c;color:#fff;
+}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions button:focus-visible{
+ outline:2px solid #4089cf;outline-offset:1px;
+}
+.hhba-original-word-viewer .hhba-word-siri-inline-actions button:disabled{
+ opacity:.5;cursor:not-allowed;
+}
+.hhba-original-word-viewer .hhba-word-siri-edit-float{
+ position:absolute;z-index:80;width:min(310px,90vw);max-height:min(460px,72dvh);
+ overflow-y:auto;box-shadow:0 18px 52px rgba(27,52,72,.20);
+ border-radius:12px;background:#fff;
+}
+.hhba-original-word-viewer .hhba-word-siri-edit-float .hhba-original-resume-editbox{
+ margin:0;width:100%;max-width:none;
+}
+@media(hover:none), (pointer:coarse){
+ .hhba-original-word-viewer .hhba-word-siri-inline-actions button{
+  min-height:42px;padding:9px 12px;font-size:12px;
+ }
+ .hhba-original-word-viewer .hhba-word-siri-inline-actions{
+  left:auto;right:0;max-width:min(94vw,325px);
+ }
+}
+@media(max-width:700px){
+ .hhba-original-word-viewer .hhba-word-siri-edit-float{
+  position:fixed;left:0!important;right:0;bottom:0!important;top:auto!important;
+  width:100%;max-height:70dvh;z-index:3600;
+  padding:14px 14px calc(17px + env(safe-area-inset-bottom,0px));
+  border-radius:16px 16px 0 0;
+ }
+ .hhba-original-word-viewer .hhba-word-siri-inline-actions{right:0;left:auto}
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-original-word-viewer .hhba-word-siri-inline-actions{transition:none}
+}
+@media print{
+ .hhba-original-word-viewer .hhba-word-siri-inline-actions,
+ .hhba-original-word-viewer .hhba-word-siri-edit-float{display:none!important}
+}
