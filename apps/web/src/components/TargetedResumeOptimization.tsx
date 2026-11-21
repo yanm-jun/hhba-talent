@@ -810,7 +810,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     <OriginalWordViewer key={sourceResume.id+':'+job.id} resume={sourceResume}
      jobId={job.id} jobTitle={job.company+'-'+(job.title_zh||job.title)}
      suggestedChanges={confirmedWordChanges}
-     glowActive={busy||wholeBusy||visualWordSuggestions.length>0}
+     glowActive={false}
      visualSuggestions={visualWordSuggestions}
      onVisualSuggestionSelect={id=>{
       if(id.startsWith('whole-')){
@@ -887,7 +887,9 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      onSessionWordDraftChange={setNativeWordTextDraft}
      pendingSuggestionCount={pendingSuggestions.length}/>
    </div>
-   {notice&&<p className="hhba-word-minimal-message" role="status">{notice}</p>}
+   {notice&&<p className={'hhba-word-minimal-message'+
+     (/(失败|无法|不可用|错误|请先|超出|没有找到|请重试)/.test(notice)?' is-error':'')}
+     role="status">{notice}</p>}
    {wordConsentOpen&&createPortal(
     <div className="hhba-word-consent-overlay" role="presentation"
      onMouseDown={event=>{if(event.currentTarget===event.target)setWordConsentOpen(false)}}>
