@@ -28,6 +28,7 @@ function stateDB(){
       {name:'hhba_jd_posting_lifecycle'},{name:'hhba_jd_retention_audit'}]};
      if(sql.startsWith('SELECT canonical_url,proof_method,status'))return {
       results:[...records.values()].filter(x=>x.next_check_at<=args[0]).slice(0,args[1])};
+     if(sql.startsWith('SELECT v.id,v.canonical_url'))return {results:[]};
      throw Error('Unexpected lifecycle list '+sql);
     },
     async first(){
@@ -221,8 +222,8 @@ test('daily maintenance is off by default, preview no automatic R2 deletion',asy
  assert.equal(result.retention.dry_run,true);
 });
 test('Word and candidate histories remain separate from the shared D1/R2 cleanup',()=>{
- const module=readFileSync(new URL('../functions/_lib/jd-lifecycle-maintenance.js',import.meta.url),'utf8');
- const cron=readFileSync(new URL('../ops/jd-lifecycle-cron-worker.mjs',import.meta.url),'utf8');
+ const module=readFileSync(new globalThis.URL('../functions/_lib/jd-lifecycle-maintenance.js',import.meta.url),'utf8');
+ const cron=readFileSync(new globalThis.URL('../ops/jd-lifecycle-cron-worker.mjs',import.meta.url),'utf8');
  assert.doesNotMatch(module,/HHBA_PRIVATE_RESUMES|\.delete\(.*resume|candidate_resume_body/);
  assert.match(module,/json_each\(h.jobs_json\)/);
  assert.match(module,/HHBA_JD_RETENTION_DELETE_ENABLED/);
