@@ -11,7 +11,7 @@ import {sha256Hex} from './real-auth.js';
 
 export const JD_ARCHIVE_KIND='HHBA_VERIFIED_JOB_JD_V1';
 export const JD_FRESH_MS=24*60*60*1000;
-const MAX_TEXT=24000;
+const MAX_TEXT=16000;
 const text=value=>typeof value==='string'?value.trim():'';
 
 export function jdArchiveConfigured(env){
@@ -146,4 +146,28 @@ export function publicJdPayload(saved,{includeText=true}={}){
    '直接读取企业官网并保存的岗位 JD；不保证此刻仍可投递。':
    '这是历史岗位 JD 版本，可能已经过期；不能当作最新招聘条件。'
  };
+}
+
+/**
+ * Model-facing JD hydration: a client-provided search summary is NEVER
+ * promoted to verified employer JD. The server reads content-addressed R2
+ * bytes and independently checks the SHA256 before giving them to an LLM.
+ */
+export async function hydrateVerifiedJobRequirements(env,job){
+ if(!job||typeof job!=='object'||Array.isArray(job))throw Error('JD_INVALID_JOB');
+ const version=job.jd_version_id;
+ if(version===undefined||version===null||version===''){
+  if(env?.HHBA_JOB_JD_REQUIRED==='1')throw Error('JD_VERIFIED_VERSION_REQUIRED');
+  return {...job,source_status:'UNVERIFIED_JOB_SUMMARY'};
+ }
+ if(!isJDVersionId(version)||!jdArchiveConfigured(env))
+  throw Error('JD_VERSION_NOT_AVAILABLE');
+ const saved=await readJobJdById(env,version);
+ if(!saved)throw Error('JD_VERSION_NOT_AVAILABLE');
+ if(!saved.fresh)throw Error('JD_VERSION_STALE');
+ if(job.official_url&&job.official_url!==saved.canonical_url)
+  throw Error('JD_JOB_IDENTITY_MISMATCH');
+ return {...job,title:saved.title,requirements:saved.full_jd,
+  official_url:saved.canonical_url,jd_version_id:saved.id,
+  jd_sha256:saved.jd_sha256,source_status:'VERIFIED_OFFICIAL_JD'};
 }
