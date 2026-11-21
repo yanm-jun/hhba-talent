@@ -837,7 +837,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      }}
      onRevisionSnapshot={handleWordRevisionSnapshot}
      onDocumentReady={revealRenderedWord}
-     editPanelHost={wordEditHost} onEditingChange={setWordEditing}
+     editPanelHost={wordEditHost} onEditingChange={(editing,inline)=>setWordEditing(editing&&!inline)}
      onOpenSuggestions={()=>setMobileSuggestionsOpen(true)}
      onPendingChange={setNativeWordPending}
      onVerifiedSave={change=>{
