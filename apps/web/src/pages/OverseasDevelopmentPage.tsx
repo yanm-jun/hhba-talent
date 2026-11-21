@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useState} from 'react';
-import {ArrowLeft,ArrowRight,ArrowUpRight,Bookmark,BookmarkCheck,BriefcaseBusiness,CheckCircle2,Compass,ExternalLink,Globe2,GraduationCap,House,Info,Plane,Search,ShieldCheck,SlidersHorizontal,Wallet,AlertTriangle,GitCompareArrows,BookOpen,MapPinned} from 'lucide-react';
+import {ArrowLeft,ArrowRight,ArrowUpRight,Bookmark,BookmarkCheck,BriefcaseBusiness,CheckCircle2,Compass,ExternalLink,Globe2,GraduationCap,House,Info,Plane,Search,ShieldCheck,SlidersHorizontal,Wallet,AlertTriangle,GitCompareArrows,BookOpen,MapPinned,Sparkles} from 'lucide-react';
 import {Link} from '../router';
 import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
@@ -58,7 +58,7 @@ export function OverseasDevelopmentPage({user,view='home',pathwayId}:{user:User|
      <p>不止留学。探索各国合法的海外工作、职业发展、学习与居留路径，从自己的目标出发，找到可核实的行动方案。</p>
      <div className="hhba-overseas-hero-actions"><Link to={countryLink} className="hhba-overseas-primary">探索新西兰 <ArrowRight size={17}/></Link><Link to={root+'/country/australia'} className="hhba-overseas-outline">探索澳大利亚 <ArrowRight size={17}/></Link><Link to={root+'/match'} className="hhba-overseas-outline">按目标初步筛选 <Compass size={17}/></Link></div>
      <div className="hhba-overseas-hero-meta"><span><CheckCircle2 size={15}/> 官方政策来源</span><span><CheckCircle2 size={15}/> 申请门槛透明</span><span><CheckCircle2 size={15}/> 不保证获签</span></div>
-    </div><div className="hhba-overseas-hero-credit"><a className="hhba-overseas-photo-credit" target="_blank" rel="noopener noreferrer" href="https://commons.wikimedia.org/wiki/File:The_Remarkables_from_Queenstown,_New_Zealand_04.jpg">实景摄影：Σ64 · CC BY 4.0 · Wikimedia Commons <ExternalLink size={12}/></a></div><div className="hhba-overseas-hero-globe" aria-hidden="true"><div className="hhba-overseas-orbit">✦</div><span>NZ</span></div></header>
+    </div><div className="hhba-overseas-hero-credit"><a className="hhba-overseas-photo-credit" target="_blank" rel="noopener noreferrer" href="https://commons.wikimedia.org/wiki/File:The_Remarkables_from_Queenstown,_New_Zealand_04.jpg">实景摄影：Σ64 · CC BY 4.0 · Wikimedia Commons <ExternalLink size={12}/></a></div><div className="hhba-overseas-hero-globe" aria-hidden="true"><div className="hhba-overseas-orbit"><Sparkles size={24} aria-hidden="true"/></div><span>NZ</span></div></header>
     <main className="hhba-overseas-container hhba-overseas-home-main">
      <section className="hhba-overseas-section" aria-labelledby="hhba-overseas-countries">
       <div className="hhba-overseas-section-head"><div><span className="hhba-overseas-kicker">EXPLORE DESTINATIONS</span><h2 id="hhba-overseas-countries">探索国家与地区</h2><p>逐国开发、逐条核实。资料未完成的国家不会伪装成可申请方案。</p></div></div>

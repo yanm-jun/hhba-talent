@@ -56,3 +56,12 @@
 .hhba-nearby-attribution{font-size:10px;margin-bottom:12px}.hhba-nearby-attribution a{color:#64748b;text-decoration:underline}
 @media(max-width:700px){.hhba-nearby-panel{align-items:stretch;flex-direction:column}.hhba-nearby-button{align-self:flex-start}.hhba-nearby-preferences{flex-direction:column;gap:3px}}
 @media(prefers-reduced-motion:reduce){.hhba-nearby-spin{animation:none}}
+
+/* The filter toolbar uses semantic SVG icons rather than Unicode glyphs. */
+.hhba-filter-pill{display:inline-flex;align-items:center;gap:6px}
+.hhba-filter-pill > svg:last-child{margin-left:auto;color:#8996a9}
+.hhba-filter-keyword button{display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.hhba-filter-glass{flex-shrink:0}
+.hhba-filter-panel-head button{display:inline-grid;place-items:center;min-width:28px;min-height:28px;border-radius:8px}
+.hhba-filter-panel-head button:hover{background:#eef3ff;color:#2254d7}
+.hhba-filter-prof-all{display:inline-flex;align-items:center;gap:6px}

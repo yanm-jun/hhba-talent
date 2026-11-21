@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft, ArrowRight, ArrowUpRight, BadgeCheck, BriefcaseBusiness,
-  CheckCircle2, ChevronDown, Clock3, Coins, Handshake,
+  Check, CheckCircle2, ChevronDown, Clock3, Coins, Handshake,
   HeartHandshake, Info, ShieldPlus, Sparkles, UsersRound
 } from 'lucide-react';
 import { Shell } from '../components/Shell';
@@ -505,7 +505,7 @@ export function JoinUsPage({ user }: { user: User | null }) {
         </div>
         <div className="join-form-shell">
           <div className="join-form-progress" aria-label="合作意向步骤">
-            {['基本信息','专业能力','合作意向'].map((label,i) => <span className={i===step ? 'is-current' : i<step ? 'is-complete' : ''} key={label}><b>{i<step ? '✓' : String(i+1).padStart(2,'0')}</b>{label}</span>)}
+            {['基本信息','专业能力','合作意向'].map((label,i) => <span className={i===step ? 'is-current' : i<step ? 'is-complete' : ''} key={label}><b>{i<step ? <Check size={14} strokeWidth={2.2} aria-hidden="true"/> : String(i+1).padStart(2,'0')}</b>{label}</span>)}
           </div>
           {submitted ? <div className="join-form-body join-form-preview">
             <span className="join-icon"><CheckCircle2 size={23}/></span>
