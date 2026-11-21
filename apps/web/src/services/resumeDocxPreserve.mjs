@@ -225,8 +225,12 @@ export async function editOriginalDocxStrict(raw,edits,options={}){
    found.crc===old.crc&&found.method===old.method,'WORD_EDIT_CORRUPTED');
   const left=pkg.bytes.subarray(old.dataStart,old.dataStart+old.packed);
   const right=rebuilt.bytes.subarray(found.dataStart,found.dataStart+found.packed);
-  requireValue(left.length===right.length&&left.every((b,i)=>b===right[i]),
-   'WORD_EDIT_CORRUPTED');
+  // A plain indexed loop avoids a callback for every byte. For a 3MB Word
+  // containing photos, Uint8Array.every() consumes a substantial part of the
+  // Workers Free 10ms CPU budget; still compare every compressed byte.
+  let identical=left.length===right.length;
+  for(let i=0;identical&&i<left.length;i++)if(left[i]!==right[i])identical=false;
+  requireValue(identical,'WORD_EDIT_CORRUPTED');
  }
  return bytes;
 }
