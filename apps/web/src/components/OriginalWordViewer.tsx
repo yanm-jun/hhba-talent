@@ -29,7 +29,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  sessionWordDraft?:PendingWordTextDraft|null;
  onSessionWordDraftChange?:(draft:PendingWordTextDraft|null)=>void;
  editPanelHost?:HTMLElement|null;
- onEditingChange?:(editing:boolean)=>void;
+ onEditingChange?:(editing:boolean,inline?:boolean)=>void;
  glowActive?:boolean;
  visualSuggestions?:WordVisualSuggestion[];
  onVisualSuggestionSelect?:(id:string)=>void;
@@ -89,8 +89,8 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   onPendingChange?.(Boolean(selected&&draft!==selected.text));
  },[selected,draft,onPendingChange]);
  useEffect(()=>{
-  onEditingChange?.(Boolean(selected));
- },[selected,onEditingChange]);
+  onEditingChange?.(Boolean(selected),Boolean(inlineVisualEditor));
+ },[selected,inlineVisualEditor,onEditingChange]);
  useEffect(()=>{
   if(!selected||draft===selected.text)return;
   const handle=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue='';};
@@ -293,7 +293,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
    const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision);
    onSessionWordDraftChange?.(null);
    onVerifiedSave?.({original:selected.text,text:draft.trim()});
-   setSelected(null);setConfirmed(false);setSaved(true);
+   setSelected(null);setConfirmed(false);setInlineVisualEditor(null);setSaved(true);
    setRevision(result.revision);setTotalRevisions(result.total_revisions);
    setRefresh(n=>n+1);setMessage('已检查版式并保存第 '+result.revision+' 次修改。原始 Word 保持不变。');
   }catch(error){setMessage(error instanceof Error?error.message:'没有保存，请缩短文字后重试。');}
@@ -306,7 +306,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   rememberPosition();setBusy(true);setMessage('');
   try{
    const result=await shiftOriginalWordRevision(resume.id,action,revision);
-   onSessionWordDraftChange?.(null);setSelected(null);setConfirmed(false);
+   onSessionWordDraftChange?.(null);setSelected(null);setConfirmed(false);setInlineVisualEditor(null);setActiveVisualId(null);
    onVersionMoved?.();
    setRevision(result.revision);setTotalRevisions(result.total_revisions);
    setSaved(result.saved);setRefresh(n=>n+1);
