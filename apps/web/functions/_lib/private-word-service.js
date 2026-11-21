@@ -79,3 +79,16 @@ export async function wordRequest(env,action,{original,edited,oldText,newText,fe
   throw Error('WORD_LAYOUT_NOT_VERIFIED');
  return report;
 }
+
+/** Lightweight DOCX-preserving edits on Cloudflare's existing Functions/R2.
+ * No LibreOffice process, public document URL, or renderer credentials needed.
+ * Production remains off until explicitly enabled by the operator.
+ */
+export const docxOnlyConfigured=env=>
+ env?.HHBA_WORD_DOCX_ONLY_ENABLED==='1'&&
+ (env?.HHBA_AUTH_ROLLOUT==='preview'||env?.HHBA_MATCH_RUNTIME_MODE==='production')&&
+ typeof env?.HHBA_MATCH_LIMIT_PEPPER==='string'&&
+ env.HHBA_MATCH_LIMIT_PEPPER.length>=24&&
+ typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function'&&
+ typeof env?.HHBA_PRIVATE_RESUMES?.get==='function'&&
+ typeof env?.HHBA_PRIVATE_RESUMES?.put==='function';
