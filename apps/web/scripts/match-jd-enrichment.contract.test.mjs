@@ -116,6 +116,50 @@ test('a different job title or a different Mainland city cannot borrow another J
  assert.equal(scoreVerifiedJDSearchJob({...job(),title:'软件开发工程师'},archive(),resume),null);
  assert.equal(scoreVerifiedJDSearchJob({...job(),location:'北京'},archive(),resume),null);
 });
+test('the second confirmed 410 suppresses a CLOSED job in this SAME Search response',async()=>{
+ const hours=60*60*1000,now=new Date();
+ const ago=new Date(now.getTime()-7*hours).toISOString();
+ let row={
+  canonical_url:URL,proof_method:'PUBLIC_EMPLOYER_ATS_V1',
+  status:'RECHECK',last_active_at:new Date(now.getTime()-3*24*hours).toISOString(),
+  last_checked_at:ago,first_gone_at:ago,last_gone_at:ago,
+  gone_count:1,closed_at:null,uncertain_count:0,
+  next_check_at:new Date(now.getTime()-hours).toISOString(),updated_at:ago
+ };
+ const db={
+  prepare(sql){let args=[];const stmt={
+   bind(...x){args=x;return stmt},
+   async all(){
+    if(sql.includes('sqlite_master'))return {results:[
+     {name:'hhba_jd_posting_lifecycle'},{name:'hhba_jd_retention_audit'}]};
+    throw Error('Unexpected query: '+sql);
+   },
+   async first(){if(sql.includes('FROM hhba_jd_posting_lifecycle'))return row;
+    throw Error('Unexpected query: '+sql)},
+   async run(){
+    if(!sql.startsWith('INSERT INTO hhba_jd_posting_lifecycle'))throw Error(sql);
+    const [canonical_url,proof_method,status,last_active_at,last_checked_at,next_check_at,
+      first_gone_at,last_gone_at,gone_count,closed_at,uncertain_count,last_reason,updated_at]=args;
+    row={canonical_url,proof_method,status,last_active_at,last_checked_at,next_check_at,
+     first_gone_at,last_gone_at,gone_count,closed_at,uncertain_count,last_reason,updated_at};
+    return {success:true,meta:{changes:1}};
+   }
+  };return stmt}
+ };
+ const live={...env,HHBA_JOB_JD_DB:db};
+ const errors=[];
+ const result=await enrichSearchMatchesWithJD(live,[job()],resume,{role_hint:'区域运营经理'},{
+  ready:async()=>true,getCached:async()=>null,
+  fetchAts:async()=>{
+   errors.push('attempted');
+   throw Object.assign(new Error('removed from official ATS'),{httpStatus:410});
+  }
+ });
+ assert.equal(errors.length,1);
+ assert.equal(row.status,'CLOSED');
+ assert.equal(result.diagnostic.closed,1);
+ assert.equal(result.matches.length,0,'closed job must not leak into same response');
+});
 test('missing documented qualifications yield NO made-up JD score',()=>{
  const result=scoreVerifiedJDSearchJob(job(),archive(),'没有工作经验或相关技能。',{role_hint:'区域运营经理'});
  assert.equal(result.jd_version_id,ID);
