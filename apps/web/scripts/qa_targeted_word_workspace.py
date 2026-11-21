@@ -137,6 +137,15 @@ def exercise(browser,name,viewport):
     # controls, not merely stored in an unavailable bottom list.
     siri=page.get_by_role('button',name='查看此处文字操作')
     siri.first.wait_for(state='visible',timeout=18000)
+    assert page.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count()==0,(
+        name,'entire Word workspace glows; only changed text may have Siri colors')
+    text_siri=page.locator('.hhba-original-resume-anchor.has-ai-preview .hhba-word-ai-changed')
+    assert text_siri.count()>0,(name,'missing actual colorful suggestion glyphs')
+    # A successful AI generation should not add an extra status panel
+    # beneath the deliberately minimal bottom toolbar.
+    success_message=page.locator('.hhba-word-minimal-message:not(.is-error)')
+    if success_message.count():
+        assert success_message.evaluate('(el)=>getComputedStyle(el).clipPath')=='inset(50%)'
     page.screenshot(path=str(OUT/f'{name}-siri-in-word.png'),animations='disabled')
     siri.first.click(timeout=12000)
     action_group=page.get_by_role('group',name='当前彩虹文字操作')
