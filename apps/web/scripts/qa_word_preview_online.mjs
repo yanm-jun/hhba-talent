@@ -11,8 +11,16 @@ const tests=[
  ['/candidate/match','page']
 ];
 const output=async(path)=>{
- const response=await fetch(base+path,{method:'GET',redirect:'manual',
+ const isPublicRoute=path==='/candidate/match';
+ const response=await fetch(base+path,{method:'GET',
+  redirect:isPublicRoute?'follow':'manual',
   cache:'no-store',signal:AbortSignal.timeout(15000)});
+ if(isPublicRoute){
+  const final=new URL(response.url);
+  assert.equal(final.origin,new URL(base).origin,'SPA must not leave the preview origin');
+  assert.ok(final.pathname.startsWith('/candidate/match'),
+   'SPA must remain on the candidate matcher route');
+ }
  const type=response.headers.get('content-type')||'';
  const bytes=path.includes('vendor')?new Uint8Array(await response.arrayBuffer()):null;
  return {status:response.status,type,
