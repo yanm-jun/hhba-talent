@@ -10,6 +10,7 @@ import type {PrivateResume} from '../src/services/privateResumes';
 
 const nativeWord=new URLSearchParams(location.search).has('word');
 const scoringFixture=new URLSearchParams(location.search).has('score');
+const multipleJobsQA=new URLSearchParams(location.search).has('jobs');
 const fullWriterQA=new URLSearchParams(location.search).has('full');
 const agentLoopQA=new URLSearchParams(location.search).has('agent');
 const long=new URLSearchParams(location.search).has('long');
@@ -30,6 +31,10 @@ const mockJob={
  recruitment_source_kind:'EMPLOYER_DOMAIN_CANDIDATE' as const,
  availability_status:'UNKNOWN' as const,recommendation_reason:'示例推荐，不代表真实招聘'
 };
+const secondMockJob={...mockJob,id:'qa-second-independent-job-2',
+ company:'另一家虚构测试企业',title:'客户服务管理',title_zh:'客户服务管理',
+ official_url:'https://example.test/jobs/qa-second',
+ requirements_basis:'需要客户服务沟通和信息核实'};
 const profile={
  education:null,education_evidence:null,experience_years:null,experience_evidence:null,
  skills:[],target_roles:['门店运营'],warnings:[]
@@ -38,8 +43,15 @@ const nativeResume:PrivateResume={id:'11111111-2222-4333-8444-555555555555',
  name:'虚构原样式简历.docx',
  type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
  size:2048,createdAt:'2026-11-20T00:00:00Z'};
-const wordRevisions=['ORIGINAL WORD RESUME'];
-let wordRevision=0;
+// Same synthetic resume, different revision branches for every job.
+type MockWordState={history:string[];revision:number};
+const wordStates=new Map<string,MockWordState>();
+function wordState(jobId?:string):MockWordState{
+ const scope=jobId===undefined?'_vault_unscoped':jobId;
+ let state=wordStates.get(scope);
+ if(!state){state={history:['ORIGINAL WORD RESUME'],revision:0};wordStates.set(scope,state);}
+ return state;
+}
 function pdfFor(text:string){
  const stream='BT /F1 18 Tf 45 760 Td ('+text.replace(/[()\\]/g,'')+') Tj ET';
  const parts=[
@@ -55,7 +67,7 @@ function pdfFor(text:string){
  for(const start of offsets.slice(1))out+=String(start).padStart(10,'0')+' 00000 n \n';
  return new TextEncoder().encode(out+'trailer\n<< /Root 1 0 R /Size 6 >>\nstartxref\n'+pointer+'\n%%EOF');
 }
-const result:MatchResponse={status:'COMPLETE',profile,matches:[mockJob],
+const result:MatchResponse={status:'COMPLETE',profile,matches:multipleJobsQA?[mockJob,secondMockJob]:[mockJob],
  matched_official_jobs:0,source:'qa-fixture',scoring:'test-only',privacy:'synthetic',
  disclaimer:'自动化测试用假公司和假岗位，绝不用于实际投递'};
 if(import.meta.env.PROD)throw new Error('QA fixture must never be used in production');
@@ -70,30 +82,42 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
  const u=new URL(url,location.origin),method=init?.method||'GET';
  if(u.pathname==='/api/resume-word'&&nativeWord){
   const action=u.searchParams.get('action');
+  if(action==='status')return respond({ok:true,enabled:true});
+  const payload=method==='POST'?JSON.parse(String(init?.body||'{}')):null;
+  const jobId=method==='POST'?payload?.job_id:
+   u.searchParams.get('job_id')||undefined;
+  const state=wordState(jobId);
+  const wordRevisions=state.history,wordRevision=state.revision;
   if(method==='POST'){
-   const payload=JSON.parse(String(init?.body||'{}'));
    if(payload.expected_revision!==wordRevision)
     return respond({ok:false,error:'WORD_REVISION_CONFLICT'},409);
    if(payload.action==='edit'){
     if(payload.original!==wordRevisions[wordRevision])
      return respond({ok:false,error:'WORD_EDIT_AMBIGUOUS'},422);
-    wordRevisions.splice(wordRevision+1);wordRevisions.push(payload.text);wordRevision++;
-   }else wordRevision+=payload.action==='undo'?-1:1;
-   return respond({ok:true,saved:wordRevision>0,revision:wordRevision,
+    wordRevisions.splice(wordRevision+1);wordRevisions.push(payload.text);
+    state.revision++;
+   }else{
+    const next=wordRevision+(payload.action==='undo'?-1:1);
+    if(next<0||next>=wordRevisions.length)
+     return respond({ok:false,error:'WORD_REVISION_CONFLICT'},409);
+    state.revision=next;
+   }
+   return respond({ok:true,saved:state.revision>0,revision:state.revision,
     total_revisions:wordRevisions.length-1,page_count:1});
   }
-  if(action==='status')return respond({ok:true,enabled:true});
-  if(action==='inspect')return respond({ok:true,revision:wordRevision,
+  if(action==='inspect')return respond({ok:true,revision:state.revision,
    total_revisions:wordRevisions.length-1,max_revisions:8,
-   editable_text:[wordRevisions[wordRevision]],
+   editable_text:[wordRevisions[state.revision]],
    history:wordRevisions.slice(1).map((text,i)=>({
     revision:i+1,original:wordRevisions[i],text,
     updated_at:'2026-11-20T00:00:00Z',page_count:1
    })),
-   saved:wordRevision?{original:wordRevisions[wordRevision-1],
-    text:wordRevisions[wordRevision],updated_at:'2026-11-20T00:00:00Z'}:null});
+   saved:state.revision?{original:wordRevisions[state.revision-1],
+    text:wordRevisions[state.revision],updated_at:'2026-11-20T00:00:00Z'}:null});
   if(action==='preview'||action==='edited-preview'||action==='download-pdf'){
-   const bytes=pdfFor(action==='preview'?wordRevisions[0]:wordRevisions[wordRevision]);
+   if(action!=='preview'&&state.revision===0)
+    return respond({ok:false,error:'WORD_NOT_EDITED'},404);
+   const bytes=pdfFor(action==='preview'?wordRevisions[0]:wordRevisions[state.revision]);
    return Promise.resolve(new Response(bytes,{status:200,
     headers:{'Content-Type':'application/pdf'}}));
   }
@@ -179,8 +203,9 @@ window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>{
   const body=JSON.parse(String(init?.body||'{}'));
   const oldText=body.before_blocks?.map((x:{text:string})=>x.text).join(' ');
   const savedText=body.after_blocks?.map((x:{text:string})=>x.text).join(' ');
-  if(oldText!=='ORIGINAL WORD RESUME'||savedText!==wordRevisions[wordRevision]||
-   wordRevision<1||!body.confirm_real||!body.consent_reassessment)
+  if(oldText!=='ORIGINAL WORD RESUME'||
+   savedText!==wordState(mockJob.id).history[wordState(mockJob.id).revision]||
+   wordState(mockJob.id).revision<1||!body.confirm_real||!body.consent_reassessment)
    return respond({error:'INVALID_REASSESSMENT_INPUT'},400);
   return respond({ok:true,kind:'HHBA_RESUME_REASSESS_V2',
    job_id:'lever-qa-synthetic',verified_job_title:'门店运营助理',
