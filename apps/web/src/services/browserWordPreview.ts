@@ -174,5 +174,8 @@ export function browserWordAnchors(mount:HTMLElement,editableText:string[]):Word
   result.push({id:'browser-word-'+result.length,text,page,
    bbox:[x,y,w,h],fontFamily:family.length<=100?family:undefined});
  }
- return result.slice(0,35);
+ // Include every uniquely verifiable text run, including content after the
+ // first screen and on later Word pages. No presentation-order truncation:
+ // later sections must not silently lose their edit buttons.
+ return result;
 }
