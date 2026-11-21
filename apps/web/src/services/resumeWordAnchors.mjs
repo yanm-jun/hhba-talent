@@ -30,5 +30,7 @@ export function matchWordAnchors({editableText,items,viewport,page,styles={}}){
  const result=[];
  for(const [text,matches] of seen)if(matches.length===1)
   result.push(matches[0]);
- return result.slice(0,35);
+ // The server already supplies the verified editable candidates; never
+ // discard later rows/pages because earlier labels exhausted a UI quota.
+ return result;
 }
