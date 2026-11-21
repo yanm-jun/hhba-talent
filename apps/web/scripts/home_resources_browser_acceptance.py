@@ -50,9 +50,9 @@ with sync_playwright() as playwright:
         assert section.locator(".hhba-home-distribution-values").count()==0
         assert section.locator(".hhba-home-phase-grid").count()==0
         pledge=section.locator(".hhba-home-pledge")
-        assert pledge.get_by_role("heading",name="透明，是我们做事的方式。").count()==1
-        assert pledge.locator('a[href="/transparency"]').count()==1
-        assert "不承诺固定金额或分配比例" in pledge.inner_text()
+        assert pledge.get_by_role("heading",name="每一份职业选择，都值得被认真守护。").count()==1
+        assert pledge.locator('a[href="/commitment"]').count()==1
+        assert "资金" not in pledge.inner_text()
         rects=[cards.nth(i).bounding_box() for i in range(2)]
         assert all(rects),f"{name}: missing card geometry"
         first,second=rects
@@ -73,6 +73,13 @@ with sync_playwright() as playwright:
         page.locator(".hhba-knowledge-search input").wait_for(timeout=20000)
         page.goto(BASE+"/rights/guide",wait_until="domcontentloaded")
         page.locator(".hhba-edition-cover").wait_for(timeout=20000)
+        page.goto(BASE+"/commitment",wait_until="domcontentloaded")
+        page.locator(".hhba-commitment-wall h1").wait_for(timeout=20000)
+        assert page.locator(".hhba-commitment-photo").count()==3
+        assert "40%" not in page.locator(".hhba-commitment-wall").inner_text()
+        overflow_wall=page.evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth+2")
+        assert overflow_wall,f"{name}: commitment wall has horizontal overflow"
+        page.screenshot(path=str(OUT/f"{name}-commitment-wall.png"),full_page=True,animations="disabled")
         context.close()
-        print(f"{name}: two real resource cards, compact pledge, public routes and responsive layout OK",flush=True)
+        print(f"{name}: two real resource cards, brand pledge, commitment wall, public routes and responsive layout OK",flush=True)
     browser.close()
