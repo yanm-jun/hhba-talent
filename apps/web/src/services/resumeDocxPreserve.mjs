@@ -15,9 +15,21 @@ const write32=(d,p,v)=>d.setUint32(p,v,true);
 const MAX_DOCX=3*1024*1024,MAX_XML=2*1024*1024,MAX_ENTRIES=1200;
 const textOnly=(s)=>typeof s==='string'&&s.length>1&&s.length<=300&&
  !/[\r\n\t\u0000-\u001f]/.test(s)&&s===s.trim();
+// The same lossless ZIP validation runs inside the browser and Workers Free.
+// A 256-entry lookup avoids an 8-round bitwise loop per source byte, which
+// matters under Cloudflare's strict per-request free CPU budget.
+const CRC_TABLE=(()=>{
+ const values=new Uint32Array(256);
+ for(let i=0;i<256;i++){
+  let c=i;
+  for(let n=0;n<8;n++)c=(c>>>1)^(c&1?0xEDB88320:0);
+  values[i]=c>>>0;
+ }
+ return values;
+})();
 function crc32(bytes){
  let c=0xFFFFFFFF;
- for(const x of bytes){c^=x;for(let j=0;j<8;j++)c=(c>>>1)^(c&1?0xEDB88320:0);}
+ for(const x of bytes)c=(c>>>8)^CRC_TABLE[(c^x)&255];
  return (c^0xFFFFFFFF)>>>0;
 }
 function u8(bytes){
