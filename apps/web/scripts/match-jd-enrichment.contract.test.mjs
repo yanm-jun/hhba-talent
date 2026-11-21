@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {enrichSearchMatchesWithJD,scoreVerifiedJDSearchJob,MATCH_JD_PIPELINE}
+import {enrichSearchMatchesWithJD,scoreVerifiedJDSearchJob,MATCH_JD_PIPELINE,matchJdEnrichmentEnabled}
  from '../functions/_lib/match-jd-enrichment.js';
 import {safeHistoryJobs} from '../functions/_lib/match-history.js';
 
@@ -38,6 +38,23 @@ test('disabled/default settings preserve provisional Search scores and never cal
  assert.equal(result.matches[0].jd_version_id,undefined);
  assert.equal(result.diagnostic.mode,'disabled');
  assert.equal(calls,0);
+});
+test('preview automatically enables verified-JD stage but production remains off without explicit switch',async()=>{
+ const preview={...env,HHBA_MATCH_JD_ENRICH_ENABLED:undefined,
+  HHBA_AUTH_ROLLOUT:'preview',HHBA_MATCH_SERVICE_ENABLED:'1'};
+ const production={...env,HHBA_MATCH_JD_ENRICH_ENABLED:undefined,
+  HHBA_AUTH_ROLLOUT:undefined,HHBA_MATCH_RUNTIME_MODE:'production'};
+ assert.equal(matchJdEnrichmentEnabled(preview),true);
+ assert.equal(matchJdEnrichmentEnabled(production),false);
+ assert.equal(matchJdEnrichmentEnabled({...preview,HHBA_MATCH_JD_ENRICH_ENABLED:'0'}),false);
+ const result=await enrichSearchMatchesWithJD(preview,[job()],resume,{role_hint:'区域运营经理'},{
+  ready:async()=>true,getCached:async()=>archive()});
+ assert.equal(result.diagnostic.mode,MATCH_JD_PIPELINE);
+ assert.equal(result.matches[0].jd_version_id,ID);
+ const untouched=await enrichSearchMatchesWithJD(production,[job()],resume,{},{
+  ready:async()=>{throw Error('must stay disabled')}});
+ assert.equal(untouched.matches[0].match_score,74);
+ assert.equal(untouched.matches[0].jd_version_id,undefined);
 });
 test('verified public JD replaces provisional score and pins immutable version for Word and history',async()=>{
  const result=await enrichSearchMatchesWithJD(env,[job()],resume,{role_hint:'区域运营经理'},{
