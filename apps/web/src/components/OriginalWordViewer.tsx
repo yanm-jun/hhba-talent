@@ -526,7 +526,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   </>}
   {ready==='available'&&!selected&&<div className="hhba-original-resume-mobile-dock" role="group" aria-label="手机端 Word 操作">
    {onOpenSuggestions&&<button type="button" onClick={onOpenSuggestions}>
-    <Sparkles size={15}/> AI 建议{pendingSuggestionCount?' '+pendingSuggestionCount:''}</button>}
+    <Sparkles size={15}/> 修改进度{pendingSuggestionCount?' '+pendingSuggestionCount:''}</button>}
    <button type="button" disabled={busy||loading||revision<=0}
     onClick={()=>void changeRevision('undo')}><Undo2 size={15}/> 撤销</button>
    <button type="button" disabled={busy||loading||revision>=totalRevisions}
