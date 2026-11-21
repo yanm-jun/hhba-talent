@@ -4,6 +4,7 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
+import {enrichSearchMatchesWithJD} from '../../_lib/match-jd-enrichment.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -123,20 +124,34 @@ function nativeResponsePayload(result){
    experience_evidence:null,skills:[],target_roles:[],warnings:[]},
   matches:result.matches,
   // Search and domain heuristics cannot independently verify official hiring ownership.
-  matched_official_jobs:0,
+  matched_official_jobs:result.matches.filter(job=>job.jd_source_status==='VERIFIED_JD').length,
   employer_source_candidates:result.matches.filter(job=>
    job.recruitment_source_kind==='EMPLOYER_DOMAIN_CANDIDATE'||
    job.recruitment_source_kind==='EMPLOYER_ATS').length,
   native_search:result.diagnostic,
   source:'DeepSeek Search 官方接口检索 + V4 Pro 简历匹配',
-  scoring:'AI 根据简历和招聘信息推荐；不代表录用概率',
+  scoring:'已核验的 JD 按 V2 规则评分；其余为搜索模型初评分或证据不足。不代表录用概率',
   privacy:'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
-  disclaimer:(result.incomplete?'本轮未达到10条或生成未完全结束，仅保留已找到的企业招聘入口。':'')+'严格不推荐第三方公开招聘平台；仅展示企业招聘站候选或企业专属招聘系统具体岗位。实际招聘归属、是否在招和投递资格仍须以企业官方公告为准。'
+  disclaimer:(result.incomplete?'本轮未达到10条或生成未完全结束，仅保留已找到的企业招聘入口。':'')+'仅展示企业招聘站候选或企业专属招聘系统具体岗位。存在 JD 版本时表示原文已核验，但 ATS 租户不等于法定企业名称；投递资格和是否仍在招以官网为准。'
  };
 }
 
 // The live Search-first model owns the job list. Only server-completed
 // matches may create durable personal history; clients cannot submit fake jobs.
+async function verifiedJdPass(env,result,resume,options,progress=()=>{}){
+ if(env?.HHBA_MATCH_JD_ENRICH_ENABLED!=='1')return result;
+ progress('reading');
+ try{
+  const checked=await enrichSearchMatchesWithJD(env,result.matches,resume,options);
+  return {...result,matches:checked.matches,
+   diagnostic:{...result.diagnostic,jd_verification:checked.diagnostic}};
+ }catch{
+  // JD indexing failures must not destroy a completed, still-provisional Search.
+  return {...result,diagnostic:{...result.diagnostic,
+   jd_verification:{mode:'failed',eligible:0,verified:0,scored:0,failed:0}}};
+ }
+}
+
 async function withSavedHistory(env,session,input,result){
  const response=nativeResponsePayload(result);
  try{
@@ -365,8 +380,10 @@ export async function onRequest({request,env}){
        options.role_hint,options.limit,{signal:abort.signal,onProgress:stage=>{
         phase=stage;send('progress',{stage});
        },onPartial:matches=>send('partial',{matches})});
-      console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
-      send('complete',await withSavedHistory(env,candidate,input,result));
+      const verified=await verifiedJdPass(env,result,redacted,options,stage=>send('progress',{stage}));
+      send('partial',{matches:verified.matches});
+      console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(verified.diagnostic));
+      send('complete',await withSavedHistory(env,candidate,input,verified));
      }catch(e){
       const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
       console.warn('HHBA_MATCH_NATIVE_ERROR',JSON.stringify({
@@ -391,8 +408,9 @@ export async function onRequest({request,env}){
  try{
   const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
    options.role_hint,options.limit);
-  console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
-  return json(await withSavedHistory(env,candidate,input,result));
+  const verified=await verifiedJdPass(env,result,redacted,options);
+  console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(verified.diagnostic));
+  return json(await withSavedHistory(env,candidate,input,verified));
  }catch(e){
   const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
   console.warn('HHBA_MATCH_NATIVE_ERROR',code);
