@@ -20,6 +20,7 @@ import {ResumePrintSheet} from './ResumePrintSheet';
 import {downloadResumeDocx} from '../services/resumeDocx';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
 import {officialJobVerifyStatus,verifyOfficialJob,type OfficialJobVerifyStatus,type OfficialVerifiedJob} from '../services/officialJobVerifyApi';
+import {jobJdArchiveStatus,ensureArchivedJobJd,type JdAwareJob} from '../services/jobJdArchive';
 import '../styles/targeted-resume-optimization.css';
 import '../styles/siri-edge.css';
 import '../styles/word-editor-minimal.css';
@@ -45,7 +46,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  // The current candidate's consented text is held only in this open tab.
  // No new public storage or automatic D1 writes for AI checkpoints.
  const wholeRunInput=useRef<{blocks:ResumeBlock[];
-  job:{title:string;requirements:string}}|null>(null);
+  job:JdAwareJob}|null>(null);
  const [revealedWholeCount,setRevealedWholeCount]=useState(0);
  useEffect(()=>{
   const count=wholeDraft?.blocks.length||0;
@@ -290,7 +291,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  }
  async function runWholeContinuation(
   initial:ResumeWholeRewriteResult,
-  input:{blocks:ResumeBlock[];job:{title:string;requirements:string}},
+  input:{blocks:ResumeBlock[];job:JdAwareJob},
   controller:AbortController
  ){
   let latest=initial;
@@ -330,6 +331,21 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    setWholeBusy(false);if(active.current===controller)active.current=null;
   }
  }
+ /**
+  * Both AI edit modes must use one server-backed official JD version whenever
+  * the shared archive is enabled. Failed official fetches do NOT silently
+  * become fabricated "full" JDs. Legacy environments retain existing
+  * summary-based behavior, explicitly labelled as incomplete evidence.
+  */
+ async function jobContextForAI(signal:AbortSignal):Promise<JdAwareJob>{
+  const title=(job.title_zh||job.title).slice(0,180);
+  if(!await jobJdArchiveStatus(signal))
+   return {title,requirements:fullJobRequirements,
+    official_url:job.official_url};
+  const official=await ensureArchivedJobJd(job.official_url,signal);
+  return {title:official.title,requirements:official.full_jd,
+   official_url:official.canonical_url,jd_version_id:official.job_id};
+ }
  async function generateWholeRewrite(answers:Record<string,string>={}){
   if(!consent||!sourceResume||!wholeSource.complete||
    !wholeSource.blocks.length||!wholeStatus?.enabled||
@@ -345,10 +361,9 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     const extra=answers[b.id]?.trim();
     return extra?{...b,text:b.text+'\n用户本人补充的事实（待核实）：'+extra}:b;
    });
-   const input={blocks:personalized,job:{
-    title:(job.title_zh||job.title).slice(0,180),
-    requirements:fullJobRequirements
-   }};
+   const trustedJob=await jobContextForAI(controller.signal);
+   if(controller.signal.aborted)return;
+   const input={blocks:personalized,job:trustedJob};
    wholeRunInput.current=input;
    const first=await requestWholeResumeRewrite(
     input.blocks,input.job,controller.signal);
@@ -380,8 +395,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   setOpenSuggestionId(null);setEditingSuggestionId(null);setSuggestionDrafts({});
   const controller=new AbortController();active.current=controller;
   try{
+   const trustedJob=await jobContextForAI(controller.signal);
+   if(controller.signal.aborted)return;
    const incoming=await requestResumeOptimization(currentBlocks,{
-    title:(job.title_zh||job.title).slice(0,120),requirements
+    ...trustedJob,title:trustedJob.title.slice(0,120),
+    requirements:trustedJob.requirements.slice(0,16000)
    },controller.signal);
    const unique=new Set<string>(),usedBlocks=new Set<string>();
    const accepted=incoming.filter(s=>{
@@ -391,7 +409,10 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    setSuggestions(accepted);
    setActiveSuggestionId(accepted[0]?.id||null);
    setOpenSuggestionId(accepted[0]?.id||null);
-   setNotice(accepted.length?'建议已生成。请逐条核实真实性，再选择填充。':'本次 AI 未发现可以可靠润色的内容。');
+   const sourceNote=trustedJob.jd_version_id?
+    '本次已依据企业官网核验的完整岗位 JD 生成建议。':
+    '当前尚未接入可核验的完整 JD，本次仅依据已保存的岗位信息生成建议。';
+   setNotice((accepted.length?'建议已生成。请逐条核实真实性，再选择填充。':'本次 AI 未发现可以可靠润色的内容。')+sourceNote);
   }catch(error){
    if(controller.signal.aborted)return;
    setNotice(error instanceof Error?error.message:'AI 润色暂时不可用。');

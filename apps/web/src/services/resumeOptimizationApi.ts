@@ -1,4 +1,5 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
+import type {JdAwareJob} from './jobJdArchive';
 import type {ResumeBlock,ResumeSuggestion} from './targetedResumeOptimization';
 
 export type ResumeOptimizationStatus={
@@ -15,6 +16,11 @@ const OPTIMIZATION_ERRORS:Record<string,string>={
   RESUME_OPTIMIZATION_ATTEMPT_LIMIT:'今天的 AI 润色尝试次数已达安全上限，请明天再试。',
   AI_PROVIDER_NOT_CONFIGURED:'后台尚未配置简历润色 AI 模型。',
   INVALID_OPTIMIZATION_INPUT:'简历证据不完整，请先完成简历解析。',
+  JD_VERIFIED_VERSION_REQUIRED:'当前岗位尚未取得核验过的完整 JD，不能进行严格定向优化。',
+  JD_VERSION_NOT_AVAILABLE:'岗位 JD 档案读取失败，请重新获取该岗位的官方 JD。',
+  JD_VERSION_STALE:'岗位 JD 需要重新核验，未按过期资料改写简历。',
+  JD_JOB_IDENTITY_MISMATCH:'岗位和 JD 版本不一致，已阻止错误的改写。',
+
   AI_OPTIMIZATION_UNAVAILABLE:'AI 润色暂时失败，未修改简历。',
   AI_PROVIDER_KEY_REJECTED:'AI 服务密钥未通过平台验证，请管理员核对 Preview 配置。',
   AI_PROVIDER_BALANCE_INSUFFICIENT:'AI 服务账户余额不足，尚未取得润色建议。',
@@ -46,7 +52,7 @@ export async function getResumeOptimizationStatus(signal?:AbortSignal):Promise<R
  }catch{return null;}
 }
 export async function requestResumeOptimization(blocks:ResumeBlock[],
- job:{title:string;requirements:string},signal?:AbortSignal):Promise<ResumeSuggestion[]>{
+ job:JdAwareJob,signal?:AbortSignal):Promise<ResumeSuggestion[]>{
  if(!realAuthReady)throw new ResumeOptimizationError('RESUME_OPTIMIZATION_NOT_ENABLED',503);
  const token=getRealAuthToken();
  if(!token)throw new ResumeOptimizationError('SESSION_INVALID',401);

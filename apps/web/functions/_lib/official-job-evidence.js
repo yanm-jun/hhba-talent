@@ -29,6 +29,38 @@ function htmlToText(html){
  return stripped.replace(/\r/g,'').replace(/[ \t]+/g,' ').replace(/\n[ \t]+/g,'\n')
   .replace(/\n{3,}/g,'\n\n').slice(0,100000);
 }
+/**
+ * Preserve employer-published JD paragraphs and section boundaries, not a
+ * model-written summary. Never claim that a truncated page is complete.
+ * HTML/text extraction is still best effort; only source-backed sections
+ * pass into the shared archive.
+ */
+export function extractOfficialJdSections(plain){
+ if(typeof plain!=='string'||plain.length<150)return null;
+ const duty=/^(?:岗位职责|工作职责|职位职责|主要职责|工作内容|岗位描述|职位描述)[：:\s]*/;
+ const req=/^(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求|职责要求)[：:\s]*/;
+ const footer=/^(?:立即申请|立即投递|投递简历|申请职位|相关职位|推荐岗位|更多职位|企业简介|友情链接|隐私政策|联系我们)\s*$/;
+ const lines=plain.split('\n').map(x=>x.replace(/[\t\u0000]+/g,' ')
+  .replace(/ +/g,' ').trim()).filter(Boolean);
+ const start=lines.findIndex(x=>duty.test(x));
+ if(start<0||!lines.slice(start+1).some(x=>req.test(x)))return null;
+ const blocks=[];let kind='other',seenDuty=false,seenReq=false;
+ for(const line of lines.slice(start)){
+  if(footer.test(line))break;
+  if(duty.test(line)){kind='responsibilities';seenDuty=true;}
+  else if(req.test(line)){kind='requirements';seenReq=true;}
+  if(kind==='other')continue;
+  if(line.length<3||line.length>4000)continue;
+  // Guard against scraping navigation/footer rather than a single vacancy.
+  if(blocks.length>=120)break;
+  blocks.push({id:'JD-'+String(blocks.length+1).padStart(3,'0'),kind,text:line});
+ }
+ if(!seenDuty||!seenReq||blocks.length<4)return null;
+ const full_jd=blocks.map(b=>b.text).join('\n');
+ if(full_jd.length<100||full_jd.length>24000)return null;
+ return {full_jd,sections:blocks,content_status:'VERIFIED_SECTIONS'};
+}
+
 async function readLimited(response){
  const declared=response.headers.get('Content-Length');
  if(declared!==null&&(!/^\d+$/.test(declared)||Number(declared)>MAX_RESPONSE))throw Error('OFFICIAL_PAGE_TOO_LARGE');
@@ -58,12 +90,14 @@ export async function directOfficialJobEvidence(url,{fetcher=fetch,now=new Date(
  if(!item||item.official_url!==locator.url||item.company!==locator.company||
   item.source_status!=='OFFICIAL_DETAIL_FETCHED')throw Error('OFFICIAL_JD_NOT_VERIFIED');
  const requirements=item.evidence?.requirement;
+ const fullJD=extractOfficialJdSections(plain);
  if(typeof requirements!=='string'||requirements.length<25)throw Error('OFFICIAL_JD_NOT_VERIFIED');
  const checked_at=new Date(now).toISOString();
  const id='verified-official-'+(await sha256Hex(locator.url)).slice(0,32);
  const jd_hash=await sha256Hex([locator.url,item.title,item.location,requirements].join('\n'));
  return {id,canonical_url:locator.url,company:item.company,title:item.title,
-  location:item.location,requirements,jd_hash,proof_method:OFFICIAL_EVIDENCE_VERSION,checked_at};
+  location:item.location,requirements,jd_hash,proof_method:OFFICIAL_EVIDENCE_VERSION,checked_at,
+  ...(fullJD||{})};
 }
 export async function validatedCachedOfficialJob(row,now=Date.now()){
  if(!row||typeof row!=='object'||row.proof_method!==OFFICIAL_EVIDENCE_VERSION)return null;

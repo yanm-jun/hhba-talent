@@ -1,0 +1,40 @@
+name: HHBA JD archive evidence and model integration
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/hhba-jd-archive.yml'
+      - 'apps/web/d1/0027_job_jd_archive.sql'
+      - 'apps/web/functions/_lib/job-jd-archive.js'
+      - 'apps/web/functions/_lib/official-job-evidence.js'
+      - 'apps/web/functions/api/job-jd.js'
+      - 'apps/web/functions/api/resume-optimize.js'
+      - 'apps/web/functions/api/resume-rewrite.js'
+      - 'apps/web/functions/api/resume-rewrite-step.js'
+      - 'apps/web/src/services/jobJdArchive.ts'
+      - 'apps/web/src/services/resumeOptimizationApi.ts'
+      - 'apps/web/src/services/resumeWholeRewriteApi.ts'
+      - 'apps/web/src/components/TargetedResumeOptimization.tsx'
+      - 'apps/web/scripts/job-jd-archive.contract.test.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-contract-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Verify JD archive and mock R2/D1 integrity
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          node --test scripts/job-jd-archive.contract.test.mjs
+          node --test scripts/official-jd-extraction.route.test.mjs || test ! -f scripts/official-jd-extraction.route.test.mjs
+      - name: Full frontend TypeScript and Vite build
+        working-directory: apps/web
+        run: npm run build

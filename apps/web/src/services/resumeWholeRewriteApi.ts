@@ -1,4 +1,5 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
+import type {JdAwareJob} from './jobJdArchive';
 import type {ResumeBlock} from './targetedResumeOptimization';
 
 export type ResumeWholeRewriteBlock={
@@ -28,6 +29,11 @@ export type ResumeWholeRewriteStatus={
 };
 const errorMessage:Record<string,string>={
  INVALID_REWRITE_INPUT:'简历或岗位资料不完整。为避免遗漏，我们没有生成不完整的改写稿。',
+ JD_VERIFIED_VERSION_REQUIRED:'未取得核验过的完整 JD，不能进行严格的岗位定向简历重写。',
+ JD_VERSION_NOT_AVAILABLE:'官方 JD 档案暂时无法取回，原始 Word 未修改。',
+ JD_VERSION_STALE:'岗位 JD 已过期，请重新核验后继续。',
+ JD_JOB_IDENTITY_MISMATCH:'岗位与 JD 版本不一致，已停止生成。',
+
  AI_CONSENT_REQUIRED:'请先同意将简历证据发送至所选 AI 服务。',
  SESSION_INVALID:'登录已失效，请重新登录。',
  FORBIDDEN:'当前账号无权使用简历重写。',
@@ -62,7 +68,7 @@ export async function getWholeRewriteStatus(signal?:AbortSignal):Promise<ResumeW
  }catch{return null;}
 }
 export async function requestWholeResumeRewrite(blocks:ResumeBlock[],
- job:{title:string;requirements:string},signal?:AbortSignal):Promise<ResumeWholeRewriteResult>{
+ job:JdAwareJob,signal?:AbortSignal):Promise<ResumeWholeRewriteResult>{
  if(!realAuthReady)throw new WholeRewriteError('RESUME_REWRITE_NOT_ENABLED',503);
  const token=getRealAuthToken();
  if(!token)throw new WholeRewriteError('SESSION_INVALID',401);
@@ -87,7 +93,7 @@ export async function requestWholeResumeRewrite(blocks:ResumeBlock[],
 /** The model selects one tool per call; keep state only in the in-memory draft.
  * Signed checkpoint prevents a modified draft from inheriting verification. */
 export async function continueWholeResumeRewrite(
- blocks:ResumeBlock[],job:{title:string;requirements:string},
+ blocks:ResumeBlock[],job:JdAwareJob,
  draft:ResumeWholeRewriteResult,signal?:AbortSignal
 ):Promise<ResumeWholeRewriteResult>{
  const checkpoint=draft.continuation?.checkpoint;
