@@ -70,7 +70,8 @@ export function browserWordAnchors(mount:HTMLElement,editableText:string[]):Word
   if([x,y,w,h].some(v=>!Number.isFinite(v))||x<0||y<0||w<4||h<2||
    x+w>1000.5||y+h>1000.5)continue;
   const family=getComputedStyle(node).fontFamily;
-  result.push({id:'browser-word-'+result.length,text,page:1,
+  const page=Math.max(1,pages.indexOf(node.closest('section.hhba-native-docx') as HTMLElement)+1);
+  result.push({id:'browser-word-'+result.length,text,page,
    bbox:[x,y,w,h],fontFamily:family.length<=100?family:undefined});
  }
  return result.slice(0,35);
