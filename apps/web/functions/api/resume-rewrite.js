@@ -4,6 +4,7 @@
 // and authenticated access remain mandatory before any production rollout.
 import {generateTailoredResume,REWRITE_KIND,completeJson,validateAuthoring,numberTokens,redacted} from '../_lib/resume-rewrite-provider.js';
 import {selectProvider} from '../_lib/resume-ai-provider.js';
+import {hydrateVerifiedJobRequirements} from '../_lib/job-jd-archive.js';
 import {runResumeEditorialAgent} from '../_lib/resume-rewrite-agent.js';
 import {issueCheckpoint} from '../_lib/resume-rewrite-checkpoint.js';
 import {responseJson as json,rejectJson as reject,rewriteActive as active,
@@ -32,12 +33,15 @@ export async function onRequestPost({request,env}){
  try{body=await boundedJson(request);}
  catch{return reject('INVALID_REQUEST',400);}
  if(body?.consent_ai!==true)return reject('AI_CONSENT_REQUIRED',400);
+ let trustedJob;
+ try{trustedJob=await hydrateVerifiedJobRequirements(env,body.job);}
+ catch(e){return reject(String(e?.message||'JD_VERSION_NOT_AVAILABLE'),409)}
  try{
   // All requests remain explicit-consent, candidate-only and local to this
   // draft. The model may choose further editorial tools, not privileged I/O.
   const signal=AbortSignal.timeout(150000);
   const base=await generateTailoredResume({
-   env,blocks:body.blocks,job:body.job,signal
+   env,blocks:body.blocks,job:trustedJob,signal
   });
   if(env?.HHBA_RESUME_AGENT_ENABLED==='0')return json(base);
   const author=selectProvider(env,'resume_rewrite');
@@ -50,13 +54,13 @@ export async function onRequestPost({request,env}){
    const resumable=rewriteContinuationActive(env);
    const agentEnv=resumable?{...env,HHBA_RESUME_AGENT_MAX_PASSES:'1'}:env;
    const autonomous=await runResumeEditorialAgent({
-    draft:base,blocks:body.blocks,job:body.job,env:agentEnv,
+    draft:base,blocks:body.blocks,job:trustedJob,env:agentEnv,
     provider:author,reviewer,
     completeJson,validateAuthoring,numberTokens,redacted,signal
    });
    if(resumable&&autonomous.autonomy?.needs_more_work){
     const token=await issueCheckpoint({env,account,blocks:body.blocks,
-     job:body.job,draft:autonomous});
+     job:trustedJob,draft:autonomous});
     return json({...autonomous,continuation:{enabled:true,checkpoint:token}});
    }
    return json(autonomous);
