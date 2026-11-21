@@ -11,6 +11,9 @@ export type HistoryMatchedJob={
  match_score:number|null;score_basis:string;recommendation_reason:string;
  availability_status:'OPEN_LISTED'|'UNKNOWN';
  recruitment_source_kind:string;recruitment_source_note:string;
+ jd_version_id?:string;jd_sha256?:string;jd_checked_at?:string;
+ jd_source_status?:'VERIFIED_JD';jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
+ jd_proof_method?:'PUBLIC_EMPLOYER_ATS_V1'|'DIRECT_EMPLOYER_HTML_V1'|null;
 };
 export type MatchHistoryDetail=MatchHistorySummary&{matches:HistoryMatchedJob[]};
 const api='/api/match-history';
