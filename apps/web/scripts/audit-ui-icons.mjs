@@ -28,7 +28,7 @@ const checks = [
   ['inlineSvg', /<svg\b/gi],
   ['svgFile', /\.(?:svg)(?=['"?#)\s])/gi],
   ['emojiCandidate', /\p{Extended_Pictographic}/gu],
-  ['symbolCandidate', /[⌄⌕▦→←↗↘×✓✕✦]/g],
+  ['symbolCandidate', /[⌄⌕▦→←↗↘×✓✕✦＋－]/g],
   ['iconFont', /\b(?:iconfont|material-icons|fa-[a-z0-9-]+)\b/gi],
   ['cssSvg', /data:image\/svg\+xml/gi],
 ];

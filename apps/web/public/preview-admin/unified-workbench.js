@@ -63,7 +63,14 @@ function addNav(open){
   sidebar.insertBefore(caption,firstSecondary);
   for(const [key,label] of group.items){
    const node=document.createElement('button');node.type='button';node.className='nav-link';
-   node.dataset.view=key;node.append(text('span','uw-nav-marker','▦'),document.createTextNode(' '+label));
+   const marker=document.createElementNS('http://www.w3.org/2000/svg','svg');
+   marker.setAttribute('viewBox','0 0 24 24');
+   marker.setAttribute('aria-hidden','true');
+   marker.classList.add('uw-nav-marker');
+   const shape=document.createElementNS('http://www.w3.org/2000/svg','path');
+   shape.setAttribute('d','M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z');
+   marker.append(shape);
+   node.dataset.view=key;node.append(marker,document.createTextNode(' '+label));
    sidebar.insertBefore(node,firstSecondary);
    // Existing dashboard.js handles all .nav-link clicks consistently.
   }
