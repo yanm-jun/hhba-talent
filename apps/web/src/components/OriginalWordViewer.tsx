@@ -219,20 +219,32 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     const result=await task.promise;
     if(!active){await task.destroy();return;}
     const counts=new Map<string,number>();
+    // PDF.js may normalize full-width Chinese punctuation. Match in the
+    // normalized domain on both sides but never substitute PDF text for the
+    // exact original Word run sent to the document-saving API.
+    const originalsByKey=new Map<string,string[]>();
+    for(const original of info.editable_text||[]){
+     const key=original.normalize('NFKC').trim();
+     originalsByKey.set(key,[...(originalsByKey.get(key)||[]),original]);
+    }
+    const candidateKeys=new Set([...originalsByKey]
+     .filter(([,originals])=>originals.length===1).map(([key])=>key));
     if(result.numPages<=20){
-     const candidates=new Set(info.editable_text||[]);
      for(let current=1;current<=result.numPages;current++){
       const content=await (await result.getPage(current))
        .getTextContent({includeMarkedContent:false});
       for(const item of content.items){
        if(typeof (item as any).str!=='string')continue;
        const label=String((item as any).str).normalize('NFKC').trim();
-       if(candidates.has(label))counts.set(label,(counts.get(label)||0)+1);
+       if(candidateKeys.has(label))counts.set(label,(counts.get(label)||0)+1);
       }
      }
     }
     if(!active)return;
-    const stableText=(info.editable_text||[]).filter(t=>counts.get(t)===1);
+    const stableText=(info.editable_text||[]).filter(t=>{
+     const key=t.normalize('NFKC').trim();
+     return candidateKeys.has(key)&&counts.get(key)===1;
+    });
     setEditable(stableText);
     onEditableSegments?.(stableText);
     doc.current=result;setCount(result.numPages);
