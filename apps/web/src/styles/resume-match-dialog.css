@@ -229,3 +229,8 @@
   padding:5px 2px 8px;margin-bottom:8px;
  }
 }
+
+
+/* The editor already has a top-left '返回匹配结果'. The duplicate persistent
+   footer consumes ~70px of the visible Word page and resembles an overlay. */
+.hhba-match-modal-editor .hhba-match-modal-foot{display:none!important}
