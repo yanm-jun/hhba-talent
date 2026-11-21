@@ -59,7 +59,7 @@ test('browser Word rejects ambiguous repeated content even after item 35',()=>{
 
 test('renderer/PDF mode also keeps 72 uniquely positioned runs',()=>{
  const items=text.map((str,i)=>({
-  str,transform:[1,0,0,1,110,2700-i*29],width:460,height:16,fontName:'F1'
+  str,transform:[1,0,0,1,110,2700-i*29],width:460,height:24,fontName:'F1'
  }));
  const viewport={width:820,height:3000,transform:[1,0,0,1,0,0],
   convertToViewportPoint:(x,y)=>[x,3000-y]};
