@@ -674,6 +674,7 @@
 .hhba-original-word-viewer .hhba-word-siri-anchor-shell.is-open .hhba-word-siri-inline-actions{
  opacity:1;visibility:visible;pointer-events:auto;transform:none;
 }
+.hhba-original-word-viewer .hhba-word-siri-anchor-shell.is-editing .hhba-word-siri-inline-actions{display:none}
 .hhba-original-word-viewer .hhba-word-siri-inline-actions button{
  display:inline-flex;align-items:center;justify-content:center;gap:4px;
  background:#fff;color:#3a5b71;border:0;border-radius:7px;
