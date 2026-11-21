@@ -24,7 +24,12 @@ export type MatchedJob = {
   professional_credential_requirements?:string[];
   professional_credential_review?:{kind:string;likely_credential:string;warning:string}|null;
   score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
-  recommendation_reason?:string;source_status?:'MODEL_SEARCH_REPORTED';
+  recommendation_reason?:string;source_status?:'MODEL_SEARCH_REPORTED'|'OFFICIAL_JD_VERIFIED';
+  jd_version_id?:string;jd_sha256?:string;jd_checked_at?:string;
+  jd_proof_method?:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1';
+  jd_source_status?:'VERIFIED_JD';
+  jd_employer_identity_status?:'ATS_TENANT_NOT_LEGAL_ENTITY_VERIFIED'|'DIRECT_EMPLOYER_SOURCE';
+  jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
   match_score?:number|null;score_basis?:string;
   availability_status?:'OPEN_LISTED'|'CLOSED_LISTED'|'POSSIBLY_CLOSED'|'UNKNOWN';
   availability_note?:string;availability_checked_at?:string|null;
