@@ -65,6 +65,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [suggestions,setSuggestions]=useState<ResumeSuggestion[]>([]);
  const [ignored,setIgnored]=useState<string[]>([]);
  const [resolvedWordVisualIds,setResolvedWordVisualIds]=useState<string[]>([]);
+ const [editedWordVisualIds,setEditedWordVisualIds]=useState<string[]>([]);
  const [confirmed,setConfirmed]=useState<string[]>([]);
  const [newEvidence,setNewEvidence]=useState<Record<string,string>>({});
  const [consent,setConsent]=useState(false);
@@ -276,7 +277,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   invalidateScore();setVersion({id:item.id,targetJobId:job.id,blocks:item.version.blocks,
    acceptedSuggestionIds:item.version.acceptedSuggestionIds});
   setDetails(normalizeResumeDocumentDetails(item.version.details));setConfirmReal(false);
-  setSuggestions([]);setIgnored([]);setResolvedWordVisualIds([]);setConfirmed([]);setNewEvidence({});setOpenSuggestionId(null);
+  setSuggestions([]);setIgnored([]);setResolvedWordVisualIds([]);setEditedWordVisualIds([]);setConfirmed([]);setNewEvidence({});setOpenSuggestionId(null);
   setEditingSuggestionId(null);setSuggestionDrafts({});setUndoStack([]);setEditingBlock(null);
   setNotice('已载入 '+new Date(item.created_at).toLocaleString()+' 的简历版本；没有修改原始简历。');
  }
@@ -377,7 +378,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   // On mobile the AI drawer must release the document while the model works.
   // The real PDF remains visible during analysis and staged suggestion reveal.
   if(sourceResume)setMobileSuggestionsOpen(false);
-  setIgnored([]);setResolvedWordVisualIds([]);setConfirmed([]);setNewEvidence({});
+  setIgnored([]);setResolvedWordVisualIds([]);setEditedWordVisualIds([]);setConfirmed([]);setNewEvidence({});
   setOpenSuggestionId(null);setEditingSuggestionId(null);setSuggestionDrafts({});
   const controller=new AbortController();active.current=controller;
   try{
@@ -459,7 +460,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  }
  function reset(){
   active.current?.abort();setBusy(false);setVersion(initial());setSuggestions([]);invalidateScore();
-  setIgnored([]);setResolvedWordVisualIds([]);setConfirmed([]);setNewEvidence({});setConfirmReal(false);setEditingBlock(null);
+  setIgnored([]);setResolvedWordVisualIds([]);setEditedWordVisualIds([]);setConfirmed([]);setNewEvidence({});setConfirmReal(false);setEditingBlock(null);
   setOpenSuggestionId(null);setEditingSuggestionId(null);setSuggestionDrafts({});setUndoStack([]);
   setNotice('已恢复原稿。');
   try{if(draftKey)sessionStorage.removeItem(draftKey);}catch{}
@@ -593,8 +594,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   version.blocks,suggestionDrafts,wordRevisionSnapshot,wholeDraft,wholeApproved,
   revealedWholeCount]);
  const pendingSuggestions=suggestions.filter(s=>!ignored.includes(s.id)&&
-  !version.acceptedSuggestionIds.includes(s.id));
- const acceptedCount=suggestions.filter(s=>version.acceptedSuggestionIds.includes(s.id)).length;
+  !editedWordVisualIds.includes(s.id)&&!version.acceptedSuggestionIds.includes(s.id));
+ const acceptedCount=suggestions.filter(s=>version.acceptedSuggestionIds.includes(s.id)||editedWordVisualIds.includes(s.id)).length;
  const pendingTextChanges=version.blocks.some(block=>{
   const original=blocks.find(item=>item.id===block.id);
   if(!original||original.text===block.text)return false;
@@ -646,7 +647,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   setVersion({id:'draft-'+job.id,targetJobId:job.id,
    blocks:data.version.blocks,acceptedSuggestionIds:[]});
   setDetails(normalizeResumeDocumentDetails(data.details));
-  setSuggestions(reviewed);setIgnored([]);setResolvedWordVisualIds([]);setSuggestionDrafts(safeFields(data.suggestionDrafts,1600));
+  setSuggestions(reviewed);setIgnored([]);setResolvedWordVisualIds([]);setEditedWordVisualIds([]);setSuggestionDrafts(safeFields(data.suggestionDrafts,1600));
   setNewEvidence(safeFields(data.newEvidence,800));
   setConfirmed([]);setOpenSuggestionId(null);setActiveSuggestionId(null);
   setEditingSuggestionId(null);setUndoStack([]);setRecoverableDraft(null);
@@ -812,17 +813,33 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
        setEditingSuggestionId(null);setMobileSuggestionsOpen(true);
       }
      }}
-     onVisualSuggestionAction={(id,action)=>{
-      setResolvedWordVisualIds(prev=>prev.includes(id)?prev:[...prev,id]);
+     onVisualSuggestionAction={(id,action,newText)=>{
+      // OriginalWordViewer calls this only after a verified Word save
+      // (accept/edit), or after the candidate explicitly ignores a draft.
       if(id.startsWith('whole-')){
-       setNotice(action==='ignored'?'此处保留原文。':'该处 Word 已经过版式验证并保存。');
+       setResolvedWordVisualIds(prev=>prev.includes(id)?prev:[...prev,id]);
+       setNotice(action==='ignored'?'此处保留原文。':'该处 Word 已通过版式验证并保存。');
        return;
       }
       const item=suggestions.find(s=>s.id===id);
       if(!item)return;
+      setResolvedWordVisualIds(prev=>prev.includes(id)?prev:[...prev,id]);
       if(action==='ignored'){
        setIgnored(prev=>prev.includes(id)?prev:[...prev,id]);
        setNotice('已忽略此处改写，保留原文。');
+      }else if(action==='edited'){
+       const changed=(newText||'').trim();
+       // The server has already verified/saved the user's custom text.
+       // Never re-apply the earlier AI proposal over the handwritten edit.
+       if(changed){
+        setEditedWordVisualIds(prev=>prev.includes(id)?prev:[...prev,id]);
+        setVersion(prev=>{
+         try{return editResumeBlock(prev,item.blockId,changed);}
+         catch{return prev;}
+        });
+       }
+       setConfirmed(prev=>prev.includes(id)?prev:[...prev,id]);
+       setNotice('已按本人编辑的文字保存并核验原 Word 排版。');
       }else{
        const proposed=(suggestionDrafts[id]??item.proposed).trim();
        setVersion(prev=>{
@@ -964,20 +981,20 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      <summary>其他修改记录与详细核对（{suggestions.length}）</summary>
     <div className="targeted-resume-word-suggestion-list">
      {suggestions.slice(0,revealedSuggestionCount).map((item,i)=>{
-      const applied=version.acceptedSuggestionIds.includes(item.id);
+      const applied=version.acceptedSuggestionIds.includes(item.id)||editedWordVisualIds.includes(item.id);
       const rejected=ignored.includes(item.id);
       const active=activeSuggestionId===item.id;
       return <section key={item.id} className={'targeted-resume-word-suggestion'+(active?' is-active':'')}>
        <button type="button" className="targeted-resume-word-suggestion-title"
         aria-expanded={active} onClick={()=>{setActiveSuggestionId(active?null:item.id);setOpenSuggestionId(active?null:item.id);setEditingSuggestionId(null);}}>
         <span>{String(i+1).padStart(2,'0')} · {item.action==='request_evidence'?'需补充真实经历':'修改记录'}</span>
-        <small>{applied?'已确认':rejected?'保留原文':'待确认'}</small>
+        <small>{editedWordVisualIds.includes(item.id)?'已编辑保存':applied?'已采纳':rejected?'保留原文':'待确认'}</small>
        </button>
        {active&&<div className="targeted-resume-word-suggestion-detail">
         <p className="targeted-resume-word-original"><strong>原文：</strong>{item.original}</p>
         {!applied&&!rejected?renderSuggestionCard(item):
          <p className="targeted-resume-word-status">
-          {applied?'建议已确认。请在左侧找到对应原文，核对并保存到 Word。':
+          {applied?'已在原 Word 验证并保存此处文字。':
            '本条保留原文，不进行修改。'}
          </p>}
        </div>}
