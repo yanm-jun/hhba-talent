@@ -62,7 +62,7 @@ function mockEnv(){const db=new StubDB(),r2=new StubR2();
  return {HHBA_JOB_JD_ARCHIVE_ENABLED:'1',HHBA_JOB_JD_DB:db,HHBA_JOB_JD_R2:r2,db,r2};}
 
 test('official text keeps multiple source sections, not a one-line Search snippet',()=>{
- const htmlText='企业招聘中心公开招募区域运营经理，长期负责连锁门店运营管理和数据报告。平台将为候选人提供招聘信息，仅通过官网进行直接申请。\n区域运营经理\n工作地点：上海\n岗位职责\n1. 经营分析与区域门店目标拆解\n2. 客户服务和门店销售流程分析\n任职要求\n1. 熟悉区域门店日常运营管理经验\n2. 具备门店经营数据分析能力\n立即申请\n更多职位\n职位列表';
+ const htmlText='企业招聘中心公开招募区域运营经理，长期负责连锁门店运营管理和数据报告。平台将为候选人提供招聘信息，仅通过官网进行直接申请。\n区域运营经理\n工作地点：上海\n岗位职责\n1. 负责公司多个直营与加盟门店的整体经营分析、经营指标管理与区域门店目标拆解，定期制定改善计划和季度经营报告\n2. 负责客户服务和门店销售流程分析，与各门店负责人及销售团队共同推动客户体验改善和销售指标进度跟踪\n任职要求\n1. 熟悉区域门店日常运营管理经验\n2. 具备门店经营数据分析能力\n立即申请\n更多职位\n职位列表';
  const parsed=extractOfficialJdSections(htmlText);
  assert.ok(parsed);
  assert.equal(parsed.content_status,'VERIFIED_SECTIONS');
@@ -127,8 +127,8 @@ test('AI receives independently verified JD instead of client-supplied summary',
 });
 
 test('private resume bucket is never referenced by public JD store',()=>{
- const doc=readFileSync(new URL('../functions/_lib/job-jd-archive.js',import.meta.url),'utf8');
- const route=readFileSync(new URL('../functions/api/job-jd.js',import.meta.url),'utf8');
+ const doc=readFileSync(new globalThis.URL('../functions/_lib/job-jd-archive.js',import.meta.url),'utf8');
+ const route=readFileSync(new globalThis.URL('../functions/api/job-jd.js',import.meta.url),'utf8');
  assert.doesNotMatch(doc,/HHBA_PRIVATE_RESUMES|hhba_candidate_resumes|candidate_resume/i);
  assert.doesNotMatch(route,/HHBA_PRIVATE_RESUMES|hhba_candidate_resumes/i);
  assert.match(route,/consent_verify/);
