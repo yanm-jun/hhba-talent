@@ -1194,3 +1194,15 @@
   padding:13px 12px 18px!important;
  }
 }
+
+
+/* When Start AI needs explicit consent, put that consent at the top of the
+   voluntarily expanded tools, before auxiliary scoring and revision details. */
+.hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-word-assistant .targeted-resume-ai-settings[open]{
+ order:-1!important;
+ margin:0 0 10px!important;
+ padding:10px 12px 13px!important;
+ background:#f7fafe;
+ border:1px solid #e3ebf5;
+ border-radius:10px;
+}
