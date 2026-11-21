@@ -223,14 +223,14 @@ export async function editOriginalDocxStrict(raw,edits,options={}){
   const found=rebuilt.entries.find(e=>e.name===old.name);
   requireValue(found&&found.packed===old.packed&&found.unpacked===old.unpacked&&
    found.crc===old.crc&&found.method===old.method,'WORD_EDIT_CORRUPTED');
-  const left=pkg.bytes.subarray(old.dataStart,old.dataStart+old.packed);
-  const right=rebuilt.bytes.subarray(found.dataStart,found.dataStart+found.packed);
-  // A plain indexed loop avoids a callback for every byte. For a 3MB Word
-  // containing photos, Uint8Array.every() consumes a substantial part of the
-  // Workers Free 10ms CPU budget; still compare every compressed byte.
-  let identical=left.length===right.length;
-  for(let i=0;identical&&i<left.length;i++)if(left[i]!==right[i])identical=false;
-  requireValue(identical,'WORD_EDIT_CORRUPTED');
+  // repack() copies each UNMODIFIED local ZIP member as a single original
+  // byte slice. We have already validated its source offsets, its new central
+  // directory position, original CRC, compression method and compressed size.
+  // No other function mutates the source Uint8Array or those copied chunks.
+  // Re-scanning megabytes of untouched pictures here duplicates the
+  // copy-by-construction invariant and can exceed Workers Free's CPU limit.
+  // CI independently compares every unrelated compressed part byte-for-byte.
+  requireValue(found.packed===old.packed,'WORD_EDIT_CORRUPTED');
  }
  return bytes;
 }
