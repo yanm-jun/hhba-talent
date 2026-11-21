@@ -471,7 +471,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     <div className="targeted-resume-suggestion targeted-resume-popover" role="region"
     aria-label="当前简历段落的 AI 建议">
     <div className="targeted-resume-popover-head">
-     <span className="targeted-resume-ai-label"><Sparkles size={13} aria-hidden="true"/> AI 原位建议 · {s.action==='request_evidence'?'请补充真实信息':'待本人核实'}</span>
+     <span className="targeted-resume-ai-label"><Sparkles size={13} aria-hidden="true"/> {sourceResume?'核实这处文字':s.action==='request_evidence'?'请补充真实信息':'待本人核实'}</span>
      <button type="button" aria-label="关闭 AI 建议" onClick={()=>{setOpenSuggestionId(null);setActiveSuggestionId(null)}}><X size={15}/></button>
     </div>
     {editingSuggestionId===s.id?<label className="targeted-resume-fact-entry">
@@ -798,7 +798,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       wholeDraft?'整份改写：'+revealedWholeCount+' / '+wholeDraft.blocks.length+' 段':
       busy?'AI 正在分析原简历…':
       '已呈现 '+revealedSuggestionCount+' / '+suggestions.length+' 处文字'}
-     <span>查看建议</span>
+     <span>查看进度</span>
     </button>}
     <OriginalWordViewer resume={sourceResume} suggestedChanges={confirmedWordChanges}
      glowActive={entranceStage==='entering'||busy||wholeBusy||wordEditing||
@@ -960,6 +960,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      revealedSuggestionCount<suggestions.length&&<p className="targeted-resume-word-reveal" role="status">
       AI 已完成分析，正在逐条呈现建议 {revealedSuggestionCount}/{suggestions.length}
      </p>}
+    <details className="hhba-word-suggestion-archive">
+     <summary>其他修改记录与详细核对（{suggestions.length}）</summary>
     <div className="targeted-resume-word-suggestion-list">
      {suggestions.slice(0,revealedSuggestionCount).map((item,i)=>{
       const applied=version.acceptedSuggestionIds.includes(item.id);
@@ -968,7 +970,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       return <section key={item.id} className={'targeted-resume-word-suggestion'+(active?' is-active':'')}>
        <button type="button" className="targeted-resume-word-suggestion-title"
         aria-expanded={active} onClick={()=>{setActiveSuggestionId(active?null:item.id);setOpenSuggestionId(active?null:item.id);setEditingSuggestionId(null);}}>
-        <span>{String(i+1).padStart(2,'0')} · {item.action==='request_evidence'?'补充真实经历':'优化文字表达'}</span>
+        <span>{String(i+1).padStart(2,'0')} · {item.action==='request_evidence'?'需补充真实经历':'修改记录'}</span>
         <small>{applied?'已确认':rejected?'保留原文':'待确认'}</small>
        </button>
        {active&&<div className="targeted-resume-word-suggestion-detail">
@@ -982,6 +984,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       </section>
      })}
     </div>
+    </details>
     {confirmedWordChanges.length>0&&<p className="targeted-resume-word-next-step">
       {confirmedWordChanges.length} 条建议已准备就绪。请点击 Word 对应文字确认。
      </p>}
