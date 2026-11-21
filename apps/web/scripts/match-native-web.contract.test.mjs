@@ -53,7 +53,7 @@ test('native results dialog never hides optimizer behind the optional match scor
  const {readFile}=await import('node:fs/promises');
  const ui=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(ui,/function visibleMatchScore\(/);
- assert.match(ui,/\{!pending&&<button type="button"/);
+ assert.match(ui,/<button type="button" disabled=\{pending\}/);
  assert.doesNotMatch(ui,/!pending&&Number\.isInteger\(job\.match_score\)/);
  assert.match(ui,/优化简历/);
  assert.match(ui,/暂无可靠分数/);
