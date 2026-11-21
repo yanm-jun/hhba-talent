@@ -52,6 +52,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  const [layoutVerified,setLayoutVerified]=useState(false);
  const [loading,setLoading]=useState(true);
  const [previewError,setPreviewError]=useState('');
+ const [readOnlyTextFallback,setReadOnlyTextFallback]=useState(false);
  const [text,setText]=useState('');
  const [page,setPage]=useState(1);
  const [count,setCount]=useState(0);
@@ -94,6 +95,9 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  }
  useEffect(()=>{
   setPage(1);setZoom(1);setFitMode('width');setActiveVisualId(null);setInlineVisualEditor(null);restorePosition.current=null;
+  // A previous job's saved revision must never leak into another job's toolbar.
+  setSaved(false);setRevision(0);setTotalRevisions(0);setHistory([]);
+  setPdfAvailable(false);setLayoutVerified(false);setReadOnlyTextFallback(false);
   renderedEntrance.current=false;
  },[resume.id,jobId]);
  useEffect(()=>{
@@ -120,6 +124,12 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    if(controller.signal.aborted)return;
    setRendererEnabled(capabilities.rendererEnabled);
    setReady(capabilities.enabled?'available':'unavailable');
+  }).catch(()=>{
+   // The Word renderer is an enhancement, not a prerequisite for reading the
+   // candidate's original private DOCX. Never leave the modal in 'checking'.
+   if(controller.signal.aborted)return;
+   setRendererEnabled(false);
+   setReady('unavailable');
   });
   return()=>controller.abort();
  },[resume.id,jobId]);
@@ -127,14 +137,35 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  useEffect(()=>{
   if(ready==='checking')return;
   let active=true,task:any=null;
-  setLoading(true);setPreviewError('');setAnchors([]);setSelected(null);setInlineVisualEditor(null);
+  setLoading(true);setPreviewError('');setReadOnlyTextFallback(false);
+  setAnchors([]);setSelected(null);setInlineVisualEditor(null);
   void(async()=>{
    try{
     if(ready==='unavailable'){
      const bytes=await fetchPrivateResumeForLocalReview(resume);
+     if(!active)return;
+     const mount=browserMount.current;
+     // Even when the server-side editor is disabled or unreachable, show the
+     // actual private DOCX pages locally; a generic text card is a last resort.
+     if(mount){
+      try{
+       const pages=await renderBrowserWord(new Uint8Array(bytes),mount);
+       if(!pages)throw Error('DOCX 没有可显示的页面');
+       if(!active)return;
+       setEditable([]);setAnchors([]);onEditableSegments?.([]);
+       setCount(pages);setPage(1);
+       setPaperSize({width:mount.scrollWidth,height:mount.scrollHeight});
+       setLoading(false);
+       if(!renderedEntrance.current){renderedEntrance.current=true;onDocumentReady?.();}
+       return;
+      }catch{
+       // Malformed/unsupported Word layout: keep the accessible text fallback.
+      }
+     }
      const content=await extractDocxText(bytes);
      if(active){
-      setText(content);setLoading(false);
+      setText(content);setReadOnlyTextFallback(true);setLoading(false);
+      onEditableSegments?.([]);
       if(!renderedEntrance.current){renderedEntrance.current=true;onDocumentReady?.();}
      }
      return;
@@ -274,7 +305,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  // Default: first Word page completely in view. The document and its text
  // hit areas share one zoom transform; candidate can switch to width-fit.
  useEffect(()=>{
-  if(ready!=='available'||rendererEnabled||loading||fitMode==='custom')return;
+  if(ready==='checking'||rendererEnabled||loading||readOnlyTextFallback||fitMode==='custom')return;
   const container=paper.current,documentPage=browserMount.current
    ?.querySelector<HTMLElement>('section.hhba-native-docx');
   if(!container||!documentPage)return;
@@ -305,7 +336,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   window.addEventListener('resize',update);
   const animation=requestAnimationFrame(update);
   return()=>{observer.disconnect();window.removeEventListener('resize',update);cancelAnimationFrame(animation)};
- },[ready,rendererEnabled,loading,fitMode,paperSize.width,paperSize.height]);
+ },[ready,rendererEnabled,loading,readOnlyTextFallback,fitMode,paperSize.width,paperSize.height]);
  useEffect(()=>{
   const position=restorePosition.current;
   if(loading||!position||page!==position.page||!paper.current)return;
@@ -551,8 +582,8 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    </div>
   </div>
   {editorTopHost&&createPortal(<button type="button" className="hhba-word-editor-header-download"
-    aria-label="下载当前 Word" title={saved?'下载当前岗位 Word':'下载原始 Word'}
-    disabled={busy||loading} onClick={()=>void(saved?downloadSaved():downloadOriginal())}>
+    aria-label="下载当前 Word" title={ready==='available'&&saved?'下载当前岗位 Word':'下载原始 Word'}
+    disabled={busy||loading} onClick={()=>void(ready==='available'&&saved?downloadSaved():downloadOriginal())}>
     <Download size={17} aria-hidden="true"/>
    </button>,editorTopHost)}
   {message&&<p className="hhba-original-resume-word-status" role="status">{message}</p>}
@@ -576,11 +607,14 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    {ready==='available'&&<button type="button" disabled={busy}
     onClick={()=>{setPreviewError('');setRefresh(n=>n+1);}}>重新载入最新版</button>}
   </div>}
-  {!loading&&ready==='unavailable'&&<div className="hhba-original-resume-word">
+  {!loading&&ready==='unavailable'&&!previewError&&<p className="hhba-original-resume-note" role="status">
+   Word 编辑服务暂不可用；下方为原文件的本地只读预览，仍可下载原件，不会覆盖或上传到 AI。
+  </p>}
+  {!loading&&ready==='unavailable'&&readOnlyTextFallback&&<div className="hhba-original-resume-word">
    <p>当前只能查看文字。要查看原来的样式，请下载原件打开。</p>
    <pre>{text}</pre>
   </div>}
-  {ready==='available'&&!rendererEnabled&&!previewError&&<>
+  {ready!=='checking'&&!rendererEnabled&&!previewError&&!readOnlyTextFallback&&<>
    <div className="hhba-original-resume-word-tools" role="group" aria-label="Word 浏览器预览缩放">
     <button type="button" aria-label="缩小 Word" disabled={zoom<=.3}
      onClick={()=>{setFitMode('custom');setZoom(v=>Math.max(.3,Math.round((v-.15)*100)/100))}}><ZoomOut size={15}/></button>
@@ -604,7 +638,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      </div>
     </div>
    </div>
-   {!loading&&anchors.length===0&&<p className="hhba-original-resume-note">
+   {!loading&&ready==='available'&&anchors.length===0&&<p className="hhba-original-resume-note">
     此 Word 没有找到可唯一定位的原文，请下载原件检查。没有对它做任何修改。</p>}
   </>}
   {!loading&&ready==='available'&&rendererEnabled&&!previewError&&<>
@@ -641,7 +675,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      下一页 <ChevronRight size={15}/></button>
    </nav>
   </>}
-  {ready==='available'&&<footer className="hhba-word-minimal-footer" aria-label="Word 编辑工具栏">
+  {ready!=='checking'&&!previewError&&!readOnlyTextFallback&&<footer className="hhba-word-minimal-footer" aria-label="Word 编辑工具栏">
    <div className="hhba-word-minimal-zoom" role="group" aria-label="简历缩放">
     <button type="button" aria-label="缩小 Word" disabled={zoom<=.3}
      onClick={()=>{setFitMode('custom');setZoom(v=>Math.max(.3,Math.round((v-.1)*100)/100))}}><ZoomOut size={17}/></button>
@@ -650,15 +684,15 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      onClick={()=>{setFitMode('custom');setZoom(v=>Math.min(2.2,Math.round((v+.1)*100)/100))}}><ZoomIn size={17}/></button>
    </div>
    <div className="hhba-word-minimal-actions" role="group" aria-label="版本与保存">
-    <button type="button" disabled={busy||loading||revision<=0}
+    <button type="button" disabled={ready!=='available'||busy||loading||revision<=0}
      title="撤销上一条 Word 修改" aria-label="撤销"
      onClick={()=>void changeRevision('undo')}><Undo2 size={17}/></button>
-    <button type="button" disabled={busy||loading||revision>=totalRevisions}
+    <button type="button" disabled={ready!=='available'||busy||loading||revision>=totalRevisions}
      title="恢复 Word 修改" aria-label="重做"
      onClick={()=>void changeRevision('redo')}><Redo2 size={17}/></button>
     <button type="button" className="hhba-word-minimal-save"
-     disabled={busy||loading} title={saved?'下载当前岗位独立 Word':'尚未修改，下载原始 Word'}
-     onClick={()=>void(saved?downloadSaved():downloadOriginal())}><Save size={16}/> 保存 Word</button>
+     disabled={busy||loading} title={ready==='available'&&saved?'下载当前岗位独立 Word':'下载原始 Word'}
+     onClick={()=>void(ready==='available'&&saved?downloadSaved():downloadOriginal())}><Save size={16}/> 保存 Word</button>
    </div>
   </footer>}
   {ready==='available'&&!selected&&<div className="hhba-original-resume-mobile-dock" role="group" aria-label="手机端 Word 操作">
