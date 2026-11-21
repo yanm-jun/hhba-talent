@@ -32,6 +32,8 @@ function stateDB(){
      throw Error('Unexpected lifecycle list '+sql);
     },
     async first(){
+     if(sql.startsWith('SELECT id,canonical_url,object_key,jd_sha256,last_verified_at FROM hhba_job_ats_jd_versions'))
+      return versions.get(args[0])||null;
      if(sql.includes('WHERE canonical_url=?'))return records.get(args[0])||null;
      throw Error('Unexpected lifecycle read '+sql);
     },
@@ -201,6 +203,33 @@ test('explicitly enabled retention removes only old, closed, unreferenced versio
  assert.equal(env._db.audit.length,1);
  assert.equal(env._db.audit[0][2],'PURGED');
  assert.ok(env.historyReads>=2);
+});
+test('a failed D1 version DELETE must never delete R2 bytes',async()=>{
+ const env=makeEnv(),state=await closePosting(env),row=candidate(state);
+ env._db.versions.set(ID,row);env.HHBA_JD_RETENTION_DELETE_ENABLED='1';
+ const oldPrepare=env._db.prepare.bind(env._db);
+ env._db.prepare=sql=>{
+  const stmt=oldPrepare(sql);
+  if(!sql.startsWith('DELETE FROM hhba_job_ats_jd_versions'))return stmt;
+  return {bind(...args){stmt.bind(...args);return this},
+   async run(){return {success:false,meta:{changes:0}}}};
+ };
+ const result=await runJdRetentionSweep(env,{dryRun:false,deps:{candidates:[row]}});
+ assert.equal(result.purged,0);
+ assert.equal(result.skipped,1);
+ assert.equal(env.deletionCount,0);
+ assert.equal(env._objects.has(KEY),true);
+ assert.equal(env._db.versions.has(ID),true);
+});
+
+test('if an indexed JD was refreshed after selection the old candidate must not remove it',async()=>{
+ const env=makeEnv(),state=await closePosting(env),row=candidate(state);
+ const refreshed={...row,last_verified_at:new Date().toISOString()};
+ env._db.versions.set(ID,refreshed);env.HHBA_JD_RETENTION_DELETE_ENABLED='1';
+ const result=await runJdRetentionSweep(env,{dryRun:false,deps:{candidates:[row]}});
+ assert.equal(result.purged,0);
+ assert.equal(env.deletionCount,0);
+ assert.equal(env._db.versions.has(ID),true);
 });
 test('active or 29-day closed vacancies never qualify for deletion',async()=>{
  const env=makeEnv();const state=await closePosting(env),row=candidate(state);
