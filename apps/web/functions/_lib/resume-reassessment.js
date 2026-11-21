@@ -2,6 +2,9 @@
 // Both snapshots are scored using HHBA_MATCH_RANKING_V2, not a keyword-derived UI score.
 import {safeJobLink,isVerifiedMainlandLocation} from './resume-match-core.js';
 import {scoreCandidateFit,RANKING_VERSION} from './match-ranking.js';
+import {extractSkillRequirements} from './job-skill-evidence.js';
+import {experienceMinRequirement,degreeMinRequirement} from './domestic-match-fusion.js';
+import {extractMandatoryProfessionalCredentials} from './professional-credentials.js';
 
 const simplify=value=>String(value||'').normalize('NFKC').toLowerCase().replace(/[\s\-_.()（）【】\[\]]+/g,'');
 const credentials=['HIGH_SCHOOL','ASSOCIATE','BACHELOR','MASTER','PHD'];
@@ -30,6 +33,36 @@ export function validatedAuditedJob(sources,id,now=Date.now()){
   min_experience_years:Number.isFinite(f.experienceMinYears)?f.experienceMinYears:null,
   minimum_education:typeof f.education==='string'?f.education:null,
   proof_hash:proof.jd_sha256,updated_at:snapshot.updated};
+}
+/**
+ * Translate only a cryptographically verified, FRESH employer JD archive
+ * into deterministic V2 score facets. Requirements come from the posted
+ * qualifications section, never a model-written recommendation. This
+ * remains a resume-evidence comparison, NOT an employer assessment.
+ */
+export function archivedJDToScoreJob(jd){
+ if(!jd?.fresh||typeof jd.id!=='string'||!/^jd_[a-f0-9]{32}$/.test(jd.id)||
+  !Array.isArray(jd.sections)||typeof jd.jd_sha256!=='string'||
+  !Array.isArray(jd.sections.filter(s=>s.kind==='requirements')))return null;
+ const rq=jd.sections.filter(s=>s?.kind==='requirements')
+  .map(s=>s.text).join('\n').slice(0,6000);
+ if(rq.length<25)return null;
+ const skills=extractSkillRequirements(rq);
+ const degree=degreeMinRequirement(rq);
+ const degrees=['HIGH_SCHOOL','ASSOCIATE','BACHELOR','MASTER','PHD'];
+ return {
+  id:jd.id,title:jd.title,company:jd.company,location:jd.location,
+  official_url:jd.canonical_url,
+  required_skills:skills.required,mandatory_skills:skills.mandatory,
+  preferred_skills:skills.preferred,unclassified_skills:skills.unclassified,
+  professional_credential_requirements:extractMandatoryProfessionalCredentials(rq).mandatory,
+  min_experience_years:experienceMinRequirement(rq),
+  minimum_education:degree===null?null:degrees[degree-1],
+  proof_hash:jd.jd_sha256,updated_at:jd.checked_at,
+  source_label:jd.proof_method==='PUBLIC_EMPLOYER_ATS_V1'?
+   '企业专属公开 ATS 招聘接口及其核验 JD 版本':
+   '企业官网直接核验及归档的 JD 版本'
+ };
 }
 export function validReassessmentInput(body){
  if(!body||typeof body!=='object'||Array.isArray(body)||body.consent_reassessment!==true||
