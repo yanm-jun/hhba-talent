@@ -11,6 +11,7 @@ import {responseJson as json,rejectJson as reject,rewriteActive,
 import {REWRITE_KIND,completeJson,validateAuthoring,numberTokens,redacted}
  from '../_lib/resume-rewrite-provider.js';
 import {selectProvider} from '../_lib/resume-ai-provider.js';
+import {hydrateVerifiedJobRequirements} from '../_lib/job-jd-archive.js';
 import {runResumeEditorialAgent} from '../_lib/resume-rewrite-agent.js';
 import {issueCheckpoint,verifyCheckpoint,publicDraft}
  from '../_lib/resume-rewrite-checkpoint.js';
@@ -63,9 +64,12 @@ export async function onRequestPost({request,env}){
  catch{return reject('INVALID_REQUEST',400);}
  if(body?.consent_ai!==true)return reject('AI_CONSENT_REQUIRED',400);
  if(!validContinuation(body))return reject('INVALID_REWRITE_INPUT',400);
+ let trustedJob;
+ try{trustedJob=await hydrateVerifiedJobRequirements(env,body.job);}
+ catch(e){return reject(String(e?.message||'JD_VERSION_NOT_AVAILABLE'),409)}
  try{
   await verifyCheckpoint({env,account,blocks:body.blocks,
-   job:body.job,draft:body.draft,token:body.checkpoint});
+   job:trustedJob,draft:body.draft,token:body.checkpoint});
  }catch(e){
   const code=e?.message==='AI_CHECKPOINT_EXPIRED'?
    'AI_CHECKPOINT_EXPIRED':e?.message==='AI_CHECKPOINT_NOT_CONFIGURED'?
@@ -78,14 +82,14 @@ export async function onRequestPost({request,env}){
   try{reviewer=selectProvider(env,'resume_reviewer');}
   catch(e){if(e.message!=='AI_PROVIDER_NOT_CONFIGURED')throw e;reviewer=author;}
   const result=await runResumeEditorialAgent({
-   draft:publicDraft(body.draft),blocks:body.blocks,job:body.job,
+   draft:publicDraft(body.draft),blocks:body.blocks,job:trustedJob,
    env:{...env,HHBA_RESUME_AGENT_MAX_PASSES:'1'},
    provider:author,reviewer,completeJson,validateAuthoring,numberTokens,
    redacted,signal:AbortSignal.timeout(150000)
   });
   if(result.autonomy?.needs_more_work){
    const token=await issueCheckpoint({
-    env,account,blocks:body.blocks,job:body.job,draft:result
+    env,account,blocks:body.blocks,job:trustedJob,draft:result
    });
    return json({...result,continuation:{enabled:true,checkpoint:token}});
   }
