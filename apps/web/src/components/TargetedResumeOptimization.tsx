@@ -123,7 +123,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const toolsRef=useRef<HTMLElement|null>(null);
  function openWordTools(){
   setMobileSuggestionsOpen(true);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>toolsRef.current?.scrollIntoView({behavior:'smooth',block:'start'})));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>toolsRef.current?.scrollIntoView({behavior:'auto',block:'start'})));
  }
  const [aiSettingsOpen,setAiSettingsOpen]=useState(false);
  const [nativeWordPending,setNativeWordPending]=useState(false);
