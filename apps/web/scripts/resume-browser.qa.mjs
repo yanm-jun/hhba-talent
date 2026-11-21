@@ -1034,6 +1034,12 @@ try{
   await scorePage.locator('.targeted-resume-ai-settings summary').click();
   await scorePage.locator('.targeted-resume-consent input[type=checkbox]').check();
   await scorePage.getByRole('button',{name:'开始 AI 优化'}).click();
+  // Draft generation releases the Word surface and intentionally collapses
+  // the AI drawer. Reopen it only after the suggestion has arrived.
+  await scorePage.locator('.targeted-resume-word-suggestion-title').first()
+   .waitFor({state:'attached',timeout:20000});
+  if(!await scorePage.locator('.targeted-resume-word-assistant').isVisible())
+   await scorePage.locator('.hhba-word-quick-actions').click();
   await scorePage.locator('.hhba-word-suggestion-archive summary').click();
   await scorePage.locator('.targeted-resume-word-suggestion-title').first().waitFor();
   assert.match(await scorePage.locator('.hhba-word-match-after').textContent(),/70/,
@@ -1205,6 +1211,8 @@ try{
     'ignored text must not appear as pending rainbow or alter the Word');
    assert.match(await context.locator('.hhba-original-resume-file-heading').textContent(),
     /当前修改进度：0 \/ 0/);
+   if(!await context.locator('.targeted-resume-word-assistant').isVisible())
+    await context.locator('.hhba-word-quick-actions').click();
    await context.getByRole('button',{name:'开始 AI 优化'}).click();
    const pendingAgain=context.locator('.hhba-word-siri-anchor-shell.has-siri-wording').first();
    await pendingAgain.waitFor();
