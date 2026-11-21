@@ -163,10 +163,70 @@ def exercise(browser,name,viewport):
                    'scriptErrors':errors})
     ctx.close()
 
+
+def exercise_readonly(browser,name,viewport,status_failure):
+    """A 503 or disabled Word service must still display the real local DOCX."""
+    import hashlib
+    ctx=browser.new_context(viewport=viewport,locale='zh-CN',
+        device_scale_factor=1,accept_downloads=True)
+    page=ctx.new_page()
+    page.add_init_script("localStorage.setItem('hhba_real_auth_token','SYNTHETIC_QA_USER')")
+    errors=[]
+    page.on('pageerror',lambda e:errors.append(str(e)))
+    ai_requests=[]
+
+    def api(route):
+        req=route.request
+        url=urlsplit(req.url)
+        query=parse_qs(url.query)
+        action=query.get('action',[''])[0]
+        if url.path.endswith('/resume-word') and action=='status':
+            return route.fulfill(status=503 if status_failure else 200,
+                content_type='application/json',
+                body=json.dumps({'ok':not status_failure,'enabled':False,
+                    'renderer_enabled':False,'docx_only_enabled':False}))
+        if url.path.startswith('/api/resumes/') and url.path.endswith('/download'):
+            return route.fulfill(status=200,body=WORD,headers={
+                'content-type':'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'content-length':str(len(WORD))})
+        if url.path.endswith('/resume-optimize'):
+            if req.method=='POST':ai_requests.append(req.post_data)
+            return route.fulfill(status=200,content_type='application/json',
+                body=json.dumps({'enabled':True,'configured':True,'ok':True}))
+        return route.fulfill(status=200,content_type='application/json',
+            body=json.dumps({'ok':True,'enabled':False,'items':[]}))
+
+    page.route('**/api/**',api)
+    page.goto(ORIGIN+'/scripts/qa-targeted-word-workspace.html',wait_until='domcontentloaded')
+    page.get_by_role('button',name='针对虚构运营督导优化简历').click(timeout=18000)
+    word=page.locator('.targeted-resume.is-word-first section.hhba-native-docx').first
+    word.wait_for(state='visible',timeout=35000)
+    assert '负责门店运营及日常数据整理工作' in word.inner_text(),(
+        name,'Real DOCX text missing in fallback')
+    page.get_by_text('Word 编辑服务暂不可用',exact=False).wait_for(timeout=12000)
+    assert page.locator('.hhba-original-resume-anchor').count()==0,(
+        name,'Read-only Word must not expose write anchors')
+    assert page.get_by_role('button',name='开始 AI 优化简历').is_disabled(),(
+        name,'AI must not run without verified Word anchors')
+    assert ai_requests==[],(name,'Read-only mode sent resume text to AI')
+    assert page.get_by_role('button',name='保存 Word').is_visible(),name
+    with page.expect_download(timeout=15000) as pending:
+        page.get_by_role('button',name='保存 Word').click()
+    assert hashlib.sha256(Path(pending.value.path()).read_bytes()).digest()==hashlib.sha256(WORD).digest(),(
+        name,'Readonly download was not the exact private original')
+    assert not errors,(name,errors)
+    page.screenshot(path=str(OUT/f'{name}-real-docx-readonly.png'),animations='disabled')
+    REPORT.append({'viewport':name,'realDocxLocalFallback':True,
+        'wordService':('503' if status_failure else 'disabled'),
+        'unchangedOriginalDownload':True,'noUnverifiedEditsOrAiRequests':True,'scriptErrors':errors})
+    ctx.close()
+
 with sync_playwright() as play:
     browser=play.chromium.launch(headless=True,args=['--no-sandbox'])
     exercise(browser,'desktop',{'width':1440,'height':900})
     exercise(browser,'mobile',{'width':390,'height':844})
+    exercise_readonly(browser,'desktop',{'width':1440,'height':900},True)
+    exercise_readonly(browser,'mobile',{'width':390,'height':844},False)
     browser.close()
 (OUT/'report.json').write_text(json.dumps(REPORT,ensure_ascii=False,indent=2))
 print('HHBA_MINIMAL_CENTERED_WORD_QA_PASS',json.dumps(REPORT,ensure_ascii=False))
