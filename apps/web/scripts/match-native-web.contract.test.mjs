@@ -6,7 +6,8 @@ const posting='https://careers.examplecorp.com/jobs/brand-supervisor-2026';
 const answer={jobs:[
  {company:'示例汽车中国',title:'品牌督导',location:'上海',salary:'15000-20000 元/月',
   reason:'你曾辅导经销商门店，具备终端巡店、DCC 管理和销售顾问培训经历，与该品牌督导岗位的渠道管理工作相关。',
-  job_basis:'负责上海经销商终端督导',url:posting},
+  job_basis:'负责上海经销商终端督导',match_score:82,
+  score_basis:'具备经销商管理和DCC培训经验，品牌经验需核实',url:posting},
  {company:'某外资企业中国区',title:'渠道运营',location:'广州',salary:'',
   reason:'具备线索转化及门店运营经验。',url:'https://jobs.ashbyhq.com/china/abcd1234'},
  {company:'海外企业',title:'督导',location:'东京',reason:'不能展示',url:'https://careers.fakecorp.com/jobs/123456'},
@@ -27,7 +28,37 @@ test('official Responses payload parser retains Mainland jobs with reasons and p
  assert.equal(out.matches[0].official_url,posting);
  assert.equal(out.matches[1].location,'广州');
  assert.equal(out.matches[0].source_status,'MODEL_SEARCH_REPORTED');
+ assert.equal(out.matches[0].match_score,82);
+ assert.equal(out.matches[0].reference_score,82);
+ assert.match(out.matches[0].score_basis,/DCC培训/);
+ assert.equal(out.matches[1].match_score,null);
+ assert.equal(out.matches[1].reference_score,0);
 });
+test('unverifiable, malformed, out-of-range AI scores are never presented as real matches',()=>{
+ const jobs=[
+  {...answer.jobs[0],match_score:101},
+  {...answer.jobs[0],company:'甲公司',url:'https://jobs.ashbyhq.com/china/testid01',match_score:89,score_basis:''},
+  {...answer.jobs[0],company:'乙公司',url:'https://jobs.ashbyhq.com/china/testid02',match_score:'88'},
+  {...answer.jobs[0],company:'丙公司',url:'https://jobs.ashbyhq.com/china/testid03',match_score:0,score_basis:'明确缺少硬性证书要求，当前匹配证据极弱'}
+ ];
+ const data=parseJobAnswer(deepseek(jobs),10).matches;
+ assert.equal(data.length,4);
+ assert.equal(data[0].match_score,null);
+ assert.equal(data[1].match_score,89,'job_basis is valid fallback evidence when score_basis is empty');
+ assert.equal(data[2].match_score,null);
+ assert.equal(data[3].match_score,0);
+});
+
+test('native results dialog never hides optimizer behind the optional match score',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const ui=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
+ assert.match(ui,/function visibleMatchScore\(/);
+ assert.match(ui,/\{!pending&&<button type="button"/);
+ assert.doesNotMatch(ui,/!pending&&Number\.isInteger\(job\.match_score\)/);
+ assert.match(ui,/优化简历/);
+ assert.match(ui,/暂无可靠分数/);
+});
+
 test('no search: never show invented jobs',()=>{
  const r={status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(answer)}]}],
  usage:{server_tool_use:{tool_search:0,tool_fetch:0}}};
@@ -44,7 +75,7 @@ test('job links are broad enough for real ATS but still specific public HTTPS pa
  assert.equal(safeJobDetailLink('https://local/jobs/12345'),null);
  assert.equal(safeJobDetailLink('https://careers.examplecorp.com/jobs/12345?access_token=secret'),null);
 });
-test('one provider POST does the Search + explanations together and returns no scores',async()=>{
+test('one provider POST does Search, evidence-based scores and explanations together',async()=>{
  const calls=[];
  const fetcher=async(url,options)=>{
   calls.push({url,body:JSON.parse(options.body)});
@@ -58,6 +89,8 @@ test('one provider POST does the Search + explanations together and returns no s
  assert.equal(calls[0].body.tool_choice,'required');
  assert.equal(calls[0].body.text.format.type,'json_object');
  assert.equal(calls[0].body.reasoning.effort,'none');
+ assert.match(calls[0].body.instructions,/match_score/);
+ assert.match(calls[0].body.instructions,/score_basis/);
  assert.equal(r.matches.length,2);
  assert.equal(r.diagnostic.searches,2);
  assert.equal(r.diagnostic.visible_jobs,2);
