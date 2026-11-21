@@ -814,12 +814,13 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
        setEditingSuggestionId(null);setMobileSuggestionsOpen(true);
       }
      }}
-     onVisualSuggestionAction={(id,action,newText)=>{
-      // OriginalWordViewer calls this only after a verified Word save
+     onVisualSuggestionAction={(id,action,newText,layoutVerified)=>{
+      // OriginalWordViewer calls this only after a saved private Word revision
       // (accept/edit), or after the candidate explicitly ignores a draft.
       if(id.startsWith('whole-')){
        setResolvedWordVisualIds(prev=>prev.includes(id)?prev:[...prev,id]);
-       setNotice(action==='ignored'?'此处保留原文。':'该处 Word 已通过版式验证并保存。');
+       setNotice(action==='ignored'?'此处保留原文。':
+         layoutVerified?'该处 Word 已通过版式验证并保存。':'该处 Word 已保存，分页需在 Word 中核对。');
        return;
       }
       const item=suggestions.find(s=>s.id===id);
@@ -840,7 +841,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
         });
        }
        setConfirmed(prev=>prev.includes(id)?prev:[...prev,id]);
-       setNotice('已按本人编辑的文字保存并核验原 Word 排版。');
+       setNotice(layoutVerified?'已按本人编辑的文字保存并核验原 Word 排版。':
+         '已按本人编辑的文字保存原格式 Word，分页仍需核对。');
       }else{
        const proposed=(suggestionDrafts[id]??item.proposed).trim();
        setVersion(prev=>{
@@ -849,7 +851,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
         catch{return prev;}
        });
        setConfirmed(prev=>prev.includes(id)?prev:[...prev,id]);
-       setNotice('已采纳并通过 Word 原版式核验，原上传文件未被覆盖。');
+       setNotice(layoutVerified?'已采纳并通过 Word 原版式核验，原上传文件未被覆盖。':
+         '已采纳并保存原格式 Word，原文件未被覆盖；请核对分页。');
       }
       setOpenSuggestionId(null);setActiveSuggestionId(null);setEditingSuggestionId(null);
      }}
