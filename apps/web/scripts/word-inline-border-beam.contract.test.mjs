@@ -25,7 +25,7 @@ test('browser Word AI text is painted on original run, not a guessed font overla
 test('Siri light is permanently on actual Word page, softly breathing and orbiting',()=>{
  assert.match(css,/section\.hhba-native-docx::before/);
  assert.match(css,/section\.hhba-native-docx::after/);
- assert.match(css,/animation:hhba-word-quiet-breathe 10\.5s ease-in-out infinite/);
+ assert.match(css,/hhba-word-siri-breathe 11s ease-in-out infinite/);
  assert.match(css,/animation:hhba-word-beam-orbit 36s linear infinite/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
  assert.match(css,/@media print\{/);
