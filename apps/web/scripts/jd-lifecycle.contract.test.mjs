@@ -29,11 +29,19 @@ function stateDB(){
      if(sql.startsWith('SELECT canonical_url,proof_method,status'))return {
       results:[...records.values()].filter(x=>x.next_check_at<=args[0]).slice(0,args[1])};
      if(sql.startsWith('SELECT v.id,v.canonical_url'))return {results:[]};
+     if(sql.startsWith('SELECT event_id,jd_version_id,reason FROM hhba_jd_retention_audit'))
+      return {results:audit.filter(x=>x[2]==='SKIPPED_ERROR'&&x[4].startsWith('R2_PENDING:'))
+       .map(x=>({event_id:x[0],jd_version_id:x[1],reason:x[4]})).slice(0,4)};
      throw Error('Unexpected lifecycle list '+sql);
     },
     async first(){
      if(sql.startsWith('SELECT id,canonical_url,object_key,jd_sha256,last_verified_at FROM hhba_job_ats_jd_versions'))
       return versions.get(args[0])||null;
+     if(sql.startsWith('SELECT id FROM hhba_job_jd_versions'))return null;
+     if(sql.startsWith('SELECT id FROM hhba_job_ats_jd_versions')){
+      const row=versions.get(args[0]);
+      return row?.object_key===args[1]?{id:row.id}:null;
+     }
      if(sql.includes('WHERE canonical_url=?'))return records.get(args[0])||null;
      throw Error('Unexpected lifecycle read '+sql);
     },
@@ -55,6 +63,11 @@ function stateDB(){
      }
      if(sql.startsWith('INSERT INTO hhba_jd_retention_audit')){
       audit.push(args);return {success:true,meta:{changes:1}};
+     }
+     if(sql.startsWith('DELETE FROM hhba_jd_retention_audit')){
+      const at=audit.findIndex(x=>x[0]===args[0]);
+      if(at>=0)audit.splice(at,1);
+      return {success:true,meta:{changes:at>=0?1:0}};
      }
      throw Error('Unexpected lifecycle write '+sql);
     }
@@ -230,6 +243,26 @@ test('if an indexed JD was refreshed after selection the old candidate must not 
  assert.equal(result.purged,0);
  assert.equal(env.deletionCount,0);
  assert.equal(env._db.versions.has(ID),true);
+});
+test('R2 network failure after successful index removal remains retryable on next Cron',async()=>{
+ const env=makeEnv(),state=await closePosting(env),row=candidate(state);
+ env.HHBA_JD_RETENTION_DELETE_ENABLED='1';
+ env._db.versions.set(ID,row);
+ const originalDelete=env.HHBA_JOB_JD_R2.delete.bind(env.HHBA_JOB_JD_R2);
+ env.HHBA_JOB_JD_R2.delete=async()=>{throw Error('R2 temporarily unavailable')};
+ const first=await runJdRetentionSweep(env,{dryRun:false,deps:{candidates:[row]}});
+ assert.equal(first.purged,0);
+ assert.equal(first.blocked,1);
+ assert.equal(env._db.versions.has(ID),false,'index is removed before R2');
+ assert.equal(env._objects.has(KEY),true,'failed R2 delete leaves recoverable bytes');
+ assert.equal(env._db.audit.filter(x=>x[2]==='SKIPPED_ERROR').length,1);
+ env.HHBA_JOB_JD_R2.delete=originalDelete;
+ const second=await runJdRetentionSweep(env,{dryRun:false,deps:{candidates:[]}});
+ assert.equal(second.retry_pending,1);
+ assert.equal(second.retry_completed,1);
+ assert.equal(env._objects.has(KEY),false);
+ assert.equal(env._db.audit.filter(x=>x[2]==='SKIPPED_ERROR').length,0);
+ assert.equal(env._db.audit.filter(x=>x[2]==='PURGED').length,1);
 });
 test('active or 29-day closed vacancies never qualify for deletion',async()=>{
  const env=makeEnv();const state=await closePosting(env),row=candidate(state);
