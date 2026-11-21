@@ -760,6 +760,8 @@ try{
    const closeIcon=first.locator('.targeted-resume-word-edit-host button[aria-label="取消修改"]');
    const closeBox=await closeIcon.boundingBox();
    const bounds=await first.evaluate(()=>({width:innerWidth,height:innerHeight}));
+   console.log('MOBILE_WORD_CLOSE_GEOMETRY',JSON.stringify({bounds,closeBox,
+    editPanel:await nativePane.boundingBox()}));
    assert.ok(closeBox && closeBox.x>=8 && closeBox.x+closeBox.width<=bounds.width-8 &&
     closeBox.y>=0 && closeBox.height>=38,
     'phone Word close icon must stay fully visible and touch accessible');
