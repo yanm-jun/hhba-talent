@@ -40,7 +40,7 @@ function normalizeDocument(value){
  const body=text(value.full_jd);
  if(body.length<80||body.length>MAX_TEXT||value.content_status!=='VERIFIED_SECTIONS'||
   value.proof_method!=='DIRECT_EMPLOYER_HTML_V1'||!body.includes('岗位职责')&&
-  !body.includes('工作职责')&&!body.includes('职位职责')&&!body.includes('工作内容'))return null;
+  !body.includes('工作职责')&&!body.includes('职位职责')&&!body.includes('主要职责')&&!body.includes('工作内容'))return null;
  const sections=Array.isArray(value.sections)?value.sections.filter(x=>
   x&&/^(JD-\d{3})$/.test(x.id)&&
   ['responsibilities','requirements','other'].includes(x.kind)&&
@@ -77,7 +77,8 @@ async function readArchivedRow(env,row){
  if(saved.id!==row.id||saved.jd_sha256!==row.jd_sha256||
   saved.canonical_url!==row.canonical_url||saved.proof_method!==row.proof_method)return null;
  const parsed=normalizeDocument(saved);
- if(!parsed||parsed.title!==row.title||parsed.location!==row.location)return null;
+ if(!parsed||parsed.company!==row.company||parsed.title!==row.title||
+  parsed.location!==row.location)return null;
  const hash=await sha256Hex(parsed.full_jd);
  if(hash!==row.jd_sha256)return null;
  const lastVerified=safeDayIso(row.last_verified_at);
