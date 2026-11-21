@@ -293,7 +293,12 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    const factor=fitMode==='page'?
     Math.min(availableWidth/pageWidth,availableHeight/pageHeight):
     availableWidth/pageWidth;
-   const next=Number(Math.max(.3,Math.min(1.4,factor)).toFixed(2));
+   // At phone widths an A4 sheet reduced to ~40% is unreadable. Keep the
+   // document at a minimum readable scale and let its OWN scroll area pan
+   // horizontally; never force the browser or whole modal to overflow.
+   const mobileWord=window.innerWidth<=700&&Boolean(container.closest('.targeted-resume.is-word-first'));
+   const minZoom=mobileWord?.68:.3;
+   const next=Number(Math.max(minZoom,Math.min(1.4,factor)).toFixed(2));
    setZoom(current=>Math.abs(current-next)<.015?current:next);
   };
   const observer=new ResizeObserver(update);observer.observe(container);
