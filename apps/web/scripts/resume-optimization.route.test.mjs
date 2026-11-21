@@ -63,6 +63,33 @@ test('feature status fails closed when disabled',async()=>{
  assert.equal((await onRequestPost({request:request(),env:h.env})).status,503);
 });
 
+test('production AI optimization can use a dedicated quota salt with bounded usage',async()=>{
+ const h=mockEnv(),previous=globalThis.fetch;
+ delete h.env.HHBA_AUTH_ROLLOUT;
+ delete h.env.HHBA_MATCH_LIMIT_PEPPER;
+ h.env.HHBA_MATCH_RUNTIME_MODE='production';
+ h.env.HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER='private-opt-only-'+('Q'.repeat(48));
+ globalThis.fetch=async()=>Response.json({choices:[{message:{content:JSON.stringify({
+  suggestions:[{id:'s0',blockId:'experience-0',action:'replace',
+   original:base.blocks[0].text,proposed:'负责区域门店日常运营管理',
+   rationale:'表达更准确',jobRequirement:'运营和团队协作',
+   evidenceStatus:'needs_user_confirmation'}]
+ })}}]});
+ try{
+  const status=await (await onRequestGet({env:h.env})).json();
+  assert.equal(status.enabled,true);
+  assert.equal(status.per_account_daily_limit,3);
+  assert.equal(status.per_account_daily_attempt_limit,6);
+  const response=await onRequestPost({request:request(),env:h.env});
+  assert.equal(response.status,200,await response.clone().text());
+  const value=await response.json();
+  assert.equal(value.suggestions.length,1);
+  assert.equal(value.suggestions[0].evidenceStatus,'needs_user_confirmation');
+  assert.equal(h.records.length,1);
+  assert.equal(h.attempts.length,1);
+ }finally{globalThis.fetch=previous;}
+});
+
 test('generates suggestions with user confirmation and enforces daily quota',async()=>{
  const h=mockEnv();
  const previous=globalThis.fetch;
