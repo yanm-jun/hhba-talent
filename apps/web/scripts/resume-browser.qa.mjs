@@ -653,21 +653,22 @@ try{
   assert.equal(await first.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),0,
    'Word idle mode should release the Siri perimeter after entrance');
   const assistant=first.locator('.targeted-resume-word-assistant');
-  if(view.name==='desktop'){
-   const popup=await assistant.boundingBox();
-   assert.ok(popup&&popup.width<=305&&popup.height<=510,
-    'desktop Word advice must stay a compact floating popup, not a tall rail');
-  }
+  assert.equal(await assistant.isVisible(),false,
+   'Word page starts without a permanent right progress panel');
   assert.equal(await assistant.locator('.targeted-resume-ai-settings')
-   .evaluate(el=>el.open),false,'the optional privacy and draft controls must start folded');
+   .evaluate(el=>el.open),false,'privacy controls must start folded');
   await first.screenshot({path:output+'/word-first-'+view.name+'-read-mode.png',fullPage:true});
   if(view.name==='mobile'){
    const wordPosition=await first.locator('.targeted-resume-word-main').boundingBox();
    assert.ok(wordPosition&&wordPosition.y<330,
-    'mobile must show the Word document near the top, not below AI permissions and settings');
-   assert.equal(await assistant.isVisible(),false,'suggestions must not cover mobile Word');
-   await first.getByRole('button',{name:'修改进度',exact:true}).click();
-   await assistant.waitFor({state:'visible'});
+    'mobile must show Word near the top, not below AI settings');
+  }
+  await first.locator('.hhba-word-quick-actions').click();
+  await assistant.waitFor({state:'visible'});
+  if(view.name==='desktop'){
+   const popup=await assistant.boundingBox();
+   assert.ok(popup&&popup.width<=430,
+    'on-demand AI controls should not consume a permanent document column');
   }
   await assistant.locator('.targeted-resume-ai-settings summary').click();
   await first.locator('.targeted-resume-draft-recovery input[type=checkbox]').check();
@@ -675,7 +676,7 @@ try{
   await first.getByRole('button',{name:'开始 AI 优化'}).click();
   if(view.name==='mobile'){
    await assistant.waitFor({state:'hidden'});
-   const status=first.locator('.hhba-word-mobile-ai-status');
+   const status=first.locator('.hhba-word-quick-actions');
    await status.waitFor();
    await first.locator('.hhba-word-native-preview .hhba-word-ai-preview-text')
     .first().waitFor();
@@ -683,6 +684,10 @@ try{
    assert.equal(await assistant.isVisible(),false,
     'mobile must display the real glowing Word while AI results arrive, not cover it with a drawer');
    await status.click();
+   await assistant.waitFor({state:'visible'});
+  }
+  if(view.name==='desktop'){
+   await first.locator('.hhba-word-quick-actions').click();
    await assistant.waitFor({state:'visible'});
   }
   await assistant.locator('.hhba-word-suggestion-archive summary').click();
@@ -791,10 +796,8 @@ try{
   await first.getByRole('button',{name:/优化简历/}).click();
   await first.getByRole('region',{name:'独立简历优化工作区'}).waitFor();
   const recoveredAssistant=first.locator('.targeted-resume-word-assistant');
-  if(view.name==='mobile'){
-   await first.getByRole('button',{name:'修改进度',exact:true}).click();
-   await recoveredAssistant.waitFor({state:'visible'});
-  }
+  await first.locator('.hhba-word-quick-actions').click();
+  await recoveredAssistant.waitFor({state:'visible'});
   await recoveredAssistant.locator('.targeted-resume-ai-settings summary').click();
   await recoveredAssistant.getByRole('button',{name:'恢复草稿'}).waitFor();
   await recoveredAssistant.getByRole('button',{name:'恢复草稿'}).click();
@@ -829,6 +832,8 @@ try{
   await full.getByRole('button',{name:/优化简历/}).first().click();
   await full.getByRole('region',{name:'原版式 Word 沉浸式 AI 优化舞台'}).waitFor();
   const assistant=full.locator('.targeted-resume-word-assistant');
+  await full.locator('.hhba-word-quick-actions').click();
+  await assistant.waitFor({state:'visible'});
   await assistant.locator('.targeted-resume-ai-settings summary').click();
   await assistant.locator('.targeted-resume-consent input[type=checkbox]').check();
   const primary=full.getByRole('button',{name:'AI 针对岗位重写整份简历'});
@@ -905,6 +910,7 @@ try{
   await page.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&full&agent',
    {waitUntil:'networkidle',timeout:45000});
   await page.getByRole('button',{name:/优化简历/}).first().click();
+  await page.locator('.hhba-word-quick-actions').click();
   await page.locator('.targeted-resume-ai-settings summary').click();
   await page.locator('.targeted-resume-consent input[type=checkbox]').check();
   await page.getByRole('button',{name:'AI 针对岗位重写整份简历'}).click();
@@ -936,14 +942,14 @@ try{
   await mobile.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&full&agent',
    {waitUntil:'networkidle',timeout:45000});
   await mobile.getByRole('button',{name:/优化简历/}).first().click();
-  await mobile.getByRole('button',{name:'修改进度',exact:true}).click();
+  await mobile.getByRole('button',{name:'打开简历 AI 优化操作',exact:true}).click();
   const assistant=mobile.locator('.targeted-resume-word-assistant');
   await assistant.waitFor({state:'visible'});
   await assistant.locator('.targeted-resume-ai-settings summary').click();
   await assistant.locator('.targeted-resume-consent input[type=checkbox]').check();
   await assistant.getByRole('button',{name:'AI 针对岗位重写整份简历'}).click();
   await assistant.waitFor({state:'hidden'});
-  const progress=mobile.locator('.hhba-word-mobile-ai-status');
+  const progress=mobile.locator('.hhba-word-quick-actions');
   await progress.waitFor({state:'visible'});
   await mobile.locator('.hhba-word-ai-changed').first().waitFor({timeout:20000});
   await mobile.screenshot({path:output+'/whole-resume-ai-mobile-live-word.png',fullPage:true});
@@ -1000,6 +1006,7 @@ try{
    'same Word revision must not be charged again for identical re-scoring');
   // Preparing more AI suggestions does not rewrite the saved DOCX. Its
   // already-audited match score must remain visible until a *new* Word save.
+  await scorePage.locator('.hhba-word-quick-actions').click();
   await scorePage.locator('.targeted-resume-ai-settings summary').click();
   await scorePage.locator('.targeted-resume-consent input[type=checkbox]').check();
   await scorePage.getByRole('button',{name:'开始 AI 优化'}).click();
@@ -1148,10 +1155,8 @@ try{
   await context.locator('.hhba-word-native-preview .hhba-original-resume-anchor').first()
    .waitFor({timeout:18000});
   const rail=context.locator('.targeted-resume-word-assistant');
-  if(view.name==='mobile'){
-   await context.getByRole('button',{name:'修改进度',exact:true}).click();
-   await rail.waitFor({state:'visible'});
-  }
+  await context.locator('.hhba-word-quick-actions').click();
+  await rail.waitFor({state:'visible'});
   await rail.locator('.targeted-resume-ai-settings summary').click();
   await rail.locator('.targeted-resume-consent input[type=checkbox]').check();
   await context.getByRole('button',{name:'开始 AI 优化'}).click();
