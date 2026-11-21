@@ -76,7 +76,7 @@ test('foreign, unrecognized, and failed direct verifications cannot be promoted 
  assert.equal(result.matches[1].match_score,74);
 });
 test('two Search candidates pointing to one canonical job consume only ONE shared JD fetch',async()=>{
- const other={...job(URL+'?gh_jid=1234567'),id:'search-duplicate',title:'区域业务督导'};
+ const other={...job(URL+'?gh_jid=1234567'),id:'search-duplicate',title:'区域运营经理'};
  let reads=0,fetches=0,writes=0;
  const result=await enrichSearchMatchesWithJD(env,[job(),other],resume,{role_hint:'区域运营经理'},{
   ready:async()=>true,
@@ -89,6 +89,10 @@ test('two Search candidates pointing to one canonical job consume only ONE share
  assert.equal(result.matches[0].jd_version_id,result.matches[1].jd_version_id);
  assert.equal(result.matches[1].official_url,URL);
 });
+test('a different job title or a different Mainland city cannot borrow another JD',()=>{
+ assert.equal(scoreVerifiedJDSearchJob({...job(),title:'软件开发工程师'},archive(),resume),null);
+ assert.equal(scoreVerifiedJDSearchJob({...job(),location:'北京'},archive(),resume),null);
+});
 test('missing documented qualifications yield NO made-up JD score',()=>{
  const result=scoreVerifiedJDSearchJob(job(),archive(),'没有工作经验或相关技能。',{role_hint:'区域运营经理'});
  assert.equal(result.jd_version_id,ID);
@@ -96,10 +100,10 @@ test('missing documented qualifications yield NO made-up JD score',()=>{
  assert.equal(result.match_score,null);
 });
 test('verified JD version crosses search UI, history and Word without storing private resume in shared JD',()=>{
- const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
- const history=readFileSync(new URL('../functions/_lib/match-history.js',import.meta.url),'utf8');
- const dialog=readFileSync(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
- const editor=readFileSync(new URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
+ const route=readFileSync(new globalThis.URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
+ const history=readFileSync(new globalThis.URL('../functions/_lib/match-history.js',import.meta.url),'utf8');
+ const dialog=readFileSync(new globalThis.URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
+ const editor=readFileSync(new globalThis.URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
  assert.match(route,/verifiedJdPass\(/);
  assert.match(route,/withSavedHistory\(env,candidate,input,verified\)/);
  assert.match(history,/verifiedJdMeta\(item\)/);
