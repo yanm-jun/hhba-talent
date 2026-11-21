@@ -15,10 +15,12 @@ import '../styles/resume-match-dialog.css';
 // The native-search adapter historically used reference_score=0 to signal
 // "no score". Never print that placeholder as a measured 0/100.
 function visibleMatchScore(job:{match_score?:number|null;reference_score?:number}):number|null{
- if(Number.isInteger(job.match_score)&&job.match_score!>=0&&job.match_score!<=100)
-  return job.match_score!;
- if(Number.isInteger(job.reference_score)&&job.reference_score!>0&&job.reference_score!<=100)
-  return job.reference_score!;
+ const reported=job.match_score;
+ if(typeof reported==='number'&&Number.isInteger(reported)&&reported>=0&&reported<=100)
+  return reported;
+ const reference=job.reference_score;
+ if(typeof reference==='number'&&Number.isInteger(reference)&&reference>0&&reference<=100)
+  return reference;
  return null;
 }
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
