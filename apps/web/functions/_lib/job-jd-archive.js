@@ -15,7 +15,9 @@ const MAX_TEXT=16000;
 const text=value=>typeof value==='string'?value.trim():'';
 
 export function jdArchiveConfigured(env){
- return env?.HHBA_JOB_JD_ARCHIVE_ENABLED==='1'&&
+ // Explicit D1+R2 bindings opt the environment in; an optional '0' killswitch
+ // disables the archive without touching any private resume integration.
+ return env?.HHBA_JOB_JD_ARCHIVE_ENABLED!=='0'&&
   typeof env.HHBA_JOB_JD_DB?.prepare==='function'&&
   typeof env.HHBA_JOB_JD_R2?.put==='function'&&
   typeof env.HHBA_JOB_JD_R2?.get==='function';
