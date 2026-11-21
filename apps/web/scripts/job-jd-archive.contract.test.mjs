@@ -132,6 +132,6 @@ test('private resume bucket is never referenced by public JD store',()=>{
  assert.doesNotMatch(doc,/HHBA_PRIVATE_RESUMES|hhba_candidate_resumes|candidate_resume/i);
  assert.doesNotMatch(route,/HHBA_PRIVATE_RESUMES|hhba_candidate_resumes/i);
  assert.match(route,/consent_verify/);
- assert.match(route,/safeOfficialJobLocator/);
+ assert.match(route,/safeJDSourceLocator/);
  assert.match(route,/countAttempt/);
 });

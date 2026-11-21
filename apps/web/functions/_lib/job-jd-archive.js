@@ -7,11 +7,17 @@
  * A stale document stays available for audit but is NEVER described as fresh.
  */
 import {safeOfficialJobLocator} from './domestic-search-fetch.js';
+import {safePublicAtsJobLocator,ATS_JD_PROOF} from './public-ats-jd.js';
+import {extractOfficialJdSections} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
 
 export const JD_ARCHIVE_KIND='HHBA_VERIFIED_JOB_JD_V1';
 export const JD_FRESH_MS=24*60*60*1000;
 const MAX_TEXT=16000;
+export const safeJDSourceLocator=url=>safeOfficialJobLocator(url)||safePublicAtsJobLocator(url);
+const JD_TABLE_DIRECT='hhba_job_jd_versions';
+const JD_TABLE_ATS='hhba_job_ats_jd_versions';
+const tableForProof=proof=>proof===ATS_JD_PROOF?JD_TABLE_ATS:JD_TABLE_DIRECT;
 const text=value=>typeof value==='string'?value.trim():'';
 
 export function jdArchiveConfigured(env){
@@ -37,12 +43,13 @@ export function isJDVersionId(id){
 }
 function normalizeDocument(value){
  if(!value||typeof value!=='object'||Array.isArray(value))return null;
- const locator=safeOfficialJobLocator(value.canonical_url);
+ const locator=safeJDSourceLocator(value.canonical_url);
  if(!locator||locator.url!==value.canonical_url||locator.company!==value.company)return null;
+ const proof=locator.kind?ATS_JD_PROOF:'DIRECT_EMPLOYER_HTML_V1';
+ if(value.proof_method!==proof)return null;
  const body=text(value.full_jd);
  if(body.length<80||body.length>MAX_TEXT||value.content_status!=='VERIFIED_SECTIONS'||
-  value.proof_method!=='DIRECT_EMPLOYER_HTML_V1'||!body.includes('岗位职责')&&
-  !body.includes('工作职责')&&!body.includes('职位职责')&&!body.includes('主要职责')&&!body.includes('工作内容'))return null;
+  !/(?:岗位职责|工作职责|职位职责|主要职责|工作内容|岗位描述|职位描述|responsibilities|what you(?:'|’)ll do|what you will do|about the role|your impact|key responsibilities|duties)/i.test(body))return null;
  const sections=Array.isArray(value.sections)?value.sections.filter(x=>
   x&&/^(JD-\d{3})$/.test(x.id)&&
   ['responsibilities','requirements','other'].includes(x.kind)&&
@@ -52,27 +59,37 @@ function normalizeDocument(value){
   section.id!=='JD-'+String(index+1).padStart(3,'0')||
   !body.includes(section.text)))return null;
  if(sections.map(section=>section.text).join('\n')!==body)return null;
+ // The full-JD hash alone does not cover an attacker changing requirement
+ // classification while retaining identical text. Re-derive section kinds
+ // from the immutable source body every time R2 is read.
+ const recomputed=extractOfficialJdSections(body);
+ if(!recomputed||JSON.stringify(recomputed.sections)!==JSON.stringify(sections))
+  return null;
  return {
   canonical_url:locator.url,company:locator.company,
   title:text(value.title).slice(0,120),
   location:text(value.location).slice(0,100),
   full_jd:body,sections,
   content_status:'VERIFIED_SECTIONS',
-  proof_method:'DIRECT_EMPLOYER_HTML_V1'
+  proof_method:proof
  };
 }
 const safeDayIso=raw=>Number.isFinite(Date.parse(raw||''))?raw:null;
 export async function readJobJdById(env,id){
  if(!isJDVersionId(id)||!jdArchiveConfigured(env))return null;
- const row=await env.HHBA_JOB_JD_DB.prepare(
-  'SELECT * FROM hhba_job_jd_versions WHERE id=?'
- ).bind(id).first();
+ const db=env.HHBA_JOB_JD_DB;
+ let row=await db.prepare('SELECT * FROM '+JD_TABLE_DIRECT+' WHERE id=?').bind(id).first();
+ if(!row){
+  try{row=await db.prepare('SELECT * FROM '+JD_TABLE_ATS+' WHERE id=?').bind(id).first()}
+  catch{return null}
+ }
  return readArchivedRow(env,row);
 }
 async function readArchivedRow(env,row){
  if(!row||!isJDVersionId(row.id)||!row.object_key?.startsWith('official-jds/v1/'))return null;
- const official=safeOfficialJobLocator(row.canonical_url);
- if(!official||official.url!==row.canonical_url)return null;
+ const official=safeJDSourceLocator(row.canonical_url);
+ if(!official||official.url!==row.canonical_url||official.company!==row.company||
+  row.proof_method!==(official.kind?ATS_JD_PROOF:'DIRECT_EMPLOYER_HTML_V1'))return null;
  const object=await env.HHBA_JOB_JD_R2.get(row.object_key);
  if(!object)return null;
  const content=await object.text();
@@ -95,10 +112,11 @@ async function readArchivedRow(env,row){
  };
 }
 export async function readFreshJobJdByUrl(env,url){
- const locator=safeOfficialJobLocator(url);
+ const locator=safeJDSourceLocator(url);
  if(!locator||!jdArchiveConfigured(env))return null;
+ const table=locator.kind?JD_TABLE_ATS:JD_TABLE_DIRECT;
  const row=await env.HHBA_JOB_JD_DB.prepare(
-  'SELECT * FROM hhba_job_jd_versions WHERE canonical_url=? ORDER BY last_verified_at DESC LIMIT 1'
+  'SELECT * FROM '+table+' WHERE canonical_url=? ORDER BY last_verified_at DESC LIMIT 1'
  ).bind(locator.url).first();
  if(!row)return null;
  const archive=await readArchivedRow(env,row);
@@ -129,7 +147,7 @@ export async function saveVerifiedJobJd(env,raw,{now=new Date()}={}){
   });
  }
  const result=await env.HHBA_JOB_JD_DB.prepare(
-  'INSERT INTO hhba_job_jd_versions(id,canonical_url,url_sha256,company,title,location,jd_sha256,'+
+  'INSERT INTO '+tableForProof(source.proof_method)+'(id,canonical_url,url_sha256,company,title,location,jd_sha256,'+
   'object_key,text_bytes,proof_method,content_status,first_verified_at,last_verified_at) '+
   'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(canonical_url,jd_sha256) DO UPDATE SET '+
   'last_verified_at=excluded.last_verified_at'
@@ -149,7 +167,9 @@ export function publicJdPayload(saved,{includeText=true}={}){
   content_status:saved.content_status,proof_method:saved.proof_method,
   ...(includeText?{full_jd:saved.full_jd,sections:saved.sections}:{}),
   disclaimer:saved.fresh?
-   '直接读取企业官网并保存的岗位 JD；不保证此刻仍可投递。':
+   (saved.proof_method===ATS_JD_PROOF?
+    '企业专属公开 ATS 招聘接口核验的原文；招聘主体法定名称和是否仍在招以企业公告为准。':
+    '直接读取受支持企业官网并保存的岗位 JD；不保证此刻仍可投递。'):
    '这是历史岗位 JD 版本，可能已经过期；不能当作最新招聘条件。'
  };
 }
