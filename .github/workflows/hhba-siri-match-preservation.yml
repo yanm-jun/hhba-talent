@@ -10,6 +10,8 @@ on:
       - 'apps/web/src/styles/resume-match-dialog.css'
       - 'apps/web/functions/api/resume-word.js'
       - 'apps/web/scripts/word-layout-preservation.qa.py'
+      - 'apps/web/scripts/resume-docx-preserve.realfile.test.mjs'
+      - 'apps/web/src/services/resumeDocxPreserve.mjs'
       - 'services/word-renderer/**'
       - 'apps/web/scripts/match-siri-preserve.contract.test.mjs'
       - '.github/workflows/hhba-siri-match-preservation.yml'
@@ -55,3 +57,8 @@ jobs:
       - name: Real Chinese multi-page DOCX render and private HTTP verification
         working-directory: services/word-renderer
         run: python real_docx_local_qa.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser and Workers OOXML patcher against genuine DEFLATED two-page Chinese DOCX
+        run: node --test apps/web/scripts/resume-docx-preserve.realfile.test.mjs
