@@ -1041,7 +1041,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    <p><ShieldCheck size={14} aria-hidden="true"/> 原来的参考分：{Number.isInteger(job.reference_score)?job.reference_score+'/100':'暂无可靠分数'}。润色后的匹配分须通过同一评分规则重新评估；评分仅供参考。</p>
    <button type="button" onClick={reset}><Undo2 size={14}/> 恢复原稿</button>
   </div>}
-  {notice&&<p role="status" className="targeted-resume-notice">{notice}</p>}
+  {!sourceResume&&notice&&<p role="status" className="targeted-resume-notice">{notice}</p>}
   {legacyPrintQa&&createPortal(<div className="hhba-print-host" data-hhba-print-host="resume">
     <ResumePrintSheet document={printDocument}/>
    </div>,document.body)}
