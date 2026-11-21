@@ -130,7 +130,6 @@ test('Siri in-document changes expose adopt edit ignore only on hover/tap and re
   'adoption must signal accepted only after a layout-verified private Word revision succeeds');
  assert.match(viewer,/onVisualSuggestionAction\?\.\(visual\.id,'ignored'\)/);
  assert.match(viewer,/className="hhba-word-siri-edit-float"/);
- assert.match(optimizer,/onVisualSuggestionAction=\{\(id,action\)=>/);
  assert.match(optimizer,/resolvedWordVisualIds/);
  assert.match(viewer,/onVisualSuggestionAction\?\.\(inlineVisualSuggestionId,'edited',draft\.trim\(\)\)/);
  assert.match(optimizer,/onVisualSuggestionAction=\{\(id,action,newText\)=>/);
