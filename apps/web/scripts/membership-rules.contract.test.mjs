@@ -20,7 +20,7 @@ test('public rules page has 16 distinct, detailed chapters and 15 concrete FAQ e
   '前六个月职业成长服务','六个月连续缴费与进阶资格','争议发生时间与既有案件','拟提供的劳动法律服务',
   '案件数量、范围及额外费用','申请、审核、文书与结案流程','合作律所、律师权限与微信沟通',
   '真实性、滥用防范与双方义务','取消续费、退款与服务中断','个人信息、证据及AI处理',
-  '咨询、投诉、复核与争议解决','企业60%与劳动者帮扶池40%','规则生效、变更及历史版本']){
+  '咨询、投诉、复核与争议解决','平台责任与求职者权益','规则生效、变更及历史版本']){
   assert.ok(rules.includes(name),name+' missing');
  }
 });
@@ -49,11 +49,12 @@ test('draft does not enable payment or falsely claim a lawyer assignment',()=>{
  assert.match(rules,/正式开售前必须明确/);
  assert.match(rules,/不能使用「售出概不退款」/);
  assert.match(rules,/不包含心理咨询/);
- assert.match(rules,/不是每笔24\.90元付款的40%/);
+ assert.match(rules,/不设按固定比例划拨利润/);
  const config=JSON.parse(read('../src/data/homepagePublicConfig.json'));
  assert.equal(config.membership.purchaseEnabled,false);
  assert.equal(config.membership.caseIntakeEnabled,false);
- assert.equal(config.distribution.reportStatus,'not_published');
+ assert.ok(!Object.hasOwn(config,'distribution'));
+ assert.equal(config.commitment.fundingPromise,false);
  assert.ok(!page.includes('onSubmit'));
  assert.ok(!page.includes('createSubscription'));
 });

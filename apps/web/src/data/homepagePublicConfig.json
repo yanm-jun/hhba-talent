@@ -28,14 +28,12 @@
     "sensitiveCaseUploadEnabled": false,
     "caseAIProcessingEnabled": false,
     "launchApproved": false,
-    "complianceRulesVersion": "0.2.1"
+    "complianceRulesVersion": "0.2.2"
   },
-  "distribution": {
-    "status": "policy_announced",
-    "companyPercent": 60,
-    "workerSupportPercent": 40,
-    "basis": "依法核算后的可分配利润",
-    "reportStatus": "not_published",
-    "reportNotice": "60/40以依法核算后的可分配利润为基数，不按营业流水直接分配。首期财务公开报告尚未发布；在完成真实核算前，不展示未经核实的收入、支出或帮扶金额。"
+  "commitment": {
+    "status": "editorial",
+    "page": "/commitment",
+    "title": "每一份职业选择，都值得被认真守护。",
+    "fundingPromise": false
   }
 }

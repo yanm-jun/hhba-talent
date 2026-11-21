@@ -77,7 +77,7 @@ test('public disclosure is a quiet page link, not a new consent or identity-trac
  const main=readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8');
  const page=readFileSync(new URL('../src/pages/DataUsePage.tsx',import.meta.url),'utf8');
  assert.match(shell,/<footer className="hhba-site-footer">[\s\S]*?<Link to="\/data-use">运营数据说明<\/Link>/);
- assert.match(shell,/<Link to="\/transparency"[^>]*>责任与透明<\/Link>/);
+ assert.match(shell,/<Link to="\/commitment"[^>]*>我们的坚持<\/Link>/);
  assert.match(shell,/<\/footer>/);
  assert.match(shell,/汇方职场/);
  assert.match(main,/if\(route==='\/data-use'\)return <DataUsePage user=\{user\}\/>/);

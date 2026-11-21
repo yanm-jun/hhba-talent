@@ -21,12 +21,14 @@ const donePage=(text)=>new Response(`<!DOCTYPE html><html lang="zh-CN"><head><me
 
 export async function onRequest({request,env}){
  const path=actionPath(request),url=new URL(request.url),db=financeDb(env);
+ // HHBA has retired its monthly funding pledge. Reject fresh subscription or
+ // confirmation requests even if old environment secrets remain configured.
+ // Existing opt-out links and historical read-only records stay available.
+ if(path==='/api/transparency/subscribe')return failure('FINANCE_SUBSCRIPTIONS_RETIRED',410);
+ if(path==='/api/transparency/confirm')return donePage('财务报告邮件订阅服务已停止');
  if(request.method==='GET'&&(path==='/api/transparency'||path==='/api/transparency/status')){
-  return json({ok:true,plan:{companyPercent:60,workerSupportPercent:40,basis:'依法核算后的可分配利润'},
-   publicationDay:21,publicationTimezone:'Asia/Shanghai',reportStatus:'not_guaranteed',
-   subscriptionEnabled:subscribeReady(env),
-   siteKey:subscribeReady(env)?String(env.HHBA_FIN_TURNSTILE_SITE_KEY):null,
-   configured:!!db});
+  return json({ok:true,plan:null,reportStatus:'retired',subscriptionEnabled:false,
+   siteKey:null,configured:!!db});
  }
  // Public-only, already redacted publication tables. Separate from private case intake.
  // A missing schema is NOT evidence that no cases or payments ever occurred.

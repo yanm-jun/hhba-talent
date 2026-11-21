@@ -57,7 +57,7 @@ export function SiteFooter(){
    ['会员与权益服务','/rights'],
    ['劳动权益知识','/rights/knowledge'],
    ['高性价比职场指南','/rights/guide'],
-   ['责任与透明','/transparency'],
+   ['我们的坚持','/commitment'],
   ]},
   {title:'关于汇方',links:[
    ['品牌介绍','/vision'],
@@ -67,7 +67,7 @@ export function SiteFooter(){
   {title:'服务与帮助',links:[
    ['全站搜索','/search'],
    ['会员服务规则','/membership/rules'],
-   ['责任与透明','/transparency'],
+   ['我们的坚持','/commitment'],
   ]},
  ] as const;
  return <footer className="hhba-site-footer">
@@ -89,7 +89,7 @@ export function SiteFooter(){
    <span>让机会与人才，找到彼此。</span>
    <div>
     <Link to="/data-use">运营数据说明</Link>
-    <Link to="/transparency">责任与透明</Link>
+    <Link to="/commitment">我们的坚持</Link>
     <Link to="/membership/rules">会员服务规则</Link>
    </div>
   </div>
