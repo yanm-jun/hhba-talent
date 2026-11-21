@@ -109,3 +109,33 @@ test('frontend-first upload shows the candidate DOCX and an independent Siri mod
  assert.match(vite,/isolatedResumePreview\?{build:/);
  assert.match(build,/HHBA_PREVIEW_ONLY_SIMPLE_RESUME_READY/);
 });
+
+test('Siri in-document changes expose adopt edit ignore only on hover/tap and require verified Word save',async()=>{
+ const viewer=await source('components/OriginalWordViewer.tsx');
+ const optimizer=await source('components/TargetedResumeOptimization.tsx');
+ const css=await source('styles/original-resume-viewer.css');
+ const modal=await source('components/CandidateMatchNativeDialog.tsx');
+ assert.match(modal,/优化简历 <span aria-hidden="true">/);
+ assert.doesNotMatch(modal,/优化简历，提高分值/);
+ assert.match(viewer,/hhba-word-siri-anchor-shell/);
+ assert.match(viewer,/hhba-word-siri-inline-actions/);
+ for(const label of ['采纳','编辑','忽略'])assert.match(viewer,new RegExp('> '+label+'<'));
+ assert.match(viewer,/aria-label="当前彩虹文字操作"/);
+ assert.match(viewer,/setActiveVisualId\(current=>current===visual\.id\?null:visual\.id\)/);
+ assert.match(viewer,/window\.confirm\('请先核实/);
+ const save=viewer.indexOf('async function acceptVisualWord');
+ const persist=viewer.indexOf('await saveOriginalWordEdit(resume.id,anchor.text,visual.proposed.trim(),revision)',save);
+ const success=viewer.indexOf("onVisualSuggestionAction?.(visual.id,'accepted')",save);
+ assert.ok(save>=0&&persist>save&&success>persist,
+  'adoption must signal accepted only after a layout-verified private Word revision succeeds');
+ assert.match(viewer,/onVisualSuggestionAction\?\.\(visual\.id,'ignored'\)/);
+ assert.match(viewer,/className="hhba-word-siri-edit-float"/);
+ assert.match(optimizer,/onVisualSuggestionAction=\{\(id,action\)=>/);
+ assert.match(optimizer,/resolvedWordVisualIds/);
+ assert.match(optimizer,/<strong><Sparkles size=\{15\}\/> 修改进度<\/strong>/);
+ assert.doesNotMatch(optimizer,/<strong><Sparkles size=\{15\}\/> AI 修改建议<\/strong>/);
+ assert.match(css,/hhba-word-siri-anchor-shell:hover \.hhba-word-siri-inline-actions/);
+ assert.match(css,/hhba-word-siri-anchor-shell:focus-within \.hhba-word-siri-inline-actions/);
+ assert.match(css,/hhba-word-siri-anchor-shell\.is-open \.hhba-word-siri-inline-actions/);
+ assert.match(css,/@media\(hover:none\)/);
+});
