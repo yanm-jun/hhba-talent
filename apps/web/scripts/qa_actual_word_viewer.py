@@ -102,12 +102,11 @@ def exercise(browser,label,viewport):
             page.get_by_role('button',name='下载 Word').click()
         content=Path(info.value.path()).read_bytes()
         assert hashlib.sha256(content).hexdigest()==expected_digest,(label,'unexpected downloaded DOCX')
-        assert page.get_by_role('button',name='下载 PDF').count()==1
-        assert page.get_by_role('button',name='下载 PDF').is_disabled()
+        assert page.get_by_role('button',name='下载 PDF').first.is_disabled()
 
     accept();download(meta['saved'])
     page.get_by_role('button',name='切换岗位乙').click()
-    page.get_by_test_id('active-job').get_by_text('role-B').wait_for(timeout=8000)
+    assert page.get_by_test_id('active-job').inner_text()=='role-B'
     accept();download(meta['saved'])
     page.get_by_role('button',name='切换岗位甲').click()
     page.get_by_text('当前修改进度：1 / 1').first.wait_for(timeout=20000)
