@@ -22,6 +22,7 @@ import {reassessmentStatus,reassessResume,type ReassessmentStatus,type Reassessm
 import {officialJobVerifyStatus,verifyOfficialJob,type OfficialJobVerifyStatus,type OfficialVerifiedJob} from '../services/officialJobVerifyApi';
 import '../styles/targeted-resume-optimization.css';
 import '../styles/siri-edge.css';
+import '../styles/word-editor-minimal.css';
 
 export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,onDraftDirtyChange,accountScope}:{profile:CandidateProfile;job:JobMatch;sourceText?:string;sourceResume?:PrivateResume;onDraftDirtyChange?:(dirty:boolean)=>void;accountScope?:string}){
  const blocks=useMemo<ResumeBlock[]>(()=>{
