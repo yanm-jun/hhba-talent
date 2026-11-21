@@ -99,7 +99,14 @@ async function finishPendingR2Delete(env,entry,now){
  if(!/^jd_[a-f0-9]{32}$/.test(id)||!KEY.test(key)||
   !entry.reason?.startsWith(RETRY_PREFIX))return false;
  // If D1 still points at the object, it MUST NEVER be deleted by recovery.
- if(await isAnyJdIndexPresent(db,id,key))return false;
+ if(await isAnyJdIndexPresent(db,id,key)){
+  // A crash before the conditional index DELETE did not detach the object.
+  // Cancel this abandoned marker; the ordinary retention scan can recheck
+  // the whole 30/90-day criteria before scheduling another purge.
+  await db.prepare('DELETE FROM hhba_jd_retention_audit WHERE event_id=? AND event_type=?')
+   .bind(entry.event_id,'SKIPPED_ERROR').run();
+  return false;
+ }
  if(await recordHistoryDependency(env,id))return false;
  const obj=await bucket.head(key);
  if(obj){
