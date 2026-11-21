@@ -12,7 +12,7 @@ const MAX_RESPONSE=220000;
 const DEGREE=['HIGH_SCHOOL','ASSOCIATE','BACHELOR','MASTER','PHD'];
 const canon=raw=>safeOfficialJobLocator(raw);
 const xmlEntities={amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",nbsp:' '};
-function htmlToText(html){
+export function htmlToText(html){
  const stripped=html
   .replace(/<!--[\s\S]*?-->/g,' ')
   .replace(/<(script|style|svg|noscript|template|iframe)\b[^>]*>[\s\S]*?<\/\1>/gi,' ')
@@ -37,8 +37,9 @@ function htmlToText(html){
  */
 export function extractOfficialJdSections(plain){
  if(typeof plain!=='string'||plain.length<150)return null;
- const duty=/^(?:岗位职责|工作职责|职位职责|主要职责|工作内容|岗位描述|职位描述)[：:\s]*/;
- const req=/^(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求|职责要求)[：:\s]*/;
+ // Literal headings from public ATS posts, not LLM-guessed section labels.
+ const duty=/^(?:岗位职责|工作职责|职位职责|主要职责|工作内容|岗位描述|职位描述|responsibilities|what you(?:'|’)ll do|what you will do|the role|about the role|your impact|key responsibilities|job responsibilities|duties)[：:\s]*/i;
+ const req=/^(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求|职责要求|requirements|qualifications|what we(?:'|’)re looking for|what you bring|who you are|skills and experience|your qualifications|basic qualifications|minimum qualifications)[：:\s]*/i;
  const footer=/^(?:立即申请|立即投递|投递简历|申请职位|相关职位|推荐岗位|更多职位|企业简介|友情链接|隐私政策|联系我们)\s*$/;
  const lines=plain.split('\n').map(x=>x.replace(/[\t\u0000]+/g,' ')
   .replace(/ +/g,' ').trim()).filter(Boolean);
