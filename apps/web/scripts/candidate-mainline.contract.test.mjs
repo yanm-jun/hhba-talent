@@ -136,7 +136,9 @@ test('Siri in-document changes expose adopt edit ignore only on hover/tap and re
  assert.match(optimizer,/editResumeBlock\(prev,item\.blockId,changed\)/);
  assert.match(optimizer,/setEditedWordVisualIds\(/);
  assert.match(optimizer,/已按本人编辑的文字保存并核验原 Word 排版/);
- assert.match(optimizer,/<strong><Sparkles size=\{15\}\/> 修改进度<\/strong>/);
+ assert.doesNotMatch(optimizer,/<strong><Sparkles size=\{15\}\/> 修改进度<\/strong>/);
+ assert.match(optimizer,/className="hhba-word-quick-actions"/);
+ assert.match(optimizer,/id="hhba-word-optimization-tools"/);
  assert.doesNotMatch(optimizer,/<strong><Sparkles size=\{15\}\/> AI 修改建议<\/strong>/);
  assert.match(css,/hhba-word-siri-anchor-shell:hover \.hhba-word-siri-inline-actions/);
  assert.match(css,/hhba-word-siri-anchor-shell:focus-within \.hhba-word-siri-inline-actions/);
@@ -170,4 +172,28 @@ test('same original Word has isolated job-scoped revision and download entry poi
  // The old private-vault reader intentionally omits the selected job.
  assert.match(vault,/<OriginalResumeViewer key=\{previewItem.id\} resume=\{previewItem\}/);
  assert.doesNotMatch(vault,/<OriginalWordViewer[^>]*jobId/);
+});
+
+
+test('Siri optimization removes permanent progress card and enhances both preview and real document',async()=>{
+ const optimizer=await source('components/TargetedResumeOptimization.tsx');
+ const layout=await source('styles/targeted-resume-optimization.css');
+ const preview=await readFile(new URL('../preview-only/siri-inline.html',import.meta.url),'utf8');
+ assert.match(optimizer,/className="hhba-word-quick-actions"/);
+ assert.match(optimizer,/aria-expanded=\{mobileSuggestionsOpen\}/);
+ assert.match(optimizer,/setMobileSuggestionsOpen\(open=>!open\)/);
+ assert.match(optimizer,/className="hhba-word-tools-scrim"/);
+ assert.match(optimizer,/aria-controls="hhba-word-optimization-tools"/);
+ assert.match(layout,/\.targeted-resume\.is-word-first \.targeted-resume-word-workspace,\s*\.hhba-match-modal-editor [^\n]+/);
+ assert.match(layout,/\.targeted-resume\.is-word-first \.targeted-resume-word-assistant\.mobile-open/);
+ assert.match(layout,/display:none!important;position:fixed/);
+ assert.match(layout,/hhba-word-bright-breathe/);
+ assert.match(layout,/animation:hhba-siri-edge-flow 6\.8s linear infinite/);
+ assert.match(layout,/hhba-original-resume-anchor\.has-ai-preview \.hhba-word-ai-preview-text>\\.hhba-word-ai-changed/);
+ assert.doesNotMatch(preview,/<aside class="side">/);
+ assert.match(preview,/\.dialog-body\{flex:1;min-height:0;overflow:auto;padding:22px;display:block\}/);
+ assert.match(preview,/animation:edge 6s linear infinite/);
+ assert.match(preview,/animation:ink 3\.1s linear infinite/);
+ assert.match(preview,/prefers-reduced-motion:reduce/);
+ assert.match(optimizer,/onVisualSuggestionAction=\{\(id,action,newText\)=>/);
 });
