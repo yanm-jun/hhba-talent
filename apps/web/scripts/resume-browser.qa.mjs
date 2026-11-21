@@ -1010,6 +1010,10 @@ try{
   await scorePage.locator('.hhba-original-resume-edit-confirm input[type=checkbox]').check();
   await scorePage.getByRole('button',{name:'确认保存'}).click();
   await scorePage.getByText('已检查版式并保存第 1 次修改',{exact:false}).waitFor();
+  // The Word editor temporarily hides the optional AI tools; reopen the
+  // drawer explicitly before verifying the saved revision's score controls.
+  if(!await scorePage.locator('.targeted-resume-word-assistant').isVisible())
+   await scorePage.locator('.hhba-word-quick-actions').click();
   await scorePage.getByText('已保存第 1 版 Word，可以按原岗位规则复评。').waitFor();
   assert.equal(await scorePage.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count(),0,
    'confirmed native Word must return to the original font without pending Siri edge');
@@ -1022,7 +1026,8 @@ try{
    'same Word revision must not be charged again for identical re-scoring');
   // Preparing more AI suggestions does not rewrite the saved DOCX. Its
   // already-audited match score must remain visible until a *new* Word save.
-  await scorePage.locator('.hhba-word-quick-actions').click();
+  if(!await scorePage.locator('.targeted-resume-word-assistant').isVisible())
+   await scorePage.locator('.hhba-word-quick-actions').click();
   await scorePage.locator('.targeted-resume-ai-settings summary').click();
   await scorePage.locator('.targeted-resume-consent input[type=checkbox]').check();
   await scorePage.getByRole('button',{name:'开始 AI 优化'}).click();
