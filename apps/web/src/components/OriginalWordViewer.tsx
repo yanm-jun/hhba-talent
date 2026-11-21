@@ -20,8 +20,8 @@ import '../styles/siri-edge.css';
 type PendingWordTextDraft={original:string;text:string;revision:number;page:number};
 export type WordVisualSuggestion={id:string;original:string;proposed:string;state:'pending'|'accepted'};
 export type WordRevisionSnapshot={revision:number;history:WordHistoryEntry[]};
-export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onVisualSuggestionAction,onRevisionSnapshot,onDocumentReady}:{
- resume:PrivateResume;onClose?:()=>void;
+export function OriginalWordViewer({resume,jobId,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onVisualSuggestionAction,onRevisionSnapshot,onDocumentReady}:{
+ resume:PrivateResume;jobId?:string;onClose?:()=>void;
  suggestedChanges?:{original:string;proposed:string}[];
  onOpenSuggestions?:()=>void;pendingSuggestionCount?:number;onPendingChange?:(dirty:boolean)=>void;
  onVerifiedSave?:(change:{original:string;text:string})=>void;
@@ -85,7 +85,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  useEffect(()=>{
   setPage(1);setZoom(1);setActiveVisualId(null);setInlineVisualEditor(null);restorePosition.current=null;
   renderedEntrance.current=false;
- },[resume.id]);
+ },[resume.id,jobId]);
  useEffect(()=>{
   onPendingChange?.(Boolean(selected&&draft!==selected.text));
  },[selected,draft,onPendingChange]);
@@ -106,7 +106,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
    if(!controller.signal.aborted)setReady(ok?'available':'unavailable');
   });
   return()=>controller.abort();
- },[resume.id]);
+ },[resume.id,jobId]);
 
  useEffect(()=>{
   if(ready==='checking')return;
@@ -123,7 +123,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
      }
      return;
     }
-    const info=await wordEditableText(resume.id);
+    const info=await wordEditableText(resume.id,undefined,jobId);
     if(!active)return;
     // Editing is permitted only when the DOCX text is unique not only in
     // the OOXML body but across every rendered page, including headers.
@@ -139,7 +139,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
     onRevisionSnapshot?.({revision:Number.isInteger(info.revision)?info.revision:(wasSaved?1:0),
      history:inspectedHistory});
     const bytes=await wordPreviewBytes(resume.id,wasSaved,undefined,
-     Number.isInteger(info.revision)?info.revision:(wasSaved?1:0));
+     Number.isInteger(info.revision)?info.revision:(wasSaved?1:0),jobId);
     if(!active)return;
     const [pdf,worker]=await Promise.all([
      import('pdfjs-dist'),import('pdfjs-dist/build/pdf.worker.min.mjs?url')
@@ -177,7 +177,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
    }
   })();
   return()=>{active=false;doc.current=null;void task?.destroy().catch(()=>{});};
- },[resume.id,ready,refresh]);
+ },[resume.id,jobId,ready,refresh]);
 
  useEffect(()=>{
   if(ready!=='available'||loading||!surface.current||!doc.current)return;
@@ -251,7 +251,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   if(!window.confirm('请先核实这段文字符合真实经历。确认采纳并保存岗位专属 Word 修改？原上传文件不会被覆盖。'))return;
   rememberPosition();setBusy(true);setMessage('');
   try{
-   const result=await saveOriginalWordEdit(resume.id,anchor.text,visual.proposed.trim(),revision);
+   const result=await saveOriginalWordEdit(resume.id,anchor.text,visual.proposed.trim(),revision,jobId);
    onSessionWordDraftChange?.(null);
    onVerifiedSave?.({original:anchor.text,text:visual.proposed.trim()});
    onVisualSuggestionAction?.(visual.id,'accepted');
@@ -275,14 +275,14 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  }
  async function downloadSaved(){
   setBusy(true);setMessage('');
-  try{await downloadOriginalWordEdited(resume.id);
+  try{await downloadOriginalWordEdited(resume.id,jobId);
    setMessage('已发起 Word 下载，请在浏览器下载列表查看。');}
   catch(error){setMessage(error instanceof Error?error.message:'下载失败，请重试。');}
   finally{setBusy(false);}
  }
  async function downloadSavedPdf(){
   setBusy(true);setMessage('');
-  try{await downloadOriginalWordPdf(resume.id);
+  try{await downloadOriginalWordPdf(resume.id,jobId);
    setMessage('已发起当前已确认版本的 PDF 下载。');}
   catch(error){setMessage(error instanceof Error?error.message:'PDF 下载失败，请重试。');}
   finally{setBusy(false);}
@@ -291,7 +291,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   if(!selected||!confirmed||busy||!draft.trim()||draft.length>300)return;
   rememberPosition();setBusy(true);setMessage('');
   try{
-   const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision);
+   const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision,jobId);
    onSessionWordDraftChange?.(null);
    onVerifiedSave?.({original:selected.text,text:draft.trim()});
    if(inlineVisualEditor&&inlineVisualSuggestionId)
@@ -308,7 +308,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   if(!confirmDiscardText())return;
   rememberPosition();setBusy(true);setMessage('');
   try{
-   const result=await shiftOriginalWordRevision(resume.id,action,revision);
+   const result=await shiftOriginalWordRevision(resume.id,action,revision,jobId);
    onSessionWordDraftChange?.(null);setSelected(null);setConfirmed(false);setInlineVisualEditor(null);setActiveVisualId(null);
    onVersionMoved?.();
    setRevision(result.revision);setTotalRevisions(result.total_revisions);
@@ -358,7 +358,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
   <div className="hhba-original-resume-toolbar">
    <div className="hhba-original-resume-file-heading">
     <strong>{resume.name}</strong>
-    <span>原版式 Word · 当前修改进度：{revision} / {totalRevisions}</span>
+    <span>{jobId?'岗位专属 Word':'原版式 Word'} · 当前修改进度：{revision} / {totalRevisions}</span>
    </div>
    <div className="hhba-original-resume-toolbar-actions">
     {ready==='available'&&<>
