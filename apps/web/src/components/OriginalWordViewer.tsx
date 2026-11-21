@@ -443,7 +443,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
        const changed=visual?splitChangedResumeText(anchor.text,visual.proposed):null;
        return <div key={anchor.id}
         className={'hhba-word-siri-anchor-shell'+(visual?.state==='pending'?' has-siri-wording':'')+
-         (activeVisualId===visual?.id?' is-open':'')}
+         (activeVisualId===visual?.id?' is-open':'')+(inlineVisualEditor===anchor.id?' is-editing':'')}
         style={{left:x/10+'%',top:y/10+'%',width:w/10+'%',height:h/10+'%'}}>
         <button type="button"
         className={"hhba-original-resume-anchor"+(selected?.id===anchor.id?" is-selected":"")+
