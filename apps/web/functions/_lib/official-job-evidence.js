@@ -82,7 +82,13 @@ export async function directOfficialJobEvidence(url,{fetcher=fetch,now=new Date(
   method:'GET',redirect:'manual',cache:'no-store',signal:AbortSignal.timeout(12000),
   headers:{Accept:'text/html,text/plain;q=0.9','User-Agent':'HHBA-JobEvidence/1.0'}
  });
- if(response.status!==200)throw Error('OFFICIAL_PAGE_UNAVAILABLE');
+ if(response.status!==200){
+  const error=new Error('OFFICIAL_PAGE_UNAVAILABLE');
+  // Only exact URL 404/410, not timeouts/403/bot blocks, can contribute
+  // to a repeated and time-spaced closure confirmation.
+  if(response.status===404||response.status===410)error.httpStatus=response.status;
+  throw error;
+ }
  const type=(response.headers.get('Content-Type')||'').toLowerCase();
  if(!type.includes('text/html')&&!type.includes('text/plain'))throw Error('OFFICIAL_PAGE_UNREADABLE');
  const raw=await readLimited(response);
