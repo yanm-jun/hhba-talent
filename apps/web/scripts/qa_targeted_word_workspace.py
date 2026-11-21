@@ -75,7 +75,17 @@ def exercise(browser,name,viewport):
     assert box and first,(name,box,first)
     assert first['x']>=box['x']-12,(name,'Word extends left',box,first)
     assert first['x']+first['width']<=box['x']+box['width']+18,(name,'Word right edge cut off',box,first)
-    assert first['y']+first['height']<=box['y']+box['height']+28,(name,'initial page not fitted',box,first)
+    assert first['y']+first['height']<=box['y']+box['height']+28,(name,'page does not fit paper',box,first)
+    modal=page.locator('.hhba-match-modal-editor .hhba-match-modal-content').bounding_box()
+    assert modal,(name,'missing visible modal viewport')
+    assert first['y']+first['height']<=modal['y']+modal['height']+12,(
+        name,'first Word page hidden below visible modal viewport',modal,first)
+    assert abs((first['x']+first['width']/2)-(box['x']+box['width']/2))<=32,(
+        name,'Word should be centered within the wide work area',box,first)
+    if name=='mobile':
+        dock=page.locator('.hhba-original-resume-mobile-dock')
+        if dock.is_visible():
+            assert dock.evaluate('(el)=>getComputedStyle(el).position') not in ('sticky','fixed')
 
     # Editing hit areas must stay clickable, but have no always-on rectangles.
     anchors=page.locator('.hhba-original-resume-anchor:not(.has-ai-preview)')
