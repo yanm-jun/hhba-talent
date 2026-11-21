@@ -478,7 +478,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
           {textFits&&changed?.prefix&&<span className="hhba-word-ai-unchanged">{changed.prefix}</span>}
           {!textFits&&<span className="hhba-word-ai-unchanged">…</span>}
           <span className="hhba-word-ai-changed hhba-resume-siri-letters">
-           {changed?.changed||'✦ 精简此处文字'}
+           {changed?.changed||'−'}
           </span>
           {textFits&&changed?.suffix&&<span className="hhba-word-ai-unchanged">{changed.suffix}</span>}
          </span>
