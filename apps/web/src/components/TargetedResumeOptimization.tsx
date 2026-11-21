@@ -20,7 +20,7 @@ import {ResumePrintSheet} from './ResumePrintSheet';
 import {downloadResumeDocx} from '../services/resumeDocx';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
 import {officialJobVerifyStatus,verifyOfficialJob,type OfficialJobVerifyStatus,type OfficialVerifiedJob} from '../services/officialJobVerifyApi';
-import {jobJdArchiveStatus,ensureArchivedJobJd,type JdAwareJob} from '../services/jobJdArchive';
+import {jobJdArchiveStatus,ensureArchivedJobJd,getArchivedJobJdVersion,type JdAwareJob} from '../services/jobJdArchive';
 import '../styles/targeted-resume-optimization.css';
 import '../styles/siri-edge.css';
 import '../styles/word-editor-minimal.css';
@@ -215,7 +215,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const before=useMemo(()=>evidenceVisibility(criteria,blocks),[criteria,blocks]);
  const after=useMemo(()=>evidenceVisibility(criteria,version.blocks),[criteria,version.blocks]);
  const hasAuditedAtsIdentity=/^(?:ashby|greenhouse|lever)-/.test(job.id);
- const scoreJobId=archivedJdId||(hasAuditedAtsIdentity?job.id:
+ const scoreJobId=archivedJdId||job.jd_version_id||(hasAuditedAtsIdentity?job.id:
   (verifiedJob&&confirmedVerifiedJob?verifiedJob.job_id:null));
  const hasSupportedJob=Boolean(scoreJobId);
  const verifiedWordScore=useMemo(()=>checkedWordScoreBlocks(blocks,
@@ -344,7 +344,16 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   if(!await jobJdArchiveStatus(signal))
    return {title,requirements:fullJobRequirements,
     official_url:job.official_url};
-  const official=await ensureArchivedJobJd(job.official_url,signal);
+  // A search result/historic snapshot already contains an audited immutable
+  // version ID. Reuse D1/R2 without a second employer request.
+  let official=null;
+  if(job.jd_version_id){
+   try{
+    const archived=await getArchivedJobJdVersion(job.jd_version_id,signal);
+    if(archived.fresh&&archived.canonical_url===job.official_url)official=archived;
+   }catch(error){if(signal.aborted)throw error;}
+  }
+  if(!official)official=await ensureArchivedJobJd(job.official_url,signal);
   if(!signal.aborted)setArchivedJdId(official.job_id);
   return {title:official.title,requirements:official.full_jd,
    official_url:official.canonical_url,jd_version_id:official.job_id};
