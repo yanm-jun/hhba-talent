@@ -1,6 +1,6 @@
 import {useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
-import {Check,ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,Redo2,ZoomIn,ZoomOut,Sparkles,X,History,ChevronDown} from 'lucide-react';
+import {Check,ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,Redo2,ZoomIn,ZoomOut,Sparkles,X,History,ChevronDown,LoaderCircle} from 'lucide-react';
 import type {PrivateResume} from '../services/privateResumes';
 import {downloadPrivateResume,fetchPrivateResumeForLocalReview} from '../services/privateResumes';
 import {extractDocxText} from '../services/docxProfile.mjs';
@@ -609,7 +609,10 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   {editPanel&&(!editPanelHost?
    <aside className="hhba-word-standalone-edit-panel" aria-label="Word 当前文字编辑">{editPanel}</aside>:
    createPortal(editPanel,editPanelHost))}
-  {loading&&<p className="hhba-original-resume-note" role="status">正在打开简历…</p>}
+  {loading&&<div className="hhba-word-loading-state" role="status" aria-live="polite">
+   <LoaderCircle className="hhba-word-loading-spinner" size={25} aria-hidden="true"/>
+   <span>正在打开简历…</span>
+  </div>}
   {saved&&ready==='available'&&!layoutVerified&&<p className="hhba-browser-word-disclaimer">
    已保存原格式 DOCX，尚未校验分页；可下载 Word，PDF 暂不可用。
   </p>}
@@ -617,7 +620,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    {rendererEnabled?'正在验证字体、分页并准备 PDF…':
     '正在保存原 DOCX 的岗位独立版本，原件不会被覆盖…'}
   </p>}
-  {previewError&&<div className="hhba-original-resume-note" role="alert">
+  {previewError&&<div className="hhba-original-resume-note hhba-word-load-error" role="alert">
    <p>{previewError}</p>
    {ready==='available'&&<button type="button" disabled={busy}
     onClick={()=>{setPreviewError('');setRefresh(n=>n+1);}}>重新载入最新版</button>}
