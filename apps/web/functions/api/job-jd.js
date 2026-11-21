@@ -11,6 +11,7 @@
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
 import {fetchPublicAtsJd} from '../_lib/public-ats-jd.js';
 import {directOfficialJobEvidence} from '../_lib/official-job-evidence.js';
+import {noteJdSourceFailure} from '../_lib/jd-posting-lifecycle.js';
 import {
  JD_ARCHIVE_KIND,jdArchiveConfigured,jdArchiveReady,safeJDSourceLocator,
  readJobJdById,readFreshJobJdByUrl,saveVerifiedJobJd,publicJdPayload
@@ -112,7 +113,12 @@ export async function onRequestPost({request,env}){
  catch{return fail('JD_ARCHIVE_QUOTA_NOT_READY',503)}
  let evidence;
  try{evidence=locator.kind?await fetchPublicAtsJd(locator.url):await directOfficialJobEvidence(locator.url)}
- catch{return fail('JD_OFFICIAL_FETCH_FAILED',422)}
+ catch(error){
+  try{await noteJdSourceFailure(env,locator.url,error)}catch{
+   return fail('JD_LIFECYCLE_NOT_READY',503);
+  }
+  return fail('JD_OFFICIAL_FETCH_FAILED',422);
+ }
  if(!evidence?.full_jd||evidence.content_status!=='VERIFIED_SECTIONS')
   return fail('JD_NOT_COMPLETE_ENOUGH',422);
  try{
