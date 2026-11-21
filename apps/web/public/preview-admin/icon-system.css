@@ -1,0 +1,33 @@
+/* HHBA admin icon treatment. Affects controls and small SVG illustrations,
+ * never charts, brand marks, or the underlying navigation semantics. */
+:root {
+  --hhba-icon-ease: cubic-bezier(.22, .72, .18, 1);
+  --hhba-icon-duration: 200ms;
+}
+svg[aria-hidden="true"] {
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  shape-rendering: geometricPrecision;
+}
+.workspace-chevron {display: inline-flex;align-items: center;justify-content: center;}
+.workspace-chevron svg {width: 16px;height: 16px;stroke-width: 1.8;}
+:where(button:not(:disabled), a[href], [role="button"]) > svg[aria-hidden="true"],
+:where(button:not(:disabled), a[href], [role="button"]) :where(.metric-icon, .placeholder-visual) > svg[aria-hidden="true"] {
+  transform-origin: 50% 50%;
+  transition: transform var(--hhba-icon-duration) var(--hhba-icon-ease),
+              color var(--hhba-icon-duration) ease,
+              opacity var(--hhba-icon-duration) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  :where(button:not(:disabled), a[href], [role="button"]):hover > svg[aria-hidden="true"],
+  :where(button:not(:disabled), a[href], [role="button"]):hover :where(.metric-icon, .placeholder-visual) > svg[aria-hidden="true"] {
+    transform: translateY(-1px);
+  }
+}
+:where(button:not(:disabled), a[href], [role="button"]):active > svg[aria-hidden="true"] {
+  transform: scale(.96);
+}
+:where(button:disabled, [aria-disabled="true"]) svg[aria-hidden="true"] {opacity: .55;}
+@media (prefers-reduced-motion: reduce) {
+  svg[aria-hidden="true"] {transition: none !important;animation: none !important;transform: none !important;}
+}
