@@ -213,3 +213,15 @@
 @media(prefers-reduced-motion:reduce){
  .hhba-word-consent-overlay{backdrop-filter:none}
 }
+
+/* Siri's gradients belong to suggested glyphs, never the entire canvas.
+   Keep the user-requested blank margins neutral even during AI analysis. */
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-resume-siri-stage.hhba-siri-edge-active::before,
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-resume-siri-stage.hhba-siri-edge-active::after{
+ display:none!important;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-message:not(.is-error){
+ position:absolute!important;width:1px!important;height:1px!important;
+ margin:0!important;padding:0!important;overflow:hidden!important;
+ clip-path:inset(50%)!important;
+}
