@@ -1,8 +1,6 @@
 name: HHBA Word browser-only actual Chromium QA
 on:
-  push:
-    branches:
-      - feature/match-dialog-preserve-siri-20261121
+  pull_request:
     paths:
       - '.github/workflows/hhba-word-browser-qa.yml'
       - 'apps/web/scripts/qa-word-browser-preview.html'
