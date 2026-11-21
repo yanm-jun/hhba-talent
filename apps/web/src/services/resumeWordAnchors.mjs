@@ -4,11 +4,21 @@ const plain=s=>String(s||'').normalize('NFKC').trim();
 export function matchWordAnchors({editableText,items,viewport,page,styles={}}){
  if(!Array.isArray(editableText)||!Array.isArray(items)||!viewport||
   !Number.isInteger(page)||page<1)return [];
- const candidates=new Set(editableText.filter(t=>typeof t==='string'&&
-  t.length>=3&&t.length<=300&&t.trim()===t));
+ // PDF text is NFKC-normalized (e.g. Chinese full-width punctuation);
+ // normalize BOTH sides for lookup, but retain the exact DOCX run for saves.
+ // If two source strings collapse to the same normalized text, neither is safe.
+ const candidates=new Map();
+ for(const value of editableText){
+  if(typeof value!=='string'||value.length<3||value.length>300||
+   value.trim()!==value)continue;
+  const key=plain(value),values=candidates.get(key)||[];
+  if(!values.includes(value))values.push(value);
+  candidates.set(key,values);
+ }
  const seen=new Map();
  for(const item of items){
-  if(!item||!candidates.has(plain(item.str))||!Array.isArray(item.transform)||
+  const key=plain(item?.str);
+  if(!item||candidates.get(key)?.length!==1||!Array.isArray(item.transform)||
    item.transform.length!==6||!Number.isFinite(item.width)||
    !Number.isFinite(item.height)||item.width<=0||item.height<=0)continue;
   if(Math.abs(item.transform[1])>.02||Math.abs(item.transform[2])>.02)continue;
@@ -20,11 +30,12 @@ export function matchWordAnchors({editableText,items,viewport,page,styles={}}){
   if(bbox.some(n=>!Number.isFinite(n))||bbox[0]<0||bbox[1]<0||
    bbox[2]<12||bbox[3]<6||bbox[0]+bbox[2]>1000||bbox[1]+bbox[3]>1000)
    continue;
-  const key=plain(item.str),matches=seen.get(key)||[];
+  const matches=seen.get(key)||[];
   const rawFamily=styles?.[item.fontName]?.fontFamily;
   const fontFamily=typeof rawFamily==='string'&&
    rawFamily.length<=100&&!/[;{}<>]/.test(rawFamily)?rawFamily:undefined;
-  matches.push({id:'word-'+page+'-'+matches.length,text:key,page,bbox,fontFamily});
+  matches.push({id:'word-'+page+'-'+matches.length,
+   text:candidates.get(key)[0],page,bbox,fontFamily});
   seen.set(key,matches);
  }
  const result=[];
