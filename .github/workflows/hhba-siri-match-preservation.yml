@@ -9,6 +9,8 @@ on:
       - 'apps/web/src/components/OriginalWordViewer.tsx'
       - 'apps/web/src/styles/resume-match-dialog.css'
       - 'apps/web/functions/api/resume-word.js'
+      - 'apps/web/scripts/word-layout-preservation.qa.py'
+      - 'services/word-renderer/**'
       - 'apps/web/scripts/match-siri-preserve.contract.test.mjs'
       - '.github/workflows/hhba-siri-match-preservation.yml'
   push:
@@ -36,3 +38,20 @@ jobs:
       - name: Build actual candidate UI including lazy-loaded Word optimizer
         working-directory: apps/web
         run: npm run build
+
+  real-word-http:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install document renderer and CJK fonts
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libreoffice-writer poppler-utils fonts-noto-cjk fontconfig
+          python -m pip install --disable-pip-version-check "pillow==11.3.0" "python-docx==1.2.0"
+      - name: Real Chinese multi-page DOCX render and private HTTP verification
+        working-directory: services/word-renderer
+        run: python real_docx_local_qa.py
