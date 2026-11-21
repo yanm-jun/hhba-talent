@@ -69,6 +69,15 @@ def main() -> None:
         run(step["run"], cwd=REPO / step.get("working-directory", "."))
     print("HHBA_CLOUDFLARE_CAMPUS_MEDIA_OK=5", flush=True)
 
+    # Preview-only release gate: demonstrate that the same source DOCX can
+    # retain independent, tamper-checked Word/PDF histories for multiple jobs.
+    # A broken isolation test must fail this feature preview before publishing.
+    if os.environ.get("CF_PAGES_BRANCH") == "feature/resume-targeted-optimization-foundation-20261119":
+        run(["node", "--experimental-strip-types", "--test",
+             "scripts/resume-word.route.test.mjs",
+             "scripts/candidate-mainline.contract.test.mjs"], cwd=WEB)
+        print("HHBA_TARGET_JOB_WORD_ISOLATION_TESTS_PASSED=1", flush=True)
+
     # Cloudflare Pages runs at '/', not Github Pages '/hhba-talent/'.
     # Enable the audited same-origin public catalogue BEFORE Vite embeds its
     # feature flags. Without this it fetches /live-recruitment/api/jobs/page,
