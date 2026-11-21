@@ -32,6 +32,7 @@ class StubDB {
    },
    async first(){
     if(sql.includes('WHERE id=?'))return db.rows.get(this.args[0])||null;
+    if(sql.includes('FROM hhba_jd_posting_lifecycle'))return null;
     if(sql.includes('WHERE canonical_url=?')){
      return [...db.rows.values()].filter(v=>v.canonical_url===this.args[0])
       .sort((a,b)=>b.last_verified_at.localeCompare(a.last_verified_at))[0]||null;
