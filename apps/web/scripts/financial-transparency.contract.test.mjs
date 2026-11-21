@@ -58,7 +58,7 @@ test('public API returns only published reports, not draft, and subscriptions fa
  const list=await publicApi({request:new Request('https://hhba.work/api/transparency/reports'),env:{}});
  assert.deepEqual((await list.json()).reports,[]);
  const sub=await publicApi({request:new Request('https://hhba.work/api/transparency/subscribe',{method:'POST',headers:{'Content-Type':'application/json',Origin:'https://hhba.work'},body:JSON.stringify({email:'a@example.com',consent:true})}),env:{}});
- assert.equal(sub.status,503);
+ assert.equal(sub.status,410);
 });
 test('no dispatch secret, unapproved report or admin identity can leak financial data',async()=>{
  const request=new Request('https://hhba.work/api/transparency/dispatch',{method:'POST'});
@@ -93,59 +93,34 @@ test('newsletter email requires explicit opt-in, domain verification and recover
  assert.match(pub,/status='unsubscribed'/);
  assert.match(pub,/email=NULL/);
 });
-test('front, admin, cron and immutable correction are all wired to same route',()=>{
- const main=read('../src/main.tsx'),shell=read('../src/components/Shell.tsx'),home=read('../src/components/HomeWorkplacePromise.tsx');
- const page=read('../src/pages/TransparencyReportsPage.tsx');
+test('the new brand wall is public and the old financial campaign is disconnected',()=>{
+ const main=read('../src/main.tsx');
+ const shell=read('../src/components/Shell.tsx');
+ const home=read('../src/components/HomeWorkplacePromise.tsx');
  const sql=read('../d1/0020_financial_transparency.sql');
- const publish=read('../functions/_lib/transparency-publish.js');
  const cron=read('../../../.github/workflows/hhba-finance-monthly-dispatch.yml');
- assert.match(main,/if\(route==='\/transparency'\)return <TransparencyPage user=\{user\}\/>/);
- assert.doesNotMatch(main,/TransparencyManagePage|route==='\/transparency\/manage'/);
- assert.match(shell,/to="\/transparency"/);
- assert.match(home,/className="hhba-home-transparency-link" to="\/transparency"/);
- assert.match(home,/api\/transparency\/reports/);
- assert.match(page,/subscriptionEnabled/);
- assert.match(page,/首期帮扶资金报告尚未发布/);
- assert.match(page,/reports\.map/);
+ const worker=read('../ops/finance-cron-worker.mjs');
+ assert.match(main,/route==='\/commitment'/);
+ assert.match(main,/route\.startsWith\('\/transparency\/'\)/);
+ assert.doesNotMatch(main,/TransparencyManagePage|return <TransparencyReportsPage/);
+ assert.match(shell,/to="\/commitment"/);
+ assert.match(home,/className="hhba-home-transparency-link" to="\/commitment"/);
+ assert.doesNotMatch(home,/api\/transparency\/reports/);
  assert.match(sql,/hhba_fin_publication_revisions/);
  assert.match(sql,/hhba_fin_deliveries/);
- assert.match(publish,/INSERT INTO hhba_fin_publication_revisions/);
- const cloudflareCron=read('../ops/finance-cron-worker.mjs');
- assert.match(cloudflareCron,/\*\/5 2-15 21 \* \*/);
- assert.match(cloudflareCron,/HHBA_FIN_DISPATCH_SECRET/);
- assert.doesNotMatch(cron,/^\s+schedule:\s*$/m);
+ assert.doesNotMatch(worker,/fetch\(TARGET/);
+ assert.match(worker,/HHBA_FIN_CRON_RETIRED_NO_ACTION/);
+ assert.doesNotMatch(cron,/curl|HHBA_FIN_DISPATCH_SECRET/);
  assert.match(cron,/workflow_dispatch/);
 });
 
-test('V6 is a worker-support transparency hub, not a company revenue dashboard',()=>{
- const overview=read('../src/pages/TransparencyPage.tsx');
- const report=read('../src/pages/TransparencyReportsPage.tsx');
- const rules=read('../src/pages/TransparencyRulesPage.tsx');
- const demo=read('../src/pages/transparencyDemoData.ts');
- const css=read('../src/styles/transparency-v5.css');
- assert.match(overview,/权益帮扶池/);
- assert.match(overview,/workerDemoTotals\.balance/);
- assert.match(overview,/workerDemoTotals\.cases/);
- for(const slug of ['cases','funds','reports','rules'])assert.ok(overview.includes('to="/transparency/'+slug+'"'));
- assert.match(overview,/financial-allocation/);
- assert.match(rules,/id="financial-allocation"/);
- assert.match(rules,/60%/);assert.match(rules,/40%/);
- assert.match(report,/月度帮扶资金报告/);
- assert.match(report,/id="fin-latest-title"/);
- assert.match(report,/id="hhba-fin-history-title"/);
- assert.match(report,/id="fin-subscribe-title"/);
- assert.match(report,/poolOperations\.map\(/);
- assert.match(report,/poolReceivedFen/);
- assert.match(report,/poolSpentFen/);
- assert.match(report,/closingPoolFen/);
- assert.doesNotMatch(report,/available\.(revenueFen|refundFen|netResultFen|distributableProfitFen|companyAllocationFen)/);
- assert.match(report,/settings\?\.subscriptionEnabled/);
- assert.match(report,/captchaToken/);
- assert.match(demo,/workerDemoCases/);
- assert.match(demo,/workerDemoLedger/);
- assert.match(demo,/WORKER_ARCHIVE_DEMO_NOTICE='此页面展示的数据为虚构演示数据。'/);
- assert.match(css,/\.hhba-v6-archive-rows/);
- assert.doesNotMatch(css,/linear-gradient\(/);
+test('editorial wall does not expose financial dashboard or obsolete policy',()=>{
+ const wall=read('../src/pages/TransparencyPage.tsx');
+ const css=read('../src/styles/commitment-wall.css');
+ assert.match(wall,/commitmentGallery\.map/);
+ assert.match(wall,/我们希望让信息更加清晰/);
+ for(const old of ['workerDemoTotals','权益帮扶池','60%','40%','financial-allocation'])assert.ok(!wall.includes(old),old);
+ assert.match(css,/@media\(max-width:720px\)/);
 });
 
 test('RFC 8058 one-click unsubscribe revokes a verified address without requiring a body token',async()=>{
@@ -164,64 +139,22 @@ test('RFC 8058 one-click unsubscribe revokes a verified address without requirin
  assert.match(observed.sql,/email=NULL/);
  assert.equal(observed.args[2],await sha256(token));
 });
-test('monthly dispatch has an explicit human-publication safeguard and bounded batches',()=>{
+test('monthly finance dispatch is unconditionally retired even with valid credentials',async()=>{
+ const secret='test-only-valid-old-finance-secret-abcdefghijklmnopqrstuvwxyz';
  const dispatch=read('../functions/api/transparency/dispatch.js');
- assert.match(dispatch,/HHBA_FIN_SEND_ENABLED/);
- assert.match(dispatch,/HHBA_FIN_AUTO_PUBLISH_ENABLED/);
- assert.match(dispatch,/REVIEWED_PENDING_MANUAL_PUBLICATION_NO_EMAIL/);
- assert.match(dispatch,/LIMIT 30/);
- assert.match(dispatch,/d\.attempts<3/);
- assert.match(dispatch,/s\.status='verified'/);
- assert.match(dispatch,/List-Unsubscribe-Post/);
- const publicRoute=read('../functions/api/transparency/[[path]].js');
- assert.match(publicRoute,/url\.searchParams\.get\('token'\)/);
+ assert.doesNotMatch(dispatch,/deliverEmail|publishReviewed|HHBA_FIN_AUTO_PUBLISH_ENABLED/);
+ const request=new Request('https://hhba.work/api/transparency/dispatch',{
+  method:'POST',headers:{Authorization:'Bearer '+secret}
+ });
+ const response=await dispatchApi({request,env:{HHBA_FIN_DISPATCH_SECRET:secret,HHBA_FIN_SEND_ENABLED:'1'}});
+ assert.equal(response.status,410);
+ assert.equal((await response.json()).code,'FINANCE_DISPATCH_RETIRED');
 });
 
-test('isolated batch delivery sends only verified recipients once and records the provider result',async()=>{
- const email='fixture@example.org';
- const hash=await sha256(email);
- let sent=false,claimed=0,recordedProviderId=null;
- let calls=[];
- const db={prepare(sql){return {bind(...params){return {
-  async all(){
-   assert.match(sql,/s\.status='verified'/);
-   assert.match(sql,/LIMIT 30/);
-   return {results:sent?[]:[{email_hash:hash,email,status:'pending',attempts:0}]};
-  },
-  async run(){
-   if(sql.includes("status='sending'")){claimed++;return {meta:{changes:1}};}
-   if(sql.includes("status='sent'")){sent=true;recordedProviderId=params[0];return {meta:{changes:1}};}
-   return {meta:{changes:1}};
-  }
- };}};}};
- const env={
-  HHBA_FIN_UNSUBSCRIBE_SECRET:'temporary-unit-test-only-secret-not-for-production-123456789',
-  RESEND_API_KEY:'test-only-not-real',HHBA_FIN_FROM_EMAIL:'HHBA Finance <finance@notify.hhba.work>'
- };
- const mockReport={period:'2026-10',revenueFen:0,netResultFen:0,
-  distributableProfitFen:0,poolAccrualFen:0,closingPoolFen:0};
- const priorFetch=globalThis.fetch;
- globalThis.fetch=async (url,options)=>{
-  assert.equal(String(url),'https://api.resend.com/emails');
-  assert.equal(options.headers.Authorization,'Bearer test-only-not-real');
-  calls.push({key:options.headers['Idempotency-Key'],payload:JSON.parse(options.body)});
-  return new Response(JSON.stringify({id:'mock-only-resend-message-id'}),{
-   status:200,headers:{'Content-Type':'application/json'}
-  });
- };
- try{
-  const first=await sendNextBatch(db,env,'2026-10',mockReport);
-  const second=await sendNextBatch(db,env,'2026-10',mockReport);
-  assert.deepEqual(first,{attempted:1,sent:1,failed:0});
-  assert.deepEqual(second,{attempted:0,sent:0,failed:0});
-  assert.equal(claimed,1);
-  assert.equal(recordedProviderId,'mock-only-resend-message-id');
-  assert.equal(calls.length,1);
-  assert.equal(calls[0].payload.to[0],email);
-  assert.match(calls[0].key,/^hhba-fin-v1-2026-10-/);
-  assert.equal(calls[0].payload.headers['List-Unsubscribe-Post'],'List-Unsubscribe=One-Click');
-  assert.match(calls[0].payload.headers['List-Unsubscribe'],/\/api\/transparency\/unsubscribe\?token=/);
- }finally{globalThis.fetch=priorFetch;}
+test('retired campaign never sends to previously subscribed people',async()=>{
+ const db={prepare(){throw Error('retired dispatcher must not read email data');}};
+ const result=await sendNextBatch(db,{RESEND_API_KEY:'test'},'2026-10',{});
+ assert.deepEqual(result,{attempted:0,sent:0,failed:0});
 });
 
 test('isolated SQLite finance lifecycle preserves first publication, corrections and immutable audit history',async()=>{
@@ -276,158 +209,48 @@ test('isolated SQLite finance lifecycle preserves first publication, corrections
  }finally{sqlite.close();}
 });
 
-test('isolated opt-in flow requires Turnstile, email confirmation and honors one-click unsubscribe',async()=>{
- const sqlite=new DatabaseSync(':memory:');
- const priorFetch=globalThis.fetch;
- const email='fixture@example.org';
- const secret='isolated-unit-test-secret-not-real-123456789012345';
- const env={
-  HHBA_TRANSPARENCY_DB:null,
-  HHBA_FIN_SUBSCRIPTIONS_ENABLED:'1',
-  HHBA_FIN_TURNSTILE_SECRET:'fake-turnstile-server-secret',
-  HHBA_FIN_TURNSTILE_SITE_KEY:'fake-turnstile-site-key',
-  HHBA_FIN_FROM_EMAIL:'HHBA Finance <finance@notify.hhba.work>',
-  HHBA_FIN_UNSUBSCRIBE_SECRET:secret,
-  RESEND_API_KEY:'mock-resend-key',
-  HHBA_FIN_PUBLIC_BASE_URL:'https://hhba.work'
- };
- let countResend=0,verifyLink='';
- try{
-  sqlite.exec(read('../d1/0020_financial_transparency.sql'));
-  const db={prepare(sql){return {bind(...values){
-   const stmt=sqlite.prepare(sql);
-   return{
-    async first(){return stmt.get(...values)||null;},
-    async all(){return {results:stmt.all(...values)};},
-    async run(){const info=stmt.run(...values);return {meta:{changes:Number(info.changes)}};}
-   };
-  }};}};
-  env.HHBA_TRANSPARENCY_DB=db;
-  globalThis.fetch=async(url,options)=>{
-   const target=String(url);
-   if(target==='https://challenges.cloudflare.com/turnstile/v0/siteverify'){
-    return new Response(JSON.stringify({success:true,hostname:'hhba.work'}),{
-     status:200,headers:{'Content-Type':'application/json'}
-    });
-   }
-   if(target==='https://api.resend.com/emails'){
-    countResend++;
-    const body=JSON.parse(options.body);
-    assert.deepEqual(body.to,[email]);
-    assert.equal(body.subject,'请确认 HHBA 帮扶资金公开邮件订阅');
-    const m=body.html.match(/\/api\/transparency\/confirm\?token=([a-f0-9]{64})/);
-    assert.ok(m,'Verification email must include a signed confirmation token');
-    verifyLink='https://hhba.work'+m[0];
-    return new Response(JSON.stringify({id:'mock-transactional-message'}),{
-     status:200,headers:{'Content-Type':'application/json'}
-    });
-   }
-   throw new Error('Unexpected network call from isolated test: '+target);
-  };
-  const request=(address,method='GET',body=null)=>new Request(address,{
-   method,headers:method==='POST'?{'Content-Type':'application/json',Origin:'https://hhba.work'}:undefined,
-   body:body===null?undefined:JSON.stringify(body)
-  });
-  const invalid=await publicApi({request:request('https://hhba.work/api/transparency/subscribe','POST',{
-   email,consent:false,turnstileToken:'mock-turnstile-token-with-adequate-length'
-  }),env});
-  assert.equal(invalid.status,400);
-  assert.equal(countResend,0);
-  const start=await publicApi({request:request('https://hhba.work/api/transparency/subscribe','POST',{
-   email,consent:true,turnstileToken:'mock-turnstile-token-with-adequate-length'
-  }),env});
-  assert.equal(start.status,200);
-  assert.equal((await start.json()).code,'CHECK_EMAIL_IF_ELIGIBLE');
-  assert.equal(countResend,1);
-  const before=sqlite.prepare('SELECT status,email FROM hhba_fin_subscribers').get();
-  assert.equal(before.status,'pending');
-  assert.equal(before.email,email);
-  const prefetched=await publicApi({request:request(verifyLink),env});
-  assert.equal(prefetched.status,200);
-  assert.match(await prefetched.text(),/我确认订阅/);
-  assert.equal(sqlite.prepare('SELECT status FROM hhba_fin_subscribers').get().status,'pending',
-   'Email-link prefetch MUST NOT activate a subscription');
-  const token=new URL(verifyLink).searchParams.get('token');
-  const blocked=await publicApi({request:new Request('https://hhba.work/api/transparency/confirm',{
-   method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded',Origin:'https://untrusted.example'},
-   body:'token='+token
-  }),env});
-  assert.equal(blocked.status,403,'Cross-origin POST must not confirm email subscription');
-  assert.equal(sqlite.prepare('SELECT status FROM hhba_fin_subscribers').get().status,'pending');
-  const confirmed=await publicApi({request:new Request('https://hhba.work/api/transparency/confirm',{
-   method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded',Origin:'https://hhba.work'},
-   body:'token='+token
-  }),env});
-  assert.equal(confirmed.status,200);
-  assert.match(await confirmed.text(),/成功订阅/);
-  assert.equal(sqlite.prepare('SELECT status FROM hhba_fin_subscribers').get().status,'verified');
-  const verifiedRepeat=await publicApi({request:request('https://hhba.work/api/transparency/subscribe','POST',{
-   email,consent:true,turnstileToken:'mock-turnstile-token-with-adequate-length'
-  }),env});
-  assert.equal(verifiedRepeat.status,200);
-  assert.equal(countResend,1,'Already-verified subscribers must not receive duplicate confirmation');
-  const emailHash=await sha256(email);
-  const unsubToken=await unsubscribeToken(env,emailHash);
-  const oneClick=new Request('https://hhba.work/api/transparency/unsubscribe?token='+unsubToken,{
-   method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
-   body:'List-Unsubscribe=One-Click'
-  });
-  const result=await publicApi({request:oneClick,env});
-  assert.equal(result.status,200);
-  assert.match(await result.text(),/已完成退订/);
-  const end=sqlite.prepare('SELECT status,email FROM hhba_fin_subscribers').get();
-  assert.equal(end.status,'unsubscribed');
-  assert.equal(end.email,null);
-  assert.equal(countResend,1,'Unsubscribing must not send any marketing or other messages');
- }finally{globalThis.fetch=priorFetch;sqlite.close();}
+test('old finance opt-in and confirmations cannot restart the retired campaign',async()=>{
+ const env={HHBA_FIN_SUBSCRIPTIONS_ENABLED:'1',RESEND_API_KEY:'old-key',
+  HHBA_FIN_TURNSTILE_SECRET:'fake-secret',HHBA_FIN_TURNSTILE_SITE_KEY:'fake-key',
+  HHBA_FIN_FROM_EMAIL:'HHBA Finance <finance@notify.hhba.work>'};
+ const req=new Request('https://hhba.work/api/transparency/subscribe',{
+  method:'POST',headers:{'Content-Type':'application/json',Origin:'https://hhba.work'},
+  body:JSON.stringify({email:'fixture@example.org',consent:true})
+ });
+ const sub=await publicApi({request:req,env});
+ assert.equal(sub.status,410);
+ assert.equal((await sub.json()).code,'FINANCE_SUBSCRIPTIONS_RETIRED');
+ const verify=await publicApi({request:new Request('https://hhba.work/api/transparency/confirm?token='+('b'.repeat(64))),env});
+ assert.equal(verify.status,200);
+ assert.match(await verify.text(),/订阅服务已停止/);
+ const status=await publicApi({request:new Request('https://hhba.work/api/transparency/status'),env});
+ const body=await status.json();
+ assert.equal(body.subscriptionEnabled,false);
+ assert.equal(body.plan,null);
+ assert.equal(body.reportStatus,'retired');
 });
 
-test('Cloudflare cron triggers only on the 21st UTC and never exposes a public HTTP endpoint',async()=>{
- const priorFetch=globalThis.fetch,originalLog=console.log,originalError=console.error;
- const calls=[],logs=[];
- globalThis.fetch=async(url,options)=>{
-  calls.push({url:String(url),authorization:options.headers.Authorization,body:options.body});
-  return new Response(JSON.stringify({ok:true,code:'NO_APPROVED_REPORT_NO_EMAIL',attempted:0}),{
-   status:200,headers:{'Content-Type':'application/json'}
-  });
- };
- console.log=(...a)=>logs.push(a);
- console.error=(...a)=>logs.push(a);
+test('retired Cloudflare cron never calls the finance endpoint',async()=>{
+ const originalFetch=globalThis.fetch;
+ const calls=[];
+ globalThis.fetch=async(...args)=>{calls.push(args);throw Error('retired worker must not perform fetch');};
  try{
-  const urlTest=await financeCronWorker.fetch();
-  assert.equal(urlTest.status,404);
-  const key='mock-test-only-secret-abcdefghijklmnopqrstuvwxyz123456';
-  const event=(ts,cron='*/5 2-15 21 * *')=>({cron,scheduledTime:Date.parse(ts)});
-  await financeCronWorker.scheduled(event('2026-11-20T02:00:00Z'),{HHBA_FIN_DISPATCH_SECRET:key});
-  await financeCronWorker.scheduled(event('2026-11-21T01:55:00Z'),{HHBA_FIN_DISPATCH_SECRET:key});
-  await financeCronWorker.scheduled(event('2026-11-21T02:00:00Z','0 2 21 * *'),{HHBA_FIN_DISPATCH_SECRET:key});
-  await financeCronWorker.scheduled(event('2026-11-21T02:00:00Z'),{HHBA_FIN_DISPATCH_SECRET:''});
-  assert.equal(calls.length,0,'No call may occur outside schedule or without configured secret');
-  await financeCronWorker.scheduled(event('2026-11-21T02:00:00Z'),{HHBA_FIN_DISPATCH_SECRET:key});
-  assert.equal(calls.length,1);
-  assert.equal(calls[0].url,'https://hhba.work/api/transparency/dispatch');
-  assert.equal(calls[0].authorization,'Bearer '+key);
-  assert.equal(calls[0].body,'{}');
-  assert.ok(!JSON.stringify(logs).includes(key),'Never log dispatch bearer tokens');
-  const workflow=read('../../../.github/workflows/hhba-finance-monthly-dispatch.yml');
-  assert.doesNotMatch(workflow,/^\s+schedule:\s*$/m,'GitHub must not run a second automatic scheduler');
-  assert.match(workflow,/workflow_dispatch/);
- }finally{globalThis.fetch=priorFetch;console.log=originalLog;console.error=originalError;}
+  const response=await financeCronWorker.fetch();
+  assert.equal(response.status,404);
+  await financeCronWorker.scheduled({scheduledTime:Date.now(),cron:'*/5 2-15 21 * *'},{HHBA_FIN_DISPATCH_SECRET:'old-secret'});
+  assert.equal(calls.length,0);
+ }finally{globalThis.fetch=originalFetch;}
 });
 
-test('finance confirmation handler separates safe GET from deliberate POST',()=>{
+test('old finance subscription is retired while prior opt-out endpoints stay functional',()=>{
  const src=read('../functions/api/transparency/[[path]].js');
- assert.match(src,/renderConfirm\(token\)/);
- assert.match(src,/if\(request.method==='POST'&&path==='\/api\/transparency\/confirm'\)/);
- assert.match(src,/if\(!safeOrigin\(request\)\)/);
- assert.match(src,/点击邮件链接不会自动完成订阅/);
- assert.match(src,/application\/x-www-form-urlencoded/);
+ assert.match(src,/FINANCE_SUBSCRIPTIONS_RETIRED/);
+ assert.match(src,/return donePage\('财务报告邮件订阅服务已停止'\)/);
+ assert.match(src,/path==='\/api\/transparency\/unsubscribe'/);
+ assert.match(src,/email=NULL/);
 });
 
-
-
-
-test('retired duplicate finance entry never serves private content and never changes public financial disclosure',()=>{
+test('retired admin shortcut cannot expose finance data through the public website',()=>{
  const target=retiredFinanceUI({request:new Request('https://hhba.work/transparency/manage')});
  assert.equal(target.status,307);
  assert.equal(target.headers.get('Location'),'https://admin.hhba.work/admin-preview/');
@@ -436,5 +259,6 @@ test('retired duplicate finance entry never serves private content and never cha
  assert.equal(write.status,405);
  const app=read('../src/main.tsx');
  assert.doesNotMatch(app,/TransparencyManagePage/);
- assert.match(app,/if\(route==='\/transparency'\)return <TransparencyPage user=\{user\}\/>/);
+ assert.match(app,/route==='\/commitment'/);
 });
+
