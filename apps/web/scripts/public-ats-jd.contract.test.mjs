@@ -24,6 +24,10 @@ function provider(url){
 
 test('Only exact ATS job detail URLs are admitted, never board roots/redirect/API paths',()=>{
  assert.equal(safePublicAtsJobLocator(GH)?.kind,'greenhouse');
+ assert.equal(safePublicAtsJobLocator(GH+'?gh_jid=1234567')?.url,GH);
+ assert.equal(safePublicAtsJobLocator(GH+'?gh_src=rolewire.app')?.url,GH);
+ assert.equal(safePublicAtsJobLocator(LEVER+'?lever-source=employer')?.url,LEVER);
+ assert.equal(safePublicAtsJobLocator(GH+'?gh_jid=9876543'),null);
  assert.equal(safePublicAtsJobLocator(LEVER)?.kind,'lever');
  for(const value of [
   'https://job-boards.greenhouse.io/hhbaexample',
