@@ -119,7 +119,7 @@ async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf',jobId?:s
  if(signature.some((byte,index)=>first[index]!==byte))
   throw Error('下载文件校验失败，请稍后重试。');
  const object=URL.createObjectURL(blob),link=document.createElement('a');
- const safeJob=(jobLabel||'岗位专属版').replace(/[<>:"/\\|?*\u0000-\u001f]/g,'')
+ const safeJob=(jobLabel||'岗位专属版').replace(/[<>:"\/\\|?*\u0000-\u001f]/g,'')
   .replace(/\s+/g,' ').trim().slice(0,64)||'岗位专属版';
  link.href=object;link.download=(jobId===undefined?'我的简历-已修改':
   '我的简历-'+safeJob+'-已优化')+'.'+format;
