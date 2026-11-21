@@ -41,15 +41,15 @@
 .hhba-home-resources-note{display:flex;align-items:flex-start;gap:8px;margin-top:18px;color:#7388A0;font-size:11px;line-height:1.8}
 .hhba-home-resources-note svg{flex:0 0 auto;margin-top:2px;color:#6486B5}
 
-/* The pledge is a low-profile brand statement, not a pseudo-financial dashboard. */
-.hhba-home-pledge{display:flex;align-items:center;justify-content:space-between;gap:22px;margin-top:14px;padding:24px 29px;border:1px solid #E7F0FC;border-radius:17px;background:rgba(255,255,255,.81)}
-.hhba-home-pledge-intro{min-width:0;max-width:700px}
-.hhba-home-pledge-intro h3{margin:8px 0 6px;color:#102A5A;font-size:clamp(17px,1.8vw,20px);line-height:1.45;letter-spacing:-.38px}
-.hhba-home-pledge-intro>p{margin:0;color:#60758F;font-size:12px;line-height:1.75}
-.hhba-home-pledge-intro .hhba-home-pledge-meta{margin-top:5px;font-size:10px;color:#8A9BB0;line-height:1.65}
-.hhba-home-report-status{color:inherit}
-.hhba-home-transparency-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:0 0 auto;padding:11px 0;text-decoration:none;font-size:12px;font-weight:750;color:#125EBC;white-space:nowrap}
-.hhba-home-transparency-link:hover{text-decoration:underline;text-underline-offset:4px}
+/* Compact editorial commitment, not a financial-disclosure promotion. */
+.hhba-home-pledge{display:flex;align-items:center;justify-content:space-between;gap:26px;margin-top:16px;padding:27px 30px;border:1px solid #E2EAF4;border-radius:17px;background:linear-gradient(108deg,rgba(255,255,255,.96),rgba(245,249,255,.92));box-shadow:0 14px 42px rgba(34,68,110,.045)}
+.hhba-home-pledge-intro{min-width:0;max-width:730px}
+.hhba-home-pledge-intro h3{margin:10px 0 9px;color:#102A5A;font-size:clamp(19px,2.1vw,23px);line-height:1.42;letter-spacing:-.55px;font-weight:780}
+.hhba-home-pledge-intro>p{margin:0;color:#5D7089;font-size:12px;line-height:1.9;max-width:640px}
+.hhba-home-pledge-signature{display:block;color:#93A2B5;font-size:10px;margin-top:10px;letter-spacing:.025em}
+.hhba-home-transparency-link{display:inline-flex;align-items:center;justify-content:center;gap:9px;flex:0 0 auto;padding:12px 0;text-decoration:none;font-size:12px;font-weight:750;color:#125EBC;white-space:nowrap}
+.hhba-home-transparency-link svg{transition:transform .2s ease}
+.hhba-home-transparency-link:hover svg{transform:translateX(4px)}
 .hhba-home-transparency-link:focus-visible{outline:2px solid #125EBC;outline-offset:4px;border-radius:4px}
 
 @media(max-width:930px){
