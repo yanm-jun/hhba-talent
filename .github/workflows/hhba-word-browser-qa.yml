@@ -25,6 +25,7 @@ on:
       - 'apps/web/scripts/qa-history-word-workspace.html'
       - 'apps/web/scripts/qa_history_word_workspace.tsx'
       - 'apps/web/scripts/qa_history_word_workspace.py'
+      - 'apps/web/scripts/word-inline-border-beam.contract.test.mjs'
       - 'apps/web/src/components/CandidateMatchHistory.tsx'
       - 'apps/web/src/styles/match-history.css'
   workflow_dispatch:
@@ -85,6 +86,7 @@ jobs:
         env:
           VITE_HHBA_REAL_AUTH_ENABLED: '1'
         run: |
+          node --test scripts/word-inline-border-beam.contract.test.mjs
           node scripts/qa_word_generate_versions.mjs
           npm run dev -- --host 127.0.0.1 --port 4173 >/tmp/hhba-word-vite.log 2>&1 &
           python scripts/qa_word_browser_preview.py
