@@ -1,0 +1,76 @@
+name: HHBA Word browser-only actual Chromium QA
+on:
+  push:
+    branches:
+      - feature/match-dialog-preserve-siri-20261121
+    paths:
+      - '.github/workflows/hhba-word-browser-qa.yml'
+      - 'apps/web/scripts/qa-word-browser-preview.html'
+      - 'apps/web/scripts/qa_word_browser_preview.py'
+      - 'apps/web/src/services/browserWordPreview.ts'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synthetic-browser-docx:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install locked HHBA dependencies and isolated browser tools
+        run: |
+          cd apps/web
+          npm ci --no-audit --no-fund
+          cd ../..
+          python -m pip install --disable-pip-version-check 'python-docx==1.2.0' 'pillow==11.3.0' 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Generate synthetic two-page Chinese Word with a table and image
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from docx import Document
+          from docx.shared import Cm
+          from PIL import Image, ImageDraw
+          image=Image.new('RGB',(460,110),'white')
+          canvas=ImageDraw.Draw(image)
+          canvas.line([(10,80),(100,33),(170,58),(280,22),(450,10)],fill=(43,95,162),width=5)
+          image.save('/tmp/hhba-synthetic-chart.png')
+          doc=Document()
+          doc.sections[0].header.paragraphs[0].text='HHBA / SYNTHETIC WORD BROWSER QA'
+          doc.sections[0].footer.paragraphs[0].text='此文件由自动化测试生成，无真实个人资料'
+          doc.add_heading('中文双页虚构简历',level=1)
+          doc.add_paragraph('负责门店运营及日常数据整理工作')
+          table=doc.add_table(rows=2,cols=2)
+          table.cell(0,0).text='岗位经历'
+          table.cell(0,1).text='门店运营管理'
+          table.cell(1,0).text='数据统计'
+          table.cell(1,1).text='不虚构业绩或任职记录'
+          doc.add_picture('/tmp/hhba-synthetic-chart.png',width=Cm(9))
+          doc.add_page_break()
+          doc.add_heading('第二页 / Skills and Education',level=1)
+          doc.add_paragraph('第二页仅用于核验图片表格及位置均保持不变')
+          path=Path('apps/web/public/__hhba_word_qa.docx')
+          doc.save(path)
+          print('Fixture generated:',path,path.stat().st_size)
+          PY
+      - name: Browser preview and unique Siri text anchor on desktop and mobile
+        working-directory: apps/web
+        run: |
+          npm run dev -- --host 127.0.0.1 --port 4173 >/tmp/hhba-word-vite.log 2>&1 &
+          python scripts/qa_word_browser_preview.py
+      - name: Upload browser screenshots and QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-synthetic-word-browser-qa
+          path: /tmp/hhba-word-browser-qa
+          if-no-files-found: ignore
+          retention-days: 7
