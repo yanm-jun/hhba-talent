@@ -378,6 +378,73 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    }}>取消</button>
   </div>
  </div>:null;
+ const anchorsOverlay=anchors.map(anchor=>{
+       const [x,y,w,h]=anchor.bbox;
+       const candidates=visualSuggestions.filter(change=>
+        change.original===anchor.text&&change.proposed.trim()&&
+        change.proposed!==anchor.text&&change.proposed.length<=300);
+       const visual=candidates.length===1?candidates[0]:null;
+       const textFits=Boolean(visual&&Array.from(visual.proposed).length<=
+        Math.max(12,Array.from(anchor.text).length*1.25));
+       const changed=visual?splitChangedResumeText(anchor.text,visual.proposed):null;
+       return <div key={anchor.id}
+        className={'hhba-word-siri-anchor-shell'+(visual?.state==='pending'?' has-siri-wording':'')+
+         (activeVisualId===visual?.id?' is-open':'')+(inlineVisualEditor===anchor.id?' is-editing':'')}
+        style={{left:x/10+'%',top:y/10+'%',width:w/10+'%',height:h/10+'%'}}>
+        <button type="button"
+        className={"hhba-original-resume-anchor"+(selected?.id===anchor.id?" is-selected":"")+
+         (visual?' has-ai-preview':'')} title={visual?'点击查看操作':'修改这段'}
+        aria-label={visual?.state==='pending'?'查看此处文字操作':'修改这段 Word'}
+        onClick={()=>{
+         if(visual?.state==='pending'){
+          setActiveVisualId(current=>current===visual.id?null:visual.id);return;
+         }
+         if(!confirmDiscardText())return;
+         // A restored draft is never accepted automatically. It must be
+         // attached to the identical visible text, page and server revision.
+         const replacing=Boolean(selected&&draft!==selected.text);
+         if(replacing)onSessionWordDraftChange?.(null);
+         const restored=!replacing&&sessionWordDraft&&
+          sessionWordDraft.revision===revision&&sessionWordDraft.page===page&&
+          sessionWordDraft.original===anchor.text&&
+          sessionWordDraft.text.length<=300&&sessionWordDraft.text.trim();
+         const matches=suggestedChanges.filter(change=>change.original===anchor.text&&
+          change.proposed.trim()&&change.proposed.length<=300);
+         const candidate=restored?sessionWordDraft!.text:
+          matches.length===1?matches[0].proposed:anchor.text;
+         setSelected(anchor);setDraft(candidate);setInlineVisualEditor(null);
+         setConfirmed(false);
+         setMessage(restored?'已恢复未保存的文字草稿，请检查后再次确认。':
+          matches.length===1?'已填入本人确认过的建议；请复核事实与原版式后再保存。':'');
+        }}>
+        {visual&&<span className="hhba-word-ai-preview" aria-hidden="true">
+         <span className="hhba-word-ai-preview-text"
+          style={{fontSize:Math.max(9,Math.min(19,(h/1000*paperSize.height)*.82))+'px',
+           fontFamily:anchor.fontFamily||undefined}}>
+          {textFits&&changed?.prefix&&<span className="hhba-word-ai-unchanged">{changed.prefix}</span>}
+          {!textFits&&<span className="hhba-word-ai-unchanged">…</span>}
+          <span className="hhba-word-ai-changed hhba-resume-siri-letters">
+           {changed?.changed||'−'}
+          </span>
+          {textFits&&changed?.suffix&&<span className="hhba-word-ai-unchanged">{changed.suffix}</span>}
+         </span>
+        </span>}
+        {!visual&&<span className="hhba-word-edit-anchor-label"><PencilLine size={12}/> 修改</span>}
+       </button>
+       {visual?.state==='pending'&&<div className="hhba-word-siri-inline-actions"
+        role="group" aria-label="当前彩虹文字操作"
+        style={y>710?{bottom:'100%'}:{top:'100%'}}>
+        <button type="button" className="is-accept" disabled={busy}
+         onClick={()=>void acceptVisualWord(anchor,visual)}><Check size={13}/> 采纳</button>
+        <button type="button" disabled={busy}
+         onClick={()=>editVisualWord(anchor,visual)}><PencilLine size={13}/> 编辑</button>
+        <button type="button" disabled={busy} onClick={()=>{
+         onVisualSuggestionAction?.(visual.id,'ignored');setActiveVisualId(null);
+         setMessage('已忽略此处彩虹文字，保留原文。');
+        }}><X size={13}/> 忽略</button>
+       </div>}
+       </div>;
+      });
  return <section className={'hhba-original-resume hhba-original-word-viewer'+
   (selected&&!editPanelHost?' has-inline-editor':'')} aria-label="查看我的 Word 简历">
   <div className="hhba-original-resume-toolbar">
@@ -457,73 +524,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      }}>
       <canvas className="hhba-original-resume-canvas" ref={surface}
        role="img" aria-label={'Word 原始页面第 '+page+' 页'}/>
-      {anchors.map(anchor=>{
-       const [x,y,w,h]=anchor.bbox;
-       const candidates=visualSuggestions.filter(change=>
-        change.original===anchor.text&&change.proposed.trim()&&
-        change.proposed!==anchor.text&&change.proposed.length<=300);
-       const visual=candidates.length===1?candidates[0]:null;
-       const textFits=Boolean(visual&&Array.from(visual.proposed).length<=
-        Math.max(12,Array.from(anchor.text).length*1.25));
-       const changed=visual?splitChangedResumeText(anchor.text,visual.proposed):null;
-       return <div key={anchor.id}
-        className={'hhba-word-siri-anchor-shell'+(visual?.state==='pending'?' has-siri-wording':'')+
-         (activeVisualId===visual?.id?' is-open':'')+(inlineVisualEditor===anchor.id?' is-editing':'')}
-        style={{left:x/10+'%',top:y/10+'%',width:w/10+'%',height:h/10+'%'}}>
-        <button type="button"
-        className={"hhba-original-resume-anchor"+(selected?.id===anchor.id?" is-selected":"")+
-         (visual?' has-ai-preview':'')} title={visual?'点击查看操作':'修改这段'}
-        aria-label={visual?.state==='pending'?'查看此处文字操作':'修改这段 Word'}
-        onClick={()=>{
-         if(visual?.state==='pending'){
-          setActiveVisualId(current=>current===visual.id?null:visual.id);return;
-         }
-         if(!confirmDiscardText())return;
-         // A restored draft is never accepted automatically. It must be
-         // attached to the identical visible text, page and server revision.
-         const replacing=Boolean(selected&&draft!==selected.text);
-         if(replacing)onSessionWordDraftChange?.(null);
-         const restored=!replacing&&sessionWordDraft&&
-          sessionWordDraft.revision===revision&&sessionWordDraft.page===page&&
-          sessionWordDraft.original===anchor.text&&
-          sessionWordDraft.text.length<=300&&sessionWordDraft.text.trim();
-         const matches=suggestedChanges.filter(change=>change.original===anchor.text&&
-          change.proposed.trim()&&change.proposed.length<=300);
-         const candidate=restored?sessionWordDraft!.text:
-          matches.length===1?matches[0].proposed:anchor.text;
-         setSelected(anchor);setDraft(candidate);setInlineVisualEditor(null);
-         setConfirmed(false);
-         setMessage(restored?'已恢复未保存的文字草稿，请检查后再次确认。':
-          matches.length===1?'已填入本人确认过的建议；请复核事实与原版式后再保存。':'');
-        }}>
-        {visual&&<span className="hhba-word-ai-preview" aria-hidden="true">
-         <span className="hhba-word-ai-preview-text"
-          style={{fontSize:Math.max(9,Math.min(19,(h/1000*paperSize.height)*.82))+'px',
-           fontFamily:anchor.fontFamily||undefined}}>
-          {textFits&&changed?.prefix&&<span className="hhba-word-ai-unchanged">{changed.prefix}</span>}
-          {!textFits&&<span className="hhba-word-ai-unchanged">…</span>}
-          <span className="hhba-word-ai-changed hhba-resume-siri-letters">
-           {changed?.changed||'−'}
-          </span>
-          {textFits&&changed?.suffix&&<span className="hhba-word-ai-unchanged">{changed.suffix}</span>}
-         </span>
-        </span>}
-        {!visual&&<span className="hhba-word-edit-anchor-label"><PencilLine size={12}/> 修改</span>}
-       </button>
-       {visual?.state==='pending'&&<div className="hhba-word-siri-inline-actions"
-        role="group" aria-label="当前彩虹文字操作"
-        style={y>710?{bottom:'100%'}:{top:'100%'}}>
-        <button type="button" className="is-accept" disabled={busy}
-         onClick={()=>void acceptVisualWord(anchor,visual)}><Check size={13}/> 采纳</button>
-        <button type="button" disabled={busy}
-         onClick={()=>editVisualWord(anchor,visual)}><PencilLine size={13}/> 编辑</button>
-        <button type="button" disabled={busy} onClick={()=>{
-         onVisualSuggestionAction?.(visual.id,'ignored');setActiveVisualId(null);
-         setMessage('已忽略此处彩虹文字，保留原文。');
-        }}><X size={13}/> 忽略</button>
-       </div>}
-       </div>;
-      })}
+      {anchorsOverlay}
       {editPanel&&inlineVisualEditor&&selected&&<div
        className="hhba-word-siri-edit-float" role="region" aria-label="原位置文字编辑"
        style={{left:Math.min(55,selected.bbox[0]/10)+'%',
