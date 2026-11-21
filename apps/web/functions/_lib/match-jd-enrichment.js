@@ -15,6 +15,15 @@ import {groundedCareerDirections} from './resume-role-evidence.js';
 import {extractSelfReportedProfessionalCredentials} from './professional-credentials.js';
 
 export const MATCH_JD_PIPELINE='HHBA_SEARCH_TO_VERIFIED_JD_V1';
+export function matchJdEnrichmentEnabled(env){
+ // Explicit kill-switch always wins, including preview.
+ if(env?.HHBA_MATCH_JD_ENRICH_ENABLED==='0')return false;
+ if(env?.HHBA_MATCH_JD_ENRICH_ENABLED==='1')return true;
+ // No Cloudflare variable migration is needed: the preview account already
+ // has the original standalone JD D1/R2 bindings and candidate-only auth.
+ // Production does NOT have HHBA_AUTH_ROLLOUT=preview.
+ return env?.HHBA_AUTH_ROLLOUT==='preview'&&env?.HHBA_MATCH_SERVICE_ENABLED==='1';
+}
 const MAX_JOBS=10,CONCURRENCY=3;
 const normalize=value=>String(value??'').normalize('NFKC').toLowerCase().replace(/[\s._\-()（）]+/g,'');
 function degreeInResume(source){
@@ -106,7 +115,7 @@ export function scoreVerifiedJDSearchJob(original,archived,resume,options={}){
 export async function enrichSearchMatchesWithJD(env,matches,resume,options={},deps={}){
  const source=Array.isArray(matches)?matches.slice(0,MAX_JOBS):[];
  const disabled={matches:source,diagnostic:{mode:'disabled',eligible:0,verified:0,scored:0,failed:0}};
- if(env?.HHBA_MATCH_JD_ENRICH_ENABLED!=='1'||!jdArchiveConfigured(env))return disabled;
+ if(!matchJdEnrichmentEnabled(env)||!jdArchiveConfigured(env))return disabled;
  const ready=deps.ready||jdArchiveReady;
  try{if(!await ready(env))return {...disabled,diagnostic:{...disabled.diagnostic,mode:'not-ready'}};}
  catch{return {...disabled,diagnostic:{...disabled.diagnostic,mode:'not-ready'}};}
