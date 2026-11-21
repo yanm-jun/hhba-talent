@@ -1078,3 +1078,47 @@
   display:none!important;
  }
 }
+
+
+/* Desktop verified Word editing is a temporary two-column editing state,
+   not an always-visible sidebar or a floating box on top of the paper.
+   Once editing finishes the Word canvas gets its full single-column width. */
+@media (min-width:701px) {
+ .targeted-resume.is-word-first
+ .targeted-resume-word-workspace:has(> .targeted-resume-word-assistant.is-word-editing) {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(255px,30%);
+  gap:16px;
+  align-items:start;
+ }
+ .targeted-resume.is-word-first .targeted-resume-word-workspace
+ > .targeted-resume-word-assistant.is-word-editing,
+ .hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-word-workspace
+ > .targeted-resume-word-assistant.is-word-editing {
+  display:block!important;
+  position:sticky;
+  top:12px;
+  left:auto;right:auto;bottom:auto;
+  width:100%;max-width:none;min-width:0;
+  margin:0;
+  max-height:min(80dvh,720px);
+  overflow:auto;
+  z-index:40;
+  box-shadow:0 8px 27px rgba(26,50,78,.10);
+  border:1px solid #dfe8f0;
+  border-radius:12px;
+  padding:12px;
+ }
+ .targeted-resume.is-word-first
+ .targeted-resume-word-assistant.is-word-editing .targeted-resume-word-review{
+  display:none;
+ }
+ .targeted-resume.is-word-first
+ .targeted-resume-word-workspace:has(> .targeted-resume-word-assistant.is-word-editing)
+ > .hhba-word-tools-scrim{
+  display:none;
+ }
+ .targeted-resume.is-word-first .targeted-resume-word-main>.hhba-original-resume{
+  min-width:0;
+ }
+}
