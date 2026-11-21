@@ -1,4 +1,4 @@
-import { ArrowUpRight, BriefcaseBusiness, Building2, Scale, Sparkles } from 'lucide-react';
+import { ArrowUpRight, BriefcaseBusiness, Building2, Scale, Sparkles, Mail } from 'lucide-react';
 import { Link, navigate } from '../router';
 import { Shell } from '../components/Shell';
 import { UnifiedJobMarket } from '../components/UnifiedJobMarket';
@@ -31,7 +31,7 @@ export function HomePage({user}:{user:User|null}){
    <h1>一份工作，值得认真选择。</h1>
    <p className="hhba-home-description">发现真实的职业机会，了解劳动权益，让每一次选择都有更多依据。</p>
    <p className="hhba-home-question">你来到这里，是为了什么？</p>
-   <button type="button" className="hhba-letter-revisit" onClick={()=>window.dispatchEvent(new Event('hhba:open-letter'))}><span aria-hidden="true">✉</span> 读一封来自 HHBA 的信</button>
+   <button type="button" className="hhba-letter-revisit" onClick={()=>window.dispatchEvent(new Event('hhba:open-letter'))}><Mail size={16} aria-hidden="true" /> 读一封来自 HHBA 的信</button>
   </section>
   <section className="entry-grid hhba-public-entry-grid hhba-home-entry-grid" aria-label="选择使用入口">
    <EntryCard kind="candidate" title="求职与机会"
