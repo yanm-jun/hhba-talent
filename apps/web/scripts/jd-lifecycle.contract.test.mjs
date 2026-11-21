@@ -264,6 +264,19 @@ test('R2 network failure after successful index removal remains retryable on nex
  assert.equal(env._db.audit.filter(x=>x[2]==='SKIPPED_ERROR').length,0);
  assert.equal(env._db.audit.filter(x=>x[2]==='PURGED').length,1);
 });
+test('orphan retry cannot delete R2 when an indexed JD still references it',async()=>{
+ const env=makeEnv(),state=await closePosting(env),row=candidate(state);
+ env._db.versions.set(ID,row);env.HHBA_JD_RETENTION_DELETE_ENABLED='1';
+ env._db.audit.push([crypto.randomUUID(),ID,'SKIPPED_ERROR',
+  new Date().toISOString(),'R2_PENDING:'+KEY]);
+ const result=await runJdRetentionSweep(env,{dryRun:false,deps:{candidates:[]}});
+ assert.equal(result.retry_pending,1);
+ assert.equal(result.retry_completed,0);
+ assert.equal(env.deletionCount,0);
+ assert.equal(env._objects.has(KEY),true);
+ assert.equal(env._db.versions.has(ID),true);
+ assert.equal(env._db.audit.filter(x=>x[2]==='SKIPPED_ERROR').length,0);
+});
 test('active or 29-day closed vacancies never qualify for deletion',async()=>{
  const env=makeEnv();const state=await closePosting(env),row=candidate(state);
  env.HHBA_JD_RETENTION_DELETE_ENABLED='1';
