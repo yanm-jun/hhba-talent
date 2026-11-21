@@ -109,8 +109,19 @@ def exercise(browser,name,viewport):
     rail.wait_for(state='visible',timeout=15000)
     assert rail.evaluate('(el)=>getComputedStyle(el).position')=='static',(name,'overlay returned')
     assert page.locator('.hhba-word-tools-scrim').count()==0
+    consent=page.locator('#hhba-word-optimization-tools .targeted-resume-consent')
+    consent.wait_for(state='visible',timeout=10000)
+    # Opening the optional tools must take the user to the consent at once:
+    # an offscreen panel is as unusable as a panel covering the Word.
+    page.wait_for_function("""() => {
+      const node=document.querySelector('#hhba-word-optimization-tools .targeted-resume-consent');
+      const container=document.querySelector('.hhba-match-modal-editor .hhba-match-modal-content');
+      if(!node||!container)return false;
+      const a=node.getBoundingClientRect(),b=container.getBoundingClientRect();
+      return a.top>=b.top-12&&a.top<b.bottom-18;
+    }""",timeout=15000)
     page.screenshot(path=str(OUT/f'{name}-inline-settings.png'),animations='disabled')
-    page.locator('.targeted-resume-consent input[type=checkbox]').check()
+    consent.locator('input[type=checkbox]').check()
     page.get_by_role('button',name='生成本岗位建议').click(timeout=15000)
     page.wait_for_function('() => document.querySelector("#hhba-word-optimization-tools")?.getAttribute("aria-hidden")==="true"',timeout=15000)
     assert len(edits)==1,(name,edits)
