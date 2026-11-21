@@ -1,0 +1,215 @@
+/* HHBA · One-document editor. Applied ONLY to the existing Word optimization
+   modal; job discovery and legacy PDF workflows remain unchanged. */
+.hhba-match-modal.hhba-match-modal-editor{
+ width:min(1370px,calc(100vw - 22px));height:calc(100dvh - 22px);
+ max-height:calc(100dvh - 22px);border-radius:15px;
+}
+.hhba-match-modal-editor .hhba-match-modal-head.hhba-word-editor-head{
+ padding:11px 22px;min-height:56px;gap:14px;background:#fff;
+ border-bottom:1px solid #e9edf2;
+}
+.hhba-word-editor-heading{display:flex;align-items:center;gap:11px;min-width:0;flex:1}
+.hhba-word-editor-heading>svg{flex:0 0 auto;color:#587086}
+.hhba-word-editor-heading-copy{min-width:0;display:flex;flex-direction:column;gap:3px}
+.hhba-word-editor-heading-copy strong{
+ display:block;font-size:13px;font-weight:690;line-height:1.25;color:#20344a;
+ max-width:min(58vw,750px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.hhba-word-editor-heading-copy small{
+ display:block;font-size:11px;color:#6a7b8c;line-height:1.3;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.hhba-word-editor-head-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.hhba-word-editor-back,.hhba-word-editor-header-download{
+ display:inline-flex;align-items:center;justify-content:center;
+ width:36px;height:36px;padding:0;border:1px solid #e9eef2;
+ border-radius:9px;background:#fff;color:#52677c;cursor:pointer;
+}
+.hhba-word-editor-header-download:hover,.hhba-word-editor-back:hover{background:#f2f6f9}
+.hhba-word-editor-header-download:disabled{cursor:wait;opacity:.5}
+.hhba-match-modal-editor .hhba-match-modal-content[data-hhba-stage="optimization"]{
+ padding:0!important;overflow:hidden;background:#f7f8fa;
+ display:flex;flex-direction:column;min-height:0;
+}
+.hhba-match-modal-editor .hhba-match-modal-content[data-hhba-stage="optimization"]
+ .hhba-match-workspace{height:100%;min-height:0;display:flex;flex-direction:column;
+ padding:0!important;margin:0!important;min-width:0;max-width:none;}
+.hhba-match-modal-editor .targeted-resume.is-word-first{
+ flex:1;min-height:0;display:flex;flex-direction:column;
+ padding:0!important;margin:0!important;width:100%!important;
+ max-width:none!important;border:0!important;box-shadow:none!important;
+ background:transparent!important;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-heading{display:none!important}
+.hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-word-workspace{
+ flex:1;min-height:0;display:flex!important;flex-direction:column!important;
+ width:100%!important;max-width:none!important;gap:0!important;
+ margin:0!important;padding:0!important;grid-template-columns:none!important;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-word-main{
+ flex:1;min-height:0;display:flex;flex-direction:column;width:100%;
+ max-width:none!important;padding:0;margin:0;position:relative;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-reader-actions{
+ flex:0 0 auto;display:flex!important;justify-content:flex-end!important;
+ align-items:center;min-height:51px;gap:0;
+ padding:7px clamp(14px,2.6vw,30px)!important;margin:0!important;
+ background:#fff;border-bottom:1px solid #edf0f4;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-reader-actions .hhba-word-primary-action{
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ min-height:36px!important;padding:8px 17px!important;font-size:12px!important;
+ color:#fff!important;border:1px solid #245879!important;border-radius:9px!important;
+ background:#245879!important;box-shadow:none!important;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-reader-actions .hhba-word-primary-action:hover:not(:disabled){
+ background:#1b4663!important;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-reader-actions .hhba-word-primary-action:disabled{opacity:.48}
+.hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-word-assistant,
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-tools-scrim,
+.hhba-match-modal-editor .hhba-match-modal-foot,
+.hhba-match-modal-editor .hhba-match-apply-last{display:none!important}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-word-viewer{
+ display:flex;flex-direction:column;flex:1;min-height:0;
+ width:100%;max-width:none!important;margin:0!important;padding:0!important;
+ border:0!important;border-radius:0!important;background:transparent!important;
+ box-shadow:none!important;overflow:hidden;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-word-viewer
+ .hhba-original-resume-toolbar,
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-word-viewer
+ .hhba-original-resume-word-tools,
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-word-viewer
+ .hhba-original-resume-mobile-dock,
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-word-viewer
+ .hhba-original-resume-pages{display:none!important}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-word-viewer
+ .hhba-original-resume-siri-stage{
+ display:flex;justify-content:center;align-items:stretch;
+ flex:1;min-height:0;margin:0!important;padding:0!important;
+ overflow:hidden!important;background:#f7f8fa;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-word-viewer
+ .hhba-original-resume-paper{
+ box-sizing:border-box;flex:0 1 auto!important;
+ width:min(780px,64%)!important;min-width:0!important;
+ max-width:780px!important;max-height:none!important;min-height:0!important;
+ height:100%!important;
+ margin:0 auto!important;padding:12px 8px 22px!important;
+ overflow:auto!important;display:flex!important;
+ justify-content:safe center!important;align-items:flex-start;
+ background:transparent!important;border:0!important;border-radius:0!important;
+ scrollbar-width:thin;scroll-behavior:auto;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-browser-word-paper
+ .hhba-browser-word-frame{flex-shrink:0!important;margin-inline:auto!important}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-native-docx{
+ background:#fff;box-shadow:0 8px 30px rgba(27,43,60,.10);
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-word-viewer
+ .hhba-original-resume-anchor:not(.has-ai-preview){
+ background:transparent!important;border-color:transparent!important;
+ outline:0!important;box-shadow:none!important;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-word-viewer
+ .hhba-original-resume-anchor:not(.has-ai-preview):is(:hover,:focus-visible,.is-selected){
+ background:rgba(71,113,160,.055)!important;
+ border-color:rgba(71,113,160,.50)!important;
+ outline:1px solid rgba(71,113,160,.15)!important;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-original-word-viewer .hhba-original-resume-anchor:not(.has-ai-preview)
+ .hhba-word-edit-anchor-label{opacity:0!important}
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-original-word-viewer .hhba-original-resume-anchor:not(.has-ai-preview):is(:hover,:focus-visible,.is-selected)
+ .hhba-word-edit-anchor-label{opacity:1!important}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-word-viewer
+ .hhba-word-minimal-footer{
+ flex:0 0 auto;order:20;position:static!important;
+ display:flex!important;align-items:center;justify-content:space-between;
+ gap:12px;min-height:58px;padding:9px clamp(14px,2.6vw,30px);
+ margin:0!important;border-top:1px solid #e7ecf0;background:#fff;
+ box-shadow:none!important;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-zoom,
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-actions{
+ display:flex;align-items:center;gap:8px;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-footer button{
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ height:37px;min-width:36px;padding:7px;
+ background:#fff;border:1px solid transparent;border-radius:8px;
+ color:#52677e;cursor:pointer;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-footer button:hover:not(:disabled){
+ background:#f1f5f8;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-footer button:disabled{
+ opacity:.4;cursor:not-allowed;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-zoom output{
+ min-width:43px;text-align:center;font-size:12px;color:#516579;
+ font-variant-numeric:tabular-nums;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-footer .hhba-word-minimal-save{
+ padding:8px 16px;color:#fff;border-color:#245879;background:#245879;
+ font-weight:650;font-size:12px;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-footer .hhba-word-minimal-save:hover:not(:disabled){
+ background:#1b4663;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-standalone-edit-panel{
+ order:0!important;position:relative!important;inset:auto!important;
+ flex:0 0 auto;width:min(780px,64%)!important;max-width:780px!important;
+ margin:8px auto!important;box-shadow:none!important;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-message{
+ margin:0;padding:6px 20px;flex:0 0 auto;background:#fff;
+ color:#536a7e;font-size:11px;text-align:center;line-height:1.4;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.hhba-original-word-viewer .hhba-word-minimal-footer{display:none}
+.hhba-word-consent-overlay{
+ position:fixed;inset:0;z-index:4500;display:flex;align-items:center;
+ justify-content:center;padding:18px;
+ background:rgba(20,34,49,.42);backdrop-filter:blur(2px);
+}
+.hhba-word-consent-dialog{
+ width:min(420px,100%);box-sizing:border-box;
+ padding:25px;background:#fff;border-radius:15px;border:1px solid #e6ecf1;
+ box-shadow:0 18px 75px rgba(18,32,52,.2);color:#273c50;
+}
+.hhba-word-consent-dialog h2{margin:0 0 10px;font-size:17px;font-weight:720}
+.hhba-word-consent-dialog p{margin:0 0 16px;font-size:13px;color:#596c80;line-height:1.7}
+.hhba-word-consent-check{display:flex;gap:9px;align-items:flex-start;line-height:1.65;
+ font-size:12px;color:#455b70;cursor:pointer}
+.hhba-word-consent-check input{flex:0 0 auto;margin:4px 0 0;accent-color:#245879}
+.hhba-word-consent-actions{margin-top:20px;display:flex;justify-content:flex-end;gap:9px}
+.hhba-word-consent-actions button{padding:10px 15px;border-radius:9px;border:1px solid #dfe6ec;
+ background:#fff;color:#31495d;cursor:pointer}
+.hhba-word-consent-actions .hhba-word-consent-start{
+ background:#245879;border-color:#245879;color:#fff;
+}
+.hhba-word-consent-actions button:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:700px){
+ .hhba-match-modal.hhba-match-modal-editor{width:100%;height:100dvh;max-height:100dvh;border-radius:0}
+ .hhba-match-modal-editor .hhba-match-modal-head.hhba-word-editor-head{padding:8px 11px}
+ .hhba-word-editor-heading{gap:8px}
+ .hhba-word-editor-heading-copy strong{max-width:47vw;font-size:12px}
+ .hhba-word-editor-heading-copy small{max-width:52vw;font-size:10px}
+ .hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-reader-actions{min-height:46px;padding:6px 12px!important}
+ .hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-word-viewer
+  .hhba-original-resume-paper{width:100%!important;max-width:none!important;padding:7px 2px 14px!important}
+ .hhba-match-modal-editor .targeted-resume.is-word-first .hhba-original-word-viewer
+  .hhba-word-minimal-footer{padding:7px 9px;min-height:55px;gap:5px}
+ .hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-zoom,
+ .hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-actions{gap:2px}
+ .hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-footer button{min-width:32px;padding:5px}
+ .hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-minimal-footer .hhba-word-minimal-save{padding:6px 9px;font-size:11px}
+ .hhba-match-modal-editor .targeted-resume.is-word-first .hhba-word-standalone-edit-panel{width:100%!important}
+ .hhba-word-consent-dialog{padding:20px}
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-word-consent-overlay{backdrop-filter:none}
+}
