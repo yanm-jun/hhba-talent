@@ -17,8 +17,9 @@ import '../styles/browser-word-preview.css';
 import '../styles/siri-edge.css';
 
 // The original DOCX is NEVER converted into an HHBA template. A privately
-// rendered PDF is used only to show the source page. Downloaded edits are
-// the genuine original OOXML with a verified small text change.
+// rendered PDF is used when available; otherwise HTML preview stays on-device.
+// Downloaded DOCX preserves the original OOXML package, but without the
+// optional LibreOffice check its visual pagination is NOT verified.
 type PendingWordTextDraft={original:string;text:string;revision:number;page:number};
 export type WordVisualSuggestion={id:string;original:string;proposed:string;state:'pending'|'accepted'};
 export type WordRevisionSnapshot={revision:number;history:WordHistoryEntry[]};
