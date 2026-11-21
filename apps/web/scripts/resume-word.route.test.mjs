@@ -73,8 +73,9 @@ function fixture({enabled=true,owner='account-A',role='candidate'}={}){
  };
  return {env,saved};
 }
-const req=(action='status',{auth=true,method='GET',body=null,foreign=false}={})=>
- new Request(origin+'/api/resume-word?action='+action+'&resume_id='+id,{
+const req=(action='status',{auth=true,method='GET',body=null,foreign=false,jobId}={})=>
+ new Request(origin+'/api/resume-word?action='+action+'&resume_id='+id+
+  (jobId===undefined?'':'&job_id='+encodeURIComponent(jobId)),{
  method,headers:{
   ...(auth?{Authorization:'Bearer synthetic-session'}:{}),
   Origin:foreign?'https://malicious.example':origin,
@@ -359,4 +360,131 @@ test('competing edits use compare-and-swap; one writer wins and the other is rej
   assert.equal(manifest.items.length,1);
   assert.equal(x.saved.size,4,'losing writer must remove its unused Word/PDF revision');
  }finally{globalThis.fetch=prior;}
+});
+
+
+test('one owned Word is isolated into independent per-job DOCX/PDF revisions, including undo/redo and legacy vault',async()=>{
+ const x=fixture(),beforeFetch=globalThis.fetch;
+ const jobA='greenhouse-test-job-A',jobB='lever-test-job-B';
+ const renderCalls=[];
+ globalThis.fetch=async(url,options)=>{
+  const body=JSON.parse(options.body);
+  if(url.endsWith('/v1/verify')){
+   renderCalls.push([body.old_text,body.new_text]);
+   return Response.json({ok:true,verified:true,report:{
+    passed:true,page_count:1,changed_pixels:65,
+    changed_region:{page:1,x:40,y:35,width:90,height:17}
+   }});
+  }
+  return new Response(pdf,{status:200,headers:{'Content-Type':'application/pdf'}});
+ };
+ const edit=async(jobId,oldText,text,rev=0)=>onRequestPost({
+  request:req('export',{method:'POST',body:{
+   resume_id:id,job_id:jobId,action:'edit',original:oldText,text,
+   expected_revision:rev,confirmed_real:true,consent_word_processing:true
+  }}),env:x.env
+ });
+ const inspect=async jobId=>(await onRequestGet({request:req('inspect',
+  jobId===undefined?{}:{jobId}),env:x.env})).json();
+ const shift=async(jobId,action,rev)=>onRequestPost({
+  request:req('export',{method:'POST',body:{
+   resume_id:id,job_id:jobId,action,expected_revision:rev,
+   confirmed_real:true,consent_word_processing:true
+  }}),env:x.env
+ });
+ try{
+  // The existing unscoped Word/vault record is deliberately populated first.
+  assert.equal((await edit(undefined,'测试用户','旧版',0)).status,200);
+  const old=await inspect();assert.equal(old.revision,1);
+  assert.ok(old.editable_text.includes('旧版'));
+  for(const job of [jobA,jobB]){
+   const fresh=await inspect(job);
+   assert.equal(fresh.revision,0,'new job starts from ORIGINAL, not the older vault revision');
+   assert.equal(fresh.saved,null);
+   assert.ok(fresh.editable_text.includes('测试用户'));
+   assert.ok(!fresh.editable_text.includes('旧版'));
+  }
+  const a=await edit(jobA,'测试用户','岗位甲',0);
+  assert.equal(a.status,200,await a.clone().text());
+  const b=await edit(jobB,'测试用户','岗位乙',0);
+  assert.equal(b.status,200,await b.clone().text());
+  assert.ok((await inspect(jobA)).editable_text.includes('岗位甲'));
+  assert.ok((await inspect(jobB)).editable_text.includes('岗位乙'));
+  assert.equal((await inspect(jobA)).revision,1);
+  assert.equal((await inspect(jobB)).revision,1);
+  assert.ok((await inspect()).editable_text.includes('旧版'));
+  const base=store+'.hhba-word-preserved-v1-'+sha;
+  const manifests=[...x.saved.keys()].filter(k=>k.startsWith(base+'.job-')&&k.endsWith('.json'));
+  assert.equal(manifests.length,2,'separate target jobs need separate private manifests');
+  const uniqueScopes=new Set(manifests.map(k=>JSON.parse(x.saved.get(k)).job_scope_sha256));
+  assert.equal(uniqueScopes.size,2);
+  for(const job of [jobA,jobB]){
+   assert.equal((await onRequestGet({request:req('download',{jobId:job}),env:x.env})).status,200);
+   assert.equal((await onRequestGet({request:req('download-pdf',{jobId:job}),env:x.env})).status,200);
+  }
+  const wordA=Buffer.from(await (await onRequestGet({
+   request:req('download',{jobId:jobA}),env:x.env})).arrayBuffer());
+  const wordB=Buffer.from(await (await onRequestGet({
+   request:req('download',{jobId:jobB}),env:x.env})).arrayBuffer());
+  assert.notDeepEqual(wordA,wordB,'each job exports its own reviewed DOCX bytes');
+  assert.ok(wordA.includes(Buffer.from('岗位甲')));
+  assert.ok(wordB.includes(Buffer.from('岗位乙')));
+  assert.equal((await shift(jobA,'undo',1)).status,200);
+  assert.equal((await inspect(jobA)).revision,0);
+  assert.equal((await onRequestGet({request:req('download',{jobId:jobA}),env:x.env})).status,404);
+  assert.equal((await inspect(jobB)).revision,1,'undo in A must not affect B');
+  assert.ok((await inspect(jobB)).editable_text.includes('岗位乙'));
+  assert.equal((await shift(jobA,'redo',0)).status,200);
+  assert.equal((await inspect(jobA)).revision,1);
+  assert.equal((await edit(jobA,'测试用户','覆盖',0)).status,409,
+   'stale A tab must never overwrite A or B');
+  assert.equal((await edit(jobB,'岗位乙','岗位乙二',1)).status,200);
+  assert.ok((await inspect(jobB)).editable_text.includes('岗位乙二'));
+  assert.ok((await inspect(jobA)).editable_text.includes('岗位甲'),
+   'continued edits in B must never update A');
+  assert.ok((await inspect()).editable_text.includes('旧版'),
+   'legacy vault remains an independent document branch');
+  assert.equal((await onRequestGet({request:req('inspect',{jobId:jobA}),
+   env:fixture({owner:'not-account-A'}).env})).status,404);
+  assert.equal(renderCalls.length,4);
+ }finally{globalThis.fetch=beforeFetch;}
+});
+
+test('job scopes cannot be malformed or swap an already verified manifest across jobs',async()=>{
+ const x=fixture(),jobA='job-A',jobB='job-B',originalFetch=globalThis.fetch;
+ const invalid=['', ' x', 'x ', '\n', 'x'.repeat(513)];
+ try{
+  for(const jobId of invalid){
+   const response=await onRequestGet({request:req('inspect',{jobId}),env:x.env});
+   assert.equal(response.status,400,'invalid GET job scope rejected');
+   assert.equal((await onRequestPost({request:req('export',{method:'POST',body:{
+    resume_id:id,job_id:jobId,original:'测试用户',text:'修改',
+    expected_revision:0,confirmed_real:true,consent_word_processing:true
+   }}),env:x.env})).status,400,'invalid POST scope rejected');
+  }
+  assert.equal((await onRequestGet({request:req('inspect&job_id=duplicate',{jobId:jobA}),
+   env:x.env})).status,400,'duplicate job ID parameters rejected');
+  globalThis.fetch=async(url,options)=>url.endsWith('/v1/verify')?
+   Response.json({ok:true,verified:true,report:{
+    passed:true,page_count:1,changed_pixels:65,
+    changed_region:{page:1,x:40,y:35,width:90,height:17}
+   }}):new Response(pdf,{status:200,headers:{'Content-Type':'application/pdf'}});
+  assert.equal((await onRequestPost({request:req('export',{method:'POST',body:{
+   resume_id:id,job_id:jobA,action:'edit',original:'测试用户',text:'甲岗位',
+   expected_revision:0,confirmed_real:true,consent_word_processing:true
+  }}),env:x.env})).status,200);
+  const key=[...x.saved.keys()].find(k=>k.endsWith('.json')&&k.includes('.job-'));
+  assert.ok(key);
+  const body=JSON.parse(x.saved.get(key));
+  assert.match(body.job_scope_sha256,/^[0-9a-f]{64}$/);
+  // A corrupted/swapped job-manifest cannot turn another job's edits into its own.
+  const targetHash=createHash('sha256').update('hhba-word-target-job-v1:'+jobB).digest('hex');
+  const crossKey=store+'.hhba-word-preserved-v1-'+sha+'.job-'+targetHash+'.json';
+  x.saved.set(crossKey,x.saved.get(key));
+  const swapped=await onRequestGet({request:req('inspect',{jobId:jobB}),env:x.env});
+  assert.equal(swapped.status,409);
+  assert.equal((await swapped.json()).error,'WORD_REVISION_CORRUPT');
+  assert.ok((await (await onRequestGet({request:req('inspect',{jobId:jobA}),env:x.env})).json())
+   .editable_text.includes('甲岗位'));
+ }finally{globalThis.fetch=originalFetch;}
 });
