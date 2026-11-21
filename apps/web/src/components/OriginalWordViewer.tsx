@@ -507,7 +507,42 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    <p>当前只能查看文字。要查看原来的样式，请下载原件打开。</p>
    <pre>{text}</pre>
   </div>}
-  {!loading&&ready==='available'&&!previewError&&<>
+  {ready==='available'&&!rendererEnabled&&!previewError&&<>
+   <div className="hhba-original-resume-word-tools" role="group" aria-label="Word 浏览器预览缩放">
+    <button type="button" aria-label="缩小 Word" disabled={zoom<=.75}
+     onClick={()=>setZoom(v=>Math.max(.75,Math.round((v-.25)*100)/100))}><ZoomOut size={15}/></button>
+    <output aria-live="polite">{Math.round(zoom*100)}%</output>
+    <button type="button" aria-label="放大 Word" disabled={zoom>=2}
+     onClick={()=>setZoom(v=>Math.min(2,Math.round((v+.25)*100)/100))}><ZoomIn size={15}/></button>
+   </div>
+   <p className="hhba-browser-word-disclaimer">
+    浏览器预览供核对文字和样式；分页未经过 Word/LibreOffice 校验，请下载 Word 后检查最终排版。
+   </p>
+   <div className={'hhba-original-resume-siri-stage hhba-siri-edge'+
+    (glowActive?' hhba-siri-edge-active':'')}>
+    <div className="hhba-original-resume-paper hhba-word-native-preview hhba-browser-word-paper" ref={paper}>
+     <div className="hhba-original-resume-page-frame hhba-browser-word-frame" style={{zoom}}>
+      <div className="hhba-browser-word-output" ref={browserMount}/>
+      {!loading&&<div className="hhba-browser-word-overlay">
+       {anchorsOverlay}
+       {editPanel&&inlineVisualEditor&&selected&&<div className="hhba-word-siri-edit-float"
+        role="region" aria-label="原位置文字编辑"
+        style={{left:Math.min(55,selected.bbox[0]/10)+'%',
+         top:selected.bbox[1]>640?undefined:(selected.bbox[1]+selected.bbox[3])/10+'%',
+         bottom:selected.bbox[1]>640?(100-selected.bbox[1]/10)+'%':undefined}}>
+        {editPanel}
+       </div>}
+      </div>}
+     </div>
+    </div>
+   </div>
+   {editPanel&&!inlineVisualEditor&&(!editPanelHost?
+    <aside className="hhba-word-standalone-edit-panel">{editPanel}</aside>:
+    createPortal(editPanel,editPanelHost))}
+   {!loading&&anchors.length===0&&<p className="hhba-original-resume-note">
+    此 Word 没有找到可唯一定位的原文，请下载原件检查。没有对它做任何修改。</p>}
+  </>}
+  {!loading&&ready==='available'&&rendererEnabled&&!previewError&&<>
    <div className="hhba-original-resume-word-tools" role="group" aria-label="Word 预览缩放">
     <button type="button" aria-label="缩小 Word" onClick={()=>setZoom(value=>Math.max(.75,Math.round((value-.25)*100)/100))}
      disabled={zoom<=.75}><ZoomOut size={15}/></button>
