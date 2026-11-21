@@ -5,7 +5,7 @@ test('current search-first candidate matching exposes job-level optimization',as
  const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  assert.match(dialog,/TargetedResumeOptimization/);
- assert.match(dialog,/优化简历，提高分值/);
+ assert.match(dialog,/优化简历/); // Button text was shortened without removing the action.
  assert.match(dialog,/hhba-native-score/);
  assert.match(dialog,/setOptimizedJobId\(job.id\)/);
  assert.match(dialog,/!pending&&parsedProfile/);
