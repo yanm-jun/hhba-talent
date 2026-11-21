@@ -1,6 +1,6 @@
 import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
-import {ArrowUpRight,BriefcaseBusiness,MapPin,Wallet,X,Search,Sparkles} from 'lucide-react';
+import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,MapPin,Wallet,X,Search,Sparkles} from 'lucide-react';
 import type {MatchResponse} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
@@ -83,19 +83,35 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
   <div className="hhba-match-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)handleClose()}}>
    <div className={'hhba-match-modal'+(optimizedJobId?' hhba-match-modal-editor':'')} role="dialog" aria-modal="true" tabIndex={-1}
     ref={ref} onKeyDown={handleKey} aria-labelledby="hhba-native-title">
-    <header className="hhba-match-modal-head">
-     <div className="hhba-match-modal-brand">
-      <span className="hhba-match-modal-symbol"><BriefcaseBusiness size={19}/></span>
-      <div><strong>汇方职场 · HHBA</strong><small>DeepSeek Search + V4 Pro 智能岗位推荐</small></div>
+    <header className={'hhba-match-modal-head'+(optimizedJobId&&sourceResume?' hhba-word-editor-head':'')}>
+     {optimizedJobId&&sourceResume&&activeJob?
+      <div className="hhba-word-editor-heading">
+       <button type="button" className="hhba-word-editor-back" onClick={backToMatches}
+        aria-label="返回岗位匹配结果" title="返回岗位匹配结果"><ArrowLeft size={17}/></button>
+       <FileText size={18} aria-hidden="true"/>
+       <div className="hhba-word-editor-heading-copy">
+        <strong>{sourceResume.name}</strong>
+        <small id="hhba-native-title">{activeJob.title_zh||activeJob.title}
+         {' · 原匹配分 '+(visibleMatchScore(activeJob)??'—')+'/100'}</small>
+       </div>
+      </div>:
+      <div className="hhba-match-modal-brand">
+       <span className="hhba-match-modal-symbol"><BriefcaseBusiness size={19}/></span>
+       <div><strong>汇方职场 · HHBA</strong><small>DeepSeek Search + V4 Pro 智能岗位推荐</small></div>
+      </div>}
+     <div className="hhba-word-editor-head-actions">
+      {optimizedJobId&&sourceResume&&<span id="hhba-word-top-download" />}
+      <button type="button" className="hhba-match-modal-close"
+       onClick={optimizedJobId&&sourceResume?()=>{
+        if(!optimizationDirty||window.confirm('简历还有未保存的文字草稿，关闭后可能丢失。确定关闭吗？'))onClose();
+       }:handleClose}
+       aria-label={optimizedJobId&&sourceResume?'关闭简历编辑':'关闭推荐'}><X size={19}/></button>
      </div>
-     <button type="button" className="hhba-match-modal-close" onClick={handleClose} aria-label="关闭推荐">
-      <X size={19}/>
-     </button>
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobId?'optimization':'matches'}>
      {activeJob&&parsedProfile?
       <section className="hhba-match-workspace" aria-label="岗位专属简历优化">
-       <button type="button" className="hhba-match-workspace-back" onClick={backToMatches}>
+       {!sourceResume&&<><button type="button" className="hhba-match-workspace-back" onClick={backToMatches}>
         返回岗位匹配结果
        </button>
        <div className="hhba-match-selected-job">
@@ -107,7 +123,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
          <strong>{visibleMatchScore(activeJob)??'—'}<small>/100</small></strong>
          <span>原简历适配分 · AI 参考，非录用概率</span>
         </div>
-       </div>
+       </div></>}
        {!sourceResume&&<div className="hhba-match-word-note" role="note">
         当前可以核对岗位定向优化内容。原 Word 版式编辑和独立的 DOCX/PDF 修订，
         需要先在「我的简历」私有保存 DOCX 原文件；不会擅自创建另一种排版。
@@ -126,9 +142,9 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
          accountScope={accountScope} sourceResume={sourceResume}
          onDraftDirtyChange={setOptimizationDirty}/>
        </Suspense>
-       <p className="hhba-match-apply-last">
+       {!sourceResume&&<p className="hhba-match-apply-last">
         处理完简历后可返回原岗位匹配结果，在原卡片上前往企业官网自行投递。
-       </p>
+       </p>}
       </section>:<>
      <div className="hhba-match-intro">
       <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> AI 搜索真实岗位并匹配简历</span>
