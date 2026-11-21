@@ -23,7 +23,7 @@ import '../styles/siri-edge.css';
 type PendingWordTextDraft={original:string;text:string;revision:number;page:number};
 export type WordVisualSuggestion={id:string;original:string;proposed:string;state:'pending'|'accepted'};
 export type WordRevisionSnapshot={revision:number;history:WordHistoryEntry[]};
-export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onVisualSuggestionAction,onRevisionSnapshot,onDocumentReady}:{
+export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onVisualSuggestionAction,onRevisionSnapshot,onDocumentReady,onEditableSegments}:{
  resume:PrivateResume;jobId?:string;jobTitle?:string;onClose?:()=>void;
  suggestedChanges?:{original:string;proposed:string}[];
  onOpenSuggestions?:()=>void;pendingSuggestionCount?:number;onPendingChange?:(dirty:boolean)=>void;
@@ -39,6 +39,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  onVisualSuggestionAction?:(id:string,action:'accepted'|'ignored'|'edited',text?:string,layoutVerified?:boolean)=>void;
  onRevisionSnapshot?:(snapshot:WordRevisionSnapshot)=>void;
  onDocumentReady?:()=>void;
+ onEditableSegments?:(segments:string[])=>void;
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
@@ -162,8 +163,11 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      const mount=browserMount.current;
      await renderBrowserWord(raw,mount);
      if(!active)return;
+     const safeAnchors=browserWordAnchors(mount,info.editable_text||[]);
      setEditable(info.editable_text||[]);
-     setAnchors(browserWordAnchors(mount,info.editable_text||[]));
+     setAnchors(safeAnchors);
+     // AI edits may only target unique, visible Word text positions.
+     onEditableSegments?.([...new Set(safeAnchors.map(item=>item.text))]);
      setCount(1);setPage(1);
      setPaperSize({width:mount.scrollWidth,height:mount.scrollHeight});
      setLoading(false);
@@ -197,7 +201,9 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      }
     }
     if(!active)return;
-    setEditable((info.editable_text||[]).filter(t=>counts.get(t)===1));
+    const stableText=(info.editable_text||[]).filter(t=>counts.get(t)===1);
+    setEditable(stableText);
+    onEditableSegments?.(stableText);
     doc.current=result;setCount(result.numPages);
     setPage(current=>Math.min(Math.max(1,current),result.numPages));setLoading(false);
    }catch(error){
