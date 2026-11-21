@@ -812,3 +812,17 @@
   flex-wrap:wrap;justify-content:flex-end;
  }
 }
+ 
+/* A stand-alone original Word viewer also centers its opening state.
+   The full-screen match editor applies its own overlaid positioning. */
+.hhba-original-word-viewer .hhba-word-loading-state{
+ display:flex;flex:1;min-height:160px;flex-direction:column;
+ align-items:center;justify-content:center;gap:12px;
+ font-size:13px;color:#75889a;line-height:1.5;text-align:center;
+}
+.hhba-original-word-viewer .hhba-word-loading-spinner{
+ color:#7093b5;animation:hhba-word-loading-turn 1.75s linear infinite;
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-original-word-viewer .hhba-word-loading-spinner{animation:none!important}
+}
