@@ -1132,6 +1132,81 @@ try{
   await stage.close();
  }
  
+
+ // Real Chromium proof for the new in-document Siri interaction. The source
+ // and job are synthetic, but the exact production React components and native
+ // Word revision API client are exercised. No suggestions are hard-coded in UI.
+ for(const view of [{name:'desktop',width:1190,height:900},
+                    {name:'mobile',width:390,height:844}]){
+  const context=await browser.newPage({viewport:{width:view.width,height:view.height},
+   locale:'zh-CN',acceptDownloads:true});
+  const errors=[];context.on('pageerror',e=>errors.push(e.message));
+  context.on('dialog',dialog=>{void dialog.accept()});
+  await context.goto('http://127.0.0.1:3000/qa/resume-flow.html?word',
+   {waitUntil:'networkidle',timeout:45000});
+  await context.getByRole('button',{name:/优化简历/}).first().click();
+  await context.locator('.hhba-word-native-preview .hhba-original-resume-anchor').first()
+   .waitFor({timeout:18000});
+  const rail=context.locator('.targeted-resume-word-assistant');
+  if(view.name==='mobile'){
+   await context.getByRole('button',{name:'AI 建议',exact:true}).click();
+   await rail.waitFor({state:'visible'});
+  }
+  await rail.locator('.targeted-resume-ai-settings summary').click();
+  await rail.locator('.targeted-resume-consent input[type=checkbox]').check();
+  await context.getByRole('button',{name:'开始 AI 优化'}).click();
+  const anchorShell=context.locator('.hhba-word-siri-anchor-shell.has-siri-wording').first();
+  await anchorShell.waitFor({timeout:20000});
+  const inlineBar=anchorShell.getByRole('group',{name:'当前彩虹文字操作'});
+  assert.equal(await inlineBar.isVisible(),false,
+   'inline actions must not permanently obscure Word before hover/tap');
+  assert.equal(await context.locator('.hhba-word-native-preview').getByText('AI 建议修改').count(),0,
+   'the document must display Siri text directly, without an explanation label');
+  if(view.name==='desktop')await anchorShell.hover();
+  else await anchorShell.locator('.hhba-original-resume-anchor').click();
+  await inlineBar.waitFor({state:'visible'});
+  for(const label of ['采纳','编辑','忽略'])
+   assert.equal(await inlineBar.getByRole('button',{name:label}).count(),1);
+  await context.screenshot({path:output+'/siri-hover-'+view.name+'-three-actions.png',
+   fullPage:true});
+  if(view.name==='desktop'){
+   // Ignore must restore original real Word pixels, without a file write.
+   await inlineBar.getByRole('button',{name:'忽略'}).click();
+   assert.equal(await context.locator('.hhba-word-siri-anchor-shell.has-siri-wording').count(),0,
+    'ignored text must not appear as pending rainbow or alter the Word');
+   assert.match(await context.locator('.hhba-original-resume-file-heading').textContent(),
+    /当前修改进度：0 \/ 0/);
+   await context.getByRole('button',{name:'开始 AI 优化'}).click();
+   const pendingAgain=context.locator('.hhba-word-siri-anchor-shell.has-siri-wording').first();
+   await pendingAgain.waitFor();
+   await pendingAgain.hover();
+   await pendingAgain.getByRole('button',{name:'编辑'}).click();
+   const floating=context.locator('.hhba-word-siri-edit-float');
+   await floating.waitFor();
+   const manual=floating.getByRole('textbox',{name:'修改 Word 文字'});
+   assert.match(await manual.inputValue(),/同步整理每日服务记录/,
+    'editing should start from the real model response in the original text position');
+   await manual.fill('REVIEWED WORD RESUME');
+   assert.equal(await floating.getByRole('button',{name:'确认保存'}).isDisabled(),true,
+    'editing must explicitly confirm factual correctness');
+   await floating.locator('input[type=checkbox]').check();
+   await context.screenshot({path:output+'/siri-inline-edit-'+view.name+'.png',
+    fullPage:true});
+   await floating.getByRole('button',{name:'确认保存'}).click();
+  }else{
+   await inlineBar.getByRole('button',{name:'采纳'}).click();
+  }
+  await context.getByText('当前修改进度：1 / 1',{exact:false}).waitFor({timeout:18000});
+  await context.locator('.hhba-original-resume-canvas').waitFor();
+  await context.waitForFunction(()=>!document.querySelector('.hhba-word-siri-anchor-shell.has-siri-wording'));
+  assert.equal(await context.locator('.hhba-word-siri-inline-actions:visible').count(),0,
+   'accepted words become native document typography after the verified save');
+  await context.screenshot({path:output+'/siri-inline-'+view.name+'-native-confirmed.png',
+   fullPage:true});
+  assert.deepEqual(errors,[],'Siri inline action workflow must not crash on '+view.name);
+  await context.close();
+ }
+ 
  console.log(JSON.stringify({result:'PASSED',desktop_pdf_pages:pages.length,
   long_pdf_pages:longPages.length,mobile:metrics,qa_output:output}));
 }finally{await browser.close()}
