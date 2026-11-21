@@ -13,6 +13,7 @@ import {explainFinalJobScore} from './match-explanation.js';
 import {deriveDocumentedWorkTenure} from './resume-tenure.js';
 import {groundedCareerDirections} from './resume-role-evidence.js';
 import {extractSelfReportedProfessionalCredentials} from './professional-credentials.js';
+import {readJdPostingState,isClosedPosting,noteJdSourceFailure} from './jd-posting-lifecycle.js';
 
 export const MATCH_JD_PIPELINE='HHBA_SEARCH_TO_VERIFIED_JD_V1';
 export function matchJdEnrichmentEnabled(env){
@@ -125,15 +126,29 @@ export async function enrichSearchMatchesWithJD(env,matches,resume,options={},de
  const fetchAts=deps.fetchAts||fetchPublicAtsJd;
  const out=[...source],candidates=source.map((job,i)=>({job,i,locator:safeJDSourceLocator(job?.official_url)}))
   .filter(x=>x.locator);
- let cursor=0,verified=0,scored=0,failed=0;
+ let cursor=0,verified=0,scored=0,failed=0,closed=0;
  const inFlight=new Map();
  const load=locator=>{
   let promise=inFlight.get(locator.url);
   if(!promise){
    promise=(async()=>{
+    // A confirmed closed JD must disappear from active recommendations even
+    // when a model's earlier Search response still points at the same URL.
+    const posting=await readJdPostingState(env,locator.url);
+    if(isClosedPosting(posting)){
+     const err=new Error('JD_POSTING_CONFIRMED_CLOSED');
+     err.isKnownClosed=true;
+     throw err;
+    }
     const cached=await getCached(env,locator.url);
     if(cached)return cached;
-    const fetched=locator.kind?await fetchAts(locator.url):await fetchDirect(locator.url);
+    let fetched;
+    try{
+     fetched=locator.kind?await fetchAts(locator.url):await fetchDirect(locator.url);
+    }catch(error){
+     await noteJdSourceFailure(env,locator.url,error);
+     throw error;
+    }
     if(!fetched?.full_jd||fetched.canonical_url!==locator.url)throw Error('JD_SOURCE_NOT_VERIFIED');
     return save(env,fetched);
    })();
@@ -152,12 +167,15 @@ export async function enrichSearchMatchesWithJD(env,matches,resume,options={},de
     if(!linked)throw Error('JD_SCORE_NOT_AVAILABLE');
     out[i]=linked;verified++;
     if(linked.jd_score_status==='V2_JD_EVIDENCE_SCORED')scored++;
-   }catch{
-    // No private content or URLs in logs. Source failures do not hide jobs.
-    failed++;
+   }catch(error){
+    // Only two independent exact-URL 404/410 checks can close a posting.
+    // Otherwise keep the preliminary result, clearly unverified.
+    if(error?.isKnownClosed){out[i]=null;closed++;}
+    else failed++;
    }
   }
  };
  await Promise.all(Array.from({length:Math.min(CONCURRENCY,candidates.length)},()=>work()));
- return {matches:out,diagnostic:{mode:MATCH_JD_PIPELINE,eligible:candidates.length,verified,scored,failed}};
+ return {matches:out.filter(Boolean),
+  diagnostic:{mode:MATCH_JD_PIPELINE,eligible:candidates.length,verified,scored,failed,closed}};
 }
