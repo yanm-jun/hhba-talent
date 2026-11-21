@@ -46,7 +46,10 @@ function normalizeDocument(value){
   ['responsibilities','requirements','other'].includes(x.kind)&&
   typeof x.text==='string'&&x.text.trim().length>0&&x.text.length<=8000
  ).slice(0,120):[];
- if(sections.length<2)return null;
+ if(sections.length<2||sections.some((section,index)=>
+  section.id!=='JD-'+String(index+1).padStart(3,'0')||
+  !body.includes(section.text)))return null;
+ if(sections.map(section=>section.text).join('\n')!==body)return null;
  return {
   canonical_url:locator.url,company:locator.company,
   title:text(value.title).slice(0,120),
