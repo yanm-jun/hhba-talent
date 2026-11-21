@@ -142,7 +142,7 @@ def exercise(browser,name,viewport):
     ring=word.evaluate('el=>({before:getComputedStyle(el,"::before").content,'
         'beam:getComputedStyle(el,"::after").animationDuration,'
         'breath:getComputedStyle(el,"::before").animationDuration})')
-    assert ring['before']!='none' and '36s' in ring['beam'] and '10.5s' in ring['breath'],(
+    assert ring['before']!='none' and '36s' in ring['beam'] and '11s' in ring['breath'],(
         name,'missing slow, always-on Siri border beam',ring)
     assert page.locator('.hhba-original-resume-siri-stage.hhba-siri-edge-active').count()==0,(
         name,'entire blank workspace must not glow')
