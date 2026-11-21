@@ -18,6 +18,9 @@ on:
       - 'apps/web/functions/_lib/public-ats-jd.js'
       - 'apps/web/d1/0028_public_ats_jd_versions.sql'
       - 'apps/web/scripts/public-ats-jd.contract.test.mjs'
+      - 'apps/web/functions/_lib/resume-reassessment.js'
+      - 'apps/web/functions/api/resume-reassess.js'
+      - 'apps/web/scripts/verified-jd-reassessment.contract.test.mjs'
   workflow_dispatch:
 permissions:
   contents: read
@@ -38,6 +41,7 @@ jobs:
           npm ci --no-audit --no-fund
           node --test scripts/job-jd-archive.contract.test.mjs
           node --test scripts/public-ats-jd.contract.test.mjs
+          node --test scripts/verified-jd-reassessment.contract.test.mjs
           node --test scripts/official-jd-extraction.route.test.mjs || test ! -f scripts/official-jd-extraction.route.test.mjs
       - name: Full frontend TypeScript and Vite build
         working-directory: apps/web
