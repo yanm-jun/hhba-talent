@@ -746,6 +746,8 @@ try{
   if(view.name==='desktop'){
    const sheet=await first.locator('.hhba-word-native-preview').boundingBox();
    const edit=await nativePane.boundingBox();
+   console.log('WORD_EDITOR_GEOMETRY',JSON.stringify({view:view.name,sheet,edit}));
+   await first.screenshot({path:output+'/word-first-desktop-edit-panel-placement.png',fullPage:true});
    assert.ok(sheet&&edit&&edit.x>=sheet.x+sheet.width-6,
     'desktop edit pane must be to the RIGHT of Word, not on top of the document');
   }else{
