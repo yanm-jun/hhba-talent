@@ -35,7 +35,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  glowActive?:boolean;
  visualSuggestions?:WordVisualSuggestion[];
  onVisualSuggestionSelect?:(id:string)=>void;
- onVisualSuggestionAction?:(id:string,action:'accepted'|'ignored'|'edited',text?:string)=>void;
+ onVisualSuggestionAction?:(id:string,action:'accepted'|'ignored'|'edited',text?:string,layoutVerified?:boolean)=>void;
  onRevisionSnapshot?:(snapshot:WordRevisionSnapshot)=>void;
  onDocumentReady?:()=>void;
 }){
@@ -279,7 +279,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    const result=await saveOriginalWordEdit(resume.id,anchor.text,visual.proposed.trim(),revision,jobId);
    onSessionWordDraftChange?.(null);
    onVerifiedSave?.({original:anchor.text,text:visual.proposed.trim()});
-   onVisualSuggestionAction?.(visual.id,'accepted');
+   onVisualSuggestionAction?.(visual.id,'accepted',undefined,result.layout_verified===true);
    setSelected(null);setConfirmed(false);setInlineVisualEditor(null);setActiveVisualId(null);
    setSaved(true);setRevision(result.revision);setTotalRevisions(result.total_revisions);
    setRefresh(n=>n+1);
@@ -322,7 +322,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    onSessionWordDraftChange?.(null);
    onVerifiedSave?.({original:selected.text,text:draft.trim()});
    if(inlineVisualEditor&&inlineVisualSuggestionId)
-    onVisualSuggestionAction?.(inlineVisualSuggestionId,'edited',draft.trim());
+    onVisualSuggestionAction?.(inlineVisualSuggestionId,'edited',draft.trim(),result.layout_verified===true);
    setSelected(null);setConfirmed(false);setInlineVisualEditor(null);setInlineVisualSuggestionId(null);setSaved(true);
    setRevision(result.revision);setTotalRevisions(result.total_revisions);
    setPdfAvailable(result.pdf_available===true);setLayoutVerified(result.layout_verified===true);
