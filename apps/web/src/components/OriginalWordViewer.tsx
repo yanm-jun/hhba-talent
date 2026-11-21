@@ -20,8 +20,8 @@ import '../styles/siri-edge.css';
 type PendingWordTextDraft={original:string;text:string;revision:number;page:number};
 export type WordVisualSuggestion={id:string;original:string;proposed:string;state:'pending'|'accepted'};
 export type WordRevisionSnapshot={revision:number;history:WordHistoryEntry[]};
-export function OriginalWordViewer({resume,jobId,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onVisualSuggestionAction,onRevisionSnapshot,onDocumentReady}:{
- resume:PrivateResume;jobId?:string;onClose?:()=>void;
+export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onVisualSuggestionAction,onRevisionSnapshot,onDocumentReady}:{
+ resume:PrivateResume;jobId?:string;jobTitle?:string;onClose?:()=>void;
  suggestedChanges?:{original:string;proposed:string}[];
  onOpenSuggestions?:()=>void;pendingSuggestionCount?:number;onPendingChange?:(dirty:boolean)=>void;
  onVerifiedSave?:(change:{original:string;text:string})=>void;
@@ -275,14 +275,14 @@ export function OriginalWordViewer({resume,jobId,onClose,suggestedChanges=[],onO
  }
  async function downloadSaved(){
   setBusy(true);setMessage('');
-  try{await downloadOriginalWordEdited(resume.id,jobId);
+  try{await downloadOriginalWordEdited(resume.id,jobId,jobTitle);
    setMessage('已发起 Word 下载，请在浏览器下载列表查看。');}
   catch(error){setMessage(error instanceof Error?error.message:'下载失败，请重试。');}
   finally{setBusy(false);}
  }
  async function downloadSavedPdf(){
   setBusy(true);setMessage('');
-  try{await downloadOriginalWordPdf(resume.id,jobId);
+  try{await downloadOriginalWordPdf(resume.id,jobId,jobTitle);
    setMessage('已发起当前已确认版本的 PDF 下载。');}
   catch(error){setMessage(error instanceof Error?error.message:'PDF 下载失败，请重试。');}
   finally{setBusy(false);}
