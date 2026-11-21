@@ -316,6 +316,7 @@ export async function onRequestPost({request,env}){
    return json({ok:true,saved:next>0,revision:next,total_revisions:state.items.length});
   }
   if(state.revision>=MAX_REVISIONS) return fail('WORD_REVISION_LIMIT',422);
+  if(!renderer&&!hashIsValid(body.client_docx_sha256))return fail('INVALID_REQUEST',400);
   if(!await quotaReady(db))return fail('WORD_DB_NOT_READY',503);
   if(!await reserve(db,env,candidate.phone,'export'))
    return fail('WORD_DAILY_LIMIT',429);
@@ -329,6 +330,8 @@ export async function onRequestPost({request,env}){
    verifyLayout:async({original,edited,oldText,newText})=>
     wordRequest(env,'verify',{original,edited,oldText,newText})
   }):{bytes:await editOriginalDocxStrict(current,selected),pageCount:null};
+  if(!renderer&&await shaBytes(result.bytes)!==body.client_docx_sha256)
+   return fail('WORD_EDIT_CORRUPTED',409);
   const pdf=renderer?await wordRequest(env,'render',{original:result.bytes}):null;
   if(!await stillOwned(db,row,candidate.phone))return fail('RESUME_NOT_FOUND',404);
   const entry={id:crypto.randomUUID(),original:body.original,text:body.text,
