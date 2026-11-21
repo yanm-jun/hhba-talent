@@ -122,7 +122,7 @@ function countWidth(s){
  }
  return units;
 }
-function editXml(xml,edits){
+function editXml(xml,edits,{allowExpansion=false}={}){
  requireValue(xml.includes('<w:document')&&xml.includes('<w:body')&&
   !/<!DOCTYPE|<!ENTITY|<\?xml-stylesheet/i.test(xml));
  const matches=[...xml.matchAll(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g)];
@@ -131,9 +131,11 @@ function editXml(xml,edits){
  for(const edit of edits){
   requireValue(edit&&textOnly(edit.original)&&textOnly(edit.text)&&
    edit.text!==edit.original,'WORD_EDIT_UNSAFE');
-  // A longer replacement can shift line wrapping, tables and page flow.
-  // Shorter lines still require subsequent rendered-page comparison.
-  requireValue(countWidth(edit.text)<=countWidth(edit.original),'WORD_EDIT_TOO_LONG');
+  // Only the opt-in DOCX-only mode may permit expansions, with an explicit
+  // UNVERIFIED pagination label. Renderer-verified mode retains the older
+  // restrictive width guard and checks page geometry before publication.
+  if(!allowExpansion)
+   requireValue(countWidth(edit.text)<=countWidth(edit.original),'WORD_EDIT_TOO_LONG');
   const hits=matches.filter(m=>decodeXML(m[1])===edit.original);
   requireValue(hits.length===1,'WORD_EDIT_AMBIGUOUS');
   const hit=hits[0];
@@ -190,11 +192,11 @@ function repack(pkg,name,replacement){
  requireValue(result.length<=MAX_DOCX,'WORD_EDIT_TOO_LARGE');
  return result;
 }
-export async function editOriginalDocxStrict(raw,edits){
+export async function editOriginalDocxStrict(raw,edits,options={}){
  requireValue(Array.isArray(edits)&&edits.length>0&&edits.length<=20,'WORD_EDIT_UNSAFE');
  const pkg=readPackage(raw),entry=pkg.entries.find(e=>e.name==='word/document.xml');
  const originalXml=dec.decode(await xmlBytes(pkg,entry));
- const rewritten=enc.encode(editXml(originalXml,edits));
+ const rewritten=enc.encode(editXml(originalXml,edits,options));
  requireValue(rewritten.length<=MAX_XML,'WORD_EDIT_TOO_LARGE');
  const bytes=repack(pkg,entry.name,rewritten);
  // Strict post-write validation: package structure intact; unrelated ZIP
