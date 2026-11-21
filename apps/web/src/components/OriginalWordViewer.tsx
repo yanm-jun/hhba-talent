@@ -33,7 +33,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  glowActive?:boolean;
  visualSuggestions?:WordVisualSuggestion[];
  onVisualSuggestionSelect?:(id:string)=>void;
- onVisualSuggestionAction?:(id:string,action:'accepted'|'ignored')=>void;
+ onVisualSuggestionAction?:(id:string,action:'accepted'|'ignored'|'edited',text?:string)=>void;
  onRevisionSnapshot?:(snapshot:WordRevisionSnapshot)=>void;
  onDocumentReady?:()=>void;
 }){
@@ -66,6 +66,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  const [message,setMessage]=useState('');
  const [activeVisualId,setActiveVisualId]=useState<string|null>(null);
  const [inlineVisualEditor,setInlineVisualEditor]=useState<string|null>(null);
+ const [inlineVisualSuggestionId,setInlineVisualSuggestionId]=useState<string|null>(null);
  const restorePosition=useRef<{page:number;left:number;top:number;outerTop:number}|null>(null);
  function rememberPosition(){
   const node=paper.current;
@@ -265,7 +266,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
  function editVisualWord(anchor:WordAnchor,visual:WordVisualSuggestion){
   if(busy||!confirmDiscardText())return;
   setSelected(anchor);setDraft(visual.proposed);setConfirmed(false);
-  setInlineVisualEditor(anchor.id);setActiveVisualId(null);
+  setInlineVisualEditor(anchor.id);setInlineVisualSuggestionId(visual.id);setActiveVisualId(null);
   setMessage('请核实和编辑真实内容，确认后才会保存岗位专属 Word。');
  }
  async function downloadOriginal(){
@@ -293,7 +294,9 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
    const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision);
    onSessionWordDraftChange?.(null);
    onVerifiedSave?.({original:selected.text,text:draft.trim()});
-   setSelected(null);setConfirmed(false);setInlineVisualEditor(null);setSaved(true);
+   if(inlineVisualEditor&&inlineVisualSuggestionId)
+    onVisualSuggestionAction?.(inlineVisualSuggestionId,'edited',draft.trim());
+   setSelected(null);setConfirmed(false);setInlineVisualEditor(null);setInlineVisualSuggestionId(null);setSaved(true);
    setRevision(result.revision);setTotalRevisions(result.total_revisions);
    setRefresh(n=>n+1);setMessage('已检查版式并保存第 '+result.revision+' 次修改。原始 Word 保持不变。');
   }catch(error){setMessage(error instanceof Error?error.message:'没有保存，请缩短文字后重试。');}
