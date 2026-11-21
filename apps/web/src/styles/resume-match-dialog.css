@@ -189,3 +189,43 @@
 @media(prefers-reduced-motion:reduce){
  .hhba-native-score .hhba-native-optimize{transition:none}
 }
+
+
+/* A selected job opens a full document workspace inside the SAME modal.
+   Expand the paper, shrink duplicate chrome and avoid layered dimming. */
+.hhba-match-modal.hhba-match-modal-editor{
+ width:min(1460px,calc(100vw - 20px));
+ height:calc(100dvh - 16px);max-height:calc(100dvh - 8px);
+}
+.hhba-match-modal-editor .hhba-match-modal-content{
+ padding:9px clamp(12px,2vw,27px) 18px;
+ background:#fff;scrollbar-width:thin;
+}
+.hhba-match-modal-editor .hhba-match-workspace{max-width:none;min-width:0}
+.hhba-match-modal-editor .hhba-match-workspace-back{
+ min-height:32px;padding:5px 8px;
+}
+.hhba-match-modal-editor .hhba-match-selected-job{
+ padding:6px 8px 9px;margin:2px 0 8px;
+ border-color:#edf0f4;
+}
+.hhba-match-modal-editor .hhba-match-selected-job h2{
+ font-size:clamp(15px,1.3vw,19px);margin:2px 0;
+}
+.hhba-match-modal-editor .hhba-match-selected-job p{
+ font-size:11px;
+}
+.hhba-match-modal-editor .hhba-match-apply-last{
+ padding:8px 11px;margin:10px 0 0;font-size:11px;
+}
+@media(max-width:700px){
+ .hhba-match-modal.hhba-match-modal-editor{
+  width:100%;height:100dvh;max-height:100dvh;
+ }
+ .hhba-match-modal-editor .hhba-match-modal-content{
+  padding:6px 9px 16px;
+ }
+ .hhba-match-modal-editor .hhba-match-selected-job{
+  padding:5px 2px 8px;margin-bottom:8px;
+ }
+}
