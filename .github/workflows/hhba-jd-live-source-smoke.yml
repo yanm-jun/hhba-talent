@@ -1,0 +1,22 @@
+name: HHBA verified JD real official ATS smoke
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/hhba-jd-live-source-smoke.yml'
+      - 'apps/web/scripts/jd-public-ats-live-smoke.mjs'
+      - 'apps/web/functions/_lib/public-ats-jd.js'
+      - 'apps/web/functions/_lib/official-job-evidence.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-public-ats-jd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test real China job detail APIs, no authentication or writes
+        run: node apps/web/scripts/jd-public-ats-live-smoke.mjs

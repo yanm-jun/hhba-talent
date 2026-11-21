@@ -84,6 +84,67 @@ function eligibleStill(row,state,now){
  // verified newer row exists (checked by the SQL candidate selection).
  return Date.parse(row.last_verified_at)<=now.getTime()-JD_SUPERSEDED_RETENTION_DAYS*DAY;
 }
+const RETRY_PREFIX='R2_PENDING:';
+async function isAnyJdIndexPresent(db,id,key){
+ for(const table of TABLES){
+  const found=await db.prepare('SELECT id FROM '+table+' WHERE id=? AND object_key=?')
+   .bind(id,key).first();
+  if(found)return true;
+ }
+ return false;
+}
+async function finishPendingR2Delete(env,entry,now){
+ const db=env.HHBA_JOB_JD_DB,bucket=env.HHBA_JOB_JD_R2;
+ const id=entry.jd_version_id,key=String(entry.reason||'').slice(RETRY_PREFIX.length);
+ if(!/^jd_[a-f0-9]{32}$/.test(id)||!KEY.test(key)||
+  !entry.reason?.startsWith(RETRY_PREFIX))return false;
+ // If D1 still points at the object, it MUST NEVER be deleted by recovery.
+ if(await isAnyJdIndexPresent(db,id,key)){
+  // A crash before the conditional index DELETE did not detach the object.
+  // Cancel this abandoned marker; the ordinary retention scan can recheck
+  // the whole 30/90-day criteria before scheduling another purge.
+  await db.prepare('DELETE FROM hhba_jd_retention_audit WHERE event_id=? AND event_type=?')
+   .bind(entry.event_id,'SKIPPED_ERROR').run();
+  return false;
+ }
+ if(await recordHistoryDependency(env,id))return false;
+ const obj=await bucket.head(key);
+ if(obj){
+  const savedHash=key.slice(key.lastIndexOf('/')+1,-5);
+  const actualHash=obj.customMetadata?.jd_sha256;
+  if(actualHash&&actualHash!==savedHash)return false;
+  await bucket.delete(key);
+ }
+ const finished=await db.prepare('INSERT INTO hhba_jd_retention_audit('+
+  'event_id,jd_version_id,event_type,event_at,reason) VALUES(?,?,?,?,?)'
+ ).bind(crypto.randomUUID(),id,'PURGED',iso(now),'R2_RETRY_COMPLETED').run();
+ if(finished?.success!==true)throw Error('JD_RETENTION_AUDIT_FAILED');
+ await db.prepare('DELETE FROM hhba_jd_retention_audit WHERE event_id=? AND event_type=?')
+  .bind(entry.event_id,'SKIPPED_ERROR').run();
+ return true;
+}
+export async function retryPendingJdObjectDeletes(env,{now=new Date(),dryRun=true}={}){
+ const result={pending:0,retried:0,skipped:0};
+ if(dryRun||env?.HHBA_JD_RETENTION_DELETE_ENABLED!=='1')return result;
+ const db=env.HHBA_JOB_JD_DB;
+ if(!db?.prepare||!env?.HHBA_JOB_JD_R2?.delete||!env?.HHBA_PNVS_AUTH_DB?.prepare)
+  return result;
+ // A previous crash may have happened after D1 index deletion but before R2.
+ const list=await db.prepare(
+  "SELECT event_id,jd_version_id,reason FROM hhba_jd_retention_audit "+
+  "WHERE event_type='SKIPPED_ERROR' AND reason LIKE 'R2_PENDING:%' "+
+  "ORDER BY event_at ASC LIMIT 4"
+ ).all();
+ const rows=list?.results||[];
+ result.pending=rows.length;
+ for(const row of rows){
+  try{
+   if(await finishPendingR2Delete(env,row,now))result.retried++;
+   else result.skipped++;
+  }catch{result.skipped++}
+ }
+ return result;
+}
 export async function runJdRetentionSweep(env,{now=new Date(),dryRun=true,deps={}}={}){
  const result={eligible:0,dry_run:dryRun,pinned:0,skipped:0,purged:0,blocked:0};
  const db=env?.HHBA_JOB_JD_DB,bucket=env?.HHBA_JOB_JD_R2;
@@ -96,6 +157,10 @@ export async function runJdRetentionSweep(env,{now=new Date(),dryRun=true,deps={
  // This read-only query must work before any object is considered for purge.
  try{await recordHistoryDependency(env,'jd_00000000000000000000000000000000')}
  catch{result.blocked++;return result}
+ // Cleanup of interrupted *index-first* deletes is idempotent and always
+ // checks both D1 tables and saved user histories before touching R2.
+ const retry=await retryPendingJdObjectDeletes(env,{now,dryRun});
+ result.retry_pending=retry.pending;result.retry_completed=retry.retried;
  const candidates=deps.candidates||await findRetentionCandidates(db,now);
  result.eligible=candidates.length;
  for(const row of candidates){
@@ -122,19 +187,63 @@ export async function runJdRetentionSweep(env,{now=new Date(),dryRun=true,deps={
    if(present){
     const hash=present.customMetadata?.jd_sha256;
     if(hash&&hash!==row.jd_sha256){result.skipped++;continue}
-    await bucket.delete(row.object_key);
    }
-   const deleted=await db.prepare(
-    'DELETE FROM '+row.table+' WHERE id=? AND canonical_url=? AND object_key=?'
-   ).bind(row.id,row.canonical_url,row.object_key).run();
-   if(deleted?.success!==true||deleted?.meta?.changes!==1){
+   // Re-read the D1 index before the destructive phase; if another worker
+   // has refreshed the same version, the cleanup candidate is obsolete.
+   const current=await db.prepare(
+    'SELECT id,canonical_url,object_key,jd_sha256,last_verified_at FROM '+
+    row.table+' WHERE id=?'
+   ).bind(row.id).first();
+   if(!current||current.canonical_url!==row.canonical_url||
+    current.object_key!==row.object_key||current.jd_sha256!==row.jd_sha256||
+    current.last_verified_at!==row.last_verified_at){
     result.skipped++;continue;
    }
-   result.purged++;
-   await db.prepare('INSERT INTO hhba_jd_retention_audit('+
+   // Record a recoverable pending R2 deletion BEFORE the index removal.
+   // If the Worker is interrupted after D1 DELETE, the next Cron run can
+   // finish removing orphan bytes without deleting a still-indexed object.
+   const pendingId=crypto.randomUUID();
+   const pending=await db.prepare('INSERT INTO hhba_jd_retention_audit('+
+    'event_id,jd_version_id,event_type,event_at,reason) VALUES(?,?,?,?,?)'
+   ).bind(pendingId,row.id,'SKIPPED_ERROR',iso(now),RETRY_PREFIX+row.object_key).run();
+   if(pending?.success!==true||pending?.meta?.changes!==1){
+    result.blocked++;continue;
+   }
+   // IMPORTANT: D1 index MUST be removed before R2 bytes. Previously a
+   // failed D1 DELETE left an indexed JD pointing to already-deleted R2.
+   // Use optimistic concurrency on the exact version and recheck state
+   // INSIDE the same D1 statement; never delete a recently refreshed row.
+   const deleted=await db.prepare(
+    'DELETE FROM '+row.table+
+    ' WHERE id=? AND canonical_url=? AND object_key=? AND jd_sha256=? AND last_verified_at=? '+
+    'AND EXISTS(SELECT 1 FROM hhba_jd_posting_lifecycle AS s '+
+    'WHERE s.canonical_url=? AND s.status=? AND '+
+    '(s.status<>\'CLOSED\' OR s.closed_at=?))'
+   ).bind(row.id,row.canonical_url,row.object_key,row.jd_sha256,
+    row.last_verified_at,row.canonical_url,row.status,row.closed_at).run();
+   if(deleted?.success!==true||deleted?.meta?.changes!==1){
+    // The original D1 record was NOT removed. Never touch its private R2.
+    await db.prepare('DELETE FROM hhba_jd_retention_audit WHERE event_id=?')
+     .bind(pendingId).run();
+    result.skipped++;continue;
+   }
+   // A transient R2 failure can leave unreferenced bytes (space), but
+   // must NEVER leave a valid index pointing at missing JD content.
+   let r2ok=true;
+   if(present)try{await bucket.delete(row.object_key)}
+   catch{r2ok=false}
+   if(!r2ok){
+    // Pending audit survives and the next Cron safely retries the orphan.
+    result.blocked++;continue;
+   }
+   const audit=await db.prepare('INSERT INTO hhba_jd_retention_audit('+
     'event_id,jd_version_id,event_type,event_at,reason) VALUES(?,?,?,?,?)'
    ).bind(crypto.randomUUID(),row.id,'PURGED',iso(now),
     state.status==='CLOSED'?'CLOSED_30D_UNREFERENCED':'SUPERSEDED_90D_UNREFERENCED').run();
+   if(audit?.success!==true){result.blocked++;continue}
+   await db.prepare('DELETE FROM hhba_jd_retention_audit WHERE event_id=?')
+    .bind(pendingId).run();
+   result.purged++;
   }catch{
    // Never infer unreferenced when authentication DB or Cloudflare fails.
    result.skipped++;
