@@ -1146,3 +1146,18 @@
   background:#fff;
  }
 }
+
+/* The mobile overlay must include its horizontal padding in its 100vw
+   width. Otherwise the Word editor close button can land past the right
+   viewport boundary, even though the document itself does not scroll. */
+@media (max-width:700px) {
+ .targeted-resume.is-word-first .targeted-resume-word-assistant,
+ .hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-word-assistant {
+  box-sizing:border-box;
+  left:0;
+  right:0;
+  width:100%;
+  max-width:100%;
+  margin:0;
+ }
+}
