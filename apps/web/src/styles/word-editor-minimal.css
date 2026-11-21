@@ -225,3 +225,148 @@
  margin:0!important;padding:0!important;overflow:hidden!important;
  clip-path:inset(50%)!important;
 }
+
+
+/* P1 · Render the proposal inside its actual DOCX run. The document renderer,
+   not our UI, owns font, size, line-height and wrapping. No extra text layer
+   or colored boxes may cover the original Word paragraphs. */
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-browser-word-output .hhba-word-inline-suggestion{
+ white-space:inherit!important;
+ overflow-wrap:anywhere;
+ font:inherit!important;
+ letter-spacing:inherit!important;
+ line-height:inherit!important;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-browser-word-output .hhba-word-inline-suggestion > .hhba-word-ai-changed{
+ display:inline!important;
+ max-width:none!important;
+ vertical-align:baseline!important;
+ position:static!important;
+ box-sizing:content-box!important;
+ margin:0!important;padding:0!important;
+ border:0!important;box-shadow:none!important;filter:none!important;
+ font:inherit!important;
+ font-size:inherit!important;font-weight:inherit!important;
+ letter-spacing:inherit!important;line-height:inherit!important;
+ white-space:inherit!important;overflow-wrap:anywhere;
+ color:#366dba;
+ background-image:linear-gradient(100deg,
+  #248ab6 0%,#557dd2 23%,#946acb 47%,#ce77aa 72%,#2c9cb9 100%);
+ background-size:175% 100%;
+ -webkit-background-clip:text;background-clip:text;
+ -webkit-text-fill-color:transparent;
+ animation:hhba-resume-siri-letters-flow 10s ease-in-out infinite alternate;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-browser-word-overlay .hhba-original-resume-anchor.has-ai-preview{
+ background:transparent!important;border-color:transparent!important;
+ outline:none!important;box-shadow:none!important;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-browser-word-overlay .hhba-original-resume-anchor.has-ai-preview:is(:hover,:focus-visible){
+ background:rgba(68,115,166,.035)!important;
+ outline:1px solid rgba(75,120,171,.32)!important;
+ outline-offset:0;
+}
+
+/* P2 · A continuously present, very soft Siri aura around the actual white
+   DOCX sheet, plus ONE brighter segment that orbits the complete perimeter.
+   A breathing ring should stay secondary to the resume's native black ink. */
+@property --hhba-word-beam-angle{
+ syntax:"<angle>";
+ initial-value:0deg;
+ inherits:false;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-browser-word-output section.hhba-native-docx,
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-word-native-preview:not(.hhba-browser-word-paper)
+ .hhba-original-resume-page-frame{
+ position:relative;
+ isolation:isolate;
+ overflow:visible;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-browser-word-output section.hhba-native-docx::before,
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-browser-word-output section.hhba-native-docx::after,
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-word-native-preview:not(.hhba-browser-word-paper)
+ .hhba-original-resume-page-frame::before,
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-word-native-preview:not(.hhba-browser-word-paper)
+ .hhba-original-resume-page-frame::after{
+ content:"";
+ position:absolute;
+ pointer-events:none;
+ border-radius:3px;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-browser-word-output section.hhba-native-docx::before,
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-word-native-preview:not(.hhba-browser-word-paper)
+ .hhba-original-resume-page-frame::before{
+ inset:-1px;
+ z-index:3;
+ border:1px solid rgba(92,149,212,.22);
+ box-shadow:0 0 10px 1px rgba(93,142,225,.095),
+  0 0 17px 2px rgba(170,110,212,.055),
+  0 0 22px 1px rgba(75,186,206,.045);
+ animation:hhba-word-quiet-breathe 10.5s ease-in-out infinite;
+}
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-browser-word-output section.hhba-native-docx::after,
+.hhba-match-modal-editor .targeted-resume.is-word-first
+ .hhba-word-native-preview:not(.hhba-browser-word-paper)
+ .hhba-original-resume-page-frame::after{
+ inset:-2px;
+ z-index:4;
+ padding:2px;
+ opacity:.65;
+ background:conic-gradient(from var(--hhba-word-beam-angle),
+  transparent 0deg,transparent 306deg,
+  rgba(65,178,226,.06) 321deg,
+  rgba(77,139,232,.58) 335deg,
+  rgba(173,113,218,.62) 345deg,
+  rgba(227,139,188,.30) 353deg,transparent 360deg);
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+ -webkit-mask-composite:xor;
+ mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+ mask-composite:exclude;
+ animation:hhba-word-beam-orbit 36s linear infinite;
+}
+@keyframes hhba-word-quiet-breathe{
+ 0%,100%{opacity:.58}
+ 50%{opacity:.92}
+}
+@keyframes hhba-word-beam-orbit{
+ to{--hhba-word-beam-angle:360deg}
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-match-modal-editor .targeted-resume.is-word-first
+  .hhba-browser-word-output .hhba-word-inline-suggestion > .hhba-word-ai-changed,
+ .hhba-match-modal-editor .targeted-resume.is-word-first
+  .hhba-browser-word-output section.hhba-native-docx::before,
+ .hhba-match-modal-editor .targeted-resume.is-word-first
+  .hhba-browser-word-output section.hhba-native-docx::after,
+ .hhba-match-modal-editor .targeted-resume.is-word-first
+  .hhba-word-native-preview:not(.hhba-browser-word-paper) .hhba-original-resume-page-frame::before,
+ .hhba-match-modal-editor .targeted-resume.is-word-first
+  .hhba-word-native-preview:not(.hhba-browser-word-paper) .hhba-original-resume-page-frame::after{
+  animation:none!important;
+ }
+}
+@media print{
+ .hhba-match-modal-editor .targeted-resume.is-word-first
+  .hhba-browser-word-output section.hhba-native-docx::before,
+ .hhba-match-modal-editor .targeted-resume.is-word-first
+  .hhba-browser-word-output section.hhba-native-docx::after,
+ .hhba-match-modal-editor .targeted-resume.is-word-first
+  .hhba-word-native-preview:not(.hhba-browser-word-paper) .hhba-original-resume-page-frame::before,
+ .hhba-match-modal-editor .targeted-resume.is-word-first
+  .hhba-word-native-preview:not(.hhba-browser-word-paper) .hhba-original-resume-page-frame::after{
+  display:none!important;
+ }
+}
