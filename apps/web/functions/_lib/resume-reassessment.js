@@ -43,7 +43,7 @@ export function validatedAuditedJob(sources,id,now=Date.now()){
 export function archivedJDToScoreJob(jd){
  if(!jd?.fresh||typeof jd.id!=='string'||!/^jd_[a-f0-9]{32}$/.test(jd.id)||
   !Array.isArray(jd.sections)||typeof jd.jd_sha256!=='string'||
-  !Array.isArray(jd.sections.filter(s=>s.kind==='requirements')))return null;
+  !jd.sections.some(s=>s?.kind==='requirements'))return null;
  const rq=jd.sections.filter(s=>s?.kind==='requirements')
   .map(s=>s.text).join('\n').slice(0,6000);
  if(rq.length<25)return null;
