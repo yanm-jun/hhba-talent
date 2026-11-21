@@ -10,10 +10,15 @@ const send=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:
 const fail=(code,status)=>send({ok:false,error:code},status);
 const MAX_BODY=96*1024,MAX_BLOCKS=12,MAX_GLOBAL=50,MAX_PERSONAL=3;
 const MAX_GLOBAL_ATTEMPTS=120,MAX_PERSONAL_ATTEMPTS=6;
+// Separate paid AI optimization quotas from unrelated matching services.
+// Preview still supports its existing shared secret until separately migrated.
+const quotaPepper=env=>typeof env?.HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER==='string'&&
+ env.HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER.length>=24?
+ env.HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER:env?.HHBA_MATCH_LIMIT_PEPPER;
 function active(env){
  return (env?.HHBA_AUTH_ROLLOUT==='preview'||env?.HHBA_MATCH_RUNTIME_MODE==='production')&&
   env?.HHBA_RESUME_OPTIMIZATION_ENABLED==='1'&&
-  typeof env?.HHBA_MATCH_LIMIT_PEPPER==='string'&&env.HHBA_MATCH_LIMIT_PEPPER.length>=24&&
+  typeof quotaPepper(env)==='string'&&quotaPepper(env).length>=24&&
   typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 }
 async function dbReady(db){
@@ -101,7 +106,7 @@ export async function onRequestPost({request,env}){
  let input;
  try{input=await readSmallJson(request);}catch{return fail('INVALID_REQUEST',400);}
  if(!valid(input))return fail('INVALID_OPTIMIZATION_INPUT',400);
- const hash=await sha256Hex(env.HHBA_MATCH_LIMIT_PEPPER+':resume-opt:'+session.phone);
+ const hash=await sha256Hex(quotaPepper(env)+':resume-opt:'+session.phone);
  let requestId;
  try{
   if(!await reserveAttempt(db,hash))return fail('RESUME_OPTIMIZATION_ATTEMPT_LIMIT',429);
