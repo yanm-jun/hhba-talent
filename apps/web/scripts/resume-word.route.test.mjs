@@ -438,8 +438,8 @@ test('one owned Word is isolated into independent per-job DOCX/PDF revisions, in
   assert.equal((await inspect(jobA)).revision,1);
   assert.equal((await edit(jobA,'测试用户','覆盖',0)).status,409,
    'stale A tab must never overwrite A or B');
-  assert.equal((await edit(jobB,'岗位乙','岗位乙二',1)).status,200);
-  assert.ok((await inspect(jobB)).editable_text.includes('岗位乙二'));
+  assert.equal((await edit(jobB,'岗位乙','岗位丙',1)).status,200);
+  assert.ok((await inspect(jobB)).editable_text.includes('岗位丙'));
   assert.ok((await inspect(jobA)).editable_text.includes('岗位甲'),
    'continued edits in B must never update A');
   assert.ok((await inspect()).editable_text.includes('旧版'),
