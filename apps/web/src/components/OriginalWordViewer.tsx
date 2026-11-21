@@ -1,4 +1,4 @@
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
 import {Check,ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,Redo2,ZoomIn,ZoomOut,Sparkles,X,History,ChevronDown} from 'lucide-react';
 import type {PrivateResume} from '../services/privateResumes';
@@ -11,7 +11,7 @@ import {
  shiftOriginalWordRevision,downloadOriginalWordEdited,downloadOriginalWordPdf,
  type WordHistoryEntry
 } from '../services/originalWordApi';
-import {renderBrowserWord,browserWordAnchors} from '../services/browserWordPreview';
+import {renderBrowserWord,browserWordAnchors,paintBrowserWordSuggestions} from '../services/browserWordPreview';
 import '../styles/original-resume-viewer.css';
 import '../styles/browser-word-preview.css';
 import '../styles/siri-edge.css';
@@ -351,6 +351,19 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   });
   return()=>cancelAnimationFrame(id);
  },[loading,page,paperSize.width,paperSize.height,refresh]);
+ // Do not draw a second line of text on top of Word. Pending proposals
+ // replace only the local DOM text inside the original DOCX run, retaining
+ // inherited font/size/line-height and natural paragraph wrapping.
+ // The original bytes are unchanged until the candidate approves an edit.
+ useLayoutEffect(()=>{
+  if(rendererEnabled||loading||ready!=='available'||!browserMount.current)return;
+  const mount=browserMount.current;
+  paintBrowserWordSuggestions(mount,editable,visualSuggestions);
+  const next=browserWordAnchors(mount,editable);
+  setAnchors(next);
+  setPaperSize({width:mount.scrollWidth,height:mount.scrollHeight});
+ },[rendererEnabled,loading,ready,editable,visualSuggestions,refresh]);
+
  // Explicit candidate confirmation and verified private Word revision are
  // mandatory before any rainbow suggestion becomes actual document text.
  async function acceptVisualWord(anchor:WordAnchor,visual:WordVisualSuggestion){
@@ -508,7 +521,9 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
          setMessage(restored?'已恢复未保存的文字草稿，请检查后再次确认。':
           matches.length===1?'已填入本人确认过的建议；请复核事实与原版式后再保存。':'');
         }}>
-        {visual&&<span className="hhba-word-ai-preview" aria-hidden="true">
+        {/* PDF remains a canvas; browser Word has its OWN native inline text
+            and must never paint a second, incorrectly sized proposal above it. */}
+        {visual&&rendererEnabled&&<span className="hhba-word-ai-preview" aria-hidden="true">
          <span className="hhba-word-ai-preview-text"
           style={{fontSize:Math.max(9,Math.min(19,(h/1000*paperSize.height)*.82))+'px',
            fontFamily:anchor.fontFamily||undefined}}>
