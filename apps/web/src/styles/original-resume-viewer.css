@@ -786,3 +786,29 @@
   position:relative!important;inset:auto!important;padding:12px!important;
  }
 }
+
+
+/* Centre the actual scaled Word sheet within the reader, while retaining
+   left-to-right scrolling if a candidate manually zooms wider than the screen. */
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-browser-word-paper{
+ display:flex!important;justify-content:safe center!important;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-browser-word-frame{
+ width:max-content!important;min-width:0!important;max-width:none!important;
+ margin-inline:auto!important;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-browser-word-output{
+ width:max-content!important;min-width:0!important;max-width:none!important;
+}
+.targeted-resume.is-word-first .hhba-original-word-viewer .hhba-native-docx-wrapper{
+ width:max-content!important;min-width:0!important;
+}
+@media(max-width:700px){
+ /* All buttons follow the Word instead of sticking over its last lines. */
+ .targeted-resume.is-word-first .hhba-original-word-viewer .hhba-original-resume-mobile-dock{
+  position:static!important;inset:auto!important;bottom:auto!important;
+  margin:12px 0 0;z-index:auto!important;
+  border-top:1px solid #e7edf3;box-shadow:none!important;
+  flex-wrap:wrap;justify-content:flex-end;
+ }
+}
