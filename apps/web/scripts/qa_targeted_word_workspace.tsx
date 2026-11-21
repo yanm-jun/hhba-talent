@@ -25,9 +25,13 @@ const job={
 const result={
  matches:[job],
  profile:{
-  full_name:'虚构测试用户',experiences:[],
-  skills:['运营'],education:[],headline:'虚构运营督导',
-  intent:{cities:['上海']}
+  education:'本科',education_evidence:'仅为测试字段',
+  experience_years:2,experience_evidence:'负责门店运营和数据整理',
+  skills:[{name:'门店运营',evidence:'负责门店运营及日常数据整理工作'}],
+  target_roles:['区域运营督导'],
+  experiences:[{role:'运营岗位',organization:'虚构测试企业',period:'合成数据',
+   evidence:'负责门店运营及日常数据整理工作'}],
+  warnings:[]
  }
 } as unknown as MatchResponse;
 createRoot(document.getElementById('root')!).render(
