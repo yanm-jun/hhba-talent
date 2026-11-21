@@ -168,9 +168,15 @@ export async function enrichSearchMatchesWithJD(env,matches,resume,options={},de
     out[i]=linked;verified++;
     if(linked.jd_score_status==='V2_JD_EVIDENCE_SCORED')scored++;
    }catch(error){
-    // Only two independent exact-URL 404/410 checks can close a posting.
-    // Otherwise keep the preliminary result, clearly unverified.
-    if(error?.isKnownClosed){out[i]=null;closed++;}
+    // A repeated verified 404/410 can CLOSE a posting during this very
+    // request, not just on an earlier search. Re-read persisted state after
+    // the error so even the second 404 never leaks a stale recommendation.
+    let confirmed=Boolean(error?.isKnownClosed);
+    if(!confirmed){
+     try{confirmed=isClosedPosting(await readJdPostingState(env,locator.url))}
+     catch{ /* an unavailable lifecycle store is not closure evidence */ }
+    }
+    if(confirmed){out[i]=null;closed++;}
     else failed++;
    }
   }
