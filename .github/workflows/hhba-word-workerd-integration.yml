@@ -26,7 +26,7 @@ jobs:
         working-directory: apps/web
         run: |
           npm ci --no-audit --no-fund
-          npm install --no-save --no-audit --no-fund miniflare@4
+          npm install --no-save --no-audit --no-fund miniflare@4 esbuild
       - name: Execute real Word Pages Function with local workerd R2 D1 and authentic session validation
         working-directory: apps/web
         run: node --experimental-strip-types scripts/qa_word_workerd_d1_r2.mjs
