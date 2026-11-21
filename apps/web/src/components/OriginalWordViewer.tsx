@@ -484,7 +484,7 @@ export function OriginalWordViewer({resume,onClose,suggestedChanges=[],onOpenSug
        </button>
        {visual?.state==='pending'&&<div className="hhba-word-siri-inline-actions"
         role="group" aria-label="当前彩虹文字操作"
-        style={y>710?{bottom:'calc(100% + 7px)'}:{top:'calc(100% + 7px)'}}>
+        style={y>710?{bottom:'100%'}:{top:'100%'}}>
         <button type="button" className="is-accept" disabled={busy}
          onClick={()=>void acceptVisualWord(anchor,visual)}><Check size={13}/> 采纳</button>
         <button type="button" disabled={busy}
