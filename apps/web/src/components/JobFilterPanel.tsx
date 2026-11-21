@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { LocateFixed, MapPin, RefreshCw } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness, ChevronDown, LocateFixed, MapPin, RefreshCw, Search, X } from 'lucide-react';
 import { forgetCity, locateRegion, readSavedCity, saveCity } from '../services/jobGeolocation';
 import chinaDivisions from '../data/china_pca_2026.json';
 import '../styles/job-filters.css';
@@ -144,21 +144,21 @@ export function JobFilterPanel({ value, onChange }: {value: JobFilterSelection; 
   {locationNotice && <p className="hhba-nearby-status" role="status">{locationNotice}</p>}
   {locationSource==='osm-pilot' && <div className="hhba-nearby-attribution"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a></div>}
   <form className="hhba-filter-keyword" onSubmit={keywordSubmit}>
-    <span className="hhba-filter-glass" aria-hidden="true">⌕</span>
+    <Search className="hhba-filter-glass" size={19} aria-hidden="true"/>
     <input aria-label="搜索公司或岗位关键词" placeholder="搜索职位 / 企业名称，如：小米、销售、产品经理" value={queryDraft} onChange={e=>setQueryDraft(e.target.value)} maxLength={120}/>
-    <button type="submit">搜索职位 →</button>
+    <button type="submit">搜索职位 <ArrowRight size={15} aria-hidden="true"/></button>
   </form>
   <div className="hhba-filter-toolbar">
     <div className="hhba-filter-pop-outer">
-      <button className={'hhba-filter-pill '+(panel==='region'?'open ':'')+(value.country?'selected':'')} type="button" aria-expanded={panel==='region'} onClick={()=>setPanel(panel==='region'?null:'region')}>📍 {regionLabel} <span>⌄</span></button>
+      <button className={'hhba-filter-pill '+(panel==='region'?'open ':'')+(value.country?'selected':'')} type="button" aria-expanded={panel==='region'} onClick={()=>setPanel(panel==='region'?null:'region')}><MapPin size={16} aria-hidden="true"/> {regionLabel} <ChevronDown size={15} aria-hidden="true"/></button>
     </div>
-    <button className={'hhba-filter-pill '+(panel==='occupation'?'open ':'')+(value.occupation?'selected':'')} type="button" aria-expanded={panel==='occupation'} onClick={()=>setPanel(panel==='occupation'?null:'occupation')}>▦ {value.occupation||'全部职类'} <span>⌄</span></button>
+    <button className={'hhba-filter-pill '+(panel==='occupation'?'open ':'')+(value.occupation?'selected':'')} type="button" aria-expanded={panel==='occupation'} onClick={()=>setPanel(panel==='occupation'?null:'occupation')}><BriefcaseBusiness size={16} aria-hidden="true"/> {value.occupation||'全部职类'} <ChevronDown size={15} aria-hidden="true"/></button>
     <label className="hhba-filter-select"><span className="sr-only">招聘类型</span><select value={value.recruitment_type} onChange={e=>set({recruitment_type:e.target.value})}>{recruitment.map(([v,l])=><option value={v} key={v}>{l}</option>)}</select></label>
     <label className="hhba-filter-select"><span className="sr-only">学历</span><select value={value.education} onChange={e=>set({education:e.target.value})}>{educational.map(([v,l])=><option value={v} key={v}>{l}</option>)}</select></label>
     <label className="hhba-filter-select"><span className="sr-only">工作方式</span><select value={value.work_mode} onChange={e=>set({work_mode:e.target.value})}>{modes.map(([v,l])=><option value={v} key={v}>{l}</option>)}</select></label>
   </div>
   {panel==='region' && <section className="hhba-filter-dropdown" aria-label="地区联动筛选">
-   <div className="hhba-filter-panel-head"><strong>选择工作地区</strong><button type="button" onClick={()=>setPanel(null)} aria-label="关闭地区选项">✕</button></div>
+   <div className="hhba-filter-panel-head"><strong>选择工作地区</strong><button type="button" onClick={()=>setPanel(null)} aria-label="关闭地区选项"><X size={16} aria-hidden="true"/></button></div>
    <div className="hhba-filter-tabs"><button type="button" className={!overseas?'active':''} onClick={()=>{setOverseas(false);setRegion('CN');}}>国内地区</button><button type="button" className={overseas?'active':''} onClick={()=>{setOverseas(true);setRegion('');}}>海外地区</button><button type="button" onClick={()=>{setRegion('');setPanel(null);}}>不限地区</button></div>
    {!overseas?<div className="hhba-filter-cascade">
     <label>省 / 直辖市 / 自治区<select value={value.province} onChange={e=>setProvince(e.target.value)}><option value="">全国省份</option>{subdivisions.map(p=><option key={p.c} value={p.n}>{p.n}</option>)}</select></label>
@@ -173,10 +173,10 @@ export function JobFilterPanel({ value, onChange }: {value: JobFilterSelection; 
    <footer className="hhba-filter-panel-footer"><small>仅筛选岗位实际披露的地点；未公开区县的岗位不会被推断到某个区县。</small><button type="button" onClick={()=>setPanel(null)}>完成选择</button></footer>
   </section>}
   {panel==='occupation' && <section className="hhba-filter-dropdown" aria-label="职业分类">
-    <div className="hhba-filter-panel-head"><strong>选择职业分类</strong><button type="button" onClick={()=>setPanel(null)} aria-label="关闭职位类型">✕</button></div>
+    <div className="hhba-filter-panel-head"><strong>选择职业分类</strong><button type="button" onClick={()=>setPanel(null)} aria-label="关闭职位类型"><X size={16} aria-hidden="true"/></button></div>
     <div className="hhba-filter-professions">
      <div className="hhba-filter-prof-groups">{professionGroups.map(g=><button type="button" key={g.group} className={activeGroup===g.group?'active':''} onClick={()=>setActiveGroup(g.group)}>{g.group}</button>)}</div>
-     <div className="hhba-filter-prof-children"><button type="button" className="hhba-filter-prof-all" onClick={()=>{set({occupation:activeGroup});setPanel(null);}}>全部{activeGroup}岗位 →</button>
+     <div className="hhba-filter-prof-children"><button type="button" className="hhba-filter-prof-all" onClick={()=>{set({occupation:activeGroup});setPanel(null);}}>全部{activeGroup}岗位 <ArrowRight size={15} aria-hidden="true"/></button>
       <div>{selectedGroup.examples.map(name=><button type="button" key={name} className={value.occupation===name?'selected':''} onClick={()=>{set({occupation:name});setPanel(null);}}>{name}</button>)}</div>
      </div>
     </div>

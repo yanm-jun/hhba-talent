@@ -1,0 +1,39 @@
+name: HHBA frontend icon inventory
+
+on:
+  pull_request:
+    paths:
+      - 'apps/web/src/**'
+      - 'apps/web/public/preview-admin/**'
+      - 'apps/web/scripts/audit-ui-icons.mjs'
+      - 'apps/admin-preview/**'
+      - 'apps/browser-extension/**'
+      - '.github/workflows/hhba-icon-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-icons:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate inventory script syntax
+        run: node --check apps/web/scripts/audit-ui-icons.mjs
+      - name: Write full source inventory
+        run: |
+          node apps/web/scripts/audit-ui-icons.mjs --json > icon-inventory.json
+          node apps/web/scripts/audit-ui-icons.mjs --markdown >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify unified icon styles are included on all website surfaces
+        run: |
+          grep -q "styles/icon-system.css" apps/web/src/main.tsx
+          grep -q "icon-system.css" apps/admin-preview/index.html
+          grep -q "icon-system.css" apps/web/public/preview-admin/index.html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hhba-frontend-icon-inventory
+          path: icon-inventory.json

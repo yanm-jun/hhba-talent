@@ -1,5 +1,5 @@
 /* Unified employer workflow areas within the existing HHBA admin console. */
-.uw-nav-marker{font-size:13px;color:#60758F;display:inline-block;min-width:17px;font-weight:700;text-align:center}
+.uw-nav-marker{color:#60758F;display:block;width:17px;height:17px;min-width:17px;flex-shrink:0;stroke-width:1.75}
 .uw-view{animation:uw-fade .16s ease-out}
 @keyframes uw-fade{from{opacity:.72;transform:translateY(3px)}to{opacity:1;transform:none}}
 .uw-content{display:grid;gap:17px;padding-bottom:42px}

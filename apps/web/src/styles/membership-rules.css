@@ -96,8 +96,8 @@
 .hhba-rules-faq{padding:0 14px;border:1px solid #E7F0FC;border-radius:9px;background:#F7F9FD}
 .hhba-rules-faq summary{display:flex;align-items:baseline;gap:10px;padding:13px 0;cursor:pointer;list-style:none;font-size:14px;line-height:1.7;color:#125EBC;font-weight:700}
 .hhba-rules-faq summary::-webkit-details-marker{display:none}
-.hhba-rules-faq summary:after{content:'＋';font-size:18px;margin-left:auto;color:#889BB0}
-.hhba-rules-faq[open] summary:after{content:'－'}
+.hhba-rules-faq summary:after{content:'';display:block;width:14px;height:14px;flex:none;margin-left:auto;color:#889BB0;background:linear-gradient(currentColor,currentColor) center/12px 1.6px no-repeat,linear-gradient(currentColor,currentColor) center/1.6px 12px no-repeat;transition:color .2s ease}
+.hhba-rules-faq[open] summary:after{background:linear-gradient(currentColor,currentColor) center/12px 1.6px no-repeat}
 .hhba-rules-faq summary span{color:#889BB0;font-size:11px;font-variant-numeric:tabular-nums}
 .hhba-rules-faq p{margin:0;padding:11px 0 15px;border-top:1px solid #E7F0FC;color:#60758F;font-size:13px;line-height:1.85}
 .hhba-rules-source-list{display:grid;gap:8px;margin:0;padding-left:18px}
