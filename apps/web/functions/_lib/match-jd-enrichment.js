@@ -91,16 +91,26 @@ export async function enrichSearchMatchesWithJD(env,matches,resume,options={},de
  const out=[...source],candidates=source.map((job,i)=>({job,i,locator:safeJDSourceLocator(job?.official_url)}))
   .filter(x=>x.locator);
  let cursor=0,verified=0,scored=0,failed=0;
+ const inFlight=new Map();
+ const load=locator=>{
+  let promise=inFlight.get(locator.url);
+  if(!promise){
+   promise=(async()=>{
+    const cached=await getCached(env,locator.url);
+    if(cached)return cached;
+    const fetched=locator.kind?await fetchAts(locator.url):await fetchDirect(locator.url);
+    if(!fetched?.full_jd||fetched.canonical_url!==locator.url)throw Error('JD_SOURCE_NOT_VERIFIED');
+    return save(env,fetched);
+   })();
+   inFlight.set(locator.url,promise);
+  }
+  return promise;
+ };
  const work=async()=>{
   while(cursor<candidates.length){
    const {job,i,locator}=candidates[cursor++];
    try{
-    let jd=await getCached(env,locator.url);
-    if(!jd){
-     const fetched=locator.kind?await fetchAts(locator.url):await fetchDirect(locator.url);
-     if(!fetched?.full_jd||fetched.canonical_url!==locator.url)throw Error('JD_SOURCE_NOT_VERIFIED');
-     jd=await save(env,fetched);
-    }
+    const jd=await load(locator);
     if(!jd?.fresh||!jd.id||jd.canonical_url!==locator.url||
      !jd.sections?.some(s=>s.kind==='requirements'))throw Error('JD_INCOMPLETE');
     const linked=scoreVerifiedJDSearchJob(job,jd,resume,options);
