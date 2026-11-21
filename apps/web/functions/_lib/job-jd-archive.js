@@ -8,6 +8,7 @@
  */
 import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 import {safePublicAtsJobLocator,ATS_JD_PROOF} from './public-ats-jd.js';
+import {extractOfficialJdSections} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
 
 export const JD_ARCHIVE_KIND='HHBA_VERIFIED_JOB_JD_V1';
@@ -58,6 +59,12 @@ function normalizeDocument(value){
   section.id!=='JD-'+String(index+1).padStart(3,'0')||
   !body.includes(section.text)))return null;
  if(sections.map(section=>section.text).join('\n')!==body)return null;
+ // The full-JD hash alone does not cover an attacker changing requirement
+ // classification while retaining identical text. Re-derive section kinds
+ // from the immutable source body every time R2 is read.
+ const recomputed=extractOfficialJdSections(body);
+ if(!recomputed||JSON.stringify(recomputed.sections)!==JSON.stringify(sections))
+  return null;
  return {
   canonical_url:locator.url,company:locator.company,
   title:text(value.title).slice(0,120),
