@@ -82,7 +82,8 @@ test('D1 and R2 retain immutable ATS provenance and can retrieve same version fo
  const record=new Map(),objects=new Map(),now=new Date();
  const db={prepare(sql){return {
    bind(...args){this.args=args;return this},
-   async first(){if(sql.includes('WHERE id=?'))return record.get(this.args[0])||null;
+   async first(){if(sql.includes('FROM hhba_jd_posting_lifecycle'))return null;
+    if(sql.includes('WHERE id=?'))return record.get(this.args[0])||null;
     if(sql.includes('WHERE canonical_url=?'))return [...record.values()].find(v=>v.canonical_url===this.args[0])||null;
     throw Error('unexpected SQL '+sql);},
    async run(){assert.match(sql,/INSERT INTO hhba_job_ats_jd_versions/);

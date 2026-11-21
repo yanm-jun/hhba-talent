@@ -10,6 +10,7 @@ import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 import {safePublicAtsJobLocator,ATS_JD_PROOF} from './public-ats-jd.js';
 import {extractOfficialJdSections} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
+import {recordJdPostingCheck,readJdPostingState,isUsablePosting} from './jd-posting-lifecycle.js';
 
 export const JD_ARCHIVE_KIND='HHBA_VERIFIED_JOB_JD_V1';
 export const JD_FRESH_MS=24*60*60*1000;
@@ -105,10 +106,13 @@ async function readArchivedRow(env,row){
  if(hash!==row.jd_sha256)return null;
  const lastVerified=safeDayIso(row.last_verified_at);
  const age=lastVerified?Date.now()-Date.parse(lastVerified):Infinity;
+ const lifecycle=await readJdPostingState(env,row.canonical_url);
  return {
   ...parsed,id:row.id,jd_sha256:row.jd_sha256,
   fetched_at:row.first_verified_at,checked_at:row.last_verified_at,
-  fresh:age>=-300000&&age<=JD_FRESH_MS
+  posting_status:lifecycle?.status||'UNTRACKED',
+  posting_closed_at:lifecycle?.closed_at||null,
+  fresh:age>=-300000&&age<=JD_FRESH_MS&&isUsablePosting(lifecycle)
  };
 }
 export async function readFreshJobJdByUrl(env,url){
@@ -155,6 +159,9 @@ export async function saveVerifiedJobJd(env,raw,{now=new Date()}={}){
   jdHash,key,new TextEncoder().encode(source.full_jd).length,source.proof_method,
   source.content_status,checked,checked).run();
  if(result?.success!==true)throw Error('JD_INDEX_WRITE_FAILED');
+ // Record ACTIVE only after the original JD text and index are durably saved.
+ // Failure to write the lifecycle state fails closed in preview/strict mode.
+ await recordJdPostingCheck(env,source.canonical_url,{now});
  return readJobJdById(env,id);
 }
 export function publicJdPayload(saved,{includeText=true}={}){
@@ -164,6 +171,8 @@ export function publicJdPayload(saved,{includeText=true}={}){
   company:saved.company,title:saved.title,location:saved.location,
   canonical_url:saved.canonical_url,jd_sha256:saved.jd_sha256,
   checked_at:saved.checked_at,fresh:saved.fresh,
+  posting_status:saved.posting_status||'UNTRACKED',
+  posting_closed_at:saved.posting_closed_at||null,
   content_status:saved.content_status,proof_method:saved.proof_method,
   ...(includeText?{full_jd:saved.full_jd,sections:saved.sections}:{}),
   disclaimer:saved.fresh?

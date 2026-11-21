@@ -30,6 +30,11 @@ on:
       - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
       - 'apps/web/src/components/CandidateMatchHistory.tsx'
       - 'apps/web/scripts/match-jd-enrichment.contract.test.mjs'
+      - 'apps/web/d1/0029_jd_posting_lifecycle.sql'
+      - 'apps/web/functions/_lib/jd-posting-lifecycle.js'
+      - 'apps/web/functions/_lib/jd-lifecycle-maintenance.js'
+      - 'apps/web/ops/jd-lifecycle-cron-worker.mjs'
+      - 'apps/web/scripts/jd-lifecycle.contract.test.mjs'
   workflow_dispatch:
 permissions:
   contents: read
@@ -52,6 +57,7 @@ jobs:
           node --test scripts/public-ats-jd.contract.test.mjs
           node --test scripts/verified-jd-reassessment.contract.test.mjs
           node --test scripts/match-jd-enrichment.contract.test.mjs
+          node --test scripts/jd-lifecycle.contract.test.mjs
           node --test scripts/match-history.contract.test.mjs
           node --test scripts/match-native-web.contract.test.mjs
           node --test scripts/official-jd-extraction.route.test.mjs || test ! -f scripts/official-jd-extraction.route.test.mjs

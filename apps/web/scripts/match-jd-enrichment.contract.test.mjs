@@ -41,7 +41,13 @@ test('disabled/default settings preserve provisional Search scores and never cal
 });
 test('preview automatically enables verified-JD stage but production remains off without explicit switch',async()=>{
  const preview={...env,HHBA_MATCH_JD_ENRICH_ENABLED:undefined,
-  HHBA_AUTH_ROLLOUT:'preview',HHBA_MATCH_SERVICE_ENABLED:'1'};
+  HHBA_AUTH_ROLLOUT:'preview',HHBA_MATCH_SERVICE_ENABLED:'1',
+  HHBA_JOB_JD_DB:{prepare(sql){
+   if(sql.includes('FROM hhba_jd_posting_lifecycle'))return {
+    bind(){return this},async first(){return null}};
+   throw Error('unexpected D1 query');
+  }}
+ };
  const production={...env,HHBA_MATCH_JD_ENRICH_ENABLED:undefined,
   HHBA_AUTH_ROLLOUT:undefined,HHBA_MATCH_RUNTIME_MODE:'production'};
  assert.equal(matchJdEnrichmentEnabled(preview),true);
