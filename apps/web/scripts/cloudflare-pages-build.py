@@ -88,6 +88,15 @@ def main() -> None:
         shutil.copy2(siri_source, siri_target)
         print("HHBA_PREVIEW_ONLY_SIRI_DEMO_READY=/preview/resume-siri.html", flush=True)
 
+        # This newer single-document hover/tap showcase is independent of the
+        # deployed Word feature, with fictional data and no external requests.
+        inline_source = WEB / "preview-only" / "siri-inline.html"
+        if not inline_source.is_file():
+            raise SystemExit("Missing isolated Siri inline action review")
+        inline_target = WEB / "dist" / "preview" / "siri-inline.html"
+        shutil.copy2(inline_source, inline_target)
+        print("HHBA_PREVIEW_ONLY_SIRI_INLINE_READY=/preview/siri-inline.html", flush=True)
+
         # The new simpler experience is the actual React component, not a
         # duplicated HTML mock. Vite emits it only for this Preview branch.
         frontend_entry = WEB / "dist" / "preview-only" / "resume-simple.html"
