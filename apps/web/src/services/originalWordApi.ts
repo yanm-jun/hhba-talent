@@ -119,7 +119,7 @@ export async function saveOriginalWordEdit(id:string,original:string,text:string
   // before publishing the private, job-scoped revision into R2.
   const source=await wordSourceBytes(id,expectedRevision,jobId);
   const patched=await editOriginalDocxStrict(source,[{original,text}]);
-  const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',patched));
+  const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',new Uint8Array(patched).buffer));
   clientHash=Array.from(digest,b=>b.toString(16).padStart(2,'0')).join('');
  }
  const response=await send('/api/resume-word','POST',{
