@@ -89,7 +89,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
        </button>
        <div className="hhba-match-selected-job">
         <div><span>针对已选岗位定向优化</span>
-         <h2>{activeJob.title_zh||activeJob.title}</h2>
+         <h2 id="hhba-native-title">{activeJob.title_zh||activeJob.title}</h2>
          <p>{activeJob.company} · {activeJob.location}</p>
         </div>
         <div className="hhba-match-selected-score">
