@@ -1,30 +1,13 @@
-name: HHBA monthly finance disclosure dispatch
-# Manual fallback only; the Cloudflare Cron Worker is the sole scheduled dispatcher.
-# This workflow safely exits when the optional repository secret is absent.
+name: HHBA retired finance dispatch (manual no-op)
+# Kept for historical workflow links. The email campaign and financial allocation
+# pledge were retired on 2026-11-22; no secrets or external APIs are used.
 on:
   workflow_dispatch:
 permissions:
   contents: read
-concurrency:
-  group: hhba-finance-dispatch
-  cancel-in-progress: false
 jobs:
-  publish-and-send:
+  no-op:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
     steps:
-      - name: Manual dispatch of published real reports only (never sample data)
-        env:
-          HHBA_FIN_DISPATCH_SECRET: ${{ secrets.HHBA_FIN_DISPATCH_SECRET }}
-        run: |
-          set -euo pipefail
-          if [ -z "${HHBA_FIN_DISPATCH_SECRET:-}" ]; then
-            echo "Finance dispatch secret not configured; no email sent."
-            exit 0
-          fi
-          curl --fail-with-body --silent --show-error \
-            --retry 2 --max-time 120 --request POST \
-            --header "Authorization: Bearer ${HHBA_FIN_DISPATCH_SECRET}" \
-            --header "Content-Type: application/json" \
-            "https://hhba.work/api/transparency/dispatch" \
-            --data '{}'
+      - name: Confirm retired campaign
+        run: echo "Retired HHBA finance mailing - no reports or messages will be sent."
