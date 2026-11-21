@@ -145,6 +145,32 @@ test('opt-in renderer-free flow saves original DOCX structure without inventing 
  assert.deepEqual(x.saved.get(store),original,'original private R2 object is untouched');
 });
 
+test('DOCX-only permits user-confirmed longer wording while strict renderer mode refuses unverified expansion',async()=>{
+ const x=fixture({enabled:false,docxOnly:true});
+ const expanded='负责山东区域多家门店运营管理、员工培训及客户体验持续改善';
+ await assert.rejects(
+  editOriginalDocxStrict(original,[{original:'测试用户',text:expanded}]),
+  /WORD_EDIT_TOO_LONG/);
+ const bytes=await editOriginalDocxStrict(original,
+  [{original:'测试用户',text:expanded}],{allowExpansion:true});
+ const digest=createHash('sha256').update(bytes).digest('hex');
+ const response=await onRequestPost({request:req('export',{method:'POST',jobId:'supervisor-expansion',body:{
+  resume_id:id,job_id:'supervisor-expansion',action:'edit',original:'测试用户',text:expanded,
+  client_docx_sha256:digest,expected_revision:0,
+  confirmed_real:true,consent_word_processing:true
+ }}),env:x.env});
+ assert.equal(response.status,200,await response.clone().text());
+ const result=await response.json();
+ assert.equal(result.layout_verified,false);
+ assert.equal(result.pdf_available,false);
+ assert.equal(result.page_count,null);
+ const stored=new Uint8Array(await (await onRequestGet({
+  request:req('download',{jobId:'supervisor-expansion'}),env:x.env
+ })).arrayBuffer());
+ assert.deepEqual(stored,bytes);
+ assert.deepEqual(x.saved.get(store),original);
+});
+
 test('only authenticated candidate owner can inspect original Word run text',async()=>{
  const x=fixture();
  const response=await onRequestGet({request:req('inspect'),env:x.env});
