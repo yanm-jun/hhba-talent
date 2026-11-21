@@ -17,6 +17,8 @@ on:
       - 'apps/web/src/styles/targeted-resume-optimization.css'
       - 'apps/web/src/styles/original-resume-viewer.css'
       - 'apps/web/src/styles/resume-match-dialog.css'
+      - 'apps/web/src/styles/word-editor-minimal.css'
+      - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
       - 'apps/web/scripts/qa-targeted-word-workspace.html'
       - 'apps/web/scripts/qa_targeted_word_workspace.tsx'
       - 'apps/web/scripts/qa_targeted_word_workspace.py'

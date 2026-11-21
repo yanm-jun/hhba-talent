@@ -23,7 +23,7 @@ import '../styles/siri-edge.css';
 type PendingWordTextDraft={original:string;text:string;revision:number;page:number};
 export type WordVisualSuggestion={id:string;original:string;proposed:string;state:'pending'|'accepted'};
 export type WordRevisionSnapshot={revision:number;history:WordHistoryEntry[]};
-export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onVisualSuggestionAction,onRevisionSnapshot,onDocumentReady}:{
+export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onVisualSuggestionAction,onRevisionSnapshot,onDocumentReady,onEditableSegments}:{
  resume:PrivateResume;jobId?:string;jobTitle?:string;onClose?:()=>void;
  suggestedChanges?:{original:string;proposed:string}[];
  onOpenSuggestions?:()=>void;pendingSuggestionCount?:number;onPendingChange?:(dirty:boolean)=>void;
@@ -39,6 +39,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  onVisualSuggestionAction?:(id:string,action:'accepted'|'ignored'|'edited',text?:string,layoutVerified?:boolean)=>void;
  onRevisionSnapshot?:(snapshot:WordRevisionSnapshot)=>void;
  onDocumentReady?:()=>void;
+ onEditableSegments?:(segments:string[])=>void;
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
@@ -56,7 +57,8 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  const [count,setCount]=useState(0);
  const [width,setWidth]=useState(680);
  const [zoom,setZoom]=useState(1);
- const [fitMode,setFitMode]=useState<'page'|'width'|'custom'>('page');
+ const [fitMode,setFitMode]=useState<'page'|'width'|'custom'>('width');
+ const [editorTopHost,setEditorTopHost]=useState<HTMLElement|null>(null);
  const [paperSize,setPaperSize]=useState({width:0,height:0});
  const [editable,setEditable]=useState<string[]>([]);
  const [anchors,setAnchors]=useState<WordAnchor[]>([]);
@@ -91,9 +93,13 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   onClose?.();
  }
  useEffect(()=>{
-  setPage(1);setZoom(1);setFitMode('page');setActiveVisualId(null);setInlineVisualEditor(null);restorePosition.current=null;
+  setPage(1);setZoom(1);setFitMode('width');setActiveVisualId(null);setInlineVisualEditor(null);restorePosition.current=null;
   renderedEntrance.current=false;
  },[resume.id,jobId]);
+ useEffect(()=>{
+  // The Word viewer owns authenticated downloads; the parent supplies only an icon slot.
+  setEditorTopHost(document.getElementById('hhba-word-top-download'));
+ },[jobId,resume.id]);
  useEffect(()=>{
   onPendingChange?.(Boolean(selected&&draft!==selected.text));
  },[selected,draft,onPendingChange]);
@@ -157,8 +163,11 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      const mount=browserMount.current;
      await renderBrowserWord(raw,mount);
      if(!active)return;
+     const safeAnchors=browserWordAnchors(mount,info.editable_text||[]);
      setEditable(info.editable_text||[]);
-     setAnchors(browserWordAnchors(mount,info.editable_text||[]));
+     setAnchors(safeAnchors);
+     // AI edits may only target unique, visible Word text positions.
+     onEditableSegments?.([...new Set(safeAnchors.map(item=>item.text))]);
      setCount(1);setPage(1);
      setPaperSize({width:mount.scrollWidth,height:mount.scrollHeight});
      setLoading(false);
@@ -192,7 +201,9 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      }
     }
     if(!active)return;
-    setEditable((info.editable_text||[]).filter(t=>counts.get(t)===1));
+    const stableText=(info.editable_text||[]).filter(t=>counts.get(t)===1);
+    setEditable(stableText);
+    onEditableSegments?.(stableText);
     doc.current=result;setCount(result.numPages);
     setPage(current=>Math.min(Math.max(1,current),result.numPages));setLoading(false);
    }catch(error){
@@ -282,7 +293,12 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    const factor=fitMode==='page'?
     Math.min(availableWidth/pageWidth,availableHeight/pageHeight):
     availableWidth/pageWidth;
-   const next=Number(Math.max(.3,Math.min(1.4,factor)).toFixed(2));
+   // At phone widths an A4 sheet reduced to ~40% is unreadable. Keep the
+   // document at a minimum readable scale and let its OWN scroll area pan
+   // horizontally; never force the browser or whole modal to overflow.
+   const mobileWord=window.innerWidth<=700&&Boolean(container.closest('.targeted-resume.is-word-first'));
+   const minZoom=mobileWord?.68:.3;
+   const next=Number(Math.max(minZoom,Math.min(1.4,factor)).toFixed(2));
    setZoom(current=>Math.abs(current-next)<.015?current:next);
   };
   const observer=new ResizeObserver(update);observer.observe(container);
@@ -534,6 +550,11 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     {onClose&&<button type="button" onClick={closeEditor} aria-label="关闭原件预览"><X size={16}/></button>}
    </div>
   </div>
+  {editorTopHost&&createPortal(<button type="button" className="hhba-word-editor-header-download"
+    aria-label="下载当前 Word" title={saved?'下载当前岗位 Word':'下载原始 Word'}
+    disabled={busy||loading} onClick={()=>void(saved?downloadSaved():downloadOriginal())}>
+    <Download size={17} aria-hidden="true"/>
+   </button>,editorTopHost)}
   {message&&<p className="hhba-original-resume-word-status" role="status">{message}</p>}
   {sessionWordDraft&&ready==='available'&&<details className="hhba-word-draft-help">
    <summary>检测到未完成文字草稿</summary>
@@ -620,6 +641,26 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      下一页 <ChevronRight size={15}/></button>
    </nav>
   </>}
+  {ready==='available'&&<footer className="hhba-word-minimal-footer" aria-label="Word 编辑工具栏">
+   <div className="hhba-word-minimal-zoom" role="group" aria-label="简历缩放">
+    <button type="button" aria-label="缩小 Word" disabled={zoom<=.3}
+     onClick={()=>{setFitMode('custom');setZoom(v=>Math.max(.3,Math.round((v-.1)*100)/100))}}><ZoomOut size={17}/></button>
+    <output aria-live="polite">{Math.round(zoom*100)}%</output>
+    <button type="button" aria-label="放大 Word" disabled={zoom>=2.2}
+     onClick={()=>{setFitMode('custom');setZoom(v=>Math.min(2.2,Math.round((v+.1)*100)/100))}}><ZoomIn size={17}/></button>
+   </div>
+   <div className="hhba-word-minimal-actions" role="group" aria-label="版本与保存">
+    <button type="button" disabled={busy||loading||revision<=0}
+     title="撤销上一条 Word 修改" aria-label="撤销"
+     onClick={()=>void changeRevision('undo')}><Undo2 size={17}/></button>
+    <button type="button" disabled={busy||loading||revision>=totalRevisions}
+     title="恢复 Word 修改" aria-label="重做"
+     onClick={()=>void changeRevision('redo')}><Redo2 size={17}/></button>
+    <button type="button" className="hhba-word-minimal-save"
+     disabled={busy||loading} title={saved?'下载当前岗位独立 Word':'尚未修改，下载原始 Word'}
+     onClick={()=>void(saved?downloadSaved():downloadOriginal())}><Save size={16}/> 保存 Word</button>
+   </div>
+  </footer>}
   {ready==='available'&&!selected&&<div className="hhba-original-resume-mobile-dock" role="group" aria-label="手机端 Word 操作">
    {onOpenSuggestions&&<button type="button" onClick={onOpenSuggestions}>
     <Sparkles size={15}/> 修改进度{pendingSuggestionCount?' '+pendingSuggestionCount:''}</button>}
