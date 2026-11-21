@@ -60,7 +60,7 @@ try{
  await journeyBefore.waitFor();
  assert.match(await journeyBefore.locator('[aria-current="step"]').textContent(),/匹配评分/);
  await page.screenshot({path:output+'/single-journey-job-score.png',fullPage:true});
- await page.getByRole('button',{name:/优化简历，提高分值/}).click();
+ await page.getByRole('button',{name:/优化简历/}).click();
  await page.getByRole('region',{name:'正式简历排版与打印'}).waitFor();
  const journeyAfter=page.getByRole('navigation',{name:'求职流程'});
  assert.match(await journeyAfter.locator('[aria-current="step"]').textContent(),/定向优化/);
@@ -178,7 +178,7 @@ try{
  const mobile=await browser.newPage({viewport:{width:390,height:844},locale:'zh-CN'});
  const mobileErrors=[];mobile.on('pageerror',e=>mobileErrors.push(e.message));
  await mobile.goto(url,{waitUntil:'networkidle',timeout:45000});
- await mobile.getByRole('button',{name:/优化简历，提高分值/}).click();
+ await mobile.getByRole('button',{name:/优化简历/}).click();
  await mobile.getByPlaceholder('请填写本人真实姓名').fill('移动端虚拟姓名');
  assert.equal(await mobile.locator('.targeted-resume-live-paper .hhba-print-sheet').count(),1);
  const metrics=await mobile.evaluate(()=>({
@@ -195,7 +195,7 @@ try{
 
  const long=await browser.newPage({viewport:{width:1365,height:900},locale:'zh-CN'});
  await long.goto(url+'?long=1',{waitUntil:'networkidle',timeout:45000});
- await long.getByRole('button',{name:/优化简历，提高分值/}).click();
+ await long.getByRole('button',{name:/优化简历/}).click();
  await long.getByPlaceholder('请填写本人真实姓名').fill('多页测试姓名');
  const longPdf=await long.pdf({format:'A4',printBackground:true});
  await writeFile(output+'/multipage-resume.pdf',longPdf);
@@ -207,7 +207,7 @@ try{
 
  const truncated=await browser.newPage({viewport:{width:1365,height:900},locale:'zh-CN'});
  await truncated.goto(url+'?truncated=1',{waitUntil:'networkidle',timeout:45000});
- await truncated.getByRole('button',{name:/优化简历，提高分值/}).click();
+ await truncated.getByRole('button',{name:/优化简历/}).click();
  await truncated.getByRole('alert').filter({hasText:'这份简历有部分内容未显示'}).waitFor();
  await truncated.getByPlaceholder('请填写本人真实姓名').fill('截断测试姓名');
  assert.equal(await truncated.getByRole('button',{name:'导出 PDF'}).isDisabled(),true,
@@ -508,7 +508,7 @@ try{
    {waitUntil:'networkidle',timeout:45000});
   assert.match(await phone.getByRole('navigation',{name:'求职流程'})
    .locator('[aria-current="step"]').textContent(),/匹配评分/);
-  await phone.getByRole('button',{name:/优化简历，提高分值/}).click();
+  await phone.getByRole('button',{name:/优化简历/}).click();
   assert.match(await phone.getByRole('navigation',{name:'求职流程'})
    .locator('[aria-current="step"]').textContent(),/定向优化/);
   const apply=phone.locator('.hhba-match-final-apply');
@@ -634,7 +634,7 @@ try{
   const errors=[];first.on('pageerror',e=>errors.push(e.message));
   await first.goto('http://127.0.0.1:3000/qa/resume-flow.html?word',
    {waitUntil:'networkidle',timeout:45000});
-  await first.getByRole('button',{name:/优化简历，提高分值/}).click();
+  await first.getByRole('button',{name:/优化简历/}).click();
   await first.getByRole('region',{name:'独立简历优化工作区'}).waitFor();
   assert.equal(await first.locator('.targeted-resume-word-workspace').count(),1,
    'saved DOCX should open one Word-first editor');
@@ -787,7 +787,7 @@ try{
    'editing repeatedly must not silently extend the six-hour private draft consent');
   first.on('dialog',dialog=>{void dialog.accept()});
   await first.reload({waitUntil:'networkidle',timeout:45000});
-  await first.getByRole('button',{name:/优化简历，提高分值/}).click();
+  await first.getByRole('button',{name:/优化简历/}).click();
   await first.getByRole('region',{name:'独立简历优化工作区'}).waitFor();
   const recoveredAssistant=first.locator('.targeted-resume-word-assistant');
   if(view.name==='mobile'){
@@ -825,7 +825,7 @@ try{
   const errors=[];full.on('pageerror',error=>errors.push(error.message));
   await full.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&full',
    {waitUntil:'networkidle',timeout:45000});
-  await full.getByRole('button',{name:/优化简历，提高分值/}).first().click();
+  await full.getByRole('button',{name:/优化简历/}).first().click();
   await full.getByRole('region',{name:'原版式 Word 沉浸式 AI 优化舞台'}).waitFor();
   const assistant=full.locator('.targeted-resume-word-assistant');
   await assistant.locator('.targeted-resume-ai-settings summary').click();
@@ -903,7 +903,7 @@ try{
   const errors=[];page.on('pageerror',error=>errors.push(error.message));
   await page.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&full&agent',
    {waitUntil:'networkidle',timeout:45000});
-  await page.getByRole('button',{name:/优化简历，提高分值/}).first().click();
+  await page.getByRole('button',{name:/优化简历/}).first().click();
   await page.locator('.targeted-resume-ai-settings summary').click();
   await page.locator('.targeted-resume-consent input[type=checkbox]').check();
   await page.getByRole('button',{name:'AI 针对岗位重写整份简历'}).click();
@@ -934,7 +934,7 @@ try{
   const errors=[];mobile.on('pageerror',error=>errors.push(error.message));
   await mobile.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&full&agent',
    {waitUntil:'networkidle',timeout:45000});
-  await mobile.getByRole('button',{name:/优化简历，提高分值/}).first().click();
+  await mobile.getByRole('button',{name:/优化简历/}).first().click();
   await mobile.getByRole('button',{name:'AI 建议',exact:true}).click();
   const assistant=mobile.locator('.targeted-resume-word-assistant');
   await assistant.waitFor({state:'visible'});
@@ -975,7 +975,7 @@ try{
   const errors=[];scorePage.on('pageerror',error=>errors.push(error.message));
   await scorePage.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&score',
    {waitUntil:'networkidle',timeout:45000});
-  const entranceCTA=scorePage.getByRole('button',{name:/优化简历，提高分值/}).first();
+  const entranceCTA=scorePage.getByRole('button',{name:/优化简历/}).first();
   await entranceCTA.waitFor();
   assert.match(await scorePage.locator('.hhba-native-score').first().textContent(),/68/);
   await entranceCTA.click();
