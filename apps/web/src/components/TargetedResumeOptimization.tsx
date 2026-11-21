@@ -314,7 +314,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    !draft.autonomy?.needs_more_work||!draft.continuation?.enabled)return;
   const controller=new AbortController();active.current=controller;
   setWholeBusy(true);setWholeApproved(false);setWholeDownloaded(false);
-  setMobileSuggestionsOpen(false);setNotice('AI 正在继续核查并优化简历…');
+  setNotice('AI 正在继续核查并优化简历…');
   try{
    const result=await runWholeContinuation(draft,input,controller);
    if(!controller.signal.aborted)
@@ -338,7 +338,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   setWholeBusy(true);setWholeApproved(false);setWholeDownloaded(false);
   setRevealedWholeCount(0);
   setWholeDraft(null);
-  setNotice('');setMobileSuggestionsOpen(false);
+  setNotice('');
   try{
    const personalized=wholeSource.blocks.map(b=>{
     const extra=answers[b.id]?.trim();
