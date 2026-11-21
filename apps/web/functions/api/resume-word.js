@@ -1,9 +1,9 @@
 // Private original DOCX display, exact-node editing, verified Word downloads.
 // No public source URLs, no "template rebuild" and no unchecked format exports.
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
-import {configured,wordRequest} from '../_lib/private-word-service.js';
+import {configured,docxOnlyConfigured,wordRequest} from '../_lib/private-word-service.js';
 import {
- inspectOriginalDocxStrict,prepareVerifiedOriginalDocxExport
+ inspectOriginalDocxStrict,editOriginalDocxStrict,prepareVerifiedOriginalDocxExport
 } from '../../src/services/resumeDocxPreserve.mjs';
 
 const ID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -111,8 +111,12 @@ function validEntry(entry){
  return entry&&
   (entry.id==='legacy'||typeof entry.id==='string'&&ID.test(entry.id))&&
   typeof entry.original==='string'&&typeof entry.text==='string'&&
-  hashIsValid(entry.docx_sha256)&&hashIsValid(entry.preview_sha256)&&
-  Number.isInteger(entry.page_count)&&entry.page_count>=1&&entry.page_count<=20;
+  hashIsValid(entry.docx_sha256)&&(
+   entry.verification==='docx_structure_only'?
+    entry.preview_sha256===null&&entry.page_count===null:
+    (entry.verification===undefined||entry.verification==='layout_verified')&&
+    hashIsValid(entry.preview_sha256)&&Number.isInteger(entry.page_count)&&
+    entry.page_count>=1&&entry.page_count<=20);
 }
 async function approved(bucket,row,jobId){
  const jobHash=jobId===undefined?null:
@@ -144,6 +148,7 @@ async function versionBytes(bucket,key,entry,format){
  if(!file)throw Error('WORD_REVISION_CORRUPT');
  const bytes=new Uint8Array(await file.arrayBuffer());
  const expected=format==='docx'?entry.docx_sha256:entry.preview_sha256;
+ if(!hashIsValid(expected))throw Error('WORD_PDF_NOT_READY');
  if(await shaBytes(bytes)!==expected)throw Error('WORD_REVISION_CORRUPT');
  return bytes;
 }
@@ -163,7 +168,7 @@ async function commitManifest(bucket,state,row,revision,items){
 function code(error){
  const known=new Set(['WORD_EDIT_TOO_LONG','WORD_EDIT_AMBIGUOUS','WORD_EDIT_UNSAFE',
   'WORD_FILE_UNSUPPORTED','WORD_EDIT_CORRUPTED','WORD_LAYOUT_NOT_VERIFIED',
-  'WORD_RENDERER_REQUIRED','WORD_EDIT_TOO_LARGE','WORD_RENDER_FAILED',
+  'WORD_RENDERER_REQUIRED','WORD_EDIT_TOO_LARGE','WORD_RENDER_FAILED','WORD_PDF_NOT_READY',
   'WORD_INVALID_FILE','WORD_INVALID_REQUEST','WORD_FONT_UNAVAILABLE',
   'WORD_FONT_UNVERIFIED','WORD_LAYOUT_MOVED','WORD_TEXT_NOT_VERIFIED',
   'WORD_RENDER_TOO_LARGE',
@@ -182,9 +187,10 @@ function errorStatus(value){
 }
 export async function onRequestGet({request,env}){
  const action=new URL(request.url).searchParams.get('action')||'preview';
- if(action==='status')
-  return json({ok:true,enabled:configured(env)});
- if(!configured(env))return fail('WORD_NOT_READY',503);
+ const renderer=configured(env),docxOnly=docxOnlyConfigured(env);
+ if(action==='status')return json({ok:true,enabled:renderer||docxOnly,
+  renderer_enabled:renderer,docx_only_enabled:docxOnly});
+ if(!renderer&&!docxOnly)return fail('WORD_NOT_READY',503);
  const db=env.HHBA_PNVS_AUTH_DB,bucket=env.HHBA_PRIVATE_RESUMES;
  let candidate;
  try{candidate=await owner(db,request);}catch{return fail('SESSION_INVALID',401);}
@@ -210,11 +216,24 @@ export async function onRequestGet({request,env}){
     saved:state.saved?{original:state.saved.original,text:state.saved.text,
      updated_at:state.saved.updated_at}:null,
     revision:state.revision,total_revisions:state.items.length,
+    layout_verified:Boolean(state.saved&&state.saved.verification!=='docx_structure_only'),
+    pdf_available:Boolean(state.saved&&state.saved.verification!=='docx_structure_only'),
     max_revisions:MAX_REVISIONS,max_daily_edits:DAILY.export,
     history:state.items.map((entry,index)=>({
      revision:index+1,original:entry.original,text:entry.text,
-     updated_at:entry.updated_at||'',page_count:entry.page_count
+     updated_at:entry.updated_at||'',page_count:entry.page_count,
+     layout_verified:entry.verification!=='docx_structure_only'
     }))});
+  }
+  if(action==='source-docx'){
+   const original=await loadBytes(bucket,row);
+   const state=await approved(bucket,row,jobId);
+   const requested=params.get('revision');
+   if(requested!==null&&(!/^(?:0|[1-9][0-9]?)$/.test(requested)||
+    Number(requested)!==state.revision))return fail('WORD_REVISION_CONFLICT',409);
+   const current=state.saved?
+    await versionBytes(bucket,state.key,state.saved,'docx'):original;
+   return replyFile(current,DOCX_MIME,'HHBA-private-current.docx');
   }
   if(action==='download'||action==='edited-preview'||action==='download-pdf'){
    await loadBytes(bucket,row);
@@ -225,12 +244,15 @@ export async function onRequestGet({request,env}){
     return fail('WORD_REVISION_CONFLICT',409);
    if(!state.saved)return fail('WORD_NOT_EDITED',404);
    const word=action==='download';
+   if(!word&&state.saved.verification==='docx_structure_only')
+    return fail('WORD_PDF_NOT_READY',422);
    const bytes=await versionBytes(bucket,state.key,state.saved,word?'docx':'pdf');
    return replyFile(bytes,word?DOCX_MIME:'application/pdf',
     word?'HHBA-resume-edited.docx':
      action==='download-pdf'?'HHBA-resume-edited.pdf':'HHBA-resume-edited-preview.pdf');
   }
   if(action!=='preview')return fail('INVALID_REQUEST',400);
+  if(!renderer)return fail('WORD_PDF_NOT_READY',422);
   const key=prefix(row)+'.source.pdf';
   const cached=await bucket.get(key);
   if(cached){
@@ -254,7 +276,8 @@ export async function onRequestGet({request,env}){
 }
 export async function onRequestPost({request,env}){
  if(!sameOrigin(request))return fail('ORIGIN_REQUIRED',403);
- if(!configured(env))return fail('WORD_NOT_READY',503);
+ const renderer=configured(env),docxOnly=docxOnlyConfigured(env);
+ if(!renderer&&!docxOnly)return fail('WORD_NOT_READY',503);
  const db=env.HHBA_PNVS_AUTH_DB,bucket=env.HHBA_PRIVATE_RESUMES;
  let candidate;
  try{candidate=await owner(db,request);}catch{return fail('SESSION_INVALID',401);}
@@ -299,24 +322,26 @@ export async function onRequestPost({request,env}){
   const current=state.saved?
    await versionBytes(bucket,state.key,state.saved,'docx'):original;
   const selected=[{original:body.original,text:body.text}];
-  // Every increment must pass a real Word renderer geometry comparison.
-  const result=await prepareVerifiedOriginalDocxExport({
+  // Exact OOXML patching preserves the original ZIP members. A renderer-free
+  // revision NEVER claims to preserve the visible Word page geometry.
+  const result=renderer?await prepareVerifiedOriginalDocxExport({
    original:current,edits:selected,
    verifyLayout:async({original,edited,oldText,newText})=>
     wordRequest(env,'verify',{original,edited,oldText,newText})
-  });
-  const pdf=await wordRequest(env,'render',{original:result.bytes});
+  }):{bytes:await editOriginalDocxStrict(current,selected),pageCount:null};
+  const pdf=renderer?await wordRequest(env,'render',{original:result.bytes}):null;
   if(!await stillOwned(db,row,candidate.phone))return fail('RESUME_NOT_FOUND',404);
   const entry={id:crypto.randomUUID(),original:body.original,text:body.text,
+   verification:renderer?'layout_verified':'docx_structure_only',
    page_count:result.pageCount,docx_sha256:await shaBytes(result.bytes),
-   preview_sha256:await shaBytes(pdf),updated_at:new Date().toISOString()};
+   preview_sha256:pdf?await shaBytes(pdf):null,updated_at:new Date().toISOString()};
   const wordKey=revisionKey(state.key,entry,'docx');
   const pdfKey=revisionKey(state.key,entry,'pdf');
-  created=[wordKey,pdfKey];
+  created=pdf?[wordKey,pdfKey]:[wordKey];
   // Publish immutable, verified bytes first; the CAS manifest becomes the
   // authoritative active revision only after both blobs are stored.
   await bucket.put(wordKey,result.bytes,{httpMetadata:{contentType:DOCX_MIME}});
-  await bucket.put(pdfKey,pdf,{httpMetadata:{contentType:'application/pdf'}});
+  if(pdf)await bucket.put(pdfKey,pdf,{httpMetadata:{contentType:'application/pdf'}});
   if(!await stillOwned(db,row,candidate.phone))throw Error('RESUME_NOT_FOUND');
   const dropped=state.items.slice(state.revision).filter(x=>x.id!=='legacy');
   const items=[...state.items.slice(0,state.revision),entry];
@@ -333,7 +358,8 @@ export async function onRequestPost({request,env}){
    return fail('RESUME_NOT_FOUND',404);
   }
   return json({ok:true,saved:true,revision:items.length,
-   total_revisions:items.length,page_count:result.pageCount});
+   total_revisions:items.length,page_count:result.pageCount,
+   layout_verified:renderer,pdf_available:renderer});
  }catch(error){
   await Promise.all(created.map(key=>bucket.delete(key).catch(()=>{})));
   const c=code(error);return fail(c,errorStatus(c));
