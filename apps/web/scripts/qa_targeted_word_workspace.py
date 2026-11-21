@@ -131,12 +131,13 @@ def exercise(browser,name,viewport):
     consent.locator('input[type=checkbox]').check()
     consent.get_by_role('button',name='同意并开始').click()
     consent.wait_for(state='hidden',timeout=10000)
-    page.wait_for_function('() => document.querySelector(".hhba-word-primary-action")?.disabled===false',timeout=16000)
-    assert len(edits)==1,(name,'AI should run once, only after consent',edits)
-    # The AI suggestion must be visible IN the Word itself, with Siri action
-    # controls, not merely stored in an unavailable bottom list.
+    # The JD cache status request adds an asynchronous step before the AI
+    # suggestion call. Wait for the ACTUAL Word suggestion instead of assuming
+    # the toolbar's enabled state means that the network round-trip finished.
     siri=page.get_by_role('button',name='查看此处文字操作')
-    siri.first.wait_for(state='visible',timeout=18000)
+    siri.first.wait_for(state='visible',timeout=22000)
+    assert len(edits)==1,(name,'AI should run once, only after consent',edits)
+    page.wait_for_function('() => document.querySelector(".hhba-word-primary-action")?.disabled===false',timeout=16000)
     # The Word page (not the entire blank workspace) always has a quiet
     # perimeter glow, with one slow orbiting beam even before AI is enabled.
     ring=word.evaluate('el=>({before:getComputedStyle(el,"::before").content,'
