@@ -50,7 +50,7 @@ function compatibleRole(title,targets){
  }
  return best;
 }
-function degreeMinRequirement(text){
+export function degreeMinRequirement(text){
  const s=textSafe(text,6000);
  // Prefer minimum explicit entry qualifications, NOT "硕士优先".
  // The input is only the official job requirements section.
@@ -66,7 +66,7 @@ function degreeMinRequirement(text){
  }
  return ranks.length?Math.min(...ranks):null;
 }
-function experienceMinRequirement(text){
+export function experienceMinRequirement(text){
  const s=textSafe(text,6000);
  // Explicit requirements only. Match variants such as 7年以上工作经验,
  // 至少7年、7-10年工作经验 and 7+ years experience.
