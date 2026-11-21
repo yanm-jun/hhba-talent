@@ -90,6 +90,30 @@ test('Word render feature defaults disabled and never opens any account file',as
  assert.equal(x.saved.size,1);
 });
 
+test('production DOCX editor can use a dedicated Word secret without activating match-wide limits',async()=>{
+ const x=fixture({enabled:false,docxOnly:true});
+ delete x.env.HHBA_MATCH_LIMIT_PEPPER;
+ delete x.env.HHBA_AUTH_ROLLOUT;
+ x.env.HHBA_MATCH_RUNTIME_MODE='production';
+ x.env.HHBA_WORD_LIMIT_PEPPER='word-only-qa-'+('z'.repeat(48));
+ const status=await (await onRequestGet({request:req('status'),env:x.env})).json();
+ assert.equal(status.enabled,true);
+ assert.equal(status.docx_only_enabled,true);
+ assert.equal(status.renderer_enabled,false);
+ const patched=await editOriginalDocxStrict(original,
+  [{original:'测试用户',text:'岗位甲运营督导'}],{allowExpansion:true});
+ const response=await onRequestPost({request:req('export',{method:'POST',jobId:'production-role',
+  body:{resume_id:id,job_id:'production-role',action:'edit',original:'测试用户',
+   text:'岗位甲运营督导',expected_revision:0,
+   client_docx_sha256:createHash('sha256').update(patched).digest('hex'),
+   confirmed_real:true,consent_word_processing:true}}),env:x.env});
+ assert.equal(response.status,200,await response.clone().text());
+ const downloaded=await onRequestGet({request:req('download',{jobId:'production-role'}),env:x.env});
+ assert.equal(downloaded.status,200);
+ assert.deepEqual(new Uint8Array(await downloaded.arrayBuffer()),patched);
+ assert.deepEqual(x.saved.get(store),original);
+});
+
 test('opt-in renderer-free flow saves original DOCX structure without inventing PDF or verified pages',async()=>{
  const x=fixture({enabled:false,docxOnly:true});
  const status=await (await onRequestGet({request:req(),env:x.env})).json();
