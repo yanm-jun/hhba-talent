@@ -102,7 +102,7 @@ def exercise(browser,name,viewport):
     page.screenshot(path=str(OUT/f'{name}-inline-settings.png'),animations='disabled')
     page.locator('.targeted-resume-consent input[type=checkbox]').check()
     page.get_by_role('button',name='生成本岗位建议').click(timeout=15000)
-    page.wait_for_function('() => document.querySelector("#hhba-word-optimization-tools")?.getAttribute("aria-hidden")==="true"',{ 'timeout':15000 })
+    page.wait_for_function('() => document.querySelector("#hhba-word-optimization-tools")?.getAttribute("aria-hidden")==="true"',timeout=15000)
     assert len(edits)==1,(name,edits)
     assert word.is_visible(),(name,'Word disappeared after AI request')
     assert not errors,(name,errors)
