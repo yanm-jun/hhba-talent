@@ -3,7 +3,10 @@
 import type {WordAnchor} from './resumeWordAnchors.mjs';
 type DocxRenderer={renderAsync:(bytes:Uint8Array,body:HTMLElement,styles:HTMLElement,
  options:Record<string,unknown>)=>Promise<unknown>};
-type WordWindow=Window&{JSZip?:unknown;docx?:DocxRenderer};
+type ZipFile={name:string;dir:boolean;_data?:{uncompressedSize?:number};
+ async:(type:'string')=>Promise<string>};
+type ZipLoader={loadAsync:(bytes:Uint8Array)=>Promise<{files:Record<string,ZipFile>}>};
+type WordWindow=Window&{JSZip?:ZipLoader;docx?:DocxRenderer};
 const scripts=new Map<string,Promise<void>>();
 function script(src:string){
  const previous=scripts.get(src);
@@ -24,8 +27,38 @@ export async function loadBrowserWordRenderer():Promise<DocxRenderer>{
  if(!global.docx?.renderAsync)throw Error('Word 浏览器预览不可用。');
  return global.docx;
 }
+async function assertPreviewSafe(bytes:Uint8Array){
+ const loader=(window as WordWindow).JSZip;
+ if(!loader||bytes.length<100||bytes.length>3*1024*1024)
+  throw Error('Word 文件无法安全预览。');
+ const zip=await loader.loadAsync(bytes);
+ const entries=Object.values(zip.files);
+ if(entries.length>1200)throw Error('Word 文件包含过多内容，无法安全预览。');
+ let total=0;
+ for(const entry of entries){
+  const size=entry._data?.uncompressedSize;
+  if(typeof size==='number'){
+   if(size>18*1024*1024)throw Error('Word 文件包含过大的嵌入内容。');
+   total+=size;
+   if(total>35*1024*1024)throw Error('Word 文件体积超出预览安全范围。');
+  }
+  if(!entry.dir&&entry.name.endsWith('.rels')){
+   const content=await entry.async('string');
+   if(content.length>1024*1024)throw Error('Word 关系文件超出安全范围。');
+   const tags=content.match(/<Relationship\\b[^>]*>/g)||[];
+   for(const rel of tags){
+    const external=/\\bTargetMode\\s*=\\s*['"]External['"]/i.test(rel);
+    const safeLink=/\\bType\\s*=\\s*['"][^'"]*\\/hyperlink['"]/i.test(rel);
+    // User-typed hyperlinks are displayed as inert text. External media and
+    // templates must never be fetched automatically on resume preview.
+    if(external&&!safeLink)throw Error('Word 包含外部加载内容，请下载原件在本地查看。');
+   }
+  }
+ }
+}
 export async function renderBrowserWord(bytes:Uint8Array,mount:HTMLElement){
  const docx=await loadBrowserWordRenderer();
+ await assertPreviewSafe(bytes);
  mount.replaceChildren();
  await docx.renderAsync(bytes,mount,mount,{
   className:'hhba-native-docx',
