@@ -68,7 +68,7 @@ try{
  await build({entryPoints:[resolve('scripts/qa_word_workerd_entry.mjs')],outfile:out,
   bundle:true,platform:'neutral',format:'esm',target:'es2022',logLevel:'warning'});
  mf=new Miniflare({
-  modules:true,scriptPath:out,compatibilityDate:'2026-11-21',
+  modules:true,scriptPath:out,compatibilityDate:'2026-08-06',
   d1Databases:{HHBA_PNVS_AUTH_DB:'local-word-d1'},
   r2Buckets:['HHBA_PRIVATE_RESUMES'],
   bindings:{
