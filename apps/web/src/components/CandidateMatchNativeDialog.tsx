@@ -105,7 +105,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
         </div>
         <div className="hhba-match-selected-score">
          <strong>{visibleMatchScore(activeJob)??'—'}<small>/100</small></strong>
-         <span>原简历 AI 适配参考分 · 非录用概率</span>
+         <span>原简历适配分 · AI 参考，非录用概率</span>
         </div>
        </div>
        {!sourceResume&&<div className="hhba-match-word-note" role="note">
@@ -165,9 +165,9 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
              '页面文本提示开放申请，是否可提交仍以招聘官网为准':'链接来自搜索结果，可能已过期或需要登录；请打开官网确认'}</small>
            </div>
           </div>
-          <div className="hhba-native-score" aria-label={visibleMatchScore(job)!==null?'简历适配参考分 '+visibleMatchScore(job)+' 分':'暂无可靠适配分'}>
+          <div className="hhba-native-score" aria-label={visibleMatchScore(job)!==null?'简历适配分 '+visibleMatchScore(job)+' 分（AI 参考）':'暂无可靠适配分'}>
            {visibleMatchScore(job)!==null?
-            <><strong>{visibleMatchScore(job)}<small>/100</small></strong><span>AI 适配参考分</span></>:
+            <><strong>{visibleMatchScore(job)}<small>/100</small></strong><span>简历适配分 · AI 参考</span></>:
             <><strong className="hhba-native-score-na">—</strong><span>暂无可靠分数</span></>}
            {!pending&&<button type="button"
              className="hhba-native-optimize" onClick={()=>{
