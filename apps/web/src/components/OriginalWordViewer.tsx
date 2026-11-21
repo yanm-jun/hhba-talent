@@ -283,7 +283,9 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    setSelected(null);setConfirmed(false);setInlineVisualEditor(null);setActiveVisualId(null);
    setSaved(true);setRevision(result.revision);setTotalRevisions(result.total_revisions);
    setRefresh(n=>n+1);
-   setMessage('已采纳并完成 Word 原版式核验。确认后的文字恢复原有字体；原上传文件保持不变。');
+   setPdfAvailable(result.pdf_available===true);setLayoutVerified(result.layout_verified===true);
+   setMessage(result.layout_verified?'已采纳并通过 Word 版式核验，原件保持不变。':
+    '已采纳并保存原格式 Word。文字与原 DOCX 结构保留，分页请下载后检查。');
   }catch(error){
    setMessage(error instanceof Error?error.message:'未保存成功，请检查此处原文后重试。');
   }finally{setBusy(false);}
@@ -323,7 +325,11 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     onVisualSuggestionAction?.(inlineVisualSuggestionId,'edited',draft.trim());
    setSelected(null);setConfirmed(false);setInlineVisualEditor(null);setInlineVisualSuggestionId(null);setSaved(true);
    setRevision(result.revision);setTotalRevisions(result.total_revisions);
-   setRefresh(n=>n+1);setMessage('已检查版式并保存第 '+result.revision+' 次修改。原始 Word 保持不变。');
+   setPdfAvailable(result.pdf_available===true);setLayoutVerified(result.layout_verified===true);
+   setRefresh(n=>n+1);
+   setMessage(result.layout_verified?
+    '已检查版式并保存第 '+result.revision+' 版。原始 Word 保持不变。':
+    '已保存第 '+result.revision+' 版原格式 DOCX，尚未核验分页。下载后请在 Word 中检查。');
   }catch(error){setMessage(error instanceof Error?error.message:'没有保存，请缩短文字后重试。');}
   finally{setBusy(false);}
  }
@@ -338,8 +344,8 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    onVersionMoved?.();
    setRevision(result.revision);setTotalRevisions(result.total_revisions);
    setSaved(result.saved);setRefresh(n=>n+1);
-   setMessage(action==='undo'?'已撤销一处修改，当前文档已恢复对应的原始字体与版式。':
-    '已重新应用已验证的 Word 修改。');
+   setMessage(action==='undo'?'已恢复上一版 Word，不影响其他岗位版本。':
+    '已重新应用已保存的 Word 修改。');
   }catch(error){setMessage(error instanceof Error?error.message:'版本切换失败，请重新打开简历。');}
   finally{setBusy(false);}
  }
@@ -364,14 +370,14 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      {original:selected.text,text:value,revision,page}:null);
    }}/>
   <p className="hhba-original-resume-edit-limit">{draft.length} / 300 字
-   · 保留原字体、字号和排版；不符合版式要求时不会保存。</p>
+   · 保留原 Word 字体及样式结构；未经专业校验的分页请自行核对。</p>
   <label className="hhba-original-resume-edit-confirm"><input type="checkbox" checked={confirmed}
    onChange={e=>setConfirmed(e.target.checked)}/>
    我已核实修改后的文字属实
   </label>
   <div className="hhba-original-resume-editbox-actions">
    <button type="button" disabled={!confirmed||!draft.trim()||busy}
-    onClick={()=>void save()}><Save size={14}/> {busy?'正在检查…':'确认保存'}</button>
+    onClick={()=>void save()}><Save size={14}/> {busy?'正在保存…':'确认保存'}</button>
    <button type="button" onClick={()=>{
     if(!confirmDiscardText())return;
     onSessionWordDraftChange?.(null);setSelected(null);setDraft('');setConfirmed(false);
@@ -467,7 +473,8 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
       <button type="button" onClick={()=>void downloadOriginal()}>下载原件</button>
       <button type="button" disabled={!saved||busy}
        onClick={()=>void downloadSaved()}>下载 Word</button>
-      <button type="button" disabled={!saved||busy}
+      <button type="button" disabled={!pdfAvailable||busy}
+       title={pdfAvailable?'下载经渲染器校验的 PDF':'该版本未做专业分页校验，暂不能下载 PDF'}
        onClick={()=>void downloadSavedPdf()}>下载 PDF</button>
      </div>
     </details>
@@ -475,7 +482,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      <summary><History size={16}/> 版本</summary>
      <div className="hhba-word-menu-content">
       <p>当前版本 {revision} / {totalRevisions} · 最多 {maxRevisions} 次修订</p>
-      <p>单日最多 {maxDailyEdits} 次保存验证，撤销和重做不计入。</p>
+      <p>单日最多 {maxDailyEdits} 次修改保存，撤销和重做不计入。</p>
       {history.length>0&&<ol className="hhba-original-resume-history-list">
        {history.map(entry=><li key={entry.revision}
         className={entry.revision===revision?'is-current':''}>
@@ -495,8 +502,12 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    <p>可在第 {sessionWordDraft.page} 页点选相同原文继续核对；修订号或原文不同不会自动填入。</p>
   </details>}
   {loading&&<p className="hhba-original-resume-note" role="status">正在打开简历…</p>}
+  {saved&&ready==='available'&&!layoutVerified&&<p className="hhba-browser-word-disclaimer">
+   已保存原格式 DOCX，尚未校验分页；可下载 Word，PDF 暂不可用。
+  </p>}
   {busy&&<p className="hhba-original-resume-word-status is-busy" role="status">
-   正在校验原 Word 的文字位置、字体与分页，保存后同步准备 PDF；检查不通过不会覆盖原件。
+   {rendererEnabled?'正在验证字体、分页并准备 PDF…':
+    '正在保存原 DOCX 的岗位独立版本，原件不会被覆盖…'}
   </p>}
   {previewError&&<div className="hhba-original-resume-note" role="alert">
    <p>{previewError}</p>
@@ -592,7 +603,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     onClick={()=>void changeRevision('undo')}><Undo2 size={15}/> 撤销</button>
    <button type="button" disabled={busy||loading||revision>=totalRevisions}
     onClick={()=>void changeRevision('redo')}><Redo2 size={15}/> 重做</button>
-   <button type="button" disabled={busy||loading||!saved}
+   <button type="button" disabled={busy||loading||!pdfAvailable}
     onClick={()=>void downloadSavedPdf()}><Download size={15}/> 下载 PDF</button>
   </div>}
  </section>;
