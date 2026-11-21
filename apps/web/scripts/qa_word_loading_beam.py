@@ -69,30 +69,36 @@ async def exercise(browser,label,viewport):
     await loader.wait_for(state='hidden',timeout=15000)
     assert '负责门店运营及日常数据整理工作' in await word.inner_text(),label
     style=await word.evaluate("""node=>{
-      const ring=getComputedStyle(node,'::before');
+      const halo=getComputedStyle(node,'::before');
       const beam=getComputedStyle(node,'::after');
       return {
-        border:ring.borderTopColor,
-        shadow:ring.boxShadow,
-        breath:ring.animationDuration,
+        haloImage:halo.backgroundImage,haloOpacity:halo.opacity,
+        haloFilter:halo.filter,haloDurations:halo.animationDuration,
+        haloMask:halo.maskImage || halo.webkitMaskImage,
         beamDuration:beam.animationDuration,
-        beamOpacity:beam.opacity,
-        beamFilter:beam.filter,
+        beamOpacity:beam.opacity,beamFilter:beam.filter,
         beamImage:beam.backgroundImage,
-        beamMask:beam.maskImage || beam.webkitMaskImage
+        beamMask:beam.maskImage || beam.webkitMaskImage,
+        haloInset:halo.inset,beamInset:beam.inset
       };
     }""")
-    assert 'rgba(85, 148, 220, 0.52)' in style['border'],(label,'Soft rim not strong enough',style)
-    assert 'rgba(88, 151, 236, 0.25)' in style['shadow'],(label,'Missing visible ambient glow',style)
-    assert '10.5s' in style['breath'] and '36s' in style['beamDuration'],(label,'Wrong slow animation',style)
+    assert 'conic-gradient' in style['haloImage'],(label,'Siri light has no blended ambient color',style)
+    assert 'rgba(74, 214, 235' in style['haloImage'] and 'rgba(234, 130, 188' in style['haloImage'],(
+        label,'Missing fused cyan/pink ambient edge light',style)
+    assert 'blur' in style['haloFilter'],(label,'Siri ambient halo not diffused',style)
+    assert style['haloMask']!='none',(label,'Ambient glow obscures the Word document',style)
+    assert '64s' in style['haloDurations'] and '11s' in style['haloDurations'],(
+        label,'Siri aura must drift and breathe independently',style)
+    assert '36s' in style['beamDuration'],(label,'Bright beam must orbit very slowly',style)
     assert float(style['beamOpacity'])>=.88,(label,'Moving highlight too dim',style)
     assert 'drop-shadow' in style['beamFilter'],(label,'Moving beam has no soft tail',style)
-    assert 'conic-gradient' in style['beamImage'],(label,'No traveling highlight',style)
+    assert style['beamImage'].count('conic-gradient')>=2,(label,'Missing continuous colored rim under traveling beam',style)
     assert style['beamMask']!='none',(label,'Light beam spills into document content',style)
     assert not errors,(label,'Browser JS errors',errors)
-    await page.screenshot(path=str(OUT/(label+'-visible-siri-beam.png')),animations='disabled')
+    await page.screenshot(path=str(OUT/(label+'-layered-siri-edge.png')),animations='allow')
     RESULTS.append({'viewport':label,'loadingCentered':True,'loadingCleared':True,
-        'siriRimVisible':True,'beamOrbitSeconds':36,'breathingSeconds':10.5,'errors':errors})
+        'siriLayeredAura':True,'beamOrbitSeconds':36,'ambientDriftSeconds':64,
+        'breathingSeconds':11,'errors':errors})
     await context.close()
 
 async def main():
