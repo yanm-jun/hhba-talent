@@ -1,5 +1,9 @@
--- HHBA public employer JD archive (isolated HHBA_JOB_JD_DB).
--- Apply ONLY to the dedicated JD database, never the candidate auth database.
+-- HHBA public employer JD archive (isolated tables via HHBA_JOB_JD_DB).
+-- The Workers Free account already has 10 D1 databases (its database-count
+-- ceiling). Bind HHBA_JOB_JD_DB to the EXISTING environment-specific
+-- metrics/library D1 database, not to the candidate authentication database.
+-- Preview and production must each use their own D1. This migration is
+-- additive and DOES NOT modify any existing metrics or user tables.
 -- No resumes, users, contact details, secrets, or AI outputs belong here.
 -- Every version links to an allowlisted, directly fetched official posting.
 CREATE TABLE IF NOT EXISTS hhba_job_jd_versions (
