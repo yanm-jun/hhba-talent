@@ -94,7 +94,6 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [manualText,setManualText]=useState('');
  const [activeSuggestionId,setActiveSuggestionId]=useState<string|null>(null);
  const [mobileSuggestionsOpen,setMobileSuggestionsOpen]=useState(false);
- const [wordEditing,setWordEditing]=useState(false);
  const [entranceStage,setEntranceStage]=useState<'waiting'|'entering'|'ready'>('waiting');
  const [revealedSuggestionCount,setRevealedSuggestionCount]=useState(0);
  const [wordRevisionSnapshot,setWordRevisionSnapshot]=useState<WordRevisionSnapshot|null>(null);
@@ -121,11 +120,12 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    reduced?0:520);
   return()=>clearTimeout(timeout);
  },[sourceResume,suggestions,revealedSuggestionCount]);
- const [wordEditHost,setWordEditHost]=useState<HTMLDivElement|null>(null);
+ const toolsRef=useRef<HTMLElement|null>(null);
+ function openWordTools(){
+  setMobileSuggestionsOpen(true);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>toolsRef.current?.scrollIntoView({behavior:'auto',block:'start'})));
+ }
  const [aiSettingsOpen,setAiSettingsOpen]=useState(false);
- useEffect(()=>{
-  if(wordEditing)setMobileSuggestionsOpen(false);
- },[wordEditing]);
  const [nativeWordPending,setNativeWordPending]=useState(false);
  const [nativeWordTextDraft,setNativeWordTextDraft]=useState<{
   original:string;text:string;revision:number;page:number
@@ -708,7 +708,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  },[draftDirty,nativeWordPending]);
  const hasSession=realAuthReady&&Boolean(getRealAuthToken());
  const optimizationControls=<>
-  {sourceResume&&<div className="hhba-whole-rewrite-start">
+  {sourceResume&&wholeStatus?.enabled&&wholeSource.complete&&<div className="hhba-whole-rewrite-start">
    <button type="button" className="hhba-whole-rewrite-primary"
     disabled={wholeBusy||busy||!wholeSource.complete||!wholeStatus?.enabled}
     onClick={()=>{
@@ -728,8 +728,6 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      active.current?.abort();setWholeBusy(false);
      setNotice('已停止后续 AI 优化；已生成的草稿仍然保留，原 Word 没有修改。');
     }}>停止 AI 继续处理</button>}
-   {wholeStatus&&!wholeStatus.enabled&&<p>完整撰写服务尚未在当前环境开放，已有局部建议功能不受影响。</p>}
-   {!wholeSource.complete&&<p role="alert">{wholeSource.reason}</p>}
   </div>}
   <div className="targeted-resume-toolbar">
    <div><strong>优化这份简历</strong><p>根据目标岗位提出修改建议，不会凭空添加经历。</p></div>
@@ -742,7 +740,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
        }
        void generate();
       }}>
-       {busy?<><LoaderCircle size={15} className="resume-match-spinning"/> 正在分析简历…</>:<><Sparkles size={15}/> 开始 AI 优化</>}
+       {busy?<><LoaderCircle size={15} className="resume-match-spinning"/> 正在分析简历…</>:<><Sparkles size={15}/> {sourceResume?'生成本岗位建议':'开始 AI 优化'}</>}
       </button>
     :<span className="targeted-resume-unavailable">{!hasSession?'站内登录后可使用 AI 润色':status?'AI 润色尚未开放':'正在检查服务状态…'}</span>}
   </div>
@@ -792,26 +790,41 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     {entranceStage==='entering'&&<p className="hhba-word-arrival-hint" role="status">
      正在呈现你的原版式简历…
     </p>}
-    <button type="button" className="hhba-word-quick-actions"
-     aria-label="打开简历 AI 优化操作" aria-expanded={mobileSuggestionsOpen}
-     aria-controls="hhba-word-optimization-tools"
-     onClick={()=>setMobileSuggestionsOpen(open=>!open)}>
-     <Sparkles size={15} aria-hidden="true"/>
-     {wholeBusy?'AI 撰写中…':busy?'AI 分析中…':
-      visualWordSuggestions.length>0?'优化操作':'开始优化'}
-    </button>
+    <div className="hhba-word-reader-actions" role="group" aria-label="简历优化工具">
+     <button type="button" className="hhba-word-primary-action"
+      disabled={!hasSession||!status?.enabled||busy||wholeBusy||!blocks.length}
+      aria-label="开始 AI 优化简历"
+      title={!hasSession?'请先登录账户':!status?.enabled?'AI 优化服务暂不可用':'针对当前岗位分析原简历'}
+      onClick={()=>{
+       if(!consent){
+        setAiSettingsOpen(true);setNotice('请先确认 AI 数据处理授权，再生成岗位专属建议。');
+        openWordTools();return;
+       }
+       void generate();
+      }}>
+      {busy?<><LoaderCircle size={15} className="resume-match-spinning"/> 正在分析…</>:
+       <><Sparkles size={15} aria-hidden="true"/>
+        {!hasSession?'登录后可优化':status&&!status.enabled?'AI 优化暂不可用':'开始 AI 优化'}</>}
+     </button>
+     <button type="button" className="hhba-word-quick-actions"
+      aria-label="打开简历 AI 优化操作" aria-expanded={mobileSuggestionsOpen}
+      aria-controls="hhba-word-optimization-tools"
+      onClick={()=>mobileSuggestionsOpen?setMobileSuggestionsOpen(false):openWordTools()}>
+      {visualWordSuggestions.length>0?'查看建议 '+visualWordSuggestions.length:'建议与设置'}
+      <ChevronDown size={14} aria-hidden="true"/>
+     </button>
+    </div>
     <OriginalWordViewer key={sourceResume.id+':'+job.id} resume={sourceResume}
      jobId={job.id} jobTitle={job.company+'-'+(job.title_zh||job.title)}
      suggestedChanges={confirmedWordChanges}
-     glowActive={entranceStage==='entering'||busy||wholeBusy||wordEditing||
-      visualWordSuggestions.length>0}
+     glowActive={busy||wholeBusy||visualWordSuggestions.length>0}
      visualSuggestions={visualWordSuggestions}
      onVisualSuggestionSelect={id=>{
       if(id.startsWith('whole-')){
-       setMobileSuggestionsOpen(true);
+       // Siri controls stay on the Word page; never auto-open a covering panel.
       }else{
        setActiveSuggestionId(id);setOpenSuggestionId(id);
-       setEditingSuggestionId(null);setMobileSuggestionsOpen(true);
+       setEditingSuggestionId(null);
       }
      }}
      onVisualSuggestionAction={(id,action,newText,layoutVerified)=>{
@@ -858,8 +871,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      }}
      onRevisionSnapshot={handleWordRevisionSnapshot}
      onDocumentReady={revealRenderedWord}
-     editPanelHost={wordEditHost} onEditingChange={(editing,inline)=>setWordEditing(editing&&!inline)}
-     onOpenSuggestions={()=>setMobileSuggestionsOpen(true)}
+     onOpenSuggestions={openWordTools}
      onPendingChange={setNativeWordPending}
      onVerifiedSave={change=>{
       setVerifiedWordEdits(prev=>[...prev.filter(item=>item.original!==change.original),change]);
@@ -872,16 +884,13 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      onSessionWordDraftChange={setNativeWordTextDraft}
      pendingSuggestionCount={pendingSuggestions.length}/>
    </div>
-   {mobileSuggestionsOpen&&<button type="button"
-    className="hhba-word-tools-scrim" aria-label="关闭 AI 优化操作"
-    onClick={()=>setMobileSuggestionsOpen(false)}/>}
-   <aside id="hhba-word-optimization-tools" className={'targeted-resume-word-assistant'+
-    (mobileSuggestionsOpen?' mobile-open':'')+(wordEditing?' is-word-editing':'')}
-    aria-label={wordEditing?'Word 文字编辑':'AI 优化操作'}>
-    <div className="targeted-resume-word-edit-host" ref={setWordEditHost}/>
+   <aside id="hhba-word-optimization-tools" ref={toolsRef}
+    className={'targeted-resume-word-assistant'+(mobileSuggestionsOpen?' mobile-open':'')}
+    aria-label="AI 建议与隐私设置" aria-hidden={!mobileSuggestionsOpen}>
+    <div className="targeted-resume-word-edit-host"/>
     <div className="targeted-resume-word-review">
     <button type="button" className="targeted-resume-mobile-rail-close"
-     onClick={()=>setMobileSuggestionsOpen(false)}>返回 Word</button>
+     onClick={()=>setMobileSuggestionsOpen(false)}>收起建议，查看简历</button>
     <section className="hhba-word-match-score" aria-label="目标岗位匹配分与复评">
      <div className="hhba-word-match-score-head">
       <div>

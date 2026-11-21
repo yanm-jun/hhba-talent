@@ -13,6 +13,13 @@ on:
       - 'apps/web/src/components/OriginalWordViewer.tsx'
       - 'apps/web/src/services/originalWordApi.ts'
       - 'apps/web/src/styles/browser-word-preview.css'
+      - 'apps/web/src/components/TargetedResumeOptimization.tsx'
+      - 'apps/web/src/styles/targeted-resume-optimization.css'
+      - 'apps/web/src/styles/original-resume-viewer.css'
+      - 'apps/web/src/styles/resume-match-dialog.css'
+      - 'apps/web/scripts/qa-targeted-word-workspace.html'
+      - 'apps/web/scripts/qa_targeted_word_workspace.tsx'
+      - 'apps/web/scripts/qa_targeted_word_workspace.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -75,6 +82,7 @@ jobs:
           npm run dev -- --host 127.0.0.1 --port 4173 >/tmp/hhba-word-vite.log 2>&1 &
           python scripts/qa_word_browser_preview.py
           python scripts/qa_actual_word_viewer.py
+          python scripts/qa_targeted_word_workspace.py
       - name: Upload browser screenshots and QA report
         if: always()
         uses: actions/upload-artifact@v4
@@ -83,5 +91,6 @@ jobs:
           path: |
             /tmp/hhba-word-browser-qa
             /tmp/hhba-word-react-qa
+            /tmp/hhba-word-unobstructed-qa
           if-no-files-found: ignore
           retention-days: 7

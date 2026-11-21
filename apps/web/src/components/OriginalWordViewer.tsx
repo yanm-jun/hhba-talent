@@ -56,6 +56,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  const [count,setCount]=useState(0);
  const [width,setWidth]=useState(680);
  const [zoom,setZoom]=useState(1);
+ const [fitMode,setFitMode]=useState<'page'|'width'|'custom'>('page');
  const [paperSize,setPaperSize]=useState({width:0,height:0});
  const [editable,setEditable]=useState<string[]>([]);
  const [anchors,setAnchors]=useState<WordAnchor[]>([]);
@@ -90,7 +91,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   onClose?.();
  }
  useEffect(()=>{
-  setPage(1);setZoom(1);setActiveVisualId(null);setInlineVisualEditor(null);restorePosition.current=null;
+  setPage(1);setZoom(1);setFitMode('page');setActiveVisualId(null);setInlineVisualEditor(null);restorePosition.current=null;
   renderedEntrance.current=false;
  },[resume.id,jobId]);
  useEffect(()=>{
@@ -214,7 +215,13 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     const source=doc.current,view=await source.getPage(page);
     if(!active||!surface.current)return;
     const base=view.getViewport({scale:1});
-    const scale=Math.min(3.2,Math.max(.5,width/base.width))*zoom;
+    const body=paper.current?.closest('.hhba-match-modal-content');
+    const pageTop=paper.current?.getBoundingClientRect().top??0;
+    const visibleBottom=body?.getBoundingClientRect().bottom??window.innerHeight;
+    const availableHeight=Math.max(230,Math.min(window.innerHeight*.77,
+     visibleBottom-pageTop-32));
+    const fitPage=fitMode==='page'?Math.min(width/base.width,availableHeight/base.height):width/base.width;
+    const scale=Math.min(3.2,Math.max(.35,fitPage))*zoom;
     const viewport=view.getViewport({scale});
     const ratio=Math.min(1.5,window.devicePixelRatio||1);
     const canvas=surface.current;
@@ -245,7 +252,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    }
   })();
   return()=>{active=false;try{task?.cancel();}catch{}};
- },[page,ready,rendererEnabled,loading,editable,width,zoom,saved,refresh]);
+ },[page,ready,rendererEnabled,loading,editable,width,zoom,fitMode,saved,refresh]);
 
  useEffect(()=>{
   const el=paper.current;if(!el)return;
@@ -253,6 +260,36 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   update();const observer=new ResizeObserver(update);observer.observe(el);
   return()=>observer.disconnect();
  },[ready,loading]);
+ // Default: first Word page completely in view. The document and its text
+ // hit areas share one zoom transform; candidate can switch to width-fit.
+ useEffect(()=>{
+  if(ready!=='available'||rendererEnabled||loading||fitMode==='custom')return;
+  const container=paper.current,documentPage=browserMount.current
+   ?.querySelector<HTMLElement>('section.hhba-native-docx');
+  if(!container||!documentPage)return;
+  const update=()=>{
+   const pageWidth=documentPage.offsetWidth+24,pageHeight=documentPage.offsetHeight+24;
+   if(!pageWidth||!pageHeight)return;
+   const availableWidth=Math.max(240,container.clientWidth-34);
+   // Measure the actual visible modal content area, not just window height.
+   // Header/toolbars consume real vertical room; size the first page to the
+   // remaining viewport rather than hiding its bottom under the dialog.
+   const content=container.closest('.hhba-match-modal-content');
+   const visibleBottom=content?.getBoundingClientRect().bottom??window.innerHeight;
+   const pageTop=container.getBoundingClientRect().top;
+   const availableHeight=Math.max(230,Math.min(window.innerHeight*.77,
+    visibleBottom-pageTop-32));
+   const factor=fitMode==='page'?
+    Math.min(availableWidth/pageWidth,availableHeight/pageHeight):
+    availableWidth/pageWidth;
+   const next=Number(Math.max(.3,Math.min(1.4,factor)).toFixed(2));
+   setZoom(current=>Math.abs(current-next)<.015?current:next);
+  };
+  const observer=new ResizeObserver(update);observer.observe(container);
+  window.addEventListener('resize',update);
+  const animation=requestAnimationFrame(update);
+  return()=>{observer.disconnect();window.removeEventListener('resize',update);cancelAnimationFrame(animation)};
+ },[ready,rendererEnabled,loading,fitMode,paperSize.width,paperSize.height]);
  useEffect(()=>{
   const position=restorePosition.current;
   if(loading||!position||page!==position.page||!paper.current)return;
@@ -502,6 +539,9 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    <summary>检测到未完成文字草稿</summary>
    <p>可在第 {sessionWordDraft.page} 页点选相同原文继续核对；修订号或原文不同不会自动填入。</p>
   </details>}
+  {editPanel&&(!editPanelHost?
+   <aside className="hhba-word-standalone-edit-panel" aria-label="Word 当前文字编辑">{editPanel}</aside>:
+   createPortal(editPanel,editPanelHost))}
   {loading&&<p className="hhba-original-resume-note" role="status">正在打开简历…</p>}
   {saved&&ready==='available'&&!layoutVerified&&<p className="hhba-browser-word-disclaimer">
    已保存原格式 DOCX，尚未校验分页；可下载 Word，PDF 暂不可用。
@@ -521,15 +561,17 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   </div>}
   {ready==='available'&&!rendererEnabled&&!previewError&&<>
    <div className="hhba-original-resume-word-tools" role="group" aria-label="Word 浏览器预览缩放">
-    <button type="button" aria-label="缩小 Word" disabled={zoom<=.75}
-     onClick={()=>setZoom(v=>Math.max(.75,Math.round((v-.25)*100)/100))}><ZoomOut size={15}/></button>
+    <button type="button" aria-label="缩小 Word" disabled={zoom<=.3}
+     onClick={()=>{setFitMode('custom');setZoom(v=>Math.max(.3,Math.round((v-.15)*100)/100))}}><ZoomOut size={15}/></button>
     <output aria-live="polite">{Math.round(zoom*100)}%</output>
     <button type="button" aria-label="放大 Word" disabled={zoom>=2}
-     onClick={()=>setZoom(v=>Math.min(2,Math.round((v+.25)*100)/100))}><ZoomIn size={15}/></button>
+     onClick={()=>{setFitMode('custom');setZoom(v=>Math.min(2,Math.round((v+.15)*100)/100))}}><ZoomIn size={15}/></button>
+    <button type="button" className={fitMode==='page'?'is-active':''}
+     onClick={()=>setFitMode('page')} aria-pressed={fitMode==='page'}>整页</button>
+    <button type="button" className={fitMode==='width'?'is-active':''}
+     onClick={()=>setFitMode('width')} aria-pressed={fitMode==='width'}>适合宽度</button>
    </div>
-   <p className="hhba-browser-word-disclaimer">
-    浏览器预览供核对文字和样式；分页未经过 Word/LibreOffice 校验，请下载 Word 后检查最终排版。
-   </p>
+
    <div className={'hhba-original-resume-siri-stage hhba-siri-edge'+
     (glowActive?' hhba-siri-edge-active':'')}>
     <div className="hhba-original-resume-paper hhba-word-native-preview hhba-browser-word-paper" ref={paper}>
@@ -537,20 +579,10 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
       <div className="hhba-browser-word-output" ref={browserMount}/>
       {!loading&&<div className="hhba-browser-word-overlay">
        {anchorsOverlay}
-       {editPanel&&inlineVisualEditor&&selected&&<div className="hhba-word-siri-edit-float"
-        role="region" aria-label="原位置文字编辑"
-        style={{left:Math.min(55,selected.bbox[0]/10)+'%',
-         top:selected.bbox[1]>640?undefined:(selected.bbox[1]+selected.bbox[3])/10+'%',
-         bottom:selected.bbox[1]>640?(100-selected.bbox[1]/10)+'%':undefined}}>
-        {editPanel}
-       </div>}
       </div>}
      </div>
     </div>
    </div>
-   {editPanel&&!inlineVisualEditor&&(!editPanelHost?
-    <aside className="hhba-word-standalone-edit-panel">{editPanel}</aside>:
-    createPortal(editPanel,editPanelHost))}
    {!loading&&anchors.length===0&&<p className="hhba-original-resume-note">
     此 Word 没有找到可唯一定位的原文，请下载原件检查。没有对它做任何修改。</p>}
   </>}
@@ -561,7 +593,8 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     <output aria-live="polite">{Math.round(zoom*100)}%</output>
     <button type="button" aria-label="放大 Word" onClick={()=>setZoom(value=>Math.min(2,Math.round((value+.25)*100)/100))}
      disabled={zoom>=2}><ZoomIn size={15}/></button>
-    <button type="button" onClick={()=>setZoom(1)} disabled={zoom===1}>适合宽度</button>
+    <button type="button" onClick={()=>{setFitMode('width');setZoom(1)}} aria-pressed={fitMode==='width'}>适合宽度</button>
+    <button type="button" onClick={()=>{setFitMode('page');setZoom(1)}} aria-pressed={fitMode==='page'}>整页</button>
    </div>
    <div className={'hhba-original-resume-siri-stage hhba-siri-edge'+
      (glowActive?' hhba-siri-edge-active':'')}>
@@ -572,19 +605,9 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
       <canvas className="hhba-original-resume-canvas" ref={surface}
        role="img" aria-label={'Word 原始页面第 '+page+' 页'}/>
       {anchorsOverlay}
-      {editPanel&&inlineVisualEditor&&selected&&<div
-       className="hhba-word-siri-edit-float" role="region" aria-label="原位置文字编辑"
-       style={{left:Math.min(55,selected.bbox[0]/10)+'%',
-        top:selected.bbox[1]>640?undefined:(selected.bbox[1]+selected.bbox[3])/10+'%',
-        bottom:selected.bbox[1]>640?(100-selected.bbox[1]/10)+'%':undefined}}>
-       {editPanel}
-      </div>}
      </div>
     </div>
    </div>
-   {editPanel&&!inlineVisualEditor&&(!editPanelHost?
-    <aside className="hhba-word-standalone-edit-panel">{editPanel}</aside>:
-    createPortal(editPanel,editPanelHost))}
    {anchors.length===0&&<p className="hhba-original-resume-note">
     这页没有找到可以安全修改的位置。</p>}
    <nav className="hhba-original-resume-pages" aria-label="Word 简历翻页">
