@@ -63,7 +63,7 @@ export function verifiedProfile(raw,text,now=new Date()){
   skills,target_roles:roles,
   professional_credentials:extractSelfReportedProfessionalCredentials(original),warnings:[]};
 }
-function safeJobLink(j){
+export function safeJobLink(j){
  if(!j||typeof j!=='object'||!['ashby','greenhouse','lever'].includes(j.platform))return false;
  if(typeof j.id!=='string'||!/^[A-Za-z0-9_-]{5,180}$/.test(j.id)||typeof j.url!=='string')return false;
  if(typeof j.title!=='string'||j.title.length<2||j.title.length>220||typeof j.company!=='string'||!j.company.trim())return false;

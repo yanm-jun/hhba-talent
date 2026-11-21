@@ -1,0 +1,64 @@
+name: HHBA Siri integration preserves existing match UI
+on:
+  pull_request:
+    paths:
+      - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
+      - 'apps/web/src/pages/CandidateMatchPage.tsx'
+      - 'apps/web/src/services/resumeMatch.ts'
+      - 'apps/web/src/components/TargetedResumeOptimization.tsx'
+      - 'apps/web/src/components/OriginalWordViewer.tsx'
+      - 'apps/web/src/styles/resume-match-dialog.css'
+      - 'apps/web/functions/api/resume-word.js'
+      - 'apps/web/scripts/word-layout-preservation.qa.py'
+      - 'apps/web/scripts/resume-docx-preserve.realfile.test.mjs'
+      - 'apps/web/src/services/resumeDocxPreserve.mjs'
+      - 'services/word-renderer/**'
+      - 'apps/web/scripts/match-siri-preserve.contract.test.mjs'
+      - '.github/workflows/hhba-siri-match-preservation.yml'
+  push:
+    branches:
+      - feature/match-dialog-preserve-siri-20261121
+permissions:
+  contents: read
+jobs:
+  safe-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Preserve native match UI and verify independent Word saves
+        working-directory: apps/web
+        run: node --experimental-strip-types --test scripts/match-siri-preserve.contract.test.mjs scripts/resume-word.route.test.mjs scripts/resume-docx-preserve.contract.test.mjs scripts/resume-optimization.route.test.mjs
+      - name: Install packages
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Build actual candidate UI including lazy-loaded Word optimizer
+        working-directory: apps/web
+        run: npm run build
+
+  real-word-http:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install document renderer and CJK fonts
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libreoffice-writer poppler-utils fonts-noto-cjk fontconfig
+          python -m pip install --disable-pip-version-check "pillow==11.3.0" "python-docx==1.2.0"
+      - name: Real Chinese multi-page DOCX render and private HTTP verification
+        working-directory: services/word-renderer
+        run: python real_docx_local_qa.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser and Workers OOXML patcher against genuine DEFLATED two-page Chinese DOCX
+        run: node --test apps/web/scripts/resume-docx-preserve.realfile.test.mjs

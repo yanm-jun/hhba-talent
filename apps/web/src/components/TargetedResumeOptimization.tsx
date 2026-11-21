@@ -1,0 +1,1152 @@
+import {useEffect,useMemo,useRef,useState} from 'react';
+import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen,Printer,FileDown,PencilLine,X ,ChevronDown} from 'lucide-react';
+import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
+import {getRealAuthToken,realAuthReady} from '../services/realAuth';
+import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimizationStatus} from '../services/resumeOptimizationApi';
+import {getWholeRewriteStatus,requestWholeResumeRewrite,continueWholeResumeRewrite,type ResumeWholeRewriteResult,type ResumeWholeRewriteStatus} from '../services/resumeWholeRewriteApi';
+import {completeRewriteSource} from '../services/resumeWholeRewriteSource';
+import {downloadWholeRewriteDocx} from '../services/resumeWholeRewriteExport';
+import {WholeResumeRewriteReview} from './WholeResumeRewriteReview';
+import {applySuggestion,validateSuggestion,editResumeBlock,type ResumeBlock,type ResumeSuggestion,type ResumeVersion} from '../services/targetedResumeOptimization';
+import {evidenceVisibility} from '../services/resumeEvidenceVisibility';
+import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResumeVersion} from '../services/resumeVersionsApi';
+import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,sourceResumeOmittedCharacters,structuredResumeOmittedCharacters,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
+import {createPortal} from 'react-dom';
+import {Link} from '../router';
+import type {PrivateResume} from '../services/privateResumes';
+import {OriginalWordViewer,type WordRevisionSnapshot,type WordVisualSuggestion} from './OriginalWordViewer';
+import {checkedWordScoreBlocks} from '../services/resumeWordScoreBridge.mjs';
+import {ResumePrintSheet} from './ResumePrintSheet';
+import {downloadResumeDocx} from '../services/resumeDocx';
+import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
+import {officialJobVerifyStatus,verifyOfficialJob,type OfficialJobVerifyStatus,type OfficialVerifiedJob} from '../services/officialJobVerifyApi';
+import '../styles/targeted-resume-optimization.css';
+import '../styles/siri-edge.css';
+
+export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,onDraftDirtyChange,accountScope}:{profile:CandidateProfile;job:JobMatch;sourceText?:string;sourceResume?:PrivateResume;onDraftDirtyChange?:(dirty:boolean)=>void;accountScope?:string}){
+ const blocks=useMemo<ResumeBlock[]>(()=>{
+ const originals=[
+  ...(Array.isArray(profile.experiences)?profile.experiences:[]).filter(e=>e.evidence?.trim()).map((e,i)=>({id:'experience-'+i,section:'experience' as const,text:e.evidence.slice(0,1600)})),
+  ...(Array.isArray(profile.skills)?profile.skills:[]).filter(s=>s.evidence?.trim()).map((s,i)=>({id:'skill-'+i,section:'skills' as const,text:s.evidence.slice(0,1600)}))
+ ].slice(0,12);
+ // Newer search-first flows preserve local source text, but do not yet expose
+ // verified structured work-history records. Keep raw paragraphs unmistakably
+ // labelled as source text, rather than inventing roles or employers.
+ if(!profile.experiences?.length&&sourceText?.trim())return sourceResumeBlocks(sourceText);
+ return originals;
+ },[profile,sourceText]);
+ const wholeSource=useMemo(()=>completeRewriteSource(profile,sourceText),[profile,sourceText]);
+ const [wholeStatus,setWholeStatus]=useState<ResumeWholeRewriteStatus|null>(null);
+ const [wholeDraft,setWholeDraft]=useState<ResumeWholeRewriteResult|null>(null);
+ const [wholeBusy,setWholeBusy]=useState(false);
+ const [wholeApproved,setWholeApproved]=useState(false);
+ const [wholeDownloaded,setWholeDownloaded]=useState(false);
+ // The current candidate's consented text is held only in this open tab.
+ // No new public storage or automatic D1 writes for AI checkpoints.
+ const wholeRunInput=useRef<{blocks:ResumeBlock[];
+  job:{title:string;requirements:string}}|null>(null);
+ const [revealedWholeCount,setRevealedWholeCount]=useState(0);
+ useEffect(()=>{
+  const count=wholeDraft?.blocks.length||0;
+  if(!count||revealedWholeCount>=count)return;
+  // The model response is already complete. Staggered reveal communicates
+  // the confirmed result without pretending tokens are streaming live.
+  const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const t=setTimeout(()=>setRevealedWholeCount(n=>Math.min(n+1,count)),reduced?0:240);
+  return()=>clearTimeout(t);
+ },[wholeDraft,revealedWholeCount]);
+ const omittedSourceCharacters=useMemo(()=>(
+  !profile.experiences?.length&&sourceText
+   ?sourceResumeOmittedCharacters(sourceText,blocks)
+   :structuredResumeOmittedCharacters(profile)
+ ),[profile,sourceText,blocks]);
+ const initial=()=>({id:'draft-'+job.id,targetJobId:job.id,blocks,acceptedSuggestionIds:[] as string[]});
+ const [version,setVersion]=useState<ResumeVersion>(initial);
+ const [suggestions,setSuggestions]=useState<ResumeSuggestion[]>([]);
+ const [ignored,setIgnored]=useState<string[]>([]);
+ const [resolvedWordVisualIds,setResolvedWordVisualIds]=useState<string[]>([]);
+ const [editedWordVisualIds,setEditedWordVisualIds]=useState<string[]>([]);
+ const [confirmed,setConfirmed]=useState<string[]>([]);
+ const [newEvidence,setNewEvidence]=useState<Record<string,string>>({});
+ const [consent,setConsent]=useState(false);
+ const [notice,setNotice]=useState('');
+ const [busy,setBusy]=useState(false);
+ const [status,setStatus]=useState<ResumeOptimizationStatus|null>(null);
+ const [scoreStatus,setScoreStatus]=useState<ReassessmentStatus|null>(null);
+ const [verifyStatus,setVerifyStatus]=useState<OfficialJobVerifyStatus|null>(null);
+ const [verifiedJob,setVerifiedJob]=useState<OfficialVerifiedJob|null>(null);
+ const [consentVerify,setConsentVerify]=useState(false);
+ const [confirmedVerifiedJob,setConfirmedVerifiedJob]=useState(false);
+ const [verifying,setVerifying]=useState(false);
+ const [scoreResult,setScoreResult]=useState<ReassessmentResult|null>(null);
+ const [scoring,setScoring]=useState(false);
+ const [confirmReassessment,setConfirmReassessment]=useState(false);
+ const [saved,setSaved]=useState<SavedResumeVersion[]>([]);
+ const [storageReady,setStorageReady]=useState(false);
+ const [saving,setSaving]=useState(false);
+ const [details,setDetails]=useState<ResumeDocumentDetails>({...EMPTY_RESUME_DOCUMENT_DETAILS});
+ const [confirmReal,setConfirmReal]=useState(false);
+ const [openSuggestionId,setOpenSuggestionId]=useState<string|null>(null);
+ const [editingSuggestionId,setEditingSuggestionId]=useState<string|null>(null);
+ const [suggestionDrafts,setSuggestionDrafts]=useState<Record<string,string>>({});
+ const [undoStack,setUndoStack]=useState<ResumeVersion[]>([]);
+ const [editingBlock,setEditingBlock]=useState<string|null>(null);
+ const [manualText,setManualText]=useState('');
+ const [activeSuggestionId,setActiveSuggestionId]=useState<string|null>(null);
+ const [mobileSuggestionsOpen,setMobileSuggestionsOpen]=useState(false);
+ const [wordEditing,setWordEditing]=useState(false);
+ const [entranceStage,setEntranceStage]=useState<'waiting'|'entering'|'ready'>('waiting');
+ const [revealedSuggestionCount,setRevealedSuggestionCount]=useState(0);
+ const [wordRevisionSnapshot,setWordRevisionSnapshot]=useState<WordRevisionSnapshot|null>(null);
+ const lastWordRevisionKey=useRef('');
+ useEffect(()=>{
+  if(sourceResume)setEntranceStage('waiting');
+ },[sourceResume?.id,job.id]);
+ useEffect(()=>{
+  if(entranceStage!=='entering')return;
+  const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const timeout=setTimeout(()=>setEntranceStage('ready'),reduced?0:1050);
+  return()=>clearTimeout(timeout);
+ },[entranceStage]);
+ function revealRenderedWord(){
+  setEntranceStage(stage=>stage==='waiting'?'entering':stage);
+ }
+ useEffect(()=>{
+  if(!sourceResume)return;
+  if(!suggestions.length){setRevealedSuggestionCount(0);return;}
+  if(revealedSuggestionCount>=suggestions.length)return;
+  // Provider results have returned; stagger is presentation, never fake streaming.
+  const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const timeout=setTimeout(()=>setRevealedSuggestionCount(n=>Math.min(n+1,suggestions.length)),
+   reduced?0:520);
+  return()=>clearTimeout(timeout);
+ },[sourceResume,suggestions,revealedSuggestionCount]);
+ const [wordEditHost,setWordEditHost]=useState<HTMLDivElement|null>(null);
+ const [aiSettingsOpen,setAiSettingsOpen]=useState(false);
+ useEffect(()=>{
+  if(wordEditing)setMobileSuggestionsOpen(false);
+ },[wordEditing]);
+ const [nativeWordPending,setNativeWordPending]=useState(false);
+ const [nativeWordTextDraft,setNativeWordTextDraft]=useState<{
+  original:string;text:string;revision:number;page:number
+ }|null>(null);
+ const [verifiedWordEdits,setVerifiedWordEdits]=useState<Array<{original:string;text:string}>>([]);
+ // Do not silently keep a resume in localStorage. Optional draft recovery
+ // requires a separate, user-checked consent and is tab/session-scoped.
+ const draftKey=sourceResume&&accountScope?
+  'hhba:word-draft-v1:'+encodeURIComponent(accountScope).slice(0,96)+
+  ':'+encodeURIComponent(sourceResume.id)+':'+encodeURIComponent(job.id).slice(0,180):'';
+ const [rememberDraft,setRememberDraft]=useState(false);
+ const [recoverableDraft,setRecoverableDraft]=useState<any|null>(null);
+ const [draftStatus,setDraftStatus]=useState('');
+ const [draftExpiresAt,setDraftExpiresAt]=useState<number|null>(null);
+ // A lightweight context check, not an authentication mechanism: drafts
+ // are already scoped to the signed-in account, document and target job.
+ const sourceSignature=useMemo(()=>{
+  const source=JSON.stringify(blocks.map(({id,section,text})=>[id,section,text]));
+  let a=2166136261,b=5381;
+  for(let i=0;i<source.length;i++){
+   a=Math.imul(a^source.charCodeAt(i),16777619);
+   b=(Math.imul(b,33)^source.charCodeAt(i))|0;
+  }
+  return source.length+':'+(a>>>0).toString(16)+':'+(b>>>0).toString(16);
+ },[blocks]);
+ useEffect(()=>{
+  if(!draftKey)return;
+  try{
+   const raw=sessionStorage.getItem(draftKey);
+   if(!raw)return;
+   const stored=JSON.parse(raw);
+   if(stored?.schema!=='HHBA_WORD_DRAFT_V2'||
+    stored.source_signature!==sourceSignature||
+    typeof stored.expires_at!=='number'||stored.expires_at<Date.now()||
+    !stored.version||!Array.isArray(stored.version.blocks)||
+    stored.version.blocks.length!==blocks.length||
+    !Array.isArray(stored.version.acceptedSuggestionIds)){
+    sessionStorage.removeItem(draftKey);return;
+   }
+   setRecoverableDraft(stored);setRememberDraft(true);
+   setDraftExpiresAt(stored.expires_at);
+  }catch{setDraftStatus('浏览器会话草稿无法读取，请继续手动编辑。');}
+ },[draftKey,sourceSignature,blocks.length]);
+ const generation=useRef(0);
+ const active=useRef<AbortController|null>(null);
+ useEffect(()=>{
+  // A different candidate Word or job must never inherit an earlier job's
+  // signed AI continuation, facts, approval or visible score.
+  active.current?.abort();
+  wholeRunInput.current=null;
+  setWholeDraft(null);setWholeBusy(false);
+  setWholeApproved(false);setWholeDownloaded(false);
+  setRevealedWholeCount(0);
+ },[job.id,sourceResume?.id,sourceText]);
+ useEffect(()=>{
+  const abort=new AbortController();
+  getResumeOptimizationStatus(abort.signal).then(setStatus);
+  getWholeRewriteStatus(abort.signal).then(setWholeStatus);
+  reassessmentStatus(abort.signal).then(setScoreStatus);
+  officialJobVerifyStatus(abort.signal).then(setVerifyStatus);
+  return ()=>{abort.abort();active.current?.abort();};
+ },[]);
+ useEffect(()=>{
+  if(!realAuthReady||!getRealAuthToken())return;
+  let alive=true;
+  listResumeVersions(job.id).then(data=>{
+   if(alive){setSaved(data.items);setStorageReady(true);}
+  }).catch(()=>{if(alive)setStorageReady(false);});
+  return ()=>{alive=false;};
+ },[job.id]);
+ const requirements=useMemo(()=>[
+  job.requirements_basis,...job.matched,...job.not_evidenced,...job.needs_verification
+ ].filter(Boolean).join('\n').slice(0,2500),[job]);
+ const fullJobRequirements=useMemo(()=>[
+  job.requirements_basis,...job.matched,...job.not_evidenced,...job.needs_verification
+ ].filter(Boolean).join('\n').slice(0,16000),[job]);
+ const criteria=useMemo(()=>[...job.matched,...job.not_evidenced], [job]);
+ const printDocument=useMemo(()=>buildResumeDocument(profile,version.blocks,details),[profile,version.blocks,details]);
+ const canPrint=readableResumeDocument(printDocument)&&omittedSourceCharacters===0;
+ const canExport=canPrint&&!editingBlock;
+ function updateDetail(key:keyof ResumeDocumentDetails,value:string){
+  setDetails(current=>({...current,[key]:value}));
+  setConfirmReal(false);
+ }
+ const before=useMemo(()=>evidenceVisibility(criteria,blocks),[criteria,blocks]);
+ const after=useMemo(()=>evidenceVisibility(criteria,version.blocks),[criteria,version.blocks]);
+ const hasAuditedAtsIdentity=/^(?:ashby|greenhouse|lever)-/.test(job.id);
+ const scoreJobId=hasAuditedAtsIdentity?job.id:
+  (verifiedJob&&confirmedVerifiedJob?verifiedJob.job_id:null);
+ const hasSupportedJob=Boolean(scoreJobId);
+ const verifiedWordScore=useMemo(()=>checkedWordScoreBlocks(blocks,
+  wordRevisionSnapshot?.history||[],wordRevisionSnapshot?.revision||0),
+  [blocks,wordRevisionSnapshot]);
+ const hasVerifiedWordRevision=Boolean(sourceResume&&wordRevisionSnapshot&&
+  wordRevisionSnapshot.revision>0);
+ function handleWordRevisionSnapshot(snapshot:WordRevisionSnapshot){
+  const key=snapshot.revision+':'+snapshot.history.map(x=>
+   x.revision+':'+x.original+':'+x.text).join('|');
+  if(lastWordRevisionKey.current===key)return;
+  lastWordRevisionKey.current=key;
+  setWordRevisionSnapshot(snapshot);
+  setScoreResult(null);setConfirmReassessment(false);
+ }
+ const hasWordingChanges=useMemo(()=>version.blocks.some(block=>{
+  const original=blocks.find(old=>old.id===block.id);
+  return !original||original.text!==block.text;
+ }),[version.blocks,blocks]);
+ const scoreSourceReady=!sourceResume?hasWordingChanges:
+  hasVerifiedWordRevision&&verifiedWordScore.ok;
+ function invalidateScore(){setScoreResult(null);setConfirmReassessment(false);}
+ async function verifyEmployer(){
+  if(hasAuditedAtsIdentity||!verifyStatus?.enabled||verifying||!consentVerify)return;
+  setVerifying(true);setNotice('');setVerifiedJob(null);
+  setConfirmedVerifiedJob(false);invalidateScore();
+  try{
+   const verified=await verifyOfficialJob(job.official_url);
+   setVerifiedJob(verified);
+   setNotice('已找到企业发布的岗位信息。请确认企业和岗位是否正确。');
+  }catch(e){setNotice(e instanceof Error?e.message:'无法独立核验该岗位页面。');}
+  finally{setVerifying(false);}
+ }
+ async function reassess(){
+  if(!scoreStatus?.enabled||!scoreJobId||scoring||!scoreSourceReady||
+   !confirmReassessment||scoreResult?.supported)return;
+  setScoring(true);setNotice('');setScoreResult(null);
+  try{
+   const result=await reassessResume(scoreJobId,profile,blocks,
+    sourceResume?verifiedWordScore.blocks:version.blocks);
+   setScoreResult(result);
+   if(!result.supported)setNotice('此岗位未通过当前官方快照复评条件，未生成分数。');
+   else setNotice('已用相同标准比较修改前后的简历。');
+  }catch(e){setNotice(e instanceof Error?e.message:'复评请求失败。');}
+  finally{setScoring(false);}
+ }
+ async function persist(){
+  if(saving||!confirmReal||!storageReady||!canPrint)return;
+  setSaving(true);setNotice('');
+  try{
+   await saveResumeVersion({id:job.id,title:job.title_zh||job.title,company:job.company},
+    version.blocks,version.acceptedSuggestionIds,details);
+   const data=await listResumeVersions(job.id);
+   setSaved(data.items);
+   setNotice('已保存本岗位专属简历版本到你的 HHBA 账户。');
+  }catch(err){setNotice(err instanceof Error?err.message:'保存失败，请重试。');}
+  finally{setSaving(false);}
+ }
+ function restore(item:SavedResumeVersion){
+  active.current?.abort();setBusy(false);
+  invalidateScore();setVersion({id:item.id,targetJobId:job.id,blocks:item.version.blocks,
+   acceptedSuggestionIds:item.version.acceptedSuggestionIds});
+  setDetails(normalizeResumeDocumentDetails(item.version.details));setConfirmReal(false);
+  setSuggestions([]);setIgnored([]);setResolvedWordVisualIds([]);setEditedWordVisualIds([]);setConfirmed([]);setNewEvidence({});setOpenSuggestionId(null);
+  setEditingSuggestionId(null);setSuggestionDrafts({});setUndoStack([]);setEditingBlock(null);
+  setNotice('已载入 '+new Date(item.created_at).toLocaleString()+' 的简历版本；没有修改原始简历。');
+ }
+ async function remove(item:SavedResumeVersion){
+  if(!window.confirm('确定删除此岗位的已保存简历版本吗？'))return;
+  try{
+   await deleteResumeVersion(item.id);
+   setSaved(previous=>previous.filter(v=>v.id!==item.id));
+   setNotice('已删除选中的云端简历版本。');
+  }catch(err){setNotice(err instanceof Error?err.message:'删除失败，请重试。');}
+ }
+ async function runWholeContinuation(
+  initial:ResumeWholeRewriteResult,
+  input:{blocks:ResumeBlock[];job:{title:string;requirements:string}},
+  controller:AbortController
+ ){
+  let latest=initial;
+  // Each awaited call executes just one model-selected tool. The signed
+  // checkpoint must verify again on the server before that tool can run.
+  while(!controller.signal.aborted&&latest.autonomy?.needs_more_work&&
+   latest.continuation?.enabled&&latest.continuation.checkpoint){
+   if((latest.autonomy.tools_used?.length||0)>=64){
+    setNotice('本轮已到达技术保护边界。当前完整草稿已保留，可先审阅。');
+    break;
+   }
+   latest=await continueWholeResumeRewrite(
+    input.blocks,input.job,latest,controller.signal);
+   if(controller.signal.aborted)return latest;
+   setWholeDraft(latest);
+  }
+  return latest;
+ }
+ async function resumeWholeRewrite(){
+  const draft=wholeDraft,input=wholeRunInput.current;
+  if(!draft||!input||wholeBusy||busy||!consent||
+   !draft.autonomy?.needs_more_work||!draft.continuation?.enabled)return;
+  const controller=new AbortController();active.current=controller;
+  setWholeBusy(true);setWholeApproved(false);setWholeDownloaded(false);
+  setMobileSuggestionsOpen(false);setNotice('AI 正在继续核查并优化简历…');
+  try{
+   const result=await runWholeContinuation(draft,input,controller);
+   if(!controller.signal.aborted)
+    setNotice(result.autonomy?.needs_more_work?
+     '已保留目前完成的修改，仍可选择继续优化或先核实草稿。':
+     'AI 已结束本轮自主优化，请核对个人事实。');
+  }catch(error){
+   if(!controller.signal.aborted)
+    setNotice('本轮 AI 后续优化暂停，已保留上一步结果。'+
+     (error instanceof Error?error.message:''));
+  }finally{
+   setWholeBusy(false);if(active.current===controller)active.current=null;
+  }
+ }
+ async function generateWholeRewrite(answers:Record<string,string>={}){
+  if(!consent||!sourceResume||!wholeSource.complete||
+   !wholeSource.blocks.length||!wholeStatus?.enabled||
+   wholeBusy||busy)return;
+  const controller=new AbortController();
+  active.current=controller;
+  setWholeBusy(true);setWholeApproved(false);setWholeDownloaded(false);
+  setRevealedWholeCount(0);
+  setWholeDraft(null);
+  setNotice('');setMobileSuggestionsOpen(false);
+  try{
+   const personalized=wholeSource.blocks.map(b=>{
+    const extra=answers[b.id]?.trim();
+    return extra?{...b,text:b.text+'\n用户本人补充的事实（待核实）：'+extra}:b;
+   });
+   const input={blocks:personalized,job:{
+    title:(job.title_zh||job.title).slice(0,180),
+    requirements:fullJobRequirements
+   }};
+   wholeRunInput.current=input;
+   const first=await requestWholeResumeRewrite(
+    input.blocks,input.job,controller.signal);
+   if(controller.signal.aborted)return;
+   setWholeDraft(first);
+   setNotice('已生成并复核完整初稿，AI 正在按需要继续查看证据和优化章节…');
+   const result=await runWholeContinuation(first,input,controller);
+   if(controller.signal.aborted)return;
+   setNotice(result.autonomy?.needs_more_work?
+    '已保留全部当前成果，后续修改可继续执行；请核实已有内容。':
+    'AI 已完成本轮自主优化。请核实个人事实并确认下载。');
+  }catch(error){
+   if(!controller.signal.aborted)
+    setNotice('已保留最后一份完整草稿。'+
+     (error instanceof Error?error.message:'AI 整份简历重写暂时未完成。'));
+  }finally{
+   setWholeBusy(false);if(active.current===controller)active.current=null;
+  }
+ }
+ async function generate(){
+  if(!consent||!blocks.length||busy||wholeBusy||!status?.enabled)return;
+  const currentBlocks=version.blocks;
+  // Previewing/re-generating AI wording does not change the verified DOCX.
+  if(!sourceResume)invalidateScore();
+  setBusy(true);setNotice('');setSuggestions([]);setRevealedSuggestionCount(0);
+  // On mobile the AI drawer must release the document while the model works.
+  // The real PDF remains visible during analysis and staged suggestion reveal.
+  if(sourceResume)setMobileSuggestionsOpen(false);
+  setIgnored([]);setResolvedWordVisualIds([]);setEditedWordVisualIds([]);setConfirmed([]);setNewEvidence({});
+  setOpenSuggestionId(null);setEditingSuggestionId(null);setSuggestionDrafts({});
+  const controller=new AbortController();active.current=controller;
+  try{
+   const incoming=await requestResumeOptimization(currentBlocks,{
+    title:(job.title_zh||job.title).slice(0,120),requirements
+   },controller.signal);
+   const unique=new Set<string>(),usedBlocks=new Set<string>();
+   const accepted=incoming.filter(s=>{
+    if(unique.has(s.id)||usedBlocks.has(s.blockId)||!validateSuggestion(currentBlocks,s))return false;
+    unique.add(s.id);usedBlocks.add(s.blockId);return true;
+   }).map((s,i)=>({...s,id:('generation-'+(++generation.current)+'-'+i+'-'+s.id).slice(0,100)}));
+   setSuggestions(accepted);
+   setActiveSuggestionId(accepted[0]?.id||null);
+   setOpenSuggestionId(accepted[0]?.id||null);
+   setNotice(accepted.length?'建议已生成。请逐条核实真实性，再选择填充。':'本次 AI 未发现可以可靠润色的内容。');
+  }catch(error){
+   if(controller.signal.aborted)return;
+   setNotice(error instanceof Error?error.message:'AI 润色暂时不可用。');
+  }finally{setBusy(false);if(active.current===controller)active.current=null;}
+ }
+ function commitVersion(next:ResumeVersion){
+  setUndoStack(stack=>[...stack.slice(-19),version]);
+  setVersion(next);setConfirmReal(false);
+  if(!sourceResume)invalidateScore();
+ }
+ function undo(){
+  const previous=undoStack.at(-1);
+  if(!previous)return;
+  setUndoStack(stack=>stack.slice(0,-1));setVersion(previous);setConfirmReal(false);
+  setEditingBlock(null);setOpenSuggestionId(null);
+  if(!sourceResume)invalidateScore();
+  setNotice('已撤销上一次简历文字修改，原始上传文件保持不变。');
+ }
+ function accept(s:ResumeSuggestion){
+  if(!confirmed.includes(s.id)){
+   setNotice('请先确认建议内容符合你的真实经历。');return;
+  }
+  const proposed=(suggestionDrafts[s.id]??s.proposed).trim();
+  const original=version.blocks.find(b=>b.id===s.blockId)?.text||'';
+  if(!proposed||proposed.length>1600||
+   (s.action==='append'&&original.length+1+proposed.length>1600)){
+   setNotice('建议文本超出单段 1600 字限制，请精简后再填充。');return;
+  }
+  try{
+   commitVersion(applySuggestion(version,{...s,proposed},true));
+   setOpenSuggestionId(null);setEditingSuggestionId(null);
+   setNotice(sourceResume?'建议已确认。请在原 Word 上点选对应文字并再次确认保存；尚未改动原文件。':
+    '已在简历文字草稿内填充。可以撤销，原始 Word 文件没有被修改。');
+  }catch{setNotice('原文已变化或缺乏真实证据，请重新生成建议。');}
+ }
+ function addFact(s:ResumeSuggestion){
+  const text=(newEvidence[s.id]||'').trim();
+  if(text.length<8){setNotice('请具体描述你的真实经历或成果，至少8个字。');return;}
+  if(!confirmed.includes(s.id)){setNotice('请确认补充内容真实、准确后再填充。');return;}
+  const original=version.blocks.find(b=>b.id===s.blockId)?.text||'';
+  if(original.length+1+text.length>1600){
+   setNotice('原文加补充内容超过单段 1600 字，请精简后重试。');return;
+  }
+  try{
+   commitVersion(applySuggestion(version,{...s,action:'append',proposed:text},true));
+   setOpenSuggestionId(null);
+   setNotice(sourceResume?'真实经历补充已记入建议草稿。复杂的新增段落暂不能安全自动写回原 Word，请自行核对。':
+    '已将你亲自填写的真实信息填充到简历文字草稿。');
+  }catch{setNotice('原文已经变化，请重新生成补充建议。');}
+ }
+ function startEdit(block:ResumeBlock){
+  setOpenSuggestionId(null);setEditingBlock(block.id);setManualText(block.text);
+ }
+ function saveEdit(){
+  if(!editingBlock)return;
+  try{
+   const next=editResumeBlock(version,editingBlock,manualText);
+   if(next.blocks.find(b=>b.id===editingBlock)?.text!==version.blocks.find(b=>b.id===editingBlock)?.text)
+    commitVersion(next);
+   setSuggestions(existing=>existing.filter(s=>s.blockId!==editingBlock));
+   setEditingBlock(null);setManualText('');
+   setNotice('简历原位置已更新文字。所有手动修改须以真实经历为准。');
+  }catch{setNotice('请输入有效内容，单个段落最多 1600 字。');}
+ }
+ function reset(){
+  active.current?.abort();setBusy(false);setVersion(initial());setSuggestions([]);invalidateScore();
+  setIgnored([]);setResolvedWordVisualIds([]);setEditedWordVisualIds([]);setConfirmed([]);setNewEvidence({});setConfirmReal(false);setEditingBlock(null);
+  setOpenSuggestionId(null);setEditingSuggestionId(null);setSuggestionDrafts({});setUndoStack([]);
+  setNotice('已恢复原稿。');
+  try{if(draftKey)sessionStorage.removeItem(draftKey);}catch{}
+  setDraftStatus('已清除本标签页草稿。');
+ }
+ function renderSuggestionCard(s:ResumeSuggestion){
+  const draft=suggestionDrafts[s.id]??s.proposed;
+  return <div className="targeted-resume-popover-shell hhba-siri-edge hhba-siri-edge-active">
+    <div className="targeted-resume-suggestion targeted-resume-popover" role="region"
+    aria-label="当前简历段落的 AI 建议">
+    <div className="targeted-resume-popover-head">
+     <span className="targeted-resume-ai-label"><Sparkles size={13} aria-hidden="true"/> {sourceResume?'核实这处文字':s.action==='request_evidence'?'请补充真实信息':'待本人核实'}</span>
+     <button type="button" aria-label="关闭 AI 建议" onClick={()=>{setOpenSuggestionId(null);setActiveSuggestionId(null)}}><X size={15}/></button>
+    </div>
+    {editingSuggestionId===s.id?<label className="targeted-resume-fact-entry">
+     <span>直接修改 AI 建议文字（填写后仍须确认真实性）</span>
+     <textarea maxLength={1600} rows={4} aria-label="修改 AI 建议"
+      className="hhba-siri-typing" value={draft}
+      onChange={e=>setSuggestionDrafts(old=>({...old,[s.id]:e.target.value}))}/>
+    </label>:<p className="targeted-resume-gradient">{draft}</p>}
+    <p className="targeted-resume-rationale">对应岗位要求：{s.jobRequirement}</p>
+    <p className="targeted-resume-rationale">{s.rationale}</p>
+    {s.action==='request_evidence'&&<label className="targeted-resume-fact-entry">
+     <span>补充自己的真实经历或成果（AI 不会猜测数据）</span>
+     <textarea maxLength={800} rows={3} value={newEvidence[s.id]||''}
+      className={(newEvidence[s.id]||'').trim()?'hhba-siri-typing':''}
+      onChange={e=>setNewEvidence(prev=>({...prev,[s.id]:e.target.value}))}
+      placeholder="例如：你在这个岗位具体做过哪些工作？"/>
+    </label>}
+    <label className="targeted-resume-confirm">
+     <input type="checkbox" checked={confirmed.includes(s.id)}
+      onChange={e=>setConfirmed(v=>e.target.checked?[...v,s.id]:v.filter(key=>key!==s.id))}/>
+     我确认建议及补充内容所描述的经历、能力和数字均属实
+    </label>
+    <div className="targeted-resume-actions">
+     {s.action==='request_evidence'
+      ?<button type="button" disabled={!confirmed.includes(s.id)||!(newEvidence[s.id]||'').trim()} onClick={()=>addFact(s)}>填充我的补充</button>
+      :<button type="button" disabled={!confirmed.includes(s.id)||!draft.trim()} onClick={()=>accept(s)}>填充到此处</button>}
+     {s.action!=='request_evidence'&&<button type="button" onClick={()=>setEditingSuggestionId(editingSuggestionId===s.id?null:s.id)}>
+      {editingSuggestionId===s.id?'完成建议修改':'修改建议'}</button>}
+     <button type="button" onClick={()=>{setIgnored(v=>[...v,s.id]);setOpenSuggestionId(null)}}>保留原文</button>
+    </div>
+   </div>
+   </div>;
+ }
+ function renderEditableBlock(id:string,text:string){
+  const block=version.blocks.find(item=>item.id===id);
+  if(!block)return <p className="hhba-print-paragraph">{text}</p>;
+  const s=suggestions.find(item=>item.blockId===id);
+  const applied=Boolean(s&&version.acceptedSuggestionIds.includes(s.id));
+  const dismissed=Boolean(s&&ignored.includes(s.id));
+  const pending=Boolean(s&&!applied&&!dismissed);
+  return <div className={'targeted-resume-inline-region'+(pending?' has-ai-suggestion':'')} data-resume-block-id={id}>
+   <div className="targeted-resume-inline-anchor">
+    {editingBlock===id?<div className="targeted-resume-inline-editor">
+     <textarea rows={4} maxLength={1600} value={manualText}
+      onChange={e=>setManualText(e.target.value)}
+      className={manualText!==block.text?'hhba-siri-typing':''}
+      aria-label="编辑当前简历段落"/>
+     <div><button type="button" onClick={saveEdit}>保存本次修改</button>
+      <button type="button" onClick={()=>{setEditingBlock(null);setManualText('')}}>取消</button></div>
+    </div>:<p className="hhba-print-paragraph">{text}</p>}
+    {editingBlock!==id&&<div className="targeted-resume-inline-controls">
+     {pending&&s&&<button type="button" className="targeted-resume-ai-trigger"
+      aria-expanded={openSuggestionId===s.id} aria-label="查看此处 AI 修改建议"
+      onClick={()=>{setOpenSuggestionId(openSuggestionId===s.id?null:s.id);setEditingSuggestionId(null)}}>
+      <Sparkles size={14} aria-hidden="true"/> AI 建议</button>}
+     <button type="button" aria-label="编辑当前简历段落" onClick={()=>startEdit(block)}>
+      <PencilLine size={13} aria-hidden="true"/> 修改</button>
+     {applied&&<span className="targeted-resume-applied"><CheckCircle2 size={12} aria-hidden="true"/> 已填充</span>}
+    </div>}
+   </div>
+   {pending&&s&&openSuggestionId===s.id&&editingBlock!==id&&renderSuggestionCard(s)}
+  </div>;
+ }
+ // The legacy browser-print template is retained solely for synthetic QA.
+ // Production PDF must originate from a renderer-verified original DOCX.
+ const legacyPrintQa=import.meta.env.DEV&&typeof window!=='undefined'&&
+  window.location.pathname.startsWith('/qa/');
+ const confirmedWordChanges=useMemo(()=>{
+  const accepted=new Set(version.acceptedSuggestionIds);
+  // Use final, user-confirmed text only. Appending paragraphs, AI unconfirmed
+  // suggestions, and non-exact source blocks must never silently patch Word.
+  const candidates=suggestions.filter(item=>accepted.has(item.id)&&item.action==='replace')
+   .map(item=>({
+    original:item.original,proposed:version.blocks.find(b=>b.id===item.blockId)?.text||''
+   })).filter(({original,proposed})=>original!==proposed&&
+    original.length>1&&original.length<=300&&
+    proposed.length>1&&proposed.length<=300&&
+    original===original.trim()&&proposed===proposed.trim()&&
+    !/[\r\n\t]/.test(original+proposed));
+  const occurrences=new Map<string,number>();
+  for(const change of candidates)
+   occurrences.set(change.original,(occurrences.get(change.original)||0)+1);
+  const approvedWhole=wholeApproved&&wholeDraft?
+   wholeDraft.blocks.filter(b=>b.changed&&b.status==='needs_user_confirmation'&&
+    b.original.length>1&&b.original.length<=300&&
+    b.proposed.length>1&&b.proposed.length<=300&&
+    !/[\r\n\t]/.test(b.original+b.proposed)).map(b=>({
+     original:b.original,proposed:b.proposed
+    })):[];
+  for(const item of approvedWhole)
+   occurrences.set(item.original,(occurrences.get(item.original)||0)+1);
+  return [...candidates,...approvedWhole].filter(change=>occurrences.get(change.original)===1);
+ },[suggestions,version.blocks,version.acceptedSuggestionIds,wholeApproved,wholeDraft]);
+ const visualWordSuggestions=useMemo<WordVisualSuggestion[]>(()=>suggestions
+  .slice(0,revealedSuggestionCount)
+  .filter(s=>s.action==='replace'&&!ignored.includes(s.id)&&!resolvedWordVisualIds.includes(s.id))
+  .map(s=>({
+   id:s.id,original:s.original,
+   proposed:version.acceptedSuggestionIds.includes(s.id)?
+    (version.blocks.find(b=>b.id===s.blockId)?.text||s.proposed):
+    (suggestionDrafts[s.id]??s.proposed),
+   state:version.acceptedSuggestionIds.includes(s.id)?'accepted' as const:'pending' as const
+  }))
+  .filter(s=>s.original.trim()&&s.proposed.trim()&&
+   s.original!==s.proposed&&s.proposed.length<=300&&
+   !(wordRevisionSnapshot?.history||[])
+    .slice(0,wordRevisionSnapshot?.revision||0)
+    .some(saved=>saved.original===s.original&&saved.text===s.proposed))
+  .concat((wholeDraft?.blocks||[])
+   .slice(0,revealedWholeCount)
+   .filter(b=>b.changed&&!resolvedWordVisualIds.includes('whole-'+b.blockId)&&
+     b.original.length<=300&&b.proposed.length<=300&&
+    b.proposed!==b.original)
+   .map(b=>({
+    id:'whole-'+b.blockId,original:b.original,proposed:b.proposed,
+    state:wholeApproved?'accepted' as const:'pending' as const
+   }))),
+ [suggestions,revealedSuggestionCount,ignored,resolvedWordVisualIds,version.acceptedSuggestionIds,
+  version.blocks,suggestionDrafts,wordRevisionSnapshot,wholeDraft,wholeApproved,
+  revealedWholeCount]);
+ const pendingSuggestions=suggestions.filter(s=>!ignored.includes(s.id)&&
+  !editedWordVisualIds.includes(s.id)&&!version.acceptedSuggestionIds.includes(s.id));
+ const acceptedCount=suggestions.filter(s=>version.acceptedSuggestionIds.includes(s.id)||editedWordVisualIds.includes(s.id)).length;
+ const pendingTextChanges=version.blocks.some(block=>{
+  const original=blocks.find(item=>item.id===block.id);
+  if(!original||original.text===block.text)return false;
+  return !sourceResume||!verifiedWordEdits.some(change=>
+   change.original===original.text&&change.text===block.text);
+ });
+ const draftDirty=pendingTextChanges||Boolean(editingBlock)||
+  Boolean(wholeDraft&&!wholeDownloaded)||
+  Boolean(nativeWordTextDraft&&nativeWordTextDraft.text!==nativeWordTextDraft.original)||
+  suggestions.some(item=>!ignored.includes(item.id)&&
+   !version.acceptedSuggestionIds.includes(item.id)&&
+   ((suggestionDrafts[item.id]||'').trim().length>0||
+    (newEvidence[item.id]||'').trim().length>0))||
+  Object.values(details).some(value=>String(value||'').trim().length>0);
+
+ function restoreSessionDraft(){
+  const data=recoverableDraft;
+  if(!data||!Array.isArray(data.version?.blocks))return;
+  const currentIds=new Set(blocks.map(b=>b.id));
+  if(data.source_signature!==sourceSignature||
+   data.version.blocks.some((item:ResumeBlock,index:number)=>
+    !currentIds.has(item.id)||item.id!==blocks[index]?.id||
+    item.section!==blocks[index]?.section||
+    typeof item.text!=='string'||item.text.length<1||item.text.length>1600)){
+   setDraftStatus('草稿和当前简历不完全一致，为安全起见未恢复。');return;
+  }
+  // Untrusted browser state can restore wording, never approval. All AI
+  // recommendations require fresh evidence confirmation after recovery.
+  const reviewed=Array.isArray(data.suggestions)?
+   data.suggestions.filter((item:ResumeSuggestion)=>
+    item&&validateSuggestion(data.version.blocks,item)).slice(0,12):[];
+  const approvedIds=new Set(reviewed.map((item:ResumeSuggestion)=>item.id));
+  const safeFields=(value:unknown,max:number):Record<string,string>=>{
+   const input=value&&typeof value==='object'&&!Array.isArray(value)?
+    value as Record<string,unknown>:{};
+   const cleaned:Record<string,string>={};
+   for(const [key,text] of Object.entries(input))
+    if(approvedIds.has(key)&&typeof text==='string'&&text.length<=max)
+     cleaned[key]=text;
+   return cleaned;
+  };
+  const native=data.native_word_draft;
+  setNativeWordTextDraft(native&&typeof native.original==='string'&&
+   typeof native.text==='string'&&native.original.length>0&&
+   native.original.length<=300&&native.text.length<=300&&
+   Number.isInteger(native.revision)&&native.revision>=0&&native.revision<=8&&
+   Number.isInteger(native.page)&&native.page>=1&&native.page<=20?
+   {original:native.original,text:native.text,revision:native.revision,page:native.page}:null);
+  setVersion({id:'draft-'+job.id,targetJobId:job.id,
+   blocks:data.version.blocks,acceptedSuggestionIds:[]});
+  setDetails(normalizeResumeDocumentDetails(data.details));
+  setSuggestions(reviewed);setIgnored([]);setResolvedWordVisualIds([]);setEditedWordVisualIds([]);setSuggestionDrafts(safeFields(data.suggestionDrafts,1600));
+  setNewEvidence(safeFields(data.newEvidence,800));
+  setConfirmed([]);setOpenSuggestionId(null);setActiveSuggestionId(null);
+  setEditingSuggestionId(null);setUndoStack([]);setRecoverableDraft(null);
+  setDraftStatus('文字草稿已恢复。AI 建议的确认状态已重置；请重新核实，原 Word 尚未保存。');
+ }
+ function discardSessionDraft(){
+  try{if(draftKey)sessionStorage.removeItem(draftKey);}catch{}
+  setRecoverableDraft(null);setRememberDraft(false);setNativeWordTextDraft(null);
+  setDraftExpiresAt(null);
+  setDraftStatus('已清除本标签页保存的文字草稿。');
+ }
+ useEffect(()=>{
+  if(!rememberDraft||!draftKey||recoverableDraft)return;
+  if(!draftExpiresAt||Date.now()>=draftExpiresAt){
+   try{sessionStorage.removeItem(draftKey);}catch{}
+   setRememberDraft(false);setDraftExpiresAt(null);
+   setDraftStatus('本次草稿保护已到期。尚未保存的文字仍在当前页面，若要继续自动保留，请重新授权。');
+   return;
+  }
+  if(!draftDirty){
+   try{sessionStorage.removeItem(draftKey);}catch{}
+   return;
+  }
+  const task=setTimeout(()=>{
+   try{
+    const payload=JSON.stringify({schema:'HHBA_WORD_DRAFT_V2',
+     source_signature:sourceSignature,
+     expires_at:draftExpiresAt,
+     version:{blocks:version.blocks,acceptedSuggestionIds:version.acceptedSuggestionIds},
+     suggestions,ignored,suggestionDrafts,newEvidence,details,
+     native_word_draft:nativeWordTextDraft});
+    if(payload.length>60000)throw Error('TOO_LARGE');
+    sessionStorage.setItem(draftKey,payload);
+    setDraftStatus('文字草稿已保存在当前浏览器标签页（不包含 Word 原文件）。');
+   }catch{setDraftStatus('当前浏览器无法自动保存草稿，请避免关闭页面。');}
+  },850);
+  return()=>clearTimeout(task);
+ },[draftKey,rememberDraft,draftDirty,draftExpiresAt,recoverableDraft,sourceSignature,
+    nativeWordTextDraft,version,suggestions,ignored,suggestionDrafts,newEvidence,details]);
+ useEffect(()=>{
+  if(!rememberDraft||!draftKey||!draftExpiresAt)return;
+  const remaining=Math.max(0,draftExpiresAt-Date.now());
+  const timer=setTimeout(()=>{
+   try{sessionStorage.removeItem(draftKey);}catch{}
+   setRememberDraft(false);setDraftExpiresAt(null);setRecoverableDraft(null);
+   setDraftStatus('草稿保留时间已结束。请重新授权后再启用自动保留。');
+  },remaining);
+  return()=>clearTimeout(timer);
+ },[rememberDraft,draftKey,draftExpiresAt]);
+
+ useEffect(()=>{onDraftDirtyChange?.(draftDirty||nativeWordPending);},
+  [draftDirty,nativeWordPending,onDraftDirtyChange]);
+ useEffect(()=>{
+  if(!draftDirty&&!nativeWordPending)return;
+  const prevent=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue='';};
+  window.addEventListener('beforeunload',prevent);
+  return()=>window.removeEventListener('beforeunload',prevent);
+ },[draftDirty,nativeWordPending]);
+ const hasSession=realAuthReady&&Boolean(getRealAuthToken());
+ const optimizationControls=<>
+  {sourceResume&&<div className="hhba-whole-rewrite-start">
+   <button type="button" className="hhba-whole-rewrite-primary"
+    disabled={wholeBusy||busy||!wholeSource.complete||!wholeStatus?.enabled}
+    onClick={()=>{
+     if(!consent){
+      setAiSettingsOpen(true);
+      setNotice('请先确认第三方 AI 数据处理授权，再进行整份简历撰写。');
+      return;
+     }
+     void generateWholeRewrite();
+    }}>
+    {wholeBusy?<><LoaderCircle size={16} className="resume-match-spinning"/>
+      AI 正在规划并撰写整份简历…</>:<><Sparkles size={16}/>
+      AI 针对岗位重写整份简历</>}
+   </button>
+   {wholeBusy&&<button type="button" className="hhba-whole-rewrite-cancel"
+    onClick={()=>{
+     active.current?.abort();setWholeBusy(false);
+     setNotice('已停止后续 AI 优化；已生成的草稿仍然保留，原 Word 没有修改。');
+    }}>停止 AI 继续处理</button>}
+   {wholeStatus&&!wholeStatus.enabled&&<p>完整撰写服务尚未在当前环境开放，已有局部建议功能不受影响。</p>}
+   {!wholeSource.complete&&<p role="alert">{wholeSource.reason}</p>}
+  </div>}
+  <div className="targeted-resume-toolbar">
+   <div><strong>优化这份简历</strong><p>根据目标岗位提出修改建议，不会凭空添加经历。</p></div>
+   {hasSession&&status?.enabled
+    ?<button type="button" disabled={busy||wholeBusy||!blocks.length||legacyPrintQa&&!sourceResume&&!consent} onClick={()=>{
+       if(!consent){
+        setAiSettingsOpen(true);
+        setNotice('请先展开隐私设置，确认 AI 处理授权，然后再生成建议。');
+        return;
+       }
+       void generate();
+      }}>
+       {busy?<><LoaderCircle size={15} className="resume-match-spinning"/> 正在分析简历…</>:<><Sparkles size={15}/> 开始 AI 优化</>}
+      </button>
+    :<span className="targeted-resume-unavailable">{!hasSession?'站内登录后可使用 AI 润色':status?'AI 润色尚未开放':'正在检查服务状态…'}</span>}
+  </div>
+  <details className="targeted-resume-ai-settings" open={sourceResume?aiSettingsOpen:legacyPrintQa||aiSettingsOpen}
+   onToggle={event=>{if(sourceResume||!legacyPrintQa)setAiSettingsOpen(event.currentTarget.open)}}>
+   <summary>隐私授权与草稿设置 <ChevronDown size={14}/></summary>
+  {omittedSourceCharacters>0&&<p className="targeted-resume-truncation" role="alert">
+   <strong>这份简历有部分内容未显示。</strong>部分文字超出可编辑或可打印容量，
+   仍有约 {omittedSourceCharacters} 个非空白字符未纳入本次预览。
+   为避免遗漏经历，本次暂不允许保存岗位版本或导出 Word 草稿；请先上传精简或分段整理后的原始简历。
+   原上传文件不会因此被修改。
+  </p>}
+  {hasSession&&(status?.enabled||wholeStatus?.enabled)&&<label className="targeted-resume-consent">
+   <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>
+   <span>我同意将上传简历中可提取的完整文字（用于整份 AI 撰写），或当前选取的简历证据（用于局部优化），连同目标岗位要求发送给平台选定的第三方 AI 服务商。系统会尽力遮盖常见联系方式，但不能保证移除全部个人信息。结果仅作为待本人核实的草稿，不会自动投递，也不会未经确认覆盖原 Word。</span>
+  </label>}
+  {sourceResume&&draftKey&&<section className="targeted-resume-draft-recovery" aria-label="当前标签页草稿保护">
+   <label><input type="checkbox" checked={rememberDraft} onChange={event=>{
+    const enabled=event.target.checked;
+    if(!enabled)discardSessionDraft();
+    else {
+     setDraftExpiresAt(Date.now()+6*60*60*1000);setRememberDraft(true);
+     setDraftStatus('已授权在本标签页保留文字草稿，6 小时后自动失效。');
+    }
+   }}/>
+    在此标签页自动保留未完成的文字草稿（最多 6 小时）
+   </label>
+   <small>仅保存文字建议，不保存 Word 原文件；不会自动上传至其他服务。共享设备请关闭此选项。</small>
+   {recoverableDraft&&<div className="targeted-resume-draft-recovery-actions">
+    <strong>找到上次未完成的草稿</strong>
+    <button type="button" onClick={restoreSessionDraft}>恢复草稿</button>
+    <button type="button" onClick={discardSessionDraft}>删除草稿</button>
+   </div>}
+   {draftStatus&&<p role="status">{draftStatus}</p>}
+  </section>}
+  </details>
+ </>;
+ return <section className={'targeted-resume'+(sourceResume?' is-word-first':'')} aria-label="岗位定向简历优化">
+  <div className="targeted-resume-heading">
+   <div><small>简历优化 / 原 Word</small><h3>{job.title_zh||job.title}</h3></div>
+   <span><Sparkles size={13} aria-hidden="true"/> 智能修改</span>
+  </div>
+  {!sourceResume&&legacyPrintQa&&optimizationControls}
+  {sourceResume?<section className={'targeted-resume-word-workspace hhba-word-stage-'+entranceStage}
+   aria-label="原版式 Word 沉浸式 AI 优化舞台">
+   <div className="targeted-resume-word-main">
+    {entranceStage==='entering'&&<p className="hhba-word-arrival-hint" role="status">
+     正在呈现你的原版式简历…
+    </p>}
+    <button type="button" className="hhba-word-quick-actions"
+     aria-label="打开简历 AI 优化操作" aria-expanded={mobileSuggestionsOpen}
+     aria-controls="hhba-word-optimization-tools"
+     onClick={()=>setMobileSuggestionsOpen(open=>!open)}>
+     <Sparkles size={15} aria-hidden="true"/>
+     {wholeBusy?'AI 撰写中…':busy?'AI 分析中…':
+      visualWordSuggestions.length>0?'优化操作':'开始优化'}
+    </button>
+    <OriginalWordViewer key={sourceResume.id+':'+job.id} resume={sourceResume}
+     jobId={job.id} jobTitle={job.company+'-'+(job.title_zh||job.title)}
+     suggestedChanges={confirmedWordChanges}
+     glowActive={entranceStage==='entering'||busy||wholeBusy||wordEditing||
+      visualWordSuggestions.length>0}
+     visualSuggestions={visualWordSuggestions}
+     onVisualSuggestionSelect={id=>{
+      if(id.startsWith('whole-')){
+       setMobileSuggestionsOpen(true);
+      }else{
+       setActiveSuggestionId(id);setOpenSuggestionId(id);
+       setEditingSuggestionId(null);setMobileSuggestionsOpen(true);
+      }
+     }}
+     onVisualSuggestionAction={(id,action,newText,layoutVerified)=>{
+      // OriginalWordViewer calls this only after a saved private Word revision
+      // (accept/edit), or after the candidate explicitly ignores a draft.
+      if(id.startsWith('whole-')){
+       setResolvedWordVisualIds(prev=>prev.includes(id)?prev:[...prev,id]);
+       setNotice(action==='ignored'?'此处保留原文。':
+         layoutVerified?'该处 Word 已通过版式验证并保存。':'该处 Word 已保存，分页需在 Word 中核对。');
+       return;
+      }
+      const item=suggestions.find(s=>s.id===id);
+      if(!item)return;
+      setResolvedWordVisualIds(prev=>prev.includes(id)?prev:[...prev,id]);
+      if(action==='ignored'){
+       setIgnored(prev=>prev.includes(id)?prev:[...prev,id]);
+       setNotice('已忽略此处改写，保留原文。');
+      }else if(action==='edited'){
+       const changed=(newText||'').trim();
+       // The server has already verified/saved the user's custom text.
+       // Never re-apply the earlier AI proposal over the handwritten edit.
+       if(changed){
+        setEditedWordVisualIds(prev=>prev.includes(id)?prev:[...prev,id]);
+        setVersion(prev=>{
+         try{return editResumeBlock(prev,item.blockId,changed);}
+         catch{return prev;}
+        });
+       }
+       setConfirmed(prev=>prev.includes(id)?prev:[...prev,id]);
+       setNotice(layoutVerified?'已按本人编辑的文字保存并核验原 Word 排版。':
+         '已按本人编辑的文字保存原格式 Word，分页仍需核对。');
+      }else{
+       const proposed=(suggestionDrafts[id]??item.proposed).trim();
+       setVersion(prev=>{
+        if(prev.acceptedSuggestionIds.includes(id))return prev;
+        try{return applySuggestion(prev,{...item,proposed},true);}
+        catch{return prev;}
+       });
+       setConfirmed(prev=>prev.includes(id)?prev:[...prev,id]);
+       setNotice(layoutVerified?'已采纳并通过 Word 原版式核验，原上传文件未被覆盖。':
+         '已采纳并保存原格式 Word，原文件未被覆盖；请核对分页。');
+      }
+      setOpenSuggestionId(null);setActiveSuggestionId(null);setEditingSuggestionId(null);
+     }}
+     onRevisionSnapshot={handleWordRevisionSnapshot}
+     onDocumentReady={revealRenderedWord}
+     editPanelHost={wordEditHost} onEditingChange={(editing,inline)=>setWordEditing(editing&&!inline)}
+     onOpenSuggestions={()=>setMobileSuggestionsOpen(true)}
+     onPendingChange={setNativeWordPending}
+     onVerifiedSave={change=>{
+      setVerifiedWordEdits(prev=>[...prev.filter(item=>item.original!==change.original),change]);
+      invalidateScore();
+     }}
+     onVersionMoved={()=>{
+      setVerifiedWordEdits([]);setNativeWordTextDraft(null);
+     }}
+     sessionWordDraft={nativeWordTextDraft}
+     onSessionWordDraftChange={setNativeWordTextDraft}
+     pendingSuggestionCount={pendingSuggestions.length}/>
+   </div>
+   {mobileSuggestionsOpen&&<button type="button"
+    className="hhba-word-tools-scrim" aria-label="关闭 AI 优化操作"
+    onClick={()=>setMobileSuggestionsOpen(false)}/>}
+   <aside id="hhba-word-optimization-tools" className={'targeted-resume-word-assistant'+
+    (mobileSuggestionsOpen?' mobile-open':'')+(wordEditing?' is-word-editing':'')}
+    aria-label={wordEditing?'Word 文字编辑':'AI 优化操作'}>
+    <div className="targeted-resume-word-edit-host" ref={setWordEditHost}/>
+    <div className="targeted-resume-word-review">
+    <button type="button" className="targeted-resume-mobile-rail-close"
+     onClick={()=>setMobileSuggestionsOpen(false)}>返回 Word</button>
+    <section className="hhba-word-match-score" aria-label="目标岗位匹配分与复评">
+     <div className="hhba-word-match-score-head">
+      <div>
+       <span>目标岗位 · {job.company}</span>
+       <strong>{job.title_zh||job.title}</strong>
+      </div>
+      <div className="hhba-word-match-number">
+       <strong>{scoreResult?.supported&&Number.isFinite(scoreResult.original_score)?
+        scoreResult.original_score:Number.isInteger(job.reference_score)?job.reference_score:'—'}</strong>
+       <small>/100</small>
+      </div>
+     </div>
+     <p className="hhba-word-match-score-caption">
+      {scoreResult?.supported?'优化前 · 同规则复评':'原始岗位适配分 · 非录用概率'}
+     </p>
+     {scoreResult?.supported&&Number.isFinite(scoreResult.updated_score)?
+      <div className="hhba-word-match-after" role="status">
+       <span>已保存 Word · 优化后</span>
+       <strong>{scoreResult.updated_score}<small>/100</small></strong>
+       <p>{typeof scoreResult.delta==='number'?
+        (scoreResult.delta>0?'提升 +'+scoreResult.delta:
+         scoreResult.delta<0?'变化 '+scoreResult.delta:'分值未变化'):
+        '已按相同岗位规则核验'} · 仅表示岗位文本匹配表现，不代表录用概率。</p>
+      </div>:
+      <p className="hhba-word-match-await">
+       {!hasVerifiedWordRevision?'完成真实 Word 修改并确认保存后，可重新评估匹配分。':
+        !verifiedWordScore.ok?'已保存的修改无法全部对应原始匹配资料，暂不生成不可靠的新分数。':
+        '已保存第 '+wordRevisionSnapshot!.revision+' 版 Word，可以按原岗位规则复评。'}
+      </p>}
+     {hasVerifiedWordRevision&&scoreStatus?.enabled&&<>
+      {!hasAuditedAtsIdentity&&verifyStatus?.enabled&&!verifiedJob&&<>
+       <label className="hhba-word-match-confirm"><input type="checkbox"
+        checked={consentVerify} onChange={e=>setConsentVerify(e.target.checked)}/>
+        同意核对企业公开的岗位要求
+       </label>
+       <button type="button" className="hhba-word-match-reassess"
+        disabled={!consentVerify||verifying} onClick={()=>void verifyEmployer()}>
+        {verifying?'正在核验岗位…':'核验该岗位以计算真实分数'}
+       </button>
+      </>}
+      {verifiedJob&&!confirmedVerifiedJob&&<label className="hhba-word-match-confirm">
+       <input type="checkbox" checked={confirmedVerifiedJob}
+        onChange={e=>setConfirmedVerifiedJob(e.target.checked)}/>
+       我已确认核验到的是 {verifiedJob.company} 的 {verifiedJob.title}
+      </label>}
+      {(hasAuditedAtsIdentity||confirmedVerifiedJob)&&<>
+       {!scoreResult?.supported&&<label className="hhba-word-match-confirm">
+        <input type="checkbox" checked={confirmReassessment}
+         onChange={e=>setConfirmReassessment(e.target.checked)}/>
+        我确认已保存的 Word 文字真实，使用同一岗位规则复评
+       </label>}
+       <button type="button" className="hhba-word-match-reassess"
+        disabled={!scoreSourceReady||!hasSupportedJob||!confirmReassessment||scoring||
+         Boolean(scoreResult?.supported)}
+        onClick={()=>void reassess()}>
+        {scoreResult?.supported?'本版已完成复评':
+         scoring?'正在核算…':'重新计算匹配分'}
+       </button>
+      </>}
+     </>}
+     {!scoreStatus?.enabled&&<p className="hhba-word-match-reassess-hint">
+      {scoreStatus?'当前环境暂未开放同规则复评，保留原匹配分，不展示猜测的新分数。':
+       '正在检查岗位复评服务…'}
+     </p>}
+     {scoreStatus?.enabled&&!hasAuditedAtsIdentity&&verifyStatus&&!verifyStatus.enabled&&
+      <p className="hhba-word-match-reassess-hint">
+       此岗位暂无法获得可审核的官方职位快照，不能负责任地给出优化后分数。
+      </p>}
+    </section>
+    {optimizationControls}
+    {wholeDraft&&<WholeResumeRewriteReview result={wholeDraft}
+     revealedCount={revealedWholeCount}
+     documentName={details.fullName}
+     onDocumentNameChange={name=>updateDetail('fullName',name)}
+     approved={wholeApproved}
+     processing={wholeBusy}
+     onResume={()=>void resumeWholeRewrite()}
+     onApprove={enabled=>{
+      setWholeApproved(enabled);if(!enabled)setWholeDownloaded(false);
+     }}
+     onRegenerate={answers=>void generateWholeRewrite(answers)}
+     onDownload={()=>{
+      try{
+       downloadWholeRewriteDocx(wholeDraft,job.title_zh||job.title,details);
+       setWholeDownloaded(true);
+       setNotice('已发起完整岗位定向 Word 下载（使用新排版）。原上传 Word 未被修改。');
+      }catch(error){
+       setNotice(error instanceof Error?error.message:'完整简历 Word 生成失败，请重试。');
+      }
+     }}/>}
+    {(suggestions.length>0||busy||wholeBusy)&&<div className="targeted-resume-word-assistant-head">
+     <strong><Sparkles size={15}/> 优化操作</strong>
+     <div className="targeted-resume-word-counts" role="status">
+      <span>待确认 {pendingSuggestions.length}</span><span>已采纳 {acceptedCount}</span><span>保留原文 {ignored.length}</span>
+     </div>
+    </div>}
+    {suggestions.length===0?<p className="targeted-resume-word-empty">
+     {busy?'AI 正在依据目标岗位分析你的真实经历…':'暂无建议，点击「开始 AI 优化」开始。'}</p>:
+     revealedSuggestionCount<suggestions.length&&<p className="targeted-resume-word-reveal" role="status">
+      AI 已完成分析，正在逐条呈现建议 {revealedSuggestionCount}/{suggestions.length}
+     </p>}
+    <details className="hhba-word-suggestion-archive">
+     <summary>其他修改记录与详细核对（{suggestions.length}）</summary>
+    <div className="targeted-resume-word-suggestion-list">
+     {suggestions.slice(0,revealedSuggestionCount).map((item,i)=>{
+      const applied=version.acceptedSuggestionIds.includes(item.id)||editedWordVisualIds.includes(item.id);
+      const rejected=ignored.includes(item.id);
+      const active=activeSuggestionId===item.id;
+      return <section key={item.id} className={'targeted-resume-word-suggestion'+(active?' is-active':'')}>
+       <button type="button" className="targeted-resume-word-suggestion-title"
+        aria-expanded={active} onClick={()=>{setActiveSuggestionId(active?null:item.id);setOpenSuggestionId(active?null:item.id);setEditingSuggestionId(null);}}>
+        <span>{String(i+1).padStart(2,'0')} · {item.action==='request_evidence'?'需补充真实经历':'修改记录'}</span>
+        <small>{editedWordVisualIds.includes(item.id)?'已编辑保存':applied?'已采纳':rejected?'保留原文':'待确认'}</small>
+       </button>
+       {active&&<div className="targeted-resume-word-suggestion-detail">
+        <p className="targeted-resume-word-original"><strong>原文：</strong>{item.original}</p>
+        {!applied&&!rejected?renderSuggestionCard(item):
+         <p className="targeted-resume-word-status">
+          {applied?'已在原 Word 验证并保存此处文字。':
+           '本条保留原文，不进行修改。'}
+         </p>}
+       </div>}
+      </section>
+     })}
+    </div>
+    </details>
+    {confirmedWordChanges.length>0&&<p className="targeted-resume-word-next-step">
+      {confirmedWordChanges.length} 条建议已准备就绪。请点击 Word 对应文字确认。
+     </p>}
+    <details className="targeted-resume-word-privacy">
+     <summary>修改与隐私说明</summary>
+     <p>AI 草稿不会直接覆盖 Word；不能唯一定位的文字或会改变原排版的建议会拒绝保存。</p>
+    </details>
+    </div>
+   </aside>
+  </section>:legacyPrintQa?<>
+  <section className="targeted-resume-document-editor" aria-label="正式简历排版与打印">
+   <div className="targeted-resume-document-heading">
+    <div><strong>直接修改简历</strong>
+     <p>点选对应段落即可修改，所有变更均可撤销。</p>
+    </div>
+    <div className="targeted-resume-document-actions">
+     <button type="button" disabled={!undoStack.length} onClick={undo}><Undo2 size={15}/> 撤销</button>
+     {legacyPrintQa&&<button type="button" disabled={!canExport} onClick={()=>window.print()}><Printer size={15}/> 导出 PDF</button>}
+     <button type="button" disabled={!canExport} onClick={()=>{try{downloadResumeDocx(printDocument,job.title_zh||job.title)}
+      catch{setNotice('Word 草稿导出失败，请稍后再试。')}}}><FileDown size={15}/> 导出 Word 草稿（新排版）</button>
+    </div>
+   </div>
+   <div className="targeted-resume-document-fields">
+    <label>姓名 <input maxLength={80} value={details.fullName} placeholder="请填写本人真实姓名" onChange={e=>updateDetail('fullName',e.target.value)}/></label>
+    <label>职业标题 <input maxLength={120} value={details.headline} placeholder="例如：区域运营督导" onChange={e=>updateDetail('headline',e.target.value)}/></label>
+    <label>联系邮箱 <input type="email" maxLength={120} value={details.email} placeholder="自行填写" onChange={e=>updateDetail('email',e.target.value)}/></label>
+    <label>联系电话 <input type="tel" maxLength={60} value={details.phone} placeholder="自行填写" onChange={e=>updateDetail('phone',e.target.value)}/></label>
+    <label>所在地区 <input maxLength={120} value={details.location} placeholder="城市 / 地区" onChange={e=>updateDetail('location',e.target.value)}/></label>
+    <label className="wide">教育信息补充 <textarea rows={2} maxLength={600} value={details.educationDetails}
+     placeholder="院校、专业、就读时间等，以真实经历为准"
+     onChange={e=>updateDetail('educationDetails',e.target.value)}/></label>
+    <label className="wide">职业概述 <textarea rows={3} maxLength={800} value={details.summary}
+     placeholder="用自己的真实工作经历和求职方向概括优势"
+     onChange={e=>updateDetail('summary',e.target.value)}/></label>
+   </div>
+   <p className="targeted-resume-print-note">此处用于核对 AI 文字建议，下载的 Word 草稿会重新排版，并非上传文件的原样式。需要保留字体和版式，请到 <Link to="/candidate/account/resume">我的简历</Link> 编辑原 Word；通过验证后，可下载 Word 和由 Word 转换的 PDF。</p>
+   {!canExport&&<p className="targeted-resume-print-note" role="status">请填写真实姓名、确认简历内容完整，并保存正在编辑的段落，才可以下载 Word 草稿。</p>}
+  </section>
+  <div className={'targeted-resume-live-paper hhba-siri-edge'+
+    ((openSuggestionId||editingBlock)?' hhba-siri-edge-active':'')}
+    aria-label="可原位编辑的简历预览">
+   <ResumePrintSheet document={printDocument} renderBlock={renderEditableBlock}/>
+  </div>
+  </>:<section className="targeted-resume-word-onboarding" role="status">
+   <strong>先使用原 Word，才能保留你的字体和版式</strong>
+   <p>这份简历尚未保存到「我的简历」。请先完成上方私有保存授权，再从原 Word 页面确认 AI 的修改建议。不会生成另一份冒充原排版的简历。</p>
+   <Link to="/candidate/account/resume">前往我的简历</Link>
+  </section>}
+  {!sourceResume&&legacyPrintQa&&before.score!==null&&<div className="targeted-resume-audit" aria-label="文字证据覆盖变化">
+   <div><small>优化前 · 要求文字覆盖</small><strong>{before.score}%</strong></div>
+   <span aria-hidden="true">→</span>
+   <div><small>当前版本 · 要求文字覆盖</small><strong>{after.score}%</strong></div>
+   <p>按现有岗位卡片列出的 {before.total} 条要求计算文字相似度，仅用于检查表达是否更清楚；不是岗位匹配分、任职资格判断或录用概率。需人工核实建议的事实依据。</p>
+   {after.missing.length>0&&<details><summary>仍未充分体现的要求（{after.missing.length}）</summary>
+    <ul>{after.missing.map((label,index)=><li key={index}>{label}</li>)}</ul></details>}
+  </div>}
+  {!sourceResume&&legacyPrintQa&&<section className="targeted-resume-reassess" aria-label="岗位匹配评分复评">
+   <div className="targeted-resume-reassess-heading">
+    <div><strong>重新查看匹配分</strong>
+     <p>只有核实了企业发布的岗位要求后，才会比较修改前后的分数。</p></div>
+    {scoreStatus?.enabled&&<button type="button" onClick={reassess} disabled={!hasSupportedJob||!hasWordingChanges||!confirmReassessment||scoring}>
+     {scoring?'正在复评…':'重新计算匹配分'}</button>}
+   </div>
+   {!hasAuditedAtsIdentity&&verifyStatus?.enabled&&
+    <div className="targeted-resume-verify">
+     <div><strong>确认目标岗位</strong>
+      <p>先确认企业的真实招聘信息，检查时不会把简历发给企业。</p>
+     </div>
+     {!verifiedJob&&<label className="targeted-resume-confirm">
+      <input type="checkbox" checked={consentVerify} onChange={e=>setConsentVerify(e.target.checked)}/>
+      我同意读取企业公开的岗位要求，用于核对匹配分。
+     </label>}
+     {!verifiedJob&&<button type="button" disabled={!consentVerify||verifying} onClick={verifyEmployer}>
+      {verifying?'正在读取企业岗位…':'确认岗位信息'}
+     </button>}
+     {verifiedJob&&<div className="targeted-resume-verified-job">
+      <p><strong>找到的岗位：</strong>{verifiedJob.company} · {verifiedJob.title} · {verifiedJob.location}</p>
+      <a href={verifiedJob.official_url} target="_blank" rel="noopener noreferrer">查看已核验职位详情</a>
+      <p>{verifiedJob.disclaimer}</p>
+      <label className="targeted-resume-confirm">
+       <input type="checkbox" checked={confirmedVerifiedJob}
+        onChange={e=>{setConfirmedVerifiedJob(e.target.checked);invalidateScore();}}/>
+       我确认这就是我要针对的岗位，并已核对企业名称、标题及工作地点。
+      </label>
+     </div>}
+    </div>}
+   {!scoreStatus?.enabled&&<p className="targeted-resume-reassess-unavailable">暂时无法重新评分，但可以继续修改简历。</p>}
+   {scoreStatus?.enabled&&<label className="targeted-resume-confirm">
+    <input type="checkbox" checked={confirmReassessment} onChange={e=>setConfirmReassessment(e.target.checked)}/>
+    我确认简历内容真实，并同意使用本次修改后的内容重新评分。
+   </label>}
+   {scoreStatus?.enabled&&!hasAuditedAtsIdentity&&!hasSupportedJob&&
+    <p className="targeted-resume-reassess-unavailable">暂时无法核实这份岗位要求，可以继续修改简历，但不能生成新的匹配分。</p>}
+   {scoreStatus?.enabled&&hasSupportedJob&&!hasWordingChanges&&<p className="targeted-resume-reassess-unavailable">请先编辑或填充一条简历内容，才需要重新评分。</p>}
+   {scoreResult?.supported&&typeof scoreResult.original_score==='number'&&typeof scoreResult.updated_score==='number'&&
+    <div className="targeted-resume-score-comparison">
+     <div><small>修改前</small><strong>{scoreResult.original_score}<span>/100</span></strong></div>
+     <div><small>修改后</small><strong>{scoreResult.updated_score}<span>/100</span></strong></div>
+     <p>差值：{scoreResult.delta&&scoreResult.delta>0?'+':''}{scoreResult.delta} 分。岗位：{scoreResult.verified_job_title} · {scoreResult.verified_company}</p>
+     {scoreResult.source_label&&<p>岗位来源：{scoreResult.source_label}；仍需在官网确认是否继续开放投递。</p>}
+     {scoreResult.selected_job_as_target_direction&&<p>因首次匹配未提供可核实的职业目标，本次将你选定的岗位视为求职意向，不视为已经具备该岗位的任职能力。</p>}
+     {scoreResult.newly_visible_terms&&scoreResult.newly_visible_terms.length>0&&
+      <p>文字新增体现：{scoreResult.newly_visible_terms.join('、')}。这些技能仍需以你的真实经历为依据。</p>}
+     <details><summary>查看评分维度</summary>
+      <table><thead><tr><th>维度</th><th>修改前</th><th>修改后</th></tr></thead>
+       <tbody>{(['role','skills','experience','education','location'] as const).map(dim=><tr key={dim}>
+        <td>{{role:'岗位方向',skills:'岗位技能',experience:'工作经验',education:'学历',location:'地点'}[dim]}</td>
+        <td>{scoreResult.before_breakdown?.[dim]??'—'}</td><td>{scoreResult.after_breakdown?.[dim]??'—'}</td>
+       </tr>)}</tbody>
+      </table>
+     </details>
+     <p className="targeted-resume-score-disclaimer">{scoreResult.important_notice}</p>
+    </div>}
+  </section>}
+  {!sourceResume&&legacyPrintQa&&<div className="targeted-resume-save">
+   <div><strong><FolderOpen size={16} aria-hidden="true"/> 我的岗位简历版本</strong>
+    <p>仅在你主动保存后，将当前已确认的文字片段保存在 HHBA 私人账号中；不保存原始 PDF/DOCX。</p></div>
+   {hasSession&&storageReady&&<button type="button" disabled={saving||!confirmReal||!canPrint} onClick={persist}>
+    <Save size={14} aria-hidden="true"/>{saving?'保存中…':'保存当前版本'}</button>}
+   {hasSession&&!storageReady&&<span className="targeted-resume-unavailable">暂时无法保存，请稍后再试</span>}
+  </div>}
+  {!sourceResume&&legacyPrintQa&&hasSession&&storageReady&&<label className="targeted-resume-confirm targeted-resume-save-confirm">
+   <input type="checkbox" checked={confirmReal} onChange={e=>setConfirmReal(e.target.checked)}/>
+   我已核实当前简历的全部文字及个人联系方式真实准确，理解点击保存后这些资料会保存在我的 HHBA 云端账户，直到我主动删除或按平台数据政策处理。
+  </label>}
+  {!sourceResume&&legacyPrintQa&&saved.length>0&&<div className="targeted-resume-history">
+   {saved.map(item=><div key={item.id}>
+    <span>{new Date(item.created_at).toLocaleString()} · {item.version.acceptedSuggestionIds.length} 条已采纳</span>
+    <button type="button" onClick={()=>restore(item)}>载入</button>
+    <button type="button" onClick={()=>remove(item)}>删除</button>
+   </div>)}
+  </div>}
+  {!sourceResume&&legacyPrintQa&&<div className="targeted-resume-footer">
+   <p><ShieldCheck size={14} aria-hidden="true"/> 原来的参考分：{Number.isInteger(job.reference_score)?job.reference_score+'/100':'暂无可靠分数'}。润色后的匹配分须通过同一评分规则重新评估；评分仅供参考。</p>
+   <button type="button" onClick={reset}><Undo2 size={14}/> 恢复原稿</button>
+  </div>}
+  {notice&&<p role="status" className="targeted-resume-notice">{notice}</p>}
+  {legacyPrintQa&&createPortal(<div className="hhba-print-host" data-hhba-print-host="resume">
+    <ResumePrintSheet document={printDocument}/>
+   </div>,document.body)}
+ </section>;
+}

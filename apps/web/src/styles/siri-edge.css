@@ -1,0 +1,162 @@
+/* HHBA Siri-inspired ambient edge light. A four-sided, subdued rainbow glow,
+   NOT a large solid-color popup border. Shared by original PDF + AI editing.
+   The glow is visual only: it never affects content, print or PDF exports. */
+@property --hhba-siri-angle {
+ syntax: "<angle>";
+ initial-value: 0deg;
+ inherits: false;
+}
+.hhba-siri-edge {
+ position: relative;
+ isolation: isolate;
+ border-radius: 13px;
+}
+/* Bleed outside all four edges, rather than cover the underlying resume. */
+.hhba-siri-edge.hhba-siri-edge-active::before,
+.hhba-siri-edge.hhba-siri-edge-active::after {
+ content: "";
+ position: absolute;
+ pointer-events: none;
+ border-radius: inherit;
+ background: conic-gradient(from var(--hhba-siri-angle) at 50% 50%,
+  #38cbe8 0deg,#66aafa 45deg,#a67bfa 105deg,
+  #e97dcc 162deg,#ffa26f 225deg,#79d3ef 288deg,#38cbe8 360deg);
+ animation: hhba-siri-edge-flow 18s linear infinite;
+}
+.hhba-siri-edge.hhba-siri-edge-active::before {
+ inset: -6px;
+ z-index: -1;
+ opacity: .66;
+ filter: blur(14px);
+}
+.hhba-siri-edge.hhba-siri-edge-active::after {
+ inset: -2px;
+ z-index: 3;
+ padding: 2px;
+ opacity: .86;
+ -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+ -webkit-mask-composite: xor;
+ mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+ mask-composite: exclude;
+}
+@keyframes hhba-siri-edge-flow {
+ to { --hhba-siri-angle: 360deg; }
+}
+/* No flashing or moving glow when reduced motion is requested. */
+@media (prefers-reduced-motion: reduce) {
+ .hhba-siri-edge.hhba-siri-edge-active::before,
+ .hhba-siri-edge.hhba-siri-edge-active::after {
+  animation: none !important;
+  --hhba-siri-angle: 24deg;
+ }
+}
+/* No AI editing aura in any exported or printed document. */
+@media print {
+ .hhba-siri-edge::before,
+ .hhba-siri-edge::after { display: none !important; }
+}
+
+/* Siri-inspired color is ONLY for unconfirmed AI suggestions and in-progress
+   edits. Once a user confirms/saves, remove this class and render native styles. */
+.hhba-resume-siri-letters{
+ display:inline-block;
+ max-width:100%;
+ color:#465daa;
+ background-image:linear-gradient(105deg,
+  #009cc2 0%,#3a7fe6 17%,#8351d5 36%,
+  #c84f9f 55%,#de7958 74%,#16b5cd 100%);
+ background-size:175% 100%;
+ background-position:6% 50%;
+ background-repeat:no-repeat;
+ -webkit-background-clip:text;
+ background-clip:text;
+ -webkit-text-fill-color:transparent;
+ animation:hhba-resume-siri-letters-flow 11s ease-in-out infinite alternate;
+}
+/* Real document glyphs: the mask is generated from PDF.js rasterized text,
+   not a guessed replacement font. Screen blend colors dark ink without
+   covering surrounding page content or changing the saved DOCX/PDF. */
+.hhba-original-resume-siri-ink{
+ position:absolute;
+ z-index:1;
+ pointer-events:none;
+ border:0;
+ background-image:linear-gradient(105deg,
+  #009cc2 0%,#3a7fe6 17%,#8351d5 36%,
+  #c84f9f 55%,#de7958 74%,#16b5cd 100%);
+ background-size:175% 100%;
+ background-position:6% 50%;
+ mix-blend-mode:screen;
+ animation:hhba-resume-siri-letters-flow 11s ease-in-out infinite alternate;
+}
+@keyframes hhba-resume-siri-letters-flow{
+ from{background-position:6% 50%}
+ to{background-position:94% 50%}
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-resume-siri-letters,.hhba-original-resume-siri-ink{
+  animation:none!important;
+  background-position:42% 50%;
+ }
+}
+@media print{
+ .hhba-original-resume-siri-ink{display:none!important}
+}
+
+/* Reuse a quiet, compact draft-preview style in both original-file editing
+   and the normalized job-optimization editor, across desktop and mobile. */
+.hhba-resume-pending-text{
+ margin:6px 0 1px;
+ padding:7px 9px;
+ max-height:95px;
+ overflow-y:auto;
+ background:#fbfcff;
+ border:1px solid #e5e9f1;
+ border-radius:8px;
+ font-size:13px;
+ line-height:1.6;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+.hhba-resume-pending-text .hhba-resume-siri-letters{
+ display:inline;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+@media print{
+ .hhba-resume-pending-text{display:none!important}
+}
+
+/* Typed draft letters themselves animate in Siri colors. No duplicate
+   suggestion block: the editable field retains its real caret, selection,
+   keyboard/IME handling and scroll position. Unsupported engines simply
+   keep their regular text color. */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+ textarea.hhba-siri-typing{
+  color:#28415e;
+  caret-color:#24344c;
+  background-image:linear-gradient(105deg,
+   #009cc2 0%,#3a7fe6 17%,#8351d5 36%,
+   #c84f9f 55%,#de7958 74%,#16b5cd 100%);
+  background-size:175% 100%;
+  background-position:6% 50%;
+  background-repeat:no-repeat;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:hhba-resume-siri-letters-flow 11s ease-in-out infinite alternate;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ textarea.hhba-siri-typing{
+  animation:none!important;
+  background-position:42% 50%;
+ }
+}
+@media print{
+ textarea.hhba-siri-typing{
+  animation:none!important;
+  background:none!important;
+  -webkit-text-fill-color:currentColor!important;
+ }
+}

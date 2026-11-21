@@ -146,6 +146,28 @@ export async function onRequest({request,env}){
      }
     });
    }
+   // Erase all user-owned original and job-specific Word revisions together.
+   if(row.media_type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'){
+    if(typeof bucket.list!=='function')return err('PRIVATE_STORAGE_NOT_ENABLED',503);
+    const storedHash=await db.prepare(
+     'SELECT sha256 FROM hhba_candidate_resumes WHERE phone=? AND id=?'
+    ).bind(phone,id).first();
+    if(!storedHash?.sha256)return err('RESUME_DELETE_UNAVAILABLE',503);
+    const wordPrefix=row.storage_key+'.hhba-word-preserved-v1-'+storedHash.sha256;
+    let cursor,passes=0;
+    do{
+     if(++passes>8)throw Error('WORD_ARTIFACT_LIST_TOO_LARGE');
+     const page=await bucket.list({prefix:wordPrefix,limit:1000,...(cursor?{cursor}:{})});
+     if(page.truncated&&!page.cursor)throw Error('WORD_ARTIFACT_LIST_INCOMPLETE');
+     for(const object of page.objects||[]){
+      if(!object.key.startsWith(wordPrefix))throw Error('WORD_ARTIFACT_LIST_INVALID');
+      await bucket.delete(object.key);
+     }
+     cursor=page.truncated?page.cursor:null;
+    }while(cursor);
+   }
+   await bucket.delete(row.storage_key+'.hhba-vision-layout-v1.json').catch(()=>{});
+   await bucket.delete(row.storage_key+'.hhba-page-edits-v1.json').catch(()=>{});
    await bucket.delete(row.storage_key);
    const deleted=await db.prepare(
     'DELETE FROM hhba_candidate_resumes WHERE phone=? AND id=?'

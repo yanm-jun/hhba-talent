@@ -1,19 +1,55 @@
-import {useEffect,useRef,type KeyboardEvent} from 'react';
+import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
-import {ArrowUpRight,BriefcaseBusiness,MapPin,Wallet,X,Search} from 'lucide-react';
+import {ArrowUpRight,BriefcaseBusiness,MapPin,Wallet,X,Search,Sparkles} from 'lucide-react';
 import type {MatchResponse} from '../services/resumeMatch';
+import type {PrivateResume} from '../services/privateResumes';
+import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
+// Load Siri/Word only after a candidate explicitly chooses a job, so the
+// existing search-results dialog retains its original performance and look.
+const TargetedResumeOptimization=lazy(()=>import('./TargetedResumeOptimization')
+ .then(x=>({default:x.TargetedResumeOptimization})));
 import {Link} from '../router';
 import '../styles/resume-match-dialog.css';
 
 // Search-first evidence governs links; server scores and ranks. Never present a score as an offer probability.
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage}:{
+export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage,sourceText,sourceResume,accountScope}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
-  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'>>;
- onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction
+  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'|'profile'>>;
+ onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction;
+ sourceText?:string;sourceResume?:PrivateResume;accountScope?:string
 }){
  const ref=useRef<HTMLDivElement|null>(null);
+ const [optimizedJobId,setOptimizedJobId]=useState<string|null>(null);
+ const [optimizationDirty,setOptimizationDirty]=useState(false);
+ const matchListScroll=useRef(0);
+ const activeJob=result.matches.find(job=>job.id===optimizedJobId);
+ const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
+ function asTargetJob(job:MatchResponse['matches'][number]):JobMatch{
+  return {
+   id:job.id,company:job.company,title:job.title,title_zh:job.title_zh||null,
+   location:job.location,official_url:job.official_url,platform:job.platform,
+   remote:job.remote,reference_score:Number.isInteger(job.match_score)?job.match_score!:job.reference_score,
+   matched:job.matched||[],not_evidenced:job.not_evidenced||[],
+   needs_verification:job.needs_verification||[],
+   requirements_basis:job.requirements_basis||job.score_basis||''
+  };
+ }
+ // The result list is never searched again on return. Preserve scroll and
+ // the exact result object from the original matching session.
+ useLayoutEffect(()=>{
+  const viewport=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content');
+  if(viewport)viewport.scrollTop=optimizedJobId?0:matchListScroll.current;
+ },[optimizedJobId]);
+ function backToMatches(){
+  if(optimizationDirty&&!window.confirm('这份岗位简历有尚未保存的文字草稿。返回后草稿可能丢失，确定返回岗位匹配结果吗？'))return;
+  setOptimizationDirty(false);setOptimizedJobId(null);
+ }
+ function handleClose(){
+  if(optimizedJobId){backToMatches();return}
+  onClose();
+ }
  useEffect(()=>{
   const overflow=document.body.style.overflow;
   const trigger=document.activeElement instanceof HTMLElement?document.activeElement:null;
@@ -21,10 +57,10 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
   return()=>{document.body.style.overflow=overflow;trigger?.focus()};
  },[]);
  function handleKey(event:KeyboardEvent<HTMLDivElement>){
-  if(event.key==='Escape'){event.preventDefault();onClose();return}
+  if(event.key==='Escape'){event.preventDefault();handleClose();return}
   if(event.key!=='Tab'||!ref.current)return;
   const focusable=Array.from(ref.current.querySelectorAll<HTMLElement>(
-   'button:not([disabled]),a[href]'
+   'button:not([disabled]),a[href],input:not([disabled]),textarea:not([disabled]),select:not([disabled])'
   )).filter(el=>el.getClientRects().length>0);
   if(!focusable.length)return;
   const first=focusable[0],last=focusable[focusable.length-1];
@@ -33,19 +69,56 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
   }else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
  }
  return createPortal(
-  <div className="hhba-match-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)onClose()}}>
-   <div className="hhba-match-modal" role="dialog" aria-modal="true" tabIndex={-1}
+  <div className="hhba-match-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)handleClose()}}>
+   <div className={'hhba-match-modal'+(optimizedJobId?' hhba-match-modal-editor':'')} role="dialog" aria-modal="true" tabIndex={-1}
     ref={ref} onKeyDown={handleKey} aria-labelledby="hhba-native-title">
     <header className="hhba-match-modal-head">
      <div className="hhba-match-modal-brand">
       <span className="hhba-match-modal-symbol"><BriefcaseBusiness size={19}/></span>
       <div><strong>汇方职场 · HHBA</strong><small>DeepSeek Search + V4 Pro 智能岗位推荐</small></div>
      </div>
-     <button type="button" className="hhba-match-modal-close" onClick={onClose} aria-label="关闭推荐">
+     <button type="button" className="hhba-match-modal-close" onClick={handleClose} aria-label="关闭推荐">
       <X size={19}/>
      </button>
     </header>
-    <div className="hhba-match-modal-content">
+    <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobId?'optimization':'matches'}>
+     {activeJob&&parsedProfile?
+      <section className="hhba-match-workspace" aria-label="岗位专属简历优化">
+       <button type="button" className="hhba-match-workspace-back" onClick={backToMatches}>
+        返回岗位匹配结果
+       </button>
+       <div className="hhba-match-selected-job">
+        <div><span>针对已选岗位定向优化</span>
+         <h2 id="hhba-native-title">{activeJob.title_zh||activeJob.title}</h2>
+         <p>{activeJob.company} · {activeJob.location}</p>
+        </div>
+        <div className="hhba-match-selected-score">
+         <strong>{Number.isInteger(activeJob.match_score)?activeJob.match_score:'—'}<small>/100</small></strong>
+         <span>原简历适配分 · 非录用概率</span>
+        </div>
+       </div>
+       {!sourceResume&&<div className="hhba-match-word-note" role="note">
+        当前可以核对岗位定向优化内容。原 Word 版式编辑和独立的 DOCX/PDF 修订，
+        需要先在「我的简历」私有保存 DOCX 原文件；不会擅自创建另一种排版。
+        {resumeStorage?.available&&<div className="hhba-match-save-resume">
+         <label><input type="checkbox" checked={resumeStorage.consent} disabled={resumeStorage.saving}
+          onChange={e=>resumeStorage.onConsent(e.target.checked)}/>
+          我同意将原文件保存在当前账户的私有简历库。</label>
+         <button type="button" disabled={!resumeStorage.consent||resumeStorage.saving}
+          onClick={resumeStorage.onSave}>{resumeStorage.saving?'正在保存…':'私有保存原简历'}</button>
+         {resumeStorage.notice&&<p role="status">{resumeStorage.notice}</p>}
+        </div>}
+       </div>}
+       <Suspense fallback={<p role="status" className="hhba-match-optimizer-loading">正在打开简历优化工作区…</p>}>
+        <TargetedResumeOptimization key={activeJob.id} profile={parsedProfile}
+         job={asTargetJob(activeJob)} sourceText={sourceText}
+         accountScope={accountScope} sourceResume={sourceResume}
+         onDraftDirtyChange={setOptimizationDirty}/>
+       </Suspense>
+       <p className="hhba-match-apply-last">
+        处理完简历后可返回原岗位匹配结果，在原卡片上前往企业官网自行投递。
+       </p>
+      </section>:<>
      <div className="hhba-match-intro">
       <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> AI 搜索真实岗位并匹配简历</span>
       <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
@@ -85,6 +158,13 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
            {Number.isInteger(job.match_score)?
             <><strong>{job.match_score}<small>/100</small></strong><span>简历适配分</span></>:
             <><strong className="hhba-native-score-na">—</strong><span>待补充证据</span></>}
+           {!pending&&Number.isInteger(job.match_score)&&<button type="button"
+             className="hhba-native-optimize" onClick={()=>{
+              matchListScroll.current=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content')?.scrollTop||0;
+              setOptimizationDirty(false);setOptimizedJobId(job.id);
+             }} aria-label={'针对'+(job.title_zh||job.title)+'优化简历'}>
+             <Sparkles size={13} aria-hidden="true"/> 优化简历
+            </button>}
           </div>
          </div>
          {job.score_basis&&Number.isInteger(job.match_score)&&
@@ -113,10 +193,11 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
      {!pending&&resumeStorage?.saved&&<p className="hhba-match-saved-resume">已选择账户中保存的简历，可在「我的简历」中继续管理。</p>}
      {resumeStorage?.notice&&<p className="hhba-match-saved-resume" role="status">{resumeStorage.notice}</p>}
      <p className="hhba-match-disclaimer">{result.disclaimer||'职位信息由 DeepSeek 联网检索提供，HHBA 未逐条人工复核。岗位是否仍开放、任职要求及薪资以原始网页为准；不会自动投递。'}</p>
+     </>}
     </div>
     <footer className="hhba-match-modal-foot">
      <span>HHBA · 让机会与人才，找到彼此。</span>
-     <button className="hhba-match-done" type="button" onClick={onClose}>完成查看</button>
+     <button className="hhba-match-done" type="button" onClick={handleClose}>{optimizedJobId?'返回匹配结果':'完成查看'}</button>
     </footer>
    </div>
   </div>,document.body);

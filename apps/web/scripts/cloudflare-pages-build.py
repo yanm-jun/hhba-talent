@@ -39,6 +39,17 @@ def main() -> None:
     wf = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
     steps = wf["jobs"]["build"]["steps"]
 
+    # This integration must preserve the currently deployed matching popup,
+    # score evidence, and PDF/DOCX upload flow. Fail before media generation
+    # or deploy if either the UI or the job-isolated Word service regresses.
+    if os.environ.get("CF_PAGES_BRANCH") == "feature/match-dialog-preserve-siri-20261121":
+        run(["node", "--experimental-strip-types", "--test",
+             "scripts/match-siri-preserve.contract.test.mjs",
+             "scripts/resume-word.route.test.mjs",
+             "scripts/resume-docx-preserve.contract.test.mjs",
+             "scripts/resume-optimization.route.test.mjs"], cwd=WEB)
+        print("HHBA_ORIGINAL_MATCH_POPUP_AND_SIRI_INTEGRATION_TESTS_PASSED=1", flush=True)
+
     # Reuse only the same published media preparation scripts from the
     # canonical workflow. Do not copy out stale assets or mutate source Git.
     prep = []

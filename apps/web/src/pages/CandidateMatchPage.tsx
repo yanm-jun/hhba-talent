@@ -39,6 +39,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [error,setError]=useState('');
 
  const [result,setResult]=useState<MatchResponse|null>(null);
+ const [optimizationSource,setOptimizationSource]=useState('');
  const controller=useRef<AbortController|null>(null);
  useEffect(()=>{
   const abort=new AbortController();
@@ -75,14 +76,14 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   if(working)return;
   previewController.current?.abort();
   setPreviewText('');setPreviewLoaded(false);setConsent(false);
-  setSavedId(id);setFile(null);setResult(null);setPartialJobs([]);
+  setSavedId(id);setFile(null);setResult(null);setPartialJobs([]);setOptimizationSource('');
   setError('');setSaveConsent(false);setSaveNotice('');
   setStorageChoice('undecided');setSavedPickerOpen(false);
  }
  function choose(candidate:File|null){
   setSavedPickerOpen(false);
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);
-  setError('');setResult(null);setSaveConsent(false);setSaveNotice('');
+  setError('');setResult(null);setOptimizationSource('');setSaveConsent(false);setSaveNotice('');
   setStorageChoice('undecided');
   if(!candidate){setFile(null);return}
   if(!/\.(pdf|docx)$/i.test(candidate.name)||!candidate.size||candidate.size>maxResumeSize){
@@ -132,7 +133,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  async function run(){
   if((!file&&!savedId)||!consent||working||previewBusy||availability!=='ready'||!getRealAuthToken()||
    (file&&!savedId&&storageChoice==='undecided'))return;
-  setWorking(true);setStage('preparing');setError('');setResult(null);setPartialJobs([]);
+  setWorking(true);setStage('preparing');setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);
   const abort=new AbortController();
   controller.current=abort;
   try{
@@ -162,6 +163,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    if(previewLoaded){
     // Once the user has reviewed/edited text, NEVER fall back to re-reading the unedited file.
     matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,matchResumeId||undefined,setStage,setPartialJobs);
+    setOptimizationSource(previewText);
    }else{
     let selected=selectedFile;
     if(!selected&&matchResumeId){
@@ -172,7 +174,10 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
      selected=new File([bytes],entry.name,{type:entry.type});
     }
     if(!selected)throw new MatchError(400,'请选择简历。');
-    matched=await submitResumeForMatching(selected,options,consent,abort.signal,matchResumeId||undefined,setStage,setPartialJobs);
+    // Preserve existing match flow and avoid a second extraction:
+    // the existing service exposes the exact locally reviewed text only to
+    // this session through a new optional callback, never to a new page.
+    matched=await submitResumeForMatching(selected,options,consent,abort.signal,matchResumeId||undefined,setStage,setPartialJobs,setOptimizationSource);
    }
    setResult(matched);setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
@@ -298,6 +303,9 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     {(result||partialJobs.length>0)&&<CandidateMatchNativeDialog
       result={result||{matches:partialJobs}}
       pending={working&&!result} notice={working?'':error}
+      sourceText={result?optimizationSource:undefined}
+      sourceResume={result&&savedId?savedFiles.find(item=>item.id===savedId&&/\.docx$/i.test(item.name)):undefined}
+      accountScope={String(user?.id||'')}
       resumeStorage={result&&file&&!savedId?{
         available:true,saved:false,consent:saveConsent,saving:saveBusy,
         notice:saveNotice,onConsent:setSaveConsent,onSave:()=>void saveResume()

@@ -1,0 +1,22 @@
+name: HHBA Word remote Preview HTTP smoke
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/hhba-word-remote-preview-smoke.yml'
+      - 'apps/web/scripts/qa_word_preview_online.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  remote-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    env:
+      HHBA_WORD_PREVIEW_TEST_URL: https://2c0282d4.hhba-talent.pages.dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check exact new opt-in Preview deployment with no user credentials
+        run: node apps/web/scripts/qa_word_preview_online.mjs

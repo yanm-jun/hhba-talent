@@ -40,7 +40,11 @@ function fixture(){
  const bucket={
   async put(key,bytes){objects.set(key,Buffer.from(bytes));},
   async get(key){const bytes=objects.get(key);return bytes?{body:new Blob([bytes]).stream()}:null;},
-  async delete(key){objects.delete(key);}
+  async delete(key){objects.delete(key);},
+  async list({prefix='',limit=1000}={}){
+   const keys=[...objects.keys()].filter(key=>key.startsWith(prefix));
+   return {objects:keys.slice(0,limit).map(key=>({key})),truncated:false};
+  }
  };
  const db={prepare(sql){return {bind(...args){return {
   async first(){
@@ -49,6 +53,9 @@ function fixture(){
    if(sql.includes('SELECT COUNT(*) AS n FROM hhba_candidate_resumes'))return {n:[...resumes.values()].filter(r=>r.phone===args[0]).length};
    if(sql.includes('SELECT COUNT(*) AS n FROM hhba_candidate_resume_upload_events'))return {n:events.filter(e=>e.phone===args[0]&&e.created_at>=args[1]).length};
    if(sql.startsWith('SELECT id FROM hhba_candidate_resumes WHERE phone=? AND sha256=?'))return [...resumes.values()].find(r=>r.phone===args[0]&&r.sha256===args[1])||null;
+   if(sql.startsWith('SELECT sha256 FROM hhba_candidate_resumes WHERE phone=? AND id=?')){
+    const row=resumes.get(args[1]);return row?.phone===args[0]?{sha256:row.sha256}:null;
+   }
    if(sql.includes('SELECT id,filename,media_type,size_bytes,storage_key FROM hhba_candidate_resumes'))return [...resumes.values()].find(r=>r.phone===args[0]&&r.id===args[1])||null;
    throw Error('Unexpected SELECT '+sql);
   },
@@ -174,6 +181,23 @@ test('duplicate and quota protection cannot be bypassed by changing file names',
  assert.equal((await invoke(f,'',PHONE_A,'POST',another,{filename:'four.pdf'})).response.status,409);
  assert.equal(f.objects.size,3);
  assert.equal((await invoke(f,'',PHONE_B)).payload.items.length,0);
+});
+
+test('deleting private DOCX removes all associated job-specific Word/PDF revisions, never another file',async()=>{
+ const f=fixture(),docx=createDocx();
+ const upload=await invoke(f,'',PHONE_A,'POST',docx,{filename:'source.docx',mime:docxMime});
+ assert.equal(upload.response.status,201);
+ const id=upload.payload.item.id,sourceKey=[...f.objects.keys()][0];
+ const prefix=sourceKey+'.hhba-word-preserved-v1-'+sha(docx);
+ const artifacts=[prefix+'.json',prefix+'.job-abc123.json',prefix+'.job-abc123.1.docx',
+  prefix+'.job-def456.json',prefix+'.job-def456.1.pdf'];
+ for(const key of artifacts)f.objects.set(key,Buffer.from('synthetic private revision'));
+ f.objects.set('other-candidate/private-original.docx',Buffer.from('unrelated private content'));
+ assert.equal((await invoke(f,'/'+id,PHONE_B,'DELETE')).response.status,404);
+ assert.equal(f.objects.size,artifacts.length+2,'other owner cannot remove this original or its revisions');
+ assert.equal((await invoke(f,'/'+id,PHONE_A,'DELETE')).response.status,200);
+ assert.deepEqual([...f.objects.keys()],['other-candidate/private-original.docx']);
+ assert.equal(f.resumes.size,0);
 });
 test('daily upload ledger persists after file removal',async()=>{
  const f=fixture();

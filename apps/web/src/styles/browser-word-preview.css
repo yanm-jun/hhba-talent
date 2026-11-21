@@ -1,0 +1,28 @@
+/* The local DOCX-to-HTML preview intentionally does not claim identical
+   Microsoft Word layout or verified pagination. The same Siri overlay runs
+   above both the browser preview and the optional renderer-verified PDF. */
+.hhba-browser-word-disclaimer{margin:6px 8px 12px;color:#74638b;
+ font-size:11px;line-height:1.65}
+.hhba-browser-word-paper{justify-content:flex-start;max-height:72dvh;
+ overscroll-behavior:contain}
+.hhba-browser-word-frame{display:block;position:relative;flex:0 0 auto;
+ width:max-content;max-width:none;min-width:100%;transform-origin:top left}
+.hhba-browser-word-output{position:relative;display:block;width:max-content;min-width:100%;
+ overflow:visible;color:#152235}
+.hhba-browser-word-output .hhba-native-docx-wrapper{
+ /* The DOCX library normally centres pages in a flex container. On mobile,
+    that can put half of the paper to the LEFT of the scroll origin. */
+ display:block!important;width:max-content!important;min-width:100%!important;
+ padding:12px!important;background:transparent!important;
+}
+.hhba-browser-word-output section.hhba-native-docx{
+ margin:12px 0!important;flex-shrink:0;
+ box-shadow:0 6px 30px rgba(33,43,63,.12);
+}
+.hhba-browser-word-overlay{position:absolute;inset:0;pointer-events:none}
+.hhba-browser-word-overlay .hhba-word-siri-anchor-shell,
+.hhba-browser-word-overlay .hhba-word-siri-edit-float{pointer-events:auto}
+@media(max-width:640px){
+ .hhba-browser-word-paper{max-height:64dvh}
+ .hhba-browser-word-output .hhba-native-docx-wrapper{padding:6px!important}
+}
