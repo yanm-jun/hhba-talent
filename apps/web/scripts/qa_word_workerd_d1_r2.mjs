@@ -28,8 +28,8 @@ const docx=new Uint8Array(createResumeDocx({
 const sha=data=>createHash('sha256').update(data).digest('hex');
 const dbSha=sha(docx);
 let mf;
-function request(action='status',{job,method='GET',body,auth=true,originOverride}={}){
- const qs=new URLSearchParams({action,resume_id:id});
+function request(action='status',{job,method='GET',body,auth=true,originOverride,resumeId=id}={}){
+ const qs=new URLSearchParams({action,resume_id:resumeId});
  if(job!==undefined)qs.set('job_id',job);
  return mf.dispatchFetch(origin+'/api/resume-word?'+qs.toString(),{
   method,headers:{
@@ -177,6 +177,43 @@ try{
  console.log('HHBA_LOCAL_WORKERD_R2_D1_PASS',JSON.stringify({
   sourceBytes:docx.length,jobASaveMs:a.elapsedMs,jobBSaveMs:b.elapsedMs,
   d1QuotaRows:row.n,r2ObjectCount:list.objects.length,runMode:'local workerd (NOT remote Cloudflare)'
+ }));
+ // Full cross-service integration with a realistic 2.9MB DOCX. This measures
+ // a complete authenticated Pages Function save path, not just the ZIP patcher.
+ // process.cpuUsage includes all Node/Miniflare threads, so it is NOT an
+ // authoritative Cloudflare isolate CPU measurement.
+ const largeId='22222222-2222-4333-8444-555555555555';
+ const largeSource=new Uint8Array(readFileSync('/tmp/hhba-word-cpu/large.docx'));
+ assert.ok(largeSource.length>2*1024*1024&&largeSource.length<=3*1024*1024);
+ const largeKey='candidate/synthetic/large-word.docx';
+ await db.prepare(insertResume).bind(
+  largeId,owner,largeKey,'large-synthetic.docx',mime,largeSource.length,
+  sha(largeSource),'private-resume-storage-v1',date,date).run();
+ await bucket.put(largeKey,largeSource,{httpMetadata:{contentType:mime}});
+ const bigSource=await request('source-docx',{job:'large-job',resumeId:largeId});
+ assert.equal(bigSource.status,200,await bigSource.clone().text());
+ assert.deepEqual(new Uint8Array(await bigSource.arrayBuffer()),largeSource);
+ const old='负责门店运营及日常数据整理工作';
+ const replacement='负责门店运营及业务数据整理';
+ const expectedLarge=await editOriginalDocxStrict(largeSource,
+  [{original:old,text:replacement}],{allowExpansion:true});
+ const clock=performance.now(),cpuStart=process.cpuUsage();
+ const savedLarge=await request('edit',{job:'large-job',method:'POST',
+  resumeId:largeId,body:{action:'edit',resume_id:largeId,job_id:'large-job',
+   original:old,text:replacement,client_docx_sha256:sha(expectedLarge),
+   expected_revision:0,confirmed_real:true,consent_word_processing:true}});
+ const cpuElapsed=process.cpuUsage(cpuStart);
+ const wallMs=+(performance.now()-clock).toFixed(1);
+ const nodeCpuMs=+((cpuElapsed.user+cpuElapsed.system)/1000).toFixed(1);
+ await expectResponse(savedLarge,200,'large DOCX authenticated Word save');
+ const bigDownload=await request('download',{job:'large-job',resumeId:largeId});
+ assert.equal(bigDownload.status,200,await bigDownload.clone().text());
+ assert.deepEqual(new Uint8Array(await bigDownload.arrayBuffer()),expectedLarge);
+ assert.deepEqual(new Uint8Array(await (await bucket.get(largeKey)).arrayBuffer()),largeSource);
+ console.log('HHBA_LOCAL_WORKERD_LARGE_DOCX_E2E_PASS',JSON.stringify({
+  sourceBytes:largeSource.length,resultBytes:expectedLarge.length,
+  wallMs,nodeProcessCpuMs:nodeCpuMs,
+  note:'LOCAL workerd + emulated D1/R2; CPU includes Node threads and is NOT real Cloudflare Free billing'
  }));
 }finally{
  if(mf)await mf.dispose();
