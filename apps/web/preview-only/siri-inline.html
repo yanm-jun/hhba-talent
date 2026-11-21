@@ -102,7 +102,7 @@ h1{font-size:clamp(23px,3vw,35px);letter-spacing:-.04em;margin:9px 0 8px;line-he
   const proposal=row.querySelector('[data-proposal]'),native=row.querySelector('[data-native]');
   const edited=row.querySelector('textarea');
   if(next==='accept'){native.textContent=text||proposal.textContent;proposal.hidden=true;native.hidden=false;}
-  else if(next==='ignore'){proposal.hidden=true;native.hidden=false;}
+  else if(next==='ignore'){proposal.hidden=true;native.textContent=row.dataset.original;native.hidden=false;}
   else{proposal.hidden=false;native.hidden=true;edited.value=proposal.textContent;}
   row.dataset.state=next;row.classList.remove('open');
   row.querySelector('.editor').hidden=true;
@@ -115,7 +115,7 @@ h1{font-size:clamp(23px,3vw,35px);letter-spacing:-.04em;margin:9px 0 8px;line-he
  document.getElementById('reset').addEventListener('click',reset);
  overlay.addEventListener('mousedown',e=>{if(e.target===overlay)close()});
  rows.forEach(row=>{
-  row.dataset.state='pending';
+  row.dataset.state='pending';row.dataset.original=row.querySelector('[data-native]').textContent;
   const ink=row.querySelector('.ink'),editor=row.querySelector('.editor'),proposal=row.querySelector('[data-proposal]');
   const show=()=>{if(row.dataset.state==='pending')row.classList.toggle('open')};
   ink.addEventListener('click',show);
