@@ -64,6 +64,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const initial=()=>({id:'draft-'+job.id,targetJobId:job.id,blocks,acceptedSuggestionIds:[] as string[]});
  const [version,setVersion]=useState<ResumeVersion>(initial);
  const [suggestions,setSuggestions]=useState<ResumeSuggestion[]>([]);
+ const [wordPromptBlocks,setWordPromptBlocks]=useState<ResumeBlock[]>([]);
  const [ignored,setIgnored]=useState<string[]>([]);
  const [resolvedWordVisualIds,setResolvedWordVisualIds]=useState<string[]>([]);
  const [editedWordVisualIds,setEditedWordVisualIds]=useState<string[]>([]);
@@ -368,8 +369,10 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   }
  }
  async function generate(){
-  if(!consent||!blocks.length||busy||wholeBusy||!status?.enabled)return;
-  const currentBlocks=version.blocks;
+  // AI only operates on unique text segments confirmed inside the real Word.
+  const currentBlocks=sourceResume?wordPromptBlocks:version.blocks;
+  if(!consent||!currentBlocks.length||busy||wholeBusy||!status?.enabled)return;
+  if(sourceResume)setVersion(prev=>({...prev,blocks:currentBlocks,acceptedSuggestionIds:[]}));
   // Previewing/re-generating AI wording does not change the verified DOCX.
   if(!sourceResume)invalidateScore();
   setBusy(true);setNotice('');setSuggestions([]);setRevealedSuggestionCount(0);
@@ -793,9 +796,9 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     </p>}
     <div className="hhba-word-reader-actions" role="group" aria-label="简历 AI 优化">
      <button type="button" className="hhba-word-primary-action"
-      disabled={!hasSession||!status?.enabled||busy||wholeBusy||!blocks.length}
+      disabled={!hasSession||!status?.enabled||busy||wholeBusy||!(sourceResume?wordPromptBlocks.length:blocks.length)}
       aria-label="开始 AI 优化简历"
-      title={!hasSession?'请登录后再优化':!status?.enabled?'AI 优化服务暂不可用':'针对当前岗位生成原位置修改建议'}
+      title={!hasSession?'请登录后再优化':!status?.enabled?'AI 优化服务暂不可用':!wordPromptBlocks.length?'正在检查 Word 中可安全修改的文字':'针对当前岗位生成原位置修改建议'}
       onClick={()=>{
        if(!consent){setWordConsentChecked(false);setWordConsentOpen(true);return;}
        void generate();
@@ -861,6 +864,17 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      }}
      onRevisionSnapshot={handleWordRevisionSnapshot}
      onDocumentReady={revealRenderedWord}
+     onEditableSegments={segments=>{
+      // Never infer a writable Word location from a long ATS/search snippet.
+      // Ignore contact-like text and only send visible, unique Word spans.
+      const safe=[...new Set(segments)].filter(value=>
+       typeof value==='string'&&value.length>=6&&value.length<=300&&
+       value===value.trim()&&!/[\r\n\t@]/.test(value)&&
+       !/^\+?[\d\s()-]{7,}$/.test(value)).slice(0,12);
+      const next=safe.map((text,i)=>({id:'word-'+i,section:'experience' as const,text}));
+      setWordPromptBlocks(prev=>
+       prev.length===next.length&&prev.every((b,i)=>b.text===next[i].text)?prev:next);
+     }}
      onPendingChange={setNativeWordPending}
      onVerifiedSave={change=>{
       setVerifiedWordEdits(prev=>[...prev.filter(item=>item.original!==change.original),change]);
