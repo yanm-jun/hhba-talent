@@ -1,5 +1,6 @@
-import {useEffect,useState} from 'react';
-import {ArrowRight,BriefcaseBusiness,Clock3,FileText,History,LoaderCircle,Search,Sparkles,Trash2} from 'lucide-react';
+import {useEffect,useRef,useState,type KeyboardEvent} from 'react';
+import {createPortal} from 'react-dom';
+import {ArrowRight,BriefcaseBusiness,Clock3,FileText,History,LoaderCircle,Search,Sparkles,Trash2,X} from 'lucide-react';
 import {Link} from '../router';
 import {CandidateMatchNativeDialog} from './CandidateMatchNativeDialog';
 import {getMatchHistory,listMatchHistory,removeMatchHistory,linkMatchHistoryResume,
@@ -52,6 +53,11 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
  const [items,setItems]=useState<MatchHistorySummary[]>([]);
  const [selected,setSelected]=useState<MatchHistoryDetail|null>(null);
  const [view,setView]=useState<HistoryView>('details');
+ const [openingView,setOpeningView]=useState<HistoryView|null>(null);
+ const modalRef=useRef<HTMLDivElement|null>(null);
+ const openerRef=useRef<HTMLElement|null>(null);
+ const openVersion=useRef(0);
+ const modalOpen=active&&Boolean(selected||openingView);
  const [original,setOriginal]=useState<PrivateResume|null>(null);
  const [wordFiles,setWordFiles]=useState<PrivateResume[]>([]);
  const [chosenWordId,setChosenWordId]=useState('');
@@ -59,8 +65,43 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
  const [editingJobId,setEditingJobId]=useState<string|null>(null);
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false);
  const [error,setError]=useState(''),[notice,setNotice]=useState('');
+ // The history list remains in place while only the dialog scrolls.
  useEffect(()=>{
-  if(!active){setEditingJobId(null);return;}
+  if(!modalOpen)return;
+  const overflow=document.body.style.overflow;
+  document.body.style.overflow='hidden';
+  const frame=requestAnimationFrame(()=>modalRef.current?.focus());
+  return()=>{
+   cancelAnimationFrame(frame);
+   document.body.style.overflow=overflow;
+   if(openerRef.current?.isConnected)openerRef.current.focus({preventScroll:true});
+  };
+ },[modalOpen]);
+ function closeModal(){
+  openVersion.current++;
+  setOpeningView(null);setSelected(null);
+  setEditingJobId(null);setOriginal(null);setWordNotice('');setBusy(false);
+ }
+ function handleModalKey(event:KeyboardEvent<HTMLDivElement>){
+  // The existing Word editor is a separately stacked top-level dialog.
+  if(editingJobId)return;
+  if(event.key==='Escape'){
+   event.preventDefault();event.stopPropagation();closeModal();return;
+  }
+  if(event.key!=='Tab'||!modalRef.current)return;
+  const controls=[...modalRef.current.querySelectorAll<HTMLElement>(
+   'button:not([disabled]),a[href],input:not([disabled]),textarea:not([disabled]),select:not([disabled])'
+  )].filter(node=>node.getClientRects().length>0);
+  if(!controls.length)return;
+  const first=controls[0],last=controls[controls.length-1];
+  if(event.shiftKey&&(document.activeElement===first||document.activeElement===modalRef.current)){
+   event.preventDefault();last.focus();
+  }else if(!event.shiftKey&&document.activeElement===last){
+   event.preventDefault();first.focus();
+  }
+ }
+ useEffect(()=>{
+  if(!active){closeModal();return;}
   let mounted=true;setLoading(true);setError('');
   void listMatchHistory().then(rows=>{if(mounted)setItems(rows)})
    .catch(e=>{if(mounted)setError(e instanceof Error?e.message:'历史记录读取失败')})
@@ -69,14 +110,20 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
  },[active]);
  async function open(id:string,nextView:HistoryView='details'){
   if(busy)return;
+  if(!modalOpen&&document.activeElement instanceof HTMLElement)openerRef.current=document.activeElement;
+  const request=++openVersion.current;
+  if(!selected)setOpeningView(nextView);
   setBusy(true);setError('');setNotice('');setWordNotice('');setEditingJobId(null);
   setOriginal(null);setChosenWordId('');setWordFiles([]);
   try{
-   const detail=await getMatchHistory(id);
-   setSelected(detail);setView(nextView);
+   // Switching modes reuses the saved historical snapshot; no new job search.
+   const detail=selected?.id===id?selected:await getMatchHistory(id);
+   if(request!==openVersion.current)return;
+   setSelected(detail);setView(nextView);setOpeningView(null);
    if(nextView==='optimize'){
     try{
      const originals=(await listPrivateResumes()).filter(item=>/\.docx$/i.test(item.name));
+     if(request!==openVersion.current)return;
      setWordFiles(originals);
      const linked=originals.find(item=>item.id===detail.resume_id)||null;
      setOriginal(linked);
@@ -84,11 +131,17 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
       '这份历史记录关联的原 Word 已不存在，或原文件不是 DOCX。请重新上传并手动关联正确的 Word。':
       '本次历史没有保存原始 Word。请从已保存的文件中选择当时的原件；如果没有，请先上传。');
     }catch(e){
-     setWordNotice(e instanceof Error?e.message:'私有简历暂时无法读取，请稍后再试。');
+     if(request===openVersion.current)
+      setWordNotice(e instanceof Error?e.message:'私有简历暂时无法读取，请稍后再试。');
     }
    }
-  }catch(e){setError(e instanceof Error?e.message:'历史记录读取失败')}
-  finally{setBusy(false)}
+  }catch(e){
+   if(request===openVersion.current){
+    setSelected(null);setError(e instanceof Error?e.message:'历史记录读取失败');
+   }
+  }finally{
+   if(request===openVersion.current){setOpeningView(null);setBusy(false)}
+  }
  }
  async function attachOriginal(){
   if(!selected||busy||!chosenWordId)return;
@@ -135,12 +188,23 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
     <Link to="/candidate/account/match">上传简历开始匹配</Link>
    </div>:<>
     <p className="hhba-match-history-explain">你可以随时查看上一次为什么推荐这些岗位，或使用同一份已保存的简历再次查找。只有重新完成匹配，才会产生新岗位对比；目前不会在后台自动搜索或发送通知。</p>
-    {selected&&<div className="hhba-match-history-detail">
-     <div className="hhba-match-history-detail-heading">
-      <div><strong>{view==='optimize'?'选择要优化的历史岗位':'本次匹配详情'}</strong>
-       <small>{dateLabel(selected.created_at)} · {selected.resume_label}</small></div>
-      <button type="button" disabled={busy} onClick={()=>{setSelected(null);setEditingJobId(null)}}>返回历史列表</button>
-     </div>
+    {modalOpen&&createPortal(
+     <div className="hhba-match-history-overlay" role="presentation"
+      onMouseDown={event=>{if(event.target===event.currentTarget&&!editingJobId)closeModal()}}>
+      <div className="hhba-match-history-dialog" role="dialog" aria-modal="true"
+       aria-labelledby="hhba-history-modal-title" tabIndex={-1} ref={modalRef}
+       onKeyDown={handleModalKey}>
+       <header className="hhba-match-history-detail-heading hhba-match-history-modal-heading">
+        <div><strong id="hhba-history-modal-title">
+         {(openingView||view)==='optimize'?'选择要优化的历史岗位':'本次匹配详情'}
+        </strong>
+         <small>{selected?dateLabel(selected.created_at)+' · '+selected.resume_label:'正在读取匹配历史…'}</small>
+        </div>
+        <button type="button" className="hhba-match-history-modal-close"
+         aria-label="关闭匹配历史弹窗" onClick={closeModal}><X size={18}/></button>
+       </header>
+       <div className="hhba-match-history-modal-body">
+       {selected?<div className="hhba-match-history-detail">
      {view==='optimize'&&<div className="hhba-match-history-optimizer-state">
       {original?<p><FileText size={16}/> 当前原 Word：<strong>{original.name}</strong></p>:
        <div className="hhba-match-history-attach">
@@ -188,8 +252,12 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
        disabled={busy} onClick={()=>void open(selected.id,'optimize')}><Sparkles size={15}/> 优化历史岗位简历</button>}
       <button type="button" disabled={busy} onClick={()=>void erase(selected.id)}><Trash2 size={15}/> 删除本次历史</button>
      </div>
-    </div>}
-    {!selected&&<div className="hhba-match-history-list">
+    </div>:<p className="hhba-match-history-modal-loading" role="status">
+     <LoaderCircle size={18} className="spin"/> 正在读取历史岗位…</p>}
+       </div>
+      </div>
+     </div>,document.body)}
+    <div className="hhba-match-history-list">
      {items.map(item=><article key={item.id}>
       <div className="hhba-match-history-icon"><FileText size={20}/></div>
       <div className="hhba-match-history-copy">
@@ -206,7 +274,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
         onClick={()=>void erase(item.id)}><Trash2 size={14}/></button>
       </div>
      </article>)}
-    </div>}
+    </div>
    </>}
   <p className="hhba-match-history-footer"><BriefcaseBusiness size={15}/> 所有记录仅对当前登录账户开放。职位可能下线，历史评分不代表录用概率。未启用自动推送。</p>
   {active&&selected&&original&&editingJobId&&
