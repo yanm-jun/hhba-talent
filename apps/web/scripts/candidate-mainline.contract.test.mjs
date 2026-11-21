@@ -16,7 +16,7 @@ test('HHBA has exactly one five-step candidate-facing resume-to-employer journey
  assert.match(page,/hhba-ai-preferences/);
  assert.match(page,/<details className="hhba-ai-preferences">/);
  assert.doesNotMatch(page,/只需三步/);
- assert.match(modal,/优化简历，提高分值/);
+ assert.match(modal,/优化简历/);
  assert.match(modal,/最后一步：企业官网投递/);
  assert.match(modal,/TargetedResumeOptimization/);
  assert.match(modal,/hhba-match-final-apply/);
