@@ -2,6 +2,7 @@
 // No API key, resume content or session token is stored in D1 or response logs.
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
 import {generateSuggestions,selectProvider} from '../_lib/resume-ai-provider.js';
+import {hydrateVerifiedJobRequirements} from '../_lib/job-jd-archive.js';
 
 const send=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store',
@@ -48,7 +49,7 @@ function valid(body){
   !Array.isArray(body.blocks)||body.blocks.length<1||body.blocks.length>MAX_BLOCKS)return false;
  if(!body.job||typeof body.job!=='object'||typeof body.job.title!=='string'||
   body.job.title.length<2||body.job.title.length>120||
-  typeof body.job.requirements!=='string'||body.job.requirements.length>2500)return false;
+  typeof body.job.requirements!=='string'||body.job.requirements.length>16000)return false;
  const ids=new Set();
  return body.blocks.every(b=>{
   if(!b||typeof b!=='object'||typeof b.id!=='string'||!/^[a-z0-9_-]{1,64}$/i.test(b.id)||
@@ -106,6 +107,12 @@ export async function onRequestPost({request,env}){
  let input;
  try{input=await readSmallJson(request);}catch{return fail('INVALID_REQUEST',400);}
  if(!valid(input))return fail('INVALID_OPTIMIZATION_INPUT',400);
+ let trustedJob;
+ try{trustedJob=await hydrateVerifiedJobRequirements(env,input.job);}
+ catch(e){
+  const code=String(e?.message||'JD_VERSION_NOT_AVAILABLE');
+  return fail(code,code==='JD_VERIFIED_VERSION_REQUIRED'||code==='JD_JOB_IDENTITY_MISMATCH'?422:409);
+ }
  const hash=await sha256Hex(quotaPepper(env)+':resume-opt:'+session.phone);
  let requestId;
  try{
@@ -115,7 +122,7 @@ export async function onRequestPost({request,env}){
  }catch{return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);}
  // Mask common contact identifiers before third-party processing.
  const blocks=input.blocks.map(b=>({id:b.id,section:b.section,text:redact(b.text)}));
- const job={title:redact(input.job.title),requirements:redact(input.job.requirements)};
+ const job={title:redact(trustedJob.title),requirements:redact(trustedJob.requirements)};
  try{
   const result=await generateSuggestions({env,blocks,job,signal:AbortSignal.timeout(25000)});
   const originalById=new Map(input.blocks.map(b=>[b.id,b.text]));
@@ -131,6 +138,7 @@ export async function onRequestPost({request,env}){
    catch{console.warn('HHBA_RESUME_OPT_EMPTY_REFUND_FAILED');}
   }
   return send({ok:true,kind:'HHBA_RESUME_OPTIMIZATION_V1',provider:result.provider,suggestions,
+   jd_version_id:trustedJob.jd_version_id||null,jd_source_status:trustedJob.source_status,
    disclaimer:'建议仅用于优化表达，用户须逐条核实；不会修改原始简历或自动提高岗位匹配分。'});
  }catch(error){
   const allowed=new Set(['AI_PROVIDER_NOT_CONFIGURED','AI_PROVIDER_UNSUPPORTED',
