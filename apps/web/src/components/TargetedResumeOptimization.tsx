@@ -792,15 +792,14 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     {entranceStage==='entering'&&<p className="hhba-word-arrival-hint" role="status">
      正在呈现你的原版式简历…
     </p>}
-    {(busy||wholeBusy||revealedSuggestionCount>0||wholeDraft)&&<button type="button"
-     className="hhba-word-mobile-ai-status" onClick={()=>setMobileSuggestionsOpen(true)}>
-     <Sparkles size={13} aria-hidden="true"/>
-     {wholeBusy?'AI 正在撰写整份简历…':
-      wholeDraft?'整份改写：'+revealedWholeCount+' / '+wholeDraft.blocks.length+' 段':
-      busy?'AI 正在分析原简历…':
-      '已呈现 '+revealedSuggestionCount+' / '+suggestions.length+' 处文字'}
-     <span>查看进度</span>
-    </button>}
+    <button type="button" className="hhba-word-quick-actions"
+     aria-label="打开简历 AI 优化操作" aria-expanded={mobileSuggestionsOpen}
+     aria-controls="hhba-word-optimization-tools"
+     onClick={()=>setMobileSuggestionsOpen(open=>!open)}>
+     <Sparkles size={15} aria-hidden="true"/>
+     {wholeBusy?'AI 撰写中…':busy?'AI 分析中…':
+      visualWordSuggestions.length>0?'优化操作':'开始优化'}
+    </button>
     <OriginalWordViewer key={sourceResume.id+':'+job.id} resume={sourceResume}
      jobId={job.id} jobTitle={job.company+'-'+(job.title_zh||job.title)}
      suggestedChanges={confirmedWordChanges}
@@ -870,9 +869,12 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      onSessionWordDraftChange={setNativeWordTextDraft}
      pendingSuggestionCount={pendingSuggestions.length}/>
    </div>
-   <aside className={'targeted-resume-word-assistant'+
+   {mobileSuggestionsOpen&&<button type="button"
+    className="hhba-word-tools-scrim" aria-label="关闭 AI 优化操作"
+    onClick={()=>setMobileSuggestionsOpen(false)}/>}
+   <aside id="hhba-word-optimization-tools" className={'targeted-resume-word-assistant'+
     (mobileSuggestionsOpen?' mobile-open':'')+(wordEditing?' is-word-editing':'')}
-    aria-label={wordEditing?'Word 文字编辑':'AI 建议工作台'}>
+    aria-label={wordEditing?'Word 文字编辑':'AI 优化操作'}>
     <div className="targeted-resume-word-edit-host" ref={setWordEditHost}/>
     <div className="targeted-resume-word-review">
     <button type="button" className="targeted-resume-mobile-rail-close"
@@ -967,13 +969,12 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
        setNotice(error instanceof Error?error.message:'完整简历 Word 生成失败，请重试。');
       }
      }}/>}
-    <div className="targeted-resume-word-assistant-head">
-     <strong><Sparkles size={15}/> 修改进度</strong>
-     <p>悬停彩虹文字即可操作；手机点击文字，核实真实性后再保存。</p>
+    {(suggestions.length>0||busy||wholeBusy)&&<div className="targeted-resume-word-assistant-head">
+     <strong><Sparkles size={15}/> 优化操作</strong>
      <div className="targeted-resume-word-counts" role="status">
       <span>待确认 {pendingSuggestions.length}</span><span>已采纳 {acceptedCount}</span><span>保留原文 {ignored.length}</span>
      </div>
-    </div>
+    </div>}
     {suggestions.length===0?<p className="targeted-resume-word-empty">
      {busy?'AI 正在依据目标岗位分析你的真实经历…':'暂无建议，点击「开始 AI 优化」开始。'}</p>:
      revealedSuggestionCount<suggestions.length&&<p className="targeted-resume-word-reveal" role="status">
