@@ -12,6 +12,18 @@ const ID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{1
 const TENANT=/^[a-z0-9][a-z0-9_-]{1,63}$/i;
 const NUMBER=/^[0-9]{4,12}$/;
 const MAX_BYTES=240000;
+const TRACKING_VALUE=/^[a-zA-Z0-9 ._:@/+%-]{1,160}$/;
+function trackingOnly(url,kind,id){
+ if(url.searchParams.size>4)return false;
+ for(const [key,value] of url.searchParams){
+  if(kind==='greenhouse'&&key==='gh_jid'&&value===id)continue;
+  if(kind==='greenhouse'&&key==='gh_src'&&TRACKING_VALUE.test(value))continue;
+  if(kind==='lever'&&key==='lever-source'&&TRACKING_VALUE.test(value))continue;
+  if(/^utm_[a-z_]{2,32}$/i.test(key)&&TRACKING_VALUE.test(value))continue;
+  return false;
+ }
+ return true;
+}
 export const ATS_JD_PROOF='PUBLIC_EMPLOYER_ATS_V1';
 
 export function safePublicAtsJobLocator(input){
@@ -19,10 +31,11 @@ export function safePublicAtsJobLocator(input){
  try{
   const u=new URL(input);
   if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash||
-   u.search||u.pathname.endsWith('/'))return null;
+   u.pathname.endsWith('/'))return null;
   const parts=u.pathname.split('/').filter(Boolean);
   if((u.hostname==='job-boards.greenhouse.io'||u.hostname==='boards.greenhouse.io')&&
    parts.length===3&&parts[1]==='jobs'&&TENANT.test(parts[0])&&NUMBER.test(parts[2])){
+   if(!trackingOnly(u,'greenhouse',parts[2]))return null;
    const tenant=parts[0].toLowerCase(),id=parts[2];
    return {kind:'greenhouse',tenant,id,company:tenant,
     url:'https://'+u.hostname+'/'+tenant+'/jobs/'+id,
@@ -30,6 +43,7 @@ export function safePublicAtsJobLocator(input){
   }
   if((u.hostname==='jobs.lever.co'||u.hostname==='jobs.eu.lever.co')&&
    parts.length===2&&TENANT.test(parts[0])&&ID.test(parts[1])){
+   if(!trackingOnly(u,'lever',parts[1]))return null;
    const tenant=parts[0].toLowerCase(),id=parts[1].toLowerCase(),
     eu=u.hostname==='jobs.eu.lever.co';
    return {kind:'lever',tenant,id,company:tenant,
