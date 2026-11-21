@@ -55,7 +55,11 @@ export function safePublicAtsJobLocator(input){
  }catch{return null;}
 }
 async function boundedJson(response){
- if(response.status!==200)throw Error('ATS_POSTING_NOT_AVAILABLE');
+ if(response.status!==200){
+  const error=new Error('ATS_POSTING_NOT_AVAILABLE');
+  if(response.status===404||response.status===410)error.httpStatus=response.status;
+  throw error;
+ }
  const type=(response.headers.get('Content-Type')||'').toLowerCase();
  if(!/(?:application\/json|\+json)/.test(type))throw Error('ATS_RESPONSE_NOT_JSON');
  const len=response.headers.get('content-length');
