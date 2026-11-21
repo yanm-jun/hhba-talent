@@ -12,7 +12,7 @@ import {editOriginalDocxStrict} from '../src/services/resumeDocxPreserve.mjs';
 // The Pages Functions module is bundled unchanged and runs in local workerd.
 // Unlike in-memory API fakes, database, R2 conditional writes and session
 // auth are real Miniflare emulators. All users, documents and keys are synthetic.
-const root=mkdtempSync(join(tmpdir(),'hhba-local-word-workerd-'));
+const root=mkdtempSync(join(resolve('.'),'.qa-word-workerd-'));
 const out=join(root,'private-word-worker.mjs');
 const origin='https://hhba-workerd-qa.invalid';
 const id='11111111-2222-4333-8444-555555555555';
