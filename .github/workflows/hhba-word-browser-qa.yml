@@ -25,6 +25,7 @@ on:
       - 'apps/web/scripts/qa-history-word-workspace.html'
       - 'apps/web/scripts/qa_history_word_workspace.tsx'
       - 'apps/web/scripts/qa_history_word_workspace.py'
+      - 'apps/web/scripts/qa_word_loading_beam.py'
       - 'apps/web/scripts/word-inline-border-beam.contract.test.mjs'
       - 'apps/web/src/components/CandidateMatchHistory.tsx'
       - 'apps/web/src/styles/match-history.css'
@@ -92,6 +93,7 @@ jobs:
           python scripts/qa_word_browser_preview.py
           python scripts/qa_actual_word_viewer.py
           python scripts/qa_targeted_word_workspace.py
+          python scripts/qa_word_loading_beam.py
           python scripts/qa_history_word_workspace.py
       - name: Upload browser screenshots and QA report
         if: always()
@@ -102,6 +104,7 @@ jobs:
             /tmp/hhba-word-browser-qa
             /tmp/hhba-word-react-qa
             /tmp/hhba-word-unobstructed-qa
+            /tmp/hhba-word-loading-beam-qa
             /tmp/hhba-history-word-qa
           if-no-files-found: ignore
           retention-days: 7
