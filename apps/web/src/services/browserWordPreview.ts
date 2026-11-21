@@ -45,10 +45,10 @@ async function assertPreviewSafe(bytes:Uint8Array){
   if(!entry.dir&&entry.name.endsWith('.rels')){
    const content=await entry.async('string');
    if(content.length>1024*1024)throw Error('Word 关系文件超出安全范围。');
-   const tags=content.match(/<Relationship\\b[^>]*>/g)||[];
+   const tags=content.match(/<Relationship\b[^>]*>/g)||[];
    for(const rel of tags){
-    const external=/\\bTargetMode\\s*=\\s*['"]External['"]/i.test(rel);
-    const safeLink=/\\bType\\s*=\\s*['"][^'"]*\\/hyperlink['"]/i.test(rel);
+    const external=/\bTargetMode\s*=\s*['"]External['"]/i.test(rel);
+    const safeLink=/\bType\s*=\s*['"][^'"]*\/hyperlink['"]/i.test(rel);
     // User-typed hyperlinks are displayed as inert text. External media and
     // templates must never be fetched automatically on resume preview.
     if(external&&!safeLink)throw Error('Word 包含外部加载内容，请下载原件在本地查看。');
