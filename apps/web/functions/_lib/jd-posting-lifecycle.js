@@ -72,6 +72,16 @@ export function classificationForCheck(old,error,now=new Date()){
   const previousMs=Date.parse(old?.last_gone_at||'');
   const independent=withinWindow&&Number.isFinite(previousMs)&&
    t.getTime()-previousMs>=JD_RECHECK_MS;
+  // Frequent search traffic must not restart the confirmation clock.
+  // Under 6 hours preserve the first signal and schedule the next probe.
+  if(withinWindow&&old?.gone_count>0&&!independent&&
+   Number.isFinite(previousMs)&&t.getTime()>=previousMs){
+   return {status:'RECHECK',last_active_at:old.last_active_at||null,
+    first_gone_at:old.first_gone_at,last_gone_at:old.last_gone_at,
+    gone_count:old.gone_count,closed_at:null,uncertain_count:old.uncertain_count||0,
+    last_reason:'HTTP_GONE_NEEDS_CONFIRMATION',
+    next_check_at:plus(new Date(previousMs),JD_RECHECK_MS)};
+  }
   const gone=independent?Math.min(20,(old?.gone_count||0)+1):1;
   const closed=gone>=2;
   return {status:closed?'CLOSED':'RECHECK',last_active_at:old?.last_active_at||null,
