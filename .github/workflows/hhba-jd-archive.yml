@@ -23,7 +23,7 @@ on:
       - 'apps/web/scripts/verified-jd-reassessment.contract.test.mjs'
       - 'apps/web/functions/_lib/match-jd-enrichment.js'
       - 'apps/web/functions/_lib/match-history.js'
-      - 'apps/web/functions/api/match-native/[[path]].js'
+      - 'apps/web/functions/api/match-native/**'
       - 'apps/web/src/services/resumeMatch.ts'
       - 'apps/web/src/services/resumeMatching.ts'
       - 'apps/web/src/services/matchHistory.ts'
