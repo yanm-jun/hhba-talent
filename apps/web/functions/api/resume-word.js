@@ -21,6 +21,11 @@ const fail=(code,status)=>json({ok:false,error:code},status);
 const sameOrigin=request=>request.headers.get('Origin')===new URL(request.url).origin&&
  request.headers.get('Sec-Fetch-Site')!=='cross-site';
 const prefix=row=>row.storage_key+'.hhba-word-preserved-v1-'+row.sha256;
+// Unscoped = existing private-vault history. Targeted edits use a separate
+// hashed branch, never silently inheriting edits from another job.
+const validJobId=value=>value===undefined||(typeof value==='string'&&
+ value.length>0&&value.length<=512&&value===value.trim()&&
+ !/[\u0000-\u001f\u007f]/.test(value));
 const shaBytes=async bytes=>{
  const hash=new Uint8Array(await crypto.subtle.digest('SHA-256',bytes));
  return Array.from(hash,b=>b.toString(16).padStart(2,'0')).join('');
@@ -109,12 +114,16 @@ function validEntry(entry){
   hashIsValid(entry.docx_sha256)&&hashIsValid(entry.preview_sha256)&&
   Number.isInteger(entry.page_count)&&entry.page_count>=1&&entry.page_count<=20;
 }
-async function approved(bucket,row){
- const key=prefix(row);
+async function approved(bucket,row,jobId){
+ const jobHash=jobId===undefined?null:
+  await sha256Hex('hhba-word-target-job-v1:'+jobId);
+ const key=prefix(row)+(jobHash?'.job-'+jobHash:'');
  const ref=await bucket.get(key+'.json');
- if(!ref)return {key,etag:null,revision:0,items:[],saved:null};
+ if(!ref)return {key,jobHash,etag:null,revision:0,items:[],saved:null};
  const raw=await ref.json();
- if(raw?.source_sha256!==row.sha256)throw Error('WORD_REVISION_CORRUPT');
+ if(raw?.source_sha256!==row.sha256||
+  (raw?.job_scope_sha256??null)!==jobHash)
+  throw Error('WORD_REVISION_CORRUPT');
  let items,revision;
  if(raw.schema==='HHBA_ORIGINAL_WORD_EDIT_V1'){
   const legacy={...raw,id:'legacy'};
@@ -128,7 +137,7 @@ async function approved(bucket,row){
    new Set(items.map(x=>x.id)).size!==items.length)
    throw Error('WORD_REVISION_CORRUPT');
  }else throw Error('WORD_REVISION_CORRUPT');
- return {key,etag:ref.etag||null,revision,items,saved:revision>0?items[revision-1]:null};
+ return {key,jobHash,etag:ref.etag||null,revision,items,saved:revision>0?items[revision-1]:null};
 }
 async function versionBytes(bucket,key,entry,format){
  const file=await bucket.get(revisionKey(key,entry,format));
@@ -141,7 +150,9 @@ async function versionBytes(bucket,key,entry,format){
 async function commitManifest(bucket,state,row,revision,items){
  if(state.items.length&&!state.etag)throw Error('WORD_REVISION_LOCK_UNAVAILABLE');
  const newState={schema:'HHBA_ORIGINAL_WORD_VERSIONS_V2',
-  source_sha256:row.sha256,revision,items,updated_at:new Date().toISOString()};
+  source_sha256:row.sha256,
+  ...(state.jobHash?{job_scope_sha256:state.jobHash}:{}),
+  revision,items,updated_at:new Date().toISOString()};
  const written=await bucket.put(state.key+'.json',JSON.stringify(newState),{
   httpMetadata:{contentType:'application/json'},
   onlyIf:state.etag?{etagMatches:state.etag}:{etagDoesNotMatch:'*'}
@@ -178,8 +189,12 @@ export async function onRequestGet({request,env}){
  let candidate;
  try{candidate=await owner(db,request);}catch{return fail('SESSION_INVALID',401);}
  if(candidate.error)return fail(candidate.error,candidate.status);
- const id=new URL(request.url).searchParams.get('resume_id');
- if(!id||!ID.test(id))return fail('INVALID_REQUEST',400);
+ const params=new URL(request.url).searchParams;
+ const id=params.get('resume_id'),jobs=params.getAll('job_id');
+ if(!id||!ID.test(id)||jobs.length>1||
+  !validJobId(jobs.length?jobs[0]:undefined))
+  return fail('INVALID_REQUEST',400);
+ const jobId=jobs[0];
  let row;
  try{
   row=await rowFor(db,id,candidate.phone);
@@ -187,7 +202,7 @@ export async function onRequestGet({request,env}){
   if(!validRow(row))return fail('WORD_INVALID_FILE',422);
   if(action==='inspect'){
    const original=await loadBytes(bucket,row);
-   const state=await approved(bucket,row);
+   const state=await approved(bucket,row,jobId);
    const current=state.saved?
     await versionBytes(bucket,state.key,state.saved,'docx'):original;
    const data=await inspectOriginalDocxStrict(current);
@@ -203,7 +218,7 @@ export async function onRequestGet({request,env}){
   }
   if(action==='download'||action==='edited-preview'||action==='download-pdf'){
    await loadBytes(bucket,row);
-   const state=await approved(bucket,row);
+   const state=await approved(bucket,row,jobId);
    const requested=new URL(request.url).searchParams.get('revision');
    if(requested!==null&&(!/^(?:0|[1-9][0-9]?)$/.test(requested)||
     Number(requested)!==state.revision))
@@ -246,8 +261,9 @@ export async function onRequestPost({request,env}){
  if(candidate.error)return fail(candidate.error,candidate.status);
  let body;
  try{body=await readSmall(request);}catch{return fail('INVALID_REQUEST',400);}
- const id=body?.resume_id,action=body?.action||'edit';
- if(!ID.test(String(id||''))||!['edit','undo','redo'].includes(action)||
+ const id=body?.resume_id,action=body?.action||'edit',jobId=body?.job_id;
+ if(!ID.test(String(id||''))||!validJobId(jobId)||
+  !['edit','undo','redo'].includes(action)||
   body?.confirmed_real!==true||body?.consent_word_processing!==true||
   (body.expected_revision!==undefined&&
    (!Number.isInteger(body.expected_revision)||body.expected_revision<0||
@@ -262,7 +278,7 @@ export async function onRequestPost({request,env}){
   if(!validRow(row))return fail('WORD_INVALID_FILE',422);
   // Verify owner-bound original even when editing a previously saved revision.
   const original=await loadBytes(bucket,row);
-  const state=await approved(bucket,row);
+  const state=await approved(bucket,row,jobId);
   if(body.expected_revision!==undefined&&body.expected_revision!==state.revision)
    return fail('WORD_REVISION_CONFLICT',409);
   if(state.items.length&&!state.etag)return fail('WORD_REVISION_LOCK_UNAVAILABLE',503);
