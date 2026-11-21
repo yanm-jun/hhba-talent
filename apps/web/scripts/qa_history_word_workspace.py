@@ -106,7 +106,12 @@ def exercise(browser,label,viewport,initial_linked,has_file=True):
     page.goto(ORIGIN+'/scripts/qa-history-word-workspace.html',wait_until='domcontentloaded')
     page.get_by_role('button',name='优化简历',exact=True).wait_for(timeout=20000)
     page.get_by_role('button',name='优化简历',exact=True).click()
-    page.get_by_text('选择要优化的历史岗位').wait_for(timeout=18000)
+    popup=page.get_by_role('dialog',name='选择要优化的历史岗位')
+    popup.wait_for(state='visible',timeout=18000)
+    assert page.locator('.hhba-match-history-list>article').count()==1
+    assert page.evaluate("document.body.style.overflow")=='hidden'
+    assert popup.locator('.hhba-match-history-modal-body').evaluate(
+        '(el)=>getComputedStyle(el).overflowY')=='auto'
     if not initial_linked:
         page.get_by_text('本次历史没有保存原始 Word',exact=False).wait_for(timeout=10000)
         if not has_file:
@@ -126,6 +131,8 @@ def exercise(browser,label,viewport,initial_linked,has_file=True):
     assert buttons.nth(1).is_enabled()
     buttons.nth(1).click()
     page.locator('.hhba-match-modal-editor').wait_for(state='visible',timeout=18000)
+    assert page.get_by_role('dialog',name='选择要优化的历史岗位').count()==1
+    assert page.locator('.hhba-match-history-list>article').count()==1
     word=page.locator('section.hhba-native-docx').first
     word.wait_for(state='visible',timeout=35000)
     assert '负责门店运营及日常数据整理工作' in word.inner_text()
