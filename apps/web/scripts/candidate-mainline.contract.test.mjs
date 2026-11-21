@@ -132,6 +132,11 @@ test('Siri in-document changes expose adopt edit ignore only on hover/tap and re
  assert.match(viewer,/className="hhba-word-siri-edit-float"/);
  assert.match(optimizer,/onVisualSuggestionAction=\{\(id,action\)=>/);
  assert.match(optimizer,/resolvedWordVisualIds/);
+ assert.match(viewer,/onVisualSuggestionAction\?\.\(inlineVisualSuggestionId,'edited',draft\.trim\(\)\)/);
+ assert.match(optimizer,/onVisualSuggestionAction=\{\(id,action,newText\)=>/);
+ assert.match(optimizer,/editResumeBlock\(prev,item\.blockId,changed\)/);
+ assert.match(optimizer,/setEditedWordVisualIds\(/);
+ assert.match(optimizer,/已按本人编辑的文字保存并核验原 Word 排版/);
  assert.match(optimizer,/<strong><Sparkles size=\{15\}\/> 修改进度<\/strong>/);
  assert.doesNotMatch(optimizer,/<strong><Sparkles size=\{15\}\/> AI 修改建议<\/strong>/);
  assert.match(css,/hhba-word-siri-anchor-shell:hover \.hhba-word-siri-inline-actions/);
