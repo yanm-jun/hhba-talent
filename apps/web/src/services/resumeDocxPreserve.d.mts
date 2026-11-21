@@ -1,6 +1,6 @@
 // Types for the existing dependency-free OOXML patcher.
 export type DocxTextEdit={original:string;text:string};
-export declare function editOriginalDocxStrict(raw:Uint8Array|ArrayBuffer,edits:DocxTextEdit[]):Promise<Uint8Array>;
+export declare function editOriginalDocxStrict(raw:Uint8Array|ArrayBuffer,edits:DocxTextEdit[],options?:{allowExpansion?:boolean}):Promise<Uint8Array>;
 export declare function prepareVerifiedOriginalDocxExport(options:{
  original:Uint8Array|ArrayBuffer;
  edits:DocxTextEdit[];
