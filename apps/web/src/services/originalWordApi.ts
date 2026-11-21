@@ -118,7 +118,7 @@ export async function saveOriginalWordEdit(id:string,original:string,text:string
   // The Cloudflare endpoint independently repeats and verifies the same patch
   // before publishing the private, job-scoped revision into R2.
   const source=await wordSourceBytes(id,expectedRevision,jobId);
-  const patched=await editOriginalDocxStrict(source,[{original,text}]);
+  const patched=await editOriginalDocxStrict(source,[{original,text}],{allowExpansion:true});
   const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',new Uint8Array(patched).buffer));
   clientHash=Array.from(digest,b=>b.toString(16).padStart(2,'0')).join('');
  }
