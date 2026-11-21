@@ -1,0 +1,38 @@
+name: HHBA Siri integration preserves existing match UI
+on:
+  pull_request:
+    paths:
+      - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
+      - 'apps/web/src/pages/CandidateMatchPage.tsx'
+      - 'apps/web/src/services/resumeMatch.ts'
+      - 'apps/web/src/components/TargetedResumeOptimization.tsx'
+      - 'apps/web/src/components/OriginalWordViewer.tsx'
+      - 'apps/web/src/styles/resume-match-dialog.css'
+      - 'apps/web/functions/api/resume-word.js'
+      - 'apps/web/scripts/match-siri-preserve.contract.test.mjs'
+      - '.github/workflows/hhba-siri-match-preservation.yml'
+  push:
+    branches:
+      - feature/match-dialog-preserve-siri-20261121
+permissions:
+  contents: read
+jobs:
+  safe-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Preserve native match UI and verify independent Word saves
+        working-directory: apps/web
+        run: node --experimental-strip-types --test scripts/match-siri-preserve.contract.test.mjs scripts/resume-word.route.test.mjs scripts/resume-docx-preserve.contract.test.mjs scripts/resume-optimization.route.test.mjs
+      - name: Install packages
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Build actual candidate UI including lazy-loaded Word optimizer
+        working-directory: apps/web
+        run: npm run build
