@@ -266,8 +266,13 @@ export async function inspectOriginalDocxStrict(raw){
  const pkg=readPackage(raw),entry=pkg.entries.find(e=>e.name==='word/document.xml');
  const originalXml=dec.decode(await xmlBytes(pkg,entry));
  const paragraphs=[...originalXml.matchAll(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g)]
-  .map(m=>decodeXML(m[1])).filter(s=>textOnly(s)).slice(0,100);
- const unique=paragraphs.filter(s=>paragraphs.filter(v=>v===s).length===1);
+  .map(m=>decodeXML(m[1])).filter(s=>textOnly(s));
+ // Count occurrences across the ENTIRE document before marking a run editable.
+ // Cutting off at 100 could hide later text and miss a duplicate beyond the
+ // cutoff, breaking the promise that an anchor targets one unique Word run.
+ const occurrences=new Map();
+ for(const value of paragraphs)occurrences.set(value,(occurrences.get(value)||0)+1);
+ const unique=paragraphs.filter(value=>occurrences.get(value)===1);
  return {mode:'strict_original_docx',editable_text:unique,
   entries:pkg.entries.map(e=>e.name)};
 }

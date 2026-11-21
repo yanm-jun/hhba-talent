@@ -33,9 +33,17 @@ const body='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
  '<w:pgSz w:w="11906" w:h="16838"/>'+
  '<w:pgMar w:top="850" w:right="850" w:bottom="850" w:left="850"/></w:sectPr>'+
  '</w:body></w:document>';
-function fixture({method=0,duplicate=false,split=false,macro=false}={}){
- const doc=duplicate?body.replace('</w:body>','<w:p><w:r><w:t>原始岗位描述</w:t></w:r></w:p></w:body>'):
+function fixture({method=0,duplicate=false,split=false,macro=false,extraParagraphs=0,duplicateTail=false}={}){
+ let doc=duplicate?body.replace('</w:body>','<w:p><w:r><w:t>原始岗位描述</w:t></w:r></w:p></w:body>'):
   split?body.replace('<w:t>原始岗位描述</w:t>','<w:t>原始岗位</w:t><w:t>描述</w:t>'):body;
+ if(extraParagraphs){
+  const extra=Array.from({length:extraParagraphs},(_,i)=>
+   '<w:p><w:r><w:t>虚构补充经历第'+i+'项</w:t></w:r></w:p>').join('');
+  const tail=duplicateTail?
+   '<w:p><w:r><w:t>原始岗位描述</w:t></w:r></w:p>':'';
+  // Keep section properties last, as a real Word document requires.
+  doc=doc.replace('<w:sectPr>',extra+tail+'<w:sectPr>');
+ }
  const parts=[
   ['[Content_Types].xml',
    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
@@ -152,6 +160,16 @@ for(const method of [0,8]){
   assert.ok(inspection.editable_text.includes('新的岗位描述'));
  });
 }
+test('Word inspection includes tail paragraphs and checks uniqueness beyond the first 100 text runs',async()=>{
+ const all=await inspectOriginalDocxStrict(fixture({extraParagraphs:110}));
+ assert.ok(all.editable_text.includes('虚构补充经历第109项'),
+  'late resume content should still be independently editable');
+ assert.ok(all.editable_text.includes('原始岗位描述'));
+ const duplicate=await inspectOriginalDocxStrict(fixture({extraParagraphs:110,duplicateTail:true}));
+ assert.ok(!duplicate.editable_text.includes('原始岗位描述'),
+  'a duplicate after the old cutoff must disqualify BOTH positions');
+ assert.ok(duplicate.editable_text.includes('虚构补充经历第109项'));
+});
 test('ambiguous, split-run, long and unconfirmed text must fail, never rebuild a new template',async()=>{
  await assert.rejects(
   ()=>editOriginalDocxStrict(fixture({duplicate:true}),
