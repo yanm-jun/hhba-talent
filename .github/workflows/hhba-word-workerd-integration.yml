@@ -8,6 +8,8 @@ on:
       - 'apps/web/functions/api/resume-word.js'
       - 'apps/web/functions/_lib/private-word-service.js'
       - 'apps/web/src/services/resumeDocxPreserve.mjs'
+      - 'apps/web/functions/_lib/domestic-match-fusion.js'
+      - 'apps/web/functions/_lib/resume-match-core.js'
   workflow_dispatch:
 permissions:
   contents: read
@@ -30,3 +32,22 @@ jobs:
       - name: Execute real Word Pages Function with local workerd R2 D1 and authentic session validation
         working-directory: apps/web
         run: node --experimental-strip-types scripts/qa_word_workerd_d1_r2.mjs
+
+  pages-functions-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked web dependencies and official Cloudflare bundler
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          npm install --no-save --no-audit --no-fund wrangler@4
+      - name: Bundle all actual Pages Functions (catch missing exports before Cloudflare)
+        working-directory: apps/web
+        run: npx wrangler pages functions build --outdir /tmp/hhba-all-pages-functions
