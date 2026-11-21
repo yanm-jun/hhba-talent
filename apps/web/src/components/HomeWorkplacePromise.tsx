@@ -1,4 +1,3 @@
-import {useEffect,useState} from 'react';
 import {ArrowRight,ArrowUpRight,BookOpen,BriefcaseBusiness,ShieldCheck} from 'lucide-react';
 import {Link} from '../router';
 import '../styles/home-workplace-promise.css';
@@ -27,16 +26,6 @@ const resources=[
 ];
 
 export function HomeWorkplacePromise(){
- const [financeReportPeriod,setFinanceReportPeriod]=useState<string|null>(null);
- const [financeStatusLoaded,setFinanceStatusLoaded]=useState(false);
- useEffect(()=>{
-  let active=true;
-  fetch(import.meta.env.BASE_URL+'api/transparency/reports',{cache:'no-store'})
-   .then(r=>{if(!r.ok)throw Error('REPORTS_UNAVAILABLE');return r.json() as Promise<{reports?:Array<{period:string}>}>;})
-   .then(data=>{if(!active)return;setFinanceReportPeriod(data.reports?.[0]?.period||null);setFinanceStatusLoaded(true);})
-   .catch(()=>{if(active)setFinanceStatusLoaded(false);});
-  return()=>{active=false;};
- },[]);
  return <section className="hhba-home-workplace" aria-labelledby="hhba-home-workplace-title">
   <header className="hhba-home-workplace-heading">
    <span className="hhba-home-workplace-kicker">HHBA · CAREER RESOURCES</span>
@@ -67,15 +56,15 @@ export function HomeWorkplacePromise(){
    <div className="hhba-home-resources-note"><ShieldCheck size={16} aria-hidden="true"/><span>免费阅读 · 法律信息仅供一般参考，具体问题以官方规定及实际情况为准。</span></div>
   </div>
 
-  <aside className="hhba-home-pledge" aria-labelledby="hhba-home-distribution-title">
+  <aside className="hhba-home-pledge" aria-labelledby="hhba-home-commitment-title">
    <div className="hhba-home-pledge-intro">
-    <span className="hhba-home-card-kicker">OUR COMMITMENT · 责任与透明</span>
-    <h3 id="hhba-home-distribution-title">透明，是我们做事的方式。</h3>
-    <p>HHBA 计划每月根据实际经营情况，安排一部分资金帮助有需要的劳动者。</p>
-    <p className="hhba-home-pledge-meta">不承诺固定金额或分配比例 · <span className="hhba-home-report-status">{financeReportPeriod?'已公开 '+financeReportPeriod+' 月度报告':financeStatusLoaded?'首期资金报告尚未发布':'资金报告状态以透明中心为准'}</span></p>
+    <span className="hhba-home-card-kicker">OUR COMMITMENT · 我们的坚持</span>
+    <h3 id="hhba-home-commitment-title">每一份职业选择，都值得被认真守护。</h3>
+    <p>从寻找机会，到走进职场。HHBA 致力于帮助求职者理解真实信息、做出更有依据的选择，持续关注劳动者的合法权益。</p>
+    <span className="hhba-home-pledge-signature">HHBA · 让机会与人才，找到彼此。</span>
    </div>
-   <Link className="hhba-home-transparency-link" to="/transparency">
-    了解我们的责任与透明 <ArrowRight size={17} aria-hidden="true"/>
+   <Link className="hhba-home-transparency-link" to="/commitment" aria-label="了解 HHBA 的坚持，进入品牌宣传墙">
+    了解我们的坚持 <ArrowRight size={17} aria-hidden="true"/>
    </Link>
   </aside>
  </section>;
