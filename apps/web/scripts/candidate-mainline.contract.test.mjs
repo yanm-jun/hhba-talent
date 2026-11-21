@@ -189,7 +189,7 @@ test('Siri optimization removes permanent progress card and enhances both previe
  assert.match(layout,/display:none!important;position:fixed/);
  assert.match(layout,/hhba-word-bright-breathe/);
  assert.match(layout,/animation:hhba-siri-edge-flow 6\.8s linear infinite/);
- assert.match(layout,/hhba-original-resume-anchor\.has-ai-preview \.hhba-word-ai-preview-text>\\.hhba-word-ai-changed/);
+ assert.match(layout,/hhba-original-resume-anchor\.has-ai-preview \.hhba-word-ai-preview-text>\.hhba-word-ai-changed/);
  assert.doesNotMatch(preview,/<aside class="side">/);
  assert.match(preview,/\.dialog-body\{flex:1;min-height:0;overflow:auto;padding:22px;display:block\}/);
  assert.match(preview,/animation:edge 6s linear infinite/);
