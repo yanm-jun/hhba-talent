@@ -666,7 +666,7 @@ try{
    assert.ok(wordPosition&&wordPosition.y<330,
     'mobile must show the Word document near the top, not below AI permissions and settings');
    assert.equal(await assistant.isVisible(),false,'suggestions must not cover mobile Word');
-   await first.getByRole('button',{name:'AI 建议',exact:true}).click();
+   await first.getByRole('button',{name:'修改进度',exact:true}).click();
    await assistant.waitFor({state:'visible'});
   }
   await assistant.locator('.targeted-resume-ai-settings summary').click();
@@ -792,7 +792,7 @@ try{
   await first.getByRole('region',{name:'独立简历优化工作区'}).waitFor();
   const recoveredAssistant=first.locator('.targeted-resume-word-assistant');
   if(view.name==='mobile'){
-   await first.getByRole('button',{name:'AI 建议',exact:true}).click();
+   await first.getByRole('button',{name:'修改进度',exact:true}).click();
    await recoveredAssistant.waitFor({state:'visible'});
   }
   await recoveredAssistant.locator('.targeted-resume-ai-settings summary').click();
@@ -936,7 +936,7 @@ try{
   await mobile.goto('http://127.0.0.1:3000/qa/resume-flow.html?word&full&agent',
    {waitUntil:'networkidle',timeout:45000});
   await mobile.getByRole('button',{name:/优化简历/}).first().click();
-  await mobile.getByRole('button',{name:'AI 建议',exact:true}).click();
+  await mobile.getByRole('button',{name:'修改进度',exact:true}).click();
   const assistant=mobile.locator('.targeted-resume-word-assistant');
   await assistant.waitFor({state:'visible'});
   await assistant.locator('.targeted-resume-ai-settings summary').click();
@@ -1149,7 +1149,7 @@ try{
    .waitFor({timeout:18000});
   const rail=context.locator('.targeted-resume-word-assistant');
   if(view.name==='mobile'){
-   await context.getByRole('button',{name:'AI 建议',exact:true}).click();
+   await context.getByRole('button',{name:'修改进度',exact:true}).click();
    await rail.waitFor({state:'visible'});
   }
   await rail.locator('.targeted-resume-ai-settings summary').click();
