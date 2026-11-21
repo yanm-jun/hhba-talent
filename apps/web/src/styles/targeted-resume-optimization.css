@@ -968,6 +968,14 @@
  position:fixed;inset:0;z-index:3400;border:0;border-radius:0;
  background:rgba(14,31,58,.19);cursor:default;
 }
+/* Desktop Word paper must remain clickable while the optional AI tools are
+   open. The panel itself stays interactive; only its ambient scrim is
+   click-through. Mobile keeps a blocking scrim with an explicit close path. */
+@media(min-width:701px){
+ .targeted-resume.is-word-first .hhba-word-tools-scrim{
+  pointer-events:none;
+ }
+}
 .targeted-resume.is-word-first .targeted-resume-word-assistant,
 .hhba-match-modal-editor .targeted-resume.is-word-first .targeted-resume-word-assistant{
  display:none!important;position:fixed;top:clamp(18px,5dvh,65px);
