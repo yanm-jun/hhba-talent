@@ -170,7 +170,7 @@ export function selectedJobs(text,hits,limit=10){
   // omits score_basis even while returning a sufficiently specific reason.
   // Never create a numeric score if the model gave none.
   const primaryBasis=clean(row.score_basis,240);
-  const fallbackBasis=reason.length>=45&&/(简历|经历|经验|负责|技能|工作|岗位)/.test(reason)?
+  const fallbackBasis=reason.length>=45&&/(简历|经历|工作经验|负责|技能|曾经|曾在)/.test(reason)?
    reason.slice(0,220):'';
   const scoreBasis=primaryBasis.length>=14?primaryBasis:fallbackBasis;
   const match_score=normalizeMatchScore(row.match_score??row.score,scoreBasis);
