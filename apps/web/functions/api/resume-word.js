@@ -329,7 +329,7 @@ export async function onRequestPost({request,env}){
    original:current,edits:selected,
    verifyLayout:async({original,edited,oldText,newText})=>
     wordRequest(env,'verify',{original,edited,oldText,newText})
-  }):{bytes:await editOriginalDocxStrict(current,selected),pageCount:null};
+  }):{bytes:await editOriginalDocxStrict(current,selected,{allowExpansion:true}),pageCount:null};
   if(!renderer&&await shaBytes(result.bytes)!==body.client_docx_sha256)
    return fail('WORD_EDIT_CORRUPTED',409);
   const pdf=renderer?await wordRequest(env,'render',{original:result.bytes}):null;
