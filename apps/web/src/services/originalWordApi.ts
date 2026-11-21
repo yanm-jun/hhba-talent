@@ -1,8 +1,9 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
+import {editOriginalDocxStrict} from './resumeDocxPreserve.mjs';
 
 type SavedWord={original:string;text:string;updated_at:string};
-export type WordHistoryEntry={revision:number;original:string;text:string;updated_at:string;page_count:number};
-export type WordInspect={ok:boolean;editable_text:string[];saved?:SavedWord|null;revision:number;total_revisions:number;max_revisions:number;max_daily_edits?:number;history?:WordHistoryEntry[]};
+export type WordHistoryEntry={revision:number;original:string;text:string;updated_at:string;page_count:number|null;layout_verified?:boolean};
+export type WordInspect={ok:boolean;editable_text:string[];saved?:SavedWord|null;revision:number;total_revisions:number;max_revisions:number;max_daily_edits?:number;history?:WordHistoryEntry[];layout_verified?:boolean;pdf_available?:boolean};
 const messages:Record<string,string>={
  WORD_NOT_READY:'Word 原样式编辑暂未开放。',
  WORD_FONT_UNAVAILABLE:'原文件使用的字体在处理环境中不可用，为保留原样式，暂不修改这份简历。',
@@ -21,6 +22,7 @@ const messages:Record<string,string>={
  WORD_EDIT_AMBIGUOUS:'无法确定原文位置，请换一段文字。',
  WORD_EDIT_UNSAFE:'这段修改暂时无法安全保存。',
  WORD_RENDER_FAILED:'暂时无法准确显示 Word 原始页面。',
+ WORD_PDF_NOT_READY:'当前版本尚未经过专业分页校验，可以先下载 Word，PDF 暂不可用。',
  WORD_FILE_UNSUPPORTED:'暂时无法处理这份 Word 的原始样式。',
  SESSION_INVALID:'请重新登录。',
  RESUME_NOT_FOUND:'简历文件未找到。',
@@ -69,11 +71,17 @@ function jobPayload(jobId?:string){
  const id=scopedJobId(jobId);
  return id===undefined?{}:{job_id:id};
 }
-export async function wordRendererReady(signal?:AbortSignal){
+export type WordCapabilities={enabled:boolean;rendererEnabled:boolean;docxOnlyEnabled:boolean};
+export async function wordEditingCapabilities(signal?:AbortSignal):Promise<WordCapabilities>{
  try{
   const response=await send('/api/resume-word?action=status','GET',undefined,signal);
-  return (await response.json()).enabled===true;
- }catch{return false;}
+  const body=await response.json();
+  return {enabled:body.enabled===true,rendererEnabled:body.renderer_enabled===true,
+   docxOnlyEnabled:body.docx_only_enabled===true};
+ }catch{return {enabled:false,rendererEnabled:false,docxOnlyEnabled:false};}
+}
+export async function wordRendererReady(signal?:AbortSignal){
+ return (await wordEditingCapabilities(signal)).enabled;
 }
 export async function wordEditableText(id:string,signal?:AbortSignal,jobId?:string):Promise<WordInspect>{
  const response=await send(url(id,'inspect',jobId),'GET',undefined,signal);
@@ -88,10 +96,35 @@ export async function wordPreviewBytes(id:string,edited=false,signal?:AbortSigna
   throw Error('简历预览文件不完整。');
  return buffer;
 }
-export type WordMutationResult={ok:true;saved:boolean;revision:number;total_revisions:number;page_count?:number};
+export type WordMutationResult={ok:true;saved:boolean;revision:number;total_revisions:number;
+ page_count?:number|null;layout_verified?:boolean;pdf_available?:boolean};
+export async function wordSourceBytes(id:string,revision:number,jobId?:string){
+ const response=await send(url(id,'source-docx',jobId)+'&revision='+revision);
+ if((response.headers.get('Content-Type')||'').split(';')[0].toLowerCase()!==
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+  throw Error('Word 文件格式不正确，请重试。');
+ const bytes=new Uint8Array(await response.arrayBuffer());
+ if(bytes.length<100||bytes.length>3*1024*1024||
+  bytes[0]!==80||bytes[1]!==75||bytes[2]!==3||bytes[3]!==4)
+  throw Error('原 Word 文件不完整。');
+ return bytes;
+}
 export async function saveOriginalWordEdit(id:string,original:string,text:string,expectedRevision=0,jobId?:string):Promise<WordMutationResult>{
+ const capabilities=await wordEditingCapabilities();
+ if(!capabilities.enabled)throw Error(messages.WORD_NOT_READY);
+ let clientHash:undefined|string;
+ if(!capabilities.rendererEnabled){
+  // Browser performs the exact OOXML edit first, without an external document server.
+  // The Cloudflare endpoint independently repeats and verifies the same patch
+  // before publishing the private, job-scoped revision into R2.
+  const source=await wordSourceBytes(id,expectedRevision,jobId);
+  const patched=await editOriginalDocxStrict(source,[{original,text}]);
+  const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',patched));
+  clientHash=Array.from(digest,b=>b.toString(16).padStart(2,'0')).join('');
+ }
  const response=await send('/api/resume-word','POST',{
   action:'edit',resume_id:id,...jobPayload(jobId),original,text,expected_revision:expectedRevision,
+  ...(clientHash?{client_docx_sha256:clientHash}:{}),
   confirmed_real:true,consent_word_processing:true
  });
  return response.json();
@@ -104,8 +137,8 @@ export async function shiftOriginalWordRevision(id:string,action:'undo'|'redo',e
  return response.json();
 }
 async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf',jobId?:string,jobLabel?:string){
- // Both files originate from the same saved, renderer-verified original DOCX.
- // A PDF is never edited in-place and no browser print-template is substituted.
+ // DOCX retains the original OOXML package. Only optional PDF originates from
+ // trusted renderer verification; never substitute a browser print-template.
  const response=await send(url(id,format==='pdf'?'download-pdf':'download',jobId));
  const expected=format==='pdf'?'application/pdf':
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
