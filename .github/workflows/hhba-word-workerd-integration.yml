@@ -1,0 +1,32 @@
+name: HHBA Word local Cloudflare workerd R2 and D1
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/hhba-word-workerd-integration.yml'
+      - 'apps/web/scripts/qa_word_workerd_entry.mjs'
+      - 'apps/web/scripts/qa_word_workerd_d1_r2.mjs'
+      - 'apps/web/functions/api/resume-word.js'
+      - 'apps/web/functions/_lib/private-word-service.js'
+      - 'apps/web/src/services/resumeDocxPreserve.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local-cloudflare-word:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked app and ephemeral local Workers runtime
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          npm install --no-save --no-audit --no-fund miniflare@4
+      - name: Execute real Word Pages Function with local workerd R2 D1 and authentic session validation
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/qa_word_workerd_d1_r2.mjs
