@@ -418,7 +418,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
           change.proposed.trim()&&change.proposed.length<=300);
          const candidate=restored?sessionWordDraft!.text:
           matches.length===1?matches[0].proposed:anchor.text;
-         setSelected(anchor);setDraft(candidate);setInlineVisualEditor(null);
+         setSelected(anchor);setPage(anchor.page);setDraft(candidate);setInlineVisualEditor(null);
          setConfirmed(false);
          setMessage(restored?'已恢复未保存的文字草稿，请检查后再次确认。':
           matches.length===1?'已填入本人确认过的建议；请复核事实与原版式后再保存。':'');
