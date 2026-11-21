@@ -4,7 +4,7 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
-import {enrichSearchMatchesWithJD} from '../../_lib/match-jd-enrichment.js';
+import {enrichSearchMatchesWithJD,matchJdEnrichmentEnabled} from '../../_lib/match-jd-enrichment.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -139,7 +139,7 @@ function nativeResponsePayload(result){
 // The live Search-first model owns the job list. Only server-completed
 // matches may create durable personal history; clients cannot submit fake jobs.
 async function verifiedJdPass(env,result,resume,options,progress=()=>{}){
- if(env?.HHBA_MATCH_JD_ENRICH_ENABLED!=='1')return result;
+ if(!matchJdEnrichmentEnabled(env))return result;
  progress('reading');
  try{
   const checked=await enrichSearchMatchesWithJD(env,result.matches,resume,options);
