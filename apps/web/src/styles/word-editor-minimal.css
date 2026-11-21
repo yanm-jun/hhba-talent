@@ -232,11 +232,8 @@
    or colored boxes may cover the original Word paragraphs. */
 .hhba-match-modal-editor .targeted-resume.is-word-first
  .hhba-browser-word-output .hhba-word-inline-suggestion{
- white-space:inherit!important;
+ /* Never override the original run's inline Word font/spacing attributes. */
  overflow-wrap:anywhere;
- font:inherit!important;
- letter-spacing:inherit!important;
- line-height:inherit!important;
 }
 .hhba-match-modal-editor .targeted-resume.is-word-first
  .hhba-browser-word-output .hhba-word-inline-suggestion > .hhba-word-ai-changed{
