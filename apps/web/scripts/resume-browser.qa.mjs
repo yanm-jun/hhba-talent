@@ -297,6 +297,9 @@ try{
  await source.getByRole('button',{name:'撤销',exact:true}).click();
  await source.getByRole('button',{name:'修改这段简历'}).waitFor({timeout:10000});
  assert.equal(await originalPdfDraft.count(),0,'undo restores the unchanged native PDF page');
+ // Undo triggers an asynchronous native PDF.js repaint. The activation
+ // button can be ready a frame before its verified text hotspots return.
+ await source.locator('.hhba-original-resume-anchor').first().waitFor({state:'visible',timeout:15000});
  assert.ok((await source.locator('.hhba-original-resume-anchor').count())>=1,
   'verified editable hotspot remains after undo');
  assert.deepEqual(sourceErrors,[],'original PDF must not cause JS runtime exceptions');
