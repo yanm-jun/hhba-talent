@@ -1,0 +1,79 @@
+/**
+ * HHBA interaction icon system — applies to every Lucide icon in the public app
+ * and candidate workspace without altering the underlying icon meaning.
+ *
+ * The SVG's original width and height are preserved to avoid regressions in
+ * dense controls, the resume editor and responsive layouts.
+ * Brand marks, employer logos, charts and editorial graphics are not icons.
+ */
+:root {
+  --hhba-icon-stroke: 1.8;
+  --hhba-icon-ease: cubic-bezier(.22, .72, .18, 1);
+  --hhba-icon-duration: 200ms;
+}
+
+svg.lucide {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: -.125em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--hhba-icon-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  shape-rendering: geometricPrecision;
+}
+
+/* Icons read their colour from the existing component; selected navigation
+ * inherits the brand tone rather than injecting a competing palette. */
+:where([aria-current="page"], [aria-selected="true"], [data-state="active"], .is-active, .active) svg.lucide {
+  stroke: currentColor;
+}
+
+/* Motion is only feedback for an actual action; static informational icons
+ * do not wobble when their parent card or unrelated text is hovered. */
+:where(a[href], button:not(:disabled), summary, [role="button"], [role="tab"]) > svg.lucide,
+:where(a[href], button:not(:disabled), summary, [role="button"], [role="tab"]) > :where(.entry-icon, .hhba-entry-icon, .hhba-library-hall-icon) svg.lucide {
+  transform-origin: 50% 50%;
+  transition: transform var(--hhba-icon-duration) var(--hhba-icon-ease),
+              opacity var(--hhba-icon-duration) ease,
+              color var(--hhba-icon-duration) ease,
+              filter var(--hhba-icon-duration) ease;
+  will-change: auto;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :where(a[href], button:not(:disabled), summary, [role="button"], [role="tab"]):hover > svg.lucide,
+  :where(a[href], button:not(:disabled), summary, [role="button"], [role="tab"]):hover > :where(.entry-icon, .hhba-entry-icon, .hhba-library-hall-icon) svg.lucide {
+    transform: translateY(-1px);
+  }
+}
+
+:where(a[href], button:not(:disabled), summary, [role="button"], [role="tab"]):active > svg.lucide {
+  transform: scale(.96);
+}
+
+:where(button:disabled, [aria-disabled="true"]) svg.lucide {
+  opacity: .55;
+  filter: none;
+}
+
+/* State indicators: allow meaningful activity only for loaders. Other icons
+ * stay still, and no glow is applied to normal text or document contents. */
+svg.lucide-loader-circle {
+  animation: hhba-icon-progress 1.2s linear infinite;
+  transform-origin: 50% 50%;
+}
+@keyframes hhba-icon-progress {
+  to { transform: rotate(360deg); }
+}
+
+/* Touch UIs never rely on hover. Users requesting less motion get none. */
+@media (prefers-reduced-motion: reduce) {
+  svg.lucide,
+  svg.lucide-loader-circle {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
