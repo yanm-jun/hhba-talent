@@ -124,7 +124,7 @@ test('Siri in-document changes expose adopt edit ignore only on hover/tap and re
  assert.match(viewer,/setActiveVisualId\(current=>current===visual\.id\?null:visual\.id\)/);
  assert.match(viewer,/window\.confirm\('请先核实/);
  const save=viewer.indexOf('async function acceptVisualWord');
- const persist=viewer.indexOf('await saveOriginalWordEdit(resume.id,anchor.text,visual.proposed.trim(),revision)',save);
+ const persist=viewer.indexOf('await saveOriginalWordEdit(resume.id,anchor.text,visual.proposed.trim(),revision,jobId)',save);
  const success=viewer.indexOf("onVisualSuggestionAction?.(visual.id,'accepted')",save);
  assert.ok(save>=0&&persist>save&&success>persist,
   'adoption must signal accepted only after a layout-verified private Word revision succeeds');
