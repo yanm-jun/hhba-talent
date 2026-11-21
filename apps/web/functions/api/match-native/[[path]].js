@@ -4,6 +4,7 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
+import {candidateAgentEnabled,candidateAgentConfiguration,runCandidateAgentMatch} from '../../_lib/candidate-agent-skills.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -127,6 +128,7 @@ function nativeResponsePayload(result){
    job.recruitment_source_kind==='EMPLOYER_DOMAIN_CANDIDATE'||
    job.recruitment_source_kind==='EMPLOYER_ATS').length,
   native_search:result.diagnostic,
+  agent:result.agent||null,
   source:'DeepSeek Search 官方接口检索 + V4 Pro 简历匹配',
   scoring:'AI 根据简历和招聘信息推荐；不代表录用概率',
   privacy:'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
@@ -296,7 +298,7 @@ export async function onRequest({request,env}){
  const url=new URL(request.url);
  const tail=url.pathname.slice('/api/match-native'.length).replace(/\/$/,'')||'/';
  if(tail==='/status'&&request.method==='GET')
-  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'SEARCH_FIRST_V1',formats:['pdf','docx']});
+  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'SEARCH_FIRST_V1',formats:['pdf','docx'],candidate_agent:candidateAgentConfiguration(env)});
  if(!enabled(env))return fail('MATCH_NOT_ENABLED',503);
  if(tail==='/provider-check'&&request.method==='GET'){
   try{
@@ -360,14 +362,19 @@ export async function onRequest({request,env}){
       if(!ended)send('progress',{stage:'waiting'});
      },12000);
      try{
-      const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-       options.role_hint,options.limit,{signal:abort.signal,onProgress:stage=>{
-        phase=stage;send('progress',{stage});
-       },onPartial:matches=>send('partial',{matches})});
+      const onProgress=stage=>{phase=stage;send('progress',{stage});};
+      const onPartial=matches=>send('partial',{matches});
+      const result=candidateAgentEnabled(env)?
+       await runCandidateAgentMatch({env,redactedResume:redacted,
+        roleHint:options.role_hint,limit:options.limit,executeSearch:runSearchFirstMatch,
+        signal:abort.signal,onProgress,onPartial}):
+       await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
+        options.role_hint,options.limit,{signal:abort.signal,onProgress,onPartial});
       console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
       send('complete',await withSavedHistory(env,candidate,input,result));
      }catch(e){
-      const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
+      const code=typeof e?.code==='string'?e.code:
+       /^AGENT_[A-Z_]+$/.test(e?.message||'')?e.message:'AI_PROVIDER_UNAVAILABLE';
       console.warn('HHBA_MATCH_NATIVE_ERROR',JSON.stringify({
        code,phase,elapsed_ms:Date.now()-started
       }));
@@ -388,12 +395,16 @@ export async function onRequest({request,env}){
  }
 
  try{
-  const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-   options.role_hint,options.limit);
+  const result=candidateAgentEnabled(env)?
+   await runCandidateAgentMatch({env,redactedResume:redacted,
+    roleHint:options.role_hint,limit:options.limit,executeSearch:runSearchFirstMatch}):
+   await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
+    options.role_hint,options.limit);
   console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
   return json(await withSavedHistory(env,candidate,input,result));
  }catch(e){
-  const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
+  const code=typeof e?.code==='string'?e.code:
+   /^AGENT_[A-Z_]+$/.test(e?.message||'')?e.message:'AI_PROVIDER_UNAVAILABLE';
   console.warn('HHBA_MATCH_NATIVE_ERROR',code);
   return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:502);
  }
