@@ -650,7 +650,7 @@
    toolstrip appears on hover/focus, or after tapping the wording on touch.
    No explanatory "AI suggested change" label is drawn onto the document. */
 .hhba-original-word-viewer .hhba-word-siri-anchor-shell{
- position:absolute;z-index:7;min-height:18px;isolation:visible;
+ position:absolute;z-index:7;min-height:18px;isolation:isolate;
 }
 .hhba-original-word-viewer .hhba-word-siri-anchor-shell:has(.hhba-original-resume-anchor:focus-visible),
 .hhba-original-word-viewer .hhba-word-siri-anchor-shell:hover,
@@ -678,7 +678,7 @@
  display:inline-flex;align-items:center;justify-content:center;gap:4px;
  background:#fff;color:#3a5b71;border:0;border-radius:7px;
  min-height:32px;padding:7px 10px;white-space:nowrap;
- font:600 11px/1.25 inherit;cursor:pointer;
+ font-family:inherit;font-size:11px;font-weight:600;line-height:1.25;cursor:pointer;
 }
 .hhba-original-word-viewer .hhba-word-siri-inline-actions button.is-accept{
  background:#315b7b;color:white;
