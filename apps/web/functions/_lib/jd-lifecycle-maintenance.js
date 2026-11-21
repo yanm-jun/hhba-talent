@@ -122,14 +122,39 @@ export async function runJdRetentionSweep(env,{now=new Date(),dryRun=true,deps={
    if(present){
     const hash=present.customMetadata?.jd_sha256;
     if(hash&&hash!==row.jd_sha256){result.skipped++;continue}
-    await bucket.delete(row.object_key);
    }
+   // Re-read the D1 index before the destructive phase; if another worker
+   // has refreshed the same version, the cleanup candidate is obsolete.
+   const current=await db.prepare(
+    'SELECT id,canonical_url,object_key,jd_sha256,last_verified_at FROM '+
+    row.table+' WHERE id=?'
+   ).bind(row.id).first();
+   if(!current||current.canonical_url!==row.canonical_url||
+    current.object_key!==row.object_key||current.jd_sha256!==row.jd_sha256||
+    current.last_verified_at!==row.last_verified_at){
+    result.skipped++;continue;
+   }
+   // IMPORTANT: D1 index MUST be removed before R2 bytes. Previously a
+   // failed D1 DELETE left an indexed JD pointing to already-deleted R2.
+   // Use optimistic concurrency on the exact version and recheck state
+   // INSIDE the same D1 statement; never delete a recently refreshed row.
    const deleted=await db.prepare(
-    'DELETE FROM '+row.table+' WHERE id=? AND canonical_url=? AND object_key=?'
-   ).bind(row.id,row.canonical_url,row.object_key).run();
+    'DELETE FROM '+row.table+
+    ' WHERE id=? AND canonical_url=? AND object_key=? AND jd_sha256=? AND last_verified_at=? '+
+    'AND EXISTS(SELECT 1 FROM hhba_jd_posting_lifecycle AS s '+
+    'WHERE s.canonical_url=? AND s.status=? AND '+
+    '(s.status<>\'CLOSED\' OR s.closed_at=?))'
+   ).bind(row.id,row.canonical_url,row.object_key,row.jd_sha256,
+    row.last_verified_at,row.canonical_url,row.status,row.closed_at).run();
    if(deleted?.success!==true||deleted?.meta?.changes!==1){
     result.skipped++;continue;
    }
+   // A transient R2 failure can leave unreferenced bytes (space), but
+   // must NEVER leave a valid index pointing at missing JD content.
+   let r2ok=true;
+   if(present)try{await bucket.delete(row.object_key)}
+   catch{r2ok=false}
+   if(!r2ok){result.blocked++;continue}
    result.purged++;
    await db.prepare('INSERT INTO hhba_jd_retention_audit('+
     'event_id,jd_version_id,event_type,event_at,reason) VALUES(?,?,?,?,?)'
