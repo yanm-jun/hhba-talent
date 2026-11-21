@@ -48,11 +48,37 @@ export function resumeJDProfile(resume,requirements,roleHint=''){
   requested_role:String(roleHint||'').slice(0,80)
  };
 }
+function samePostedRole(found,verified){
+ const a=normalize(found),b=normalize(verified);
+ if(!a||!b)return false;
+ if(a===b||a.includes(b)||b.includes(a))return true;
+ const chinese=/[\u4e00-\u9fff]/;
+ if(chinese.test(a)||chinese.test(b)){
+  const bigrams=value=>new Set(Array.from({length:Math.max(0,value.length-1)},
+   (_,i)=>value.slice(i,i+2)));
+  const x=bigrams(a),y=bigrams(b);
+  const overlap=[...x].filter(t=>y.has(t)).length;
+  return overlap>=2&&overlap/Math.min(x.size||1,y.size||1)>=.5;
+ }
+ const words=value=>new Set(value.split(/[^a-z0-9]+/i).filter(x=>x.length>=3));
+ const x=words(found.toLowerCase()),y=words(verified.toLowerCase());
+ const overlap=[...x].filter(w=>y.has(w)).length;
+ return overlap>=2&&overlap/Math.min(x.size||1,y.size||1)>=.5;
+}
 export function scoreVerifiedJDSearchJob(original,archived,resume,options={}){
+ if(!samePostedRole(original?.title,archived?.title)||
+  !normalize(original?.location).includes(normalize(archived?.location)))return null;
  const job=archivedJDToScoreJob(archived);
  if(!job)return null;
  const profile=resumeJDProfile(resume,job,options.role_hint);
- const fit=scoreCandidateFit(profile,job,{role_hint:profile.requested_role});
+ // User-selected role hints alone are not job skills and cannot justify
+ // numeric scoring. Require independently documented resume evidence.
+ const evidence=profile.skills.length>0||
+  (Number.isFinite(profile.experience_years)&&job.min_experience_years>0)||
+  Boolean(profile.education&&job.minimum_education)||
+  profile.target_roles.some(role=>samePostedRole(role,job.title));
+ const fit=evidence?scoreCandidateFit(profile,job,{role_hint:profile.requested_role}):
+  {eligible:false,reason:'RESUME_EVIDENCE_MISSING',score:null};
  const linked={
   ...original,official_url:archived.canonical_url,
   jd_version_id:archived.id,jd_sha256:archived.jd_sha256,
