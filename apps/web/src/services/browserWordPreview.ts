@@ -82,7 +82,12 @@ export function browserWordAnchors(mount:HTMLElement,editableText:string[]):Word
  const pages=[...mount.querySelectorAll<HTMLElement>('section.hhba-native-docx')];
  if(!pages.length)return [];
  const bounds=mount.getBoundingClientRect();
- if(bounds.width<100||bounds.height<100)return [];
+ // On phones the DOCX paper is wider than the scrollable viewport.
+ // Anchor coordinates must use the FULL rendered document, never the clipped
+ // visible area, otherwise valid text can be rejected as "out of bounds".
+ const fullWidth=Math.max(mount.scrollWidth,mount.offsetWidth);
+ const fullHeight=Math.max(mount.scrollHeight,mount.offsetHeight);
+ if(bounds.width<100||bounds.height<100||fullWidth<100||fullHeight<100)return [];
  const safe=new Set(editableText.filter(s=>typeof s==='string'&&s.trim()===s&&s.length>=3&&s.length<=300));
  const found=new Map<string,HTMLElement[]>();
  // Only leaf spans with exactly one matching run may be edited. Ambiguous or
@@ -97,9 +102,10 @@ export function browserWordAnchors(mount:HTMLElement,editableText:string[]):Word
  for(const [text,elements] of found){
   if(elements.length!==1)continue;
   const node=elements[0],rect=node.getBoundingClientRect();
-  const x=(rect.left-bounds.left)/bounds.width*1000;
-  const y=(rect.top-bounds.top)/bounds.height*1000;
-  const w=rect.width/bounds.width*1000,h=rect.height/bounds.height*1000;
+  const scaleX=bounds.width/mount.offsetWidth,scaleY=bounds.height/mount.offsetHeight;
+  const x=(rect.left-bounds.left)/scaleX/fullWidth*1000;
+  const y=(rect.top-bounds.top)/scaleY/fullHeight*1000;
+  const w=rect.width/scaleX/fullWidth*1000,h=rect.height/scaleY/fullHeight*1000;
   if([x,y,w,h].some(v=>!Number.isFinite(v))||x<0||y<0||w<4||h<2||
    x+w>1000.5||y+h>1000.5)continue;
   const family=getComputedStyle(node).fontFamily;
