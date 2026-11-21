@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>HHBA 本地 DOCX 浏览器验收</title>
+<style>
+body{background:#e9edf3;font-family:Arial,sans-serif;margin:0;padding:12px}
+#hhba-word-fixture{position:relative;max-width:1100px;margin:auto;overflow:auto}
+#status{padding:10px;background:white;margin:10px auto;max-width:1100px;font-size:13px}
+</style>
+</head>
+<body>
+<div id="status" role="status">正在载入虚构双页 DOCX……</div>
+<div id="hhba-word-fixture"></div>
+<script type="module">
+import {renderBrowserWord,browserWordAnchors} from '/src/services/browserWordPreview.ts';
+const OLD='负责门店运营及日常数据整理工作';
+const status=document.getElementById('status');
+const root=document.getElementById('hhba-word-fixture');
+try{
+  const r=await fetch('/__hhba_word_qa.docx',{cache:'no-store'});
+  if(!r.ok)throw Error('synthetic DOCX fixture missing');
+  const bytes=new Uint8Array(await r.arrayBuffer());
+  const pageCount=await renderBrowserWord(bytes,root);
+  const anchors=browserWordAnchors(root,[OLD]);
+  window.__HHBA_WORD_QA={
+   state:'ok',pageCount,anchors,
+   text:root.textContent||'',
+   images:root.querySelectorAll('img').length,
+   scriptTags:root.querySelectorAll('script').length,
+   remoteImageCount:[...root.querySelectorAll('img[src]')]
+    .filter(x=>!/^(data:|blob:)/i.test(x.getAttribute('src')||'')).length
+  };
+  status.textContent='DOCX 浏览器预览已渲染（仅结构与样式近似，分页未经 Word 验证）';
+}catch(e){
+  window.__HHBA_WORD_QA={state:'error',error:String(e)};
+  status.textContent='验收失败：'+String(e);
+}
+</script>
+</body>
+</html>
