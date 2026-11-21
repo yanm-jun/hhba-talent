@@ -1,6 +1,7 @@
 // Candidate-only same-JD V2 ranking reassessment. No generative AI calls.
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
-import {validatedAuditedJob,validReassessmentInput,sameEngineReassessment} from '../_lib/resume-reassessment.js';
+import {validatedAuditedJob,validReassessmentInput,sameEngineReassessment,archivedJDToScoreJob} from '../_lib/resume-reassessment.js';
+import {readJobJdById,jdArchiveConfigured} from '../_lib/job-jd-archive.js';
 import {validatedCachedOfficialJob} from '../_lib/official-job-evidence.js';
 const LIMIT_BYTES=160*1024,PER_ACCOUNT=12,GLOBAL=400;
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
@@ -57,7 +58,7 @@ async function reserve(db,identity){
 }
 export async function onRequestGet({env}){
  return json({kind:'HHBA_RESUME_REASSESS_V2',enabled:active(env)&&await ready(env.HHBA_PNVS_AUTH_DB),
-  ranking_version:'HHBA_MATCH_RANKING_V2',scope:'AUDITED_MAINLAND_ATS_ONLY'});
+  ranking_version:'HHBA_MATCH_RANKING_V2',scope:'AUDITED_MAINLAND_ATS_AND_VERIFIED_JD_VERSIONS'});
 }
 export async function onRequestPost({request,env}){
  if(!sameOrigin(request))return bad('ORIGIN_REQUIRED',403);
@@ -76,7 +77,10 @@ export async function onRequestPost({request,env}){
  if(!validReassessmentInput(input))return bad('INVALID_REASSESSMENT_INPUT',400);
  let job;
  try{
-  if(/^verified-official-[a-f0-9]{32}$/.test(input.job_id)){
+  if(/^jd_[a-f0-9]{32}$/.test(input.job_id)){
+   const jd=jdArchiveConfigured(env)?await readJobJdById(env,input.job_id):null;
+   job=archivedJDToScoreJob(jd);
+  }else if(/^verified-official-[a-f0-9]{32}$/.test(input.job_id)){
    const row=await db.prepare('SELECT * FROM hhba_official_job_evidence WHERE id=?')
     .bind(input.job_id).first();
    job=await validatedCachedOfficialJob(row);
