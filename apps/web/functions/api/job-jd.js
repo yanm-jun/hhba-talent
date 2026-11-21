@@ -9,10 +9,10 @@
  * no candidate resume content, and no public R2 bucket URL.
  */
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
-import {safeOfficialJobLocator} from '../_lib/domestic-search-fetch.js';
+import {fetchPublicAtsJd} from '../_lib/public-ats-jd.js';
 import {directOfficialJobEvidence} from '../_lib/official-job-evidence.js';
 import {
- JD_ARCHIVE_KIND,jdArchiveConfigured,jdArchiveReady,
+ JD_ARCHIVE_KIND,jdArchiveConfigured,jdArchiveReady,safeJDSourceLocator,
  readJobJdById,readFreshJobJdByUrl,saveVerifiedJobJd,publicJdPayload
 } from '../_lib/job-jd-archive.js';
 
@@ -82,7 +82,7 @@ export async function onRequestGet({request,env}){
   }catch{return fail('JD_ARCHIVE_READ_FAILED',503)}
  }
  const requested=url.searchParams.get('official_url')||'';
- const locator=safeOfficialJobLocator(requested);
+ const locator=safeJDSourceLocator(requested);
  if(!locator)return fail('OFFICIAL_URL_NOT_SUPPORTED',422);
  try{
   const item=await readFreshJobJdByUrl(env,locator.url);
@@ -102,7 +102,7 @@ export async function onRequestPost({request,env}){
  try{data=await readJson(request)}catch{return fail('INVALID_REQUEST',400)}
  if(data?.consent_verify!==true||typeof data.official_url!=='string')
   return fail('CONSENT_REQUIRED',400);
- const locator=safeOfficialJobLocator(data.official_url);
+ const locator=safeJDSourceLocator(data.official_url);
  if(!locator)return fail('OFFICIAL_URL_NOT_SUPPORTED',422);
  try{
   const cached=await readFreshJobJdByUrl(env,locator.url);
@@ -111,7 +111,7 @@ export async function onRequestPost({request,env}){
  try{if(!await countAttempt(env,session))return fail('JD_EXTERNAL_FETCH_LIMIT',429)}
  catch{return fail('JD_ARCHIVE_QUOTA_NOT_READY',503)}
  let evidence;
- try{evidence=await directOfficialJobEvidence(locator.url)}
+ try{evidence=locator.kind?await fetchPublicAtsJd(locator.url):await directOfficialJobEvidence(locator.url)}
  catch{return fail('JD_OFFICIAL_FETCH_FAILED',422)}
  if(!evidence?.full_jd||evidence.content_status!=='VERIFIED_SECTIONS')
   return fail('JD_NOT_COMPLETE_ENOUGH',422);
