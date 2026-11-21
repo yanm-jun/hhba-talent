@@ -6,6 +6,13 @@ on:
       - 'apps/web/scripts/qa-word-browser-preview.html'
       - 'apps/web/scripts/qa_word_browser_preview.py'
       - 'apps/web/src/services/browserWordPreview.ts'
+      - 'apps/web/scripts/qa-actual-word-viewer.html'
+      - 'apps/web/scripts/qa_actual_word_viewer.tsx'
+      - 'apps/web/scripts/qa_actual_word_viewer.py'
+      - 'apps/web/scripts/qa_word_generate_versions.mjs'
+      - 'apps/web/src/components/OriginalWordViewer.tsx'
+      - 'apps/web/src/services/originalWordApi.ts'
+      - 'apps/web/src/styles/browser-word-preview.css'
   workflow_dispatch:
 permissions:
   contents: read
@@ -59,16 +66,22 @@ jobs:
           doc.save(path)
           print('Fixture generated:',path,path.stat().st_size)
           PY
-      - name: Browser preview and unique Siri text anchor on desktop and mobile
+      - name: Browser and actual React Siri editor on desktop and mobile
         working-directory: apps/web
+        env:
+          VITE_HHBA_REAL_AUTH_ENABLED: '1'
         run: |
+          node scripts/qa_word_generate_versions.mjs
           npm run dev -- --host 127.0.0.1 --port 4173 >/tmp/hhba-word-vite.log 2>&1 &
           python scripts/qa_word_browser_preview.py
+          python scripts/qa_actual_word_viewer.py
       - name: Upload browser screenshots and QA report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: hhba-synthetic-word-browser-qa
-          path: /tmp/hhba-word-browser-qa
+          path: |
+            /tmp/hhba-word-browser-qa
+            /tmp/hhba-word-react-qa
           if-no-files-found: ignore
           retention-days: 7
