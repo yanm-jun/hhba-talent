@@ -84,14 +84,11 @@ test('public job and company browsing are not marked as private workspaces, and 
  assert.ok(home.includes("onClick={()=>navigate(user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch')}"),'signed-in users go directly to AI matching, others sign in with return destination');
 });
 
-test('homepage financial disclosure uses distributable profit, not turnover, and does not invent reports',()=>{
+test('homepage config exposes editorial commitment without a finance allocation promise',()=>{
  const body=JSON.parse(read('../src/data/homepagePublicConfig.json'));
- assert.equal(body.distribution.companyPercent,60);
- assert.equal(body.distribution.workerSupportPercent,40);
- assert.equal(body.distribution.companyPercent+body.distribution.workerSupportPercent,100);
- assert.equal(body.distribution.basis,'依法核算后的可分配利润');
- assert.equal(body.distribution.reportStatus,'not_published');
- assert.match(body.distribution.reportNotice,/首期财务公开报告尚未发布/);
+ assert.equal(body.commitment.page,'/commitment');
+ assert.equal(body.commitment.fundingPromise,false);
+ assert.ok(!Object.hasOwn(body,'distribution'));
 });
 
 test('homepage promotes free rights, avoids legacy membership marketing and preserves recruitment modules',()=>{
@@ -109,34 +106,23 @@ test('homepage promotes free rights, avoids legacy membership marketing and pres
  assert.ok(component.includes('20 个专题'));
  assert.ok(component.includes('200 条原创建议'));
  assert.ok(component.includes('免费开放'));
- assert.ok(component.includes('api/transparency/reports'));
+ assert.ok(component.includes('to="/commitment"'));
+ assert.ok(!component.includes('api/transparency/reports'));
  for(const removed of ['api/public/homepage','¥24.90','membership.','distribution.','60%','40%','连续缴费','会员服务'])
   assert.ok(!component.includes(removed),'outdated homepage claim: '+removed);
  assert.ok(!home.includes('HomeLiveDrawer'));
 });
-test('homepage keeps the existing background and shows two real resources with a slim pledge',()=>{
+test('homepage pledge links to the brand wall and never promotes a funding programme',()=>{
  const component=read('../src/components/HomeWorkplacePromise.tsx');
  const css=read('../src/styles/home-workplace-promise.css');
- for(const content of [
-   '让职业选择更有依据。','HHBA · CAREER RESOURCES',
-   'hhba-home-membership-card hhba-home-resources-panel',
-   'hhba-home-resource-grid','hhba-home-resource-card',
-   '劳动权益知识库','高性价比职场指南','20 个专题','200 条原创建议',
-   "href:'/rights/knowledge'","href:'/rights/guide'",
-   'hhba-home-pledge','每月根据实际经营情况',
-   '不承诺固定金额或分配比例','to="/transparency"',
-   'api/transparency/reports'
- ])assert.ok(component.includes(content),'missing new homepage resource content: '+content);
- for(const legacy of [
-  'hhba-home-price','hhba-home-distribution-values','hhba-home-phase-grid',
-  '职场权益知识','权益自助指引','to="/membership/rules"','60%','40%'
- ])assert.ok(!component.includes(legacy),'outdated visual / claim: '+legacy);
- assert.match(css,/\.hhba-home-workplace::before/);
- assert.match(css,/\.hhba-home-resource-grid\{display:grid;grid-template-columns:repeat\(2,/);
- assert.match(css,/\.hhba-home-resource-grid\{grid-template-columns:1fr/);
+ const wall=read('../src/pages/TransparencyPage.tsx');
+ for(const phrase of ['OUR COMMITMENT · 我们的坚持','每一份职业选择，都值得被认真守护。','to="/commitment"'])assert.ok(component.includes(phrase));
+ for(const removed of ['每月根据实际经营情况','资金报告','不承诺固定金额或分配比例','/transparency','api/transparency'])assert.ok(!component.includes(removed),removed);
  assert.match(css,/\.hhba-home-pledge\{display:flex/);
  assert.match(css,/@media\(max-width:680px\)/);
- assert.match(css,/:focus-visible/);
+ assert.match(wall,/commitmentGallery\.map/);
+ assert.match(wall,/role="dialog"/);
+ assert.match(wall,/尚未开放/);
 });
 
 test('home job footer is one compact row; full marketplace still supports page jump',()=>{
