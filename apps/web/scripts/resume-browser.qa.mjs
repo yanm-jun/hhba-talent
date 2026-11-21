@@ -754,6 +754,12 @@ try{
    const edit=await nativePane.boundingBox();
    assert.ok(edit&&edit.y>=view.height*.35,
     'phone editor must open as a bottom sheet instead of a popup on Word');
+   const closeIcon=first.locator('.targeted-resume-word-edit-host button[aria-label="取消修改"]');
+   const closeBox=await closeIcon.boundingBox();
+   const bounds=await first.evaluate(()=>({width:innerWidth,height:innerHeight}));
+   assert.ok(closeBox && closeBox.x>=8 && closeBox.x+closeBox.width<=bounds.width-8 &&
+    closeBox.y>=0 && closeBox.height>=38,
+    'phone Word close icon must stay fully visible and touch accessible');
   }
   assert.equal(await first.locator('.hhba-original-resume-edit-glow').count(),0,
    'the Word paper must not be obscured by an edit popup');
