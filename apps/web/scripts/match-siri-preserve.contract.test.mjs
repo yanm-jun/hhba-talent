@@ -90,7 +90,7 @@ test('one job = one private Word revision scope; the original file is untouched'
  assert.match(word,/downloadOriginalWordEdited\(resume\.id,jobId,jobTitle\)/);
  assert.match(backend,/hhba-word-target-job-v1:/);
  assert.match(backend,/job_scope_sha256/);
- assert.match(optimizer,/onVisualSuggestionAction=\{\(id,action,newText\)=>/);
+ assert.match(optimizer,/onVisualSuggestionAction=\{\(id,action,newText,layoutVerified\)=>/);
  assert.match(word,/hhba-word-siri-inline-actions/);
  for(const label of ['采纳','编辑','忽略'])assert.ok(word.includes('> '+label+'<'));
 });
