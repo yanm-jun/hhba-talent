@@ -7,7 +7,7 @@
  * No made-up jobs, employers or source links can be returned by this planner.
  */
 const BASE='https://api.deepseek.com';
-const DEFAULT_TIMEOUT_MS=18000;
+const DEFAULT_TIMEOUT_MS=35000;
 const clean=x=>String(x||'').replace(/[\u0000-\u001f]/g,' ').replace(/\s+/g,' ').trim();
 const pii=/(?:[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|\b1[3-9]\d{9}\b|\b\d{17}[\dXx]\b|(?:微信|手机号|QQ号|身份证号)\s*[:：])/i;
 const unsafe=/(?:https?:\/\/|(?:\b(?:login|password|token|api[_-]?key|passwd)\b))/i;
@@ -49,8 +49,8 @@ export async function planAutonomousMainlandSearch(key,redactedResume,roleHint,{
  const response=await fetcher(BASE+'/responses',{
   method:'POST',redirect:'manual',signal:sig,
   headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
-  body:JSON.stringify({model:'deepseek-v4-pro',
-   text:{format:{type:'json_object'}},max_output_tokens:3200,stream:false,
+  body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'max'},
+   text:{format:{type:'json_object'}},max_output_tokens:14000,stream:false,
    instructions,
    input:'目标职位（可为空）：'+clean(roleHint).slice(0,80)+
     '\n已脱敏且用户授权用于分析的简历：\n'+String(redactedResume||'').slice(0,12000)})
