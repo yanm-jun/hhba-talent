@@ -80,6 +80,18 @@ export function targetedEmployerRecoveryQueries(history,usedQueries=[]){
  }
  return normalizeAutonomousQueries(proposals,usedQueries).slice(0,4);
 }
+/**
+ * A final source-discovery pass when the Agent has too little real employer
+ * evidence. Only already-public role names and locally derived career-family
+ * search terms are sent to Search. No private CV excerpt or invented URL.
+ */
+export function underfilledOfficialSearchQueries(resume,roleHint,history,usedQueries=[]){
+ const reposts=targetedEmployerRecoveryQueries(history,usedQueries);
+ const known=searchQueries(resume,roleHint);
+ const fresh=usedQueries.slice(-4).map(q=>
+  q.slice(0,80)+' 企业自有招聘官网 在招岗位 工作城市');
+ return normalizeAutonomousQueries([...reposts,...known,...fresh],usedQueries).slice(0,8);
+}
 async function modelDecision(key,resume,roleHint,pool,queries,history,deadline,{
  fetcher=fetch,signal=null,decisionTimeoutMs=35000
 }={}){
@@ -145,6 +157,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  let pool=[],usedQueries=[],pageReads=0,searchCalls=0,searchFailures=0;
  let checkpointRestored=false,checkpointWrites=0,checkpointErrors=0;
  let checkpointRefreshAttempted=false,checkpointRefreshQueries=0;
+ let underfilledExpansionQueries=0,underfilledExpansionNew=0;
  let rawHits=0,loops=0,decisions=0,decisionFailures=0,reflections=0;
  let exitReason='unknown',shortlistIds=[],agentPlannedQueries=0;
  let rejectedLinks=0;
@@ -375,6 +388,19 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  }
  if(exitReason==='unknown')exitReason='runtime_budget';
  ensureActive();
+ // Do not treat the Agent's early "finish" as proof that no more jobs
+ // exist. With a thin employer-source pool, make one final bounded Search
+ // using independent public role clues and related career-family queries.
+ // Reserve enough time for the real selection and scoring output.
+ if(pool.filter(isRecommendationEligible).length<Math.min(limit,6)&&budget()>56000){
+  const supplementary=underfilledOfficialSearchQueries(resume,roleHint,history,usedQueries);
+  if(supplementary.length){
+   onProgress('searching');
+   activity('searching','企业岗位来源数量不足，正在执行最后一轮补充官网检索，避免过早结束。');
+   underfilledExpansionQueries=supplementary.length;
+   underfilledExpansionNew=await searchTool(supplementary,{reserveMs:44000});
+  }
+ }
  let eligible=pool.filter(isRecommendationEligible);
  activity('writing',eligible.length?
   '已找到 '+eligible.length+' 个来源合规的候选职位，正在对照简历逐条分析。':
@@ -524,6 +550,8 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    checkpoint_restored:checkpointRestored,
    checkpoint_refresh_attempted:checkpointRefreshAttempted,
    checkpoint_refresh_queries:checkpointRefreshQueries,
+   underfilled_expansion_queries:underfilledExpansionQueries,
+   underfilled_expansion_new:underfilledExpansionNew,
    checkpoint_writes:checkpointWrites,
    checkpoint_errors:checkpointErrors,
    source_before:sourceCounts(result),source_after:sourceCounts(result),
