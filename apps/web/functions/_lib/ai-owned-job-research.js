@@ -155,7 +155,17 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
     searchFailures+=result.diagnostic?.search_failures??0;
     rejectedLinks+=result.diagnostic?.rejected_links??0;
     completed.push(...result.hits);
-   }catch(e){searchFailures+=part.length;history.push({type:'search_error',code:String(e.code||'UNAVAILABLE')})}
+   }catch(e){
+    searchFailures+=part.length;
+    history.push({type:'search_error',code:String(e.code||'UNAVAILABLE')});
+    // Configuration, balance and rate-limit errors are NOT "no suitable
+    // jobs". The old code swallowed these errors, continued searching and
+    // misleadingly failed after the entire research window.
+    if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+      'AI_PROVIDER_RATE_LIMITED','AI_SEARCH_API_REJECTED',
+      'AI_SEARCH_UNAVAILABLE','AI_SEARCH_RESPONSE_INVALID'].includes(e?.code))
+     throw e;
+   }
   }
   const old=pool.length;
   pool=mergeCandidateHits(pool,completed,240);
