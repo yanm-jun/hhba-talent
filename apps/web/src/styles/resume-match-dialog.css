@@ -301,6 +301,13 @@
 .hhba-research-entry small{display:block;margin:5px 0 0;font-size:11px;color:#8196ae}
 .hhba-research-now{display:flex;align-items:flex-start;gap:11px;border:1px solid #e6edf5;border-radius:11px;background:#f8faff;padding:13px 15px;font-size:12px;line-height:1.8;color:#31567c;font-weight:570}
 .hhba-research-now .hhba-research-live-dot{margin-top:6px}
+.hhba-match-progress-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:8px;list-style:none;padding:0;margin:0 0 12px}
+.hhba-match-progress-steps li{border:1px solid #e6edf5;border-radius:8px;padding:8px 10px;font-size:12px;color:#526984}
+.hhba-match-progress-steps li[aria-current=step]{border-color:#a9cffd;background:#eaf3ff;color:#114f9e;font-weight:700}
+.hhba-match-progress-copy{flex:1;display:grid;gap:3px;min-width:0}
+.hhba-match-progress-copy strong{font-size:14px}
+.hhba-match-progress-copy span,.hhba-match-progress-time{font-weight:500}
+.hhba-match-progress-time{flex-shrink:0;font-variant-numeric:tabular-nums}
 .hhba-research-footer{display:flex;align-items:center;flex-wrap:wrap;gap:8px 15px;padding-top:16px;color:#8a9caf;font-size:11px;line-height:1.7}
 .hhba-research-footer p{width:100%;margin:0;font-size:11px;color:#916c35}
 .hhba-research-record-hint{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:2px 0;margin-left:auto;color:#4a77b5;cursor:pointer;font-size:11px}

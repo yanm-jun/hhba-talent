@@ -92,6 +92,25 @@ test('a model-invented URL is never displayed, even when only a real source prev
  assert.ok(out.matches.every(job=>job.match_score===null),
   'if the model invented a URL, only a real, explicitly uns cored source preview may survive');
 });
+test('direct employer discovery survives failure of public web search',async()=>{
+ const displayed=[];
+ const result=await runAgentOwnedMainlandMatch('synthetic',resume,'',1,{
+  expandDetailed:false,onSources:(jobs,closed,urls)=>displayed.push(...urls)
+ },{
+  plan:async()=>({queries:['区域渠道督导 企业官网招聘'],catalogKeywords:['渠道运营']}),
+  search:async()=>{throw Object.assign(Error('unavailable'),{code:'AI_SEARCH_UNAVAILABLE'});},
+  searchCatalogs:async(words,{page})=>{
+   assert.deepEqual(words,['渠道运营']);
+   assert.equal(page,1);
+   return {hits:[first],searches:2,raw:1,failures:0};
+  },
+  decide:async()=>({actions:[{type:'finish'}],shortlist_ids:['j1']}),
+  select:async(key,cv,hits)=>({matches:[jobOf(hits[0])]})
+ });
+ assert.ok(displayed.includes(first.url));
+ assert.equal(result.matches[0].official_url,first.url);
+ assert.equal(result.diagnostic.official_catalog_searches,2);
+});
 test('model not available for planning falls back only for tool discovery, still uses AI action loop',async()=>{
  const searched=[];
  const out=await runAgentOwnedMainlandMatch('synthetic',resume,'',10,{
