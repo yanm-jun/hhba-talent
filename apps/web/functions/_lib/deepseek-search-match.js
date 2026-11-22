@@ -76,18 +76,38 @@ async function providerJson(fetcher,key,path,body,timeoutMs,signal){
  }
  try{return await response.json();}catch{throw codeError('AI_SEARCH_RESPONSE_INVALID');}
 }
+// A single upstream timeout or 5xx must not erase an otherwise useful
+// search direction. Retry only transient failures within the ORIGINAL
+// per-query time window; never retry invalid requests, rate limits or auth.
+const RETRYABLE_SEARCH_ERRORS=new Set([
+ 'AI_SEARCH_TIMEOUT','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UNAVAILABLE'
+]);
 export async function searchPublicJobs(key,text,roleHint,{
  fetcher=fetch,signal=null,onProgress=()=>{},queryTimeoutMs=14000,
  queriesOverride=null,maxHits=28,allowEmpty=false
 }={}){
  const start=Date.now(),queries=queriesOverride||searchQueries(text,roleHint),errors=[];
+ let retryAttempts=0,retryRecovered=0;
  onProgress('searching');
  const responses=await Promise.all(queries.map(async query=>{
-  try{
-   const data=await providerJson(fetcher,key,'/v1/tools/search',
-    {query,count:20,need_content:false},queryTimeoutMs,signal);
+  const queryStart=Date.now(),payload={query,count:20,need_content:false};
+  const call=async timeout=>{
+   const data=await providerJson(fetcher,key,'/v1/tools/search',payload,timeout,signal);
    if(!Array.isArray(data?.results))throw codeError('AI_SEARCH_RESPONSE_INVALID');
    return data;
+  };
+  try{
+   // Leave a small recovery window when the first call consumes its timeout.
+   const first=queryTimeoutMs>=6500?Math.floor(queryTimeoutMs*.70):queryTimeoutMs;
+   try{return await call(first)}
+   catch(error){
+    const remaining=queryTimeoutMs-(Date.now()-queryStart);
+    if(signal?.aborted||!RETRYABLE_SEARCH_ERRORS.has(error?.code)||remaining<2200)throw error;
+    retryAttempts++;
+    const response=await call(remaining);
+    retryRecovered++;
+    return response;
+   }
   }catch(e){errors.push(e.code||'AI_PROVIDER_UNAVAILABLE');return {results:[]};}
  }));
  const hits=normalizeHits(responses,maxHits);
@@ -108,6 +128,7 @@ export async function searchPublicJobs(key,text,roleHint,{
   successful_searches:queries.length-errors.length,raw_results:responses.reduce((a,x)=>a+x.results.length,0),
   candidate_links:hits.length,search_failures:errors.length,
   provider_error_codes:[...new Set(errors)].slice(0,6),
+  retry_attempts:retryAttempts,retry_recovered:retryRecovered,
   rejected_links:responses.reduce((a,x)=>a+x.results.length,0)-hits.length,
   rejected_title_hints}};
 }
