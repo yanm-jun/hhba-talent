@@ -13,6 +13,7 @@ import {planAutonomousMainlandSearch,normalizeAutonomousQueries}
 import {searchPublicJobs,enrichCandidateDetails,reasonAboutJobs,
  recoverSearchGroundedShortlist,expandDetailedReasons,sourceOnlyJobPreviews,indexedJobWorkCity} from './deepseek-search-match.js';
 import {mergeCandidateHits} from './match-search-growth.js';
+import {selectedIndexIndustries,fallbackIndexIndustries} from './domestic-employer-index.js';
 import {isRecommendationEligible,classifyJobAvailability} from './match-job-quality.js';
 import {isMainlandEmployerJobUrl,isDirectEmployerSourceHit,sourceCounts} from './match-employer-source.js';
 
@@ -161,6 +162,8 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  let checkpointRefreshAttempted=false,checkpointRefreshQueries=0;
  let underfilledExpansionQueries=0,underfilledExpansionNew=0;
  let rawHits=0,searchRetryAttempts=0,searchRetryRecovered=0;
+ let indexRowsConsidered=0,indexQueries=0,indexNewJobs=0,indexUnavailable=false;
+ let indexSectors=[];
  let loops=0,decisions=0,decisionFailures=0,reflections=0;
  let exitReason='unknown',shortlistIds=[],agentPlannedQueries=0;
  let rejectedLinks=0;
@@ -318,6 +321,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    const initial=await plan(key,resume,roleHint,{...options,
     plannerTimeoutMs:Math.min(35000,budget())});
    queries=normalizeAutonomousQueries(initial?.queries);
+   indexSectors=selectedIndexIndustries(initial?.industry_ids);
    agentPlannedQueries=queries.length;
    history.push({type:'plan',strategy:shorten(initial?.strategy,180),queries:queries.length});
    if(initial?.strategy)activity('planning','AI 初步研究方向：'+shorten(initial.strategy,190));
@@ -333,6 +337,30 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   await searchTool(queries,{reserveMs:85000});
   if(!pool.length&&earlyError&&['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
    'AI_PROVIDER_RATE_LIMITED','AI_SEARCH_API_REJECTED'].includes(earlyError?.code))throw earlyError;
+ }
+ // Use HHBA's domestic employer index as navigation, never as job data.
+ // AI selects the industries; no company row is ever shown as a vacancy.
+ // The exact same public Search and JD gates validate any eventual result.
+ if(discoveredCount()<discoveryTarget&&budget()>75000&&
+    typeof options.employerIndex==='function'){
+  const roles=distinct([roleHint,...(options.resumeProfile?.target_roles||[])])
+   .filter(x=>typeof x==='string'&&x.trim().length>=2).slice(0,4);
+  const sectors=indexSectors.length?indexSectors:fallbackIndexIndustries(roles);
+  if(roles.length&&sectors.length){
+   try{
+    const hints=await options.employerIndex(roles,sectors);
+    if(hints?.available){
+     indexRowsConsidered=Number(hints.considered)||0;
+     indexSectors=selectedIndexIndustries(hints.sectors);
+     const seedQueries=normalizeAutonomousQueries(hints.queries,usedQueries).slice(0,6);
+     indexQueries=seedQueries.length;
+     if(seedQueries.length){
+      activity('searching','正在使用 HHBA 国内企业馆提供的招聘入口线索，定向搜索真实岗位。');
+      indexNewJobs=await searchTool(seedQueries,{reserveMs:59000});
+     }
+    }else indexUnavailable=true;
+   }catch{indexUnavailable=true}
+  }
  }
  // Cached sources are not a finished search. Replan and refresh when a
  // resumed research session has fewer than six eligible job sources.
@@ -608,6 +636,9 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    selection_rounds:selectionRounds,underfilled_rechecks:underfilledRechecks,
    explicit_city_sources:evidenceCities,unscored_source_previews:sourceOnlyCount,
    rejected_links:rejectedLinks,ats_verification_leads:0,
+   employer_index:{considered:indexRowsConsidered,queries:indexQueries,
+    new_candidate_links:indexNewJobs,industries:indexSectors.length,
+    unavailable:indexUnavailable},
    search_retry_attempts:searchRetryAttempts,search_retry_recovered:searchRetryRecovered,
    details_expanded:detail.expanded,details_failed_batches:detail.detail_failures,
    third_party_results_shown:0}};

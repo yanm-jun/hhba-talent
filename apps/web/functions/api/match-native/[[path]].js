@@ -13,6 +13,7 @@ import {checkMatchProviderCapabilities} from '../../_lib/match-provider-prefligh
 import {recognizeMatchResume,compareMatchResumeToJd} from '../../_lib/resume-jd-match-agent.js';
 import {recognizeResumeFile} from '../../_lib/resume-ocr.js';
 import {createMatchJdReview,matchPostingKey} from '../../_lib/match-jd-review.js';
+import {indexedEmployerSearchHints} from '../../_lib/domestic-employer-index.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -222,6 +223,9 @@ async function matchResumeWorkflow(env,candidate,resume,options,{
    onUpdate:jobs=>onPartial(provisionalPartial(jobs))}).catch(()=>null);
  const researchOptions={signal,checkpoint,resumeProfile:profile,onProgress,onActivity,
   autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0',
+  // Access to D1 remains server-only; only public employer names and domains
+  // inform Search. This callback never returns a 'job' to the frontend.
+  employerIndex:(roles,sectors)=>indexedEmployerSearchHints(env,roles,sectors,{limit:6}),
   excludePosting,
   ...(review?{verifiedCount:review.verifiedCount,onSources:review.add}:{}),
   onPartial:jobs=>{
