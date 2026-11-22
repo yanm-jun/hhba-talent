@@ -14,7 +14,8 @@ test('the existing result cards and original Word editor survive the user-approv
  const preserved=[
   '汇方职场 · HHBA',
   'AI 深度职业研究',
-  '职业研究已完成 · 本次整理 {result.matches.length} 个岗位',
+  '本轮岗位研究结果不足',
+  '已整理 {result.matches.length} 个岗位',
   '适配分是有依据的参考，不是录用概率。',
   'hhba-match-history-confirm',
   'hhba-native-list',
