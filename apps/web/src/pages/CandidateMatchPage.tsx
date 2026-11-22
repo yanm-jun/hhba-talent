@@ -7,7 +7,7 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchProgress,MatchError} from '../services/resumeMatch';
+import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchProgress,type NativeMatchActivity,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -36,7 +36,21 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [working,setWorking]=useState(false);
   const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
   const [stage,setStage]=useState<NativeMatchProgress>('preparing');
+ const [activity,setActivity]=useState<NativeMatchActivity|null>(null);
+ const [elapsedSeconds,setElapsedSeconds]=useState(0);
+ const startedAt=useRef(0),lastResearchUpdateAt=useRef(0);
  const progress=(next:NativeMatchProgress)=>setStage(previous=>next==='waiting'?previous:next);
+ const reportActivity=(next:NativeMatchActivity)=>{
+  lastResearchUpdateAt.current=Date.now();
+  setActivity(next);setStage(next.stage);
+ };
+ useEffect(()=>{
+  if(!working)return;
+  const id=window.setInterval(()=>{
+   setElapsedSeconds(Math.max(0,Math.floor((Date.now()-startedAt.current)/1000)));
+  },1000);
+  return()=>window.clearInterval(id);
+ },[working]);
  const [error,setError]=useState('');
 
  const [result,setResult]=useState<MatchResponse|null>(null);
@@ -134,6 +148,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  async function run(){
   if((!file&&!savedId)||!consent||working||previewBusy||availability!=='ready'||!getRealAuthToken()||
    (file&&!savedId&&storageChoice==='undecided'))return;
+  startedAt.current=Date.now();lastResearchUpdateAt.current=Date.now();
+  setElapsedSeconds(0);setActivity(null);
   setWorking(true);setStage('preparing');setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);
   const abort=new AbortController();
   controller.current=abort;
@@ -163,7 +179,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    let matched:MatchResponse;
    if(previewLoaded){
     // Once the user has reviewed/edited text, NEVER fall back to re-reading the unedited file.
-    matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,matchResumeId||undefined,progress,setPartialJobs);
+    matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,matchResumeId||undefined,progress,setPartialJobs,reportActivity);
     setOptimizationSource(previewText);
    }else{
     let selected=selectedFile;
@@ -178,7 +194,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     // Preserve existing match flow and avoid a second extraction:
     // the existing service exposes the exact locally reviewed text only to
     // this session through a new optional callback, never to a new page.
-    matched=await submitResumeForMatching(selected,options,consent,abort.signal,matchResumeId||undefined,progress,setPartialJobs,setOptimizationSource);
+    matched=await submitResumeForMatching(selected,options,consent,abort.signal,matchResumeId||undefined,progress,setPartialJobs,setOptimizationSource,reportActivity);
    }
    setResult(matched);setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
@@ -303,7 +319,10 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     </div>
     {((result||partialJobs.length>0)||working)&&<CandidateMatchNativeDialog
       result={result||{matches:partialJobs}}
-      pending={working&&!result} progressStage={stage} notice={working?'':error}
+      pending={working&&!result} progressStage={stage} progressActivity={activity}
+      elapsedSeconds={elapsedSeconds}
+      activityIdleSeconds={Math.max(0,Math.floor((Date.now()-lastResearchUpdateAt.current)/1000))}
+      notice={working?'':error}
       sourceText={result?optimizationSource:undefined}
       sourceResume={result&&savedId?savedFiles.find(item=>item.id===savedId&&/\.docx$/i.test(item.name)):undefined}
       accountScope={String(user?.id||'')}
