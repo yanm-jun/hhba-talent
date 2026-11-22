@@ -3,7 +3,7 @@
 // 2) optional DeepSeek Fetch enriches weak snippets
 // 3) DeepSeek V4 Pro selects/justifies linked candidates, never invents links.
 import {safeJobDetailLink,decodeSearchText} from './deepseek-native-match.js';
-import {isMainlandJobLocation} from './mainland-job-location.js';
+import {isMainlandJobLocation,findMainlandCity} from './mainland-job-location.js';
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from './match-job-quality.js';
 import {supplementalQueries,mergeCandidateHits,combineRecommended} from './match-search-growth.js';
 import {recruitmentSourceKind,isEmployerDirectedSource,isMainlandEmployerJobUrl,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting,sourceCounts} from './match-employer-source.js';
@@ -149,12 +149,29 @@ function closedRows(text){
  }
  return rows;
 }
+/**
+ * Only use a work city from Search text if the employer's indexed excerpt
+ * explicitly labels it as the work location. Never infer the user's city
+ * or reinterpret a company HQ as the posting's job location.
+ */
+export function indexedJobWorkCity(hit){
+ const body=[hit?.summary,hit?.snippet,hit?.content].filter(Boolean).join(' ');
+ const match=body.match(/(?:工作地点|工作城市|办公地点|办公城市|岗位地点|岗位城市)[：:\\s]{0,4}([^，。；;\\n]{2,40})/i);
+ if(!match)return null;
+ const candidate=String(match[1]).split(/(?:\\s{2,}|要求|待遇|学历|职责|任职|岗位|职位)/)[0].trim();
+ return isMainlandJobLocation(candidate)?candidate:
+  (findMainlandCity(candidate)&&!/(?:香港|澳门|台湾|海外|境外|国外)/.test(candidate)?
+   findMainlandCity(candidate):null);
+}
 export function selectedJobs(text,hits,limit=10){
  const byId=new Map(hits.map(h=>[h.id,h])),found=[],seen=new Set();
  for(const row of closedRows(text)){
   const evidence=byId.get(String(row?.id||row?.candidate_id||''));
   if(!evidence)continue;
-  const location=clean(row.location,90),reason=clean(row.reason,650),
+  const reportedLocation=clean(row.location,140);
+  const location=isMainlandJobLocation(reportedLocation)?reportedLocation:
+   indexedJobWorkCity(evidence)||'';
+  const reason=clean(row.reason,650),
    title=clean(row.title,110),company=clean(row.company,100);
   if(!isMainlandJobLocation(location)||!reason||!company||!title||foreign.test(title))continue;
   if(!isRecommendationEligible(evidence))continue;
@@ -203,6 +220,44 @@ function outputFromResponse(data){
  return (data?.output||[]).filter(v=>v?.type==='message').flatMap(v=>
   (v.content||[]).filter(c=>c?.type==='output_text').map(c=>c.text||'')).join('');
 }
+/**
+ * A shortlist model can produce zero valid jobs despite a nonempty, linked
+ * Search result. One bounded repair pass asks for only source-backed city,
+ * company, title and reason; the normal selectedJobs validator is reused.
+ */
+export async function recoverSearchGroundedShortlist(key,resume,hits,limit,{
+ fetcher=fetch,signal=null,recoveryTimeoutMs=11500
+}={}){
+ if(!hits.length)return [];
+ const timeout=AbortSignal.timeout(recoveryTimeoutMs);
+ const merged=signal?AbortSignal.any([signal,timeout]):timeout;
+ const input=hits.slice(0,20).map(hit=>({
+  id:hit.id,original_title:hit.title,source_site:hit.source,
+  original_excerpt:String(hit.content||hit.summary||hit.snippet||'').slice(0,850),
+  explicit_work_city:indexedJobWorkCity(hit)
+ }));
+ try{
+  const response=await fetcher(BASE+'/responses',{
+   method:'POST',redirect:'manual',signal:merged,
+   headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
+   body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'none'},
+    text:{format:{type:'json_object'}},max_output_tokens:2500,stream:false,
+    instructions:[
+     '你是中国大陆招聘公开岗位信息校对员。上轮岗位初选未返回有效列表，请根据下面已有的具体职位网页摘要再次识别。',
+     '只输出实际给出的候选id。公司名、岗位名、地点必须有网页摘要证据；尤其工作城市必须是职位工作城市，不可把企业总部所在地当作工作地点。',
+     '如果明确的职位地点和公司名称没有公开证据，不要选择该条。允许只返回1个真实岗位；不要为了凑数虚构职位。',
+     '简历依据必须来自给定的脱敏简历。理由50-120字，承认不确定的要求，不承诺录用。',
+     '返回JSON：{"jobs":[{"id":"候选id","company":"原网页中的企业","title":"原网页中的岗位","location":"有证据的大陆工作城市","reason":"来自简历的具体岗位方向分析","match_score":null,"score_basis":"","job_basis":""}]}'
+    ].join('\n'),
+    input:'脱敏简历：\n'+String(resume||'').slice(0,6500)+'\n可核对的企业招聘网页候选：\n'+JSON.stringify(input)})
+  });
+  if(!response.ok)return [];
+  const data=await response.json();
+  const raw=outputFromResponse(data);
+  return selectedJobs(raw,hits,limit);
+ }catch{return []}
+}
+
 export async function reasonAboutJobs(key,resume,hits,limit,{
  fetcher=fetch,signal=null,onProgress=()=>{},onPartial=()=>{},modelTimeoutMs=37000,shortlistOnly=false
 }={}){
@@ -396,10 +451,25 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  const show=jobs=>{visible=jobs;onPartial(jobs);};
  // Short first pass: return the ranked shortlist, scoring and brief explanations
  // before any further search or the full prose pass.
- const first=pool.length?await reasonAboutJobs(key,resume,pool,limit,{
-  ...opts,shortlistOnly:true,modelTimeoutMs:opts.modelTimeoutMs??26000,
-  onProgress,onPartial:show
- }):{matches:[],model_ms:0,provider_rows:0};
+ // A model output with zero eligible rows must NOT abort the entire search.
+ // Continue with the independent source-grounded recovery + supplemental Search.
+ let first={matches:[],model_ms:0,provider_rows:0};
+ if(pool.length){
+  try{
+   first=await reasonAboutJobs(key,resume,pool,limit,{
+    ...opts,shortlistOnly:true,modelTimeoutMs:opts.modelTimeoutMs??26000,
+    onProgress,onPartial:show
+   });
+  }catch(error){
+   if(error?.code!=='AI_MATCH_NO_VALID_JOBS')throw error;
+   console.warn('HHBA_MATCH_SHORTLIST_EMPTY',JSON.stringify({
+    candidates:pool.length,phase:'first-pass',recovery:'started'
+   }));
+   onProgress('writing');
+   const recovered=await recoverSearchGroundedShortlist(key,resume,pool,limit,opts);
+   first={matches:recovered,model_ms:0,provider_rows:0};
+  }
+ }
  firstModelMs=first.model_ms;firstRows=first.provider_rows;
  visible=combineRecommended(visible,first.matches,limit);
  if(visible.length)show(visible);
@@ -425,10 +495,18 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
     additionalFetches=checked.fetches;pool=mergeCandidateHits(pool,checked.hits,48);
     const unselected=pool.filter(h=>!visible.some(j=>j.official_url===h.url));
     if(unselected.length){
-     const extra=await reasonAboutJobs(key,resume,unselected,limit-visible.length,{
-      ...opts,shortlistOnly:true,modelTimeoutMs:opts.supplementalModelTimeoutMs??18000,
-      onProgress,onPartial:jobs=>show(combineRecommended(visible,jobs,limit))
-     });
+     let extra;
+     try{
+      extra=await reasonAboutJobs(key,resume,unselected,limit-visible.length,{
+       ...opts,shortlistOnly:true,modelTimeoutMs:opts.supplementalModelTimeoutMs??18000,
+       onProgress,onPartial:jobs=>show(combineRecommended(visible,jobs,limit))
+      });
+     }catch(error){
+      if(error?.code!=='AI_MATCH_NO_VALID_JOBS')throw error;
+      const recovered=await recoverSearchGroundedShortlist(key,resume,
+       unselected,limit-visible.length,opts);
+      extra={matches:recovered,model_ms:0,provider_rows:0};
+     }
      secondModelMs=extra.model_ms;secondRows=extra.provider_rows;
      visible=combineRecommended(visible,extra.matches,limit);show(visible);
     }
@@ -444,7 +522,14 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  visible=visible.filter(j=>isMainlandEmployerJobUrl(j.official_url));
  const beforeSource=sourceCounts(visible);
  const prefer={matches:visible,hits:pool,lookups:0,replaced:0,lookup_ms:0};
- if(!visible.length)throw codeError('AI_EMPLOYER_JOBS_NOT_FOUND');
+ if(!visible.length){
+  console.warn('HHBA_MATCH_ALL_SHORTLISTS_EMPTY',JSON.stringify({
+   candidate_links:pool.length,primary_candidates:search.diagnostic.candidate_links,
+   primary_filtered:search.diagnostic.rejected_links,
+   supplement_candidates:additionalCandidates
+  }));
+  throw codeError('AI_EMPLOYER_JOBS_NOT_FOUND');
+ }
  const detail=opts.expandDetailed===false?{matches:visible,expanded:0,detail_ms:0,detail_failures:0}:
   await expandDetailedReasons(key,resume,visible,pool,{...opts,onProgress,onPartial:show});
  visible=detail.matches;
