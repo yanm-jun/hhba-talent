@@ -17,7 +17,7 @@ export async function createMatchJdReview(env,resume,options,dependencies={}){
  const deadline=AbortSignal.timeout(210000);
  const signal=options.signal?AbortSignal.any([options.signal,deadline]):deadline;
  const records=new Map(),queue=[],running=new Set(),closed=new Set();
- let verified=0,scored=0,failed=0;
+ let verified=0,scored=0,failed=0,atsEnqueued=0;
 
  function markClosed(url){
   const key=matchPostingKey(url);
@@ -89,6 +89,10 @@ export async function createMatchJdReview(env,resume,options,dependencies={}){
   for(const url of closedUrls)markClosed(url);
   function enqueue(locator,job){
    if(!locator||closed.has(locator.url)||records.has(locator.url)||options.exclude?.has(locator.url))return;
+   // Public ATS endpoints are valuable, but ten pages of rate limits must
+   // never delay a candidate's entire result stream for minutes.
+   if(locator.kind&&atsEnqueued>=12)return;
+   if(locator.kind)atsEnqueued++;
    const record={job:job||{
     id:'external-'+locator.id.replace(/[:.]/g,'-'),official_url:locator.url,
     platform:'企业官网',source:locator.domain,source_type:'站外官方招聘',
