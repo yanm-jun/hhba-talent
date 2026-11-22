@@ -9,6 +9,7 @@ import {enrichSearchMatchesWithJD,matchJdEnrichmentEnabled} from '../../_lib/mat
 import {researchDomesticJobEvidence} from '../../_lib/domestic-job-research.js';
 import {iterateScoredJobEvidence} from '../../_lib/agent-score-feedback.js';
 import {createAccountResearchCheckpoint} from '../../_lib/ai-research-checkpoint.js';
+import {jobResearchQuality} from '../../_lib/agent-quality-metrics.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -199,9 +200,11 @@ async function domesticResearchPass(env,key,result,resume,options,progress=()=>{
    feedback={mode:'unavailable',code:String(error?.code||'RESEARCH_UNAVAILABLE').slice(0,60)};
   }
  }
- return {...result,matches:final,
-  diagnostic:{...result.diagnostic,domestic_evidence:checked.diagnostic,
-   score_feedback:feedback}};
+ const diagnostic={...result.diagnostic,domestic_evidence:checked.diagnostic,
+  score_feedback:feedback};
+ return {...result,matches:final,diagnostic:{
+  ...diagnostic,quality:jobResearchQuality(final,diagnostic)
+ }};
 }
 async function checkpointForCandidate(env,candidate,resume,roleHint){
  if(env?.HHBA_AI_OWNED_RESEARCH_ENABLED==='0'||
