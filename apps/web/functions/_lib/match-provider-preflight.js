@@ -13,7 +13,7 @@ export function providerStatusError(status){
  return 'AI_PROVIDER_UNAVAILABLE';
 }
 export async function checkMatchProviderCapabilities(key,{
- fetcher=fetch,signal=null,timeoutMs=11000
+ fetcher=fetch,signal=null,timeoutMs=15000
 }={}){
  const deadline=AbortSignal.timeout(timeoutMs);
  const sig=signal?AbortSignal.any([signal,deadline]):deadline;
@@ -34,14 +34,21 @@ export async function checkMatchProviderCapabilities(key,{
  };
  // Check actual permission for Search; balance alone can be READY even when
  // this API is disabled, rejects the request shape or has no tool access.
- const [balance,search]=await Promise.all([
+ const [balance,search,model]=await Promise.all([
   request('/user/balance',{method:'GET'}),
   request('/v1/tools/search',{method:'POST',body:JSON.stringify({
    query:'中国大陆 企业招聘 岗位职责 官方招聘',count:1,need_content:false
+  })}),
+  request('/responses',{method:'POST',body:JSON.stringify({
+   model:'deepseek-v4-pro',reasoning:{effort:'none'},
+   text:{format:{type:'json_object'}},max_output_tokens:96,stream:false,
+   instructions:'仅回复一个JSON对象。',input:'健康检查：回复 {"ok":true}'
   })})
  ]);
  if(balance?.is_available!==true)throw codeError('AI_PROVIDER_BALANCE_INSUFFICIENT');
  if(!Array.isArray(search?.results))throw codeError('AI_SEARCH_RESPONSE_INVALID');
- return {ok:true,status:'READY',capabilities:['balance','deepseek_search'],
+ if(!Array.isArray(model?.output)||model?.status==='failed')
+  throw codeError('AI_PROVIDER_RESPONSE_INVALID');
+ return {ok:true,status:'READY',capabilities:['balance','deepseek_search','v4_pro_responses_json'],
   searches_returned:search.results.length};
 }
