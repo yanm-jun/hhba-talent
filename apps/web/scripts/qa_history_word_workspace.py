@@ -2,6 +2,7 @@
 Desktop: linked original. Mobile: explicit association. Missing original: no fake editor.
 """
 import json
+import re
 from pathlib import Path
 from urllib.parse import urlsplit,parse_qs
 from playwright.sync_api import sync_playwright
@@ -79,7 +80,7 @@ def exercise(browser,label,viewport,initial_linked,has_file=True):
                     'max_revisions':8,'max_daily_edits':6,
                     'pdf_available':False,'layout_verified':False})
             if action=='source-docx':
-                assert parse_qs(url.query)['job_id'][0]=='history-'+HISTORY_ID+'-1'
+                assert re.fullmatch(r'posting-url-v1-[a-f0-9]{32}',parse_qs(url.query)['job_id'][0])
                 return route.fulfill(status=200,body=WORD,headers={
                     'content-type':'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})
             raise AssertionError('Unexpected Word endpoint '+action)
