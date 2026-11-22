@@ -3,6 +3,7 @@
 // 2) optional DeepSeek Fetch enriches weak snippets
 // 3) DeepSeek V4 Pro selects/justifies linked candidates, never invents links.
 import {safeJobDetailLink,decodeSearchText} from './deepseek-native-match.js';
+import {safePublicAtsJobLocator} from './public-ats-jd.js';
 import {isMainlandJobLocation,findMainlandCity} from './mainland-job-location.js';
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from './match-job-quality.js';
 import {supplementalQueries,mergeCandidateHits,combineRecommended} from './match-search-growth.js';
@@ -53,6 +54,25 @@ export function normalizeHits(searchResponses,max=28){
   }
  }
  return sortEmployerFirst([...byUrl.values()],max).map((item,i)=>({...item,id:'j'+(i+1)}));
+}
+// Discover exact public employer ATS posting URLs as *verification leads*.
+// They are NEVER shown from Search alone. The independent Greenhouse/Lever
+// posting API must confirm the same ID, a Mainland workplace and a complete JD.
+export function publicMainlandAtsVerificationLeads(searchResponses,max=12){
+ const urls=new Set();
+ for(const result of searchResponses){
+  for(const hit of result?.results||[]){
+   const safe=safeJobDetailLink(hit?.url);
+   const locator=safe&&safePublicAtsJobLocator(safe);
+   if(!locator)continue;
+   const title=clean(hit?.title,160),summary=clean(hit?.summary||hit?.snippet,500);
+   if(!title||!roleEvidence.test(title+' '+summary))continue;
+   if(foreign.test(title)&&!/(?:中国|China|上海|北京|深圳|广州|成都|杭州)/i.test(title))continue;
+   urls.add(locator.url);
+   if(urls.size>=max)return [...urls];
+  }
+ }
+ return [...urls];
 }
 async function providerJson(fetcher,key,path,body,timeoutMs,signal){
  const timeout=AbortSignal.timeout(timeoutMs);
@@ -111,11 +131,13 @@ export async function searchPublicJobs(key,text,roleHint,{
   }catch(e){errors.push(e.code||'AI_PROVIDER_UNAVAILABLE');return {results:[]};}
  }));
  const hits=normalizeHits(responses,maxHits);
+ const atsPostingUrls=publicMainlandAtsVerificationLeads(responses);
  // The Agent may use rejected THIRD-PARTY job titles only as research clues:
  // find the named employer's OWN hiring page, never use the original URL.
  // No raw snippets, phone numbers, or CV text cross this boundary.
  const rejected_title_hints=[...new Set(responses.flatMap(r=>r.results||[])
-  .filter(h=>!isDirectEmployerSourceHit({url:h?.url,source:h?.site_name||h?.source}))
+  .filter(h=>!isDirectEmployerSourceHit({url:h?.url,source:h?.site_name||h?.source})&&
+   !safePublicAtsJobLocator(h?.url))
   .map(h=>clean(h?.title,90))
   .filter(t=>t.length>=4&&t.length<=90))].slice(0,8);
  const fatal=['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
@@ -124,12 +146,14 @@ export async function searchPublicJobs(key,text,roleHint,{
  // A healthy empty Search result must not hide parallel API auth/quota failure.
  if(!hits.length&&(fatal||!allowEmpty||errors.length===queries.length))
   throw codeError(fatal||(errors.length===queries.length?'AI_SEARCH_UNAVAILABLE':'AI_SEARCH_NO_DETAIL_JOBS'));
- return {hits,diagnostic:{search_ms:Date.now()-start,queries:queries.length,
+ return {hits,ats_posting_urls:atsPostingUrls,
+  diagnostic:{search_ms:Date.now()-start,queries:queries.length,
   successful_searches:queries.length-errors.length,raw_results:responses.reduce((a,x)=>a+x.results.length,0),
   candidate_links:hits.length,search_failures:errors.length,
   provider_error_codes:[...new Set(errors)].slice(0,6),
   retry_attempts:retryAttempts,retry_recovered:retryRecovered,
-  rejected_links:responses.reduce((a,x)=>a+x.results.length,0)-hits.length,
+  ats_verification_leads:atsPostingUrls.length,
+  rejected_links:Math.max(0,responses.reduce((a,x)=>a+x.results.length,0)-hits.length-atsPostingUrls.length),
   rejected_title_hints}};
 }
 export async function enrichCandidateDetails(key,hits,{
