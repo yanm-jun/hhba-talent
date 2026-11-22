@@ -278,3 +278,54 @@ test('Agent cannot finish after a single employer role without trying a bounded 
  assert.ok(queries.some(q=>q.includes('在招岗位')||q.includes('官方招聘')));
  assert.ok(out.matches.every(job=>job.official_url.includes('zhaopin.meituan.com')));
 });
+
+test('many official URLs without city evidence still trigger follow-up research',async()=>{
+ const weak=Array.from({length:8},(_,i)=>({...employer,
+  id:'j'+(i+1),url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId='+String(880000+i),
+  summary:'岗位内容待核实，招聘信息未展示具体工作城市。',
+  snippet:'招聘职位资料尚不完整',content:''}));
+ const strong={...employer,id:'j99'};
+ let searches=0;
+ const result=await runAgentOwnedMainlandMatch('synthetic','模拟简历：门店区域运营','',10,
+  {expandDetailed:false},{
+   plan:async()=>({queries:['区域运营 企业招聘']}),
+   search:async(k,cv,hint,opts)=>{
+    searches++;
+    if(opts.queriesOverride.some(q=>q.includes('在招岗位')))
+     return {hits:[strong],diagnostic:{successful_searches:1,raw_results:5}};
+    return {hits:weak,diagnostic:{successful_searches:1,raw_results:12}};
+   },
+   decide:async()=>({actions:[{type:'finish'}]}),
+   select:async()=>{const e=new Error('AI_MATCH_NO_VALID_JOBS');e.code=e.message;throw e},
+   recover:async()=>[]
+  });
+ assert.ok(searches>=2);
+ assert.ok(result.diagnostic.underfilled_expansion_queries>0);
+ assert.ok(result.matches.some(x=>x.official_url===strong.url));
+});
+test('suspected closure from Search is eligible for a fresh employer-page Fetch, not silently lost',async()=>{
+ const candidate={...employer,availability:{status:'POSSIBLY_CLOSED'},
+  summary:'督导经理社招-正式 工作地点：北京市。搜索摘要可能指向已结束招聘的公告。'};
+ let read=0,steps=0;
+ const output=await runAgentOwnedMainlandMatch('synthetic','模拟简历：区域运营管理','',10,
+  {expandDetailed:false},{
+   plan:async()=>({queries:['督导经理 企业官网']}),
+   search:async()=>({hits:[candidate],diagnostic:{successful_searches:1,raw_results:1}}),
+   decide:async(k,cv,hits)=>{
+    steps++;
+    if(steps===1)return {actions:[{type:'fetch',candidate_ids:['j1']}]};
+    return {actions:[{type:'finish'}]};
+   },
+   fetchDetails:async(k,hits)=>{
+    read++;
+    return {hits:hits.map(h=>({...h,content:
+     '督导经理社招-正式。工作地点：北京市。该岗位正在招聘，开放申请，负责商户运营、门店督导、销售流程整改。',
+     availability:{status:'OPEN_LISTED'}})),fetches:1};
+   },
+   select:async()=>{const e=new Error('AI_MATCH_NO_VALID_JOBS');e.code=e.message;throw e},
+   recover:async()=>[]
+  });
+ assert.ok(read>0);
+ assert.ok(output.diagnostic.page_reads>0);
+ assert.ok(output.matches.every(j=>j.availability_status!=='CLOSED_LISTED'));
+});
