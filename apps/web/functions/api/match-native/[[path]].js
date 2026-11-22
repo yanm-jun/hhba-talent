@@ -245,7 +245,7 @@ async function matchResumeWorkflow(env,candidate,resume,options,{
   },onProgress);
  }
  onPartial(provisionalPartial(verified.matches));
- const researched=await domesticResearchPass(env,key,verified,resume,{signal},onProgress);
+ const researched=await domesticResearchPass(env,key,verified,resume,{signal,resumeProfile:profile},onProgress);
  const canContinue=Boolean(checkpoint&&await checkpoint.load());
  return {result:{...researched,profile,can_continue:canContinue},checkpoint};
 }
