@@ -45,7 +45,7 @@ export function normalizeHits(searchResponses,max=28){
    const key=url.replace(/[?&](?:utm_[^=&]+|from|source)=[^&]*/gi,'').replace(/[?&]$/,'');
    const prev=byUrl.get(key);
    const row={id:'j'+(byUrl.size+1),title,url,summary,snippet,
-    source:clean(hit?.site_name,80),date:hit?.date||null,content:'',
+    source:clean(hit?.site_name||hit?.source,80),date:hit?.date||null,content:'',
     recruitment_source_kind:recruitmentSourceKind(url),
     availability:classifyJobAvailability({summary,snippet})};
    if(!isDirectEmployerSourceHit(row))continue;
@@ -176,7 +176,9 @@ export function selectedJobs(text,hits,limit=10){
   const reason=clean(row.reason,1400),
    title=clean(row.title,110),company=clean(row.company,100);
   if(!isMainlandJobLocation(location)||!reason||!company||!title||foreign.test(title))continue;
-  if(!isRecommendationEligible(evidence))continue;
+  if(!isRecommendationEligible(evidence)||evidence.content&&
+   !isRecommendationEligible({...evidence,availability:classifyJobAvailability(
+    {content:evidence.content},{fetched:true})}))continue;
   // Defense in depth: never let model output or an alternate code path leak a job-board link.
   const verifiedKind=recruitmentSourceKind(evidence.url);
   if(!isDirectEmployerSourceHit(evidence))continue;
@@ -278,6 +280,9 @@ export function sourceOnlyJobPreviews(hits,limit=10){
  for(const hit of hits){
   if(out.length>=limit)break;
   if(!isDirectEmployerSourceHit(hit)||!isRecommendationEligible(hit)||urls.has(hit.url))continue;
+  // Check the fetched text itself, not only potentially stale Search metadata.
+  if(hit.content&&!isRecommendationEligible({...hit,availability:
+   classifyJobAvailability({content:hit.content},{fetched:true})}))continue;
   const site=clean(hit.source,90);
   const company=site.replace(/(?:官方招聘|招聘官网|招聘平台|招聘网站|人才招聘|招聘|官网|careers?|jobs?)$/gi,'')
    .replace(/(?:有限责任公司|股份有限公司|有限公司|公司)$/,'').trim();
