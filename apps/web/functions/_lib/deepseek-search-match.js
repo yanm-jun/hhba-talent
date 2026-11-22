@@ -310,6 +310,10 @@ export function sourceOnlyJobPreviews(hits,limit=10){
   if(!after&&generic){
    const explicit=summary.match(/^(.{2,50}?)(?:社招|校招|社会招聘|校园招聘)(?:[\s\-—·]|$)/);
    if(explicit)after=explicit[1];
+   if(!after){
+    const labeled=summary.match(/(?:职位名称|岗位名称|招聘岗位|招聘职位)[：:\s]{0,3}([\u4e00-\u9fffA-Za-z0-9·+\-/ ]{2,42}?)(?=\s*(?:工作地点|工作城市|岗位职责|任职要求|招聘人数|学历|经验|，|。|；|$))/);
+    if(labeled)after=labeled[1].trim();
+   }
   }
   // Many employer job detail pages use just the position as <title>.
   // The source must explicitly label itself a company's recruitment site.
