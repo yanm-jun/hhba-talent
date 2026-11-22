@@ -26,7 +26,7 @@ import '../styles/targeted-resume-optimization.css';
 import '../styles/siri-edge.css';
 import '../styles/word-editor-minimal.css';
 
-export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,onDraftDirtyChange,accountScope}:{profile:CandidateProfile;job:JobMatch;sourceText?:string;sourceResume?:PrivateResume;onDraftDirtyChange?:(dirty:boolean)=>void;accountScope?:string}){
+export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,onDraftDirtyChange,accountScope,requireVerifiedJd=false}:{profile:CandidateProfile;job:JobMatch;sourceText?:string;sourceResume?:PrivateResume;onDraftDirtyChange?:(dirty:boolean)=>void;accountScope?:string;requireVerifiedJd?:boolean}){
  // Reopen the same employer posting from a new search or history using the same private Word branch.
  const postingScope=useMemo(()=>stablePostingScope(job.official_url),[job.official_url]);
  const blocks=useMemo<ResumeBlock[]>(()=>{
@@ -208,7 +208,10 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   job.requirements_basis,...job.matched,...job.not_evidenced,...job.needs_verification
  ].filter(Boolean).join('\n').slice(0,16000),[job]);
  const criteria=useMemo(()=>[...job.matched,...job.not_evidenced], [job]);
- const printDocument=useMemo(()=>buildResumeDocument(profile,version.blocks,details),[profile,version.blocks,details]);
+ const textDraft=requireVerifiedJd&&!sourceResume&&Boolean(sourceText?.trim());
+ const printDocument=useMemo(()=>buildResumeDocument(textDraft?
+  {...profile,skills:[],experiences:[],education:null,education_evidence:null}:profile,
+  version.blocks,details),[profile,version.blocks,details,textDraft]);
  const canPrint=readableResumeDocument(printDocument)&&omittedSourceCharacters===0;
  const canExport=canPrint&&!editingBlock;
  function updateDetail(key:keyof ResumeDocumentDetails,value:string){
@@ -345,6 +348,18 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  async function jobContextForAI(signal:AbortSignal):Promise<JdAwareJob>{
   const title=(job.title_zh||job.title).slice(0,180);
   if(!postingScope)throw Error('岗位官网地址无效，已阻止可能串岗的简历优化。');
+  if(requireVerifiedJd&&(!job.jd_version_id||!job.jd_sha256))
+   throw Error('请先完成此岗位的 JD 核验，再优化简历。');
+  if(job.jd_version_id){
+   const official=await getArchivedJobJdVersion(job.jd_version_id,signal);
+   if(official.canonical_url!==job.official_url||official.job_id!==job.jd_version_id||
+    (job.jd_sha256&&official.jd_sha256!==job.jd_sha256))
+    throw Error('岗位 JD 版本不一致，请重新匹配后再优化。');
+   if(!official.fresh)throw Error('岗位 JD 需要重新核验，请重新匹配后再优化。');
+   if(!signal.aborted)setArchivedJdId(official.job_id);
+   return {title:official.title,requirements:official.full_jd,official_url:official.canonical_url,
+    jd_version_id:official.job_id,jd_sha256:official.jd_sha256};
+  }
   // An indexed employer page is NOT the same as a verified full job JD.
   const partial=job.evidence_status==='PARTIAL_SOURCE'&&
    typeof job.evidence_excerpt==='string'&&job.evidence_excerpt.length>=130?
@@ -353,23 +368,10 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   const insufficient=job.evidence_status==='SEARCH_SNIPPET_ONLY'||
    job.evidence_status==='INSUFFICIENT_EVIDENCE';
   if(!await jobJdArchiveStatus(signal)){
-   if(job.jd_version_id)throw Error('原匹配 JD 版本目前无法核验，请在 JD 服务恢复后重新评分。');
    if(partial)return partial;
    if(insufficient)throw Error('该岗位目前只有搜索摘要，证据不足。请先从企业招聘页确认职位要求，再优化 Word。');
    // Backwards-compatible historical snapshots remain labelled summary-only.
    return {title,requirements:fullJobRequirements,official_url:job.official_url};
-  }
-  // Verified JD identity is immutable: do not silently substitute a newer JD.
-  if(job.jd_version_id){
-   const official=await getArchivedJobJdVersion(job.jd_version_id,signal);
-   if(official.canonical_url!==job.official_url||official.job_id!==job.jd_version_id||
-    (job.jd_sha256&&official.jd_sha256!==job.jd_sha256))
-    throw Error('JD 版本与当前岗位不一致，已阻止优化。请重新搜索并评分。');
-   if(!official.fresh)
-    throw Error('此岗位 JD 已过期或停止招聘。请重新核验岗位并评分，不会拿新 JD 冒充旧评分依据。');
-   if(!signal.aborted)setArchivedJdId(official.job_id);
-   return {title:official.title,requirements:official.full_jd,
-    official_url:official.canonical_url,jd_version_id:official.job_id};
   }
   // Where official full JD fetch fails (common with mainland recruiting),
   // use only attributed partial research material. Never fake a JD version.
@@ -847,7 +849,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    <div><small>简历优化 / 原 Word</small><h3>{job.title_zh||job.title}</h3></div>
    <span><Sparkles size={13} aria-hidden="true"/> 智能修改</span>
   </div>
-  {!sourceResume&&legacyPrintQa&&optimizationControls}
+  {!sourceResume&&(legacyPrintQa||textDraft)&&optimizationControls}
   {sourceResume?<section className={'targeted-resume-word-workspace hhba-word-stage-'+entranceStage}
    aria-label="原版式 Word 沉浸式 AI 优化舞台">
    <div className="targeted-resume-word-main">
@@ -974,6 +976,20 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      </section>
     </div>,document.body)}
 
+  </section>:textDraft?<section className="targeted-resume-document-editor" aria-label="岗位 Word 草稿">
+   <div className="targeted-resume-document-heading">
+    <div><strong>岗位 Word 草稿</strong><p>核对修改后可下载重新排版的 Word。投递前请检查联系方式。</p></div>
+    <div className="targeted-resume-document-actions">
+     <button type="button" disabled={!undoStack.length} onClick={undo}><Undo2 size={15}/> 撤销</button>
+     <button type="button" disabled={!hasWordingChanges||Boolean(editingBlock)||omittedSourceCharacters>0}
+      onClick={()=>{try{downloadResumeDocx(printDocument,job.title_zh||job.title,'简历正文');}
+       catch{setNotice('Word 草稿导出失败，请稍后再试。')}}}><FileDown size={15}/> 下载 Word</button>
+    </div>
+   </div>
+   {omittedSourceCharacters>0&&<p role="alert">简历超出草稿容量。请在匹配页核对并精简文字后重试。</p>}
+   <div className="targeted-resume-live-paper">
+    <ResumePrintSheet document={printDocument} renderBlock={renderEditableBlock}/>
+   </div>
   </section>:legacyPrintQa?<>
   <section className="targeted-resume-document-editor" aria-label="正式简历排版与打印">
    <div className="targeted-resume-document-heading">

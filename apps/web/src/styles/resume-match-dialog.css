@@ -331,3 +331,6 @@
 .hhba-research-report-funnel>div>span{font-size:10px;color:#8a9ab0}
 .hhba-research-report-funnel p{font-size:12px;line-height:1.9;color:#566c87;margin:8px 0 0}
 .hhba-research-report-funnel .hhba-research-report-limit{color:#755d3d}
+.hhba-native-comparisons{list-style:none;margin:12px 0;padding:0;display:grid;gap:8px}
+.hhba-native-comparisons li{padding:8px 10px;background:#f5f8fc;border-radius:8px;overflow-wrap:anywhere}
+.hhba-native-comparisons li div{margin-top:3px}

@@ -9,7 +9,7 @@ export type ArchivedOfficialJd={
  disclaimer:string;from_cache?:boolean;
 };
 export type JdAwareJob={
- title:string;requirements:string;official_url?:string;jd_version_id?:string;
+ title:string;requirements:string;official_url?:string;jd_version_id?:string;jd_sha256?:string;
 };
 export class JobJdArchiveError extends Error{
  constructor(readonly code:string,readonly status:number){

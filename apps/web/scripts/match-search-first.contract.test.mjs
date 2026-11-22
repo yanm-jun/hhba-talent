@@ -435,14 +435,12 @@ test('official company links are left untouched and never cost an extra Search r
  assert.equal(res.replaced,0);
  assert.equal(res.matches[0].official_url,job.official_url);
 });
-test('native cards show only employer career pages or dedicated ATS without fallback to a third-party platform',async()=>{
+test('native cards point to employer recruitment pages without a third-party action',async()=>{
  const {readFile}=await import('node:fs/promises');
  const jsx=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
- assert.match(jsx,/recruitment_source_note/);
  assert.doesNotMatch(jsx,/THIRD_PARTY_BOARD/);
- assert.match(jsx,/企业专属招聘系统/);
+ assert.match(jsx,/前往企业官网投递/);
  assert.doesNotMatch(jsx,/查看第三方平台职位/);
- assert.match(jsx,/不提供第三方招聘平台链接/);
 });
 
 test('strict employer-only: no popular third-party job board or unknown source reaches selectedJobs',()=>{

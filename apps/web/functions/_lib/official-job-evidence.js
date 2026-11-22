@@ -5,8 +5,10 @@ import {safeOfficialJobLocator,extractOfficialJob} from './domestic-search-fetch
 import {extractSkillRequirements} from './job-skill-evidence.js';
 import {degreeMinRequirement,experienceMinRequirement} from './domestic-match-fusion.js';
 import {sha256Hex} from './real-auth.js';
+import {isMainlandJobLocation} from './mainland-job-location.js';
 
 export const OFFICIAL_EVIDENCE_VERSION='DIRECT_EMPLOYER_HTML_V1';
+export const MEITUAN_DETAIL_SOURCE='MEITUAN_PUBLIC_JOB_DETAIL_V1';
 const FRESH_MS=24*60*60*1000;
 const MAX_RESPONSE=220000;
 const DEGREE=['HIGH_SCHOOL','ASSOCIATE','BACHELOR','MASTER','PHD'];
@@ -75,11 +77,50 @@ async function readLimited(response){
  for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
  try{return new TextDecoder('utf-8',{fatal:true}).decode(bytes);}catch{throw Error('OFFICIAL_PAGE_DECODE_FAILED');}
 }
-export async function directOfficialJobEvidence(url,{fetcher=fetch,now=new Date()}={}){
+async function meituanOfficialJobEvidence(locator,{fetcher,now,signal}){
+ const jobUnionId=new URL(locator.url).searchParams.get('jobUnionId');
+ // The public vacancy page makes this same read-only request. Its HTML
+ // response is a JS shell, so the official duties are in the JSON response.
+ const response=await fetcher('https://zhaopin.meituan.com/api/official/job/getJobDetail',{
+  method:'POST',redirect:'manual',cache:'no-store',signal,
+  headers:{Accept:'application/json','Content-Type':'application/json'},
+  body:JSON.stringify({jobUnionId,jobShareType:'1'})
+ });
+ if(response.status!==200||!response.headers.get('Content-Type')?.includes('application/json'))
+  throw Error('OFFICIAL_PAGE_UNAVAILABLE');
+ const result=JSON.parse(await readLimited(response));
+ const job=result?.data;
+ if(result?.status!==1||job?.jobUnionId!==jobUnionId||job?.jobStatus!=='000')
+  throw Error('OFFICIAL_JD_NOT_VERIFIED');
+ const title=typeof job.name==='string'?job.name.trim():'';
+ const cities=Array.isArray(job.cityList)?job.cityList.map(city=>city?.name):[];
+ if(title.length<2||title.length>86||!cities.length||
+  !cities.every(city=>typeof city==='string'&&isMainlandJobLocation(city)))
+  throw Error('OFFICIAL_JD_NOT_VERIFIED');
+ const location=[...new Set(cities)].join('、');
+ if(location.length>100||typeof job.jobDuty!=='string'||typeof job.jobRequirement!=='string'||
+  !job.jobDuty.trim()||!job.jobRequirement.trim())throw Error('OFFICIAL_JD_NOT_VERIFIED');
+ const workYear=typeof job.workYear==='string'&&job.workYear.trim()?'工作经验：'+job.workYear.trim():'';
+ const sections=extractOfficialJdSections(
+  ['岗位职责',htmlToText(job.jobDuty),'任职要求',htmlToText(job.jobRequirement),workYear].filter(Boolean).join('\n'));
+ if(!sections)throw Error('OFFICIAL_JD_NOT_VERIFIED');
+ const requirements=sections.sections.filter(section=>section.kind==='requirements')
+  .map(section=>section.text).join('\n');
+ const id='verified-official-'+(await sha256Hex(locator.url)).slice(0,32);
+ const jdHash=await sha256Hex([locator.url,title,location,requirements].join('\n'));
+ return {id,canonical_url:locator.url,company:locator.company,title,location,requirements,
+  jd_hash:jdHash,checked_at:new Date(now).toISOString(),proof_method:OFFICIAL_EVIDENCE_VERSION,
+  retrieval_method:MEITUAN_DETAIL_SOURCE,...sections};
+}
+export async function directOfficialJobEvidence(url,{fetcher=fetch,now=new Date(),signal}={}){
  const locator=canon(url);
  if(!locator)throw Error('OFFICIAL_URL_NOT_SUPPORTED');
+ const timeout=AbortSignal.timeout(12000);
+ const mergedSignal=signal?AbortSignal.any([signal,timeout]):timeout;
+ if(locator.domain==='zhaopin.meituan.com')
+  return meituanOfficialJobEvidence(locator,{fetcher,now,signal:mergedSignal});
  const response=await fetcher(locator.url,{
-  method:'GET',redirect:'manual',cache:'no-store',signal:AbortSignal.timeout(12000),
+  method:'GET',redirect:'manual',cache:'no-store',signal:mergedSignal,
   headers:{Accept:'text/html,text/plain;q=0.9','User-Agent':'HHBA-JobEvidence/1.0'}
  });
  if(response.status!==200){

@@ -53,7 +53,7 @@ test('native results dialog never hides optimizer behind the optional match scor
  const {readFile}=await import('node:fs/promises');
  const ui=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(ui,/function visibleMatchScore\(/);
- assert.match(ui,/<button type="button" disabled=\{pending\}/);
+ assert.match(ui,/<button type="button" disabled=\{pending\|\|!job\.jd_version_id\|\|!job\.jd_sha256\}/);
  assert.doesNotMatch(ui,/!pending&&Number\.isInteger\(job\.match_score\)/);
  assert.match(ui,/优化简历/);
  assert.match(ui,/暂无可靠分数/);
@@ -172,7 +172,7 @@ test('frontend fetches one native SSE stream and maps stages without restarting 
  const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(page,/progressStage=\{stage\}/);
  assert.match(dialog,/搜索企业岗位/);
- assert.match(dialog,/hhba-research-journal/);
+ assert.match(dialog,/stageTitle\[progressStage\]/);
 });
 
 
@@ -190,6 +190,9 @@ test('authenticated route streams Search-first stages and final linked jobs',asy
   if(url.endsWith('/responses')){
    const body=JSON.parse(options.body);
    assert.equal(body.tools,undefined);
+   if(body.instructions.includes('HHBA 的简历识别 Agent'))return Response.json({status:'completed',output:[
+    {type:'message',content:[{type:'output_text',text:JSON.stringify({facts:[
+     {kind:'work',quote:'上海经销商运营培训，DCC管理'}]})}]}]});
    const jobs={jobs:[{id:'j1',company:'示例汽车中国',title:'品牌督导',location:'上海',
     reason:'简历中管理经销商DCC线索、门店培训和区域品牌业务的经历，与负责上海经销商业务协同和渠道培训的岗位较为吻合。可用门店转化率改善等数据证明能力，行业岗位具体资格仍需核对。'}]};
    const events=[
@@ -228,10 +231,11 @@ test('authenticated route streams Search-first stages and final linked jobs',asy
   assert.match(events,/event: complete/);
   assert.doesNotMatch(events,/event: failure/);
   assert.match(events,/示例汽车中国/);
+  assert.match(events,/"facts":\[\{"id":"CV-1"/);
   assert.doesNotMatch(events,/东京/);
   assert.equal(calls.filter(x=>x.endsWith('/v1/tools/search')).length,queryCount+3,
    '2 supplemental Search queries and 1 targeted domestic evidence check');
-  assert.equal(calls.filter(x=>x.endsWith('/responses')).length,3,'one shortlist, one detailed reason pass and one bounded evidence analysis batch');
+  assert.equal(calls.filter(x=>x.endsWith('/responses')).length,3,'resume recognition, shortlist and reason pass');
  }finally{globalThis.fetch=realFetch}
 });
 
@@ -275,8 +279,8 @@ test('frontend shows partial results without pretending network completion',asyn
  assert.match(svc,/onPartial\?\./);
  assert.match(page,/result\|\|partialJobs\.length>0/);
  assert.match(page,/setPartialJobs/);
- assert.match(dialog,/pending\?null:activeJob/);
- assert.match(dialog,/研究完成后将统一展示报告/);
+ assert.match(dialog,/!pending&&activeJob&&parsedProfile/);
+ assert.match(dialog,/已找到 \{result\.matches\.length\} 个岗位/);
 });
 
 

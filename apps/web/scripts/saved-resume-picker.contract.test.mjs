@@ -52,13 +52,13 @@ test('a saved resume is chosen with no duplicate upload, closes the list and cle
 test('existing deep-linked resume and local new upload still work independently',()=>{
  assert.match(match,/deepLinkPending=useRef/);
  assert.match(match,/setSavedId\(requested\)/);
- assert.match(match,/setSavedId\(''\);setFile\(candidate\)/);
- assert.match(match,/setSavedPickerOpen\(false\);\n  previewController\.current\?\.abort/);
+ assert.match(match,/setFile\(candidate\);\s+void preview\(candidate\)/);
+ assert.match(match,/setSavedPickerOpen\(false\);\s+previewController\.current\?\.abort/);
  assert.match(match,/id="hhba-ai-resume"/);
  assert.match(match,/onDrop=\{\(e:DragEvent<HTMLLabelElement>\)=>\{e\.preventDefault\(\);setDrag\(false\);choose\(e\.dataTransfer\.files\?\.\[0\]\|\|null\)\}\}/);
  assert.match(match,/if\(\(!file&&!savedId\)\|\|!consent/);
- assert.match(match,/fetchPrivateResumeForLocalReview\(entry\)/);
- assert.match(match,/submitResumeForMatching\(/);
+ assert.match(match,/fetchPrivateResumeForLocalReview\(source,abort\.signal\)/);
+ assert.match(match,/submitExtractedResumeText\(previewText,/);
 });
 
 test('mobile chooser is compact and accessible without changing the rest of the job matching flow',()=>{

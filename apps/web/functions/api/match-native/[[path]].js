@@ -7,10 +7,10 @@ import {runAgentOwnedMainlandMatch} from '../../_lib/ai-owned-job-research.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {enrichSearchMatchesWithJD,matchJdEnrichmentEnabled} from '../../_lib/match-jd-enrichment.js';
 import {researchDomesticJobEvidence} from '../../_lib/domestic-job-research.js';
-import {iterateScoredJobEvidence} from '../../_lib/agent-score-feedback.js';
 import {createAccountResearchCheckpoint} from '../../_lib/ai-research-checkpoint.js';
 import {jobResearchQuality} from '../../_lib/agent-quality-metrics.js';
 import {checkMatchProviderCapabilities} from '../../_lib/match-provider-preflight.js';
+import {recognizeMatchResume,compareMatchResumeToJd} from '../../_lib/resume-jd-match-agent.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -114,11 +114,10 @@ async function readProviderEvents(response,onProgress=()=>{},onPartial=()=>{},li
  if(receivedSearch)onProgress('writing');
  return completed;
 }
-function nativeResponsePayload(result){
+function nativeResponsePayload(result,limit){
  return {
   status:'COMPLETE',
-  profile:{education:null,education_evidence:null,experience_years:null,
-   experience_evidence:null,skills:[],target_roles:[],warnings:[]},
+  profile:result.profile,
   matches:result.matches,
   // Search and domain heuristics cannot independently verify official hiring ownership.
   matched_official_jobs:result.matches.filter(job=>job.jd_source_status==='VERIFIED_JD').length,
@@ -126,16 +125,16 @@ function nativeResponsePayload(result){
    job.recruitment_source_kind==='EMPLOYER_DOMAIN_CANDIDATE'||
    job.recruitment_source_kind==='EMPLOYER_ATS').length,
   native_search:result.diagnostic,
-  source:'DeepSeek Search 官方接口检索 + V4 Pro 简历匹配',
-  scoring:'完整 JD 使用证据适配分；有部分资料使用 AI 初步适配分；仅有搜索摘要时可提供岗位方向参考分（不代表满足任职要求）；证据不足则不评分。均非录用概率。',
+  source:'中国大陆企业招聘页面',
+  scoring:'匹配分依据核验后的完整岗位 JD 和简历证据。',
   privacy:'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
-  disclaimer:(result.incomplete?'本轮未达到10条或生成未完全结束，仅保留已找到的招聘入口。':'')+'中国大陆企业招聘来源均须以实际官网核实；初步适配分及岗位方向参考分不代表已核对全部任职资格，证据不足不评分；职位仍否开放以企业公告为准。'
+  disclaimer:(result.matches.length<limit?`本轮找到 ${result.matches.length} 个符合展示条件的岗位，目标为 ${limit} 个。`:'')+'招聘状态和任职要求以企业公告为准。证据不足的岗位暂不评分。'
  };
 }
 
 // The live Search-first model owns the job list. Only server-completed
 // matches may create durable personal history; clients cannot submit fake jobs.
-async function verifiedJdPass(env,result,resume,options,progress=()=>{}){
+async function verifiedJdPass(env,result,resume,options,progress){
  if(!matchJdEnrichmentEnabled(env))return result;
  progress('reading');
  try{
@@ -155,7 +154,8 @@ async function runCandidateResearch(env,key,resume,roleHint,limit,options={}){
  if(env?.HHBA_AI_OWNED_RESEARCH_ENABLED==='0')
   return runSearchFirstMatch(key,resume,roleHint,limit,options);
  try{
-  return await runAgentOwnedMainlandMatch(key,resume,roleHint,limit,options);
+  // Candidate discovery is preliminary. The full-JD Agent writes the comparisons.
+  return await runAgentOwnedMainlandMatch(key,resume,roleHint,limit,{...options,expandDetailed:false});
  }catch(error){
   if(options.signal?.aborted||error?.code==='AI_MATCH_CANCELLED')throw error;
   // "No verified source" is a valid evidence conclusion, not a model
@@ -174,31 +174,16 @@ async function runCandidateResearch(env,key,resume,roleHint,limit,options={}){
    agent_fallback:true,agent_error:String(error?.code||'AGENT_UNAVAILABLE').slice(0,70)}};
  }
 }
-async function domesticResearchPass(env,key,result,resume,options,progress=()=>{},signal=null,publish=()=>{}){
+async function domesticResearchPass(env,key,result,options,progress){
  progress('researching');
- const checked=await researchDomesticJobEvidence(key,resume,result.matches,{
-  ...options,signal,onProgress:progress,
-  enabled:env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'
+ const checked=await researchDomesticJobEvidence(key,'',result.matches,{
+  ...options,score:false,enabled:env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'
  });
- publish(checked.matches);
- let final=checked.matches,feedback={mode:'disabled'};
- // The grading result is evidence for the next Agent decision, not the end
- // of its authority. The legacy stream mocks remain isolated.
- if(env?.HHBA_AI_OWNED_RESEARCH_ENABLED!=='0'&&
-    env?.HHBA_AGENT_SCORE_FEEDBACK_ENABLED!=='0'&&
-    env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'&&!signal?.aborted){
-  try{
-   const revised=await iterateScoredJobEvidence(key,resume,final,{
-    ...options,signal,onProgress:progress,timeBudgetMs:40000
-   });
-   final=revised.matches;feedback=revised.diagnostic;
-   if(feedback.feedback_refined_jobs>0)publish(final);
-  }catch(error){
-   feedback={mode:'unavailable',code:String(error?.code||'RESEARCH_UNAVAILABLE').slice(0,60)};
-  }
- }
+ const final=checked.matches.map(job=>job.jd_source_status==='VERIFIED_JD'?job:{...job,
+  match_score:null,reference_score:0,score_basis:'',matched:[],not_evidenced:[],
+  recommendation_reason:'已找到企业招聘入口，完整岗位 JD 尚待核验。'});
  const diagnostic={...result.diagnostic,domestic_evidence:checked.diagnostic,
-  score_feedback:feedback};
+  visible_jobs:final.length};
  return {...result,matches:final,diagnostic:{
   ...diagnostic,quality:jobResearchQuality(final,diagnostic)
  }};
@@ -214,11 +199,34 @@ async function checkpointForCandidate(env,candidate,resume,roleHint){
 function provisionalPartial(jobs){
  // No numerical score until official JD or independently researched evidence.
  return jobs.map(job=>job.jd_source_status==='VERIFIED_JD'?job:
-  {...job,match_score:null,reference_score:0,score_basis:''});
+  {...job,match_score:null,reference_score:0,score_basis:'',matched:[],not_evidenced:[],
+   recommendation_reason:'已找到企业招聘入口，正在核对岗位 JD。'});
+}
+
+async function matchResumeWorkflow(env,candidate,resume,options,{
+ signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{}
+}={}){
+ const key=env.HHBA_MATCH_DEEPSEEK_KEY;
+ onProgress('parsing');
+ const profile=await recognizeMatchResume(key,resume,options.role_hint,{signal});
+ const checkpoint=await checkpointForCandidate(env,candidate,resume,options.role_hint);
+ const researchOptions={signal,checkpoint,resumeProfile:profile,onProgress,onActivity,
+  autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0',
+  onPartial:jobs=>onPartial(provisionalPartial(jobs))};
+ const result=await runCandidateResearch(env,key,resume,options.role_hint,options.limit,researchOptions);
+ const verified=await verifiedJdPass(env,result,resume,{
+  ...options,signal,onVerified:jobs=>onPartial(provisionalPartial(jobs)),compareEvidence:jd=>{
+   onProgress('scoring');
+   return compareMatchResumeToJd(key,profile,jd,{signal});
+  }
+ },onProgress);
+ onPartial(provisionalPartial(verified.matches));
+ const researched=await domesticResearchPass(env,key,verified,{signal},onProgress);
+ return {result:{...researched,profile},checkpoint};
 }
 
 async function withSavedHistory(env,session,input,result){
- const response=nativeResponsePayload(result);
+ const response=nativeResponsePayload(result,input.options.limit);
  try{
   const item=await saveMatchHistory(env.HHBA_PNVS_AUTH_DB,session.phone,
    input.resume_id??null,input.options.role_hint,result.matches);
@@ -440,26 +448,19 @@ export async function onRequest({request,env}){
     void (async()=>{
      const started=Date.now();
      let phase='preparing';
+     const reportProgress=stage=>{phase=stage;send('progress',{stage});};
      const heartbeat=setInterval(()=>{
       if(!ended)send('heartbeat',{stage:phase,elapsed_ms:Date.now()-started});
      },12000);
      try{
-      const checkpoint=await checkpointForCandidate(env,candidate,redacted,options.role_hint);
-      const result=await runCandidateResearch(env,env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-       options.role_hint,options.limit,{signal:abort.signal,
-       checkpoint,autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0',onProgress:stage=>{
-        phase=stage;send('progress',{stage});
-       },onActivity:detail=>{
+      const {result,checkpoint}=await matchResumeWorkflow(env,candidate,redacted,options,{
+       signal:abort.signal,onProgress:reportProgress,onActivity:detail=>{
         if(detail&&typeof detail==='object')
          send('activity',detail);
-       },onPartial:matches=>send('partial',{matches:provisionalPartial(matches)})});
-      const verified=await verifiedJdPass(env,result,redacted,options,stage=>send('progress',{stage}));
-      const researched=await domesticResearchPass(env,env.HHBA_MATCH_DEEPSEEK_KEY,
-       verified,redacted,options,stage=>send('progress',{stage}),abort.signal,
-       matches=>send('partial',{matches}));
-      send('partial',{matches:researched.matches});
-      console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(researched.diagnostic));
-      send('complete',await withSavedHistory(env,candidate,input,researched));
+       },onPartial:matches=>send('partial',{matches})});
+      if(abort.signal.aborted)return;
+      console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
+      send('complete',await withSavedHistory(env,candidate,input,result));
       await checkpoint?.clear();
      }catch(e){
       const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
@@ -487,19 +488,14 @@ export async function onRequest({request,env}){
  }
 
  try{
-  const checkpoint=await checkpointForCandidate(env,candidate,redacted,options.role_hint);
-  const result=await runCandidateResearch(env,env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-   options.role_hint,options.limit,{checkpoint,autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0'});
-  const verified=await verifiedJdPass(env,result,redacted,options);
-  const researched=await domesticResearchPass(env,env.HHBA_MATCH_DEEPSEEK_KEY,
-   verified,redacted,options);
-  console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(researched.diagnostic));
-  const payload=await withSavedHistory(env,candidate,input,researched);
+  const {result,checkpoint}=await matchResumeWorkflow(env,candidate,redacted,options,{signal:request.signal});
+  console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
+  const payload=await withSavedHistory(env,candidate,input,result);
   await checkpoint?.clear();
   return json(payload);
  }catch(e){
   const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
   console.warn('HHBA_MATCH_NATIVE_ERROR',JSON.stringify({code,...(code==='AI_EMPLOYER_JOBS_NOT_FOUND'&&e?.diagnostic?{diagnostic:e.diagnostic}:{})}));
-  return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:502);
+  return fail(code,code==='AI_PROFILE_INCOMPLETE'?422:code==='AI_PROVIDER_RATE_LIMITED'?429:502);
  }
 }

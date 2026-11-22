@@ -108,10 +108,11 @@ test('incorrect employer board identity cannot be recommended',()=>{
 test('privacy-reviewed empty text never silently falls back to raw resume',async()=>{
  const {readFile}=await import('node:fs/promises');
  const ui=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
- assert.match(ui,/if\(previewLoaded\)/);
- assert.match(ui,/previewLoaded&&previewText\.replace\(\/\\s\/g,''\)\.length<30/);
- assert.match(ui,/setPreviewLoaded\(false\);setConsent\(false\);\s*setSavedId/);
- assert.match(ui,/Once the user has reviewed\/edited text, NEVER fall back/);
+ assert.match(ui,/identifiedCharacters=redactResumeTextLocally\(previewText\)\.replace\(\/\\s\/g,''\)\.length/);
+ assert.match(ui,/!previewLoaded\|\|\s*identifiedCharacters<30/);
+ assert.match(ui,/setPreviewLoaded\(false\);setPreviewError\(''\);setConsent\(false\);\s*setSavedId/);
+ assert.match(ui,/await submitExtractedResumeText\(previewText,/);
+ assert.doesNotMatch(ui,/submitResumeForMatching/);
 });
 
 
@@ -121,8 +122,8 @@ test('saved R2 resumes offer direct AI navigation without auto-upload or auto-co
  const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  assert.match(vault,/candidate\/account\/match\?resume=/);
  assert.match(page,/deepLinkPending\.current/);
- assert.match(page,/rows\.some\(item=>item\.id===requested\)/);
- assert.match(page,/setSavedId\(requested\)/);
+ assert.match(page,/rows\.find\(item=>item\.id===requested\)/);
+ assert.match(page,/setSavedId\(requested\);\s*void preview\(entry\)/);
  assert.doesNotMatch(vault,/submitResumeForMatching/);
 });
 test('Top 10 never repeats company+title just because an ATS job has more locations',()=>{

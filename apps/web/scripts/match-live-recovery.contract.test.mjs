@@ -70,14 +70,13 @@ test('credential/usage problems are never swallowed and never misreported as a l
   }),e=>e.code===code);
  }
 });
-test('existing modal and SSE path contain independently updated action text and real search metrics',()=>{
+test('the modal shows current progress while SSE retains search metrics',()=>{
  const app=readFileSync(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  const service=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
  const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
- assert.match(app,/progressActivity\?\.message/);
- assert.match(app,/elapsedSeconds/);
- assert.match(app,/activityIdleSeconds>=22/);
- assert.match(app,/来源候选/);
+ assert.match(app,/stageTitle\[progressStage\]/);
+ assert.match(app,/已找到 \{result\.matches\.length\} 个岗位/);
+ assert.doesNotMatch(app,/DeepSeek|候选来源/);
  assert.match(service,/event==='activity'/);
  assert.match(service,/onActivity\?\.\(/);
  assert.match(route,/send\('activity',detail\)/);

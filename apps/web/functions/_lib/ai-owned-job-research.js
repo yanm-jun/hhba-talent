@@ -86,12 +86,17 @@ export function targetedEmployerRecoveryQueries(history,usedQueries=[]){
  * evidence. Only already-public role names and locally derived career-family
  * search terms are sent to Search. No private CV excerpt or invented URL.
  */
-export function underfilledOfficialSearchQueries(resume,roleHint,history,usedQueries=[]){
+export function underfilledOfficialSearchQueries(resume,roleHint,history,usedQueries=[],pool=[]){
+ const employers=new Map();
+ for(const job of sourceOnlyJobPreviews(pool,6)){
+  const host=new URL(job.official_url).hostname;
+  if(!employers.has(host))employers.set(host,job.title+' '+job.location+' 社会招聘 site:'+host);
+ }
  const reposts=targetedEmployerRecoveryQueries(history,usedQueries);
  const known=searchQueries(resume,roleHint);
  const fresh=usedQueries.slice(-4).map(q=>
   q.slice(0,80)+' 企业自有招聘官网 在招岗位 工作城市');
- return normalizeAutonomousQueries([...reposts,...known,...fresh],usedQueries).slice(0,8);
+ return normalizeAutonomousQueries([...employers.values(),...reposts,...known,...fresh],usedQueries).slice(0,8);
 }
 async function modelDecision(key,resume,roleHint,pool,queries,history,deadline,{
  fetcher=fetch,signal=null,decisionTimeoutMs=35000
@@ -185,6 +190,16 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
     elapsed_ms:Date.now()-started,...extra}
   });
  const evidenceReadyCount=()=>pool.filter(h=>isRecommendationEligible(h)&&Boolean(indexedJobWorkCity(h))).length;
+ let previewSignature='';
+ function publishSourcePreviews(){
+  if(signal?.aborted)return;
+  const jobs=sourceOnlyJobPreviews(pool,limit);
+  const signature=JSON.stringify(jobs.map(job=>[job.official_url,job.title,job.availability_status]));
+  if(signature===previewSignature||(!jobs.length&&!previewSignature))return;
+  previewSignature=signature;
+  onPartial(jobs.map(job=>({...job,evidence_status:'RESEARCH_PENDING',
+   recommendation_reason:'已找到企业招聘页面，正在对照简历核对岗位条件。'})));
+ }
  async function saveCheckpoint(phase){
   if(!options.checkpoint?.save)return;
   try{
@@ -231,6 +246,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   }
   const old=pool.length;
   pool=mergeCandidateHits(pool,completed,240).filter(isDirectEmployerSourceHit);
+  publishSourcePreviews();
   history.push({type:'search',queries:executed,found:pool.length-old,
    requested:proposed.length,skipped_due_budget:proposed.length-executed.length,
    rejected_title_hints:[...new Set(rejectedHints)].slice(0,8)});
@@ -251,7 +267,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    try{
     const response=await fetchDetails(key,part,{...options,
      maxFetch:part.length,fetchTimeoutMs:Math.min(9000,budget())});
-    const updated=new Map(response.hits.map(h=>[h.url,h]));
+    const updated=new Map([...response.hits,...(response.closed_hits||[])].map(h=>[h.url,h]));
     const fetchedUrls=new Set(part.map(hit=>hit.url));
     pool=pool.map(hit=>{
      if(updated.has(hit.url))return {...updated.get(hit.url),fetch_attempted:true};
@@ -264,6 +280,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    }catch(e){history.push({type:'fetch_error',code:String(e.code||'UNAVAILABLE')})}
   }
   pageReads+=read;
+  publishSourcePreviews();
   history.push({type:'fetch',candidate_ids:candidateIds,read});
   await saveCheckpoint('fetch');
   activity('researching',read>0?
@@ -412,7 +429,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  // using independent public role clues and related career-family queries.
  // Reserve enough time for the real selection and scoring output.
  if(evidenceReadyCount()<Math.min(limit,6)&&budget()>56000){
-  const supplementary=underfilledOfficialSearchQueries(resume,roleHint,history,usedQueries);
+  const supplementary=underfilledOfficialSearchQueries(resume,roleHint,history,usedQueries,pool);
   if(supplementary.length){
    onProgress('searching');
    activity('searching','企业岗位来源数量不足，正在执行最后一轮补充官网检索，避免过早结束。');
@@ -555,7 +572,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  }
  const result=detail.matches.filter(job=>
    isMainlandEmployerJobUrl(job.official_url)&&
-   pool.some(h=>h.url===job.official_url&&isDirectEmployerSourceHit(h)));
+   pool.some(h=>h.url===job.official_url&&isDirectEmployerSourceHit(h)&&isRecommendationEligible(h)));
  return {matches:result,incomplete:result.length<limit||detail.detail_failures>0,
   diagnostic:{mode:AGENT_VERSION,model:'deepseek-v4-pro',
    searches:searchCalls,page_reads:pageReads,provider_items:rawHits,

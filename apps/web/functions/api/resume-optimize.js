@@ -3,6 +3,7 @@
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
 import {generateSuggestions,selectProvider} from '../_lib/resume-ai-provider.js';
 import {hydrateVerifiedJobRequirements} from '../_lib/job-jd-archive.js';
+import {auditTargetedResumeSuggestions} from '../_lib/resume-rewrite-provider.js';
 
 const send=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store',
@@ -122,11 +123,16 @@ export async function onRequestPost({request,env}){
  }catch{return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);}
  // Mask common contact identifiers before third-party processing.
  const blocks=input.blocks.map(b=>({id:b.id,section:b.section,text:redact(b.text)}));
- const job={title:redact(trustedJob.title),requirements:redact(trustedJob.requirements)};
+ const job={title:redact(trustedJob.title),requirements:redact(trustedJob.requirements),
+  verified:trustedJob.source_status==='VERIFIED_OFFICIAL_JD'};
  try{
-  const result=await generateSuggestions({env,blocks,job,signal:AbortSignal.timeout(25000)});
+  const signal=AbortSignal.any([request.signal,AbortSignal.timeout(90000)]);
+  const result=await generateSuggestions({env,blocks,job,signal});
+  const checked=job.verified?await auditTargetedResumeSuggestions({
+   env,blocks,job,suggestions:result.suggestions,signal
+  }):result.suggestions;
   const originalById=new Map(input.blocks.map(b=>[b.id,b.text]));
-  const suggestions=result.suggestions.filter(s=>originalById.has(s.blockId)).map(s=>({
+  const suggestions=checked.filter(s=>originalById.has(s.blockId)).map(s=>({
    ...s,original:originalById.get(s.blockId),
    // AI is never authoritative evidence of a new fact. User must explicitly accept.
    evidenceStatus:'needs_user_confirmation'

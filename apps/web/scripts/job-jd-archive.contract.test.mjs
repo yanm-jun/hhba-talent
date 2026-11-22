@@ -5,7 +5,7 @@ import {
  saveVerifiedJobJd,readJobJdById,readFreshJobJdByUrl,hydrateVerifiedJobRequirements,
  jdArchiveReady,publicJdPayload
 } from '../functions/_lib/job-jd-archive.js';
-import {extractOfficialJdSections} from '../functions/_lib/official-job-evidence.js';
+import {directOfficialJobEvidence,extractOfficialJdSections} from '../functions/_lib/official-job-evidence.js';
 
 const URL='https://careers.tencent.com/jobdesc.html?postId=123456789012';
 const baseline=()=>({
@@ -72,6 +72,154 @@ test('official text keeps multiple source sections, not a one-line Search snippe
  assert.match(parsed.full_jd,/任职要求/);
  assert.doesNotMatch(parsed.full_jd,/更多职位|职位列表/);
  assert.deepEqual(parsed.sections.map(x=>x.id),['JD-001','JD-002','JD-003','JD-004','JD-005','JD-006']);
+});
+
+test('Meituan reads the exact public employer detail, including multiple work cities and full requirements',async()=>{
+ const canonical='https://zhaopin.meituan.com/web/position/detail?jobUnionId=4885239249';
+ const posting={jobUnionId:'4885239249',jobStatus:'000',name:'督导经理',
+  cityList:[{name:'北京市'},{name:'上海市'}],workYear:'3年',
+  jobDuty:'负责区域内门店日常运营，带领团队复核销售指标及运营状况。<br>通过门店巡查和跨部门协作跟进改进方案。',
+  jobRequirement:'具备连锁门店或区域运营管理经验。<br>具备运营数据分析能力，熟悉销售团队培训。'};
+ const source=overrides=>async(url,init)=>{
+  assert.equal(url,'https://zhaopin.meituan.com/api/official/job/getJobDetail');
+  assert.equal(init.method,'POST');
+  assert.deepEqual(JSON.parse(init.body),{jobUnionId:posting.jobUnionId,jobShareType:'1'});
+  assert.ok(!init.headers.Authorization&&!init.headers.Cookie);
+  return Response.json({status:1,data:{...posting,...overrides}});
+ };
+ const raw=await directOfficialJobEvidence(canonical,{fetcher:source({})});
+ assert.equal(raw.title,'督导经理');
+ assert.equal(raw.location,'北京市、上海市');
+ assert.match(raw.full_jd,/岗位职责\n.*负责区域内门店/);
+ assert.match(raw.full_jd,/任职要求\n.*具备连锁门店/);
+ const saved=await saveVerifiedJobJd(mockEnv(),raw);
+ assert.equal(publicJdPayload(saved).retrieval_method,'MEITUAN_PUBLIC_JOB_DETAIL_V1');
+ for(const invalid of [{jobUnionId:'8888888888'},{jobStatus:'999'},{jobRequirement:''},
+  {cityList:[{name:'上海市'},{name:'香港'}]}])
+  await assert.rejects(directOfficialJobEvidence(canonical,{fetcher:source(invalid)}),/OFFICIAL_JD_NOT_VERIFIED/);
+});
+
+test('authenticated matching recognizes real CV facts then scores and reuses the exact verified employer JD',async()=>{
+ const {onRequest}=await import('../functions/api/match-native/[[path]].js');
+ const {onRequestPost:optimize}=await import('../functions/api/resume-optimize.js');
+ const env=mockEnv();
+ const saved=await saveVerifiedJobJd(env,baseline());
+ const fact='负责三家门店的销售指标分析与月度运营复盘';
+ const reply=answer=>Response.json({status:'completed',
+  output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(answer)}]}]});
+ const calls=[];
+ const db={prepare(sql){return {bind(){return this},async first(){
+  if(sql.includes('hhba_auth_sessions'))return {phone:'13800000000',revoked:0,
+   expires_at:new Date(Date.now()+3600000).toISOString()};
+  if(sql.includes('hhba_auth_users'))return {role:'candidate'};
+  return null;
+ },async all(){return {results:sql.includes('sqlite_master')?[
+  {name:'hhba_resume_optimization_requests'},{name:'hhba_resume_optimization_attempts'}
+ ]:[]}},async run(){return {success:true,meta:{changes:1}}}}}};
+ Object.assign(env,{HHBA_MATCH_SERVICE_ENABLED:'1',HHBA_MATCH_DEEPSEEK_KEY:'synthetic-test-key',
+  HHBA_PNVS_AUTH_DB:db,HHBA_AGENT_CHECKPOINT_ENABLED:'0'});
+ const makeRequest=text=>new Request('https://example.org/api/match-native/resume',{
+  method:'POST',headers:{Origin:'https://example.org',Authorization:'Bearer synthetic-token',
+   Accept:'text/event-stream','Content-Type':'application/json'},
+  body:JSON.stringify({text,consent:true,options:{country:'CN',remote_only:false,role_hint:'区域运营',limit:1}})
+ });
+ const originalFetch=globalThis.fetch;
+ globalThis.fetch=async(uri,init)=>{
+  const path=new globalThis.URL(uri).pathname;
+  const input=JSON.parse(init.body);
+  calls.push(path);
+  if(path==='/v1/tools/search'){
+   assert.ok(!input.query.includes(fact));
+   return Response.json({results:[
+    {title:'腾讯区域运营经理招聘',site_name:'腾讯招聘',url:URL,
+     summary:'腾讯区域运营经理。工作地点：上海。岗位职责：门店运营、销售指标分析。'},
+    {title:'其他企业区域运营经理',site_name:'其他企业招聘',
+     url:'https://job-boards.greenhouse.io/unknown/jobs/1234567',
+     summary:'工作地点：上海。岗位职责：门店运营和销售指标分析。'},
+    {title:'区域运营经理',site_name:'BOSS直聘',url:'https://www.zhipin.com/job_detail/abc.html',
+     summary:'工作地点：上海。岗位职责：门店运营和销售指标分析。'}
+   ]});
+  }
+  if(path==='/v1/tools/fetch')return Response.json({content:''});
+  if(path==='/v1/chat/completions'){
+   const system=input.messages[0].content,user=JSON.parse(input.messages[1].content);
+   assert.equal(user.job.requirements,baseline().full_jd);
+   const result=system.includes('事实审查员')?(()=>{
+    assert.deepEqual(user.blocks.map(block=>block.blockId),['keep','reject']);
+    return {checks:[{blockId:'keep',safe:true},{blockId:'reject',safe:false}]};
+   })():{suggestions:[
+    {blockId:'keep',proposed:'负责门店销售指标分析并开展月度运营复盘。',jobRequirement:baseline().sections[1].text},
+    {blockId:'reject',proposed:'担任团队直属负责人。',jobRequirement:baseline().sections[2].text},
+    {blockId:'unsupported-jd',proposed:'协调销售团队推进运营改进。',jobRequirement:'捏造的岗位条件'},
+    {blockId:'unsupported-number',proposed:'推动销售额上升99%。',jobRequirement:baseline().sections[1].text}
+   ].map(row=>({...row,action:'replace'}))};
+   return Response.json({choices:[{message:{content:JSON.stringify(result)}}]});
+  }
+  if(input.instructions.includes('HHBA 的简历识别 Agent')){
+   assert.ok(!input.input.includes('synthetic@example.com'));
+   return reply({facts:[{kind:'work',quote:fact},{kind:'work',quote:'捏造了不存在的工作成果'}]});
+  }
+  if(input.instructions.includes('HHBA 的岗位匹配 Agent')){
+   const compare=JSON.parse(input.input);
+   assert.equal(compare.resume_facts.length,1);
+   assert.ok(compare.sections.some(section=>section.text.includes('工作')||section.kind==='requirements'));
+   return reply({score:81,comparisons:[
+    {jd_id:'JD-002',resume_id:'CV-1',status:'supported'},
+    {jd_id:'JD-006',resume_id:null,status:'missing'},
+    {jd_id:'JD-005',resume_id:'CV-8',status:'supported'},
+    {jd_id:'JD-099',resume_id:'CV-1',status:'supported'}
+   ]});
+  }
+  if(input.input.includes('已脱敏且用户授权用于分析的简历')){
+   assert.ok(input.input.includes('已核对的职业证据'));
+   return reply({queries:['腾讯 区域运营经理 上海 官网招聘']});
+  }
+  if(input.input.includes('已有真实招聘证据'))
+   return reply({actions:[{type:'finish'}],shortlist_ids:['j1']});
+  const selected={jobs:[{id:'j1',company:'腾讯',title:'区域运营经理',location:'上海',
+   reason:'简历记载了门店销售指标分析及月度运营复盘，与岗位运营职责方向相关。'}]};
+  return new Response('event: response.completed\ndata: '+JSON.stringify({type:'response.completed',
+   response:{status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(selected)}]}]}})+'\n\n',
+  {headers:{'Content-Type':'text/event-stream'}});
+ };
+ try{
+  const failed=await onRequest({request:makeRequest('这是一段没有可供核验的职业信息的测试文字，仅用于确认识别失败会阻止后续流程。'),env});
+  assert.match(await failed.text(),/AI_PROFILE_INCOMPLETE/);
+  assert.deepEqual(calls,['/responses'],'recognition failure cannot start Search or score');
+  const success=await onRequest({request:makeRequest('工作经历：'+fact+'，并协调销售团队跟进运营改进。联系邮箱 synthetic@example.com'),env});
+  const events=await success.text();
+  assert.match(events,/"stage":"parsing"/);
+  assert.match(events,/"stage":"reading"/);
+  const complete=JSON.parse(events.match(/event: complete\ndata: (.+)/)[1]);
+  assert.equal(complete.matches.length,1);
+  assert.equal(complete.profile.facts[0].quote,fact);
+  const match=complete.matches[0];
+  assert.equal(match.official_url,URL);
+  assert.equal(match.match_score,81);
+  assert.equal(match.jd_comparisons.length,2);
+  assert.equal(match.jd_comparisons[0].resume_evidence,fact);
+  assert.equal(match.jd_comparisons[0].requirement,baseline().sections[1].text);
+  assert.equal(match.jd_version_id,saved.id);
+  const input={official_url:match.official_url,jd_version_id:match.jd_version_id,jd_sha256:match.jd_sha256};
+  const trusted=await hydrateVerifiedJobRequirements(env,{...input,requirements:'客户端伪造岗位要求'});
+  assert.equal(trusted.requirements,baseline().full_jd);
+  await assert.rejects(hydrateVerifiedJobRequirements(env,{...input,jd_sha256:'0'.repeat(64)}),/JD_JOB_IDENTITY_MISMATCH/);
+  const optimized=await optimize({
+   request:new Request('https://example.org/api/resume-optimize',{method:'POST',
+    headers:{Origin:'https://example.org',Authorization:'Bearer synthetic-token','Content-Type':'application/json'},
+    body:JSON.stringify({consent_ai:true,job:{...input,title:match.title,requirements:'客户端伪造岗位要求'},
+     blocks:['keep','reject','unsupported-jd','unsupported-number'].map(id=>({id,section:'experience',text:fact}))})}),
+   env:{...env,HHBA_RESUME_OPTIMIZATION_ENABLED:'1',HHBA_MATCH_RUNTIME_MODE:'production',
+    HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER:'synthetic-optimization-pepper',
+    HHBA_AI_DEFAULT_PROVIDER:'openai',HHBA_AI_OPENAI_API_KEY:'synthetic-key',HHBA_AI_OPENAI_MODEL:'mock-model'}
+  });
+  assert.equal(optimized.status,200);
+  const output=await optimized.json();
+  assert.equal(output.jd_version_id,match.jd_version_id);
+  assert.deepEqual(output.suggestions.map(item=>item.blockId),['keep']);
+  assert.equal(output.suggestions[0].evidenceStatus,'needs_user_confirmation');
+  assert.ok([...env.r2.objects.values()].every(value=>!value.includes(fact)),'shared JD archive must not contain CV quotes');
+ }finally{globalThis.fetch=originalFetch;}
 });
 
 test('JD archive deduplicates same exact employer text for any number of users',async()=>{

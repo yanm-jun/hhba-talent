@@ -8,6 +8,7 @@ export type MatchProfile = {
   experience_years:number|null;experience_evidence:string|null;
   skills:{name:string;evidence:string}[];target_roles:string[];
   professional_credentials?:string[];warnings:string[];
+  facts?:{id:string;kind:'work'|'project'|'skill'|'education'|'credential';quote:string}[];
 };
 export type MatchedJob = {
   id:string;company:string;title:string;title_zh?:string|null;location:string;
@@ -33,7 +34,8 @@ export type MatchedJob = {
   jd_proof_method?:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1';
   jd_source_status?:'VERIFIED_JD';
   jd_employer_identity_status?:'ATS_TENANT_NOT_LEGAL_ENTITY_VERIFIED'|'DIRECT_EMPLOYER_SOURCE';
-  jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
+  jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'AI_VERIFIED_JD_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
+  jd_comparisons?:{requirement:string;resume_evidence:string|null;status:'supported'|'partial'|'missing'}[];
   match_score?:number|null;score_basis?:string;
   availability_status?:'OPEN_LISTED'|'CLOSED_LISTED'|'POSSIBLY_CLOSED'|'UNKNOWN';
   availability_note?:string;availability_checked_at?:string|null;
@@ -88,7 +90,7 @@ const errorMap:Record<string,string>={
   AI_MATCH_NO_VALID_JOBS:'本轮 AI 候选名单没有通过岗位信息核验，这不代表你的简历不符合国内招聘要求。请尝试重新搜索或填写具体岗位方向。',
   AI_EMPLOYER_JOBS_NOT_FOUND:'本轮已尝试补充搜索，但仍未找到信息足够明确的企业招聘岗位链接；并非你的简历不适合。请稍后重试或填写更具体的岗位方向。',
   AI_PROVIDER_RESPONSE_INVALID:'DeepSeek 输出中断或格式异常，暂不展示不完整推荐。',
-  AI_PROFILE_INCOMPLETE:'AI 未能可靠识别简历内容，请完善简历后重试。',
+  AI_PROFILE_INCOMPLETE:'AI 没有识别到可用于匹配的经历或技能。请核对简历文字，补充真实内容后重试。',
   MATCH_PERSONAL_LIMIT:'今天的个人免费体验次数已达上限。',
   MATCH_GLOBAL_LIMIT:'平台今天的 AI 体验额度已用完。',
   BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。',
@@ -142,7 +144,7 @@ export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Pr
   throw new MatchError(400,(e as Error)?.message||errorMap.INVALID_RESUME_TEXT);
  }
 }
-export type NativeMatchProgress='preparing'|'connected'|'planning'|'searching'|'reading'|'researching'|'writing'|'scoring'|'waiting';
+export type NativeMatchProgress='preparing'|'parsing'|'connected'|'planning'|'searching'|'reading'|'researching'|'writing'|'scoring'|'waiting';
 export type NativeMatchActivity={
  stage:NativeMatchProgress;message:string;searches?:number;raw_results?:number;
  candidate_links?:number;rejected_links?:number;pages_read?:number;decisions?:number;
@@ -164,7 +166,7 @@ async function consumeNativeMatchStream(
   let value:any;try{value=JSON.parse(data)}catch{return}
   if(event==='progress'){
    const stage=value?.stage;
-   if(['preparing','connected','planning','searching','reading','researching','writing','scoring','waiting'].includes(stage))
+   if(['preparing','parsing','connected','planning','searching','reading','researching','writing','scoring','waiting'].includes(stage))
     onProgress?.(stage as NativeMatchProgress);
   }else if(event==='activity'){
    const stage=value?.stage;
@@ -179,14 +181,14 @@ async function consumeNativeMatchStream(
      search_failures:number(value.search_failures),elapsed_ms:number(value.elapsed_ms)});
    }
   }else if(event==='partial'){
-   if(Array.isArray(value?.matches)&&value.matches.length>0&&value.matches.length<=10)
+   if(Array.isArray(value?.matches)&&value.matches.length<=10)
     onPartial?.(value.matches as MatchedJob[]);
   }else if(event==='failure'){
    const code=String(value?.error||'AI_PROVIDER_UNAVAILABLE');
    const stage=String(value?.phase||'preparing');
    const elapsed=Number(value?.elapsed_ms||0);
    const names:Record<string,string>={
-    preparing:'连接 DeepSeek',connected:'准备联网搜索',planning:'AI 自主规划补充搜索方向',searching:'DeepSeek Search 检索职位',reading:'读取岗位详情',researching:'研究国内岗位证据',writing:'生成初步名单',scoring:'分析适配分和推荐理由'
+    preparing:'准备匹配',parsing:'识别简历',connected:'准备搜索',planning:'分析求职方向',searching:'搜索企业岗位',reading:'核验岗位 JD',researching:'核对招聘资料',writing:'整理岗位',scoring:'对照简历和岗位 JD'
    };
    const elapsedNote=Number.isFinite(elapsed)&&elapsed>=1000?
     '（'+Math.round(elapsed/1000)+'秒，阶段：'+(names[stage]||'模型处理')+'）':'';

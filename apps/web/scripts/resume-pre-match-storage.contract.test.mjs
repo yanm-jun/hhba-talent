@@ -20,21 +20,20 @@ test('original file retention is a separate explicit choice, not a side effect o
  assert.match(page,/onChange=\{e=>setConsent\(e.target.checked\)\}/);
 });
 
-test('private storage is acknowledged before either reviewed-text or raw-file matching starts',()=>{
+test('private storage is acknowledged before reviewed-text matching starts',()=>{
  const begin=page.indexOf(' async function run()');
  const end=page.indexOf(' return <Shell user={user}',begin);
  const run=page.slice(begin,end);
  const saved=run.indexOf('await uploadPrivateResume(selectedFile,true)');
  const submitEdited=run.indexOf('await submitExtractedResumeText(');
- const submitFile=run.indexOf('await submitResumeForMatching(');
- assert.ok(saved>0&&saved<submitEdited&&saved<submitFile,'save must precede all AI matching paths');
+ assert.ok(saved>0&&saved<submitEdited,'save must precede the AI matching request');
  assert.match(run,/if\(selectedFile&&!matchResumeId&&storageChoice==='save'\)/);
  assert.match(run,/matchResumeId=stored\.id/);
  assert.match(run,/setSavedId\(stored\.id\);setFile\(null\)/);
  assert.match(run,/setSavedFiles\(all=>all\.some\(item=>item\.id===stored\.id\)/);
  assert.match(run,/new Event\('hhba:private-resumes-changed'\)/);
  assert.match(run,/submitExtractedResumeText\(previewText,options,consent,abort\.signal,matchResumeId\|\|undefined/);
- assert.match(run,/submitResumeForMatching\(selected,options,consent,abort\.signal,matchResumeId\|\|undefined/);
+ assert.doesNotMatch(run,/submitResumeForMatching\(/);
 });
 
 test('storage failures must stop matching, and opting out never uploads the binary',()=>{

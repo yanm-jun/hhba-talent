@@ -10,20 +10,17 @@ const optimizer=read('../src/components/TargetedResumeOptimization.tsx');
 const word=read('../src/components/OriginalWordViewer.tsx');
 const backend=read('../functions/api/resume-word.js');
 
-test('the existing result cards and original Word editor survive the user-approved narrative research redesign',()=>{
+test('the simpler result cards preserve the original Word editor and the selected posting',()=>{
  const preserved=[
-  '汇方职场 · HHBA',
-  'AI 深度职业研究',
-  '本轮岗位研究结果不足',
-  '已整理 {result.matches.length} 个岗位',
-  '适配分是有依据的参考，不是录用概率。',
+  '岗位匹配',
+  '找到 {result.matches.length} 个岗位',
+  '匹配分用于求职参考，不是录用概率。',
   'hhba-match-history-confirm',
   'hhba-native-list',
   'result.matches.map((job,i)=>',
   'job.company',
   'job.title_zh||job.title',
   'job.location',
-  'job.recruitment_source_note',
   "job.availability_status==='OPEN_LISTED'",
   'job.match_score',
   'job.score_basis',
@@ -36,7 +33,7 @@ test('the existing result cards and original Word editor survive the user-approv
  for(const value of preserved)assert.ok(dialog.includes(value),'preserve old native result UI: '+value);
  assert.match(dialog,/className=\{'hhba-match-modal'\+\(optimizedJobId\?' hhba-match-modal-editor':''\)\}/);
  assert.match(dialog,/result\.matches\.find\(job=>job\.id===optimizedJobId\)/);
- assert.match(dialog,/<button type="button" disabled=\{pending\}/);
+ assert.match(dialog,/<button type="button" disabled=\{pending\|\|!job\.jd_version_id\|\|!job\.jd_sha256\}/);
  assert.doesNotMatch(dialog,/!pending&&Number\.isInteger\(job\.match_score\)&&<button/);
  assert.match(dialog,/className="hhba-native-optimize"/);
  assert.match(dialog,/> 优化简历/);
@@ -46,8 +43,8 @@ test('the existing result cards and original Word editor survive the user-approv
  assert.match(dialog,/viewport\.scrollTop=optimizedJobId\?0:matchListScroll\.current/);
  assert.match(dialog,/if\(optimizedJobId\)\{backToMatches\(\);return\}/);
  assert.match(dialog,/\{optimizedJobId\?'返回匹配结果':pending\?'取消搜索':'完成查看'\}/);
- assert.match(dialog,/hhba-research-journal/);
- assert.match(dialog,/pending\?null:activeJob/);
+ assert.match(dialog,/stageTitle\[progressStage\]/);
+ assert.match(dialog,/!pending&&activeJob&&parsedProfile/);
  assert.doesNotMatch(dialog,/<CandidateJourneySteps/);
 });
 
@@ -58,9 +55,8 @@ test('homepage & candidate workbench keep original matcher route and PDF/DOCX fl
  assert.match(page,/checked=\{storageChoice==='save'\}/);
  assert.match(page,/checked=\{storageChoice==='once'\}/);
  assert.match(page,/AI 为我寻找适合的工作|开始智能匹配/);
- assert.match(page,/let matched:MatchResponse;/);
- assert.match(page,/matched=await submitResumeForMatching\(selected,options,consent,abort\.signal,matchResumeId\|\|undefined,progress,setPartialJobs,setOptimizationSource,reportActivity\)/);
- assert.match(page,/setOptimizationSource\(previewText\)/);
+ assert.match(page,/matched=await submitExtractedResumeText\(previewText,options,consent,abort\.signal,matchResumeId\|\|undefined,/);
+ assert.match(page,/setOptimizationSource\(redactResumeTextLocally\(previewText\)\)/);
  assert.match(page,/sourceText=\{result\?optimizationSource:undefined\}/);
  assert.match(page,/sourceResume=\{result&&savedId\?savedFiles\.find/);
  assert.match(page,/embedded=\{embedded\}/);

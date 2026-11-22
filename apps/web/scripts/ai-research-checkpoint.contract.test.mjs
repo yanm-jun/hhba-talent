@@ -127,8 +127,8 @@ test('migration and authenticated API integrate the checkpoint without saving CV
  assert.match(sql,/CREATE TABLE IF NOT EXISTS hhba_ai_research_checkpoints/);
  assert.match(sql,/REFERENCES hhba_auth_users\(phone\)/);
  assert.ok(!/resume_text|resume_json|raw_cv/i.test(sql));
- assert.match(route,/checkpointForCandidate\(env,candidate,redacted,options\.role_hint\)/);
- assert.match(route,/iterateScoredJobEvidence/);
+ assert.match(route,/checkpointForCandidate\(env,candidate,resume,options\.role_hint\)/);
+ assert.match(route,/compareMatchResumeToJd/);
  assert.match(route,/checkpoint\?\.clear\(\)/);
 });
 

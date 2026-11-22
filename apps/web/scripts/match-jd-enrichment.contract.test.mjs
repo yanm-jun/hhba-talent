@@ -39,7 +39,7 @@ test('disabled/default settings preserve provisional Search scores and never cal
  assert.equal(result.diagnostic.mode,'disabled');
  assert.equal(calls,0);
 });
-test('preview automatically enables verified-JD stage but production remains off without explicit switch',async()=>{
+test('a configured JD archive enables the matching stage in preview and production',async()=>{
  const preview={...env,HHBA_MATCH_JD_ENRICH_ENABLED:undefined,
   HHBA_AUTH_ROLLOUT:'preview',HHBA_MATCH_SERVICE_ENABLED:'1',
   HHBA_JOB_JD_DB:{prepare(sql){
@@ -49,16 +49,17 @@ test('preview automatically enables verified-JD stage but production remains off
   }}
  };
  const production={...env,HHBA_MATCH_JD_ENRICH_ENABLED:undefined,
-  HHBA_AUTH_ROLLOUT:undefined,HHBA_MATCH_RUNTIME_MODE:'production'};
+  HHBA_AUTH_ROLLOUT:undefined,HHBA_MATCH_SERVICE_ENABLED:'1'};
  assert.equal(matchJdEnrichmentEnabled(preview),true);
- assert.equal(matchJdEnrichmentEnabled(production),false);
+ assert.equal(matchJdEnrichmentEnabled(production),true);
+ assert.equal(matchJdEnrichmentEnabled({...production,HHBA_JOB_JD_R2:undefined}),false);
  assert.equal(matchJdEnrichmentEnabled({...preview,HHBA_MATCH_JD_ENRICH_ENABLED:'0'}),false);
  const result=await enrichSearchMatchesWithJD(preview,[job()],resume,{role_hint:'区域运营经理'},{
   ready:async()=>true,getCached:async()=>archive()});
  assert.equal(result.diagnostic.mode,MATCH_JD_PIPELINE);
  assert.equal(result.matches[0].jd_version_id,ID);
- const untouched=await enrichSearchMatchesWithJD(production,[job()],resume,{},{
-  ready:async()=>{throw Error('must stay disabled')}});
+ const untouched=await enrichSearchMatchesWithJD(production,[job()],resume,{domesticOnly:true},{
+  ready:async()=>true,fetchAts:async()=>{throw Error('foreign ATS must not be fetched')}});
  assert.equal(untouched.matches[0].match_score,74);
  assert.equal(untouched.matches[0].jd_version_id,undefined);
 });
@@ -170,7 +171,7 @@ test('verified JD version crosses search UI, history and Word without storing pr
  const dialog=readFileSync(new globalThis.URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  const editor=readFileSync(new globalThis.URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
  assert.match(route,/verifiedJdPass\(/);
- assert.match(route,/withSavedHistory\(env,candidate,input,researched\)/);
+ assert.match(route,/withSavedHistory\(env,candidate,input,result\)/);
  assert.match(route,/domesticOnly:true/);
  assert.match(history,/verifiedJdMeta\(item\)/);
  assert.match(dialog,/jd_version_id:job\.jd_version_id/);

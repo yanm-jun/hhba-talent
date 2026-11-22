@@ -1,5 +1,5 @@
 /**
- * HHBA stage 3, behind the preview-only HHBA_MATCH_JD_ENRICH_ENABLED switch.
+ * Exact employer JD verification for candidate matching.
  * Search results are provisional until their exact employer posting is read.
  * Never store resume text in the shared JD archive.
  */
@@ -17,13 +17,9 @@ import {readJdPostingState,isClosedPosting,noteJdSourceFailure} from './jd-posti
 
 export const MATCH_JD_PIPELINE='HHBA_SEARCH_TO_VERIFIED_JD_V1';
 export function matchJdEnrichmentEnabled(env){
- // Explicit kill-switch always wins, including preview.
  if(env?.HHBA_MATCH_JD_ENRICH_ENABLED==='0')return false;
  if(env?.HHBA_MATCH_JD_ENRICH_ENABLED==='1')return true;
- // No Cloudflare variable migration is needed: the preview account already
- // has the original standalone JD D1/R2 bindings and candidate-only auth.
- // Production does NOT have HHBA_AUTH_ROLLOUT=preview.
- return env?.HHBA_AUTH_ROLLOUT==='preview'&&env?.HHBA_MATCH_SERVICE_ENABLED==='1';
+ return jdArchiveConfigured(env)&&env?.HHBA_MATCH_SERVICE_ENABLED==='1';
 }
 const MAX_JOBS=10,CONCURRENCY=3;
 const normalize=value=>String(value??'').normalize('NFKC').toLowerCase().replace(/[\s._\-()（）]+/g,'');
@@ -76,8 +72,10 @@ function samePostedRole(found,verified){
  return overlap>=2&&overlap/Math.min(x.size||1,y.size||1)>=.5;
 }
 export function scoreVerifiedJDSearchJob(original,archived,resume,options={}){
+ const reportedLocation=normalize(original?.location);
+ const verifiedCities=String(archived?.location||'').split(/[、，,|/；;]/).map(city=>normalize(city).replace(/市$/,''));
  if(!samePostedRole(original?.title,archived?.title)||
-  !normalize(original?.location).includes(normalize(archived?.location)))return null;
+  !verifiedCities.some(city=>city&&reportedLocation.includes(city)))return null;
  const job=archivedJDToScoreJob(archived);
  if(!job)return null;
  const profile=resumeJDProfile(resume,job,options.role_hint);
@@ -90,10 +88,11 @@ export function scoreVerifiedJDSearchJob(original,archived,resume,options={}){
  const fit=evidence?scoreCandidateFit(profile,job,{role_hint:profile.requested_role}):
   {eligible:false,reason:'RESUME_EVIDENCE_MISSING',score:null};
  const linked={
-  ...original,official_url:archived.canonical_url,
+  ...original,location:archived.location,official_url:archived.canonical_url,
   jd_version_id:archived.id,jd_sha256:archived.jd_sha256,
   jd_checked_at:archived.checked_at,jd_proof_method:archived.proof_method,
   jd_source_status:'VERIFIED_JD',source_status:'OFFICIAL_JD_VERIFIED',
+  evidence_status:'VERIFIED_FULL_JD',
   jd_employer_identity_status:archived.proof_method==='PUBLIC_EMPLOYER_ATS_V1'?
    'ATS_TENANT_NOT_LEGAL_ENTITY_VERIFIED':'DIRECT_EMPLOYER_SOURCE',
   ranking_version:'HHBA_MATCH_RANKING_V2',
@@ -144,7 +143,8 @@ export async function enrichSearchMatchesWithJD(env,matches,resume,options={},de
     if(cached)return cached;
     let fetched;
     try{
-     fetched=locator.kind?await fetchAts(locator.url):await fetchDirect(locator.url);
+    fetched=locator.kind?await fetchAts(locator.url):
+     await fetchDirect(locator.url,{signal:options.signal});
     }catch(error){
      await noteJdSourceFailure(env,locator.url,error);
      throw error;
@@ -158,6 +158,7 @@ export async function enrichSearchMatchesWithJD(env,matches,resume,options={},de
  };
  const work=async()=>{
   while(cursor<candidates.length){
+   if(options.signal?.aborted)return;
    const {job,i,locator}=candidates[cursor++];
    try{
     const jd=await load(locator);
@@ -165,8 +166,23 @@ export async function enrichSearchMatchesWithJD(env,matches,resume,options={},de
      !jd.sections?.some(s=>s.kind==='requirements'))throw Error('JD_INCOMPLETE');
     const linked=scoreVerifiedJDSearchJob(job,jd,resume,options);
     if(!linked)throw Error('JD_SCORE_NOT_AVAILABLE');
-    out[i]=linked;verified++;
-    if(linked.jd_score_status==='V2_JD_EVIDENCE_SCORED')scored++;
+    verified++;
+    if(options.compareEvidence){
+     const analysis=await options.compareEvidence(jd).catch(()=>null);
+     const score=analysis?.score??null;
+     out[i]={...linked,match_score:score,reference_score:score??0,
+      score_breakdown:undefined,score_reasoning:undefined,ranking_version:undefined,
+      score_basis:score===null?'':'依据这份岗位 JD 与简历证据逐项对照。',
+      recommendation_reason:!analysis?'已取得完整岗位 JD，本次暂未生成匹配分。':
+       score===null?'简历中能与这份岗位 JD 对照的证据不足，暂未评分。':'下面是这份岗位 JD 与简历原文的具体对应。',
+      matched:[],not_evidenced:[],jd_comparisons:analysis?.comparisons??[],
+      jd_score_status:score===null?'INSUFFICIENT_RESUME_EVIDENCE':'AI_VERIFIED_JD_SCORED'};
+     if(score!==null)scored++;
+    }else{
+     out[i]=linked;
+     if(linked.jd_score_status==='V2_JD_EVIDENCE_SCORED')scored++;
+    }
+    options.onVerified?.(out.filter(Boolean));
    }catch(error){
     // A repeated verified 404/410 can CLOSE a posting during this very
     // request, not just on an earlier search. Re-read persisted state after
@@ -176,7 +192,7 @@ export async function enrichSearchMatchesWithJD(env,matches,resume,options={},de
      try{confirmed=isClosedPosting(await readJdPostingState(env,locator.url))}
      catch{ /* an unavailable lifecycle store is not closure evidence */ }
     }
-    if(confirmed){out[i]=null;closed++;}
+    if(confirmed){out[i]=null;closed++;options.onVerified?.(out.filter(Boolean));}
     else failed++;
    }
   }

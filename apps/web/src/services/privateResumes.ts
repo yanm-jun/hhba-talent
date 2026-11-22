@@ -31,7 +31,7 @@ function token(){
  if(!token)throw Error('请先登录真实求职者账户。');
  return token;
 }
-async function request(path:string,method:string,body?:File,consent=false){
+async function request(path:string,method:string,body?:File,consent=false,signal?:AbortSignal){
  const session=token();
  const headers:Record<string,string>={Authorization:'Bearer '+session};
  if(body){
@@ -40,7 +40,7 @@ async function request(path:string,method:string,body?:File,consent=false){
   if(consent)headers['X-HHBA-Storage-Consent']='private-resume-storage-v1';
  }
  const res=await fetch(API+path,{
-  method,headers,body:body||undefined,credentials:'same-origin',cache:'no-store',
+  method,headers,body:body||undefined,credentials:'same-origin',cache:'no-store',signal,
  });
  if(!res.ok){
   const error=await res.json().catch(()=>null) as {error?:string}|null;
@@ -82,15 +82,15 @@ export async function downloadPrivateResume(resume:PrivateResume):Promise<void>{
  }finally{window.setTimeout(()=>URL.revokeObjectURL(temp),10000);}
 }
 
-/** Read this account's private resume only after the user clicks to analyze it.
+/** Read this account's private resume when selected for text review.
  * The raw PDF/DOCX stays inside the browser until local text extraction.
  * Never persist the blob, expose it in URLs, or forward it to an AI service.
  */
-export async function fetchPrivateResumeForLocalReview(resume:PrivateResume):Promise<ArrayBuffer>{
+export async function fetchPrivateResumeForLocalReview(resume:PrivateResume,signal?:AbortSignal):Promise<ArrayBuffer>{
  if(!/^[0-9a-f-]{36}$/.test(resume.id))throw Error('简历标识无效。');
  if(!/\.(?:pdf|docx)$/i.test(resume.name)||resume.size<30||resume.size>PRIVATE_RESUME_LIMIT)
   throw Error('这份简历不符合读取要求，请重新上传。');
- const res=await request('/'+resume.id+'/download','GET');
+ const res=await request('/'+resume.id+'/download','GET',undefined,false,signal);
  const claimed=Number(res.headers.get('Content-Length')||0);
  if(!Number.isFinite(claimed)||claimed<30||claimed>PRIVATE_RESUME_LIMIT)
   throw Error('私有简历文件大小异常。');
