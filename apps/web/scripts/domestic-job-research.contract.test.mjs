@@ -99,6 +99,41 @@ test('verified local employer JD keeps canonical hash/score and never triggers p
  assert.equal(out.matches[0].match_score,86);
  assert.equal(out.matches[0].jd_version_id,pinned.jd_version_id);
 });
+
+test('AI role-direction fit remains preliminary; unsupported candidates never inherit shortlist scores',async()=>{
+ const direction=post({
+  research_anchor:hit({summary:'星河汽车有限公司发布区域督导职位。工作地点：济南。详情和任职资格请查看官网。',
+   snippet:'星河汽车有限公司 区域督导 济南'})
+ });
+ const unknown=post({id:'search-j2',company:'另一家汽车公司',official_url:REMOTE,
+  match_score:97,reference_score:97,score_basis:'模型上游旧评分'});
+ const fetcher=async(url,args)=>{
+  if(url.endsWith('/v1/tools/search'))
+   return new Response(JSON.stringify({results:[]}),{status:200});
+  const batch=JSON.parse(args.body).input;
+  assert.match(batch,/本人负责汽车零售门店/);
+  return new Response(JSON.stringify({output:[{type:'message',content:[{type:'output_text',
+   text:JSON.stringify({jobs:[
+    {id:'search-j1',match_score:78,
+     score_basis:'结合简历中的汽车零售门店运营经历，这个岗位名称与区域督导方向一致，但尚未核实企业公开的具体岗位职责与任职条件，只能作为方向参考。',
+     resume_evidence:'简历写明本人负责汽车零售门店的流程管理及销售培训。',
+     role_relation:'页面公开列有区域督导岗位，职业方向与过去门店督导工作有关联。',
+     unknowns:'工作年限、学历要求、薪酬以及实际日常职责都没有得到可靠确认。',
+     next_step:'打开企业招聘页面核对最新具体 JD 和官方申请状态。'},
+    {id:'search-j2',match_score:97,score_basis:'虽然简历经历相关，但该岗位并没有可靠的公开职责或公司归属证据，应当暂时留空。'}
+   ]})}]}]}),{status:200});
+ };
+ const result=await researchDomesticJobEvidence('test','本人负责汽车零售门店的流程管理及销售培训。',[direction,unknown],
+  {fetcher});
+ assert.equal(result.matches.find(x=>x.id==='search-j1').evidence_status,'SEARCH_SNIPPET_ONLY');
+ assert.equal(result.matches.find(x=>x.id==='search-j1').evidence_score_status,'AI_DIRECTION_REFERENCE_SCORED');
+ assert.equal(result.matches.find(x=>x.id==='search-j1').match_score,78);
+ assert.match(result.matches.find(x=>x.id==='search-j1').recommendation_reason,/待核实条件/);
+ assert.equal(result.matches.find(x=>x.id==='search-j2').evidence_status,'INSUFFICIENT_EVIDENCE');
+ assert.equal(result.matches.find(x=>x.id==='search-j2').match_score,null);
+ assert.equal(result.diagnostic.scored,1);
+});
+
 test('original matching/history/Word path all use researched source evidence',()=>{
  const route=readFileSync(new globalThis.URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
  const history=readFileSync(new globalThis.URL('../functions/_lib/match-history.js',import.meta.url),'utf8');
@@ -109,6 +144,10 @@ test('original matching/history/Word path all use researched source evidence',()
  assert.match(route,/onPartial\(provisionalPartial\(review\?review\.preview\(fresh\):fresh\)\)/);
  assert.match(history,/evidence_excerpt:/);
  assert.match(word,/job\.evidence_status==='PARTIAL_SOURCE'/);
- assert.match(route,/score:false/);
+ assert.match(route,/researchDomesticJobEvidence\(key,resume,result\.matches/);
+ assert.match(route,/onProgress:progress/);
+ assert.doesNotMatch(route,/score:false/);
  assert.match(dialog,/完整岗位 JD 待核验/);
+ assert.match(dialog,/方向参考分/);
+ assert.match(dialog,/初步匹配分/);
 });
