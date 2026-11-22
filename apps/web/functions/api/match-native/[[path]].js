@@ -129,7 +129,7 @@ function nativeResponsePayload(result,limit){
   native_search:result.diagnostic,
   can_continue:result.can_continue===true,
   source:'中国大陆企业招聘页面',
-  scoring:'匹配分依据核验后的完整岗位 JD 和简历证据。',
+  scoring:'完整岗位 JD 与简历证据产生匹配分；部分公开职责与岗位方向仅产生明确标注的初步参考分，不能替代完整 JD 核验。',
   privacy:'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
   disclaimer:(result.matches.length<limit?`本轮找到 ${result.matches.length} 个符合展示条件的岗位，目标为 ${limit} 个。`:'')+'招聘状态和任职要求以企业公告为准。证据不足的岗位暂不评分。'
  };
@@ -157,14 +157,26 @@ async function runCandidateResearch(env,key,resume,roleHint,limit,options={}){
   return runSearchFirstMatch(key,resume,roleHint,limit,options);
  return runAgentOwnedMainlandMatch(key,resume,roleHint,limit,{...options,expandDetailed:false});
 }
-async function domesticResearchPass(env,key,result,options,progress){
+async function domesticResearchPass(env,key,result,resume,options,progress){
  progress('researching');
- const checked=await researchDomesticJobEvidence(key,'',result.matches,{
-  ...options,score:false,enabled:env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'
+ // The public-search pass never receives CV text. The already redacted
+ // resume goes only to the reasoning model, which compares it with source
+ // excerpts. Without complete JD this score is explicitly preliminary.
+ const checked=await researchDomesticJobEvidence(key,resume,result.matches,{
+  ...options,onProgress:progress,
+  enabled:env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'
  });
- const final=checked.matches.map(job=>job.jd_source_status==='VERIFIED_JD'?job:{...job,
-  match_score:null,reference_score:0,score_basis:'',matched:[],not_evidenced:[],
-  recommendation_reason:'已找到企业招聘入口，完整岗位 JD 尚待核验。'});
+ const final=checked.matches.map(job=>{
+  if(job.jd_source_status==='VERIFIED_JD')return job;
+  if((job.evidence_score_status==='AI_PARTIAL_SOURCE_SCORED'&&
+      job.evidence_status==='PARTIAL_SOURCE')||
+     (job.evidence_score_status==='AI_DIRECTION_REFERENCE_SCORED'&&
+      job.evidence_status==='SEARCH_SNIPPET_ONLY'))return job;
+  // Unverified employer pages are still useful leads, but must never inherit
+  // a numerical score from an earlier model shortlist without sourced evidence.
+  return {...job,match_score:null,reference_score:0,score_basis:'',
+   evidence_score_status:undefined};
+ });
  const diagnostic={...result.diagnostic,domestic_evidence:checked.diagnostic,
   visible_jobs:final.length};
  return {...result,matches:final,diagnostic:{
@@ -233,7 +245,7 @@ async function matchResumeWorkflow(env,candidate,resume,options,{
   },onProgress);
  }
  onPartial(provisionalPartial(verified.matches));
- const researched=await domesticResearchPass(env,key,verified,{signal},onProgress);
+ const researched=await domesticResearchPass(env,key,verified,resume,{signal},onProgress);
  const canContinue=Boolean(checkpoint&&await checkpoint.load());
  return {result:{...researched,profile,can_continue:canContinue},checkpoint};
 }

@@ -79,6 +79,8 @@ test('the matcher shows its current step and preserves original Word optimizatio
  const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  const css=readFileSync(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
  assert.match(modal,/stageTitle\[progressStage\]/);
+ assert.match(modal,/progressActivity\?\.message&&<span>/,'the live AI research explanation must be visible at every step');
+ assert.doesNotMatch(modal,/progressStage==='parsing'&&progressActivity/,'do not hide search/research/analysis messages');
  assert.match(modal,/!pending&&activeJob&&parsedProfile/);
  assert.doesNotMatch(modal,/DeepSeek|researchTrail\.map/);
  assert.match(modal,/TargetedResumeOptimization/);

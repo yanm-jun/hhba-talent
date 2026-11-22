@@ -321,7 +321,7 @@ test('authenticated route streams Search-first stages and final linked jobs',asy
   assert.doesNotMatch(events,/东京/);
   assert.equal(calls.filter(x=>x.endsWith('/v1/tools/search')).length,queryCount+3,
    '2 supplemental Search queries and 1 targeted domestic evidence check');
-  assert.equal(calls.filter(x=>x.endsWith('/responses')).length,3,'resume recognition, shortlist and reason pass');
+  assert.equal(calls.filter(x=>x.endsWith('/responses')).length,4,'resume recognition, shortlist, reason and evidence analysis pass');
  }finally{globalThis.fetch=realFetch}
 });
 
