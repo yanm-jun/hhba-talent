@@ -166,7 +166,7 @@ async function consumeNativeMatchStream(
     onProgress?.(stage as NativeMatchProgress);
   }else if(event==='activity'){
    const stage=value?.stage;
-   if(typeof value?.message==='string'&&value.message.length<=180&&
+   if(typeof value?.message==='string'&&value.message.length<=340&&
       ['preparing','connected','planning','searching','reading','researching','writing','scoring'].includes(stage)){
     const number=(v:unknown)=>typeof v==='number'&&Number.isFinite(v)&&v>=0?
      Math.floor(v):undefined;
