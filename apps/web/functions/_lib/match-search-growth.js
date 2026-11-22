@@ -1,7 +1,7 @@
 // Search-first coverage extension. No saved job index, guessed URLs or ATS APIs.
 import {MAINLAND_CITIES} from './mainland-job-location.js';
 import {sortByMatchScore} from './match-job-quality.js';
-import {allowedEmployerJobLink} from './match-employer-source.js';
+import {allowedEmployerJobLink,isDirectEmployerSourceHit} from './match-employer-source.js';
 const plain=s=>String(s||'').replace(/[\r\n<>\"']/g,' ').replace(/\s+/g,' ').trim();
 export function explicitPreferredCity(resume){
  const s=String(resume||'').slice(0,12000);
@@ -32,7 +32,7 @@ export function supplementalQueries(resume,roleHint,primaryQueries=[]){
 export function mergeCandidateHits(initial,additional,max=48){
  const normalized=new Set(),merged=[];
  for(const hit of [...initial,...additional]){
-  if(!hit?.url||!allowedEmployerJobLink(hit.url)||normalized.has(hit.url))continue;
+  if(!hit?.url||!isDirectEmployerSourceHit(hit)||normalized.has(hit.url))continue;
   normalized.add(hit.url);
   merged.push({...hit,id:'j'+(merged.length+1)});
   if(merged.length>=max)break;
