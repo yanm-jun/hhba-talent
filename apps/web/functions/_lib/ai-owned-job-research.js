@@ -75,7 +75,8 @@ export function targetedEmployerRecoveryQueries(history,usedQueries=[]){
    .trim();
   if(title.length<4||/(?:Job Board|职位列表|全部职位|招聘首页|招聘频道|职位搜索)/i.test(title)||
    /(?:https?:\/\/|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|(?<!\d)1[3-9]\d{9}(?!\d))/i.test(title))continue;
-  if(!/(?:招聘|岗位|职位|督导|运营|经理|主管|专员|产品|销售|设计|工程师|顾问|交付|渠道|店长|DCC)/i.test(title))continue;
+  // No occupation whitelist: public titles can be cook, florist, farmer,
+  // technician, driver or any other role; only privacy and source checks apply.
   proposals.push(title.slice(0,58)+' 企业官网 官方招聘 职位详情 -site:zhipin.com -site:51job.com -site:liepin.com');
  }
  return normalizeAutonomousQueries(proposals,usedQueries).slice(0,4);
