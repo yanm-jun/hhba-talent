@@ -23,6 +23,16 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
   return reference;
  return null;
 }
+// Do not present a role-direction estimate as if a complete employer JD
+// had been independently checked. Every preliminary number has its own label.
+function matchScoreLabel(job:MatchResponse['matches'][number]):string{
+ if(job.jd_source_status==='VERIFIED_JD')return 'JD 匹配分';
+ if(job.evidence_status==='PARTIAL_SOURCE'&&
+    job.evidence_score_status==='AI_PARTIAL_SOURCE_SCORED')return '初步匹配分';
+ if(job.evidence_status==='SEARCH_SNIPPET_ONLY'&&
+    job.evidence_score_status==='AI_DIRECTION_REFERENCE_SCORED')return '方向参考分';
+ return '匹配分';
+}
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
 export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
@@ -215,7 +225,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
            <div className="hhba-native-meta"><span><MapPin size={13}/>{job.location}</span>
             {job.salary&&<span><Wallet size={13}/>{job.salary}</span>}</div>
            <div className="hhba-native-source" role="note">
-            {job.jd_source_status==='VERIFIED_JD'?'完整岗位 JD 已核验':pending?'正在核验岗位 JD':'完整岗位 JD 待核验'}
+            {job.jd_source_status==='VERIFIED_JD'?'完整岗位 JD 已核验':job.evidence_status==='PARTIAL_SOURCE'?'公开岗位职责部分可核对 · 完整 JD 待核验':job.evidence_status==='SEARCH_SNIPPET_ONLY'?'岗位方向参考 · 完整 JD 待核验':pending?'正在核验岗位 JD':'完整岗位 JD 待核验'}
            </div>
            <div className="hhba-native-availability" role="note">
             <span className={job.availability_status==='OPEN_LISTED'?'hhba-native-state-open':'hhba-native-state-unknown'}>
@@ -225,9 +235,9 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
              '页面文本提示开放申请，是否可提交仍以招聘官网为准':job.jd_source_status==='VERIFIED_JD'?'已核验岗位详情原文，但投递资格和是否仍开放申请仍需到官网确认':'链接来自搜索结果，可能已过期或需要登录；请打开官网确认'}</small>
            </div>
           </div>
-          <div className="hhba-native-score" aria-label={visibleMatchScore(job)!==null?'简历适配分 '+visibleMatchScore(job)+' 分（AI 参考）':'暂无可靠适配分'}>
+          <div className="hhba-native-score" aria-label={visibleMatchScore(job)!==null?matchScoreLabel(job)+' '+visibleMatchScore(job)+' 分（AI 参考）':'暂无可靠适配分'}>
            {visibleMatchScore(job)!==null?
-            <><strong>{visibleMatchScore(job)}<small>/100</small></strong><span>匹配分</span></>:
+            <><strong>{visibleMatchScore(job)}<small>/100</small></strong><span>{matchScoreLabel(job)}</span></>:
             <><strong className="hhba-native-score-na">—</strong><span>暂无可靠分数</span></>}
            <button type="button" disabled={pending||!parsedProfile||!job.jd_version_id||!job.jd_sha256}
              title={!job.jd_version_id||!job.jd_sha256?'取得完整岗位 JD 后可优化':pending||!parsedProfile?'匹配完成后可优化':'针对所选岗位优化简历'}
@@ -240,7 +250,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
           </div>
          </div>
          {job.score_basis&&visibleMatchScore(job)!==null&&
-          <p className="hhba-native-score-basis"><strong>评分依据：</strong>{job.score_basis}</p>}
+          <p className="hhba-native-score-basis"><strong>{matchScoreLabel(job)}依据：</strong>{job.score_basis}</p>}
          <p className="hhba-native-reason"><strong>{job.jd_comparisons?.length?'为什么推荐：':'匹配依据：'}</strong>
           {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
          {!!job.jd_comparisons?.length&&<ul className="hhba-native-comparisons">
