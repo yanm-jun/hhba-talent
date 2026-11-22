@@ -4,7 +4,7 @@ import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sor
 import {recruitmentSourceKind,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting} from '../functions/_lib/match-employer-source.js';
 import {explicitPreferredCity,supplementalQueries,mergeCandidateHits,combineRecommended} from '../functions/_lib/match-search-growth.js';
 import {searchQueries,normalizeHits,selectedJobs,searchPublicJobs,
- enrichCandidateDetails,reasonAboutJobs,runSearchFirstMatch,preferEmployerPostingUrls} from '../functions/_lib/deepseek-search-match.js';
+ enrichCandidateDetails,reasonAboutJobs,runSearchFirstMatch,preferEmployerPostingUrls,indexedJobWorkCity,recoverSearchGroundedShortlist} from '../functions/_lib/deepseek-search-match.js';
 
 const cv='负责HHBA AI智能体、Agent RAG工作流产品，并管理名爵汽车经销商DCC与销售培训。';
 const posts=Array.from({length:12},(_,i)=>({
@@ -463,6 +463,62 @@ test('strict employer-only: no popular third-party job board or unknown source r
   availability:{status:'UNKNOWN'},summary:'上海职位招聘'}];
  assert.equal(selectedJobs(JSON.stringify(raw),manual,10).length,0,
   'forged kind must never bypass URL-based checks');
+});
+test('indexed employer work city is used only when the page explicitly labels a Mainland job location',()=>{
+ assert.equal(indexedJobWorkCity({summary:'汽车督导招聘，工作地点：上海。岗位职责涉及经销商培训。'}),'上海');
+ assert.equal(indexedJobWorkCity({summary:'企业总部位于上海，但岗位工作地点尚未发布。'}),null);
+ assert.equal(indexedJobWorkCity({summary:'企业北京总部发布岗位，工作地点：东京。'}),null);
+});
+test('zero initial shortlist triggers source-grounded AI recovery rather than aborting after search',async()=>{
+ const publicPosting={
+  url:'https://careers.orbit-cn.com/jobs/supervisor-2026',
+  title:'星云科技 品牌督导 上海 招聘',
+  site_name:'星云科技',
+  summary:'星云科技2026年招聘品牌督导，工作地点：上海。岗位职责包括管理经销商门店、培训销售团队、进行销售数据复盘。任职要求有良好沟通能力及汽车渠道运营经验。'.repeat(2),
+  snippet:'星云科技品牌督导，工作地点上海'
+ };
+ const calls=[];
+ const fetcher=async(url,options)=>{
+  const body=JSON.parse(options.body);calls.push({url,body});
+  if(url.endsWith('/v1/tools/search'))return new Response(JSON.stringify({results:[publicPosting]}),{status:200});
+  if(url.endsWith('/v1/tools/fetch'))return new Response(JSON.stringify({title:publicPosting.title,content:publicPosting.summary}),{status:200});
+  if(url.endsWith('/responses')&&body.stream===true){
+   const empty={jobs:[]};
+   const lines=[{type:'response.output_text.delta',delta:JSON.stringify(empty)},
+    {type:'response.completed',response:response(empty)}];
+   return new Response(lines.map(x=>'event: '+x.type+'\ndata: '+JSON.stringify(x)+'\n\n').join(''),
+    {status:200,headers:{'Content-Type':'text/event-stream'}});
+  }
+  if(url.endsWith('/responses')&&body.stream===false){
+   const fixed={jobs:[{id:'j1',company:'星云科技',title:'品牌督导',location:'',
+    reason:'我的汽车渠道督导、经销商培训和销售转化复盘实践，与这份公开的品牌督导岗位方向存在相关性。具体资格和经验年限仍须核对企业官网。'}]};
+   return new Response(JSON.stringify(response(fixed)),{status:200});
+  }
+  throw Error('Unexpected URL: '+url);
+ };
+ const partial=[];
+ const out=await runSearchFirstMatch('fake-secret','曾做经销商品牌督导及销售培训','',10,{
+  fetcher,supplementalLimit:0,expandDetailed:false,onPartial:jobs=>partial.push(jobs)
+ });
+ assert.equal(out.matches.length,1);
+ assert.equal(out.matches[0].company,'星云科技');
+ assert.equal(out.matches[0].location,'上海');
+ assert.equal(out.matches[0].official_url,publicPosting.url);
+ assert.ok(partial.length>0);
+ assert.equal(calls.filter(x=>x.url.endsWith('/responses')&&x.body.stream===false).length,1);
+ assert.ok(calls.every(x=>!JSON.stringify(x.body).includes('www.zhipin.com')));
+});
+test('repair response cannot invent employers or reuse a candidate id for a mismatched role',async()=>{
+ const hits=normalizeHits([{results:[{title:'星云科技 品牌督导 上海 招聘',
+  url:'https://careers.orbit-cn.com/jobs/supervisor-2026',
+  site_name:'星云科技',summary:'星云科技品牌督导，工作地点：上海。经销商门店运营和渠道管理招聘信息。'}]}]);
+ const fake=await recoverSearchGroundedShortlist('fake-secret','经销商培训',hits,10,{
+  fetcher:async()=>new Response(JSON.stringify(response({jobs:[{
+   id:'j1',company:'另一家无关公司',title:'品牌督导',location:'上海',
+   reason:'虽然岗位名称相似，但是公司来源不明，因此不能直接认定本岗位归属真实企业。'
+  }]})),{status:200})
+ });
+ assert.equal(fake.length,0,'repair must not present unsupported company attribution');
 });
 test('only third-party sites: automatically searches employer domains, then shows no fabricated fallback',async()=>{
  const calls=[],platformHits={results:[{
