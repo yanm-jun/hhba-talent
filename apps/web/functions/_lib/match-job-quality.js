@@ -3,7 +3,7 @@
 // Never infer "open" from HTTP 200, page age, Search inclusion, or a generic Apply button.
 import {decodeSearchText} from './deepseek-native-match.js';
 const tidy=s=>decodeSearchText(typeof s==='string'?s:'').replace(/\s+/g,' ').slice(0,4200);
-const closed=/(?:该|此|本)?(?:职位|岗位)(?:目前|现已|已经|暂时)?(?:已关闭|已下线|已停止招聘|已结束招聘|已经招满|已招满|已过期|已失效|不再接受(?:申请|简历|投递)|已停止(?:接受|接收)(?:申请|简历))|(?:招聘已结束|招聘已经结束|申请通道已关闭|简历投递已截止|停止接收简历|招聘截止|招聘已截止|已结束投递|职位已经关闭|职位已撤销|position (?:has been )?filled|no longer accepting applications|this job (?:is|has been) closed|position is no longer available|application (?:period|window) (?:is )?closed)/i;
+const closed=/(?:该|此|本)?(?:职位|岗位)(?:目前|现已|已经|暂时)?(?:已关闭|已下线|已停止招聘|已结束招聘|已经招满|已招满|已过期|已失效|不再接受(?:申请|简历|投递)|已停止(?:接受|接收)(?:申请|简历))|(?:招聘已结束|招聘已经结束|申请通道已关闭|简历投递已截止|停止接收简历|招聘截止|招聘已截止|已结束投递|职位已经关闭|职位已撤销|(?:当前|该|此|本)?(?:职位|岗位)(?:暂时|目前|现已)?(?:无法|不能|不可|不支持)(?:投递|申请)|(?:投递|申请)(?:按钮|入口|通道)(?:不可用|已关闭|暂不可用)|position (?:has been )?filled|no longer accepting applications|this job (?:is|has been) closed|position is no longer available|application (?:period|window) (?:is )?closed)/i;
 const open=/(?:该|此|本)(?:岗位|职位)(?:目前)?(?:正在招聘|仍在招聘|开放申请|开放投递|接受申请|接受投递|招聘中)|(?:简历投递通道已开放|正在接受申请|仍在接受申请|currently accepting applications|applications are open)/i;
 const excerpt=(text,re)=>{const m=re.exec(text);if(!m)return '';return text.slice(Math.max(0,m.index-36),Math.min(text.length,m.index+m[0].length+36));};
 export function classifyJobAvailability(hit,{fetched=false,checkedAt=new Date().toISOString()}={}){
