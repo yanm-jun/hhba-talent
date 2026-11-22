@@ -2,7 +2,6 @@
 // No raw CV text, document bytes, email/phone in returned JSON, telemetry or payload.
 // These are recommendations, NEVER applications and NEVER automatically monitored.
 import {allowedEmployerJobLink} from './match-employer-source.js';
-import {safePublicAtsJobLocator} from './public-ats-jd.js';
 
 const text=(v,n)=>typeof v==='string'?v.replace(/[\u0000-\u001f]/g,' ').trim().slice(0,n):'';
 const score=v=>Number.isInteger(v)&&v>=0&&v<=100?v:null;
@@ -23,16 +22,11 @@ const verifiedJdMeta=item=>{
 };
 const rowId=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const maxHistory=30;
-const isValidUrl=(value,item=null)=>{
+const isValidUrl=value=>{
  try{
   const u=new URL(value);
-  if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash)return false;
-  if(allowedEmployerJobLink(u.href))return true;
-  // Never persist an unverified, foreign-hosted ATS Search lead as an
-  // official job. Only an immutable, independently verified Mainland JD
-  // with its exact canonical public ATS posting URL may enter history.
-  return verifiedJdMeta(item).jd_proof_method==='PUBLIC_EMPLOYER_ATS_V1'&&
-   safePublicAtsJobLocator(u.href)?.url===u.href;
+  return u.protocol==='https:'&&!u.username&&!u.password&&!u.port&&!u.hash&&
+   allowedEmployerJobLink(u.href);
  }catch{return false}
 };
 const parsedJobs=raw=>{
@@ -42,7 +36,7 @@ export function safeHistoryJobs(matches){
  if(!Array.isArray(matches))return [];
  const seen=new Set(),out=[];
  for(const item of matches){
-  if(!item||!isValidUrl(item.official_url,item)||seen.has(item.official_url))continue;
+  if(!item||!isValidUrl(item.official_url)||seen.has(item.official_url))continue;
   const company=text(item.company,110),title=text(item.title_zh||item.title,125);
   const location=text(item.location,80);
   if(!company||!title||!location)continue;
@@ -74,7 +68,7 @@ export function compareOpportunitySets(previous,current){
  const seen=new Set(),priorScore=new Map();
  for(const run of previous){
   for(const job of parsedJobs(run.jobs_json)){
-   if(!isValidUrl(job.official_url,job))continue;
+   if(!isValidUrl(job.official_url))continue;
    seen.add(job.official_url);
    const x=score(job.match_score);
    if(x!==null)priorScore.set(job.official_url,

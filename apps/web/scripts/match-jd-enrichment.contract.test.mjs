@@ -58,16 +58,15 @@ test('a configured JD archive enables the matching stage in preview and producti
   ready:async()=>true,getCached:async()=>archive()});
  assert.equal(result.diagnostic.mode,MATCH_JD_PIPELINE);
  assert.equal(result.matches[0].jd_version_id,ID);
+ let attempts=0;
  const mainland=await enrichSearchMatchesWithJD(production,[job()],resume,{domesticOnly:true},{
-  ready:async()=>true,getCached:async()=>archive()});
- assert.equal(mainland.matches[0].jd_source_status,'VERIFIED_JD',
-  'verified China roles on exact employer ATS postings can enter Mainland matching');
- const foreign=await enrichSearchMatchesWithJD(production,[job()],resume,{domesticOnly:true},{
-  ready:async()=>true,getCached:async()=>null,
-  fetchAts:async()=>{throw Error('ATS_NOT_MAINLAND')}});
- assert.equal(foreign.matches[0].jd_version_id,undefined);
- assert.equal(foreign.diagnostic.verified,0);
- assert.equal(foreign.diagnostic.failed,1);
+  ready:async()=>true,getCached:async()=>{attempts++;return archive()},
+  fetchAts:async()=>{attempts++;throw Error('ATS_FOREIGN_SOURCE_FORBIDDEN')}
+ });
+ assert.equal(attempts,0,'mainland matching never fetches even a cached foreign ATS posting');
+ assert.equal(mainland.matches[0].jd_source_status,undefined);
+ assert.equal(mainland.diagnostic.eligible,0);
+ assert.equal(mainland.diagnostic.verified,0);
 });
 test('verified public JD replaces provisional score and pins immutable version for Word and history',async()=>{
  const result=await enrichSearchMatchesWithJD(env,[job()],resume,{role_hint:'区域运营经理'},{
@@ -85,8 +84,8 @@ test('verified public JD replaces provisional score and pins immutable version f
  assert.equal(first.jd_score_status,'V2_JD_EVIDENCE_SCORED');
  assert.equal(typeof first.match_score,'number');
  assert.notEqual(first.score_basis,'仅基于搜索摘要的 AI 初评分');
- assert.equal(safeHistoryJobs(result.matches).length,1,
-  'independently verified Mainland ATS jobs may enter history with immutable JD provenance');
+ assert.equal(safeHistoryJobs(result.matches).length,0,
+  'foreign-hosted ATS postings are no longer part of HHBA mainland recommendation history');
  assert.ok(!('full_jd' in first),'response must not contain raw full JD or personal CV');
 });
 test('foreign, unrecognized, and failed direct verifications cannot be promoted as verified JD',async()=>{
