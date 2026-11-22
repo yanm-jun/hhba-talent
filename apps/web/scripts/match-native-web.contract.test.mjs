@@ -315,6 +315,8 @@ test('authenticated route streams Search-first stages and final linked jobs',asy
   const events=await response.text();
   assert.match(events,/event: progress/);
   assert.match(events,/event: complete/);
+  assert.match(events,/"phase_latency_ms":\{"resume_recognition":\d+,"discovery":\d+,"jd_finish_wait":\d+,"evidence_research":\d+,"total":\d+\}/,
+   'live research reports stage wall times without logging private resume content');
   assert.doesNotMatch(events,/event: failure/);
   assert.match(events,/示例汽车中国/);
   assert.match(events,/"facts":\[\{"id":"CV-1"/);
