@@ -120,9 +120,23 @@ function modelText(json){
  * score evidence, résumé facts and application advice. Direction-fit scores
  * are explicitly preliminary when JD duties/qualifications are unavailable.
  */
-async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,modelTimeoutMs=56000}={}){
+// The recognition Agent already grounded these quotes in the resume. Reuse
+// exact evidence across parallel job batches instead of retransmitting long
+// unrelated CV sections. Fall back to the full redacted resume when no
+// sufficiently rich verified evidence is available.
+export function compactResearchResumeEvidence(resume,profile){
+ const facts=Array.isArray(profile?.facts)?profile.facts:[];
+ const quotes=[...new Set(facts.map(f=>typeof f?.quote==='string'?f.quote.trim():'')
+  .filter(q=>q.length>=8&&q.length<=360))];
+ if(quotes.length<3)return String(resume||'').slice(0,10000);
+ const summary=quotes.map((q,i)=>'CV-'+(i+1)+' '+q).join('\n');
+ return summary.length>=120?summary.slice(0,8500):String(resume||'').slice(0,10000);
+}
+async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,modelTimeoutMs=56000,
+ resumeProfile=null}={}){
  const candidates=jobs.filter(j=>j.evidence_status!=='VERIFIED_FULL_JD');
  if(!candidates.length)return jobs;
+ const evidenceResume=compactResearchResumeEvidence(resume,resumeProfile);
  const dataset=candidates.map(job=>({id:job.id,company:job.company,title:job.title,
   location:job.location,evidence_level:job.evidence_status,
   source_excerpt:String(job.evidence_excerpt||'').slice(0,1400),
@@ -151,7 +165,7 @@ async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,m
     headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
     body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'max'},
      text:{format:{type:'json_object'}},max_output_tokens:18000,stream:false,
-     instructions,input:'脱敏简历：\n'+String(resume||'').slice(0,10000)+
+     instructions,input:'已核对的脱敏简历证据（不足时使用脱敏原文）：\n'+evidenceResume+
       '\n逐岗位公开资料（不代表已核验完整JD）：\n'+JSON.stringify(batch)})
    });
    if(!r.ok)throw Error('EVIDENCE_MODEL_UNAVAILABLE');
