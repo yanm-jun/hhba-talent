@@ -106,9 +106,58 @@ test('stale stored search checkpoints cannot reintroduce banned recruiter links'
  assert.equal(res.pool[0].url,employer.url);
  assert.deepEqual(res.shortlistIds,['j1']);
 });
+
+test('when Search finds job-board postings, Agent receives only title hints and can target the actual employer domain',async()=>{
+ const {searchPublicJobs}=await import('../functions/_lib/deepseek-search-match.js');
+ const board=aggregators[7];
+ const provider=await searchPublicJobs('synthetic','dummy text','',{
+  queriesOverride:['区域督导 企业招聘'],
+  fetcher:async()=>new Response(JSON.stringify({results:[
+   {title:board.title,url:board.url,site_name:board.source,summary:'第三方转发职位'},
+   {title:employer.title,url:employer.url,site_name:employer.source,
+    summary:employer.summary,snippet:employer.snippet}
+  ]}),{status:200}),
+  allowEmpty:true
+ });
+ assert.equal(provider.hits.length,1);
+ assert.equal(provider.hits[0].url,employer.url);
+ assert.ok(provider.diagnostic.rejected_title_hints.includes(board.title));
+ assert.ok(!JSON.stringify(provider.hits).includes(board.url));
+ const queryLog=[];
+ let decisionCalls=0;
+ const result=await runAgentOwnedMainlandMatch('synthetic','虚构测试简历：区域运营管理','',10,
+  {expandDetailed:false},{
+   plan:async()=>({queries:['区域督导']}),
+   search:async(key,cv,hint,{queriesOverride})=>{
+    queryLog.push(...queriesOverride);
+    if(queriesOverride.some(q=>q.includes('美团官网')))
+     return {hits:[employer],diagnostic:{successful_searches:1,raw_results:2}};
+    return {hits:[],diagnostic:{successful_searches:1,raw_results:12,
+     rejected_title_hints:['美团招聘督导经理','汽车渠道督导 - 第三方招聘平台'],rejected_links:12}};
+   },
+   decide:async(key,cv,hint,pool,queries,history)=>{
+    decisionCalls++;
+    if(decisionCalls===1){
+     assert.ok(history.some(h=>Array.isArray(h.rejected_title_hints)&&
+      h.rejected_title_hints.includes('美团招聘督导经理')));
+     return {actions:[{type:'search',queries:['美团官网 督导经理 工作地点 北京 招聘']}]};
+    }
+    return {actions:[{type:'finish'}]};
+   },
+   select:async()=>{const err=new Error('AI_MATCH_NO_VALID_JOBS');err.code=err.message;throw err},
+   recover:async()=>[]
+  });
+ assert.ok(queryLog.some(q=>q.includes('美团官网')));
+ assert.equal(result.matches.length,1);
+ assert.equal(result.matches[0].official_url,employer.url);
+ assert.equal(result.matches[0].match_score,null);
+});
+
 test('Agent must reserve real time for a shortlist rather than spending all 150 seconds iterating Search',()=>{
  const script=readFileSync(new URL('../functions/_lib/ai-owned-job-research.js',import.meta.url),'utf8');
- assert.match(script,/const reserve=pool\.length\|\|completed\.length\?61000:38000/);
- assert.match(script,/while\(budget\(\)>\(pool\.length>=5\?98000:73000\)\)/);
+ assert.match(script,/const reserve=Math\.max\(40000,reserveMs\)/);
+ assert.match(script,/searchTool\(queries,\{reserveMs:85000\}\)/);
+ assert.match(script,/searchTool\(next\.queries,\{reserveMs:44000\}\)/);
+ assert.match(script,/while\(budget\(\)>\(pool\.length>=5\?97000:67000\)\)/);
  assert.match(script,/modelTimeoutMs:Math\.min\(32000,Math\.max\(1000,budget\(\)-12500\)\)/);
 });
