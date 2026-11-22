@@ -108,6 +108,7 @@ test('the real candidate route defaults to model-owned loop and preserves authen
  assert.match(route,/runAgentOwnedMainlandMatch/);
  assert.match(route,/HHBA_AI_OWNED_RESEARCH_ENABLED==='0'/);
  assert.match(route,/runCandidateResearch\(env,env\.HHBA_MATCH_DEEPSEEK_KEY/);
+ assert.match(route,/'AI_EMPLOYER_JOBS_NOT_FOUND'\]\.includes\(error\?\.code\)\)throw error/);
  assert.match(route,/domesticResearchPass/);
  assert.match(route,/candidateSession\(env,request\)/);
  assert.match(route,/redactForModel\(input\.text\)/);
