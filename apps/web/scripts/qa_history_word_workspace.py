@@ -2,6 +2,7 @@
 Desktop: linked original. Mobile: explicit association. Missing original: no fake editor.
 """
 import json
+import os
 import re
 from pathlib import Path
 from urllib.parse import urlsplit,parse_qs
@@ -155,10 +156,40 @@ def exercise(browser,label,viewport,initial_linked,has_file=True):
     ctx.close()
 
 with sync_playwright() as play:
-    browser=play.chromium.launch(headless=True,args=['--no-sandbox'])
+    browser=play.chromium.launch(headless=True,args=['--no-sandbox'],
+        executable_path=os.environ.get('PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH') or None)
     exercise(browser,'desktop-linked',{'width':1440,'height':900},True)
     exercise(browser,'mobile-associated',{'width':390,'height':844},False)
     exercise(browser,'missing-original',{'width':390,'height':844},False,False)
     browser.close()
 (OUT/'report.json').write_text(json.dumps(REPORT,ensure_ascii=False,indent=2))
 print('HHBA_HISTORY_WORD_QA_PASS',json.dumps(REPORT,ensure_ascii=False))
+
+# Existing CI calls this script after starting the Vite browser fixture. Keep the
+# search/JD and Word acceptance in one gate; do not silently skip a failed stage.
+def run_joined_job_to_word_acceptance():
+    import subprocess
+    import tempfile
+
+    from qa_two_job_word_acceptance import main as run_word_browser
+
+    with tempfile.TemporaryDirectory(prefix='hhba-acceptance-') as tmp:
+        manifest = str(Path(tmp) / 'jobs.json')
+        env = {**os.environ, 'HHBA_GATE_FIXTURE_JSON': manifest,
+               'HHBA_ACCEPTANCE_JOBS_JSON': manifest}
+        subprocess.run(['node', '--test', 'scripts/hhba-research-jd-integrated.contract.test.mjs'],
+                       env=env, check=True)
+        subprocess.run(['node', '--experimental-strip-types', '--test',
+                        'scripts/resume-word.route.test.mjs'], env=env, check=True)
+        existing = os.environ.get('HHBA_ACCEPTANCE_JOBS_JSON')
+        os.environ['HHBA_ACCEPTANCE_JOBS_JSON'] = manifest
+        try:
+            run_word_browser()
+        finally:
+            if existing is None:
+                os.environ.pop('HHBA_ACCEPTANCE_JOBS_JSON', None)
+            else:
+                os.environ['HHBA_ACCEPTANCE_JOBS_JSON'] = existing
+
+if __name__ == '__main__':
+    run_joined_job_to_word_acceptance()

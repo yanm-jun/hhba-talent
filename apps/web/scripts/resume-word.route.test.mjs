@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import {readFileSync} from 'node:fs';
+import {stablePostingScope} from '../src/services/stablePostingScope.mjs';
 import {createResumeDocx} from '../src/services/resumeDocx.ts';
 import {editOriginalDocxStrict} from '../src/services/resumeDocxPreserve.mjs';
 import {onRequestGet,onRequestPost} from '../functions/api/resume-word.js';
@@ -472,7 +474,28 @@ test('competing edits use compare-and-swap; one writer wins and the other is rej
 
 test('one owned Word is isolated into independent per-job DOCX/PDF revisions, including undo/redo and legacy vault',async()=>{
  const x=fixture(),beforeFetch=globalThis.fetch;
- const jobA='greenhouse-test-job-A',jobB='lever-test-job-B',jobC='supervisor-test-job-C';
+ // In the joined acceptance use the same exact validated employer URLs
+ // that the preceding search/JD test passed to the Word browser fixture.
+ const handoff=process.env.HHBA_ACCEPTANCE_JOBS_JSON?
+  JSON.parse(readFileSync(process.env.HHBA_ACCEPTANCE_JOBS_JSON,'utf8')):null;
+ const pair=handoff?.verified||[];
+ if(handoff){
+  assert.equal(pair.length,2);
+  for(const item of pair){
+   assert.equal(item.jd_source_status,'VERIFIED_JD');
+   assert.match(item.jd_version_id,/^jd_[a-f0-9]{32}$/);
+   assert.match(item.jd_sha256,/^[a-f0-9]{64}$/);
+   assert.ok(Number.isInteger(item.match_score));
+  }
+  assert.notEqual(pair[0].jd_version_id,pair[1].jd_version_id);
+  assert.equal(handoff.excerptOnly.match_score,null);
+  assert.equal(handoff.excerptOnly.jd_version_id,undefined);
+ }
+ const jobA=handoff?stablePostingScope(pair[0].official_url):'test-job-A';
+ const jobB=handoff?stablePostingScope(pair[1].official_url):'test-job-B';
+ const jobC='supervisor-test-job-C';
+ assert.ok(jobA&&jobB);
+ assert.notEqual(jobA,jobB);
  const renderCalls=[];
  globalThis.fetch=async(url,options)=>{
   const body=JSON.parse(options.body);
@@ -608,3 +631,4 @@ test('job scopes cannot be malformed or swap an already verified manifest across
    .editable_text.includes('甲岗位'));
  }finally{globalThis.fetch=originalFetch;}
 });
+

@@ -10,7 +10,7 @@ const BOARD_HOSTS=[
  'indeed.com','glassdoor.com','monster.com','reed.co.uk','totaljobs.com',
  'linkedin.com','ziprecruiter.com','simplyhired.com',
  // Confirmed third-party platforms found in a failed live mainland search.
- 'niuqizp.com','tzrl.com','0550.com','veryeast.cn','cadcc.com.cn'
+ 'niuqizp.com','tzrl.com','0550.com','veryeast.cn','cadcc.com.cn','goodjob.cn'
 ];
 const ATS_HOSTS=[
  'myworkdayjobs.com','workdayjobs.com','greenhouse.io',
@@ -108,7 +108,7 @@ export function corroboratesEmployerPosting(job,hit){
  const kind=hit?.recruitment_source_kind||recruitmentSourceKind(hit?.url);
  // Never silently relabel a third-party platform as an official employer URL.
  if(kind!=='EMPLOYER_DOMAIN_CANDIDATE'&&kind!=='EMPLOYER_ATS')return false;
- const evidence=compact([hit?.title,hit?.site_name||hit?.source,hit?.summary,hit?.snippet].join(' '));
+ const evidence=compact([hit?.title,hit?.site_name||hit?.source,hit?.summary,hit?.snippet,hit?.content].join(' '));
  const company=companyCore(job.company),title=titleCore(job.title),city=basicLocation(job.location);
  // Both company and specific job title must be evident in the returned Search result.
  // Do not trust a company name echoed only in the Search query.

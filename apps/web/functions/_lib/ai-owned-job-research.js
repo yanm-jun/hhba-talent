@@ -377,7 +377,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
     'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED'].includes(e?.code))throw e;
    decisionFailures++;
-   history.push({type:'reflection_error',code:String(e.code||'INVALID')});
+   history.push({type:'reflection_error',code:e?.name==='TimeoutError'?'AI_DECISION_TIMEOUT':String(e?.code||'INVALID')});
    exitReason='model_decision_unavailable';
    activity('planning','决策模型本轮未返回有效内容，将尝试使用已找到的真实招聘证据。');break;
   }

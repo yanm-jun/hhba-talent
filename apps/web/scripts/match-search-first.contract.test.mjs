@@ -4,7 +4,7 @@ import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sor
 import {recruitmentSourceKind,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting} from '../functions/_lib/match-employer-source.js';
 import {explicitPreferredCity,supplementalQueries,mergeCandidateHits,combineRecommended} from '../functions/_lib/match-search-growth.js';
 import {searchQueries,normalizeHits,selectedJobs,searchPublicJobs,
- enrichCandidateDetails,reasonAboutJobs,runSearchFirstMatch,preferEmployerPostingUrls,indexedJobWorkCity,recoverSearchGroundedShortlist} from '../functions/_lib/deepseek-search-match.js';
+ enrichCandidateDetails,reasonAboutJobs,runSearchFirstMatch,preferEmployerPostingUrls,indexedJobWorkCity,recoverSearchGroundedShortlist,sourceOnlyJobPreviews} from '../functions/_lib/deepseek-search-match.js';
 
 const cv='负责HHBA AI智能体、Agent RAG工作流产品，并管理名爵汽车经销商DCC与销售培训。';
 const posts=Array.from({length:12},(_,i)=>({
@@ -580,4 +580,51 @@ test('first Search is third-party only: official supplemental results can still 
  assert.ok(partial.flat().every(url=>url===corporate.url));
  assert.equal(result.diagnostic.source_after.third_party_board,0);
  assert.equal(result.diagnostic.third_party_results_shown,0);
+});
+
+
+// Regression cases for explicit employer work-city evidence.
+const employer=(overrides={})=>({
+ id:'j1',url:'https://careers.example.com/cn/job/R173207/region-sales',source:'Example Foods, Incorporated',
+ title:'零售区域销售主管-铜陵 job in Wuhu, Anhui, China | Sales jobs at Example Foods',
+ summary:'Job Description: 管理区域销售与经销商渠道。 Requirements: 三年销售经验。',
+ content:'',availability:{status:'UNKNOWN'},...overrides
+});
+test('employer single-job header supplies Wuhu, not the sales territory in the role title',()=>{
+ const row=employer();
+ assert.equal(indexedJobWorkCity(row),'Wuhu');
+ const [job]=sourceOnlyJobPreviews([row]);
+ assert.equal(job?.title,'零售区域销售主管-铜陵');
+ assert.equal(job?.match_score,null);
+ assert.equal(job?.application_status,'NEEDS_OFFICIAL_CONFIRMATION');
+});
+test('Fetch preserves explicit country and site even after the excerpt limit',async()=>{
+ const row=employer({url:'https://example.com/ph-en/careers/career-search/job/details/req-10090943-sales',
+  title:'地区经理',source:'Example Pharma',summary:'招聘信息。'});
+ const full='Job ID: REQ-10090943\nJob Description: 区域销售和团队管理。\n'+'岗位职责：区域业务规划。'.repeat(350)+
+ '\nLocation\n\nChina\n\nSite\n\nShanghai (Shanghai)\n\nCompany / Legal Entity\nExample Pharma Beijing\nApply to Job';
+ const res=await enrichCandidateDetails('test',[row],{fetcher:async()=>new Response(JSON.stringify({content:full}))});
+ assert.equal(res.hits.length,1);
+ assert.equal(indexedJobWorkCity(res.hits[0]),'Shanghai (Shanghai)');
+ assert.equal(sourceOnlyJobPreviews(res.hits)[0]?.title,'地区经理');
+});
+test('do not infer a city from a title alone, an ambiguous country, headquarters or market lists',()=>{
+ assert.equal(indexedJobWorkCity(employer({title:'销售主管-铜陵'})),null);
+ assert.equal(indexedJobWorkCity(employer({title:'销售主管 job in Washington, China | Jobs at Example'})),null);
+ assert.equal(indexedJobWorkCity(employer({title:'销售主管 job in Shanghai, Singapore, China | Jobs at Example'})),null);
+ const empty=employer({title:'地区经理',summary:'Job Description: 区域销售',content:'Location: China\nCompany headquarters: Beijing'});
+ assert.equal(indexedJobWorkCity(empty),null);
+ assert.equal(indexedJobWorkCity({...empty,content:'Location: Singapore\nSite: Shanghai (Shanghai)'}),null);
+ const careerGrid={...empty,title:'社会招聘',url:'https://careers.example.com/recruit.html?pageNumber=3',content:'Job Description\nLocation: Shanghai, China'};
+ assert.deepEqual(sourceOnlyJobPreviews([careerGrid]),[]);
+ assert.deepEqual(sourceOnlyJobPreviews([employer({availability:{status:'CLOSED_LISTED'}})]),[]);
+ assert.deepEqual(sourceOnlyJobPreviews([employer({url:'https://job.goodjob.cn/job963820.html',source:'俊才网'})]),[]);
+});
+test('a concrete employer listing preserves its Chinese location metadata late in the body',async()=>{
+ const job=employer({url:'https://jobs.example.com/zh/detail-page/job-detail/REF99683M-p-1234abcd/',
+  title:'渠道销售经理',source:'示例公司官方招聘',summary:'工作职责与要求'});
+ const full='岗位职责：渠道管理、经销商沟通。'.repeat(320)+'\n\n### 所在地\n北京市\n\n职位编号 REF99683M\n';
+ const result=await enrichCandidateDetails('test',[job],{fetcher:async()=>new Response(JSON.stringify({content:full}))});
+ assert.equal(indexedJobWorkCity(result.hits[0]),'北京市');
+ assert.equal(sourceOnlyJobPreviews(result.hits)[0]?.title,'渠道销售经理');
 });
