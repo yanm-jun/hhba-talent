@@ -54,7 +54,7 @@ function toSource(hit,job){
  const source=safeEvidenceUrl(hit.url,job);
  if(!source||!sameJob(job,hit))return null;
  const excerpt=clean(hit.content||hit.summary||hit.snippet,850);
- return excerpt.length>=55?{...source,excerpt}:null;
+ return excerpt.length>=32?{...source,excerpt}:null;
 }
 export function assessDomesticEvidence(job,searchHits=[]){
  if(job?.jd_source_status==='VERIFIED_JD')
@@ -72,7 +72,7 @@ export function assessDomesticEvidence(job,searchHits=[]){
  // Search snippets rarely contain both formal section headings. An employer
  // listing with a job-specific duty OR qualification is still useful partial
  // evidence; the label never claims a complete JD.
- const tier=content.length>=85&&(hasDuty.test(content)||hasRequirements.test(content))?
+ const tier=content.length>=55&&(hasDuty.test(content)||hasRequirements.test(content))?
   'PARTIAL_SOURCE':sources.length?'SEARCH_SNIPPET_ONLY':'INSUFFICIENT_EVIDENCE';
  const previousReason=clean(job.recommendation_reason,750);
  const usefulPrevious=previousReason.length>=75&&/(?:简历|经历|经验|能力|技能|工作)/.test(previousReason);
