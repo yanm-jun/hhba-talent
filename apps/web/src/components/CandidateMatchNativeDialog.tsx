@@ -48,7 +48,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
  const progressStep=progressStage==='preparing'?0:
   ['connected','searching'].includes(progressStage)?1:
   ['reading','researching'].includes(progressStage)?2:
-  ['writing','scoring'].includes(progressStage)?3:1;
+  progressStage==='scoring'?3:progressStage==='writing'?1:1;
  const matchListScroll=useRef(0);
  const activeJob=result.matches.find(job=>job.id===optimizedJobId);
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
