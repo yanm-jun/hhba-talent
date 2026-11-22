@@ -138,7 +138,7 @@ export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Pr
   throw new MatchError(400,(e as Error)?.message||errorMap.INVALID_RESUME_TEXT);
  }
 }
-export type NativeMatchProgress='preparing'|'connected'|'searching'|'reading'|'researching'|'writing'|'scoring'|'waiting';
+export type NativeMatchProgress='preparing'|'connected'|'planning'|'searching'|'reading'|'researching'|'writing'|'scoring'|'waiting';
 async function consumeNativeMatchStream(
  response:Response,onProgress?:(stage:NativeMatchProgress)=>void,
  onPartial?:(jobs:MatchedJob[])=>void
@@ -154,7 +154,7 @@ async function consumeNativeMatchStream(
   let value:any;try{value=JSON.parse(data)}catch{return}
   if(event==='progress'){
    const stage=value?.stage;
-   if(['preparing','connected','searching','reading','researching','writing','scoring','waiting'].includes(stage))
+   if(['preparing','connected','planning','searching','reading','researching','writing','scoring','waiting'].includes(stage))
     onProgress?.(stage as NativeMatchProgress);
   }else if(event==='partial'){
    if(Array.isArray(value?.matches)&&value.matches.length>0&&value.matches.length<=10)
@@ -164,7 +164,7 @@ async function consumeNativeMatchStream(
    const stage=String(value?.phase||'preparing');
    const elapsed=Number(value?.elapsed_ms||0);
    const names:Record<string,string>={
-    preparing:'连接 DeepSeek',connected:'准备联网搜索',searching:'DeepSeek Search 检索职位',reading:'读取岗位详情',researching:'研究国内岗位证据',writing:'生成初步名单',scoring:'分析适配分和推荐理由'
+    preparing:'连接 DeepSeek',connected:'准备联网搜索',planning:'AI 自主规划补充搜索方向',searching:'DeepSeek Search 检索职位',reading:'读取岗位详情',researching:'研究国内岗位证据',writing:'生成初步名单',scoring:'分析适配分和推荐理由'
    };
    const elapsedNote=Number.isFinite(elapsed)&&elapsed>=1000?
     '（'+Math.round(elapsed/1000)+'秒，阶段：'+(names[stage]||'模型处理')+'）':'';
