@@ -28,6 +28,7 @@ on:
       - 'apps/web/functions/_lib/domestic-job-research.js'
       - 'apps/web/functions/_lib/autonomous-mainland-search.js'
       - 'apps/web/functions/_lib/ai-owned-job-research.js'
+      - 'apps/web/functions/_lib/domestic-employer-index.js'
       - 'apps/web/functions/_lib/agent-score-feedback.js'
       - 'apps/web/functions/_lib/ai-research-checkpoint.js'
       - 'apps/web/functions/_lib/agent-quality-metrics.js'
@@ -36,6 +37,7 @@ on:
       - 'apps/web/scripts/ai-research-checkpoint.contract.test.mjs'
       - 'apps/web/scripts/agent-quality-metrics.contract.test.mjs'
       - 'apps/web/scripts/ai-owned-job-research.contract.test.mjs'
+      - 'apps/web/scripts/domestic-employer-index.contract.test.mjs'
       - 'apps/web/scripts/match-live-recovery.contract.test.mjs'
       - 'apps/web/scripts/match-deep-research-experience.contract.test.mjs'
       - 'apps/web/scripts/match-production-failure-regression.contract.test.mjs'
@@ -95,6 +97,7 @@ jobs:
           node --test scripts/match-search-first.contract.test.mjs
           node --test scripts/autonomous-mainland-search.contract.test.mjs
           node --test scripts/ai-owned-job-research.contract.test.mjs
+          node --test scripts/domestic-employer-index.contract.test.mjs
           node --test scripts/match-live-recovery.contract.test.mjs
           node --test scripts/match-deep-research-experience.contract.test.mjs
           node --test scripts/match-production-failure-regression.contract.test.mjs
