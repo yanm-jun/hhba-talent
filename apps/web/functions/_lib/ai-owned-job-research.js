@@ -280,6 +280,31 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   // the Agent has a chance to correct source quality and choose candidates.
   await searchTool(queries,{reserveMs:85000});
  }
+ // Cached sources are not a finished search. Replan and refresh when a
+ // resumed research session has fewer than six eligible job sources.
+ if(checkpointRestored&&pool.filter(isRecommendationEligible).length<Math.min(limit,6)&&budget()>76000){
+  onProgress('planning');
+  activity('planning','已恢复旧岗位来源，但数量不足；正在继续搜索新的企业招聘页面。');
+  let nextQueries=[];
+  try{
+   const planResult=await plan(key,resume,roleHint,{...options,
+    plannerTimeoutMs:Math.min(18000,Math.max(3500,budget()-73000))});
+   nextQueries=normalizeAutonomousQueries(planResult?.queries,usedQueries);
+  }catch(e){
+   if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+     'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED'].includes(e?.code))throw e;
+  }
+  if(!nextQueries.length){
+   nextQueries=normalizeAutonomousQueries([
+    ...searchQueries(resume,roleHint),
+    ...usedQueries.slice(-4).map(q=>q+' 近期社招 企业官方招聘')
+   ],usedQueries);
+  }
+  if(nextQueries.length){
+   agentPlannedQueries+=nextQueries.length;
+   await searchTool(nextQueries.slice(0,12),{reserveMs:69000});
+  }
+ }
  // Don't deliberate for the entire service window over job-board results.
  // Re-check the actual employer's hiring pages; all URLs still go through
  // the normal official-source and vacancy evidence gates.
