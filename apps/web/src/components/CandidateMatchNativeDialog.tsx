@@ -1,6 +1,6 @@
 import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
-import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,MapPin,Wallet,X,Search,Sparkles,Check,LoaderCircle} from 'lucide-react';
+import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,MapPin,Wallet,X,Search,Sparkles,Check,LoaderCircle,ChevronDown,BrainCircuit,Activity} from 'lucide-react';
 import type {MatchResponse,NativeMatchProgress,NativeMatchActivity} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
@@ -25,11 +25,12 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 }
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,pending=false,progressStage='preparing',progressActivity=null,elapsedSeconds=0,activityIdleSeconds=0,notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
+export function CandidateMatchNativeDialog({result,onClose,pending=false,progressStage='preparing',progressActivity=null,elapsedSeconds=0,activityIdleSeconds=0,researchTrail=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
-  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'|'profile'>>;
+  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'|'profile'|'native_search'>>;
  onClose:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
  progressActivity?:NativeMatchActivity|null;elapsedSeconds?:number;activityIdleSeconds?:number;
+ researchTrail?:NativeMatchActivity[];
  notice?:string;resumeStorage?:ResumeStorageAction;
  sourceText?:string;sourceResume?:PrivateResume;accountScope?:string;
  // Match-history handoff enters the same existing editor without rerunning a search.
@@ -40,31 +41,27 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
   initialOptimizedJobId&&result.matches.some(job=>job.id===initialOptimizedJobId)
    ?initialOptimizedJobId:null);
  const [optimizationDirty,setOptimizationDirty]=useState(false);
- // The stage comes from real backend progress events; no fake percentages.
- const steps=[
-  {label:'准备简历',detail:'解析简历并准备本次匹配材料'},
-  {label:'搜索真实岗位',detail:progressStage==='planning'?'AI 正在自主探索更多适合的职业方向':'正在检索中国大陆的企业招聘入口'},
-  {label:'研究岗位证据',detail:'核对来源、职责与任职要求'},
-  {label:'生成评分和推荐',detail:'逐岗位比较真实经历并提出投递建议'}
- ];
- const progressStep=progressStage==='preparing'?0:
-  ['connected','searching','planning'].includes(progressStage)?1:
-  ['reading','researching'].includes(progressStage)?2:
-  ['writing','scoring'].includes(progressStage)?3:1;
- const liveAction=progressActivity?.message||
-  (progressStage==='preparing'?'正在准备简历分析材料并连接智能匹配服务。':
-   progressStage==='planning'?'AI 正在制定或调整搜索计划。':
-   progressStage==='searching'?'正在等待 DeepSeek Search 返回公开招聘网页。':
-   progressStage==='reading'?'正在读取已发现的职位详情。':
-   progressStage==='researching'?'正在核对岗位来源及任职要求。':
-   progressStage==='writing'?'正在等待模型生成初步推荐名单。':
-   progressStage==='scoring'?'正在评估简历匹配度并整理依据。':
-   '正在等待后台返回新的研究进展。');
- const counters=[
-  typeof progressActivity?.searches==='number'?'已搜索 '+progressActivity.searches+' 次':null,
-  typeof progressActivity?.raw_results==='number'?'收到 '+progressActivity.raw_results+' 条网页结果':null,
-  typeof progressActivity?.candidate_links==='number'?'来源候选 '+progressActivity.candidate_links+' 条':null,
-  typeof progressActivity?.pages_read==='number'?'读取详情 '+progressActivity.pages_read+' 份':null
+ // Only real server-side events form the research journal; this is
+ // NOT a dump or simulation of the model's private chain of thought.
+ const journalViewport=useRef<HTMLDivElement|null>(null);
+ const followJournal=useRef(true);
+ useEffect(()=>{
+  const el=journalViewport.current;
+  if(pending&&el&&followJournal.current)el.scrollTop=el.scrollHeight;
+ },[pending,researchTrail]);
+ const stageTitle:Record<NativeMatchProgress,string>={
+  preparing:'准备简历分析',connected:'验证 AI 服务',
+  planning:'研究职业方向',searching:'搜索企业岗位',
+  reading:'读取招聘资料',researching:'核实岗位证据',
+  writing:'整理候选名单',scoring:'分析匹配依据',
+  waiting:'等待外部服务'
+ };
+ const liveAction=progressActivity?.message||stageTitle[progressStage]+'，正在等待实际执行结果。';
+ const clocks=(ms:number)=>Math.floor(ms/60000)+'分'+Math.floor(ms%60000/1000)+'秒';
+ const latestFacts=[
+  typeof progressActivity?.searches==='number'?'完成搜索 '+progressActivity.searches+' 次':null,
+  typeof progressActivity?.candidate_links==='number'?'已发现来源候选 '+progressActivity.candidate_links+' 条':null,
+  typeof progressActivity?.pages_read==='number'?'读取职位详情 '+progressActivity.pages_read+' 份':null
  ].filter((value):value is string=>Boolean(value));
  const matchListScroll=useRef(0);
  const activeJob=result.matches.find(job=>job.id===optimizedJobId);
@@ -131,7 +128,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
       </div>:
       <div className="hhba-match-modal-brand">
        <span className="hhba-match-modal-symbol"><BriefcaseBusiness size={19}/></span>
-       <div><strong>汇方职场 · HHBA</strong><small>DeepSeek Search + V4 Pro 智能岗位推荐</small></div>
+       <div><strong>汇方职场 · HHBA</strong><small>{pending?'AI 深度职业研究 · DeepSeek Search + V4 Pro':'AI 深度研究 · 职业推荐报告'}</small></div>
       </div>}
      <div className="hhba-word-editor-head-actions">
       {optimizedJobId&&sourceResume&&<span id="hhba-word-top-download" />}
@@ -143,34 +140,52 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
      </div>
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobId?'optimization':'matches'}>
-     {pending&&<section className={'hhba-match-live-progress'+(result.matches.length?' is-compact':'')} role="status" aria-live="polite">
-      <div className="hhba-match-live-heading">
-       <span className="hhba-match-live-sparkle"><Sparkles size={20} aria-hidden="true"/></span>
-       <div><h2 id={result.matches.length?undefined:'hhba-native-title'}>
-        {result.matches.length?'已发现 '+result.matches.length+' 个候选岗位':'正在为你寻找合适的工作机会'}
-       </h2><p>AI 自主搜索、阅读企业岗位并逐条分析；以下展示后台实际反馈。</p></div>
+     {pending&&<section className="hhba-research-session" aria-label="AI 深度职业研究">
+      <div className="hhba-research-heading">
+       <div className="hhba-research-orb"><BrainCircuit size={24} aria-hidden="true"/></div>
+       <div>
+        <span className="hhba-research-kicker"><span className="hhba-research-live-dot"/> 深度研究中 · {Math.floor(elapsedSeconds/60)}:{String(elapsedSeconds%60).padStart(2,'0')}</span>
+        <h2 id="hhba-native-title">正在研究适合你的职业机会</h2>
+        <p>AI 正在探索职业方向、核实企业招聘资料并分析匹配依据。研究完成后将统一展示报告。</p>
+       </div>
       </div>
-      <div className="hhba-match-live-action">
-       <span className="hhba-match-live-pulse" aria-hidden="true"/>
-       <strong>{liveAction}</strong>
-       <span className="hhba-match-live-clock">已运行 {Math.floor(elapsedSeconds/60)>0?Math.floor(elapsedSeconds/60)+'分':''}{elapsedSeconds%60}秒</span>
+      <div className="hhba-research-journal" ref={journalViewport} role="log" aria-live="off"
+       aria-label="真实岗位研究记录"
+       onScroll={event=>{
+        const el=event.currentTarget;
+        followJournal.current=el.scrollHeight-el.scrollTop-el.clientHeight<75;
+       }}>
+       {researchTrail.length===0?
+        <div className="hhba-research-entry">
+         <span className="hhba-research-entry-dot"/><div><strong>正在准备研究</strong>
+          <p>{liveAction}</p></div>
+        </div>:
+        researchTrail.map((entry,i)=><div className="hhba-research-entry" key={i}>
+         <span className="hhba-research-entry-dot"/>
+         <div>
+          <div className="hhba-research-entry-head"><strong>{stageTitle[entry.stage]||'研究进展'}</strong>
+           {typeof entry.elapsed_ms==='number'&&<time>{clocks(entry.elapsed_ms)}</time>}</div>
+          <p>{entry.message}</p>
+          {typeof entry.candidate_links==='number'&&entry.candidate_links>0&&
+           (i===researchTrail.length-1||entry.candidate_links!==researchTrail[i+1]?.candidate_links)&&
+           <small>当前候选来源：{entry.candidate_links} 条</small>}
+         </div>
+        </div>)}
       </div>
-      {counters.length>0&&<p className="hhba-match-live-facts">{counters.join(' · ')}</p>}
-      {activityIdleSeconds>=22&&<p className="hhba-match-live-wait">
-       已有 {activityIdleSeconds} 秒没有收到新的研究动作；可能仍在等待模型或网络响应。如果当前搜索失败，系统会明确提示原因。
-      </p>}
-      <div className="hhba-match-live-rail" aria-hidden="true"><span/></div>
-      <ol className="hhba-match-live-steps">
-       {steps.map((step,i)=><li key={step.label} className={i<progressStep?'is-done':i===progressStep?'is-active':'is-upcoming'}>
-        <span className="hhba-match-live-marker">
-         {i<progressStep?<Check size={15}/>:i===progressStep?<LoaderCircle size={16} className="spin"/>:String(i+1)}
-        </span>
-        <div><strong>{step.label}</strong><small>{step.detail}</small></div>
-       </li>)}
-      </ol>
-      <p className="hhba-match-live-footnote">显示的搜索及岗位数量来自后台实际记录；动态进度条不代表已完成百分比。最终以企业招聘公告为准。</p>
+      <div className="hhba-research-now" role="status" aria-live="polite">
+       <span className="hhba-research-live-dot"/><span>{liveAction}</span>
+      </div>
+      <div className="hhba-research-footer">
+       {latestFacts.length>0&&<span>{latestFacts.join(' · ')}</span>}
+       {result.matches.length>0&&<span>已整理 {result.matches.length} 条初步推荐，最终报告仍在核验</span>}
+       {activityIdleSeconds>=22&&<p>已有 {activityIdleSeconds} 秒没有收到新研究事件，可能正在等待 DeepSeek 或企业网页响应。</p>}
+       <button type="button" className="hhba-research-record-hint" onClick={()=>{
+        const el=journalViewport.current;
+        if(el){el.scrollTop=el.scrollHeight;followJournal.current=true;}
+       }}><Activity size={13}/> 查看最新研究记录</button>
+      </div>
      </section>}
-     {pending&&result.matches.length===0?null:activeJob&&parsedProfile?
+     {pending?null:activeJob&&parsedProfile?
       <section className="hhba-match-workspace" aria-label="岗位专属简历优化">
        {!sourceResume&&<><button type="button" className="hhba-match-workspace-back" onClick={backToMatches}>
         返回岗位匹配结果
@@ -208,10 +223,30 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
        </p>}
       </section>:<>
      <div className="hhba-match-intro">
-      <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> AI 搜索真实岗位并匹配简历</span>
-      <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
-      <p>适配分仅供比较，不是录用概率。只展示中国大陆企业招聘岗位，不提供第三方招聘平台链接。{pending?'结果正在陆续生成，下方岗位可先查看。':'以下岗位网址来自 DeepSeek Search 结果，推荐原因由 V4 Pro 根据简历生成。'}</p>
+      <span className="hhba-match-eyebrow"><Sparkles size={14} style={{verticalAlign:'-2px',marginRight:5}}/> AI 深度职业研究报告</span>
+      <h2 id="hhba-native-title">职业研究已完成 · 本次整理 {result.matches.length} 个岗位</h2>
+      <p>职位来源可追溯，适配分是有依据的参考，不是录用概率。没有足够证据的岗位明确标注待核实，不会为了凑足数量编造招聘信息；不提供第三方招聘平台链接。</p>
      </div>
+     {result.native_search&&<section className="hhba-research-report-funnel" aria-label="本次岗位研究依据">
+      <div><strong>本次研究情况</strong><span>记录来自实际搜索和岗位筛选，不代表全部网页都是职位。</span></div>
+      <p>累计获得 {result.native_search.provider_items||0} 条网页搜索结果，
+       整理了 {result.native_search.candidate_links??result.native_search.visible_jobs} 条来源候选。
+       {typeof result.native_search.explicit_city_sources==='number'&&<>
+        其中 {result.native_search.explicit_city_sources} 条提供明确国内工作城市证据。</>}
+       {typeof result.native_search.underfilled_rechecks==='number'&&result.native_search.underfilled_rechecks>0&&<>
+        因推荐数量不足，AI 又对未入选的候选进行了补充比较。</>}
+      </p>
+      {result.matches.length<10&&<p className="hhba-research-report-limit">
+       本次只展示 {result.matches.length} 条能够追溯到招聘来源的岗位信息；
+       证据不足或来源不符合要求的网页不会为了凑数量进入推荐。
+      </p>}
+     </section>}
+     {researchTrail.length>0&&<details className="hhba-research-report-log">
+      <summary><FileText size={16}/> 查看本次 AI 研究记录 <ChevronDown size={15}/></summary>
+      <div className="hhba-research-report-entries">
+       {researchTrail.map((entry,i)=><p key={i}><strong>{stageTitle[entry.stage]||'研究记录'}</strong> · {entry.message}</p>)}
+      </div>
+     </details>}
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {!pending&&result.history_status==='SAVED'&&<div className="hhba-match-history-confirm">
       <span>这次的真实推荐结果已保存到你账户的「匹配历史」，下次登录可以继续查看。</span>

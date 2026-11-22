@@ -11,7 +11,7 @@
 import {planAutonomousMainlandSearch,normalizeAutonomousQueries}
  from './autonomous-mainland-search.js';
 import {searchQueries,searchPublicJobs,enrichCandidateDetails,reasonAboutJobs,
- recoverSearchGroundedShortlist,expandDetailedReasons,sourceOnlyJobPreviews} from './deepseek-search-match.js';
+ recoverSearchGroundedShortlist,expandDetailedReasons,sourceOnlyJobPreviews,indexedJobWorkCity} from './deepseek-search-match.js';
 import {mergeCandidateHits} from './match-search-growth.js';
 import {isRecommendationEligible} from './match-job-quality.js';
 import {isMainlandEmployerJobUrl,sourceCounts} from './match-employer-source.js';
@@ -83,6 +83,7 @@ async function modelDecision(key,resume,roleHint,pool,queries,history,deadline,{
   '不知道该搜索什么时，可以尝试岗位同义词、相邻职业、技能迁移、行业细分、城市与企业官方招聘公告，不强制凑满10个。',
   'finish时用shortlist_ids给出你认为值得由匹配模型详细评分的真实候选ID，优先有岗位职责和明确中国大陆工作地点者。',
   '不要为了配额或固定轮数而提前停止，也不要无意义重复搜索；当进一步行动已难以增加真实有效证据时结束。',
+  '在 rationale 中用对求职者有帮助的简短中文研究摘要，解释本轮为何检索、复核或停止；只讲可公开核实的理由，不输出私人内部推理、凭空编造的新发现或原始简历内容。',
   '只返回JSON对象：{"actions":[{"type":"search","queries":["..."]}],"shortlist_ids":["j1"],"rationale":"你为什么选择这些下一步动作"}。'
  ].join('\n');
  const response=await fetcher(BASE+'/responses',{
@@ -127,7 +128,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  let exitReason='unknown',shortlistIds=[],agentPlannedQueries=0;
  let rejectedLinks=0;
  function activity(stage,message){
-  onActivity({stage,message:String(message).slice(0,160),
+  onActivity({stage,message:String(message).slice(0,330),
    searches:searchCalls,raw_results:rawHits,candidate_links:pool.length,
    rejected_links:rejectedLinks,pages_read:pageReads,decisions,
    search_failures:searchFailures,elapsed_ms:Date.now()-started});
@@ -236,6 +237,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    queries=normalizeAutonomousQueries(initial?.queries);
    agentPlannedQueries=queries.length;
    history.push({type:'plan',strategy:shorten(initial?.strategy,180),queries:queries.length});
+   if(initial?.strategy)activity('planning','AI 初步研究方向：'+shorten(initial.strategy,190));
   }catch(e){
    if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
     'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED'].includes(e?.code))throw e;
@@ -262,7 +264,9 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    const raw=await decide(key,resume,roleHint,pool,usedQueries,history,deadline,options);
    next=normalizeResearchDecision(raw,pool,usedQueries);
    decisions++;
-   activity('planning','AI 已完成第 '+decisions+' 次研究决策，正在执行所选工具。');
+   activity('planning',next.rationale?
+    '本轮职业研究说明：'+shorten(next.rationale,210):
+    'AI 已完成第 '+decisions+' 次研究决策，正在执行所选工具。');
   }catch(e){
    if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
     'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED'].includes(e?.code))throw e;
@@ -297,7 +301,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  }
  if(exitReason==='unknown')exitReason='runtime_budget';
  ensureActive();
- const eligible=pool.filter(isRecommendationEligible);
+ let eligible=pool.filter(isRecommendationEligible);
  activity('writing',eligible.length?
   '已找到 '+eligible.length+' 个来源合规的候选职位，正在对照简历逐条分析。':
   '尚未获得符合真实来源要求的职位链接，正在汇总本轮研究结果。');
@@ -305,6 +309,22 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   const error=Object.assign(new Error('AI_EMPLOYER_JOBS_NOT_FOUND'),{code:'AI_EMPLOYER_JOBS_NOT_FOUND'});
   throw error;
  }
+ // Some Agents finish after selecting just one candidate. Before ranking,
+ // read additional real employer pages when there is enough request budget.
+ // A failed Fetch is never interpreted as proof of closure.
+ if(eligible.length>1&&pageReads<Math.min(4,eligible.length)&&budget()>55000){
+  const need=eligible.filter(h=>!h.content&&!h.fetch_attempted)
+   .slice(0,Math.min(4,eligible.length));
+  if(need.length){
+   onProgress('researching');
+   activity('researching','正在补充读取其他真实候选岗位，避免只依据一份招聘详情作结论。');
+   await fetchTool(need.map(x=>x.id));
+   eligible=pool.filter(isRecommendationEligible);
+  }
+ }
+ const evidenceCities=eligible.filter(h=>Boolean(indexedJobWorkCity(h))).length;
+ activity('writing','找到 '+eligible.length+' 条可研究的企业职位来源，其中 '+evidenceCities+
+  ' 条包含明确的国内工作地点证据；开始核验具体适配情况。');
  // AI-selected focus gets priority, but source objects are still from the
  // verified Search collection. Ranking never trusts invented model URLs.
  const focus=new Set(shortlistIds);
@@ -313,7 +333,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  // The selection model can analyze up to 32 unique source records per call;
  // batch if the Agent found more. Output limit is the user's card count, not
  // the maximum number of researched postings.
- let matches=[],selectionFailures=0;
+ let matches=[],selectionFailures=0,selectionRounds=0,underfilledRechecks=0,sourceOnlyCount=0;
  const choicePages=batches(ordered,32);
  for(const page of choicePages){
   ensureActive();
@@ -321,6 +341,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   onProgress('writing');
   activity('writing','正在核对本批职位的工作城市、公开要求和简历匹配依据。');
   try{
+   selectionRounds++;
    const part=await select(key,resume,page,limit-matches.length,{
     ...options,shortlistOnly:true,modelTimeoutMs:Math.min(42000,Math.max(1000,budget())),
     onPartial:jobs=>onPartial([...matches,...jobs])});
@@ -356,14 +377,50 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    }
   }
  }
- // If the model failed, an actual Search result with an explicit employer,
- // job role and mainland city may still be shown as UNSCORED preview.
- // This is not a fabricated recommendation or a fake match score.
- if(!matches.length&&selectionFailures>0){
-  const previews=sourceOnlyJobPreviews(eligible,limit);
+ // A first shortlist returning one of twelve candidates is not a
+ // conclusion about the other eleven. Re-evaluate unused real sources once
+ // while the service window still has time, then retain evidenced previews.
+ // This does not ask the model to invent listings to hit a numeric target.
+ const alreadyMatched=()=>new Set(matches.map(job=>job.official_url));
+ let unselected=eligible.filter(h=>!alreadyMatched().has(h.url));
+ if(matches.length<limit&&unselected.length&&budget()>12500){
+  underfilledRechecks++;
+  onProgress('writing');
+  activity('writing','第一轮整理了 '+matches.length+' 个岗位，还有 '+unselected.length+
+   ' 条企业候选尚未进入推荐；AI 正在重新比较这些资料。');
+  try{
+   selectionRounds++;
+   const pass=await select(key,resume,unselected,limit-matches.length,{
+    ...options,shortlistOnly:true,
+    modelTimeoutMs:Math.max(5000,Math.min(20000,budget()-4500)),
+    onPartial:jobs=>onPartial([...matches,...jobs])});
+   for(const job of pass.matches){
+    if(!isMainlandEmployerJobUrl(job.official_url)||
+      !unselected.some(hit=>hit.url===job.official_url)||
+      alreadyMatched().has(job.official_url))continue;
+    matches.push(job);
+    if(matches.length>=limit)break;
+   }
+   if(matches.length)onPartial([...matches]);
+  }catch(e){
+   selectionFailures++;
+   if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+    'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED'].includes(e?.code))throw e;
+  }
+  unselected=eligible.filter(h=>!alreadyMatched().has(h.url));
+ }
+ // Last step: a source-grounded posting with corroborated employer, role and
+ // explicit Mainland city may be shown transparently as UNSCORED, never as
+ // a verified JD or fabricated match score. Do not silently discard all
+ // remaining genuine candidates just because model selection was sparse.
+ if(matches.length<limit&&unselected.length){
+  const previews=sourceOnlyJobPreviews(unselected,limit-matches.length);
+  sourceOnlyCount=previews.length;
   if(previews.length){
-   matches=previews;onPartial([...matches]);
-   activity('writing','模型未完成个性化初选；已恢复 '+matches.length+' 条可追溯的企业岗位候选，正在继续核实证据。');
+   matches.push(...previews);
+   onPartial([...matches]);
+   activity('writing','另保留 '+previews.length+
+    ' 条企业招聘来源明确的待核实线索，暂不冒充已评分的职位。');
   }
  }
  if(!matches.length){
@@ -392,6 +449,8 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    checkpoint_errors:checkpointErrors,
    source_before:sourceCounts(result),source_after:sourceCounts(result),
    search_failures:searchFailures,selection_failures:selectionFailures,
+   selection_rounds:selectionRounds,underfilled_rechecks:underfilledRechecks,
+   explicit_city_sources:evidenceCities,unscored_source_previews:sourceOnlyCount,
    rejected_links:rejectedLinks,
    details_expanded:detail.expanded,details_failed_batches:detail.detail_failures,
    third_party_results_shown:0}};

@@ -64,7 +64,8 @@ test('model chooses research, then cross-industry search, then evidence-based fi
  assert.equal(result.diagnostic.agent_decisions,3);
  assert.equal(result.diagnostic.agent_reflections,2);
  assert.equal(result.diagnostic.agent_exit_reason,'agent_finished');
- assert.equal(result.diagnostic.page_reads,1);
+ assert.ok(result.diagnostic.page_reads>=1,'real source research must not be skipped');
+ assert.ok(result.diagnostic.selection_rounds>=1);
  assert.deepEqual(queryLog,['汽车区域督导 上海 企业官网招聘',
   '跨行业 数字化项目运营 杭州 企业招聘']);
  assert.equal(result.matches[0].official_url,adjacent.url);
@@ -73,8 +74,8 @@ test('model chooses research, then cross-industry search, then evidence-based fi
  assert.equal(result.diagnostic.third_party_results_shown,0);
  assert.ok(observed.length>0);
 });
-test('model-proposed foreign or unobserved URLs cannot appear in recommendations',async()=>{
- const r=await assert.rejects(runAgentOwnedMainlandMatch('synthetic',resume,'',10,{
+test('a model-invented URL is never displayed, even when only a real source preview survives',async()=>{
+ const out=await runAgentOwnedMainlandMatch('synthetic',resume,'',10,{
   expandDetailed:false
  },{
   plan:async()=>({queries:['汽车区域督导 上海 企业官网招聘']}),
@@ -82,8 +83,12 @@ test('model-proposed foreign or unobserved URLs cannot appear in recommendations
   decide:async()=>({actions:[{type:'finish'}],shortlist_ids:['j1']}),
   select:async()=>({matches:[{...jobOf(first),
    official_url:'https://careers.fictitious-company.com/jobs/invented'}]})
- }),error=>error.code==='AI_EMPLOYER_JOBS_NOT_FOUND');
- assert.equal(r,undefined);
+ });
+ assert.ok(out.matches.every(job=>job.official_url!==
+  'https://careers.fictitious-company.com/jobs/invented'));
+ assert.ok(out.matches.every(job=>job.official_url===first.url));
+ assert.ok(out.matches.every(job=>job.match_score===null),
+  'if the model invented a URL, only a real, explicitly uns cored source preview may survive');
 });
 test('model not available for planning falls back only for tool discovery, still uses AI action loop',async()=>{
  const searched=[];

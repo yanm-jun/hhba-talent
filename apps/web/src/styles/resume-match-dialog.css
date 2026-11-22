@@ -279,3 +279,55 @@
  .hhba-match-live-progress.is-compact .hhba-match-live-marker{width:18px;height:18px}
 }
 @media(prefers-reduced-motion:reduce){.hhba-match-live-rail span,.hhba-match-live-pulse{animation:none}.hhba-match-live-rail span{width:42%}}
+
+/* Deep career research: one quiet journal while working, a complete report afterwards. */
+.hhba-match-modal-content:has(.hhba-research-session){display:flex;flex-direction:column;overflow:hidden;padding:30px 42px 24px}
+.hhba-research-session{display:flex;flex:1;flex-direction:column;min-height:0;gap:0;color:#172d49}
+.hhba-research-heading{display:flex;align-items:flex-start;gap:17px;padding:3px 0 23px;border-bottom:1px solid #e6edf5}
+.hhba-research-orb{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;background:#edf4ff;border:1px solid #dfeafb;border-radius:15px;color:#2365c0}
+.hhba-research-heading h2{font-size:22px;line-height:1.36;letter-spacing:-.028em;margin:7px 0 9px;font-weight:740}
+.hhba-research-heading p{font-size:12px;line-height:1.85;margin:0;color:#6c7d93;max-width:650px}
+.hhba-research-kicker{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:680;color:#346baa;font-variant-numeric:tabular-nums}
+.hhba-research-live-dot{display:inline-block;flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:#347dd0;box-shadow:0 0 0 4px rgba(52,125,208,.09);animation:hhba-live-pulse 2.1s ease-in-out infinite}
+.hhba-research-journal{flex:1;min-height:130px;overflow-y:auto;overscroll-behavior:contain;padding:26px 11px 20px 5px;scrollbar-width:thin;scrollbar-color:#c5d5e8 transparent}
+.hhba-research-entry{display:grid;grid-template-columns:17px minmax(0,1fr);gap:14px;position:relative;padding:0 0 22px}
+.hhba-research-entry:not(:last-child)::before{content:'';position:absolute;top:15px;bottom:-2px;left:7px;width:1px;background:#e6edf5}
+.hhba-research-entry-dot{position:relative;z-index:1;width:9px;height:9px;border-radius:50%;margin:5px 0 0 3px;border:2px solid #d8e7f8;background:white}
+.hhba-research-entry:last-child .hhba-research-entry-dot{border-color:#6193da;background:#6193da;box-shadow:0 0 0 4px #edf5ff}
+.hhba-research-entry-head{display:flex;align-items:baseline;justify-content:space-between;gap:15px}
+.hhba-research-entry-head strong,.hhba-research-entry strong{font-size:13px;font-weight:700;color:#2c405e}
+.hhba-research-entry-head time{font-size:11px;color:#9aacc1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hhba-research-entry p{margin:8px 0 0;font-size:13px;line-height:1.95;color:#506783;overflow-wrap:anywhere}
+.hhba-research-entry small{display:block;margin:5px 0 0;font-size:11px;color:#8196ae}
+.hhba-research-now{display:flex;align-items:flex-start;gap:11px;border:1px solid #e6edf5;border-radius:11px;background:#f8faff;padding:13px 15px;font-size:12px;line-height:1.8;color:#31567c;font-weight:570}
+.hhba-research-now .hhba-research-live-dot{margin-top:6px}
+.hhba-research-footer{display:flex;align-items:center;flex-wrap:wrap;gap:8px 15px;padding-top:16px;color:#8a9caf;font-size:11px;line-height:1.7}
+.hhba-research-footer p{width:100%;margin:0;font-size:11px;color:#916c35}
+.hhba-research-record-hint{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:2px 0;margin-left:auto;color:#4a77b5;cursor:pointer;font-size:11px}
+.hhba-research-report-log{border:1px solid #e3ebf4;border-radius:12px;background:#fbfcfe;margin:0 0 23px}
+.hhba-research-report-log summary{cursor:pointer;display:flex;align-items:center;gap:9px;padding:15px 17px;font-size:12px;font-weight:700;color:#365579;list-style:none}
+.hhba-research-report-log summary::-webkit-details-marker{display:none}
+.hhba-research-report-log summary svg:last-child{margin-left:auto;transition:transform .15s}
+.hhba-research-report-log[open] summary svg:last-child{transform:rotate(180deg)}
+.hhba-research-report-entries{border-top:1px solid #e3ebf4;max-height:260px;overflow-y:auto;padding:13px 18px}
+.hhba-research-report-entries p{font-size:12px;line-height:1.85;color:#526b88;margin:4px 0 12px}
+.hhba-research-report-entries strong{font-size:12px;color:#2f527b}
+@media(max-width:640px){
+ .hhba-match-modal-content:has(.hhba-research-session){padding:22px 17px 18px}
+ .hhba-research-heading{gap:11px;padding-bottom:19px}
+ .hhba-research-orb{width:38px;height:38px;flex-basis:38px;border-radius:12px}
+ .hhba-research-heading h2{font-size:18px}
+ .hhba-research-heading p{font-size:11px}
+ .hhba-research-journal{padding-top:22px;padding-right:1px}
+ .hhba-research-entry p{font-size:12px}
+ .hhba-research-now{font-size:11px}
+ .hhba-research-record-hint{margin-left:0}
+}
+@media(prefers-reduced-motion:reduce){.hhba-research-live-dot{animation:none}.hhba-research-report-log summary svg{transition:none}}
+
+.hhba-research-report-funnel{padding:17px 19px;margin:0 0 18px;border-radius:12px;border:1px solid #e4edf7;background:#f8faff}
+.hhba-research-report-funnel>div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.hhba-research-report-funnel strong{font-size:13px;color:#21476e}
+.hhba-research-report-funnel>div>span{font-size:10px;color:#8a9ab0}
+.hhba-research-report-funnel p{font-size:12px;line-height:1.9;color:#566c87;margin:8px 0 0}
+.hhba-research-report-funnel .hhba-research-report-limit{color:#755d3d}

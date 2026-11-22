@@ -10,13 +10,12 @@ const optimizer=read('../src/components/TargetedResumeOptimization.tsx');
 const word=read('../src/components/OriginalWordViewer.tsx');
 const backend=read('../functions/api/resume-word.js');
 
-test('the original ten-job native matching popup is NOT replaced or redesigned',()=>{
+test('the existing result cards and original Word editor survive the user-approved narrative research redesign',()=>{
  const preserved=[
   '汇方职场 · HHBA',
-  'DeepSeek Search + V4 Pro 智能岗位推荐',
-  'AI 搜索真实岗位并匹配简历',
-  '根据你的简历，已找到 {result.matches.length} 个岗位',
-  '适配分仅供比较，不是录用概率。',
+  'AI 深度职业研究',
+  '职业研究已完成 · 本次整理 {result.matches.length} 个岗位',
+  '适配分是有依据的参考，不是录用概率。',
   'hhba-match-history-confirm',
   'hhba-native-list',
   'result.matches.map((job,i)=>',
@@ -46,7 +45,8 @@ test('the original ten-job native matching popup is NOT replaced or redesigned',
  assert.match(dialog,/viewport\.scrollTop=optimizedJobId\?0:matchListScroll\.current/);
  assert.match(dialog,/if\(optimizedJobId\)\{backToMatches\(\);return\}/);
  assert.match(dialog,/\{optimizedJobId\?'返回匹配结果':pending\?'取消搜索':'完成查看'\}/);
- assert.match(dialog,/hhba-match-live-progress/);
+ assert.match(dialog,/hhba-research-journal/);
+ assert.match(dialog,/pending\?null:activeJob/);
  assert.doesNotMatch(dialog,/<CandidateJourneySteps/);
 });
 
