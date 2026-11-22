@@ -6,7 +6,7 @@ import {safeJobDetailLink,decodeSearchText} from './deepseek-native-match.js';
 import {isMainlandJobLocation} from './mainland-job-location.js';
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from './match-job-quality.js';
 import {supplementalQueries,mergeCandidateHits,combineRecommended} from './match-search-growth.js';
-import {recruitmentSourceKind,isEmployerDirectedSource,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting,sourceCounts} from './match-employer-source.js';
+import {recruitmentSourceKind,isEmployerDirectedSource,isMainlandEmployerJobUrl,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting,sourceCounts} from './match-employer-source.js';
 
 const BASE='https://api.deepseek.com';
 const foreign=/(?:香港|澳门|澳門|台湾|臺灣|日本|东京|大阪|新加坡|美国|英国|越南|海外|境外|驻外|overseas|hong kong|tokyo|singapore|remote overseas)/i;
@@ -36,7 +36,7 @@ export function normalizeHits(searchResponses,max=28){
  for(const result of searchResponses){
   for(const hit of result?.results||[]){
    const url=safeJobDetailLink(hit?.url);
-   if(!url||!isEmployerDirectedSource(recruitmentSourceKind(url)))continue;
+   if(!url||!isMainlandEmployerJobUrl(url))continue;
    const title=clean(hit?.title,160),summary=clean(hit?.summary||hit?.snippet,900);
    const snippet=clean(hit?.snippet,300);
    if(!title||!roleEvidence.test(title+' '+summary+' '+url))continue;
@@ -160,7 +160,7 @@ export function selectedJobs(text,hits,limit=10){
   if(!isRecommendationEligible(evidence))continue;
   // Defense in depth: never let model output or an alternate code path leak a job-board link.
   const verifiedKind=recruitmentSourceKind(evidence.url);
-  if(!isEmployerDirectedSource(verifiedKind))continue;
+  if(!isMainlandEmployerJobUrl(evidence.url))continue;
   const signature=(company+'|'+title).toLowerCase().replace(/\s/g,'');
   if(seen.has(signature)||seen.has(evidence.url))continue;
   seen.add(signature);seen.add(evidence.url);
@@ -187,6 +187,11 @@ export function selectedJobs(text,hits,limit=10){
    matched:[reason],recommendation_reason:reason,not_evidenced:[],
    needs_verification:['根据岗位原始网页核对最新招聘状态与硬性任职条件。'],
    requirements_basis:clean(row.job_basis||evidence.summary,220),
+   // Actual independently retrieved source evidence, NOT the model-generated JD summary.
+   research_anchor:{url:evidence.url,title:evidence.title,site_name:evidence.source,
+    summary:clean(evidence.summary,700),snippet:clean(evidence.snippet,250),
+    content:clean(evidence.content,800)},
+   evidence_status:'RESEARCH_PENDING',
    salary:clean(row.salary,65)||null,experience_requirement:null,
    checked_at:new Date().toISOString()
   });
@@ -436,7 +441,7 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  }
  // No public job-board fallback, including transient SSE partial responses.
  // The former replacement stage is unnecessary: job boards never enter the shortlist.
- visible=visible.filter(j=>isEmployerDirectedSource(recruitmentSourceKind(j.official_url)));
+ visible=visible.filter(j=>isMainlandEmployerJobUrl(j.official_url));
  const beforeSource=sourceCounts(visible);
  const prefer={matches:visible,hits:pool,lookups:0,replaced:0,lookup_ms:0};
  if(!visible.length)throw codeError('AI_EMPLOYER_JOBS_NOT_FOUND');
