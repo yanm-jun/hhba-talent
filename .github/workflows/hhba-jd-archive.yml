@@ -14,6 +14,9 @@ on:
       - 'apps/web/src/services/resumeOptimizationApi.ts'
       - 'apps/web/src/services/resumeWholeRewriteApi.ts'
       - 'apps/web/src/components/TargetedResumeOptimization.tsx'
+      - 'apps/web/src/services/stablePostingScope.mjs'
+      - 'apps/web/src/services/stablePostingScope.d.mts'
+      - 'apps/web/scripts/posting-scope.contract.test.mjs'
       - 'apps/web/scripts/job-jd-archive.contract.test.mjs'
       - 'apps/web/functions/_lib/public-ats-jd.js'
       - 'apps/web/d1/0028_public_ats_jd_versions.sql'
@@ -57,6 +60,7 @@ jobs:
           node --test scripts/public-ats-jd.contract.test.mjs
           node --test scripts/verified-jd-reassessment.contract.test.mjs
           node --test scripts/match-jd-enrichment.contract.test.mjs
+          node --test scripts/posting-scope.contract.test.mjs
           node --test scripts/jd-lifecycle.contract.test.mjs
           node --test scripts/match-history.contract.test.mjs
           node --test scripts/match-native-web.contract.test.mjs

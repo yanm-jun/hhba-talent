@@ -15,6 +15,9 @@ on:
       - 'apps/web/scripts/qa_actual_word_viewer.py'
       - 'apps/web/scripts/qa_word_generate_versions.mjs'
       - 'apps/web/src/components/OriginalWordViewer.tsx'
+      - 'apps/web/src/services/stablePostingScope.mjs'
+      - 'apps/web/src/services/stablePostingScope.d.mts'
+      - 'apps/web/scripts/posting-scope.contract.test.mjs'
       - 'apps/web/src/services/originalWordApi.ts'
       - 'apps/web/src/styles/browser-word-preview.css'
       - 'apps/web/src/components/TargetedResumeOptimization.tsx'
@@ -92,7 +95,7 @@ jobs:
         env:
           VITE_HHBA_REAL_AUTH_ENABLED: '1'
         run: |
-          node --experimental-strip-types --test scripts/word-inline-border-beam.contract.test.mjs scripts/word-anchor-completeness.contract.test.mjs scripts/resume-docx-preserve.contract.test.mjs
+          node --experimental-strip-types --test scripts/word-inline-border-beam.contract.test.mjs scripts/word-anchor-completeness.contract.test.mjs scripts/resume-docx-preserve.contract.test.mjs scripts/posting-scope.contract.test.mjs
           node scripts/qa_word_generate_versions.mjs
           npm run dev -- --host 127.0.0.1 --port 4173 >/tmp/hhba-word-vite.log 2>&1 &
           python scripts/qa_word_browser_preview.py

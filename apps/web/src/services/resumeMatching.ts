@@ -11,7 +11,7 @@ export type JobMatch={
  official_url:string;platform:string;remote:boolean;reference_score:number;
  matched:string[];not_evidenced:string[];needs_verification:string[];
  requirements_basis:string;
- jd_version_id?:string;
+ jd_version_id?:string;jd_sha256?:string;
 };
 export type ResumeMatchResponse={
  status:'COMPLETE';profile:CandidateProfile;matches:JobMatch[];matched_official_jobs:number;
