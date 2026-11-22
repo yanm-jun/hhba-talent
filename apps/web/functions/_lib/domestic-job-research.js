@@ -24,10 +24,15 @@ function sameJob(job,hit){
  const s=compact([hit.title,hit.site_name,hit.summary,hit.snippet].join(' '));
  const company=compact(job.company).replace(/(?:有限责任公司|股份有限公司|有限公司|集团公司|集团|公司)$/,'');
  const title=compact(job.title_zh||job.title).replace(/(?:岗位|职位|招聘)$/,'');
+ // Multi-role listings in China often separate subroles with /、（）.
+ const roleNames=String(job.title_zh||job.title||'').split(/[\/、,，（）()]/)
+  .map(part=>compact(part).replace(/(?:岗位|职位|招聘)$/,'')).filter(part=>part.length>=3);
+ const roleMatch=s.includes(title)||(title.length>=5&&s.includes(title.slice(0,5)))||
+  roleNames.some(part=>s.includes(part)||part.length>=5&&s.includes(part.slice(0,5)));
  const city=compact(job.location).replace(/(市|省|区|县|中国大陆)/g,'').slice(0,5);
  return company.length>=2&&title.length>=2&&
   (heading.includes(company)||company.length>=5&&heading.includes(company.slice(0,5)))&&
-  (s.includes(title)||title.length>=5&&s.includes(title.slice(0,5)))&&
+  roleMatch&&
   (city.length<2||s.includes(city));
 }
 function safeEvidenceUrl(value,job){
@@ -64,17 +69,23 @@ export function assessDomesticEvidence(job,searchHits=[]){
  }
  const content=sources.filter(s=>s.kind==='EMPLOYER_PAGE_CANDIDATE')
   .map(s=>s.excerpt).join('\n').slice(0,1400);
- const tier=content.length>=130&&hasDuty.test(content)&&hasRequirements.test(content)?
+ // Search snippets rarely contain both formal section headings. An employer
+ // listing with a job-specific duty OR qualification is still useful partial
+ // evidence; the label never claims a complete JD.
+ const tier=content.length>=85&&(hasDuty.test(content)||hasRequirements.test(content))?
   'PARTIAL_SOURCE':sources.length?'SEARCH_SNIPPET_ONLY':'INSUFFICIENT_EVIDENCE';
+ const previousReason=clean(job.recommendation_reason,750);
+ const usefulPrevious=previousReason.length>=75&&/(?:简历|经历|经验|能力|技能|工作)/.test(previousReason);
+ const fallbackReason=usefulPrevious?previousReason+
+  '\n核实建议：以上仅为根据已检索资料作出的初步分析，岗位最新硬性条件请以企业发布内容为准。':
+  '当前仅能确认岗位方向与搜索入口，尚缺乏可交叉核对的任职要求。请先核对企业招聘页的具体职责与资格，再决定是否投递。';
  return {...job,evidence_status:tier,
   evidence_sources:sources.map(({url,kind})=>({url,kind})),
   evidence_checked_at:new Date().toISOString(),evidence_excerpt:content,
   // Employer ownership and complete JD remain unverified.
   requirements_basis:content||'暂无可核对的岗位职责与任职要求',
   match_score:null,reference_score:0,score_basis:'',
-  recommendation_reason:tier==='PARTIAL_SOURCE'?
-   '已找到这份岗位的部分公开材料，正在根据可核对的职责与要求分析简历；完整岗位条件仍请到企业招聘页确认。':
-   '这份职位与求职方向可能相关，但目前没有足够的真实岗位要求，暂不能判断具体匹配程度。',
+  recommendation_reason:fallbackReason,
   needs_verification:tier==='PARTIAL_SOURCE'?
    ['仅有企业招聘页候选的部分公开证据，并非已核验完整 JD；请在官网确认最新岗位与投递状态。']:
    ['缺少足够的岗位职责或任职资格证据，不能可靠打分；请打开企业招聘页面核对。']
@@ -95,37 +106,68 @@ function modelText(json){
  return (json?.output||[]).filter(x=>x?.type==='message').flatMap(x=>
   (x.content||[]).filter(y=>y?.type==='output_text').map(y=>y.text||'')).join('');
 }
-async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,modelTimeoutMs=22000}={}){
- const eligible=jobs.filter(j=>j.evidence_status==='PARTIAL_SOURCE');
- if(!eligible.length)return jobs;
- const dataset=eligible.map(job=>({id:job.id,company:job.company,title:job.title,
-  location:job.location,partial_evidence:job.evidence_excerpt.slice(0,1150),
-  source_urls:job.evidence_sources.slice(0,3).map(s=>s.url)}));
+/**
+ * One model research pass for ALL selected vacancies: independent analyses,
+ * score evidence, résumé facts and application advice. Direction-fit scores
+ * are explicitly preliminary when JD duties/qualifications are unavailable.
+ */
+async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,modelTimeoutMs=25000}={}){
+ const candidates=jobs.filter(j=>j.evidence_status!=='VERIFIED_FULL_JD');
+ if(!candidates.length)return jobs;
+ const dataset=candidates.map(job=>({id:job.id,company:job.company,title:job.title,
+  location:job.location,evidence_level:job.evidence_status,
+  source_excerpt:String(job.evidence_excerpt||'').slice(0,1400),
+  original_search_summary:String(job.research_anchor?.summary||'').slice(0,600),
+  source_urls:(job.evidence_sources||[]).slice(0,3).map(x=>x.url),
+  prior_role_reason:clean(job.recommendation_reason,420)}));
  const instructions=[
-  '你是 HHBA 中国大陆岗位证据分析 Agent，只根据真实简历和本次检索到的公开岗位部分信息做初步适配评估。',
-  '这些资料不是已核验完整 JD，不能编造学历、经验、资质、职责、招聘状态、企业官方认证、来源或录用概率。',
-  '如证据充分则输出0至100整数和不少于30字的具体score_basis，明确对应的简历事实和岗位公开证据；不足则match_score=null。',
-  '只返回输入中的id，不加新岗位，不提供或修改链接。严格JSON：{"jobs":[{"id":"原id","match_score":null,"score_basis":"对比有依据的岗位要求与简历内容"}]}'
+  '你是 HHBA 中国大陆求职岗位研究员。每个岗位必须独立分析，严禁套用相同推荐理由。',
+  '只根据脱敏简历中实际写明的经历/成绩与给定公开资料作判断。严禁编造 JD、学历、经验、证书、工作职责、招聘状态或公司身份。',
+  '分别输出四个具体中文内容：resume_evidence 说明简历里明确的相关经历、能力或成果；role_relation 解释这些经历与已知岗位方向/来源内容的关系；unknowns 说明尚未核实的硬性要求或真实差距，不要把未知当成不符合；next_step 给出具体核实和投递建议。',
+  '每一项需要具体、有信息量，不能写通用客套话。若职位正文缺失，可分析岗位名称与真实简历的方向关联，但不能声称企业要求某能力。',
+  'PARTIAL_SOURCE 有公开职责或要求，可对照其文字生成0-100的 AI 初步适配分；SEARCH_SNIPPET_ONLY 只能评价岗位方向与简历的初步关联，不得表示已满足任职要求，分数必须用方向参考分解释；INSUFFICIENT_EVIDENCE 一律返回 match_score:null。',
+  '打分依据 score_basis 要至少40字，明确至少一项用户简历事实和本次已知的岗位信息，指出未核实的条件。证据不足必须返回null；不能为了凑分而虚构。',
+  '所有岗位必须使用已有id，禁止新增岗位、链接或来源，禁止把方向分冒充完整JD匹配分，禁止承诺录用。',
+  '严格输出 JSON 对象：{"jobs":[{"id":"原id","match_score":82,"score_basis":"具体评分依据","resume_evidence":"简历里的真实依据","role_relation":"与已知岗位的关系","unknowns":"需要核实的条件","next_step":"实际行动建议"}]}'
  ].join('\n');
  const timeout=AbortSignal.timeout(modelTimeoutMs),sig=signal?AbortSignal.any([signal,timeout]):timeout;
  const r=await fetcher(BASE+'/responses',{method:'POST',redirect:'manual',signal:sig,
   headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
   body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'none'},
-   text:{format:{type:'json_object'}},max_output_tokens:2900,stream:false,
-   instructions,input:'脱敏简历：\n'+String(resume||'').slice(0,9000)+'\n候选岗位的公开证据：\n'+JSON.stringify(dataset)})
+   text:{format:{type:'json_object'}},max_output_tokens:5700,stream:false,
+   instructions,input:'脱敏简历：\n'+String(resume||'').slice(0,10000)+
+    '\n逐岗位公开资料（不代表已核验完整JD）：\n'+JSON.stringify(dataset)})
  });
  if(!r.ok)throw Error('EVIDENCE_MODEL_UNAVAILABLE');
  let parsed;try{parsed=JSON.parse(modelText(await r.json()))}catch{throw Error('EVIDENCE_MODEL_INVALID')}
  const byId=new Map((Array.isArray(parsed?.jobs)?parsed.jobs:[])
   .filter(x=>x&&typeof x.id==='string').map(x=>[x.id,x]));
  return jobs.map(job=>{
-  if(job.evidence_status!=='PARTIAL_SOURCE')return job;
-  const row=byId.get(job.id),basis=clean(row?.score_basis,360);
-  const score=normalizeMatchScore(row?.match_score,basis.length>=30?basis:'');
-  if(score===null)return job;
-  return {...job,match_score:score,reference_score:score,score_basis:basis,
-   recommendation_reason:basis,
-   evidence_score_status:'AI_PARTIAL_SOURCE_SCORED'};
+  if(job.evidence_status==='VERIFIED_FULL_JD')return job;
+  const row=byId.get(job.id);
+  if(!row)return job;
+  const sections=[
+   ['相关经历',row.resume_evidence],['岗位关联',row.role_relation],
+   ['待核实条件',row.unknowns],['投递建议',row.next_step]
+  ].map(([label,value])=>({label,value:clean(value,240)}));
+  const complete=sections.every(x=>x.value.length>=16);
+  const reason=complete?sections.map(x=>x.label+'：'+x.value).join('\n'):
+   job.recommendation_reason;
+  const basis=clean(row.score_basis,420);
+  const eligible=job.evidence_status==='PARTIAL_SOURCE'||
+   job.evidence_status==='SEARCH_SNIPPET_ONLY';
+  const grounded=/(?:简历|经历|经验|技能|能力|曾|负责)/.test(basis)&&
+   /(岗位|职位|方向|职责|要求|工作)/.test(basis);
+  const value=eligible&&grounded?normalizeMatchScore(row.match_score,
+   basis.length>=40?basis:''):null;
+  // For a snippet-only candidate, this is a career-DIRECTION score,
+  // not a claim that the employer's JD requirements were verified.
+  const scoreStatus=value===null?undefined:job.evidence_status==='PARTIAL_SOURCE'?
+   'AI_PARTIAL_SOURCE_SCORED':'AI_DIRECTION_REFERENCE_SCORED';
+  return {...job,recommendation_reason:reason,
+   ...(value!==null?{match_score:value,reference_score:value,score_basis:basis,
+    evidence_score_status:scoreStatus}:{}),
+   evidence_reason_status:complete?'AI_INDIVIDUAL_ANALYSIS':'FALLBACK'};
  });
 }
 export async function researchDomesticJobEvidence(key,resume,matches,options={},deps={}){
@@ -145,13 +187,15 @@ export async function researchDomesticJobEvidence(key,resume,matches,options={},
  };
  await Promise.all(Array.from({length:Math.min(CONCURRENCY,jobs.length)},()=>work()));
  let result=out;
- try{result=await score(key,resume,out,options);}catch{/* never restore ungrounded scores */}
+ if(options.onProgress)options.onProgress('scoring');
+ try{result=await score(key,resume,out,options);}catch{/* retain source-qualified preliminary reasons; never invent scores */}
  return {matches:sortByMatchScore(result),diagnostic:{
   mode:DOMESTIC_EVIDENCE_PIPELINE,researched:reads,search_failures:failures,
   partial:result.filter(j=>j.evidence_status==='PARTIAL_SOURCE').length,
   snippet_only:result.filter(j=>j.evidence_status==='SEARCH_SNIPPET_ONLY').length,
   insufficient:result.filter(j=>j.evidence_status==='INSUFFICIENT_EVIDENCE').length,
-  scored:result.filter(j=>j.evidence_score_status==='AI_PARTIAL_SOURCE_SCORED').length,
+  scored:result.filter(j=>j.evidence_score_status==='AI_PARTIAL_SOURCE_SCORED'||
+   j.evidence_score_status==='AI_DIRECTION_REFERENCE_SCORED').length,
   verified:result.filter(j=>j.evidence_status==='VERIFIED_FULL_JD').length
  }};
 }
