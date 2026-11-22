@@ -317,7 +317,7 @@ test('5 shortlisted roles are shown before supplemental search, then 10 roles an
   throw Error('unexpected '+url);
  };
  const result=await runSearchFirstMatch('synthetic-secret-not-real',cv,'AI产品经理',10,{
-  fetcher,onProgress:x=>stages.push(x),onPartial:jobs=>seen.push({
+  fetcher,autonomousPlanning:false,onProgress:x=>stages.push(x),onPartial:jobs=>seen.push({
    count:jobs.length,expanded:jobs.filter(j=>j.reason_detail_complete).length,
    urls:jobs.map(j=>j.official_url)
   })
@@ -531,7 +531,7 @@ test('only third-party sites: automatically searches employer domains, then show
   throw Error('Model and Fetch must never be called when only job boards exist: '+url);
  };
  await assert.rejects(
-  runSearchFirstMatch('synthetic-secret-not-real',cv,'品牌督导',10,{fetcher}),
+  runSearchFirstMatch('synthetic-secret-not-real',cv,'品牌督导',10,{fetcher,autonomousPlanning:false}),
   /AI_EMPLOYER_JOBS_NOT_FOUND/
  );
  assert.equal(calls.length,searchQueries(cv,'品牌督导').length+2);
