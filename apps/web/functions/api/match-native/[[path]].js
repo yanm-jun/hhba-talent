@@ -11,6 +11,7 @@ import {createAccountResearchCheckpoint} from '../../_lib/ai-research-checkpoint
 import {jobResearchQuality} from '../../_lib/agent-quality-metrics.js';
 import {checkMatchProviderCapabilities} from '../../_lib/match-provider-preflight.js';
 import {recognizeMatchResume,compareMatchResumeToJd} from '../../_lib/resume-jd-match-agent.js';
+import {recognizeResumeFile} from '../../_lib/resume-ocr.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -385,7 +386,7 @@ export async function onRequest({request,env}){
  const url=new URL(request.url);
  const tail=url.pathname.slice('/api/match-native'.length).replace(/\/$/,'')||'/';
  if(tail==='/status'&&request.method==='GET')
-  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'SEARCH_FIRST_V1',formats:['pdf','docx']});
+  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'SEARCH_FIRST_V1',formats:['pdf','docx','jpg','png','webp']});
  if(!enabled(env))return fail('MATCH_NOT_ENABLED',503);
  if(tail==='/provider-check'&&request.method==='GET'){
   try{
@@ -397,12 +398,16 @@ export async function onRequest({request,env}){
    return fail(code,502);
   }
  }
- if(tail!=='/resume'||request.method!=='POST')return fail('NOT_FOUND',404);
+ if(!['/resume','/ocr'].includes(tail)||request.method!=='POST')return fail('NOT_FOUND',404);
  if(request.headers.get('Origin')!==url.origin||request.headers.get('Sec-Fetch-Site')==='cross-site')
   return fail('ORIGIN_REQUIRED',403);
  let candidate;
  try{candidate=await candidateSession(env,request);if(!candidate)return fail('SESSION_INVALID',401);}
  catch{return fail('SESSION_INVALID',401);}
+ if(tail==='/ocr'){
+  try{return json({ok:true,...await recognizeResumeFile(request,env.HHBA_MATCH_DEEPSEEK_KEY)});}
+  catch(error){return fail(error?.code||'OCR_SERVICE_UNAVAILABLE',error?.status||502);}
+ }
  let input;
  try{
   const raw=await request.text();

@@ -7,4 +7,4 @@ export declare function pdfTextItemsToLines(items:unknown[]):string[];
 export declare function extractPdfText(buffer:ArrayBuffer,options?:{
  signal?:AbortSignal;
  loadPdfJs?:()=>Promise<{getDocument:(input:Record<string,unknown>)=>{promise:Promise<{numPages:number;getPage:(n:number)=>Promise<{getTextContent:(options?:unknown)=>Promise<{items:unknown[]}>;cleanup?:()=>void}>}>;destroy:()=>Promise<void>};GlobalWorkerOptions?:{workerSrc:string}}>;
-}):Promise<{text:string;pages:number;characters:number}>;
+}):Promise<{text:string;pages:number;characters:number;hasTextlessPages:boolean}>;

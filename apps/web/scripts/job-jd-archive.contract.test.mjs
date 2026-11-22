@@ -185,7 +185,7 @@ test('authenticated matching recognizes real CV facts then scores and reuses the
  try{
   const failed=await onRequest({request:makeRequest('这是一段没有可供核验的职业信息的测试文字，仅用于确认识别失败会阻止后续流程。'),env});
   assert.match(await failed.text(),/AI_PROFILE_INCOMPLETE/);
-  assert.deepEqual(calls,['/responses'],'recognition failure cannot start Search or score');
+  assert.deepEqual(calls,['/responses','/responses'],'recognition retries once before deciding whether to search');
   const success=await onRequest({request:makeRequest('工作经历：'+fact+'，并协调销售团队跟进运营改进。联系邮箱 synthetic@example.com'),env});
   const events=await success.text();
   assert.match(events,/"stage":"parsing"/);

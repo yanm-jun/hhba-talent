@@ -59,6 +59,65 @@ test('native results dialog never hides optimizer behind the optional match scor
  assert.match(ui,/暂无可靠分数/);
 });
 
+test('authorized resume OCR sends only an approved file to DeepSeek and keeps partial recognized text',async()=>{
+ const original=globalThis.fetch;
+ const calls=[];
+ globalThis.fetch=async(url,options)=>{
+  calls.push(url);
+  assert.equal(url,'https://api.deepseek.com/v1/tools/ocr');
+  assert.equal(options.body.get('purpose'),'text_recognition');
+  const file=options.body.get('file');
+  assert.equal(file.name,'resume.png');
+  assert.equal(file.type,'image/png');
+  return Response.json({object:'ocr.result',purpose:'text_recognition',page_count:1,pages:[
+   {index:0,finish_reason:'length',text:'<｜ref｜>工作经历</｜ref｜><｜box｜>[[52, 40, 948, 96]]<｜/box｜>\n负责门店运营和月度数据分析。synthetic@example.com'}
+  ]});
+ };
+ const db={prepare(sql){return {bind(){return this},async first(){
+  if(sql.includes('hhba_auth_sessions'))return {phone:'13800000000',revoked:0,
+   expires_at:new Date(Date.now()+3600000).toISOString()};
+  if(sql.includes('hhba_auth_users'))return {role:'candidate'};
+  return null;
+ },async run(){return {success:true}}}}};
+ const env={HHBA_MATCH_SERVICE_ENABLED:'1',HHBA_MATCH_DEEPSEEK_KEY:'synthetic-secret-not-real',
+  HHBA_PNVS_AUTH_DB:db};
+ const origin='https://hhba.example';
+ const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aEWQAAAAASUVORK5CYII=','base64');
+ const request=(headers={},body=png)=>new Request(origin+'/api/match-native/ocr',{method:'POST',
+  headers:{Origin:origin,Authorization:'Bearer synthetic-client-token','Content-Type':'application/octet-stream',
+   'X-HHBA-Resume-Format':'png','X-HHBA-OCR-Consent':'deepseek-resume-ocr-v1',...headers},body});
+ try{
+  assert.equal((await onRequest({request:request({Origin:'https://elsewhere.example'}),env})).status,403);
+  assert.equal((await onRequest({request:request({Authorization:''}),env})).status,401);
+  assert.equal((await onRequest({request:request({'X-HHBA-OCR-Consent':''}),env})).status,400);
+  assert.equal((await onRequest({request:request({'X-HHBA-Resume-Format':'jpg'}),env})).status,400);
+  assert.equal((await onRequest({request:request({},new Uint8Array(3*1024*1024+1)),env})).status,413);
+  assert.deepEqual(calls,[]);
+  const result=await onRequest({request:request(),env});
+  assert.equal(result.headers.get('cache-control'),'private, no-store');
+  assert.deepEqual(await result.json(),{
+   ok:true,partial:true,text:'工作经历\n负责门店运营和月度数据分析。[邮箱已隐藏]'});
+  assert.equal(calls.length,1);
+ }finally{globalThis.fetch=original;}
+});
+
+test('semantic recognition retries on Flash and accepts line wraps in OCR evidence',async()=>{
+ const {recognizeMatchResume}=await import('../functions/_lib/resume-jd-match-agent.js');
+ const models=[];
+ const data=await recognizeMatchResume('synthetic','工作经历：负责门店\n运营和数据整理','',{
+  fetcher:async(uri,init)=>{
+   const {model}=JSON.parse(init.body);
+   models.push(model);
+   const facts=model==='deepseek-v4-pro'?[]:[{kind:'work',quote:'负责门店运营和数据整理'},
+    {kind:'credential',quote:'持有从未写过的高级执照'}];
+   return Response.json({status:'completed',output:[
+    {type:'message',content:[{type:'output_text',text:JSON.stringify({facts})}]}]});
+  }
+ });
+ assert.deepEqual(models,['deepseek-v4-pro','deepseek-flash']);
+ assert.deepEqual(data.facts,[{id:'CV-1',kind:'work',quote:'负责门店运营和数据整理'}]);
+});
+
 test('no search: never show invented jobs',()=>{
  const r={status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(answer)}]}],
  usage:{server_tool_use:{tool_search:0,tool_fetch:0}}};

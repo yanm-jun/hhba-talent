@@ -93,7 +93,7 @@ export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs}={
   if(!Number.isInteger(document.numPages)||document.numPages<1||
     document.numPages>PDF_MAX_PAGES)
    throw new PDFResumeError("PDF_PAGES","PDF 简历最多支持 15 页，请精简后重试。");
-  const pages=[];let chars=0;
+  const pages=[];let chars=0,hasTextlessPages=false;
   for(let n=1;n<=document.numPages;n++){
    if(expired)throw new PDFResumeError("PDF_TIMEOUT","PDF 处理超时，请导出更简洁的文字版 PDF。");
    if(signal?.aborted)throw abortError();
@@ -101,6 +101,7 @@ export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs}={
    const content=await page.getTextContent({includeMarkedContent:false});
    const contentLines=pdfTextItemsToLines(content.items);
    const text=contentLines.join("\n");
+   if(text.replace(/\s/g,"").length<12)hasTextlessPages=true;
    chars+=text.length;
    if(chars>PDF_MAX_TEXT)throw new PDFResumeError("PDF_TEXT_LIMIT","PDF 文字超过安全提取上限，请精简后重试。");
    if(text)pages.push(text);
@@ -109,7 +110,7 @@ export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs}={
   const extracted=pages.join("\n");
   if(extracted.replace(/\s/g,"").length<12)
    throw new PDFResumeError("PDF_NO_TEXT","这份 PDF 未发现足够的可复制文字，可能是扫描件。请使用文字版 PDF，或改为手动填写后同步。");
-  return {text:extracted,pages:document.numPages,characters:chars};
+  return {text:extracted,pages:document.numPages,characters:chars,hasTextlessPages};
  }catch(e){
   if(expired)throw new PDFResumeError("PDF_TIMEOUT","PDF 处理超时，请导出更简洁的文字版 PDF。");
   if(signal?.aborted)throw abortError();

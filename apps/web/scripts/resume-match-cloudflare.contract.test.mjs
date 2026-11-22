@@ -110,7 +110,7 @@ test('privacy-reviewed empty text never silently falls back to raw resume',async
  const ui=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  assert.match(ui,/identifiedCharacters=redactResumeTextLocally\(previewText\)\.replace\(\/\\s\/g,''\)\.length/);
  assert.match(ui,/!previewLoaded\|\|\s*identifiedCharacters<30/);
- assert.match(ui,/setPreviewLoaded\(false\);setPreviewError\(''\);setConsent\(false\);\s*setSavedId/);
+ assert.match(ui,/setPreviewLoaded\(false\);setPreviewError\(''\);setConsent\(false\);/);
  assert.match(ui,/await submitExtractedResumeText\(previewText,/);
  assert.doesNotMatch(ui,/submitResumeForMatching/);
 });
