@@ -55,7 +55,14 @@ export async function planAutonomousMainlandSearch(key,redactedResume,roleHint,{
    input:'目标职位（可为空）：'+clean(roleHint).slice(0,80)+
     '\n已脱敏且用户授权用于分析的简历：\n'+String(redactedResume||'').slice(0,12000)})
  });
- if(!response.ok)throw Error('SEARCH_PLANNER_PROVIDER_UNAVAILABLE');
+ if(!response.ok){
+  const code=response.status===401||response.status===403?'AI_PROVIDER_KEY_REJECTED':
+   response.status===402?'AI_PROVIDER_BALANCE_INSUFFICIENT':
+   response.status===429?'AI_PROVIDER_RATE_LIMITED':
+   [400,404,422].includes(response.status)?'AI_PROVIDER_REQUEST_REJECTED':
+   'AI_PROVIDER_UNAVAILABLE';
+  throw Object.assign(new Error(code),{code});
+ }
  let result;try{result=JSON.parse(outputText(await response.json()))}
  catch{throw Error('SEARCH_PLANNER_INVALID_JSON')}
  return {queries:normalizeAutonomousQueries(result?.queries),
