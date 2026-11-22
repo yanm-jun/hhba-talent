@@ -298,7 +298,8 @@ test('5 shortlisted roles are shown before supplemental search, then 10 roles an
    }
    shortlist++;
    assert.ok(payload.instructions.includes('先快速生成岗位名单'));
-   assert.ok(payload.max_output_tokens<=3500);
+   assert.ok(payload.max_output_tokens>=12000,'shortlist model is no longer constrained to 3500 tokens');
+   assert.equal(payload.reasoning.effort,'high');
    const candidates=JSON.parse(payload.input.split('可选真实职位：\n')[1]);
    const roles=candidates.map((h,i)=>({
     id:h.id,company:'模拟雇主'+h.id,title:'产品职位'+h.id,
