@@ -57,7 +57,9 @@ export function sanitizePublicResearchCheckpoint(input){
 }
 export async function resumeFingerprint(secret,phone,redactedResume,roleHint){
  if(typeof secret!=='string'||secret.length<16)throw Error('CHECKPOINT_SECRET_MISSING');
- const data='HHBA_RESEARCH_CHECKPOINT_V1\n'+String(phone)+'\n'+
+ // Restart existing searches so jobs obtained from retired search paths
+ // never enter the new AI-only search.
+ const data='HHBA_RESEARCH_CHECKPOINT_V2\n'+String(phone)+'\n'+
   String(roleHint||'')+'\n'+String(redactedResume||'');
  const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),
   {name:'HMAC',hash:'SHA-256'},false,['sign']);

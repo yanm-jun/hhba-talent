@@ -11,7 +11,6 @@ import {createAccountResearchCheckpoint} from '../../_lib/ai-research-checkpoint
 import {jobResearchQuality} from '../../_lib/agent-quality-metrics.js';
 import {checkMatchProviderCapabilities} from '../../_lib/match-provider-preflight.js';
 import {recognizeMatchResume,compareMatchResumeToJd} from '../../_lib/resume-jd-match-agent.js';
-import {matchEmployerHost,rankEmployerMatches,MATCH_POSTINGS_PER_EMPLOYER} from '../../_lib/match-employer-source.js';
 import {recognizeResumeFile} from '../../_lib/resume-ocr.js';
 import {createMatchJdReview,matchPostingKey} from '../../_lib/match-jd-review.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
@@ -152,40 +151,20 @@ async function verifiedJdPass(env,result,resume,options,progress){
  }
 }
 
-// The model directs the search and investigation by default.
-// The previous source-grounded flow is kept for provider failure recovery.
+// A deliberate rollout switch retains the previous entry point.
 async function runCandidateResearch(env,key,resume,roleHint,limit,options={}){
  if(env?.HHBA_AI_OWNED_RESEARCH_ENABLED==='0')
   return runSearchFirstMatch(key,resume,roleHint,limit,options);
- try{
-  // Candidate discovery is preliminary. The full-JD Agent writes the comparisons.
-  return await runAgentOwnedMainlandMatch(key,resume,roleHint,limit,{...options,expandDetailed:false});
- }catch(error){
-  if(options.signal?.aborted||error?.code==='AI_MATCH_CANCELLED')throw error;
-  // "No verified source" is a valid evidence conclusion, not a model
-  // failure. Never override an intentional Agent conclusion with a fixed
-  // keyword fallback that might accidentally recommend weaker sources.
-  if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
-   'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED',
-   'AI_EMPLOYER_JOBS_NOT_FOUND',
-   'AI_SEARCH_API_REJECTED','AI_SEARCH_UNAVAILABLE',
-   'AI_SEARCH_RESPONSE_INVALID'].includes(error?.code))throw error;
-  console.warn('HHBA_AI_RESEARCH_RECOVERY',JSON.stringify({
-   reason:String(error?.code||'AGENT_UNAVAILABLE').slice(0,70),mode:'legacy-fallback'
-  }));
-  const fallback=await runSearchFirstMatch(key,resume,roleHint,limit,options);
-  return {...fallback,diagnostic:{...fallback.diagnostic,
-   agent_fallback:true,agent_error:String(error?.code||'AGENT_UNAVAILABLE').slice(0,70)}};
- }
+ return runAgentOwnedMainlandMatch(key,resume,roleHint,limit,{...options,expandDetailed:false});
 }
 async function domesticResearchPass(env,key,result,options,progress){
  progress('researching');
  const checked=await researchDomesticJobEvidence(key,'',result.matches,{
   ...options,score:false,enabled:env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'
  });
- const final=rankEmployerMatches(checked.matches.map(job=>job.jd_source_status==='VERIFIED_JD'?job:{...job,
+ const final=checked.matches.map(job=>job.jd_source_status==='VERIFIED_JD'?job:{...job,
   match_score:null,reference_score:0,score_basis:'',matched:[],not_evidenced:[],
-  recommendation_reason:'已找到企业招聘入口，完整岗位 JD 尚待核验。'}),options.limit,options.previousEmployerCounts);
+  recommendation_reason:'已找到企业招聘入口，完整岗位 JD 尚待核验。'});
  const diagnostic={...result.diagnostic,domestic_evidence:checked.diagnostic,
   visible_jobs:final.length};
  return {...result,matches:final,diagnostic:{
@@ -219,25 +198,18 @@ async function matchResumeWorkflow(env,candidate,resume,options,{
  onActivity({stage:'planning',message:'已核对 '+profile.facts.length+' 条简历证据，正在规划岗位搜索方向。'});
  const checkpoint=await checkpointForCandidate(env,candidate,resume,options.role_hint);
  const excluded=new Set((options.exclude_urls||[]).map(matchPostingKey));
- const previousEmployerCounts=new Map();
- for(const url of excluded){
-  const employer=matchEmployerHost(url);
-  if(employer)previousEmployerCounts.set(employer,(previousEmployerCounts.get(employer)||0)+1);
- }
- const previousEmployers=new Set(previousEmployerCounts.keys());
- const excludePosting=url=>excluded.has(matchPostingKey(url))||
-  (previousEmployerCounts.get(matchEmployerHost(url))||0)>=MATCH_POSTINGS_PER_EMPLOYER;
+ const excludePosting=url=>excluded.has(matchPostingKey(url));
  const compareEvidence=(jd,reviewSignal=signal)=>{
   onProgress('scoring');
   return compareMatchResumeToJd(key,profile,jd,{signal:reviewSignal});
  };
  const review=env?.HHBA_AI_OWNED_RESEARCH_ENABLED==='0'?null:
-  await createMatchJdReview(env,resume,{...options,exclude:excluded,previousEmployerCounts,signal,compareEvidence,
+  await createMatchJdReview(env,resume,{...options,exclude:excluded,signal,compareEvidence,
    onUpdate:jobs=>onPartial(provisionalPartial(jobs))}).catch(()=>null);
  const researchOptions={signal,checkpoint,resumeProfile:profile,onProgress,onActivity,
   autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0',
-  excludePosting,previousEmployers,
-  ...(review?{verifiedCount:review.verifiedCount,scoredEmployerCount:review.scoredEmployerCount,onSources:review.add}:{}),
+  excludePosting,
+  ...(review?{verifiedCount:review.verifiedCount,onSources:review.add}:{}),
   onPartial:jobs=>{
    const fresh=jobs.filter(job=>!excludePosting(job.official_url));
    onPartial(provisionalPartial(review?review.preview(fresh):fresh));
@@ -261,7 +233,7 @@ async function matchResumeWorkflow(env,candidate,resume,options,{
   },onProgress);
  }
  onPartial(provisionalPartial(verified.matches));
- const researched=await domesticResearchPass(env,key,verified,{signal,limit:options.limit,previousEmployerCounts},onProgress);
+ const researched=await domesticResearchPass(env,key,verified,{signal},onProgress);
  const canContinue=Boolean(checkpoint&&await checkpoint.load());
  return {result:{...researched,profile,can_continue:canContinue},checkpoint};
 }

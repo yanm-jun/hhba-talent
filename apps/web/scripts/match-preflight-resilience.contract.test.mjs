@@ -84,7 +84,7 @@ test('planner HTTP 400/401/402/429 rejection retains provider error, never silen
     plan:async()=>{const error=new Error(code);error.code=code;throw error},
     search:async()=>{searched=true;return {hits:[]}}
    }),e=>e.code===code);
-  assert.equal(searched,true,'only initial parallel public Search may start before a fatal planner rejection');
+  assert.equal(searched,false,'with no recognized target role, a rejected plan does not trigger a preset search');
  }
 });
 test('agent reflective model permission failure is not disguised as zero valid jobs',async()=>{

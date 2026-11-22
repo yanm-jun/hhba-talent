@@ -68,8 +68,8 @@ test('model chooses research, then cross-industry search, then evidence-based fi
  assert.ok(result.diagnostic.selection_rounds>=1);
  assert.ok(queryLog.includes('汽车区域督导 上海 企业官网招聘'));
  assert.ok(queryLog.includes('跨行业 数字化项目运营 杭州 企业招聘'));
- assert.ok(queryLog.some(q=>q.includes('汽车渠道运营')),
-  'privacy-safe initial Search starts even before the AI planner finishes');
+ assert.equal(queryLog[0],'汽车区域督导 上海 企业官网招聘',
+  'AI directs the initial search when no resume-derived role was supplied');
  assert.equal(result.matches[0].official_url,adjacent.url);
  assert.equal(chosen[0][0],adjacent.url,'AI-selected research focus precedes original source');
  assert.ok(progress.includes('planning')&&progress.includes('researching')&&progress.includes('searching'));
@@ -92,51 +92,10 @@ test('a model-invented URL is never displayed, even when only a real source prev
  assert.ok(out.matches.every(job=>job.match_score===null),
   'if the model invented a URL, only a real, explicitly uns cored source preview may survive');
 });
-test('direct employer discovery survives failure of public web search',async()=>{
- const displayed=[];
- const result=await runAgentOwnedMainlandMatch('synthetic',resume,'',1,{
-  expandDetailed:false,onSources:(jobs,closed,urls)=>displayed.push(...urls)
- },{
-  plan:async()=>({queries:['区域渠道督导 企业官网招聘'],catalogKeywords:['渠道运营']}),
-  search:async()=>{throw Object.assign(Error('unavailable'),{code:'AI_SEARCH_UNAVAILABLE'});},
-  searchCatalogs:async(words,{page})=>{
-   assert.deepEqual(words,['渠道运营']);
-   assert.equal(page,1);
-   return {hits:[first],searches:2,raw:1,failures:0};
-  },
-  decide:async()=>({actions:[{type:'finish'}],shortlist_ids:['j1']}),
-  select:async(key,cv,hits)=>({matches:[jobOf(hits[0])]})
- });
- assert.ok(displayed.includes(first.url));
- assert.equal(result.matches[0].official_url,first.url);
- assert.equal(result.diagnostic.official_catalog_searches,2);
-});
-test('an otherwise full set from one employer triggers a different-employer search',async()=>{
- const primary={...first,url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId=4885239249',
-  title:'美团 区域渠道督导 上海 招聘',source:'美团招聘',
-  summary:'美团招聘区域渠道督导，工作地点上海，负责渠道经营分析。'};
- const searched=[],found=new Set();
- const result=await runAgentOwnedMainlandMatch('synthetic',resume,'区域渠道督导',4,{
-  expandDetailed:false,verifiedCount:()=>4,scoredEmployerCount:()=>found.size,
-  onSources:(jobs,closed,urls)=>urls.forEach(url=>found.add(new URL(url).hostname))
- },{
-  plan:async()=>({queries:['区域渠道督导 上海 企业官网招聘']}),
-  search:async(key,text,hint,{queriesOverride})=>{
-   searched.push(...queriesOverride);
-   return {hits:queriesOverride.some(query=>query.includes('-site:meituan.com'))?[primary,first]:[primary]};
-  },
-  fetchDetails:async(key,hits)=>({hits,fetches:0}),
-  decide:async()=>({actions:[{type:'finish'}]}),
-  select:async(key,text,hits)=>({matches:hits.map(jobOf)})
- });
- assert.ok(searched.some(query=>query.includes('-site:meituan.com')));
- assert.ok(found.has('careers.xinghai-cn.com'));
- assert.ok(result.matches.some(job=>job.official_url===first.url));
-});
 test('model not available for planning falls back only for tool discovery, still uses AI action loop',async()=>{
  const searched=[];
  const out=await runAgentOwnedMainlandMatch('synthetic',resume,'',10,{
-  expandDetailed:false
+  expandDetailed:false,resumeProfile:{target_roles:['经销商培训']}
  },{
   plan:async()=>{throw Error('planner unavailable')},
   search:async(k,cv,hint,{queriesOverride})=>{
@@ -147,6 +106,7 @@ test('model not available for planning falls back only for tool discovery, still
   select:async(k,cv,hits)=>({matches:[jobOf(hits[0])]})
  });
  assert.ok(searched.length>0,'fallback remains available when planning provider fails');
+ assert.ok(searched.every(query=>query.includes('经销商培训')));
  assert.equal(out.matches.length,1);
  assert.equal(out.diagnostic.agent_exit_reason,'agent_finished');
 });
@@ -157,8 +117,8 @@ test('the real candidate route defaults to model-owned loop and preserves authen
  assert.match(route,/HHBA_AI_OWNED_RESEARCH_ENABLED==='0'/);
  assert.match(route,/runCandidateResearch\(env,key,resume/);
  assert.match(route,/'AI_EMPLOYER_JOBS_NOT_FOUND'/);
- assert.match(route,/'AI_SEARCH_API_REJECTED'/);
- assert.match(route,/includes\(error\?\.code\)\)throw error/);
+ assert.match(route,/return runAgentOwnedMainlandMatch\(key,resume,roleHint,limit/);
+ assert.doesNotMatch(route,/HHBA_AI_RESEARCH_RECOVERY/);
  assert.match(route,/domesticResearchPass/);
  assert.match(route,/candidateSession\(env,request\)/);
  assert.match(route,/redactForModel\(input\.text\)/);
@@ -173,7 +133,9 @@ test('first Search starts without waiting for autonomous planner, but planner di
   summary:'区域督导经理社招-正式 工作地点：北京市。岗位职责：商家运营与督导。',
   availability:{status:'UNKNOWN'}};
  const result=await runAgentOwnedMainlandMatch('synthetic',
-  '模拟简历：做过区域汽车门店督导管理','',10,{expandDetailed:false},{
+  '模拟简历：做过区域汽车门店督导管理','',10,{
+   expandDetailed:false,resumeProfile:{target_roles:['区域门店督导']}
+  },{
    plan:async()=>{
     assert.ok(observations.includes('search-started'),
      'public Search should not be blocked on reasoning planning');
