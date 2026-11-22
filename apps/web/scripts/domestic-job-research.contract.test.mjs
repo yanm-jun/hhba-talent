@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {assessDomesticEvidence,researchDomesticJobEvidence,DOMESTIC_EVIDENCE_PIPELINE}
+import {assessDomesticEvidence,researchDomesticJobEvidence,DOMESTIC_EVIDENCE_PIPELINE,compactResearchResumeEvidence}
  from '../functions/_lib/domestic-job-research.js';
 import {allowedEmployerJobLink,isMainlandEmployerJobUrl}
  from '../functions/_lib/match-employer-source.js';
@@ -16,6 +16,23 @@ const post=(extras={})=>({id:'search-j1',company:'星河汽车有限公司',
  ...extras});
 const hit=(extras={})=>({url:URL,title:'星河汽车有限公司 区域督导 济南 招聘',
  summary:quote.repeat(2),site_name:'星河汽车',...extras});
+test('reuses only original resume quotes already checked by the recognition Agent',()=>{
+ const raw='学历本科。门店销售、DCC 转化率改善及区域经销商培训。'.repeat(180);
+ const verified={facts:[
+  {kind:'work',quote:'本人负责区域经销商辅导和门店销售流程培训，持续改善门店转化。'},
+  {kind:'skill',quote:'分析 DCC 线索转化率、到店率和试驾情况，并制作数据报告。'},
+  {kind:'project',quote:'组织多个直营网点开展终端运营巡店、问题复盘与整改。'},
+  {kind:'work',quote:'本人负责区域经销商辅导和门店销售流程培训，持续改善门店转化。'}
+ ]};
+ const compact=compactResearchResumeEvidence(raw,verified);
+ assert.ok(compact.length<raw.length);
+ assert.match(compact,/CV-1 本人负责区域经销商辅导/);
+ assert.match(compact,/CV-2 分析 DCC/);
+ assert.equal((compact.match(/本人负责区域经销商辅导/g)||[]).length,1);
+ assert.equal(compactResearchResumeEvidence(raw,{facts:[verified.facts[0]]}),raw.slice(0,10000),
+  'short or incomplete fact collections fall back to the original redacted resume');
+});
+
 test('no Greenhouse, Lever, Workday or Ashby in new mainland job discovery or history',()=>{
  for(const url of [
   'https://job-boards.greenhouse.io/company/jobs/1234567',
