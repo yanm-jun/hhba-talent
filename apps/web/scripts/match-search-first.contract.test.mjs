@@ -105,7 +105,7 @@ test('V4 Pro reasons only about Search results; no tools are passed to model',as
    assert.equal(body.model,'deepseek-v4-pro');
    assert.equal(body.tools,undefined);
    assert.equal(body.text.format.type,'json_object');
-   assert.equal(body.reasoning.effort,'none');
+   assert.equal(body.reasoning.effort,'high');
    return new Response(eventStream,{headers:{'Content-Type':'text/event-stream'}});
   },onPartial:x=>partial.push(x.length)
  });
