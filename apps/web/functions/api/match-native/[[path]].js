@@ -170,7 +170,9 @@ async function runCandidateResearch(env,key,resume,roleHint,limit,options={}){
   // failure. Never override an intentional Agent conclusion with a fixed
   // keyword fallback that might accidentally recommend weaker sources.
   if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
-   'AI_PROVIDER_RATE_LIMITED','AI_EMPLOYER_JOBS_NOT_FOUND'].includes(error?.code))throw error;
+   'AI_PROVIDER_RATE_LIMITED','AI_EMPLOYER_JOBS_NOT_FOUND',
+   'AI_SEARCH_API_REJECTED','AI_SEARCH_UNAVAILABLE',
+   'AI_SEARCH_RESPONSE_INVALID'].includes(error?.code))throw error;
   console.warn('HHBA_AI_RESEARCH_RECOVERY',JSON.stringify({
    reason:String(error?.code||'AGENT_UNAVAILABLE').slice(0,70),mode:'legacy-fallback'
   }));
