@@ -225,7 +225,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
      <div className="hhba-match-intro">
       <span className="hhba-match-eyebrow"><Sparkles size={14} style={{verticalAlign:'-2px',marginRight:5}}/> AI 深度职业研究报告</span>
       <h2 id="hhba-native-title">职业研究已完成 · 本次整理 {result.matches.length} 个岗位</h2>
-      <p>职位来源可追溯，适配分是有依据的参考，不是录用概率。没有足够证据的岗位明确标注待核实，不会为了凑足数量编造招聘信息。</p>
+      <p>职位来源可追溯，适配分是有依据的参考，不是录用概率。没有足够证据的岗位明确标注待核实，不会为了凑足数量编造招聘信息；不提供第三方招聘平台链接。</p>
      </div>
      {result.native_search&&<section className="hhba-research-report-funnel" aria-label="本次岗位研究依据">
       <div><strong>本次研究情况</strong><span>记录来自实际搜索和岗位筛选，不代表全部网页都是职位。</span></div>
