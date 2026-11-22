@@ -30,12 +30,34 @@ export function supplementalQueries(resume,roleHint,primaryQueries=[]){
  return [...new Set(candidates)].filter(q=>!primaryQueries.includes(q)).slice(0,2);
 }
 export function mergeCandidateHits(initial,additional,max=48){
- const normalized=new Set(),merged=[];
+ const positions=new Map(),merged=[];
+ const genericTitle=/^(?:职位详情|岗位详情|招聘详情|职位信息|岗位信息|job details?|position details?)$/i;
  for(const hit of [...initial,...additional]){
-  if(!hit?.url||!isDirectEmployerSourceHit(hit)||normalized.has(hit.url))continue;
-  normalized.add(hit.url);
+  if(!hit?.url||!isDirectEmployerSourceHit(hit))continue;
+  const position=positions.get(hit.url);
+  if(position!==undefined){
+   // Fresh public Search evidence must not be silently dropped just because
+   // a saved checkpoint already owns the same URL. Preserve the stable ID
+   // and previously fetched job content, but refresh snippets/availability.
+   const previous=merged[position];
+   const title=(!genericTitle.test(String(hit.title||''))||
+      !previous.title)?hit.title:previous.title;
+   const summary=String(hit.summary||'').length>=String(previous.summary||'').length?
+      hit.summary:previous.summary;
+   const snippet=String(hit.snippet||'').length>=String(previous.snippet||'').length?
+      hit.snippet:previous.snippet;
+   const availability=hit.availability?.status==='POSSIBLY_CLOSED'?
+      hit.availability:previous.content?previous.availability:
+      hit.availability||previous.availability;
+   merged[position]={...previous,title:title||previous.title,
+    summary:summary||previous.summary,snippet:snippet||previous.snippet,
+    source:hit.source||previous.source,availability,
+    fetch_attempted:previous.content?previous.fetch_attempted:false};
+   continue;
+  }
+  if(merged.length>=max)continue;
+  positions.set(hit.url,merged.length);
   merged.push({...hit,id:'j'+(merged.length+1)});
-  if(merged.length>=max)break;
  }
  return merged;
 }
