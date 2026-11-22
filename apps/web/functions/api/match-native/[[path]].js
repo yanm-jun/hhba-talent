@@ -393,7 +393,8 @@ export async function onRequest({request,env}){
      },12000);
      try{
       const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-       options.role_hint,options.limit,{signal:abort.signal,onProgress:stage=>{
+       options.role_hint,options.limit,{signal:abort.signal,
+       autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0',onProgress:stage=>{
         phase=stage;send('progress',{stage});
        },onPartial:matches=>send('partial',{matches:provisionalPartial(matches)})});
       const verified=await verifiedJdPass(env,result,redacted,options,stage=>send('progress',{stage}));
@@ -425,7 +426,7 @@ export async function onRequest({request,env}){
 
  try{
   const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-   options.role_hint,options.limit);
+   options.role_hint,options.limit,{autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0'});
   const verified=await verifiedJdPass(env,result,redacted,options);
   const researched=await domesticResearchPass(env,env.HHBA_MATCH_DEEPSEEK_KEY,
    verified,redacted,options);
