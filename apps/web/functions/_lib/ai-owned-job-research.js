@@ -160,7 +160,9 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  let checkpointRestored=false,checkpointWrites=0,checkpointErrors=0;
  let checkpointRefreshAttempted=false,checkpointRefreshQueries=0;
  let underfilledExpansionQueries=0,underfilledExpansionNew=0;
- let rawHits=0,loops=0,decisions=0,decisionFailures=0,reflections=0;
+ let rawHits=0,atsVerificationLeads=0,searchRetryAttempts=0,searchRetryRecovered=0;
+ const atsQueued=new Set();
+ let loops=0,decisions=0,decisionFailures=0,reflections=0;
  let exitReason='unknown',shortlistIds=[],agentPlannedQueries=0;
  let rejectedLinks=0;
  function activity(stage,message){
@@ -234,7 +236,19 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
     rawHits+=result.diagnostic?.raw_results??result.hits.length;
     searchFailures+=result.diagnostic?.search_failures??0;
     rejectedLinks+=result.diagnostic?.rejected_links??0;
+    searchRetryAttempts+=result.diagnostic?.retry_attempts??0;
+    searchRetryRecovered+=result.diagnostic?.retry_recovered??0;
     rejectedHints.push(...(result.diagnostic?.rejected_title_hints||[]));
+    // ATS URLs are only a private verification queue. No unverified
+    // Greenhouse/Lever Search result is ever added to the public job pool.
+    if(options.onSources&&result.ats_posting_urls?.length){
+     // Queue at most twelve unique ATS APIs per matching run. A bad
+     // provider batch must not make JD review monopolize the UX deadline.
+     const fresh=result.ats_posting_urls.filter(url=>!atsQueued.has(url))
+      .slice(0,Math.max(0,12-atsQueued.size));
+     fresh.forEach(url=>atsQueued.add(url));
+     if(fresh.length){atsVerificationLeads+=fresh.length;options.onSources([],[],fresh)}
+    }
     pool=mergeCandidateHits(pool,result.hits.filter(includeHit),240).filter(includeHit);
     publishSourcePreviews();
    }catch(e){
@@ -604,7 +618,8 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    search_failures:searchFailures,selection_failures:selectionFailures,
    selection_rounds:selectionRounds,underfilled_rechecks:underfilledRechecks,
    explicit_city_sources:evidenceCities,unscored_source_previews:sourceOnlyCount,
-   rejected_links:rejectedLinks,
+   rejected_links:rejectedLinks,ats_verification_leads:atsVerificationLeads,
+   search_retry_attempts:searchRetryAttempts,search_retry_recovered:searchRetryRecovered,
    details_expanded:detail.expanded,details_failed_batches:detail.detail_failures,
    third_party_results_shown:0}};
 }

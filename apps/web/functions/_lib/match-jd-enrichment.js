@@ -124,7 +124,11 @@ export async function enrichSearchMatchesWithJD(env,matches,resume,options={},de
  const fetchDirect=deps.fetchDirect||directOfficialJobEvidence;
  const fetchAts=deps.fetchAts||fetchPublicAtsJd;
  const out=[...source],candidates=source.map((job,i)=>({job,i,locator:safeJDSourceLocator(job?.official_url)}))
-  .filter(x=>x.locator&&!(options.domesticOnly&&x.locator.kind));
+  .filter(x=>x.locator);
+ // A Greenhouse/Lever origin is NOT evidence of a foreign job. Their exact
+ // public posting API must independently confirm a Mainland work city and
+ //完整职责/任职条件 before any recommendation is promoted to VERIFIED_JD.
+ // fetchPublicAtsJd performs that verification; failures remain unverified.
  let cursor=0,verified=0,scored=0,failed=0,closed=0;
  const inFlight=new Map();
  const load=locator=>{

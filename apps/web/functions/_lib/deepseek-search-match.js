@@ -3,6 +3,7 @@
 // 2) optional DeepSeek Fetch enriches weak snippets
 // 3) DeepSeek V4 Pro selects/justifies linked candidates, never invents links.
 import {safeJobDetailLink,decodeSearchText} from './deepseek-native-match.js';
+import {safePublicAtsJobLocator} from './public-ats-jd.js';
 import {isMainlandJobLocation,findMainlandCity} from './mainland-job-location.js';
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from './match-job-quality.js';
 import {supplementalQueries,mergeCandidateHits,combineRecommended} from './match-search-growth.js';
@@ -54,6 +55,27 @@ export function normalizeHits(searchResponses,max=28){
  }
  return sortEmployerFirst([...byUrl.values()],max).map((item,i)=>({...item,id:'j'+(i+1)}));
 }
+// Discover exact public employer ATS posting URLs as *verification leads*.
+// They are NEVER shown from Search alone. The independent Greenhouse/Lever
+// posting API must confirm the same ID, a Mainland workplace and a complete JD.
+export function publicMainlandAtsVerificationLeads(searchResponses,max=12){
+ const urls=new Set();
+ for(const result of searchResponses){
+  for(const hit of result?.results||[]){
+   const safe=safeJobDetailLink(hit?.url);
+   const locator=safe&&safePublicAtsJobLocator(safe);
+   if(!locator)continue;
+   const title=clean(hit?.title,160),summary=clean(hit?.summary||hit?.snippet,500);
+   // Exact ATS URL structure already proves this is a single posting
+   // candidate; English employer search titles often omit the word "job".
+   if(title.length<4||summary.length<20)continue;
+   if(foreign.test(title)&&!/(?:中国|China|上海|北京|深圳|广州|成都|杭州)/i.test(title))continue;
+   urls.add(locator.url);
+   if(urls.size>=max)return [...urls];
+  }
+ }
+ return [...urls];
+}
 async function providerJson(fetcher,key,path,body,timeoutMs,signal){
  const timeout=AbortSignal.timeout(timeoutMs);
  const merged=signal?AbortSignal.any([signal,timeout]):timeout;
@@ -76,26 +98,48 @@ async function providerJson(fetcher,key,path,body,timeoutMs,signal){
  }
  try{return await response.json();}catch{throw codeError('AI_SEARCH_RESPONSE_INVALID');}
 }
+// A single upstream timeout or 5xx must not erase an otherwise useful
+// search direction. Retry only transient failures within the ORIGINAL
+// per-query time window; never retry invalid requests, rate limits or auth.
+const RETRYABLE_SEARCH_ERRORS=new Set([
+ 'AI_SEARCH_TIMEOUT','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UNAVAILABLE'
+]);
 export async function searchPublicJobs(key,text,roleHint,{
  fetcher=fetch,signal=null,onProgress=()=>{},queryTimeoutMs=14000,
  queriesOverride=null,maxHits=28,allowEmpty=false
 }={}){
  const start=Date.now(),queries=queriesOverride||searchQueries(text,roleHint),errors=[];
+ let retryAttempts=0,retryRecovered=0;
  onProgress('searching');
  const responses=await Promise.all(queries.map(async query=>{
-  try{
-   const data=await providerJson(fetcher,key,'/v1/tools/search',
-    {query,count:20,need_content:false},queryTimeoutMs,signal);
+  const queryStart=Date.now(),payload={query,count:20,need_content:false};
+  const call=async timeout=>{
+   const data=await providerJson(fetcher,key,'/v1/tools/search',payload,timeout,signal);
    if(!Array.isArray(data?.results))throw codeError('AI_SEARCH_RESPONSE_INVALID');
    return data;
+  };
+  try{
+   // Leave a small recovery window when the first call consumes its timeout.
+   const first=queryTimeoutMs>=6500?Math.floor(queryTimeoutMs*.70):queryTimeoutMs;
+   try{return await call(first)}
+   catch(error){
+    const remaining=queryTimeoutMs-(Date.now()-queryStart);
+    if(signal?.aborted||!RETRYABLE_SEARCH_ERRORS.has(error?.code)||remaining<2200)throw error;
+    retryAttempts++;
+    const response=await call(remaining);
+    retryRecovered++;
+    return response;
+   }
   }catch(e){errors.push(e.code||'AI_PROVIDER_UNAVAILABLE');return {results:[]};}
  }));
  const hits=normalizeHits(responses,maxHits);
+ const atsPostingUrls=publicMainlandAtsVerificationLeads(responses);
  // The Agent may use rejected THIRD-PARTY job titles only as research clues:
  // find the named employer's OWN hiring page, never use the original URL.
  // No raw snippets, phone numbers, or CV text cross this boundary.
  const rejected_title_hints=[...new Set(responses.flatMap(r=>r.results||[])
-  .filter(h=>!isDirectEmployerSourceHit({url:h?.url,source:h?.site_name||h?.source}))
+  .filter(h=>!isDirectEmployerSourceHit({url:h?.url,source:h?.site_name||h?.source})&&
+   !safePublicAtsJobLocator(h?.url))
   .map(h=>clean(h?.title,90))
   .filter(t=>t.length>=4&&t.length<=90))].slice(0,8);
  const fatal=['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
@@ -104,11 +148,14 @@ export async function searchPublicJobs(key,text,roleHint,{
  // A healthy empty Search result must not hide parallel API auth/quota failure.
  if(!hits.length&&(fatal||!allowEmpty||errors.length===queries.length))
   throw codeError(fatal||(errors.length===queries.length?'AI_SEARCH_UNAVAILABLE':'AI_SEARCH_NO_DETAIL_JOBS'));
- return {hits,diagnostic:{search_ms:Date.now()-start,queries:queries.length,
+ return {hits,ats_posting_urls:atsPostingUrls,
+  diagnostic:{search_ms:Date.now()-start,queries:queries.length,
   successful_searches:queries.length-errors.length,raw_results:responses.reduce((a,x)=>a+x.results.length,0),
   candidate_links:hits.length,search_failures:errors.length,
   provider_error_codes:[...new Set(errors)].slice(0,6),
-  rejected_links:responses.reduce((a,x)=>a+x.results.length,0)-hits.length,
+  retry_attempts:retryAttempts,retry_recovered:retryRecovered,
+  ats_verification_leads:atsPostingUrls.length,
+  rejected_links:Math.max(0,responses.reduce((a,x)=>a+x.results.length,0)-hits.length-atsPostingUrls.length),
   rejected_title_hints}};
 }
 export async function enrichCandidateDetails(key,hits,{
@@ -127,7 +174,11 @@ export async function enrichCandidateDetails(key,hits,{
  const detail=await Promise.all(needs.map(async hit=>{
   try{
    const d=await providerJson(fetcher,key,'/v1/tools/fetch',{url:hit.url},fetchTimeoutMs,signal);
-   const content=clean(d?.content,2600);
+   const raw=typeof d?.content==='string'?d.content.slice(0,80000):'';
+   const siteCity=structuredPostingWorkCity(hit,raw);
+   // Preserve explicit work-city evidence near the front of the bounded excerpt.
+   // Employer pages often put Location/Site after the entire job description.
+   const content=clean((siteCity?'工作地点：'+siteCity+'。 ':'')+raw,2600);
    if(content.length>80){
     success++;
     return {...hit,content,availability:classifyJobAvailability({content},{fetched:true})};
@@ -167,10 +218,47 @@ function closedRows(text){
  * explicitly labels it as the work location. Never infer the user's city
  * or reinterpret a company HQ as the posting's job location.
  */
+// Accept only employer-shaped, specific vacancy pages, not catalogue or search pages.
+function singlePostingDetail(hit){
+ if(!isDirectEmployerSourceHit(hit))return false;
+ const path=new URL(hit.url).pathname;
+ return /\/(?:job|jobs|position|positions|job-detail)\/(?:details\/)?(?=[a-z\d-]*\d)[a-z\d-]+(?:\/|$)/i.test(path);
+}
+
+function englishPostingDetails(hit,raw=hit?.content){
+ if(!singlePostingDetail(hit))return null;
+ // Explicit employer title template: the location field, not a territory
+ // embedded in the role name, is the structured location. Require country.
+ const title=String(hit.title||'').match(/^(.{2,100}?)\s+job in\s+([^,|]{2,40}),\s*(?:([^,|]{2,40}),\s*)?China\s*\|\s*[^|]{0,70}jobs?\s+at\s+[^|]{2,60}$/i);
+ const body=String(raw||'');
+ const field=(label)=>body.match(new RegExp('(?:^|\\n)\\s*(?:#{1,6}\\s*|\\*\\*)?'+label+'(?:\\*\\*)?[ \\t]*(?::[ \\t]*|(?:\\r?\\n[ \\t]*)+)([^\\r\\n]{2,90})(?=\\r?\\n|$)','i'))?.[1].trim()||'';
+ const location=field('(?:Work Location|Job Location|Location)');
+ const site=field('Site');
+ const mainlandCountry=/^(?:China|中国|中国大陆|Mainland China)$/i;
+ const locationParts=location.split(/\s*[,，]\s*/);
+ const mainlandRegion=/^(?:Anhui|Beijing|Chongqing|Fujian|Gansu|Guangdong|Guangxi|Guizhou|Hainan|Hebei|Heilongjiang|Henan|Hubei|Hunan|Inner Mongolia|Jiangsu|Jiangxi|Jilin|Liaoning|Ningxia|Qinghai|Shaanxi|Shandong|Shanghai|Shanxi|Sichuan|Tianjin|Tibet|Xinjiang|Yunnan|Zhejiang|(?:安徽|福建|甘肃|广东|广西|贵州|海南|河北|黑龙江|河南|湖北|湖南|内蒙古|江苏|江西|吉林|辽宁|宁夏|青海|陕西|山东|山西|四川|西藏|新疆|云南|浙江)(?:省|自治区)?)$/i;
+ const explicitCountry=mainlandCountry.test(locationParts.at(-1)||'')&&
+  locationParts.length<=3&&(locationParts.length!==3||mainlandRegion.test(locationParts[1]));
+ if(title?.[3]&&!mainlandRegion.test(title[3].trim()))return null;
+ const city=explicitCountry?(locationParts.length>1?locationParts[0]:site):
+  (!location&&title?title[2].trim():'');
+ if(!city||!isMainlandJobLocation(city))return null;
+ // A contradiction between the page's direct location field and title is
+ // not enough evidence to show either city as a verified recommendation.
+ if(title&&findMainlandCity(title[2])!==findMainlandCity(city))return null;
+ return {city,title:title?.[1].trim()||''};
+}
+
+function structuredPostingWorkCity(hit,raw=hit?.content){
+ if(!singlePostingDetail(hit))return null;
+ const city=String(raw||'').match(/(?:^|\r?\n)[ \t]*(?:#{1,6}[ \t]*|\*\*)?(?:所在地|工作地点|工作城市|办公地点|岗位地点)(?:\*\*)?[ \t]*(?:[：:][ \t]*|(?:\r?\n[ \t]*)+)([^\r\n，。；;]{2,48})(?=\r?\n|[，。；;]|$)/)?.[1]?.trim();
+ return city&&isMainlandJobLocation(city)?city:englishPostingDetails(hit,raw)?.city||null;
+}
+
 export function indexedJobWorkCity(hit){
  const body=[hit?.summary,hit?.snippet,hit?.content].filter(Boolean).join(' ');
  const match=body.match(/(?:工作地点|工作城市|办公地点|办公城市|岗位地点|岗位城市)[：:\s]{0,4}([^，。；;\n]{2,40})/i);
- if(!match)return null;
+ if(!match)return structuredPostingWorkCity(hit);
  const candidate=String(match[1]).split(/(?:\s{2,}|要求|待遇|学历|职责|任职|岗位|职位|部门|工作经验|更新时间|招聘人数)/)[0].trim();
  return isMainlandJobLocation(candidate)?candidate:
   (findMainlandCity(candidate)&&!/(?:香港|澳门|台湾|海外|境外|国外)/.test(candidate)?
@@ -295,7 +383,7 @@ export function sourceOnlyJobPreviews(hits,limit=10){
   if(hit.content&&!isRecommendationEligible({...hit,availability:
    classifyJobAvailability({content:hit.content},{fetched:true})}))continue;
   const site=clean(hit.source,90);
-  const company=site.replace(/(?:官方招聘|招聘官网|招聘平台|招聘网站|人才招聘|招聘|官网|careers?|jobs?)$/gi,'')
+  const company=site.replace(/,?\s+(?:incorporated|inc\.?|corporation|corp\.?|limited|ltd\.?)$/i,'').replace(/(?:官方招聘|招聘官网|招聘平台|招聘网站|人才招聘|招聘|官网|careers?|jobs?)$/gi,'')
    .replace(/(?:有限责任公司|股份有限公司|有限公司|公司)$/,'').trim();
   if(company.length<2||/(?:招聘网|求职网|人才市场|招聘平台|岗位合集)/.test(company))continue;
   const heading=clean(hit.title,150);
@@ -319,6 +407,14 @@ export function sourceOnlyJobPreviews(hits,limit=10){
   // Many employer job detail pages use just the position as <title>.
   // The source must explicitly label itself a company's recruitment site.
   if(!after&&!generic&&/(?:官方招聘|招聘官网|人才招聘|招聘|careers?|talent)/i.test(site))
+   after=heading;
+  // An employer brand plus a specific requisition and job-detail text can
+  // corroborate a plain role title even when its brand lacks a "careers" suffix.
+  const englishDetail=englishPostingDetails(hit);
+  if(englishDetail?.title)after=englishDetail.title;
+  if(!after&&!generic&&singlePostingDetail(hit)&&
+   /(?:Job Description|About the Role|岗位职责|职位描述)/i.test(hit.content||'')&&
+   /(?:\bjob id\b|\breq[- ]?\d+\b)/i.test(hit.content||''))
    after=heading;
   if(!after)continue;
   after=after.replace(/^(?:股份有限公司|有限责任公司|有限公司|集团公司|集团|公司)?[\s·|／/，,:：—–-]*/,'')
@@ -361,6 +457,7 @@ export async function reasonAboutJobs(key,resume,hits,limit,{
  const start=Date.now();onProgress('writing');
  const cards=hits.slice(0,32).map(h=>({
   id:h.id,title:h.title,url:h.url,description:(h.content||h.summary||h.snippet).slice(0,800),
+  explicit_work_city:indexedJobWorkCity(h),
   recruitment_source:h.recruitment_source_kind||recruitmentSourceKind(h.url),
   availability:h.availability?.status||'UNKNOWN',
   availability_note:h.availability?.evidence||'投递状态待确认'
