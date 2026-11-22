@@ -265,6 +265,60 @@ export async function recoverSearchGroundedShortlist(key,resume,hits,limit,{
  }catch{return []}
 }
 
+/**
+ * Search-source-only recovery for a shortlist model timeout.
+ * IMPORTANT: these are NOT scored matches. A preview is allowed only when
+ * company, specific role and explicit mainland work city are independently
+ * visible in the Search item, and the URL is an employer-source candidate.
+ * Domestic evidence scoring must still examine the public source separately.
+ */
+export function sourceOnlyJobPreviews(hits,limit=10){
+ const out=[],urls=new Set();
+ for(const hit of hits){
+  if(out.length>=limit)break;
+  if(!isMainlandEmployerJobUrl(hit?.url)||!isRecommendationEligible(hit)||urls.has(hit.url))continue;
+  const site=clean(hit.source,90);
+  const company=site.replace(/(?:官方招聘|招聘官网|招聘平台|招聘网站|人才招聘|招聘|官网|careers?|jobs?)$/gi,'')
+   .replace(/(?:有限责任公司|股份有限公司|有限公司|公司)$/,'').trim();
+  if(company.length<2||/(?:招聘网|求职网|人才市场|招聘平台|岗位合集)/.test(company))continue;
+  const heading=clean(hit.title,150);
+  const workCity=indexedJobWorkCity(hit);
+  if(!workCity||!heading.includes(company))continue;
+  const after=heading.slice(heading.indexOf(company)+company.length)
+   .replace(/^(?:股份有限公司|有限责任公司|有限公司|集团公司|集团|公司)?[\s·|／/，,:：—–-]*/,'')
+   .replace(/(?:202[4-9]\s*年?)|(?:社招|校招|社会招聘|校园招聘|公开招聘|岗位招聘|职位招聘|招聘职位|招聘岗位|立即申请|招聘)/g,' ')
+   .replace(workCity,' ')
+   .replace(/(?:[·|／/，,:：—–-]\s*)+(?:\d+)?$/,'').trim()
+   .replace(/^[\s·|／/，,:：—–-]+|[\s·|／/，,:：—–-]+$/g,'').trim();
+  const title=after.replace(/(?:岗位|职位)$/,'').trim();
+  if(title.length<2||title.length>54||/^(?:岗位|职位|职位列表|招聘详情|点击查看)$/.test(title))continue;
+  if(!corroboratesEmployerPosting({company,title,location:workCity},hit))continue;
+  const reason='这条岗位信息来自真实公开招聘搜索结果，网页显示岗位为“'+title+
+   '”，工作地点为'+workCity+'。本轮岗位个性化分析尚未得到足够的模型回复，暂不提供适配分；请查看原招聘页面核对职位职责、任职要求和是否仍开放申请。';
+  urls.add(hit.url);
+  out.push({
+   id:'search-'+hit.id,company,title,title_zh:title,location:workCity,
+   recruitment_source_kind:recruitmentSourceKind(hit.url),
+   recruitment_source_note:sourceDisplay(recruitmentSourceKind(hit.url)),
+   match_score:null,reference_score:0,score_basis:'',
+   availability_status:hit.availability?.status||'UNKNOWN',
+   availability_note:hit.availability?.evidence||'投递状态待确认',
+   official_url:hit.url,platform:'deepseek-search',
+   source:new URL(hit.url).hostname,source_type:'站外招聘职位',
+   source_status:'SOURCE_SEARCH_PREVIEW',
+   application_status:'NEEDS_OFFICIAL_CONFIRMATION',
+   recommendation_reason:reason,matched:[reason],
+   not_evidenced:[],needs_verification:['需核对岗位详情和个人任职条件。'],
+   requirements_basis:clean(hit.summary||hit.snippet,220),
+   evidence_status:'SEARCH_SNIPPET_ONLY',evidence_reason_status:'FALLBACK',
+   research_anchor:{url:hit.url,title:hit.title,site_name:hit.source,
+    summary:clean(hit.summary,700),snippet:clean(hit.snippet,250),
+    content:clean(hit.content,800)},remote:false
+  });
+ }
+ return out;
+}
+
 export async function reasonAboutJobs(key,resume,hits,limit,{
  fetcher=fetch,signal=null,onProgress=()=>{},onPartial=()=>{},modelTimeoutMs=37000,shortlistOnly=false
 }={}){

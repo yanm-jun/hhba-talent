@@ -6,7 +6,9 @@ const BOARD_HOSTS=[
  'zhipin.com','51job.com','zhaopin.com','liepin.com','lagou.com',
  'shixiseng.com','yingjiesheng.com','jobui.com','kanzhun.com',
  '58.com','ganji.com','maimai.cn','bosszhipin.com','100offer.com',
- 'job5156.com','chinahr.com','qianchengwuyou.com'
+ 'job5156.com','chinahr.com','qianchengwuyou.com',
+ 'indeed.com','glassdoor.com','monster.com','reed.co.uk','totaljobs.com',
+ 'linkedin.com','ziprecruiter.com','simplyhired.com'
 ];
 const ATS_HOSTS=[
  'myworkdayjobs.com','workdayjobs.com','greenhouse.io',
@@ -29,7 +31,7 @@ export function recruitmentSourceKind(url){
  // A generic /jobs or /positions URL is not enough: public boards also use them.
  // Prefer explicit careers-domain branding or dedicated recruitment paths.
  if(/^(careers?|jobs?|recruit(?:ment)?|zhaopin|join|talent|hr|campus)\./.test(host)
-  ||/(?:\/(?:careers?|recruit(?:ment)?|join-us|vacanc(?:y|ies))\/)/i.test(u.pathname))
+  ||/(?:\/(?:careers?|recruit(?:ment)?|join-us|vacanc(?:y|ies)|job-openings?|talent|campus|zhaopin|career-center|recruiting)(?:\/|$))/i.test(u.pathname))
   return 'EMPLOYER_DOMAIN_CANDIDATE';
  return 'UNVERIFIED';
 }

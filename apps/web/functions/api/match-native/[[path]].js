@@ -170,7 +170,9 @@ async function runCandidateResearch(env,key,resume,roleHint,limit,options={}){
   // failure. Never override an intentional Agent conclusion with a fixed
   // keyword fallback that might accidentally recommend weaker sources.
   if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
-   'AI_PROVIDER_RATE_LIMITED','AI_EMPLOYER_JOBS_NOT_FOUND'].includes(error?.code))throw error;
+   'AI_PROVIDER_RATE_LIMITED','AI_EMPLOYER_JOBS_NOT_FOUND',
+   'AI_SEARCH_API_REJECTED','AI_SEARCH_UNAVAILABLE',
+   'AI_SEARCH_RESPONSE_INVALID'].includes(error?.code))throw error;
   console.warn('HHBA_AI_RESEARCH_RECOVERY',JSON.stringify({
    reason:String(error?.code||'AGENT_UNAVAILABLE').slice(0,70),mode:'legacy-fallback'
   }));
@@ -443,7 +445,7 @@ export async function onRequest({request,env}){
      const started=Date.now();
      let phase='preparing';
      const heartbeat=setInterval(()=>{
-      if(!ended)send('progress',{stage:'waiting'});
+      if(!ended)send('heartbeat',{stage:phase,elapsed_ms:Date.now()-started});
      },12000);
      try{
       const checkpoint=await checkpointForCandidate(env,candidate,redacted,options.role_hint);
@@ -451,6 +453,9 @@ export async function onRequest({request,env}){
        options.role_hint,options.limit,{signal:abort.signal,
        checkpoint,autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0',onProgress:stage=>{
         phase=stage;send('progress',{stage});
+       },onActivity:detail=>{
+        if(detail&&typeof detail==='object')
+         send('activity',detail);
        },onPartial:matches=>send('partial',{matches:provisionalPartial(matches)})});
       const verified=await verifiedJdPass(env,result,redacted,options,stage=>send('progress',{stage}));
       const researched=await domesticResearchPass(env,env.HHBA_MATCH_DEEPSEEK_KEY,

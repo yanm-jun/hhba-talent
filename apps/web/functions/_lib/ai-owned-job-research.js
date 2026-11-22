@@ -11,7 +11,7 @@
 import {planAutonomousMainlandSearch,normalizeAutonomousQueries}
  from './autonomous-mainland-search.js';
 import {searchQueries,searchPublicJobs,enrichCandidateDetails,reasonAboutJobs,
- recoverSearchGroundedShortlist,expandDetailedReasons} from './deepseek-search-match.js';
+ recoverSearchGroundedShortlist,expandDetailedReasons,sourceOnlyJobPreviews} from './deepseek-search-match.js';
 import {mergeCandidateHits} from './match-search-growth.js';
 import {isRecommendationEligible} from './match-job-quality.js';
 import {isMainlandEmployerJobUrl,sourceCounts} from './match-employer-source.js';
@@ -105,6 +105,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  const started=Date.now();
  const onProgress=options.onProgress||(()=>{});
  const onPartial=options.onPartial||(()=>{});
+ const onActivity=options.onActivity||(()=>{});
  const windowMs=bounded(options.researchWindowMs,30000,300000,DEFAULT_RESEARCH_WINDOW_MS);
  const deadline=started+windowMs;
  const plan=deps.plan||planAutonomousMainlandSearch;
@@ -118,6 +119,13 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  let checkpointRestored=false,checkpointWrites=0,checkpointErrors=0;
  let rawHits=0,loops=0,decisions=0,decisionFailures=0,reflections=0;
  let exitReason='unknown',shortlistIds=[],agentPlannedQueries=0;
+ let rejectedLinks=0;
+ function activity(stage,message){
+  onActivity({stage,message:String(message).slice(0,160),
+   searches:searchCalls,raw_results:rawHits,candidate_links:pool.length,
+   rejected_links:rejectedLinks,pages_read:pageReads,decisions,
+   search_failures:searchFailures,elapsed_ms:Date.now()-started});
+ }
  const history=[];
  const signal=options.signal;
  const ensureActive=()=>{if(signal?.aborted)throw abortError()};
@@ -145,13 +153,28 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
     searchCalls+=result.diagnostic?.successful_searches??part.length;
     rawHits+=result.diagnostic?.raw_results??result.hits.length;
     searchFailures+=result.diagnostic?.search_failures??0;
+    rejectedLinks+=result.diagnostic?.rejected_links??0;
     completed.push(...result.hits);
-   }catch(e){searchFailures+=part.length;history.push({type:'search_error',code:String(e.code||'UNAVAILABLE')})}
+   }catch(e){
+    searchFailures+=part.length;
+    history.push({type:'search_error',code:String(e.code||'UNAVAILABLE')});
+    // Configuration, balance and rate-limit errors are NOT "no suitable
+    // jobs". The old code swallowed these errors, continued searching and
+    // misleadingly failed after the entire research window.
+    if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+      'AI_PROVIDER_RATE_LIMITED','AI_SEARCH_API_REJECTED',
+      'AI_SEARCH_UNAVAILABLE','AI_SEARCH_RESPONSE_INVALID'].includes(e?.code))
+     throw e;
+   }
   }
   const old=pool.length;
   pool=mergeCandidateHits(pool,completed,240);
   history.push({type:'search',queries:proposed,found:pool.length-old});
   await saveCheckpoint('search');
+  activity('searching',pool.length?
+   '已完成本轮企业招聘检索，正在核对来源并决定下一步。':
+   rawHits?'搜索返回了招聘信息，但尚未找到符合来源要求的企业岗位页；AI 将调整查询。':
+   '本轮暂无可核验的职位链接，AI 将结合结果调整搜索方向。');
   return pool.length-old;
  }
  async function fetchTool(candidateIds){
@@ -179,9 +202,12 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   pageReads+=read;
   history.push({type:'fetch',candidate_ids:candidateIds,read});
   await saveCheckpoint('fetch');
+  activity('researching',read>0?
+   '已读取 '+read+' 份候选岗位资料，正在核对岗位条件。':
+   '本轮职位详情未能读取，继续保留岗位原始搜索证据。');
   return read;
  }
- ensureActive();onProgress('planning');
+ ensureActive();onProgress('planning');activity('planning','AI 正在分析简历，规划职业方向和企业招聘检索。');
  if(options.checkpoint?.load){
   try{
    const restored=await options.checkpoint.load();
@@ -192,6 +218,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
     history.push(...(restored.history||[]).slice(-16));
     checkpointRestored=pool.length>0;
     history.push({type:'resumed',found:pool.length});
+    activity('planning','已恢复此前保存的公开岗位研究记录，正在继续核验。');
    }
   }catch{checkpointErrors++}
  }
@@ -208,24 +235,31 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    queries=searchQueries(resume,roleHint);
    history.push({type:'plan_unavailable',code:String(e.code||'PROVIDER_UNAVAILABLE')});
   }
+  activity('searching','已规划 '+queries.length+' 个公开招聘搜索方向，开始逐批检索。');
   await searchTool(queries);
  }
  // Reserve a meaningful window for evidence-backed selection rather than
  // letting the search loop consume the whole request and return no jobs.
- while(budget()>45000){
+ // Preserve time for evidence-backed shortlist, not a cap on occupations.
+ while(budget()>70000||(!pool.length&&budget()>42000)){
   ensureActive();
   // Every turn feeds observations and the previous action outcomes back to
   // the model. The model, not a fixed search count, chooses the next tool.
   onProgress('planning');
+  activity('planning',pool.length?
+   'AI 正在复核候选岗位，决定继续搜索还是读取详情。':
+   'AI 正在分析缺失的企业招聘来源，准备调整搜索策略。');
   let next;
   try{
    const raw=await decide(key,resume,roleHint,pool,usedQueries,history,deadline,options);
    next=normalizeResearchDecision(raw,pool,usedQueries);
    decisions++;
+   activity('planning','AI 已完成第 '+decisions+' 次研究决策，正在执行所选工具。');
   }catch(e){
    decisionFailures++;
    history.push({type:'reflection_error',code:String(e.code||'INVALID')});
-   exitReason='model_decision_unavailable';break;
+   exitReason='model_decision_unavailable';
+   activity('planning','决策模型本轮未返回有效内容，将尝试使用已找到的真实招聘证据。');break;
   }
   if(next.shortlistIds.length)shortlistIds=next.shortlistIds;
   history.push({type:'reflection',action_count:next.queries.length+next.fetchIds.length,
@@ -235,9 +269,17 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    exitReason='no_safe_new_action';break;
   }
   const before=pool.length;
-  if(next.queries.length){onProgress('searching');await searchTool(next.queries);}
+  if(next.queries.length){
+   onProgress('searching');
+   activity('searching','AI 选择了 '+next.queries.length+' 个新的企业招聘查询，正在继续搜索。');
+   await searchTool(next.queries);
+  }
   let read=0;
-  if(next.fetchIds.length){onProgress('researching');read=await fetchTool(next.fetchIds);}
+  if(next.fetchIds.length){
+   onProgress('researching');
+   activity('researching','AI 选择了 '+next.fetchIds.length+' 个候选页面，准备核对职位详情。');
+   read=await fetchTool(next.fetchIds);
+  }
   reflections++;
   history.push({type:'action_result',new_jobs:pool.length-before,pages_read:read});
   await saveCheckpoint('reflection');
@@ -246,6 +288,9 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  if(exitReason==='unknown')exitReason='runtime_budget';
  ensureActive();
  const eligible=pool.filter(isRecommendationEligible);
+ activity('writing',eligible.length?
+  '已找到 '+eligible.length+' 个来源合规的候选职位，正在对照简历逐条分析。':
+  '尚未获得符合真实来源要求的职位链接，正在汇总本轮研究结果。');
  if(!eligible.length){
   const error=Object.assign(new Error('AI_EMPLOYER_JOBS_NOT_FOUND'),{code:'AI_EMPLOYER_JOBS_NOT_FOUND'});
   throw error;
@@ -264,6 +309,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   ensureActive();
   if(matches.length>=limit||budget()<1500)break;
   onProgress('writing');
+  activity('writing','正在核对本批职位的工作城市、公开要求和简历匹配依据。');
   try{
    const part=await select(key,resume,page,limit-matches.length,{
     ...options,shortlistOnly:true,modelTimeoutMs:Math.min(42000,Math.max(1000,budget())),
@@ -274,19 +320,40 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
     matches.push(job);
     if(matches.length>=limit)break;
    }
-   if(matches.length)onPartial([...matches]);
+   if(matches.length){
+    onPartial([...matches]);
+    activity('writing','已生成 '+matches.length+' 个真实来源候选，正在补充证据。');
+   }
   }catch(e){
    selectionFailures++;
+   if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+    'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED'].includes(e?.code))throw e;
+   activity('writing','本批初选未通过核验，正在尝试从已检索的真实岗位资料恢复。');
    if(e?.code==='AI_MATCH_NO_VALID_JOBS'&&budget()>5000){
-    const rescued=await recover(key,resume,page,limit-matches.length,{
-     ...options,recoveryTimeoutMs:Math.min(23000,budget())});
-    for(const job of rescued){
-     if(isMainlandEmployerJobUrl(job.official_url)&&page.some(hit=>hit.url===job.official_url)&&
-      !matches.some(j=>j.official_url===job.official_url))
-      matches.push(job);
+    try{
+     const rescued=await recover(key,resume,page,limit-matches.length,{
+      ...options,recoveryTimeoutMs:Math.min(23000,budget())});
+     for(const job of rescued){
+      if(isMainlandEmployerJobUrl(job.official_url)&&page.some(hit=>hit.url===job.official_url)&&
+       !matches.some(j=>j.official_url===job.official_url))
+       matches.push(job);
+     }
+     if(matches.length)onPartial([...matches]);
+    }catch(recoveryError){
+     if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+       'AI_PROVIDER_RATE_LIMITED'].includes(recoveryError?.code))throw recoveryError;
     }
-    if(matches.length)onPartial([...matches]);
    }
+  }
+ }
+ // If the model failed, an actual Search result with an explicit employer,
+ // job role and mainland city may still be shown as UNSCORED preview.
+ // This is not a fabricated recommendation or a fake match score.
+ if(!matches.length&&selectionFailures>0){
+  const previews=sourceOnlyJobPreviews(eligible,limit);
+  if(previews.length){
+   matches=previews;onPartial([...matches]);
+   activity('writing','模型未完成个性化初选；已恢复 '+matches.length+' 条可追溯的企业岗位候选，正在继续核实证据。');
   }
  }
  if(!matches.length){
@@ -296,6 +363,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  // source-evidence layer independently validates and rescores afterwards.
  let detail={matches,expanded:0,detail_failures:0,detail_ms:0};
  if(options.expandDetailed!==false&&budget()>4000){
+  activity('scoring','已发现 '+matches.length+' 个真实岗位来源，正在生成更详细的推荐依据。');
   try{detail=await expand(key,resume,matches,pool,{
    ...options,detailTimeoutMs:Math.min(45000,budget()),onPartial,onProgress});
   }catch{detail.detail_failures=1}
@@ -314,6 +382,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    checkpoint_errors:checkpointErrors,
    source_before:sourceCounts(result),source_after:sourceCounts(result),
    search_failures:searchFailures,selection_failures:selectionFailures,
+   rejected_links:rejectedLinks,
    details_expanded:detail.expanded,details_failed_batches:detail.detail_failures,
    third_party_results_shown:0}};
 }

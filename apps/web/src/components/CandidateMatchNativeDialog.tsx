@@ -1,7 +1,7 @@
 import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,MapPin,Wallet,X,Search,Sparkles,Check,LoaderCircle} from 'lucide-react';
-import type {MatchResponse,NativeMatchProgress} from '../services/resumeMatch';
+import type {MatchResponse,NativeMatchProgress,NativeMatchActivity} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 // Load Siri/Word only after a candidate explicitly chooses a job, so the
@@ -25,10 +25,12 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 }
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,pending=false,progressStage='preparing',notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
+export function CandidateMatchNativeDialog({result,onClose,pending=false,progressStage='preparing',progressActivity=null,elapsedSeconds=0,activityIdleSeconds=0,notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'|'profile'>>;
- onClose:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;notice?:string;resumeStorage?:ResumeStorageAction;
+ onClose:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
+ progressActivity?:NativeMatchActivity|null;elapsedSeconds?:number;activityIdleSeconds?:number;
+ notice?:string;resumeStorage?:ResumeStorageAction;
  sourceText?:string;sourceResume?:PrivateResume;accountScope?:string;
  // Match-history handoff enters the same existing editor without rerunning a search.
  initialOptimizedJobId?:string;
@@ -46,8 +48,24 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
   {label:'生成评分和推荐',detail:'逐岗位比较真实经历并提出投递建议'}
  ];
  const progressStep=progressStage==='preparing'?0:
-  ['connected','searching','reading','writing'].includes(progressStage)?1:
-  progressStage==='researching'?2:progressStage==='scoring'?3:1;
+  ['connected','searching','planning'].includes(progressStage)?1:
+  ['reading','researching'].includes(progressStage)?2:
+  ['writing','scoring'].includes(progressStage)?3:1;
+ const liveAction=progressActivity?.message||
+  (progressStage==='preparing'?'正在准备简历分析材料并连接智能匹配服务。':
+   progressStage==='planning'?'AI 正在制定或调整搜索计划。':
+   progressStage==='searching'?'正在等待 DeepSeek Search 返回公开招聘网页。':
+   progressStage==='reading'?'正在读取已发现的职位详情。':
+   progressStage==='researching'?'正在核对岗位来源及任职要求。':
+   progressStage==='writing'?'正在等待模型生成初步推荐名单。':
+   progressStage==='scoring'?'正在评估简历匹配度并整理依据。':
+   '正在等待后台返回新的研究进展。');
+ const counters=[
+  typeof progressActivity?.searches==='number'?'已搜索 '+progressActivity.searches+' 次':null,
+  typeof progressActivity?.raw_results==='number'?'收到 '+progressActivity.raw_results+' 条网页结果':null,
+  typeof progressActivity?.candidate_links==='number'?'来源候选 '+progressActivity.candidate_links+' 条':null,
+  typeof progressActivity?.pages_read==='number'?'读取详情 '+progressActivity.pages_read+' 份':null
+ ].filter((value):value is string=>Boolean(value));
  const matchListScroll=useRef(0);
  const activeJob=result.matches.find(job=>job.id===optimizedJobId);
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
@@ -130,8 +148,17 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
        <span className="hhba-match-live-sparkle"><Sparkles size={20} aria-hidden="true"/></span>
        <div><h2 id={result.matches.length?undefined:'hhba-native-title'}>
         {result.matches.length?'已发现 '+result.matches.length+' 个候选岗位':'正在为你寻找合适的工作机会'}
-       </h2><p>搜索、岗位研究和推荐分析都在这个窗口进行，结果会陆续出现。</p></div>
+       </h2><p>AI 自主搜索、阅读企业岗位并逐条分析；以下展示后台实际反馈。</p></div>
       </div>
+      <div className="hhba-match-live-action">
+       <span className="hhba-match-live-pulse" aria-hidden="true"/>
+       <strong>{liveAction}</strong>
+       <span className="hhba-match-live-clock">已运行 {Math.floor(elapsedSeconds/60)>0?Math.floor(elapsedSeconds/60)+'分':''}{elapsedSeconds%60}秒</span>
+      </div>
+      {counters.length>0&&<p className="hhba-match-live-facts">{counters.join(' · ')}</p>}
+      {activityIdleSeconds>=22&&<p className="hhba-match-live-wait">
+       已有 {activityIdleSeconds} 秒没有收到新的研究动作；可能仍在等待模型或网络响应。如果当前搜索失败，系统会明确提示原因。
+      </p>}
       <div className="hhba-match-live-rail" aria-hidden="true"><span/></div>
       <ol className="hhba-match-live-steps">
        {steps.map((step,i)=><li key={step.label} className={i<progressStep?'is-done':i===progressStep?'is-active':'is-upcoming'}>
@@ -141,7 +168,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
         <div><strong>{step.label}</strong><small>{step.detail}</small></div>
        </li>)}
       </ol>
-      <p className="hhba-match-live-footnote">进度根据后台实际阶段变化，不伪造完成百分比；以企业官方公告为准。</p>
+      <p className="hhba-match-live-footnote">显示的搜索及岗位数量来自后台实际记录；动态进度条不代表已完成百分比。最终以企业招聘公告为准。</p>
      </section>}
      {pending&&result.matches.length===0?null:activeJob&&parsedProfile?
       <section className="hhba-match-workspace" aria-label="岗位专属简历优化">
