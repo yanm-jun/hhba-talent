@@ -44,7 +44,9 @@ export type MatchedJob = {
 export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
   matched_official_jobs:number;source:string;scoring:string;privacy:string;disclaimer:string;
-  native_search?:{model:string;searches:number;page_reads:number;provider_items:number;visible_jobs:number;discarded:number;elapsed_ms:number};
+  native_search?:{model:string;searches:number;page_reads:number;provider_items:number;visible_jobs:number;discarded:number;elapsed_ms:number;
+   candidate_links?:number;explicit_city_sources?:number;selection_rounds?:number;
+   underfilled_rechecks?:number;unscored_source_previews?:number};
   history_id?:string|null;
   history_status?:'SAVED'|'EMPTY'|'UNAVAILABLE';
   new_job_count?:number;
