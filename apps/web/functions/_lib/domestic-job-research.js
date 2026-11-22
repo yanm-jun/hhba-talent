@@ -168,7 +168,7 @@ async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,m
   const sections=[
    ['相关经历',row.resume_evidence],['岗位关联',row.role_relation],
    ['待核实条件',row.unknowns],['投递建议',row.next_step]
-  ].map(([label,value])=>({label,value:clean(value,240)}));
+  ].map(([label,value])=>({label,value:clean(value,480)}));
   const complete=sections.every(x=>x.value.length>=16);
   const reason=complete?sections.map(x=>x.label+'：'+x.value).join('\n'):
    job.recommendation_reason;
