@@ -171,8 +171,8 @@ test('frontend fetches one native SSE stream and maps stages without restarting 
  assert.match(page,/setStage/);
  const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(page,/progressStage=\{stage\}/);
- assert.match(dialog,/搜索真实岗位/);
- assert.match(dialog,/hhba-match-live-progress/);
+ assert.match(dialog,/搜索企业岗位/);
+ assert.match(dialog,/hhba-research-journal/);
 });
 
 
@@ -275,7 +275,8 @@ test('frontend shows partial results without pretending network completion',asyn
  assert.match(svc,/onPartial\?\./);
  assert.match(page,/result\|\|partialJobs\.length>0/);
  assert.match(page,/setPartialJobs/);
- assert.match(dialog,/pending\?'（继续搜索中）'/);
+ assert.match(dialog,/pending\?null:activeJob/);
+ assert.match(dialog,/研究完成后将统一展示报告/);
 });
 
 
