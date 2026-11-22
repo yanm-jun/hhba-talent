@@ -274,6 +274,8 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   }catch{checkpointErrors++}
  }
  if(!checkpointRestored){
+  const early=searchTool(searchQueries(resume,roleHint),{reserveMs:93000}).then(()=>null,e=>e);
+  activity('searching','已同步开启首轮岗位来源搜索，AI 继续自主规划相关职业方向。');
   let queries;
   try{
    const initial=await plan(key,resume,roleHint,{...options,
@@ -289,6 +291,9 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    queries=searchQueries(resume,roleHint);
    history.push({type:'plan_unavailable',code:String(e.code||'PROVIDER_UNAVAILABLE')});
   }
+  const earlyError=await early;
+  if(earlyError&&['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+   'AI_PROVIDER_RATE_LIMITED','AI_SEARCH_API_REJECTED'].includes(earlyError?.code))throw earlyError;
   activity('searching','已规划 '+queries.length+' 个公开招聘搜索方向，开始逐批检索。');
   // Initial broad discovery cannot spend the full service window before
   // the Agent has a chance to correct source quality and choose candidates.
