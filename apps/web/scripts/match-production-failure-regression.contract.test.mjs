@@ -9,6 +9,7 @@ import {classifyJobAvailability,isRecommendationEligible}
  from '../functions/_lib/match-job-quality.js';
 import {runAgentOwnedMainlandMatch,targetedEmployerRecoveryQueries} from '../functions/_lib/ai-owned-job-research.js';
 import {sanitizePublicResearchCheckpoint} from '../functions/_lib/ai-research-checkpoint.js';
+import {mergeCandidateHits} from '../functions/_lib/match-search-growth.js';
 
 // Public URL/title structures reconstructed from the failing 2026-11-22
 // production research checkpoint. No actual resume, phone, identity or key.
@@ -224,4 +225,56 @@ test('three cached job sources cannot finish with zero fresh Search when the sho
  assert.ok(seen.includes('新增跨行业 运营督导 企业官网 社招'));
  assert.equal(r.diagnostic.provider_items,13,'fresh search metrics cannot be zero');
  assert.ok(r.diagnostic.candidate_links>=4);
+});
+
+test('one empty successful query cannot hide concurrent DeepSeek auth or quota failure',async()=>{
+ const {searchPublicJobs}=await import('../functions/_lib/deepseek-search-match.js');
+ const fetcher=async(url,{body})=>{
+  const query=JSON.parse(body).query;
+  if(query.includes('认证失败'))return new Response('{"error":"invalid key"}',{status:401});
+  return new Response(JSON.stringify({results:[]}),{status:200});
+ };
+ await assert.rejects(()=>searchPublicJobs('synthetic','synthetic','',{
+  queriesOverride:['认证失败的招聘查询','返回空结果的招聘查询'],
+  fetcher,allowEmpty:true
+ }),{code:'AI_PROVIDER_KEY_REJECTED'});
+});
+test('duplicate official source refreshes search evidence without changing stable ID',()=>{
+ const previous={...employer,id:'j1',summary:'较旧的公开搜索信息',
+  fetch_attempted:true,availability:{status:'UNKNOWN'}};
+ const newer={...employer,id:'j9',summary:employer.summary,
+  fetch_attempted:false,availability:{status:'UNKNOWN'}};
+ const merged=mergeCandidateHits([previous],[newer],30);
+ assert.equal(merged.length,1);
+ assert.equal(merged[0].id,'j1');
+ assert.equal(merged[0].summary,newer.summary);
+ assert.equal(merged[0].fetch_attempted,false);
+ const closed=mergeCandidateHits([previous],[{...newer,
+  availability:{status:'POSSIBLY_CLOSED'}}],30);
+ assert.equal(closed[0].availability.status,'POSSIBLY_CLOSED');
+});
+test('Agent cannot finish after a single employer role without trying a bounded final expansion',async()=>{
+ const newRole={...employer,id:'j77',
+  url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId=70000077',
+  summary:'区域运营专员社招-正式 更新时间：2026/11/10 工作地点：上海市 岗位职责：门店运营和区域协调。',
+  snippet:'区域运营专员社招-正式 工作地点：上海市'};
+ const queries=[];
+ const out=await runAgentOwnedMainlandMatch('synthetic','测试简历：有区域门店运营经验','',10,
+  {expandDetailed:false},{
+   plan:async()=>({queries:['区域督导 企业招聘']}),
+   search:async(key,resume,hint,options)=>{
+    queries.push(...options.queriesOverride);
+    if(options.queriesOverride.some(q=>q.includes('在招岗位')||q.includes('官方招聘')))
+     return {hits:[newRole],diagnostic:{successful_searches:1,raw_results:10}};
+    return {hits:[employer],diagnostic:{successful_searches:1,raw_results:12}};
+   },
+   decide:async()=>({actions:[{type:'finish'}]}),
+   select:async()=>{const e=new Error('AI_MATCH_NO_VALID_JOBS');e.code=e.message;throw e;},
+   recover:async()=>[]
+  });
+ assert.ok(out.diagnostic.underfilled_expansion_queries>0);
+ assert.ok(out.diagnostic.candidate_links>=2);
+ assert.ok(out.diagnostic.provider_items>=12);
+ assert.ok(queries.some(q=>q.includes('在招岗位')||q.includes('官方招聘')));
+ assert.ok(out.matches.every(job=>job.official_url.includes('zhaopin.meituan.com')));
 });
