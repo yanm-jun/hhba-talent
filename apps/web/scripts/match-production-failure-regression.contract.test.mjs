@@ -197,3 +197,31 @@ test('zero official sources must trigger bounded employer-domain discovery befor
  assert.equal(result.matches[0].match_score,null);
  assert.equal(result.diagnostic.third_party_results_shown,0);
 });
+
+test('three cached job sources cannot finish with zero fresh Search when the shortlist is sparse',async()=>{
+ const seen=[];
+ const cached={pool:[employer,{...employer,id:'j14',
+   url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId=300001'},
+   {...employer,id:'j15',
+    url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId=300002'}],
+  usedQueries:['原有搜索方向 企业招聘'],history:[{type:'search',found:3}],shortlistIds:[]};
+ const added={...employer,id:'j16',title:'区域运营专员',
+  url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId=300003',
+  summary:'美团招聘区域运营专员社招-正式。工作地点：北京市。岗位职责：门店巡查、区域运营和渠道协调。'};
+ const r=await runAgentOwnedMainlandMatch('synthetic','虚构测试简历：负责门店运营','',10,{
+  expandDetailed:false,checkpoint:{load:async()=>cached,save:async()=>true}
+ },{
+  plan:async()=>({queries:['新增跨行业 运营督导 企业官网 社招']}),
+  search:async(k,cv,hint,opts)=>{
+   seen.push(...opts.queriesOverride);
+   return {hits:[added],diagnostic:{successful_searches:1,raw_results:13}};
+  },
+  decide:async()=>({actions:[{type:'finish'}]}),
+  select:async()=>{const err=new Error('AI_MATCH_NO_VALID_JOBS');err.code=err.message;throw err;},
+  recover:async()=>[]
+ });
+ assert.equal(r.diagnostic.checkpoint_restored,true);
+ assert.ok(seen.includes('新增跨行业 运营督导 企业官网 社招'));
+ assert.equal(r.diagnostic.provider_items,13,'fresh search metrics cannot be zero');
+ assert.ok(r.diagnostic.candidate_links>=4);
+});
