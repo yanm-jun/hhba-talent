@@ -153,10 +153,10 @@ async function verifiedJdPass(env,result,resume,options,progress=()=>{}){
  }
 }
 
-async function domesticResearchPass(env,key,result,resume,options,progress=()=>{}){
+async function domesticResearchPass(env,key,result,resume,options,progress=()=>{},signal=null){
  progress('reading');
  const checked=await researchDomesticJobEvidence(key,resume,result.matches,{
-  ...options,enabled:env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'
+  ...options,signal,enabled:env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'
  });
  return {...result,matches:checked.matches,
   diagnostic:{...result.diagnostic,domestic_evidence:checked.diagnostic}};
@@ -397,7 +397,7 @@ export async function onRequest({request,env}){
        },onPartial:matches=>send('partial',{matches:provisionalPartial(matches)})});
       const verified=await verifiedJdPass(env,result,redacted,options,stage=>send('progress',{stage}));
       const researched=await domesticResearchPass(env,env.HHBA_MATCH_DEEPSEEK_KEY,
-       verified,redacted,options,stage=>send('progress',{stage}));
+       verified,redacted,options,stage=>send('progress',{stage}),abort.signal);
       send('partial',{matches:researched.matches});
       console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(researched.diagnostic));
       send('complete',await withSavedHistory(env,candidate,input,researched));
