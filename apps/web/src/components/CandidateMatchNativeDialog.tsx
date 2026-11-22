@@ -49,7 +49,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
    matched:job.matched||[],not_evidenced:job.not_evidenced||[],
    needs_verification:job.needs_verification||[],
    requirements_basis:job.requirements_basis||job.score_basis||'',
-   jd_version_id:job.jd_version_id
+   jd_version_id:job.jd_version_id,jd_sha256:job.jd_sha256
   };
  }
  // The result list is never searched again on return. Preserve scroll and
