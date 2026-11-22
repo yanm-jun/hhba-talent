@@ -39,8 +39,23 @@ export function recruitmentSourceKind(url){
 export function isEmployerDirectedSource(kind){
  return kind==='EMPLOYER_DOMAIN_CANDIDATE'||kind==='EMPLOYER_ATS';
 }
+// The mainland candidate workflow does not use foreign-hosted ATS providers.
+// Do not reclassify these hosts as "employer domains" just because a path says /jobs.
+const FOREIGN_HOSTED_ATS=[
+ 'greenhouse.io','lever.co','ashbyhq.com','myworkdayjobs.com','workdayjobs.com',
+ 'smartrecruiters.com','taleo.net','icims.com','recruitee.com',
+ 'successfactors.com','oraclecloud.com','jobvite.com','breezy.hr','teamtailor.com'
+];
+export function isMainlandEmployerJobUrl(raw){
+ try{
+  const u=new URL(raw);
+  if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash)return false;
+  if(FOREIGN_HOSTED_ATS.some(d=>sameOrChild(u.hostname.toLowerCase(),d)))return false;
+  return recruitmentSourceKind(u.href)==='EMPLOYER_DOMAIN_CANDIDATE';
+ }catch{return false;}
+}
 export function allowedEmployerJobLink(raw){
- return isEmployerDirectedSource(recruitmentSourceKind(raw));
+ return isMainlandEmployerJobUrl(raw);
 }
 export function sourcePriority(kind){
  return kind==='EMPLOYER_DOMAIN_CANDIDATE'?0:kind==='EMPLOYER_ATS'?1:
