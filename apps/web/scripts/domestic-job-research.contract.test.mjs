@@ -100,10 +100,10 @@ test('verified local employer JD keeps canonical hash/score and never triggers p
  assert.equal(out.matches[0].jd_version_id,pinned.jd_version_id);
 });
 test('original matching/history/Word path all use researched source evidence',()=>{
- const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
- const history=readFileSync(new URL('../functions/_lib/match-history.js',import.meta.url),'utf8');
- const word=readFileSync(new URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
- const dialog=readFileSync(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
+ const route=readFileSync(new globalThis.URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
+ const history=readFileSync(new globalThis.URL('../functions/_lib/match-history.js',import.meta.url),'utf8');
+ const word=readFileSync(new globalThis.URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
+ const dialog=readFileSync(new globalThis.URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(route,/researchDomesticJobEvidence/);
  assert.match(route,/domesticOnly:true/);
  assert.match(route,/provisionalPartial\(matches\)/);
