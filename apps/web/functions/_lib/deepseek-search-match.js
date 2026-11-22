@@ -284,9 +284,24 @@ export function sourceOnlyJobPreviews(hits,limit=10){
   if(company.length<2||/(?:招聘网|求职网|人才市场|招聘平台|岗位合集)/.test(company))continue;
   const heading=clean(hit.title,150);
   const workCity=indexedJobWorkCity(hit);
-  if(!workCity||!heading.includes(company))continue;
-  const after=heading.slice(heading.indexOf(company)+company.length)
-   .replace(/^(?:股份有限公司|有限责任公司|有限公司|集团公司|集团|公司)?[\s·|／/，,:：—–-]*/,'')
+  if(!workCity)continue;
+  // Some *actual employer* search results have the generic HTML <title>
+  // "职位详情"; the indexed description contains the REAL specific role.
+  // Do not mistake a generic page title for proof that no role exists.
+  const generic=/^(?:职位详情|岗位详情|招聘详情|职位信息|岗位信息|job details?|position details?)$/i.test(heading);
+  const summary=clean(hit.summary||hit.snippet,280).replace(/^#+\s*/,'');
+  let after=heading.includes(company)?
+   heading.slice(heading.indexOf(company)+company.length):'';
+  if(!after&&generic){
+   const explicit=summary.match(/^(.{2,50}?)(?:社招|校招|社会招聘|校园招聘)(?:[\s\-—·]|$)/);
+   if(explicit)after=explicit[1];
+  }
+  // Many employer job detail pages use just the position as <title>.
+  // The source must explicitly label itself a company's recruitment site.
+  if(!after&&!generic&&/(?:官方招聘|招聘官网|人才招聘|招聘|careers?|talent)/i.test(site))
+   after=heading;
+  if(!after)continue;
+  after=after.replace(/^(?:股份有限公司|有限责任公司|有限公司|集团公司|集团|公司)?[\s·|／/，,:：—–-]*/,'')
    .replace(/(?:202[4-9]\s*年?)|(?:社招|校招|社会招聘|校园招聘|公开招聘|岗位招聘|职位招聘|招聘职位|招聘岗位|立即申请|招聘)/g,' ')
    .replace(workCity,' ')
    .replace(/(?:[·|／/，,:：—–-]\s*)+(?:\d+)?$/,'').trim()
