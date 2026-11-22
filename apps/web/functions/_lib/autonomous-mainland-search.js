@@ -21,7 +21,10 @@ export function normalizeAutonomousQueries(values,used=[]){
   const key=query.toLowerCase();
   // Search API's query field supports short human-readable searches. These
   // checks protect contacts and keys, not the AI's choice of job direction.
-  if(query.length<5||query.length>128||pii.test(query)||unsafe.test(query)||known.has(key))continue;
+  // Short Chinese job titles such as 区域督导 are meaningful search queries.
+  // Reject only empty or extremely broad one/two-character phrases, not all
+  // real four-character occupations.
+  if(query.length<3||query.length>128||pii.test(query)||unsafe.test(query)||known.has(key))continue;
   known.add(key);
   output.push(query);
  }

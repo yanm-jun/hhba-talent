@@ -5,7 +5,7 @@
  * A keyed fingerprint prevents raw résumé hashes becoming a dictionary leak.
  * Checkpoints expire in 24 h and are deleted opportunistically on write.
  */
-import {isMainlandEmployerJobUrl} from './match-employer-source.js';
+import {isDirectEmployerSourceHit} from './match-employer-source.js';
 const MAX_JSON=125000;
 const removePII=value=>String(value||'')
  .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,'[邮箱]')
@@ -15,7 +15,7 @@ const removePII=value=>String(value||'')
  .replace(/[\u0000-\u001f]/g,' ').trim();
 const text=(value,length)=>removePII(value).slice(0,length);
 const publicHit=source=>{
- if(!source||!isMainlandEmployerJobUrl(source.url))return null;
+ if(!isDirectEmployerSourceHit(source))return null;
  const availability=['UNKNOWN','OPEN_LISTED','POSSIBLY_CLOSED','CLOSED_LISTED']
   .includes(source.availability?.status)?source.availability.status:'UNKNOWN';
  return {id:text(source.id,48),url:source.url,title:text(source.title,150),

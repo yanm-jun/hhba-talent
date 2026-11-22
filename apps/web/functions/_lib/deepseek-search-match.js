@@ -7,7 +7,7 @@ import {isMainlandJobLocation,findMainlandCity} from './mainland-job-location.js
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from './match-job-quality.js';
 import {supplementalQueries,mergeCandidateHits,combineRecommended} from './match-search-growth.js';
 import {planAutonomousMainlandSearch,normalizeAutonomousQueries} from './autonomous-mainland-search.js';
-import {recruitmentSourceKind,isEmployerDirectedSource,isMainlandEmployerJobUrl,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting,sourceCounts} from './match-employer-source.js';
+import {recruitmentSourceKind,isEmployerDirectedSource,isMainlandEmployerJobUrl,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting,sourceCounts,isDirectEmployerSourceHit} from './match-employer-source.js';
 
 const BASE='https://api.deepseek.com';
 const foreign=/(?:香港|澳门|澳門|台湾|臺灣|日本|东京|大阪|新加坡|美国|英国|越南|海外|境外|驻外|overseas|hong kong|tokyo|singapore|remote overseas)/i;
@@ -45,9 +45,10 @@ export function normalizeHits(searchResponses,max=28){
    const key=url.replace(/[?&](?:utm_[^=&]+|from|source)=[^&]*/gi,'').replace(/[?&]$/,'');
    const prev=byUrl.get(key);
    const row={id:'j'+(byUrl.size+1),title,url,summary,snippet,
-    source:clean(hit?.site_name,80),date:hit?.date||null,content:'',
+    source:clean(hit?.site_name||hit?.source,80),date:hit?.date||null,content:'',
     recruitment_source_kind:recruitmentSourceKind(url),
     availability:classifyJobAvailability({summary,snippet})};
+   if(!isDirectEmployerSourceHit(row))continue;
    if(!prev||summary.length>prev.summary.length)byUrl.set(key,{...row,id:prev?.id||row.id});
   }
  }
@@ -90,6 +91,13 @@ export async function searchPublicJobs(key,text,roleHint,{
   }catch(e){errors.push(e.code||'AI_PROVIDER_UNAVAILABLE');return {results:[]};}
  }));
  const hits=normalizeHits(responses,maxHits);
+ // The Agent may use rejected THIRD-PARTY job titles only as research clues:
+ // find the named employer's OWN hiring page, never use the original URL.
+ // No raw snippets, phone numbers, or CV text cross this boundary.
+ const rejected_title_hints=[...new Set(responses.flatMap(r=>r.results||[])
+  .filter(h=>!isDirectEmployerSourceHit({url:h?.url,source:h?.site_name||h?.source}))
+  .map(h=>clean(h?.title,90))
+  .filter(t=>t.length>=4&&t.length<=90))].slice(0,8);
  if(!hits.length&&(!allowEmpty||errors.length===queries.length))throw codeError(errors.includes('AI_PROVIDER_KEY_REJECTED')?'AI_PROVIDER_KEY_REJECTED':
   errors.includes('AI_PROVIDER_BALANCE_INSUFFICIENT')?'AI_PROVIDER_BALANCE_INSUFFICIENT':
   errors.includes('AI_PROVIDER_RATE_LIMITED')?'AI_PROVIDER_RATE_LIMITED':
@@ -98,7 +106,8 @@ export async function searchPublicJobs(key,text,roleHint,{
  return {hits,diagnostic:{search_ms:Date.now()-start,queries:queries.length,
   successful_searches:queries.length-errors.length,raw_results:responses.reduce((a,x)=>a+x.results.length,0),
   candidate_links:hits.length,search_failures:errors.length,
-  rejected_links:responses.reduce((a,x)=>a+x.results.length,0)-hits.length}};
+  rejected_links:responses.reduce((a,x)=>a+x.results.length,0)-hits.length,
+  rejected_title_hints}};
 }
 export async function enrichCandidateDetails(key,hits,{
  fetcher=fetch,signal=null,onProgress=()=>{},maxFetch=8,fetchTimeoutMs=3200
@@ -159,7 +168,7 @@ export function indexedJobWorkCity(hit){
  const body=[hit?.summary,hit?.snippet,hit?.content].filter(Boolean).join(' ');
  const match=body.match(/(?:工作地点|工作城市|办公地点|办公城市|岗位地点|岗位城市)[：:\s]{0,4}([^，。；;\n]{2,40})/i);
  if(!match)return null;
- const candidate=String(match[1]).split(/(?:\s{2,}|要求|待遇|学历|职责|任职|岗位|职位)/)[0].trim();
+ const candidate=String(match[1]).split(/(?:\s{2,}|要求|待遇|学历|职责|任职|岗位|职位|部门|工作经验|更新时间|招聘人数)/)[0].trim();
  return isMainlandJobLocation(candidate)?candidate:
   (findMainlandCity(candidate)&&!/(?:香港|澳门|台湾|海外|境外|国外)/.test(candidate)?
    findMainlandCity(candidate):null);
@@ -175,10 +184,12 @@ export function selectedJobs(text,hits,limit=10){
   const reason=clean(row.reason,1400),
    title=clean(row.title,110),company=clean(row.company,100);
   if(!isMainlandJobLocation(location)||!reason||!company||!title||foreign.test(title))continue;
-  if(!isRecommendationEligible(evidence))continue;
+  if(!isRecommendationEligible(evidence)||evidence.content&&
+   !isRecommendationEligible({...evidence,availability:classifyJobAvailability(
+    {content:evidence.content},{fetched:true})}))continue;
   // Defense in depth: never let model output or an alternate code path leak a job-board link.
   const verifiedKind=recruitmentSourceKind(evidence.url);
-  if(!isMainlandEmployerJobUrl(evidence.url))continue;
+  if(!isDirectEmployerSourceHit(evidence))continue;
   const signature=(company+'|'+title).toLowerCase().replace(/\s/g,'');
   if(seen.has(signature)||seen.has(evidence.url))continue;
   seen.add(signature);seen.add(evidence.url);
@@ -276,16 +287,34 @@ export function sourceOnlyJobPreviews(hits,limit=10){
  const out=[],urls=new Set();
  for(const hit of hits){
   if(out.length>=limit)break;
-  if(!isMainlandEmployerJobUrl(hit?.url)||!isRecommendationEligible(hit)||urls.has(hit.url))continue;
+  if(!isDirectEmployerSourceHit(hit)||!isRecommendationEligible(hit)||urls.has(hit.url))continue;
+  // Check the fetched text itself, not only potentially stale Search metadata.
+  if(hit.content&&!isRecommendationEligible({...hit,availability:
+   classifyJobAvailability({content:hit.content},{fetched:true})}))continue;
   const site=clean(hit.source,90);
   const company=site.replace(/(?:官方招聘|招聘官网|招聘平台|招聘网站|人才招聘|招聘|官网|careers?|jobs?)$/gi,'')
    .replace(/(?:有限责任公司|股份有限公司|有限公司|公司)$/,'').trim();
   if(company.length<2||/(?:招聘网|求职网|人才市场|招聘平台|岗位合集)/.test(company))continue;
   const heading=clean(hit.title,150);
   const workCity=indexedJobWorkCity(hit);
-  if(!workCity||!heading.includes(company))continue;
-  const after=heading.slice(heading.indexOf(company)+company.length)
-   .replace(/^(?:股份有限公司|有限责任公司|有限公司|集团公司|集团|公司)?[\s·|／/，,:：—–-]*/,'')
+  if(!workCity)continue;
+  // Some *actual employer* search results have the generic HTML <title>
+  // "职位详情"; the indexed description contains the REAL specific role.
+  // Do not mistake a generic page title for proof that no role exists.
+  const generic=/^(?:职位详情|岗位详情|招聘详情|职位信息|岗位信息|job details?|position details?)$/i.test(heading);
+  const summary=clean(hit.summary||hit.snippet,280).replace(/^#+\s*/,'');
+  let after=heading.includes(company)?
+   heading.slice(heading.indexOf(company)+company.length):'';
+  if(!after&&generic){
+   const explicit=summary.match(/^(.{2,50}?)(?:社招|校招|社会招聘|校园招聘)(?:[\s\-—·]|$)/);
+   if(explicit)after=explicit[1];
+  }
+  // Many employer job detail pages use just the position as <title>.
+  // The source must explicitly label itself a company's recruitment site.
+  if(!after&&!generic&&/(?:官方招聘|招聘官网|人才招聘|招聘|careers?|talent)/i.test(site))
+   after=heading;
+  if(!after)continue;
+  after=after.replace(/^(?:股份有限公司|有限责任公司|有限公司|集团公司|集团|公司)?[\s·|／/，,:：—–-]*/,'')
    .replace(/(?:202[4-9]\s*年?)|(?:社招|校招|社会招聘|校园招聘|公开招聘|岗位招聘|职位招聘|招聘职位|招聘岗位|立即申请|招聘)/g,' ')
    .replace(workCity,' ')
    .replace(/(?:[·|／/，,:：—–-]\s*)+(?:\d+)?$/,'').trim()

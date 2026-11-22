@@ -8,7 +8,9 @@ const BOARD_HOSTS=[
  '58.com','ganji.com','maimai.cn','bosszhipin.com','100offer.com',
  'job5156.com','chinahr.com','qianchengwuyou.com',
  'indeed.com','glassdoor.com','monster.com','reed.co.uk','totaljobs.com',
- 'linkedin.com','ziprecruiter.com','simplyhired.com'
+ 'linkedin.com','ziprecruiter.com','simplyhired.com',
+ // Confirmed third-party platforms found in a failed live mainland search.
+ 'niuqizp.com','tzrl.com','0550.com','veryeast.cn','cadcc.com.cn'
 ];
 const ATS_HOSTS=[
  'myworkdayjobs.com','workdayjobs.com','greenhouse.io',
@@ -21,12 +23,16 @@ const compact=s=>String(s||'').replace(/[\s《》【】[\]（）()·•:：—�
 const companyCore=s=>compact(s).replace(/^(?:北京市?|上海市?|深圳市?|广州市?|杭州市?|成都市?)/,'')
  .replace(/(?:股份)?(?:有限责任公司|有限公司|股份有限公司|集团公司|集团|公司)$/,'');
 const titleCore=s=>compact(s).replace(/(?:社会招聘|校园招聘|社招|校招|急聘|岗位招聘|职位招聘|招聘岗位|招聘职位|实习生|招聘)$/,'');
-const basicLocation=s=>compact(s).replace(/(市|区|县|省|中国大陆|中国内地)/g,'').slice(0,6);
+const basicLocation=s=>compact(String(s||'').split(/[、，,|/；;]/)[0]).replace(/(市|区|县|省|中国大陆|中国内地)/g,'').slice(0,6);
 export function recruitmentSourceKind(url){
  let u;
  try{u=new URL(url)}catch{return 'UNVERIFIED';}
  const host=u.hostname.toLowerCase();
  if(BOARD_HOSTS.some(d=>sameOrChild(host,d)))return 'THIRD_PARTY_BOARD';
+ // University employment portals and venture-portfolio boards repost other
+ // organizations' roles; a "jobs." hostname is not employer authorization.
+ if(host.endsWith('.edu.cn')||/(?:^|\/)companies\/[^/]+\/jobs(?:\/|$)/i.test(u.pathname))
+  return 'THIRD_PARTY_BOARD';
  if(ATS_HOSTS.some(d=>sameOrChild(host,d)))return 'EMPLOYER_ATS';
  // A generic /jobs or /positions URL is not enough: public boards also use them.
  // Prefer explicit careers-domain branding or dedicated recruitment paths.
@@ -35,6 +41,22 @@ export function recruitmentSourceKind(url){
   return 'EMPLOYER_DOMAIN_CANDIDATE';
  return 'UNVERIFIED';
 }
+/**
+ * A recruiting domain-shaped URL is only a candidate. The provider's site
+ * name can explicitly reveal that it is a UNIVERSITY/ASSOCIATION/JOB BOARD.
+ * Filter those before they enter the model pool, not after burning the entire
+ * 150-second window trying to turn them into employer-owned pages.
+ */
+export function isDirectEmployerSourceHit(hit){
+ if(!hit||!isMainlandEmployerJobUrl(hit.url))return false;
+ const name=String(hit.source||hit.site_name||'').trim();
+ if(/(?:招聘网|求职网|人才网|人才市场|人才招聘平台|招聘聚合|招聘平台|直聘|就业平台|就业指导中心|招聘信息网|商会|行业协会)/i.test(name))
+  return false;
+ if(/(?:大学|职业技术学院|高等专科学校|职业学院|就业学院)(?:招聘|就业|就业网|毕业生就业|官方)?$/i.test(name))
+  return false;
+ return true;
+}
+
 // HHBA strictly forbids consumer job boards and unknown aggregators in results.
 // Employer-branded career sites and dedicated employer ATS positions may be considered.
 // Domain shape is a candidate signal, not proof of corporate authorization.
