@@ -241,6 +241,13 @@
 .hhba-match-live-sparkle{flex:0 0 42px;height:42px;display:grid;place-items:center;border:1px solid #d1e3ff;border-radius:13px;background:#fff;color:#2976cd;box-shadow:0 6px 20px #285e9c12}
 .hhba-match-live-heading h2{margin:0 0 5px;font-size:20px;font-weight:760;letter-spacing:-.02em;line-height:1.4}
 .hhba-match-live-heading p{margin:0;font-size:12px;line-height:1.7;color:#68809e}
+.hhba-match-live-action{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px;padding:12px 14px;background:#fff;border:1px solid #d9e5f6;border-radius:10px}
+.hhba-match-live-action strong{flex:1;min-width:180px;font-size:12px;line-height:1.7;font-weight:650;color:#294970}
+.hhba-match-live-pulse{width:8px;height:8px;border-radius:50%;background:#4382ea;box-shadow:0 0 0 4px #dbe9ff;animation:hhba-live-pulse 2.1s ease-in-out infinite}
+@keyframes hhba-live-pulse{50%{opacity:.47;box-shadow:0 0 0 7px #eaf2ff}}
+.hhba-match-live-clock{font-size:11px;color:#546d90;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hhba-match-live-facts{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0;font-size:11px;color:#5a7394;line-height:1.7}
+.hhba-match-live-wait{margin:10px 0 0;padding:9px 12px;border-left:2px solid #e6a94a;border-radius:4px;background:#fff9ed;color:#83662c;font-size:11px;line-height:1.6}
 .hhba-match-live-rail{position:relative;overflow:hidden;height:5px;border-radius:8px;background:#dce8f8;margin:22px 0}
 .hhba-match-live-rail span{position:absolute;inset:0 auto 0 0;width:35%;border-radius:8px;background:linear-gradient(90deg,#80a9f4,#9a9fff,#5cbbd8);animation:hhba-progress-moving 1.8s ease-in-out infinite alternate}
 @keyframes hhba-progress-moving{from{transform:translateX(0)}to{transform:translateX(185%)}}
@@ -271,4 +278,4 @@
  .hhba-match-live-progress.is-compact .hhba-match-live-steps strong{font-size:9px;line-height:1.2}
  .hhba-match-live-progress.is-compact .hhba-match-live-marker{width:18px;height:18px}
 }
-@media(prefers-reduced-motion:reduce){.hhba-match-live-rail span{animation:none;width:42%}}
+@media(prefers-reduced-motion:reduce){.hhba-match-live-rail span,.hhba-match-live-pulse{animation:none}.hhba-match-live-rail span{width:42%}}
