@@ -83,6 +83,7 @@ async function modelDecision(key,resume,roleHint,pool,queries,history,deadline,{
   '不知道该搜索什么时，可以尝试岗位同义词、相邻职业、技能迁移、行业细分、城市与企业官方招聘公告，不强制凑满10个。',
   'finish时用shortlist_ids给出你认为值得由匹配模型详细评分的真实候选ID，优先有岗位职责和明确中国大陆工作地点者。',
   '不要为了配额或固定轮数而提前停止，也不要无意义重复搜索；当进一步行动已难以增加真实有效证据时结束。',
+  '在 rationale 中用对求职者有帮助的简短中文研究摘要，解释本轮为何检索、复核或停止；只讲可公开核实的理由，不输出私人内部推理、凭空编造的新发现或原始简历内容。',
   '只返回JSON对象：{"actions":[{"type":"search","queries":["..."]}],"shortlist_ids":["j1"],"rationale":"你为什么选择这些下一步动作"}。'
  ].join('\n');
  const response=await fetcher(BASE+'/responses',{
@@ -127,7 +128,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  let exitReason='unknown',shortlistIds=[],agentPlannedQueries=0;
  let rejectedLinks=0;
  function activity(stage,message){
-  onActivity({stage,message:String(message).slice(0,160),
+  onActivity({stage,message:String(message).slice(0,330),
    searches:searchCalls,raw_results:rawHits,candidate_links:pool.length,
    rejected_links:rejectedLinks,pages_read:pageReads,decisions,
    search_failures:searchFailures,elapsed_ms:Date.now()-started});
@@ -236,6 +237,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    queries=normalizeAutonomousQueries(initial?.queries);
    agentPlannedQueries=queries.length;
    history.push({type:'plan',strategy:shorten(initial?.strategy,180),queries:queries.length});
+   if(initial?.strategy)activity('planning','AI 初步研究方向：'+shorten(initial.strategy,190));
   }catch(e){
    if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
     'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED'].includes(e?.code))throw e;
@@ -262,7 +264,9 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    const raw=await decide(key,resume,roleHint,pool,usedQueries,history,deadline,options);
    next=normalizeResearchDecision(raw,pool,usedQueries);
    decisions++;
-   activity('planning','AI 已完成第 '+decisions+' 次研究决策，正在执行所选工具。');
+   activity('planning',next.rationale?
+    '本轮职业研究说明：'+shorten(next.rationale,210):
+    'AI 已完成第 '+decisions+' 次研究决策，正在执行所选工具。');
   }catch(e){
    if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
     'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED'].includes(e?.code))throw e;
