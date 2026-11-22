@@ -20,6 +20,7 @@ function researchQuery(job){
   '中国大陆 企业官网 官方招聘 岗位职责 任职要求'].join(' ').slice(0,128);
 }
 function sameJob(job,hit){
+ const heading=compact([hit.title,hit.site_name].join(' '));
  const s=compact([hit.title,hit.site_name,hit.summary,hit.snippet].join(' '));
  const company=compact(job.company).replace(/(?:有限责任公司|股份有限公司|有限公司|集团公司|集团|公司)$/,'');
  const title=compact(job.title_zh||job.title).replace(/(?:岗位|职位|招聘)$/,'');
