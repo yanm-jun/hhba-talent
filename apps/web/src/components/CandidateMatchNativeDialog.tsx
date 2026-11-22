@@ -48,7 +48,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
  useEffect(()=>{
   const el=journalViewport.current;
   if(pending&&el&&followJournal.current)el.scrollTop=el.scrollHeight;
- },[pending,researchTrail.length]);
+ },[pending,researchTrail]);
  const stageTitle:Record<NativeMatchProgress,string>={
   preparing:'准备简历分析',connected:'验证 AI 服务',
   planning:'研究职业方向',searching:'搜索企业岗位',
