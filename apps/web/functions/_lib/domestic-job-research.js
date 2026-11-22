@@ -71,6 +71,9 @@ export function assessDomesticEvidence(job,searchHits=[]){
   // Employer ownership and complete JD remain unverified.
   requirements_basis:content||'暂无可核对的岗位职责与任职要求',
   match_score:null,reference_score:0,score_basis:'',
+  recommendation_reason:tier==='PARTIAL_SOURCE'?
+   '已找到这份岗位的部分公开材料，正在根据可核对的职责与要求分析简历；完整岗位条件仍请到企业招聘页确认。':
+   '这份职位与求职方向可能相关，但目前没有足够的真实岗位要求，暂不能判断具体匹配程度。',
   needs_verification:tier==='PARTIAL_SOURCE'?
    ['仅有企业招聘页候选的部分公开证据，并非已核验完整 JD；请在官网确认最新岗位与投递状态。']:
    ['缺少足够的岗位职责或任职资格证据，不能可靠打分；请打开企业招聘页面核对。']
@@ -120,12 +123,14 @@ async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,m
   const score=normalizeMatchScore(row?.match_score,basis.length>=30?basis:'');
   if(score===null)return job;
   return {...job,match_score:score,reference_score:score,score_basis:basis,
+   recommendation_reason:basis,
    evidence_score_status:'AI_PARTIAL_SOURCE_SCORED'};
  });
 }
 export async function researchDomesticJobEvidence(key,resume,matches,options={},deps={}){
  const jobs=Array.isArray(matches)?matches.slice(0,MAX_JOBS):[];
- if(options.enabled===false)return {matches:jobs,diagnostic:{mode:'disabled',researched:0,partial:0,scored:0}};
+ if(options.enabled===false)return {matches:jobs.map(j=>assessDomesticEvidence(j)),
+  diagnostic:{mode:'disabled',researched:0,partial:0,scored:0}};
  const research=deps.search||providerSearch,score=deps.score||scorePartialEvidence;
  const out=new Array(jobs.length);let cursor=0,reads=0,failures=0;
  const work=async()=>{
