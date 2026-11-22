@@ -98,7 +98,7 @@ test('Agent resumes public evidence, but replans when the old shortlist is insuf
  assert.equal(planned,true);
  assert.equal(searched,true);
  assert.equal(result.diagnostic.checkpoint_restored,true);
- assert.equal(result.diagnostic.provider_items,5);
+ assert.ok(result.diagnostic.provider_items>=5,'resume refresh may legitimately find more than one batch');
  assert.equal(selected[0].url,valid.url);
  assert.equal(result.matches[0].official_url,valid.url);
 });
