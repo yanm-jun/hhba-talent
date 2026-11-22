@@ -47,6 +47,23 @@ test('preflight catches incompatible model Responses config before candidate att
  await assert.rejects(checkMatchProviderCapabilities('synthetic',{fetcher}),
   e=>e.code==='AI_PROVIDER_REQUEST_REJECTED');
 });
+
+test('an HTTP 200 without a completed valid JSON answer must NOT pass provider readiness',async()=>{
+ const cases=[
+  {status:'incomplete',output:[{type:'message',content:[{type:'output_text',text:'{"ok":true}'}]}]},
+  {status:'completed',output:[{type:'reasoning',content:[{type:'reasoning_text',text:'analysis'}]}]},
+  {status:'completed',output:[{type:'message',content:[{type:'output_text',text:'not JSON'}]}]},
+  {status:'completed',output:[{type:'message',content:[{type:'output_text',text:'{"ok":false}'}]}]},
+  {status:'completed',output:[]},
+  {status:'failed',output:[{type:'message',content:[{type:'output_text',text:'{"ok":true}'}]}]}
+ ];
+ for(const payload of cases){
+  const {fetcher}=checkable({'/responses':()=>new Response(JSON.stringify(payload),{status:200})});
+  await assert.rejects(checkMatchProviderCapabilities('synthetic',{fetcher}),
+   err=>err.code==='AI_PROVIDER_RESPONSE_INVALID');
+ }
+});
+
 test('no balance and unreadable model payload are reported as distinct failures',async()=>{
  const noBalance=checkable({'/user/balance':()=>new Response('{"is_available":false}',{status:200})});
  await assert.rejects(checkMatchProviderCapabilities('synthetic',{fetcher:noBalance.fetcher}),

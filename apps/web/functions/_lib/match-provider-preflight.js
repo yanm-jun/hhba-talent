@@ -51,8 +51,17 @@ export async function checkMatchProviderCapabilities(key,{
  ]);
  if(balance?.is_available!==true)throw codeError('AI_PROVIDER_BALANCE_INSUFFICIENT');
  if(!Array.isArray(search?.results))throw codeError('AI_SEARCH_RESPONSE_INVALID');
- if(!Array.isArray(model?.output)||model?.status==='failed')
+ // An HTTP 200 with only reasoning tokens, incomplete status or an
+ // empty output array does not prove that the model can return a usable JSON
+ // recommendation. Check the actual terminal response and JSON payload.
+ if(model?.status!=='completed'||!Array.isArray(model.output))
   throw codeError('AI_PROVIDER_RESPONSE_INVALID');
+ const answer=model.output.filter(x=>x?.type==='message')
+  .flatMap(x=>(x.content||[]).filter(y=>y?.type==='output_text')
+   .map(y=>typeof y.text==='string'?y.text:'')).join('');
+ let parsed;
+ try{parsed=JSON.parse(answer)}catch{throw codeError('AI_PROVIDER_RESPONSE_INVALID')}
+ if(parsed?.ok!==true)throw codeError('AI_PROVIDER_RESPONSE_INVALID');
  return {ok:true,status:'READY',capabilities:['balance','deepseek_search','v4_pro_responses_json'],
   searches_returned:search.results.length};
 }
