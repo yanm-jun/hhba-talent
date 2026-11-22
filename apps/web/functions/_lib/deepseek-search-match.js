@@ -227,7 +227,7 @@ function outputFromResponse(data){
  * company, title and reason; the normal selectedJobs validator is reused.
  */
 export async function recoverSearchGroundedShortlist(key,resume,hits,limit,{
- fetcher=fetch,signal=null,recoveryTimeoutMs=11500
+ fetcher=fetch,signal=null,recoveryTimeoutMs=28000
 }={}){
  if(!hits.length)return [];
  const timeout=AbortSignal.timeout(recoveryTimeoutMs);
@@ -241,8 +241,8 @@ export async function recoverSearchGroundedShortlist(key,resume,hits,limit,{
   const response=await fetcher(BASE+'/responses',{
    method:'POST',redirect:'manual',signal:merged,
    headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
-   body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'none'},
-    text:{format:{type:'json_object'}},max_output_tokens:2500,stream:false,
+   body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'high'},
+    text:{format:{type:'json_object'}},max_output_tokens:9500,stream:false,
     instructions:[
      '你是中国大陆招聘公开岗位信息校对员。上轮岗位初选未返回有效列表，请根据下面已有的具体职位网页摘要再次识别。',
      '只输出实际给出的候选id。公司名、岗位名、地点必须有网页摘要证据；尤其工作城市必须是职位工作城市，不可把企业总部所在地当作工作地点。',
@@ -287,8 +287,8 @@ export async function reasonAboutJobs(key,resume,hits,limit,{
   '优先把最有把握的一条完整对象尽早输出，后续逐条补齐。不得在JSON以外输出文字。'
  ].join('\n');
  const payload={
-  model:'deepseek-v4-pro',reasoning:{effort:'none'},
-  text:{format:{type:'json_object'}},max_output_tokens:shortlistOnly?3500:5600,stream:true,
+  model:'deepseek-v4-pro',reasoning:{effort:'high'},
+  text:{format:{type:'json_object'}},max_output_tokens:shortlistOnly?12000:16000,stream:true,
   instructions,
   input:'脱敏简历：\n'+String(resume).slice(0,10000)+'\n可选真实职位：\n'+JSON.stringify(cards)
  };
@@ -395,7 +395,7 @@ export async function preferEmployerPostingUrls(key,matches,hits,{
 // Expand the shortlist in two small parallel requests. The first-ranked jobs
 // were already sent to the browser; slow prose generation never hides them.
 export async function expandDetailedReasons(key,resume,matches,hits,{
- fetcher=fetch,signal=null,onPartial=()=>{},onProgress=()=>{},detailTimeoutMs=20000
+ fetcher=fetch,signal=null,onPartial=()=>{},onProgress=()=>{},detailTimeoutMs=52000
 }={}){
  if(!matches.length)return {matches,expanded:0,detail_ms:0,detail_failures:0};
  const started=Date.now(),lookup=new Map(hits.map(h=>[h.url,h]));
@@ -421,8 +421,8 @@ export async function expandDetailedReasons(key,resume,matches,hits,{
    const combined=signal?AbortSignal.any([signal,timeout]):timeout;
    const response=await fetcher(BASE+'/responses',{method:'POST',redirect:'manual',signal:combined,
     headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
-    body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'none'},
-     text:{format:{type:'json_object'}},max_output_tokens:2200,stream:false,
+    body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'max'},
+     text:{format:{type:'json_object'}},max_output_tokens:18000,stream:false,
      instructions:prompt,input:'脱敏简历：\n'+String(resume).slice(0,7000)+
       '\n已选真实岗位：\n'+JSON.stringify(description)})
    });
@@ -464,7 +464,7 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  if(pool.length){
   try{
    first=await reasonAboutJobs(key,resume,pool,limit,{
-    ...opts,shortlistOnly:true,modelTimeoutMs:opts.modelTimeoutMs??26000,
+    ...opts,shortlistOnly:true,modelTimeoutMs:opts.modelTimeoutMs??44000,
     onProgress,onPartial:show
    });
   }catch(error){
@@ -522,7 +522,7 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
      let extra;
      try{
       extra=await reasonAboutJobs(key,resume,unselected,limit-visible.length,{
-       ...opts,shortlistOnly:true,modelTimeoutMs:opts.supplementalModelTimeoutMs??18000,
+       ...opts,shortlistOnly:true,modelTimeoutMs:opts.supplementalModelTimeoutMs??42000,
        onProgress,onPartial:jobs=>show(combineRecommended(visible,jobs,limit))
       });
      }catch(error){
