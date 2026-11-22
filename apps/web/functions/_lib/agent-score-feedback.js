@@ -45,6 +45,8 @@ async function planFeedback(key,resume,jobs,history,{fetcher=fetch,signal=null,t
   city:j.location,evidence_status:j.evidence_status,score:j.match_score,
   score_basis:clean(j.score_basis,260),evidence_excerpt:clean(j.evidence_excerpt,680),
   evidence_gaps:Array.isArray(j.evidence_gaps)?j.evidence_gaps.slice(0,5):[],
+  next_research_questions:Array.isArray(j.next_research_questions)?
+   j.next_research_questions.slice(0,5):[],
   source_count:j.evidence_sources?.length||0}));
  const instructions=[
   '你是 HHBA 岗位研究主 Agent，评分器已经根据公开证据分析岗位，现在请决定是否必须回头补充研究。',
@@ -85,6 +87,8 @@ export async function iterateScoredJobEvidence(key,resume,matches,options={},dep
   const unresolved=jobs.filter(j=>j.jd_source_status!=='VERIFIED_JD'&&
    (j.match_score===null||j.match_score===undefined||
     j.evidence_status==='INSUFFICIENT_EVIDENCE'||
+    j.evidence_status==='SEARCH_SNIPPET_ONLY'||
+    (Array.isArray(j.evidence_gaps)&&j.evidence_gaps.length>0)||
     j.evidence_reason_status!=='AI_INDIVIDUAL_ANALYSIS'));
   if(!unresolved.length)break;
   let choice;
@@ -110,10 +114,13 @@ export async function iterateScoredJobEvidence(key,resume,matches,options={},dep
   const targets=unresolved.filter(j=>collected.has(j.id));
   if(!targets.length)break;
   const byId=new Map(jobs.map(j=>[j.id,j]));
-  const updated=await rescore(key,resume,targets,{...options,
-   onProgress:()=>onProgress('scoring')},{
-   search:async(k,job)=>collected.get(job.id)||[]
-  });
+  let updated;
+  try{
+   updated=await rescore(key,resume,targets,{...options,
+    onProgress:()=>onProgress('scoring')},{
+    search:async(k,job)=>collected.get(job.id)||[]
+   });
+  }catch{errors++;break}
   let roundImprovements=0;
   for(const current of updated.matches||[]){
    const old=byId.get(current.id);
