@@ -11,7 +11,7 @@
 import {planAutonomousMainlandSearch,normalizeAutonomousQueries}
  from './autonomous-mainland-search.js';
 import {searchQueries,searchPublicJobs,enrichCandidateDetails,reasonAboutJobs,
- recoverSearchGroundedShortlist,expandDetailedReasons} from './deepseek-search-match.js';
+ recoverSearchGroundedShortlist,expandDetailedReasons,sourceOnlyJobPreviews} from './deepseek-search-match.js';
 import {mergeCandidateHits} from './match-search-growth.js';
 import {isRecommendationEligible} from './match-job-quality.js';
 import {isMainlandEmployerJobUrl,sourceCounts} from './match-employer-source.js';
@@ -326,17 +326,34 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    }
   }catch(e){
    selectionFailures++;
+   if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+    'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED'].includes(e?.code))throw e;
    activity('writing','本批初选未通过核验，正在尝试从已检索的真实岗位资料恢复。');
    if(e?.code==='AI_MATCH_NO_VALID_JOBS'&&budget()>5000){
-    const rescued=await recover(key,resume,page,limit-matches.length,{
-     ...options,recoveryTimeoutMs:Math.min(23000,budget())});
-    for(const job of rescued){
-     if(isMainlandEmployerJobUrl(job.official_url)&&page.some(hit=>hit.url===job.official_url)&&
-      !matches.some(j=>j.official_url===job.official_url))
-      matches.push(job);
+    try{
+     const rescued=await recover(key,resume,page,limit-matches.length,{
+      ...options,recoveryTimeoutMs:Math.min(23000,budget())});
+     for(const job of rescued){
+      if(isMainlandEmployerJobUrl(job.official_url)&&page.some(hit=>hit.url===job.official_url)&&
+       !matches.some(j=>j.official_url===job.official_url))
+       matches.push(job);
+     }
+     if(matches.length)onPartial([...matches]);
+    }catch(recoveryError){
+     if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+       'AI_PROVIDER_RATE_LIMITED'].includes(recoveryError?.code))throw recoveryError;
     }
-    if(matches.length)onPartial([...matches]);
    }
+  }
+ }
+ // If the model failed, an actual Search result with an explicit employer,
+ // job role and mainland city may still be shown as UNSCORED preview.
+ // This is not a fabricated recommendation or a fake match score.
+ if(!matches.length&&selectionFailures>0){
+  const previews=sourceOnlyJobPreviews(eligible,limit);
+  if(previews.length){
+   matches=previews;onPartial([...matches]);
+   activity('writing','模型未完成个性化初选；已恢复 '+matches.length+' 条可追溯的企业岗位候选，正在继续核实证据。');
   }
  }
  if(!matches.length){
