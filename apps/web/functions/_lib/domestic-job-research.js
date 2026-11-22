@@ -130,7 +130,7 @@ export function compactResearchResumeEvidence(resume,profile){
   .filter(q=>q.length>=8&&q.length<=360))];
  if(quotes.length<3)return String(resume||'').slice(0,10000);
  const summary=quotes.map((q,i)=>'CV-'+(i+1)+' '+q).join('\n');
- return summary.length>=120?summary.slice(0,8500):String(resume||'').slice(0,10000);
+ return summary.length>=80?summary.slice(0,8500):String(resume||'').slice(0,10000);
 }
 async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,modelTimeoutMs=56000,
  resumeProfile=null}={}){
