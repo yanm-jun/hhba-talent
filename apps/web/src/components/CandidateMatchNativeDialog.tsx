@@ -205,8 +205,8 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
            {visibleMatchScore(job)!==null?
             <><strong>{visibleMatchScore(job)}<small>/100</small></strong><span>匹配分</span></>:
             <><strong className="hhba-native-score-na">—</strong><span>暂无可靠分数</span></>}
-           <button type="button" disabled={pending||!job.jd_version_id||!job.jd_sha256}
-             title={!job.jd_version_id||!job.jd_sha256?'取得完整岗位 JD 后可优化':pending?'匹配完成后可优化':'针对所选岗位优化简历'}
+           <button type="button" disabled={pending||!parsedProfile||!job.jd_version_id||!job.jd_sha256}
+             title={!job.jd_version_id||!job.jd_sha256?'取得完整岗位 JD 后可优化':pending||!parsedProfile?'匹配完成后可优化':'针对所选岗位优化简历'}
              className="hhba-native-optimize" onClick={()=>{
               matchListScroll.current=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content')?.scrollTop||0;
               setOptimizationDirty(false);setOptimizedJobId(job.id);
