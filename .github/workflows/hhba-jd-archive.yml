@@ -57,6 +57,9 @@ on:
       - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
       - 'apps/web/src/components/CandidateMatchHistory.tsx'
       - 'apps/web/scripts/match-jd-enrichment.contract.test.mjs'
+      - 'apps/web/scripts/match-jd-identity-recovery.contract.test.mjs'
+      - 'apps/web/scripts/match-search-retry.contract.test.mjs'
+      - 'apps/web/scripts/match-ats-verified-only.contract.test.mjs'
       - 'apps/web/d1/0029_jd_posting_lifecycle.sql'
       - 'apps/web/functions/_lib/jd-posting-lifecycle.js'
       - 'apps/web/functions/_lib/jd-lifecycle-maintenance.js'
@@ -84,6 +87,9 @@ jobs:
           node --test scripts/public-ats-jd.contract.test.mjs
           node --test scripts/verified-jd-reassessment.contract.test.mjs
           node --test scripts/match-jd-enrichment.contract.test.mjs
+          node --test scripts/match-jd-identity-recovery.contract.test.mjs
+          node --test scripts/match-search-retry.contract.test.mjs
+          node --test scripts/match-ats-verified-only.contract.test.mjs
           node --test scripts/domestic-job-research.contract.test.mjs
           node --test scripts/match-experience-regression.contract.test.mjs
           node --test scripts/match-search-first.contract.test.mjs
