@@ -139,9 +139,15 @@ export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Pr
  }
 }
 export type NativeMatchProgress='preparing'|'connected'|'planning'|'searching'|'reading'|'researching'|'writing'|'scoring'|'waiting';
+export type NativeMatchActivity={
+ stage:NativeMatchProgress;message:string;searches?:number;raw_results?:number;
+ candidate_links?:number;rejected_links?:number;pages_read?:number;decisions?:number;
+ search_failures?:number;elapsed_ms?:number
+};
 async function consumeNativeMatchStream(
  response:Response,onProgress?:(stage:NativeMatchProgress)=>void,
- onPartial?:(jobs:MatchedJob[])=>void
+ onPartial?:(jobs:MatchedJob[])=>void,
+ onActivity?:(activity:NativeMatchActivity)=>void
 ):Promise<MatchResponse>{
  if(!response.body)throw new MatchError(502,'智能匹配连接没有返回可读取的结果。');
  const decoder=new TextDecoder(),reader=response.body.getReader();
@@ -156,6 +162,18 @@ async function consumeNativeMatchStream(
    const stage=value?.stage;
    if(['preparing','connected','planning','searching','reading','researching','writing','scoring','waiting'].includes(stage))
     onProgress?.(stage as NativeMatchProgress);
+  }else if(event==='activity'){
+   const stage=value?.stage;
+   if(typeof value?.message==='string'&&value.message.length<=180&&
+      ['preparing','connected','planning','searching','reading','researching','writing','scoring'].includes(stage)){
+    const number=(v:unknown)=>typeof v==='number'&&Number.isFinite(v)&&v>=0?
+     Math.floor(v):undefined;
+    onActivity?.({stage:stage as NativeMatchProgress,message:value.message,
+     searches:number(value.searches),raw_results:number(value.raw_results),
+     candidate_links:number(value.candidate_links),rejected_links:number(value.rejected_links),
+     pages_read:number(value.pages_read),decisions:number(value.decisions),
+     search_failures:number(value.search_failures),elapsed_ms:number(value.elapsed_ms)});
+   }
   }else if(event==='partial'){
    if(Array.isArray(value?.matches)&&value.matches.length>0&&value.matches.length<=10)
     onPartial?.(value.matches as MatchedJob[]);
@@ -197,7 +215,8 @@ async function consumeNativeMatchStream(
 export async function submitExtractedResumeText(
  text:string,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string,
  onProgress?:(stage:NativeMatchProgress)=>void,
- onPartial?:(jobs:MatchedJob[])=>void
+ onPartial?:(jobs:MatchedJob[])=>void,
+ onActivity?:(activity:NativeMatchActivity)=>void
 ):Promise<MatchResponse>{
  if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
  const token=session();
@@ -213,7 +232,7 @@ export async function submitExtractedResumeText(
   throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
  const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
  if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。');
- const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial):
+ const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity):
   await response.json().catch(()=>({})) as Partial<MatchResponse>&{error?:string};
  if(!response.ok)throw new MatchError(response.status,errorMap[(data as {error?:string}).error||'']||'智能匹配服务暂时不可用。');
  if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||data.matches.length>10)
@@ -225,13 +244,14 @@ export async function submitResumeForMatching(
  file:File,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string,
  onProgress?:(stage:NativeMatchProgress)=>void,
  onPartial?:(jobs:MatchedJob[])=>void,
- onExtracted?:(text:string)=>void
+ onExtracted?:(text:string)=>void,
+ onActivity?:(activity:NativeMatchActivity)=>void
 ):Promise<MatchResponse>{
  if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
  const extracted=await extractResumeTextLocally(file,signal);
  if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
  onExtracted?.(extracted); // same locally-redacted text, not a second model request
- return submitExtractedResumeText(extracted,opts,consent,signal,resumeId,onProgress,onPartial);
+ return submitExtractedResumeText(extracted,opts,consent,signal,resumeId,onProgress,onPartial,onActivity);
 }
 
 /** Preview-only free balance/key check, authenticated candidate, no resume content. */
