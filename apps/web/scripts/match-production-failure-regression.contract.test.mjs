@@ -329,3 +329,24 @@ test('suspected closure from Search is eligible for a fresh employer-page Fetch,
  assert.ok(output.diagnostic.page_reads>0);
  assert.ok(output.matches.every(j=>j.availability_status!=='CLOSED_LISTED'));
 });
+
+test('employer discovery is occupation-neutral rather than limited to supervisors and managers',async()=>{
+ const {targetedEmployerRecoveryQueries}=await import('../functions/_lib/ai-owned-job-research.js');
+ const hints=['连锁餐厅厨师','花店高级花艺师','农场收割工','机械焊工','司机驾驶员'];
+ const queries=targetedEmployerRecoveryQueries([{type:'search',rejected_title_hints:hints}],[]);
+ assert.ok(queries.some(q=>q.includes('厨师')));
+ assert.ok(queries.some(q=>q.includes('花艺师')));
+ assert.ok(queries.some(q=>q.includes('收割工')));
+ assert.equal(queries.length,4,'one bounded round still limits the number of searches');
+});
+test('generic official job-page titles can recover explicitly labeled niche occupations',()=>{
+ const job={...employer,id:'j-florist',title:'职位详情',
+  summary:'招聘岗位：花艺师 工作地点：上海市 招聘人数：2人。岗位职责：花束搭配与鲜花修剪。',
+  snippet:'招聘岗位：花艺师 工作地点：上海市'};
+ const preview=sourceOnlyJobPreviews([job],10);
+ assert.equal(preview.length,1);
+ assert.equal(preview[0].title,'花艺师');
+ assert.equal(preview[0].company,'美团');
+ assert.equal(preview[0].location,'上海市');
+ assert.equal(preview[0].match_score,null);
+});
