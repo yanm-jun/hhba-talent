@@ -154,9 +154,9 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       <LoaderCircle size={18} className="spin" aria-hidden="true"/>
       <div className="hhba-match-progress-copy">
        <strong id="hhba-native-title">{stageTitle[progressStage]}…</strong>
-       {progressStage==='parsing'&&progressActivity?.stage==='parsing'&&<span>{progressActivity.message}</span>}
+       {progressActivity?.message&&<span>{progressActivity.message}</span>}
        {progressActivity?.searches!==undefined&&<span>
-        已执行 {progressActivity.searches} 次检索 · 发现 {progressActivity.candidate_links??0} 条企业岗位线索
+        已执行 {progressActivity.searches} 次检索 · 发现 {progressActivity.candidate_links??0} 条企业岗位线索 · 已阅读 {progressActivity.pages_read??0} 份岗位资料
        </span>}
        {result.matches.length>0&&<span>已找到 {result.matches.length} 个岗位</span>}
       </div>
