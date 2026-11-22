@@ -1,0 +1,98 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {checkMatchProviderCapabilities} from '../functions/_lib/match-provider-preflight.js';
+import {planAutonomousMainlandSearch} from '../functions/_lib/autonomous-mainland-search.js';
+import {runAgentOwnedMainlandMatch} from '../functions/_lib/ai-owned-job-research.js';
+
+function checkable(fetchOverrides={}){
+ const calls=[];
+ const fetcher=async(url,options={})=>{
+  const path=new URL(url).pathname;
+  calls.push({path,body:options.body?JSON.parse(options.body):undefined});
+  if(fetchOverrides[path])return fetchOverrides[path](options);
+  return new Response(JSON.stringify(path==='/user/balance'?{is_available:true}:
+   path==='/v1/tools/search'?{results:[]}:
+   {status:'completed',output:[{type:'message',content:[{type:'output_text',text:'{"ok":true}'}]}]}),
+   {status:200,headers:{'Content-Type':'application/json'}});
+ };
+ return {calls,fetcher};
+}
+test('candidate preflight probes balance, real Search and V4 Pro structured response without résumé data',async()=>{
+ const {calls,fetcher}=checkable();
+ const result=await checkMatchProviderCapabilities('synthetic-key-not-real',{fetcher});
+ assert.deepEqual(result.capabilities,['balance','deepseek_search','v4_pro_responses_json']);
+ assert.deepEqual(calls.map(x=>x.path).sort(),[
+  '/user/balance','/v1/tools/search','/responses'].sort());
+ assert.equal(calls.find(x=>x.path==='/v1/tools/search').body.count,1);
+ assert.equal(calls.find(x=>x.path==='/v1/tools/search').body.need_content,false);
+ assert.ok(calls.every(x=>!JSON.stringify(x.body||'').includes('my private CV')));
+ assert.equal(calls.find(x=>x.path==='/responses').body.model,'deepseek-v4-pro');
+ assert.equal(calls.find(x=>x.path==='/responses').body.text.format.type,'json_object');
+});
+test('configured balance is not enough if Search API access is missing or malformed',async()=>{
+ for(const [status,code] of [[401,'AI_PROVIDER_KEY_REJECTED'],
+  [400,'AI_SEARCH_API_REJECTED'],[429,'AI_PROVIDER_RATE_LIMITED'],
+  [502,'AI_PROVIDER_UNAVAILABLE']]){
+  const {fetcher}=checkable({'/v1/tools/search':()=>new Response('{}',{status})});
+  await assert.rejects(checkMatchProviderCapabilities('synthetic',{fetcher}),
+   e=>e.code===code);
+ }
+ const {fetcher}=checkable({'/v1/tools/search':()=>new Response('{"data":[]}',{status:200})});
+ await assert.rejects(checkMatchProviderCapabilities('synthetic',{fetcher}),
+  e=>e.code==='AI_SEARCH_RESPONSE_INVALID');
+});
+test('preflight catches incompatible model Responses config before candidate attempts full job search',async()=>{
+ const {fetcher}=checkable({'/responses':()=>new Response('{}',{status:400})});
+ await assert.rejects(checkMatchProviderCapabilities('synthetic',{fetcher}),
+  e=>e.code==='AI_PROVIDER_REQUEST_REJECTED');
+});
+test('no balance and unreadable model payload are reported as distinct failures',async()=>{
+ const noBalance=checkable({'/user/balance':()=>new Response('{"is_available":false}',{status:200})});
+ await assert.rejects(checkMatchProviderCapabilities('synthetic',{fetcher:noBalance.fetcher}),
+  e=>e.code==='AI_PROVIDER_BALANCE_INSUFFICIENT');
+ const badModel=checkable({'/responses':()=>new Response('{"status":"failed","output":[]}',{status:200})});
+ await assert.rejects(checkMatchProviderCapabilities('synthetic',{fetcher:badModel.fetcher}),
+  e=>e.code==='AI_PROVIDER_RESPONSE_INVALID');
+});
+test('planner HTTP 400/401/402/429 rejection retains provider error, never silently becomes keyword fallback',async()=>{
+ const cases=[[400,'AI_PROVIDER_REQUEST_REJECTED'],[401,'AI_PROVIDER_KEY_REJECTED'],
+  [402,'AI_PROVIDER_BALANCE_INSUFFICIENT'],[429,'AI_PROVIDER_RATE_LIMITED']];
+ for(const [status,code] of cases){
+  await assert.rejects(planAutonomousMainlandSearch('synthetic','candidate CV','',{
+   fetcher:async()=>new Response('{}',{status})}),e=>e.code===code);
+  let searched=false;
+  await assert.rejects(runAgentOwnedMainlandMatch('synthetic','candidate CV','',10,
+   {expandDetailed:false},{
+    plan:async()=>{const error=new Error(code);error.code=code;throw error},
+    search:async()=>{searched=true;return {hits:[]}}
+   }),e=>e.code===code);
+  assert.equal(searched,false,'wrong: fatal model rejection was turned into a Search retry');
+ }
+});
+test('agent reflective model permission failure is not disguised as zero valid jobs',async()=>{
+ const source={id:'j1',title:'华东汽车公司 渠道督导 上海 招聘',
+  source:'华东汽车公司',
+  url:'https://careers.chinacorp.cn/jobs/channel-supervisor',
+  summary:'华东汽车公司招聘渠道督导。工作地点：上海。岗位职责：分析经销商销售流程、培训一线团队。',
+  availability:{status:'UNKNOWN'}};
+ await assert.rejects(runAgentOwnedMainlandMatch('synthetic',
+  '渠道督导业务培训经验','',10,{
+   fetcher:async()=>new Response('{}',{status:402}),expandDetailed:false
+  },{
+   plan:async()=>({queries:['渠道督导 上海 企业招聘']}),
+   search:async()=>({hits:[source],diagnostic:{successful_searches:1,raw_results:1}})
+  }),e=>e.code==='AI_PROVIDER_BALANCE_INSUFFICIENT');
+});
+test('authenticated preflight precedes saving CV or streaming a full AI job match',()=>{
+ const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
+ assert.match(page,/await checkMatchProviderConnection\(abort\.signal\)/);
+ const checkAt=page.indexOf('await checkMatchProviderConnection(abort.signal)');
+ const saveAt=page.indexOf('const stored=await uploadPrivateResume(selectedFile,true)');
+ assert.ok(checkAt>0&&saveAt>checkAt);
+ assert.match(route,/candidateSession\(env,request\)/);
+ assert.match(route,/await checkMatchProviderCapabilities\(env\.HHBA_MATCH_DEEPSEEK_KEY\)/);
+ assert.match(route,/return fail\(code,502\)/);
+ assert.ok(!route.includes('providerCheck(env.HHBA_MATCH_DEEPSEEK_KEY)'));
+});
