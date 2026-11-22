@@ -75,7 +75,7 @@ test('D1 checkpoint load/save/clear is user-scoped and survives a simulated reco
  assert.equal(await owner.load(),null);
  assert.ok(sql.some(q=>q.includes('ON CONFLICT')));
 });
-test('Agent resumes public evidence without replanning and without losing real URL identity',async()=>{
+test('Agent resumes public evidence, but replans when the old shortlist is insufficient',async()=>{
  let planned=false,searched=false,selected=[];
  const state=sanitizePublicResearchCheckpoint({pool:[valid],
   usedQueries:['星海汽车有限公司 上海 渠道督导 官方招聘'],
@@ -83,8 +83,8 @@ test('Agent resumes public evidence without replanning and without losing real U
  const result=await runAgentOwnedMainlandMatch('synthetic','resume','',10,{
   expandDetailed:false,checkpoint:{load:async()=>state,save:async()=>true}
  },{
-  plan:async()=>{planned=true;throw Error('should not replan')},
-  search:async()=>{searched=true;throw Error('should not search again')},
+  plan:async()=>{planned=true;return {queries:['星海汽车 官网招聘 2026 新岗位']};},
+  search:async()=>{searched=true;return {hits:[],diagnostic:{successful_searches:1,raw_results:5}};},
   decide:async()=>({actions:[{type:'finish'}],shortlist_ids:['j1']}),
   select:async(k,cv,items)=>{
    selected=items;
@@ -95,9 +95,10 @@ test('Agent resumes public evidence without replanning and without losing real U
    }]};
   }
  });
- assert.equal(planned,false);
- assert.equal(searched,false);
+ assert.equal(planned,true);
+ assert.equal(searched,true);
  assert.equal(result.diagnostic.checkpoint_restored,true);
+ assert.equal(result.diagnostic.provider_items,5);
  assert.equal(selected[0].url,valid.url);
  assert.equal(result.matches[0].official_url,valid.url);
 });

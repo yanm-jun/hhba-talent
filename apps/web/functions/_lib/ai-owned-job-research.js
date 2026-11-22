@@ -144,6 +144,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  const expand=deps.expand||expandDetailedReasons;
  let pool=[],usedQueries=[],pageReads=0,searchCalls=0,searchFailures=0;
  let checkpointRestored=false,checkpointWrites=0,checkpointErrors=0;
+ let checkpointRefreshAttempted=false,checkpointRefreshQueries=0;
  let rawHits=0,loops=0,decisions=0,decisionFailures=0,reflections=0;
  let exitReason='unknown',shortlistIds=[],agentPlannedQueries=0;
  let rejectedLinks=0;
@@ -279,6 +280,33 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   // Initial broad discovery cannot spend the full service window before
   // the Agent has a chance to correct source quality and choose candidates.
   await searchTool(queries,{reserveMs:85000});
+ }
+ // Cached sources are not a finished search. Replan and refresh when a
+ // resumed research session has fewer than six eligible job sources.
+ if(checkpointRestored&&pool.filter(isRecommendationEligible).length<Math.min(limit,6)&&budget()>76000){
+  checkpointRefreshAttempted=true;
+  onProgress('planning');
+  activity('planning','已恢复旧岗位来源，但数量不足；正在继续搜索新的企业招聘页面。');
+  let nextQueries=[];
+  try{
+   const planResult=await plan(key,resume,roleHint,{...options,
+    plannerTimeoutMs:Math.min(18000,Math.max(3500,budget()-73000))});
+   nextQueries=normalizeAutonomousQueries(planResult?.queries,usedQueries);
+  }catch(e){
+   if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+     'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED'].includes(e?.code))throw e;
+  }
+  if(!nextQueries.length){
+   nextQueries=normalizeAutonomousQueries([
+    ...searchQueries(resume,roleHint),
+    ...usedQueries.slice(-4).map(q=>q+' 近期社招 企业官方招聘')
+   ],usedQueries);
+  }
+  if(nextQueries.length){
+   checkpointRefreshQueries=nextQueries.length;
+   agentPlannedQueries+=nextQueries.length;
+   await searchTool(nextQueries.slice(0,12),{reserveMs:69000});
+  }
  }
  // Don't deliberate for the entire service window over job-board results.
  // Re-check the actual employer's hiring pages; all URLs still go through
@@ -493,7 +521,10 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    agent_decisions:decisions,agent_reflections:reflections,
    agent_decision_failures:decisionFailures,agent_exit_reason:exitReason,
    agent_page_research_reads:pageReads,
-   checkpoint_restored:checkpointRestored,checkpoint_writes:checkpointWrites,
+   checkpoint_restored:checkpointRestored,
+   checkpoint_refresh_attempted:checkpointRefreshAttempted,
+   checkpoint_refresh_queries:checkpointRefreshQueries,
+   checkpoint_writes:checkpointWrites,
    checkpoint_errors:checkpointErrors,
    source_before:sourceCounts(result),source_after:sourceCounts(result),
    search_failures:searchFailures,selection_failures:selectionFailures,
