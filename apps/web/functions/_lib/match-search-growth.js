@@ -46,8 +46,9 @@ export function mergeCandidateHits(initial,additional,max=48){
       hit.summary:previous.summary;
    const snippet=String(hit.snippet||'').length>=String(previous.snippet||'').length?
       hit.snippet:previous.snippet;
-   const availability=hit.availability?.status==='POSSIBLY_CLOSED'?
-      hit.availability:previous.content?previous.availability:
+   // An actual fetched employer page outranks a speculative Search snippet.
+   // Without fetched content, the fresh Search closure warning must win.
+   const availability=previous.content?previous.availability:
       hit.availability||previous.availability;
    merged[position]={...previous,title:title||previous.title,
     summary:summary||previous.summary,snippet:snippet||previous.snippet,
