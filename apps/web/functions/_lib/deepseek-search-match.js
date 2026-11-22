@@ -7,7 +7,7 @@ import {isMainlandJobLocation,findMainlandCity} from './mainland-job-location.js
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from './match-job-quality.js';
 import {supplementalQueries,mergeCandidateHits,combineRecommended} from './match-search-growth.js';
 import {planAutonomousMainlandSearch,normalizeAutonomousQueries} from './autonomous-mainland-search.js';
-import {recruitmentSourceKind,isEmployerDirectedSource,isMainlandEmployerJobUrl,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting,sourceCounts} from './match-employer-source.js';
+import {recruitmentSourceKind,isEmployerDirectedSource,isMainlandEmployerJobUrl,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting,sourceCounts,isDirectEmployerSourceHit} from './match-employer-source.js';
 
 const BASE='https://api.deepseek.com';
 const foreign=/(?:香港|澳门|澳門|台湾|臺灣|日本|东京|大阪|新加坡|美国|英国|越南|海外|境外|驻外|overseas|hong kong|tokyo|singapore|remote overseas)/i;
@@ -48,6 +48,7 @@ export function normalizeHits(searchResponses,max=28){
     source:clean(hit?.site_name,80),date:hit?.date||null,content:'',
     recruitment_source_kind:recruitmentSourceKind(url),
     availability:classifyJobAvailability({summary,snippet})};
+   if(!isDirectEmployerSourceHit(row))continue;
    if(!prev||summary.length>prev.summary.length)byUrl.set(key,{...row,id:prev?.id||row.id});
   }
  }
@@ -178,7 +179,7 @@ export function selectedJobs(text,hits,limit=10){
   if(!isRecommendationEligible(evidence))continue;
   // Defense in depth: never let model output or an alternate code path leak a job-board link.
   const verifiedKind=recruitmentSourceKind(evidence.url);
-  if(!isMainlandEmployerJobUrl(evidence.url))continue;
+  if(!isDirectEmployerSourceHit(evidence))continue;
   const signature=(company+'|'+title).toLowerCase().replace(/\s/g,'');
   if(seen.has(signature)||seen.has(evidence.url))continue;
   seen.add(signature);seen.add(evidence.url);
@@ -276,7 +277,7 @@ export function sourceOnlyJobPreviews(hits,limit=10){
  const out=[],urls=new Set();
  for(const hit of hits){
   if(out.length>=limit)break;
-  if(!isMainlandEmployerJobUrl(hit?.url)||!isRecommendationEligible(hit)||urls.has(hit.url))continue;
+  if(!isDirectEmployerSourceHit(hit)||!isRecommendationEligible(hit)||urls.has(hit.url))continue;
   const site=clean(hit.source,90);
   const company=site.replace(/(?:官方招聘|招聘官网|招聘平台|招聘网站|人才招聘|招聘|官网|careers?|jobs?)$/gi,'')
    .replace(/(?:有限责任公司|股份有限公司|有限公司|公司)$/,'').trim();
