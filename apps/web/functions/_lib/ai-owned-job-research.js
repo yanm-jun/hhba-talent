@@ -96,8 +96,14 @@ async function modelDecision(key,resume,roleHint,pool,queries,history,deadline,{
     '\n已有真实招聘证据（候选ID为唯一访问凭据）：\n'+JSON.stringify(observations.slice(0,100))+
     '\n本轮已做的工具操作：\n'+JSON.stringify(history.slice(-14))})
  });
- if(!response.ok)throw Object.assign(new Error('AI_AGENT_DECISION_UNAVAILABLE'),{
-  code:response.status===429?'AI_PROVIDER_RATE_LIMITED':'AI_AGENT_DECISION_UNAVAILABLE'});
+ if(!response.ok){
+  const code=response.status===401||response.status===403?'AI_PROVIDER_KEY_REJECTED':
+   response.status===402?'AI_PROVIDER_BALANCE_INSUFFICIENT':
+   response.status===429?'AI_PROVIDER_RATE_LIMITED':
+   [400,404,422].includes(response.status)?'AI_PROVIDER_REQUEST_REJECTED':
+   'AI_AGENT_DECISION_UNAVAILABLE';
+  throw Object.assign(new Error(code),{code});
+ }
  try{return JSON.parse(modelOutput(await response.json()))}
  catch{throw Object.assign(new Error('AI_AGENT_DECISION_INVALID'),{code:'AI_AGENT_DECISION_INVALID'})}
 }
@@ -231,6 +237,8 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    agentPlannedQueries=queries.length;
    history.push({type:'plan',strategy:shorten(initial?.strategy,180),queries:queries.length});
   }catch(e){
+   if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+    'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED'].includes(e?.code))throw e;
    // Fixed search terms are only the provider-outage fallback.
    queries=searchQueries(resume,roleHint);
    history.push({type:'plan_unavailable',code:String(e.code||'PROVIDER_UNAVAILABLE')});
@@ -256,6 +264,8 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    decisions++;
    activity('planning','AI 已完成第 '+decisions+' 次研究决策，正在执行所选工具。');
   }catch(e){
+   if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+    'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED'].includes(e?.code))throw e;
    decisionFailures++;
    history.push({type:'reflection_error',code:String(e.code||'INVALID')});
    exitReason='model_decision_unavailable';

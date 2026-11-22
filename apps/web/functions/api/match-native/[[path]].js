@@ -10,6 +10,7 @@ import {researchDomesticJobEvidence} from '../../_lib/domestic-job-research.js';
 import {iterateScoredJobEvidence} from '../../_lib/agent-score-feedback.js';
 import {createAccountResearchCheckpoint} from '../../_lib/ai-research-checkpoint.js';
 import {jobResearchQuality} from '../../_lib/agent-quality-metrics.js';
+import {checkMatchProviderCapabilities} from '../../_lib/match-provider-preflight.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -47,15 +48,6 @@ async function candidateSession(env,request){
  if(!session)return null;
  const user=await getUserByPhone(db,session.phone);
  return user?.role==='candidate'?session:null;
-}
-async function providerCheck(key){
- const r=await fetch('https://api.deepseek.com/user/balance',{
-  method:'GET',redirect:'manual',signal:AbortSignal.timeout(12000),
-  headers:{Authorization:'Bearer '+key,Accept:'application/json'}
- });
- if(!r.ok)return {error:providerError(r.status)};
- const data=await r.json();
- return data?.is_available===true?{ok:true}:{error:'AI_PROVIDER_BALANCE_INSUFFICIENT'};
 }
 // DeepSeek Responses emits semantic SSE rather than a single blocking JSON body.
 // We listen to search progress and only trust its terminal response.completed event.
@@ -170,7 +162,8 @@ async function runCandidateResearch(env,key,resume,roleHint,limit,options={}){
   // failure. Never override an intentional Agent conclusion with a fixed
   // keyword fallback that might accidentally recommend weaker sources.
   if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
-   'AI_PROVIDER_RATE_LIMITED','AI_EMPLOYER_JOBS_NOT_FOUND',
+   'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED',
+   'AI_EMPLOYER_JOBS_NOT_FOUND',
    'AI_SEARCH_API_REJECTED','AI_SEARCH_UNAVAILABLE',
    'AI_SEARCH_RESPONSE_INVALID'].includes(error?.code))throw error;
   console.warn('HHBA_AI_RESEARCH_RECOVERY',JSON.stringify({
@@ -389,9 +382,12 @@ export async function onRequest({request,env}){
  if(tail==='/provider-check'&&request.method==='GET'){
   try{
    if(!(await candidateSession(env,request)))return fail('SESSION_INVALID',401);
-   const result=await providerCheck(env.HHBA_MATCH_DEEPSEEK_KEY);
-   return result.ok?json({ok:true,status:'READY'}):fail(result.error,502);
-  }catch{return fail('AI_PROVIDER_UNAVAILABLE',502);}
+   const result=await checkMatchProviderCapabilities(env.HHBA_MATCH_DEEPSEEK_KEY);
+   return json({ok:true,status:'READY',capabilities:result.capabilities});
+  }catch(error){
+   const code=typeof error?.code==='string'?error.code:'AI_PROVIDER_UNAVAILABLE';
+   return fail(code,502);
+  }
  }
  if(tail!=='/resume'||request.method!=='POST')return fail('NOT_FOUND',404);
  if(request.headers.get('Origin')!==url.origin||request.headers.get('Sec-Fetch-Site')==='cross-site')

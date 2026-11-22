@@ -271,7 +271,7 @@ export async function checkMatchProviderConnection(signal?:AbortSignal):Promise<
  if(!response.ok)throw new MatchError(response.status,
   errorMap[data.error||'']||'AI 服务检测暂时不可用。');
  if(data.ok!==true||data.status!=='READY')throw new MatchError(502,'AI 服务检测返回异常结果。');
- return 'AI 密钥验证成功、余额可用。没有发送简历，也没有消耗匹配次数。';
+ return 'DeepSeek 余额、Search 检索与 V4 Pro 模型 JSON 接口均通过检查。没有发送简历，也没有消耗匹配次数。';
 }
 
 /** Safe outbound detail URL for a fetched and independently reviewed mainland

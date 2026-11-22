@@ -7,7 +7,7 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchProgress,type NativeMatchActivity,MatchError} from '../services/resumeMatch';
+import {matchServiceReady,checkMatchProviderConnection,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchProgress,type NativeMatchActivity,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -56,6 +56,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [result,setResult]=useState<MatchResponse|null>(null);
  const [optimizationSource,setOptimizationSource]=useState('');
  const controller=useRef<AbortController|null>(null);
+ const providerCheckedAt=useRef(0);
  useEffect(()=>{
   const abort=new AbortController();
   void matchServiceReady(abort.signal).then(ok=>{if(!abort.signal.aborted)setAvailability(ok?'ready':'disabled')});
@@ -154,6 +155,16 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   const abort=new AbortController();
   controller.current=abort;
   try{
+   // Validate the actual Search capability once before sending CV content or
+   // committing an upload. A valid account balance does NOT imply that the
+   // DeepSeek Search API is available. Cache only a successful result.
+   if(Date.now()-providerCheckedAt.current>300000){
+    setStage('connected');
+    setActivity({stage:'connected',
+     message:'先检测 DeepSeek Search 接口与账户权限，避免启动后长时间空等。'});
+    await checkMatchProviderConnection(abort.signal);
+    providerCheckedAt.current=Date.now();
+   }
    // A new upload is never silently stored: save only after explicit choice,
    // and only after its private vault confirms a valid file ID.
    let matchResumeId=savedId;

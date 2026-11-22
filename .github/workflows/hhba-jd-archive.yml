@@ -37,6 +37,8 @@ on:
       - 'apps/web/scripts/agent-quality-metrics.contract.test.mjs'
       - 'apps/web/scripts/ai-owned-job-research.contract.test.mjs'
       - 'apps/web/scripts/match-live-recovery.contract.test.mjs'
+      - 'apps/web/functions/_lib/match-provider-preflight.js'
+      - 'apps/web/scripts/match-preflight-resilience.contract.test.mjs'
       - 'apps/web/scripts/autonomous-mainland-search.contract.test.mjs'
       - 'apps/web/functions/_lib/deepseek-search-match.js'
       - 'apps/web/functions/_lib/match-employer-source.js'
@@ -86,6 +88,7 @@ jobs:
           node --test scripts/autonomous-mainland-search.contract.test.mjs
           node --test scripts/ai-owned-job-research.contract.test.mjs
           node --test scripts/match-live-recovery.contract.test.mjs
+          node --test scripts/match-preflight-resilience.contract.test.mjs
           node --test scripts/agent-score-feedback.contract.test.mjs
           node --test scripts/ai-research-checkpoint.contract.test.mjs
           node --test scripts/agent-quality-metrics.contract.test.mjs
