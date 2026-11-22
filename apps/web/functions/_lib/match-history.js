@@ -46,6 +46,15 @@ export function safeHistoryJobs(matches){
     item.availability_status:'UNKNOWN',
    recruitment_source_kind:text(item.recruitment_source_kind,35),
    recruitment_source_note:text(item.recruitment_source_note,130),
+   // Retain source provenance for later Word revisions; never persist raw CV.
+   evidence_status:['VERIFIED_FULL_JD','PARTIAL_SOURCE','SEARCH_SNIPPET_ONLY','INSUFFICIENT_EVIDENCE']
+    .includes(item.evidence_status)?item.evidence_status:null,
+   evidence_excerpt:text(item.evidence_excerpt,1400),
+   evidence_sources:(Array.isArray(item.evidence_sources)?item.evidence_sources:[])
+    .slice(0,4).filter(s=>s&&typeof s.url==='string'&&
+     /^(?:https:\/\/)/.test(s.url)&&s.url.length<=1300&&
+     ['EMPLOYER_PAGE_CANDIDATE','PUBLIC_ANNOUNCEMENT_CANDIDATE'].includes(s.kind))
+    .map(s=>({url:s.url,kind:s.kind})),
    ...verifiedJdMeta(item)});
   if(out.length===10)break;
  }
