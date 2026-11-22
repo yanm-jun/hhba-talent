@@ -12,6 +12,9 @@ export type HistoryMatchedJob={
  availability_status:'OPEN_LISTED'|'UNKNOWN';
  recruitment_source_kind:string;recruitment_source_note:string;
  jd_version_id?:string;jd_sha256?:string;jd_checked_at?:string;
+ evidence_status?:'VERIFIED_FULL_JD'|'PARTIAL_SOURCE'|'SEARCH_SNIPPET_ONLY'|'INSUFFICIENT_EVIDENCE';
+ evidence_excerpt?:string;
+ evidence_sources?:{url:string;kind:string}[];
  jd_source_status?:'VERIFIED_JD';jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
  jd_proof_method?:'PUBLIC_EMPLOYER_ATS_V1'|'DIRECT_EMPLOYER_HTML_V1'|null;
 };
