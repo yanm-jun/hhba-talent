@@ -27,7 +27,7 @@ type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
 export function CandidateMatchNativeDialog({result,onClose,pending=false,progressStage='preparing',progressActivity=null,elapsedSeconds=0,activityIdleSeconds=0,researchTrail=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
-  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'|'profile'>>;
+  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'|'profile'|'native_search'>>;
  onClose:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
  progressActivity?:NativeMatchActivity|null;elapsedSeconds?:number;activityIdleSeconds?:number;
  researchTrail?:NativeMatchActivity[];
@@ -227,6 +227,20 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
       <h2 id="hhba-native-title">职业研究已完成 · 本次整理 {result.matches.length} 个岗位</h2>
       <p>职位来源可追溯，适配分是有依据的参考，不是录用概率。没有足够证据的岗位明确标注待核实，不会为了凑足数量编造招聘信息。</p>
      </div>
+     {result.native_search&&<section className="hhba-research-report-funnel" aria-label="本次岗位研究依据">
+      <div><strong>本次研究情况</strong><span>记录来自实际搜索和岗位筛选，不代表全部网页都是职位。</span></div>
+      <p>累计获得 {result.native_search.provider_items||0} 条网页搜索结果，
+       整理了 {result.native_search.candidate_links??result.native_search.visible_jobs} 条来源候选。
+       {typeof result.native_search.explicit_city_sources==='number'&&<>
+        其中 {result.native_search.explicit_city_sources} 条提供明确国内工作城市证据。</>}
+       {typeof result.native_search.underfilled_rechecks==='number'&&result.native_search.underfilled_rechecks>0&&<>
+        因推荐数量不足，AI 又对未入选的候选进行了补充比较。</>}
+      </p>
+      {result.matches.length<10&&<p className="hhba-research-report-limit">
+       本次只展示 {result.matches.length} 条能够追溯到招聘来源的岗位信息；
+       证据不足或来源不符合要求的网页不会为了凑数量进入推荐。
+      </p>}
+     </section>}
      {researchTrail.length>0&&<details className="hhba-research-report-log">
       <summary><FileText size={16}/> 查看本次 AI 研究记录 <ChevronDown size={15}/></summary>
       <div className="hhba-research-report-entries">
