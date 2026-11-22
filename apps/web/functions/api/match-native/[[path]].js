@@ -202,10 +202,12 @@ async function matchResumeWorkflow(env,candidate,resume,options,{
  signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{}
 }={}){
  const key=env.HHBA_MATCH_DEEPSEEK_KEY;
+ const workflowStart=Date.now();
  onProgress('parsing');
  onActivity({stage:'parsing',message:'正在从简历正文核对工作经历和技能。'});
  const profile=await recognizeMatchResume(key,resume,options.role_hint,{signal,
   onFallback:()=>onActivity({stage:'parsing',message:'已启动另一轮简历核对，取得原文证据后将开始搜索岗位。'})});
+ const profileMs=Date.now()-workflowStart;
  onProgress('planning');
  onActivity({stage:'planning',message:'已核对 '+profile.facts.length+' 条简历证据，正在规划岗位搜索方向。'});
  const checkpoint=await checkpointForCandidate(env,candidate,resume,options.role_hint);
@@ -227,12 +229,15 @@ async function matchResumeWorkflow(env,candidate,resume,options,{
    onPartial(provisionalPartial(review?review.preview(fresh):fresh));
   }};
  let result;
+ const discoveryStart=Date.now();
  try{result=await runCandidateResearch(env,key,resume,options.role_hint,options.limit,researchOptions);}
  catch(error){
   if(error?.code!=='AI_EMPLOYER_JOBS_NOT_FOUND'||(!checkpoint&&!review))throw error;
   result={matches:[],incomplete:true,diagnostic:error.diagnostic||{}};
  }
+ const discoveryMs=Date.now()-discoveryStart;
  const fresh={...result,matches:result.matches.filter(job=>!excludePosting(job.official_url))};
+ const jdWaitStart=Date.now();
  let verified;
  if(review){
   onProgress('reading');
@@ -244,10 +249,17 @@ async function matchResumeWorkflow(env,candidate,resume,options,{
    ...options,signal,onVerified:jobs=>onPartial(provisionalPartial(jobs)),compareEvidence
   },onProgress);
  }
+ const jdFinishWaitMs=Date.now()-jdWaitStart;
  onPartial(provisionalPartial(verified.matches));
+ const evidenceStart=Date.now();
  const researched=await domesticResearchPass(env,key,verified,resume,{signal,resumeProfile:profile},onProgress);
+ const evidenceMs=Date.now()-evidenceStart;
  const canContinue=Boolean(checkpoint&&await checkpoint.load());
- return {result:{...researched,profile,can_continue:canContinue},checkpoint};
+ return {result:{...researched,profile,can_continue:canContinue,
+  diagnostic:{...researched.diagnostic,phase_latency_ms:{
+   resume_recognition:profileMs,discovery:discoveryMs,
+   jd_finish_wait:jdFinishWaitMs,evidence_research:evidenceMs,
+   total:Date.now()-workflowStart}}},checkpoint};
 }
 
 async function withSavedHistory(env,session,input,result){
