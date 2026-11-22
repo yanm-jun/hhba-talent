@@ -61,6 +61,25 @@ export function normalizeResearchDecision(raw,pool,usedQueries){
  return {queries,fetchIds:ids,shortlistIds:shortlist,finish,
   rationale:shorten(data.rationale,240),sourceCount:byUrl.size};
 }
+/**
+ * Source recovery: use public repost titles as hints for a bounded search
+ * of employer-owned hiring pages. Repost URLs never become job links.
+ */
+export function targetedEmployerRecoveryQueries(history,usedQueries=[]){
+ const titles=[...history].reverse().flatMap(row=>
+  Array.isArray(row?.rejected_title_hints)?row.rejected_title_hints:[]);
+ const proposals=[];
+ for(const item of titles){
+  const title=shorten(item,95)
+   .replace(/(?:[-—–|_ ]+)(?:牛企直聘|智联招聘|前程无忧|最佳东方|猎聘|BOSS直聘|招聘网|求职网)(?:.*)?$/i,'')
+   .trim();
+  if(title.length<4||/(?:Job Board|职位列表|全部职位|招聘首页|招聘频道|职位搜索)/i.test(title)||
+   /(?:https?:\/\/|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|(?<!\d)1[3-9]\d{9}(?!\d))/i.test(title))continue;
+  if(!/(?:招聘|岗位|职位|督导|运营|经理|主管|专员|产品|销售|设计|工程师|顾问|交付|渠道|店长|DCC)/i.test(title))continue;
+  proposals.push(title.slice(0,58)+' 企业官网 官方招聘 职位详情 -site:zhipin.com -site:51job.com -site:liepin.com');
+ }
+ return normalizeAutonomousQueries(proposals,usedQueries).slice(0,4);
+}
 async function modelDecision(key,resume,roleHint,pool,queries,history,deadline,{
  fetcher=fetch,signal=null,decisionTimeoutMs=35000
 }={}){
@@ -260,6 +279,16 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   // Initial broad discovery cannot spend the full service window before
   // the Agent has a chance to correct source quality and choose candidates.
   await searchTool(queries,{reserveMs:85000});
+ }
+ // Don't deliberate for the entire service window over job-board results.
+ // Re-check the actual employer's hiring pages; all URLs still go through
+ // the normal official-source and vacancy evidence gates.
+ if(pool.filter(isRecommendationEligible).length<3&&budget()>74000){
+  const recoveryQueries=targetedEmployerRecoveryQueries(history,usedQueries);
+  if(recoveryQueries.length){
+   activity('searching','公开结果中存在招聘转载线索，正在定向核对企业自身的招聘页面。');
+   await searchTool(recoveryQueries,{reserveMs:63000});
+  }
  }
  // Reserve a meaningful window for evidence-backed selection rather than
  // letting the search loop consume the whole request and return no jobs.
