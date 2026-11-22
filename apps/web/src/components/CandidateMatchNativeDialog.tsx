@@ -233,6 +233,10 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
        整理了 {result.native_search.candidate_links??result.native_search.visible_jobs} 条来源候选。{result.native_search.checkpoint_restored&&'其中包含上次保留的公开岗位研究记录，本轮新增网页数不包含旧记录。'}
        {typeof result.native_search.explicit_city_sources==='number'&&<>
         其中 {result.native_search.explicit_city_sources} 条提供明确国内工作城市证据。</>}
+       {typeof result.native_search.search_failures==='number'&&result.native_search.search_failures>0&&<>
+        本轮还有 {result.native_search.search_failures} 条公开搜索请求未成功，实际结果可能不完整。</>}
+       {typeof result.native_search.underfilled_expansion_queries==='number'&&result.native_search.underfilled_expansion_queries>0&&<>
+        岗位来源不足时已额外尝试 {result.native_search.underfilled_expansion_queries} 个官网搜索方向，新增 {result.native_search.underfilled_expansion_new||0} 条候选。</>}
        {typeof result.native_search.underfilled_rechecks==='number'&&result.native_search.underfilled_rechecks>0&&<>
         因推荐数量不足，AI 又对未入选的候选进行了补充比较。</>}
       </p>

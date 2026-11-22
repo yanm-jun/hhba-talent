@@ -66,8 +66,10 @@ test('model chooses research, then cross-industry search, then evidence-based fi
  assert.equal(result.diagnostic.agent_exit_reason,'agent_finished');
  assert.ok(result.diagnostic.page_reads>=1,'real source research must not be skipped');
  assert.ok(result.diagnostic.selection_rounds>=1);
- assert.deepEqual(queryLog,['汽车区域督导 上海 企业官网招聘',
-  '跨行业 数字化项目运营 杭州 企业招聘']);
+ assert.ok(queryLog.includes('汽车区域督导 上海 企业官网招聘'));
+ assert.ok(queryLog.includes('跨行业 数字化项目运营 杭州 企业招聘'));
+ assert.ok(queryLog.some(q=>q.includes('汽车渠道运营')),
+  'privacy-safe initial Search starts even before the AI planner finishes');
  assert.equal(result.matches[0].official_url,adjacent.url);
  assert.equal(chosen[0][0],adjacent.url,'AI-selected research focus precedes original source');
  assert.ok(progress.includes('planning')&&progress.includes('researching')&&progress.includes('searching'));
@@ -120,4 +122,31 @@ test('the real candidate route defaults to model-owned loop and preserves authen
  assert.match(route,/candidateSession\(env,request\)/);
  assert.match(route,/redactForModel\(input\.text\)/);
  assert.match(word,/jobContextForAI/);
+});
+
+test('first Search starts without waiting for autonomous planner, but planner directions still execute',async()=>{
+ const observations=[];
+ const src={id:'j1',title:'职位详情',
+  url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId=980001',
+  source:'美团招聘',
+  summary:'区域督导经理社招-正式 工作地点：北京市。岗位职责：商家运营与督导。',
+  availability:{status:'UNKNOWN'}};
+ const result=await runAgentOwnedMainlandMatch('synthetic',
+  '模拟简历：做过区域汽车门店督导管理','',10,{expandDetailed:false},{
+   plan:async()=>{
+    assert.ok(observations.includes('search-started'),
+     'public Search should not be blocked on reasoning planning');
+    observations.push('planner');
+    return {queries:['DeepSeek自选 多行业 招聘渠道运营']};
+   },
+   search:async(k,resume,hint,opts)=>{
+    observations.push('search-started');
+    return {hits:[src],diagnostic:{successful_searches:opts.queriesOverride.length,raw_results:3}};
+   },
+   decide:async()=>({actions:[{type:'finish'}]}),
+   select:async()=>{const e=new Error('AI_MATCH_NO_VALID_JOBS');e.code=e.message;throw e;},
+   recover:async()=>[]
+  });
+ assert.ok(result.matches.length>=1);
+ assert.ok(result.diagnostic.searches>=1);
 });

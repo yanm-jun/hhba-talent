@@ -98,7 +98,7 @@ test('Agent resumes public evidence, but replans when the old shortlist is insuf
  assert.equal(planned,true);
  assert.equal(searched,true);
  assert.equal(result.diagnostic.checkpoint_restored,true);
- assert.equal(result.diagnostic.provider_items,5);
+ assert.ok(result.diagnostic.provider_items>=5,'resume refresh may legitimately find more than one batch');
  assert.equal(selected[0].url,valid.url);
  assert.equal(result.matches[0].official_url,valid.url);
 });
@@ -130,4 +130,18 @@ test('migration and authenticated API integrate the checkpoint without saving CV
  assert.match(route,/checkpointForCandidate\(env,candidate,redacted,options\.role_hint\)/);
  assert.match(route,/iterateScoredJobEvidence/);
  assert.match(route,/checkpoint\?\.clear\(\)/);
+});
+
+test('public source-clue titles survive a safe checkpoint, but failed page reads are retryable',()=>{
+ const state=sanitizePublicResearchCheckpoint({pool:[{...valid,fetch_attempted:true}],
+  history:[{type:'search',found:1,rejected_title_hints:[
+   '美团招聘区域督导经理','https://board.invalid/jobs/1',
+   'person@example.com','联系13800138000','汽车渠道督导招聘'
+  ]}]});
+ assert.equal(state.pool[0].fetch_attempted,false);
+ assert.ok(state.history[0].rejected_title_hints.includes('美团招聘区域督导经理'));
+ assert.ok(state.history[0].rejected_title_hints.includes('汽车渠道督导招聘'));
+ assert.ok(!JSON.stringify(state).includes('board.invalid'));
+ assert.ok(!JSON.stringify(state).includes('13800138000'));
+ assert.ok(!JSON.stringify(state).includes('person@example.com'));
 });

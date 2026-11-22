@@ -21,7 +21,7 @@ const publicHit=source=>{
  return {id:text(source.id,48),url:source.url,title:text(source.title,150),
   source:text(source.source,95),summary:text(source.summary,650),
   snippet:text(source.snippet,300),content:text(source.content,1000),
-  availability:{status:availability},fetch_attempted:source.fetch_attempted===true,
+  availability:{status:availability},fetch_attempted:false,
   recruitment_source_kind:'EMPLOYER_DOMAIN_CANDIDATE'};
 };
 export function sanitizePublicResearchCheckpoint(input){
@@ -42,6 +42,13 @@ export function sanitizePublicResearchCheckpoint(input){
   type:text(entry?.type,32),code:text(entry?.code,60),
   found:Number.isInteger(entry?.found)?entry.found:undefined,
   read:Number.isInteger(entry?.read)?entry.read:undefined,
+  // Public Search snippets can guide later official-employer lookup. Keep
+  // short role titles only, never mirror URLs, contacts or applicant data.
+  rejected_title_hints:Array.isArray(entry?.rejected_title_hints)?
+   entry.rejected_title_hints.filter(item=>typeof item==='string')
+    .map(item=>text(item,90))
+    .filter(item=>item.length>=4&&!/(?:https?:\/\/|@|(?<!\d)1[3-9]\d{9}(?!\d))/.test(item))
+    .slice(0,8):undefined,
   finish:entry?.finish===true
  })):[];
  const state={version:1,pool,usedQueries,shortlistIds,history};

@@ -98,14 +98,16 @@ export async function searchPublicJobs(key,text,roleHint,{
   .filter(h=>!isDirectEmployerSourceHit({url:h?.url,source:h?.site_name||h?.source}))
   .map(h=>clean(h?.title,90))
   .filter(t=>t.length>=4&&t.length<=90))].slice(0,8);
- if(!hits.length&&(!allowEmpty||errors.length===queries.length))throw codeError(errors.includes('AI_PROVIDER_KEY_REJECTED')?'AI_PROVIDER_KEY_REJECTED':
-  errors.includes('AI_PROVIDER_BALANCE_INSUFFICIENT')?'AI_PROVIDER_BALANCE_INSUFFICIENT':
-  errors.includes('AI_PROVIDER_RATE_LIMITED')?'AI_PROVIDER_RATE_LIMITED':
-  errors.includes('AI_SEARCH_API_REJECTED')?'AI_SEARCH_API_REJECTED':
-  errors.length===queries.length?'AI_SEARCH_UNAVAILABLE':'AI_SEARCH_NO_DETAIL_JOBS');
+ const fatal=['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+  'AI_PROVIDER_RATE_LIMITED','AI_SEARCH_API_REJECTED']
+  .find(code=>errors.includes(code));
+ // A healthy empty Search result must not hide parallel API auth/quota failure.
+ if(!hits.length&&(fatal||!allowEmpty||errors.length===queries.length))
+  throw codeError(fatal||(errors.length===queries.length?'AI_SEARCH_UNAVAILABLE':'AI_SEARCH_NO_DETAIL_JOBS'));
  return {hits,diagnostic:{search_ms:Date.now()-start,queries:queries.length,
   successful_searches:queries.length-errors.length,raw_results:responses.reduce((a,x)=>a+x.results.length,0),
   candidate_links:hits.length,search_failures:errors.length,
+  provider_error_codes:[...new Set(errors)].slice(0,6),
   rejected_links:responses.reduce((a,x)=>a+x.results.length,0)-hits.length,
   rejected_title_hints}};
 }
