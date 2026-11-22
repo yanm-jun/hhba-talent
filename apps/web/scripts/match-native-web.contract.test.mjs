@@ -88,7 +88,7 @@ test('one provider POST does Search, evidence-based scores and explanations toge
  assert.deepEqual(calls[0].body.tools,[{type:'web_search'}]);
  assert.equal(calls[0].body.tool_choice,'required');
  assert.equal(calls[0].body.text.format.type,'json_object');
- assert.equal(calls[0].body.reasoning.effort,'none');
+ assert.equal(calls[0].body.reasoning.effort,'high');
  assert.match(calls[0].body.instructions,/match_score/);
  assert.match(calls[0].body.instructions,/score_basis/);
  assert.equal(r.matches.length,2);
@@ -154,7 +154,7 @@ test('V4 Pro search receives SSE events and safely assembles the completed resul
   });
  assert.equal(calls.length,1);
  assert.equal(calls[0].stream,true);
- assert.equal(calls[0].max_output_tokens,3600);
+ assert.equal(calls[0].max_output_tokens,12000);
  assert.equal(out.matches.length,2);
  assert.ok(progress.includes('searching'));
  assert.ok(progress.includes('writing'));
@@ -296,7 +296,7 @@ test('dual native DeepSeek searches run concurrently and merge ten unique roles'
   const body=JSON.parse(options.body);
   const adjacent=body.input.includes('优先发掘简历能力可迁移');
   assert.equal(body.model,'deepseek-v4-pro');
-  assert.equal(body.max_output_tokens,3600);
+  assert.equal(body.max_output_tokens,12000);
   assert.equal(body.stream,true);
   const jobs=Array.from({length:6},(_,i)=>({
    company:adjacent&&i===0?'直接企业1':(adjacent?'迁移企业':'直接企业')+(i+1),
