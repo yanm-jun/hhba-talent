@@ -66,7 +66,9 @@ export function publicMainlandAtsVerificationLeads(searchResponses,max=12){
    const locator=safe&&safePublicAtsJobLocator(safe);
    if(!locator)continue;
    const title=clean(hit?.title,160),summary=clean(hit?.summary||hit?.snippet,500);
-   if(!title||!roleEvidence.test(title+' '+summary))continue;
+   // Exact ATS URL structure already proves this is a single posting
+   // candidate; English employer search titles often omit the word "job".
+   if(title.length<4||summary.length<20)continue;
    if(foreign.test(title)&&!/(?:中国|China|上海|北京|深圳|广州|成都|杭州)/i.test(title))continue;
    urls.add(locator.url);
    if(urls.size>=max)return [...urls];
