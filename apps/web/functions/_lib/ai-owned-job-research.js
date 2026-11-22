@@ -115,12 +115,22 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  const recover=deps.recover||recoverSearchGroundedShortlist;
  const expand=deps.expand||expandDetailedReasons;
  let pool=[],usedQueries=[],pageReads=0,searchCalls=0,searchFailures=0;
+ let checkpointRestored=false,checkpointWrites=0,checkpointErrors=0;
  let rawHits=0,loops=0,decisions=0,decisionFailures=0,reflections=0;
  let exitReason='unknown',shortlistIds=[],agentPlannedQueries=0;
  const history=[];
  const signal=options.signal;
  const ensureActive=()=>{if(signal?.aborted)throw abortError()};
  const budget=()=>Math.max(0,deadline-Date.now());
+ async function saveCheckpoint(phase){
+  if(!options.checkpoint?.save)return;
+  try{
+   const saved=await options.checkpoint.save({pool,usedQueries,
+    shortlistIds,history,phase});
+   if(saved)checkpointWrites++;
+   else checkpointErrors++;
+  }catch{checkpointErrors++}
+ }
  async function searchTool(values){
   const proposed=normalizeAutonomousQueries(values,usedQueries);
   if(!proposed.length)return 0;
@@ -141,10 +151,11 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   const old=pool.length;
   pool=mergeCandidateHits(pool,completed,240);
   history.push({type:'search',queries:proposed,found:pool.length-old});
+  await saveCheckpoint('search');
   return pool.length-old;
  }
  async function fetchTool(candidateIds){
-  const selected=pool.filter(h=>candidateIds.includes(h.id)&&!h.content&&
+  const selected=pool.filter(h=>candidateIds.includes(h.id)&&!h.content&&!h.fetch_attempted&&
    h.availability?.status!=='CLOSED_LISTED');
   if(!selected.length)return 0;
   let read=0;
@@ -156,10 +167,10 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
     const updated=new Map(response.hits.map(h=>[h.url,h]));
     const fetchedUrls=new Set(part.map(hit=>hit.url));
     pool=pool.map(hit=>{
-     if(updated.has(hit.url))return updated.get(hit.url);
-     if(fetchedUrls.has(hit.url))
-      return {...hit,availability:{status:'CLOSED_LISTED',
-       evidence:'职位详情研究结果判定不宜继续推荐',checked_at:new Date().toISOString()}};
+     if(updated.has(hit.url))return {...updated.get(hit.url),fetch_attempted:true};
+     // A failed fetch is NOT evidence the employer closed this vacancy.
+     // Preserve the source's original availability and record the failure.
+     if(fetchedUrls.has(hit.url))return {...hit,fetch_attempted:true};
      return hit;
     });
     read+=response.fetches??0;
@@ -167,23 +178,38 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   }
   pageReads+=read;
   history.push({type:'fetch',candidate_ids:candidateIds,read});
+  await saveCheckpoint('fetch');
   return read;
  }
  ensureActive();onProgress('planning');
- let queries;
- try{
-  const initial=await plan(key,resume,roleHint,{...options,
-   plannerTimeoutMs:Math.min(35000,budget())});
-  queries=normalizeAutonomousQueries(initial?.queries);
-  agentPlannedQueries=queries.length;
-  history.push({type:'plan',strategy:shorten(initial?.strategy,180),queries:queries.length});
- }catch(e){
-  // If planning fails, a small well-known search is the escape hatch, not
-  // the normal decision-maker and not a fabricated result.
-  queries=searchQueries(resume,roleHint);
-  history.push({type:'plan_unavailable',code:String(e.code||'PROVIDER_UNAVAILABLE')});
+ if(options.checkpoint?.load){
+  try{
+   const restored=await options.checkpoint.load();
+   if(restored?.pool?.length){
+    pool=restored.pool.filter(h=>isMainlandEmployerJobUrl(h.url));
+    usedQueries=normalizeAutonomousQueries(restored.usedQueries);
+    shortlistIds=(restored.shortlistIds||[]).filter(id=>pool.some(h=>h.id===id));
+    history.push(...(restored.history||[]).slice(-16));
+    checkpointRestored=pool.length>0;
+    history.push({type:'resumed',found:pool.length});
+   }
+  }catch{checkpointErrors++}
  }
- await searchTool(queries);
+ if(!checkpointRestored){
+  let queries;
+  try{
+   const initial=await plan(key,resume,roleHint,{...options,
+    plannerTimeoutMs:Math.min(35000,budget())});
+   queries=normalizeAutonomousQueries(initial?.queries);
+   agentPlannedQueries=queries.length;
+   history.push({type:'plan',strategy:shorten(initial?.strategy,180),queries:queries.length});
+  }catch(e){
+   // Fixed search terms are only the provider-outage fallback.
+   queries=searchQueries(resume,roleHint);
+   history.push({type:'plan_unavailable',code:String(e.code||'PROVIDER_UNAVAILABLE')});
+  }
+  await searchTool(queries);
+ }
  // Reserve a meaningful window for evidence-backed selection rather than
  // letting the search loop consume the whole request and return no jobs.
  while(budget()>45000){
@@ -214,6 +240,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   if(next.fetchIds.length){onProgress('researching');read=await fetchTool(next.fetchIds);}
   reflections++;
   history.push({type:'action_result',new_jobs:pool.length-before,pages_read:read});
+  await saveCheckpoint('reflection');
   if(budget()<3500){exitReason='runtime_budget';break;}
  }
  if(exitReason==='unknown')exitReason='runtime_budget';
@@ -283,6 +310,8 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    agent_decisions:decisions,agent_reflections:reflections,
    agent_decision_failures:decisionFailures,agent_exit_reason:exitReason,
    agent_page_research_reads:pageReads,
+   checkpoint_restored:checkpointRestored,checkpoint_writes:checkpointWrites,
+   checkpoint_errors:checkpointErrors,
    source_before:sourceCounts(result),source_after:sourceCounts(result),
    search_failures:searchFailures,selection_failures:selectionFailures,
    details_expanded:detail.expanded,details_failed_batches:detail.detail_failures,
