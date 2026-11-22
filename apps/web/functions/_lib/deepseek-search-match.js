@@ -91,6 +91,13 @@ export async function searchPublicJobs(key,text,roleHint,{
   }catch(e){errors.push(e.code||'AI_PROVIDER_UNAVAILABLE');return {results:[]};}
  }));
  const hits=normalizeHits(responses,maxHits);
+ // The Agent may use rejected THIRD-PARTY job titles only as research clues:
+ // find the named employer's OWN hiring page, never use the original URL.
+ // No raw snippets, phone numbers, or CV text cross this boundary.
+ const rejected_title_hints=[...new Set(responses.flatMap(r=>r.results||[])
+  .filter(h=>!isDirectEmployerSourceHit({url:h?.url,source:h?.site_name||h?.source}))
+  .map(h=>clean(h?.title,90))
+  .filter(t=>t.length>=4&&t.length<=90))].slice(0,8);
  if(!hits.length&&(!allowEmpty||errors.length===queries.length))throw codeError(errors.includes('AI_PROVIDER_KEY_REJECTED')?'AI_PROVIDER_KEY_REJECTED':
   errors.includes('AI_PROVIDER_BALANCE_INSUFFICIENT')?'AI_PROVIDER_BALANCE_INSUFFICIENT':
   errors.includes('AI_PROVIDER_RATE_LIMITED')?'AI_PROVIDER_RATE_LIMITED':
@@ -99,7 +106,8 @@ export async function searchPublicJobs(key,text,roleHint,{
  return {hits,diagnostic:{search_ms:Date.now()-start,queries:queries.length,
   successful_searches:queries.length-errors.length,raw_results:responses.reduce((a,x)=>a+x.results.length,0),
   candidate_links:hits.length,search_failures:errors.length,
-  rejected_links:responses.reduce((a,x)=>a+x.results.length,0)-hits.length}};
+  rejected_links:responses.reduce((a,x)=>a+x.results.length,0)-hits.length,
+  rejected_title_hints}};
 }
 export async function enrichCandidateDetails(key,hits,{
  fetcher=fetch,signal=null,onProgress=()=>{},maxFetch=8,fetchTimeoutMs=3200
