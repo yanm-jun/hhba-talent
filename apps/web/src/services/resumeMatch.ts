@@ -24,7 +24,7 @@ export type MatchedJob = {
   professional_credential_requirements?:string[];
   professional_credential_review?:{kind:string;likely_credential:string;warning:string}|null;
   score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
-  recommendation_reason?:string;source_status?:'MODEL_SEARCH_REPORTED'|'OFFICIAL_JD_VERIFIED';
+  recommendation_reason?:string;source_status?:'MODEL_SEARCH_REPORTED'|'SOURCE_SEARCH_PREVIEW'|'OFFICIAL_JD_VERIFIED';
   jd_version_id?:string;jd_sha256?:string;jd_checked_at?:string;
   evidence_status?:'VERIFIED_FULL_JD'|'PARTIAL_SOURCE'|'SEARCH_SNIPPET_ONLY'|'INSUFFICIENT_EVIDENCE'|'RESEARCH_PENDING';
   evidence_excerpt?:string;
