@@ -172,7 +172,7 @@ export function selectedJobs(text,hits,limit=10){
   const reportedLocation=clean(row.location,140);
   const location=isMainlandJobLocation(reportedLocation)?reportedLocation:
    indexedJobWorkCity(evidence)||'';
-  const reason=clean(row.reason,650),
+  const reason=clean(row.reason,1400),
    title=clean(row.title,110),company=clean(row.company,100);
   if(!isMainlandJobLocation(location)||!reason||!company||!title||foreign.test(title))continue;
   if(!isRecommendationEligible(evidence))continue;
@@ -282,7 +282,7 @@ export async function reasonAboutJobs(key,resume,hits,limit,{
   '若搜索结果没有明确工作地点或职位内容，只能不选该条。不要猜城市、公司或岗位硬性要求；不可虚构学历或经历。',
   '优先选择网页有明确招聘开放证据的岗位；UNKNOWN不能写成可投递，CLOSED_LISTED和POSSIBLY_CLOSED不得推荐。尽可能返回十个真实职位，不为凑数捏造。',
   '为每条岗位给出0～100整数的「简历适配分」match_score，依据已有简历和招聘内容评估岗位方向、工作经验、技能与城市偏好，不代表录用概率。分数需有独立的score_basis（至少30字）解释具体加分与不足；证据不充分时match_score填null、score_basis为空。',
-  shortlistOnly?'先快速生成岗位名单。每个候选先完整输出 match_score 与独立 score_basis（至少30字，写出具体简历依据和职位要求），不得省略；无法判断则明确写 null。理由再写45～70字，详细分析将由下一阶段补充。请优先列满符合条件的候选。':'每个为什么推荐的理由写120～180字，结合简历的真实经历成果与职位内容、岗位职责映射、必要的差距提示；避免套话，不能保证录用。',
+  shortlistOnly?'先快速生成岗位名单。每个候选先完整输出 match_score 与独立 score_basis（至少30字，写出具体简历依据和职位要求），不得省略；无法判断则明确写 null。理由只需简洁但必须具体，详细分析由下一阶段继续完成；不要为固定字数牺牲重要信息。请优先列满符合条件的候选。':'每个为什么推荐的理由写120～180字，结合简历的真实经历成果与职位内容、岗位职责映射、必要的差距提示；避免套话，不能保证录用。',
   '输出 JSON 对象，结构：{"jobs":[{"id":"候选id，如j1","company":"岗位原网页中企业","title":"岗位","location":"中国大陆实际工作城市","match_score":85,"score_basis":"岗位与简历实际技能或职责吻合的证据，至少25字","reason":"初步推荐理由，后续补充详细说明","job_basis":"网页明确的岗位职责要点","salary":""}]}。',
   '优先把最有把握的一条完整对象尽早输出，后续逐条补齐。不得在JSON以外输出文字。'
  ].join('\n');
@@ -413,7 +413,7 @@ export async function expandDetailedReasons(key,resume,matches,hits,{
   });
   const prompt=[
    '你只负责补充 HHBA 已有岗位的推荐理由。岗位公司、职位、城市、分数已经确定，不得更改、增删岗位或编造任职条件。',
-   '对每条候选撰写120～180字中文具体理由：简历中的真实相关经历和成果、与此职位明确职责的对应、可能的经验差距。',
+   '对每条候选独立撰写充分、具体且可核对的推荐理由：简历中的真实相关经历和成果、与此职位明确职责的对应、可能的经验差距、投递建议。不要限制在固定字数内，信息多时可以写得更详细。',
    '不要输出URL、额外岗位或成功率预测。没有具体职责证据时明确说明不确定。输出JSON：{"jobs":[{"id":"原有id","reason":"具体理由"}]}。'
   ].join('\n');
   try{
@@ -431,7 +431,7 @@ export async function expandDetailedReasons(key,resume,matches,hits,{
    let source;
    try{source=JSON.parse(raw)}catch{source={jobs:closedRows(raw)}}
    const updates=new Map((source?.jobs||[]).filter(v=>v&&typeof v.id==='string'&&typeof v.reason==='string')
-    .map(v=>[v.id,clean(v.reason,650)]));
+    .map(v=>[v.id,clean(v.reason,1400)]));
    let changed=false;
    for(const job of group){
     const reason=updates.get(job.id);
