@@ -6,6 +6,7 @@ import {safeJobDetailLink,decodeSearchText} from './deepseek-native-match.js';
 import {isMainlandJobLocation,findMainlandCity} from './mainland-job-location.js';
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from './match-job-quality.js';
 import {supplementalQueries,mergeCandidateHits,combineRecommended} from './match-search-growth.js';
+import {planAutonomousMainlandSearch,normalizeAutonomousQueries} from './autonomous-mainland-search.js';
 import {recruitmentSourceKind,isEmployerDirectedSource,isMainlandEmployerJobUrl,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting,sourceCounts} from './match-employer-source.js';
 
 const BASE='https://api.deepseek.com';
@@ -479,26 +480,43 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  firstModelMs=first.model_ms;firstRows=first.provider_rows;
  visible=combineRecommended(visible,first.matches,limit);
  if(visible.length)show(visible);
- // Search another two complementary directions ONLY if there is room. Existing
- // results remain on screen; no repeat resume upload or fictitious fill-ins.
+ // The model, not a fixed hand-written industry/role table, chooses the
+ // next search directions. Static queries are a fallback only. The output
+ // card limit (user's requested result count) does NOT cap AI exploration.
+ let agentQueries=0,agentPlanningStatus='not_needed';
  if(visible.length<limit&&opts.supplementalLimit!==0){
-  const queries=supplementalQueries(resume,roleHint,searchQueries(resume,roleHint))
-   .slice(0,opts.supplementalLimit??2);
+  const used=searchQueries(resume,roleHint);
+  let autonomous=[];
+  if(opts.autonomousPlanning!==false){
+   onProgress('planning');
+   try{
+    const plan=await planAutonomousMainlandSearch(key,resume,roleHint,opts);
+    autonomous=normalizeAutonomousQueries(plan.queries,used);
+    agentQueries=autonomous.length;
+    agentPlanningStatus=autonomous.length?'completed':'no_queries';
+   }catch(error){
+    agentPlanningStatus='provider_unavailable';
+    console.warn('HHBA_AGENT_SEARCH_PLAN_UNAVAILABLE',String(error?.message||'UNKNOWN').slice(0,60));
+   }
+  }else agentPlanningStatus='disabled_by_test_or_option';
+  const fallback=supplementalQueries(resume,roleHint,used);
+  const queries=normalizeAutonomousQueries([...autonomous,...fallback],used)
+   .slice(0,Number.isInteger(opts.supplementalLimit)?opts.supplementalLimit:undefined);
   if(queries.length){
    additionalQueries=queries.length;
    try{
     const supplemental=await searchPublicJobs(key,resume,roleHint,{
-     ...opts,queriesOverride:queries,maxHits:28,allowEmpty:true,queryTimeoutMs:opts.supplementalTimeoutMs??9000
+     ...opts,queriesOverride:queries,maxHits:Math.max(28,queries.length*7),allowEmpty:true,queryTimeoutMs:opts.supplementalTimeoutMs??11000
     });
     supplementSearchMs=supplemental.diagnostic.search_ms;
     additionalCandidates=supplemental.hits.length;
     additionalFiltered=supplemental.diagnostic.rejected_links;
     const earlier=new Set(pool.map(h=>h.url));
-    const combined=mergeCandidateHits(pool,supplemental.hits,48);
+    const combined=mergeCandidateHits(pool,supplemental.hits,Math.max(48,queries.length*7));
     const fresh=combined.filter(h=>!earlier.has(h.url));
     // Only four extra Fetch calls, all parallel. Keep the initial searchable list.
     const checked=await enrichCandidateDetails(key,fresh,{...opts,maxFetch:4,fetchTimeoutMs:2400});
-    additionalFetches=checked.fetches;pool=mergeCandidateHits(pool,checked.hits,48);
+    additionalFetches=checked.fetches;pool=mergeCandidateHits(pool,checked.hits,Math.max(48,queries.length*7));
     const unselected=pool.filter(h=>!visible.some(j=>j.official_url===h.url));
     if(unselected.length){
      let extra;
@@ -556,7 +574,8 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
   initial_closed:enriched.excluded_closed,
   third_party_results_shown:0,
   initial_model_rows:firstRows,initial_visible:first.matches.length,
-  supplement_queries:additionalQueries,supplement_search_ms:supplementSearchMs,
+  supplement_queries:additionalQueries,agent_planned_queries:agentQueries,
+  agent_planning_status:agentPlanningStatus,supplement_search_ms:supplementSearchMs,
   supplement_failed:supplementalFailed,supplement_found:additionalCandidates,
   supplement_filtered_links:additionalFiltered,supplement_model_rows:secondRows,
   final_shortlisted:visible.length,details_expanded:detail.expanded,
