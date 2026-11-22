@@ -96,3 +96,79 @@ test('authenticated preflight precedes saving CV or streaming a full AI job matc
  assert.match(route,/return fail\(code,502\)/);
  assert.ok(!route.includes('providerCheck(env.HHBA_MATCH_DEEPSEEK_KEY)'));
 });
+
+test('default authenticated Cloudflare SSE route genuinely runs model-owned plan→Search→decision→shortlist without a legacy-only mock',async()=>{
+ const {onRequest}=await import('../functions/api/match-native/[[path]].js');
+ const original=globalThis.fetch,calls=[];
+ const url='https://careers.xingyuan-auto.cn/jobs/regional-supervisor-2026';
+ const job={id:'j1',company:'星源汽车有限公司',title:'区域渠道督导',location:'上海',
+  match_score:81,score_basis:'这份简历记载了对经销商日常销售流程的真实管理、客户线索复盘以及区域团队培训经历，可对照企业区域督导岗位职责，但具体任职资格需在官网核实。',
+  reason:'简历中的经销商门店督导、销售培训及线索转化复盘经验与岗位的渠道管理职责方向相关。建议重点整理跨店辅导的实际结果，查看企业官网中的任职经验要求并核对是否在招聘。',
+  job_basis:'区域经销商管理、门店辅导和销售培训'};
+ const modelReply=payload=>new Response(JSON.stringify({status:'completed',
+  output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(payload)}]}]}),
+  {status:200,headers:{'Content-Type':'application/json'}});
+ globalThis.fetch=async(uri,config)=>{
+  const path=new URL(uri).pathname;
+  calls.push({path,body:config?.body?JSON.parse(config.body):null});
+  if(path==='/v1/tools/search')
+   return new Response(JSON.stringify({results:[{title:'星源汽车有限公司 区域渠道督导 上海 招聘',
+    url,site_name:'星源汽车有限公司',snippet:'星源汽车有限公司区域渠道督导 工作地点：上海',
+    summary:'星源汽车有限公司招聘区域渠道督导。工作地点：上海。岗位职责：区域经销商管理、门店培训与线索转化复盘。任职要求具有渠道销售沟通能力。'}]}),
+    {status:200});
+  if(path==='/responses'){
+   const input=String(JSON.parse(config.body).input||'');
+   if(input.includes('已脱敏且用户授权用于分析的简历'))
+    return modelReply({queries:['星源汽车 区域渠道督导 上海 企业官网招聘'],strategy:'渠道岗位'});
+   if(input.includes('已有真实招聘证据'))
+    return modelReply({actions:[{type:'finish'}],shortlist_ids:['j1'],rationale:'已经找到直接岗位证据'});
+   if(JSON.parse(config.body).stream===true){
+    const rows={jobs:[job]};
+    const response={status:'completed',output:[
+     {type:'message',content:[{type:'output_text',text:JSON.stringify(rows)}]}]};
+    const events=[{type:'response.output_text.delta',delta:JSON.stringify(rows)},
+     {type:'response.completed',response}].map(x=>'event: '+x.type+'\ndata: '+JSON.stringify(x)+'\n\n').join('');
+    return new Response(events,{status:200,headers:{'Content-Type':'text/event-stream'}});
+   }
+   return modelReply({jobs:[{id:'search-j1',reason:job.reason}]});
+  }
+  throw Error('Unexpected outbound URL '+uri);
+ };
+ const db={prepare(sql){return {bind(){return {
+  async first(){
+   if(sql.includes('hhba_auth_sessions'))return {phone:'13800000000',revoked:0,
+    expires_at:new Date(Date.now()+3600000).toISOString()};
+   if(sql.includes('hhba_auth_users'))return {role:'candidate',phone:'13800000000'};
+   throw Error('unused D1 lookup');
+  },async run(){return {success:true}}
+ }}}}};
+ const env={HHBA_MATCH_SERVICE_ENABLED:'1',
+  HHBA_MATCH_DEEPSEEK_KEY:'synthetic-test-secret-not-production',
+  HHBA_AI_OWNED_RESEARCH_ENABLED:'1',
+  HHBA_AGENT_CHECKPOINT_ENABLED:'0',
+  HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED:'0',
+  HHBA_MATCH_JD_ENRICH_ENABLED:'0',HHBA_PNVS_AUTH_DB:db};
+ try{
+  const request=new Request('https://hhba.example/api/match-native/resume',{
+   method:'POST',headers:{Origin:'https://hhba.example',
+    Authorization:'Bearer synthetic-client-token',
+    Accept:'text/event-stream','Content-Type':'application/json'},
+   body:JSON.stringify({text:'经销商区域门店督导，DCC 管理、线索转化数据分析与团队培训。负责门店流程改善。',
+    consent:true,options:{country:'CN',remote_only:false,role_hint:'',limit:10}})
+  });
+  const response=await onRequest({request,env});
+  assert.equal(response.status,200);
+  const events=await response.text();
+  assert.match(events,/event: activity/,'Agent must report actual actions');
+  assert.match(events,/event: progress/);
+  assert.match(events,/event: complete/);
+  assert.doesNotMatch(events,/event: failure/);
+  assert.match(events,/星源汽车有限公司/);
+  assert.match(events,/HHBA_MAINLAND_AI_OWNED_RESEARCH_V1/);
+  assert.ok(calls.some(x=>x.path==='/responses'&&
+   String(x.body?.input||'').includes('已有真实招聘证据')));
+  assert.ok(calls.some(x=>x.path==='/v1/tools/search'));
+  assert.ok(!calls.some(x=>String(x.body?.query||'').includes('经销商区域门店督导')),
+   'public query must not leak exact CV text');
+ }finally{globalThis.fetch=original}
+});
