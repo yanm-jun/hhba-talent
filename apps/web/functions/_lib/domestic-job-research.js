@@ -136,6 +136,7 @@ async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,m
   '每一项需要具体、有信息量，不能写通用客套话。若职位正文缺失，可分析岗位名称与真实简历的方向关联，但不能声称企业要求某能力。',
   'PARTIAL_SOURCE 有公开职责或要求，可对照其文字生成0-100的 AI 初步适配分；SEARCH_SNIPPET_ONLY 只能评价岗位方向与简历的初步关联，不得表示已满足任职要求，分数必须用方向参考分解释；INSUFFICIENT_EVIDENCE 一律返回 match_score:null。',
   '打分依据 score_basis 要至少40字，明确至少一项用户简历事实和本次已知的岗位信息，指出未核实的条件。证据不足必须返回null；不能为了凑分而虚构。',
+  '对每个岗位还要提供 evidence_gaps（仍缺少的具体公开职责或任职资格证据）和 next_research_questions（可以通过企业公开信息进一步核实的问题）。只能围绕真实岗位发问，不编造JD。',
   '所有岗位必须使用已有id，禁止新增岗位、链接或来源，禁止把方向分冒充完整JD匹配分，禁止承诺录用。',
   '严格输出 JSON 对象：{"jobs":[{"id":"原id","match_score":82,"score_basis":"具体评分依据","resume_evidence":"简历里的真实依据","role_relation":"与已知岗位的关系","unknowns":"需要核实的条件","next_step":"实际行动建议"}]}'
  ].join('\n');
@@ -184,6 +185,10 @@ async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,m
   const scoreStatus=value===null?undefined:job.evidence_status==='PARTIAL_SOURCE'?
    'AI_PARTIAL_SOURCE_SCORED':'AI_DIRECTION_REFERENCE_SCORED';
   return {...job,recommendation_reason:reason,
+   evidence_gaps:Array.isArray(row.evidence_gaps)?
+    row.evidence_gaps.filter(x=>typeof x==='string').slice(0,5).map(x=>clean(x,180)):[],
+   next_research_questions:Array.isArray(row.next_research_questions)?
+    row.next_research_questions.filter(x=>typeof x==='string').slice(0,5).map(x=>clean(x,180)):[],
    ...(value!==null?{match_score:value,reference_score:value,score_basis:basis,
     evidence_score_status:scoreStatus}:{}),
    evidence_reason_status:complete?'AI_INDIVIDUAL_ANALYSIS':'FALLBACK'};
