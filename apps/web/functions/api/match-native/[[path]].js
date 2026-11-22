@@ -179,12 +179,13 @@ async function runCandidateResearch(env,key,resume,roleHint,limit,options={}){
    agent_fallback:true,agent_error:String(error?.code||'AGENT_UNAVAILABLE').slice(0,70)}};
  }
 }
-async function domesticResearchPass(env,key,result,resume,options,progress=()=>{},signal=null){
+async function domesticResearchPass(env,key,result,resume,options,progress=()=>{},signal=null,publish=()=>{}){
  progress('researching');
  const checked=await researchDomesticJobEvidence(key,resume,result.matches,{
   ...options,signal,onProgress:progress,
   enabled:env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'
  });
+ publish(checked.matches);
  let final=checked.matches,feedback={mode:'disabled'};
  // The grading result is evidence for the next Agent decision, not the end
  // of its authority. The legacy stream mocks remain isolated.
@@ -196,6 +197,7 @@ async function domesticResearchPass(env,key,result,resume,options,progress=()=>{
     ...options,signal,onProgress:progress,timeBudgetMs:40000
    });
    final=revised.matches;feedback=revised.diagnostic;
+   if(feedback.feedback_refined_jobs>0)publish(final);
   }catch(error){
    feedback={mode:'unavailable',code:String(error?.code||'RESEARCH_UNAVAILABLE').slice(0,60)};
   }
@@ -452,7 +454,8 @@ export async function onRequest({request,env}){
        },onPartial:matches=>send('partial',{matches:provisionalPartial(matches)})});
       const verified=await verifiedJdPass(env,result,redacted,options,stage=>send('progress',{stage}));
       const researched=await domesticResearchPass(env,env.HHBA_MATCH_DEEPSEEK_KEY,
-       verified,redacted,options,stage=>send('progress',{stage}),abort.signal);
+       verified,redacted,options,stage=>send('progress',{stage}),abort.signal,
+       matches=>send('partial',{matches}));
       send('partial',{matches:researched.matches});
       console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(researched.diagnostic));
       send('complete',await withSavedHistory(env,candidate,input,researched));
