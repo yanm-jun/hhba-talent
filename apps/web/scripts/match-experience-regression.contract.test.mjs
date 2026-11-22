@@ -110,9 +110,9 @@ test('real stage-aware modal mounts at click and preserves original scroll/resul
  const style=readFileSync(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
  assert.match(page,/\(result\|\|partialJobs\.length>0\)\|\|working/);
  assert.match(page,/progressStage=\{stage\}/);
- assert.match(modal,/hhba-match-live-progress/);
- assert.match(modal,/pending&&result\.matches\.length===0\?null:/);
- assert.match(modal,/正在为你寻找合适的工作机会/);
+ assert.match(modal,/hhba-research-journal/);
+ assert.match(modal,/pending\?null:activeJob/);
+ assert.match(modal,/正在研究适合你的职业机会/);
  assert.match(modal,/取消搜索/);
  assert.match(style,/prefers-reduced-motion:reduce/);
  assert.match(route,/progress\('researching'\)/);
