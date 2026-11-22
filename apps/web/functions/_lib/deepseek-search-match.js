@@ -156,9 +156,9 @@ function closedRows(text){
  */
 export function indexedJobWorkCity(hit){
  const body=[hit?.summary,hit?.snippet,hit?.content].filter(Boolean).join(' ');
- const match=body.match(/(?:工作地点|工作城市|办公地点|办公城市|岗位地点|岗位城市)[：:\\s]{0,4}([^，。；;\\n]{2,40})/i);
+ const match=body.match(/(?:工作地点|工作城市|办公地点|办公城市|岗位地点|岗位城市)[：:\s]{0,4}([^，。；;\n]{2,40})/i);
  if(!match)return null;
- const candidate=String(match[1]).split(/(?:\\s{2,}|要求|待遇|学历|职责|任职|岗位|职位)/)[0].trim();
+ const candidate=String(match[1]).split(/(?:\s{2,}|要求|待遇|学历|职责|任职|岗位|职位)/)[0].trim();
  return isMainlandJobLocation(candidate)?candidate:
   (findMainlandCity(candidate)&&!/(?:香港|澳门|台湾|海外|境外|国外)/.test(candidate)?
    findMainlandCity(candidate):null);
@@ -254,7 +254,13 @@ export async function recoverSearchGroundedShortlist(key,resume,hits,limit,{
   if(!response.ok)return [];
   const data=await response.json();
   const raw=outputFromResponse(data);
-  return selectedJobs(raw,hits,limit);
+  const selected=selectedJobs(raw,hits,limit);
+  // In repair mode, require independent Search text to corroborate the
+  // company's name and actual role. A response id alone proves nothing.
+  return selected.filter(job=>{
+   const source=hits.find(hit=>hit.url===job.official_url);
+   return source&&corroboratesEmployerPosting(job,source);
+  });
  }catch{return []}
 }
 
