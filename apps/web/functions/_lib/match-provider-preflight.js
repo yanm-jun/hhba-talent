@@ -28,7 +28,11 @@ export async function checkMatchProviderCapabilities(key,{
    throw codeError(e?.name==='TimeoutError'||e?.name==='AbortError'?
     'AI_PROVIDER_TIMEOUT':'AI_PROVIDER_NETWORK_ERROR');
   }
-  if(!response.ok)throw codeError(providerStatusError(response.status));
+  if(!response.ok){
+   const code=providerStatusError(response.status);
+   throw codeError(path==='/responses'&&code==='AI_SEARCH_API_REJECTED'?
+    'AI_PROVIDER_REQUEST_REJECTED':code);
+  }
   try{return await response.json()}
   catch{throw codeError('AI_SEARCH_RESPONSE_INVALID')}
  };
