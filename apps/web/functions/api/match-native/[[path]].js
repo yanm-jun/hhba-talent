@@ -7,6 +7,8 @@ import {runAgentOwnedMainlandMatch} from '../../_lib/ai-owned-job-research.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {enrichSearchMatchesWithJD,matchJdEnrichmentEnabled} from '../../_lib/match-jd-enrichment.js';
 import {researchDomesticJobEvidence} from '../../_lib/domestic-job-research.js';
+import {iterateScoredJobEvidence} from '../../_lib/agent-score-feedback.js';
+import {createAccountResearchCheckpoint} from '../../_lib/ai-research-checkpoint.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -182,8 +184,32 @@ async function domesticResearchPass(env,key,result,resume,options,progress=()=>{
   ...options,signal,onProgress:progress,
   enabled:env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'
  });
- return {...result,matches:checked.matches,
-  diagnostic:{...result.diagnostic,domestic_evidence:checked.diagnostic}};
+ let final=checked.matches,feedback={mode:'disabled'};
+ // The grading result is evidence for the next Agent decision, not the end
+ // of its authority. The legacy stream mocks remain isolated.
+ if(env?.HHBA_AI_OWNED_RESEARCH_ENABLED!=='0'&&
+    env?.HHBA_AGENT_SCORE_FEEDBACK_ENABLED!=='0'&&
+    env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'&&!signal?.aborted){
+  try{
+   const revised=await iterateScoredJobEvidence(key,resume,final,{
+    ...options,signal,onProgress:progress,timeBudgetMs:40000
+   });
+   final=revised.matches;feedback=revised.diagnostic;
+  }catch(error){
+   feedback={mode:'unavailable',code:String(error?.code||'RESEARCH_UNAVAILABLE').slice(0,60)};
+  }
+ }
+ return {...result,matches:final,
+  diagnostic:{...result.diagnostic,domestic_evidence:checked.diagnostic,
+   score_feedback:feedback}};
+}
+async function checkpointForCandidate(env,candidate,resume,roleHint){
+ if(env?.HHBA_AI_OWNED_RESEARCH_ENABLED==='0'||
+  env?.HHBA_AGENT_CHECKPOINT_ENABLED==='0')return null;
+ try{return await createAccountResearchCheckpoint(
+  env.HHBA_PNVS_AUTH_DB,candidate.phone,resume,roleHint,
+  env.HHBA_RESEARCH_CHECKPOINT_SECRET||env.HHBA_MATCH_DEEPSEEK_KEY
+ )}catch{return null}
 }
 function provisionalPartial(jobs){
  // No numerical score until official JD or independently researched evidence.
@@ -415,9 +441,10 @@ export async function onRequest({request,env}){
       if(!ended)send('progress',{stage:'waiting'});
      },12000);
      try{
+      const checkpoint=await checkpointForCandidate(env,candidate,redacted,options.role_hint);
       const result=await runCandidateResearch(env,env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
        options.role_hint,options.limit,{signal:abort.signal,
-       autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0',onProgress:stage=>{
+       checkpoint,autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0',onProgress:stage=>{
         phase=stage;send('progress',{stage});
        },onPartial:matches=>send('partial',{matches:provisionalPartial(matches)})});
       const verified=await verifiedJdPass(env,result,redacted,options,stage=>send('progress',{stage}));
@@ -426,6 +453,7 @@ export async function onRequest({request,env}){
       send('partial',{matches:researched.matches});
       console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(researched.diagnostic));
       send('complete',await withSavedHistory(env,candidate,input,researched));
+      await checkpoint?.clear();
      }catch(e){
       const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
       console.warn('HHBA_MATCH_NATIVE_ERROR',JSON.stringify({
@@ -448,13 +476,16 @@ export async function onRequest({request,env}){
  }
 
  try{
+  const checkpoint=await checkpointForCandidate(env,candidate,redacted,options.role_hint);
   const result=await runCandidateResearch(env,env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-   options.role_hint,options.limit,{autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0'});
+   options.role_hint,options.limit,{checkpoint,autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0'});
   const verified=await verifiedJdPass(env,result,redacted,options);
   const researched=await domesticResearchPass(env,env.HHBA_MATCH_DEEPSEEK_KEY,
    verified,redacted,options);
   console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(researched.diagnostic));
-  return json(await withSavedHistory(env,candidate,input,researched));
+  const payload=await withSavedHistory(env,candidate,input,researched);
+  await checkpoint?.clear();
+  return json(payload);
  }catch(e){
   const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
   console.warn('HHBA_MATCH_NATIVE_ERROR',code);
