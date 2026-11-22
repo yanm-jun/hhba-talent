@@ -224,13 +224,13 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
       </section>:<>
      <div className="hhba-match-intro">
       <span className="hhba-match-eyebrow"><Sparkles size={14} style={{verticalAlign:'-2px',marginRight:5}}/> AI 深度职业研究报告</span>
-      <h2 id="hhba-native-title">职业研究已完成 · 本次整理 {result.matches.length} 个岗位</h2>
+      <h2 id="hhba-native-title">{result.matches.length<10?'本轮岗位研究结果不足':'本轮职业研究报告'} · 已整理 {result.matches.length} 个岗位</h2>
       <p>职位来源可追溯，适配分是有依据的参考，不是录用概率。没有足够证据的岗位明确标注待核实，不会为了凑足数量编造招聘信息；不提供第三方招聘平台链接。</p>
      </div>
      {result.native_search&&<section className="hhba-research-report-funnel" aria-label="本次岗位研究依据">
       <div><strong>本次研究情况</strong><span>记录来自实际搜索和岗位筛选，不代表全部网页都是职位。</span></div>
-      <p>累计获得 {result.native_search.provider_items||0} 条网页搜索结果，
-       整理了 {result.native_search.candidate_links??result.native_search.visible_jobs} 条来源候选。
+      <p>本轮新获取 {result.native_search.provider_items||0} 条网页搜索结果，
+       整理了 {result.native_search.candidate_links??result.native_search.visible_jobs} 条来源候选。{result.native_search.checkpoint_restored&&'其中包含上次保留的公开岗位研究记录，本轮新增网页数不包含旧记录。'}
        {typeof result.native_search.explicit_city_sources==='number'&&<>
         其中 {result.native_search.explicit_city_sources} 条提供明确国内工作城市证据。</>}
        {typeof result.native_search.underfilled_rechecks==='number'&&result.native_search.underfilled_rechecks>0&&<>
