@@ -190,7 +190,7 @@ test('Agent must reserve real time for a shortlist rather than spending all 150 
  assert.match(script,/const reserve=Math\.max\(40000,reserveMs\)/);
  assert.match(script,/discoverSources\(queries,[^\n]+,1,85000\)/);
  assert.match(script,/searchTool\(next\.queries,\{reserveMs:44000\}\)/);
- assert.match(script,/while\(budget\(\)>67000&&\(!options\.verifiedCount\|\|discoveredCount\(\)<discoveryTarget\)\)/);
+ assert.match(script,/while\(budget\(\)>67000&&\(!options\.verifiedCount\|\|needsMore\(\)\)\)/);
  assert.match(script,/modelTimeoutMs:Math\.min\(32000,Math\.max\(1000,budget\(\)-12500\)\)/);
 });
 

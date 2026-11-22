@@ -111,6 +111,28 @@ test('direct employer discovery survives failure of public web search',async()=>
  assert.equal(result.matches[0].official_url,first.url);
  assert.equal(result.diagnostic.official_catalog_searches,2);
 });
+test('an otherwise full set from one employer triggers a different-employer search',async()=>{
+ const primary={...first,url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId=4885239249',
+  title:'美团 区域渠道督导 上海 招聘',source:'美团招聘',
+  summary:'美团招聘区域渠道督导，工作地点上海，负责渠道经营分析。'};
+ const searched=[],found=new Set();
+ const result=await runAgentOwnedMainlandMatch('synthetic',resume,'区域渠道督导',4,{
+  expandDetailed:false,verifiedCount:()=>4,scoredEmployerCount:()=>found.size,
+  onSources:(jobs,closed,urls)=>urls.forEach(url=>found.add(new URL(url).hostname))
+ },{
+  plan:async()=>({queries:['区域渠道督导 上海 企业官网招聘']}),
+  search:async(key,text,hint,{queriesOverride})=>{
+   searched.push(...queriesOverride);
+   return {hits:queriesOverride.some(query=>query.includes('-site:meituan.com'))?[primary,first]:[primary]};
+  },
+  fetchDetails:async(key,hits)=>({hits,fetches:0}),
+  decide:async()=>({actions:[{type:'finish'}]}),
+  select:async(key,text,hits)=>({matches:hits.map(jobOf)})
+ });
+ assert.ok(searched.some(query=>query.includes('-site:meituan.com')));
+ assert.ok(found.has('careers.xinghai-cn.com'));
+ assert.ok(result.matches.some(job=>job.official_url===first.url));
+});
 test('model not available for planning falls back only for tool discovery, still uses AI action loop',async()=>{
  const searched=[];
  const out=await runAgentOwnedMainlandMatch('synthetic',resume,'',10,{
