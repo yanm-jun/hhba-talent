@@ -31,7 +31,7 @@ export function recruitmentSourceKind(url){
  // A generic /jobs or /positions URL is not enough: public boards also use them.
  // Prefer explicit careers-domain branding or dedicated recruitment paths.
  if(/^(careers?|jobs?|recruit(?:ment)?|zhaopin|join|talent|hr|campus)\./.test(host)
-  ||/(?:\/(?:careers?|recruit(?:ment)?|join-us|vacanc(?:y|ies)|jobs?|positions?|job[-_]?details?|position[-_]?details?|talent|campus|招聘|职位|岗位)(?:\/|$))/i.test(u.pathname))
+  ||/(?:\/(?:careers?|recruit(?:ment)?|join-us|vacanc(?:y|ies)|job-openings?|talent|campus|zhaopin|career-center|recruiting)(?:\/|$))/i.test(u.pathname))
   return 'EMPLOYER_DOMAIN_CANDIDATE';
  return 'UNVERIFIED';
 }
