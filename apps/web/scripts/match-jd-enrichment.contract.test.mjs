@@ -78,11 +78,9 @@ test('verified public JD replaces provisional score and pins immutable version f
  assert.equal(first.jd_score_status,'V2_JD_EVIDENCE_SCORED');
  assert.equal(typeof first.match_score,'number');
  assert.notEqual(first.score_basis,'仅基于搜索摘要的 AI 初评分');
- const saved=safeHistoryJobs(result.matches)[0];
- assert.equal(saved.jd_version_id,ID);
- assert.equal(saved.jd_sha256,HASH);
- assert.equal(saved.jd_score_status,'V2_JD_EVIDENCE_SCORED');
- assert.ok(!('full_jd' in saved),'history must not contain full JD or personal CV');
+ assert.equal(safeHistoryJobs(result.matches).length,0,
+  'new mainland matching history must not persist foreign-hosted ATS jobs');
+ assert.ok(!('full_jd' in first),'response must not contain raw full JD or personal CV');
 });
 test('foreign, unrecognized, and failed direct verifications cannot be promoted as verified JD',async()=>{
  const bad={...job(),official_url:'https://jobs.board.example/unknown'};
@@ -172,7 +170,8 @@ test('verified JD version crosses search UI, history and Word without storing pr
  const dialog=readFileSync(new globalThis.URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  const editor=readFileSync(new globalThis.URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
  assert.match(route,/verifiedJdPass\(/);
- assert.match(route,/withSavedHistory\(env,candidate,input,verified\)/);
+ assert.match(route,/withSavedHistory\(env,candidate,input,researched\)/);
+ assert.match(route,/domesticOnly:true/);
  assert.match(history,/verifiedJdMeta\(item\)/);
  assert.match(dialog,/jd_version_id:job\.jd_version_id/);
  assert.match(editor,/getArchivedJobJdVersion\(job\.jd_version_id/);

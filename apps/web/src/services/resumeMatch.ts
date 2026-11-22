@@ -26,6 +26,10 @@ export type MatchedJob = {
   score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
   recommendation_reason?:string;source_status?:'MODEL_SEARCH_REPORTED'|'OFFICIAL_JD_VERIFIED';
   jd_version_id?:string;jd_sha256?:string;jd_checked_at?:string;
+  evidence_status?:'VERIFIED_FULL_JD'|'PARTIAL_SOURCE'|'SEARCH_SNIPPET_ONLY'|'INSUFFICIENT_EVIDENCE'|'RESEARCH_PENDING';
+  evidence_excerpt?:string;
+  evidence_sources?:{url:string;kind:string}[];
+  evidence_score_status?:'AI_PARTIAL_SOURCE_SCORED';
   jd_proof_method?:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1';
   jd_source_status?:'VERIFIED_JD';
   jd_employer_identity_status?:'ATS_TENANT_NOT_LEGAL_ENTITY_VERIFIED'|'DIRECT_EMPLOYER_SOURCE';

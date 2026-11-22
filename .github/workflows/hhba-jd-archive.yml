@@ -25,6 +25,11 @@ on:
       - 'apps/web/functions/api/resume-reassess.js'
       - 'apps/web/scripts/verified-jd-reassessment.contract.test.mjs'
       - 'apps/web/functions/_lib/match-jd-enrichment.js'
+      - 'apps/web/functions/_lib/domestic-job-research.js'
+      - 'apps/web/functions/_lib/deepseek-search-match.js'
+      - 'apps/web/functions/_lib/match-employer-source.js'
+      - 'apps/web/scripts/domestic-job-research.contract.test.mjs'
+      - 'apps/web/scripts/match-search-first.contract.test.mjs'
       - 'apps/web/functions/_lib/match-history.js'
       - 'apps/web/functions/api/match-native/**'
       - 'apps/web/src/services/resumeMatch.ts'
@@ -60,6 +65,8 @@ jobs:
           node --test scripts/public-ats-jd.contract.test.mjs
           node --test scripts/verified-jd-reassessment.contract.test.mjs
           node --test scripts/match-jd-enrichment.contract.test.mjs
+          node --test scripts/domestic-job-research.contract.test.mjs
+          node --test scripts/match-search-first.contract.test.mjs
           node --test scripts/posting-scope.contract.test.mjs
           node --test scripts/jd-lifecycle.contract.test.mjs
           node --test scripts/match-history.contract.test.mjs

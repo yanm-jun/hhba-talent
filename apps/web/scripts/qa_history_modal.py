@@ -62,6 +62,9 @@ def scenario(browser,label,size):
     opener.click()
     modal=page.get_by_role('dialog',name='本次匹配详情')
     modal.wait_for(state='visible',timeout=20000)
+    # The overlay mounts before the asynchronous history detail arrives.
+    # Wait for all 17 rendered jobs rather than sampling the initial loading state.
+    page.wait_for_function("document.querySelectorAll('.hhba-match-history-dialog .hhba-match-history-job').length===17",timeout=20000)
     assert modal.locator('.hhba-match-history-job').count()==17
     assert row.count()==1,'history rows must stay in DOM under the modal'
     assert page.evaluate("document.body.style.overflow")=='hidden'

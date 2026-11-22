@@ -12,6 +12,8 @@ export type JobMatch={
  matched:string[];not_evidenced:string[];needs_verification:string[];
  requirements_basis:string;
  jd_version_id?:string;jd_sha256?:string;
+ evidence_status?:'VERIFIED_FULL_JD'|'PARTIAL_SOURCE'|'SEARCH_SNIPPET_ONLY'|'INSUFFICIENT_EVIDENCE'|'RESEARCH_PENDING';
+ evidence_excerpt?:string;
 };
 export type ResumeMatchResponse={
  status:'COMPLETE';profile:CandidateProfile;matches:JobMatch[];matched_official_jobs:number;
