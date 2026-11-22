@@ -190,11 +190,11 @@ export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetc
  const start=Date.now();
  const body={
   model:'deepseek-v4-pro',
-  reasoning:{effort:'none'},
+  reasoning:{effort:'high'},
   tools:[{type:'web_search'}],
   tool_choice:'required',
   text:{format:{type:'json_object'}},
-  max_output_tokens:3600,
+  max_output_tokens:12000,
   stream:true,
   instructions:prompt,
   input:'请自行联网搜索真实职位，再给出推荐，不用先让我确认。\n'+
