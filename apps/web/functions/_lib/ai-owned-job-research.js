@@ -13,8 +13,8 @@ import {planAutonomousMainlandSearch,normalizeAutonomousQueries}
 import {searchQueries,searchPublicJobs,enrichCandidateDetails,reasonAboutJobs,
  recoverSearchGroundedShortlist,expandDetailedReasons,sourceOnlyJobPreviews,indexedJobWorkCity} from './deepseek-search-match.js';
 import {mergeCandidateHits} from './match-search-growth.js';
-import {isRecommendationEligible} from './match-job-quality.js';
-import {isMainlandEmployerJobUrl,sourceCounts} from './match-employer-source.js';
+import {isRecommendationEligible,classifyJobAvailability} from './match-job-quality.js';
+import {isMainlandEmployerJobUrl,isDirectEmployerSourceHit,sourceCounts} from './match-employer-source.js';
 
 export const AGENT_VERSION='HHBA_MAINLAND_AI_OWNED_RESEARCH_V1';
 const BASE='https://api.deepseek.com';
@@ -151,11 +151,16 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   if(!proposed.length)return 0;
   const completed=[];
   for(const part of batches(proposed,TOOL_PARALLELISM)){
-   ensureActive();if(budget()<2500)break;
+   ensureActive();
+   // Never let batches of public Search eat the time reserved for reviewing
+   // actual roles. With candidates already found, leave enough budget for
+   // model selection, evidence checks and source-only recovery.
+   const reserve=pool.length||completed.length?61000:38000;
+   if(budget()<=reserve)break;
    usedQueries.push(...part);
    try{
     const result=await search(key,resume,roleHint,{...options,
-     queriesOverride:part,allowEmpty:true,queryTimeoutMs:Math.min(14000,budget()),
+     queriesOverride:part,allowEmpty:true,queryTimeoutMs:Math.min(12000,Math.max(3000,budget()-reserve)),
      maxHits:Math.max(48,part.length*20)});
     searchCalls+=result.diagnostic?.successful_searches??part.length;
     rawHits+=result.diagnostic?.raw_results??result.hits.length;
@@ -175,7 +180,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    }
   }
   const old=pool.length;
-  pool=mergeCandidateHits(pool,completed,240);
+  pool=mergeCandidateHits(pool,completed,240).filter(isDirectEmployerSourceHit);
   history.push({type:'search',queries:proposed,found:pool.length-old});
   await saveCheckpoint('search');
   activity('searching',pool.length?
@@ -186,7 +191,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  }
  async function fetchTool(candidateIds){
   const selected=pool.filter(h=>candidateIds.includes(h.id)&&!h.content&&!h.fetch_attempted&&
-   h.availability?.status!=='CLOSED_LISTED');
+   isDirectEmployerSourceHit(h)&&isRecommendationEligible(h));
   if(!selected.length)return 0;
   let read=0;
   for(const part of batches(selected,TOOL_PARALLELISM)){
@@ -219,7 +224,8 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   try{
    const restored=await options.checkpoint.load();
    if(restored?.pool?.length){
-    pool=restored.pool.filter(h=>isMainlandEmployerJobUrl(h.url));
+    pool=restored.pool.filter(isDirectEmployerSourceHit).map(h=>
+     h.content?{...h,availability:classifyJobAvailability({content:h.content},{fetched:true})}:h);
     usedQueries=normalizeAutonomousQueries(restored.usedQueries);
     shortlistIds=(restored.shortlistIds||[]).filter(id=>pool.some(h=>h.id===id));
     history.push(...(restored.history||[]).slice(-16));
@@ -251,7 +257,10 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  // Reserve a meaningful window for evidence-backed selection rather than
  // letting the search loop consume the whole request and return no jobs.
  // Preserve time for evidence-backed shortlist, not a cap on occupations.
- while(budget()>70000||(!pool.length&&budget()>42000)){
+ // Autonomy continues when sources are thin, but never at the cost of
+ // destroying the final shortlist. This is a runtime reserve, not a
+ // restriction on the model's choice of career directions.
+ while(budget()>(pool.length>=5?98000:73000)){
   ensureActive();
   // Every turn feeds observations and the previous action outcomes back to
   // the model. The model, not a fixed search count, chooses the next tool.
@@ -261,7 +270,8 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    'AI 正在分析缺失的企业招聘来源，准备调整搜索策略。');
   let next;
   try{
-   const raw=await decide(key,resume,roleHint,pool,usedQueries,history,deadline,options);
+   const raw=await decide(key,resume,roleHint,pool,usedQueries,history,deadline,{
+    ...options,decisionTimeoutMs:Math.min(19000,Math.max(3500,budget()-57000))});
    next=normalizeResearchDecision(raw,pool,usedQueries);
    decisions++;
    activity('planning',next.rationale?
@@ -343,7 +353,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   try{
    selectionRounds++;
    const part=await select(key,resume,page,limit-matches.length,{
-    ...options,shortlistOnly:true,modelTimeoutMs:Math.min(42000,Math.max(1000,budget())),
+    ...options,shortlistOnly:true,modelTimeoutMs:Math.min(32000,Math.max(1000,budget()-12500)),
     onPartial:jobs=>onPartial([...matches,...jobs])});
    for(const job of part.matches){
     if(!isMainlandEmployerJobUrl(job.official_url)||!page.some(hit=>hit.url===job.official_url)||
@@ -435,7 +445,9 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    ...options,detailTimeoutMs:Math.min(45000,budget()),onPartial,onProgress});
   }catch{detail.detail_failures=1}
  }
- const result=detail.matches.filter(job=>isMainlandEmployerJobUrl(job.official_url));
+ const result=detail.matches.filter(job=>
+   isMainlandEmployerJobUrl(job.official_url)&&
+   pool.some(h=>h.url===job.official_url&&isDirectEmployerSourceHit(h)));
  return {matches:result,incomplete:result.length<limit||detail.detail_failures>0,
   diagnostic:{mode:AGENT_VERSION,model:'deepseek-v4-pro',
    searches:searchCalls,page_reads:pageReads,provider_items:rawHits,
