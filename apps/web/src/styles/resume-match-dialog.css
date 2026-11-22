@@ -234,3 +234,41 @@
 /* The editor already has a top-left '返回匹配结果'. The duplicate persistent
    footer consumes ~70px of the visible Word page and resembles an overlay. */
 .hhba-match-modal-editor .hhba-match-modal-foot{display:none!important}
+
+/* One continuous search→results dialog. Only real backend stages drive its state. */
+.hhba-match-live-progress{margin:0 0 23px;padding:24px 26px;border:1px solid #dae7fa;border-radius:16px;background:linear-gradient(135deg,#f8fbff 0%,#eef5ff 55%,#fff 100%);color:#102a5a}
+.hhba-match-live-heading{display:flex;align-items:flex-start;gap:14px}
+.hhba-match-live-sparkle{flex:0 0 42px;height:42px;display:grid;place-items:center;border:1px solid #d1e3ff;border-radius:13px;background:#fff;color:#2976cd;box-shadow:0 6px 20px #285e9c12}
+.hhba-match-live-heading h2{margin:0 0 5px;font-size:20px;font-weight:760;letter-spacing:-.02em;line-height:1.4}
+.hhba-match-live-heading p{margin:0;font-size:12px;line-height:1.7;color:#68809e}
+.hhba-match-live-rail{position:relative;overflow:hidden;height:5px;border-radius:8px;background:#dce8f8;margin:22px 0}
+.hhba-match-live-rail span{position:absolute;inset:0 auto 0 0;width:35%;border-radius:8px;background:linear-gradient(90deg,#80a9f4,#9a9fff,#5cbbd8);animation:hhba-progress-moving 1.8s ease-in-out infinite alternate}
+@keyframes hhba-progress-moving{from{transform:translateX(0)}to{transform:translateX(185%)}}
+.hhba-match-live-steps{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.hhba-match-live-steps li{display:flex;gap:8px;align-items:flex-start;min-width:0;opacity:.49}
+.hhba-match-live-steps li.is-done{opacity:.85}
+.hhba-match-live-steps li.is-active{opacity:1}
+.hhba-match-live-marker{flex-shrink:0;width:24px;height:24px;display:grid;place-items:center;border:1px solid #d5e2f1;border-radius:50%;background:#fff;color:#91a1b9;font-size:11px;font-weight:700}
+.hhba-match-live-steps .is-done .hhba-match-live-marker{background:#e8f5f2;border-color:#cee7da;color:#258875}
+.hhba-match-live-steps .is-active .hhba-match-live-marker{background:#eaf2ff;border-color:#c5d8ff;color:#246ad0}
+.hhba-match-live-steps strong{display:block;font-size:12px;font-weight:720;line-height:1.45}
+.hhba-match-live-steps small{display:block;margin-top:4px;font-size:10px;line-height:1.6;color:#7489a1}
+.hhba-match-live-footnote{font-size:10px;color:#8392a7;margin:14px 0 0;line-height:1.7}
+.hhba-match-live-progress.is-compact{padding:14px 20px}
+.hhba-match-live-progress.is-compact .hhba-match-live-heading h2{font-size:15px}
+.hhba-match-live-progress.is-compact .hhba-match-live-heading p{font-size:11px}
+.hhba-match-live-progress.is-compact .hhba-match-live-sparkle{height:34px;flex-basis:34px}
+.hhba-match-live-progress.is-compact .hhba-match-live-rail{margin:12px 0}
+.hhba-match-live-progress.is-compact .hhba-match-live-steps small,.hhba-match-live-progress.is-compact .hhba-match-live-footnote{display:none}
+.hhba-native-reason{white-space:pre-line;overflow-wrap:anywhere}
+@media(max-width:640px){
+ .hhba-match-live-progress{padding:18px 15px;margin-bottom:16px}
+ .hhba-match-live-heading h2{font-size:17px}
+ .hhba-match-live-steps{grid-template-columns:1fr 1fr;row-gap:13px}
+ .hhba-match-live-steps strong{font-size:11px}
+ .hhba-match-live-progress.is-compact .hhba-match-live-steps{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+ .hhba-match-live-progress.is-compact .hhba-match-live-steps li{gap:4px;align-items:center}
+ .hhba-match-live-progress.is-compact .hhba-match-live-steps strong{font-size:9px;line-height:1.2}
+ .hhba-match-live-progress.is-compact .hhba-match-live-marker{width:18px;height:18px}
+}
+@media(prefers-reduced-motion:reduce){.hhba-match-live-rail span{animation:none;width:42%}}

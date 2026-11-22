@@ -1,7 +1,7 @@
 import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
-import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,MapPin,Wallet,X,Search,Sparkles} from 'lucide-react';
-import type {MatchResponse} from '../services/resumeMatch';
+import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,MapPin,Wallet,X,Search,Sparkles,Check,LoaderCircle} from 'lucide-react';
+import type {MatchResponse,NativeMatchProgress} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 // Load Siri/Word only after a candidate explicitly chooses a job, so the
@@ -25,10 +25,10 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 }
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,pending=false,notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
+export function CandidateMatchNativeDialog({result,onClose,pending=false,progressStage='preparing',notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'improved_job_count'|'profile'>>;
- onClose:()=>void;pending?:boolean;notice?:string;resumeStorage?:ResumeStorageAction;
+ onClose:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;notice?:string;resumeStorage?:ResumeStorageAction;
  sourceText?:string;sourceResume?:PrivateResume;accountScope?:string;
  // Match-history handoff enters the same existing editor without rerunning a search.
  initialOptimizedJobId?:string;
@@ -38,6 +38,16 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
   initialOptimizedJobId&&result.matches.some(job=>job.id===initialOptimizedJobId)
    ?initialOptimizedJobId:null);
  const [optimizationDirty,setOptimizationDirty]=useState(false);
+ // The stage comes from real backend progress events; no fake percentages.
+ const steps=[
+  {label:'准备简历',detail:'解析简历并准备本次匹配材料'},
+  {label:'搜索真实岗位',detail:'正在检索中国大陆的企业招聘入口'},
+  {label:'研究岗位证据',detail:'核对来源、职责与任职要求'},
+  {label:'生成评分和推荐',detail:'逐岗位比较真实经历并提出投递建议'}
+ ];
+ const progressStep=progressStage==='preparing'?0:
+  ['connected','searching','reading','writing'].includes(progressStage)?1:
+  progressStage==='researching'?2:progressStage==='scoring'?3:1;
  const matchListScroll=useRef(0);
  const activeJob=result.matches.find(job=>job.id===optimizedJobId);
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
@@ -115,7 +125,25 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
      </div>
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobId?'optimization':'matches'}>
-     {activeJob&&parsedProfile?
+     {pending&&<section className={'hhba-match-live-progress'+(result.matches.length?' is-compact':'')} role="status" aria-live="polite">
+      <div className="hhba-match-live-heading">
+       <span className="hhba-match-live-sparkle"><Sparkles size={20} aria-hidden="true"/></span>
+       <div><h2 id={result.matches.length?undefined:'hhba-native-title'}>
+        {result.matches.length?'已发现 '+result.matches.length+' 个候选岗位':'正在为你寻找合适的工作机会'}
+       </h2><p>搜索、岗位研究和推荐分析都在这个窗口进行，结果会陆续出现。</p></div>
+      </div>
+      <div className="hhba-match-live-rail" aria-hidden="true"><span/></div>
+      <ol className="hhba-match-live-steps">
+       {steps.map((step,i)=><li key={step.label} className={i<progressStep?'is-done':i===progressStep?'is-active':'is-upcoming'}>
+        <span className="hhba-match-live-marker">
+         {i<progressStep?<Check size={15}/>:i===progressStep?<LoaderCircle size={16} className="spin"/>:String(i+1)}
+        </span>
+        <div><strong>{step.label}</strong><small>{step.detail}</small></div>
+       </li>)}
+      </ol>
+      <p className="hhba-match-live-footnote">进度根据后台实际阶段变化，不伪造完成百分比；以企业官方公告为准。</p>
+     </section>}
+     {pending&&result.matches.length===0?null:activeJob&&parsedProfile?
       <section className="hhba-match-workspace" aria-label="岗位专属简历优化">
        {!sourceResume&&<><button type="button" className="hhba-match-workspace-back" onClick={backToMatches}>
         返回岗位匹配结果
@@ -179,7 +207,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
            <div className="hhba-native-source" role="note">
             {job.jd_source_status==='VERIFIED_JD'?'已核验岗位 JD 原文 · '+(job.jd_score_status==='V2_JD_EVIDENCE_SCORED'?'按岗位要求评分':'简历证据仍需补充'):
              job.evidence_status==='PARTIAL_SOURCE'?'已研究部分公开岗位证据 · 非完整 JD':
-             job.evidence_status==='SEARCH_SNIPPET_ONLY'?'只有公开搜索摘要 · 暂不评分':
+             job.evidence_status==='SEARCH_SNIPPET_ONLY'?(job.evidence_score_status==='AI_DIRECTION_REFERENCE_SCORED'?'岗位方向参考分 · 任职条件待核实':'只有公开搜索摘要 · 暂不评分'):
              job.evidence_status==='INSUFFICIENT_EVIDENCE'?'岗位要求证据不足 · 暂不评分':
              job.recruitment_source_note||'招聘来源待确认'}
            </div>
@@ -193,7 +221,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
           </div>
           <div className="hhba-native-score" aria-label={visibleMatchScore(job)!==null?'简历适配分 '+visibleMatchScore(job)+' 分（AI 参考）':'暂无可靠适配分'}>
            {visibleMatchScore(job)!==null?
-            <><strong>{visibleMatchScore(job)}<small>/100</small></strong><span>{job.jd_score_status==='V2_JD_EVIDENCE_SCORED'?'JD 证据适配分':'部分证据 · AI 参考分'}</span></>:
+            <><strong>{visibleMatchScore(job)}<small>/100</small></strong><span>{job.jd_score_status==='V2_JD_EVIDENCE_SCORED'?'JD 证据适配分':job.evidence_score_status==='AI_DIRECTION_REFERENCE_SCORED'?'方向参考分':'初步适配分 · AI 参考'}</span></>:
             <><strong className="hhba-native-score-na">—</strong><span>暂无可靠分数</span></>}
            <button type="button" disabled={pending}
              title={pending?'搜索完成后即可针对这个岗位优化简历':'针对所选岗位优化简历'}
@@ -235,7 +263,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
     </div>
     <footer className="hhba-match-modal-foot">
      <span>HHBA · 让机会与人才，找到彼此。</span>
-     <button className="hhba-match-done" type="button" onClick={handleClose}>{optimizedJobId?'返回匹配结果':'完成查看'}</button>
+     <button className="hhba-match-done" type="button" onClick={handleClose}>{optimizedJobId?'返回匹配结果':pending?'取消搜索':'完成查看'}</button>
     </footer>
    </div>
   </div>,document.body);

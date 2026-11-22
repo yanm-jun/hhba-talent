@@ -131,9 +131,9 @@ function nativeResponsePayload(result){
    job.recruitment_source_kind==='EMPLOYER_ATS').length,
   native_search:result.diagnostic,
   source:'DeepSeek Search 官方接口检索 + V4 Pro 简历匹配',
-  scoring:'已核验的完整 JD 使用 V2 评分；有足够公开招聘证据的岗位使用 AI 部分证据参考分；其余不评分。均非录用概率。',
+  scoring:'完整 JD 使用证据适配分；有部分资料使用 AI 初步适配分；仅有搜索摘要时可提供岗位方向参考分（不代表满足任职要求）；证据不足则不评分。均非录用概率。',
   privacy:'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
-  disclaimer:(result.incomplete?'本轮未达到10条或生成未完全结束，仅保留已找到的招聘入口。':'')+'以中国大陆企业招聘来源候选为主；公开检索资料不代表官网认证或完整 JD。仅取得部分材料时明确标注，无法核实则不给匹配分；投递资格与招聘状态以企业官网为准。'
+  disclaimer:(result.incomplete?'本轮未达到10条或生成未完全结束，仅保留已找到的招聘入口。':'')+'中国大陆企业招聘来源均须以实际官网核实；初步适配分及岗位方向参考分不代表已核对全部任职资格，证据不足不评分；职位仍否开放以企业公告为准。'
  };
 }
 
@@ -154,9 +154,10 @@ async function verifiedJdPass(env,result,resume,options,progress=()=>{}){
 }
 
 async function domesticResearchPass(env,key,result,resume,options,progress=()=>{},signal=null){
- progress('reading');
+ progress('researching');
  const checked=await researchDomesticJobEvidence(key,resume,result.matches,{
-  ...options,signal,enabled:env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'
+  ...options,signal,onProgress:progress,
+  enabled:env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'
  });
  return {...result,matches:checked.matches,
   diagnostic:{...result.diagnostic,domestic_evidence:checked.diagnostic}};

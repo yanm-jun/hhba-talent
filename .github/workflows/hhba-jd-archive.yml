@@ -29,6 +29,9 @@ on:
       - 'apps/web/functions/_lib/deepseek-search-match.js'
       - 'apps/web/functions/_lib/match-employer-source.js'
       - 'apps/web/scripts/domestic-job-research.contract.test.mjs'
+      - 'apps/web/scripts/match-experience-regression.contract.test.mjs'
+      - 'apps/web/src/styles/resume-match-dialog.css'
+      - 'apps/web/src/pages/CandidateMatchPage.tsx'
       - 'apps/web/scripts/match-search-first.contract.test.mjs'
       - 'apps/web/functions/_lib/match-history.js'
       - 'apps/web/functions/api/match-native/**'
@@ -66,6 +69,7 @@ jobs:
           node --test scripts/verified-jd-reassessment.contract.test.mjs
           node --test scripts/match-jd-enrichment.contract.test.mjs
           node --test scripts/domestic-job-research.contract.test.mjs
+          node --test scripts/match-experience-regression.contract.test.mjs
           node --test scripts/match-search-first.contract.test.mjs
           node --test scripts/posting-scope.contract.test.mjs
           node --test scripts/jd-lifecycle.contract.test.mjs

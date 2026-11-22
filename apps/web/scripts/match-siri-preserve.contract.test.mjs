@@ -45,7 +45,8 @@ test('the original ten-job native matching popup is NOT replaced or redesigned',
  assert.match(dialog,/const matchListScroll=useRef\(0\)/);
  assert.match(dialog,/viewport\.scrollTop=optimizedJobId\?0:matchListScroll\.current/);
  assert.match(dialog,/if\(optimizedJobId\)\{backToMatches\(\);return\}/);
- assert.match(dialog,/\{optimizedJobId\?'返回匹配结果':'完成查看'\}/);
+ assert.match(dialog,/\{optimizedJobId\?'返回匹配结果':pending\?'取消搜索':'完成查看'\}/);
+ assert.match(dialog,/hhba-match-live-progress/);
  assert.doesNotMatch(dialog,/<CandidateJourneySteps/);
 });
 
@@ -57,7 +58,7 @@ test('homepage & candidate workbench keep original matcher route and PDF/DOCX fl
  assert.match(page,/checked=\{storageChoice==='once'\}/);
  assert.match(page,/AI 为我寻找适合的工作|开始智能匹配/);
  assert.match(page,/let matched:MatchResponse;/);
- assert.match(page,/matched=await submitResumeForMatching\(selected,options,consent,abort\.signal,matchResumeId\|\|undefined,setStage,setPartialJobs,setOptimizationSource\)/);
+ assert.match(page,/matched=await submitResumeForMatching\(selected,options,consent,abort\.signal,matchResumeId\|\|undefined,progress,setPartialJobs,setOptimizationSource\)/);
  assert.match(page,/setOptimizationSource\(previewText\)/);
  assert.match(page,/sourceText=\{result\?optimizationSource:undefined\}/);
  assert.match(page,/sourceResume=\{result&&savedId\?savedFiles\.find/);
