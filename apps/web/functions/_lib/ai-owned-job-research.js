@@ -161,6 +161,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  let checkpointRefreshAttempted=false,checkpointRefreshQueries=0;
  let underfilledExpansionQueries=0,underfilledExpansionNew=0;
  let rawHits=0,atsVerificationLeads=0,searchRetryAttempts=0,searchRetryRecovered=0;
+ const atsQueued=new Set();
  let loops=0,decisions=0,decisionFailures=0,reflections=0;
  let exitReason='unknown',shortlistIds=[],agentPlannedQueries=0;
  let rejectedLinks=0;
@@ -241,8 +242,12 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
     // ATS URLs are only a private verification queue. No unverified
     // Greenhouse/Lever Search result is ever added to the public job pool.
     if(options.onSources&&result.ats_posting_urls?.length){
-     atsVerificationLeads+=result.ats_posting_urls.length;
-     options.onSources([],[],result.ats_posting_urls);
+     // Queue at most twelve unique ATS APIs per matching run. A bad
+     // provider batch must not make JD review monopolize the UX deadline.
+     const fresh=result.ats_posting_urls.filter(url=>!atsQueued.has(url))
+      .slice(0,Math.max(0,12-atsQueued.size));
+     fresh.forEach(url=>atsQueued.add(url));
+     if(fresh.length){atsVerificationLeads+=fresh.length;options.onSources([],[],fresh)}
     }
     pool=mergeCandidateHits(pool,result.hits.filter(includeHit),240).filter(includeHit);
     publishSourcePreviews();
