@@ -3,6 +3,7 @@
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
+import {runAgentOwnedMainlandMatch} from '../../_lib/ai-owned-job-research.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {enrichSearchMatchesWithJD,matchJdEnrichmentEnabled} from '../../_lib/match-jd-enrichment.js';
 import {researchDomesticJobEvidence} from '../../_lib/domestic-job-research.js';
@@ -153,6 +154,25 @@ async function verifiedJdPass(env,result,resume,options,progress=()=>{}){
  }
 }
 
+// The model directs the search and investigation by default.
+// The previous source-grounded flow is kept for provider failure recovery.
+async function runCandidateResearch(env,key,resume,roleHint,limit,options={}){
+ if(env?.HHBA_AI_OWNED_RESEARCH_ENABLED==='0')
+  return runSearchFirstMatch(key,resume,roleHint,limit,options);
+ try{
+  return await runAgentOwnedMainlandMatch(key,resume,roleHint,limit,options);
+ }catch(error){
+  if(options.signal?.aborted||error?.code==='AI_MATCH_CANCELLED')throw error;
+  if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+   'AI_PROVIDER_RATE_LIMITED'].includes(error?.code))throw error;
+  console.warn('HHBA_AI_RESEARCH_RECOVERY',JSON.stringify({
+   reason:String(error?.code||'AGENT_UNAVAILABLE').slice(0,70),mode:'legacy-fallback'
+  }));
+  const fallback=await runSearchFirstMatch(key,resume,roleHint,limit,options);
+  return {...fallback,diagnostic:{...fallback.diagnostic,
+   agent_fallback:true,agent_error:String(error?.code||'AGENT_UNAVAILABLE').slice(0,70)}};
+ }
+}
 async function domesticResearchPass(env,key,result,resume,options,progress=()=>{},signal=null){
  progress('researching');
  const checked=await researchDomesticJobEvidence(key,resume,result.matches,{
@@ -392,7 +412,7 @@ export async function onRequest({request,env}){
       if(!ended)send('progress',{stage:'waiting'});
      },12000);
      try{
-      const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
+      const result=await runCandidateResearch(env,env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
        options.role_hint,options.limit,{signal:abort.signal,
        autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0',onProgress:stage=>{
         phase=stage;send('progress',{stage});
@@ -425,7 +445,7 @@ export async function onRequest({request,env}){
  }
 
  try{
-  const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
+  const result=await runCandidateResearch(env,env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
    options.role_hint,options.limit,{autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0'});
   const verified=await verifiedJdPass(env,result,redacted,options);
   const researched=await domesticResearchPass(env,env.HHBA_MATCH_DEEPSEEK_KEY,
