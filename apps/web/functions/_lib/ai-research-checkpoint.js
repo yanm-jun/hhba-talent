@@ -21,7 +21,7 @@ const publicHit=source=>{
  return {id:text(source.id,48),url:source.url,title:text(source.title,150),
   source:text(source.source,95),summary:text(source.summary,650),
   snippet:text(source.snippet,300),content:text(source.content,1000),
-  availability:{status:availability},
+  availability:{status:availability},fetch_attempted:source.fetch_attempted===true,
   recruitment_source_kind:'EMPLOYER_DOMAIN_CANDIDATE'};
 };
 export function sanitizePublicResearchCheckpoint(input){
