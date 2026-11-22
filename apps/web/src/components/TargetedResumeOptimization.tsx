@@ -345,13 +345,21 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  async function jobContextForAI(signal:AbortSignal):Promise<JdAwareJob>{
   const title=(job.title_zh||job.title).slice(0,180);
   if(!postingScope)throw Error('岗位官网地址无效，已阻止可能串岗的简历优化。');
+  // An indexed employer page is NOT the same as a verified full job JD.
+  const partial=job.evidence_status==='PARTIAL_SOURCE'&&
+   typeof job.evidence_excerpt==='string'&&job.evidence_excerpt.length>=130?
+   {title,requirements:'以下为公开检索到的部分岗位材料，非完整已核验JD。只能依据有明确文字的要求给出简历措辞建议，不得推断其他硬性资格：\n'+
+    job.evidence_excerpt.slice(0,1400),official_url:job.official_url}:null;
+  const insufficient=job.evidence_status==='SEARCH_SNIPPET_ONLY'||
+   job.evidence_status==='INSUFFICIENT_EVIDENCE';
   if(!await jobJdArchiveStatus(signal)){
    if(job.jd_version_id)throw Error('原匹配 JD 版本目前无法核验，请在 JD 服务恢复后重新评分。');
-   // Legacy, explicitly marked summary-only: NEVER claim this is a verified JD.
+   if(partial)return partial;
+   if(insufficient)throw Error('该岗位目前只有搜索摘要，证据不足。请先从企业招聘页确认职位要求，再优化 Word。');
+   // Backwards-compatible historical snapshots remain labelled summary-only.
    return {title,requirements:fullJobRequirements,official_url:job.official_url};
   }
-  // The score and rewrite of a previously JD-verified result MUST use precisely
-  // that immutable JD version. No silent refresh into a different description.
+  // Verified JD identity is immutable: do not silently substitute a newer JD.
   if(job.jd_version_id){
    const official=await getArchivedJobJdVersion(job.jd_version_id,signal);
    if(official.canonical_url!==job.official_url||official.job_id!==job.jd_version_id||
@@ -363,12 +371,19 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    return {title:official.title,requirements:official.full_jd,
     official_url:official.canonical_url,jd_version_id:official.job_id};
   }
-  // Provisional search scoring stays provisional. The verified JD returned here
-  // is the sole evidence for subsequent optimization and reassessment.
-  const official=await ensureArchivedJobJd(job.official_url,signal);
-  if(!signal.aborted)setArchivedJdId(official.job_id);
-  return {title:official.title,requirements:official.full_jd,
-   official_url:official.canonical_url,jd_version_id:official.job_id};
+  // Where official full JD fetch fails (common with mainland recruiting),
+  // use only attributed partial research material. Never fake a JD version.
+  try{
+   const official=await ensureArchivedJobJd(job.official_url,signal);
+   if(!signal.aborted)setArchivedJdId(official.job_id);
+   return {title:official.title,requirements:official.full_jd,
+    official_url:official.canonical_url,jd_version_id:official.job_id};
+  }catch(error){
+   if(signal.aborted)throw error;
+   if(partial)return partial;
+   if(insufficient)throw Error('该岗位未能取得足够的公开任职要求，已停止无依据的简历优化。');
+   throw error;
+  }
  }
  async function generateWholeRewrite(answers:Record<string,string>={}){
   if(!consent||!sourceResume||!wholeSource.complete||
