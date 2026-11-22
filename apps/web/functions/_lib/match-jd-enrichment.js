@@ -125,7 +125,7 @@ export async function enrichSearchMatchesWithJD(env,matches,resume,options={},de
  const fetchDirect=deps.fetchDirect||directOfficialJobEvidence;
  const fetchAts=deps.fetchAts||fetchPublicAtsJd;
  const out=[...source],candidates=source.map((job,i)=>({job,i,locator:safeJDSourceLocator(job?.official_url)}))
-  .filter(x=>x.locator);
+  .filter(x=>x.locator&&!(options.domesticOnly&&x.locator.kind));
  let cursor=0,verified=0,scored=0,failed=0,closed=0;
  const inFlight=new Map();
  const load=locator=>{
