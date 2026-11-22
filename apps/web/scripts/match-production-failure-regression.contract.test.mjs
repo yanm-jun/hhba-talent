@@ -7,7 +7,7 @@ import {normalizeHits,sourceOnlyJobPreviews}
  from '../functions/_lib/deepseek-search-match.js';
 import {classifyJobAvailability,isRecommendationEligible}
  from '../functions/_lib/match-job-quality.js';
-import {runAgentOwnedMainlandMatch} from '../functions/_lib/ai-owned-job-research.js';
+import {runAgentOwnedMainlandMatch,targetedEmployerRecoveryQueries} from '../functions/_lib/ai-owned-job-research.js';
 import {sanitizePublicResearchCheckpoint} from '../functions/_lib/ai-research-checkpoint.js';
 
 // Public URL/title structures reconstructed from the failing 2026-11-22
@@ -160,4 +160,40 @@ test('Agent must reserve real time for a shortlist rather than spending all 150 
  assert.match(script,/searchTool\(next\.queries,\{reserveMs:44000\}\)/);
  assert.match(script,/while\(budget\(\)>\(pool\.length>=5\?97000:67000\)\)/);
  assert.match(script,/modelTimeoutMs:Math\.min\(32000,Math\.max\(1000,budget\(\)-12500\)\)/);
+});
+
+test('source recovery queries use only public role clues, not private or invalid mirror URLs',()=>{
+ const queries=targetedEmployerRecoveryQueries([
+  {type:'search',rejected_title_hints:[
+   'B Capital Job Board','美团招聘督导经理','15712345678','person@example.com',
+   '美团招聘督导经理','DCC主管-小米汽车经销商','职位列表']},
+ ],['已搜索官方岗位']);
+ assert.equal(queries.length,2);
+ assert.ok(queries.every(q=>q.includes('企业官网')&&q.includes('-site:zhipin.com')));
+ assert.ok(queries.some(q=>q.includes('美团招聘督导经理')));
+ assert.ok(queries.every(q=>!q.includes('15712345678')&&!q.includes('example.com')));
+});
+test('zero official sources must trigger bounded employer-domain discovery before a no-jobs failure',async()=>{
+ const queries=[];
+ const result=await runAgentOwnedMainlandMatch('synthetic-key',
+  '合成测试简历：参与过区域门店运营和商户项目协调。','',10,
+  {expandDetailed:false},{
+   plan:async()=>({queries:['区域督导 企业招聘 招聘岗位']}),
+   search:async(key,cv,hint,opts)=>{
+    queries.push(...opts.queriesOverride);
+    if(opts.queriesOverride.some(q=>q.includes('美团招聘督导经理')&&q.includes('企业官网')))
+     return {hits:[employer],diagnostic:{successful_searches:1,raw_results:3}};
+    return {hits:[],diagnostic:{successful_searches:1,raw_results:20,
+     rejected_title_hints:['美团招聘督导经理','B Capital Job Board'],
+     rejected_links:20}};
+   },
+   decide:async()=>({actions:[{type:'finish'}]}),
+   select:async()=>{const e=new Error('AI_MATCH_NO_VALID_JOBS');e.code=e.message;throw e},
+   recover:async()=>[]
+  });
+ assert.ok(queries.some(q=>q.includes('美团招聘督导经理')&&q.includes('企业官网')));
+ assert.equal(result.matches.length,1);
+ assert.equal(result.matches[0].official_url,employer.url);
+ assert.equal(result.matches[0].match_score,null);
+ assert.equal(result.diagnostic.third_party_results_shown,0);
 });
