@@ -105,15 +105,19 @@ export async function indexedEmployerSearchHints(env,roles,industryIds,opts={}){
  try{
   // Fixed column names/table and validated enum values; no applicant text
   // or role hints go to D1, no vendor URL is fetched and no PII is stored.
-  const sql="SELECT enterprise,recruitment_url,source_kind,industry_id "+
-   "FROM hhba_industry_employer_links WHERE industry_id IN ("+
-   sectors.map(()=>'?').join(',')+") AND recruitment_url LIKE 'https://%' "+
-   "ORDER BY CASE source_kind "+
+  // Take a comparable sample from every AI-selected hall. A straight
+  // ORDER BY source_kind LIMIT 180 would starve smaller industries.
+  const sql="WITH ranked AS (SELECT enterprise,recruitment_url,source_kind,industry_id,"+
+   "ROW_NUMBER() OVER (PARTITION BY industry_id ORDER BY CASE source_kind "+
    "WHEN 'official_public_careers_evidence' THEN 0 "+
    "WHEN 'previously_reviewed_official' THEN 1 "+
    "WHEN 'historical_employer_profile_official_portal' THEN 2 "+
    "WHEN 'saved_careers' THEN 3 "+
-   "WHEN 'employer_careers_candidate' THEN 4 ELSE 8 END, industry_id, enterprise LIMIT 180";
+   "WHEN 'employer_careers_candidate' THEN 4 ELSE 8 END,enterprise) AS hall_rank "+
+   "FROM hhba_industry_employer_links WHERE industry_id IN ("+
+   sectors.map(()=>'?').join(',')+") AND recruitment_url LIKE 'https://%') "+
+   "SELECT enterprise,recruitment_url,source_kind,industry_id "+
+   "FROM ranked WHERE hall_rank<=36 ORDER BY hall_rank,industry_id LIMIT 180";
   const result=await db.prepare(sql).bind(...sectors).all();
   const rows=Array.isArray(result?.results)?result.results:[];
   return {queries:buildIndexedEmployerQueries(rows,roles,opts),
