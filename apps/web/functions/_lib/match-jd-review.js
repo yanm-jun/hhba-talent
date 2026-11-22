@@ -87,7 +87,11 @@ export async function createMatchJdReview(env,resume,options,dependencies={}){
     id:'external-'+locator.id.replace(/[:.]/g,'-'),official_url:locator.url,
     platform:'企业官网',source:locator.domain,source_type:'站外官方招聘',
     application_status:'NEEDS_OFFICIAL_CONFIRMATION',recruitment_source_kind:'EMPLOYER_DOMAIN_CANDIDATE'
-   },match:null,resolvePostingIdentity:!job};
+   },match:null,
+    // An AI shortlist / Search snippet is NOT a trusted posting identity.
+    // Always bind employer, exact role and work city to the independently
+    // fetched JD before scoring; this also repairs generic "职位详情" titles.
+    resolvePostingIdentity:job?.jd_source_status!=='VERIFIED_JD'};
    records.set(locator.url,record);queue.push(record);
   }
   for(const job of jobs)enqueue(safeOfficialJobLocator(job?.official_url),job);
