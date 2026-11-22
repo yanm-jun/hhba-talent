@@ -33,7 +33,7 @@ test('title-only candidate and unrelated employer evidence never create a numeri
  assert.equal(noInfo.evidence_status,'INSUFFICIENT_EVIDENCE');
  assert.equal(noInfo.match_score,null);
  const wrong=assessDomesticEvidence(post(),[
-  hit({title:'另一家公司 区域督导 济南',summary:'另一家公司 区域督导 济南 '+quote.repeat(2),
+  hit({title:'另一家公司 区域督导 济南',site_name:'另一家公司',summary:'另一家公司 区域督导 济南 '+quote.repeat(2),
    url:'https://careers.other-cn.com/jobs/regional-supervisor'})
  ]);
  assert.equal(wrong.match_score,null);
