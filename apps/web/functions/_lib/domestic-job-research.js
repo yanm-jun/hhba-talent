@@ -26,7 +26,7 @@ function sameJob(job,hit){
  const title=compact(job.title_zh||job.title).replace(/(?:岗位|职位|招聘)$/,'');
  const city=compact(job.location).replace(/(市|省|区|县|中国大陆)/g,'').slice(0,5);
  return company.length>=2&&title.length>=2&&
-  (s.includes(company)||company.length>=5&&s.includes(company.slice(0,5)))&&
+  (heading.includes(company)||company.length>=5&&heading.includes(company.slice(0,5)))&&
   (s.includes(title)||title.length>=5&&s.includes(title.slice(0,5)))&&
   (city.length<2||s.includes(city));
 }
