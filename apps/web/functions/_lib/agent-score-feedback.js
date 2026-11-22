@@ -114,6 +114,7 @@ export async function iterateScoredJobEvidence(key,resume,matches,options={},dep
   const targets=unresolved.filter(j=>collected.has(j.id));
   if(!targets.length)break;
   const byId=new Map(jobs.map(j=>[j.id,j]));
+  onProgress('scoring');
   let updated;
   try{
    updated=await rescore(key,resume,targets,{...options,
