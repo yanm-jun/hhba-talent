@@ -7,7 +7,7 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchProgress} from '../services/resumeMatch';
+import {matchServiceReady,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -40,6 +40,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [working,setWorking]=useState(false);
  const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
  const [stage,setStage]=useState<NativeMatchProgress>('preparing');
+ const [activity,setActivity]=useState<NativeMatchActivity|null>(null);
  const progress=(next:NativeMatchProgress)=>setStage(previous=>next==='waiting'?previous:next);
  const [error,setError]=useState('');
 
@@ -180,7 +181,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   if((!file&&!savedId)||!consent||working||saveBusy||controller.current||previewBusy||ocrBusy||!previewLoaded||
    identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()||
    (file&&!savedId&&storageChoice==='undecided'))return;
-  setWorking(true);setStage('preparing');setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);
+  setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);
   const abort=new AbortController();
   controller.current=abort;
   try{
@@ -208,7 +209,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    }
    const matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,matchResumeId||undefined,
     stage=>{if(!abort.signal.aborted)progress(stage);},
-    jobs=>{if(!abort.signal.aborted)setPartialJobs(jobs);});
+    jobs=>{if(!abort.signal.aborted)setPartialJobs(jobs);},
+    detail=>{if(!abort.signal.aborted)setActivity(detail);});
    if(abort.signal.aborted)return;
    setOptimizationSource(redactResumeTextLocally(previewText));
    lastSearch.current={text:previewText,options,resumeId:matchResumeId||undefined};
@@ -226,18 +228,20 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   const combine=(jobs:MatchedJob[])=>Array.from(new Map(
    [...previous.matches,...jobs].map(job=>[job.official_url,job])
   ).values());
-  setWorking(true);setStage('preparing');setError('');setResult(null);setPartialJobs(previous.matches);
+  let collected=previous.matches;
+  setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setPartialJobs(collected);
   try{
    const next=await submitExtractedResumeText(search.text,{...search.options,
     exclude_urls:previous.matches.map(job=>job.official_url).slice(-50)},true,abort.signal,search.resumeId,
     stage=>{if(!abort.signal.aborted)progress(stage);},
-    jobs=>{if(!abort.signal.aborted)setPartialJobs(combine(jobs));});
+    jobs=>{if(!abort.signal.aborted){collected=combine(jobs);setPartialJobs(collected);}},
+    detail=>{if(!abort.signal.aborted)setActivity(detail);});
    if(abort.signal.aborted)return;
    setResult({...next,matches:combine(next.matches)});
    setPartialJobs([]);
   }catch(error){
    if(!abort.signal.aborted){
-    setResult(previous);
+    setResult({...previous,matches:collected});
     setPartialJobs([]);
     setError(error instanceof Error?error.message:'继续搜索暂未完成，请重试。');
    }
@@ -373,7 +377,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     </div>
     {((result||partialJobs.length>0)||working)&&<CandidateMatchNativeDialog
       result={result||{matches:partialJobs}}
-      pending={working&&!result} progressStage={stage}
+      pending={working&&!result} progressStage={stage} progressActivity={activity}
       onContinue={result?.can_continue?()=>void continueSearch():undefined}
       notice={working?'':error}
       sourceText={result?optimizationSource:undefined}

@@ -119,6 +119,61 @@ test('semantic recognition retries on Flash and accepts line wraps in OCR eviden
  assert.deepEqual(data.facts,[{id:'CV-1',kind:'work',quote:'负责门店运营和数据整理'}]);
 });
 
+test('slow Pro recognition starts Flash before Pro times out and cancels redundant work',async()=>{
+ const {recognizeMatchResume}=await import('../functions/_lib/resume-jd-match-agent.js');
+ const models=[],quote='负责门店运营和数据整理';
+ let proCancelled=false,startedBackup=false;
+ const profile=await recognizeMatchResume('synthetic','工作经历：'+quote,'',{
+  fallbackDelayMs:3,onFallback:()=>{startedBackup=true;},
+  fetcher:async(uri,init)=>{
+   const {model}=JSON.parse(init.body);
+   models.push(model);
+   if(model==='deepseek-v4-pro')return new Promise((resolve,reject)=>{
+    init.signal.addEventListener('abort',()=>{
+     proCancelled=true;
+     reject(init.signal.reason);
+    },{once:true});
+   });
+   return Response.json({status:'completed',output:[{type:'message',content:[
+    {type:'output_text',text:JSON.stringify({facts:[{kind:'work',quote}]})}
+   ]}]});
+  }
+ });
+ assert.deepEqual(models,['deepseek-v4-pro','deepseek-flash']);
+ assert.equal(startedBackup,true);
+ assert.equal(proCancelled,true);
+ assert.equal(profile.facts[0].quote,quote);
+});
+
+test('official catalog search uses short keywords, validates locations and rejects closed postings',async()=>{
+ const {searchOfficialJobCatalogs}=await import('../functions/_lib/official-job-catalog-search.js');
+ const calls=[];
+ const results=await searchOfficialJobCatalogs(['区域运营','私人资料 resume@example.com'],{
+  page:2,
+  fetcher:async(url,init)=>{
+   const request=new URL(url);calls.push(request.hostname);
+   if(request.hostname==='careers.tencent.com'){
+    assert.equal(request.searchParams.get('pageIndex'),'2');
+    assert.equal(decodeURIComponent(request.searchParams.get('keyword')),'区域运营');
+    return Response.json({Code:200,Data:{Posts:[
+     {PostId:'2097166275703910400',RecruitPostName:'区域运营经理',LocationName:'上海',IsValid:true},
+     {PostId:'2097166275703910401',RecruitPostName:'区域运营经理',LocationName:'新加坡',IsValid:true}
+    ]}});
+   }
+   const body=JSON.parse(init.body);
+   assert.equal(body.page.pageNo,2);
+   assert.equal(body.keywords,'区域运营');
+   return Response.json({status:1,data:{list:[
+    {jobUnionId:'4885239249',name:'区域运营经理',cityList:[{name:'北京'}],jobStatus:'000'},
+    {jobUnionId:'4885239248',name:'区域运营经理',cityList:[{name:'北京'}],jobStatus:'001'}
+   ]}});
+  }
+ });
+ assert.deepEqual(calls,['careers.tencent.com','zhaopin.meituan.com']);
+ assert.equal(results.hits.length,2);
+ assert.ok(results.hits.every(hit=>hit.recruitment_source_kind==='EMPLOYER_DOMAIN_CANDIDATE'));
+});
+
 test('no search: never show invented jobs',()=>{
  const r={status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(answer)}]}],
  usage:{server_tool_use:{tool_search:0,tool_fetch:0}}};

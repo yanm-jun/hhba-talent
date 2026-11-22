@@ -50,7 +50,7 @@ export type MatchResponse = {
    candidate_links?:number;explicit_city_sources?:number;selection_rounds?:number;
    underfilled_rechecks?:number;unscored_source_previews?:number;checkpoint_restored?:boolean;
    underfilled_expansion_queries?:number;underfilled_expansion_new?:number;
-   search_failures?:number;rejected_links?:number;agent_exit_reason?:string};
+   search_failures?:number;rejected_links?:number;official_catalog_searches?:number;agent_exit_reason?:string};
   history_id?:string|null;
   history_status?:'SAVED'|'EMPTY'|'UNAVAILABLE';
   new_job_count?:number;
@@ -194,7 +194,7 @@ export type NativeMatchActivity={
 async function consumeNativeMatchStream(
  response:Response,onProgress?:(stage:NativeMatchProgress)=>void,
  onPartial?:(jobs:MatchedJob[])=>void,
- onActivity?:(activity:NativeMatchActivity)=>void
+ onActivity?:(activity:NativeMatchActivity)=>void,onReceive?:()=>void
 ):Promise<MatchResponse>{
  if(!response.body)throw new MatchError(502,'智能匹配连接没有返回可读取的结果。');
  const decoder=new TextDecoder(),reader=response.body.getReader();
@@ -205,6 +205,7 @@ async function consumeNativeMatchStream(
    .map(line=>line.slice(5).trimStart()).join('\n');
   if(!event||!data)return;
   let value:any;try{value=JSON.parse(data)}catch{return}
+  onReceive?.();
   if(event==='progress'){
    const stage=value?.stage;
    if(['preparing','parsing','connected','planning','searching','reading','researching','writing','scoring','waiting'].includes(stage))
@@ -212,7 +213,7 @@ async function consumeNativeMatchStream(
   }else if(event==='activity'){
    const stage=value?.stage;
    if(typeof value?.message==='string'&&value.message.length<=340&&
-      ['preparing','connected','planning','searching','reading','researching','writing','scoring'].includes(stage)){
+      ['preparing','parsing','connected','planning','searching','reading','researching','writing','scoring'].includes(stage)){
     const number=(v:unknown)=>typeof v==='number'&&Number.isFinite(v)&&v>=0?
      Math.floor(v):undefined;
     onActivity?.({stage:stage as NativeMatchProgress,message:value.message,
@@ -248,13 +249,17 @@ async function consumeNativeMatchStream(
    while((stop=buffer.indexOf('\n\n'))>=0){
     const event=buffer.slice(0,stop);buffer=buffer.slice(stop+2);
     parseEvent(event);
+    if(complete)return complete;
    }
   }
   if(buffer.trim())parseEvent(buffer);
  }catch(e){
   if(e instanceof MatchError||(e as Error)?.name==='AbortError')throw e;
   throw new MatchError(503,'智能匹配连接中断，未收到完整推荐。');
- }finally{reader.releaseLock();}
+ }finally{
+  void reader.cancel().catch(()=>{});
+  reader.releaseLock();
+ }
  if(!complete)throw new MatchError(502,'智能匹配未返回完整结果，请稍后重试。');
  return complete;
 }
@@ -269,22 +274,43 @@ export async function submitExtractedResumeText(
  const token=session();
  const cleaned=redactResumeTextLocally(text);
  if(cleaned.replace(/\s/g,'').length<30)throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
- const response=await fetch(API+'/resume',{
-  method:'POST',credentials:'same-origin',cache:'no-store',signal,
-  headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
-  body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
-   options:{country:'CN',remote_only:false,
-    role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10)),exclude_urls:opts.exclude_urls}})
- }).catch(e=>{if((e as Error)?.name==='AbortError')throw e;
-  throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
- const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
- if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。');
- const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity):
-  await response.json().catch(()=>({})) as Partial<MatchResponse>&{error?:string};
- if(!response.ok)throw new MatchError(response.status,errorMap[(data as {error?:string}).error||'']||'智能匹配服务暂时不可用。');
- if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||data.matches.length>10)
-  throw new MatchError(502,errorMap.BAD_RESPONSE);
- return data as MatchResponse;
+ const watchdog=new AbortController();
+ const requestSignal=signal?AbortSignal.any([signal,watchdog.signal]):watchdog.signal;
+ let idleTimer:ReturnType<typeof setTimeout>|undefined;
+ const timeout=(message:string)=>watchdog.abort(new MatchError(504,message));
+ // The server sends a heartbeat every 12 seconds, including during long AI calls.
+ const onReceive=()=>{
+  clearTimeout(idleTimer);
+  idleTimer=setTimeout(()=>timeout('一段时间没有收到匹配进度，已结束本次等待。可用当前简历重试。'),35000);
+ };
+ const deadline=setTimeout(()=>timeout('这次智能匹配用时过长，已结束本次等待。可用当前简历重试。'),300000);
+ onReceive();
+ try{
+  const response=await fetch(API+'/resume',{
+   method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
+   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
+   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
+    options:{country:'CN',remote_only:false,
+     role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10)),exclude_urls:opts.exclude_urls}})
+  }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
+   if((e as Error)?.name==='AbortError')throw e;
+   throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
+  onReceive();
+  const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
+  if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。');
+  const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,onReceive):
+   await response.json().catch(()=>({})) as Partial<MatchResponse>&{error?:string};
+  if(!response.ok)throw new MatchError(response.status,errorMap[(data as {error?:string}).error||'']||'智能匹配服务暂时不可用。');
+  if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||data.matches.length>10)
+   throw new MatchError(502,errorMap.BAD_RESPONSE);
+  return data as MatchResponse;
+ }catch(error){
+  if(requestSignal.aborted)throw requestSignal.reason;
+  throw error;
+ }finally{
+  clearTimeout(idleTimer);
+  clearTimeout(deadline);
+ }
 }
 
 export async function submitResumeForMatching(

@@ -1,7 +1,7 @@
 import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,MapPin,Wallet,X,Sparkles,LoaderCircle} from 'lucide-react';
-import type {MatchResponse,NativeMatchProgress} from '../services/resumeMatch';
+import type {MatchResponse,NativeMatchActivity,NativeMatchProgress} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 // Load Siri/Word only after a candidate explicitly chooses a job, so the
@@ -25,10 +25,11 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 }
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
+export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
-  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'profile'>>;
+  'disclaimer'|'history_id'|'history_status'|'new_job_count'|'profile'|'native_search'>>;
  onClose:()=>void;onContinue?:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
+ progressActivity?:NativeMatchActivity|null;
  notice?:string;resumeStorage?:ResumeStorageAction;
  sourceText?:string;sourceResume?:PrivateResume;accountScope?:string;
  // Match-history handoff enters the same existing editor without rerunning a search.
@@ -38,6 +39,14 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  const [optimizedJobUrl,setOptimizedJobUrl]=useState<string|null>(()=>
   result.matches.find(job=>job.id===initialOptimizedJobId&&job.jd_version_id&&job.jd_sha256)?.official_url||null);
  const [optimizationDirty,setOptimizationDirty]=useState(false);
+ const [elapsed,setElapsed]=useState(0);
+ useEffect(()=>{
+  if(!pending)return;
+  const started=Date.now();
+  setElapsed(0);
+  const timer=window.setInterval(()=>setElapsed(Math.floor((Date.now()-started)/1000)),1000);
+  return()=>window.clearInterval(timer);
+ },[pending]);
  const stageTitle:Record<NativeMatchProgress,string>={
   preparing:'准备匹配',parsing:'识别简历经历和技能',connected:'准备搜索',
   planning:'研究职业方向',searching:'搜索企业岗位',
@@ -45,6 +54,12 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
   writing:'整理岗位',scoring:'对照简历和岗位 JD',
   waiting:'正在匹配岗位'
  };
+ const progressSteps=[
+  {label:'识别简历',stages:['preparing','parsing']},
+  {label:'搜索企业岗位',stages:['connected','planning','searching']},
+  {label:'核验岗位 JD',stages:['reading','researching']},
+  {label:'对照简历评分',stages:['writing','scoring']}
+ ];
  const matchListScroll=useRef(0);
  const activeJob=result.matches.find(job=>job.official_url===optimizedJobUrl);
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
@@ -122,11 +137,21 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
      </div>
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobUrl?'optimization':'matches'}>
-     {pending&&<div className="hhba-research-now" role="status">
+     {pending&&<><ol className="hhba-match-progress-steps" aria-label="匹配进度">
+      {progressSteps.map(step=><li key={step.label}
+       aria-current={step.stages.includes(progressStage)?'step':undefined}>{step.label}</li>)}
+     </ol><div className="hhba-research-now" role="status">
       <LoaderCircle size={18} className="spin" aria-hidden="true"/>
-      <strong id="hhba-native-title">{stageTitle[progressStage]}…</strong>
-      {result.matches.length>0&&<span>已找到 {result.matches.length} 个岗位</span>}
-     </div>}
+      <div className="hhba-match-progress-copy">
+       <strong id="hhba-native-title">{stageTitle[progressStage]}…</strong>
+       {progressStage==='parsing'&&progressActivity?.stage==='parsing'&&<span>{progressActivity.message}</span>}
+       {progressActivity?.searches!==undefined&&<span>
+        已执行 {progressActivity.searches} 次检索 · 发现 {progressActivity.candidate_links??0} 条企业岗位线索
+       </span>}
+       {result.matches.length>0&&<span>已找到 {result.matches.length} 个岗位</span>}
+      </div>
+      <span className="hhba-match-progress-time" aria-hidden="true">已用时 {elapsed} 秒</span>
+     </div></>}
      {!pending&&activeJob&&parsedProfile?
       <section className="hhba-match-workspace" aria-label="岗位专属简历优化">
        {!sourceResume&&<><button type="button" className="hhba-match-workspace-back" onClick={backToMatches}>
@@ -232,7 +257,11 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       </div>:
       !pending&&<div className="hhba-match-empty"><BriefcaseBusiness size={23}/>
        <h3>本轮没有找到符合条件的具体职位链接</h3>
-       <p>本轮未找到符合条件的企业招聘站岗位。已排除第三方招聘平台，数量不足也不会用它们补齐。</p>
+       <p>简历已识别完成。本轮企业官网检索没有得到可推荐的具体岗位。</p>
+       {result.native_search?.searches!==undefined&&<p>已检索 {result.native_search.searches} 次
+        {'，发现 '+(result.native_search.candidate_links??0)+' 条企业岗位线索。'}</p>}
+       {!!result.profile?.target_roles?.length&&<p>搜索参考方向 · {result.profile.target_roles.join('、')}</p>}
+       {onContinue&&<p>选择「继续搜索岗位」，可以换一批搜索词并继续核对招聘来源。</p>}
       </div>}
      {!pending&&resumeStorage?.available&&<div className="hhba-match-save-resume">
        <strong>把这份简历保存到「我的简历」</strong>

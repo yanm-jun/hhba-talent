@@ -192,8 +192,8 @@ test('authenticated matching recognizes real CV facts then scores and reuses the
   if(path==='/v1/tools/search'){
    assert.ok(!input.query.includes(fact));
    return Response.json({results:[
-    {title:'腾讯区域运营经理招聘',site_name:'腾讯招聘',url:URL,
-     summary:'腾讯区域运营经理。工作地点：上海。岗位职责：门店运营、销售指标分析。'},
+    {title:'职位详情',site_name:'腾讯招聘',url:URL,
+     summary:'腾讯官方职位详情，工作地点和职责查看岗位页面。'},
     {title:'其他企业区域运营经理',site_name:'其他企业招聘',
      url:'https://job-boards.greenhouse.io/unknown/jobs/1234567',
      summary:'工作地点：上海。岗位职责：门店运营和销售指标分析。'},

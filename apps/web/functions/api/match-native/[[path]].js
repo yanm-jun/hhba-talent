@@ -211,7 +211,11 @@ async function matchResumeWorkflow(env,candidate,resume,options,{
 }={}){
  const key=env.HHBA_MATCH_DEEPSEEK_KEY;
  onProgress('parsing');
- const profile=await recognizeMatchResume(key,resume,options.role_hint,{signal});
+ onActivity({stage:'parsing',message:'正在从简历正文核对工作经历和技能。'});
+ const profile=await recognizeMatchResume(key,resume,options.role_hint,{signal,
+  onFallback:()=>onActivity({stage:'parsing',message:'已启动另一轮简历核对，取得原文证据后将开始搜索岗位。'})});
+ onProgress('planning');
+ onActivity({stage:'planning',message:'已核对 '+profile.facts.length+' 条简历证据，正在规划岗位搜索方向。'});
  const checkpoint=await checkpointForCandidate(env,candidate,resume,options.role_hint);
  const excluded=new Set((options.exclude_urls||[]).map(matchPostingKey));
  const excludePosting=url=>excluded.has(matchPostingKey(url));

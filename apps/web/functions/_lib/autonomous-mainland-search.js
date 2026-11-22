@@ -11,7 +11,7 @@ const DEFAULT_TIMEOUT_MS=35000;
 const clean=x=>String(x||'').replace(/[\u0000-\u001f]/g,' ').replace(/\s+/g,' ').trim();
 const pii=/(?:[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|\b1[3-9]\d{9}\b|\b\d{17}[\dXx]\b|(?:微信|手机号|QQ号|身份证号)\s*[:：])/i;
 const unsafe=/(?:https?:\/\/|(?:\b(?:login|password|token|api[_-]?key|passwd)\b))/i;
-export function normalizeAutonomousQueries(values,used=[]){
+export function normalizeAutonomousQueries(values,used=[],{minLength=3}={}){
  if(!Array.isArray(values))return [];
  const known=new Set((Array.isArray(used)?used:[]).map(x=>clean(x).toLowerCase()));
  const output=[];
@@ -24,7 +24,7 @@ export function normalizeAutonomousQueries(values,used=[]){
   // Short Chinese job titles such as 区域督导 are meaningful search queries.
   // Reject only empty or extremely broad one/two-character phrases, not all
   // real four-character occupations.
-  if(query.length<3||query.length>128||pii.test(query)||unsafe.test(query)||known.has(key))continue;
+  if(query.length<minLength||query.length>128||pii.test(query)||unsafe.test(query)||known.has(key))continue;
   known.add(key);
   output.push(query);
  }
@@ -47,7 +47,8 @@ export async function planAutonomousMainlandSearch(key,redactedResume,roleHint,{
   '检索语句不要含求职者姓名、学校学号、手机号、邮箱、住址、身份证、QQ、微信、原简历原句、隐私信息，也不要在搜索词中夹带URL或任何API密钥。',
   '不要编造招聘信息、特定企业正在招人或真实职位链接；规划查询语句不等于发现职位。',
   '按你认为有价值的角度组织多条高质量、不重复且彼此补充的中文搜索语句，每条控制在128字符内。不要为了固定数目而凑数。',
-  '返回严格 JSON 对象：{"queries":["用于企业官方岗位搜索的查询1","查询2"],"strategy":"简短说明涵盖的职业方向"}'
+  '另外给出 catalog_keywords，供企业招聘官网的站内搜索使用。每个词只包含通用岗位名称或专业技能，例如区域运营或机器视觉；不要放姓名、企业名、地名或简历原句。',
+  '返回严格 JSON 对象：{"queries":["用于企业官方岗位搜索的查询1","查询2"],"catalog_keywords":["通用岗位名","通用专业技能"],"strategy":"简短说明涵盖的职业方向"}'
  ].join('\n');
  const response=await fetcher(BASE+'/responses',{
   method:'POST',redirect:'manual',signal:sig,
@@ -70,5 +71,6 @@ export async function planAutonomousMainlandSearch(key,redactedResume,roleHint,{
  let result;try{result=JSON.parse(outputText(await response.json()))}
  catch{throw Error('SEARCH_PLANNER_INVALID_JSON')}
  return {queries:normalizeAutonomousQueries(result?.queries),
+  catalogKeywords:normalizeAutonomousQueries(result?.catalog_keywords,[],{minLength:2}),
   strategy:clean(result?.strategy).slice(0,240)};
 }

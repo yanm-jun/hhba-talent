@@ -24,15 +24,17 @@ export async function createMatchJdReview(env,resume,options,dependencies={}){
   if(!key||closed.has(key))return;
   closed.add(key);
   const record=records.get(key);
-  if(!record?.match)return;
+  if(!record?.verified)return;
   verified--;
-  if(Number.isInteger(record.match.match_score))scored--;
+  if(Number.isInteger(record.match?.match_score))scored--;
+  record.verified=false;
   record.match=null;
  }
 
  function summarize(leads=[]){
   const candidates=new Map();
-  for(const job of [...leads,...Array.from(records.values(),record=>record.job)]){
+  for(const job of [...leads,...Array.from(records.values(),record=>
+   record.resolvePostingIdentity?record.match:record.job).filter(Boolean)]){
    const key=matchPostingKey(job.official_url);
    if(!key||!isMainlandEmployerJobUrl(key)||options.exclude?.has(key))continue;
    const record=records.get(key);
@@ -46,21 +48,26 @@ export async function createMatchJdReview(env,resume,options,dependencies={}){
    (b.match_score??-1)-(a.match_score??-1)).slice(0,options.limit);
  }
  function pump(){
-  if(signal.aborted||verified>=options.limit)return;
-  while(running.size<2&&queue.length&&verified+running.size<options.limit){
+  if(signal.aborted||scored>=options.limit)return;
+  while(running.size<3&&queue.length&&scored+running.size<options.limit){
    const record=queue.shift();
    const key=matchPostingKey(record.job.official_url);
    if(closed.has(key))continue;
    const task=(async()=>{
     try{
      const result=await enrich(env,[record.job],resume,{
-      ...options,signal,domesticOnly:true,compareEvidence:jd=>options.compareEvidence(jd,signal)
+      ...options,signal,domesticOnly:true,resolvePostingIdentity:record.resolvePostingIdentity,
+      compareEvidence:jd=>options.compareEvidence(jd,signal)
      },{ready:async()=>true});
      if(result.diagnostic.closed>0)markClosed(key);
      if(closed.has(key))return;
      const job=result.matches.find(item=>item.jd_source_status==='VERIFIED_JD');
      if(!job){failed++;return;}
-     record.match=job;verified++;
+     record.verified=true;verified++;
+     // Search text can omit the city and job title. Only the verified employer
+     // detail may supply those fields. An unscored URL-only lead stays hidden.
+     if(record.resolvePostingIdentity&&!Number.isInteger(job.match_score))return;
+     record.match=job;
      if(Number.isInteger(job.match_score))scored++;
     }catch{failed++;}
    })().finally(()=>{
@@ -71,20 +78,25 @@ export async function createMatchJdReview(env,resume,options,dependencies={}){
    running.add(task);
   }
  }
- function add(jobs,closedUrls=[]){
+ function add(jobs,closedUrls=[],postingUrls=[]){
   if(signal.aborted)return;
   for(const url of closedUrls)markClosed(url);
-  for(const job of jobs){
-   const locator=safeOfficialJobLocator(job?.official_url);
-   if(!locator||closed.has(locator.url)||records.has(locator.url)||options.exclude?.has(locator.url))continue;
-   const record={job,match:null};
+  function enqueue(locator,job){
+   if(!locator||closed.has(locator.url)||records.has(locator.url)||options.exclude?.has(locator.url))return;
+   const record={job:job||{
+    id:'external-'+locator.id.replace(/[:.]/g,'-'),official_url:locator.url,
+    platform:'企业官网',source:locator.domain,source_type:'站外官方招聘',
+    application_status:'NEEDS_OFFICIAL_CONFIRMATION',recruitment_source_kind:'EMPLOYER_DOMAIN_CANDIDATE'
+   },match:null,resolvePostingIdentity:!job};
    records.set(locator.url,record);queue.push(record);
   }
+  for(const job of jobs)enqueue(safeOfficialJobLocator(job?.official_url),job);
+  for(const url of postingUrls)enqueue(safeOfficialJobLocator(url));
   pump();
  }
  return {
   add,preview:summarize,
-  verifiedCount:()=>verified,
+  verifiedCount:()=>scored,
   async finish(jobs){
    add(jobs);
    while(running.size){await Promise.allSettled([...running]);}

@@ -15,6 +15,7 @@ import {searchQueries,searchPublicJobs,enrichCandidateDetails,reasonAboutJobs,
 import {mergeCandidateHits} from './match-search-growth.js';
 import {isRecommendationEligible,classifyJobAvailability} from './match-job-quality.js';
 import {isMainlandEmployerJobUrl,isDirectEmployerSourceHit,sourceCounts} from './match-employer-source.js';
+import {searchOfficialJobCatalogs} from './official-job-catalog-search.js';
 
 export const AGENT_VERSION='HHBA_MAINLAND_AI_OWNED_RESEARCH_V1';
 const BASE='https://api.deepseek.com';
@@ -161,11 +162,12 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  const select=deps.select||reasonAboutJobs;
  const recover=deps.recover||recoverSearchGroundedShortlist;
  const expand=deps.expand||expandDetailedReasons;
+ const searchCatalogs=deps.searchCatalogs||searchOfficialJobCatalogs;
  let pool=[],usedQueries=[],pageReads=0,searchCalls=0,searchFailures=0;
  let checkpointRestored=false,checkpointWrites=0,checkpointErrors=0;
  let checkpointRefreshAttempted=false,checkpointRefreshQueries=0;
  let underfilledExpansionQueries=0,underfilledExpansionNew=0;
- let rawHits=0,loops=0,decisions=0,decisionFailures=0,reflections=0;
+ let rawHits=0,loops=0,decisions=0,decisionFailures=0,reflections=0,catalogSearches=0;
  let exitReason='unknown',shortlistIds=[],agentPlannedQueries=0;
  let rejectedLinks=0;
  function activity(stage,message){
@@ -184,8 +186,8 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    // Public source counts only. Never log resume text, search titles,
    // user identifiers, model prompts or provider credentials.
    diagnostic:{phase,searches:searchCalls,provider_items:rawHits,
-    source_candidates:pool.length,explicit_city_sources:evidenceReadyCount(),
-    search_failures:searchFailures,rejected_links:rejectedLinks,
+    source_candidates:pool.length,candidate_links:pool.length,explicit_city_sources:evidenceReadyCount(),
+    search_failures:searchFailures,rejected_links:rejectedLinks,official_catalog_searches:catalogSearches,
     agent_decisions:decisions,checkpoint_restored:checkpointRestored,
     elapsed_ms:Date.now()-started,...extra}
   });
@@ -193,11 +195,14 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  const discoveredCount=()=>options.verifiedCount?.()??evidenceReadyCount();
  const discoveryTarget=options.verifiedCount?limit:Math.min(limit,6);
  const includeHit=hit=>isDirectEmployerSourceHit(hit)&&!options.excludePosting?.(hit.url);
+ const groundedTerms=normalizeAutonomousQueries(options.resumeProfile?.target_roles,[],{minLength:2});
  let previewSignature='';
  function publishSourcePreviews(){
   if(signal?.aborted)return;
-  if(options.onSources)options.onSources(sourceOnlyJobPreviews(pool,pool.length),
-   pool.filter(hit=>hit.availability?.status==='CLOSED_LISTED').map(hit=>hit.url));
+  if(options.onSources){
+   const closed=pool.filter(hit=>hit.availability?.status==='CLOSED_LISTED').map(hit=>hit.url);
+   options.onSources(sourceOnlyJobPreviews(pool,pool.length),closed,pool.map(hit=>hit.url));
+  }
   const jobs=sourceOnlyJobPreviews(pool,limit);
   const signature=JSON.stringify(jobs.map(job=>[job.official_url,job.title,job.availability_status]));
   if(signature===previewSignature||(!jobs.length&&!previewSignature))return;
@@ -213,6 +218,28 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    if(saved)checkpointWrites++;
    else checkpointErrors++;
   }catch{checkpointErrors++}
+ }
+ async function catalogTool(words,page){
+  if(!options.onSources||!words?.length||signal?.aborted)return;
+  onProgress('searching');
+  activity('searching','正在查询企业官网自己的职位列表。');
+  const result=await searchCatalogs(words,{signal,page});
+  ensureActive();
+  catalogSearches+=result.searches;
+  searchCalls+=result.searches;
+  searchFailures+=result.failures;
+  rawHits+=result.raw;
+  pool=mergeCandidateHits(pool,result.hits.filter(includeHit),240).filter(includeHit);
+  publishSourcePreviews();
+  history.push({type:'official_catalog_search',searches:result.searches,found:result.hits.length});
+  activity('searching','企业官网职位列表已查询，正在验证具体岗位。');
+  return result.searches>0;
+ }
+ async function discoverSources(queries,keywords,page,reserveMs){
+  const [web,catalog]=await Promise.allSettled([searchTool(queries,{reserveMs}),catalogTool(keywords,page)]);
+  ensureActive();
+  if(web.status==='rejected'&&!pool.length)throw web.reason;
+  if(catalog.status==='fulfilled'&&catalog.value)await saveCheckpoint('official_catalog_search');
  }
  async function searchTool(values,{reserveMs=48000}={}){
   const proposed=normalizeAutonomousQueries(values,usedQueries);
@@ -244,7 +271,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
     // Configuration, balance and rate-limit errors are NOT "no suitable
     // jobs". The old code swallowed these errors, continued searching and
     // misleadingly failed after the entire research window.
-    if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+    if(!pool.length&&['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
       'AI_PROVIDER_RATE_LIMITED','AI_SEARCH_API_REJECTED',
       'AI_SEARCH_UNAVAILABLE','AI_SEARCH_RESPONSE_INVALID'].includes(e?.code))
      throw e;
@@ -309,13 +336,16 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   }catch{checkpointErrors++}
  }
  if(!checkpointRestored){
-  const early=searchTool(searchQueries(resume,roleHint),{reserveMs:93000}).then(()=>null,e=>e);
+  const earlyQueries=[...groundedTerms.map(role=>role+' 企业官网 社会招聘 中国大陆 工作地点'),
+   ...searchQueries(resume,roleHint)];
+  const early=searchTool(earlyQueries,{reserveMs:93000}).then(()=>null,e=>e);
   activity('searching','已同步开启首轮岗位来源搜索，AI 继续自主规划相关职业方向。');
-  let queries;
+  let queries,catalogKeywords=[];
   try{
    const initial=await plan(key,resume,roleHint,{...options,
     plannerTimeoutMs:Math.min(35000,budget())});
    queries=normalizeAutonomousQueries(initial?.queries);
+   catalogKeywords=initial?.catalogKeywords||[];
    agentPlannedQueries=queries.length;
    history.push({type:'plan',strategy:shorten(initial?.strategy,180),queries:queries.length});
    if(initial?.strategy)activity('planning','AI 初步研究方向：'+shorten(initial.strategy,190));
@@ -327,12 +357,12 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    history.push({type:'plan_unavailable',code:String(e.code||'PROVIDER_UNAVAILABLE')});
   }
   const earlyError=await early;
-  if(earlyError&&['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
-   'AI_PROVIDER_RATE_LIMITED','AI_SEARCH_API_REJECTED'].includes(earlyError?.code))throw earlyError;
   activity('searching','已规划 '+queries.length+' 个公开招聘搜索方向，开始逐批检索。');
   // Initial broad discovery cannot spend the full service window before
   // the Agent has a chance to correct source quality and choose candidates.
-  await searchTool(queries,{reserveMs:85000});
+  await discoverSources(queries,catalogKeywords.length?catalogKeywords:groundedTerms,1,85000);
+  if(!pool.length&&earlyError&&['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
+   'AI_PROVIDER_RATE_LIMITED','AI_SEARCH_API_REJECTED'].includes(earlyError?.code))throw earlyError;
  }
  // Cached sources are not a finished search. Replan and refresh when a
  // resumed research session has fewer than six eligible job sources.
@@ -340,11 +370,12 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   checkpointRefreshAttempted=true;
   onProgress('planning');
   activity('planning','已恢复旧岗位来源，但数量不足；正在继续搜索新的企业招聘页面。');
-  let nextQueries=[];
+  let nextQueries=[],catalogKeywords=[];
   try{
    const planResult=await plan(key,resume,roleHint,{...options,
     plannerTimeoutMs:Math.min(18000,Math.max(3500,budget()-73000))});
    nextQueries=normalizeAutonomousQueries(planResult?.queries,usedQueries);
+   catalogKeywords=planResult?.catalogKeywords||[];
   }catch(e){
    if(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
      'AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_REQUEST_REJECTED'].includes(e?.code))throw e;
@@ -358,8 +389,8 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   if(nextQueries.length){
    checkpointRefreshQueries=nextQueries.length;
    agentPlannedQueries+=nextQueries.length;
-   await searchTool(nextQueries.slice(0,12),{reserveMs:69000});
   }
+  await discoverSources(nextQueries.slice(0,12),catalogKeywords.length?catalogKeywords:groundedTerms,2,69000);
  }
  // Don't deliberate for the entire service window over job-board results.
  // Re-check the actual employer's hiring pages; all URLs still go through
@@ -589,7 +620,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    pool.some(h=>h.url===job.official_url&&isDirectEmployerSourceHit(h)&&isRecommendationEligible(h)));
  return {matches:result,incomplete:result.length<limit||detail.detail_failures>0,
   diagnostic:{mode:AGENT_VERSION,model:'deepseek-v4-pro',
-   searches:searchCalls,page_reads:pageReads,provider_items:rawHits,
+   searches:searchCalls,page_reads:pageReads,provider_items:rawHits,official_catalog_searches:catalogSearches,
    visible_jobs:result.length,discarded:Math.max(0,pool.length-result.length),
    elapsed_ms:Date.now()-started,candidate_links:pool.length,
    agent_queries:usedQueries.length,agent_planned_queries:agentPlannedQueries,

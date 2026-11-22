@@ -164,7 +164,9 @@ export async function enrichSearchMatchesWithJD(env,matches,resume,options={},de
     const jd=await load(locator);
     if(!jd?.fresh||!jd.id||jd.canonical_url!==locator.url||
      !jd.sections?.some(s=>s.kind==='requirements'))throw Error('JD_INCOMPLETE');
-    const linked=scoreVerifiedJDSearchJob(job,jd,resume,options);
+    const inputJob=options.resolvePostingIdentity&&jd.company===locator.company?
+     {...job,company:jd.company,title:jd.title,title_zh:jd.title,location:jd.location}:job;
+    const linked=scoreVerifiedJDSearchJob(inputJob,jd,resume,options);
     if(!linked)throw Error('JD_SCORE_NOT_AVAILABLE');
     verified++;
     if(options.compareEvidence){
