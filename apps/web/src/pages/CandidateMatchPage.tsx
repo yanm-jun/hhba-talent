@@ -7,7 +7,7 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
+import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchProgress,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -35,7 +35,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10});
  const [working,setWorking]=useState(false);
   const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
-  const [stage,setStage]=useState<'preparing'|'connected'|'searching'|'reading'|'writing'|'waiting'>('preparing');
+  const [stage,setStage]=useState<NativeMatchProgress>('preparing');
+ const progress=(next:NativeMatchProgress)=>setStage(previous=>next==='waiting'?previous:next);
  const [error,setError]=useState('');
 
  const [result,setResult]=useState<MatchResponse|null>(null);
@@ -162,7 +163,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    let matched:MatchResponse;
    if(previewLoaded){
     // Once the user has reviewed/edited text, NEVER fall back to re-reading the unedited file.
-    matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,matchResumeId||undefined,setStage,setPartialJobs);
+    matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,matchResumeId||undefined,progress,setPartialJobs);
     setOptimizationSource(previewText);
    }else{
     let selected=selectedFile;
@@ -177,7 +178,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     // Preserve existing match flow and avoid a second extraction:
     // the existing service exposes the exact locally reviewed text only to
     // this session through a new optional callback, never to a new page.
-    matched=await submitResumeForMatching(selected,options,consent,abort.signal,matchResumeId||undefined,setStage,setPartialJobs,setOptimizationSource);
+    matched=await submitResumeForMatching(selected,options,consent,abort.signal,matchResumeId||undefined,progress,setPartialJobs,setOptimizationSource);
    }
    setResult(matched);setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
@@ -290,7 +291,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           {working?<><LoaderCircle className="spin" size={18}/> {saveBusy?'正在保存简历…':'正在提取简历并匹配岗位…'}</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>
-        {working&&<p className="hhba-ai-processing" role="status">{stage==='preparing'?'正在准备智能匹配…':stage==='connected'?'正在连接岗位信息…':stage==='searching'?'正在寻找中国大陆岗位…':stage==='reading'?'正在读取候选岗位信息…':stage==='waiting'?'正在生成推荐，请稍候…':'正在分析简历并生成推荐理由…'}</p>}
+        {working&&<p className="hhba-ai-processing" role="status">智能搜索进度与已发现岗位已在弹窗中展示。</p>}
       </section>
       <aside className="hhba-ai-aside">
         <div className="hhba-ai-aside-card"><h3>只需三步</h3>
@@ -300,9 +301,9 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          <p className="hhba-ai-aside-footnote">工作地点仅限中国大陆；招聘状态请以岗位原始网页为准。</p>
       </aside>
     </div>
-    {(result||partialJobs.length>0)&&<CandidateMatchNativeDialog
+    {((result||partialJobs.length>0)||working)&&<CandidateMatchNativeDialog
       result={result||{matches:partialJobs}}
-      pending={working&&!result} notice={working?'':error}
+      pending={working&&!result} progressStage={stage} notice={working?'':error}
       sourceText={result?optimizationSource:undefined}
       sourceResume={result&&savedId?savedFiles.find(item=>item.id===savedId&&/\.docx$/i.test(item.name)):undefined}
       accountScope={String(user?.id||'')}
