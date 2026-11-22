@@ -25,19 +25,18 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 }
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,pending=false,progressStage='preparing',notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
+export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'profile'>>;
- onClose:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
+ onClose:()=>void;onContinue?:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
  notice?:string;resumeStorage?:ResumeStorageAction;
  sourceText?:string;sourceResume?:PrivateResume;accountScope?:string;
  // Match-history handoff enters the same existing editor without rerunning a search.
  initialOptimizedJobId?:string;
 }){
  const ref=useRef<HTMLDivElement|null>(null);
- const [optimizedJobId,setOptimizedJobId]=useState<string|null>(()=>
-  initialOptimizedJobId&&result.matches.some(job=>job.id===initialOptimizedJobId&&job.jd_version_id&&job.jd_sha256)
-   ?initialOptimizedJobId:null);
+ const [optimizedJobUrl,setOptimizedJobUrl]=useState<string|null>(()=>
+  result.matches.find(job=>job.id===initialOptimizedJobId&&job.jd_version_id&&job.jd_sha256)?.official_url||null);
  const [optimizationDirty,setOptimizationDirty]=useState(false);
  const stageTitle:Record<NativeMatchProgress,string>={
   preparing:'准备匹配',parsing:'识别简历经历和技能',connected:'准备搜索',
@@ -47,7 +46,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
   waiting:'正在匹配岗位'
  };
  const matchListScroll=useRef(0);
- const activeJob=result.matches.find(job=>job.id===optimizedJobId);
+ const activeJob=result.matches.find(job=>job.official_url===optimizedJobUrl);
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
  function asTargetJob(job:MatchResponse['matches'][number]):JobMatch{
   return {
@@ -65,14 +64,14 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
  // the exact result object from the original matching session.
  useLayoutEffect(()=>{
   const viewport=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content');
-  if(viewport)viewport.scrollTop=optimizedJobId?0:matchListScroll.current;
- },[optimizedJobId]);
+  if(viewport)viewport.scrollTop=optimizedJobUrl?0:matchListScroll.current;
+ },[optimizedJobUrl]);
  function backToMatches(){
   if(optimizationDirty&&!window.confirm('这份岗位简历有尚未保存的文字草稿。返回后草稿可能丢失，确定返回岗位匹配结果吗？'))return;
-  setOptimizationDirty(false);setOptimizedJobId(null);
+  setOptimizationDirty(false);setOptimizedJobUrl(null);
  }
  function handleClose(){
-  if(optimizedJobId){backToMatches();return}
+  if(optimizedJobUrl){backToMatches();return}
   onClose();
  }
  useEffect(()=>{
@@ -95,10 +94,10 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
  }
  return createPortal(
   <div className="hhba-match-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)handleClose()}}>
-   <div className={'hhba-match-modal'+(optimizedJobId?' hhba-match-modal-editor':'')} role="dialog" aria-modal="true" tabIndex={-1}
+   <div className={'hhba-match-modal'+(optimizedJobUrl?' hhba-match-modal-editor':'')} role="dialog" aria-modal="true" tabIndex={-1}
     ref={ref} onKeyDown={handleKey} aria-labelledby="hhba-native-title">
-    <header className={'hhba-match-modal-head'+(optimizedJobId&&sourceResume?' hhba-word-editor-head':'')}>
-     {optimizedJobId&&sourceResume&&activeJob?
+    <header className={'hhba-match-modal-head'+(optimizedJobUrl&&sourceResume?' hhba-word-editor-head':'')}>
+     {optimizedJobUrl&&sourceResume&&activeJob?
       <div className="hhba-word-editor-heading">
        <button type="button" className="hhba-word-editor-back" onClick={backToMatches}
         aria-label="返回岗位匹配结果" title="返回岗位匹配结果"><ArrowLeft size={17}/></button>
@@ -114,15 +113,15 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
        <div><strong>岗位匹配</strong></div>
       </div>}
      <div className="hhba-word-editor-head-actions">
-      {optimizedJobId&&sourceResume&&<span id="hhba-word-top-download" />}
+      {optimizedJobUrl&&sourceResume&&<span id="hhba-word-top-download" />}
       <button type="button" className="hhba-match-modal-close"
-       onClick={optimizedJobId&&sourceResume?()=>{
+       onClick={optimizedJobUrl&&sourceResume?()=>{
         if(!optimizationDirty||window.confirm('简历还有未保存的文字草稿，关闭后可能丢失。确定关闭吗？'))onClose();
        }:handleClose}
-       aria-label={optimizedJobId&&sourceResume?'关闭简历编辑':'关闭推荐'}><X size={19}/></button>
+       aria-label={optimizedJobUrl&&sourceResume?'关闭简历编辑':'关闭推荐'}><X size={19}/></button>
      </div>
     </header>
-    <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobId?'optimization':'matches'}>
+    <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobUrl?'optimization':'matches'}>
      {pending&&<div className="hhba-research-now" role="status">
       <LoaderCircle size={18} className="spin" aria-hidden="true"/>
       <strong id="hhba-native-title">{stageTitle[progressStage]}…</strong>
@@ -182,7 +181,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
      {result.matches.length?
       <div className="hhba-native-list">
        {result.matches.map((job,i)=>(
-        <article key={job.id} className="hhba-native-job">
+        <article key={job.official_url} className="hhba-native-job">
          <div className="hhba-native-top">
           <span className="hhba-native-num">{String(i+1).padStart(2,'0')}</span>
           <div className="hhba-native-heading">
@@ -209,7 +208,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
              title={!job.jd_version_id||!job.jd_sha256?'取得完整岗位 JD 后可优化':pending||!parsedProfile?'匹配完成后可优化':'针对所选岗位优化简历'}
              className="hhba-native-optimize" onClick={()=>{
               matchListScroll.current=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content')?.scrollTop||0;
-              setOptimizationDirty(false);setOptimizedJobId(job.id);
+              setOptimizationDirty(false);setOptimizedJobUrl(job.official_url);
              }} aria-label={'针对'+(job.title_zh||job.title)+'优化简历'}>
              <Sparkles size={13} aria-hidden="true"/> 优化简历
             </button>
@@ -250,8 +249,10 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
      </>}
     </div>
     <footer className="hhba-match-modal-foot">
-     <span>HHBA · 让机会与人才，找到彼此。</span>
-     <button className="hhba-match-done" type="button" onClick={handleClose}>{optimizedJobId?'返回匹配结果':pending?'取消搜索':'完成查看'}</button>
+     {!optimizedJobUrl&&onContinue&&!pending?
+      <button className="hhba-match-done" type="button" onClick={onContinue}>继续搜索岗位</button>:
+      <span>HHBA · 让机会与人才，找到彼此。</span>}
+     <button className="hhba-match-done" type="button" onClick={handleClose}>{optimizedJobUrl?'返回匹配结果':pending?'取消搜索':'完成查看'}</button>
     </footer>
    </div>
   </div>,document.body);

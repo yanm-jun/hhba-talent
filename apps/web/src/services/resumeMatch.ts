@@ -55,8 +55,9 @@ export type MatchResponse = {
   history_status?:'SAVED'|'EMPTY'|'UNAVAILABLE';
   new_job_count?:number;
   improved_job_count?:number;
+  can_continue?:boolean;
 };
-export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number};
+export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
 const API='/api/match-native';
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=3*1024*1024;
@@ -273,7 +274,7 @@ export async function submitExtractedResumeText(
   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
    options:{country:'CN',remote_only:false,
-    role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10))}})
+    role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10)),exclude_urls:opts.exclude_urls}})
  }).catch(e=>{if((e as Error)?.name==='AbortError')throw e;
   throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
  const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');

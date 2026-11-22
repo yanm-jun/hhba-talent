@@ -46,6 +46,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [result,setResult]=useState<MatchResponse|null>(null);
  const [optimizationSource,setOptimizationSource]=useState('');
  const controller=useRef<AbortController|null>(null);
+ const lastSearch=useRef<{text:string;options:MatchOptions;resumeId?:string}|null>(null);
  const identifiedCharacters=redactResumeTextLocally(previewText).replace(/\s/g,'').length;
  useEffect(()=>{
   const abort=new AbortController();
@@ -210,12 +211,37 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     jobs=>{if(!abort.signal.aborted)setPartialJobs(jobs);});
    if(abort.signal.aborted)return;
    setOptimizationSource(redactResumeTextLocally(previewText));
+   lastSearch.current={text:previewText,options,resumeId:matchResumeId||undefined};
    setResult(matched);setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
    setConsent(false);
   }catch(e){
    if(!abort.signal.aborted)setError(e instanceof Error?e.message:'智能匹配暂时失败，请稍后再试。');
   }finally{setWorking(false);controller.current=null}
+ }
+ async function continueSearch(){
+  const previous=result,search=lastSearch.current;
+  if(!previous?.can_continue||!search||controller.current||!getRealAuthToken())return;
+  const abort=new AbortController();controller.current=abort;
+  const combine=(jobs:MatchedJob[])=>Array.from(new Map(
+   [...previous.matches,...jobs].map(job=>[job.official_url,job])
+  ).values());
+  setWorking(true);setStage('preparing');setError('');setResult(null);setPartialJobs(previous.matches);
+  try{
+   const next=await submitExtractedResumeText(search.text,{...search.options,
+    exclude_urls:previous.matches.map(job=>job.official_url).slice(-50)},true,abort.signal,search.resumeId,
+    stage=>{if(!abort.signal.aborted)progress(stage);},
+    jobs=>{if(!abort.signal.aborted)setPartialJobs(combine(jobs));});
+   if(abort.signal.aborted)return;
+   setResult({...next,matches:combine(next.matches)});
+   setPartialJobs([]);
+  }catch(error){
+   if(!abort.signal.aborted){
+    setResult(previous);
+    setPartialJobs([]);
+    setError(error instanceof Error?error.message:'继续搜索暂未完成，请重试。');
+   }
+  }finally{setWorking(false);controller.current=null;}
  }
  return <Shell user={user} embedded={embedded}>
   <section className={embedded?'hhba-ai-page hhba-ai-page-embedded':'hhba-ai-page'}>
@@ -348,6 +374,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     {((result||partialJobs.length>0)||working)&&<CandidateMatchNativeDialog
       result={result||{matches:partialJobs}}
       pending={working&&!result} progressStage={stage}
+      onContinue={result?.can_continue?()=>void continueSearch():undefined}
       notice={working?'':error}
       sourceText={result?optimizationSource:undefined}
       sourceResume={result&&savedId?savedFiles.find(item=>item.id===savedId&&/\.docx$/i.test(item.name)):undefined}

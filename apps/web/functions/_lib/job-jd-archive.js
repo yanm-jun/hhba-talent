@@ -8,7 +8,7 @@
  */
 import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 import {safePublicAtsJobLocator,ATS_JD_PROOF} from './public-ats-jd.js';
-import {extractOfficialJdSections,MEITUAN_DETAIL_SOURCE} from './official-job-evidence.js';
+import {extractOfficialJdSections,MEITUAN_DETAIL_SOURCE,TENCENT_DETAIL_SOURCE} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
 import {recordJdPostingCheck,readJdPostingState,isUsablePosting} from './jd-posting-lifecycle.js';
 
@@ -71,8 +71,9 @@ function normalizeDocument(value){
   title:text(value.title).slice(0,120),
   location:text(value.location).slice(0,100),
   full_jd:body,sections,
-  ...(locator.domain==='zhaopin.meituan.com'&&value.retrieval_method===MEITUAN_DETAIL_SOURCE?
-   {retrieval_method:MEITUAN_DETAIL_SOURCE}:{}),
+  ...((locator.domain==='zhaopin.meituan.com'&&value.retrieval_method===MEITUAN_DETAIL_SOURCE)||
+      (locator.domain==='careers.tencent.com'&&value.retrieval_method===TENCENT_DETAIL_SOURCE)?
+   {retrieval_method:value.retrieval_method}:{}),
   content_status:'VERIFIED_SECTIONS',
   proof_method:proof
  };

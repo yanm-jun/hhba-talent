@@ -99,6 +99,63 @@ test('Meituan reads the exact public employer detail, including multiple work ci
   await assert.rejects(directOfficialJobEvidence(canonical,{fetcher:source(invalid)}),/OFFICIAL_JD_NOT_VERIFIED/);
 });
 
+test('Tencent public detail supplies the complete JD behind the employer page shell',async()=>{
+ const candidate='https://careers.tencent.com/jobdesc.html?postId=2097166275703910400';
+ const postId=new globalThis.URL(candidate).searchParams.get('postId');
+ const calls=[];
+ const fetcher=async(url,init)=>{
+  calls.push(url);
+  if(url===candidate)return new Response('<main id="app"></main>',{headers:{'Content-Type':'text/html'}});
+  const query=new globalThis.URL(url);
+  assert.equal(query.origin,'https://careers.tencent.com');
+  assert.equal(query.pathname,'/tencentcareer/api/post/ByPostId');
+  assert.equal(query.searchParams.get('postId'),postId);
+  assert.equal(init.redirect,'manual');
+  return Response.json({Code:200,Data:{PostId:postId,RecruitPostName:'区域运营经理',LocationName:'广州',
+   Responsibility:'负责区域内门店日常运营，按月分析销售指标和客户服务数据。',
+   Requirement:'具备连锁门店或区域运营管理经验，能够完成经营数据分析。',
+   RequireWorkYearsName:'一年以上工作经验'}});
+ };
+ const jd=await directOfficialJobEvidence(candidate,{fetcher});
+ assert.equal(calls.length,2);
+ assert.equal(jd.canonical_url,candidate);
+ assert.equal(jd.retrieval_method,'TENCENT_PUBLIC_JOB_DETAIL_V1');
+ assert.equal(jd.location,'广州');
+ assert.match(jd.full_jd,/任职要求\n具备连锁门店/);
+ assert.match(jd.full_jd,/一年以上/);
+ const saved=await saveVerifiedJobJd(mockEnv(),jd);
+ assert.equal(publicJdPayload(saved).retrieval_method,'TENCENT_PUBLIC_JOB_DETAIL_V1');
+});
+
+test('official JD review starts before shortlist, skips unsupported links, and replaces failed candidates',async()=>{
+ const {createMatchJdReview}=await import('../functions/_lib/match-jd-review.js');
+ const hits=[...Array.from({length:4},(_,index)=>({
+  id:'job-'+index,title:'区域运营经理',location:'北京',
+  official_url:'https://careers.tencent.com/jobdesc.html?postId='+String(2097166275703910400n+BigInt(index))
+ })),{id:'third-party',official_url:'https://www.zhipin.com/job_detail/dummy.html'}];
+ const reviewed=[],updates=[];
+ const review=await createMatchJdReview({HHBA_MATCH_JD_ENRICH_ENABLED:'1'},'resume',{
+  limit:2,onUpdate:jobs=>updates.push(jobs)
+ },{ready:async()=>true,enrich:async(env,[job])=>{
+  reviewed.push(job.id);
+  const status=job.id==='job-0'?{closed:1}:{closed:0};
+  const matches=job.id==='job-0'?[]:job.id==='job-1'?[job]:
+   [{...job,jd_source_status:'VERIFIED_JD',match_score:75}];
+  return {diagnostic:status,matches};
+ }});
+ review.add(hits.slice(0,2));
+ assert.deepEqual(reviewed,['job-0','job-1'],'verification starts before the shortlist is available');
+ const result=await review.finish(hits);
+ assert.equal(result.diagnostic.verified,2);
+ assert.equal(result.diagnostic.closed,1);
+ assert.deepEqual(result.matches.map(job=>job.id),['job-2','job-3']);
+ assert.ok(updates.some(jobs=>jobs.some(job=>job.jd_source_status==='VERIFIED_JD')));
+ assert.deepEqual(reviewed,['job-0','job-1','job-2','job-3']);
+ review.add([], [hits[2].official_url]);
+ assert.equal(review.verifiedCount(),1);
+ assert.ok(!review.preview(hits).some(job=>job.id==='job-2'));
+});
+
 test('authenticated matching recognizes real CV facts then scores and reuses the exact verified employer JD',async()=>{
  const {onRequest}=await import('../functions/api/match-native/[[path]].js');
  const {onRequestPost:optimize}=await import('../functions/api/resume-optimize.js');
@@ -107,15 +164,19 @@ test('authenticated matching recognizes real CV facts then scores and reuses the
  const fact='负责三家门店的销售指标分析与月度运营复盘';
  const reply=answer=>Response.json({status:'completed',
   output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(answer)}]}]});
- const calls=[];
+ const calls=[],optimizationWrites=[];
  const db={prepare(sql){return {bind(){return this},async first(){
   if(sql.includes('hhba_auth_sessions'))return {phone:'13800000000',revoked:0,
    expires_at:new Date(Date.now()+3600000).toISOString()};
   if(sql.includes('hhba_auth_users'))return {role:'candidate'};
+  if(sql.includes("name='hhba_resume_optimization_tasks'"))return {name:'hhba_resume_optimization_tasks'};
   return null;
  },async all(){return {results:sql.includes('sqlite_master')?[
   {name:'hhba_resume_optimization_requests'},{name:'hhba_resume_optimization_attempts'}
- ]:[]}},async run(){return {success:true,meta:{changes:1}}}}}};
+ ]:[]}},async run(){
+  if(sql.startsWith('INSERT')&&sql.includes('hhba_resume_optimization_'))optimizationWrites.push(sql);
+  return {success:true,meta:{changes:1}};
+ }}}};
  Object.assign(env,{HHBA_MATCH_SERVICE_ENABLED:'1',HHBA_MATCH_DEEPSEEK_KEY:'synthetic-test-key',
   HHBA_PNVS_AUTH_DB:db,HHBA_AGENT_CHECKPOINT_ENABLED:'0'});
  const makeRequest=text=>new Request('https://example.org/api/match-native/resume',{
@@ -141,9 +202,15 @@ test('authenticated matching recognizes real CV facts then scores and reuses the
    ]});
   }
   if(path==='/v1/tools/fetch')return Response.json({content:''});
-  if(path==='/v1/chat/completions'){
+  if(path==='/chat/completions'){
    const system=input.messages[0].content,user=JSON.parse(input.messages[1].content);
    assert.equal(user.job.requirements,baseline().full_jd);
+   assert.equal(input.model,'deepseek-v4-pro');
+   assert.deepEqual(input.thinking,{type:'enabled'});
+   if(system.includes('整体编辑计划')){
+    assert.equal(user.context,'完整简历正文。'+fact);
+    return Response.json({choices:[{message:{content:JSON.stringify({focus:['门店运营']})}}]});
+   }
    const result=system.includes('事实审查员')?(()=>{
     assert.deepEqual(user.blocks.map(block=>block.blockId),['keep','reject']);
     return {checks:[{blockId:'keep',safe:true},{blockId:'reject',safe:false}]};
@@ -208,14 +275,18 @@ test('authenticated matching recognizes real CV facts then scores and reuses the
    request:new Request('https://example.org/api/resume-optimize',{method:'POST',
     headers:{Origin:'https://example.org',Authorization:'Bearer synthetic-token','Content-Type':'application/json'},
     body:JSON.stringify({consent_ai:true,job:{...input,title:match.title,requirements:'客户端伪造岗位要求'},
+     full_document:{text:'完整简历正文。'+fact},
      blocks:['keep','reject','unsupported-jd','unsupported-number'].map(id=>({id,section:'experience',text:fact}))})}),
    env:{...env,HHBA_RESUME_OPTIMIZATION_ENABLED:'1',HHBA_MATCH_RUNTIME_MODE:'production',
     HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER:'synthetic-optimization-pepper',
-    HHBA_AI_DEFAULT_PROVIDER:'openai',HHBA_AI_OPENAI_API_KEY:'synthetic-key',HHBA_AI_OPENAI_MODEL:'mock-model'}
+    HHBA_AI_DEFAULT_PROVIDER:'deepseek'}
   });
   assert.equal(optimized.status,200);
   const output=await optimized.json();
   assert.equal(output.jd_version_id,match.jd_version_id);
+  assert.deepEqual(output.pending_block_ids,[]);
+  assert.equal(optimizationWrites.length,1);
+  assert.match(optimizationWrites[0],/INSERT INTO hhba_resume_optimization_tasks/);
   assert.deepEqual(output.suggestions.map(item=>item.blockId),['keep']);
   assert.equal(output.suggestions[0].evidenceStatus,'needs_user_confirmation');
   assert.ok([...env.r2.objects.values()].every(value=>!value.includes(fact)),'shared JD archive must not contain CV quotes');

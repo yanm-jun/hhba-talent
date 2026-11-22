@@ -31,8 +31,8 @@ test('the simpler result cards preserve the original Word editor and the selecte
   '完成查看',
  ];
  for(const value of preserved)assert.ok(dialog.includes(value),'preserve old native result UI: '+value);
- assert.match(dialog,/className=\{'hhba-match-modal'\+\(optimizedJobId\?' hhba-match-modal-editor':''\)\}/);
- assert.match(dialog,/result\.matches\.find\(job=>job\.id===optimizedJobId\)/);
+ assert.match(dialog,/className=\{'hhba-match-modal'\+\(optimizedJobUrl\?' hhba-match-modal-editor':''\)\}/);
+ assert.match(dialog,/result\.matches\.find\(job=>job\.official_url===optimizedJobUrl\)/);
  assert.match(dialog,/<button type="button" disabled=\{pending\|\|!parsedProfile\|\|!job\.jd_version_id\|\|!job\.jd_sha256\}/);
  assert.doesNotMatch(dialog,/!pending&&Number\.isInteger\(job\.match_score\)&&<button/);
  assert.match(dialog,/className="hhba-native-optimize"/);
@@ -40,9 +40,9 @@ test('the simpler result cards preserve the original Word editor and the selecte
  assert.match(dialog,/<TargetedResumeOptimization key=\{activeJob\.id\}/);
  assert.match(dialog,/onDraftDirtyChange=\{setOptimizationDirty\}/);
  assert.match(dialog,/const matchListScroll=useRef\(0\)/);
- assert.match(dialog,/viewport\.scrollTop=optimizedJobId\?0:matchListScroll\.current/);
- assert.match(dialog,/if\(optimizedJobId\)\{backToMatches\(\);return\}/);
- assert.match(dialog,/\{optimizedJobId\?'返回匹配结果':pending\?'取消搜索':'完成查看'\}/);
+ assert.match(dialog,/viewport\.scrollTop=optimizedJobUrl\?0:matchListScroll\.current/);
+ assert.match(dialog,/if\(optimizedJobUrl\)\{backToMatches\(\);return\}/);
+ assert.match(dialog,/\{optimizedJobUrl\?'返回匹配结果':pending\?'取消搜索':'完成查看'\}/);
  assert.match(dialog,/stageTitle\[progressStage\]/);
  assert.match(dialog,/!pending&&activeJob&&parsedProfile/);
  assert.doesNotMatch(dialog,/<CandidateJourneySteps/);

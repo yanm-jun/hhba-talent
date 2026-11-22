@@ -37,9 +37,9 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  // Newer search-first flows preserve local source text, but do not yet expose
  // verified structured work-history records. Keep raw paragraphs unmistakably
  // labelled as source text, rather than inventing roles or employers.
- if(!profile.experiences?.length&&sourceText?.trim())return sourceResumeBlocks(sourceText);
+ if(!profile.experiences?.length&&sourceText?.trim())return sourceResumeBlocks(sourceText,requireVerifiedJd);
  return originals;
- },[profile,sourceText]);
+ },[profile,sourceText,requireVerifiedJd]);
  const wholeSource=useMemo(()=>completeRewriteSource(profile,sourceText),[profile,sourceText]);
  const [wholeStatus,setWholeStatus]=useState<ResumeWholeRewriteStatus|null>(null);
  const [wholeDraft,setWholeDraft]=useState<ResumeWholeRewriteResult|null>(null);
@@ -69,6 +69,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [version,setVersion]=useState<ResumeVersion>(initial);
  const [suggestions,setSuggestions]=useState<ResumeSuggestion[]>([]);
  const [wordPromptBlocks,setWordPromptBlocks]=useState<ResumeBlock[]>([]);
+ const wordDocumentText=useRef('');
+ const previousOptimization=useRef<{key:string;suggestions:ResumeSuggestion[];pending:string[]}|null>(null);
  const [ignored,setIgnored]=useState<string[]>([]);
  const [resolvedWordVisualIds,setResolvedWordVisualIds]=useState<string[]>([]);
  const [editedWordVisualIds,setEditedWordVisualIds]=useState<string[]>([]);
@@ -438,12 +440,25 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   try{
    const trustedJob=await jobContextForAI(controller.signal);
    if(controller.signal.aborted)return;
-   const incoming=await requestResumeOptimization(currentBlocks,{
+   const targetedJob={
     ...trustedJob,title:trustedJob.title.slice(0,120),
     requirements:trustedJob.requirements.slice(0,16000)
-   },controller.signal);
+   };
+   const context=sourceResume?(wordDocumentText.current||sourceText||''):(sourceText||'');
+   const full=requireVerifiedJd;
+   if(full&&status?.full_document_enabled===false)
+    throw Error('整份简历优化任务暂未就绪，请稍后重试。');
+   const key=JSON.stringify([targetedJob.jd_version_id,targetedJob.jd_sha256,currentBlocks,context]);
+   const prior=full&&previousOptimization.current?.key===key?previousOptimization.current:null;
+   let pending:string[]=[];
+   const incoming=prior&&!prior.pending.length?prior.suggestions:
+    await requestResumeOptimization(full?currentBlocks:currentBlocks.slice(0,12),targetedJob,controller.signal,
+     full?{text:context,wanted:prior?.pending,onPending:ids=>{pending=ids;},
+      onQueued:()=>setNotice('简历优化正在排队，轮到后会继续。')}:undefined);
+   const combined=[...new Map([...(prior?.suggestions||[]),...incoming].map(item=>[item.blockId,item])).values()];
+   if(full)previousOptimization.current={key,suggestions:combined,pending};
    const unique=new Set<string>(),usedBlocks=new Set<string>();
-   const accepted=incoming.filter(s=>{
+   const accepted=combined.filter(s=>{
     if(unique.has(s.id)||usedBlocks.has(s.blockId)||!validateSuggestion(currentBlocks,s))return false;
     unique.add(s.id);usedBlocks.add(s.blockId);return true;
    }).map((s,i)=>({...s,id:('generation-'+(++generation.current)+'-'+i+'-'+s.id).slice(0,100)}));
@@ -453,7 +468,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    const sourceNote=trustedJob.jd_version_id?
     '本次已依据企业官网核验的完整岗位 JD 生成建议。':
     '当前尚未接入可核验的完整 JD，本次仅依据已保存的岗位信息生成建议。';
-   setNotice((accepted.length?'建议已生成。请逐条核实真实性，再选择填充。':'本次 AI 未发现可以可靠润色的内容。')+sourceNote);
+   setNotice(pending.length?('已保留本次建议。还有 '+pending.length+' 处待处理，再点优化可接着处理。'):
+    (accepted.length?'建议已生成。请逐条核实真实性，再选择填充。':'本次 AI 未发现可以可靠润色的内容。')+sourceNote);
   }catch(error){
    if(controller.signal.aborted)return;
    setNotice(error instanceof Error?error.message:'AI 润色暂时不可用。');
@@ -926,13 +942,14 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      }}
      onRevisionSnapshot={handleWordRevisionSnapshot}
      onDocumentReady={revealRenderedWord}
-     onEditableSegments={segments=>{
+     onEditableSegments={(segments,documentText)=>{
       // Never infer a writable Word location from a long ATS/search snippet.
       // Ignore contact-like text and only send visible, unique Word spans.
       const safe=[...new Set(segments)].filter(value=>
        typeof value==='string'&&value.length>=6&&value.length<=300&&
        value===value.trim()&&!/[\r\n\t@]/.test(value)&&
-       !/^\+?[\d\s()-]{7,}$/.test(value)).slice(0,12);
+       !/^\+?[\d\s()-]{7,}$/.test(value));
+      wordDocumentText.current=documentText||'';
       const next=safe.map((text,i)=>({id:'word-'+i,section:'experience' as const,text}));
       setWordPromptBlocks(prev=>
        prev.length===next.length&&prev.every((b,i)=>b.text===next[i].text)?prev:next);

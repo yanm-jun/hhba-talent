@@ -1,6 +1,63 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {onRequestGet,onRequestPost} from '../functions/api/resume-optimize.js';
+import {optimizeResumeDocument,reserveResumeOptimizationTask}
+ from '../functions/_lib/resume-optimization-task.js';
+
+test('entire-document optimization plans over every paragraph, batches review and resumes pending blocks',async()=>{
+ const blocks=Array.from({length:27},(_,index)=>({id:'word-'+index,text:'真实经历 '+index,section:'experience'}));
+ const batches=[],scanned=[],plan=async(input)=>{
+  assert.equal(input.blocks.length,blocks.length);
+  assert.equal(input.context,'整份简历的上下文');
+  return {focus:['门店数据']};
+ };
+ const deps={plan,generate:async({blocks:batch,documentContext})=>{
+  assert.deepEqual(documentContext.focus,['门店数据']);
+  batches.push(batch.map(block=>block.id));
+  if(batch.some(block=>block.id==='word-24')&&!scanned.includes('resume'))throw Error('AI_PROVIDER_UPSTREAM_ERROR');
+  return {suggestions:batch.map(block=>({blockId:block.id}))};
+ },audit:async request=>request.suggestions};
+ const input={env:{},blocks,context:'整份简历的上下文',job:{requirements:'招聘正文'},signal:new AbortController().signal};
+ const first=await optimizeResumeDocument(input,deps);
+ assert.deepEqual(batches.map(batch=>batch.length),[12,12,3,3]);
+ assert.equal(first.suggestions.length,24);
+ assert.deepEqual(first.pendingIds,['word-24','word-25','word-26']);
+ scanned.push('resume');
+ const next=await optimizeResumeDocument({...input,wanted:first.pendingIds},deps);
+ assert.deepEqual(next.pendingIds,[]);
+ assert.deepEqual(next.suggestions.map(item=>item.blockId),first.pendingIds);
+});
+
+test('full document task lease stores only hashes and rejects a concurrent duplicate',async()=>{
+ let held=false,leaseId='',taskHash='';
+ const run=[];
+ const db={prepare(sql){
+  return {bind(...args){
+   return {
+    async run(){
+     run.push({sql,args});
+     if(sql.startsWith('INSERT')){
+      if(held)return {success:true,meta:{changes:0}};
+      held=true;
+      taskHash=args[1];
+      leaseId=args[2];
+     }
+     if(sql.includes('lease_id=?')&&args[1]===leaseId)held=false;
+     return {success:true,meta:{changes:1}};
+    },
+    async first(){return held?{task_hash:taskHash}:null;}
+   };
+  }};
+ }};
+ const original={text:'私人简历识别内容',jd:'jd_test'};
+ const lease=await reserveResumeOptimizationTask(db,'account-hash',original);
+ assert.ok(lease);
+ assert.deepEqual(await reserveResumeOptimizationTask(db,'account-hash',original),{duplicate:true});
+ assert.equal(await reserveResumeOptimizationTask(db,'account-hash',{...original,jd:'jd_other'}),null);
+ assert.ok(!JSON.stringify(run).includes(original.text));
+ await lease.release();
+ assert.ok(await reserveResumeOptimizationTask(db,'account-hash',original));
+});
 
 const url='https://preview.hhba.example/api/resume-optimize';
 const base={

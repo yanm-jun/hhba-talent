@@ -12,6 +12,7 @@ import {jobResearchQuality} from '../../_lib/agent-quality-metrics.js';
 import {checkMatchProviderCapabilities} from '../../_lib/match-provider-preflight.js';
 import {recognizeMatchResume,compareMatchResumeToJd} from '../../_lib/resume-jd-match-agent.js';
 import {recognizeResumeFile} from '../../_lib/resume-ocr.js';
+import {createMatchJdReview,matchPostingKey} from '../../_lib/match-jd-review.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -126,6 +127,7 @@ function nativeResponsePayload(result,limit){
    job.recruitment_source_kind==='EMPLOYER_DOMAIN_CANDIDATE'||
    job.recruitment_source_kind==='EMPLOYER_ATS').length,
   native_search:result.diagnostic,
+  can_continue:result.can_continue===true,
   source:'中国大陆企业招聘页面',
   scoring:'匹配分依据核验后的完整岗位 JD 和简历证据。',
   privacy:'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
@@ -211,19 +213,45 @@ async function matchResumeWorkflow(env,candidate,resume,options,{
  onProgress('parsing');
  const profile=await recognizeMatchResume(key,resume,options.role_hint,{signal});
  const checkpoint=await checkpointForCandidate(env,candidate,resume,options.role_hint);
+ const excluded=new Set((options.exclude_urls||[]).map(matchPostingKey));
+ const excludePosting=url=>excluded.has(matchPostingKey(url));
+ const compareEvidence=(jd,reviewSignal=signal)=>{
+  onProgress('scoring');
+  return compareMatchResumeToJd(key,profile,jd,{signal:reviewSignal});
+ };
+ const review=env?.HHBA_AI_OWNED_RESEARCH_ENABLED==='0'?null:
+  await createMatchJdReview(env,resume,{...options,exclude:excluded,signal,compareEvidence,
+   onUpdate:jobs=>onPartial(provisionalPartial(jobs))}).catch(()=>null);
  const researchOptions={signal,checkpoint,resumeProfile:profile,onProgress,onActivity,
   autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0',
-  onPartial:jobs=>onPartial(provisionalPartial(jobs))};
- const result=await runCandidateResearch(env,key,resume,options.role_hint,options.limit,researchOptions);
- const verified=await verifiedJdPass(env,result,resume,{
-  ...options,signal,onVerified:jobs=>onPartial(provisionalPartial(jobs)),compareEvidence:jd=>{
-   onProgress('scoring');
-   return compareMatchResumeToJd(key,profile,jd,{signal});
-  }
- },onProgress);
+  excludePosting,
+  ...(review?{verifiedCount:review.verifiedCount,onSources:review.add}:{}),
+  onPartial:jobs=>{
+   const fresh=jobs.filter(job=>!excludePosting(job.official_url));
+   onPartial(provisionalPartial(review?review.preview(fresh):fresh));
+  }};
+ let result;
+ try{result=await runCandidateResearch(env,key,resume,options.role_hint,options.limit,researchOptions);}
+ catch(error){
+  if(error?.code!=='AI_EMPLOYER_JOBS_NOT_FOUND'||(!checkpoint&&!review))throw error;
+  result={matches:[],incomplete:true,diagnostic:error.diagnostic||{}};
+ }
+ const fresh={...result,matches:result.matches.filter(job=>!excludePosting(job.official_url))};
+ let verified;
+ if(review){
+  onProgress('reading');
+  const checked=await review.finish(fresh.matches);
+  verified={...fresh,matches:checked.matches,
+   diagnostic:{...fresh.diagnostic,jd_verification:checked.diagnostic}};
+ }else{
+  verified=await verifiedJdPass(env,fresh,resume,{
+   ...options,signal,onVerified:jobs=>onPartial(provisionalPartial(jobs)),compareEvidence
+  },onProgress);
+ }
  onPartial(provisionalPartial(verified.matches));
  const researched=await domesticResearchPass(env,key,verified,{signal},onProgress);
- return {result:{...researched,profile},checkpoint};
+ const canContinue=Boolean(checkpoint&&await checkpoint.load());
+ return {result:{...researched,profile,can_continue:canContinue},checkpoint};
 }
 
 async function withSavedHistory(env,session,input,result){
@@ -422,6 +450,10 @@ export async function onRequest({request,env}){
     typeof options.role_hint!=='string'||options.role_hint.length>80||
     !Number.isInteger(options.limit)||options.limit<1||options.limit>10)
   return fail('INVALID_RESUME_TEXT',400);
+ if(options.exclude_urls!==undefined&&(!Array.isArray(options.exclude_urls)||
+   options.exclude_urls.length>50||options.exclude_urls.some(url=>
+    typeof url!=='string'||url.length>1000||!url.startsWith('https://'))))
+  return fail('INVALID_RESUME_TEXT',400);
  if(input.resume_id!==null&&input.resume_id!==undefined&&input.resume_id!==''){
   if(typeof input.resume_id!=='string'||!/^[0-9a-f-]{36}$/i.test(input.resume_id))
    return fail('RESUME_NOT_FOUND',404);
@@ -466,7 +498,7 @@ export async function onRequest({request,env}){
       if(abort.signal.aborted)return;
       console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
       send('complete',await withSavedHistory(env,candidate,input,result));
-      await checkpoint?.clear();
+      if(!result.can_continue)await checkpoint?.clear();
      }catch(e){
       const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
       const diagnostics=code==='AI_EMPLOYER_JOBS_NOT_FOUND'&&e?.diagnostic?
@@ -496,7 +528,7 @@ export async function onRequest({request,env}){
   const {result,checkpoint}=await matchResumeWorkflow(env,candidate,redacted,options,{signal:request.signal});
   console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
   const payload=await withSavedHistory(env,candidate,input,result);
-  await checkpoint?.clear();
+  if(!result.can_continue)await checkpoint?.clear();
   return json(payload);
  }catch(e){
   const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';

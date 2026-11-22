@@ -38,10 +38,11 @@ export function normalizeResumeDocumentDetails(raw:unknown):ResumeDocumentDetail
  * positions, educational credentials, or employment achievements.
  * Never silently invent semantic headings. The original document stays intact.
  */
-export function sourceResumeBlocks(raw:string):ResumeBlock[]{
- const source=typeof raw==='string'?raw.replace(/\r\n?/g,'\n').trim().slice(0,19000):'';
+export function sourceResumeBlocks(raw:string,fullDocument=false):ResumeBlock[]{
+ const source=typeof raw==='string'?raw.replace(/\r\n?/g,'\n').trim():'';
  if(!source)return [];
- const parts=source.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+ const parts=(fullDocument?source:source.slice(0,19000)).split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+ const max=fullDocument?Infinity:12;
  const chunks:string[]=[];
  let current='';
  function push(){if(current.trim())chunks.push(current.trim());current='';}
@@ -50,12 +51,12 @@ export function sourceResumeBlocks(raw:string):ResumeBlock[]{
   for(const piece of segments){
    if(current.length+piece.length+1>1400)push();
    current=current?current+'\n'+piece:piece;
-   if(chunks.length>=12)break;
+   if(chunks.length>=max)break;
   }
-  if(chunks.length>=12)break;
+  if(chunks.length>=max)break;
  }
- if(chunks.length<12)push();
- return chunks.slice(0,12).map((text,i)=>({id:'source-'+i,section:'summary',text}));
+ if(chunks.length<max)push();
+ return chunks.slice(0,max).map((text,i)=>({id:'source-'+i,section:'summary',text}));
 }
 /** Keep exports honest: the 12 editable source snippets may omit the end of
  * a long CV. Compare non-whitespace characters so paragraph wrapping and

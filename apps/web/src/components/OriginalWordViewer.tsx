@@ -39,7 +39,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  onVisualSuggestionAction?:(id:string,action:'accepted'|'ignored'|'edited',text?:string,layoutVerified?:boolean)=>void;
  onRevisionSnapshot?:(snapshot:WordRevisionSnapshot)=>void;
  onDocumentReady?:()=>void;
- onEditableSegments?:(segments:string[])=>void;
+ onEditableSegments?:(segments:string[],documentText?:string)=>void;
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
@@ -198,7 +198,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      setEditable(info.editable_text||[]);
      setAnchors(safeAnchors);
      // AI edits may only target unique, visible Word text positions.
-     onEditableSegments?.([...new Set(safeAnchors.map(item=>item.text))]);
+     onEditableSegments?.([...new Set(safeAnchors.map(item=>item.text))],mount.innerText);
      setCount(1);setPage(1);
      setPaperSize({width:mount.scrollWidth,height:mount.scrollHeight});
      setLoading(false);
@@ -229,12 +229,14 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     }
     const candidateKeys=new Set([...originalsByKey]
      .filter(([,originals])=>originals.length===1).map(([key])=>key));
+    const documentText:string[]=[];
     if(result.numPages<=20){
      for(let current=1;current<=result.numPages;current++){
       const content=await (await result.getPage(current))
        .getTextContent({includeMarkedContent:false});
       for(const item of content.items){
        if(typeof (item as any).str!=='string')continue;
+       documentText.push(String((item as any).str));
        const label=String((item as any).str).normalize('NFKC').trim();
        if(candidateKeys.has(label))counts.set(label,(counts.get(label)||0)+1);
       }
@@ -246,7 +248,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      return candidateKeys.has(key)&&counts.get(key)===1;
     });
     setEditable(stableText);
-    onEditableSegments?.(stableText);
+    onEditableSegments?.(stableText,documentText.join('\n'));
     doc.current=result;setCount(result.numPages);
     setPage(current=>Math.min(Math.max(1,current),result.numPages));setLoading(false);
    }catch(error){
