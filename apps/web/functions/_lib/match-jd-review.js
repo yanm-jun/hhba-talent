@@ -1,7 +1,7 @@
 import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 import {jdArchiveReady} from './job-jd-archive.js';
 import {enrichSearchMatchesWithJD,matchJdEnrichmentEnabled} from './match-jd-enrichment.js';
-import {isMainlandEmployerJobUrl,matchEmployerHost,rankEmployerMatches,MATCH_POSTINGS_PER_EMPLOYER} from './match-employer-source.js';
+import {isMainlandEmployerJobUrl} from './match-employer-source.js';
 
 export const matchPostingKey=url=>safeOfficialJobLocator(url)?.url||url;
 
@@ -17,13 +17,7 @@ export async function createMatchJdReview(env,resume,options,dependencies={}){
  const deadline=AbortSignal.timeout(210000);
  const signal=options.signal?AbortSignal.any([options.signal,deadline]):deadline;
  const records=new Map(),queue=[],running=new Set(),closed=new Set();
- const activeByEmployer=new Map(),scoredByEmployer=new Map();
  let verified=0,scored=0,failed=0;
- const adjust=(counts,employer,delta)=>{
-  const count=(counts.get(employer)||0)+delta;
-  if(count>0)counts.set(employer,count);
-  else counts.delete(employer);
- };
 
  function markClosed(url){
   const key=matchPostingKey(url);
@@ -32,10 +26,7 @@ export async function createMatchJdReview(env,resume,options,dependencies={}){
   const record=records.get(key);
   if(!record?.verified)return;
   verified--;
-  if(Number.isInteger(record.match?.match_score)){
-   scored--;
-   adjust(scoredByEmployer,record.employer,-1);
-  }
+  if(Number.isInteger(record.match?.match_score))scored--;
   record.verified=false;
   record.match=null;
  }
@@ -52,20 +43,16 @@ export async function createMatchJdReview(env,resume,options,dependencies={}){
    if(candidates.has(key)&&!match)continue;
    candidates.set(key,match||job);
   }
-  return rankEmployerMatches([...candidates.values()],options.limit,options.previousEmployerCounts);
+  return [...candidates.values()].sort((a,b)=>
+   Number(b.jd_source_status==='VERIFIED_JD')-Number(a.jd_source_status==='VERIFIED_JD')||
+   (b.match_score??-1)-(a.match_score??-1)).slice(0,options.limit);
  }
  function pump(){
   if(signal.aborted||scored>=options.limit)return;
   while(running.size<3&&queue.length&&scored+running.size<options.limit){
-   const workFor=record=>(scoredByEmployer.get(record.employer)||0)+(activeByEmployer.get(record.employer)||0)+
-    (options.previousEmployerCounts?.get(record.employer)||0);
-   const available=record=>!closed.has(matchPostingKey(record.job.official_url));
-   let index=queue.findIndex(record=>available(record)&&workFor(record)===0);
-   if(index<0)index=queue.findIndex(record=>available(record)&&workFor(record)<MATCH_POSTINGS_PER_EMPLOYER);
-   if(index<0)break;
-   const [record]=queue.splice(index,1);
+   const record=queue.shift();
    const key=matchPostingKey(record.job.official_url);
-   adjust(activeByEmployer,record.employer,1);
+   if(closed.has(key))continue;
    const task=(async()=>{
     try{
      const result=await enrich(env,[record.job],resume,{
@@ -81,14 +68,10 @@ export async function createMatchJdReview(env,resume,options,dependencies={}){
      // detail may supply those fields. An unscored URL-only lead stays hidden.
      if(record.resolvePostingIdentity&&!Number.isInteger(job.match_score))return;
      record.match=job;
-     if(Number.isInteger(job.match_score)){
-      scored++;
-      adjust(scoredByEmployer,record.employer,1);
-     }
+     if(Number.isInteger(job.match_score))scored++;
     }catch{failed++;}
    })().finally(()=>{
     running.delete(task);
-    adjust(activeByEmployer,record.employer,-1);
     if(!signal.aborted)options.onUpdate?.(summarize());
     pump();
    });
@@ -104,7 +87,7 @@ export async function createMatchJdReview(env,resume,options,dependencies={}){
     id:'external-'+locator.id.replace(/[:.]/g,'-'),official_url:locator.url,
     platform:'企业官网',source:locator.domain,source_type:'站外官方招聘',
     application_status:'NEEDS_OFFICIAL_CONFIRMATION',recruitment_source_kind:'EMPLOYER_DOMAIN_CANDIDATE'
-   },employer:matchEmployerHost(locator.url),match:null,resolvePostingIdentity:!job};
+   },match:null,resolvePostingIdentity:!job};
    records.set(locator.url,record);queue.push(record);
   }
   for(const job of jobs)enqueue(safeOfficialJobLocator(job?.official_url),job);
@@ -114,7 +97,6 @@ export async function createMatchJdReview(env,resume,options,dependencies={}){
  return {
   add,preview:summarize,
   verifiedCount:()=>scored,
-  scoredEmployerCount:()=>scoredByEmployer.size,
   async finish(jobs){
    add(jobs);
    while(running.size){await Promise.allSettled([...running]);}

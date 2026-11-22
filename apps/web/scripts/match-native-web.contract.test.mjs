@@ -145,35 +145,6 @@ test('slow Pro recognition starts Flash before Pro times out and cancels redunda
  assert.equal(profile.facts[0].quote,quote);
 });
 
-test('official catalog search uses short keywords, validates locations and rejects closed postings',async()=>{
- const {searchOfficialJobCatalogs}=await import('../functions/_lib/official-job-catalog-search.js');
- const calls=[];
- const results=await searchOfficialJobCatalogs(['区域运营','私人资料 resume@example.com'],{
-  page:2,
-  fetcher:async(url,init)=>{
-   const request=new URL(url);calls.push(request.hostname);
-   if(request.hostname==='careers.tencent.com'){
-    assert.equal(request.searchParams.get('pageIndex'),'2');
-    assert.equal(decodeURIComponent(request.searchParams.get('keyword')),'区域运营');
-    return Response.json({Code:200,Data:{Posts:[
-     {PostId:'2097166275703910400',RecruitPostName:'区域运营经理',LocationName:'上海',IsValid:true},
-     {PostId:'2097166275703910401',RecruitPostName:'区域运营经理',LocationName:'新加坡',IsValid:true}
-    ]}});
-   }
-   const body=JSON.parse(init.body);
-   assert.equal(body.page.pageNo,2);
-   assert.equal(body.keywords,'区域运营');
-   return Response.json({status:1,data:{list:[
-    {jobUnionId:'4885239249',name:'区域运营经理',cityList:[{name:'北京'}],jobStatus:'000'},
-    {jobUnionId:'4885239248',name:'区域运营经理',cityList:[{name:'北京'}],jobStatus:'001'}
-   ]}});
-  }
- });
- assert.deepEqual(calls,['careers.tencent.com','zhaopin.meituan.com']);
- assert.equal(results.hits.length,2);
- assert.ok(results.hits.every(hit=>hit.recruitment_source_kind==='EMPLOYER_DOMAIN_CANDIDATE'));
-});
-
 test('no search: never show invented jobs',()=>{
  const r={status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(answer)}]}],
  usage:{server_tool_use:{tool_search:0,tool_fetch:0}}};

@@ -62,7 +62,6 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  ];
  const matchListScroll=useRef(0);
  const activeJob=result.matches.find(job=>job.official_url===optimizedJobUrl);
- const employerCount=new Set(result.matches.map(job=>job.company.trim()).filter(Boolean)).size;
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
  function asTargetJob(job:MatchResponse['matches'][number]):JobMatch{
   return {
@@ -190,8 +189,6 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       </section>:<>
      {!pending&&<div className="hhba-match-intro">
       <h2 id="hhba-native-title">找到 {result.matches.length} 个岗位</h2>
-      {employerCount===1&&<p>本次结果来自同一家企业。{onContinue?'可以继续搜索其他企业官网。':''}</p>}
-      {employerCount>1&&<p>来自 {employerCount} 家企业</p>}
       <p>匹配分用于求职参考，不是录用概率。</p>
       {!!result.profile?.facts?.length&&<details>
        <summary>已识别的简历证据（{result.profile.facts.length} 条）</summary>

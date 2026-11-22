@@ -129,36 +129,3 @@ export function sourceCounts(jobs){
  }
  return out;
 }
-
-// Treat different careers subdomains of the same company as one source.
-export function matchEmployerHost(url){
- try{
-  const host=new URL(url).hostname;
-  return host.replace(/^(?:(?:www|careers?|jobs?|recruit(?:ment)?|zhaopin|join|talent|hr|campus)\.)+/,'');
- }catch{return '';}
-}
-
-export const MATCH_POSTINGS_PER_EMPLOYER=2;
-
-export function rankEmployerMatches(jobs,limit,previousEmployerCounts){
- const priority=job=>job.jd_source_status==='VERIFIED_JD'?(Number.isInteger(job.match_score)?2:1):0;
- const sorted=[...jobs].sort((a,b)=>priority(b)-priority(a)||
-  (b.match_score??-1)-(a.match_score??-1));
- const shown=new Map(previousEmployerCounts),result=[];
- // Keep scored and verified results ahead of weaker leads. At each evidence
- // level, give each employer's strongest job a turn before its second job.
- for(const level of [2,1,0]){
-  const rows=sorted.filter(job=>priority(job)===level);
-  for(let round=0;round<MATCH_POSTINGS_PER_EMPLOYER;round++){
-   for(const job of rows){
-    const employer=matchEmployerHost(job.official_url);
-    const count=shown.get(employer)||0;
-    if(!employer||count!==round||result.includes(job))continue;
-    shown.set(employer,count+1);
-    result.push(job);
-    if(result.length>=limit)return result;
-   }
-  }
- }
- return result;
-}

@@ -80,7 +80,7 @@ test('a fetched closure retracts the early lead while official-domain recovery b
   {expandDetailed:false,onPartial:jobs=>events.push(jobs)}, {
    plan:async()=>({queries:['北京 区域运营 岗位详情']}),
    search:async(key,resume,hint,options)=>({
-    hits:options.queriesOverride.some(q=>q.includes('site:zhaopin.meituan.com'))?openJobs:[closed],
+    hits:options.queriesOverride.some(q=>q.includes('企业自有招聘官网'))?openJobs:[closed],
     diagnostic:{successful_searches:1,raw_results:3}
    }),
    decide:async()=>({actions:[{type:'finish'}]}),
@@ -188,9 +188,9 @@ test('when Search finds job-board postings, Agent receives only title hints and 
 test('Agent must reserve real time for a shortlist rather than spending all 150 seconds iterating Search',()=>{
  const script=readFileSync(new URL('../functions/_lib/ai-owned-job-research.js',import.meta.url),'utf8');
  assert.match(script,/const reserve=Math\.max\(40000,reserveMs\)/);
- assert.match(script,/discoverSources\(queries,[^\n]+,1,85000\)/);
+ assert.match(script,/searchTool\(queries,\{reserveMs:85000\}\)/);
  assert.match(script,/searchTool\(next\.queries,\{reserveMs:44000\}\)/);
- assert.match(script,/while\(budget\(\)>67000&&\(!options\.verifiedCount\|\|needsMore\(\)\)\)/);
+ assert.match(script,/while\(budget\(\)>67000&&\(!options\.verifiedCount\|\|discoveredCount\(\)<discoveryTarget\)\)/);
  assert.match(script,/modelTimeoutMs:Math\.min\(32000,Math\.max\(1000,budget\(\)-12500\)\)/);
 });
 

@@ -50,7 +50,7 @@ export type MatchResponse = {
    candidate_links?:number;explicit_city_sources?:number;selection_rounds?:number;
    underfilled_rechecks?:number;unscored_source_previews?:number;checkpoint_restored?:boolean;
    underfilled_expansion_queries?:number;underfilled_expansion_new?:number;
-   search_failures?:number;rejected_links?:number;official_catalog_searches?:number;agent_exit_reason?:string};
+   search_failures?:number;rejected_links?:number;agent_exit_reason?:string};
   history_id?:string|null;
   history_status?:'SAVED'|'EMPTY'|'UNAVAILABLE';
   new_job_count?:number;

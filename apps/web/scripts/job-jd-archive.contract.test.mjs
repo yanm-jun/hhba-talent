@@ -156,32 +156,18 @@ test('official JD review starts before shortlist, skips unsupported links, and r
  assert.ok(!review.preview(hits).some(job=>job.id==='job-2'));
 });
 
-test('many early jobs from one employer leave review slots for other official employers',async()=>{
+test('JD-based matches keep the AI scores in order without an employer quota',async()=>{
  const {createMatchJdReview}=await import('../functions/_lib/match-jd-review.js');
- const meituan=Array.from({length:12},(_,index)=>({
-  id:'mt-'+index,company:'美团',
+ const hits=[70,88,93].map((score,index)=>({
+  id:'same-company-'+index,company:'美团',score,
   official_url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId='+(4885239249+index)
  }));
- const others=[
-  {id:'huawei',company:'华为',official_url:'https://career.huawei.com/cn/job-details?advertisementId=7527341'},
-  {id:'tencent',company:'腾讯',official_url:'https://careers.tencent.com/jobdesc.html?postId=2097166275703910400'}
- ];
- const seen=[];
- const review=await createMatchJdReview({HHBA_MATCH_JD_ENRICH_ENABLED:'1'},'resume',{limit:10},{
-  ready:async()=>true,enrich:async(env,[job])=>{
-   seen.push(job.company);
-   return {diagnostic:{closed:0},matches:[{...job,jd_source_status:'VERIFIED_JD',
-    match_score:job.company==='美团'?88:82}]};
-  }
+ const review=await createMatchJdReview({HHBA_MATCH_JD_ENRICH_ENABLED:'1'},'resume',{limit:5},{
+  ready:async()=>true,enrich:async(env,[job])=>({
+   diagnostic:{closed:0},matches:[{...job,jd_source_status:'VERIFIED_JD',match_score:job.score}]
+  })
  });
- review.add(meituan);
- assert.deepEqual(seen,['美团','美团']);
- const result=await review.finish(others);
- assert.deepEqual(result.matches.map(job=>job.company),['美团','华为','腾讯','美团']);
- assert.equal(review.scoredEmployerCount(),3);
- const {rankEmployerMatches}=await import('../functions/_lib/match-employer-source.js');
- const continuation=rankEmployerMatches(result.matches,10,new Map([['meituan.com',1]]));
- assert.equal(continuation.filter(job=>job.company==='美团').length,1);
+ assert.deepEqual((await review.finish(hits)).matches.map(job=>job.match_score),[93,88,70]);
 });
 
 test('authenticated matching recognizes real CV facts then scores and reuses the exact verified employer JD',async()=>{
