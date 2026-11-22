@@ -130,18 +130,28 @@ async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,m
   '所有岗位必须使用已有id，禁止新增岗位、链接或来源，禁止把方向分冒充完整JD匹配分，禁止承诺录用。',
   '严格输出 JSON 对象：{"jobs":[{"id":"原id","match_score":82,"score_basis":"具体评分依据","resume_evidence":"简历里的真实依据","role_relation":"与已知岗位的关系","unknowns":"需要核实的条件","next_step":"实际行动建议"}]}'
  ].join('\n');
- const timeout=AbortSignal.timeout(modelTimeoutMs),sig=signal?AbortSignal.any([signal,timeout]):timeout;
- const r=await fetcher(BASE+'/responses',{method:'POST',redirect:'manual',signal:sig,
-  headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
-  body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'none'},
-   text:{format:{type:'json_object'}},max_output_tokens:5700,stream:false,
-   instructions,input:'脱敏简历：\n'+String(resume||'').slice(0,10000)+
-    '\n逐岗位公开资料（不代表已核验完整JD）：\n'+JSON.stringify(dataset)})
- });
- if(!r.ok)throw Error('EVIDENCE_MODEL_UNAVAILABLE');
- let parsed;try{parsed=JSON.parse(modelText(await r.json()))}catch{throw Error('EVIDENCE_MODEL_INVALID')}
- const byId=new Map((Array.isArray(parsed?.jobs)?parsed.jobs:[])
-  .filter(x=>x&&typeof x.id==='string').map(x=>[x.id,x]));
+ // At most four jobs per model request. A malformed answer for one group
+ // must not erase the explanations from nine other real employer listings.
+ const batches=[];for(let i=0;i<dataset.length;i+=4)batches.push(dataset.slice(i,i+4));
+ const answers=await Promise.all(batches.map(async batch=>{
+  try{
+   const timeout=AbortSignal.timeout(modelTimeoutMs);
+   const sig=signal?AbortSignal.any([signal,timeout]):timeout;
+   const r=await fetcher(BASE+'/responses',{method:'POST',redirect:'manual',signal:sig,
+    headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
+    body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'none'},
+     text:{format:{type:'json_object'}},max_output_tokens:3600,stream:false,
+     instructions,input:'脱敏简历：\n'+String(resume||'').slice(0,10000)+
+      '\n逐岗位公开资料（不代表已核验完整JD）：\n'+JSON.stringify(batch)})
+   });
+   if(!r.ok)throw Error('EVIDENCE_MODEL_UNAVAILABLE');
+   const parsed=JSON.parse(modelText(await r.json()));
+   const permitted=new Set(batch.map(x=>x.id));
+   return (Array.isArray(parsed?.jobs)?parsed.jobs:[])
+    .filter(x=>x&&typeof x.id==='string'&&permitted.has(x.id));
+  }catch{return []}
+ }));
+ const byId=new Map(answers.flat().map(row=>[row.id,row]));
  return jobs.map(job=>{
   if(job.evidence_status==='VERIFIED_FULL_JD')return job;
   const row=byId.get(job.id);
