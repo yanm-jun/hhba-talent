@@ -350,3 +350,28 @@ test('generic official job-page titles can recover explicitly labeled niche occu
  assert.equal(preview[0].location,'上海市');
  assert.equal(preview[0].match_score,null);
 });
+
+test('no-official-job error provides only source counts for troubleshooting',async()=>{
+ let caught;
+ try{
+  await runAgentOwnedMainlandMatch('synthetic',
+   '模拟私密简历 user-secret@example.com 13800138000','',10,
+   {expandDetailed:false},{
+    plan:async()=>({queries:['职场发展 企业招聘']}),
+    search:async()=>({hits:[],diagnostic:{successful_searches:1,raw_results:8,
+     search_failures:0,rejected_links:8}}),
+    decide:async()=>({actions:[{type:'finish'}]})
+   });
+ }catch(e){caught=e}
+ assert.equal(caught?.code,'AI_EMPLOYER_JOBS_NOT_FOUND');
+ assert.ok(caught.diagnostic.searches>0);
+ assert.ok(caught.diagnostic.provider_items>=8);
+ assert.equal(caught.diagnostic.source_candidates,0);
+ assert.equal(caught.diagnostic.explicit_city_sources,0);
+ assert.ok(['source_discovery','shortlist_selection'].includes(caught.diagnostic.phase));
+ assert.ok(!JSON.stringify(caught.diagnostic).includes('user-secret@example.com'));
+ assert.ok(!JSON.stringify(caught.diagnostic).includes('13800138000'));
+ const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
+ assert.match(route,/send\('failure',\{error:code,phase,elapsed_ms:/);
+ assert.match(route,/const diagnostics=code==='AI_EMPLOYER_JOBS_NOT_FOUND'/);
+});

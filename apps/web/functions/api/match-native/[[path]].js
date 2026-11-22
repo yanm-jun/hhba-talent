@@ -463,10 +463,14 @@ export async function onRequest({request,env}){
       await checkpoint?.clear();
      }catch(e){
       const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
+      const diagnostics=code==='AI_EMPLOYER_JOBS_NOT_FOUND'&&e?.diagnostic?
+       e.diagnostic:undefined;
       console.warn('HHBA_MATCH_NATIVE_ERROR',JSON.stringify({
-       code,phase,elapsed_ms:Date.now()-started
+       code,phase,elapsed_ms:Date.now()-started,
+       ...(diagnostics?{diagnostic:diagnostics}:{})
       }));
-      send('failure',{error:code,phase,elapsed_ms:Date.now()-started});
+      send('failure',{error:code,phase,elapsed_ms:Date.now()-started,
+       ...(diagnostics?{diagnostic:diagnostics}:{})});
      }finally{
       clearInterval(heartbeat);
       if(!ended){ended=true;try{controller.close()}catch{}}
@@ -495,7 +499,7 @@ export async function onRequest({request,env}){
   return json(payload);
  }catch(e){
   const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
-  console.warn('HHBA_MATCH_NATIVE_ERROR',code);
+  console.warn('HHBA_MATCH_NATIVE_ERROR',JSON.stringify({code,...(code==='AI_EMPLOYER_JOBS_NOT_FOUND'&&e?.diagnostic?{diagnostic:e.diagnostic}:{})}));
   return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:502);
  }
 }

@@ -173,6 +173,17 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  const signal=options.signal;
  const ensureActive=()=>{if(signal?.aborted)throw abortError()};
  const budget=()=>Math.max(0,deadline-Date.now());
+ const noEmployerSourceError=(phase,extra={})=>Object.assign(
+  new Error('AI_EMPLOYER_JOBS_NOT_FOUND'),{
+   code:'AI_EMPLOYER_JOBS_NOT_FOUND',
+   // Public source counts only. Never log resume text, search titles,
+   // user identifiers, model prompts or provider credentials.
+   diagnostic:{phase,searches:searchCalls,provider_items:rawHits,
+    source_candidates:pool.length,explicit_city_sources:evidenceReadyCount(),
+    search_failures:searchFailures,rejected_links:rejectedLinks,
+    agent_decisions:decisions,checkpoint_restored:checkpointRestored,
+    elapsed_ms:Date.now()-started,...extra}
+  });
  const evidenceReadyCount=()=>pool.filter(h=>isRecommendationEligible(h)&&Boolean(indexedJobWorkCity(h))).length;
  async function saveCheckpoint(phase){
   if(!options.checkpoint?.save)return;
@@ -414,8 +425,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   '已找到 '+eligible.length+' 个来源合规的候选职位，正在对照简历逐条分析。':
   '尚未获得符合真实来源要求的职位链接，正在汇总本轮研究结果。');
  if(!eligible.length){
-  const error=Object.assign(new Error('AI_EMPLOYER_JOBS_NOT_FOUND'),{code:'AI_EMPLOYER_JOBS_NOT_FOUND'});
-  throw error;
+  throw noEmployerSourceError('source_discovery');
  }
  // Some Agents finish after selecting just one candidate. Before ranking,
  // read additional real employer pages when there is enough request budget.
@@ -532,7 +542,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   }
  }
  if(!matches.length){
-  throw Object.assign(new Error('AI_EMPLOYER_JOBS_NOT_FOUND'),{code:'AI_EMPLOYER_JOBS_NOT_FOUND'});
+  throw noEmployerSourceError('shortlist_selection',{selection_failures:selectionFailures,selection_rounds:selectionRounds});
  }
  // Detailed prose is a separate optional model tool. The final domestic
  // source-evidence layer independently validates and rescores afterwards.
