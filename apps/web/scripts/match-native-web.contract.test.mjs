@@ -209,7 +209,7 @@ test('authenticated route streams Search-first stages and final linked jobs',asy
    throw Error('unexpected database read');
   },async run(){return {success:true}}
  }}}}};
- const env={HHBA_MATCH_SERVICE_ENABLED:'1',
+ const env={HHBA_MATCH_SERVICE_ENABLED:'1',HHBA_AUTONOMOUS_SEARCH_ENABLED:'0',
   HHBA_MATCH_DEEPSEEK_KEY:'synthetic-secret-not-real',
   HHBA_PNVS_AUTH_DB:db};
  const request=new Request('https://hhba.example/api/match-native/resume',{
