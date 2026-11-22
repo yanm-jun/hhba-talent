@@ -52,7 +52,8 @@ test('AI selection timeout preserves grounded positions instead of a false no-jo
  assert.equal(result.matches.length,1);
  assert.equal(result.matches[0].official_url,hit.url);
  assert.equal(result.matches[0].match_score,null);
- assert.equal(result.diagnostic.selection_failures,1);
+ assert.ok(result.diagnostic.selection_failures>=1);
+ assert.equal(result.diagnostic.selection_rounds,2,'a sparse shortlist receives one independent follow-up comparison');
  assert.ok(activity.some(x=>x.searches===1&&x.raw_results===12&&x.candidate_links===1));
  assert.ok(activity.some(x=>x.stage==='writing'&&x.message.includes('可追溯')));
 });
