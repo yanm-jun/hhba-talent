@@ -120,7 +120,7 @@ function modelText(json){
  * score evidence, résumé facts and application advice. Direction-fit scores
  * are explicitly preliminary when JD duties/qualifications are unavailable.
  */
-async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,modelTimeoutMs=25000}={}){
+async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,modelTimeoutMs=56000}={}){
  const candidates=jobs.filter(j=>j.evidence_status!=='VERIFIED_FULL_JD');
  if(!candidates.length)return jobs;
  const dataset=candidates.map(job=>({id:job.id,company:job.company,title:job.title,
@@ -148,8 +148,8 @@ async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,m
    const sig=signal?AbortSignal.any([signal,timeout]):timeout;
    const r=await fetcher(BASE+'/responses',{method:'POST',redirect:'manual',signal:sig,
     headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
-    body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'none'},
-     text:{format:{type:'json_object'}},max_output_tokens:3600,stream:false,
+    body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'max'},
+     text:{format:{type:'json_object'}},max_output_tokens:18000,stream:false,
      instructions,input:'脱敏简历：\n'+String(resume||'').slice(0,10000)+
       '\n逐岗位公开资料（不代表已核验完整JD）：\n'+JSON.stringify(batch)})
    });
@@ -168,7 +168,7 @@ async function scorePartialEvidence(key,resume,jobs,{fetcher=fetch,signal=null,m
   const sections=[
    ['相关经历',row.resume_evidence],['岗位关联',row.role_relation],
    ['待核实条件',row.unknowns],['投递建议',row.next_step]
-  ].map(([label,value])=>({label,value:clean(value,240)}));
+  ].map(([label,value])=>({label,value:clean(value,480)}));
   const complete=sections.every(x=>x.value.length>=16);
   const reason=complete?sections.map(x=>x.label+'：'+x.value).join('\n'):
    job.recommendation_reason;

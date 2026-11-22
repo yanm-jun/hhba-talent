@@ -190,11 +190,11 @@ export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetc
  const start=Date.now();
  const body={
   model:'deepseek-v4-pro',
-  reasoning:{effort:'none'},
+  reasoning:{effort:'high'},
   tools:[{type:'web_search'}],
   tool_choice:'required',
   text:{format:{type:'json_object'}},
-  max_output_tokens:3600,
+  max_output_tokens:12000,
   stream:true,
   instructions:prompt,
   input:'请自行联网搜索真实职位，再给出推荐，不用先让我确认。\n'+
@@ -393,7 +393,8 @@ export async function onRequest({request,env}){
      },12000);
      try{
       const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-       options.role_hint,options.limit,{signal:abort.signal,onProgress:stage=>{
+       options.role_hint,options.limit,{signal:abort.signal,
+       autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0',onProgress:stage=>{
         phase=stage;send('progress',{stage});
        },onPartial:matches=>send('partial',{matches:provisionalPartial(matches)})});
       const verified=await verifiedJdPass(env,result,redacted,options,stage=>send('progress',{stage}));
@@ -425,7 +426,7 @@ export async function onRequest({request,env}){
 
  try{
   const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
-   options.role_hint,options.limit);
+   options.role_hint,options.limit,{autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0'});
   const verified=await verifiedJdPass(env,result,redacted,options);
   const researched=await domesticResearchPass(env,env.HHBA_MATCH_DEEPSEEK_KEY,
    verified,redacted,options);

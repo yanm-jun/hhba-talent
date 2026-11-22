@@ -6,6 +6,7 @@ import {safeJobDetailLink,decodeSearchText} from './deepseek-native-match.js';
 import {isMainlandJobLocation,findMainlandCity} from './mainland-job-location.js';
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from './match-job-quality.js';
 import {supplementalQueries,mergeCandidateHits,combineRecommended} from './match-search-growth.js';
+import {planAutonomousMainlandSearch,normalizeAutonomousQueries} from './autonomous-mainland-search.js';
 import {recruitmentSourceKind,isEmployerDirectedSource,isMainlandEmployerJobUrl,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting,sourceCounts} from './match-employer-source.js';
 
 const BASE='https://api.deepseek.com';
@@ -171,7 +172,7 @@ export function selectedJobs(text,hits,limit=10){
   const reportedLocation=clean(row.location,140);
   const location=isMainlandJobLocation(reportedLocation)?reportedLocation:
    indexedJobWorkCity(evidence)||'';
-  const reason=clean(row.reason,650),
+  const reason=clean(row.reason,1400),
    title=clean(row.title,110),company=clean(row.company,100);
   if(!isMainlandJobLocation(location)||!reason||!company||!title||foreign.test(title))continue;
   if(!isRecommendationEligible(evidence))continue;
@@ -226,7 +227,7 @@ function outputFromResponse(data){
  * company, title and reason; the normal selectedJobs validator is reused.
  */
 export async function recoverSearchGroundedShortlist(key,resume,hits,limit,{
- fetcher=fetch,signal=null,recoveryTimeoutMs=11500
+ fetcher=fetch,signal=null,recoveryTimeoutMs=28000
 }={}){
  if(!hits.length)return [];
  const timeout=AbortSignal.timeout(recoveryTimeoutMs);
@@ -240,8 +241,8 @@ export async function recoverSearchGroundedShortlist(key,resume,hits,limit,{
   const response=await fetcher(BASE+'/responses',{
    method:'POST',redirect:'manual',signal:merged,
    headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
-   body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'none'},
-    text:{format:{type:'json_object'}},max_output_tokens:2500,stream:false,
+   body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'high'},
+    text:{format:{type:'json_object'}},max_output_tokens:9500,stream:false,
     instructions:[
      '你是中国大陆招聘公开岗位信息校对员。上轮岗位初选未返回有效列表，请根据下面已有的具体职位网页摘要再次识别。',
      '只输出实际给出的候选id。公司名、岗位名、地点必须有网页摘要证据；尤其工作城市必须是职位工作城市，不可把企业总部所在地当作工作地点。',
@@ -281,13 +282,13 @@ export async function reasonAboutJobs(key,resume,hits,limit,{
   '若搜索结果没有明确工作地点或职位内容，只能不选该条。不要猜城市、公司或岗位硬性要求；不可虚构学历或经历。',
   '优先选择网页有明确招聘开放证据的岗位；UNKNOWN不能写成可投递，CLOSED_LISTED和POSSIBLY_CLOSED不得推荐。尽可能返回十个真实职位，不为凑数捏造。',
   '为每条岗位给出0～100整数的「简历适配分」match_score，依据已有简历和招聘内容评估岗位方向、工作经验、技能与城市偏好，不代表录用概率。分数需有独立的score_basis（至少30字）解释具体加分与不足；证据不充分时match_score填null、score_basis为空。',
-  shortlistOnly?'先快速生成岗位名单。每个候选先完整输出 match_score 与独立 score_basis（至少30字，写出具体简历依据和职位要求），不得省略；无法判断则明确写 null。理由再写45～70字，详细分析将由下一阶段补充。请优先列满符合条件的候选。':'每个为什么推荐的理由写120～180字，结合简历的真实经历成果与职位内容、岗位职责映射、必要的差距提示；避免套话，不能保证录用。',
+  shortlistOnly?'先快速生成岗位名单。每个候选先完整输出 match_score 与独立 score_basis（至少30字，写出具体简历依据和职位要求），不得省略；无法判断则明确写 null。理由只需简洁但必须具体，详细分析由下一阶段继续完成；不要为固定字数牺牲重要信息。请优先列满符合条件的候选。':'每个为什么推荐的理由写120～180字，结合简历的真实经历成果与职位内容、岗位职责映射、必要的差距提示；避免套话，不能保证录用。',
   '输出 JSON 对象，结构：{"jobs":[{"id":"候选id，如j1","company":"岗位原网页中企业","title":"岗位","location":"中国大陆实际工作城市","match_score":85,"score_basis":"岗位与简历实际技能或职责吻合的证据，至少25字","reason":"初步推荐理由，后续补充详细说明","job_basis":"网页明确的岗位职责要点","salary":""}]}。',
   '优先把最有把握的一条完整对象尽早输出，后续逐条补齐。不得在JSON以外输出文字。'
  ].join('\n');
  const payload={
-  model:'deepseek-v4-pro',reasoning:{effort:'none'},
-  text:{format:{type:'json_object'}},max_output_tokens:shortlistOnly?3500:5600,stream:true,
+  model:'deepseek-v4-pro',reasoning:{effort:'high'},
+  text:{format:{type:'json_object'}},max_output_tokens:shortlistOnly?12000:16000,stream:true,
   instructions,
   input:'脱敏简历：\n'+String(resume).slice(0,10000)+'\n可选真实职位：\n'+JSON.stringify(cards)
  };
@@ -394,7 +395,7 @@ export async function preferEmployerPostingUrls(key,matches,hits,{
 // Expand the shortlist in two small parallel requests. The first-ranked jobs
 // were already sent to the browser; slow prose generation never hides them.
 export async function expandDetailedReasons(key,resume,matches,hits,{
- fetcher=fetch,signal=null,onPartial=()=>{},onProgress=()=>{},detailTimeoutMs=20000
+ fetcher=fetch,signal=null,onPartial=()=>{},onProgress=()=>{},detailTimeoutMs=52000
 }={}){
  if(!matches.length)return {matches,expanded:0,detail_ms:0,detail_failures:0};
  const started=Date.now(),lookup=new Map(hits.map(h=>[h.url,h]));
@@ -412,7 +413,7 @@ export async function expandDetailedReasons(key,resume,matches,hits,{
   });
   const prompt=[
    '你只负责补充 HHBA 已有岗位的推荐理由。岗位公司、职位、城市、分数已经确定，不得更改、增删岗位或编造任职条件。',
-   '对每条候选撰写120～180字中文具体理由：简历中的真实相关经历和成果、与此职位明确职责的对应、可能的经验差距。',
+   '对每条候选独立撰写充分、具体且可核对的推荐理由：简历中的真实相关经历和成果、与此职位明确职责的对应、可能的经验差距、投递建议。不要限制在固定字数内，信息多时可以写得更详细。',
    '不要输出URL、额外岗位或成功率预测。没有具体职责证据时明确说明不确定。输出JSON：{"jobs":[{"id":"原有id","reason":"具体理由"}]}。'
   ].join('\n');
   try{
@@ -420,8 +421,8 @@ export async function expandDetailedReasons(key,resume,matches,hits,{
    const combined=signal?AbortSignal.any([signal,timeout]):timeout;
    const response=await fetcher(BASE+'/responses',{method:'POST',redirect:'manual',signal:combined,
     headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
-    body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'none'},
-     text:{format:{type:'json_object'}},max_output_tokens:2200,stream:false,
+    body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'max'},
+     text:{format:{type:'json_object'}},max_output_tokens:18000,stream:false,
      instructions:prompt,input:'脱敏简历：\n'+String(resume).slice(0,7000)+
       '\n已选真实岗位：\n'+JSON.stringify(description)})
    });
@@ -430,7 +431,7 @@ export async function expandDetailedReasons(key,resume,matches,hits,{
    let source;
    try{source=JSON.parse(raw)}catch{source={jobs:closedRows(raw)}}
    const updates=new Map((source?.jobs||[]).filter(v=>v&&typeof v.id==='string'&&typeof v.reason==='string')
-    .map(v=>[v.id,clean(v.reason,650)]));
+    .map(v=>[v.id,clean(v.reason,1400)]));
    let changed=false;
    for(const job of group){
     const reason=updates.get(job.id);
@@ -463,7 +464,7 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  if(pool.length){
   try{
    first=await reasonAboutJobs(key,resume,pool,limit,{
-    ...opts,shortlistOnly:true,modelTimeoutMs:opts.modelTimeoutMs??26000,
+    ...opts,shortlistOnly:true,modelTimeoutMs:opts.modelTimeoutMs??44000,
     onProgress,onPartial:show
    });
   }catch(error){
@@ -479,32 +480,49 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  firstModelMs=first.model_ms;firstRows=first.provider_rows;
  visible=combineRecommended(visible,first.matches,limit);
  if(visible.length)show(visible);
- // Search another two complementary directions ONLY if there is room. Existing
- // results remain on screen; no repeat resume upload or fictitious fill-ins.
+ // The model, not a fixed hand-written industry/role table, chooses the
+ // next search directions. Static queries are a fallback only. The output
+ // card limit (user's requested result count) does NOT cap AI exploration.
+ let agentQueries=0,agentPlanningStatus='not_needed';
  if(visible.length<limit&&opts.supplementalLimit!==0){
-  const queries=supplementalQueries(resume,roleHint,searchQueries(resume,roleHint))
-   .slice(0,opts.supplementalLimit??2);
+  const used=searchQueries(resume,roleHint);
+  let autonomous=[];
+  if(opts.autonomousPlanning!==false){
+   onProgress('planning');
+   try{
+    const plan=await planAutonomousMainlandSearch(key,resume,roleHint,opts);
+    autonomous=normalizeAutonomousQueries(plan.queries,used);
+    agentQueries=autonomous.length;
+    agentPlanningStatus=autonomous.length?'completed':'no_queries';
+   }catch(error){
+    agentPlanningStatus='provider_unavailable';
+    console.warn('HHBA_AGENT_SEARCH_PLAN_UNAVAILABLE',String(error?.message||'UNKNOWN').slice(0,60));
+   }
+  }else agentPlanningStatus='disabled_by_test_or_option';
+  const fallback=supplementalQueries(resume,roleHint,used);
+  const queries=normalizeAutonomousQueries([...autonomous,...fallback],used)
+   .slice(0,Number.isInteger(opts.supplementalLimit)?opts.supplementalLimit:undefined);
   if(queries.length){
    additionalQueries=queries.length;
    try{
     const supplemental=await searchPublicJobs(key,resume,roleHint,{
-     ...opts,queriesOverride:queries,maxHits:28,allowEmpty:true,queryTimeoutMs:opts.supplementalTimeoutMs??9000
+     ...opts,queriesOverride:queries,maxHits:Math.max(28,queries.length*7),allowEmpty:true,queryTimeoutMs:opts.supplementalTimeoutMs??11000
     });
     supplementSearchMs=supplemental.diagnostic.search_ms;
     additionalCandidates=supplemental.hits.length;
     additionalFiltered=supplemental.diagnostic.rejected_links;
     const earlier=new Set(pool.map(h=>h.url));
-    const combined=mergeCandidateHits(pool,supplemental.hits,48);
+    const combined=mergeCandidateHits(pool,supplemental.hits,Math.max(48,queries.length*7));
     const fresh=combined.filter(h=>!earlier.has(h.url));
     // Only four extra Fetch calls, all parallel. Keep the initial searchable list.
     const checked=await enrichCandidateDetails(key,fresh,{...opts,maxFetch:4,fetchTimeoutMs:2400});
-    additionalFetches=checked.fetches;pool=mergeCandidateHits(pool,checked.hits,48);
+    additionalFetches=checked.fetches;pool=mergeCandidateHits(pool,checked.hits,Math.max(48,queries.length*7));
     const unselected=pool.filter(h=>!visible.some(j=>j.official_url===h.url));
     if(unselected.length){
      let extra;
      try{
       extra=await reasonAboutJobs(key,resume,unselected,limit-visible.length,{
-       ...opts,shortlistOnly:true,modelTimeoutMs:opts.supplementalModelTimeoutMs??18000,
+       ...opts,shortlistOnly:true,modelTimeoutMs:opts.supplementalModelTimeoutMs??42000,
        onProgress,onPartial:jobs=>show(combineRecommended(visible,jobs,limit))
       });
      }catch(error){
@@ -556,7 +574,8 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
   initial_closed:enriched.excluded_closed,
   third_party_results_shown:0,
   initial_model_rows:firstRows,initial_visible:first.matches.length,
-  supplement_queries:additionalQueries,supplement_search_ms:supplementSearchMs,
+  supplement_queries:additionalQueries,agent_planned_queries:agentQueries,
+  agent_planning_status:agentPlanningStatus,supplement_search_ms:supplementSearchMs,
   supplement_failed:supplementalFailed,supplement_found:additionalCandidates,
   supplement_filtered_links:additionalFiltered,supplement_model_rows:secondRows,
   final_shortlisted:visible.length,details_expanded:detail.expanded,

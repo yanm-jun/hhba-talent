@@ -105,7 +105,7 @@ test('V4 Pro reasons only about Search results; no tools are passed to model',as
    assert.equal(body.model,'deepseek-v4-pro');
    assert.equal(body.tools,undefined);
    assert.equal(body.text.format.type,'json_object');
-   assert.equal(body.reasoning.effort,'none');
+   assert.equal(body.reasoning.effort,'high');
    return new Response(eventStream,{headers:{'Content-Type':'text/event-stream'}});
   },onPartial:x=>partial.push(x.length)
  });
@@ -298,7 +298,8 @@ test('5 shortlisted roles are shown before supplemental search, then 10 roles an
    }
    shortlist++;
    assert.ok(payload.instructions.includes('先快速生成岗位名单'));
-   assert.ok(payload.max_output_tokens<=3500);
+   assert.ok(payload.max_output_tokens>=12000,'shortlist model is no longer constrained to 3500 tokens');
+   assert.equal(payload.reasoning.effort,'high');
    const candidates=JSON.parse(payload.input.split('可选真实职位：\n')[1]);
    const roles=candidates.map((h,i)=>({
     id:h.id,company:'模拟雇主'+h.id,title:'产品职位'+h.id,
@@ -317,7 +318,7 @@ test('5 shortlisted roles are shown before supplemental search, then 10 roles an
   throw Error('unexpected '+url);
  };
  const result=await runSearchFirstMatch('synthetic-secret-not-real',cv,'AI产品经理',10,{
-  fetcher,onProgress:x=>stages.push(x),onPartial:jobs=>seen.push({
+  fetcher,autonomousPlanning:false,onProgress:x=>stages.push(x),onPartial:jobs=>seen.push({
    count:jobs.length,expanded:jobs.filter(j=>j.reason_detail_complete).length,
    urls:jobs.map(j=>j.official_url)
   })
@@ -531,7 +532,7 @@ test('only third-party sites: automatically searches employer domains, then show
   throw Error('Model and Fetch must never be called when only job boards exist: '+url);
  };
  await assert.rejects(
-  runSearchFirstMatch('synthetic-secret-not-real',cv,'品牌督导',10,{fetcher}),
+  runSearchFirstMatch('synthetic-secret-not-real',cv,'品牌督导',10,{fetcher,autonomousPlanning:false}),
   /AI_EMPLOYER_JOBS_NOT_FOUND/
  );
  assert.equal(calls.length,searchQueries(cv,'品牌督导').length+2);

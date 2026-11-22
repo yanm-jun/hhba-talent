@@ -26,6 +26,8 @@ on:
       - 'apps/web/scripts/verified-jd-reassessment.contract.test.mjs'
       - 'apps/web/functions/_lib/match-jd-enrichment.js'
       - 'apps/web/functions/_lib/domestic-job-research.js'
+      - 'apps/web/functions/_lib/autonomous-mainland-search.js'
+      - 'apps/web/scripts/autonomous-mainland-search.contract.test.mjs'
       - 'apps/web/functions/_lib/deepseek-search-match.js'
       - 'apps/web/functions/_lib/match-employer-source.js'
       - 'apps/web/scripts/domestic-job-research.contract.test.mjs'
@@ -71,6 +73,7 @@ jobs:
           node --test scripts/domestic-job-research.contract.test.mjs
           node --test scripts/match-experience-regression.contract.test.mjs
           node --test scripts/match-search-first.contract.test.mjs
+          node --test scripts/autonomous-mainland-search.contract.test.mjs
           node --test scripts/posting-scope.contract.test.mjs
           node --test scripts/jd-lifecycle.contract.test.mjs
           node --test scripts/match-history.contract.test.mjs

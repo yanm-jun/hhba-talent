@@ -41,7 +41,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,progres
  // The stage comes from real backend progress events; no fake percentages.
  const steps=[
   {label:'准备简历',detail:'解析简历并准备本次匹配材料'},
-  {label:'搜索真实岗位',detail:'正在检索中国大陆的企业招聘入口'},
+  {label:'搜索真实岗位',detail:progressStage==='planning'?'AI 正在自主探索更多适合的职业方向':'正在检索中国大陆的企业招聘入口'},
   {label:'研究岗位证据',detail:'核对来源、职责与任职要求'},
   {label:'生成评分和推荐',detail:'逐岗位比较真实经历并提出投递建议'}
  ];
