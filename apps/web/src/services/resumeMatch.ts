@@ -127,15 +127,12 @@ export function redactResumeTextLocally(text:string):string{
   .trim().slice(0,20000);
 }
 export function resumeFileFormat(name:string){
- const extension=/\.([a-z0-9]+)$/i.exec(name)?.[1].toLowerCase();
- if(extension==='jpeg')return 'jpg';
- return ['pdf','docx','jpg','png','webp'].includes(extension||'')?extension:null;
+ return /\.(pdf|docx)$/i.exec(name)?.[1].toLowerCase()??null;
 }
 export async function inspectResumeTextLocally(file:File,signal?:AbortSignal):Promise<{text:string;needsOcr:boolean}>{
  const format=resumeFileFormat(file.name);
  if(!format||file.size<30||file.size>LIMIT)
-  throw new MatchError(413,'请选择 3 MB 以内的 PDF、DOCX 或 JPG、PNG、WebP 图片。');
- if(format!=='pdf'&&format!=='docx')return {text:'',needsOcr:true};
+  throw new MatchError(413,'请选择 3 MB 以内的 Word（DOCX）或 PDF 简历。');
  try{
   const buffer=await file.arrayBuffer();
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
@@ -147,7 +144,7 @@ export async function inspectResumeTextLocally(file:File,signal?:AbortSignal):Pr
  }catch(e){
   if((e as Error)?.name==='AbortError'||e instanceof MatchError)throw e;
   if((e instanceof PDFResumeError&&['PDF_NO_TEXT','PDF_FAILED','PDF_TIMEOUT'].includes(e.code))||
-   (format==='docx'&&(e as Error)?.message==='DOCX 中未找到可复制文字'))
+   format==='docx')
    return {text:'',needsOcr:true};
   throw new MatchError(400,(e as Error)?.message||errorMap.INVALID_RESUME_TEXT);
  }
@@ -159,17 +156,17 @@ export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Pr
 }
 
 const ocrErrors:Record<string,string>={
- SESSION_INVALID:'请先登录求职账号，再识别扫描件或照片。',
+ SESSION_INVALID:'请先登录求职账号，再识别简历文档。',
  OCR_CONSENT_REQUIRED:'请先授权 DeepSeek 处理这份原文件。',
- OCR_INVALID_FILE:'文件内容、格式或清晰度无法读取。可换清晰图片或重新导出文件。',
- OCR_UNSUPPORTED_FORMAT:'请使用 PDF、DOCX 或 JPG、PNG、WebP 图片。',
+ OCR_INVALID_FILE:'这份文件无法读取。请在 Word 中另存为 DOCX，或重新导出 PDF。',
+ OCR_UNSUPPORTED_FORMAT:'请选择 Word（DOCX）或 PDF 简历。',
  OCR_FILE_TOO_LARGE:'请选择 3 MB 以内的简历文件。',
  OCR_TOO_MANY_PAGES:'简历最多支持 15 页，请精简后重试。',
- OCR_NO_TEXT:'图片或扫描件里暂时读不到文字，请换清晰照片或补全简历文字。',
- OCR_BUSY:'图片识别服务繁忙，请稍后重试。',
- OCR_TIMEOUT:'图片识别超时，请重试或换清晰的单页照片。'
+ OCR_NO_TEXT:'暂时无法从文档中识别文字。请重新导出简历，或粘贴简历文字。',
+ OCR_BUSY:'文档识别服务繁忙，请稍后重试。',
+ OCR_TIMEOUT:'文档识别超时，请重试。'
 };
-export async function recognizeResumeImage(file:File,signal?:AbortSignal):Promise<{text:string;partial:boolean}>{
+export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Promise<{text:string;partial:boolean}>{
  const token=session();
  const format=resumeFileFormat(file.name);
  if(!format||file.size<30||file.size>LIMIT)throw new MatchError(400,ocrErrors.OCR_INVALID_FILE);
@@ -180,11 +177,11 @@ export async function recognizeResumeImage(file:File,signal?:AbortSignal):Promis
   body:file
  }).catch(error=>{
   if(error?.name==='AbortError')throw error;
-  throw new MatchError(503,'暂时连不上图片识别服务，请重试。');
+  throw new MatchError(503,'暂时连不上文档识别服务，请重试。');
  });
  const data=await response.json().catch(()=>null) as {ok?:boolean;error?:string;text?:string;partial?:boolean}|null;
  if(!response.ok||data?.ok!==true||typeof data.text!=='string')
-  throw new MatchError(response.status,ocrErrors[data?.error||'']||'图片识别暂未完成，可以重试或粘贴简历文字。');
+  throw new MatchError(response.status,ocrErrors[data?.error||'']||'文档识别暂未完成，可以重试或粘贴简历文字。');
  return {text:redactResumeTextLocally(data.text),partial:data.partial===true};
 }
 export type NativeMatchProgress='preparing'|'parsing'|'connected'|'planning'|'searching'|'reading'|'researching'|'writing'|'scoring'|'waiting';

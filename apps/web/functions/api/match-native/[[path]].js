@@ -386,7 +386,7 @@ export async function onRequest({request,env}){
  const url=new URL(request.url);
  const tail=url.pathname.slice('/api/match-native'.length).replace(/\/$/,'')||'/';
  if(tail==='/status'&&request.method==='GET')
-  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'SEARCH_FIRST_V1',formats:['pdf','docx','jpg','png','webp']});
+  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'SEARCH_FIRST_V1',formats:['pdf','docx']});
  if(!enabled(env))return fail('MATCH_NOT_ENABLED',503);
  if(tail==='/provider-check'&&request.method==='GET'){
   try{

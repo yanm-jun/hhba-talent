@@ -4,12 +4,8 @@ import {MAX_TEXT_LENGTH,redactForModel} from './resume-match-core.js';
 export const OCR_CONSENT='deepseek-resume-ocr-v1';
 const OCR_URL='https://api.deepseek.com/v1/tools/ocr';
 const OCR_RESPONSE_LIMIT=2*1024*1024;
-const formats=new Map([
- ['pdf','application/pdf'],['docx',DOCX_MIME],['jpg','image/jpeg'],
- ['png','image/png'],['webp','image/webp']
-]);
+const formats=new Map([['pdf','application/pdf'],['docx',DOCX_MIME]]);
 const failure=(code,status)=>Object.assign(new Error(code),{code,status});
-const hasPrefix=(data,...prefix)=>prefix.every((byte,i)=>data[i]===byte);
 
 async function readBytes(message,limit,error){
  const declared=message.headers.get('Content-Length');
@@ -32,19 +28,6 @@ async function readBytes(message,limit,error){
  return bytes;
 }
 
-function validateFile(bytes,format){
- if(bytes.length<30)throw failure('OCR_INVALID_FILE',400);
- if(format==='pdf'||format==='docx'){
-  try{validateResumeBytes(bytes,'resume.'+format);}
-  catch{throw failure('OCR_INVALID_FILE',400);}
- }else{
-  const valid=format==='png'?hasPrefix(bytes,137,80,78,71,13,10,26,10):
-   format==='jpg'?hasPrefix(bytes,255,216,255):
-   hasPrefix(bytes,82,73,70,70)&&hasPrefix(bytes.subarray(8),87,69,66,80);
-  if(!valid)throw failure('OCR_INVALID_FILE',400);
- }
-}
-
 export async function recognizeResumeFile(request,key,fetcher=fetch){
  if(request.headers.get('X-HHBA-OCR-Consent')!==OCR_CONSENT)
   throw failure('OCR_CONSENT_REQUIRED',400);
@@ -53,7 +36,8 @@ export async function recognizeResumeFile(request,key,fetcher=fetch){
  if(!mime||request.headers.get('Content-Type')!=='application/octet-stream')
   throw failure('OCR_UNSUPPORTED_FORMAT',415);
  const bytes=await readBytes(request,RESUME_LIMIT_BYTES,failure('OCR_FILE_TOO_LARGE',413));
- validateFile(bytes,format);
+ try{validateResumeBytes(bytes,'resume.'+format);}
+ catch{throw failure('OCR_INVALID_FILE',400);}
  const purpose=format==='docx'?'rich_layout_recognition':'text_recognition';
  const body=new FormData();
  body.set('purpose',purpose);

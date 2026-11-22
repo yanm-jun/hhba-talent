@@ -62,7 +62,7 @@ export async function recognizeMatchResume(key,resume,roleHint,options={}){
   if(!['AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_TIMEOUT','AI_PROVIDER_NETWORK_ERROR',
    'AI_PROVIDER_UNAVAILABLE'].includes(error.code))throw error;
  }
- const instruction=parseInstructions+'\n请额外留意照片文字中的换行和表格，优先寻找简短、能逐字核对的职责、学习或技能片段。';
+ const instruction=parseInstructions+'\n请额外留意文档文字中的换行和表格，优先寻找简短、能逐字核对的职责、学习或技能片段。';
  const raw=await askAgent(key,instruction,input,{...options,model:'deepseek-flash'});
  const profile=groundedResumeProfile(raw,resume);
  if(!profile)throw failure('AI_PROFILE_INCOMPLETE');

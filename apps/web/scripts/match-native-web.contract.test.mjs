@@ -67,8 +67,8 @@ test('authorized resume OCR sends only an approved file to DeepSeek and keeps pa
   assert.equal(url,'https://api.deepseek.com/v1/tools/ocr');
   assert.equal(options.body.get('purpose'),'text_recognition');
   const file=options.body.get('file');
-  assert.equal(file.name,'resume.png');
-  assert.equal(file.type,'image/png');
+  assert.equal(file.name,'resume.pdf');
+  assert.equal(file.type,'application/pdf');
   return Response.json({object:'ocr.result',purpose:'text_recognition',page_count:1,pages:[
    {index:0,finish_reason:'length',text:'<｜ref｜>工作经历</｜ref｜><｜box｜>[[52, 40, 948, 96]]<｜/box｜>\n负责门店运营和月度数据分析。synthetic@example.com'}
   ]});
@@ -82,15 +82,16 @@ test('authorized resume OCR sends only an approved file to DeepSeek and keeps pa
  const env={HHBA_MATCH_SERVICE_ENABLED:'1',HHBA_MATCH_DEEPSEEK_KEY:'synthetic-secret-not-real',
   HHBA_PNVS_AUTH_DB:db};
  const origin='https://hhba.example';
- const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aEWQAAAAASUVORK5CYII=','base64');
- const request=(headers={},body=png)=>new Request(origin+'/api/match-native/ocr',{method:'POST',
+ const pdf=Buffer.from('%PDF-1.7\n% synthetic document container for route test\n%%EOF');
+ const request=(headers={},body=pdf)=>new Request(origin+'/api/match-native/ocr',{method:'POST',
   headers:{Origin:origin,Authorization:'Bearer synthetic-client-token','Content-Type':'application/octet-stream',
-   'X-HHBA-Resume-Format':'png','X-HHBA-OCR-Consent':'deepseek-resume-ocr-v1',...headers},body});
+   'X-HHBA-Resume-Format':'pdf','X-HHBA-OCR-Consent':'deepseek-resume-ocr-v1',...headers},body});
  try{
   assert.equal((await onRequest({request:request({Origin:'https://elsewhere.example'}),env})).status,403);
   assert.equal((await onRequest({request:request({Authorization:''}),env})).status,401);
   assert.equal((await onRequest({request:request({'X-HHBA-OCR-Consent':''}),env})).status,400);
-  assert.equal((await onRequest({request:request({'X-HHBA-Resume-Format':'jpg'}),env})).status,400);
+  assert.equal((await onRequest({request:request({'X-HHBA-Resume-Format':'jpg'}),env})).status,415);
+  assert.equal((await onRequest({request:request({},Buffer.alloc(64)),env})).status,400);
   assert.equal((await onRequest({request:request({},new Uint8Array(3*1024*1024+1)),env})).status,413);
   assert.deepEqual(calls,[]);
   const result=await onRequest({request:request(),env});

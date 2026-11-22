@@ -7,10 +7,10 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeImage,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchProgress} from '../services/resumeMatch';
+import {matchServiceReady,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchProgress} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
-const supportedTypes='.pdf,.docx,.jpg,.jpeg,.png,.webp,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,image/webp';
+const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const maxResumeSize=3*1024*1024;
 
 export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
@@ -105,9 +105,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   if(!candidate){setFile(null);return}
   const format=resumeFileFormat(candidate.name);
   if(!format||candidate.size<30||candidate.size>maxResumeSize){
-    setFile(null);setError('请选择 3 MB 以内的 PDF、DOCX 或 JPG、PNG、WebP 图片。');return;
+    setFile(null);setError('请选择 3 MB 以内的 Word（DOCX）或 PDF 简历。');return;
   }
-  if(format!=='pdf'&&format!=='docx')setStorageChoice('once');
   setFile(candidate);
   void preview(candidate);
  }
@@ -144,15 +143,15 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   const abort=new AbortController();previewController.current=abort;
   setOcrBusy(true);setPreviewError('');setPreviewNote('');setConsent(false);
   try{
-   const recognized=await recognizeResumeImage(ocrFile,abort.signal);
+   const recognized=await recognizeResumeDocument(ocrFile,abort.signal);
    if(abort.signal.aborted)return;
    const enough=recognized.text.replace(/\s/g,'').length>=30;
    if(!previewText.trim()||enough)setPreviewText(recognized.text);
    setPreviewNote(recognized.partial||!enough?'已保留可用文字，请核对原件并补全。':
-    '图片识别已完成，请核对经历和技能。');
+    '文档识别已完成，请核对经历和技能。');
    if(!recognized.partial&&enough)setOcrFile(null);
   }catch(error){
-   if(!abort.signal.aborted)setPreviewError(error instanceof Error?error.message:'图片识别暂未完成，请重试。');
+   if(!abort.signal.aborted)setPreviewError(error instanceof Error?error.message:'文档识别暂未完成，请重试。');
   }finally{
    if(previewController.current===abort){setOcrBusy(false);previewController.current=null;}
   }
@@ -235,7 +234,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
        </div></div>}
     <div className="hhba-ai-layout">
       <section className="hhba-ai-upload">
-        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>支持 PDF、DOCX 和简历照片，最大 3 MB。</p></header>
+        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>支持 Word（DOCX）和 PDF，最大 3 MB。</p></header>
         {user&&privateResumeAvailable&&savedFiles.length>0&&<div className="hhba-ai-saved-picker">
           <button type="button" className="hhba-ai-saved-picker-trigger"
            aria-expanded={savedPickerOpen} aria-controls="hhba-ai-existing-options"
@@ -274,13 +273,13 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           onDrop={(e:DragEvent<HTMLLabelElement>)=>{e.preventDefault();setDrag(false);choose(e.dataTransfer.files?.[0]||null)}}>
           <FileText size={26}/>
           <strong>{file?file.name:savedId?'或上传一份新简历，替换当前选择':'点击选择文件，或将简历拖到这里'}</strong>
-          <span>{file?(file.size/1024/1024).toFixed(2)+' MB':'PDF、DOCX、JPG、PNG 或 WebP'}</span>
+          <span>{file?(file.size/1024/1024).toFixed(2)+' MB':'PDF 或 DOCX'}</span>
         </label>
         {(file||savedId)&&<div className="hhba-ai-review-tools">
          {previewBusy&&<p role="status">正在读取简历文字…</p>}
-         {ocrBusy&&<p role="status"><LoaderCircle className="spin" size={15}/> 正在识别扫描件或照片…</p>}
+         {ocrBusy&&<p role="status"><LoaderCircle className="spin" size={15}/> 正在识别文档文字…</p>}
          {ocrFile&&!ocrBusy&&<div className="hhba-ai-text-review">
-          <strong>{previewText?'部分页面需要图片识别':'用图片识别读取简历'}</strong>
+          <strong>{previewText?'部分页面需要进一步识别':'改用 DeepSeek 读取文档'}</strong>
           <p>点击下方按钮即同意将这份原文件发送给 DeepSeek 识别文字。识别完成后，你可以核对和修改结果。</p>
           <button type="button" disabled={working||saveBusy||!getRealAuthToken()} onClick={()=>void runOcr()}>
            {previewError?'同意并重试识别':'同意并识别'}
@@ -300,7 +299,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
            重新读取简历
          </button>}
         </div>}
-        {file&&!savedId&&/\.(pdf|docx)$/i.test(file.name)&&<fieldset className="hhba-ai-storage-choice" disabled={working||saveBusy}>
+        {file&&!savedId&&<fieldset className="hhba-ai-storage-choice" disabled={working||saveBusy}>
          <legend>这份简历，是否保存到「我的简历」？</legend>
          <label className={storageChoice==='save'?'is-selected':''}>
           <input type="radio" name="hhba-resume-storage" value="save"
