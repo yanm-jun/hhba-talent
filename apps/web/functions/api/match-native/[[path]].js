@@ -5,6 +5,7 @@ import {redactForModel} from '../../_lib/resume-match-core.js';
 import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {enrichSearchMatchesWithJD,matchJdEnrichmentEnabled} from '../../_lib/match-jd-enrichment.js';
+import {researchDomesticJobEvidence} from '../../_lib/domestic-job-research.js';
 import {parseJobAnswer,wasWebSearched,partialJobMatchesFromText} from '../../_lib/deepseek-native-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -130,9 +131,9 @@ function nativeResponsePayload(result){
    job.recruitment_source_kind==='EMPLOYER_ATS').length,
   native_search:result.diagnostic,
   source:'DeepSeek Search 官方接口检索 + V4 Pro 简历匹配',
-  scoring:'已核验的 JD 按 V2 规则评分；其余为搜索模型初评分或证据不足。不代表录用概率',
+  scoring:'已核验的完整 JD 使用 V2 评分；有足够公开招聘证据的岗位使用 AI 部分证据参考分；其余不评分。均非录用概率。',
   privacy:'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
-  disclaimer:(result.incomplete?'本轮未达到10条或生成未完全结束，仅保留已找到的企业招聘入口。':'')+'仅展示企业招聘站候选或企业专属招聘系统具体岗位。存在 JD 版本时表示原文已核验，但 ATS 租户不等于法定企业名称；投递资格和是否仍在招以官网为准。'
+  disclaimer:(result.incomplete?'本轮未达到10条或生成未完全结束，仅保留已找到的招聘入口。':'')+'以中国大陆企业招聘来源候选为主；公开检索资料不代表官网认证或完整 JD。仅取得部分材料时明确标注，无法核实则不给匹配分；投递资格与招聘状态以企业官网为准。'
  };
 }
 
@@ -142,7 +143,7 @@ async function verifiedJdPass(env,result,resume,options,progress=()=>{}){
  if(!matchJdEnrichmentEnabled(env))return result;
  progress('reading');
  try{
-  const checked=await enrichSearchMatchesWithJD(env,result.matches,resume,options);
+  const checked=await enrichSearchMatchesWithJD(env,result.matches,resume,{...options,domesticOnly:true});
   return {...result,matches:checked.matches,
    diagnostic:{...result.diagnostic,jd_verification:checked.diagnostic}};
  }catch{
@@ -150,6 +151,20 @@ async function verifiedJdPass(env,result,resume,options,progress=()=>{}){
   return {...result,diagnostic:{...result.diagnostic,
    jd_verification:{mode:'failed',eligible:0,verified:0,scored:0,failed:0}}};
  }
+}
+
+async function domesticResearchPass(env,key,result,resume,options,progress=()=>{}){
+ progress('reading');
+ const checked=await researchDomesticJobEvidence(key,resume,result.matches,{
+  ...options,enabled:env?.HHBA_DOMESTIC_EVIDENCE_RESEARCH_ENABLED!=='0'
+ });
+ return {...result,matches:checked.matches,
+  diagnostic:{...result.diagnostic,domestic_evidence:checked.diagnostic}};
+}
+function provisionalPartial(jobs){
+ // No numerical score until official JD or independently researched evidence.
+ return jobs.map(job=>job.jd_source_status==='VERIFIED_JD'?job:
+  {...job,match_score:null,reference_score:0,score_basis:''});
 }
 
 async function withSavedHistory(env,session,input,result){
@@ -379,11 +394,13 @@ export async function onRequest({request,env}){
       const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
        options.role_hint,options.limit,{signal:abort.signal,onProgress:stage=>{
         phase=stage;send('progress',{stage});
-       },onPartial:matches=>send('partial',{matches})});
+       },onPartial:matches=>send('partial',{matches:provisionalPartial(matches)})});
       const verified=await verifiedJdPass(env,result,redacted,options,stage=>send('progress',{stage}));
-      send('partial',{matches:verified.matches});
-      console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(verified.diagnostic));
-      send('complete',await withSavedHistory(env,candidate,input,verified));
+      const researched=await domesticResearchPass(env,env.HHBA_MATCH_DEEPSEEK_KEY,
+       verified,redacted,options,stage=>send('progress',{stage}));
+      send('partial',{matches:researched.matches});
+      console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(researched.diagnostic));
+      send('complete',await withSavedHistory(env,candidate,input,researched));
      }catch(e){
       const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
       console.warn('HHBA_MATCH_NATIVE_ERROR',JSON.stringify({
@@ -409,8 +426,10 @@ export async function onRequest({request,env}){
   const result=await runSearchFirstMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
    options.role_hint,options.limit);
   const verified=await verifiedJdPass(env,result,redacted,options);
-  console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(verified.diagnostic));
-  return json(await withSavedHistory(env,candidate,input,verified));
+  const researched=await domesticResearchPass(env,env.HHBA_MATCH_DEEPSEEK_KEY,
+   verified,redacted,options);
+  console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(researched.diagnostic));
+  return json(await withSavedHistory(env,candidate,input,researched));
  }catch(e){
   const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
   console.warn('HHBA_MATCH_NATIVE_ERROR',code);
