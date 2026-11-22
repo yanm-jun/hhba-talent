@@ -22,18 +22,27 @@ function researchQuery(job){
 function sameJob(job,hit){
  const heading=compact([hit.title,hit.site_name].join(' '));
  const s=compact([hit.title,hit.site_name,hit.summary,hit.snippet].join(' '));
- const company=compact(job.company).replace(/(?:有限责任公司|股份有限公司|有限公司|集团公司|集团|公司)$/,'');
+ // Chinese legal-name qualifiers and multiple work cities are common.
+ const shortCompany=String(job.company||'')
+  .replace(/[（(](?:中国|大陆|北京|上海|广州|深圳|杭州|苏州|成都|南京|济南)[）)]/g,'');
+ const company=compact(shortCompany)
+  .replace(/(?:有限责任公司|股份有限公司|有限公司|集团公司|集团|公司)$/,'');
  const title=compact(job.title_zh||job.title).replace(/(?:岗位|职位|招聘)$/,'');
- // Multi-role listings in China often separate subroles with /、（）.
- const roleNames=String(job.title_zh||job.title||'').split(/[\/、,，（）()]/)
-  .map(part=>compact(part).replace(/(?:岗位|职位|招聘)$/,'')).filter(part=>part.length>=3);
- const roleMatch=s.includes(title)||(title.length>=5&&s.includes(title.slice(0,5)))||
-  roleNames.some(part=>s.includes(part)||part.length>=5&&s.includes(part.slice(0,5)));
- const city=compact(job.location).replace(/(市|省|区|县|中国大陆)/g,'').slice(0,5);
- return company.length>=2&&title.length>=2&&
-  (heading.includes(company)||company.length>=5&&heading.includes(company.slice(0,5)))&&
-  roleMatch&&
-  (city.length<2||s.includes(city));
+ const roles=String(job.title_zh||job.title||'').split(/[\/、,，（）()]/)
+  .map(x=>compact(x).replace(/(?:岗位|职位|招聘)$/,''))
+  .filter(x=>x.length>=3);
+ const roleMatch=s.includes(title)||title.length>=5&&s.includes(title.slice(0,5))||
+  roles.some(role=>s.includes(role)||role.length>=5&&
+   (s.includes(role.slice(0,5))||s.includes(role.slice(-3))));
+ const cities=String(job.location||'').split(/[\/、,，;；|\s]+/)
+  .map(city=>compact(city).replace(/(市|省|区|县|中国大陆)/g,''))
+  .filter(city=>city.length>=2&&city.length<=14);
+ const citiesMatch=!cities.length||cities.some(city=>
+  /^(?:全国|多地|各地|可选)/.test(city)||s.includes(city)||s.includes(city.slice(0,2)));
+ const companyMatch=heading.includes(company)||
+  company.length>=4&&heading.includes(company.slice(0,4))||
+  company.length>=3&&heading.includes(company.slice(0,3));
+ return company.length>=3&&title.length>=2&&companyMatch&&roleMatch&&citiesMatch;
 }
 function safeEvidenceUrl(value,job){
  if(typeof value!=='string'||value.length>1300)return null;
