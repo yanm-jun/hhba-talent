@@ -37,12 +37,22 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
   const [stage,setStage]=useState<NativeMatchProgress>('preparing');
  const [activity,setActivity]=useState<NativeMatchActivity|null>(null);
+ // The readable research journal contains ONLY real server events, never
+ // inferred model chain-of-thought or client-invented job discoveries.
+ const [researchTrail,setResearchTrail]=useState<NativeMatchActivity[]>([]);
  const [elapsedSeconds,setElapsedSeconds]=useState(0);
  const startedAt=useRef(0),lastResearchUpdateAt=useRef(0);
  const progress=(next:NativeMatchProgress)=>setStage(previous=>next==='waiting'?previous:next);
  const reportActivity=(next:NativeMatchActivity)=>{
   lastResearchUpdateAt.current=Date.now();
   setActivity(next);setStage(next.stage);
+  setResearchTrail(previous=>{
+   const prior=previous[previous.length-1];
+   if(prior?.message===next.message&&prior?.stage===next.stage&&
+      prior?.candidate_links===next.candidate_links&&prior?.pages_read===next.pages_read)
+    return previous;
+   return [...previous,next].slice(-60);
+  });
  };
  useEffect(()=>{
   if(!working)return;
@@ -150,7 +160,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   if((!file&&!savedId)||!consent||working||previewBusy||availability!=='ready'||!getRealAuthToken()||
    (file&&!savedId&&storageChoice==='undecided'))return;
   startedAt.current=Date.now();lastResearchUpdateAt.current=Date.now();
-  setElapsedSeconds(0);setActivity(null);
+  setElapsedSeconds(0);setActivity(null);setResearchTrail([]);
   setWorking(true);setStage('preparing');setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);
   const abort=new AbortController();
   controller.current=abort;
@@ -160,8 +170,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    // DeepSeek Search API is available. Cache only a successful result.
    if(Date.now()-providerCheckedAt.current>300000){
     setStage('connected');
-    setActivity({stage:'connected',
-     message:'先检测 DeepSeek Search 接口与账户权限，避免启动后长时间空等。'});
+    reportActivity({stage:'connected',
+     message:'正在检查 DeepSeek Search、V4 Pro 接口和账户权限。'});
     await checkMatchProviderConnection(abort.signal);
     providerCheckedAt.current=Date.now();
    }
@@ -333,6 +343,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
       pending={working&&!result} progressStage={stage} progressActivity={activity}
       elapsedSeconds={elapsedSeconds}
       activityIdleSeconds={Math.max(0,Math.floor((Date.now()-lastResearchUpdateAt.current)/1000))}
+      researchTrail={researchTrail}
       notice={working?'':error}
       sourceText={result?optimizationSource:undefined}
       sourceResume={result&&savedId?savedFiles.find(item=>item.id===savedId&&/\.docx$/i.test(item.name)):undefined}
