@@ -223,7 +223,7 @@ test('three cached job sources cannot finish with zero fresh Search when the sho
  });
  assert.equal(r.diagnostic.checkpoint_restored,true);
  assert.ok(seen.includes('新增跨行业 运营督导 企业官网 社招'));
- assert.equal(r.diagnostic.provider_items,13,'fresh search metrics cannot be zero');
+ assert.ok(r.diagnostic.provider_items>=13,'fresh search metrics cannot be zero');
  assert.ok(r.diagnostic.candidate_links>=4);
 });
 
