@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {isMainlandEmployerJobUrl,isDirectEmployerSourceHit,recruitmentSourceKind}
  from '../functions/_lib/match-employer-source.js';
-import {normalizeHits,sourceOnlyJobPreviews}
+import {enrichCandidateDetails,normalizeHits,sourceOnlyJobPreviews}
  from '../functions/_lib/deepseek-search-match.js';
 import {classifyJobAvailability,isRecommendationEligible}
  from '../functions/_lib/match-job-quality.js';
@@ -65,6 +65,37 @@ test('an employer Fetch saying 当前职位无法投递 is a closure, not a vali
  assert.equal(isRecommendationEligible({...closedEmployer,availability}),false);
  const searchState=classifyJobAvailability({summary:'当前职位无法投递，招聘已暂停。工作地点：深圳市'});
  assert.equal(searchState.status,'POSSIBLY_CLOSED');
+});
+
+test('a fetched closure retracts the early lead while official-domain recovery brings in other jobs',async()=>{
+ const openJobs=[1,2].map(i=>({...employer,
+  title:`美团 区域运营${i===1?'专员':'经理'} 北京 招聘`,
+  url:`https://zhaopin.meituan.com/web/position/detail?jobUnionId=490000000${i}`,
+  summary:`美团招聘区域运营${i===1?'专员':'经理'}。工作地点：北京市。职责包括门店运营、区域协调和商户项目。`
+ }));
+ const closed={...employer,content:''};
+ const events=[];
+ const result=await runAgentOwnedMainlandMatch('synthetic-key',
+  '虚构测试简历：参与门店运营、区域协调和人员培训。','区域运营',10,
+  {expandDetailed:false,onPartial:jobs=>events.push(jobs)}, {
+   plan:async()=>({queries:['北京 区域运营 岗位详情']}),
+   search:async(key,resume,hint,options)=>({
+    hits:options.queriesOverride.some(q=>q.includes('site:zhaopin.meituan.com'))?openJobs:[closed],
+    diagnostic:{successful_searches:1,raw_results:3}
+   }),
+   decide:async()=>({actions:[{type:'finish'}]}),
+   fetchDetails:async(key,hits)=>enrichCandidateDetails(key,hits,{fetcher:async(uri,init)=>{
+    const url=JSON.parse(init.body).url;
+    return Response.json({content:url===closed.url?closedEmployer.content:''});
+   }}),
+   select:async()=>({matches:[]})
+ });
+ assert.equal(events[0][0].official_url,closed.url);
+ assert.equal(events[0][0].evidence_status,'RESEARCH_PENDING');
+ assert.ok(events.some(jobs=>jobs.length===2&&jobs.every(job=>job.official_url!==closed.url)));
+ assert.deepEqual(result.matches.map(job=>job.official_url),openJobs.map(job=>job.url));
+ assert.equal(result.diagnostic.underfilled_expansion_new,2);
+ assert.ok(result.matches.every(job=>job.match_score===null));
 });
 test('corporate recruiting page with generic 职位详情 title recovers real role from indexed source text',()=>{
  const result=sourceOnlyJobPreviews([employer],10);
@@ -159,7 +190,7 @@ test('Agent must reserve real time for a shortlist rather than spending all 150 
  assert.match(script,/const reserve=Math\.max\(40000,reserveMs\)/);
  assert.match(script,/searchTool\(queries,\{reserveMs:85000\}\)/);
  assert.match(script,/searchTool\(next\.queries,\{reserveMs:44000\}\)/);
- assert.match(script,/while\(budget\(\)>\(pool\.length>=5\?97000:67000\)\)/);
+ assert.match(script,/while\(budget\(\)>67000&&\(!options\.verifiedCount\|\|discoveredCount\(\)<discoveryTarget\)\)/);
  assert.match(script,/modelTimeoutMs:Math\.min\(32000,Math\.max\(1000,budget\(\)-12500\)\)/);
 });
 

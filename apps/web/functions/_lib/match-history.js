@@ -14,7 +14,7 @@ const verifiedJdMeta=item=>{
   jd_version_id:item.jd_version_id,jd_sha256:item.jd_sha256,
   jd_checked_at:item.jd_checked_at,
   jd_source_status:'VERIFIED_JD',
-  jd_score_status:['V2_JD_EVIDENCE_SCORED','INSUFFICIENT_RESUME_EVIDENCE']
+  jd_score_status:['V2_JD_EVIDENCE_SCORED','AI_VERIFIED_JD_SCORED','INSUFFICIENT_RESUME_EVIDENCE']
    .includes(item.jd_score_status)?item.jd_score_status:'INSUFFICIENT_RESUME_EVIDENCE',
   jd_proof_method:['PUBLIC_EMPLOYER_ATS_V1','DIRECT_EMPLOYER_HTML_V1']
    .includes(item.jd_proof_method)?item.jd_proof_method:null
@@ -41,7 +41,8 @@ export function safeHistoryJobs(matches){
   out.push({id:text(item.id,75),company,title,location,
    official_url:item.official_url,match_score:score(item.match_score),
    score_basis:text(item.score_basis,360),
-   recommendation_reason:text(item.recommendation_reason,850),
+   recommendation_reason:text(Array.isArray(item.jd_comparisons)?
+    '按核验后的岗位 JD 和当时的简历证据完成比对。重新匹配可查看逐项证据。':item.recommendation_reason,850),
    availability_status:['OPEN_LISTED','UNKNOWN'].includes(item.availability_status)?
     item.availability_status:'UNKNOWN',
    recruitment_source_kind:text(item.recruitment_source_kind,35),

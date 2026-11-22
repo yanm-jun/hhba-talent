@@ -106,8 +106,9 @@ test('original matching/history/Word path all use researched source evidence',()
  const dialog=readFileSync(new globalThis.URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(route,/researchDomesticJobEvidence/);
  assert.match(route,/domesticOnly:true/);
- assert.match(route,/provisionalPartial\(matches\)/);
+ assert.match(route,/onPartial\(provisionalPartial\(review\?review\.preview\(fresh\):fresh\)\)/);
  assert.match(history,/evidence_excerpt:/);
  assert.match(word,/job\.evidence_status==='PARTIAL_SOURCE'/);
- assert.match(dialog,/已研究部分公开岗位证据/);
+ assert.match(route,/score:false/);
+ assert.match(dialog,/完整岗位 JD 待核验/);
 });

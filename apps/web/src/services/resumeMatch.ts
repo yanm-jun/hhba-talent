@@ -1,13 +1,14 @@
 // HHBA same-origin Cloudflare AI matching. No provider key in the browser.
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import {extractDocxText} from './docxProfile.mjs';
-import {extractPdfText} from './pdfProfile.mjs';
+import {extractPdfText,PDFResumeError} from './pdfProfile.mjs';
 
 export type MatchProfile = {
   education:string|null;education_evidence:string|null;
   experience_years:number|null;experience_evidence:string|null;
   skills:{name:string;evidence:string}[];target_roles:string[];
   professional_credentials?:string[];warnings:string[];
+  facts?:{id:string;kind:'work'|'project'|'skill'|'education'|'credential';quote:string}[];
 };
 export type MatchedJob = {
   id:string;company:string;title:string;title_zh?:string|null;location:string;
@@ -33,7 +34,8 @@ export type MatchedJob = {
   jd_proof_method?:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1';
   jd_source_status?:'VERIFIED_JD';
   jd_employer_identity_status?:'ATS_TENANT_NOT_LEGAL_ENTITY_VERIFIED'|'DIRECT_EMPLOYER_SOURCE';
-  jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
+  jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'AI_VERIFIED_JD_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
+  jd_comparisons?:{requirement:string;resume_evidence:string|null;status:'supported'|'partial'|'missing'}[];
   match_score?:number|null;score_basis?:string;
   availability_status?:'OPEN_LISTED'|'CLOSED_LISTED'|'POSSIBLY_CLOSED'|'UNKNOWN';
   availability_note?:string;availability_checked_at?:string|null;
@@ -53,8 +55,9 @@ export type MatchResponse = {
   history_status?:'SAVED'|'EMPTY'|'UNAVAILABLE';
   new_job_count?:number;
   improved_job_count?:number;
+  can_continue?:boolean;
 };
-export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number};
+export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
 const API='/api/match-native';
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=3*1024*1024;
@@ -88,7 +91,7 @@ const errorMap:Record<string,string>={
   AI_MATCH_NO_VALID_JOBS:'本轮 AI 候选名单没有通过岗位信息核验，这不代表你的简历不符合国内招聘要求。请尝试重新搜索或填写具体岗位方向。',
   AI_EMPLOYER_JOBS_NOT_FOUND:'本轮已尝试补充搜索，但仍未找到信息足够明确的企业招聘岗位链接；并非你的简历不适合。请稍后重试或填写更具体的岗位方向。',
   AI_PROVIDER_RESPONSE_INVALID:'DeepSeek 输出中断或格式异常，暂不展示不完整推荐。',
-  AI_PROFILE_INCOMPLETE:'AI 未能可靠识别简历内容，请完善简历后重试。',
+  AI_PROFILE_INCOMPLETE:'AI 没有识别到可用于匹配的经历或技能。请核对简历文字，补充真实内容后重试。',
   MATCH_PERSONAL_LIMIT:'今天的个人免费体验次数已达上限。',
   MATCH_GLOBAL_LIMIT:'平台今天的 AI 体验额度已用完。',
   BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。',
@@ -124,25 +127,65 @@ export function redactResumeTextLocally(text:string):string{
   .replace(/(?:微信号|微信|QQ号|QQ)\s*[:：]\s*[A-Za-z0-9_-]{5,32}/gi,'[即时通讯账号已隐藏]')
   .trim().slice(0,20000);
 }
-export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Promise<string>{
- if(!/\.(pdf|docx)$/i.test(file.name)||file.size<30||file.size>LIMIT)
-  throw new MatchError(413,'请选择 3 MB 以内的 PDF 或 DOCX 简历。');
+export function resumeFileFormat(name:string){
+ return /\.(pdf|docx)$/i.exec(name)?.[1].toLowerCase()??null;
+}
+export async function inspectResumeTextLocally(file:File,signal?:AbortSignal):Promise<{text:string;needsOcr:boolean}>{
+ const format=resumeFileFormat(file.name);
+ if(!format||file.size<30||file.size>LIMIT)
+  throw new MatchError(413,'请选择 3 MB 以内的 Word（DOCX）或 PDF 简历。');
  try{
   const buffer=await file.arrayBuffer();
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
-  const value=/\.pdf$/i.test(file.name)?
-   (await extractPdfText(buffer,{signal})).text:
-   await extractDocxText(buffer);
+  const pdf=format==='pdf'?await extractPdfText(buffer,{signal}):null;
+  const value=pdf?.text??await extractDocxText(buffer);
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
   const text=redactResumeTextLocally(value);
-  if(text.replace(/\s/g,'').length<30)throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
-  return text;
+  return {text,needsOcr:pdf?.hasTextlessPages===true||text.replace(/\s/g,'').length<30};
  }catch(e){
   if((e as Error)?.name==='AbortError'||e instanceof MatchError)throw e;
+  if((e instanceof PDFResumeError&&['PDF_NO_TEXT','PDF_FAILED','PDF_TIMEOUT'].includes(e.code))||
+   format==='docx')
+   return {text:'',needsOcr:true};
   throw new MatchError(400,(e as Error)?.message||errorMap.INVALID_RESUME_TEXT);
  }
 }
-export type NativeMatchProgress='preparing'|'connected'|'planning'|'searching'|'reading'|'researching'|'writing'|'scoring'|'waiting';
+export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Promise<string>{
+ const {text}=await inspectResumeTextLocally(file,signal);
+ if(text.replace(/\s/g,'').length<30)throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
+ return text;
+}
+
+const ocrErrors:Record<string,string>={
+ SESSION_INVALID:'请先登录求职账号，再识别简历文档。',
+ OCR_CONSENT_REQUIRED:'请先授权 DeepSeek 处理这份原文件。',
+ OCR_INVALID_FILE:'这份文件无法读取。请在 Word 中另存为 DOCX，或重新导出 PDF。',
+ OCR_UNSUPPORTED_FORMAT:'请选择 Word（DOCX）或 PDF 简历。',
+ OCR_FILE_TOO_LARGE:'请选择 3 MB 以内的简历文件。',
+ OCR_TOO_MANY_PAGES:'简历最多支持 15 页，请精简后重试。',
+ OCR_NO_TEXT:'暂时无法从文档中识别文字。请重新导出简历，或粘贴简历文字。',
+ OCR_BUSY:'文档识别服务繁忙，请稍后重试。',
+ OCR_TIMEOUT:'文档识别超时，请重试。'
+};
+export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Promise<{text:string;partial:boolean}>{
+ const token=session();
+ const format=resumeFileFormat(file.name);
+ if(!format||file.size<30||file.size>LIMIT)throw new MatchError(400,ocrErrors.OCR_INVALID_FILE);
+ const response=await fetch(API+'/ocr',{
+  method:'POST',credentials:'same-origin',cache:'no-store',signal,
+  headers:{'Content-Type':'application/octet-stream',Authorization:'Bearer '+token,
+   'X-HHBA-Resume-Format':format,'X-HHBA-OCR-Consent':'deepseek-resume-ocr-v1'},
+  body:file
+ }).catch(error=>{
+  if(error?.name==='AbortError')throw error;
+  throw new MatchError(503,'暂时连不上文档识别服务，请重试。');
+ });
+ const data=await response.json().catch(()=>null) as {ok?:boolean;error?:string;text?:string;partial?:boolean}|null;
+ if(!response.ok||data?.ok!==true||typeof data.text!=='string')
+  throw new MatchError(response.status,ocrErrors[data?.error||'']||'文档识别暂未完成，可以重试或粘贴简历文字。');
+ return {text:redactResumeTextLocally(data.text),partial:data.partial===true};
+}
+export type NativeMatchProgress='preparing'|'parsing'|'connected'|'planning'|'searching'|'reading'|'researching'|'writing'|'scoring'|'waiting';
 export type NativeMatchActivity={
  stage:NativeMatchProgress;message:string;searches?:number;raw_results?:number;
  candidate_links?:number;rejected_links?:number;pages_read?:number;decisions?:number;
@@ -164,7 +207,7 @@ async function consumeNativeMatchStream(
   let value:any;try{value=JSON.parse(data)}catch{return}
   if(event==='progress'){
    const stage=value?.stage;
-   if(['preparing','connected','planning','searching','reading','researching','writing','scoring','waiting'].includes(stage))
+   if(['preparing','parsing','connected','planning','searching','reading','researching','writing','scoring','waiting'].includes(stage))
     onProgress?.(stage as NativeMatchProgress);
   }else if(event==='activity'){
    const stage=value?.stage;
@@ -179,14 +222,14 @@ async function consumeNativeMatchStream(
      search_failures:number(value.search_failures),elapsed_ms:number(value.elapsed_ms)});
    }
   }else if(event==='partial'){
-   if(Array.isArray(value?.matches)&&value.matches.length>0&&value.matches.length<=10)
+   if(Array.isArray(value?.matches)&&value.matches.length<=10)
     onPartial?.(value.matches as MatchedJob[]);
   }else if(event==='failure'){
    const code=String(value?.error||'AI_PROVIDER_UNAVAILABLE');
    const stage=String(value?.phase||'preparing');
    const elapsed=Number(value?.elapsed_ms||0);
    const names:Record<string,string>={
-    preparing:'连接 DeepSeek',connected:'准备联网搜索',planning:'AI 自主规划补充搜索方向',searching:'DeepSeek Search 检索职位',reading:'读取岗位详情',researching:'研究国内岗位证据',writing:'生成初步名单',scoring:'分析适配分和推荐理由'
+    preparing:'准备匹配',parsing:'识别简历',connected:'准备搜索',planning:'分析求职方向',searching:'搜索企业岗位',reading:'核验岗位 JD',researching:'核对招聘资料',writing:'整理岗位',scoring:'对照简历和岗位 JD'
    };
    const elapsedNote=Number.isFinite(elapsed)&&elapsed>=1000?
     '（'+Math.round(elapsed/1000)+'秒，阶段：'+(names[stage]||'模型处理')+'）':'';
@@ -231,7 +274,7 @@ export async function submitExtractedResumeText(
   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
    options:{country:'CN',remote_only:false,
-    role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10))}})
+    role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10)),exclude_urls:opts.exclude_urls}})
  }).catch(e=>{if((e as Error)?.name==='AbortError')throw e;
   throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
  const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');

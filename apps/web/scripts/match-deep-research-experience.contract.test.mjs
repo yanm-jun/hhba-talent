@@ -74,19 +74,17 @@ test('if other sources lack explicit work-city evidence, system must not fabrica
  assert.equal(out.diagnostic.unscored_source_previews,0);
  assert.equal(out.diagnostic.explicit_city_sources,1);
 });
-test('research is one continuous journal before a final report and preserves original Word optimization',()=>{
+test('the matcher shows its current step and preserves original Word optimization',()=>{
  const modal=readFileSync(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  const css=readFileSync(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
- assert.match(modal,/hhba-research-journal/);
- assert.match(modal,/researchTrail\.map/);
- assert.match(modal,/pending\?null:activeJob/);
- assert.match(modal,/hhba-research-report-log/);
+ assert.match(modal,/stageTitle\[progressStage\]/);
+ assert.match(modal,/!pending&&activeJob&&parsedProfile/);
+ assert.doesNotMatch(modal,/DeepSeek|researchTrail\.map/);
  assert.match(modal,/TargetedResumeOptimization/);
  assert.match(modal,/sourceResume=\{sourceResume\}/);
- assert.match(page,/setResearchTrail/);
- assert.match(page,/researchTrail=\{researchTrail\}/);
- assert.match(css,/hhba-research-journal/);
+ assert.match(page,/progressStage=\{stage\}/);
+ assert.match(css,/hhba-research-now/);
  assert.match(css,/prefers-reduced-motion/);
  assert.ok(!modal.includes('hhba-match-live-steps'),'old four-step progress rail should be retired');
 });

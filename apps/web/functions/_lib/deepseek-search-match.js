@@ -138,7 +138,8 @@ export async function enrichCandidateDetails(key,hits,{
  const map=new Map(detail.map(hit=>[hit.id,hit]));
  const checked=hits.map(hit=>map.get(hit.id)||hit);
  const eligible=checked.filter(isRecommendationEligible);
- return {hits:eligible,fetches:success,fetch_ms:Date.now()-start,
+ return {hits:eligible,closed_hits:checked.filter(hit=>hit.availability?.status==='CLOSED_LISTED'),
+  fetches:success,fetch_ms:Date.now()-start,
   excluded_closed:checked.length-eligible.length};
 }
 function closedRows(text){

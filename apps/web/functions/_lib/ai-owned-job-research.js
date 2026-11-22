@@ -86,12 +86,17 @@ export function targetedEmployerRecoveryQueries(history,usedQueries=[]){
  * evidence. Only already-public role names and locally derived career-family
  * search terms are sent to Search. No private CV excerpt or invented URL.
  */
-export function underfilledOfficialSearchQueries(resume,roleHint,history,usedQueries=[]){
+export function underfilledOfficialSearchQueries(resume,roleHint,history,usedQueries=[],pool=[]){
+ const employers=new Map();
+ for(const job of sourceOnlyJobPreviews(pool,6)){
+  const host=new URL(job.official_url).hostname;
+  if(!employers.has(host))employers.set(host,job.title+' '+job.location+' 社会招聘 site:'+host);
+ }
  const reposts=targetedEmployerRecoveryQueries(history,usedQueries);
  const known=searchQueries(resume,roleHint);
  const fresh=usedQueries.slice(-4).map(q=>
   q.slice(0,80)+' 企业自有招聘官网 在招岗位 工作城市');
- return normalizeAutonomousQueries([...reposts,...known,...fresh],usedQueries).slice(0,8);
+ return normalizeAutonomousQueries([...employers.values(),...reposts,...known,...fresh],usedQueries).slice(0,8);
 }
 async function modelDecision(key,resume,roleHint,pool,queries,history,deadline,{
  fetcher=fetch,signal=null,decisionTimeoutMs=35000
@@ -185,6 +190,21 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
     elapsed_ms:Date.now()-started,...extra}
   });
  const evidenceReadyCount=()=>pool.filter(h=>isRecommendationEligible(h)&&Boolean(indexedJobWorkCity(h))).length;
+ const discoveredCount=()=>options.verifiedCount?.()??evidenceReadyCount();
+ const discoveryTarget=options.verifiedCount?limit:Math.min(limit,6);
+ const includeHit=hit=>isDirectEmployerSourceHit(hit)&&!options.excludePosting?.(hit.url);
+ let previewSignature='';
+ function publishSourcePreviews(){
+  if(signal?.aborted)return;
+  if(options.onSources)options.onSources(sourceOnlyJobPreviews(pool,pool.length),
+   pool.filter(hit=>hit.availability?.status==='CLOSED_LISTED').map(hit=>hit.url));
+  const jobs=sourceOnlyJobPreviews(pool,limit);
+  const signature=JSON.stringify(jobs.map(job=>[job.official_url,job.title,job.availability_status]));
+  if(signature===previewSignature||(!jobs.length&&!previewSignature))return;
+  previewSignature=signature;
+  onPartial(jobs.map(job=>({...job,evidence_status:'RESEARCH_PENDING',
+   recommendation_reason:'已找到企业招聘页面，正在对照简历核对岗位条件。'})));
+ }
  async function saveCheckpoint(phase){
   if(!options.checkpoint?.save)return;
   try{
@@ -197,7 +217,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  async function searchTool(values,{reserveMs=48000}={}){
   const proposed=normalizeAutonomousQueries(values,usedQueries);
   if(!proposed.length)return 0;
-  const completed=[],executed=[],rejectedHints=[];
+  const old=pool.length,executed=[],rejectedHints=[];
   for(const part of batches(proposed,TOOL_PARALLELISM)){
    ensureActive();
    // Never let batches of public Search eat the time reserved for reviewing
@@ -216,7 +236,8 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
     searchFailures+=result.diagnostic?.search_failures??0;
     rejectedLinks+=result.diagnostic?.rejected_links??0;
     rejectedHints.push(...(result.diagnostic?.rejected_title_hints||[]));
-    completed.push(...result.hits);
+    pool=mergeCandidateHits(pool,result.hits.filter(includeHit),240).filter(includeHit);
+    publishSourcePreviews();
    }catch(e){
     searchFailures+=part.length;
     history.push({type:'search_error',code:String(e.code||'UNAVAILABLE')});
@@ -229,8 +250,6 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
      throw e;
    }
   }
-  const old=pool.length;
-  pool=mergeCandidateHits(pool,completed,240).filter(isDirectEmployerSourceHit);
   history.push({type:'search',queries:executed,found:pool.length-old,
    requested:proposed.length,skipped_due_budget:proposed.length-executed.length,
    rejected_title_hints:[...new Set(rejectedHints)].slice(0,8)});
@@ -251,7 +270,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    try{
     const response=await fetchDetails(key,part,{...options,
      maxFetch:part.length,fetchTimeoutMs:Math.min(9000,budget())});
-    const updated=new Map(response.hits.map(h=>[h.url,h]));
+    const updated=new Map([...response.hits,...(response.closed_hits||[])].map(h=>[h.url,h]));
     const fetchedUrls=new Set(part.map(hit=>hit.url));
     pool=pool.map(hit=>{
      if(updated.has(hit.url))return {...updated.get(hit.url),fetch_attempted:true};
@@ -264,6 +283,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
    }catch(e){history.push({type:'fetch_error',code:String(e.code||'UNAVAILABLE')})}
   }
   pageReads+=read;
+  publishSourcePreviews();
   history.push({type:'fetch',candidate_ids:candidateIds,read});
   await saveCheckpoint('fetch');
   activity('researching',read>0?
@@ -275,13 +295,14 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  if(options.checkpoint?.load){
   try{
    const restored=await options.checkpoint.load();
-   if(restored?.pool?.length){
-    pool=restored.pool.filter(isDirectEmployerSourceHit).map(h=>
+   if(restored?.pool?.length||restored?.usedQueries?.length){
+    pool=(restored.pool||[]).filter(includeHit).map(h=>
      h.content?{...h,availability:classifyJobAvailability({content:h.content},{fetched:true})}:h);
     usedQueries=normalizeAutonomousQueries(restored.usedQueries);
     shortlistIds=(restored.shortlistIds||[]).filter(id=>pool.some(h=>h.id===id));
     history.push(...(restored.history||[]).slice(-16));
-    checkpointRestored=pool.length>0;
+    checkpointRestored=true;
+    publishSourcePreviews();
     history.push({type:'resumed',found:pool.length});
     activity('planning','已恢复此前保存的公开岗位研究记录，正在继续核验。');
    }
@@ -315,7 +336,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  }
  // Cached sources are not a finished search. Replan and refresh when a
  // resumed research session has fewer than six eligible job sources.
- if(checkpointRestored&&evidenceReadyCount()<Math.min(limit,6)&&budget()>76000){
+ if(checkpointRestored&&discoveredCount()<discoveryTarget&&budget()>76000){
   checkpointRefreshAttempted=true;
   onProgress('planning');
   activity('planning','已恢复旧岗位来源，但数量不足；正在继续搜索新的企业招聘页面。');
@@ -356,11 +377,12 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  // Autonomy continues when sources are thin, but never at the cost of
  // destroying the final shortlist. This is a runtime reserve, not a
  // restriction on the model's choice of career directions.
- while(budget()>(pool.length>=5?97000:67000)){
+ while(budget()>67000&&(!options.verifiedCount||discoveredCount()<discoveryTarget)){
   ensureActive();
   // Every turn feeds observations and the previous action outcomes back to
   // the model. The model, not a fixed search count, chooses the next tool.
   onProgress('planning');
+  if(options.verifiedCount)history.push({type:'verified_jd',found:discoveredCount(),target:discoveryTarget});
   activity('planning',pool.length?
    'AI 正在复核候选岗位，决定继续搜索还是读取详情。':
    'AI 正在分析缺失的企业招聘来源，准备调整搜索策略。');
@@ -384,7 +406,16 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
   if(next.shortlistIds.length)shortlistIds=next.shortlistIds;
   history.push({type:'reflection',action_count:next.queries.length+next.fetchIds.length,
    finish:next.finish,rationale:next.rationale});
-  if(next.finish){exitReason='agent_finished';break;}
+  if(next.finish){
+   if(options.verifiedCount&&discoveredCount()<discoveryTarget){
+    const queries=underfilledOfficialSearchQueries(resume,roleHint,history,usedQueries,pool);
+    const newlyFound=queries.length?await searchTool(queries,{reserveMs:44000}):0;
+    underfilledExpansionQueries+=queries.length;
+    underfilledExpansionNew+=newlyFound;
+    if(newlyFound>0)continue;
+   }
+   exitReason='agent_finished';break;
+  }
   if(!next.queries.length&&!next.fetchIds.length){
    exitReason='no_safe_new_action';break;
   }
@@ -411,13 +442,13 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  // exist. With a thin employer-source pool, make one final bounded Search
  // using independent public role clues and related career-family queries.
  // Reserve enough time for the real selection and scoring output.
- if(evidenceReadyCount()<Math.min(limit,6)&&budget()>56000){
-  const supplementary=underfilledOfficialSearchQueries(resume,roleHint,history,usedQueries);
+ if(discoveredCount()<discoveryTarget&&budget()>56000){
+  const supplementary=underfilledOfficialSearchQueries(resume,roleHint,history,usedQueries,pool);
   if(supplementary.length){
    onProgress('searching');
    activity('searching','企业岗位来源数量不足，正在执行最后一轮补充官网检索，避免过早结束。');
-   underfilledExpansionQueries=supplementary.length;
-   underfilledExpansionNew=await searchTool(supplementary,{reserveMs:44000});
+   underfilledExpansionQueries+=supplementary.length;
+   underfilledExpansionNew+=await searchTool(supplementary,{reserveMs:44000});
   }
  }
  let eligible=pool.filter(isRecommendationEligible);
@@ -555,7 +586,7 @@ export async function runAgentOwnedMainlandMatch(key,resume,roleHint,limit=10,op
  }
  const result=detail.matches.filter(job=>
    isMainlandEmployerJobUrl(job.official_url)&&
-   pool.some(h=>h.url===job.official_url&&isDirectEmployerSourceHit(h)));
+   pool.some(h=>h.url===job.official_url&&isDirectEmployerSourceHit(h)&&isRecommendationEligible(h)));
  return {matches:result,incomplete:result.length<limit||detail.detail_failures>0,
   diagnostic:{mode:AGENT_VERSION,model:'deepseek-v4-pro',
    searches:searchCalls,page_reads:pageReads,provider_items:rawHits,

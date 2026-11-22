@@ -6,6 +6,7 @@ export type ResumeOptimizationStatus={
  kind:'HHBA_RESUME_OPTIMIZATION_V1';enabled:boolean;configured:boolean;
  per_account_daily_limit:number;global_daily_limit:number;
  per_account_daily_attempt_limit?:number;global_daily_attempt_limit?:number;
+ full_document_enabled?:boolean;
 };
 const OPTIMIZATION_ERRORS:Record<string,string>={
   SESSION_INVALID:'当前登录已失效，请重新登录。',
@@ -14,6 +15,9 @@ const OPTIMIZATION_ERRORS:Record<string,string>={
   RESUME_OPTIMIZATION_DB_NOT_READY:'平台简历优化额度服务尚未准备好。',
   RESUME_OPTIMIZATION_LIMIT:'今天成功生成简历建议的次数已达上限。',
   RESUME_OPTIMIZATION_ATTEMPT_LIMIT:'今天的 AI 润色尝试次数已达安全上限，请明天再试。',
+  RESUME_OPTIMIZATION_TASK_DB_NOT_READY:'整份简历优化任务暂未就绪，请稍后重试。',
+  RESUME_OPTIMIZATION_IN_PROGRESS:'这份简历已在处理同一岗位，可以回到已开始优化的窗口。',
+  RESUME_OPTIMIZATION_QUEUED:'当前正在排队处理简历优化，请稍后重试。',
   AI_PROVIDER_NOT_CONFIGURED:'后台尚未配置简历润色 AI 模型。',
   INVALID_OPTIMIZATION_INPUT:'简历证据不完整，请先完成简历解析。',
   JD_VERIFIED_VERSION_REQUIRED:'当前岗位尚未取得核验过的完整 JD，不能进行严格定向优化。',
@@ -51,19 +55,59 @@ export async function getResumeOptimizationStatus(signal?:AbortSignal):Promise<R
    ?value as ResumeOptimizationStatus:null;
  }catch{return null;}
 }
+type DocumentOptimization={
+ text:string;wanted?:string[];onPending?:(ids:string[])=>void;onQueued?:()=>void;
+};
+function waitForOptimizationSlot(signal?:AbortSignal){
+ return new Promise<void>((resolve,reject)=>{
+  if(signal?.aborted){reject(signal.reason);return;}
+  const cancel=()=>{clearTimeout(timer);reject(signal?.reason);};
+  const timer=setTimeout(()=>{
+   signal?.removeEventListener('abort',cancel);resolve();
+  },2500);
+  signal?.addEventListener('abort',cancel,{once:true});
+ });
+}
 export async function requestResumeOptimization(blocks:ResumeBlock[],
- job:JdAwareJob,signal?:AbortSignal):Promise<ResumeSuggestion[]>{
+ job:JdAwareJob,signal?:AbortSignal,document?:DocumentOptimization):Promise<ResumeSuggestion[]>{
  if(!realAuthReady)throw new ResumeOptimizationError('RESUME_OPTIMIZATION_NOT_ENABLED',503);
  const token=getRealAuthToken();
  if(!token)throw new ResumeOptimizationError('SESSION_INVALID',401);
- let response:Response;
- try{
-  response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
-   headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
-   body:JSON.stringify({consent_ai:true,blocks,job})});
- }catch{throw new ResumeOptimizationError('NETWORK_ERROR',503);}
- const data=await response.json().catch(()=>({})) as {ok?:boolean;error?:string;suggestions?:ResumeSuggestion[]};
- if(!response.ok)throw new ResumeOptimizationError(data.error||'UNKNOWN_ERROR',response.status);
- if(data.ok!==true||!Array.isArray(data.suggestions))throw new ResumeOptimizationError('INVALID_RESPONSE',502);
- return data.suggestions;
+ const suggestions=new Map<string,ResumeSuggestion>();
+ let wanted=document?.wanted;
+ const ids=new Set(blocks.map(block=>block.id));
+ let queueStarted=0;
+ for(;;){
+  let response:Response;
+  try{
+   response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
+    headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
+    body:JSON.stringify({consent_ai:true,blocks,job,
+     ...(document?{full_document:{text:document.text,wanted}}:{})})});
+  }catch{throw new ResumeOptimizationError('NETWORK_ERROR',503);}
+  const data=await response.json().catch(()=>({})) as {
+   ok?:boolean;error?:string;suggestions?:ResumeSuggestion[];pending_block_ids?:string[]
+  };
+  if(document&&data.error==='RESUME_OPTIMIZATION_QUEUED'){
+   queueStarted ||= Date.now();
+   if(Date.now()-queueStarted<240000){
+    document.onQueued?.();
+    await waitForOptimizationSlot(signal);
+    continue;
+   }
+  }else queueStarted=0;
+  if(!response.ok||data.ok!==true||!Array.isArray(data.suggestions)){
+   if(wanted&&suggestions.size){document?.onPending?.(wanted);break;}
+   throw new ResumeOptimizationError(data.error||'INVALID_RESPONSE',response.status);
+  }
+  for(const item of data.suggestions)suggestions.set(item.blockId,item);
+  const pending=Array.isArray(data.pending_block_ids)?
+   [...new Set(data.pending_block_ids.filter(id=>ids.has(id)&&(!wanted||wanted.includes(id))))]:[];
+  if(!document||!pending.length){document?.onPending?.([]);break;}
+  if(pending.length>=(wanted?.length??blocks.length)){
+   document.onPending?.(pending);break;
+  }
+  wanted=pending;
+ }
+ return [...suggestions.values()];
 }

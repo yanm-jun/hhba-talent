@@ -211,8 +211,10 @@ export async function researchDomesticJobEvidence(key,resume,matches,options={},
  };
  await Promise.all(Array.from({length:Math.min(CONCURRENCY,jobs.length)},()=>work()));
  let result=out;
- if(options.onProgress)options.onProgress('scoring');
- try{result=await score(key,resume,out,options);}catch{/* retain source-qualified preliminary reasons; never invent scores */}
+ if(options.score!==false){
+  if(options.onProgress)options.onProgress('scoring');
+  try{result=await score(key,resume,out,options);}catch{/* retain source-qualified preliminary reasons; never invent scores */}
+ }
  return {matches:sortByMatchScore(result),diagnostic:{
   mode:DOMESTIC_EVIDENCE_PIPELINE,researched:reads,search_failures:failures,
   partial:result.filter(j=>j.evidence_status==='PARTIAL_SOURCE').length,

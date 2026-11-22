@@ -239,8 +239,8 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
        <p><strong>推荐理由：</strong>{job.recommendation_reason||'暂无补充理由，请核对岗位详情。'}</p>
        <div className="hhba-match-history-job-actions">
         {href&&<a href={href} target="_blank" rel="noopener noreferrer">查看原招聘页面（仍需确认在招） <ArrowRight size={14}/></a>}
-        {view==='optimize'&&<button type="button" disabled={!original||busy}
-         title={!original?'请先关联原 Word':'使用本次历史岗位的资料优化原 Word'}
+        {view==='optimize'&&<button type="button" disabled={!original||busy||!job.jd_version_id||!job.jd_sha256}
+         title={!job.jd_version_id||!job.jd_sha256?'请重新匹配并核验这个岗位的完整 JD':!original?'请先关联原 Word':'使用本次匹配的岗位 JD 优化原 Word'}
          onClick={()=>setEditingJobId(historyJobId(selected.id,i))}>
           <Sparkles size={15}/> 优化这个岗位的简历
          </button>}

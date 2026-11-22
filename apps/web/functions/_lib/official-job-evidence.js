@@ -5,8 +5,11 @@ import {safeOfficialJobLocator,extractOfficialJob} from './domestic-search-fetch
 import {extractSkillRequirements} from './job-skill-evidence.js';
 import {degreeMinRequirement,experienceMinRequirement} from './domestic-match-fusion.js';
 import {sha256Hex} from './real-auth.js';
+import {isMainlandJobLocation} from './mainland-job-location.js';
 
 export const OFFICIAL_EVIDENCE_VERSION='DIRECT_EMPLOYER_HTML_V1';
+export const MEITUAN_DETAIL_SOURCE='MEITUAN_PUBLIC_JOB_DETAIL_V1';
+export const TENCENT_DETAIL_SOURCE='TENCENT_PUBLIC_JOB_DETAIL_V1';
 const FRESH_MS=24*60*60*1000;
 const MAX_RESPONSE=220000;
 const DEGREE=['HIGH_SCHOOL','ASSOCIATE','BACHELOR','MASTER','PHD'];
@@ -75,11 +78,67 @@ async function readLimited(response){
  for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
  try{return new TextDecoder('utf-8',{fatal:true}).decode(bytes);}catch{throw Error('OFFICIAL_PAGE_DECODE_FAILED');}
 }
-export async function directOfficialJobEvidence(url,{fetcher=fetch,now=new Date()}={}){
+async function publicEmployerDetail(locator,{title,location,duties,requirements,workYear},method,now){
+ if(typeof title!=='string'||title.trim().length<2||title.trim().length>86||
+  typeof location!=='string'||location.length>100||!isMainlandJobLocation(location)||
+  typeof duties!=='string'||typeof requirements!=='string'||!duties.trim()||!requirements.trim())
+  throw Error('OFFICIAL_JD_NOT_VERIFIED');
+ title=title.trim();
+ const experience=typeof workYear==='string'&&workYear.trim()?'工作经验：'+workYear.trim():'';
+ const sections=extractOfficialJdSections(
+  ['岗位职责',htmlToText(duties),'任职要求',htmlToText(requirements),experience].filter(Boolean).join('\n'));
+ if(!sections)throw Error('OFFICIAL_JD_NOT_VERIFIED');
+ const qualifications=sections.sections.filter(section=>section.kind==='requirements')
+  .map(section=>section.text).join('\n');
+ const id='verified-official-'+(await sha256Hex(locator.url)).slice(0,32);
+ const jdHash=await sha256Hex([locator.url,title,location,qualifications].join('\n'));
+ return {id,canonical_url:locator.url,company:locator.company,title,location,
+  requirements:qualifications,jd_hash:jdHash,checked_at:new Date(now).toISOString(),
+  proof_method:OFFICIAL_EVIDENCE_VERSION,retrieval_method:method,...sections};
+}
+async function meituanOfficialJobEvidence(locator,{fetcher,now,signal}){
+ const jobUnionId=new URL(locator.url).searchParams.get('jobUnionId');
+ // The public vacancy page makes this same read-only request. Its HTML
+ // response is a JS shell, so the official duties are in the JSON response.
+ const response=await fetcher('https://zhaopin.meituan.com/api/official/job/getJobDetail',{
+  method:'POST',redirect:'manual',cache:'no-store',signal,
+  headers:{Accept:'application/json','Content-Type':'application/json'},
+  body:JSON.stringify({jobUnionId,jobShareType:'1'})
+ });
+ if(response.status!==200||!response.headers.get('Content-Type')?.includes('application/json'))
+  throw Error('OFFICIAL_PAGE_UNAVAILABLE');
+ const result=JSON.parse(await readLimited(response));
+ const job=result?.data;
+ if(result?.status!==1||job?.jobUnionId!==jobUnionId||job?.jobStatus!=='000')
+  throw Error('OFFICIAL_JD_NOT_VERIFIED');
+ const cities=Array.isArray(job.cityList)?job.cityList.map(city=>city?.name):[];
+ if(!cities.length||!cities.every(city=>typeof city==='string'&&isMainlandJobLocation(city)))
+  throw Error('OFFICIAL_JD_NOT_VERIFIED');
+ return publicEmployerDetail(locator,{title:job.name,location:[...new Set(cities)].join('、'),
+  duties:job.jobDuty,requirements:job.jobRequirement,workYear:job.workYear},MEITUAN_DETAIL_SOURCE,now);
+}
+async function tencentOfficialJobEvidence(locator,{fetcher,now,signal}){
+ const postId=new URL(locator.url).searchParams.get('postId');
+ const query=new URLSearchParams({timestamp:String(Date.now()),postId,language:'zh-cn'});
+ const response=await fetcher('https://careers.tencent.com/tencentcareer/api/post/ByPostId?'+query,{
+  method:'GET',redirect:'manual',cache:'no-store',signal,headers:{Accept:'application/json'}
+ });
+ if(response.status!==200||!response.headers.get('Content-Type')?.includes('application/json'))
+  throw Error('OFFICIAL_PAGE_UNAVAILABLE');
+ const result=JSON.parse(await readLimited(response)),job=result?.Data;
+ if(result?.Code!==200||job?.PostId!==postId)throw Error('OFFICIAL_JD_NOT_VERIFIED');
+ return publicEmployerDetail(locator,{title:job.RecruitPostName,location:job.LocationName,
+  duties:job.Responsibility,requirements:job.Requirement,workYear:job.RequireWorkYearsName},TENCENT_DETAIL_SOURCE,now);
+}
+export async function directOfficialJobEvidence(url,{fetcher=fetch,now=new Date(),signal}={}){
  const locator=canon(url);
  if(!locator)throw Error('OFFICIAL_URL_NOT_SUPPORTED');
+ const timeout=AbortSignal.timeout(12000);
+ const mergedSignal=signal?AbortSignal.any([signal,timeout]):timeout;
+ if(locator.domain==='zhaopin.meituan.com')
+  return meituanOfficialJobEvidence(locator,{fetcher,now,signal:mergedSignal});
  const response=await fetcher(locator.url,{
-  method:'GET',redirect:'manual',cache:'no-store',signal:AbortSignal.timeout(12000),
+  method:'GET',redirect:'manual',cache:'no-store',signal:mergedSignal,
   headers:{Accept:'text/html,text/plain;q=0.9','User-Agent':'HHBA-JobEvidence/1.0'}
  });
  if(response.status!==200){
@@ -94,6 +153,10 @@ export async function directOfficialJobEvidence(url,{fetcher=fetch,now=new Date(
  const raw=await readLimited(response);
  const plain=type.includes('text/html')?htmlToText(raw):raw;
  const item=extractOfficialJob({url:locator.url},{content:plain},now);
+ // The Tencent detail page may only contain its rendering shell. The
+ // employer's public API binds the returned content to the same exact ID.
+ if(locator.domain==='careers.tencent.com'&&(!item||!extractOfficialJdSections(plain)))
+  return tencentOfficialJobEvidence(locator,{fetcher,now,signal:mergedSignal});
  if(!item||item.official_url!==locator.url||item.company!==locator.company||
   item.source_status!=='OFFICIAL_DETAIL_FETCHED')throw Error('OFFICIAL_JD_NOT_VERIFIED');
  const requirements=item.evidence?.requirement;

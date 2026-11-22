@@ -101,13 +101,11 @@ test('agent reflective model permission failure is not disguised as zero valid j
    search:async()=>({hits:[source],diagnostic:{successful_searches:1,raw_results:1}})
   }),e=>e.code==='AI_PROVIDER_BALANCE_INSUFFICIENT');
 });
-test('authenticated preflight precedes saving CV or streaming a full AI job match',()=>{
+test('authenticated provider diagnostics remain available without gating a candidate match',()=>{
  const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
- assert.match(page,/await checkMatchProviderConnection\(abort\.signal\)/);
- const checkAt=page.indexOf('await checkMatchProviderConnection(abort.signal)');
- const saveAt=page.indexOf('const stored=await uploadPrivateResume(selectedFile,true)');
- assert.ok(checkAt>0&&saveAt>checkAt);
+ assert.doesNotMatch(page,/checkMatchProviderConnection/);
+ assert.match(page,/await submitExtractedResumeText\(/);
  assert.match(route,/candidateSession\(env,request\)/);
  assert.match(route,/await checkMatchProviderCapabilities\(env\.HHBA_MATCH_DEEPSEEK_KEY\)/);
  assert.match(route,/return fail\(code,502\)/);
@@ -135,6 +133,8 @@ test('default authenticated Cloudflare SSE route genuinely runs model-owned plan
     {status:200});
   if(path==='/responses'){
    const input=String(JSON.parse(config.body).input||'');
+   if(JSON.parse(config.body).instructions.includes('HHBA 的简历识别 Agent'))
+    return modelReply({facts:[{kind:'work',quote:'负责门店流程改善'}]});
    if(input.includes('已脱敏且用户授权用于分析的简历'))
     return modelReply({queries:['星源汽车 区域渠道督导 上海 企业官网招聘'],strategy:'渠道岗位'});
    if(input.includes('已有真实招聘证据'))

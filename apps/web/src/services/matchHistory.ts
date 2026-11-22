@@ -15,7 +15,7 @@ export type HistoryMatchedJob={
  evidence_status?:'VERIFIED_FULL_JD'|'PARTIAL_SOURCE'|'SEARCH_SNIPPET_ONLY'|'INSUFFICIENT_EVIDENCE';
  evidence_excerpt?:string;
  evidence_sources?:{url:string;kind:string}[];
- jd_source_status?:'VERIFIED_JD';jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
+ jd_source_status?:'VERIFIED_JD';jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'AI_VERIFIED_JD_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
  jd_proof_method?:'PUBLIC_EMPLOYER_ATS_V1'|'DIRECT_EMPLOYER_HTML_V1'|null;
 };
 export type MatchHistoryDetail=MatchHistorySummary&{matches:HistoryMatchedJob[]};

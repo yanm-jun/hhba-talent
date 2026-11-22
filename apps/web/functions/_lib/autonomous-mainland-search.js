@@ -36,14 +36,14 @@ function outputText(result){
   .filter(part=>part?.type==='output_text').map(part=>part.text||'')).join('');
 }
 export async function planAutonomousMainlandSearch(key,redactedResume,roleHint,{
- fetcher=fetch,signal=null,plannerTimeoutMs=DEFAULT_TIMEOUT_MS
+ fetcher=fetch,signal=null,plannerTimeoutMs=DEFAULT_TIMEOUT_MS,resumeProfile=null
 }={}){
  const timeout=AbortSignal.timeout(plannerTimeoutMs);
  const sig=signal?AbortSignal.any([signal,timeout]):timeout;
  const instructions=[
   '你是 HHBA 国内求职搜索策略智能体。你完全负责根据真实简历推断目标岗位方向、可迁移职业能力和相关岗位的多种招聘表述。',
   '不要被固定行业关键词、用户过去的职称或某几个岗位名称所限制。自主探索直接相关、相邻、跨行业和容易被忽略的真实职业机会。目标岗位方向输入为空时，你自己根据简历综合判断。',
-  '这些搜索短句只用于查询中国大陆公开招聘信息。尽量覆盖企业官网、官方招聘公告、企业自有招聘站、公开招聘信息与职位任职要求，允许把专业名、经历和技能转成适合国内招聘用语。',
+  '这些短句用于搜索中国大陆企业官网或自有招聘站的具体职位。优先有完整岗位职责和任职要求的企业原始页面。排除国外 ATS 和第三方招聘平台。允许把专业名、经历和技能转成国内公开招聘用语。',
   '检索语句不要含求职者姓名、学校学号、手机号、邮箱、住址、身份证、QQ、微信、原简历原句、隐私信息，也不要在搜索词中夹带URL或任何API密钥。',
   '不要编造招聘信息、特定企业正在招人或真实职位链接；规划查询语句不等于发现职位。',
   '按你认为有价值的角度组织多条高质量、不重复且彼此补充的中文搜索语句，每条控制在128字符内。不要为了固定数目而凑数。',
@@ -56,6 +56,7 @@ export async function planAutonomousMainlandSearch(key,redactedResume,roleHint,{
    text:{format:{type:'json_object'}},max_output_tokens:14000,stream:false,
    instructions,
    input:'目标职位（可为空）：'+clean(roleHint).slice(0,80)+
+    (resumeProfile?'\n已核对的职业证据：'+JSON.stringify(resumeProfile.facts):'')+
     '\n已脱敏且用户授权用于分析的简历：\n'+String(redactedResume||'').slice(0,12000)})
  });
  if(!response.ok){

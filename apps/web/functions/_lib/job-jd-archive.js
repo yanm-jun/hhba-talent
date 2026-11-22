@@ -8,7 +8,7 @@
  */
 import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 import {safePublicAtsJobLocator,ATS_JD_PROOF} from './public-ats-jd.js';
-import {extractOfficialJdSections} from './official-job-evidence.js';
+import {extractOfficialJdSections,MEITUAN_DETAIL_SOURCE,TENCENT_DETAIL_SOURCE} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
 import {recordJdPostingCheck,readJdPostingState,isUsablePosting} from './jd-posting-lifecycle.js';
 
@@ -71,6 +71,9 @@ function normalizeDocument(value){
   title:text(value.title).slice(0,120),
   location:text(value.location).slice(0,100),
   full_jd:body,sections,
+  ...((locator.domain==='zhaopin.meituan.com'&&value.retrieval_method===MEITUAN_DETAIL_SOURCE)||
+      (locator.domain==='careers.tencent.com'&&value.retrieval_method===TENCENT_DETAIL_SOURCE)?
+   {retrieval_method:value.retrieval_method}:{}),
   content_status:'VERIFIED_SECTIONS',
   proof_method:proof
  };
@@ -174,6 +177,7 @@ export function publicJdPayload(saved,{includeText=true}={}){
   posting_status:saved.posting_status||'UNTRACKED',
   posting_closed_at:saved.posting_closed_at||null,
   content_status:saved.content_status,proof_method:saved.proof_method,
+  ...(saved.retrieval_method?{retrieval_method:saved.retrieval_method}:{}),
   ...(includeText?{full_jd:saved.full_jd,sections:saved.sections}:{}),
   disclaimer:saved.fresh?
    (saved.proof_method===ATS_JD_PROOF?
@@ -200,7 +204,8 @@ export async function hydrateVerifiedJobRequirements(env,job){
  const saved=await readJobJdById(env,version);
  if(!saved)throw Error('JD_VERSION_NOT_AVAILABLE');
  if(!saved.fresh)throw Error('JD_VERSION_STALE');
- if(job.official_url&&job.official_url!==saved.canonical_url)
+ if((job.official_url&&job.official_url!==saved.canonical_url)||
+    (job.jd_sha256&&job.jd_sha256!==saved.jd_sha256))
   throw Error('JD_JOB_IDENTITY_MISMATCH');
  return {...job,title:saved.title,requirements:saved.full_jd,
   official_url:saved.canonical_url,jd_version_id:saved.id,

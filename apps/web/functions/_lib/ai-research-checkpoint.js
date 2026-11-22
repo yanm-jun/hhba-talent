@@ -77,7 +77,7 @@ export async function createAccountResearchCheckpoint(db,phone,redactedResume,ro
   },
   async save(raw){
    const state=sanitizePublicResearchCheckpoint(raw);
-   if(!state||!state.pool.length)return false;
+   if(!state||(!state.pool.length&&!state.usedQueries.length))return false;
    const encoded=JSON.stringify(state);
    const now=new Date(),expires=new Date(now.getTime()+86400000).toISOString();
    try{

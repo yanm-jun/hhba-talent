@@ -11,6 +11,9 @@ WORD=(Path('public')/'__hhba_word_qa.docx').read_bytes()
 OUT=Path('/tmp/hhba-word-unobstructed-qa')
 OUT.mkdir(parents=True,exist_ok=True)
 REPORT=[]
+JD_ID='jd_'+'a'*32
+JD_SHA='b'*64
+JD='岗位职责\n负责门店日常运营与区域数据整理。\n任职要求\n门店运营管理与数据分析。'
 
 def exercise(browser,name,viewport):
     ctx=browser.new_context(viewport=viewport,locale='zh-CN',device_scale_factor=1)
@@ -25,6 +28,11 @@ def exercise(browser,name,viewport):
         query=parse_qs(urlsplit(req.url).query)
         action=query.get('action',[''])[0]
         path=urlsplit(req.url).path
+        if path.endswith('/job-jd'):
+            assert query.get('jd_id')==[JD_ID]
+            return route.fulfill(json={'ok':True,'verified':True,'job_id':JD_ID,'jd_sha256':JD_SHA,
+                'canonical_url':'https://jobs.example.org/synthetic-only','fresh':True,
+                'title':'虚构运营督导','full_jd':JD,'sections':[]})
         if path.endswith('/resume-word'):
             if action=='status':
                 return route.fulfill(status=200,content_type='application/json',
@@ -48,6 +56,8 @@ def exercise(browser,name,viewport):
             payload=req.post_data_json
             assert payload['consent_ai'] is True
             assert payload['job']['title'] and payload['blocks']
+            assert payload['job']['jd_version_id']==JD_ID and payload['job']['jd_sha256']==JD_SHA
+            assert payload['job']['requirements']==JD
             text=payload['blocks'][0]['text']
             assert payload['blocks'][0]['id']=='word-0',('not anchored Word',payload['blocks'])
             assert text=='负责门店运营及日常数据整理工作',('AI received wrong original text',text)

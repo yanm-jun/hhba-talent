@@ -24,7 +24,10 @@ JOB_2={**JOB_1,'id':'saved-search-2','company':'虚构企业乙',
        'title':'历史区域督导','official_url':'https://jobs.example.org/saved-2',
        'match_score':88,'score_basis':'历史评分依据：区域督导及门店运营',
        'recommendation_reason':'历史推荐理由：门店运营数据整理工作',
-       'recruitment_source_kind':'EMPLOYER_DOMAIN_CANDIDATE'}
+       'recruitment_source_kind':'EMPLOYER_DOMAIN_CANDIDATE',
+       'jd_version_id':'jd_'+'d'*32,'jd_sha256':'e'*64,
+       'jd_source_status':'VERIFIED_JD','jd_score_status':'AI_VERIFIED_JD_SCORED'}
+JD='岗位职责\n负责区域督导与运营数据整理。\n任职要求\n具备门店运营经验。'
 REPORT=[]
 
 def exercise(browser,label,viewport,initial_linked,has_file=True):
@@ -71,6 +74,11 @@ def exercise(browser,label,viewport,initial_linked,has_file=True):
         if path=='/api/resumes':
             return j(route,{'ok':True,'kind':'HHBA_PRIVATE_RESUME_VAULT_V1',
                 'items':[resume] if has_file else []})
+        if path=='/api/job-jd':
+            assert parse_qs(url.query).get('jd_id')==[JOB_2['jd_version_id']]
+            return j(route,{'ok':True,'verified':True,'job_id':JOB_2['jd_version_id'],
+                'jd_sha256':JOB_2['jd_sha256'],'canonical_url':JOB_2['official_url'],
+                'title':JOB_2['title'],'fresh':True,'full_jd':JD,'sections':[]})
         if path=='/api/resume-word':
             if action=='status':
                 return j(route,{'ok':True,'enabled':True,'renderer_enabled':False,'docx_only_enabled':True})
@@ -92,7 +100,9 @@ def exercise(browser,label,viewport,initial_linked,has_file=True):
             payload=req.post_data_json
             assert payload['consent_ai'] is True
             assert payload['job']['title']=='历史区域督导',payload
-            assert '历史评分依据' in payload['job']['requirements'],payload
+            assert payload['job']['requirements']==JD,payload
+            assert payload['job']['jd_version_id']==JOB_2['jd_version_id']
+            assert payload['job']['jd_sha256']==JOB_2['jd_sha256']
             assert payload['blocks'][0]['text']=='负责门店运营及日常数据整理工作'
             data['ai_calls'].append(payload)
             text=payload['blocks'][0]['text']
@@ -129,6 +139,7 @@ def exercise(browser,label,viewport,initial_linked,has_file=True):
         assert data['link_calls']==1
     buttons=page.get_by_role('button',name='优化这个岗位的简历')
     assert buttons.count()==2
+    assert buttons.first.is_disabled(), 'historical search-only job must be matched with an official JD first'
     assert buttons.nth(1).is_enabled()
     buttons.nth(1).click()
     page.locator('.hhba-match-modal-editor').wait_for(state='visible',timeout=18000)
