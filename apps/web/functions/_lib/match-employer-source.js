@@ -23,7 +23,7 @@ const compact=s=>String(s||'').replace(/[\s《》【】[\]（）()·•:：—�
 const companyCore=s=>compact(s).replace(/^(?:北京市?|上海市?|深圳市?|广州市?|杭州市?|成都市?)/,'')
  .replace(/(?:股份)?(?:有限责任公司|有限公司|股份有限公司|集团公司|集团|公司)$/,'');
 const titleCore=s=>compact(s).replace(/(?:社会招聘|校园招聘|社招|校招|急聘|岗位招聘|职位招聘|招聘岗位|招聘职位|实习生|招聘)$/,'');
-const basicLocation=s=>compact(s).replace(/(市|区|县|省|中国大陆|中国内地)/g,'').slice(0,6);
+const basicLocation=s=>compact(String(s||'').split(/[、，,|/；;]/)[0]).replace(/(市|区|县|省|中国大陆|中国内地)/g,'').slice(0,6);
 export function recruitmentSourceKind(url){
  let u;
  try{u=new URL(url)}catch{return 'UNVERIFIED';}
