@@ -169,7 +169,10 @@ test('frontend fetches one native SSE stream and maps stages without restarting 
  assert.match(svc,/event==='complete'/);
  assert.match(svc,/event==='failure'/);
  assert.match(page,/setStage/);
- assert.match(page,/正在寻找中国大陆岗位/);
+ const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
+ assert.match(page,/progressStage=\{stage\}/);
+ assert.match(dialog,/搜索真实岗位/);
+ assert.match(dialog,/hhba-match-live-progress/);
 });
 
 
@@ -228,7 +231,7 @@ test('authenticated route streams Search-first stages and final linked jobs',asy
   assert.doesNotMatch(events,/东京/);
   assert.equal(calls.filter(x=>x.endsWith('/v1/tools/search')).length,queryCount+3,
    '2 supplemental Search queries and 1 targeted domestic evidence check');
-  assert.equal(calls.filter(x=>x.endsWith('/responses')).length,2,'one shortlist call and one details pass');
+  assert.equal(calls.filter(x=>x.endsWith('/responses')).length,3,'one shortlist, one detailed reason pass and one bounded evidence analysis batch');
  }finally{globalThis.fetch=realFetch}
 });
 
