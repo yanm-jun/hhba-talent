@@ -62,6 +62,19 @@ test('direction-only scores remain clearly preliminary when requirements are mis
  assert.equal(x.matches[0].evidence_score_status,'AI_DIRECTION_REFERENCE_SCORED');
  assert.equal(x.matches[0].match_score,76);
 });
+test('mainland multi-location employer and legal company aliases preserve usable evidence',()=>{
+ const job={...posting(1),company:'亚信科技（中国）有限公司',
+  title:'运营/职能岗（产品经理助理、产品运营、项目管理助理等）',
+  location:'北京/杭州/苏州/上海'};
+ const article={url:job.official_url,
+  title:'亚信科技 招聘项目管理助理（北京）',
+  site_name:'亚信科技',summary:'亚信科技项目管理助理岗位招聘，工作地点北京。工作职责：支持项目计划协调、进度管理与跨部门沟通。任职要求具备一定的业务分析和协作能力。',
+  snippet:'项目管理助理，北京，企业招聘'};
+ const result=assessDomesticEvidence(job,[article]);
+ assert.equal(result.evidence_status,'PARTIAL_SOURCE');
+ assert.equal(result.evidence_sources.length,1);
+ assert.match(result.evidence_excerpt,/项目计划协调/);
+});
 test('title alone or absent real source never receives unsupported numeric score',async()=>{
  const x=await researchDomesticJobEvidence('mock-secret',resume,[posting(1)],{},{
   search:async()=>[],
