@@ -324,3 +324,10 @@
  .hhba-research-record-hint{margin-left:0}
 }
 @media(prefers-reduced-motion:reduce){.hhba-research-live-dot{animation:none}.hhba-research-report-log summary svg{transition:none}}
+
+.hhba-research-report-funnel{padding:17px 19px;margin:0 0 18px;border-radius:12px;border:1px solid #e4edf7;background:#f8faff}
+.hhba-research-report-funnel>div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.hhba-research-report-funnel strong{font-size:13px;color:#21476e}
+.hhba-research-report-funnel>div>span{font-size:10px;color:#8a9ab0}
+.hhba-research-report-funnel p{font-size:12px;line-height:1.9;color:#566c87;margin:8px 0 0}
+.hhba-research-report-funnel .hhba-research-report-limit{color:#755d3d}
