@@ -6,6 +6,8 @@
  */
 import {isDirectEmployerSourceHit,isMainlandEmployerJobUrl} from './match-employer-source.js';
 import {findMainlandCity,isMainlandJobLocation} from './mainland-job-location.js';
+import {openAIMatchToolCall} from './openai-match-adapter.js';
+import {assessExperienceRequirement} from './match-hard-qualification.js';
 export const MATCH_V2='HHBA_MATCH_CLEAN_V2';
 const BASE='https://api.deepseek.com';
 const clean=(s,n=160)=>String(s??'').replace(/[\u0000-\u001f]/g,' ').replace(/\s+/g,' ').trim().slice(0,n);
@@ -52,13 +54,15 @@ function jsonOf(v){
 // Only public read-only Search and Fetch operations get one bounded retry.
 // Paid/uncertain model reasoning requests are never retried automatically.
 async function call(fetcher,key,path,payload,ms,signal){
+ if(key?.name==='openai')return openAIMatchToolCall(fetcher,key,path,payload,ms,signal);
+ const apiKey=typeof key==='string'?key:key?.key;
  const retryable=path==='/v1/tools/search'||path==='/v1/tools/fetch';
  for(let attempt=0;attempt<(retryable?2:1);attempt++){
   if(signal?.aborted)throw err('AI_MATCH_CANCELLED');
   const timeout=AbortSignal.timeout(ms),merged=signal?AbortSignal.any([signal,timeout]):timeout;
   let res;
   try{res=await fetcher(BASE+path,{method:'POST',redirect:'manual',signal:merged,
-   headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
+   headers:{Authorization:'Bearer '+apiKey,'Content-Type':'application/json',Accept:'application/json'},
    body:JSON.stringify(payload)})}
   catch{throw err(signal?.aborted?'AI_MATCH_CANCELLED':'AI_PROVIDER_TIMEOUT')}
   if(!res.ok){
@@ -440,9 +444,11 @@ export async function scoreJobs(fetcher,key,profile,jobs,signal,diagnostic={}){
  return jobs.map((j,i)=>{
   const a=answers.find(x=>x?.id==='p'+(i+1))||{};
   const comparisons=groundedMatchExplanations(j,a,facts);
+  const tenure=assessExperienceRequirement(j.requirements,profile);
+  const tenureUnverified=['BELOW_MINIMUM','UNVERIFIED'].includes(tenure.status);
   const aligned=Array.isArray(a.alignments)?a.alignments:[];
   const cited=aligned.some(x=>factIds.has(x?.resume_fact_id))&&comparisons.matched.length>0;
-  const score=j.duties&&j.requirements&&cited&&
+  const score=!tenureUnverified&&j.duties&&j.requirements&&cited&&
    Number.isInteger(a.score)&&a.score>=0&&a.score<=100&&
    clean(a.reason,600).length>=35&&clean(a.score_basis,360).length>=18?a.score:null;
   const reason=comparisons.matched.length?
@@ -451,21 +457,25 @@ export async function scoreJobs(fetcher,key,profile,jobs,signal,diagnostic={}){
    '已检索到企业“'+j.company+'”的“'+j.title+'”岗位，工作地点为'+j.location+
    '，但还没有形成可逐项核对的简历与JD对应证据，因此不提供猜测的匹配分。';
   return {id:'v2-'+(i+1),company:j.company,title:j.title,title_zh:j.title,
+   qualification_status:tenure.status,
+   minimum_experience_years:tenure.requiredYears,
    location:j.location,official_url:j.url,source_type:'站外招聘职位',
    recruitment_source_kind:'EMPLOYER_DOMAIN_CANDIDATE',
    recruitment_source_note:'已取得职位页面原文，企业所属及实际在招状态待人工确认',
    source_status:'SOURCE_SEARCH_PREVIEW',application_status:'NEEDS_OFFICIAL_CONFIRMATION',
-   platform:'deepseek-search',source:new URL(j.url).hostname,remote:false,
+   platform:key?.name==='openai'?'openai-web-search':'deepseek-search',source:new URL(j.url).hostname,remote:false,
    match_score:score,reference_score:score??0,
    score_basis:score===null?'':'初步参考分基于本轮可核对的简历事实与岗位原文；具体对应见下方，完整官方 JD 仍待独立核验。',
    evidence_status:'PARTIAL_SOURCE',
    evidence_score_status:score===null?undefined:'AI_PARTIAL_SOURCE_SCORED',
    score_evidence_status:comparisons.matched.length||comparisons.not_evidenced.length?
     'GROUNDED_JD_RESUME_QUOTES':undefined,
-   recommendation_reason:reason,matched:comparisons.matched,
-   not_evidenced:comparisons.not_evidenced,
+   recommendation_reason:tenureUnverified?reason+' '+tenure.note:reason,
+   matched:comparisons.matched,
+   not_evidenced:tenureUnverified?[...comparisons.not_evidenced,tenure.note]:comparisons.not_evidenced,
    requirements_basis:clean(j.requirements||j.duties,500),
-   needs_verification:['以企业官方最新公告确认岗位是否仍开放、硬性任职要求。'],
+   needs_verification:['以企业官方最新公告确认岗位是否仍开放、硬性任职要求。',
+    ...(tenureUnverified?[tenure.note]:[])],
    evidence_excerpt:clean(j.excerpt,1200),
    evidence_sources:[{url:j.url,kind:'EMPLOYER_PAGE_CANDIDATE'}],
    availability_status:'UNKNOWN',availability_note:'招聘状态待确认',
@@ -486,7 +496,8 @@ export function rankCleanMatchResults(jobs){
 export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
  {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},excludeUrls=[]}={},deps={}){
  const fetcher=deps.fetcher||fetch,start=Date.now();
- const d={mode:MATCH_V2,model:'deepseek-v4-pro',searches:0,page_reads:0,
+ const d={mode:MATCH_V2,model:key?.name==='openai'?key.model:'deepseek-v4-pro',
+  provider:key?.name==='openai'?'openai':'deepseek',searches:0,page_reads:0,
   provider_items:0,candidate_links:0,visible_jobs:0,discarded:0,
   search_raw_results:0,search_empty_queries:0,search_rejection_counts:{},
   elapsed_ms:0,stage:'planning',queries:0,search_failures:0,

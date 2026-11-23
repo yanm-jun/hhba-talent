@@ -1,5 +1,6 @@
 import {verifiedProfile} from './resume-match-core.js';
 import {outputText} from './deepseek-native-match.js';
+import {openAIJson} from './openai-match-adapter.js';
 
 const providerUrl='https://api.deepseek.com/responses';
 const failure=code=>Object.assign(new Error(code),{code});
@@ -9,12 +10,15 @@ const factKinds=new Set(['work','project','skill','education','credential']);
 
 async function askAgent(key,instructions,input,{fetcher=fetch,signal,timeoutMs=60000,
  model='deepseek-v4-pro',reasoningEffort='high'}={}){
+ if(key?.name==='openai')return openAIJson(fetcher,key,instructions,input,timeoutMs,signal,
+  {maxOutput:10000});
+ const apiKey=typeof key==='string'?key:key?.key;
  const timeout=AbortSignal.timeout(timeoutMs);
  let response;
  try{
   response=await fetcher(providerUrl,{
    method:'POST',redirect:'manual',signal:signal?AbortSignal.any([signal,timeout]):timeout,
-   headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},
+   headers:{Authorization:'Bearer '+apiKey,'Content-Type':'application/json'},
    body:JSON.stringify({model,reasoning:{effort:reasoningEffort},stream:false,
     text:{format:{type:'json_object'}},max_output_tokens:10000,instructions,input:JSON.stringify(input)})
   });
@@ -69,6 +73,12 @@ export async function recognizeMatchResume(key,resume,roleHint,options={}){
   return profile;
  };
  let startBackup;
+ // OpenAI gets a single model attempt rather than the retired DeepSeek
+ // speculative parallel fallback, which previously could double paid calls.
+ if(key?.name==='openai'){
+  try{return await read(parseInstructions,{timeoutMs:60000})}
+  finally{controller.abort()}
+ }
  const backupReady=new Promise(resolve=>{startBackup=resolve;});
  const timer=setTimeout(startBackup,options.fallbackDelayMs??8000);
  const primary=read(parseInstructions,{timeoutMs:50000}).catch(error=>{
