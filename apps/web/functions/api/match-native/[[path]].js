@@ -4,6 +4,7 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
 import {runAgentOwnedMainlandMatch} from '../../_lib/ai-owned-job-research.js';
+import {runNativeDeepSearchJobs} from '../../_lib/native-deepsearch-job-research.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {enrichSearchMatchesWithJD,matchJdEnrichmentEnabled} from '../../_lib/match-jd-enrichment.js';
 import {researchDomesticJobEvidence} from '../../_lib/domestic-job-research.js';
@@ -154,6 +155,11 @@ async function verifiedJdPass(env,result,resume,options,progress){
 
 // A deliberate rollout switch retains the previous entry point.
 async function runCandidateResearch(env,key,resume,roleHint,limit,options={}){
+ if(options.search_engine==='deepseek_native'){
+  if(env?.HHBA_DEEPSEEK_NATIVE_TRIAL_ENABLED==='0')
+   throw Object.assign(new Error('AI_NATIVE_DEEPSEARCH_DISABLED'),{code:'AI_NATIVE_DEEPSEARCH_DISABLED'});
+  return runNativeDeepSearchJobs(key,resume,roleHint,limit,options);
+ }
  if(env?.HHBA_AI_OWNED_RESEARCH_ENABLED==='0')
   return runSearchFirstMatch(key,resume,roleHint,limit,options);
  return runAgentOwnedMainlandMatch(key,resume,roleHint,limit,{...options,expandDetailed:false});
@@ -211,7 +217,8 @@ async function matchResumeWorkflow(env,candidate,resume,options,{
  const profileMs=Date.now()-workflowStart;
  onProgress('planning');
  onActivity({stage:'planning',message:'已核对 '+profile.facts.length+' 条简历证据，正在规划岗位搜索方向。'});
- const checkpoint=await checkpointForCandidate(env,candidate,resume,options.role_hint);
+ const checkpoint=options.search_engine==='deepseek_native'?null:
+  await checkpointForCandidate(env,candidate,resume,options.role_hint);
  const excluded=new Set((options.exclude_urls||[]).map(matchPostingKey));
  const excludePosting=url=>excluded.has(matchPostingKey(url));
  const compareEvidence=(jd,reviewSignal=signal)=>{
@@ -222,6 +229,7 @@ async function matchResumeWorkflow(env,candidate,resume,options,{
   await createMatchJdReview(env,resume,{...options,exclude:excluded,signal,compareEvidence,
    onUpdate:jobs=>onPartial(provisionalPartial(jobs))}).catch(()=>null);
  const researchOptions={signal,checkpoint,resumeProfile:profile,onProgress,onActivity,
+  search_engine:options.search_engine||'standard',
   autonomousPlanning:env?.HHBA_AUTONOMOUS_SEARCH_ENABLED!=='0',
   // Access to D1 remains server-only; only public employer names and domains
   // inform Search. This callback never returns a 'job' to the frontend.
@@ -426,7 +434,7 @@ export async function onRequest({request,env}){
  const url=new URL(request.url);
  const tail=url.pathname.slice('/api/match-native'.length).replace(/\/$/,'')||'/';
  if(tail==='/status'&&request.method==='GET')
-  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'SEARCH_FIRST_V1',formats:['pdf','docx']});
+  return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'SEARCH_FIRST_V1',formats:['pdf','docx'],native_deepsearch_trial:env?.HHBA_DEEPSEEK_NATIVE_TRIAL_ENABLED!=='0'});
  if(!enabled(env))return fail('MATCH_NOT_ENABLED',503);
  if(tail==='/provider-check'&&request.method==='GET'){
   try{
@@ -460,7 +468,8 @@ export async function onRequest({request,env}){
     input.text.replace(/\s/g,'').length<30||!options||
     options.country!=='CN'||options.remote_only!==false||
     typeof options.role_hint!=='string'||options.role_hint.length>80||
-    !Number.isInteger(options.limit)||options.limit<1||options.limit>10)
+    !Number.isInteger(options.limit)||options.limit<1||options.limit>10||
+    (options.search_engine!==undefined&&!['standard','deepseek_native'].includes(options.search_engine)))
   return fail('INVALID_RESUME_TEXT',400);
  if(options.exclude_urls!==undefined&&(!Array.isArray(options.exclude_urls)||
    options.exclude_urls.length>50||options.exclude_urls.some(url=>
