@@ -59,6 +59,14 @@ test('full document task lease stores only hashes and rejects a concurrent dupli
  assert.ok(await reserveResumeOptimizationTask(db,'account-hash',original));
 });
 
+// The application now uses OpenAI Responses for Word optimization; keep the
+// existing privacy and quota assertions while returning a realistic envelope.
+function asResponses(chat){
+ const text=chat?.choices?.[0]?.message?.content||'';
+ return Response.json({status:'completed',output:[
+  {type:'message',content:[{type:'output_text',text}]}]});
+}
+
 const url='https://preview.hhba.example/api/resume-optimize';
 const base={
  consent_ai:true,
@@ -126,7 +134,7 @@ test('production AI optimization can use a dedicated quota salt with bounded usa
  delete h.env.HHBA_MATCH_LIMIT_PEPPER;
  h.env.HHBA_MATCH_RUNTIME_MODE='production';
  h.env.HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER='private-opt-only-'+('Q'.repeat(48));
- globalThis.fetch=async()=>Response.json({choices:[{message:{content:JSON.stringify({
+ globalThis.fetch=async()=>asResponses({choices:[{message:{content:JSON.stringify({
   suggestions:[{id:'s0',blockId:'experience-0',action:'replace',
    original:base.blocks[0].text,proposed:'负责区域门店日常运营管理',
    rationale:'表达更准确',jobRequirement:'运营和团队协作',
@@ -154,9 +162,9 @@ test('generates suggestions with user confirmation and enforces daily quota',asy
  globalThis.fetch=async (_url,options)=>{
   count++;
   const submitted=JSON.parse(options.body);
-  const input=JSON.parse(submitted.messages[1].content);
+  const input=JSON.parse(submitted.input);
   assert.equal(input.blocks[0].text,base.blocks[0].text);
-  return Response.json({choices:[{message:{content:JSON.stringify({suggestions:[{
+  return asResponses({choices:[{message:{content:JSON.stringify({suggestions:[{
    id:'suggestion-0',blockId:'experience-0',action:'replace',
    original:base.blocks[0].text,proposed:'统筹门店日常运营',
    rationale:'使用更清晰的动词',jobRequirement:'运营和团队协作',
@@ -183,8 +191,8 @@ test('provider never receives contact identifiers in evidence',async()=>{
  globalThis.fetch=async(_url,options)=>{
   assert.doesNotMatch(options.body,/tester@example.org/);
   const submitted=JSON.parse(options.body);
-  assert.match(submitted.messages[1].content,/邮箱已脱敏/);
-  return Response.json({choices:[{message:{content:JSON.stringify({suggestions:[]})}}]});
+  assert.match(submitted.input,/邮箱已脱敏/);
+  return asResponses({choices:[{message:{content:JSON.stringify({suggestions:[]})}}]});
  };
  try{
   const result=await onRequestPost({request:request({
@@ -201,10 +209,10 @@ test('bounded twelve-section Chinese resume passes UTF-8 request limit',async()=
  globalThis.fetch=async (_url,options)=>{
   called=true;
   const data=JSON.parse(options.body);
-  const input=JSON.parse(data.messages[1].content);
+  const input=JSON.parse(data.input);
   assert.equal(input.blocks.length,12);
   assert.ok(new TextEncoder().encode(options.body).byteLength>18000);
-  return Response.json({choices:[{message:{content:'{"suggestions":[]}'}}]});
+  return asResponses({choices:[{message:{content:'{"suggestions":[]}'}}]});
  };
  try{
   const blocks=Array.from({length:12},(_,i)=>({
@@ -262,7 +270,7 @@ test('repeated provider failures still have an independent six-attempt cap',asyn
 
 test('no safe AI suggestions leaves successful-generation allowance unused',async()=>{
  const h=mockEnv(),original=globalThis.fetch;
- globalThis.fetch=async()=>Response.json({choices:[{
+ globalThis.fetch=async()=>asResponses({choices:[{
   finish_reason:'stop',message:{content:'{"suggestions":[]}'}
  }]});
  try{
