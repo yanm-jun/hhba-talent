@@ -20,7 +20,11 @@ const reply=data=>Response.json({status:'completed',output:[
 function fixtureEnv(flags={}){
  const writes=[],requests=[];
  const db={prepare(sql){
-  return {bind(...args){
+  return {async first(){
+   if(sql.includes('sqlite_master')&&sql.includes('hhba_resume_match_requests'))
+    return {name:'hhba_resume_match_requests'};
+   return null;
+  },bind(...args){
    return {
     async first(){
      if(sql.includes('FROM hhba_auth_sessions'))
