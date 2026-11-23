@@ -55,8 +55,28 @@ function chineseLocation(location:string){
  return cityNames[key]||location;
 }
 function officialLink(item:MatchedJob){
- if(item.source_type==='站外官方招聘'||item.source_type==='站外招聘职位')
-  return safeExternalJobApplicationUrl({...item,source_type:'站外官方招聘'});
+ if(item.source_type==='站外招聘职位'){
+  // Clean V2 uses v2-N IDs. The older official-link validator expects a
+  // canonical employer+posting ID, so normalize ONLY after source evidence.
+  if(!/^v2-\\d+$/.test(item.id)||
+   item.recruitment_source_kind!=='EMPLOYER_DOMAIN_CANDIDATE'||
+   !['PARTIAL_SOURCE','VERIFIED_FULL_JD'].includes(item.evidence_status||'')||
+   item.application_status!=='NEEDS_OFFICIAL_CONFIRMATION')return null;
+  try{
+   const u=new URL(item.official_url);
+   if(u.protocol!=='https:'||u.hostname!==item.source)return null;
+   let postingId=u.searchParams.values().next().value||'';
+   if(u.hostname==='jobs.bytedance.com')
+    postingId=u.pathname.match(/^\\/experienced\\/position\\/([0-9]{13,22})\\/detail$/)?.[1]||'';
+   if(u.hostname==='talent.baidu.com')
+    postingId=u.pathname.match(/^\\/jobs\\/detail\\/SOCIAL\\/([0-9a-f-]{36})$/i)?.[1]?.toLowerCase()||'';
+   if(!postingId)return null;
+   const canonicalId='external-'+u.hostname.replace(/[^a-zA-Z0-9_-]/g,'-')+'-'+postingId;
+   return safeExternalJobApplicationUrl({...item,source_type:'站外官方招聘',
+    id:canonicalId});
+  }catch{return null}
+ }
+ if(item.source_type==='站外官方招聘')return safeExternalJobApplicationUrl(item);
  return safeOfficialJobUrl({id:item.id,source:item.source,platform:item.platform,
   company:item.company,title:item.title,url:item.official_url,location:item.location,remote:item.remote});
 }
