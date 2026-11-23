@@ -45,12 +45,17 @@ export async function openAIResponse(fetcher,provider,request,{signal=null,timeo
  if(response.status>=300&&response.status<400)
   throw fail('AI_PROVIDER_UNEXPECTED_REDIRECT');
  if(!response.ok){
-  if([401,403].includes(response.status))throw fail('AI_PROVIDER_KEY_REJECTED');
-  if(response.status===402)throw fail('AI_PROVIDER_BALANCE_INSUFFICIENT');
-  if(response.status===429)throw fail('AI_PROVIDER_RATE_LIMITED');
-  if([400,404,405,422].includes(response.status))
-   throw fail('AI_PROVIDER_REQUEST_REJECTED');
-  throw fail('AI_PROVIDER_UPSTREAM_ERROR');
+  // Preserve the HTTP status for authenticated, preview-only diagnosis.
+  // Never copy upstream error bodies, authorization headers, or request inputs.
+  const status=response.status;
+  const code=[401,403].includes(status)?'AI_PROVIDER_KEY_REJECTED':
+   status===402?'AI_PROVIDER_BALANCE_INSUFFICIENT':
+   status===429?'AI_PROVIDER_RATE_LIMITED':
+   [400,404,405,422].includes(status)?'AI_PROVIDER_REQUEST_REJECTED':
+   'AI_PROVIDER_UPSTREAM_ERROR';
+  const error=fail(code);
+  error.upstreamStatus=status;
+  throw error;
  }
  let data;
  try{data=await response.json()}catch{throw fail('AI_PROVIDER_RESPONSE_INVALID')}
