@@ -155,6 +155,9 @@ async function verifiedJdPass(env,result,resume,options,progress){
 }
 
 // A deliberate rollout switch retains the previous entry point.
+function standardAgentResearch(key,resume,roleHint,limit,options={}){
+ return runAgentOwnedMainlandMatch(key,resume,roleHint,limit,{...options,expandDetailed:false});
+}
 async function runCandidateResearch(env,key,resume,roleHint,limit,options={}){
  if(options.search_engine==='deepseek_native'){
   if(env?.HHBA_DEEPSEEK_NATIVE_TRIAL_ENABLED==='0')
@@ -163,7 +166,7 @@ async function runCandidateResearch(env,key,resume,roleHint,limit,options={}){
  }
  if(env?.HHBA_AI_OWNED_RESEARCH_ENABLED==='0')
   return runSearchFirstMatch(key,resume,roleHint,limit,options);
- return runAgentOwnedMainlandMatch(key,resume,roleHint,limit,{...options,expandDetailed:false});
+ return runHybridMainlandJobResearch(key,resume,roleHint,limit,options,{native:standardAgentResearch});
 }
 async function domesticResearchPass(env,key,result,resume,options,progress){
  progress('researching');
