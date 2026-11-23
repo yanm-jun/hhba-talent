@@ -320,6 +320,17 @@ export async function scoreJobs(fetcher,key,profile,jobs,signal,diagnostic={}){
    research_anchor:{url:j.url,title:j.source_title,summary:clean(j.excerpt,650)}};
  });
 }
+/** Final cards order by independent JD provenance, then evidence-backed
+ * reference score. Missing model scores stay missing; never convert to 0.
+ * Sorting is stable for equivalent evidence quality.
+ */
+export function rankCleanMatchResults(jobs){
+ const items=Array.isArray(jobs)?jobs:[];
+ const verified=j=>j?.jd_source_status==='VERIFIED_JD'?1:0;
+ const score=j=>Number.isInteger(j?.match_score)&&j.match_score>=0&&
+  j.match_score<=100?j.match_score:-1;
+ return [...items].sort((a,b)=>verified(b)-verified(a)||score(b)-score(a));
+}
 export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
  {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},excludeUrls=[]}={},deps={}){
  const fetcher=deps.fetcher||fetch,start=Date.now();
