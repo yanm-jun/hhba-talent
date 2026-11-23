@@ -28,6 +28,9 @@ test('extraction differentiates 5-year minimum from unrelated numbers',()=>{
  assert.equal(minimumExperienceFromJd('Minimum 3–5 years of experience in retail marketing').years,3);
  assert.equal(minimumExperienceFromJd('活动开展3次，转化率提升20%，任职资格不限'),null);
  assert.equal(minimumExperienceFromJd('质保期3年，产品维修服务'),null);
+ assert.equal(minimumExperienceFromJd('负责过门店管理（区经理职级2年以上经验优先）、有服务优化项目经验优先'),null);
+ assert.equal(minimumExperienceFromJd('3 years retail experience preferred'),null);
+ assert.equal(minimumExperienceFromJd('至少5年以上门店运营经验，英语沟通者优先').years,5);
 });
 
 test('an apparently perfect skill match cannot override missing or short experience history',async()=>{
