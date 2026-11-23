@@ -7,7 +7,7 @@
  */
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
-import {recognizeResumeFile} from '../../_lib/resume-ocr.js';
+import {recognizeOpenAIResumeFile} from '../../_lib/resume-ocr-openai-v2.js';
 import {recognizeMatchResume} from '../../_lib/resume-jd-match-agent.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {runCleanJobMatch,rankCleanMatchResults,MATCH_V2,findEmployerSources,readEmployerPages,extractJobs,officialDetailRecoveryQueries} from '../../_lib/clean-match-v2.js';
@@ -16,7 +16,9 @@ import {checkCleanMatchProvider} from '../../_lib/clean-match-v2-provider-check.
 import {authorizeOperatorQa,startQaRun,appendQaStage,finishQaRun,getQaRun,
  redactQaDiagnostic} from '../../_lib/clean-match-v2-qa-log.js';
 
-const KIND='HHBA_NATIVE_WEB_MATCH_V1';
+const KIND='HHBA_OPENAI_MATCH_V2';
+const openAIProvider=env=>({key:env?.HHBA_MATCH_OPENAI_API_KEY||env?.HHBA_AI_OPENAI_API_KEY,
+ model:env?.HHBA_MATCH_OPENAI_MODEL||'gpt-6.2-astra'});
 // An entirely synthetic, intentionally fabricated candidate, never the
 // signed-in person's uploaded résumé, private document, or stored profile.
 const ACCEPTANCE_SCENARIO='automotive_operations_v1';
@@ -39,8 +41,8 @@ const fail=(code,status=502)=>json({ok:false,error:code},status);
 // and preview-only until the complete workflow passes live acceptance.
 const providerConfigured=env=>
  env?.HHBA_MATCH_SERVICE_ENABLED==='1'&&
- typeof env?.HHBA_MATCH_DEEPSEEK_KEY==='string'&&
- env.HHBA_MATCH_DEEPSEEK_KEY.length>=16&&
+ typeof openAIProvider(env).key==='string'&&
+ openAIProvider(env).key.length>=16&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 const enabled=env=>providerConfigured(env)&&env?.HHBA_MATCH_CLEAN_V2_ENABLED==='1';
 // CF_PAGES_BRANCH is guaranteed as a Pages BUILD variable, not a runtime
@@ -102,7 +104,7 @@ async function operatorQaRun(env,request){
    const plan={roles:['区域督导','渠道运营','销售运营'],cities:['上海','苏州']};
    plan.queries=officialDetailRecoveryQueries(plan);
    enqueue('searching',{queries:plan.queries.length});
-   const search=await findEmployerSources(fetch,env.HHBA_MATCH_DEEPSEEK_KEY,plan,request.signal);
+   const search=await findEmployerSources(fetch,openAIProvider(env),plan,request.signal);
    const d={stage:'reading',searches:search.queries-search.failures,
     search_failures:search.failures,search_raw_results:search.raw_results,
     search_empty_queries:search.empty_queries,candidate_links:search.sources.length,
@@ -112,14 +114,14 @@ async function operatorQaRun(env,request){
     extraction_page_rejections:{}};
    enqueue('reading',{searches:d.searches,
     search_raw_results:d.search_raw_results,candidate_links:d.candidate_links});
-   const read=await readEmployerPages(fetch,env.HHBA_MATCH_DEEPSEEK_KEY,
+   const read=await readEmployerPages(fetch,openAIProvider(env),
     search.sources.slice(0,4),request.signal,{targetSuccesses:4});
    d.fetch_attempted=read.attempts;d.fetch_failures=read.failures;
    d.page_reads=read.pages.length;d.fetch_error_codes=read.error_codes;
    enqueue('researching',{fetch_attempted:d.fetch_attempted,page_reads:d.page_reads,
     fetch_failures:d.fetch_failures});
    const extracted=read.pages.length?
-    await extractJobs(fetch,env.HHBA_MATCH_DEEPSEEK_KEY,read.pages,request.signal):
+    await extractJobs(fetch,openAIProvider(env),read.pages,request.signal):
     {jobs:[],model_failures:0,city_evidence:0,page_rejections:{}};
    d.city_evidence_count=extracted.city_evidence;
    d.model_failures=extracted.model_failures;
@@ -185,7 +187,7 @@ function publicResult(profile,matches,diagnostic,target){
   employer_source_candidates:matches.length-verified,
   native_search:diagnostic,source:'中国大陆企业招聘原文',
   scoring:'有真实 JD 和简历证据时提供参考分；未充分核实的岗位不虚构匹配分，绝非录用概率。',
-  privacy:'仅在本次授权下向 DeepSeek 发送脱敏简历文字，不公开或保存简历原文。',
+  privacy:'仅在本次授权下向 OpenAI 官方 API 发送脱敏简历文字，不公开或保存简历原文。',
   disclaimer:matches.length<target?
    '本轮已找到 '+matches.length+' 条有具体职位证据的候选，尚未达到目标 '+target+
     ' 条。职位开放状态及最新要求仍需点击企业来源核实。':
@@ -196,14 +198,14 @@ async function workflow(env,session,input,redacted,{signal,onProgress,onActivity
  const started=Date.now();
  onProgress('parsing');
  onActivity({stage:'parsing',message:'开始理解简历中的真实工作经历及职业能力。'});
- const profile=await recognizeMatchResume(env.HHBA_MATCH_DEEPSEEK_KEY,
+ const profile=await recognizeMatchResume(openAIProvider(env),
   redacted,input.options.role_hint,{signal,onFallback:()=>onActivity({
    stage:'parsing',message:'正在补充核对简历证据，避免误判经历。'})});
  const resumeMs=Date.now()-started;
  onProgress('planning');
  onActivity({stage:'planning',message:'识别到 '+(profile.facts?.length||0)+
   ' 条简历原文证据，将开始新的企业岗位研究流程。'});
- const discovery=await runCleanJobMatch(env.HHBA_MATCH_DEEPSEEK_KEY,
+ const discovery=await runCleanJobMatch(openAIProvider(env),
   redacted,profile,input.options.role_hint,input.options.limit,{
    signal,onProgress,onActivity,onPartial,
    excludeUrls:input.options.exclude_urls||[]
@@ -211,7 +213,7 @@ async function workflow(env,session,input,redacted,{signal,onProgress,onActivity
  // This is a new, independent official-JD archive bridge, NOT the retired
  // search Agent. It can unlock the unchanged, evidence-gated Word optimizer.
  const jdStart=Date.now();
- const archived=await archiveCleanMatchJobs(env,env.HHBA_MATCH_DEEPSEEK_KEY,
+ const archived=await archiveCleanMatchJobs(env,openAIProvider(env),
   profile,discovery.matches,{signal,onActivity,onPartial});
  const matches=rankCleanMatchResults(archived.matches);
  const diagnostic={...discovery.diagnostic,visible_jobs:matches.length,
@@ -328,7 +330,7 @@ export async function onRequest({request,env}){
  if(!session)return fail('SESSION_INVALID',401);
  if(tail==='/provider-check'){
   try{
-   const probe=await checkCleanMatchProvider(env.HHBA_MATCH_DEEPSEEK_KEY,
+   const probe=await checkCleanMatchProvider(openAIProvider(env),
     {signal:request.signal});
    return json({...probe,engine:MATCH_V2});
   }catch(e){
@@ -362,7 +364,7 @@ export async function onRequest({request,env}){
    {persistHistory:false});
  }
  if(tail==='/ocr'){
-  try{return json({ok:true,...await recognizeResumeFile(request,env.HHBA_MATCH_DEEPSEEK_KEY)})}
+  try{return json({ok:true,...await recognizeOpenAIResumeFile(request,openAIProvider(env))})}
   catch(e){return fail(e?.code||'OCR_SERVICE_UNAVAILABLE',e?.status||502)}
  }
  let input;
