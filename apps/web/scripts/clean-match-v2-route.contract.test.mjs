@@ -1,0 +1,196 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {onRequest} from '../functions/api/match-next/[[path]].js';
+
+const KEY='synthetic-provider-key-never-real';
+const PHONE='13911110000';
+const JD_URL='https://careers.tencent.com/jobdesc.html?postId=2097166275703910400';
+const QUOTE='负责汽车区域门店运营监督、渠道培训及销售漏斗复盘';
+const JD=[
+ '腾讯社会招聘','招聘单位：腾讯','职位名称：销售运营主管',
+ '工作地点：上海','岗位职责：负责渠道运营和销售数据复盘工作',
+ '任职要求：具有销售数据分析经验和跨团队协作能力',
+ '申请说明：职位信息请以腾讯企业官方页面为准，实际开放状态待核验'
+].join('\n');
+const reply=data=>Response.json({status:'completed',output:[
+ {type:'message',content:[{type:'output_text',text:JSON.stringify(data)}]}
+]});
+
+function fixtureEnv(flags={}){
+ const writes=[],requests=[];
+ const db={prepare(sql){
+  return {bind(...args){
+   return {
+    async first(){
+     if(sql.includes('FROM hhba_auth_sessions'))
+      return {phone:PHONE,revoked:0,expires_at:new Date(Date.now()+60000).toISOString()};
+     if(sql.includes('FROM hhba_auth_users'))return {phone:PHONE,role:'candidate'};
+     return null;
+    },
+    async all(){return {results:[]}},
+    async run(){
+     writes.push({sql,args});return {success:true,meta:{changes:1}};
+    }
+   };
+  }};
+ }};
+ return {env:{
+  HHBA_MATCH_DEEPSEEK_KEY:KEY,
+  HHBA_MATCH_SERVICE_ENABLED:'1',
+  HHBA_PNVS_AUTH_DB:db,...flags
+ },writes,requests};
+}
+function request(tail,options={}){
+ return new Request('https://hhba.work/api/match-next'+tail,{
+  ...options,headers:{Authorization:'Bearer test-candidate-token',
+   Origin:'https://hhba.work',...options.headers}
+ });
+}
+function installProviderMock(){
+ const original=globalThis.fetch,calls=[];
+ globalThis.fetch=async (url,options={})=>{
+  const path=new URL(url).pathname,body=options.body?JSON.parse(options.body):{};
+  calls.push({path,body});
+  if(path==='/user/balance')return Response.json({is_available:true});
+  if(path==='/v1/tools/search')return Response.json({results:[{
+   url:JD_URL,title:'腾讯 销售运营主管 上海职位',
+   summary:'上海销售运营主管，渠道运营和销售数据复盘',
+   site_name:'腾讯招聘'
+  }]});
+  if(path==='/v1/tools/fetch')return Response.json({content:JD,
+   title:'腾讯销售运营主管'});
+  if(path==='/responses'){
+   const prompt=body.instructions||'';
+   if(prompt.includes('健康检查'))return reply({ok:true});
+   if(prompt.includes('简历识别 Agent'))return reply({
+    facts:[{kind:'work',quote:QUOTE}],skills:[{name:'门店运营',evidence:QUOTE}],
+    target_roles:['区域运营'],education:null,education_evidence:null,
+    experience_years:null,experience_evidence:null
+   });
+   if(prompt.includes('检索策略'))return reply({queries:['区域督导 上海 职位详情 企业官网']});
+   if(prompt.includes('提取真实公司'))return reply({jobs:[{
+    id:'p1',company:'腾讯',title:'销售运营主管',
+    duties_quote:'负责渠道运营和销售数据复盘工作',
+    requirements_quote:'具有销售数据分析经验和跨团队协作能力'
+   }]});
+   if(prompt.includes('求职匹配分析师'))return reply({jobs:[{
+    id:'p1',score:82,resume_fact_ids:['CV-1'],
+    alignments:[{jd_quote:'负责渠道运营和销售数据复盘工作',
+     resume_fact_id:'CV-1'}],
+    gaps:[{jd_quote:'具有销售数据分析经验和跨团队协作能力'}],
+    reason:'这份简历记载了区域门店运营、渠道培训和销售漏斗复盘的实际工作，与渠道运营和销售数据复盘职责存在明确的对应关系，但仍需核实其他岗位要求。',
+    score_basis:'岗位职责要求渠道运营和销售数据复盘，而简历有门店管理及渠道培训的真实经历，但其他技能条件尚待核对。'
+   }]});
+   throw Error('unexpected model prompt');
+  }
+  throw Error('unexpected provider path '+path);
+ };
+ return {calls,restore(){globalThis.fetch=original}};
+}
+
+test('preview-only opt-in permits authenticated live preflight while matching stays disabled',async()=>{
+ const {env}=fixtureEnv({CF_PAGES_BRANCH:'fix/preflight-test',
+  HHBA_MATCH_V2_PREFLIGHT_ENABLED:'1'});
+ const status=await (await onRequest({request:request('/status'),env})).json();
+ assert.equal(status.enabled,false);
+ assert.equal(status.preflight_available,true);
+ let probeCalls=0;
+ const previous=globalThis.fetch;
+ globalThis.fetch=async(url,opts={})=>{
+  probeCalls++;
+  const path=new URL(url).pathname;
+  if(path==='/user/balance')return Response.json({is_available:true});
+  if(path==='/v1/tools/search')return Response.json({results:[]});
+  if(path==='/responses')return reply({ok:true});
+  if(path==='/v1/tools/fetch')return Response.json({content:
+   'Provider Fetch returned verified public documentation content. '.repeat(3)});
+  throw Error('unexpected '+path);
+ };
+ try{
+  const unauthorized=await onRequest({request:new Request(
+   'https://hhba.work/api/match-next/provider-check'),env});
+  assert.equal(unauthorized.status,401);
+  assert.equal(probeCalls,0,'unauthenticated traffic must not incur provider spend');
+  const preflight=await onRequest({request:request('/provider-check'),env});
+  assert.equal(preflight.status,200);
+  const data=await preflight.json();
+  assert.equal(data.status,'READY');
+  assert.equal(data.fetch_content_verified,true);
+  assert.deepEqual(data.capabilities.sort(),[
+   'balance','deepseek_fetch','deepseek_search','v4_pro_responses_json'].sort());
+  assert.equal(probeCalls,4);
+  const denied=await onRequest({request:request('/resume',{
+   method:'POST',body:'{}'}),env});
+  assert.equal(denied.status,503,'preflight can never unlock the public match API');
+  assert.equal((await denied.json()).error,'MATCH_NOT_ENABLED');
+ }finally{globalThis.fetch=previous}
+});
+
+test('production cannot opt into pre-launch probe without the real release gate',async()=>{
+ for(const branch of ['main',undefined]){
+  const {env}=fixtureEnv({CF_PAGES_BRANCH:branch,
+   HHBA_MATCH_V2_PREFLIGHT_ENABLED:'1'});
+  const status=await (await onRequest({request:request('/status'),env})).json();
+  assert.equal(status.enabled,false);
+  assert.equal(status.preflight_available,false);
+  const res=await onRequest({request:request('/provider-check'),env});
+  assert.equal(res.status,503);
+  assert.equal((await res.json()).error,'MATCH_PREFLIGHT_NOT_ENABLED');
+ }
+});
+
+test('authenticated synthetic résumé travels across actual V2 HTTP handler, Search, Fetch, evidence and private history',async()=>{
+ const {env,writes}=fixtureEnv({CF_PAGES_BRANCH:'main',
+  HHBA_MATCH_CLEAN_V2_ENABLED:'1'});
+ const mocked=installProviderMock();
+ try{
+  const body={consent:true,
+   text:'求职意向城市：上海\n工作经历：'+QUOTE+
+    '\n联系邮箱：candidate@example.com，手机：13812345678',
+   options:{country:'CN',remote_only:false,role_hint:'区域督导',limit:1}
+  };
+  const res=await onRequest({request:request('/resume',{
+   method:'POST',headers:{'Content-Type':'application/json'},
+   body:JSON.stringify(body)
+  }),env});
+  assert.equal(res.status,200);
+  const data=await res.json();
+  assert.equal(data.status,'COMPLETE');
+  assert.equal(data.native_search.visible_jobs,1);
+  assert.equal(data.native_search.page_reads,1);
+  assert.equal(data.matches.length,1);
+  assert.equal(data.matches[0].official_url,JD_URL);
+  assert.equal(data.matches[0].location,'上海');
+  assert.equal(data.matches[0].match_score,82);
+  assert.match(data.matches[0].matched[0],/岗位原文.*简历原文/);
+  assert.equal(data.matches[0].jd_source_status,undefined,
+   'unverified JD must never unlock Word editing');
+  assert.equal(data.matched_official_jobs,0);
+  assert.equal(data.history_status,'SAVED');
+  const saved=writes.find(x=>x.sql.includes('INSERT INTO hhba_ai_match_history'));
+  assert.ok(saved,'private recommendations are saved only after a real candidate session');
+  assert.doesNotMatch(JSON.stringify(saved.args),/candidate@example\.com|13812345678|工作经历：/);
+  assert.deepEqual([...new Set(mocked.calls.map(x=>x.path))].sort(),[
+   '/responses','/v1/tools/fetch','/v1/tools/search'].sort());
+  assert.doesNotMatch(JSON.stringify(mocked.calls),/candidate@example\.com|13812345678/);
+  assert.ok(mocked.calls.some(x=>JSON.stringify(x.body).includes('邮箱已隐藏')),
+   'model receives redacted résumé, not contact details');
+ }finally{mocked.restore()}
+});
+
+test('provider credential failures never forge a vacancy or save a history entry',async()=>{
+ const {env,writes}=fixtureEnv({CF_PAGES_BRANCH:'main',
+  HHBA_MATCH_CLEAN_V2_ENABLED:'1'});
+ const previous=globalThis.fetch;
+ globalThis.fetch=async()=>new Response('invalid key',{status:401});
+ try{
+  const response=await onRequest({request:request('/resume',{
+   method:'POST',body:JSON.stringify({consent:true,
+    text:'求职意向城市：上海\n工作经历：'+QUOTE,
+    options:{country:'CN',remote_only:false,role_hint:'区域督导',limit:1}})
+  }),env});
+  assert.equal(response.status,502);
+  assert.equal((await response.json()).error,'AI_PROVIDER_KEY_REJECTED');
+  assert.equal(writes.some(x=>x.sql.includes('hhba_ai_match_history')),false);
+ }finally{globalThis.fetch=previous}
+});
