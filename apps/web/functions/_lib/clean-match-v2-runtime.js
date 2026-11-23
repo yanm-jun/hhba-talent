@@ -17,9 +17,11 @@ export function matchV2Runtime(env){
    if(parsed&&typeof parsed==='object'&&!Array.isArray(parsed))compact=parsed;
   }catch{}
  }
- const preview=env?.HHBA_AUTH_ROLLOUT==='preview'&&
-  env?.HHBA_PREVIEW_AI_DIAG_ENABLED==='1';
+ const diagEnabled=env?.HHBA_AUTH_ROLLOUT==='preview'&&
+  (env?.HHBA_PREVIEW_AI_DIAG_ENABLED==='1'||compact.diagEnabled===true);
+ const preview=diagEnabled;
  return {
+  diagEnabled,
   baseUrl:env?.HHBA_MATCH_OPENAI_BASE_URL||compact.baseUrl||'https://api.openai.com/v1',
   model:env?.HHBA_MATCH_OPENAI_MODEL||compact.model||'gpt-6.2-astra',
   matchEnabled:env?.HHBA_MATCH_CLEAN_V2_ENABLED==='1'||
