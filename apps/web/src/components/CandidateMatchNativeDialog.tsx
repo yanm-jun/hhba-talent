@@ -268,7 +268,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       !pending&&<div className="hhba-match-empty"><BriefcaseBusiness size={23}/>
        <h3>本轮没有找到符合条件的具体职位链接</h3>
        <p>简历已识别完成。本轮企业官网检索没有得到可推荐的具体岗位。</p>
-       {result.native_search?.searches!==undefined&&<p>DeepSeek / 搜索工具已检索 {result.native_search.searches} 次，
+       {result.native_search?.searches!==undefined&&<p>智能搜索已检索 {result.native_search.searches} 次，
         找到 {result.native_search.candidate_links??0} 条符合国内企业来源要求的职位网址。
        </p>}
        {result.native_search?.model_candidate_rows!==undefined&&<p>
