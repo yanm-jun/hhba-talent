@@ -22,7 +22,7 @@ export function selectProvider(env,task='resume_optimization',{reasoning=false}=
  // OpenAI. Production and other legacy services retain their own settings.
  const runtime=matchV2Runtime(env);
  const v2Word=runtime.wordEnabled&&
-  env?.HHBA_AUTH_ROLLOUT==='preview'&&env?.HHBA_PREVIEW_AI_DIAG_ENABLED==='1'&&
+  env?.HHBA_AUTH_ROLLOUT==='preview'&&runtime.diagEnabled&&
   ['resume_optimization','resume_rewrite','resume_reviewer'].includes(task);
  const requested=v2Word?'openai':clip(
   env?.['HHBA_AI_'+task.toUpperCase()+'_PROVIDER']||
