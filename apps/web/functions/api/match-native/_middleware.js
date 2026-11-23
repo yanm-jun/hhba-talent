@@ -2,8 +2,8 @@
  * Hard retirement of HHBA's old CV-matching engine.
  *
  * Cloudflare Pages Functions middleware is evaluated on live requests before
- * the old [[path]] handler, regardless of whether build-time CF_PAGES_BRANCH
- * was supplied to the runtime. Never execute legacy DeepSeek Search/Agent.
+ * the old [[path]] handler, independent of build-time environment details.
+ * Never execute legacy DeepSeek Search/Agent.
  *
  * This does NOT touch account, resume, history or JD archive data.
  */
