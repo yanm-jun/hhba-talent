@@ -111,3 +111,29 @@ test('OpenAI JSON transport does not swallow missing evidence as a valid rewrite
   assert.equal(got.checks[0].safe,false);
  }finally{globalThis.fetch=previous}
 });
+
+test('preview V2 Word author and reviewer inherit the approved relay without altering production',async()=>{
+ const env={...wordEnv,HHBA_MATCH_OPENAI_BASE_URL:'https://api-c.reqtoken.com/v1',
+  HHBA_MATCH_OPENAI_MODEL:'gpt-6.2-sol'};
+ const provider=selectProvider(env,'resume_rewrite');
+ assert.equal(provider.baseUrl,'https://api-c.reqtoken.com/v1');
+ assert.equal(provider.model,'gpt-6.2-sol');
+ assert.equal(selectProvider(env,'resume_reviewer').baseUrl,provider.baseUrl);
+ const previous=globalThis.fetch;
+ const calls=[];
+ globalThis.fetch=async(url,opts)=>{
+  calls.push({url,opts});
+  assert.equal(url,'https://api-c.reqtoken.com/v1/responses');
+  const body=JSON.parse(opts.body);
+  assert.equal(body.model,'gpt-6.2-sol');
+  assert.equal(body.store,false);
+  assert.equal(opts.headers.Authorization,'Bearer '+KEY);
+  return response({focus:['真实渠道运营工作']});
+ };
+ try{
+  const result=await completeJson(provider,'岗位定向 Word 编辑',{job,blocks},
+   AbortSignal.timeout(10000),3000);
+  assert.equal(result.focus[0],'真实渠道运营工作');
+  assert.equal(calls.length,1);
+ }finally{globalThis.fetch=previous}
+});
