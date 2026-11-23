@@ -5,6 +5,7 @@ import {selectCleanMatchProvider,openAIJson,openAISearch,openAIFetchOfficial,
 import {runCleanJobMatch} from '../functions/_lib/clean-match-v2.js';
 import {recognizeMatchResume} from '../functions/_lib/resume-jd-match-agent.js';
 import {onRequest} from '../functions/api/match-next/[[path]].js';
+import {selectProvider} from '../functions/_lib/resume-ai-provider.js';
 
 const URL='https://careers.tencent.com/jobdesc.html?postId=2097166275703910400';
 const fakeJob='<h1>腾讯社会招聘</h1><p>招聘单位：腾讯</p>'+
@@ -123,6 +124,18 @@ test('OpenAI readiness checks actual JSON and web_search, never returns a fake b
  const checked=await checkOpenAIMatchProvider(provider,{fetcher:testFetcher});
  assert.equal(checked.status,'READY');
  assert.deepEqual(checked.capabilities,['openai_responses_json','openai_web_search']);
+});
+
+
+test('Word writing provider stays on DeepSeek until explicitly opted into OpenAI',()=>{
+ const both={HHBA_MATCH_OPENAI_API_KEY:provider.key,
+  HHBA_MATCH_DEEPSEEK_KEY:'TEST_DEEPSEEK_KEY_NOT_REAL_98765'};
+ assert.equal(selectProvider(both,'resume_rewrite').name,'deepseek');
+ const opted={...both,HHBA_AI_DEFAULT_PROVIDER:'openai'};
+ const selected=selectProvider(opted,'resume_rewrite');
+ assert.equal(selected.name,'openai');
+ assert.equal(selected.model,'gpt-6.2-sol');
+ assert.equal(selected.key,provider.key);
 });
 
 test('match status reveals selected provider without leaking server API credentials',async()=>{
