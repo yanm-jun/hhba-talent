@@ -78,6 +78,9 @@ test('only single-employer job pages are considered, not foreign ATS, board or c
  assert.equal(isExactEmployerJobUrl(BAD),false);
  assert.equal(isExactEmployerJobUrl(BOARD),false);
  assert.equal(isExactEmployerJobUrl('https://careers.tencent.com/search.html'),false);
+ assert.equal(isExactEmployerJobUrl('https://talent.baidu.com/jobs/social-list'),false,
+  'social job list is not a specific posting even though /jobs/ appears in its path');
+ assert.equal(isExactEmployerJobUrl('https://talent.baidu.com/jobs/detail/SOCIAL/b49d8fee-0151-492b-8fc6-68bbab36b4dd'),true);
  assert.equal(isExactEmployerJobUrl('https://www.tencent.com'),false);
 });
 
@@ -360,7 +363,7 @@ test('underfilled Search triggers one adaptive wave and backfills a second real 
  const fetcher=async(url,opts)=>{
   const path=new URL(url).pathname,req=JSON.parse(opts.body);
   if(path==='/v1/tools/search'&&
-   /招聘 职位详情 工作地点 岗位职责|企业招聘 任职要求 职位申请/.test(req.query)){
+   req.query.includes('site:career.huawei.com/cn/job-details')){
    seen.push(req.query);
    return Response.json({results:[{url:HUAWEI,
     title:'华为 渠道运营主管 上海 职位',site_name:'华为招聘',
@@ -395,7 +398,8 @@ test('adaptive query planning never repeats prior terms and survives unavailable
  assert.equal(result.planning_error,'AI_PROVIDER_UPSTREAM_ERROR');
  assert.ok(result.queries.length>=1&&result.queries.length<=6);
  assert.ok(result.queries.every(x=>!used.includes(x)));
- assert.ok(result.queries.every(x=>x.includes('渠道运营')));
+ assert.ok(result.queries.every(x=>x.includes('site:')));
+ assert.ok(result.queries.some(x=>x.includes('渠道运营')));
 });
 
 test('only verbatim JD quotes and actual résumé fact IDs become user-visible evidence',()=>{
