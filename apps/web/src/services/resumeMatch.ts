@@ -150,7 +150,7 @@ export async function matchServiceReady(signal?:AbortSignal):Promise<boolean>{
   const response=await fetch(API+'/status',{method:'GET',credentials:'same-origin',cache:'no-store',signal});
   if(!response.ok||!(response.headers.get('content-type')||'').includes('json'))return false;
   const data=await response.json() as {kind?:string;enabled?:boolean};
-  return data.kind==='HHBA_NATIVE_WEB_MATCH_V1'&&data.enabled===true;
+  return data.kind==='HHBA_OPENAI_MATCH_V2'&&data.enabled===true;
  }catch{return false}
 }
 /** An authenticated, explicit-on-click provider probe for the isolated preview.
