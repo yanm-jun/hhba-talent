@@ -92,6 +92,39 @@ test('source-grounded vacancy requires explicit work city and real company/title
   duties_quote:'模型编造且不存在于页面的岗位职责内容'}),null);
 });
 
+test('Huawei mainland official job-details URL is accepted; markdown headings give real workplace evidence',()=>{
+ const url='https://career.huawei.com/cn/job-details?advertisementId=46681';
+ assert.equal(isExactEmployerJobUrl(url),true);
+ const body=[
+  '# 职位详情','## 法务合规专员','', '## 工作地点','', '上海',
+  '## 岗位职责','1、参与外管遵从合规风险识别与评估，并支持相关整改闭环。',
+  '## 任职要求','1、熟悉合规风险管理、法规检索与数据分析。'
+ ].join('\n');
+ const job=groundedVacancy({url,title:'职位详情',site:'华为招聘',content:body},{
+  company:'华为',title:'法务合规专员',
+  duties_quote:'参与外管遵从合规风险识别与评估',
+  requirements_quote:'熟悉合规风险管理、法规检索与数据分析'
+ });
+ assert.equal(job?.company,'华为');
+ assert.equal(job?.title,'法务合规专员');
+ assert.equal(job?.location,'上海');
+ assert.match(job?.duties||'',/风险识别/);
+ assert.equal(groundedVacancy({url,title:'职位详情',site:'华为招聘',
+  content:body.replace('## 工作地点\n\n上海','## 公司总部\n\n上海')},{
+   company:'华为',title:'法务合规专员',
+   duties_quote:'参与外管遵从合规风险识别与评估'
+  }),null,'headquarters cannot substitute for explicitly listed work city');
+});
+
+test('Markdown sections do not turn generic work-city headings into invented cities',()=>{
+ const url='https://career.huawei.com/cn/job-details?advertisementId=46681';
+ const generic=['职位名称：区域运营专员','公司名称：华为',
+  '## 工作地点','', '## 岗位职责',
+  '负责渠道管理与数据复盘。',
+  '## 任职要求','具备相关工作经验。'].join('\n');
+ assert.equal(groundedVacancy({url,title:'职位详情',site:'华为招聘',content:generic}),null);
+});
+
 test('Clean V2 finds real page via provider Search, reads JD and scores only with evidenced CV fact',async()=>{
  const {calls,fetcher}=makeFetcher(),activity=[],stage=[],partials=[];
  const result=await runCleanJobMatch('test-key',

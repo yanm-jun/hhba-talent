@@ -93,7 +93,7 @@ export function isExactEmployerJobUrl(url){
    !isMainlandEmployerJobUrl(url)||
    !isDirectEmployerSourceHit({url,source:''}))return false;
   const path=u.pathname.toLowerCase(),query=[...u.searchParams.keys()]
-   .some(x=>/^(?:post.?id|job.?id|position.?id|jobunionid|requisitionid|jobcode)$/i.test(x));
+   .some(x=>/^(?:post.?id|job.?id|position.?id|jobunionid|requisitionid|advertisementid|jobcode)$/i.test(x));
   if(/\/(?:search|index|list|jobs|positions|careers?|job-?list)(?:\.html?)?\/?$/.test(path)&&!query)return false;
   return /\/(?:job|jobs|position|vacancy|detail)\b/i.test(path)||query;
  }catch{return false}
@@ -140,19 +140,37 @@ export async function readEmployerPages(fetcher,key,sources,signal){
  }
  return {pages,attempts,failures};
 }
-function cityFromPage(content){
- const pattern=/(?:^|\n)\s*(?:[-*#]+\s*)?(?:工作地点|工作地址|工作城市|岗位地点|职位地点|办公地点|Work Location|Job Location)\s*[：:]\s*([^\n，。；;]{2,65})/gim;
- for(const m of String(content||'').matchAll(pattern)){
-  if(foreign.test(m[1]))continue;
-  const city=findMainlandCity(m[1]);
-  if(city&&isMainlandJobLocation(city))return city;
+// DeepSeek Fetch returns Markdown: headings and values may be on different lines.
+function markdownField(content,labels,max=140){
+ const rows=String(content||'').split(/\r?\n/).map(x=>x.trim()
+  .replace(/^#{1,6}\s*/,'').replace(/^[-*]\s+/,'')
+  .replace(/\*\*/g,'').replace(/^【(.+)】$/,'$1').trim());
+ const re=new RegExp('^(?:'+labels+')(?:[：:][ \t]*(.*))?$','i');
+ for(let i=0;i<rows.length;i++){
+  const match=rows[i].match(re);
+  if(!match)continue;
+  const value=match[1]?.trim()||rows.slice(i+1,i+4).find(x=>x.length>0)||'';
+  if(/^(?:岗位职责|任职要求|工作地点|工作城市|公司名称|职位名称|工作内容|学历要求|Job Location|Requirements)$/i.test(value))continue;
+  return clean(value,max);
  }
- return null;
+ return '';
+}
+function cityFromPage(content){
+ const place=markdownField(content,'工作地点|工作地址|工作城市|岗位地点|职位地点|办公地点|Work Location|Job Location',75);
+ if(!place||foreign.test(place))return null;
+ const city=findMainlandCity(place);
+ return city&&isMainlandJobLocation(city)?city:null;
 }
 function field(content,names,max=140){
- const m=String(content||'').match(new RegExp('(?:^|\\n)\\s*(?:[-*#]+\\s*)?(?:'+names+
-  ')\\s*[：:]\\s*([^\\n。；;]{2,'+max+'})','im'));
- return clean(m?.[1],max);
+ return markdownField(content,names,max);
+}
+function companyFromSearchSource(site){
+ const name=clean(site,80);
+ if(!/(?:招聘|careers?|jobs?)/i.test(name)||
+  /(?:招聘网|人才网|招聘平台|人才市场|求职网|招聘信息网|校就业网)/i.test(name))return '';
+ const brand=clean(name.replace(/(?:官方|社会|校园|人才|企业)?(?:招聘|careers?|jobs?).*$/i,'')
+  .split(/[|\s·]/)[0],65);
+ return brand.length>=2&&!/^(?:中国|企业|平台|人才|职位|官方|招聘)$/.test(brand)?brand:'';
 }
 function quotedIn(quote,body){
  if(!quote)return false;
@@ -163,7 +181,8 @@ export function groundedVacancy(page,proposal={}){
  if(!isExactEmployerJobUrl(page?.url)||!page?.content)return null;
  const location=cityFromPage(page.content);
  if(!location)return null;
- const company=clean(proposal.company||field(page.content,'招聘单位|招聘公司|公司名称|企业名称',70),95);
+ const company=clean(proposal.company||field(page.content,'招聘单位|招聘公司|公司名称|企业名称',70)||
+  companyFromSearchSource(page.site),95);
  const title=clean(proposal.title||field(page.content,'职位名称|岗位名称|招聘岗位|招聘职位',72),105);
  if(company.length<2||title.length<2||
   /^(?:职位详情|岗位详情|招聘信息|企业招聘|岗位列表)$/.test(company)||

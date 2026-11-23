@@ -11,6 +11,7 @@ import {recognizeResumeFile} from '../../_lib/resume-ocr.js';
 import {recognizeMatchResume} from '../../_lib/resume-jd-match-agent.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {runCleanJobMatch,MATCH_V2} from '../../_lib/clean-match-v2.js';
+import {archiveCleanMatchJobs} from '../../_lib/clean-match-v2-jd-bridge.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
 const headers={'Content-Type':'application/json; charset=utf-8',
@@ -56,15 +57,23 @@ async function workflow(env,session,input,redacted,{signal,onProgress,onActivity
  onProgress('planning');
  onActivity({stage:'planning',message:'识别到 '+(profile.facts?.length||0)+
   ' 条简历原文证据，将开始新的企业岗位研究流程。'});
- const {matches,diagnostic}=await runCleanJobMatch(env.HHBA_MATCH_DEEPSEEK_KEY,
+ const discovery=await runCleanJobMatch(env.HHBA_MATCH_DEEPSEEK_KEY,
   redacted,profile,input.options.role_hint,input.options.limit,{
    signal,onProgress,onActivity,onPartial,
    excludeUrls:input.options.exclude_urls||[]
   });
+ // This is a new, independent official-JD archive bridge, NOT the retired
+ // search Agent. It can unlock the unchanged, evidence-gated Word optimizer.
+ const jdStart=Date.now();
+ const archived=await archiveCleanMatchJobs(env,env.HHBA_MATCH_DEEPSEEK_KEY,
+  profile,discovery.matches,{signal,onActivity,onPartial});
+ const matches=archived.matches;
+ const diagnostic={...discovery.diagnostic,visible_jobs:matches.length,
+  jd_verification:archived.diagnostic};
  const result=publicResult(profile,matches,{
   ...diagnostic,phase_latency_ms:{resume_recognition:resumeMs,
-   discovery:diagnostic.elapsed_ms,
-   jd_finish_wait:0,evidence_research:0,total:Date.now()-started}
+   discovery:discovery.diagnostic.elapsed_ms,
+   jd_finish_wait:Date.now()-jdStart,evidence_research:0,total:Date.now()-started}
  },input.options.limit);
  // Only server-confirmed source jobs can create candidate history.
  try{
