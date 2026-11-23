@@ -172,7 +172,8 @@ test('failed model reasoning still permits only page-verified, unscored source f
  assert.equal(result.matches.length,1);
  assert.equal(result.matches[0].match_score,null);
  assert.equal(result.matches[0].official_url,JD_URL);
- assert.equal(result.diagnostic.model_failures,1);
+ assert.equal(result.diagnostic.model_failures,0,'directly verified JD must bypass paid extraction model');
+ assert.equal(result.diagnostic.model_pages_attempted,0);
  assert.equal(result.diagnostic.score_provider_error,'AI_PROVIDER_RESPONSE_INVALID');
 });
 
@@ -635,4 +636,5 @@ test('unreadable pages and missing JD identities are categorized without logging
  assert.equal(result.page_rejections.company_or_role_missing,1);
  assert.equal(result.page_rejections.invalid_detail_url,0);
  assert.equal(result.model_failures,0);
+ assert.equal(result.model_pages_attempted,1,'model sees only the one city-evidenced page needing extraction');
 });
