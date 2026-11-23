@@ -161,7 +161,7 @@ test('failed model reasoning still permits only page-verified, unscored source f
  assert.equal(result.matches[0].match_score,null);
  assert.equal(result.matches[0].official_url,JD_URL);
  assert.equal(result.diagnostic.model_failures,1);
- assert.equal(result.diagnostic.score_provider_error,undefined);
+ assert.equal(result.diagnostic.score_provider_error,'AI_PROVIDER_RESPONSE_INVALID');
 });
 
 test('no work-city evidence never becomes a scored or unscored vacancy',async()=>{
