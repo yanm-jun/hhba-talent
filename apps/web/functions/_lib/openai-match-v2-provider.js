@@ -10,7 +10,7 @@ export function openAIConfig(value){
  const key=typeof value==='string'?value:value?.key;
  const model=typeof value==='string'?DEFAULT_OPENAI_MATCH_MODEL:
   value?.model||DEFAULT_OPENAI_MATCH_MODEL;
- if(typeof key!=='string'||key.length<16)throw fail('AI_PROVIDER_NOT_CONFIGURED');
+ if(typeof key!=='string'||!key.trim())throw fail('AI_PROVIDER_NOT_CONFIGURED');
  if(typeof model!=='string'||!/^[a-zA-Z0-9._-]{3,80}$/.test(model))
   throw fail('AI_PROVIDER_MODEL_INVALID');
  return {key,model};
