@@ -11,6 +11,7 @@ import {safeJDSourceLocator,readFreshJobJdByUrl,saveVerifiedJobJd,
 import {directOfficialJobEvidence} from './official-job-evidence.js';
 import {compareMatchResumeToJd} from './resume-jd-match-agent.js';
 import {findMainlandCity} from './mainland-job-location.js';
+import {assessExperienceRequirement} from './match-hard-qualification.js';
 
 const norm=s=>String(s||'').normalize('NFKC').toLowerCase()
  .replace(/[\s._\-()（）【】]+/g,'')
@@ -76,18 +77,22 @@ export async function archiveCleanMatchJobs(env,key,profile,matches,{
      !jd.sections.some(x=>x.kind==='responsibilities'))
      throw Error('JD_IDENTITY_INCOMPATIBLE');
     diag.verified++;
+    const tenure=assessExperienceRequirement(jd.sections.filter(x=>x.kind==='requirements')
+     .map(x=>x.text).join('\n'),profile);
+    const blocked=['BELOW_MINIMUM','UNVERIFIED'].includes(tenure.status);
     let assessment=null;
-    try{assessment=await compare(key,profile,jd,{signal,timeoutMs:26000})}catch{}
+    if(!blocked){try{assessment=await compare(key,profile,jd,{signal,timeoutMs:26000})}catch{}}
     const score=Number.isInteger(assessment?.score)&&assessment.score>=0&&assessment.score<=100?
      assessment.score:null;
     if(score!==null)diag.scored++;
     out[index]={...job,company:jd.company,title:jd.title,title_zh:jd.title,
      location:jd.location,match_score:score,reference_score:score??0,
+     qualification_status:tenure.status,minimum_experience_years:tenure.requiredYears,
      score_basis:score!==null?'已核对企业完整岗位 JD 与简历原文证据；具体对应项见下方。':'完整岗位 JD 已核验，但本轮简历证据不足以给出可靠分数。',
-     recommendation_reason:score===null?
+     recommendation_reason:blocked?tenure.note:score===null?
       '已取得并保存本岗位完整官方 JD，简历适配分尚未取得充分证据；请逐项核对职位要求。':
       '已取得并保存本岗位完整官方 JD，以下为简历原文与职位要求的逐项对应。',
-     matched:[],not_evidenced:[],jd_comparisons:assessment?.comparisons||[],
+     matched:[],not_evidenced:blocked?[tenure.note]:[],jd_comparisons:assessment?.comparisons||[],
      jd_version_id:jd.id,jd_sha256:jd.jd_sha256,jd_checked_at:jd.checked_at,
      jd_source_status:'VERIFIED_JD',source_status:'OFFICIAL_JD_VERIFIED',
      jd_score_status:score===null?'INSUFFICIENT_RESUME_EVIDENCE':'AI_VERIFIED_JD_SCORED',
