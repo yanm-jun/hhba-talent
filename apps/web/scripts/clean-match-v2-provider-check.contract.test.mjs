@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {checkCleanMatchProvider,MATCH_V2_PREFLIGHT}
  from '../functions/_lib/clean-match-v2-provider-check.js';
 
@@ -51,12 +52,8 @@ test('balance or Search failure prevents a false READY despite working Fetch moc
   e=>e?.code==='AI_PROVIDER_KEY_REJECTED');
 });
 test('new matching backend route delegates provider-check to actual probe, never static READY',()=>{
- const {readFileSync}=requireFile();
  const route=readFileSync(new URL('../functions/api/match-next/[[path]].js',import.meta.url),'utf8');
  assert.match(route,/checkCleanMatchProvider/);
  assert.doesNotMatch(route,/return json\(\{ok:true,status:'READY',engine:MATCH_V2\}\)/);
  assert.match(route,/candidateSession\(env,request\)/);
 });
-function requireFile(){return {readFileSync:(...a)=>readFileSyncCompat(...a)}}
-function readFileSyncCompat(...args){return innerRead(...args)}
-import {readFileSync as innerRead} from 'node:fs';
