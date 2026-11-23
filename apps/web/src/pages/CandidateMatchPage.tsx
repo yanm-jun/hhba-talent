@@ -7,7 +7,7 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
+import {matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -36,6 +36,9 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
+ const [preflightAvailable,setPreflightAvailable]=useState(false);
+ const [preflightBusy,setPreflightBusy]=useState(false);
+ const [preflightNotice,setPreflightNotice]=useState('');
  const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10});
  const [working,setWorking]=useState(false);
  const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
@@ -52,6 +55,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  useEffect(()=>{
   const abort=new AbortController();
   void matchServiceReady(abort.signal).then(ok=>{if(!abort.signal.aborted)setAvailability(ok?'ready':'disabled')});
+  void matchPreviewPreflightAvailable(abort.signal).then(ok=>{if(!abort.signal.aborted)setPreflightAvailable(ok)});
   return()=>{abort.abort();controller.current?.abort();previewController.current?.abort()};
  },[]);
  useEffect(()=>{
@@ -247,6 +251,18 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    }
   }finally{setWorking(false);controller.current=null;}
  }
+ async function runPreviewPreflight(){
+  if(preflightBusy||!preflightAvailable||!user||!getRealAuthToken())return;
+  setPreflightBusy(true);setPreflightNotice('');
+  try{
+   const result=await runMatchPreviewProviderCheck();
+   setPreflightNotice(result.status==='READY'?
+    'DeepSeek 账户、Search、模型 JSON 和 Fetch 已通过本次真实接口预检。此结果不代表岗位搜索和 Word 优化已通过端到端验收。':
+    '接口预检未通过。');
+  }catch(e){
+   setPreflightNotice(e instanceof Error?e.message:'接口预检失败，请检查配置。');
+  }finally{setPreflightBusy(false)}
+ }
  return <Shell user={user} embedded={embedded}>
   <section className={embedded?'hhba-ai-page hhba-ai-page-embedded':'hhba-ai-page'}>
     {!embedded&&<nav className="hhba-ai-breadcrumb"><Link to="/candidate/account"><ArrowLeft size={15}/> 工作台</Link>
@@ -261,6 +277,14 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
        <LockKeyhole size={19}/><div><strong>岗位智能匹配后台正在重新开发。</strong>
        <p>此前搜索无法稳定提供真实岗位，已暂停这项服务的公开使用。你的个人简历和账户资料不会因此被清空。</p>
        <button type="button" onClick={()=>{setAvailability('loading');void matchServiceReady().then(ok=>setAvailability(ok?'ready':'disabled'))}}>重新检测服务状态</button>
+       {preflightAvailable&&<div className="hhba-ai-preview-diagnostic">
+        <p>预览验收专用：只检查 DeepSeek 接口能力，不读取你的简历，也不开放正式岗位匹配。</p>
+        {user&&getRealAuthToken()?<button type="button" disabled={preflightBusy}
+         onClick={()=>void runPreviewPreflight()}>
+          {preflightBusy?'正在检查 DeepSeek…':'检查 DeepSeek 接口'}
+         </button>:<p>请先登录预览测试账号，再执行接口预检。</p>}
+        {preflightNotice&&<p role="status">{preflightNotice}</p>}
+       </div>}
        </div></div>}
     <div className="hhba-ai-layout">
       <section className="hhba-ai-upload">
