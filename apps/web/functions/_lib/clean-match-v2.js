@@ -84,7 +84,7 @@ export async function planMatchSearch(fetcher,key,profile,hint,resume,signal){
    .filter(x=>x.length>=7&&!contact.test(x)&&!foreign.test(x));
   return {...fallback,queries:uniq([...fallback.queries.slice(0,4),...suggested,
    ...fallback.queries.slice(4)]).slice(0,10),planned:suggested.length};
- }catch(e){if(signal?.aborted)throw e;return {...fallback,planned:0}}
+ }catch(e){if(signal?.aborted)throw e;return {...fallback,planned:0,planning_error:e?.code||'AI_PROVIDER_UNAVAILABLE'}}
 }
 export function isExactEmployerJobUrl(url){
  try{
@@ -124,7 +124,7 @@ export async function findEmployerSources(fetcher,key,plan,signal){
   failures:errors.length,error_codes:uniq(errors).slice(0,4)};
 }
 export async function readEmployerPages(fetcher,key,sources,signal){
- const pages=[];let attempts=0,failures=0;
+ const pages=[],errors=[];let attempts=0,failures=0;
  const queue=sources.slice(0,24);
  for(let i=0;i<queue.length;i+=4){
   const part=await Promise.all(queue.slice(i,i+4).map(async row=>{
@@ -133,12 +133,13 @@ export async function readEmployerPages(fetcher,key,sources,signal){
     const data=await call(fetcher,key,'/v1/tools/fetch',{url:row.url},11000,signal);
     const content=typeof data?.content==='string'?data.content.slice(0,18000):'';
     if(content.replace(/\s/g,'').length>=100)return {...row,content};
-   }catch{}
+    errors.push('AI_FETCH_EMPTY_CONTENT');
+   }catch(e){errors.push(e?.code||'AI_PROVIDER_UPSTREAM_ERROR')}
    failures++;return null;
   }));
   pages.push(...part.filter(Boolean));
  }
- return {pages,attempts,failures};
+ return {pages,attempts,failures,error_codes:uniq(errors).slice(0,6)};
 }
 // DeepSeek Fetch returns Markdown: headings and values may be on different lines.
 function markdownField(content,labels,max=140){
@@ -220,7 +221,7 @@ export async function extractJobs(fetcher,key,pages,signal){
  }
  return {jobs,model_failures:failed,city_evidence:pages.filter(x=>cityFromPage(x.content)).length};
 }
-export async function scoreJobs(fetcher,key,profile,jobs,signal){
+export async function scoreJobs(fetcher,key,profile,jobs,signal,diagnostic={}){
  const facts=(profile?.facts||[]).slice(0,18)
   .filter(x=>typeof x?.quote==='string').map(x=>({id:x.id,quote:clean(x.quote,220)}));
  let answers=[];
@@ -232,7 +233,7 @@ export async function scoreJobs(fetcher,key,profile,jobs,signal){
      company:j.company,title:j.title,location:j.location,duties:j.duties,
      requirements:j.requirements}))},32000,signal);
    answers=Array.isArray(response.jobs)?response.jobs:[];
-  }catch{}
+  }catch(e){diagnostic.score_provider_error=e?.code||'AI_PROVIDER_UNAVAILABLE'}
  }
  const factIds=new Set(facts.map(x=>x.id));
  return jobs.map((j,i)=>{
@@ -269,12 +270,14 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
   provider_items:0,candidate_links:0,visible_jobs:0,discarded:0,
   elapsed_ms:0,stage:'planning',queries:0,search_failures:0,
   fetch_attempted:0,fetch_failures:0,city_evidence_count:0,
-  extracted_jobs:0,provider_error_codes:[]};
+  extracted_jobs:0,provider_error_codes:[],fetch_error_codes:[],
+  model_failures:0,score_provider_error:null,planning_error:null};
  const report=(stage,message,counts={})=>{
   d.stage=stage;onProgress(stage);onActivity({stage,message,...counts});
  };
  report('planning','正在规划适合的岗位方向及意向城市。');
  const plan=await planMatchSearch(fetcher,key,profile,hint,resume,signal);
+ d.planning_error=plan.planning_error||null;
  report('searching','AI 已规划 '+plan.queries.length+' 组国内企业岗位搜索。');
  const search=await findEmployerSources(fetcher,key,plan,signal);
  d.searches=search.queries-search.failures;d.queries=search.queries;
@@ -283,11 +286,13 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
  const sources=search.sources.filter(x=>!excludeUrls.includes(x.url));
  report('searching','完成 '+search.queries+' 组搜索，发现 '+sources.length+
   ' 条需要进一步核实的企业职位链接。',{searches:d.searches,candidate_links:sources.length});
- if(!sources.length){d.stage='no_employer_sources';d.elapsed_ms=Date.now()-start;
+ if(!sources.length){d.stage=search.failures===search.queries?
+  'search_provider_unavailable':'no_employer_sources';d.elapsed_ms=Date.now()-start;
   return {matches:[],diagnostic:d}}
  report('reading','正在读取具体职位详情，不能只依赖搜索摘要。');
  const read=await readEmployerPages(fetcher,key,sources,signal);
- d.fetch_attempted=read.attempts;d.page_reads=read.pages.length;d.fetch_failures=read.failures;
+ d.fetch_attempted=read.attempts;d.page_reads=read.pages.length;
+ d.fetch_failures=read.failures;d.fetch_error_codes=read.error_codes;
  report('reading','尝试读取 '+read.attempts+' 个网页，成功 '+read.pages.length+
   ' 个。',{pages_read:read.pages.length});
  if(!read.pages.length){d.stage='pages_unreadable';d.elapsed_ms=Date.now()-start;
@@ -295,10 +300,11 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
  report('researching','正在依据读取的岗位原文核对公司、职位和工作地点。');
  const extracted=await extractJobs(fetcher,key,read.pages,signal);
  d.extracted_jobs=extracted.jobs.length;d.city_evidence_count=extracted.city_evidence;
+ d.model_failures=extracted.model_failures;
  if(!extracted.jobs.length){d.stage='insufficient_job_evidence';d.elapsed_ms=Date.now()-start;
   return {matches:[],diagnostic:d}}
  report('scoring','已核实 '+extracted.jobs.length+' 条职位来源，正在对照真实简历证据。');
- const matches=await scoreJobs(fetcher,key,profile,extracted.jobs.slice(0,limit),signal);
+ const matches=await scoreJobs(fetcher,key,profile,extracted.jobs.slice(0,limit),signal,d);
  d.visible_jobs=matches.length;d.elapsed_ms=Date.now()-start;d.stage='complete';
  onPartial(matches);
  return {matches,diagnostic:d};
