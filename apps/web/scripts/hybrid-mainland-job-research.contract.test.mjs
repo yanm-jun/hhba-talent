@@ -149,6 +149,25 @@ test('neither provider returns job links: error remains actionable and keeps saf
   x.diagnostic?.hybrid_fallback?.searched===6);
 });
 
+test('default Agent also receives bounded company-first backup Search instead of returning an unexplained zero',async()=>{
+ let count=0,ranAgent=false;
+ const result=await runHybridMainlandJobResearch('fake-key','期望城市：上海','区域督导',10,{
+  search_engine:'standard',resumeProfile:evidence,
+  employerIndex:async()=>({available:true,considered:120,
+   queries:['华东汽车 区域督导 招聘 site:careers.hd-auto.cn','某零售集团 区域运营 招聘 site:careers.retail.cn']})
+ },{
+  native:async()=>{ranAgent=true;return {matches:[],diagnostic:{mode:'AGENT',searches:2}};},
+  search:async(_k,_cv,_role,options)=>{
+   count=options.queriesOverride.length;
+   return searchResponse([{url:OFFICIAL}],options.queriesOverride);
+  },
+  previews:()=>[job(OFFICIAL)]
+ });
+ assert.equal(ranAgent,true);
+ assert.equal(count,5,'normal Agent limits concurrent backup requests');
+ assert.equal(result.matches.length,1);
+ assert.equal(result.diagnostic.hybrid_fallback.index_companies_considered,120);
+});
 test('hybrid is wired to native trial, while normal AI-owned engine and authentic JD gates remain intact',()=>{
  const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
  assert.match(route,/runHybridMainlandJobResearch\(key,resume,roleHint,limit,options\)/);
