@@ -1,47 +1,25 @@
 /**
- * Explicit, candidate-authorized DeepSeek Search/Fetch/Responses readiness
- * probe. Runs only on demand and never sends a résumé, name, or user URL.
- * Unlike the previous static READY answer, every declared capability
- * must actually succeed before enabling a green result.
+ * Preview-only, explicitly user-authorized official OpenAI readiness check.
+ * No résumé, private account info, API key or candidate job history is sent.
+ * This is NOT end-to-end proof that public employer sites can be parsed.
  */
-import {checkMatchProviderCapabilities,providerStatusError}
- from './match-provider-preflight.js';
-
-const PUBLIC_TEST_URL='https://api-docs.deepseek.com/zh-cn/guides/search/';
+import {openAIJson,openAIEmployerSearch} from './openai-match-v2-provider.js';
+export const MATCH_V2_PREFLIGHT='HHBA_OPENAI_V2_LIVE_PROVIDER_PREFLIGHT';
 const fail=code=>Object.assign(new Error(code),{code});
-export const MATCH_V2_PREFLIGHT='HHBA_MATCH_V2_LIVE_PROVIDER_PREFLIGHT';
-
-export async function checkCleanMatchProvider(key,{
- fetcher=fetch,signal=null,fetchTimeoutMs=12000
+export async function checkCleanMatchProvider(provider,{
+ fetcher=fetch,signal=null
 }={}){
- const base=await checkMatchProviderCapabilities(key,{
-  fetcher,signal,timeoutMs:15000
- });
- const timeout=AbortSignal.timeout(fetchTimeoutMs);
- const merged=signal?AbortSignal.any([signal,timeout]):timeout;
- let response;
- try{
-  response=await fetcher('https://api.deepseek.com/v1/tools/fetch',{
-   method:'POST',redirect:'manual',signal:merged,
-   headers:{Authorization:'Bearer '+key,
-    Accept:'application/json','Content-Type':'application/json'},
-   body:JSON.stringify({url:PUBLIC_TEST_URL})
-  });
- }catch{
-  throw fail(signal?.aborted?'AI_MATCH_CANCELLED':'AI_FETCH_TIMEOUT');
- }
- if(!response.ok){
-  // Fetch 403 may be a target-site security block, not a rejected API key.
-  if(response.status===403)throw fail('AI_FETCH_ACCESS_DENIED');
-  const code=providerStatusError(response.status);
-  throw fail(code==='AI_SEARCH_API_REJECTED'?'AI_FETCH_API_REJECTED':code);
- }
- let payload;
- try{payload=await response.json()}catch{throw fail('AI_FETCH_RESPONSE_INVALID')}
- if(typeof payload?.content!=='string'||payload.content.trim().length<80)
-  throw fail('AI_FETCH_RESPONSE_INVALID');
+ const check=await openAIJson(fetcher,provider,
+  '仅返回 JSON 对象：{"ok":true}。不要输出其他内容。',
+  {task:'public model API readiness check; no user information'},20000,signal);
+ if(check?.ok!==true)throw fail('AI_PROVIDER_RESPONSE_INVALID');
+ // The hosted tool needs its own live check: plain JSON success is not Search.
+ const search=await openAIEmployerSearch(fetcher,provider,
+  '腾讯官网 社会招聘 职位详情',signal);
+ if(!Array.isArray(search?.results)||!search.results.length)
+  throw fail('AI_SEARCH_EMPTY_SOURCES');
  return {ok:true,status:'READY',kind:MATCH_V2_PREFLIGHT,
-  capabilities:[...base.capabilities,'deepseek_fetch'],
-  searches_returned:base.searches_returned,
-  fetch_content_verified:true};
+  capabilities:['openai_responses_json','openai_web_search_sources'],
+  searches_returned:search.results.length,
+  fetch_content_verified:false};
 }
