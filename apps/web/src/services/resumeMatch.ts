@@ -57,12 +57,17 @@ export type MatchResponse = {
   improved_job_count?:number;
   can_continue?:boolean;
 };
-export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
+export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];search_engine?:'standard'|'deepseek_native'};
 const API='/api/match-native';
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=3*1024*1024;
 const errorMap:Record<string,string>={
   MATCH_NOT_ENABLED:'智能匹配服务尚未开放，请稍后再试。',
+  AI_NATIVE_DEEPSEARCH_DISABLED:'原生深度搜索试用暂时关闭，请选择常规搜索。',
+  AI_NATIVE_DEEPSEARCH_TIMEOUT:'DeepSeek 原生深度搜索用时过长，本轮未完成，请尝试常规搜索。',
+  AI_NATIVE_DEEPSEARCH_INCOMPLETE:'DeepSeek 原生深度搜索未完整结束，未使用不完整结果。',
+  AI_NATIVE_DEEPSEARCH_FAILED:'DeepSeek 原生深度搜索执行失败，可切换常规搜索重试。',
+  AI_NATIVE_DEEPSEARCH_INVALID_ANSWER:'DeepSeek 本轮未返回合格岗位结构，请改用常规搜索重试。',
   MATCH_DATABASE_NOT_READY:'智能匹配额度保护尚未配置，已停止分析以防产生费用。',
   SESSION_INVALID:'请登录 HHBA 求职账户后重试。',
   FORBIDDEN:'当前账户无权使用求职者匹配服务。',
@@ -291,7 +296,8 @@ export async function submitExtractedResumeText(
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
    body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
     options:{country:'CN',remote_only:false,
-     role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10)),exclude_urls:opts.exclude_urls}})
+     role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10)),exclude_urls:opts.exclude_urls,
+     search_engine:opts.search_engine||'standard'}})
   }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
    if((e as Error)?.name==='AbortError')throw e;
    throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
