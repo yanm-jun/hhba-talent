@@ -208,9 +208,13 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
      {!pending&&result.native_search?.hybrid_fallback&&<p className="hhba-match-disclaimer" role="status">
       本轮国内企业补充搜索 {result.native_search.hybrid_fallback.queries??0} 组查询，
       发现 {result.native_search.hybrid_fallback.candidate_links??0} 条合规招聘来源，
-      其中 {result.native_search.hybrid_fallback.source_previews??0} 条已有职位与工作城市证据；
-      未核实完整 JD 的岗位仍会明确标注。
-      {result.native_search.native_error?' 主搜索未完整成功，已保留独立搜索取得的真实证据。':''}
+      已尝试打开 {result.native_search.hybrid_fallback.fetch_attempted??0} 个网页，
+      实际读取成功 {result.native_search.hybrid_fallback.fetched_job_pages??0} 个，
+      找到 {result.native_search.hybrid_fallback.explicit_work_city_sources??0} 条明确工作城市证据；
+      目前形成 {result.native_search.hybrid_fallback.source_previews??0} 条有职位与地点依据的待核实职位。
+      {result.native_search.native_error?' 主搜索未完整成功，另一路搜索已独立核对来源。':''}
+      {result.native_search.hybrid_fallback.candidate_links>0&&result.native_search.hybrid_fallback.source_previews===0?
+       '本轮仍未完成职位信息核实，不代表没有适合的岗位。':''}
      </p>}
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {!pending&&result.history_status==='SAVED'&&<div className="hhba-match-history-confirm">
@@ -273,8 +277,8 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
        ))}
       </div>:
       !pending&&<div className="hhba-match-empty"><BriefcaseBusiness size={23}/>
-       <h3>本轮没有找到符合条件的具体职位链接</h3>
-       <p>简历已识别完成。本轮企业官网检索没有得到可推荐的具体岗位。</p>
+       <h3>本轮暂未确认可推荐的具体岗位</h3>
+       <p>简历识别已完成；本轮搜索未能取得足够的职位名称、实际工作地点和来源证据。不能据此认为市场上没有适合的工作。</p>
        {result.native_search?.searches!==undefined&&<p>智能搜索已检索 {result.native_search.searches} 次，
         找到 {result.native_search.candidate_links??0} 条符合国内企业来源要求的职位网址。
        </p>}
