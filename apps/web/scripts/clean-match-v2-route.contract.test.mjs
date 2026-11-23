@@ -437,3 +437,67 @@ test('QA audit sanitization rejects URLs, raw page text, names and malicious pro
  assert.deepEqual(x.error_codes,['AI_PROVIDER_TIMEOUT']);
  assert.doesNotMatch(JSON.stringify(x),/13911110000|个人简历|example.com|secret/);
 });
+
+
+test('focused operator QA uses real Search/Fetch/JD extraction but not private history or unsupported score claims',async()=>{
+ const {env,writes}=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
+ const mock=installProviderMock();
+ const origin='https://5f88e175.hhba-talent.pages.dev';
+ try{
+  const response=await onRequest({request:new Request(origin+'/api/match-next/operator-run',{
+   method:'POST',headers:{Origin:origin,'X-HHBA-QA-Token':QA_TOKEN,
+    'Content-Type':'application/json'},
+   body:JSON.stringify({consent:true,scenario:'automotive_operations_v1',
+    mode:'focused',request_id:'d96592c5-f571-4f35-bddf-4d256fa4d1f5'})
+  }),env});
+  assert.equal(response.status,200);
+  const output=await response.json();
+  assert.equal(output.mode,'focused');
+  assert.equal(output.status,'COMPLETED_PARTIAL');
+  assert.equal(output.summary.searches,6);
+  assert.equal(output.summary.page_reads,1);
+  assert.equal(output.summary.extracted_jobs,1);
+  assert.equal(output.summary.visible_jobs,1);
+  assert.equal(output.matches[0].jd_source_status,'PARTIAL_SOURCE');
+  assert.equal(output.matches[0].match_score,undefined);
+  assert.ok(mock.calls.some(x=>x.path==='/v1/tools/search'));
+  assert.ok(mock.calls.some(x=>x.path==='/v1/tools/fetch'));
+  assert.equal(mock.calls.filter(x=>x.path==='/responses').length,1);
+  assert.equal(writes.some(x=>x.sql.includes('hhba_ai_match_history')),false);
+ }finally{mock.restore()}
+});
+
+test('operator retries with identical request_id cannot invoke the paid pipeline twice',async()=>{
+ const {env}=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
+ const original=env.HHBA_PNVS_AUTH_DB.prepare.bind(env.HHBA_PNVS_AUTH_DB);
+ const id='d96592c5-f571-4f35-bddf-4d256fa4d1f5';
+ let begun=0;
+ env.HHBA_PNVS_AUTH_DB.prepare=sql=>{
+  if(sql.includes('INSERT INTO hhba_match_qa_runs'))return {
+   bind(){return {async run(){
+    begun++;if(begun>1)throw Error('UNIQUE constraint');
+    return {success:true,meta:{changes:1}};
+   }}}
+  };
+  if(sql.includes('SELECT id FROM hhba_match_qa_runs WHERE id=?'))return{
+   bind(x){return{async first(){return{id:x}}}}
+  };
+  return original(sql);
+ };
+ const mock=installProviderMock();
+ const origin='https://5f88e175.hhba-talent.pages.dev';
+ const request=()=>new Request(origin+'/api/match-next/operator-run',{
+  method:'POST',headers:{Origin:origin,'X-HHBA-QA-Token':QA_TOKEN,
+   'Content-Type':'application/json'},
+  body:JSON.stringify({consent:true,scenario:'automotive_operations_v1',
+   mode:'focused',request_id:id})
+ });
+ try{
+  assert.equal((await onRequest({request:request(),env})).status,200);
+  const before=mock.calls.length;
+  const replay=await onRequest({request:request(),env});
+  assert.equal(replay.status,409);
+  assert.deepEqual(await replay.json(),{run_id:id,status:'ALREADY_STARTED'});
+  assert.equal(mock.calls.length,before);
+ }finally{mock.restore()}
+});
