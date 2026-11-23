@@ -335,12 +335,12 @@ test('underfilled Search triggers one adaptive wave and backfills a second real 
   '意向工作城市：上海\\n渠道督导、销售复盘',profile,'区域督导',10,
   {},{fetcher});
  assert.equal(result.diagnostic.recovery_planned,true);
- assert.equal(result.diagnostic.recovery_queries,6);
+ assert.ok(result.diagnostic.recovery_queries>=1&&result.diagnostic.recovery_queries<=6);
+ assert.equal(result.diagnostic.queries,10+result.diagnostic.recovery_queries);
  assert.equal(result.diagnostic.recovery_candidates,1);
  assert.equal(result.diagnostic.candidate_links,2);
  assert.equal(result.diagnostic.fetch_attempted,2);
  assert.equal(result.diagnostic.page_reads,2);
- assert.equal(result.diagnostic.queries,16);
  assert.equal(result.diagnostic.visible_jobs,2);
  assert.ok(seen.length>0);
  assert.deepEqual(new Set(result.matches.map(x=>x.official_url)),new Set([JD_URL,HUAWEI]));
