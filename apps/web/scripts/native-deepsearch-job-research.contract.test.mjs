@@ -132,13 +132,40 @@ test('a real streaming native deep-search session forwards tool progress and sou
  assert.ok(activity.every(x=>!JSON.stringify(x).includes('已脱敏的门店运营简历')));
 });
 
+test('SSE read_page completion exposes an actually opened single job as a JD review lead',async()=>{
+ const listing={...sourceItem,action:{type:'search',
+  queries:['上海 企业岗位'],sources:[{type:'url',
+   url:'https://careers.tencent.com/search.html',title:'腾讯招聘首页'}]}};
+ const opened={type:'web_search_call',id:'read-job',status:'completed',
+  kind:'deep_search',action:{type:'open_page',url:OFFICIAL},
+  page:{url:OFFICIAL,title:'腾讯 销售运营主管'}};
+ const final={...modelResponse([row()]),output:[listing,opened,
+  {type:'message',content:[{type:'output_text',text:JSON.stringify({jobs:[row()]})}]}]};
+ const urls=[];
+ const out=await runNativeDeepSearchJobs('synthetic','去标识化的岗位经历','区域督导',10,
+  {onSources:(_jobs,_closed,links)=>urls.push(...links)},
+  {fetcher:async()=>asSse([
+   {type:'response.output_item.done',item:listing},
+   {type:'response.output_item.done',item:opened},
+   {type:'response.completed',response:final}
+  ])});
+ assert.deepEqual(urls,[OFFICIAL]);
+ assert.equal(out.matches.length,1);
+ assert.equal(out.diagnostic.search_result_links,0);
+ assert.equal(out.diagnostic.opened_job_pages,1);
+ assert.equal(out.diagnostic.model_candidate_rows,1);
+ assert.equal(out.diagnostic.model_source_grounded,1);
+});
+
 test('missing native Search calls or a provider failure cannot present model-invented job links',async()=>{
  const noSearch={status:'completed',
   output:[{type:'message',content:[{type:'output_text',text:JSON.stringify({jobs:[row()]})}]}],
   usage:{server_tool_use:{tool_search:0,tool_fetch:0}}};
  await assert.rejects(runNativeDeepSearchJobs('test-key','简历','督导',10,{},{
   fetcher:async()=>asSse([{type:'response.completed',response:noSearch}])
- }),e=>e.code==='AI_EMPLOYER_JOBS_NOT_FOUND');
+ }),e=>e.code==='AI_EMPLOYER_JOBS_NOT_FOUND'&&
+  e.diagnostic?.research_error==='NO_ELIGIBLE_EMPLOYER_JOB_SOURCES'&&
+  e.diagnostic?.searches===0&&e.diagnostic?.candidate_links===0);
  await assert.rejects(runNativeDeepSearchJobs('test-key','简历','督导',10,{},{
   fetcher:async()=>asSse([{type:'response.failed',response:{status:'failed',error:{code:'server_error'}}}])
  }),e=>e.code==='AI_NATIVE_DEEPSEARCH_FAILED');
