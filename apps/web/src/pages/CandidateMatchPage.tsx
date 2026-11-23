@@ -294,7 +294,9 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
        <LockKeyhole size={19}/><div><strong>岗位智能匹配后台正在重新开发。</strong>
        <p>此前搜索无法稳定提供真实岗位，已暂停这项服务的公开使用。你的个人简历和账户资料不会因此被清空。</p>
        <button type="button" onClick={()=>{setAvailability('loading');void matchServiceReady().then(ok=>setAvailability(ok?'ready':'disabled'))}}>重新检测服务状态</button>
-       {preflightAvailable&&<div className="hhba-ai-preview-diagnostic">
+       </div></div>}
+     {/* Preview provider checks must be visible independently of the matching-service state. */}
+     {preflightAvailable&&<div className="hhba-ai-preview-diagnostic">
         <p>预览验收专用：只检查已配置 AI 服务的接口能力，不读取你的简历，也不开放正式岗位匹配。</p>
         {user&&getRealAuthToken()?<button type="button" disabled={preflightBusy}
          onClick={()=>void runPreviewPreflight()}>
@@ -340,7 +342,6 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          </div>}
         </div>}
        </div>}
-       </div></div>}
     <div className="hhba-ai-layout">
       <section className="hhba-ai-upload">
         <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>支持 Word（DOCX）和 PDF，最大 3 MB。</p></header>
