@@ -261,20 +261,22 @@ export async function readEmployerPages(fetcher,key,sources,signal,{targetSucces
 // DeepSeek Fetch returns Markdown: headings and values may be on different lines.
 function markdownField(content,labels,max=140){
  const rows=String(content||'').split(/\r?\n/).map(x=>x.trim()
-  .replace(/^#{1,6}\s*/,'').replace(/^[-*]\s+/,'')
-  .replace(/\*\*/g,'').replace(/^【(.+)】$/,'$1').trim());
- const re=new RegExp('^(?:'+labels+')(?:[：:][ \t]*(.*))?$','i');
+  .replace(/^#{1,6}\s*/,'').replace(/^(?:>\s*|[-*•]\s+|\d{1,2}[.、]\s+)/,'')
+  .replace(/\*\*/g,'').replace(/^【(.+)】$/,'$1')
+  .replace(/^\|\s*|\s*\|$/g,'').trim());
+ const re=new RegExp('^(?:'+labels+')(?:\\s*[：:|｜][ \\t]*(.*))?$','i');
+ const heading=/^(?:岗位职责|任职要求|工作地点|工作城市|工作地址|工作内容|职位名称|岗位名称|公司名称|招聘单位|学历要求|Job Location|Work Location|Requirements)$/i;
  for(let i=0;i<rows.length;i++){
   const match=rows[i].match(re);
   if(!match)continue;
-  const value=match[1]?.trim()||rows.slice(i+1,i+4).find(x=>x.length>0)||'';
-  if(/^(?:岗位职责|任职要求|工作地点|工作城市|公司名称|职位名称|工作内容|学历要求|Job Location|Requirements)$/i.test(value))continue;
+  const value=match[1]?.trim()||rows.slice(i+1,i+4).find(x=>x.length>0&&!heading.test(x))||'';
+  if(heading.test(value))continue;
   return clean(value,max);
  }
  return '';
 }
 function cityFromPage(content){
- const place=markdownField(content,'工作地点|工作地址|工作城市|岗位地点|职位地点|办公地点|Work Location|Job Location',75);
+ const place=markdownField(content,'工作地点|工作地址|工作城市|工作地|工作区域|岗位地点|岗位工作地点|职位地点|职位工作地点|职位城市|上班地点|招聘地点|办公地点|办公城市|Work Location|Job Location|Location',90);
  if(!place||foreign.test(place))return null;
  const city=findMainlandCity(place);
  return city&&isMainlandJobLocation(city)?city:null;
@@ -295,30 +297,73 @@ function quotedIn(quote,body){
  const a=clean(quote,220).replace(/\s/g,''),b=String(body).replace(/\s/g,'');
  return a.length>=8&&b.includes(a);
 }
-export function groundedVacancy(page,proposal={}){
- if(!isExactEmployerJobUrl(page?.url)||!page?.content)return null;
+// Only independently recognized employer-owned domain families can supply
+// a fallback company name, and the brand must still be written in fetched JD
+// or the source metadata. It is NEVER proof that a job is currently open.
+function officialDomainBrand(url){
+ try{
+  const h=new URL(url).hostname.toLowerCase();
+  return ({
+   'careers.tencent.com':'腾讯','career.huawei.com':'华为',
+   'talent.baidu.com':'百度','jobs.bytedance.com':'字节跳动',
+   'zhaopin.meituan.com':'美团','zhaopin.jd.com':'京东'
+  })[h]||'';
+ }catch{return ''}
+}
+function titleFromJobHeading(content){
+ const lines=String(content||'').split(/\r?\n/).slice(0,26);
+ const jobRole=/(?:运营|督导|销售|主管|经理|专员|顾问|工程师|研发|设计|产品|财务|法务|数据|渠道|市场|负责人|分析师|总监|助理|实习)/;
+ for(const line of lines){
+  const m=line.match(/^\s*#{1,3}\s+(.{2,85})$/);
+  if(!m)continue;
+  const candidate=m[1].replace(/\*\*/g,'').trim();
+  if(candidate.length>65||!jobRole.test(candidate)||
+   /^(?:招聘职位|全部职位|更多职位|企业招聘|职位详情|岗位职责|任职要求|公司介绍|招聘岗位列表)/.test(candidate))continue;
+  return candidate;
+ }
+ return '';
+}
+// Inspect the evidence for EACH fetched page. No contents, URLs, CV, or
+// employer names enter diagnostic logs, only bounded aggregate counts.
+export function inspectGroundedVacancy(page,proposal={}){
+ const reject=reason=>({job:null,reason});
+ if(!isExactEmployerJobUrl(page?.url))return reject('invalid_detail_url');
+ if(typeof page?.content!=='string'||!page.content.trim())return reject('empty_page');
  const location=cityFromPage(page.content);
- if(!location)return null;
- const company=clean(proposal.company||field(page.content,'招聘单位|招聘公司|公司名称|企业名称',70)||
-  companyFromSearchSource(page.site),95);
- const title=clean(proposal.title||field(page.content,'职位名称|岗位名称|招聘岗位|招聘职位',72),105);
+ if(!location)return reject('work_city_missing');
+ const company=clean(proposal.company||field(page.content,
+  '招聘单位|招聘公司|公司名称|企业名称|所属公司|所属企业',70)||
+  companyFromSearchSource(page.site)||officialDomainBrand(page.url),95);
+ const title=clean(proposal.title||field(page.content,
+  '职位名称|岗位名称|招聘岗位|招聘职位|职位名|岗位名',72)||
+  titleFromJobHeading(page.content),105);
  if(company.length<2||title.length<2||
   /^(?:职位详情|岗位详情|招聘信息|企业招聘|岗位列表)$/.test(company)||
-  /^(?:职位详情|岗位详情|招聘职位|岗位列表|职位列表)$/.test(title))return null;
- if(!page.content.includes(company)&&!page.site.includes(company)&&!page.title.includes(company))return null;
- if(!page.content.includes(title)&&!page.title.includes(title))return null;
+  /^(?:职位详情|岗位详情|招聘职位|岗位列表|职位列表)$/.test(title))
+  return reject('company_or_role_missing');
+ if(!page.content.includes(company)&&!(page.site||'').includes(company)&&
+  !(page.title||'').includes(company))return reject('employer_identity_missing');
+ if(!page.content.includes(title)&&!(page.title||'').includes(title))
+  return reject('role_title_unverified');
  const duties=clean(proposal.duties_quote||field(page.content,
-  '岗位职责|工作职责|职位描述|工作内容',200),240);
+  '岗位职责|工作职责|职责描述|职位职责|职位描述|工作内容|主要职责',200),240);
  const requirements=clean(proposal.requirements_quote||field(page.content,
-  '任职要求|任职资格|岗位要求|资格要求',200),240);
- if(duties&&!quotedIn(duties,page.content))return null;
- if(requirements&&!quotedIn(requirements,page.content))return null;
- if(!duties&&!requirements)return null;
- return {company,title,location,duties,requirements,url:page.url,
-  excerpt:clean(page.content,1300),source_title:page.title};
+  '任职要求|任职资格|岗位要求|资格要求|职位要求|应聘要求',200),240);
+ if(duties&&!quotedIn(duties,page.content))return reject('duties_quote_unverified');
+ if(requirements&&!quotedIn(requirements,page.content))return reject('requirements_quote_unverified');
+ if(!duties&&!requirements)return reject('no_verbatim_jd_fields');
+ return {job:{company,title,location,duties,requirements,url:page.url,
+  excerpt:clean(page.content,1300),source_title:page.title},reason:null};
+}
+export function groundedVacancy(page,proposal={}){
+ return inspectGroundedVacancy(page,proposal).job;
 }
 export async function extractJobs(fetcher,key,pages,signal){
  const jobs=[],seen=new Set();let failed=0;
+ const rejects={invalid_detail_url:0,empty_page:0,work_city_missing:0,
+  company_or_role_missing:0,employer_identity_missing:0,
+  role_title_unverified:0,duties_quote_unverified:0,
+  requirements_quote_unverified:0,no_verbatim_jd_fields:0};
  for(let i=0;i<pages.length;i+=4){
   const batch=pages.slice(i,i+4);
   let rows=[];
@@ -331,12 +376,16 @@ export async function extractJobs(fetcher,key,pages,signal){
   }catch{failed++}
   for(let j=0;j<batch.length;j++){
    const page=batch[j],p=rows.find(x=>x?.id==='p'+(i+j+1))||{};
-   const job=groundedVacancy(page,p)||groundedVacancy(page,{});
-   if(!job||seen.has(job.url))continue;
-   seen.add(job.url);jobs.push(job);
+   const first=inspectGroundedVacancy(page,p);
+   const fallback=first.job?first:inspectGroundedVacancy(page,{});
+   if(!fallback.job){if(rejects[fallback.reason]!==undefined)rejects[fallback.reason]++;continue}
+   if(seen.has(fallback.job.url))continue;
+   seen.add(fallback.job.url);jobs.push(fallback.job);
   }
  }
- return {jobs,model_failures:failed,city_evidence:pages.filter(x=>cityFromPage(x.content)).length};
+ return {jobs,model_failures:failed,
+  city_evidence:pages.filter(x=>cityFromPage(x.content)).length,
+  page_rejections:rejects};
 }
 /** Verify model-cited JD phrases and resume fact IDs against input evidence.
  * Unanchored reasons never become user-visible credentials or a numeric score.
@@ -433,6 +482,7 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
   elapsed_ms:0,stage:'planning',queries:0,search_failures:0,
   fetch_attempted:0,fetch_failures:0,city_evidence_count:0,
   extracted_jobs:0,provider_error_codes:[],fetch_error_codes:[],
+  extraction_page_rejections:{},
   model_failures:0,score_provider_error:null,planning_error:null,
   source_batches:0,source_backfill_attempts:0,source_exhausted:false,
   recovery_planned:false,recovery_queries:0,recovery_candidates:0,
@@ -518,6 +568,8 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
   const extracted=await extractJobs(fetcher,key,read.pages,signal);
   d.city_evidence_count+=extracted.city_evidence;
   d.model_failures+=extracted.model_failures;
+  for(const [k,v] of Object.entries(extracted.page_rejections))
+   d.extraction_page_rejections[k]=(d.extraction_page_rejections[k]||0)+v;
   for(const job of extracted.jobs){
    if(!seenJobs.has(job.url)){seenJobs.add(job.url);jobs.push(job)}
   }

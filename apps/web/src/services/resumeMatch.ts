@@ -60,6 +60,11 @@ export type MatchResponse = {
    fetch_failures?:number;city_evidence_count?:number;extracted_jobs?:number;
    provider_error_codes?:string[];fetch_error_codes?:string[];
    model_failures?:number;score_provider_error?:string|null;planning_error?:string|null;
+   extraction_page_rejections?:{invalid_detail_url?:number;empty_page?:number;
+    work_city_missing?:number;company_or_role_missing?:number;
+    employer_identity_missing?:number;role_title_unverified?:number;
+    duties_quote_unverified?:number;requirements_quote_unverified?:number;
+    no_verbatim_jd_fields?:number};
    source_batches?:number;source_backfill_attempts?:number;source_exhausted?:boolean;
    search_raw_results?:number;search_empty_queries?:number;
    search_rejection_counts?:{no_url?:number;non_employer?:number;not_detail?:number;

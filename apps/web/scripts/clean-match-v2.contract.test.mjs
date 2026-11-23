@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preferredCities,fallbackPlan,isExactEmployerJobUrl,groundedVacancy,
- runCleanJobMatch,findEmployerSources,readEmployerPages,planRecoverySearch,officialDetailRecoveryQueries,diversifyEmployerSources,groundedMatchExplanations,scoreJobs,rankCleanMatchResults,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
+ runCleanJobMatch,findEmployerSources,readEmployerPages,planRecoverySearch,officialDetailRecoveryQueries,diversifyEmployerSources,inspectGroundedVacancy,extractJobs,groundedMatchExplanations,scoreJobs,rankCleanMatchResults,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
 import {onRequest} from '../functions/api/match-next/[[path]].js';
 import {onRequest as legacyMatchRoute} from '../functions/api/match-native/[[path]].js';
 
@@ -566,4 +566,73 @@ test('site-specific second wave recovers an employer JD after ten empty generic 
  assert.equal(x.matches[0].official_url,official);
  assert.equal(x.matches[0].location,'上海');
  assert.equal(x.matches[0].company,'百度');
+});
+
+
+test('real employer Markdown headings, numbered sections and table cells can yield a grounded job without inventing evidence',()=>{
+ const url='https://career.huawei.com/cn/job-details?advertisementId=46681';
+ const content=[
+  '# 华为社会招聘','## 渠道运营主管',
+  '| 招聘单位 | 华为 |',
+  '| 工作城市 | 上海 |',
+  '## 岗位职责','1. 负责中国大陆渠道经营和销售漏斗的数据分析与定期复盘。',
+  '## 任职要求','1. 具备渠道沟通与跨部门项目协作能力，能够根据指标提出具体改进建议。',
+  '申请说明：请通过企业官方招聘详情页查询实时开放情况。'
+ ].join('\n');
+ const assessed=inspectGroundedVacancy({
+  url,title:'华为 渠道运营主管',site:'华为',content
+ });
+ assert.equal(assessed.reason,null);
+ assert.equal(assessed.job.company,'华为');
+ assert.equal(assessed.job.title,'渠道运营主管');
+ assert.equal(assessed.job.location,'上海');
+ assert.match(assessed.job.duties,/渠道经营/);
+ assert.match(assessed.job.requirements,/跨部门项目协作/);
+ assert.equal(assessed.job.url,url);
+});
+
+test('a company headquarters or role search title is never substituted for missing explicit work-city evidence',()=>{
+ const base={
+  url:'https://career.huawei.com/cn/job-details?advertisementId=46681',
+  title:'华为 渠道运营主管 上海招聘',site:'华为',
+  content:[
+   '# 华为社会招聘','## 渠道运营主管',
+   '| 公司总部 | 上海 |',
+   '## 岗位职责','1. 负责渠道运营和团队协作，以及数据复盘。',
+   '## 任职要求','1. 熟悉企业销售流程和数据管理。'
+  ].join('\n')
+ };
+ assert.equal(inspectGroundedVacancy(base).reason,'work_city_missing');
+ assert.equal(inspectGroundedVacancy({...base,
+  content:base.content.replace('| 公司总部 | 上海 |','| 工作城市 | 东京 |')
+ }).reason,'work_city_missing');
+ assert.equal(inspectGroundedVacancy({...base,
+  content:base.content.replace('| 公司总部 | 上海 |','| 工作城市 | 上海 |')
+ }).reason,null);
+});
+
+test('unreadable pages and missing JD identities are categorized without logging external content',async()=>{
+ const url='https://careers.tencent.com/jobdesc.html?postId=2097166275703910400';
+ const valid=['腾讯社会招聘','招聘单位：腾讯','职位名称：销售运营主管',
+  '工作地点：上海','岗位职责：负责渠道运营和销售数据复盘工作',
+  '任职要求：具有销售数据分析经验和跨团队协作能力'].join('\n');
+ const noCity=valid.replace('工作地点：上海','公司总部：上海');
+ const noRole=valid.replace('职位名称：销售运营主管','公司说明：腾讯的区域管理部门');
+ const pages=[
+  {url,title:'腾讯销售运营主管',site:'腾讯招聘',content:noCity},
+  {url:url.replace('postId=2097166275703910400','postId=2097166275703910401'),
+   title:'职位详情',site:'腾讯招聘',content:noRole},
+  {url:url.replace('postId=2097166275703910400','postId=2097166275703910402'),
+   title:'腾讯销售运营主管',site:'腾讯招聘',content:valid}
+ ];
+ const result=await extractJobs(async(_url,opts)=>{
+  assert.equal(new URL(_url).pathname,'/responses');
+  return reply({jobs:[]});
+ },'mock',pages);
+ assert.equal(result.jobs.length,1);
+ assert.equal(result.city_evidence,2);
+ assert.equal(result.page_rejections.work_city_missing,1);
+ assert.equal(result.page_rejections.company_or_role_missing,1);
+ assert.equal(result.page_rejections.invalid_detail_url,0);
+ assert.equal(result.model_failures,0);
 });
