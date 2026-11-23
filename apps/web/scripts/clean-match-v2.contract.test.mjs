@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preferredCities,fallbackPlan,isExactEmployerJobUrl,groundedVacancy,
- runCleanJobMatch,diversifyEmployerSources,groundedMatchExplanations,scoreJobs,rankCleanMatchResults,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
+ runCleanJobMatch,planRecoverySearch,diversifyEmployerSources,groundedMatchExplanations,scoreJobs,rankCleanMatchResults,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
 import {onRequest} from '../functions/api/match-next/[[path]].js';
 import {onRequest as legacyMatchRoute} from '../functions/api/match-native/[[path]].js';
 
@@ -135,8 +135,11 @@ test('Clean V2 finds real page via provider Search, reads JD and scores only wit
    onPartial:x=>partials.push(...x)
   },{fetcher});
  assert.equal(result.diagnostic.mode,MATCH_V2);
- assert.equal(result.diagnostic.queries,10);
- assert.equal(result.diagnostic.searches,10);
+ assert.equal(result.diagnostic.queries,16,'scarce first-round results trigger six additional queries');
+ assert.equal(result.diagnostic.searches,16);
+ assert.equal(result.diagnostic.recovery_planned,true);
+ assert.equal(result.diagnostic.recovery_queries,6);
+ assert.equal(result.diagnostic.recovery_candidates,0,'same employer URL is not a new job');
  assert.equal(result.diagnostic.candidate_links,1,'duplicate Search sources are not job count');
  assert.equal(result.diagnostic.fetch_attempted,1);
  assert.equal(result.diagnostic.page_reads,1);
@@ -232,7 +235,8 @@ test('single failed search does not masquerade as zero market demand when anothe
  const result=await runCleanJobMatch('test','期望工作城市：上海',profile,'区域督导',10,{}, {fetcher:partial});
  assert.equal(result.matches.length,1);
  assert.equal(result.diagnostic.search_failures,1);
- assert.equal(result.diagnostic.searches,9);
+ assert.equal(result.diagnostic.searches,15);
+ assert.equal(result.diagnostic.recovery_queries,6);
  assert.deepEqual(result.diagnostic.provider_error_codes,['AI_PROVIDER_UPSTREAM_ERROR']);
  assert.equal(result.diagnostic.stage,'complete');
 });
@@ -303,6 +307,56 @@ test('location-less first 24 employer pages do not hide a valid later official v
  assert.equal(result.matches[0].official_url,urls[24]);
  assert.equal(result.matches[0].location,'上海');
  assert.ok(stages.includes('researching')&&stages.includes('scoring'));
+});
+
+test('underfilled Search triggers one adaptive wave and backfills a second real employer JD',async()=>{
+ const {fetcher:base}=makeFetcher(),seen=[];
+ const HUAWEI='https://career.huawei.com/cn/job-details?advertisementId=46681';
+ const other=[
+  '华为社会招聘','公司名称：华为','职位名称：渠道运营主管',
+  '工作地点：上海','岗位职责：负责销售渠道管理、区域业务分析与跨部门项目协调执行',
+  '任职要求：熟悉企业运营指标、渠道经营管理和数据分析方法，能够协调多部门落实年度经营计划',
+  '岗位说明：本岗位职位信息可供求职者在企业招聘页面核对，并以招聘方最新官方公示为准'
+ ].join('\\n');
+ const fetcher=async(url,opts)=>{
+  const path=new URL(url).pathname,req=JSON.parse(opts.body);
+  if(path==='/v1/tools/search'&&
+   /招聘 职位详情 工作地点 岗位职责|企业招聘 任职要求 职位申请/.test(req.query)){
+   seen.push(req.query);
+   return Response.json({results:[{url:HUAWEI,
+    title:'华为 渠道运营主管 上海 职位',site_name:'华为招聘',
+    summary:'岗位职责、工作城市、任职要求'}]});
+  }
+  if(path==='/v1/tools/fetch'&&req.url===HUAWEI)
+   return Response.json({content:other});
+  return base(url,opts);
+ };
+ const result=await runCleanJobMatch('test-key',
+  '意向工作城市：上海\\n渠道督导、销售复盘',profile,'区域督导',10,
+  {},{fetcher});
+ assert.equal(result.diagnostic.recovery_planned,true);
+ assert.equal(result.diagnostic.recovery_queries,6);
+ assert.equal(result.diagnostic.recovery_candidates,1);
+ assert.equal(result.diagnostic.candidate_links,2);
+ assert.equal(result.diagnostic.fetch_attempted,2);
+ assert.equal(result.diagnostic.page_reads,2);
+ assert.equal(result.diagnostic.queries,16);
+ assert.equal(result.diagnostic.visible_jobs,2);
+ assert.ok(seen.length>0);
+ assert.deepEqual(new Set(result.matches.map(x=>x.official_url)),new Set([JD_URL,HUAWEI]));
+ assert.ok(result.matches.every(x=>x.location==='上海'));
+ assert.ok(result.matches.every(x=>x.evidence_status==='PARTIAL_SOURCE'));
+});
+
+test('adaptive query planning never repeats prior terms and survives unavailable reasoning model',async()=>{
+ const used=['渠道运营 上海 社会招聘 职位详情 企业官网'];
+ const fetcher=async()=>new Response('error',{status:503});
+ const result=await planRecoverySearch(fetcher,'test',
+  {roles:['渠道运营'],cities:['上海']},{previousQueries:used});
+ assert.equal(result.planning_error,'AI_PROVIDER_UPSTREAM_ERROR');
+ assert.ok(result.queries.length>=1&&result.queries.length<=6);
+ assert.ok(result.queries.every(x=>!used.includes(x)));
+ assert.ok(result.queries.every(x=>x.includes('渠道运营')));
 });
 
 test('only verbatim JD quotes and actual résumé fact IDs become user-visible evidence',()=>{
