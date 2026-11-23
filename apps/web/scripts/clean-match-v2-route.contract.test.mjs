@@ -145,6 +145,23 @@ test('preview-only opt-in permits authenticated live preflight while matching st
  }finally{globalThis.fetch=previous}
 });
 
+test('preview provider check emits safe stage and status for a gateway failure',async()=>{
+ const {env}=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
+ const previous=globalThis.fetch;
+ let calls=0;
+ globalThis.fetch=async()=>{calls++;return new Response('SECRET=never-expose-this',{status:503})};
+ try{
+  const res=await onRequest({request:previewRequest('/provider-check'),env});
+  assert.equal(res.status,502);
+  const output=await res.json();
+  assert.deepEqual(output,{ok:false,error:'AI_PROVIDER_UPSTREAM_ERROR',
+   stage:'basic_responses',upstream_status:503});
+  assert.equal(calls,1);
+  assert.ok(!JSON.stringify(output).includes('never-expose-this'));
+  assert.ok(!JSON.stringify(output).includes(KEY));
+ }finally{globalThis.fetch=previous}
+});
+
 test('production cannot opt into pre-launch probe without the real release gate',async()=>{
  for(const branch of ['main',undefined]){
   const {env}=fixtureEnv({CF_PAGES_BRANCH:branch,
