@@ -177,6 +177,36 @@ test('AI source recovery can identify a fetched role, but may not invent links, 
  assert.equal(result.diagnostic.hybrid_fallback.model_recovered,1);
 });
 
+test('incomplete native deep search preserves independent opened public sources even when the final model answer fails',async()=>{
+ const incomplete=Object.assign(new Error('AI_NATIVE_DEEPSEARCH_INCOMPLETE'),{
+  code:'AI_NATIVE_DEEPSEARCH_INCOMPLETE',
+  diagnostic:{searches:4,page_reads:3,candidate_links:1},
+  public_sources:[{url:OFFICIAL,title:'职位详情',site_name:'腾讯招聘',
+   summary:'腾讯官方招聘职位详情'}]
+ });
+ let fetchedNative=0;
+ const result=await runHybridMainlandJobResearch('test-key',
+  '已脱敏的汽车行业门店运营工作经验','区域督导',10,{
+  resumeProfile:evidence
+ },{
+  native:async()=>{throw incomplete},
+  search:async(_k,_cv,_role,o)=>searchResponse([],o.queriesOverride),
+  enrich:async(_k,leads)=>{
+   fetchedNative+=leads.length;
+   return {hits:leads.map(x=>({...x,
+    content:'职位名称：销售运营主管 工作地点：上海。 招聘单位：腾讯。 岗位职责：负责渠道销售运营、商务团队协作、门店数据分析与转化复盘。 任职资格：了解市场销售管理与零售运营流程。',
+    availability:{status:'UNKNOWN'}
+   })),fetches:leads.length};
+  }
+ });
+ assert.equal(fetchedNative,1);
+ assert.deepEqual(result.matches.map(x=>x.official_url),[OFFICIAL]);
+ assert.equal(result.matches[0].match_score,null);
+ assert.equal(result.diagnostic.native_error,'AI_NATIVE_DEEPSEARCH_INCOMPLETE');
+ assert.equal(result.diagnostic.hybrid_fallback.native_source_salvage_attempted,1);
+ assert.equal(result.diagnostic.hybrid_fallback.native_source_salvage_jobs,1);
+});
+
 test('hybrid native search also uses bounded company-index hints without treating old company URLs as live jobs',async()=>{
  const indexQueries=['华东汽车 区域督导 社会招聘 site:careers.hd-auto.cn',
   '新创零售 渠道运营 社会招聘 site:career.retail-example.cn'];
