@@ -96,7 +96,7 @@ function installProviderMock(){
 }
 
 test('preview-only opt-in permits authenticated live preflight while matching stays disabled',async()=>{
- const {env}=fixtureEnv({HHBA_MATCH_V2_PREFLIGHT_ENABLED:'1'});
+ const {env}=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
  const status=await (await onRequest({request:previewRequest('/status'),env})).json();
  assert.equal(status.enabled,false);
  assert.equal(status.preflight_available,true);
@@ -135,7 +135,7 @@ test('preview-only opt-in permits authenticated live preflight while matching st
 test('production cannot opt into pre-launch probe without the real release gate',async()=>{
  for(const branch of ['main',undefined]){
   const {env}=fixtureEnv({CF_PAGES_BRANCH:branch,
-   HHBA_MATCH_V2_PREFLIGHT_ENABLED:'1'});
+   HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
   const status=await (await onRequest({request:request('/status'),env})).json();
   assert.equal(status.enabled,false);
   assert.equal(status.preflight_available,false);
