@@ -5,7 +5,7 @@
  * OCR and private match history. Old deepsearch/hybrid/ATS/checkpoint logic
  * is not imported and cannot influence this endpoint.
  */
-import {sessionOfBearer,getUserByPhone,sha256Hex} from '../../_lib/real-auth.js';
+import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {recognizeResumeFile} from '../../_lib/resume-ocr.js';
 import {recognizeMatchResume} from '../../_lib/resume-jd-match-agent.js';
@@ -53,27 +53,6 @@ const previewPreflight=(env,request)=>{
  }catch{return false}
 };
 const mayCheckProvider=(env,request)=>enabled(env)||previewPreflight(env,request);
-// Reuse the EXISTING isolated preview D1 quota table. A single conditional
-// SQL INSERT is atomic: max four live expensive sample runs globally per
-// UTC day and two per candidate. No new binding, migration, or user CV storage.
-// Never refund ambiguous provider errors: upstream calls may still be billed.
-async function reserveSyntheticAcceptance(env,phone){
- if(typeof env?.HHBA_MATCH_LIMIT_PEPPER!=='string'||
-  env.HHBA_MATCH_LIMIT_PEPPER.length<24)return null;
- const day=new Date().toISOString().slice(0,10),id=crypto.randomUUID();
- const identity='v2qa:'+await sha256Hex(
-  env.HHBA_MATCH_LIMIT_PEPPER+':v2qa:'+phone);
- const db=env.HHBA_PNVS_AUTH_DB;
- const table=await db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='hhba_resume_match_requests'").first();
- if(table?.name!=='hhba_resume_match_requests')return null;
- const reserved=await db.prepare(
-  'INSERT INTO hhba_resume_match_requests(request_id,day_utc,account_hash,created_at) '+
-  'SELECT ?,?,?,? WHERE '+
-  "(SELECT COUNT(*) FROM hhba_resume_match_requests WHERE day_utc=? AND account_hash LIKE 'v2qa:%')<4 AND "+
-  '(SELECT COUNT(*) FROM hhba_resume_match_requests WHERE day_utc=? AND account_hash=?)<2'
- ).bind(id,day,identity,new Date().toISOString(),day,day,identity).run();
- return reserved?.success===true&&reserved?.meta?.changes===1;
-}
 async function candidateSession(env,request){
  const session=await sessionOfBearer(env.HHBA_PNVS_AUTH_DB,request,Date.now());
  if(!session)return null;
@@ -237,13 +216,10 @@ export async function onRequest({request,env}){
   if(sampleRequest?.scenario!==ACCEPTANCE_SCENARIO||
    Object.keys(sampleRequest).some(k=>!['consent','scenario'].includes(k)))
    return fail('INVALID_SYNTHETIC_CHECK_REQUEST',400);
-  // Reserve the budget BEFORE any model / Search / Fetch request.
-  // A missing DB table or secret must fail closed, never cost the project money.
-  let reserved;
-  try{reserved=await reserveSyntheticAcceptance(env,session.phone)}
-  catch{return fail('MATCH_SYNTHETIC_QUOTA_UNAVAILABLE',503)}
-  if(reserved===null)return fail('MATCH_SYNTHETIC_QUOTA_UNAVAILABLE',503);
-  if(reserved!==true)return fail('MATCH_SYNTHETIC_LIMIT',429);
+  // No per-day or per-account QA cap: repeated authorized preview runs are
+  // needed for diagnosing real Search/Fetch/JD failures. Still require login,
+  // same-origin consent, a fixed server-side synthetic résumé and preview-only
+  // hostname; no match history or real candidate résumé is used.
   const input={options:{country:'CN',remote_only:false,
    role_hint:'汽车区域督导 销售运营',limit:10,exclude_urls:[]},
    resume_id:null};

@@ -40,7 +40,6 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [preflightBusy,setPreflightBusy]=useState(false);
  const [preflightNotice,setPreflightNotice]=useState('');
  const [syntheticBusy,setSyntheticBusy]=useState(false);
- const [syntheticStarted,setSyntheticStarted]=useState(false);
  const [syntheticStage,setSyntheticStage]=useState<NativeMatchProgress>('preparing');
  const [syntheticActivity,setSyntheticActivity]=useState<NativeMatchActivity|null>(null);
  const [syntheticResult,setSyntheticResult]=useState<MatchResponse|null>(null);
@@ -270,8 +269,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   }finally{setPreflightBusy(false)}
  }
  async function runSyntheticAcceptance(){
-  if(!preflightAvailable||syntheticStarted||syntheticBusy||!user||!getRealAuthToken())return;
-  setSyntheticBusy(true);setSyntheticStarted(true);setSyntheticError('');
+  if(!preflightAvailable||syntheticBusy||!user||!getRealAuthToken())return;
+  setSyntheticBusy(true);setSyntheticError('');
   setSyntheticResult(null);setSyntheticStage('preparing');setSyntheticActivity(null);
   try{
    const result=await runMatchPreviewSyntheticAcceptance(undefined,
@@ -305,9 +304,10 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
         {user&&getRealAuthToken()&&<div className="hhba-ai-preview-acceptance">
          <p><strong>下一关：完整岗位搜索验收（虚构简历）</strong></p>
          <p>使用固定的虚构汽车运营简历，实际调用 DeepSeek 查找最多 10 条中国大陆企业岗位，读取 JD 并评分。不会读取你的简历，也不会将结果存入你的匹配历史。运行会产生真实 API 调用费用。</p>
-         <button type="button" disabled={syntheticStarted||syntheticBusy}
+         <button type="button" disabled={syntheticBusy}
           onClick={()=>void runSyntheticAcceptance()}>
-          {syntheticBusy?'正在执行真实岗位搜索…':syntheticStarted?'本页已经执行过一次验收':'用虚构简历验证真实岗位搜索'}
+          {syntheticBusy?'正在执行真实岗位搜索…':
+           syntheticResult||syntheticError?'重新运行虚构简历岗位搜索':'用虚构简历验证真实岗位搜索'}
          </button>
          {syntheticBusy&&<p role="status">当前阶段：{syntheticStage} · {syntheticActivity?.message||'正在准备真实企业岗位检索…'}</p>}
          {syntheticError&&<p role="alert">验收未通过：{syntheticError}</p>}
