@@ -43,6 +43,7 @@ export function selectProvider(env,task='resume_optimization',{reasoning=false}=
   String(env?.HHBA_AI_DEEPSEEK_REASONING_EFFORT||'').toLowerCase())?
   String(env.HHBA_AI_DEEPSEEK_REASONING_EFFORT).toLowerCase():'max';
  return {name:requested,...PROVIDERS[requested],key,model:model.trim(),
+  ...(v2Word?{v2Responses:true}:{}),
   ...(requested==='deepseek'&&deepseekWriter?{reasoningEffort:effort}:{})};
 }
 export function parseSuggestions(raw,allowedBlockIds){
@@ -103,7 +104,7 @@ export async function generateSuggestions({env,blocks,job,signal,documentContext
   output_format_example:sample,
   instructions:'严格输出符合示例字段名的JSON对象，不要复制示例建议内容；blockId必须是blocks中的id；一份段落至多一条建议。完整简历上下文用于理解结构，不能把其他段落里的经历、数字或资格写进当前段落。'});
  let url,headers,body;
- if(provider.name==='openai'){
+ if(provider.v2Responses===true){
   // The latest OpenAI models require Responses, not legacy Chat Completions.
   const parsed=await openAIJson(fetch,provider,system,JSON.parse(input),
    documentContext?120000:60000,signal,
