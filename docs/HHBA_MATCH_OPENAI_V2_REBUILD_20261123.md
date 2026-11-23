@@ -23,6 +23,14 @@ V2 不允许调用 DeepSeek，不使用「兼容 OpenAI」的第三方网关，�
 - `HHBA_PREVIEW_AI_DIAG_ENABLED=1`：仅用于 Cloudflare **preview hostname** 的明确授权诊断。
 - `HHBA_MATCH_CLEAN_V2_ENABLED=0`：验收前在**生产**保持关闭。**不要将预览诊断设置复制到正式站。**
 
+### Word 简历优化迁移（预览隔离）
+- 可在独立预览环境配置 `HHBA_MATCH_OPENAI_WORD_V2_ENABLED=1`。**仅当** `HHBA_AUTH_ROLLOUT=preview` 且 `HHBA_PREVIEW_AI_DIAG_ENABLED=1` 时，Word 的 `resume_optimization`、`resume_rewrite` 和 `resume_reviewer` 才会被强制改走 OpenAI。
+- Word 使用 V2 的 `HHBA_MATCH_OPENAI_API_KEY` 和 `HHBA_MATCH_OPENAI_MODEL`；没有有效 OpenAI Key 则报告未配置，**不静默回退 DeepSeek**。
+- `generateSuggestions` 和 `completeJson` 对 OpenAI 使用 Responses API，覆盖定向建议、整篇撰写、独立事实审核和 Agent 续写。原本非 OpenAI 的 provider 行为不变。
+- Word 改写仍要求已经可信核验的 JD 身份、签名续写 checkpoint、求职者登录、明确授权；所有建议还需要用户确认，不应直接修改原始简历。
+- 这并**不会**把整个网站的所有遗留 AI 服务切成 OpenAI，也不会让预览环境自动开放生产功能；原有 Word 独立发布和合规开关仍需配置。
+- 回归测试：`apps/web/scripts/clean-match-v2-openai-word.contract.test.mjs`；必须继续运行既有 Word / JD archive / 页面回归测试。
+
 V2 官方接口固定到 `https://api.openai.com/v1/responses`；其它 provider 不会被自动回退调用。V2 部署不要求/读取 `HHBA_MATCH_DEEPSEEK_KEY`。原本停用的旧匹配后端文件未被删除，以免影响不相关遗留服务。
 
 ## 验收状态与边界
