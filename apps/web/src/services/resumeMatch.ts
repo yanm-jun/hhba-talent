@@ -143,6 +143,45 @@ export async function matchServiceReady(signal?:AbortSignal):Promise<boolean>{
   return data.kind==='HHBA_NATIVE_WEB_MATCH_V1'&&data.enabled===true;
  }catch{return false}
 }
+/** An authenticated, explicit-on-click provider probe for the isolated preview.
+ * Never sends résumé data and never works from the public production hostname.
+ */
+const isCleanV2PreviewHost=()=>typeof window!=='undefined'&&
+ window.location.hostname.endsWith('.hhba-talent.pages.dev')&&
+ window.location.hostname!=='hhba-talent.pages.dev';
+export async function matchPreviewPreflightAvailable(signal?:AbortSignal):Promise<boolean>{
+ if(!isCleanV2PreviewHost()||!realAuthReady)return false;
+ try{
+  const response=await fetch(API+'/status',{
+   method:'GET',credentials:'same-origin',cache:'no-store',signal
+  });
+  if(!response.ok)return false;
+  const data=await response.json() as {enabled?:boolean;preflight_available?:boolean};
+  return data.enabled===false&&data.preflight_available===true;
+ }catch{return false}
+}
+export async function runMatchPreviewProviderCheck(signal?:AbortSignal):Promise<{
+ status:'READY';capabilities:string[];fetch_content_verified:boolean
+}>{
+ if(!isCleanV2PreviewHost())throw new MatchError(403,'只能在独立的 HHBA 预览环境中执行接口预检。');
+ const token=session();
+ const response=await fetch(API+'/provider-check',{
+  method:'GET',credentials:'same-origin',cache:'no-store',signal,
+  headers:{Authorization:'Bearer '+token}
+ }).catch(error=>{
+  if(error?.name==='AbortError')throw error;
+  throw new MatchError(503,'预览环境暂时无法连接接口预检服务。');
+ });
+ const data=await response.json().catch(()=>null) as {
+  ok?:boolean;status?:string;capabilities?:string[];error?:string;
+  fetch_content_verified?:boolean
+ }|null;
+ if(!response.ok||data?.ok!==true||data?.status!=='READY'||
+  !Array.isArray(data.capabilities)||data.fetch_content_verified!==true)
+  throw new MatchError(response.status,errorMap[data?.error||'']||
+   'DeepSeek 接口预检未通过，请检查预览环境配置。');
+ return {status:'READY',capabilities:data.capabilities,fetch_content_verified:true};
+}
 /** Best-effort browser redaction before submitting text to HHBA's server. */
 export function redactResumeTextLocally(text:string):string{
  return text
