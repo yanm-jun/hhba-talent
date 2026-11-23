@@ -104,6 +104,29 @@ export async function planMatchSearch(fetcher,key,profile,hint,resume,signal){
  * vacancies. Never treat search snippets as vacancies or invent URLs.
  * This uses only non-sensitive role, city and public source metadata.
  */
+// Known official employer career-detail URL families, NOT a claimed job list.
+// Only Search may supply URLs; each returned page still requires Fetch, work
+// city, exact JD quotation, and independent official JD identity checks.
+// A generic search returning no *detail URLs* must not cause empty Fetch.
+const OFFICIAL_DETAIL_SEARCH_SITES=[
+ 'site:talent.baidu.com/jobs/detail/SOCIAL/',
+ 'site:careers.tencent.com/jobdesc.html',
+ 'site:career.huawei.com/cn/job-details',
+ 'site:jobs.bytedance.com/experienced/position/',
+ 'site:zhaopin.meituan.com/web/position/detail',
+ 'site:zhaopin.jd.com/web/job-info-detail'
+];
+export function officialDetailRecoveryQueries(plan){
+ const candidates=uniq((plan?.roles||[])
+  .flatMap(x=>String(x).split(/[、，,/\s]+/))
+  .map(role).filter(x=>x.length>=2));
+ const synonyms=/(?:区域|督导|门店|销售|渠道|汽车|市场|运营)/.test(candidates.join(' '))?
+  ['渠道运营','销售运营','市场运营']:[];
+ const terms=uniq([...candidates,...synonyms]);
+ const fallback=terms.length?terms:['岗位'];
+ return OFFICIAL_DETAIL_SEARCH_SITES.map((site,i)=>
+  clean(fallback[i%fallback.length]+' 招聘 '+site,128));
+}
 export async function planRecoverySearch(fetcher,key,plan,
  {previousQueries=[],candidates=[],jobs=[]}={},signal){
  const used=new Set(previousQueries.map(x=>clean(x,128)));
@@ -128,7 +151,10 @@ export async function planRecoverySearch(fetcher,key,plan,
   if(signal?.aborted)throw e;
   planningError=e?.code||'AI_PROVIDER_UNAVAILABLE';
  }
- return {queries:uniq([...suggested,...fallback])
+ // Always prioritize six employer-specific recovery searches when the first
+ // wave has zero/insufficient evidence. Generic model suggestions follow only
+ // if a targeted query is already in the previous batch.
+ return {queries:uniq([...officialDetailRecoveryQueries(plan),...suggested,...fallback])
   .filter(x=>x.length>=7&&!used.has(x)).slice(0,6),
   planning_error:planningError};
 }
@@ -167,28 +193,44 @@ export function diversifyEmployerSources(rows){
 }
 export async function findEmployerSources(fetcher,key,plan,signal){
  const seen=new Set(),all=[],errors=[];
+ // Aggregate counters only; never log a URL, résumé, query, API response or
+ // provider key. The previous 0-Fetch output could not distinguish an empty
+ // Search index from over-strict official-detail filtering.
+ const rejects={no_url:0,non_employer:0,not_detail:0,duplicate:0,
+  empty_metadata:0,foreign_title:0};
+ let rawResults=0,emptyQueries=0;
  for(let i=0;i<plan.queries.length;i+=5)await Promise.all(plan.queries.slice(i,i+5).map(async query=>{
   try{
    const data=await call(fetcher,key,'/v1/tools/search',{query,count:25,
     need_content:false},12500,signal);
    if(!Array.isArray(data?.results))throw err('AI_SEARCH_RESPONSE_INVALID');
+   rawResults+=data.results.length;
+   if(!data.results.length)emptyQueries++;
    for(const row of data.results){
-    if(!isExactEmployerJobUrl(row?.url)||seen.has(row.url))continue;
+    if(typeof row?.url!=='string'||!row.url){rejects.no_url++;continue}
+    const site=clean(row?.site_name||row?.source,90);
+    if(!isDirectEmployerSourceHit({url:row.url,source:site})){
+     rejects.non_employer++;continue;
+    }
+    if(!isExactEmployerJobUrl(row.url)){rejects.not_detail++;continue}
+    if(seen.has(row.url)){rejects.duplicate++;continue}
     const title=clean(row?.title,160),summary=clean(row?.summary||row?.snippet,1000);
-    if(!title&&!summary)continue;
-    if(foreign.test(title)&&!plan.cities.some(x=>title.includes(x)))continue;
-    seen.add(row.url);all.push({url:row.url,title,summary,
-     site:clean(row?.site_name||row?.source,90)});
+    if(!title&&!summary){rejects.empty_metadata++;continue}
+    if(foreign.test(title)&&!(plan.cities||[]).some(x=>title.includes(x))){
+     rejects.foreign_title++;continue;
+    }
+    seen.add(row.url);all.push({url:row.url,title,summary,site});
    }
   }catch(e){errors.push(e.code||'AI_PROVIDER_UPSTREAM_ERROR')}
  }));
  const weight=x=>{const text=x.title+' '+x.summary;
-  return (plan.roles.some(r=>text.includes(r))?5:0)+
-   (plan.cities.some(c=>text.includes(c))?5:0)+
+  return ((plan.roles||[]).some(r=>text.includes(r))?5:0)+
+   ((plan.cities||[]).some(c=>text.includes(c))?5:0)+
    (/(?:岗位职责|任职要求|工作地点)/.test(text)?3:0)};
  all.sort((a,b)=>weight(b)-weight(a));
- return {sources:diversifyEmployerSources(all).slice(0,70),queries:plan.queries.length,
-  failures:errors.length,error_codes:uniq(errors).slice(0,4)};
+ return {sources:diversifyEmployerSources(all).slice(0,70),
+  queries:plan.queries.length,raw_results:rawResults,empty_queries:emptyQueries,
+  rejection_counts:rejects,failures:errors.length,error_codes:uniq(errors).slice(0,4)};
 }
 export async function readEmployerPages(fetcher,key,sources,signal,{targetSuccesses=8}={}){
  const pages=[],errors=[];let attempts=0,failures=0;
@@ -382,6 +424,7 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
  const fetcher=deps.fetcher||fetch,start=Date.now();
  const d={mode:MATCH_V2,model:'deepseek-v4-pro',searches:0,page_reads:0,
   provider_items:0,candidate_links:0,visible_jobs:0,discarded:0,
+  search_raw_results:0,search_empty_queries:0,search_rejection_counts:{},
   elapsed_ms:0,stage:'planning',queries:0,search_failures:0,
   fetch_attempted:0,fetch_failures:0,city_evidence_count:0,
   extracted_jobs:0,provider_error_codes:[],fetch_error_codes:[],
@@ -399,10 +442,14 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
  const search=await findEmployerSources(fetcher,key,plan,signal);
  d.searches=search.queries-search.failures;d.queries=search.queries;
  d.search_failures=search.failures;d.provider_error_codes=search.error_codes;
- d.candidate_links=search.sources.length;d.provider_items=search.sources.length;
+ d.candidate_links=search.sources.length;d.provider_items=search.raw_results;
+ d.search_raw_results=search.raw_results;
+ d.search_empty_queries=search.empty_queries;
+ d.search_rejection_counts=search.rejection_counts;
  let sources=search.sources.filter(x=>!excludeUrls.includes(x.url));
- report('searching','完成 '+search.queries+' 组搜索，发现 '+sources.length+
-  ' 条需要进一步核实的企业职位链接。',{searches:d.searches,candidate_links:sources.length});
+ report('searching','完成 '+search.queries+' 组搜索：检索源返回 '+search.raw_results+
+  ' 条原始结果，其中 '+sources.length+' 条符合企业职位详情链接初筛。',{
+   searches:d.searches,raw_results:d.search_raw_results,candidate_links:sources.length});
  if(!sources.length&&search.failures===search.queries){
   d.stage='search_provider_unavailable';d.elapsed_ms=Date.now()-start;
   return {matches:[],diagnostic:d}}
@@ -435,10 +482,17 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
    const novel=supplemental.sources.filter(x=>!known.has(x.url));
    sources=[...sources,...novel];
    d.recovery_candidates=novel.length;
-   d.candidate_links=sources.length;d.provider_items=sources.length;
-   report('searching','第二轮新增 '+novel.length+' 条不同的企业职位链接；累计 '+sources.length+
-    ' 条候选链接，已验证 '+jobs.length+' 条岗位。',{
-    searches:d.searches,candidate_links:sources.length,recovery_candidates:novel.length});
+   d.candidate_links=sources.length;
+   d.search_raw_results+=supplemental.raw_results;
+   d.provider_items=d.search_raw_results;
+   d.search_empty_queries+=supplemental.empty_queries;
+   for(const [k,v] of Object.entries(supplemental.rejection_counts))
+    d.search_rejection_counts[k]=(d.search_rejection_counts[k]||0)+v;
+   report('searching','第二轮搜索额外返回 '+supplemental.raw_results+
+    ' 条原始结果，其中 '+novel.length+' 条是新的企业职位详情链接；累计 '+
+    sources.length+' 条候选链接，已核对 '+jobs.length+' 条岗位。',{
+    searches:d.searches,raw_results:d.search_raw_results,
+    candidate_links:sources.length,recovery_candidates:novel.length});
    if(novel.length)report('reading','正在读取补充发现的企业职位详情。');
    continue;
   }
@@ -469,7 +523,8 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
  }
  d.source_exhausted=cursor>=sources.length;
  if(!d.page_reads){d.stage=sources.length?'pages_unreadable':
-  d.searches?'no_employer_sources':'search_provider_unavailable';
+  d.searches?(d.search_raw_results?'all_search_urls_filtered':'search_index_empty'):
+   'search_provider_unavailable';
   d.elapsed_ms=Date.now()-start;
   return {matches:[],diagnostic:d}}
  if(!jobs.length){d.stage='insufficient_job_evidence';d.elapsed_ms=Date.now()-start;
