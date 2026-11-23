@@ -14,6 +14,7 @@ import {runCleanJobMatch,rankCleanMatchResults,MATCH_V2,findEmployerSources,read
 import {archiveCleanMatchJobs} from '../../_lib/clean-match-v2-jd-bridge.js';
 import {checkCleanMatchProvider} from '../../_lib/clean-match-v2-provider-check.js';
 import {matchV2Runtime} from '../../_lib/clean-match-v2-runtime.js';
+import {recordProviderProbe,readRecentProviderProbes} from '../../_lib/clean-match-v2-provider-probe-log.js';
 import {authorizeOperatorQa,startQaRun,appendQaStage,finishQaRun,getQaRun,
  redactQaDiagnostic} from '../../_lib/clean-match-v2-qa-log.js';
 
@@ -299,6 +300,12 @@ export async function onRequest({request,env}){
   return json({kind:KIND,engine:MATCH_V2,enabled:enabled(env),
    preflight_available:mayCheckProvider(env,request),
    synthetic_check_available:previewPreflight(env,request),scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],mode:'EVIDENCE_FIRST_V2'});
+ if(tail==='/operator-probes'){
+  if(!await operatorGate(env,request)||request.method!=='GET')return fail('NOT_FOUND',404);
+  try{return json({ok:true,kind:'HHBA_MATCH_V2_PROVIDER_PROBE_LOG',
+   records:await readRecentProviderProbes(env.HHBA_PNVS_AUTH_DB,20)})}
+  catch{return fail('MATCH_QA_LOG_NOT_READY',503)}
+ }
  if(tail==='/operator-run'||tail==='/operator-log'){
   if(!await operatorGate(env,request))return fail('NOT_FOUND',404);
   if(tail==='/operator-run'){
@@ -331,9 +338,19 @@ export async function onRequest({request,env}){
  try{session=await candidateSession(env,request)}catch{}
  if(!session)return fail('SESSION_INVALID',401);
  if(tail==='/provider-check'){
+  // An authenticated preview preflight writes one anonymous D1 record.
+  // Audit problems never turn a good provider verdict into a failure.
+  const started=Date.now();
+  const writeProbe=async data=>{
+   try{await recordProviderProbe(env.HHBA_PNVS_AUTH_DB,{
+    kind:'CANDIDATE_PREFLIGHT',duration_ms:Date.now()-started,...data})}
+   catch{console.warn('HHBA_MATCH_V2_PROBE_LOG_UNAVAILABLE')}
+  };
   try{
    const probe=await checkCleanMatchProvider(openAIProvider(env),
     {signal:request.signal});
+   await writeProbe({outcome:'READY',stage:'completed',
+    sources_returned:probe.searches_returned});
    return json({...probe,engine:MATCH_V2});
   }catch(e){
    const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
@@ -341,6 +358,7 @@ export async function onRequest({request,env}){
     e.probeStage:'unknown';
    const upstream_status=Number.isInteger(e?.upstreamStatus)&&
     e.upstreamStatus>=400&&e.upstreamStatus<=599?e.upstreamStatus:null;
+   await writeProbe({outcome:'FAILED',stage,error_code:code,upstream_status});
    // No upstream message/body/secret/profile appears in logs or UI.
    const diagnostic={code,stage,upstream_status};
    console.warn('HHBA_MATCH_V2_PROVIDER_CHECK_FAILED',JSON.stringify(diagnostic));
