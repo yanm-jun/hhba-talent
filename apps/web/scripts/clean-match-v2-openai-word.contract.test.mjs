@@ -55,6 +55,7 @@ test('preview V2 forces official OpenAI only, with no silent DeepSeek fallback',
  assert.equal(p.name,'openai');
  assert.equal(p.model,'gpt-6.2-astra');
  assert.equal(p.key,KEY);
+ assert.equal(p.v2Responses,true);
  assert.equal(selectProvider(wordEnv,'resume_rewrite').name,'openai');
  assert.equal(selectProvider(wordEnv,'resume_reviewer').name,'openai');
  assert.throws(()=>selectProvider({...wordEnv,HHBA_MATCH_OPENAI_API_KEY:undefined},
@@ -105,7 +106,7 @@ test('OpenAI JSON transport does not swallow missing evidence as a valid rewrite
  const previous=globalThis.fetch;
  globalThis.fetch=async()=>response({checks:[{blockId:'exp-1',safe:false,concern:'缺少事实'}]});
  try{
-  const got=await completeJson({name:'openai',key:KEY,model:'gpt-6.2-astra'},
+  const got=await completeJson({name:'openai',key:KEY,model:'gpt-6.2-astra',v2Responses:true},
    '审核事实', {blocks},AbortSignal.timeout(10000),2000);
   assert.equal(got.checks[0].safe,false);
  }finally{globalThis.fetch=previous}
