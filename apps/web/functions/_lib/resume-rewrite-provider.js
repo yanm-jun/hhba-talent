@@ -87,7 +87,7 @@ export function validateAuthoring(block,proposal,quotes,numbers){
  return null;
 }
 export async function completeJson(provider,system,user,signal,maxTokens=9000){
- if(provider?.name==='openai'){
+ if(provider?.name==='openai'&&provider?.v2Responses===true){
   // All OpenAI author, reviewer and agent-planning calls use the official
   // Responses API; never send an Astra-model prompt to /chat/completions.
   return openAIJson(fetch,provider,system,user,120000,signal,
