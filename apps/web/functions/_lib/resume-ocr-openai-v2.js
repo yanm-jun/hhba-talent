@@ -1,8 +1,9 @@
 /**
- * Clean V2 document recognition via the OFFICIAL OpenAI Responses API.
+ * Clean V2 document recognition via a configured OpenAI Responses-compatible API.
  * PDF: visual + text document understanding. DOCX: extracted document text.
  * Requires the existing candidate-authenticated /ocr route and explicit consent.
  * Files never enter the public web_search tool or JD search prompts.
+ * A third-party relay may process raw files; require explicit user consent.
  */
 import {RESUME_LIMIT_BYTES,DOCX_MIME,validateResumeBytes} from './private-resume-validation.js';
 import {MAX_TEXT_LENGTH,redactForModel} from './resume-match-core.js';
