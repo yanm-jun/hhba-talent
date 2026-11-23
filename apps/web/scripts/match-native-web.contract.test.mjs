@@ -209,7 +209,8 @@ test('new upload UI uses native endpoint and native results, not legacy multi-st
  const {readFile}=await import('node:fs/promises');
  const svc=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
  const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
- assert.match(svc,/const API='\/api\/match-native'/);
+ assert.match(svc,/const API='\/api\/match-next'/);
+ // The active candidate UI is now bound to the clean V2 backend.
  assert.match(page,/CandidateMatchNativeDialog/);
  assert.doesNotMatch(page,/CandidateMatchResultDialog/);
 });
