@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {selectProvider,generateSuggestions} from '../functions/_lib/resume-ai-provider.js';
+import {matchV2Runtime} from '../functions/_lib/clean-match-v2-runtime.js';
+import {onRequest as matchNextRoute} from '../functions/api/match-next/[[path]].js';
 import {completeJson,auditTargetedResumeSuggestions,generateTailoredResume}
  from '../functions/_lib/resume-rewrite-provider.js';
 import {optimizeResumeDocument} from '../functions/_lib/resume-optimization-task.js';
@@ -136,4 +138,47 @@ test('preview V2 Word author and reviewer inherit the approved relay without alt
   assert.equal(result.focus[0],'真实渠道运营工作');
   assert.equal(calls.length,1);
  }finally{globalThis.fetch=previous}
+});
+
+test('compact V2 preview config enables matching and Word without extra cloud variables',async()=>{
+ const env={
+  HHBA_AUTH_ROLLOUT:'preview',
+  HHBA_PREVIEW_AI_DIAG_ENABLED:'1',
+  HHBA_MATCH_SERVICE_ENABLED:'1',
+  HHBA_MATCH_OPENAI_API_KEY:KEY,
+  HHBA_PNVS_AUTH_DB:{prepare(){return {}}},
+  HHBA_MATCH_V2_RUNTIME:JSON.stringify({
+   baseUrl:'https://api-c.reqtoken.com/v1',
+   model:'gpt-6.2-sol',matchEnabled:true,wordEnabled:true
+  })
+ };
+ const config=matchV2Runtime(env);
+ assert.equal(config.matchEnabled,true);
+ assert.equal(config.wordEnabled,true);
+ assert.equal(config.model,'gpt-6.2-sol');
+ assert.equal(config.baseUrl,'https://api-c.reqtoken.com/v1');
+ const writer=selectProvider(env,'resume_rewrite');
+ assert.equal(writer.v2Responses,true);
+ assert.equal(writer.baseUrl,'https://api-c.reqtoken.com/v1');
+ assert.equal(writer.model,'gpt-6.2-sol');
+ const response=await matchNextRoute({env,request:new Request(
+  'https://compact-preview.hhba-talent.pages.dev/api/match-next/status'
+ )});
+ const status=await response.json();
+ assert.equal(status.enabled,true);
+ assert.equal(status.preflight_available,true);
+});
+test('compact V2 flags cannot enable production, and bad JSON fails closed',()=>{
+ const compact=JSON.stringify({matchEnabled:true,wordEnabled:true,
+  model:'gpt-6.2-sol',baseUrl:'https://api-c.reqtoken.com/v1'});
+ const prod={HHBA_AUTH_ROLLOUT:'production',HHBA_MATCH_V2_RUNTIME:compact,
+  HHBA_MATCH_OPENAI_API_KEY:KEY};
+ assert.equal(matchV2Runtime(prod).matchEnabled,false);
+ assert.equal(matchV2Runtime(prod).wordEnabled,false);
+ assert.equal(selectProvider(prod,'resume_rewrite').name,'deepseek');
+ assert.equal(matchV2Runtime({HHBA_AUTH_ROLLOUT:'preview',
+  HHBA_PREVIEW_AI_DIAG_ENABLED:'1',HHBA_MATCH_V2_RUNTIME:'{bad-json'}).matchEnabled,false);
+ // Explicit previous env variables retain backward compatibility.
+ assert.equal(matchV2Runtime({HHBA_MATCH_OPENAI_MODEL:'older-model',
+  HHBA_MATCH_V2_RUNTIME:compact}).model,'older-model');
 });
