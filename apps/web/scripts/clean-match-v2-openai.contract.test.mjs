@@ -1,0 +1,113 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {openAIResponse,openAIJson,openAIEmployerSearch,
+ openAISearchSources,readOfficialEmployerPage,safePublicEmployerUrl}
+ from '../functions/_lib/openai-match-v2-provider.js';
+import {runCleanJobMatch} from '../functions/_lib/clean-match-v2.js';
+import {recognizeMatchResume} from '../functions/_lib/resume-jd-match-openai-v2.js';
+
+const URL='https://careers.tencent.com/jobdesc.html?postId=2097166275703910400';
+const SECRET='synthetic-not-a-real-token';
+const CV='负责区域门店督导、汽车渠道培训及销售数据复盘';
+const JD=[
+ '腾讯招聘','公司名称：腾讯','职位名称：渠道运营专员','工作地点：上海',
+ '岗位职责：负责渠道运营和销售数据复盘工作',
+ '任职要求：具有销售数据分析经验和跨团队协作能力',
+ '薪酬以企业官方岗位公告为准。'
+].join('\n');
+const json=value=>Response.json({status:'completed',output:[
+ {type:'message',content:[{type:'output_text',text:JSON.stringify(value)}]}
+]});
+const search=urls=>Response.json({status:'completed',output:[
+ {type:'web_search_call',status:'completed',action:{type:'search',
+  sources:urls.map(url=>({url,title:'腾讯 渠道运营专员 官方招聘'}))}}
+]});
+function syntheticFetch(calls){
+ return async(raw,opts)=>{
+  const url=new URL(raw);calls.push({url:raw,opts});
+  if(url.origin==='https://api.openai.com'&&url.pathname==='/v1/responses'){
+   const body=JSON.parse(opts.body);
+   if(body.tools?.some(t=>t.type==='web_search'))return search([URL]);
+   if(body.instructions?.includes('简历识别 Agent'))
+    return json({facts:[{kind:'work',quote:CV}],skills:[{name:'渠道运营',evidence:CV}],
+     target_roles:['渠道运营'],education:null,education_evidence:null,
+     experience_years:null,experience_evidence:null});
+   if(body.instructions?.includes('检索策略')||body.instructions?.includes('第二轮'))
+    return json({queries:[]});
+   if(body.instructions?.includes('求职匹配分析师'))
+    return json({jobs:[{id:'p1',score:79,alignments:[{jd_quote:'负责渠道运营和销售数据复盘工作',resume_fact_id:'CV-1'}],gaps:[],
+      reason:'简历包含区域门店督导、渠道培训和数据复盘的可核对经历，岗位职责涉及渠道运营与销售数据复盘，具备可验证的相关经验。',
+      score_basis:'简历渠道培训及销售复盘能力与本岗位原文对应，但其余专业任职要求仍待核验。'}]});
+   if(body.instructions?.includes('提取真实公司'))return json({jobs:[]});
+   throw Error('unexpected model prompt');
+  }
+  if(raw===URL)return new Response(JD,{headers:{'Content-Type':'text/plain'}});
+  throw Error('cannot read other destinations');
+ };
+}
+test('Responses transport is pinned to official OpenAI and sends store:false',async()=>{
+ const calls=[];
+ const out=await openAIJson(syntheticFetch(calls),{key:SECRET,model:'gpt-6.2-astra'},
+  '仅输出 JSON',{'task':'test'});
+ assert.deepEqual(typeof out,'object');
+ assert.equal(calls.length,1);
+ assert.equal(calls[0].url,'https://api.openai.com/v1/responses');
+ const opts=calls[0].opts,body=JSON.parse(opts.body);
+ assert.equal(body.store,false);
+ assert.equal(opts.redirect,'manual');
+ assert.equal(opts.headers.Authorization,'Bearer '+SECRET);
+});
+test('Search trusts only completed OpenAI tool sources, not model text listing URLs',async()=>{
+ const hallucinated=JSON.stringify({urls:[URL]});
+ assert.deepEqual(openAISearchSources({status:'completed',output:[
+  {type:'message',content:[{type:'output_text',text:hallucinated}]}
+ ]}),[]);
+ const calls=[];
+ const result=await openAIEmployerSearch(syntheticFetch(calls),SECRET,'渠道运营 上海',null);
+ assert.equal(result.results.length,1);
+ assert.equal(result.results[0].url,URL);
+ const body=JSON.parse(calls[0].opts.body);
+ assert.equal(body.tool_choice,'required');
+ assert.ok(body.tools.some(x=>x.type==='web_search'));
+ assert.ok(!JSON.stringify(body).includes(CV));
+});
+test('Employer-only reader blocks private networks and will not forward OpenAI token',async()=>{
+ for(const u of [
+  'http://careers.tencent.com/jobdesc.html?postId=1',
+  'https://127.0.0.1/jobs/detail/123','https://localhost/job/1',
+  'https://169.254.169.254/job/1','https://foo.nip.io/job/1',
+  'https://user:pass@careers.tencent.com/jobs/detail/1'
+ ])assert.equal(safePublicEmployerUrl(u),false,u);
+ const calls=[];
+ const page=await readOfficialEmployerPage(syntheticFetch(calls),URL,null);
+ assert.match(page.content,/工作地点：上海/);
+ assert.equal(calls[0].opts.method,'GET');
+ assert.equal(calls[0].opts.redirect,'manual');
+ assert.equal(JSON.stringify(calls[0]),JSON.stringify(calls[0]).replace(SECRET,SECRET),
+  'no key should appear in employer GET request');
+ assert.ok(!JSON.stringify(calls[0].opts).includes(SECRET));
+});
+test('V2 from résumé evidence to actual employer JD does not call a DeepSeek endpoint',async()=>{
+ const calls=[],fetcher=syntheticFetch(calls);
+ const provider={key:SECRET,model:'gpt-6.2-astra'};
+ const profile=await recognizeMatchResume(provider,
+  '工作经历：'+CV+'\n求职意向城市：上海','渠道运营',
+  {fetcher,fallbackDelayMs:60000});
+ assert.equal(profile.facts[0].quote,CV);
+ const result=await runCleanJobMatch(provider,'工作经历：'+CV+'\n求职意向城市：上海',
+  profile,'渠道运营',10,{},{fetcher});
+ assert.equal(result.matches.length,1);
+ assert.equal(result.matches[0].official_url,URL);
+ assert.equal(result.matches[0].location,'上海');
+ assert.equal(result.matches[0].match_score,79);
+ assert.ok(calls.some(x=>x.url===URL),'must read a real employer URL');
+ assert.ok(calls.filter(x=>x.url!==URL).every(x=>x.url==='https://api.openai.com/v1/responses'));
+ assert.ok(calls.filter(x=>x.url===URL).every(x=>!x.opts.headers.Authorization));
+ assert.ok(calls.some(x=>JSON.stringify(x.opts.body||'').includes(CV)));
+ assert.ok(calls.filter(x=>x.opts.body?.includes('web_search')).every(x=>
+  !x.opts.body.includes(CV)),'public web search cannot receive private résumé');
+});
+test('upstream model key rejection is an explicit error, never a fabricated recommendation',async()=>{
+ await assert.rejects(openAIResponse(async()=>new Response('denied',{status:401}),SECRET,{input:'hi'}),
+  e=>e.code==='AI_PROVIDER_KEY_REJECTED');
+});
