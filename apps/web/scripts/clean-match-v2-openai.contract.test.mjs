@@ -39,6 +39,7 @@ function syntheticFetch(calls){
       reason:'简历包含区域门店督导、渠道培训和数据复盘的可核对经历，岗位职责涉及渠道运营与销售数据复盘，具备可验证的相关经验。',
       score_basis:'简历渠道培训及销售复盘能力与本岗位原文对应，但其余专业任职要求仍待核验。'}]});
    if(body.instructions?.includes('提取真实公司'))return json({jobs:[]});
+   if(body.instructions?.includes('仅输出 JSON'))return json({ok:true});
    throw Error('unexpected model prompt');
   }
   if(raw===URL)return new Response(JD,{headers:{'Content-Type':'text/plain'}});
@@ -83,8 +84,6 @@ test('Employer-only reader blocks private networks and will not forward OpenAI t
  assert.match(page.content,/工作地点：上海/);
  assert.equal(calls[0].opts.method,'GET');
  assert.equal(calls[0].opts.redirect,'manual');
- assert.equal(JSON.stringify(calls[0]),JSON.stringify(calls[0]).replace(SECRET,SECRET),
-  'no key should appear in employer GET request');
  assert.ok(!JSON.stringify(calls[0].opts).includes(SECRET));
 });
 test('V2 from résumé evidence to actual employer JD does not call a DeepSeek endpoint',async()=>{
