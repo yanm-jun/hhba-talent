@@ -20,7 +20,7 @@ export function selectCleanMatchProvider(env){
  if(name==='openai'){
   const key=env?.HHBA_MATCH_OPENAI_API_KEY||env?.HHBA_AI_OPENAI_API_KEY;
   if(typeof key!=='string'||key.trim().length<16)return null;
-  const model=String(env?.HHBA_MATCH_OPENAI_MODEL||env?.HHBA_AI_OPENAI_MODEL||'gpt-6-sol').trim();
+  const model=String(env?.HHBA_MATCH_OPENAI_MODEL||env?.HHBA_AI_OPENAI_MODEL||'gpt-6.2-sol').trim();
   if(!/^[a-zA-Z0-9._-]{3,90}$/.test(model))return null;
   return {name:'openai',key,model};
  }
