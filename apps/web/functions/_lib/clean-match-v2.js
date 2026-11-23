@@ -98,6 +98,27 @@ export function isExactEmployerJobUrl(url){
   return /\/(?:job|jobs|position|vacancy|detail)\b/i.test(path)||query;
  }catch{return false}
 }
+// Search often yields many postings from one employer. Visit distinct employers
+// before exhausting a single site's pages, without changing evidence rules.
+export function diversifyEmployerSources(rows){
+ const groups=new Map();
+ for(const row of rows){
+  let host;
+  try{host=new URL(row.url).hostname}catch{continue}
+  if(!groups.has(host))groups.set(host,[]);
+  groups.get(host).push(row);
+ }
+ const prioritized=[];
+ let any=true,level=0;
+ while(any){
+  any=false;
+  for(const group of groups.values()){
+   if(level<group.length){prioritized.push(group[level]);any=true}
+  }
+  level++;
+ }
+ return prioritized;
+}
 export async function findEmployerSources(fetcher,key,plan,signal){
  const seen=new Set(),all=[],errors=[];
  await Promise.all(plan.queries.map(async query=>{
@@ -120,14 +141,15 @@ export async function findEmployerSources(fetcher,key,plan,signal){
    (plan.cities.some(c=>text.includes(c))?5:0)+
    (/(?:岗位职责|任职要求|工作地点)/.test(text)?3:0)};
  all.sort((a,b)=>weight(b)-weight(a));
- return {sources:all.slice(0,70),queries:plan.queries.length,
+ return {sources:diversifyEmployerSources(all).slice(0,70),queries:plan.queries.length,
   failures:errors.length,error_codes:uniq(errors).slice(0,4)};
 }
-export async function readEmployerPages(fetcher,key,sources,signal){
+export async function readEmployerPages(fetcher,key,sources,signal,{targetSuccesses=8}={}){
  const pages=[],errors=[];let attempts=0,failures=0;
  const queue=sources.slice(0,24);
- for(let i=0;i<queue.length;i+=4){
-  const part=await Promise.all(queue.slice(i,i+4).map(async row=>{
+ for(let i=0;i<queue.length;i+=6){
+  if(signal?.aborted)throw err('AI_MATCH_CANCELLED');
+  const part=await Promise.all(queue.slice(i,i+6).map(async row=>{
    attempts++;
    try{
     const data=await call(fetcher,key,'/v1/tools/fetch',{url:row.url},11000,signal);
@@ -138,7 +160,9 @@ export async function readEmployerPages(fetcher,key,sources,signal){
    failures++;return null;
   }));
   pages.push(...part.filter(Boolean));
+  if(pages.length>=targetSuccesses)break;
  }
+ if(signal?.aborted)throw err('AI_MATCH_CANCELLED');
  return {pages,attempts,failures,error_codes:uniq(errors).slice(0,6)};
 }
 // DeepSeek Fetch returns Markdown: headings and values may be on different lines.
@@ -271,7 +295,8 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
   elapsed_ms:0,stage:'planning',queries:0,search_failures:0,
   fetch_attempted:0,fetch_failures:0,city_evidence_count:0,
   extracted_jobs:0,provider_error_codes:[],fetch_error_codes:[],
-  model_failures:0,score_provider_error:null,planning_error:null};
+  model_failures:0,score_provider_error:null,planning_error:null,
+  source_batches:0,source_backfill_attempts:0,source_exhausted:false};
  const report=(stage,message,counts={})=>{
   d.stage=stage;onProgress(stage);onActivity({stage,message,...counts});
  };
@@ -289,22 +314,46 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
  if(!sources.length){d.stage=search.failures===search.queries?
   'search_provider_unavailable':'no_employer_sources';d.elapsed_ms=Date.now()-start;
   return {matches:[],diagnostic:d}}
- report('reading','正在读取具体职位详情，不能只依赖搜索摘要。');
- const read=await readEmployerPages(fetcher,key,sources,signal);
- d.fetch_attempted=read.attempts;d.page_reads=read.pages.length;
- d.fetch_failures=read.failures;d.fetch_error_codes=read.error_codes;
- report('reading','尝试读取 '+read.attempts+' 个网页，成功 '+read.pages.length+
-  ' 个。',{pages_read:read.pages.length});
- if(!read.pages.length){d.stage='pages_unreadable';d.elapsed_ms=Date.now()-start;
+ report('reading','正在逐批读取企业职位详情；遇到打不开或缺少工作地点的页面，将继续核对其他来源。');
+ // An early block of inaccessible or location-less pages must not hide the
+ // remaining real employer sources. Bound paid Fetch calls and stop when
+ // enough grounded vacancies are found.
+ const jobs=[],seenJobs=new Set(),maxAttempts=Math.min(36,sources.length);
+ let cursor=0;
+ while(cursor<maxAttempts&&jobs.length<limit){
+  if(signal?.aborted)throw err('AI_MATCH_CANCELLED');
+  const batch=sources.slice(cursor,Math.min(cursor+24,maxAttempts));
+  const read=await readEmployerPages(fetcher,key,batch,signal);
+  if(!read.attempts)break;
+  cursor+=read.attempts;
+  d.source_batches++;
+  if(d.source_batches>1)d.source_backfill_attempts+=read.attempts;
+  d.fetch_attempted+=read.attempts;d.page_reads+=read.pages.length;
+  d.fetch_failures+=read.failures;
+  d.fetch_error_codes=uniq([...d.fetch_error_codes,...read.error_codes]).slice(0,6);
+  report('reading','已尝试读取 '+d.fetch_attempted+' 个职位网页，成功 '+d.page_reads+
+   ' 个；正在继续筛查具体工作地点与岗位职责。',{pages_read:d.page_reads,
+    fetch_attempted:d.fetch_attempted,source_batches:d.source_batches});
+  if(!read.pages.length)continue;
+  report('researching','核对第 '+d.source_batches+' 批岗位原文，不将公司总部当成工作城市。');
+  const extracted=await extractJobs(fetcher,key,read.pages,signal);
+  d.city_evidence_count+=extracted.city_evidence;
+  d.model_failures+=extracted.model_failures;
+  for(const job of extracted.jobs){
+   if(!seenJobs.has(job.url)){seenJobs.add(job.url);jobs.push(job)}
+  }
+  d.extracted_jobs=jobs.length;
+  report('researching','已找到 '+jobs.length+' 条有明确岗位原文的职位，目标 '+limit+
+   ' 条；如来源充足会继续核验。',{extracted_jobs:jobs.length,
+    source_batches:d.source_batches});
+ }
+ d.source_exhausted=cursor>=sources.length;
+ if(!d.page_reads){d.stage='pages_unreadable';d.elapsed_ms=Date.now()-start;
   return {matches:[],diagnostic:d}}
- report('researching','正在依据读取的岗位原文核对公司、职位和工作地点。');
- const extracted=await extractJobs(fetcher,key,read.pages,signal);
- d.extracted_jobs=extracted.jobs.length;d.city_evidence_count=extracted.city_evidence;
- d.model_failures=extracted.model_failures;
- if(!extracted.jobs.length){d.stage='insufficient_job_evidence';d.elapsed_ms=Date.now()-start;
+ if(!jobs.length){d.stage='insufficient_job_evidence';d.elapsed_ms=Date.now()-start;
   return {matches:[],diagnostic:d}}
- report('scoring','已核实 '+extracted.jobs.length+' 条职位来源，正在对照真实简历证据。');
- const matches=await scoreJobs(fetcher,key,profile,extracted.jobs.slice(0,limit),signal,d);
+ report('scoring','已核实 '+jobs.length+' 条职位来源，正在对照真实简历证据。');
+ const matches=await scoreJobs(fetcher,key,profile,jobs.slice(0,limit),signal,d);
  d.visible_jobs=matches.length;d.elapsed_ms=Date.now()-start;d.stage='complete';
  onPartial(matches);
  return {matches,diagnostic:d};
