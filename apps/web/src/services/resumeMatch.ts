@@ -185,14 +185,26 @@ export async function runMatchPreviewProviderCheck(signal?:AbortSignal):Promise<
  });
  const data=await response.json().catch(()=>null) as {
   ok?:boolean;status?:string;capabilities?:string[];error?:string;
+  stage?:string;upstream_status?:number|null;
   fetch_content_verified?:boolean
  }|null;
  if(!response.ok||data?.ok!==true||data?.status!=='READY'||
   !Array.isArray(data.capabilities)||
   !data.capabilities.includes('openai_responses_json')||
-  !data.capabilities.includes('openai_web_search_sources'))
-  throw new MatchError(response.status,errorMap[data?.error||'']||
-   'OpenAI 接口预检未通过，请检查预览环境配置。');
+  !data.capabilities.includes('openai_web_search_sources')){
+  const stages:Record<string,string>={
+   basic_responses:'第一关：基础 Responses 连通性',
+   structured_json:'第二关：结构化 JSON 输出',
+   web_search_sources:'第三关：联网搜索真实来源'
+  };
+  const stage=stages[data?.stage||'']||'接口检查';
+  const http=Number.isInteger(data?.upstream_status)&&
+   (data?.upstream_status??0)>=400&&(data?.upstream_status??0)<=599?
+    '，中转站 HTTP '+data?.upstream_status:'';
+  const description=errorMap[data?.error||'']||
+   '返回内容不符合 V2 所需接口规范。';
+  throw new MatchError(response.status,stage+'未通过'+http+'：'+description);
+ }
  return {status:'READY',capabilities:data.capabilities,fetch_content_verified:data.fetch_content_verified===true};
 }
 /** Best-effort browser redaction before submitting text to HHBA's server. */
