@@ -341,7 +341,8 @@ test('synthetic preview reruns are allowed without rate quota table, salt or cal
    assert.equal(result.matches.length,1);
   }
   assert.ok(provider.calls.filter(x=>x.path==='/v1/tools/search').length>=3);
-  assert.equal(writes.length,0,'repeated synthetic QA cannot write candidate matching history');
+  assert.equal(writes.some(x=>/hhba_ai_match_history|hhba_resume_match_requests/.test(x.sql)),false,
+   'repeated synthetic QA may archive JD evidence but must not write candidate history or quota');
  }finally{provider.restore()}
 });
 
