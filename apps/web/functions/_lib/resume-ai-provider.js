@@ -43,7 +43,8 @@ export function selectProvider(env,task='resume_optimization',{reasoning=false}=
   String(env?.HHBA_AI_DEEPSEEK_REASONING_EFFORT||'').toLowerCase())?
   String(env.HHBA_AI_DEEPSEEK_REASONING_EFFORT).toLowerCase():'max';
  return {name:requested,...PROVIDERS[requested],key,model:model.trim(),
-  ...(v2Word?{v2Responses:true}:{}),
+  ...(v2Word?{v2Responses:true,
+   baseUrl:env?.HHBA_MATCH_OPENAI_BASE_URL||'https://api.openai.com/v1'}:{}),
   ...(requested==='deepseek'&&deepseekWriter?{reasoningEffort:effort}:{})};
 }
 export function parseSuggestions(raw,allowedBlockIds){
