@@ -6,7 +6,7 @@ import {openAIResponse,openAIJson,openAIEmployerSearch,
 import {runCleanJobMatch} from '../functions/_lib/clean-match-v2.js';
 import {recognizeMatchResume} from '../functions/_lib/resume-jd-match-openai-v2.js';
 
-const URL='https://careers.tencent.com/jobdesc.html?postId=2097166275703910400';
+const JD_URL='https://careers.tencent.com/jobdesc.html?postId=2097166275703910400';
 const SECRET='synthetic-not-a-real-token';
 const CV='负责区域门店督导、汽车渠道培训及销售数据复盘';
 const JD=[
@@ -27,7 +27,7 @@ function syntheticFetch(calls){
   const url=new URL(raw);calls.push({url:raw,opts});
   if(url.origin==='https://api.openai.com'&&url.pathname==='/v1/responses'){
    const body=JSON.parse(opts.body);
-   if(body.tools?.some(t=>t.type==='web_search'))return search([URL]);
+   if(body.tools?.some(t=>t.type==='web_search'))return search([JD_URL]);
    if(body.instructions?.includes('简历识别 Agent'))
     return json({facts:[{kind:'work',quote:CV}],skills:[{name:'渠道运营',evidence:CV}],
      target_roles:['渠道运营'],education:null,education_evidence:null,
@@ -42,7 +42,7 @@ function syntheticFetch(calls){
    if(body.instructions?.includes('仅输出 JSON'))return json({ok:true});
    throw Error('unexpected model prompt');
   }
-  if(raw===URL)return new Response(JD,{headers:{'Content-Type':'text/plain'}});
+  if(raw===JD_URL)return new Response(JD,{headers:{'Content-Type':'text/plain'}});
   throw Error('cannot read other destinations');
  };
 }
@@ -59,14 +59,14 @@ test('Responses transport is pinned to official OpenAI and sends store:false',as
  assert.equal(opts.headers.Authorization,'Bearer '+SECRET);
 });
 test('Search trusts only completed OpenAI tool sources, not model text listing URLs',async()=>{
- const hallucinated=JSON.stringify({urls:[URL]});
+ const hallucinated=JSON.stringify({urls:[JD_URL]});
  assert.deepEqual(openAISearchSources({status:'completed',output:[
   {type:'message',content:[{type:'output_text',text:hallucinated}]}
  ]}),[]);
  const calls=[];
  const result=await openAIEmployerSearch(syntheticFetch(calls),SECRET,'渠道运营 上海',null);
  assert.equal(result.results.length,1);
- assert.equal(result.results[0].url,URL);
+ assert.equal(result.results[0].url,JD_URL);
  const body=JSON.parse(calls[0].opts.body);
  assert.equal(body.tool_choice,'required');
  assert.ok(body.tools.some(x=>x.type==='web_search'));
@@ -80,7 +80,7 @@ test('Employer-only reader blocks private networks and will not forward OpenAI t
   'https://user:pass@careers.tencent.com/jobs/detail/1'
  ])assert.equal(safePublicEmployerUrl(u),false,u);
  const calls=[];
- const page=await readOfficialEmployerPage(syntheticFetch(calls),URL,null);
+ const page=await readOfficialEmployerPage(syntheticFetch(calls),JD_URL,null);
  assert.match(page.content,/工作地点：上海/);
  assert.equal(calls[0].opts.method,'GET');
  assert.equal(calls[0].opts.redirect,'manual');
@@ -96,12 +96,12 @@ test('V2 from résumé evidence to actual employer JD does not call a DeepSeek e
  const result=await runCleanJobMatch(provider,'工作经历：'+CV+'\n求职意向城市：上海',
   profile,'渠道运营',10,{},{fetcher});
  assert.equal(result.matches.length,1);
- assert.equal(result.matches[0].official_url,URL);
+ assert.equal(result.matches[0].official_url,JD_URL);
  assert.equal(result.matches[0].location,'上海');
  assert.equal(result.matches[0].match_score,79);
- assert.ok(calls.some(x=>x.url===URL),'must read a real employer URL');
- assert.ok(calls.filter(x=>x.url!==URL).every(x=>x.url==='https://api.openai.com/v1/responses'));
- assert.ok(calls.filter(x=>x.url===URL).every(x=>!x.opts.headers.Authorization));
+ assert.ok(calls.some(x=>x.url===JD_URL),'must read a real employer JD_URL');
+ assert.ok(calls.filter(x=>x.url!==JD_URL).every(x=>x.url==='https://api.openai.com/v1/responses'));
+ assert.ok(calls.filter(x=>x.url===JD_URL).every(x=>!x.opts.headers.Authorization));
  assert.ok(calls.some(x=>JSON.stringify(x.opts.body||'').includes(CV)));
  assert.ok(calls.filter(x=>x.opts.body?.includes('web_search')).every(x=>
   !x.opts.body.includes(CV)),'public web search cannot receive private résumé');
