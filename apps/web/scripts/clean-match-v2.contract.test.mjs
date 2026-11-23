@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preferredCities,fallbackPlan,isExactEmployerJobUrl,groundedVacancy,
- runCleanJobMatch,diversifyEmployerSources,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
+ runCleanJobMatch,diversifyEmployerSources,groundedMatchExplanations,scoreJobs,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
 import {onRequest} from '../functions/api/match-next/[[path]].js';
 import {onRequest as legacyMatchRoute} from '../functions/api/match-native/[[path]].js';
 
@@ -52,6 +52,8 @@ function makeFetcher({withoutCity=false,allSearchFail=false,noFetch=false,unsupp
    if(instructions.includes('求职匹配分析师'))
     return reply({jobs:[{id:'p1',score:82,
      resume_fact_ids:['CV-1'],
+     alignments:[{jd_quote:'负责渠道运营和销售数据复盘工作',resume_fact_id:'CV-1'}],
+     gaps:[{jd_quote:'具有销售数据分析经验和跨团队协作能力'}],
      reason:'简历具有汽车区域门店运营、渠道培训及销售漏斗复盘的真实经历，可对应岗位的渠道运营和销售数据分析职责；仍须核对企业对行业经验及学历的具体要求。',
      score_basis:'岗位职责要求渠道运营与销售数据复盘，简历有相应门店和渠道经验，但最低学历及行业任职年限仍待核对。'}]});
    throw Error('unexpected reasoning prompt');
@@ -142,6 +144,10 @@ test('Clean V2 finds real page via provider Search, reads JD and scores only wit
  assert.deepEqual(result.matches.map(x=>x.official_url),[JD_URL]);
  assert.equal(result.matches[0].match_score,82);
  assert.equal(result.matches[0].location,'上海');
+ assert.equal(result.matches[0].score_evidence_status,'GROUNDED_JD_RESUME_QUOTES');
+ assert.match(result.matches[0].matched[0],/岗位原文.*负责渠道运营.*简历原文.*负责汽车区域/);
+ assert.match(result.matches[0].not_evidenced[0],/岗位要求/);
+ assert.doesNotMatch(result.matches[0].recommendation_reason,/仍须核对企业对行业经验及学历/);
  assert.equal(result.matches[0].jd_source_status,undefined,
   'page text is useful evidence but not an independently verified immutable JD archive');
  assert.equal(result.matches[0].evidence_status,'PARTIAL_SOURCE');
@@ -297,4 +303,43 @@ test('location-less first 24 employer pages do not hide a valid later official v
  assert.equal(result.matches[0].official_url,urls[24]);
  assert.equal(result.matches[0].location,'上海');
  assert.ok(stages.includes('researching')&&stages.includes('scoring'));
+});
+
+test('only verbatim JD quotes and actual résumé fact IDs become user-visible evidence',()=>{
+ const job=groundedVacancy({url:JD_URL,title:'腾讯 销售运营主管',
+  site:'腾讯招聘',content:JD});
+ const v=groundedMatchExplanations(job,{
+  alignments:[
+   {jd_quote:'负责渠道运营和销售数据复盘工作',resume_fact_id:'CV-1'},
+   {jd_quote:'企业强制要求金融资格证书',resume_fact_id:'CV-1'},
+   {jd_quote:'负责渠道运营和销售数据复盘工作',resume_fact_id:'fake-id'}
+  ],
+  gaps:[
+   {jd_quote:'具有销售数据分析经验和跨团队协作能力'},
+   {jd_quote:'必须拥有不存在的证书'}
+  ]
+ },profile.facts);
+ assert.equal(v.matched.length,1);
+ assert.equal(v.not_evidenced.length,1);
+ assert.match(v.matched[0],/汽车区域门店运营/);
+ assert.doesNotMatch(v.matched.join(' '),/资格证书/);
+ assert.doesNotMatch(v.not_evidenced.join(' '),/不存在/);
+});
+
+test('a plausible-looking numeric score with fabricated or unmapped citations stays unscored',async()=>{
+ const job=groundedVacancy({url:JD_URL,title:'腾讯 销售运营主管',
+  site:'腾讯招聘',content:JD});
+ const fetcher=async()=>reply({jobs:[{id:'p1',score:98,
+  resume_fact_ids:['CV-1'],alignments:[
+   {jd_quote:'企业严格要求博士学历和十年经验',resume_fact_id:'CV-1'}
+  ],gaps:[{jd_quote:'企业严格要求博士学历和十年经验'}],
+  reason:'这个候选人显然满足所有岗位要求，可以直接入职，所有职业证书和学历都没有任何问题，完全符合任职资格与工作地点要求。',
+  score_basis:'所有任职要求完全达标，包括学历、证书和技能，入职概率极高。'}]});
+ const matches=await scoreJobs(fetcher,'test',profile,[job]);
+ assert.equal(matches.length,1);
+ assert.equal(matches[0].match_score,null);
+ assert.equal(matches[0].matched.length,0);
+ assert.equal(matches[0].not_evidenced.length,0);
+ assert.equal(matches[0].score_evidence_status,undefined);
+ assert.doesNotMatch(matches[0].recommendation_reason,/博士|入职概率极高|直接入职/);
 });
