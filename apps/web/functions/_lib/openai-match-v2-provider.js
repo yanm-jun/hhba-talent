@@ -50,10 +50,12 @@ export async function openAIResponse(fetcher,provider,request,{signal=null,timeo
   throw fail(data?.status==='incomplete'?'AI_PROVIDER_RESPONSE_TRUNCATED':'AI_PROVIDER_RESPONSE_INVALID');
  return data;
 }
-export async function openAIJson(fetcher,provider,instructions,input,ms=40000,signal=null){
+export async function openAIJson(fetcher,provider,instructions,input,ms=40000,signal=null,
+ {maxOutputTokens=9000}={}){
  const data=await openAIResponse(fetcher,provider,{
   instructions,input:JSON.stringify(input),reasoning:{effort:'medium'},
-  text:{format:{type:'json_object'}},max_output_tokens:9000
+  text:{format:{type:'json_object'}},
+  max_output_tokens:Math.max(256,Math.min(30000,maxOutputTokens))
  },{signal,timeoutMs:ms});
  const raw=openAIOutputText(data).trim().replace(/^```(?:json)?\s*|\s*```$/gi,'');
  try{
