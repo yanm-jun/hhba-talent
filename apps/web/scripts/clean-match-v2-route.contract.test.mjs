@@ -137,7 +137,7 @@ test('preview-only opt-in permits authenticated live preflight while matching st
   assert.equal(data.fetch_content_verified,false);
   assert.deepEqual(data.capabilities.sort(),[
    'openai_responses_json','openai_web_search_sources'].sort());
-  assert.equal(probeCalls,2);
+  assert.equal(probeCalls,3,'baseline Responses, JSON and live search are three separate stages');
   const denied=await onRequest({request:previewRequest('/resume',{
    method:'POST',body:'{}'}),env});
   assert.equal(denied.status,503,'preflight can never unlock the public match API');
