@@ -523,7 +523,8 @@ test('site-specific second wave recovers an employer JD after ten empty generic 
   '百度社会招聘','招聘单位：百度','职位名称：渠道运营专员',
   '工作地点：上海','岗位职责：负责渠道运营和销售数据复盘工作',
   '任职要求：具有销售数据分析经验和跨团队协作能力',
-  '申请说明：实际岗位开放情况请以企业官方招聘页面为准'
+  '申请说明：实际岗位开放情况请以企业官方招聘页面为准',
+  '岗位介绍：该职位主要协助渠道经营、客户线索质量跟踪、线下活动管理和跨部门运营协同，定期汇总岗位成果与实际改进建议。'
  ].join('\n');
  let searches=0,fetches=0;
  const fetcher=async(url,opts)=>{
