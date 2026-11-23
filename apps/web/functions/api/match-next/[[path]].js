@@ -10,7 +10,7 @@ import {redactForModel} from '../../_lib/resume-match-core.js';
 import {recognizeResumeFile} from '../../_lib/resume-ocr.js';
 import {recognizeMatchResume} from '../../_lib/resume-jd-match-agent.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
-import {runCleanJobMatch,rankCleanMatchResults,MATCH_V2} from '../../_lib/clean-match-v2.js';
+import {runCleanJobMatch,rankCleanMatchResults,MATCH_V2,findEmployerSources,readEmployerPages,extractJobs,officialDetailRecoveryQueries} from '../../_lib/clean-match-v2.js';
 import {archiveCleanMatchJobs} from '../../_lib/clean-match-v2-jd-bridge.js';
 import {checkCleanMatchProvider} from '../../_lib/clean-match-v2-provider-check.js';
 import {authorizeOperatorQa,startQaRun,appendQaStage,finishQaRun,getQaRun,
@@ -69,12 +69,22 @@ async function operatorQaRun(env,request){
   payload=JSON.parse(raw)}catch{return fail('INVALID_SYNTHETIC_CHECK_REQUEST',400)}
  if(payload?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',400);
  if(payload.scenario!==ACCEPTANCE_SCENARIO||
-  Object.keys(payload).some(k=>!['consent','scenario'].includes(k)))
+  (payload.mode!==undefined&&!['focused','full'].includes(payload.mode))||
+  (payload.request_id!==undefined&&
+   (typeof payload.request_id!=='string'||!/^[0-9a-f-]{36}$/i.test(payload.request_id)))||
+  Object.keys(payload).some(k=>!['consent','scenario','mode','request_id'].includes(k)))
   return fail('INVALID_SYNTHETIC_CHECK_REQUEST',400);
- const db=env.HHBA_PNVS_AUTH_DB,runId=crypto.randomUUID(),started=Date.now();
- // No paid provider request unless the persistent log has started.
+ const db=env.HHBA_PNVS_AUTH_DB,runId=payload.request_id||crypto.randomUUID(),
+  started=Date.now(),mode=payload.mode||'full';
+ // The same caller request_id may never trigger a second paid QA run.
  try{await startQaRun(db,runId)}
- catch{return fail('MATCH_QA_LOG_NOT_READY',503)}
+ catch{
+  try{const row=await db.prepare('SELECT id FROM hhba_match_qa_runs WHERE id=?')
+   .bind(runId).first();
+   if(row?.id===runId)return json({run_id:runId,status:'ALREADY_STARTED'},409);
+  }catch{}
+  return fail('MATCH_QA_LOG_NOT_READY',503);
+ }
  let lastStage='preparing',seq=0,chain=Promise.resolve();
  const enqueue=(stage,counts={})=>{
   lastStage=stage;
@@ -84,6 +94,56 @@ async function operatorQaRun(env,request){
    .catch(()=>{}); // A stage-log failure cannot falsely claim full success.
  };
  enqueue('preparing');
+ // A bounded operator-only stage diagnostic, not user-facing 10-job matching.
+ // Search official employer JD domains, Fetch up to four pages and extract
+ // source-grounded vacancies; fits the remote browser's 120s maximum.
+ if(mode==='focused'){
+  try{
+   const plan={roles:['区域督导','渠道运营','销售运营'],cities:['上海','苏州']};
+   plan.queries=officialDetailRecoveryQueries(plan);
+   enqueue('searching',{queries:plan.queries.length});
+   const search=await findEmployerSources(fetch,env.HHBA_MATCH_DEEPSEEK_KEY,plan,request.signal);
+   const d={stage:'reading',searches:search.queries-search.failures,
+    search_failures:search.failures,search_raw_results:search.raw_results,
+    search_empty_queries:search.empty_queries,candidate_links:search.sources.length,
+    search_rejection_counts:search.rejection_counts,provider_error_codes:search.error_codes,
+    fetch_attempted:0,fetch_failures:0,page_reads:0,
+    city_evidence_count:0,model_failures:0,extracted_jobs:0,visible_jobs:0,
+    extraction_page_rejections:{}};
+   enqueue('reading',{searches:d.searches,
+    search_raw_results:d.search_raw_results,candidate_links:d.candidate_links});
+   const read=await readEmployerPages(fetch,env.HHBA_MATCH_DEEPSEEK_KEY,
+    search.sources.slice(0,4),request.signal,{targetSuccesses:4});
+   d.fetch_attempted=read.attempts;d.fetch_failures=read.failures;
+   d.page_reads=read.pages.length;d.fetch_error_codes=read.error_codes;
+   enqueue('researching',{fetch_attempted:d.fetch_attempted,page_reads:d.page_reads,
+    fetch_failures:d.fetch_failures});
+   const extracted=read.pages.length?
+    await extractJobs(fetch,env.HHBA_MATCH_DEEPSEEK_KEY,read.pages,request.signal):
+    {jobs:[],model_failures:0,city_evidence:0,page_rejections:{}};
+   d.city_evidence_count=extracted.city_evidence;
+   d.model_failures=extracted.model_failures;
+   d.extraction_page_rejections=extracted.page_rejections;
+   d.extracted_jobs=extracted.jobs.length;d.visible_jobs=extracted.jobs.length;
+   d.stage='complete';
+   enqueue('complete',{extracted_jobs:d.extracted_jobs,
+    city_evidence_count:d.city_evidence_count,model_failures:d.model_failures});
+   await chain;
+   const status=extracted.jobs.length?'COMPLETED_PARTIAL':'COMPLETED_ZERO';
+   await finishQaRun(db,runId,status,d,Date.now()-started);
+   return json({run_id:runId,mode:'focused',status,
+    note:'只验证企业链接、最多4个真实网页与原文JD提取；不代表10条岗位和匹配评分验收成功',
+    summary:redactQaDiagnostic(d),
+    matches:extracted.jobs.map(x=>({company:x.company,title:x.title,
+     location:x.location,official_url:x.url,jd_source_status:'PARTIAL_SOURCE'}))});
+  }catch(e){
+   await chain;
+   const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
+   try{await finishQaRun(db,runId,'FAILED',{stage:lastStage,
+    provider_error_codes:[code]},Date.now()-started)}catch{}
+   return json({run_id:runId,mode:'focused',status:'FAILED',error:code},502);
+  }
+ }
  const options={country:'CN',remote_only:false,role_hint:'汽车区域督导 销售运营',
   limit:10,exclude_urls:[]};
  try{
