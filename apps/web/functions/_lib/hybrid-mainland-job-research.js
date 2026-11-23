@@ -12,6 +12,7 @@
 import {runNativeDeepSearchJobs} from './native-deepsearch-job-research.js';
 import {searchPublicJobs,sourceOnlyJobPreviews} from './deepseek-search-match.js';
 import {isMainlandEmployerJobUrl} from './match-employer-source.js';
+import {fallbackIndexIndustries} from './domestic-employer-index.js';
 
 export const HYBRID_DISCOVERY_VERSION='HHBA_MAINLAND_NATIVE_HYBRID_RECALL_V1';
 const compact=(value,max=90)=>String(value||'').replace(/[\u0000-\u001f]/g,' ')
@@ -71,8 +72,20 @@ const fatalProviderCode=new Set([
 export async function runHybridMainlandJobResearch(key,resume,roleHint,limit=10,options={},deps={}){
  const native=deps.native||runNativeDeepSearchJobs,search=deps.search||searchPublicJobs,
   previews=deps.previews||sourceOnlyJobPreviews,now=Date.now();
- const queries=mainlandHybridSearchQueries(resume,roleHint,options.resumeProfile,6);
+ const baseQueries=mainlandHybridSearchQueries(resume,roleHint,options.resumeProfile,6);
+ let queries=baseQueries,indexCompanies=0;
  const companion=(async()=>{
+  const roles=[roleHint,...(options.resumeProfile?.target_roles||[])].map(role).filter(Boolean).slice(0,4);
+  if(typeof options.employerIndex==='function'&&roles.length){
+   try{
+    const hint=await options.employerIndex(roles,fallbackIndexIndustries(roles));
+    if(hint?.available&&Array.isArray(hint.queries)){
+     indexCompanies=Number(hint.considered)||0;
+     queries=[...new Set([...baseQueries,...hint.queries.filter(q=>
+      typeof q==='string'&&q.length<=128&&!CONTACT.test(q))])].slice(0,9);
+    }
+   }catch{/* Index is only a hint. Public Search remains independent. */}
+  }
   if(!queries.length)return {matches:[],hits:[],diagnostic:{queries:0,raw_results:0,candidate_links:0},error:null};
   try{
    const r=await search(key,'',roleHint,{signal:options.signal,
@@ -130,7 +143,7 @@ export async function runHybridMainlandJobResearch(key,resume,roleHint,limit=10,
   candidate_links:(Number(diag.candidate_links)||0)+(Number(searchDiag.candidate_links)||0),
   provider_items:(Number(diag.provider_items)||0)+(Number(searchDiag.raw_results)||0),
   visible_jobs:merged.length,elapsed_ms:Date.now()-now,
-  hybrid_fallback:{queries:queries.length,
+  hybrid_fallback:{queries:queries.length,index_companies_considered:indexCompanies,
    raw_results:Number(searchDiag.raw_results)||0,
    candidate_links:supplement.hits.length,
    source_previews:supplement.matches.length,
