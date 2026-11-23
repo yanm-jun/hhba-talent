@@ -13,7 +13,9 @@ function responsesMock(mock){
   const oldInput={...init,body:JSON.stringify({model:request.model,
    messages:[{role:'system',content:request.instructions},
     {role:'user',content:request.input}]})};
-  const response=await mock(url,oldInput);
+  let response;
+  try{response=await mock(url,oldInput)}
+  catch(error){console.error('OPENAI_FIXTURE_MOCK_ASSERT',error.message);throw error}
   if(!response.ok)return response;
   const data=await response.json();
   const content=data?.choices?.[0]?.message?.content;
