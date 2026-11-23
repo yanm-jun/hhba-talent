@@ -18,14 +18,15 @@ V2 不调用 DeepSeek，默认走 OpenAI 官方 API；可明确选择用户授�
 
 在 Cloudflare Pages **Preview** 环境设置：
 - `HHBA_MATCH_OPENAI_API_KEY`：**Secret**，可为 OpenAI 官方 Key，或授权的 reqtoken 中转站 Token。绝不存放在浏览器、GitHub、文档或聊天里；聊天里公开过的密钥须轮换。
-- `HHBA_MATCH_OPENAI_BASE_URL`：纯文本。官方使用 `https://api.openai.com/v1`；当前中转站使用 `https://api-c.reqtoken.com/v1`。仅这两个固定 HTTPS 地址获准传输 Token，其他源直接报 `AI_PROVIDER_ENDPOINT_NOT_APPROVED`；不会跟随 3xx 重定向。
-- `HHBA_MATCH_OPENAI_MODEL`：纯文本。中转站示例 `gpt-6.2-sol`；官方默认 `gpt-6.2-astra`。模型是否真实可用须通过实际 Responses / web_search 验证，不以名称或代理宣传推断。
+- `HHBA_MATCH_V2_RUNTIME`：**纯文本 JSON，不包含密钥**。Cloudflare Pages 免费方案只有 64 个变量/Secret 名额，原来四个非敏感配置已合并：`{"baseUrl":"https://api-c.reqtoken.com/v1","model":"gpt-6.2-sol","matchEnabled":true,"wordEnabled":true}`。生产环境不会因为这个预览配置而开启 V2。
+- `HHBA_MATCH_OPENAI_BASE_URL`、`HHBA_MATCH_OPENAI_MODEL`、`HHBA_MATCH_CLEAN_V2_ENABLED`、`HHBA_MATCH_OPENAI_WORD_V2_ENABLED`：单独配置的旧字段仍可向后兼容，但预览环境已将它们清理，由紧凑字段替代。
+- 仅两个固定 HTTPS 地址可接收 Token：`https://api.openai.com/v1`、`https://api-c.reqtoken.com/v1`，其他源返回 `AI_PROVIDER_ENDPOINT_NOT_APPROVED`。模型权限、Responses 和 web_search 必须真机验证。
 - `HHBA_MATCH_SERVICE_ENABLED=1` 和授权登录的 D1 绑定。
 - `HHBA_PREVIEW_AI_DIAG_ENABLED=1`：仅用于 Cloudflare **preview hostname** 的明确授权诊断。
-- `HHBA_MATCH_CLEAN_V2_ENABLED=0`：验收前在**生产**保持关闭。**不要将预览诊断设置复制到正式站。**
+- 生产不设置 `HHBA_MATCH_CLEAN_V2_ENABLED=1`，且紧凑配置的 preview 标志绝不能自动打开正式站：验收前在**生产**保持关闭。**不要将预览诊断设置复制到正式站。**
 
 ### Word 简历优化迁移（预览隔离）
-- 可在独立预览环境配置 `HHBA_MATCH_OPENAI_WORD_V2_ENABLED=1`。**仅当** `HHBA_AUTH_ROLLOUT=preview` 且 `HHBA_PREVIEW_AI_DIAG_ENABLED=1` 时，Word 的 `resume_optimization`、`resume_rewrite` 和 `resume_reviewer` 才会被强制改走指定 GPT Responses 兼容接口。
+- 可在独立预览环境使用紧凑配置中的 `wordEnabled:true`（或旧变量 `HHBA_MATCH_OPENAI_WORD_V2_ENABLED=1`）。**仅当** `HHBA_AUTH_ROLLOUT=preview` 且 `HHBA_PREVIEW_AI_DIAG_ENABLED=1` 时，Word 的 `resume_optimization`、`resume_rewrite` 和 `resume_reviewer` 才会被强制改走指定 GPT Responses 兼容接口。
 - Word 使用 V2 的 `HHBA_MATCH_OPENAI_API_KEY`、`HHBA_MATCH_OPENAI_BASE_URL` 和 `HHBA_MATCH_OPENAI_MODEL`；没有有效的对应服务 Token 则报告未配置，**不静默回退 DeepSeek**。
 - `generateSuggestions` 和 `completeJson` 对 OpenAI 使用 Responses API，覆盖定向建议、整篇撰写、独立事实审核和 Agent 续写。原本非 OpenAI 的 provider 行为不变。
 - Word 改写仍要求已经可信核验的 JD 身份、签名续写 checkpoint、求职者登录、明确授权；所有建议还需要用户确认，不应直接修改原始简历。
@@ -51,3 +52,6 @@ V2 使用 `{HHBA_MATCH_OPENAI_BASE_URL}/responses`。只有官方 OpenAI 与用�
 - `apps/web/scripts/clean-match-v2-openai.contract.test.mjs`
 
 新模块独立，禁止从 V2 路由调用旧 DeepSeek 识别/搜索工具。`HHBA_MATCH_CLEAN_V2_ENABLED` 保持生产关闭是发布门槛，不是待修功能。
+
+## Cloudflare Pages 免费变量数量修复
+2026-11-23 新版 Preview 构建曾因 66 个 worker binding 超出免费计划 64 限制，在 Function 发布步骤失败。已将预览四个明文项合并为一个 `HHBA_MATCH_V2_RUNTIME`，预览绑定项从 64 减至 61，不触碰其他业务环境变量，给 Preview 的独立 Secret 留出名额。当前发现用户误将 `HHBA_MATCH_OPENAI_API_KEY` 加入 Production，必须由用户在 Cloudflare 控制台的 **Preview** 分组重新输入密钥；加密 Secret 不能从 Production 读取或复制。正式部署未放行。
