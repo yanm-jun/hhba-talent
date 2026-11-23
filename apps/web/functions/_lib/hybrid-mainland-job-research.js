@@ -72,7 +72,8 @@ const fatalProviderCode=new Set([
 export async function runHybridMainlandJobResearch(key,resume,roleHint,limit=10,options={},deps={}){
  const native=deps.native||runNativeDeepSearchJobs,search=deps.search||searchPublicJobs,
   previews=deps.previews||sourceOnlyJobPreviews,now=Date.now();
- const baseQueries=mainlandHybridSearchQueries(resume,roleHint,options.resumeProfile,6);
+ const nativeTrial=options.search_engine==='deepseek_native';
+ const baseQueries=mainlandHybridSearchQueries(resume,roleHint,options.resumeProfile,nativeTrial?6:3);
  let queries=baseQueries,indexCompanies=0;
  const companion=(async()=>{
   const roles=[roleHint,...(options.resumeProfile?.target_roles||[])].map(role).filter(Boolean).slice(0,4);
@@ -82,7 +83,7 @@ export async function runHybridMainlandJobResearch(key,resume,roleHint,limit=10,
     if(hint?.available&&Array.isArray(hint.queries)){
      indexCompanies=Number(hint.considered)||0;
      queries=[...new Set([...baseQueries,...hint.queries.filter(q=>
-      typeof q==='string'&&q.length<=128&&!CONTACT.test(q))])].slice(0,9);
+      typeof q==='string'&&q.length<=128&&!CONTACT.test(q))])].slice(0,nativeTrial?9:5);
     }
    }catch{/* Index is only a hint. Public Search remains independent. */}
   }
