@@ -13,7 +13,8 @@ const JD=[
  '腾讯招聘','公司名称：腾讯','职位名称：渠道运营专员','工作地点：上海',
  '岗位职责：负责渠道运营和销售数据复盘工作',
  '任职要求：具有销售数据分析经验和跨团队协作能力',
- '薪酬以企业官方岗位公告为准。'
+ '薪酬以企业官方岗位公告为准。',
+ '工作说明：该职位需要跨团队配合，定期整理客户运营数据，复盘转化指标并向渠道管理团队汇报实际工作进展。'
 ].join('\n');
 const json=value=>Response.json({status:'completed',output:[
  {type:'message',content:[{type:'output_text',text:JSON.stringify(value)}]}
