@@ -220,7 +220,13 @@ test('preview provider diagnostic requires explicit click and existing authorize
  assert.match(page,/user&&getRealAuthToken\(\)\?<button/);
  assert.match(page,/onClick=\{\(\)=>void runPreviewPreflight\(\)\}/);
  assert.match(service,/window\.location\.hostname\.endsWith\('\.hhba-talent\.pages\.dev'\)/);
- assert.match(service,/data\.enabled===false&&data\.preflight_available===true/);
+ assert.match(service,/return data\.preflight_available===true/);
+ assert.doesNotMatch(service,/data\.enabled===false&&data\.preflight_available===true/);
+ const pausePanel=page.indexOf("availability==='disabled'&&<div");
+ const pausedPanelClosing=page.indexOf('</div></div>}',pausePanel);
+ const diagPanel=page.indexOf('preflightAvailable&&<div className="hhba-ai-preview-diagnostic">');
+ assert.ok(pausePanel>=0&&pausedPanelClosing>pausePanel&&diagPanel>pausedPanelClosing,
+  'preview provider check must not be nested inside disabled-service banner');
  assert.match(service,/fetch\(API\+'\/provider-check'/);
  assert.match(service,/headers:\{Authorization:'Bearer '\+token\}/);
  const probe=service.slice(service.indexOf('export async function runMatchPreviewProviderCheck'),
