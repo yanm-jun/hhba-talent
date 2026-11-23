@@ -42,8 +42,14 @@ test('native deep research uses official DeepSeek Flash high-thinking web tools 
 
 test('only completed native provider search sources are eligible, not the model or an open-page URL by itself',()=>{
  const fake={type:'web_search_call',status:'completed',kind:'deep_search',
-  action:{type:'open_page',url:INVENTED},page:{url:INVENTED}};
- assert.deepEqual(nativeDeepSearchSources([fake]),[]);
+  action:{type:'open_page',url:INVENTED}};
+ assert.deepEqual(nativeDeepSearchSources([fake]),[],
+  'model proposed URL alone must not count; requires a completed opened-page result');
+ const successful={...fake,page:{url:INVENTED,title:'已打开的真实工具页面'}};
+ assert.deepEqual(nativeDeepSearchSources([successful]).map(x=>x.url),[INVENTED],
+  'completed native open_page is research evidence, but never itself a verified JD');
+ const failed={...successful,status:'failed'};
+ assert.deepEqual(nativeDeepSearchSources([failed]),[]);
  assert.deepEqual(nativeDeepSearchSources([sourceItem]).map(x=>x.url),[OFFICIAL]);
  const parsed=groundedNativeJobAnswer(modelResponse([row(),row(INVENTED),
   row(FOREIGN),row(BOARD)]),10);
@@ -52,6 +58,38 @@ test('only completed native provider search sources are eligible, not the model 
  assert.equal(parsed.matches[0].source_status,'SOURCE_SEARCH_PREVIEW');
  assert.equal(parsed.matches[0].research_anchor.url,OFFICIAL);
  assert.equal(parsed.matches[0].jd_source_status,undefined);
+});
+
+test('native deep research accepts a specific job found by opening a search result, never just model text',()=>{
+ const listPage='https://careers.tencent.com/search.html';
+ const searched={...sourceItem,action:{...sourceItem.action,
+  sources:[{type:'url',url:listPage,title:'腾讯招聘职位列表'}]}};
+ const opened={type:'web_search_call',id:'opened-direct',status:'completed',
+  kind:'deep_search',action:{type:'open_page',url:OFFICIAL},
+  page:{url:OFFICIAL,title:'销售运营主管 - 腾讯招聘'}};
+ const response={...modelResponse([row()]),output:[searched,opened,
+  {type:'message',content:[{type:'output_text',text:JSON.stringify({jobs:[row()]})}]}]};
+ const sources=nativeDeepSearchSources(response);
+ assert.deepEqual(sources.map(x=>x.url),[OFFICIAL]);
+ assert.equal(sources[0].source_origin,'OPENED_PAGE');
+ const result=groundedNativeJobAnswer(response,10);
+ assert.equal(result.matches.length,1);
+ assert.equal(result.matches[0].official_url,OFFICIAL);
+ assert.equal(result.matches[0].match_score,null);
+ assert.equal(result.matches[0].research_anchor.url,OFFICIAL);
+});
+
+test('unverified model suggestions do not consume 10 result slots before a genuine employer source',()=>{
+ const rows=Array.from({length:12},(_,i)=>({
+  ...row('https://careers.fake-recommendation.cn/jobs/unseen-'+i),
+  company:'未证实公司'+i,title:'区域督导'+i
+ }));
+ rows.push(row());
+ const parsed=groundedNativeJobAnswer(modelResponse(rows),10);
+ assert.equal(parsed.received,13);
+ assert.equal(parsed.source_grounded,1);
+ assert.deepEqual(parsed.matches.map(x=>x.official_url),[OFFICIAL]);
+ assert.equal(parsed.rejected,12);
 });
 
 test('a real streaming native deep-search session forwards tool progress and source leads but not raw CV or fake links',async()=>{
@@ -94,13 +132,40 @@ test('a real streaming native deep-search session forwards tool progress and sou
  assert.ok(activity.every(x=>!JSON.stringify(x).includes('已脱敏的门店运营简历')));
 });
 
+test('SSE read_page completion exposes an actually opened single job as a JD review lead',async()=>{
+ const listing={...sourceItem,action:{type:'search',
+  queries:['上海 企业岗位'],sources:[{type:'url',
+   url:'https://careers.tencent.com/search.html',title:'腾讯招聘首页'}]}};
+ const opened={type:'web_search_call',id:'read-job',status:'completed',
+  kind:'deep_search',action:{type:'open_page',url:OFFICIAL},
+  page:{url:OFFICIAL,title:'腾讯 销售运营主管'}};
+ const final={...modelResponse([row()]),output:[listing,opened,
+  {type:'message',content:[{type:'output_text',text:JSON.stringify({jobs:[row()]})}]}]};
+ const urls=[];
+ const out=await runNativeDeepSearchJobs('synthetic','去标识化的岗位经历','区域督导',10,
+  {onSources:(_jobs,_closed,links)=>urls.push(...links)},
+  {fetcher:async()=>asSse([
+   {type:'response.output_item.done',item:listing},
+   {type:'response.output_item.done',item:opened},
+   {type:'response.completed',response:final}
+  ])});
+ assert.deepEqual(urls,[OFFICIAL]);
+ assert.equal(out.matches.length,1);
+ assert.equal(out.diagnostic.search_result_links,0);
+ assert.equal(out.diagnostic.opened_job_pages,1);
+ assert.equal(out.diagnostic.model_candidate_rows,1);
+ assert.equal(out.diagnostic.model_source_grounded,1);
+});
+
 test('missing native Search calls or a provider failure cannot present model-invented job links',async()=>{
  const noSearch={status:'completed',
   output:[{type:'message',content:[{type:'output_text',text:JSON.stringify({jobs:[row()]})}]}],
   usage:{server_tool_use:{tool_search:0,tool_fetch:0}}};
  await assert.rejects(runNativeDeepSearchJobs('test-key','简历','督导',10,{},{
   fetcher:async()=>asSse([{type:'response.completed',response:noSearch}])
- }),e=>e.code==='AI_EMPLOYER_JOBS_NOT_FOUND');
+ }),e=>e.code==='AI_EMPLOYER_JOBS_NOT_FOUND'&&
+  e.diagnostic?.research_error==='NO_ELIGIBLE_EMPLOYER_JOB_SOURCES'&&
+  e.diagnostic?.searches===0&&e.diagnostic?.candidate_links===0);
  await assert.rejects(runNativeDeepSearchJobs('test-key','简历','督导',10,{},{
   fetcher:async()=>asSse([{type:'response.failed',response:{status:'failed',error:{code:'server_error'}}}])
  }),e=>e.code==='AI_NATIVE_DEEPSEARCH_FAILED');

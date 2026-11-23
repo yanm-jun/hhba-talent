@@ -50,7 +50,10 @@ export type MatchResponse = {
    candidate_links?:number;explicit_city_sources?:number;selection_rounds?:number;
    underfilled_rechecks?:number;unscored_source_previews?:number;checkpoint_restored?:boolean;
    underfilled_expansion_queries?:number;underfilled_expansion_new?:number;
-   search_failures?:number;rejected_links?:number;agent_exit_reason?:string};
+   search_failures?:number;rejected_links?:number;agent_exit_reason?:string;
+   mode?:string;research_error?:string;search_result_links?:number;
+   opened_job_pages?:number;model_candidate_rows?:number;model_source_grounded?:number;
+   jd_verification?:{eligible?:number;verified?:number;scored?:number;failed?:number}};
   history_id?:string|null;
   history_status?:'SAVED'|'EMPTY'|'UNAVAILABLE';
   new_job_count?:number;
