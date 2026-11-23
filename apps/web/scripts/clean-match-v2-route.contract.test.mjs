@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {redactQaDiagnostic} from '../functions/_lib/clean-match-v2-qa-log.js';
+import {adaptOldSearchFixtures as adapt} from './v2-openai-test-compat.mjs';
 import {onRequest} from '../functions/api/match-next/[[path]].js';
 
 const KEY='synthetic-provider-key-never-real';
@@ -47,7 +48,7 @@ function fixtureEnv(flags={}){
   }};
  }};
  return {env:{
-  HHBA_MATCH_DEEPSEEK_KEY:KEY,
+  HHBA_MATCH_OPENAI_API_KEY:KEY,
   HHBA_MATCH_SERVICE_ENABLED:'1',
   HHBA_PNVS_AUTH_DB:db,...flags
  },writes,requests};
@@ -67,7 +68,7 @@ function previewRequest(tail,options={}){
 }
 function installProviderMock(){
  const original=globalThis.fetch,calls=[];
- globalThis.fetch=async (url,options={})=>{
+ globalThis.fetch=adapt(async (url,options={})=>{
   const path=new URL(url).pathname,body=options.body?JSON.parse(options.body):{};
   calls.push({path,body});
   if(path==='/user/balance')return Response.json({is_available:true});
@@ -80,7 +81,7 @@ function installProviderMock(){
    title:'腾讯销售运营主管'});
   if(path==='/responses'){
    const prompt=body.instructions||'';
-   if(prompt.includes('健康检查'))return reply({ok:true});
+   if(prompt.includes('健康检查')||prompt.includes('仅返回 JSON'))return reply({ok:true});
    if(prompt.includes('简历识别 Agent'))return reply({
     facts:[{kind:'work',quote:QUOTE}],skills:[{name:'门店运营',evidence:QUOTE}],
     target_roles:['区域运营'],education:null,education_evidence:null,
@@ -103,7 +104,7 @@ function installProviderMock(){
    throw Error('unexpected model prompt');
   }
   throw Error('unexpected provider path '+path);
- };
+ });
  return {calls,restore(){globalThis.fetch=original}};
 }
 
@@ -114,16 +115,16 @@ test('preview-only opt-in permits authenticated live preflight while matching st
  assert.equal(status.preflight_available,true);
  let probeCalls=0;
  const previous=globalThis.fetch;
- globalThis.fetch=async(url,opts={})=>{
+ globalThis.fetch=adapt(async(url,opts={})=>{
   probeCalls++;
   const path=new URL(url).pathname;
   if(path==='/user/balance')return Response.json({is_available:true});
-  if(path==='/v1/tools/search')return Response.json({results:[]});
+  if(path==='/v1/tools/search')return Response.json({results:[{url:JD_URL,title:'腾讯 招聘岗位'}]});
   if(path==='/responses')return reply({ok:true});
   if(path==='/v1/tools/fetch')return Response.json({content:
    'Provider Fetch returned verified public documentation content. '.repeat(3)});
   throw Error('unexpected '+path);
- };
+ });
  try{
   const unauthorized=await onRequest({request:new Request(
    'https://5f88e175.hhba-talent.pages.dev/api/match-next/provider-check'),env});
@@ -133,10 +134,10 @@ test('preview-only opt-in permits authenticated live preflight while matching st
   assert.equal(preflight.status,200);
   const data=await preflight.json();
   assert.equal(data.status,'READY');
-  assert.equal(data.fetch_content_verified,true);
+  assert.equal(data.fetch_content_verified,false);
   assert.deepEqual(data.capabilities.sort(),[
-   'balance','deepseek_fetch','deepseek_search','v4_pro_responses_json'].sort());
-  assert.equal(probeCalls,4);
+   'openai_responses_json','openai_web_search_sources'].sort());
+  assert.equal(probeCalls,2);
   const denied=await onRequest({request:previewRequest('/resume',{
    method:'POST',body:'{}'}),env});
   assert.equal(denied.status,503,'preflight can never unlock the public match API');
