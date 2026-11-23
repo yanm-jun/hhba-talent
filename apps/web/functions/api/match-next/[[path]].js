@@ -337,8 +337,15 @@ export async function onRequest({request,env}){
    return json({...probe,engine:MATCH_V2});
   }catch(e){
    const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
-   console.warn('HHBA_MATCH_V2_PROVIDER_CHECK_FAILED',JSON.stringify({code}));
-   return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:502);
+   const stage=['basic_responses','structured_json','web_search_sources'].includes(e?.probeStage)?
+    e.probeStage:'unknown';
+   const upstream_status=Number.isInteger(e?.upstreamStatus)&&
+    e.upstreamStatus>=400&&e.upstreamStatus<=599?e.upstreamStatus:null;
+   // No upstream message/body/secret/profile appears in logs or UI.
+   const diagnostic={code,stage,upstream_status};
+   console.warn('HHBA_MATCH_V2_PROVIDER_CHECK_FAILED',JSON.stringify(diagnostic));
+   return json({ok:false,error:code,stage,upstream_status},
+    code==='AI_PROVIDER_RATE_LIMITED'?429:502);
   }
  }
  if(tail==='/synthetic-check'){
