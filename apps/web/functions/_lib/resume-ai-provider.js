@@ -2,6 +2,7 @@
  * Server-only AI provider routing. Never expose credentials to the browser.
  * Keep provider model names configurable; vendors change model availability.
  */
+import {openAIJson} from './openai-match-adapter.js';
 export const PROVIDERS = Object.freeze({
  deepseek:{baseUrl:'https://api.deepseek.com',protocol:'openai'},
  openai:{baseUrl:'https://api.openai.com/v1',protocol:'openai'},
@@ -15,17 +16,21 @@ export const PROVIDERS = Object.freeze({
 const allowedKeys=new Set(Object.keys(PROVIDERS));
 const clip=(value,max=20000)=>String(value||'').slice(0,max);
 export function selectProvider(env,task='resume_optimization',{reasoning=false}={}){
- const requested=clip(env?.['HHBA_AI_'+task.toUpperCase()+'_PROVIDER']||env?.HHBA_AI_DEFAULT_PROVIDER||'deepseek',30).toLowerCase();
+ const requested=clip(env?.['HHBA_AI_'+task.toUpperCase()+'_PROVIDER']||env?.HHBA_AI_DEFAULT_PROVIDER||
+  (env?.HHBA_MATCH_OPENAI_API_KEY?'openai':'deepseek'),30).toLowerCase();
  if(!allowedKeys.has(requested))throw new Error('AI_PROVIDER_UNSUPPORTED');
  const prefix='HHBA_AI_'+requested.toUpperCase()+'_';
  // For the existing HHBA DeepSeek integration, reuse the server-side secret
  // instead of requiring the founder to duplicate sensitive credentials.
- const key=env?.[prefix+'API_KEY']||(requested==='deepseek'?env?.HHBA_MATCH_DEEPSEEK_KEY:null);
+ const key=env?.[prefix+'API_KEY']||
+  (requested==='openai'?env?.HHBA_MATCH_OPENAI_API_KEY:
+   requested==='deepseek'?env?.HHBA_MATCH_DEEPSEEK_KEY:null);
  // "deepseek-chat"/"deepseek-reasoner" were retired in 2026: use the current
  // non-thinking Flash model by default, always allowing explicit override.
  const deepseekWriter=reasoning||['resume_rewrite','resume_reviewer'].includes(task);
- const model=env?.[prefix+'MODEL']||(requested==='deepseek'?
-  (deepseekWriter?'deepseek-v4-pro':'deepseek-flash'):null);
+ const model=env?.[prefix+'MODEL']||
+  (requested==='openai'?(env?.HHBA_MATCH_OPENAI_MODEL||'gpt-6-sol'):
+   requested==='deepseek'?(deepseekWriter?'deepseek-v4-pro':'deepseek-flash'):null);
  if(typeof key!=='string'||!key.trim()||typeof model!=='string'||!model.trim())throw new Error('AI_PROVIDER_NOT_CONFIGURED');
  const effort=['low','high','max'].includes(
   String(env?.HHBA_AI_DEEPSEEK_REASONING_EFFORT||'').toLowerCase())?
@@ -90,6 +95,10 @@ export async function generateSuggestions({env,blocks,job,signal,documentContext
   ...(documentContext?{document_context:documentContext}:{}),
   output_format_example:sample,
   instructions:'严格输出符合示例字段名的JSON对象，不要复制示例建议内容；blockId必须是blocks中的id；一份段落至多一条建议。完整简历上下文用于理解结构，不能把其他段落里的经历、数字或资格写进当前段落。'});
+ let parsed=provider.name==='openai'?await openAIJson(fetch,{
+  name:'openai',key:provider.key,model:provider.model},system,input,60000,signal,
+  {maxOutput:outputBudget}):null;
+ if(!parsed){
  let url,headers,body;
  if(provider.protocol==='anthropic'){
   url=provider.baseUrl+'/messages';
@@ -131,9 +140,9 @@ export async function generateSuggestions({env,blocks,job,signal,documentContext
  const output=provider.protocol==='anthropic'?data?.content?.filter(x=>x.type==='text').map(x=>x.text).join(''):data?.choices?.[0]?.message?.content;
  if(data?.choices?.[0]?.finish_reason==='length')throw new Error('AI_PROVIDER_RESPONSE_TRUNCATED');
  if(typeof output!=='string'||!output.trim())throw new Error('AI_PROVIDER_RESPONSE_EMPTY');
- let parsed;
  try{parsed=JSON.parse(output.replace(/^\s*```(?:json)?\s*|\s*```\s*$/g,''));}
  catch{throw new Error('AI_PROVIDER_RESPONSE_JSON_INVALID');}
+ }
  let suggestions;
  try{suggestions=parseSuggestions(parsed,blocks.map(b=>b.id));}
  catch{throw new Error('AI_PROVIDER_SUGGESTION_SCHEMA_INVALID');}
