@@ -135,7 +135,7 @@ export async function readOfficialEmployerPage(fetcher,url,signal){
    await new Promise(resolve=>setTimeout(resolve,150));
    continue;
   }
-  throw fail(response.status===403?'AI_FETCH_ACCESS_DENIED':'AI_FETCH_UPSTREAM_ERROR');
+  throw fail([401,403].includes(response.status)?'AI_FETCH_ACCESS_DENIED':'AI_FETCH_UPSTREAM_ERROR');
  }
  const length=Number(response.headers?.get('content-length')||0);
  if(length>320000)throw fail('AI_FETCH_TOO_LARGE');
