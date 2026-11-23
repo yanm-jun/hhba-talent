@@ -317,7 +317,7 @@ test('underfilled Search triggers one adaptive wave and backfills a second real 
   '工作地点：上海','岗位职责：负责销售渠道管理、区域业务分析与跨部门项目协调执行',
   '任职要求：熟悉企业运营指标、渠道经营管理和数据分析方法，能够协调多部门落实年度经营计划',
   '岗位说明：本岗位职位信息可供求职者在企业招聘页面核对，并以招聘方最新官方公示为准'
- ].join('\\n');
+ ].join('\n');
  const fetcher=async(url,opts)=>{
   const path=new URL(url).pathname,req=JSON.parse(opts.body);
   if(path==='/v1/tools/search'&&
@@ -332,7 +332,7 @@ test('underfilled Search triggers one adaptive wave and backfills a second real 
   return base(url,opts);
  };
  const result=await runCleanJobMatch('test-key',
-  '意向工作城市：上海\\n渠道督导、销售复盘',profile,'区域督导',10,
+  '意向工作城市：上海\n渠道督导、销售复盘',profile,'区域督导',10,
   {},{fetcher});
  assert.equal(result.diagnostic.recovery_planned,true);
  assert.ok(result.diagnostic.recovery_queries>=1&&result.diagnostic.recovery_queries<=6);
