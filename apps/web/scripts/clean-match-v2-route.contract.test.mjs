@@ -44,7 +44,6 @@ function fixtureEnv(flags={}){
  return {env:{
   HHBA_MATCH_DEEPSEEK_KEY:KEY,
   HHBA_MATCH_SERVICE_ENABLED:'1',
-  HHBA_MATCH_LIMIT_PEPPER:'synthetic-qa-pepper-fixture-not-production',
   HHBA_PNVS_AUTH_DB:db,...flags
  },writes,requests};
 }
@@ -255,13 +254,8 @@ test('preview-only synthetic acceptance runs the actual search route and never s
   assert.ok(provider.calls.some(x=>x.path==='/v1/tools/fetch'));
   assert.equal(writes.some(x=>x.sql.includes('hhba_ai_match_history')),false,
    'preview-only synthetic test must never write private match history');
-  const qa= writes.find(x=>x.sql.includes('INSERT INTO hhba_resume_match_requests'));
-  assert.ok(qa,'the expensive operation must reserve a server-side budget first');
-  assert.match(qa.sql,/account_hash LIKE 'v2qa:%'/);
-  assert.match(qa.sql,/<4 AND/);
-  assert.match(qa.sql,/<2/);
-  assert.equal(qa.args.some(x=>String(x).includes(PHONE)),false,
-   'quota history must not store a plaintext candidate phone number');
+  assert.equal(writes.some(x=>x.sql.includes('hhba_resume_match_requests')),false,
+   'preview QA must not depend on any per-account or global daily quota');
   assert.doesNotMatch(JSON.stringify(provider.calls),/candidate@example\.com|13812345678/);
  }finally{provider.restore()}
 });
@@ -320,26 +314,43 @@ test('preview synthetic acceptance UI is clearly labeled and never sends a user 
 });
 
 
-test('unavailable quota or exhausted budget blocks expensive synthetic Search and Fetch',async()=>{
- const cleanRequest=()=>previewRequest('/synthetic-check',{
-  method:'POST',body:JSON.stringify({consent:true,scenario:'automotive_operations_v1'})
- });
- const previous=globalThis.fetch;
- let calls=0;globalThis.fetch=async()=>{calls++;throw new Error('paid provider must not be called')};
+
+test('synthetic preview reruns are allowed without rate quota table, salt or calendar-day budget',async()=>{
+ const {env,writes}=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
+ delete env.HHBA_MATCH_LIMIT_PEPPER;
+ const originalPrepare=env.HHBA_PNVS_AUTH_DB.prepare.bind(env.HHBA_PNVS_AUTH_DB);
+ env.HHBA_PNVS_AUTH_DB.prepare=sql=>{
+  if(/hhba_resume_match_requests|quota|daily|v2qa:/i.test(sql))
+   throw Error('synthetic preview must not touch any quota table');
+  return originalPrepare(sql);
+ };
+ const provider=installProviderMock();
  try{
-  const missingSecret=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1',
-   HHBA_MATCH_LIMIT_PEPPER:''});
-  let res=await onRequest({request:cleanRequest(),env:missingSecret.env});
-  assert.equal(res.status,503);
-  assert.equal((await res.json()).error,'MATCH_SYNTHETIC_QUOTA_UNAVAILABLE');
-  const full=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
-  const prepare=full.env.HHBA_PNVS_AUTH_DB.prepare.bind(full.env.HHBA_PNVS_AUTH_DB);
-  full.env.HHBA_PNVS_AUTH_DB.prepare=sql=>
-   sql.includes('INSERT INTO hhba_resume_match_requests')?
-    {bind(){return {async run(){return {success:true,meta:{changes:0}}}}}}:prepare(sql);
-  res=await onRequest({request:cleanRequest(),env:full.env});
-  assert.equal(res.status,429);
-  assert.equal((await res.json()).error,'MATCH_SYNTHETIC_LIMIT');
-  assert.equal(calls,0,'no preview over-budget request may reach the paid provider');
- }finally{globalThis.fetch=previous}
+  for(let attempt=0;attempt<3;attempt++){
+   const response=await onRequest({request:previewRequest('/synthetic-check',{
+    method:'POST',headers:{Accept:'text/event-stream','Content-Type':'application/json'},
+    body:JSON.stringify({consent:true,scenario:'automotive_operations_v1'})
+   }),env});
+   assert.equal(response.status,200,'same candidate may rerun synthetic QA repeatedly');
+   const text=await response.text();
+   const complete=text.split('\n\n').find(x=>x.startsWith('event: complete'));
+   assert.ok(complete);
+   const result=JSON.parse(complete.slice(complete.indexOf('data: ')+6));
+   assert.equal(result.preview_synthetic,true);
+   assert.equal(result.history_status,'EMPTY');
+   assert.equal(result.matches.length,1);
+  }
+  assert.ok(provider.calls.filter(x=>x.path==='/v1/tools/search').length>=3);
+  assert.equal(writes.length,0,'repeated synthetic QA cannot write candidate matching history');
+ }finally{provider.restore()}
+});
+
+test('synthetic QA UI re-enables its one-click button after a completed or failed run',()=>{
+ const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ const route=readFileSync(new URL('../functions/api/match-next/[[path]].js',import.meta.url),'utf8');
+ assert.doesNotMatch(page,/syntheticStarted|setSyntheticStarted/);
+ assert.match(page,/disabled=\{syntheticBusy\}/);
+ assert.match(page,/重新运行虚构简历岗位搜索/);
+ assert.doesNotMatch(route,/reserveSyntheticAcceptance|MATCH_SYNTHETIC_LIMIT|MATCH_SYNTHETIC_QUOTA_UNAVAILABLE/);
+ assert.match(route,/if\(!previewPreflight\(env,request\)\)return fail\('MATCH_SYNTHETIC_NOT_ENABLED',503\)/);
 });
