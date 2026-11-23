@@ -1,19 +1,27 @@
 /**
- * Official OpenAI-only transport for HHBA Clean Match V2.
- * No configurable proxy, OpenAI-compatible third-party host, or DeepSeek fallback.
- * Search results must be actual web_search sources, never model-written links.
+ * OpenAI Responses-compatible transport for HHBA Clean Match V2.
+ * Supports the official endpoint or the explicitly approved reqtoken relay.
+ * Provider selection and credentials are server-side only; no DeepSeek fallback.
+ * Search results must come from completed tool citations, never model prose.
  */
-const ENDPOINT='https://api.openai.com/v1/responses';
+const OFFICIAL_BASE='https://api.openai.com/v1';
+const APPROVED_BASES=new Set([OFFICIAL_BASE,'https://api-c.reqtoken.com/v1']);
 export const DEFAULT_OPENAI_MATCH_MODEL='gpt-6.2-astra';
 const fail=code=>Object.assign(new Error(code),{code});
 export function openAIConfig(value){
  const key=typeof value==='string'?value:value?.key;
  const model=typeof value==='string'?DEFAULT_OPENAI_MATCH_MODEL:
   value?.model||DEFAULT_OPENAI_MATCH_MODEL;
+ const configuredBase=typeof value==='string'?OFFICIAL_BASE:
+  value?.baseUrl||OFFICIAL_BASE;
  if(typeof key!=='string'||!key.trim())throw fail('AI_PROVIDER_NOT_CONFIGURED');
  if(typeof model!=='string'||!/^[a-zA-Z0-9._-]{3,80}$/.test(model))
   throw fail('AI_PROVIDER_MODEL_INVALID');
- return {key,model};
+ // Prevent credentials/PII leaking to arbitrary origins, loopback, or redirects.
+ if(typeof configuredBase!=='string'||!APPROVED_BASES.has(configuredBase))
+  throw fail('AI_PROVIDER_ENDPOINT_NOT_APPROVED');
+ return {key,model,baseUrl:configuredBase,
+  endpoint:configuredBase+'/responses'};
 }
 export function openAIOutputText(payload){
  return (payload?.output||[]).filter(x=>x?.type==='message')
@@ -21,12 +29,12 @@ export function openAIOutputText(payload){
    .map(y=>typeof y.text==='string'?y.text:'')).join('');
 }
 export async function openAIResponse(fetcher,provider,request,{signal=null,timeoutMs=40000}={}){
- const {key,model}=openAIConfig(provider);
+ const {key,model,endpoint}=openAIConfig(provider);
  const timeout=AbortSignal.timeout(timeoutMs),merged=signal?
   AbortSignal.any([signal,timeout]):timeout;
  let response;
  try{
-  response=await fetcher(ENDPOINT,{method:'POST',redirect:'manual',signal:merged,
+  response=await fetcher(endpoint,{method:'POST',redirect:'manual',signal:merged,
    headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',
     Accept:'application/json'},
    body:JSON.stringify({model,store:false,stream:false,...request})});
