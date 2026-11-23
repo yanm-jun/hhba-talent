@@ -9,7 +9,7 @@
 import {safeJDSourceLocator,readFreshJobJdByUrl,saveVerifiedJobJd,
  jdArchiveReady} from './job-jd-archive.js';
 import {directOfficialJobEvidence} from './official-job-evidence.js';
-import {compareMatchResumeToJd} from './resume-jd-match-agent.js';
+import {compareMatchResumeToJd} from './resume-jd-match-openai-v2.js';
 import {findMainlandCity} from './mainland-job-location.js';
 
 const norm=s=>String(s||'').normalize('NFKC').toLowerCase()

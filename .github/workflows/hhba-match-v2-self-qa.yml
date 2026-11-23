@@ -1,0 +1,41 @@
+name: HHBA Match V2 self-QA diagnostic log
+on:
+  pull_request:
+    paths:
+      - 'apps/web/functions/_lib/openai-match-v2-provider.js'
+      - 'apps/web/functions/_lib/clean-match-v2-provider-check.js'
+      - 'apps/web/functions/_lib/clean-match-v2-provider-probe-log.js'
+      - 'apps/web/functions/api/match-next/**'
+      - 'apps/web/scripts/clean-match-v2-*.contract.test.mjs'
+      - 'apps/web/scripts/clean-match-v2-route.contract.test.mjs'
+      - 'apps/web/scripts/match-v2-self-qa-report.mjs'
+      - 'apps/web/d1/0032_match_v2_provider_probe_logs.sql'
+      - '.github/workflows/hhba-match-v2-self-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  v2-self-qa-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact dependencies
+        working-directory: apps/web
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Generate privacy-safe diagnostic report without user testing
+        working-directory: apps/web
+        run: node scripts/match-v2-self-qa-report.mjs
+      - name: Publish inspection artifacts even if a check fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-match-v2-self-qa-${{ github.run_id }}
+          path: apps/web/artifacts/match-v2-self-qa/
+          retention-days: 21
+          if-no-files-found: warn

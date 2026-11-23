@@ -7,16 +7,21 @@
  */
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
-import {recognizeResumeFile} from '../../_lib/resume-ocr.js';
-import {recognizeMatchResume} from '../../_lib/resume-jd-match-agent.js';
+import {recognizeOpenAIResumeFile} from '../../_lib/resume-ocr-openai-v2.js';
+import {recognizeMatchResume} from '../../_lib/resume-jd-match-openai-v2.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {runCleanJobMatch,rankCleanMatchResults,MATCH_V2,findEmployerSources,readEmployerPages,extractJobs,officialDetailRecoveryQueries} from '../../_lib/clean-match-v2.js';
 import {archiveCleanMatchJobs} from '../../_lib/clean-match-v2-jd-bridge.js';
 import {checkCleanMatchProvider} from '../../_lib/clean-match-v2-provider-check.js';
+import {matchV2Runtime} from '../../_lib/clean-match-v2-runtime.js';
+import {recordProviderProbe,readRecentProviderProbes} from '../../_lib/clean-match-v2-provider-probe-log.js';
 import {authorizeOperatorQa,startQaRun,appendQaStage,finishQaRun,getQaRun,
  redactQaDiagnostic} from '../../_lib/clean-match-v2-qa-log.js';
 
-const KIND='HHBA_NATIVE_WEB_MATCH_V1';
+const KIND='HHBA_OPENAI_MATCH_V2';
+const openAIProvider=env=>({key:env?.HHBA_MATCH_OPENAI_API_KEY||env?.HHBA_AI_OPENAI_API_KEY,
+ model:matchV2Runtime(env).model,
+ baseUrl:matchV2Runtime(env).baseUrl});
 // An entirely synthetic, intentionally fabricated candidate, never the
 // signed-in person's uploaded résumé, private document, or stored profile.
 const ACCEPTANCE_SCENARIO='automotive_operations_v1';
@@ -39,15 +44,15 @@ const fail=(code,status=502)=>json({ok:false,error:code},status);
 // and preview-only until the complete workflow passes live acceptance.
 const providerConfigured=env=>
  env?.HHBA_MATCH_SERVICE_ENABLED==='1'&&
- typeof env?.HHBA_MATCH_DEEPSEEK_KEY==='string'&&
- env.HHBA_MATCH_DEEPSEEK_KEY.length>=16&&
+ typeof openAIProvider(env).key==='string'&&
+ openAIProvider(env).key.length>=16&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
-const enabled=env=>providerConfigured(env)&&env?.HHBA_MATCH_CLEAN_V2_ENABLED==='1';
+const enabled=env=>providerConfigured(env)&&matchV2Runtime(env).matchEnabled;
 // CF_PAGES_BRANCH is guaranteed as a Pages BUILD variable, not a runtime
 // binding. Bind prelaunch permission to preview-only env config AND the exact
 // Cloudflare preview hostname. Never grant preflight on the hhba.work domain.
 const previewPreflight=(env,request)=>{
- if(!providerConfigured(env)||env?.HHBA_PREVIEW_AI_DIAG_ENABLED!=='1'||
+ if(!providerConfigured(env)||!matchV2Runtime(env).diagEnabled||
   env?.CF_PAGES_BRANCH==='main')return false;
  try{
   const host=new URL(request.url).hostname.toLowerCase();
@@ -102,7 +107,7 @@ async function operatorQaRun(env,request){
    const plan={roles:['区域督导','渠道运营','销售运营'],cities:['上海','苏州']};
    plan.queries=officialDetailRecoveryQueries(plan);
    enqueue('searching',{queries:plan.queries.length});
-   const search=await findEmployerSources(fetch,env.HHBA_MATCH_DEEPSEEK_KEY,plan,request.signal);
+   const search=await findEmployerSources(fetch,openAIProvider(env),plan,request.signal);
    const d={stage:'reading',searches:search.queries-search.failures,
     search_failures:search.failures,search_raw_results:search.raw_results,
     search_empty_queries:search.empty_queries,candidate_links:search.sources.length,
@@ -112,14 +117,14 @@ async function operatorQaRun(env,request){
     extraction_page_rejections:{}};
    enqueue('reading',{searches:d.searches,
     search_raw_results:d.search_raw_results,candidate_links:d.candidate_links});
-   const read=await readEmployerPages(fetch,env.HHBA_MATCH_DEEPSEEK_KEY,
+   const read=await readEmployerPages(fetch,openAIProvider(env),
     search.sources.slice(0,4),request.signal,{targetSuccesses:4});
    d.fetch_attempted=read.attempts;d.fetch_failures=read.failures;
    d.page_reads=read.pages.length;d.fetch_error_codes=read.error_codes;
    enqueue('researching',{fetch_attempted:d.fetch_attempted,page_reads:d.page_reads,
     fetch_failures:d.fetch_failures});
    const extracted=read.pages.length?
-    await extractJobs(fetch,env.HHBA_MATCH_DEEPSEEK_KEY,read.pages,request.signal):
+    await extractJobs(fetch,openAIProvider(env),read.pages,request.signal):
     {jobs:[],model_failures:0,city_evidence:0,page_rejections:{}};
    d.city_evidence_count=extracted.city_evidence;
    d.model_failures=extracted.model_failures;
@@ -185,7 +190,7 @@ function publicResult(profile,matches,diagnostic,target){
   employer_source_candidates:matches.length-verified,
   native_search:diagnostic,source:'中国大陆企业招聘原文',
   scoring:'有真实 JD 和简历证据时提供参考分；未充分核实的岗位不虚构匹配分，绝非录用概率。',
-  privacy:'仅在本次授权下向 DeepSeek 发送脱敏简历文字，不公开或保存简历原文。',
+  privacy:'仅在本次授权下向已配置的 AI 服务（可能经第三方中转站）发送脱敏简历文字；HHBA 不公开简历原文。',
   disclaimer:matches.length<target?
    '本轮已找到 '+matches.length+' 条有具体职位证据的候选，尚未达到目标 '+target+
     ' 条。职位开放状态及最新要求仍需点击企业来源核实。':
@@ -196,14 +201,14 @@ async function workflow(env,session,input,redacted,{signal,onProgress,onActivity
  const started=Date.now();
  onProgress('parsing');
  onActivity({stage:'parsing',message:'开始理解简历中的真实工作经历及职业能力。'});
- const profile=await recognizeMatchResume(env.HHBA_MATCH_DEEPSEEK_KEY,
+ const profile=await recognizeMatchResume(openAIProvider(env),
   redacted,input.options.role_hint,{signal,onFallback:()=>onActivity({
    stage:'parsing',message:'正在补充核对简历证据，避免误判经历。'})});
  const resumeMs=Date.now()-started;
  onProgress('planning');
  onActivity({stage:'planning',message:'识别到 '+(profile.facts?.length||0)+
   ' 条简历原文证据，将开始新的企业岗位研究流程。'});
- const discovery=await runCleanJobMatch(env.HHBA_MATCH_DEEPSEEK_KEY,
+ const discovery=await runCleanJobMatch(openAIProvider(env),
   redacted,profile,input.options.role_hint,input.options.limit,{
    signal,onProgress,onActivity,onPartial,
    excludeUrls:input.options.exclude_urls||[]
@@ -211,7 +216,7 @@ async function workflow(env,session,input,redacted,{signal,onProgress,onActivity
  // This is a new, independent official-JD archive bridge, NOT the retired
  // search Agent. It can unlock the unchanged, evidence-gated Word optimizer.
  const jdStart=Date.now();
- const archived=await archiveCleanMatchJobs(env,env.HHBA_MATCH_DEEPSEEK_KEY,
+ const archived=await archiveCleanMatchJobs(env,openAIProvider(env),
   profile,discovery.matches,{signal,onActivity,onPartial});
  const matches=rankCleanMatchResults(archived.matches);
  const diagnostic={...discovery.diagnostic,visible_jobs:matches.length,
@@ -295,6 +300,12 @@ export async function onRequest({request,env}){
   return json({kind:KIND,engine:MATCH_V2,enabled:enabled(env),
    preflight_available:mayCheckProvider(env,request),
    synthetic_check_available:previewPreflight(env,request),scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],mode:'EVIDENCE_FIRST_V2'});
+ if(tail==='/operator-probes'){
+  if(!await operatorGate(env,request)||request.method!=='GET')return fail('NOT_FOUND',404);
+  try{return json({ok:true,kind:'HHBA_MATCH_V2_PROVIDER_PROBE_LOG',
+   records:await readRecentProviderProbes(env.HHBA_PNVS_AUTH_DB,20)})}
+  catch{return fail('MATCH_QA_LOG_NOT_READY',503)}
+ }
  if(tail==='/operator-run'||tail==='/operator-log'){
   if(!await operatorGate(env,request))return fail('NOT_FOUND',404);
   if(tail==='/operator-run'){
@@ -327,14 +338,32 @@ export async function onRequest({request,env}){
  try{session=await candidateSession(env,request)}catch{}
  if(!session)return fail('SESSION_INVALID',401);
  if(tail==='/provider-check'){
+  // An authenticated preview preflight writes one anonymous D1 record.
+  // Audit problems never turn a good provider verdict into a failure.
+  const started=Date.now();
+  const writeProbe=async data=>{
+   try{await recordProviderProbe(env.HHBA_PNVS_AUTH_DB,{
+    kind:'CANDIDATE_PREFLIGHT',duration_ms:Date.now()-started,...data})}
+   catch{console.warn('HHBA_MATCH_V2_PROBE_LOG_UNAVAILABLE')}
+  };
   try{
-   const probe=await checkCleanMatchProvider(env.HHBA_MATCH_DEEPSEEK_KEY,
+   const probe=await checkCleanMatchProvider(openAIProvider(env),
     {signal:request.signal});
+   await writeProbe({outcome:'READY',stage:'completed',
+    sources_returned:probe.searches_returned});
    return json({...probe,engine:MATCH_V2});
   }catch(e){
    const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
-   console.warn('HHBA_MATCH_V2_PROVIDER_CHECK_FAILED',JSON.stringify({code}));
-   return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:502);
+   const stage=['basic_responses','structured_json','web_search_sources'].includes(e?.probeStage)?
+    e.probeStage:'unknown';
+   const upstream_status=Number.isInteger(e?.upstreamStatus)&&
+    e.upstreamStatus>=400&&e.upstreamStatus<=599?e.upstreamStatus:null;
+   await writeProbe({outcome:'FAILED',stage,error_code:code,upstream_status});
+   // No upstream message/body/secret/profile appears in logs or UI.
+   const diagnostic={code,stage,upstream_status};
+   console.warn('HHBA_MATCH_V2_PROVIDER_CHECK_FAILED',JSON.stringify(diagnostic));
+   return json({ok:false,error:code,stage,upstream_status},
+    code==='AI_PROVIDER_RATE_LIMITED'?429:502);
   }
  }
  if(tail==='/synthetic-check'){
@@ -362,7 +391,7 @@ export async function onRequest({request,env}){
    {persistHistory:false});
  }
  if(tail==='/ocr'){
-  try{return json({ok:true,...await recognizeResumeFile(request,env.HHBA_MATCH_DEEPSEEK_KEY)})}
+  try{return json({ok:true,...await recognizeOpenAIResumeFile(request,openAIProvider(env))})}
   catch(e){return fail(e?.code||'OCR_SERVICE_UNAVAILABLE',e?.status||502)}
  }
  let input;

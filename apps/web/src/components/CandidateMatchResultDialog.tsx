@@ -55,6 +55,27 @@ function chineseLocation(location:string){
  return cityNames[key]||location;
 }
 function officialLink(item:MatchedJob){
+ if(item.source_type==='站外招聘职位'){
+  // Clean V2 uses v2-N IDs. The older official-link validator expects a
+  // canonical employer+posting ID, so normalize ONLY after source evidence.
+  if(!/^v2-\d+$/.test(item.id)||
+   item.recruitment_source_kind!=='EMPLOYER_DOMAIN_CANDIDATE'||
+   !['PARTIAL_SOURCE','VERIFIED_FULL_JD'].includes(item.evidence_status||'')||
+   item.application_status!=='NEEDS_OFFICIAL_CONFIRMATION')return null;
+  try{
+   const u=new URL(item.official_url);
+   if(u.protocol!=='https:'||u.hostname!==item.source)return null;
+   let postingId=u.searchParams.values().next().value||'';
+   if(u.hostname==='jobs.bytedance.com')
+    postingId=u.pathname.match(/^\/experienced\/position\/([0-9]{13,22})\/detail$/)?.[1]||'';
+   if(u.hostname==='talent.baidu.com')
+    postingId=u.pathname.match(/^\/jobs\/detail\/SOCIAL\/([0-9a-f-]{36})$/i)?.[1]?.toLowerCase()||'';
+   if(!postingId)return null;
+   const canonicalId='external-'+u.hostname.replace(/[^a-zA-Z0-9_-]/g,'-')+'-'+postingId;
+   return safeExternalJobApplicationUrl({...item,source_type:'站外官方招聘',
+    id:canonicalId});
+  }catch{return null}
+ }
  if(item.source_type==='站外官方招聘')return safeExternalJobApplicationUrl(item);
  return safeOfficialJobUrl({id:item.id,source:item.source,platform:item.platform,
   company:item.company,title:item.title,url:item.official_url,location:item.location,remote:item.remote});
@@ -72,7 +93,7 @@ function Row({item,onOpen}:{item:MatchedJob;onOpen:()=>void}){
     <span><BriefcaseBusiness size={13}/>{item.experience_requirement||'经验未注明'}</span>
    </span>
   </span>
-  <span className="hhba-match-job-score"><strong>{item.reference_score}<small>分</small></strong><span>参考匹配度</span></span>
+  <span className="hhba-match-job-score"><strong>{typeof item.match_score==='number'?item.match_score:'—'}{typeof item.match_score==='number'&&<small>分</small>}</strong><span>{typeof item.match_score==='number'?'参考匹配度':'证据待核验'}</span></span>
   <ArrowUpRight className="hhba-match-job-arrow" size={17} aria-hidden="true"/>
  </button>;
 }
@@ -118,7 +139,7 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
       <div className="hhba-match-detail-head">
        <div><p className="hhba-match-detail-company">{selected.company}</p>
         <h2 id="hhba-match-dialog-title">{chineseJobTitle(selected)}</h2></div>
-       <span className="hhba-match-job-score"><strong>{selected.reference_score}<small>分</small></strong><span>参考匹配度</span></span>
+       <span className="hhba-match-job-score"><strong>{typeof selected.match_score==='number'?selected.match_score:'—'}{typeof selected.match_score==='number'&&<small>分</small>}</strong><span>{typeof selected.match_score==='number'?'参考匹配度':'证据待核验'}</span></span>
       </div>
       <div className="hhba-match-detail-facts">
        <span><MapPin size={15}/>{chineseLocation(selected.location)}</span>
@@ -134,8 +155,8 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
       </section>}
       <section className="hhba-match-detail-section"><h3>岗位要求与投递</h3>
        <p>请在企业官方页面核实完整任职要求、薪资及最新招聘状态，匹配分数不代表录用概率。</p>
-       {link?<a className="hhba-match-detail-apply" href={link} rel="noopener noreferrer" target="_blank" data-hhba-recruitment-outbound="true">查看企业官方岗位 <ArrowUpRight size={16}/></a>:
-        selected.source_type!=='站外官方招聘'?<Link className="hhba-match-detail-apply" to={'/candidate/jobs/'+encodeURIComponent(selected.id)}>查看岗位资料 <ArrowUpRight size={16}/></Link>:
+       {link?<a className="hhba-match-detail-apply" href={link} rel="noopener noreferrer" target="_blank" data-hhba-recruitment-outbound="true">{selected.source_type==='站外招聘职位'?'核对企业岗位来源':'查看企业官方岗位'} <ArrowUpRight size={16}/></a>:
+        selected.source_type!=='站外官方招聘'&&selected.source_type!=='站外招聘职位'?<Link className="hhba-match-detail-apply" to={'/candidate/jobs/'+encodeURIComponent(selected.id)}>查看岗位资料 <ArrowUpRight size={16}/></Link>:
         <p className="hhba-match-detail-unavailable">暂未取得安全可用的官方投递入口。</p>}
       </section>
      </>:<>

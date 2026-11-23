@@ -6,8 +6,8 @@
  */
 import {isDirectEmployerSourceHit,isMainlandEmployerJobUrl} from './match-employer-source.js';
 import {findMainlandCity,isMainlandJobLocation} from './mainland-job-location.js';
+import {openAIJson,openAIEmployerSearch,readOfficialEmployerPage,safePublicEmployerUrl,DEFAULT_OPENAI_MATCH_MODEL} from './openai-match-v2-provider.js';
 export const MATCH_V2='HHBA_MATCH_CLEAN_V2';
-const BASE='https://api.deepseek.com';
 const clean=(s,n=160)=>String(s??'').replace(/[\u0000-\u001f]/g,' ').replace(/\s+/g,' ').trim().slice(0,n);
 const uniq=xs=>[...new Set(xs.filter(Boolean))];
 const err=code=>Object.assign(new Error(code),{code});
@@ -36,55 +36,9 @@ export function fallbackPlan(profile,hint,resume){
  }
  return {roles,cities,queries};
 }
-function textOf(v){
- return (v?.output||[]).filter(x=>x?.type==='message')
-  .flatMap(x=>(x.content||[]).filter(y=>y?.type==='output_text').map(y=>y.text||'')).join('');
-}
-function jsonOf(v){
- let s=textOf(v).trim();
- if(!s)throw err('AI_PROVIDER_RESPONSE_INVALID');
- const f=s.match(/^\x60{3}(?:json)?\s*([\s\S]*?)\x60{3}$/i);
- if(f)s=f[1];
- else if(!s.startsWith('{')){const a=s.indexOf('{'),b=s.lastIndexOf('}');
-  if(a<0||b<=a)throw err('AI_PROVIDER_RESPONSE_INVALID');s=s.slice(a,b+1);}
- try{return JSON.parse(s)}catch{throw err('AI_PROVIDER_RESPONSE_INVALID')}
-}
-// Only public read-only Search and Fetch operations get one bounded retry.
-// Paid/uncertain model reasoning requests are never retried automatically.
-async function call(fetcher,key,path,payload,ms,signal){
- const retryable=path==='/v1/tools/search'||path==='/v1/tools/fetch';
- for(let attempt=0;attempt<(retryable?2:1);attempt++){
-  if(signal?.aborted)throw err('AI_MATCH_CANCELLED');
-  const timeout=AbortSignal.timeout(ms),merged=signal?AbortSignal.any([signal,timeout]):timeout;
-  let res;
-  try{res=await fetcher(BASE+path,{method:'POST',redirect:'manual',signal:merged,
-   headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
-   body:JSON.stringify(payload)})}
-  catch{throw err(signal?.aborted?'AI_MATCH_CANCELLED':'AI_PROVIDER_TIMEOUT')}
-  if(!res.ok){
-   if([401,403].includes(res.status))throw err('AI_PROVIDER_KEY_REJECTED');
-   if(res.status===402)throw err('AI_PROVIDER_BALANCE_INSUFFICIENT');
-   if([400,404,422].includes(res.status))throw err('AI_PROVIDER_REQUEST_REJECTED');
-   if(retryable&&attempt===0&&[429,500,502,503,504].includes(res.status)){
-    const after=Number(res.headers?.get('retry-after')||0);
-    const delay=res.status===429?
-     Math.min(1200,Math.max(300,Number.isFinite(after)&&after>0?after*1000:450)):180;
-    await new Promise(resolve=>setTimeout(resolve,delay));
-    continue;
-   }
-   if(res.status===429)throw err('AI_PROVIDER_RATE_LIMITED');
-   throw err('AI_PROVIDER_UPSTREAM_ERROR');
-  }
-  try{return await res.json()}catch{throw err('AI_PROVIDER_RESPONSE_INVALID')}
- }
- throw err('AI_PROVIDER_UPSTREAM_ERROR');
-}
-async function ask(fetcher,key,instructions,input,ms,signal){
- const res=await call(fetcher,key,'/responses',{model:'deepseek-v4-pro',
-  reasoning:{effort:'medium'},text:{format:{type:'json_object'}},
-  max_output_tokens:4500,stream:false,instructions,
-  input:JSON.stringify(input)},ms,signal);
- return jsonOf(res);
+// Only official OpenAI Responses, no legacy or third-party provider calls.
+async function ask(fetcher,provider,instructions,input,ms,signal){
+ return openAIJson(fetcher,provider,instructions,input,ms,signal);
 }
 export async function planMatchSearch(fetcher,key,profile,hint,resume,signal){
  const fallback=fallbackPlan(profile,hint,resume);
@@ -206,8 +160,7 @@ export async function findEmployerSources(fetcher,key,plan,signal){
  let rawResults=0,emptyQueries=0;
  for(let i=0;i<plan.queries.length;i+=5)await Promise.all(plan.queries.slice(i,i+5).map(async query=>{
   try{
-   const data=await call(fetcher,key,'/v1/tools/search',{query,count:25,
-    need_content:false},12500,signal);
+   const data=await openAIEmployerSearch(fetcher,key,query,signal);
    if(!Array.isArray(data?.results))throw err('AI_SEARCH_RESPONSE_INVALID');
    rawResults+=data.results.length;
    if(!data.results.length)emptyQueries++;
@@ -217,7 +170,8 @@ export async function findEmployerSources(fetcher,key,plan,signal){
     if(!isDirectEmployerSourceHit({url:row.url,source:site})){
      rejects.non_employer++;continue;
     }
-    if(!isExactEmployerJobUrl(row.url)){rejects.not_detail++;continue}
+    if(!isExactEmployerJobUrl(row.url)||!safePublicEmployerUrl(row.url)){
+     rejects.not_detail++;continue}
     if(seen.has(row.url)){rejects.duplicate++;continue}
     const title=clean(row?.title,160),summary=clean(row?.summary||row?.snippet,1000);
     if(!title&&!summary){rejects.empty_metadata++;continue}
@@ -245,7 +199,8 @@ export async function readEmployerPages(fetcher,key,sources,signal,{targetSucces
   const part=await Promise.all(queue.slice(i,i+6).map(async row=>{
    attempts++;
    try{
-    const data=await call(fetcher,key,'/v1/tools/fetch',{url:row.url},11000,signal);
+    if(!isExactEmployerJobUrl(row.url))throw err('AI_FETCH_URL_REJECTED');
+    const data=await readOfficialEmployerPage(fetcher,row.url,signal);
     const content=typeof data?.content==='string'?data.content.slice(0,18000):'';
     if(content.replace(/\s/g,'').length>=100)return {...row,content};
     errors.push('AI_FETCH_EMPTY_CONTENT');
@@ -258,7 +213,7 @@ export async function readEmployerPages(fetcher,key,sources,signal,{targetSucces
  if(signal?.aborted)throw err('AI_MATCH_CANCELLED');
  return {pages,attempts,failures,error_codes:uniq(errors).slice(0,6)};
 }
-// DeepSeek Fetch returns Markdown: headings and values may be on different lines.
+// Employer page content can be normalized HTML or Markdown.
 function markdownField(content,labels,max=140){
  const rows=String(content||'').split(/\r?\n/).map(x=>x.trim()
   .replace(/^#{1,6}\s*/,'').replace(/^(?:>\s*|[-*•]\s+|\d{1,2}[.、]\s+)/,'')
@@ -455,7 +410,7 @@ export async function scoreJobs(fetcher,key,profile,jobs,signal,diagnostic={}){
    recruitment_source_kind:'EMPLOYER_DOMAIN_CANDIDATE',
    recruitment_source_note:'已取得职位页面原文，企业所属及实际在招状态待人工确认',
    source_status:'SOURCE_SEARCH_PREVIEW',application_status:'NEEDS_OFFICIAL_CONFIRMATION',
-   platform:'deepseek-search',source:new URL(j.url).hostname,remote:false,
+   platform:'openai-web-search',source:new URL(j.url).hostname,remote:false,
    match_score:score,reference_score:score??0,
    score_basis:score===null?'':'初步参考分基于本轮可核对的简历事实与岗位原文；具体对应见下方，完整官方 JD 仍待独立核验。',
    evidence_status:'PARTIAL_SOURCE',
@@ -486,7 +441,7 @@ export function rankCleanMatchResults(jobs){
 export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
  {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},excludeUrls=[]}={},deps={}){
  const fetcher=deps.fetcher||fetch,start=Date.now();
- const d={mode:MATCH_V2,model:'deepseek-v4-pro',searches:0,page_reads:0,
+ const d={mode:MATCH_V2,model:typeof key==='object'&&key?.model||DEFAULT_OPENAI_MATCH_MODEL,searches:0,page_reads:0,
   provider_items:0,candidate_links:0,visible_jobs:0,discarded:0,
   search_raw_results:0,search_empty_queries:0,search_rejection_counts:{},
   elapsed_ms:0,stage:'planning',queries:0,search_failures:0,

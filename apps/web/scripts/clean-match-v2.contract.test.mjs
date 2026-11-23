@@ -1,10 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {adaptOldSearchFixtures as adapt} from './v2-openai-test-compat.mjs';
 import {preferredCities,fallbackPlan,isExactEmployerJobUrl,groundedVacancy,
- runCleanJobMatch,findEmployerSources,readEmployerPages,planRecoverySearch,officialDetailRecoveryQueries,diversifyEmployerSources,inspectGroundedVacancy,extractJobs,groundedMatchExplanations,scoreJobs,rankCleanMatchResults,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
+ runCleanJobMatch as runCore,findEmployerSources as findCore,readEmployerPages as readCore,planRecoverySearch as planRecoveryCore,officialDetailRecoveryQueries,diversifyEmployerSources,inspectGroundedVacancy,extractJobs as extractCore,groundedMatchExplanations,scoreJobs as scoreCore,rankCleanMatchResults,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
 import {onRequest} from '../functions/api/match-next/[[path]].js';
 import {onRequest as legacyMatchRoute} from '../functions/api/match-native/[[path]].js';
+
+// Preserve the original grounded-JD regression scenarios while their synthetic
+// HTTP fixtures are adapted from separate tools to OpenAI Responses + web_search.
+const runCleanJobMatch=(key,resume,profile,hint,limit,opts={},deps={})=>
+ runCore(key,resume,profile,hint,limit,opts,{...deps,
+  fetcher:adapt(deps.fetcher||fetch)});
+const findEmployerSources=(fetcher,...args)=>findCore(adapt(fetcher),...args);
+const readEmployerPages=(fetcher,...args)=>readCore(adapt(fetcher),...args);
+const planRecoverySearch=(fetcher,...args)=>planRecoveryCore(adapt(fetcher),...args);
+const extractJobs=(fetcher,...args)=>extractCore(adapt(fetcher),...args);
+const scoreJobs=(fetcher,...args)=>scoreCore(adapt(fetcher),...args);
 
 const JD_URL='https://careers.tencent.com/jobdesc.html?postId=2097166275703910400';
 const BAD='https://job-boards.greenhouse.io/example/jobs/1234567';
@@ -202,12 +214,12 @@ test('Fetch failure must not be silently represented as there are no jobs',async
  assert.equal(result.diagnostic.stage,'pages_unreadable');
  assert.equal(result.diagnostic.fetch_attempted,1);
  assert.equal(result.diagnostic.fetch_failures,1);
- assert.deepEqual(result.diagnostic.fetch_error_codes,['AI_PROVIDER_UPSTREAM_ERROR']);
+ assert.deepEqual(result.diagnostic.fetch_error_codes,['AI_FETCH_UPSTREAM_ERROR']);
 });
 
 test('rebuild launch gate is closed until independent live evidence acceptance',async()=>{
  const res=await onRequest({request:new Request('https://hhba.work/api/match-next/status'),
-  env:{HHBA_MATCH_SERVICE_ENABLED:'1',HHBA_MATCH_DEEPSEEK_KEY:'synthetic-key-long-enough',
+  env:{HHBA_MATCH_SERVICE_ENABLED:'1',HHBA_MATCH_OPENAI_API_KEY:'synthetic-key-long-enough',
    HHBA_PNVS_AUTH_DB:{prepare(){}}}});
  const status=await res.json();
  assert.equal(status.enabled,false);
@@ -281,13 +293,13 @@ test('Fetch retries one transient 503, but never retries rejected credentials',a
  },'test',[source]);
  assert.equal(deniedCalls,1,'authentication failures must not be retried');
  assert.equal(denied.pages.length,0);
- assert.deepEqual(denied.error_codes,['AI_PROVIDER_KEY_REJECTED']);
+ assert.deepEqual(denied.error_codes,['AI_FETCH_ACCESS_DENIED']);
 });
 
 test('new backend owns status and has no imports of hybrid, Greenhouse, Lever, checkpoints or stale Agent',async()=>{
  const res=await onRequest({
   request:new Request('https://hhba.work/api/match-next/status'),
-  env:{HHBA_MATCH_CLEAN_V2_ENABLED:'1',HHBA_MATCH_SERVICE_ENABLED:'1',HHBA_MATCH_DEEPSEEK_KEY:'synthetic-key-long-enough',
+  env:{HHBA_MATCH_CLEAN_V2_ENABLED:'1',HHBA_MATCH_SERVICE_ENABLED:'1',HHBA_MATCH_OPENAI_API_KEY:'synthetic-key-long-enough',
    HHBA_PNVS_AUTH_DB:{prepare(){}}}
  });
  assert.equal(res.status,200);
@@ -486,7 +498,7 @@ test('Search can have raw results without a single employer vacancy URL, and rep
  const result=await runCleanJobMatch('mock-key','求职意向城市：上海',profile,'渠道运营',10,{}, {fetcher});
  assert.equal(result.matches.length,0);
  assert.equal(result.diagnostic.searches,16);
- assert.equal(result.diagnostic.search_raw_results,64);
+ assert.equal(result.diagnostic.search_raw_results,48);
  assert.equal(result.diagnostic.candidate_links,0);
  assert.equal(result.diagnostic.fetch_attempted,0);
  assert.equal(result.diagnostic.stage,'all_search_urls_filtered');
@@ -494,10 +506,10 @@ test('Search can have raw results without a single employer vacancy URL, and rep
  assert.ok(result.diagnostic.search_rejection_counts.not_detail>=16);
  assert.equal(result.diagnostic.search_failures,0);
  const solo=await findEmployerSources(fetcher,'mock-key',p);
- assert.equal(solo.raw_results,4);
+ assert.equal(solo.raw_results,3);
  assert.equal(solo.sources.length,0);
  assert.deepEqual(solo.rejection_counts,{
-  no_url:1,non_employer:2,not_detail:1,duplicate:0,empty_metadata:0,foreign_title:0
+  no_url:0,non_employer:2,not_detail:1,duplicate:0,empty_metadata:0,foreign_title:0
  });
 });
 

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {redactQaDiagnostic} from '../functions/_lib/clean-match-v2-qa-log.js';
+import {adaptOldSearchFixtures as adapt} from './v2-openai-test-compat.mjs';
 import {onRequest} from '../functions/api/match-next/[[path]].js';
 
 const KEY='synthetic-provider-key-never-real';
@@ -47,7 +48,7 @@ function fixtureEnv(flags={}){
   }};
  }};
  return {env:{
-  HHBA_MATCH_DEEPSEEK_KEY:KEY,
+  HHBA_MATCH_OPENAI_API_KEY:KEY,
   HHBA_MATCH_SERVICE_ENABLED:'1',
   HHBA_PNVS_AUTH_DB:db,...flags
  },writes,requests};
@@ -67,7 +68,7 @@ function previewRequest(tail,options={}){
 }
 function installProviderMock(){
  const original=globalThis.fetch,calls=[];
- globalThis.fetch=async (url,options={})=>{
+ globalThis.fetch=adapt(async (url,options={})=>{
   const path=new URL(url).pathname,body=options.body?JSON.parse(options.body):{};
   calls.push({path,body});
   if(path==='/user/balance')return Response.json({is_available:true});
@@ -80,7 +81,7 @@ function installProviderMock(){
    title:'腾讯销售运营主管'});
   if(path==='/responses'){
    const prompt=body.instructions||'';
-   if(prompt.includes('健康检查'))return reply({ok:true});
+   if(prompt.includes('健康检查')||prompt.includes('仅返回 JSON'))return reply({ok:true});
    if(prompt.includes('简历识别 Agent'))return reply({
     facts:[{kind:'work',quote:QUOTE}],skills:[{name:'门店运营',evidence:QUOTE}],
     target_roles:['区域运营'],education:null,education_evidence:null,
@@ -103,7 +104,7 @@ function installProviderMock(){
    throw Error('unexpected model prompt');
   }
   throw Error('unexpected provider path '+path);
- };
+ });
  return {calls,restore(){globalThis.fetch=original}};
 }
 
@@ -114,16 +115,16 @@ test('preview-only opt-in permits authenticated live preflight while matching st
  assert.equal(status.preflight_available,true);
  let probeCalls=0;
  const previous=globalThis.fetch;
- globalThis.fetch=async(url,opts={})=>{
+ globalThis.fetch=adapt(async(url,opts={})=>{
   probeCalls++;
   const path=new URL(url).pathname;
   if(path==='/user/balance')return Response.json({is_available:true});
-  if(path==='/v1/tools/search')return Response.json({results:[]});
+  if(path==='/v1/tools/search')return Response.json({results:[{url:JD_URL,title:'腾讯 招聘岗位'}]});
   if(path==='/responses')return reply({ok:true});
   if(path==='/v1/tools/fetch')return Response.json({content:
    'Provider Fetch returned verified public documentation content. '.repeat(3)});
   throw Error('unexpected '+path);
- };
+ });
  try{
   const unauthorized=await onRequest({request:new Request(
    'https://5f88e175.hhba-talent.pages.dev/api/match-next/provider-check'),env});
@@ -133,14 +134,37 @@ test('preview-only opt-in permits authenticated live preflight while matching st
   assert.equal(preflight.status,200);
   const data=await preflight.json();
   assert.equal(data.status,'READY');
-  assert.equal(data.fetch_content_verified,true);
+  assert.equal(data.fetch_content_verified,false);
   assert.deepEqual(data.capabilities.sort(),[
-   'balance','deepseek_fetch','deepseek_search','v4_pro_responses_json'].sort());
-  assert.equal(probeCalls,4);
+   'openai_responses_json','openai_web_search_sources'].sort());
+  assert.equal(probeCalls,3,'baseline Responses, JSON and live search are three separate stages');
   const denied=await onRequest({request:previewRequest('/resume',{
    method:'POST',body:'{}'}),env});
   assert.equal(denied.status,503,'preflight can never unlock the public match API');
   assert.equal((await denied.json()).error,'MATCH_NOT_ENABLED');
+ }finally{globalThis.fetch=previous}
+});
+
+test('preview provider check emits safe stage and status for a gateway failure',async()=>{
+ const {env,writes}=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
+ const previous=globalThis.fetch;
+ let calls=0;
+ globalThis.fetch=async()=>{calls++;return new Response('SECRET=never-expose-this',{status:503})};
+ try{
+  const res=await onRequest({request:previewRequest('/provider-check'),env});
+  assert.equal(res.status,502);
+  const output=await res.json();
+  assert.deepEqual(output,{ok:false,error:'AI_PROVIDER_UPSTREAM_ERROR',
+   stage:'basic_responses',upstream_status:503});
+  assert.equal(calls,1);
+  assert.ok(!JSON.stringify(output).includes('never-expose-this'));
+  const logs=writes.filter(x=>x.sql.includes('INSERT INTO hhba_match_v2_provider_probes'));
+  assert.equal(logs.length,1,'single failed preflight automatically writes D1 log');
+  assert.ok(logs[0].args.includes('AI_PROVIDER_UPSTREAM_ERROR'));
+  assert.ok(logs[0].args.includes(503));
+  assert.ok(!JSON.stringify(logs).includes('never-expose-this'));
+  assert.ok(!JSON.stringify(logs).includes(KEY));
+  assert.ok(!JSON.stringify(output).includes(KEY));
  }finally{globalThis.fetch=previous}
 });
 
@@ -219,7 +243,13 @@ test('preview provider diagnostic requires explicit click and existing authorize
  assert.match(page,/user&&getRealAuthToken\(\)\?<button/);
  assert.match(page,/onClick=\{\(\)=>void runPreviewPreflight\(\)\}/);
  assert.match(service,/window\.location\.hostname\.endsWith\('\.hhba-talent\.pages\.dev'\)/);
- assert.match(service,/data\.enabled===false&&data\.preflight_available===true/);
+ assert.match(service,/return data\.preflight_available===true/);
+ assert.doesNotMatch(service,/data\.enabled===false&&data\.preflight_available===true/);
+ const pausePanel=page.indexOf("availability==='disabled'&&<div");
+ const pausedPanelClosing=page.indexOf('</div></div>}',pausePanel);
+ const diagPanel=page.indexOf('preflightAvailable&&<div className="hhba-ai-preview-diagnostic">');
+ assert.ok(pausePanel>=0&&pausedPanelClosing>pausePanel&&diagPanel>pausedPanelClosing,
+  'preview provider check must not be nested inside disabled-service banner');
  assert.match(service,/fetch\(API\+'\/provider-check'/);
  assert.match(service,/headers:\{Authorization:'Bearer '\+token\}/);
  const probe=service.slice(service.indexOf('export async function runMatchPreviewProviderCheck'),

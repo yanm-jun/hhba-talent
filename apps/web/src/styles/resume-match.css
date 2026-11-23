@@ -11,6 +11,13 @@
 .hhba-ai-admin-note,.hhba-ai-service-check{max-width:900px;display:flex;gap:12px;border:1px solid #E7F0FC;background:#F7F9FD;border-radius:13px;padding:16px 19px;margin:20px 0;font-size:13px;color:#60758F;line-height:1.8}
 .hhba-ai-admin-note p{margin:5px 0 8px}
 .hhba-ai-admin-note button{background:#fff;border:1px solid #C5DBF8;color:#125EBC;border-radius:7px;padding:8px 12px;cursor:pointer}
+.hhba-ai-preview-diagnostic{max-width:900px;box-sizing:border-box;padding:18px 20px;margin:16px 0 24px;border:1px solid #C5DBF8;border-radius:13px;background:#F7F9FD;color:#365271;font-size:13px;line-height:1.75}
+.hhba-ai-preview-diagnostic p{margin:0 0 12px}
+.hhba-ai-preview-diagnostic button{border:1px solid #125EBC;background:#125EBC;color:#fff;border-radius:8px;font-size:13px;font-weight:650;padding:10px 15px;cursor:pointer}
+.hhba-ai-preview-diagnostic button:disabled{opacity:.55;cursor:wait}
+.hhba-ai-preview-acceptance{border-top:1px solid #E7F0FC;margin-top:14px;padding-top:14px}
+.hhba-ai-preview-acceptance ul{padding-left:20px;overflow-wrap:anywhere}
+.hhba-ai-preview-acceptance a{color:#125EBC}
 .hhba-ai-layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;align-items:start;gap:22px}
 .hhba-ai-upload,.hhba-ai-aside-card{border:1px solid #E7F0FC;border-radius:15px;background:white;box-shadow:0 4px 20px rgba(16,42,90,.035)}
 .hhba-ai-upload{padding:27px 28px}
