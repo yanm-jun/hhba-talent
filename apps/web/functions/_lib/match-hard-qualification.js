@@ -32,7 +32,7 @@ export function minimumExperienceFromJd(requirements){
    const following=text.slice(match.index+match[0].length)
     .split(/[，,。；;!！?？]/)[0].slice(0,28);
    const optionalBefore=/(?:优先(?:考虑|具备|拥有|具有)?|加分|preferred|nice\s+to\s+have)[\s\u4e00-\u9fff]{0,7}$/i.test(preceding);
-   const optionalAfter=/^(?:[\s\u4e00-\u9fff]{0,8}(?:优先(?:考虑)?|为佳|加分)|\s*(?:preferred|desirable|a\s+plus)\b)/i.test(following);
+   const optionalAfter=/^(?:[\s\u4e00-\u9fff]{0,8}(?:优先(?:考虑)?|为佳|加分)|\s*(?:(?:of|in|related|relevant|retail|work|operations|marketing|training|management|experience)\s+){0,6}(?:preferred|desirable|a\s+plus)\b)/i.test(following);
    if(optionalBefore||optionalAfter)continue;
    // Weak rules may accidentally include unrelated tenure such as bonuses.
    if(/(?:合同期限|质保|保修|售后保修|有效期|质保期|试用期)/.test(context)&&
