@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preferredCities,fallbackPlan,isExactEmployerJobUrl,groundedVacancy,
- runCleanJobMatch,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
+ runCleanJobMatch,diversifyEmployerSources,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
 import {onRequest} from '../functions/api/match-next/[[path]].js';
 import {onRequest as legacyMatchRoute} from '../functions/api/match-native/[[path]].js';
 
@@ -248,4 +248,53 @@ test('new backend owns status and has no imports of hybrid, Greenhouse, Lever, c
  assert.match(code,/EXPLICIT_AI_SHARING_CONSENT_REQUIRED/);
  assert.match(code,/sessionOfBearer/);
  assert.match(code,/saveMatchHistory/);
+});
+
+
+test('source order visits different employer domains before dozens of postings from one site',()=>{
+ const tencent=Array.from({length:20},(_,i)=>({
+  url:'https://careers.tencent.com/jobdesc.html?postId='+(100000+i),
+  title:'腾讯 渠道管理 '+i,site:'腾讯招聘'
+ }));
+ const huawei={url:'https://career.huawei.com/cn/job-details?advertisementId=46681',
+  title:'华为运营岗位',site:'华为招聘'};
+ const ranked=diversifyEmployerSources([...tencent,huawei]);
+ assert.deepEqual(ranked.slice(0,2).map(x=>new URL(x.url).hostname),
+  ['careers.tencent.com','career.huawei.com']);
+ assert.equal(ranked.length,21);
+ assert.equal(new Set(ranked.map(x=>x.url)).size,21);
+});
+
+test('location-less first 24 employer pages do not hide a valid later official vacancy',async()=>{
+ const urls=Array.from({length:25},(_,i)=>JD_URL.replace(
+  /postId=\\d+/,'postId='+(2097166275703910400n+BigInt(i)).toString()));
+ const base=makeFetcher().fetcher;
+ const fetcher=async(url,opts)=>{
+  const path=new URL(url).pathname;
+  if(path==='/v1/tools/search')return Response.json({results:urls.map((jobUrl,i)=>({
+   url:jobUrl,title:'腾讯 销售运营主管 上海 第'+(i+1)+'个职位',
+   site_name:'腾讯招聘',summary:'岗位详情及渠道运营要求'
+  }))});
+  if(path==='/v1/tools/fetch'){
+   const jobUrl=JSON.parse(opts.body).url;
+   return Response.json({content:jobUrl===urls[24]?JD:
+    JD.replace('工作地点：上海','公司总部：上海')});
+  }
+  return base(url,opts);
+ };
+ const stages=[];
+ const result=await runCleanJobMatch('test-key',
+  '意向工作城市：上海\\n渠道督导、销售复盘',profile,'区域督导',10,
+  {onProgress:stage=>stages.push(stage)},{fetcher});
+ assert.equal(result.diagnostic.candidate_links,25);
+ assert.equal(result.diagnostic.fetch_attempted,25);
+ assert.ok(result.diagnostic.source_batches>1,'later pages were actually fetched');
+ assert.ok(result.diagnostic.source_backfill_attempts>0);
+ assert.equal(result.diagnostic.page_reads,25);
+ assert.equal(result.diagnostic.extracted_jobs,1);
+ assert.equal(result.diagnostic.stage,'complete');
+ assert.equal(result.matches.length,1);
+ assert.equal(result.matches[0].official_url,urls[24]);
+ assert.equal(result.matches[0].location,'上海');
+ assert.ok(stages.includes('researching')&&stages.includes('scoring'));
 });
