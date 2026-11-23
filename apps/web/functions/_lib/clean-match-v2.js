@@ -166,8 +166,13 @@ export function isExactEmployerJobUrl(url){
    !isDirectEmployerSourceHit({url,source:''}))return false;
   const path=u.pathname.toLowerCase(),query=[...u.searchParams.keys()]
    .some(x=>/^(?:post.?id|job.?id|position.?id|jobunionid|requisitionid|advertisementid|jobcode)$/i.test(x));
-  if(/\/(?:search|index|list|jobs|positions|careers?|job-?list)(?:\.html?)?\/?$/.test(path)&&!query)return false;
-  return /\/(?:job|jobs|position|vacancy|detail)\b/i.test(path)||query;
+  // /jobs/social-list and /jobs/search are job INDEXES, not individual JDs.
+  // The old /jobs word-boundary test accepted them as if they were vacancies.
+  const listing=/(?:^|\/)(?:search|index|list|careers?|job-?list|social-list|campus-list|search-jobs|job-search|job-listing)(?:\/|\.|$)/i.test(path)||
+   /\/(?:jobs?|positions?)\/(?:search|list|social-list|campus-list|category|departments?)(?:\/|\.|$)/i.test(path)||
+   /\/(?:jobs|positions)(?:\.html?)?\/?$/i.test(path);
+  if(listing&&!query)return false;
+  return query||/\/(?:job|jobs|position|positions|vacancy|vacancies|detail|jobdesc|job-info-detail|job-details)\b/i.test(path);
  }catch{return false}
 }
 // Search often yields many postings from one employer. Visit distinct employers
