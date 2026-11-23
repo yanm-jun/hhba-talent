@@ -33,7 +33,7 @@ const enabled=env=>providerConfigured(env)&&env?.HHBA_MATCH_CLEAN_V2_ENABLED==='
 // binding. Bind prelaunch permission to preview-only env config AND the exact
 // Cloudflare preview hostname. Never grant preflight on the hhba.work domain.
 const previewPreflight=(env,request)=>{
- if(!providerConfigured(env)||env?.HHBA_MATCH_V2_PREFLIGHT_ENABLED!=='1'||
+ if(!providerConfigured(env)||env?.HHBA_PREVIEW_AI_DIAG_ENABLED!=='1'||
   env?.CF_PAGES_BRANCH==='main')return false;
  try{
   const host=new URL(request.url).hostname.toLowerCase();
