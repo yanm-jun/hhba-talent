@@ -89,13 +89,22 @@ export function openAISearchSources(data){
 }
 export async function openAIEmployerSearch(fetcher,provider,query,signal){
  // Never send a résumé, phone, name or private profile to web_search.
- const response=await openAIResponse(fetcher,provider,{
+ const request={
   instructions:'检索中国大陆企业自身招聘官网的单个社会招聘职位详情。务必实际使用联网搜索工具。不要编造网址、岗位、招聘状态。优先回答检索到的企业职位页面，不要将招聘聚合平台作为结果。',
   input:'请联网检索：'+String(query).slice(0,160),
   tools:[{type:'web_search',external_web_access:true}],
   tool_choice:'required',include:['web_search_call.action.sources'],
   reasoning:{effort:'low'},max_output_tokens:1200
- },{signal,timeoutMs:45000});
+ };
+ let response;
+ for(let attempt=0;attempt<2;attempt++){
+  try{response=await openAIResponse(fetcher,provider,request,{signal,timeoutMs:45000});break}
+  catch(e){
+   if(attempt===1||signal?.aborted||
+    !['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR'].includes(e?.code))throw e;
+   await new Promise(resolve=>setTimeout(resolve,180));
+  }
+ }
  if(!response.output.some(x=>x?.type==='web_search_call'&&x?.status==='completed'))
   throw fail('AI_SEARCH_RESPONSE_INVALID');
  return {results:openAISearchSources(response)};
@@ -115,10 +124,19 @@ export async function readOfficialEmployerPage(fetcher,url,signal){
  if(!safePublicEmployerUrl(url))throw fail('AI_FETCH_URL_REJECTED');
  const timeout=AbortSignal.timeout(14000),merged=signal?AbortSignal.any([signal,timeout]):timeout;
  let response;
- try{response=await fetcher(url,{method:'GET',redirect:'manual',signal:merged,
-  headers:{Accept:'text/html,text/plain,application/xhtml+xml;q=0.8'}})}
- catch{throw fail(signal?.aborted?'AI_MATCH_CANCELLED':'AI_FETCH_TIMEOUT')}
- if(!response.ok)throw fail(response.status===403?'AI_FETCH_ACCESS_DENIED':'AI_FETCH_UPSTREAM_ERROR');
+ for(let attempt=0;attempt<2;attempt++){
+  try{response=await fetcher(url,{method:'GET',redirect:'manual',signal:merged,
+   headers:{Accept:'text/html,text/plain,application/xhtml+xml;q=0.8'}})}
+  catch{
+   throw fail(signal?.aborted?'AI_MATCH_CANCELLED':'AI_FETCH_TIMEOUT');
+  }
+  if(response.ok)break;
+  if(attempt===0&&[429,500,502,503,504].includes(response.status)){
+   await new Promise(resolve=>setTimeout(resolve,150));
+   continue;
+  }
+  throw fail(response.status===403?'AI_FETCH_ACCESS_DENIED':'AI_FETCH_UPSTREAM_ERROR');
+ }
  const length=Number(response.headers?.get('content-length')||0);
  if(length>320000)throw fail('AI_FETCH_TOO_LARGE');
  const type=response.headers?.get('content-type')||'';
