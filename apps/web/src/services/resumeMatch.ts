@@ -167,7 +167,8 @@ export async function matchPreviewPreflightAvailable(signal?:AbortSignal):Promis
   });
   if(!response.ok)return false;
   const data=await response.json() as {enabled?:boolean;preflight_available?:boolean};
-  return data.enabled===false&&data.preflight_available===true;
+  // Backend grants preview preflight independently of the match launch flag.
+  return data.preflight_available===true;
  }catch{return false}
 }
 export async function runMatchPreviewProviderCheck(signal?:AbortSignal):Promise<{
