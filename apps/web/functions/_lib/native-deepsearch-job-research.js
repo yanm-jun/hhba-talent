@@ -192,10 +192,22 @@ export async function runNativeDeepSearchJobs(key,resume,roleHint,limit=10,optio
   }
   if(buffer.trim())consume(buffer);
  }finally{try{await reader.cancel()}catch{}try{reader.releaseLock()}catch{}}
- if(terminal!=='completed'||!completed||completed.status!=='completed')
-  throw failure(terminal==='response.incomplete'?'AI_NATIVE_DEEPSEARCH_INCOMPLETE':
-   'AI_NATIVE_DEEPSEARCH_FAILED');
+ // A final incomplete/failed model response may still contain genuinely
+ // completed public web Search or page-open items. Retain only those verified
+ // tool URLs for independent later JD review, never the unfinished model text.
  for(const row of nativeDeepSearchSources(completed))sources.set(row.url,row);
+ if(terminal!=='completed'||!completed||completed.status!=='completed'){
+  const error=failure(terminal==='response.incomplete'?'AI_NATIVE_DEEPSEARCH_INCOMPLETE':
+   'AI_NATIVE_DEEPSEARCH_FAILED');
+  error.public_sources=[...sources.values()].slice(0,36);
+  error.diagnostic={mode:NATIVE_DEEPSEARCH_VERSION,
+   phase:'native_final_response',provider_status:terminal||'missing',
+   searches:Number(completed?.usage?.server_tool_use?.tool_search||searches),
+   page_reads:Number(completed?.usage?.server_tool_use?.tool_fetch||reads),
+   candidate_links:sources.size,source_provenance:'COMPLETED_PROVIDER_WEB_TOOLS_ONLY',
+   elapsed_ms:Date.now()-start};
+  throw error;
+ }
  const toolUse=completed.usage?.server_tool_use||{};
  if(!sources.size||!Number(toolUse.tool_search||searches)){
   const error=failure('AI_EMPLOYER_JOBS_NOT_FOUND');
