@@ -146,7 +146,7 @@ test('preview-only opt-in permits authenticated live preflight while matching st
 });
 
 test('preview provider check emits safe stage and status for a gateway failure',async()=>{
- const {env}=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
+ const {env,writes}=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
  const previous=globalThis.fetch;
  let calls=0;
  globalThis.fetch=async()=>{calls++;return new Response('SECRET=never-expose-this',{status:503})};
@@ -158,6 +158,12 @@ test('preview provider check emits safe stage and status for a gateway failure',
    stage:'basic_responses',upstream_status:503});
   assert.equal(calls,1);
   assert.ok(!JSON.stringify(output).includes('never-expose-this'));
+  const logs=writes.filter(x=>x.sql.includes('INSERT INTO hhba_match_v2_provider_probes'));
+  assert.equal(logs.length,1,'single failed preflight automatically writes D1 log');
+  assert.ok(logs[0].args.includes('AI_PROVIDER_UPSTREAM_ERROR'));
+  assert.ok(logs[0].args.includes(503));
+  assert.ok(!JSON.stringify(logs).includes('never-expose-this'));
+  assert.ok(!JSON.stringify(logs).includes(KEY));
   assert.ok(!JSON.stringify(output).includes(KEY));
  }finally{globalThis.fetch=previous}
 });
