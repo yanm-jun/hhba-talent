@@ -74,6 +74,34 @@ test('parallel native + standalone Search retains sourced mainland job prospects
  assert.ok(activity.some(x=>x.message.includes('补充搜索')));
 });
 
+test('hybrid native search also uses bounded company-index hints without treating old company URLs as live jobs',async()=>{
+ const indexQueries=['华东汽车 区域督导 社会招聘 site:careers.hd-auto.cn',
+  '新创零售 渠道运营 社会招聘 site:career.retail-example.cn'];
+ let inputRoles=[],inputSectors=[],queries=[];
+ const response=await runHybridMainlandJobResearch('test-key',
+  '历史工作地点山东，期望工作城市：上海\n13800138000','区域督导',10,{
+   resumeProfile:evidence,
+   employerIndex:async(roles,sectors)=>{
+    inputRoles=roles;inputSectors=sectors;
+    return {available:true,considered:120,queries:indexQueries,sectors};
+   }
+  },{
+   native:async()=>({matches:[],diagnostic:{searches:1}}),
+   search:async(_k,_text,_h,options)=>{
+    queries=options.queriesOverride;
+    return searchResponse([],queries);
+   }
+  });
+ assert.equal(inputRoles[0],'区域督导');
+ assert.ok(inputSectors.includes('retail')||inputSectors.includes('automotive'));
+ assert.equal(queries.length,8);
+ assert.ok(queries.includes(indexQueries[0]));
+ assert.ok(queries.includes(indexQueries[1]));
+ assert.ok(queries.every(q=>!q.includes('13800138000')));
+ assert.equal(response.matches.length,0);
+ assert.equal(response.diagnostic.hybrid_fallback.index_companies_considered,120);
+});
+
 test('source-only mainland job remains a transparent lead even if native model produces zero jobs',async()=>{
  const result=await runHybridMainlandJobResearch('fake-key',
   '期望城市：上海\n区督导','区域督导',10,{
