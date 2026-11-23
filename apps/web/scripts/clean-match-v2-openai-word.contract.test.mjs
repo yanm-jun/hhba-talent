@@ -172,7 +172,7 @@ test('compact V2 flags cannot enable production, and bad JSON fails closed',()=>
  const compact=JSON.stringify({matchEnabled:true,wordEnabled:true,
   model:'gpt-6.2-sol',baseUrl:'https://api-c.reqtoken.com/v1'});
  const prod={HHBA_AUTH_ROLLOUT:'production',HHBA_MATCH_V2_RUNTIME:compact,
-  HHBA_MATCH_OPENAI_API_KEY:KEY};
+  HHBA_MATCH_OPENAI_API_KEY:KEY,HHBA_MATCH_DEEPSEEK_KEY:'synthetic-legacy-test-only'};
  assert.equal(matchV2Runtime(prod).matchEnabled,false);
  assert.equal(matchV2Runtime(prod).wordEnabled,false);
  assert.equal(selectProvider(prod,'resume_rewrite').name,'deepseek');
