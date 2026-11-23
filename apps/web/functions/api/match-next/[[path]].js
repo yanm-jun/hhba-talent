@@ -20,13 +20,20 @@ const headers={'Content-Type':'application/json; charset=utf-8',
  'Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'};
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers});
 const fail=(code,status=502)=>json({ok:false,error:code},status);
-// Explicit launch gate: the replacement is not shown to real users merely
-// because mocks passed. Enable only after real employer Search/Fetch acceptance.
-const enabled=env=>env?.HHBA_MATCH_CLEAN_V2_ENABLED==='1'&&
+// A real provider preflight must be possible before flipping the public
+// matching launch gate. It remains candidate-authenticated, explicit opt-in,
+// and preview-only until the complete workflow passes live acceptance.
+const providerConfigured=env=>
  env?.HHBA_MATCH_SERVICE_ENABLED==='1'&&
  typeof env?.HHBA_MATCH_DEEPSEEK_KEY==='string'&&
  env.HHBA_MATCH_DEEPSEEK_KEY.length>=16&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
+const enabled=env=>providerConfigured(env)&&env?.HHBA_MATCH_CLEAN_V2_ENABLED==='1';
+const previewPreflight=env=>providerConfigured(env)&&
+ typeof env?.CF_PAGES_BRANCH==='string'&&
+ env.CF_PAGES_BRANCH!==''&&env.CF_PAGES_BRANCH!=='main'&&
+ env?.HHBA_MATCH_V2_PREFLIGHT_ENABLED==='1';
+const mayCheckProvider=env=>enabled(env)||previewPreflight(env);
 async function candidateSession(env,request){
  const session=await sessionOfBearer(env.HHBA_PNVS_AUTH_DB,request,Date.now());
  if(!session)return null;
@@ -141,9 +148,11 @@ export async function onRequest({request,env}){
  const tail=url.pathname.slice('/api/match-next'.length).replace(/\/$/,'')||'/';
  if(tail==='/status'&&request.method==='GET')
   return json({kind:KIND,engine:MATCH_V2,enabled:enabled(env),
-   scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],mode:'EVIDENCE_FIRST_V2'});
- if(!enabled(env))return fail('MATCH_NOT_ENABLED',503);
+   preflight_available:mayCheckProvider(env),scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],mode:'EVIDENCE_FIRST_V2'});
  if(!['/resume','/ocr','/provider-check'].includes(tail))return fail('NOT_FOUND',404);
+ if(tail==='/provider-check'){
+  if(!mayCheckProvider(env))return fail('MATCH_PREFLIGHT_NOT_ENABLED',503);
+ }else if(!enabled(env))return fail('MATCH_NOT_ENABLED',503);
  if(tail==='/provider-check'&&request.method!=='GET')return fail('NOT_FOUND',404);
  if(tail!=='/provider-check'&&request.method!=='POST')return fail('NOT_FOUND',404);
  if(tail!=='/provider-check'&&(request.headers.get('Origin')!==url.origin||
