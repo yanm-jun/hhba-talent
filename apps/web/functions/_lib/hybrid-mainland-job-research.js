@@ -128,7 +128,7 @@ export async function runHybridMainlandJobResearch(key,resume,roleHint,limit=10,
    let modelRecovered=0;
    let jobs=[...fromFetched];
    if(jobs.length<Math.min(limit,6)&&
-      candidates.some(hit=>typeof hit.content==='string'&&hit.content.length>=90)){
+      candidates.some(hit=>typeof hit.content==='string'&&hit.content.length>=80)){
     options.onActivity?.({stage:'researching',message:'已阅读 '+readSuccess+
      ' 个招聘网页，正在让 AI 对照原始页面复核仍未识别的岗位与工作城市。'});
     try{
