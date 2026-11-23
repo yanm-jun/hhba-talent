@@ -13,7 +13,9 @@ const failure=code=>Object.assign(new Error(code),{code});
 const clean=(s,n=240)=>String(s??'').replace(/[\u0000-\u001f]/g,' ').replace(/\s+/g,' ').trim().slice(0,n);
 
 export function selectCleanMatchProvider(env){
- const name=String(env?.HHBA_MATCH_AI_PROVIDER||'openai').trim().toLowerCase();
+ const requested=String(env?.HHBA_MATCH_AI_PROVIDER||'').trim().toLowerCase();
+ const hasOpenAI=typeof (env?.HHBA_MATCH_OPENAI_API_KEY||env?.HHBA_AI_OPENAI_API_KEY)==='string';
+ const name=requested||(hasOpenAI?'openai':'deepseek');
  if(name==='openai'){
   const key=env?.HHBA_MATCH_OPENAI_API_KEY||env?.HHBA_AI_OPENAI_API_KEY;
   if(typeof key!=='string'||key.trim().length<16)return null;
