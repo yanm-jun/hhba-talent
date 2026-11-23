@@ -32,6 +32,7 @@ on:
       - 'apps/web/functions/_lib/hybrid-mainland-job-research.js'
       - 'apps/web/functions/_lib/clean-match-v2.js'
       - 'apps/web/functions/_lib/clean-match-v2-jd-bridge.js'
+      - 'apps/web/functions/_lib/clean-match-v2-provider-check.js'
       - 'apps/web/functions/api/match-next/**'
       - 'apps/web/functions/_lib/domestic-employer-index.js'
       - 'apps/web/functions/_lib/agent-score-feedback.js'
@@ -46,6 +47,7 @@ on:
       - 'apps/web/scripts/hybrid-mainland-job-research.contract.test.mjs'
       - 'apps/web/scripts/clean-match-v2.contract.test.mjs'
       - 'apps/web/scripts/clean-match-v2-jd-bridge.contract.test.mjs'
+      - 'apps/web/scripts/clean-match-v2-provider-check.contract.test.mjs'
       - 'apps/web/scripts/domestic-employer-index.contract.test.mjs'
       - 'apps/web/scripts/match-live-recovery.contract.test.mjs'
       - 'apps/web/scripts/match-deep-research-experience.contract.test.mjs'
@@ -110,6 +112,7 @@ jobs:
           node --test scripts/hybrid-mainland-job-research.contract.test.mjs
           node --test scripts/clean-match-v2.contract.test.mjs
           node --test scripts/clean-match-v2-jd-bridge.contract.test.mjs
+          node --test scripts/clean-match-v2-provider-check.contract.test.mjs
           node --test scripts/domestic-employer-index.contract.test.mjs
           node --test scripts/match-live-recovery.contract.test.mjs
           node --test scripts/match-deep-research-experience.contract.test.mjs
