@@ -186,10 +186,12 @@ export async function runMatchPreviewProviderCheck(signal?:AbortSignal):Promise<
   fetch_content_verified?:boolean
  }|null;
  if(!response.ok||data?.ok!==true||data?.status!=='READY'||
-  !Array.isArray(data.capabilities)||data.fetch_content_verified!==true)
+  !Array.isArray(data.capabilities)||
+  !data.capabilities.includes('openai_responses_json')||
+  !data.capabilities.includes('openai_web_search_sources'))
   throw new MatchError(response.status,errorMap[data?.error||'']||
    'OpenAI 接口预检未通过，请检查预览环境配置。');
- return {status:'READY',capabilities:data.capabilities,fetch_content_verified:true};
+ return {status:'READY',capabilities:data.capabilities,fetch_content_verified:data.fetch_content_verified===true};
 }
 /** Best-effort browser redaction before submitting text to HHBA's server. */
 export function redactResumeTextLocally(text:string):string{
