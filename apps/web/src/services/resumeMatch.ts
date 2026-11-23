@@ -56,7 +56,10 @@ export type MatchResponse = {
    jd_verification?:{eligible?:number;verified?:number;scored?:number;failed?:number};
    native_error?:string|null;native_mode?:string|null;
    hybrid_fallback?:{queries?:number;raw_results?:number;candidate_links?:number;
-    source_previews?:number;search_failures?:number;index_companies_considered?:number;error?:string|null}};
+    source_previews?:number;source_preview_before_fetch?:number;
+    fetch_attempted?:number;fetched_job_pages?:number;fetch_failures?:number;
+    explicit_work_city_sources?:number;model_recovered?:number;
+    search_failures?:number;index_companies_considered?:number;error?:string|null}};
   history_id?:string|null;
   history_status?:'SAVED'|'EMPTY'|'UNAVAILABLE';
   new_job_count?:number;
