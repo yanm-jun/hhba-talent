@@ -10,8 +10,8 @@
  * marked open or called "verified JD" without the existing independent gates.
  */
 import {runNativeDeepSearchJobs} from './native-deepsearch-job-research.js';
-import {searchPublicJobs,sourceOnlyJobPreviews} from './deepseek-search-match.js';
-import {isMainlandEmployerJobUrl} from './match-employer-source.js';
+import {searchPublicJobs,enrichCandidateDetails,sourceOnlyJobPreviews,recoverSearchGroundedShortlist,indexedJobWorkCity} from './deepseek-search-match.js';
+import {isMainlandEmployerJobUrl,isDirectEmployerSourceHit} from './match-employer-source.js';
 import {fallbackIndexIndustries} from './domestic-employer-index.js';
 
 export const HYBRID_DISCOVERY_VERSION='HHBA_MAINLAND_NATIVE_HYBRID_RECALL_V1';
@@ -71,6 +71,8 @@ const fatalProviderCode=new Set([
 
 export async function runHybridMainlandJobResearch(key,resume,roleHint,limit=10,options={},deps={}){
  const native=deps.native||runNativeDeepSearchJobs,search=deps.search||searchPublicJobs,
+  enrich=deps.enrich||enrichCandidateDetails,
+  recover=deps.recover||recoverSearchGroundedShortlist,
   previews=deps.previews||sourceOnlyJobPreviews,now=Date.now();
  const nativeTrial=options.search_engine!=='standard';
  const baseQueries=mainlandHybridSearchQueries(resume,roleHint,options.resumeProfile,nativeTrial?6:3);
@@ -91,17 +93,81 @@ export async function runHybridMainlandJobResearch(key,resume,roleHint,limit=10,
   try{
    const r=await search(key,'',roleHint,{signal:options.signal,
     queriesOverride:queries,allowEmpty:true,maxHits:54,queryTimeoutMs:12500});
-   const hits=(r.hits||[]).filter(x=>isMainlandEmployerJobUrl(x.url)&&
+   const hits=(r.hits||[]).filter(x=>isDirectEmployerSourceHit(x)&&
     options.excludePosting?.(x.url)!==true);
-   const jobs=previews(hits,limit).filter(x=>isMainlandEmployerJobUrl(x.official_url));
-   // Pages are validated separately. Do not show search hits as verified JDs.
-   if(hits.length)options.onSources?.(jobs,[],hits.map(x=>x.url));
+   // Search can return a legitimate official vacancy URL with only a
+   // generic "职位详情" summary. Never discard it before fetching the page.
+   if(hits.length)options.onSources?.([],[],hits.map(x=>x.url));
+   const initial=previews(hits,limit).filter(job=>
+    isMainlandEmployerJobUrl(job.official_url));
+   let candidates=hits,readSuccess=0,readAttempted=0,readFailures=0;
+   if(hits.length){
+    readAttempted=Math.min(hits.length,12);
+    options.onProgress?.('reading');
+    options.onActivity?.({stage:'reading',
+     message:'已发现 '+hits.length+' 条国内企业招聘链接，正在打开最多 '+
+      readAttempted+' 个具体网页核对岗位名称和工作地点。'});
+    try{
+     const details=await enrich(key,hits,{signal:options.signal,
+      onProgress:options.onProgress,
+      maxFetch:readAttempted,fetchTimeoutMs:6500});
+     candidates=(details?.hits||hits).filter(x=>isDirectEmployerSourceHit(x));
+     readSuccess=Math.min(readAttempted,Number(details?.fetches)||0);
+     readFailures=Math.max(0,readAttempted-readSuccess);
+    }catch{
+     // Broken Fetch never invalidates the original public Search evidence.
+     candidates=hits;readFailures=readAttempted;
+    }
+   }
+   const cityEvidence=candidates.filter(hit=>Boolean(indexedJobWorkCity(hit))).length;
+   const fromFetched=previews(candidates,limit).filter(job=>
+    isMainlandEmployerJobUrl(job.official_url));
+   // Model-backed source extraction is supplementary, not a trusted answer:
+   // URL, employer, job and real work-city must still corroborate with the
+   // ORIGINAL fetched Search record via the existing selectedJobs validator.
+   let modelRecovered=0;
+   let jobs=[...fromFetched];
+   if(jobs.length<Math.min(limit,6)&&
+      candidates.some(hit=>typeof hit.content==='string'&&hit.content.length>=90)){
+    options.onActivity?.({stage:'researching',message:'已阅读 '+readSuccess+
+     ' 个招聘网页，正在让 AI 对照原始页面复核仍未识别的岗位与工作城市。'});
+    try{
+     const extracted=await recover(key,resume,candidates,
+      Math.min(limit,10),{signal:options.signal,recoveryTimeoutMs:19000});
+     const byUrl=new Map(candidates.map(hit=>[hit.url,hit]));
+     const seen=new Set(jobs.map(job=>job.official_url));
+     for(const raw of Array.isArray(extracted)?extracted:[]){
+      const url=raw?.official_url,hit=byUrl.get(url);
+      if(!hit||!isDirectEmployerSourceHit(hit)||seen.has(url)||
+       !indexedJobWorkCity(hit)||!isMainlandEmployerJobUrl(url)||
+       options.excludePosting?.(url)===true)continue;
+      // Never trust a model's score or open/recruiting-state claims.
+      const job={...raw,match_score:null,reference_score:0,score_basis:'',
+       source_type:'站外招聘职位',source_status:'SOURCE_SEARCH_PREVIEW',
+       evidence_status:'RESEARCH_PENDING',recruitment_source_kind:'EMPLOYER_DOMAIN_CANDIDATE',
+       application_status:'NEEDS_OFFICIAL_CONFIRMATION',
+       research_anchor:{url,title:hit.title,site_name:hit.source,
+        summary:String(hit.content||hit.summary||'').slice(0,700)}};
+      seen.add(url);jobs.push(job);modelRecovered++;
+      if(jobs.length>=limit)break;
+     }
+    }catch{/* public-source previews remain available */}
+   }
+   if(!jobs.length&&initial.length)jobs=initial;
+   if(jobs.length)options.onSources?.(jobs,[],[]);
    if(jobs.length)options.onPartial?.(jobs);
    options.onActivity?.({stage:'searching',
-    message:'国内企业职位补充搜索已完成 '+queries.length+' 组关键词，获得 '+hits.length+
-     ' 条企业招聘来源，其中 '+jobs.length+' 条有明确职位与城市证据。',
-    searches:r.diagnostic?.successful_searches||0,candidate_links:hits.length});
-   return {matches:jobs,hits,diagnostic:r.diagnostic||{},error:null};
+    message:'国内企业补充搜索：检索 '+queries.length+' 组关键词，发现 '+hits.length+
+     ' 条招聘来源，读取 '+readSuccess+' 个网页、确认 '+cityEvidence+
+     ' 条具体工作城市证据，形成 '+jobs.length+' 条待核实职位。',
+    searches:r.diagnostic?.successful_searches||0,candidate_links:hits.length,
+    pages_read:readSuccess});
+   return {matches:jobs,hits:candidates,diagnostic:{...r.diagnostic,
+    source_preview_before_fetch:initial.length,
+    fetched_job_pages:readSuccess,fetch_attempted:readAttempted,
+    fetch_failures:readFailures,explicit_work_city_sources:cityEvidence,
+    model_recovered:modelRecovered,source_previews:jobs.length},error:null};
+
   }catch(e){
    const code=knownCode(e);
    options.onActivity?.({stage:'searching',message:'国内企业补充搜索暂不可用；原生深度搜索继续独立执行。'});
@@ -148,6 +214,12 @@ export async function runHybridMainlandJobResearch(key,resume,roleHint,limit=10,
    raw_results:Number(searchDiag.raw_results)||0,
    candidate_links:supplement.hits.length,
    source_previews:supplement.matches.length,
+   source_preview_before_fetch:Number(searchDiag.source_preview_before_fetch)||0,
+   fetch_attempted:Number(searchDiag.fetch_attempted)||0,
+   fetched_job_pages:Number(searchDiag.fetched_job_pages)||0,
+   fetch_failures:Number(searchDiag.fetch_failures)||0,
+   explicit_work_city_sources:Number(searchDiag.explicit_work_city_sources)||0,
+   model_recovered:Number(searchDiag.model_recovered)||0,
    search_failures:Number(searchDiag.search_failures)||0,
    error:supplement.error}
  }};
