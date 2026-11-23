@@ -6,6 +6,7 @@
  */
 import {checkMatchProviderCapabilities,providerStatusError}
  from './match-provider-preflight.js';
+import {checkOpenAIMatchProvider} from './openai-match-adapter.js';
 
 const PUBLIC_TEST_URL='https://api-docs.deepseek.com/zh-cn/guides/search/';
 const fail=code=>Object.assign(new Error(code),{code});
@@ -14,7 +15,9 @@ export const MATCH_V2_PREFLIGHT='HHBA_MATCH_V2_LIVE_PROVIDER_PREFLIGHT';
 export async function checkCleanMatchProvider(key,{
  fetcher=fetch,signal=null,fetchTimeoutMs=12000
 }={}){
- const base=await checkMatchProviderCapabilities(key,{
+ if(key?.name==='openai')return checkOpenAIMatchProvider(key,{fetcher,signal});
+ const vendorKey=typeof key==='string'?key:key?.key;
+ const base=await checkMatchProviderCapabilities(vendorKey,{
   fetcher,signal,timeoutMs:15000
  });
  const timeout=AbortSignal.timeout(fetchTimeoutMs);
