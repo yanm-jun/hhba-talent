@@ -44,6 +44,11 @@ export function nativeDeepSearchSources(responseOrOutput){
  const add=(url,metadata,origin)=>{
   const safe=safeJobDetailLink(url);
   if(!safe||!isMainlandEmployerJobUrl(safe)||found.has(safe))return;
+  // /search.html and /list.html look like valid job URLs when hosted on
+  // careers.* but are only navigation pages, not single vacancies.
+  const page=new URL(safe);
+  if(/\/(?:search|list|index|job-?list|position-?list|jobs|positions|careers?)(?:\.(?:html?|aspx|php))?\/?$/i.test(page.pathname)&&
+   ![...page.searchParams.keys()].some(k=>/(?:job.?id|post.?id|position.?id|vacanc.?id|jobunionid)/i.test(k)))return;
   found.set(safe,{url:safe,title:clean(metadata?.title,180),
    site_name:clean(metadata?.site_name,100),
    summary:clean(metadata?.snippet,650),source_origin:origin});
