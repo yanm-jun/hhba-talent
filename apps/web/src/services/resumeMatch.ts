@@ -310,8 +310,8 @@ export async function submitExtractedResumeText(
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
    body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
     options:{country:'CN',remote_only:false,
-     role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10)),exclude_urls:opts.exclude_urls,
-     })
+     role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10)),exclude_urls:opts.exclude_urls
+    }})
   }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
    if((e as Error)?.name==='AbortError')throw e;
    throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
