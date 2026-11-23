@@ -152,7 +152,7 @@ test('AI source recovery can identify a fetched role, but may not invent links, 
  const hit={id:'id-1',url:OFFICIAL,title:'职位详情',
   source:'腾讯招聘',summary:'职位详情',snippet:'职位详情',
   content:'',availability:{status:'UNKNOWN'}};
- const fetched={...hit,content:'招聘单位：腾讯\n职位名称：销售运营主管\n工作地点：上海\n岗位职责：销售运营、渠道支持。\n任职要求：经营数据分析。',
+ const fetched={...hit,content:'招聘单位：腾讯\n职位名称：销售运营主管\n工作地点：上海\n岗位职责：负责区域销售运营、渠道支持，定期复盘线索、到店、试驾转化数据，落实跨团队协同与客户经营。\n任职要求：经营数据分析，销售流程管理与跨部门协作能力。',
   availability:{status:'UNKNOWN'}};
  let received=false;
  const result=await runHybridMainlandJobResearch('key','期望工作城市：上海','区域督导',10,
