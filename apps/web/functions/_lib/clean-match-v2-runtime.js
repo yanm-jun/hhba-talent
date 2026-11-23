@@ -17,9 +17,11 @@ export function matchV2Runtime(env){
    if(parsed&&typeof parsed==='object'&&!Array.isArray(parsed))compact=parsed;
   }catch{}
  }
- const diagEnabled=env?.HHBA_AUTH_ROLLOUT==='preview'&&
-  (env?.HHBA_PREVIEW_AI_DIAG_ENABLED==='1'||compact.diagEnabled===true);
- const preview=diagEnabled;
+ // Preserve the legacy explicit preview flag used by earlier QA clients;
+ // compact-config diagnostics are only permitted under preview rollout.
+ const diagEnabled=env?.HHBA_PREVIEW_AI_DIAG_ENABLED==='1'||
+  (env?.HHBA_AUTH_ROLLOUT==='preview'&&compact.diagEnabled===true);
+ const preview=env?.HHBA_AUTH_ROLLOUT==='preview'&&diagEnabled;
  return {
   diagEnabled,
   baseUrl:env?.HHBA_MATCH_OPENAI_BASE_URL||compact.baseUrl||'https://api.openai.com/v1',
