@@ -29,7 +29,7 @@ export function selectProvider(env,task='resume_optimization',{reasoning=false}=
  // non-thinking Flash model by default, always allowing explicit override.
  const deepseekWriter=reasoning||['resume_rewrite','resume_reviewer'].includes(task);
  const model=env?.[prefix+'MODEL']||
-  (requested==='openai'?(env?.HHBA_MATCH_OPENAI_MODEL||'gpt-6-sol'):
+  (requested==='openai'?(env?.HHBA_MATCH_OPENAI_MODEL||'gpt-6.2-sol'):
    requested==='deepseek'?(deepseekWriter?'deepseek-v4-pro':'deepseek-flash'):null);
  if(typeof key!=='string'||!key.trim()||typeof model!=='string'||!model.trim())throw new Error('AI_PROVIDER_NOT_CONFIGURED');
  const effort=['low','high','max'].includes(
