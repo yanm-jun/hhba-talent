@@ -329,7 +329,14 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
             {' · '}<a href={job.official_url} target="_blank" rel="noopener noreferrer">核对企业职位来源</a>
            </li>)}
           </ul>}
-          <p>错误与排查：搜索失败 {syntheticResult.native_search?.search_failures??0} 次，Fetch 失败 {syntheticResult.native_search?.fetch_failures??0} 次；岗位是否仍开放，须以企业官网实时信息为准。</p>
+          {(syntheticResult.native_search?.page_reads??0)>0&&<div className="hhba-ai-preview-extraction-diagnostics">
+           <p><strong>JD 原文提取诊断：</strong>成功读取 {syntheticResult.native_search?.page_reads??0} 个页面，其中明确识别工作城市 {syntheticResult.native_search?.city_evidence_count??0} 个，提取合格职位 {syntheticResult.native_search?.extracted_jobs??0} 条。</p>
+           <p>淘汰原因：缺少明确工作城市 {syntheticResult.native_search?.extraction_page_rejections?.work_city_missing??0} · 公司或岗位名缺失 {syntheticResult.native_search?.extraction_page_rejections?.company_or_role_missing??0} · 公司身份缺乏原文佐证 {syntheticResult.native_search?.extraction_page_rejections?.employer_identity_missing??0} · 职位名称缺乏原文佐证 {syntheticResult.native_search?.extraction_page_rejections?.role_title_unverified??0}。</p>
+           <p>职责或任职要求缺乏逐字证据 {(syntheticResult.native_search?.extraction_page_rejections?.duties_quote_unverified??0)+(syntheticResult.native_search?.extraction_page_rejections?.requirements_quote_unverified??0)+(syntheticResult.native_search?.extraction_page_rejections?.no_verbatim_jd_fields??0)} · 提取模型失败 {syntheticResult.native_search?.model_failures??0} 批。</p>
+          </div>}
+          <p>错误与排查：搜索失败 {syntheticResult.native_search?.search_failures??0} 次，Fetch 失败 {syntheticResult.native_search?.fetch_failures??0} 次
+           {syntheticResult.native_search?.fetch_error_codes?.length?'（错误代码：'+syntheticResult.native_search.fetch_error_codes.join('、')+'）':''}；
+           岗位是否仍开放，须以企业官网实时信息为准。</p>
          </div>}
         </div>}
        </div>}
