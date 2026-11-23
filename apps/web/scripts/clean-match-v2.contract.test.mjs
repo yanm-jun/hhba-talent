@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import {preferredCities,fallbackPlan,isExactEmployerJobUrl,groundedVacancy,
  runCleanJobMatch,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
 import {onRequest} from '../functions/api/match-next/[[path]].js';
+import {onRequest as legacyMatchRoute} from '../functions/api/match-native/[[path]].js';
 
 const JD_URL='https://careers.tencent.com/jobdesc.html?postId=2097166275703910400';
 const BAD='https://job-boards.greenhouse.io/example/jobs/1234567';
@@ -160,6 +161,21 @@ test('rebuild launch gate is closed until independent live evidence acceptance',
    HHBA_PNVS_AUTH_DB:{prepare(){}}}});
  const status=await res.json();
  assert.equal(status.enabled,false);
+});
+
+test('old resume matching backend is retired in production but has no data-destructive changes',async()=>{
+ const status=await legacyMatchRoute({
+  request:new Request('https://hhba.work/api/match-native/status'),
+  env:{CF_PAGES_BRANCH:'main'}
+ });
+ assert.equal(status.status,200);
+ assert.equal((await status.json()).enabled,false);
+ const match=await legacyMatchRoute({
+  request:new Request('https://hhba.work/api/match-native/resume',{method:'POST'}),
+  env:{CF_PAGES_BRANCH:'main'}
+ });
+ assert.equal(match.status,410);
+ assert.equal((await match.json()).error,'MATCH_BACKEND_RETIRED');
 });
 
 test('new backend owns status and has no imports of hybrid, Greenhouse, Lever, checkpoints or stale Agent',async()=>{
