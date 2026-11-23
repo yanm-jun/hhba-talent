@@ -71,7 +71,7 @@ export type MatchResponse = {
   improved_job_count?:number;
   can_continue?:boolean;
 };
-export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];search_engine?:'standard'|'deepseek_native'};
+export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
 const API='/api/match-next'; // Clean V2 backend. Legacy Agent is disconnected.
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=3*1024*1024;
@@ -311,7 +311,7 @@ export async function submitExtractedResumeText(
    body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
     options:{country:'CN',remote_only:false,
      role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10)),exclude_urls:opts.exclude_urls,
-     search_engine:opts.search_engine||'standard'}})
+     })
   }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
    if((e as Error)?.name==='AbortError')throw e;
    throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
