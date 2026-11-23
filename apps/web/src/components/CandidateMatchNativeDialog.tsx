@@ -268,8 +268,20 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       !pending&&<div className="hhba-match-empty"><BriefcaseBusiness size={23}/>
        <h3>本轮没有找到符合条件的具体职位链接</h3>
        <p>简历已识别完成。本轮企业官网检索没有得到可推荐的具体岗位。</p>
-       {result.native_search?.searches!==undefined&&<p>已检索 {result.native_search.searches} 次
-        {'，发现 '+(result.native_search.candidate_links??0)+' 条企业岗位线索。'}</p>}
+       {result.native_search?.searches!==undefined&&<p>DeepSeek / 搜索工具已检索 {result.native_search.searches} 次，
+        找到 {result.native_search.candidate_links??0} 条符合国内企业来源要求的职位网址。
+       </p>}
+       {result.native_search?.model_candidate_rows!==undefined&&<p>
+        AI 提出了 {result.native_search.model_candidate_rows} 条候选职位，
+        其中 {result.native_search.model_source_grounded??0} 条网址可与实际搜索或已打开网页对应。
+       </p>}
+       {result.native_search?.research_error==='NO_ELIGIBLE_EMPLOYER_JOB_SOURCES'&&<p>
+        本轮没有取得通过官网来源要求的具体职位网址，不能把这个结果理解为市场上没有适合你的工作。
+       </p>}
+       {result.native_search?.jd_verification&&<p>
+        JD 核验：已尝试 {result.native_search.jd_verification.eligible??0} 条，
+        成功核实 {result.native_search.jd_verification.verified??0} 条。
+       </p>}
        {!!result.profile?.target_roles?.length&&<p>搜索参考方向 · {result.profile.target_roles.join('、')}</p>}
        {onContinue&&<p>选择「继续搜索岗位」，可以换一批搜索词并继续核对招聘来源。</p>}
       </div>}
