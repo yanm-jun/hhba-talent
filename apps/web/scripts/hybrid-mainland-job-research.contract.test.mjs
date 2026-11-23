@@ -68,10 +68,143 @@ test('parallel native + standalone Search retains sourced mainland job prospects
  assert.equal(result.diagnostic.mode,HYBRID_DISCOVERY_VERSION);
  assert.equal(result.diagnostic.searches,10);
  assert.equal(result.diagnostic.hybrid_fallback.queries,6);
- assert.equal(sourceCalls.length,1);
+ assert.ok(sourceCalls.length>=1);
  assert.deepEqual(sourceCalls[0].links,[OFFICIAL,SECOND]);
+ assert.ok(sourceCalls.at(-1).jobs.length>=1,'after evidence review the candidates are surfaced again');
  assert.ok(partial.length>=2);
  assert.ok(activity.some(x=>x.message.includes('补充搜索')));
+});
+
+test('regression: 18 real source URLs with generic Search snippets are actually fetched before a verdict of zero jobs',async()=>{
+ const hits=Array.from({length:18},(_,i)=>({
+  id:'j'+(i+1),
+  url:'https://careers.tencent.com/jobdesc.html?postId='+String(2097166275703910400n+BigInt(i)),
+  title:'职位详情',source:'腾讯招聘',summary:'腾讯招聘职位详情',
+  snippet:'腾讯招聘职位详情',content:'',
+  availability:{status:'UNKNOWN'}
+ }));
+ const activities=[],sources=[];
+ const error=Object.assign(new Error('AI_EMPLOYER_JOBS_NOT_FOUND'),{
+  code:'AI_EMPLOYER_JOBS_NOT_FOUND',diagnostic:{searches:0,candidate_links:0}});
+ const result=await runHybridMainlandJobResearch('fake-key',
+  '区域门店督导经验\n意向工作城市：上海','区域督导',10,{
+   resumeProfile:evidence,
+   onActivity:x=>activities.push(x.message),
+   onSources:(_jobs,_closed,urls)=>sources.push(urls)
+  },{
+   native:async()=>{throw error;},
+   search:async(_key,cv,_role,opt)=>{
+    assert.equal(cv,'','Search must not receive a resume');
+    return searchResponse(hits,opt.queriesOverride);
+   },
+   enrich:async(_key,rows,opts)=>{
+    assert.equal(rows.length,18);
+    assert.equal(opts.maxFetch,12);
+    assert.equal(opts.fetchTimeoutMs,6500);
+    return {hits:rows.map((hit,i)=>i===0?{
+     ...hit,content:'招聘单位：腾讯\n职位名称：销售运营主管\n工作地点：上海\n岗位职责：负责业务销售运营、渠道辅导和数据分析。\n任职要求：熟悉门店数据分析及跨团队协作。',
+     availability:{status:'UNKNOWN'}
+    }:hit),fetches:1,excluded_closed:0};
+   },
+   recover:async()=>[]
+  });
+ assert.equal(result.matches.length,1,'public vacancy with fetched company, title and city is not discarded');
+ assert.equal(result.matches[0].location,'上海');
+ assert.equal(result.matches[0].title,'销售运营主管');
+ assert.equal(result.matches[0].match_score,null);
+ assert.equal(result.matches[0].jd_source_status,undefined);
+ assert.equal(result.diagnostic.hybrid_fallback.candidate_links,18);
+ assert.equal(result.diagnostic.hybrid_fallback.source_preview_before_fetch,0);
+ assert.equal(result.diagnostic.hybrid_fallback.fetch_attempted,12);
+ assert.equal(result.diagnostic.hybrid_fallback.fetched_job_pages,1);
+ assert.equal(result.diagnostic.hybrid_fallback.source_previews,1);
+ assert.ok(sources[0].length===18);
+ assert.ok(activities.some(x=>x.includes('打开最多')));
+});
+
+test('fetch failed: no fake job/location is created and diagnostics report unreadable pages',async()=>{
+ const hits=Array.from({length:18},(_,i)=>({
+  id:'j'+i,
+  url:'https://jobs.company-portal.cn/position/job-'+(i+20000),
+  title:'职位详情',source:'企业招聘',summary:'职位详情，更多信息请打开官网',
+  snippet:'职位详情，更多信息请打开官网',content:'',
+  availability:{status:'UNKNOWN'}
+ }));
+ let recoveryCalls=0;
+ const result=await runHybridMainlandJobResearch('fake-key',
+  '期望工作城市：上海','区域督导',10,{
+   resumeProfile:evidence
+  },{
+   native:async()=>({matches:[],diagnostic:{searches:1}}),
+   search:async(_k,_c,_h,o)=>searchResponse(hits,o.queriesOverride),
+   enrich:async(_k,rows)=>({hits:rows,fetches:0,excluded_closed:0}),
+   recover:async()=>{recoveryCalls++;return []}
+  });
+ assert.equal(result.matches.length,0);
+ assert.equal(result.diagnostic.hybrid_fallback.fetch_attempted,12);
+ assert.equal(result.diagnostic.hybrid_fallback.fetched_job_pages,0);
+ assert.equal(result.diagnostic.hybrid_fallback.fetch_failures,12);
+ assert.equal(result.diagnostic.hybrid_fallback.source_previews,0);
+ assert.equal(recoveryCalls,0,'do not use an AI to invent missing web evidence');
+});
+
+test('AI source recovery can identify a fetched role, but may not invent links, mainland cities or numerical scores',async()=>{
+ const hit={id:'id-1',url:OFFICIAL,title:'职位详情',
+  source:'腾讯招聘',summary:'职位详情',snippet:'职位详情',
+  content:'',availability:{status:'UNKNOWN'}};
+ const fetched={...hit,content:'招聘单位：腾讯\n职位名称：销售运营主管\n工作地点：上海\n岗位职责：负责区域销售运营、渠道支持，定期复盘线索、到店、试驾转化数据，落实跨团队协同与客户经营。\n任职要求：经营数据分析，销售流程管理与跨部门协作能力。',
+  availability:{status:'UNKNOWN'}};
+ let received=false;
+ const result=await runHybridMainlandJobResearch('key','期望工作城市：上海','区域督导',10,
+  {resumeProfile:evidence},{
+   native:async()=>({matches:[],diagnostic:{searches:1}}),
+   search:async(_k,_c,_h,o)=>searchResponse([hit],o.queriesOverride),
+   enrich:async()=>({hits:[fetched],fetches:1}),
+   previews:()=>[],
+   recover:async(_k,_resume,rows)=>{
+    received=rows[0].content.includes('工作地点：上海');
+    return [
+     {...job(OFFICIAL,'腾讯'),title:'销售运营主管',match_score:99,score_basis:'未经核实的分数'},
+     {...job('https://careers.fake-recommend.cn/jobs/unknown'),'title':'区域督导',match_score:92},
+     {...job(BOARD),match_score:90}
+    ];
+   }
+  });
+ assert.ok(received);
+ assert.deepEqual(result.matches.map(x=>x.official_url),[OFFICIAL]);
+ assert.equal(result.matches[0].match_score,null);
+ assert.equal(result.matches[0].reference_score,0);
+ assert.equal(result.diagnostic.hybrid_fallback.model_recovered,1);
+});
+
+test('incomplete native deep search preserves independent opened public sources even when the final model answer fails',async()=>{
+ const incomplete=Object.assign(new Error('AI_NATIVE_DEEPSEARCH_INCOMPLETE'),{
+  code:'AI_NATIVE_DEEPSEARCH_INCOMPLETE',
+  diagnostic:{searches:4,page_reads:3,candidate_links:1},
+  public_sources:[{url:OFFICIAL,title:'职位详情',site_name:'腾讯招聘',
+   summary:'腾讯官方招聘职位详情'}]
+ });
+ let fetchedNative=0;
+ const result=await runHybridMainlandJobResearch('test-key',
+  '已脱敏的汽车行业门店运营工作经验','区域督导',10,{
+  resumeProfile:evidence
+ },{
+  native:async()=>{throw incomplete},
+  search:async(_k,_cv,_role,o)=>searchResponse([],o.queriesOverride),
+  enrich:async(_k,leads)=>{
+   fetchedNative+=leads.length;
+   return {hits:leads.map(x=>({...x,
+    content:'职位名称：销售运营主管 工作地点：上海。 招聘单位：腾讯。 岗位职责：负责渠道销售运营、商务团队协作、门店数据分析与转化复盘。 任职资格：了解市场销售管理与零售运营流程。',
+    availability:{status:'UNKNOWN'}
+   })),fetches:leads.length};
+  }
+ });
+ assert.equal(fetchedNative,1);
+ assert.deepEqual(result.matches.map(x=>x.official_url),[OFFICIAL]);
+ assert.equal(result.matches[0].match_score,null);
+ assert.equal(result.diagnostic.native_error,'AI_NATIVE_DEEPSEARCH_INCOMPLETE');
+ assert.equal(result.diagnostic.hybrid_fallback.native_source_salvage_attempted,1);
+ assert.equal(result.diagnostic.hybrid_fallback.native_source_salvage_jobs,1);
 });
 
 test('hybrid native search also uses bounded company-index hints without treating old company URLs as live jobs',async()=>{

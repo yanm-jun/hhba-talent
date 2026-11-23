@@ -171,6 +171,49 @@ test('missing native Search calls or a provider failure cannot present model-inv
  }),e=>e.code==='AI_NATIVE_DEEPSEARCH_FAILED');
 });
 
+test('incomplete native Responses preserves completed public Search sources for independent JD recovery',async()=>{
+ const partial={status:'incomplete',
+  incomplete_details:{reason:'max_output_tokens'},output:[sourceItem],
+  usage:{server_tool_use:{tool_search:2,tool_fetch:0}}};
+ let error;
+ try{
+  await runNativeDeepSearchJobs('synthetic','脱敏简历','渠道运营',10,{},{
+   fetcher:async()=>asSse([
+    {type:'response.output_item.done',item:sourceItem},
+    {type:'response.incomplete',response:partial}
+   ])
+  });
+ }catch(e){error=e}
+ assert.equal(error?.code,'AI_NATIVE_DEEPSEARCH_INCOMPLETE');
+ assert.deepEqual(error?.public_sources?.map(x=>x.url),[OFFICIAL]);
+ assert.equal(error?.diagnostic?.candidate_links,1);
+ assert.equal(error?.diagnostic?.searches,2);
+ assert.ok(!JSON.stringify(error.diagnostic).includes('脱敏简历'));
+});
+
+test('broken DeepSeek event stream still preserves real completed employer source links',async()=>{
+ const encoder=new TextEncoder();
+ let readCount=0;
+ const stream=new ReadableStream({
+  pull(controller){
+   if(readCount++===0){
+    controller.enqueue(encoder.encode('event: response.output_item.done\n'+
+     'data: '+JSON.stringify({type:'response.output_item.done',item:sourceItem})+'\n\n'));
+   }else controller.error(new Error('simulated network drop'));
+  }
+ });
+ let err;
+ try{
+  await runNativeDeepSearchJobs('synthetic','脱敏简历','区域运营',10,{},{
+   fetcher:async()=>new Response(stream,{status:200,
+    headers:{'Content-Type':'text/event-stream'}})
+  });
+ }catch(e){err=e}
+ assert.equal(err?.code,'AI_PROVIDER_STREAM_BROKEN');
+ assert.deepEqual(err?.public_sources?.map(x=>x.url),[OFFICIAL]);
+ assert.equal(err?.diagnostic?.candidate_links,1);
+});
+
 test('native deep-search selectable in same UI and safely wired into authenticated existing JD/history pipeline',()=>{
  const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
  const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');

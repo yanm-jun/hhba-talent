@@ -119,6 +119,15 @@ export async function runNativeDeepSearchJobs(key,resume,roleHint,limit=10,optio
   onActivity=options.onActivity||(()=>{}),onSources=options.onSources||(()=>{});
  const start=Date.now(),sources=new Map();
  let searches=0,reads=0,sourceBatches=0,completed=null,terminal='';
+ const interrupt=(code,phase='native_stream')=>{
+  const e=failure(code);
+  e.public_sources=[...sources.values()].slice(0,36);
+  e.diagnostic={mode:NATIVE_DEEPSEARCH_VERSION,phase,
+   searches,page_reads:reads,candidate_links:sources.size,
+   source_provenance:'COMPLETED_PROVIDER_WEB_TOOLS_ONLY',
+   elapsed_ms:Date.now()-start};
+  return e;
+ };
  const timeout=AbortSignal.timeout(155000);
  const signal=options.signal?AbortSignal.any([options.signal,timeout]):timeout;
  const payload={model:'deepseek-flash',reasoning:{effort:'high'},
@@ -182,20 +191,32 @@ export async function runNativeDeepSearchJobs(key,resume,roleHint,limit=10,optio
   while(true){
    let part;
    try{part=await reader.read()}
-   catch{throw failure(options.signal?.aborted?'AI_MATCH_CANCELLED':
+   catch{throw interrupt(options.signal?.aborted?'AI_MATCH_CANCELLED':
     signal.aborted?'AI_NATIVE_DEEPSEARCH_TIMEOUT':'AI_PROVIDER_STREAM_BROKEN')}
    if(part.done)break;
    buffer+=decoder.decode(part.value,{stream:true}).replace(/\r/g,'');
-   if(buffer.length>95000)throw failure('AI_PROVIDER_RESPONSE_INVALID');
+   if(buffer.length>95000)throw interrupt('AI_PROVIDER_RESPONSE_INVALID');
    const blocks=buffer.split('\n\n');buffer=blocks.pop()||'';
    for(const block of blocks)consume(block);
   }
   if(buffer.trim())consume(buffer);
  }finally{try{await reader.cancel()}catch{}try{reader.releaseLock()}catch{}}
- if(terminal!=='completed'||!completed||completed.status!=='completed')
-  throw failure(terminal==='response.incomplete'?'AI_NATIVE_DEEPSEARCH_INCOMPLETE':
-   'AI_NATIVE_DEEPSEARCH_FAILED');
+ // A final incomplete/failed model response may still contain genuinely
+ // completed public web Search or page-open items. Retain only those verified
+ // tool URLs for independent later JD review, never the unfinished model text.
  for(const row of nativeDeepSearchSources(completed))sources.set(row.url,row);
+ if(terminal!=='completed'||!completed||completed.status!=='completed'){
+  const error=failure(terminal==='response.incomplete'?'AI_NATIVE_DEEPSEARCH_INCOMPLETE':
+   'AI_NATIVE_DEEPSEARCH_FAILED');
+  error.public_sources=[...sources.values()].slice(0,36);
+  error.diagnostic={mode:NATIVE_DEEPSEARCH_VERSION,
+   phase:'native_final_response',provider_status:terminal||'missing',
+   searches:Number(completed?.usage?.server_tool_use?.tool_search||searches),
+   page_reads:Number(completed?.usage?.server_tool_use?.tool_fetch||reads),
+   candidate_links:sources.size,source_provenance:'COMPLETED_PROVIDER_WEB_TOOLS_ONLY',
+   elapsed_ms:Date.now()-start};
+  throw error;
+ }
  const toolUse=completed.usage?.server_tool_use||{};
  if(!sources.size||!Number(toolUse.tool_search||searches)){
   const error=failure('AI_EMPLOYER_JOBS_NOT_FOUND');

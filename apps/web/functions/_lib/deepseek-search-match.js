@@ -197,8 +197,15 @@ function closedRows(text){
 // Accept only employer-shaped, specific vacancy pages, not catalogue or search pages.
 function singlePostingDetail(hit){
  if(!isDirectEmployerSourceHit(hit))return false;
- const path=new URL(hit.url).pathname;
- return /\/(?:job|jobs|position|positions|job-detail)\/(?:details\/)?(?=[a-z\d-]*\d)[a-z\d-]+(?:\/|$)/i.test(path);
+ const u=new URL(hit.url),path=u.pathname;
+ if(/\/(?:search|list|index|job-?list|position-?list|jobs|positions)(?:\.html?)?\/?$/i.test(path)&&
+  ![...u.searchParams.keys()].some(k=>/(?:post.?id|job.?id|position.?id)/i.test(k)))return false;
+ const specificPath=/\/(?:job|jobs|position|positions|job-detail)\/(?:details\/)?[a-z\d-]{3,}(?:\/|$)/i.test(path)&&
+  !/\/(?:search|list|index|all-jobs)(?:\/|$)/i.test(path);
+ const idQuery=[...u.searchParams.entries()].some(([k,v])=>
+  /^(?:post.?id|job.?id|position.?id|jobunionid|requisitionid)$/i.test(k)&&v.length>=4);
+ const detailPage=/(?:^|\/)(?:jobdesc|jobdetail|job-detail|positiondetail|position-detail|jobdetails|position-details|detail)(?:\.html?)?\/?$/i.test(path);
+ return specificPath||(idQuery&&detailPage);
 }
 
 function englishPostingDetails(hit,raw=hit?.content){
@@ -227,13 +234,13 @@ function englishPostingDetails(hit,raw=hit?.content){
 
 function structuredPostingWorkCity(hit,raw=hit?.content){
  if(!singlePostingDetail(hit))return null;
- const city=String(raw||'').match(/(?:^|\r?\n)[ \t]*(?:#{1,6}[ \t]*|\*\*)?(?:所在地|工作地点|工作城市|办公地点|岗位地点)(?:\*\*)?[ \t]*(?:[：:][ \t]*|(?:\r?\n[ \t]*)+)([^\r\n，。；;]{2,48})(?=\r?\n|[，。；;]|$)/)?.[1]?.trim();
+ const city=String(raw||'').match(/(?:^|\r?\n)[ \t]*(?:#{1,6}[ \t]*|\*\*)?(?:所在地|工作地点|工作城市|工作地址|办公地点|岗位地点|职位地点|Work Location|Job Location)(?:\*\*)?[ \t]*(?:[：:][ \t]*|(?:\r?\n[ \t]*)+)([^\r\n，。；;]{2,48})(?=\r?\n|[，。；;]|$)/i)?.[1]?.trim();
  return city&&isMainlandJobLocation(city)?city:englishPostingDetails(hit,raw)?.city||null;
 }
 
 export function indexedJobWorkCity(hit){
  const body=[hit?.summary,hit?.snippet,hit?.content].filter(Boolean).join(' ');
- const match=body.match(/(?:工作地点|工作城市|办公地点|办公城市|岗位地点|岗位城市)[：:\s]{0,4}([^，。；;\n]{2,40})/i);
+ const match=body.match(/(?:工作地点|工作城市|工作地址|办公地点|办公城市|岗位地点|岗位城市|职位地点)[：:\s]{0,4}([^，。；;\n]{2,40})/i);
  if(!match)return structuredPostingWorkCity(hit);
  const candidate=String(match[1]).split(/(?:\s{2,}|要求|待遇|学历|职责|任职|岗位|职位|部门|工作经验|更新时间|招聘人数)/)[0].trim();
  return isMainlandJobLocation(candidate)?candidate:
@@ -359,8 +366,15 @@ export function sourceOnlyJobPreviews(hits,limit=10){
   if(hit.content&&!isRecommendationEligible({...hit,availability:
    classifyJobAvailability({content:hit.content},{fetched:true})}))continue;
   const site=clean(hit.source,90);
-  const company=site.replace(/,?\s+(?:incorporated|inc\.?|corporation|corp\.?|limited|ltd\.?)$/i,'').replace(/(?:官方招聘|招聘官网|招聘平台|招聘网站|人才招聘|招聘|官网|careers?|jobs?)$/gi,'')
+  const content=clean(hit.content||'',2500);
+  const employerLabel=content.match(/(?:招聘单位|用人单位|公司名称|企业名称)[：:\s]{0,3}([\u4e00-\u9fffA-Za-z0-9·（）()&]{2,55}?)(?=\s*(?:工作地点|工作地址|岗位名称|职位名称|岗位职责|任职要求|\s{2}|[，。；;]|$))/)?.[1]?.trim()||'';
+  // A source's branded site name is helpful, but a generic "职位详情"
+  // site label must not make a real JD with explicit "招聘单位" disappear.
+  const siteCompany=site.replace(/,?\s+(?:incorporated|inc\.?|corporation|corp\.?|limited|ltd\.?)$/i,'')
+   .replace(/(?:官方招聘|招聘官网|招聘平台|招聘网站|人才招聘|招聘|官网|careers?|jobs?)$/gi,'')
    .replace(/(?:有限责任公司|股份有限公司|有限公司|公司)$/,'').trim();
+  const company=siteCompany.length>=2&&!/^(?:职位详情|岗位详情|岗位信息|职位信息|招聘信息|企业|中国|人才|官网)$/i.test(siteCompany)?
+   siteCompany:employerLabel.replace(/(?:有限责任公司|股份有限公司|有限公司|公司)$/,'').trim();
   if(company.length<2||/(?:招聘网|求职网|人才市场|招聘平台|岗位合集)/.test(company))continue;
   const heading=clean(hit.title,150);
   const workCity=indexedJobWorkCity(hit);
@@ -370,13 +384,14 @@ export function sourceOnlyJobPreviews(hits,limit=10){
   // Do not mistake a generic page title for proof that no role exists.
   const generic=/^(?:职位详情|岗位详情|招聘详情|职位信息|岗位信息|job details?|position details?)$/i.test(heading);
   const summary=clean(hit.summary||hit.snippet,280).replace(/^#+\s*/,'');
+  const roleEvidence=clean([summary,hit.content].filter(Boolean).join(' '),2700);
   let after=heading.includes(company)?
    heading.slice(heading.indexOf(company)+company.length):'';
   if(!after&&generic){
    const explicit=summary.match(/^(.{2,50}?)(?:社招|校招|社会招聘|校园招聘)(?:[\s\-—·]|$)/);
    if(explicit)after=explicit[1];
    if(!after){
-    const labeled=summary.match(/(?:职位名称|岗位名称|招聘岗位|招聘职位)[：:\s]{0,3}([\u4e00-\u9fffA-Za-z0-9·+\-/ ]{2,42}?)(?=\s*(?:工作地点|工作城市|岗位职责|任职要求|招聘人数|学历|经验|，|。|；|$))/);
+    const labeled=roleEvidence.match(/(?:职位名称|岗位名称|招聘岗位|招聘职位)[：:\s]{0,3}([\u4e00-\u9fffA-Za-z0-9·+\-/ ]{2,42}?)(?=\s*(?:工作地点|工作地址|工作城市|岗位职责|任职要求|招聘人数|学历|经验|，|。|；|$))/);
     if(labeled)after=labeled[1].trim();
    }
   }
