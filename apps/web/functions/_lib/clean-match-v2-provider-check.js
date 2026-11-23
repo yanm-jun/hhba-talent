@@ -31,6 +31,8 @@ export async function checkCleanMatchProvider(key,{
   throw fail(signal?.aborted?'AI_MATCH_CANCELLED':'AI_FETCH_TIMEOUT');
  }
  if(!response.ok){
+  // Fetch 403 may be a target-site security block, not a rejected API key.
+  if(response.status===403)throw fail('AI_FETCH_ACCESS_DENIED');
   const code=providerStatusError(response.status);
   throw fail(code==='AI_SEARCH_API_REJECTED'?'AI_FETCH_API_REJECTED':code);
  }
