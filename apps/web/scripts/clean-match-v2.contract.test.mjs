@@ -267,7 +267,7 @@ test('source order visits different employer domains before dozens of postings f
 
 test('location-less first 24 employer pages do not hide a valid later official vacancy',async()=>{
  const urls=Array.from({length:25},(_,i)=>JD_URL.replace(
-  /postId=\\d+/,'postId='+(2097166275703910400n+BigInt(i)).toString()));
+  /postId=\d+/,'postId='+(2097166275703910400n+BigInt(i)).toString()));
  const base=makeFetcher().fetcher;
  const fetcher=async(url,opts)=>{
   const path=new URL(url).pathname;
@@ -284,7 +284,7 @@ test('location-less first 24 employer pages do not hide a valid later official v
  };
  const stages=[];
  const result=await runCleanJobMatch('test-key',
-  '意向工作城市：上海\\n渠道督导、销售复盘',profile,'区域督导',10,
+  '意向工作城市：上海\n渠道督导、销售复盘',profile,'区域督导',10,
   {onProgress:stage=>stages.push(stage)},{fetcher});
  assert.equal(result.diagnostic.candidate_links,25);
  assert.equal(result.diagnostic.fetch_attempted,25);
