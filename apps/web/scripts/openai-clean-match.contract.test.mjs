@@ -12,7 +12,7 @@ const fakeJob='<h1>腾讯社会招聘</h1><p>招聘单位：腾讯</p>'+
  '<p>岗位职责：负责渠道运营和销售数据复盘工作</p>'+
  '<p>任职要求：具有销售数据分析经验和跨团队协作能力</p>'+
  '<p>岗位说明：本职位围绕销售渠道数据、业务过程和团队协作开展运营分析，负责日常数据复核、跨部门沟通、执行跟踪及业务流程持续优化，要求能基于真实数据提供可检查的改进建议。</p>';
-const provider={name:'openai',model:'gpt-6-sol',key:'TEST_OPENAI_KEY_NOT_REAL_987654321'};
+const provider={name:'openai',model:'gpt-6.2-sol',key:'TEST_OPENAI_KEY_NOT_REAL_987654321'};
 const modelResult=json=>Response.json({status:'completed',output:[
  {type:'message',content:[{type:'output_text',text:JSON.stringify(json)}]}]});
 const searchResult=(sources,extras={})=>Response.json({status:'completed',output:[
@@ -45,7 +45,7 @@ test('provider defaults to OpenAI when the Cloudflare key is configured, DeepSee
  const selected=selectCleanMatchProvider({HHBA_MATCH_OPENAI_API_KEY:provider.key,
   HHBA_MATCH_DEEPSEEK_KEY:'TEST_DEEPSEEK_KEY_NOT_REAL_98765'});
  assert.equal(selected.name,'openai');
- assert.equal(selected.model,'gpt-6-sol');
+ assert.equal(selected.model,'gpt-6.2-sol');
  assert.equal(selectCleanMatchProvider({HHBA_MATCH_DEEPSEEK_KEY:'TEST_DEEPSEEK_KEY_NOT_REAL_98765'}).name,'deepseek');
  assert.equal(selectCleanMatchProvider({HHBA_MATCH_AI_PROVIDER:'openai',HHBA_MATCH_DEEPSEEK_KEY:'TEST_DEEPSEEK_KEY_NOT_REAL_98765'}),null);
  assert.equal(selectCleanMatchProvider({HHBA_MATCH_OPENAI_API_KEY:'x'}),null);
