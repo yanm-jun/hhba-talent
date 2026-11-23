@@ -81,6 +81,8 @@ const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays 
 const LIMIT=3*1024*1024;
 const errorMap:Record<string,string>={
   MATCH_NOT_ENABLED:'智能匹配服务尚未开放，请稍后再试。',
+  MATCH_SYNTHETIC_LIMIT:'预览验收的真实 DeepSeek 调用次数已达今日安全上限，请勿重复执行。',
+  MATCH_SYNTHETIC_QUOTA_UNAVAILABLE:'预览验收额度保护尚未就绪，已停止调用，避免产生未经保护的费用。',
   AI_NATIVE_DEEPSEARCH_DISABLED:'原生深度搜索试用暂时关闭，请选择常规搜索。',
   AI_NATIVE_DEEPSEARCH_TIMEOUT:'DeepSeek 原生深度搜索用时过长，本轮未完成，请尝试常规搜索。',
   AI_NATIVE_DEEPSEARCH_INCOMPLETE:'DeepSeek 原生深度搜索未完整结束，未使用不完整结果。',
