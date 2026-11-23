@@ -125,7 +125,8 @@ const errorMap:Record<string,string>={
   AI_MATCH_REASON_TIMEOUT:'候选岗位已检索，但推荐理由生成超时；请稍后再试。',
   AI_MATCH_NO_VALID_JOBS:'本轮 AI 候选名单没有通过岗位信息核验，这不代表你的简历不符合国内招聘要求。请尝试重新搜索或填写具体岗位方向。',
   AI_EMPLOYER_JOBS_NOT_FOUND:'本轮已尝试补充搜索，但仍未找到信息足够明确的企业招聘岗位链接；并非你的简历不适合。请稍后重试或填写更具体的岗位方向。',
-  AI_PROVIDER_RESPONSE_INVALID:'OpenAI 输出中断或格式异常，暂不展示不完整推荐。',
+  AI_PROVIDER_RESPONSE_INVALID:'AI 服务输出中断或格式异常，暂不展示不完整推荐。',
+ AI_PROVIDER_ENDPOINT_NOT_APPROVED:'AI 接口地址未通过安全校验，请联系管理员检查中转站地址。',
   AI_PROFILE_INCOMPLETE:'AI 没有识别到可用于匹配的经历或技能。请核对简历文字，补充真实内容后重试。',
   MATCH_PERSONAL_LIMIT:'今天的个人免费体验次数已达上限。',
   MATCH_GLOBAL_LIMIT:'平台今天的 AI 体验额度已用完。',
@@ -234,7 +235,7 @@ export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Pr
 
 const ocrErrors:Record<string,string>={
  SESSION_INVALID:'请先登录求职账号，再识别简历文档。',
- OCR_CONSENT_REQUIRED:'请先授权向 OpenAI 官方 API 发送这份原文件进行文档识别。',
+ OCR_CONSENT_REQUIRED:'请先授权把这份原文件发送给当前配置的 AI 服务商识别（可能经第三方中转站）。',
  OCR_INVALID_FILE:'这份文件无法读取。请在 Word 中另存为 DOCX，或重新导出 PDF。',
  OCR_UNSUPPORTED_FORMAT:'请选择 Word（DOCX）或 PDF 简历。',
  OCR_FILE_TOO_LARGE:'请选择 3 MB 以内的简历文件。',
@@ -460,7 +461,7 @@ export async function checkMatchProviderConnection(signal?:AbortSignal):Promise<
  if(!response.ok)throw new MatchError(response.status,
   errorMap[data.error||'']||'AI 服务检测暂时不可用。');
  if(data.ok!==true||data.status!=='READY')throw new MatchError(502,'AI 服务检测返回异常结果。');
- return 'OpenAI 官方 Responses JSON 与联网搜索来源检查通过；未发送个人简历，仍需另行验证真实企业职位读取。';
+ return '当前 AI 服务的 Responses JSON 与联网搜索来源检查通过；未发送个人简历，仍需另行验证真实企业职位读取。';
 }
 
 /** Safe outbound detail URL for a fetched and independently reviewed mainland
