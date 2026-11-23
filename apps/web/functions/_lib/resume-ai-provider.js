@@ -112,7 +112,7 @@ export async function generateSuggestions({env,blocks,job,signal,documentContext
   try{suggestions=parseSuggestions(parsed,blocks.map(b=>b.id));}
   catch{throw new Error('AI_PROVIDER_SUGGESTION_SCHEMA_INVALID')}
   const byId=new Map(blocks.map(block=>[block.id,block.text]));
-  const comparable=text=>text.replace(/\\s+/g,' ').trim();
+  const comparable=text=>text.replace(/\s+/g,' ').trim();
   const jd=job.verified?comparable(job.requirements):'';
   if(jd)suggestions=suggestions.filter(item=>{
    const requirement=comparable(item.jobRequirement);
