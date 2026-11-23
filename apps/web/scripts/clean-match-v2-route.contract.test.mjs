@@ -46,6 +46,13 @@ function request(tail,options={}){
    Origin:'https://hhba.work',...options.headers}
  });
 }
+function previewRequest(tail,options={}){
+ const origin='https://5f88e175.hhba-talent.pages.dev';
+ return new Request(origin+'/api/match-next'+tail,{
+  ...options,headers:{Authorization:'Bearer test-candidate-token',
+   Origin:origin,...options.headers}
+ });
+}
 function installProviderMock(){
  const original=globalThis.fetch,calls=[];
  globalThis.fetch=async (url,options={})=>{
@@ -89,9 +96,8 @@ function installProviderMock(){
 }
 
 test('preview-only opt-in permits authenticated live preflight while matching stays disabled',async()=>{
- const {env}=fixtureEnv({CF_PAGES_BRANCH:'fix/preflight-test',
-  HHBA_MATCH_V2_PREFLIGHT_ENABLED:'1'});
- const status=await (await onRequest({request:request('/status'),env})).json();
+ const {env}=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
+ const status=await (await onRequest({request:previewRequest('/status'),env})).json();
  assert.equal(status.enabled,false);
  assert.equal(status.preflight_available,true);
  let probeCalls=0;
@@ -108,10 +114,10 @@ test('preview-only opt-in permits authenticated live preflight while matching st
  };
  try{
   const unauthorized=await onRequest({request:new Request(
-   'https://hhba.work/api/match-next/provider-check'),env});
+   'https://5f88e175.hhba-talent.pages.dev/api/match-next/provider-check'),env});
   assert.equal(unauthorized.status,401);
   assert.equal(probeCalls,0,'unauthenticated traffic must not incur provider spend');
-  const preflight=await onRequest({request:request('/provider-check'),env});
+  const preflight=await onRequest({request:previewRequest('/provider-check'),env});
   assert.equal(preflight.status,200);
   const data=await preflight.json();
   assert.equal(data.status,'READY');
@@ -119,7 +125,7 @@ test('preview-only opt-in permits authenticated live preflight while matching st
   assert.deepEqual(data.capabilities.sort(),[
    'balance','deepseek_fetch','deepseek_search','v4_pro_responses_json'].sort());
   assert.equal(probeCalls,4);
-  const denied=await onRequest({request:request('/resume',{
+  const denied=await onRequest({request:previewRequest('/resume',{
    method:'POST',body:'{}'}),env});
   assert.equal(denied.status,503,'preflight can never unlock the public match API');
   assert.equal((await denied.json()).error,'MATCH_NOT_ENABLED');
@@ -129,7 +135,7 @@ test('preview-only opt-in permits authenticated live preflight while matching st
 test('production cannot opt into pre-launch probe without the real release gate',async()=>{
  for(const branch of ['main',undefined]){
   const {env}=fixtureEnv({CF_PAGES_BRANCH:branch,
-   HHBA_MATCH_V2_PREFLIGHT_ENABLED:'1'});
+   HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
   const status=await (await onRequest({request:request('/status'),env})).json();
   assert.equal(status.enabled,false);
   assert.equal(status.preflight_available,false);

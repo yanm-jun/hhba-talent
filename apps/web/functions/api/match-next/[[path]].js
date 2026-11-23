@@ -29,11 +29,18 @@ const providerConfigured=env=>
  env.HHBA_MATCH_DEEPSEEK_KEY.length>=16&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 const enabled=env=>providerConfigured(env)&&env?.HHBA_MATCH_CLEAN_V2_ENABLED==='1';
-const previewPreflight=env=>providerConfigured(env)&&
- typeof env?.CF_PAGES_BRANCH==='string'&&
- env.CF_PAGES_BRANCH!==''&&env.CF_PAGES_BRANCH!=='main'&&
- env?.HHBA_MATCH_V2_PREFLIGHT_ENABLED==='1';
-const mayCheckProvider=env=>enabled(env)||previewPreflight(env);
+// CF_PAGES_BRANCH is guaranteed as a Pages BUILD variable, not a runtime
+// binding. Bind prelaunch permission to preview-only env config AND the exact
+// Cloudflare preview hostname. Never grant preflight on the hhba.work domain.
+const previewPreflight=(env,request)=>{
+ if(!providerConfigured(env)||env?.HHBA_PREVIEW_AI_DIAG_ENABLED!=='1'||
+  env?.CF_PAGES_BRANCH==='main')return false;
+ try{
+  const host=new URL(request.url).hostname.toLowerCase();
+  return host.endsWith('.hhba-talent.pages.dev')&&host!=='hhba-talent.pages.dev';
+ }catch{return false}
+};
+const mayCheckProvider=(env,request)=>enabled(env)||previewPreflight(env,request);
 async function candidateSession(env,request){
  const session=await sessionOfBearer(env.HHBA_PNVS_AUTH_DB,request,Date.now());
  if(!session)return null;
@@ -148,10 +155,10 @@ export async function onRequest({request,env}){
  const tail=url.pathname.slice('/api/match-next'.length).replace(/\/$/,'')||'/';
  if(tail==='/status'&&request.method==='GET')
   return json({kind:KIND,engine:MATCH_V2,enabled:enabled(env),
-   preflight_available:mayCheckProvider(env),scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],mode:'EVIDENCE_FIRST_V2'});
+   preflight_available:mayCheckProvider(env,request),scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],mode:'EVIDENCE_FIRST_V2'});
  if(!['/resume','/ocr','/provider-check'].includes(tail))return fail('NOT_FOUND',404);
  if(tail==='/provider-check'){
-  if(!mayCheckProvider(env))return fail('MATCH_PREFLIGHT_NOT_ENABLED',503);
+  if(!mayCheckProvider(env,request))return fail('MATCH_PREFLIGHT_NOT_ENABLED',503);
  }else if(!enabled(env))return fail('MATCH_NOT_ENABLED',503);
  if(tail==='/provider-check'&&request.method!=='GET')return fail('NOT_FOUND',404);
  if(tail!=='/provider-check'&&request.method!=='POST')return fail('NOT_FOUND',404);
