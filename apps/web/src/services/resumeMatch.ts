@@ -59,6 +59,8 @@ export type MatchResponse = {
     source_previews?:number;source_preview_before_fetch?:number;
     fetch_attempted?:number;fetched_job_pages?:number;fetch_failures?:number;
     explicit_work_city_sources?:number;model_recovered?:number;
+    native_source_salvage_attempted?:number;native_source_salvage_fetched?:number;
+    native_source_salvage_jobs?:number;
     search_failures?:number;index_companies_considered?:number;error?:string|null}};
   history_id?:string|null;
   history_status?:'SAVED'|'EMPTY'|'UNAVAILABLE';
