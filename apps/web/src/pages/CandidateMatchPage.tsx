@@ -7,7 +7,7 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
+import {matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -39,6 +39,12 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [preflightAvailable,setPreflightAvailable]=useState(false);
  const [preflightBusy,setPreflightBusy]=useState(false);
  const [preflightNotice,setPreflightNotice]=useState('');
+ const [syntheticBusy,setSyntheticBusy]=useState(false);
+ const [syntheticStarted,setSyntheticStarted]=useState(false);
+ const [syntheticStage,setSyntheticStage]=useState<NativeMatchProgress>('preparing');
+ const [syntheticActivity,setSyntheticActivity]=useState<NativeMatchActivity|null>(null);
+ const [syntheticResult,setSyntheticResult]=useState<MatchResponse|null>(null);
+ const [syntheticError,setSyntheticError]=useState('');
  const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10});
  const [working,setWorking]=useState(false);
  const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
@@ -263,6 +269,18 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    setPreflightNotice(e instanceof Error?e.message:'接口预检失败，请检查配置。');
   }finally{setPreflightBusy(false)}
  }
+ async function runSyntheticAcceptance(){
+  if(!preflightAvailable||syntheticStarted||syntheticBusy||!user||!getRealAuthToken())return;
+  setSyntheticBusy(true);setSyntheticStarted(true);setSyntheticError('');
+  setSyntheticResult(null);setSyntheticStage('preparing');setSyntheticActivity(null);
+  try{
+   const result=await runMatchPreviewSyntheticAcceptance(undefined,
+    setSyntheticStage,setSyntheticActivity);
+   setSyntheticResult(result);
+  }catch(e){
+   setSyntheticError(e instanceof Error?e.message:'合成简历验收失败。');
+  }finally{setSyntheticBusy(false)}
+ }
  return <Shell user={user} embedded={embedded}>
   <section className={embedded?'hhba-ai-page hhba-ai-page-embedded':'hhba-ai-page'}>
     {!embedded&&<nav className="hhba-ai-breadcrumb"><Link to="/candidate/account"><ArrowLeft size={15}/> 工作台</Link>
@@ -284,6 +302,30 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           {preflightBusy?'正在检查 DeepSeek…':'检查 DeepSeek 接口'}
          </button>:<p>请先登录预览测试账号，再执行接口预检。</p>}
         {preflightNotice&&<p role="status">{preflightNotice}</p>}
+        {user&&getRealAuthToken()&&<div className="hhba-ai-preview-acceptance">
+         <p><strong>下一关：完整岗位搜索验收（虚构简历）</strong></p>
+         <p>使用固定的虚构汽车运营简历，实际调用 DeepSeek 查找最多 10 条中国大陆企业岗位，读取 JD 并评分。不会读取你的简历，也不会将结果存入你的匹配历史。运行会产生真实 API 调用费用。</p>
+         <button type="button" disabled={syntheticStarted||syntheticBusy}
+          onClick={()=>void runSyntheticAcceptance()}>
+          {syntheticBusy?'正在执行真实岗位搜索…':syntheticStarted?'本页已经执行过一次验收':'用虚构简历验证真实岗位搜索'}
+         </button>
+         {syntheticBusy&&<p role="status">当前阶段：{syntheticStage} · {syntheticActivity?.message||'正在准备真实企业岗位检索…'}</p>}
+         {syntheticError&&<p role="alert">验收未通过：{syntheticError}</p>}
+         {syntheticResult?.preview_synthetic&&<div role="status">
+          <p><strong>合成简历验收结果（不是你的岗位推荐）</strong></p>
+          <p>找到 {syntheticResult.matches.length}/10 条候选职位 · 搜索 {syntheticResult.native_search?.searches??0} 次 · 读取 {syntheticResult.native_search?.page_reads??0} 个页面 · 独立核验完整 JD {syntheticResult.native_search?.jd_verification?.verified??0} 条。</p>
+          <p>{syntheticResult.matches.length>=10?'已达到数量目标，但仍需核对岗位真实性与体验。':'未达到 10 条目标，不能据此开启正式匹配服务。'}</p>
+          {syntheticResult.matches.length>0&&<ul>
+           {syntheticResult.matches.map(job=><li key={job.official_url}>
+            {job.company} · {job.title_zh||job.title} · {job.location}
+            {' · '}{typeof job.match_score==='number'?job.match_score+' 分':'未取得可靠匹配分'}
+            {' · '}{job.jd_source_status==='VERIFIED_JD'?'完整 JD 已核验':'完整 JD 未核验'}
+            {' · '}<a href={job.official_url} target="_blank" rel="noopener noreferrer">核对企业职位来源</a>
+           </li>)}
+          </ul>}
+          <p>错误与排查：搜索失败 {syntheticResult.native_search?.search_failures??0} 次，Fetch 失败 {syntheticResult.native_search?.fetch_failures??0} 次；岗位是否仍开放，须以企业官网实时信息为准。</p>
+         </div>}
+        </div>}
        </div>}
        </div></div>}
     <div className="hhba-ai-layout">
