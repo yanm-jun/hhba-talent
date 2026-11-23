@@ -119,6 +119,15 @@ export async function runNativeDeepSearchJobs(key,resume,roleHint,limit=10,optio
   onActivity=options.onActivity||(()=>{}),onSources=options.onSources||(()=>{});
  const start=Date.now(),sources=new Map();
  let searches=0,reads=0,sourceBatches=0,completed=null,terminal='';
+ const interrupt=(code,phase='native_stream')=>{
+  const e=failure(code);
+  e.public_sources=[...sources.values()].slice(0,36);
+  e.diagnostic={mode:NATIVE_DEEPSEARCH_VERSION,phase,
+   searches,page_reads:reads,candidate_links:sources.size,
+   source_provenance:'COMPLETED_PROVIDER_WEB_TOOLS_ONLY',
+   elapsed_ms:Date.now()-start};
+  return e;
+ };
  const timeout=AbortSignal.timeout(155000);
  const signal=options.signal?AbortSignal.any([options.signal,timeout]):timeout;
  const payload={model:'deepseek-flash',reasoning:{effort:'high'},
@@ -182,11 +191,11 @@ export async function runNativeDeepSearchJobs(key,resume,roleHint,limit=10,optio
   while(true){
    let part;
    try{part=await reader.read()}
-   catch{throw failure(options.signal?.aborted?'AI_MATCH_CANCELLED':
+   catch{throw interrupt(options.signal?.aborted?'AI_MATCH_CANCELLED':
     signal.aborted?'AI_NATIVE_DEEPSEARCH_TIMEOUT':'AI_PROVIDER_STREAM_BROKEN')}
    if(part.done)break;
    buffer+=decoder.decode(part.value,{stream:true}).replace(/\r/g,'');
-   if(buffer.length>95000)throw failure('AI_PROVIDER_RESPONSE_INVALID');
+   if(buffer.length>95000)throw interrupt('AI_PROVIDER_RESPONSE_INVALID');
    const blocks=buffer.split('\n\n');buffer=blocks.pop()||'';
    for(const block of blocks)consume(block);
   }
