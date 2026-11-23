@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preferredCities,fallbackPlan,isExactEmployerJobUrl,groundedVacancy,
- runCleanJobMatch,planRecoverySearch,diversifyEmployerSources,groundedMatchExplanations,scoreJobs,rankCleanMatchResults,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
+ runCleanJobMatch,findEmployerSources,readEmployerPages,planRecoverySearch,diversifyEmployerSources,groundedMatchExplanations,scoreJobs,rankCleanMatchResults,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
 import {onRequest} from '../functions/api/match-next/[[path]].js';
 import {onRequest as legacyMatchRoute} from '../functions/api/match-native/[[path]].js';
 
@@ -224,7 +224,7 @@ test('old resume matching backend is retired in production but has no data-destr
  assert.equal((await match.json()).error,'MATCH_BACKEND_RETIRED');
 });
 
-test('single failed search does not masquerade as zero market demand when another source is valid',async()=>{
+test('one transient failed Search is retried and recovered before marking the provider unhealthy',async()=>{
  let n=0;
  const {fetcher}=makeFetcher();
  const partial=async(url,opts)=>{
@@ -234,11 +234,50 @@ test('single failed search does not masquerade as zero market demand when anothe
  };
  const result=await runCleanJobMatch('test','期望工作城市：上海',profile,'区域督导',10,{}, {fetcher:partial});
  assert.equal(result.matches.length,1);
- assert.equal(result.diagnostic.search_failures,1);
- assert.equal(result.diagnostic.searches,15);
+ assert.equal(result.diagnostic.search_failures,0);
+ assert.equal(result.diagnostic.searches,16);
  assert.equal(result.diagnostic.recovery_queries,6);
- assert.deepEqual(result.diagnostic.provider_error_codes,['AI_PROVIDER_UPSTREAM_ERROR']);
+ assert.deepEqual(result.diagnostic.provider_error_codes,[]);
  assert.equal(result.diagnostic.stage,'complete');
+});
+
+test('429 Search response gets one bounded retry, no false provider failure',async()=>{
+ const {fetcher:base}=makeFetcher();let calls=0;
+ const transient=async(url,opts)=>{
+  if(new URL(url).pathname==='/v1/tools/search'&&++calls===1)
+   return new Response('temporary rate limit',{status:429});
+  return base(url,opts);
+ };
+ const found=await findEmployerSources(transient,'test',{
+  queries:['区域督导 上海 社会招聘 企业官网'],
+  roles:['区域督导'],cities:['上海']});
+ assert.equal(calls,2);
+ assert.equal(found.queries,1);
+ assert.equal(found.failures,0);
+ assert.deepEqual(found.error_codes,[]);
+ assert.equal(found.sources[0].url,JD_URL);
+});
+
+test('Fetch retries one transient 503, but never retries rejected credentials',async()=>{
+ const {fetcher:base}=makeFetcher();let calls=0;
+ const transient=async(url,opts)=>{
+  if(new URL(url).pathname==='/v1/tools/fetch'&&++calls===1)
+   return new Response('temporary error',{status:503});
+  return base(url,opts);
+ };
+ const source={url:JD_URL,title:'腾讯 销售运营主管 上海职位',site:'腾讯招聘'};
+ const read=await readEmployerPages(transient,'test',[source]);
+ assert.equal(calls,2);
+ assert.equal(read.attempts,1,'retry is a second HTTP attempt, not a second source');
+ assert.equal(read.pages.length,1);
+ assert.equal(read.failures,0);
+ let deniedCalls=0;
+ const denied=await readEmployerPages(async()=>{
+  deniedCalls++;return new Response('bad key',{status:401});
+ },'test',[source]);
+ assert.equal(deniedCalls,1,'authentication failures must not be retried');
+ assert.equal(denied.pages.length,0);
+ assert.deepEqual(denied.error_codes,['AI_PROVIDER_KEY_REJECTED']);
 });
 
 test('new backend owns status and has no imports of hybrid, Greenhouse, Lever, checkpoints or stale Agent',async()=>{
