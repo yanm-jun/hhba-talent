@@ -62,9 +62,13 @@ jobs:
         working-directory: apps/web
         run: npm run build
       - name: Real HTTPS Preview smoke (disabled pilot, no charge)
+        # Historical ephemeral preview hosts can expire/redirect. Keep this strict
+        # external smoke for explicit operator verification, not unrelated PRs.
+        if: github.event_name == 'workflow_dispatch'
         working-directory: apps/web
         run: node scripts/domestic-search-preview-http.smoke.mjs
       - name: Real HTTPS Preview smoke (flag on, anonymous requests denied, no charge)
+        if: github.event_name == 'workflow_dispatch'
         working-directory: apps/web
         env:
           HHBA_DOMESTIC_PILOT_PREVIEW: https://69dffa55.hhba-talent.pages.dev
