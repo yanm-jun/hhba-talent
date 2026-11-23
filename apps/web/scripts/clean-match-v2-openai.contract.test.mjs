@@ -111,3 +111,42 @@ test('upstream model key rejection is an explicit error, never a fabricated reco
  await assert.rejects(openAIResponse(async()=>new Response('denied',{status:401}),SECRET,{input:'hi'}),
   e=>e.code==='AI_PROVIDER_KEY_REJECTED');
 });
+
+test('approved HTTPS relay is configured server-side, retains model, and only trusts tool citations',async()=>{
+ const calls=[];
+ const provider={key:'synthetic-relay-key',model:'gpt-6.2-sol',baseUrl:'https://api-c.reqtoken.com/v1'};
+ const mock=async(url,opts)=>{
+  calls.push({url,opts});
+  const body=JSON.parse(opts.body);
+  assert.equal(body.model,'gpt-6.2-sol');
+  assert.equal(body.store,false);
+  assert.equal(opts.redirect,'manual');
+  assert.equal(opts.headers.Authorization,'Bearer synthetic-relay-key');
+  if(body.tools?.some(t=>t.type==='web_search'))return search([JD_URL]);
+  return json({ok:true});
+ };
+ const parsed=await openAIJson(mock,provider,'仅输出 JSON',{task:'test'});
+ assert.equal(parsed.ok,true);
+ const sources=await openAIEmployerSearch(mock,provider,'渠道运营 上海',null);
+ assert.equal(sources.results[0]?.url,JD_URL);
+ assert.equal(calls.length,2);
+ assert.ok(calls.every(x=>x.url==='https://api-c.reqtoken.com/v1/responses'));
+ assert.ok(!JSON.stringify(calls[1].opts.body).includes(CV));
+});
+test('provider refuses unapproved origins, scheme changes, query-string credential leaks, and redirects',async()=>{
+ const bad=[
+  'http://api-c.reqtoken.com/v1','https://api-c.reqtoken.com/v1?pass=1',
+  'https://api-c.reqtoken.com/v1/','https://api-c.reqtoken.com.evil.example/v1',
+  'https://api.openai.com@evil.example/v1','https://127.0.0.1/v1',
+  'https://api.deepseek.com/v1'
+ ];
+ for(const baseUrl of bad){
+  let called=false;
+  await assert.rejects(openAIResponse(async()=>{called=true;return json({ok:true})},
+   {key:SECRET,model:'gpt-6.2-sol',baseUrl},{input:'public'}),e=>e.code==='AI_PROVIDER_ENDPOINT_NOT_APPROVED');
+  assert.equal(called,false,'invalid base URL must never receive API credentials');
+ }
+ await assert.rejects(openAIResponse(async()=>new Response(null,{status:302,headers:{Location:'https://evil.example'}}),
+  {key:SECRET,model:'gpt-6.2-sol',baseUrl:'https://api-c.reqtoken.com/v1'},{input:'public'}),
+  e=>e.code==='AI_PROVIDER_UNEXPECTED_REDIRECT');
+});
