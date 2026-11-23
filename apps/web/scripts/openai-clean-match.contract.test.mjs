@@ -45,7 +45,7 @@ test('provider defaults to OpenAI when the Cloudflare key is configured, DeepSee
  const selected=selectCleanMatchProvider({HHBA_MATCH_OPENAI_API_KEY:provider.key,
   HHBA_MATCH_DEEPSEEK_KEY:'TEST_DEEPSEEK_KEY_NOT_REAL_98765'});
  assert.equal(selected.name,'openai');
- assert.equal(selected.model,'gpt-6-sol');
+ assert.equal(selected.model,'gpt-6.2-sol');
  assert.equal(selectCleanMatchProvider({HHBA_MATCH_DEEPSEEK_KEY:'TEST_DEEPSEEK_KEY_NOT_REAL_98765'}).name,'deepseek');
  assert.equal(selectCleanMatchProvider({HHBA_MATCH_AI_PROVIDER:'openai',HHBA_MATCH_DEEPSEEK_KEY:'TEST_DEEPSEEK_KEY_NOT_REAL_98765'}),null);
  assert.equal(selectCleanMatchProvider({HHBA_MATCH_OPENAI_API_KEY:'x'}),null);
