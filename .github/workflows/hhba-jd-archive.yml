@@ -29,6 +29,7 @@ on:
       - 'apps/web/functions/_lib/autonomous-mainland-search.js'
       - 'apps/web/functions/_lib/ai-owned-job-research.js'
       - 'apps/web/functions/_lib/native-deepsearch-job-research.js'
+      - 'apps/web/functions/_lib/hybrid-mainland-job-research.js'
       - 'apps/web/functions/_lib/domestic-employer-index.js'
       - 'apps/web/functions/_lib/agent-score-feedback.js'
       - 'apps/web/functions/_lib/ai-research-checkpoint.js'
@@ -39,6 +40,7 @@ on:
       - 'apps/web/scripts/agent-quality-metrics.contract.test.mjs'
       - 'apps/web/scripts/ai-owned-job-research.contract.test.mjs'
       - 'apps/web/scripts/native-deepsearch-job-research.contract.test.mjs'
+      - 'apps/web/scripts/hybrid-mainland-job-research.contract.test.mjs'
       - 'apps/web/scripts/domestic-employer-index.contract.test.mjs'
       - 'apps/web/scripts/match-live-recovery.contract.test.mjs'
       - 'apps/web/scripts/match-deep-research-experience.contract.test.mjs'
@@ -100,6 +102,7 @@ jobs:
           node --test scripts/autonomous-mainland-search.contract.test.mjs
           node --test scripts/ai-owned-job-research.contract.test.mjs
           node --test scripts/native-deepsearch-job-research.contract.test.mjs
+          node --test scripts/hybrid-mainland-job-research.contract.test.mjs
           node --test scripts/domestic-employer-index.contract.test.mjs
           node --test scripts/match-live-recovery.contract.test.mjs
           node --test scripts/match-deep-research-experience.contract.test.mjs
