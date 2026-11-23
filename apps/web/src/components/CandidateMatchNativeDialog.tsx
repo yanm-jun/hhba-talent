@@ -213,7 +213,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       找到 {result.native_search.hybrid_fallback.explicit_work_city_sources??0} 条明确工作城市证据；
       目前形成 {result.native_search.hybrid_fallback.source_previews??0} 条有职位与地点依据的待核实职位。
       {result.native_search.native_error?' 主搜索未完整成功，另一路搜索已独立核对来源。':''}
-      {result.native_search.hybrid_fallback.candidate_links>0&&result.native_search.hybrid_fallback.source_previews===0?
+      {(result.native_search.hybrid_fallback.candidate_links??0)>0&&(result.native_search.hybrid_fallback.source_previews??0)===0?
        '本轮仍未完成职位信息核实，不代表没有适合的岗位。':''}
      </p>}
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
