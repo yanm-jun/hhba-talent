@@ -150,12 +150,24 @@ async function boundedResponseText(response,max=900000){
  }}finally{reader.releaseLock()}
  return chars+decoder.decode();
 }
+function publicEmployerHost(host){
+ const h=String(host||'').toLowerCase().replace(/\.$/,'');
+ const labels=h.split('.');
+ const tld=labels.at(-1)||'';
+ if(labels.length<2||h.length>253||!/^([a-z0-9-]+\.)+[a-z]{2,24}$/.test(h)||
+  !/^[a-z]{2,24}$/.test(tld))return false;
+ if(/(?:^|\.)(?:localhost|local|internal|invalid|test|example)$/.test(h)||
+  /(?:^|\.)(?:nip\.io|sslip\.io|localtest\.me|localhost\.direct)$/.test(h))
+  return false;
+ return true;
+}
 export async function openAIFetchOfficial(fetcher,url,ms,signal){
  if(typeof url!=='string'||!isMainlandEmployerJobUrl(url)||
   !isDirectEmployerSourceHit({url,source:''}))throw failure('AI_FETCH_URL_REJECTED');
  let u;
  try{u=new URL(url)}catch{throw failure('AI_FETCH_URL_REJECTED')}
- if(u.protocol!=='https:'||u.port||u.username||u.password)
+ if(u.protocol!=='https:'||u.port||u.username||u.password||u.hash||
+  !publicEmployerHost(u.hostname))
   throw failure('AI_FETCH_URL_REJECTED');
  const timeout=AbortSignal.timeout(ms);
  let response;
