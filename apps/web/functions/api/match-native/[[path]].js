@@ -190,8 +190,8 @@ async function domesticResearchPass(env,key,result,resume,options,progress){
   ...diagnostic,quality:jobResearchQuality(final,diagnostic)
  }};
 }
-async function checkpointForCandidate(env,candidate,resume,roleHint,searchEngine){
- if(searchEngine==='deepseek_native'||env?.HHBA_AI_OWNED_RESEARCH_ENABLED==='0'||
+async function checkpointForCandidate(env,candidate,resume,roleHint){
+ if(env?.HHBA_AI_OWNED_RESEARCH_ENABLED==='0'||
   env?.HHBA_AGENT_CHECKPOINT_ENABLED==='0')return null;
  try{return await createAccountResearchCheckpoint(
   env.HHBA_PNVS_AUTH_DB,candidate.phone,resume,roleHint,
@@ -217,7 +217,8 @@ async function matchResumeWorkflow(env,candidate,resume,options,{
  const profileMs=Date.now()-workflowStart;
  onProgress('planning');
  onActivity({stage:'planning',message:'已核对 '+profile.facts.length+' 条简历证据，正在规划岗位搜索方向。'});
- const checkpoint=await checkpointForCandidate(env,candidate,resume,options.role_hint,options.search_engine);
+ const checkpoint=options.search_engine==='deepseek_native'?null:
+  await checkpointForCandidate(env,candidate,resume,options.role_hint);
  const excluded=new Set((options.exclude_urls||[]).map(matchPostingKey));
  const excludePosting=url=>excluded.has(matchPostingKey(url));
  const compareEvidence=(jd,reviewSignal=signal)=>{
