@@ -49,21 +49,35 @@ function jsonOf(v){
   if(a<0||b<=a)throw err('AI_PROVIDER_RESPONSE_INVALID');s=s.slice(a,b+1);}
  try{return JSON.parse(s)}catch{throw err('AI_PROVIDER_RESPONSE_INVALID')}
 }
+// Only public read-only Search and Fetch operations get one bounded retry.
+// Paid/uncertain model reasoning requests are never retried automatically.
 async function call(fetcher,key,path,payload,ms,signal){
- const timeout=AbortSignal.timeout(ms),merged=signal?AbortSignal.any([signal,timeout]):timeout;
- let res;
- try{res=await fetcher(BASE+path,{method:'POST',redirect:'manual',signal:merged,
-  headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
-  body:JSON.stringify(payload)})}
- catch{throw err(signal?.aborted?'AI_MATCH_CANCELLED':'AI_PROVIDER_TIMEOUT')}
- if(!res.ok){
-  if([401,403].includes(res.status))throw err('AI_PROVIDER_KEY_REJECTED');
-  if(res.status===402)throw err('AI_PROVIDER_BALANCE_INSUFFICIENT');
-  if(res.status===429)throw err('AI_PROVIDER_RATE_LIMITED');
-  if([400,404,422].includes(res.status))throw err('AI_PROVIDER_REQUEST_REJECTED');
-  throw err('AI_PROVIDER_UPSTREAM_ERROR');
+ const retryable=path==='/v1/tools/search'||path==='/v1/tools/fetch';
+ for(let attempt=0;attempt<(retryable?2:1);attempt++){
+  if(signal?.aborted)throw err('AI_MATCH_CANCELLED');
+  const timeout=AbortSignal.timeout(ms),merged=signal?AbortSignal.any([signal,timeout]):timeout;
+  let res;
+  try{res=await fetcher(BASE+path,{method:'POST',redirect:'manual',signal:merged,
+   headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
+   body:JSON.stringify(payload)})}
+  catch{throw err(signal?.aborted?'AI_MATCH_CANCELLED':'AI_PROVIDER_TIMEOUT')}
+  if(!res.ok){
+   if([401,403].includes(res.status))throw err('AI_PROVIDER_KEY_REJECTED');
+   if(res.status===402)throw err('AI_PROVIDER_BALANCE_INSUFFICIENT');
+   if([400,404,422].includes(res.status))throw err('AI_PROVIDER_REQUEST_REJECTED');
+   if(retryable&&attempt===0&&[429,500,502,503,504].includes(res.status)){
+    const after=Number(res.headers?.get('retry-after')||0);
+    const delay=res.status===429?
+     Math.min(1200,Math.max(300,Number.isFinite(after)&&after>0?after*1000:450)):180;
+    await new Promise(resolve=>setTimeout(resolve,delay));
+    continue;
+   }
+   if(res.status===429)throw err('AI_PROVIDER_RATE_LIMITED');
+   throw err('AI_PROVIDER_UPSTREAM_ERROR');
+  }
+  try{return await res.json()}catch{throw err('AI_PROVIDER_RESPONSE_INVALID')}
  }
- try{return await res.json()}catch{throw err('AI_PROVIDER_RESPONSE_INVALID')}
+ throw err('AI_PROVIDER_UPSTREAM_ERROR');
 }
 async function ask(fetcher,key,instructions,input,ms,signal){
  const res=await call(fetcher,key,'/responses',{model:'deepseek-v4-pro',
@@ -153,7 +167,7 @@ export function diversifyEmployerSources(rows){
 }
 export async function findEmployerSources(fetcher,key,plan,signal){
  const seen=new Set(),all=[],errors=[];
- await Promise.all(plan.queries.map(async query=>{
+ for(let i=0;i<plan.queries.length;i+=5)await Promise.all(plan.queries.slice(i,i+5).map(async query=>{
   try{
    const data=await call(fetcher,key,'/v1/tools/search',{query,count:25,
     need_content:false},12500,signal);
