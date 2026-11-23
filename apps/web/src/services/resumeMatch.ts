@@ -90,10 +90,10 @@ const LIMIT=3*1024*1024;
 const errorMap:Record<string,string>={
   MATCH_NOT_ENABLED:'智能匹配服务尚未开放，请稍后再试。',
   AI_NATIVE_DEEPSEARCH_DISABLED:'原生深度搜索试用暂时关闭，请选择常规搜索。',
-  AI_NATIVE_DEEPSEARCH_TIMEOUT:'DeepSeek 原生深度搜索用时过长，本轮未完成，请尝试常规搜索。',
-  AI_NATIVE_DEEPSEARCH_INCOMPLETE:'DeepSeek 原生深度搜索未完整结束，未使用不完整结果。',
-  AI_NATIVE_DEEPSEARCH_FAILED:'DeepSeek 原生深度搜索执行失败，可切换常规搜索重试。',
-  AI_NATIVE_DEEPSEARCH_INVALID_ANSWER:'DeepSeek 本轮未返回合格岗位结构，请改用常规搜索重试。',
+  AI_NATIVE_DEEPSEARCH_TIMEOUT:'OpenAI 原生深度搜索用时过长，本轮未完成，请尝试常规搜索。',
+  AI_NATIVE_DEEPSEARCH_INCOMPLETE:'OpenAI 原生深度搜索未完整结束，未使用不完整结果。',
+  AI_NATIVE_DEEPSEARCH_FAILED:'OpenAI 原生深度搜索执行失败，可切换常规搜索重试。',
+  AI_NATIVE_DEEPSEARCH_INVALID_ANSWER:'OpenAI 本轮未返回合格岗位结构，请改用常规搜索重试。',
   MATCH_DATABASE_NOT_READY:'智能匹配额度保护尚未配置，已停止分析以防产生费用。',
   SESSION_INVALID:'请登录 HHBA 求职账户后重试。',
   FORBIDDEN:'当前账户无权使用求职者匹配服务。',
@@ -108,31 +108,31 @@ const errorMap:Record<string,string>={
   AI_PROVIDER_BALANCE_INSUFFICIENT:'AI 平台账户余额不足，请联系 HHBA 管理员充值。',
   AI_PROVIDER_RATE_LIMITED:'AI 平台当前请求较多，请稍后再试。',
   AI_PROVIDER_REQUEST_REJECTED:'AI 服务请求配置有误，HHBA 正在检查接口兼容性。',
-  AI_PROVIDER_UPSTREAM_ERROR:'DeepSeek 服务器暂时异常，请稍后再试。',
-  AI_PROVIDER_NETWORK_ERROR:'HHBA 暂时无法连接 DeepSeek，请稍后再试。',
+  AI_PROVIDER_UPSTREAM_ERROR:'OpenAI 服务器暂时异常，请稍后再试。',
+  AI_PROVIDER_NETWORK_ERROR:'HHBA 暂时无法连接 OpenAI，请稍后再试。',
   AI_PROVIDER_REDIRECT_BLOCKED:'AI 接口发生异常重定向，为保护密钥，已安全终止请求。',
-  AI_PROVIDER_TIMEOUT:'DeepSeek 接口等待超时，尚未取得完整结果。',
-  AI_PROVIDER_SLOW:'DeepSeek 请求超时且没有发现可展示岗位。',
-  AI_SEARCH_TIMEOUT:'DeepSeek Search 搜索服务超时。',
-  AI_SEARCH_UNAVAILABLE:'DeepSeek Search 暂时不可用，未调用推荐模型。',
+  AI_PROVIDER_TIMEOUT:'OpenAI 接口等待超时，尚未取得完整结果。',
+  AI_PROVIDER_SLOW:'OpenAI 请求超时且没有发现可展示岗位。',
+  AI_SEARCH_TIMEOUT:'OpenAI Search 搜索服务超时。',
+  AI_SEARCH_UNAVAILABLE:'OpenAI Search 暂时不可用，未调用推荐模型。',
   AI_SEARCH_NO_DETAIL_JOBS:'搜索已完成，但未找到符合要求的具体岗位页面；没有编造职位。',
-  AI_SEARCH_API_REJECTED:'DeepSeek Search API 拒绝了请求，请检查账号权限或接口配置。',
-  AI_SEARCH_RESPONSE_INVALID:'DeepSeek Search 返回格式异常，请检查接口兼容性。',
-  AI_FETCH_TIMEOUT:'DeepSeek 网页读取服务响应超时，本次不视为岗位不存在。',
-  AI_FETCH_API_REJECTED:'DeepSeek Fetch 接口拒绝请求，需检查网页读取权限或接口配置。',
-  AI_FETCH_ACCESS_DENIED:'DeepSeek Fetch 的网页访问被安全策略限制，并非密钥一定失效。',
-  AI_FETCH_RESPONSE_INVALID:'DeepSeek Fetch 未返回有效网页正文，服务健康检查未通过。',
+  AI_SEARCH_API_REJECTED:'OpenAI Search API 拒绝了请求，请检查账号权限或接口配置。',
+  AI_SEARCH_RESPONSE_INVALID:'OpenAI Search 返回格式异常，请检查接口兼容性。',
+  AI_FETCH_TIMEOUT:'OpenAI 网页读取服务响应超时，本次不视为岗位不存在。',
+  AI_FETCH_API_REJECTED:'OpenAI Fetch 接口拒绝请求，需检查网页读取权限或接口配置。',
+  AI_FETCH_ACCESS_DENIED:'OpenAI Fetch 的网页访问被安全策略限制，并非密钥一定失效。',
+  AI_FETCH_RESPONSE_INVALID:'OpenAI Fetch 未返回有效网页正文，服务健康检查未通过。',
   AI_MATCH_REASON_TIMEOUT:'候选岗位已检索，但推荐理由生成超时；请稍后再试。',
   AI_MATCH_NO_VALID_JOBS:'本轮 AI 候选名单没有通过岗位信息核验，这不代表你的简历不符合国内招聘要求。请尝试重新搜索或填写具体岗位方向。',
   AI_EMPLOYER_JOBS_NOT_FOUND:'本轮已尝试补充搜索，但仍未找到信息足够明确的企业招聘岗位链接；并非你的简历不适合。请稍后重试或填写更具体的岗位方向。',
-  AI_PROVIDER_RESPONSE_INVALID:'DeepSeek 输出中断或格式异常，暂不展示不完整推荐。',
+  AI_PROVIDER_RESPONSE_INVALID:'OpenAI 输出中断或格式异常，暂不展示不完整推荐。',
   AI_PROFILE_INCOMPLETE:'AI 没有识别到可用于匹配的经历或技能。请核对简历文字，补充真实内容后重试。',
   MATCH_PERSONAL_LIMIT:'今天的个人免费体验次数已达上限。',
   MATCH_GLOBAL_LIMIT:'平台今天的 AI 体验额度已用完。',
   BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。',
-  AI_WEB_SEARCH_NOT_USED:'DeepSeek 本次没有执行联网搜索，未展示未经搜索证实的岗位，请重试。',
-  AI_RESPONSE_INVALID:'DeepSeek 返回结果格式异常，请重试。',
-  AI_PROVIDER_INCOMPLETE:'DeepSeek 搜索未能完成，没有返回不完整的岗位结果。'
+  AI_WEB_SEARCH_NOT_USED:'OpenAI 本次没有执行联网搜索，未展示未经搜索证实的岗位，请重试。',
+  AI_RESPONSE_INVALID:'OpenAI 返回结果格式异常，请重试。',
+  AI_PROVIDER_INCOMPLETE:'OpenAI 搜索未能完成，没有返回不完整的岗位结果。'
 };
 export class MatchError extends Error {
  constructor(public readonly status:number,message:string){super(message);this.name='MatchError'}
@@ -188,7 +188,7 @@ export async function runMatchPreviewProviderCheck(signal?:AbortSignal):Promise<
  if(!response.ok||data?.ok!==true||data?.status!=='READY'||
   !Array.isArray(data.capabilities)||data.fetch_content_verified!==true)
   throw new MatchError(response.status,errorMap[data?.error||'']||
-   'DeepSeek 接口预检未通过，请检查预览环境配置。');
+   'OpenAI 接口预检未通过，请检查预览环境配置。');
  return {status:'READY',capabilities:data.capabilities,fetch_content_verified:true};
 }
 /** Best-effort browser redaction before submitting text to HHBA's server. */
@@ -232,7 +232,7 @@ export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Pr
 
 const ocrErrors:Record<string,string>={
  SESSION_INVALID:'请先登录求职账号，再识别简历文档。',
- OCR_CONSENT_REQUIRED:'请先授权 DeepSeek 处理这份原文件。',
+ OCR_CONSENT_REQUIRED:'请先授权向 OpenAI 官方 API 发送这份原文件进行文档识别。',
  OCR_INVALID_FILE:'这份文件无法读取。请在 Word 中另存为 DOCX，或重新导出 PDF。',
  OCR_UNSUPPORTED_FORMAT:'请选择 Word（DOCX）或 PDF 简历。',
  OCR_FILE_TOO_LARGE:'请选择 3 MB 以内的简历文件。',
@@ -248,7 +248,7 @@ export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Pro
  const response=await fetch(API+'/ocr',{
   method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/octet-stream',Authorization:'Bearer '+token,
-   'X-HHBA-Resume-Format':format,'X-HHBA-OCR-Consent':'deepseek-resume-ocr-v1'},
+   'X-HHBA-Resume-Format':format,'X-HHBA-OCR-Consent':'openai-resume-ocr-v2'},
   body:file
  }).catch(error=>{
   if(error?.name==='AbortError')throw error;
@@ -339,7 +339,7 @@ async function consumeNativeMatchStream(
 }
 
 /**
- * Explicit-on-click real DeepSeek acceptance run with a fixed SERVER-SIDE
+ * Explicit-on-click real OpenAI acceptance run with a fixed SERVER-SIDE
  * fake résumé. This endpoint cannot read or match the user's uploaded résumé,
  * never writes to their recommendation history and only runs in Pages preview.
  */
@@ -458,7 +458,7 @@ export async function checkMatchProviderConnection(signal?:AbortSignal):Promise<
  if(!response.ok)throw new MatchError(response.status,
   errorMap[data.error||'']||'AI 服务检测暂时不可用。');
  if(data.ok!==true||data.status!=='READY')throw new MatchError(502,'AI 服务检测返回异常结果。');
- return 'DeepSeek 余额、Search 检索与 V4 Pro 模型 JSON 接口均通过检查。没有发送简历，也没有消耗匹配次数。';
+ return 'OpenAI 官方 Responses JSON 与联网搜索来源检查通过；未发送个人简历，仍需另行验证真实企业职位读取。';
 }
 
 /** Safe outbound detail URL for a fetched and independently reviewed mainland
