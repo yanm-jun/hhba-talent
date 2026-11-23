@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preferredCities,fallbackPlan,isExactEmployerJobUrl,groundedVacancy,
- runCleanJobMatch,diversifyEmployerSources,groundedMatchExplanations,scoreJobs,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
+ runCleanJobMatch,diversifyEmployerSources,groundedMatchExplanations,scoreJobs,rankCleanMatchResults,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
 import {onRequest} from '../functions/api/match-next/[[path]].js';
 import {onRequest as legacyMatchRoute} from '../functions/api/match-native/[[path]].js';
 
@@ -342,4 +342,20 @@ test('a plausible-looking numeric score with fabricated or unmapped citations st
  assert.equal(matches[0].not_evidenced.length,0);
  assert.equal(matches[0].score_evidence_status,undefined);
  assert.doesNotMatch(matches[0].recommendation_reason,/博士|入职概率极高|直接入职/);
+});
+
+test('final recommendations rank verified JD provenance and genuine scores, never a fake zero',()=>{
+ const rows=[
+  {id:'partial-empty',evidence_status:'PARTIAL_SOURCE',match_score:null},
+  {id:'verified-low',jd_source_status:'VERIFIED_JD',match_score:62},
+  {id:'partial-high',evidence_status:'PARTIAL_SOURCE',match_score:96},
+  {id:'verified-high',jd_source_status:'VERIFIED_JD',match_score:84},
+  {id:'verified-empty',jd_source_status:'VERIFIED_JD',match_score:null}
+ ];
+ const ranked=rankCleanMatchResults(rows);
+ assert.deepEqual(ranked.map(x=>x.id),[
+  'verified-high','verified-low','verified-empty','partial-high','partial-empty'
+ ]);
+ assert.equal(rows[0].id,'partial-empty','original results must not be mutated');
+ assert.equal(ranked[2].match_score,null,'unscored evidence is not a score of zero');
 });
