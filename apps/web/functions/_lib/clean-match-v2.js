@@ -264,7 +264,7 @@ function markdownField(content,labels,max=140){
   .replace(/^#{1,6}\s*/,'').replace(/^(?:>\s*|[-*•]\s+|\d{1,2}[.、]\s+)/,'')
   .replace(/\*\*/g,'').replace(/^【(.+)】$/,'$1')
   .replace(/^\|\s*|\s*\|$/g,'').trim());
- const re=new RegExp('^(?:'+labels+')(?:[：:|｜][ \t]*(.*))?$','i');
+ const re=new RegExp('^(?:'+labels+')(?:\\s*[：:|｜][ \\t]*(.*))?$','i');
  const heading=/^(?:岗位职责|任职要求|工作地点|工作城市|工作地址|工作内容|职位名称|岗位名称|公司名称|招聘单位|学历要求|Job Location|Work Location|Requirements)$/i;
  for(let i=0;i<rows.length;i++){
   const match=rows[i].match(re);
