@@ -61,6 +61,9 @@ export type MatchResponse = {
    provider_error_codes?:string[];fetch_error_codes?:string[];
    model_failures?:number;score_provider_error?:string|null;planning_error?:string|null;
    source_batches?:number;source_backfill_attempts?:number;source_exhausted?:boolean;
+   search_raw_results?:number;search_empty_queries?:number;
+   search_rejection_counts?:{no_url?:number;non_employer?:number;not_detail?:number;
+    duplicate?:number;empty_metadata?:number;foreign_title?:number};
    hybrid_fallback?:{queries?:number;raw_results?:number;candidate_links?:number;
     source_previews?:number;source_preview_before_fetch?:number;
     fetch_attempted?:number;fetched_job_pages?:number;fetch_failures?:number;

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preferredCities,fallbackPlan,isExactEmployerJobUrl,groundedVacancy,
- runCleanJobMatch,findEmployerSources,readEmployerPages,planRecoverySearch,diversifyEmployerSources,groundedMatchExplanations,scoreJobs,rankCleanMatchResults,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
+ runCleanJobMatch,findEmployerSources,readEmployerPages,planRecoverySearch,officialDetailRecoveryQueries,diversifyEmployerSources,groundedMatchExplanations,scoreJobs,rankCleanMatchResults,MATCH_V2} from '../functions/_lib/clean-match-v2.js';
 import {onRequest} from '../functions/api/match-next/[[path]].js';
 import {onRequest as legacyMatchRoute} from '../functions/api/match-native/[[path]].js';
 
@@ -78,6 +78,9 @@ test('only single-employer job pages are considered, not foreign ATS, board or c
  assert.equal(isExactEmployerJobUrl(BAD),false);
  assert.equal(isExactEmployerJobUrl(BOARD),false);
  assert.equal(isExactEmployerJobUrl('https://careers.tencent.com/search.html'),false);
+ assert.equal(isExactEmployerJobUrl('https://talent.baidu.com/jobs/social-list'),false,
+  'social job list is not a specific posting even though /jobs/ appears in its path');
+ assert.equal(isExactEmployerJobUrl('https://talent.baidu.com/jobs/detail/SOCIAL/b49d8fee-0151-492b-8fc6-68bbab36b4dd'),true);
  assert.equal(isExactEmployerJobUrl('https://www.tencent.com'),false);
 });
 
@@ -360,7 +363,7 @@ test('underfilled Search triggers one adaptive wave and backfills a second real 
  const fetcher=async(url,opts)=>{
   const path=new URL(url).pathname,req=JSON.parse(opts.body);
   if(path==='/v1/tools/search'&&
-   /招聘 职位详情 工作地点 岗位职责|企业招聘 任职要求 职位申请/.test(req.query)){
+   req.query.includes('site:career.huawei.com/cn/job-details')){
    seen.push(req.query);
    return Response.json({results:[{url:HUAWEI,
     title:'华为 渠道运营主管 上海 职位',site_name:'华为招聘',
@@ -395,7 +398,8 @@ test('adaptive query planning never repeats prior terms and survives unavailable
  assert.equal(result.planning_error,'AI_PROVIDER_UPSTREAM_ERROR');
  assert.ok(result.queries.length>=1&&result.queries.length<=6);
  assert.ok(result.queries.every(x=>!used.includes(x)));
- assert.ok(result.queries.every(x=>x.includes('渠道运营')));
+ assert.ok(result.queries.every(x=>x.includes('site:')));
+ assert.ok(result.queries.some(x=>x.includes('渠道运营')));
 });
 
 test('only verbatim JD quotes and actual résumé fact IDs become user-visible evidence',()=>{
@@ -451,4 +455,115 @@ test('final recommendations rank verified JD provenance and genuine scores, neve
  ]);
  assert.equal(rows[0].id,'partial-empty','original results must not be mutated');
  assert.equal(ranked[2].match_score,null,'unscored evidence is not a score of zero');
+});
+
+
+test('recovery targets diverse exact employer career-detail sites instead of repeating generic searches',()=>{
+ const terms=officialDetailRecoveryQueries({roles:['汽车区域督导 销售运营','渠道运营'],cities:['上海']});
+ assert.equal(terms.length,6);
+ assert.ok(terms.some(x=>x.includes('site:talent.baidu.com/jobs/detail/SOCIAL/')));
+ assert.ok(terms.some(x=>x.includes('site:careers.tencent.com/jobdesc.html')));
+ assert.ok(terms.some(x=>x.includes('site:career.huawei.com/cn/job-details')));
+ assert.ok(terms.some(x=>x.includes('site:jobs.bytedance.com/experienced/position/')));
+ assert.ok(terms.some(x=>x.includes('site:zhaopin.jd.com/web/job-info-detail')));
+ assert.ok(terms.every(x=>x.includes(' 招聘 site:')));
+ assert.ok(terms.every(x=>!x.includes('汽车区域督导 销售运营 招聘')),
+  'split a compound user hint so job search does not require both titles at once');
+});
+
+test('Search can have raw results without a single employer vacancy URL, and reports rejection counts honestly',async()=>{
+ const fetcher=async(url)=>{
+  assert.equal(new URL(url).pathname,'/v1/tools/search');
+  return Response.json({results:[
+   {url:'https://www.zhipin.com/job_detail/1234567',site_name:'BOSS直聘',title:'销售运营'},
+   {url:'https://talent.baidu.com/jobs/social-list',site_name:'百度招聘',title:'百度在招职位'},
+   {url:'https://www.tencent.com',site_name:'腾讯官网',title:'腾讯'},
+   {url:null,site_name:'未知来源',title:'区域运营'}
+  ]});
+ };
+ const p={roles:['渠道运营'],cities:['上海'],queries:['渠道运营 上海 职位详情 企业官网']};
+ const result=await runCleanJobMatch('mock-key','求职意向城市：上海',profile,'渠道运营',10,{}, {fetcher});
+ assert.equal(result.matches.length,0);
+ assert.equal(result.diagnostic.searches,16);
+ assert.equal(result.diagnostic.search_raw_results,64);
+ assert.equal(result.diagnostic.candidate_links,0);
+ assert.equal(result.diagnostic.fetch_attempted,0);
+ assert.equal(result.diagnostic.stage,'all_search_urls_filtered');
+ assert.ok(result.diagnostic.search_rejection_counts.non_employer>=16);
+ assert.ok(result.diagnostic.search_rejection_counts.not_detail>=16);
+ assert.equal(result.diagnostic.search_failures,0);
+ const solo=await findEmployerSources(fetcher,'mock-key',p);
+ assert.equal(solo.raw_results,4);
+ assert.equal(solo.sources.length,0);
+ assert.deepEqual(solo.rejection_counts,{
+  no_url:1,non_employer:2,not_detail:1,duplicate:0,empty_metadata:0,foreign_title:0
+ });
+});
+
+test('empty provider index does not masquerade as a credential failure',async()=>{
+ const mock=async(url,opts)=>{
+  const path=new URL(url).pathname;
+  if(path==='/v1/tools/search')return Response.json({results:[]});
+  if(path==='/responses')return reply({queries:['渠道运营 上海 企业官网 详情']});
+  throw Error('Fetch should not run with zero source URLs');
+ };
+ const x=await runCleanJobMatch('mock','求职意向城市：上海',profile,'渠道运营',10,{}, {fetcher:mock});
+ assert.equal(x.matches.length,0);
+ assert.equal(x.diagnostic.searches,16);
+ assert.equal(x.diagnostic.search_raw_results,0);
+ assert.equal(x.diagnostic.search_empty_queries,16);
+ assert.equal(x.diagnostic.search_failures,0);
+ assert.equal(x.diagnostic.fetch_attempted,0);
+ assert.equal(x.diagnostic.stage,'search_index_empty');
+});
+
+test('site-specific second wave recovers an employer JD after ten empty generic queries',async()=>{
+ const official='https://talent.baidu.com/jobs/detail/SOCIAL/b49d8fee-0151-492b-8fc6-68bbab36b4dd';
+ const page=[
+  '百度社会招聘','招聘单位：百度','职位名称：渠道运营专员',
+  '工作地点：上海','岗位职责：负责渠道运营和销售数据复盘工作',
+  '任职要求：具有销售数据分析经验和跨团队协作能力',
+  '申请说明：实际岗位开放情况请以企业官方招聘页面为准',
+  '岗位介绍：该职位主要协助渠道经营、客户线索质量跟踪、线下活动管理和跨部门运营协同，定期汇总岗位成果与实际改进建议。'
+ ].join('\n');
+ let searches=0,fetches=0;
+ const fetcher=async(url,opts)=>{
+  const endpoint=new URL(url).pathname,payload=JSON.parse(opts.body||'{}');
+  if(endpoint==='/v1/tools/search'){
+   searches++;
+   return Response.json({results:payload.query.includes('site:talent.baidu.com/jobs/detail/SOCIAL/')?
+    [{url:official,title:'百度 渠道运营专员 上海',site_name:'百度招聘',
+      summary:'百度招聘 社招 上海 岗位职责 任职要求'}]:[]});
+  }
+  if(endpoint==='/v1/tools/fetch'){fetches++;return Response.json({content:page})}
+  if(endpoint==='/responses'){
+   const instructions=payload.instructions||'';
+   if(instructions.includes('检索策略')||instructions.includes('第二轮'))
+    return reply({queries:[]});
+   if(instructions.includes('提取真实公司'))
+    return reply({jobs:[{id:'p1',company:'百度',title:'渠道运营专员',
+      duties_quote:'负责渠道运营和销售数据复盘工作',
+      requirements_quote:'具有销售数据分析经验和跨团队协作能力'}]});
+   if(instructions.includes('求职匹配分析师'))return reply({jobs:[{
+    id:'p1',score:82,alignments:[{
+      jd_quote:'负责渠道运营和销售数据复盘工作',resume_fact_id:'CV-1'
+    }],gaps:[{jd_quote:'具有销售数据分析经验和跨团队协作能力'}],
+    reason:'简历原文提供了汽车门店渠道运营和销售漏斗复盘经历，可以对照渠道运营岗位的职责，但是其他任职条件必须进一步核对。',
+    score_basis:'工作经历中的渠道沟通与销售漏斗复盘与岗位职责相关，但无法证实全部任职硬性条件。'
+   }]});
+   throw Error('unexpected model prompt');
+  }
+  throw Error('unexpected paid call '+endpoint);
+ };
+ const x=await runCleanJobMatch('mock','求职意向城市：上海',profile,'区域督导',10,{}, {fetcher});
+ assert.equal(searches,16);
+ assert.equal(fetches,1);
+ assert.equal(x.diagnostic.recovery_planned,true);
+ assert.equal(x.diagnostic.recovery_candidates,1);
+ assert.equal(x.diagnostic.search_raw_results,1);
+ assert.equal(x.diagnostic.page_reads,1);
+ assert.equal(x.matches.length,1);
+ assert.equal(x.matches[0].official_url,official);
+ assert.equal(x.matches[0].location,'上海');
+ assert.equal(x.matches[0].company,'百度');
 });

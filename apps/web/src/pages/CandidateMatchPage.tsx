@@ -314,6 +314,12 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          {syntheticResult?.preview_synthetic&&<div role="status">
           <p><strong>合成简历验收结果（不是你的岗位推荐）</strong></p>
           <p>找到 {syntheticResult.matches.length}/10 条候选职位 · 搜索 {syntheticResult.native_search?.searches??0} 次 · 读取 {syntheticResult.native_search?.page_reads??0} 个页面 · 独立核验完整 JD {syntheticResult.native_search?.jd_verification?.verified??0} 条。</p>
+          <p>Search 原始结果 {syntheticResult.native_search?.search_raw_results??0} 条 · 符合企业职位详情链接初筛 {syntheticResult.native_search?.candidate_links??0} 条。</p>
+          {(syntheticResult.native_search?.search_raw_results??0)>0&&<p>初筛原因：非企业来源或受限站点 {syntheticResult.native_search?.search_rejection_counts?.non_employer??0} 条 · 非独立职位详情 {syntheticResult.native_search?.search_rejection_counts?.not_detail??0} 条 · 重复链接 {syntheticResult.native_search?.search_rejection_counts?.duplicate??0} 条。</p>}
+          {syntheticResult.matches.length===0&&(syntheticResult.native_search?.page_reads??0)===0&&
+           <p><strong>{(syntheticResult.native_search?.search_raw_results??0)===0?
+            '当前 DeepSeek Search 没有返回可用网页记录，需要调整检索来源。':
+            'Search 返回了网页，但没有任何结果进入岗位详情读取，需要检查官网链接识别与筛除原因。'}</strong></p>}
           <p>{syntheticResult.matches.length>=10?'已达到数量目标，但仍需核对岗位真实性与体验。':'未达到 10 条目标，不能据此开启正式匹配服务。'}</p>
           {syntheticResult.matches.length>0&&<ul>
            {syntheticResult.matches.map(job=><li key={job.official_url}>
