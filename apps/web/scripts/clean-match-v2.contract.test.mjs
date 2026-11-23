@@ -160,6 +160,8 @@ test('failed model reasoning still permits only page-verified, unscored source f
  assert.equal(result.matches.length,1);
  assert.equal(result.matches[0].match_score,null);
  assert.equal(result.matches[0].official_url,JD_URL);
+ assert.equal(result.diagnostic.model_failures,1);
+ assert.equal(result.diagnostic.score_provider_error,'AI_PROVIDER_RESPONSE_INVALID');
 });
 
 test('no work-city evidence never becomes a scored or unscored vacancy',async()=>{
@@ -174,8 +176,9 @@ test('provider has zero official candidates: no invented links and clear stage c
  const {fetcher}=makeFetcher({allSearchFail:true});
  const result=await runCleanJobMatch('test','意向城市：上海',profile,'区域督导',10,{}, {fetcher});
  assert.deepEqual(result.matches,[]);
- assert.equal(result.diagnostic.stage,'no_employer_sources');
+ assert.equal(result.diagnostic.stage,'search_provider_unavailable');
  assert.equal(result.diagnostic.search_failures,10);
+ assert.deepEqual(result.diagnostic.provider_error_codes,['AI_PROVIDER_UPSTREAM_ERROR']);
  assert.equal(result.diagnostic.page_reads,0);
 });
 
@@ -186,6 +189,7 @@ test('Fetch failure must not be silently represented as there are no jobs',async
  assert.equal(result.diagnostic.stage,'pages_unreadable');
  assert.equal(result.diagnostic.fetch_attempted,1);
  assert.equal(result.diagnostic.fetch_failures,1);
+ assert.deepEqual(result.diagnostic.fetch_error_codes,['AI_PROVIDER_UPSTREAM_ERROR']);
 });
 
 test('rebuild launch gate is closed until independent live evidence acceptance',async()=>{
@@ -209,6 +213,22 @@ test('old resume matching backend is retired in production but has no data-destr
  });
  assert.equal(match.status,410);
  assert.equal((await match.json()).error,'MATCH_BACKEND_RETIRED');
+});
+
+test('single failed search does not masquerade as zero market demand when another source is valid',async()=>{
+ let n=0;
+ const {fetcher}=makeFetcher();
+ const partial=async(url,opts)=>{
+  if(new URL(url).pathname==='/v1/tools/search'&&n++===0)
+   return new Response('temporary upstream error',{status:503});
+  return fetcher(url,opts);
+ };
+ const result=await runCleanJobMatch('test','期望工作城市：上海',profile,'区域督导',10,{}, {fetcher:partial});
+ assert.equal(result.matches.length,1);
+ assert.equal(result.diagnostic.search_failures,1);
+ assert.equal(result.diagnostic.searches,9);
+ assert.deepEqual(result.diagnostic.provider_error_codes,['AI_PROVIDER_UPSTREAM_ERROR']);
+ assert.equal(result.diagnostic.stage,'complete');
 });
 
 test('new backend owns status and has no imports of hybrid, Greenhouse, Lever, checkpoints or stale Agent',async()=>{

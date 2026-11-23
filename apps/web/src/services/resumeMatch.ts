@@ -57,7 +57,8 @@ export type MatchResponse = {
    native_error?:string|null;native_mode?:string|null;
    version?:string;stage?:string;queries?:number;fetch_attempted?:number;
    fetch_failures?:number;city_evidence_count?:number;extracted_jobs?:number;
-   provider_error_codes?:string[];
+   provider_error_codes?:string[];fetch_error_codes?:string[];
+   model_failures?:number;score_provider_error?:string|null;planning_error?:string|null;
    hybrid_fallback?:{queries?:number;raw_results?:number;candidate_links?:number;
     source_previews?:number;source_preview_before_fetch?:number;
     fetch_attempted?:number;fetched_job_pages?:number;fetch_failures?:number;

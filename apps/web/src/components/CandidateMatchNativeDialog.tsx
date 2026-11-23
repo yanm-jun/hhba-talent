@@ -212,6 +212,18 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       成功读取 {result.native_search.page_reads??0} 个，
       有明确工作城市原文的网页 {result.native_search.city_evidence_count??0} 个，
       最终识别 {result.native_search.extracted_jobs??0} 条具体职位。
+      {(result.native_search.search_failures??0)>0?
+       ' 搜索服务异常 '+(result.native_search.search_failures??0)+' 组；':''}
+      {(result.native_search.fetch_failures??0)>0?
+       ' 网页读取失败 '+(result.native_search.fetch_failures??0)+' 次；':''}
+      {(result.native_search.model_failures??0)>0?
+       ' 岗位信息提取模型失败 '+(result.native_search.model_failures??0)+' 批；':''}
+      {result.native_search.score_provider_error?' 本次评分模型异常：'+result.native_search.score_provider_error+'；':''}
+      {result.native_search.planning_error?' 搜索规划异常：'+result.native_search.planning_error+'；':''}
+      {result.native_search.provider_error_codes?.length?
+       ' 搜索错误：'+result.native_search.provider_error_codes.join('、')+'；':''}
+      {result.native_search.fetch_error_codes?.length?
+       ' 网页错误：'+result.native_search.fetch_error_codes.join('、')+'；':''}
       {result.native_search.stage!=='complete'?
        ' 本轮没有充分取得真实职位证据（阶段：'+result.native_search.stage+'），不代表没有适合的工作。':''}
      </p>}
