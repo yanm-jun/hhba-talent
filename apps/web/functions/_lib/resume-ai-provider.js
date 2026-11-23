@@ -16,8 +16,10 @@ export const PROVIDERS = Object.freeze({
 const allowedKeys=new Set(Object.keys(PROVIDERS));
 const clip=(value,max=20000)=>String(value||'').slice(0,max);
 export function selectProvider(env,task='resume_optimization',{reasoning=false}={}){
- const requested=clip(env?.['HHBA_AI_'+task.toUpperCase()+'_PROVIDER']||env?.HHBA_AI_DEFAULT_PROVIDER||
-  (env?.HHBA_MATCH_OPENAI_API_KEY?'openai':'deepseek'),30).toLowerCase();
+ // Word editing is independently enabled: keep existing provider until the
+ // OpenAI Word workflow has passed live document regression and is opted in.
+ const requested=clip(env?.['HHBA_AI_'+task.toUpperCase()+'_PROVIDER']||
+  env?.HHBA_AI_DEFAULT_PROVIDER||'deepseek',30).toLowerCase();
  if(!allowedKeys.has(requested))throw new Error('AI_PROVIDER_UNSUPPORTED');
  const prefix='HHBA_AI_'+requested.toUpperCase()+'_';
  // For the existing HHBA DeepSeek integration, reuse the server-side secret
