@@ -31,7 +31,7 @@ on:
       - 'apps/web/functions/_lib/native-deepsearch-job-research.js'
       - 'apps/web/functions/_lib/hybrid-mainland-job-research.js'
       - 'apps/web/functions/_lib/clean-match-v2.js'
-      - 'apps/web/functions/api/match-next/[[path]].js'
+      - 'apps/web/functions/api/match-next/**'
       - 'apps/web/functions/_lib/domestic-employer-index.js'
       - 'apps/web/functions/_lib/agent-score-feedback.js'
       - 'apps/web/functions/_lib/ai-research-checkpoint.js'
