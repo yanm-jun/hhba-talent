@@ -154,10 +154,18 @@ test('Fetch failure must not be silently represented as there are no jobs',async
  assert.equal(result.diagnostic.fetch_failures,1);
 });
 
+test('rebuild launch gate is closed until independent live evidence acceptance',async()=>{
+ const res=await onRequest({request:new Request('https://hhba.work/api/match-next/status'),
+  env:{HHBA_MATCH_SERVICE_ENABLED:'1',HHBA_MATCH_DEEPSEEK_KEY:'synthetic-key-long-enough',
+   HHBA_PNVS_AUTH_DB:{prepare(){}}}});
+ const status=await res.json();
+ assert.equal(status.enabled,false);
+});
+
 test('new backend owns status and has no imports of hybrid, Greenhouse, Lever, checkpoints or stale Agent',async()=>{
  const res=await onRequest({
   request:new Request('https://hhba.work/api/match-next/status'),
-  env:{HHBA_MATCH_SERVICE_ENABLED:'1',HHBA_MATCH_DEEPSEEK_KEY:'synthetic-key-long-enough',
+  env:{HHBA_MATCH_CLEAN_V2_ENABLED:'1',HHBA_MATCH_SERVICE_ENABLED:'1',HHBA_MATCH_DEEPSEEK_KEY:'synthetic-key-long-enough',
    HHBA_PNVS_AUTH_DB:{prepare(){}}}
  });
  assert.equal(res.status,200);
