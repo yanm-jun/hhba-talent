@@ -3,6 +3,7 @@
  * Keep provider model names configurable; vendors change model availability.
  */
 import {openAIJson} from './openai-match-v2-provider.js';
+import {matchV2Runtime} from './clean-match-v2-runtime.js';
 
 export const PROVIDERS = Object.freeze({
  deepseek:{baseUrl:'https://api.deepseek.com',protocol:'openai'},
@@ -19,7 +20,8 @@ const clip=(value,max=20000)=>String(value||'').slice(0,max);
 export function selectProvider(env,task='resume_optimization',{reasoning=false}={}){
  // Only the explicitly isolated, preview-only V2 Word track is forced to
  // OpenAI. Production and other legacy services retain their own settings.
- const v2Word=env?.HHBA_MATCH_OPENAI_WORD_V2_ENABLED==='1'&&
+ const runtime=matchV2Runtime(env);
+ const v2Word=runtime.wordEnabled&&
   env?.HHBA_AUTH_ROLLOUT==='preview'&&env?.HHBA_PREVIEW_AI_DIAG_ENABLED==='1'&&
   ['resume_optimization','resume_rewrite','resume_reviewer'].includes(task);
  const requested=v2Word?'openai':clip(
@@ -34,7 +36,7 @@ export function selectProvider(env,task='resume_optimization',{reasoning=false}=
  // "deepseek-chat"/"deepseek-reasoner" were retired in 2026: use the current
  // non-thinking Flash model by default, always allowing explicit override.
  const deepseekWriter=reasoning||['resume_rewrite','resume_reviewer'].includes(task);
- const model=v2Word?(env?.HHBA_MATCH_OPENAI_MODEL||'gpt-6.2-astra'):
+ const model=v2Word?runtime.model:
   env?.[prefix+'MODEL']||(requested==='deepseek'?
    (deepseekWriter?'deepseek-v4-pro':'deepseek-flash'):
    requested==='openai'?'gpt-6.2-astra':null);
@@ -44,7 +46,7 @@ export function selectProvider(env,task='resume_optimization',{reasoning=false}=
   String(env.HHBA_AI_DEEPSEEK_REASONING_EFFORT).toLowerCase():'max';
  return {name:requested,...PROVIDERS[requested],key,model:model.trim(),
   ...(v2Word?{v2Responses:true,
-   baseUrl:env?.HHBA_MATCH_OPENAI_BASE_URL||'https://api.openai.com/v1'}:{}),
+   baseUrl:runtime.baseUrl}:{}),
   ...(requested==='deepseek'&&deepseekWriter?{reasoningEffort:effort}:{})};
 }
 export function parseSuggestions(raw,allowedBlockIds){
