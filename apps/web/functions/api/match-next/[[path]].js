@@ -18,7 +18,10 @@ const headers={'Content-Type':'application/json; charset=utf-8',
  'Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'};
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers});
 const fail=(code,status=502)=>json({ok:false,error:code},status);
-const enabled=env=>env?.HHBA_MATCH_SERVICE_ENABLED==='1'&&
+// Explicit launch gate: the replacement is not shown to real users merely
+// because mocks passed. Enable only after real employer Search/Fetch acceptance.
+const enabled=env=>env?.HHBA_MATCH_CLEAN_V2_ENABLED==='1'&&
+ env?.HHBA_MATCH_SERVICE_ENABLED==='1'&&
  typeof env?.HHBA_MATCH_DEEPSEEK_KEY==='string'&&
  env.HHBA_MATCH_DEEPSEEK_KEY.length>=16&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
