@@ -262,7 +262,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   try{
    const result=await runMatchPreviewProviderCheck();
    setPreflightNotice(result.status==='READY'?
-    'DeepSeek 账户、Search、模型 JSON 和 Fetch 已通过本次真实接口预检。此结果不代表岗位搜索和 Word 优化已通过端到端验收。':
+    'OpenAI Responses JSON 与联网搜索来源已通过本次接口预检；尚未证明企业职位网页可读、JD 有效或 Word 优化端到端通过。':
     '接口预检未通过。');
   }catch(e){
    setPreflightNotice(e instanceof Error?e.message:'接口预检失败，请检查配置。');
@@ -295,15 +295,15 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
        <p>此前搜索无法稳定提供真实岗位，已暂停这项服务的公开使用。你的个人简历和账户资料不会因此被清空。</p>
        <button type="button" onClick={()=>{setAvailability('loading');void matchServiceReady().then(ok=>setAvailability(ok?'ready':'disabled'))}}>重新检测服务状态</button>
        {preflightAvailable&&<div className="hhba-ai-preview-diagnostic">
-        <p>预览验收专用：只检查 DeepSeek 接口能力，不读取你的简历，也不开放正式岗位匹配。</p>
+        <p>预览验收专用：只检查 OpenAI 官方接口能力，不读取你的简历，也不开放正式岗位匹配。</p>
         {user&&getRealAuthToken()?<button type="button" disabled={preflightBusy}
          onClick={()=>void runPreviewPreflight()}>
-          {preflightBusy?'正在检查 DeepSeek…':'检查 DeepSeek 接口'}
+          {preflightBusy?'正在检查 OpenAI…':'检查 OpenAI 接口'}
          </button>:<p>请先登录预览测试账号，再执行接口预检。</p>}
         {preflightNotice&&<p role="status">{preflightNotice}</p>}
         {user&&getRealAuthToken()&&<div className="hhba-ai-preview-acceptance">
          <p><strong>下一关：完整岗位搜索验收（虚构简历）</strong></p>
-         <p>使用固定的虚构汽车运营简历，实际调用 DeepSeek 查找最多 10 条中国大陆企业岗位，读取 JD 并评分。不会读取你的简历，也不会将结果存入你的匹配历史。运行会产生真实 API 调用费用。</p>
+         <p>使用固定的虚构汽车运营简历，实际调用 OpenAI 查找最多 10 条中国大陆企业岗位，读取 JD 并评分。不会读取你的简历，也不会将结果存入你的匹配历史。运行会产生真实 API 调用费用。</p>
          <button type="button" disabled={syntheticBusy}
           onClick={()=>void runSyntheticAcceptance()}>
           {syntheticBusy?'正在执行真实岗位搜索…':
@@ -318,7 +318,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           {(syntheticResult.native_search?.search_raw_results??0)>0&&<p>初筛原因：非企业来源或受限站点 {syntheticResult.native_search?.search_rejection_counts?.non_employer??0} 条 · 非独立职位详情 {syntheticResult.native_search?.search_rejection_counts?.not_detail??0} 条 · 重复链接 {syntheticResult.native_search?.search_rejection_counts?.duplicate??0} 条。</p>}
           {syntheticResult.matches.length===0&&(syntheticResult.native_search?.page_reads??0)===0&&
            <p><strong>{(syntheticResult.native_search?.search_raw_results??0)===0?
-            '当前 DeepSeek Search 没有返回可用网页记录，需要调整检索来源。':
+            '当前 OpenAI 联网搜索没有返回可用的企业岗位详情来源，需要调整检索来源。':
             'Search 返回了网页，但没有任何结果进入岗位详情读取，需要检查官网链接识别与筛除原因。'}</strong></p>}
           <p>{syntheticResult.matches.length>=10?'已达到数量目标，但仍需核对岗位真实性与体验。':'未达到 10 条目标，不能据此开启正式匹配服务。'}</p>
           {syntheticResult.matches.length>0&&<ul>
@@ -388,8 +388,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          {previewBusy&&<p role="status">正在读取简历文字…</p>}
          {ocrBusy&&<p role="status"><LoaderCircle className="spin" size={15}/> 正在识别文档文字…</p>}
          {ocrFile&&!ocrBusy&&<div className="hhba-ai-text-review">
-          <strong>{previewText?'部分页面需要进一步识别':'改用 DeepSeek 读取文档'}</strong>
-          <p>点击下方按钮即同意将这份原文件发送给 DeepSeek 识别文字。识别完成后，你可以核对和修改结果。</p>
+          <strong>{previewText?'部分页面需要进一步识别':'改用 OpenAI 读取文档'}</strong>
+          <p>点击下方按钮即同意将这份原文件发送给 OpenAI 官方 API 识别文字。识别完成后，你可以核对和修改结果。</p>
           <button type="button" disabled={working||saveBusy||!getRealAuthToken()} onClick={()=>void runOcr()}>
            {previewError?'同意并重试识别':'同意并识别'}
           </button>
