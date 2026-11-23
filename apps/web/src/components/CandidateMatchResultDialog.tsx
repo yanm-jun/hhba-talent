@@ -58,7 +58,7 @@ function officialLink(item:MatchedJob){
  if(item.source_type==='站外招聘职位'){
   // Clean V2 uses v2-N IDs. The older official-link validator expects a
   // canonical employer+posting ID, so normalize ONLY after source evidence.
-  if(!/^v2-\\d+$/.test(item.id)||
+  if(!/^v2-\d+$/.test(item.id)||
    item.recruitment_source_kind!=='EMPLOYER_DOMAIN_CANDIDATE'||
    !['PARTIAL_SOURCE','VERIFIED_FULL_JD'].includes(item.evidence_status||'')||
    item.application_status!=='NEEDS_OFFICIAL_CONFIRMATION')return null;
@@ -67,9 +67,9 @@ function officialLink(item:MatchedJob){
    if(u.protocol!=='https:'||u.hostname!==item.source)return null;
    let postingId=u.searchParams.values().next().value||'';
    if(u.hostname==='jobs.bytedance.com')
-    postingId=u.pathname.match(/^\\/experienced\\/position\\/([0-9]{13,22})\\/detail$/)?.[1]||'';
+    postingId=u.pathname.match(/^\/experienced\/position\/([0-9]{13,22})\/detail$/)?.[1]||'';
    if(u.hostname==='talent.baidu.com')
-    postingId=u.pathname.match(/^\\/jobs\\/detail\\/SOCIAL\\/([0-9a-f-]{36})$/i)?.[1]?.toLowerCase()||'';
+    postingId=u.pathname.match(/^\/jobs\/detail\/SOCIAL\/([0-9a-f-]{36})$/i)?.[1]?.toLowerCase()||'';
    if(!postingId)return null;
    const canonicalId='external-'+u.hostname.replace(/[^a-zA-Z0-9_-]/g,'-')+'-'+postingId;
    return safeExternalJobApplicationUrl({...item,source_type:'站外官方招聘',
