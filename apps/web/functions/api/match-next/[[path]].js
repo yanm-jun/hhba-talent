@@ -10,7 +10,7 @@ import {redactForModel} from '../../_lib/resume-match-core.js';
 import {recognizeResumeFile} from '../../_lib/resume-ocr.js';
 import {recognizeMatchResume} from '../../_lib/resume-jd-match-agent.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
-import {runCleanJobMatch,MATCH_V2} from '../../_lib/clean-match-v2.js';
+import {runCleanJobMatch,rankCleanMatchResults,MATCH_V2} from '../../_lib/clean-match-v2.js';
 import {archiveCleanMatchJobs} from '../../_lib/clean-match-v2-jd-bridge.js';
 import {checkCleanMatchProvider} from '../../_lib/clean-match-v2-provider-check.js';
 
@@ -68,7 +68,7 @@ async function workflow(env,session,input,redacted,{signal,onProgress,onActivity
  const jdStart=Date.now();
  const archived=await archiveCleanMatchJobs(env,env.HHBA_MATCH_DEEPSEEK_KEY,
   profile,discovery.matches,{signal,onActivity,onPartial});
- const matches=archived.matches;
+ const matches=rankCleanMatchResults(archived.matches);
  const diagnostic={...discovery.diagnostic,visible_jobs:matches.length,
   jd_verification:archived.diagnostic};
  const result=publicResult(profile,matches,{

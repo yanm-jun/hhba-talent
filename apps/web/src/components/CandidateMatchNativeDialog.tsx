@@ -289,6 +289,15 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
           <p className="hhba-native-score-basis"><strong>{matchScoreLabel(job)}依据：</strong>{job.score_basis}</p>}
          <p className="hhba-native-reason"><strong>{job.jd_comparisons?.length?'为什么推荐：':'匹配依据：'}</strong>
           {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
+         {job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&job.jd_source_status!=='VERIFIED_JD'&&
+          <ul className="hhba-native-comparisons" aria-label="岗位与简历原文证据对照">
+           {(job.matched||[]).map((line,i)=><li key={'supported-'+i}>
+            <strong>有简历原文对应</strong><div>{line}</div>
+           </li>)}
+           {(job.not_evidenced||[]).map((line,i)=><li key={'not-evidenced-'+i}>
+            <strong>尚未建立对应证据</strong><div>{line}</div>
+           </li>)}
+          </ul>}
          {!!job.jd_comparisons?.length&&<ul className="hhba-native-comparisons">
           {job.jd_comparisons.map(item=><li key={item.requirement}>
            <strong>{item.status==='supported'?'有对应经历':item.status==='partial'?'部分对应':'缺少简历证据'}</strong>
