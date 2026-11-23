@@ -7,23 +7,6 @@ import {optimizeResumeDocument,reserveResumeOptimizationTask}
 // Existing route fixtures modeled Chat Completions. Adapt their mocked I/O to
 // the current OpenAI Responses payload while retaining their assertions about
 // redaction, quota accounting and user-confirmation semantics.
-function responsesMock(mock){
- return async (url,init={})=>{
-  const request=JSON.parse(init.body||'{}');
-  const oldInput={...init,body:JSON.stringify({model:request.model,
-   messages:[{role:'system',content:request.instructions},
-    {role:'user',content:request.input}]})};
-  let response;
-  try{response=await mock(url,oldInput)}
-  catch(error){console.error('OPENAI_FIXTURE_MOCK_ASSERT',error.message);throw error}
-  if(!response.ok)return response;
-  const data=await response.json();
-  const content=data?.choices?.[0]?.message?.content;
-  return typeof content==='string'?Response.json({status:'completed',
-   output:[{type:'message',content:[{type:'output_text',text:content}]}]}):Response.json(data);
- };
-}
-
 
 test('entire-document optimization plans over every paragraph, batches review and resumes pending blocks',async()=>{
  const blocks=Array.from({length:27},(_,index)=>({id:'word-'+index,text:'真实经历 '+index,section:'experience'}));
@@ -161,7 +144,6 @@ test('production AI optimization can use a dedicated quota salt with bounded usa
    rationale:'表达更准确',jobRequirement:'运营和团队协作',
    evidenceStatus:'needs_user_confirmation'}]
  })}}]});
- globalThis.fetch=responsesMock(globalThis.fetch);
  try{
   const status=await (await onRequestGet({env:h.env})).json();
   assert.equal(status.enabled,true);
@@ -193,7 +175,6 @@ test('generates suggestions with user confirmation and enforces daily quota',asy
    evidenceStatus:'verified'
   }]})}}]});
  };
- globalThis.fetch=responsesMock(globalThis.fetch);
  try{
   for(let i=0;i<3;i++){
    const result=await onRequestPost({request:request(),env:h.env});
@@ -217,7 +198,6 @@ test('provider never receives contact identifiers in evidence',async()=>{
   assert.match(submitted.input,/邮箱已脱敏/);
   return asResponses({choices:[{message:{content:JSON.stringify({suggestions:[]})}}]});
  };
- globalThis.fetch=responsesMock(globalThis.fetch);
  try{
   const result=await onRequestPost({request:request({
    ...base,blocks:[{...base.blocks[0],text}]
@@ -238,7 +218,6 @@ test('bounded twelve-section Chinese resume passes UTF-8 request limit',async()=
   assert.ok(new TextEncoder().encode(options.body).byteLength>18000);
   return asResponses({choices:[{message:{content:'{"suggestions":[]}'}}]});
  };
- globalThis.fetch=responsesMock(globalThis.fetch);
  try{
   const blocks=Array.from({length:12},(_,i)=>({
    id:'experience-'+i,section:'experience',text:'负责区域门店运营与客户管理工作'.repeat(70)
@@ -298,7 +277,6 @@ test('no safe AI suggestions leaves successful-generation allowance unused',asyn
  globalThis.fetch=async()=>asResponses({choices:[{
   finish_reason:'stop',message:{content:'{"suggestions":[]}'}
  }]});
- globalThis.fetch=responsesMock(globalThis.fetch);
  try{
   const response=await onRequestPost({request:request(),env:h.env});
   assert.equal(response.status,200);
