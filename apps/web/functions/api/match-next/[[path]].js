@@ -108,7 +108,7 @@ async function operatorQaRun(env,request){
     search_empty_queries:search.empty_queries,candidate_links:search.sources.length,
     search_rejection_counts:search.rejection_counts,provider_error_codes:search.error_codes,
     fetch_attempted:0,fetch_failures:0,page_reads:0,
-    city_evidence_count:0,model_failures:0,extracted_jobs:0,visible_jobs:0,
+    city_evidence_count:0,model_failures:0,model_pages_attempted:0,extracted_jobs:0,visible_jobs:0,
     extraction_page_rejections:{}};
    enqueue('reading',{searches:d.searches,
     search_raw_results:d.search_raw_results,candidate_links:d.candidate_links});
@@ -123,6 +123,7 @@ async function operatorQaRun(env,request){
     {jobs:[],model_failures:0,city_evidence:0,page_rejections:{}};
    d.city_evidence_count=extracted.city_evidence;
    d.model_failures=extracted.model_failures;
+   d.model_pages_attempted=extracted.model_pages_attempted||0;
    d.extraction_page_rejections=extracted.page_rejections;
    d.extracted_jobs=extracted.jobs.length;d.visible_jobs=extracted.jobs.length;
    d.stage='complete';

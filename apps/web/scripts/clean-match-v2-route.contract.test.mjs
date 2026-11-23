@@ -462,7 +462,9 @@ test('focused operator QA uses real Search/Fetch/JD extraction but not private h
   assert.equal(output.matches[0].match_score,undefined);
   assert.ok(mock.calls.some(x=>x.path==='/v1/tools/search'));
   assert.ok(mock.calls.some(x=>x.path==='/v1/tools/fetch'));
-  assert.equal(mock.calls.filter(x=>x.path==='/responses').length,1);
+  assert.equal(mock.calls.filter(x=>x.path==='/responses').length,0,
+   'all explicit JD fields should be parsed locally without an extraction model call');
+  assert.equal(output.summary.model_pages_attempted,0);
   assert.equal(writes.some(x=>x.sql.includes('hhba_ai_match_history')),false);
  }finally{mock.restore()}
 });
