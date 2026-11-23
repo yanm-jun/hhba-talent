@@ -36,7 +36,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
- const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10});
+ const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10,search_engine:'standard'});
  const [working,setWorking]=useState(false);
  const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
  const [stage,setStage]=useState<NativeMatchProgress>('preparing');
@@ -351,6 +351,18 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          <label>目标岗位方向<input value={options.role_hint} maxLength={80} placeholder="例如：软件开发、数据分析、销售、视觉设计"
           onChange={e=>setOptions(x=>({...x,role_hint:e.target.value}))}/></label>
         </div>
+        <div className="hhba-ai-fields hhba-ai-fields-one">
+         <label>搜索方式
+          <select value={options.search_engine||'standard'} disabled={working}
+           onChange={e=>setOptions(x=>({...x,search_engine:e.target.value as 'standard'|'deepseek_native'}))}>
+           <option value="standard">常规 AI 岗位搜索</option>
+           <option value="deepseek_native">DeepSeek 原生深度搜索 · 试用</option>
+          </select>
+         </label>
+        </div>
+        {options.search_engine==='deepseek_native'&&<p className="hhba-ai-notice" role="status">
+         <ShieldCheck size={15}/>DeepSeek 将自主进行多轮联网搜索及网页阅读。仅展示有实际搜索来源的国内企业岗位；搜索时间和结果数量可能变化。
+        </p>}
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
