@@ -8,7 +8,7 @@ const safeNumber=n=>Number.isFinite(n)&&n>=0?Math.min(1e9,Math.trunc(n)):0;
 const counterKeys=[
  'searches','search_failures','search_raw_results','search_empty_queries',
  'candidate_links','fetch_attempted','fetch_failures','page_reads',
- 'city_evidence_count','extracted_jobs','visible_jobs','model_failures',
+ 'city_evidence_count','extracted_jobs','visible_jobs','model_failures','model_pages_attempted',
  'source_batches','recovery_queries','recovery_candidates','elapsed_ms'
 ];
 const countObject=v=>Object.fromEntries(Object.entries(v||{}).filter(([k,val])=>
