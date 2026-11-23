@@ -31,6 +31,7 @@ export type MatchedJob = {
   evidence_excerpt?:string;
   evidence_sources?:{url:string;kind:string}[];
   evidence_score_status?:'AI_PARTIAL_SOURCE_SCORED'|'AI_DIRECTION_REFERENCE_SCORED';
+  score_evidence_status?:'GROUNDED_JD_RESUME_QUOTES';
   jd_proof_method?:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1';
   jd_source_status?:'VERIFIED_JD';
   jd_employer_identity_status?:'ATS_TENANT_NOT_LEGAL_ENTITY_VERIFIED'|'DIRECT_EMPLOYER_SOURCE';
@@ -59,6 +60,7 @@ export type MatchResponse = {
    fetch_failures?:number;city_evidence_count?:number;extracted_jobs?:number;
    provider_error_codes?:string[];fetch_error_codes?:string[];
    model_failures?:number;score_provider_error?:string|null;planning_error?:string|null;
+   source_batches?:number;source_backfill_attempts?:number;source_exhausted?:boolean;
    hybrid_fallback?:{queries?:number;raw_results?:number;candidate_links?:number;
     source_previews?:number;source_preview_before_fetch?:number;
     fetch_attempted?:number;fetched_job_pages?:number;fetch_failures?:number;
