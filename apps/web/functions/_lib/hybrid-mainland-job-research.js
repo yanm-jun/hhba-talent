@@ -182,9 +182,43 @@ export async function runHybridMainlandJobResearch(key,resume,roleHint,limit=10,
   {matches:[],hits:[],diagnostic:{},error:'AI_SEARCH_UNAVAILABLE'};
  const deep=nativeResult.status==='fulfilled'?nativeResult.value:null;
  const nativeError=nativeResult.status==='rejected'?knownCode(nativeResult.reason):null;
+ if(nativeError==='AI_MATCH_CANCELLED'||options.signal?.aborted){
+  throw nativeResult.reason||Object.assign(new Error('AI_MATCH_CANCELLED'),{code:'AI_MATCH_CANCELLED'});
+ }
  if(nativeError&&fatalProviderCode.has(nativeError)&&supplement.error)
   throw nativeResult.reason;
- if(!deep&&!supplement.matches.length&&!supplement.hits.length){
+ // A failed/incomplete native reasoning answer can still have genuine
+ // completed Search/open_page source evidence. The model's unfinished text
+ // is NEVER used. Read these public URLs with the independent Fetch tool.
+ let salvagedNative=[],salvageAttempted=0,salvageFetched=0;
+ const independentUrls=new Set(supplement.hits.map(x=>x.url));
+ if(nativeResult.status==='rejected'&&Array.isArray(nativeResult.reason?.public_sources)){
+  const rawSources=nativeResult.reason.public_sources.slice(0,30);
+  const leads=rawSources.map((row,i)=>({
+   id:'native-opened-'+i,url:row?.url,title:row?.title||'职位详情',
+   source:row?.site_name||'',
+   summary:row?.summary||'',snippet:row?.summary||'',content:'',
+   availability:{status:'UNKNOWN'}
+  })).filter(hit=>isDirectEmployerSourceHit(hit)&&
+   !independentUrls.has(hit.url)&&options.excludePosting?.(hit.url)!==true).slice(0,8);
+  if(leads.length){
+   salvageAttempted=leads.length;
+   options.onSources?.([],[],leads.map(x=>x.url));
+   try{
+    const details=await enrich(key,leads,{signal:options.signal,
+     onProgress:options.onProgress,maxFetch:leads.length,fetchTimeoutMs:5500});
+    salvageFetched=Number(details?.fetches)||0;
+    salvagedNative=previews(details?.hits||leads,limit)
+     .filter(job=>isMainlandEmployerJobUrl(job.official_url));
+   }catch{/* Native source URLs remain public hints, not confirmed vacancies. */}
+   if(salvagedNative.length){
+    options.onSources?.(salvagedNative,[],[]);
+    options.onPartial?.(salvagedNative);
+   }
+  }
+ }
+
+ if(!deep&&!supplement.matches.length&&!supplement.hits.length&&!salvagedNative.length){
   if(nativeResult.status==='rejected'){
    const e=nativeResult.reason;
    if(!e.diagnostic)e.diagnostic={};
@@ -194,7 +228,7 @@ export async function runHybridMainlandJobResearch(key,resume,roleHint,limit=10,
   }
  }
  const merged=[],seen=new Set();
- for(const item of [...(deep?.matches||[]),...supplement.matches]){
+ for(const item of [...(deep?.matches||[]),...supplement.matches,...salvagedNative]){
   if(!item||!isMainlandEmployerJobUrl(item.official_url)||
    options.excludePosting?.(item.official_url)===true||
    seen.has(item.official_url))continue;
@@ -220,6 +254,9 @@ export async function runHybridMainlandJobResearch(key,resume,roleHint,limit=10,
    fetch_failures:Number(searchDiag.fetch_failures)||0,
    explicit_work_city_sources:Number(searchDiag.explicit_work_city_sources)||0,
    model_recovered:Number(searchDiag.model_recovered)||0,
+   native_source_salvage_attempted:salvageAttempted,
+   native_source_salvage_fetched:salvageFetched,
+   native_source_salvage_jobs:salvagedNative.length,
    search_failures:Number(searchDiag.search_failures)||0,
    error:supplement.error}
  }};
