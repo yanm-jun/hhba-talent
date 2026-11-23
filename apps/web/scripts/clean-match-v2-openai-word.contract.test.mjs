@@ -143,18 +143,18 @@ test('preview V2 Word author and reviewer inherit the approved relay without alt
 test('compact V2 preview config enables matching and Word without extra cloud variables',async()=>{
  const env={
   HHBA_AUTH_ROLLOUT:'preview',
-  HHBA_PREVIEW_AI_DIAG_ENABLED:'1',
   HHBA_MATCH_SERVICE_ENABLED:'1',
   HHBA_MATCH_OPENAI_API_KEY:KEY,
   HHBA_PNVS_AUTH_DB:{prepare(){return {}}},
   HHBA_MATCH_V2_RUNTIME:JSON.stringify({
    baseUrl:'https://api-c.reqtoken.com/v1',
-   model:'gpt-6.2-sol',matchEnabled:true,wordEnabled:true
+   model:'gpt-6.2-sol',matchEnabled:true,wordEnabled:true,diagEnabled:true
   })
  };
  const config=matchV2Runtime(env);
  assert.equal(config.matchEnabled,true);
  assert.equal(config.wordEnabled,true);
+ assert.equal(config.diagEnabled,true);
  assert.equal(config.model,'gpt-6.2-sol');
  assert.equal(config.baseUrl,'https://api-c.reqtoken.com/v1');
  const writer=selectProvider(env,'resume_rewrite');
@@ -169,12 +169,13 @@ test('compact V2 preview config enables matching and Word without extra cloud va
  assert.equal(status.preflight_available,true);
 });
 test('compact V2 flags cannot enable production, and bad JSON fails closed',()=>{
- const compact=JSON.stringify({matchEnabled:true,wordEnabled:true,
+ const compact=JSON.stringify({matchEnabled:true,wordEnabled:true,diagEnabled:true,
   model:'gpt-6.2-sol',baseUrl:'https://api-c.reqtoken.com/v1'});
  const prod={HHBA_AUTH_ROLLOUT:'production',HHBA_MATCH_V2_RUNTIME:compact,
   HHBA_MATCH_OPENAI_API_KEY:KEY,HHBA_MATCH_DEEPSEEK_KEY:'synthetic-legacy-test-only'};
  assert.equal(matchV2Runtime(prod).matchEnabled,false);
  assert.equal(matchV2Runtime(prod).wordEnabled,false);
+ assert.equal(matchV2Runtime(prod).diagEnabled,false);
  assert.equal(selectProvider(prod,'resume_rewrite').name,'deepseek');
  assert.equal(matchV2Runtime({HHBA_AUTH_ROLLOUT:'preview',
   HHBA_PREVIEW_AI_DIAG_ENABLED:'1',HHBA_MATCH_V2_RUNTIME:'{bad-json'}).matchEnabled,false);
