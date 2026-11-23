@@ -18,7 +18,8 @@ import {authorizeOperatorQa,startQaRun,appendQaStage,finishQaRun,getQaRun,
 
 const KIND='HHBA_OPENAI_MATCH_V2';
 const openAIProvider=env=>({key:env?.HHBA_MATCH_OPENAI_API_KEY||env?.HHBA_AI_OPENAI_API_KEY,
- model:env?.HHBA_MATCH_OPENAI_MODEL||'gpt-6.2-astra'});
+ model:env?.HHBA_MATCH_OPENAI_MODEL||'gpt-6.2-astra',
+ baseUrl:env?.HHBA_MATCH_OPENAI_BASE_URL||'https://api.openai.com/v1'});
 // An entirely synthetic, intentionally fabricated candidate, never the
 // signed-in person's uploaded résumé, private document, or stored profile.
 const ACCEPTANCE_SCENARIO='automotive_operations_v1';
