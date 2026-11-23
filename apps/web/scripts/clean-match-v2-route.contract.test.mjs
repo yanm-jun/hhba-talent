@@ -215,3 +215,92 @@ test('preview provider diagnostic requires explicit click and existing authorize
   service.indexOf('/** Best-effort browser redaction'));
  assert.doesNotMatch(probe,/resume_id|resume_facts|\bbody:JSON\.stringify/);
 });
+
+
+test('preview-only synthetic acceptance runs the actual search route and never stores a candidate history row',async()=>{
+ const {env,writes}=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
+ const provider=installProviderMock();
+ try{
+  const response=await onRequest({request:previewRequest('/synthetic-check',{
+   method:'POST',headers:{Accept:'text/event-stream','Content-Type':'application/json'},
+   body:JSON.stringify({consent:true,scenario:'automotive_operations_v1'})
+  }),env});
+  assert.equal(response.status,200);
+  assert.match(response.headers.get('content-type')||'',/text\/event-stream/);
+  const body=await response.text();
+  assert.match(body,/event: complete/);
+  assert.match(body,/event: activity/);
+  const complete=body.split('\n\n').filter(x=>x.startsWith('event: complete'))[0];
+  assert.ok(complete,'the actual search workflow must complete');
+  const result=JSON.parse(complete.slice(complete.indexOf('data: ')+6));
+  assert.equal(result.preview_synthetic,true);
+  assert.equal(result.status,'COMPLETE');
+  assert.equal(result.history_status,'EMPTY');
+  assert.equal(result.history_id,null);
+  assert.ok(result.profile.facts.some(x=>x.quote===QUOTE));
+  assert.equal(result.matches.length,1);
+  assert.equal(result.matches[0].official_url,JD_URL);
+  assert.equal(result.native_search.visible_jobs,1);
+  assert.equal(result.native_search.jd_verification.not_ready,true);
+  assert.ok(result.native_search.searches>=1);
+  assert.ok(result.native_search.page_reads>=1);
+  assert.ok(provider.calls.some(x=>x.path==='/v1/tools/search'));
+  assert.ok(provider.calls.some(x=>x.path==='/v1/tools/fetch'));
+  assert.equal(writes.some(x=>x.sql.includes('hhba_ai_match_history')),false,
+   'preview-only synthetic test must never write private match history');
+  assert.doesNotMatch(JSON.stringify(provider.calls),/candidate@example\.com|13812345678/);
+ }finally{provider.restore()}
+});
+
+test('synthetic acceptance rejects no login, missing consent, unexpected payloads and production access without invoking paid provider',async()=>{
+ const {env}=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
+ const old=globalThis.fetch;let paidCalls=0;
+ globalThis.fetch=async()=>{paidCalls++;throw Error('unexpected paid call')};
+ try{
+  const noLogin=await onRequest({request:new Request(
+   'https://5f88e175.hhba-talent.pages.dev/api/match-next/synthetic-check',{
+    method:'POST',headers:{Origin:'https://5f88e175.hhba-talent.pages.dev'},
+    body:JSON.stringify({consent:true,scenario:'automotive_operations_v1'})
+   }),env});
+  assert.equal(noLogin.status,401);
+  const noConsent=await onRequest({request:previewRequest('/synthetic-check',{
+   method:'POST',body:JSON.stringify({consent:false,scenario:'automotive_operations_v1'})
+  }),env});
+  assert.equal(noConsent.status,400);
+  assert.equal((await noConsent.json()).error,'EXPLICIT_AI_SHARING_CONSENT_REQUIRED');
+  for(const invalid of [{consent:true,scenario:'automotive_operations_v1',text:'real candidate CV'},
+   {consent:true,scenario:'malicious'},{consent:true,scenario:'automotive_operations_v1',resume_id:'secret'}]){
+   const denied=await onRequest({request:previewRequest('/synthetic-check',{
+    method:'POST',body:JSON.stringify(invalid)
+   }),env});
+   assert.equal(denied.status,400);
+   assert.equal((await denied.json()).error,'INVALID_SYNTHETIC_CHECK_REQUEST');
+  }
+  const production=await onRequest({request:request('/synthetic-check',{
+   method:'POST',body:JSON.stringify({consent:true,scenario:'automotive_operations_v1'})
+  }),env});
+  assert.equal(production.status,503);
+  assert.equal((await production.json()).error,'MATCH_SYNTHETIC_NOT_ENABLED');
+  const wrongMethod=await onRequest({request:previewRequest('/synthetic-check'),env});
+  assert.equal(wrongMethod.status,404);
+  assert.equal(paidCalls,0);
+ }finally{globalThis.fetch=old}
+});
+
+test('preview synthetic acceptance UI is clearly labeled and never sends a user résumé',()=>{
+ const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ const service=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ const route=readFileSync(new URL('../functions/api/match-next/[[path]].js',import.meta.url),'utf8');
+ assert.match(page,/用虚构简历验证真实岗位搜索/);
+ assert.match(page,/不是你的岗位推荐/);
+ assert.match(page,/未达到 10 条目标/);
+ assert.match(page,/syntheticResult\.native_search\?\.jd_verification\?\.verified/);
+ assert.match(service,/isCleanV2PreviewHost\(\)/);
+ assert.match(service,/body:JSON\.stringify\(\{consent:true,scenario:'automotive_operations_v1'\}\)/);
+ assert.match(route,/preview_synthetic=true/);
+ assert.match(route,/if\(!persistHistory\)/);
+ assert.match(route,/if\(!previewPreflight\(env,request\)\)return fail\('MATCH_SYNTHETIC_NOT_ENABLED',503\)/);
+ const fn=service.slice(service.indexOf('export async function runMatchPreviewSyntheticAcceptance'),
+  service.indexOf('export async function submitExtractedResumeText'));
+ assert.doesNotMatch(fn,/\bresumeId\b|resume_id|privateResume|file\.arrayBuffer/);
+});

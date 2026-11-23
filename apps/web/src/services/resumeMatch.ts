@@ -73,6 +73,7 @@ export type MatchResponse = {
   new_job_count?:number;
   improved_job_count?:number;
   can_continue?:boolean;
+  preview_synthetic?:boolean;
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
 const API='/api/match-next'; // Clean V2 backend. Legacy Agent is disconnected.
@@ -327,6 +328,45 @@ async function consumeNativeMatchStream(
  }
  if(!complete)throw new MatchError(502,'智能匹配未返回完整结果，请稍后重试。');
  return complete;
+}
+
+/**
+ * Explicit-on-click real DeepSeek acceptance run with a fixed SERVER-SIDE
+ * fake résumé. This endpoint cannot read or match the user's uploaded résumé,
+ * never writes to their recommendation history and only runs in Pages preview.
+ */
+export async function runMatchPreviewSyntheticAcceptance(
+ signal?:AbortSignal,
+ onProgress?:(stage:NativeMatchProgress)=>void,
+ onActivity?:(activity:NativeMatchActivity)=>void
+):Promise<MatchResponse>{
+ if(!isCleanV2PreviewHost())throw new MatchError(403,
+  '合成简历验收仅在独立预览环境开放。');
+ const token=session();
+ const deadline=AbortSignal.timeout(330000);
+ const requestSignal=signal?AbortSignal.any([signal,deadline]):deadline;
+ const response=await fetch(API+'/synthetic-check',{
+  method:'POST',credentials:'same-origin',cache:'no-store',
+  signal:requestSignal,
+  headers:{Authorization:'Bearer '+token,'Content-Type':'application/json',
+   Accept:'text/event-stream'},
+  body:JSON.stringify({consent:true,scenario:'automotive_operations_v1'})
+ }).catch(error=>{
+  if(requestSignal.aborted)throw new MatchError(504,'合成简历验收等待超时或被取消。');
+  if(error?.name==='AbortError')throw error;
+  throw new MatchError(503,'暂时无法连接合成简历验收接口。');
+ });
+ if(!response.ok){
+  const data=await response.json().catch(()=>null) as {error?:string}|null;
+  throw new MatchError(response.status,
+   errorMap[data?.error||'']||'合成简历验收未能启动。');
+ }
+ if(!(response.headers.get('content-type')||'').includes('text/event-stream'))
+  throw new MatchError(502,'验收服务未返回流式岗位搜索进度。');
+ const result=await consumeNativeMatchStream(response,onProgress,undefined,onActivity);
+ if(result.preview_synthetic!==true)
+  throw new MatchError(502,'验收响应缺少合成简历标识，已停止展示结果。');
+ return result;
 }
 
 export async function submitExtractedResumeText(

@@ -15,6 +15,18 @@ import {archiveCleanMatchJobs} from '../../_lib/clean-match-v2-jd-bridge.js';
 import {checkCleanMatchProvider} from '../../_lib/clean-match-v2-provider-check.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
+// An entirely synthetic, intentionally fabricated candidate, never the
+// signed-in person's uploaded résumé, private document, or stored profile.
+const ACCEPTANCE_SCENARIO='automotive_operations_v1';
+const ACCEPTANCE_RESUME=[
+ '测试样本（虚构人物，不代表任何真实求职者）',
+ '求职意向城市：上海、苏州',
+ '求职方向：汽车区域督导、销售运营、渠道运营',
+ '工作经历：负责汽车区域门店运营监督、渠道培训及销售漏斗复盘',
+ '项目经历：组织过线下品牌活动，使用表格记录线索、邀约、到店、试驾和订单，',
+ '协助团队定期复盘销售转化，整理并追踪门店整改事项。',
+ '技能：Excel 基础数据统计、渠道沟通、销售活动组织。'
+].join('\n');
 const headers={'Content-Type':'application/json; charset=utf-8',
  'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff',
  'Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'};
@@ -61,7 +73,7 @@ function publicResult(profile,matches,diagnostic,target){
    '结果来自本轮真实检索和网页读取，招聘状态以企业官方公告为准。',
   can_continue:false};
 }
-async function workflow(env,session,input,redacted,{signal,onProgress,onActivity,onPartial}){
+async function workflow(env,session,input,redacted,{signal,onProgress,onActivity,onPartial,persistHistory=true}){
  const started=Date.now();
  onProgress('parsing');
  onActivity({stage:'parsing',message:'开始理解简历中的真实工作经历及职业能力。'});
@@ -90,21 +102,28 @@ async function workflow(env,session,input,redacted,{signal,onProgress,onActivity
    discovery:discovery.diagnostic.elapsed_ms,
    jd_finish_wait:Date.now()-jdStart,evidence_research:0,total:Date.now()-started}
  },input.options.limit);
- // Only server-confirmed source jobs can create candidate history.
- try{
-  const saved=await saveMatchHistory(env.HHBA_PNVS_AUTH_DB,session.phone,
-   input.resume_id||null,input.options.role_hint,matches);
-  result.history_id=saved?.id||null;
-  result.history_status=saved?'SAVED':'EMPTY';
-  result.new_job_count=saved?.new_job_count||0;
-  result.improved_job_count=saved?.improved_job_count||0;
- }catch{
-  result.history_id=null;result.history_status='UNAVAILABLE';
+ // Synthetic acceptance MUST NOT write to the candidate's match history.
+ if(!persistHistory){
+  result.history_id=null;result.history_status='EMPTY';
   result.new_job_count=0;result.improved_job_count=0;
+  result.preview_synthetic=true;
+ }else{
+  // Only server-confirmed source jobs can create candidate history.
+  try{
+   const saved=await saveMatchHistory(env.HHBA_PNVS_AUTH_DB,session.phone,
+    input.resume_id||null,input.options.role_hint,matches);
+   result.history_id=saved?.id||null;
+   result.history_status=saved?'SAVED':'EMPTY';
+   result.new_job_count=saved?.new_job_count||0;
+   result.improved_job_count=saved?.improved_job_count||0;
+  }catch{
+   result.history_id=null;result.history_status='UNAVAILABLE';
+   result.new_job_count=0;result.improved_job_count=0;
+  }
  }
  return result;
 }
-function streamMatch(env,session,input,redacted){
+function streamMatch(env,session,input,redacted,{persistHistory=true}={}){
  const encoder=new TextEncoder(),abort=new AbortController();
  let closed=false,phase='preparing';
  const body=new ReadableStream({
@@ -122,7 +141,7 @@ function streamMatch(env,session,input,redacted){
    void (async()=>{
     try{
      const result=await workflow(env,session,input,redacted,{
-      signal:abort.signal,onProgress:progress,
+      signal:abort.signal,onProgress:progress,persistHistory,
       onActivity:x=>send('activity',x),
       onPartial:matches=>send('partial',{matches})
      });
@@ -155,12 +174,17 @@ export async function onRequest({request,env}){
  const tail=url.pathname.slice('/api/match-next'.length).replace(/\/$/,'')||'/';
  if(tail==='/status'&&request.method==='GET')
   return json({kind:KIND,engine:MATCH_V2,enabled:enabled(env),
-   preflight_available:mayCheckProvider(env,request),scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],mode:'EVIDENCE_FIRST_V2'});
- if(!['/resume','/ocr','/provider-check'].includes(tail))return fail('NOT_FOUND',404);
- if(tail==='/provider-check'){
+   preflight_available:mayCheckProvider(env,request),
+   synthetic_check_available:previewPreflight(env,request),scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],mode:'EVIDENCE_FIRST_V2'});
+ if(!['/resume','/ocr','/provider-check','/synthetic-check'].includes(tail))
+  return fail('NOT_FOUND',404);
+ if(tail==='/synthetic-check'){
+  if(!previewPreflight(env,request))return fail('MATCH_SYNTHETIC_NOT_ENABLED',503);
+ }else if(tail==='/provider-check'){
   if(!mayCheckProvider(env,request))return fail('MATCH_PREFLIGHT_NOT_ENABLED',503);
  }else if(!enabled(env))return fail('MATCH_NOT_ENABLED',503);
  if(tail==='/provider-check'&&request.method!=='GET')return fail('NOT_FOUND',404);
+ if(tail==='/synthetic-check'&&request.method!=='POST')return fail('NOT_FOUND',404);
  if(tail!=='/provider-check'&&request.method!=='POST')return fail('NOT_FOUND',404);
  if(tail!=='/provider-check'&&(request.headers.get('Origin')!==url.origin||
   request.headers.get('Sec-Fetch-Site')==='cross-site'))return fail('ORIGIN_REQUIRED',403);
@@ -177,6 +201,26 @@ export async function onRequest({request,env}){
    console.warn('HHBA_MATCH_V2_PROVIDER_CHECK_FAILED',JSON.stringify({code}));
    return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:502);
   }
+ }
+ if(tail==='/synthetic-check'){
+  // Requires the same-origin, signed-in candidate session, explicit consent,
+  // and a fixed server-side sample. No user-supplied résumé or prompt accepted.
+  let sampleRequest;
+  try{
+   const raw=await request.text();
+   if(raw.length>160)throw Error('invalid');
+   sampleRequest=JSON.parse(raw);
+  }catch{return fail('INVALID_SYNTHETIC_CHECK_REQUEST',400)}
+  if(sampleRequest?.consent!==true)
+   return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',400);
+  if(sampleRequest?.scenario!==ACCEPTANCE_SCENARIO||
+   Object.keys(sampleRequest).some(k=>!['consent','scenario'].includes(k)))
+   return fail('INVALID_SYNTHETIC_CHECK_REQUEST',400);
+  const input={options:{country:'CN',remote_only:false,
+   role_hint:'汽车区域督导 销售运营',limit:10,exclude_urls:[]},
+   resume_id:null};
+  return streamMatch(env,session,input,redactForModel(ACCEPTANCE_RESUME),
+   {persistHistory:false});
  }
  if(tail==='/ocr'){
   try{return json({ok:true,...await recognizeResumeFile(request,env.HHBA_MATCH_DEEPSEEK_KEY)})}
