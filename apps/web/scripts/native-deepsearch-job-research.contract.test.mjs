@@ -214,7 +214,7 @@ test('broken DeepSeek event stream still preserves real completed employer sourc
  assert.equal(err?.diagnostic?.candidate_links,1);
 });
 
-test('native deep-search selectable in same UI and safely wired into authenticated existing JD/history pipeline',()=>{
+test('legacy native research remains archived but is not selectable in the clean V2 UI',()=>{
  const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
  const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  const transport=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
@@ -224,7 +224,7 @@ test('native deep-search selectable in same UI and safely wired into authenticat
  assert.match(route,/domesticResearchPass/);
  assert.match(route,/withSavedHistory/);
  assert.match(route,/EXPLICIT_AI_SHARING_CONSENT_REQUIRED/);
- assert.match(page,/DeepSeek 原生深度搜索 · 试用/);
- assert.match(transport,/search_engine:opts\.search_engine/);
+ assert.doesNotMatch(page,/DeepSeek 原生深度搜索 · 试用/);
+ assert.match(transport,/const API='\/api\/match-next'/);
  assert.match(route,/HHBA_DEEPSEEK_NATIVE_TRIAL_ENABLED/);
 });

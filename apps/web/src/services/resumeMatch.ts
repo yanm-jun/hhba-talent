@@ -55,6 +55,9 @@ export type MatchResponse = {
    opened_job_pages?:number;model_candidate_rows?:number;model_source_grounded?:number;
    jd_verification?:{eligible?:number;verified?:number;scored?:number;failed?:number};
    native_error?:string|null;native_mode?:string|null;
+   version?:string;stage?:string;queries?:number;fetch_attempted?:number;
+   fetch_failures?:number;city_evidence_count?:number;extracted_jobs?:number;
+   provider_error_codes?:string[];
    hybrid_fallback?:{queries?:number;raw_results?:number;candidate_links?:number;
     source_previews?:number;source_preview_before_fetch?:number;
     fetch_attempted?:number;fetched_job_pages?:number;fetch_failures?:number;
@@ -68,8 +71,8 @@ export type MatchResponse = {
   improved_job_count?:number;
   can_continue?:boolean;
 };
-export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];search_engine?:'standard'|'deepseek_native'};
-const API='/api/match-native';
+export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
+const API='/api/match-next'; // Clean V2 backend. Legacy Agent is disconnected.
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=3*1024*1024;
 const errorMap:Record<string,string>={
@@ -307,8 +310,8 @@ export async function submitExtractedResumeText(
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
    body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
     options:{country:'CN',remote_only:false,
-     role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10)),exclude_urls:opts.exclude_urls,
-     search_engine:opts.search_engine||'standard'}})
+     role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10)),exclude_urls:opts.exclude_urls
+    }})
   }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
    if((e as Error)?.name==='AbortError')throw e;
    throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});

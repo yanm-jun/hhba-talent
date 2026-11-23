@@ -36,7 +36,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
- const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10,search_engine:'standard'});
+ const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10});
  const [working,setWorking]=useState(false);
  const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
  const [stage,setStage]=useState<NativeMatchProgress>('preparing');
@@ -258,8 +258,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     </div>
     {availability==='loading'&&<p className="hhba-ai-service-check"><LoaderCircle size={17} className="spin"/>正在检查平台智能匹配服务…</p>}
     {availability==='disabled'&&<div className="hhba-ai-admin-note" role="status">
-       <LockKeyhole size={19}/><div><strong>智能匹配服务暂未启用。</strong>
-       <p>请稍后再试，或直接浏览公开岗位。</p>
+       <LockKeyhole size={19}/><div><strong>岗位智能匹配后台正在重新开发。</strong>
+       <p>此前搜索无法稳定提供真实岗位，已暂停这项服务的公开使用。你的个人简历和账户资料不会因此被清空。</p>
        <button type="button" onClick={()=>{setAvailability('loading');void matchServiceReady().then(ok=>setAvailability(ok?'ready':'disabled'))}}>重新检测服务状态</button>
        </div></div>}
     <div className="hhba-ai-layout">
@@ -351,18 +351,9 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          <label>目标岗位方向<input value={options.role_hint} maxLength={80} placeholder="例如：软件开发、数据分析、销售、视觉设计"
           onChange={e=>setOptions(x=>({...x,role_hint:e.target.value}))}/></label>
         </div>
-        <div className="hhba-ai-fields hhba-ai-fields-one">
-         <label>搜索方式
-          <select value={options.search_engine||'standard'} disabled={working}
-           onChange={e=>setOptions(x=>({...x,search_engine:e.target.value as 'standard'|'deepseek_native'}))}>
-           <option value="standard">常规 AI 岗位搜索</option>
-           <option value="deepseek_native">DeepSeek 原生深度搜索 · 试用</option>
-          </select>
-         </label>
-        </div>
-        {options.search_engine==='deepseek_native'&&<p className="hhba-ai-notice" role="status">
-         <ShieldCheck size={15}/>DeepSeek 将自主进行多轮联网搜索及网页阅读。仅展示有实际搜索来源的国内企业岗位；搜索时间和结果数量可能变化。
-        </p>}
+        <p className="hhba-ai-notice" role="status">
+         <ShieldCheck size={15}/>AI 将根据简历检索国内企业职位，打开招聘详情并核对实际工作地点和任职要求。结果不足时会说明哪个环节缺少证据。
+        </p>
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>

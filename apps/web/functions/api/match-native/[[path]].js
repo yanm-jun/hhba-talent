@@ -437,6 +437,15 @@ export async function runNativeDualMatch(key,text,roleHint,limit=10,{
 export async function onRequest({request,env}){
  const url=new URL(request.url);
  const tail=url.pathname.slice('/api/match-native'.length).replace(/\/$/,'')||'/';
+ // Clean rebuild: keep the old module in Git only for rollback and historical
+ // contract compatibility. Production cannot execute its obsolete search
+ // pipeline after the new UI has switched to /api/match-next.
+ if(env?.CF_PAGES_BRANCH==='main'){
+  if(tail==='/status'&&request.method==='GET')
+   return json({kind:KIND,enabled:false,scope:'CN_MAINLAND_ONLY',
+    mode:'RETIRED_REBUILD_IN_PROGRESS',formats:['pdf','docx']});
+  return fail('MATCH_BACKEND_RETIRED',410);
+ }
  if(tail==='/status'&&request.method==='GET')
   return json({kind:KIND,enabled:enabled(env),scope:'CN_MAINLAND_ONLY',mode:'SEARCH_FIRST_V1',formats:['pdf','docx'],native_deepsearch_trial:env?.HHBA_DEEPSEEK_NATIVE_TRIAL_ENABLED!=='0'});
  if(!enabled(env))return fail('MATCH_NOT_ENABLED',503);
