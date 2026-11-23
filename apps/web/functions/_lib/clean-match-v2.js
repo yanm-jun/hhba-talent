@@ -86,6 +86,38 @@ export async function planMatchSearch(fetcher,key,profile,hint,resume,signal){
    ...fallback.queries.slice(4)]).slice(0,10),planned:suggested.length};
  }catch(e){if(signal?.aborted)throw e;return {...fallback,planned:0,planning_error:e?.code||'AI_PROVIDER_UNAVAILABLE'}}
 }
+/** Re-plan one bounded Search wave when the first wave has too few real
+ * vacancies. Never treat search snippets as vacancies or invent URLs.
+ * This uses only non-sensitive role, city and public source metadata.
+ */
+export async function planRecoverySearch(fetcher,key,plan,
+ {previousQueries=[],candidates=[],jobs=[]}={},signal){
+ const used=new Set(previousQueries.map(x=>clean(x,128)));
+ const cities=plan.cities?.length?uniq([...plan.cities,'全国']):['全国'];
+ const fallback=[];
+ for(const name of (plan.roles||[]).slice(0,4))for(const city of cities.slice(0,4)){
+  fallback.push(clean(name+' '+city+' 招聘 职位详情 工作地点 岗位职责',128));
+  fallback.push(clean(name+' '+city+' 企业招聘 任职要求 职位申请',128));
+ }
+ let suggested=[],planningError=null;
+ try{
+  const v=await ask(fetcher,key,
+   '你负责第二轮企业招聘检索策略。第一轮有效职位不足，请主动调整岗位同义词、企业来源和搜索角度，而不是重复原搜索词。仅搜索中国大陆企业的具体在招职位页面，不得自造招聘URL，不得宣称已有岗位真实在招。只输出JSON：{"queries":["6条新的搜索短语"]}',
+   {roles:plan.roles,cities:plan.cities,
+    previous_queries:previousQueries.slice(0,16),
+    employer_source_titles:candidates.slice(0,8).map(x=>clean(x.title,100)),
+    grounded_job_titles:jobs.slice(0,8).map(x=>clean(x.title,90))},15000,signal);
+  suggested=(Array.isArray(v.queries)?v.queries:[])
+   .filter(x=>typeof x==='string').map(x=>clean(x,128))
+   .filter(x=>x.length>=7&&!contact.test(x)&&!foreign.test(x));
+ }catch(e){
+  if(signal?.aborted)throw e;
+  planningError=e?.code||'AI_PROVIDER_UNAVAILABLE';
+ }
+ return {queries:uniq([...suggested,...fallback])
+  .filter(x=>x.length>=7&&!used.has(x)).slice(0,6),
+  planning_error:planningError};
+}
 export function isExactEmployerJobUrl(url){
  try{
   const u=new URL(url);
@@ -340,7 +372,9 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
   fetch_attempted:0,fetch_failures:0,city_evidence_count:0,
   extracted_jobs:0,provider_error_codes:[],fetch_error_codes:[],
   model_failures:0,score_provider_error:null,planning_error:null,
-  source_batches:0,source_backfill_attempts:0,source_exhausted:false};
+  source_batches:0,source_backfill_attempts:0,source_exhausted:false,
+  recovery_planned:false,recovery_queries:0,recovery_candidates:0,
+  recovery_planning_error:null};
  const report=(stage,message,counts={})=>{
   d.stage=stage;onProgress(stage);onActivity({stage,message,...counts});
  };
@@ -352,21 +386,49 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
  d.searches=search.queries-search.failures;d.queries=search.queries;
  d.search_failures=search.failures;d.provider_error_codes=search.error_codes;
  d.candidate_links=search.sources.length;d.provider_items=search.sources.length;
- const sources=search.sources.filter(x=>!excludeUrls.includes(x.url));
+ let sources=search.sources.filter(x=>!excludeUrls.includes(x.url));
  report('searching','完成 '+search.queries+' 组搜索，发现 '+sources.length+
   ' 条需要进一步核实的企业职位链接。',{searches:d.searches,candidate_links:sources.length});
- if(!sources.length){d.stage=search.failures===search.queries?
-  'search_provider_unavailable':'no_employer_sources';d.elapsed_ms=Date.now()-start;
+ if(!sources.length&&search.failures===search.queries){
+  d.stage='search_provider_unavailable';d.elapsed_ms=Date.now()-start;
   return {matches:[],diagnostic:d}}
- report('reading','正在逐批读取企业职位详情；遇到打不开或缺少工作地点的页面，将继续核对其他来源。');
+ if(sources.length)report('reading','正在逐批读取企业职位详情；遇到打不开或缺少工作地点的页面，将继续核对其他来源。');
  // An early block of inaccessible or location-less pages must not hide the
  // remaining real employer sources. Bound paid Fetch calls and stop when
  // enough grounded vacancies are found.
- const jobs=[],seenJobs=new Set(),maxAttempts=Math.min(36,sources.length);
- let cursor=0;
- while(cursor<maxAttempts&&jobs.length<limit){
+ const jobs=[],seenJobs=new Set(),maxAttempts=36;
+ let cursor=0,recoveryUsed=false;
+ while(d.fetch_attempted<maxAttempts&&jobs.length<limit){
   if(signal?.aborted)throw err('AI_MATCH_CANCELLED');
-  const batch=sources.slice(cursor,Math.min(cursor+24,maxAttempts));
+  if(cursor>=sources.length){
+   if(recoveryUsed)break;
+   recoveryUsed=true;d.recovery_planned=true;
+   report('searching','有效职位仍不足 '+limit+' 条，AI 正在调整岗位关键词和企业来源，再做一轮补充检索。',{
+    extracted_jobs:jobs.length,source_exhausted:true});
+   const recovery=await planRecoverySearch(fetcher,key,plan,{
+    previousQueries:plan.queries,candidates:sources,jobs},signal);
+   d.recovery_planning_error=recovery.planning_error;
+   d.recovery_queries=recovery.queries.length;
+   if(!recovery.queries.length)break;
+   const supplemental=await findEmployerSources(fetcher,key,
+    {...plan,queries:recovery.queries},signal);
+   d.queries+=supplemental.queries;
+   d.searches+=supplemental.queries-supplemental.failures;
+   d.search_failures+=supplemental.failures;
+   d.provider_error_codes=uniq([...d.provider_error_codes,
+    ...supplemental.error_codes]).slice(0,6);
+   const known=new Set([...sources.map(x=>x.url),...excludeUrls]);
+   const novel=supplemental.sources.filter(x=>!known.has(x.url));
+   sources=[...sources,...novel];
+   d.recovery_candidates=novel.length;
+   d.candidate_links=sources.length;d.provider_items=sources.length;
+   report('searching','第二轮新增 '+novel.length+' 条不同的企业职位链接；累计 '+sources.length+
+    ' 条候选链接，已验证 '+jobs.length+' 条岗位。',{
+    searches:d.searches,candidate_links:sources.length,recovery_candidates:novel.length});
+   if(novel.length)report('reading','正在读取补充发现的企业职位详情。');
+   continue;
+  }
+  const batch=sources.slice(cursor,Math.min(cursor+24,maxAttempts,sources.length));
   const read=await readEmployerPages(fetcher,key,batch,signal);
   if(!read.attempts)break;
   cursor+=read.attempts;
@@ -392,7 +454,9 @@ export async function runCleanJobMatch(key,resume,profile,hint,limit=10,
     source_batches:d.source_batches});
  }
  d.source_exhausted=cursor>=sources.length;
- if(!d.page_reads){d.stage='pages_unreadable';d.elapsed_ms=Date.now()-start;
+ if(!d.page_reads){d.stage=sources.length?'pages_unreadable':
+  d.searches?'no_employer_sources':'search_provider_unavailable';
+  d.elapsed_ms=Date.now()-start;
   return {matches:[],diagnostic:d}}
  if(!jobs.length){d.stage='insufficient_job_evidence';d.elapsed_ms=Date.now()-start;
   return {matches:[],diagnostic:d}}
