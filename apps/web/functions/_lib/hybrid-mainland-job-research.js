@@ -72,7 +72,7 @@ const fatalProviderCode=new Set([
 export async function runHybridMainlandJobResearch(key,resume,roleHint,limit=10,options={},deps={}){
  const native=deps.native||runNativeDeepSearchJobs,search=deps.search||searchPublicJobs,
   previews=deps.previews||sourceOnlyJobPreviews,now=Date.now();
- const nativeTrial=options.search_engine==='deepseek_native';
+ const nativeTrial=options.search_engine!=='standard';
  const baseQueries=mainlandHybridSearchQueries(resume,roleHint,options.resumeProfile,nativeTrial?6:3);
  let queries=baseQueries,indexCompanies=0;
  const companion=(async()=>{
