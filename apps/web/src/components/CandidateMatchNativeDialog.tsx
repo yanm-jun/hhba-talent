@@ -205,6 +205,13 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
        <ul>{result.profile.facts.map(fact=><li key={fact.id}>{fact.quote}</li>)}</ul>
       </details>}
      </div>}
+     {!pending&&result.native_search?.hybrid_fallback&&<p className="hhba-match-disclaimer" role="status">
+      本轮国内企业补充搜索 {result.native_search.hybrid_fallback.queries??0} 组查询，
+      发现 {result.native_search.hybrid_fallback.candidate_links??0} 条合规招聘来源，
+      其中 {result.native_search.hybrid_fallback.source_previews??0} 条已有职位与工作城市证据；
+      未核实完整 JD 的岗位仍会明确标注。
+      {result.native_search.native_error?' 主搜索未完整成功，已保留独立搜索取得的真实证据。':''}
+     </p>}
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {!pending&&result.history_status==='SAVED'&&<div className="hhba-match-history-confirm">
       <span>这次的真实推荐结果已保存到你账户的「匹配历史」，下次登录可以继续查看。</span>
