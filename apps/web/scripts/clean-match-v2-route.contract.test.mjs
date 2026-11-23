@@ -26,6 +26,8 @@ function fixtureEnv(flags={}){
      if(sql.includes('FROM hhba_auth_sessions'))
       return {phone:PHONE,revoked:0,expires_at:new Date(Date.now()+60000).toISOString()};
      if(sql.includes('FROM hhba_auth_users'))return {phone:PHONE,role:'candidate'};
+     if(sql.includes('sqlite_master')&&sql.includes('hhba_resume_match_requests'))
+      return {name:'hhba_resume_match_requests'};
      return null;
     },
     async all(){return {results:[]}},
@@ -38,6 +40,7 @@ function fixtureEnv(flags={}){
  return {env:{
   HHBA_MATCH_DEEPSEEK_KEY:KEY,
   HHBA_MATCH_SERVICE_ENABLED:'1',
+  HHBA_MATCH_LIMIT_PEPPER:'synthetic-qa-pepper-fixture-not-production',
   HHBA_PNVS_AUTH_DB:db,...flags
  },writes,requests};
 }
@@ -248,6 +251,13 @@ test('preview-only synthetic acceptance runs the actual search route and never s
   assert.ok(provider.calls.some(x=>x.path==='/v1/tools/fetch'));
   assert.equal(writes.some(x=>x.sql.includes('hhba_ai_match_history')),false,
    'preview-only synthetic test must never write private match history');
+  const qa= writes.find(x=>x.sql.includes('INSERT INTO hhba_resume_match_requests'));
+  assert.ok(qa,'the expensive operation must reserve a server-side budget first');
+  assert.match(qa.sql,/account_hash LIKE 'v2qa:%'/);
+  assert.match(qa.sql,/<4 AND/);
+  assert.match(qa.sql,/<2/);
+  assert.equal(qa.args.some(x=>String(x).includes(PHONE)),false,
+   'quota history must not store a plaintext candidate phone number');
   assert.doesNotMatch(JSON.stringify(provider.calls),/candidate@example\.com|13812345678/);
  }finally{provider.restore()}
 });
@@ -303,4 +313,29 @@ test('preview synthetic acceptance UI is clearly labeled and never sends a user 
  const fn=service.slice(service.indexOf('export async function runMatchPreviewSyntheticAcceptance'),
   service.indexOf('export async function submitExtractedResumeText'));
  assert.doesNotMatch(fn,/\bresumeId\b|resume_id|privateResume|file\.arrayBuffer/);
+});
+
+
+test('unavailable quota or exhausted budget blocks expensive synthetic Search and Fetch',async()=>{
+ const cleanRequest=()=>previewRequest('/synthetic-check',{
+  method:'POST',body:JSON.stringify({consent:true,scenario:'automotive_operations_v1'})
+ });
+ const previous=globalThis.fetch;
+ let calls=0;globalThis.fetch=async()=>{calls++;throw new Error('paid provider must not be called')};
+ try{
+  const missingSecret=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1',
+   HHBA_MATCH_LIMIT_PEPPER:''});
+  let res=await onRequest({request:cleanRequest(),env:missingSecret.env});
+  assert.equal(res.status,503);
+  assert.equal((await res.json()).error,'MATCH_SYNTHETIC_QUOTA_UNAVAILABLE');
+  const full=fixtureEnv({HHBA_PREVIEW_AI_DIAG_ENABLED:'1'});
+  const prepare=full.env.HHBA_PNVS_AUTH_DB.prepare.bind(full.env.HHBA_PNVS_AUTH_DB);
+  full.env.HHBA_PNVS_AUTH_DB.prepare=sql=>
+   sql.includes('INSERT INTO hhba_resume_match_requests')?
+    {bind(){return {async run(){return {success:true,meta:{changes:0}}}}}}:prepare(sql);
+  res=await onRequest({request:cleanRequest(),env:full.env});
+  assert.equal(res.status,429);
+  assert.equal((await res.json()).error,'MATCH_SYNTHETIC_LIMIT');
+  assert.equal(calls,0,'no preview over-budget request may reach the paid provider');
+ }finally{globalThis.fetch=previous}
 });
