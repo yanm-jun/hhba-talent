@@ -258,8 +258,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     </div>
     {availability==='loading'&&<p className="hhba-ai-service-check"><LoaderCircle size={17} className="spin"/>正在检查平台智能匹配服务…</p>}
     {availability==='disabled'&&<div className="hhba-ai-admin-note" role="status">
-       <LockKeyhole size={19}/><div><strong>智能匹配服务暂未启用。</strong>
-       <p>请稍后再试，或直接浏览公开岗位。</p>
+       <LockKeyhole size={19}/><div><strong>岗位智能匹配后台正在重新开发。</strong>
+       <p>此前搜索无法稳定提供真实岗位，已暂停这项服务的公开使用。你的个人简历和账户资料不会因此被清空。</p>
        <button type="button" onClick={()=>{setAvailability('loading');void matchServiceReady().then(ok=>setAvailability(ok?'ready':'disabled'))}}>重新检测服务状态</button>
        </div></div>}
     <div className="hhba-ai-layout">
