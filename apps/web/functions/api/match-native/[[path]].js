@@ -5,6 +5,7 @@ import {redactForModel} from '../../_lib/resume-match-core.js';
 import {runSearchFirstMatch} from '../../_lib/deepseek-search-match.js';
 import {runAgentOwnedMainlandMatch} from '../../_lib/ai-owned-job-research.js';
 import {runNativeDeepSearchJobs} from '../../_lib/native-deepsearch-job-research.js';
+import {runHybridMainlandJobResearch} from '../../_lib/hybrid-mainland-job-research.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {enrichSearchMatchesWithJD,matchJdEnrichmentEnabled} from '../../_lib/match-jd-enrichment.js';
 import {researchDomesticJobEvidence} from '../../_lib/domestic-job-research.js';
@@ -158,7 +159,7 @@ async function runCandidateResearch(env,key,resume,roleHint,limit,options={}){
  if(options.search_engine==='deepseek_native'){
   if(env?.HHBA_DEEPSEEK_NATIVE_TRIAL_ENABLED==='0')
    throw Object.assign(new Error('AI_NATIVE_DEEPSEARCH_DISABLED'),{code:'AI_NATIVE_DEEPSEARCH_DISABLED'});
-  return runNativeDeepSearchJobs(key,resume,roleHint,limit,options);
+  return runHybridMainlandJobResearch(key,resume,roleHint,limit,options);
  }
  if(env?.HHBA_AI_OWNED_RESEARCH_ENABLED==='0')
   return runSearchFirstMatch(key,resume,roleHint,limit,options);
