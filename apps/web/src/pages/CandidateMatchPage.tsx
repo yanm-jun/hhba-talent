@@ -295,7 +295,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
        <p>此前搜索无法稳定提供真实岗位，已暂停这项服务的公开使用。你的个人简历和账户资料不会因此被清空。</p>
        <button type="button" onClick={()=>{setAvailability('loading');void matchServiceReady().then(ok=>setAvailability(ok?'ready':'disabled'))}}>重新检测服务状态</button>
        {preflightAvailable&&<div className="hhba-ai-preview-diagnostic">
-        <p>预览验收专用：只检查 OpenAI 官方接口能力，不读取你的简历，也不开放正式岗位匹配。</p>
+        <p>预览验收专用：只检查已配置 AI 服务的接口能力，不读取你的简历，也不开放正式岗位匹配。</p>
         {user&&getRealAuthToken()?<button type="button" disabled={preflightBusy}
          onClick={()=>void runPreviewPreflight()}>
           {preflightBusy?'正在检查 OpenAI…':'检查 OpenAI 接口'}
@@ -389,7 +389,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          {ocrBusy&&<p role="status"><LoaderCircle className="spin" size={15}/> 正在识别文档文字…</p>}
          {ocrFile&&!ocrBusy&&<div className="hhba-ai-text-review">
           <strong>{previewText?'部分页面需要进一步识别':'改用 OpenAI 读取文档'}</strong>
-          <p>点击下方按钮即同意将这份原文件发送给 OpenAI 官方 API 识别文字。识别完成后，你可以核对和修改结果。</p>
+          <p>点击下方按钮即同意将这份原文件发送给当前配置的 AI 服务商进行文字识别；如使用第三方中转站，文件也会经过该服务商。识别完成后，你可以核对和修改结果。</p>
           <button type="button" disabled={working||saveBusy||!getRealAuthToken()} onClick={()=>void runOcr()}>
            {previewError?'同意并重试识别':'同意并识别'}
           </button>
