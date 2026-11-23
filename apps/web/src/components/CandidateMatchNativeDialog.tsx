@@ -205,6 +205,16 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
        <ul>{result.profile.facts.map(fact=><li key={fact.id}>{fact.quote}</li>)}</ul>
       </details>}
      </div>}
+     {!pending&&result.native_search?.mode==='HHBA_MATCH_CLEAN_V2'&&<p className="hhba-match-disclaimer" role="status">
+      新版独立求职研究：搜索 {result.native_search.queries??0} 组关键词，
+      取得 {result.native_search.candidate_links??0} 条企业职位来源，
+      尝试打开 {result.native_search.fetch_attempted??0} 个网页，
+      成功读取 {result.native_search.page_reads??0} 个，
+      有明确工作城市原文的网页 {result.native_search.city_evidence_count??0} 个，
+      最终识别 {result.native_search.extracted_jobs??0} 条具体职位。
+      {result.native_search.stage!=='complete'?
+       ' 本轮没有充分取得真实职位证据（阶段：'+result.native_search.stage+'），不代表没有适合的工作。':''}
+     </p>}
      {!pending&&result.native_search?.hybrid_fallback&&<p className="hhba-match-disclaimer" role="status">
       本轮国内企业补充搜索 {result.native_search.hybrid_fallback.queries??0} 组查询，
       发现 {result.native_search.hybrid_fallback.candidate_links??0} 条合规招聘来源，
