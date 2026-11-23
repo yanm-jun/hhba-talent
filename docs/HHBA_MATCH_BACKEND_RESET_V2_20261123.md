@@ -26,6 +26,15 @@
 唯一新搜索引擎：`apps/web/functions/_lib/clean-match-v2.js`  
 端到端合约测试：`apps/web/scripts/clean-match-v2.contract.test.mjs`
 
+## 上线前隔离诊断（不开放用户匹配）
+
+- `/api/match-next/status` 继续只报告状态，不泄露 DeepSeek Key。
+- **生产环境**：没有通过真实岗位验收前，`HHBA_MATCH_CLEAN_V2_ENABLED` 必须保持关闭；同时 `/resume`、`/ocr`、`/provider-check` 都不能通过预览开关旁路。
+- **非 main 的 Cloudflare Pages 预览分支**：仅在单独明确设置 `HHBA_MATCH_V2_PREFLIGHT_ENABLED=1`，已有后端服务、API Secret、D1 登录会话均有效，且请求携带候选人有效登录 Bearer Token 时，`GET /api/match-next/provider-check` 才调用真实 Balance / Search / Responses JSON / Fetch API。
+- 该探针只发送预设公开测试内容，不读取、不发送任何简历，不创建岗位推荐或历史记录，也不开放 `POST /resume`。
+- 探针返回 READY **只证明四项基础服务这一次能调用成功**，不能替代多份模拟简历、真实企业 JD 和 Word 优化的端到端人工验收。
+- 提交 CI 使用脱敏的合成简历模拟整个 HTTP 路由及证据保存，不能冒充真实供应商联调通过。预览环境未授权或未配置该开关时，探针仍关闭。
+
 ## 上线门槛
 
 **默认关闭新求职匹配服务。** 仅当安全的真实岗位验收满足要求，才在 Cloudflare 配置 `HHBA_MATCH_CLEAN_V2_ENABLED=1`，将新版正式开放。新引擎尚未经过真实 DeepSeek 生产 Search/Fetch + 登录简历端到端测试，不能宣称已达到 10 个真实职位或已恢复全部 Word 优化的 JD 证据。
