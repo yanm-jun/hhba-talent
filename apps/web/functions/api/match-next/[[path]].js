@@ -13,13 +13,14 @@ import {saveMatchHistory} from '../../_lib/match-history.js';
 import {runCleanJobMatch,rankCleanMatchResults,MATCH_V2,findEmployerSources,readEmployerPages,extractJobs,officialDetailRecoveryQueries} from '../../_lib/clean-match-v2.js';
 import {archiveCleanMatchJobs} from '../../_lib/clean-match-v2-jd-bridge.js';
 import {checkCleanMatchProvider} from '../../_lib/clean-match-v2-provider-check.js';
+import {matchV2Runtime} from '../../_lib/clean-match-v2-runtime.js';
 import {authorizeOperatorQa,startQaRun,appendQaStage,finishQaRun,getQaRun,
  redactQaDiagnostic} from '../../_lib/clean-match-v2-qa-log.js';
 
 const KIND='HHBA_OPENAI_MATCH_V2';
 const openAIProvider=env=>({key:env?.HHBA_MATCH_OPENAI_API_KEY||env?.HHBA_AI_OPENAI_API_KEY,
- model:env?.HHBA_MATCH_OPENAI_MODEL||'gpt-6.2-astra',
- baseUrl:env?.HHBA_MATCH_OPENAI_BASE_URL||'https://api.openai.com/v1'});
+ model:matchV2Runtime(env).model,
+ baseUrl:matchV2Runtime(env).baseUrl});
 // An entirely synthetic, intentionally fabricated candidate, never the
 // signed-in person's uploaded résumé, private document, or stored profile.
 const ACCEPTANCE_SCENARIO='automotive_operations_v1';
@@ -45,7 +46,7 @@ const providerConfigured=env=>
  typeof openAIProvider(env).key==='string'&&
  openAIProvider(env).key.length>=16&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
-const enabled=env=>providerConfigured(env)&&env?.HHBA_MATCH_CLEAN_V2_ENABLED==='1';
+const enabled=env=>providerConfigured(env)&&matchV2Runtime(env).matchEnabled;
 // CF_PAGES_BRANCH is guaranteed as a Pages BUILD variable, not a runtime
 // binding. Bind prelaunch permission to preview-only env config AND the exact
 // Cloudflare preview hostname. Never grant preflight on the hhba.work domain.
