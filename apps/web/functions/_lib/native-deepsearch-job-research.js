@@ -29,21 +29,37 @@ export function nativeDeepSearchInstructions(limit=10){
  ].join('\n');
 }
 
-/** Only completed real provider SEARCH results can authorize a displayed URL. */
+/**
+ * A real provider search result OR a successfully opened page can support
+ * a job link. DeepSeek frequently searches a company listing and then opens
+ * an exact posting; rejecting that open_page URL drops genuine research.
+ *
+ * Both kinds remain ONLY discovery candidates, never a verified JD.
+ * Model prose URLs, failed opens and third-party / foreign ATS stay excluded.
+ */
 export function nativeDeepSearchSources(responseOrOutput){
  const output=Array.isArray(responseOrOutput)?responseOrOutput:responseOrOutput?.output;
  const found=new Map();
  if(!Array.isArray(output))return [];
+ const add=(url,metadata,origin)=>{
+  const safe=safeJobDetailLink(url);
+  if(!safe||!isMainlandEmployerJobUrl(safe)||found.has(safe))return;
+  found.set(safe,{url:safe,title:clean(metadata?.title,180),
+   site_name:clean(metadata?.site_name,100),
+   summary:clean(metadata?.snippet,650),source_origin:origin});
+ };
  for(const item of output){
-  if(item?.type!=='web_search_call'||item.status!=='completed'||
-   item.action?.type!=='search'||!Array.isArray(item.action.sources))continue;
-  for(const source of item.action.sources){
-   const url=safeJobDetailLink(source?.url);
-   if(!url||!isMainlandEmployerJobUrl(url)||found.has(url))continue;
-   found.set(url,{url,title:clean(source.title,180),site_name:clean(source.site_name,100),
-    summary:clean(source.snippet,650)});
-   if(found.size>=90)return [...found.values()];
+  if(item?.type!=='web_search_call'||item.status!=='completed')continue;
+  const action=item.action||{};
+  if(action.type==='search'&&Array.isArray(action.sources)){
+   for(const source of action.sources)add(source?.url,source,'SEARCH_RESULT');
+  }else if(item.kind==='deep_search'&&action.type==='open_page'&&
+   typeof item.page?.url==='string'){
+   // A completed page result comes from DeepSeek's actual browsing tool.
+   // action.url alone may be model-proposed, so never use it as evidence.
+   add(item.page.url,{title:item.page.title},'OPENED_PAGE');
   }
+  if(found.size>=90)break;
  }
  return [...found.values()];
 }
@@ -62,8 +78,16 @@ export function groundedNativeJobAnswer(response,limit=10,observed=[]){
  }
  let answer;
  try{answer=JSON.parse(raw)}catch{return {matches:[],received:0,rejected:0,invalid_answer:true}}
+ // Filter against the PROVIDER TOOL sources before asking the generic
+ // parser to take its first ten. Previously ten unsupported rows could
+ // exhaust that limit even when the 11th row was a genuine opened posting.
+ const rows=Array.isArray(answer?.jobs)?answer.jobs:[];
+ const groundedRows=rows.filter(row=>{
+  const url=safeJobDetailLink(row?.url||row?.link);
+  return Boolean(url&&anchors.has(url));
+ });
  const candidates=parseJobAnswer({output:[{type:'message',content:[
-  {type:'output_text',text:JSON.stringify(answer)}
+  {type:'output_text',text:JSON.stringify({jobs:groundedRows})}
  ]}]},limit);
  const matches=[],seen=new Set();
  for(const job of candidates.matches){
@@ -80,8 +104,8 @@ export function groundedNativeJobAnswer(response,limit=10,observed=[]){
    match_score:null,reference_score:0,score_basis:'',
    evidence_status:'RESEARCH_PENDING'});
  }
- return {matches,received:candidates.received,
-  rejected:Math.max(0,candidates.received-matches.length),invalid_answer:false};
+ return {matches,received:rows.length,source_grounded:groundedRows.length,
+  rejected:Math.max(0,rows.length-matches.length),invalid_answer:false};
 }
 
 /** Real provider SSE events become compact user-visible progress, not model thought text. */
@@ -131,8 +155,14 @@ export async function runNativeDeepSearchJobs(key,resume,roleHint,limit=10,optio
      onActivity({stage:'searching',message:'DeepSeek 完成 '+searches+
       ' 轮联网检索，找到 '+sources.size+' 条国内企业岗位页线索，继续核对。'});
     }else if(['open_page','find_in_page'].includes(action?.type)){
-     reads++;onProgress('reading');
-     onActivity({stage:'reading',message:'DeepSeek 已执行 '+reads+' 次网页阅读或页内查找。'});
+     reads++;
+     // The resolved opened page may be a specific job absent from the
+     // original search list. Send only its independently returned URL to JD.
+     const fresh=nativeDeepSearchSources([item]).filter(x=>!sources.has(x.url));
+     for(const row of fresh)sources.set(row.url,row);
+     if(fresh.length&&sourceBatches++<5)onSources([],[],fresh.map(x=>x.url));
+     onProgress('reading');
+     onActivity({stage:'reading',message:'DeepSeek 已执行 '+reads+' 次网页阅读或页内查找；新增 '+fresh.length+' 条具体职位页线索。'});
     }
    }
   }
@@ -162,8 +192,15 @@ export async function runNativeDeepSearchJobs(key,resume,roleHint,limit=10,optio
    'AI_NATIVE_DEEPSEARCH_FAILED');
  for(const row of nativeDeepSearchSources(completed))sources.set(row.url,row);
  const toolUse=completed.usage?.server_tool_use||{};
- if(!sources.size||!Number(toolUse.tool_search||searches))
-  throw failure('AI_EMPLOYER_JOBS_NOT_FOUND');
+ if(!sources.size||!Number(toolUse.tool_search||searches)){
+  const error=failure('AI_EMPLOYER_JOBS_NOT_FOUND');
+  error.diagnostic={mode:NATIVE_DEEPSEARCH_VERSION,model:'deepseek-flash',
+   phase:'native_source_discovery',searches:Number(toolUse.tool_search||searches),
+   page_reads:Number(toolUse.tool_fetch||reads),candidate_links:sources.size,
+   provider_items:sources.size,research_error:'NO_ELIGIBLE_EMPLOYER_JOB_SOURCES',
+   elapsed_ms:Date.now()-start};
+  throw error;
+ }
  const parsed=groundedNativeJobAnswer(completed,limit,[...sources.values()]);
  if(parsed.invalid_answer)throw failure('AI_NATIVE_DEEPSEARCH_INVALID_ANSWER');
  onProgress('writing');
@@ -173,6 +210,9 @@ export async function runNativeDeepSearchJobs(key,resume,roleHint,limit=10,optio
   diagnostic:{mode:NATIVE_DEEPSEARCH_VERSION,model:'deepseek-flash',
    searches:Number(toolUse.tool_search||searches),page_reads:Number(toolUse.tool_fetch||reads),
    provider_items:sources.size,candidate_links:sources.size,visible_jobs:parsed.matches.length,
+   search_result_links:[...sources.values()].filter(x=>x.source_origin==='SEARCH_RESULT').length,
+   opened_job_pages:[...sources.values()].filter(x=>x.source_origin==='OPENED_PAGE').length,
+   model_candidate_rows:parsed.received,model_source_grounded:parsed.source_grounded,
    discarded:parsed.rejected,elapsed_ms:Date.now()-start,
    native_search_calls:searches,native_read_calls:reads,third_party_results_shown:0}};
 }
