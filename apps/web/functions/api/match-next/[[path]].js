@@ -188,7 +188,7 @@ function publicResult(profile,matches,diagnostic,target){
   employer_source_candidates:matches.length-verified,
   native_search:diagnostic,source:'中国大陆企业招聘原文',
   scoring:'有真实 JD 和简历证据时提供参考分；未充分核实的岗位不虚构匹配分，绝非录用概率。',
-  privacy:'仅在本次授权下向 OpenAI 官方 API 发送脱敏简历文字，不公开或保存简历原文。',
+  privacy:'仅在本次授权下向已配置的 AI 服务（可能经第三方中转站）发送脱敏简历文字；HHBA 不公开简历原文。',
   disclaimer:matches.length<target?
    '本轮已找到 '+matches.length+' 条有具体职位证据的候选，尚未达到目标 '+target+
     ' 条。职位开放状态及最新要求仍需点击企业来源核实。':
