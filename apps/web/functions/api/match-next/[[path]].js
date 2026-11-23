@@ -12,6 +12,7 @@ import {recognizeMatchResume} from '../../_lib/resume-jd-match-agent.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {runCleanJobMatch,MATCH_V2} from '../../_lib/clean-match-v2.js';
 import {archiveCleanMatchJobs} from '../../_lib/clean-match-v2-jd-bridge.js';
+import {checkCleanMatchProvider} from '../../_lib/clean-match-v2-provider-check.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
 const headers={'Content-Type':'application/json; charset=utf-8',
@@ -150,8 +151,17 @@ export async function onRequest({request,env}){
  let session;
  try{session=await candidateSession(env,request)}catch{}
  if(!session)return fail('SESSION_INVALID',401);
- if(tail==='/provider-check')
-  return json({ok:true,status:'READY',engine:MATCH_V2});
+ if(tail==='/provider-check'){
+  try{
+   const probe=await checkCleanMatchProvider(env.HHBA_MATCH_DEEPSEEK_KEY,
+    {signal:request.signal});
+   return json({...probe,engine:MATCH_V2});
+  }catch(e){
+   const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
+   console.warn('HHBA_MATCH_V2_PROVIDER_CHECK_FAILED',JSON.stringify({code}));
+   return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:502);
+  }
+ }
  if(tail==='/ocr'){
   try{return json({ok:true,...await recognizeResumeFile(request,env.HHBA_MATCH_DEEPSEEK_KEY)})}
   catch(e){return fail(e?.code||'OCR_SERVICE_UNAVAILABLE',e?.status||502)}
