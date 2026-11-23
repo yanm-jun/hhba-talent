@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {onRequest} from '../functions/api/match-next/[[path]].js';
 
 const KEY='synthetic-provider-key-never-real';
@@ -199,4 +200,18 @@ test('provider credential failures never forge a vacancy or save a history entry
   assert.equal((await response.json()).error,'AI_PROVIDER_KEY_REJECTED');
   assert.equal(writes.some(x=>x.sql.includes('hhba_ai_match_history')),false);
  }finally{globalThis.fetch=previous}
+});
+test('preview provider diagnostic requires explicit click and existing authorized candidate session',()=>{
+ const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ const service=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ assert.match(page,/preflightAvailable&&<div className="hhba-ai-preview-diagnostic">/);
+ assert.match(page,/user&&getRealAuthToken\(\)\?<button/);
+ assert.match(page,/onClick=\{\(\)=>void runPreviewPreflight\(\)\}/);
+ assert.match(service,/window\.location\.hostname\.endsWith\('\.hhba-talent\.pages\.dev'\)/);
+ assert.match(service,/data\.enabled===false&&data\.preflight_available===true/);
+ assert.match(service,/fetch\(API\+'\/provider-check'/);
+ assert.match(service,/headers:\{Authorization:'Bearer '\+token\}/);
+ const probe=service.slice(service.indexOf('export async function runMatchPreviewProviderCheck'),
+  service.indexOf('/** Best-effort browser redaction'));
+ assert.doesNotMatch(probe,/resume_id|resume_facts|\bbody:JSON\.stringify/);
 });
