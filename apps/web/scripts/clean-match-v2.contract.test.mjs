@@ -214,7 +214,7 @@ test('Fetch failure must not be silently represented as there are no jobs',async
  assert.equal(result.diagnostic.stage,'pages_unreadable');
  assert.equal(result.diagnostic.fetch_attempted,1);
  assert.equal(result.diagnostic.fetch_failures,1);
- assert.deepEqual(result.diagnostic.fetch_error_codes,['AI_PROVIDER_UPSTREAM_ERROR']);
+ assert.deepEqual(result.diagnostic.fetch_error_codes,['AI_FETCH_UPSTREAM_ERROR']);
 });
 
 test('rebuild launch gate is closed until independent live evidence acceptance',async()=>{
@@ -293,7 +293,7 @@ test('Fetch retries one transient 503, but never retries rejected credentials',a
  },'test',[source]);
  assert.equal(deniedCalls,1,'authentication failures must not be retried');
  assert.equal(denied.pages.length,0);
- assert.deepEqual(denied.error_codes,['AI_PROVIDER_KEY_REJECTED']);
+ assert.deepEqual(denied.error_codes,['AI_FETCH_ACCESS_DENIED']);
 });
 
 test('new backend owns status and has no imports of hybrid, Greenhouse, Lever, checkpoints or stale Agent',async()=>{
@@ -498,7 +498,7 @@ test('Search can have raw results without a single employer vacancy URL, and rep
  const result=await runCleanJobMatch('mock-key','求职意向城市：上海',profile,'渠道运营',10,{}, {fetcher});
  assert.equal(result.matches.length,0);
  assert.equal(result.diagnostic.searches,16);
- assert.equal(result.diagnostic.search_raw_results,64);
+ assert.equal(result.diagnostic.search_raw_results,48);
  assert.equal(result.diagnostic.candidate_links,0);
  assert.equal(result.diagnostic.fetch_attempted,0);
  assert.equal(result.diagnostic.stage,'all_search_urls_filtered');
@@ -506,10 +506,10 @@ test('Search can have raw results without a single employer vacancy URL, and rep
  assert.ok(result.diagnostic.search_rejection_counts.not_detail>=16);
  assert.equal(result.diagnostic.search_failures,0);
  const solo=await findEmployerSources(fetcher,'mock-key',p);
- assert.equal(solo.raw_results,4);
+ assert.equal(solo.raw_results,3);
  assert.equal(solo.sources.length,0);
  assert.deepEqual(solo.rejection_counts,{
-  no_url:1,non_employer:2,not_detail:1,duplicate:0,empty_metadata:0,foreign_title:0
+  no_url:0,non_employer:2,not_detail:1,duplicate:0,empty_metadata:0,foreign_title:0
  });
 });
 
