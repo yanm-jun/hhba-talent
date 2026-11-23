@@ -6,7 +6,7 @@ This branch exists only to trigger an isolated Cloudflare Pages preview deployme
 ## Gate contract
 
 - Production `HHBA_MATCH_CLEAN_V2_ENABLED` must remain **unset/off**.
-- Preview `HHBA_MATCH_V2_PREFLIGHT_ENABLED=1` permits **only** authenticated candidate `GET /api/match-next/provider-check`; it must not unlock `POST /api/match-next/resume`.
+- Preview `HHBA_PREVIEW_AI_DIAG_ENABLED=1` permits **only** authenticated candidate `GET /api/match-next/provider-check`; it must not unlock `POST /api/match-next/resume`.
 - The preflight tests DeepSeek balance, Search, Responses JSON and Fetch against public test content without sharing any résumé or user URL.
 - A successful preflight is not proof that real jobs can be found or that Word optimization is fully verified.
 
