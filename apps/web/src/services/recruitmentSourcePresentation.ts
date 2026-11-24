@@ -43,9 +43,10 @@ export function recruitmentText(raw?:string|null){
  let text='',cursor=0;
  for(const item of matches){
   let start=item.start,end=item.end;
+  let annotation=false;
   // A citation wrapped by parentheses is a standalone annotation, not prose.
-  if(!item.label&&start>cursor&&((raw[start-1]==='('&&raw[end]===')')||(raw[start-1]==='（'&&raw[end]==='）')||(raw[start-1]==='['&&raw[end]===']')||(raw[start-1]==='<'&&raw[end]==='>'))){start--;end++;}
-  text+=raw.slice(cursor,start)+(item.label||'');cursor=end;
+  if(!item.label&&start>cursor&&((raw[start-1]==='('&&raw[end]===')')||(raw[start-1]==='（'&&raw[end]==='）')||(raw[start-1]==='['&&raw[end]===']')||(raw[start-1]==='<'&&raw[end]==='>'))){start--;end++;annotation=true;}
+  text+=raw.slice(cursor,start)+(item.label||(annotation?'':safeRecruitmentSource(item.url)?'见下方来源':'链接暂不可用'));cursor=end;
  }
  text+=raw.slice(cursor);
  return text.replace(/[ \t]+(?=[，。；、！？,.!?;])/g,'').replace(/[ \t]+$/gm,'').replace(/^[ \t]+/gm,'').trim();
@@ -53,15 +54,16 @@ export function recruitmentText(raw?:string|null){
 type SourceInput={company?:string;official_url?:string;source_type?:string;jd_source_status?:string;requirements_basis?:string;score_basis?:string;recommendation_reason?:string;evidence_excerpt?:string;recruitment_source_note?:string;matched?:string[];not_evidenced?:string[];needs_verification?:string[];evidence_sources?:{url:string;kind?:string}[];jd_research?:{facts?:{url:string;quote:string}[];inference?:string;unknowns?:string[]};research_detail?:{comparisons?:{requirement:string;analysis:string}[];strengths?:string;risks?:string;competition?:string;career_development?:string;optimization_advice?:string;score_explanation?:string;extra_sections?:{title:string;content:string}[]};jd_comparisons?:{requirement:string}[]};
 export function collectRecruitmentSources(job:SourceInput,includePrimary=true):RecruitmentSource[]{
  const list=new Map<string,RecruitmentSource>();
+ const sourceKey=(u:URL)=>{const copy=new URL(u.href);for(const k of [...copy.searchParams.keys()])if(/^(utm_.+|gclid|fbclid|msclkid)$/i.test(k))copy.searchParams.delete(k);return copy.href;};
  const add=(raw:string,verified=false,label='')=>{
   const u=safeRecruitmentSource(raw);if(!u)return;
-  const prior=list.get(u.href);
-  list.set(u.href,{url:u.href,host:u.hostname,verified:verified||!!prior?.verified,label:verified?label||prior?.label||'':prior?.label||label});
+  const key=sourceKey(u),prior=list.get(key);
+  list.set(key,{url:prior?.url||u.href,host:u.hostname,verified:verified||!!prior?.verified,label:prior?.label||label});
  };
  const primary=job.official_url?safeRecruitmentSource(job.official_url)?.href:undefined;
  const verified=job.source_type==='站外官方招聘'&&job.jd_source_status==='VERIFIED_JD';
  if(includePrimary&&primary)add(primary,verified,job.company?job.company+'招聘页面':'岗位招聘页面');
- const addRelated=(raw:string,label='')=>add(raw,!!primary&&safeRecruitmentSource(raw)?.href===primary&&verified,label);
+ const addRelated=(raw:string,label='')=>{const u=safeRecruitmentSource(raw);if(u)add(raw,!!primary&&sourceKey(u)===sourceKey(new URL(primary))&&verified,label);};
  for(const source of job.evidence_sources||[])addRelated(source.url);
  for(const fact of job.jd_research?.facts||[])addRelated(fact.url);
  const detail=job.research_detail;
