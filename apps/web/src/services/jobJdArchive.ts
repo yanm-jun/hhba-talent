@@ -62,15 +62,17 @@ export async function getArchivedJobJdVersion(id:string,signal?:AbortSignal):Pro
  return result;
 }
 /** Triggered only after the candidate's existing AI/verification consent. */
-export async function ensureArchivedJobJd(officialUrl:string,signal?:AbortSignal):Promise<ArchivedOfficialJd>{
+export async function ensureArchivedJobJd(officialUrl:string,signal?:AbortSignal,previousJdId?:string):Promise<ArchivedOfficialJd>{
  const token=getRealAuthToken();
  if(!realAuthReady||!token)throw new JobJdArchiveError('SESSION_INVALID',401);
+ if(!previousJdId){
  const cached=await request(PATH+'?official_url='+encodeURIComponent(officialUrl),
   {method:'GET'},signal) as {ok?:boolean;verified?:boolean;found?:boolean};
  if(cached.ok&&cached.verified)return cached as ArchivedOfficialJd;
+ }
  const verified=await request(PATH,{
   method:'POST',headers:{'Content-Type':'application/json'},
-  body:JSON.stringify({official_url:officialUrl,consent_verify:true})
+  body:JSON.stringify({official_url:officialUrl,consent_verify:true,...(previousJdId?{previous_jd_id:previousJdId}:{})})
  },signal) as ArchivedOfficialJd;
  if(verified.ok!==true||verified.verified!==true||verified.fresh!==true||
   typeof verified.full_jd!=='string'||!Array.isArray(verified.sections))
