@@ -41,7 +41,7 @@ async function accountBinding(key,user){
 export async function issueCheckpoint({env,account,blocks,job,draft,now=Date.now()}){
  const key=await importKey(env);
  const payload={
-  v:1,account:await accountBinding(key,account),
+  v:1,nonce:crypto.randomUUID(),account:await accountBinding(key,account),
   content:await digest({blocks,job,draft:publicDraft(draft)}),
   until:now+MAX_TTL_MS
  };
