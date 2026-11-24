@@ -5,7 +5,7 @@ import type {User} from '../services/api';
 import {Link} from '../router';
 import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDialog';
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
-import {linkMatchHistoryResume} from '../services/matchHistory';
+import {linkMatchHistoryResume,getMatchHistory,historyJobsForContinuation} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
 import {MATCH_V4_PREVIEW,matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
 import '../styles/resume-match.css';
@@ -19,6 +19,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [savedId,setSavedId]=useState('');
  const [savedPickerOpen,setSavedPickerOpen]=useState(false);
  const deepLinkPending=useRef<string|null>(new URLSearchParams(window.location.search).get('resume'));
+ const historyPending=useRef<string|null>(new URLSearchParams(window.location.search).get('history'));
  const [previewText,setPreviewText]=useState('');
  const [previewLoaded,setPreviewLoaded]=useState(false);
  const [previewBusy,setPreviewBusy]=useState(false);
@@ -94,7 +95,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  },[user?.id]);
  function selectSavedResume(id:string){
   if(working||saveBusy)return;
-  deepLinkPending.current=null;
+  deepLinkPending.current=null;historyPending.current=null;
   previewController.current?.abort();
   setPreviewText('');setPreviewLoaded(false);setPreviewError('');setConsent(false);
   setOcrFile(null);setOcrBusy(false);setPreviewNote('');
@@ -106,7 +107,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  }
  function choose(candidate:File|null){
   if(working||saveBusy)return;
-  deepLinkPending.current=null;
+  deepLinkPending.current=null;historyPending.current=null;
   setSavedPickerOpen(false);
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setPreviewError('');setConsent(false);
   setOcrFile(null);setOcrBusy(false);setPreviewNote('');
@@ -216,14 +217,24 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     // in that case do not start the AI request.
     if(abort.signal.aborted)throw new DOMException('Cancelled','AbortError');
    }
-   const matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,matchResumeId||undefined,
+   let priorJobs:MatchedJob[]=[],runOptions=options;
+   if(MATCH_V4_PREVIEW&&historyPending.current&&matchResumeId){
+    const detail=await getMatchHistory(historyPending.current);
+    if(detail.engine!=='V4'||detail.resume_id!==matchResumeId)throw Error('历史任务与当前简历不匹配，请重新选择。');
+    priorJobs=historyJobsForContinuation(detail);
+    runOptions={...options,role_hint:detail.role_hint,history_id:detail.id,exclude_urls:priorJobs.map(job=>job.official_url)};
+    setPartialJobs(priorJobs);
+   }
+   const combine=(jobs:MatchedJob[])=>[...new Map([...priorJobs,...jobs].map(job=>[job.official_url,job])).values()];
+   const matched=await submitExtractedResumeText(previewText,runOptions,consent,abort.signal,matchResumeId||undefined,
     stage=>{if(!abort.signal.aborted)progress(stage);},
-    jobs=>{if(!abort.signal.aborted)setPartialJobs(jobs);},
+    jobs=>{if(!abort.signal.aborted)setPartialJobs(combine(jobs));},
     detail=>{if(!abort.signal.aborted)setActivity(detail);});
    if(abort.signal.aborted)return;
    setOptimizationSource(redactResumeTextLocally(previewText));
-   lastSearch.current={text:previewText,options,resumeId:matchResumeId||undefined};
-   setResult(matched);setPartialJobs([]);
+   lastSearch.current={text:previewText,options:runOptions,resumeId:matchResumeId||undefined};
+   historyPending.current=null;
+   setResult({...matched,matches:combine(matched.matches)});setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
    setConsent(false);
   }catch(e){
