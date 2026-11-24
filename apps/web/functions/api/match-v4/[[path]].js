@@ -135,14 +135,19 @@ export async function onRequest({request,env}){
   try{const score=await scoreVerifiedV4Job(env,body.job,resume,{signal:request.signal});
    if(body.history_id)try{await patchV4Job(db,session.phone,body.history_id,body.job.official_url,score);}catch{}
    return reply({ok:true,score});}
-  catch(e){return fail(e?.code||'V4_SCORE_UNAVAILABLE',502);}
+  catch(e){const code=e?.code||e?.message||'V4_SCORE_UNAVAILABLE';
+   return fail(/^(AI_PROVIDER_|JD_)/.test(code)?code:'V4_SCORE_UNAVAILABLE',/^JD_/.test(code)?422:502);
+  }
  }
  if(suffix==='/jd'){
   if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
   try{const job=await prepareV4JobForOptimization(env,body.official_url,{signal:request.signal,expectedTitle:typeof body.title==='string'?body.title:undefined});
    if(body.history_id)try{await patchV4Job(db,session.phone,body.history_id,body.official_url,job);}catch{}
    return reply({ok:true,job});}
-  catch(e){return fail(e?.message==='JD_ARCHIVE_DISABLED'?'JD_ARCHIVE_DISABLED':e?.message==='JD_JOB_IDENTITY_MISMATCH'?'JD_JOB_IDENTITY_MISMATCH':'JD_NOT_COMPLETE_ENOUGH',422)}
+  catch(e){
+   if(e?.code==='V4_PAGE_TEMPORARILY_UNAVAILABLE'||e?.name==='TypeError'||e?.name==='TimeoutError')return fail('V4_PAGE_TEMPORARILY_UNAVAILABLE',503);
+   return fail(e?.message==='JD_ARCHIVE_DISABLED'?'JD_ARCHIVE_DISABLED':e?.message==='JD_JOB_IDENTITY_MISMATCH'?'JD_JOB_IDENTITY_MISMATCH':'JD_NOT_COMPLETE_ENOUGH',422);
+  }
  }
  // The third-party relay is not OpenAI official infrastructure.
  if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
