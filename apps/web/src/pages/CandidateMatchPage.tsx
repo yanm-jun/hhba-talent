@@ -7,7 +7,7 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
+import {MATCH_V4_PREVIEW,matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -115,8 +115,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   setStorageChoice('undecided');
   if(!candidate){setFile(null);return}
   const format=resumeFileFormat(candidate.name);
-  if(!format||candidate.size<30||candidate.size>maxResumeSize){
-    setFile(null);setError('请选择 3 MB 以内的 Word（DOCX）或 PDF 简历。');return;
+  if(!format||candidate.size<30||(!MATCH_V4_PREVIEW&&candidate.size>maxResumeSize)){
+    setFile(null);setError(MATCH_V4_PREVIEW?'请选择有效的 Word（DOCX）或 PDF 简历。':'请选择 3 MB 以内的 Word（DOCX）或 PDF 简历。');return;
   }
   setFile(candidate);
   void preview(candidate);
@@ -241,7 +241,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setPartialJobs(collected);
   try{
    const next=await submitExtractedResumeText(search.text,{...search.options,
-    exclude_urls:previous.matches.map(job=>job.official_url).slice(-50)},true,abort.signal,search.resumeId,
+    exclude_urls:MATCH_V4_PREVIEW?previous.matches.map(job=>job.official_url):previous.matches.map(job=>job.official_url).slice(-50)},true,abort.signal,search.resumeId,
     stage=>{if(!abort.signal.aborted)progress(stage);},
     jobs=>{if(!abort.signal.aborted){collected=combine(jobs);setPartialJobs(collected);}},
     detail=>{if(!abort.signal.aborted)setActivity(detail);});
@@ -343,7 +343,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
        </div></div>}
     <div className="hhba-ai-layout">
       <section className="hhba-ai-upload">
-        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>支持 Word（DOCX）和 PDF，最大 3 MB。</p></header>
+        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>{MATCH_V4_PREVIEW?'支持 Word（DOCX）和 PDF。':'支持 Word（DOCX）和 PDF，最大 3 MB。'}</p></header>
         {user&&privateResumeAvailable&&savedFiles.length>0&&<div className="hhba-ai-saved-picker">
           <button type="button" className="hhba-ai-saved-picker-trigger"
            aria-expanded={savedPickerOpen} aria-controls="hhba-ai-existing-options"
@@ -399,7 +399,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           {!previewError&&identifiedCharacters>0&&<small role="status">已识别 {identifiedCharacters} 个非空白字符，请核对工作经历、技能和求职方向。</small>}
           {previewNote&&<small role="status">{previewNote}</small>}
           {previewError&&<p className="hhba-ai-error" role="alert">{previewError} 你可以在下方粘贴或补全简历文字。</p>}
-          <textarea id="hhba-ai-text-preview" rows={6} maxLength={20000} value={previewText}
+          <textarea id="hhba-ai-text-preview" rows={6} maxLength={MATCH_V4_PREVIEW?undefined:20000} value={previewText}
            disabled={working||saveBusy||ocrBusy} onChange={e=>{setPreviewText(e.target.value);setConsent(false);}}/>
           <small>{identifiedCharacters<30?'请输入至少 30 个非空白字符。':'可直接修改，最多 20,000 字。'}</small>
          </div>}
@@ -427,7 +427,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           <p>可选填目标方向；不填写时，AI 会根据简历为你推荐。</p></header>
         <div className="hhba-ai-mainland-only"><span>工作区域</span><strong>中国大陆</strong><small>不推荐港澳台或境外岗位</small></div>
         <div className="hhba-ai-fields hhba-ai-fields-one">
-         <label>目标岗位方向<input value={options.role_hint} maxLength={80} placeholder="例如：软件开发、数据分析、销售、视觉设计"
+         <label>目标岗位方向<input value={options.role_hint} maxLength={MATCH_V4_PREVIEW?undefined:80} placeholder="例如：软件开发、数据分析、销售、视觉设计"
           onChange={e=>setOptions(x=>({...x,role_hint:e.target.value}))}/></label>
         </div>
         <p className="hhba-ai-notice" role="status">
