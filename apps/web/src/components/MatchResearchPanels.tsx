@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import '../styles/resume-match-dialog.css';
 import type {MatchProfile,MatchResearchReport,MatchedJob,NativeMatchProgress} from '../services/resumeMatch';
 
 const stages=[
