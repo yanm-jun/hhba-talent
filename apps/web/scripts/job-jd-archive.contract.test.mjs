@@ -388,7 +388,7 @@ test('full Word optimization and V4 reassessment use actual authenticated saved 
 
 
 test('V4 Word score and optimization reject stale revision responses and allow fresh explicit research',()=>{
- const ui=readFileSync(new URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
+ const ui=readFileSync(new globalThis.URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
  assert.match(ui,/scoreRequest\.current\?\.abort\(\)/);
  assert.match(ui,/controller\.signal\.aborted\|\|scoreRequest\.current!==controller/);
  assert.match(ui,/result\.job_id!==scoreJobId/);
