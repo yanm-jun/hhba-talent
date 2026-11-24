@@ -4,8 +4,8 @@ import type {ResumeBlock,ResumeSuggestion} from './targetedResumeOptimization';
 
 export type ResumeOptimizationStatus={
  kind:'HHBA_RESUME_OPTIMIZATION_V1';enabled:boolean;configured:boolean;
- per_account_daily_limit:number;global_daily_limit:number;
- per_account_daily_attempt_limit?:number;global_daily_attempt_limit?:number;
+ per_account_daily_limit:number|null;global_daily_limit:number|null;
+ per_account_daily_attempt_limit?:number|null;global_daily_attempt_limit?:number|null;
  full_document_enabled?:boolean;
 };
 const OPTIMIZATION_ERRORS:Record<string,string>={
