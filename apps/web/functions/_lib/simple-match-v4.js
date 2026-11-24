@@ -89,6 +89,12 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent}={}){
  }
  if(response.status>=300&&response.status<400)throw fault('AI_PROVIDER_REDIRECT_BLOCKED');
  if(!response.ok){
+  // A relay may not implement streaming. Retry once without SSE only for
+  // explicit request rejection, not after a streamed job already started.
+  if(provider.stream&&[400,422].includes(response.status)){
+   await response.body?.cancel().catch(()=>{});
+   return v4Call(fetcher,{...provider,stream:false},payload,{signal,onEvent});
+  }
   if([401,403].includes(response.status))throw fault('AI_PROVIDER_KEY_REJECTED');
   if(response.status===402)throw fault('AI_PROVIDER_BALANCE_INSUFFICIENT');
   if(response.status===429)throw fault('AI_PROVIDER_RATE_LIMITED');
