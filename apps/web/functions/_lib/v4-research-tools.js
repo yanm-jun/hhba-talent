@@ -70,7 +70,7 @@ export async function v4RunResearchActions(actions,opts){
 const stageGuide='可调用 research_actions 数组或 research_action 单项工具。除公开来源工具外，{type:"text_page",collection:"resume"|"jd"|"document",offset:字符偏移} 可读取当前任务原文的后续页。原文仅用于本次模型研究，禁止作为搜索词或传往网页工具。若输入显示分页，必须阅读全部相关原文并结合证据再判断。可用 research_notes 保留简洁、可核对的阶段研究发现；不能用摘要替代原文证据。当前阶段如需复查网页，使用 read_page；recheck只在全局搜索与复盘阶段执行，不直接改变已核验JD。';
 export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetcher,browser,signal,resume='',jd='',document='',collections={},ledger=[],note=()=>{}}={}){
  const original=JSON.parse(payload.input);
- const knownUrls=new Set(sourceUrls.map(v4PublicJobUrl).filter(Boolean));
+ const knownUrls=new Set([...sourceUrls,...ledger.map(r=>r.url)].map(v4PublicJobUrl).filter(Boolean));
  const seen=new Set(),stageLedger=[...ledger],notes=[];let budget=90000,paged=false,results=null,repeat=false;
  const originals={resume,jd,document};
  const delivered={resume:[],jd:[],document:[]};
@@ -95,7 +95,7 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
   if(results)input.research_tool_results=results;
   const indexPage=v4ResearchMemoryPage(v4EvidenceIndex(stageLedger),0,Math.max(256,Math.floor(budget/3)));
   if(stageLedger.length)input.research_evidence={total:indexPage.total,next_cursor:indexPage.next_cursor,items:indexPage.items};
-  if(notes.length)input.research_notes=v4ResearchMemoryPage(notes,0,Math.max(256,Math.floor(budget/3))).items;
+  if(notes.length){const latest=v4ResearchMemoryPage([...notes].reverse(),0,Math.max(256,Math.floor(budget/3)));input.research_notes=latest.items.reverse();input.research_notes_index={total:notes.length,collection:'notes',order:'chronological'};}
   let response;
   try{response=await call({...payload,instructions:payload.instructions+' '+V4_RESEARCH_TOOL_GUIDE+' '+stageGuide,input:JSON.stringify(input)})}
   catch(e){

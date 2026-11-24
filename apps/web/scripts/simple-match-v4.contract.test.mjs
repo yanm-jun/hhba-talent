@@ -842,3 +842,24 @@ test('V4 stage retains earlier public evidence while later tool results arrive',
  },{instructions:'test',input:JSON.stringify({resume_text:resume})},{parse:r=>r.value,sourceUrls:[url],resume,ledger,fetcher:async()=>new Response('官方岗位原文',{headers:{'content-type':'text/plain'}})});
  assert.equal(result.value.score,85);assert.equal(ledger.length,1);assert.equal(ledger[0].text,'官方岗位原文');
 });
+
+
+test('V4 stage can independently refresh a public source retained by an earlier stage',async()=>{
+ const {v4StageResearchCall}=await import('../functions/_lib/v4-research-tools.js');
+ const ledger=[{type:'read_page',mode:'static',url,offset:0,text:'older JD'}];let calls=0;
+ await v4StageResearchCall(async p=>{
+  const i=JSON.parse(p.input);calls++;
+  if(calls===1)return {value:{research_action:{type:'read_page',url,mode:'static'}}};
+  assert.equal(i.research_tool_results[0].ok,true);
+  assert.equal(i.research_tool_results[0].text,'updated JD');return {value:{score:85}};
+ },{instructions:'test',input:'{}'},{parse:r=>r.value,ledger,fetcher:async()=>new Response('updated JD',{headers:{'content-type':'text/plain'}})});
+ assert.equal(calls,2);assert.equal(ledger.length,2);
+});
+test('V4 preserves candidate groups both inside and outside a result wrapper',async()=>{
+ const extra={...row,title:'区域运营支持',url:url+'-extra'};let calls=0;
+ const result=await v4Match(async(u,options)=>{
+  if(!u.endsWith('/responses'))return new Response('blocked',{status:403});
+  calls++;return model({research_complete:true,jobs:[row],result:{positions:[extra]}},[url,extra.url]);
+ },provider,resume,'全国');
+ assert.equal(calls,1);assert.equal(result.matches.length,2);
+});
