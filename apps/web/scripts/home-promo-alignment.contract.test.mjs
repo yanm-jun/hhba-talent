@@ -20,13 +20,13 @@ test('shortened height and mobile stacking retain readable action button',()=>{
  assert.ok(promo.includes('.home-match-promo + .unified-market{margin-top:28px}'));
  assert.ok(promo.includes('.home-match-promo button{justify-content:center}'));
 });
-test('AI CTA, three public entrances and shared job marketplace remain available',()=>{
+test('AI CTA, two core entrances and shared job marketplace remain available',()=>{
  assert.ok(home.includes('className="home-match-promo"'));
  assert.ok(home.includes("const matchTarget=user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'")&&home.includes('onClick={()=>navigate(matchTarget)}')&&home.includes('candidateTarget={matchTarget}'));
   assert.ok(home.includes('开始智能匹配'));
  assert.ok(home.includes('title="求职与机会"'));
  assert.ok(home.includes('title="劳动权益"'));
- assert.ok(home.includes('title="企业招聘导航"'));
+ assert.ok(home.includes('title="劳动权益"'));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
 });
 test('marketplace, workplace plan, talent services and company directory remain in the intended order',()=>{
