@@ -171,20 +171,24 @@ export async function saveVerifiedJobJd(env,raw,{now=new Date()}={}){
 }
 
 const V4_PUBLIC_PROOF='V4_STRUCTURED_JOBPOSTING';
+const V4_HTML_PROOF='V4_EMPLOYER_HTML_JOB';
+const isV4PublicProof=proof=>[V4_PUBLIC_PROOF,V4_HTML_PROOF].includes(proof);
 const v4Key=id=>'official-jds/v4-public/'+id+'.json';
 function normalizeV4Public(raw){
  // This is an independently retrieved same-domain structured posting, not
  // a legal-entity ownership certificate. Never use AI-provided JD text here.
- if(raw?.proof_method!==V4_PUBLIC_PROOF||raw.source_confirmed!==true||
+ if(!isV4PublicProof(raw?.proof_method)||
+  (raw.proof_method===V4_PUBLIC_PROOF?raw.source_confirmed!==true:raw.independently_read!==true)||
   v4PublicJobUrl(raw.canonical_url)!==raw.canonical_url||
   !raw.canonical_url||recruitmentSourceKind(raw.canonical_url)==='THIRD_PARTY_BOARD')return null;
  const body=text(raw.full_jd),company=text(raw.company),title=text(raw.title),location=text(raw.location);
  if(!company||!title||!location||body.length<80||body.length>240000)return null;
- const sections=extractOfficialJdSections(body);
+ const sections=extractOfficialJdSections(body,{full:true});
  if(!sections||sections.full_jd!==body)return null;
  return {canonical_url:raw.canonical_url,company,title,location,
   full_jd:body,sections:sections.sections,content_status:'VERIFIED_SECTIONS',
-  proof_method:V4_PUBLIC_PROOF,source_confirmed:true};
+  proof_method:raw.proof_method,source_confirmed:raw.source_confirmed===true,
+  independently_read:true};
 }
 async function v4PublicIdentity(source){
  const jd_sha256=await sha256Hex(source.full_jd);
@@ -200,7 +204,7 @@ export async function saveV4PublicJobJd(env,raw,{now=new Date()}={}){
  const record={...source,...identity,checked_at};
  await env.HHBA_JOB_JD_R2.put(v4Key(identity.id),JSON.stringify(record),{
   httpMetadata:{contentType:'application/json; charset=utf-8'},
-  customMetadata:{kind:JD_ARCHIVE_KIND,proof_method:V4_PUBLIC_PROOF}
+  customMetadata:{kind:JD_ARCHIVE_KIND,proof_method:source.proof_method}
  });
  return readV4PublicJd(env,identity.id);
 }
@@ -231,7 +235,7 @@ export function publicJdPayload(saved,{includeText=true}={}){
   ...(saved.retrieval_method?{retrieval_method:saved.retrieval_method}:{}),
   ...(includeText?{full_jd:saved.full_jd,sections:saved.sections}:{}),
   disclaimer:saved.fresh?
-   (saved.proof_method===V4_PUBLIC_PROOF?'独立读取的同域结构化招聘 JD；企业法定身份与是否仍在招需要在原始页面确认。':saved.proof_method===ATS_JD_PROOF?
+   (isV4PublicProof(saved.proof_method)?'独立读取的公开招聘 JD；企业官网归属及是否仍在招需要在原始页面确认。':saved.proof_method===ATS_JD_PROOF?
     '企业专属公开 ATS 招聘接口核验的原文；招聘主体法定名称和是否仍在招以企业公告为准。':
     '直接读取受支持企业官网并保存的岗位 JD；不保证此刻仍可投递。'):
    '这是历史岗位 JD 版本，可能已经过期；不能当作最新招聘条件。'
@@ -260,5 +264,5 @@ export async function hydrateVerifiedJobRequirements(env,job){
   throw Error('JD_JOB_IDENTITY_MISMATCH');
  return {...job,title:saved.title,requirements:saved.full_jd,
   official_url:saved.canonical_url,jd_version_id:saved.id,
-  jd_sha256:saved.jd_sha256,source_status:saved.proof_method===V4_PUBLIC_PROOF?'VERIFIED_PUBLIC_JD':'VERIFIED_OFFICIAL_JD'};
+  jd_sha256:saved.jd_sha256,source_status:isV4PublicProof(saved.proof_method)?'VERIFIED_PUBLIC_JD':'VERIFIED_OFFICIAL_JD'};
 }
