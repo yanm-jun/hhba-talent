@@ -32,7 +32,7 @@ test('private storage is acknowledged before reviewed-text matching starts',()=>
  assert.match(run,/setSavedId\(stored\.id\);setFile\(null\)/);
  assert.match(run,/setSavedFiles\(all=>all\.some\(item=>item\.id===stored\.id\)/);
  assert.match(run,/new Event\('hhba:private-resumes-changed'\)/);
- assert.match(run,/submitExtractedResumeText\(previewText,options,consent,abort\.signal,matchResumeId\|\|undefined/);
+ assert.match(run,/submitExtractedResumeText\(previewText,runOptions,consent,abort\.signal,matchResumeId\|\|undefined/);
  assert.doesNotMatch(run,/submitResumeForMatching\(/);
 });
 
