@@ -63,6 +63,7 @@ function valid(body,env){
  if(doc!==undefined&&(!doc||Array.isArray(doc)||typeof doc!=='object'||
   !/^jd_[a-f0-9]{32}$/.test(body.job.jd_version_id||'')||!/^[a-f0-9]{64}$/.test(body.job.jd_sha256||'')||
   typeof doc.text!=='string'||doc.text.length>(env?.HHBA_MATCH_V4_READY==='1'?250000:50000)||
+  (doc.feedback!==undefined&&typeof doc.feedback!=='string')||
   (doc.wanted!==undefined&&(!Array.isArray(doc.wanted)||!doc.wanted.length||
    doc.wanted.length>body.blocks.length))))return false;
  const ids=new Set();
@@ -156,7 +157,8 @@ export async function onRequestPost({request,env}){
  try{
   const signal=env?.HHBA_MATCH_V4_READY==='1'?request.signal:AbortSignal.any([request.signal,AbortSignal.timeout(input.full_document?180000:90000)]);
   const whole=input.full_document?await optimizeResumeDocument({
-   env,blocks,context:redact(input.full_document.text),job,signal,wanted:input.full_document.wanted
+   env,blocks,context:redact(input.full_document.text),job,signal,wanted:input.full_document.wanted,
+   feedback:env?.HHBA_MATCH_V4_READY==='1'&&input.full_document.feedback?redact(input.full_document.feedback):undefined
   }):null;
   const result=whole||await generateSuggestions({env,blocks,job,signal});
   const checked=job.verified&&!whole?await auditTargetedResumeSuggestions({
