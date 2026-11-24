@@ -153,7 +153,7 @@ const SYSTEM_WRITE=`你是 HHBA 的专业简历撰写者，任务是针对给定
 const SYSTEM_AUDIT=`你是独立的 HHBA 简历事实审查员。对照原文与 AI 改写，发现任何无法证实的任职经历、雇主、学历、日期、数字、证书、技能、成果、职责、夸张用语或暗示，必须拒绝该段。招聘启事不是求职者事实来源。
 仅输出 JSON 对象：{"checks":[{"blockId":"源段落ID","safe":true,"concern":"没有问题时空字符串，或写明无法证实的具体事实"}]}。每个段落都要检查，不能跳过；不知道是否安全就 safe:false。`;
 
-export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions,signal}){
+export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions,signal,withCoverage=false}){
  const originalById=new Map(blocks.map(block=>[block.id,block.text]));
  const draftBlocks=[];
  for(const suggestion of suggestions){
@@ -164,7 +164,10 @@ export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions
   if([...numberTokens(suggestion.proposed)].some(token=>!numbers.has(token)))continue;
   draftBlocks.push({blockId:suggestion.blockId,original,proposed:suggestion.proposed});
  }
- if(!draftBlocks.length)return suggestions.filter(item=>item.action==='request_evidence');
+ if(!draftBlocks.length){
+  const accepted=suggestions.filter(item=>item.action==='request_evidence');
+  return withCoverage?{suggestions:accepted,pendingIds:suggestions.filter(item=>item.action!=='request_evidence').map(item=>item.blockId)}:accepted;
+ }
  let reviewer;
  try{reviewer=selectProvider(env,'resume_reviewer');}
  catch(error){
@@ -177,7 +180,9 @@ export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions
   const rows=checks.filter(check=>check?.blockId===block.blockId);
   return rows.length===1&&rows[0].safe===true;
  }).map(block=>block.blockId));
- return suggestions.filter(item=>item.action==='request_evidence'||confirmed.has(item.blockId));
+ const accepted=suggestions.filter(item=>item.action==='request_evidence'||confirmed.has(item.blockId));
+ // Rejected or missing checks need another editing pass, not a false completion.
+ return withCoverage?{suggestions:accepted,pendingIds:suggestions.filter(item=>!accepted.includes(item)).map(item=>item.blockId)}:accepted;
 }
 
 export async function generateTailoredResume({env,blocks,job,signal}){
