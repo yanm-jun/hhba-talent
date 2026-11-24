@@ -1,22 +1,19 @@
 import {useEffect,useId,useRef,useState} from 'react';
-import {Bookmark,BriefcaseBusiness,ChevronDown,ChevronRight,ClipboardList,FileUser,LayoutDashboard,MousePointerClick,Scale,Search,ShieldCheck,SlidersHorizontal,UserRound} from 'lucide-react';
+import {Bookmark,BriefcaseBusiness,ChevronDown,ChevronRight,ClipboardList,FileUser,LayoutDashboard,Scale,Search,Settings,UserRound} from 'lucide-react';
 import {Link} from '../router';
 import '../styles/candidate-account-dropdown.css';
 
 // The personal center is a navigation disclosure, not a separate candidate account system.
-// Existing paths remain available. Membership is a clearly labeled, non-collecting preview.
+// Quick links expose active services; account settings opens the existing profile workspace.
 export const CANDIDATE_ACCOUNT_LINKS=[
  {label:'工作台',path:'/candidate/account',Icon:LayoutDashboard},
  {label:'智能岗位匹配',path:'/candidate/match',Icon:Search},
  {label:'我的简历',path:'/candidate/account/resume',Icon:FileUser},
  {label:'我的收藏',path:'/candidate/saved',Icon:Bookmark},
- {label:'匹配历史',path:'/candidate/account/applications',Icon:ClipboardList},
- {label:'一键网申',path:'/candidate/account/apply-assistant',Icon:MousePointerClick},
+ {label:'历史查找',path:'/candidate/account/applications',Icon:ClipboardList},
  {label:'职业成长档案',path:'/candidate/account/career',Icon:BriefcaseBusiness},
- {label:'会员与权益服务',path:'/candidate/account/rights',Icon:ShieldCheck,description:'服务筹备中'},
- {label:'劳动权益知识',path:'/candidate/account/legal-aid',Icon:Scale,description:'免费知识专题'},
- {label:'个人资料',path:'/candidate/account/profile',Icon:UserRound},
- {label:'求职偏好',path:'/candidate/account/preferences',Icon:SlidersHorizontal}
+ {label:'劳动权益知识',path:'/candidate/account/legal-aid',Icon:Scale},
+ {label:'账户设置',path:'/candidate/account/profile',Icon:Settings}
 ] as const;
 
 export function CandidateAccountDropdown({displayName}:{displayName?:string}){
@@ -60,18 +57,16 @@ export function CandidateAccountDropdown({displayName}:{displayName?:string}){
   </button>
   {open&&<div id={id} role="navigation" className="hhba-account-dropdown-panel" aria-label="个人中心快速导航">
     <div className="hhba-account-dropdown-links">
-     {CANDIDATE_ACCOUNT_LINKS.map(({label,path,Icon,...rest})=><Link
+     {CANDIDATE_ACCOUNT_LINKS.map(({label,path,Icon})=><Link
        to={path} key={path} className="hhba-account-dropdown-item"
        onClick={()=>setOpen(false)}>
        <Icon size={16} strokeWidth={1.8} aria-hidden="true"/>
        <span className="hhba-account-dropdown-copy">
         <strong>{label}</strong>
-        {'description' in rest&&<small>{rest.description}</small>}
        </span>
        <ChevronRight size={15} aria-hidden="true" className="hhba-account-dropdown-chevron"/>
       </Link>)}
     </div>
-    <p className="hhba-account-dropdown-footnote">会员购买与案件材料提交尚未开放，请勿在知识页面上传个人敏感证据。</p>
    </div>}
  </div>;
 }

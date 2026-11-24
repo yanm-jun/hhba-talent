@@ -54,7 +54,7 @@ test('all public rights and legal knowledge URLs render independently, while pri
    "if(route==='/rights/support')return <LegalAidInterventionPage user={user}/>",
    String.raw`if(/^\/rights\/knowledge\/[a-z-]{5,60}$/.test(route))return <LegalAidTopicPage`
  ])assert.ok(routes.includes(route),'public route missing: '+route);
- assert.ok(footer.includes("['会员与权益服务','/rights']"));
+ assert.ok(!footer.includes("['会员与权益服务','/rights']"));
  assert.ok(footer.includes("['劳动权益知识','/rights/knowledge']"));
  assert.ok(home.includes(":'/rights/knowledge';"));
  assert.ok(rights.includes('embedded?"个人工作台":"HHBA 首页"'));
@@ -70,7 +70,7 @@ test('all public rights and legal knowledge URLs render independently, while pri
  for(const path of ["/candidate/account/rights","/candidate/account/legal-aid","/candidate/account/legal-aid/intervention"]){
    assert.ok(routes.includes("route==='"+path+"'"),'private route missing: '+path);
  }
- assert.ok(personal.includes("path:'/candidate/account/rights'"));
+ assert.ok(!personal.includes("path:'/candidate/account/rights'"));
  assert.ok(dropdown.includes("path:'/candidate/account/legal-aid'"));
  for(const path of ["/rights","/rights/knowledge","/rights/support"])assert.ok(search.includes("path:'"+path+"'"));
 });
@@ -78,7 +78,7 @@ test('public browsing remains available, while both homepage AI matching entranc
  const home=read('../src/pages/HomePage.tsx');
  const shell=read('../src/components/Shell.tsx');
  assert.ok(home.includes("kind==='candidate'?(candidateTarget||'/candidate/match')"));
- assert.ok(shell.includes("['我要应聘','/candidate/jobs']"));
+ assert.ok(shell.includes("['招聘市场','/candidate/jobs']"));
  assert.ok(shell.includes("if(route==='/candidate')return signedIn?'candidate':'public'"));
  assert.ok(shell.includes("return 'public';"));
  assert.ok(home.includes("const matchTarget=user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'")&&home.includes('onClick={()=>navigate(matchTarget)}')&&home.includes('candidateTarget={matchTarget}'),'signed-in users go directly to AI matching, others sign in with return destination');

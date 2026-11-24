@@ -26,7 +26,7 @@ const pages:{id:Section;label:string;icon:typeof UserRound;description:string}[]
  {id:'profile',label:'个人资料',icon:UserRound,description:'填写真实个人资料'},
  {id:'preferences',label:'求职偏好',icon:SlidersHorizontal,description:'地点、职位和工作方式'},
  {id:'resume',label:'我的简历',icon:FileUser,description:'账户私有简历管理'},
- {id:'applications',label:'匹配历史',icon:BriefcaseBusiness,description:'AI 推荐的岗位及适配理由'},
+ {id:'applications',label:'历史查找',icon:BriefcaseBusiness,description:'AI 推荐的岗位及适配理由'},
  {id:'privacy',label:'账户与隐私',icon:ShieldCheck,description:'账户安全与历史数据管理'},
  {id:'career',label:'职业成长档案',icon:BriefcaseBusiness,description:'管理现有职业资料与简历'},
 ];
@@ -35,12 +35,11 @@ const navGroups=[
   {label:'智能岗位匹配',path:'/candidate/account/match',Icon:Search},
   {label:'我的简历',path:'/candidate/account/resume',Icon:FileUser},
   {label:'我的收藏',path:'/candidate/saved',Icon:Bookmark},
-  {label:'匹配历史',path:'/candidate/account/applications',Icon:History},
+  {label:'历史查找',path:'/candidate/account/applications',Icon:History},
   {label:'一键网申',path:'/candidate/account/apply-assistant',Icon:MousePointerClick}
  ]},
  {title:'职业与权益',items:[
   {label:'职业成长档案',path:'/candidate/account/career',Icon:BriefcaseBusiness},
-  {label:'会员与权益服务',path:'/candidate/account/rights',Icon:ShieldCheck},
   {label:'劳动权益知识',path:'/candidate/account/legal-aid',Icon:Scale}
  ]},
  {title:'账户管理',items:[
@@ -184,7 +183,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
  }
  const areaLabels:Record<AccountArea,string>={general:'一般访问',jobs:'岗位浏览',companies:'企业资料',policies:'人才政策',tools:'求职工具',job_save:'岗位收藏操作'};
  const trackingPrevented=typeof navigator!=='undefined'&&(navigator.doNotTrack==='1'||(navigator as Navigator & {globalPrivacyControl?:boolean}).globalPrivacyControl===true);
- const embeddedTitles:Partial<Record<EmbeddedSection,string>>={match:'智能岗位匹配',rights:'会员与权益服务','legal-aid':'劳动权益知识','legal-aid-intervention':'劳动权益知识','legal-aid-topic':'劳动权益知识'};
+ const embeddedTitles:Partial<Record<EmbeddedSection,string>>={match:'智能岗位匹配',rights:'劳动权益','legal-aid':'劳动权益知识','legal-aid-intervention':'劳动权益知识','legal-aid-topic':'劳动权益知识'};
  const sectionTitle=current==='apply-assistant'?'一键网申':embeddedTitles[current as EmbeddedSection]||pages.find(page=>page.id===current)?.label||'个人中心';
  if(!user?.account_types?.includes('candidate'))return <Shell user={user}><section className="hhba-personal"><p role="status">请先使用真实求职者账号登录。</p><Link to="/candidate/login">前往登录</Link></section></Shell>;
  return <Shell user={user}>
@@ -229,11 +228,11 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
       </div>
      </section>
      <section className="hhba-workbench-rights" aria-labelledby="hhba-workbench-rights-title">
-      <div className="hhba-workbench-rights-head"><h3 id="hhba-workbench-rights-title">职业与劳动权益</h3><span>服务筹备中</span></div>
+      <div className="hhba-workbench-rights-head"><h3 id="hhba-workbench-rights-title">职业与劳动权益</h3><span>免费知识</span></div>
       <div className="hhba-workbench-rights-main"><span className="hhba-workbench-rights-icon"><ShieldCheck size={21}/></span>
-       <div><strong>长期职业与权益支持</strong><p>了解会员资格、月度服务及劳动法律支持。</p></div>
+       <div><strong>劳动权益知识</strong><p>免费了解劳动合同、工资、社保与职场权益知识。</p></div>
       </div>
-      <Link to="/candidate/account/rights" className="hhba-workbench-rights-link">查看权益服务详情 <ArrowRight size={16}/></Link>
+      <Link to="/candidate/account/legal-aid" className="hhba-workbench-rights-link">查看劳动权益知识 <ArrowRight size={16}/></Link>
      </section>
      <p className="hhba-workbench-signature">HHBA · YOUR CAREER, CONTINUED</p>
      {error&&<p className="hhba-personal-error" role="alert">{error}</p>}

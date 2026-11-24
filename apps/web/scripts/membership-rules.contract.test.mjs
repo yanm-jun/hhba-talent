@@ -137,14 +137,15 @@ test('one career workbench keeps all service entry points without fake member st
  assert.doesNotMatch(main,/return <AuthChoicePage/);
  assert.match(personal,/职业与权益/);
  assert.match(personal,/职业成长档案/);
- assert.match(personal,/会员与权益服务/);
+ assert.doesNotMatch(personal,/会员与权益服务/);
  assert.match(personal,/hhba-workbench-overview/);
  assert.match(personal,/hhba-workbench-rights/);
  assert.doesNotMatch(personal,/hhba:career-stage:|hhba-career-switch|¥24\.90/);
  assert.match(rights,/¥24\.90/);
  assert.match(rights,/尚未开放购买/);
  assert.match(rights,/不包含仲裁和诉讼代理/);
- assert.match(dropdown,/\/candidate\/account\/rights/);
+ assert.doesNotMatch(dropdown,/\/candidate\/account\/rights/);
+ assert.match(dropdown,/\/candidate\/account\/legal-aid/);
  assert.match(main,/if\(route==='\/candidate\/account\/rights'\)return <WorkplaceRightsPage/);
  assert.equal(config.membership.priceCents,2490);
  assert.equal(config.membership.purchaseEnabled,false);

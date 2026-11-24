@@ -5,6 +5,14 @@ const css=readFileSync(new URL('../src/styles/experience-navigation.css',import.
 let passed=0;function check(name,fn){fn();passed++;console.log('✓ '+name)}
 function nav(){const i=shell.indexOf('<header className="topbar');const j=shell.indexOf('</header>',i);assert.ok(i>=0);assert.ok(j>i);return shell.slice(i,j);}
 const header=nav();
+const dropdown=readFileSync(new URL('../src/components/CandidateAccountDropdown.tsx',import.meta.url),'utf8');
+check('Account shortcuts expose eight active destinations without retired membership or apply assistant',()=>{
+ const links=[...dropdown.matchAll(/\{label:'([^']+)',path:'([^']+)'/g)];
+ assert.deepEqual(links.map(m=>m[1]),['工作台','智能岗位匹配','我的简历','我的收藏','历史查找','职业成长档案','劳动权益知识','账户设置']);
+ assert.equal(new Set(links.map(m=>m[2])).size,8);
+ assert.doesNotMatch(dropdown,/会员|一键网申|apply-assistant|服务筹备中/);
+ assert.ok(dropdown.includes("label:'账户设置',path:'/candidate/account/profile'"));
+});
 check('Top navigation keeps only high-value shortcuts',()=>{
  for(const text of ['海外发展','人才政策','招聘市场','加入我们','个人中心','登录 / 注册'])assert.ok(header.includes(text),text);
  assert.ok(header.includes('<HeaderSiteSearch/>'));
@@ -24,10 +32,11 @@ check('Candidate account remains the personal-center entry',()=>{
 });
 check('Footer contains the complete categorized navigation',()=>{
  for(const group of ['求职服务','职业机会','劳动者权益','关于汇方','服务与帮助'])assert.ok(shell.includes("title:'"+group+"'"),group);
- for(const path of ['/candidate/match','/candidate/account/resume','/candidate/account/applications','/candidate/account/apply-assistant','/candidate/account/career','/commitment','/vision','/join','/data-use','/membership/rules'])
+ for(const path of ['/candidate/match','/candidate/account/resume','/candidate/account/applications','/candidate/account/apply-assistant','/candidate/account/career','/commitment','/vision','/join','/data-use','/candidate/account/privacy','/rights/knowledge'])
   assert.ok(shell.includes("['")&&shell.includes(path),path);
  assert.ok(shell.includes('<SiteFooter/>'));
  assert.doesNotMatch(shell,/企业招聘导航|\/companies\/library/);
+ assert.doesNotMatch(shell,/会员与权益服务|会员服务规则|\/membership\/rules/);
 });
 check('Footer is not a second product navigation system',()=>{
  assert.equal((shell.match(/function SiteFooter\(/g)||[]).length,1);
