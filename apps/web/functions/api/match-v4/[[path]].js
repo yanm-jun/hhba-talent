@@ -7,7 +7,7 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {v4Provider,v4Match,v4Call,v4OutputText} from '../../_lib/simple-match-v4.js';
 import {prepareV4JobForOptimization} from '../../_lib/v4-jd-bridge.js';
-import {saveV4Round,patchV4Job} from '../../_lib/v4-match-history.js';
+import {saveV4Round,patchV4Job,finishV4History} from '../../_lib/v4-match-history.js';
 import {scoreVerifiedV4Job} from '../../_lib/v4-jd-score.js';
 import {validateResumeBytes,RESUME_LIMIT_BYTES} from '../../_lib/private-resume-validation.js';
 
@@ -90,7 +90,7 @@ export async function onRequest({request,env}){
  if(suffix==='/status'&&request.method==='GET')
   return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:enabled(env,request),
    scope:'CN_MAINLAND_ONLY',formats:['pdf','docx']});
- if(!['/resume','/jd','/ocr','/score'].includes(suffix)||request.method!=='POST')return fail('NOT_FOUND',404);
+ if(!['/resume','/jd','/ocr','/score','/finish'].includes(suffix)||request.method!=='POST')return fail('NOT_FOUND',404);
  if(!enabled(env,request))return fail('MATCH_NOT_ENABLED',503);
  const origin=new URL(request.url).origin;
  if(request.headers.get('Origin')!==origin||
@@ -124,6 +124,10 @@ export async function onRequest({request,env}){
   const text=await request.text();
   body=JSON.parse(text);
  }catch{return fail('INVALID_REQUEST',400)}
+ if(suffix==='/finish'){
+  try{return (await finishV4History(db,session.phone,body?.history_id))?reply({ok:true}):fail('MATCH_HISTORY_NOT_FOUND',404);}
+  catch{return fail('MATCH_HISTORY_DB_NOT_READY',503);}
+ }
  if(suffix==='/score'){
   if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
   const resume=sanitize(body.text);if(!resume)return fail('INVALID_RESUME_TEXT',400);
