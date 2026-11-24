@@ -2,6 +2,7 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen,Printer,FileDown,PencilLine,X ,ChevronDown} from 'lucide-react';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 import {getRealAuthToken,realAuthReady} from '../services/realAuth';
+import {MATCH_V4_PREVIEW} from '../services/resumeMatch';
 import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimizationStatus} from '../services/resumeOptimizationApi';
 import {getWholeRewriteStatus,requestWholeResumeRewrite,continueWholeResumeRewrite,type ResumeWholeRewriteResult,type ResumeWholeRewriteStatus} from '../services/resumeWholeRewriteApi';
 import {completeRewriteSource} from '../services/resumeWholeRewriteSource';
@@ -309,7 +310,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   // checkpoint must verify again on the server before that tool can run.
   while(!controller.signal.aborted&&latest.autonomy?.needs_more_work&&
    latest.continuation?.enabled&&latest.continuation.checkpoint){
-   if((latest.autonomy.tools_used?.length||0)>=64){
+   if(!MATCH_V4_PREVIEW&&(latest.autonomy.tools_used?.length||0)>=64){
     setNotice('本轮已到达技术保护边界。当前完整草稿已保留，可先审阅。');
     break;
    }
@@ -348,7 +349,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   * summary-based behavior, explicitly labelled as incomplete evidence.
   */
  async function jobContextForAI(signal:AbortSignal):Promise<JdAwareJob>{
-  const title=(job.title_zh||job.title).slice(0,180);
+  const title=MATCH_V4_PREVIEW?(job.title_zh||job.title):(job.title_zh||job.title).slice(0,180);
   if(!postingScope)throw Error('岗位官网地址无效，已阻止可能串岗的简历优化。');
   if(requireVerifiedJd&&(!job.jd_version_id||!job.jd_sha256))
    throw Error('请先完成此岗位的 JD 核验，再优化简历。');
@@ -441,8 +442,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    const trustedJob=await jobContextForAI(controller.signal);
    if(controller.signal.aborted)return;
    const targetedJob={
-    ...trustedJob,title:trustedJob.title.slice(0,120),
-    requirements:trustedJob.requirements.slice(0,16000)
+    ...trustedJob,title:MATCH_V4_PREVIEW?trustedJob.title:trustedJob.title.slice(0,120),
+    requirements:MATCH_V4_PREVIEW?trustedJob.requirements:trustedJob.requirements.slice(0,16000)
    };
    const context=sourceResume?(wordDocumentText.current||sourceText||''):(sourceText||'');
    const full=requireVerifiedJd;
@@ -452,7 +453,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    const prior=full&&previousOptimization.current?.key===key?previousOptimization.current:null;
    let pending:string[]=[];
    const incoming=prior&&!prior.pending.length?prior.suggestions:
-    await requestResumeOptimization(full?currentBlocks:currentBlocks.slice(0,12),targetedJob,controller.signal,
+    await requestResumeOptimization(full||MATCH_V4_PREVIEW?currentBlocks:currentBlocks.slice(0,12),targetedJob,controller.signal,
      full?{text:context,wanted:prior?.pending,onPending:ids=>{pending=ids;},
       onQueued:()=>setNotice('简历优化正在排队，轮到后会继续。')}:undefined);
    const combined=[...new Map([...(prior?.suggestions||[]),...incoming].map(item=>[item.blockId,item])).values()];
@@ -516,7 +517,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   if(text.length<8){setNotice('请具体描述你的真实经历或成果，至少8个字。');return;}
   if(!confirmed.includes(s.id)){setNotice('请确认补充内容真实、准确后再填充。');return;}
   const original=version.blocks.find(b=>b.id===s.blockId)?.text||'';
-  if(original.length+1+text.length>1600){
+  if(!MATCH_V4_PREVIEW&&original.length+1+text.length>1600){
    setNotice('原文加补充内容超过单段 1600 字，请精简后重试。');return;
   }
   try{
@@ -559,7 +560,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     </div>
     {editingSuggestionId===s.id?<label className="targeted-resume-fact-entry">
      <span>直接修改 AI 建议文字（填写后仍须确认真实性）</span>
-     <textarea maxLength={1600} rows={4} aria-label="修改 AI 建议"
+     <textarea maxLength={MATCH_V4_PREVIEW?undefined:1600} rows={4} aria-label="修改 AI 建议"
       className="hhba-siri-typing" value={draft}
       onChange={e=>setSuggestionDrafts(old=>({...old,[s.id]:e.target.value}))}/>
     </label>:<p className="targeted-resume-gradient">{draft}</p>}
@@ -567,7 +568,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     <p className="targeted-resume-rationale">{s.rationale}</p>
     {s.action==='request_evidence'&&<label className="targeted-resume-fact-entry">
      <span>补充自己的真实经历或成果（AI 不会猜测数据）</span>
-     <textarea maxLength={800} rows={3} value={newEvidence[s.id]||''}
+     <textarea maxLength={MATCH_V4_PREVIEW?undefined:800} rows={3} value={newEvidence[s.id]||''}
       className={(newEvidence[s.id]||'').trim()?'hhba-siri-typing':''}
       onChange={e=>setNewEvidence(prev=>({...prev,[s.id]:e.target.value}))}
       placeholder="例如：你在这个岗位具体做过哪些工作？"/>
@@ -598,7 +599,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   return <div className={'targeted-resume-inline-region'+(pending?' has-ai-suggestion':'')} data-resume-block-id={id}>
    <div className="targeted-resume-inline-anchor">
     {editingBlock===id?<div className="targeted-resume-inline-editor">
-     <textarea rows={4} maxLength={1600} value={manualText}
+     <textarea rows={4} maxLength={MATCH_V4_PREVIEW?undefined:1600} value={manualText}
       onChange={e=>setManualText(e.target.value)}
       className={manualText!==block.text?'hhba-siri-typing':''}
       aria-label="编辑当前简历段落"/>
