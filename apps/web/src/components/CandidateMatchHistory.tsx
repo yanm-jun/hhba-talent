@@ -36,7 +36,7 @@ function toOptimizerJob(job:HistoryMatchedJob,historyId:string,index:number):Mat
   // These are the *saved* reasons, not a freshly fetched job description.
   requirements_basis:(job.evidence_status==='PARTIAL_SOURCE'&&job.evidence_excerpt?
    job.evidence_excerpt:[job.score_basis,job.recommendation_reason].filter(Boolean).join('\n')).slice(0,1800),
-  evidence_status:job.evidence_status,evidence_excerpt:job.evidence_excerpt,
+  evidence_status:job.evidence_status,evidence_excerpt:job.evidence_excerpt,evidence_score_status:job.evidence_score_status,
   score_basis:job.score_basis,recommendation_reason:job.recommendation_reason,
   recruitment_source_note:job.recruitment_source_note,
   recruitment_source_kind:job.recruitment_source_kind==='EMPLOYER_ATS'?'EMPLOYER_ATS':
@@ -248,7 +248,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
       </article>;
      })}
      <div className="hhba-match-history-actions">
-      {selected.resume_id?<Link to={'/candidate/account/match?resume='+encodeURIComponent(selected.resume_id)}>用这份简历重新匹配</Link>:
+      {selected.resume_id?<Link to={'/candidate/account/match?resume='+encodeURIComponent(selected.resume_id)+(selected.engine==='V4'&&selected.research_pending?'&history='+encodeURIComponent(selected.id):'')}>{selected.engine==='V4'&&selected.research_pending?'恢复上次搜索':'用这份简历重新匹配'}</Link>:
        <Link to="/candidate/account/match">上传简历重新匹配</Link>}
       {view==='details'&&<button type="button" className="hhba-match-history-optimize-secondary"
        disabled={busy} onClick={()=>void open(selected.id,'optimize')}><Sparkles size={15}/> 优化历史岗位简历</button>}
