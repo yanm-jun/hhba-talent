@@ -377,11 +377,23 @@ test('full Word optimization and V4 reassessment use actual authenticated saved 
  assert.match(ui,/fetchPrivateResumeForLocalReview\(sourceResume\),wordSourceBytes\(sourceResume.id,revision,postingScope\)/);
  assert.match(ui,/beforeBlocks=sourceResumeBlocks\(redactResumeTextLocally\(originalText\),true\)/);
  assert.match(ui,/afterBlocks=sourceResumeBlocks\(redactResumeTextLocally\(editedText\),true\)/);
- assert.match(ui,/reassessResume\(scoreJobId,profile,beforeBlocks,afterBlocks,undefined,v4Reassessment\)/);
+ assert.match(ui,/reassessResume\(scoreJobId,profile,beforeBlocks,afterBlocks,controller.signal,v4Reassessment\)/);
  assert.match(ui,/wordSourceBytes\(sourceResume.id,wordRevisionSnapshot.revision,postingScope\)/);
  assert.match(ui,/context=redactResumeTextLocally\(await extractDocxText/);
  assert.match(ui,/revisionKey!==lastWordRevisionKey.current/);
  assert.match(ui,/hasVerifiedWordRevision&&\(v4Reassessment\|\|verifiedWordScore.ok\)/);
  assert.match(source,/Number\(requested\)!==state.revision/);
  assert.match(ui,/!job.jd_version_id&&!hasAuditedAtsIdentity&&verifyStatus\?\.enabled/);
+});
+
+
+test('V4 Word score and optimization reject stale revision responses and allow fresh explicit research',()=>{
+ const ui=readFileSync(new URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
+ assert.match(ui,/scoreRequest\.current\?\.abort\(\)/);
+ assert.match(ui,/controller\.signal\.aborted\|\|scoreRequest\.current!==controller/);
+ assert.match(ui,/result\.job_id!==scoreJobId/);
+ assert.match(ui,/startingRevision!==lastWordRevisionKey\.current/);
+ assert.match(ui,/previousOptimization\.current\.pending\.length/);
+ assert.doesNotMatch(ui,/prior&&!prior\.pending\.length\?prior\.suggestions/);
+ assert.match(ui,/scoreResult\.job_id===targetedJob\.jd_version_id/);
 });
