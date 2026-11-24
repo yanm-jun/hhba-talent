@@ -222,7 +222,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     const detail=await getMatchHistory(historyPending.current);
     if(detail.engine!=='V4'||detail.resume_id!==matchResumeId)throw Error('历史任务与当前简历不匹配，请重新选择。');
     priorJobs=historyJobsForContinuation(detail);
-    runOptions={...options,role_hint:detail.role_hint,history_id:detail.id,recovery_jobs:priorJobs,exclude_urls:[]};
+    runOptions={...options,role_hint:detail.role_hint,history_id:detail.id,recovery_jobs:priorJobs,exclude_urls:[],research_context:detail.research_checkpoint?{round:detail.research_checkpoint.round,summary:'此前完成的公开招聘研究已保留；根据当前简历继续。'}:undefined};
     setPartialJobs(priorJobs);
    }
    const combine=(jobs:MatchedJob[])=>[...new Map([...priorJobs,...jobs].map(job=>[MATCH_V4_PREVIEW?v4PostingKey(job):job.official_url,job])).values()];

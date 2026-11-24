@@ -7,7 +7,7 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {v4Provider,v4Match,v4Call,v4OutputText} from '../../_lib/simple-match-v4.js';
 import {prepareV4JobForOptimization} from '../../_lib/v4-jd-bridge.js';
-import {saveV4Round,patchV4Job,finishV4History} from '../../_lib/v4-match-history.js';
+import {saveV4Round,patchV4Job,finishV4History,readV4ResearchCheckpoint} from '../../_lib/v4-match-history.js';
 import {scoreVerifiedV4Job} from '../../_lib/v4-jd-score.js';
 import {validateResumeBytes,RESUME_LIMIT_BYTES} from '../../_lib/private-resume-validation.js';
 
@@ -54,11 +54,13 @@ function events(env,request,input){
    send('progress',{stage:'preparing'});
    void (async()=>{
     try{
+     const checkpoint=await readV4ResearchCheckpoint(env.HHBA_PNVS_AUTH_DB,input.phone,input.history_id);
+     const researchContext=checkpoint&&checkpoint.round>(input.research_context?.round||0)?{round:checkpoint.round,summary:'已恢复此前完成的搜索轮次及历史岗位；根据当前原文继续研究。'}:input.research_context;
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
-      signal,excludeUrls:input.exclude_urls,previousPostings:input.previous_postings,researchContext:input.research_context,oneRound:true,skipEnrich:true,onProgress:progress,onActivity:activity,
+      signal,excludeUrls:input.exclude_urls,previousPostings:input.previous_postings,researchContext,oneRound:true,skipEnrich:true,onProgress:progress,onActivity:activity,
       onPartial:matches=>send('partial',{matches})});
      try{
-      result.history_id=await saveV4Round(env.HHBA_PNVS_AUTH_DB,input.phone,{taskId:input.history_id,resumeId:input.resume_id,roleHint:input.role_hint,matches:result.matches,researchPending:result.research_pending});
+      result.history_id=await saveV4Round(env.HHBA_PNVS_AUTH_DB,input.phone,{taskId:input.history_id,resumeId:input.resume_id,roleHint:input.role_hint,matches:result.matches,researchPending:result.research_pending,researchRound:result.research_context?.round});
       result.history_status='SAVED';
      }catch(e){result.history_status='UNAVAILABLE';console.warn('HHBA_V4_HISTORY_WRITE_FAILED',e?.name||'Error');}
      console.info('HHBA_V4_MATCH',JSON.stringify({result:'COMPLETE',

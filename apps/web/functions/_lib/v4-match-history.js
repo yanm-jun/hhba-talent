@@ -22,7 +22,7 @@ function safeJob(x){
  return result;
 }
 const summarySQL="SELECT t.id,t.resume_id,t.resume_label,t.role_hint,t.created_at,t.research_pending,COUNT(j.job_url) job_count,MAX(j.match_score) best_score,0 new_job_count,0 improved_job_count FROM hhba_v4_match_tasks t LEFT JOIN hhba_v4_match_jobs j ON j.task_id=t.id";
-export async function saveV4Round(db,phone,{taskId,resumeId,roleHint,matches,researchPending}){
+export async function saveV4Round(db,phone,{taskId,resumeId,roleHint,matches,researchPending,researchRound}){
  if(!uuid.test(taskId||''))throw Error('INVALID_HISTORY_ID');
  let resume=null;
  if(resumeId){
@@ -44,6 +44,12 @@ export async function saveV4Round(db,phone,{taskId,resumeId,roleHint,matches,res
  };
  for(const job of rows){const n=new TextEncoder().encode(JSON.stringify(job)).byteLength;if(batch.length&&size+n>400000)await write();batch.push(job);size+=n;}
  await write();
+ if(Number.isSafeInteger(researchRound)&&researchRound>0){
+  // Persist operational progress only, never raw CV, profile facts or private prompts.
+  // Existing installations without the additive migration keep their saved jobs.
+  try{await db.prepare('INSERT INTO hhba_v4_research_checkpoints(task_id,completed_round,search_complete) VALUES(?,?,?) ON CONFLICT(task_id) DO UPDATE SET completed_round=excluded.completed_round,search_complete=excluded.search_complete WHERE excluded.completed_round>=hhba_v4_research_checkpoints.completed_round').bind(taskId,researchRound,researchPending?0:1).run();}
+  catch(e){console.warn('HHBA_V4_RESEARCH_CHECKPOINT_UNAVAILABLE',e?.name||'Error');}
+ }
  await db.prepare('UPDATE hhba_v4_match_tasks SET research_pending=? WHERE id=? AND phone=?').bind(1,taskId,phone).run();
  return taskId;
 }
@@ -64,6 +70,13 @@ export async function listV4History(db,phone){
  const rows=await db.prepare(summarySQL+' WHERE t.phone=? GROUP BY t.id ORDER BY t.created_at DESC').bind(phone).all();
  return (rows.results||[]).map(x=>({...x,engine:'V4',research_pending:!!x.research_pending}));
 }
+export async function readV4ResearchCheckpoint(db,phone,id){
+ if(!uuid.test(id||''))return null;
+ try{
+  const row=await db.prepare('SELECT c.completed_round,c.search_complete FROM hhba_v4_research_checkpoints c JOIN hhba_v4_match_tasks t ON t.id=c.task_id WHERE t.id=? AND t.phone=?').bind(id,phone).first();
+  return row&&Number.isSafeInteger(row.completed_round)&&row.completed_round>=0?{round:row.completed_round,search_complete:!!row.search_complete}:null;
+ }catch{return null;}
+}
 export async function getV4History(db,phone,id){
  if(!uuid.test(id))return null;
  const row=await db.prepare(summarySQL+' WHERE t.phone=? AND t.id=? GROUP BY t.id').bind(phone,id).first();
@@ -71,7 +84,8 @@ export async function getV4History(db,phone,id){
  const jobs=await db.prepare('SELECT result_json FROM hhba_v4_match_jobs WHERE task_id=? ORDER BY match_score DESC,job_url').bind(id).all();
  let resumeId=row.resume_id||null;
  if(resumeId&&!(await db.prepare('SELECT id FROM hhba_candidate_resumes WHERE phone=? AND id=?').bind(phone,resumeId).first()))resumeId=null;
- return {...row,resume_id:resumeId,engine:'V4',research_pending:!!row.research_pending,matches:(jobs.results||[]).map(x=>JSON.parse(x.result_json))};
+ const checkpoint=await readV4ResearchCheckpoint(db,phone,id);
+ return {...row,resume_id:resumeId,engine:'V4',research_pending:!!row.research_pending,...(checkpoint?{research_checkpoint:checkpoint}:{}),matches:(jobs.results||[]).map(x=>JSON.parse(x.result_json))};
 }
 export async function deleteV4History(db,phone,id){
  const result=await db.prepare('DELETE FROM hhba_v4_match_tasks WHERE phone=? AND id=?').bind(phone,id).run();

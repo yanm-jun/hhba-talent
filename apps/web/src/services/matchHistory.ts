@@ -20,7 +20,7 @@ export type HistoryMatchedJob={
  jd_source_status?:'VERIFIED_JD';jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'AI_VERIFIED_JD_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
  jd_proof_method?:'PUBLIC_EMPLOYER_ATS_V1'|'DIRECT_EMPLOYER_HTML_V1'|'V4_STRUCTURED_JOBPOSTING'|'V4_MODEL_SOURCE_GROUNDED'|null;
 };
-export type MatchHistoryDetail=MatchHistorySummary&{matches:HistoryMatchedJob[]};
+export type MatchHistoryDetail=MatchHistorySummary&{matches:HistoryMatchedJob[];research_checkpoint?:{round:number;search_complete:boolean}};
 const api='/api/match-history';
 const errorText:Record<string,string>={
  SESSION_INVALID:'登录已失效，请重新登录。',

@@ -554,3 +554,13 @@ test('V4 image OCR accepts authorized image inputs without sending a DOCX archiv
  const make=consent=>new Request('https://hhba.work/api/match-v4/ocr',{method:'POST',headers:{Origin:'https://hhba.work','Content-Type':'application/octet-stream',Authorization:'Bearer test-token','X-HHBA-Resume-Format':'image','X-HHBA-Image-Mime':'image/png',...(consent?{'X-HHBA-OCR-Consent':'v4-resume-ocr-v1'}:{})},body:Uint8Array.from([137,80,78,71,13,10,26,10,0,0,0,0])});
  try{assert.equal((await onRequest({request:make(false),env})).status,403);assert.equal(calls,0);assert.equal((await onRequest({request:make(true),env})).status,200);assert.equal(calls,1);}finally{globalThis.fetch=old;}
 });
+
+
+test('V4 persisted research progress is account-bound and contains no source resume data',async()=>{
+ const {readV4ResearchCheckpoint}=await import('../functions/_lib/v4-match-history.js');
+ const id='12345678-1234-1234-1234-123456789abc';
+ const db={prepare(sql){assert.match(sql,/t\.phone=\?/);return {bind(task,phone){return {async first(){return task===id&&phone==='owner'?{completed_round:12,search_complete:0}:null}}}}}};
+ assert.deepEqual(await readV4ResearchCheckpoint(db,'owner',id),{round:12,search_complete:false});
+ assert.equal(await readV4ResearchCheckpoint(db,'other',id),null);
+ assert.equal(await readV4ResearchCheckpoint(db,'owner','invalid'),null);
+});

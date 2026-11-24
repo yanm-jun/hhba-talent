@@ -84,7 +84,7 @@ export type MatchResponse = {
   improved_job_count?:number;
   can_continue?:boolean;
   research_pending?:boolean;
-  research_context?:{round:number;profile:MatchProfile;summary:string};
+  research_context?:{round:number;profile?:MatchProfile;summary:string};
   preview_synthetic?:boolean;
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];previous_postings?:{posting_key:string;url:string;company:string;title:string;location:string}[];history_id?:string;recovery_jobs?:MatchedJob[];research_context?:MatchResponse['research_context']};
@@ -475,7 +475,7 @@ export async function submitExtractedResumeText(
  if(!MATCH_V4_PREVIEW)return submitMatchRound(text,opts,consent,signal,resumeId,onProgress,onPartial,onActivity);
  const collected=new Map<string,MatchedJob>((opts.recovery_jobs||[]).map(job=>[v4PostingKey(job),job]));
  const historyId=opts.history_id||crypto.randomUUID();
- let last:MatchResponse|undefined,round=0,delay=1000;
+ let last:MatchResponse|undefined,round=opts.research_context?.round||0,delay=1000;
  const publish=(jobs:MatchedJob[])=>{for(const job of jobs){const key=v4PostingKey(job);collected.set(key,{...collected.get(key),...job});}onPartial?.([...collected.values()]);};
  const pause=(ms:number)=>new Promise<void>((resolve,reject)=>{
   if(signal?.aborted){reject(signal.reason);return;}
@@ -487,7 +487,7 @@ export async function submitExtractedResumeText(
   if(signal?.aborted)throw signal.reason;
   try{
    const data=await submitMatchRound(text,{...opts,history_id:historyId,research_context:last?.research_context||opts.research_context,exclude_urls:[],previous_postings:[...collected.values()].map(job=>({posting_key:v4PostingKey(job),url:job.official_url,company:job.company,title:job.title,location:job.location}))},consent,signal,resumeId,onProgress,publish,onActivity);
-   publish(data.matches);last={...data,profile:(data.profile.facts?.length||data.profile.skills.length||data.profile.target_roles.length||!last)?data.profile:last.profile};round++;delay=1000;
+   publish(data.matches);last={...data,profile:(data.profile.facts?.length||data.profile.skills.length||data.profile.target_roles.length||!last)?data.profile:last.profile};round=data.research_context?.round??round+1;delay=1000;
    onActivity?.({stage:'searching',message:'第 '+round+' 轮已完成，累计 '+collected.size+' 条岗位来源。',searches:round,candidate_links:collected.size});
    if(!data.research_pending)break;
   }catch(e){
