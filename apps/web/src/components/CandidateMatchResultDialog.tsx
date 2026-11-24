@@ -1,3 +1,4 @@
+import {RecruitmentSourceLinks,recruitmentText} from './RecruitmentSourceLinks';
 import {useEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowLeft,ArrowUpRight,BriefcaseBusiness,Building2,MapPin,Wallet,CheckCircle2,X} from 'lucide-react';
@@ -126,11 +127,11 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
        <span><BriefcaseBusiness size={15}/>{selected.experience_requirement||'经验未注明'}</span>
       </div>
       <section className="hhba-match-detail-section"><h3>为什么推荐给您</h3>
-       {selected.matched?.length?<ul>{selected.matched.map((reason,i)=><li key={i}><CheckCircle2 size={15}/>{reason}</li>)}</ul>:
+       {selected.matched?.length?<ul>{selected.matched.map((reason,i)=><li key={i}><CheckCircle2 size={15}/>{recruitmentText(reason)}</li>)}</ul>:
         <p>该岗位与您的求职方向有关，具体职责请参考企业招聘原文。</p>}
       </section>
       {Boolean(selected.not_evidenced?.length)&&<section className="hhba-match-detail-section">
-       <h3>需要进一步确认的条件</h3><ul>{selected.not_evidenced.map((gap,i)=><li key={i}>{gap}</li>)}</ul>
+       <h3>需要进一步确认的条件</h3><ul>{selected.not_evidenced.map((gap,i)=><li key={i}>{recruitmentText(gap)}</li>)}</ul>
       </section>}
       <section className="hhba-match-detail-section"><h3>岗位要求与投递</h3>
        <p>请在企业官方页面核实完整任职要求、薪资及最新招聘状态，匹配分数不代表录用概率。</p>
@@ -138,6 +139,7 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
         selected.source_type!=='站外官方招聘'?<Link className="hhba-match-detail-apply" to={'/candidate/jobs/'+encodeURIComponent(selected.id)}>查看岗位资料 <ArrowUpRight size={16}/></Link>:
         <p className="hhba-match-detail-unavailable">暂未取得安全可用的官方投递入口。</p>}
       </section>
+      <RecruitmentSourceLinks job={selected}/>
      </>:<>
       <div className="hhba-match-intro">
        <span className="hhba-match-eyebrow">为您精选的岗位机会</span>
