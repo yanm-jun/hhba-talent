@@ -36,7 +36,7 @@ export function modelDecision(raw,validIds){
  const sections=[],seen=new Set();
  for(const row of Array.isArray(raw.sections)?raw.sections:[]){
   if(!row||!allowed.has(row.blockId)||seen.has(row.blockId))continue;
-  const goal=typeof row.goal==='string'?row.goal.trim().slice(0,800):'';
+  const goal=typeof row.goal==='string'?row.goal.trim():'';
   if(!goal)continue;
   seen.add(row.blockId);sections.push({blockId:row.blockId,goal});
  }
@@ -75,9 +75,9 @@ export async function runResumeEditorialAgent({
  const previous=Array.isArray(draft.autonomy?.tools_used)?
   draft.autonomy.tools_used.filter(event=>event&&
    ['inspect_source','rewrite_sections','ask_user','finish'].includes(event.action))
-   .slice(0,64).map(event=>({
+   .map(event=>({
     action:event.action,sections:Array.isArray(event.sections)?
-     event.sections.filter(id=>typeof id==='string').slice(0,96):[],
+     event.sections.filter(id=>typeof id==='string'):[],
     accepted:Number.isInteger(event.accepted)?event.accepted:0
    })):[];
  const trace=[...previous];
@@ -85,7 +85,7 @@ export async function runResumeEditorialAgent({
  const rewritten=new Map(draft.blocks.map(b=>[b.blockId,{...b}]));
  const questions=[...draft.questions];
  const warnings=[...draft.warnings];
- const maxRounds=Number.isFinite(Number(env?.HHBA_RESUME_AGENT_MAX_PASSES))?
+ const maxRounds=env?.HHBA_MATCH_V4_READY==='1'&&!env?.HHBA_RESUME_AGENT_MAX_PASSES?Infinity:Number.isFinite(Number(env?.HHBA_RESUME_AGENT_MAX_PASSES))?
   Math.max(1,Math.min(16,Math.floor(Number(env.HHBA_RESUME_AGENT_MAX_PASSES)))):4;
  let stop='model_finished';
  let previousSignature=typeof draft.autonomy?.previous_signature==='string'?
@@ -96,7 +96,7 @@ export async function runResumeEditorialAgent({
   if(originalById.has(id))
    inspected.set(id,redacted(originalById.get(id).text));
  }
- if(trace.length>=64){
+ if(env?.HHBA_MATCH_V4_READY!=='1'&&trace.length>=64){
   return {...draft,autonomy:{...draft.autonomy,enabled:true,
    rounds:trace.length,stop_reason:'execution_round_guard',
    needs_more_work:true,tools_used:trace,
@@ -109,8 +109,8 @@ export async function runResumeEditorialAgent({
   if(signal?.aborted)throw new Error('AI_PROVIDER_TIMEOUT');
   const digest=blocks.map(b=>{
    const now=rewritten.get(b.id);
-   return {blockId:b.id,section:b.section,source:excerpt(redacted(b.text)),
-    draft:excerpt(redacted(now?.proposed)),changed:now?.changed||false,
+   return {blockId:b.id,section:b.section,source:env?.HHBA_MATCH_V4_READY==='1'?redacted(b.text):excerpt(redacted(b.text)),
+    draft:env?.HHBA_MATCH_V4_READY==='1'?redacted(now?.proposed||''):excerpt(redacted(now?.proposed)),changed:now?.changed||false,
     status:now?.status||'missing'};
   });
   const decisionRaw=await completeJson(provider,POLICY,{
@@ -188,7 +188,7 @@ export async function runResumeEditorialAgent({
      rationale:typeof row.rationale==='string'?row.rationale.slice(0,750):
       current.rationale,
      jobRequirements:Array.isArray(row.jobRequirements)?
-      row.jobRequirements.filter(x=>typeof x==='string').slice(0,12):
+      row.jobRequirements.filter(x=>typeof x==='string'):
       current.jobRequirements});
     event.accepted++;
    }

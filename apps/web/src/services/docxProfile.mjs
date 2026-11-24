@@ -5,9 +5,9 @@
 const read16=(view,offset)=>view.getUint16(offset,true);
 const read32=(view,offset)=>view.getUint32(offset,true);
 const dec=new TextDecoder();
-const MAX_XML=2*1024*1024;
-const MAX_ZIP=3*1024*1024;
-const MAX_TEXT=50000;
+const MAX_XML=16*1024*1024;
+const MAX_ZIP=12*1024*1024;
+const MAX_TEXT=250000;
 export const PROFILE_FIELD_LABELS=Object.freeze([
  ['fullName','姓名'],['phone','手机号'],['email','邮箱'],
  ['school','毕业院校'],['major','所学专业'],['education','最高学历'],

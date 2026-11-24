@@ -11,7 +11,7 @@ const send=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:
  'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'
 }});
 const fail=(code,status)=>send({ok:false,error:code},status);
-const MAX_BODY=256*1024,MAX_BLOCKS=12,MAX_GLOBAL=50,MAX_PERSONAL=3;
+const MAX_BODY=2*1024*1024,MAX_BLOCKS=12,MAX_GLOBAL=50,MAX_PERSONAL=3;
 const MAX_GLOBAL_ATTEMPTS=120,MAX_PERSONAL_ATTEMPTS=6;
 // Separate paid AI optimization quotas from unrelated matching services.
 // Preview still supports its existing shared secret until separately migrated.
@@ -52,17 +52,17 @@ async function readSmallJson(request){
  const all=new Uint8Array(bytes);let pos=0;for(const c of chunks){all.set(c,pos);pos+=c.byteLength;}
  try{return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(all));}catch{throw Error('INVALID_REQUEST');}
 }
-function valid(body){
+function valid(body,env){
  if(!body||Array.isArray(body)||typeof body!=='object'||body.consent_ai!==true||
   !Array.isArray(body.blocks)||body.blocks.length<1)return false;
  if(!body.job||typeof body.job!=='object'||typeof body.job.title!=='string'||
   body.job.title.length<2||body.job.title.length>120||
-  typeof body.job.requirements!=='string'||body.job.requirements.length>16000)return false;
+  typeof body.job.requirements!=='string'||body.job.requirements.length>(env?.HHBA_MATCH_V4_READY==='1'?250000:16000))return false;
  const doc=body.full_document;
  if(doc===undefined&&body.blocks.length>MAX_BLOCKS)return false;
  if(doc!==undefined&&(!doc||Array.isArray(doc)||typeof doc!=='object'||
   !/^jd_[a-f0-9]{32}$/.test(body.job.jd_version_id||'')||!/^[a-f0-9]{64}$/.test(body.job.jd_sha256||'')||
-  typeof doc.text!=='string'||doc.text.length>50000||
+  typeof doc.text!=='string'||doc.text.length>(env?.HHBA_MATCH_V4_READY==='1'?250000:50000)||
   (doc.wanted!==undefined&&(!Array.isArray(doc.wanted)||!doc.wanted.length||
    doc.wanted.length>body.blocks.length))))return false;
  const ids=new Set();
@@ -104,16 +104,16 @@ async function releaseFailedRequest(db,requestId,hash){
 export async function onRequestGet({env}){
  let configured=false;
  try{selectProvider(env);configured=true;}catch{}
- return send({kind:'HHBA_RESUME_OPTIMIZATION_V1',enabled:active(env)&&configured&&await dbReady(env.HHBA_PNVS_AUTH_DB),
+ return send({kind:'HHBA_RESUME_OPTIMIZATION_V1',enabled:active(env)&&configured&&(env?.HHBA_MATCH_V4_READY==='1'||await dbReady(env.HHBA_PNVS_AUTH_DB)),
   full_document_enabled:active(env)&&configured&&await taskReady(env.HHBA_PNVS_AUTH_DB),
-  configured,per_account_daily_limit:MAX_PERSONAL,global_daily_limit:MAX_GLOBAL,
-  per_account_daily_attempt_limit:MAX_PERSONAL_ATTEMPTS,global_daily_attempt_limit:MAX_GLOBAL_ATTEMPTS});
+  configured,per_account_daily_limit:env?.HHBA_MATCH_V4_READY==='1'?null:MAX_PERSONAL,global_daily_limit:env?.HHBA_MATCH_V4_READY==='1'?null:MAX_GLOBAL,
+  per_account_daily_attempt_limit:env?.HHBA_MATCH_V4_READY==='1'?null:MAX_PERSONAL_ATTEMPTS,global_daily_attempt_limit:env?.HHBA_MATCH_V4_READY==='1'?null:MAX_GLOBAL_ATTEMPTS});
 }
 export async function onRequestPost({request,env}){
  if(!sameOrigin(request))return fail('ORIGIN_REQUIRED',403);
  if(!active(env))return fail('RESUME_OPTIMIZATION_NOT_ENABLED',503);
  const db=env.HHBA_PNVS_AUTH_DB;
- if(!await dbReady(db))return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);
+ if(env?.HHBA_MATCH_V4_READY!=='1'&&!await dbReady(db))return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);
  try{selectProvider(env);}catch{return fail('AI_PROVIDER_NOT_CONFIGURED',503);}
  let session;
  try{session=await sessionOfBearer(db,request,Date.now());
@@ -123,7 +123,7 @@ export async function onRequestPost({request,env}){
  }catch{return fail('SESSION_INVALID',401);}
  let input;
  try{input=await readSmallJson(request);}catch{return fail('INVALID_REQUEST',400);}
- if(!valid(input))return fail('INVALID_OPTIMIZATION_INPUT',400);
+ if(!valid(input,env))return fail('INVALID_OPTIMIZATION_INPUT',400);
  let trustedJob;
  try{trustedJob=await hydrateVerifiedJobRequirements(env,input.job);}
  catch(e){
@@ -131,27 +131,30 @@ export async function onRequestPost({request,env}){
   return fail(code,code==='JD_VERIFIED_VERSION_REQUIRED'||code==='JD_JOB_IDENTITY_MISMATCH'?422:409);
  }
  const hash=await sha256Hex(quotaPepper(env)+':resume-opt:'+session.phone);
- let requestId,lease;
+ let requestId,lease,renewTimer;
  try{
   if(input.full_document){
    if(!await taskReady(db))return fail('RESUME_OPTIMIZATION_TASK_DB_NOT_READY',503);
    lease=await reserveResumeOptimizationTask(db,hash,{
     jd:trustedJob.jd_version_id,blocks:input.blocks,text:input.full_document.text
-   });
+   },{unrestricted:env?.HHBA_MATCH_V4_READY==='1'});
    if(lease?.duplicate)return fail('RESUME_OPTIMIZATION_IN_PROGRESS',409);
    if(!lease)return fail('RESUME_OPTIMIZATION_QUEUED',409);
+   if(lease.renew)renewTimer=setInterval(()=>{void lease.renew().catch(()=>{});},60000);
   }else{
-   if(!await reserveAttempt(db,hash))return fail('RESUME_OPTIMIZATION_ATTEMPT_LIMIT',429);
-   requestId=await reserve(db,hash);
-   if(!requestId)return fail('RESUME_OPTIMIZATION_LIMIT',429);
+   if(env?.HHBA_MATCH_V4_READY!=='1'){
+    if(!await reserveAttempt(db,hash))return fail('RESUME_OPTIMIZATION_ATTEMPT_LIMIT',429);
+    requestId=await reserve(db,hash);
+    if(!requestId)return fail('RESUME_OPTIMIZATION_LIMIT',429);
+   }
   }
  }catch{return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);}
  // Mask common contact identifiers before third-party processing.
  const blocks=input.blocks.map(b=>({id:b.id,section:b.section,text:redact(b.text)}));
  const job={title:redact(trustedJob.title),requirements:redact(trustedJob.requirements),
-  verified:trustedJob.source_status==='VERIFIED_OFFICIAL_JD'};
+  verified:['VERIFIED_OFFICIAL_JD','VERIFIED_PUBLIC_JD'].includes(trustedJob.source_status)};
  try{
-  const signal=AbortSignal.any([request.signal,AbortSignal.timeout(input.full_document?180000:90000)]);
+  const signal=env?.HHBA_MATCH_V4_READY==='1'?request.signal:AbortSignal.any([request.signal,AbortSignal.timeout(input.full_document?180000:90000)]);
   const whole=input.full_document?await optimizeResumeDocument({
    env,blocks,context:redact(input.full_document.text),job,signal,wanted:input.full_document.wanted
   }):null;
@@ -167,7 +170,7 @@ export async function onRequestPost({request,env}){
   }));
   // An empty or fully rejected suggestion set is not a successful optimization.
   // Refund only this request's success allocation; preserve attempt accounting.
-  if(suggestions.length===0){
+  if(suggestions.length===0&&requestId){
    try{await releaseFailedRequest(db,requestId,hash);}
    catch{console.warn('HHBA_RESUME_OPT_EMPTY_REFUND_FAILED');}
   }
@@ -187,11 +190,12 @@ export async function onRequestPost({request,env}){
   const code=allowed.has(error?.message)?error.message:'AI_OPTIMIZATION_UNAVAILABLE';
   // Failed provider calls restore the *successful* daily allowance, while the
   // separate attempt ledger remains consumed to bound repeated paid retries.
-  try{await releaseFailedRequest(db,requestId,hash);}catch{console.warn('HHBA_RESUME_OPT_QUOTA_RELEASE_FAILED');}
+  try{if(requestId)await releaseFailedRequest(db,requestId,hash);}catch{console.warn('HHBA_RESUME_OPT_QUOTA_RELEASE_FAILED');}
   console.warn('HHBA_RESUME_OPTIMIZATION_FAILED',code);
   return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:
    code==='AI_PROVIDER_NOT_CONFIGURED'?503:502);
  }finally{
+  if(renewTimer)clearInterval(renewTimer);
   if(lease)await lease.release().catch(()=>console.warn('HHBA_RESUME_OPTIMIZATION_LEASE_RELEASE_FAILED'));
  }
 }

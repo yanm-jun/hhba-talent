@@ -8,7 +8,9 @@ import {
 
 const ID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const DOCX_MIME='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-const LIMIT=3072,DAILY={preview:4,export:6},MAX_REVISIONS=8;
+const LIMIT=65536,DAILY={preview:4,export:6},MAX_REVISIONS=8;
+const v4=env=>env?.HHBA_MATCH_V4_READY==='1';
+const editLimit=env=>v4(env)?1600:300;
 const common={
  'Cache-Control':'private, no-store',
  'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
@@ -118,7 +120,7 @@ function validEntry(entry){
     hashIsValid(entry.preview_sha256)&&Number.isInteger(entry.page_count)&&
     entry.page_count>=1&&entry.page_count<=20);
 }
-async function approved(bucket,row,jobId){
+async function approved(bucket,row,jobId,env){
  const jobHash=jobId===undefined?null:
   await sha256Hex('hhba-word-target-job-v1:'+jobId);
  const key=prefix(row)+(jobHash?'.job-'+jobHash:'');
@@ -135,7 +137,7 @@ async function approved(bucket,row,jobId){
   items=[legacy];revision=1;
  }else if(raw.schema==='HHBA_ORIGINAL_WORD_VERSIONS_V2'){
   items=raw.items;revision=raw.revision;
-  if(!Array.isArray(items)||items.length<1||items.length>MAX_REVISIONS||
+  if(!Array.isArray(items)||items.length<1||(!v4(env)&&items.length>MAX_REVISIONS)||
    !Number.isInteger(revision)||revision<0||revision>items.length||
    items.some(x=>!validEntry(x))||
    new Set(items.map(x=>x.id)).size!==items.length)
@@ -208,7 +210,7 @@ export async function onRequestGet({request,env}){
   if(!validRow(row))return fail('WORD_INVALID_FILE',422);
   if(action==='inspect'){
    const original=await loadBytes(bucket,row);
-   const state=await approved(bucket,row,jobId);
+   const state=await approved(bucket,row,jobId,env);
    const current=state.saved?
     await versionBytes(bucket,state.key,state.saved,'docx'):original;
    const data=await inspectOriginalDocxStrict(current);
@@ -218,7 +220,7 @@ export async function onRequestGet({request,env}){
     revision:state.revision,total_revisions:state.items.length,
     layout_verified:Boolean(state.saved&&state.saved.verification!=='docx_structure_only'),
     pdf_available:Boolean(state.saved&&state.saved.verification!=='docx_structure_only'),
-    max_revisions:MAX_REVISIONS,max_daily_edits:DAILY.export,
+    max_revisions:v4(env)?null:MAX_REVISIONS,max_daily_edits:v4(env)?null:DAILY.export,
     history:state.items.map((entry,index)=>({
      revision:index+1,original:entry.original,text:entry.text,
      updated_at:entry.updated_at||'',page_count:entry.page_count,
@@ -227,9 +229,9 @@ export async function onRequestGet({request,env}){
   }
   if(action==='source-docx'){
    const original=await loadBytes(bucket,row);
-   const state=await approved(bucket,row,jobId);
+   const state=await approved(bucket,row,jobId,env);
    const requested=params.get('revision');
-   if(requested!==null&&(!/^(?:0|[1-9][0-9]?)$/.test(requested)||
+   if(requested!==null&&(!/^(?:0|[1-9][0-9]*)$/.test(requested)||
     Number(requested)!==state.revision))return fail('WORD_REVISION_CONFLICT',409);
    const current=state.saved?
     await versionBytes(bucket,state.key,state.saved,'docx'):original;
@@ -237,9 +239,9 @@ export async function onRequestGet({request,env}){
   }
   if(action==='download'||action==='edited-preview'||action==='download-pdf'){
    await loadBytes(bucket,row);
-   const state=await approved(bucket,row,jobId);
+   const state=await approved(bucket,row,jobId,env);
    const requested=new URL(request.url).searchParams.get('revision');
-   if(requested!==null&&(!/^(?:0|[1-9][0-9]?)$/.test(requested)||
+   if(requested!==null&&(!/^(?:0|[1-9][0-9]*)$/.test(requested)||
     Number(requested)!==state.revision))
     return fail('WORD_REVISION_CONFLICT',409);
    if(!state.saved)return fail('WORD_NOT_EDITED',404);
@@ -260,8 +262,8 @@ export async function onRequestGet({request,env}){
    if(bytes.length>=500&&bytes.length<=12*1024*1024)
     return replyFile(bytes,'application/pdf','HHBA-resume-original-preview.pdf');
   }
-  if(!await quotaReady(db))return fail('WORD_DB_NOT_READY',503);
-  if(!await reserve(db,env,candidate.phone,'preview'))
+  if(!v4(env)&&!await quotaReady(db))return fail('WORD_DB_NOT_READY',503);
+  if(!v4(env)&&!await reserve(db,env,candidate.phone,'preview'))
    return fail('WORD_DAILY_LIMIT',429);
   const original=await loadBytes(bucket,row);
   const rendered=await wordRequest(env,'render',{original});
@@ -290,9 +292,9 @@ export async function onRequestPost({request,env}){
   body?.confirmed_real!==true||body?.consent_word_processing!==true||
   (body.expected_revision!==undefined&&
    (!Number.isInteger(body.expected_revision)||body.expected_revision<0||
-    body.expected_revision>MAX_REVISIONS))||
+    (!v4(env)&&body.expected_revision>MAX_REVISIONS)))||
   (action==='edit'&&(typeof body?.original!=='string'||
-   typeof body?.text!=='string'||body.original.length>300||body.text.length>300)))
+   typeof body?.text!=='string'||body.original.length>editLimit(env)||body.text.length>editLimit(env))))
   return fail('INVALID_REQUEST',400);
  let row,created=[];
  try{
@@ -301,7 +303,7 @@ export async function onRequestPost({request,env}){
   if(!validRow(row))return fail('WORD_INVALID_FILE',422);
   // Verify owner-bound original even when editing a previously saved revision.
   const original=await loadBytes(bucket,row);
-  const state=await approved(bucket,row,jobId);
+  const state=await approved(bucket,row,jobId,env);
   if(body.expected_revision!==undefined&&body.expected_revision!==state.revision)
    return fail('WORD_REVISION_CONFLICT',409);
   if(state.items.length&&!state.etag)return fail('WORD_REVISION_LOCK_UNAVAILABLE',503);
@@ -315,10 +317,10 @@ export async function onRequestPost({request,env}){
    }
    return json({ok:true,saved:next>0,revision:next,total_revisions:state.items.length});
   }
-  if(state.revision>=MAX_REVISIONS) return fail('WORD_REVISION_LIMIT',422);
+  if(!v4(env)&&state.revision>=MAX_REVISIONS) return fail('WORD_REVISION_LIMIT',422);
   if(!renderer&&!hashIsValid(body.client_docx_sha256))return fail('INVALID_REQUEST',400);
-  if(!await quotaReady(db))return fail('WORD_DB_NOT_READY',503);
-  if(!await reserve(db,env,candidate.phone,'export'))
+  if(!v4(env)&&!await quotaReady(db))return fail('WORD_DB_NOT_READY',503);
+  if(!v4(env)&&!await reserve(db,env,candidate.phone,'export'))
    return fail('WORD_DAILY_LIMIT',429);
   const current=state.saved?
    await versionBytes(bucket,state.key,state.saved,'docx'):original;

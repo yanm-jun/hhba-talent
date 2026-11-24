@@ -11,10 +11,11 @@
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
 import {fetchPublicAtsJd} from '../_lib/public-ats-jd.js';
 import {directOfficialJobEvidence} from '../_lib/official-job-evidence.js';
+import {v4ReadEmployerJob} from '../_lib/v4-open-job-evidence.js';
 import {noteJdSourceFailure} from '../_lib/jd-posting-lifecycle.js';
 import {
  JD_ARCHIVE_KIND,jdArchiveConfigured,jdArchiveReady,safeJDSourceLocator,
- readJobJdById,readFreshJobJdByUrl,saveVerifiedJobJd,publicJdPayload
+ readJobJdById,readFreshJobJdByUrl,saveVerifiedJobJd,saveV4PublicJobJd,publicJdPayload
 } from '../_lib/job-jd-archive.js';
 
 const MAX_BODY=4500,DAILY_PERSON=40,DAILY_TOTAL=1200;
@@ -103,13 +104,32 @@ export async function onRequestPost({request,env}){
  try{data=await readJson(request)}catch{return fail('INVALID_REQUEST',400)}
  if(data?.consent_verify!==true||typeof data.official_url!=='string')
   return fail('CONSENT_REQUIRED',400);
+ // V4 refresh is limited to an existing independently archived URL, not
+ // arbitrary user-provided network destinations.
+ if(env?.HHBA_MATCH_V4_READY==='1'&&typeof data.previous_jd_id==='string'){
+  try{
+   const previous=await readJobJdById(env,data.previous_jd_id);
+   if(!previous||previous.canonical_url!==data.official_url)return fail('JD_JOB_IDENTITY_MISMATCH',409);
+   if(previous.fresh)return respond({...publicJdPayload(previous),from_cache:true});
+   if(previous.proof_method==='V4_STRUCTURED_JOBPOSTING'||previous.proof_method==='V4_EMPLOYER_HTML_JOB'){
+    const evidence=await v4ReadEmployerJob(previous.canonical_url,{signal:request.signal});
+    // A reused URL must not silently turn one employer's vacancy into another.
+    if(evidence.company!==previous.company||evidence.title!==previous.title||evidence.location!==previous.location)
+     return fail('JD_JOB_IDENTITY_MISMATCH',409);
+    const source=evidence.proof_method==='V4_STRUCTURED_JOBPOSTING'&&!evidence.source_confirmed?
+     {...evidence,proof_method:'V4_EMPLOYER_HTML_JOB'}:evidence;
+    const archived=await saveV4PublicJobJd(env,source);
+    return archived?respond({...publicJdPayload(archived),from_cache:false}):fail('JD_ARCHIVE_WRITE_FAILED',503);
+   }
+  }catch{return fail('JD_OFFICIAL_FETCH_FAILED',422);}
+ }
  const locator=safeJDSourceLocator(data.official_url);
  if(!locator)return fail('OFFICIAL_URL_NOT_SUPPORTED',422);
  try{
   const cached=await readFreshJobJdByUrl(env,locator.url);
   if(cached)return respond({...publicJdPayload(cached),from_cache:true});
  }catch{return fail('JD_ARCHIVE_READ_FAILED',503)}
- try{if(!await countAttempt(env,session))return fail('JD_EXTERNAL_FETCH_LIMIT',429)}
+ try{if(env?.HHBA_MATCH_V4_READY!=='1'&&!await countAttempt(env,session))return fail('JD_EXTERNAL_FETCH_LIMIT',429)}
  catch{return fail('JD_ARCHIVE_QUOTA_NOT_READY',503)}
  let evidence;
  try{evidence=locator.kind?await fetchPublicAtsJd(locator.url):await directOfficialJobEvidence(locator.url)}

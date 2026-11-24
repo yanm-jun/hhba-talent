@@ -65,8 +65,8 @@ function checkDocx(bytes){
  }
  if(pos!==start+length||!hasTypes||!hasDocument)return reject('INVALID_DOCX_CONTAINER');
 }
-export function validateResumeBytes(bytes,filename){
- if(!(bytes instanceof Uint8Array)||bytes.length<30||bytes.length>RESUME_LIMIT_BYTES)
+export function validateResumeBytes(bytes,filename,maxBytes=RESUME_LIMIT_BYTES){
+ if(!(bytes instanceof Uint8Array)||bytes.length<30||bytes.length>maxBytes)
   return reject('INVALID_RESUME_SIZE');
  const isPdf=/\.pdf$/i.test(filename),isDocx=/\.docx$/i.test(filename);
  if(!isPdf&&!isDocx)return reject('INVALID_FILENAME');

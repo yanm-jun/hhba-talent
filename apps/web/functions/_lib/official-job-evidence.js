@@ -15,7 +15,7 @@ const MAX_RESPONSE=220000;
 const DEGREE=['HIGH_SCHOOL','ASSOCIATE','BACHELOR','MASTER','PHD'];
 const canon=raw=>safeOfficialJobLocator(raw);
 const xmlEntities={amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",nbsp:' '};
-export function htmlToText(html){
+export function htmlToText(html,{maxChars=100000}={}){
  const stripped=html
   .replace(/<!--[\s\S]*?-->/g,' ')
   .replace(/<(script|style|svg|noscript|template|iframe)\b[^>]*>[\s\S]*?<\/\1>/gi,' ')
@@ -30,7 +30,7 @@ export function htmlToText(html){
    return xmlEntities[entity.toLowerCase()]||' ';
   });
  return stripped.replace(/\r/g,'').replace(/[ \t]+/g,' ').replace(/\n[ \t]+/g,'\n')
-  .replace(/\n{3,}/g,'\n\n').slice(0,100000);
+  .replace(/\n{3,}/g,'\n\n').slice(0,maxChars);
 }
 /**
  * Preserve employer-published JD paragraphs and section boundaries, not a
@@ -38,7 +38,7 @@ export function htmlToText(html){
  * HTML/text extraction is still best effort; only source-backed sections
  * pass into the shared archive.
  */
-export function extractOfficialJdSections(plain){
+export function extractOfficialJdSections(plain,{full=false}={}){
  if(typeof plain!=='string'||plain.length<80)return null;
  // Literal headings from public ATS posts, not LLM-guessed section labels.
  const duty=/^(?:岗位职责|工作职责|职位职责|主要职责|工作内容|岗位描述|职位描述|responsibilities|what you(?:'|’)ll do|what you will do|the role|about the role|your impact|key responsibilities|job responsibilities|duties)[：:\s]*/i;
@@ -54,14 +54,14 @@ export function extractOfficialJdSections(plain){
   if(duty.test(line)){kind='responsibilities';seenDuty=true;}
   else if(req.test(line)){kind='requirements';seenReq=true;}
   if(kind==='other')continue;
-  if(line.length<3||line.length>4000)continue;
+  if(line.length<3||(!full&&line.length>4000))continue;
   // Guard against scraping navigation/footer rather than a single vacancy.
-  if(blocks.length>=120)break;
+  if(!full&&blocks.length>=120)break;
   blocks.push({id:'JD-'+String(blocks.length+1).padStart(3,'0'),kind,text:line});
  }
  if(!seenDuty||!seenReq||blocks.length<4)return null;
  const full_jd=blocks.map(b=>b.text).join('\n');
- if(full_jd.length<80||full_jd.length>24000)return null;
+ if(full_jd.length<80||full_jd.length>(full?240000:24000))return null;
  return {full_jd,sections:blocks,content_status:'VERIFIED_SECTIONS'};
 }
 

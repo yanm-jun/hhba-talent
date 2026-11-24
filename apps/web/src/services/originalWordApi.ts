@@ -3,7 +3,7 @@ import {editOriginalDocxStrict} from './resumeDocxPreserve.mjs';
 
 type SavedWord={original:string;text:string;updated_at:string};
 export type WordHistoryEntry={revision:number;original:string;text:string;updated_at:string;page_count:number|null;layout_verified?:boolean};
-export type WordInspect={ok:boolean;editable_text:string[];saved?:SavedWord|null;revision:number;total_revisions:number;max_revisions:number;max_daily_edits?:number;history?:WordHistoryEntry[];layout_verified?:boolean;pdf_available?:boolean};
+export type WordInspect={ok:boolean;editable_text:string[];saved?:SavedWord|null;revision:number;total_revisions:number;max_revisions:number|null;max_daily_edits?:number|null;history?:WordHistoryEntry[];layout_verified?:boolean;pdf_available?:boolean};
 const messages:Record<string,string>={
  WORD_NOT_READY:'Word 原样式编辑暂未开放。',
  WORD_FONT_UNAVAILABLE:'原文件使用的字体在处理环境中不可用，为保留原样式，暂不修改这份简历。',

@@ -13,7 +13,7 @@ const read32=(d,p)=>d.getUint32(p,true);
 const write16=(d,p,v)=>d.setUint16(p,v,true);
 const write32=(d,p,v)=>d.setUint32(p,v,true);
 const MAX_DOCX=3*1024*1024,MAX_XML=2*1024*1024,MAX_ENTRIES=1200;
-const textOnly=(s)=>typeof s==='string'&&s.length>1&&s.length<=300&&
+const textOnly=(s)=>typeof s==='string'&&s.length>1&&s.length<=1600&&
  !/[\r\n\t\u0000-\u001f]/.test(s)&&s===s.trim();
 // The same lossless ZIP validation runs inside the browser and Workers Free.
 // A 256-entry lookup avoids an 8-round bitwise loop per source byte, which

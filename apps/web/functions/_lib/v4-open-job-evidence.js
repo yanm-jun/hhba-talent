@@ -40,7 +40,6 @@ function pageTitle(html){
 function postings(html){
  const found=[];
  for(const m of html.matchAll(/<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)){
-  if(m[1].length>100000)continue;
   try{
    const root=JSON.parse(m[1]);
    const visit=(v,depth)=>{
@@ -87,7 +86,7 @@ async function limitedRead(r){
  if(r.status!==200)throw Error('V4_PAGE_UNAVAILABLE');
  const ct=(r.headers.get('content-type')||'').toLowerCase();
  if(!ct.includes('text/html')&&!ct.includes('text/plain'))throw Error('V4_PAGE_NOT_HTML');
- const max=550000,cl=Number(r.headers.get('content-length')||0);
+ const max=2*1024*1024,cl=Number(r.headers.get('content-length')||0);
  if(cl>max||!r.body)throw Error('V4_PAGE_TOO_LARGE');
  const reader=r.body.getReader(),chunks=[];let len=0;
  try{for(;;){
@@ -103,29 +102,29 @@ async function limitedRead(r){
 export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()}={}){
  const canonical=v4PublicJobUrl(url);
  if(!canonical)throw Error('V4_UNSAFE_URL');
- const timeout=AbortSignal.timeout(12000);
+ const timeout=AbortSignal.timeout(45000);
  const r=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',
   headers:{Accept:'text/html,text/plain;q=0.9'},signal:signal?AbortSignal.any([signal,timeout]):timeout});
- const html=await limitedRead(r),plain=htmlToText(html);
+ const html=await limitedRead(r),plain=htmlToText(html,{maxChars:Infinity});
  if(CLOSED.test(plain.slice(0,12000)))throw Error('V4_JOB_CLOSED');
  for(const j of postings(html)){
   const org=companyOf(j),title=trim(j.title);
-  const city=postedLocation(j)||htmlLocation(plain),desc=htmlToText(trim(j.description));
+  const city=postedLocation(j)||htmlLocation(plain),desc=htmlToText(trim(j.description),{maxChars:Infinity});
   if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city||desc.length<90)continue;
   if(j.validThrough&&Number.isFinite(Date.parse(j.validThrough))&&Date.parse(j.validThrough)<now.getTime())continue;
   // A multinational's official careers host may differ from its corporate website.
   // Do not discard real JD content merely because the domains differ.
-  const sections=extractOfficialJdSections(desc);
+  const sections=extractOfficialJdSections(desc,{full:true});
   const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
   if(!sections||requirements.length<18)continue;
   return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
    canonical_url:canonical,company:org.name.slice(0,100),title:title.slice(0,86),
-   location:city,requirements:requirements.slice(0,5500),full_jd:sections.full_jd,
+   location:city,requirements,full_jd:sections.full_jd,
    checked_at:now.toISOString(),proof_method:'V4_STRUCTURED_JOBPOSTING',
-   source_confirmed:!!org.url&&relatedDomains(canonical,org.url),application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
+   source_confirmed:!!org.url&&relatedDomains(canonical,org.url),independently_read:true,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
  }
  // Chinese employer career sites often serve normal HTML without JSON-LD.
- const sections=extractOfficialJdSections(plain),title=pageTitle(html);
+ const sections=extractOfficialJdSections(plain,{full:true}),title=pageTitle(html);
  const company=meta(html,'property','og:site_name')||meta(html,'name','application-name');
  const city=htmlLocation(plain);
  const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
@@ -133,7 +132,7 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
   throw Error('V4_JOB_DETAILS_NOT_VERIFIED');
  return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
   canonical_url:canonical,company:company.slice(0,100),title,location:city,
-  requirements:requirements.slice(0,5500),full_jd:sections.full_jd,
+  requirements,full_jd:sections.full_jd,
   checked_at:now.toISOString(),proof_method:'V4_EMPLOYER_HTML_JOB',
-  source_confirmed:false,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
+  source_confirmed:false,independently_read:true,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
 }

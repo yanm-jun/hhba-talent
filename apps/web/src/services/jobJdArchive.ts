@@ -4,7 +4,7 @@ export type ArchivedOfficialJd={
  ok:true;kind:'HHBA_VERIFIED_JOB_JD_V1';verified:true;job_id:string;
  company:string;title:string;location:string;canonical_url:string;
  jd_sha256:string;checked_at:string;fresh:boolean;
- content_status:'VERIFIED_SECTIONS';proof_method:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1';
+ content_status:'VERIFIED_SECTIONS';proof_method:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1'|'V4_STRUCTURED_JOBPOSTING'|'V4_EMPLOYER_HTML_JOB';
  full_jd:string;sections:{id:string;kind:'responsibilities'|'requirements'|'other';text:string}[];
  disclaimer:string;from_cache?:boolean;
 };
@@ -62,15 +62,17 @@ export async function getArchivedJobJdVersion(id:string,signal?:AbortSignal):Pro
  return result;
 }
 /** Triggered only after the candidate's existing AI/verification consent. */
-export async function ensureArchivedJobJd(officialUrl:string,signal?:AbortSignal):Promise<ArchivedOfficialJd>{
+export async function ensureArchivedJobJd(officialUrl:string,signal?:AbortSignal,previousJdId?:string):Promise<ArchivedOfficialJd>{
  const token=getRealAuthToken();
  if(!realAuthReady||!token)throw new JobJdArchiveError('SESSION_INVALID',401);
+ if(!previousJdId){
  const cached=await request(PATH+'?official_url='+encodeURIComponent(officialUrl),
   {method:'GET'},signal) as {ok?:boolean;verified?:boolean;found?:boolean};
  if(cached.ok&&cached.verified)return cached as ArchivedOfficialJd;
+ }
  const verified=await request(PATH,{
   method:'POST',headers:{'Content-Type':'application/json'},
-  body:JSON.stringify({official_url:officialUrl,consent_verify:true})
+  body:JSON.stringify({official_url:officialUrl,consent_verify:true,...(previousJdId?{previous_jd_id:previousJdId}:{})})
  },signal) as ArchivedOfficialJd;
  if(verified.ok!==true||verified.verified!==true||verified.fresh!==true||
   typeof verified.full_jd!=='string'||!Array.isArray(verified.sections))

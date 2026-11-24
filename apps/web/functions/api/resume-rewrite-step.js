@@ -13,6 +13,7 @@ import {REWRITE_KIND,completeJson,validateAuthoring,numberTokens,redacted}
 import {selectProvider} from '../_lib/resume-ai-provider.js';
 import {hydrateVerifiedJobRequirements} from '../_lib/job-jd-archive.js';
 import {runResumeEditorialAgent} from '../_lib/resume-rewrite-agent.js';
+import {claimAiCheckpoint} from '../_lib/ai-checkpoint-claim.js';
 import {issueCheckpoint,verifyCheckpoint,publicDraft}
  from '../_lib/resume-rewrite-checkpoint.js';
 
@@ -20,10 +21,10 @@ const allowedSections=new Set(['summary','experience','skills','education','proj
 function validContinuation(body){
  if(!body||body.consent_ai!==true||
   !Array.isArray(body.blocks)||body.blocks.length<1||
-  body.blocks.length>96||!body.job||typeof body.job!=='object'||
+  body.blocks.length>512||!body.job||typeof body.job!=='object'||
   typeof body.job.title!=='string'||!body.job.title.trim()||
   body.job.title.length>180||
-  typeof body.job.requirements!=='string'||body.job.requirements.length>16000)
+  typeof body.job.requirements!=='string'||body.job.requirements.length>250000)
   return false;
  const ids=new Set();
  if(!body.blocks.every(b=>b&&typeof b.id==='string'&&
@@ -76,6 +77,11 @@ export async function onRequestPost({request,env}){
    'AI_CHECKPOINT_NOT_CONFIGURED':'AI_CHECKPOINT_INVALID';
   return reject(code,code==='AI_CHECKPOINT_NOT_CONFIGURED'?503:409);
  }
+ let claim;
+ if(env?.HHBA_V4_CHECKPOINT_REPLAY_PROTECTION==='1'){
+  try{claim=await claimAiCheckpoint(env.HHBA_PNVS_AUTH_DB,body.checkpoint);if(!claim)return reject('AI_CHECKPOINT_ALREADY_USED',409);}
+  catch{return reject('AI_CHECKPOINT_DB_UNAVAILABLE',503);}
+ }
  try{
   const author=selectProvider(env,'resume_rewrite');
   let reviewer;
@@ -85,7 +91,7 @@ export async function onRequestPost({request,env}){
    draft:publicDraft(body.draft),blocks:body.blocks,job:trustedJob,
    env:{...env,HHBA_RESUME_AGENT_MAX_PASSES:'1'},
    provider:author,reviewer,completeJson,validateAuthoring,numberTokens,
-   redacted,signal:AbortSignal.timeout(150000)
+   redacted,signal:env?.HHBA_MATCH_V4_READY==='1'?request.signal:AbortSignal.timeout(150000)
   });
   if(result.autonomy?.needs_more_work){
    const token=await issueCheckpoint({
@@ -95,6 +101,7 @@ export async function onRequestPost({request,env}){
   }
   return json({...result,continuation:{enabled:false}});
  }catch(e){
+  if(claim)await claim.release().catch(()=>console.warn('HHBA_CHECKPOINT_RELEASE_FAILED'));
   const code=typeof e?.message==='string'&&
    /^(AI_PROVIDER_|AI_CHECKPOINT_)/.test(e.message)?
    e.message:'AI_AGENT_CONTINUATION_FAILED';

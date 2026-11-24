@@ -6,9 +6,9 @@ import {isMainlandJobLocation} from './mainland-job-location.js';
 import {groundedCareerDirections} from './resume-role-evidence.js';
 import {extractSelfReportedProfessionalCredentials} from './professional-credentials.js';
 export const MAX_TEXT_LENGTH=20000;
-export function redactForModel(value){
+export function redactForModel(value,maxLength=MAX_TEXT_LENGTH){
  if(typeof value!=='string')return '';
- return value.slice(0,MAX_TEXT_LENGTH)
+ return value.slice(0,maxLength)
   .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,'[邮箱已隐藏]')
   .replace(/(?<!\d)1[3-9]\d{9}(?!\d)/g,'[手机号已隐藏]')
   .replace(/(?<![0-9A-Za-z])\d{17}[0-9Xx](?![0-9A-Za-z])/g,'[身份证号已隐藏]')

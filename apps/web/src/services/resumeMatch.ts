@@ -32,7 +32,7 @@ export type MatchedJob = {
   evidence_sources?:{url:string;kind:string}[];
   evidence_score_status?:'AI_PARTIAL_SOURCE_SCORED'|'AI_DIRECTION_REFERENCE_SCORED';
   score_evidence_status?:'GROUNDED_JD_RESUME_QUOTES';
-  jd_proof_method?:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1';
+  jd_proof_method?:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1'|'V4_STRUCTURED_JOBPOSTING'|'V4_EMPLOYER_HTML_JOB';
   jd_source_status?:'VERIFIED_JD';
   jd_employer_identity_status?:'ATS_TENANT_NOT_LEGAL_ENTITY_VERIFIED'|'DIRECT_EMPLOYER_SOURCE';
   jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'AI_VERIFIED_JD_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
@@ -84,17 +84,16 @@ export type MatchResponse = {
   preview_synthetic?:boolean;
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
-const API='/api/match-next'; // Original default preserved for production and V2 compatibility.
-// V4 is an explicit opt-in trial, rather than replacing the default user journey.
+const API='/api/match-next'; // Legacy diagnostic endpoints only; the user-facing matching path is V4.
+// V4 is the normal matching engine on the approved HHBA hosts.
 const MATCH_V4_PREVIEW=typeof window!=='undefined'&&
  (window.location.hostname.endsWith('.hhba-talent.pages.dev')&&
   window.location.hostname!=='hhba-talent.pages.dev'||
   window.location.hostname==='hhba.work'||
-  window.location.hostname==='www.hhba.work')&&
- new URLSearchParams(window.location.search).get('v4')==='1';
+  window.location.hostname==='www.hhba.work');
 const EFFECTIVE_API=MATCH_V4_PREVIEW?'/api/match-v4':API;
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
-const LIMIT=3*1024*1024;
+const LIMIT=12*1024*1024;
 const errorMap:Record<string,string>={
   MATCH_NOT_ENABLED:'智能匹配服务尚未开放，请稍后再试。',
   AI_NATIVE_DEEPSEARCH_DISABLED:'原生深度搜索试用暂时关闭，请选择常规搜索。',
@@ -139,6 +138,7 @@ const errorMap:Record<string,string>={
   MATCH_GLOBAL_LIMIT:'平台今天的 AI 体验额度已用完。',
   BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。',
   AI_WEB_SEARCH_NOT_USED:'AI 本轮未执行联网搜索，未展示未核实岗位。',
+  AI_RESEARCH_COMPLETION_UNCONFIRMED:'AI 未明确完成研究，已保留已取得的结果，可继续搜索。',
   AI_RESPONSE_INVALID:'DeepSeek 返回结果格式异常，请重试。',
   AI_PROVIDER_INCOMPLETE:'DeepSeek 搜索未能完成，没有返回不完整的岗位结果。'
 };
@@ -207,7 +207,7 @@ export function redactResumeTextLocally(text:string):string{
   .replace(/(?<![0-9A-Za-z])\d{17}[0-9Xx](?![0-9A-Za-z])/g,'[身份证号已隐藏]')
   .replace(/\bhttps?:\/\/[^\s<>]{3,200}/gi,'[个人网址已隐藏]')
   .replace(/(?:微信号|微信|QQ号|QQ)\s*[:：]\s*[A-Za-z0-9_-]{5,32}/gi,'[即时通讯账号已隐藏]')
-  .trim().slice(0,20000);
+  .trim();
 }
 export function resumeFileFormat(name:string){
  return /\.(pdf|docx)$/i.exec(name)?.[1].toLowerCase()??null;
@@ -215,7 +215,7 @@ export function resumeFileFormat(name:string){
 export async function inspectResumeTextLocally(file:File,signal?:AbortSignal):Promise<{text:string;needsOcr:boolean}>{
  const format=resumeFileFormat(file.name);
  if(!format||file.size<30||file.size>LIMIT)
-  throw new MatchError(413,'请选择 3 MB 以内的 Word（DOCX）或 PDF 简历。');
+  throw new MatchError(413,'请选择 12 MB 以内的 Word（DOCX）或 PDF 简历。');
  try{
   const buffer=await file.arrayBuffer();
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
@@ -240,7 +240,8 @@ export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Pr
 
 const ocrErrors:Record<string,string>={
  SESSION_INVALID:'请先登录求职账号，再识别简历文档。',
- OCR_CONSENT_REQUIRED:'请先授权 DeepSeek 处理这份原文件。',
+ OCR_CONSENT_REQUIRED:'请先明确授权 AI 服务处理这份原文件。',
+  OCR_FILE_PROVIDER_UNSUPPORTED:'当前模型接口不支持此文件识别方式，请尝试文字版 PDF 或粘贴简历原文。',
  OCR_INVALID_FILE:'这份文件无法读取。请在 Word 中另存为 DOCX，或重新导出 PDF。',
  OCR_UNSUPPORTED_FORMAT:'请选择 Word（DOCX）或 PDF 简历。',
  OCR_FILE_TOO_LARGE:'请选择 3 MB 以内的简历文件。',
@@ -256,7 +257,7 @@ export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Pro
  const response=await fetch(EFFECTIVE_API+'/ocr',{
   method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/octet-stream',Authorization:'Bearer '+token,
-   'X-HHBA-Resume-Format':format,'X-HHBA-OCR-Consent':'deepseek-resume-ocr-v1'},
+   'X-HHBA-Resume-Format':format,'X-HHBA-OCR-Consent':MATCH_V4_PREVIEW?'openai-relay-resume-ocr-v4':'deepseek-resume-ocr-v1'},
   body:file
  }).catch(error=>{
   if(error?.name==='AbortError')throw error;
@@ -273,14 +274,17 @@ export type NativeMatchActivity={
  candidate_links?:number;rejected_links?:number;pages_read?:number;decisions?:number;
  search_failures?:number;elapsed_ms?:number
 };
+type MatchContinuation={status:'CONTINUE';continuation:{state:unknown;token:string}};
+type MatchStreamResponse=MatchResponse|MatchContinuation;
 async function consumeNativeMatchStream(
  response:Response,onProgress?:(stage:NativeMatchProgress)=>void,
  onPartial?:(jobs:MatchedJob[])=>void,
  onActivity?:(activity:NativeMatchActivity)=>void,onReceive?:()=>void
-):Promise<MatchResponse>{
+):Promise<MatchStreamResponse>{
  if(!response.body)throw new MatchError(502,'智能匹配连接没有返回可读取的结果。');
  const decoder=new TextDecoder(),reader=response.body.getReader();
- let buffer='',complete:MatchResponse|null=null;
+ let buffer='',complete:MatchStreamResponse|null=null;
+ let partialJobs:MatchedJob[]=[],finalJobs:MatchedJob[]=[];
  function parseEvent(chunk:string){
   const event=chunk.split('\n').find(line=>line.startsWith('event:'))?.slice(6).trim();
   const data=chunk.split('\n').filter(line=>line.startsWith('data:'))
@@ -304,7 +308,17 @@ async function consumeNativeMatchStream(
      pages_read:number(value.pages_read),decisions:number(value.decisions),
      search_failures:number(value.search_failures),elapsed_ms:number(value.elapsed_ms)});
    }
-  }else if(event==='partial'){
+  }else if(event==='partial_begin'){
+    partialJobs=[];
+   }else if(event==='partial_job'){
+    if(value?.job)partialJobs.push(value.job as MatchedJob);
+   }else if(event==='partial_end'){
+    onPartial?.([...partialJobs]);
+   }else if(event==='final_begin'){
+    finalJobs=[];
+   }else if(event==='final_job'){
+    if(value?.job)finalJobs.push(value.job as MatchedJob);
+   }else if(event==='partial'){
    if(Array.isArray(value?.matches)&&(MATCH_V4_PREVIEW||value.matches.length<=10))
     onPartial?.(value.matches as MatchedJob[]);
   }else if(event==='failure'){
@@ -318,7 +332,10 @@ async function consumeNativeMatchStream(
     '（'+Math.round(elapsed/1000)+'秒，阶段：'+(names[stage]||'模型处理')+'）':'';
    throw new MatchError(502,(errorMap[code]||'智能匹配服务暂时不可用。')+elapsedNote);
   }else if(event==='complete'){
-   complete=value as MatchResponse;
+   if(value?.matches_streamed===true){
+     if(finalJobs.length!==value.match_count)throw new MatchError(502,'岗位结果传输不完整，可重试。');
+     complete={...value,matches:finalJobs} as MatchResponse;
+    }else complete=value as MatchStreamResponse;
   }
  }
  try{
@@ -326,13 +343,14 @@ async function consumeNativeMatchStream(
    const {value,done}=await reader.read();
    if(done)break;
    buffer+=decoder.decode(value,{stream:true}).replace(/\r/g,'');
-   if(buffer.length>320000)throw new MatchError(502,'结果数据异常，已停止处理。');
    let stop;
    while((stop=buffer.indexOf('\n\n'))>=0){
     const event=buffer.slice(0,stop);buffer=buffer.slice(stop+2);
     parseEvent(event);
     if(complete)return complete;
    }
+   // Bound a malformed single event, not the number of streamed jobs.
+   if(buffer.length>8000000)throw new MatchError(502,'单条结果传输异常，已停止处理。');
   }
   if(buffer.trim())parseEvent(buffer);
  }catch(e){
@@ -380,7 +398,7 @@ export async function runMatchPreviewSyntheticAcceptance(
  if(!(response.headers.get('content-type')||'').includes('text/event-stream'))
   throw new MatchError(502,'验收服务未返回流式岗位搜索进度。');
  const result=await consumeNativeMatchStream(response,onProgress,undefined,onActivity);
- if(result.preview_synthetic!==true)
+ if(result.status!=='COMPLETE'||result.preview_synthetic!==true)
   throw new MatchError(502,'验收响应缺少合成简历标识，已停止展示结果。');
  return result;
 }
@@ -409,7 +427,10 @@ export async function submitExtractedResumeText(
  const deadline=MATCH_V4_PREVIEW?undefined:setTimeout(()=>
   timeout('这次智能匹配用时过长，已结束本次等待。可用当前简历重试。'),300000);
  onReceive();
+ let continuation:MatchContinuation['continuation']|undefined;
  try{
+  for(;;){
+  if(requestSignal.aborted)throw requestSignal.reason;
   const response=await fetch(EFFECTIVE_API+'/resume',{
    method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
@@ -418,7 +439,7 @@ export async function submitExtractedResumeText(
      role_hint:opts.role_hint,
      ...(!MATCH_V4_PREVIEW?{limit:Math.min(10,Math.max(1,opts.limit||10))}:{}),
      exclude_urls:opts.exclude_urls
-    }})
+    },...(continuation?{continuation}:{})})
   }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
    if((e as Error)?.name==='AbortError')throw e;
    throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
@@ -426,12 +447,18 @@ export async function submitExtractedResumeText(
   const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
   if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。');
   const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,onReceive):
-   await response.json().catch(()=>({})) as Partial<MatchResponse>&{error?:string};
+   await response.json().catch(()=>({})) as (Partial<MatchResponse>|MatchContinuation)&{error?:string};
   if(!response.ok)throw new MatchError(response.status,errorMap[(data as {error?:string}).error||'']||'智能匹配服务暂时不可用。');
+  if(data.status==='CONTINUE'){
+   if(!MATCH_V4_PREVIEW||!data.continuation||typeof data.continuation.token!=='string'||!data.continuation.state)throw new MatchError(502,'AI 续接状态异常。');
+   continuation=data.continuation;
+   continue;
+  }
   if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||
    (!MATCH_V4_PREVIEW&&data.matches.length>10))
    throw new MatchError(502,errorMap.BAD_RESPONSE);
   return data as MatchResponse;
+  }
  }catch(error){
   if(requestSignal.aborted)throw requestSignal.reason;
   throw error;

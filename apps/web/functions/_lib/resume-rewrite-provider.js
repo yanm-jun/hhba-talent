@@ -8,9 +8,10 @@
  * Untrusted job descriptions and resume text are DATA, not instructions.
  */
 import {selectProvider} from './resume-ai-provider.js';
+import {v4Call,v4ParseJson} from './simple-match-v4.js';
 
 export const REWRITE_KIND='HHBA_WHOLE_RESUME_REWRITE_V1';
-const GROUP_CHARS=8000,MAX_BLOCKS=96,MAX_TEXT_PER_BLOCK=8000;
+const GROUP_CHARS=8000,MAX_BLOCKS=512,MAX_TEXT_PER_BLOCK=8000;
 const compact=x=>String(x??'').trim();
 function error(code){throw new Error(code);}
 export function redacted(text){
@@ -22,7 +23,7 @@ function validInputs(blocks,job){
  if(!Array.isArray(blocks)||blocks.length<1||blocks.length>MAX_BLOCKS||
   !job||typeof job!=='object'||typeof job.title!=='string'||
   !job.title.trim()||job.title.length>180||
-  typeof job.requirements!=='string'||job.requirements.length>16000)
+  typeof job.requirements!=='string'||job.requirements.length>250000)
   return false;
  const used=new Set();
  return blocks.every(b=>b&&typeof b.id==='string'&&
@@ -73,7 +74,7 @@ export function validateAuthoring(block,proposal,quotes,numbers){
  if(typeof proposal!=='string'||!proposal.trim()||
   proposal.length>Math.max(12000,block.text.length*4))
   return 'INVALID_REWRITE_TEXT';
- if(!Array.isArray(quotes)||quotes.length===0||quotes.length>20)
+ if(!Array.isArray(quotes)||quotes.length===0)
   return 'MISSING_SOURCE_EVIDENCE';
  for(const q of quotes){
   if(typeof q!=='string'||q.trim().length<3||!block.text.includes(q.trim()))
@@ -86,6 +87,11 @@ export function validateAuthoring(block,proposal,quotes,numbers){
  return null;
 }
 export async function completeJson(provider,system,user,signal,maxTokens=9000){
+ if(provider.protocol==='responses'){
+  const reply=await v4Call(fetch,provider,{instructions:system,input:JSON.stringify(user)},{signal});
+  if(reply.status!=='completed')error('AI_PROVIDER_RESPONSE_TRUNCATED');
+  return v4ParseJson(reply);
+ }
  const headers={'content-type':'application/json'},url=provider.baseUrl+
   (provider.protocol==='anthropic'?'/messages':'/chat/completions');
  let body;
@@ -191,7 +197,7 @@ export async function generateTailoredResume({env,blocks,job,signal}){
  const rewritten=[],issues=[],groups=balancedGroups(safeBlocks);
  for(const group of groups){
   const response=await completeJson(provider,SYSTEM_WRITE,{
-   job:safeJob,focus:Array.isArray(plan.focus)?plan.focus.slice(0,30):[],
+   job:safeJob,focus:Array.isArray(plan.focus)?plan.focus:[],
    blocks:group
   },signal,12000);
   const writers=Array.isArray(response.rewrites)?response.rewrites:[];
@@ -230,7 +236,7 @@ export async function generateTailoredResume({env,blocks,job,signal}){
     evidenceQuotes:safe?quotes.map(compact):[],
     rationale:safe?compact(draft?.rationale).slice(0,750):'此段保留原文，需人工补充证据或重新审查。',
     jobRequirements:safe&&Array.isArray(draft?.jobRequirements)?
-     draft.jobRequirements.filter(x=>typeof x==='string').slice(0,12):[],
+     draft.jobRequirements.filter(x=>typeof x==='string'):[],
     status:safe?'needs_user_confirmation':'kept_original'
    });
   }

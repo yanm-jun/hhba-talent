@@ -1,9 +1,9 @@
 // Derive reassessment input from *server-verified Word revisions only*.
 // No AI draft, CSS overlay or guessed replacement counts as a saved edit.
 // A source node must map to exactly one position in the parsed source evidence.
-export function checkedWordScoreBlocks(originalBlocks,history,revision){
+export function checkedWordScoreBlocks(originalBlocks,history,revision,full=false){
  if(!Array.isArray(originalBlocks)||!Array.isArray(history)||
-  !Number.isInteger(revision)||revision<0||revision>8||history.length<revision)
+  !Number.isInteger(revision)||revision<0||(!full&&revision>8)||history.length<revision)
   return {ok:false,reason:'WORD_HISTORY_INCOMPLETE',blocks:[],applied:0};
  const blocks=originalBlocks.map(b=>({...b}));
  if(!blocks.length||blocks.some(b=>!b||typeof b.text!=='string'||typeof b.id!=='string'))
@@ -12,7 +12,7 @@ export function checkedWordScoreBlocks(originalBlocks,history,revision){
   const h=history[step];
   if(!h||h.revision!==step+1||typeof h.original!=='string'||
    typeof h.text!=='string'||!h.original.trim()||!h.text.trim()||
-   h.original===h.text||h.original.length>300||h.text.length>300)
+   h.original===h.text||(!full&&(h.original.length>300||h.text.length>300)))
    return {ok:false,reason:'WORD_HISTORY_INCOMPLETE',blocks:[],applied:step};
   const hits=[];
   for(let i=0;i<blocks.length;i++){
@@ -31,7 +31,7 @@ export function checkedWordScoreBlocks(originalBlocks,history,revision){
     blocks:[],applied:step};
   const {index,at}=hits[0],before=blocks[index].text;
   const next=before.slice(0,at)+h.text+before.slice(at+h.original.length);
-  if(next.length>1600)
+  if(!full&&next.length>1600)
    return {ok:false,reason:'WORD_EDIT_OUTSIDE_PROFILE',blocks:[],applied:step};
   blocks[index]={...blocks[index],text:next};
  }

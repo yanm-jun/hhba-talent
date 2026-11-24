@@ -8,7 +8,7 @@ import type {ResumeBlock,ResumeSection} from './targetedResumeOptimization';
  */
 export type CompleteRewriteSource={blocks:ResumeBlock[];complete:boolean;reason?:string};
 const MAX_CHARS_PER_BLOCK=4200;
-const MAX_BLOCKS=96;
+const MAX_BLOCKS=512;
 function sectionOf(text:string):ResumeSection{
  // JavaScript \b is an ASCII-oriented word boundary and does not match
  // headings followed by Chinese punctuation or Chinese body text reliably.

@@ -6,24 +6,28 @@ const BATCH_SIZE=12;
 const CONCURRENCY=3;
 const LEASE_MS=4*60*1000;
 
-export async function reserveResumeOptimizationTask(db,accountHash,source){
+export async function reserveResumeOptimizationTask(db,accountHash,source,{unrestricted=false}={}){
  const taskHash=await sha256Hex(accountHash+'\n'+JSON.stringify(source));
  const leaseId=crypto.randomUUID(),now=new Date().toISOString();
  const expires=new Date(Date.now()+LEASE_MS).toISOString();
  await db.prepare('DELETE FROM hhba_resume_optimization_tasks WHERE expires_at<=?').bind(now).run();
  const result=await db.prepare(
   'INSERT INTO hhba_resume_optimization_tasks(account_hash,task_hash,lease_id,expires_at) '+
-  'SELECT ?,?,?,? WHERE (SELECT COUNT(*) FROM hhba_resume_optimization_tasks WHERE expires_at>?)<12 '+
+  (unrestricted?'SELECT ?,?,?,? WHERE 1=1 ':'SELECT ?,?,?,? WHERE (SELECT COUNT(*) FROM hhba_resume_optimization_tasks WHERE expires_at>?)<12 ')+
   'ON CONFLICT(account_hash) DO UPDATE SET task_hash=excluded.task_hash,lease_id=excluded.lease_id,'+
   'expires_at=excluded.expires_at WHERE hhba_resume_optimization_tasks.expires_at<=?'
- ).bind(accountHash,taskHash,leaseId,expires,now,now).run();
+ ).bind(accountHash,taskHash,leaseId,expires,...(unrestricted?[]:[now]),now).run();
  if(result?.success!==true||result?.meta?.changes!==1){
   const running=await db.prepare(
    'SELECT task_hash FROM hhba_resume_optimization_tasks WHERE account_hash=? AND expires_at>?'
   ).bind(accountHash,now).first();
   return running?.task_hash===taskHash?{duplicate:true}:null;
  }
- return {async release(){
+ return {async renew(){
+  const until=new Date(Date.now()+LEASE_MS).toISOString();
+  const r=await db.prepare('UPDATE hhba_resume_optimization_tasks SET expires_at=? WHERE account_hash=? AND lease_id=?').bind(until,accountHash,leaseId).run();
+  return r?.success===true&&r?.meta?.changes===1;
+ },async release(){
   await db.prepare('DELETE FROM hhba_resume_optimization_tasks WHERE account_hash=? AND lease_id=?')
    .bind(accountHash,leaseId).run();
  }};
@@ -42,12 +46,12 @@ export async function optimizeResumeDocument({env,blocks,context,job,signal,want
  const generate=deps.generate||generateSuggestions;
  const audit=deps.audit||auditTargetedResumeSuggestions;
  const plan=deps.plan||(input=>completeJson(selectProvider(env,'resume_rewrite'),editorialInstructions,input,
-  AbortSignal.any([signal,AbortSignal.timeout(55000)]),7000));
+  signal,7000));
  let focus=[];
  try{
   const proposed=await plan({job,context,blocks});
   if(Array.isArray(proposed?.focus))focus=proposed.focus.filter(value=>typeof value==='string')
-   .map(value=>value.trim().slice(0,360)).filter(Boolean).slice(0,20);
+   .map(value=>value.trim()).filter(Boolean);
  }catch(error){
   if(terminal.has(error?.message)&&error.message!=='AI_PROVIDER_NOT_CONFIGURED')throw error;
  }
@@ -55,10 +59,13 @@ export async function optimizeResumeDocument({env,blocks,context,job,signal,want
  const scoped=blocks.filter(block=>!chosen||chosen.has(block.id));
  const batches=[];
  for(let i=0;i<scoped.length;i+=BATCH_SIZE)batches.push(scoped.slice(i,i+BATCH_SIZE));
+ // V4 yields after a small per-invocation budget; the client automatically
+ // submits remaining IDs, preserving all sections. This is not a total limit.
+ const activeBatches=env?.HHBA_MATCH_V4_READY==='1'?batches.slice(0,3):batches;
  const results=new Array(batches.length);
  let cursor=0,terminalError=null,provider;
  async function work(){
-  while(cursor<batches.length&&!signal.aborted&&!terminalError){
+  while(cursor<activeBatches.length&&!signal.aborted&&!terminalError){
    const index=cursor++,batch=batches[index];
    const run=async()=>{
     const result=await generate({env,blocks:batch,job,signal,documentContext:{text:context,focus}});
@@ -75,7 +82,7 @@ export async function optimizeResumeDocument({env,blocks,context,job,signal,want
    }
   }
  }
- await Promise.all(Array.from({length:Math.min(CONCURRENCY,batches.length)},work));
+ await Promise.all(Array.from({length:Math.min(CONCURRENCY,activeBatches.length)},work));
  if(terminalError&&!results.some(Boolean))throw terminalError;
  return {
   provider,

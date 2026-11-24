@@ -4,5 +4,5 @@ export type CheckedWordScoreBlocks=
  | {ok:true;reason:null;blocks:ResumeBlock[];applied:number}
  | {ok:false;reason:string;blocks:ResumeBlock[];applied:number};
 export declare function checkedWordScoreBlocks(
- originalBlocks:ResumeBlock[],history:VerifiedWordHistoryEntry[],revision:number
+ originalBlocks:ResumeBlock[],history:VerifiedWordHistoryEntry[],revision:number,full?:boolean
 ):CheckedWordScoreBlocks;

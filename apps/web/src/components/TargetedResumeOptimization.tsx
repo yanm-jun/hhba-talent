@@ -30,14 +30,15 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  // Reopen the same employer posting from a new search or history using the same private Word branch.
  const postingScope=useMemo(()=>stablePostingScope(job.official_url),[job.official_url]);
  const blocks=useMemo<ResumeBlock[]>(()=>{
+ if(requireVerifiedJd&&sourceText?.trim())return sourceResumeBlocks(sourceText,true);
  const originals=[
   ...(Array.isArray(profile.experiences)?profile.experiences:[]).filter(e=>e.evidence?.trim()).map((e,i)=>({id:'experience-'+i,section:'experience' as const,text:e.evidence.slice(0,1600)})),
   ...(Array.isArray(profile.skills)?profile.skills:[]).filter(s=>s.evidence?.trim()).map((s,i)=>({id:'skill-'+i,section:'skills' as const,text:s.evidence.slice(0,1600)}))
- ].slice(0,12);
+ ];
  // Newer search-first flows preserve local source text, but do not yet expose
  // verified structured work-history records. Keep raw paragraphs unmistakably
  // labelled as source text, rather than inventing roles or employers.
- if(!profile.experiences?.length&&sourceText?.trim())return sourceResumeBlocks(sourceText,requireVerifiedJd);
+ if(!profile.experiences?.length&&sourceText?.trim())return sourceResumeBlocks(sourceText,true);
  return originals;
  },[profile,sourceText,requireVerifiedJd]);
  const wholeSource=useMemo(()=>completeRewriteSource(profile,sourceText),[profile,sourceText]);
@@ -227,8 +228,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   (verifiedJob&&confirmedVerifiedJob?verifiedJob.job_id:null));
  const hasSupportedJob=Boolean(scoreJobId);
  const verifiedWordScore=useMemo(()=>checkedWordScoreBlocks(blocks,
-  wordRevisionSnapshot?.history||[],wordRevisionSnapshot?.revision||0),
-  [blocks,wordRevisionSnapshot]);
+  wordRevisionSnapshot?.history||[],wordRevisionSnapshot?.revision||0,requireVerifiedJd),
+  [blocks,wordRevisionSnapshot,requireVerifiedJd]);
  const hasVerifiedWordRevision=Boolean(sourceResume&&wordRevisionSnapshot&&
   wordRevisionSnapshot.revision>0);
  function handleWordRevisionSnapshot(snapshot:WordRevisionSnapshot){
@@ -263,7 +264,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   setScoring(true);setNotice('');setScoreResult(null);
   try{
    const result=await reassessResume(scoreJobId,profile,blocks,
-    sourceResume?verifiedWordScore.blocks:version.blocks);
+    sourceResume?verifiedWordScore.blocks:version.blocks,undefined,scoreStatus.ranking_version==='HHBA_AI_MATCH_V4');
    setScoreResult(result);
    if(!result.supported)setNotice('此岗位未通过当前官方快照复评条件，未生成分数。');
    else setNotice('已用相同标准比较修改前后的简历。');
@@ -309,10 +310,6 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   // checkpoint must verify again on the server before that tool can run.
   while(!controller.signal.aborted&&latest.autonomy?.needs_more_work&&
    latest.continuation?.enabled&&latest.continuation.checkpoint){
-   if((latest.autonomy.tools_used?.length||0)>=64){
-    setNotice('本轮已到达技术保护边界。当前完整草稿已保留，可先审阅。');
-    break;
-   }
    latest=await continueWholeResumeRewrite(
     input.blocks,input.job,latest,controller.signal);
    if(controller.signal.aborted)return latest;
@@ -353,11 +350,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   if(requireVerifiedJd&&(!job.jd_version_id||!job.jd_sha256))
    throw Error('请先完成此岗位的 JD 核验，再优化简历。');
   if(job.jd_version_id){
-   const official=await getArchivedJobJdVersion(job.jd_version_id,signal);
+   let official=await getArchivedJobJdVersion(job.jd_version_id,signal);
    if(official.canonical_url!==job.official_url||official.job_id!==job.jd_version_id||
     (job.jd_sha256&&official.jd_sha256!==job.jd_sha256))
     throw Error('岗位 JD 版本不一致，请重新匹配后再优化。');
-   if(!official.fresh)throw Error('岗位 JD 需要重新核验，请重新匹配后再优化。');
+   if(!official.fresh)official=await ensureArchivedJobJd(job.official_url,signal,job.jd_version_id);
    if(!signal.aborted)setArchivedJdId(official.job_id);
    return {title:official.title,requirements:official.full_jd,official_url:official.canonical_url,
     jd_version_id:official.job_id,jd_sha256:official.jd_sha256};
@@ -381,7 +378,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    const official=await ensureArchivedJobJd(job.official_url,signal);
    if(!signal.aborted)setArchivedJdId(official.job_id);
    return {title:official.title,requirements:official.full_jd,
-    official_url:official.canonical_url,jd_version_id:official.job_id};
+    official_url:official.canonical_url,jd_version_id:official.job_id,jd_sha256:official.jd_sha256};
   }catch(error){
    if(signal.aborted)throw error;
    if(partial)return partial;
@@ -442,7 +439,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    if(controller.signal.aborted)return;
    const targetedJob={
     ...trustedJob,title:trustedJob.title.slice(0,120),
-    requirements:trustedJob.requirements.slice(0,16000)
+    requirements:trustedJob.requirements
    };
    const context=sourceResume?(wordDocumentText.current||sourceText||''):(sourceText||'');
    const full=requireVerifiedJd;
@@ -452,7 +449,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    const prior=full&&previousOptimization.current?.key===key?previousOptimization.current:null;
    let pending:string[]=[];
    const incoming=prior&&!prior.pending.length?prior.suggestions:
-    await requestResumeOptimization(full?currentBlocks:currentBlocks.slice(0,12),targetedJob,controller.signal,
+    await requestResumeOptimization(currentBlocks,targetedJob,controller.signal,
      full?{text:context,wanted:prior?.pending,onPending:ids=>{pending=ids;},
       onQueued:()=>setNotice('简历优化正在排队，轮到后会继续。')}:undefined);
    const combined=[...new Map([...(prior?.suggestions||[]),...incoming].map(item=>[item.blockId,item])).values()];
@@ -630,8 +627,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    .map(item=>({
     original:item.original,proposed:version.blocks.find(b=>b.id===item.blockId)?.text||''
    })).filter(({original,proposed})=>original!==proposed&&
-    original.length>1&&original.length<=300&&
-    proposed.length>1&&proposed.length<=300&&
+    original.length>1&&original.length<=1600&&
+    proposed.length>1&&proposed.length<=1600&&
     original===original.trim()&&proposed===proposed.trim()&&
     !/[\r\n\t]/.test(original+proposed));
   const occurrences=new Map<string,number>();
@@ -639,8 +636,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    occurrences.set(change.original,(occurrences.get(change.original)||0)+1);
   const approvedWhole=wholeApproved&&wholeDraft?
    wholeDraft.blocks.filter(b=>b.changed&&b.status==='needs_user_confirmation'&&
-    b.original.length>1&&b.original.length<=300&&
-    b.proposed.length>1&&b.proposed.length<=300&&
+    b.original.length>1&&b.original.length<=1600&&
+    b.proposed.length>1&&b.proposed.length<=1600&&
     !/[\r\n\t]/.test(b.original+b.proposed)).map(b=>({
      original:b.original,proposed:b.proposed
     })):[];
@@ -659,14 +656,14 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    state:version.acceptedSuggestionIds.includes(s.id)?'accepted' as const:'pending' as const
   }))
   .filter(s=>s.original.trim()&&s.proposed.trim()&&
-   s.original!==s.proposed&&s.proposed.length<=300&&
+   s.original!==s.proposed&&s.proposed.length<=1600&&
    !(wordRevisionSnapshot?.history||[])
     .slice(0,wordRevisionSnapshot?.revision||0)
     .some(saved=>saved.original===s.original&&saved.text===s.proposed))
   .concat((wholeDraft?.blocks||[])
    .slice(0,revealedWholeCount)
    .filter(b=>b.changed&&!resolvedWordVisualIds.includes('whole-'+b.blockId)&&
-     b.original.length<=300&&b.proposed.length<=300&&
+     b.original.length<=1600&&b.proposed.length<=1600&&
     b.proposed!==b.original)
    .map(b=>({
     id:'whole-'+b.blockId,original:b.original,proposed:b.proposed,
@@ -708,7 +705,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   // recommendations require fresh evidence confirmation after recovery.
   const reviewed=Array.isArray(data.suggestions)?
    data.suggestions.filter((item:ResumeSuggestion)=>
-    item&&validateSuggestion(data.version.blocks,item)).slice(0,12):[];
+    item&&validateSuggestion(data.version.blocks,item)):[];
   const approvedIds=new Set(reviewed.map((item:ResumeSuggestion)=>item.id));
   const safeFields=(value:unknown,max:number):Record<string,string>=>{
    const input=value&&typeof value==='object'&&!Array.isArray(value)?
@@ -722,8 +719,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   const native=data.native_word_draft;
   setNativeWordTextDraft(native&&typeof native.original==='string'&&
    typeof native.text==='string'&&native.original.length>0&&
-   native.original.length<=300&&native.text.length<=300&&
-   Number.isInteger(native.revision)&&native.revision>=0&&native.revision<=8&&
+   native.original.length<=1600&&native.text.length<=1600&&
+   Number.isInteger(native.revision)&&native.revision>=0&&
    Number.isInteger(native.page)&&native.page>=1&&native.page<=20?
    {original:native.original,text:native.text,revision:native.revision,page:native.page}:null);
   setVersion({id:'draft-'+(postingScope||'invalid'),targetJobId:postingScope||'invalid',
@@ -761,7 +758,6 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      version:{blocks:version.blocks,acceptedSuggestionIds:version.acceptedSuggestionIds},
      suggestions,ignored,suggestionDrafts,newEvidence,details,
      native_word_draft:nativeWordTextDraft});
-    if(payload.length>60000)throw Error('TOO_LARGE');
     sessionStorage.setItem(draftKey,payload);
     setDraftStatus('文字草稿已保存在当前浏览器标签页（不包含 Word 原文件）。');
    }catch{setDraftStatus('当前浏览器无法自动保存草稿，请避免关闭页面。');}
@@ -946,7 +942,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       // Never infer a writable Word location from a long ATS/search snippet.
       // Ignore contact-like text and only send visible, unique Word spans.
       const safe=[...new Set(segments)].filter(value=>
-       typeof value==='string'&&value.length>=6&&value.length<=300&&
+       typeof value==='string'&&value.length>=6&&value.length<=1600&&
        value===value.trim()&&!/[\r\n\t@]/.test(value)&&
        !/^\+?[\d\s()-]{7,}$/.test(value));
       wordDocumentText.current=documentText||'';
@@ -1054,11 +1050,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    {after.missing.length>0&&<details><summary>仍未充分体现的要求（{after.missing.length}）</summary>
     <ul>{after.missing.map((label,index)=><li key={index}>{label}</li>)}</ul></details>}
   </div>}
-  {!sourceResume&&legacyPrintQa&&<section className="targeted-resume-reassess" aria-label="岗位匹配评分复评">
+  {((!sourceResume&&legacyPrintQa)||(requireVerifiedJd&&scoreStatus?.ranking_version==='HHBA_AI_MATCH_V4'))&&<section className="targeted-resume-reassess" aria-label="岗位匹配评分复评">
    <div className="targeted-resume-reassess-heading">
     <div><strong>重新查看匹配分</strong>
      <p>只有核实了企业发布的岗位要求后，才会比较修改前后的分数。</p></div>
-    {scoreStatus?.enabled&&<button type="button" onClick={reassess} disabled={!hasSupportedJob||!hasWordingChanges||!confirmReassessment||scoring}>
+    {scoreStatus?.enabled&&<button type="button" onClick={reassess} disabled={!hasSupportedJob||!scoreSourceReady||!confirmReassessment||scoring}>
      {scoring?'正在复评…':'重新计算匹配分'}</button>}
    </div>
    {!hasAuditedAtsIdentity&&verifyStatus?.enabled&&
@@ -1087,11 +1083,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    {!scoreStatus?.enabled&&<p className="targeted-resume-reassess-unavailable">暂时无法重新评分，但可以继续修改简历。</p>}
    {scoreStatus?.enabled&&<label className="targeted-resume-confirm">
     <input type="checkbox" checked={confirmReassessment} onChange={e=>setConfirmReassessment(e.target.checked)}/>
-    我确认简历内容真实，并同意使用本次修改后的内容重新评分。
+    我确认简历内容真实，并同意使用修改前后脱敏简历及岗位 JD 通过 AI 中转服务重新评分。
    </label>}
    {scoreStatus?.enabled&&!hasAuditedAtsIdentity&&!hasSupportedJob&&
     <p className="targeted-resume-reassess-unavailable">暂时无法核实这份岗位要求，可以继续修改简历，但不能生成新的匹配分。</p>}
-   {scoreStatus?.enabled&&hasSupportedJob&&!hasWordingChanges&&<p className="targeted-resume-reassess-unavailable">请先编辑或填充一条简历内容，才需要重新评分。</p>}
+   {scoreStatus?.enabled&&hasSupportedJob&&!scoreSourceReady&&<p className="targeted-resume-reassess-unavailable">请先编辑或填充一条简历内容，才需要重新评分。</p>}
    {scoreResult?.supported&&typeof scoreResult.original_score==='number'&&typeof scoreResult.updated_score==='number'&&
     <div className="targeted-resume-score-comparison">
      <div><small>修改前</small><strong>{scoreResult.original_score}<span>/100</span></strong></div>
@@ -1101,14 +1097,16 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      {scoreResult.selected_job_as_target_direction&&<p>因首次匹配未提供可核实的职业目标，本次将你选定的岗位视为求职意向，不视为已经具备该岗位的任职能力。</p>}
      {scoreResult.newly_visible_terms&&scoreResult.newly_visible_terms.length>0&&
       <p>文字新增体现：{scoreResult.newly_visible_terms.join('、')}。这些技能仍需以你的真实经历为依据。</p>}
-     <details><summary>查看评分维度</summary>
+     {scoreResult.before_reason&&<p>修改前依据：{scoreResult.before_reason}</p>}
+     {scoreResult.after_reason&&<p>修改后依据：{scoreResult.after_reason}</p>}
+     {scoreResult.ranking_version!=='HHBA_AI_MATCH_V4'&&<details><summary>查看评分维度</summary>
       <table><thead><tr><th>维度</th><th>修改前</th><th>修改后</th></tr></thead>
        <tbody>{(['role','skills','experience','education','location'] as const).map(dim=><tr key={dim}>
         <td>{{role:'岗位方向',skills:'岗位技能',experience:'工作经验',education:'学历',location:'地点'}[dim]}</td>
         <td>{scoreResult.before_breakdown?.[dim]??'—'}</td><td>{scoreResult.after_breakdown?.[dim]??'—'}</td>
        </tr>)}</tbody>
       </table>
-     </details>
+     </details>}
      <p className="targeted-resume-score-disclaimer">{scoreResult.important_notice}</p>
     </div>}
   </section>}

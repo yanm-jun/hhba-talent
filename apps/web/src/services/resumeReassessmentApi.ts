@@ -11,7 +11,7 @@ export type ReassessmentResult={
  source_label?:string;selected_job_as_target_direction?:boolean;
  supported:boolean;reason?:string;original_score?:number;updated_score?:number;
  delta?:number;before_breakdown?:Record<string,number>;after_breakdown?:Record<string,number>;
- newly_visible_terms?:string[];lost_visible_terms?:string[];important_notice?:string;
+ newly_visible_terms?:string[];lost_visible_terms?:string[];important_notice?:string;before_reason?:string;after_reason?:string;
 };
 const PATH='/api/resume-reassess';
 const errors:Record<string,string>={
@@ -35,15 +35,15 @@ export async function reassessmentStatus(signal?:AbortSignal):Promise<Reassessme
  }catch{return null;}
 }
 export async function reassessResume(jobId:string,profile:CandidateProfile,
- beforeBlocks:ResumeBlock[],afterBlocks:ResumeBlock[],signal?:AbortSignal):Promise<ReassessmentResult>{
+ beforeBlocks:ResumeBlock[],afterBlocks:ResumeBlock[],signal?:AbortSignal,v4=false):Promise<ReassessmentResult>{
  const token=getRealAuthToken();
  if(!realAuthReady||!token)throw new ReassessmentError('SESSION_INVALID',401);
  const data={
-  job_id:jobId,consent_reassessment:true,confirm_real:true,
+  job_id:jobId,consent_reassessment:true,confirm_real:true,...(v4?{consent_ai:true}:{}),
   profile:{
    education:profile.education,experience_years:profile.experience_years,
-   target_roles:profile.target_roles.slice(0,7),
-   skills:profile.skills.slice(0,30).map(s=>({name:s.name}))
+   target_roles:v4?profile.target_roles:profile.target_roles.slice(0,7),
+   skills:(v4?profile.skills:profile.skills.slice(0,30)).map(s=>({name:s.name}))
   },before_blocks:beforeBlocks,after_blocks:afterBlocks
  };
  let response:Response;
