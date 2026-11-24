@@ -27,7 +27,7 @@ test('the simpler result cards preserve the original Word editor and the selecte
  assert.match(dialog,/const matchListScroll=useRef\(0\)/);
  assert.match(dialog,/viewport\.scrollTop=optimizedJobUrl\?0:matchListScroll\.current/);
  assert.match(dialog,/if\(optimizedJobUrl\)\{backToMatches\(\);return\}/);
- assert.match(dialog,/\{optimizedJobUrl\?'返回匹配结果':pending\?'收起或取消':'完成查看'\}/);
+ assert.match(dialog,/\{optimizedJobUrl\?'返回匹配结果':pending\?'最小化':'完成查看'\}/);
  assert.match(dialog,/stageTitle\[progressStage\]/);
  assert.match(dialog,/!pending&&activeJob&&parsedProfile/);
  assert.doesNotMatch(dialog,/<CandidateJourneySteps/);
@@ -81,18 +81,22 @@ test('one job = one private Word revision scope; the original file is untouched'
 });
 
 
-test('running search cannot be cancelled by backdrop, Escape or minimizing',()=>{
+test('backdrop and close minimize directly; only explicit termination aborts the running task',()=>{
  const close=dialog.slice(dialog.indexOf('function handleClose()'),dialog.indexOf('function handleKey('));
- assert.match(close,/if\(pending\)\{setConfirmTerminate\(false\);setConfirmClose\(true\);return\}/);
+ assert.match(close,/if\(pending\)\{minimizeSearch\(\);return\}/);
  const minimize=close.slice(close.indexOf('function minimizeSearch()'),close.indexOf('function restoreSearch()'));
  assert.match(minimize,/setMinimized\(true\)/);
- assert.doesNotMatch(minimize,/onClose\(|abort\(/);
+ assert.doesNotMatch(minimize,/onClose\(|abort\(|setConfirmTerminate\(true\)/);
+ assert.match(close,/function restoreSearch\(\)\{setMinimized\(false\);\}/);
  assert.match(dialog,/if\(!pending\)handleClose\(\)/);
- assert.match(dialog,/onMouseDown=\{e=>\{if\(e.target===e.currentTarget\)e.preventDefault\(\)\}\}/);
- assert.match(dialog,/if\(confirmTerminate\)\{setConfirmClose\(false\);onClose\(\)\}else setConfirmTerminate\(true\)/);
+ assert.match(dialog,/onClick=\{e=>\{if\(e.target===e.currentTarget&&pending\)minimizeSearch\(\)\}\}/);
+ assert.match(dialog,/onClick=\{\(\)=>setConfirmTerminate\(true\)\}>终止匹配/);
+ assert.match(dialog,/onClick=\{\(\)=>\{setConfirmTerminate\(false\);onClose\(\)\}\}>确认终止本次匹配/);
  assert.match(dialog,/hidden=\{minimized\}/);
  assert.match(dialog,/onClick=\{restoreSearch\}/);
+ assert.match(dialog,/confirmTerminate&&pending&&<dialog/);
  assert.match(dialog,/dialog.showModal\(\)/);
- assert.match(dialog,/if\(!pending\)\{setConfirmClose\(false\);setConfirmTerminate\(false\);\}/);
+ assert.match(dialog,/if\(!pending\)setConfirmTerminate\(false\)/);
  assert.match(page,/onClose=\{\(\)=>\{if\(working\)controller.current\?\.abort\(\)/);
+ assert.match(page,/\|\|working\|\|researchJobs\.length>0/);
 });
