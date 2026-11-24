@@ -291,7 +291,7 @@ async function matchTaskReference(text:string,opts:MatchOptions,resumeId?:string
   if(saved?.until>Date.now()&&/^[a-f0-9-]{36}$/.test(saved.id))taskId=saved.id;
   localStorage.setItem(key,JSON.stringify({id:taskId,until:Date.now()+23*3600000}));
  }catch{}
- return {id:taskId,clear(){try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(saved?.id===taskId)localStorage.removeItem(key)}catch{}}};
+ return {id:taskId,touch(){try{localStorage.setItem(key,JSON.stringify({id:taskId,until:Date.now()+23*3600000}))}catch{}},clear(){try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(saved?.id===taskId)localStorage.removeItem(key)}catch{}}};
 }
 
 async function consumeNativeMatchStream(
@@ -300,9 +300,10 @@ async function consumeNativeMatchStream(
  onActivity?:(activity:NativeMatchActivity)=>void,onReceive?:()=>void,
  onResearch?:(report:MatchResearchReport)=>void,onResearchJobs?:(jobs:MatchedJob[])=>void
 ):Promise<MatchStreamResponse>{
- if(!response.body)throw new MatchError(502,'智能匹配连接没有返回可读取的结果。');
+ if(!response.body)throw new MatchError(502,'智能匹配连接没有返回可读取的结果。',true);
  const decoder=new TextDecoder(),reader=response.body.getReader();
  let buffer='',complete:MatchStreamResponse|null=null;
+ let eventPieces:{type:string;total:number;parts:string[]}|null=null;
  let partialJobs:MatchedJob[]=[],finalJobs:MatchedJob[]=[],researchJobs:MatchedJob[]=[];
  let researchReport:MatchResearchReport|undefined;
  function parseEvent(chunk:string){
@@ -311,6 +312,14 @@ async function consumeNativeMatchStream(
    .map(line=>line.slice(5).trimStart()).join('\n');
   if(!event||!data)return;
   let value:any;try{value=JSON.parse(data)}catch{return}
+  if(event==='hhba_event_piece'){
+   if(typeof value?.type!=='string'||value.type==='hhba_event_piece'||!Number.isSafeInteger(value.total)||value.total<1||!Number.isSafeInteger(value.index)||typeof value.text!=='string')throw new MatchError(502,'研究结果分段格式异常。',true);
+   if(value.index===0)eventPieces={type:value.type,total:value.total,parts:[]};
+   if(!eventPieces||eventPieces.type!==value.type||eventPieces.total!==value.total||value.index!==eventPieces.parts.length||value.index>=value.total)throw new MatchError(502,'研究结果分段顺序异常，可重试。',true);
+   eventPieces.parts.push(value.text);onReceive?.();
+   if(eventPieces.parts.length===eventPieces.total){const assembled=eventPieces;eventPieces=null;parseEvent('event: '+assembled.type+'\ndata: '+assembled.parts.join(''));}
+   return;
+  }
   onReceive?.();
   if(event==='progress'){
    const stage=value?.stage;
@@ -496,7 +505,7 @@ export async function submitExtractedResumeText(
   }
   if(data.status==='CONTINUE'){
    if(!MATCH_V4_PREVIEW||!data.continuation||typeof data.continuation.token!=='string'||!data.continuation.state)throw new MatchError(502,'AI 续接状态异常。');
-   continuation=data.continuation;reconnectDelay=1000;
+   continuation=data.continuation;task?.touch();reconnectDelay=1000;
    continue;
   }
   if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||

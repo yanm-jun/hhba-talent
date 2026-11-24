@@ -254,3 +254,43 @@ export async function v4RenderPublicJobDocument(url,{browser,signal}={}){
  if(CLOSED.test(title)||(plain.length<80&&CLOSED.test(plain)))throw Error('V4_JOB_CLOSED');
  return {url:target,plain,site,title,rendered:true};
 }
+
+
+// Read a bounded byte window from a large public document, not a truncated
+// substitute for a verified complete JD. Each next_offset is addressable.
+// The full response is streamed; only the requested window is retained.
+export async function v4ReadPublicJobDocumentWindow(url,{fetcher=fetch,signal,offset=0,maxBytes=256*1024}={}){
+ let current=v4PublicJobUrl(url);
+ if(!Number.isSafeInteger(offset)||offset<0)offset=0;
+ const seen=new Set(),windowBytes=Number.isSafeInteger(maxBytes)&&maxBytes>0?Math.min(256*1024,maxBytes):256*1024;
+ while(current&&!seen.has(current)&&!isCommercialRecruitmentBoard(current)){
+  seen.add(current);
+  if(signal?.aborted)throw signal.reason;
+  const r=await fetcher(current,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,application/json,text/plain'},signal});
+  if([301,302,303,307,308].includes(r.status)){
+   const next=r.headers.get('location');await r.body?.cancel().catch(()=>{});
+   current=next?v4PublicJobUrl(new URL(next,current).href):null;continue;
+  }
+  if(!r.ok||r.status===206||!r.body)throw Error('V4_PAGE_UNAVAILABLE');
+  const ct=(r.headers.get('content-type')||'').toLowerCase();
+  if(!/text\/(html|plain)|json/.test(ct))throw Error('V4_PAGE_NOT_HTML');
+  const reader=r.body.getReader(),out=new Uint8Array(windowBytes);let position=0,written=0,hasMore=false;
+  try{
+   for(;;){
+    if(signal?.aborted)throw signal.reason;
+    const {done,value}=await reader.read();if(done)break;
+    const end=position+value.byteLength;
+    if(end>offset&&written<windowBytes){
+     const start=Math.max(0,offset-position),n=Math.min(value.byteLength-start,windowBytes-written);
+     if(n>0){out.set(value.subarray(start,start+n),written);written+=n;}
+    }
+    position=end;
+    if(position>offset+windowBytes){hasMore=true;break;}
+   }
+  }finally{await reader.cancel().catch(()=>{});reader.releaseLock();}
+  const raw=new TextDecoder().decode(out.subarray(0,written));
+  // Include actual visible text and JSON text; do not mark a window as complete JD.
+  return {url:current,offset,next_offset:hasMore?offset+written:null,unit:'bytes',text:ct.includes('json')?raw:htmlToText(raw,{maxChars:Infinity}),complete_document:false};
+ }
+ throw Error('V4_UNSAFE_OR_REPEATED_REDIRECT');
+}

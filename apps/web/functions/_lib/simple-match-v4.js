@@ -10,6 +10,7 @@ import {sha256Hex} from './real-auth.js';
 import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
 import {CANDIDATE_TARGET,FINAL_TARGET,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,eligibleCuratedScore,qualifiedReport} from './v4-curated-reports.js';
 import {findMainlandCity} from './mainland-job-location.js';
+import {v4ResearchMemoryPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE} from './v4-research-tools.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 
 const BASE='https://api-c.reqtoken.com/v1';
@@ -98,6 +99,11 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent}={}){
    await response.body?.cancel().catch(()=>{});
    return v4Call(fetcher,{...provider,stream:false},payload,{signal,onEvent});
   }
+  if(response.status===413)throw fault('AI_PROVIDER_CONTEXT_TOO_LARGE');
+  if([400,422].includes(response.status)){
+   let error;try{error=(await response.json())?.error}catch{}
+   if(['context_length_exceeded','context_window_exceeded','input_too_long','max_context_length'].includes(error?.code)||/maximum context length|context window.*(?:exceed|too large)|input.*too long/i.test(typeof error?.message==='string'?error.message:''))throw fault('AI_PROVIDER_CONTEXT_TOO_LARGE');
+  }
   if([401,403].includes(response.status))throw fault('AI_PROVIDER_KEY_REJECTED');
   if(response.status===402)throw fault('AI_PROVIDER_BALANCE_INSUFFICIENT');
   if(response.status===429)throw fault('AI_PROVIDER_RATE_LIMITED');
@@ -114,8 +120,8 @@ export function v4GroundProfile(raw,resume){
  const profile=raw?.profile&&typeof raw.profile==='object'?raw.profile:raw||{};
  const exact=quote=>!!quote&&norm(resume).includes(norm(quote));
  const facts=(Array.isArray(profile.facts)?profile.facts:[])
-  .map(x=>({kind:text(x?.kind,22),quote:text(x?.quote)}))
-  .filter(x=>['work','project','skill','education','credential'].includes(x.kind)&&exact(x.quote))
+  .map(x=>({kind:text(x?.kind),quote:text(x?.quote)}))
+  .filter(x=>x.kind&&exact(x.quote))
   .map((x,i)=>({id:'v4-'+(i+1),...x}));
  const skills=(Array.isArray(profile.skills)?profile.skills:[])
   .map(x=>({name:text(x?.name),evidence:text(x?.evidence)}))
@@ -185,7 +191,7 @@ async function toJson(fetcher,provider,response,{signal}={}){
    const formatted=await v4Call(fetcher,provider,{
     instructions:'只转换提供的求职研究文本为JSON，不联网、不补写、不发明岗位和链接。'
      +'输出对象：profile（summary,roles,skills,facts,education,education_evidence,experience_years,experience_evidence）'
-     +'以及 jobs 数组，每项 company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote。'
+     +'以及 jobs 数组，每项 company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote。原样保留 research_action，不发明工具请求。'
      +'没有原文支持的字段使用 null。完整保留真实找到的岗位，不设置数量上限。'
      +'同时原样保留 research_complete、continue_search、completion_reason、search_strategy，以及每个岗位的 source_kind、site_name、employer_proof_url、employer_proof_urls、requirements、fit_summary。不得擅自缩减岗位或引用。',
     input:raw
@@ -397,13 +403,19 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const processedEarlier=new Set(checkpoint?.processedEarlier||[]);
  const sourceLeads=new Set(checkpoint?.sourceLeads||[]),submittedSources=new Set(checkpoint?.submittedSources||[]);
  const processedEvidence=new Map(checkpoint?.processedEvidence||[]);
+ const explicitRechecks=new Set(checkpoint?.explicitRechecks||[]),recheckedEvidence=new Set(checkpoint?.recheckedEvidence||[]);
+ const actionSeen=new Set(checkpoint?.actionSeen||[]);
+ let researchToolResult=checkpoint?.researchToolResult||null;
+ let researchContextBudget=checkpoint?.researchContextBudget||90000;
+ const candidateMemory=()=>[...rows.entries()].map(([url,j])=>({url,company:j.company,title:j.title,location:j.location}));
+ const unresolvedMemory=()=>priorState?priorState.matches.filter(j=>j.jd_source_status!=='VERIFIED_JD'||j.source_type!=='站外官方招聘'||!Number.isInteger(j.match_score)||j.report_status==='UNAVAILABLE').map(j=>({url:j.research_candidate_url||j.official_url,official_url:j.official_url,company:j.company,title:j.title,location:j.location,score:j.match_score,reason:j.score_basis})):[];
  const candidateEvidence=j=>JSON.stringify([j.company,j.title,j.location,j.employer_proof_url,j.employer_proof_urls,j.requirements]);
  const priorState=checkpoint?.priorState||null;
  const backfillSignature=checkpoint?.backfillSignature||'';
  let completionReason=checkpoint?.completionReason||'';
  const note=code=>{diag[code]=(diag[code]||0)+1;};
  const publishResearch=()=>onResearch(report());
- const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],priorState,backfillSignature,...extra}});
+ const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],researchToolResult,researchContextBudget,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],priorState,backfillSignature,...extra}});
  // This phase is reachable only after every candidate has completed a verification
  // attempt. Report generation cannot influence the initial score ranking.
  if(curated&&checkpoint?.phase==='reporting'){
@@ -462,7 +474,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(final.length<FINAL_TARGET)note('UNDERFILLED_EXPANSION');
    note('AI_FINAL_REVIEW');
    onActivity('searching','AI 正在复盘候选覆盖与未完成核验的岗位，自主补充研究及官方证据。');
-   return continuation('research',{processedEarlier:[...rows.keys()],processedEvidence:[...rows.entries()].map(([u,j])=>[u,candidateEvidence(j)]),backfillSignature:candidateSetSignature,priorState:{matches:combined,read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures},stalledStrategy:'',stalledSearches:[],providerRecovery:'',researchError:null,recoveryHint:'已尝试核验全部现有候选，当前有 '+final.length+' 份正式推荐，'+concreteCount()+' 个具体候选。请自主复盘搜索覆盖、失败原因及尚未解决的候选，可选择寻找新机会或补充旧岗位的新官方证据。不要重复无变化的候选，不凑数。若确无新增可信证据，请明确完成并说明原因。诊断：'+JSON.stringify(diag)});
+   return continuation('research',{processedEarlier:[...rows.keys()],processedEvidence:[...rows.entries()].map(([u,j])=>[u,candidateEvidence(j)]),explicitRechecks:[],researchToolResult:null,backfillSignature:candidateSetSignature,priorState:{matches:combined,read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures},stalledStrategy:'',stalledSearches:[],providerRecovery:'',researchError:null,recoveryHint:'已尝试核验全部现有候选，当前有 '+final.length+' 份正式推荐，'+concreteCount()+' 个具体候选。请自主复盘搜索覆盖、失败原因及尚未解决的候选，可选择寻找新机会或补充旧岗位的新官方证据。不要重复无变化的候选，不凑数。若确无新增可信证据，请明确完成并说明原因。诊断：'+JSON.stringify(diag)});
   }
   const incomplete=!!researchError||concreteCount()<CANDIDATE_TARGET||final.length<FINAL_TARGET||!!checkpoint.scoreFailures||reportFailures>0;
   if(!final.length)note('NO_FORMAL_RECOMMENDATIONS');
@@ -505,7 +517,9 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   round++;
   onActivity('searching','AI 正在进行第 '+round+' 轮联网研究，已保留 '+rows.size+
    (curated?' 个有效候选岗位，目标 '+CANDIDATE_TARGET+' 个。':' 条招聘来源；由 AI 自主决定是否继续。'));
-  const pendingSources=[...sourceLeads].filter(u=>!rows.has(u)&&!submittedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u));
+  const allPendingSources=[...sourceLeads].filter(u=>!rows.has(u)&&!submittedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u));
+  const sourcePage=v4ResearchMemoryPage(allPendingSources,0,Math.min(70000,researchContextBudget)),pendingSources=sourcePage.items;
+  const candidatePage=v4ResearchMemoryPage(candidateMemory(),0,researchContextBudget),reviewPage=v4ResearchMemoryPage(unresolvedMemory(),0,researchContextBudget);
   let response;
   try{
    response=await v4Call(fetcher,provider,{
@@ -523,19 +537,26 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      +'profile:{summary,roles,skills:[{name,evidence}],facts:[{kind,quote}],'
      +'education,education_evidence,experience_years,experience_evidence}，'
      +(curated?'jobs:[{company,title,location,url,salary,score,fit_summary,requirements,source_kind,site_name,employer_proof_url,employer_proof_urls}]。':'jobs:[{company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote,source_kind,site_name,employer_proof_url,evidence_sources:[{url}]}]。')
-     +'resume_quote 必须逐字来自简历，岗位有真实来源才填写。'
+     +'resume_quote 必须逐字来自简历，岗位有真实来源才填写。'+(curated?V4_RESEARCH_TOOL_GUIDE:'')
      +'如果已有来源不够好，请自行继续搜索新行业和新企业；不要只重复以前找到的网址。'
      +'若输入存在未分类的公开来源，先研究它们是否包含真实具体岗位或可继续发现岗位的官方入口；只将具体岗位放入 jobs，不把入口或列表当成岗位。若发现旧岗位新增官方证明或JD信息，更新同一网址的候选。'+ '本轮只报告真实搜索所得，返回具体 HTTPS 链接。查询仅使用公开职业方向和岗位关键词，勿向搜索引擎发送个人简历原文、姓名或联系方式。',
     input:JSON.stringify({resume_text:resume,preferred_job_or_city:roleHint,
-     country:'中国大陆',previously_discovered_jobs:curated?[...rows.entries()].map(([url,j])=>({url,company:j.company,title:j.title,location:j.location})): [...rows.entries()].map(([url,j])=>({...j,url})),
+     country:'中国大陆',previously_discovered_jobs:curated?candidatePage.items: [...rows.entries()].map(([url,j])=>({...j,url})),
      ...(curated?{candidate_target:CANDIDATE_TARGET,remaining_candidates:Math.max(0,CANDIDATE_TARGET-concreteCount())}:{}),
-     prior_profile:profile,...(curated?{unclassified_public_sources:pendingSources,review_context:priorState?{verified_reports:priorState.matches.filter(qualifiedReport).length,unresolved:priorState.matches.filter(j=>j.jd_source_status!=='VERIFIED_JD'||j.source_type!=='站外官方招聘'||!Number.isInteger(j.match_score)||j.report_status==='UNAVAILABLE').map(j=>({url:j.research_candidate_url||j.official_url,official_url:j.official_url,company:j.company,title:j.title,location:j.location,score:j.match_score,reason:j.score_basis}))}:null}:{}),excluded_previously_recommended_urls:[...excluded],research_round:round,recovery_hint:recoveryHint,excluded_commercial_domains:[...commercialBoardDomains,...new Set([...rejectedBoards].map(u=>new URL(u).hostname))]}),
-    tools:[{type:'web_search'}],tool_choice:'required',
+     prior_profile:profile,...(curated?{unclassified_public_sources:pendingSources,research_memory:{candidates:{total:candidatePage.total,next_cursor:candidatePage.next_cursor},sources:{total:sourceLeads.size,pending:allPendingSources.length,pending_next_cursor:sourcePage.next_cursor},unresolved:{total:reviewPage.total,next_cursor:reviewPage.next_cursor}},research_tool_result:researchToolResult,context_page_budget:researchContextBudget,review_context:priorState?{verified_reports:priorState.matches.filter(qualifiedReport).length,unresolved:reviewPage.items}:null}:{}),excluded_previously_recommended_urls:[...excluded],research_round:round,recovery_hint:recoveryHint,excluded_commercial_domains:[...commercialBoardDomains,...new Set([...rejectedBoards].map(u=>new URL(u).hostname))]}),
+    tools:[{type:'web_search'}],tool_choice:curated&&researchToolResult?'auto':'required',
     include:['web_search_call.action.sources']
    },{signal,onEvent:providerActivity});
   }catch(e){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    const code=e?.code||'AI_PROVIDER_UNAVAILABLE';
+   if(curated&&code==='AI_PROVIDER_CONTEXT_TOO_LARGE'&&researchContextBudget>4096){
+    researchContextBudget=Math.max(4096,Math.floor(researchContextBudget/2));
+    // Recompute only the transport view; the complete research store is untouched.
+    if(researchToolResult?.type==='memory'&&researchToolResult.ok){const collection=researchToolResult.collection;const items=collection==='candidates'?candidateMemory():collection==='sources'?[...sourceLeads]:unresolvedMemory();researchToolResult={type:'memory',collection,ok:true,...v4ResearchMemoryPage(items,researchToolResult.cursor,researchContextBudget)};}
+    else if(typeof researchToolResult?.text==='string'&&researchToolResult.text.length>researchContextBudget){researchToolResult={type:'read_page',ok:false,url:researchToolResult.url,error:'CONTEXT_PAGE_TOO_LARGE',suggested_mode:researchToolResult.mode,offset:researchToolResult.offset};}
+    note('AI_CONTEXT_REPAGED');recoveryHint='接口报告上下文容量不足，已缩小单次传输页；完整候选和原始研究状态仍保留，可按页读取。';continue;
+   }
    if(curated&&isV4RetryableProviderError(code))throw e;
    if(['AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RATE_LIMITED'].includes(code)&&providerRecovery!==code){
     providerRecovery=code;recoveryHint='联网服务暂时异常，请从已有资料继续，调整检索词及研究策略，不重复之前的请求。';
@@ -547,7 +568,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    onActivity('searching','本轮联网服务暂时中断；已保留此前查到的 '+rows.size+' 条结果。');
    break;
   }
-  if(!response.output.some(x=>x?.type==='web_search_call')&&!v4ToolSources(response).length){
+  let requestedAction=null;try{requestedAction=v4ParseJson(response).research_action||null}catch{}
+  if(!response.output.some(x=>x?.type==='web_search_call')&&!v4ToolSources(response).length&&!(curated&&(requestedAction||researchToolResult))){
    if(curated)for(const u of v4Sources(response))if(!isCommercialRecruitmentBoard(u))sourceLeads.add(curatedUrl(u));
    researchError='AI_WEB_SEARCH_NOT_USED';note(researchError);
    if(curated&&providerRecovery!=='AI_WEB_SEARCH_NOT_USED'){providerRecovery='AI_WEB_SEARCH_NOT_USED';recoveryHint='请使用实际联网工具，保留已取得的候选来源。';continue;}
@@ -613,11 +635,33 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   // Older compatible relay outputs may not contain the new boolean.
   // No numeric round/position threshold controls completion.
   // A different phrasing of an existing recommendation is not discovery.
-  const signature=await sha256Hex(JSON.stringify([...rows.entries()].map(([url,j])=>[url,j.company||'',j.title||'',j.location||'']).sort(([a],[b])=>a.localeCompare(b))));
+  const signature=await sha256Hex(JSON.stringify({rows:[...rows.entries()].map(([url,j])=>[url,candidateEvidence(j)]).sort(([a],[b])=>a.localeCompare(b)),...(curated?{sources:[...sourceLeads].sort(),reviewed:[...submittedSources].sort(),rechecks:[...explicitRechecks].sort()}: {})}));
   const madeProgress=signature!==lastSignature;
   lastSignature=signature;
   if(madeProgress){stalledStrategy='';stalledSearches.clear();}
   const strategySignature=await sha256Hex(JSON.stringify({candidates:signature,queries:[...queries].sort(),strategy:text(data.search_strategy),status:response.status}));
+  if(curated){
+   const action=data.research_action;
+   if(action&&typeof action==='object'){
+    const actionKey=await sha256Hex(JSON.stringify([signature,researchContextBudget,action.type,action.collection,action.cursor,action.url,action.mode,action.offset]));
+    if(!actionSeen.has(actionKey)){
+     actionSeen.add(actionKey);
+     const knownUrls=new Set([...sourceLeads,...rows.keys()].map(v4PublicJobUrl).filter(Boolean));
+     researchToolResult=await v4RunResearchAction(action,{collections:{candidates:candidateMemory(),sources:[...sourceLeads],unresolved:unresolvedMemory()},knownUrls,fetcher,browser:env.BROWSER,signal,budget:researchContextBudget});
+     if(researchToolResult.ok&&action.type==='recheck'){
+      const u=researchToolResult.url,j=rows.get(u);
+      const key=j?JSON.stringify([u,candidateEvidence(j)]):'';
+      if(j&&!recheckedEvidence.has(key)){explicitRechecks.add(u);recheckedEvidence.add(key);}
+      else researchToolResult={type:'recheck',url:u,ok:false,error:'ALREADY_RECHECKED_OR_NO_CANDIDATE'};
+     }
+     note(researchToolResult.ok?'AI_RESEARCH_TOOL_USED':'AI_RESEARCH_TOOL_UNAVAILABLE');
+     recoveryHint='已执行你自主选择的研究工具。请根据返回的 research_tool_result 继续判断，可再次请求不同的工具或分页，或继续搜索。';
+     continue;
+    }
+    note('AI_REPEATED_TOOL_REQUEST');researchToolResult={type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
+    if(!stalledSearches.has(actionKey)){stalledSearches.add(actionKey);recoveryHint='同一工具参数及证据没有变化，请选择其他工具、偏移量或搜索策略；不要重复无效请求。';continue;}
+   }else researchToolResult=null;
+  }
   if(response.status==='incomplete'){
    researchError='AI_PROVIDER_INCOMPLETE';
    if(!madeProgress&&stalledStrategy===signature){note('PROVIDER_INCOMPLETE_NO_PROGRESS');break;}
@@ -651,7 +695,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // gets the same full-JD verification and independent scoring attempt.
  if(stepMode&&checkpoint?.phase!=='verification'&&(curated||rows.size))return continuation('verification',{next:0,matches:priorState?.matches||[],read:priorState?.read||0,scored:priorState?.scored||0,archived:priorState?.archived||0,scoreFailures:priorState?.scoreFailures||0,reportFailures:priorState?.reportFailures||0,priorState:null});
  const offset=checkpoint?.phase==='verification'?checkpoint.next:0;
- const allEntries=[...rows.entries()].filter(([u,j])=>!processedEarlier.has(u)||processedEvidence.get(u)!==candidateEvidence(j));
+ const allEntries=[...rows.entries()].filter(([u,j])=>!processedEarlier.has(u)||processedEvidence.get(u)!==candidateEvidence(j)||explicitRechecks.has(u));
  // Process small batches across separate requests to keep provider, fetch, D1 and R2 calls within a Worker invocation.
  // The batch size is not a recommendation limit; every discovered entry is processed.
  const entries=stepMode?allEntries.slice(offset,offset+(curated?1:2)):allEntries;
@@ -741,7 +785,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   }
  };
  await Promise.all(Array.from({length:Math.min(4,entries.length)},worker));
- const revisedOrigins=new Set(matches.filter(j=>j.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&j.source_type==='站外官方招聘').map(j=>j.research_candidate_url||j.official_url));
+ const revisedOrigins=new Set(matches.filter(j=>j.excluded_closed||j.excluded_board||j.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&j.source_type==='站外官方招聘').map(j=>j.research_candidate_url||j.official_url));
  const rawCombined=[...previousMatches.filter(j=>!curated||!revisedOrigins.has(j.research_candidate_url||j.official_url)),...matches].filter(j=>!j.excluded_board&&!j.excluded_closed&&!isCommercialRecruitmentBoard(j.official_url,j));
  const combined=curated?[...new Map(rawCombined.sort((a,b)=>(a.match_score??-1)-(b.match_score??-1)).map(j=>[j.official_url,j])).values()]:rawCombined;
  if(officialOnly)onPartial(reportMatches());

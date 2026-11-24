@@ -51,8 +51,13 @@ function events(env,request,input){
   start(controller){
    const send=(type,payload)=>{
     if(closed)return;
-    try{controller.enqueue(encoder.encode('event: '+type+'\ndata: '+JSON.stringify(payload)+'\n\n'))}
-    catch{closed=true;}
+    try{
+     const serialized=JSON.stringify(payload);
+     if(serialized.length>500000&&type!=='heartbeat'){
+      const parts=Math.ceil(serialized.length/500000);
+      for(let i=0;i<parts;i++)controller.enqueue(encoder.encode('event: hhba_event_piece\ndata: '+JSON.stringify({type,index:i,total:parts,text:serialized.slice(i*500000,(i+1)*500000)})+'\n\n'));
+     }else controller.enqueue(encoder.encode('event: '+type+'\ndata: '+serialized+'\n\n'));
+    }catch{closed=true;}
    };
    const heart=setInterval(()=>send('heartbeat',{stage:phase,
     elapsed_ms:Date.now()-started}),12000);

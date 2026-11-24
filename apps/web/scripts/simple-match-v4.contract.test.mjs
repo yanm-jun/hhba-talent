@@ -751,3 +751,28 @@ test('V4 dynamic page reading uses a public-origin-scoped, read-only browser act
  await assert.rejects(()=>v4RenderPublicJobDocument('https://127.0.0.1/',{browser}),/V4_UNSAFE_URL/);
  await assert.rejects(()=>v4RenderPublicJobDocument(url,{browser:{quickAction:async()=>new Response(null,{status:429})}}),/V4_BROWSER_QUOTA_OR_RATE_LIMIT/);
 });
+
+
+test('research memory pages preserve every candidate without a hard count limit',async()=>{
+ const {v4ResearchMemoryPage}=await import('../functions/_lib/v4-research-tools.js');
+ const data=Array.from({length:730},(_,i)=>({id:i,text:'candidate '.repeat(50)}));
+ const collected=[];let cursor=0;
+ do{const page=v4ResearchMemoryPage(data,cursor,4000);collected.push(...page.items);cursor=page.next_cursor;}while(cursor!==null);
+ assert.deepEqual(collected,data);
+});
+test('AI-selected tools can read public source windows and reject unrelated URLs',async()=>{
+ const {v4RunResearchAction}=await import('../functions/_lib/v4-research-tools.js');
+ const content='A'.repeat(3000000);
+ const opts={collections:{candidates:[],sources:[url],unresolved:[]},knownUrls:new Set([url]),fetcher:async()=>new Response(content,{headers:{'content-type':'text/plain'}})};
+ const first=await v4RunResearchAction({type:'read_page',mode:'window',url,offset:0},opts);
+ assert.equal(first.ok,true);assert.equal(first.complete_document,false);assert.equal(first.next_offset,262144);
+ const next=await v4RunResearchAction({type:'read_page',mode:'window',url,offset:first.next_offset},opts);
+ assert.equal(next.offset,262144);assert.equal(next.text.length,262144);
+ const rejected=await v4RunResearchAction({type:'read_page',url:'https://private.invalid/'},opts);
+ assert.equal(rejected.ok,false);
+});
+
+
+test('V4 recognizes explicit upstream context overflow without claiming completion',async()=>{
+ await assert.rejects(()=>v4Call(async()=>Response.json({error:{code:'context_length_exceeded'}},{status:400}),provider,{input:'synthetic'}),/AI_PROVIDER_CONTEXT_TOO_LARGE/);
+});
