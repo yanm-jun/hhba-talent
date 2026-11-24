@@ -554,7 +554,7 @@ test('four stage buttons show real reports without changing AI execution',async(
  const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
  const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  for(const label of ['识别简历','搜索企业岗位','核验岗位 JD','对照简历评分'])assert.ok(panels.includes(label));
- assert.match(panels,/onClick=\{\(\)=>setSelected/);assert.match(panels,/report\?\.rounds/);
+ assert.match(panels,/onClick=\{\(\)=>\{setSelected\(i\);onSelectionChange\?\.\(i\)\}\}/);assert.match(panels,/report\?\.rounds/);
  assert.match(dialog,/!optimizedJobUrl&&<MatchResearchPanels/);
  assert.doesNotMatch(panels,/AbortController|fetch\(/);
 });
@@ -620,4 +620,24 @@ test('curated modal renders a single selected report with full detail and horizo
  const report=await readFile(new URL('../src/components/CuratedJobReport.tsx',import.meta.url),'utf8');
  assert.match(report,/岗位要求与简历经历逐项对照/);assert.match(report,/detail\.comparisons\.map/);
  assert.doesNotMatch(report,/\.slice\(/);
+});
+
+test('refined stage workspace derives discovery animation solely from actual backend events',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
+ const css=await readFile(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
+ assert.match(panels,/discovered=report\?\.discovered\?\?all\.length/);
+ assert.match(panels,/key=\{discovered\}/);
+ assert.match(panels,/width:ratio\+'%'/);
+ assert.match(panels,/activity\?\.message/);
+ assert.match(panels,/setArrival\(old=>/);
+ assert.doesNotMatch(panels,/setInterval|setTimeout|Math\.random|fetch\(/);
+ assert.match(dialog,/selection=\{selectedStage\}/);
+ assert.match(dialog,/onFollow=\{\(\)=>selectStage\(null\)\}/);
+ assert.match(dialog,/showResults&&<>/);
+ assert.match(panels,/全部已收到候选岗位/);
+ assert.match(panels,/<CuratedJobReport detail=\{scoreJob\.research_detail\}/);
+ assert.match(css,/prefers-reduced-motion:reduce/);
+ assert.match(css,/hhba-search-progress>div\{[^}]*transition:width/);
 });
