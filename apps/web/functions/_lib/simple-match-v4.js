@@ -5,7 +5,6 @@
  * credible job leads because an employer uses an unfamiliar JD format.
  */
 import {v4PublicJobUrl,v4ReadEmployerJob} from './v4-open-job-evidence.js';
-import {directOfficialJobEvidence} from './official-job-evidence.js';
 
 const BASE='https://api-c.reqtoken.com/v1';
 const MODEL='gpt-6.2-sol';
@@ -207,10 +206,7 @@ function sourceKind(url){
 }
 async function checkJob(fetcher,url,signal){
  try{return await v4ReadEmployerJob(url,{fetcher,signal})}
- catch{
-  try{return await directOfficialJobEvidence(url,{fetcher,signal})}
-  catch{return null}
- }
+ catch{return null}
 }
 async function enrich(fetcher,rows,{signal,onActivity=()=>{}}={}){
  // A bounded concurrency pool protects third-party sites, not a count limit
