@@ -863,3 +863,23 @@ test('V4 preserves candidate groups both inside and outside a result wrapper',as
  },provider,resume,'全国');
  assert.equal(calls,1);assert.equal(result.matches.length,2);
 });
+
+test('curated V4 completed research can resume the same candidate pool and re-rank globally',async()=>{
+ const second={...row,title:'渠道运营支持',url:url+'-next'};
+ const jd='负责渠道运营和经销商业务流程管理，具备渠道运营经验和销售人员培训能力。';
+ const scored=[],reported=[];let expanded=false,profiles=0;
+ const fetcher=async(u,opts)=>{
+  if(!u.endsWith('/responses'))return new Response('<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:u===second.url?second.title:row.title,hiringOrganization:{name:row.company,url:'https://careers.other-motors.cn'},jobLocation:{address:{addressLocality:'上海'}},description:jd})+'</script>',{headers:{'content-type':'text/html'}});
+  const p=JSON.parse(opts.body),i=JSON.parse(p.input);
+  if(p.instructions.includes('自主整理个人职业画像')){profiles++;return model({profile:{summary:'渠道运营经验'}});}
+  if(p.instructions.includes('专业求职研究 AI'))return model({research_complete:true,completion_reason:'已完成覆盖',jobs:expanded?[second]:[row]},[expanded?second.url:url]);
+  const assessment={suitable:true,score:i.job.title===second.title?98:85,reason:'原文支持',resume_quote:'汽车经销商渠道运营',jd_quote:'渠道运营和经销商业务流程'};
+  if(i.established_score!==undefined)reported.push(i.job.title);else scored.push(i.job.title);
+  return model(assessment);
+ };
+ const first=await v4Match(fetcher,provider,resume,'全国',{curated:true,allowContinue:true});
+ assert.equal(first.can_continue,true);assert.equal(first.matches.length,1);assert.ok(first.resume_checkpoint);
+ expanded=true;
+ const next=await v4Match(fetcher,provider,resume,'全国',{curated:true,allowContinue:true,checkpoint:first.resume_checkpoint});
+ assert.equal(profiles,1);assert.deepEqual(scored,[row.title,second.title]);assert.equal(reported.length,2);assert.equal(next.matches.length,2);assert.equal(next.matches[0].title,second.title);
+});
