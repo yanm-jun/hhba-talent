@@ -2,7 +2,7 @@
 import {v4PostingKey} from './v4PostingIdentity.mjs';
 export {v4PostingKey} from './v4PostingIdentity.mjs';
 import {getRealAuthToken,realAuthReady} from './realAuth';
-import {extractDocxText} from './docxProfile.mjs';
+import {extractDocxText,inspectDocxContents} from './docxProfile.mjs';
 import {extractPdfText,PDFResumeError} from './pdfProfile.mjs';
 
 export type MatchProfile = {
@@ -223,10 +223,11 @@ export async function inspectResumeTextLocally(file:File,signal?:AbortSignal):Pr
   const buffer=await file.arrayBuffer();
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
   const pdf=format==='pdf'?await extractPdfText(buffer,{signal,unbounded:MATCH_V4_PREVIEW}):null;
-  const value=pdf?.text??await extractDocxText(buffer,{signal,unbounded:MATCH_V4_PREVIEW});
+  const docx=MATCH_V4_PREVIEW&&format==='docx'?await inspectDocxContents(buffer,{signal}):null;
+  const value=pdf?.text??docx?.text??await extractDocxText(buffer,{signal,unbounded:MATCH_V4_PREVIEW});
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
   const text=redactResumeTextLocally(value);
-  return {text,needsOcr:pdf?.hasTextlessPages===true||text.replace(/\s/g,'').length<(MATCH_V4_PREVIEW?1:30)};
+  return {text,needsOcr:pdf?.hasTextlessPages===true||docx?.hasImages===true||text.replace(/\s/g,'').length<(MATCH_V4_PREVIEW?1:30)};
  }catch(e){
   if((e as Error)?.name==='AbortError'||e instanceof MatchError)throw e;
   if((e instanceof PDFResumeError&&['PDF_NO_TEXT','PDF_FAILED','PDF_TIMEOUT'].includes(e.code))||
@@ -243,7 +244,7 @@ export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Pr
 
 const ocrErrors:Record<string,string>={
  SESSION_INVALID:'请先登录求职账号，再识别简历文档。',
- OCR_CONSENT_REQUIRED:'请先授权 DeepSeek 处理这份原文件。',
+ OCR_CONSENT_REQUIRED:'请先授权 AI 服务识别文档。',
  OCR_INVALID_FILE:'这份文件无法读取。请在 Word 中另存为 DOCX，或重新导出 PDF。',
  OCR_UNSUPPORTED_FORMAT:'请选择 Word（DOCX）或 PDF 简历。',
  OCR_FILE_TOO_LARGE:'请选择 3 MB 以内的简历文件。',
@@ -256,6 +257,25 @@ export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Pro
  const token=session();
  const format=resumeFileFormat(file.name);
  if(!format||file.size<30||(!MATCH_V4_PREVIEW&&file.size>LIMIT))throw new MatchError(400,ocrErrors.OCR_INVALID_FILE);
+ if(MATCH_V4_PREVIEW&&format==='docx'){
+  const doc=await inspectDocxContents(await file.arrayBuffer(),{signal,includeImages:true});
+  const sections=[doc.text];let partial=doc.partial;
+  for(const image of doc.images){
+   if(signal?.aborted)throw signal.reason;
+   // Each embedded image is an independent authorized visual research call.
+   // A failure never discards the already-extracted body or previous images.
+   try{
+    const r=await fetch(EFFECTIVE_API+'/ocr',{method:'POST',credentials:'same-origin',cache:'no-store',signal,
+     headers:{'Content-Type':'application/octet-stream',Authorization:'Bearer '+token,'X-HHBA-Resume-Format':'image','X-HHBA-Image-Mime':image.mime,'X-HHBA-OCR-Consent':'v4-resume-ocr-v1'},body:new Blob([image.bytes],{type:image.mime})});
+    const value=await r.json();
+    if(r.ok&&value.ok===true&&typeof value.text==='string'){if(value.text.trim())sections.push(value.text);partial=partial||value.partial===true;}
+    else partial=true;
+   }catch(e){if(signal?.aborted)throw e;partial=true;}
+  }
+  const text=redactResumeTextLocally(sections.filter(Boolean).join('\n'));
+  if(!text)throw new MatchError(422,ocrErrors.OCR_NO_TEXT);
+  return {text,partial};
+ }
  const response=await fetch(EFFECTIVE_API+'/ocr',{
   method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/octet-stream',Authorization:'Bearer '+token,

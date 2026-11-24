@@ -402,7 +402,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          {ocrBusy&&<p role="status"><LoaderCircle className="spin" size={15}/> 正在识别文档文字…</p>}
          {ocrFile&&!ocrBusy&&<div className="hhba-ai-text-review">
           <strong>{previewText?'部分页面需要进一步识别':'使用 AI 读取扫描版文档'}</strong>
-          <p>点击下方按钮即同意将原 PDF 发送至配置的第三方 AI 服务识别文字。识别完成后请核对并修改结果；无法读取的 DOCX 可重新导出为 PDF。</p>
+          <p>点击下方按钮即同意将 PDF 原文件或 Word 中的内嵌图片发送至配置的第三方 AI 服务识别文字。Word 正文、页眉页脚优先在本地提取。识别完成后请核对结果。</p>
           <button type="button" disabled={working||saveBusy||!getRealAuthToken()} onClick={()=>void runOcr()}>
            {previewError?'同意并重试识别':'同意并识别'}
           </button>

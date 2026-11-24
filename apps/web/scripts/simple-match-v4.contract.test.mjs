@@ -544,3 +544,13 @@ test('V4 editorial planning reads every source segment only after actual context
  });
  assert.deepEqual(reviewed.checks.map(x=>x.blockId),['a','b','c']);
 });
+
+
+test('V4 image OCR accepts authorized image inputs without sending a DOCX archive',async()=>{
+ const db={prepare(sql){return {bind(){return {async first(){if(sql.includes('hhba_auth_sessions'))return {phone:'13911110000',revoked:0,expires_at:new Date(Date.now()+60000).toISOString()};if(sql.includes('hhba_auth_users'))return {role:'candidate'};return null;},async run(){return {success:true}}}}}}};
+ const env={HHBA_AGENT_RELAY_API_KEY:key,HHBA_MATCH_V4_READY:'1',HHBA_PNVS_AUTH_DB:db};
+ const old=globalThis.fetch;let calls=0;
+ globalThis.fetch=async(_u,opts)=>{calls++;const image=JSON.parse(opts.body).input[0].content[0];assert.equal(image.type,'input_image');assert.match(image.image_url,/^data:image\/png;base64,/);assert.equal(image.detail,'high');return model({ok:true});};
+ const make=consent=>new Request('https://hhba.work/api/match-v4/ocr',{method:'POST',headers:{Origin:'https://hhba.work','Content-Type':'application/octet-stream',Authorization:'Bearer test-token','X-HHBA-Resume-Format':'image','X-HHBA-Image-Mime':'image/png',...(consent?{'X-HHBA-OCR-Consent':'v4-resume-ocr-v1'}:{})},body:Uint8Array.from([137,80,78,71,13,10,26,10,0,0,0,0])});
+ try{assert.equal((await onRequest({request:make(false),env})).status,403);assert.equal(calls,0);assert.equal((await onRequest({request:make(true),env})).status,200);assert.equal(calls,1);}finally{globalThis.fetch=old;}
+});
