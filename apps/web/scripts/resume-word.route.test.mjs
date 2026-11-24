@@ -608,3 +608,25 @@ test('job scopes cannot be malformed or swap an already verified manifest across
    .editable_text.includes('甲岗位'));
  }finally{globalThis.fetch=originalFetch;}
 });
+
+
+test('V4 accepts long confirmed Word text through authenticated save, inspect and download without truncation',async()=>{
+ const x=fixture({enabled:false,docxOnly:true});
+ x.env.HHBA_MATCH_V4_READY='1';
+ const proposed='虚构的长段落测试内容。'.repeat(2300);
+ assert.ok(proposed.length>1600);
+ assert.ok(new TextEncoder().encode(proposed).length>65536);
+ const expected=await editOriginalDocxStrict(original,[{original:'测试用户',text:proposed}],{allowExpansion:true});
+ const saved=await onRequestPost({request:req('export',{method:'POST',jobId:'long-v4-role',body:{
+  resume_id:id,job_id:'long-v4-role',action:'edit',original:'测试用户',text:proposed,
+  expected_revision:0,confirmed_real:true,consent_word_processing:true,
+  client_docx_sha256:createHash('sha256').update(expected).digest('hex')
+ }}),env:x.env});
+ assert.equal(saved.status,200,await saved.clone().text());
+ assert.equal((await saved.json()).revision,1);
+ const inspection=await onRequestGet({request:req('inspect',{jobId:'long-v4-role'}),env:x.env});
+ assert.ok((await inspection.json()).editable_text.includes(proposed));
+ const download=await onRequestGet({request:req('download',{jobId:'long-v4-role'}),env:x.env});
+ assert.deepEqual(new Uint8Array(await download.arrayBuffer()),expected);
+ assert.deepEqual(x.saved.get(store),original);
+});
