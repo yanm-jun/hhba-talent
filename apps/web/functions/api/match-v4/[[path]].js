@@ -8,8 +8,8 @@ import {redactForModel} from '../../_lib/resume-match-core.js';
 import {v4Provider,v4Match} from '../../_lib/simple-match-v4.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {recognizeV4Resume} from '../../_lib/v4-resume-ocr.js';
-import {checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint} from '../../_lib/v4-match-checkpoint-storage.js';
-import {claimAiCheckpoint} from '../../_lib/ai-checkpoint-claim.js';
+import {checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint,matchTaskKey,saveMatchTask,readMatchTask} from '../../_lib/v4-match-checkpoint-storage.js';
+import {claimAiCheckpoint,leaseMatchTask} from '../../_lib/ai-checkpoint-claim.js';
 import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -61,14 +61,33 @@ function events(env,request,input){
     send(kind+'_end',{count:matches.length});
    };
    send('progress',{stage:'preparing'});
+   const leaseAbort=new AbortController();
+   const leaseTimer=input.lease?setInterval(()=>input.lease.renew().catch(()=>leaseAbort.abort()),60000):null;
+   const executionSignal=input.lease?AbortSignal.any([request.signal,leaseAbort.signal]):request.signal;
+   async function releaseTask(){if(input.lease){const lease=input.lease;input.lease=null;await lease.release();}}
    void (async()=>{
     let succeeded=false;
     try{
+     if(input.cachedResult){
+      const cached=input.cachedResult;
+      await releaseTask();
+      sendJobs('final',cached.matches);
+      send('complete',{...cached,matches:[],matches_streamed:true,match_count:cached.matches.length});
+      succeeded=true;return;
+     }
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
-      signal:request.signal,onProgress:progress,onActivity:activity,env,excludeUrls:input.excludeUrls,
+      signal:executionSignal,onProgress:progress,onActivity:activity,env,excludeUrls:input.excludeUrls,
       stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,
       onPartial:matches=>sendJobs('partial',matches)});
+     if(executionSignal.aborted)throw Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
      if(result.status==='CONTINUE'){
+      if(input.taskKey){
+       await input.lease.renew();
+       await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint});
+       await releaseTask();
+       send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});
+       succeeded=true;return;
+      }
       // Store derived research state only when a private encrypted checkpoint
       // bucket with lifecycle management has been enabled by the operator.
       const state=checkpointStorageReady(env)?await storeMatchCheckpoint(env,result.checkpoint):result.checkpoint;
@@ -85,6 +104,11 @@ function events(env,request,input){
       const saved=await saveMatchHistory(env.HHBA_PNVS_AUTH_DB,input.phone,input.resume_id,input.role_hint,result.matches.map(job=>({...job,v4_source:true})));
       Object.assign(result,saved?{history_status:'SAVED',history_id:saved.id,new_job_count:saved.new_job_count,improved_job_count:saved.improved_job_count}:{history_status:'EMPTY'});
      }catch{result.history_status='UNAVAILABLE';console.warn('HHBA_V4_HISTORY_UNAVAILABLE');}
+     if(input.taskKey){
+      await input.lease.renew();
+      await saveMatchTask(env,input.taskKey,{result});
+      await releaseTask();
+     }
      sendJobs('final',result.matches);
      send('complete',{...result,matches:[],matches_streamed:true,match_count:result.matches.length});
      succeeded=true;
@@ -94,7 +118,8 @@ function events(env,request,input){
       elapsed_ms:Date.now()-started}));
      send('failure',{error:code,phase,elapsed_ms:Date.now()-started});
     }finally{
-     clearInterval(heart);
+     clearInterval(heart);if(leaseTimer)clearInterval(leaseTimer);
+     await releaseTask().catch(()=>console.warn('HHBA_TASK_LEASE_RELEASE_FAILED'));
      if(input.claim&&(!succeeded||closed))await input.claim.release().catch(()=>console.warn('HHBA_CHECKPOINT_RELEASE_FAILED'));
      if(succeeded&&!closed&&input.pointer)await deleteMatchCheckpoint(env,input.pointer).catch(()=>console.warn('HHBA_CHECKPOINT_CLEANUP_FAILED'));
      if(!closed){closed=true;try{controller.close()}catch{}}
@@ -150,6 +175,18 @@ export async function onRequest({request,env}){
  const excludeUrls=Array.isArray(body?.options?.exclude_urls)?body.options.exclude_urls.filter(x=>typeof x==='string'):[];
  // Do not store raw resume, query, job results, or model output in server logs.
  const input={text:resume,role_hint:role,excludeUrls,phone:session.phone,resume_id:body.resume_id||null};
+ if(checkpointStorageReady(env)&&body.task_id!==undefined){
+  try{
+   input.taskKey=await matchTaskKey(env,session.phone,body.task_id,{text:resume,role,excludeUrls,resume_id:input.resume_id});
+   input.lease=await leaseMatchTask(db,input.taskKey);
+   if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
+   const saved=await readMatchTask(env,input.taskKey);
+   if(saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
+   else if(saved?.checkpoint)input.checkpoint=saved.checkpoint;
+   else if(body.continuation!==undefined){await input.lease.release();return fail('AI_CHECKPOINT_EXPIRED',409);}
+  }catch(e){if(input.lease)await input.lease.release().catch(()=>{});return fail(e?.message==='AI_CHECKPOINT_INVALID'?'AI_CHECKPOINT_INVALID':'AI_CHECKPOINT_DB_UNAVAILABLE',503);}
+  return events(env,request,input);
+ }
  if(body.continuation!==undefined){
   if(!checkpointEnv(env)||!body.continuation?.state||typeof body.continuation.token!=='string')return fail('AI_CHECKPOINT_INVALID',409);
   try{
