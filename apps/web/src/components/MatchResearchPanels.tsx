@@ -129,7 +129,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
      {parsed.education&&<div><small>教育背景</small><strong>{parsed.education}</strong>{parsed.education_evidence&&<p>{parsed.education_evidence}</p>}</div>}
      {parsed.experience_years!=null&&<div><small>识别工作年限</small><strong>{parsed.experience_years}<small> 年</small></strong>{parsed.experience_evidence&&<p>{parsed.experience_evidence}</p>}</div>}
     </div>}
-    {!!parsed.facts?.length&&<section className="hhba-refined-section"><h3>真实简历经历与成果</h3><div className="hhba-fact-list">{parsed.facts.map((fact,i)=><div key={fact.id||i}><span>{String(i+1).padStart(2,'0')}</span><p>{recruitmentText(fact.quote)}</p></div>)}</div></section>}
+    {!!parsed.facts?.length&&<section className="hhba-refined-section"><h3>真实简历经历与成果</h3><div className="hhba-fact-list">{parsed.facts.map((fact,i)=><div key={fact.id||i}><span>{String(i+1).padStart(2,'0')}</span><p>{fact.quote}</p></div>)}</div></section>}
     {!!parsed.skills?.length&&<section className="hhba-refined-section"><h3>核心能力与原文依据</h3><div className="hhba-skill-list">{parsed.skills.map((skill,i)=><div key={i}><strong>{skill.name}</strong>{skill.evidence&&<p>{skill.evidence}</p>}</div>)}</div></section>}
     {!!parsed.target_roles?.length&&<section className="hhba-refined-section"><h3>AI 自主研究方向</h3><div className="hhba-stage-tags">{parsed.target_roles.map((role,i)=><span key={i}>{role}</span>)}</div></section>}
     {!!parsed.warnings?.length&&<p className="hhba-refined-note">{parsed.warnings.join('；')}</p>}
