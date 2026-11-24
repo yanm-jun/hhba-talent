@@ -6,6 +6,7 @@
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {v4Provider,v4Match} from '../../_lib/simple-match-v4.js';
+import {saveMatchHistory} from '../../_lib/match-history.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
 const reply=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
@@ -59,6 +60,11 @@ function events(env,request,input){
      console.info('HHBA_V4_MATCH',JSON.stringify({result:'COMPLETE',
       found:result.matches.length,official:result.matched_official_jobs,
       duration_ms:Date.now()-started}));
+     // Store only result metadata, never the resume or raw model prompt.
+     try{
+      const saved=await saveMatchHistory(env.HHBA_PNVS_AUTH_DB,input.phone,input.resume_id,input.role_hint,result.matches.map(job=>({...job,v4_source:true})));
+      Object.assign(result,saved?{history_status:'SAVED',history_id:saved.id,new_job_count:saved.new_job_count,improved_job_count:saved.improved_job_count}:{history_status:'EMPTY'});
+     }catch{result.history_status='UNAVAILABLE';console.warn('HHBA_V4_HISTORY_UNAVAILABLE');}
      sendJobs('final',result.matches);
      send('complete',{...result,matches:[],matches_streamed:true,match_count:result.matches.length});
     }catch(e){
@@ -116,5 +122,5 @@ export async function onRequest({request,env}){
   body.options.role_hint.trim():'';
  const excludeUrls=Array.isArray(body?.options?.exclude_urls)?body.options.exclude_urls.filter(x=>typeof x==='string'):[];
  // Do not store raw resume, query, job results, or model output in server logs.
- return events(env,request,{text:resume,role_hint:role,excludeUrls});
+ return events(env,request,{text:resume,role_hint:role,excludeUrls,phone:session.phone,resume_id:body.resume_id||null});
 }
