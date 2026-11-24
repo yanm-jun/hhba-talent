@@ -10,15 +10,22 @@ test('a single dashboard serves all candidate accounts regardless of employment 
  assert.doesNotMatch(personal,/careerStage|hhba:career-stage:|正在求职.*已经入职/);
  assert.match(personal,/current==='overview'/);
  assert.match(personal,/个人账户/);
- assert.match(personal,/职业概览与最近记录/);
+ assert.match(personal,/我的工作台/);
  assert.doesNotMatch(personal,/hhba-workbench-opportunity|发现适合自己的下一份工作/);
- assert.match(personal,/hhba-workbench-overview/);
- assert.match(personal,/hhba-workbench-rights/);
+ assert.match(personal,/hhba-workbench-card-grid/);
+ assert.doesNotMatch(personal,/hhba-workbench-rights|hhba-workbench-overview/);
  assert.match(personal,/label:'智能岗位匹配'/);
 });
 test('sidebar groups preserve existing services and connect new service information',()=>{
- for(const label of ['求职服务','职业与权益','账户管理','智能岗位匹配','我的简历','我的收藏','历史查找','一键网申','职业成长档案','劳动权益知识','个人资料','求职偏好','账户与隐私'])
-  assert.ok(personal.includes(label),label+' must be visible');
+ const sidebar=personal.slice(personal.indexOf('const navGroups='),personal.indexOf('function matchDate'));
+ const cards=personal.slice(personal.indexOf('const workspaceCards='),personal.indexOf('const sectionTitle='));
+ const links=source=>[...source.matchAll(/\{label:'([^']+)',path:'([^']+)'/g)].map(m=>[m[1],m[2]]);
+ assert.deepEqual(links(sidebar).map(x=>x[0]),['劳动权益知识','个人资料','求职偏好','账户与隐私']);
+ assert.deepEqual(links(cards).map(x=>x[0]),['智能岗位匹配','我的简历','我的收藏','历史查找','职业成长档案']);
+ const destinations=[...links(sidebar),...links(cards)].map(x=>x[1]);
+ assert.equal(new Set(destinations).size,destinations.length);
+ assert.doesNotMatch(sidebar,/一键网申|会员与权益服务/);
+ assert.equal((cards.match(/primary:true/g)||[]).length,1);
  assert.match(routes,/privacy\|apply-assistant\|career/);
  assert.match(personal,/hasVisited\('resume'\).*<PrivateResumeVault active=\{current==='resume'\}\/>/);
  assert.match(personal,/hasVisited\('applications'\).*<CandidateMatchHistory active=\{current==='applications'\}\/>/);
@@ -29,11 +36,11 @@ test('overview displays actual account data and does not advertise unlaunched me
  assert.match(personal,/latestMatch\.created_at/);
  assert.match(personal,/savedCount/);
  assert.match(personal,/resumeCount/);
- assert.match(personal,/免费知识/);
+ assert.match(personal,/劳动权益知识/);
  assert.doesNotMatch(personal,/会员与权益服务|服务筹备中|了解会员资格/);
  assert.doesNotMatch(personal,/¥24\.90|hhba-career-membership|规划会员月费/);
  assert.match(personal,/职业成长档案/);
- assert.match(personal,/职业经历/);
+ assert.match(personal,/职业成长档案/);
 });
 test('growth archive reuses real profile and private resumes rather than inventing work history',()=>{
  assert.match(personal,/current==='career'/);
@@ -42,7 +49,7 @@ test('growth archive reuses real profile and private resumes rather than inventi
  assert.match(personal,/独立的任职经历、工作成果和阶段性更新记录尚在规划中/);
 });
 test('tight right column, clear left groups and responsive mobile nav',()=>{
- for(const selector of ['.hhba-workbench-heading','.hhba-workbench-overview','.hhba-account-nav-group','.hhba-workbench-record-list','.hhba-workbench-rights'])
+ for(const selector of ['.hhba-workbench-heading','.hhba-workbench-card-grid','.hhba-account-nav-group','.hhba-workbench-card-primary','.hhba-workbench-card:focus-visible'])
   assert.ok(css.includes(selector),selector);
  assert.match(css,/overflow-x:auto/);
  assert.match(css,/focus-visible/);

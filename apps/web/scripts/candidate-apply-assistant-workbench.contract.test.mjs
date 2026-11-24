@@ -8,15 +8,15 @@ const service=read('../src/services/applyCredits.ts');
 const css=read('../src/styles/demo-account.css');
 const entry=read('../src/main.tsx');
 test('minimal workbench keeps true resume, saved jobs and matching history',()=>{
- assert.match(page,/hhba-workbench-overview/);
+ assert.match(page,/hhba-workbench-card-grid/);
  assert.match(page,/resumeCount/);
  assert.match(page,/savedCount/);
  assert.match(page,/historyCount/);
  assert.match(page,/latestMatch/);
  assert.match(page,/label:'智能岗位匹配',path:'\/candidate\/account\/match'/);
  assert.doesNotMatch(page,/hhba-account-stat-grid|hhba-career-membership|hhba:career-stage:/);
- assert.ok(page.includes("label:'一键网申'"),'apply assistant remains in the grouped navigation');
- assert.ok(page.includes("to=\"/candidate/account/rights\""));
+ assert.ok(!page.includes("label:'一键网申'"),'apply assistant is removed from the grouped navigation only');
+ assert.ok(page.includes("label:'劳动权益知识',path:'/candidate/account/legal-aid'"));
 });
 test('new link routes to an installation guide and keeps privacy safety disclaimers',()=>{
  assert.ok(entry.includes('privacy|apply-assistant'));
@@ -31,8 +31,8 @@ test('new link routes to an installation guide and keeps privacy safety disclaim
 });
 test('original account styling stays available while workbench uses compact cards',()=>{
  const theme=read('../src/styles/career-refresh.css');
- assert.match(theme,/\.hhba-workbench-profile-links/);
- assert.match(theme,/\.hhba-workbench-rights-main/);
+ assert.match(theme,/\.hhba-workbench-card-grid/);
+ assert.match(theme,/\.hhba-workbench-card-primary/);
  assert.match(theme,/@media\(max-width:620px\)/);
  assert.ok(css.includes('.hhba-account-tool-grid'),'original account subpages remain styled');
 });

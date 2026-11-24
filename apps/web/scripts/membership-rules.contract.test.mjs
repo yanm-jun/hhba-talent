@@ -135,11 +135,11 @@ test('one career workbench keeps all service entry points without fake member st
  assert.match(auth,/欢迎来到汇方职场/);
  assert.match(main,/if\(route==='\/auth'\)return <PhoneAuthPage/);
  assert.doesNotMatch(main,/return <AuthChoicePage/);
- assert.match(personal,/职业与权益/);
+ assert.match(personal,/职业服务/);
  assert.match(personal,/职业成长档案/);
  assert.doesNotMatch(personal,/会员与权益服务/);
- assert.match(personal,/hhba-workbench-overview/);
- assert.match(personal,/hhba-workbench-rights/);
+ assert.match(personal,/hhba-workbench-card-grid/);
+ assert.doesNotMatch(personal,/hhba-workbench-rights/);
  assert.doesNotMatch(personal,/hhba:career-stage:|hhba-career-switch|¥24\.90/);
  assert.match(rights,/¥24\.90/);
  assert.match(rights,/尚未开放购买/);
