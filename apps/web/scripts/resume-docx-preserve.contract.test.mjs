@@ -221,3 +221,15 @@ test('production-facing Word export refuses to release files without trusted ren
  assert.ok(parts(approved.bytes).get('word/document.xml').raw
   .toString().includes('新的岗位描述'));
 });
+
+
+test('V4 preserves long Word runs and more than twenty unique edits without changing unrelated ZIP members',async()=>{
+ const source=fixture({extraParagraphs:25});
+ const edits=Array.from({length:25},(_,i)=>({original:'虚构补充经历第'+i+'项',text:'原文可核实的工作经历第'+i+'项'}));
+ edits.push({original:'原始岗位描述',text:'真实岗位描述'.repeat(70)});
+ const result=await editOriginalDocxStrict(source,edits,{allowExpansion:true,unbounded:true});
+ const inspected=await inspectOriginalDocxStrict(result,{unbounded:true});
+ assert.ok(inspected.editable_text.includes(edits[25].text));
+ for(const edit of edits)assert.ok(inspected.editable_text.includes(edit.text));
+ await assert.rejects(()=>editOriginalDocxStrict(fixture({duplicate:true}),[{original:'原始岗位描述',text:'真实岗位描述'.repeat(70)}],{allowExpansion:true,unbounded:true}),/WORD_EDIT_AMBIGUOUS/);
+});
