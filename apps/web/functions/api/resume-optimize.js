@@ -151,7 +151,7 @@ export async function onRequestPost({request,env}){
  // Mask common contact identifiers before third-party processing.
  const blocks=input.blocks.map(b=>({id:b.id,section:b.section,text:redact(b.text)}));
  const job={title:redact(trustedJob.title),requirements:redact(trustedJob.requirements),
-  verified:trustedJob.source_status==='VERIFIED_OFFICIAL_JD'};
+  verified:['VERIFIED_OFFICIAL_JD','VERIFIED_PUBLIC_JD'].includes(trustedJob.source_status)};
  try{
   const signal=env?.HHBA_MATCH_V4_READY==='1'?request.signal:AbortSignal.any([request.signal,AbortSignal.timeout(input.full_document?180000:90000)]);
   const whole=input.full_document?await optimizeResumeDocument({
