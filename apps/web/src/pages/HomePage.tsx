@@ -1,4 +1,4 @@
-import { ArrowUpRight, BriefcaseBusiness, Building2, Scale, Sparkles, Mail } from 'lucide-react';
+import { ArrowUpRight, BriefcaseBusiness, Scale, Sparkles, Mail } from 'lucide-react';
 import { Link, navigate } from '../router';
 import { Shell } from '../components/Shell';
 import { UnifiedJobMarket } from '../components/UnifiedJobMarket';
@@ -10,10 +10,10 @@ import { BrandMark } from '../components/BrandMark';
 import type { User } from '../services/api';
 import '../styles/home-match-promo.css';
 
-function EntryCard({kind,title,body,footer,candidateTarget}:{kind:'candidate'|'directory'|'rights';title:string;body:string;footer:string;candidateTarget?:string}){
- const Icon=kind==='candidate'?BriefcaseBusiness:kind==='rights'?Scale:Building2;
+function EntryCard({kind,title,body,footer,candidateTarget}:{kind:'candidate'|'rights';title:string;body:string;footer:string;candidateTarget?:string}){
+ const Icon=kind==='candidate'?BriefcaseBusiness:Scale;
  const target=kind==='candidate'?(candidateTarget||'/candidate/match')
-  :kind==='rights'?'/rights/knowledge':'/companies/library';
+  :'/rights/knowledge';
  return <Link to={target} className={'entry-card hhba-entry-card hhba-entry-'+kind}
    aria-label={title+'，'+footer}>
    <span className="entry-icon"><Icon size={23}/></span>
@@ -41,9 +41,6 @@ export function HomePage({user}:{user:User|null}){
    <EntryCard kind="rights" title="劳动权益"
     body="免费查阅劳动权益知识、相关法律依据和职场问题自助指引。"
     footer="查看劳动权益知识"/>
-   <EntryCard kind="directory" title="企业招聘导航"
-    body="按行业、企业或专业查找招聘渠道，浏览17个行业馆的官方招聘入口。"
-    footer="查看企业与招聘入口"/>
   </section>
   <section className="home-match-promo" aria-labelledby="home-match-promo-title">
    <div className="home-match-promo-copy">
