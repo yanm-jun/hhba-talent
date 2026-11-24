@@ -3,6 +3,7 @@
 // These are recommendations, NEVER applications and NEVER automatically monitored.
 import {allowedEmployerJobLink,isCommercialRecruitmentBoard} from './match-employer-source.js';
 import {v4PublicJobUrl} from './v4-open-job-evidence.js';
+import {cleanJdResearch} from './v4-jd-research.js';
 
 const text=(v,n=Infinity)=>typeof v==='string'?v.replace(/[\u0000-\u001f]/g,' ').trim().slice(0,n):'';
 const score=v=>Number.isInteger(v)&&v>=0&&v<=100?v:null;
@@ -45,7 +46,7 @@ export function safeHistoryJobs(matches){
   if(!company||!title||!location)continue;
   seen.add(item.official_url);
   out.push({id:text(item.id,75),company,title,location,
-   ...(item.v4_source===true?{v4_source:true,source_type:item.source_type==='站外官方招聘'?'站外官方招聘':'站外招聘职位',score_evidence_status:item.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'?'GROUNDED_JD_RESUME_QUOTES':undefined,research_detail:safeDetailedReport(item.research_detail)}:{}),
+   ...(item.v4_source===true?{v4_source:true,source_type:item.source_type==='站外官方招聘'?'站外官方招聘':'站外招聘职位',score_evidence_status:item.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'?'GROUNDED_JD_RESUME_QUOTES':undefined,research_detail:safeDetailedReport(item.research_detail),jd_research:cleanJdResearch(item.jd_research),checked_at:text(item.checked_at),...(item.jd_source_status==='VERIFIED_JD'&&item.evidence_status==='VERIFIED_FULL_JD'&&item.source_type==='站外官方招聘'&&text(item.evidence_excerpt)?{jd_source_status:'VERIFIED_JD'}:{})}:{}),
    official_url:item.official_url,match_score:score(item.match_score),
    score_basis:text(item.score_basis,v4?Infinity:360),
    recommendation_reason:text(!v4&&Array.isArray(item.jd_comparisons)?
