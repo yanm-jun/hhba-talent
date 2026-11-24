@@ -75,14 +75,22 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
  if(!token)throw new ResumeOptimizationError('SESSION_INVALID',401);
  const suggestions=new Map<string,ResumeSuggestion>();
  let wanted=document?.wanted;
+ // Legacy single-suggestion endpoint accepts at most 12 source blocks per
+ // request. Process every batch rather than truncating the resume.
+ const legacyBatches:ResumeBlock[][]=[];
+ if(!document)for(let i=0;i<blocks.length;i+=12)legacyBatches.push(blocks.slice(i,i+12));
+ let batchIndex=0,previousStall='';
  const ids=new Set(blocks.map(block=>block.id));
 
  for(;;){
+  if(signal?.aborted)throw signal.reason;
+  const batch=document?blocks:legacyBatches[batchIndex];
+  if(!batch?.length)break;
   let response:Response;
   try{
    response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
     headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
-    body:JSON.stringify({consent_ai:true,blocks,job,
+    body:JSON.stringify({consent_ai:true,blocks:batch,job,
      ...(document?{full_document:{text:document.text,wanted}}:{})})});
   }catch{throw new ResumeOptimizationError('NETWORK_ERROR',503);}
   const data=await response.json().catch(()=>({})) as {
@@ -100,11 +108,17 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
   for(const item of data.suggestions)suggestions.set(item.blockId,item);
   const pending=Array.isArray(data.pending_block_ids)?
    [...new Set(data.pending_block_ids.filter(id=>ids.has(id)&&(!wanted||wanted.includes(id))))]:[];
-  if(!document||!pending.length){document?.onPending?.([]);break;}
+  if(!document){batchIndex++;continue;}
+  if(!pending.length){document.onPending?.([]);break;}
   if(pending.length>=(wanted?.length??blocks.length)){
-   document.onPending?.(pending);break;
+   const signature=JSON.stringify([...pending].sort());
+   // Retry a stalled response with backoff, but surface persistent no-progress
+   // rather than indefinitely spending on the same failed work.
+   if(previousStall===signature){document.onPending?.(pending);break;}
+   previousStall=signature;wanted=pending;document.onQueued?.();
+   await waitForOptimizationSlot(signal);continue;
   }
-  wanted=pending;
+  previousStall='';wanted=pending;
  }
  return [...suggestions.values()];
 }
