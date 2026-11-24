@@ -608,3 +608,20 @@ test('job scopes cannot be malformed or swap an already verified manifest across
    .editable_text.includes('甲岗位'));
  }finally{globalThis.fetch=originalFetch;}
 });
+
+
+test('V4 Word route accepts long exact-run edits past the legacy eight revisions without a quota table',async()=>{
+ const x=fixture({enabled:false,docxOnly:true});x.env.HHBA_MATCH_V4_READY='1';delete x.env.HHBA_MATCH_LIMIT_PEPPER;
+ const old=x.env.HHBA_PNVS_AUTH_DB.prepare;
+ x.env.HHBA_PNVS_AUTH_DB.prepare=function(sql){assert.doesNotMatch(sql,/hhba_resume_word_attempts/);return old.call(this,sql)};
+ let bytes=original,from='测试用户';
+ for(let i=0;i<10;i++){
+  const next='真实经历'+String(i)+'渠道运营'.repeat(85);
+  bytes=await editOriginalDocxStrict(bytes,[{original:from,text:next}],{allowExpansion:true,unbounded:true});
+  const res=await onRequestPost({request:req('export',{method:'POST',jobId:'v4-role',body:{resume_id:id,job_id:'v4-role',action:'edit',original:from,text:next,expected_revision:i,client_docx_sha256:createHash('sha256').update(bytes).digest('hex'),confirmed_real:true,consent_word_processing:true}}),env:x.env});
+  assert.equal(res.status,200,await res.clone().text());from=next;
+ }
+ const info=await (await onRequestGet({request:req('inspect',{jobId:'v4-role'}),env:x.env})).json();
+ assert.equal(info.revision,10);assert.equal(info.max_revisions,null);assert.ok(info.editable_text.includes(from));
+ assert.deepEqual(x.saved.get(store),original);
+});
