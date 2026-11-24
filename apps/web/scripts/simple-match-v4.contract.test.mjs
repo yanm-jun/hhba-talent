@@ -84,7 +84,7 @@ test('Two AI calls can finish without inventing posts when no official page is c
  assert.match(r.disclaimer,/不编造/);
 });
 test('V4 is disabled on production even when Preview Secret exists',async()=>{
- const mock={HHBA_AGENT_RELAY_API_KEY:key,
+ const mock={HHBA_AGENT_RELAY_API_KEY:key,HHBA_MATCH_V4_READY:'1',
   HHBA_PNVS_AUTH_DB:{prepare:()=>{throw Error('should not query DB')}}};
  const r=await onRequest({request:new Request('https://hhba.work/api/match-v4/status'),env:mock});
  assert.equal((await r.json()).enabled,false);
