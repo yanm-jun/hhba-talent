@@ -712,3 +712,42 @@ test('V4 independently verifies deeply nested public JSON and a multi-page emplo
  assert.equal(await v4EmployerAuthorization(detail,'示例企业',[root,portal],{fetcher}),true);
  assert.equal(await v4EmployerAuthorization(detail,'示例企业',root,{fetcher}),false);
 });
+
+
+test('curated V4 performs final AI review even when initial search finds zero candidates',async()=>{
+ let searches=0,profileCalls=0;const fixture={...row};
+ const jd='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:fixture.title,hiringOrganization:{name:fixture.company,url:'https://careers.other-motors.cn'},jobLocation:{address:{addressLocality:'上海'}},description:'负责渠道运营和经销商业务流程管理，具备沟通协调能力。'})+'</script>';
+ const fetcher=async(u,opts)=>{
+  if(!u.endsWith('/responses'))return new Response(jd,{headers:{'content-type':'text/html'}});
+  const p=JSON.parse(opts.body),input=JSON.parse(p.input);
+  if(p.instructions.includes('自主整理个人职业画像')){profileCalls++;return model({profile:{summary:'渠道运营经历'}});}
+  if(p.instructions.includes('专业求职研究 AI')){
+   searches++;
+   const review=input.review_context!==null;
+   return model({research_complete:true,completion_reason:'已复查官方招聘来源',jobs:review?[fixture]:[]},review?[url]:[]);
+  }
+  return model({suitable:true,score:85,reason:'原文支持',resume_quote:'汽车经销商渠道运营',jd_quote:'渠道运营和经销商业务流程'});
+ };
+ const result=await v4Match(fetcher,provider,resume,'全国',{officialOnly:true,curated:true});
+ assert.equal(profileCalls,1);
+ assert.ok(searches>=2);
+ assert.equal(result.matches.length,1);
+ assert.ok(result.native_search.diagnostics.AI_FINAL_REVIEW>=1);
+ assert.equal(result.native_search.stage,'partial');
+});
+
+
+test('V4 dynamic page reading uses a public-origin-scoped, read-only browser action',async()=>{
+ const {v4RenderPublicJobDocument}=await import('../functions/_lib/v4-open-job-evidence.js');
+ let captured;
+ const browser={quickAction:async(action,args)=>{captured={action,args};return new Response('<title>区域运营岗位</title><p>负责渠道运营及门店管理。</p>',{headers:{'content-type':'text/html'}})}};
+ const result=await v4RenderPublicJobDocument(url,{browser});
+ assert.equal(captured.action,'content');
+ assert.equal(captured.args.url,url);
+ assert.ok(new RegExp(captured.args.allowRequestPattern[0]).test(url));
+ assert.ok(!new RegExp(captured.args.allowRequestPattern[0]).test('https://careers.other-motors.cn.evil.cn/'));
+ assert.equal(result.rendered,true);
+ assert.match(result.plain,/负责渠道运营/);
+ await assert.rejects(()=>v4RenderPublicJobDocument('https://127.0.0.1/',{browser}),/V4_UNSAFE_URL/);
+ await assert.rejects(()=>v4RenderPublicJobDocument(url,{browser:{quickAction:async()=>new Response(null,{status:429})}}),/V4_BROWSER_QUOTA_OR_RATE_LIMIT/);
+});

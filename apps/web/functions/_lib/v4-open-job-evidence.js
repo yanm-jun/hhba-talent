@@ -222,3 +222,35 @@ export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal}={}){
  }
  throw Error('V4_UNSAFE_OR_REPEATED_REDIRECT');
 }
+
+
+/** Read-only dynamic-page fallback. No account, CV, cookie, authorization or
+ * arbitrary script is passed to the browser. Restrict browser traffic to the
+ * requested public origin; cross-origin redirects are not source evidence. */
+export async function v4RenderPublicJobDocument(url,{browser,signal}={}){
+ const target=v4PublicJobUrl(url);
+ if(!target||isCommercialRecruitmentBoard(target))throw Error('V4_UNSAFE_URL');
+ if(typeof browser?.quickAction!=='function')throw Error('V4_BROWSER_UNAVAILABLE');
+ if(signal?.aborted)throw signal.reason;
+ const host=new URL(target).hostname.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&');
+ const response=await browser.quickAction('content',{
+  url:target,allowRequestPattern:['^https://'+host+'(?::443)?(?:/|$)'],
+  rejectResourceTypes:['image','media','font'],
+  gotoOptions:{waitUntil:'networkidle2'}
+ });
+ if(signal?.aborted)throw signal.reason;
+ if(response.status===429)throw Error('V4_BROWSER_QUOTA_OR_RATE_LIMIT');
+ const raw=await limitedRead(response,{allowJson:true});
+ let html=raw;
+ if((response.headers.get('content-type')||'').includes('json')){
+  let parsed;try{parsed=JSON.parse(raw)}catch{throw Error('V4_BROWSER_RESPONSE_INVALID')}
+  if(parsed?.success===false||typeof parsed?.result!=='string')throw Error('V4_BROWSER_RESPONSE_INVALID');
+  html=parsed.result;
+ }
+ if(!html.trim())throw Error('V4_BROWSER_EMPTY');
+ const site=meta(html,'property','og:site_name')||meta(html,'name','application-name'),title=pageTitle(html);
+ if(isCommercialRecruitmentBoard(target,{site_name:site}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
+ const plain=htmlToText(html,{maxChars:Infinity}).trim();
+ if(CLOSED.test(title)||(plain.length<80&&CLOSED.test(plain)))throw Error('V4_JOB_CLOSED');
+ return {url:target,plain,site,title,rendered:true};
+}
