@@ -6,6 +6,7 @@
  */
 import {v4PublicJobUrl,v4ReadEmployerJob} from './v4-open-job-evidence.js';
 import {directOfficialJobEvidence} from './official-job-evidence.js';
+import {sha256Hex} from './real-auth.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 
 const BASE='https://api-c.reqtoken.com/v1';
@@ -334,7 +335,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    ' 条可追溯来源；AI 正在判断是否需要继续搜索。');
   // Older compatible relay outputs may not contain the new boolean.
   // No numeric round/position threshold controls completion.
-  const signature=JSON.stringify([...rows.entries()].sort(([a],[b])=>a.localeCompare(b)));
+  const signature=await sha256Hex(JSON.stringify([...rows.entries()].sort(([a],[b])=>a.localeCompare(b))));
   const madeProgress=signature!==lastSignature;
   lastSignature=signature;
   if(response.status==='incomplete'){
