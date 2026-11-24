@@ -377,3 +377,21 @@ test('V4 retains rejected numeric claims for another evidence-grounded pass with
   withCoverage:true,signal:new AbortController().signal});
  assert.deepEqual(result,{suggestions:[],pendingIds:['a']});
 });
+
+
+test('same-JD reassessment feedback reaches full document planning and actual writing as advisory evidence',async()=>{
+ const blocks=[{id:'word-1',section:'experience',text:'整理门店每周销售数据。'}];
+ const feedback='原文具备门店数据整理经验，但不能推断管理人数。';
+ let planned=false,written=false;
+ const r=await optimizeResumeDocument({env:{HHBA_MATCH_V4_READY:'1'},blocks,context:blocks[0].text,
+  job:{title:'门店督导',requirements:'经营数据分析'},signal:new AbortController().signal,feedback},{
+  plan:async input=>{assert.equal(input.prior_review_feedback,feedback);planned=true;return {focus:['突出真实数据整理经历']};},
+  generate:async input=>{
+   assert.equal(input.documentContext.prior_review_feedback,feedback);
+   assert.deepEqual(input.documentContext.focus,['突出真实数据整理经历']);
+   written=true;return {suggestions:[],reviewedIds:['word-1']};
+  },
+  audit:async()=>({suggestions:[],pendingIds:[]})
+ });
+ assert.equal(planned,true);assert.equal(written,true);assert.deepEqual(r.pendingIds,[]);
+});

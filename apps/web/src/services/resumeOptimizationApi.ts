@@ -58,7 +58,7 @@ export async function getResumeOptimizationStatus(signal?:AbortSignal):Promise<R
  }catch{return null;}
 }
 type DocumentOptimization={
- text:string;wanted?:string[];onPending?:(ids:string[])=>void;onQueued?:()=>void;
+ text:string;wanted?:string[];feedback?:string;onPending?:(ids:string[])=>void;onQueued?:()=>void;
  onCheckpoint?:(checkpoint:OptimizationCheckpoint)=>void;onPaused?:(error:unknown)=>void;
 };
 function waitForOptimizationSlot(signal?:AbortSignal){
@@ -82,7 +82,7 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
    response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
     headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
     body:JSON.stringify({consent_ai:true,blocks:batch,job,
-     ...(document?{full_document:{text:document.text,wanted}}:{})})});
+     ...(document?{full_document:{text:document.text,wanted,feedback:document.feedback}}:{})})});
   }catch(error){
    if(signal?.aborted)throw signal.reason;
    throw new ResumeOptimizationError('NETWORK_ERROR',503);
