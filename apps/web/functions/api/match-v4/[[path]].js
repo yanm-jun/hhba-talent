@@ -7,6 +7,7 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {v4Provider,v4Match} from '../../_lib/simple-match-v4.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
+import {recognizeV4Resume} from '../../_lib/v4-resume-ocr.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
 const reply=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
@@ -92,14 +93,14 @@ export async function onRequest({request,env}){
  if(suffix==='/status'&&request.method==='GET')
   return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:enabled(env,request),
    scope:'CN_MAINLAND_ONLY',formats:['pdf','docx']});
- if(suffix!=='/resume'||request.method!=='POST')return fail('NOT_FOUND',404);
+ if(!['/resume','/ocr'].includes(suffix)||request.method!=='POST')return fail('NOT_FOUND',404);
  if(!enabled(env,request))return fail('MATCH_NOT_ENABLED',503);
  const origin=new URL(request.url).origin;
  if(request.headers.get('Origin')!==origin||
   request.headers.get('Sec-Fetch-Site')==='cross-site')return fail('ORIGIN_REQUIRED',403);
- if(!(request.headers.get('Content-Type')||'').startsWith('application/json'))
+ if(suffix!=='/ocr'&&!(request.headers.get('Content-Type')||'').startsWith('application/json'))
   return fail('INVALID_REQUEST',415);
- if(Number(request.headers.get('Content-Length')||0)>1200000)return fail('INVALID_RESUME_TEXT',413);
+ if(suffix!=='/ocr'&&Number(request.headers.get('Content-Length')||0)>1200000)return fail('INVALID_RESUME_TEXT',413);
  const db=env.HHBA_PNVS_AUTH_DB;
  let session;
  try{session=await sessionOfBearer(db,request,Date.now())}catch{return fail('SESSION_INVALID',401)}
@@ -107,6 +108,10 @@ export async function onRequest({request,env}){
  let candidate;
  try{candidate=await getUserByPhone(db,session.phone)}catch{return fail('SESSION_INVALID',401)}
  if(candidate?.role!=='candidate')return fail('FORBIDDEN',403);
+ if(suffix==='/ocr'){
+  try{return reply({ok:true,...await recognizeV4Resume(request,v4Provider(env))});}
+  catch(e){return fail(e?.code||'OCR_SERVICE_UNAVAILABLE',e?.status||502);}
+ }
  let body;
  try{
   const text=await request.text();
