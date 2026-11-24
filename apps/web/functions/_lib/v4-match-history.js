@@ -43,7 +43,7 @@ export async function saveV4Round(db,phone,{taskId,resumeId,roleHint,matches,res
  };
  for(const job of rows){const n=new TextEncoder().encode(JSON.stringify(job)).byteLength;if(batch.length&&size+n>400000)await write();batch.push(job);size+=n;}
  await write();
- await db.prepare('UPDATE hhba_v4_match_tasks SET research_pending=? WHERE id=? AND phone=?').bind(researchPending?1:0,taskId,phone).run();
+ await db.prepare('UPDATE hhba_v4_match_tasks SET research_pending=? WHERE id=? AND phone=?').bind(1,taskId,phone).run();
  return taskId;
 }
 export async function patchV4Job(db,phone,taskId,url,patch){
@@ -77,5 +77,11 @@ export async function linkV4History(db,phone,id,resumeId){
  const resume=await db.prepare('SELECT id,filename FROM hhba_candidate_resumes WHERE phone=? AND id=?').bind(phone,resumeId).first();
  if(!resume)throw Error('RESUME_NOT_OWNED');
  const result=await db.prepare('UPDATE hhba_v4_match_tasks SET resume_id=?,resume_label=? WHERE phone=? AND id=?').bind(resume.id,resume.filename,phone,id).run();
+ return Number(result.meta?.changes)===1;
+}
+
+export async function finishV4History(db,phone,id){
+ if(!uuid.test(id||''))return false;
+ const result=await db.prepare('UPDATE hhba_v4_match_tasks SET research_pending=0 WHERE id=? AND phone=?').bind(id,phone).run();
  return Number(result.meta?.changes)===1;
 }
