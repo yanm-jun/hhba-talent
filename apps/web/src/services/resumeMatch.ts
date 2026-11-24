@@ -11,7 +11,9 @@ export type MatchProfile = {
   facts?:{id:string;kind:'work'|'project'|'skill'|'education'|'credential';quote:string}[];
 };
 export type MatchResearchDetail={comparisons:{requirement:string;resume_evidence:string|null;status:'supported'|'partial'|'missing';analysis:string}[];strengths:string;risks:string;career_development:string;optimization_advice:string;competition:string;score_explanation:string;extra_sections:{title:string;content:string}[]};
+export type JobJdResearch={facts:{url:string;quote:string;context:'same_job'|'related_context'}[];inference:string;unknowns:string[];diagnostics:string[];checked_at?:string};
 export type MatchedJob = {
+  jd_research?:JobJdResearch;
   research_detail?:MatchResearchDetail;
   id:string;company:string;title:string;title_zh?:string|null;location:string;
   official_url:string;platform:string;source:string;remote:boolean;
