@@ -124,7 +124,7 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
    canonical_url:canonical,company:org.name.slice(0,100),title:title.slice(0,86),
    location:city,requirements:requirements.slice(0,5500),full_jd:sections.full_jd,
    checked_at:now.toISOString(),proof_method:'V4_STRUCTURED_JOBPOSTING',
-   source_confirmed:!!org.url,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
+   source_confirmed:!!org.url&&relatedDomains(canonical,org.url),application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
  }
  // Chinese employer career sites often serve normal HTML without JSON-LD.
  const sections=extractOfficialJdSections(plain),title=pageTitle(html);
