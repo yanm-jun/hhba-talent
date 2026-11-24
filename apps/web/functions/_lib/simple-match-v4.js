@@ -16,7 +16,7 @@ const norm=v=>String(v||'').replace(/\s+/g,' ').trim();
 
 export function v4Provider(env={}){
  const key=env.HHBA_AGENT_RELAY_API_KEY;
- return typeof key==='string'&&key.trim().length>=16?{key,model:MODEL}:null;
+ return typeof key==='string'&&key.trim().length>=16?{key,model:typeof env.HHBA_V4_MODEL==='string'&&env.HHBA_V4_MODEL.trim()?env.HHBA_V4_MODEL.trim():MODEL}:null;
 }
 export function v4OutputText(response){
  return (response?.output||[]).filter(x=>x?.type==='message')
@@ -239,8 +239,8 @@ function renderJob(x,url,verified,resume,toolLinked,index){
  * even if a later round or optional verification has an upstream failure.
  */
 export async function v4Match(fetcher,provider,resume,roleHint,
- {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{}}={}){
- const rows=new Map(),toolUrls=new Set();
+ {signal,excludeUrls=[],onProgress=()=>{},onActivity=()=>{},onPartial=()=>{}}={}){
+ const rows=new Map(),toolUrls=new Set(),excluded=new Set(excludeUrls.map(v4PublicJobUrl).filter(Boolean));
  let profile=v4GroundProfile({summary:'',roles:[]},resume);
  let researchComplete=false,round=0,researchError=null;
  onProgress('parsing');
@@ -272,7 +272,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     input:JSON.stringify({resume_text:resume,preferred_job_or_city:roleHint,
      country:'中国大陆',previously_discovered_jobs:[...rows.entries()].map(([url,j])=>({
       url,title:j.title||j.role||null,company:j.company||null})),
-     research_round:round,request:'请明确返回 research_complete 布尔值；缺少该字段不会结束研究。'}),
+     previous_search_urls:[...excluded],research_round:round,request:'请明确返回 research_complete 布尔值；缺少该字段不会结束研究。'}),
     tools:[{type:'web_search'}],tool_choice:'required',
     include:['web_search_call.action.sources']
    },{signal});
@@ -298,11 +298,11 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   const p=v4GroundProfile(data,resume);
   if(p.facts.length||p.target_roles.length||p.summary)profile=p;
   const fromModel=candidates(data,response);
-  for(const [url,job] of fromModel)if(!rows.has(url))rows.set(url,job);
+  for(const [url,job] of fromModel)if(!excluded.has(url)&&!rows.has(url))rows.set(url,job);
   const cites=v4ToolSources(response);
   for(const url of cites){
    toolUrls.add(url);
-   if(!rows.has(url))rows.set(url,{
+   if(!excluded.has(url)&&!rows.has(url))rows.set(url,{
     company:'企业待核实',title:'招聘来源待核实',location:'工作地点待核实',
     reason:'AI 联网搜索引用此来源，具体岗位与投递状态仍需核对。'
    });
@@ -331,5 +331,5 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   native_search:{mode:'V4_SIMPLE_AI',searches:round,candidate_links:rows.size,
    page_reads:read,visible_jobs:matches.length,research_error:researchError||undefined,
    jd_verification:{eligible:rows.size,verified,failed:rows.size-read}},
-  can_continue:!!researchError};
+  can_continue:true};
 }
