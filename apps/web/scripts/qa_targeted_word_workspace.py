@@ -68,7 +68,7 @@ def exercise(browser,name,viewport):
                         'jobRequirement':'门店运营管理与数据分析',
                         'evidenceStatus':'needs_user_confirmation'}
             return route.fulfill(status=200,content_type='application/json',
-                body=json.dumps({'ok':True,'suggestions':[suggestion]}))
+                body=json.dumps({'ok':True,'suggestions':[suggestion],'pending_block_ids':[]}))
         return route.fulfill(status=200,content_type='application/json',
             body=json.dumps({'ok':True,'enabled':False,'configured':False,'items':[]}))
 

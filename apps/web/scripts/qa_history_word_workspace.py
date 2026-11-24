@@ -106,7 +106,7 @@ def exercise(browser,label,viewport,initial_linked,has_file=True):
             assert payload['blocks'][0]['text']=='负责门店运营及日常数据整理工作'
             data['ai_calls'].append(payload)
             text=payload['blocks'][0]['text']
-            return j(route,{'ok':True,'suggestions':[{
+            return j(route,{'ok':True,'pending_block_ids':[],'suggestions':[{
               'id':'history-suggestion-1','blockId':payload['blocks'][0]['id'],
               'action':'replace','original':text,'proposed':'负责门店运营和数据整理',
               'rationale':'基于真实经历的措辞修改','jobRequirement':'岗位需要区域督导',
