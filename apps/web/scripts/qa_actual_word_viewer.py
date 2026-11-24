@@ -61,6 +61,7 @@ def exercise(browser,label,viewport):
             if str(active[job])!=rev:return j(409,{'ok':False,'error':'WORD_REVISION_CONFLICT'})
             return doc(saved if active[job] else original)
         if action=='download':
+            assert query.get('revision')==[str(active[job])], 'download must match displayed revision'
             if active[job]==0:return j(404,{'ok':False,'error':'WORD_NOT_EDITED'})
             audit.append(job+':download')
             return doc(saved)
