@@ -337,3 +337,19 @@ test('V4 suggestion parser preserves more than twelve distinct suggestions',asyn
  const items=Array.from({length:20},(_,i)=>({id:'s'+i,blockId:'b'+i,action:'replace',original:'原文字',proposed:'真实经历'.repeat(450),rationale:'依据原文',jobRequirement:'岗位要求'}));
  assert.equal(parseSuggestions({suggestions:items},items.map(x=>x.blockId),{unbounded:true}).length,20);
 });
+
+
+test('V4 carries research summary and actual round number into a new hosting request',async()=>{
+ const first=await v4Match(async()=>model({research_complete:false,research_summary:'已探索汽车渠道岗位，下一步研究零售运营。',profile:{roles:['区域运营']},jobs:[row]},[url]),provider,resume,'全国',{oneRound:true,skipEnrich:true});
+ const next=await v4Match(async(u,opts)=>{
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  assert.equal(input.research_round,2);assert.match(input.previous_research.summary,/零售运营/);
+  assert.ok(input.previous_search_urls.includes(url));
+  return model({research_complete:true,jobs:[]},[]);
+ },provider,resume,'全国',{oneRound:true,skipEnrich:true,researchContext:first.research_context,excludeUrls:[url]});
+ assert.equal(next.research_context.round,2);assert.equal(next.research_pending,false);
+});
+test('V4 provider selection cannot silently fall back to a legacy provider',async()=>{
+ const {selectProvider}=await import('../functions/_lib/resume-ai-provider.js');
+ assert.throws(()=>selectProvider({HHBA_MATCH_V4_READY:'1',HHBA_MATCH_DEEPSEEK_KEY:'fake-key'}),/AI_PROVIDER_NOT_CONFIGURED/);
+});
