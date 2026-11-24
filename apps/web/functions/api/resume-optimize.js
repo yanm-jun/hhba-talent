@@ -22,7 +22,7 @@ const quotaPepper=env=>typeof env?.HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER==='stri
 function active(env){
  return (env?.HHBA_AUTH_ROLLOUT==='preview'||env?.HHBA_MATCH_RUNTIME_MODE==='production')&&
   env?.HHBA_RESUME_OPTIMIZATION_ENABLED==='1'&&
-  typeof quotaPepper(env)==='string'&&quotaPepper(env).length>=24&&
+  (isV4(env)||(typeof quotaPepper(env)==='string'&&quotaPepper(env).length>=24))&&
   typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 }
 async function dbReady(db){
@@ -106,8 +106,8 @@ async function releaseFailedRequest(db,requestId,hash){
 export async function onRequestGet({env}){
  let configured=false;
  try{selectProvider(env);configured=true;}catch{}
- return send({kind:'HHBA_RESUME_OPTIMIZATION_V1',enabled:active(env)&&configured&&await dbReady(env.HHBA_PNVS_AUTH_DB),
-  full_document_enabled:active(env)&&configured&&await taskReady(env.HHBA_PNVS_AUTH_DB),
+ return send({kind:'HHBA_RESUME_OPTIMIZATION_V1',enabled:active(env)&&configured&&(isV4(env)||await dbReady(env.HHBA_PNVS_AUTH_DB)),
+  full_document_enabled:active(env)&&configured&&(isV4(env)||await taskReady(env.HHBA_PNVS_AUTH_DB)),
   unlimited_product_quota:isV4(env),
   configured,per_account_daily_limit:MAX_PERSONAL,global_daily_limit:MAX_GLOBAL,
   per_account_daily_attempt_limit:MAX_PERSONAL_ATTEMPTS,global_daily_attempt_limit:MAX_GLOBAL_ATTEMPTS});
@@ -116,7 +116,7 @@ export async function onRequestPost({request,env}){
  if(!sameOrigin(request))return fail('ORIGIN_REQUIRED',403);
  if(!active(env))return fail('RESUME_OPTIMIZATION_NOT_ENABLED',503);
  const db=env.HHBA_PNVS_AUTH_DB;
- if(!await dbReady(db))return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);
+ if(!isV4(env)&&!await dbReady(db))return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);
  try{selectProvider(env);}catch{return fail('AI_PROVIDER_NOT_CONFIGURED',503);}
  let session;
  try{session=await sessionOfBearer(db,request,Date.now());
@@ -136,7 +136,7 @@ export async function onRequestPost({request,env}){
  const hash=await sha256Hex(quotaPepper(env)+':resume-opt:'+session.phone);
  let requestId,lease;
  try{
-  if(input.full_document){
+  if(input.full_document&&!isV4(env)){
    if(!await taskReady(db))return fail('RESUME_OPTIMIZATION_TASK_DB_NOT_READY',503);
    lease=await reserveResumeOptimizationTask(db,hash,{
     jd:trustedJob.jd_version_id,blocks:input.blocks,text:input.full_document.text
