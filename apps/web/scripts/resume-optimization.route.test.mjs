@@ -331,3 +331,49 @@ test('a resumed document retains its earlier checkpoint even if the next request
  assert.deepEqual(checkpoints.at(-1).pending,['c']);
  assert.deepEqual(pauses,['NETWORK_ERROR']);
 });
+
+
+test('V4 distinguishes explicit keep decisions from omitted and invalid proposals',async()=>{
+ const {reviewedOptimizationIds}=await import('../functions/_lib/resume-ai-provider.js');
+ const blocks=['a','b','c','d','e'].map(id=>({id,text:'真实经历 '+id}));
+ const raw={suggestions:[{blockId:'a'},{blockId:'c'}],keep:[
+  {blockId:'b',reason:'已有充分证据，无需改写'},
+  {blockId:'c',reason:'与无效修改冲突'},
+  {blockId:'d',reason:''},{blockId:'outside',reason:'unknown'}
+ ]};
+ assert.deepEqual(reviewedOptimizationIds(raw,blocks,[{blockId:'a'}]),['a','b']);
+});
+
+test('V4 retains verified suggestions, completes explicit keep decisions and continues missing or rejected edits',async()=>{
+ const blocks=['a','b','c','d'].map(id=>({id,section:'experience',text:'真实经历 '+id}));
+ const visited=[];
+ const deps={
+  plan:async()=>({focus:['岗位相关真实经历']}),
+  generate:async({blocks})=>{
+   visited.push(blocks.map(b=>b.id));
+   if(blocks.length===4)return {provider:'openai-relay',reviewedIds:['a','b','c'],
+    suggestions:[{blockId:'a'},{blockId:'c'}]};
+   return {provider:'openai-relay',reviewedIds:blocks.map(b=>b.id),suggestions:[]};
+  },
+  audit:async({suggestions,withCoverage})=>{
+   assert.equal(withCoverage,true);
+   return {suggestions:suggestions.filter(s=>s.blockId==='a'),
+    pendingIds:suggestions.filter(s=>s.blockId==='c').map(s=>s.blockId)};
+  }
+ };
+ const input={env:{HHBA_MATCH_V4_READY:'1'},blocks,context:'完整简历',job:{requirements:'JD'},signal:new AbortController().signal};
+ const first=await optimizeResumeDocument(input,deps);
+ assert.deepEqual(first.suggestions,[{blockId:'a'}]);
+ assert.deepEqual(first.pendingIds,['c','d']);
+ const second=await optimizeResumeDocument({...input,wanted:first.pendingIds},deps);
+ assert.deepEqual(second.pendingIds,[]);
+ assert.deepEqual(visited,[['a','b','c','d'],['c','d']]);
+});
+
+test('V4 retains rejected numeric claims for another evidence-grounded pass without publishing them',async()=>{
+ const {auditTargetedResumeSuggestions}=await import('../functions/_lib/resume-rewrite-provider.js');
+ const result=await auditTargetedResumeSuggestions({env:{},blocks:[{id:'a',text:'负责运营'}],
+  job:{},suggestions:[{blockId:'a',action:'replace',proposed:'提升销售额 50%'}],
+  withCoverage:true,signal:new AbortController().signal});
+ assert.deepEqual(result,{suggestions:[],pendingIds:['a']});
+});
