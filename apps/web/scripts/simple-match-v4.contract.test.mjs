@@ -391,3 +391,19 @@ test('V4 entire-document optimization advances across multiple invocation budget
  }while(wanted.length);
  assert.deepEqual([...ids].sort(),blocks.map(b=>b.id).sort());
 });
+
+test('V4 native Responses streaming consumes verified final response and forwards only event types',async()=>{
+ const eventTypes=[];const data={status:'completed',output:[{type:'message',content:[{type:'output_text',text:'{"ok":true}'}]}]};
+ const events=[{type:'response.web_search_call.searching',private_text:'not forwarded'},
+  {type:'response.output_text.delta',delta:'private model output'},
+  {type:'response.completed',response:data}];
+ const streamed=await v4Call(async(_url,options)=>{
+  assert.equal(JSON.parse(options.body).stream,true);
+  assert.equal(options.headers.accept,'text/event-stream');
+  return new Response(events.map(e=>'data: '+JSON.stringify(e)+'\n\n').join(''),{headers:{'content-type':'text/event-stream'}});
+ },{...provider,stream:true},{input:'synthetic'}, {onEvent:event=>eventTypes.push(event)});
+ assert.deepEqual(streamed,data);
+ assert.deepEqual(eventTypes,['response.web_search_call.searching','response.output_text.delta']);
+ await assert.rejects(v4Call(async()=>new Response('data: '+JSON.stringify(events[0])+'\n\n',{headers:{'content-type':'text/event-stream'}}),
+  {...provider,stream:true},{input:'synthetic'}),/AI_PROVIDER_RESPONSE_INVALID/);
+});
