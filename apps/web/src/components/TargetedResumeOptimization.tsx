@@ -113,6 +113,13 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [revealedSuggestionCount,setRevealedSuggestionCount]=useState(0);
  const [wordRevisionSnapshot,setWordRevisionSnapshot]=useState<WordRevisionSnapshot|null>(null);
  const lastWordRevisionKey=useRef('');
+ const wordScope=useRef(JSON.stringify([sourceResume?.id,postingScope]));
+ useEffect(()=>{
+  const scope=JSON.stringify([sourceResume?.id,postingScope]);
+  if(wordScope.current===scope)return;
+  wordScope.current=scope;lastWordRevisionKey.current='';
+  setWordRevisionSnapshot(null);setWordPromptBlocks([]);
+ },[sourceResume?.id,postingScope]);
  useEffect(()=>{
   if(sourceResume)setEntranceStage('waiting');
  },[sourceResume?.id,postingScope]);
@@ -184,9 +191,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  useEffect(()=>{
   // A different candidate Word or job must never inherit an earlier job's
   // signed AI continuation, facts, approval or visible score.
-  active.current?.abort();
+  active.current?.abort();active.current=null;setBusy(false);
   scoreRequest.current?.abort();scoreRequest.current=null;setScoring(false);
-  lastWordRevisionKey.current='';setWordRevisionSnapshot(null);setWordPromptBlocks([]);
   wholeRunInput.current=null;
   setArchivedJdId(null);setScoreResult(null);setConfirmReassessment(false);
   setWholeDraft(null);setWholeBusy(false);
@@ -488,14 +494,18 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    const full=requireVerifiedJd;
    if(full&&status?.full_document_enabled===false)
     throw Error('整份简历优化任务暂未就绪，请稍后重试。');
-   const key=JSON.stringify([targetedJob.jd_version_id,targetedJob.jd_sha256,currentBlocks,context]);
-   const prior=full&&previousOptimization.current?.key===key?previousOptimization.current:null;
+   const feedback=v4Reassessment&&scoreResult?.supported&&scoreResult.job_id===targetedJob.jd_version_id?
+    scoreResult.after_reason:undefined;
+   const key=JSON.stringify([targetedJob.jd_version_id,targetedJob.jd_sha256,currentBlocks,context,feedback]);
+   // Only resume unfinished work. An explicit new optimization after a full
+   // review must invoke AI again, even if the document has not changed.
+   const prior=full&&previousOptimization.current?.key===key&&previousOptimization.current.pending.length?
+    previousOptimization.current:null;
    let pending:string[]=prior?.pending||[];
    let pauseMessage='';
    const mergeSuggestions=(incoming:ResumeSuggestion[])=>[...new Map([...(prior?.suggestions||[]),...incoming].map(item=>[item.blockId,item])).values()];
-   const incoming=prior&&!prior.pending.length?prior.suggestions:
-    await requestResumeOptimization(currentBlocks,targetedJob,controller.signal,
-     full?{text:context,wanted:prior?.pending,
+   const incoming=await requestResumeOptimization(currentBlocks,targetedJob,controller.signal,
+     full?{text:context,wanted:prior?.pending,feedback,
       onCheckpoint:checkpoint=>{
        pending=checkpoint.pending;
        previousOptimization.current={key,suggestions:mergeSuggestions(checkpoint.suggestions),pending};
