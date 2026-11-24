@@ -92,3 +92,22 @@ test('all accepted edits must survive successive Word revisions before same-JD r
  assert.equal(result.stages.docx.applied_edits,3);
  assert.equal(result.stages.docx.original_unchanged,true);
 });
+
+
+test('V4 keeps a complete long model proposal and writes it into actual DOCX without a character quota',async()=>{
+ const {parseSuggestions,normalizeDocumentSuggestions}=await import('../functions/_lib/resume-ai-provider.js');
+ const result=await runSyntheticResumeAcceptance({env,signal,
+  optimize:async({blocks})=>{
+   const b=blocks[0],proposed=b.text+'虚构测试补充内容。'.repeat(220);
+   assert.ok(proposed.length>1600);
+   const items=parseSuggestions({suggestions:[{blockId:b.id,action:'replace',original:b.text,proposed}]},[b.id],{fullDocument:true});
+   assert.equal(items[0].proposed,proposed);
+   return {pendingIds:[],suggestions:normalizeDocumentSuggestions(blocks,items)};
+  },
+  reassess:async({afterBlocks})=>{
+   assert.equal((afterBlocks[0].text.match(/虚构测试补充内容。/g)||[]).length,220);
+   return {supported:true,original_score:80,updated_score:80,delta:0};
+  }});
+ assert.equal(result.status,'PASS');
+ assert.equal(result.stages.docx.applied_edits,1);
+});

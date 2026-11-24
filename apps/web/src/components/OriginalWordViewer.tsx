@@ -383,7 +383,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  async function acceptVisualWord(anchor:WordAnchor,visual:WordVisualSuggestion){
   if(ready!=='available'||busy||loading||visual.state!=='pending'||
    !editable.includes(anchor.text)||!visual.proposed.trim()||
-   visual.proposed.length>1600||visual.proposed===anchor.text)return;
+   visual.proposed===anchor.text)return;
   if(!confirmDiscardText())return;
   if(!window.confirm('请先核实这段文字符合真实经历。确认采纳并保存岗位专属 Word 修改？原上传文件不会被覆盖。'))return;
   rememberPosition();setBusy(true);setMessage('');
@@ -429,7 +429,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   finally{setBusy(false);}
  }
  async function save(){
-  if(!selected||!confirmed||busy||loading||!draft.trim()||draft.length>1600)return;
+  if(!selected||!confirmed||busy||loading||!draft.trim())return;
   rememberPosition();setBusy(true);setMessage('');
   try{
    const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision,jobId);
@@ -478,12 +478,12 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   </label>
   <textarea id="hhba-word-current-edit" aria-label="修改 Word 文字" value={draft} rows={5}
    className={draft!==selected.text?'hhba-siri-typing':''}
-   maxLength={1600} onChange={e=>{
+   onChange={e=>{
     const value=e.target.value;setDraft(value);setConfirmed(false);
     onSessionWordDraftChange?.(value!==selected.text?
      {original:selected.text,text:value,revision,page}:null);
    }}/>
-  <p className="hhba-original-resume-edit-limit">{draft.length} / 1600 字
+  <p className="hhba-original-resume-edit-limit">{draft.length} 字
    · 保留原 Word 字体及样式结构；未经专业校验的分页请自行核对。</p>
   <label className="hhba-original-resume-edit-confirm"><input type="checkbox" checked={confirmed}
    onChange={e=>setConfirmed(e.target.checked)}/>
@@ -502,7 +502,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
        const [x,y,w,h]=anchor.bbox;
        const candidates=visualSuggestions.filter(change=>
         change.original===anchor.text&&change.proposed.trim()&&
-        change.proposed!==anchor.text&&change.proposed.length<=1600);
+        change.proposed!==anchor.text);
        const visual=candidates.length===1?candidates[0]:null;
        const textFits=Boolean(visual&&Array.from(visual.proposed).length<=
         Math.max(12,Array.from(anchor.text).length*1.25));
@@ -527,9 +527,9 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
          const restored=!replacing&&sessionWordDraft&&
           sessionWordDraft.revision===revision&&sessionWordDraft.page===page&&
           sessionWordDraft.original===anchor.text&&
-          sessionWordDraft.text.length<=1600&&sessionWordDraft.text.trim();
+          sessionWordDraft.text.trim();
          const matches=suggestedChanges.filter(change=>change.original===anchor.text&&
-          change.proposed.trim()&&change.proposed.length<=1600);
+          change.proposed.trim());
          const candidate=restored?sessionWordDraft!.text:
           matches.length===1?matches[0].proposed:anchor.text;
          setSelected(anchor);setPage(anchor.page);setDraft(candidate);setInlineVisualEditor(null);

@@ -10,7 +10,8 @@ const ID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const DOCX_MIME='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const LIMIT=65536,DAILY={preview:4,export:6},MAX_REVISIONS=8;
 const v4=env=>env?.HHBA_MATCH_V4_READY==='1';
-const editLimit=env=>v4(env)?1600:300;
+// V4 is bounded by the actual request and OOXML package, not an arbitrary character count.
+const editLimit=env=>v4(env)?Infinity:300;
 const common={
  'Cache-Control':'private, no-store',
  'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
@@ -83,18 +84,18 @@ async function reserve(db,env,phone,action){
   date,hash,action,DAILY[action]).run();
  return result?.success===true&&result?.meta?.changes===1;
 }
-async function readSmall(request){
+async function readSmall(request,limit=LIMIT){
  if(!/^application\/json(?:;|$)/i.test(request.headers.get('Content-Type')||''))
   throw Error('INVALID_REQUEST');
  const claimed=request.headers.get('Content-Length');
- if(claimed!==null&&(!/^\d+$/.test(claimed)||Number(claimed)>LIMIT))
+ if(claimed!==null&&(!/^\d+$/.test(claimed)||Number(claimed)>limit))
   throw Error('INVALID_REQUEST');
  const reader=request.body?.getReader();
  if(!reader)throw Error('INVALID_REQUEST');
  const chunks=[];let length=0;
  try{for(;;){const chunk=await reader.read();if(chunk.done)break;
   length+=chunk.value.byteLength;
-  if(length>LIMIT){await reader.cancel();throw Error('INVALID_REQUEST');}
+  if(length>limit){await reader.cancel();throw Error('INVALID_REQUEST');}
   chunks.push(chunk.value);
  }}finally{reader.releaseLock();}
  const bytes=new Uint8Array(length);let i=0;
@@ -285,7 +286,7 @@ export async function onRequestPost({request,env}){
  try{candidate=await owner(db,request);}catch{return fail('SESSION_INVALID',401);}
  if(candidate.error)return fail(candidate.error,candidate.status);
  let body;
- try{body=await readSmall(request);}catch{return fail('INVALID_REQUEST',400);}
+ try{body=await readSmall(request,v4(env)?2*1024*1024:LIMIT);}catch{return fail('INVALID_REQUEST',400);}
  const id=body?.resume_id,action=body?.action||'edit',jobId=body?.job_id;
  if(!ID.test(String(id||''))||!validJobId(jobId)||
   !['edit','undo','redo'].includes(action)||
