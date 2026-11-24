@@ -1,4 +1,5 @@
-import {useEffect,useId,useMemo,useRef,useState} from 'react';
+import {useEffect,useId,useLayoutEffect,useMemo,useRef,useState} from 'react';
+import {createPortal} from 'react-dom';
 import {ChevronLeft,ChevronRight,ChevronDown,ArrowUpRight,MapPin} from 'lucide-react';
 import '../styles/resume-match-dialog.css';
 import {CuratedJobReport} from './CuratedJobReport';
@@ -21,13 +22,30 @@ function OfficialLink({job}:{job:MatchedJob}){
  const href=confirmed(job)&&safeLink(job.official_url);
  return href?<a className="hhba-refined-source-link" href={href} target="_blank" rel="noopener noreferrer">查看官方招聘页面 <ArrowUpRight size={13}/></a>:null;
 }
-function ReportPager({count,index,onChange}:{count:number;index:number;onChange:(i:number)=>void}){
+export function ReportPager({count,index,onChange,pending=false}:{count:number;index:number;onChange:(i:number)=>void;pending?:boolean}){
+ const anchor=useRef<HTMLDivElement>(null);
+ const [modal,setModal]=useState<HTMLElement|null>(null);
+ useLayoutEffect(()=>{
+  setModal(anchor.current?.closest<HTMLElement>('.hhba-match-modal')??null);
+ },[]);
+ const change=(next:number)=>{
+  if(next<0||next>=count)return;
+  onChange(next);
+  const viewport=anchor.current?.closest<HTMLElement>('.hhba-match-modal-content');
+  if(viewport&&anchor.current)viewport.scrollTop+=anchor.current.getBoundingClientRect().top-viewport.getBoundingClientRect().top-12;
+ };
  if(!count)return null;
- return <nav className="hhba-refined-pager" aria-label="岗位切换">
-  <button type="button" disabled={index===0} onClick={()=>onChange(index-1)}><ChevronLeft size={16}/> 上一个</button>
-  <span>{String(index+1).padStart(2,'0')} / {count}</span>
-  <button type="button" disabled={index>=count-1} onClick={()=>onChange(index+1)}>下一个 <ChevronRight size={16}/></button>
- </nav>;
+ const previous=<button type="button" className="hhba-report-pager-side hhba-report-pager-prev" aria-label="上一个岗位" title="上一个岗位" disabled={index===0} onClick={()=>change(index-1)}><ChevronLeft size={20} aria-hidden="true"/></button>;
+ const next=<button type="button" className="hhba-report-pager-side hhba-report-pager-next" aria-label="下一个岗位" title="下一个岗位" disabled={index>=count-1} onClick={()=>change(index+1)}><ChevronRight size={20} aria-hidden="true"/></button>;
+ return <>
+  <div ref={anchor} className="hhba-report-pager-anchor" aria-hidden="true"/>
+  <nav className={'hhba-report-pager'+(modal?' hhba-report-pager-sticky':'')} aria-label="岗位切换">
+   {!modal&&previous}
+   <strong aria-live="polite" aria-atomic="true">{String(index+1).padStart(2,'0')} / {count}{pending&&<small>（持续更新）</small>}</strong>
+   {!modal&&next}
+  </nav>
+  {modal&&createPortal(<div className="hhba-report-pager-overlay" role="group" aria-label="切换岗位">{previous}{next}</div>,modal)}
+ </>;
 }
 export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=false,progressStage='preparing',activity,elapsed,selection,onSelectionChange,onFollow,externalScore=false}:{
  profile?:MatchProfile;report?:MatchResearchReport;jobs:MatchedJob[];officialJobs:MatchedJob[];pending?:boolean;progressStage?:NativeMatchProgress;
@@ -135,7 +153,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
     <div className="hhba-refined-job-head"><div><JobTitle job={scoreJob}/></div><div className="hhba-refined-score">{scoreJob.match_score??'—'}<small>/100</small></div></div>
     {scoreJob.research_detail?<CuratedJobReport detail={scoreJob.research_detail} jd={scoreJob.evidence_excerpt}/>:<><p>{scoreJob.score_basis}</p><p>{scoreJob.recommendation_reason}</p>{!!scoreJob.matched?.length&&<ul>{scoreJob.matched.map((v,i)=><li key={i}>{v}</li>)}</ul>}{!!scoreJob.not_evidenced?.length&&<ul>{scoreJob.not_evidenced.map((v,i)=><li key={i}>{v}</li>)}</ul>}</>}
     <OfficialLink job={scoreJob}/>
-   </article><ReportPager count={officialJobs.length} index={currentScoreIndex} onChange={setScoreIndex}/></>:empty(pending?'正在核验和评分，完整报告产生后自动展示。':'本次没有达到交付要求的正式推荐。'))}
+   </article></>:empty(pending?'正在核验和评分，完整报告产生后自动展示。':'本次没有达到交付要求的正式推荐。'))}
   </>}
  </section>
  </>;

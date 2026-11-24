@@ -505,3 +505,30 @@
  .hhba-curated-card .hhba-native-score strong{font-size:29px}
 }
 @media(prefers-reduced-motion:reduce){.hhba-refined-stage *,.hhba-refined-steps *{animation:none!important;transition:none!important}}
+
+
+/* Report navigation: page number stays in the reading column; arrows sit in
+   the modal's side gutters, outside the vertically scrolling report. */
+.hhba-match-modal{position:relative}
+.hhba-report-pager-anchor{height:0;min-height:0}
+.hhba-report-pager{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0;padding:7px 0;color:#c62828;font-size:17px;font-weight:750;line-height:1.4;font-variant-numeric:tabular-nums;text-align:center}
+.hhba-report-pager strong{color:#c62828;font-weight:750}
+.hhba-report-pager strong small{font-size:11px;font-weight:600;margin-left:4px}
+.hhba-report-pager-sticky{position:sticky;top:0;z-index:2;background:#fff}
+.hhba-report-pager-overlay{position:absolute;inset:0;z-index:3;pointer-events:none}
+.hhba-report-pager-side{box-sizing:border-box;display:inline-grid;place-items:center;flex:none;width:36px;height:36px;padding:0;border:1px solid #dce5ef;border-radius:50%;background:#fff;color:#175bb5;cursor:pointer;pointer-events:auto;transition:background .15s,border-color .15s}
+.hhba-report-pager-side:not(:disabled):hover{background:#f1f6fc;border-color:#b3c9e3}
+.hhba-report-pager-side:disabled{color:#b7c6d6;border-color:#e7edf4;cursor:default}
+.hhba-report-pager-overlay .hhba-report-pager-side{position:absolute;top:50%;transform:translateY(-50%)}
+.hhba-report-pager-overlay .hhba-report-pager-prev{left:36px}
+.hhba-report-pager-overlay .hhba-report-pager-next{right:46px}
+.hhba-match-modal:has(>.hhba-report-pager-overlay) .hhba-curated-list{padding-inline:35px}
+@media(max-width:640px){
+ .hhba-match-modal:has(>.hhba-report-pager-overlay) .hhba-match-modal-content{padding-inline:40px}
+ .hhba-match-modal:has(>.hhba-report-pager-overlay) .hhba-curated-list{padding-inline:0}
+ .hhba-report-pager-overlay .hhba-report-pager-prev{left:3px}
+ .hhba-report-pager-overlay .hhba-report-pager-next{right:3px}
+ .hhba-report-pager-overlay .hhba-report-pager-side{width:34px;height:44px;border-radius:18px}
+ .hhba-report-pager{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){.hhba-report-pager-side{transition:none}}
