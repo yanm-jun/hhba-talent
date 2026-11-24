@@ -111,7 +111,7 @@ export function paintBrowserWordSuggestions(
  for(const suggestion of suggestions){
   if(suggestion.state!=='pending'||!allowed.has(suggestion.original)||
    suggestion.proposed===suggestion.original||!suggestion.proposed.trim()||
-   suggestion.proposed.length>300)continue;
+   suggestion.proposed.length>1600)continue;
   proposals.set(suggestion.original,[...(proposals.get(suggestion.original)||[]),
    suggestion.proposed]);
  }
@@ -146,7 +146,7 @@ export function browserWordAnchors(mount:HTMLElement,editableText:string[]):Word
  const fullWidth=Math.max(mount.scrollWidth,mount.offsetWidth);
  const fullHeight=Math.max(mount.scrollHeight,mount.offsetHeight);
  if(bounds.width<100||bounds.height<100||fullWidth<100||fullHeight<100)return [];
- const safe=new Set(editableText.filter(s=>typeof s==='string'&&s.trim()===s&&s.length>=3&&s.length<=300));
+ const safe=new Set(editableText.filter(s=>typeof s==='string'&&s.trim()===s&&s.length>=3&&s.length<=1600));
  const found=new Map<string,HTMLElement[]>();
  // Only leaf spans with exactly one matching run may be edited. Ambiguous or
  // duplicated text (including repeated headers) is never clickable.
