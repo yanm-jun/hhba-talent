@@ -96,7 +96,9 @@ function browserParagraphRuns(mount:HTMLElement,allowed:Set<string>){
   if(spans.length<2||spans.some(s=>s.tagName!=='SPAN'||(s.querySelector('span')&&!s.hasAttribute('data-hhba-original-run'))))continue;
   if(Array.from(paragraph.childNodes).some(n=>n.nodeType!==1&&Boolean(n.textContent)))continue;
   if(spans.some(s=>Array.from(s.children).some(child=>!child.classList.contains('hhba-word-ai-changed'))))continue;
-  const text=spans.map(s=>s.getAttribute('data-hhba-original-run')??s.textContent??'').join('');
+  const source=spans.map(s=>s.getAttribute('data-hhba-original-run')??s.textContent??'');
+  if(source.filter(Boolean).length<2)continue;
+  const text=source.join('');
   if(allowed.has(text))groups.push({text,paragraph,spans});
  }
  return groups;
