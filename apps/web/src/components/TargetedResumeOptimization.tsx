@@ -493,10 +493,12 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       onQueued:()=>setNotice('简历优化正在等待可用服务，已确认的进度会保留。')}:undefined);
    const combined=mergeSuggestions(incoming);
    if(full)previousOptimization.current={key,suggestions:combined,pending};
-   const unique=new Set<string>(),usedBlocks=new Set<string>();
+   // Provider suggestion IDs are local to a batch. Distinct Word blocks may
+   // legitimately receive the same provider ID, so deduplicate by block only.
+   const usedBlocks=new Set<string>();
    const accepted=combined.filter(s=>{
-    if(unique.has(s.id)||usedBlocks.has(s.blockId)||!validateSuggestion(currentBlocks,s))return false;
-    unique.add(s.id);usedBlocks.add(s.blockId);return true;
+    if(usedBlocks.has(s.blockId)||!validateSuggestion(currentBlocks,s))return false;
+    usedBlocks.add(s.blockId);return true;
    }).map((s,i)=>({...s,id:('generation-'+(++generation.current)+'-'+i+'-'+s.id).slice(0,100)}));
    setSuggestions(accepted);
    setActiveSuggestionId(accepted[0]?.id||null);
