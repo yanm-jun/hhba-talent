@@ -9,6 +9,7 @@ import {v4Provider,v4Match,v4Call,v4OutputText} from '../../_lib/simple-match-v4
 import {prepareV4JobForOptimization} from '../../_lib/v4-jd-bridge.js';
 import {saveV4Round,patchV4Job,finishV4History} from '../../_lib/v4-match-history.js';
 import {scoreVerifiedV4Job} from '../../_lib/v4-jd-score.js';
+import {readV4EmployerIndex} from '../../_lib/v4-employer-index-tool.js';
 import {validateResumeBytes,RESUME_LIMIT_BYTES} from '../../_lib/private-resume-validation.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -54,8 +55,14 @@ function events(env,request,input){
    send('progress',{stage:'preparing'});
    void (async()=>{
     try{
+     let context=input.research_context;
+     if(context?.employer_index_request){
+      activity('searching','AI 正在读取自主选择的 HHBA 企业招聘目录。');
+      const index=await readV4EmployerIndex(env,context.employer_index_request);
+      context={...context,employer_index_request:null,employer_index_result:index};
+     }
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
-      signal,excludeUrls:input.exclude_urls,researchContext:input.research_context,oneRound:true,skipEnrich:true,onProgress:progress,onActivity:activity,
+      signal,excludeUrls:input.exclude_urls,researchContext:context,oneRound:true,skipEnrich:true,onProgress:progress,onActivity:activity,
       onPartial:matches=>send('partial',{matches})});
      try{
       result.history_id=await saveV4Round(env.HHBA_PNVS_AUTH_DB,input.phone,{taskId:input.history_id,resumeId:input.resume_id,roleHint:input.role_hint,matches:result.matches,researchPending:result.research_pending});
