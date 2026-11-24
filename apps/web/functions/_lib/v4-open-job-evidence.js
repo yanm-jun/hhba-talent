@@ -86,6 +86,7 @@ function htmlLocation(plain){
  return m?findMainlandCity(m[1]):null;
 }
 async function limitedRead(r){
+ if(r.status===429||r.status>=500)throw Object.assign(Error('V4_PAGE_TEMPORARILY_UNAVAILABLE'),{code:'V4_PAGE_TEMPORARILY_UNAVAILABLE'});
  if(r.status!==200)throw Error('V4_PAGE_UNAVAILABLE');
  const ct=(r.headers.get('content-type')||'').toLowerCase();
  if(!ct.includes('text/html')&&!ct.includes('text/plain'))throw Error('V4_PAGE_NOT_HTML');
@@ -104,16 +105,18 @@ async function limitedRead(r){
  for(const chunk of chunks){bytes.set(chunk,i);i+=chunk.length}
  return new TextDecoder().decode(bytes);
 }
-export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()}={}){
+export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date(),expectedTitle}={}){
  const canonical=v4PublicJobUrl(url);
  if(!canonical)throw Error('V4_UNSAFE_URL');
  const r=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',
   headers:{Accept:'text/html,text/plain;q=0.9'},signal});
  const html=await limitedRead(r),plain=htmlToText(html,{unbounded:true});
+ const expected=typeof expectedTitle==='string'&&!/待核实/.test(expectedTitle)?expectedTitle.normalize('NFKC').replace(/\s+/g,'').toLowerCase():'';
  if(CLOSED.test(plain))throw Error('V4_JOB_CLOSED');
  for(const j of postings(html)){
   const org=companyOf(j),title=trim(j.title);
   const city=postedLocation(j)||htmlLocation(plain),desc=htmlToText(trim(j.description),{unbounded:true});
+  if(expected&&title.normalize('NFKC').replace(/\s+/g,'').toLowerCase()!==expected)continue;
   if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city||desc.length<90)continue;
   if(j.validThrough&&Number.isFinite(Date.parse(j.validThrough))&&Date.parse(j.validThrough)<now.getTime())continue;
   // A multinational's official careers host may differ from its corporate website.
