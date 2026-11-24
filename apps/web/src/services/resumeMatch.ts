@@ -166,6 +166,7 @@ const isCleanV2PreviewHost=()=>typeof window!=='undefined'&&
  window.location.hostname.endsWith('.hhba-talent.pages.dev')&&
  window.location.hostname!=='hhba-talent.pages.dev';
 export async function matchPreviewPreflightAvailable(signal?:AbortSignal):Promise<boolean>{
+ if(MATCH_V4_PREVIEW)return false;
  if(!isCleanV2PreviewHost()||!realAuthReady)return false;
  try{
   const response=await fetch(API+'/status',{
