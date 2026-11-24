@@ -418,18 +418,15 @@ test('V4 adapts search context only after explicit upstream overflow and still e
 });
 
 
-test('V4 employer directory tool can read all industries with independent page cursor',async()=>{
- const {normalizeEmployerIndexRequest,readV4EmployerIndex}=await import('../functions/_lib/v4-employer-index-tool.js');
- const {INDUSTRY_HALL_IDS}=await import('../functions/_lib/domestic-employer-index.js');
- const request={industries:[...INDUSTRY_HALL_IDS,'invalid'],offset:300};
- assert.equal(normalizeEmployerIndexRequest(request).industries.length,17);
- let params;
- const db={prepare(sql){assert.match(sql,/LIMIT \\? OFFSET \\?/);return {bind(...p){params=p;return {all:async()=>({results:Array.from({length:101},(_,i)=>({enterprise:'企业'+i,recruitment_url:'https://jobs.company.cn/'+i,industry_id:'automotive'}))})}}}}};
- const result=await readV4EmployerIndex({HHBA_JOB_JD_DB:db},request);
- assert.equal(params.at(-1),300);assert.equal(result.items.length,100);assert.equal(result.next_offset,400);
- assert.equal(result.status,'OK');
-});
-test('V4 model-directed enterprise research request keeps research pending',async()=>{
- const result=await v4Match(async()=>model({research_complete:true,jobs:[row],employer_index_request:{industries:['automotive','retail'],offset:200}},[url]),provider,resume,'全国',{oneRound:true,skipEnrich:true});
- assert.equal(result.research_pending,true);assert.equal(result.research_context.employer_index_request.offset,200);
+test('V4 searches from resume evidence without platform industry categories or an employer directory',async()=>{
+ const outlier={...row,company:'虚构跨学科测试企业',title:'声景交互研究助理',url:'https://careers.other-motors.cn/research/soundscape'};
+ const result=await v4Match(async(u,opts)=>{
+  const payload=JSON.parse(opts.body);
+  assert.match(payload.instructions,/不要依赖平台预设分类、企业目录或固定企业名单/);
+  assert.doesNotMatch(payload.instructions,/17个行业|employer_index_request|industryIds/);
+  assert.doesNotMatch(payload.input,/employer_index_result|employer_index_request/);
+  return model({research_complete:true,jobs:[outlier]},[outlier.url]);
+ },provider,resume,'全国',{oneRound:true,skipEnrich:true});
+ assert.equal(result.research_pending,false);
+ assert.equal(result.matches[0].title,outlier.title);
 });
