@@ -350,11 +350,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   if(requireVerifiedJd&&(!job.jd_version_id||!job.jd_sha256))
    throw Error('请先完成此岗位的 JD 核验，再优化简历。');
   if(job.jd_version_id){
-   const official=await getArchivedJobJdVersion(job.jd_version_id,signal);
+   let official=await getArchivedJobJdVersion(job.jd_version_id,signal);
    if(official.canonical_url!==job.official_url||official.job_id!==job.jd_version_id||
     (job.jd_sha256&&official.jd_sha256!==job.jd_sha256))
     throw Error('岗位 JD 版本不一致，请重新匹配后再优化。');
-   if(!official.fresh)throw Error('岗位 JD 需要重新核验，请重新匹配后再优化。');
+   if(!official.fresh)official=await ensureArchivedJobJd(job.official_url,signal,job.jd_version_id);
    if(!signal.aborted)setArchivedJdId(official.job_id);
    return {title:official.title,requirements:official.full_jd,official_url:official.canonical_url,
     jd_version_id:official.job_id,jd_sha256:official.jd_sha256};
@@ -378,7 +378,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    const official=await ensureArchivedJobJd(job.official_url,signal);
    if(!signal.aborted)setArchivedJdId(official.job_id);
    return {title:official.title,requirements:official.full_jd,
-    official_url:official.canonical_url,jd_version_id:official.job_id};
+    official_url:official.canonical_url,jd_version_id:official.job_id,jd_sha256:official.jd_sha256};
   }catch(error){
    if(signal.aborted)throw error;
    if(partial)return partial;
