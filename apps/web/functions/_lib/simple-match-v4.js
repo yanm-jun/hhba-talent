@@ -6,7 +6,7 @@
  */
 import {v4PublicJobUrl,v4ReadEmployerJob} from './v4-open-job-evidence.js';
 import {directOfficialJobEvidence} from './official-job-evidence.js';
-import {jdArchiveConfigured,saveVerifiedJobJd} from './job-jd-archive.js';
+import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 
 const BASE='https://api-c.reqtoken.com/v1';
 const MODEL='gpt-6.2-sol';
@@ -195,10 +195,10 @@ function renderJob(x,url,verified,resume,toolLinked,index){
  const n=Number(rawScore),numbered=rawScore!==null&&rawScore!==undefined&&
   rawScore!==''&&Number.isInteger(n)&&n>=0&&n<=100;
  const score=numbered&&resumeGrounded?n:null;
- const confirmed=Boolean(verified?.source_confirmed||
-  String(verified?.proof_method||'').startsWith('DIRECT_EMPLOYER'));
+ const confirmed=String(verified?.proof_method||'').startsWith('DIRECT_EMPLOYER');
+ const independentlyRead=confirmed||verified?.source_confirmed===true;
  const full=Boolean(verified?.full_jd);
- const status=full?(confirmed?'VERIFIED_FULL_JD':'PARTIAL_SOURCE'):'SEARCH_SNIPPET_ONLY';
+ const status=full?(independentlyRead?'VERIFIED_FULL_JD':'PARTIAL_SOURCE'):'SEARCH_SNIPPET_ONLY';
  const reason=text(x?.reason||x?.recommendation_reason,600)||
   (resumeGrounded?'根据简历中的相关经历，建议进一步查看该职位要求。':'这是 AI 搜索得到的职位线索，需打开原始页面核对。');
  const note=source==='THIRD_PARTY_BOARD'?
@@ -221,7 +221,7 @@ function renderJob(x,url,verified,resume,toolLinked,index){
     full&&jdGrounded?'有简历与招聘 JD 原文依据的 AI 参考分（非录用概率）':
     'AI 职业方向参考分；JD 尚未完全核验（非录用概率）',
   recommendation_reason:reason,
-  ...(full&&confirmed?{jd_source_status:'VERIFIED_JD'}:{}),
+  ...(full&&independentlyRead?{jd_source_status:'VERIFIED_JD',jd_proof_method:verified.proof_method}:{}),
   evidence_status:status,
   evidence_score_status:score!==null&&!(full&&jdGrounded)?
    'AI_DIRECTION_REFERENCE_SCORED':undefined,
@@ -346,8 +346,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    const i=cursor++,[url,job]=entries[i],jd=results.get(url);
    if(!jd?.full_jd)continue;
    // Only the existing independent official proof may be promoted to an immutable JD version.
-   if(jdArchiveConfigured(env)&&String(jd.proof_method||'').startsWith('DIRECT_EMPLOYER')){
-    try{const saved=await saveVerifiedJobJd(env,jd);if(saved?.fresh){
+   if(jdArchiveConfigured(env)&&(String(jd.proof_method||'').startsWith('DIRECT_EMPLOYER')||jd.source_confirmed===true)){
+    try{const saved=String(jd.proof_method||'').startsWith('DIRECT_EMPLOYER')?await saveVerifiedJobJd(env,jd):await saveV4PublicJobJd(env,jd);if(saved?.fresh){
      Object.assign(matches[i],{jd_version_id:saved.id,jd_sha256:saved.jd_sha256,jd_checked_at:saved.checked_at});archived++;
     }}catch{/* retain public evidence without inventing archive IDs */}
    }
@@ -364,12 +364,12 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     scored++;
    }catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');scoreFailures++;}
    onPartial([...matches]);
-   onActivity('scoring','已对 '+scored+' 条岗位按完整 JD 重新评分，已存档 '+archived+' 条官方 JD。');
+   onActivity('scoring','已对 '+scored+' 条岗位按完整 JD 重新评分，已存档 '+archived+' 条有原文依据的 JD。');
   }
  };
  await Promise.all(Array.from({length:Math.min(4,entries.length)},worker));
  matches.sort((a,b)=>(b.match_score??-1)-(a.match_score??-1));
- const verified=matches.filter(x=>x.jd_source_status==='VERIFIED_JD').length;
+ const verified=matches.filter(x=>x.jd_source_status==='VERIFIED_JD'&&x.source_type==='站外官方招聘').length;
  return {status:'COMPLETE',profile,matches,matched_official_jobs:verified,
   source:'AI 联网搜索与公开招聘网页',
   scoring:'AI 匹配分仅供职业参考，不代表录用概率。',
