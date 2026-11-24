@@ -328,7 +328,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
            </li>)}
           </ul>}
          {!!job.jd_comparisons?.length&&<ul className="hhba-native-comparisons">
-          {job.jd_comparisons.map(item=><li key={recruitmentText(item.requirement)}>
+          {job.jd_comparisons.map(item=><li key={item.requirement}>
            <strong>{item.status==='supported'?'有对应经历':item.status==='partial'?'部分对应':'缺少简历证据'}</strong>
            <div>岗位 JD · {recruitmentText(item.requirement)}</div>
            {item.resume_evidence&&<div>简历原文 · {item.resume_evidence}</div>}
