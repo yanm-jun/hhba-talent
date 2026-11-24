@@ -41,7 +41,8 @@ def main() -> None:
 
     # V4 preview: anonymous relay smoke test, never a real applicant resume.
     # Results appear in build logs with only coarse status/error codes.
-    if os.environ.get('CF_PAGES_BRANCH') in ('feat/simple-resume-match-v4-20261124', 'fix/v4-open-job-discovery-20261124', 'fix/v4-direct-ai-recommend-20261124'):
+    if os.environ.get('CF_PAGES_BRANCH') in ('feat/simple-resume-match-v4-20261124', 'fix/v4-open-job-discovery-20261124', 'fix/v4-direct-ai-recommend-20261124', 'fix/v4-autonomous-pipeline-20261124'):
+        run(['node', '--test', 'scripts/simple-match-v4.contract.test.mjs'], cwd=WEB)
         run(['node', 'scripts/simple-match-v4-live-smoke.mjs'], cwd=WEB)
 
     # This integration must preserve the currently deployed matching popup,
