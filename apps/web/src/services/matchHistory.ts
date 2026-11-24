@@ -4,7 +4,7 @@ import {getRealAuthToken} from './realAuth';
 export type MatchHistorySummary={
  id:string;resume_id:string|null;resume_label:string;role_hint:string;
  created_at:string;job_count:number;best_score:number|null;
- new_job_count:number;improved_job_count:number;
+ new_job_count:number;improved_job_count:number;engine?:'V4';research_pending?:boolean;
 };
 export type HistoryMatchedJob={
  id:string;company:string;title:string;location:string;official_url:string;
@@ -16,7 +16,7 @@ export type HistoryMatchedJob={
  evidence_excerpt?:string;
  evidence_sources?:{url:string;kind:string}[];
  jd_source_status?:'VERIFIED_JD';jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'AI_VERIFIED_JD_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
- jd_proof_method?:'PUBLIC_EMPLOYER_ATS_V1'|'DIRECT_EMPLOYER_HTML_V1'|null;
+ jd_proof_method?:'PUBLIC_EMPLOYER_ATS_V1'|'DIRECT_EMPLOYER_HTML_V1'|'V4_STRUCTURED_JOBPOSTING'|null;
 };
 export type MatchHistoryDetail=MatchHistorySummary&{matches:HistoryMatchedJob[]};
 const api='/api/match-history';
