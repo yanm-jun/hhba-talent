@@ -11,7 +11,7 @@ import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-
 
 const BASE='https://api-c.reqtoken.com/v1';
 function providerBase(value){
- try{const u=new URL(value||BASE);if(u.protocol!=='https:'||u.username||u.password||u.search||u.hash)return null;return u.href.replace(/\\/$/,'');}catch{return null;}
+ try{const u=new URL(value||BASE);if(u.protocol!=='https:'||u.username||u.password||u.search||u.hash)return null;return (u.href.endsWith('/')?u.href.slice(0,-1):u.href);}catch{return null;}
 }
 const MODEL='gpt-6.2-sol';
 const fault=code=>Object.assign(new Error(code),{code});
