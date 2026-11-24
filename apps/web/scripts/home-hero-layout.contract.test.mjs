@@ -35,8 +35,11 @@ test('home preserves job search, company directory and adds labor-rights support
     'title="求职与机会"','title="劳动权益"','title="企业招聘导航"','<UnifiedJobMarket compact/>']){
   assert.ok(home.includes(t),'home content unexpectedly removed: '+t);
  }
- assert.ok(home.includes("kind==='candidate'?'/candidate/jobs'"),
-   'public 求职与机会 card must consistently open the public job market');
+ assert.ok(home.includes("kind==='candidate'?(candidateTarget||'/candidate/match')"),
+   '求职与机会 card must use the AI match destination');
+ assert.ok(home.includes('candidateTarget={matchTarget}'));
+ assert.ok(home.includes('onClick={()=>navigate(matchTarget)}'));
+ assert.ok(home.includes('to={target}'), 'the whole card remains clickable');
  assert.ok(home.includes("kind==='rights'?'/rights/knowledge'"),
    'public rights card must open a standalone explanation');
  assert.ok(home.includes(":'/companies/library'"),'company directory entry must lead to the 17 industry halls');
