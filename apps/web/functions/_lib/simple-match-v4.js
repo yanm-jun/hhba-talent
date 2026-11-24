@@ -195,8 +195,9 @@ function renderJob(x,url,verified,resume,toolLinked,index){
  return {id:verified?.id||'v4-source-'+index,company,title,title_zh:title,location,
   official_url:url,platform:source==='THIRD_PARTY_BOARD'?'第三方招聘线索':
     confirmed?'企业官方招聘':'招聘来源（企业官网待核实）',
-  recruitment_source_kind:source,source_type:source==='THIRD_PARTY_BOARD'?
-   '站外招聘职位':'站外官方招聘',
+  recruitment_source_kind:source==='THIRD_PARTY_BOARD'?source:
+   confirmed?'EMPLOYER_DOMAIN_CANDIDATE':'UNVERIFIED',
+  source_type:confirmed?'站外官方招聘':'站外招聘职位',
   recruitment_source_note:note,
   source:new URL(url).hostname,remote:false,salary:text(x?.salary,100)||null,
   reference_score:score??0,match_score:score,
