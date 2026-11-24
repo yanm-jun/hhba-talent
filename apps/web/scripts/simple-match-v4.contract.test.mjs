@@ -257,3 +257,70 @@ test('V4 JD extraction preserves long legitimate sections',async()=>{
  assert.ok(jd.full_jd.length>24000);
  assert.ok(htmlToText('<p>'+('岗位职责'.repeat(30000))+'</p>',{unbounded:true}).length>100000);
 });
+
+
+test('V4 search yields one round to renew the hosting request budget without a total round cap',async()=>{
+ let requests=0;
+ const result=await v4Match(async(u)=>{
+  requests++;
+  assert.ok(u.endsWith('/responses'),'no employer-page subrequests are spent during this search round');
+  return model({research_complete:false,jobs:[row]},[url]);
+ },provider,resume,'全国',{oneRound:true,skipEnrich:true});
+ assert.equal(requests,1);
+ assert.equal(result.research_pending,true);
+ assert.equal(result.matches.length,1);
+ const next=await v4Match(async()=>model({research_complete:true,jobs:[{...row,url:'https://jobs.other-motors.cn/second'}]}),
+  provider,resume,'全国',{oneRound:true,skipEnrich:true,excludeUrls:[url]});
+ assert.equal(next.research_pending,false);
+ assert.equal(next.matches.length,1);
+});
+
+test('V4 saves independently fetched structured JD and the existing optimizer can hydrate it',async()=>{
+ const {prepareV4JobForOptimization}=await import('../functions/_lib/v4-jd-bridge.js');
+ const {hydrateVerifiedJobRequirements}=await import('../functions/_lib/job-jd-archive.js');
+ const files=new Map();
+ const env={HHBA_JOB_JD_DB:{prepare:()=>({bind:()=>({first:async()=>null})})},
+  HHBA_JOB_JD_R2:{put:async(key,value)=>files.set(key,value),get:async key=>files.has(key)?{text:async()=>files.get(key)}:null}};
+ const html='<script type="application/ld+json">'+JSON.stringify({
+  '@type':'JobPosting',title:row.title,hiringOrganization:{name:row.company,url:'https://careers.other-motors.cn'},
+  jobLocation:{address:{addressLocality:'上海'}},
+  description:'<p>岗位职责</p><p>负责区域渠道运营和经销商业务流程管理。</p><p>负责销售人员培训以及经营数据的跟踪分析。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，能够提供门店改善方案。</p><p>具备跨团队沟通和业务数据分析能力。</p>'
+ })+'</script>';
+ const patch=await prepareV4JobForOptimization(env,url,{expectedTitle:row.title,fetcher:async()=>new Response(html,{headers:{'content-type':'text/html'}})});
+ assert.match(patch.jd_version_id,/^jd_[a-f0-9]{32}$/);
+ const trusted=await hydrateVerifiedJobRequirements(env,{title:'客户端文字',official_url:url,jd_version_id:patch.jd_version_id,jd_sha256:patch.jd_sha256,requirements:'虚构要求'});
+ assert.equal(trusted.title,row.title);
+ assert.ok(trusted.requirements.includes('渠道运营和经销商业务流程'));
+ assert.doesNotMatch(trusted.requirements,/虚构要求/);
+ await assert.rejects(()=>hydrateVerifiedJobRequirements(env,{official_url:url,jd_version_id:patch.jd_version_id,jd_sha256:'0'.repeat(64)}),/JD_JOB_IDENTITY_MISMATCH/);
+});
+
+test('V4 OCR requires candidate authorization and explicit file-sharing consent; transmits PDF and redacts recognized text',async()=>{
+ const db={prepare(sql){return {bind(){return {
+  async first(){if(sql.includes('hhba_auth_sessions'))return {phone:'13911110000',revoked:0,expires_at:new Date(Date.now()+60000).toISOString()};
+   if(sql.includes('hhba_auth_users'))return {role:'candidate'};return null;},
+  async run(){return {success:true}}
+ }}}}};
+ const env={HHBA_AGENT_RELAY_API_KEY:key,HHBA_MATCH_V4_READY:'1',HHBA_PNVS_AUTH_DB:db};
+ const old=globalThis.fetch;let calls=0;
+ globalThis.fetch=async(u,opts)=>{
+  calls++;const payload=JSON.parse(opts.body);
+  assert.equal(payload.input[0].content[0].type,'input_file');
+  assert.match(payload.input[0].content[0].file_data,/^data:application\/pdf;base64,/);
+  return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:'真实工作经历：负责渠道运营与人员培训。 synthetic@example.com'}]}]});
+ };
+ const make=(consent,auth=true)=>new Request('https://hhba.work/api/match-v4/ocr',{method:'POST',
+  headers:{Origin:'https://hhba.work','Content-Type':'application/octet-stream','X-HHBA-Resume-Format':'pdf',
+   ...(auth?{Authorization:'Bearer test-token'}:{}),...(consent?{'X-HHBA-OCR-Consent':'v4-resume-ocr-v1'}:{})},
+  body:'%PDF-1.7\n'+('synthetic data '.repeat(4))+'\n%%EOF'});
+ try{
+  assert.equal((await onRequest({request:make(true,false),env})).status,401);
+  assert.equal((await onRequest({request:make(false),env})).status,403);
+  assert.equal(calls,0);
+  const result=await (await onRequest({request:make(true),env})).json();
+  assert.equal(result.ok,true);
+  assert.equal(result.partial,false);
+  assert.match(result.text,/邮箱已隐藏/);
+  assert.equal(calls,1);
+ }finally{globalThis.fetch=old}
+});
