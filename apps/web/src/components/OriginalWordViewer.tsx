@@ -394,7 +394,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    onVisualSuggestionAction?.(visual.id,'accepted',undefined,result.layout_verified===true);
    setSelected(null);setConfirmed(false);setInlineVisualEditor(null);setActiveVisualId(null);
    setSaved(true);setRevision(result.revision);setTotalRevisions(result.total_revisions);
-   setRefresh(n=>n+1);
+   setLoading(true);setRefresh(n=>n+1);
    setPdfAvailable(result.pdf_available===true);setLayoutVerified(result.layout_verified===true);
    setMessage(result.layout_verified?'已采纳并通过 Word 版式核验，原件保持不变。':
     '已采纳并保存原格式 Word。文字与原 DOCX 结构保留，分页请下载后检查。');
@@ -413,21 +413,23 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   catch(error){setMessage(error instanceof Error?error.message:'下载失败，请重试。');}
  }
  async function downloadSaved(){
+  if(busy||loading||!saved||revision<=0)return;
   setBusy(true);setMessage('');
-  try{await downloadOriginalWordEdited(resume.id,jobId,jobTitle);
+  try{await downloadOriginalWordEdited(resume.id,jobId,jobTitle,revision);
    setMessage('已发起 Word 下载，请在浏览器下载列表查看。');}
   catch(error){setMessage(error instanceof Error?error.message:'下载失败，请重试。');}
   finally{setBusy(false);}
  }
  async function downloadSavedPdf(){
+  if(busy||loading||!saved||!pdfAvailable||revision<=0)return;
   setBusy(true);setMessage('');
-  try{await downloadOriginalWordPdf(resume.id,jobId,jobTitle);
+  try{await downloadOriginalWordPdf(resume.id,jobId,jobTitle,revision);
    setMessage('已发起当前已确认版本的 PDF 下载。');}
   catch(error){setMessage(error instanceof Error?error.message:'PDF 下载失败，请重试。');}
   finally{setBusy(false);}
  }
  async function save(){
-  if(!selected||!confirmed||busy||!draft.trim()||draft.length>1600)return;
+  if(!selected||!confirmed||busy||loading||!draft.trim()||draft.length>1600)return;
   rememberPosition();setBusy(true);setMessage('');
   try{
    const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision,jobId);
@@ -446,7 +448,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   finally{setBusy(false);}
  }
  async function changeRevision(action:'undo'|'redo'){
-  if(busy||ready!=='available'||action==='undo'&&revision<=0||
+  if(busy||loading||ready!=='available'||action==='undo'&&revision<=0||
    action==='redo'&&revision>=totalRevisions)return;
   if(!confirmDiscardText())return;
   rememberPosition();setBusy(true);setMessage('');
@@ -455,7 +457,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    onSessionWordDraftChange?.(null);setSelected(null);setConfirmed(false);setInlineVisualEditor(null);setActiveVisualId(null);
    onVersionMoved?.();
    setRevision(result.revision);setTotalRevisions(result.total_revisions);
-   setSaved(result.saved);setRefresh(n=>n+1);
+   setSaved(result.saved);setPdfAvailable(false);setLayoutVerified(false);setLoading(true);setRefresh(n=>n+1);
    setMessage(action==='undo'?'已恢复上一版 Word，不影响其他岗位版本。':
     '已重新应用已保存的 Word 修改。');
   }catch(error){setMessage(error instanceof Error?error.message:'版本切换失败，请重新打开简历。');}
@@ -585,9 +587,9 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      <summary><Download size={16}/> 导出 <ChevronDown size={13}/></summary>
      <div className="hhba-word-menu-content">
       <button type="button" onClick={()=>void downloadOriginal()}>下载原件</button>
-      <button type="button" disabled={!saved||busy}
+      <button type="button" disabled={!saved||busy||loading}
        onClick={()=>void downloadSaved()}>下载 Word</button>
-      <button type="button" disabled={!pdfAvailable||busy}
+      <button type="button" disabled={!pdfAvailable||busy||loading}
        title={pdfAvailable?'下载经渲染器校验的 PDF':'该版本未做专业分页校验，暂不能下载 PDF'}
        onClick={()=>void downloadSavedPdf()}>下载 PDF</button>
      </div>
