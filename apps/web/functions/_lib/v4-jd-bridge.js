@@ -1,7 +1,7 @@
 // V4 on-demand JD verification: one job per HTTP request. No CV is stored.
 import {v4PublicJobUrl,v4ReadEmployerJob} from './v4-open-job-evidence.js';
-import {directOfficialJobEvidence,extractOfficialJdSections} from './official-job-evidence.js';
-import {readFreshJobJdByUrl,saveVerifiedJobJd,safeJDSourceLocator,jdArchiveConfigured} from './job-jd-archive.js';
+import {v4SourceSections} from './v4-open-job-evidence.js';
+export const v4ArchiveConfigured=env=>typeof env?.HHBA_JOB_JD_R2?.get==='function'&&typeof env?.HHBA_JOB_JD_R2?.put==='function';
 import {sha256Hex} from './real-auth.js';
 const board=/(?:^|\.)(?:zhipin\.com|liepin\.com|51job\.com|zhaopin\.com|lagou\.com|indeed\.com|linkedin\.com|glassdoor\.com)$/i;
 const keyOf=id=>'official-jds/v4/'+id+'.json';
@@ -14,13 +14,13 @@ function normalized(source){
     typeof source.company!=='string'||!source.company.trim()||
     typeof source.title!=='string'||!source.title.trim()||
     typeof source.location!=='string'||!source.location.trim())return null;
- const sections=extractOfficialJdSections(source.full_jd,{unbounded:true});
+ const sections=v4SourceSections(source.full_jd);
  if(!sections)return null;
  return {canonical_url:url,company:source.company,title:source.title,location:source.location,
   proof_method:proof,source_confirmed:true,...sections};
 }
 export async function readV4ArchivedJd(env,id){
- if(!/^jd_[a-f0-9]{32}$/.test(id)||!jdArchiveConfigured(env))return null;
+ if(!/^jd_[a-f0-9]{32}$/.test(id)||!v4ArchiveConfigured(env))return null;
  const object=await env.HHBA_JOB_JD_R2.get(keyOf(id));if(!object)return null;
  let raw;try{raw=JSON.parse(await object.text());}catch{return null;}
  const source=normalized(raw);
@@ -42,21 +42,11 @@ async function saveV4PublicJd(env,source){
  return readV4ArchivedJd(env,id);
 }
 export async function prepareV4JobForOptimization(env,url,{signal,fetcher=fetch,expectedTitle}={}){
- if(!jdArchiveConfigured(env))throw Error('JD_ARCHIVE_DISABLED');
+ if(!v4ArchiveConfigured(env))throw Error('JD_ARCHIVE_DISABLED');
  const canonical=v4PublicJobUrl(url);
  if(!canonical||board.test(new URL(canonical).hostname))throw Error('JD_NOT_COMPLETE_ENOUGH');
- let saved;
- const locator=safeJDSourceLocator(canonical);
- if(locator&&!locator.kind){
-  try{
-   saved=await readFreshJobJdByUrl(env,locator.url);
-   if(!saved){const verified=await directOfficialJobEvidence(locator.url,{signal,fetcher});saved=await saveVerifiedJobJd(env,verified);}
-  }catch{}
- }
- if(!saved?.fresh){
-  const verified=await v4ReadEmployerJob(canonical,{signal,fetcher,expectedTitle});
-  saved=await saveV4PublicJd(env,verified);
- }
+ const verified=await v4ReadEmployerJob(canonical,{signal,fetcher,expectedTitle});
+ const saved=await saveV4PublicJd(env,verified);
  if(!saved?.fresh||saved.canonical_url!==canonical)throw Error('JD_NOT_COMPLETE_ENOUGH');
  if(expectedTitle&& !/待核实/.test(expectedTitle)&&norm(expectedTitle)!==norm(saved.title))
   throw Error('JD_JOB_IDENTITY_MISMATCH');
