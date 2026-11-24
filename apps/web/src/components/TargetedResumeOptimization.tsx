@@ -2,7 +2,7 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {Sparkles,Undo2,ShieldCheck,LoaderCircle,CheckCircle2,Save,FolderOpen,Printer,FileDown,PencilLine,X ,ChevronDown} from 'lucide-react';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 import {getRealAuthToken,realAuthReady} from '../services/realAuth';
-import {MATCH_V4_PREVIEW} from '../services/resumeMatch';
+import {MATCH_V4_PREVIEW,prepareV4Job} from '../services/resumeMatch';
 import {getResumeOptimizationStatus,requestResumeOptimization,type ResumeOptimizationStatus} from '../services/resumeOptimizationApi';
 import {getWholeRewriteStatus,requestWholeResumeRewrite,continueWholeResumeRewrite,type ResumeWholeRewriteResult,type ResumeWholeRewriteStatus} from '../services/resumeWholeRewriteApi';
 import {completeRewriteSource} from '../services/resumeWholeRewriteSource';
@@ -263,8 +263,10 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    !confirmReassessment||scoreResult?.supported)return;
   setScoring(true);setNotice('');setScoreResult(null);
   try{
-   const result=await reassessResume(scoreJobId,profile,blocks,
-    sourceResume?verifiedWordScore.blocks:version.blocks);
+   const controller=new AbortController();active.current=controller;
+   const target=MATCH_V4_PREVIEW?await jobContextForAI(controller.signal):null;
+   const result=await reassessResume(target?.jd_version_id||scoreJobId,profile,blocks,
+    sourceResume?verifiedWordScore.blocks:version.blocks,controller.signal);
    setScoreResult(result);
    if(!result.supported)setNotice('此岗位未通过当前官方快照复评条件，未生成分数。');
    else setNotice('已用相同标准比较修改前后的简历。');
@@ -358,7 +360,15 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    if(official.canonical_url!==job.official_url||official.job_id!==job.jd_version_id||
     (job.jd_sha256&&official.jd_sha256!==job.jd_sha256))
     throw Error('岗位 JD 版本不一致，请重新匹配后再优化。');
-   if(!official.fresh)throw Error('岗位 JD 需要重新核验，请重新匹配后再优化。');
+   if(!official.fresh){
+    if(!MATCH_V4_PREVIEW)throw Error('岗位 JD 需要重新核验，请重新匹配后再优化。');
+    const refreshed=await prepareV4Job(job.official_url,signal,official.title);
+    if(!refreshed.jd_version_id||!refreshed.jd_sha256||!refreshed.requirements_basis)
+     throw Error('岗位 JD 重新核验失败，未使用过期要求。');
+    if(!signal.aborted)setArchivedJdId(refreshed.jd_version_id);
+    return {title:refreshed.title||official.title,requirements:refreshed.requirements_basis,
+     official_url:job.official_url,jd_version_id:refreshed.jd_version_id,jd_sha256:refreshed.jd_sha256};
+   }
    if(!signal.aborted)setArchivedJdId(official.job_id);
    return {title:official.title,requirements:official.full_jd,official_url:official.canonical_url,
     jd_version_id:official.job_id,jd_sha256:official.jd_sha256};
