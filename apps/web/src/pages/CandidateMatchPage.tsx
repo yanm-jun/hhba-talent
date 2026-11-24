@@ -241,7 +241,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setPartialJobs(collected);
   try{
    const next=await submitExtractedResumeText(search.text,{...search.options,
-    exclude_urls:MATCH_V4_PREVIEW?previous.matches.map(job=>job.official_url):previous.matches.map(job=>job.official_url).slice(-50)},true,abort.signal,search.resumeId,
+    history_id:MATCH_V4_PREVIEW?previous.history_id||undefined:undefined,
+     exclude_urls:MATCH_V4_PREVIEW?previous.matches.map(job=>job.official_url):previous.matches.map(job=>job.official_url).slice(-50)},true,abort.signal,search.resumeId,
     stage=>{if(!abort.signal.aborted)progress(stage);},
     jobs=>{if(!abort.signal.aborted){collected=combine(jobs);setPartialJobs(collected);}},
     detail=>{if(!abort.signal.aborted)setActivity(detail);});
