@@ -46,17 +46,27 @@ export async function runSyntheticResumeAcceptance({env,signal,optimize=optimize
  try{
   const job={title:jd.title,requirements:jd.full_jd,verified:true};
   const source=syntheticDocx(),originalHash=digest(source);
-  let wanted=blocks.map(b=>b.id),suggestions=new Map();
-  // The diagnostic stops at no-progress; this is not a product AI quota.
+  let wanted=blocks.map(b=>b.id),suggestions=new Map(),reviewFeedback={};
+  const stalledStates=new Set();
+  // The diagnostic follows changing review feedback; a repeated identical
+  // state stops without imposing a model research-round quota.
   while(wanted.length){
-   const result=await optimize({env,blocks,context:blocks.map(b=>b.text).join('\n'),job,signal,wanted});
-   for(const item of result.suggestions)suggestions.set(item.blockId,item);
+   const result=await optimize({env,blocks,context:blocks.map(b=>b.text).join('\n'),job,signal,wanted,reviewFeedback});
    const pending=result.pendingIds;
    if(!Array.isArray(pending)||pending.some(id=>!wanted.includes(id)))fail('QA_INVALID_PENDING');
+   for(const item of result.suggestions)if(!pending.includes(item.blockId))suggestions.set(item.blockId,item);
+   reviewFeedback=Object.fromEntries(pending.flatMap(id=>{
+    const direction=result.reviewFeedback?.[id]??reviewFeedback[id];
+    return typeof direction==='string'&&direction.trim()?[[id,direction.trim()]]:[];
+   }));
    summary.stages.optimization={reviewed:blocks.length-pending.length,total:blocks.length,suggestions:suggestions.size};
    emit();
    if(result.pauseReason)fail(result.pauseReason);
-   if(pending.length>=wanted.length)fail('QA_NO_PROGRESS');
+   if(pending.length>=wanted.length){
+    const signature=JSON.stringify([...pending].sort().map(id=>[id,reviewFeedback[id]||'']));
+    if(stalledStates.has(signature)||!Object.keys(reviewFeedback).length)fail('QA_NO_PROGRESS');
+    stalledStates.add(signature);
+   }else stalledStates.clear();
    wanted=pending;
   }
   const edits=[...suggestions.values()].filter(s=>s.action==='replace'&&s.proposed!==s.original&&s.proposed.trim()&&!/[\r\n\t]/.test(s.proposed));
