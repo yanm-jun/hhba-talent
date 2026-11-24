@@ -373,7 +373,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           </div>
         </div>}
         {user&&privateResumeAvailable&&vaultError&&<p className="hhba-ai-vault-error" role="status">{vaultError}</p>}
-        {!getRealAuthToken()&&<p className="hhba-ai-service-check">AI 简历匹配需要先 <Link to="/candidate/login?next=%2Fcandidate%2Fmatch">登录 HHBA 求职账号</Link>。</p>}
+        {!getRealAuthToken()&&<p className="hhba-ai-service-check">AI 简历匹配需要先 <Link to={new URLSearchParams(window.location.search).get("v4")==="1"?"/candidate/login?next=%2Fcandidate%2Fmatch%3Fv4%3D1":"/candidate/login?next=%2Fcandidate%2Fmatch"}>登录 HHBA 求职账号</Link>。</p>}
         <input id="hhba-ai-resume" className="sr-only" type="file" accept={supportedTypes} disabled={working||saveBusy}
           onChange={(e:ChangeEvent<HTMLInputElement>)=>{choose(e.target.files?.[0]||null);e.target.value='';}}/>
         <label htmlFor="hhba-ai-resume" className={'hhba-ai-drop '+(drag?'dragging':'')}
