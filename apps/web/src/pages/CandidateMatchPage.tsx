@@ -32,7 +32,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [saveBusy,setSaveBusy]=useState(false);
  const [saveNotice,setSaveNotice]=useState('');
  // The user chooses whether the ORIGINAL binary should be retained.
- const [storageChoice,setStorageChoice]=useState<'undecided'|'save'|'once'>('once');
+ const [storageChoice,setStorageChoice]=useState<'undecided'|'save'|'once'>('undecided');
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
@@ -100,7 +100,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   setOcrFile(null);setOcrBusy(false);setPreviewNote('');
   setSavedId(id);setFile(null);setResult(null);setPartialJobs([]);setOptimizationSource('');
   setError('');setSaveConsent(false);setSaveNotice('');
-  setStorageChoice('once');setSavedPickerOpen(false);
+  setStorageChoice('undecided');setSavedPickerOpen(false);
   const entry=savedFiles.find(item=>item.id===id);
   if(entry)void preview(entry);
  }
@@ -112,7 +112,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   setOcrFile(null);setOcrBusy(false);setPreviewNote('');
   setError('');setResult(null);setPartialJobs([]);setOptimizationSource('');setSaveConsent(false);setSaveNotice('');
   setSavedId('');
-  setStorageChoice('once');
+  setStorageChoice('undecided');
   if(!candidate){setFile(null);return}
   const format=resumeFileFormat(candidate.name);
   if(!format||candidate.size<30||candidate.size>maxResumeSize){
@@ -436,7 +436,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 将脱敏后的简历文字发送给第三方 AI 中转服务进行岗位推荐；原文件不会因此上传给 AI。</span>
+          <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 使用我的简历信息进行智能岗位匹配；并同意本次将脱敏后的简历文字发送至第三方 AI 中转服务，原文件不随之发送。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
