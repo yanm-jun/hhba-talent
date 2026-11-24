@@ -73,7 +73,6 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [version,setVersion]=useState<ResumeVersion>(initial);
  const [suggestions,setSuggestions]=useState<ResumeSuggestion[]>([]);
  const [wordPromptBlocks,setWordPromptBlocks]=useState<ResumeBlock[]>([]);
- const wordDocumentText=useRef('');
  const previousOptimization=useRef<{key:string;suggestions:ResumeSuggestion[];pending:string[]}|null>(null);
  const [ignored,setIgnored]=useState<string[]>([]);
  const [resolvedWordVisualIds,setResolvedWordVisualIds]=useState<string[]>([]);
@@ -465,7 +464,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    };
    // Use the authenticated current DOCX body as the full-document context, not
    // a rendered-page excerpt or a stale pre-optimization resume snapshot.
-   let context=sourceText||'';
+   let context=redactResumeTextLocally(currentBlocks.map(block=>block.text).join('\n'));
    if(sourceResume){
     if(!postingScope||!wordRevisionSnapshot)throw Error('请等待当前 Word 版本读取完成。');
     const revisionKey=lastWordRevisionKey.current;
@@ -971,14 +970,13 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      }}
      onRevisionSnapshot={handleWordRevisionSnapshot}
      onDocumentReady={revealRenderedWord}
-     onEditableSegments={(segments,documentText)=>{
+     onEditableSegments={(segments)=>{
       // Never infer a writable Word location from a long ATS/search snippet.
       // Ignore contact-like text and only send visible, unique Word spans.
       const safe=[...new Set(segments)].filter(value=>
        typeof value==='string'&&value.length>=6&&value.length<=1600&&
        value===value.trim()&&!/[\r\n\t@]/.test(value)&&
        !/^\+?[\d\s()-]{7,}$/.test(value));
-      wordDocumentText.current=documentText||'';
       const next=safe.map((text,i)=>({id:'word-'+i,section:'experience' as const,text}));
       setWordPromptBlocks(prev=>
        prev.length===next.length&&prev.every((b,i)=>b.text===next[i].text)?prev:next);
