@@ -369,3 +369,19 @@ test('private resume bucket is never referenced by public JD store',()=>{
  assert.match(route,/safeJDSourceLocator/);
  assert.match(route,/countAttempt/);
 });
+
+
+test('full Word optimization and V4 reassessment use actual authenticated saved revisions',()=>{
+ const ui=readFileSync(new globalThis.URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
+ const source=readFileSync(new globalThis.URL('../functions/api/resume-word.js',import.meta.url),'utf8');
+ assert.match(ui,/fetchPrivateResumeForLocalReview\(sourceResume\),wordSourceBytes\(sourceResume.id,revision,postingScope\)/);
+ assert.match(ui,/beforeBlocks=sourceResumeBlocks\(redactResumeTextLocally\(originalText\),true\)/);
+ assert.match(ui,/afterBlocks=sourceResumeBlocks\(redactResumeTextLocally\(editedText\),true\)/);
+ assert.match(ui,/reassessResume\(scoreJobId,profile,beforeBlocks,afterBlocks,undefined,v4Reassessment\)/);
+ assert.match(ui,/wordSourceBytes\(sourceResume.id,wordRevisionSnapshot.revision,postingScope\)/);
+ assert.match(ui,/context=redactResumeTextLocally\(await extractDocxText/);
+ assert.match(ui,/revisionKey!==lastWordRevisionKey.current/);
+ assert.match(ui,/hasVerifiedWordRevision&&\(v4Reassessment\|\|verifiedWordScore.ok\)/);
+ assert.match(source,/Number\(requested\)!==state.revision/);
+ assert.match(ui,/!job.jd_version_id&&!hasAuditedAtsIdentity&&verifyStatus\?\.enabled/);
+});
