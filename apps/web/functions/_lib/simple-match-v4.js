@@ -16,7 +16,11 @@ const norm=v=>String(v||'').replace(/\s+/g,' ').trim();
 
 export function v4Provider(env={}){
  const key=env.HHBA_AGENT_RELAY_API_KEY;
- return typeof key==='string'&&key.trim().length>=16?{key,model:typeof env.HHBA_V4_MODEL==='string'&&env.HHBA_V4_MODEL.trim()?env.HHBA_V4_MODEL.trim():MODEL}:null;
+ let baseUrl=BASE;
+ if(typeof env.HHBA_V4_BASE_URL==='string'&&env.HHBA_V4_BASE_URL.trim()){
+  try{const u=new URL(env.HHBA_V4_BASE_URL.trim());if(u.protocol!=='https:'||u.username||u.password||u.search||u.hash)return null;baseUrl=u.href.replace(/\/$/,'');}catch{return null;}
+ }
+ return typeof key==='string'&&key.trim().length>=16?{key,baseUrl,model:typeof env.HHBA_V4_MODEL==='string'&&env.HHBA_V4_MODEL.trim()?env.HHBA_V4_MODEL.trim():MODEL}:null;
 }
 export function v4OutputText(response){
  return (response?.output||[]).filter(x=>x?.type==='message')
@@ -39,7 +43,7 @@ export async function v4Call(fetcher,provider,payload,{signal}={}){
  try{
   // Let the provider and the hosting runtime govern request duration. HHBA
   // adds no separate per-model-call wall-clock deadline to long job research.
-  response=await fetcher(BASE+'/responses',{
+  response=await fetcher((provider.baseUrl||BASE)+'/responses',{
    method:'POST',redirect:'manual',
    headers:{authorization:'Bearer '+provider.key,'content-type':'application/json',
     accept:'application/json','x-openai-actor-authorization':'local-image-extension'},
