@@ -229,13 +229,13 @@ export async function generateTailoredResume({env,blocks,job,signal}){
    const reason=problem||(!auditResult?'AUDIT_INCOMPLETE':!auditResult.safe?
     'AI_FACT_CHECK_REJECTED':null);
    if(!safe)issues.push({blockId:block.id,code:reason,
-    note:compact(auditResult?.concern).slice(0,350)});
+    note:compact(auditResult?.concern).slice(0,unbounded?undefined:350)});
    rewritten.push({
     blockId:block.id,section:block.section,original:raw.text,
     proposed:safe?proposal:raw.text,
     changed:safe&&proposal!==raw.text,
     evidenceQuotes:safe?quotes.map(compact):[],
-    rationale:safe?compact(draft?.rationale).slice(0,750):'此段保留原文，需人工补充证据或重新审查。',
+    rationale:safe?compact(draft?.rationale).slice(0,unbounded?undefined:750):'此段保留原文，需人工补充证据或重新审查。',
     jobRequirements:safe&&Array.isArray(draft?.jobRequirements)?
      draft.jobRequirements.filter(x=>typeof x==='string').slice(0,unbounded?undefined:12):[],
     status:safe?'needs_user_confirmation':'kept_original'
