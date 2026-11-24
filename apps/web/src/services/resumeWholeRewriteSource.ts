@@ -13,6 +13,7 @@ const MAX_BLOCKS=96;
 function sectionOf(text:string):ResumeSection{
  // JavaScript \b is an ASCII-oriented word boundary and does not match
  // headings followed by Chinese punctuation or Chinese body text reliably.
+ if(MATCH_V4_PREVIEW)return 'source';
  const line=text.split('\n',1)[0].trim().slice(0,90);
  if(/^(?:教育背景|教育经历|学历信息|学历|Education)(?=$|[：:\s])/i.test(line))
   return 'education';
@@ -31,6 +32,7 @@ export function completeRewriteSource(profile:CandidateProfile,sourceText?:strin
   const value=text.trim();
   if(!value)return;
   // Respect paragraph boundaries where possible but never discard overflow.
+  if(MATCH_V4_PREVIEW){chunks.push({section,text:value});return;}
   for(let start=0;start<value.length;start+=MAX_CHARS_PER_BLOCK){
    chunks.push({section,text:value.slice(start,start+MAX_CHARS_PER_BLOCK)});
   }

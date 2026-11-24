@@ -8,7 +8,7 @@ export type MatchProfile = {
   experience_years:number|null;experience_evidence:string|null;
   skills:{name:string;evidence:string}[];target_roles:string[];
   professional_credentials?:string[];warnings:string[];
-  facts?:{id:string;kind:'work'|'project'|'skill'|'education'|'credential';quote:string}[];
+  facts?:{id:string;kind:string;quote:string}[];
 };
 export type MatchedJob = {
   id:string;company:string;title:string;title_zh?:string|null;location:string;
@@ -224,7 +224,7 @@ export async function inspectResumeTextLocally(file:File,signal?:AbortSignal):Pr
   const value=pdf?.text??await extractDocxText(buffer,{signal,unbounded:MATCH_V4_PREVIEW});
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
   const text=redactResumeTextLocally(value);
-  return {text,needsOcr:pdf?.hasTextlessPages===true||text.replace(/\s/g,'').length<30};
+  return {text,needsOcr:pdf?.hasTextlessPages===true||text.replace(/\s/g,'').length<(MATCH_V4_PREVIEW?1:30)};
  }catch(e){
   if((e as Error)?.name==='AbortError'||e instanceof MatchError)throw e;
   if((e instanceof PDFResumeError&&['PDF_NO_TEXT','PDF_FAILED','PDF_TIMEOUT'].includes(e.code))||
@@ -235,7 +235,7 @@ export async function inspectResumeTextLocally(file:File,signal?:AbortSignal):Pr
 }
 export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Promise<string>{
  const {text}=await inspectResumeTextLocally(file,signal);
- if(text.replace(/\s/g,'').length<30)throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
+ if(text.replace(/\s/g,'').length<(MATCH_V4_PREVIEW?1:30))throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
  return text;
 }
 
@@ -395,7 +395,7 @@ async function submitMatchRound(
  if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
  const token=session();
  const cleaned=redactResumeTextLocally(text);
- if(cleaned.replace(/\s/g,'').length<30)throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
+ if(cleaned.replace(/\s/g,'').length<(MATCH_V4_PREVIEW?1:30))throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
  const watchdog=new AbortController();
  const requestSignal=signal?AbortSignal.any([signal,watchdog.signal]):watchdog.signal;
  let idleTimer:ReturnType<typeof setTimeout>|undefined;

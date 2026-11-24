@@ -33,7 +33,7 @@ const enabled=(env,request)=>allowedHost(request)&&env?.HHBA_MATCH_V4_READY==='1
 const sanitize=(raw)=>{
  if(typeof raw!=='string')return null;
  const text=redactForModel(raw.trim(),{unbounded:true});
- return text.replace(/\s/g,'').length>=30?text:null;
+ return text.replace(/\s/g,'').length>0?text:null;
 };
 function events(env,request,input){
  const encoder=new TextEncoder();let closed=false,phase='preparing';

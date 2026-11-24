@@ -30,7 +30,7 @@ function validInputs(blocks,job,unbounded=false){
   /^[a-zA-Z0-9_-]{1,64}$/.test(b.id)&&!used.has(b.id)&&
   (used.add(b.id),true)&&typeof b.text==='string'&&b.text.trim()&&
   (unbounded||b.text.length<=MAX_TEXT_PER_BLOCK)&&
-  ['summary','experience','skills','education','projects'].includes(b.section));
+  (unbounded?typeof b.section==='string'&&Boolean(b.section.trim()):['summary','experience','skills','education','projects'].includes(b.section)));
 }
 function balancedGroups(blocks){
  const groups=[];let group=[],size=0;

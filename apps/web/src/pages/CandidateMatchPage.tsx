@@ -157,7 +157,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   try{
    const recognized=await recognizeResumeDocument(ocrFile,abort.signal);
    if(abort.signal.aborted)return;
-   const enough=recognized.text.replace(/\s/g,'').length>=30;
+   const enough=recognized.text.replace(/\s/g,'').length>=(MATCH_V4_PREVIEW?1:30);
    if(!previewText.trim()||enough)setPreviewText(recognized.text);
    setPreviewNote(recognized.partial||!enough?'已保留可用文字，请核对原件并补全。':
     '文档识别已完成，请核对经历和技能。');
@@ -189,7 +189,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  }
  async function run(){
   if((!file&&!savedId)||!consent||working||saveBusy||controller.current||previewBusy||ocrBusy||!previewLoaded||
-   identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()||
+   identifiedCharacters<(MATCH_V4_PREVIEW?1:30)||availability!=='ready'||!getRealAuthToken()||
    (file&&!savedId&&storageChoice==='undecided'))return;
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);
   const abort=new AbortController();
@@ -414,7 +414,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           {previewError&&<p className="hhba-ai-error" role="alert">{previewError} 你可以在下方粘贴或补全简历文字。</p>}
           <textarea id="hhba-ai-text-preview" rows={6} maxLength={MATCH_V4_PREVIEW?undefined:20000} value={previewText}
            disabled={working||saveBusy||ocrBusy} onChange={e=>{setPreviewText(e.target.value);setConsent(false);}}/>
-          <small>{identifiedCharacters<30?'请输入至少 30 个非空白字符。':MATCH_V4_PREVIEW?'可直接修改。':'可直接修改，最多 20,000 字。'}</small>
+          <small>{identifiedCharacters<(MATCH_V4_PREVIEW?1:30)?(MATCH_V4_PREVIEW?'请输入可供 AI 分析的真实简历信息。':'请输入至少 30 个非空白字符。'):MATCH_V4_PREVIEW?'可直接修改。':'可直接修改，最多 20,000 字。'}</small>
          </div>}
          {!previewBusy&&!ocrBusy&&!ocrFile&&(!previewLoaded||previewError)&&<button type="button" disabled={working||saveBusy}
           onClick={()=>{const source=file||savedFiles.find(item=>item.id===savedId);if(source)void preview(source);}}>
@@ -456,7 +456,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
           disabled={(!file&&!savedId)||!consent||working||saveBusy||previewBusy||ocrBusy||!previewLoaded||
            (file&&!savedId&&storageChoice==='undecided')||
-           identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()}>
+           identifiedCharacters<(MATCH_V4_PREVIEW?1:30)||availability!=='ready'||!getRealAuthToken()}>
           {working?<><LoaderCircle className="spin" size={18}/> {saveBusy?'正在保存简历…':'正在匹配岗位…'}</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>

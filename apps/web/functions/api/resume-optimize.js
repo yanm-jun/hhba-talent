@@ -72,7 +72,7 @@ function valid(body,v4=false){
  const blocksValid=body.blocks.every(b=>{
   if(!b||typeof b!=='object'||typeof b.id!=='string'||!/^[a-z0-9_-]{1,64}$/i.test(b.id)||
    typeof b.text!=='string'||!b.text.trim()||(!v4&&b.text.length>1600)||ids.has(b.id))return false;
-  ids.add(b.id);return ['experience','skills','summary','education','projects'].includes(b.section);
+  ids.add(b.id);return v4?typeof b.section==='string'&&Boolean(b.section.trim()):['experience','skills','summary','education','projects'].includes(b.section);
  });
  return blocksValid&&(!doc?.wanted||doc.wanted.every(id=>ids.has(id)));
 }

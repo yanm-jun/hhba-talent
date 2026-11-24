@@ -31,10 +31,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  // Reopen the same employer posting from a new search or history using the same private Word branch.
  const postingScope=useMemo(()=>stablePostingScope(job.official_url),[job.official_url]);
  const blocks=useMemo<ResumeBlock[]>(()=>{
+ if(MATCH_V4_PREVIEW&&sourceText?.trim())return sourceResumeBlocks(sourceText,true);
  const originals=[
-  ...(Array.isArray(profile.experiences)?profile.experiences:[]).filter(e=>e.evidence?.trim()).map((e,i)=>({id:'experience-'+i,section:'experience' as const,text:e.evidence.slice(0,1600)})),
-  ...(Array.isArray(profile.skills)?profile.skills:[]).filter(s=>s.evidence?.trim()).map((s,i)=>({id:'skill-'+i,section:'skills' as const,text:s.evidence.slice(0,1600)}))
- ].slice(0,12);
+  ...(Array.isArray(profile.experiences)?profile.experiences:[]).filter(e=>e.evidence?.trim()).map((e,i)=>({id:'experience-'+i,section:'experience' as const,text:e.evidence.slice(0,MATCH_V4_PREVIEW?undefined:1600)})),
+  ...(Array.isArray(profile.skills)?profile.skills:[]).filter(s=>s.evidence?.trim()).map((s,i)=>({id:'skill-'+i,section:'skills' as const,text:s.evidence.slice(0,MATCH_V4_PREVIEW?undefined:1600)}))
+ ].slice(0,MATCH_V4_PREVIEW?undefined:12);
  // Newer search-first flows preserve local source text, but do not yet expose
  // verified structured work-history records. Keep raw paragraphs unmistakably
  // labelled as source text, rather than inventing roles or employers.
@@ -206,10 +207,10 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  },[postingScope]);
  const requirements=useMemo(()=>[
   job.requirements_basis,...job.matched,...job.not_evidenced,...job.needs_verification
- ].filter(Boolean).join('\n').slice(0,2500),[job]);
+ ].filter(Boolean).join('\n').slice(0,MATCH_V4_PREVIEW?undefined:2500),[job]);
  const fullJobRequirements=useMemo(()=>[
   job.requirements_basis,...job.matched,...job.not_evidenced,...job.needs_verification
- ].filter(Boolean).join('\n').slice(0,16000),[job]);
+ ].filter(Boolean).join('\n').slice(0,MATCH_V4_PREVIEW?undefined:16000),[job]);
  const criteria=useMemo(()=>[...job.matched,...job.not_evidenced], [job]);
  const textDraft=requireVerifiedJd&&!sourceResume&&Boolean(sourceText?.trim());
  const printDocument=useMemo(()=>buildResumeDocument(textDraft?
@@ -524,7 +525,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  }
  function addFact(s:ResumeSuggestion){
   const text=(newEvidence[s.id]||'').trim();
-  if(text.length<8){setNotice('请具体描述你的真实经历或成果，至少8个字。');return;}
+  if(text.length<(MATCH_V4_PREVIEW?1:8)){setNotice('请具体描述你的真实经历或成果。');return;}
   if(!confirmed.includes(s.id)){setNotice('请确认补充内容真实、准确后再填充。');return;}
   const original=version.blocks.find(b=>b.id===s.blockId)?.text||'';
   if(!MATCH_V4_PREVIEW&&original.length+1+text.length>1600){

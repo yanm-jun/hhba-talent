@@ -471,3 +471,11 @@ test('V4 keeps distinct same-paragraph alternatives and independently rejects un
   assert.equal(reviewed[0].id,suggestions[0].id);
  }finally{globalThis.fetch=old}
 });
+
+
+test('V4 preserves grounded facts outside historical resume categories and arbitrary experience cutoffs',async()=>{
+ const {v4GroundProfile}=await import('../functions/_lib/simple-match-v4.js');
+ const source='具有六十二年工作经历，曾获民间传统工艺传承荣誉。';
+ const parsed=v4GroundProfile({facts:[{kind:'非遗传承',quote:'民间传统工艺传承荣誉'}],experience_years:62,experience_evidence:'六十二年工作经历'},source);
+ assert.equal(parsed.facts[0].kind,'非遗传承');assert.equal(parsed.experience_years,62);
+});

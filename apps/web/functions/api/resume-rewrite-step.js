@@ -28,7 +28,7 @@ function validContinuation(body,unbounded=false){
  const ids=new Set();
  if(!body.blocks.every(b=>b&&typeof b.id==='string'&&
   /^[a-zA-Z0-9_-]{1,64}$/.test(b.id)&&!ids.has(b.id)&&
-  (ids.add(b.id),true)&&allowedSections.has(b.section)&&
+  (ids.add(b.id),true)&&(unbounded?typeof b.section==='string'&&Boolean(b.section.trim()):allowedSections.has(b.section))&&
   typeof b.text==='string'&&b.text.trim()&&(unbounded||b.text.length<=8000)))
   return false;
  const draft=body.draft;

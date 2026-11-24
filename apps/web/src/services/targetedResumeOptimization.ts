@@ -5,7 +5,7 @@
  */
 export const AI_PROVIDERS = ['deepseek','openai','anthropic','gemini','qwen','zhipu','groq','openrouter'] as const;
 export type AiProvider = typeof AI_PROVIDERS[number];
-export type ResumeSection = 'summary'|'experience'|'education'|'skills'|'projects';
+export type ResumeSection = string; // V4 may describe any real section; legacy validators retain their schema.
 export type SuggestionAction = 'replace'|'append'|'request_evidence';
 export type EvidenceStatus = 'verified'|'needs_user_confirmation';
 export interface ResumeBlock { id:string; section:ResumeSection; text:string; }

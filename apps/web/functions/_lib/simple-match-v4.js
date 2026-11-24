@@ -116,7 +116,7 @@ export function v4GroundProfile(raw,resume){
  const exact=quote=>quote.length>=4&&norm(resume).includes(norm(quote));
  const facts=(Array.isArray(profile.facts)?profile.facts:[])
   .map(x=>({kind:text(x?.kind,22),quote:text(x?.quote,500)}))
-  .filter(x=>['work','project','skill','education','credential'].includes(x.kind)&&exact(x.quote))
+  .filter(x=>x.kind&&exact(x.quote))
   .map((x,i)=>({id:'v4-'+(i+1),...x}));
  const skills=(Array.isArray(profile.skills)?profile.skills:[])
   .map(x=>({name:text(x?.name,100),evidence:text(x?.evidence,450)}))
@@ -126,7 +126,7 @@ export function v4GroundProfile(raw,resume){
  const eduQuote=text(profile.education_evidence,400);
  return {education:exact(eduQuote)?text(profile.education,200):null,
   education_evidence:exact(eduQuote)?eduQuote:null,
-  experience_years:Number.isFinite(years)&&years>=0&&years<=60&&exact(expQuote)?years:null,
+  experience_years:Number.isFinite(years)&&years>=0&&exact(expQuote)?years:null,
   experience_evidence:exact(expQuote)?expQuote:null,
   skills,facts,warnings:[],
   target_roles:texts(profile.roles||profile.target_roles),
@@ -312,7 +312,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      +'每轮返回一个有效 JSON 对象：'
      +'research_summary（总结已探索的方向、发现、尚未解决的问题，供下一轮使用），research_complete（布尔值：仍然值得联网继续查找时必须为 false；'
      +'研究充分或继续查找没有实际价值时才为 true），'
-     +'profile:{summary,roles,skills:[{name,evidence}],facts:[{kind,quote}],'
+     +'profile:{summary,roles,skills:[{name,evidence}],facts:[{kind,quote}]（kind 使用最合适的自由事实分类，quote 必须来自简历原文），'
      +'education,education_evidence,experience_years,experience_evidence}，'
      +'jobs:[{company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote}]。'
      +'resume_quote 必须逐字来自简历，岗位有真实来源才填写。'
