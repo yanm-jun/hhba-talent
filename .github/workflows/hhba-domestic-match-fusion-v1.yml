@@ -28,6 +28,15 @@ on:
       - 'apps/web/scripts/domestic-search-preview-http.smoke.mjs'
       - '.github/workflows/hhba-domestic-match-fusion-v1.yml'
   workflow_dispatch:
+    inputs:
+      legacy_preview_off:
+        description: 'Current authorized legacy preview URL with pilot disabled'
+        required: false
+        type: string
+      legacy_preview_on:
+        description: 'Current authorized legacy preview URL with pilot enabled'
+        required: false
+        type: string
 permissions:
   contents: read
 jobs:
@@ -61,12 +70,18 @@ jobs:
       - name: Check HHBA web production build
         working-directory: apps/web
         run: npm run build
-      - name: Real HTTPS Preview smoke (disabled pilot, no charge)
-        working-directory: apps/web
-        run: node scripts/domestic-search-preview-http.smoke.mjs
-      - name: Real HTTPS Preview smoke (flag on, anonymous requests denied, no charge)
+      # These are independent retired V1 external deployment diagnostics, not
+      # the V4 feature acceptance gate. Explicit current URLs are required.
+      - name: Real HTTPS legacy Preview smoke (disabled pilot, no charge)
+        if: github.event_name == 'workflow_dispatch' && inputs.legacy_preview_off != ''
         working-directory: apps/web
         env:
-          HHBA_DOMESTIC_PILOT_PREVIEW: https://69dffa55.hhba-talent.pages.dev
+          HHBA_DOMESTIC_PILOT_PREVIEW: ${{ inputs.legacy_preview_off }}
+        run: node scripts/domestic-search-preview-http.smoke.mjs
+      - name: Real HTTPS legacy Preview smoke (flag on, anonymous requests denied, no charge)
+        if: github.event_name == 'workflow_dispatch' && inputs.legacy_preview_on != ''
+        working-directory: apps/web
+        env:
+          HHBA_DOMESTIC_PILOT_PREVIEW: ${{ inputs.legacy_preview_on }}
           HHBA_DOMESTIC_PILOT_EXPECT_ENABLED: '1'
         run: node scripts/domestic-search-preview-http.smoke.mjs

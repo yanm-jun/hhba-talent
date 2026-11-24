@@ -38,7 +38,7 @@ test('invalid links must never accidentally edit the unscoped original Word',()=
 });
 test('UI keeps Word, saved versions and session drafts under the same stable posting scope',()=>{
  const source=readFileSync(new URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
- assert.match(source,/postingScope=useMemo\(\(\)=>stablePostingScope\(job\.official_url\)/);
+ assert.match(source,/postingScope=useMemo\(\(\)=>stablePostingScope\(job\.official_url,MATCH_V4_PREVIEW\?job\.posting_key:undefined\)/);
  assert.match(source,/jobId=\{postingScope\}/);
  assert.match(source,/listResumeVersions\(postingScope\)/);
  assert.match(source,/saveResumeVersion\(\{id:postingScope/);
@@ -51,4 +51,12 @@ test('verified JD previously used to score cannot silently be refreshed to a new
  assert.match(source,/official\.jd_sha256!==job\.jd_sha256/);
  assert.match(source,/if\(!official\.fresh\)/);
  assert.doesNotMatch(source,/if\(!official\)official=await ensureArchivedJobJd/);
+});
+
+
+test('V4 two distinct vacancies on one URL never share a Word scope, even for long public URLs',async()=>{
+ const {v4PostingKey}=await import('../src/services/v4PostingIdentity.mjs');
+ const long='https://jobs.example.org/list?parameters='+'a'.repeat(1900);
+ const a=v4PostingKey({company:'企业',title:'运营',location:'北京'},long),b=v4PostingKey({company:'企业',title:'培训',location:'北京'},long);
+ assert.notEqual(a,b);assert.match(stablePostingScope(long,a),/^posting-url-v1-[a-f0-9]{32}$/);assert.notEqual(stablePostingScope(long,a),stablePostingScope(long,b));
 });

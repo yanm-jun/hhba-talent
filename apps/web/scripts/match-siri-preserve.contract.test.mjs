@@ -32,7 +32,7 @@ test('the simpler result cards preserve the original Word editor and the selecte
  ];
  for(const value of preserved)assert.ok(dialog.includes(value),'preserve old native result UI: '+value);
  assert.match(dialog,/className=\{'hhba-match-modal'\+\(optimizedJobUrl\?' hhba-match-modal-editor':''\)\}/);
- assert.match(dialog,/displayedJobs\.find\(job=>job\.official_url===optimizedJobUrl\)/);
+ assert.match(dialog,/displayedJobs\.find\(job=>keyOf\(job\)===optimizedJobUrl\)/);
  assert.match(dialog,/disabled=\{pending\|\|!parsedProfile\|\|!!preparingJd\|\|\(!MATCH_V4_PREVIEW&&\(!job\.jd_version_id\|\|!job\.jd_sha256\)\)\}/);
  assert.match(dialog,/await prepareV4Job\(/);
  assert.doesNotMatch(dialog,/!pending&&Number\.isInteger\(job\.match_score\)&&<button/);
@@ -86,7 +86,7 @@ test('matching card layout untouched; only a small button and an active-only opt
 
 test('one job = one private Word revision scope; the original file is untouched',()=>{
  assert.match(optimizer,/jobId=\{postingScope\}/);
- assert.match(optimizer,/stablePostingScope\(job\.official_url\)/);
+ assert.match(optimizer,/stablePostingScope\(job\.official_url,MATCH_V4_PREVIEW\?job\.posting_key:undefined\)/);
  assert.match(word,/saveOriginalWordEdit\(resume\.id,anchor\.text,visual\.proposed\.trim\(\),revision,jobId\)/);
  assert.match(word,/downloadOriginalWordEdited\(resume\.id,jobId,jobTitle\)/);
  assert.match(backend,/hhba-word-target-job-v1:/);
