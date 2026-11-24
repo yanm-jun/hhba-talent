@@ -81,6 +81,7 @@ export type MatchResponse = {
   new_job_count?:number;
   improved_job_count?:number;
   can_continue?:boolean;
+  research_pending?:boolean;
   preview_synthetic?:boolean;
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
@@ -140,7 +141,7 @@ const errorMap:Record<string,string>={
   AI_PROVIDER_INCOMPLETE:'AI 搜索未能完成，没有返回不完整的岗位结果。'
 };
 export class MatchError extends Error {
- constructor(public readonly status:number,message:string){super(message);this.name='MatchError'}
+ constructor(public readonly status:number,message:string,public readonly code?:string){super(message);this.name='MatchError'}
 }
 function session(){
  if(!realAuthReady)throw new MatchError(401,'请在 HHBA 正式站登录求职账户。');
@@ -254,7 +255,7 @@ export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Pro
  const response=await fetch(EFFECTIVE_API+'/ocr',{
   method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/octet-stream',Authorization:'Bearer '+token,
-   'X-HHBA-Resume-Format':format,'X-HHBA-OCR-Consent':'deepseek-resume-ocr-v1'},
+   'X-HHBA-Resume-Format':format,'X-HHBA-OCR-Consent':MATCH_V4_PREVIEW?'v4-resume-ocr-v1':'deepseek-resume-ocr-v1'},
   body:file
  }).catch(error=>{
   if(error?.name==='AbortError')throw error;
@@ -262,7 +263,7 @@ export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Pro
  });
  const data=await response.json().catch(()=>null) as {ok?:boolean;error?:string;text?:string;partial?:boolean}|null;
  if(!response.ok||data?.ok!==true||typeof data.text!=='string')
-  throw new MatchError(response.status,ocrErrors[data?.error||'']||'文档识别暂未完成，可以重试或粘贴简历文字。');
+  throw new MatchError(response.status,ocrErrors[data?.error||'']||errorMap[data?.error||'']||'文档识别暂未完成，可以重试或粘贴简历文字。');
  return {text:redactResumeTextLocally(data.text),partial:data.partial===true};
 }
 export type NativeMatchProgress='preparing'|'parsing'|'connected'|'planning'|'searching'|'reading'|'researching'|'writing'|'scoring'|'waiting';
@@ -314,7 +315,7 @@ async function consumeNativeMatchStream(
    };
    const elapsedNote=Number.isFinite(elapsed)&&elapsed>=1000?
     '（'+Math.round(elapsed/1000)+'秒，阶段：'+(names[stage]||'模型处理')+'）':'';
-   throw new MatchError(502,(errorMap[code]||'智能匹配服务暂时不可用。')+elapsedNote);
+   throw new MatchError(502,(errorMap[code]||'智能匹配服务暂时不可用。')+elapsedNote,code);
   }else if(event==='complete'){
    complete=value as MatchResponse;
   }
@@ -383,7 +384,7 @@ export async function runMatchPreviewSyntheticAcceptance(
  return result;
 }
 
-export async function submitExtractedResumeText(
+async function submitMatchRound(
  text:string,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string,
  onProgress?:(stage:NativeMatchProgress)=>void,
  onPartial?:(jobs:MatchedJob[])=>void,
@@ -425,7 +426,7 @@ export async function submitExtractedResumeText(
   if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。');
   const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,onReceive):
    await response.json().catch(()=>({})) as Partial<MatchResponse>&{error?:string};
-  if(!response.ok)throw new MatchError(response.status,errorMap[(data as {error?:string}).error||'']||'智能匹配服务暂时不可用。');
+  if(!response.ok)throw new MatchError(response.status,errorMap[(data as {error?:string}).error||'']||'智能匹配服务暂时不可用。',(data as {error?:string}).error);
   if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||
    (!MATCH_V4_PREVIEW&&data.matches.length>10))
    throw new MatchError(502,errorMap.BAD_RESPONSE);
@@ -437,6 +438,72 @@ export async function submitExtractedResumeText(
   clearTimeout(idleTimer);
   clearTimeout(deadline);
  }
+}
+
+/** Each V4 HTTP request runs one AI-controlled research round. This renews
+ * Cloudflare's per-request resource budget without capping the full search.
+ * Keep the accumulated results in this authenticated browser session. */
+export async function submitExtractedResumeText(
+ text:string,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string,
+ onProgress?:(stage:NativeMatchProgress)=>void,onPartial?:(jobs:MatchedJob[])=>void,
+ onActivity?:(activity:NativeMatchActivity)=>void
+):Promise<MatchResponse>{
+ if(!MATCH_V4_PREVIEW)return submitMatchRound(text,opts,consent,signal,resumeId,onProgress,onPartial,onActivity);
+ const collected=new Map<string,MatchedJob>(),previous=new Set(opts.exclude_urls||[]);
+ let last:MatchResponse|undefined,round=0,delay=1000;
+ const publish=(jobs:MatchedJob[])=>{for(const job of jobs)if(!previous.has(job.official_url))collected.set(job.official_url,job);onPartial?.([...collected.values()]);};
+ const pause=(ms:number)=>new Promise<void>((resolve,reject)=>{
+  if(signal?.aborted){reject(signal.reason);return;}
+  const abort=()=>{clearTimeout(timer);reject(signal?.reason);};
+  const timer=setTimeout(()=>{signal?.removeEventListener('abort',abort);resolve();},ms);
+  signal?.addEventListener('abort',abort,{once:true});
+ });
+ while(true){
+  if(signal?.aborted)throw signal.reason;
+  try{
+   const data=await submitMatchRound(text,{...opts,exclude_urls:[...previous,...collected.keys()]},consent,signal,resumeId,onProgress,publish,onActivity);
+   publish(data.matches);last=data;round++;delay=1000;
+   onActivity?.({stage:'searching',message:'第 '+round+' 轮已完成，累计 '+collected.size+' 条岗位来源。',searches:round,candidate_links:collected.size});
+   if(!data.research_pending)break;
+  }catch(e){
+   if(signal?.aborted)throw signal.reason;
+   const err=e as MatchError;
+   const transient=err.code?['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_UNAVAILABLE'].includes(err.code):[502,503,504,429].includes(err.status);
+   if(!transient){
+    if(!last)throw e;
+    last={...last,disclaimer:last.disclaimer+' 本次搜索暂停，可继续搜索。'};break;
+   }
+   onActivity?.({stage:'searching',message:'接口暂时异常，已保留 '+collected.size+' 条岗位，正在自动恢复。'});
+   await pause(delay);delay=Math.min(delay*2,30000);
+  }
+ }
+ if(!last)throw new MatchError(502,'未取得完整的岗位研究结果。');
+ onProgress?.('reading');
+ // Verify one public JD per request, instead of spending the entire hosting
+ // subrequest budget on all vacancies at once. No total job-count cap.
+ const queue=[...collected.values()];let cursor=0,checked=0;
+ const worker=async()=>{
+  while(cursor<queue.length){
+   if(signal?.aborted)throw signal.reason;
+   const job=queue[cursor++];
+   try{const verified=await prepareV4Job(job.official_url,signal);collected.set(job.official_url,{...job,...verified});}
+   catch(e){if(signal?.aborted)throw e;}
+   checked++;onActivity?.({stage:'reading',message:'已检查 '+checked+' / '+queue.length+' 条岗位来源。',pages_read:checked});
+   onPartial?.([...collected.values()]);
+  }
+ };
+ await Promise.all(Array.from({length:Math.min(3,queue.length)},()=>worker()));
+ const matches=[...collected.values()].sort((a,b)=>(b.match_score??-1)-(a.match_score??-1));
+ return {...last,matches,matched_official_jobs:matches.filter(j=>j.jd_source_status==='VERIFIED_JD').length,can_continue:true,research_pending:false};
+}
+export async function prepareV4Job(officialUrl:string,signal?:AbortSignal):Promise<Partial<MatchedJob>>{
+ const response=await fetch('/api/match-v4/jd',{method:'POST',credentials:'same-origin',cache:'no-store',signal,
+  headers:{'Content-Type':'application/json',Authorization:'Bearer '+session()},
+  body:JSON.stringify({consent:true,official_url:officialUrl})});
+ const data=await response.json().catch(()=>null);
+ if(!response.ok||data?.ok!==true||!data.job?.jd_version_id||!data.job?.jd_sha256)
+  throw new MatchError(response.status,'暂未取得可用于优化的可信 JD，请核对招聘原页面或稍后重试。');
+ return data.job;
 }
 
 export async function submitResumeForMatching(
