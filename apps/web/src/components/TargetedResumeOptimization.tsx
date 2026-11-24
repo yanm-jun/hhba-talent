@@ -309,10 +309,6 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   // checkpoint must verify again on the server before that tool can run.
   while(!controller.signal.aborted&&latest.autonomy?.needs_more_work&&
    latest.continuation?.enabled&&latest.continuation.checkpoint){
-   if((latest.autonomy.tools_used?.length||0)>=64){
-    setNotice('本轮已到达技术保护边界。当前完整草稿已保留，可先审阅。');
-    break;
-   }
    latest=await continueWholeResumeRewrite(
     input.blocks,input.job,latest,controller.signal);
    if(controller.signal.aborted)return latest;
@@ -708,7 +704,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   // recommendations require fresh evidence confirmation after recovery.
   const reviewed=Array.isArray(data.suggestions)?
    data.suggestions.filter((item:ResumeSuggestion)=>
-    item&&validateSuggestion(data.version.blocks,item)).slice(0,12):[];
+    item&&validateSuggestion(data.version.blocks,item)):[];
   const approvedIds=new Set(reviewed.map((item:ResumeSuggestion)=>item.id));
   const safeFields=(value:unknown,max:number):Record<string,string>=>{
    const input=value&&typeof value==='object'&&!Array.isArray(value)?
