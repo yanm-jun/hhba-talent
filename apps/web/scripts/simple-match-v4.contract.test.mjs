@@ -558,3 +558,18 @@ test('four stage buttons show real reports without changing AI execution',async(
  assert.match(dialog,/!optimizedJobUrl&&<MatchResearchPanels/);
  assert.doesNotMatch(panels,/AbortController|fetch\(/);
 });
+
+test('V4 accepts a separate authorized recruitment system with independently read employer link',async()=>{
+ const {v4EmployerAuthorization}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const target='https://new-ats.cn/tenant/roles/112',proof='https://brand-new-employer.cn/recruitment';
+ const html='<html><head><meta property="og:site_name" content="新企业集团"><title>新企业集团官方招聘</title></head><body><a href="'+target+'">查看岗位</a></body></html>';
+ const fetcher=async()=>new Response(html,{headers:{'content-type':'text/html'}});
+ assert.equal(await v4EmployerAuthorization(target,'新企业集团',proof,{fetcher}),true);
+ assert.equal(await v4EmployerAuthorization(target,'其他企业',proof,{fetcher}),false);
+ assert.equal(await v4EmployerAuthorization(target,'新企业集团','https://www.zhipin.com/job/112',{fetcher}),false);
+});
+test('V4 excludes an unfamiliar commercial board discovered from the actual page identity',async()=>{
+ const u='https://unknown-market.cn/jobs/32';
+ const html='<meta property="og:site_name" content="全国商业招聘平台"><h1>职位招聘</h1>';
+ await assert.rejects(v4ReadEmployerJob(u,{fetcher:async()=>new Response(html,{headers:{'content-type':'text/html'}})}),/V4_COMMERCIAL_BOARD_EXCLUDED/);
+});
