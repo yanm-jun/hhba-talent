@@ -1,7 +1,7 @@
 // Authenticated-only snapshots of AI recommendations.
 // No raw CV text, document bytes, email/phone in returned JSON, telemetry or payload.
 // These are recommendations, NEVER applications and NEVER automatically monitored.
-import {allowedEmployerJobLink} from './match-employer-source.js';
+import {allowedEmployerJobLink,isCommercialRecruitmentBoard} from './match-employer-source.js';
 import {v4PublicJobUrl} from './v4-open-job-evidence.js';
 
 const text=(v,n=Infinity)=>typeof v==='string'?v.replace(/[\u0000-\u001f]/g,' ').trim().slice(0,n):'';
@@ -39,12 +39,13 @@ export function safeHistoryJobs(matches){
  for(const item of matches){
   if(!item||!(item.v4_source===true?v4PublicJobUrl(item.official_url)===item.official_url:isValidUrl(item.official_url))||seen.has(item.official_url))continue;
   const v4=item.v4_source===true;
+  if(v4&&isCommercialRecruitmentBoard(item.official_url,item))continue;
   const company=text(item.company,v4?Infinity:110),title=text(item.title_zh||item.title,v4?Infinity:125);
   const location=text(item.location,v4?Infinity:80);
   if(!company||!title||!location)continue;
   seen.add(item.official_url);
   out.push({id:text(item.id,75),company,title,location,
-   ...(item.v4_source===true?{v4_source:true}:{}),
+   ...(item.v4_source===true?{v4_source:true,source_type:item.source_type==='站外官方招聘'?'站外官方招聘':'站外招聘职位',score_evidence_status:item.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'?'GROUNDED_JD_RESUME_QUOTES':undefined}:{}),
    official_url:item.official_url,match_score:score(item.match_score),
    score_basis:text(item.score_basis,v4?Infinity:360),
    recommendation_reason:text(!v4&&Array.isArray(item.jd_comparisons)?
@@ -59,7 +60,7 @@ export function safeHistoryJobs(matches){
    evidence_excerpt:text(item.evidence_excerpt,v4?Infinity:1400),
    ...(v4?{requirements_basis:text(item.requirements_basis),matched:(Array.isArray(item.matched)?item.matched:[]).filter(x=>typeof x==='string'),not_evidenced:(Array.isArray(item.not_evidenced)?item.not_evidenced:[]).filter(x=>typeof x==='string'),salary:typeof item.salary==='string'?item.salary:null}:{} ),
    evidence_sources:(Array.isArray(item.evidence_sources)?(v4?item.evidence_sources:item.evidence_sources.slice(0,4)):[])
-    .filter(s=>s&&typeof s.url==='string'&&
+    .filter(s=>s&&typeof s.url==='string'&&(!v4||!isCommercialRecruitmentBoard(s.url))&&
      (v4?!!v4PublicJobUrl(s.url):/^(?:https:\/\/)/.test(s.url)&&s.url.length<=1300)&&
      (v4?['EMPLOYER_PAGE_CANDIDATE','PUBLIC_ANNOUNCEMENT_CANDIDATE','PUBLIC_SEARCH_CITATION','MODEL_REPORTED_SOURCE']:['EMPLOYER_PAGE_CANDIDATE','PUBLIC_ANNOUNCEMENT_CANDIDATE']).includes(s.kind))
     .map(s=>({url:s.url,kind:s.kind})),
@@ -119,24 +120,41 @@ export function historyTextSegments(data){
  }
  return chunks;
 }
+// Persist structured research outcomes, not raw resume or model reasoning.
+// Original resume quotations are shown in the active task only.
+export function safeResearchReport(report){
+ if(!report||!Array.isArray(report.rounds)||!report.profile)return null;
+ const p=report.profile,strings=v=>Array.isArray(v)?v.filter(x=>typeof x==='string'):[],num=v=>Number.isSafeInteger(v)&&v>=0?v:0;
+ return {profile:{education:typeof p.education==='string'?p.education:null,education_evidence:null,
+  experience_years:Number.isFinite(p.experience_years)?p.experience_years:null,experience_evidence:null,
+  summary:text(p.summary),skills:Array.isArray(p.skills)?p.skills.filter(s=>typeof s?.name==='string').map(s=>({name:s.name,evidence:''})):[],
+  target_roles:strings(p.target_roles),warnings:['历史报告仅保留分析结论，不保存简历原文引文。']},
+  rounds:report.rounds.map(r=>({round:num(r.round),queries:strings(r.queries),cited_count:num(r.cited_count),candidates:num(r.candidates),added:num(r.added),excluded_count:num(r.excluded_count)})),
+  excluded_count:num(report.excluded_count),discovered:num(report.discovered)};
+}
+function unpackHistory(raw,row){
+ const parsed=JSON.parse(raw);
+ if(Array.isArray(parsed))return {...row,jobs_json:raw};
+ if(parsed?.format!=='HHBA_RESEARCH_REPORT_V1'||!Array.isArray(parsed.jobs))throw Error('MATCH_HISTORY_SEGMENTS_INCOMPLETE');
+ return {...row,jobs_json:JSON.stringify(parsed.jobs),research_report:safeResearchReport(parsed.report),research_leads:safeHistoryJobs(parsed.leads)};
+}
 function segmentManifest(raw){
  try{const value=JSON.parse(raw);return ['HHBA_HISTORY_SEGMENTS_V1','HHBA_HISTORY_TEXT_SEGMENTS_V2'].includes(value?.format)&&Number.isSafeInteger(value.count)&&value.count>0?value:null;}catch{return null;}
 }
 async function expandHistoryRow(db,row){
  const manifest=segmentManifest(row.jobs_json);
- if(!manifest)return row;
+ if(!manifest)return unpackHistory(row.jobs_json,row);
  const result=await db.prepare('SELECT position,jobs_json FROM hhba_ai_match_history_segments WHERE history_id=? ORDER BY position').bind(row.id).all();
  const segments=result?.results||[];
  if(segments.length!==manifest.count||segments.some((part,i)=>part.position!==i))throw Error('MATCH_HISTORY_SEGMENTS_INCOMPLETE');
  if(manifest.format==='HHBA_HISTORY_TEXT_SEGMENTS_V2'){
   const data=segments.map(part=>JSON.parse(part.jobs_json));
   if(data.some(v=>typeof v!=='string'))throw Error('MATCH_HISTORY_SEGMENTS_INCOMPLETE');
-  const raw=data.join('');if(!Array.isArray(JSON.parse(raw)))throw Error('MATCH_HISTORY_SEGMENTS_INCOMPLETE');
-  return {...row,jobs_json:raw};
+  return unpackHistory(data.join(''),row);
  }
  return {...row,jobs_json:JSON.stringify(segments.flatMap(part=>parsedJobs(part.jobs_json)))};
 }
-export async function saveMatchHistory(db,phone,resumeId,roleHint,modelMatches){
+export async function saveMatchHistory(db,phone,resumeId,roleHint,modelMatches,researchReport=null,researchLeads=[]){
  if(!db||typeof db.prepare!=='function')throw Error('MATCH_HISTORY_DB_UNAVAILABLE');
  let resume=null;
  if(resumeId!==null&&resumeId!==undefined&&resumeId!==''){
@@ -145,14 +163,14 @@ export async function saveMatchHistory(db,phone,resumeId,roleHint,modelMatches){
    .bind(phone,resumeId).first();
   if(!resume)throw Error('RESUME_NOT_OWNED');
  }
- const jobs=safeHistoryJobs(modelMatches);
- if(!jobs.length)return null;
+ const jobs=safeHistoryJobs(modelMatches),report=safeResearchReport(researchReport);
+ if(!jobs.length&&!report)return null;
  const previous=await db.prepare('SELECT id,jobs_json FROM hhba_ai_match_history WHERE phone=? ORDER BY created_at DESC LIMIT ?')
   .bind(phone,maxHistory).all();
  const previousRuns=await Promise.all((previous?.results||[]).map(row=>expandHistoryRow(db,row)));
  const delta=compareOpportunitySets(previousRuns,jobs);
  const best=jobs.reduce((v,x)=>x.match_score===null?v:Math.max(v,x.match_score),-1);
- const data=JSON.stringify(jobs);
+ const data=JSON.stringify(report?{format:'HHBA_RESEARCH_REPORT_V1',jobs,report,leads:safeHistoryJobs(researchLeads)}:jobs);
  const segments=new TextEncoder().encode(data).byteLength>1500000?historyTextSegments(data):null;
  const payload=segments?JSON.stringify({format:'HHBA_HISTORY_TEXT_SEGMENTS_V2',count:segments.length}):data;
  const id=crypto.randomUUID(),created=new Date().toISOString();
@@ -181,7 +199,8 @@ export async function getMatchHistory(db,phone,id){
    .bind(phone,resumeId).first();
   if(!stillOwned)resumeId=null; // Deleted private resume does not invalidate the historic job list.
  }
- return {...summary(row),resume_id:resumeId,matches:safeHistoryJobs(parsedJobs((await expandHistoryRow(db,row)).jobs_json))};
+ const expanded=await expandHistoryRow(db,row);
+ return {...summary(row),resume_id:resumeId,matches:safeHistoryJobs(parsedJobs(expanded.jobs_json)),...(expanded.research_report?{research_report:expanded.research_report,research_leads:expanded.research_leads}: {})};
 }
 export async function deleteMatchHistory(db,phone,id){
  if(!rowId.test(id))return false;
