@@ -85,13 +85,10 @@ export type MatchResponse = {
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
 const API='/api/match-next'; // Original default preserved for production and V2 compatibility.
-// V4 is an explicit opt-in trial, rather than replacing the default user journey.
-const MATCH_V4_PREVIEW=typeof window!=='undefined'&&
- (window.location.hostname.endsWith('.hhba-talent.pages.dev')&&
-  window.location.hostname!=='hhba-talent.pages.dev'||
-  window.location.hostname==='hhba.work'||
-  window.location.hostname==='www.hhba.work')&&
- new URLSearchParams(window.location.search).get('v4')==='1';
+// V4 is the default on HHBA hosts; the legacy API remains for isolated diagnostics.
+export const MATCH_V4_PREVIEW=typeof window!=='undefined'&&
+ (window.location.hostname.endsWith('.hhba-talent.pages.dev')||
+  window.location.hostname==='hhba.work'||window.location.hostname==='www.hhba.work');
 const EFFECTIVE_API=MATCH_V4_PREVIEW?'/api/match-v4':API;
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=3*1024*1024;
@@ -119,7 +116,7 @@ const errorMap:Record<string,string>={
   AI_PROVIDER_UPSTREAM_ERROR:'AI 服务暂时异常，请稍后重试。',
   AI_PROVIDER_NETWORK_ERROR:'HHBA 暂时无法连接 AI 服务，请稍后重试。',
   AI_PROVIDER_REDIRECT_BLOCKED:'AI 接口发生异常重定向，为保护密钥，已安全终止请求。',
-  AI_PROVIDER_TIMEOUT:'DeepSeek 接口等待超时，尚未取得完整结果。',
+  AI_PROVIDER_TIMEOUT:'AI 接口等待超时，尚未取得完整结果。',
   AI_PROVIDER_SLOW:'DeepSeek 请求超时且没有发现可展示岗位。',
   AI_SEARCH_TIMEOUT:'DeepSeek Search 搜索服务超时。',
   AI_SEARCH_UNAVAILABLE:'DeepSeek Search 暂时不可用，未调用推荐模型。',
@@ -140,7 +137,7 @@ const errorMap:Record<string,string>={
   BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。',
   AI_WEB_SEARCH_NOT_USED:'AI 本轮未执行联网搜索，未展示未核实岗位。',
   AI_RESPONSE_INVALID:'DeepSeek 返回结果格式异常，请重试。',
-  AI_PROVIDER_INCOMPLETE:'DeepSeek 搜索未能完成，没有返回不完整的岗位结果。'
+  AI_PROVIDER_INCOMPLETE:'AI 搜索未能完成，没有返回不完整的岗位结果。'
 };
 export class MatchError extends Error {
  constructor(public readonly status:number,message:string){super(message);this.name='MatchError'}
@@ -220,8 +217,8 @@ export async function inspectResumeTextLocally(file:File,signal?:AbortSignal):Pr
  try{
   const buffer=await file.arrayBuffer();
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
-  const pdf=format==='pdf'?await extractPdfText(buffer,{signal}):null;
-  const value=pdf?.text??await extractDocxText(buffer);
+  const pdf=format==='pdf'?await extractPdfText(buffer,{signal,unbounded:MATCH_V4_PREVIEW}):null;
+  const value=pdf?.text??await extractDocxText(buffer,{signal,unbounded:MATCH_V4_PREVIEW});
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
   const text=redactResumeTextLocally(value);
   return {text,needsOcr:pdf?.hasTextlessPages===true||text.replace(/\s/g,'').length<30};
