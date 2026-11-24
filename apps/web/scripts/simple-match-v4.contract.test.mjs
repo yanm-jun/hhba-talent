@@ -591,3 +591,13 @@ test('V4 rewrites and independently audits all segments of an oversized single p
  const result=await rewriteV4LongBlock({provider,reviewer:provider,block,job:{title:'运营',requirements:'运营'},focus:[],call});
  assert.equal(reviewed.join(''),original);assert.equal(result.rewrites[0].text,original);assert.equal(result.recoveredChecks[0].safe,true);
 });
+
+
+test('V4 compressed transport preserves the complete Unicode request and rejects malformed compressed bodies',async()=>{
+ const {readV4Json}=await import('../functions/_lib/v4-json-transport.js');
+ const value={consent_ai:true,blocks:[{id:'a',text:'完整简历原文🎓'.repeat(180000)}]};
+ const body=await new Response(new Blob([JSON.stringify(value)]).stream().pipeThrough(new CompressionStream('gzip'))).blob();
+ const request=new Request('https://hhba.work/api/resume-rewrite',{method:'POST',headers:{'Content-Type':'application/json','X-HHBA-JSON-Encoding':'gzip'},body});
+ assert.deepEqual(await readV4Json(request),value);
+ await assert.rejects(()=>readV4Json(new Request('https://hhba.work/api/resume-rewrite',{method:'POST',headers:{'Content-Type':'application/json','X-HHBA-JSON-Encoding':'gzip'},body:'not gzip'})),/INVALID_REQUEST/);
+});

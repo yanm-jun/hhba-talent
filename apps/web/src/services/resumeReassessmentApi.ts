@@ -1,3 +1,4 @@
+import {v4JsonRequest} from './v4JsonTransport';
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import {MATCH_V4_PREVIEW} from './resumeMatch';
 import type {CandidateProfile} from './resumeMatching';
@@ -16,6 +17,7 @@ export type ReassessmentResult={
 };
 const PATH='/api/resume-reassess';
 const errors:Record<string,string>={
+ AI_REQUEST_SEGMENT_REQUIRED:'本次数据超出单次传输安全容量，未截断任何原文。需分段继续。',
  ORIGIN_REQUIRED:'请求来源未通过验证。',SESSION_INVALID:'请先登录 HHBA 求职者账号。',
  REASSESSMENT_NOT_ENABLED:'岗位重新评分功能尚未开放。',REASSESSMENT_DB_NOT_READY:'后台评分额度服务尚未准备好。',
  REASSESSMENT_LIMIT:'今天的岗位复评次数已达上限。',
@@ -49,9 +51,9 @@ export async function reassessResume(jobId:string,profile:CandidateProfile,
  };
  let response:Response;
  try{
-  response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
+  response=await fetch(PATH,await v4JsonRequest({method:'POST',cache:'no-store',credentials:'omit',signal,
    headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
-   body:JSON.stringify(data)});
+   body:JSON.stringify(data)},MATCH_V4_PREVIEW));
  }catch{throw new ReassessmentError('NETWORK_UNAVAILABLE',503);}
  const payload=await response.json().catch(()=>({})) as Partial<ReassessmentResult>&{error?:string};
  if(!response.ok)throw new ReassessmentError(payload.error||'UNKNOWN_ERROR',response.status);

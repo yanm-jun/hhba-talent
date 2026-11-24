@@ -1,5 +1,6 @@
 /** Shared security boundary for the two private candidate AI editing routes. */
 import {sessionOfBearer,getUserByPhone} from './real-auth.js';
+import {readV4Json} from './v4-json-transport.js';
 
 const MAX_BODY=2*1024*1024;
 export const responseJson=(payload,status=200)=>new Response(JSON.stringify(payload),{
@@ -26,7 +27,8 @@ export function rewriteOriginOK(request){
  return request.headers.get('Origin')===url.origin&&
   request.headers.get('Sec-Fetch-Site')!=='cross-site';
 }
-export async function rewriteRequestJson(request){
+export async function rewriteRequestJson(request,env){
+ if(env?.HHBA_MATCH_V4_READY==='1')return readV4Json(request);
  if(!/^application\/json(?:;|$)/i.test(request.headers.get('Content-Type')||''))
   throw Error('INVALID_REQUEST');
  const declared=request.headers.get('Content-Length');

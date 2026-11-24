@@ -222,7 +222,10 @@ export async function rewriteV4LongBlock({provider,reviewer,block,job,focus,sign
   }catch(e){
    if(!capacity(e)||signal?.aborted)throw e;
    if(!compactJob&&job.requirements.length>text.length&&focus.length)return visit(text,true);
-   const pieces=splitV4ContextText(text);
+   const mid=Math.floor(text.length/2),before=text.lastIndexOf('\n',mid),after=text.indexOf('\n',mid);
+   const candidates=[before,after].filter(n=>n>=Math.floor(text.length/4)&&n<Math.ceil(text.length*3/4)).sort((a,b)=>Math.abs(a-mid)-Math.abs(b-mid));
+   const cut=candidates.length?candidates[0]+1:0;
+   const pieces=cut>0&&cut<text.length?[text.slice(0,cut),text.slice(cut)]:splitV4ContextText(text);
    if(!pieces)throw e;
    const a=await visit(pieces[0],compactJob),b=await visit(pieces[1],compactJob);
    return {text:a.text+(a.text.endsWith('\n')||b.text.startsWith('\n')?'':'\n')+b.text,quotes:[...a.quotes,...b.quotes],rationales:[...a.rationales,...b.rationales],requirements:[...a.requirements,...b.requirements],questions:[...a.questions,...b.questions],held:[...a.held,...b.held]};

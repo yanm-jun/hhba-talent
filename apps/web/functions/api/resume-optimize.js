@@ -1,5 +1,6 @@
 // Candidate-only, opt-in, server-side AI resume suggestion route.
 // No API key, resume content or session token is stored in D1 or response logs.
+import {readV4Json} from '../_lib/v4-json-transport.js';
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
 import {generateSuggestions,selectProvider} from '../_lib/resume-ai-provider.js';
 import {hydrateVerifiedJobRequirements} from '../_lib/job-jd-archive.js';
@@ -126,7 +127,7 @@ export async function onRequestPost({request,env}){
   if(user?.role!=='candidate')return fail('FORBIDDEN',403);
  }catch{return fail('SESSION_INVALID',401);}
  let input;
- try{input=await readSmallJson(request,isV4(env));}catch{return fail('INVALID_REQUEST',400);}
+ try{input=isV4(env)?await readV4Json(request):await readSmallJson(request);}catch(e){return fail(e?.message==='AI_REQUEST_SEGMENT_REQUIRED'?'AI_REQUEST_SEGMENT_REQUIRED':'INVALID_REQUEST',e?.message==='AI_REQUEST_SEGMENT_REQUIRED'?413:400);}
  if(!valid(input,isV4(env)))return fail('INVALID_OPTIMIZATION_INPUT',400);
  let trustedJob;
  try{trustedJob=await hydrateVerifiedJobRequirements(env,input.job);}

@@ -1,3 +1,4 @@
+import {v4JsonRequest} from './v4JsonTransport';
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import {MATCH_V4_PREVIEW} from './resumeMatch';
 import type {JdAwareJob} from './jobJdArchive';
@@ -15,7 +16,8 @@ const OPTIMIZATION_ERRORS:Record<string,string>={
   FORBIDDEN:'当前账户无权使用求职者简历优化。',
   RESUME_OPTIMIZATION_NOT_ENABLED:'简历 AI 润色服务尚未启用。',
   RESUME_OPTIMIZATION_DB_NOT_READY:'平台简历优化额度服务尚未准备好。',
-  RESUME_OPTIMIZATION_LIMIT:'今天成功生成简历建议的次数已达上限。',
+  AI_REQUEST_SEGMENT_REQUIRED:'本次数据超出单次传输安全容量，未截断任何原文。需分段继续。',
+ RESUME_OPTIMIZATION_LIMIT:'今天成功生成简历建议的次数已达上限。',
   RESUME_OPTIMIZATION_ATTEMPT_LIMIT:'今天的 AI 润色尝试次数已达安全上限，请明天再试。',
   RESUME_OPTIMIZATION_TASK_DB_NOT_READY:'整份简历优化任务暂未就绪，请稍后重试。',
   RESUME_OPTIMIZATION_IN_PROGRESS:'这份简历已在处理同一岗位，可以回到已开始优化的窗口。',
@@ -89,10 +91,10 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
   if(!requestBlocks.length)break;
   let response:Response;
   try{
-   response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
+   response=await fetch(PATH,await v4JsonRequest({method:'POST',cache:'no-store',credentials:'omit',signal,
     headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
     body:JSON.stringify({consent_ai:true,blocks:requestBlocks,job:MATCH_V4_PREVIEW&&job.jd_version_id&&job.jd_sha256?{...job,requirements:''}:job,
-     ...(document?{full_document:{text:document.text,wanted:remaining?requestBlocks.map(b=>b.id):wanted}}:{})})});
+     ...(document?{full_document:{text:document.text,wanted:remaining?requestBlocks.map(b=>b.id):wanted}}:{})})},MATCH_V4_PREVIEW));
   }catch(e){if(signal?.aborted)throw e;if(MATCH_V4_PREVIEW){await retry();continue;}throw new ResumeOptimizationError('NETWORK_ERROR',503);}
   const data=await response.json().catch(()=>({})) as {
    ok?:boolean;error?:string;suggestions?:ResumeSuggestion[];pending_block_ids?:string[]

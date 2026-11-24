@@ -1,3 +1,4 @@
+import {v4JsonRequest} from './v4JsonTransport';
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import type {JdAwareJob} from './jobJdArchive';
 import type {ResumeBlock} from './targetedResumeOptimization';
@@ -28,6 +29,7 @@ export type ResumeWholeRewriteStatus={
  requires_user_approval:boolean;
 };
 const errorMessage:Record<string,string>={
+ AI_REQUEST_SEGMENT_REQUIRED:'本次数据超出单次传输安全容量，未截断任何原文。需分段继续。',
  INVALID_REWRITE_INPUT:'简历或岗位资料不完整。为避免遗漏，我们没有生成不完整的改写稿。',
  JD_VERIFIED_VERSION_REQUIRED:'未取得核验过的完整 JD，不能进行严格的岗位定向简历重写。',
  JD_VERSION_NOT_AVAILABLE:'官方 JD 档案暂时无法取回，原始 Word 未修改。',
@@ -60,11 +62,12 @@ const PATH='/api/resume-rewrite';
 const v4Active=()=>typeof window!=='undefined'&&(/(^|\.)hhba\.work$/.test(window.location.hostname)||window.location.hostname.endsWith('.hhba-talent.pages.dev'));
 const retryCodes=new Set(['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_RESPONSE_JSON_INVALID','AI_PROVIDER_RESPONSE_TRUNCATED','AI_PROVIDER_STREAM_INTERRUPTED','NETWORK_ERROR']);
 async function rewriteFetch(url:string,init:RequestInit):Promise<Response>{
+ const transport=await v4JsonRequest(init,v4Active());
  let delay=1000;
  for(;;){
   if(init.signal?.aborted)throw init.signal.reason;
   try{
-   const response=await fetch(url,init);
+   const response=await fetch(url,transport);
    if(!v4Active()||response.ok)return response;
    const data=await response.clone().json().catch(()=>({}));
    if(!retryCodes.has(data.error)&&!(!data.error&&[429,502,503,504].includes(response.status)))return response;

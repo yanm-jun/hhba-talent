@@ -30,8 +30,8 @@ export async function onRequestPost({request,env}){
  catch(e){return reject(e?.message==='FORBIDDEN'?'FORBIDDEN':'SESSION_INVALID',
   e?.message==='FORBIDDEN'?403:401);}
  let body;
- try{body=await boundedJson(request);}
- catch{return reject('INVALID_REQUEST',400);}
+ try{body=await boundedJson(request,env);}
+ catch(e){return reject(e?.message==='AI_REQUEST_SEGMENT_REQUIRED'?'AI_REQUEST_SEGMENT_REQUIRED':'INVALID_REQUEST',e?.message==='AI_REQUEST_SEGMENT_REQUIRED'?413:400);}
  if(body?.consent_ai!==true)return reject('AI_CONSENT_REQUIRED',400);
  let trustedJob;
  try{trustedJob=await hydrateVerifiedJobRequirements(env,body.job);}

@@ -1,4 +1,5 @@
 // Candidate-only same-JD V2 ranking reassessment. No generative AI calls.
+import {readV4Json} from '../_lib/v4-json-transport.js';
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
 import {validatedAuditedJob,validReassessmentInput,sameEngineReassessment,archivedJDToScoreJob} from '../_lib/resume-reassessment.js';
 import {readJobJdById,jdArchiveConfigured} from '../_lib/job-jd-archive.js';
@@ -78,7 +79,7 @@ export async function onRequestPost({request,env}){
   if(user?.role!=='candidate')return bad('FORBIDDEN',403);
  }catch{return bad('SESSION_INVALID',401);}
  let input;
- try{input=await readBody(request,v4(env));}catch{return bad('INVALID_REASSESSMENT_INPUT',400);}
+ try{input=v4(env)?await readV4Json(request):await readBody(request);}catch(e){return bad(e?.message==='AI_REQUEST_SEGMENT_REQUIRED'?'AI_REQUEST_SEGMENT_REQUIRED':'INVALID_REASSESSMENT_INPUT',e?.message==='AI_REQUEST_SEGMENT_REQUIRED'?413:400);}
  if(v4(env)){
   const validBlocks=blocks=>Array.isArray(blocks)&&blocks.length>0&&blocks.every(b=>b&&typeof b.id==='string'&&typeof b.text==='string'&&b.text.trim())&&new Set(blocks.map(b=>b.id)).size===blocks.length;
   if(input?.consent_reassessment!==true||input?.confirm_real!==true||!/^jd_[a-f0-9]{32}$/.test(input.job_id||'')||!validBlocks(input.before_blocks)||!validBlocks(input.after_blocks))
