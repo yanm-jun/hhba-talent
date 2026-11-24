@@ -199,9 +199,12 @@ function sourceKind(url){
  return recruitmentSourceKind(url)==='THIRD_PARTY_BOARD'?'THIRD_PARTY_BOARD':'EMPLOYER_DOMAIN_CANDIDATE';
 }
 async function checkJob(fetcher,url,signal){
- try{return await directOfficialJobEvidence(url,{fetcher,signal})}
+ // Open research first, including unfamiliar employers. Known employer API
+ // adapters are a fallback for JS shells, never the primary search scope.
+ try{return await v4ReadEmployerJob(url,{fetcher,signal})}
  catch{
-  try{return await v4ReadEmployerJob(url,{fetcher,signal})}
+  if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
+  try{return await directOfficialJobEvidence(url,{fetcher,signal,full:true})}
   catch{return null}
  }
 }
@@ -223,7 +226,7 @@ async function enrich(fetcher,rows,{signal,onActivity=()=>{}}={}){
  onActivity('reading','已查阅 '+urls.length+' 条岗位来源，其中 '+read+' 条取得了可核对的 JD。');
  return {results,read};
 }
-function renderJob(x,url,verified,resume,toolLinked,index){
+function renderJob(x,url,verified,resume,toolLinked,index,toolUrls=new Set()){
  const source=sourceKind(url),company=text(verified?.company||x?.company)||'企业待核实';
  const title=text(verified?.title||x?.title||x?.role)||'职位详情待核实';
  const location=text(verified?.location||x?.location||x?.city)||'工作地点待核实';
@@ -266,7 +269,7 @@ function renderJob(x,url,verified,resume,toolLinked,index){
   evidence_score_status:score!==null&&!(full&&jdGrounded)?
    'AI_DIRECTION_REFERENCE_SCORED':undefined,
   evidence_excerpt:text(verified?.full_jd||x?.jd_quote),
-  evidence_sources:[...new Map([url,...(Array.isArray(x?.evidence_sources)?x.evidence_sources.map(s=>typeof s==='string'?s:s?.url):[])].map(v4PublicJobUrl).filter(Boolean).map(u=>[u,{url:u,kind:u===url?'EMPLOYER_PAGE_CANDIDATE':'PUBLIC_ANNOUNCEMENT_CANDIDATE'}])).values()],
+  evidence_sources:[...new Map([url,...(Array.isArray(x?.evidence_sources)?x.evidence_sources.map(s=>typeof s==='string'?s:s?.url):[])].map(v4PublicJobUrl).filter(Boolean).map(u=>[u,{url:u,kind:u===url?(source==='THIRD_PARTY_BOARD'?'MODEL_REPORTED_SOURCE':'EMPLOYER_PAGE_CANDIDATE'):toolUrls.has(u)?'PUBLIC_SEARCH_CITATION':'MODEL_REPORTED_SOURCE'}])).values()],
   checked_at:verified?.checked_at||null,
   score_evidence_status:full&&jdGrounded&&resumeGrounded?
    'GROUNDED_JD_RESUME_QUOTES':undefined,
@@ -381,7 +384,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   }
   // Do not wait for every website scrape before showing model research.
   if(rows.size)onPartial([...rows.entries()].map(([url,job],i)=>
-   renderJob(job,url,null,resume,toolUrls.has(url),i)));
+   renderJob(job,url,null,resume,toolUrls.has(url),i,toolUrls)));
   onActivity('searching','第 '+round+' 轮研究已完成，累计取得 '+rows.size+
    ' 条可追溯来源；AI 正在判断是否需要继续搜索。');
   // Older compatible relay outputs may not contain the new boolean.
@@ -422,7 +425,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const {results,read}=await enrich(fetcher,new Map(entries),{signal,onActivity});
  onProgress('scoring');
  const previousMatches=checkpoint?.phase==='verification'?checkpoint.matches||[]:[];
- const matches=entries.map(([url,job],i)=>renderJob(job,url,results.get(url),resume,toolUrls.has(url),offset+i));
+ const matches=entries.map(([url,job],i)=>renderJob(job,url,results.get(url),resume,toolUrls.has(url),offset+i,toolUrls));
  let cursor=0,scored=checkpoint?.scored||0,archived=checkpoint?.archived||0,scoreFailures=checkpoint?.scoreFailures||0;
  const worker=async()=>{
   while(cursor<entries.length){
@@ -433,7 +436,11 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(jdArchiveConfigured(env)&&(String(jd.proof_method||'').startsWith('DIRECT_EMPLOYER')||jd.source_confirmed===true||jd.independently_read===true)&&sourceKind(url)!=='THIRD_PARTY_BOARD'){
     try{let saved;
     if(String(jd.proof_method||'').startsWith('DIRECT_EMPLOYER')){
-     try{saved=await saveVerifiedJobJd(env,jd)}catch{saved=await saveV4PublicJobJd(env,{...jd,proof_method:'V4_EMPLOYER_HTML_JOB',independently_read:true})}
+     try{
+      if(jd.title.length>120||jd.location.length>100)throw Error('V4_FULL_METADATA');
+      saved=await saveVerifiedJobJd(env,jd);
+      if(saved.title!==jd.title||saved.company!==jd.company)throw Error('V4_FULL_METADATA');
+     }catch{saved=await saveV4PublicJobJd(env,{...jd,proof_method:'V4_EMPLOYER_HTML_JOB',independently_read:true})}
     }else saved=await saveV4PublicJobJd(env,jd.proof_method==='V4_STRUCTURED_JOBPOSTING'&&!jd.source_confirmed?{...jd,proof_method:'V4_EMPLOYER_HTML_JOB'}:jd);if(saved?.fresh){
      Object.assign(matches[i],{jd_version_id:saved.id,jd_sha256:saved.jd_sha256,jd_checked_at:saved.checked_at,jd_proof_method:saved.proof_method});archived++;
     }}catch{/* retain public evidence without inventing archive IDs */}
@@ -457,8 +464,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     }
     missingEvidence=[reply.status!=='completed'?'incomplete':'',!Number.isInteger(assessment.score)||assessment.score<0||assessment.score>100?'score':'',rq.length<4||!norm(resume).includes(norm(rq))?'resume_quote':'',jq.length<4||!norm(jd.full_jd).includes(norm(jq))?'jd_quote':''].filter(Boolean).join(',');
     if(missingEvidence)throw fault('AI_SCORE_EVIDENCE_MISSING');
-    const rescored=renderJob({...job,...assessment,match_score:assessment.score},url,jd,resume,toolUrls.has(url),offset+i);
-    Object.assign(matches[i],rescored,{score_basis:'AI 已基于独立读取的 JD 与简历原文重新评分（非录用概率）',score_evidence_status:'GROUNDED_JD_RESUME_QUOTES'});
+    const rescored=renderJob({...job,...assessment,match_score:assessment.score},url,jd,resume,toolUrls.has(url),offset+i,toolUrls);
+    Object.assign(matches[i],rescored,{...(matches[i].jd_version_id?{jd_proof_method:matches[i].jd_proof_method}:{}),score_basis:'AI 已基于独立读取的 JD 与简历原文重新评分（非录用概率）',score_evidence_status:'GROUNDED_JD_RESUME_QUOTES'});
     scored++;break;
    }catch(e){
     if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
