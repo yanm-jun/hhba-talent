@@ -27,8 +27,8 @@ const enabled=(env,request)=>allowedHost(request)&&env?.HHBA_MATCH_V4_READY==='1
  Boolean(v4Provider(env))&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 const sanitize=(raw)=>{
- if(typeof raw!=='string'||raw.length>22000)return null;
- const text=redactForModel(raw.trim()).slice(0,20000);
+ if(typeof raw!=='string'||raw.length>250000)return null;
+ const text=redactForModel(raw.trim(),Infinity);
  return text.replace(/\s/g,'').length>=30?text:null;
 };
 function events(env,request,input){
@@ -45,16 +45,22 @@ function events(env,request,input){
     elapsed_ms:Date.now()-started}),12000);
    const progress=stage=>{phase=stage;send('progress',{stage})};
    const activity=(stage,message)=>send('activity',{stage,message});
+   const sendJobs=(kind,matches)=>{
+    send(kind+'_begin',{count:matches.length});
+    for(const job of matches)send(kind+'_job',{job});
+    send(kind+'_end',{count:matches.length});
+   };
    send('progress',{stage:'preparing'});
    void (async()=>{
     try{
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
-      signal:request.signal,onProgress:progress,onActivity:activity,
-      onPartial:matches=>send('partial',{matches})});
+      signal:request.signal,onProgress:progress,onActivity:activity,env,excludeUrls:input.excludeUrls,
+      onPartial:matches=>sendJobs('partial',matches)});
      console.info('HHBA_V4_MATCH',JSON.stringify({result:'COMPLETE',
       found:result.matches.length,official:result.matched_official_jobs,
       duration_ms:Date.now()-started}));
-     send('complete',result);
+     sendJobs('final',result.matches);
+     send('complete',{...result,matches:[],matches_streamed:true,match_count:result.matches.length});
     }catch(e){
      const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
      console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({error:code,stage:phase,
@@ -87,7 +93,7 @@ export async function onRequest({request,env}){
   request.headers.get('Sec-Fetch-Site')==='cross-site')return fail('ORIGIN_REQUIRED',403);
  if(!(request.headers.get('Content-Type')||'').startsWith('application/json'))
   return fail('INVALID_REQUEST',415);
- if(Number(request.headers.get('Content-Length')||0)>55000)return fail('INVALID_RESUME_TEXT',413);
+ if(Number(request.headers.get('Content-Length')||0)>1200000)return fail('INVALID_RESUME_TEXT',413);
  const db=env.HHBA_PNVS_AUTH_DB;
  let session;
  try{session=await sessionOfBearer(db,request,Date.now())}catch{return fail('SESSION_INVALID',401)}
@@ -98,7 +104,7 @@ export async function onRequest({request,env}){
  let body;
  try{
   const text=await request.text();
-  if(text.length>55000)return fail('INVALID_RESUME_TEXT',413);
+  if(text.length>1200000)return fail('INVALID_RESUME_TEXT',413);
   body=JSON.parse(text);
  }catch{return fail('INVALID_REQUEST',400)}
  // The third-party relay is not OpenAI official infrastructure.
@@ -107,7 +113,8 @@ export async function onRequest({request,env}){
  const resume=sanitize(body.text);
  if(!resume)return fail('INVALID_RESUME_TEXT',400);
  const role=typeof body?.options?.role_hint==='string'?
-  body.options.role_hint.trim().slice(0,80):'';
+  body.options.role_hint.trim():'';
+ const excludeUrls=Array.isArray(body?.options?.exclude_urls)?body.options.exclude_urls.filter(x=>typeof x==='string'):[];
  // Do not store raw resume, query, job results, or model output in server logs.
- return events(env,request,{text:resume,role_hint:role});
+ return events(env,request,{text:resume,role_hint:role,excludeUrls});
 }
