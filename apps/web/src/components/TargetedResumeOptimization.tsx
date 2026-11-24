@@ -95,6 +95,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [verifying,setVerifying]=useState(false);
  const [scoreResult,setScoreResult]=useState<ReassessmentResult|null>(null);
  const [scoring,setScoring]=useState(false);
+ const scoreRequest=useRef<AbortController|null>(null);
  const [confirmReassessment,setConfirmReassessment]=useState(false);
  const [saved,setSaved]=useState<SavedResumeVersion[]>([]);
  const [storageReady,setStorageReady]=useState(false);
@@ -184,6 +185,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   // A different candidate Word or job must never inherit an earlier job's
   // signed AI continuation, facts, approval or visible score.
   active.current?.abort();
+  scoreRequest.current?.abort();scoreRequest.current=null;setScoring(false);
+  lastWordRevisionKey.current='';setWordRevisionSnapshot(null);setWordPromptBlocks([]);
   wholeRunInput.current=null;
   setArchivedJdId(null);setScoreResult(null);setConfirmReassessment(false);
   setWholeDraft(null);setWholeBusy(false);
@@ -196,7 +199,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   getWholeRewriteStatus(abort.signal).then(setWholeStatus);
   reassessmentStatus(abort.signal).then(setScoreStatus);
   officialJobVerifyStatus(abort.signal).then(setVerifyStatus);
-  return ()=>{abort.abort();active.current?.abort();};
+  return ()=>{abort.abort();active.current?.abort();scoreRequest.current?.abort();};
  },[]);
  useEffect(()=>{
   if(!realAuthReady||!getRealAuthToken()||!postingScope)return;
@@ -240,7 +243,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   if(lastWordRevisionKey.current===key)return;
   lastWordRevisionKey.current=key;
   setWordRevisionSnapshot(snapshot);
-  setScoreResult(null);setConfirmReassessment(false);
+  invalidateScore();
  }
  const hasWordingChanges=useMemo(()=>version.blocks.some(block=>{
   const original=blocks.find(old=>old.id===block.id);
@@ -251,7 +254,10 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  // Legacy scoring retains its exact text-replay checks.
  const scoreSourceReady=!sourceResume?hasWordingChanges:
   hasVerifiedWordRevision&&(v4Reassessment||verifiedWordScore.ok);
- function invalidateScore(){setScoreResult(null);setConfirmReassessment(false);}
+ function invalidateScore(){
+  scoreRequest.current?.abort();scoreRequest.current=null;setScoring(false);
+  setScoreResult(null);setConfirmReassessment(false);
+ }
  async function verifyEmployer(){
   if(hasAuditedAtsIdentity||!verifyStatus?.enabled||verifying||!consentVerify)return;
   setVerifying(true);setNotice('');setVerifiedJob(null);
@@ -266,6 +272,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  async function reassess(){
   if(!scoreStatus?.enabled||!scoreJobId||scoring||!scoreSourceReady||
    !confirmReassessment||scoreResult?.supported)return;
+  const controller=new AbortController();scoreRequest.current=controller;
   setScoring(true);setNotice('');setScoreResult(null);
   try{
    const revisionKey=lastWordRevisionKey.current;
@@ -284,13 +291,16 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     if(!beforeBlocks.length||!afterBlocks.length)throw Error('原始或已保存 Word 正文为空，无法可靠复评。');
     if(revisionKey!==lastWordRevisionKey.current)throw Error('Word 版本已变化，请基于当前版本重新评分。');
    }
-   const result=await reassessResume(scoreJobId,profile,beforeBlocks,afterBlocks,undefined,v4Reassessment);
+   if(controller.signal.aborted||scoreRequest.current!==controller)return;
+   const result=await reassessResume(scoreJobId,profile,beforeBlocks,afterBlocks,controller.signal,v4Reassessment);
+   if(controller.signal.aborted||scoreRequest.current!==controller)return;
+   if(v4Reassessment&&result.job_id!==scoreJobId)throw Error('复评岗位版本不一致，请重新评分。');
    if(sourceResume&&revisionKey!==lastWordRevisionKey.current){setNotice('Word 版本已变化，请重新评分。');return;}
    setScoreResult(result);
    if(!result.supported)setNotice('此岗位未通过当前官方快照复评条件，未生成分数。');
    else setNotice('已用相同标准比较修改前后的简历。');
-  }catch(e){setNotice(e instanceof Error?e.message:'复评请求失败。');}
-  finally{setScoring(false);}
+  }catch(e){if(!controller.signal.aborted&&scoreRequest.current===controller)setNotice(e instanceof Error?e.message:'复评请求失败。');}
+  finally{if(scoreRequest.current===controller){scoreRequest.current=null;setScoring(false);}}
  }
  async function persist(){
   if(saving||!confirmReal||!storageReady||!canPrint||!postingScope)return;
@@ -456,6 +466,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   setOpenSuggestionId(null);setEditingSuggestionId(null);setSuggestionDrafts({});
   const controller=new AbortController();active.current=controller;
   try{
+   const startingRevision=lastWordRevisionKey.current;
    const trustedJob=await jobContextForAI(controller.signal);
    if(controller.signal.aborted)return;
    const targetedJob={
@@ -491,6 +502,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
        setNotice('已检查 '+(currentBlocks.length-pending.length)+' / '+currentBlocks.length+' 处可编辑内容，继续处理剩余段落…');
       },onPaused:error=>{pauseMessage=error instanceof Error?error.message:'本轮研究暂时中断。';},
       onQueued:()=>setNotice('简历优化正在等待可用服务，已确认的进度会保留。')}:undefined);
+   if(controller.signal.aborted)return;
+   if(sourceResume&&startingRevision!==lastWordRevisionKey.current)throw Error('Word 版本已变化，本轮建议未写入新版本，请重新优化。');
    const combined=mergeSuggestions(incoming);
    if(full)previousOptimization.current={key,suggestions:combined,pending};
    // Provider suggestion IDs are local to a batch. Distinct Word blocks may
@@ -511,7 +524,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   }catch(error){
    if(controller.signal.aborted)return;
    setNotice(error instanceof Error?error.message:'AI 润色暂时不可用。');
-  }finally{setBusy(false);if(active.current===controller)active.current=null;}
+  }finally{if(active.current===controller){active.current=null;setBusy(false);}}
  }
  // Explicit third-party consent must commit before the AI call.
  useEffect(()=>{
@@ -996,7 +1009,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       invalidateScore();
      }}
      onVersionMoved={()=>{
-      setVerifiedWordEdits([]);setNativeWordTextDraft(null);
+      invalidateScore();setVerifiedWordEdits([]);setNativeWordTextDraft(null);
      }}
      sessionWordDraft={nativeWordTextDraft}
      onSessionWordDraftChange={setNativeWordTextDraft}
