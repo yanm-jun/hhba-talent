@@ -283,7 +283,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    onActivity('searching','本轮联网服务暂时中断；已保留此前查到的 '+rows.size+' 条结果。');
    break;
   }
-  if(!response.output.some(x=>x?.type==='web_search_call')){
+  if(!response.output.some(x=>x?.type==='web_search_call')&&!v4ToolSources(response).length){
    if(!rows.size)throw fault('AI_WEB_SEARCH_NOT_USED');
    researchError='AI_WEB_SEARCH_NOT_USED';
    break;
@@ -379,5 +379,5 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   native_search:{mode:'V4_SIMPLE_AI',searches:round,candidate_links:rows.size,
    page_reads:read,visible_jobs:matches.length,research_error:researchError||undefined,
    jd_verification:{eligible:rows.size,verified,failed:rows.size-read,scored,archived},score_failures:scoreFailures},
-  can_continue:!!researchError};
+  can_continue:true};
 }
