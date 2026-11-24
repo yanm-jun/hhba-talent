@@ -110,12 +110,14 @@ export function v4Sources(response){
  return urls;
 }
 function candidateUrl(x){
- return v4PublicJobUrl(x?.official_url||x?.url||x?.job_url||x?.link);
+ return v4PublicJobUrl(x?.official_url||x?.url||x?.job_url||x?.link||
+  x?.apply_url||x?.application_url||x?.source_url||x?.job_link);
 }
 function candidates(payload,response){
- const data=Array.isArray(payload.jobs)?payload.jobs:
-  Array.isArray(payload.matches)?payload.matches:
-  Array.isArray(payload.recommendations)?payload.recommendations:[];
+ const root=payload?.result&&typeof payload.result==='object'?payload.result:
+  payload?.data&&typeof payload.data==='object'?payload.data:payload;
+ const data=[root?.jobs,root?.matches,root?.recommendations,root?.positions,
+  root?.job_recommendations,root?.job_list,root?.vacancies].find(Array.isArray)||[];
  const rows=new Map();
  for(const x of data){
   if(!x||typeof x!=='object')continue;
@@ -139,7 +141,8 @@ async function toJson(fetcher,provider,response,{signal}={}){
     +'没有原文支持的字段使用 null。完整保留真实找到的岗位，不设置数量上限。',
    input:raw,max_output_tokens:9000
   },{signal});
-  return v4ParseJson(formatted);
+  try{return v4ParseJson(formatted)}
+  catch{return {profile:{summary:text(raw,600),roles:[]},jobs:[]}}
  }
 }
 function sourceKind(url){
@@ -180,7 +183,9 @@ function renderJob(x,url,verified,resume,toolLinked,index){
  const resumeGrounded=resumeQuote.length>=4&&norm(resume).includes(norm(resumeQuote));
  const jdGrounded=verified?.full_jd&&jdQuote.length>=4&&
   norm(verified.full_jd).includes(norm(jdQuote));
- const n=Number(x?.match_score??x?.score),numbered=Number.isInteger(n)&&n>=0&&n<=100;
+ const rawScore=x?.match_score??x?.score;
+ const n=Number(rawScore),numbered=rawScore!==null&&rawScore!==undefined&&
+  rawScore!==''&&Number.isInteger(n)&&n>=0&&n<=100;
  const score=numbered&&resumeGrounded?n:null;
  const confirmed=Boolean(verified?.source_confirmed||
   String(verified?.proof_method||'').startsWith('DIRECT_EMPLOYER'));
