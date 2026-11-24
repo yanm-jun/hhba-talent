@@ -407,3 +407,22 @@ test('V4 native Responses streaming consumes verified final response and forward
  await assert.rejects(v4Call(async()=>new Response('data: '+JSON.stringify(events[0])+'\n\n',{headers:{'content-type':'text/event-stream'}}),
   {...provider,stream:true},{input:'synthetic'}),/AI_PROVIDER_RESPONSE_INVALID/);
 });
+
+test('V4 reassessment accepts complete document evidence beyond legacy limits',async()=>{
+ const {validReassessmentInput}=await import('../functions/_lib/resume-reassessment.js');
+ const blocks=Array.from({length:35},(_,i)=>({id:'block-'+i,section:'experience',text:'真实经历'+i+'甲'.repeat(1700)}));
+ const input={job_id:'jd_'+'a'.repeat(32),consent_reassessment:true,confirm_real:true,
+  profile:{education:null,experience_years:5,target_roles:Array.from({length:12},(_,i)=>'岗位'+i),
+   skills:Array.from({length:40},(_,i)=>({name:'技能'+i}))},before_blocks:blocks,after_blocks:blocks};
+ assert.equal(validReassessmentInput(input),false);
+ assert.equal(validReassessmentInput(input,{v4:true}),true);
+ assert.equal(validReassessmentInput({...input,after_blocks:blocks.slice(1)},{v4:true}),false);
+});
+test('V4 Word score replay accepts more than eight verified revisions',async()=>{
+ const {checkedWordScoreBlocks}=await import('../src/services/resumeWordScoreBridge.mjs');
+ const original=[{id:'one',section:'experience',text:'真实项目第0阶段'}];
+ const history=Array.from({length:15},(_,i)=>({revision:i+1,original:'真实项目第'+i+'阶段',text:'真实项目第'+(i+1)+'阶段'}));
+ assert.equal(checkedWordScoreBlocks(original,history,15).ok,false);
+ const result=checkedWordScoreBlocks(original,history,15,true);
+ assert.equal(result.ok,true);assert.equal(result.blocks[0].text,'真实项目第15阶段');
+});
