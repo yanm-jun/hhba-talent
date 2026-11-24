@@ -131,15 +131,16 @@ export async function onRequestPost({request,env}){
   return fail(code,code==='JD_VERIFIED_VERSION_REQUIRED'||code==='JD_JOB_IDENTITY_MISMATCH'?422:409);
  }
  const hash=await sha256Hex(quotaPepper(env)+':resume-opt:'+session.phone);
- let requestId,lease;
+ let requestId,lease,renewTimer;
  try{
   if(input.full_document){
    if(!await taskReady(db))return fail('RESUME_OPTIMIZATION_TASK_DB_NOT_READY',503);
    lease=await reserveResumeOptimizationTask(db,hash,{
     jd:trustedJob.jd_version_id,blocks:input.blocks,text:input.full_document.text
-   });
+   },{unrestricted:env?.HHBA_MATCH_V4_READY==='1'});
    if(lease?.duplicate)return fail('RESUME_OPTIMIZATION_IN_PROGRESS',409);
    if(!lease)return fail('RESUME_OPTIMIZATION_QUEUED',409);
+   if(lease.renew)renewTimer=setInterval(()=>{void lease.renew().catch(()=>{});},60000);
   }else{
    if(env?.HHBA_MATCH_V4_READY!=='1'){
     if(!await reserveAttempt(db,hash))return fail('RESUME_OPTIMIZATION_ATTEMPT_LIMIT',429);
@@ -194,6 +195,7 @@ export async function onRequestPost({request,env}){
   return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:
    code==='AI_PROVIDER_NOT_CONFIGURED'?503:502);
  }finally{
+  if(renewTimer)clearInterval(renewTimer);
   if(lease)await lease.release().catch(()=>console.warn('HHBA_RESUME_OPTIMIZATION_LEASE_RELEASE_FAILED'));
  }
 }
