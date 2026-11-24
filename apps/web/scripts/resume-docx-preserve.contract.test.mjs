@@ -238,6 +238,10 @@ test('same-style split text nodes become one editable paragraph and preserve XML
  assert.equal(after.get('word/document.xml').raw.toString(),expected);
  for(const [name,part] of before)if(name!=='word/document.xml')assert.deepEqual(after.get(name).compressed,part.compressed);
  assert.ok((await inspectOriginalDocxStrict(edited,{allowParagraphRuns:true})).editable_text.includes(proposed));
+ const second='进一步突出真实岗位相关经历';
+ const revised=await editOriginalDocxStrict(edited,[{original:proposed,text:second}],{allowExpansion:true});
+ assert.ok((await inspectOriginalDocxStrict(revised,{allowParagraphRuns:true})).editable_text.includes(second));
+ assert.deepEqual(parts(revised).get('word/styles.xml').compressed,before.get('word/styles.xml').compressed);
 });
 test('mixed styles and duplicated split paragraphs cannot be merged into an unsafe anchor',async()=>{
  for(const input of [fixture({mixed:true}),fixture({split:true,splitDuplicate:true})]){
