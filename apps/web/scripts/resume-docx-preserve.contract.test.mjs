@@ -33,9 +33,11 @@ const body='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
  '<w:pgSz w:w="11906" w:h="16838"/>'+
  '<w:pgMar w:top="850" w:right="850" w:bottom="850" w:left="850"/></w:sectPr>'+
  '</w:body></w:document>';
-function fixture({method=0,duplicate=false,split=false,macro=false,extraParagraphs=0,duplicateTail=false}={}){
+function fixture({method=0,duplicate=false,split=false,macro=false,extraParagraphs=0,duplicateTail=false,mixed=false,splitDuplicate=false}={}){
  let doc=duplicate?body.replace('</w:body>','<w:p><w:r><w:t>原始岗位描述</w:t></w:r></w:p></w:body>'):
   split?body.replace('<w:t>原始岗位描述</w:t>','<w:t>原始岗位</w:t><w:t>描述</w:t>'):body;
+ if(mixed)doc=doc.replace('<w:t>原始岗位描述</w:t>','<w:t>原始岗位</w:t></w:r><w:r><w:rPr><w:i/></w:rPr><w:t>描述</w:t>');
+ if(splitDuplicate)doc=doc.replace('</w:body>','<w:p><w:r><w:t>原始岗位</w:t><w:t>描述</w:t></w:r></w:p></w:body>');
  if(extraParagraphs){
   const extra=Array.from({length:extraParagraphs},(_,i)=>
    '<w:p><w:r><w:t>虚构补充经历第'+i+'项</w:t></w:r></w:p>').join('');
@@ -220,4 +222,27 @@ test('production-facing Word export refuses to release files without trusted ren
  assert.equal(approved.pageCount,1);
  assert.ok(parts(approved.bytes).get('word/document.xml').raw
   .toString().includes('新的岗位描述'));
+});
+
+
+test('same-style split text nodes become one editable paragraph and preserve XML formatting',async()=>{
+ const input=fixture({split:true,method:8});
+ const before=parts(input);
+ const inspection=await inspectOriginalDocxStrict(input,{allowParagraphRuns:true});
+ assert.ok(inspection.editable_text.includes('原始岗位描述'));
+ assert.ok(!inspection.editable_text.includes('原始岗位'));
+ const proposed='负责岗位相关业务与数据整理工作';
+ const edited=await editOriginalDocxStrict(input,[{original:'原始岗位描述',text:proposed}],{allowExpansion:true});
+ const after=parts(edited);
+ const expected=before.get('word/document.xml').raw.toString().replace('<w:t>原始岗位</w:t><w:t>描述</w:t>','<w:t>'+proposed+'</w:t><w:t></w:t>');
+ assert.equal(after.get('word/document.xml').raw.toString(),expected);
+ for(const [name,part] of before)if(name!=='word/document.xml')assert.deepEqual(after.get(name).compressed,part.compressed);
+ assert.ok((await inspectOriginalDocxStrict(edited,{allowParagraphRuns:true})).editable_text.includes(proposed));
+});
+test('mixed styles and duplicated split paragraphs cannot be merged into an unsafe anchor',async()=>{
+ for(const input of [fixture({mixed:true}),fixture({split:true,splitDuplicate:true})]){
+  const inspection=await inspectOriginalDocxStrict(input,{allowParagraphRuns:true});
+  assert.ok(!inspection.editable_text.includes('原始岗位描述'));
+  await assert.rejects(()=>editOriginalDocxStrict(input,[{original:'原始岗位描述',text:'真实改写'}],{allowExpansion:true}),/WORD_EDIT_AMBIGUOUS/);
+ }
 });
