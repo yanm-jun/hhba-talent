@@ -40,18 +40,18 @@ function pageTitle(html){
 }
 function postings(html){
  const found=[];
- for(const m of html.matchAll(/<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)){
+ const documents=[...html.matchAll(/<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)].map(m=>m[1]);
+ if(/^[\s]*[\[{]/.test(html))documents.push(html);
+ for(const document of documents){
   try{
-   const root=JSON.parse(m[1]);
-   const visit=(v,depth)=>{
-    if(!v||depth>7||typeof v!=='object')return;
-    if(Array.isArray(v)){v.forEach(x=>visit(x,depth+1));return}
-    const t=v['@type'],a=Array.isArray(t)?t:[t];
-    if(a.some(x=>typeof x==='string'&&/(?:^|\/)JobPosting$/i.test(x)))found.push(v);
-    if(v['@graph'])visit(v['@graph'],depth+1);
-    if(v.mainEntity)visit(v.mainEntity,depth+1);
-   };
-   visit(root,0);
+   const root=JSON.parse(document);
+   const stack=[root];
+   while(stack.length){
+    const v=stack.pop();if(!v||typeof v!=='object')continue;
+    const t=v['@type'],types=Array.isArray(t)?t:[t];
+    if(types.some(x=>typeof x==='string'&&/(?:^|\/)JobPosting$/i.test(x)))found.push(v);
+    for(const child of Object.values(v))if(child&&typeof child==='object')stack.push(child);
+   }
   }catch{}
  }
  return found;
@@ -84,7 +84,7 @@ function htmlLocation(plain){
  return m?findMainlandCity(m[1]):null;
 }
 async function limitedRead(r,{allowJson=false}={}){
- if(r.status!==200)throw Error('V4_PAGE_UNAVAILABLE');
+ if(!r.ok||r.status===206)throw Error('V4_PAGE_UNAVAILABLE');
  const ct=(r.headers.get('content-type')||'').toLowerCase();
  if(!ct.includes('text/html')&&!ct.includes('text/plain')&&!(allowJson&&ct.includes('json')))throw Error('V4_PAGE_NOT_HTML');
  const max=2*1024*1024,cl=Number(r.headers.get('content-length')||0);
@@ -104,42 +104,52 @@ async function limitedRead(r,{allowJson=false}={}){
 // host. Require the actual link and employer identity on the referring page,
 // never trust an ATS hostname or the model's assertion on its own.
 export async function v4EmployerAuthorization(jobUrl,company,proofUrl,{fetcher=fetch,signal}={}){
- const proof=v4PublicJobUrl(proofUrl),target=v4PublicJobUrl(jobUrl);
- if(!proof||!target||proof===target||isCommercialRecruitmentBoard(proof)||isCommercialRecruitmentBoard(target)||!company)return false;
+ const target=v4PublicJobUrl(jobUrl),chain=(Array.isArray(proofUrl)?proofUrl:[proofUrl]).map(v4PublicJobUrl);
+ if(!target||!chain.length||!company||chain.some(u=>!u||u===target||isCommercialRecruitmentBoard(u))||new Set(chain).size!==chain.length||isCommercialRecruitmentBoard(target))return false;
+ const normalize=v=>String(v||'').normalize('NFKC').replace(/[^\p{L}\p{N}]/gu,'').toLowerCase();
+ const identity=normalize(company);
+ if(identity.length<2)return false;
  try{
-  const r=await fetcher(proof,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,text/plain;q=0.9'},signal});
-  const html=await limitedRead(r);
-  const site=meta(html,'property','og:site_name')||meta(html,'name','application-name');
-  if(isCommercialRecruitmentBoard(proof,{site_name:site}))return false;
-  const normalize=v=>String(v||'').normalize('NFKC').replace(/[^\p{L}\p{N}]/gu,'').toLowerCase();
-  const identity=normalize(company);
-  // Page-level corporate identity, not an incidental company name in a job list.
-  const labels=[site,meta(html,'name','author'),tag(html,'title')].map(normalize);
-  if(identity.length<2||!labels.some(v=>v.includes(identity)))return false;
-  for(const a of html.matchAll(/<a\b[^>]*\bhref\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>/gi)){
-   const href=(a[1]||a[2]).replace(/&amp;/gi,'&');
-   let resolved;try{resolved=v4PublicJobUrl(new URL(href,proof).href)}catch{continue}
-   if(resolved===target)return true;
+  for(let i=0;i<chain.length;i++){
+   const proof=chain[i],next=chain[i+1]||target;
+   const r=await fetcher(proof,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,text/plain;q=0.9'},signal});
+   const html=await limitedRead(r);
+   const site=meta(html,'property','og:site_name')||meta(html,'name','application-name');
+   if(isCommercialRecruitmentBoard(proof,{site_name:site}))return false;
+   // Each step must be an actual public link, starting at a page bearing employer identity.
+   if(i===0&&![site,meta(html,'name','author'),tag(html,'title')].map(normalize).some(v=>v.includes(identity)))return false;
+   let linked=false;
+   for(const a of html.matchAll(/<a\b[^>]*\bhref\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>/gi)){
+    let resolved;try{resolved=v4PublicJobUrl(new URL((a[1]||a[2]).replace(/&amp;/gi,'&'),proof).href)}catch{continue}
+    if(resolved===next){linked=true;break;}
+   }
+   if(!linked)return false;
   }
-  return false;
+  return true;
  }catch(e){if(signal?.aborted)throw e;return false;}
 }
-export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()}={}){
- const canonical=v4PublicJobUrl(url);
+export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date(),expected}={}){
+ let canonical=v4PublicJobUrl(url);
  if(!canonical)throw Error('V4_UNSAFE_URL');
  if(isCommercialRecruitmentBoard(canonical))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
- // The first read uses a normal deadline; a slower or interrupted read
- // gets a second attempt without a separate HHBA wall-clock deadline.
+ // No separate HHBA wall-clock deadline. Retry transient page errors.
  // Keep the public-HTTPS and response-size checks; never follow redirects blindly.
  let html;
  for(const retry of [false,true]){
   if(signal?.aborted)throw signal.reason;
-  const timeout=retry?signal:signal?AbortSignal.any([signal,AbortSignal.timeout(45000)]):AbortSignal.timeout(45000);
+  const timeout=signal;
   try{
-   const r=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',
-    headers:{Accept:'text/html,text/plain;q=0.9'},...(timeout?{signal:timeout}:{})});
+   let r;const visited=new Set();
+   for(;;){
+    if(visited.has(canonical))throw Error('V4_REPEATED_REDIRECT');visited.add(canonical);
+    r=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,application/json,text/plain;q=0.9'},...(timeout?{signal:timeout}:{})});
+    if(![301,302,303,307,308].includes(r.status))break;
+    const location=r.headers.get('location');await r.body?.cancel().catch(()=>{});
+    const next=location?v4PublicJobUrl(new URL(location,canonical).href):null;
+    if(!next||isCommercialRecruitmentBoard(next))throw Error('V4_UNSAFE_REDIRECT');canonical=next;
+   }
    if([408,425,429,500,502,503,504].includes(r.status)){await r.body?.cancel().catch(()=>{});throw Error('V4_TRANSIENT_PAGE_ERROR');}
-   html=await limitedRead(r);break;
+   html=await limitedRead(r,{allowJson:true});break;
   }catch(e){
    if(signal?.aborted||retry||(!['AbortError','TimeoutError','TypeError'].includes(e?.name)&&e?.message!=='V4_TRANSIENT_PAGE_ERROR'))throw e;
   }
@@ -147,12 +157,21 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  const siteName=meta(html,'property','og:site_name')||meta(html,'name','application-name');
  if(isCommercialRecruitmentBoard(canonical,{site_name:siteName}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
  const plain=htmlToText(html,{maxChars:Infinity});
- if(CLOSED.test(plain.slice(0,12000)))throw Error('V4_JOB_CLOSED');
- for(const j of postings(html)){
+ const all=postings(html);
+ const titleText=pageTitle(html),explicitClosed=CLOSED.test(titleText)||CLOSED.test(plain.trim())&&plain.trim().length<80;
+ const compact=x=>trim(x).normalize('NFKC').replace(/\s+/g,'').toLowerCase();
+ const expectedTitle=compact(expected?.title||expected?.role);
+ let candidates=all;
+ if(all.length>1){const exact=all.filter(j=>{try{return !!j.url&&v4PublicJobUrl(new URL(j.url,canonical).href)===canonical}catch{return false}});
+  candidates=exact.length===1?exact:all.filter(j=>expectedTitle&&compact(j.title)===expectedTitle);
+  if(candidates.length!==1)throw Error('V4_JOB_DETAILS_AMBIGUOUS');
+ }
+ if(explicitClosed&&!candidates.length)throw Error('V4_JOB_CLOSED');
+ for(const j of candidates){
   const org=companyOf(j),title=trim(j.title);
   const city=postedLocation(j)||htmlLocation(plain),desc=htmlToText(trim(j.description),{maxChars:Infinity});
   if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city||!desc.trim())continue;
-  if(j.validThrough&&Number.isFinite(Date.parse(j.validThrough))&&Date.parse(j.validThrough)<now.getTime())throw Error('V4_JOB_CLOSED');
+  if(explicitClosed||j.validThrough&&Number.isFinite(Date.parse(j.validThrough))&&Date.parse(j.validThrough)<now.getTime())throw Error('V4_JOB_CLOSED');
   // A multinational's official careers host may differ from its corporate website.
   // Do not discard real JD content merely because the domains differ.
   const sections=extractOfficialJdSections(desc,{full:true});
@@ -198,7 +217,7 @@ export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal}={}){
   const site=meta(raw,'property','og:site_name')||meta(raw,'name','application-name');
   if(isCommercialRecruitmentBoard(current,{site_name:site}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
   const plain=htmlToText(raw,{maxChars:Infinity}).trim();
-  if(CLOSED.test(plain.slice(0,12000)))throw Error('V4_JOB_CLOSED');
+  if(CLOSED.test(pageTitle(raw))||(plain.length<80&&CLOSED.test(plain)))throw Error('V4_JOB_CLOSED');
   return {url:current,plain,site,title:pageTitle(raw)};
  }
  throw Error('V4_UNSAFE_OR_REPEATED_REDIRECT');

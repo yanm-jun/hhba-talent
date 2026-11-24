@@ -8,7 +8,7 @@ export function curatedUrl(raw){
 }
 export function candidateSummary(job,url){
  return {url,company:str(job.company),title:str(job.title||job.role),location:str(job.location||job.city),salary:str(job.salary)||null,
-  source_kind:str(job.source_kind),site_name:str(job.site_name),employer_proof_url:str(job.employer_proof_url),
+  source_kind:str(job.source_kind),site_name:str(job.site_name),employer_proof_url:str(job.employer_proof_url),employer_proof_urls:Array.isArray(job.employer_proof_urls)?job.employer_proof_urls.filter(v=>typeof v==='string'&&v.trim()):[],
   preliminary_score:Number.isInteger(job.score)&&job.score>=0&&job.score<=100?job.score:null,
   fit_summary:str(job.fit_summary||job.reason||job.recommendation_reason),requirements:str(job.requirements)};
 }

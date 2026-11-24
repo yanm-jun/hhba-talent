@@ -46,7 +46,7 @@ export type MatchedJob = {
   evidence_quality?:{skills:string;experience:string;education:string};
   ranking_version?:'HHBA_MATCH_RANKING_V2';
 };
-export type MatchResearchReport={profile:MatchProfile;rounds:{round:number;queries:string[];cited_count:number;candidates:number;added:number;excluded_count:number}[];excluded_count:number;discovered:number;candidate_target?:number;final_target?:number;concrete_count?:number;completion_reason?:string;diagnostics?:Record<string,number>};
+export type MatchResearchReport={profile:MatchProfile;rounds:{round:number;queries:string[];cited_count:number;candidates:number;added:number;excluded_count:number}[];excluded_count:number;discovered:number;candidate_target?:number;final_target?:number;concrete_count?:number;completion_reason?:string;unresolved_source_count?:number;diagnostics?:Record<string,number>};
 export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
   research_report?:MatchResearchReport;research_leads?:MatchedJob[];
@@ -147,7 +147,7 @@ const errorMap:Record<string,string>={
   AI_PROVIDER_INCOMPLETE:'DeepSeek 搜索未能完成，没有返回不完整的岗位结果。'
 };
 export class MatchError extends Error {
- constructor(public readonly status:number,message:string){super(message);this.name='MatchError'}
+ constructor(public readonly status:number,message:string,public readonly retryable=false){super(message);this.name='MatchError'}
 }
 function session(){
  if(!realAuthReady)throw new MatchError(401,'请在 HHBA 正式站登录求职账户。');
@@ -358,11 +358,11 @@ async function consumeNativeMatchStream(
    };
    const elapsedNote=Number.isFinite(elapsed)&&elapsed>=1000?
     '（'+Math.round(elapsed/1000)+'秒，阶段：'+(names[stage]||'模型处理')+'）':'';
-   throw new MatchError(502,(errorMap[code]||'智能匹配服务暂时不可用。')+elapsedNote);
+   throw new MatchError(502,(errorMap[code]||'智能匹配服务暂时不可用。')+elapsedNote,value?.retryable===true);
   }else if(event==='complete'){
    if(value?.matches_streamed===true){
-     if(finalJobs.length!==value.match_count)throw new MatchError(502,'岗位结果传输不完整，可重试。');
-     if(value.research_leads_streamed===true&&researchJobs.length!==value.research_lead_count)throw new MatchError(502,'研究报告传输不完整，可重试。');
+     if(finalJobs.length!==value.match_count)throw new MatchError(502,'岗位结果传输不完整，可重试。',true);
+     if(value.research_leads_streamed===true&&researchJobs.length!==value.research_lead_count)throw new MatchError(502,'研究报告传输不完整，可重试。',true);
      complete={...value,matches:finalJobs,...(value.research_leads_streamed?{research_leads:researchJobs}:{}),research_report:value.research_report||researchReport} as MatchResponse;
     }else complete=value as MatchStreamResponse;
   }
@@ -384,12 +384,12 @@ async function consumeNativeMatchStream(
   if(buffer.trim())parseEvent(buffer);
  }catch(e){
   if(e instanceof MatchError||(e as Error)?.name==='AbortError')throw e;
-  throw new MatchError(503,'智能匹配连接中断，未收到完整推荐。');
+  throw new MatchError(503,'智能匹配连接中断，未收到完整推荐。',true);
  }finally{
   void reader.cancel().catch(()=>{});
   reader.releaseLock();
  }
- if(!complete)throw new MatchError(502,'智能匹配未返回完整结果，请稍后重试。');
+ if(!complete)throw new MatchError(502,'智能匹配未返回完整结果，请稍后重试。',true);
  return complete;
 }
 
@@ -460,9 +460,17 @@ export async function submitExtractedResumeText(
  let continuation:MatchContinuation['continuation']|undefined;
  let task:Awaited<ReturnType<typeof matchTaskReference>>|undefined;
  if(MATCH_V4_PREVIEW){try{task=await matchTaskReference(cleaned,opts,resumeId)}catch{}}
+ let reconnectDelay=1000;
+ const reconnect=async()=>{
+  if(requestSignal.aborted)throw requestSignal.reason;
+  onActivity?.({stage:'waiting',message:'连接暂时异常，正在恢复原任务进度。'});
+  await new Promise<void>((resolve,reject)=>{const stop=()=>{clearTimeout(timer);reject(requestSignal.reason)};const timer=setTimeout(()=>{requestSignal.removeEventListener('abort',stop);resolve()},reconnectDelay);requestSignal.addEventListener('abort',stop,{once:true});});
+  reconnectDelay=Math.min(reconnectDelay*2,30000);
+ };
  try{
   for(;;){
   if(requestSignal.aborted)throw requestSignal.reason;
+  try{
   const response=await fetch(EFFECTIVE_API+'/resume',{
    method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
@@ -474,21 +482,21 @@ export async function submitExtractedResumeText(
     },...(continuation?{continuation}:{})})
   }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
    if((e as Error)?.name==='AbortError')throw e;
-   throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
+   throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。',true);});
   onReceive();
   const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
-  if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。');
+  if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。',response.status===429||response.status>=500);
   const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,onReceive,onResearch,onResearchJobs):
    await response.json().catch(()=>({})) as (Partial<MatchResponse>|MatchContinuation)&{error?:string};
   if(!response.ok){
    const code=(data as {error?:string}).error||'';
-   if(code==='AI_TASK_IN_PROGRESS')throw new MatchError(409,'上次任务正在处理当前阶段，请重新点击匹配以恢复进度，不会重复开启同一阶段。');
+   if(code==='AI_TASK_IN_PROGRESS')throw new MatchError(409,'上次任务正在处理当前阶段，正在等待原任务恢复。',true);
    if(code==='AI_CHECKPOINT_EXPIRED'){task?.clear();throw new MatchError(409,'已保存的研究状态已过期，请重新启动匹配。');}
-   throw new MatchError(response.status,errorMap[code]||'智能匹配服务暂时不可用。');
+   throw new MatchError(response.status,errorMap[code]||'智能匹配服务暂时不可用。',code==='AI_CHECKPOINT_DB_UNAVAILABLE'||(!code&&(response.status===429||response.status>=500)));
   }
   if(data.status==='CONTINUE'){
    if(!MATCH_V4_PREVIEW||!data.continuation||typeof data.continuation.token!=='string'||!data.continuation.state)throw new MatchError(502,'AI 续接状态异常。');
-   continuation=data.continuation;
+   continuation=data.continuation;reconnectDelay=1000;
    continue;
   }
   if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||
@@ -498,6 +506,7 @@ export async function submitExtractedResumeText(
   if(data.research_report)onResearch?.(data.research_report);
   if(data.research_leads)onResearchJobs?.(data.research_leads);
   return data as MatchResponse;
+  }catch(error){if(!MATCH_V4_PREVIEW||!task||!(error instanceof MatchError)||!error.retryable||requestSignal.aborted)throw error;await reconnect();}
   }
  }catch(error){
   if(requestSignal.aborted)throw requestSignal.reason;

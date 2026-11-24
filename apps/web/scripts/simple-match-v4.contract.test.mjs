@@ -600,7 +600,7 @@ test('curated V4 retains all candidates beyond the 500 target and scores before 
   scoreIds.add(id);return model({suitable:id!==499,score:id===499?40:score,reason:report.reason,resume_quote:report.resume_quote,jd_quote:report.jd_quote,matched:report.matched,gaps:report.gaps});
  };
  const result=await v4Match(fetcher,provider,resume,'全国',{officialOnly:true,curated:true});
- assert.equal(parsed,1);assert.equal(searches,1);
+ assert.equal(parsed,1);assert.equal(searches,2);
  assert.equal(result.research_report.discovered,502);assert.equal(result.matches.length,50);
  assert.equal(readIds.size,502);assert.equal(scoreIds.size,501);assert.equal(deep,51);
  assert.equal(reportIds[0],498);assert.equal(reportIds[1],497);
@@ -690,4 +690,25 @@ test('curated V4 recovers an inaccessible official lead and expands insufficient
  assert.ok(result.matches.some(j=>j.official_url===alternate));
  assert.equal(result.native_search.stage,'partial');
  assert.ok(result.native_search.diagnostics.UNDERFILLED_EXPANSION>=1);
+});
+
+
+test('V4 curated provider interruption does not mark the current research as finished',async()=>{
+ const {isV4RetryableProviderError}=await import('../functions/_lib/simple-match-v4.js');
+ assert.equal(isV4RetryableProviderError('AI_PROVIDER_RATE_LIMITED'),true);
+ assert.equal(isV4RetryableProviderError('AI_PROVIDER_KEY_REJECTED'),false);
+ await assert.rejects(()=>v4Match(async()=>new Response(null,{status:429}),provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true}),/AI_PROVIDER_RATE_LIMITED/);
+});
+
+
+test('V4 independently verifies deeply nested public JSON and a multi-page employer authorization chain',async()=>{
+ const {v4EmployerAuthorization}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const root='https://example-employer.cn/',portal='https://jobs.example-employer.cn/openings',detail='https://jobs.example-employer.cn/post/123';
+ let nested={'@type':'JobPosting',title:'运营岗位',hiringOrganization:{name:'示例企业',url:'https://example-employer.cn'},jobLocation:{address:{addressLocality:'上海'}},description:'负责运营管理，具备沟通协调能力。'};
+ for(let i=0;i<15;i++)nested={nested};
+ const fetcher=async u=>u===root?new Response('<title>示例企业官网</title><a href="'+portal+'">招聘</a>',{headers:{'content-type':'text/html'}}):u===portal?new Response('<a href="'+detail+'">岗位详情</a>',{headers:{'content-type':'text/html'}}):Response.json(nested);
+ const jd=await v4ReadEmployerJob(detail,{fetcher});
+ assert.equal(jd.title,'运营岗位');assert.equal(jd.full_jd,'负责运营管理，具备沟通协调能力。');
+ assert.equal(await v4EmployerAuthorization(detail,'示例企业',[root,portal],{fetcher}),true);
+ assert.equal(await v4EmployerAuthorization(detail,'示例企业',root,{fetcher}),false);
 });

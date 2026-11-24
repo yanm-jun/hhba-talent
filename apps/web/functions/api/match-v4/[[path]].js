@@ -7,7 +7,7 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
-import {v4Provider,v4Match} from '../../_lib/simple-match-v4.js';
+import {v4Provider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {recognizeV4Resume} from '../../_lib/v4-resume-ocr.js';
 import {checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint,matchTaskKey,saveMatchTask,readMatchTask} from '../../_lib/v4-match-checkpoint-storage.js';
@@ -42,7 +42,7 @@ const checkpointEnv=env=>{
  const secret=env?.HHBA_MATCH_V4_CHECKPOINT_SECRET||env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET;
  return typeof secret==='string'&&secret.length>=32?{HHBA_RESUME_AGENT_CHECKPOINT_SECRET:'hhba-v4-match:'+secret}:null;
 };
-const checkpointArgs=(env,input,draft)=>({env:checkpointEnv(env),account:input.phone,blocks:[input.text],job:{role:input.role_hint,excludeUrls:input.excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-research-v3'},draft});
+const checkpointArgs=(env,input,draft)=>({env:checkpointEnv(env),account:input.phone,blocks:[input.text],job:{role:input.role_hint,excludeUrls:input.excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-research-v4'},draft});
 function events(env,request,input){
  const encoder=new TextEncoder();let closed=false,phase='preparing';
  const started=Date.now();
@@ -129,7 +129,7 @@ function events(env,request,input){
      const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
      console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,
       elapsed_ms:Date.now()-started}));
-     send('failure',{error:code,phase,elapsed_ms:Date.now()-started});
+     send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable:!!input.taskKey&&(isV4RetryableProviderError(code)||leaseAbort.signal.aborted&&!request.signal.aborted)});
     }finally{
      clearInterval(heart);if(leaseTimer)clearInterval(leaseTimer);
      await releaseTask().catch(()=>console.warn('HHBA_TASK_LEASE_RELEASE_FAILED'));
@@ -190,7 +190,7 @@ export async function onRequest({request,env}){
  const input={text:resume,role_hint:role,excludeUrls,phone:session.phone,resume_id:body.resume_id||null};
  if(checkpointStorageReady(env)&&body.task_id!==undefined){
   try{
-   input.taskKey=await matchTaskKey(env,session.phone,body.task_id,{text:resume,role,excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-research-v3'});
+   input.taskKey=await matchTaskKey(env,session.phone,body.task_id,{text:resume,role,excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-research-v4'});
    input.lease=await leaseMatchTask(db,input.taskKey);
    if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
    const saved=await readMatchTask(env,input.taskKey);
