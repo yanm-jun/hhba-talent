@@ -9,6 +9,9 @@ import {directOfficialJobEvidence} from './official-job-evidence.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 
 const BASE='https://api-c.reqtoken.com/v1';
+function providerBase(value){
+ try{const u=new URL(value||BASE);if(u.protocol!=='https:'||u.username||u.password||u.search||u.hash)return null;return u.href.replace(/\\/$/,'');}catch{return null;}
+}
 const MODEL='gpt-6.2-sol';
 const fault=code=>Object.assign(new Error(code),{code});
 const text=(v,n=1200)=>typeof v==='string'?v.trim().slice(0,n):'';
@@ -17,7 +20,8 @@ const norm=v=>String(v||'').replace(/\s+/g,' ').trim();
 
 export function v4Provider(env={}){
  const key=env.HHBA_AGENT_RELAY_API_KEY;
- return typeof key==='string'&&key.trim().length>=16?{key,model:env.HHBA_AGENT_RELAY_MODEL?.trim()||MODEL,...(env.HHBA_AGENT_REASONING_EFFORT?{reasoningEffort:env.HHBA_AGENT_REASONING_EFFORT}: {})}:null;
+ const baseUrl=providerBase(env.HHBA_AGENT_RELAY_BASE_URL);
+ return typeof key==='string'&&key.trim().length>=16&&baseUrl?{key,baseUrl,model:env.HHBA_AGENT_RELAY_MODEL?.trim()||MODEL,...(env.HHBA_AGENT_REASONING_EFFORT?{reasoningEffort:env.HHBA_AGENT_REASONING_EFFORT}: {})}:null;
 }
 export function v4OutputText(response){
  return (response?.output||[]).filter(x=>x?.type==='message')
@@ -40,7 +44,7 @@ export async function v4Call(fetcher,provider,payload,{signal}={}){
  try{
   // Let the provider and the hosting runtime govern request duration. HHBA
   // adds no separate per-model-call wall-clock deadline to long job research.
-  response=await fetcher(BASE+'/responses',{
+  response=await fetcher((provider.baseUrl||BASE)+'/responses',{
    method:'POST',redirect:'manual',
    headers:{authorization:'Bearer '+provider.key,'content-type':'application/json',
     accept:'application/json','x-openai-actor-authorization':'local-image-extension'},
