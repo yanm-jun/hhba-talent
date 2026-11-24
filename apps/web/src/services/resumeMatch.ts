@@ -240,7 +240,8 @@ export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Pr
 
 const ocrErrors:Record<string,string>={
  SESSION_INVALID:'请先登录求职账号，再识别简历文档。',
- OCR_CONSENT_REQUIRED:'请先授权 DeepSeek 处理这份原文件。',
+ OCR_CONSENT_REQUIRED:'请先明确授权 AI 服务处理这份原文件。',
+  OCR_FILE_PROVIDER_UNSUPPORTED:'当前模型接口不支持此文件识别方式，请尝试文字版 PDF 或粘贴简历原文。',
  OCR_INVALID_FILE:'这份文件无法读取。请在 Word 中另存为 DOCX，或重新导出 PDF。',
  OCR_UNSUPPORTED_FORMAT:'请选择 Word（DOCX）或 PDF 简历。',
  OCR_FILE_TOO_LARGE:'请选择 3 MB 以内的简历文件。',
@@ -256,7 +257,7 @@ export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Pro
  const response=await fetch(EFFECTIVE_API+'/ocr',{
   method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/octet-stream',Authorization:'Bearer '+token,
-   'X-HHBA-Resume-Format':format,'X-HHBA-OCR-Consent':'deepseek-resume-ocr-v1'},
+   'X-HHBA-Resume-Format':format,'X-HHBA-OCR-Consent':MATCH_V4_PREVIEW?'openai-relay-resume-ocr-v4':'deepseek-resume-ocr-v1'},
   body:file
  }).catch(error=>{
   if(error?.name==='AbortError')throw error;
