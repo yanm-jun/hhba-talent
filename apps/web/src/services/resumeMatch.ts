@@ -84,8 +84,10 @@ export type MatchResponse = {
   preview_synthetic?:boolean;
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
-const API=typeof window!=='undefined'&&window.location.hostname.endsWith('.hhba-talent.pages.dev')&&
- window.location.hostname!=='hhba-talent.pages.dev'?'/api/match-v4':'/api/match-next'; // V4 preview only
+const API='/api/match-next'; // Original default preserved for production and V2 compatibility.
+const MATCH_V4_PREVIEW=typeof window!=='undefined'&&window.location.hostname.endsWith('.hhba-talent.pages.dev')&&
+ window.location.hostname!=='hhba-talent.pages.dev';
+const EFFECTIVE_API=MATCH_V4_PREVIEW?'/api/match-v4':API;
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=3*1024*1024;
 const errorMap:Record<string,string>={
@@ -147,7 +149,7 @@ function session(){
 export async function matchServiceReady(signal?:AbortSignal):Promise<boolean>{
  if(!realAuthReady)return false;
  try{
-  const response=await fetch(API+'/status',{method:'GET',credentials:'same-origin',cache:'no-store',signal});
+  const response=await fetch(EFFECTIVE_API+'/status',{method:'GET',credentials:'same-origin',cache:'no-store',signal});
   if(!response.ok||!(response.headers.get('content-type')||'').includes('json'))return false;
   const data=await response.json() as {kind?:string;enabled?:boolean};
   return data.kind==='HHBA_NATIVE_WEB_MATCH_V1'&&data.enabled===true;
@@ -162,7 +164,7 @@ const isCleanV2PreviewHost=()=>typeof window!=='undefined'&&
 export async function matchPreviewPreflightAvailable(signal?:AbortSignal):Promise<boolean>{
  if(!isCleanV2PreviewHost()||!realAuthReady)return false;
  try{
-  const response=await fetch(API+'/status',{
+  const response=await fetch(EFFECTIVE_API+'/status',{
    method:'GET',credentials:'same-origin',cache:'no-store',signal
   });
   if(!response.ok)return false;
@@ -175,7 +177,7 @@ export async function runMatchPreviewProviderCheck(signal?:AbortSignal):Promise<
 }>{
  if(!isCleanV2PreviewHost())throw new MatchError(403,'只能在独立的 HHBA 预览环境中执行接口预检。');
  const token=session();
- const response=await fetch(API+'/provider-check',{
+ const response=await fetch(EFFECTIVE_API+'/provider-check',{
   method:'GET',credentials:'same-origin',cache:'no-store',signal,
   headers:{Authorization:'Bearer '+token}
  }).catch(error=>{
@@ -246,7 +248,7 @@ export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Pro
  const token=session();
  const format=resumeFileFormat(file.name);
  if(!format||file.size<30||file.size>LIMIT)throw new MatchError(400,ocrErrors.OCR_INVALID_FILE);
- const response=await fetch(API+'/ocr',{
+ const response=await fetch(EFFECTIVE_API+'/ocr',{
   method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/octet-stream',Authorization:'Bearer '+token,
    'X-HHBA-Resume-Format':format,'X-HHBA-OCR-Consent':'deepseek-resume-ocr-v1'},
@@ -354,7 +356,7 @@ export async function runMatchPreviewSyntheticAcceptance(
  const token=session();
  const deadline=AbortSignal.timeout(330000);
  const requestSignal=signal?AbortSignal.any([signal,deadline]):deadline;
- const response=await fetch(API+'/synthetic-check',{
+ const response=await fetch(EFFECTIVE_API+'/synthetic-check',{
   method:'POST',credentials:'same-origin',cache:'no-store',
   signal:requestSignal,
   headers:{Authorization:'Bearer '+token,'Content-Type':'application/json',
@@ -400,7 +402,7 @@ export async function submitExtractedResumeText(
  const deadline=setTimeout(()=>timeout('这次智能匹配用时过长，已结束本次等待。可用当前简历重试。'),300000);
  onReceive();
  try{
-  const response=await fetch(API+'/resume',{
+  const response=await fetch(EFFECTIVE_API+'/resume',{
    method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
    body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
@@ -447,7 +449,7 @@ export async function checkMatchProviderConnection(signal?:AbortSignal):Promise<
  const token=session();
  let response;
  try{
-  response=await fetch(API+'/provider-check',{
+  response=await fetch(EFFECTIVE_API+'/provider-check',{
    method:'GET',credentials:'same-origin',cache:'no-store',signal,
    headers:{Authorization:'Bearer '+token}
   });
