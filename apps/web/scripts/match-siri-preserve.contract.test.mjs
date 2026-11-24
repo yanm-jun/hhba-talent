@@ -79,3 +79,20 @@ test('one job = one private Word revision scope; the original file is untouched'
  assert.match(word,/hhba-word-siri-inline-actions/);
  for(const label of ['采纳','编辑','忽略'])assert.ok(word.includes('> '+label+'<'));
 });
+
+
+test('running search cannot be cancelled by backdrop, Escape or minimizing',()=>{
+ const close=dialog.slice(dialog.indexOf('function handleClose()'),dialog.indexOf('function handleKey('));
+ assert.match(close,/if\(pending\)\{setConfirmTerminate\(false\);setConfirmClose\(true\);return\}/);
+ const minimize=close.slice(close.indexOf('function minimizeSearch()'),close.indexOf('function restoreSearch()'));
+ assert.match(minimize,/setMinimized\(true\)/);
+ assert.doesNotMatch(minimize,/onClose\(|abort\(/);
+ assert.match(dialog,/if\(!pending\)handleClose\(\)/);
+ assert.match(dialog,/onMouseDown=\{e=>\{if\(e.target===e.currentTarget\)e.preventDefault\(\)\}\}/);
+ assert.match(dialog,/if\(confirmTerminate\)\{setConfirmClose\(false\);onClose\(\)\}else setConfirmTerminate\(true\)/);
+ assert.match(dialog,/hidden=\{minimized\}/);
+ assert.match(dialog,/onClick=\{restoreSearch\}/);
+ assert.match(dialog,/dialog.showModal\(\)/);
+ assert.match(dialog,/if\(!pending\)\{setConfirmClose\(false\);setConfirmTerminate\(false\);\}/);
+ assert.match(page,/onClose=\{\(\)=>\{if\(working\)controller.current\?\.abort\(\)/);
+});
