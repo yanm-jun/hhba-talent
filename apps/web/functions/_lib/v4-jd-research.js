@@ -29,7 +29,7 @@ export function mergeJdResearch(a,b){
 }
 const origin=j=>j.research_candidate_url||j.official_url;
 const official=j=>j?.jd_source_status==='VERIFIED_JD'&&j.source_type==='站外官方招聘'&&!!text(j.evidence_excerpt);
-const strength=j=>official(j)?3:j?.evidence_status==='VERIFIED_FULL_JD'&&text(j.evidence_excerpt)?2:j?.evidence_status==='PARTIAL_SOURCE'&&text(j.evidence_excerpt)?1:0;
+const strength=j=>official(j)?3:j?.evidence_status==='VERIFIED_FULL_JD'&&text(j.evidence_excerpt)?2:j?.evidence_status==='PARTIAL_SOURCE'&&text(j.evidence_excerpt)||j?.jd_research?.facts?.length?1:0;
 export function preserveJobEvidence(previous,current){
  if(!previous)return current;
  if(!current)return previous;
