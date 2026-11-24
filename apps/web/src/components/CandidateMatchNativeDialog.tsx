@@ -1,6 +1,7 @@
 import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,MapPin,Wallet,X,Sparkles,LoaderCircle} from 'lucide-react';
+import {CuratedJobReport} from './CuratedJobReport';
 import {MatchResearchPanels} from './MatchResearchPanels';
 import type {MatchResponse,MatchResearchReport,MatchedJob,NativeMatchActivity,NativeMatchProgress} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
@@ -67,6 +68,17 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
   waiting:'正在匹配岗位'
  };
 
+ const [viewIndex,setViewIndex]=useState(0);
+ const swipe=useRef<{x:number;y:number}|null>(null);
+ const singleReport=result.matches.some(j=>!!j.research_detail)||!!researchReport?.final_target;
+ const currentIndex=Math.min(viewIndex,Math.max(0,result.matches.length-1));
+ const changeJob=(next:number)=>{
+  if(next<0||next>=result.matches.length)return;
+  setViewIndex(next);
+  const viewport=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content');
+  const card=ref.current?.querySelector<HTMLElement>('.hhba-native-list');
+  if(viewport&&card)viewport.scrollTop+=card.getBoundingClientRect().top-viewport.getBoundingClientRect().top-12;
+ };
  const matchListScroll=useRef(0);
  const activeJob=result.matches.find(job=>job.official_url===optimizedJobUrl);
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
@@ -104,6 +116,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  },[]);
  function handleKey(event:KeyboardEvent<HTMLDivElement>){
   if(event.key==='Escape'){event.preventDefault();handleClose();return}
+  if(singleReport&&!optimizedJobUrl&&event.target===ref.current&&(event.key==='ArrowLeft'||event.key==='ArrowRight')){event.preventDefault();changeJob(currentIndex+(event.key==='ArrowRight'?1:-1));return;}
   if(event.key!=='Tab'||!ref.current)return;
   const focusable=Array.from(ref.current.querySelectorAll<HTMLElement>(
    'button:not([disabled]),a[href],input:not([disabled]),textarea:not([disabled]),select:not([disabled])'
@@ -246,9 +259,13 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
      {!pending&&result.history_status==='UNAVAILABLE'&&
       <p className="hhba-match-history-warning" role="status">本次岗位推荐已完成，但账户匹配历史暂未保存成功，请保留当前结果并稍后重试。</p>}
      {result.matches.length?
-      <div className="hhba-native-list">
-       {result.matches.map((job,i)=>(
-        <article key={job.official_url} className="hhba-native-job">
+      <div className={'hhba-native-list'+(singleReport?' hhba-curated-list':'')}>
+       {singleReport&&<nav className="hhba-curated-nav" aria-label="岗位报告切换"><button type="button" disabled={currentIndex===0} onClick={()=>changeJob(currentIndex-1)}>‹ 上一个</button><strong>{String(currentIndex+1).padStart(2,'0')} / {result.matches.length}{pending?'（持续更新）':''}</strong><button type="button" disabled={currentIndex===result.matches.length-1} onClick={()=>changeJob(currentIndex+1)}>下一个 ›</button></nav>}
+       {result.matches.map((job,i)=>singleReport&&i!==currentIndex?null:(
+        <article key={job.official_url} className={'hhba-native-job'+(singleReport?' hhba-curated-card':'')}
+          onTouchStart={e=>{swipe.current={x:e.touches[0].clientX,y:e.touches[0].clientY}}}
+          onTouchEnd={e=>{const start=swipe.current;swipe.current=null;if(!singleReport||!start)return;const dx=e.changedTouches[0].clientX-start.x,dy=e.changedTouches[0].clientY-start.y;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.3)changeJob(currentIndex+(dx<0?1:-1))}}
+          onWheel={e=>{if(singleReport&&Math.abs(e.deltaX)>50&&Math.abs(e.deltaX)>Math.abs(e.deltaY)*1.5)changeJob(currentIndex+(e.deltaX>0?1:-1))}}>
          <div className="hhba-native-top">
           <span className="hhba-native-num">{String(i+1).padStart(2,'0')}</span>
           <div className="hhba-native-heading">
@@ -283,7 +300,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
          </div>
          {job.score_basis&&visibleMatchScore(job)!==null&&
           <p className="hhba-native-score-basis"><strong>{matchScoreLabel(job)}依据：</strong>{job.score_basis}</p>}
-         <p className="hhba-native-reason"><strong>{job.jd_comparisons?.length?'为什么推荐：':'匹配依据：'}</strong>
+         {job.research_detail?<CuratedJobReport detail={job.research_detail} jd={job.evidence_excerpt}/>:<><p className="hhba-native-reason"><strong>{job.jd_comparisons?.length?'为什么推荐：':'匹配依据：'}</strong>
           {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
          {job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&job.jd_source_status!=='VERIFIED_JD'&&
           <ul className="hhba-native-comparisons" aria-label="岗位与简历原文证据对照">
@@ -301,10 +318,12 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
            {item.resume_evidence&&<div>简历原文 · {item.resume_evidence}</div>}
           </li>)}
          </ul>}
+         </>}
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
           data-hhba-recruitment-outbound="true">{job.jd_version_id&&job.jd_proof_method!=='V4_STRUCTURED_JOBPOSTING'&&job.jd_proof_method!=='V4_EMPLOYER_HTML_JOB'?'前往企业官网投递':job.platform==='第三方招聘线索'||job.recruitment_source_kind==='UNVERIFIED'?'查看招聘来源（待核验）':'查看企业招聘页面'} <ArrowUpRight size={15}/></a>
         </article>
        ))}
+       {singleReport&&<nav className="hhba-curated-nav hhba-curated-nav-bottom" aria-label="继续浏览岗位"><button type="button" disabled={currentIndex===0} onClick={()=>changeJob(currentIndex-1)}>‹ 上一个</button><span>左右滑动切换岗位 · {currentIndex+1}/{result.matches.length}</span><button type="button" disabled={currentIndex===result.matches.length-1} onClick={()=>changeJob(currentIndex+1)}>下一个 ›</button></nav>}
       </div>:
       !pending&&<div className="hhba-match-empty"><BriefcaseBusiness size={23}/>
        <h3>本轮暂未确认可推荐的具体岗位</h3>
