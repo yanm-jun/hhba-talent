@@ -143,9 +143,12 @@ function paragraphRunGroups(xml,matches){
  for(const p of xml.matchAll(/<w:p(?:\s[^>]*)?>([\s\S]*?)<\/w:p>/g)){
   const inner=p[1],offset=p.index+p[0].indexOf('>')+1;
   const nodes=[...inner.matchAll(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g)];
-  if(nodes.length<2)continue;
+  if(!nodes.length)continue;
   const text=nodes.map(m=>decodeXML(m[1])).join('');
   paragraphCounts.set(text,(paragraphCounts.get(text)||0)+1);
+  // A previously merged paragraph has one nonempty node and retained empty
+  // styled nodes. Treat it as the ordinary unique text run, not two anchors.
+  if(nodes.filter(m=>decodeXML(m[1]).length>0).length<2)continue;
   if(!textOnly(text))continue;
   // A leading pPr is allowed but must remain byte-identical.
   const content=inner.replace(/^\s*<w:pPr(?:\s[^>]*)?>[\s\S]*?<\/w:pPr>/,'').trim();
