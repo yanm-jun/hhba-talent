@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {v4Provider,v4Call,v4ParseJson,v4GroundProfile,v4Sources,v4GroundScores,
  v4Match} from '../functions/_lib/simple-match-v4.js';
 import {onRequest} from '../functions/api/match-v4/[[path]].js';
+import {v4PublicJobUrl,v4ReadEmployerJob} from '../functions/_lib/v4-open-job-evidence.js';
 
 const key='TEST_ONLY_FAKE_KEY_0123456789';
 const provider=v4Provider({HHBA_AGENT_RELAY_API_KEY:key});
@@ -78,7 +79,7 @@ test('Two AI calls can finish without inventing posts when no official page is c
    {url:'https://www.zhipin.com/job_detail/invalid'}]}}]);
  };
  const r=await v4Match(fake,provider,'负责渠道运营工作，熟悉团队配合与业务跟进。','渠道运营');
- assert.equal(steps,2);
+ assert.equal(steps,3);
  assert.equal(r.status,'COMPLETE');
  assert.equal(r.matches.length,0);
  assert.match(r.disclaimer,/不编造/);
@@ -101,4 +102,58 @@ test('V4 requires explicit flag and never runs unauthenticated or cross-origin',
   body:JSON.stringify({consent:true,text:'工作经历'.repeat(30),options:{country:'CN'}})
  }),env:mock});
  assert.equal(p.status,403);
+});
+
+test('V4 does not require a fixed list of companies, paths, or titles',async()=>{
+ const url='https://careers.shancheng-motors.cn/recruitment/social/detail/2026-778?ref=careers';
+ assert.equal(v4PublicJobUrl(url),url);
+ assert.equal(v4PublicJobUrl('https://www.zhipin.com/job_detail/fake.html'),null);
+ assert.equal(v4PublicJobUrl('http://careers.shancheng-motors.cn/jobs/1'),null);
+ assert.equal(v4PublicJobUrl('https://127.0.0.1/private'),null);
+ assert.equal(v4PublicJobUrl('https://metadata.google.internal/computeMetadata/v1'),null);
+ assert.equal(v4PublicJobUrl('https://careers.shancheng-motors.cn.evil.local/jobs/2'),null);
+ const desc='<p>岗位职责</p><p>负责经销商的日常经营数据分析和业务流程指导。</p>'+
+  '<p>负责区域渠道团队业务培训和终端零售能力提升。</p>'+
+  '<p>任职要求</p><p>熟悉经销商销售管理与门店日常经营分析方法。</p>'+
+  '<p>能独立完成渠道人员培训、业务复盘与改善工作。</p>';
+ const html='<html><head><script type="application/ld+json">'+
+  JSON.stringify({'@context':'https://schema.org','@type':'JobPosting',title:'区域渠道督导',
+   hiringOrganization:{'@type':'Organization',name:'山城汽车',url:'https://careers.shancheng-motors.cn'},
+   jobLocation:{'@type':'Place',address:{addressLocality:'上海',addressCountry:'CN'}},
+   description:desc})+'</script></head><body><h1>区域渠道督导</h1></body></html>';
+ let requested='';
+ const job=await v4ReadEmployerJob(url,{fetcher:async(u,opts)=>{
+  requested=u;assert.equal(opts.redirect,'manual');assert.equal(opts.method,'GET');
+  return new Response(html,{status:200,headers:{'content-type':'text/html'}});
+ }});
+ assert.equal(requested,url);
+ assert.equal(job.company,'山城汽车');
+ assert.equal(job.title,'区域渠道督导');
+ assert.equal(job.location,'上海');
+ assert.ok(job.full_jd.includes('任职要求'));
+ assert.equal(job.source_confirmed,true);
+});
+test('V4 independently rejects imaginary, closed and unrelated organization postings',async()=>{
+ const url='https://jobs.another-motors.cn/position/11886';
+ const description='<p>岗位职责</p><p>负责汽车区域门店督导经营改善、数据监控与指导。</p>'+
+  '<p>跟进经销商团队的培训和工作复盘。</p><p>任职要求</p>'+
+  '<p>具备区域终端管理、业务培训和数据分析的经历。</p>'+
+  '<p>具备独立工作和跨团队协作能力。</p>';
+ const posting={'@type':'JobPosting',title:'区域运营管理',
+  jobLocation:{address:{addressLocality:'上海'}},
+  hiringOrganization:{name:'不相关汽车企业',url:'https://unrelated-host.cn'},
+  description};
+ const mk=j=>'<script type="application/ld+json">'+JSON.stringify(j)+'</script>';
+ const externalOrg=await v4ReadEmployerJob(url,{fetcher:async()=>new Response(mk(posting),{
+  headers:{'content-type':'text/html'}})});
+ assert.equal(externalOrg.source_confirmed,false, 'different corporate/career host requires user-facing qualification');
+ await assert.rejects(()=>v4ReadEmployerJob(url,{fetcher:async()=>new Response('岗位已下线',{
+  headers:{'content-type':'text/html'}})}),/V4_JOB_CLOSED/);
+});
+test('V4 can harvest real candidate URLs printed by relay even when citation metadata is absent',()=>{
+ const url='https://careers.shancheng-motors.cn/recruitment/social/detail/2026-778';
+ const data={output:[{type:'web_search_call',action:{sources:[]}},
+  {type:'message',content:[{type:'output_text',
+   text:'找到的官网岗位：'+url+'\nhttps://www.zhipin.com/job_detail/not-official.html'}]}]};
+ assert.deepEqual(v4Sources(data),[url]);
 });

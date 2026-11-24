@@ -142,7 +142,8 @@ test('UI shows the correct login -> upload -> history navigation and real manual
  const history=read('components/CandidateMatchHistory.tsx');
  assert.ok(home.includes("navigate(user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch')"));
   assert.ok(login.includes('?next=%2Fcandidate%2Fmatch'));
-  assert.ok(match.includes('to="/candidate/login?next=%2Fcandidate%2Fmatch"'));
+  assert.ok(match.includes('/candidate/login?next=%2Fcandidate%2Fmatch'), 'default route still directs candidate to login');
+ assert.ok(match.includes('%3Fv4%3D1'), 'opt-in V4 link survives candidate login');
  assert.match(home,/kind==='candidate'\?'\/candidate\/jobs'/);
  assert.match(login,/requested === '\/candidate\/match'/);
  assert.match(match,/uploadPrivateResume\(file,true\)/);
