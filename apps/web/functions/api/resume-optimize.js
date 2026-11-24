@@ -20,6 +20,7 @@ const quotaPepper=env=>typeof env?.HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER==='stri
  env.HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER.length>=24?
  env.HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER:env?.HHBA_MATCH_LIMIT_PEPPER;
 function active(env){
+ if(isV4(env))return typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
  return (env?.HHBA_AUTH_ROLLOUT==='preview'||env?.HHBA_MATCH_RUNTIME_MODE==='production')&&
   env?.HHBA_RESUME_OPTIMIZATION_ENABLED==='1'&&
   (isV4(env)||(typeof quotaPepper(env)==='string'&&quotaPepper(env).length>=24))&&
@@ -133,7 +134,7 @@ export async function onRequestPost({request,env}){
   const code=String(e?.message||'JD_VERSION_NOT_AVAILABLE');
   return fail(code,code==='JD_VERIFIED_VERSION_REQUIRED'||code==='JD_JOB_IDENTITY_MISMATCH'?422:409);
  }
- const hash=await sha256Hex(quotaPepper(env)+':resume-opt:'+session.phone);
+ const hash=isV4(env)?null:await sha256Hex(quotaPepper(env)+':resume-opt:'+session.phone);
  let requestId,lease;
  try{
   if(input.full_document&&!isV4(env)){
