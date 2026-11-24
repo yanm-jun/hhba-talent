@@ -61,7 +61,7 @@ export function safeHistoryJobs(matches){
    evidence_sources:(Array.isArray(item.evidence_sources)?(v4?item.evidence_sources:item.evidence_sources.slice(0,4)):[])
     .filter(s=>s&&typeof s.url==='string'&&
      (v4?!!v4PublicJobUrl(s.url):/^(?:https:\/\/)/.test(s.url)&&s.url.length<=1300)&&
-     ['EMPLOYER_PAGE_CANDIDATE','PUBLIC_ANNOUNCEMENT_CANDIDATE'].includes(s.kind))
+     (v4?['EMPLOYER_PAGE_CANDIDATE','PUBLIC_ANNOUNCEMENT_CANDIDATE','PUBLIC_SEARCH_CITATION','MODEL_REPORTED_SOURCE']:['EMPLOYER_PAGE_CANDIDATE','PUBLIC_ANNOUNCEMENT_CANDIDATE']).includes(s.kind))
     .map(s=>({url:s.url,kind:s.kind})),
    ...verifiedJdMeta(item)});
 
