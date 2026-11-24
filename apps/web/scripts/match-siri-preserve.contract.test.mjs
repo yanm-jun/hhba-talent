@@ -17,7 +17,7 @@ test('the simpler result cards preserve the original Word editor and the selecte
   '匹配分用于求职参考，不是录用概率。',
   'hhba-match-history-confirm',
   'hhba-native-list',
-  'result.matches.map((job,i)=>',
+  'displayedJobs.map((job,i)=>',
   'job.company',
   'job.title_zh||job.title',
   'job.location',
@@ -32,11 +32,12 @@ test('the simpler result cards preserve the original Word editor and the selecte
  ];
  for(const value of preserved)assert.ok(dialog.includes(value),'preserve old native result UI: '+value);
  assert.match(dialog,/className=\{'hhba-match-modal'\+\(optimizedJobUrl\?' hhba-match-modal-editor':''\)\}/);
- assert.match(dialog,/result\.matches\.find\(job=>job\.official_url===optimizedJobUrl\)/);
- assert.match(dialog,/<button type="button" disabled=\{pending\|\|!parsedProfile\|\|!job\.jd_version_id\|\|!job\.jd_sha256\}/);
+ assert.match(dialog,/displayedJobs\.find\(job=>job\.official_url===optimizedJobUrl\)/);
+ assert.match(dialog,/disabled=\{pending\|\|!parsedProfile\|\|!!preparingJd\|\|\(!MATCH_V4_PREVIEW&&\(!job\.jd_version_id\|\|!job\.jd_sha256\)\)\}/);
+ assert.match(dialog,/await prepareV4Job\(/);
  assert.doesNotMatch(dialog,/!pending&&Number\.isInteger\(job\.match_score\)&&<button/);
  assert.match(dialog,/className="hhba-native-optimize"/);
- assert.match(dialog,/> 优化简历/);
+ assert.match(dialog,/核验 JD 中…':'优化简历'/);
  assert.match(dialog,/<TargetedResumeOptimization key=\{activeJob\.id\}/);
  assert.match(dialog,/onDraftDirtyChange=\{setOptimizationDirty\}/);
  assert.match(dialog,/const matchListScroll=useRef\(0\)/);
