@@ -184,15 +184,56 @@ export async function adaptiveV4Plan(provider,system,input,signal,call=completeJ
   return {focus:[...new Set(results.flatMap(r=>Array.isArray(r.focus)?r.focus:[]))],questions:results.flatMap(r=>Array.isArray(r.questions)?r.questions:[]),recommended_order:blocks.map(b=>b.id)};
  }
 }
-export async function adaptiveV4BlockCall(provider,system,input,signal,maxTokens,field,call=completeJson){
- try{return await call(provider,system,input,signal,maxTokens)}
+export async function adaptiveV4BlockCall(provider,system,input,signal,maxTokens,field,call=completeJson,recoverSingle){
+ try{const result=await call(provider,system,input,signal,maxTokens);return recoverSingle?{[field]:result[field],questions:result.questions,recoveredChecks:[]}:result;}
  catch(e){
-  if(signal?.aborted||!['AI_PROVIDER_CONTEXT_EXCEEDED','AI_PROVIDER_RESPONSE_TRUNCATED'].includes(e?.code||e?.message)||input.blocks?.length<2)throw e;
+  if(signal?.aborted||!['AI_PROVIDER_CONTEXT_EXCEEDED','AI_PROVIDER_RESPONSE_TRUNCATED'].includes(e?.code||e?.message))throw e;
+  if(input.blocks?.length===1&&recoverSingle)return recoverSingle(input.blocks[0],e);
+  if(input.blocks?.length<2)throw e;
   const mid=Math.ceil(input.blocks.length/2);
-  const first=await adaptiveV4BlockCall(provider,system,{...input,blocks:input.blocks.slice(0,mid)},signal,maxTokens,field,call);
-  const second=await adaptiveV4BlockCall(provider,system,{...input,blocks:input.blocks.slice(mid)},signal,maxTokens,field,call);
-  return {[field]:[...(Array.isArray(first[field])?first[field]:[]),...(Array.isArray(second[field])?second[field]:[])],questions:[...(first.questions||[]),...(second.questions||[])]};
+  const first=await adaptiveV4BlockCall(provider,system,{...input,blocks:input.blocks.slice(0,mid)},signal,maxTokens,field,call,recoverSingle);
+  const second=await adaptiveV4BlockCall(provider,system,{...input,blocks:input.blocks.slice(mid)},signal,maxTokens,field,call,recoverSingle);
+  return {[field]:[...(Array.isArray(first[field])?first[field]:[]),...(Array.isArray(second[field])?second[field]:[])],questions:[...(first.questions||[]),...(second.questions||[])],recoveredChecks:[...(first.recoveredChecks||[]),...(second.recoveredChecks||[])]};
  }
+}
+// A single giant paragraph can also exceed the provider context or output
+// window. Recover only on a real capacity error; independently author and
+// review every segment, and retain the original segment on factual rejection.
+// Recovered audit metadata is constructed locally, never accepted from AI.
+export async function rewriteV4LongBlock({provider,reviewer,block,job,focus,signal,call=completeJson}){
+ const capacity=e=>['AI_PROVIDER_CONTEXT_EXCEEDED','AI_PROVIDER_RESPONSE_TRUNCATED'].includes(e?.code||e?.message);
+ async function visit(text,compactJob=false){
+  if(signal?.aborted)throw signal.reason;
+  const source=redacted(text),raw={...block,text};
+  const scopedJob=compactJob?{title:job.title,requirements:'',context_note:'完整JD已分段研究；focus 是依据原文生成的编辑重点，不是额外候选人事实。'}:job;
+  try{
+   const written=await call(provider,SYSTEM_WRITE,{job:scopedJob,focus,blocks:[{...block,text:source}]},signal,12000);
+   const rows=Array.isArray(written.rewrites)?written.rewrites.filter(x=>x?.blockId===block.id):[];
+   const row=rows.length===1?rows[0]:null;
+   const proposal=compact(row?.text);
+   const quotes=Array.isArray(row?.sourceQuotes)?row.sourceQuotes:[];
+   const questions=safeQuestions(written.questions,[block],true);
+   const problem=validateAuthoring(raw,proposal,quotes,numberTokens(text),{unbounded:true});
+   if(problem)return {text,quotes:[],rationales:[],requirements:[],questions,held:[problem]};
+   const audit=await call(reviewer,SYSTEM_AUDIT,{job:{title:job.title},blocks:[{blockId:block.id,original:source,proposed:proposal}]},signal,6500);
+   const checks=Array.isArray(audit.checks)?audit.checks.filter(x=>x?.blockId===block.id):[];
+   if(checks.length!==1||checks[0].safe!==true)return {text,quotes:[],rationales:[],requirements:[],questions,held:['AI_FACT_CHECK_REJECTED']};
+   return {text:proposal,quotes,rationales:[compact(row.rationale)],requirements:Array.isArray(row.jobRequirements)?row.jobRequirements.filter(x=>typeof x==='string'):[],questions,held:[]};
+  }catch(e){
+   if(!capacity(e)||signal?.aborted)throw e;
+   if(!compactJob&&job.requirements.length>text.length&&focus.length)return visit(text,true);
+   const pieces=splitV4ContextText(text);
+   if(!pieces)throw e;
+   const a=await visit(pieces[0],compactJob),b=await visit(pieces[1],compactJob);
+   return {text:a.text+(a.text.endsWith('\n')||b.text.startsWith('\n')?'':'\n')+b.text,quotes:[...a.quotes,...b.quotes],rationales:[...a.rationales,...b.rationales],requirements:[...a.requirements,...b.requirements],questions:[...a.questions,...b.questions],held:[...a.held,...b.held]};
+  }
+ }
+ const recovered=await visit(block.text);
+ // Cross-segment merge must still satisfy the entire original paragraph's
+ // quote and numeric checks. Preserve original if a split interrupted a fact.
+ const problem=validateAuthoring(block,recovered.text,recovered.quotes,numberTokens(block.text),{unbounded:true});
+ const safe=!problem;
+ return {rewrites:[{blockId:block.id,text:safe?recovered.text:block.text,sourceQuotes:safe?recovered.quotes:[],rationale:recovered.rationales.filter(Boolean).join('\n'),jobRequirements:[...new Set(recovered.requirements)]}],questions:recovered.questions,recoveredChecks:[{blockId:block.id,safe,concern:[...recovered.held,...(problem?[problem]:[])].join('；')}]};
 }
 export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions,signal}){
  const originalById=new Map(blocks.map(block=>[block.id,block.text]));
@@ -242,7 +283,7 @@ export async function generateTailoredResume({env,blocks,job,signal}){
  const rewritten=[],issues=[],groups=unbounded?[safeBlocks]:balancedGroups(safeBlocks);
  for(const group of groups){
   const writeInput={job:safeJob,focus:Array.isArray(plan.focus)?plan.focus.slice(0,unbounded?undefined:30):[],blocks:group};
-  const response=unbounded?await adaptiveV4BlockCall(provider,SYSTEM_WRITE,writeInput,signal,12000,'rewrites'):await completeJson(provider,SYSTEM_WRITE,writeInput,signal,12000);
+  const response=unbounded?await adaptiveV4BlockCall(provider,SYSTEM_WRITE,writeInput,signal,12000,'rewrites',completeJson,block=>rewriteV4LongBlock({provider,reviewer,block:blocks.find(b=>b.id===block.id),job:safeJob,focus:writeInput.focus,signal})):await completeJson(provider,SYSTEM_WRITE,writeInput,signal,12000);
   const writers=Array.isArray(response.rewrites)?response.rewrites:[];
   questions.push(...safeQuestions(response.questions,blocks,unbounded));
   const keyed=new Map();
@@ -251,12 +292,14 @@ export async function generateTailoredResume({env,blocks,job,signal}){
     continue;
    keyed.set(row.blockId,row);
   }
-  const reviewInput=group.map(block=>({
+  const recoveredChecks=Array.isArray(response.recoveredChecks)?response.recoveredChecks:[];
+  const recoveredIds=new Set(recoveredChecks.map(c=>c.blockId));
+  const reviewInput=group.filter(block=>!recoveredIds.has(block.id)).map(block=>({
    blockId:block.id,original:block.text,
    proposed:compact(keyed.get(block.id)?.text||'')
   }));
-  const audit=unbounded?await adaptiveV4BlockCall(reviewer,SYSTEM_AUDIT,{job:{title:safeJob.title},blocks:reviewInput},signal,6500,'checks'):await completeJson(reviewer,SYSTEM_AUDIT,{job:safeJob,blocks:reviewInput},signal,6500);
-  const checks=new Map();
+  const audit=!reviewInput.length?{checks:[]}:unbounded?await adaptiveV4BlockCall(reviewer,SYSTEM_AUDIT,{job:{title:safeJob.title},blocks:reviewInput},signal,6500,'checks'):await completeJson(reviewer,SYSTEM_AUDIT,{job:safeJob,blocks:reviewInput},signal,6500);
+  const checks=new Map(recoveredChecks.map(c=>[c.blockId,c]));
   for(const check of Array.isArray(audit.checks)?audit.checks:[]){
    if(check&&typeof check.blockId==='string'&&!checks.has(check.blockId))
     checks.set(check.blockId,check);
@@ -270,6 +313,7 @@ export async function generateTailoredResume({env,blocks,job,signal}){
    const safe=problem===null&&auditResult?.safe===true;
    const reason=problem||(!auditResult?'AUDIT_INCOMPLETE':!auditResult.safe?
     'AI_FACT_CHECK_REJECTED':null);
+   if(safe&&recoveredIds.has(block.id)&&auditResult.concern)issues.push({blockId:block.id,code:'PARTIAL_SEGMENT_RETAINED',note:auditResult.concern});
    if(!safe)issues.push({blockId:block.id,code:reason,
     note:compact(auditResult?.concern).slice(0,unbounded?undefined:350)});
    rewritten.push({

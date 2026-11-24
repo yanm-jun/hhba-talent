@@ -575,3 +575,19 @@ test('V4 PDF visual reader processes every page in sequence and exposes recovery
  await readPdfVisualPages(bytes.buffer,{loadPdfJs,createCanvas,onPage:async p=>{visited.push(p.number);assert.equal(p.localText,'page '+p.number);assert.equal((await p.tiles()).length,2);}});
  assert.deepEqual(visited,Array.from({length:18},(_,i)=>i+1));assert.deepEqual(cleaned,visited);
 });
+
+
+test('V4 rewrites and independently audits all segments of an oversized single paragraph',async()=>{
+ const {rewriteV4LongBlock}=await import('../functions/_lib/resume-rewrite-provider.js');
+ const original='甲负责销售渠道运营。\n乙负责人员培训。';
+ const block={id:'long',section:'experience',text:original};
+ const reviewed=[];
+ const call=async(_provider,_policy,input)=>{
+  const b=input.blocks[0];
+  if(b.original!==undefined){reviewed.push(b.original);return {checks:[{blockId:'long',safe:true}]};}
+  if(b.text===original)throw Object.assign(Error('AI_PROVIDER_CONTEXT_EXCEEDED'),{code:'AI_PROVIDER_CONTEXT_EXCEEDED'});
+  return {rewrites:[{blockId:'long',text:b.text.trim(),sourceQuotes:[b.text.trim()],rationale:'保留真实事实',jobRequirements:[]}],questions:[]};
+ };
+ const result=await rewriteV4LongBlock({provider,reviewer:provider,block,job:{title:'运营',requirements:'运营'},focus:[],call});
+ assert.equal(reviewed.join(''),original);assert.equal(result.rewrites[0].text,original);assert.equal(result.recoveredChecks[0].safe,true);
+});
