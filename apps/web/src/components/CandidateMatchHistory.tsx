@@ -229,7 +229,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
      </div>}
      {view==='details'&&selected.research_report&&<MatchResearchPanels key={selected.id} report={selected.research_report} jobs={(selected.research_leads||[]).map((job,i)=>toOptimizerJob(job,selected.id,i))} officialJobs={selected.matches.map((job,i)=>toOptimizerJob(job,selected.id,i))}/>}
      {selected.new_job_count>0&&<p className="hhba-match-history-new">{'相较之前已保存的记录，本次新发现 '+selected.new_job_count+' 个未推荐过的岗位。'}</p>}
-     {selected.matches.map((job,i)=>{
+     {(view==='details'&&selected.research_report?.final_target?[]:selected.matches).map((job,i)=>{
       const href=safeJobUrl(job.official_url);
       return <article key={job.official_url} className="hhba-match-history-job">
        <div className="hhba-match-history-job-top">

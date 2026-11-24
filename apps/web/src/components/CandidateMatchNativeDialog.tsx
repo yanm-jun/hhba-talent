@@ -2,7 +2,7 @@ import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEve
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,MapPin,Wallet,X,Sparkles,LoaderCircle} from 'lucide-react';
 import {CuratedJobReport} from './CuratedJobReport';
-import {MatchResearchPanels} from './MatchResearchPanels';
+import {MatchResearchPanels,matchStageIndex} from './MatchResearchPanels';
 import type {MatchResponse,MatchResearchReport,MatchedJob,NativeMatchActivity,NativeMatchProgress} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
@@ -69,6 +69,19 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  };
 
  const [viewIndex,setViewIndex]=useState(0);
+ const [manualStage,setManualStage]=useState<number|null>(null);
+ const [furthestStage,setFurthestStage]=useState(0);
+ const currentStage=matchStageIndex(progressStage);
+ useEffect(()=>{
+  if(pending&&currentStage>=0)setFurthestStage(old=>Math.max(old,currentStage));
+ },[pending,currentStage]);
+ const selectedStage=manualStage??(pending?Math.max(furthestStage,currentStage):3);
+ const showResults=selectedStage===3;
+ const selectStage=(next:number|null)=>{
+  setManualStage(next);
+  const viewport=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content');
+  if(viewport)viewport.scrollTop=0;
+ };
  const swipe=useRef<{x:number;y:number}|null>(null);
  const singleReport=result.matches.some(j=>!!j.research_detail)||!!researchReport?.final_target;
  const currentIndex=Math.min(viewIndex,Math.max(0,result.matches.length-1));
@@ -116,7 +129,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  },[]);
  function handleKey(event:KeyboardEvent<HTMLDivElement>){
   if(event.key==='Escape'){event.preventDefault();handleClose();return}
-  if(singleReport&&!optimizedJobUrl&&event.target===ref.current&&(event.key==='ArrowLeft'||event.key==='ArrowRight')){event.preventDefault();changeJob(currentIndex+(event.key==='ArrowRight'?1:-1));return;}
+  if(singleReport&&showResults&&!optimizedJobUrl&&event.target===ref.current&&(event.key==='ArrowLeft'||event.key==='ArrowRight')){event.preventDefault();changeJob(currentIndex+(event.key==='ArrowRight'?1:-1));return;}
   if(event.key!=='Tab'||!ref.current)return;
   const focusable=Array.from(ref.current.querySelectorAll<HTMLElement>(
    'button:not([disabled]),a[href],input:not([disabled]),textarea:not([disabled]),select:not([disabled])'
@@ -130,7 +143,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  return createPortal(
   <div className="hhba-match-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)handleClose()}}>
    <div className={'hhba-match-modal'+(optimizedJobUrl?' hhba-match-modal-editor':'')} role="dialog" aria-modal="true" tabIndex={-1}
-    ref={ref} onKeyDown={handleKey} aria-labelledby="hhba-native-title">
+    ref={ref} onKeyDown={handleKey} aria-label={optimizedJobUrl?'岗位专属简历优化':'岗位匹配'}>
     <header className={'hhba-match-modal-head'+(optimizedJobUrl&&sourceResume?' hhba-word-editor-head':'')}>
      {optimizedJobUrl&&sourceResume&&activeJob?
       <div className="hhba-word-editor-heading">
@@ -157,8 +170,8 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
      </div>
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobUrl?'optimization':'matches'}>
-     {!optimizedJobUrl&&<MatchResearchPanels profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches} pending={pending} progressStage={progressStage}/>}
-     {pending&&<><div className="hhba-research-now" role="status">
+     {!optimizedJobUrl&&<MatchResearchPanels profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches} pending={pending} progressStage={progressStage} activity={progressActivity} elapsed={elapsed} selection={selectedStage} onSelectionChange={selectStage} onFollow={()=>selectStage(null)} externalScore/>}
+     {pending&&selectedStage!==1&&<><div className="hhba-research-now" role="status">
       <LoaderCircle size={18} className="spin" aria-hidden="true"/>
       <div className="hhba-match-progress-copy">
        <strong id="hhba-native-title">{stageTitle[progressStage]}…</strong>
@@ -206,6 +219,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
        <a className="hhba-native-apply" href={activeJob.official_url} target="_blank" rel="noopener noreferrer"
         data-hhba-recruitment-outbound="true">前往企业官网投递 <ArrowUpRight size={15}/></a>
       </section>:<>
+     {showResults&&<>
      {!pending&&<div className="hhba-match-intro">
       <h2 id="hhba-native-title">找到 {result.matches.length} 个岗位</h2>
       <p>匹配分用于求职参考，不是录用概率。</p>
@@ -320,7 +334,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
          </ul>}
          </>}
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
-          data-hhba-recruitment-outbound="true">{job.jd_version_id&&job.jd_proof_method!=='V4_STRUCTURED_JOBPOSTING'&&job.jd_proof_method!=='V4_EMPLOYER_HTML_JOB'?'前往企业官网投递':job.platform==='第三方招聘线索'||job.recruitment_source_kind==='UNVERIFIED'?'查看招聘来源（待核验）':'查看企业招聘页面'} <ArrowUpRight size={15}/></a>
+          data-hhba-recruitment-outbound="true">{job.research_detail&&job.source_type==='站外官方招聘'?'前往企业官网投递':job.jd_version_id&&job.jd_proof_method!=='V4_STRUCTURED_JOBPOSTING'&&job.jd_proof_method!=='V4_EMPLOYER_HTML_JOB'?'前往企业官网投递':job.platform==='第三方招聘线索'||job.recruitment_source_kind==='UNVERIFIED'?'查看招聘来源（待核验）':'查看企业招聘页面'} <ArrowUpRight size={15}/></a>
         </article>
        ))}
        {singleReport&&<nav className="hhba-curated-nav hhba-curated-nav-bottom" aria-label="继续浏览岗位"><button type="button" disabled={currentIndex===0} onClick={()=>changeJob(currentIndex-1)}>‹ 上一个</button><span>左右滑动切换岗位 · {currentIndex+1}/{result.matches.length}</span><button type="button" disabled={currentIndex===result.matches.length-1} onClick={()=>changeJob(currentIndex+1)}>下一个 ›</button></nav>}
@@ -345,6 +359,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
        {!!result.profile?.target_roles?.length&&<p>搜索参考方向 · {result.profile.target_roles.join('、')}</p>}
        {onContinue&&<p>选择「继续搜索岗位」，可以换一批搜索词并继续核对招聘来源。</p>}
       </div>}
+     </>}
      {!pending&&resumeStorage?.available&&<div className="hhba-match-save-resume">
        <strong>把这份简历保存到「我的简历」</strong>
        <p>原文件仅写入你的私有简历库，方便下次复用；不会因保存而再次调用 AI 或向企业投递。</p>
@@ -356,7 +371,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       </div>}
      {!pending&&resumeStorage?.saved&&<p className="hhba-match-saved-resume">已选择账户中保存的简历，可在「我的简历」中继续管理。</p>}
      {resumeStorage?.notice&&<p className="hhba-match-saved-resume" role="status">{resumeStorage.notice}</p>}
-     {!pending&&<p className="hhba-match-disclaimer">{result.disclaimer||'招聘状态、薪资和任职要求以企业官网为准。'}</p>}
+     {!pending&&showResults&&<p className="hhba-match-disclaimer">{result.disclaimer||'招聘状态、薪资和任职要求以企业官网为准。'}</p>}
      </>}
     </div>
     <footer className="hhba-match-modal-foot">
