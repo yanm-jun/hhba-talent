@@ -112,7 +112,7 @@ function events(env,request,input){
       duration_ms:Date.now()-started}));
      // Store only result metadata, never the resume or raw model prompt.
      try{
-      const saved=await saveMatchHistory(env.HHBA_PNVS_AUTH_DB,input.phone,input.resume_id,input.role_hint,result.matches.map(job=>({...job,v4_source:true})));
+      const saved=await saveMatchHistory(env.HHBA_PNVS_AUTH_DB,input.phone,input.resume_id,input.role_hint,result.matches.map(job=>({...job,v4_source:true})),result.research_report,(result.research_leads||[]).map(job=>({...job,v4_source:true})));
       Object.assign(result,saved?{history_status:'SAVED',history_id:saved.id,new_job_count:saved.new_job_count,improved_job_count:saved.improved_job_count}:{history_status:'EMPTY'});
      }catch{result.history_status='UNAVAILABLE';console.warn('HHBA_V4_HISTORY_UNAVAILABLE');}
      if(input.taskKey){
