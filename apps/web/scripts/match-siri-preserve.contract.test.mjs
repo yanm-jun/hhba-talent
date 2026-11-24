@@ -11,38 +11,23 @@ const word=read('../src/components/OriginalWordViewer.tsx');
 const backend=read('../functions/api/resume-word.js');
 
 test('the simpler result cards preserve the original Word editor and the selected posting',()=>{
- const preserved=[
-  '岗位匹配',
-  '找到 {result.matches.length} 个岗位',
-  '匹配分用于求职参考，不是录用概率。',
-  'hhba-match-history-confirm',
-  'hhba-native-list',
-  'result.matches.map((job,i)=>',
-  'job.company',
-  'job.title_zh||job.title',
-  'job.location',
-  "job.availability_status==='OPEN_LISTED'",
-  'job.match_score',
-  'job.score_basis',
-  'job.recommendation_reason',
-  'job.official_url',
-  'data-hhba-recruitment-outbound="true"',
-  '保存到我的简历',
-  '完成查看',
- ];
- for(const value of preserved)assert.ok(dialog.includes(value),'preserve old native result UI: '+value);
+ const panels=read('../src/components/MatchResearchPanels.tsx');
+ const preserved=['岗位匹配','hhba-match-history-confirm','data-hhba-recruitment-outbound="true"','保存到我的简历','完成查看'];
+ for(const value of preserved)assert.ok(dialog.includes(value),'preserve result workflow: '+value);
+ for(const value of ['匹配分用于求职参考，不是录用概率。','job.company','job.title_zh||job.title','job.location',"jdJob.availability_status==='OPEN_LISTED'",'job.match_score','jdJob.score_basis','jdJob.recommendation_reason','job.official_url'])assert.ok(panels.includes(value),'preserve unified result information: '+value);
  assert.match(dialog,/className=\{'hhba-match-modal'\+\(optimizedJobUrl\?' hhba-match-modal-editor':''\)\}/);
- assert.match(dialog,/result\.matches\.find\(job=>job\.official_url===optimizedJobUrl\)/);
- assert.match(dialog,/<button type="button" disabled=\{pending\|\|!parsedProfile\|\|!job\.jd_version_id\|\|!job\.jd_sha256\}/);
- assert.doesNotMatch(dialog,/!pending&&Number\.isInteger\(job\.match_score\)&&<button/);
- assert.match(dialog,/className="hhba-native-optimize"/);
- assert.match(dialog,/> 优化简历/);
+ assert.match(dialog,/result\.matches\.find\(job=>job\.official_url===optimizedJobUrl\)\|\|researchJobs\.find/);
+ assert.match(panels,/<button type="button" disabled=\{pending\|\|!optimizationAvailable\|\|!jdJob\.jd_version_id\|\|!jdJob\.jd_sha256\}/);
+ assert.match(panels,/className="hhba-native-optimize"/);
+ assert.match(panels,/> 优化简历/);
+ assert.match(dialog,/onOptimize=\{optimizeJob\}/);
+ assert.match(dialog,/setSelectedJobUrl\(job\.official_url\)/);
  assert.match(dialog,/<TargetedResumeOptimization key=\{activeJob\.id\}/);
  assert.match(dialog,/onDraftDirtyChange=\{setOptimizationDirty\}/);
  assert.match(dialog,/const matchListScroll=useRef\(0\)/);
  assert.match(dialog,/viewport\.scrollTop=optimizedJobUrl\?0:matchListScroll\.current/);
  assert.match(dialog,/if\(optimizedJobUrl\)\{backToMatches\(\);return\}/);
- assert.match(dialog,/\{optimizedJobUrl\?'返回匹配结果':pending\?'取消搜索':'完成查看'\}/);
+ assert.match(dialog,/\{optimizedJobUrl\?'返回匹配结果':pending\?'最小化':'完成查看'\}/);
  assert.match(dialog,/stageTitle\[progressStage\]/);
  assert.match(dialog,/!pending&&activeJob&&parsedProfile/);
  assert.doesNotMatch(dialog,/<CandidateJourneySteps/);
@@ -93,4 +78,25 @@ test('one job = one private Word revision scope; the original file is untouched'
  assert.match(optimizer,/onVisualSuggestionAction=\{\(id,action,newText,layoutVerified\)=>/);
  assert.match(word,/hhba-word-siri-inline-actions/);
  for(const label of ['采纳','编辑','忽略'])assert.ok(word.includes('> '+label+'<'));
+});
+
+
+test('backdrop and close minimize directly; only explicit termination aborts the running task',()=>{
+ const close=dialog.slice(dialog.indexOf('function handleClose()'),dialog.indexOf('function handleKey('));
+ assert.match(close,/if\(pending\)\{minimizeSearch\(\);return\}/);
+ const minimize=close.slice(close.indexOf('function minimizeSearch()'),close.indexOf('function restoreSearch()'));
+ assert.match(minimize,/setMinimized\(true\)/);
+ assert.doesNotMatch(minimize,/onClose\(|abort\(|setConfirmTerminate\(true\)/);
+ assert.match(close,/function restoreSearch\(\)\{setMinimized\(false\);\}/);
+ assert.match(dialog,/if\(!pending\)handleClose\(\)/);
+ assert.match(dialog,/onClick=\{e=>\{if\(e.target===e.currentTarget&&pending\)minimizeSearch\(\)\}\}/);
+ assert.match(dialog,/onClick=\{\(\)=>setConfirmTerminate\(true\)\}>终止匹配/);
+ assert.match(dialog,/onClick=\{\(\)=>\{setConfirmTerminate\(false\);onClose\(\)\}\}>确认终止本次匹配/);
+ assert.match(dialog,/hidden=\{minimized\}/);
+ assert.match(dialog,/onClick=\{restoreSearch\}/);
+ assert.match(dialog,/confirmTerminate&&pending&&<dialog/);
+ assert.match(dialog,/dialog.showModal\(\)/);
+ assert.match(dialog,/if\(!pending\)setConfirmTerminate\(false\)/);
+ assert.match(page,/onClose=\{\(\)=>\{if\(working\)controller.current\?\.abort\(\)/);
+ assert.match(page,/\|\|working\|\|researchJobs\.length>0/);
 });

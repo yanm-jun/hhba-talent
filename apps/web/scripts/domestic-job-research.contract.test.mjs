@@ -164,7 +164,8 @@ test('original matching/history/Word path all use researched source evidence',()
  assert.match(route,/researchDomesticJobEvidence\(key,resume,result\.matches/);
  assert.match(route,/onProgress:progress/);
  assert.doesNotMatch(route,/score:false/);
- assert.match(dialog,/完整岗位 JD 待核验/);
- assert.match(dialog,/方向参考分/);
- assert.match(dialog,/初步匹配分/);
+ const panels=readFileSync(new globalThis.URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ assert.match(panels,/尚未取得可核验原文/);
+ assert.match(panels,/方向参考分/);
+ assert.match(panels,/初步参考分/);
 });

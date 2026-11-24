@@ -454,7 +454,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           {working?<><LoaderCircle className="spin" size={18}/> {saveBusy?'正在保存简历…':'正在匹配岗位…'}</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>
-        {working&&<p className="hhba-ai-processing" role="status">智能搜索进度与已发现岗位已在弹窗中展示。</p>}
+        {working&&<p className="hhba-ai-processing" role="status">智能研究正在进行。可通过研究窗口或右下角任务入口查看进度；收起窗口不会取消当前页面的搜索。</p>}
       </section>
       <aside className="hhba-ai-aside">
         <div className="hhba-ai-aside-card"><h3>只需三步</h3>
@@ -464,7 +464,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          <p className="hhba-ai-aside-footnote">工作地点仅限中国大陆；招聘状态请以岗位原始网页为准。</p>
       </aside>
     </div>
-    {((result||partialJobs.length>0)||working)&&<CandidateMatchNativeDialog
+    {((result||partialJobs.length>0)||working||researchJobs.length>0)&&<CandidateMatchNativeDialog
       result={result||{matches:partialJobs,profile:researchReport?.profile}}
       researchReport={result?.research_report||researchReport} researchJobs={result?.research_leads||researchJobs}
       pending={working&&!result} progressStage={stage} progressActivity={activity}

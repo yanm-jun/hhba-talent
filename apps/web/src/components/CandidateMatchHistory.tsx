@@ -66,6 +66,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
  const [chosenWordId,setChosenWordId]=useState('');
  const [wordNotice,setWordNotice]=useState('');
  const [editingJobId,setEditingJobId]=useState<string|null>(null);
+ const [selectedJobUrl,setSelectedJobUrl]=useState<string|null>(null);
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false);
  const [error,setError]=useState(''),[notice,setNotice]=useState('');
  // The history list remains in place while only the dialog scrolls.
@@ -115,6 +116,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
   if(busy)return;
   if(!modalOpen&&document.activeElement instanceof HTMLElement)openerRef.current=document.activeElement;
   const request=++openVersion.current;
+  if(selected?.id!==id)setSelectedJobUrl(null);
   if(!selected)setOpeningView(nextView);
   setBusy(true);setError('');setNotice('');setWordNotice('');setEditingJobId(null);
   setOriginal(null);setChosenWordId('');setWordFiles([]);
@@ -175,6 +177,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
   finally{setBusy(false)}
  }
  const historyJobs=selected?.matches.map((job,index)=>toOptimizerJob(job,selected.id,index))||[];
+ const historyLeads=selected?.research_leads?.map((job,index)=>toOptimizerJob(job,selected.id,selected.matches.length+index))||[];
  return <section className="hhba-account-panel hhba-match-history" aria-label="AI 匹配历史">
   <div className="hhba-account-section-heading">
    <div><h2><History size={21}/> AI 匹配历史</h2>
@@ -227,9 +230,9 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
       {original&&wordNotice&&<small role="status">{wordNotice}</small>}
       <small>已核验 JD 的历史岗位会复用对应原文版本；其他岗位仅保留当时的搜索摘要。岗位是否仍在招聘以企业官网为准，分数不代表录用概率。</small>
      </div>}
-     {view==='details'&&selected.research_report&&<MatchResearchPanels key={selected.id} report={selected.research_report} jobs={(selected.research_leads||[]).map((job,i)=>toOptimizerJob(job,selected.id,i))} officialJobs={selected.matches.map((job,i)=>toOptimizerJob(job,selected.id,i))}/>}
+     {selected.research_report&&<MatchResearchPanels key={selected.id} report={selected.research_report} jobs={historyLeads} officialJobs={historyJobs} selectedJobUrl={selectedJobUrl} onJobChange={setSelectedJobUrl} onOptimize={job=>{setSelectedJobUrl(job.official_url);if(view==='details')void open(selected.id,'optimize');else setEditingJobId(job.id)}} optimizationAvailable={!busy&&(view==='details'||!!original)}/>}
      {selected.new_job_count>0&&<p className="hhba-match-history-new">{'相较之前已保存的记录，本次新发现 '+selected.new_job_count+' 个未推荐过的岗位。'}</p>}
-     {(view==='details'&&selected.research_report?.final_target?[]:selected.matches).map((job,i)=>{
+     {(selected.research_report?[]:selected.matches).map((job,i)=>{
       const href=safeJobUrl(job.official_url);
       return <article key={job.official_url} className="hhba-match-history-job">
        <div className="hhba-match-history-job-top">
@@ -287,6 +290,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
   {active&&selected&&original&&editingJobId&&
    <CandidateMatchNativeDialog key={selected.id+':'+editingJobId}
     result={{profile:historyProfile,matches:historyJobs}}
+    researchReport={selected.research_report} researchJobs={historyLeads}
     initialOptimizedJobId={editingJobId}
     sourceResume={original} accountScope={selected.id}
     onClose={()=>setEditingJobId(null)}/>}

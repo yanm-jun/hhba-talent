@@ -196,8 +196,11 @@ test('native Top10 is in a focus-managed single dialog with reasons and direct U
  assert.match(dialog,/event\.key==='Escape'/);
  assert.match(dialog,/onMouseDown/);
  assert.match(dialog,/document\.body\.style\.overflow='hidden'/);
- assert.match(dialog,/job\.recommendation_reason/);
- assert.match(dialog,/href=\{job\.official_url\}/);
+ const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ const sources=await readFile(new URL('../src/components/RecruitmentSourceLinks.tsx',import.meta.url),'utf8');
+ assert.match(panels,/jdJob\.recommendation_reason/);
+ assert.match(panels,/<RecruitmentSourceLinks job=\{jdJob\}/);
+ assert.match(sources,/href=\{source\.url\}/);
 });
 
 test('same-version audited internal job with minimum 7 years is rejected for 3-year applicant',()=>{
