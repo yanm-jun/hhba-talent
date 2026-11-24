@@ -10,7 +10,8 @@ const BOARD_HOSTS=[
  'indeed.com','glassdoor.com','monster.com','reed.co.uk','totaljobs.com',
  'linkedin.com','ziprecruiter.com','simplyhired.com',
  // Confirmed third-party platforms found in a failed live mainland search.
- 'niuqizp.com','tzrl.com','0550.com','veryeast.cn','cadcc.com.cn','goodjob.cn'
+ 'niuqizp.com','tzrl.com','0550.com','veryeast.cn','cadcc.com.cn','goodjob.cn',
+ 'jobcn.com','job168.com','liepin.cn','job1001.com','job001.cn','job592.com','job51.com','jobsdb.com','jobstreet.com','jobleads.com','jooble.org','talent.com','careerjet.com','jobrapido.com','adzuna.com','careerbuilder.com','jobright.ai','jora.com','jobradar.com','jobbole.com'
 ];
 const ATS_HOSTS=[
  'myworkdayjobs.com','workdayjobs.com','greenhouse.io',
@@ -19,6 +20,19 @@ const ATS_HOSTS=[
  'jobvite.com','breezy.hr','teamtailor.com'
 ];
 const sameOrChild=(host,domain)=>host===domain||host.endsWith('.'+domain);
+// V4 exclusion is not the legacy whitelist/foreign-ATS policy. An employer's
+// own university recruitment or its authorized ATS can still be eligible.
+export const commercialBoardDomains=Object.freeze([...BOARD_HOSTS]);
+export function isCommercialRecruitmentBoard(raw,metadata={}){
+ let host;try{host=new URL(raw).hostname.toLowerCase().replace(/\.$/,'')}catch{return false;}
+ if(BOARD_HOSTS.some(d=>sameOrChild(host,d)))return true;
+ const category=String(metadata?.source_kind||metadata?.source_type||'').toLowerCase();
+ if(['third_party_board','commercial_job_board','job_aggregator','recruitment_marketplace','staffing_marketplace','第三方招聘平台','商业招聘平台','招聘聚合平台'].includes(category))return true;
+ // Only explicit site identity, not the job title/company name or a generic
+ // careers path: a corporate careers page must never be excluded by shape.
+ const site=String(metadata?.site_name||metadata?.source_name||'');
+ return /(?:招聘聚合平台|第三方招聘平台|商业招聘平台|求职招聘平台|招聘信息聚合|招聘信息发布平台|job aggregator|job board marketplace|third.party job board)/i.test(site);
+}
 const compact=s=>String(s||'').replace(/[\s《》【】[\]（）()·•:：—–\-_,.，。/\\]+/g,'').toLowerCase();
 const companyCore=s=>compact(s).replace(/^(?:北京市?|上海市?|深圳市?|广州市?|杭州市?|成都市?)/,'')
  .replace(/(?:股份)?(?:有限责任公司|有限公司|股份有限公司|集团公司|集团|公司)$/,'');
