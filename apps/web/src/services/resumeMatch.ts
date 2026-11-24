@@ -84,17 +84,16 @@ export type MatchResponse = {
   preview_synthetic?:boolean;
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
-const API='/api/match-next'; // Original default preserved for production and V2 compatibility.
-// V4 is an explicit opt-in trial, rather than replacing the default user journey.
+const API='/api/match-next'; // Legacy diagnostic endpoints only; the user-facing matching path is V4.
+// V4 is the normal matching engine on the approved HHBA hosts.
 const MATCH_V4_PREVIEW=typeof window!=='undefined'&&
  (window.location.hostname.endsWith('.hhba-talent.pages.dev')&&
   window.location.hostname!=='hhba-talent.pages.dev'||
   window.location.hostname==='hhba.work'||
-  window.location.hostname==='www.hhba.work')&&
- new URLSearchParams(window.location.search).get('v4')==='1';
+  window.location.hostname==='www.hhba.work');
 const EFFECTIVE_API=MATCH_V4_PREVIEW?'/api/match-v4':API;
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
-const LIMIT=3*1024*1024;
+const LIMIT=12*1024*1024;
 const errorMap:Record<string,string>={
   MATCH_NOT_ENABLED:'智能匹配服务尚未开放，请稍后再试。',
   AI_NATIVE_DEEPSEARCH_DISABLED:'原生深度搜索试用暂时关闭，请选择常规搜索。',
@@ -139,6 +138,7 @@ const errorMap:Record<string,string>={
   MATCH_GLOBAL_LIMIT:'平台今天的 AI 体验额度已用完。',
   BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。',
   AI_WEB_SEARCH_NOT_USED:'AI 本轮未执行联网搜索，未展示未核实岗位。',
+  AI_RESEARCH_COMPLETION_UNCONFIRMED:'AI 未明确完成研究，已保留已取得的结果，可继续搜索。',
   AI_RESPONSE_INVALID:'DeepSeek 返回结果格式异常，请重试。',
   AI_PROVIDER_INCOMPLETE:'DeepSeek 搜索未能完成，没有返回不完整的岗位结果。'
 };
@@ -207,7 +207,7 @@ export function redactResumeTextLocally(text:string):string{
   .replace(/(?<![0-9A-Za-z])\d{17}[0-9Xx](?![0-9A-Za-z])/g,'[身份证号已隐藏]')
   .replace(/\bhttps?:\/\/[^\s<>]{3,200}/gi,'[个人网址已隐藏]')
   .replace(/(?:微信号|微信|QQ号|QQ)\s*[:：]\s*[A-Za-z0-9_-]{5,32}/gi,'[即时通讯账号已隐藏]')
-  .trim().slice(0,20000);
+  .trim();
 }
 export function resumeFileFormat(name:string){
  return /\.(pdf|docx)$/i.exec(name)?.[1].toLowerCase()??null;
@@ -215,7 +215,7 @@ export function resumeFileFormat(name:string){
 export async function inspectResumeTextLocally(file:File,signal?:AbortSignal):Promise<{text:string;needsOcr:boolean}>{
  const format=resumeFileFormat(file.name);
  if(!format||file.size<30||file.size>LIMIT)
-  throw new MatchError(413,'请选择 3 MB 以内的 Word（DOCX）或 PDF 简历。');
+  throw new MatchError(413,'请选择 12 MB 以内的 Word（DOCX）或 PDF 简历。');
  try{
   const buffer=await file.arrayBuffer();
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
@@ -281,6 +281,7 @@ async function consumeNativeMatchStream(
  if(!response.body)throw new MatchError(502,'智能匹配连接没有返回可读取的结果。');
  const decoder=new TextDecoder(),reader=response.body.getReader();
  let buffer='',complete:MatchResponse|null=null;
+ let partialJobs:MatchedJob[]=[],finalJobs:MatchedJob[]=[];
  function parseEvent(chunk:string){
   const event=chunk.split('\n').find(line=>line.startsWith('event:'))?.slice(6).trim();
   const data=chunk.split('\n').filter(line=>line.startsWith('data:'))
@@ -304,7 +305,17 @@ async function consumeNativeMatchStream(
      pages_read:number(value.pages_read),decisions:number(value.decisions),
      search_failures:number(value.search_failures),elapsed_ms:number(value.elapsed_ms)});
    }
-  }else if(event==='partial'){
+  }else if(event==='partial_begin'){
+    partialJobs=[];
+   }else if(event==='partial_job'){
+    if(value?.job)partialJobs.push(value.job as MatchedJob);
+   }else if(event==='partial_end'){
+    onPartial?.([...partialJobs]);
+   }else if(event==='final_begin'){
+    finalJobs=[];
+   }else if(event==='final_job'){
+    if(value?.job)finalJobs.push(value.job as MatchedJob);
+   }else if(event==='partial'){
    if(Array.isArray(value?.matches)&&(MATCH_V4_PREVIEW||value.matches.length<=10))
     onPartial?.(value.matches as MatchedJob[]);
   }else if(event==='failure'){
@@ -318,7 +329,10 @@ async function consumeNativeMatchStream(
     '（'+Math.round(elapsed/1000)+'秒，阶段：'+(names[stage]||'模型处理')+'）':'';
    throw new MatchError(502,(errorMap[code]||'智能匹配服务暂时不可用。')+elapsedNote);
   }else if(event==='complete'){
-   complete=value as MatchResponse;
+   if(value?.matches_streamed===true){
+     if(finalJobs.length!==value.match_count)throw new MatchError(502,'岗位结果传输不完整，可重试。');
+     complete={...value,matches:finalJobs} as MatchResponse;
+    }else complete=value as MatchResponse;
   }
  }
  try{
@@ -326,13 +340,14 @@ async function consumeNativeMatchStream(
    const {value,done}=await reader.read();
    if(done)break;
    buffer+=decoder.decode(value,{stream:true}).replace(/\r/g,'');
-   if(buffer.length>320000)throw new MatchError(502,'结果数据异常，已停止处理。');
    let stop;
    while((stop=buffer.indexOf('\n\n'))>=0){
     const event=buffer.slice(0,stop);buffer=buffer.slice(stop+2);
     parseEvent(event);
     if(complete)return complete;
    }
+   // Bound a malformed single event, not the number of streamed jobs.
+   if(buffer.length>8000000)throw new MatchError(502,'单条结果传输异常，已停止处理。');
   }
   if(buffer.trim())parseEvent(buffer);
  }catch(e){
