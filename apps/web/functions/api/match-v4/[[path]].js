@@ -7,6 +7,7 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {v4Provider,v4Match,v4Call,v4OutputText} from '../../_lib/simple-match-v4.js';
 import {prepareV4JobForOptimization} from '../../_lib/v4-jd-bridge.js';
+import {saveV4Round,patchV4Job} from '../../_lib/v4-match-history.js';
 import {scoreVerifiedV4Job} from '../../_lib/v4-jd-score.js';
 import {validateResumeBytes,RESUME_LIMIT_BYTES} from '../../_lib/private-resume-validation.js';
 
@@ -56,6 +57,10 @@ function events(env,request,input){
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
       signal,excludeUrls:input.exclude_urls,oneRound:true,skipEnrich:true,onProgress:progress,onActivity:activity,
       onPartial:matches=>send('partial',{matches})});
+     try{
+      result.history_id=await saveV4Round(env.HHBA_PNVS_AUTH_DB,input.phone,{taskId:input.history_id,resumeId:input.resume_id,roleHint:input.role_hint,matches:result.matches,researchPending:result.research_pending});
+      result.history_status='SAVED';
+     }catch(e){result.history_status='UNAVAILABLE';console.warn('HHBA_V4_HISTORY_WRITE_FAILED',e?.name||'Error');}
      console.info('HHBA_V4_MATCH',JSON.stringify({result:'COMPLETE',
       found:result.matches.length,official:result.matched_official_jobs,
       duration_ms:Date.now()-started}));
@@ -123,12 +128,16 @@ export async function onRequest({request,env}){
   if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
   const resume=sanitize(body.text);if(!resume)return fail('INVALID_RESUME_TEXT',400);
   if(!body.job?.jd_version_id||!body.job?.jd_sha256||!body.job?.official_url)return fail('JD_VERIFIED_VERSION_REQUIRED',422);
-  try{return reply({ok:true,score:await scoreVerifiedV4Job(env,body.job,resume,{signal:request.signal})});}
+  try{const score=await scoreVerifiedV4Job(env,body.job,resume,{signal:request.signal});
+   if(body.history_id)try{await patchV4Job(db,session.phone,body.history_id,body.job.official_url,score);}catch{}
+   return reply({ok:true,score});}
   catch(e){return fail(e?.code||'V4_SCORE_UNAVAILABLE',502);}
  }
  if(suffix==='/jd'){
   if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
-  try{return reply({ok:true,job:await prepareV4JobForOptimization(env,body.official_url,{signal:request.signal,expectedTitle:typeof body.title==='string'?body.title:undefined})});}
+  try{const job=await prepareV4JobForOptimization(env,body.official_url,{signal:request.signal,expectedTitle:typeof body.title==='string'?body.title:undefined});
+   if(body.history_id)try{await patchV4Job(db,session.phone,body.history_id,body.official_url,job);}catch{}
+   return reply({ok:true,job});}
   catch(e){return fail(e?.message==='JD_ARCHIVE_DISABLED'?'JD_ARCHIVE_DISABLED':e?.message==='JD_JOB_IDENTITY_MISMATCH'?'JD_JOB_IDENTITY_MISMATCH':'JD_NOT_COMPLETE_ENOUGH',422)}
  }
  // The third-party relay is not OpenAI official infrastructure.
@@ -140,5 +149,6 @@ export async function onRequest({request,env}){
   redactForModel(body.options.role_hint,{unbounded:true}):'';
  // Do not store raw resume, query, job results, or model output in server logs.
  const exclude_urls=Array.isArray(body?.options?.exclude_urls)?body.options.exclude_urls.filter(x=>typeof x==='string'):[];
- return events(env,request,{text:resume,role_hint:role,exclude_urls});
+ const history_id=typeof body.history_id==='string'&&/^[0-9a-f-]{36}$/i.test(body.history_id)?body.history_id:crypto.randomUUID();
+ return events(env,request,{text:resume,role_hint:role,exclude_urls,history_id,phone:session.phone,resume_id:body.resume_id||null});
 }
