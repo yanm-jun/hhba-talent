@@ -1,7 +1,8 @@
 import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,MapPin,Wallet,X,Sparkles,LoaderCircle} from 'lucide-react';
-import type {MatchResponse,NativeMatchActivity,NativeMatchProgress} from '../services/resumeMatch';
+import {MatchResearchPanels} from './MatchResearchPanels';
+import type {MatchResponse,MatchResearchReport,MatchedJob,NativeMatchActivity,NativeMatchProgress} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 // Load Siri/Word only after a candidate explicitly chooses a job, so the
@@ -35,11 +36,12 @@ function matchScoreLabel(job:MatchResponse['matches'][number]):string{
 }
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
+export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'profile'|'native_search'>>;
  onClose:()=>void;onContinue?:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
  progressActivity?:NativeMatchActivity|null;
+ researchReport?:MatchResearchReport;researchJobs?:MatchedJob[];
  notice?:string;resumeStorage?:ResumeStorageAction;
  sourceText?:string;sourceResume?:PrivateResume;accountScope?:string;
  // Match-history handoff enters the same existing editor without rerunning a search.
@@ -64,12 +66,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
   writing:'整理岗位',scoring:'对照简历和岗位 JD',
   waiting:'正在匹配岗位'
  };
- const progressSteps=[
-  {label:'识别简历',stages:['preparing','parsing']},
-  {label:'搜索企业岗位',stages:['connected','planning','searching']},
-  {label:'核验岗位 JD',stages:['reading','researching']},
-  {label:'对照简历评分',stages:['writing','scoring']}
- ];
+
  const matchListScroll=useRef(0);
  const activeJob=result.matches.find(job=>job.official_url===optimizedJobUrl);
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
@@ -147,10 +144,8 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
      </div>
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobUrl?'optimization':'matches'}>
-     {pending&&<><ol className="hhba-match-progress-steps" aria-label="匹配进度">
-      {progressSteps.map(step=><li key={step.label}
-       aria-current={step.stages.includes(progressStage)?'step':undefined}>{step.label}</li>)}
-     </ol><div className="hhba-research-now" role="status">
+     {!optimizedJobUrl&&<MatchResearchPanels profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches} pending={pending} progressStage={progressStage}/>}
+     {pending&&<><div className="hhba-research-now" role="status">
       <LoaderCircle size={18} className="spin" aria-hidden="true"/>
       <div className="hhba-match-progress-copy">
        <strong id="hhba-native-title">{stageTitle[progressStage]}…</strong>
@@ -158,7 +153,8 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
        {progressActivity?.searches!==undefined&&<span>
         已执行 {progressActivity.searches} 次检索 · 发现 {progressActivity.candidate_links??0} 条企业岗位线索 · 已阅读 {progressActivity.pages_read??0} 份岗位资料
        </span>}
-       {result.matches.length>0&&<span>已找到 {result.matches.length} 个岗位</span>}
+       {researchReport&&<span>已发现 {researchReport.discovered} 条候选招聘来源 · 已排除 {researchReport.excluded_count} 条商业平台链接</span>}
+       {result.matches.length>0&&<span>已找到 {result.matches.length} 个岗位（官方来源已核验）</span>}
       </div>
       <span className="hhba-match-progress-time" aria-hidden="true">已用时 {elapsed} 秒</span>
      </div></>}

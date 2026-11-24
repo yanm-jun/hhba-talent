@@ -3,6 +3,7 @@
 import {htmlToText,extractOfficialJdSections} from './official-job-evidence.js';
 import {findMainlandCity} from './mainland-job-location.js';
 import {sha256Hex} from './real-auth.js';
+import {isCommercialRecruitmentBoard} from './match-employer-source.js';
 const LOCAL=/(?:^|\.)(?:localhost|local|internal|test|invalid|example|onion|nip\.io|sslip\.io|localtest\.me)$/i;
 const CLOSED=/(?:职位已关闭|岗位已下线|停止招聘|不再接受申请|职位已过期|招聘已结束|position (?:closed|expired)|job (?:closed|expired))/i;
 const GENERIC=/^(?:招聘|岗位详情|职位详情|职业机会|人才招聘|职位|招聘信息|job details|jobs|careers|recruitment|job opening)$/i;
@@ -99,9 +100,34 @@ async function limitedRead(r){
  for(const chunk of chunks){bytes.set(chunk,i);i+=chunk.length}
  return new TextDecoder().decode(bytes);
 }
+// An independently opened employer page may authorize a separate recruitment
+// host. Require the actual link and employer identity on the referring page,
+// never trust an ATS hostname or the model's assertion on its own.
+export async function v4EmployerAuthorization(jobUrl,company,proofUrl,{fetcher=fetch,signal}={}){
+ const proof=v4PublicJobUrl(proofUrl),target=v4PublicJobUrl(jobUrl);
+ if(!proof||!target||proof===target||isCommercialRecruitmentBoard(proof)||isCommercialRecruitmentBoard(target)||!company)return false;
+ try{
+  const r=await fetcher(proof,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,text/plain;q=0.9'},signal});
+  const html=await limitedRead(r);
+  const site=meta(html,'property','og:site_name')||meta(html,'name','application-name');
+  if(isCommercialRecruitmentBoard(proof,{site_name:site}))return false;
+  const normalize=v=>String(v||'').normalize('NFKC').replace(/[^\p{L}\p{N}]/gu,'').toLowerCase();
+  const identity=normalize(company);
+  // Page-level corporate identity, not an incidental company name in a job list.
+  const labels=[site,meta(html,'name','author'),tag(html,'title')].map(normalize);
+  if(identity.length<2||!labels.some(v=>v.includes(identity)))return false;
+  for(const a of html.matchAll(/<a\b[^>]*\bhref\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>/gi)){
+   const href=(a[1]||a[2]).replace(/&amp;/gi,'&');
+   let resolved;try{resolved=v4PublicJobUrl(new URL(href,proof).href)}catch{continue}
+   if(resolved===target)return true;
+  }
+  return false;
+ }catch(e){if(signal?.aborted)throw e;return false;}
+}
 export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()}={}){
  const canonical=v4PublicJobUrl(url);
  if(!canonical)throw Error('V4_UNSAFE_URL');
+ if(isCommercialRecruitmentBoard(canonical))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
  // The first read uses a normal deadline; a slower or interrupted read
  // gets a second attempt without a separate HHBA wall-clock deadline.
  // Keep the public-HTTPS and response-size checks; never follow redirects blindly.
@@ -118,6 +144,8 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
    if(signal?.aborted||retry||(!['AbortError','TimeoutError','TypeError'].includes(e?.name)&&e?.message!=='V4_TRANSIENT_PAGE_ERROR'))throw e;
   }
  }
+ const siteName=meta(html,'property','og:site_name')||meta(html,'name','application-name');
+ if(isCommercialRecruitmentBoard(canonical,{site_name:siteName}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
  const plain=htmlToText(html,{maxChars:Infinity});
  if(CLOSED.test(plain.slice(0,12000)))throw Error('V4_JOB_CLOSED');
  for(const j of postings(html)){

@@ -1,3 +1,4 @@
+import {MatchResearchPanels} from './MatchResearchPanels';
 import {useEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowRight,BriefcaseBusiness,Clock3,FileText,History,LoaderCircle,Search,Sparkles,Trash2,X} from 'lucide-react';
@@ -30,7 +31,7 @@ function toOptimizerJob(job:HistoryMatchedJob,historyId:string,index:number):Mat
  return {
   id:historyJobId(historyId,index),company:job.company,title:job.title,title_zh:job.title,
   location:job.location,official_url:job.official_url,
-  platform:job.recruitment_source_kind||'UNVERIFIED',source:'MATCH_HISTORY',remote:false,
+  platform:job.recruitment_source_kind||'UNVERIFIED',source:'MATCH_HISTORY',remote:false,source_type:job.source_type,score_evidence_status:job.score_evidence_status,
   reference_score:job.match_score??0,match_score:job.match_score,
   matched:job.matched||[],not_evidenced:job.not_evidenced||[],needs_verification:[],salary:job.salary,
   // These are the *saved* reasons, not a freshly fetched job description.
@@ -226,6 +227,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
       {original&&wordNotice&&<small role="status">{wordNotice}</small>}
       <small>已核验 JD 的历史岗位会复用对应原文版本；其他岗位仅保留当时的搜索摘要。岗位是否仍在招聘以企业官网为准，分数不代表录用概率。</small>
      </div>}
+     {view==='details'&&selected.research_report&&<MatchResearchPanels key={selected.id} report={selected.research_report} jobs={(selected.research_leads||[]).map((job,i)=>toOptimizerJob(job,selected.id,i))} officialJobs={selected.matches.map((job,i)=>toOptimizerJob(job,selected.id,i))}/>}
      {selected.new_job_count>0&&<p className="hhba-match-history-new">{'相较之前已保存的记录，本次新发现 '+selected.new_job_count+' 个未推荐过的岗位。'}</p>}
      {selected.matches.map((job,i)=>{
       const href=safeJobUrl(job.official_url);

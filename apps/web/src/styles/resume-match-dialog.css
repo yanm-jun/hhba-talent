@@ -341,3 +341,25 @@
 .hhba-native-comparisons{list-style:none;margin:12px 0;padding:0;display:grid;gap:8px}
 .hhba-native-comparisons li{padding:8px 10px;background:#f5f8fc;border-radius:8px;overflow-wrap:anywhere}
 .hhba-native-comparisons li div{margin-top:3px}
+
+/* Research result windows: keep the existing modal and the current-step rail. */
+.hhba-match-progress-steps li{padding:0;min-width:0}
+.hhba-stage-tab{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;height:100%;background:transparent;color:inherit;border:0;border-radius:7px;padding:9px 10px;font:inherit;text-align:left;cursor:pointer}
+.hhba-stage-tab span{opacity:.65;flex:none}
+.hhba-stage-tab:hover,.hhba-stage-tab[aria-expanded=true]{background:#eaf3ff;color:#114f9e}
+.hhba-stage-tab:focus-visible{outline:2px solid #347ad5;outline-offset:2px}
+.hhba-stage-report{border:1px solid #dce7f4;border-radius:11px;padding:16px;margin:0 0 12px;font-size:13px;line-height:1.75;color:#31506f;background:#fff;overflow-wrap:anywhere}
+.hhba-stage-report header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;color:#193d68}
+.hhba-stage-report header button{border:0;background:transparent;color:#2364ae;font-size:12px;cursor:pointer}
+.hhba-stage-report h4{font-size:13px;margin:12px 0 6px;color:#183b65}
+.hhba-stage-report p{white-space:pre-wrap;margin:5px 0}
+.hhba-stage-report ul{padding-left:20px;margin:7px 0}
+.hhba-stage-tags,.hhba-stage-stats{display:flex;flex-wrap:wrap;gap:7px}
+.hhba-stage-tags span,.hhba-stage-stats span{background:#f1f6fc;border-radius:6px;padding:4px 8px}
+.hhba-stage-report details{border-top:1px solid #e8eef6;padding:8px 0}
+.hhba-stage-report summary{cursor:pointer;color:#234b7b;font-weight:600}
+.hhba-stage-report .hhba-stage-jobs{list-style:none;padding:0}
+.hhba-stage-jobs>li{border-bottom:1px solid #e8eef6;padding:9px 0}
+.hhba-stage-report a{color:#1764b4;overflow-wrap:anywhere}
+.hhba-stage-empty{color:#68809b}
+@media(max-width:640px){.hhba-match-progress-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.hhba-stage-report{padding:12px}.hhba-stage-tab{padding:8px}}

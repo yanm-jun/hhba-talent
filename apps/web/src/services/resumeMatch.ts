@@ -7,7 +7,7 @@ export type MatchProfile = {
   education:string|null;education_evidence:string|null;
   experience_years:number|null;experience_evidence:string|null;
   skills:{name:string;evidence:string}[];target_roles:string[];
-  professional_credentials?:string[];warnings:string[];
+  professional_credentials?:string[];warnings:string[];summary?:string;
   facts?:{id:string;kind:'work'|'project'|'skill'|'education'|'credential';quote:string}[];
 };
 export type MatchedJob = {
@@ -44,8 +44,10 @@ export type MatchedJob = {
   evidence_quality?:{skills:string;experience:string;education:string};
   ranking_version?:'HHBA_MATCH_RANKING_V2';
 };
+export type MatchResearchReport={profile:MatchProfile;rounds:{round:number;queries:string[];cited_count:number;candidates:number;added:number;excluded_count:number}[];excluded_count:number;discovered:number};
 export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
+  research_report?:MatchResearchReport;research_leads?:MatchedJob[];
   matched_official_jobs:number;source:string;scoring:string;privacy:string;disclaimer:string;
   native_search?:{model:string;searches:number;page_reads:number;provider_items:number;visible_jobs:number;discarded:number;elapsed_ms:number;
    candidate_links?:number;explicit_city_sources?:number;selection_rounds?:number;
@@ -293,12 +295,14 @@ async function matchTaskReference(text:string,opts:MatchOptions,resumeId?:string
 async function consumeNativeMatchStream(
  response:Response,onProgress?:(stage:NativeMatchProgress)=>void,
  onPartial?:(jobs:MatchedJob[])=>void,
- onActivity?:(activity:NativeMatchActivity)=>void,onReceive?:()=>void
+ onActivity?:(activity:NativeMatchActivity)=>void,onReceive?:()=>void,
+ onResearch?:(report:MatchResearchReport)=>void,onResearchJobs?:(jobs:MatchedJob[])=>void
 ):Promise<MatchStreamResponse>{
  if(!response.body)throw new MatchError(502,'智能匹配连接没有返回可读取的结果。');
  const decoder=new TextDecoder(),reader=response.body.getReader();
  let buffer='',complete:MatchStreamResponse|null=null;
- let partialJobs:MatchedJob[]=[],finalJobs:MatchedJob[]=[];
+ let partialJobs:MatchedJob[]=[],finalJobs:MatchedJob[]=[],researchJobs:MatchedJob[]=[];
+ let researchReport:MatchResearchReport|undefined;
  function parseEvent(chunk:string){
   const event=chunk.split('\n').find(line=>line.startsWith('event:'))?.slice(6).trim();
   const data=chunk.split('\n').filter(line=>line.startsWith('data:'))
@@ -322,6 +326,14 @@ async function consumeNativeMatchStream(
      pages_read:number(value.pages_read),decisions:number(value.decisions),
      search_failures:number(value.search_failures),elapsed_ms:number(value.elapsed_ms)});
    }
+  }else if(event==='research_report'){
+   if(value?.profile&&Array.isArray(value.rounds)){researchReport=value as MatchResearchReport;onResearch?.(researchReport);}
+  }else if(event==='research_begin'){
+   researchJobs=[];
+  }else if(event==='research_job'){
+   if(value?.job)researchJobs.push(value.job as MatchedJob);
+  }else if(event==='research_end'){
+   onResearchJobs?.([...researchJobs]);
   }else if(event==='partial_begin'){
     partialJobs=[];
    }else if(event==='partial_job'){
@@ -348,7 +360,8 @@ async function consumeNativeMatchStream(
   }else if(event==='complete'){
    if(value?.matches_streamed===true){
      if(finalJobs.length!==value.match_count)throw new MatchError(502,'岗位结果传输不完整，可重试。');
-     complete={...value,matches:finalJobs} as MatchResponse;
+     if(value.research_leads_streamed===true&&researchJobs.length!==value.research_lead_count)throw new MatchError(502,'研究报告传输不完整，可重试。');
+     complete={...value,matches:finalJobs,...(value.research_leads_streamed?{research_leads:researchJobs}:{}),research_report:value.research_report||researchReport} as MatchResponse;
     }else complete=value as MatchStreamResponse;
   }
  }
@@ -421,7 +434,8 @@ export async function submitExtractedResumeText(
  text:string,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string,
  onProgress?:(stage:NativeMatchProgress)=>void,
  onPartial?:(jobs:MatchedJob[])=>void,
- onActivity?:(activity:NativeMatchActivity)=>void
+ onActivity?:(activity:NativeMatchActivity)=>void,
+ onResearch?:(report:MatchResearchReport)=>void,onResearchJobs?:(jobs:MatchedJob[])=>void
 ):Promise<MatchResponse>{
  if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
  const token=session();
@@ -462,7 +476,7 @@ export async function submitExtractedResumeText(
   onReceive();
   const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
   if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。');
-  const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,onReceive):
+  const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,onReceive,onResearch,onResearchJobs):
    await response.json().catch(()=>({})) as (Partial<MatchResponse>|MatchContinuation)&{error?:string};
   if(!response.ok){
    const code=(data as {error?:string}).error||'';
@@ -479,6 +493,8 @@ export async function submitExtractedResumeText(
    (!MATCH_V4_PREVIEW&&data.matches.length>10))
    throw new MatchError(502,errorMap.BAD_RESPONSE);
   task?.clear();
+  if(data.research_report)onResearch?.(data.research_report);
+  if(data.research_leads)onResearchJobs?.(data.research_leads);
   return data as MatchResponse;
   }
  }catch(error){

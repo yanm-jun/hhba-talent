@@ -7,7 +7,7 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
+import {matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchResearchReport,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -47,6 +47,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10});
  const [working,setWorking]=useState(false);
  const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
+ const [researchReport,setResearchReport]=useState<MatchResearchReport>();
+ const [researchJobs,setResearchJobs]=useState<MatchedJob[]>([]);
  const [stage,setStage]=useState<NativeMatchProgress>('preparing');
  const [activity,setActivity]=useState<NativeMatchActivity|null>(null);
  const progress=(next:NativeMatchProgress)=>setStage(previous=>next==='waiting'?previous:next);
@@ -98,7 +100,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   previewController.current?.abort();
   setPreviewText('');setPreviewLoaded(false);setPreviewError('');setConsent(false);
   setOcrFile(null);setOcrBusy(false);setPreviewNote('');
-  setSavedId(id);setFile(null);setResult(null);setPartialJobs([]);setOptimizationSource('');
+  setSavedId(id);setFile(null);setResult(null);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);setOptimizationSource('');
   setError('');setSaveConsent(false);setSaveNotice('');
   setStorageChoice('undecided');setSavedPickerOpen(false);
   const entry=savedFiles.find(item=>item.id===id);
@@ -110,7 +112,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   setSavedPickerOpen(false);
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setPreviewError('');setConsent(false);
   setOcrFile(null);setOcrBusy(false);setPreviewNote('');
-  setError('');setResult(null);setPartialJobs([]);setOptimizationSource('');setSaveConsent(false);setSaveNotice('');
+  setError('');setResult(null);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);setOptimizationSource('');setSaveConsent(false);setSaveNotice('');
   setSavedId('');
   setStorageChoice('undecided');
   if(!candidate){setFile(null);return}
@@ -190,7 +192,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   if((!file&&!savedId)||!consent||working||saveBusy||controller.current||previewBusy||ocrBusy||!previewLoaded||
    identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()||
    (file&&!savedId&&storageChoice==='undecided'))return;
-  setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);
+  setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
   const abort=new AbortController();
   controller.current=abort;
   try{
@@ -219,7 +221,9 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    const matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,matchResumeId||undefined,
     stage=>{if(!abort.signal.aborted)progress(stage);},
     jobs=>{if(!abort.signal.aborted)setPartialJobs(jobs);},
-    detail=>{if(!abort.signal.aborted)setActivity(detail);});
+    detail=>{if(!abort.signal.aborted)setActivity(detail);},
+    report=>{if(!abort.signal.aborted)setResearchReport(report);},
+    jobs=>{if(!abort.signal.aborted)setResearchJobs(jobs);});
    if(abort.signal.aborted)return;
    setOptimizationSource(redactResumeTextLocally(previewText));
    lastSearch.current={text:previewText,options,resumeId:matchResumeId||undefined};
@@ -244,7 +248,9 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     exclude_urls:previous.matches.map(job=>job.official_url)},true,abort.signal,search.resumeId,
     stage=>{if(!abort.signal.aborted)progress(stage);},
     jobs=>{if(!abort.signal.aborted){collected=combine(jobs);setPartialJobs(collected);}},
-    detail=>{if(!abort.signal.aborted)setActivity(detail);});
+    detail=>{if(!abort.signal.aborted)setActivity(detail);},
+    report=>{if(!abort.signal.aborted)setResearchReport(report);},
+    jobs=>{if(!abort.signal.aborted)setResearchJobs(jobs);});
    if(abort.signal.aborted)return;
    setResult({...next,matches:combine(next.matches)});
    setPartialJobs([]);
@@ -436,7 +442,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 使用我的简历信息进行智能岗位匹配；并同意本次将脱敏后的简历文字发送至第三方 AI 中转服务，原文件不随之发送。为保障连续研究，服务可能短期加密保存研究中间状态与结果（不含原始简历文件），临时对象按24小时清理规则处理。若断网或关闭网页，可在23小时内用同一账号、相同简历及求职意向再次匹配，恢复最近保存的阶段。</span>
+          <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 使用我的简历信息进行智能岗位匹配；并同意本次将脱敏后的简历文字发送至第三方 AI 中转服务，原文件不随之发送。为保障连续研究，服务可能短期加密保存研究中间状态与结果（不含原始简历文件），临时对象按24小时清理规则处理。若断网或关闭网页，可在23小时内用同一账号、相同简历及求职意向再次匹配，恢复最近保存的阶段。匹配历史保留分析结论、招聘研究成果与评分，不保存简历原文引文。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
@@ -458,7 +464,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
       </aside>
     </div>
     {((result||partialJobs.length>0)||working)&&<CandidateMatchNativeDialog
-      result={result||{matches:partialJobs}}
+      result={result||{matches:partialJobs,profile:researchReport?.profile}}
+      researchReport={result?.research_report||researchReport} researchJobs={result?.research_leads||researchJobs}
       pending={working&&!result} progressStage={stage} progressActivity={activity}
       onContinue={result?.can_continue?()=>void continueSearch():undefined}
       notice={working?'':error}
@@ -470,7 +477,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
         notice:saveNotice,onConsent:setSaveConsent,onSave:()=>void saveResume()
        }:result&&savedId?{available:false,saved:true,consent:false,saving:false,
         notice:saveNotice,onConsent:()=>{},onSave:()=>{}}:undefined}
-      onClose={()=>{if(working)controller.current?.abort();setPartialJobs([]);setResult(null);setWorking(false);}}/>}
+      onClose={()=>{if(working)controller.current?.abort();setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);setResult(null);setWorking(false);}}/>}
      <div className="hhba-ai-footer"><Link to="/candidate/jobs">不上传简历，直接搜索公开岗位 <ArrowRight size={15}/></Link></div>
   </section>
  </Shell>;
