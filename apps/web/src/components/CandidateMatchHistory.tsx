@@ -31,7 +31,7 @@ function toOptimizerJob(job:HistoryMatchedJob,historyId:string,index:number):Mat
  return {
   id:historyJobId(historyId,index),company:job.company,title:job.title,title_zh:job.title,
   location:job.location,official_url:job.official_url,
-  platform:job.recruitment_source_kind||'UNVERIFIED',source:'MATCH_HISTORY',remote:false,source_type:job.source_type,score_evidence_status:job.score_evidence_status,research_detail:job.research_detail,jd_research:job.jd_research,checked_at:job.checked_at,
+  platform:job.recruitment_source_kind||'UNVERIFIED',source:'MATCH_HISTORY',remote:false,source_type:job.source_type,score_evidence_status:job.score_evidence_status,research_detail:job.research_detail,jd_research:job.jd_research,checked_at:job.checked_at,evidence_score_status:job.evidence_score_status,
   reference_score:job.match_score??0,match_score:job.match_score,
   matched:job.matched||[],not_evidenced:job.not_evidenced||[],needs_verification:[],salary:job.salary,
   // These are the *saved* reasons, not a freshly fetched job description.
