@@ -11,32 +11,17 @@ const word=read('../src/components/OriginalWordViewer.tsx');
 const backend=read('../functions/api/resume-word.js');
 
 test('the simpler result cards preserve the original Word editor and the selected posting',()=>{
- const preserved=[
-  '岗位匹配',
-  '找到 {result.matches.length} 个岗位',
-  '匹配分用于求职参考，不是录用概率。',
-  'hhba-match-history-confirm',
-  'hhba-native-list',
-  'result.matches.map((job,i)=>',
-  'job.company',
-  'job.title_zh||job.title',
-  'job.location',
-  "job.availability_status==='OPEN_LISTED'",
-  'job.match_score',
-  'job.score_basis',
-  'job.recommendation_reason',
-  'job.official_url',
-  'data-hhba-recruitment-outbound="true"',
-  '保存到我的简历',
-  '完成查看',
- ];
- for(const value of preserved)assert.ok(dialog.includes(value),'preserve old native result UI: '+value);
+ const panels=read('../src/components/MatchResearchPanels.tsx');
+ const preserved=['岗位匹配','hhba-match-history-confirm','data-hhba-recruitment-outbound="true"','保存到我的简历','完成查看'];
+ for(const value of preserved)assert.ok(dialog.includes(value),'preserve result workflow: '+value);
+ for(const value of ['匹配分用于求职参考，不是录用概率。','job.company','job.title_zh||job.title','job.location',"jdJob.availability_status==='OPEN_LISTED'",'job.match_score','jdJob.score_basis','jdJob.recommendation_reason','job.official_url'])assert.ok(panels.includes(value),'preserve unified result information: '+value);
  assert.match(dialog,/className=\{'hhba-match-modal'\+\(optimizedJobUrl\?' hhba-match-modal-editor':''\)\}/);
- assert.match(dialog,/result\.matches\.find\(job=>job\.official_url===optimizedJobUrl\)/);
- assert.match(dialog,/<button type="button" disabled=\{pending\|\|!parsedProfile\|\|!job\.jd_version_id\|\|!job\.jd_sha256\}/);
- assert.doesNotMatch(dialog,/!pending&&Number\.isInteger\(job\.match_score\)&&<button/);
- assert.match(dialog,/className="hhba-native-optimize"/);
- assert.match(dialog,/> 优化简历/);
+ assert.match(dialog,/result\.matches\.find\(job=>job\.official_url===optimizedJobUrl\)\|\|researchJobs\.find/);
+ assert.match(panels,/<button type="button" disabled=\{pending\|\|!optimizationAvailable\|\|!jdJob\.jd_version_id\|\|!jdJob\.jd_sha256\}/);
+ assert.match(panels,/className="hhba-native-optimize"/);
+ assert.match(panels,/> 优化简历/);
+ assert.match(dialog,/onOptimize=\{optimizeJob\}/);
+ assert.match(dialog,/setSelectedJobUrl\(job\.official_url\)/);
  assert.match(dialog,/<TargetedResumeOptimization key=\{activeJob\.id\}/);
  assert.match(dialog,/onDraftDirtyChange=\{setOptimizationDirty\}/);
  assert.match(dialog,/const matchListScroll=useRef\(0\)/);
