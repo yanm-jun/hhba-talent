@@ -1,3 +1,4 @@
+import {v4Provider,v4Call,v4OutputText} from './simple-match-v4.js';
 /**
  * Server-only AI provider routing. Never expose credentials to the browser.
  * Keep provider model names configurable; vendors change model availability.
@@ -15,6 +16,11 @@ export const PROVIDERS = Object.freeze({
 const allowedKeys=new Set(Object.keys(PROVIDERS));
 const clip=(value,max=20000)=>String(value||'').slice(0,max);
 export function selectProvider(env,task='resume_optimization',{reasoning=false}={}){
+ if(env?.HHBA_MATCH_V4_READY==='1'){
+  const relay=v4Provider(env);
+  if(!relay)throw new Error('AI_PROVIDER_NOT_CONFIGURED');
+  return {...relay,name:'openai-relay',protocol:'responses'};
+ }
  const requested=clip(env?.['HHBA_AI_'+task.toUpperCase()+'_PROVIDER']||env?.HHBA_AI_DEFAULT_PROVIDER||'deepseek',30).toLowerCase();
  if(!allowedKeys.has(requested))throw new Error('AI_PROVIDER_UNSUPPORTED');
  const prefix='HHBA_AI_'+requested.toUpperCase()+'_';
@@ -47,7 +53,7 @@ export function parseSuggestions(raw,allowedBlockIds){
   modify:'replace',improve:'replace',add:'append',supplement:'append',
   ask_user:'request_evidence',request_details:'request_evidence'};
  const asText=value=>typeof value==='string'?value.trim():'';
- for(const [index,s] of list.slice(0,12).entries()){
+ for(const [index,s] of list.entries()){
   if(!s||typeof s!=='object'||Array.isArray(s))continue;
   const namedId=asText(s.blockId)||asText(s.block_id)||asText(s.targetBlockId)||asText(s.target_block_id);
   const blockId=allowed.has(namedId)?namedId:(!namedId&&allowed.size===1?[...allowed][0]:'');
@@ -90,6 +96,12 @@ export async function generateSuggestions({env,blocks,job,signal,documentContext
   ...(documentContext?{document_context:documentContext}:{}),
   output_format_example:sample,
   instructions:'严格输出符合示例字段名的JSON对象，不要复制示例建议内容；blockId必须是blocks中的id；一份段落至多一条建议。完整简历上下文用于理解结构，不能把其他段落里的经历、数字或资格写进当前段落。'});
+ let output;
+ if(provider.protocol==='responses'){
+  const reply=await v4Call(fetch,provider,{instructions:system,input},{signal});
+  if(reply.status!=='completed')throw new Error('AI_PROVIDER_RESPONSE_TRUNCATED');
+  output=v4OutputText(reply);
+ }else{
  let url,headers,body;
  if(provider.protocol==='anthropic'){
   url=provider.baseUrl+'/messages';
@@ -128,8 +140,9 @@ export async function generateSuggestions({env,blocks,job,signal,documentContext
  }
  let data;
  try{data=await response.json();}catch{throw new Error('AI_PROVIDER_RESPONSE_HTTP_INVALID');}
- const output=provider.protocol==='anthropic'?data?.content?.filter(x=>x.type==='text').map(x=>x.text).join(''):data?.choices?.[0]?.message?.content;
+ output=provider.protocol==='anthropic'?data?.content?.filter(x=>x.type==='text').map(x=>x.text).join(''):data?.choices?.[0]?.message?.content;
  if(data?.choices?.[0]?.finish_reason==='length')throw new Error('AI_PROVIDER_RESPONSE_TRUNCATED');
+ }
  if(typeof output!=='string'||!output.trim())throw new Error('AI_PROVIDER_RESPONSE_EMPTY');
  let parsed;
  try{parsed=JSON.parse(output.replace(/^\s*```(?:json)?\s*|\s*```\s*$/g,''));}
