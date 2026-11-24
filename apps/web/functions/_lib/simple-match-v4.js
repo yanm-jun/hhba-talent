@@ -7,7 +7,7 @@
 import {v4PublicJobUrl,v4ReadEmployerJob} from './v4-open-job-evidence.js';
 import {directOfficialJobEvidence} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
-import {recruitmentSourceKind} from './match-employer-source.js';
+import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 
 const BASE='https://api-c.reqtoken.com/v1';
@@ -196,14 +196,16 @@ async function toJson(fetcher,provider,response,{signal}={}){
  }
 }
 function sourceKind(url){
- return recruitmentSourceKind(url)==='THIRD_PARTY_BOARD'?'THIRD_PARTY_BOARD':'EMPLOYER_DOMAIN_CANDIDATE';
+ return isCommercialRecruitmentBoard(url)?'THIRD_PARTY_BOARD':recruitmentSourceKind(url)==='EMPLOYER_ATS'?'EMPLOYER_ATS':'EMPLOYER_DOMAIN_CANDIDATE';
 }
 async function checkJob(fetcher,url,signal){
+ if(isCommercialRecruitmentBoard(url))return null;
  // Open research first, including unfamiliar employers. Known employer API
  // adapters are a fallback for JS shells, never the primary search scope.
  try{return await v4ReadEmployerJob(url,{fetcher,signal})}
- catch{
+ catch(e){
   if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
+  if(e?.message==='V4_COMMERCIAL_BOARD_EXCLUDED')return {excluded_board:true};
   try{return await directOfficialJobEvidence(url,{fetcher,signal,full:true})}
   catch{return null}
  }
@@ -218,7 +220,7 @@ async function enrich(fetcher,rows,{signal,onActivity=()=>{}}={}){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    const url=urls[next++];
    const checked=await checkJob(fetcher,url,signal);
-   if(checked)read++;
+   if(checked&&!checked.excluded_board)read++;
    results.set(url,checked);
   }
  };
@@ -238,7 +240,7 @@ function renderJob(x,url,verified,resume,toolLinked,index,toolUrls=new Set()){
  const n=Number(rawScore),numbered=rawScore!==null&&rawScore!==undefined&&
   rawScore!==''&&Number.isInteger(n)&&n>=0&&n<=100;
  const score=numbered&&resumeGrounded?n:null;
- const confirmed=String(verified?.proof_method||'').startsWith('DIRECT_EMPLOYER');
+ const confirmed=String(verified?.proof_method||'').startsWith('DIRECT_EMPLOYER')||verified?.source_confirmed===true;
  const independentlyRead=source!=='THIRD_PARTY_BOARD'&&(confirmed||verified?.source_confirmed===true||verified?.independently_read===true);
  const full=Boolean(verified?.full_jd);
  const status=full?(independentlyRead?'VERIFIED_FULL_JD':'PARTIAL_SOURCE'):'SEARCH_SNIPPET_ONLY';
@@ -252,7 +254,7 @@ function renderJob(x,url,verified,resume,toolLinked,index,toolUrls=new Set()){
   official_url:url,platform:source==='THIRD_PARTY_BOARD'?'第三方招聘线索':
     confirmed?'企业官方招聘':'招聘来源（企业官网待核实）',
   recruitment_source_kind:source==='THIRD_PARTY_BOARD'?source:
-   confirmed?'EMPLOYER_DOMAIN_CANDIDATE':'UNVERIFIED',
+   confirmed?source:'UNVERIFIED',
   source_type:confirmed?'站外官方招聘':'站外招聘职位',
   recruitment_source_note:note,
   source:new URL(url).hostname,remote:false,salary:text(x?.salary)||null,
@@ -269,12 +271,13 @@ function renderJob(x,url,verified,resume,toolLinked,index,toolUrls=new Set()){
   evidence_score_status:score!==null&&!(full&&jdGrounded)?
    'AI_DIRECTION_REFERENCE_SCORED':undefined,
   evidence_excerpt:text(verified?.full_jd||x?.jd_quote),
-  evidence_sources:[...new Map([url,...(Array.isArray(x?.evidence_sources)?x.evidence_sources.map(s=>typeof s==='string'?s:s?.url):[])].map(v4PublicJobUrl).filter(Boolean).map(u=>[u,{url:u,kind:u===url?(source==='THIRD_PARTY_BOARD'?'MODEL_REPORTED_SOURCE':'EMPLOYER_PAGE_CANDIDATE'):toolUrls.has(u)?'PUBLIC_SEARCH_CITATION':'MODEL_REPORTED_SOURCE'}])).values()],
+  evidence_sources:[...new Map([url,...(Array.isArray(x?.evidence_sources)?x.evidence_sources.map(s=>typeof s==='string'?s:s?.url):[])].map(v4PublicJobUrl).filter(u=>u&&!isCommercialRecruitmentBoard(u)).map(u=>[u,{url:u,kind:u===url?(source==='THIRD_PARTY_BOARD'?'MODEL_REPORTED_SOURCE':'EMPLOYER_PAGE_CANDIDATE'):toolUrls.has(u)?'PUBLIC_SEARCH_CITATION':'MODEL_REPORTED_SOURCE'}])).values()],
   checked_at:verified?.checked_at||null,
   score_evidence_status:full&&jdGrounded&&resumeGrounded?
    'GROUNDED_JD_RESUME_QUOTES':undefined,
   application_status:'NEEDS_OFFICIAL_CONFIRMATION',
   availability_status:'UNKNOWN',
+  ...(verified?.excluded_board?{excluded_board:true}:{}),
   source_cited_by_tool:toolLinked
  };
 }
@@ -284,13 +287,16 @@ function renderJob(x,url,verified,resume,toolLinked,index,toolUrls=new Set()){
  * even if a later round or optional verification has an upstream failure.
  */
 export async function v4Match(fetcher,provider,resume,roleHint,
- {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},env={},excludeUrls=[],checkpoint=null,stepMode=false}={}){
+ {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},onResearch=()=>{},officialOnly=false,env={},excludeUrls=[],checkpoint=null,stepMode=false}={}){
  // A checkpoint is accepted only after account/input-bound signature verification in the HTTP route.
- const rows=new Map(checkpoint?.rows||[]),toolUrls=new Set(checkpoint?.toolUrls||[]),excluded=new Set(excludeUrls.map(v4PublicJobUrl).filter(Boolean));
+ const rows=new Map((checkpoint?.rows||[]).filter(([u,j])=>!isCommercialRecruitmentBoard(u,j))),toolUrls=new Set((checkpoint?.toolUrls||[]).filter(u=>!isCommercialRecruitmentBoard(u))),excluded=new Set(excludeUrls.map(v4PublicJobUrl).filter(Boolean));
  let profile=checkpoint?.profile||v4GroundProfile({summary:'',roles:[]},resume);
  let researchComplete=checkpoint?.phase==='verification',round=checkpoint?.round||0,researchError=checkpoint?.researchError||null,recoveryHint=checkpoint?.recoveryHint||'';
  let lastSignature=checkpoint?.lastSignature||'';
  let stalledStrategy=checkpoint?.stalledStrategy||'',providerRecovery=checkpoint?.providerRecovery||'';
+ const rejectedBoards=new Set(checkpoint?.rejectedBoards||[]),rounds=checkpoint?.rounds||[];
+ const report=()=>({profile,rounds:[...rounds],excluded_count:rejectedBoards.size,discovered:rows.size});
+ const publishResearch=()=>onResearch(report());
  const startRound=round;
  let lastProviderEvent='';
  const providerActivity=event=>{
@@ -299,7 +305,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   if(event==='response.web_search_call.searching')onActivity('searching','模型正在实际执行联网检索。');
   if(event==='response.web_search_call.completed')onActivity('searching','模型已收到联网检索结果，正在研究来源。');
  };
- const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,...extra}});
+ const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,...extra}});
+ publishResearch();
  onProgress('parsing');
  onActivity('parsing','AI 正在阅读简历并自主规划合适的职业方向。');
  onProgress('searching');
@@ -317,20 +324,22 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      +'请使用 web_search 自主寻找中国大陆真实招聘机会，逐条分析应聘者的经历和 JD。'
      +'不要限制企业、行业、岗位方向或推荐数量；搜索轮次也不设人为上限。'
      +'不因为网页格式不同而丢弃实际找到的职位。'
-     +'优先企业官网和官方投递链接；其他来源可作为明确待核验的线索，但不可伪称官网。'
+     +'只研究企业官网、官方招聘公告、企业授权的官方招聘系统。排除商业第三方招聘平台（包括已知及新发现的招聘聚合、信息转发、求职市场平台），不得将它们用于搜索依据、评分或推荐。不得将第三方招聘站误称企业官网。' 
+     +'不是网站白名单；自主发现任何行业、任何企业的官方招聘渠道。遇到商业平台检索结果直接忽略并改用企业官方渠道。' 
+     +'为每个岗位如实填写 source_kind（employer_official、employer_authorized_ats、official_public_notice、unknown、third_party_board）和 site_name。不能确认的标记 unknown。'
      +'不要虚构职位、公司、地点、薪资、网址和能力。'
      +'每轮返回一个有效 JSON 对象：'
      +'research_complete（布尔值：仍然值得联网继续查找时必须为 false；'
      +'研究充分或继续查找没有实际价值时才为 true），'
      +'profile:{summary,roles,skills:[{name,evidence}],facts:[{kind,quote}],'
      +'education,education_evidence,experience_years,experience_evidence}，'
-     +'jobs:[{company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote,evidence_sources:[{url}]}]。'
+     +'jobs:[{company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote,source_kind,site_name,evidence_sources:[{url}]}]。'
      +'resume_quote 必须逐字来自简历，岗位有真实来源才填写。'
      +'如果已有来源不够好，请自行继续搜索新行业和新企业；不要只重复以前找到的网址。'
      +'本轮只报告真实搜索所得，返回具体 HTTPS 链接。',
     input:JSON.stringify({resume_text:resume,preferred_job_or_city:roleHint,
      country:'中国大陆',previously_discovered_jobs:[...rows.entries()].map(([url,j])=>({...j,url})),
-     prior_profile:profile,excluded_previously_recommended_urls:[...excluded],research_round:round,recovery_hint:recoveryHint}),
+     prior_profile:profile,excluded_previously_recommended_urls:[...excluded],research_round:round,recovery_hint:recoveryHint,excluded_commercial_domains:[...commercialBoardDomains,...new Set([...rejectedBoards].map(u=>new URL(u).hostname))]}),
     tools:[{type:'web_search'}],tool_choice:'required',
     include:['web_search_call.action.sources']
    },{signal,onEvent:providerActivity});
@@ -369,19 +378,26 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     skills:union(profile.skills,p.skills,x=>x.name+'\n'+x.evidence),target_roles:union(profile.target_roles,p.target_roles,x=>x),summary:p.summary||profile.summary};
   }
   const fromModel=candidates(data,response);
-  for(const [url,job] of fromModel)if(!excluded.has(url)){
+  const beforeCount=rows.size;
+  for(const [url,job] of fromModel){
+   if(isCommercialRecruitmentBoard(url,job)){rejectedBoards.add(url);rows.delete(url);toolUrls.delete(url);continue;}
+   if(excluded.has(url)||rejectedBoards.has(url))continue;
    const useful=Object.fromEntries(Object.entries(job).filter(([,v])=>v!==null&&v!==undefined&&v!==''&&(!Array.isArray(v)||v.length)));
    rows.set(url,{...rows.get(url),...useful});
   }
   const cites=v4ToolSources(response);
   for(const url of cites){
+   if(isCommercialRecruitmentBoard(url)||rejectedBoards.has(url)){rejectedBoards.add(url);continue;}
    if(excluded.has(url))continue;
    toolUrls.add(url);
-   if(!rows.has(url))rows.set(url,{
+   if(!officialOnly&&!rows.has(url))rows.set(url,{
     company:'企业待核实',title:'招聘来源待核实',location:'工作地点待核实',
     reason:'AI 联网搜索引用此来源，具体岗位与投递状态仍需核对。'
    });
   }
+  const queries=[...new Set((response.output||[]).filter(x=>x?.type==='web_search_call').flatMap(x=>[x.action?.query,...(Array.isArray(x.action?.queries)?x.action.queries:[])]).filter(x=>typeof x==='string'&&x.trim()))];
+  rounds.push({round,queries,cited_count:cites.filter(u=>!isCommercialRecruitmentBoard(u)&&!rejectedBoards.has(u)).length,candidates:rows.size,added:Math.max(0,rows.size-beforeCount),excluded_count:rejectedBoards.size});
+  publishResearch();
   // Do not wait for every website scrape before showing model research.
   if(rows.size)onPartial([...rows.entries()].map(([url,job],i)=>
    renderJob(job,url,null,resume,toolUrls.has(url),i,toolUrls)));
@@ -399,6 +415,9 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(!madeProgress)break;
    recoveryHint='上轮输出未完整结束，请从已有来源继续研究；分批输出完整JSON，不重复已收集内容。';
    continue;
+  }
+  if(officialOnly&&data.research_complete===true&&data.continue_search!==true&&!rows.size&&rejectedBoards.size&&stalledStrategy!==signature){
+   stalledStrategy=signature;recoveryHint='上一轮仅有商业招聘平台或非岗位引用，请改为企业官网、官方招聘公告和企业授权招聘系统，寻找真实具体岗位。';continue;
   }
   if(data.research_complete===true&&data.continue_search!==true){researchComplete=true;researchError=null;}
   else if(data.research_complete!==false&&data.continue_search!==true){
@@ -424,14 +443,15 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  onActivity('reading','正在核对第 '+(offset+1)+' 至 '+(offset+entries.length)+' 条岗位来源，共 '+rows.size+' 条。');
  const {results,read}=await enrich(fetcher,new Map(entries),{signal,onActivity});
  onProgress('scoring');
- const previousMatches=checkpoint?.phase==='verification'?checkpoint.matches||[]:[];
+ const previousMatches=checkpoint?.phase==='verification'?(checkpoint.matches||[]).filter(j=>!isCommercialRecruitmentBoard(j.official_url,j)&&!j.excluded_board):[];
  const matches=entries.map(([url,job],i)=>renderJob(job,url,results.get(url),resume,toolUrls.has(url),offset+i,toolUrls));
  let cursor=0,scored=checkpoint?.scored||0,archived=checkpoint?.archived||0,scoreFailures=checkpoint?.scoreFailures||0;
  const worker=async()=>{
   while(cursor<entries.length){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    const i=cursor++,[url,job]=entries[i],jd=results.get(url);
-   if(!jd?.full_jd)continue;
+   if(jd?.excluded_board){rejectedBoards.add(url);publishResearch();continue;}
+   if(!jd?.full_jd||(officialOnly&&matches[i].source_type!=='站外官方招聘'))continue;
    // Only the existing independent official proof may be promoted to an immutable JD version.
    if(jdArchiveConfigured(env)&&(String(jd.proof_method||'').startsWith('DIRECT_EMPLOYER')||jd.source_confirmed===true||jd.independently_read===true)&&sourceKind(url)!=='THIRD_PARTY_BOARD'){
     try{let saved;
@@ -482,25 +502,28 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     Object.assign(matches[i],{match_score:null,reference_score:0,score_basis:'完整 JD 已读取，但重新评分未取得可靠依据；请核对岗位原文。',score_evidence_status:undefined});
     break;
    }}
-   onPartial([...previousMatches,...matches]);
+   onPartial([...previousMatches,...matches].filter(j=>!j.excluded_board));
    onActivity('scoring','已对 '+scored+' 条岗位按完整 JD 重新评分，已存档 '+archived+' 条有原文依据的 JD。');
   }
  };
  await Promise.all(Array.from({length:Math.min(4,entries.length)},worker));
- const combined=[...previousMatches,...matches];
+ const combined=[...previousMatches,...matches].filter(j=>!j.excluded_board&&!isCommercialRecruitmentBoard(j.official_url,j));
+ onPartial(combined);
  const readTotal=(checkpoint?.read||0)+read;
  if(stepMode&&offset+entries.length<allEntries.length)return continuation('verification',{next:offset+entries.length,matches:combined,read:readTotal,scored,archived,scoreFailures});
  combined.sort((a,b)=>(b.match_score??-1)-(a.match_score??-1));
  const verified=combined.filter(x=>x.jd_source_status==='VERIFIED_JD').length;
  const official=combined.filter(x=>x.jd_source_status==='VERIFIED_JD'&&x.source_type==='站外官方招聘').length;
- return {status:'COMPLETE',profile,matches:combined,matched_official_jobs:official,
+ const delivered=officialOnly?combined.filter(j=>j.jd_source_status==='VERIFIED_JD'&&j.source_type==='站外官方招聘'):combined;
+ return {status:'COMPLETE',profile,matches:delivered,matched_official_jobs:official,
+  ...(officialOnly?{research_report:report(),research_leads:combined.filter(j=>!delivered.includes(j))}:{}),
   source:'AI 联网搜索与公开招聘网页',
   scoring:'AI 匹配分仅供职业参考，不代表录用概率。',
   privacy:'经明确授权向第三方 AI 中转服务发送脱敏简历文本；不发送原文件。',
   disclaimer:'岗位来源按已核验、待核验标记；是否仍可投递请以原始招聘网页为准。'
    +(researchError?' 本次联网服务中断，已保留已发现的候选来源。':''),
   native_search:{mode:'V4_SIMPLE_AI',searches:round,candidate_links:rows.size,
-   page_reads:readTotal,visible_jobs:combined.length,research_error:researchError||undefined,
+   page_reads:readTotal,visible_jobs:delivered.length,research_error:researchError||undefined,
    jd_verification:{eligible:rows.size,verified,failed:rows.size-readTotal,scored,archived},score_failures:scoreFailures},
   can_continue:true};
 }
