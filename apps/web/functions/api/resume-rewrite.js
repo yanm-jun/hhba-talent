@@ -71,8 +71,12 @@ export async function onRequestPost({request,env}){
    const code=typeof e?.message==='string'&&e.message.startsWith('AI_PROVIDER_')?
     e.message:'AI_AGENT_REVIEW_UNAVAILABLE';
    console.warn('HHBA_AI_AGENT_REVIEW_INCOMPLETE',code);
-   return json({...base,autonomy:{enabled:true,rounds:0,stop_reason:'tool_unavailable',
-    needs_more_work:true,tools_used:[]}});
+   const recoverable={...base,autonomy:{enabled:true,rounds:0,stop_reason:'execution_round_guard',needs_more_work:true,tools_used:[]}};
+   if(env?.HHBA_MATCH_V4_READY==='1'&&rewriteContinuationActive(env)&&['AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_RESPONSE_JSON_INVALID','AI_PROVIDER_RESPONSE_TRUNCATED','AI_PROVIDER_STREAM_INTERRUPTED'].includes(code)){
+    const checkpoint=await issueCheckpoint({env,account,blocks:body.blocks,job:trustedJob,draft:recoverable});
+    return json({...recoverable,continuation:{enabled:true,checkpoint}});
+   }
+   return json({...recoverable,autonomy:{...recoverable.autonomy,stop_reason:'tool_unavailable'}});
   }
  }catch(e){
   const allowed=new Set(['INVALID_REWRITE_INPUT','AI_PROVIDER_NOT_CONFIGURED',
@@ -82,7 +86,7 @@ export async function onRequestPost({request,env}){
    'AI_PROVIDER_TIMEOUT','AI_PROVIDER_NETWORK_ERROR',
    'AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_RESPONSE_EMPTY',
    'AI_PROVIDER_RESPONSE_JSON_INVALID','AI_PROVIDER_RESPONSE_TRUNCATED',
-   'AI_PROVIDER_RESPONSE_HTTP_INVALID','AI_PROVIDER_UNEXPECTED_REDIRECT']);
+   'AI_PROVIDER_RESPONSE_HTTP_INVALID','AI_PROVIDER_UNEXPECTED_REDIRECT','AI_PROVIDER_STREAM_INTERRUPTED','AI_PROVIDER_CONTEXT_EXCEEDED']);
   const code=allowed.has(e?.message)?e.message:'AI_RESUME_REWRITE_FAILED';
   // Never log resume text, provider payloads, credentials or private names.
   console.warn('HHBA_FULL_REWRITE_FAILED',code);
