@@ -23,7 +23,7 @@ function validInputs(blocks,job){
  if(!Array.isArray(blocks)||blocks.length<1||blocks.length>MAX_BLOCKS||
   !job||typeof job!=='object'||typeof job.title!=='string'||
   !job.title.trim()||job.title.length>180||
-  typeof job.requirements!=='string'||job.requirements.length>16000)
+  typeof job.requirements!=='string'||job.requirements.length>250000)
   return false;
  const used=new Set();
  return blocks.every(b=>b&&typeof b.id==='string'&&
