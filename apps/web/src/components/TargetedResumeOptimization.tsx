@@ -228,7 +228,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   (verifiedJob&&confirmedVerifiedJob?verifiedJob.job_id:null));
  const hasSupportedJob=Boolean(scoreJobId);
  const verifiedWordScore=useMemo(()=>checkedWordScoreBlocks(blocks,
-  wordRevisionSnapshot?.history||[],wordRevisionSnapshot?.revision||0),
+  wordRevisionSnapshot?.history||[],wordRevisionSnapshot?.revision||0,{unbounded:MATCH_V4_PREVIEW}),
   [blocks,wordRevisionSnapshot]);
  const hasVerifiedWordRevision=Boolean(sourceResume&&wordRevisionSnapshot&&
   wordRevisionSnapshot.revision>0);
@@ -631,8 +631,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    .map(item=>({
     original:item.original,proposed:version.blocks.find(b=>b.id===item.blockId)?.text||''
    })).filter(({original,proposed})=>original!==proposed&&
-    original.length>1&&original.length<=300&&
-    proposed.length>1&&proposed.length<=300&&
+    original.length>1&&(MATCH_V4_PREVIEW||original.length<=300)&&
+    proposed.length>1&&(MATCH_V4_PREVIEW||proposed.length<=300)&&
     original===original.trim()&&proposed===proposed.trim()&&
     !/[\r\n\t]/.test(original+proposed));
   const occurrences=new Map<string,number>();
@@ -640,8 +640,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    occurrences.set(change.original,(occurrences.get(change.original)||0)+1);
   const approvedWhole=wholeApproved&&wholeDraft?
    wholeDraft.blocks.filter(b=>b.changed&&b.status==='needs_user_confirmation'&&
-    b.original.length>1&&b.original.length<=300&&
-    b.proposed.length>1&&b.proposed.length<=300&&
+    b.original.length>1&&(MATCH_V4_PREVIEW||b.original.length<=300)&&
+    b.proposed.length>1&&(MATCH_V4_PREVIEW||b.proposed.length<=300)&&
     !/[\r\n\t]/.test(b.original+b.proposed)).map(b=>({
      original:b.original,proposed:b.proposed
     })):[];
@@ -660,14 +660,14 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    state:version.acceptedSuggestionIds.includes(s.id)?'accepted' as const:'pending' as const
   }))
   .filter(s=>s.original.trim()&&s.proposed.trim()&&
-   s.original!==s.proposed&&s.proposed.length<=300&&
+   s.original!==s.proposed&&(MATCH_V4_PREVIEW||s.proposed.length<=300)&&
    !(wordRevisionSnapshot?.history||[])
     .slice(0,wordRevisionSnapshot?.revision||0)
     .some(saved=>saved.original===s.original&&saved.text===s.proposed))
   .concat((wholeDraft?.blocks||[])
    .slice(0,revealedWholeCount)
    .filter(b=>b.changed&&!resolvedWordVisualIds.includes('whole-'+b.blockId)&&
-     b.original.length<=300&&b.proposed.length<=300&&
+     (MATCH_V4_PREVIEW||(b.original.length<=300&&b.proposed.length<=300))&&
     b.proposed!==b.original)
    .map(b=>({
     id:'whole-'+b.blockId,original:b.original,proposed:b.proposed,
@@ -702,14 +702,14 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    data.version.blocks.some((item:ResumeBlock,index:number)=>
     !currentIds.has(item.id)||item.id!==blocks[index]?.id||
     item.section!==blocks[index]?.section||
-    typeof item.text!=='string'||item.text.length<1||item.text.length>1600)){
+    typeof item.text!=='string'||item.text.length<1||(!MATCH_V4_PREVIEW&&item.text.length>1600))){
    setDraftStatus('草稿和当前简历不完全一致，为安全起见未恢复。');return;
   }
   // Untrusted browser state can restore wording, never approval. All AI
   // recommendations require fresh evidence confirmation after recovery.
   const reviewed=Array.isArray(data.suggestions)?
    data.suggestions.filter((item:ResumeSuggestion)=>
-    item&&validateSuggestion(data.version.blocks,item)).slice(0,12):[];
+    item&&validateSuggestion(data.version.blocks,item)).slice(0,MATCH_V4_PREVIEW?undefined:12):[];
   const approvedIds=new Set(reviewed.map((item:ResumeSuggestion)=>item.id));
   const safeFields=(value:unknown,max:number):Record<string,string>=>{
    const input=value&&typeof value==='object'&&!Array.isArray(value)?
@@ -723,15 +723,15 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   const native=data.native_word_draft;
   setNativeWordTextDraft(native&&typeof native.original==='string'&&
    typeof native.text==='string'&&native.original.length>0&&
-   native.original.length<=300&&native.text.length<=300&&
-   Number.isInteger(native.revision)&&native.revision>=0&&native.revision<=8&&
-   Number.isInteger(native.page)&&native.page>=1&&native.page<=20?
+   (MATCH_V4_PREVIEW||(native.original.length<=300&&native.text.length<=300))&&
+   Number.isInteger(native.revision)&&native.revision>=0&&(MATCH_V4_PREVIEW||native.revision<=8)&&
+   Number.isInteger(native.page)&&native.page>=1&&(MATCH_V4_PREVIEW||native.page<=20)?
    {original:native.original,text:native.text,revision:native.revision,page:native.page}:null);
   setVersion({id:'draft-'+(postingScope||'invalid'),targetJobId:postingScope||'invalid',
    blocks:data.version.blocks,acceptedSuggestionIds:[]});
   setDetails(normalizeResumeDocumentDetails(data.details));
-  setSuggestions(reviewed);setIgnored([]);setResolvedWordVisualIds([]);setEditedWordVisualIds([]);setSuggestionDrafts(safeFields(data.suggestionDrafts,1600));
-  setNewEvidence(safeFields(data.newEvidence,800));
+  setSuggestions(reviewed);setIgnored([]);setResolvedWordVisualIds([]);setEditedWordVisualIds([]);setSuggestionDrafts(safeFields(data.suggestionDrafts,MATCH_V4_PREVIEW?Infinity:1600));
+  setNewEvidence(safeFields(data.newEvidence,MATCH_V4_PREVIEW?Infinity:800));
   setConfirmed([]);setOpenSuggestionId(null);setActiveSuggestionId(null);
   setEditingSuggestionId(null);setUndoStack([]);setRecoverableDraft(null);
   setDraftStatus('文字草稿已恢复。AI 建议的确认状态已重置；请重新核实，原 Word 尚未保存。');
@@ -762,7 +762,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      version:{blocks:version.blocks,acceptedSuggestionIds:version.acceptedSuggestionIds},
      suggestions,ignored,suggestionDrafts,newEvidence,details,
      native_word_draft:nativeWordTextDraft});
-    if(payload.length>60000)throw Error('TOO_LARGE');
+    if(!MATCH_V4_PREVIEW&&payload.length>60000)throw Error('TOO_LARGE');
     sessionStorage.setItem(draftKey,payload);
     setDraftStatus('文字草稿已保存在当前浏览器标签页（不包含 Word 原文件）。');
    }catch{setDraftStatus('当前浏览器无法自动保存草稿，请避免关闭页面。');}
@@ -947,7 +947,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       // Never infer a writable Word location from a long ATS/search snippet.
       // Ignore contact-like text and only send visible, unique Word spans.
       const safe=[...new Set(segments)].filter(value=>
-       typeof value==='string'&&value.length>=6&&value.length<=300&&
+       typeof value==='string'&&value.length>=6&&(MATCH_V4_PREVIEW||value.length<=300)&&
        value===value.trim()&&!/[\r\n\t@]/.test(value)&&
        !/^\+?[\d\s()-]{7,}$/.test(value));
       wordDocumentText.current=documentText||'';
