@@ -8,7 +8,7 @@ export const responseJson=(payload,status=200)=>new Response(JSON.stringify(payl
   'Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'}
 });
 export const rejectJson=(error,status)=>responseJson({ok:false,error},status);
-export const rewriteActive=env=>env?.HHBA_RESUME_REWRITE_ENABLED==='1'&&
+export const rewriteActive=env=>(env?.HHBA_MATCH_V4_READY==='1'&&env?.HHBA_AUTH_ROLLOUT==='preview'&&typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function')||env?.HHBA_RESUME_REWRITE_ENABLED==='1'&&
  ((env?.HHBA_AUTH_ROLLOUT==='preview')||
   (env?.HHBA_MATCH_RUNTIME_MODE==='production'&&
    env?.HHBA_RESUME_REWRITE_PRODUCTION_ALLOWED==='1'))&&
