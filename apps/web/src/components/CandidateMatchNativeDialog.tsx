@@ -1,3 +1,4 @@
+import {RecruitmentSourceLinks,recruitmentText} from './RecruitmentSourceLinks';
 import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,MapPin,Wallet,X,Sparkles,LoaderCircle} from 'lucide-react';
@@ -314,26 +315,27 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
           </div>
          </div>
          {job.score_basis&&visibleMatchScore(job)!==null&&
-          <p className="hhba-native-score-basis"><strong>{matchScoreLabel(job)}依据：</strong>{job.score_basis}</p>}
+          <p className="hhba-native-score-basis"><strong>{matchScoreLabel(job)}依据：</strong>{recruitmentText(job.score_basis)}</p>}
          {job.research_detail?<CuratedJobReport detail={job.research_detail} jd={job.evidence_excerpt}/>:<><p className="hhba-native-reason"><strong>{job.jd_comparisons?.length?'为什么推荐：':'匹配依据：'}</strong>
-          {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
+          {recruitmentText(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
          {job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&job.jd_source_status!=='VERIFIED_JD'&&
           <ul className="hhba-native-comparisons" aria-label="岗位与简历原文证据对照">
            {(job.matched||[]).map((line,i)=><li key={'supported-'+i}>
-            <strong>有简历原文对应</strong><div>{line}</div>
+            <strong>有简历原文对应</strong><div>{recruitmentText(line)}</div>
            </li>)}
            {(job.not_evidenced||[]).map((line,i)=><li key={'not-evidenced-'+i}>
-            <strong>尚未建立对应证据</strong><div>{line}</div>
+            <strong>尚未建立对应证据</strong><div>{recruitmentText(line)}</div>
            </li>)}
           </ul>}
          {!!job.jd_comparisons?.length&&<ul className="hhba-native-comparisons">
-          {job.jd_comparisons.map(item=><li key={item.requirement}>
+          {job.jd_comparisons.map(item=><li key={recruitmentText(item.requirement)}>
            <strong>{item.status==='supported'?'有对应经历':item.status==='partial'?'部分对应':'缺少简历证据'}</strong>
-           <div>岗位 JD · {item.requirement}</div>
+           <div>岗位 JD · {recruitmentText(item.requirement)}</div>
            {item.resume_evidence&&<div>简历原文 · {item.resume_evidence}</div>}
           </li>)}
          </ul>}
          </>}
+         <RecruitmentSourceLinks job={job}/>
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
           data-hhba-recruitment-outbound="true">{job.research_detail&&job.source_type==='站外官方招聘'?'前往企业官网投递':job.jd_version_id&&job.jd_proof_method!=='V4_STRUCTURED_JOBPOSTING'&&job.jd_proof_method!=='V4_EMPLOYER_HTML_JOB'?'前往企业官网投递':job.platform==='第三方招聘线索'||job.recruitment_source_kind==='UNVERIFIED'?'查看招聘来源（待核验）':'查看企业招聘页面'} <ArrowUpRight size={15}/></a>
         </article>
