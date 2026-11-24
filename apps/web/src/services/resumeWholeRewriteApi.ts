@@ -57,6 +57,27 @@ export class WholeRewriteError extends Error{
  }
 }
 const PATH='/api/resume-rewrite';
+const v4Active=()=>typeof window!=='undefined'&&(/(^|\.)hhba\.work$/.test(window.location.hostname)||window.location.hostname.endsWith('.hhba-talent.pages.dev'));
+const retryCodes=new Set(['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_RESPONSE_JSON_INVALID','AI_PROVIDER_RESPONSE_TRUNCATED','AI_PROVIDER_STREAM_INTERRUPTED','NETWORK_ERROR']);
+async function rewriteFetch(url:string,init:RequestInit):Promise<Response>{
+ let delay=1000;
+ for(;;){
+  if(init.signal?.aborted)throw init.signal.reason;
+  try{
+   const response=await fetch(url,init);
+   if(!v4Active()||response.ok)return response;
+   const data=await response.clone().json().catch(()=>({}));
+   if(!retryCodes.has(data.error)&&!(!data.error&&[429,502,503,504].includes(response.status)))return response;
+  }catch(e){if(init.signal?.aborted||!v4Active())throw e;}
+  await new Promise<void>((resolve,reject)=>{
+   const signal=init.signal;
+   const abort=()=>{clearTimeout(timer);reject(signal?.reason);};
+   const timer=setTimeout(()=>{signal?.removeEventListener('abort',abort);resolve();},delay);
+   signal?.addEventListener('abort',abort,{once:true});
+  });
+  delay=Math.min(delay*2,30000);
+ }
+}
 export async function getWholeRewriteStatus(signal?:AbortSignal):Promise<ResumeWholeRewriteStatus|null>{
  if(!realAuthReady)return null;
  try{
@@ -74,7 +95,7 @@ export async function requestWholeResumeRewrite(blocks:ResumeBlock[],
  if(!token)throw new WholeRewriteError('SESSION_INVALID',401);
  let response:Response;
  try{
-  response=await fetch(PATH,{method:'POST',credentials:'omit',cache:'no-store',signal,
+  response=await rewriteFetch(PATH,{method:'POST',credentials:'omit',cache:'no-store',signal,
    headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
    body:JSON.stringify({consent_ai:true,blocks,job})});
  }catch(e){
@@ -104,7 +125,7 @@ export async function continueWholeResumeRewrite(
  if(!token)throw new WholeRewriteError('SESSION_INVALID',401);
  let response:Response;
  try{
-  response=await fetch('/api/resume-rewrite-step',{
+  response=await rewriteFetch('/api/resume-rewrite-step',{
    method:'POST',credentials:'omit',cache:'no-store',signal,
    headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
    body:JSON.stringify({consent_ai:true,blocks,job,draft,checkpoint})
