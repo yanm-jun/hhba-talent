@@ -36,6 +36,8 @@ const sanitize=(raw)=>{
 function events(env,request,input){
  const encoder=new TextEncoder();let closed=false,phase='preparing';
  const started=Date.now();
+ const controllerAbort=new AbortController();
+ const signal=AbortSignal.any([request.signal,controllerAbort.signal]);
  const stream=new ReadableStream({
   start(controller){
    const send=(type,payload)=>{
@@ -51,7 +53,7 @@ function events(env,request,input){
    void (async()=>{
     try{
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
-      signal:request.signal,excludeUrls:input.exclude_urls,oneRound:true,skipEnrich:true,onProgress:progress,onActivity:activity,
+      signal,excludeUrls:input.exclude_urls,oneRound:true,skipEnrich:true,onProgress:progress,onActivity:activity,
       onPartial:matches=>send('partial',{matches})});
      console.info('HHBA_V4_MATCH',JSON.stringify({result:'COMPLETE',
       found:result.matches.length,official:result.matched_official_jobs,
@@ -68,7 +70,7 @@ function events(env,request,input){
     }
    })();
   },
-  cancel(){closed=true;}
+  cancel(){closed=true;controllerAbort.abort();}
  });
  return new Response(stream,{status:200,headers:{
   'Content-Type':'text/event-stream; charset=utf-8',
@@ -118,8 +120,8 @@ export async function onRequest({request,env}){
  }catch{return fail('INVALID_REQUEST',400)}
  if(suffix==='/jd'){
   if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
-  try{return reply({ok:true,job:await prepareV4JobForOptimization(env,body.official_url,{signal:request.signal})});}
-  catch(e){return fail(e?.message==='JD_ARCHIVE_DISABLED'?'JD_ARCHIVE_DISABLED':'JD_NOT_COMPLETE_ENOUGH',422)}
+  try{return reply({ok:true,job:await prepareV4JobForOptimization(env,body.official_url,{signal:request.signal,expectedTitle:typeof body.title==='string'?body.title:undefined})});}
+  catch(e){return fail(e?.message==='JD_ARCHIVE_DISABLED'?'JD_ARCHIVE_DISABLED':e?.message==='JD_JOB_IDENTITY_MISMATCH'?'JD_JOB_IDENTITY_MISMATCH':'JD_NOT_COMPLETE_ENOUGH',422)}
  }
  // The third-party relay is not OpenAI official infrastructure.
  if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
