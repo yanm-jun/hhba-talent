@@ -15,7 +15,7 @@ function safeJob(x){
   official_url:url,match_score:nullableScore(x.match_score),score_basis:clean(x.score_basis),
   recommendation_reason:clean(x.recommendation_reason),availability_status:x.availability_status==='OPEN_LISTED'?'OPEN_LISTED':'UNKNOWN',
   recruitment_source_kind:clean(x.recruitment_source_kind),recruitment_source_note:clean(x.recruitment_source_note),
-  evidence_status:clean(x.evidence_status),evidence_excerpt:clean(x.evidence_excerpt)};
+  evidence_status:clean(x.evidence_status),evidence_score_status:clean(x.evidence_score_status),evidence_excerpt:clean(x.evidence_excerpt)};
  if(/^jd_[a-f0-9]{32}$/.test(x.jd_version_id||'')&&/^[a-f0-9]{64}$/.test(x.jd_sha256||'')&&x.jd_source_status==='VERIFIED_JD')
   Object.assign(result,{jd_version_id:x.jd_version_id,jd_sha256:x.jd_sha256,jd_checked_at:x.jd_checked_at,jd_source_status:x.jd_source_status,jd_score_status:x.jd_score_status,jd_proof_method:x.jd_proof_method});
  return result;
