@@ -85,9 +85,11 @@ export type MatchResponse = {
   new_job_count?:number;
   improved_job_count?:number;
   can_continue?:boolean;
+  research_generation?:number;
+  research_task_id?:string;
   preview_synthetic?:boolean;
 };
-export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
+export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];research_task_id?:string;research_generation?:number};
 const API='/api/match-next'; // Legacy diagnostic endpoints only; the user-facing matching path is V4.
 // V4 is the normal matching engine on the approved HHBA hosts.
 const MATCH_V4_PREVIEW=typeof window!=='undefined'&&
@@ -285,7 +287,7 @@ type MatchStreamResponse=MatchResponse|MatchContinuation;
 async function matchTaskReference(text:string,opts:MatchOptions,resumeId?:string){
  const fingerprint=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([text,opts.role_hint,opts.exclude_urls||[],resumeId||null])));
  const key='hhba:v4:pending:'+Array.from(new Uint8Array(fingerprint),v=>v.toString(16).padStart(2,'0')).join('');
- let taskId=crypto.randomUUID();
+ let taskId:string=crypto.randomUUID();
  try{
   const saved=JSON.parse(localStorage.getItem(key)||'null');
   if(saved?.until>Date.now()&&/^[a-f0-9-]{36}$/.test(saved.id))taskId=saved.id;
@@ -468,7 +470,7 @@ export async function submitExtractedResumeText(
  onReceive();
  let continuation:MatchContinuation['continuation']|undefined;
  let task:Awaited<ReturnType<typeof matchTaskReference>>|undefined;
- if(MATCH_V4_PREVIEW){try{task=await matchTaskReference(cleaned,opts,resumeId)}catch{}}
+ if(MATCH_V4_PREVIEW){try{task=opts.research_task_id?{id:opts.research_task_id,touch(){},clear(){}}:await matchTaskReference(cleaned,opts,resumeId)}catch{}}
  let reconnectDelay=1000;
  const reconnect=async()=>{
   if(requestSignal.aborted)throw requestSignal.reason;
@@ -483,7 +485,7 @@ export async function submitExtractedResumeText(
   const response=await fetch(EFFECTIVE_API+'/resume',{
    method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
-   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,...(task?{task_id:task.id}:{}),
+   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,...(task?{task_id:task.id,research_generation:opts.research_generation??0}:{}),
     options:{country:'CN',remote_only:false,
      role_hint:opts.role_hint,
      ...(!MATCH_V4_PREVIEW?{limit:Math.min(10,Math.max(1,opts.limit||10))}:{}),
@@ -512,6 +514,7 @@ export async function submitExtractedResumeText(
    (!MATCH_V4_PREVIEW&&data.matches.length>10))
    throw new MatchError(502,errorMap.BAD_RESPONSE);
   task?.clear();
+  if(task&&data.can_continue&&typeof data.research_generation==='number')data.research_task_id=task.id;
   if(data.research_report)onResearch?.(data.research_report);
   if(data.research_leads)onResearchJobs?.(data.research_leads);
   return data as MatchResponse;

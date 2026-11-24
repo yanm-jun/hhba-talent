@@ -34,7 +34,7 @@ const enabled=(env,request)=>allowedHost(request)&&env?.HHBA_MATCH_V4_READY==='1
  Boolean(v4Provider(env))&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 const sanitize=(raw)=>{
- if(typeof raw!=='string'||raw.length>250000)return null;
+ if(typeof raw!=='string')return null;
  const text=redactForModel(raw.trim(),Infinity);
  return text.replace(/\s/g,'').length>=30?text:null;
 };
@@ -92,9 +92,11 @@ function events(env,request,input){
       sendFinal(cached);
       succeeded=true;return;
      }
+     let recoveryState=()=>null;
+     input.recoveryState=()=>recoveryState();
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
       signal:executionSignal,onProgress:progress,onActivity:activity,env,excludeUrls:input.excludeUrls,
-      stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,
+      stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
       onResearch:sendResearch,
       onPartial:matches=>{sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
      if(executionSignal.aborted)throw Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
@@ -102,7 +104,7 @@ function events(env,request,input){
       console.info('HHBA_V4_STAGE',JSON.stringify({trace,phase:result.checkpoint.phase,round:result.checkpoint.round,candidates:result.checkpoint.rows?.length,processed:result.checkpoint.next,scored:result.checkpoint.scored,diagnostics:result.checkpoint.diagnostics}));
       if(input.taskKey){
        await input.lease.renew();
-       await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint});
+       await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint,generation:input.generation||0});
        await releaseTask();
        send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});
        succeeded=true;return;
@@ -118,8 +120,11 @@ function events(env,request,input){
      console.info('HHBA_V4_MATCH',JSON.stringify({trace,result:result.native_search?.stage==='partial'?'PARTIAL':'COMPLETE',
       found:result.matches.length,official:result.matched_official_jobs,candidates:result.native_search?.candidate_links,searches:result.native_search?.searches,verification:result.native_search?.jd_verification,diagnostics:result.native_search?.diagnostics,research_error:result.native_search?.research_error,
       duration_ms:Date.now()-started}));
+     // Keep the private continuation state server-side; never include it in a client event or history.
+     const resumeCheckpoint=result.resume_checkpoint;delete result.resume_checkpoint;
+     if(input.taskKey)result.research_generation=input.generation||0;
      // Persist completed research first. A history-service failure must not repeat paid model calls.
-     if(input.taskKey){await input.lease.renew();await saveMatchTask(env,input.taskKey,{result:{...result,history_status:'UNAVAILABLE'}});}
+     if(input.taskKey){await input.lease.renew();await saveMatchTask(env,input.taskKey,{result:{...result,history_status:'UNAVAILABLE'},checkpoint:resumeCheckpoint,generation:input.generation||0});}
      // Store only result metadata, never the resume or raw model prompt.
      try{
       const saved=await saveMatchHistory(env.HHBA_PNVS_AUTH_DB,input.phone,input.resume_id,input.role_hint,result.matches.map(job=>({...job,v4_source:true})),result.research_report,(result.research_leads||[]).map(job=>({...job,v4_source:true})));
@@ -127,13 +132,14 @@ function events(env,request,input){
      }catch{result.history_status='UNAVAILABLE';console.warn('HHBA_V4_HISTORY_UNAVAILABLE');}
      if(input.taskKey){
       await input.lease.renew();
-      await saveMatchTask(env,input.taskKey,{result});
+      await saveMatchTask(env,input.taskKey,{result,checkpoint:resumeCheckpoint,generation:input.generation||0});
       await releaseTask();
      }
      sendFinal(result);
      succeeded=true;
     }catch(e){
      const code=typeof e?.code==='string'?e.code:leaseAbort.signal.aborted?'AI_CHECKPOINT_LEASE_LOST':'AI_PROVIDER_UNAVAILABLE';
+     if(input.taskKey&&input.lease&&isV4RetryableProviderError(code)&&!leaseAbort.signal.aborted){try{const state=input.recoveryState?.();if(state){await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:state,generation:input.generation||0});}}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
      console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,
       elapsed_ms:Date.now()-started}));
      send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable:!!input.taskKey&&(isV4RetryableProviderError(code)||leaseAbort.signal.aborted&&!request.signal.aborted)});
@@ -201,8 +207,13 @@ export async function onRequest({request,env}){
    input.lease=await leaseMatchTask(db,input.taskKey);
    if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
    const saved=await readMatchTask(env,input.taskKey);
-   if(saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
-   else if(saved?.checkpoint)input.checkpoint=saved.checkpoint;
+   const generation=body.research_generation??0;
+   if(!Number.isSafeInteger(generation)||generation<0||generation>(saved?.generation||0)+1){await input.lease.release();return fail('AI_CHECKPOINT_INVALID',409);}
+   input.generation=generation;
+   if(generation===(saved?.generation||0)&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
+   else if(saved?.checkpoint&&generation===(saved.generation||0))input.checkpoint=saved.checkpoint;
+   else if(saved?.result?.status==='COMPLETE'&&saved.checkpoint&&generation===(saved.generation||0)+1){input.checkpoint=saved.checkpoint;await saveMatchTask(env,input.taskKey,{checkpoint:input.checkpoint,generation});}
+   else if(generation>0){await input.lease.release();return fail('AI_CHECKPOINT_EXPIRED',409);}
    else if(body.continuation!==undefined){await input.lease.release();return fail('AI_CHECKPOINT_EXPIRED',409);}
   }catch(e){if(input.lease)await input.lease.release().catch(()=>{});return fail(e?.message==='AI_CHECKPOINT_INVALID'?'AI_CHECKPOINT_INVALID':'AI_CHECKPOINT_DB_UNAVAILABLE',503);}
   return events(env,request,input);

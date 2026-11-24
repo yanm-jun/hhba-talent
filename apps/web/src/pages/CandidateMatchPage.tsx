@@ -244,19 +244,20 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   let collected=previous.matches;
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setPartialJobs(collected);
   try{
+   const durable=!!previous.research_task_id&&typeof previous.research_generation==='number';
    const next=await submitExtractedResumeText(search.text,{...search.options,
-    exclude_urls:previous.matches.map(job=>job.official_url)},true,abort.signal,search.resumeId,
+    ...(durable?{research_task_id:previous.research_task_id,research_generation:previous.research_generation!+1}:{exclude_urls:previous.matches.map(job=>job.official_url)})},true,abort.signal,search.resumeId,
     stage=>{if(!abort.signal.aborted)progress(stage);},
-    jobs=>{if(!abort.signal.aborted){collected=combine(jobs);setPartialJobs(collected);}},
+    jobs=>{if(!abort.signal.aborted){collected=durable?jobs:combine(jobs);setPartialJobs(collected);}},
     detail=>{if(!abort.signal.aborted)setActivity(detail);},
     report=>{if(!abort.signal.aborted)setResearchReport(report);},
     jobs=>{if(!abort.signal.aborted)setResearchJobs(jobs);});
    if(abort.signal.aborted)return;
-   setResult({...next,matches:combine(next.matches)});
+   setResult(durable?next:{...next,matches:combine(next.matches)});
    setPartialJobs([]);
   }catch(error){
    if(!abort.signal.aborted){
-    setResult({...previous,matches:collected});
+    setResult(previous.research_task_id?previous:{...previous,matches:collected});
     setPartialJobs([]);
     setError(error instanceof Error?error.message:'继续搜索暂未完成，请重试。');
    }
