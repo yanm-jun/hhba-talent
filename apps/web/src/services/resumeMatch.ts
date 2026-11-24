@@ -544,7 +544,7 @@ export async function submitExtractedResumeText(
  const pendingVerification=new Set<string>();
  const transientVerification=(e:unknown)=>{
   const err=e as MatchError;
-  if(err.code)return ['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_STREAM_INTERRUPTED','AI_PROVIDER_RESPONSE_INVALID','V4_PAGE_TEMPORARILY_UNAVAILABLE','V4_SCORE_UNAVAILABLE','AI_PROVIDER_INCOMPLETE'].includes(err.code);
+  if(err.code)return ['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_STREAM_INTERRUPTED','AI_PROVIDER_RESPONSE_INVALID','V4_PAGE_TEMPORARILY_UNAVAILABLE','V4_SCORE_UNAVAILABLE','AI_PROVIDER_INCOMPLETE','JD_ARCHIVE_DISABLED'].includes(err.code);
   return e instanceof TypeError||[429,502,503,504].includes(err.status);
  };
  const retryVerification=async<T,>(work:()=>Promise<T>,job:MatchedJob):Promise<T>=>{
@@ -564,7 +564,7 @@ export async function submitExtractedResumeText(
    if(signal?.aborted)throw signal.reason;
    const job=queue[cursor++];
    try{
-    const verified=await retryVerification(()=>prepareV4Job(job.official_url,signal,job.title,historyId,v4PostingKey(job)),job);
+    const verified=await retryVerification(()=>prepareV4Job(job.official_url,signal,job.title,historyId,v4PostingKey(job),job.location),job);
     const merged={...job,...verified};collected.set(v4PostingKey(job),merged);
     onPartial?.([...collected.values()]);
     try{const score=await retryVerification(()=>scoreV4Job(merged,text,signal,historyId),job);collected.set(v4PostingKey(job),{...merged,...score});pendingVerification.delete(v4PostingKey(job));}
@@ -595,10 +595,10 @@ async function scoreV4Job(job:MatchedJob,text:string,signal?:AbortSignal,history
  if(!response.ok||data?.ok!==true||!data.score)throw new MatchError(response.status,'完整 JD 评分暂未完成。',data?.error);
  return data.score;
 }
-export async function prepareV4Job(officialUrl:string,signal?:AbortSignal,title?:string,historyId?:string,postingKey?:string):Promise<Partial<MatchedJob>>{
+export async function prepareV4Job(officialUrl:string,signal?:AbortSignal,title?:string,historyId?:string,postingKey?:string,location?:string):Promise<Partial<MatchedJob>>{
  const response=await fetch('/api/match-v4/jd',{method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/json',Authorization:'Bearer '+session()},
-  body:JSON.stringify({consent:true,official_url:officialUrl,title,history_id:historyId,posting_key:postingKey})});
+  body:JSON.stringify({consent:true,official_url:officialUrl,title,location,history_id:historyId,posting_key:postingKey})});
  const data=await response.json().catch(()=>null);
  if(!response.ok||data?.ok!==true||!data.job?.jd_version_id||!data.job?.jd_sha256)
   throw new MatchError(response.status,'暂未取得可用于优化的可信 JD，请核对招聘原页面或稍后重试。',data?.error);

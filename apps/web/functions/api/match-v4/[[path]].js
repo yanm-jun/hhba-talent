@@ -154,12 +154,14 @@ export async function onRequest({request,env}){
  }
  if(suffix==='/jd'){
   if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
-  try{const job=await prepareV4JobForOptimization(env,body.official_url,{signal:request.signal,expectedTitle:typeof body.title==='string'?body.title:undefined});
+  try{const job=await prepareV4JobForOptimization(env,body.official_url,{signal:request.signal,expectedTitle:typeof body.title==='string'?body.title:undefined,expectedLocation:typeof body.location==='string'?body.location:undefined});
    if(body.history_id)try{await patchV4Job(db,session.phone,body.history_id,body.official_url,job,body.posting_key);}catch{}
    return reply({ok:true,job});}
   catch(e){
    if(e?.code==='V4_PAGE_TEMPORARILY_UNAVAILABLE'||e?.name==='TypeError'||e?.name==='TimeoutError')return fail('V4_PAGE_TEMPORARILY_UNAVAILABLE',503);
-   return fail(e?.message==='JD_ARCHIVE_DISABLED'?'JD_ARCHIVE_DISABLED':e?.message==='JD_JOB_IDENTITY_MISMATCH'?'JD_JOB_IDENTITY_MISMATCH':'JD_NOT_COMPLETE_ENOUGH',422);
+   const code=e?.code||e?.message||'JD_NOT_COMPLETE_ENOUGH';
+   if(/^AI_PROVIDER_/.test(code)||code==='JD_ARCHIVE_DISABLED')return fail(code,503);
+   return fail(code==='JD_JOB_IDENTITY_MISMATCH'?code:'JD_NOT_COMPLETE_ENOUGH',422);
   }
  }
  // The third-party relay is not OpenAI official infrastructure.

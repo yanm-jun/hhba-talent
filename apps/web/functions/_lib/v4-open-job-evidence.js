@@ -95,6 +95,23 @@ function htmlLocation(plain){
  const m=plain.match(/(?:工作地点|工作城市|办公地点|工作地区|工作区域|Work Location|Location)\s*[：:\s]\s*([^\n]+)/i);
  return m?m[1].trim():null;
 }
+// Follow public HTTPS same-organization redirects without forwarding credentials.
+async function fetchPublicPage(canonical,fetcher,signal){
+ const visited=new Set();let current=canonical;
+ for(;;){
+  if(visited.has(current))throw Error('V4_PAGE_REDIRECT_LOOP');
+  visited.add(current);
+  const response=await fetcher(current,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,text/plain;q=0.9'},signal});
+  if(![301,302,303,307,308].includes(response.status))return {response,resolved:current};
+  const location=response.headers.get('Location');
+  await response.body?.cancel().catch(()=>{});
+  let next;try{next=v4PublicJobUrl(new URL(location,current).href)}catch{}
+  if(!location||!next||!relatedDomains(canonical,next))throw Error('V4_PAGE_REDIRECT_UNVERIFIED');
+  current=next;
+ }
+}
+const normalizedPlace=s=>trim(s).normalize('NFKC').replace(/[\s,，、/]/g,'').toLowerCase();
+const matchesPlace=(a,b)=>{const x=normalizedPlace(a),y=normalizedPlace(b);return Boolean(x&&y&&(x.includes(y)||y.includes(x)));};
 async function limitedRead(r){
  if(r.status===429||r.status>=500)throw Object.assign(Error('V4_PAGE_TEMPORARILY_UNAVAILABLE'),{code:'V4_PAGE_TEMPORARILY_UNAVAILABLE'});
  if(r.status!==200)throw Error('V4_PAGE_UNAVAILABLE');
@@ -117,19 +134,26 @@ async function limitedRead(r){
 }
 export async function v4ReadPublicPage(url,{fetcher=fetch,signal}={}){
  const canonical=v4PublicJobUrl(url);if(!canonical)throw Error('V4_UNSAFE_URL');
- const response=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,text/plain;q=0.9'},signal});
+ const {response,resolved}=await fetchPublicPage(canonical,fetcher,signal);
  const html=await limitedRead(response),plain=htmlToText(html,{unbounded:true});
- return {canonical,html,plain};
+ return {canonical,resolved,html,plain};
 }
-export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date(),expectedTitle,allowUnstructured=false}={}){
+export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date(),expectedTitle,expectedLocation,allowUnstructured=false}={}){
  const canonical=v4PublicJobUrl(url);
  if(!canonical)throw Error('V4_UNSAFE_URL');
- const r=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',
-  headers:{Accept:'text/html,text/plain;q=0.9'},signal});
+ const {response:r,resolved}=await fetchPublicPage(canonical,fetcher,signal);
  const html=await limitedRead(r),plain=htmlToText(html,{unbounded:true});
  const expected=typeof expectedTitle==='string'&&!/待核实/.test(expectedTitle)?expectedTitle.normalize('NFKC').replace(/\s+/g,'').toLowerCase():'';
- if(CLOSED.test(plain))throw Error('V4_JOB_CLOSED');
- for(const j of postings(html)){
+ const all=postings(html);
+ const isClosed=j=>CLOSED.test(trim(j.description))||Boolean(j.validThrough&&Number.isFinite(Date.parse(j.validThrough))&&Date.parse(j.validThrough)<now.getTime());
+ const titled=all.filter(j=>!expected||trim(j.title).normalize('NFKC').replace(/\s+/g,'').toLowerCase()===expected);
+ const expectedPlace=typeof expectedLocation==='string'&&!/待核实|全国|不限/.test(expectedLocation)?expectedLocation:'';
+ const scoped=expectedPlace?titled.filter(j=>matchesPlace(postedLocation(j)||htmlLocation(plain),expectedPlace)):titled;
+ if((titled.length&&titled.every(isClosed))||(!all.length&&CLOSED.test(plain)&&!allowUnstructured))throw Error('V4_JOB_CLOSED');
+ const open=scoped.filter(j=>!isClosed(j));
+ // Never guess which of multiple identical titles is meant. The unstructured
+ // research path can resolve location and identity from actual source evidence.
+ for(const j of (open.length===1&&!(all.length===1&&CLOSED.test(plain))?open:[])){
   const org=companyOf(j),title=trim(j.title);
   const city=postedLocation(j)||htmlLocation(plain),desc=htmlToText(trim(j.description),{unbounded:true});
   if(expected&&title.normalize('NFKC').replace(/\s+/g,'').toLowerCase()!==expected)continue;
@@ -141,21 +165,21 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
   if(!sections)continue;
   const requirements=sections.full_jd;
   return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
-   canonical_url:canonical,company:org.name,title,
+   canonical_url:canonical,resolved_url:resolved,company:org.name,title,
    location:city,requirements,full_jd:sections.full_jd,
    checked_at:now.toISOString(),proof_method:'V4_STRUCTURED_JOBPOSTING',
-   source_confirmed:!!org.url&&relatedDomains(canonical,org.url),application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
+   source_confirmed:!!org.url&&relatedDomains(resolved,org.url),application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
  }
  // Chinese employer career sites often serve normal HTML without JSON-LD.
  const sections=v4SourceSections(plain),title=pageTitle(html);
  const company=meta(html,'property','og:site_name')||meta(html,'name','application-name');
  const city=htmlLocation(plain);
  const requirements=sections?.full_jd||'';
- if(allowUnstructured&&plain.trim())return {canonical_url:canonical,company,title,location:city,source_text:plain,source_confirmed:false,proof_method:'V4_EMPLOYER_HTML_JOB',checked_at:now.toISOString()};
+ if(allowUnstructured&&plain.trim())return {canonical_url:canonical,resolved_url:resolved,company,title,location:city,source_text:plain,source_confirmed:false,proof_method:'V4_EMPLOYER_HTML_JOB',checked_at:now.toISOString()};
  if(!title||!company||GENERIC.test(company)||!city||!sections)
   throw Error('V4_JOB_DETAILS_NOT_VERIFIED');
  return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
-  canonical_url:canonical,company,title,location:city,
+  canonical_url:canonical,resolved_url:resolved,company,title,location:city,
   requirements,full_jd:sections.full_jd,
   checked_at:now.toISOString(),proof_method:'V4_EMPLOYER_HTML_JOB',
   source_confirmed:false,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};

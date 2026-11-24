@@ -655,3 +655,14 @@ test('V4 allows autonomous planning without web tools but never accepts unsearch
  const first=await v4Match(fetcher,provider,resume,'全国',{oneRound:true,skipEnrich:true});assert.equal(first.matches.length,0);assert.equal(first.research_pending,true);
  const second=await v4Match(fetcher,provider,resume,'全国',{oneRound:true,skipEnrich:true,researchContext:first.research_context});assert.equal(second.matches.length,1);assert.equal(second.research_pending,false);
 });
+
+
+test('V4 public JD research follows safe same-organization redirects and resolves same-title location',async()=>{
+ const target='https://careers.other-motors.cn/recruitment/new-list';
+ const make=(city,desc)=>({'@type':'JobPosting',title:'区域渠道运营',hiringOrganization:{name:'其他汽车企业',url:'https://other-motors.cn'},jobLocation:{address:{addressCountry:'CN',addressLocality:city}},description:desc});
+ const html='<p>另一个职位已关闭</p><script type="application/ld+json">'+JSON.stringify([make('上海','负责上海渠道'),make('北京','负责北京渠道')])+'</script>';
+ const calls=[];const fetcher=async u=>{calls.push(u);return u===url?new Response(null,{status:302,headers:{Location:target}}):new Response(html,{headers:{'content-type':'text/html'}})};
+ const job=await v4ReadEmployerJob(url,{fetcher,expectedTitle:'区域渠道运营',expectedLocation:'北京'});
+ assert.deepEqual(calls,[url,target]);assert.equal(job.location,'北京');assert.equal(job.full_jd,'负责北京渠道');assert.equal(job.resolved_url,target);
+ await assert.rejects(()=>v4ReadEmployerJob(url,{fetcher:async()=>new Response(null,{status:302,headers:{Location:'https://localhost/private'}})}),/V4_PAGE_REDIRECT_UNVERIFIED/);
+});
