@@ -276,6 +276,20 @@ export type NativeMatchActivity={
 };
 type MatchContinuation={status:'CONTINUE';continuation:{state:unknown;token:string}};
 type MatchStreamResponse=MatchResponse|MatchContinuation;
+// Only an opaque ID and expiry are persisted locally; no raw CV, access
+// token, signed continuation or model output is written to localStorage.
+async function matchTaskReference(text:string,opts:MatchOptions,resumeId?:string){
+ const fingerprint=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([text,opts.role_hint,opts.exclude_urls||[],resumeId||null])));
+ const key='hhba:v4:pending:'+Array.from(new Uint8Array(fingerprint),v=>v.toString(16).padStart(2,'0')).join('');
+ let taskId=crypto.randomUUID();
+ try{
+  const saved=JSON.parse(localStorage.getItem(key)||'null');
+  if(saved?.until>Date.now()&&/^[a-f0-9-]{36}$/.test(saved.id))taskId=saved.id;
+  localStorage.setItem(key,JSON.stringify({id:taskId,until:Date.now()+23*3600000}));
+ }catch{}
+ return {id:taskId,clear(){try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(saved?.id===taskId)localStorage.removeItem(key)}catch{}}};
+}
+
 async function consumeNativeMatchStream(
  response:Response,onProgress?:(stage:NativeMatchProgress)=>void,
  onPartial?:(jobs:MatchedJob[])=>void,
@@ -428,13 +442,15 @@ export async function submitExtractedResumeText(
   timeout('这次智能匹配用时过长，已结束本次等待。可用当前简历重试。'),300000);
  onReceive();
  let continuation:MatchContinuation['continuation']|undefined;
+ let task:Awaited<ReturnType<typeof matchTaskReference>>|undefined;
+ if(MATCH_V4_PREVIEW){try{task=await matchTaskReference(cleaned,opts,resumeId)}catch{}}
  try{
   for(;;){
   if(requestSignal.aborted)throw requestSignal.reason;
   const response=await fetch(EFFECTIVE_API+'/resume',{
    method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
-   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
+   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,...(task?{task_id:task.id}:{}),
     options:{country:'CN',remote_only:false,
      role_hint:opts.role_hint,
      ...(!MATCH_V4_PREVIEW?{limit:Math.min(10,Math.max(1,opts.limit||10))}:{}),
@@ -448,7 +464,12 @@ export async function submitExtractedResumeText(
   if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。');
   const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,onReceive):
    await response.json().catch(()=>({})) as (Partial<MatchResponse>|MatchContinuation)&{error?:string};
-  if(!response.ok)throw new MatchError(response.status,errorMap[(data as {error?:string}).error||'']||'智能匹配服务暂时不可用。');
+  if(!response.ok){
+   const code=(data as {error?:string}).error||'';
+   if(code==='AI_TASK_IN_PROGRESS')throw new MatchError(409,'上次任务正在处理当前阶段，请重新点击匹配以恢复进度，不会重复开启同一阶段。');
+   if(code==='AI_CHECKPOINT_EXPIRED'){task?.clear();throw new MatchError(409,'已保存的研究状态已过期，请重新启动匹配。');}
+   throw new MatchError(response.status,errorMap[code]||'智能匹配服务暂时不可用。');
+  }
   if(data.status==='CONTINUE'){
    if(!MATCH_V4_PREVIEW||!data.continuation||typeof data.continuation.token!=='string'||!data.continuation.state)throw new MatchError(502,'AI 续接状态异常。');
    continuation=data.continuation;
@@ -457,6 +478,7 @@ export async function submitExtractedResumeText(
   if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||
    (!MATCH_V4_PREVIEW&&data.matches.length>10))
    throw new MatchError(502,errorMap.BAD_RESPONSE);
+  task?.clear();
   return data as MatchResponse;
   }
  }catch(error){
