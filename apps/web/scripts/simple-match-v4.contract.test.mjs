@@ -601,3 +601,12 @@ test('V4 compressed transport preserves the complete Unicode request and rejects
  assert.deepEqual(await readV4Json(request),value);
  await assert.rejects(()=>readV4Json(new Request('https://hhba.work/api/resume-rewrite',{method:'POST',headers:{'Content-Type':'application/json','X-HHBA-JSON-Encoding':'gzip'},body:'not gzip'})),/INVALID_REQUEST/);
 });
+
+
+test('V4 background availability requires private storage, explicit feature activation and scoped secret',async()=>{
+ const {backgroundReady,createBackground}=await import('../functions/_lib/v4-background-match.js');
+ assert.equal(backgroundReady({HHBA_MATCH_V4_READY:'1'}),false);
+ await assert.rejects(()=>createBackground({},'owner',{consent:true,country:'CN'}),/BACKGROUND_CONSENT_REQUIRED/);
+ const env={HHBA_MATCH_V4_READY:'1',HHBA_V4_BACKGROUND_ENABLED:'1',HHBA_V4_BACKGROUND_SECRET:'a'.repeat(32),HHBA_V4_TASK_R2:{put(){}},HHBA_PNVS_AUTH_DB:{prepare(){}}};
+ assert.equal(backgroundReady(env),true);
+});

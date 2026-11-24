@@ -14,7 +14,7 @@ function safeJob(x){
  if(!url||!x.company||!x.title||!x.location)return null;
  const result={id:clean(x.id),company:clean(x.company),title:clean(x.title_zh||x.title),location:clean(x.location),
   official_url:url,...(isV4PostingKey(x.posting_key)?{posting_key:x.posting_key}:{}),match_score:nullableScore(x.match_score),score_basis:clean(x.score_basis),
-  recommendation_reason:clean(x.recommendation_reason),availability_status:x.availability_status==='OPEN_LISTED'?'OPEN_LISTED':'UNKNOWN',
+  recommendation_reason:clean(x.recommendation_reason),...(x.jd_score_status==='BACKGROUND_UNVERIFIED'?{jd_score_status:'BACKGROUND_UNVERIFIED'}:{}),availability_status:x.availability_status==='OPEN_LISTED'?'OPEN_LISTED':'UNKNOWN',
   recruitment_source_kind:clean(x.recruitment_source_kind),recruitment_source_note:clean(x.recruitment_source_note),
   evidence_status:clean(x.evidence_status),evidence_score_status:clean(x.evidence_score_status),evidence_excerpt:clean(x.evidence_excerpt)};
  if(/^jd_[a-f0-9]{32}$/.test(x.jd_version_id||'')&&/^[a-f0-9]{64}$/.test(x.jd_sha256||'')&&x.jd_source_status==='VERIFIED_JD')
