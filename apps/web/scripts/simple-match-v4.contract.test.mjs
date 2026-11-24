@@ -373,3 +373,46 @@ test('V4 authoring keeps all real source quotations while rejecting invented evi
  assert.equal(validateAuthoring(block,block.text,quotes,numberTokens(block.text),{unbounded:true}),null);
  assert.equal(validateAuthoring(block,block.text,[...quotes,'虚构资格'],numberTokens(block.text),{unbounded:true}),'SOURCE_QUOTE_NOT_FOUND');
 });
+
+
+test('V4 native Responses SSE reconstructs final verified object and only emits safe tool status',async()=>{
+ const original=await model({research_complete:true,jobs:[row]},[url]).json();
+ const events=[
+  {type:'response.web_search_call.in_progress'},
+  {type:'response.web_search_call.completed'},
+  {type:'response.output_text.delta',delta:'partial private model output'},
+  {type:'response.completed',response:original}
+ ];
+ const wire=events.map(e=>'event: '+e.type+'\r\ndata: '+JSON.stringify(e)+'\r\n\r\n').join('');
+ const bytes=new TextEncoder().encode(wire),activity=[];
+ const stream=new ReadableStream({start(c){for(let i=0;i<bytes.length;i+=17)c.enqueue(bytes.slice(i,i+17));c.close();}});
+ const configured=v4Provider({HHBA_AGENT_RELAY_API_KEY:key,HHBA_V4_STREAM:'1',HHBA_V4_REASONING_EFFORT:'high'});
+ const result=await v4Call(async(u,opts)=>{
+  const body=JSON.parse(opts.body);
+  assert.equal(body.stream,true);assert.equal(body.reasoning.effort,'high');
+  assert.equal(body.store,false);assert.equal(body.max_output_tokens,undefined);
+  return new Response(stream,{headers:{'Content-Type':'text/event-stream'}});
+ },configured,{input:'synthetic'},{onEvent:e=>activity.push(e)});
+ assert.deepEqual(v4ToolSources(result),[url]);
+ assert.equal(v4ParseJson(result).jobs[0].title,row.title);
+ assert.deepEqual(activity,['searching','search_completed','writing']);
+});
+
+test('V4 refuses to promote interrupted upstream streams to completed output',async()=>{
+ const stream=new Response('data: '+JSON.stringify({type:'response.output_text.delta',delta:'{"ok":true}'})+'\n\n',{headers:{'Content-Type':'text/event-stream'}});
+ await assert.rejects(()=>v4Call(async()=>stream,provider,{input:'synthetic'}),/AI_PROVIDER_STREAM_INTERRUPTED/);
+});
+
+test('V4 adapts search context only after explicit upstream overflow and still excludes all previous URLs',async()=>{
+ const excluded=Array.from({length:24},(_,i)=>'https://careers.other-motors.cn/recruitment/positions/'+i);
+ let calls=0;
+ const result=await v4Match(async(u,opts)=>{
+  calls++;const input=JSON.parse(JSON.parse(opts.body).input);
+  assert.equal(input.resume_text,resume);
+  if(input.previous_search_urls.length>6)return Response.json({error:{code:'context_length_exceeded'}},{status:400});
+  return model({research_complete:true,jobs:[{...row,url:excluded[0]},row]},[url,excluded[0]]);
+ },provider,resume,'全国',{oneRound:true,skipEnrich:true,excludeUrls:excluded});
+ assert.ok(calls>1);
+ assert.deepEqual(result.matches.map(x=>x.official_url),[url]);
+ assert.equal(result.research_pending,false);
+});
