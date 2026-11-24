@@ -457,3 +457,19 @@ test('V4 recovers a temporary network failure before any job has been discovered
  },provider,resume,'全国');
  assert.equal(attempts,2);assert.equal(result.matches.length,1);
 });
+
+test('V4 encrypted R2 checkpoint removes growing research state from browser request',async()=>{
+ const {storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint}=await import('../functions/_lib/v4-match-checkpoint-storage.js');
+ const objects=new Map(),bucket={async put(k,v){objects.set(k,v.slice())},async get(k){const v=objects.get(k);return v?{arrayBuffer:async()=>v.buffer}:null},async delete(k){objects.delete(k)}};
+ const env={HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',HHBA_MATCH_V4_CHECKPOINT_SECRET:'synthetic-key-for-encrypted-test-only',HHBA_PRIVATE_RESUMES:bucket};
+ const state={rows:Array.from({length:500},(_,i)=>['https://jobs.co.cn/'+i,{reason:'测试研究资料'.repeat(200)}])};
+ const now=Date.now(),pointer=await storeMatchCheckpoint(env,state,now);
+ assert.ok(JSON.stringify(pointer).length<100);
+ assert.deepEqual(await loadMatchCheckpoint(env,pointer,now),state);
+ const bytes=[...objects.values()][0];
+ assert.ok(!new TextDecoder().decode(bytes).includes('测试研究资料'));
+ await assert.rejects(loadMatchCheckpoint(env,pointer,now+3600001),/AI_CHECKPOINT_EXPIRED/);
+ await assert.rejects(loadMatchCheckpoint({...env,HHBA_MATCH_V4_CHECKPOINT_SECRET:'another-synthetic-key-not-authorized'},pointer,now),/AI_CHECKPOINT_INVALID/);
+ await deleteMatchCheckpoint(env,pointer);
+ assert.equal(objects.size,0);
+});
