@@ -1,5 +1,5 @@
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
-import {backgroundReady,createBackground,uploadBackgroundPart,queueBackground,backgroundState,cancelBackground,resumeBackground,advanceBackground} from '../../_lib/v4-background-match.js';
+import {backgroundStorageReady,backgroundReady,createBackground,uploadBackgroundPart,queueBackground,backgroundState,cancelBackground,resumeBackground,advanceBackground} from '../../_lib/v4-background-match.js';
 const send=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex'}});
 const fail=(error,status)=>send({ok:false,error},status);
 const same=(a,b)=>{if(typeof a!=='string'||typeof b!=='string'||a.length!==b.length)return false;let different=0;for(let i=0;i<a.length;i++)different|=a.charCodeAt(i)^b.charCodeAt(i);return different===0;};
@@ -7,7 +7,7 @@ export async function onRequest({request,env}){
  const url=new URL(request.url),route=url.pathname.slice('/api/match-background'.length).replace(/\/$/,'');
  const ready=backgroundReady(env);
  if(route==='/status'&&request.method==='GET')return send({ok:true,enabled:ready});
- if(!ready)return fail('BACKGROUND_NOT_ENABLED',503);
+ if(!ready&&!(backgroundStorageReady(env)&&(/^\/[0-9a-f-]{36}(?:\/cancel)?$/i.test(route))))return fail('BACKGROUND_NOT_ENABLED',503);
  if(route==='/tick'&&request.method==='POST'){
   if(!same(request.headers.get('X-HHBA-Background-Secret'),env.HHBA_V4_BACKGROUND_SECRET))return fail('FORBIDDEN',403);
   const result=await advanceBackground(env);return send({ok:true,...result});

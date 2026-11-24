@@ -193,7 +193,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
     <p>上传简历并完成一次 AI 推荐后，真实的岗位结果会自动保存到你的账户。历史记录不会被算作投递。</p>
     <Link to="/candidate/account/match">上传简历开始匹配</Link>
    </div>:<>
-    <p className="hhba-match-history-explain">你可以随时查看上一次为什么推荐这些岗位，或使用同一份已保存的简历再次查找。只有重新完成匹配，才会产生新岗位对比；经明确授权的后台任务可以持续研究；不自动发送通知。</p>
+    <p className="hhba-match-history-explain">你可以随时查看上一次为什么推荐这些岗位，或使用同一份已保存的简历再次查找。只有重新完成匹配，才会产生新岗位对比；未经明确授权不会在后台自动搜索；已授权的任务可在历史列表取消或恢复。不自动发送通知。</p>
     {modalOpen&&createPortal(
      <div className="hhba-match-history-overlay" role="presentation"
       onMouseDown={event=>{if(event.target===event.currentTarget&&!editingJobId)closeModal()}}>

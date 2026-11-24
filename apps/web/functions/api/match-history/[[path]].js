@@ -1,6 +1,6 @@
 // Private, user-scoped history of AI-recommended jobs. Not an application tracker.
 // Creation is server-owned by /api/match-native; the client cannot upload results.
-import {backgroundReady,cancelBackground} from '../../_lib/v4-background-match.js';
+import {backgroundStorageReady,cancelBackground} from '../../_lib/v4-background-match.js';
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {listMatchHistory,getMatchHistory,deleteMatchHistory,linkSavedResumeToHistory} from '../../_lib/match-history.js';
 import {v4HistoryReady,listV4History,getV4History,deleteV4History,linkV4History} from '../../_lib/v4-match-history.js';
@@ -43,7 +43,7 @@ export async function onRequest({request,env}){
    return item?send({ok:true,kind:KIND,item}):error('MATCH_HISTORY_NOT_FOUND',404);
   }
   if(id&&uuid.test(id)&&method==='DELETE'){
-   if(backgroundReady(env))await cancelBackground(env,session.phone,id);
+   if(backgroundStorageReady(env))await cancelBackground(env,session.phone,id);
    const removed=(v4&&await deleteV4History(db,session.phone,id))||await deleteMatchHistory(db,session.phone,id);
    return removed?send({ok:true,deleted:true,id}):error('MATCH_HISTORY_NOT_FOUND',404);
   }

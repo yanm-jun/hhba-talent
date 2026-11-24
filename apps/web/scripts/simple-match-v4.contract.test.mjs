@@ -610,3 +610,39 @@ test('V4 background availability requires private storage, explicit feature acti
  const env={HHBA_MATCH_V4_READY:'1',HHBA_V4_BACKGROUND_ENABLED:'1',HHBA_V4_BACKGROUND_SECRET:'a'.repeat(32),HHBA_V4_TASK_R2:{put(){}},HHBA_PNVS_AUTH_DB:{prepare(){}}};
  assert.equal(backgroundReady(env),true);
 });
+
+
+test('V4 durable upload and cancellation are account bound, idempotent, and clean all temporary objects',async()=>{
+ const {DatabaseSync}=await import('node:sqlite');
+ const {readFileSync}=await import('node:fs');
+ const {createBackground,uploadBackgroundPart,queueBackground,backgroundState,cancelBackground,advanceBackground}=await import('../functions/_lib/v4-background-match.js');
+ const sqlite=new DatabaseSync(':memory:');
+ sqlite.exec("PRAGMA foreign_keys=ON; CREATE TABLE hhba_auth_users(phone TEXT PRIMARY KEY); INSERT INTO hhba_auth_users VALUES('owner'),('other'); CREATE TABLE hhba_candidate_resumes(id TEXT,phone TEXT,filename TEXT);");
+ for(const name of ['0036_v4_match_history.sql','0037_v4_research_checkpoints.sql','0038_v4_background_tasks.sql'])sqlite.exec(readFileSync(new URL('../d1/'+name,import.meta.url),'utf8'));
+ const db={prepare(sql){return {bind(...args){return {async first(){return sqlite.prepare(sql).get(...args)||null},async run(){return {meta:{changes:Number(sqlite.prepare(sql).run(...args).changes)}}},async all(){return {results:sqlite.prepare(sql).all(...args)}}}}}}};
+ const objects=new Map();
+ const bucket={async put(k,v,options){if(options?.onlyIf&&objects.has(k))return null;objects.set(k,v);return {key:k};},async get(k){return objects.has(k)?{text:async()=>objects.get(k)}:null;},async list({prefix}){return {objects:[...objects.keys()].filter(k=>k.startsWith(prefix)).map(key=>({key})),truncated:false}},async delete(keys){for(const k of Array.isArray(keys)?keys:[keys])objects.delete(k)}};
+ const env={HHBA_MATCH_V4_READY:'1',HHBA_V4_BACKGROUND_ENABLED:'1',HHBA_V4_BACKGROUND_SECRET:'a'.repeat(32),HHBA_AGENT_RELAY_API_KEY:key,HHBA_V4_TASK_R2:bucket,HHBA_PNVS_AUTH_DB:db};
+ const id='12345678-1234-1234-1234-123456789abc';
+ const body={id,consent:true,consent_background_storage:true,country:'CN'};
+ const req=text=>new Request('https://hhba.work/api/match-background/'+id+'/parts/0',{method:'PUT',body:text});
+ await createBackground(env,'owner',body);
+ assert.equal(await backgroundState(env,'other',id),null);
+ await assert.rejects(()=>uploadBackgroundPart(env,'other',id,0,req('无权读取')),/INVALID_BACKGROUND_PART/);
+ assert.equal((await uploadBackgroundPart(env,'owner',id,0,req('负责汽车销售运营。'))).uploaded_parts,1);
+ assert.equal((await uploadBackgroundPart(env,'owner',id,0,req('负责汽车销售运营。'))).uploaded_parts,1);
+ await assert.rejects(()=>uploadBackgroundPart(env,'owner',id,0,req('修改已有片段')),/BACKGROUND_PART_CONFLICT/);
+ await uploadBackgroundPart(env,'owner',id,1,req('负责团队培训。'));
+ assert.equal((await queueBackground(env,'owner',id,{parts:2})).state,'QUEUED');
+ let calls=0;
+ const fetcher=async()=>{calls++;return model({research_complete:true,jobs:[]},[])};
+ await advanceBackground(env,{fetcher});assert.equal((await backgroundState(env,'owner',id)).phase,'SEARCH');
+ await advanceBackground(env,{fetcher});assert.equal((await backgroundState(env,'owner',id)).phase,'VERIFY');
+ assert.equal(calls,2);
+ assert.equal(await cancelBackground(env,'other',id),false);
+ assert.equal(await cancelBackground(env,'owner',id),true);
+ assert.equal(objects.size,0);
+ assert.equal((await backgroundState(env,'owner',id)).state,'CANCELLED');
+ assert.equal((await advanceBackground(env,{fetcher})).state,'IDLE');assert.equal(calls,2);
+ sqlite.close();
+});

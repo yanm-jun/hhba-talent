@@ -12,6 +12,7 @@ export const PART_BYTES=512*1024;
 const key=(id,suffix)=>'v4-background/'+id+'/'+suffix;
 const dbOf=env=>env.HHBA_PNVS_AUTH_DB;
 const bucketOf=env=>env.HHBA_V4_TASK_R2;
+export const backgroundStorageReady=env=>typeof bucketOf(env)?.put==='function'&&typeof dbOf(env)?.prepare==='function';
 export const backgroundReady=env=>env.HHBA_MATCH_V4_READY==='1'&&env.HHBA_V4_BACKGROUND_ENABLED==='1'&&typeof env.HHBA_V4_BACKGROUND_SECRET==='string'&&env.HHBA_V4_BACKGROUND_SECRET.length>=32&&typeof bucketOf(env)?.put==='function'&&typeof dbOf(env)?.prepare==='function';
 const changed=r=>Number(r?.meta?.changes)===1;
 const owned=async(db,phone,id)=>uuid.test(id||'')?db.prepare('SELECT * FROM hhba_v4_background_tasks WHERE phone=? AND id=?').bind(phone,id).first():null;
@@ -32,6 +33,7 @@ export async function createBackground(env,phone,body){
  if(!uuid.test(id||''))throw Error('INVALID_REQUEST');
  const db=dbOf(env),existing=await owned(db,phone,id);
  if(existing)return publicState(existing);
+ if(await db.prepare('SELECT id FROM hhba_v4_match_tasks WHERE id=?').bind(id).first())throw Error('BACKGROUND_ID_CONFLICT');
  let resumeId=body.resume_id||null;
  if(resumeId&&(!uuid.test(resumeId)||!await db.prepare('SELECT id FROM hhba_candidate_resumes WHERE phone=? AND id=?').bind(phone,resumeId).first()))throw Error('RESUME_NOT_OWNED');
  const now=Date.now(),role=redactForModel(typeof body.role_hint==='string'?body.role_hint:'',{unbounded:true});
@@ -58,7 +60,7 @@ export async function uploadBackgroundPart(env,phone,id,index,request){
 export async function queueBackground(env,phone,id,body){
  const db=dbOf(env),row=await owned(db,phone,id);
  if(!row)throw Error('BACKGROUND_NOT_FOUND');
- if(row.state!=='UPLOADING')return publicState(row);
+ if(row.state!=='UPLOADING'){if(['QUEUED','RUNNING','PAUSED','COMPLETE'].includes(row.state))return publicState(row);throw Error('BACKGROUND_NOT_FOUND');}
  if(body?.parts!==row.uploaded_parts||row.uploaded_parts<1)throw Error('INVALID_BACKGROUND_PART');
  // Establish private history before marking the task accepted.
  await saveV4Round(db,phone,{taskId:id,resumeId:row.resume_id,roleHint:row.role_hint,matches:[],researchPending:true});
@@ -96,7 +98,9 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
  const claim=await db.prepare("UPDATE hhba_v4_background_tasks SET state='RUNNING',lease=?,lease_until=?,updated_at=? WHERE id=? AND state IN ('QUEUED','RUNNING') AND lease_until<=?").bind(lease,now+20*60000,now,row.id,now).run();
  if(!changed(claim))return {state:'BUSY'};
  const id=row.id,phone=row.phone;
- const live=async()=>{const current=await owned(db,phone,id);if(current?.state!=='RUNNING'||current.lease!==lease)throw Error('BACKGROUND_CANCELLED');};
+ const live=async()=>{const current=await owned(db,phone,id);if(current?.state!=='RUNNING'||current.lease!==lease)throw Error('BACKGROUND_CANCELLED');
+  if(!await db.prepare('SELECT id FROM hhba_v4_match_tasks WHERE id=? AND phone=?').bind(id,phone).first())throw Error('BACKGROUND_HISTORY_MISSING');
+  if(current.resume_id&&!await db.prepare('SELECT id FROM hhba_candidate_resumes WHERE id=? AND phone=?').bind(current.resume_id,phone).first())throw Error('BACKGROUND_RESUME_REMOVED');};
  const update=async(phase,sourcePart,round,state='QUEUED',error=null,nextAt=0)=>{
   await live();
   return changed(await db.prepare("UPDATE hhba_v4_background_tasks SET state=?,phase=?,source_part=?,research_round=?,error=?,next_at=?,lease=NULL,lease_until=0,updated_at=? WHERE id=? AND state='RUNNING' AND lease=?").bind(state,phase,sourcePart,round,error,nextAt,Date.now(),id,lease).run());
@@ -112,11 +116,11 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
    await live();
    const found=await v4Match(fetcher,v4Provider(env),source,row.role_hint,{oneRound:true,skipEnrich:true,previousPostings:matches.map(j=>({posting_key:v4PostingKey(j),url:j.official_url,title:j.title,company:j.company,location:j.location})),researchContext:context||{round:row.research_round,summary:'继续阅读全部已授权的简历片段。'}});
    await live();
-   await saveV4Round(db,phone,{taskId:id,resumeId:row.resume_id,roleHint:row.role_hint,matches:found.matches,researchPending:true,researchRound:found.research_context?.round});
+   await saveV4Round(db,phone,{taskId:id,resumeId:row.resume_id,roleHint:row.role_hint,matches:found.matches.map(j=>({...j,match_score:null,score_basis:'等待完整简历与正式 JD 核验。'})),researchPending:true,researchRound:found.research_context?.round});
    await put(env,id,'context/'+row.source_part,found.research_context);
    const round=found.research_context?.round||row.research_round+1;
    if(found.native_search?.research_error&&!retryable(found.native_search.research_error))throw Error(found.native_search.research_error);
-   if(found.research_pending){await update('SEARCH',row.source_part,round);return {state:'QUEUED',phase:'SEARCH'};}
+   if(found.research_pending){await update('SEARCH',row.source_part,round,'QUEUED',found.native_search?.research_error||null,found.native_search?.research_error?Date.now()+60000:0);return {state:'QUEUED',phase:'SEARCH'};}
    const next=row.source_part+1;
    await update(next<row.uploaded_parts?'SEARCH':'VERIFY',next<row.uploaded_parts?next:0,round);
    return {state:'QUEUED'};
@@ -166,6 +170,7 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
   return {state:'QUEUED'};
  }catch(e){
   const code=codeOf(e);
+  if(['BACKGROUND_HISTORY_MISSING','BACKGROUND_RESUME_REMOVED'].includes(code)){await cancelBackground(env,phone,id);return {state:'CANCELLED'};}
   if(code==='BACKGROUND_CANCELLED'){const current=await owned(db,phone,id);if(!current||current.state==='CANCELLED'||current.state==='COMPLETE')await purgeBackgroundSource(env,id).catch(()=>{});return {state:'STALE_LEASE'};}
   try{await update(row.phase,row.source_part,row.research_round,retryable(code)?'QUEUED':'PAUSED',code,retryable(code)?Date.now()+60000:0);}catch{}
   return {state:retryable(code)?'RETRY':'PAUSED',error:code};
