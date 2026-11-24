@@ -26,6 +26,8 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 // Do not present a role-direction estimate as if a complete employer JD
 // had been independently checked. Every preliminary number has its own label.
 function matchScoreLabel(job:MatchResponse['matches'][number]):string{
+ // Archiving a JD does not retroactively validate a preliminary AI score.
+ if(job.jd_source_status==='VERIFIED_JD'&&job.evidence_score_status==='AI_DIRECTION_REFERENCE_SCORED')return '方向参考分';
  if(job.jd_source_status==='VERIFIED_JD')return 'JD 匹配分';
  if(job.evidence_status==='PARTIAL_SOURCE'&&
     job.evidence_score_status==='AI_PARTIAL_SOURCE_SCORED')return '初步匹配分';
