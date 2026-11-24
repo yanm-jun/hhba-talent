@@ -134,12 +134,45 @@ function countWidth(s){
  }
  return units;
 }
+// Recognize paragraphs consisting ONLY of ordinary text runs with identical
+// run properties. No links, fields, breaks, drawings, tracked changes, nested
+// text boxes or mixed formatting may be merged. Keep every XML run and its
+// style tags intact; change text nodes only.
+function paragraphRunGroups(xml,matches){
+ const index=new Map(matches.map(m=>[m.index,m])),groups=[],paragraphCounts=new Map();
+ for(const p of xml.matchAll(/<w:p(?:\s[^>]*)?>([\s\S]*?)<\/w:p>/g)){
+  const inner=p[1],offset=p.index+p[0].indexOf('>')+1;
+  const nodes=[...inner.matchAll(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g)];
+  if(nodes.length<2)continue;
+  const text=nodes.map(m=>decodeXML(m[1])).join('');
+  paragraphCounts.set(text,(paragraphCounts.get(text)||0)+1);
+  if(!textOnly(text))continue;
+  // A leading pPr is allowed but must remain byte-identical.
+  const content=inner.replace(/^\s*<w:pPr(?:\s[^>]*)?>[\s\S]*?<\/w:pPr>/,'').trim();
+  const runs=[...content.matchAll(/<w:r(?:\s[^>]*)?>([\s\S]*?)<\/w:r>/g)];
+  if(!runs.length||runs.map(m=>m[0]).join('')!==content.replace(/>\s+</g,'><'))continue;
+  const styles=new Set();
+  let valid=true;
+  for(const run of runs){
+   const value=run[1].trim(),props=value.match(/^<w:rPr(?:\s[^>]*)?>[\s\S]*?<\/w:rPr>/)?.[0]||'';
+   styles.add(props);
+   const rest=value.slice(props.length).trim();
+   if(!/^(?:<w:t(?:\s[^>]*)?>[^<]*<\/w:t>\s*)+$/.test(rest)){valid=false;break;}
+  }
+  if(!valid||styles.size!==1)continue;
+  const exact=nodes.map(m=>index.get(offset+m.index));
+  if(exact.some(m=>!m))continue;
+  groups.push({text,nodes:exact});
+ }
+ return {groups,paragraphCounts};
+}
 function editXml(xml,edits,{allowExpansion=false}={}){
  requireValue(xml.includes('<w:document')&&xml.includes('<w:body')&&
   !/<!DOCTYPE|<!ENTITY|<\?xml-stylesheet/i.test(xml));
  const matches=[...xml.matchAll(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g)];
  requireValue(matches.length>0);
  const changed=new Map(),used=new Set();
+ const {groups,paragraphCounts}=allowExpansion?paragraphRunGroups(xml,matches):{groups:[],paragraphCounts:new Map()};
  for(const edit of edits){
   requireValue(edit&&textOnly(edit.original)&&textOnly(edit.text)&&
    edit.text!==edit.original,'WORD_EDIT_UNSAFE');
@@ -149,12 +182,16 @@ function editXml(xml,edits,{allowExpansion=false}={}){
   if(!allowExpansion)
    requireValue(countWidth(edit.text)<=countWidth(edit.original),'WORD_EDIT_TOO_LONG');
   const hits=matches.filter(m=>decodeXML(m[1])===edit.original);
-  requireValue(hits.length===1,'WORD_EDIT_AMBIGUOUS');
-  const hit=hits[0];
-  requireValue(!used.has(hit.index),'WORD_EDIT_AMBIGUOUS');
-  used.add(hit.index);
-  const prefix=hit[0].slice(0,hit[0].indexOf('>')+1);
-  changed.set(hit.index,prefix+encodeXML(edit.text)+'</w:t>');
+  const combined=groups.filter(group=>group.text===edit.original);
+  requireValue(hits.length+combined.length===1&&
+   (!combined.length||paragraphCounts.get(edit.original)===1),'WORD_EDIT_AMBIGUOUS');
+  const targets=combined.length?combined[0].nodes:hits;
+  for(const [i,hit] of targets.entries()){
+   requireValue(!used.has(hit.index),'WORD_EDIT_AMBIGUOUS');
+   used.add(hit.index);
+   const prefix=hit[0].slice(0,hit[0].indexOf('>')+1);
+   changed.set(hit.index,prefix+encodeXML(i===0?edit.text:'')+'</w:t>');
+  }
  }
  let patched=xml;
  for(const match of matches.slice().reverse()){
@@ -262,17 +299,20 @@ export async function prepareVerifiedOriginalDocxExport({
  return {bytes:docx,verified:true,pageCount:report.page_count};
 }
 
-export async function inspectOriginalDocxStrict(raw){
+export async function inspectOriginalDocxStrict(raw,{allowParagraphRuns=false}={}){
  const pkg=readPackage(raw),entry=pkg.entries.find(e=>e.name==='word/document.xml');
  const originalXml=dec.decode(await xmlBytes(pkg,entry));
- const paragraphs=[...originalXml.matchAll(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g)]
-  .map(m=>decodeXML(m[1])).filter(s=>textOnly(s));
- // Count occurrences across the ENTIRE document before marking a run editable.
- // Cutting off at 100 could hide later text and miss a duplicate beyond the
- // cutoff, breaking the promise that an anchor targets one unique Word run.
+ const matches=[...originalXml.matchAll(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g)];
  const occurrences=new Map();
- for(const value of paragraphs)occurrences.set(value,(occurrences.get(value)||0)+1);
- const unique=paragraphs.filter(value=>occurrences.get(value)===1);
+ for(const m of matches){
+  const value=decodeXML(m[1]);occurrences.set(value,(occurrences.get(value)||0)+1);
+ }
+ const {groups,paragraphCounts}=allowParagraphRuns?paragraphRunGroups(originalXml,matches):{groups:[],paragraphCounts:new Map()};
+ const eligible=groups.filter(g=>paragraphCounts.get(g.text)===1&&!occurrences.has(g.text));
+ const covered=new Set(eligible.flatMap(g=>g.nodes.map(m=>m.index)));
+ const unique=matches.filter(m=>!covered.has(m.index)).map(m=>decodeXML(m[1])).filter(value=>
+  textOnly(value)&&occurrences.get(value)===1&&!groups.some(g=>g.text===value));
+ unique.push(...eligible.map(g=>g.text));
  return {mode:'strict_original_docx',editable_text:unique,
   entries:pkg.entries.map(e=>e.name)};
 }

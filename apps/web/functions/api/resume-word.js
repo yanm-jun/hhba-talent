@@ -214,7 +214,7 @@ export async function onRequestGet({request,env}){
    const state=await approved(bucket,row,jobId,env);
    const current=state.saved?
     await versionBytes(bucket,state.key,state.saved,'docx'):original;
-   const data=await inspectOriginalDocxStrict(current);
+   const data=await inspectOriginalDocxStrict(current,{allowParagraphRuns:v4(env)&&!renderer});
    return json({ok:true,editable_text:data.editable_text,
     saved:state.saved?{original:state.saved.original,text:state.saved.text,
      updated_at:state.saved.updated_at}:null,
