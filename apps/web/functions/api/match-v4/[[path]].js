@@ -18,7 +18,8 @@ const preview=request=>{
  return u.protocol==='https:'&&u.hostname.endsWith('.hhba-talent.pages.dev')&&
   u.hostname!=='hhba-talent.pages.dev';
 };
-const enabled=(env,request)=>preview(request)&&Boolean(v4Provider(env))&&
+const enabled=(env,request)=>preview(request)&&env?.HHBA_MATCH_V4_READY==='1'&&
+ Boolean(v4Provider(env))&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 const sanitize=(raw)=>{
  if(typeof raw!=='string'||raw.length>22000)return null;
