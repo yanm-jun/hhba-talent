@@ -635,14 +635,23 @@ test('V4 durable upload and cancellation are account bound, idempotent, and clea
  await uploadBackgroundPart(env,'owner',id,1,req('负责团队培训。'));
  assert.equal((await queueBackground(env,'owner',id,{parts:2})).state,'QUEUED');
  let calls=0;
- const fetcher=async()=>{calls++;return model({research_complete:true,jobs:[]},[])};
+ const fetcher=async(_url,opts)=>{calls++;const p=JSON.parse(opts.body);if(!p.tools){const input=JSON.parse(p.input);return model({profile:{summary:input.resume_segment,facts:[{kind:'经验',quote:input.resume_segment}],roles:['运营']}});}assert.equal(p.tool_choice,'auto');assert.match(p.input,/汽车销售运营/);assert.match(p.input,/团队培训/);return model({research_complete:true,jobs:[]},[])};
+ await advanceBackground(env,{fetcher});assert.equal((await backgroundState(env,'owner',id)).phase,'PROFILE');
  await advanceBackground(env,{fetcher});assert.equal((await backgroundState(env,'owner',id)).phase,'SEARCH');
  await advanceBackground(env,{fetcher});assert.equal((await backgroundState(env,'owner',id)).phase,'VERIFY');
- assert.equal(calls,2);
+ assert.equal(calls,3);
  assert.equal(await cancelBackground(env,'other',id),false);
  assert.equal(await cancelBackground(env,'owner',id),true);
  assert.equal(objects.size,0);
  assert.equal((await backgroundState(env,'owner',id)).state,'CANCELLED');
- assert.equal((await advanceBackground(env,{fetcher})).state,'IDLE');assert.equal(calls,2);
+ assert.equal((await advanceBackground(env,{fetcher})).state,'IDLE');assert.equal(calls,3);
  sqlite.close();
+});
+
+
+test('V4 allows autonomous planning without web tools but never accepts unsearched vacancies',async()=>{
+ let calls=0;
+ const fetcher=async(_url,opts)=>{calls++;assert.equal(JSON.parse(opts.body).tool_choice,'auto');if(calls===1)return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify({research_complete:false,research_summary:'先规划渠道和培训方向',jobs:[row]})}]}]});return model({research_complete:true,jobs:[row]},[url]);};
+ const first=await v4Match(fetcher,provider,resume,'全国',{oneRound:true,skipEnrich:true});assert.equal(first.matches.length,0);assert.equal(first.research_pending,true);
+ const second=await v4Match(fetcher,provider,resume,'全国',{oneRound:true,skipEnrich:true,researchContext:first.research_context});assert.equal(second.matches.length,1);assert.equal(second.research_pending,false);
 });

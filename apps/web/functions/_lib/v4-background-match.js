@@ -1,7 +1,7 @@
 // An opt-in background job is not tied to a browser request. A scheduled
 // Worker invokes one durable unit at a time. No model call/round/job cap.
 // Temporary redacted source and context are private, separate from history.
-import {v4Match,v4Provider,v4Call,v4ParseJson} from './simple-match-v4.js';
+import {v4Match,v4Provider,v4Call,v4ParseJson,resumeResearchIndex} from './simple-match-v4.js';
 import {redactForModel} from './resume-match-core.js';
 import {saveV4Round,getV4History,patchV4Job,finishV4History} from './v4-match-history.js';
 import {prepareV4JobForOptimization} from './v4-jd-bridge.js';
@@ -64,7 +64,7 @@ export async function queueBackground(env,phone,id,body){
  if(body?.parts!==row.uploaded_parts||row.uploaded_parts<1)throw Error('INVALID_BACKGROUND_PART');
  // Establish private history before marking the task accepted.
  await saveV4Round(db,phone,{taskId:id,resumeId:row.resume_id,roleHint:row.role_hint,matches:[],researchPending:true});
- const updated=await db.prepare("UPDATE hhba_v4_background_tasks SET state='QUEUED',updated_at=?,next_at=0 WHERE id=? AND phone=? AND state='UPLOADING'").bind(Date.now(),id,phone).run();
+ const updated=await db.prepare("UPDATE hhba_v4_background_tasks SET state='QUEUED',phase=CASE WHEN uploaded_parts>1 THEN 'PROFILE' ELSE 'SEARCH' END,updated_at=?,next_at=0 WHERE id=? AND phone=? AND state='UPLOADING'").bind(Date.now(),id,phone).run();
  if(!changed(updated))throw Error('BACKGROUND_NOT_FOUND');return publicState(await owned(db,phone,id));
 }
 export async function backgroundState(env,phone,id){const t=await owned(dbOf(env),phone,id);return t?publicState(t):null;}
@@ -98,9 +98,13 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
  const claim=await db.prepare("UPDATE hhba_v4_background_tasks SET state='RUNNING',lease=?,lease_until=?,updated_at=? WHERE id=? AND state IN ('QUEUED','RUNNING') AND lease_until<=?").bind(lease,now+20*60000,now,row.id,now).run();
  if(!changed(claim))return {state:'BUSY'};
  const id=row.id,phone=row.phone;
+ const controller=new AbortController();
  const live=async()=>{const current=await owned(db,phone,id);if(current?.state!=='RUNNING'||current.lease!==lease)throw Error('BACKGROUND_CANCELLED');
   if(!await db.prepare('SELECT id FROM hhba_v4_match_tasks WHERE id=? AND phone=?').bind(id,phone).first())throw Error('BACKGROUND_HISTORY_MISSING');
   if(current.resume_id&&!await db.prepare('SELECT id FROM hhba_candidate_resumes WHERE id=? AND phone=?').bind(current.resume_id,phone).first())throw Error('BACKGROUND_RESUME_REMOVED');};
+ const renew=async()=>{await live();const result=await db.prepare("UPDATE hhba_v4_background_tasks SET lease_until=? WHERE id=? AND lease=? AND state='RUNNING'").bind(Date.now()+20*60000,id,lease).run();if(!changed(result))throw Error('BACKGROUND_CANCELLED');};
+ const timer=setInterval(()=>{void renew().catch(()=>controller.abort(Error('BACKGROUND_CANCELLED')))},30000);
+ const guardedFetch=async(url,options={})=>{await renew();if(controller.signal.aborted)throw controller.signal.reason;return fetcher(url,{...options,signal:options.signal?AbortSignal.any([options.signal,controller.signal]):controller.signal});};
  const update=async(phase,sourcePart,round,state='QUEUED',error=null,nextAt=0)=>{
   await live();
   return changed(await db.prepare("UPDATE hhba_v4_background_tasks SET state=?,phase=?,source_part=?,research_round=?,error=?,next_at=?,lease=NULL,lease_until=0,updated_at=? WHERE id=? AND state='RUNNING' AND lease=?").bind(state,phase,sourcePart,round,error,nextAt,Date.now(),id,lease).run());
@@ -109,20 +113,33 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
   const detail=await getV4History(db,phone,id);
   if(!detail)throw Error('BACKGROUND_HISTORY_MISSING');
   const matches=detail.matches;
-  if(row.phase==='SEARCH'){
+  if(row.phase==='PROFILE'){
    const source=await get(env,id,'source/'+row.source_part);
+   if(typeof source!=='string'||!source.trim())throw Error('BACKGROUND_SOURCE_MISSING');
+   const profile=await get(env,id,'profile/'+row.source_part)||await resumeResearchIndex(guardedFetch,v4Provider(env),source,row.role_hint,controller.signal);
+   await live();await put(env,id,'profile/'+row.source_part,profile);
+   const next=row.source_part+1;
+   await update(next<row.uploaded_parts?'PROFILE':'SEARCH',next<row.uploaded_parts?next:0,row.research_round);
+   return {state:'QUEUED',phase:next<row.uploaded_parts?'PROFILE':'SEARCH'};
+  }
+  if(row.phase==='SEARCH'){
+   let source=await get(env,id,'source/0');
+   if(row.uploaded_parts>1){
+    const profiles=[];
+    for(let n=0;n<row.uploaded_parts;n++){const p=await get(env,id,'profile/'+n);if(!p)throw Error('BACKGROUND_PROFILE_MISSING');profiles.push(p);}
+    source=JSON.stringify({source_kind:'全简历分段证据索引（非原文）',profiles});
+   }
    if(typeof source!=='string'||!source.trim())throw Error('BACKGROUND_SOURCE_MISSING');
    const context=await get(env,id,'context/'+row.source_part);
    await live();
-   const found=await v4Match(fetcher,v4Provider(env),source,row.role_hint,{oneRound:true,skipEnrich:true,previousPostings:matches.map(j=>({posting_key:v4PostingKey(j),url:j.official_url,title:j.title,company:j.company,location:j.location})),researchContext:context||{round:row.research_round,summary:'继续阅读全部已授权的简历片段。'}});
+   const found=await v4Match(guardedFetch,v4Provider(env),source,row.role_hint,{signal:controller.signal,sourceRepresentation:row.uploaded_parts>1?'全简历分段证据索引':'complete_source',oneRound:true,skipEnrich:true,previousPostings:matches.map(j=>({posting_key:v4PostingKey(j),url:j.official_url,title:j.title,company:j.company,location:j.location})),researchContext:context||{round:row.research_round,summary:'继续阅读全部已授权的简历片段。'}});
    await live();
    await saveV4Round(db,phone,{taskId:id,resumeId:row.resume_id,roleHint:row.role_hint,matches:found.matches.map(j=>({...j,match_score:null,score_basis:'等待完整简历与正式 JD 核验。'})),researchPending:true,researchRound:found.research_context?.round});
    await put(env,id,'context/'+row.source_part,found.research_context);
    const round=found.research_context?.round||row.research_round+1;
    if(found.native_search?.research_error&&!retryable(found.native_search.research_error))throw Error(found.native_search.research_error);
    if(found.research_pending){await update('SEARCH',row.source_part,round,'QUEUED',found.native_search?.research_error||null,found.native_search?.research_error?Date.now()+60000:0);return {state:'QUEUED',phase:'SEARCH'};}
-   const next=row.source_part+1;
-   await update(next<row.uploaded_parts?'SEARCH':'VERIFY',next<row.uploaded_parts?next:0,round);
+   await update('VERIFY',0,round);
    return {state:'QUEUED'};
   }
   // Verified jobs are scored against every source part, not just the first.
@@ -136,7 +153,7 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
   const posting=v4PostingKey(candidate),jobKey='job/'+posting;
   let job=candidate;
   if(!job.jd_version_id){
-   try{const verified=await prepareV4JobForOptimization(env,job.official_url,{fetcher,expectedTitle:job.title});await live();await patchV4Job(db,phone,id,job.official_url,verified,posting);await update('VERIFY',0,row.research_round);return {state:'QUEUED'};}
+   try{const verified=await prepareV4JobForOptimization(env,job.official_url,{fetcher:guardedFetch,signal:controller.signal,expectedTitle:job.title,expectedLocation:job.location});await live();await patchV4Job(db,phone,id,job.official_url,verified,posting);await update('VERIFY',0,row.research_round);return {state:'QUEUED'};}
    catch(e){const code=codeOf(e);if(!permanentJD(code))throw e;await live();await patchV4Job(db,phone,id,job.official_url,{jd_score_status:'BACKGROUND_UNVERIFIED',match_score:null,score_basis:'未取得可靠的完整 JD，未提供匹配分。'},posting);await update('VERIFY',0,row.research_round);return {state:'QUEUED'};}
   }
   // One score part per invocation; retain intermediate evidence privately.
@@ -145,7 +162,7 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
    const source=await get(env,id,'source/'+findings.next);
    if(typeof source!=='string')throw Error('BACKGROUND_SOURCE_MISSING');
    await live();
-   const score=await scoreVerifiedV4Job(env,job,source,{fetcher});await live();
+   const score=await scoreVerifiedV4Job(env,job,source,{fetcher:guardedFetch,signal:controller.signal});await live();
    findings.parts.push(score);findings.next++;
    await put(env,id,jobKey,findings);
    await update('VERIFY',0,row.research_round);return {state:'QUEUED'};
@@ -159,7 +176,7 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
    let value=null,reason='完整分段研究未发现足够的简历证据。';
    if(evidence){
     await live();
-    const r=await v4Call(fetcher,v4Provider(env),{instructions:'综合同一岗位与同一份简历所有分段的真实核验证据。不得平均局部分数，某段未发现证据不代表其他段没有。不能捏造资格。只返回 JSON {score:0至100整数或null,reason:解释}。',input:JSON.stringify({title:job.title,findings:findings.parts.map(p=>({score:p.match_score,reason:p.recommendation_reason,comparisons:p.jd_comparisons}))})});
+    const r=await v4Call(guardedFetch,v4Provider(env),{instructions:'综合同一岗位与同一份简历所有分段的真实核验证据。不得平均局部分数，某段未发现证据不代表其他段没有。不能捏造资格。只返回 JSON {score:0至100整数或null,reason:解释}。',input:JSON.stringify({title:job.title,findings:findings.parts.map(p=>({score:p.match_score,reason:p.recommendation_reason,comparisons:p.jd_comparisons}))})});
     if(r.status!=='completed')throw Error('AI_PROVIDER_INCOMPLETE');
     const a=v4ParseJson(r);value=Number.isInteger(a.score)&&a.score>=0&&a.score<=100?a.score:null;reason=typeof a.reason==='string'?a.reason:reason;
    }
@@ -169,10 +186,10 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
   await bucketOf(env).delete(key(id,jobKey));await update('VERIFY',0,row.research_round);
   return {state:'QUEUED'};
  }catch(e){
-  const code=codeOf(e);
+  const code=controller.signal.aborted?'BACKGROUND_CANCELLED':codeOf(e);
   if(['BACKGROUND_HISTORY_MISSING','BACKGROUND_RESUME_REMOVED'].includes(code)){await cancelBackground(env,phone,id);return {state:'CANCELLED'};}
   if(code==='BACKGROUND_CANCELLED'){const current=await owned(db,phone,id);if(!current||current.state==='CANCELLED'||current.state==='COMPLETE')await purgeBackgroundSource(env,id).catch(()=>{});return {state:'STALE_LEASE'};}
   try{await update(row.phase,row.source_part,row.research_round,retryable(code)?'QUEUED':'PAUSED',code,retryable(code)?Date.now()+60000:0);}catch{}
   return {state:retryable(code)?'RETRY':'PAUSED',error:code};
- }
+ }finally{clearInterval(timer);}
 }
