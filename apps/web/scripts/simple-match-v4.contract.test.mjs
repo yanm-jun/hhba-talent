@@ -78,7 +78,7 @@ test('V4 sends résumé directly to AI web search and preserves credible job lea
    assert.equal(payload.tools[0].type,'web_search');
    assert.ok(payload.input.includes('汽车经销商渠道运营'));
    assert.ok(payload.instructions.includes('不要限制企业'));
-   return model({profile:{summary:'适合区域渠道运营',roles:['渠道运营']},jobs:[row]},[url]);
+   return model({research_complete:true,profile:{summary:'适合区域渠道运营',roles:['渠道运营']},jobs:[row]},[url]);
   }
   return new Response('blocked',{status:403});
  };
@@ -101,7 +101,7 @@ test('V4 does not silently cap recommendations at 10 or 20',async()=>{
   url:'https://recruitment.company'+i+'.cn/vacancies/'+i}));
  let modelCalls=0;
  const fetcher=async(u)=>{
-  if(u.endsWith('/responses')){modelCalls++;return model({profile:{roles:['区域督导']},jobs:rows});}
+  if(u.endsWith('/responses')){modelCalls++;return model({research_complete:true,profile:{roles:['区域督导']},jobs:rows});}
   return new Response('not accessible',{status:403});
  };
  const r=await v4Match(fetcher,provider,resume,'全国');
@@ -188,4 +188,33 @@ test('V4 frontend never rejects more than ten posts or cancels at the legacy fiv
  assert.match(service,/!MATCH_V4_PREVIEW&&data\.matches\.length>10/);
  assert.match(service,/MATCH_V4_PREVIEW\?undefined:setTimeout/);
  assert.match(service,/!MATCH_V4_PREVIEW\?\{limit:/);
+});
+
+
+test('V4 preserves long resume and preference and does not stop on missing completion flag',async()=>{
+ const longResume=resume+'经历'.repeat(15000)+'独特末尾经历';
+ const hint='全国'.repeat(100)+'末尾意向';
+ let calls=0;
+ const result=await v4Match(async(u,options)=>{
+  if(!u.endsWith('/responses'))return new Response('blocked',{status:403});
+  const input=JSON.parse(JSON.parse(options.body).input);
+  assert.equal(input.resume_text,longResume);
+  assert.equal(input.preferred_job_or_city,hint);
+  calls++;
+  return model({...(calls===2?{research_complete:true}:{}),jobs:[row]},[url]);
+ },provider,longResume,hint);
+ assert.equal(calls,2);
+ assert.equal(result.matches.length,1);
+});
+test('V4 removes local request and response size caps without changing legacy defaults',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const {redactForModel}=await import('../functions/_lib/resume-match-core.js');
+ const long='经历'.repeat(20000)+'末尾';
+ assert.equal(redactForModel(long,{unbounded:true}),long);
+ assert.equal(redactForModel(long).length,20000);
+ const endpoint=await readFile(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ assert.doesNotMatch(endpoint,/55000|22000|slice\\(0,20000\\)|slice\\(0,80\\)/);
+ const service=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ assert.match(service,/!MATCH_V4_PREVIEW&&buffer.length>320000/);
+ assert.match(service,/!MATCH_V4_PREVIEW&&file.size>LIMIT/);
 });
