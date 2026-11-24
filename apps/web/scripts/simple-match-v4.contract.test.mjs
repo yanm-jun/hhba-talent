@@ -218,3 +218,42 @@ test('V4 removes local request and response size caps without changing legacy de
  assert.match(service,/!MATCH_V4_PREVIEW&&buffer.length>320000/);
  assert.match(service,/!MATCH_V4_PREVIEW&&file.size>LIMIT/);
 });
+
+
+test('V4 is the ordinary HHBA matching route and document parsing opts out of business caps',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const service=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ const {wordXmlToText}=await import('../src/services/docxProfile.mjs');
+ const {extractPdfText}=await import('../src/services/pdfProfile.mjs');
+ assert.doesNotMatch(service,/get\('v4'\)==='1'/);
+ assert.match(page,/maxLength=\{MATCH_V4_PREVIEW\?undefined:20000\}/);
+ assert.match(page,/maxLength=\{MATCH_V4_PREVIEW\?undefined:80\}/);
+ const long='真实工作经历'.repeat(10000);
+ const xml='<w:document><w:body><w:p><w:t>'+long+'</w:t></w:p></w:body></w:document>';
+ assert.equal(wordXmlToText(xml,{unbounded:true}),long);
+ const buffer=new Uint8Array(4*1024*1024);buffer.set(new TextEncoder().encode('%PDF-1.7'));
+ const result=await extractPdfText(buffer.buffer,{unbounded:true,loadPdfJs:async()=>({getDocument:()=>({promise:Promise.resolve({numPages:16,getPage:async()=>({getTextContent:async()=>({items:[{str:long}]})})}),destroy:async()=>{}})})});
+ assert.equal(result.pages,16);
+ assert.ok(result.text.length>50000);
+});
+test('V4 continuation excludes every previously found URL and can be requested after completion',async()=>{
+ const previous=Array.from({length:60},(_,i)=>'https://careers.company.cn/job/'+i);
+ const newUrl='https://careers.company.cn/job/new';
+ const result=await v4Match(async(u,options)=>{
+  if(!u.endsWith('/responses'))return new Response('blocked',{status:403});
+  const input=JSON.parse(JSON.parse(options.body).input);
+  assert.equal(input.previous_search_urls.length,60);
+  return model({research_complete:true,jobs:[{...row,url:previous[0]},{...row,url:newUrl}]},[previous[59],newUrl]);
+ },provider,resume,'全国',{excludeUrls:previous});
+ assert.deepEqual(result.matches.map(x=>x.official_url),[newUrl]);
+ assert.equal(result.can_continue,true);
+});
+test('V4 JD extraction preserves long legitimate sections',async()=>{
+ const {extractOfficialJdSections,htmlToText}=await import('../functions/_lib/official-job-evidence.js');
+ const lines=['岗位职责',...Array.from({length:140},(_,i)=>'负责渠道运营工作 '+i+' 详细要求'.repeat(40)),'任职要求','具有真实工作经历和团队协作能力','具有销售数据分析经验'];
+ const jd=extractOfficialJdSections(lines.join('\n'),{unbounded:true});
+ assert.ok(jd.sections.length>120);
+ assert.ok(jd.full_jd.length>24000);
+ assert.ok(htmlToText('<p>'+('岗位职责'.repeat(30000))+'</p>',{unbounded:true}).length>100000);
+});
