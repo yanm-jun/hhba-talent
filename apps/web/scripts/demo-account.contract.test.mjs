@@ -40,7 +40,9 @@ test('original workbench has real account profile, isolated favorites and transp
  assert.match(account,/hasVisited\('resume'\).*<PrivateResumeVault active=\{current==='resume'\}\/>/);
  const vault=source('components/PrivateResumeVault.tsx');
  assert.match(vault,/私有简历服务尚未启用/);
- assert.match(account,/hhba-workbench-profile-links/);
+ assert.match(account,/hhba-workbench-card-grid/);
+ assert.match(account,/to="\/candidate\/account\/profile"/);
+ assert.match(account,/to="\/candidate\/account\/resume"/);
  assert.match(account,/hhba-career-record-list/);
 });
 test('workbench layout remains consistent across desktop and mobile',()=>{
