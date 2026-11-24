@@ -14,7 +14,8 @@ const secret=(v)=>typeof v==='string'&&v.trim().length>=16;
 
 export const AGENT_V3_PROVIDER='HHBA_OPENAI_AGENT_V3';
 export function resolveAgentProvider(env={}){
- const requested=String(env.HHBA_AGENT_PROVIDER||'openai').trim().toLowerCase();
+ const requested=String(env.HHBA_AGENT_PROVIDER||
+  (secret(env.HHBA_AGENT_RELAY_API_KEY)?'relay':'openai')).trim().toLowerCase();
  if(!['openai','relay'].includes(requested))return null;
  const base=requested==='relay'?RELAY:OFFICIAL;
  // The origin is set by server deployment configuration only. Arbitrary user
@@ -27,7 +28,8 @@ export function resolveAgentProvider(env={}){
  const model=String(env.HHBA_AGENT_MODEL||'gpt-6.2-sol').trim();
  const reviewModel=String(env.HHBA_AGENT_REVIEW_MODEL||model).trim();
  if(!modelName(model)||!modelName(reviewModel))return null;
- const actor=String(env.HHBA_AGENT_ACTOR_AUTH||'').trim();
+ const actor=String(env.HHBA_AGENT_ACTOR_AUTH||
+  (requested==='relay'?'local-image-extension':'')).trim();
  // This nonstandard header is a relay/CLI setting, not an OpenAI feature.
  // Do not reflect arbitrary header values or accept newline injection.
  if(actor&&(requested!=='relay'||!/^[A-Za-z0-9._-]{1,80}$/.test(actor)))
