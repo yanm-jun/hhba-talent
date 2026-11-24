@@ -39,7 +39,7 @@ export async function onRequestPost({request,env}){
  try{
   // All requests remain explicit-consent, candidate-only and local to this
   // draft. The model may choose further editorial tools, not privileged I/O.
-  const signal=AbortSignal.timeout(150000);
+  const signal=env?.HHBA_MATCH_V4_READY==='1'?request.signal:AbortSignal.timeout(150000);
   const base=await generateTailoredResume({
    env,blocks:body.blocks,job:trustedJob,signal
   });
