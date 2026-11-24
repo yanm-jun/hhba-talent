@@ -39,7 +39,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
 }){
  const ref=useRef<HTMLDivElement|null>(null);
  const [optimizedJobUrl,setOptimizedJobUrl]=useState<string|null>(()=>
-  result.matches.find(job=>job.id===initialOptimizedJobId&&job.jd_version_id&&job.jd_sha256)?.official_url||null);
+  [...result.matches,...researchJobs].find(job=>job.id===initialOptimizedJobId&&job.jd_version_id&&job.jd_sha256)?.official_url||null);
  const [optimizationDirty,setOptimizationDirty]=useState(false);
  const [elapsed,setElapsed]=useState(0);
  useEffect(()=>{
@@ -57,7 +57,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
   waiting:'正在匹配岗位'
  };
 
- const [selectedJobUrl,setSelectedJobUrl]=useState<string|null>(null);
+ const [selectedJobUrl,setSelectedJobUrl]=useState<string|null>(optimizedJobUrl);
  const [manualStage,setManualStage]=useState<number|null>(null);
  const [furthestStage,setFurthestStage]=useState(0);
  const currentStage=matchStageIndex(progressStage);
