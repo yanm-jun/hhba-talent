@@ -8,6 +8,7 @@ import {redactForModel} from '../../_lib/resume-match-core.js';
 import {v4Provider,v4Match} from '../../_lib/simple-match-v4.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {recognizeV4Resume} from '../../_lib/v4-resume-ocr.js';
+import {claimAiCheckpoint} from '../../_lib/ai-checkpoint-claim.js';
 import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -60,6 +61,7 @@ function events(env,request,input){
    };
    send('progress',{stage:'preparing'});
    void (async()=>{
+    let succeeded=false;
     try{
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
       signal:request.signal,onProgress:progress,onActivity:activity,env,excludeUrls:input.excludeUrls,
@@ -68,6 +70,7 @@ function events(env,request,input){
      if(result.status==='CONTINUE'){
       const token=await issueCheckpoint(checkpointArgs(env,input,result.checkpoint));
       send('complete',{status:'CONTINUE',continuation:{state:result.checkpoint,token}});
+      succeeded=true;
       return;
      }
      console.info('HHBA_V4_MATCH',JSON.stringify({result:'COMPLETE',
@@ -80,6 +83,7 @@ function events(env,request,input){
      }catch{result.history_status='UNAVAILABLE';console.warn('HHBA_V4_HISTORY_UNAVAILABLE');}
      sendJobs('final',result.matches);
      send('complete',{...result,matches:[],matches_streamed:true,match_count:result.matches.length});
+     succeeded=true;
     }catch(e){
      const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
      console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({error:code,stage:phase,
@@ -87,6 +91,7 @@ function events(env,request,input){
      send('failure',{error:code,phase,elapsed_ms:Date.now()-started});
     }finally{
      clearInterval(heart);
+     if(input.claim&&!succeeded)await input.claim.release().catch(()=>console.warn('HHBA_CHECKPOINT_RELEASE_FAILED'));
      if(!closed){closed=true;try{controller.close()}catch{}}
     }
    })();
@@ -145,6 +150,10 @@ export async function onRequest({request,env}){
   try{
    await verifyCheckpoint({...checkpointArgs(env,input,body.continuation.state),token:body.continuation.token});
   }catch{return fail('AI_CHECKPOINT_INVALID',409)}
+  if(env?.HHBA_V4_CHECKPOINT_REPLAY_PROTECTION==='1'){
+   try{input.claim=await claimAiCheckpoint(db,body.continuation.token);if(!input.claim)return fail('AI_CHECKPOINT_ALREADY_USED',409);}
+   catch{return fail('AI_CHECKPOINT_DB_UNAVAILABLE',503);}
+  }
   input.checkpoint=body.continuation.state;
  }
  return events(env,request,input);
