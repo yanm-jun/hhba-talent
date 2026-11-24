@@ -12,13 +12,13 @@ test('the bottom-right people photograph popup is completely absent from the hom
 
 test('removal does not affect the HHBA interactive homepage and letter',()=>{
  for(const expected of [
-  'title="企业招聘导航"',
+  'title="劳动权益"',
   '<HomeCompanyMarquee/>',
   '<UnifiedJobMarket compact/>',
   '<HomeOpenLetter autoOpen={false}/>',
   '<WinterInternshipPopup/>',
   '求职与机会',
-  '企业招聘导航'
+  '劳动权益'
  ]) assert.ok(home.includes(expected),expected);
 });
 
