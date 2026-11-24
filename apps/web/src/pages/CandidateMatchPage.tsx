@@ -11,7 +11,7 @@ import {matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProvider
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-const maxResumeSize=3*1024*1024;
+const maxResumeSize=12*1024*1024;
 
 export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
  const [file,setFile]=useState<File|null>(null);
@@ -116,7 +116,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   if(!candidate){setFile(null);return}
   const format=resumeFileFormat(candidate.name);
   if(!format||candidate.size<30||candidate.size>maxResumeSize){
-    setFile(null);setError('请选择 3 MB 以内的 Word（DOCX）或 PDF 简历。');return;
+    setFile(null);setError('请选择 12 MB 以内的 Word（DOCX）或 PDF 简历。');return;
   }
   setFile(candidate);
   void preview(candidate);
@@ -343,7 +343,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
        </div></div>}
     <div className="hhba-ai-layout">
       <section className="hhba-ai-upload">
-        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>支持 Word（DOCX）和 PDF，最大 3 MB。</p></header>
+        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>支持 Word（DOCX）和 PDF，单次匹配最大 12 MB；私有原文件存储另有大小限制。</p></header>
         {user&&privateResumeAvailable&&savedFiles.length>0&&<div className="hhba-ai-saved-picker">
           <button type="button" className="hhba-ai-saved-picker-trigger"
            aria-expanded={savedPickerOpen} aria-controls="hhba-ai-existing-options"
@@ -399,9 +399,9 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           {!previewError&&identifiedCharacters>0&&<small role="status">已识别 {identifiedCharacters} 个非空白字符，请核对工作经历、技能和求职方向。</small>}
           {previewNote&&<small role="status">{previewNote}</small>}
           {previewError&&<p className="hhba-ai-error" role="alert">{previewError} 你可以在下方粘贴或补全简历文字。</p>}
-          <textarea id="hhba-ai-text-preview" rows={6} maxLength={20000} value={previewText}
+          <textarea id="hhba-ai-text-preview" rows={6} maxLength={250000} value={previewText}
            disabled={working||saveBusy||ocrBusy} onChange={e=>{setPreviewText(e.target.value);setConsent(false);}}/>
-          <small>{identifiedCharacters<30?'请输入至少 30 个非空白字符。':'可直接修改，最多 20,000 字。'}</small>
+          <small>{identifiedCharacters<30?'请输入至少 30 个非空白字符。':'可直接修改，最多 250,000 字，超过时建议分段处理。'}</small>
          </div>}
          {!previewBusy&&!ocrBusy&&!ocrFile&&(!previewLoaded||previewError)&&<button type="button" disabled={working||saveBusy}
           onClick={()=>{const source=file||savedFiles.find(item=>item.id===savedId);if(source)void preview(source);}}>
@@ -412,8 +412,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          <legend>这份简历，是否保存到「我的简历」？</legend>
          <label className={storageChoice==='save'?'is-selected':''}>
           <input type="radio" name="hhba-resume-storage" value="save"
-           checked={storageChoice==='save'} onChange={()=>setStorageChoice('save')}/>
-          <span><strong>保存到我的简历</strong><small>匹配前私有保存原 PDF/DOCX，今后可直接选择复用（最多 3 份）。</small></span>
+           checked={storageChoice==='save'} disabled={file.size>3*1024*1024} onChange={()=>setStorageChoice('save')}/>
+          <span><strong>保存到我的简历</strong><small>匹配前私有保存原 PDF/DOCX（目前单份 3 MB、最多 3 份），今后可直接选择复用。</small></span>
          </label>
          <label className={storageChoice==='once'?'is-selected':''}>
           <input type="radio" name="hhba-resume-storage" value="once"
@@ -427,7 +427,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           <p>可选填目标方向；不填写时，AI 会根据简历为你推荐。</p></header>
         <div className="hhba-ai-mainland-only"><span>工作区域</span><strong>中国大陆</strong><small>不推荐港澳台或境外岗位</small></div>
         <div className="hhba-ai-fields hhba-ai-fields-one">
-         <label>目标岗位方向<input value={options.role_hint} maxLength={80} placeholder="例如：软件开发、数据分析、销售、视觉设计"
+         <label>目标岗位方向<input value={options.role_hint} placeholder="例如：软件开发、数据分析、销售、视觉设计"
           onChange={e=>setOptions(x=>({...x,role_hint:e.target.value}))}/></label>
         </div>
         <p className="hhba-ai-notice" role="status">
