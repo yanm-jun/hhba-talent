@@ -20,7 +20,7 @@ const allowedSections=new Set(['summary','experience','skills','education','proj
 function validContinuation(body){
  if(!body||body.consent_ai!==true||
   !Array.isArray(body.blocks)||body.blocks.length<1||
-  body.blocks.length>96||!body.job||typeof body.job!=='object'||
+  body.blocks.length>512||!body.job||typeof body.job!=='object'||
   typeof body.job.title!=='string'||!body.job.title.trim()||
   body.job.title.length>180||
   typeof body.job.requirements!=='string'||body.job.requirements.length>16000)
