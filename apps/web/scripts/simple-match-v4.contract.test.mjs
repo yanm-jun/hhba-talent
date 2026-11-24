@@ -83,11 +83,19 @@ test('Two AI calls can finish without inventing posts when no official page is c
  assert.equal(r.matches.length,0);
  assert.match(r.disclaimer,/不编造/);
 });
-test('V4 is disabled on production even when Preview Secret exists',async()=>{
+test('V4 requires explicit flag and never runs unauthenticated or cross-origin',async()=>{
  const mock={HHBA_AGENT_RELAY_API_KEY:key,HHBA_MATCH_V4_READY:'1',
   HHBA_PNVS_AUTH_DB:{prepare:()=>{throw Error('should not query DB')}}};
+ const disabled=await onRequest({request:new Request('https://hhba.work/api/match-v4/status'),
+  env:{...mock,HHBA_MATCH_V4_READY:'0'}});
+ assert.equal((await disabled.json()).enabled,false);
  const r=await onRequest({request:new Request('https://hhba.work/api/match-v4/status'),env:mock});
- assert.equal((await r.json()).enabled,false);
+ assert.equal((await r.json()).enabled,true);
+ const noAuth=await onRequest({request:new Request('https://hhba.work/api/match-v4/resume',{
+  method:'POST',headers:{Origin:'https://hhba.work','Content-Type':'application/json'},
+  body:JSON.stringify({consent:true,text:'工作经历'.repeat(30),options:{country:'CN'}})
+ }),env:{...mock,HHBA_PNVS_AUTH_DB:{prepare:()=>({first:async()=>null})}}});
+ assert.equal(noAuth.status,401);
  const p=await onRequest({request:new Request('https://v4.hhba-talent.pages.dev/api/match-v4/resume',{
   method:'POST',headers:{Origin:'https://evil.example','Content-Type':'application/json'},
   body:JSON.stringify({consent:true,text:'工作经历'.repeat(30),options:{country:'CN'}})
