@@ -243,9 +243,10 @@ test('Score and recruitment status appear in compact modal, not admission probab
  const jsx=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  const css=await readFile(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
  assert.match(jsx,/简历适配分/);
- assert.match(jsx,/不是录用概率/);
- assert.match(jsx,/投递状态未确认/);
- assert.match(jsx,/网页显示在招/);
+ const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ assert.match(panels,/不是录用概率/);
+ assert.match(panels,/仍需官网确认/);
+ assert.match(panels,/页面显示开放，仍需确认/);
  assert.match(css,/hhba-native-score-basis/);
 });
 
