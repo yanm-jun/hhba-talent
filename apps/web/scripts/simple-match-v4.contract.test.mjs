@@ -437,3 +437,23 @@ test('streaming request rejection falls back to JSON without repeating completed
  assert.deepEqual(attempts,[true,false]);
  assert.equal(v4ParseJson(result).ok,true);
 });
+
+test('V4 changes search strategy after duplicate discoveries and finds further jobs',async()=>{
+ let rounds=0;const fresh={...row,url:'https://careers.further-employer.cn/vacancies/22'};
+ const result=await v4Match(async(u,options)=>{
+  if(!u.endsWith('/responses'))return new Response('unavailable',{status:403});
+  rounds++;
+  if(rounds===3)assert.ok(JSON.parse(options.body).input.includes('换搜索策略'));
+  return model({research_complete:rounds===3,jobs:rounds===3?[fresh]:[row]},[rounds===3?fresh.url:url]);
+ },provider,resume,'全国');
+ assert.equal(rounds,3);assert.equal(result.matches.length,2);
+});
+test('V4 recovers a temporary network failure before any job has been discovered',async()=>{
+ let attempts=0;
+ const result=await v4Match(async(u)=>{
+  if(!u.endsWith('/responses'))return new Response('unavailable',{status:403});
+  if(++attempts===1)throw Error('synthetic network failure');
+  return model({research_complete:true,jobs:[row]},[url]);
+ },provider,resume,'全国');
+ assert.equal(attempts,2);assert.equal(result.matches.length,1);
+});
