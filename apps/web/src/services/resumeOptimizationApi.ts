@@ -113,8 +113,8 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
   const pending=Array.isArray(data.pending_block_ids)?
    [...new Set(data.pending_block_ids.filter(id=>ids.has(id)&&(!wanted||wanted.includes(id))))]:[];
   if(remaining){
-   const retry=new Set(pending);
-   const next=remaining.filter(id=>!batchIds.has(id)||retry.has(id));
+   const pendingSet=new Set(pending);
+   const next=remaining.filter(id=>!batchIds.has(id)||pendingSet.has(id));
    if(next.length===remaining.length){document?.onPending?.(next);await retry();continue;}
    retryDelay=1000;
    remaining=next;document?.onPending?.(remaining);
