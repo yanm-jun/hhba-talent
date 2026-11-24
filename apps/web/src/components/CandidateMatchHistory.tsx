@@ -229,7 +229,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
      {selected.new_job_count>0&&<p className="hhba-match-history-new">{'相较之前已保存的记录，本次新发现 '+selected.new_job_count+' 个未推荐过的岗位。'}</p>}
      {selected.matches.map((job,i)=>{
       const href=safeJobUrl(job.official_url);
-      return <article key={job.official_url} className="hhba-match-history-job">
+      return <article key={job.posting_key||job.official_url} className="hhba-match-history-job">
        <div className="hhba-match-history-job-top">
         <span>{String(i+1).padStart(2,'0')}</span>
         <div><strong>{job.company}</strong><h3>{job.title}</h3><small>{job.location} · {job.recruitment_source_note||'企业招聘入口待核验'}</small></div>

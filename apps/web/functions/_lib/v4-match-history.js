@@ -1,5 +1,6 @@
 // Server-owned search checkpoints. Store only recommendation metadata, not CV
 // text or source quotes. One posting per row avoids the legacy ten-job cap.
+import {isV4PostingKey} from '../../src/services/v4PostingIdentity.mjs';
 import {v4PublicJobUrl} from './v4-open-job-evidence.js';
 import {redactForModel} from './resume-match-core.js';
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -12,7 +13,7 @@ function safeJob(x){
  const url=v4PublicJobUrl(x?.official_url);
  if(!url||!x.company||!x.title||!x.location)return null;
  const result={id:clean(x.id),company:clean(x.company),title:clean(x.title_zh||x.title),location:clean(x.location),
-  official_url:url,match_score:nullableScore(x.match_score),score_basis:clean(x.score_basis),
+  official_url:url,...(isV4PostingKey(x.posting_key)?{posting_key:x.posting_key}:{}),match_score:nullableScore(x.match_score),score_basis:clean(x.score_basis),
   recommendation_reason:clean(x.recommendation_reason),availability_status:x.availability_status==='OPEN_LISTED'?'OPEN_LISTED':'UNKNOWN',
   recruitment_source_kind:clean(x.recruitment_source_kind),recruitment_source_note:clean(x.recruitment_source_note),
   evidence_status:clean(x.evidence_status),evidence_score_status:clean(x.evidence_score_status),evidence_excerpt:clean(x.evidence_excerpt)};
@@ -38,7 +39,7 @@ export async function saveV4Round(db,phone,{taskId,resumeId,roleHint,matches,res
  const rows=(matches||[]).map(safeJob).filter(Boolean);let batch=[],size=0;
  const write=async()=>{
   if(!batch.length)return;
-  await db.prepare("INSERT INTO hhba_v4_match_jobs(task_id,job_url,match_score,result_json) SELECT ?,json_extract(value,'$.official_url'),json_extract(value,'$.match_score'),value FROM json_each(?) WHERE 1 ON CONFLICT(task_id,job_url) DO NOTHING")
+  await db.prepare("INSERT INTO hhba_v4_match_jobs(task_id,job_url,match_score,result_json) SELECT ?,COALESCE(json_extract(value,'$.posting_key'),json_extract(value,'$.official_url')),json_extract(value,'$.match_score'),value FROM json_each(?) WHERE 1 ON CONFLICT(task_id,job_url) DO NOTHING")
    .bind(taskId,JSON.stringify(batch)).run();batch=[];size=0;
  };
  for(const job of rows){const n=new TextEncoder().encode(JSON.stringify(job)).byteLength;if(batch.length&&size+n>400000)await write();batch.push(job);size+=n;}
@@ -46,14 +47,17 @@ export async function saveV4Round(db,phone,{taskId,resumeId,roleHint,matches,res
  await db.prepare('UPDATE hhba_v4_match_tasks SET research_pending=? WHERE id=? AND phone=?').bind(1,taskId,phone).run();
  return taskId;
 }
-export async function patchV4Job(db,phone,taskId,url,patch){
+export async function patchV4Job(db,phone,taskId,url,patch,postingKey){
  if(!uuid.test(taskId||'')||!v4PublicJobUrl(url))return false;
- const row=await db.prepare('SELECT j.result_json FROM hhba_v4_match_jobs j JOIN hhba_v4_match_tasks t ON t.id=j.task_id WHERE t.phone=? AND j.task_id=? AND j.job_url=?').bind(phone,taskId,url).first();
+ const key=isV4PostingKey(postingKey)?postingKey:url;
+ const row=await db.prepare('SELECT j.result_json FROM hhba_v4_match_jobs j JOIN hhba_v4_match_tasks t ON t.id=j.task_id WHERE t.phone=? AND j.task_id=? AND j.job_url=?').bind(phone,taskId,key).first();
  if(!row)return false;
- const result=safeJob({...JSON.parse(row.result_json),...patch,official_url:url});
+ const old=JSON.parse(row.result_json);
+ if(old.official_url!==url)return false;
+ const result=safeJob({...old,...patch,official_url:url,posting_key:old.posting_key});
  if(!result)return false;
  await db.prepare('UPDATE hhba_v4_match_jobs SET result_json=?,match_score=? WHERE task_id=? AND job_url=? AND EXISTS(SELECT 1 FROM hhba_v4_match_tasks WHERE id=? AND phone=?)')
-  .bind(JSON.stringify(result),result.match_score,taskId,url,taskId,phone).run();
+  .bind(JSON.stringify(result),result.match_score,taskId,key,taskId,phone).run();
  return true;
 }
 export async function listV4History(db,phone){

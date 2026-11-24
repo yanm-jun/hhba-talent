@@ -479,3 +479,16 @@ test('V4 preserves grounded facts outside historical resume categories and arbit
  const parsed=v4GroundProfile({facts:[{kind:'非遗传承',quote:'民间传统工艺传承荣誉'}],experience_years:62,experience_evidence:'六十二年工作经历'},source);
  assert.equal(parsed.facts[0].kind,'非遗传承');assert.equal(parsed.experience_years,62);
 });
+
+
+test('V4 preserves distinct positions on a shared official URL across research rounds',async()=>{
+ const {v4PostingKey}=await import('../src/services/v4PostingIdentity.mjs');
+ const jobs=[row,{...row,title:'渠道培训经理'}];
+ const result=await v4Match(async()=>model({research_complete:true,jobs},[url]),provider,resume,'全国',{oneRound:true,skipEnrich:true});
+ assert.equal(result.matches.length,2);assert.notEqual(result.matches[0].posting_key,result.matches[1].posting_key);
+ const prior=result.matches.map(j=>({posting_key:j.posting_key,url:j.official_url,title:j.title,company:j.company,location:j.location}));
+ const third={...row,title:'门店业务运营顾问'};
+ const next=await v4Match(async()=>model({research_complete:true,jobs:[...jobs,third]},[url]),provider,resume,'全国',{oneRound:true,skipEnrich:true,previousPostings:prior});
+ assert.equal(next.matches.length,1);assert.equal(next.matches[0].title,third.title);
+ assert.equal(next.matches[0].posting_key,v4PostingKey(third,url));
+});

@@ -7,7 +7,7 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume,getMatchHistory,historyJobsForContinuation} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {MATCH_V4_PREVIEW,matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
+import {v4PostingKey,MATCH_V4_PREVIEW,matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -222,10 +222,10 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     const detail=await getMatchHistory(historyPending.current);
     if(detail.engine!=='V4'||detail.resume_id!==matchResumeId)throw Error('历史任务与当前简历不匹配，请重新选择。');
     priorJobs=historyJobsForContinuation(detail);
-    runOptions={...options,role_hint:detail.role_hint,history_id:detail.id,recovery_jobs:priorJobs,exclude_urls:priorJobs.map(job=>job.official_url)};
+    runOptions={...options,role_hint:detail.role_hint,history_id:detail.id,recovery_jobs:priorJobs,exclude_urls:[]};
     setPartialJobs(priorJobs);
    }
-   const combine=(jobs:MatchedJob[])=>[...new Map([...priorJobs,...jobs].map(job=>[job.official_url,job])).values()];
+   const combine=(jobs:MatchedJob[])=>[...new Map([...priorJobs,...jobs].map(job=>[MATCH_V4_PREVIEW?v4PostingKey(job):job.official_url,job])).values()];
    const matched=await submitExtractedResumeText(previewText,runOptions,consent,abort.signal,matchResumeId||undefined,
     stage=>{if(!abort.signal.aborted)progress(stage);},
     jobs=>{if(!abort.signal.aborted)setPartialJobs(combine(jobs));},
@@ -246,7 +246,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   if(!previous?.can_continue||!search||controller.current||!getRealAuthToken())return;
   const abort=new AbortController();controller.current=abort;
   const combine=(jobs:MatchedJob[])=>Array.from(new Map(
-   [...previous.matches,...jobs].map(job=>[job.official_url,job])
+   [...previous.matches,...jobs].map(job=>[MATCH_V4_PREVIEW?v4PostingKey(job):job.official_url,job])
   ).values());
   let collected=previous.matches;
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setPartialJobs(collected);
@@ -254,7 +254,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    const next=await submitExtractedResumeText(search.text,{...search.options,
     history_id:MATCH_V4_PREVIEW?previous.history_id||undefined:undefined,
      recovery_jobs:MATCH_V4_PREVIEW?previous.matches:undefined,
-     exclude_urls:MATCH_V4_PREVIEW?previous.matches.map(job=>job.official_url):previous.matches.map(job=>job.official_url).slice(-50)},true,abort.signal,search.resumeId,
+     exclude_urls:MATCH_V4_PREVIEW?[]:previous.matches.map(job=>job.official_url).slice(-50)},true,abort.signal,search.resumeId,
     stage=>{if(!abort.signal.aborted)progress(stage);},
     jobs=>{if(!abort.signal.aborted){collected=combine(jobs);setPartialJobs(collected);}},
     detail=>{if(!abort.signal.aborted)setActivity(detail);});

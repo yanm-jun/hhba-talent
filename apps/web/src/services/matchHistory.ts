@@ -8,7 +8,7 @@ export type MatchHistorySummary={
  new_job_count:number;improved_job_count:number;engine?:'V4';research_pending?:boolean;
 };
 export type HistoryMatchedJob={
- id:string;company:string;title:string;location:string;official_url:string;
+ id:string;posting_key?:string;company:string;title:string;location:string;official_url:string;
  match_score:number|null;score_basis:string;recommendation_reason:string;
  availability_status:'OPEN_LISTED'|'UNKNOWN';
  recruitment_source_kind:string;recruitment_source_note:string;
@@ -70,7 +70,7 @@ export async function linkMatchHistoryResume(historyId:string,resumeId:string):P
 
 export function historyJobsForContinuation(detail:MatchHistoryDetail):MatchedJob[]{
  return detail.matches.map((job,i)=>({
-  id:job.id||'history-'+detail.id+'-'+i,company:job.company,title:job.title,title_zh:job.title,
+  id:job.id||'history-'+detail.id+'-'+i,posting_key:job.posting_key,company:job.company,title:job.title,title_zh:job.title,
   location:job.location,official_url:job.official_url,platform:job.recruitment_source_kind||'招聘来源',
   source:'MATCH_HISTORY',remote:false,reference_score:job.match_score??0,match_score:job.match_score,
   matched:[],not_evidenced:[],needs_verification:[],requirements_basis:job.evidence_excerpt||'',

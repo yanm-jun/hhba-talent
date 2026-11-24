@@ -55,7 +55,7 @@ function events(env,request,input){
    void (async()=>{
     try{
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
-      signal,excludeUrls:input.exclude_urls,researchContext:input.research_context,oneRound:true,skipEnrich:true,onProgress:progress,onActivity:activity,
+      signal,excludeUrls:input.exclude_urls,previousPostings:input.previous_postings,researchContext:input.research_context,oneRound:true,skipEnrich:true,onProgress:progress,onActivity:activity,
       onPartial:matches=>send('partial',{matches})});
      try{
       result.history_id=await saveV4Round(env.HHBA_PNVS_AUTH_DB,input.phone,{taskId:input.history_id,resumeId:input.resume_id,roleHint:input.role_hint,matches:result.matches,researchPending:result.research_pending});
@@ -133,7 +133,7 @@ export async function onRequest({request,env}){
   const resume=sanitize(body.text);if(!resume)return fail('INVALID_RESUME_TEXT',400);
   if(!body.job?.jd_version_id||!body.job?.jd_sha256||!body.job?.official_url)return fail('JD_VERIFIED_VERSION_REQUIRED',422);
   try{const score=await scoreVerifiedV4Job(env,body.job,resume,{signal:request.signal});
-   if(body.history_id)try{await patchV4Job(db,session.phone,body.history_id,body.job.official_url,score);}catch{}
+   if(body.history_id)try{await patchV4Job(db,session.phone,body.history_id,body.job.official_url,score,body.job.posting_key);}catch{}
    return reply({ok:true,score});}
   catch(e){const code=e?.code||e?.message||'V4_SCORE_UNAVAILABLE';
    return fail(/^(AI_PROVIDER_|JD_)/.test(code)?code:'V4_SCORE_UNAVAILABLE',/^JD_/.test(code)?422:502);
@@ -142,7 +142,7 @@ export async function onRequest({request,env}){
  if(suffix==='/jd'){
   if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
   try{const job=await prepareV4JobForOptimization(env,body.official_url,{signal:request.signal,expectedTitle:typeof body.title==='string'?body.title:undefined});
-   if(body.history_id)try{await patchV4Job(db,session.phone,body.history_id,body.official_url,job);}catch{}
+   if(body.history_id)try{await patchV4Job(db,session.phone,body.history_id,body.official_url,job,body.posting_key);}catch{}
    return reply({ok:true,job});}
   catch(e){
    if(e?.code==='V4_PAGE_TEMPORARILY_UNAVAILABLE'||e?.name==='TypeError'||e?.name==='TimeoutError')return fail('V4_PAGE_TEMPORARILY_UNAVAILABLE',503);
@@ -158,8 +158,9 @@ export async function onRequest({request,env}){
   redactForModel(body.options.role_hint,{unbounded:true}):'';
  // Do not store raw resume, query, job results, or model output in server logs.
  const exclude_urls=Array.isArray(body?.options?.exclude_urls)?body.options.exclude_urls.filter(x=>typeof x==='string'):[];
+ const previous_postings=Array.isArray(body?.options?.previous_postings)?body.options.previous_postings:[];
  const history_id=typeof body.history_id==='string'&&/^[0-9a-f-]{36}$/i.test(body.history_id)?body.history_id:crypto.randomUUID();
  const incoming=body.research_context;
  const research_context=incoming&&typeof incoming==='object'&&!Array.isArray(incoming)?{round:incoming.round,profile:incoming.profile,summary:incoming.summary}:null;
- return events(env,request,{text:resume,role_hint:role,exclude_urls,research_context,history_id,phone:session.phone,resume_id:body.resume_id||null});
+ return events(env,request,{text:resume,role_hint:role,exclude_urls,previous_postings,research_context,history_id,phone:session.phone,resume_id:body.resume_id||null});
 }

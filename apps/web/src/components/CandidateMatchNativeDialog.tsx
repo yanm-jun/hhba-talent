@@ -1,7 +1,7 @@
 import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,MapPin,Wallet,X,Sparkles,LoaderCircle} from 'lucide-react';
-import {MATCH_V4_PREVIEW,prepareV4Job,type MatchResponse,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
+import {v4PostingKey,MATCH_V4_PREVIEW,prepareV4Job,type MatchResponse,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 // Load Siri/Word only after a candidate explicitly chooses a job, so the
@@ -47,9 +47,10 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  // Match-history handoff enters the same existing editor without rerunning a search.
  initialOptimizedJobId?:string;
 }){
+ const keyOf=(job:MatchResponse['matches'][number])=>MATCH_V4_PREVIEW?v4PostingKey(job):job.official_url;
  const ref=useRef<HTMLDivElement|null>(null);
  const [optimizedJobUrl,setOptimizedJobUrl]=useState<string|null>(()=>
-  result.matches.find(job=>job.id===initialOptimizedJobId&&job.jd_version_id&&job.jd_sha256)?.official_url||null);
+  (()=>{const job=result.matches.find(job=>job.id===initialOptimizedJobId&&job.jd_version_id&&job.jd_sha256);return job?keyOf(job):null})());
  const [optimizationDirty,setOptimizationDirty]=useState(false);
  const [preparedJobs,setPreparedJobs]=useState<Record<string,MatchResponse['matches'][number]>>({});
  const [preparingJd,setPreparingJd]=useState('');
@@ -78,27 +79,27 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
   {label:'对照简历评分',stages:['writing','scoring']}
  ];
  const matchListScroll=useRef(0);
- const displayedJobs=result.matches.map(job=>preparedJobs[job.official_url]||job);
- const activeJob=displayedJobs.find(job=>job.official_url===optimizedJobUrl);
+ const displayedJobs=result.matches.map(job=>preparedJobs[keyOf(job)]||job);
+ const activeJob=displayedJobs.find(job=>keyOf(job)===optimizedJobUrl);
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
  async function openOptimization(job:MatchResponse['matches'][number]){
   if(pending||!parsedProfile||preparingJd)return;
   setJdError('');
   if(!job.jd_version_id||!job.jd_sha256){
    if(!MATCH_V4_PREVIEW)return;
-   const abort=new AbortController();jdController.current=abort;setPreparingJd(job.official_url);
+   const abort=new AbortController();jdController.current=abort;setPreparingJd(keyOf(job));
    try{const patch=await prepareV4Job(job.official_url,abort.signal,job.title);
     if(abort.signal.aborted)return;
-    setPreparedJobs(all=>({...all,[job.official_url]:{...job,...patch}}));
+    setPreparedJobs(all=>({...all,[keyOf(job)]:{...job,...patch}}));
    }catch(e){if(!abort.signal.aborted)setJdError(e instanceof Error?e.message:'暂时无法取得可靠 JD。');return;}
    finally{if(jdController.current===abort){jdController.current=null;setPreparingJd('');}}
   }
   matchListScroll.current=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content')?.scrollTop||0;
-  setOptimizationDirty(false);setOptimizedJobUrl(job.official_url);
+  setOptimizationDirty(false);setOptimizedJobUrl(keyOf(job));
  }
  function asTargetJob(job:MatchResponse['matches'][number]):JobMatch{
   return {
-   id:job.id,company:job.company,title:job.title,title_zh:job.title_zh||null,
+   id:job.id,posting_key:job.posting_key,company:job.company,title:job.title,title_zh:job.title_zh||null,
    location:job.location,official_url:job.official_url,platform:job.platform,
    remote:job.remote,reference_score:visibleMatchScore(job)??0,
    matched:job.matched||[],not_evidenced:job.not_evidenced||[],
@@ -276,7 +277,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
      {result.matches.length?
       <div className="hhba-native-list">
        {displayedJobs.map((job,i)=>(
-        <article key={job.official_url} className="hhba-native-job">
+        <article key={keyOf(job)} className="hhba-native-job">
          <div className="hhba-native-top">
           <span className="hhba-native-num">{String(i+1).padStart(2,'0')}</span>
           <div className="hhba-native-heading">
@@ -302,7 +303,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
            <button type="button" disabled={pending||!parsedProfile||!!preparingJd||(!MATCH_V4_PREVIEW&&(!job.jd_version_id||!job.jd_sha256))}
              title={!job.jd_version_id||!job.jd_sha256?'点击核验原文并准备优化':pending||!parsedProfile?'匹配完成后可优化':'针对所选岗位优化简历'}
              className="hhba-native-optimize" onClick={()=>void openOptimization(job)} aria-label={'针对'+(job.title_zh||job.title)+'优化简历'}>
-             <Sparkles size={13} aria-hidden="true"/> {preparingJd===job.official_url?'核验 JD 中…':'优化简历'}
+             <Sparkles size={13} aria-hidden="true"/> {preparingJd===keyOf(job)?'核验 JD 中…':'优化简历'}
             </button>
           </div>
          </div>

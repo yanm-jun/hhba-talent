@@ -7,7 +7,7 @@ export type CandidateProfile = {
  warnings:string[];
 };
 export type JobMatch={
- id:string;company:string;title:string;title_zh:string|null;location:string;
+ id:string;posting_key?:string;company:string;title:string;title_zh:string|null;location:string;
  official_url:string;platform:string;remote:boolean;reference_score:number;
  matched:string[];not_evidenced:string[];needs_verification:string[];
  requirements_basis:string;

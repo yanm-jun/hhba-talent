@@ -29,7 +29,7 @@ import '../styles/word-editor-minimal.css';
 
 export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,onDraftDirtyChange,accountScope,requireVerifiedJd=false}:{profile:CandidateProfile;job:JobMatch;sourceText?:string;sourceResume?:PrivateResume;onDraftDirtyChange?:(dirty:boolean)=>void;accountScope?:string;requireVerifiedJd?:boolean}){
  // Reopen the same employer posting from a new search or history using the same private Word branch.
- const postingScope=useMemo(()=>stablePostingScope(job.official_url),[job.official_url]);
+ const postingScope=useMemo(()=>stablePostingScope(job.official_url,MATCH_V4_PREVIEW?job.posting_key:undefined),[job.official_url,job.posting_key]);
  const blocks=useMemo<ResumeBlock[]>(()=>{
  if(MATCH_V4_PREVIEW&&sourceText?.trim())return sourceResumeBlocks(sourceText,true);
  const originals=[
