@@ -84,6 +84,7 @@ export function SiteFooter(){
    <span>© {new Date().getFullYear()} 汇方职场 · HHBA</span>
    <span>让机会与人才，找到彼此。</span>
    <div>
+    <Link to="/privacy">隐私说明</Link>
     <Link to="/data-use">运营数据说明</Link>
     <Link to="/commitment">我们的坚持</Link>
    </div>

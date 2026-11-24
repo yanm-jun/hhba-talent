@@ -1,0 +1,26 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const read=p=>readFileSync(new URL(p,import.meta.url),'utf8');
+test('privacy notice is public, readable in a separate tab and retains independent consent',()=>{
+ const match=read('../src/pages/CandidateMatchPage.tsx');
+ const main=read('../src/main.tsx');
+ const notice=read('../src/pages/PrivacyNoticePage.tsx');
+ const account=read('../src/pages/PersonalCenterPage.tsx');
+ const footer=read('../src/components/Shell.tsx');
+ const checkbox=match.match(/<label className="hhba-ai-consent">[\s\S]*?<\/label>/)?.[0];
+ assert.ok(checkbox);
+ assert.match(checkbox,/checked=\{consent\}/);
+ assert.match(checkbox,/setConsent\(e.target.checked\)/);
+ assert.match(checkbox,/BASE_URL\+'privacy'/);
+ assert.match(checkbox,/target="_blank" rel="noopener noreferrer"/);
+ assert.doesNotMatch(checkbox,/24小时|23小时|中间状态/);
+ assert.match(checkbox,/脱敏后的简历文字发送至第三方 AI/);
+ assert.match(match,/!consent\|\|working/);
+ assert.ok(main.indexOf("if(route==='/privacy')")<main.indexOf('const isCandidateWorkspaceRoute='));
+ assert.match(notice,/export function PrivacyNoticePage/);
+ assert.equal((notice.match(/<section id="privacy-/g)||[]).length,10);
+ for(const phrase of ['二十四小时','二十三小时','独立授权','原始简历文件','ReqToken','尚待','历史查找'])assert.ok(notice.includes(phrase),phrase);
+ assert.match(account,/to="\/privacy"/);
+ assert.match(footer,/to="\/privacy"/);
+});

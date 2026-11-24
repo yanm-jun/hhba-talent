@@ -271,7 +271,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
     {hasVisited('resume')&&<div className="hhba-account-cached-stage" aria-hidden={current!=='resume'} style={{display:current==='resume'?'block':'none'}}><PrivateResumeVault active={current==='resume'}/></div>}
     {hasVisited('applications')&&<div className="hhba-account-cached-stage" aria-hidden={current!=='applications'} style={{display:current==='applications'?'block':'none'}}><CandidateMatchHistory active={current==='applications'}/></div>}
     {current==='privacy'&&<section className="hhba-account-panel">
-     <div className="hhba-account-section-heading"><div><h2>账户与隐私</h2><p>查看账户安全、数据使用说明和历史记录清理。</p></div></div>
+     <div className="hhba-account-section-heading"><div><h2>账户与隐私</h2><p>查看账户安全、数据使用说明和历史记录清理。<Link to="/privacy">阅读完整隐私说明</Link></p></div></div>
      <div className="hhba-account-privacy-row"><div><strong><ChartNoAxesCombined size={18}/>运营数据的使用范围</strong>
       <p>网站只汇总不关联个人的页面访问、岗位浏览、岗位搜索及官网跳转次数。不设置访问统计 Cookie，不保存访客标识、搜索词、详细页面地址、简历正文或个人联系方式。注册人数和岗位收藏数量来自真实业务记录，不据此推断个人浏览轨迹。</p>
       <p>不再新增可按账号识别的日活行为记录，因此账号 DAU、WAU、MAU 和用户留存暂不统计，也不会用浏览量冒充。</p>
