@@ -64,26 +64,26 @@ export function archivedJDToScoreJob(jd){
    '企业官网直接核验及归档的 JD 版本'
  };
 }
-export function validReassessmentInput(body){
+export function validReassessmentInput(body,{v4=false}={}){
  if(!body||typeof body!=='object'||Array.isArray(body)||body.consent_reassessment!==true||
   body.confirm_real!==true||typeof body.job_id!=='string'||body.job_id.length<5||
   body.job_id.length>180||!/^[A-Za-z0-9_-]+$/.test(body.job_id))return false;
  if(!Array.isArray(body.before_blocks)||!Array.isArray(body.after_blocks)||
-  body.before_blocks.length<1||body.before_blocks.length>12||
+  body.before_blocks.length<1||(!v4&&body.before_blocks.length>12)||
   body.after_blocks.length!==body.before_blocks.length)return false;
  const validBlock=b=>b&&typeof b.id==='string'&&/^[a-z0-9_-]{1,64}$/i.test(b.id)&&
   ['experience','skills','summary','education','projects'].includes(b.section)&&
-  typeof b.text==='string'&&b.text.trim().length>=2&&b.text.length<=1600;
+  typeof b.text==='string'&&b.text.trim().length>=2&&(v4||b.text.length<=1600);
  if(!body.before_blocks.every(validBlock)||!body.after_blocks.every(validBlock))return false;
  const originals=new Map(body.before_blocks.map(b=>[b.id,b.section]));
  if(originals.size!==body.before_blocks.length||body.after_blocks.some(b=>originals.get(b.id)!==b.section))return false;
  const p=body.profile;
  if(!p||typeof p!=='object'||Array.isArray(p))return false;
- if(p.education!==null&&p.education!==undefined&&!credentials.includes(p.education))return false;
+ if(!v4&&p.education!==null&&p.education!==undefined&&!credentials.includes(p.education))return false;
  if(p.experience_years!==null&&p.experience_years!==undefined&&
-  (!Number.isFinite(p.experience_years)||p.experience_years<0||p.experience_years>50))return false;
- if(!Array.isArray(p.target_roles)||p.target_roles.length>7||p.target_roles.some(x=>typeof x!=='string'||x.length>80))return false;
- if(!Array.isArray(p.skills)||p.skills.length>30||p.skills.some(x=>typeof x?.name!=='string'||x.name.length>60))return false;
+  (!Number.isFinite(p.experience_years)||p.experience_years<0||p.experience_years>(v4?60:50)))return false;
+ if(!Array.isArray(p.target_roles)||(!v4&&p.target_roles.length>7)||p.target_roles.some(x=>typeof x!=='string'||(!v4&&x.length>80)))return false;
+ if(!Array.isArray(p.skills)||(!v4&&p.skills.length>30)||p.skills.some(x=>typeof x?.name!=='string'||(!v4&&x.name.length>60)))return false;
  return true;
 }
 const exactTextMention=(text,term)=>{
