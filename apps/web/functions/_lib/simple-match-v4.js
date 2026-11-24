@@ -319,10 +319,9 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   researchComplete=response.status==='completed'&&(data.research_complete===true||data.continue_search===false);
   if(oneRound)break;
  }
- onProgress('reading');
- onActivity('reading','开始读取 '+rows.size+' 条公开岗位来源，核对可获取的 JD。');
+ if(!skipEnrich){onProgress('reading');onActivity('reading','开始读取 '+rows.size+' 条公开岗位来源，核对可获取的 JD。');}
  const {results,read}=skipEnrich?{results:new Map(),read:0}:await enrich(fetcher,rows,{signal,onActivity});
- onProgress('scoring');
+ if(!skipEnrich)onProgress('scoring');
  const matches=[...rows.entries()].map(([url,job],i)=>
   renderJob(job,url,results.get(url),resume,toolUrls.has(url),i));
  const verified=matches.filter(x=>x.jd_source_status==='VERIFIED_JD').length;
