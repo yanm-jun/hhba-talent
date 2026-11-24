@@ -1,4 +1,5 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
+import {MATCH_V4_PREVIEW} from './resumeMatch';
 import type {JdAwareJob} from './jobJdArchive';
 import type {ResumeBlock,ResumeSuggestion} from './targetedResumeOptimization';
 
@@ -77,20 +78,25 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
  let wanted=document?.wanted;
  const ids=new Set(blocks.map(block=>block.id));
  let queueStarted=0;
+ // A batch is a per-request unit, not a cap on the entire document.
+ let remaining=MATCH_V4_PREVIEW?(wanted||blocks.map(b=>b.id)):null;
  for(;;){
+  const requestBlocks=remaining?blocks.filter(b=>remaining!.slice(0,12).includes(b.id)):blocks;
+  const batchIds=new Set(requestBlocks.map(b=>b.id));
+  if(!requestBlocks.length)break;
   let response:Response;
   try{
    response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
     headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
-    body:JSON.stringify({consent_ai:true,blocks,job,
-     ...(document?{full_document:{text:document.text,wanted}}:{})})});
+    body:JSON.stringify({consent_ai:true,blocks:requestBlocks,job,
+     ...(document?{full_document:{text:document.text,wanted:remaining?requestBlocks.map(b=>b.id):wanted}}:{})})});
   }catch{throw new ResumeOptimizationError('NETWORK_ERROR',503);}
   const data=await response.json().catch(()=>({})) as {
    ok?:boolean;error?:string;suggestions?:ResumeSuggestion[];pending_block_ids?:string[]
   };
   if(document&&data.error==='RESUME_OPTIMIZATION_QUEUED'){
    queueStarted ||= Date.now();
-   if(Date.now()-queueStarted<240000){
+   if(MATCH_V4_PREVIEW||Date.now()-queueStarted<240000){
     document.onQueued?.();
     await waitForOptimizationSlot(signal);
     continue;
@@ -103,6 +109,14 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
   for(const item of data.suggestions)suggestions.set(item.blockId,item);
   const pending=Array.isArray(data.pending_block_ids)?
    [...new Set(data.pending_block_ids.filter(id=>ids.has(id)&&(!wanted||wanted.includes(id))))]:[];
+  if(remaining){
+   const retry=new Set(pending);
+   const next=remaining.filter(id=>!batchIds.has(id)||retry.has(id));
+   if(next.length===remaining.length){document?.onPending?.(next);break;}
+   remaining=next;document?.onPending?.(remaining);
+   if(!remaining.length)break;
+   wanted=undefined;continue;
+  }
   if(!document||!pending.length){document?.onPending?.([]);break;}
   if(pending.length>=(wanted?.length??blocks.length)){
    document.onPending?.(pending);break;
