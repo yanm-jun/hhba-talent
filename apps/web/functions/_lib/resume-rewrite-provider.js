@@ -19,17 +19,17 @@ export function redacted(text){
   .replace(/(?<!\d)1[3-9]\d{9}(?!\d)/g,'[PHONE_REDACTED]')
   .replace(/(?<!\d)\d{17}[\dXx](?!\d)/g,'[ID_REDACTED]');
 }
-function validInputs(blocks,job){
- if(!Array.isArray(blocks)||blocks.length<1||blocks.length>MAX_BLOCKS||
+function validInputs(blocks,job,unbounded=false){
+ if(!Array.isArray(blocks)||blocks.length<1||(!unbounded&&blocks.length>MAX_BLOCKS)||
   !job||typeof job!=='object'||typeof job.title!=='string'||
-  !job.title.trim()||job.title.length>180||
-  typeof job.requirements!=='string'||job.requirements.length>16000)
+  !job.title.trim()||(!unbounded&&job.title.length>180)||
+  typeof job.requirements!=='string'||(!unbounded&&job.requirements.length>16000))
   return false;
  const used=new Set();
  return blocks.every(b=>b&&typeof b.id==='string'&&
   /^[a-zA-Z0-9_-]{1,64}$/.test(b.id)&&!used.has(b.id)&&
   (used.add(b.id),true)&&typeof b.text==='string'&&b.text.trim()&&
-  b.text.length<=MAX_TEXT_PER_BLOCK&&
+  (unbounded||b.text.length<=MAX_TEXT_PER_BLOCK)&&
   ['summary','experience','skills','education','projects'].includes(b.section));
 }
 function balancedGroups(blocks){
@@ -181,7 +181,7 @@ export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions
 }
 
 export async function generateTailoredResume({env,blocks,job,signal}){
- if(!validInputs(blocks,job))error('INVALID_REWRITE_INPUT');
+ if(!validInputs(blocks,job,env?.HHBA_MATCH_V4_READY==='1'))error('INVALID_REWRITE_INPUT');
  const provider=selectProvider(env,'resume_rewrite');
  let reviewer;
  try{reviewer=selectProvider(env,'resume_reviewer');}
