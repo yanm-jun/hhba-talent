@@ -41,7 +41,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
    {report?.rounds.map(r=><details key={r.round}><summary>第 {r.round} 轮 · 新增 {r.added} 条候选 · {r.cited_count} 条非商业平台引用</summary>
     {r.queries.length?<ul>{r.queries.map((q,i)=><li key={i}>{q}</li>)}</ul>:<p>接口未返回本轮具体检索词。</p>}</details>)}
    <h4>已发现的招聘候选（不是最终推荐）</h4>
-   {all.length?<ul className="hhba-stage-jobs">{all.map(job=><li key={job.official_url}><strong>{job.company} · {job.title_zh||job.title}</strong><p>{job.location} · {confirmed(job)?'官方来源已核验':'来源待核验'}</p>{safeLink(job.official_url)&&<a href={safeLink(job.official_url)!} target="_blank" rel="noopener noreferrer">查看原始来源</a>}</li>)}</ul>:empty(pending?'正在搜索官方招聘渠道，尚无候选。':'本轮没有保留可展示的候选。')}
+   {all.length?<ul className="hhba-stage-jobs">{all.map(job=><li key={job.official_url}><strong>{job.company} · {job.title_zh||job.title}</strong><p>{job.location} · {confirmed(job)?'官方来源已核验':'来源待核验'}</p>{confirmed(job)&&safeLink(job.official_url)?<a href={safeLink(job.official_url)!} target="_blank" rel="noopener noreferrer">查看官方招聘来源</a>:<small>来源未确认，不提供投递入口。</small>}</li>)}</ul>:empty(pending?'正在搜索官方招聘渠道，尚无候选。':'本轮没有保留可展示的候选。')}
   </>}
   {selected===2&&<>
    <div className="hhba-stage-stats"><span>已核验官方 JD {all.filter(confirmed).length}</span><span>待核验 {all.filter(j=>!confirmed(j)).length}</span></div>
@@ -49,8 +49,8 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
     {job.requirements_basis&&<><h4>岗位要求</h4><p>{job.requirements_basis}</p></>}
     {job.evidence_excerpt&&<><h4>原文依据</h4><p>{job.evidence_excerpt}</p></>}
     {job.jd_checked_at||job.checked_at?<p>核验时间：{job.jd_checked_at||job.checked_at}</p>:null}
-    {safeLink(job.official_url)&&<a href={safeLink(job.official_url)!} target="_blank" rel="noopener noreferrer">招聘原始页面</a>}
-    {!!job.evidence_sources?.length&&<ul>{job.evidence_sources.map((source,i)=>safeLink(source.url)?<li key={i}><a href={safeLink(source.url)!} target="_blank" rel="noopener noreferrer">{source.url}</a></li>:null)}</ul>}
+    {confirmed(job)&&safeLink(job.official_url)&&<a href={safeLink(job.official_url)!} target="_blank" rel="noopener noreferrer">官方招聘原始页面</a>}
+    {confirmed(job)&&!!job.evidence_sources?.length&&<ul>{job.evidence_sources.map((source,i)=>safeLink(source.url)?<li key={i}><a href={safeLink(source.url)!} target="_blank" rel="noopener noreferrer">{source.url}</a></li>:null)}</ul>}
    </details></li>)}</ul>:empty(pending?'等待岗位网页核验成果。':'未取得可核验的岗位 JD。')}
   </>}
   {selected===3&&<>
