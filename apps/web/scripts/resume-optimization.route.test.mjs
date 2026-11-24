@@ -319,3 +319,15 @@ test('backend returns terminal pause and preserved successful document batches',
  });
  assert.deepEqual(result.pendingIds,['word-12']);assert.equal(result.pauseReason,'AI_PROVIDER_RATE_LIMITED');
 });
+
+
+test('a resumed document retains its earlier checkpoint even if the next request immediately fails',async()=>{
+ const {continueDocumentOptimization}=await import('../src/services/resumeOptimizationContinuation.mjs');
+ const checkpoints=[],pauses=[];
+ const result=await continueDocumentOptimization({blockIds:['a','b','c'],wanted:['c'],
+  request:async()=>{throw Error('NETWORK_ERROR')},wait:async()=>{},
+  onCheckpoint:c=>checkpoints.push(c),onPaused:e=>pauses.push(e.message)});
+ assert.deepEqual(result,[]);
+ assert.deepEqual(checkpoints.at(-1).pending,['c']);
+ assert.deepEqual(pauses,['NETWORK_ERROR']);
+});
