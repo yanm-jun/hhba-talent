@@ -92,13 +92,27 @@ export function agentV3OutputText(response){
   .join('\n').trim();
 }
 export async function agentV3Json(fetcher,provider,{instructions,input,maxTokens=5200,model,signal}){
- const data=await agentV3Request(fetcher,provider,'/responses',{
-  payload:{model:model||provider.model,instructions,
-   input:typeof input==='string'?input:JSON.stringify(input),
-   text:{format:{type:'json_object'}},max_output_tokens:maxTokens},
-  signal,timeoutMs:55000
- });
- const raw=agentV3OutputText(data);
+ // Some third-party relays support Responses but not text.format JSON.
+ // First request structured JSON, then fall back to plain Responses only
+ // when the relay returns an HTTP request/server incompatibility error.
+ const common={model:model||provider.model,instructions,
+  input:typeof input==='string'?input:JSON.stringify(input),
+  max_output_tokens:maxTokens};
+ let data;
+ try{
+  data=await agentV3Request(fetcher,provider,'/responses',{
+   payload:{...common,text:{format:{type:'json_object'}}},
+   signal,timeoutMs:55000});
+ }catch(e){
+  if(provider?.name!=='relay'||!['AI_PROVIDER_REQUEST_REJECTED',
+   'AI_PROVIDER_UPSTREAM_ERROR'].includes(e?.code))throw e;
+  data=await agentV3Request(fetcher,provider,'/responses',{
+   payload:{...common,instructions:instructions+
+    '\n只输出一个有效的 JSON 对象，不需要 Markdown 标记或额外解释。'},
+   signal,timeoutMs:55000});
+ }
+ let raw=agentV3OutputText(data);
+ if(raw.startsWith('```'))raw=raw.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
  try{
   const value=JSON.parse(raw);
   if(!value||typeof value!=='object'||Array.isArray(value))throw Error();
