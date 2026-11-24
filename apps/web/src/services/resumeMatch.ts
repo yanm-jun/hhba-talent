@@ -84,7 +84,7 @@ export type MatchResponse = {
   research_pending?:boolean;
   preview_synthetic?:boolean;
 };
-export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
+export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];history_id?:string};
 const API='/api/match-next'; // Original default preserved for production and V2 compatibility.
 // V4 is the default on HHBA hosts; the legacy API remains for isolated diagnostics.
 export const MATCH_V4_PREVIEW=typeof window!=='undefined'&&
@@ -412,7 +412,7 @@ async function submitMatchRound(
   const response=await fetch(EFFECTIVE_API+'/resume',{
    method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
-   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
+   body:JSON.stringify({resume_id:resumeId||null,history_id:opts.history_id,text:cleaned,consent:true,
     options:{country:'CN',remote_only:false,
      role_hint:opts.role_hint,
      ...(!MATCH_V4_PREVIEW?{limit:Math.min(10,Math.max(1,opts.limit||10))}:{}),
@@ -450,6 +450,7 @@ export async function submitExtractedResumeText(
 ):Promise<MatchResponse>{
  if(!MATCH_V4_PREVIEW)return submitMatchRound(text,opts,consent,signal,resumeId,onProgress,onPartial,onActivity);
  const collected=new Map<string,MatchedJob>(),previous=new Set(opts.exclude_urls||[]);
+ const historyId=opts.history_id||crypto.randomUUID();
  let last:MatchResponse|undefined,round=0,delay=1000;
  const publish=(jobs:MatchedJob[])=>{for(const job of jobs)if(!previous.has(job.official_url))collected.set(job.official_url,job);onPartial?.([...collected.values()]);};
  const pause=(ms:number)=>new Promise<void>((resolve,reject)=>{
@@ -461,7 +462,7 @@ export async function submitExtractedResumeText(
  while(true){
   if(signal?.aborted)throw signal.reason;
   try{
-   const data=await submitMatchRound(text,{...opts,exclude_urls:[...previous,...collected.keys()]},consent,signal,resumeId,onProgress,publish,onActivity);
+   const data=await submitMatchRound(text,{...opts,history_id:historyId,exclude_urls:[...previous,...collected.keys()]},consent,signal,resumeId,onProgress,publish,onActivity);
    publish(data.matches);last={...data,profile:(data.profile.facts?.length||data.profile.skills.length||data.profile.target_roles.length||!last)?data.profile:last.profile};round++;delay=1000;
    onActivity?.({stage:'searching',message:'第 '+round+' 轮已完成，累计 '+collected.size+' 条岗位来源。',searches:round,candidate_links:collected.size});
    if(!data.research_pending)break;
@@ -487,10 +488,10 @@ export async function submitExtractedResumeText(
    if(signal?.aborted)throw signal.reason;
    const job=queue[cursor++];
    try{
-    const verified=await prepareV4Job(job.official_url,signal,job.title);
+    const verified=await prepareV4Job(job.official_url,signal,job.title,historyId);
     const merged={...job,...verified};collected.set(job.official_url,merged);
     onPartial?.([...collected.values()]);
-    try{const score=await scoreV4Job(merged,text,signal);collected.set(job.official_url,{...merged,...score});}
+    try{const score=await scoreV4Job(merged,text,signal,historyId);collected.set(job.official_url,{...merged,...score});}
     catch(e){if(signal?.aborted)throw e;}
    }
    catch(e){if(signal?.aborted)throw e;}
@@ -505,17 +506,17 @@ export async function submitExtractedResumeText(
  return {...last,matches,matched_official_jobs:verified,can_continue:true,research_pending:false,
   native_search:{...last.native_search!,searches:round,page_reads:checked,visible_jobs:matches.length,candidate_links:matches.length,jd_verification:{eligible:matches.length,verified,scored,failed:matches.length-verified}}};
 }
-async function scoreV4Job(job:MatchedJob,text:string,signal?:AbortSignal):Promise<Partial<MatchedJob>>{
+async function scoreV4Job(job:MatchedJob,text:string,signal?:AbortSignal,historyId?:string):Promise<Partial<MatchedJob>>{
  const response=await fetch('/api/match-v4/score',{method:'POST',credentials:'same-origin',cache:'no-store',signal,
-  headers:{'Content-Type':'application/json',Authorization:'Bearer '+session()},body:JSON.stringify({consent:true,text:redactResumeTextLocally(text),job:{jd_version_id:job.jd_version_id,jd_sha256:job.jd_sha256,official_url:job.official_url}})});
+  headers:{'Content-Type':'application/json',Authorization:'Bearer '+session()},body:JSON.stringify({consent:true,history_id:historyId,text:redactResumeTextLocally(text),job:{jd_version_id:job.jd_version_id,jd_sha256:job.jd_sha256,official_url:job.official_url}})});
  const data=await response.json().catch(()=>null);
  if(!response.ok||data?.ok!==true||!data.score)throw new MatchError(response.status,'完整 JD 评分暂未完成。');
  return data.score;
 }
-export async function prepareV4Job(officialUrl:string,signal?:AbortSignal,title?:string):Promise<Partial<MatchedJob>>{
+export async function prepareV4Job(officialUrl:string,signal?:AbortSignal,title?:string,historyId?:string):Promise<Partial<MatchedJob>>{
  const response=await fetch('/api/match-v4/jd',{method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/json',Authorization:'Bearer '+session()},
-  body:JSON.stringify({consent:true,official_url:officialUrl,title})});
+  body:JSON.stringify({consent:true,official_url:officialUrl,title,history_id:historyId})});
  const data=await response.json().catch(()=>null);
  if(!response.ok||data?.ok!==true||!data.job?.jd_version_id||!data.job?.jd_sha256)
   throw new MatchError(response.status,'暂未取得可用于优化的可信 JD，请核对招聘原页面或稍后重试。');
