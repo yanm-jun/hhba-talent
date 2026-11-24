@@ -306,7 +306,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
           </li>)}
          </ul>}
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
-          data-hhba-recruitment-outbound="true">{job.jd_version_id?'前往企业官网投递':job.recruitment_source_kind==='THIRD_PARTY_BOARD'||job.recruitment_source_kind==='UNVERIFIED'?'查看招聘来源（待核验）':'查看企业招聘页面'} <ArrowUpRight size={15}/></a>
+          data-hhba-recruitment-outbound="true">{job.jd_version_id?'前往企业官网投递':job.platform==='第三方招聘线索'||job.recruitment_source_kind==='UNVERIFIED'?'查看招聘来源（待核验）':'查看企业招聘页面'} <ArrowUpRight size={15}/></a>
         </article>
        ))}
       </div>:
