@@ -39,6 +39,11 @@ def main() -> None:
     wf = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
     steps = wf["jobs"]["build"]["steps"]
 
+    # V4 preview: anonymous relay smoke test, never a real applicant resume.
+    # Results appear in build logs with only coarse status/error codes.
+    if os.environ.get('CF_PAGES_BRANCH') == 'feat/simple-resume-match-v4-20261124':
+        run(['node', 'scripts/simple-match-v4-live-smoke.mjs'], cwd=WEB)
+
     # This integration must preserve the currently deployed matching popup,
     # score evidence, and PDF/DOCX upload flow. Fail before media generation
     # or deploy if either the UI or the job-isolated Word service regresses.

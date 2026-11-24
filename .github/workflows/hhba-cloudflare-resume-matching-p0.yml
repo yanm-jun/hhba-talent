@@ -27,6 +27,9 @@ jobs:
         run: |
           node --check 'functions/api/match/[[path]].js'
           node --check functions/_lib/resume-match-core.js
+          node --check functions/_lib/simple-match-v4.js
+          node --check 'functions/api/match-v4/[[path]].js'
+          node --check scripts/simple-match-v4-live-smoke.mjs
           node --check functions/_lib/resume-tenure.js
           node --check functions/_lib/mainland-job-location.js
           node --check 'functions/api/match-native/[[path]].js'
@@ -43,7 +46,7 @@ jobs:
           node --check 'functions/api/match-history/[[path]].js'
           node --check functions/_lib/resume-role-evidence.js
           node --check functions/_lib/professional-credentials.js
-          node --test scripts/resume-pre-match-storage.contract.test.mjs scripts/saved-resume-picker.contract.test.mjs scripts/match-v5-credentials.contract.test.mjs scripts/match-audit-hardgates.contract.test.mjs scripts/resume-tenure.contract.test.mjs scripts/resume-match-cloudflare.contract.test.mjs scripts/resume-match-endtoend.test.mjs scripts/match-native-web.contract.test.mjs scripts/match-legacy-retirement.contract.test.mjs scripts/clean-match-v2.contract.test.mjs scripts/clean-match-v2-jd-bridge.contract.test.mjs scripts/clean-match-v2-provider-check.contract.test.mjs scripts/clean-match-v2-route.contract.test.mjs scripts/match-search-first.contract.test.mjs scripts/match-history.contract.test.mjs scripts/demo-account.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
+          node --test scripts/simple-match-v4.contract.test.mjs scripts/resume-pre-match-storage.contract.test.mjs scripts/saved-resume-picker.contract.test.mjs scripts/match-v5-credentials.contract.test.mjs scripts/match-audit-hardgates.contract.test.mjs scripts/resume-tenure.contract.test.mjs scripts/resume-match-cloudflare.contract.test.mjs scripts/resume-match-endtoend.test.mjs scripts/match-native-web.contract.test.mjs scripts/match-legacy-retirement.contract.test.mjs scripts/clean-match-v2.contract.test.mjs scripts/clean-match-v2-jd-bridge.contract.test.mjs scripts/clean-match-v2-provider-check.contract.test.mjs scripts/clean-match-v2-route.contract.test.mjs scripts/match-search-first.contract.test.mjs scripts/match-history.contract.test.mjs scripts/demo-account.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
       - name: TypeScript and Vite bundle
         working-directory: apps/web
         run: npm run build
