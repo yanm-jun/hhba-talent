@@ -60,7 +60,7 @@ export async function v4Call(fetcher,provider,payload,{signal}={}){
  }
  let data;
  try{data=await response.json()}catch{throw fault('AI_PROVIDER_RESPONSE_INVALID')}
- if(!Array.isArray(data?.output)||data.status!=='completed')
+ if(!Array.isArray(data?.output)||!['completed','incomplete'].includes(data.status))
   throw fault('AI_PROVIDER_RESPONSE_INVALID');
  return data;
 }
@@ -298,7 +298,10 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   const p=v4GroundProfile(data,resume);
   if(p.facts.length||p.target_roles.length||p.summary)profile=p;
   const fromModel=candidates(data,response);
-  for(const [url,job] of fromModel)if(!excluded.has(url)&&!rows.has(url))rows.set(url,job);
+  for(const [url,job] of fromModel)if(!excluded.has(url)){
+   const previous=rows.get(url);
+   rows.set(url,previous?{...previous,...Object.fromEntries(Object.entries(job).filter(([,v])=>v!==null&&v!==undefined&&v!==''))}:job);
+  }
   const cites=v4ToolSources(response);
   for(const url of cites){
    toolUrls.add(url);
@@ -313,7 +316,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   onActivity('searching','第 '+round+' 轮研究已完成，累计取得 '+rows.size+
    ' 条可追溯来源；AI 正在判断是否需要继续搜索。');
   // Only an explicit model decision completes research; a missing flag does not.
-  researchComplete=data.research_complete===true||data.continue_search===false;
+  researchComplete=response.status==='completed'&&(data.research_complete===true||data.continue_search===false);
  }
  onProgress('reading');
  onActivity('reading','开始读取 '+rows.size+' 条公开岗位来源，核对可获取的 JD。');
