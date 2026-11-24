@@ -39,12 +39,12 @@ function HeaderSiteSearch(){
 export function SiteFooter(){
  const columns=[
   {title:'求职服务',links:[
-   ['我要应聘','/candidate/jobs'],
+   ['个人工作台','/candidate/account'],
    ['智能岗位匹配','/candidate/match'],
    ['我的简历','/candidate/account/resume'],
    ['我的收藏','/candidate/saved'],
-   ['匹配历史','/candidate/account/applications'],
-   ['一键网申','/candidate/account/apply-assistant'],
+   ['历史查找','/candidate/account/applications'],
+   ['网申辅助（体验）','/candidate/account/apply-assistant'],
    ['职业成长档案','/candidate/account/career'],
   ]},
   {title:'职业机会',links:[
@@ -61,12 +61,11 @@ export function SiteFooter(){
   {title:'关于汇方',links:[
    ['品牌介绍','/vision'],
    ['加入我们','/join'],
-   ['运营数据说明','/data-use'],
   ]},
   {title:'服务与帮助',links:[
    ['全站搜索','/search'],
    ['会员服务规则','/membership/rules'],
-   ['我们的坚持','/commitment'],
+   ['账户与隐私','/candidate/account/privacy'],
   ]},
  ] as const;
  return <footer className="hhba-site-footer">
