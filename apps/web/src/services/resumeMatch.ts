@@ -82,9 +82,10 @@ export type MatchResponse = {
   improved_job_count?:number;
   can_continue?:boolean;
   research_pending?:boolean;
+  research_context?:{round:number;profile:MatchProfile;summary:string};
   preview_synthetic?:boolean;
 };
-export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];history_id?:string;recovery_jobs?:MatchedJob[]};
+export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];history_id?:string;recovery_jobs?:MatchedJob[];research_context?:MatchResponse['research_context']};
 const API='/api/match-next'; // Original default preserved for production and V2 compatibility.
 // V4 is the default on HHBA hosts; the legacy API remains for isolated diagnostics.
 export const MATCH_V4_PREVIEW=typeof window!=='undefined'&&
@@ -412,7 +413,7 @@ async function submitMatchRound(
   const response=await fetch(EFFECTIVE_API+'/resume',{
    method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
-   body:JSON.stringify({resume_id:resumeId||null,history_id:opts.history_id,text:cleaned,consent:true,
+   body:JSON.stringify({resume_id:resumeId||null,history_id:opts.history_id,research_context:opts.research_context,text:cleaned,consent:true,
     options:{country:'CN',remote_only:false,
      role_hint:opts.role_hint,
      ...(!MATCH_V4_PREVIEW?{limit:Math.min(10,Math.max(1,opts.limit||10))}:{}),
@@ -462,7 +463,7 @@ export async function submitExtractedResumeText(
  while(true){
   if(signal?.aborted)throw signal.reason;
   try{
-   const data=await submitMatchRound(text,{...opts,history_id:historyId,exclude_urls:[...previous,...collected.keys()]},consent,signal,resumeId,onProgress,publish,onActivity);
+   const data=await submitMatchRound(text,{...opts,history_id:historyId,research_context:last?.research_context||opts.research_context,exclude_urls:[...previous,...collected.keys()]},consent,signal,resumeId,onProgress,publish,onActivity);
    publish(data.matches);last={...data,profile:(data.profile.facts?.length||data.profile.skills.length||data.profile.target_roles.length||!last)?data.profile:last.profile};round++;delay=1000;
    onActivity?.({stage:'searching',message:'第 '+round+' 轮已完成，累计 '+collected.size+' 条岗位来源。',searches:round,candidate_links:collected.size});
    if(!data.research_pending)break;
