@@ -1,0 +1,28 @@
+name: HHBA V4 AI capabilities contract
+on:
+  pull_request:
+    paths:
+      - 'apps/web/functions/_lib/simple-match-v4.js'
+      - 'apps/web/functions/_lib/v4-*.js'
+      - 'apps/web/functions/api/match-v4/**'
+      - 'apps/web/src/services/resumeMatch.ts'
+      - 'apps/web/scripts/simple-match-v4*.mjs'
+      - '.github/workflows/hhba-v4-ai-contract.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  v4-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install project dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify V4 API behavior and resume evidence
+        working-directory: apps/web
+        run: node --test scripts/simple-match-v4.contract.test.mjs

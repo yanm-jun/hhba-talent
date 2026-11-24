@@ -9,6 +9,7 @@ import {
 const ID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const DOCX_MIME='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const LIMIT=3072,DAILY={preview:4,export:6},MAX_REVISIONS=8;
+const v4=env=>env?.HHBA_MATCH_V4_READY==='1';
 const common={
  'Cache-Control':'private, no-store',
  'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
@@ -81,18 +82,19 @@ async function reserve(db,env,phone,action){
   date,hash,action,DAILY[action]).run();
  return result?.success===true&&result?.meta?.changes===1;
 }
-async function readSmall(request){
+async function readSmall(request,unbounded=false){
+ const limit=unbounded?3*1024*1024:LIMIT;
  if(!/^application\/json(?:;|$)/i.test(request.headers.get('Content-Type')||''))
   throw Error('INVALID_REQUEST');
  const claimed=request.headers.get('Content-Length');
- if(claimed!==null&&(!/^\d+$/.test(claimed)||Number(claimed)>LIMIT))
+ if(claimed!==null&&(!/^\d+$/.test(claimed)||Number(claimed)>limit))
   throw Error('INVALID_REQUEST');
  const reader=request.body?.getReader();
  if(!reader)throw Error('INVALID_REQUEST');
  const chunks=[];let length=0;
  try{for(;;){const chunk=await reader.read();if(chunk.done)break;
   length+=chunk.value.byteLength;
-  if(length>LIMIT){await reader.cancel();throw Error('INVALID_REQUEST');}
+  if(length>limit){await reader.cancel();throw Error('INVALID_REQUEST');}
   chunks.push(chunk.value);
  }}finally{reader.releaseLock();}
  const bytes=new Uint8Array(length);let i=0;
@@ -118,7 +120,7 @@ function validEntry(entry){
     hashIsValid(entry.preview_sha256)&&Number.isInteger(entry.page_count)&&
     entry.page_count>=1&&entry.page_count<=20);
 }
-async function approved(bucket,row,jobId){
+async function approved(bucket,row,jobId,unbounded=false){
  const jobHash=jobId===undefined?null:
   await sha256Hex('hhba-word-target-job-v1:'+jobId);
  const key=prefix(row)+(jobHash?'.job-'+jobHash:'');
@@ -135,7 +137,7 @@ async function approved(bucket,row,jobId){
   items=[legacy];revision=1;
  }else if(raw.schema==='HHBA_ORIGINAL_WORD_VERSIONS_V2'){
   items=raw.items;revision=raw.revision;
-  if(!Array.isArray(items)||items.length<1||items.length>MAX_REVISIONS||
+  if(!Array.isArray(items)||items.length<1||(!unbounded&&items.length>MAX_REVISIONS)||
    !Number.isInteger(revision)||revision<0||revision>items.length||
    items.some(x=>!validEntry(x))||
    new Set(items.map(x=>x.id)).size!==items.length)
@@ -208,17 +210,18 @@ export async function onRequestGet({request,env}){
   if(!validRow(row))return fail('WORD_INVALID_FILE',422);
   if(action==='inspect'){
    const original=await loadBytes(bucket,row);
-   const state=await approved(bucket,row,jobId);
+   const state=await approved(bucket,row,jobId,v4(env));
    const current=state.saved?
     await versionBytes(bucket,state.key,state.saved,'docx'):original;
-   const data=await inspectOriginalDocxStrict(current);
+   const data=await inspectOriginalDocxStrict(current,{unbounded:v4(env)});
    return json({ok:true,editable_text:data.editable_text,
     saved:state.saved?{original:state.saved.original,text:state.saved.text,
      updated_at:state.saved.updated_at}:null,
     revision:state.revision,total_revisions:state.items.length,
     layout_verified:Boolean(state.saved&&state.saved.verification!=='docx_structure_only'),
     pdf_available:Boolean(state.saved&&state.saved.verification!=='docx_structure_only'),
-    max_revisions:MAX_REVISIONS,max_daily_edits:DAILY.export,
+    max_revisions:v4(env)?null:MAX_REVISIONS,max_daily_edits:v4(env)?null:DAILY.export,
+    unlimited_product_quota:v4(env),
     history:state.items.map((entry,index)=>({
      revision:index+1,original:entry.original,text:entry.text,
      updated_at:entry.updated_at||'',page_count:entry.page_count,
@@ -227,9 +230,9 @@ export async function onRequestGet({request,env}){
   }
   if(action==='source-docx'){
    const original=await loadBytes(bucket,row);
-   const state=await approved(bucket,row,jobId);
+   const state=await approved(bucket,row,jobId,v4(env));
    const requested=params.get('revision');
-   if(requested!==null&&(!/^(?:0|[1-9][0-9]?)$/.test(requested)||
+   if(requested!==null&&(!/^(?:0|[1-9][0-9]*)$/.test(requested)||
     Number(requested)!==state.revision))return fail('WORD_REVISION_CONFLICT',409);
    const current=state.saved?
     await versionBytes(bucket,state.key,state.saved,'docx'):original;
@@ -237,9 +240,9 @@ export async function onRequestGet({request,env}){
   }
   if(action==='download'||action==='edited-preview'||action==='download-pdf'){
    await loadBytes(bucket,row);
-   const state=await approved(bucket,row,jobId);
+   const state=await approved(bucket,row,jobId,v4(env));
    const requested=new URL(request.url).searchParams.get('revision');
-   if(requested!==null&&(!/^(?:0|[1-9][0-9]?)$/.test(requested)||
+   if(requested!==null&&(!/^(?:0|[1-9][0-9]*)$/.test(requested)||
     Number(requested)!==state.revision))
     return fail('WORD_REVISION_CONFLICT',409);
    if(!state.saved)return fail('WORD_NOT_EDITED',404);
@@ -260,8 +263,8 @@ export async function onRequestGet({request,env}){
    if(bytes.length>=500&&bytes.length<=12*1024*1024)
     return replyFile(bytes,'application/pdf','HHBA-resume-original-preview.pdf');
   }
-  if(!await quotaReady(db))return fail('WORD_DB_NOT_READY',503);
-  if(!await reserve(db,env,candidate.phone,'preview'))
+  if(!v4(env)&&!await quotaReady(db))return fail('WORD_DB_NOT_READY',503);
+  if(!v4(env)&&!await reserve(db,env,candidate.phone,'preview'))
    return fail('WORD_DAILY_LIMIT',429);
   const original=await loadBytes(bucket,row);
   const rendered=await wordRequest(env,'render',{original});
@@ -283,16 +286,16 @@ export async function onRequestPost({request,env}){
  try{candidate=await owner(db,request);}catch{return fail('SESSION_INVALID',401);}
  if(candidate.error)return fail(candidate.error,candidate.status);
  let body;
- try{body=await readSmall(request);}catch{return fail('INVALID_REQUEST',400);}
+ try{body=await readSmall(request,v4(env));}catch{return fail('INVALID_REQUEST',400);}
  const id=body?.resume_id,action=body?.action||'edit',jobId=body?.job_id;
  if(!ID.test(String(id||''))||!validJobId(jobId)||
   !['edit','undo','redo'].includes(action)||
   body?.confirmed_real!==true||body?.consent_word_processing!==true||
   (body.expected_revision!==undefined&&
    (!Number.isInteger(body.expected_revision)||body.expected_revision<0||
-    body.expected_revision>MAX_REVISIONS))||
+    (!v4(env)&&body.expected_revision>MAX_REVISIONS)))||
   (action==='edit'&&(typeof body?.original!=='string'||
-   typeof body?.text!=='string'||body.original.length>300||body.text.length>300)))
+   typeof body?.text!=='string'||(!v4(env)&&(body.original.length>300||body.text.length>300)))))
   return fail('INVALID_REQUEST',400);
  let row,created=[];
  try{
@@ -301,7 +304,7 @@ export async function onRequestPost({request,env}){
   if(!validRow(row))return fail('WORD_INVALID_FILE',422);
   // Verify owner-bound original even when editing a previously saved revision.
   const original=await loadBytes(bucket,row);
-  const state=await approved(bucket,row,jobId);
+  const state=await approved(bucket,row,jobId,v4(env));
   if(body.expected_revision!==undefined&&body.expected_revision!==state.revision)
    return fail('WORD_REVISION_CONFLICT',409);
   if(state.items.length&&!state.etag)return fail('WORD_REVISION_LOCK_UNAVAILABLE',503);
@@ -315,10 +318,10 @@ export async function onRequestPost({request,env}){
    }
    return json({ok:true,saved:next>0,revision:next,total_revisions:state.items.length});
   }
-  if(state.revision>=MAX_REVISIONS) return fail('WORD_REVISION_LIMIT',422);
+  if(!v4(env)&&state.revision>=MAX_REVISIONS) return fail('WORD_REVISION_LIMIT',422);
   if(!renderer&&!hashIsValid(body.client_docx_sha256))return fail('INVALID_REQUEST',400);
-  if(!await quotaReady(db))return fail('WORD_DB_NOT_READY',503);
-  if(!await reserve(db,env,candidate.phone,'export'))
+  if(!v4(env)&&!await quotaReady(db))return fail('WORD_DB_NOT_READY',503);
+  if(!v4(env)&&!await reserve(db,env,candidate.phone,'export'))
    return fail('WORD_DAILY_LIMIT',429);
   const current=state.saved?
    await versionBytes(bucket,state.key,state.saved,'docx'):original;
@@ -326,10 +329,10 @@ export async function onRequestPost({request,env}){
   // Exact OOXML patching preserves the original ZIP members. A renderer-free
   // revision NEVER claims to preserve the visible Word page geometry.
   const result=renderer?await prepareVerifiedOriginalDocxExport({
-   original:current,edits:selected,
+   original:current,edits:selected,unbounded:v4(env),
    verifyLayout:async({original,edited,oldText,newText})=>
     wordRequest(env,'verify',{original,edited,oldText,newText})
-  }):{bytes:await editOriginalDocxStrict(current,selected,{allowExpansion:true}),pageCount:null};
+  }):{bytes:await editOriginalDocxStrict(current,selected,{allowExpansion:true,unbounded:v4(env)}),pageCount:null};
   if(!renderer&&await shaBytes(result.bytes)!==body.client_docx_sha256)
    return fail('WORD_EDIT_CORRUPTED',409);
   const pdf=renderer?await wordRequest(env,'render',{original:result.bytes}):null;

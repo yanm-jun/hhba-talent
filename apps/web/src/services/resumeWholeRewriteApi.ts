@@ -1,3 +1,4 @@
+import {v4JsonRequest} from './v4JsonTransport';
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import type {JdAwareJob} from './jobJdArchive';
 import type {ResumeBlock} from './targetedResumeOptimization';
@@ -28,6 +29,7 @@ export type ResumeWholeRewriteStatus={
  requires_user_approval:boolean;
 };
 const errorMessage:Record<string,string>={
+ AI_REQUEST_SEGMENT_REQUIRED:'本次数据超出单次传输安全容量，未截断任何原文。需分段继续。',
  INVALID_REWRITE_INPUT:'简历或岗位资料不完整。为避免遗漏，我们没有生成不完整的改写稿。',
  JD_VERIFIED_VERSION_REQUIRED:'未取得核验过的完整 JD，不能进行严格的岗位定向简历重写。',
  JD_VERSION_NOT_AVAILABLE:'官方 JD 档案暂时无法取回，原始 Word 未修改。',
@@ -57,6 +59,28 @@ export class WholeRewriteError extends Error{
  }
 }
 const PATH='/api/resume-rewrite';
+const v4Active=()=>typeof window!=='undefined'&&(/(^|\.)hhba\.work$/.test(window.location.hostname)||window.location.hostname.endsWith('.hhba-talent.pages.dev'));
+const retryCodes=new Set(['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_RESPONSE_JSON_INVALID','AI_PROVIDER_RESPONSE_TRUNCATED','AI_PROVIDER_STREAM_INTERRUPTED','NETWORK_ERROR']);
+async function rewriteFetch(url:string,init:RequestInit):Promise<Response>{
+ const transport=await v4JsonRequest(init,v4Active());
+ let delay=1000;
+ for(;;){
+  if(init.signal?.aborted)throw init.signal.reason;
+  try{
+   const response=await fetch(url,transport);
+   if(!v4Active()||response.ok)return response;
+   const data=await response.clone().json().catch(()=>({}));
+   if(!retryCodes.has(data.error)&&!(!data.error&&[429,502,503,504].includes(response.status)))return response;
+  }catch(e){if(init.signal?.aborted||!v4Active())throw e;}
+  await new Promise<void>((resolve,reject)=>{
+   const signal=init.signal;
+   const abort=()=>{clearTimeout(timer);reject(signal?.reason);};
+   const timer=setTimeout(()=>{signal?.removeEventListener('abort',abort);resolve();},delay);
+   signal?.addEventListener('abort',abort,{once:true});
+  });
+  delay=Math.min(delay*2,30000);
+ }
+}
 export async function getWholeRewriteStatus(signal?:AbortSignal):Promise<ResumeWholeRewriteStatus|null>{
  if(!realAuthReady)return null;
  try{
@@ -74,9 +98,9 @@ export async function requestWholeResumeRewrite(blocks:ResumeBlock[],
  if(!token)throw new WholeRewriteError('SESSION_INVALID',401);
  let response:Response;
  try{
-  response=await fetch(PATH,{method:'POST',credentials:'omit',cache:'no-store',signal,
+  response=await rewriteFetch(PATH,{method:'POST',credentials:'omit',cache:'no-store',signal,
    headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
-   body:JSON.stringify({consent_ai:true,blocks,job})});
+   body:JSON.stringify({consent_ai:true,blocks,job:v4Active()&&job.jd_version_id&&job.jd_sha256?{...job,requirements:''}:job})});
  }catch(e){
   if((e as Error)?.name==='AbortError')throw e;
   throw new WholeRewriteError('NETWORK_ERROR',503);
@@ -104,10 +128,10 @@ export async function continueWholeResumeRewrite(
  if(!token)throw new WholeRewriteError('SESSION_INVALID',401);
  let response:Response;
  try{
-  response=await fetch('/api/resume-rewrite-step',{
+  response=await rewriteFetch('/api/resume-rewrite-step',{
    method:'POST',credentials:'omit',cache:'no-store',signal,
    headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
-   body:JSON.stringify({consent_ai:true,blocks,job,draft,checkpoint})
+   body:JSON.stringify({consent_ai:true,blocks,job:v4Active()&&job.jd_version_id&&job.jd_sha256?{...job,requirements:''}:job,draft,checkpoint})
   });
  }catch(e){
   if((e as Error)?.name==='AbortError')throw e;

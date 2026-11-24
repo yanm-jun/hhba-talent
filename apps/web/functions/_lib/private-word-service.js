@@ -93,7 +93,7 @@ export const wordLimitPepper=env=>
 export const docxOnlyConfigured=env=>
  env?.HHBA_WORD_DOCX_ONLY_ENABLED==='1'&&
  (env?.HHBA_AUTH_ROLLOUT==='preview'||env?.HHBA_MATCH_RUNTIME_MODE==='production')&&
- typeof wordLimitPepper(env)==='string'&&wordLimitPepper(env).length>=24&&
+ (env?.HHBA_MATCH_V4_READY==='1'||(typeof wordLimitPepper(env)==='string'&&wordLimitPepper(env).length>=24))&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function'&&
  typeof env?.HHBA_PRIVATE_RESUMES?.get==='function'&&
  typeof env?.HHBA_PRIVATE_RESUMES?.put==='function';

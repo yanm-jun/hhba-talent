@@ -30,8 +30,8 @@ export async function onRequestPost({request,env}){
  catch(e){return reject(e?.message==='FORBIDDEN'?'FORBIDDEN':'SESSION_INVALID',
   e?.message==='FORBIDDEN'?403:401);}
  let body;
- try{body=await boundedJson(request);}
- catch{return reject('INVALID_REQUEST',400);}
+ try{body=await boundedJson(request,env);}
+ catch(e){return reject(e?.message==='AI_REQUEST_SEGMENT_REQUIRED'?'AI_REQUEST_SEGMENT_REQUIRED':'INVALID_REQUEST',e?.message==='AI_REQUEST_SEGMENT_REQUIRED'?413:400);}
  if(body?.consent_ai!==true)return reject('AI_CONSENT_REQUIRED',400);
  let trustedJob;
  try{trustedJob=await hydrateVerifiedJobRequirements(env,body.job);}
@@ -39,7 +39,8 @@ export async function onRequestPost({request,env}){
  try{
   // All requests remain explicit-consent, candidate-only and local to this
   // draft. The model may choose further editorial tools, not privileged I/O.
-  const signal=AbortSignal.timeout(150000);
+  const signal=env?.HHBA_MATCH_V4_READY==='1'?request.signal:AbortSignal.timeout(150000);
+  if(env?.HHBA_MATCH_V4_READY==='1'&&env?.HHBA_RESUME_AGENT_ENABLED!=='0'&&!rewriteContinuationActive(env))return reject('AI_CHECKPOINT_NOT_CONFIGURED',503);
   const base=await generateTailoredResume({
    env,blocks:body.blocks,job:trustedJob,signal
   });
@@ -71,8 +72,12 @@ export async function onRequestPost({request,env}){
    const code=typeof e?.message==='string'&&e.message.startsWith('AI_PROVIDER_')?
     e.message:'AI_AGENT_REVIEW_UNAVAILABLE';
    console.warn('HHBA_AI_AGENT_REVIEW_INCOMPLETE',code);
-   return json({...base,autonomy:{enabled:true,rounds:0,stop_reason:'tool_unavailable',
-    needs_more_work:true,tools_used:[]}});
+   const recoverable={...base,autonomy:{enabled:true,rounds:0,stop_reason:'execution_round_guard',needs_more_work:true,tools_used:[]}};
+   if(env?.HHBA_MATCH_V4_READY==='1'&&rewriteContinuationActive(env)&&['AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_RESPONSE_JSON_INVALID','AI_PROVIDER_RESPONSE_TRUNCATED','AI_PROVIDER_STREAM_INTERRUPTED'].includes(code)){
+    const checkpoint=await issueCheckpoint({env,account,blocks:body.blocks,job:trustedJob,draft:recoverable});
+    return json({...recoverable,continuation:{enabled:true,checkpoint}});
+   }
+   return json({...recoverable,autonomy:{...recoverable.autonomy,stop_reason:'tool_unavailable'}});
   }
  }catch(e){
   const allowed=new Set(['INVALID_REWRITE_INPUT','AI_PROVIDER_NOT_CONFIGURED',
@@ -82,7 +87,7 @@ export async function onRequestPost({request,env}){
    'AI_PROVIDER_TIMEOUT','AI_PROVIDER_NETWORK_ERROR',
    'AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_RESPONSE_EMPTY',
    'AI_PROVIDER_RESPONSE_JSON_INVALID','AI_PROVIDER_RESPONSE_TRUNCATED',
-   'AI_PROVIDER_RESPONSE_HTTP_INVALID','AI_PROVIDER_UNEXPECTED_REDIRECT']);
+   'AI_PROVIDER_RESPONSE_HTTP_INVALID','AI_PROVIDER_UNEXPECTED_REDIRECT','AI_PROVIDER_STREAM_INTERRUPTED','AI_PROVIDER_CONTEXT_EXCEEDED']);
   const code=allowed.has(e?.message)?e.message:'AI_RESUME_REWRITE_FAILED';
   // Never log resume text, provider payloads, credentials or private names.
   console.warn('HHBA_FULL_REWRITE_FAILED',code);

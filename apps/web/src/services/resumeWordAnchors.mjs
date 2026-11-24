@@ -1,7 +1,7 @@
 // Word text nodes may be edited only when their exact text appears uniquely
 // in the true PDF output produced from the SAME original DOCX.
 const plain=s=>String(s||'').normalize('NFKC').trim();
-export function matchWordAnchors({editableText,items,viewport,page,styles={}}){
+export function matchWordAnchors({editableText,items,viewport,page,styles={},unbounded=false}){
  if(!Array.isArray(editableText)||!Array.isArray(items)||!viewport||
   !Number.isInteger(page)||page<1)return [];
  // PDF text is NFKC-normalized (e.g. Chinese full-width punctuation);
@@ -9,7 +9,7 @@ export function matchWordAnchors({editableText,items,viewport,page,styles={}}){
  // If two source strings collapse to the same normalized text, neither is safe.
  const candidates=new Map();
  for(const value of editableText){
-  if(typeof value!=='string'||value.length<3||value.length>300||
+  if(typeof value!=='string'||value.length<3||(!unbounded&&value.length>300)||
    value.trim()!==value)continue;
   const key=plain(value),values=candidates.get(key)||[];
   if(!values.includes(value))values.push(value);

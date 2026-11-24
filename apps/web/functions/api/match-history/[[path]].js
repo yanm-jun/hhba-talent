@@ -1,7 +1,9 @@
 // Private, user-scoped history of AI-recommended jobs. Not an application tracker.
 // Creation is server-owned by /api/match-native; the client cannot upload results.
+import {backgroundStorageReady,cancelBackground} from '../../_lib/v4-background-match.js';
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {listMatchHistory,getMatchHistory,deleteMatchHistory,linkSavedResumeToHistory} from '../../_lib/match-history.js';
+import {v4HistoryReady,listV4History,getV4History,deleteV4History,linkV4History} from '../../_lib/v4-match-history.js';
 const KIND='HHBA_ACCOUNT_MATCH_HISTORY_V1';
 const send=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store',
@@ -30,14 +32,19 @@ export async function onRequest({request,env}){
  const id=route.match(/^\/([0-9a-f-]{36})$/i)?.[1];
  const link=route.match(/^\/([0-9a-f-]{36})\/link$/i)?.[1];
  try{
-  if((route===''||route==='/')&&method==='GET')
-   return send({ok:true,kind:KIND,items:await listMatchHistory(db,session.phone)});
+  const v4=await v4HistoryReady(db);
+  if((route===''||route==='/')&&method==='GET'){
+   const old=await listMatchHistory(db,session.phone);
+   const newer=v4?await listV4History(db,session.phone):[];
+   return send({ok:true,kind:KIND,items:[...newer,...old].sort((a,b)=>b.created_at.localeCompare(a.created_at))});
+  }
   if(id&&uuid.test(id)&&method==='GET'){
-   const item=await getMatchHistory(db,session.phone,id);
+   const item=(v4?await getV4History(db,session.phone,id):null)||await getMatchHistory(db,session.phone,id);
    return item?send({ok:true,kind:KIND,item}):error('MATCH_HISTORY_NOT_FOUND',404);
   }
   if(id&&uuid.test(id)&&method==='DELETE'){
-   const removed=await deleteMatchHistory(db,session.phone,id);
+   if(backgroundStorageReady(env))await cancelBackground(env,session.phone,id);
+   const removed=(v4&&await deleteV4History(db,session.phone,id))||await deleteMatchHistory(db,session.phone,id);
    return removed?send({ok:true,deleted:true,id}):error('MATCH_HISTORY_NOT_FOUND',404);
   }
   if(link&&uuid.test(link)&&method==='POST'){
@@ -47,7 +54,7 @@ export async function onRequest({request,env}){
    if(typeof body?.resume_id!=='string'||!uuid.test(body.resume_id))
     return error('INVALID_HISTORY_LINK',400);
    try{
-    const ok=await linkSavedResumeToHistory(db,session.phone,link,body.resume_id);
+    const ok=(v4&&await linkV4History(db,session.phone,link,body.resume_id))||await linkSavedResumeToHistory(db,session.phone,link,body.resume_id);
     return ok?send({ok:true,id:link,resume_id:body.resume_id}):error('MATCH_HISTORY_NOT_FOUND',404);
    }catch(e){return error(e?.message==='RESUME_NOT_OWNED'?'RESUME_NOT_OWNED':'INVALID_HISTORY_LINK',404);}
   }

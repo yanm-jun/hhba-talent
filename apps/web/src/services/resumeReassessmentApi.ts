@@ -1,12 +1,14 @@
+import {v4JsonRequest} from './v4JsonTransport';
 import {getRealAuthToken,realAuthReady} from './realAuth';
+import {MATCH_V4_PREVIEW} from './resumeMatch';
 import type {CandidateProfile} from './resumeMatching';
 import type {ResumeBlock} from './targetedResumeOptimization';
 
 export type ReassessmentStatus={
- kind:'HHBA_RESUME_REASSESS_V2';enabled:boolean;ranking_version:string;scope:string;
+ kind:'HHBA_RESUME_REASSESS_V2'|'HHBA_RESUME_REASSESS_V4';enabled:boolean;ranking_version:string;scope:string;
 };
 export type ReassessmentResult={
- ok:true;kind:'HHBA_RESUME_REASSESS_V2';job_id:string;verified_job_title:string;
+ ok:true;kind:'HHBA_RESUME_REASSESS_V2'|'HHBA_RESUME_REASSESS_V4';job_id:string;verified_job_title:string;
  verified_company:string;job_snapshot_updated_at:string;ranking_version:string;
  source_label?:string;selected_job_as_target_direction?:boolean;
  supported:boolean;reason?:string;original_score?:number;updated_score?:number;
@@ -15,6 +17,7 @@ export type ReassessmentResult={
 };
 const PATH='/api/resume-reassess';
 const errors:Record<string,string>={
+ AI_REQUEST_SEGMENT_REQUIRED:'本次数据超出单次传输安全容量，未截断任何原文。需分段继续。',
  ORIGIN_REQUIRED:'请求来源未通过验证。',SESSION_INVALID:'请先登录 HHBA 求职者账号。',
  REASSESSMENT_NOT_ENABLED:'岗位重新评分功能尚未开放。',REASSESSMENT_DB_NOT_READY:'后台评分额度服务尚未准备好。',
  REASSESSMENT_LIMIT:'今天的岗位复评次数已达上限。',
@@ -31,7 +34,7 @@ export async function reassessmentStatus(signal?:AbortSignal):Promise<Reassessme
   const r=await fetch(PATH,{method:'GET',cache:'no-store',credentials:'omit',signal});
   if(!r.ok)return null;
   const data=await r.json() as ReassessmentStatus;
-  return data.kind==='HHBA_RESUME_REASSESS_V2'?data:null;
+  return data.kind===(MATCH_V4_PREVIEW?'HHBA_RESUME_REASSESS_V4':'HHBA_RESUME_REASSESS_V2')?data:null;
  }catch{return null;}
 }
 export async function reassessResume(jobId:string,profile:CandidateProfile,
@@ -42,19 +45,19 @@ export async function reassessResume(jobId:string,profile:CandidateProfile,
   job_id:jobId,consent_reassessment:true,confirm_real:true,
   profile:{
    education:profile.education,experience_years:profile.experience_years,
-   target_roles:profile.target_roles.slice(0,7),
-   skills:profile.skills.slice(0,30).map(s=>({name:s.name}))
+   target_roles:profile.target_roles.slice(0,MATCH_V4_PREVIEW?undefined:7),
+   skills:profile.skills.slice(0,MATCH_V4_PREVIEW?undefined:30).map(s=>({name:s.name}))
   },before_blocks:beforeBlocks,after_blocks:afterBlocks
  };
  let response:Response;
  try{
-  response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
+  response=await fetch(PATH,await v4JsonRequest({method:'POST',cache:'no-store',credentials:'omit',signal,
    headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
-   body:JSON.stringify(data)});
+   body:JSON.stringify(data)},MATCH_V4_PREVIEW));
  }catch{throw new ReassessmentError('NETWORK_UNAVAILABLE',503);}
  const payload=await response.json().catch(()=>({})) as Partial<ReassessmentResult>&{error?:string};
  if(!response.ok)throw new ReassessmentError(payload.error||'UNKNOWN_ERROR',response.status);
- if(payload.ok!==true||payload.kind!=='HHBA_RESUME_REASSESS_V2'||
+ if(payload.ok!==true||payload.kind!==(MATCH_V4_PREVIEW?'HHBA_RESUME_REASSESS_V4':'HHBA_RESUME_REASSESS_V2')||
   typeof payload.supported!=='boolean')throw new ReassessmentError('INVALID_RESULT',502);
  return payload as ReassessmentResult;
 }

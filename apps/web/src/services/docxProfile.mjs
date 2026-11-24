@@ -26,8 +26,8 @@ export function cleanProfile(input){
  }
  return result;
 }
-async function unzipDocXml(buffer){
- if(!(buffer instanceof ArrayBuffer)||buffer.byteLength<50||buffer.byteLength>MAX_ZIP)throw Error('文件大小不符合要求');
+function docxDirectory(buffer,{unbounded=false}={}){
+ if(!(buffer instanceof ArrayBuffer)||buffer.byteLength<50||(!unbounded&&buffer.byteLength>MAX_ZIP))throw Error('文件大小不符合要求');
  const view=new DataView(buffer),bytes=new Uint8Array(buffer);
  // ZIP EOCD may be followed by a small archive comment.
  let eocd=-1;
@@ -36,21 +36,29 @@ async function unzipDocXml(buffer){
  }
  if(eocd<0)throw Error('DOCX 文件尾部结构无效');
  const entries=read16(view,eocd+10),centralOffset=read32(view,eocd+16);
- if(entries<1||entries>1200||centralOffset>=eocd)throw Error('DOCX 文件目录不受支持');
- let offset=centralOffset,record=null;
+ if(entries<1||(!unbounded&&entries>1200)||centralOffset>=eocd)throw Error('DOCX 文件目录不受支持');
+ let offset=centralOffset;
+ const records=new Map();
  for(let i=0;i<entries;i++){
   if(offset+46>eocd||read32(view,offset)!==0x02014b50)throw Error('DOCX 目录损坏');
   const nameLen=read16(view,offset+28),extra=read16(view,offset+30),comment=read16(view,offset+32);
   if(offset+46+nameLen+extra+comment>eocd)throw Error('DOCX 目录越界');
   const name=dec.decode(bytes.subarray(offset+46,offset+46+nameLen));
-  if(name==='word/document.xml'){
-   record={method:read16(view,offset+10),flags:read16(view,offset+8),
-    packed:read32(view,offset+20),unpacked:read32(view,offset+24),local:read32(view,offset+42)};
-  }
+  if(records.has(name))throw Error('DOCX 目录重复');
+  records.set(name,{method:read16(view,offset+10),flags:read16(view,offset+8),
+    packed:read32(view,offset+20),unpacked:read32(view,offset+24),local:read32(view,offset+42)});
   offset+=46+nameLen+extra+comment;
  }
- if(!record||record.flags&1||record.unpacked<10||record.unpacked>MAX_XML||
-   record.packed<5||record.packed>MAX_ZIP)throw Error('无法安全提取 DOCX 文本');
+ return records;
+}
+async function unzipDocXml(buffer,{unbounded=false,signal,part='word/document.xml',binary=false,directory}={}){
+ const view=new DataView(buffer),bytes=new Uint8Array(buffer);
+ const record=(directory||docxDirectory(buffer,{unbounded})).get(part);
+ if(!record||record.flags&1||record.unpacked<10||(!unbounded&&record.unpacked>MAX_XML)||
+   record.packed<5||(!unbounded&&record.packed>MAX_ZIP))throw Error('无法安全提取 DOCX 文本');
+ // Reject deceptive ZIP expansion, even in the unrestricted matching path.
+ if(unbounded&&record.unpacked>Math.max(MAX_XML,record.packed*200))throw Error('DOCX 异常压缩比例');
+ if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
  const p=record.local;
  if(p+30>buffer.byteLength||read32(view,p)!==0x04034b50)throw Error('DOCX 文件数据损坏');
  const start=p+30+read16(view,p+26)+read16(view,p+28);
@@ -67,7 +75,8 @@ async function unzipDocXml(buffer){
    while(true){
     const part=await reader.read();if(part.done)break;
     size+=part.value.byteLength;
-    if(size>MAX_XML){await reader.cancel();throw Error('DOCX 解压内容超过安全限制')}
+    if(signal?.aborted){await reader.cancel();throw new DOMException('Cancelled','AbortError')}
+    if(size>record.unpacked||(!unbounded&&size>MAX_XML)){await reader.cancel();throw Error('DOCX 解压内容超过安全限制')}
     chunks.push(part.value);
    }
   }finally{reader.releaseLock()}
@@ -75,7 +84,7 @@ async function unzipDocXml(buffer){
   for(const chunk of chunks){output.set(chunk,at);at+=chunk.length}
  }else throw Error('不支持此 DOCX 压缩方式');
  if(output.length!==record.unpacked)throw Error('DOCX 数据长度校验失败');
- return dec.decode(output);
+ return binary?output:dec.decode(output);
 }
 const xmlChars=s=>s.replace(/&(#x[0-9a-f]+|#[0-9]+|amp|lt|gt|quot|apos);/gi,(raw,k)=>{
  if(k==='amp')return '&';if(k==='lt')return '<';if(k==='gt')return '>';
@@ -86,10 +95,10 @@ const xmlChars=s=>s.replace(/&(#x[0-9a-f]+|#[0-9]+|amp|lt|gt|quot|apos);/gi,(raw
  }
  return raw;
 });
-export function wordXmlToText(xml){
- if(typeof xml!=='string'||xml.length>MAX_XML||
+export function wordXmlToText(xml,{unbounded=false,additionalPart=false}={}){
+ if(typeof xml!=='string'||(!unbounded&&xml.length>MAX_XML)||
   /<!DOCTYPE|<!ENTITY|<\?xml-stylesheet/i.test(xml))throw Error('DOCX 含有不支持的 XML 声明');
- if(!/<w:document(?:\s|>)/.test(xml)||!/<w:body(?:\s|>)/.test(xml))throw Error('DOCX 不是有效正文');
+ if(additionalPart?!/<w:(?:hdr|ftr|footnotes|endnotes)(?:\s|>)/.test(xml):!/<w:document(?:\s|>)/.test(xml)||!/<w:body(?:\s|>)/.test(xml))throw Error('DOCX 不是有效正文');
  const paragraphs=[];
  const paragraphPattern=/<w:p(?:\s[^>]*)?>([\s\S]*?)<\/w:p>/g;
  for(const p of xml.matchAll(paragraphPattern)){
@@ -100,13 +109,39 @@ export function wordXmlToText(xml){
   }
   const line=bits.join('').replace(/[\u0000-\u0008\u000b-\u001f]/g,'').trim();
   if(line)paragraphs.push(line);
-  if(paragraphs.join('\n').length>MAX_TEXT)throw Error('简历文本超过本地提取上限');
+  if(!unbounded&&paragraphs.join('\n').length>MAX_TEXT)throw Error('简历文本超过本地提取上限');
  }
  if(!paragraphs.length)throw Error('DOCX 中未找到可复制文字');
  return paragraphs.join('\n');
 }
-export async function extractDocxText(buffer){
- return wordXmlToText(await unzipDocXml(buffer));
+export async function extractDocxText(buffer,options={}){
+ if(options.unbounded)return (await inspectDocxContents(buffer,options)).text;
+ return wordXmlToText(await unzipDocXml(buffer,options),options);
+}
+// Only local ZIP members. Never resolve relationships or fetch external images.
+// The expansion guard protects memory rather than limiting AI research volume.
+const mediaType=name=>/\.png$/i.test(name)?'image/png':/\.jpe?g$/i.test(name)?'image/jpeg':/\.webp$/i.test(name)?'image/webp':/\.gif$/i.test(name)?'image/gif':null;
+export async function inspectDocxContents(buffer,{signal,includeImages=false}={}){
+ const directory=docxDirectory(buffer,{unbounded:true});
+ const extra=[...directory.keys()].filter(n=>/^word\/(?:header\d+|footer\d+|footnotes|endnotes)\.xml$/i.test(n)).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+ const media=[...directory.keys()].filter(n=>/^word\/media\/[^/\\\\]+$/i.test(n));
+ const names=['word/document.xml',...extra];
+ const selected=includeImages?[...names,...media.filter(mediaType)]:names;
+ if(selected.reduce((n,name)=>n+(directory.get(name)?.unpacked||0),0)>24*1024*1024)throw Error('DOCX 解压资源超出安全容量');
+ const sections=[];let partial=false;
+ for(const part of names){
+  if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
+  const xml=await unzipDocXml(buffer,{unbounded:true,signal,part,directory});
+  try{const text=wordXmlToText(xml,{unbounded:true,additionalPart:part!=='word/document.xml'});if(text)sections.push(text);}
+  catch(e){if(!String(e?.message).includes('未找到可复制文字'))throw e;}
+ }
+ const images=[];
+ if(includeImages)for(const name of media){
+  const mime=mediaType(name);if(!mime){partial=true;continue;}
+  const bytes=await unzipDocXml(buffer,{unbounded:true,signal,part:name,binary:true,directory});
+  images.push({name,mime,bytes});
+ }
+ return {text:sections.join('\n'),hasImages:media.length>0,images,partial};
 }
 export function inferProfileFromText(text){
  if(typeof text!=='string'||!text.trim())return cleanProfile({});

@@ -5,7 +5,7 @@
  */
 export const AI_PROVIDERS = ['deepseek','openai','anthropic','gemini','qwen','zhipu','groq','openrouter'] as const;
 export type AiProvider = typeof AI_PROVIDERS[number];
-export type ResumeSection = 'summary'|'experience'|'education'|'skills'|'projects';
+export type ResumeSection = string; // V4 may describe any real section; legacy validators retain their schema.
 export type SuggestionAction = 'replace'|'append'|'request_evidence';
 export type EvidenceStatus = 'verified'|'needs_user_confirmation';
 export interface ResumeBlock { id:string; section:ResumeSection; text:string; }
@@ -36,7 +36,7 @@ export function applySuggestion(version:ResumeVersion,s:ResumeSuggestion,confirm
 }
 export function editResumeBlock(version:ResumeVersion,blockId:string,updatedText:string):ResumeVersion {
  const text=updatedText.trim();
- if(!text||text.length>1600)throw new Error('INVALID_BLOCK_TEXT');
+ if(!text)throw new Error('INVALID_BLOCK_TEXT');
  if(!version.blocks.some(block=>block.id===blockId))throw new Error('UNKNOWN_RESUME_BLOCK');
  return {...version,blocks:version.blocks.map(block=>block.id===blockId?{...block,text}:block)};
 }

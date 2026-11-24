@@ -89,7 +89,7 @@ export async function renderBrowserWord(bytes:Uint8Array,mount:HTMLElement){
  */
 export function paintBrowserWordSuggestions(
  mount:HTMLElement,editableText:string[],
- suggestions:readonly {original:string;proposed:string;state:'pending'|'accepted'}[]
+ suggestions:readonly {original:string;proposed:string;state:'pending'|'accepted'}[],unbounded=false
 ):void{
  const attribute='data-hhba-original-run';
  for(const node of mount.querySelectorAll<HTMLElement>('span[data-hhba-original-run]')){
@@ -111,7 +111,7 @@ export function paintBrowserWordSuggestions(
  for(const suggestion of suggestions){
   if(suggestion.state!=='pending'||!allowed.has(suggestion.original)||
    suggestion.proposed===suggestion.original||!suggestion.proposed.trim()||
-   suggestion.proposed.length>300)continue;
+   (!unbounded&&suggestion.proposed.length>300))continue;
   proposals.set(suggestion.original,[...(proposals.get(suggestion.original)||[]),
    suggestion.proposed]);
  }
@@ -136,7 +136,7 @@ export function paintBrowserWordSuggestions(
  }
 }
 
-export function browserWordAnchors(mount:HTMLElement,editableText:string[]):WordAnchor[]{
+export function browserWordAnchors(mount:HTMLElement,editableText:string[],unbounded=false):WordAnchor[]{
  const pages=[...mount.querySelectorAll<HTMLElement>('section.hhba-native-docx')];
  if(!pages.length)return [];
  const bounds=mount.getBoundingClientRect();
@@ -146,7 +146,7 @@ export function browserWordAnchors(mount:HTMLElement,editableText:string[]):Word
  const fullWidth=Math.max(mount.scrollWidth,mount.offsetWidth);
  const fullHeight=Math.max(mount.scrollHeight,mount.offsetHeight);
  if(bounds.width<100||bounds.height<100||fullWidth<100||fullHeight<100)return [];
- const safe=new Set(editableText.filter(s=>typeof s==='string'&&s.trim()===s&&s.length>=3&&s.length<=300));
+ const safe=new Set(editableText.filter(s=>typeof s==='string'&&s.trim()===s&&s.length>=3&&(unbounded||s.length<=300)));
  const found=new Map<string,HTMLElement[]>();
  // Only leaf spans with exactly one matching run may be edited. Ambiguous or
  // duplicated text (including repeated headers) is never clickable.

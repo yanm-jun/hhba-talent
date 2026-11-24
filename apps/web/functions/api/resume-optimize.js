@@ -1,5 +1,6 @@
 // Candidate-only, opt-in, server-side AI resume suggestion route.
 // No API key, resume content or session token is stored in D1 or response logs.
+import {readV4Json} from '../_lib/v4-json-transport.js';
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
 import {generateSuggestions,selectProvider} from '../_lib/resume-ai-provider.js';
 import {hydrateVerifiedJobRequirements} from '../_lib/job-jd-archive.js';
@@ -12,6 +13,7 @@ const send=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:
 }});
 const fail=(code,status)=>send({ok:false,error:code},status);
 const MAX_BODY=256*1024,MAX_BLOCKS=12,MAX_GLOBAL=50,MAX_PERSONAL=3;
+const isV4=env=>env?.HHBA_MATCH_V4_READY==='1';
 const MAX_GLOBAL_ATTEMPTS=120,MAX_PERSONAL_ATTEMPTS=6;
 // Separate paid AI optimization quotas from unrelated matching services.
 // Preview still supports its existing shared secret until separately migrated.
@@ -19,9 +21,10 @@ const quotaPepper=env=>typeof env?.HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER==='stri
  env.HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER.length>=24?
  env.HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER:env?.HHBA_MATCH_LIMIT_PEPPER;
 function active(env){
+ if(isV4(env))return typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
  return (env?.HHBA_AUTH_ROLLOUT==='preview'||env?.HHBA_MATCH_RUNTIME_MODE==='production')&&
   env?.HHBA_RESUME_OPTIMIZATION_ENABLED==='1'&&
-  typeof quotaPepper(env)==='string'&&quotaPepper(env).length>=24&&
+  (isV4(env)||(typeof quotaPepper(env)==='string'&&quotaPepper(env).length>=24))&&
   typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 }
 async function dbReady(db){
@@ -42,34 +45,35 @@ function sameOrigin(request){
  const url=new URL(request.url);
  return request.headers.get('Origin')===url.origin&&request.headers.get('Sec-Fetch-Site')!=='cross-site';
 }
-async function readSmallJson(request){
+async function readSmallJson(request,v4=false){
+ const limit=v4?3*1024*1024:MAX_BODY;
  const declared=request.headers.get('Content-Length');
- if(!request.body||declared!==null&&(!/^\d+$/.test(declared)||Number(declared)>MAX_BODY))throw Error('INVALID_REQUEST');
+ if(!request.body||declared!==null&&(!/^\d+$/.test(declared)||Number(declared)>limit))throw Error('INVALID_REQUEST');
  const reader=request.body.getReader();let bytes=0;const chunks=[];
  try{for(;;){const x=await reader.read();if(x.done)break;bytes+=x.value.byteLength;
-  if(bytes>MAX_BODY){await reader.cancel();throw Error('INVALID_REQUEST');}chunks.push(x.value);}
+  if(bytes>limit){await reader.cancel();throw Error('INVALID_REQUEST');}chunks.push(x.value);}
  }finally{reader.releaseLock();}
  const all=new Uint8Array(bytes);let pos=0;for(const c of chunks){all.set(c,pos);pos+=c.byteLength;}
  try{return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(all));}catch{throw Error('INVALID_REQUEST');}
 }
-function valid(body){
+function valid(body,v4=false){
  if(!body||Array.isArray(body)||typeof body!=='object'||body.consent_ai!==true||
   !Array.isArray(body.blocks)||body.blocks.length<1)return false;
  if(!body.job||typeof body.job!=='object'||typeof body.job.title!=='string'||
-  body.job.title.length<2||body.job.title.length>120||
-  typeof body.job.requirements!=='string'||body.job.requirements.length>16000)return false;
+  body.job.title.length<2||(!v4&&body.job.title.length>120)||
+  typeof body.job.requirements!=='string'||(!v4&&body.job.requirements.length>16000))return false;
  const doc=body.full_document;
- if(doc===undefined&&body.blocks.length>MAX_BLOCKS)return false;
+ if(!v4&&doc===undefined&&body.blocks.length>MAX_BLOCKS)return false;
  if(doc!==undefined&&(!doc||Array.isArray(doc)||typeof doc!=='object'||
   !/^jd_[a-f0-9]{32}$/.test(body.job.jd_version_id||'')||!/^[a-f0-9]{64}$/.test(body.job.jd_sha256||'')||
-  typeof doc.text!=='string'||doc.text.length>50000||
+  typeof doc.text!=='string'||(!v4&&doc.text.length>50000)||
   (doc.wanted!==undefined&&(!Array.isArray(doc.wanted)||!doc.wanted.length||
    doc.wanted.length>body.blocks.length))))return false;
  const ids=new Set();
  const blocksValid=body.blocks.every(b=>{
   if(!b||typeof b!=='object'||typeof b.id!=='string'||!/^[a-z0-9_-]{1,64}$/i.test(b.id)||
-   typeof b.text!=='string'||!b.text.trim()||b.text.length>1600||ids.has(b.id))return false;
-  ids.add(b.id);return ['experience','skills','summary','education','projects'].includes(b.section);
+   typeof b.text!=='string'||!b.text.trim()||(!v4&&b.text.length>1600)||ids.has(b.id))return false;
+  ids.add(b.id);return v4?typeof b.section==='string'&&Boolean(b.section.trim()):['experience','skills','summary','education','projects'].includes(b.section);
  });
  return blocksValid&&(!doc?.wanted||doc.wanted.every(id=>ids.has(id)));
 }
@@ -104,16 +108,17 @@ async function releaseFailedRequest(db,requestId,hash){
 export async function onRequestGet({env}){
  let configured=false;
  try{selectProvider(env);configured=true;}catch{}
- return send({kind:'HHBA_RESUME_OPTIMIZATION_V1',enabled:active(env)&&configured&&await dbReady(env.HHBA_PNVS_AUTH_DB),
-  full_document_enabled:active(env)&&configured&&await taskReady(env.HHBA_PNVS_AUTH_DB),
-  configured,per_account_daily_limit:MAX_PERSONAL,global_daily_limit:MAX_GLOBAL,
-  per_account_daily_attempt_limit:MAX_PERSONAL_ATTEMPTS,global_daily_attempt_limit:MAX_GLOBAL_ATTEMPTS});
+ return send({kind:'HHBA_RESUME_OPTIMIZATION_V1',enabled:active(env)&&configured&&(isV4(env)||await dbReady(env.HHBA_PNVS_AUTH_DB)),
+  full_document_enabled:active(env)&&configured&&(isV4(env)||await taskReady(env.HHBA_PNVS_AUTH_DB)),
+  unlimited_product_quota:isV4(env),
+  configured,per_account_daily_limit:isV4(env)?null:MAX_PERSONAL,global_daily_limit:isV4(env)?null:MAX_GLOBAL,
+  per_account_daily_attempt_limit:isV4(env)?null:MAX_PERSONAL_ATTEMPTS,global_daily_attempt_limit:isV4(env)?null:MAX_GLOBAL_ATTEMPTS});
 }
 export async function onRequestPost({request,env}){
  if(!sameOrigin(request))return fail('ORIGIN_REQUIRED',403);
  if(!active(env))return fail('RESUME_OPTIMIZATION_NOT_ENABLED',503);
  const db=env.HHBA_PNVS_AUTH_DB;
- if(!await dbReady(db))return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);
+ if(!isV4(env)&&!await dbReady(db))return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);
  try{selectProvider(env);}catch{return fail('AI_PROVIDER_NOT_CONFIGURED',503);}
  let session;
  try{session=await sessionOfBearer(db,request,Date.now());
@@ -122,25 +127,25 @@ export async function onRequestPost({request,env}){
   if(user?.role!=='candidate')return fail('FORBIDDEN',403);
  }catch{return fail('SESSION_INVALID',401);}
  let input;
- try{input=await readSmallJson(request);}catch{return fail('INVALID_REQUEST',400);}
- if(!valid(input))return fail('INVALID_OPTIMIZATION_INPUT',400);
+ try{input=isV4(env)?await readV4Json(request):await readSmallJson(request);}catch(e){return fail(e?.message==='AI_REQUEST_SEGMENT_REQUIRED'?'AI_REQUEST_SEGMENT_REQUIRED':'INVALID_REQUEST',e?.message==='AI_REQUEST_SEGMENT_REQUIRED'?413:400);}
+ if(!valid(input,isV4(env)))return fail('INVALID_OPTIMIZATION_INPUT',400);
  let trustedJob;
  try{trustedJob=await hydrateVerifiedJobRequirements(env,input.job);}
  catch(e){
   const code=String(e?.message||'JD_VERSION_NOT_AVAILABLE');
   return fail(code,code==='JD_VERIFIED_VERSION_REQUIRED'||code==='JD_JOB_IDENTITY_MISMATCH'?422:409);
  }
- const hash=await sha256Hex(quotaPepper(env)+':resume-opt:'+session.phone);
+ const hash=isV4(env)?null:await sha256Hex(quotaPepper(env)+':resume-opt:'+session.phone);
  let requestId,lease;
  try{
-  if(input.full_document){
+  if(input.full_document&&!isV4(env)){
    if(!await taskReady(db))return fail('RESUME_OPTIMIZATION_TASK_DB_NOT_READY',503);
    lease=await reserveResumeOptimizationTask(db,hash,{
     jd:trustedJob.jd_version_id,blocks:input.blocks,text:input.full_document.text
    });
    if(lease?.duplicate)return fail('RESUME_OPTIMIZATION_IN_PROGRESS',409);
    if(!lease)return fail('RESUME_OPTIMIZATION_QUEUED',409);
-  }else{
+  }else if(!isV4(env)){
    if(!await reserveAttempt(db,hash))return fail('RESUME_OPTIMIZATION_ATTEMPT_LIMIT',429);
    requestId=await reserve(db,hash);
    if(!requestId)return fail('RESUME_OPTIMIZATION_LIMIT',429);
@@ -151,7 +156,7 @@ export async function onRequestPost({request,env}){
  const job={title:redact(trustedJob.title),requirements:redact(trustedJob.requirements),
   verified:trustedJob.source_status==='VERIFIED_OFFICIAL_JD'};
  try{
-  const signal=AbortSignal.any([request.signal,AbortSignal.timeout(input.full_document?180000:90000)]);
+  const signal=isV4(env)?request.signal:AbortSignal.any([request.signal,AbortSignal.timeout(input.full_document?180000:90000)]);
   const whole=input.full_document?await optimizeResumeDocument({
    env,blocks,context:redact(input.full_document.text),job,signal,wanted:input.full_document.wanted
   }):null;

@@ -11,6 +11,8 @@
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
 import {fetchPublicAtsJd} from '../_lib/public-ats-jd.js';
 import {directOfficialJobEvidence} from '../_lib/official-job-evidence.js';
+import {prepareV4JobForOptimization,readV4ArchivedJd} from '../_lib/v4-jd-bridge.js';
+import {v4PublicJobUrl} from '../_lib/v4-open-job-evidence.js';
 import {noteJdSourceFailure} from '../_lib/jd-posting-lifecycle.js';
 import {
  JD_ARCHIVE_KIND,jdArchiveConfigured,jdArchiveReady,safeJDSourceLocator,
@@ -83,6 +85,10 @@ export async function onRequestGet({request,env}){
   }catch{return fail('JD_ARCHIVE_READ_FAILED',503)}
  }
  const requested=url.searchParams.get('official_url')||'';
+ if(env?.HHBA_MATCH_V4_READY==='1'){
+  if(!v4PublicJobUrl(requested))return fail('OFFICIAL_URL_NOT_SUPPORTED',422);
+  return respond({ok:true,kind:JD_ARCHIVE_KIND,found:false,verified:false});
+ }
  const locator=safeJDSourceLocator(requested);
  if(!locator)return fail('OFFICIAL_URL_NOT_SUPPORTED',422);
  try{
@@ -103,6 +109,13 @@ export async function onRequestPost({request,env}){
  try{data=await readJson(request)}catch{return fail('INVALID_REQUEST',400)}
  if(data?.consent_verify!==true||typeof data.official_url!=='string')
   return fail('CONSENT_REQUIRED',400);
+ if(env?.HHBA_MATCH_V4_READY==='1'){
+  try{
+   const job=await prepareV4JobForOptimization(env,data.official_url,{signal:request.signal,expectedTitle:typeof data.title==='string'?data.title:undefined});
+   const saved=await readV4ArchivedJd(env,job.jd_version_id);
+   return saved?respond({...publicJdPayload(saved),from_cache:false}):fail('JD_ARCHIVE_WRITE_FAILED',503);
+  }catch(e){return fail(e?.code==='V4_PAGE_TEMPORARILY_UNAVAILABLE'?'V4_PAGE_TEMPORARILY_UNAVAILABLE':'JD_NOT_COMPLETE_ENOUGH',e?.code==='V4_PAGE_TEMPORARILY_UNAVAILABLE'?503:422);}
+ }
  const locator=safeJDSourceLocator(data.official_url);
  if(!locator)return fail('OFFICIAL_URL_NOT_SUPPORTED',422);
  try{

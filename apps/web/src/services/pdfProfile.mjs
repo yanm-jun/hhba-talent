@@ -7,9 +7,9 @@ export const PDF_MAX_TEXT=50000;
 export class PDFResumeError extends Error{
  constructor(code,message){super(message);this.code=code;this.name="PDFResumeError";}
 }
-export function assertPdfBytes(buffer){
+export function assertPdfBytes(buffer,{unbounded=false}={}){
  if(!(buffer instanceof ArrayBuffer)||buffer.byteLength<32||
-  buffer.byteLength>PDF_MAX_BYTES)throw new PDFResumeError("PDF_SIZE","PDF 文件大小必须在 3 MB 以内。");
+  (!unbounded&&buffer.byteLength>PDF_MAX_BYTES))throw new PDFResumeError("PDF_SIZE","PDF 文件大小必须在 3 MB 以内。");
  const bytes=new Uint8Array(buffer,0,Math.min(1024,buffer.byteLength));
  let header=false;
  for(let i=0;i<=bytes.length-5;i++){
@@ -21,7 +21,7 @@ const normalized=s=>s.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,"").re
 /** Preserve lines using PDF.js text item order and line positions.
  * Text evidence is presented for manual correction, never trusted as identity.
  */
-export function pdfTextItemsToLines(items){
+export function pdfTextItemsToLines(items,{unbounded=false}={}){
  if(!Array.isArray(items))return [];
  const result=[];let line="",lastY=null;
  const flush=()=>{const value=normalized(line);if(value)result.push(value);line="";lastY=null;};
@@ -36,7 +36,7 @@ export function pdfTextItemsToLines(items){
    if(y!==null)lastY=y;
   }
   if(item.hasEOL)flush();
-  if(result.join("\n").length>PDF_MAX_TEXT)
+  if(!unbounded&&result.join("\n").length>PDF_MAX_TEXT)
    throw new PDFResumeError("PDF_TEXT_LIMIT","PDF 可复制文字过长，请精简简历后重试。");
  }
  flush();
@@ -64,13 +64,13 @@ function abortError(){const err=new Error("本次 PDF 提取已取消。");err.n
 /** The injected loadPdfJs is only for unit tests; production always uses
  * firstPartyPdfJs, bundled locally. All work has an overall bounded timeout.
  */
-export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs}={}){
- assertPdfBytes(buffer);
+export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs,unbounded=false}={}){
+ assertPdfBytes(buffer,{unbounded});
  if(signal?.aborted)throw abortError();
  let task=null,expired=false;
  const abort=()=>{if(task)void task.destroy().catch(()=>{});};
  if(signal)signal.addEventListener("abort",abort,{once:true});
- const timer=setTimeout(()=>{expired=true;abort();},15000);
+ const timer=unbounded?undefined:setTimeout(()=>{expired=true;abort();},15000);
  try{
   const pdf=await loadPdfJs();
   if(expired)throw new PDFResumeError("PDF_TIMEOUT","PDF 处理超时，请导出更简洁的文字版 PDF。");
@@ -91,7 +91,7 @@ export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs}={
   if(expired)throw new PDFResumeError("PDF_TIMEOUT","PDF 处理超时，请导出更简洁的文字版 PDF。");
   if(signal?.aborted)throw abortError();
   if(!Number.isInteger(document.numPages)||document.numPages<1||
-    document.numPages>PDF_MAX_PAGES)
+    (!unbounded&&document.numPages>PDF_MAX_PAGES))
    throw new PDFResumeError("PDF_PAGES","PDF 简历最多支持 15 页，请精简后重试。");
   const pages=[];let chars=0,hasTextlessPages=false;
   for(let n=1;n<=document.numPages;n++){
@@ -99,11 +99,11 @@ export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs}={
    if(signal?.aborted)throw abortError();
    const page=await document.getPage(n);
    const content=await page.getTextContent({includeMarkedContent:false});
-   const contentLines=pdfTextItemsToLines(content.items);
+   const contentLines=pdfTextItemsToLines(content.items,{unbounded});
    const text=contentLines.join("\n");
    if(text.replace(/\s/g,"").length<12)hasTextlessPages=true;
    chars+=text.length;
-   if(chars>PDF_MAX_TEXT)throw new PDFResumeError("PDF_TEXT_LIMIT","PDF 文字超过安全提取上限，请精简后重试。");
+   if(!unbounded&&chars>PDF_MAX_TEXT)throw new PDFResumeError("PDF_TEXT_LIMIT","PDF 文字超过安全提取上限，请精简后重试。");
    if(text)pages.push(text);
    page.cleanup?.();
   }
@@ -120,4 +120,65 @@ export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs}={
   if(signal)signal.removeEventListener("abort",abort);
   if(task)await task.destroy().catch(()=>{});
  }
+}
+
+
+// The caller must obtain explicit visual-processing consent before using this
+// path. Render and release one page at a time, never rasterize the entire PDF
+// in memory. Pixel budget protects browser memory, not document page count.
+export async function readPdfVisualPages(buffer,{signal,onPage,loadPdfJs=firstPartyPdfJs,createCanvas=()=>document.createElement('canvas')}={}){
+ assertPdfBytes(buffer,{unbounded:true});
+ if(typeof onPage!=='function')throw Error('PDF_PAGE_HANDLER_REQUIRED');
+ if(signal?.aborted)throw abortError();
+ let task,renderTask;
+ const abort=()=>{try{renderTask?.cancel()}catch{}if(task)void task.destroy().catch(()=>{});};
+ signal?.addEventListener('abort',abort,{once:true});
+ const canvasBlob=canvas=>new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('PDF_PAGE_RENDER_FAILED')),'image/jpeg',0.92));
+ try{
+  const pdf=await loadPdfJs();
+  task=pdf.getDocument({data:new Uint8Array(buffer.slice(0)),enableScripting:false,isEvalSupported:false,enableXfa:false,disableAutoFetch:true,disableStream:true,stopAtErrors:true,useSystemFonts:false});
+  const doc=await task.promise;
+  if(!Number.isInteger(doc.numPages)||doc.numPages<1)throw Error('PDF_INVALID');
+  for(let number=1;number<=doc.numPages;number++){
+   if(signal?.aborted)throw abortError();
+   const page=await doc.getPage(number);
+   let localText='',canvas;
+   try{
+    const content=await page.getTextContent({includeMarkedContent:false});
+    localText=pdfTextItemsToLines(content.items,{unbounded:true}).join('\n');
+    const base=page.getViewport({scale:1});
+    let scale=Math.min(2.5,Math.sqrt(6000000/Math.max(1,base.width*base.height)));
+    canvas=createCanvas();
+    let blob;
+    for(;;){
+     if(signal?.aborted)throw abortError();
+     const viewport=page.getViewport({scale});
+     canvas.width=Math.max(1,Math.ceil(viewport.width));canvas.height=Math.max(1,Math.ceil(viewport.height));
+     renderTask=page.render({canvas,canvasContext:canvas.getContext('2d',{alpha:false}),viewport,background:'#ffffff'});
+     await renderTask.promise;renderTask=null;
+     blob=await canvasBlob(canvas);
+     if(blob.size<=3*1024*1024)break;
+     if(canvas.width<=1&&canvas.height<=1)throw Error('PDF_PAGE_IMAGE_TOO_LARGE');
+     scale*=0.75;
+    }
+    // OCR may return partial text. The callback can request smaller visual
+    // tiles of this same page without asking the user to upload again.
+    const tiles=async()=>{
+     const result=[];
+     for(const [start,end] of [[0,Math.floor(canvas.height/2)],[Math.floor(canvas.height/2),canvas.height]]){
+      if(end<=start)continue;
+      const tile=createCanvas();tile.width=canvas.width;tile.height=end-start;
+      try{tile.getContext('2d',{alpha:false}).drawImage(canvas,0,start,canvas.width,end-start,0,0,tile.width,tile.height);result.push(await canvasBlob(tile));}
+      finally{tile.width=tile.height=0;}
+     }
+     return result;
+    };
+    await onPage({number,total:doc.numPages,localText,blob,tiles});
+   }catch(e){
+    if(signal?.aborted)throw abortError();
+    // Preserve extracted text and report page failure; don't skip it silently.
+    await onPage({number,total:doc.numPages,localText,blob:null,error:true});
+   }finally{if(canvas)canvas.width=canvas.height=0;page.cleanup?.();}
+  }
+ }finally{signal?.removeEventListener('abort',abort);if(task)await task.destroy().catch(()=>{});}
 }

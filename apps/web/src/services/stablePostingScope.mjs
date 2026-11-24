@@ -12,8 +12,8 @@ const SEED_1=14695981039346656037n;
 const SEED_2=7809847782465536322n;
 const TRACKING=/^(?:utm_[a-z0-9_]+|gh_src|lever-source|from|source|ref|referrer|tracking|campaign)$/i;
 
-export function normalizePostingUrl(value){
- if(typeof value!=='string'||value.length>1800)return null;
+export function normalizePostingUrl(value,{unbounded=false}={}){
+ if(typeof value!=='string'||(!unbounded&&value.length>1800))return null;
  try{
   const u=new URL(value);
   if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash||
@@ -31,9 +31,9 @@ function fnv64(bytes,seed){
  for(const b of bytes)h=((h^BigInt(b))*PRIME)&MASK;
  return h.toString(16).padStart(16,'0');
 }
-export function stablePostingScope(officialUrl){
- const canonical=normalizePostingUrl(officialUrl);
+export function stablePostingScope(officialUrl,postingKey){
+ const canonical=normalizePostingUrl(officialUrl,{unbounded:typeof postingKey==='string'&&/^v4-posting-[a-f0-9]{32}$/.test(postingKey)});
  if(!canonical)return null;
- const bytes=new TextEncoder().encode(canonical);
+ const bytes=new TextEncoder().encode(typeof postingKey==='string'&&/^v4-posting-[a-f0-9]{32}$/.test(postingKey)?canonical+'\n'+postingKey:canonical);
  return 'posting-url-v1-'+fnv64(bytes,SEED_1)+fnv64(bytes,SEED_2);
 }

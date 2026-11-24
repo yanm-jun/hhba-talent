@@ -1,11 +1,14 @@
+import {v4JsonRequest} from './v4JsonTransport';
 import {getRealAuthToken,realAuthReady} from './realAuth';
+import {MATCH_V4_PREVIEW} from './resumeMatch';
 import type {JdAwareJob} from './jobJdArchive';
 import type {ResumeBlock,ResumeSuggestion} from './targetedResumeOptimization';
 
 export type ResumeOptimizationStatus={
  kind:'HHBA_RESUME_OPTIMIZATION_V1';enabled:boolean;configured:boolean;
- per_account_daily_limit:number;global_daily_limit:number;
- per_account_daily_attempt_limit?:number;global_daily_attempt_limit?:number;
+ per_account_daily_limit:number|null;global_daily_limit:number|null;
+ per_account_daily_attempt_limit?:number|null;global_daily_attempt_limit?:number|null;
+ unlimited_product_quota?:boolean;
  full_document_enabled?:boolean;
 };
 const OPTIMIZATION_ERRORS:Record<string,string>={
@@ -13,7 +16,8 @@ const OPTIMIZATION_ERRORS:Record<string,string>={
   FORBIDDEN:'当前账户无权使用求职者简历优化。',
   RESUME_OPTIMIZATION_NOT_ENABLED:'简历 AI 润色服务尚未启用。',
   RESUME_OPTIMIZATION_DB_NOT_READY:'平台简历优化额度服务尚未准备好。',
-  RESUME_OPTIMIZATION_LIMIT:'今天成功生成简历建议的次数已达上限。',
+  AI_REQUEST_SEGMENT_REQUIRED:'本次数据超出单次传输安全容量，未截断任何原文。需分段继续。',
+ RESUME_OPTIMIZATION_LIMIT:'今天成功生成简历建议的次数已达上限。',
   RESUME_OPTIMIZATION_ATTEMPT_LIMIT:'今天的 AI 润色尝试次数已达安全上限，请明天再试。',
   RESUME_OPTIMIZATION_TASK_DB_NOT_READY:'整份简历优化任务暂未就绪，请稍后重试。',
   RESUME_OPTIMIZATION_IN_PROGRESS:'这份简历已在处理同一岗位，可以回到已开始优化的窗口。',
@@ -58,13 +62,13 @@ export async function getResumeOptimizationStatus(signal?:AbortSignal):Promise<R
 type DocumentOptimization={
  text:string;wanted?:string[];onPending?:(ids:string[])=>void;onQueued?:()=>void;
 };
-function waitForOptimizationSlot(signal?:AbortSignal){
+function waitForOptimizationSlot(signal?:AbortSignal,ms=2500){
  return new Promise<void>((resolve,reject)=>{
   if(signal?.aborted){reject(signal.reason);return;}
   const cancel=()=>{clearTimeout(timer);reject(signal?.reason);};
   const timer=setTimeout(()=>{
    signal?.removeEventListener('abort',cancel);resolve();
-  },2500);
+  },ms);
   signal?.addEventListener('abort',cancel,{once:true});
  });
 }
@@ -76,21 +80,29 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
  const suggestions=new Map<string,ResumeSuggestion>();
  let wanted=document?.wanted;
  const ids=new Set(blocks.map(block=>block.id));
- let queueStarted=0;
+ let queueStarted=0,retryDelay=1000;
+ const retryable=new Set(['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_RESPONSE_HTTP_INVALID','AI_PROVIDER_RESPONSE_TRUNCATED','AI_PROVIDER_RESPONSE_JSON_INVALID','AI_PROVIDER_RESPONSE_EMPTY','AI_PROVIDER_SUGGESTION_SCHEMA_INVALID','RESUME_OPTIMIZATION_QUEUED','RESUME_OPTIMIZATION_IN_PROGRESS']);
+ const retry=async()=>{document?.onQueued?.();await waitForOptimizationSlot(signal,retryDelay);retryDelay=Math.min(retryDelay*2,30000);};
+ // A batch is a per-request unit, not a cap on the entire document.
+ let remaining=MATCH_V4_PREVIEW?(wanted||blocks.map(b=>b.id)):null;
  for(;;){
+  const requestBlocks=remaining?blocks.filter(b=>remaining!.slice(0,12).includes(b.id)):blocks;
+  const batchIds=new Set(requestBlocks.map(b=>b.id));
+  if(!requestBlocks.length)break;
   let response:Response;
   try{
-   response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
+   response=await fetch(PATH,await v4JsonRequest({method:'POST',cache:'no-store',credentials:'omit',signal,
     headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
-    body:JSON.stringify({consent_ai:true,blocks,job,
-     ...(document?{full_document:{text:document.text,wanted}}:{})})});
-  }catch{throw new ResumeOptimizationError('NETWORK_ERROR',503);}
+    body:JSON.stringify({consent_ai:true,blocks:requestBlocks,job:MATCH_V4_PREVIEW&&job.jd_version_id&&job.jd_sha256?{...job,requirements:''}:job,
+     ...(document?{full_document:{text:document.text,wanted:remaining?requestBlocks.map(b=>b.id):wanted}}:{})})},MATCH_V4_PREVIEW));
+  }catch(e){if(signal?.aborted)throw e;if(MATCH_V4_PREVIEW){await retry();continue;}throw new ResumeOptimizationError('NETWORK_ERROR',503);}
   const data=await response.json().catch(()=>({})) as {
    ok?:boolean;error?:string;suggestions?:ResumeSuggestion[];pending_block_ids?:string[]
   };
+  if(MATCH_V4_PREVIEW&&(retryable.has(data.error||'')||(!data.error&&[429,502,503,504].includes(response.status)))){await retry();continue;}
   if(document&&data.error==='RESUME_OPTIMIZATION_QUEUED'){
    queueStarted ||= Date.now();
-   if(Date.now()-queueStarted<240000){
+   if(MATCH_V4_PREVIEW||Date.now()-queueStarted<240000){
     document.onQueued?.();
     await waitForOptimizationSlot(signal);
     continue;
@@ -100,9 +112,18 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
    if(wanted&&suggestions.size){document?.onPending?.(wanted);break;}
    throw new ResumeOptimizationError(data.error||'INVALID_RESPONSE',response.status);
   }
-  for(const item of data.suggestions)suggestions.set(item.blockId,item);
+  for(const item of data.suggestions)suggestions.set(MATCH_V4_PREVIEW?JSON.stringify([item.blockId,item.action,item.proposed,item.jobRequirement]):item.blockId,item);
   const pending=Array.isArray(data.pending_block_ids)?
    [...new Set(data.pending_block_ids.filter(id=>ids.has(id)&&(!wanted||wanted.includes(id))))]:[];
+  if(remaining){
+   const pendingSet=new Set(pending);
+   const next=remaining.filter(id=>!batchIds.has(id)||pendingSet.has(id));
+   if(next.length===remaining.length){document?.onPending?.(next);await retry();continue;}
+   retryDelay=1000;
+   remaining=next;document?.onPending?.(remaining);
+   if(!remaining.length)break;
+   wanted=undefined;continue;
+  }
   if(!document||!pending.length){document?.onPending?.([]);break;}
   if(pending.length>=(wanted?.length??blocks.length)){
    document.onPending?.(pending);break;

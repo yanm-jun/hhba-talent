@@ -41,6 +41,7 @@ export function normalizeResumeDocumentDetails(raw:unknown):ResumeDocumentDetail
 export function sourceResumeBlocks(raw:string,fullDocument=false):ResumeBlock[]{
  const source=typeof raw==='string'?raw.replace(/\r\n?/g,'\n').trim():'';
  if(!source)return [];
+ if(fullDocument)return source.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean).map((text,i)=>({id:'source-'+i,section:'summary',text}));
  const parts=(fullDocument?source:source.slice(0,19000)).split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
  const max=fullDocument?Infinity:12;
  const chunks:string[]=[];

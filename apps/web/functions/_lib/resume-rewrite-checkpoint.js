@@ -9,6 +9,9 @@
  */
 const encoder=new TextEncoder();
 const MAX_TTL_MS=60*60*1000;
+// V4 checkpoints are still account-bound and signed. Give long editorial
+// tasks a longer recovery window; every successful step renews the token.
+const ttl=env=>env?.HHBA_MATCH_V4_READY==='1'?24*MAX_TTL_MS:MAX_TTL_MS;
 const MAX_TOKEN_LENGTH=4000;
 const base64url=bytes=>btoa(String.fromCharCode(...bytes))
  .replaceAll('+','-').replaceAll('/','_').replace(/=+$/,'');
@@ -43,7 +46,7 @@ export async function issueCheckpoint({env,account,blocks,job,draft,now=Date.now
  const payload={
   v:1,account:await accountBinding(key,account),
   content:await digest({blocks,job,draft:publicDraft(draft)}),
-  until:now+MAX_TTL_MS
+  until:now+ttl(env)
  };
  const message=base64url(encoder.encode(JSON.stringify(payload)));
  const signature=base64url(new Uint8Array(await crypto.subtle.sign(
@@ -69,7 +72,7 @@ export async function verifyCheckpoint({
   .decode(fromBase64url(parts[1])));}
  catch{throw Error('AI_CHECKPOINT_INVALID');}
  if(payload?.v!==1||!Number.isFinite(payload.until)||
-  payload.until<now||payload.until>now+MAX_TTL_MS+3000)
+  payload.until<now||payload.until>now+ttl(env)+3000)
   throw Error('AI_CHECKPOINT_EXPIRED');
  const accountId=await accountBinding(key,account);
  if(payload.account!==accountId||

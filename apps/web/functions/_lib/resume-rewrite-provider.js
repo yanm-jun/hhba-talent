@@ -8,6 +8,7 @@
  * Untrusted job descriptions and resume text are DATA, not instructions.
  */
 import {selectProvider} from './resume-ai-provider.js';
+import {v4Call,v4ParseJson,v4OutputText,splitV4ContextText} from './simple-match-v4.js';
 
 export const REWRITE_KIND='HHBA_WHOLE_RESUME_REWRITE_V1';
 const GROUP_CHARS=8000,MAX_BLOCKS=96,MAX_TEXT_PER_BLOCK=8000;
@@ -18,18 +19,18 @@ export function redacted(text){
   .replace(/(?<!\d)1[3-9]\d{9}(?!\d)/g,'[PHONE_REDACTED]')
   .replace(/(?<!\d)\d{17}[\dXx](?!\d)/g,'[ID_REDACTED]');
 }
-function validInputs(blocks,job){
- if(!Array.isArray(blocks)||blocks.length<1||blocks.length>MAX_BLOCKS||
+function validInputs(blocks,job,unbounded=false){
+ if(!Array.isArray(blocks)||blocks.length<1||(!unbounded&&blocks.length>MAX_BLOCKS)||
   !job||typeof job!=='object'||typeof job.title!=='string'||
-  !job.title.trim()||job.title.length>180||
-  typeof job.requirements!=='string'||job.requirements.length>16000)
+  !job.title.trim()||(!unbounded&&job.title.length>180)||
+  typeof job.requirements!=='string'||(!unbounded&&job.requirements.length>16000))
   return false;
  const used=new Set();
  return blocks.every(b=>b&&typeof b.id==='string'&&
   /^[a-zA-Z0-9_-]{1,64}$/.test(b.id)&&!used.has(b.id)&&
   (used.add(b.id),true)&&typeof b.text==='string'&&b.text.trim()&&
-  b.text.length<=MAX_TEXT_PER_BLOCK&&
-  ['summary','experience','skills','education','projects'].includes(b.section));
+  (unbounded||b.text.length<=MAX_TEXT_PER_BLOCK)&&
+  (unbounded?typeof b.section==='string'&&Boolean(b.section.trim()):['summary','experience','skills','education','projects'].includes(b.section)));
 }
 function balancedGroups(blocks){
  const groups=[];let group=[],size=0;
@@ -56,27 +57,27 @@ function recommendedOrder(proposed,blocks){
   return original;
  return proposed;
 }
-function safeQuestions(value,blocks){
+function safeQuestions(value,blocks,unbounded=false){
  const ids=new Set(blocks.map(x=>x.id)),out=[],used=new Set();
  for(const q of (Array.isArray(value)?value:[])){
   if(!q||typeof q!=='object')continue;
   const question=compact(q.question||q.prompt);
   const blockId=compact(q.blockId||q.block_id);
-  if(question.length<6||question.length>420||!ids.has(blockId)||used.has(blockId+question))continue;
+  if(question.length<(unbounded?1:6)||(!unbounded&&question.length>420)||!ids.has(blockId)||used.has(blockId+question))continue;
   used.add(blockId+question);
   out.push({blockId,question,
-   reason:compact(q.reason).slice(0,400),status:'user_input_needed'});
+   reason:unbounded?compact(q.reason):compact(q.reason).slice(0,400),status:'user_input_needed'});
  }
  return out;
 }
-export function validateAuthoring(block,proposal,quotes,numbers){
+export function validateAuthoring(block,proposal,quotes,numbers,{unbounded=false}={}){
  if(typeof proposal!=='string'||!proposal.trim()||
-  proposal.length>Math.max(12000,block.text.length*4))
+  (!unbounded&&proposal.length>Math.max(12000,block.text.length*4)))
   return 'INVALID_REWRITE_TEXT';
- if(!Array.isArray(quotes)||quotes.length===0||quotes.length>20)
+ if(!Array.isArray(quotes)||quotes.length===0||(!unbounded&&quotes.length>20))
   return 'MISSING_SOURCE_EVIDENCE';
  for(const q of quotes){
-  if(typeof q!=='string'||q.trim().length<3||!block.text.includes(q.trim()))
+  if(typeof q!=='string'||q.trim().length<(unbounded?1:3)||!block.text.includes(q.trim()))
    return 'SOURCE_QUOTE_NOT_FOUND';
  }
  if(/\[(?:EMAIL|PHONE|ID)_REDACTED\]/.test(proposal))return 'SENSITIVE_PLACEHOLDER_IN_DRAFT';
@@ -86,6 +87,19 @@ export function validateAuthoring(block,proposal,quotes,numbers){
  return null;
 }
 export async function completeJson(provider,system,user,signal,maxTokens=9000){
+ if(provider.protocol==='responses'){
+  const result=await v4Call(fetch,provider,{instructions:system,input:JSON.stringify(user)},{signal});
+  if(result.status!=='completed')throw Error('AI_PROVIDER_RESPONSE_TRUNCATED');
+  try{return v4ParseJson(result);}
+  catch(e){
+   if(signal?.aborted||e?.code!=='AI_PROVIDER_RESPONSE_INVALID')throw e;
+   const raw=v4OutputText(result);
+   if(!raw)throw e;
+   const repaired=await v4Call(fetch,provider,{instructions:system+'\n上次未返回有效 JSON，请重新根据原始输入独立完成任务，严格返回规定的 JSON 对象，不得编造事实或把不明确的审查结果视为通过。',input:JSON.stringify(user)},{signal});
+   if(repaired.status!=='completed')throw Error('AI_PROVIDER_RESPONSE_TRUNCATED');
+   return v4ParseJson(repaired);
+  }
+ }
  const headers={'content-type':'application/json'},url=provider.baseUrl+
   (provider.protocol==='anthropic'?'/messages':'/chat/completions');
  let body;
@@ -147,16 +161,96 @@ const SYSTEM_WRITE=`你是 HHBA 的专业简历撰写者，任务是针对给定
 const SYSTEM_AUDIT=`你是独立的 HHBA 简历事实审查员。对照原文与 AI 改写，发现任何无法证实的任职经历、雇主、学历、日期、数字、证书、技能、成果、职责、夸张用语或暗示，必须拒绝该段。招聘启事不是求职者事实来源。
 仅输出 JSON 对象：{"checks":[{"blockId":"源段落ID","safe":true,"concern":"没有问题时空字符串，或写明无法证实的具体事实"}]}。每个段落都要检查，不能跳过；不知道是否安全就 safe:false。`;
 
+// Planning reads every source segment. Only split after the actual model reports
+// context overflow; do not pre-truncate the resume or the archived JD.
+export async function adaptiveV4Plan(provider,system,input,signal,call=completeJson){
+ try{return await call(provider,system,input,signal,7000)}
+ catch(e){
+  if(e?.code!=='AI_PROVIDER_CONTEXT_EXCEEDED'||signal?.aborted)throw e;
+  const blocks=Array.isArray(input.blocks)?input.blocks:[];
+  const jd=input.job?.requirements||'',context=typeof input.context==='string'?input.context:'';
+  const blockSize=blocks.reduce((n,b)=>n+String(b.text||'').length,0);
+  const choices=[];
+  if(blocks.length>1)choices.push({size:blockSize,parts:[{...input,blocks:blocks.slice(0,Math.ceil(blocks.length/2))},{...input,blocks:blocks.slice(Math.ceil(blocks.length/2))}]});
+  else if(blocks.length===1){const p=splitV4ContextText(blocks[0].text);if(p)choices.push({size:blockSize,parts:p.map(text=>({...input,blocks:[{...blocks[0],text}]}))});}
+  for(const [field,value] of [['jd',jd],['context',context]]){
+   const p=splitV4ContextText(value);
+   if(p)choices.push({size:value.length,parts:p.map(text=>field==='jd'?{...input,job:{...input.job,requirements:text}}:{...input,context:text})});
+  }
+  choices.sort((a,b)=>b.size-a.size);
+  if(!choices.length)throw e;
+  const results=[];
+  for(const part of choices[0].parts)results.push(await adaptiveV4Plan(provider,system+'\n当前为分段研究，勿把局部判断当成整份简历结论。保留本段全部真实证据与优化重点。',part,signal,call));
+  return {focus:[...new Set(results.flatMap(r=>Array.isArray(r.focus)?r.focus:[]))],questions:results.flatMap(r=>Array.isArray(r.questions)?r.questions:[]),recommended_order:blocks.map(b=>b.id)};
+ }
+}
+export async function adaptiveV4BlockCall(provider,system,input,signal,maxTokens,field,call=completeJson,recoverSingle){
+ try{const result=await call(provider,system,input,signal,maxTokens);return recoverSingle?{[field]:result[field],questions:result.questions,recoveredChecks:[]}:result;}
+ catch(e){
+  if(signal?.aborted||!['AI_PROVIDER_CONTEXT_EXCEEDED','AI_PROVIDER_RESPONSE_TRUNCATED'].includes(e?.code||e?.message))throw e;
+  if(input.blocks?.length===1&&recoverSingle)return recoverSingle(input.blocks[0],e);
+  if(input.blocks?.length<2)throw e;
+  const mid=Math.ceil(input.blocks.length/2);
+  const first=await adaptiveV4BlockCall(provider,system,{...input,blocks:input.blocks.slice(0,mid)},signal,maxTokens,field,call,recoverSingle);
+  const second=await adaptiveV4BlockCall(provider,system,{...input,blocks:input.blocks.slice(mid)},signal,maxTokens,field,call,recoverSingle);
+  return {[field]:[...(Array.isArray(first[field])?first[field]:[]),...(Array.isArray(second[field])?second[field]:[])],questions:[...(first.questions||[]),...(second.questions||[])],recoveredChecks:[...(first.recoveredChecks||[]),...(second.recoveredChecks||[])]};
+ }
+}
+// A single giant paragraph can also exceed the provider context or output
+// window. Recover only on a real capacity error; independently author and
+// review every segment, and retain the original segment on factual rejection.
+// Recovered audit metadata is constructed locally, never accepted from AI.
+export async function rewriteV4LongBlock({provider,reviewer,block,job,focus,signal,call=completeJson}){
+ const capacity=e=>['AI_PROVIDER_CONTEXT_EXCEEDED','AI_PROVIDER_RESPONSE_TRUNCATED'].includes(e?.code||e?.message);
+ async function visit(text,compactJob=false){
+  if(signal?.aborted)throw signal.reason;
+  const source=redacted(text),raw={...block,text};
+  const scopedJob=compactJob?{title:job.title,requirements:'',context_note:'完整JD已分段研究；focus 是依据原文生成的编辑重点，不是额外候选人事实。'}:job;
+  try{
+   const written=await call(provider,SYSTEM_WRITE,{job:scopedJob,focus,blocks:[{...block,text:source}]},signal,12000);
+   const rows=Array.isArray(written.rewrites)?written.rewrites.filter(x=>x?.blockId===block.id):[];
+   const row=rows.length===1?rows[0]:null;
+   const proposal=compact(row?.text);
+   const quotes=Array.isArray(row?.sourceQuotes)?row.sourceQuotes:[];
+   const questions=safeQuestions(written.questions,[block],true);
+   const problem=validateAuthoring(raw,proposal,quotes,numberTokens(text),{unbounded:true});
+   if(problem)return {text,quotes:[],rationales:[],requirements:[],questions,held:[problem]};
+   const audit=await call(reviewer,SYSTEM_AUDIT,{job:{title:job.title},blocks:[{blockId:block.id,original:source,proposed:proposal}]},signal,6500);
+   const checks=Array.isArray(audit.checks)?audit.checks.filter(x=>x?.blockId===block.id):[];
+   if(checks.length!==1||checks[0].safe!==true)return {text,quotes:[],rationales:[],requirements:[],questions,held:['AI_FACT_CHECK_REJECTED']};
+   return {text:proposal,quotes,rationales:[compact(row.rationale)],requirements:Array.isArray(row.jobRequirements)?row.jobRequirements.filter(x=>typeof x==='string'):[],questions,held:[]};
+  }catch(e){
+   if(!capacity(e)||signal?.aborted)throw e;
+   if(!compactJob&&job.requirements.length>text.length&&focus.length)return visit(text,true);
+   const mid=Math.floor(text.length/2),before=text.lastIndexOf('\n',mid),after=text.indexOf('\n',mid);
+   const candidates=[before,after].filter(n=>n>=Math.floor(text.length/4)&&n<Math.ceil(text.length*3/4)).sort((a,b)=>Math.abs(a-mid)-Math.abs(b-mid));
+   const cut=candidates.length?candidates[0]+1:0;
+   const pieces=cut>0&&cut<text.length?[text.slice(0,cut),text.slice(cut)]:splitV4ContextText(text);
+   if(!pieces)throw e;
+   const a=await visit(pieces[0],compactJob),b=await visit(pieces[1],compactJob);
+   return {text:a.text+(a.text.endsWith('\n')||b.text.startsWith('\n')?'':'\n')+b.text,quotes:[...a.quotes,...b.quotes],rationales:[...a.rationales,...b.rationales],requirements:[...a.requirements,...b.requirements],questions:[...a.questions,...b.questions],held:[...a.held,...b.held]};
+  }
+ }
+ const recovered=await visit(block.text);
+ // Cross-segment merge must still satisfy the entire original paragraph's
+ // quote and numeric checks. Preserve original if a split interrupted a fact.
+ const problem=validateAuthoring(block,recovered.text,recovered.quotes,numberTokens(block.text),{unbounded:true});
+ const safe=!problem;
+ return {rewrites:[{blockId:block.id,text:safe?recovered.text:block.text,sourceQuotes:safe?recovered.quotes:[],rationale:recovered.rationales.filter(Boolean).join('\n'),jobRequirements:[...new Set(recovered.requirements)]}],questions:recovered.questions,recoveredChecks:[{blockId:block.id,safe,concern:[...recovered.held,...(problem?[problem]:[])].join('；')}]};
+}
 export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions,signal}){
  const originalById=new Map(blocks.map(block=>[block.id,block.text]));
- const draftBlocks=[];
- for(const suggestion of suggestions){
+ const unbounded=env?.HHBA_MATCH_V4_READY==='1';
+ const draftBlocks=[],auditIds=new Map();
+ for(const [index,suggestion] of suggestions.entries()){
   if(suggestion.action==='request_evidence')continue;
   const original=originalById.get(suggestion.blockId);
   if(!original)continue;
   const numbers=numberTokens(original);
   if([...numberTokens(suggestion.proposed)].some(token=>!numbers.has(token)))continue;
-  draftBlocks.push({blockId:suggestion.blockId,original,proposed:suggestion.proposed});
+  const auditId=unbounded?'alternative-'+index:suggestion.blockId;
+  auditIds.set(suggestion,auditId);
+  draftBlocks.push({blockId:auditId,original,proposed:suggestion.proposed});
  }
  if(!draftBlocks.length)return suggestions.filter(item=>item.action==='request_evidence');
  let reviewer;
@@ -165,17 +259,17 @@ export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions
   if(error.message!=='AI_PROVIDER_NOT_CONFIGURED')throw error;
   reviewer=selectProvider(env);
  }
- const audit=await completeJson(reviewer,SYSTEM_AUDIT,{job,blocks:draftBlocks},signal,6500);
+ const audit=unbounded?await adaptiveV4BlockCall(reviewer,SYSTEM_AUDIT,{job:{title:job.title},blocks:draftBlocks},signal,6500,'checks'):await completeJson(reviewer,SYSTEM_AUDIT,{job,blocks:draftBlocks},signal,6500);
  const checks=Array.isArray(audit.checks)?audit.checks:[];
  const confirmed=new Set(draftBlocks.filter(block=>{
   const rows=checks.filter(check=>check?.blockId===block.blockId);
   return rows.length===1&&rows[0].safe===true;
  }).map(block=>block.blockId));
- return suggestions.filter(item=>item.action==='request_evidence'||confirmed.has(item.blockId));
+ return suggestions.filter(item=>item.action==='request_evidence'||confirmed.has(auditIds.get(item)));
 }
 
 export async function generateTailoredResume({env,blocks,job,signal}){
- if(!validInputs(blocks,job))error('INVALID_REWRITE_INPUT');
+ if(!validInputs(blocks,job,env?.HHBA_MATCH_V4_READY==='1'))error('INVALID_REWRITE_INPUT');
  const provider=selectProvider(env,'resume_rewrite');
  let reviewer;
  try{reviewer=selectProvider(env,'resume_reviewer');}
@@ -185,29 +279,30 @@ export async function generateTailoredResume({env,blocks,job,signal}){
  // Numeric evidence belongs to its own source section; global numeric pools
  // would allow "50 deals" from employer A to be attributed to employer B.
  // Planning reads every block; it does not contain a hard 5-item suggestion cap.
- const plan=await completeJson(provider,SYSTEM_PLAN,{job:safeJob,blocks:safeBlocks},signal,7000);
- const questions=safeQuestions(plan.questions,blocks);
+ const unbounded=env?.HHBA_MATCH_V4_READY==='1';
+ const plan=unbounded?await adaptiveV4Plan(provider,SYSTEM_PLAN,{job:safeJob,blocks:safeBlocks},signal):await completeJson(provider,SYSTEM_PLAN,{job:safeJob,blocks:safeBlocks},signal,7000);
+ const questions=safeQuestions(plan.questions,blocks,unbounded);
  const order=recommendedOrder(plan.recommended_order,blocks);
- const rewritten=[],issues=[],groups=balancedGroups(safeBlocks);
+ const rewritten=[],issues=[],groups=unbounded?[safeBlocks]:balancedGroups(safeBlocks);
  for(const group of groups){
-  const response=await completeJson(provider,SYSTEM_WRITE,{
-   job:safeJob,focus:Array.isArray(plan.focus)?plan.focus.slice(0,30):[],
-   blocks:group
-  },signal,12000);
+  const writeInput={job:safeJob,focus:Array.isArray(plan.focus)?plan.focus.slice(0,unbounded?undefined:30):[],blocks:group};
+  const response=unbounded?await adaptiveV4BlockCall(provider,SYSTEM_WRITE,writeInput,signal,12000,'rewrites',completeJson,block=>rewriteV4LongBlock({provider,reviewer,block:blocks.find(b=>b.id===block.id),job:safeJob,focus:writeInput.focus,signal})):await completeJson(provider,SYSTEM_WRITE,writeInput,signal,12000);
   const writers=Array.isArray(response.rewrites)?response.rewrites:[];
-  questions.push(...safeQuestions(response.questions,blocks));
+  questions.push(...safeQuestions(response.questions,blocks,unbounded));
   const keyed=new Map();
   for(const row of writers){
    if(!row||typeof row!=='object'||typeof row.blockId!=='string'||keyed.has(row.blockId))
     continue;
    keyed.set(row.blockId,row);
   }
-  const reviewInput=group.map(block=>({
+  const recoveredChecks=Array.isArray(response.recoveredChecks)?response.recoveredChecks:[];
+  const recoveredIds=new Set(recoveredChecks.map(c=>c.blockId));
+  const reviewInput=group.filter(block=>!recoveredIds.has(block.id)).map(block=>({
    blockId:block.id,original:block.text,
    proposed:compact(keyed.get(block.id)?.text||'')
   }));
-  const audit=await completeJson(reviewer,SYSTEM_AUDIT,{job:safeJob,blocks:reviewInput},signal,6500);
-  const checks=new Map();
+  const audit=!reviewInput.length?{checks:[]}:unbounded?await adaptiveV4BlockCall(reviewer,SYSTEM_AUDIT,{job:{title:safeJob.title},blocks:reviewInput},signal,6500,'checks'):await completeJson(reviewer,SYSTEM_AUDIT,{job:safeJob,blocks:reviewInput},signal,6500);
+  const checks=new Map(recoveredChecks.map(c=>[c.blockId,c]));
   for(const check of Array.isArray(audit.checks)?audit.checks:[]){
    if(check&&typeof check.blockId==='string'&&!checks.has(check.blockId))
     checks.set(check.blockId,check);
@@ -216,21 +311,22 @@ export async function generateTailoredResume({env,blocks,job,signal}){
    const raw=blocks.find(x=>x.id===block.id),draft=keyed.get(block.id);
    const proposal=compact(draft?.text);
    const quotes=Array.isArray(draft?.sourceQuotes)?draft.sourceQuotes:[];
-   const problem=validateAuthoring(raw,proposal,quotes,numberTokens(raw.text));
+   const problem=validateAuthoring(raw,proposal,quotes,numberTokens(raw.text),{unbounded});
    const auditResult=checks.get(block.id);
    const safe=problem===null&&auditResult?.safe===true;
    const reason=problem||(!auditResult?'AUDIT_INCOMPLETE':!auditResult.safe?
     'AI_FACT_CHECK_REJECTED':null);
+   if(safe&&recoveredIds.has(block.id)&&auditResult.concern)issues.push({blockId:block.id,code:'PARTIAL_SEGMENT_RETAINED',note:auditResult.concern});
    if(!safe)issues.push({blockId:block.id,code:reason,
-    note:compact(auditResult?.concern).slice(0,350)});
+    note:compact(auditResult?.concern).slice(0,unbounded?undefined:350)});
    rewritten.push({
     blockId:block.id,section:block.section,original:raw.text,
     proposed:safe?proposal:raw.text,
     changed:safe&&proposal!==raw.text,
     evidenceQuotes:safe?quotes.map(compact):[],
-    rationale:safe?compact(draft?.rationale).slice(0,750):'此段保留原文，需人工补充证据或重新审查。',
+    rationale:safe?compact(draft?.rationale).slice(0,unbounded?undefined:750):'此段保留原文，需人工补充证据或重新审查。',
     jobRequirements:safe&&Array.isArray(draft?.jobRequirements)?
-     draft.jobRequirements.filter(x=>typeof x==='string').slice(0,12):[],
+     draft.jobRequirements.filter(x=>typeof x==='string').slice(0,unbounded?undefined:12):[],
     status:safe?'needs_user_confirmation':'kept_original'
    });
   }

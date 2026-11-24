@@ -17,19 +17,19 @@ import {issueCheckpoint,verifyCheckpoint,publicDraft}
  from '../_lib/resume-rewrite-checkpoint.js';
 
 const allowedSections=new Set(['summary','experience','skills','education','projects']);
-function validContinuation(body){
+function validContinuation(body,unbounded=false){
  if(!body||body.consent_ai!==true||
   !Array.isArray(body.blocks)||body.blocks.length<1||
-  body.blocks.length>96||!body.job||typeof body.job!=='object'||
+  (!unbounded&&body.blocks.length>96)||!body.job||typeof body.job!=='object'||
   typeof body.job.title!=='string'||!body.job.title.trim()||
-  body.job.title.length>180||
-  typeof body.job.requirements!=='string'||body.job.requirements.length>16000)
+  (!unbounded&&body.job.title.length>180)||
+  typeof body.job.requirements!=='string'||(!unbounded&&body.job.requirements.length>16000))
   return false;
  const ids=new Set();
  if(!body.blocks.every(b=>b&&typeof b.id==='string'&&
   /^[a-zA-Z0-9_-]{1,64}$/.test(b.id)&&!ids.has(b.id)&&
-  (ids.add(b.id),true)&&allowedSections.has(b.section)&&
-  typeof b.text==='string'&&b.text.trim()&&b.text.length<=8000))
+  (ids.add(b.id),true)&&(unbounded?typeof b.section==='string'&&Boolean(b.section.trim()):allowedSections.has(b.section))&&
+  typeof b.text==='string'&&b.text.trim()&&(unbounded||b.text.length<=8000)))
   return false;
  const draft=body.draft;
  if(!draft||draft.ok!==true||draft.kind!==REWRITE_KIND||
@@ -47,7 +47,7 @@ function validContinuation(body){
   if(!original||used.has(block.blockId))return false;
   used.add(block.blockId);
   return block.original===original.text&&block.section===original.section&&
-   typeof block.proposed==='string'&&block.proposed.length<=36000&&
+   typeof block.proposed==='string'&&(unbounded||block.proposed.length<=36000)&&
    ['needs_user_confirmation','kept_original'].includes(block.status);
  });
 }
@@ -60,10 +60,10 @@ export async function onRequestPost({request,env}){
  catch(e){return reject(e?.message==='FORBIDDEN'?'FORBIDDEN':'SESSION_INVALID',
   e?.message==='FORBIDDEN'?403:401);}
  let body;
- try{body=await rewriteRequestJson(request);}
- catch{return reject('INVALID_REQUEST',400);}
+ try{body=await rewriteRequestJson(request,env);}
+ catch(e){return reject(e?.message==='AI_REQUEST_SEGMENT_REQUIRED'?'AI_REQUEST_SEGMENT_REQUIRED':'INVALID_REQUEST',e?.message==='AI_REQUEST_SEGMENT_REQUIRED'?413:400);}
  if(body?.consent_ai!==true)return reject('AI_CONSENT_REQUIRED',400);
- if(!validContinuation(body))return reject('INVALID_REWRITE_INPUT',400);
+ if(!validContinuation(body,env?.HHBA_MATCH_V4_READY==='1'))return reject('INVALID_REWRITE_INPUT',400);
  let trustedJob;
  try{trustedJob=await hydrateVerifiedJobRequirements(env,body.job);}
  catch(e){return reject(String(e?.message||'JD_VERSION_NOT_AVAILABLE'),409)}
@@ -85,7 +85,7 @@ export async function onRequestPost({request,env}){
    draft:publicDraft(body.draft),blocks:body.blocks,job:trustedJob,
    env:{...env,HHBA_RESUME_AGENT_MAX_PASSES:'1'},
    provider:author,reviewer,completeJson,validateAuthoring,numberTokens,
-   redacted,signal:AbortSignal.timeout(150000)
+   redacted,signal:env?.HHBA_MATCH_V4_READY==='1'?request.signal:AbortSignal.timeout(150000)
   });
   if(result.autonomy?.needs_more_work){
    const token=await issueCheckpoint({

@@ -5,9 +5,10 @@ import type {User} from '../services/api';
 import {Link} from '../router';
 import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDialog';
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
-import {linkMatchHistoryResume} from '../services/matchHistory';
+import {linkMatchHistoryResume,getMatchHistory,historyJobsForContinuation} from '../services/matchHistory';
+import {backgroundMatchAvailable,startBackgroundMatch} from '../services/v4BackgroundMatch';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
+import {v4PostingKey,MATCH_V4_PREVIEW,matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -19,6 +20,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [savedId,setSavedId]=useState('');
  const [savedPickerOpen,setSavedPickerOpen]=useState(false);
  const deepLinkPending=useRef<string|null>(new URLSearchParams(window.location.search).get('resume'));
+ const historyPending=useRef<string|null>(new URLSearchParams(window.location.search).get('history'));
  const [previewText,setPreviewText]=useState('');
  const [previewLoaded,setPreviewLoaded]=useState(false);
  const [previewBusy,setPreviewBusy]=useState(false);
@@ -35,6 +37,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [storageChoice,setStorageChoice]=useState<'undecided'|'save'|'once'>('undecided');
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
+ const [backgroundAvailable,setBackgroundAvailable]=useState(false),[backgroundConsent,setBackgroundConsent]=useState(false);
+ const [backgroundNotice,setBackgroundNotice]=useState('');
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
  const [preflightAvailable,setPreflightAvailable]=useState(false);
  const [preflightBusy,setPreflightBusy]=useState(false);
@@ -59,6 +63,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const identifiedCharacters=redactResumeTextLocally(previewText).replace(/\s/g,'').length;
  useEffect(()=>{
   const abort=new AbortController();
+  if(MATCH_V4_PREVIEW)void backgroundMatchAvailable(abort.signal).then(ok=>{if(!abort.signal.aborted)setBackgroundAvailable(ok)});
   void matchServiceReady(abort.signal).then(ok=>{if(!abort.signal.aborted)setAvailability(ok?'ready':'disabled')});
   void matchPreviewPreflightAvailable(abort.signal).then(ok=>{if(!abort.signal.aborted)setPreflightAvailable(ok)});
   return()=>{abort.abort();controller.current?.abort();previewController.current?.abort()};
@@ -94,7 +99,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  },[user?.id]);
  function selectSavedResume(id:string){
   if(working||saveBusy)return;
-  deepLinkPending.current=null;
+  deepLinkPending.current=null;historyPending.current=null;
   previewController.current?.abort();
   setPreviewText('');setPreviewLoaded(false);setPreviewError('');setConsent(false);
   setOcrFile(null);setOcrBusy(false);setPreviewNote('');
@@ -106,7 +111,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  }
  function choose(candidate:File|null){
   if(working||saveBusy)return;
-  deepLinkPending.current=null;
+  deepLinkPending.current=null;historyPending.current=null;
   setSavedPickerOpen(false);
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setPreviewError('');setConsent(false);
   setOcrFile(null);setOcrBusy(false);setPreviewNote('');
@@ -115,8 +120,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   setStorageChoice('undecided');
   if(!candidate){setFile(null);return}
   const format=resumeFileFormat(candidate.name);
-  if(!format||candidate.size<30||candidate.size>maxResumeSize){
-    setFile(null);setError('请选择 3 MB 以内的 Word（DOCX）或 PDF 简历。');return;
+  if(!format||candidate.size<30||(!MATCH_V4_PREVIEW&&candidate.size>maxResumeSize)){
+    setFile(null);setError(MATCH_V4_PREVIEW?'请选择有效的 Word（DOCX）或 PDF 简历。':'请选择 3 MB 以内的 Word（DOCX）或 PDF 简历。');return;
   }
   setFile(candidate);
   void preview(candidate);
@@ -156,7 +161,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   try{
    const recognized=await recognizeResumeDocument(ocrFile,abort.signal);
    if(abort.signal.aborted)return;
-   const enough=recognized.text.replace(/\s/g,'').length>=30;
+   const enough=recognized.text.replace(/\s/g,'').length>=(MATCH_V4_PREVIEW?1:30);
    if(!previewText.trim()||enough)setPreviewText(recognized.text);
    setPreviewNote(recognized.partial||!enough?'已保留可用文字，请核对原件并补全。':
     '文档识别已完成，请核对经历和技能。');
@@ -188,7 +193,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  }
  async function run(){
   if((!file&&!savedId)||!consent||working||saveBusy||controller.current||previewBusy||ocrBusy||!previewLoaded||
-   identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()||
+   identifiedCharacters<(MATCH_V4_PREVIEW?1:30)||availability!=='ready'||!getRealAuthToken()||
    (file&&!savedId&&storageChoice==='undecided'))return;
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);
   const abort=new AbortController();
@@ -216,14 +221,29 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     // in that case do not start the AI request.
     if(abort.signal.aborted)throw new DOMException('Cancelled','AbortError');
    }
-   const matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,matchResumeId||undefined,
+   if(backgroundAvailable&&backgroundConsent&&!historyPending.current){
+    const task=await startBackgroundMatch(redactResumeTextLocally(previewText),options.role_hint||'',matchResumeId||undefined,abort.signal);
+    setBackgroundNotice('后台任务已接受。可以关闭页面，在「历史查找」查看进度或取消。任务编号：'+task.id);
+    setConsent(false);setBackgroundConsent(false);window.dispatchEvent(new Event('hhba:match-history-changed'));return;
+   }
+   let priorJobs:MatchedJob[]=[],runOptions=options;
+   if(MATCH_V4_PREVIEW&&historyPending.current&&matchResumeId){
+    const detail=await getMatchHistory(historyPending.current);
+    if(detail.engine!=='V4'||detail.resume_id!==matchResumeId)throw Error('历史任务与当前简历不匹配，请重新选择。');
+    priorJobs=historyJobsForContinuation(detail);
+    runOptions={...options,role_hint:detail.role_hint,history_id:detail.id,recovery_jobs:priorJobs,exclude_urls:[],research_context:detail.research_checkpoint?{round:detail.research_checkpoint.round,summary:'此前完成的公开招聘研究已保留；根据当前简历继续。'}:undefined};
+    setPartialJobs(priorJobs);
+   }
+   const combine=(jobs:MatchedJob[])=>[...new Map([...priorJobs,...jobs].map(job=>[MATCH_V4_PREVIEW?v4PostingKey(job):job.official_url,job])).values()];
+   const matched=await submitExtractedResumeText(previewText,runOptions,consent,abort.signal,matchResumeId||undefined,
     stage=>{if(!abort.signal.aborted)progress(stage);},
-    jobs=>{if(!abort.signal.aborted)setPartialJobs(jobs);},
+    jobs=>{if(!abort.signal.aborted)setPartialJobs(combine(jobs));},
     detail=>{if(!abort.signal.aborted)setActivity(detail);});
    if(abort.signal.aborted)return;
    setOptimizationSource(redactResumeTextLocally(previewText));
-   lastSearch.current={text:previewText,options,resumeId:matchResumeId||undefined};
-   setResult(matched);setPartialJobs([]);
+   lastSearch.current={text:previewText,options:runOptions,resumeId:matchResumeId||undefined};
+   historyPending.current=null;
+   setResult({...matched,matches:combine(matched.matches)});setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
    setConsent(false);
   }catch(e){
@@ -235,13 +255,15 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   if(!previous?.can_continue||!search||controller.current||!getRealAuthToken())return;
   const abort=new AbortController();controller.current=abort;
   const combine=(jobs:MatchedJob[])=>Array.from(new Map(
-   [...previous.matches,...jobs].map(job=>[job.official_url,job])
+   [...previous.matches,...jobs].map(job=>[MATCH_V4_PREVIEW?v4PostingKey(job):job.official_url,job])
   ).values());
   let collected=previous.matches;
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setPartialJobs(collected);
   try{
    const next=await submitExtractedResumeText(search.text,{...search.options,
-    exclude_urls:previous.matches.map(job=>job.official_url).slice(-50)},true,abort.signal,search.resumeId,
+    history_id:MATCH_V4_PREVIEW?previous.history_id||undefined:undefined,
+     recovery_jobs:MATCH_V4_PREVIEW?previous.matches:undefined,
+     exclude_urls:MATCH_V4_PREVIEW?[]:previous.matches.map(job=>job.official_url).slice(-50)},true,abort.signal,search.resumeId,
     stage=>{if(!abort.signal.aborted)progress(stage);},
     jobs=>{if(!abort.signal.aborted){collected=combine(jobs);setPartialJobs(collected);}},
     detail=>{if(!abort.signal.aborted)setActivity(detail);});
@@ -343,7 +365,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
        </div></div>}
     <div className="hhba-ai-layout">
       <section className="hhba-ai-upload">
-        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>支持 Word（DOCX）和 PDF，最大 3 MB。</p></header>
+        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>{MATCH_V4_PREVIEW?'支持 Word（DOCX）和 PDF。':'支持 Word（DOCX）和 PDF，最大 3 MB。'}</p></header>
         {user&&privateResumeAvailable&&savedFiles.length>0&&<div className="hhba-ai-saved-picker">
           <button type="button" className="hhba-ai-saved-picker-trigger"
            aria-expanded={savedPickerOpen} aria-controls="hhba-ai-existing-options"
@@ -373,7 +395,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           </div>
         </div>}
         {user&&privateResumeAvailable&&vaultError&&<p className="hhba-ai-vault-error" role="status">{vaultError}</p>}
-        {!getRealAuthToken()&&<p className="hhba-ai-service-check">AI 简历匹配需要先 <Link to={new URLSearchParams(window.location.search).get("v4")==="1"?"/candidate/login?next=%2Fcandidate%2Fmatch%3Fv4%3D1":"/candidate/login?next=%2Fcandidate%2Fmatch"}>登录 HHBA 求职账号</Link>。</p>}
+        {!getRealAuthToken()&&<p className="hhba-ai-service-check">AI 简历匹配需要先 <Link to="/candidate/login?next=%2Fcandidate%2Fmatch">登录 HHBA 求职账号</Link>。</p>}
         <input id="hhba-ai-resume" className="sr-only" type="file" accept={supportedTypes} disabled={working||saveBusy}
           onChange={(e:ChangeEvent<HTMLInputElement>)=>{choose(e.target.files?.[0]||null);e.target.value='';}}/>
         <label htmlFor="hhba-ai-resume" className={'hhba-ai-drop '+(drag?'dragging':'')}
@@ -388,8 +410,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          {previewBusy&&<p role="status">正在读取简历文字…</p>}
          {ocrBusy&&<p role="status"><LoaderCircle className="spin" size={15}/> 正在识别文档文字…</p>}
          {ocrFile&&!ocrBusy&&<div className="hhba-ai-text-review">
-          <strong>{previewText?'部分页面需要进一步识别':'改用 DeepSeek 读取文档'}</strong>
-          <p>点击下方按钮即同意将这份原文件发送给 DeepSeek 识别文字。识别完成后，你可以核对和修改结果。</p>
+          <strong>{previewText?'部分页面需要进一步识别':'使用 AI 读取扫描版文档'}</strong>
+          <p>点击下方按钮即同意将 PDF 页面图像或 Word 中的内嵌图片发送至配置的第三方 AI 服务识别文字。Word 正文、页眉页脚优先在本地提取。识别完成后请核对结果。</p>
           <button type="button" disabled={working||saveBusy||!getRealAuthToken()} onClick={()=>void runOcr()}>
            {previewError?'同意并重试识别':'同意并识别'}
           </button>
@@ -399,9 +421,9 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           {!previewError&&identifiedCharacters>0&&<small role="status">已识别 {identifiedCharacters} 个非空白字符，请核对工作经历、技能和求职方向。</small>}
           {previewNote&&<small role="status">{previewNote}</small>}
           {previewError&&<p className="hhba-ai-error" role="alert">{previewError} 你可以在下方粘贴或补全简历文字。</p>}
-          <textarea id="hhba-ai-text-preview" rows={6} maxLength={20000} value={previewText}
+          <textarea id="hhba-ai-text-preview" rows={6} maxLength={MATCH_V4_PREVIEW?undefined:20000} value={previewText}
            disabled={working||saveBusy||ocrBusy} onChange={e=>{setPreviewText(e.target.value);setConsent(false);}}/>
-          <small>{identifiedCharacters<30?'请输入至少 30 个非空白字符。':'可直接修改，最多 20,000 字。'}</small>
+          <small>{identifiedCharacters<(MATCH_V4_PREVIEW?1:30)?(MATCH_V4_PREVIEW?'请输入可供 AI 分析的真实简历信息。':'请输入至少 30 个非空白字符。'):MATCH_V4_PREVIEW?'可直接修改。':'可直接修改，最多 20,000 字。'}</small>
          </div>}
          {!previewBusy&&!ocrBusy&&!ocrFile&&(!previewLoaded||previewError)&&<button type="button" disabled={working||saveBusy}
           onClick={()=>{const source=file||savedFiles.find(item=>item.id===savedId);if(source)void preview(source);}}>
@@ -427,7 +449,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           <p>可选填目标方向；不填写时，AI 会根据简历为你推荐。</p></header>
         <div className="hhba-ai-mainland-only"><span>工作区域</span><strong>中国大陆</strong><small>不推荐港澳台或境外岗位</small></div>
         <div className="hhba-ai-fields hhba-ai-fields-one">
-         <label>目标岗位方向<input value={options.role_hint} maxLength={80} placeholder="例如：软件开发、数据分析、销售、视觉设计"
+         <label>目标岗位方向<input value={options.role_hint} maxLength={MATCH_V4_PREVIEW?undefined:80} placeholder="例如：软件开发、数据分析、销售、视觉设计"
           onChange={e=>setOptions(x=>({...x,role_hint:e.target.value}))}/></label>
         </div>
         <p className="hhba-ai-notice" role="status">
@@ -438,14 +460,16 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           onChange={e=>setConsent(e.target.checked)}/>
           <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 使用我的简历信息进行智能岗位匹配；并同意本次将脱敏后的简历文字发送至第三方 AI 中转服务，原文件不随之发送。</span>
         </label>
+        {backgroundAvailable&&!historyPending.current&&<label className="hhba-ai-consent"><input type="checkbox" checked={backgroundConsent} onChange={e=>setBackgroundConsent(e.target.checked)}/><span>允许后台持续匹配：关闭网页后继续执行，同意临时私有保存脱敏简历文字与研究进度；完成或取消后删除临时资料，可在历史记录中取消。</span></label>}
+        {backgroundNotice&&<p role="status" className="hhba-ai-notice">{backgroundNotice}</p>}
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
           disabled={(!file&&!savedId)||!consent||working||saveBusy||previewBusy||ocrBusy||!previewLoaded||
            (file&&!savedId&&storageChoice==='undecided')||
-           identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()}>
+           identifiedCharacters<(MATCH_V4_PREVIEW?1:30)||availability!=='ready'||!getRealAuthToken()}>
           {working?<><LoaderCircle className="spin" size={18}/> {saveBusy?'正在保存简历…':'正在匹配岗位…'}</>:
-           <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
+           <><BriefcaseBusiness size={17}/> {backgroundAvailable&&backgroundConsent?'开始后台匹配':'开始智能匹配'} <ArrowRight size={17}/></>}
         </button>
         {working&&<p className="hhba-ai-processing" role="status">智能搜索进度与已发现岗位已在弹窗中展示。</p>}
       </section>
