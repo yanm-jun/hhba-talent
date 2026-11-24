@@ -470,7 +470,7 @@ export async function submitExtractedResumeText(
   }catch(e){
    if(signal?.aborted)throw signal.reason;
    const err=e as MatchError;
-   const transient=err.code?['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_UNAVAILABLE'].includes(err.code):[502,503,504,429].includes(err.status);
+   const transient=err.code?['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_STREAM_INTERRUPTED','AI_PROVIDER_UNAVAILABLE'].includes(err.code):[502,503,504,429].includes(err.status);
    if(!transient){
     if(!last)throw e;
     last={...last,disclaimer:last.disclaimer+' 本次搜索暂停，可继续搜索。'};break;
@@ -484,38 +484,58 @@ export async function submitExtractedResumeText(
  // Verify one public JD per request, instead of spending the entire hosting
  // subrequest budget on all vacancies at once. No total job-count cap.
  const queue=[...collected.values()].filter(job=>!job.jd_version_id||job.jd_score_status!=='AI_VERIFIED_JD_SCORED');let cursor=0,checked=0;
+ const pendingVerification=new Set<string>();
+ const transientVerification=(e:unknown)=>{
+  const err=e as MatchError;
+  if(err.code)return ['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_STREAM_INTERRUPTED','AI_PROVIDER_RESPONSE_INVALID','V4_PAGE_TEMPORARILY_UNAVAILABLE','V4_SCORE_UNAVAILABLE','AI_PROVIDER_INCOMPLETE'].includes(err.code);
+  return e instanceof TypeError||[429,502,503,504].includes(err.status);
+ };
+ const retryVerification=async<T,>(work:()=>Promise<T>,job:MatchedJob):Promise<T>=>{
+  let delay=1000;
+  for(;;){
+   if(signal?.aborted)throw signal.reason;
+   try{return await work();}catch(e){
+    if(signal?.aborted||!transientVerification(e))throw e;
+    pendingVerification.add(job.official_url);
+    onActivity?.({stage:'reading',message:'岗位核验或评分服务暂时异常，保留已完成结果，正在恢复。'});
+    await pause(delay);delay=Math.min(delay*2,30000);
+   }
+  }
+ };
  const worker=async()=>{
   while(cursor<queue.length){
    if(signal?.aborted)throw signal.reason;
    const job=queue[cursor++];
    try{
-    const verified=await prepareV4Job(job.official_url,signal,job.title,historyId);
+    const verified=await retryVerification(()=>prepareV4Job(job.official_url,signal,job.title,historyId),job);
     const merged={...job,...verified};collected.set(job.official_url,merged);
     onPartial?.([...collected.values()]);
-    try{const score=await scoreV4Job(merged,text,signal,historyId);collected.set(job.official_url,{...merged,...score});}
-    catch(e){if(signal?.aborted)throw e;}
+    try{const score=await retryVerification(()=>scoreV4Job(merged,text,signal,historyId),job);collected.set(job.official_url,{...merged,...score});pendingVerification.delete(job.official_url);}
+    catch(e){if(signal?.aborted)throw e;pendingVerification.add(job.official_url);}
    }
-   catch(e){if(signal?.aborted)throw e;}
+   catch(e){if(signal?.aborted)throw e;
+    const err=e as MatchError;if(err.status!==422)pendingVerification.add(job.official_url);
+   }
    checked++;onActivity?.({stage:'reading',message:'已检查 '+checked+' / '+queue.length+' 条岗位来源。',pages_read:checked});
    onPartial?.([...collected.values()]);
   }
  };
  await Promise.all(Array.from({length:Math.min(3,queue.length)},()=>worker()));
  const matches=[...collected.values()].sort((a,b)=>(b.match_score??-1)-(a.match_score??-1));
- if(last.history_status==='SAVED'&&!last.research_pending){
+ if(last.history_status==='SAVED'&&!last.research_pending&&!pendingVerification.size){
   try{const done=await fetch('/api/match-v4/finish',{method:'POST',credentials:'same-origin',cache:'no-store',signal,headers:{'Content-Type':'application/json',Authorization:'Bearer '+session()},body:JSON.stringify({history_id:historyId})});if(!done.ok)last.history_status='UNAVAILABLE';}
   catch(e){if(signal?.aborted)throw e;last.history_status='UNAVAILABLE';}
  }
  const verified=matches.filter(j=>j.jd_source_status==='VERIFIED_JD').length;
  const scored=matches.filter(j=>j.jd_score_status==='AI_VERIFIED_JD_SCORED').length;
- return {...last,matches,matched_official_jobs:verified,can_continue:true,research_pending:false,
+ return {...last,matches,matched_official_jobs:verified,can_continue:true,research_pending:Boolean(last.research_pending||pendingVerification.size),
   native_search:{...last.native_search!,searches:round,page_reads:checked,visible_jobs:matches.length,candidate_links:matches.length,jd_verification:{eligible:matches.length,verified,scored,failed:matches.length-verified}}};
 }
 async function scoreV4Job(job:MatchedJob,text:string,signal?:AbortSignal,historyId?:string):Promise<Partial<MatchedJob>>{
  const response=await fetch('/api/match-v4/score',{method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/json',Authorization:'Bearer '+session()},body:JSON.stringify({consent:true,history_id:historyId,text:redactResumeTextLocally(text),job:{jd_version_id:job.jd_version_id,jd_sha256:job.jd_sha256,official_url:job.official_url}})});
  const data=await response.json().catch(()=>null);
- if(!response.ok||data?.ok!==true||!data.score)throw new MatchError(response.status,'完整 JD 评分暂未完成。');
+ if(!response.ok||data?.ok!==true||!data.score)throw new MatchError(response.status,'完整 JD 评分暂未完成。',data?.error);
  return data.score;
 }
 export async function prepareV4Job(officialUrl:string,signal?:AbortSignal,title?:string,historyId?:string):Promise<Partial<MatchedJob>>{
@@ -524,7 +544,7 @@ export async function prepareV4Job(officialUrl:string,signal?:AbortSignal,title?
   body:JSON.stringify({consent:true,official_url:officialUrl,title,history_id:historyId})});
  const data=await response.json().catch(()=>null);
  if(!response.ok||data?.ok!==true||!data.job?.jd_version_id||!data.job?.jd_sha256)
-  throw new MatchError(response.status,'暂未取得可用于优化的可信 JD，请核对招聘原页面或稍后重试。');
+  throw new MatchError(response.status,'暂未取得可用于优化的可信 JD，请核对招聘原页面或稍后重试。',data?.error);
  return data.job;
 }
 
