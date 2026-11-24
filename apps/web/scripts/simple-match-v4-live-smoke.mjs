@@ -12,7 +12,7 @@ if(!provider){console.log(label+JSON.stringify({status:'MISSING_RELAY_KEY'}));pr
 const report={status:'PARTIAL',model:provider.model,model_catalog:'NOT_TESTED',
  responses:'NOT_TESTED',web_search:'NOT_TESTED',cited_official_links:0,model_job_rows:0,format:'NOT_TESTED'};
 try{
- const r=await fetch('https://api-c.reqtoken.com/v1/models',{
+ const r=await fetch(provider.baseUrl+'/models',{
   headers:{authorization:'Bearer '+provider.key,
    'x-openai-actor-authorization':'local-image-extension'},
   redirect:'manual',signal:AbortSignal.timeout(12000)});
@@ -29,6 +29,18 @@ try{
  });
  report.responses=v4ParseJson(d).ok===true?'JSON_OK':'JSON_UNEXPECTED';
 }catch(e){report.responses=e?.code||'PROVIDER_ERROR'}
+// Probe the relay using only synthetic content, independently of rollout flags.
+for(const effort of ['xhigh','high']){
+ try{
+  let events=0;
+  const result=await v4Call(fetch,{...provider,stream:true,reasoningEffort:effort},{
+   instructions:'Return only a JSON object with ok:true.',input:'Synthetic compatibility check.'
+  },{onEvent:()=>events++});
+  if(v4ParseJson(result).ok===true&&result.status==='completed'){
+   report.reasoning_probe=effort;report.native_stream=events>0?'EVENTS_OBSERVED':'JSON_ONLY';break;
+  }
+ }catch(e){report.reasoning_probe=e?.code||'PROVIDER_ERROR';}
+}
 try{
  const d=await v4Call(fetch,provider,{
   instructions:'You help job seekers in China. Use web_search to find currently hiring, real employer job pages for automotive channel supervisor or dealer operations roles in China. Return ONE VALID JSON OBJECT with profile:{roles:[...]}, jobs:[{company,title,location,url,score,reason,resume_quote}]. Do not invent links. Find as many as the research actually supports; no company allowlist or numerical cap.',
