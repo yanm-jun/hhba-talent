@@ -71,7 +71,7 @@ test('legacy directory remains accessible by direct route without homepage or fo
  const legacyIdx=main.indexOf("route==='/companies/discover'");
  assert.ok(routeIdx>0&&legacyIdx>routeIdx,'new route must precede legacy company routes');
  assert.ok(!home.includes('/companies/library'));
- assert.ok(!shell.includes("['企业招聘导航']"));
+ assert.doesNotMatch(shell,/企业招聘导航|\/companies\/library/);
  assert.ok(home.includes('title="求职与机会"'));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
  assert.ok(home.includes('<HomeCompanyMarquee/>'));
