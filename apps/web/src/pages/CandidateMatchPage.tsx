@@ -388,8 +388,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          {previewBusy&&<p role="status">正在读取简历文字…</p>}
          {ocrBusy&&<p role="status"><LoaderCircle className="spin" size={15}/> 正在识别文档文字…</p>}
          {ocrFile&&!ocrBusy&&<div className="hhba-ai-text-review">
-          <strong>{previewText?'部分页面需要进一步识别':'改用 DeepSeek 读取文档'}</strong>
-          <p>点击下方按钮即同意将这份原文件发送给 DeepSeek 识别文字。识别完成后，你可以核对和修改结果。</p>
+          <strong>{previewText?'部分页面需要进一步识别':'改用 AI 读取文档'}</strong>
+          <p>点击下方按钮即同意将这份原文件（可能含联系方式等个人信息）发送给当前配置的第三方 AI 中转服务识别文字。识别完成后，你可以核对和修改结果。</p>
           <button type="button" disabled={working||saveBusy||!getRealAuthToken()} onClick={()=>void runOcr()}>
            {previewError?'同意并重试识别':'同意并识别'}
           </button>
