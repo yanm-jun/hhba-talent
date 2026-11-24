@@ -22,7 +22,7 @@ const norm=v=>String(v||'').replace(/\s+/g,' ').trim();
 export function v4Provider(env={}){
  const key=env.HHBA_AGENT_RELAY_API_KEY;
  const baseUrl=providerBase(env.HHBA_AGENT_RELAY_BASE_URL);
- return typeof key==='string'&&key.trim().length>=16&&baseUrl?{key,baseUrl,model:env.HHBA_AGENT_RELAY_MODEL?.trim()||MODEL,...(env.HHBA_AGENT_REASONING_EFFORT?{reasoningEffort:env.HHBA_AGENT_REASONING_EFFORT}: {})}:null;
+ return typeof key==='string'&&key.trim().length>=16&&baseUrl?{key,baseUrl,stream:env.HHBA_AGENT_RELAY_STREAM==='1',model:env.HHBA_AGENT_RELAY_MODEL?.trim()||MODEL,...(env.HHBA_AGENT_REASONING_EFFORT?{reasoningEffort:env.HHBA_AGENT_REASONING_EFFORT}: {})}:null;
 }
 export function v4OutputText(response){
  return (response?.output||[]).filter(x=>x?.type==='message')
@@ -39,7 +39,37 @@ export function v4ParseJson(response){
   return parsed;
  }catch{throw fault('AI_PROVIDER_RESPONSE_INVALID')}
 }
-export async function v4Call(fetcher,provider,payload,{signal}={}){
+// Native Responses SSE support is opt-in until the configured relay has
+// demonstrated a complete stream. Never forward model reasoning or CV text.
+export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{}}={}){
+ if(!(response.headers.get('content-type')||'').includes('text/event-stream'))return response.json();
+ if(!response.body)throw fault('AI_PROVIDER_RESPONSE_INVALID');
+ const reader=response.body.getReader(),decoder=new TextDecoder();let buffer='',complete=null;
+ function parse(frame){
+  const raw=frame.split('\n').filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trimStart()).join('\n');
+  if(!raw||raw==='[DONE]')return;
+  let event;try{event=JSON.parse(raw)}catch{throw fault('AI_PROVIDER_RESPONSE_INVALID')}
+  if(event.type==='error'||event.type==='response.failed')throw fault('AI_PROVIDER_UPSTREAM_ERROR');
+  if(event.type==='response.completed'||event.type==='response.incomplete')complete=event.response;
+  if(['response.in_progress','response.web_search_call.in_progress','response.web_search_call.searching','response.web_search_call.completed','response.output_text.delta'].includes(event.type)){
+   try{onEvent(event.type)}catch{}
+  }
+ }
+ try{
+  for(;;){
+   if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
+   const chunk=await reader.read();if(chunk.done)break;
+   buffer+=decoder.decode(chunk.value,{stream:true}).replace(/\r\n/g,'\n');
+   let index;
+   while((index=buffer.indexOf('\n\n'))>=0){parse(buffer.slice(0,index));buffer=buffer.slice(index+2);}
+   if(complete)break;
+  }
+  if(!complete){buffer+=decoder.decode();if(buffer.trim())parse(buffer);}
+ }finally{await reader.cancel().catch(()=>{});reader.releaseLock();}
+ if(!complete)throw fault('AI_PROVIDER_RESPONSE_INVALID');
+ return complete;
+}
+export async function v4Call(fetcher,provider,payload,{signal,onEvent}={}){
  if(!provider)throw fault('AI_PROVIDER_NOT_CONFIGURED');
  let response;
  try{
@@ -48,8 +78,8 @@ export async function v4Call(fetcher,provider,payload,{signal}={}){
   response=await fetcher((provider.baseUrl||BASE)+'/responses',{
    method:'POST',redirect:'manual',
    headers:{authorization:'Bearer '+provider.key,'content-type':'application/json',
-    accept:'application/json','x-openai-actor-authorization':'local-image-extension'},
-   body:JSON.stringify({...(provider.reasoningEffort?{reasoning:{effort:provider.reasoningEffort}}:{}),...payload,model:provider.model,store:false,stream:false}),
+    accept:provider.stream?'text/event-stream':'application/json','x-openai-actor-authorization':'local-image-extension'},
+   body:JSON.stringify({...(provider.reasoningEffort?{reasoning:{effort:provider.reasoningEffort}}:{}),...payload,model:provider.model,store:false,stream:provider.stream===true}),
    ...(signal?{signal}:{} )
   });
  }catch(e){
@@ -65,7 +95,7 @@ export async function v4Call(fetcher,provider,payload,{signal}={}){
   throw fault('AI_PROVIDER_REQUEST_REJECTED');
  }
  let data;
- try{data=await response.json()}catch{throw fault('AI_PROVIDER_RESPONSE_INVALID')}
+ try{data=await v4ReadProviderResponse(response,{signal,onEvent})}catch(e){throw fault(e?.code||'AI_PROVIDER_RESPONSE_INVALID')}
  if(!Array.isArray(data?.output)||!['completed','incomplete'].includes(data.status))
   throw fault('AI_PROVIDER_RESPONSE_INVALID');
  return data;
@@ -252,6 +282,13 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  let researchComplete=checkpoint?.phase==='verification',round=checkpoint?.round||0,researchError=checkpoint?.researchError||null,recoveryHint=checkpoint?.recoveryHint||'';
  let lastSignature=checkpoint?.lastSignature||'';
  const startRound=round;
+ let lastProviderEvent='';
+ const providerActivity=event=>{
+  if(event===lastProviderEvent)return;
+  lastProviderEvent=event;
+  if(event==='response.web_search_call.searching')onActivity('searching','模型正在实际执行联网检索。');
+  if(event==='response.web_search_call.completed')onActivity('searching','模型已收到联网检索结果，正在研究来源。');
+ };
  const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,...extra}});
  onProgress('parsing');
  onActivity('parsing','AI 正在阅读简历并自主规划合适的职业方向。');
@@ -286,7 +323,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      prior_profile:profile,excluded_previously_recommended_urls:[...excluded],research_round:round,recovery_hint:recoveryHint}),
     tools:[{type:'web_search'}],tool_choice:'required',
     include:['web_search_call.action.sources']
-   },{signal});
+   },{signal,onEvent:providerActivity});
   }catch(e){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    if(!rows.size)throw e;
