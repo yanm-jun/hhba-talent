@@ -47,3 +47,10 @@ test('home preserves job search, AI matching and labor-rights support',()=>{
  assert.ok(home.includes('className="home-match-promo"'),'resume matching link changed');
  assert.ok(home.includes('<HomeWorkplacePromise/>'));
 });
+
+test('two homepage cards form a compact centered group independently of the full-width AI banner',()=>{
+ assert.match(homeStyles,/\.hhba-public-entry-grid\.hhba-home-entry-grid\{width:calc\(100% - 24px\);max-width:744px;margin-inline:auto;grid-template-columns:repeat\(2,minmax\(0,1fr\)\);gap:16px\}/);
+ assert.match(homeStyles,/\.hhba-home-entry-grid \.hhba-entry-card\{min-width:0;min-height:160px;padding:13px 14px/);
+ assert.match(homeStyles,/\.hhba-public-entry-grid\.hhba-home-entry-grid\{grid-template-columns:1fr;gap:11px\}/);
+ assert.ok(read('../src/styles/home-match-promo.css').includes('max-width:1096px'));
+});
