@@ -7,6 +7,7 @@
 import {v4PublicJobUrl,v4ReadEmployerJob} from './v4-open-job-evidence.js';
 import {directOfficialJobEvidence} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
+import {recruitmentSourceKind} from './match-employer-source.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 
 const BASE='https://api-c.reqtoken.com/v1';
@@ -189,9 +190,7 @@ async function toJson(fetcher,provider,response,{signal}={}){
  }
 }
 function sourceKind(url){
- const host=new URL(url).hostname.toLowerCase();
- return /(?:^|\.)(?:zhipin\.com|liepin\.com|51job\.com|zhaopin\.com|lagou\.com|indeed\.com|linkedin\.com|glassdoor\.com)$/.test(host)?
-  'THIRD_PARTY_BOARD':'EMPLOYER_DOMAIN_CANDIDATE';
+ return recruitmentSourceKind(url)==='THIRD_PARTY_BOARD'?'THIRD_PARTY_BOARD':'EMPLOYER_DOMAIN_CANDIDATE';
 }
 async function checkJob(fetcher,url,signal){
  try{return await directOfficialJobEvidence(url,{fetcher,signal})}
@@ -231,7 +230,7 @@ function renderJob(x,url,verified,resume,toolLinked,index){
   rawScore!==''&&Number.isInteger(n)&&n>=0&&n<=100;
  const score=numbered&&resumeGrounded?n:null;
  const confirmed=String(verified?.proof_method||'').startsWith('DIRECT_EMPLOYER');
- const independentlyRead=confirmed||verified?.source_confirmed===true;
+ const independentlyRead=source!=='THIRD_PARTY_BOARD'&&(confirmed||verified?.source_confirmed===true||verified?.independently_read===true);
  const full=Boolean(verified?.full_jd);
  const status=full?(independentlyRead?'VERIFIED_FULL_JD':'PARTIAL_SOURCE'):'SEARCH_SNIPPET_ONLY';
  const reason=text(x?.reason||x?.recommendation_reason,600)||
@@ -410,8 +409,11 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    const i=cursor++,[url,job]=entries[i],jd=results.get(url);
    if(!jd?.full_jd)continue;
    // Only the existing independent official proof may be promoted to an immutable JD version.
-   if(jdArchiveConfigured(env)&&(String(jd.proof_method||'').startsWith('DIRECT_EMPLOYER')||jd.source_confirmed===true)){
-    try{const saved=String(jd.proof_method||'').startsWith('DIRECT_EMPLOYER')?await saveVerifiedJobJd(env,jd):await saveV4PublicJobJd(env,jd);if(saved?.fresh){
+   if(jdArchiveConfigured(env)&&(String(jd.proof_method||'').startsWith('DIRECT_EMPLOYER')||jd.source_confirmed===true||jd.independently_read===true)&&sourceKind(url)!=='THIRD_PARTY_BOARD'){
+    try{let saved;
+    if(String(jd.proof_method||'').startsWith('DIRECT_EMPLOYER')){
+     try{saved=await saveVerifiedJobJd(env,jd)}catch{saved=await saveV4PublicJobJd(env,{...jd,proof_method:'V4_EMPLOYER_HTML_JOB',independently_read:true})}
+    }else saved=await saveV4PublicJobJd(env,jd);if(saved?.fresh){
      Object.assign(matches[i],{jd_version_id:saved.id,jd_sha256:saved.jd_sha256,jd_checked_at:saved.checked_at});archived++;
     }}catch{/* retain public evidence without inventing archive IDs */}
    }
