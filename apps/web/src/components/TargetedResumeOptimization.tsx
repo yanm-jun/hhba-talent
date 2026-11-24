@@ -13,7 +13,10 @@ import {deleteResumeVersion,listResumeVersions,saveResumeVersion,type SavedResum
 import {buildResumeDocument,readableResumeDocument,normalizeResumeDocumentDetails,sourceResumeBlocks,sourceResumeOmittedCharacters,structuredResumeOmittedCharacters,EMPTY_RESUME_DOCUMENT_DETAILS,type ResumeDocumentDetails} from '../services/resumeDocument';
 import {createPortal} from 'react-dom';
 import {Link} from '../router';
-import type {PrivateResume} from '../services/privateResumes';
+import {fetchPrivateResumeForLocalReview,type PrivateResume} from '../services/privateResumes';
+import {wordSourceBytes} from '../services/originalWordApi';
+import {extractDocxText} from '../services/docxProfile.mjs';
+import {redactResumeTextLocally} from '../services/resumeMatch';
 import {OriginalWordViewer,type WordRevisionSnapshot,type WordVisualSuggestion} from './OriginalWordViewer';
 import {checkedWordScoreBlocks} from '../services/resumeWordScoreBridge.mjs';
 import {ResumePrintSheet} from './ResumePrintSheet';
@@ -244,8 +247,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   const original=blocks.find(old=>old.id===block.id);
   return !original||original.text!==block.text;
  }),[version.blocks,blocks]);
+ const v4Reassessment=scoreStatus?.ranking_version==='HHBA_AI_MATCH_V4';
+ // V4 scores the actual original and saved DOCX, not an incomplete historical profile.
+ // Legacy scoring retains its exact text-replay checks.
  const scoreSourceReady=!sourceResume?hasWordingChanges:
-  hasVerifiedWordRevision&&verifiedWordScore.ok;
+  hasVerifiedWordRevision&&(v4Reassessment||verifiedWordScore.ok);
  function invalidateScore(){setScoreResult(null);setConfirmReassessment(false);}
  async function verifyEmployer(){
   if(hasAuditedAtsIdentity||!verifyStatus?.enabled||verifying||!consentVerify)return;
@@ -263,8 +269,24 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    !confirmReassessment||scoreResult?.supported)return;
   setScoring(true);setNotice('');setScoreResult(null);
   try{
-   const result=await reassessResume(scoreJobId,profile,blocks,
-    sourceResume?verifiedWordScore.blocks:version.blocks,undefined,scoreStatus.ranking_version==='HHBA_AI_MATCH_V4');
+   const revisionKey=lastWordRevisionKey.current;
+   let beforeBlocks=blocks,afterBlocks=sourceResume?verifiedWordScore.blocks:version.blocks;
+   if(sourceResume&&v4Reassessment){
+    const revision=wordRevisionSnapshot?.revision;
+    if(!revision||!postingScope)throw Error('请先保存当前岗位的 Word 修改，再重新评分。');
+    const [originalBytes,editedBytes]=await Promise.all([
+     fetchPrivateResumeForLocalReview(sourceResume),wordSourceBytes(sourceResume.id,revision,postingScope)
+    ]);
+    const [originalText,editedText]=await Promise.all([
+     extractDocxText(originalBytes),extractDocxText(new Uint8Array(editedBytes).buffer)
+    ]);
+    beforeBlocks=sourceResumeBlocks(redactResumeTextLocally(originalText),true);
+    afterBlocks=sourceResumeBlocks(redactResumeTextLocally(editedText),true);
+    if(!beforeBlocks.length||!afterBlocks.length)throw Error('原始或已保存 Word 正文为空，无法可靠复评。');
+    if(revisionKey!==lastWordRevisionKey.current)throw Error('Word 版本已变化，请基于当前版本重新评分。');
+   }
+   const result=await reassessResume(scoreJobId,profile,beforeBlocks,afterBlocks,undefined,v4Reassessment);
+   if(sourceResume&&revisionKey!==lastWordRevisionKey.current){setNotice('Word 版本已变化，请重新评分。');return;}
    setScoreResult(result);
    if(!result.supported)setNotice('此岗位未通过当前官方快照复评条件，未生成分数。');
    else setNotice('已用相同标准比较修改前后的简历。');
@@ -441,7 +463,18 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     ...trustedJob,title:trustedJob.title.slice(0,120),
     requirements:trustedJob.requirements
    };
-   const context=sourceResume?(wordDocumentText.current||sourceText||''):(sourceText||'');
+   // Use the authenticated current DOCX body as the full-document context, not
+   // a rendered-page excerpt or a stale pre-optimization resume snapshot.
+   let context=sourceText||'';
+   if(sourceResume){
+    if(!postingScope||!wordRevisionSnapshot)throw Error('请等待当前 Word 版本读取完成。');
+    const revisionKey=lastWordRevisionKey.current;
+    const current=await wordSourceBytes(sourceResume.id,wordRevisionSnapshot.revision,postingScope);
+    context=redactResumeTextLocally(await extractDocxText(new Uint8Array(current).buffer));
+    if(controller.signal.aborted)return;
+    if(revisionKey!==lastWordRevisionKey.current)throw Error('Word 版本已变化，请重新生成优化建议。');
+    if(!context.trim())throw Error('当前 Word 正文为空，无法执行完整简历优化。');
+   }
    const full=requireVerifiedJd;
    if(full&&status?.full_document_enabled===false)
     throw Error('整份简历优化任务暂未就绪，请稍后重试。');
@@ -1053,11 +1086,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   {((!sourceResume&&legacyPrintQa)||(requireVerifiedJd&&scoreStatus?.ranking_version==='HHBA_AI_MATCH_V4'))&&<section className="targeted-resume-reassess" aria-label="岗位匹配评分复评">
    <div className="targeted-resume-reassess-heading">
     <div><strong>重新查看匹配分</strong>
-     <p>只有核实了企业发布的岗位要求后，才会比较修改前后的分数。</p></div>
+     <p>使用同一份已核验岗位 JD，比较原始简历和已保存的修改版本。分数可能上升、持平或下降。</p></div>
     {scoreStatus?.enabled&&<button type="button" onClick={reassess} disabled={!hasSupportedJob||!scoreSourceReady||!confirmReassessment||scoring}>
      {scoring?'正在复评…':'重新计算匹配分'}</button>}
    </div>
-   {!hasAuditedAtsIdentity&&verifyStatus?.enabled&&
+   {!job.jd_version_id&&!hasAuditedAtsIdentity&&verifyStatus?.enabled&&
     <div className="targeted-resume-verify">
      <div><strong>确认目标岗位</strong>
       <p>先确认企业的真实招聘信息，检查时不会把简历发给企业。</p>
