@@ -85,7 +85,7 @@ export async function onRequestPost({request,env}){
    draft:publicDraft(body.draft),blocks:body.blocks,job:trustedJob,
    env:{...env,HHBA_RESUME_AGENT_MAX_PASSES:'1'},
    provider:author,reviewer,completeJson,validateAuthoring,numberTokens,
-   redacted,signal:AbortSignal.timeout(150000)
+   redacted,signal:env?.HHBA_MATCH_V4_READY==='1'?request.signal:AbortSignal.timeout(150000)
   });
   if(result.autonomy?.needs_more_work){
    const token=await issueCheckpoint({
