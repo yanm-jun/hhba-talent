@@ -776,3 +776,41 @@ test('AI-selected tools can read public source windows and reject unrelated URLs
 test('V4 recognizes explicit upstream context overflow without claiming completion',async()=>{
  await assert.rejects(()=>v4Call(async()=>Response.json({error:{code:'context_length_exceeded'}},{status:400}),provider,{input:'synthetic'}),/AI_PROVIDER_CONTEXT_TOO_LARGE/);
 });
+
+
+test('V4 model-selected batches retain multiple candidate groups and support scoring/report research',async()=>{
+ const second={...row,title:'区域运营支持',url:url+'-second'};
+ const jd='负责渠道运营和经销商业务流程管理，要求具备渠道运营经验及销售人员培训能力。';
+ let search=0,toolBatch=false,profileTools=false,scoreCount=0,reportCount=0;
+ const fetcher=async(u,opts)=>{
+  if(!u.endsWith('/responses'))return new Response('<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:u===second.url?second.title:row.title,hiringOrganization:{name:row.company,url:'https://careers.other-motors.cn'},jobLocation:{address:{addressLocality:'上海'}},description:jd})+'</script>',{headers:{'content-type':'text/html'}});
+  const p=JSON.parse(opts.body),i=JSON.parse(p.input);
+  if(p.instructions.includes('自主整理个人职业画像')){
+   if(!i.research_tool_results)return model({research_actions:[{type:'text_page',collection:'resume',offset:0}]});
+   profileTools=i.research_tool_results[0].text===resume;return model({profile:{summary:'渠道运营经验'}});
+  }
+  if(p.instructions.includes('专业求职研究 AI')){
+   search++;
+   if(search===1)return model({research_complete:false,jobs:[row],positions:[second],research_actions:[{type:'memory',collection:'candidates',cursor:0},{type:'memory',collection:'sources',cursor:0}]},[url,second.url]);
+   if(search===2)toolBatch=i.research_tool_result?.results?.length===2&&i.research_tool_result.results[0].items.length===2;
+   return model({research_complete:true,completion_reason:'已充分复查',jobs:[]});
+  }
+  if(!i.research_tool_results)return model({research_actions:[{type:'text_page',collection:'resume',offset:0},{type:'text_page',collection:'jd',offset:0}]});
+  assert.equal(i.research_tool_results.length,2);assert.equal(i.research_tool_results[0].text,resume);assert.equal(i.research_tool_results[1].text,jd);
+  if(i.established_score!==undefined)reportCount++;else scoreCount++;
+  return model({suitable:true,score:85,reason:'原文支持',resume_quote:'汽车经销商渠道运营',jd_quote:'渠道运营和经销商业务流程'});
+ };
+ const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true});
+ assert.equal(result.matches.length,2);assert.equal(scoreCount,2);assert.equal(reportCount,2);assert.ok(toolBatch&&profileTools);
+});
+test('V4 stage pagination delivers all original pages before accepting a final assessment',async()=>{
+ const {v4StageResearchCall}=await import('../functions/_lib/v4-research-tools.js');
+ const longResume='简历原文'.repeat(30000),longJd='岗位要求'.repeat(30000),seen={resume:[],jd:[]};
+ const r=await v4StageResearchCall(async p=>{
+  const i=JSON.parse(p.input);
+  if(!i.original_text_pages)throw Object.assign(Error('context'),{code:'AI_PROVIDER_CONTEXT_TOO_LARGE'});
+  for(const page of i.research_tool_results||[])seen[page.collection].push(page.offset);
+  return {status:'completed',output:[],value:{score:85}};
+ },{instructions:'test',input:JSON.stringify({resume_text:longResume,job:{full_jd:longJd}})},{parse:r=>r.value,resume:longResume,jd:longJd});
+ assert.equal(r.value.score,85);assert.ok(seen.resume.length>=2&&seen.jd.length>=2);
+});
