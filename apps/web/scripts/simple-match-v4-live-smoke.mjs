@@ -44,6 +44,13 @@ try{
   report.model_job_rows=Array.isArray(value.jobs)?value.jobs.length:0;
  }catch{report.format='JSON_INVALID'}
 }catch(e){report.web_search=e?.code||'PROVIDER_ERROR'}
+try{
+ const streamed=await v4Call(fetch,{...provider,stream:true},{
+  instructions:'Only return JSON with the boolean field ok set to true.',
+  input:'Synthetic streaming capability check. No applicant data.'
+ },{signal:AbortSignal.timeout(180000)});
+ report.native_stream=v4ParseJson(streamed).ok===true?'FINAL_RESPONSE_OK':'UNEXPECTED';
+}catch(e){report.native_stream=e?.code||'PROVIDER_ERROR'}
 report.status=report.responses==='JSON_OK'&&report.web_search==='TOOL_CALLED'&&report.format==='JSON_OK'&&report.model_job_rows>0?'READY':'PARTIAL';
 console.log(label+JSON.stringify(report));
 if(report.status!=='READY')process.exitCode=1;
