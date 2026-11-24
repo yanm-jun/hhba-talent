@@ -353,3 +353,23 @@ test('V4 provider selection cannot silently fall back to a legacy provider',asyn
  const {selectProvider}=await import('../functions/_lib/resume-ai-provider.js');
  assert.throws(()=>selectProvider({HHBA_MATCH_V4_READY:'1',HHBA_MATCH_DEEPSEEK_KEY:'fake-key'}),/AI_PROVIDER_NOT_CONFIGURED/);
 });
+
+
+test('V4 reassessment readiness never depends on the legacy daily quota ledger',async()=>{
+ const {onRequestGet}=await import('../functions/api/resume-reassess.js');
+ const env={HHBA_MATCH_V4_READY:'1',HHBA_AGENT_RELAY_API_KEY:key,
+  HHBA_JOB_JD_DB:{prepare(){throw Error('Unexpected quota query')}},
+  HHBA_JOB_JD_R2:{get(){},put(){}},
+  HHBA_PNVS_AUTH_DB:{prepare(){throw Error('Unexpected quota query')}}};
+ const data=await (await onRequestGet({env})).json();
+ assert.equal(data.kind,'HHBA_RESUME_REASSESS_V4');
+ assert.equal(data.ranking_version,'HHBA_AI_VERIFIED_JD_V4');
+});
+
+test('V4 authoring keeps all real source quotations while rejecting invented evidence',async()=>{
+ const {validateAuthoring,numberTokens}=await import('../functions/_lib/resume-rewrite-provider.js');
+ const quotes=Array.from({length:25},(_,i)=>'真实工作证据'+i);
+ const block={id:'source',text:quotes.join('；')};
+ assert.equal(validateAuthoring(block,block.text,quotes,numberTokens(block.text),{unbounded:true}),null);
+ assert.equal(validateAuthoring(block,block.text,[...quotes,'虚构资格'],numberTokens(block.text),{unbounded:true}),'SOURCE_QUOTE_NOT_FOUND');
+});
