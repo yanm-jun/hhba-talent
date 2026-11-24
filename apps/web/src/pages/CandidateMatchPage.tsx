@@ -464,7 +464,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          <p className="hhba-ai-aside-footnote">工作地点仅限中国大陆；招聘状态请以岗位原始网页为准。</p>
       </aside>
     </div>
-    {((result||partialJobs.length>0)||working)&&<CandidateMatchNativeDialog
+    {((result||partialJobs.length>0)||working||researchJobs.length>0)&&<CandidateMatchNativeDialog
       result={result||{matches:partialJobs,profile:researchReport?.profile}}
       researchReport={result?.research_report||researchReport} researchJobs={result?.research_leads||researchJobs}
       pending={working&&!result} progressStage={stage} progressActivity={activity}
