@@ -66,6 +66,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
  const [chosenWordId,setChosenWordId]=useState('');
  const [wordNotice,setWordNotice]=useState('');
  const [editingJobId,setEditingJobId]=useState<string|null>(null);
+ const [selectedJobUrl,setSelectedJobUrl]=useState<string|null>(null);
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false);
  const [error,setError]=useState(''),[notice,setNotice]=useState('');
  // The history list remains in place while only the dialog scrolls.
@@ -115,6 +116,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
   if(busy)return;
   if(!modalOpen&&document.activeElement instanceof HTMLElement)openerRef.current=document.activeElement;
   const request=++openVersion.current;
+  if(selected?.id!==id)setSelectedJobUrl(null);
   if(!selected)setOpeningView(nextView);
   setBusy(true);setError('');setNotice('');setWordNotice('');setEditingJobId(null);
   setOriginal(null);setChosenWordId('');setWordFiles([]);
@@ -228,7 +230,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
       {original&&wordNotice&&<small role="status">{wordNotice}</small>}
       <small>已核验 JD 的历史岗位会复用对应原文版本；其他岗位仅保留当时的搜索摘要。岗位是否仍在招聘以企业官网为准，分数不代表录用概率。</small>
      </div>}
-     {selected.research_report&&<MatchResearchPanels key={selected.id} report={selected.research_report} jobs={historyLeads} officialJobs={historyJobs} onOptimize={view==='optimize'?job=>setEditingJobId(job.id):undefined} optimizationAvailable={!!original&&!busy}/>}
+     {selected.research_report&&<MatchResearchPanels key={selected.id} report={selected.research_report} jobs={historyLeads} officialJobs={historyJobs} selectedJobUrl={selectedJobUrl} onJobChange={setSelectedJobUrl} onOptimize={job=>{setSelectedJobUrl(job.official_url);if(view==='details')void open(selected.id,'optimize');else setEditingJobId(job.id)}} optimizationAvailable={!busy&&(view==='details'||!!original)}/>}
      {selected.new_job_count>0&&<p className="hhba-match-history-new">{'相较之前已保存的记录，本次新发现 '+selected.new_job_count+' 个未推荐过的岗位。'}</p>}
      {(selected.research_report?[]:selected.matches).map((job,i)=>{
       const href=safeJobUrl(job.official_url);
