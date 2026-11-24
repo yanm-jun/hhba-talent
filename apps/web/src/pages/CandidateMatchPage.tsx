@@ -388,8 +388,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          {previewBusy&&<p role="status">正在读取简历文字…</p>}
          {ocrBusy&&<p role="status"><LoaderCircle className="spin" size={15}/> 正在识别文档文字…</p>}
          {ocrFile&&!ocrBusy&&<div className="hhba-ai-text-review">
-          <strong>{previewText?'部分页面需要进一步识别':'改用 DeepSeek 读取文档'}</strong>
-          <p>点击下方按钮即同意将这份原文件发送给 DeepSeek 识别文字。识别完成后，你可以核对和修改结果。</p>
+          <strong>{previewText?'部分页面需要进一步识别':'使用 AI 读取扫描版文档'}</strong>
+          <p>点击下方按钮即同意将原 PDF 发送至配置的第三方 AI 服务识别文字。识别完成后请核对并修改结果；无法读取的 DOCX 可重新导出为 PDF。</p>
           <button type="button" disabled={working||saveBusy||!getRealAuthToken()} onClick={()=>void runOcr()}>
            {previewError?'同意并重试识别':'同意并识别'}
           </button>
@@ -401,7 +401,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           {previewError&&<p className="hhba-ai-error" role="alert">{previewError} 你可以在下方粘贴或补全简历文字。</p>}
           <textarea id="hhba-ai-text-preview" rows={6} maxLength={MATCH_V4_PREVIEW?undefined:20000} value={previewText}
            disabled={working||saveBusy||ocrBusy} onChange={e=>{setPreviewText(e.target.value);setConsent(false);}}/>
-          <small>{identifiedCharacters<30?'请输入至少 30 个非空白字符。':'可直接修改，最多 20,000 字。'}</small>
+          <small>{identifiedCharacters<30?'请输入至少 30 个非空白字符。':MATCH_V4_PREVIEW?'可直接修改。':'可直接修改，最多 20,000 字。'}</small>
          </div>}
          {!previewBusy&&!ocrBusy&&!ocrFile&&(!previewLoaded||previewError)&&<button type="button" disabled={working||saveBusy}
           onClick={()=>{const source=file||savedFiles.find(item=>item.id===savedId);if(source)void preview(source);}}>
