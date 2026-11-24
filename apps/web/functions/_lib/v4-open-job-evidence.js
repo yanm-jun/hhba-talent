@@ -69,7 +69,7 @@ function companyOf(j){
  if(typeof o==='string')return {name:o,url:''};
  return {name:trim(o?.name),url:trim(o?.url)||trim(o?.sameAs)};
 }
-function relatedDomains(jobUrl,companyUrl){
+export function relatedDomains(jobUrl,companyUrl){
  if(!companyUrl)return true;
  try{
   const a=new URL(jobUrl).hostname.replace(/^www\./,'');
@@ -115,7 +115,13 @@ async function limitedRead(r){
  for(const chunk of chunks){bytes.set(chunk,i);i+=chunk.length}
  return new TextDecoder().decode(bytes);
 }
-export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date(),expectedTitle}={}){
+export async function v4ReadPublicPage(url,{fetcher=fetch,signal}={}){
+ const canonical=v4PublicJobUrl(url);if(!canonical)throw Error('V4_UNSAFE_URL');
+ const response=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,text/plain;q=0.9'},signal});
+ const html=await limitedRead(response),plain=htmlToText(html,{unbounded:true});
+ return {canonical,html,plain};
+}
+export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date(),expectedTitle,allowUnstructured=false}={}){
  const canonical=v4PublicJobUrl(url);
  if(!canonical)throw Error('V4_UNSAFE_URL');
  const r=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',
@@ -145,6 +151,7 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  const company=meta(html,'property','og:site_name')||meta(html,'name','application-name');
  const city=htmlLocation(plain);
  const requirements=sections?.full_jd||'';
+ if(allowUnstructured&&plain.trim())return {canonical_url:canonical,company,title,location:city,source_text:plain,source_confirmed:false,proof_method:'V4_EMPLOYER_HTML_JOB',checked_at:now.toISOString()};
  if(!title||!company||GENERIC.test(company)||!city||!sections)
   throw Error('V4_JOB_DETAILS_NOT_VERIFIED');
  return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),

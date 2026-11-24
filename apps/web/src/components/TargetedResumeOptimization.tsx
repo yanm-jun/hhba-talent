@@ -167,7 +167,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    const stored=JSON.parse(raw);
    if(stored?.schema!=='HHBA_WORD_DRAFT_V2'||
     stored.source_signature!==sourceSignature||
-    typeof stored.expires_at!=='number'||stored.expires_at<Date.now()||
+    (MATCH_V4_PREVIEW?stored.expires_at!==null&&(typeof stored.expires_at!=='number'||stored.expires_at<Date.now()):typeof stored.expires_at!=='number'||stored.expires_at<Date.now())||
     !stored.version||!Array.isArray(stored.version.blocks)||
     stored.version.blocks.length!==blocks.length||
     !Array.isArray(stored.version.acceptedSuggestionIds)){
@@ -759,7 +759,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  }
  useEffect(()=>{
   if(!rememberDraft||!draftKey||recoverableDraft)return;
-  if(!draftExpiresAt||Date.now()>=draftExpiresAt){
+  if((!MATCH_V4_PREVIEW&&!draftExpiresAt)||(draftExpiresAt!==null&&Date.now()>=draftExpiresAt)){
    try{sessionStorage.removeItem(draftKey);}catch{}
    setRememberDraft(false);setDraftExpiresAt(null);
    setDraftStatus('本次草稿保护已到期。尚未保存的文字仍在当前页面，若要继续自动保留，请重新授权。');
@@ -860,11 +860,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     const enabled=event.target.checked;
     if(!enabled)discardSessionDraft();
     else {
-     setDraftExpiresAt(Date.now()+6*60*60*1000);setRememberDraft(true);
-     setDraftStatus('已授权在本标签页保留文字草稿，6 小时后自动失效。');
+     setDraftExpiresAt(MATCH_V4_PREVIEW?null:Date.now()+6*60*60*1000);setRememberDraft(true);
+     setDraftStatus(MATCH_V4_PREVIEW?'已授权在本标签页会话内保留草稿，直到删除或关闭会话。':'已授权在本标签页保留文字草稿，6 小时后自动失效。');
     }
    }}/>
-    在此标签页自动保留未完成的文字草稿（最多 6 小时）
+    在此标签页自动保留未完成的文字草稿{MATCH_V4_PREVIEW?'（当前会话内）':'（最多 6 小时）'}
    </label>
    <small>仅保存文字建议，不保存 Word 原文件；不会自动上传至其他服务。共享设备请关闭此选项。</small>
    {recoverableDraft&&<div className="targeted-resume-draft-recovery-actions">

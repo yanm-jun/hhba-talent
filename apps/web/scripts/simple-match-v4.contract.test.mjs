@@ -492,3 +492,20 @@ test('V4 preserves distinct positions on a shared official URL across research r
  assert.equal(next.matches.length,1);assert.equal(next.matches[0].title,third.title);
  assert.equal(next.matches[0].posting_key,v4PostingKey(third,url));
 });
+
+
+test('V4 capability negotiation only changes reasoning on explicit unsupported parameter',async()=>{
+ const p={...provider,model:'synthetic-reasoning-negotiation',reasoningEffort:'auto',stream:true};const efforts=[];
+ const out=await v4Call(async(_u,opts)=>{const body=JSON.parse(opts.body);efforts.push(body.reasoning?.effort);if(body.reasoning?.effort==='xhigh')return Response.json({error:{code:'unsupported_value',param:'reasoning.effort',message:'unsupported reasoning effort'}},{status:400});return model({ok:true})},p,{input:'synthetic'});
+ assert.deepEqual(efforts,['xhigh','high']);assert.equal(v4ParseJson(out).ok,true);
+ let count=0;await assert.rejects(()=>v4Call(async()=>{count++;return Response.json({error:{code:'context_length_exceeded'}},{status:400})},{...p,model:'synthetic-no-downgrade'},{input:'test'}),/AI_PROVIDER_CONTEXT_EXCEEDED/);assert.equal(count,1);
+});
+
+test('V4 AI can extract a plain HTML JD with independently corroborated company evidence',async()=>{
+ const {prepareV4JobForOptimization}=await import('../functions/_lib/v4-jd-bridge.js');
+ const files=new Map(),env={HHBA_MATCH_V4_READY:'1',HHBA_AGENT_RELAY_API_KEY:key,HHBA_JOB_JD_R2:{put:async(k,v)=>files.set(k,v),get:async k=>files.has(k)?{text:async()=>files.get(k)}:null}};
+ const jd='协助开展声音数据采集。熟悉现场记录。',identity='其他汽车企业',target='声景研究助理',home='https://careers.other-motors.cn/about';
+ const fetcher=async(u,opts)=>u.endsWith('/responses')?model({valid:true,title:target,company:identity,location:'雄安新区',full_jd:jd,employer_source_url:home,identity_quote:identity},[home]):new Response(u===home?'<p>'+identity+'</p>':'<h1>'+target+'</h1><p>'+identity+'</p><p>雄安新区</p><p>'+jd+'</p>',{headers:{'content-type':'text/html'}});
+ const result=await prepareV4JobForOptimization(env,url,{expectedTitle:target,fetcher});
+ assert.equal(result.jd_proof_method,'V4_MODEL_SOURCE_GROUNDED');assert.equal(result.requirements_basis,jd);
+});

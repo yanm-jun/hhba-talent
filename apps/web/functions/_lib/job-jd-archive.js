@@ -186,7 +186,7 @@ export function publicJdPayload(saved,{includeText=true}={}){
   disclaimer:saved.fresh?
    (saved.proof_method===ATS_JD_PROOF?
     '企业专属公开 ATS 招聘接口核验的原文；招聘主体法定名称和是否仍在招以企业公告为准。':
-    saved.proof_method==='V4_STRUCTURED_JOBPOSTING'?'直接读取招聘网站公开结构化 JD 并核对招聘主体域名；实际企业身份及投递状态仍需确认。':'直接读取受支持企业官网并保存的岗位 JD；不保证此刻仍可投递。'):
+    saved.proof_method==='V4_MODEL_SOURCE_GROUNDED'?'AI 研究并独立读取网页原文与企业身份来源；实际企业身份及投递状态仍需确认。':saved.proof_method==='V4_STRUCTURED_JOBPOSTING'?'直接读取招聘网站公开结构化 JD 并核对招聘主体域名；实际企业身份及投递状态仍需确认。':'直接读取受支持企业官网并保存的岗位 JD；不保证此刻仍可投递。'):
    '这是历史岗位 JD 版本，可能已经过期；不能当作最新招聘条件。'
  };
 }

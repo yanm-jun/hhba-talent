@@ -77,7 +77,29 @@ export async function readV4ResponseStream(response,{signal,onEvent=()=>{}}={}){
  if(!terminal)throw fault('AI_PROVIDER_STREAM_INTERRUPTED');
  return terminal;
 }
+const compatibleEffort=new Map();
+function explicitlyUnsupported(error,param){
+ const e=error?.error||{},code=String(e.code||''),name=String(e.param||''),message=String(e.message||'');
+ return /^(unsupported_parameter|unsupported_value|invalid_value|unknown_parameter)$/.test(code)&&name.includes(param)||(/unsupported|not supported|unknown parameter|invalid value|supported values/i.test(message)&&message.toLowerCase().includes(param.toLowerCase()));
+}
 export async function v4Call(fetcher,provider,payload,{signal,onEvent}={}){
+ if(!provider)throw fault('AI_PROVIDER_NOT_CONFIGURED');
+ if(provider.reasoningEffort!=='auto')return requestV4Response(fetcher,provider,payload,{signal,onEvent});
+ const key=String(provider.baseUrl||BASE)+'\n'+provider.model;
+ const efforts=['xhigh','high','medium','low',undefined];
+ const prior=compatibleEffort.get(key);
+ const candidates=prior===undefined?efforts:efforts.slice(Math.max(0,efforts.indexOf(prior||undefined)));
+ for(const effort of candidates){
+  try{
+   const result=await requestV4Response(fetcher,{...provider,reasoningEffort:effort},payload,{signal,onEvent});
+   compatibleEffort.set(key,effort||'');
+   console.info('HHBA_V4_PROVIDER_CAPABILITY',JSON.stringify({reasoning_effort:effort||'provider_default',stream_requested:provider.stream===true}));
+   return result;
+  }catch(e){if(e?.code!=='AI_PROVIDER_REASONING_UNSUPPORTED'||signal?.aborted||effort===undefined)throw e;}
+ }
+ throw fault('AI_PROVIDER_REQUEST_REJECTED');
+}
+async function requestV4Response(fetcher,provider,payload,{signal,onEvent}={}){
  if(!provider)throw fault('AI_PROVIDER_NOT_CONFIGURED');
  let response;
  try{
@@ -103,6 +125,8 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent}={}){
   if(response.status===400){
    const error=await response.json().catch(()=>null);
    if(['context_length_exceeded','context_window_exceeded'].includes(error?.error?.code))throw fault('AI_PROVIDER_CONTEXT_EXCEEDED');
+   if(provider.reasoningEffort&&explicitlyUnsupported(error,'reasoning'))throw fault('AI_PROVIDER_REASONING_UNSUPPORTED');
+   if(provider.stream&&explicitlyUnsupported(error,'stream'))return requestV4Response(fetcher,{...provider,stream:false},payload,{signal,onEvent});
   }
   throw fault('AI_PROVIDER_REQUEST_REJECTED');
  }
