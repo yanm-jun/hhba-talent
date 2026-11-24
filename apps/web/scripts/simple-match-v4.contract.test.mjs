@@ -248,3 +248,63 @@ test('V4 repeats scoring after reading an independently obtained full JD',async(
  assert.equal(r.native_search.jd_verification.scored,1);
  assert.equal(r.matches[0].score_evidence_status,'GROUNDED_JD_RESUME_QUOTES');
 });
+
+test('V4 independent public JD archive supports an unfamiliar employer without asserting official ownership',async()=>{
+ const {saveV4PublicJobJd,readJobJdById,hydrateVerifiedJobRequirements}=await import('../functions/_lib/job-jd-archive.js');
+ const {extractOfficialJdSections}=await import('../functions/_lib/official-job-evidence.js');
+ const jd=extractOfficialJdSections('岗位职责\n负责区域渠道运营和经销商业务流程的标准化管理和优化。\n负责区域销售人员培训和业务数据管理。\n任职要求\n熟悉渠道运营和经销商业务流程，能够提供门店运营管理改善建议。\n具备项目沟通能力和业务数据分析能力。');
+ const objects=new Map();
+ const env={HHBA_JOB_JD_DB:{prepare(){return {bind(){return this},async first(){return null}}}},
+  HHBA_JOB_JD_R2:{async put(k,v){objects.set(k,v)},async get(k){return objects.has(k)?{text:async()=>objects.get(k)}:null}}};
+ const raw={...jd,canonical_url:url,company:row.company,title:row.title,location:'上海',proof_method:'V4_STRUCTURED_JOBPOSTING',source_confirmed:true};
+ const saved=await saveV4PublicJobJd(env,raw);
+ assert.ok(saved.fresh);
+ const found=await readJobJdById(env,saved.id);
+ assert.equal(found.full_jd,jd.full_jd);
+ const trusted=await hydrateVerifiedJobRequirements(env,{jd_version_id:saved.id,jd_sha256:saved.jd_sha256,official_url:url});
+ assert.equal(trusted.source_status,'VERIFIED_PUBLIC_JD');
+ assert.equal(trusted.requirements,jd.full_jd);
+ await assert.rejects(saveV4PublicJobJd(env,{...raw,source_confirmed:false}),/JD_NOT_VERIFIED/);
+ await assert.rejects(saveV4PublicJobJd(env,{...raw,canonical_url:'https://www.zhipin.com/job_detail/12345.html'}),/JD_NOT_VERIFIED/);
+ const objectKey=[...objects.keys()][0];
+ objects.set(objectKey,JSON.stringify({...JSON.parse(objects.get(objectKey)),jd_sha256:'0'.repeat(64)}));
+ assert.equal(await readJobJdById(env,saved.id),null);
+});
+test('V4 history keeps more than ten independently labelled public recommendations',async()=>{
+ const {safeHistoryJobs}=await import('../functions/_lib/match-history.js');
+ const rows=Array.from({length:37},(_,i)=>({...row,id:'v4-'+i,v4_source:true,official_url:'https://careers.company'+i+'.cn/roles/'+i,match_score:84}));
+ assert.equal(safeHistoryJobs(rows).length,37);
+ assert.equal(safeHistoryJobs([...rows,{...rows[0],official_url:'http://localhost/a'}]).length,37);
+});
+test('V4 OCR requires specific explicit original-file authorization and redacts transcription',async()=>{
+ const {recognizeV4Resume,V4_OCR_CONSENT}=await import('../functions/_lib/v4-resume-ocr.js');
+ let calls=0;
+ const req=consent=>new Request('https://hhba.work/api/match-v4/ocr',{method:'POST',headers:{'Content-Type':'application/octet-stream','X-HHBA-Resume-Format':'pdf','X-HHBA-OCR-Consent':consent},body:'%PDF-1.7\nsynthetic resume test document\n%%EOF'});
+ const fetcher=async(u,options)=>{
+  calls++;
+  const payload=JSON.parse(options.body);
+  assert.equal(payload.input[0].content[0].type,'input_file');
+  assert.ok(payload.input[0].content[0].file_data.startsWith('data:application/pdf;base64,'));
+  return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:'负责门店运营和数据分析 synthetic@example.com'}]}]});
+ };
+ await assert.rejects(recognizeV4Resume(req(''),provider,fetcher),/OCR_CONSENT_REQUIRED/);
+ assert.equal(calls,0);
+ const result=await recognizeV4Resume(req(V4_OCR_CONSENT),provider,fetcher);
+ assert.equal(calls,1);
+ assert.equal(result.text,'负责门店运营和数据分析 [邮箱已隐藏]');
+ assert.equal(result.partial,false);
+});
+test('V4 automatically resumes after a missing completion flag when it has made progress',async()=>{
+ let rounds=0;
+ const fetcher=async(u,options)=>{
+  if(!u.endsWith('/responses'))return new Response('blocked',{status:403});
+  rounds++;
+  if(rounds===1)return model({jobs:[row]},[url]);
+  assert.ok(JSON.parse(options.body).input.includes('上轮未明确研究是否完成'));
+  return model({research_complete:true,jobs:[row]},[url]);
+ };
+ const r=await v4Match(fetcher,provider,resume,'上海');
+ assert.equal(rounds,2);
+ assert.equal(r.matches.length,1);
+ assert.equal(r.native_search.research_error,undefined);
+});
