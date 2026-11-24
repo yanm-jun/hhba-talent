@@ -4,7 +4,7 @@ export type ArchivedOfficialJd={
  ok:true;kind:'HHBA_VERIFIED_JOB_JD_V1';verified:true;job_id:string;
  company:string;title:string;location:string;canonical_url:string;
  jd_sha256:string;checked_at:string;fresh:boolean;
- content_status:'VERIFIED_SECTIONS';proof_method:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1';
+ content_status:'VERIFIED_SECTIONS';proof_method:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1'|'V4_STRUCTURED_JOBPOSTING';
  full_jd:string;sections:{id:string;kind:'responsibilities'|'requirements'|'other';text:string}[];
  disclaimer:string;from_cache?:boolean;
 };
