@@ -574,7 +574,7 @@ test('V4 excludes an unfamiliar commercial board discovered from the actual page
  await assert.rejects(v4ReadEmployerJob(u,{fetcher:async()=>new Response(html,{headers:{'content-type':'text/html'}})}),/V4_COMMERCIAL_BOARD_EXCLUDED/);
 });
 
-test('curated V4 verifies all 500 candidates before generating globally highest scoring reports',async()=>{
+test('curated V4 retains all candidates beyond the 500 target and scores before globally selecting reports',async()=>{
  const jobs=Array.from({length:502},(_,i)=>({...row,company:'新企业'+(i+1),title:'区域运营岗位'+(i+1),url:'https://careers.new-employer.cn/roles/'+(i+1),fit_summary:'适合区域运营经验',requirements:'渠道运营和经销商业务流程'}));
  const board={...jobs[0],url:'https://www.zhipin.com/job_detail/123.html'},duplicate={...jobs[0],url:jobs[0].url+'?utm_source=search'},generic={company:'待核实',title:'职位详情待核实',location:'上海',url:'https://careers.new-employer.cn/'};
  let searches=0,deep=0,parsed=0;const readIds=new Set(),scoreIds=new Set(),reportIds=[];
@@ -582,17 +582,18 @@ test('curated V4 verifies all 500 candidates before generating globally highest 
  const fetcher=async(u,opts)=>{
   if(!u.endsWith('/responses')){
    const id=Number(new URL(u).pathname.split('/').pop());readIds.add(id);
-   if(id===500)return new Response('closed',{status:403});
+   if(id===500)return new Response('职位已关闭',{headers:{'content-type':'text/html'}});
    const html='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:'区域运营岗位'+id,hiringOrganization:{name:'新企业'+id,url:'https://careers.new-employer.cn'},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责渠道运营和经销商业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
    return new Response(html,{headers:{'content-type':'text/html'}});
   }
   const payload=JSON.parse(opts.body),input=JSON.parse(payload.input);
-  if(payload.tools){searches++;return model({research_complete:false,jobs:[board,generic,jobs[0],duplicate,...jobs.slice(1)]},jobs.map(j=>j.url));}
+  if(payload.instructions.includes('公开招聘来源研究员'))return model({sources:[],research_complete:true,completion_reason:'无其他可靠来源'});
+  if(payload.instructions.includes('专业求职研究 AI')){searches++;return model({research_complete:true,completion_reason:'已充分覆盖',jobs:[board,generic,jobs[0],duplicate,...jobs.slice(1)]},jobs.map(j=>j.url));}
   if(payload.instructions.includes('自主整理个人职业画像')){parsed++;return model({profile:{summary:'渠道运营经历',roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}});}
   const id=Number(input.job.title.replace('区域运营岗位',''));
   const score=id===498?99:id===497?98:70;
   if(input.established_score!==undefined){
-   assert.equal(readIds.size,500,'every candidate attempted before reports');assert.equal(scoreIds.size,499,'every available JD scored before reports');
+   assert.equal(readIds.size,502,'every candidate attempted before reports');assert.equal(scoreIds.size,501,'every available JD scored before reports');
    deep++;reportIds.push(id);assert.equal(input.established_score,score);
    return model(id===497?{suitable:false,reason:'深度核验发现硬性差距'}:{...report,score});
   }
@@ -600,25 +601,25 @@ test('curated V4 verifies all 500 candidates before generating globally highest 
  };
  const result=await v4Match(fetcher,provider,resume,'全国',{officialOnly:true,curated:true});
  assert.equal(parsed,1);assert.equal(searches,1);
- assert.equal(result.research_report.discovered,500);assert.equal(result.matches.length,50);
- assert.equal(readIds.size,500);assert.equal(scoreIds.size,499);assert.equal(deep,51);
+ assert.equal(result.research_report.discovered,502);assert.equal(result.matches.length,50);
+ assert.equal(readIds.size,502);assert.equal(scoreIds.size,501);assert.equal(deep,51);
  assert.equal(reportIds[0],498);assert.equal(reportIds[1],497);
- assert.equal(result.native_search.jd_verification.scored,499);
- assert.equal(result.native_search.jd_verification.eligible,500);
+ assert.equal(result.native_search.jd_verification.scored,501);
+ assert.equal(result.native_search.jd_verification.eligible,502);
  assert.ok(result.research_leads.some(j=>j.title==='区域运营岗位497'&&j.match_score===98));
  assert.equal(result.matches[0].title,'区域运营岗位498');
  assert.ok(result.matches.every(j=>j.research_detail?.comparisons?.length&&j.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'));
  assert.equal(result.can_continue,false);
- assert.equal(result.research_leads.length,450);
+ assert.equal(result.research_leads.length,451);
  assert.ok(result.research_leads.some(j=>j.title==='区域运营岗位499'&&j.match_score===40));
 });
-test('curated report rejects invented CV quotes and missing report sections, permits grounded detailed analysis',async()=>{
+test('curated report rejects invented CV quotes but accepts flexible evidence-backed structure',async()=>{
  const {validateCuratedReport,curatedUrl,candidateKey,concreteCandidate}=await import('../functions/_lib/v4-curated-reports.js');
  const jd='负责渠道运营和经销商业务流程管理。';
  const v={suitable:true,score:88,reason:'依据原文',strengths:'优势',risks:'差距',career_development:'发展',optimization_advice:'建议',competition:'竞争力',resume_quote:'汽车经销商渠道运营',jd_quote:'渠道运营和经销商业务流程',comparisons:[{jd_quote:'渠道运营和经销商业务流程',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'对照原文'}]};
  assert.equal(validateCuratedReport(v,resume,jd).ok,true);
  assert.equal(validateCuratedReport({...v,comparisons:[{...v.comparisons[0],resume_quote:'虚构管理一百家企业'}]},resume,jd).ok,false);
- assert.equal(validateCuratedReport({...v,risks:''},resume,jd).ok,false);
+ assert.equal(validateCuratedReport({...v,risks:''},resume,jd).ok,true);
  assert.equal(validateCuratedReport({suitable:false},resume,jd).declined,true);
  assert.equal(curatedUrl(url+'?utm_source=test'),url);
  assert.equal(candidateKey(row),candidateKey({...row,url:url+'?utm_source=x'}));
@@ -651,4 +652,42 @@ test('refined stage workspace derives discovery animation solely from actual bac
  assert.match(panels,/<CuratedJobReport detail=\{scoreJob\.research_detail\}/);
  assert.match(css,/prefers-reduced-motion:reduce/);
  assert.match(css,/hhba-search-progress>div\{[^}]*transition:width/);
+});
+
+
+test('curated V4 recovers an inaccessible official lead and expands insufficient results without re-scoring previous jobs',async()=>{
+ const original='https://careers.recovery-employer.cn/jobs/one',alternate='https://careers.recovery-employer.cn/jobs/one-detail',second='https://careers.recovery-employer.cn/jobs/two';
+ const make=(url,title)=>({company:'恢复企业',title,location:'上海',url,source_kind:'employer_official'});
+ const one=make(original,'渠道运营一'),two=make(second,'渠道运营二');
+ const jd='负责渠道运营和经销商业务流程管理。具有渠道运营经验，能够分析数据及协调业务。';
+ let searches=0,recovered=0;const scored=[],reported=[];
+ const fetcher=async(u,opts)=>{
+  if(!u.endsWith('/responses')){
+   if(u===original)return new Response('unavailable',{status:403});
+   if(u!==alternate&&u!==second)return new Response('not found',{status:404});
+   const html='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:u===alternate?one.title:two.title,hiringOrganization:{name:one.company,url:'https://careers.recovery-employer.cn'},jobLocation:{address:{addressLocality:'上海'}},description:jd})+'</script>';
+   return new Response(html,{headers:{'content-type':'text/html'}});
+  }
+  const p=JSON.parse(opts.body),i=JSON.parse(p.input);
+  if(p.instructions.includes('自主整理个人职业画像'))return model({profile:{summary:'渠道运营经历'}});
+  if(p.instructions.includes('公开招聘来源研究员')){recovered++;return model({sources:[{url:alternate}],research_complete:true,completion_reason:'找到同一岗位的官方详情'},[alternate]);}
+  if(p.instructions.includes('专业求职研究 AI')){
+   searches++;
+   const expanded=String(i.recovery_hint).includes('正式推荐')||String(i.recovery_hint).includes('最终仅有')||searches>=3;
+   return model({research_complete:true,completion_reason:'已探索其他官方来源',jobs:expanded?[two]:[one]},[expanded?second:original]);
+  }
+  const assessment={suitable:true,score:i.job.title===two.title?97:85,reason:'原文支持渠道运营',resume_quote:'汽车经销商渠道运营',jd_quote:'渠道运营和经销商业务流程'};
+  if(i.established_score!==undefined){reported.push(i.job.title);return model(assessment);}
+  scored.push(i.job.title);return model(assessment);
+ };
+ const result=await v4Match(fetcher,provider,resume,'全国',{officialOnly:true,curated:true});
+ assert.ok(searches>=3);assert.equal(recovered,1);
+ assert.equal(scored.filter(t=>t===one.title).length,1);
+ assert.equal(scored.filter(t=>t===two.title).length,1);
+ assert.equal(reported.length,2);
+ assert.equal(result.matches.length,2);
+ assert.equal(result.matches[0].title,two.title);
+ assert.ok(result.matches.some(j=>j.official_url===alternate));
+ assert.equal(result.native_search.stage,'partial');
+ assert.ok(result.native_search.diagnostics.UNDERFILLED_EXPANSION>=1);
 });

@@ -42,10 +42,11 @@ const checkpointEnv=env=>{
  const secret=env?.HHBA_MATCH_V4_CHECKPOINT_SECRET||env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET;
  return typeof secret==='string'&&secret.length>=32?{HHBA_RESUME_AGENT_CHECKPOINT_SECRET:'hhba-v4-match:'+secret}:null;
 };
-const checkpointArgs=(env,input,draft)=>({env:checkpointEnv(env),account:input.phone,blocks:[input.text],job:{role:input.role_hint,excludeUrls:input.excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-global-v2'},draft});
+const checkpointArgs=(env,input,draft)=>({env:checkpointEnv(env),account:input.phone,blocks:[input.text],job:{role:input.role_hint,excludeUrls:input.excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-research-v3'},draft});
 function events(env,request,input){
  const encoder=new TextEncoder();let closed=false,phase='preparing';
  const started=Date.now();
+ const trace=input.taskKey?input.taskKey.slice(0,16):crypto.randomUUID();
  const stream=new ReadableStream({
   start(controller){
    const send=(type,payload)=>{
@@ -93,6 +94,7 @@ function events(env,request,input){
       onPartial:matches=>{sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
      if(executionSignal.aborted)throw Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
      if(result.status==='CONTINUE'){
+      console.info('HHBA_V4_STAGE',JSON.stringify({trace,phase:result.checkpoint.phase,round:result.checkpoint.round,candidates:result.checkpoint.rows?.length,processed:result.checkpoint.next,scored:result.checkpoint.scored,diagnostics:result.checkpoint.diagnostics}));
       if(input.taskKey){
        await input.lease.renew();
        await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint});
@@ -108,8 +110,8 @@ function events(env,request,input){
       succeeded=true;
       return;
      }
-     console.info('HHBA_V4_MATCH',JSON.stringify({result:'COMPLETE',
-      found:result.matches.length,official:result.matched_official_jobs,
+     console.info('HHBA_V4_MATCH',JSON.stringify({trace,result:result.native_search?.stage==='partial'?'PARTIAL':'COMPLETE',
+      found:result.matches.length,official:result.matched_official_jobs,candidates:result.native_search?.candidate_links,searches:result.native_search?.searches,verification:result.native_search?.jd_verification,diagnostics:result.native_search?.diagnostics,research_error:result.native_search?.research_error,
       duration_ms:Date.now()-started}));
      // Store only result metadata, never the resume or raw model prompt.
      try{
@@ -125,7 +127,7 @@ function events(env,request,input){
      succeeded=true;
     }catch(e){
      const code=typeof e?.code==='string'?e.code:'AI_PROVIDER_UNAVAILABLE';
-     console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({error:code,stage:phase,
+     console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,
       elapsed_ms:Date.now()-started}));
      send('failure',{error:code,phase,elapsed_ms:Date.now()-started});
     }finally{
@@ -188,7 +190,7 @@ export async function onRequest({request,env}){
  const input={text:resume,role_hint:role,excludeUrls,phone:session.phone,resume_id:body.resume_id||null};
  if(checkpointStorageReady(env)&&body.task_id!==undefined){
   try{
-   input.taskKey=await matchTaskKey(env,session.phone,body.task_id,{text:resume,role,excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-global-v2'});
+   input.taskKey=await matchTaskKey(env,session.phone,body.task_id,{text:resume,role,excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-research-v3'});
    input.lease=await leaseMatchTask(db,input.taskKey);
    if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
    const saved=await readMatchTask(env,input.taskKey);

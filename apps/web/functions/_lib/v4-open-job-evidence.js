@@ -9,7 +9,7 @@ const CLOSED=/(?:职位已关闭|岗位已下线|停止招聘|不再接受申请
 const GENERIC=/^(?:招聘|岗位详情|职位详情|职业机会|人才招聘|职位|招聘信息|job details|jobs|careers|recruitment|job opening)$/i;
 const trim=s=>typeof s==='string'?s.trim():'';
 export function v4PublicJobUrl(value){
- if(typeof value!=='string'||value.length>2000)return null;
+ if(typeof value!=='string'||!value.trim())return null;
  try{
   const u=new URL(value.trim()),h=u.hostname.replace(/\.$/,'').toLowerCase();
   if(u.protocol!=='https:'||u.username||u.password||(u.port&&u.port!=='443'))return null;
@@ -83,10 +83,10 @@ function htmlLocation(plain){
  const m=plain.match(/(?:工作地点|工作城市|办公地点|工作地区|工作区域|Work Location|Location)\s*[：:\s]\s*([^\n]{2,80})/i);
  return m?findMainlandCity(m[1]):null;
 }
-async function limitedRead(r){
+async function limitedRead(r,{allowJson=false}={}){
  if(r.status!==200)throw Error('V4_PAGE_UNAVAILABLE');
  const ct=(r.headers.get('content-type')||'').toLowerCase();
- if(!ct.includes('text/html')&&!ct.includes('text/plain'))throw Error('V4_PAGE_NOT_HTML');
+ if(!ct.includes('text/html')&&!ct.includes('text/plain')&&!(allowJson&&ct.includes('json')))throw Error('V4_PAGE_NOT_HTML');
  const max=2*1024*1024,cl=Number(r.headers.get('content-length')||0);
  if(cl>max||!r.body)throw Error('V4_PAGE_TOO_LARGE');
  const reader=r.body.getReader(),chunks=[];let len=0;
@@ -151,16 +151,17 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  for(const j of postings(html)){
   const org=companyOf(j),title=trim(j.title);
   const city=postedLocation(j)||htmlLocation(plain),desc=htmlToText(trim(j.description),{maxChars:Infinity});
-  if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city||desc.length<90)continue;
-  if(j.validThrough&&Number.isFinite(Date.parse(j.validThrough))&&Date.parse(j.validThrough)<now.getTime())continue;
+  if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city||!desc.trim())continue;
+  if(j.validThrough&&Number.isFinite(Date.parse(j.validThrough))&&Date.parse(j.validThrough)<now.getTime())throw Error('V4_JOB_CLOSED');
   // A multinational's official careers host may differ from its corporate website.
   // Do not discard real JD content merely because the domains differ.
   const sections=extractOfficialJdSections(desc,{full:true});
   const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
-  if(!sections||requirements.length<18)continue;
+  // JobPosting itself identifies the published description; no required heading vocabulary.
+  if(!desc.trim())continue;
   return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
    canonical_url:canonical,company:org.name,title,
-   location:city,requirements,full_jd:sections.full_jd,
+   location:city,requirements:requirements||desc,full_jd:desc,
    checked_at:now.toISOString(),proof_method:'V4_STRUCTURED_JOBPOSTING',
    source_confirmed:!!org.url&&relatedDomains(canonical,org.url),independently_read:true,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
  }
@@ -176,4 +177,29 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
   requirements,full_jd:sections.full_jd,
   checked_at:now.toISOString(),proof_method:'V4_EMPLOYER_HTML_JOB',
   source_confirmed:false,independently_read:true,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
+}
+
+/** Independently read an unusual official document for AI-assisted extraction.
+ * Bounded bytes protect the Worker; unavailable documents are research leads,
+ * not proof of a closed vacancy. Never send a CV to employer pages.
+ */
+export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal}={}){
+ let current=v4PublicJobUrl(url);const seen=new Set();
+ while(current&&!seen.has(current)&&!isCommercialRecruitmentBoard(current)){
+  if(signal?.aborted)throw signal.reason;
+  seen.add(current);
+  const r=await fetcher(current,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,application/json,text/plain'},signal});
+  if([301,302,303,307,308].includes(r.status)){
+   const next=r.headers.get('location');await r.body?.cancel().catch(()=>{});
+   if(!next)throw Error('V4_REDIRECT_MISSING');
+   current=v4PublicJobUrl(new URL(next,current).href);continue;
+  }
+  const raw=await limitedRead(r,{allowJson:true});
+  const site=meta(raw,'property','og:site_name')||meta(raw,'name','application-name');
+  if(isCommercialRecruitmentBoard(current,{site_name:site}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
+  const plain=htmlToText(raw,{maxChars:Infinity}).trim();
+  if(CLOSED.test(plain.slice(0,12000)))throw Error('V4_JOB_CLOSED');
+  return {url:current,plain,site,title:pageTitle(raw)};
+ }
+ throw Error('V4_UNSAFE_OR_REPEATED_REDIRECT');
 }

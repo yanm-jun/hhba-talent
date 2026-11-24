@@ -46,7 +46,7 @@ export type MatchedJob = {
   evidence_quality?:{skills:string;experience:string;education:string};
   ranking_version?:'HHBA_MATCH_RANKING_V2';
 };
-export type MatchResearchReport={profile:MatchProfile;rounds:{round:number;queries:string[];cited_count:number;candidates:number;added:number;excluded_count:number}[];excluded_count:number;discovered:number;candidate_target?:number;final_target?:number};
+export type MatchResearchReport={profile:MatchProfile;rounds:{round:number;queries:string[];cited_count:number;candidates:number;added:number;excluded_count:number}[];excluded_count:number;discovered:number;candidate_target?:number;final_target?:number;concrete_count?:number;completion_reason?:string;diagnostics?:Record<string,number>};
 export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
   research_report?:MatchResearchReport;research_leads?:MatchedJob[];
@@ -56,7 +56,7 @@ export type MatchResponse = {
    underfilled_rechecks?:number;unscored_source_previews?:number;checkpoint_restored?:boolean;
    underfilled_expansion_queries?:number;underfilled_expansion_new?:number;
    search_failures?:number;rejected_links?:number;agent_exit_reason?:string;
-   mode?:string;research_error?:string;search_result_links?:number;
+   mode?:string;research_error?:string;search_result_links?:number;diagnostics?:Record<string,number>;
    opened_job_pages?:number;model_candidate_rows?:number;model_source_grounded?:number;
    jd_verification?:{eligible?:number;verified?:number;scored?:number;failed?:number};
    native_error?:string|null;native_mode?:string|null;

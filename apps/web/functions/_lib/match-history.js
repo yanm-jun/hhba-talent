@@ -136,7 +136,7 @@ export function safeResearchReport(report){
   summary:text(p.summary),skills:Array.isArray(p.skills)?p.skills.filter(s=>typeof s?.name==='string').map(s=>({name:s.name,evidence:''})):[],
   target_roles:strings(p.target_roles),warnings:['历史报告仅保留分析结论，不保存简历原文引文。']},
   rounds:report.rounds.map(r=>({round:num(r.round),queries:strings(r.queries),cited_count:num(r.cited_count),candidates:num(r.candidates),added:num(r.added),excluded_count:num(r.excluded_count)})),
-  excluded_count:num(report.excluded_count),discovered:num(report.discovered),...(report.candidate_target?{candidate_target:num(report.candidate_target),final_target:num(report.final_target)}:{})};
+  excluded_count:num(report.excluded_count),discovered:num(report.discovered),...(report.diagnostics?{diagnostics:Object.fromEntries(Object.entries(report.diagnostics).filter(([k])=>/^[A-Z_]+$/.test(k)).map(([k,v])=>[k,num(v)]))}:{}),...(report.concrete_count!==undefined?{concrete_count:num(report.concrete_count)}:{}),...(report.completion_reason?{completion_reason:text(report.completion_reason)}:{}),...(report.candidate_target?{candidate_target:num(report.candidate_target),final_target:num(report.final_target)}:{})};
 }
 function unpackHistory(raw,row){
  const parsed=JSON.parse(raw);

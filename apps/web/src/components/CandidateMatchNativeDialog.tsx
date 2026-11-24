@@ -221,13 +221,14 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       </section>:<>
      {showResults&&<>
      {!pending&&<div className="hhba-match-intro">
-      <h2 id="hhba-native-title">找到 {result.matches.length} 个岗位</h2>
+      <h2 id="hhba-native-title">{!pending&&result.matches.length===0?'本次尚未形成正式推荐':'找到 '+result.matches.length+' 个岗位'}</h2>
       <p>匹配分用于求职参考，不是录用概率。</p>
       {!!result.profile?.facts?.length&&<details>
        <summary>已识别的简历证据（{result.profile.facts.length} 条）</summary>
        <ul>{result.profile.facts.map(fact=><li key={fact.id}>{fact.quote}</li>)}</ul>
       </details>}
      </div>}
+     {!pending&&result.native_search?.mode==='V4_SIMPLE_AI'&&<div className="hhba-match-disclaimer" role="status">本次发现 {result.native_search.candidate_links??0} 个候选，已核验 JD {result.native_search.jd_verification?.verified??0} 个，完成证据评分 {result.native_search.jd_verification?.scored??0} 个。{result.native_search.stage==='partial'?'研究未达到完整交付目标；未核验或证据不足的候选保留在研究记录，不代表没有适合的工作。':''}{result.native_search.research_error?' 研究中断原因：'+result.native_search.research_error:''}{result.native_search.diagnostics&&Object.keys(result.native_search.diagnostics).length>0?<details><summary>查看实际核验诊断</summary>{Object.entries(result.native_search.diagnostics).map(([code,count])=><span key={code}>{code}：{count}；</span>)}</details>:null}</div>}
      {!pending&&result.native_search?.mode==='HHBA_MATCH_CLEAN_V2'&&<p className="hhba-match-disclaimer" role="status">
       新版独立求职研究：搜索 {result.native_search.queries??0} 组关键词，
       取得 {result.native_search.candidate_links??0} 条企业职位来源，

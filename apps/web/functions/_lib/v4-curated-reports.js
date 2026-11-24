@@ -23,18 +23,17 @@ export function concreteCandidate(job){
 export function validateCuratedReport(value,resume,jd){
  const errors=[];
  if(value?.suitable!==true) return {ok:false,declined:value?.suitable===false,errors:['suitable']};
- const sections=['reason','strengths','risks','career_development','optimization_advice','competition'];
- for(const field of sections)if(!str(value[field]))errors.push(field);
+ if(!str(value.reason))errors.push('reason');
  const comparisons=Array.isArray(value.comparisons)?value.comparisons:[];
- if(!comparisons.length)errors.push('comparisons');
- const has=(source,quote)=>str(quote).length>=4&&norm(source).includes(norm(quote));
- let supported=0;
+ // Optional report structure is not an eligibility gate; validate any supplied claims.
+ const has=(source,quote)=>!!str(quote)&&norm(source).includes(norm(quote));
+
  for(const c of comparisons){
   if(!['supported','partial','missing'].includes(c?.status)||!has(jd,c?.jd_quote)||!str(c?.analysis)){errors.push('comparison_jd_or_analysis');continue;}
-  if(c.status!=='missing'){if(!has(resume,c.resume_quote))errors.push('comparison_resume');else supported++;}
+  if(c.status!=='missing'){if(!has(resume,c.resume_quote))errors.push('comparison_resume');}
   else if(str(c.resume_quote)&&!has(resume,c.resume_quote))errors.push('comparison_resume');
  }
- if(!supported)errors.push('supported_comparison');
+
  if(!Number.isInteger(value.score)||value.score<0||value.score>100)errors.push('score');
  if(!has(resume,value.resume_quote)||!has(jd,value.jd_quote))errors.push('score_quotes');
  if(errors.length)return {ok:false,errors:[...new Set(errors)]};
@@ -48,7 +47,7 @@ export function rankCandidateUrls(payload,rows){
  const valid=ordered.filter(u=>keys.has(u)&&!seen.has(u)&&(seen.add(u),true));
  return valid.length===keys.size?valid:null;
 }
-export function qualifiedReport(job){return job?.source_type==='站外官方招聘'&&job.jd_source_status==='VERIFIED_JD'&&job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&Number.isInteger(job.match_score)&&!!job.research_detail;}
+export function qualifiedReport(job){return job?.curated_suitable!==false&&job?.source_type==='站外官方招聘'&&job.jd_source_status==='VERIFIED_JD'&&job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&Number.isInteger(job.match_score)&&!!job.research_detail;}
 
 // Only independently verified, evidence-scored and suitable jobs enter the global report ranking.
 export function eligibleCuratedScore(job){return job?.curated_suitable===true&&job.source_type==='站外官方招聘'&&job.jd_source_status==='VERIFIED_JD'&&job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&Number.isInteger(job.match_score)&&job.match_score>=0&&job.match_score<=100&&!!str(job.evidence_excerpt);}
