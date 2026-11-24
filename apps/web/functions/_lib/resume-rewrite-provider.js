@@ -153,36 +153,56 @@ const SYSTEM_WRITE=`你是 HHBA 的专业简历撰写者，任务是针对给定
 const SYSTEM_AUDIT=`你是独立的 HHBA 简历事实审查员。对照原文与 AI 改写，发现任何无法证实的任职经历、雇主、学历、日期、数字、证书、技能、成果、职责、夸张用语或暗示，必须拒绝该段。招聘启事不是求职者事实来源。
 仅输出 JSON 对象：{"checks":[{"blockId":"源段落ID","safe":true,"concern":"没有问题时空字符串，或写明无法证实的具体事实"}]}。每个段落都要检查，不能跳过；不知道是否安全就 safe:false。`;
 
-export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions,signal,withCoverage=false}){
+// V4 reviews both edits and explicit keep decisions against the entire
+// resume and JD. The model, not a keyword threshold, chooses whether another
+// writing pass can materially improve the presentation of existing facts.
+export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions,signal,withCoverage=false,reviewContext,reviewedIds=[]}){
+ const autonomous=withCoverage&&env?.HHBA_MATCH_V4_READY==='1'&&Boolean(reviewContext);
  const originalById=new Map(blocks.map(block=>[block.id,block.text]));
- const draftBlocks=[];
+ const draftBlocks=[],reviewFeedback={};
  for(const suggestion of suggestions){
   if(suggestion.action==='request_evidence')continue;
   const original=originalById.get(suggestion.blockId);
   if(!original)continue;
   const numbers=numberTokens(original);
-  if([...numberTokens(suggestion.proposed)].some(token=>!numbers.has(token)))continue;
+  if([...numberTokens(suggestion.proposed)].some(token=>!numbers.has(token))){
+   if(autonomous)reviewFeedback[suggestion.blockId]='改写包含原段落无法核实的数字或日期。重新对照原文，保留真实事实；无法核实则向本人提问。';
+   continue;
+  }
   draftBlocks.push({blockId:suggestion.blockId,original,proposed:suggestion.proposed});
  }
- if(!draftBlocks.length){
-  const accepted=suggestions.filter(item=>item.action==='request_evidence');
-  return withCoverage?{suggestions:accepted,pendingIds:suggestions.filter(item=>item.action!=='request_evidence').map(item=>item.blockId)}:accepted;
+ if(autonomous){
+  const attempted=new Set(suggestions.map(s=>s.blockId));
+  for(const id of reviewedIds){
+   if(!attempted.has(id)&&originalById.has(id))draftBlocks.push({blockId:id,original:originalById.get(id),proposed:originalById.get(id),decision:'keep'});
+  }
  }
- let reviewer;
- try{reviewer=selectProvider(env,'resume_reviewer');}
- catch(error){
-  if(error.message!=='AI_PROVIDER_NOT_CONFIGURED')throw error;
-  reviewer=selectProvider(env);
+ let checks=[];
+ if(draftBlocks.length){
+  let reviewer;
+  try{reviewer=selectProvider(env,'resume_reviewer');}
+  catch(error){
+   if(error.message!=='AI_PROVIDER_NOT_CONFIGURED')throw error;
+   reviewer=selectProvider(env);
+  }
+  const instruction=autonomous?SYSTEM_AUDIT+'\\n同时独立审查当前段落（包括保留原文的决定）是否已经充分体现真实经历与目标JD的关联。对照完整简历上下文与编辑计划，判断是否还有实质性且有真实依据的表达改善；如有，needs_revision:true，concern 写明具体可改善的位置、证据和方向；如没有，needs_revision:false。不要为了改动而改动或强制提高分数。缺少事实则建议提问，不可编造。每个检查项返回 blockId、safe、needs_revision、concern。':SYSTEM_AUDIT;
+  const audit=await completeJson(reviewer,instruction,{job,blocks:draftBlocks,...(autonomous?{document_context:reviewContext}:{})},signal,6500);
+  checks=Array.isArray(audit.checks)?audit.checks:[];
  }
- const audit=await completeJson(reviewer,SYSTEM_AUDIT,{job,blocks:draftBlocks},signal,6500);
- const checks=Array.isArray(audit.checks)?audit.checks:[];
  const confirmed=new Set(draftBlocks.filter(block=>{
   const rows=checks.filter(check=>check?.blockId===block.blockId);
-  return rows.length===1&&rows[0].safe===true;
+  const row=rows.length===1?rows[0]:null;
+  if(row?.safe===true&&(!autonomous||row.needs_revision!==true))return true;
+  if(autonomous)reviewFeedback[block.blockId]=typeof row?.concern==='string'&&row.concern.trim()?row.concern.trim():
+   '独立审查尚未确认该段。重新对照真实原文与JD，核实事实并改进表达，必要时明确保留或提问。';
+  return false;
  }).map(block=>block.blockId));
  const accepted=suggestions.filter(item=>item.action==='request_evidence'||confirmed.has(item.blockId));
  // Rejected or missing checks need another editing pass, not a false completion.
- return withCoverage?{suggestions:accepted,pendingIds:suggestions.filter(item=>!accepted.includes(item)).map(item=>item.blockId)}:accepted;
+ if(!withCoverage)return accepted;
+ const pendingIds=[...new Set([...suggestions.filter(item=>!accepted.includes(item)).map(item=>item.blockId),
+  ...(autonomous?draftBlocks.filter(b=>!confirmed.has(b.blockId)).map(b=>b.blockId):[])])];
+ return {suggestions:accepted,pendingIds,...(autonomous&&Object.keys(reviewFeedback).length?{reviewFeedback}:{})};
 }
 
 export async function generateTailoredResume({env,blocks,job,signal}){
