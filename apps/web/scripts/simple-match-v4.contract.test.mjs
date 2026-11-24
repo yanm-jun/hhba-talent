@@ -346,3 +346,48 @@ test('V4 checkpoint signatures reject other accounts, changed resume, or modifie
  await assert.rejects(verifyCheckpoint({...args,token,blocks:['不同简历']}));
  await assert.rejects(verifyCheckpoint({...args,token,draft:{phase:'verification',rows:[]}}));
 });
+
+test('V4 segments large match histories without losing order or Unicode',async()=>{
+ const {historySegments}=await import('../functions/_lib/match-history.js');
+ const jobs=Array.from({length:1000},(_,i)=>({id:'job-'+i,reason:'岗位匹配依据'.repeat(100)}));
+ const chunks=historySegments(jobs);
+ assert.ok(chunks.length>1);
+ assert.ok(chunks.every(x=>new TextEncoder().encode(x).byteLength<=500000));
+ assert.deepEqual(chunks.flatMap(x=>JSON.parse(x)),jobs);
+});
+test('V4 continuation claim is one-time and a failed step can release the claim',async()=>{
+ const {claimAiCheckpoint}=await import('../functions/_lib/ai-checkpoint-claim.js');
+ const held=new Map();
+ const db={prepare(sql){return {bind(...args){return {async run(){
+  if(sql.startsWith('INSERT OR IGNORE')){
+   if(held.has(args[0]))return {success:true,meta:{changes:0}};
+   held.set(args[0],args[1]);return {success:true,meta:{changes:1}};
+  }
+  if(sql.includes('token_hash=?'))held.delete(args[0]);
+  return {success:true,meta:{changes:1}};
+ }}}}}};
+ const token='synthetic-signed-checkpoint';
+ const first=await claimAiCheckpoint(db,token);
+ assert.ok(first);
+ assert.equal(await claimAiCheckpoint(db,token),null);
+ assert.equal([...held.keys()][0].length,64);
+ assert.notEqual([...held.keys()][0],token);
+ await first.release();
+ assert.ok(await claimAiCheckpoint(db,token));
+});
+test('V4 entire-document optimization advances across multiple invocation budgets',async()=>{
+ const {optimizeResumeDocument}=await import('../functions/_lib/resume-optimization-task.js');
+ const blocks=Array.from({length:77},(_,i)=>({id:'word-'+i,section:'experience',text:'负责真实项目'+i}));
+ const input={env:{HHBA_MATCH_V4_READY:'1'},blocks,context:blocks.map(b=>b.text).join('\n'),
+  job:{title:'项目管理',requirements:'真实项目经验'},signal:new AbortController().signal};
+ const deps={plan:async({blocks})=>{assert.equal(blocks.length,77);return {focus:['真实经历']}},
+  generate:async({blocks})=>({provider:'synthetic',suggestions:blocks.map(b=>({blockId:b.id}))}),
+  audit:async({suggestions})=>suggestions};
+ const ids=[];let wanted;
+ do{
+  const result=await optimizeResumeDocument({...input,wanted},deps);
+  ids.push(...result.suggestions.map(x=>x.blockId));
+  wanted=result.pendingIds;
+ }while(wanted.length);
+ assert.deepEqual([...ids].sort(),blocks.map(b=>b.id).sort());
+});
