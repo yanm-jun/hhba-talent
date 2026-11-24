@@ -75,9 +75,9 @@ export async function runResumeEditorialAgent({
  const previous=Array.isArray(draft.autonomy?.tools_used)?
   draft.autonomy.tools_used.filter(event=>event&&
    ['inspect_source','rewrite_sections','ask_user','finish'].includes(event.action))
-   .slice(0,64).map(event=>({
+   .map(event=>({
     action:event.action,sections:Array.isArray(event.sections)?
-     event.sections.filter(id=>typeof id==='string').slice(0,96):[],
+     event.sections.filter(id=>typeof id==='string'):[],
     accepted:Number.isInteger(event.accepted)?event.accepted:0
    })):[];
  const trace=[...previous];
@@ -96,7 +96,7 @@ export async function runResumeEditorialAgent({
   if(originalById.has(id))
    inspected.set(id,redacted(originalById.get(id).text));
  }
- if(trace.length>=64){
+ if(env?.HHBA_MATCH_V4_READY!=='1'&&trace.length>=64){
   return {...draft,autonomy:{...draft.autonomy,enabled:true,
    rounds:trace.length,stop_reason:'execution_round_guard',
    needs_more_work:true,tools_used:trace,
