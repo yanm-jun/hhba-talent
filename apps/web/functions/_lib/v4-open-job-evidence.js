@@ -109,16 +109,16 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  if(!canonical)throw Error('V4_UNSAFE_URL');
  const r=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',
   headers:{Accept:'text/html,text/plain;q=0.9'},signal});
- const html=await limitedRead(r),plain=htmlToText(html);
+ const html=await limitedRead(r),plain=htmlToText(html,{unbounded:true});
  if(CLOSED.test(plain))throw Error('V4_JOB_CLOSED');
  for(const j of postings(html)){
   const org=companyOf(j),title=trim(j.title);
-  const city=postedLocation(j)||htmlLocation(plain),desc=htmlToText(trim(j.description));
+  const city=postedLocation(j)||htmlLocation(plain),desc=htmlToText(trim(j.description),{unbounded:true});
   if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city||desc.length<90)continue;
   if(j.validThrough&&Number.isFinite(Date.parse(j.validThrough))&&Date.parse(j.validThrough)<now.getTime())continue;
   // A multinational's official careers host may differ from its corporate website.
   // Do not discard real JD content merely because the domains differ.
-  const sections=extractOfficialJdSections(desc);
+  const sections=extractOfficialJdSections(desc,{unbounded:true});
   const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
   if(!sections||requirements.length<18)continue;
   return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
@@ -128,7 +128,7 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
    source_confirmed:!!org.url&&relatedDomains(canonical,org.url),application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
  }
  // Chinese employer career sites often serve normal HTML without JSON-LD.
- const sections=extractOfficialJdSections(plain),title=pageTitle(html);
+ const sections=extractOfficialJdSections(plain,{unbounded:true}),title=pageTitle(html);
  const company=meta(html,'property','og:site_name')||meta(html,'name','application-name');
  const city=htmlLocation(plain);
  const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
