@@ -84,7 +84,7 @@ export type MatchResponse = {
   research_pending?:boolean;
   preview_synthetic?:boolean;
 };
-export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];history_id?:string};
+export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];history_id?:string;recovery_jobs?:MatchedJob[]};
 const API='/api/match-next'; // Original default preserved for production and V2 compatibility.
 // V4 is the default on HHBA hosts; the legacy API remains for isolated diagnostics.
 export const MATCH_V4_PREVIEW=typeof window!=='undefined'&&
@@ -449,7 +449,7 @@ export async function submitExtractedResumeText(
  onActivity?:(activity:NativeMatchActivity)=>void
 ):Promise<MatchResponse>{
  if(!MATCH_V4_PREVIEW)return submitMatchRound(text,opts,consent,signal,resumeId,onProgress,onPartial,onActivity);
- const collected=new Map<string,MatchedJob>(),previous=new Set(opts.exclude_urls||[]);
+ const collected=new Map<string,MatchedJob>((opts.recovery_jobs||[]).map(job=>[job.official_url,job])),previous=new Set(opts.exclude_urls||[]);
  const historyId=opts.history_id||crypto.randomUUID();
  let last:MatchResponse|undefined,round=0,delay=1000;
  const publish=(jobs:MatchedJob[])=>{for(const job of jobs)if(!previous.has(job.official_url))collected.set(job.official_url,job);onPartial?.([...collected.values()]);};
@@ -482,7 +482,7 @@ export async function submitExtractedResumeText(
  onProgress?.('reading');
  // Verify one public JD per request, instead of spending the entire hosting
  // subrequest budget on all vacancies at once. No total job-count cap.
- const queue=[...collected.values()];let cursor=0,checked=0;
+ const queue=[...collected.values()].filter(job=>!job.jd_version_id||job.jd_score_status!=='AI_VERIFIED_JD_SCORED');let cursor=0,checked=0;
  const worker=async()=>{
   while(cursor<queue.length){
    if(signal?.aborted)throw signal.reason;
@@ -501,6 +501,10 @@ export async function submitExtractedResumeText(
  };
  await Promise.all(Array.from({length:Math.min(3,queue.length)},()=>worker()));
  const matches=[...collected.values()].sort((a,b)=>(b.match_score??-1)-(a.match_score??-1));
+ if(last.history_status==='SAVED'&&!last.research_pending){
+  try{const done=await fetch('/api/match-v4/finish',{method:'POST',credentials:'same-origin',cache:'no-store',signal,headers:{'Content-Type':'application/json',Authorization:'Bearer '+session()},body:JSON.stringify({history_id:historyId})});if(!done.ok)last.history_status='UNAVAILABLE';}
+  catch(e){if(signal?.aborted)throw e;last.history_status='UNAVAILABLE';}
+ }
  const verified=matches.filter(j=>j.jd_source_status==='VERIFIED_JD').length;
  const scored=matches.filter(j=>j.jd_score_status==='AI_VERIFIED_JD_SCORED').length;
  return {...last,matches,matched_official_jobs:verified,can_continue:true,research_pending:false,
