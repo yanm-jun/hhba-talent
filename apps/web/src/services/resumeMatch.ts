@@ -494,7 +494,9 @@ export async function submitExtractedResumeText(
  };
  await Promise.all(Array.from({length:Math.min(3,queue.length)},()=>worker()));
  const matches=[...collected.values()].sort((a,b)=>(b.match_score??-1)-(a.match_score??-1));
- return {...last,matches,matched_official_jobs:matches.filter(j=>j.jd_source_status==='VERIFIED_JD').length,can_continue:true,research_pending:false};
+ const verified=matches.filter(j=>j.jd_source_status==='VERIFIED_JD').length;
+ return {...last,matches,matched_official_jobs:verified,can_continue:true,research_pending:false,
+  native_search:{...last.native_search!,searches:round,page_reads:checked,visible_jobs:matches.length,candidate_links:matches.length,jd_verification:{eligible:matches.length,verified,failed:matches.length-verified}}};
 }
 export async function prepareV4Job(officialUrl:string,signal?:AbortSignal,title?:string):Promise<Partial<MatchedJob>>{
  const response=await fetch('/api/match-v4/jd',{method:'POST',credentials:'same-origin',cache:'no-store',signal,
