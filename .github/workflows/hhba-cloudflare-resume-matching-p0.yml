@@ -36,6 +36,7 @@ jobs:
           node --check functions/_lib/match-hard-qualification.js
           node --check functions/_lib/openai-match-adapter.js
           node --check functions/_lib/agent-v3-provider.js
+          node --check scripts/agent-v3-relay-live-smoke.mjs
           node --check functions/_lib/agent-v3-understanding.js
           node --check functions/api/agent-v3/[[path]].js
           node --check functions/_lib/resume-ai-provider.js
