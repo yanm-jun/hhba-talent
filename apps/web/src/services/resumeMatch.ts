@@ -486,7 +486,13 @@ export async function submitExtractedResumeText(
   while(cursor<queue.length){
    if(signal?.aborted)throw signal.reason;
    const job=queue[cursor++];
-   try{const verified=await prepareV4Job(job.official_url,signal,job.title);collected.set(job.official_url,{...job,...verified});}
+   try{
+    const verified=await prepareV4Job(job.official_url,signal,job.title);
+    const merged={...job,...verified};collected.set(job.official_url,merged);
+    onPartial?.([...collected.values()]);
+    try{const score=await scoreV4Job(merged,text,signal);collected.set(job.official_url,{...merged,...score});}
+    catch(e){if(signal?.aborted)throw e;}
+   }
    catch(e){if(signal?.aborted)throw e;}
    checked++;onActivity?.({stage:'reading',message:'已检查 '+checked+' / '+queue.length+' 条岗位来源。',pages_read:checked});
    onPartial?.([...collected.values()]);
@@ -495,8 +501,16 @@ export async function submitExtractedResumeText(
  await Promise.all(Array.from({length:Math.min(3,queue.length)},()=>worker()));
  const matches=[...collected.values()].sort((a,b)=>(b.match_score??-1)-(a.match_score??-1));
  const verified=matches.filter(j=>j.jd_source_status==='VERIFIED_JD').length;
+ const scored=matches.filter(j=>j.jd_score_status==='AI_VERIFIED_JD_SCORED').length;
  return {...last,matches,matched_official_jobs:verified,can_continue:true,research_pending:false,
-  native_search:{...last.native_search!,searches:round,page_reads:checked,visible_jobs:matches.length,candidate_links:matches.length,jd_verification:{eligible:matches.length,verified,failed:matches.length-verified}}};
+  native_search:{...last.native_search!,searches:round,page_reads:checked,visible_jobs:matches.length,candidate_links:matches.length,jd_verification:{eligible:matches.length,verified,scored,failed:matches.length-verified}}};
+}
+async function scoreV4Job(job:MatchedJob,text:string,signal?:AbortSignal):Promise<Partial<MatchedJob>>{
+ const response=await fetch('/api/match-v4/score',{method:'POST',credentials:'same-origin',cache:'no-store',signal,
+  headers:{'Content-Type':'application/json',Authorization:'Bearer '+session()},body:JSON.stringify({consent:true,text:redactResumeTextLocally(text),job:{jd_version_id:job.jd_version_id,jd_sha256:job.jd_sha256,official_url:job.official_url}})});
+ const data=await response.json().catch(()=>null);
+ if(!response.ok||data?.ok!==true||!data.score)throw new MatchError(response.status,'完整 JD 评分暂未完成。');
+ return data.score;
 }
 export async function prepareV4Job(officialUrl:string,signal?:AbortSignal,title?:string):Promise<Partial<MatchedJob>>{
  const response=await fetch('/api/match-v4/jd',{method:'POST',credentials:'same-origin',cache:'no-store',signal,
