@@ -76,7 +76,7 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
  const suggestions=new Map<string,ResumeSuggestion>();
  let wanted=document?.wanted;
  const ids=new Set(blocks.map(block=>block.id));
- let queueStarted=0;
+
  for(;;){
   let response:Response;
   try{
@@ -89,13 +89,10 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
    ok?:boolean;error?:string;suggestions?:ResumeSuggestion[];pending_block_ids?:string[]
   };
   if(document&&data.error==='RESUME_OPTIMIZATION_QUEUED'){
-   queueStarted ||= Date.now();
-   if(Date.now()-queueStarted<240000){
-    document.onQueued?.();
-    await waitForOptimizationSlot(signal);
-    continue;
-   }
-  }else queueStarted=0;
+   document.onQueued?.();
+   await waitForOptimizationSlot(signal);
+   continue;
+  }
   if(!response.ok||data.ok!==true||!Array.isArray(data.suggestions)){
    if(wanted&&suggestions.size){document?.onPending?.(wanted);break;}
    throw new ResumeOptimizationError(data.error||'INVALID_RESPONSE',response.status);
