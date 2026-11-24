@@ -308,3 +308,41 @@ test('V4 automatically resumes after a missing completion flag when it has made 
  assert.equal(r.matches.length,1);
  assert.equal(r.native_search.research_error,undefined);
 });
+
+test('V4 checkpoint continues across separate invocations without reducing the number of jobs',async()=>{
+ const jobs=Array.from({length:37},(_,i)=>({...row,url:'https://careers.v4-company'+i+'.cn/roles/'+i}));
+ let modelCalls=0,pageCalls=0;
+ const fetcher=async(u,opts)=>{
+  if(u.endsWith('/responses')){
+   modelCalls++;
+   return model({research_complete:modelCalls===2,jobs:modelCalls===1?jobs.slice(0,20):jobs.slice(20)});
+  }
+  pageCalls++;
+  return new Response('unavailable',{status:403});
+ };
+ let checkpoint=null,result,requests=0;
+ do{
+  const before=pageCalls;
+  result=await v4Match(fetcher,provider,resume,'全国',{stepMode:true,checkpoint});
+  requests++;
+  assert.ok(pageCalls-before<=2,'at most two distinct unfamiliar pages read per invocation');
+  checkpoint=result.checkpoint;
+ }while(result.status==='CONTINUE'&&requests<60);
+ assert.equal(result.status,'COMPLETE');
+ assert.equal(modelCalls,2);
+ assert.equal(result.matches.length,37);
+ assert.equal(new Set(result.matches.map(j=>j.official_url)).size,37);
+ assert.equal(result.native_search.candidate_links,37);
+ assert.equal(pageCalls,37);
+ assert.ok(requests>10);
+});
+test('V4 checkpoint signatures reject other accounts, changed resume, or modified state',async()=>{
+ const {issueCheckpoint,verifyCheckpoint}=await import('../functions/_lib/resume-rewrite-checkpoint.js');
+ const args={env:{HHBA_RESUME_AGENT_CHECKPOINT_SECRET:'synthetic-v4-checkpoint-secret-only-for-tests'},
+  account:'candidate-a',blocks:[resume],job:{role:'上海'},draft:{phase:'research',rows:[[url,row]]}};
+ const token=await issueCheckpoint(args);
+ assert.equal(await verifyCheckpoint({...args,token}),true);
+ await assert.rejects(verifyCheckpoint({...args,token,account:'candidate-b'}));
+ await assert.rejects(verifyCheckpoint({...args,token,blocks:['不同简历']}));
+ await assert.rejects(verifyCheckpoint({...args,token,draft:{phase:'verification',rows:[]}}));
+});
