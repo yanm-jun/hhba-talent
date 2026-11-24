@@ -38,6 +38,11 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  initialOptimizedJobId?:string;
 }){
  const ref=useRef<HTMLDivElement|null>(null);
+ const confirmRef=useRef<HTMLDialogElement|null>(null);
+ const dockRef=useRef<HTMLButtonElement|null>(null);
+ const [minimized,setMinimized]=useState(false);
+ const [confirmClose,setConfirmClose]=useState(false);
+ const [confirmTerminate,setConfirmTerminate]=useState(false);
  const [optimizedJobUrl,setOptimizedJobUrl]=useState<string|null>(()=>
   [...result.matches,...researchJobs].find(job=>job.id===initialOptimizedJobId&&job.jd_version_id&&job.jd_sha256)?.official_url||null);
  const [optimizationDirty,setOptimizationDirty]=useState(false);
@@ -103,16 +108,32 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  }
  function handleClose(){
   if(optimizedJobUrl){backToMatches();return}
+  if(pending){setConfirmTerminate(false);setConfirmClose(true);return}
   onClose();
  }
+ // Window visibility is independent of the request owned by CandidateMatchPage.
+ // Never invoke onClose (which aborts the request) when minimizing.
+ function minimizeSearch(){
+  setConfirmClose(false);setConfirmTerminate(false);setMinimized(true);
+ }
+ function restoreSearch(){setMinimized(false);}
  useEffect(()=>{
+  if(minimized){dockRef.current?.focus();return}
   const overflow=document.body.style.overflow;
   const trigger=document.activeElement instanceof HTMLElement?document.activeElement:null;
   document.body.style.overflow='hidden';ref.current?.focus();
   return()=>{document.body.style.overflow=overflow;trigger?.focus()};
- },[]);
+ },[minimized]);
+ useEffect(()=>{
+  const dialog=confirmRef.current;
+  if(confirmClose&&pending&&dialog&&!dialog.open)dialog.showModal();
+  return()=>{if(dialog?.open)dialog.close()};
+ },[confirmClose,pending]);
+ useEffect(()=>{
+  if(!pending){setConfirmClose(false);setConfirmTerminate(false);}
+ },[pending]);
  function handleKey(event:KeyboardEvent<HTMLDivElement>){
-  if(event.key==='Escape'){event.preventDefault();handleClose();return}
+  if(event.key==='Escape'){event.preventDefault();event.stopPropagation();if(!pending)handleClose();return}
   if(showResults&&!optimizedJobUrl&&event.target===ref.current&&(event.key==='ArrowLeft'||event.key==='ArrowRight')){event.preventDefault();ref.current?.querySelector<HTMLButtonElement>(event.key==='ArrowRight'?'.hhba-report-pager-next':'.hhba-report-pager-prev')?.click();return;}
   if(event.key!=='Tab'||!ref.current)return;
   const focusable=Array.from(ref.current.querySelectorAll<HTMLElement>(
@@ -124,8 +145,8 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
    event.preventDefault();last.focus();
   }else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
  }
- return createPortal(
-  <div className="hhba-match-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)handleClose()}}>
+ return createPortal(<>
+  <div className="hhba-match-overlay" role="presentation" hidden={minimized} style={minimized?{display:'none'}:undefined} onMouseDown={e=>{if(e.target===e.currentTarget)e.preventDefault()}}>
    <div className={'hhba-match-modal'+(optimizedJobUrl?' hhba-match-modal-editor':'')} role="dialog" aria-modal="true" tabIndex={-1}
     ref={ref} onKeyDown={handleKey} aria-label={optimizedJobUrl?'岗位专属简历优化':'岗位匹配'}>
     <header className={'hhba-match-modal-head'+(optimizedJobUrl&&sourceResume?' hhba-word-editor-head':'')}>
@@ -268,8 +289,23 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
      {!optimizedJobUrl&&onContinue&&!pending?
       <button className="hhba-match-done" type="button" onClick={onContinue}>继续搜索岗位</button>:
       <span>HHBA · 让机会与人才，找到彼此。</span>}
-     <button className="hhba-match-done" type="button" onClick={handleClose}>{optimizedJobUrl?'返回匹配结果':pending?'取消搜索':'完成查看'}</button>
+     <button className="hhba-match-done" type="button" onClick={handleClose}>{optimizedJobUrl?'返回匹配结果':pending?'收起或取消':'完成查看'}</button>
     </footer>
    </div>
-  </div>,document.body);
+  </div>
+  {minimized&&<button ref={dockRef} type="button" className="hhba-match-task-dock" onClick={restoreSearch} aria-label={pending?'恢复正在运行的岗位研究':'查看岗位研究结果'}>
+   <span className="hhba-match-task-icon">{pending?<LoaderCircle size={20} className="spin" aria-hidden="true"/>:<BriefcaseBusiness size={20} aria-hidden="true"/>}</span>
+   <span className="hhba-match-task-copy"><strong>{pending?'AI 正在研究岗位':'岗位研究已结束'}</strong><small>{pending?stageTitle[progressStage]+' · '+(researchReport?.discovered??researchJobs.length)+' 个候选':'点击查看已收到的研究结果'}</small></span>
+   <span className="hhba-match-task-action">{pending?'查看进度':'查看结果'}</span>
+  </button>}
+  {confirmClose&&pending&&<dialog ref={confirmRef} className="hhba-match-exit-dialog" aria-labelledby="hhba-match-exit-title" onCancel={e=>{e.preventDefault();setConfirmClose(false);setConfirmTerminate(false)}} onClick={e=>{if(e.target===e.currentTarget)e.preventDefault()}}>
+   <div className="hhba-match-exit-heading"><span className="hhba-match-task-icon"><LoaderCircle size={22} className="spin" aria-hidden="true"/></span><h2 id="hhba-match-exit-title">{confirmTerminate?'确定终止本次匹配？':'AI 正在研究岗位'}</h2></div>
+   <p>{confirmTerminate?'终止后将取消当前请求，尚未保存的本次研究结果可能丢失。':'当前匹配任务尚未完成。你可以暂时收起窗口，在当前页面继续等待研究结果。'}</p>
+   <div className="hhba-match-exit-actions">
+    {!confirmTerminate&&<button type="button" className="hhba-match-exit-primary" onClick={minimizeSearch}>最小化，继续研究</button>}
+    <button type="button" className="hhba-match-exit-secondary" autoFocus onClick={()=>{setConfirmClose(false);setConfirmTerminate(false)}}>返回研究页面</button>
+    <button type="button" className="hhba-match-exit-danger" onClick={()=>{if(confirmTerminate){setConfirmClose(false);onClose()}else setConfirmTerminate(true)}}>{confirmTerminate?'确认终止本次匹配':'终止本次匹配'}</button>
+   </div>
+  </dialog>}
+ </>,document.body);
 }
