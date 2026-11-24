@@ -78,15 +78,15 @@ async function readLimited(response){
  for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
  try{return new TextDecoder('utf-8',{fatal:true}).decode(bytes);}catch{throw Error('OFFICIAL_PAGE_DECODE_FAILED');}
 }
-async function publicEmployerDetail(locator,{title,location,duties,requirements,workYear},method,now){
- if(typeof title!=='string'||title.trim().length<2||title.trim().length>86||
-  typeof location!=='string'||location.length>100||!isMainlandJobLocation(location)||
+async function publicEmployerDetail(locator,{title,location,duties,requirements,workYear},method,now,full=false){
+ if(typeof title!=='string'||title.trim().length<2||(!full&&title.trim().length>86)||
+  typeof location!=='string'||(!full&&location.length>100)||!isMainlandJobLocation(location)||
   typeof duties!=='string'||typeof requirements!=='string'||!duties.trim()||!requirements.trim())
   throw Error('OFFICIAL_JD_NOT_VERIFIED');
  title=title.trim();
  const experience=typeof workYear==='string'&&workYear.trim()?'工作经验：'+workYear.trim():'';
  const sections=extractOfficialJdSections(
-  ['岗位职责',htmlToText(duties),'任职要求',htmlToText(requirements),experience].filter(Boolean).join('\n'));
+  ['岗位职责',htmlToText(duties,{maxChars:full?Infinity:100000}),'任职要求',htmlToText(requirements,{maxChars:full?Infinity:100000}),experience].filter(Boolean).join('\n'),{full});
  if(!sections)throw Error('OFFICIAL_JD_NOT_VERIFIED');
  const qualifications=sections.sections.filter(section=>section.kind==='requirements')
   .map(section=>section.text).join('\n');
@@ -96,7 +96,7 @@ async function publicEmployerDetail(locator,{title,location,duties,requirements,
   requirements:qualifications,jd_hash:jdHash,checked_at:new Date(now).toISOString(),
   proof_method:OFFICIAL_EVIDENCE_VERSION,retrieval_method:method,...sections};
 }
-async function meituanOfficialJobEvidence(locator,{fetcher,now,signal}){
+async function meituanOfficialJobEvidence(locator,{fetcher,now,signal,full=false}){
  const jobUnionId=new URL(locator.url).searchParams.get('jobUnionId');
  // The public vacancy page makes this same read-only request. Its HTML
  // response is a JS shell, so the official duties are in the JSON response.
@@ -115,9 +115,9 @@ async function meituanOfficialJobEvidence(locator,{fetcher,now,signal}){
  if(!cities.length||!cities.every(city=>typeof city==='string'&&isMainlandJobLocation(city)))
   throw Error('OFFICIAL_JD_NOT_VERIFIED');
  return publicEmployerDetail(locator,{title:job.name,location:[...new Set(cities)].join('、'),
-  duties:job.jobDuty,requirements:job.jobRequirement,workYear:job.workYear},MEITUAN_DETAIL_SOURCE,now);
+  duties:job.jobDuty,requirements:job.jobRequirement,workYear:job.workYear},MEITUAN_DETAIL_SOURCE,now,full);
 }
-async function tencentOfficialJobEvidence(locator,{fetcher,now,signal}){
+async function tencentOfficialJobEvidence(locator,{fetcher,now,signal,full=false}){
  const postId=new URL(locator.url).searchParams.get('postId');
  const query=new URLSearchParams({timestamp:String(Date.now()),postId,language:'zh-cn'});
  const response=await fetcher('https://careers.tencent.com/tencentcareer/api/post/ByPostId?'+query,{
@@ -128,15 +128,15 @@ async function tencentOfficialJobEvidence(locator,{fetcher,now,signal}){
  const result=JSON.parse(await readLimited(response)),job=result?.Data;
  if(result?.Code!==200||job?.PostId!==postId)throw Error('OFFICIAL_JD_NOT_VERIFIED');
  return publicEmployerDetail(locator,{title:job.RecruitPostName,location:job.LocationName,
-  duties:job.Responsibility,requirements:job.Requirement,workYear:job.RequireWorkYearsName},TENCENT_DETAIL_SOURCE,now);
+  duties:job.Responsibility,requirements:job.Requirement,workYear:job.RequireWorkYearsName},TENCENT_DETAIL_SOURCE,now,full);
 }
-export async function directOfficialJobEvidence(url,{fetcher=fetch,now=new Date(),signal}={}){
+export async function directOfficialJobEvidence(url,{fetcher=fetch,now=new Date(),signal,full=false}={}){
  const locator=canon(url);
  if(!locator)throw Error('OFFICIAL_URL_NOT_SUPPORTED');
- const timeout=AbortSignal.timeout(12000);
- const mergedSignal=signal?AbortSignal.any([signal,timeout]):timeout;
+ const timeout=full?null:AbortSignal.timeout(12000);
+ const mergedSignal=timeout?(signal?AbortSignal.any([signal,timeout]):timeout):signal;
  if(locator.domain==='zhaopin.meituan.com')
-  return meituanOfficialJobEvidence(locator,{fetcher,now,signal:mergedSignal});
+  return meituanOfficialJobEvidence(locator,{fetcher,now,signal:mergedSignal,full});
  const response=await fetcher(locator.url,{
   method:'GET',redirect:'manual',cache:'no-store',signal:mergedSignal,
   headers:{Accept:'text/html,text/plain;q=0.9','User-Agent':'HHBA-JobEvidence/1.0'}
@@ -151,16 +151,16 @@ export async function directOfficialJobEvidence(url,{fetcher=fetch,now=new Date(
  const type=(response.headers.get('Content-Type')||'').toLowerCase();
  if(!type.includes('text/html')&&!type.includes('text/plain'))throw Error('OFFICIAL_PAGE_UNREADABLE');
  const raw=await readLimited(response);
- const plain=type.includes('text/html')?htmlToText(raw):raw;
+ const plain=type.includes('text/html')?htmlToText(raw,{maxChars:full?Infinity:100000}):raw;
  const item=extractOfficialJob({url:locator.url},{content:plain},now);
  // The Tencent detail page may only contain its rendering shell. The
  // employer's public API binds the returned content to the same exact ID.
- if(locator.domain==='careers.tencent.com'&&(!item||!extractOfficialJdSections(plain)))
-  return tencentOfficialJobEvidence(locator,{fetcher,now,signal:mergedSignal});
+ if(locator.domain==='careers.tencent.com'&&(!item||!extractOfficialJdSections(plain,{full})))
+  return tencentOfficialJobEvidence(locator,{fetcher,now,signal:mergedSignal,full});
  if(!item||item.official_url!==locator.url||item.company!==locator.company||
   item.source_status!=='OFFICIAL_DETAIL_FETCHED')throw Error('OFFICIAL_JD_NOT_VERIFIED');
  const requirements=item.evidence?.requirement;
- const fullJD=extractOfficialJdSections(plain);
+ const fullJD=extractOfficialJdSections(plain,{full});
  if(typeof requirements!=='string'||requirements.length<25)throw Error('OFFICIAL_JD_NOT_VERIFIED');
  const checked_at=new Date(now).toISOString();
  const id='verified-official-'+(await sha256Hex(locator.url)).slice(0,32);
