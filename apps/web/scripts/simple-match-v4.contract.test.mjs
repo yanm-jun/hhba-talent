@@ -437,3 +437,78 @@ test('streaming request rejection falls back to JSON without repeating completed
  assert.deepEqual(attempts,[true,false]);
  assert.equal(v4ParseJson(result).ok,true);
 });
+
+test('V4 changes search strategy after duplicate discoveries and finds further jobs',async()=>{
+ let rounds=0;const fresh={...row,url:'https://careers.further-employer.cn/vacancies/22'};
+ const result=await v4Match(async(u,options)=>{
+  if(!u.endsWith('/responses'))return new Response('unavailable',{status:403});
+  rounds++;
+  if(rounds===3)assert.ok(JSON.parse(options.body).input.includes('换搜索策略'));
+  return model({research_complete:rounds===3,jobs:rounds===3?[fresh]:[row]},[rounds===3?fresh.url:url]);
+ },provider,resume,'全国');
+ assert.equal(rounds,3);assert.equal(result.matches.length,2);
+});
+test('V4 recovers a temporary network failure before any job has been discovered',async()=>{
+ let attempts=0;
+ const result=await v4Match(async(u)=>{
+  if(!u.endsWith('/responses'))return new Response('unavailable',{status:403});
+  if(++attempts===1)throw Error('synthetic network failure');
+  return model({research_complete:true,jobs:[row]},[url]);
+ },provider,resume,'全国');
+ assert.equal(attempts,2);assert.equal(result.matches.length,1);
+});
+
+test('V4 encrypted R2 checkpoint removes growing research state from browser request',async()=>{
+ const {storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint}=await import('../functions/_lib/v4-match-checkpoint-storage.js');
+ const objects=new Map(),bucket={async put(k,v){objects.set(k,v.slice())},async get(k){const v=objects.get(k);return v?{arrayBuffer:async()=>v.buffer}:null},async delete(k){objects.delete(k)}};
+ const env={HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',HHBA_MATCH_V4_CHECKPOINT_SECRET:'synthetic-key-for-encrypted-test-only',HHBA_PRIVATE_RESUMES:bucket};
+ const state={rows:Array.from({length:500},(_,i)=>['https://jobs.co.cn/'+i,{reason:'测试研究资料'.repeat(200)}])};
+ const now=Date.now(),pointer=await storeMatchCheckpoint(env,state,now);
+ assert.ok(JSON.stringify(pointer).length<100);
+ assert.deepEqual(await loadMatchCheckpoint(env,pointer,now),state);
+ const bytes=[...objects.values()][0];
+ assert.ok(!new TextDecoder().decode(bytes).includes('测试研究资料'));
+ await assert.rejects(loadMatchCheckpoint(env,pointer,now+3600001),/AI_CHECKPOINT_EXPIRED/);
+ await assert.rejects(loadMatchCheckpoint({...env,HHBA_MATCH_V4_CHECKPOINT_SECRET:'another-synthetic-key-not-authorized'},pointer,now),/AI_CHECKPOINT_INVALID/);
+ await deleteMatchCheckpoint(env,pointer);
+ assert.equal(objects.size,0);
+});
+
+test('V4 retains a long original job title and employer name after a transient page error',async()=>{
+ const title='高级区域运营与渠道发展综合管理岗位'.repeat(10),company='跨区域综合产业发展企业集团'.repeat(12);
+ const html='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title,hiringOrganization:{name:company,url:'https://careers.other-motors.cn'},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责渠道运营与区域管理，完善门店运营业务流程并开展销售数据分析。</p><p>持续协调跨部门业务并提供管理支持。</p><p>任职要求</p><p>具有相关业务运营经验、沟通能力和项目管理经验。</p><p>具备独立分析和组织协调能力。</p>'})+'</script><h1>'+title+'</h1>';
+ let calls=0,secondSignal;
+ const jd=await v4ReadEmployerJob(url,{fetcher:async(u,options)=>{
+  calls++;if(calls===1)return new Response('temporary',{status:503});
+  secondSignal=options.signal;return new Response(html,{headers:{'content-type':'text/html'}});
+ }});
+ assert.equal(calls,2);assert.equal(secondSignal,undefined);
+ assert.equal(jd.title,title);assert.equal(jd.company,company);
+});
+test('V4 history retains all sources and complete long content',async()=>{
+ const {safeHistoryJobs,historyTextSegments}=await import('../functions/_lib/match-history.js');
+ const sources=Array.from({length:12},(_,i)=>({url:'https://careers.other-motors.cn/details/'+i,kind:'EMPLOYER_PAGE_CANDIDATE'}));
+ const long='公开岗位要求与评分依据'.repeat(30000);
+ const job={...row,id:'v4-history',v4_source:true,official_url:url,title:'原始岗位名称'.repeat(35),company:'原始企业名称'.repeat(35),score_basis:long,recommendation_reason:long,evidence_excerpt:long,requirements_basis:long,evidence_sources:sources};
+ const [saved]=safeHistoryJobs([job]);
+ assert.equal(saved.title,job.title);assert.equal(saved.company,job.company);assert.equal(saved.evidence_sources.length,12);
+ for(const field of ['score_basis','recommendation_reason','evidence_excerpt','requirements_basis'])assert.equal(saved[field],long);
+ const serialized=JSON.stringify([saved]),segments=historyTextSegments(serialized);
+ assert.ok(segments.length>1);assert.equal(segments.map(x=>JSON.parse(x)).join(''),serialized);
+});
+test('V4 interrupted task records are encrypted, isolated by owner and exact input, and recoverable',async()=>{
+ const {matchTaskKey,saveMatchTask,readMatchTask}=await import('../functions/_lib/v4-match-checkpoint-storage.js');
+ const objects=new Map(),bucket={async put(k,v){objects.set(k,v.slice())},async get(k){const v=objects.get(k);return v?{arrayBuffer:async()=>v.buffer}:null}};
+ const env={HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',HHBA_MATCH_V4_CHECKPOINT_SECRET:'synthetic-key-for-recovery-testing-only',HHBA_PRIVATE_RESUMES:bucket};
+ const id=crypto.randomUUID(),input={text:'synthetic resume',role:'全国'};
+ const a=await matchTaskKey(env,'candidate-a',id,input),b=await matchTaskKey(env,'candidate-b',id,input),c=await matchTaskKey(env,'candidate-a',id,{...input,role:'上海'});
+ assert.notEqual(a,b);assert.notEqual(a,c);
+ const now=Date.now(),checkpoint={checkpoint:{phase:'research',rows:[[url,{title:'公开研究状态'}]]}};
+ await saveMatchTask(env,a,checkpoint,now);
+ assert.deepEqual(await readMatchTask(env,a,now),checkpoint);
+ assert.equal(await readMatchTask(env,b,now),null);assert.equal(await readMatchTask(env,c,now),null);
+ assert.ok(!new TextDecoder().decode([...objects.values()][0]).includes('公开研究状态'));
+ await saveMatchTask(env,a,{result:{status:'COMPLETE',matches:[row]}},now);
+ assert.equal((await readMatchTask(env,a,now)).result.status,'COMPLETE');
+ assert.equal(await readMatchTask(env,a,now+23*3600000+1),null);
+});

@@ -32,8 +32,8 @@ function tag(html,name){
 }
 function pageTitle(html){
  for(const v of [tag(html,'h1'),meta(html,'property','og:title'),tag(html,'title')]){
-  const s=v.split(/\s+[|｜]\s+| - | — /)[0].trim();
-  if(s.length>=2&&s.length<=86&&!GENERIC.test(s))return s;
+  const s=v.trim();
+  if(s.length>=2&&!GENERIC.test(s))return s;
  }
  return '';
 }
@@ -102,10 +102,23 @@ async function limitedRead(r){
 export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()}={}){
  const canonical=v4PublicJobUrl(url);
  if(!canonical)throw Error('V4_UNSAFE_URL');
- const timeout=AbortSignal.timeout(45000);
- const r=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',
-  headers:{Accept:'text/html,text/plain;q=0.9'},signal:signal?AbortSignal.any([signal,timeout]):timeout});
- const html=await limitedRead(r),plain=htmlToText(html,{maxChars:Infinity});
+ // The first read uses a normal deadline; a slower or interrupted read
+ // gets a second attempt without a separate HHBA wall-clock deadline.
+ // Keep the public-HTTPS and response-size checks; never follow redirects blindly.
+ let html;
+ for(const retry of [false,true]){
+  if(signal?.aborted)throw signal.reason;
+  const timeout=retry?signal:signal?AbortSignal.any([signal,AbortSignal.timeout(45000)]):AbortSignal.timeout(45000);
+  try{
+   const r=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',
+    headers:{Accept:'text/html,text/plain;q=0.9'},...(timeout?{signal:timeout}:{})});
+   if([408,425,429,500,502,503,504].includes(r.status)){await r.body?.cancel().catch(()=>{});throw Error('V4_TRANSIENT_PAGE_ERROR');}
+   html=await limitedRead(r);break;
+  }catch(e){
+   if(signal?.aborted||retry||(!['AbortError','TimeoutError','TypeError'].includes(e?.name)&&e?.message!=='V4_TRANSIENT_PAGE_ERROR'))throw e;
+  }
+ }
+ const plain=htmlToText(html,{maxChars:Infinity});
  if(CLOSED.test(plain.slice(0,12000)))throw Error('V4_JOB_CLOSED');
  for(const j of postings(html)){
   const org=companyOf(j),title=trim(j.title);
@@ -118,7 +131,7 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
   const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
   if(!sections||requirements.length<18)continue;
   return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
-   canonical_url:canonical,company:org.name.slice(0,100),title:title.slice(0,86),
+   canonical_url:canonical,company:org.name,title,
    location:city,requirements,full_jd:sections.full_jd,
    checked_at:now.toISOString(),proof_method:'V4_STRUCTURED_JOBPOSTING',
    source_confirmed:!!org.url&&relatedDomains(canonical,org.url),independently_read:true,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
@@ -131,7 +144,7 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  if(!title||!company||GENERIC.test(company)||!city||!sections||requirements.length<18)
   throw Error('V4_JOB_DETAILS_NOT_VERIFIED');
  return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
-  canonical_url:canonical,company:company.slice(0,100),title,location:city,
+  canonical_url:canonical,company,title,location:city,
   requirements,full_jd:sections.full_jd,
   checked_at:now.toISOString(),proof_method:'V4_EMPLOYER_HTML_JOB',
   source_confirmed:false,independently_read:true,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};

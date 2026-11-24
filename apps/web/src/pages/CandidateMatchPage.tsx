@@ -436,7 +436,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 使用我的简历信息进行智能岗位匹配；并同意本次将脱敏后的简历文字发送至第三方 AI 中转服务，原文件不随之发送。</span>
+          <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 使用我的简历信息进行智能岗位匹配；并同意本次将脱敏后的简历文字发送至第三方 AI 中转服务，原文件不随之发送。为保障连续研究，服务可能短期加密保存研究中间状态与结果（不含原始简历文件），临时对象按24小时清理规则处理。若断网或关闭网页，可在23小时内用同一账号、相同简历及求职意向再次匹配，恢复最近保存的阶段。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}

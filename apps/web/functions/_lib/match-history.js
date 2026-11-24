@@ -4,7 +4,7 @@
 import {allowedEmployerJobLink} from './match-employer-source.js';
 import {v4PublicJobUrl} from './v4-open-job-evidence.js';
 
-const text=(v,n)=>typeof v==='string'?v.replace(/[\u0000-\u001f]/g,' ').trim().slice(0,n):'';
+const text=(v,n=Infinity)=>typeof v==='string'?v.replace(/[\u0000-\u001f]/g,' ').trim().slice(0,n):'';
 const score=v=>Number.isInteger(v)&&v>=0&&v<=100?v:null;
 const verifiedJdMeta=item=>{
  if(!/^jd_[a-f0-9]{32}$/.test(item?.jd_version_id||'')||
@@ -38,28 +38,30 @@ export function safeHistoryJobs(matches){
  const seen=new Set(),out=[];
  for(const item of matches){
   if(!item||!(item.v4_source===true?v4PublicJobUrl(item.official_url)===item.official_url:isValidUrl(item.official_url))||seen.has(item.official_url))continue;
-  const company=text(item.company,110),title=text(item.title_zh||item.title,125);
-  const location=text(item.location,80);
+  const v4=item.v4_source===true;
+  const company=text(item.company,v4?Infinity:110),title=text(item.title_zh||item.title,v4?Infinity:125);
+  const location=text(item.location,v4?Infinity:80);
   if(!company||!title||!location)continue;
   seen.add(item.official_url);
   out.push({id:text(item.id,75),company,title,location,
    ...(item.v4_source===true?{v4_source:true}:{}),
    official_url:item.official_url,match_score:score(item.match_score),
-   score_basis:text(item.score_basis,360),
-   recommendation_reason:text(Array.isArray(item.jd_comparisons)?
-    '按核验后的岗位 JD 和当时的简历证据完成比对。重新匹配可查看逐项证据。':item.recommendation_reason,850),
+   score_basis:text(item.score_basis,v4?Infinity:360),
+   recommendation_reason:text(!v4&&Array.isArray(item.jd_comparisons)?
+    '按核验后的岗位 JD 和当时的简历证据完成比对。重新匹配可查看逐项证据。':item.recommendation_reason,v4?Infinity:850),
    availability_status:['OPEN_LISTED','UNKNOWN'].includes(item.availability_status)?
     item.availability_status:'UNKNOWN',
    recruitment_source_kind:text(item.recruitment_source_kind,35),
-   recruitment_source_note:text(item.recruitment_source_note,130),
+   recruitment_source_note:text(item.recruitment_source_note,v4?Infinity:130),
    // Retain source provenance for later Word revisions; never persist raw CV.
    evidence_status:['VERIFIED_FULL_JD','PARTIAL_SOURCE','SEARCH_SNIPPET_ONLY','INSUFFICIENT_EVIDENCE']
     .includes(item.evidence_status)?item.evidence_status:null,
-   evidence_excerpt:text(item.evidence_excerpt,1400),
-   evidence_sources:(Array.isArray(item.evidence_sources)?item.evidence_sources:[])
-    .slice(0,4).filter(s=>s&&typeof s.url==='string'&&
-     /^(?:https:\/\/)/.test(s.url)&&s.url.length<=1300&&
-     ['EMPLOYER_PAGE_CANDIDATE','PUBLIC_ANNOUNCEMENT_CANDIDATE'].includes(s.kind))
+   evidence_excerpt:text(item.evidence_excerpt,v4?Infinity:1400),
+   ...(v4?{requirements_basis:text(item.requirements_basis),matched:(Array.isArray(item.matched)?item.matched:[]).filter(x=>typeof x==='string'),not_evidenced:(Array.isArray(item.not_evidenced)?item.not_evidenced:[]).filter(x=>typeof x==='string'),salary:typeof item.salary==='string'?item.salary:null}:{} ),
+   evidence_sources:(Array.isArray(item.evidence_sources)?(v4?item.evidence_sources:item.evidence_sources.slice(0,4)):[])
+    .filter(s=>s&&typeof s.url==='string'&&
+     (v4?!!v4PublicJobUrl(s.url):/^(?:https:\/\/)/.test(s.url)&&s.url.length<=1300)&&
+     (v4?['EMPLOYER_PAGE_CANDIDATE','PUBLIC_ANNOUNCEMENT_CANDIDATE','PUBLIC_SEARCH_CITATION','MODEL_REPORTED_SOURCE']:['EMPLOYER_PAGE_CANDIDATE','PUBLIC_ANNOUNCEMENT_CANDIDATE']).includes(s.kind))
     .map(s=>({url:s.url,kind:s.kind})),
    ...verifiedJdMeta(item)});
 
@@ -105,8 +107,20 @@ export function historySegments(jobs){
  if(items.length)segments.push(JSON.stringify(items));
  return segments;
 }
+// JSON-string chunks support even a single large item without truncation.
+// Use conservative character chunks: UTF-8 and JSON escaping stay below
+// the D1 row limit even for control characters or non-ASCII text.
+export function historyTextSegments(data){
+ const chunks=[];
+ for(let offset=0;offset<data.length;){
+  let end=Math.min(offset+65000,data.length);
+  if(end<data.length&&/[\uD800-\uDBFF]/.test(data[end-1]))end--;
+  chunks.push(JSON.stringify(data.slice(offset,end)));offset=end;
+ }
+ return chunks;
+}
 function segmentManifest(raw){
- try{const value=JSON.parse(raw);return value?.format==='HHBA_HISTORY_SEGMENTS_V1'&&Number.isSafeInteger(value.count)&&value.count>0?value:null;}catch{return null;}
+ try{const value=JSON.parse(raw);return ['HHBA_HISTORY_SEGMENTS_V1','HHBA_HISTORY_TEXT_SEGMENTS_V2'].includes(value?.format)&&Number.isSafeInteger(value.count)&&value.count>0?value:null;}catch{return null;}
 }
 async function expandHistoryRow(db,row){
  const manifest=segmentManifest(row.jobs_json);
@@ -114,6 +128,12 @@ async function expandHistoryRow(db,row){
  const result=await db.prepare('SELECT position,jobs_json FROM hhba_ai_match_history_segments WHERE history_id=? ORDER BY position').bind(row.id).all();
  const segments=result?.results||[];
  if(segments.length!==manifest.count||segments.some((part,i)=>part.position!==i))throw Error('MATCH_HISTORY_SEGMENTS_INCOMPLETE');
+ if(manifest.format==='HHBA_HISTORY_TEXT_SEGMENTS_V2'){
+  const data=segments.map(part=>JSON.parse(part.jobs_json));
+  if(data.some(v=>typeof v!=='string'))throw Error('MATCH_HISTORY_SEGMENTS_INCOMPLETE');
+  const raw=data.join('');if(!Array.isArray(JSON.parse(raw)))throw Error('MATCH_HISTORY_SEGMENTS_INCOMPLETE');
+  return {...row,jobs_json:raw};
+ }
  return {...row,jobs_json:JSON.stringify(segments.flatMap(part=>parsedJobs(part.jobs_json)))};
 }
 export async function saveMatchHistory(db,phone,resumeId,roleHint,modelMatches){
@@ -133,12 +153,12 @@ export async function saveMatchHistory(db,phone,resumeId,roleHint,modelMatches){
  const delta=compareOpportunitySets(previousRuns,jobs);
  const best=jobs.reduce((v,x)=>x.match_score===null?v:Math.max(v,x.match_score),-1);
  const data=JSON.stringify(jobs);
- const segments=new TextEncoder().encode(data).byteLength>1500000?historySegments(jobs):null;
- const payload=segments?JSON.stringify({format:'HHBA_HISTORY_SEGMENTS_V1',count:segments.length}):data;
+ const segments=new TextEncoder().encode(data).byteLength>1500000?historyTextSegments(data):null;
+ const payload=segments?JSON.stringify({format:'HHBA_HISTORY_TEXT_SEGMENTS_V2',count:segments.length}):data;
  const id=crypto.randomUUID(),created=new Date().toISOString();
  const statement=db.prepare('INSERT INTO hhba_ai_match_history(id,phone,resume_id,resume_label,role_hint,created_at,job_count,best_score,new_job_count,improved_job_count,jobs_json) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
   .bind(id,phone,resume?.id||null,resume?text(resume.filename,150):'本次上传的简历（未保存）',
-   text(roleHint,80),created,jobs.length,best<0?null:best,
+   text(roleHint,modelMatches.some(x=>x?.v4_source===true)?Infinity:80),created,jobs.length,best<0?null:best,
    delta.new_job_count,delta.improved_job_count,payload);
  const inserted=segments?(await db.batch([statement,...segments.map((value,i)=>db.prepare('INSERT INTO hhba_ai_match_history_segments(history_id,position,jobs_json) VALUES(?,?,?)').bind(id,i,value))]))[0]:await statement.run();
  if(inserted?.success!==true||Number(inserted?.meta?.changes)!==1)

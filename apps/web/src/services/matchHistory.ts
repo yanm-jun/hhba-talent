@@ -14,9 +14,10 @@ export type HistoryMatchedJob={
  jd_version_id?:string;jd_sha256?:string;jd_checked_at?:string;
  evidence_status?:'VERIFIED_FULL_JD'|'PARTIAL_SOURCE'|'SEARCH_SNIPPET_ONLY'|'INSUFFICIENT_EVIDENCE';
  evidence_excerpt?:string;
+ requirements_basis?:string;matched?:string[];not_evidenced?:string[];salary?:string|null;
  evidence_sources?:{url:string;kind:string}[];
  jd_source_status?:'VERIFIED_JD';jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'AI_VERIFIED_JD_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
- jd_proof_method?:'PUBLIC_EMPLOYER_ATS_V1'|'DIRECT_EMPLOYER_HTML_V1'|'V4_STRUCTURED_JOBPOSTING'|null;
+ jd_proof_method?:'PUBLIC_EMPLOYER_ATS_V1'|'DIRECT_EMPLOYER_HTML_V1'|'V4_STRUCTURED_JOBPOSTING'|'V4_EMPLOYER_HTML_JOB'|null;
 };
 export type MatchHistoryDetail=MatchHistorySummary&{matches:HistoryMatchedJob[]};
 const api='/api/match-history';
