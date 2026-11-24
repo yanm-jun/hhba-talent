@@ -87,6 +87,20 @@ export async function renderBrowserWord(bytes:Uint8Array,mount:HTMLElement){
  * Only unique editable leaf runs may be touched. Original run styling,
  * paragraph wrapping and the actual Word sheet layout remain authoritative.
  */
+// Server inspection advertises only uniquely editable, same-style paragraphs.
+// Match rendered direct leaf spans, not guessed text or a rebuilt paragraph.
+function browserParagraphRuns(mount:HTMLElement,allowed:Set<string>){
+ const groups:{text:string;paragraph:HTMLElement;spans:HTMLElement[]}[]=[];
+ for(const paragraph of mount.querySelectorAll<HTMLElement>('section.hhba-native-docx p')){
+  const spans=Array.from(paragraph.children||[]) as HTMLElement[];
+  if(spans.length<2||spans.some(s=>s.tagName!=='SPAN'||(s.querySelector('span')&&!s.hasAttribute('data-hhba-original-run'))))continue;
+  if(Array.from(paragraph.childNodes).some(n=>n.nodeType!==1&&Boolean(n.textContent)))continue;
+  if(spans.some(s=>Array.from(s.children).some(child=>!child.classList.contains('hhba-word-ai-changed'))))continue;
+  const text=spans.map(s=>s.getAttribute('data-hhba-original-run')??s.textContent??'').join('');
+  if(allowed.has(text))groups.push({text,paragraph,spans});
+ }
+ return groups;
+}
 export function paintBrowserWordSuggestions(
  mount:HTMLElement,editableText:string[],
  suggestions:readonly {original:string;proposed:string;state:'pending'|'accepted'}[]
@@ -107,6 +121,7 @@ export function paintBrowserWordSuggestions(
   if(!allowed.has(source))continue;
   grouped.set(source,[...(grouped.get(source)||[]),node]);
  }
+ const paragraphs=browserParagraphRuns(mount,allowed);
  const proposals=new Map<string,string[]>();
  for(const suggestion of suggestions){
   if(suggestion.state!=='pending'||!allowed.has(suggestion.original)||
@@ -115,9 +130,16 @@ export function paintBrowserWordSuggestions(
    suggestion.proposed]);
  }
  for(const [original,values] of proposals){
-  const nodes=grouped.get(original);
-  if(values.length!==1||nodes?.length!==1)continue;
-  const node=nodes[0],proposal=values[0];
+  const nodes=grouped.get(original)||[];
+  const joined=paragraphs.filter(group=>group.text===original);
+  if(values.length!==1||nodes.length+joined.length!==1)continue;
+  const group=joined[0];
+  const node=group?group.spans[0]:nodes[0],proposal=values[0];
+  if(group){
+   for(const span of group.spans.slice(1)){
+    span.setAttribute(attribute,span.textContent||'');span.replaceChildren();
+   }
+  }
   const before=Array.from(original),after=Array.from(proposal);
   let start=0,end=0;
   while(start<before.length&&start<after.length&&before[start]===after[start])start++;
@@ -129,7 +151,7 @@ export function paintBrowserWordSuggestions(
   const mark=document.createElement('span');
   mark.className='hhba-word-ai-changed hhba-resume-siri-letters';
   mark.textContent=changed||'\u200b';
-  node.setAttribute(attribute,original);
+  node.setAttribute(attribute,group?(node.textContent||''):original);
   node.classList.add('hhba-word-inline-suggestion');
   node.replaceChildren(document.createTextNode(prefix),mark,document.createTextNode(suffix));
  }
@@ -157,6 +179,9 @@ export function browserWordAnchors(mount:HTMLElement,editableText:string[]):Word
   const value=original??span.textContent??'';
   if(!safe.has(value))continue;
   const entries=found.get(value)||[];entries.push(span);found.set(value,entries);
+ }
+ for(const group of browserParagraphRuns(mount,safe)){
+  const entries=found.get(group.text)||[];entries.push(group.paragraph);found.set(group.text,entries);
  }
  const result:WordAnchor[]=[];
  for(const [text,elements] of found){
