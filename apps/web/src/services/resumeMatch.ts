@@ -32,7 +32,7 @@ export type MatchedJob = {
   evidence_sources?:{url:string;kind:string}[];
   evidence_score_status?:'AI_PARTIAL_SOURCE_SCORED'|'AI_DIRECTION_REFERENCE_SCORED';
   score_evidence_status?:'GROUNDED_JD_RESUME_QUOTES';
-  jd_proof_method?:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1';
+  jd_proof_method?:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1'|'V4_STRUCTURED_JOBPOSTING';
   jd_source_status?:'VERIFIED_JD';
   jd_employer_identity_status?:'ATS_TENANT_NOT_LEGAL_ENTITY_VERIFIED'|'DIRECT_EMPLOYER_SOURCE';
   jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'AI_VERIFIED_JD_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
@@ -462,7 +462,7 @@ export async function submitExtractedResumeText(
   if(signal?.aborted)throw signal.reason;
   try{
    const data=await submitMatchRound(text,{...opts,exclude_urls:[...previous,...collected.keys()]},consent,signal,resumeId,onProgress,publish,onActivity);
-   publish(data.matches);last=data;round++;delay=1000;
+   publish(data.matches);last={...data,profile:(data.profile.facts?.length||data.profile.skills.length||data.profile.target_roles.length||!last)?data.profile:last.profile};round++;delay=1000;
    onActivity?.({stage:'searching',message:'第 '+round+' 轮已完成，累计 '+collected.size+' 条岗位来源。',searches:round,candidate_links:collected.size});
    if(!data.research_pending)break;
   }catch(e){
@@ -486,7 +486,7 @@ export async function submitExtractedResumeText(
   while(cursor<queue.length){
    if(signal?.aborted)throw signal.reason;
    const job=queue[cursor++];
-   try{const verified=await prepareV4Job(job.official_url,signal);collected.set(job.official_url,{...job,...verified});}
+   try{const verified=await prepareV4Job(job.official_url,signal,job.title);collected.set(job.official_url,{...job,...verified});}
    catch(e){if(signal?.aborted)throw e;}
    checked++;onActivity?.({stage:'reading',message:'已检查 '+checked+' / '+queue.length+' 条岗位来源。',pages_read:checked});
    onPartial?.([...collected.values()]);
@@ -496,10 +496,10 @@ export async function submitExtractedResumeText(
  const matches=[...collected.values()].sort((a,b)=>(b.match_score??-1)-(a.match_score??-1));
  return {...last,matches,matched_official_jobs:matches.filter(j=>j.jd_source_status==='VERIFIED_JD').length,can_continue:true,research_pending:false};
 }
-export async function prepareV4Job(officialUrl:string,signal?:AbortSignal):Promise<Partial<MatchedJob>>{
+export async function prepareV4Job(officialUrl:string,signal?:AbortSignal,title?:string):Promise<Partial<MatchedJob>>{
  const response=await fetch('/api/match-v4/jd',{method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/json',Authorization:'Bearer '+session()},
-  body:JSON.stringify({consent:true,official_url:officialUrl})});
+  body:JSON.stringify({consent:true,official_url:officialUrl,title})});
  const data=await response.json().catch(()=>null);
  if(!response.ok||data?.ok!==true||!data.job?.jd_version_id||!data.job?.jd_sha256)
   throw new MatchError(response.status,'暂未取得可用于优化的可信 JD，请核对招聘原页面或稍后重试。');
