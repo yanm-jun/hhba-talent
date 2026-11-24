@@ -305,7 +305,7 @@ async function consumeNativeMatchStream(
      search_failures:number(value.search_failures),elapsed_ms:number(value.elapsed_ms)});
    }
   }else if(event==='partial'){
-   if(Array.isArray(value?.matches)&&value.matches.length<=10)
+   if(Array.isArray(value?.matches)&&(MATCH_V4_PREVIEW||value.matches.length<=10))
     onPartial?.(value.matches as MatchedJob[]);
   }else if(event==='failure'){
    const code=String(value?.error||'AI_PROVIDER_UNAVAILABLE');
@@ -401,10 +401,13 @@ export async function submitExtractedResumeText(
  const timeout=(message:string)=>watchdog.abort(new MatchError(504,message));
  // The server sends a heartbeat every 12 seconds, including during long AI calls.
  const onReceive=()=>{
+  // V4 research has no HHBA-imposed inactivity or overall deadline.
+  if(MATCH_V4_PREVIEW)return;
   clearTimeout(idleTimer);
   idleTimer=setTimeout(()=>timeout('一段时间没有收到匹配进度，已结束本次等待。可用当前简历重试。'),35000);
  };
- const deadline=setTimeout(()=>timeout('这次智能匹配用时过长，已结束本次等待。可用当前简历重试。'),300000);
+ const deadline=MATCH_V4_PREVIEW?undefined:setTimeout(()=>
+  timeout('这次智能匹配用时过长，已结束本次等待。可用当前简历重试。'),300000);
  onReceive();
  try{
   const response=await fetch(EFFECTIVE_API+'/resume',{
@@ -412,7 +415,9 @@ export async function submitExtractedResumeText(
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
    body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
     options:{country:'CN',remote_only:false,
-     role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10)),exclude_urls:opts.exclude_urls
+     role_hint:opts.role_hint,
+     ...(!MATCH_V4_PREVIEW?{limit:Math.min(10,Math.max(1,opts.limit||10))}:{}),
+     exclude_urls:opts.exclude_urls
     }})
   }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
    if((e as Error)?.name==='AbortError')throw e;
@@ -423,7 +428,8 @@ export async function submitExtractedResumeText(
   const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,onReceive):
    await response.json().catch(()=>({})) as Partial<MatchResponse>&{error?:string};
   if(!response.ok)throw new MatchError(response.status,errorMap[(data as {error?:string}).error||'']||'智能匹配服务暂时不可用。');
-  if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||data.matches.length>10)
+  if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||
+   (!MATCH_V4_PREVIEW&&data.matches.length>10))
    throw new MatchError(502,errorMap.BAD_RESPONSE);
   return data as MatchResponse;
  }catch(error){

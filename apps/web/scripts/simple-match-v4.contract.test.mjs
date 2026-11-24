@@ -148,3 +148,44 @@ test('V4 does not send a résumé if not authorized, cross-origin or unauthentic
  }),env});
  assert.equal(cross.status,403);
 });
+
+test('V4 lets the model continue across independent web-search rounds with no fixed round count',async()=>{
+ const makeLead=i=>({...row,company:'雇主'+i,
+  url:'https://careers.industry'+i+'.cn/roles/'+i});
+ let rounds=0;const partials=[],progress=[];
+ const fetcher=async(u)=>{
+  if(u.endsWith('/responses')){
+   rounds++;
+   const jobs=rounds===1?[makeLead(1)]:[makeLead(2),makeLead(3)];
+   return model({research_complete:rounds>=2,
+    profile:{roles:['区域渠道管理'],summary:'相关汽车渠道经验'},
+    jobs},jobs.map(x=>x.url));
+  }
+  return new Response('not readable',{status:403});
+ };
+ const result=await v4Match(fetcher,provider,resume,'全国',{
+  onPartial:jobs=>partials.push(jobs.length),onProgress:p=>progress.push(p)
+ });
+ assert.equal(rounds,2,'AI returned the explicit stop decision, not a numeric cap');
+ assert.deepEqual(partials,[1,3]);
+ assert.equal(result.matches.length,3);
+ assert.equal(result.native_search.searches,2);
+ assert.deepEqual(progress,['parsing','searching','reading','scoring']);
+});
+test('V4 has no per-model-call timeout and respects explicit cancellation',async()=>{
+ const controller=new AbortController();let options;
+ const fetcher=async(u,opts)=>{options=opts;return model({ok:true})};
+ await v4Call(fetcher,provider,{input:'test'},{signal:controller.signal});
+ assert.equal(options.signal,controller.signal);
+ const direct=async(u,opts)=>{options=opts;return model({ok:true})};
+ await v4Call(direct,provider,{input:'test'});
+ assert.equal(options.signal,undefined);
+});
+test('V4 frontend never rejects more than ten posts or cancels at the legacy five-minute deadline',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const service=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ assert.match(service,/MATCH_V4_PREVIEW\|\|value\.matches\.length<=10/);
+ assert.match(service,/!MATCH_V4_PREVIEW&&data\.matches\.length>10/);
+ assert.match(service,/MATCH_V4_PREVIEW\?undefined:setTimeout/);
+ assert.match(service,/!MATCH_V4_PREVIEW\?\{limit:/);
+});

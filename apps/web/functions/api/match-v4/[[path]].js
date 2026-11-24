@@ -49,7 +49,8 @@ function events(env,request,input){
    void (async()=>{
     try{
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
-      signal:request.signal,onProgress:progress,onActivity:activity});
+      signal:request.signal,onProgress:progress,onActivity:activity,
+      onPartial:matches=>send('partial',{matches})});
      console.info('HHBA_V4_MATCH',JSON.stringify({result:'COMPLETE',
       found:result.matches.length,official:result.matched_official_jobs,
       duration_ms:Date.now()-started}));
