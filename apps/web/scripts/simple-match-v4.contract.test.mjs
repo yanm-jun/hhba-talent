@@ -509,3 +509,19 @@ test('V4 AI can extract a plain HTML JD with independently corroborated company 
  const result=await prepareV4JobForOptimization(env,url,{expectedTitle:target,fetcher});
  assert.equal(result.jd_proof_method,'V4_MODEL_SOURCE_GROUNDED');assert.equal(result.requirements_basis,jd);
 });
+
+
+test('V4 context splitting retains every source character and all evidence categories',async()=>{
+ const {splitV4ContextText}=await import('../functions/_lib/simple-match-v4.js');
+ const raw='第一部分经历\n第二部分🎓荣誉\n第三部分技能';
+ const parts=splitV4ContextText(raw);assert.equal(parts.join(''),raw);assert.ok(parts.every(x=>x.length>0));
+ const cv='第一部分负责汽车渠道运营。\n第二部分获得传统工艺荣誉。';
+ let fullAttempts=0,segments=[];
+ const fetcher=async(_u,opts)=>{const p=JSON.parse(opts.body),input=JSON.parse(p.input);
+  if(p.tools){if(input.resume_representation==='complete_source'){fullAttempts++;return Response.json({error:{code:'context_length_exceeded'}},{status:400});}return model({research_complete:true,jobs:[row]},[url]);}
+  if(input.resume_segment===cv)return Response.json({error:{code:'context_length_exceeded'}},{status:400});
+  segments.push(input.resume_segment);return model({profile:{facts:[{kind:'自由分类',quote:input.resume_segment.trim()}],summary:input.resume_segment.trim(),roles:['运营']}});
+ };
+ const result=await v4Match(fetcher,provider,cv,'全国',{oneRound:true,skipEnrich:true});
+ assert.equal(fullAttempts,1);assert.equal(segments.join(''),cv);assert.equal(result.profile.facts.length,2);
+});
