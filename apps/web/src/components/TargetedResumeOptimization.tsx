@@ -483,7 +483,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   void generate();
  },[consent,generateAfterConsent]);
  function commitVersion(next:ResumeVersion){
-  setUndoStack(stack=>[...stack.slice(-19),version]);
+  setUndoStack(stack=>[...(MATCH_V4_PREVIEW?stack:stack.slice(-19)),version]);
   setVersion(next);setConfirmReal(false);
   if(!sourceResume)invalidateScore();
  }
