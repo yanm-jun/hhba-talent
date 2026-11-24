@@ -588,7 +588,7 @@ test('curated V4 stops at 500 concrete candidates, ranks by AI, backfills reject
   }
   const payload=JSON.parse(opts.body),input=JSON.parse(payload.input);
   if(payload.tools){searches++;return model({research_complete:false,jobs:[board,generic,jobs[0],duplicate,...jobs.slice(1)]},jobs.map(j=>j.url));}
-  if(payload.instructions.includes('职业画像')){parsed++;return model({profile:{summary:'渠道运营经历',roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}});}
+  if(payload.instructions.includes('职业画像')&&!payload.instructions.includes('ordered_ids')){parsed++;return model({profile:{summary:'渠道运营经历',roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}});}
   if(payload.instructions.includes('ordered_ids')){rankings++;assert.equal(input.candidates.length,500);assert.ok(input.candidates.every(j=>!j.url));return model({ordered_ids:input.candidates.map(j=>j.id).reverse()});}
   deep++;return model(input.job.title==='区域运营岗位499'?{suitable:false}:report);
  };
