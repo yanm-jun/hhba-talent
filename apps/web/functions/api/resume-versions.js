@@ -1,7 +1,7 @@
 // Account-owned job-targeted resume snapshots. Explicit save only; no raw PDF/DOCX storage.
 import {sessionOfBearer,getUserByPhone} from '../_lib/real-auth.js';
 const KIND='HHBA_TARGETED_RESUME_VERSIONS_V1';
-const MAX_BYTES=96*1024;
+const MAX_BYTES=2*1024*1024;
 const respond=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store',
  'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'
@@ -27,12 +27,12 @@ async function jsonBody(request){
  try{return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));}
  catch{throw Error('BAD_BODY');}
 }
-function validDraft(payload){
+function validDraft(payload,env){
  if(!payload||Array.isArray(payload)||typeof payload!=='object'||payload.confirmed_real!==true||
   !allowedText(payload.job_id,1,160)||!allowedText(payload.job_title,2,150)||
   !allowedText(payload.company,1,150)||!Array.isArray(payload.blocks)||
-  payload.blocks.length===0||payload.blocks.length>12||!Array.isArray(payload.accepted_ids)||
-  payload.accepted_ids.length>12)return false;
+  payload.blocks.length===0||(env?.HHBA_MATCH_V4_READY!=='1'&&payload.blocks.length>12)||!Array.isArray(payload.accepted_ids)||
+  (env?.HHBA_MATCH_V4_READY!=='1'&&payload.accepted_ids.length>12))return false;
  const ids=new Set();
  if(!payload.blocks.every(b=>{
   if(!b||!allowedText(b.id,1,64)||!/^[A-Za-z0-9_-]+$/.test(b.id)||
@@ -71,7 +71,7 @@ export async function onRequest({request,env}){
    if(!allowedText(job,1,160))return error('INVALID_JOB_ID',400);
    const rows=await db.prepare(
     'SELECT id,job_id,job_title,company,content_json,created_at FROM hhba_targeted_resume_versions '+
-    'WHERE phone=? AND job_id=? ORDER BY created_at DESC LIMIT 10'
+    'WHERE phone=? AND job_id=? ORDER BY created_at DESC'+(env?.HHBA_MATCH_V4_READY==='1'?'':' LIMIT 10')
    ).bind(session.phone,job).all();
    return respond({ok:true,kind:KIND,items:(rows.results||[]).map(r=>({
     id:r.id,job_id:r.job_id,job_title:r.job_title,company:r.company,
@@ -86,15 +86,16 @@ export async function onRequest({request,env}){
    return out?.meta?.changes===1?respond({ok:true,deleted:true}):error('VERSION_NOT_FOUND',404);
   }
   let payload;try{payload=await jsonBody(request);}catch{return error('INVALID_VERSION',400);}
-  if(!validDraft(payload))return error('INVALID_VERSION',400);
+  if(!validDraft(payload,env))return error('INVALID_VERSION',400);
   const version={blocks:payload.blocks,acceptedSuggestionIds:payload.accepted_ids,...(payload.details?{details:payload.details}:{})};
   const serialized=JSON.stringify(version);
-  if(serialized.length>24000)return error('VERSION_TOO_LARGE',400);
+  if(new TextEncoder().encode(serialized).byteLength>(env?.HHBA_MATCH_V4_READY==='1'?1500000:24000))return error('VERSION_TOO_LARGE',400);
   const id=crypto.randomUUID(),created=new Date().toISOString();
+  const unrestricted=env?.HHBA_MATCH_V4_READY==='1';
   const result=await db.prepare(
    'INSERT INTO hhba_targeted_resume_versions(id,phone,job_id,job_title,company,content_json,created_at) '+
-   'SELECT ?,?,?,?,?,?,? WHERE (SELECT COUNT(*) FROM hhba_targeted_resume_versions WHERE phone=?)<15'
-  ).bind(id,session.phone,payload.job_id,payload.job_title,payload.company,serialized,created,session.phone).run();
+   (unrestricted?'VALUES(?,?,?,?,?,?,?)':'SELECT ?,?,?,?,?,?,? WHERE (SELECT COUNT(*) FROM hhba_targeted_resume_versions WHERE phone=?)<15')
+  ).bind(id,session.phone,payload.job_id,payload.job_title,payload.company,serialized,created,...(unrestricted?[]:[session.phone])).run();
   if(result?.success!==true||result?.meta?.changes!==1)return error('VERSION_ACCOUNT_LIMIT',409);
   return respond({ok:true,kind:KIND,id,created_at:created},201);
  }catch{
