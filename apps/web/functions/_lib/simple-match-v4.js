@@ -239,7 +239,7 @@ function renderJob(x,url,verified,resume,toolLinked,index){
  * even if a later round or optional verification has an upstream failure.
  */
 export async function v4Match(fetcher,provider,resume,roleHint,
- {signal,excludeUrls=[],onProgress=()=>{},onActivity=()=>{},onPartial=()=>{}}={}){
+ {signal,excludeUrls=[],oneRound=false,skipEnrich=false,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{}}={}){
  const rows=new Map(),toolUrls=new Set(),excluded=new Set(excludeUrls.map(v4PublicJobUrl).filter(Boolean));
  let profile=v4GroundProfile({summary:'',roles:[]},resume);
  let researchComplete=false,round=0,researchError=null;
@@ -317,10 +317,11 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    ' 条可追溯来源；AI 正在判断是否需要继续搜索。');
   // Only an explicit model decision completes research; a missing flag does not.
   researchComplete=response.status==='completed'&&(data.research_complete===true||data.continue_search===false);
+  if(oneRound)break;
  }
  onProgress('reading');
  onActivity('reading','开始读取 '+rows.size+' 条公开岗位来源，核对可获取的 JD。');
- const {results,read}=await enrich(fetcher,rows,{signal,onActivity});
+ const {results,read}=skipEnrich?{results:new Map(),read:0}:await enrich(fetcher,rows,{signal,onActivity});
  onProgress('scoring');
  const matches=[...rows.entries()].map(([url,job],i)=>
   renderJob(job,url,results.get(url),resume,toolUrls.has(url),i));
@@ -334,5 +335,5 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   native_search:{mode:'V4_SIMPLE_AI',searches:round,candidate_links:rows.size,
    page_reads:read,visible_jobs:matches.length,research_error:researchError||undefined,
    jd_verification:{eligible:rows.size,verified,failed:rows.size-read}},
-  can_continue:true};
+  research_pending:!researchComplete,can_continue:true};
 }
