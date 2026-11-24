@@ -115,7 +115,8 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
   const city=postedLocation(j)||htmlLocation(plain),desc=htmlToText(trim(j.description));
   if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city||desc.length<90)continue;
   if(j.validThrough&&Number.isFinite(Date.parse(j.validThrough))&&Date.parse(j.validThrough)<now.getTime())continue;
-  if(!relatedDomains(canonical,org.url))continue;
+  // A multinational's official careers host may differ from its corporate website.
+  // Do not discard real JD content merely because the domains differ.
   const sections=extractOfficialJdSections(desc);
   const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
   if(!sections||requirements.length<18)continue;
