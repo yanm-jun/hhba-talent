@@ -2,7 +2,7 @@ import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEve
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,MapPin,Wallet,X,Sparkles,LoaderCircle} from 'lucide-react';
 import {CuratedJobReport} from './CuratedJobReport';
-import {MatchResearchPanels,matchStageIndex} from './MatchResearchPanels';
+import {MatchResearchPanels,ReportPager,matchStageIndex} from './MatchResearchPanels';
 import type {MatchResponse,MatchResearchReport,MatchedJob,NativeMatchActivity,NativeMatchProgress} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
@@ -275,7 +275,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       <p className="hhba-match-history-warning" role="status">本次岗位推荐已完成，但账户匹配历史暂未保存成功，请保留当前结果并稍后重试。</p>}
      {result.matches.length?
       <div className={'hhba-native-list'+(singleReport?' hhba-curated-list':'')}>
-       {singleReport&&<nav className="hhba-curated-nav" aria-label="岗位报告切换"><button type="button" disabled={currentIndex===0} onClick={()=>changeJob(currentIndex-1)}>‹ 上一个</button><strong>{String(currentIndex+1).padStart(2,'0')} / {result.matches.length}{pending?'（持续更新）':''}</strong><button type="button" disabled={currentIndex===result.matches.length-1} onClick={()=>changeJob(currentIndex+1)}>下一个 ›</button></nav>}
+        {singleReport&&<ReportPager count={result.matches.length} index={currentIndex} onChange={changeJob} pending={pending}/>}
        {result.matches.map((job,i)=>singleReport&&i!==currentIndex?null:(
         <article key={job.official_url} className={'hhba-native-job'+(singleReport?' hhba-curated-card':'')}
           onTouchStart={e=>{swipe.current={x:e.touches[0].clientX,y:e.touches[0].clientY}}}
@@ -338,7 +338,6 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
           data-hhba-recruitment-outbound="true">{job.research_detail&&job.source_type==='站外官方招聘'?'前往企业官网投递':job.jd_version_id&&job.jd_proof_method!=='V4_STRUCTURED_JOBPOSTING'&&job.jd_proof_method!=='V4_EMPLOYER_HTML_JOB'?'前往企业官网投递':job.platform==='第三方招聘线索'||job.recruitment_source_kind==='UNVERIFIED'?'查看招聘来源（待核验）':'查看企业招聘页面'} <ArrowUpRight size={15}/></a>
         </article>
        ))}
-       {singleReport&&<nav className="hhba-curated-nav hhba-curated-nav-bottom" aria-label="继续浏览岗位"><button type="button" disabled={currentIndex===0} onClick={()=>changeJob(currentIndex-1)}>‹ 上一个</button><span>左右滑动切换岗位 · {currentIndex+1}/{result.matches.length}</span><button type="button" disabled={currentIndex===result.matches.length-1} onClick={()=>changeJob(currentIndex+1)}>下一个 ›</button></nav>}
       </div>:
       !pending&&<div className="hhba-match-empty"><BriefcaseBusiness size={23}/>
        <h3>本轮暂未确认可推荐的具体岗位</h3>
