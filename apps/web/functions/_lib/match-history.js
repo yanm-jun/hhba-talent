@@ -107,8 +107,20 @@ export function historySegments(jobs){
  if(items.length)segments.push(JSON.stringify(items));
  return segments;
 }
+// JSON-string chunks support even a single large item without truncation.
+// Use conservative character chunks: UTF-8 and JSON escaping stay below
+// the D1 row limit even for control characters or non-ASCII text.
+export function historyTextSegments(data){
+ const chunks=[];
+ for(let offset=0;offset<data.length;){
+  let end=Math.min(offset+65000,data.length);
+  if(end<data.length&&/[\uD800-\uDBFF]/.test(data[end-1]))end--;
+  chunks.push(JSON.stringify(data.slice(offset,end)));offset=end;
+ }
+ return chunks;
+}
 function segmentManifest(raw){
- try{const value=JSON.parse(raw);return value?.format==='HHBA_HISTORY_SEGMENTS_V1'&&Number.isSafeInteger(value.count)&&value.count>0?value:null;}catch{return null;}
+ try{const value=JSON.parse(raw);return ['HHBA_HISTORY_SEGMENTS_V1','HHBA_HISTORY_TEXT_SEGMENTS_V2'].includes(value?.format)&&Number.isSafeInteger(value.count)&&value.count>0?value:null;}catch{return null;}
 }
 async function expandHistoryRow(db,row){
  const manifest=segmentManifest(row.jobs_json);
@@ -116,6 +128,12 @@ async function expandHistoryRow(db,row){
  const result=await db.prepare('SELECT position,jobs_json FROM hhba_ai_match_history_segments WHERE history_id=? ORDER BY position').bind(row.id).all();
  const segments=result?.results||[];
  if(segments.length!==manifest.count||segments.some((part,i)=>part.position!==i))throw Error('MATCH_HISTORY_SEGMENTS_INCOMPLETE');
+ if(manifest.format==='HHBA_HISTORY_TEXT_SEGMENTS_V2'){
+  const data=segments.map(part=>JSON.parse(part.jobs_json));
+  if(data.some(v=>typeof v!=='string'))throw Error('MATCH_HISTORY_SEGMENTS_INCOMPLETE');
+  const raw=data.join('');if(!Array.isArray(JSON.parse(raw)))throw Error('MATCH_HISTORY_SEGMENTS_INCOMPLETE');
+  return {...row,jobs_json:raw};
+ }
  return {...row,jobs_json:JSON.stringify(segments.flatMap(part=>parsedJobs(part.jobs_json)))};
 }
 export async function saveMatchHistory(db,phone,resumeId,roleHint,modelMatches){
@@ -135,8 +153,8 @@ export async function saveMatchHistory(db,phone,resumeId,roleHint,modelMatches){
  const delta=compareOpportunitySets(previousRuns,jobs);
  const best=jobs.reduce((v,x)=>x.match_score===null?v:Math.max(v,x.match_score),-1);
  const data=JSON.stringify(jobs);
- const segments=new TextEncoder().encode(data).byteLength>1500000?historySegments(jobs):null;
- const payload=segments?JSON.stringify({format:'HHBA_HISTORY_SEGMENTS_V1',count:segments.length}):data;
+ const segments=new TextEncoder().encode(data).byteLength>1500000?historyTextSegments(data):null;
+ const payload=segments?JSON.stringify({format:'HHBA_HISTORY_TEXT_SEGMENTS_V2',count:segments.length}):data;
  const id=crypto.randomUUID(),created=new Date().toISOString();
  const statement=db.prepare('INSERT INTO hhba_ai_match_history(id,phone,resume_id,resume_label,role_hint,created_at,job_count,best_score,new_job_count,improved_job_count,jobs_json) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
   .bind(id,phone,resume?.id||null,resume?text(resume.filename,150):'本次上传的简历（未保存）',
