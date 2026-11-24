@@ -274,3 +274,48 @@ test('no safe AI suggestions leaves successful-generation allowance unused',asyn
   assert.equal(h.attempts.length,1,'the provider call still counts toward attempts');
  }finally{globalThis.fetch=original;}
 });
+
+
+test('document continuation keeps zero-suggestion reviewed blocks across network failure',async()=>{
+ const {continueDocumentOptimization}=await import('../src/services/resumeOptimizationContinuation.mjs');
+ const seen=[],checkpoints=[],pauses=[];
+ const result=await continueDocumentOptimization({blockIds:['a','b','c'],request:async pending=>{
+  seen.push(pending);if(seen.length===1)return {suggestions:[],pending:['c']};
+  throw Error('NETWORK_ERROR');
+ },wait:async()=>{},onCheckpoint:value=>checkpoints.push(value),onPaused:error=>pauses.push(error.message)});
+ assert.deepEqual(result,[]);
+ assert.deepEqual(checkpoints.at(-1),{pending:['c'],suggestions:[]});
+ assert.deepEqual(pauses,['NETWORK_ERROR']);
+ const resumed=await continueDocumentOptimization({blockIds:['a','b','c'],wanted:checkpoints.at(-1).pending,
+  request:async pending=>{assert.deepEqual(pending,['c']);return {suggestions:[{blockId:'c'}],pending:[]}},
+  wait:async()=>{}});
+ assert.deepEqual(resumed,[{blockId:'c'}]);
+});
+
+test('successful AI edits survive provider failure; terminal pause avoids another paid request',async()=>{
+ const {continueDocumentOptimization}=await import('../src/services/resumeOptimizationContinuation.mjs');
+ const checkpoints=[],pauses=[];let calls=0;
+ const result=await continueDocumentOptimization({blockIds:['a','b'],request:async()=>{
+  calls++;return {suggestions:[{blockId:'a',proposed:'真实经历'}],pending:['b'],pauseError:Error('AI_PROVIDER_RATE_LIMITED')};
+ },wait:async()=>{},onCheckpoint:c=>checkpoints.push(c),onPaused:e=>pauses.push(e.message)});
+ assert.equal(calls,1);assert.equal(result.length,1);
+ assert.deepEqual(checkpoints.at(-1).pending,['b']);assert.deepEqual(pauses,['AI_PROVIDER_RATE_LIMITED']);
+});
+
+test('malformed continuation cannot silently mark unknown sections complete',async()=>{
+ const {continueDocumentOptimization}=await import('../src/services/resumeOptimizationContinuation.mjs');
+ const checkpoints=[];
+ await assert.rejects(continueDocumentOptimization({blockIds:['a','b'],
+  request:async()=>({suggestions:[],pending:['unrelated']}),wait:async()=>{},onCheckpoint:c=>checkpoints.push(c)}));
+ assert.deepEqual(checkpoints.at(-1).pending,['a','b']);
+});
+
+test('backend returns terminal pause and preserved successful document batches',async()=>{
+ const blocks=Array.from({length:13},(_,index)=>({id:'word-'+index,section:'experience',text:'真实经历 '+index}));
+ const result=await optimizeResumeDocument({env:{HHBA_MATCH_V4_READY:'1'},blocks,context:'完整简历',job:{requirements:'JD'},signal:new AbortController().signal},{
+  plan:async()=>({focus:[]}),
+  generate:async({blocks})=>{if(blocks.some(b=>b.id==='word-12'))throw Error('AI_PROVIDER_RATE_LIMITED');return {provider:'openai',suggestions:[]}},
+  audit:async({suggestions})=>suggestions
+ });
+ assert.deepEqual(result.pendingIds,['word-12']);assert.equal(result.pauseReason,'AI_PROVIDER_RATE_LIMITED');
+});
