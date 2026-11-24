@@ -100,6 +100,30 @@ async function limitedRead(r){
  for(const chunk of chunks){bytes.set(chunk,i);i+=chunk.length}
  return new TextDecoder().decode(bytes);
 }
+// An independently opened employer page may authorize a separate recruitment
+// host. Require the actual link and employer identity on the referring page,
+// never trust an ATS hostname or the model's assertion on its own.
+export async function v4EmployerAuthorization(jobUrl,company,proofUrl,{fetcher=fetch,signal}={}){
+ const proof=v4PublicJobUrl(proofUrl),target=v4PublicJobUrl(jobUrl);
+ if(!proof||!target||proof===target||isCommercialRecruitmentBoard(proof)||isCommercialRecruitmentBoard(target)||!company)return false;
+ try{
+  const r=await fetcher(proof,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,text/plain;q=0.9'},signal});
+  const html=await limitedRead(r);
+  const site=meta(html,'property','og:site_name')||meta(html,'name','application-name');
+  if(isCommercialRecruitmentBoard(proof,{site_name:site}))return false;
+  const normalize=v=>String(v||'').normalize('NFKC').replace(/[^\p{L}\p{N}]/gu,'').toLowerCase();
+  const identity=normalize(company);
+  // Page-level corporate identity, not an incidental company name in a job list.
+  const labels=[site,meta(html,'name','author'),tag(html,'title')].map(normalize);
+  if(identity.length<2||!labels.some(v=>v.includes(identity)))return false;
+  for(const a of html.matchAll(/<a\b[^>]*\bhref\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>/gi)){
+   const href=(a[1]||a[2]).replace(/&amp;/gi,'&');
+   let resolved;try{resolved=v4PublicJobUrl(new URL(href,proof).href)}catch{continue}
+   if(resolved===target)return true;
+  }
+  return false;
+ }catch(e){if(signal?.aborted)throw e;return false;}
+}
 export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()}={}){
  const canonical=v4PublicJobUrl(url);
  if(!canonical)throw Error('V4_UNSAFE_URL');
