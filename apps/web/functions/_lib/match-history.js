@@ -93,6 +93,29 @@ export const summary=row=>({
  new_job_count:Number(row.new_job_count||0),
  improved_job_count:Number(row.improved_job_count||0)
 });
+const SEGMENT_BYTES=500000;
+export function historySegments(jobs){
+ const encoder=new TextEncoder(),segments=[];let items=[],size=2;
+ for(const job of jobs){
+  const bytes=encoder.encode(JSON.stringify(job)).byteLength+(items.length?1:0);
+  if(bytes>SEGMENT_BYTES-2)throw Error('MATCH_HISTORY_ITEM_TOO_LARGE');
+  if(items.length&&size+bytes>SEGMENT_BYTES){segments.push(JSON.stringify(items));items=[];size=2;}
+  items.push(job);size+=encoder.encode(JSON.stringify(job)).byteLength+(items.length>1?1:0);
+ }
+ if(items.length)segments.push(JSON.stringify(items));
+ return segments;
+}
+function segmentManifest(raw){
+ try{const value=JSON.parse(raw);return value?.format==='HHBA_HISTORY_SEGMENTS_V1'&&Number.isSafeInteger(value.count)&&value.count>0?value:null;}catch{return null;}
+}
+async function expandHistoryRow(db,row){
+ const manifest=segmentManifest(row.jobs_json);
+ if(!manifest)return row;
+ const result=await db.prepare('SELECT position,jobs_json FROM hhba_ai_match_history_segments WHERE history_id=? ORDER BY position').bind(row.id).all();
+ const segments=result?.results||[];
+ if(segments.length!==manifest.count||segments.some((part,i)=>part.position!==i))throw Error('MATCH_HISTORY_SEGMENTS_INCOMPLETE');
+ return {...row,jobs_json:JSON.stringify(segments.flatMap(part=>parsedJobs(part.jobs_json)))};
+}
 export async function saveMatchHistory(db,phone,resumeId,roleHint,modelMatches){
  if(!db||typeof db.prepare!=='function')throw Error('MATCH_HISTORY_DB_UNAVAILABLE');
  let resume=null;
@@ -104,18 +127,20 @@ export async function saveMatchHistory(db,phone,resumeId,roleHint,modelMatches){
  }
  const jobs=safeHistoryJobs(modelMatches);
  if(!jobs.length)return null;
- const previous=await db.prepare('SELECT jobs_json FROM hhba_ai_match_history WHERE phone=? ORDER BY created_at DESC LIMIT ?')
+ const previous=await db.prepare('SELECT id,jobs_json FROM hhba_ai_match_history WHERE phone=? ORDER BY created_at DESC LIMIT ?')
   .bind(phone,maxHistory).all();
- const delta=compareOpportunitySets(previous?.results||[],jobs);
+ const previousRuns=await Promise.all((previous?.results||[]).map(row=>expandHistoryRow(db,row)));
+ const delta=compareOpportunitySets(previousRuns,jobs);
  const best=jobs.reduce((v,x)=>x.match_score===null?v:Math.max(v,x.match_score),-1);
  const data=JSON.stringify(jobs);
- // D1 row size is a platform constraint, never discard individual jobs.
- if(new TextEncoder().encode(data).byteLength>1500000)throw Error('MATCH_HISTORY_STORAGE_TOO_LARGE');
+ const segments=new TextEncoder().encode(data).byteLength>1500000?historySegments(jobs):null;
+ const payload=segments?JSON.stringify({format:'HHBA_HISTORY_SEGMENTS_V1',count:segments.length}):data;
  const id=crypto.randomUUID(),created=new Date().toISOString();
- const inserted=await db.prepare('INSERT INTO hhba_ai_match_history(id,phone,resume_id,resume_label,role_hint,created_at,job_count,best_score,new_job_count,improved_job_count,jobs_json) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
+ const statement=db.prepare('INSERT INTO hhba_ai_match_history(id,phone,resume_id,resume_label,role_hint,created_at,job_count,best_score,new_job_count,improved_job_count,jobs_json) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
   .bind(id,phone,resume?.id||null,resume?text(resume.filename,150):'本次上传的简历（未保存）',
    text(roleHint,80),created,jobs.length,best<0?null:best,
-   delta.new_job_count,delta.improved_job_count,data).run();
+   delta.new_job_count,delta.improved_job_count,payload);
+ const inserted=segments?(await db.batch([statement,...segments.map((value,i)=>db.prepare('INSERT INTO hhba_ai_match_history_segments(history_id,position,jobs_json) VALUES(?,?,?)').bind(id,i,value))]))[0]:await statement.run();
  if(inserted?.success!==true||Number(inserted?.meta?.changes)!==1)
   throw Error('MATCH_HISTORY_WRITE_FAILED');
  return {id,...delta};
@@ -136,7 +161,7 @@ export async function getMatchHistory(db,phone,id){
    .bind(phone,resumeId).first();
   if(!stillOwned)resumeId=null; // Deleted private resume does not invalidate the historic job list.
  }
- return {...summary(row),resume_id:resumeId,matches:safeHistoryJobs(parsedJobs(row.jobs_json))};
+ return {...summary(row),resume_id:resumeId,matches:safeHistoryJobs(parsedJobs((await expandHistoryRow(db,row)).jobs_json))};
 }
 export async function deleteMatchHistory(db,phone,id){
  if(!rowId.test(id))return false;
