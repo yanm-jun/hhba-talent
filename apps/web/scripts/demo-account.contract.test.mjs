@@ -35,7 +35,7 @@ test('original workbench has real account profile, isolated favorites and transp
  assert.match(account,/saveCandidateWorkspacePreferences\(/);
  assert.match(saved,/HHBA_ACCOUNT_SAVED_JOBS_V1/);
  assert.match(account,/hasVisited\('applications'\).*<CandidateMatchHistory active=\{current==='applications'\}\/>/);
- assert.match(account,/匹配历史/);
+ assert.match(account,/历史查找/);
  assert.doesNotMatch(account,/真实投递接口尚未接通/);
  assert.match(account,/hasVisited\('resume'\).*<PrivateResumeVault active=\{current==='resume'\}\/>/);
  const vault=source('components/PrivateResumeVault.tsx');

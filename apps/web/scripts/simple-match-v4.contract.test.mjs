@@ -588,7 +588,7 @@ test('curated V4 retains all candidates beyond the 500 target and scores before 
   }
   const payload=JSON.parse(opts.body),input=JSON.parse(payload.input);
   if(payload.instructions.includes('公开招聘来源研究员'))return model({sources:[],research_complete:true,completion_reason:'无其他可靠来源'});
-  if(payload.instructions.includes('专业求职研究 AI')){searches++;return model({research_complete:true,completion_reason:'已充分覆盖',jobs:[board,generic,jobs[0],duplicate,...jobs.slice(1)]},jobs.map(j=>j.url));}
+  if(payload.instructions.includes('专业求职研究 AI')){searches++;const inspected=input.unclassified_public_sources?.includes(generic.url);return model({research_complete:true,completion_reason:'已充分覆盖',jobs:[board,generic,jobs[0],duplicate,...jobs.slice(1)],reviewed_sources:inspected?[{url:generic.url,status:'official_entry',reason:'企业招聘入口，不是具体岗位'}]:[]},[...jobs.map(j=>j.url),...(inspected?[generic.url]:[])]);}
   if(payload.instructions.includes('自主整理个人职业画像')){parsed++;return model({profile:{summary:'渠道运营经历',roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}});}
   const id=Number(input.job.title.replace('区域运营岗位',''));
   const score=id===498?99:id===497?98:70;
@@ -601,7 +601,7 @@ test('curated V4 retains all candidates beyond the 500 target and scores before 
  };
  const result=await v4Match(fetcher,provider,resume,'全国',{officialOnly:true,curated:true});
  assert.equal(parsed,1);assert.equal(searches,2);
- assert.equal(result.research_report.discovered,502);assert.equal(result.matches.length,50);
+ assert.equal(result.research_report.discovered,502);assert.equal(result.research_report.unresolved_source_count,0);assert.equal(result.matches.length,50);
  assert.equal(readIds.size,502);assert.equal(scoreIds.size,501);assert.equal(deep,51);
  assert.equal(reportIds[0],498);assert.equal(reportIds[1],497);
  assert.equal(result.native_search.jd_verification.scored,501);
