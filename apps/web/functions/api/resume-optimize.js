@@ -175,7 +175,7 @@ export async function onRequestPost({request,env}){
    catch{console.warn('HHBA_RESUME_OPT_EMPTY_REFUND_FAILED');}
   }
   return send({ok:true,kind:'HHBA_RESUME_OPTIMIZATION_V1',provider:result.provider,suggestions,
-   ...(whole?{pending_block_ids:whole.pendingIds}:{}),
+   ...(whole?{pending_block_ids:whole.pendingIds,...(whole.pauseReason?{pause_reason:whole.pauseReason}:{})}:{}),
    jd_version_id:trustedJob.jd_version_id||null,jd_source_status:trustedJob.source_status,
    disclaimer:'建议仅用于优化表达，用户须逐条核实；不会修改原始简历或自动提高岗位匹配分。'});
  }catch(error){
