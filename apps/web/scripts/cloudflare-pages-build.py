@@ -39,6 +39,12 @@ def main() -> None:
     wf = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
     steps = wf["jobs"]["build"]["steps"]
 
+    # V3 only: server-side synthetic relay capability check during Pages
+    # preview build. Never run on main/production or use a candidate resume.
+    # A failed capability is recorded in build logs; it must not publish V3.
+    if os.environ.get("CF_PAGES_BRANCH") == "feat/hhba-agent-v3-relay-20261124":
+        run(["node", "scripts/agent-v3-relay-live-smoke.mjs"], cwd=WEB)
+
     # This integration must preserve the currently deployed matching popup,
     # score evidence, and PDF/DOCX upload flow. Fail before media generation
     # or deploy if either the UI or the job-isolated Word service regresses.
