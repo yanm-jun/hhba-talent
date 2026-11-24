@@ -446,3 +446,28 @@ test('V4 uses its own R2 archive without legacy D1, fixed city lists or mandator
  assert.equal(trusted.requirements,description);
  assert.equal(trusted.source_status,'VERIFIED_OFFICIAL_JD');
 });
+
+
+test('V4 keeps distinct same-paragraph alternatives and independently rejects unsupported drafts',async()=>{
+ const {parseSuggestions}=await import('../functions/_lib/resume-ai-provider.js');
+ const {auditTargetedResumeSuggestions}=await import('../functions/_lib/resume-rewrite-provider.js');
+ const original='负责销售人员培训与渠道运营。';
+ const suggestions=parseSuggestions({suggestions:[
+  {id:'same',blockId:'b1',action:'replace',original,proposed:'负责渠道运营及销售团队培训。',rationale:'强调渠道',jobRequirement:'渠道运营'},
+  {id:'same',blockId:'b1',action:'replace',original,proposed:'主管全国渠道运营及销售培训。',rationale:'不实测试',jobRequirement:'渠道运营'}
+ ]},['b1'],{unbounded:true});
+ assert.equal(suggestions.length,2);
+ assert.notEqual(suggestions[0].id,suggestions[1].id);
+ const old=globalThis.fetch;
+ globalThis.fetch=async(_url,opts)=>{
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  assert.equal(input.blocks.length,2);
+  assert.notEqual(input.blocks[0].blockId,input.blocks[1].blockId);
+  return model({checks:input.blocks.map(b=>({blockId:b.blockId,safe:!b.proposed.includes('全国'),concern:''}))});
+ };
+ try{
+  const reviewed=await auditTargetedResumeSuggestions({env:{HHBA_MATCH_V4_READY:'1',HHBA_AGENT_RELAY_API_KEY:key},blocks:[{id:'b1',section:'experience',text:original}],job:{title:'运营',requirements:'渠道运营'},suggestions});
+  assert.equal(reviewed.length,1);
+  assert.equal(reviewed[0].id,suggestions[0].id);
+ }finally{globalThis.fetch=old}
+});
