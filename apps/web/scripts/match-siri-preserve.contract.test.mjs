@@ -27,7 +27,7 @@ test('the simpler result cards preserve the original Word editor and the selecte
  assert.match(dialog,/const matchListScroll=useRef\(0\)/);
  assert.match(dialog,/viewport\.scrollTop=optimizedJobUrl\?0:matchListScroll\.current/);
  assert.match(dialog,/if\(optimizedJobUrl\)\{backToMatches\(\);return\}/);
- assert.match(dialog,/\{optimizedJobUrl\?'返回匹配结果':pending\?'取消搜索':'完成查看'\}/);
+ assert.match(dialog,/\{optimizedJobUrl\?'返回匹配结果':pending\?'收起或取消':'完成查看'\}/);
  assert.match(dialog,/stageTitle\[progressStage\]/);
  assert.match(dialog,/!pending&&activeJob&&parsedProfile/);
  assert.doesNotMatch(dialog,/<CandidateJourneySteps/);
