@@ -274,14 +274,16 @@ export type NativeMatchActivity={
  candidate_links?:number;rejected_links?:number;pages_read?:number;decisions?:number;
  search_failures?:number;elapsed_ms?:number
 };
+type MatchContinuation={status:'CONTINUE';continuation:{state:unknown;token:string}};
+type MatchStreamResponse=MatchResponse|MatchContinuation;
 async function consumeNativeMatchStream(
  response:Response,onProgress?:(stage:NativeMatchProgress)=>void,
  onPartial?:(jobs:MatchedJob[])=>void,
  onActivity?:(activity:NativeMatchActivity)=>void,onReceive?:()=>void
-):Promise<MatchResponse>{
+):Promise<MatchStreamResponse>{
  if(!response.body)throw new MatchError(502,'智能匹配连接没有返回可读取的结果。');
  const decoder=new TextDecoder(),reader=response.body.getReader();
- let buffer='',complete:MatchResponse|null=null;
+ let buffer='',complete:MatchStreamResponse|null=null;
  let partialJobs:MatchedJob[]=[],finalJobs:MatchedJob[]=[];
  function parseEvent(chunk:string){
   const event=chunk.split('\n').find(line=>line.startsWith('event:'))?.slice(6).trim();
@@ -333,7 +335,7 @@ async function consumeNativeMatchStream(
    if(value?.matches_streamed===true){
      if(finalJobs.length!==value.match_count)throw new MatchError(502,'岗位结果传输不完整，可重试。');
      complete={...value,matches:finalJobs} as MatchResponse;
-    }else complete=value as MatchResponse;
+    }else complete=value as MatchStreamResponse;
   }
  }
  try{
@@ -396,7 +398,7 @@ export async function runMatchPreviewSyntheticAcceptance(
  if(!(response.headers.get('content-type')||'').includes('text/event-stream'))
   throw new MatchError(502,'验收服务未返回流式岗位搜索进度。');
  const result=await consumeNativeMatchStream(response,onProgress,undefined,onActivity);
- if(result.preview_synthetic!==true)
+ if(result.status!=='COMPLETE'||result.preview_synthetic!==true)
   throw new MatchError(502,'验收响应缺少合成简历标识，已停止展示结果。');
  return result;
 }
@@ -425,7 +427,10 @@ export async function submitExtractedResumeText(
  const deadline=MATCH_V4_PREVIEW?undefined:setTimeout(()=>
   timeout('这次智能匹配用时过长，已结束本次等待。可用当前简历重试。'),300000);
  onReceive();
+ let continuation:MatchContinuation['continuation']|undefined;
  try{
+  for(;;){
+  if(requestSignal.aborted)throw requestSignal.reason;
   const response=await fetch(EFFECTIVE_API+'/resume',{
    method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
@@ -434,7 +439,7 @@ export async function submitExtractedResumeText(
      role_hint:opts.role_hint,
      ...(!MATCH_V4_PREVIEW?{limit:Math.min(10,Math.max(1,opts.limit||10))}:{}),
      exclude_urls:opts.exclude_urls
-    }})
+    },...(continuation?{continuation}:{})})
   }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
    if((e as Error)?.name==='AbortError')throw e;
    throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
@@ -442,12 +447,18 @@ export async function submitExtractedResumeText(
   const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
   if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。');
   const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,onReceive):
-   await response.json().catch(()=>({})) as Partial<MatchResponse>&{error?:string};
+   await response.json().catch(()=>({})) as (Partial<MatchResponse>|MatchContinuation)&{error?:string};
   if(!response.ok)throw new MatchError(response.status,errorMap[(data as {error?:string}).error||'']||'智能匹配服务暂时不可用。');
+  if(data.status==='CONTINUE'){
+   if(!MATCH_V4_PREVIEW||!data.continuation||typeof data.continuation.token!=='string'||!data.continuation.state)throw new MatchError(502,'AI 续接状态异常。');
+   continuation=data.continuation;
+   continue;
+  }
   if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||
    (!MATCH_V4_PREVIEW&&data.matches.length>10))
    throw new MatchError(502,errorMap.BAD_RESPONSE);
   return data as MatchResponse;
+  }
  }catch(error){
   if(requestSignal.aborted)throw requestSignal.reason;
   throw error;
