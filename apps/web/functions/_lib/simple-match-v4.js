@@ -152,8 +152,10 @@ export function v4GroundScores(raw,jobs,resume){
   const s=scored.get(j.canonical_url)||{},a=clip(s.resume_quote,220),b=clip(s.jd_quote,220);
   const quoted=a.length>=4&&b.length>=4&&norm(resume).includes(norm(a))&&norm(j.full_jd).includes(norm(b));
   const n=Number(s.score),score=quoted&&Number.isInteger(n)&&n>=0&&n<=100?n:null;
+  const officialConfirmed=j.source_confirmed===true||String(j.proof_method||'').startsWith('DIRECT_EMPLOYER');
   return {id:j.id||'v4-'+i,company:j.company,title:j.title,title_zh:j.title,
-   location:j.location,official_url:j.canonical_url,platform:'企业官方招聘',
+   location:j.location,official_url:j.canonical_url,
+   platform:officialConfirmed?'企业官方招聘':'招聘详情（官网归属待核实）',
    source:new URL(j.canonical_url).hostname,remote:false,
    reference_score:score??0,match_score:score,
    matched:quoted?list(s.matched,5):[],not_evidenced:quoted?list(s.gaps,5):[],
