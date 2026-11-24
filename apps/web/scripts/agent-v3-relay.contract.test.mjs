@@ -24,7 +24,8 @@ test('explicit relay isolation never falls back to official OpenAI production se
  assert.equal(resolveAgentProvider({...config,HHBA_AGENT_BASE_URL:'http://api-c.reqtoken.com/v1'}),null);
  assert.equal(resolveAgentProvider({...config,HHBA_AGENT_ACTOR_AUTH:'bad\nHeader'}),null);
  assert.equal(resolveAgentProvider({...config,HHBA_AGENT_PROVIDER:'openai',
-  HHBA_AGENT_BASE_URL:'https://api.openai.com/v1',HHBA_AGENT_OPENAI_API_KEY:token}).name,'openai');
+  HHBA_AGENT_BASE_URL:'https://api.openai.com/v1',HHBA_AGENT_OPENAI_API_KEY:token,
+  HHBA_AGENT_ACTOR_AUTH:''}).name,'openai');
 });
 test('relay uses Responses only and forces store false; credentials stay server side',async()=>{
  const p=resolveAgentProvider(config);
