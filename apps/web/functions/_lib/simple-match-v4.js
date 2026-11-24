@@ -10,7 +10,7 @@ import {directOfficialJobEvidence} from './official-job-evidence.js';
 const BASE='https://api-c.reqtoken.com/v1';
 const MODEL='gpt-6.2-sol';
 const fault=code=>Object.assign(new Error(code),{code});
-const text=(v,n=1200)=>typeof v==='string'?v.trim().slice(0,n):'';
+const text=(v)=>typeof v==='string'?v.trim():'';
 const texts=v=>Array.isArray(v)?v.filter(x=>typeof x==='string').map(s=>text(s,360)).filter(Boolean):[];
 const norm=v=>String(v||'').replace(/\s+/g,' ').trim();
 
@@ -272,7 +272,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     input:JSON.stringify({resume_text:resume,preferred_job_or_city:roleHint,
      country:'中国大陆',previously_discovered_jobs:[...rows.entries()].map(([url,j])=>({
       url,title:j.title||j.role||null,company:j.company||null})),
-     research_round:round}),
+     research_round:round,request:'请明确返回 research_complete 布尔值；缺少该字段不会结束研究。'}),
     tools:[{type:'web_search'}],tool_choice:'required',
     include:['web_search_call.action.sources']
    },{signal});
@@ -312,10 +312,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    renderJob(job,url,null,resume,toolUrls.has(url),i)));
   onActivity('searching','第 '+round+' 轮研究已完成，累计取得 '+rows.size+
    ' 条可追溯来源；AI 正在判断是否需要继续搜索。');
-  // Older compatible relay outputs may not contain the new boolean.
-  // No numeric round/position threshold controls completion.
-  researchComplete=data.research_complete===true||
-   (data.research_complete!==false&&data.continue_search!==true);
+  // Only an explicit model decision completes research; a missing flag does not.
+  researchComplete=data.research_complete===true||data.continue_search===false;
  }
  onProgress('reading');
  onActivity('reading','开始读取 '+rows.size+' 条公开岗位来源，核对可获取的 JD。');
