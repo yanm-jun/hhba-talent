@@ -201,21 +201,22 @@ export async function runMatchPreviewProviderCheck(signal?:AbortSignal):Promise<
 }
 /** Best-effort browser redaction before submitting text to HHBA's server. */
 export function redactResumeTextLocally(text:string):string{
- return text
+ const redacted=text
   .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,'[邮箱已隐藏]')
   .replace(/(?<!\d)1[3-9]\d{9}(?!\d)/g,'[手机号已隐藏]')
   .replace(/(?<![0-9A-Za-z])\d{17}[0-9Xx](?![0-9A-Za-z])/g,'[身份证号已隐藏]')
   .replace(/\bhttps?:\/\/[^\s<>]{3,200}/gi,'[个人网址已隐藏]')
   .replace(/(?:微信号|微信|QQ号|QQ)\s*[:：]\s*[A-Za-z0-9_-]{5,32}/gi,'[即时通讯账号已隐藏]')
-  .trim().slice(0,20000);
+  .trim();
+ return MATCH_V4_PREVIEW?redacted:redacted.slice(0,20000);
 }
 export function resumeFileFormat(name:string){
  return /\.(pdf|docx)$/i.exec(name)?.[1].toLowerCase()??null;
 }
 export async function inspectResumeTextLocally(file:File,signal?:AbortSignal):Promise<{text:string;needsOcr:boolean}>{
  const format=resumeFileFormat(file.name);
- if(!format||file.size<30||file.size>LIMIT)
-  throw new MatchError(413,'请选择 3 MB 以内的 Word（DOCX）或 PDF 简历。');
+ if(!format||file.size<30||(!MATCH_V4_PREVIEW&&file.size>LIMIT))
+  throw new MatchError(413,MATCH_V4_PREVIEW?'请选择有效的 Word（DOCX）或 PDF 简历。':'请选择 3 MB 以内的 Word（DOCX）或 PDF 简历。');
  try{
   const buffer=await file.arrayBuffer();
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
@@ -252,7 +253,7 @@ const ocrErrors:Record<string,string>={
 export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Promise<{text:string;partial:boolean}>{
  const token=session();
  const format=resumeFileFormat(file.name);
- if(!format||file.size<30||file.size>LIMIT)throw new MatchError(400,ocrErrors.OCR_INVALID_FILE);
+ if(!format||file.size<30||(!MATCH_V4_PREVIEW&&file.size>LIMIT))throw new MatchError(400,ocrErrors.OCR_INVALID_FILE);
  const response=await fetch(EFFECTIVE_API+'/ocr',{
   method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/octet-stream',Authorization:'Bearer '+token,
@@ -326,7 +327,7 @@ async function consumeNativeMatchStream(
    const {value,done}=await reader.read();
    if(done)break;
    buffer+=decoder.decode(value,{stream:true}).replace(/\r/g,'');
-   if(buffer.length>320000)throw new MatchError(502,'结果数据异常，已停止处理。');
+   if(!MATCH_V4_PREVIEW&&buffer.length>320000)throw new MatchError(502,'结果数据异常，已停止处理。');
    let stop;
    while((stop=buffer.indexOf('\n\n'))>=0){
     const event=buffer.slice(0,stop);buffer=buffer.slice(stop+2);
