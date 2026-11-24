@@ -8,6 +8,7 @@
  * Untrusted job descriptions and resume text are DATA, not instructions.
  */
 import {selectProvider} from './resume-ai-provider.js';
+import {v4Call,v4ParseJson} from './simple-match-v4.js';
 
 export const REWRITE_KIND='HHBA_WHOLE_RESUME_REWRITE_V1';
 const GROUP_CHARS=8000,MAX_BLOCKS=96,MAX_TEXT_PER_BLOCK=8000;
@@ -86,6 +87,11 @@ export function validateAuthoring(block,proposal,quotes,numbers){
  return null;
 }
 export async function completeJson(provider,system,user,signal,maxTokens=9000){
+ if(provider.protocol==='responses'){
+  const reply=await v4Call(fetch,provider,{instructions:system,input:JSON.stringify(user)},{signal});
+  if(reply.status!=='completed')error('AI_PROVIDER_RESPONSE_TRUNCATED');
+  return v4ParseJson(reply);
+ }
  const headers={'content-type':'application/json'},url=provider.baseUrl+
   (provider.protocol==='anthropic'?'/messages':'/chat/completions');
  let body;
