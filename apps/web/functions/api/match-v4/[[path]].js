@@ -49,7 +49,7 @@ function events(env,request,input){
    void (async()=>{
     try{
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
-      signal:request.signal,onProgress:progress,onActivity:activity,
+      signal:request.signal,excludeUrls:input.exclude_urls,onProgress:progress,onActivity:activity,
       onPartial:matches=>send('partial',{matches})});
      console.info('HHBA_V4_MATCH',JSON.stringify({result:'COMPLETE',
       found:result.matches.length,official:result.matched_official_jobs,
@@ -107,5 +107,6 @@ export async function onRequest({request,env}){
  const role=typeof body?.options?.role_hint==='string'?
   redactForModel(body.options.role_hint,{unbounded:true}):'';
  // Do not store raw resume, query, job results, or model output in server logs.
- return events(env,request,{text:resume,role_hint:role});
+ const exclude_urls=Array.isArray(body?.options?.exclude_urls)?body.options.exclude_urls.filter(x=>typeof x==='string'):[];
+ return events(env,request,{text:resume,role_hint:role,exclude_urls});
 }
