@@ -57,24 +57,24 @@ function recommendedOrder(proposed,blocks){
   return original;
  return proposed;
 }
-function safeQuestions(value,blocks){
+function safeQuestions(value,blocks,unbounded=false){
  const ids=new Set(blocks.map(x=>x.id)),out=[],used=new Set();
  for(const q of (Array.isArray(value)?value:[])){
   if(!q||typeof q!=='object')continue;
   const question=compact(q.question||q.prompt);
   const blockId=compact(q.blockId||q.block_id);
-  if(question.length<6||question.length>420||!ids.has(blockId)||used.has(blockId+question))continue;
+  if(question.length<6||(!unbounded&&question.length>420)||!ids.has(blockId)||used.has(blockId+question))continue;
   used.add(blockId+question);
   out.push({blockId,question,
-   reason:compact(q.reason).slice(0,400),status:'user_input_needed'});
+   reason:unbounded?compact(q.reason):compact(q.reason).slice(0,400),status:'user_input_needed'});
  }
  return out;
 }
-export function validateAuthoring(block,proposal,quotes,numbers){
+export function validateAuthoring(block,proposal,quotes,numbers,{unbounded=false}={}){
  if(typeof proposal!=='string'||!proposal.trim()||
-  proposal.length>Math.max(12000,block.text.length*4))
+  (!unbounded&&proposal.length>Math.max(12000,block.text.length*4)))
   return 'INVALID_REWRITE_TEXT';
- if(!Array.isArray(quotes)||quotes.length===0||quotes.length>20)
+ if(!Array.isArray(quotes)||quotes.length===0||(!unbounded&&quotes.length>20))
   return 'MISSING_SOURCE_EVIDENCE';
  for(const q of quotes){
   if(typeof q!=='string'||q.trim().length<3||!block.text.includes(q.trim()))
@@ -192,16 +192,17 @@ export async function generateTailoredResume({env,blocks,job,signal}){
  // would allow "50 deals" from employer A to be attributed to employer B.
  // Planning reads every block; it does not contain a hard 5-item suggestion cap.
  const plan=await completeJson(provider,SYSTEM_PLAN,{job:safeJob,blocks:safeBlocks},signal,7000);
- const questions=safeQuestions(plan.questions,blocks);
+ const unbounded=env?.HHBA_MATCH_V4_READY==='1';
+ const questions=safeQuestions(plan.questions,blocks,unbounded);
  const order=recommendedOrder(plan.recommended_order,blocks);
  const rewritten=[],issues=[],groups=balancedGroups(safeBlocks);
  for(const group of groups){
   const response=await completeJson(provider,SYSTEM_WRITE,{
-   job:safeJob,focus:Array.isArray(plan.focus)?plan.focus.slice(0,30):[],
+   job:safeJob,focus:Array.isArray(plan.focus)?plan.focus.slice(0,unbounded?undefined:30):[],
    blocks:group
   },signal,12000);
   const writers=Array.isArray(response.rewrites)?response.rewrites:[];
-  questions.push(...safeQuestions(response.questions,blocks));
+  questions.push(...safeQuestions(response.questions,blocks,unbounded));
   const keyed=new Map();
   for(const row of writers){
    if(!row||typeof row!=='object'||typeof row.blockId!=='string'||keyed.has(row.blockId))
@@ -222,7 +223,7 @@ export async function generateTailoredResume({env,blocks,job,signal}){
    const raw=blocks.find(x=>x.id===block.id),draft=keyed.get(block.id);
    const proposal=compact(draft?.text);
    const quotes=Array.isArray(draft?.sourceQuotes)?draft.sourceQuotes:[];
-   const problem=validateAuthoring(raw,proposal,quotes,numberTokens(raw.text));
+   const problem=validateAuthoring(raw,proposal,quotes,numberTokens(raw.text),{unbounded});
    const auditResult=checks.get(block.id);
    const safe=problem===null&&auditResult?.safe===true;
    const reason=problem||(!auditResult?'AUDIT_INCOMPLETE':!auditResult.safe?
@@ -236,7 +237,7 @@ export async function generateTailoredResume({env,blocks,job,signal}){
     evidenceQuotes:safe?quotes.map(compact):[],
     rationale:safe?compact(draft?.rationale).slice(0,750):'此段保留原文，需人工补充证据或重新审查。',
     jobRequirements:safe&&Array.isArray(draft?.jobRequirements)?
-     draft.jobRequirements.filter(x=>typeof x==='string').slice(0,12):[],
+     draft.jobRequirements.filter(x=>typeof x==='string').slice(0,unbounded?undefined:12):[],
     status:safe?'needs_user_confirmation':'kept_original'
    });
   }
