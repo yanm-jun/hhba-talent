@@ -42,12 +42,12 @@ export async function optimizeResumeDocument({env,blocks,context,job,signal,want
  const generate=deps.generate||generateSuggestions;
  const audit=deps.audit||auditTargetedResumeSuggestions;
  const plan=deps.plan||(input=>completeJson(selectProvider(env,'resume_rewrite'),editorialInstructions,input,
-  AbortSignal.any([signal,AbortSignal.timeout(55000)]),7000));
+  signal,7000));
  let focus=[];
  try{
   const proposed=await plan({job,context,blocks});
   if(Array.isArray(proposed?.focus))focus=proposed.focus.filter(value=>typeof value==='string')
-   .map(value=>value.trim().slice(0,360)).filter(Boolean).slice(0,20);
+   .map(value=>value.trim().slice(0,360)).filter(Boolean);
  }catch(error){
   if(terminal.has(error?.message)&&error.message!=='AI_PROVIDER_NOT_CONFIGURED')throw error;
  }
