@@ -144,8 +144,9 @@ test('V4 independently rejects imaginary, closed and unrelated organization post
   hiringOrganization:{name:'不相关汽车企业',url:'https://unrelated-host.cn'},
   description};
  const mk=j=>'<script type="application/ld+json">'+JSON.stringify(j)+'</script>';
- await assert.rejects(()=>v4ReadEmployerJob(url,{fetcher:async()=>new Response(mk(posting),{
-  headers:{'content-type':'text/html'}})}),/V4_JOB_DETAILS_NOT_VERIFIED/);
+ const externalOrg=await v4ReadEmployerJob(url,{fetcher:async()=>new Response(mk(posting),{
+  headers:{'content-type':'text/html'}})});
+ assert.equal(externalOrg.source_confirmed,false, 'different corporate/career host requires user-facing qualification');
  await assert.rejects(()=>v4ReadEmployerJob(url,{fetcher:async()=>new Response('岗位已下线',{
   headers:{'content-type':'text/html'}})}),/V4_JOB_CLOSED/);
 });
