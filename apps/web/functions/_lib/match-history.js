@@ -17,7 +17,7 @@ const verifiedJdMeta=item=>{
   jd_source_status:'VERIFIED_JD',
   jd_score_status:['V2_JD_EVIDENCE_SCORED','AI_VERIFIED_JD_SCORED','INSUFFICIENT_RESUME_EVIDENCE']
    .includes(item.jd_score_status)?item.jd_score_status:'INSUFFICIENT_RESUME_EVIDENCE',
-  jd_proof_method:['PUBLIC_EMPLOYER_ATS_V1','DIRECT_EMPLOYER_HTML_V1']
+  jd_proof_method:['PUBLIC_EMPLOYER_ATS_V1','DIRECT_EMPLOYER_HTML_V1','V4_STRUCTURED_JOBPOSTING']
    .includes(item.jd_proof_method)?item.jd_proof_method:null
  };
 };
