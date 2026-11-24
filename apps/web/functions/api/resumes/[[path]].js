@@ -59,6 +59,7 @@ export async function onRequest({request,env}){
  if(!bucket||typeof bucket.put!=='function'||typeof bucket.get!=='function'||typeof bucket.delete!=='function')
   return err('PRIVATE_STORAGE_NOT_ENABLED',503);
  const phone=session.phone,method=request.method;
+ const v4=env?.HHBA_MATCH_V4_READY==='1';
  const pathname=new URL(request.url).pathname;
  const tail=pathname.slice(routePrefix.length).replace(/\/$/,'');
  if(['POST','DELETE','PUT'].includes(method)&&!sameSiteMutation(request))
@@ -66,10 +67,10 @@ export async function onRequest({request,env}){
  try{
   if(tail===''&&method==='GET'){
    const rows=await db.prepare(
-    'SELECT id,filename,media_type,size_bytes,created_at FROM hhba_candidate_resumes WHERE phone=? ORDER BY created_at DESC LIMIT 3'
+    'SELECT id,filename,media_type,size_bytes,created_at FROM hhba_candidate_resumes WHERE phone=? ORDER BY created_at DESC'+(v4?'':' LIMIT 3')
    ).bind(phone).all();
    return safeJson({kind:'HHBA_PRIVATE_RESUME_VAULT_V1',
-    maxFiles:RESUME_MAX_PER_ACCOUNT,items:(rows.results||[]).map(summary)});
+    maxFiles:v4?null:RESUME_MAX_PER_ACCOUNT,items:(rows.results||[]).map(summary)});
   }
   if(tail===''&&method==='POST'){
    if(request.headers.get('X-HHBA-Storage-Consent')!==STORAGE_CONSENT_VERSION)
@@ -79,10 +80,12 @@ export async function onRequest({request,env}){
    const inputMime=(request.headers.get('Content-Type')||'').split(';')[0].toLowerCase();
    if(inputMime!==format.mime&&inputMime!=='application/octet-stream')
     return err('FILE_TYPE_MISMATCH',415);
+   if(!v4){
    const count=await db.prepare(
     'SELECT COUNT(*) AS n FROM hhba_candidate_resumes WHERE phone=?'
    ).bind(phone).first();
    if(Number(count?.n)>=RESUME_MAX_PER_ACCOUNT)return err('RESUME_LIMIT_REACHED',409);
+   }
    const dayAgo=new Date(Date.now()-24*3600000).toISOString();
    const uploads=await db.prepare(
     'SELECT COUNT(*) AS n FROM hhba_candidate_resume_upload_events WHERE phone=? AND created_at>=?'
@@ -103,9 +106,9 @@ export async function onRequest({request,env}){
     const saved=await db.prepare(
      'INSERT OR IGNORE INTO hhba_candidate_resumes '+
      '(id,phone,storage_key,filename,media_type,size_bytes,sha256,storage_consent_version,storage_consent_at,created_at) '+
-     'SELECT ?,?,?,?,?,?,?,?,?,? WHERE (SELECT COUNT(*) FROM hhba_candidate_resumes WHERE phone=?)<?'
+     'SELECT ?,?,?,?,?,?,?,?,?,?'+(v4?'':' WHERE (SELECT COUNT(*) FROM hhba_candidate_resumes WHERE phone=?)<?')
     ).bind(id,phone,key,filename,format.mime,format.size,hash,
-      STORAGE_CONSENT_VERSION,createdAt,createdAt,phone,RESUME_MAX_PER_ACCOUNT).run();
+      STORAGE_CONSENT_VERSION,createdAt,createdAt,...(v4?[]:[phone,RESUME_MAX_PER_ACCOUNT])).run();
     inserted=saved?.success===true&&saved?.meta?.changes===1;
     if(!inserted){await bucket.delete(key);return err('RESUME_ALREADY_EXISTS_OR_LIMIT',409);}
     const event=await db.prepare(
