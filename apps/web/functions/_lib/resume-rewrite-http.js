@@ -20,7 +20,8 @@ export const rewriteContinuationActive=env=>rewriteActive(env)&&
  typeof env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET==='string'&&
  env.HHBA_RESUME_AGENT_CHECKPOINT_SECRET.length>=32&&
  (env?.HHBA_AUTH_ROLLOUT==='preview'||
-  env?.HHBA_RESUME_AGENT_CONTINUE_PRODUCTION_ALLOWED==='1');
+  (env?.HHBA_RESUME_AGENT_CONTINUE_PRODUCTION_ALLOWED==='1'&&
+   (env?.HHBA_MATCH_V4_READY!=='1'||env?.HHBA_V4_CHECKPOINT_REPLAY_PROTECTION==='1')));
 export function rewriteOriginOK(request){
  const url=new URL(request.url);
  return request.headers.get('Origin')===url.origin&&
