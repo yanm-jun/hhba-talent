@@ -1,5 +1,5 @@
-import {useEffect,useId,useMemo,useState} from 'react';
-import {ChevronLeft,ChevronRight,ChevronDown,ArrowUpRight,Check,MapPin} from 'lucide-react';
+import {useEffect,useId,useMemo,useRef,useState} from 'react';
+import {ChevronLeft,ChevronRight,ChevronDown,ArrowUpRight,MapPin} from 'lucide-react';
 import '../styles/resume-match-dialog.css';
 import {CuratedJobReport} from './CuratedJobReport';
 import type {MatchProfile,MatchResearchReport,MatchedJob,NativeMatchProgress,NativeMatchActivity} from '../services/resumeMatch';
@@ -39,6 +39,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
  const [scoreIndex,setScoreIndex]=useState(0);
  const [arrival,setArrival]=useState<string[]>([]);
  const [query,setQuery]=useState('');
+ const reportSwipe=useRef<{x:number;y:number}|null>(null);
  const active=selection??selected;
  const actual=matchStageIndex(progressStage);
  const parsed=report?.profile||profile;
@@ -67,6 +68,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
  const jdJob=jdItems[currentJdIndex];
  const currentScoreIndex=Math.min(scoreIndex,Math.max(0,officialJobs.length-1));
  const scoreJob=officialJobs[currentScoreIndex];
+ const changeScore=(direction:number)=>setScoreIndex(Math.max(0,Math.min(officialJobs.length-1,currentScoreIndex+direction)));
  const empty=(message:string)=><p className="hhba-stage-empty">{message}</p>;
  const status=(i:number)=>!pending?'':actual===i?'正在处理':actual>i?'可查看已有成果':'查看已有成果';
  return <>
@@ -129,7 +131,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
   {active===3&&<>
    <div className="hhba-refined-title"><span>04 / MATCH REPORT</span><h2>精选岗位匹配报告</h2><p>逐项对照简历和官方 JD，一次只阅读一个岗位。</p></div>
    <div className="hhba-refined-metrics hhba-score-metrics"><div><small>正式推荐</small><strong>{officialJobs.length}{report?.final_target?<em> / {report.final_target}</em>:null}</strong></div><div><small>原文证据支持评分</small><strong>{officialJobs.filter(scoreGrounded).length}</strong></div></div>
-   {!externalScore&&(scoreJob?<><ReportPager count={officialJobs.length} index={currentScoreIndex} onChange={setScoreIndex}/><article className="hhba-verified-report">
+   {!externalScore&&(scoreJob?<><ReportPager count={officialJobs.length} index={currentScoreIndex} onChange={setScoreIndex}/><article className="hhba-verified-report hhba-curated-card" onTouchStart={e=>{reportSwipe.current={x:e.touches[0].clientX,y:e.touches[0].clientY}}} onTouchEnd={e=>{const start=reportSwipe.current;reportSwipe.current=null;if(!start)return;const dx=e.changedTouches[0].clientX-start.x,dy=e.changedTouches[0].clientY-start.y;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.3)changeScore(dx<0?1:-1)}}>
     <div className="hhba-refined-job-head"><div><JobTitle job={scoreJob}/></div><div className="hhba-refined-score">{scoreJob.match_score??'—'}<small>/100</small></div></div>
     {scoreJob.research_detail?<CuratedJobReport detail={scoreJob.research_detail} jd={scoreJob.evidence_excerpt}/>:<><p>{scoreJob.score_basis}</p><p>{scoreJob.recommendation_reason}</p>{!!scoreJob.matched?.length&&<ul>{scoreJob.matched.map((v,i)=><li key={i}>{v}</li>)}</ul>}{!!scoreJob.not_evidenced?.length&&<ul>{scoreJob.not_evidenced.map((v,i)=><li key={i}>{v}</li>)}</ul>}</>}
     <OfficialLink job={scoreJob}/>
