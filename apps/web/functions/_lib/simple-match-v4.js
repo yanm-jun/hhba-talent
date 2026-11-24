@@ -244,15 +244,20 @@ function renderJob(x,url,verified,resume,toolLinked,index){
  * even if a later round or optional verification has an upstream failure.
  */
 export async function v4Match(fetcher,provider,resume,roleHint,
- {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},env={},excludeUrls=[]}={}){
- const rows=new Map(),toolUrls=new Set(),excluded=new Set(excludeUrls.map(v4PublicJobUrl).filter(Boolean));
- let profile=v4GroundProfile({summary:'',roles:[]},resume);
- let researchComplete=false,round=0,researchError=null,recoveryHint='';
- let lastSignature='';
+ {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},env={},excludeUrls=[],checkpoint=null,stepMode=false}={}){
+ // A checkpoint is accepted only after account/input-bound signature verification in the HTTP route.
+ const rows=new Map(checkpoint?.rows||[]),toolUrls=new Set(checkpoint?.toolUrls||[]),excluded=new Set(excludeUrls.map(v4PublicJobUrl).filter(Boolean));
+ let profile=checkpoint?.profile||v4GroundProfile({summary:'',roles:[]},resume);
+ let researchComplete=checkpoint?.phase==='verification',round=checkpoint?.round||0,researchError=checkpoint?.researchError||null,recoveryHint=checkpoint?.recoveryHint||'';
+ let lastSignature=checkpoint?.lastSignature||'';
+ const startRound=round;
+ const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,...extra}});
  onProgress('parsing');
  onActivity('parsing','AI 正在阅读简历并自主规划合适的职业方向。');
  onProgress('searching');
  while(!researchComplete){
+  // One research round per request, not a limit on total research rounds.
+  if(stepMode&&round>startRound)return continuation('research');
   if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
   round++;
   onActivity('searching','AI 正在进行第 '+round+' 轮联网研究，已保留 '+rows.size+
@@ -348,13 +353,19 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    researchError='AI_RESEARCH_NO_NEW_EVIDENCE';break;
   }else recoveryHint='';
  }
+ if(stepMode&&checkpoint?.phase!=='verification'&&rows.size)return continuation('verification',{next:0,matches:[],read:0,scored:0,archived:0,scoreFailures:0});
+ const offset=checkpoint?.phase==='verification'?checkpoint.next:0;
+ const allEntries=[...rows.entries()];
+ // Process small batches across separate requests to keep provider, fetch, D1 and R2 calls within a Worker invocation.
+ // The batch size is not a recommendation limit; every discovered entry is processed.
+ const entries=stepMode?allEntries.slice(offset,offset+2):allEntries;
  onProgress('reading');
- onActivity('reading','开始读取 '+rows.size+' 条公开岗位来源，核对可获取的 JD。');
- const {results,read}=await enrich(fetcher,rows,{signal,onActivity});
+ onActivity('reading','正在核对第 '+(offset+1)+' 至 '+(offset+entries.length)+' 条岗位来源，共 '+rows.size+' 条。');
+ const {results,read}=await enrich(fetcher,new Map(entries),{signal,onActivity});
  onProgress('scoring');
- const entries=[...rows.entries()];
- const matches=entries.map(([url,job],i)=>renderJob(job,url,results.get(url),resume,toolUrls.has(url),i));
- let cursor=0,scored=0,archived=0,scoreFailures=0;
+ const previousMatches=checkpoint?.phase==='verification'?checkpoint.matches||[]:[];
+ const matches=entries.map(([url,job],i)=>renderJob(job,url,results.get(url),resume,toolUrls.has(url),offset+i));
+ let cursor=0,scored=checkpoint?.scored||0,archived=checkpoint?.archived||0,scoreFailures=checkpoint?.scoreFailures||0;
  const worker=async()=>{
   while(cursor<entries.length){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
@@ -380,7 +391,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      break;
     }
     if(reply.status!=='completed'||!Number.isInteger(assessment.score)||assessment.score<0||assessment.score>100||rq.length<4||jq.length<4||!norm(resume).includes(norm(rq))||!norm(jd.full_jd).includes(norm(jq)))throw fault('AI_SCORE_EVIDENCE_MISSING');
-    const rescored=renderJob({...job,...assessment,match_score:assessment.score},url,jd,resume,toolUrls.has(url),i);
+    const rescored=renderJob({...job,...assessment,match_score:assessment.score},url,jd,resume,toolUrls.has(url),offset+i);
     Object.assign(matches[i],rescored,{score_basis:'AI 已基于独立读取的 JD 与简历原文重新评分（非录用概率）',score_evidence_status:'GROUNDED_JD_RESUME_QUOTES'});
     scored++;break;
    }catch(e){
@@ -394,21 +405,24 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     Object.assign(matches[i],{match_score:null,reference_score:0,score_basis:'完整 JD 已读取，但重新评分未取得可靠依据；请核对岗位原文。',score_evidence_status:undefined});
     break;
    }}
-   onPartial([...matches]);
+   onPartial([...previousMatches,...matches]);
    onActivity('scoring','已对 '+scored+' 条岗位按完整 JD 重新评分，已存档 '+archived+' 条有原文依据的 JD。');
   }
  };
  await Promise.all(Array.from({length:Math.min(4,entries.length)},worker));
- matches.sort((a,b)=>(b.match_score??-1)-(a.match_score??-1));
- const verified=matches.filter(x=>x.jd_source_status==='VERIFIED_JD'&&x.source_type==='站外官方招聘').length;
- return {status:'COMPLETE',profile,matches,matched_official_jobs:verified,
+ const combined=[...previousMatches,...matches];
+ const readTotal=(checkpoint?.read||0)+read;
+ if(stepMode&&offset+entries.length<allEntries.length)return continuation('verification',{next:offset+entries.length,matches:combined,read:readTotal,scored,archived,scoreFailures});
+ combined.sort((a,b)=>(b.match_score??-1)-(a.match_score??-1));
+ const verified=combined.filter(x=>x.jd_source_status==='VERIFIED_JD'&&x.source_type==='站外官方招聘').length;
+ return {status:'COMPLETE',profile,matches:combined,matched_official_jobs:verified,
   source:'AI 联网搜索与公开招聘网页',
   scoring:'AI 匹配分仅供职业参考，不代表录用概率。',
   privacy:'经明确授权向第三方 AI 中转服务发送脱敏简历文本；不发送原文件。',
   disclaimer:'岗位来源按已核验、待核验标记；是否仍可投递请以原始招聘网页为准。'
    +(researchError?' 本次联网服务中断，已保留已发现的候选来源。':''),
   native_search:{mode:'V4_SIMPLE_AI',searches:round,candidate_links:rows.size,
-   page_reads:read,visible_jobs:matches.length,research_error:researchError||undefined,
-   jd_verification:{eligible:rows.size,verified,failed:rows.size-read,scored,archived},score_failures:scoreFailures},
+   page_reads:readTotal,visible_jobs:combined.length,research_error:researchError||undefined,
+   jd_verification:{eligible:rows.size,verified,failed:rows.size-readTotal,scored,archived},score_failures:scoreFailures},
   can_continue:true};
 }
