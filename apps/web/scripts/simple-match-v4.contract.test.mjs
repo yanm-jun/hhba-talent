@@ -426,3 +426,14 @@ test('V4 Word score replay accepts more than eight verified revisions',async()=>
  const result=checkedWordScoreBlocks(original,history,15,true);
  assert.equal(result.ok,true);assert.equal(result.blocks[0].text,'真实项目第15阶段');
 });
+
+test('streaming request rejection falls back to JSON without repeating completed requests',async()=>{
+ const attempts=[];
+ const result=await v4Call(async(url,opts)=>{
+  attempts.push(JSON.parse(opts.body).stream);
+  if(attempts.length===1)return new Response('stream not supported',{status:400});
+  return model({ok:true});
+ },{...provider,stream:true},{input:'synthetic'});
+ assert.deepEqual(attempts,[true,false]);
+ assert.equal(v4ParseJson(result).ok,true);
+});
