@@ -55,7 +55,7 @@ function events(env,request,input){
    void (async()=>{
     try{
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
-      signal,excludeUrls:input.exclude_urls,oneRound:true,skipEnrich:true,onProgress:progress,onActivity:activity,
+      signal,excludeUrls:input.exclude_urls,researchContext:input.research_context,oneRound:true,skipEnrich:true,onProgress:progress,onActivity:activity,
       onPartial:matches=>send('partial',{matches})});
      try{
       result.history_id=await saveV4Round(env.HHBA_PNVS_AUTH_DB,input.phone,{taskId:input.history_id,resumeId:input.resume_id,roleHint:input.role_hint,matches:result.matches,researchPending:result.research_pending});
@@ -154,5 +154,6 @@ export async function onRequest({request,env}){
  // Do not store raw resume, query, job results, or model output in server logs.
  const exclude_urls=Array.isArray(body?.options?.exclude_urls)?body.options.exclude_urls.filter(x=>typeof x==='string'):[];
  const history_id=typeof body.history_id==='string'&&/^[0-9a-f-]{36}$/i.test(body.history_id)?body.history_id:crypto.randomUUID();
- return events(env,request,{text:resume,role_hint:role,exclude_urls,history_id,phone:session.phone,resume_id:body.resume_id||null});
+ const research_context=body.research_context&&typeof body.research_context==='object'?body.research_context:null;
+ return events(env,request,{text:resume,role_hint:role,exclude_urls,research_context,history_id,phone:session.phone,resume_id:body.resume_id||null});
 }
