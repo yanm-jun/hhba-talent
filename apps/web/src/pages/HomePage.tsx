@@ -10,9 +10,9 @@ import { BrandMark } from '../components/BrandMark';
 import type { User } from '../services/api';
 import '../styles/home-match-promo.css';
 
-function EntryCard({kind,title,body,footer}:{kind:'candidate'|'directory'|'rights';title:string;body:string;footer:string}){
+function EntryCard({kind,title,body,footer,candidateTarget}:{kind:'candidate'|'directory'|'rights';title:string;body:string;footer:string;candidateTarget?:string}){
  const Icon=kind==='candidate'?BriefcaseBusiness:kind==='rights'?Scale:Building2;
- const target=kind==='candidate'?'/candidate/jobs'
+ const target=kind==='candidate'?(candidateTarget||'/candidate/match')
   :kind==='rights'?'/rights/knowledge':'/companies/library';
  return <Link to={target} className={'entry-card hhba-entry-card hhba-entry-'+kind}
    aria-label={title+'，'+footer}>
@@ -23,6 +23,7 @@ function EntryCard({kind,title,body,footer}:{kind:'candidate'|'directory'|'right
 }
 
 export function HomePage({user}:{user:User|null}){
+ const matchTarget=user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch';
  return <Shell user={user}>
   <section className="home-hero hhba-public-hero">
    <div className="hhba-public-hero-logo"><BrandMark variant="icon" size="hero"/></div>
@@ -34,8 +35,8 @@ export function HomePage({user}:{user:User|null}){
    <button type="button" className="hhba-letter-revisit" onClick={()=>window.dispatchEvent(new Event('hhba:open-letter'))}><Mail size={16} aria-hidden="true" /> 读一封来自 HHBA 的信</button>
   </section>
   <section className="entry-grid hhba-public-entry-grid hhba-home-entry-grid" aria-label="选择使用入口">
-   <EntryCard kind="candidate" title="求职与机会"
-    body="浏览真实招聘机会，使用 AI 简历匹配与优化，前往企业官方渠道投递。"
+   <EntryCard kind="candidate" title="求职与机会" candidateTarget={matchTarget}
+    body="上传简历，使用 AI 智能匹配与定向优化，寻找适合你的真实岗位，前往企业官方渠道投递。"
     footer="探索求职与机会"/>
    <EntryCard kind="rights" title="劳动权益"
     body="免费查阅劳动权益知识、相关法律依据和职场问题自助指引。"
@@ -50,7 +51,7 @@ export function HomePage({user}:{user:User|null}){
     <div><span className="home-match-promo-kicker">HHBA AI MATCH</span><strong id="home-match-promo-title">让 AI 先理解你，再帮你寻找合适岗位</strong>
      <p>从简历提取职业能力，分析岗位要求与能力差距，优先寻找企业官方招聘信息。</p></div>
    </div>
-   <button type="button" onClick={()=>navigate(user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch')}>
+   <button type="button" onClick={()=>navigate(matchTarget)}>
     <span>开始智能匹配</span><ArrowUpRight size={17}/>
    </button>
   </section>
