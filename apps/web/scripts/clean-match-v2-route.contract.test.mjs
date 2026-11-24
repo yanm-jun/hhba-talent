@@ -314,7 +314,7 @@ test('preview synthetic acceptance UI is clearly labeled and never sends a user 
  assert.match(route,/if\(!persistHistory\)/);
  assert.match(route,/if\(!previewPreflight\(env,request\)\)return fail\('MATCH_SYNTHETIC_NOT_ENABLED',503\)/);
  const fn=service.slice(service.indexOf('export async function runMatchPreviewSyntheticAcceptance'),
-  service.indexOf('export async function submitExtractedResumeText'));
+  service.indexOf('async function submitMatchRound'));
  assert.doesNotMatch(fn,/\bresumeId\b|resume_id|privateResume|file\.arrayBuffer/);
 });
 
