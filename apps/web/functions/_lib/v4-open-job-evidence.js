@@ -10,7 +10,7 @@ const htmlToText=html=>legacyHtmlToText(html,{unbounded:true});
 const extractOfficialJdSections=plain=>legacyJdSections(plain,{unbounded:true});
 const trim=s=>typeof s==='string'?s.trim():'';
 export function v4PublicJobUrl(value){
- if(typeof value!=='string'||value.length>2000)return null;
+ if(typeof value!=='string')return null;
  try{
   const u=new URL(value.trim()),h=u.hostname.replace(/\.$/,'').toLowerCase();
   if(u.protocol!=='https:'||u.username||u.password||(u.port&&u.port!=='443'))return null;
@@ -107,9 +107,8 @@ async function limitedRead(r){
 export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()}={}){
  const canonical=v4PublicJobUrl(url);
  if(!canonical)throw Error('V4_UNSAFE_URL');
- const timeout=AbortSignal.timeout(12000);
  const r=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',
-  headers:{Accept:'text/html,text/plain;q=0.9'},signal:signal?AbortSignal.any([signal,timeout]):timeout});
+  headers:{Accept:'text/html,text/plain;q=0.9'},signal});
  const html=await limitedRead(r),plain=htmlToText(html);
  if(CLOSED.test(plain))throw Error('V4_JOB_CLOSED');
  for(const j of postings(html)){
