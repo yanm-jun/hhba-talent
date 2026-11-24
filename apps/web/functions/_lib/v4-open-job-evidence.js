@@ -4,7 +4,6 @@ import {htmlToText,extractOfficialJdSections} from './official-job-evidence.js';
 import {findMainlandCity} from './mainland-job-location.js';
 import {sha256Hex} from './real-auth.js';
 const LOCAL=/(?:^|\.)(?:localhost|local|internal|test|invalid|example|onion|nip\.io|sslip\.io|localtest\.me)$/i;
-const BOARD=/(?:^|\.)(?:zhipin\.com|liepin\.com|51job\.com|zhaopin\.com|lagou\.com|kanzhun\.com|maimai\.cn|indeed\.com|linkedin\.com|glassdoor\.com|jobui\.com|jobstreet\.com|yjbys\.com)$/i;
 const CLOSED=/(?:职位已关闭|岗位已下线|停止招聘|不再接受申请|职位已过期|招聘已结束|position (?:closed|expired)|job (?:closed|expired))/i;
 const GENERIC=/^(?:招聘|岗位详情|职位详情|职业机会|人才招聘|职位|招聘信息|job details|jobs|careers|recruitment|job opening)$/i;
 const trim=s=>typeof s==='string'?s.trim():'';
@@ -13,10 +12,9 @@ export function v4PublicJobUrl(value){
  try{
   const u=new URL(value.trim()),h=u.hostname.replace(/\.$/,'').toLowerCase();
   if(u.protocol!=='https:'||u.username||u.password||(u.port&&u.port!=='443'))return null;
-  if(!h.includes('.')||h.includes(':')||/^\d+\.\d+\.\d+\.\d+$/.test(h)||LOCAL.test(h)||BOARD.test(h))return null;
+  if(!h.includes('.')||h.includes(':')||/^\d+\.\d+\.\d+\.\d+$/.test(h)||LOCAL.test(h))return null;
   if(/(?:^|\.)example\.(?:com|net|org)$/.test(h))return null;
   u.hash='';
-  if(u.pathname==='/'&&!u.search)return null;
   return u.href;
  }catch{return null}
 }
