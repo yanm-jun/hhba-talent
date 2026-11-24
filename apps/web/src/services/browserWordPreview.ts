@@ -153,6 +153,7 @@ export function paintBrowserWordSuggestions(
   const mark=document.createElement('span');
   mark.className='hhba-word-ai-changed hhba-resume-siri-letters';
   mark.textContent=changed||'\u200b';
+  if(proposal.includes('\n')&&mark.style)mark.style.whiteSpace='pre-wrap';
   node.setAttribute(attribute,group?(node.textContent||''):original);
   node.classList.add('hhba-word-inline-suggestion');
   node.replaceChildren(document.createTextNode(prefix),mark,document.createTextNode(suffix));

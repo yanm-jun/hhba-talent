@@ -10,5 +10,5 @@ export declare function prepareVerifiedOriginalDocxExport(options:{
  }>
 }):Promise<{bytes:Uint8Array;verified:true;pageCount:number}>;
 export declare function inspectOriginalDocxStrict(raw:Uint8Array|ArrayBuffer,options?:{allowParagraphRuns?:boolean}):Promise<{
- mode:'strict_original_docx';editable_text:string[];entries:string[]
+ mode:'strict_original_docx';editable_text:string[];paragraph_text:string[];entries:string[]
 }>;

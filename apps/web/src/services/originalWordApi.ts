@@ -3,7 +3,7 @@ import {editOriginalDocxStrict} from './resumeDocxPreserve.mjs';
 
 type SavedWord={original:string;text:string;updated_at:string};
 export type WordHistoryEntry={revision:number;original:string;text:string;updated_at:string;page_count:number|null;layout_verified?:boolean};
-export type WordInspect={ok:boolean;editable_text:string[];saved?:SavedWord|null;revision:number;total_revisions:number;max_revisions:number|null;max_daily_edits?:number|null;history?:WordHistoryEntry[];layout_verified?:boolean;pdf_available?:boolean};
+export type WordInspect={ok:boolean;editable_text:string[];paragraph_text?:string[];saved?:SavedWord|null;revision:number;total_revisions:number;max_revisions:number|null;max_daily_edits?:number|null;history?:WordHistoryEntry[];layout_verified?:boolean;pdf_available?:boolean};
 const messages:Record<string,string>={
  WORD_NOT_READY:'Word 原样式编辑暂未开放。',
  WORD_FONT_UNAVAILABLE:'原文件使用的字体在处理环境中不可用，为保留原样式，暂不修改这份简历。',
@@ -19,7 +19,7 @@ const messages:Record<string,string>={
  WORD_REVISION_LOCK_UNAVAILABLE:'暂时无法安全保存，请稍后再试。',
  WORD_LAYOUT_NOT_VERIFIED:'修改后排版发生了变化，未保存此次修改。',
  WORD_EDIT_TOO_LONG:'这段文字放不下，请缩短后再保存。',
- WORD_EDIT_AMBIGUOUS:'无法确定原文位置，请换一段文字。',
+ WORD_EDIT_AMBIGUOUS:'无法安全定位这段文字或新增段落，请核对 Word 结构。',
  WORD_EDIT_UNSAFE:'这段修改暂时无法安全保存。',
  WORD_RENDER_FAILED:'暂时无法准确显示 Word 原始页面。',
  WORD_PDF_NOT_READY:'当前版本尚未经过专业分页校验，可以先下载 Word，PDF 暂不可用。',

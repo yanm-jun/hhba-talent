@@ -1001,16 +1001,17 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      }}
      onRevisionSnapshot={handleWordRevisionSnapshot}
      onDocumentReady={revealRenderedWord}
-     onEditableSegments={(segments)=>{
+     onEditableSegments={(segments,_documentText,paragraphText)=>{
       // Never infer a writable Word location from a long ATS/search snippet.
       // Ignore contact-like text and only send visible, unique Word spans.
       const safe=[...new Set(segments)].filter(value=>
        typeof value==='string'&&value.length>=6&&
        value===value.trim()&&!/[\r\n\t@]/.test(value)&&
        !/^\+?[\d\s()-]{7,}$/.test(value));
-      const next=safe.map((text,i)=>({id:'word-'+i,section:'experience' as const,text}));
+      const fullParagraphs=new Set(paragraphText||[]);
+      const next=safe.map((text,i)=>({id:'word-'+i,section:'experience' as const,text,paragraphEditable:fullParagraphs.has(text)}));
       setWordPromptBlocks(prev=>
-       prev.length===next.length&&prev.every((b,i)=>b.text===next[i].text)?prev:next);
+       prev.length===next.length&&prev.every((b,i)=>b.text===next[i].text&&b.paragraphEditable===next[i].paragraphEditable)?prev:next);
      }}
      onPendingChange={setNativeWordPending}
      onVerifiedSave={change=>{

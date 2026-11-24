@@ -39,7 +39,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  onVisualSuggestionAction?:(id:string,action:'accepted'|'ignored'|'edited',text?:string,layoutVerified?:boolean)=>void;
  onRevisionSnapshot?:(snapshot:WordRevisionSnapshot)=>void;
  onDocumentReady?:()=>void;
- onEditableSegments?:(segments:string[],documentText?:string)=>void;
+ onEditableSegments?:(segments:string[],documentText?:string,paragraphText?:string[])=>void;
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
@@ -198,7 +198,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      setEditable(info.editable_text||[]);
      setAnchors(safeAnchors);
      // AI edits may only target unique, visible Word text positions.
-     onEditableSegments?.([...new Set(safeAnchors.map(item=>item.text))],mount.innerText);
+     onEditableSegments?.([...new Set(safeAnchors.map(item=>item.text))],mount.innerText,info.paragraph_text||[]);
      setCount(1);setPage(1);
      setPaperSize({width:mount.scrollWidth,height:mount.scrollHeight});
      setLoading(false);
