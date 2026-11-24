@@ -1,3 +1,4 @@
+import {MATCH_V4_PREVIEW} from './resumeMatch';
 import type {CandidateProfile} from './resumeMatching';
 import type {ResumeBlock,ResumeSection} from './targetedResumeOptimization';
 
@@ -47,7 +48,7 @@ export function completeRewriteSource(profile:CandidateProfile,sourceText?:strin
    x=>x.evidence===profile.experience_evidence))
    push('experience',profile.experience_evidence);
  }
- if(chunks.length>MAX_BLOCKS){
+ if(!MATCH_V4_PREVIEW&&chunks.length>MAX_BLOCKS){
   return {blocks:[],complete:false,
    reason:'这份简历可提取文本超过当前单次处理容量。必须使用分段连续任务读取全文，不能偷偷遗漏后面的经历。'};
  }
