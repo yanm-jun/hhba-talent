@@ -72,7 +72,7 @@ test('one job = one private Word revision scope; the original file is untouched'
  assert.match(optimizer,/jobId=\{postingScope\}/);
  assert.match(optimizer,/stablePostingScope\(job\.official_url\)/);
  assert.match(word,/saveOriginalWordEdit\(resume\.id,anchor\.text,visual\.proposed\.trim\(\),revision,jobId\)/);
- assert.match(word,/downloadOriginalWordEdited\(resume\.id,jobId,jobTitle\)/);
+ assert.match(word,/downloadOriginalWordEdited\(resume\.id,jobId,jobTitle,revision\)/);
  assert.match(backend,/hhba-word-target-job-v1:/);
  assert.match(backend,/job_scope_sha256/);
  assert.match(optimizer,/onVisualSuggestionAction=\{\(id,action,newText,layoutVerified\)=>/);

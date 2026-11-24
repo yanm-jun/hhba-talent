@@ -136,10 +136,11 @@ export async function shiftOriginalWordRevision(id:string,action:'undo'|'redo',e
  });
  return response.json();
 }
-async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf',jobId?:string,jobLabel?:string){
+async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf',jobId?:string,jobLabel?:string,revision?:number){
  // DOCX retains the original OOXML package. Only optional PDF originates from
  // trusted renderer verification; never substitute a browser print-template.
- const response=await send(url(id,format==='pdf'?'download-pdf':'download',jobId));
+ if(revision!==undefined&&(!Number.isInteger(revision)||revision<=0))throw Error('当前 Word 版本尚未保存。');
+ const response=await send(url(id,format==='pdf'?'download-pdf':'download',jobId)+(revision===undefined?'':'&revision='+revision));
  const expected=format==='pdf'?'application/pdf':
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
  if((response.headers.get('Content-Type')||'').split(';')[0].toLowerCase()!==expected)
@@ -159,9 +160,9 @@ async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf',jobId?:s
  link.hidden=true;document.body.appendChild(link);
  try{link.click();}finally{link.remove();setTimeout(()=>URL.revokeObjectURL(object),10000);}
 }
-export async function downloadOriginalWordEdited(id:string,jobId?:string,jobLabel?:string){
- return downloadVerifiedWordResult(id,'docx',jobId,jobLabel);
+export async function downloadOriginalWordEdited(id:string,jobId?:string,jobLabel?:string,revision?:number){
+ return downloadVerifiedWordResult(id,'docx',jobId,jobLabel,revision);
 }
-export async function downloadOriginalWordPdf(id:string,jobId?:string,jobLabel?:string){
- return downloadVerifiedWordResult(id,'pdf',jobId,jobLabel);
+export async function downloadOriginalWordPdf(id:string,jobId?:string,jobLabel?:string,revision?:number){
+ return downloadVerifiedWordResult(id,'pdf',jobId,jobLabel,revision);
 }
