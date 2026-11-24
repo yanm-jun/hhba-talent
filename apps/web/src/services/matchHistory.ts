@@ -1,5 +1,5 @@
 // Private AI recommendation history: account-bound D1, never a job application.
-import type {MatchResearchReport,MatchResearchDetail} from './resumeMatch';
+import type {MatchResearchReport,MatchResearchDetail,JobJdResearch} from './resumeMatch';
 import {getRealAuthToken} from './realAuth';
 
 export type MatchHistorySummary={
@@ -11,6 +11,7 @@ export type HistoryMatchedJob={
  id:string;company:string;title:string;location:string;official_url:string;
  match_score:number|null;score_basis:string;recommendation_reason:string;
  research_detail?:MatchResearchDetail;
+ jd_research?:JobJdResearch;checked_at?:string;
  source_type?:'站外官方招聘'|'站外招聘职位';score_evidence_status?:'GROUNDED_JD_RESUME_QUOTES';
  availability_status:'OPEN_LISTED'|'UNKNOWN';
  recruitment_source_kind:string;recruitment_source_note:string;
