@@ -2,6 +2,7 @@
  * Server-only AI provider routing. Never expose credentials to the browser.
  * Keep provider model names configurable; vendors change model availability.
  */
+import {v4Provider,v4Call,v4OutputText} from './simple-match-v4.js';
 export const PROVIDERS = Object.freeze({
  deepseek:{baseUrl:'https://api.deepseek.com',protocol:'openai'},
  openai:{baseUrl:'https://api.openai.com/v1',protocol:'openai'},
@@ -15,6 +16,8 @@ export const PROVIDERS = Object.freeze({
 const allowedKeys=new Set(Object.keys(PROVIDERS));
 const clip=(value,max=20000)=>String(value||'').slice(0,max);
 export function selectProvider(env,task='resume_optimization',{reasoning=false}={}){
+ const relay=env?.HHBA_MATCH_V4_READY==='1'?v4Provider(env):null;
+ if(relay)return {name:'openai',protocol:'responses',...relay};
  const requested=clip(env?.['HHBA_AI_'+task.toUpperCase()+'_PROVIDER']||env?.HHBA_AI_DEFAULT_PROVIDER||'deepseek',30).toLowerCase();
  if(!allowedKeys.has(requested))throw new Error('AI_PROVIDER_UNSUPPORTED');
  const prefix='HHBA_AI_'+requested.toUpperCase()+'_';
@@ -91,6 +94,18 @@ export async function generateSuggestions({env,blocks,job,signal,documentContext
   output_format_example:sample,
   instructions:'严格输出符合示例字段名的JSON对象，不要复制示例建议内容；blockId必须是blocks中的id；一份段落至多一条建议。完整简历上下文用于理解结构，不能把其他段落里的经历、数字或资格写进当前段落。'});
  let url,headers,body;
+ if(provider.protocol==='responses'){
+  // Route legacy editing UI through the same V4 model, with no imposed output budget.
+  const data=await v4Call(fetch,provider,{instructions:system,input},{signal});
+  const output=v4OutputText(data);
+  if(data.status!=='completed')throw Error('AI_PROVIDER_RESPONSE_TRUNCATED');
+  const parsed=JSON.parse(output.replace(/^\s*```(?:json)?\s*|\s*```\s*$/g,''));
+  let suggestions=parseSuggestions(parsed,blocks.map(b=>b.id));
+  const byId=new Map(blocks.map(b=>[b.id,b.text]));
+  const comparable=text=>text.replace(/\s+/g,' ').trim();
+  if(job.verified)suggestions=suggestions.filter(s=>comparable(s.jobRequirement).length>=4&&comparable(job.requirements).includes(comparable(s.jobRequirement)));
+  return {provider:provider.name,suggestions:suggestions.map(s=>({...s,original:byId.get(s.blockId)}))};
+ }
  if(provider.protocol==='anthropic'){
   url=provider.baseUrl+'/messages';
   headers={'content-type':'application/json','x-api-key':provider.key,'anthropic-version':'2023-06-01'};
