@@ -466,11 +466,11 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     await requestResumeOptimization(full||MATCH_V4_PREVIEW?currentBlocks:currentBlocks.slice(0,12),targetedJob,controller.signal,
      full?{text:context,wanted:prior?.pending,onPending:ids=>{pending=ids;},
       onQueued:()=>setNotice('简历优化正在排队，轮到后会继续。')}:undefined);
-   const combined=[...new Map([...(prior?.suggestions||[]),...incoming].map(item=>[item.blockId,item])).values()];
+   const combined=[...new Map([...(prior?.suggestions||[]),...incoming].map(item=>[MATCH_V4_PREVIEW?JSON.stringify([item.blockId,item.action,item.proposed,item.jobRequirement]):item.blockId,item])).values()];
    if(full)previousOptimization.current={key,suggestions:combined,pending};
    const unique=new Set<string>(),usedBlocks=new Set<string>();
    const accepted=combined.filter(s=>{
-    if(unique.has(s.id)||usedBlocks.has(s.blockId)||!validateSuggestion(currentBlocks,s))return false;
+    if((!MATCH_V4_PREVIEW&&(unique.has(s.id)||usedBlocks.has(s.blockId)))||!validateSuggestion(currentBlocks,s))return false;
     unique.add(s.id);usedBlocks.add(s.blockId);return true;
    }).map((s,i)=>({...s,id:('generation-'+(++generation.current)+'-'+i+'-'+s.id).slice(0,100)}));
    setSuggestions(accepted);
@@ -602,7 +602,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  function renderEditableBlock(id:string,text:string){
   const block=version.blocks.find(item=>item.id===id);
   if(!block)return <p className="hhba-print-paragraph">{text}</p>;
-  const s=suggestions.find(item=>item.blockId===id);
+  const choices=suggestions.filter(item=>item.blockId===id&&!ignored.includes(item.id)&&validateSuggestion(version.blocks,item));
+  const s=choices.find(item=>item.id===openSuggestionId)||choices[0]||suggestions.find(item=>item.blockId===id&&version.acceptedSuggestionIds.includes(item.id));
   const applied=Boolean(s&&version.acceptedSuggestionIds.includes(s.id));
   const dismissed=Boolean(s&&ignored.includes(s.id));
   const pending=Boolean(s&&!applied&&!dismissed);
@@ -626,7 +627,9 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      {applied&&<span className="targeted-resume-applied"><CheckCircle2 size={12} aria-hidden="true"/> 已填充</span>}
     </div>}
    </div>
-   {pending&&s&&openSuggestionId===s.id&&editingBlock!==id&&renderSuggestionCard(s)}
+   {pending&&s&&openSuggestionId===s.id&&editingBlock!==id&&<>
+    {MATCH_V4_PREVIEW&&choices.length>1&&<div className="targeted-resume-actions" aria-label="此段落的备选建议">{choices.map((choice,index)=><button key={choice.id} type="button" aria-pressed={choice.id===s.id} onClick={()=>{setOpenSuggestionId(choice.id);setEditingSuggestionId(null)}}>方案 {index+1}</button>)}</div>}
+    {renderSuggestionCard(s)}</>}
   </div>;
  }
  // The legacy browser-print template is retained solely for synthetic QA.
@@ -661,7 +664,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  },[suggestions,version.blocks,version.acceptedSuggestionIds,wholeApproved,wholeDraft]);
  const visualWordSuggestions=useMemo<WordVisualSuggestion[]>(()=>suggestions
   .slice(0,revealedSuggestionCount)
-  .filter(s=>s.action==='replace'&&!ignored.includes(s.id)&&!resolvedWordVisualIds.includes(s.id))
+  .filter(s=>s.action==='replace'&&!ignored.includes(s.id)&&!resolvedWordVisualIds.includes(s.id)&&(!MATCH_V4_PREVIEW||!suggestions.some(other=>other.blockId===s.blockId&&other.id!==s.id&&(version.acceptedSuggestionIds.includes(other.id)||editedWordVisualIds.includes(other.id)))))
+  .filter((s,i,items)=>!MATCH_V4_PREVIEW||items.findIndex(other=>other.original===s.original)===i)
   .map(s=>({
    id:s.id,original:s.original,
    proposed:version.acceptedSuggestionIds.includes(s.id)?
@@ -684,10 +688,10 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     state:wholeApproved?'accepted' as const:'pending' as const
    }))),
  [suggestions,revealedSuggestionCount,ignored,resolvedWordVisualIds,version.acceptedSuggestionIds,
-  version.blocks,suggestionDrafts,wordRevisionSnapshot,wholeDraft,wholeApproved,
+  version.blocks,suggestionDrafts,wordRevisionSnapshot,wholeDraft,wholeApproved,editedWordVisualIds,
   revealedWholeCount]);
  const pendingSuggestions=suggestions.filter(s=>!ignored.includes(s.id)&&
-  !editedWordVisualIds.includes(s.id)&&!version.acceptedSuggestionIds.includes(s.id));
+  !editedWordVisualIds.includes(s.id)&&!version.acceptedSuggestionIds.includes(s.id)&&(!MATCH_V4_PREVIEW||!suggestions.some(other=>other.blockId===s.blockId&&(version.acceptedSuggestionIds.includes(other.id)||editedWordVisualIds.includes(other.id)))));
  const acceptedCount=suggestions.filter(s=>version.acceptedSuggestionIds.includes(s.id)||editedWordVisualIds.includes(s.id)).length;
  const pendingTextChanges=version.blocks.some(block=>{
   const original=blocks.find(item=>item.id===block.id);
