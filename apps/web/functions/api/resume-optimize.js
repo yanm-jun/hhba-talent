@@ -141,9 +141,11 @@ export async function onRequestPost({request,env}){
    if(lease?.duplicate)return fail('RESUME_OPTIMIZATION_IN_PROGRESS',409);
    if(!lease)return fail('RESUME_OPTIMIZATION_QUEUED',409);
   }else{
-   if(!await reserveAttempt(db,hash))return fail('RESUME_OPTIMIZATION_ATTEMPT_LIMIT',429);
-   requestId=await reserve(db,hash);
-   if(!requestId)return fail('RESUME_OPTIMIZATION_LIMIT',429);
+   if(env?.HHBA_MATCH_V4_READY!=='1'){
+    if(!await reserveAttempt(db,hash))return fail('RESUME_OPTIMIZATION_ATTEMPT_LIMIT',429);
+    requestId=await reserve(db,hash);
+    if(!requestId)return fail('RESUME_OPTIMIZATION_LIMIT',429);
+   }
   }
  }catch{return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);}
  // Mask common contact identifiers before third-party processing.
@@ -151,7 +153,7 @@ export async function onRequestPost({request,env}){
  const job={title:redact(trustedJob.title),requirements:redact(trustedJob.requirements),
   verified:trustedJob.source_status==='VERIFIED_OFFICIAL_JD'};
  try{
-  const signal=AbortSignal.any([request.signal,AbortSignal.timeout(input.full_document?180000:90000)]);
+  const signal=env?.HHBA_MATCH_V4_READY==='1'?request.signal:AbortSignal.any([request.signal,AbortSignal.timeout(input.full_document?180000:90000)]);
   const whole=input.full_document?await optimizeResumeDocument({
    env,blocks,context:redact(input.full_document.text),job,signal,wanted:input.full_document.wanted
   }):null;
@@ -167,7 +169,7 @@ export async function onRequestPost({request,env}){
   }));
   // An empty or fully rejected suggestion set is not a successful optimization.
   // Refund only this request's success allocation; preserve attempt accounting.
-  if(suggestions.length===0){
+  if(suggestions.length===0&&requestId){
    try{await releaseFailedRequest(db,requestId,hash);}
    catch{console.warn('HHBA_RESUME_OPT_EMPTY_REFUND_FAILED');}
   }
@@ -187,7 +189,7 @@ export async function onRequestPost({request,env}){
   const code=allowed.has(error?.message)?error.message:'AI_OPTIMIZATION_UNAVAILABLE';
   // Failed provider calls restore the *successful* daily allowance, while the
   // separate attempt ledger remains consumed to bound repeated paid retries.
-  try{await releaseFailedRequest(db,requestId,hash);}catch{console.warn('HHBA_RESUME_OPT_QUOTA_RELEASE_FAILED');}
+  try{if(requestId)await releaseFailedRequest(db,requestId,hash);}catch{console.warn('HHBA_RESUME_OPT_QUOTA_RELEASE_FAILED');}
   console.warn('HHBA_RESUME_OPTIMIZATION_FAILED',code);
   return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:
    code==='AI_PROVIDER_NOT_CONFIGURED'?503:502);
