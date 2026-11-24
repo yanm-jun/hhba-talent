@@ -222,7 +222,9 @@ test('V4 production host uses V4 without a query parameter; final result can be 
  assert.doesNotMatch(service,/new URLSearchParams\(window\.location\.search\)\.get\('v4'\)==='1'/);
  assert.match(service,/event==='final_job'/);
  assert.match(service,/finalJobs\.length!==value\.match_count/);
- assert.match(route,/sendJobs\('final',result\.matches\)/);
+ assert.match(route,/sendJobs\('final',matches\)/);
+ assert.match(route,/officialOnly:true/);
+ assert.match(service,/event==='research_report'/);
 });
 test('V4 repeats scoring after reading an independently obtained full JD',async()=>{
  const html='<html><head><script type="application/ld+json">'+JSON.stringify({
@@ -511,4 +513,48 @@ test('V4 interrupted task records are encrypted, isolated by owner and exact inp
  await saveMatchTask(env,a,{result:{status:'COMPLETE',matches:[row]}},now);
  assert.equal((await readMatchTask(env,a,now)).result.status,'COMPLETE');
  assert.equal(await readMatchTask(env,a,now+23*3600000+1),null);
+});
+
+test('V4 official-only research excludes known and newly identified commercial platforms and preserves unfamiliar employer',async()=>{
+ const board='https://www.zhipin.com/job_detail/123.html',unknownBoard='https://new-market.cn/roles/55',unconfirmed='https://unknown-employer.cn/roles/77',official=url;
+ const html='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:row.title,hiringOrganization:{name:row.company,url:'https://careers.other-motors.cn'},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责渠道运营和经销商业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
+ const reports=[],partials=[],reads=[];let queries=0;
+ const result=await v4Match(async(u,opts)=>{
+  if(!u.endsWith('/responses')){reads.push(u);return u===official?new Response(html,{headers:{'content-type':'text/html'}}):new Response('unavailable',{status:403});}
+  const payload=JSON.parse(opts.body);
+  if(payload.tools){queries++;assert.ok(payload.input.includes('zhipin.com'));assert.match(payload.instructions,/排除商业第三方招聘平台/);
+   return model({research_complete:true,jobs:[{...row,url:board},{...row,url:unknownBoard,source_kind:'third_party_board'},{...row,url:unconfirmed},{...row,url:official}]},[board,unknownBoard,unconfirmed,official,'https://careers.other-motors.cn/about']);
+  }
+  if(payload.instructions.includes('职业画像'))return model({profile:{summary:'区域运营经验',roles:['渠道运营'],skills:[{name:'渠道管理',evidence:'汽车经销商渠道运营'}]}});
+  return model({score:92,reason:'渠道经验匹配',resume_quote:'汽车经销商渠道运营',jd_quote:'渠道运营和经销商业务流程',matched:['渠道运营'],gaps:[]});
+ },provider,resume,'全国',{officialOnly:true,onResearch:r=>reports.push(r),onPartial:j=>partials.push(j)});
+ assert.equal(queries,1);assert.equal(result.matches.length,1);assert.equal(result.matches[0].official_url,official);
+ assert.equal(result.matches[0].match_score,92);assert.equal(result.research_leads.length,1);assert.equal(result.research_leads[0].official_url,unconfirmed);
+ assert.ok(!reads.includes(board)&&!reads.includes(unknownBoard));
+ assert.ok(partials.flat().every(j=>![board,unknownBoard].includes(j.official_url)));
+ assert.equal(result.research_report.excluded_count,2);assert.equal(result.research_report.discovered,2);
+ assert.ok(reports.some(r=>r.profile.skills.some(s=>s.name==='渠道管理')));
+});
+test('commercial board exclusion is not an enterprise or industry whitelist',async()=>{
+ const {isCommercialRecruitmentBoard}=await import('../functions/_lib/match-employer-source.js');
+ assert.equal(isCommercialRecruitmentBoard('https://m.liepin.com/job/123'),true);
+ assert.equal(isCommercialRecruitmentBoard('https://unknown-market.cn/jobs/123',{source_kind:'third_party_board'}),true);
+ assert.equal(isCommercialRecruitmentBoard('https://careers.new-employer.cn/posting/123'),false);
+ assert.equal(isCommercialRecruitmentBoard('https://university.edu.cn/hr/positions/123'),false);
+ assert.equal(isCommercialRecruitmentBoard('https://company.myworkdayjobs.com/External/job/123'),false);
+});
+test('history research profile retains derived outcomes but not original resume quotations',async()=>{
+ const {safeResearchReport}=await import('../functions/_lib/match-history.js');
+ const report=safeResearchReport({profile:{summary:'渠道运营',skills:[{name:'渠道管理',evidence:'ORIGINAL_RESUME_QUOTE'}],facts:[{quote:'ORIGINAL_RESUME_QUOTE'}],target_roles:['运营']},rounds:[{round:1,queries:['企业官网 区域运营'],added:3}],excluded_count:2,discovered:3});
+ assert.equal(report.profile.skills[0].name,'渠道管理');
+ assert.ok(!JSON.stringify(report).includes('ORIGINAL_RESUME_QUOTE'));assert.equal(report.rounds[0].added,3);
+});
+test('four stage buttons show real reports without changing AI execution',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
+ for(const label of ['识别简历','搜索企业岗位','核验岗位 JD','对照简历评分'])assert.ok(panels.includes(label));
+ assert.match(panels,/onClick=\{\(\)=>setSelected/);assert.match(panels,/report\?\.rounds/);
+ assert.match(dialog,/!optimizedJobUrl&&<MatchResearchPanels/);
+ assert.doesNotMatch(panels,/AbortController|fetch\(/);
 });
