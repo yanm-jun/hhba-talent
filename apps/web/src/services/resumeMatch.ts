@@ -164,7 +164,7 @@ const isCleanV2PreviewHost=()=>typeof window!=='undefined'&&
 export async function matchPreviewPreflightAvailable(signal?:AbortSignal):Promise<boolean>{
  if(!isCleanV2PreviewHost()||!realAuthReady)return false;
  try{
-  const response=await fetch(EFFECTIVE_API+'/status',{
+  const response=await fetch(API+'/status',{
    method:'GET',credentials:'same-origin',cache:'no-store',signal
   });
   if(!response.ok)return false;
@@ -177,7 +177,7 @@ export async function runMatchPreviewProviderCheck(signal?:AbortSignal):Promise<
 }>{
  if(!isCleanV2PreviewHost())throw new MatchError(403,'只能在独立的 HHBA 预览环境中执行接口预检。');
  const token=session();
- const response=await fetch(EFFECTIVE_API+'/provider-check',{
+ const response=await fetch(API+'/provider-check',{
   method:'GET',credentials:'same-origin',cache:'no-store',signal,
   headers:{Authorization:'Bearer '+token}
  }).catch(error=>{
@@ -356,7 +356,7 @@ export async function runMatchPreviewSyntheticAcceptance(
  const token=session();
  const deadline=AbortSignal.timeout(330000);
  const requestSignal=signal?AbortSignal.any([signal,deadline]):deadline;
- const response=await fetch(EFFECTIVE_API+'/synthetic-check',{
+ const response=await fetch(API+'/synthetic-check',{
   method:'POST',credentials:'same-origin',cache:'no-store',
   signal:requestSignal,
   headers:{Authorization:'Bearer '+token,'Content-Type':'application/json',
@@ -449,7 +449,7 @@ export async function checkMatchProviderConnection(signal?:AbortSignal):Promise<
  const token=session();
  let response;
  try{
-  response=await fetch(EFFECTIVE_API+'/provider-check',{
+  response=await fetch(API+'/provider-check',{
    method:'GET',credentials:'same-origin',cache:'no-store',signal,
    headers:{Authorization:'Bearer '+token}
   });
