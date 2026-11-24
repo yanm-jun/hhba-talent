@@ -11,7 +11,7 @@ import {selectProvider} from './resume-ai-provider.js';
 import {v4Call,v4ParseJson} from './simple-match-v4.js';
 
 export const REWRITE_KIND='HHBA_WHOLE_RESUME_REWRITE_V1';
-const GROUP_CHARS=8000,MAX_BLOCKS=96,MAX_TEXT_PER_BLOCK=8000;
+const GROUP_CHARS=8000,MAX_BLOCKS=512,MAX_TEXT_PER_BLOCK=8000;
 const compact=x=>String(x??'').trim();
 function error(code){throw new Error(code);}
 export function redacted(text){
@@ -197,7 +197,7 @@ export async function generateTailoredResume({env,blocks,job,signal}){
  const rewritten=[],issues=[],groups=balancedGroups(safeBlocks);
  for(const group of groups){
   const response=await completeJson(provider,SYSTEM_WRITE,{
-   job:safeJob,focus:Array.isArray(plan.focus)?plan.focus.slice(0,30):[],
+   job:safeJob,focus:Array.isArray(plan.focus)?plan.focus:[],
    blocks:group
   },signal,12000);
   const writers=Array.isArray(response.rewrites)?response.rewrites:[];
