@@ -70,7 +70,7 @@ function valid(body,env){
  const ids=new Set();
  const blocksValid=body.blocks.every(b=>{
   if(!b||typeof b!=='object'||typeof b.id!=='string'||!/^[a-z0-9_-]{1,64}$/i.test(b.id)||
-   typeof b.text!=='string'||!b.text.trim()||b.text.length>1600||ids.has(b.id))return false;
+   typeof b.text!=='string'||!b.text.trim()||((env?.HHBA_MATCH_V4_READY!=='1'||!doc)&&b.text.length>1600)||ids.has(b.id))return false;
   ids.add(b.id);return ['experience','skills','summary','education','projects'].includes(b.section);
  });
  return blocksValid&&(!doc?.wanted||doc.wanted.every(id=>ids.has(id)))&&(!doc?.review_feedback||Object.keys(doc.review_feedback).every(id=>ids.has(id)));

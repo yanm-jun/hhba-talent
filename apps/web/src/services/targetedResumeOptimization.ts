@@ -34,9 +34,9 @@ export function applySuggestion(version:ResumeVersion,s:ResumeSuggestion,confirm
   ...b,text:s.action==='replace'?s.proposed:b.text+String.fromCharCode(10)+s.proposed
  }:b),acceptedSuggestionIds:[...version.acceptedSuggestionIds,s.id]};
 }
-export function editResumeBlock(version:ResumeVersion,blockId:string,updatedText:string):ResumeVersion {
+export function editResumeBlock(version:ResumeVersion,blockId:string,updatedText:string,{originalWord=false}:{originalWord?:boolean}={}):ResumeVersion {
  const text=updatedText.trim();
- if(!text||text.length>1600)throw new Error('INVALID_BLOCK_TEXT');
+ if(!text||(!originalWord&&text.length>1600))throw new Error('INVALID_BLOCK_TEXT');
  if(!version.blocks.some(block=>block.id===blockId))throw new Error('UNKNOWN_RESUME_BLOCK');
  return {...version,blocks:version.blocks.map(block=>block.id===blockId?{...block,text}:block)};
 }

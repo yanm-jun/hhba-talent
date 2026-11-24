@@ -93,9 +93,9 @@ test('PDF comparison normalizes Chinese punctuation but preserves the Word origi
 
 
 test('long editable Word run and long AI expansion remain visible and actionable',()=>{
- const source='真实经历与工作过程。'.repeat(38);
+ const source='真实经历与工作过程。'.repeat(200);
  const proposed=source+'结合目标岗位突出已有工作职责。'.repeat(10);
- assert.ok(source.length>300&&proposed.length>300&&proposed.length<=1600);
+ assert.ok(source.length>1600&&proposed.length>1600);
  const page={},attributes=new Map(),classes=new Set();
  const node={textContent:source,querySelector:()=>null,closest:()=>page,
   getAttribute:k=>attributes.get(k)??null,setAttribute:(k,v)=>attributes.set(k,v),

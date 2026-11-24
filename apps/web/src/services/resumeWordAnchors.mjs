@@ -9,7 +9,7 @@ export function matchWordAnchors({editableText,items,viewport,page,styles={}}){
  // If two source strings collapse to the same normalized text, neither is safe.
  const candidates=new Map();
  for(const value of editableText){
-  if(typeof value!=='string'||value.length<3||value.length>1600||
+  if(typeof value!=='string'||value.length<3||
    value.trim()!==value)continue;
   const key=plain(value),values=candidates.get(key)||[];
   if(!values.includes(value))values.push(value);

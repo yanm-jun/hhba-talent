@@ -39,7 +39,7 @@ export function selectProvider(env,task='resume_optimization',{reasoning=false}=
  return {name:requested,...PROVIDERS[requested],key,model:model.trim(),
   ...(requested==='deepseek'&&deepseekWriter?{reasoningEffort:effort}:{})};
 }
-export function parseSuggestions(raw,allowedBlockIds){
+export function parseSuggestions(raw,allowedBlockIds,{fullDocument=false}={}){
  if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new Error('AI_PROVIDER_RESPONSE_INVALID');
  const candidates=[
   raw.suggestions,raw.optimizations,raw.recommendations,raw.changes,
@@ -66,7 +66,7 @@ export function parseSuggestions(raw,allowedBlockIds){
   if(!['replace','append','request_evidence'].includes(action))continue;
   const isEvidenceRequest=action==='request_evidence';
   const proposed=rawProposal||(isEvidenceRequest?'请补充你真实参与的相关工作、项目或成果。':'');
-  if(!proposed||proposed.length>1600)continue;
+  if(!proposed||(!fullDocument&&proposed.length>1600))continue;
   const original=asText(s.original)||asText(s.before)||'原始段落内容由服务端核实';
   const rationale=asText(s.rationale)||asText(s.reason)||asText(s.explanation)||
    '请结合真实经历核实这条表达建议';
@@ -75,7 +75,7 @@ export function parseSuggestions(raw,allowedBlockIds){
   used.add(blockId);
   accepted.push({
    id:clip(asText(s.id)||'suggestion-'+(index+1)+'-'+blockId,100),
-   blockId,action,original:clip(original,1600),proposed:clip(proposed,1600),
+   blockId,action,original:fullDocument?original:clip(original,1600),proposed:fullDocument?proposed:clip(proposed,1600),
    rationale:clip(rationale,600),jobRequirement,
    evidenceStatus:'needs_user_confirmation'
   });
@@ -111,7 +111,7 @@ export function normalizeDocumentSuggestions(blocks,suggestions){
    proposed=original+join+proposed;
   }
   // Do not silently cut text or report a non-writable suggestion as complete.
-  if(!proposed||proposed.length>1600||/[\r\n\t\u0000-\u001f]/.test(proposed)||proposed===original)return [];
+  if(!proposed||/[\r\n\t\u0000-\u001f]/.test(proposed)||proposed===original)return [];
   return [{...s,action:'replace',original,proposed}];
  });
 }
@@ -182,7 +182,7 @@ export async function generateSuggestions({env,blocks,job,signal,documentContext
  try{parsed=JSON.parse(output.replace(/^\s*```(?:json)?\s*|\s*```\s*$/g,''));}
  catch{throw new Error('AI_PROVIDER_RESPONSE_JSON_INVALID');}
  let suggestions;
- try{suggestions=parseSuggestions(parsed,blocks.map(b=>b.id));}
+ try{suggestions=parseSuggestions(parsed,blocks.map(b=>b.id),{fullDocument:explicitCoverage});}
  catch{throw new Error('AI_PROVIDER_SUGGESTION_SCHEMA_INVALID');}
  // The model is not the source of truth for original paragraphs. Its "original"
  // field is often a shorter excerpt, whereas the UI requires exact block text.
