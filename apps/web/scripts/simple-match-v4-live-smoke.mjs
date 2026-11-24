@@ -4,15 +4,15 @@
  */
 import {v4Provider,v4Call,v4ParseJson,v4Sources} from '../functions/_lib/simple-match-v4.js';
 const label='HHBA_V4_LIVE_SMOKE=';
-if(!['feat/simple-resume-match-v4-20261124','fix/v4-open-job-discovery-20261124','fix/v4-direct-ai-recommend-20261124'].includes(process.env.CF_PAGES_BRANCH)){
+if(!['feat/simple-resume-match-v4-20261124','fix/v4-open-job-discovery-20261124','fix/v4-direct-ai-recommend-20261124','fix/v4-autonomous-pipeline-20261124'].includes(process.env.CF_PAGES_BRANCH)){
  console.log(label+JSON.stringify({status:'SKIPPED_OTHER_BRANCH'}));process.exit(0);
 }
 const provider=v4Provider(process.env);
-if(!provider){console.log(label+JSON.stringify({status:'MISSING_RELAY_KEY'}));process.exit(0)}
+if(!provider){console.log(label+JSON.stringify({status:'MISSING_RELAY_KEY'}));process.exit(1)}
 const report={status:'PARTIAL',model:provider.model,model_catalog:'NOT_TESTED',
  responses:'NOT_TESTED',web_search:'NOT_TESTED',cited_official_links:0,model_job_rows:0,format:'NOT_TESTED'};
 try{
- const r=await fetch('https://api-c.reqtoken.com/v1/models',{
+ const r=await fetch((provider.baseUrl||'https://api-c.reqtoken.com/v1')+'/models',{
   headers:{authorization:'Bearer '+provider.key,
    'x-openai-actor-authorization':'local-image-extension'},
   redirect:'manual',signal:AbortSignal.timeout(12000)});
@@ -25,9 +25,8 @@ try{
 try{
  const d=await v4Call(fetch,provider,{
   instructions:'Only emit a JSON object with one boolean field ok, set to true.',
-  input:'Synthetic API diagnostic. Respond with {"ok":true}.',
-  max_output_tokens:800
- },{timeoutMs:37000});
+  input:'Synthetic API diagnostic. Respond with {"ok":true}.'
+ },{signal:AbortSignal.timeout(180000)});
  report.responses=v4ParseJson(d).ok===true?'JSON_OK':'JSON_UNEXPECTED';
 }catch(e){report.responses=e?.code||'PROVIDER_ERROR'}
 try{
@@ -35,8 +34,8 @@ try{
   instructions:'You help job seekers in China. Use web_search to find currently hiring, real employer job pages for automotive channel supervisor or dealer operations roles in China. Return ONE VALID JSON OBJECT with profile:{roles:[...]}, jobs:[{company,title,location,url,score,reason,resume_quote}]. Do not invent links. Find as many as the research actually supports; no company allowlist or numerical cap.',
   input:JSON.stringify({resume_text:'曾负责汽车经销商销售运营、销售人员培训、渠道数据分析及终端督导。',preferred_city:'上海或全国',scope:'中国大陆真实岗位'}),
   tools:[{type:'web_search'}],tool_choice:'required',
-  include:['web_search_call.action.sources'],max_output_tokens:7000
- },{timeoutMs:95000});
+  include:['web_search_call.action.sources']
+ },{signal:AbortSignal.timeout(300000)});
  report.web_search=d.output.some(x=>x?.type==='web_search_call')?'TOOL_CALLED':'TOOL_NOT_CALLED';
  report.cited_official_links=v4Sources(d).length;
  try{
@@ -47,3 +46,4 @@ try{
 }catch(e){report.web_search=e?.code||'PROVIDER_ERROR'}
 report.status=report.responses==='JSON_OK'&&report.web_search==='TOOL_CALLED'&&report.format==='JSON_OK'&&report.model_job_rows>0?'READY':'PARTIAL';
 console.log(label+JSON.stringify(report));
+if(report.status!=='READY')process.exitCode=1;
