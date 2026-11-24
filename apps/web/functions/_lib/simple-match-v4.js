@@ -335,7 +335,7 @@ async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,br
   },{parse:v4ParseJson,sourceUrls:[job.official_url,...facts.map(f=>f.url)],fetcher,browser,signal,resume,jd:evidence,ledger,note});
   const value=v4ParseJson(reply);
   if(reply.status==='completed'&&Number.isInteger(value.score)&&value.score>=0&&value.score<=100&&text(value.reason)&&exactQuote(resume,value.resume_quote)&&facts.some(f=>exactQuote(f.quote,value.jd_quote))){
-   Object.assign(job,{match_score:value.score,reference_score:value.score,evidence_score_status:'AI_PARTIAL_SOURCE_SCORED',score_basis:'基于部分公开岗位原文的初步参考分（非正式 JD 匹配分）',recommendation_reason:text(value.reason)});
+   Object.assign(job,{match_score:value.score,reference_score:value.score,evidence_status:'PARTIAL_SOURCE',evidence_score_status:'AI_PARTIAL_SOURCE_SCORED',score_basis:'基于部分公开岗位原文的初步参考分（非正式 JD 匹配分）',recommendation_reason:text(value.reason)});
    note('JD_PARTIAL_REFERENCE_SCORED');
   }
  }catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(isV4RetryableProviderError(e?.code))throw e;note(e?.code||'JD_PARTIAL_REFERENCE_UNAVAILABLE');}
