@@ -1,15 +1,15 @@
 // HHBA user-triggered, browser-local PDF text extraction using pinned
 // Mozilla PDF.js. Nothing is sent to AI, third-party CDNs, or the extension.
 // Parser and worker are bundled as first-party assets by Vite.
-export const PDF_MAX_BYTES=3*1024*1024;
-export const PDF_MAX_PAGES=15;
-export const PDF_MAX_TEXT=50000;
+export const PDF_MAX_BYTES=12*1024*1024;
+export const PDF_MAX_PAGES=150;
+export const PDF_MAX_TEXT=250000;
 export class PDFResumeError extends Error{
  constructor(code,message){super(message);this.code=code;this.name="PDFResumeError";}
 }
 export function assertPdfBytes(buffer){
  if(!(buffer instanceof ArrayBuffer)||buffer.byteLength<32||
-  buffer.byteLength>PDF_MAX_BYTES)throw new PDFResumeError("PDF_SIZE","PDF 文件大小必须在 3 MB 以内。");
+  buffer.byteLength>PDF_MAX_BYTES)throw new PDFResumeError("PDF_SIZE","PDF 文件大小必须在 12 MB 以内。");
  const bytes=new Uint8Array(buffer,0,Math.min(1024,buffer.byteLength));
  let header=false;
  for(let i=0;i<=bytes.length-5;i++){
@@ -70,7 +70,7 @@ export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs}={
  let task=null,expired=false;
  const abort=()=>{if(task)void task.destroy().catch(()=>{});};
  if(signal)signal.addEventListener("abort",abort,{once:true});
- const timer=setTimeout(()=>{expired=true;abort();},15000);
+ const timer=setTimeout(()=>{expired=true;abort();},120000);
  try{
   const pdf=await loadPdfJs();
   if(expired)throw new PDFResumeError("PDF_TIMEOUT","PDF 处理超时，请导出更简洁的文字版 PDF。");
