@@ -80,6 +80,9 @@ jobs:
           doc.sections[0].footer.paragraphs[0].text='此文件由自动化测试生成，无真实个人资料'
           doc.add_heading('中文双页虚构简历',level=1)
           doc.add_paragraph('负责门店运营及日常数据整理工作')
+          split=doc.add_paragraph()
+          split.add_run('虚构测试：多节点')
+          split.add_run('岗位运营经历')
           table=doc.add_table(rows=2,cols=2)
           table.cell(0,0).text='岗位经历'
           table.cell(0,1).text='门店运营管理'
