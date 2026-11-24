@@ -174,6 +174,12 @@ export async function onRequestPost({request,env}){
    try{await releaseFailedRequest(db,requestId,hash);}
    catch{console.warn('HHBA_RESUME_OPT_EMPTY_REFUND_FAILED');}
   }
+  // Operational diagnostics only: never log resume text, prompts, job URLs or identity.
+  if(whole&&env?.HHBA_MATCH_V4_READY==='1')console.info('HHBA_RESUME_OPTIMIZATION_PROGRESS',JSON.stringify({
+   requested:input.full_document.wanted?.length??blocks.length,
+   pending:whole.pendingIds.length,suggestions:suggestions.length,
+   pause_reason:whole.pauseReason||null
+  }));
   return send({ok:true,kind:'HHBA_RESUME_OPTIMIZATION_V1',provider:result.provider,suggestions,
    ...(whole?{pending_block_ids:whole.pendingIds,...(whole.pauseReason?{pause_reason:whole.pauseReason}:{})}:{}),
    jd_version_id:trustedJob.jd_version_id||null,jd_source_status:trustedJob.source_status,
