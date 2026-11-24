@@ -54,7 +54,7 @@ export async function prepareV4JobForOptimization(env,url,{signal,fetcher=fetch,
   }catch{}
  }
  if(!saved?.fresh){
-  const verified=await v4ReadEmployerJob(canonical,{signal,fetcher});
+  const verified=await v4ReadEmployerJob(canonical,{signal,fetcher,expectedTitle});
   saved=await saveV4PublicJd(env,verified);
  }
  if(!saved?.fresh||saved.canonical_url!==canonical)throw Error('JD_NOT_COMPLETE_ENOUGH');
