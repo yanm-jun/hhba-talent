@@ -1,6 +1,7 @@
 import {useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
 import {Check,ChevronLeft,ChevronRight,Download,PencilLine,Save,Undo2,Redo2,ZoomIn,ZoomOut,Sparkles,X,History,ChevronDown,LoaderCircle} from 'lucide-react';
+import {MATCH_V4_PREVIEW} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import {downloadPrivateResume,fetchPrivateResumeForLocalReview} from '../services/privateResumes';
 import {extractDocxText} from '../services/docxProfile.mjs';
@@ -179,7 +180,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     setSaved(wasSaved);
     setRevision(Number.isInteger(info.revision)?info.revision:(wasSaved?1:0));
     setTotalRevisions(Number.isInteger(info.total_revisions)?info.total_revisions:(wasSaved?1:0));
-    setMaxRevisions(Number.isInteger(info.max_revisions)?info.max_revisions:8);
+    setMaxRevisions(typeof info.max_revisions==='number'&&Number.isInteger(info.max_revisions)?info.max_revisions:8);
     setMaxDailyEdits(typeof info.max_daily_edits==='number'&&Number.isInteger(info.max_daily_edits)?info.max_daily_edits:6);
     const inspectedHistory=Array.isArray(info.history)?info.history:[];
     setHistory(inspectedHistory);
@@ -295,7 +296,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     const content=await view.getTextContent({includeMarkedContent:false});
     if(!active)return;
     const items=content.items.filter((x:any)=>typeof x.str==='string') as any;
-    setAnchors(matchWordAnchors({
+    setAnchors(matchWordAnchors({unbounded:MATCH_V4_PREVIEW,
      editableText:editable,items,styles:content.styles,viewport:viewport as any,page
     }));
     if(!renderedEntrance.current){
@@ -383,7 +384,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  async function acceptVisualWord(anchor:WordAnchor,visual:WordVisualSuggestion){
   if(ready!=='available'||busy||loading||visual.state!=='pending'||
    !editable.includes(anchor.text)||!visual.proposed.trim()||
-   visual.proposed.length>300||visual.proposed===anchor.text)return;
+   (!MATCH_V4_PREVIEW&&visual.proposed.length>300)||visual.proposed===anchor.text)return;
   if(!confirmDiscardText())return;
   if(!window.confirm('请先核实这段文字符合真实经历。确认采纳并保存岗位专属 Word 修改？原上传文件不会被覆盖。'))return;
   rememberPosition();setBusy(true);setMessage('');
@@ -427,7 +428,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   finally{setBusy(false);}
  }
  async function save(){
-  if(!selected||!confirmed||busy||!draft.trim()||draft.length>300)return;
+  if(!selected||!confirmed||busy||!draft.trim()||(!MATCH_V4_PREVIEW&&draft.length>300))return;
   rememberPosition();setBusy(true);setMessage('');
   try{
    const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision,jobId);
@@ -476,12 +477,12 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   </label>
   <textarea id="hhba-word-current-edit" aria-label="修改 Word 文字" value={draft} rows={5}
    className={draft!==selected.text?'hhba-siri-typing':''}
-   maxLength={300} onChange={e=>{
+   maxLength={MATCH_V4_PREVIEW?undefined:300} onChange={e=>{
     const value=e.target.value;setDraft(value);setConfirmed(false);
     onSessionWordDraftChange?.(value!==selected.text?
      {original:selected.text,text:value,revision,page}:null);
    }}/>
-  <p className="hhba-original-resume-edit-limit">{draft.length} / 300 字
+  <p className="hhba-original-resume-edit-limit">{draft.length}{MATCH_V4_PREVIEW?'':' / 300'} 字
    · 保留原 Word 字体及样式结构；未经专业校验的分页请自行核对。</p>
   <label className="hhba-original-resume-edit-confirm"><input type="checkbox" checked={confirmed}
    onChange={e=>setConfirmed(e.target.checked)}/>
@@ -500,7 +501,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
        const [x,y,w,h]=anchor.bbox;
        const candidates=visualSuggestions.filter(change=>
         change.original===anchor.text&&change.proposed.trim()&&
-        change.proposed!==anchor.text&&change.proposed.length<=300);
+        change.proposed!==anchor.text&&(MATCH_V4_PREVIEW||change.proposed.length<=300));
        const visual=candidates.length===1?candidates[0]:null;
        const textFits=Boolean(visual&&Array.from(visual.proposed).length<=
         Math.max(12,Array.from(anchor.text).length*1.25));
@@ -525,9 +526,9 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
          const restored=!replacing&&sessionWordDraft&&
           sessionWordDraft.revision===revision&&sessionWordDraft.page===page&&
           sessionWordDraft.original===anchor.text&&
-          sessionWordDraft.text.length<=300&&sessionWordDraft.text.trim();
+          (MATCH_V4_PREVIEW||sessionWordDraft.text.length<=300)&&sessionWordDraft.text.trim();
          const matches=suggestedChanges.filter(change=>change.original===anchor.text&&
-          change.proposed.trim()&&change.proposed.length<=300);
+          change.proposed.trim()&&(MATCH_V4_PREVIEW||change.proposed.length<=300));
          const candidate=restored?sessionWordDraft!.text:
           matches.length===1?matches[0].proposed:anchor.text;
          setSelected(anchor);setPage(anchor.page);setDraft(candidate);setInlineVisualEditor(null);
@@ -595,8 +596,8 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     <details className="hhba-word-menu hhba-original-resume-version-menu">
      <summary><History size={16}/> 版本</summary>
      <div className="hhba-word-menu-content">
-      <p>当前版本 {revision} / {totalRevisions} · 最多 {maxRevisions} 次修订</p>
-      <p>单日最多 {maxDailyEdits} 次修改保存，撤销和重做不计入。</p>
+      <p>当前版本 {revision} / {totalRevisions}{!MATCH_V4_PREVIEW&&' · 最多 '+maxRevisions+' 次修订'}</p>
+      {!MATCH_V4_PREVIEW&&<p>单日最多 {maxDailyEdits} 次修改保存，撤销和重做不计入。</p>}
       {history.length>0&&<ol className="hhba-original-resume-history-list">
        {history.map(entry=><li key={entry.revision}
         className={entry.revision===revision?'is-current':''}>
