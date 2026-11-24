@@ -413,8 +413,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     try{let saved;
     if(String(jd.proof_method||'').startsWith('DIRECT_EMPLOYER')){
      try{saved=await saveVerifiedJobJd(env,jd)}catch{saved=await saveV4PublicJobJd(env,{...jd,proof_method:'V4_EMPLOYER_HTML_JOB',independently_read:true})}
-    }else saved=await saveV4PublicJobJd(env,jd);if(saved?.fresh){
-     Object.assign(matches[i],{jd_version_id:saved.id,jd_sha256:saved.jd_sha256,jd_checked_at:saved.checked_at});archived++;
+    }else saved=await saveV4PublicJobJd(env,jd.proof_method==='V4_STRUCTURED_JOBPOSTING'&&!jd.source_confirmed?{...jd,proof_method:'V4_EMPLOYER_HTML_JOB'}:jd);if(saved?.fresh){
+     Object.assign(matches[i],{jd_version_id:saved.id,jd_sha256:saved.jd_sha256,jd_checked_at:saved.checked_at,jd_proof_method:saved.proof_method});archived++;
     }}catch{/* retain public evidence without inventing archive IDs */}
    }
    const scoreInput={resume_text:resume,job:{company:jd.company,title:jd.title,location:jd.location,full_jd:jd.full_jd}};
@@ -454,8 +454,9 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const readTotal=(checkpoint?.read||0)+read;
  if(stepMode&&offset+entries.length<allEntries.length)return continuation('verification',{next:offset+entries.length,matches:combined,read:readTotal,scored,archived,scoreFailures});
  combined.sort((a,b)=>(b.match_score??-1)-(a.match_score??-1));
- const verified=combined.filter(x=>x.jd_source_status==='VERIFIED_JD'&&x.source_type==='站外官方招聘').length;
- return {status:'COMPLETE',profile,matches:combined,matched_official_jobs:verified,
+ const verified=combined.filter(x=>x.jd_source_status==='VERIFIED_JD').length;
+ const official=combined.filter(x=>x.jd_source_status==='VERIFIED_JD'&&x.source_type==='站外官方招聘').length;
+ return {status:'COMPLETE',profile,matches:combined,matched_official_jobs:official,
   source:'AI 联网搜索与公开招聘网页',
   scoring:'AI 匹配分仅供职业参考，不代表录用概率。',
   privacy:'经明确授权向第三方 AI 中转服务发送脱敏简历文本；不发送原文件。',
