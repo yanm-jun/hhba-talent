@@ -1,6 +1,7 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import type {JdAwareJob} from './jobJdArchive';
 import type {ResumeBlock,ResumeSuggestion} from './targetedResumeOptimization';
+import {continueDocumentOptimization,type OptimizationCheckpoint} from './resumeOptimizationContinuation.mjs';
 
 export type ResumeOptimizationStatus={
  kind:'HHBA_RESUME_OPTIMIZATION_V1';enabled:boolean;configured:boolean;
@@ -36,7 +37,8 @@ const OPTIMIZATION_ERRORS:Record<string,string>={
   AI_PROVIDER_TIMEOUT:'AI 润色等待超时，未修改简历。',
   AI_PROVIDER_RESPONSE_INVALID:'AI 返回内容格式不符合要求，未修改简历。',
   AI_PROVIDER_RESPONSE_HTTP_INVALID:'AI 服务返回非标准数据，未修改简历。',
-  AI_PROVIDER_RESPONSE_TRUNCATED:'AI 建议生成被截断，请缩短简历段落后重试。',
+  AI_PROVIDER_RESPONSE_TRUNCATED:'本批 AI 建议未完整返回，可继续处理尚未完成的段落。',
+  NETWORK_ERROR:'网络连接中断，请继续处理尚未确认完成的段落。',
   AI_PROVIDER_RESPONSE_EMPTY:'AI 没有生成可用文字，请稍后重试。',
   AI_PROVIDER_RESPONSE_JSON_INVALID:'AI 返回的 JSON 不完整，请稍后重试。',
   AI_PROVIDER_SUGGESTION_SCHEMA_INVALID:'AI 的建议格式不符合安全要求，请稍后重试。'
@@ -57,6 +59,7 @@ export async function getResumeOptimizationStatus(signal?:AbortSignal):Promise<R
 }
 type DocumentOptimization={
  text:string;wanted?:string[];onPending?:(ids:string[])=>void;onQueued?:()=>void;
+ onCheckpoint?:(checkpoint:OptimizationCheckpoint)=>void;onPaused?:(error:unknown)=>void;
 };
 function waitForOptimizationSlot(signal?:AbortSignal){
  return new Promise<void>((resolve,reject)=>{
@@ -73,52 +76,39 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
  if(!realAuthReady)throw new ResumeOptimizationError('RESUME_OPTIMIZATION_NOT_ENABLED',503);
  const token=getRealAuthToken();
  if(!token)throw new ResumeOptimizationError('SESSION_INVALID',401);
- const suggestions=new Map<string,ResumeSuggestion>();
- let wanted=document?.wanted;
- // Legacy single-suggestion endpoint accepts at most 12 source blocks per
- // request. Process every batch rather than truncating the resume.
- const legacyBatches:ResumeBlock[][]=[];
- if(!document)for(let i=0;i<blocks.length;i+=12)legacyBatches.push(blocks.slice(i,i+12));
- let batchIndex=0,previousStall='';
- const ids=new Set(blocks.map(block=>block.id));
-
- for(;;){
-  if(signal?.aborted)throw signal.reason;
-  const batch=document?blocks:legacyBatches[batchIndex];
-  if(!batch?.length)break;
+ const submit=async(batch:ResumeBlock[],wanted?:string[])=>{
   let response:Response;
   try{
    response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
     headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
     body:JSON.stringify({consent_ai:true,blocks:batch,job,
      ...(document?{full_document:{text:document.text,wanted}}:{})})});
-  }catch{throw new ResumeOptimizationError('NETWORK_ERROR',503);}
+  }catch(error){
+   if(signal?.aborted)throw signal.reason;
+   throw new ResumeOptimizationError('NETWORK_ERROR',503);
+  }
   const data=await response.json().catch(()=>({})) as {
-   ok?:boolean;error?:string;suggestions?:ResumeSuggestion[];pending_block_ids?:string[]
+   ok?:boolean;error?:string;suggestions?:ResumeSuggestion[];pending_block_ids?:string[];pause_reason?:string;
   };
-  if(document&&data.error==='RESUME_OPTIMIZATION_QUEUED'){
-   document.onQueued?.();
-   await waitForOptimizationSlot(signal);
-   continue;
-  }
-  if(!response.ok||data.ok!==true||!Array.isArray(data.suggestions)){
-   if(wanted&&suggestions.size){document?.onPending?.(wanted);break;}
+  if(document&&data.error==='RESUME_OPTIMIZATION_QUEUED')return {queued:true};
+  if(!response.ok||data.ok!==true||!Array.isArray(data.suggestions))
    throw new ResumeOptimizationError(data.error||'INVALID_RESPONSE',response.status);
-  }
-  for(const item of data.suggestions)suggestions.set(item.blockId,item);
-  const pending=Array.isArray(data.pending_block_ids)?
-   [...new Set(data.pending_block_ids.filter(id=>ids.has(id)&&(!wanted||wanted.includes(id))))]:[];
-  if(!document){batchIndex++;continue;}
-  if(!pending.length){document.onPending?.([]);break;}
-  if(pending.length>=(wanted?.length??blocks.length)){
-   const signature=JSON.stringify([...pending].sort());
-   // Retry a stalled response with backoff, but surface persistent no-progress
-   // rather than indefinitely spending on the same failed work.
-   if(previousStall===signature){document.onPending?.(pending);break;}
-   previousStall=signature;wanted=pending;document.onQueued?.();
-   await waitForOptimizationSlot(signal);continue;
-  }
-  previousStall='';wanted=pending;
+  return {suggestions:data.suggestions,pending:data.pending_block_ids,
+   pauseError:data.pause_reason?new ResumeOptimizationError(data.pause_reason,response.status):undefined,
+   invalidError:new ResumeOptimizationError('INVALID_RESPONSE',502)};
+ };
+ if(document)return continueDocumentOptimization({
+  blockIds:blocks.map(block=>block.id),wanted:document.wanted,signal,
+  request:wanted=>submit(blocks,wanted),wait:waitForOptimizationSlot,
+  onCheckpoint:checkpoint=>{document.onPending?.(checkpoint.pending);document.onCheckpoint?.(checkpoint);},
+  onQueued:document.onQueued,onPaused:document.onPaused
+ });
+ // Legacy endpoint processes every batch rather than truncating the resume.
+ const suggestions=new Map<string,ResumeSuggestion>();
+ for(let i=0;i<blocks.length;i+=12){
+  if(signal?.aborted)throw signal.reason;
+  const result=await submit(blocks.slice(i,i+12));
+  for(const item of result.suggestions||[])suggestions.set(item.blockId,item);
  }
  return [...suggestions.values()];
 }
