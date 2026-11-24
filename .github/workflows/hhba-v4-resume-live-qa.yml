@@ -1,0 +1,51 @@
+name: HHBA V4 resume real-model acceptance
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/scripts/v4-resume-live-acceptance*'
+      - 'apps/web/functions/_lib/v4-resume-reassess.js'
+      - 'apps/web/functions/_lib/resume-ai-provider.js'
+      - 'apps/web/functions/_lib/resume-optimization-task.js'
+      - 'apps/web/functions/_lib/resume-rewrite-provider.js'
+      - 'apps/web/functions/api/resume-optimize.js'
+      - 'apps/web/functions/api/resume-reassess.js'
+      - '.github/workflows/hhba-v4-resume-live-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify synthetic Word and optimization contracts
+        working-directory: apps/web
+        run: node --test scripts/v4-resume-live-acceptance.contract.test.mjs scripts/resume-optimization.route.test.mjs
+  real-provider:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    needs: contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Real provider on fictional resume and JD only
+        working-directory: apps/web
+        env:
+          HHBA_AGENT_RELAY_API_KEY: ${{ secrets.HHBA_AGENT_RELAY_API_KEY }}
+          HHBA_AGENT_RELAY_BASE_URL: ${{ vars.HHBA_AGENT_RELAY_BASE_URL }}
+          HHBA_AGENT_RELAY_MODEL: ${{ vars.HHBA_AGENT_RELAY_MODEL }}
+          HHBA_AGENT_RELAY_STREAM: ${{ vars.HHBA_AGENT_RELAY_STREAM }}
+          HHBA_AGENT_REASONING_EFFORT: ${{ vars.HHBA_AGENT_REASONING_EFFORT }}
+        run: node scripts/v4-resume-live-acceptance.mjs

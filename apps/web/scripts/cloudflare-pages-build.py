@@ -45,6 +45,13 @@ def main() -> None:
         run(['node', '--test', 'scripts/simple-match-v4.contract.test.mjs'], cwd=WEB)
         run(['node', 'scripts/simple-match-v4-live-smoke.mjs'], cwd=WEB)
 
+    # Explicit diagnostic branch or opt-in setting only. No extra paid
+    # optimization calls on ordinary production builds.
+    if os.environ.get("CF_PAGES_BRANCH") == "qa/v4-resume-live-acceptance-20261124" or os.environ.get("HHBA_V4_RESUME_LIVE_QA") == "1":
+        run(["node", "--test", "scripts/v4-resume-live-acceptance.contract.test.mjs",
+             "scripts/resume-optimization.route.test.mjs"], cwd=WEB)
+        run(["node", "scripts/v4-resume-live-acceptance.mjs"], cwd=WEB)
+
     # This integration must preserve the currently deployed matching popup,
     # score evidence, and PDF/DOCX upload flow. Fail before media generation
     # or deploy if either the UI or the job-isolated Word service regresses.
