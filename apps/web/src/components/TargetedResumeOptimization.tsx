@@ -30,14 +30,15 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  // Reopen the same employer posting from a new search or history using the same private Word branch.
  const postingScope=useMemo(()=>stablePostingScope(job.official_url),[job.official_url]);
  const blocks=useMemo<ResumeBlock[]>(()=>{
+ if(requireVerifiedJd&&sourceText?.trim())return sourceResumeBlocks(sourceText,true);
  const originals=[
   ...(Array.isArray(profile.experiences)?profile.experiences:[]).filter(e=>e.evidence?.trim()).map((e,i)=>({id:'experience-'+i,section:'experience' as const,text:e.evidence.slice(0,1600)})),
   ...(Array.isArray(profile.skills)?profile.skills:[]).filter(s=>s.evidence?.trim()).map((s,i)=>({id:'skill-'+i,section:'skills' as const,text:s.evidence.slice(0,1600)}))
- ].slice(0,12);
+ ];
  // Newer search-first flows preserve local source text, but do not yet expose
  // verified structured work-history records. Keep raw paragraphs unmistakably
  // labelled as source text, rather than inventing roles or employers.
- if(!profile.experiences?.length&&sourceText?.trim())return sourceResumeBlocks(sourceText,requireVerifiedJd);
+ if(!profile.experiences?.length&&sourceText?.trim())return sourceResumeBlocks(sourceText,true);
  return originals;
  },[profile,sourceText,requireVerifiedJd]);
  const wholeSource=useMemo(()=>completeRewriteSource(profile,sourceText),[profile,sourceText]);
@@ -448,7 +449,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    const prior=full&&previousOptimization.current?.key===key?previousOptimization.current:null;
    let pending:string[]=[];
    const incoming=prior&&!prior.pending.length?prior.suggestions:
-    await requestResumeOptimization(full?currentBlocks:currentBlocks.slice(0,12),targetedJob,controller.signal,
+    await requestResumeOptimization(currentBlocks,targetedJob,controller.signal,
      full?{text:context,wanted:prior?.pending,onPending:ids=>{pending=ids;},
       onQueued:()=>setNotice('简历优化正在排队，轮到后会继续。')}:undefined);
    const combined=[...new Map([...(prior?.suggestions||[]),...incoming].map(item=>[item.blockId,item])).values()];
@@ -719,7 +720,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   setNativeWordTextDraft(native&&typeof native.original==='string'&&
    typeof native.text==='string'&&native.original.length>0&&
    native.original.length<=1600&&native.text.length<=1600&&
-   Number.isInteger(native.revision)&&native.revision>=0&&native.revision<=8&&
+   Number.isInteger(native.revision)&&native.revision>=0&&
    Number.isInteger(native.page)&&native.page>=1&&native.page<=20?
    {original:native.original,text:native.text,revision:native.revision,page:native.page}:null);
   setVersion({id:'draft-'+(postingScope||'invalid'),targetJobId:postingScope||'invalid',
@@ -757,7 +758,6 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      version:{blocks:version.blocks,acceptedSuggestionIds:version.acceptedSuggestionIds},
      suggestions,ignored,suggestionDrafts,newEvidence,details,
      native_word_draft:nativeWordTextDraft});
-    if(payload.length>60000)throw Error('TOO_LARGE');
     sessionStorage.setItem(draftKey,payload);
     setDraftStatus('文字草稿已保存在当前浏览器标签页（不包含 Word 原文件）。');
    }catch{setDraftStatus('当前浏览器无法自动保存草稿，请避免关闭页面。');}
