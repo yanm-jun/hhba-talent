@@ -140,12 +140,12 @@ test('UI shows the correct login -> upload -> history navigation and real manual
  const vault=read('components/PrivateResumeVault.tsx');
  const dialog=read('components/CandidateMatchNativeDialog.tsx');
  const history=read('components/CandidateMatchHistory.tsx');
- assert.ok(home.includes("navigate(user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch')"));
+ assert.ok(home.includes("const matchTarget=user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'")&&home.includes('onClick={()=>navigate(matchTarget)}')&&home.includes('candidateTarget={matchTarget}'));
   assert.ok(login.includes('?next=%2Fcandidate%2Fmatch'));
   assert.ok(match.includes('/candidate/login?next=%2Fcandidate%2Fmatch'), 'default route still directs candidate to login');
  assert.ok(!match.includes('%3Fv4%3D1'), 'V4 is the default after candidate login');
  assert.match(read('services/resumeMatch.ts'),/const EFFECTIVE_API=MATCH_V4_PREVIEW\?'/);
- assert.match(home,/kind==='candidate'\?'\/candidate\/jobs'/);
+ assert.match(home,/kind==='candidate'\?\(candidateTarget\|\|'\/candidate\/match'\)/);
  assert.match(login,/requested === '\/candidate\/match'/);
  assert.match(match,/uploadPrivateResume\(file,true\)/);
  assert.match(match,/linkMatchHistoryResume\(/);
