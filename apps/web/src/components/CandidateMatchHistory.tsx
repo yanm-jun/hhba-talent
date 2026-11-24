@@ -1,3 +1,4 @@
+import {RecruitmentSourceLinks,recruitmentText} from './RecruitmentSourceLinks';
 import {MatchResearchPanels} from './MatchResearchPanels';
 import {useEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
@@ -233,14 +234,14 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
       return <article key={job.official_url} className="hhba-match-history-job">
        <div className="hhba-match-history-job-top">
         <span>{String(i+1).padStart(2,'0')}</span>
-        <div><strong>{job.company}</strong><h3>{job.title}</h3><small>{job.location} · {job.recruitment_source_note||'企业招聘入口待核验'}</small></div>
+        <div><strong>{job.company}</strong><h3>{job.title}</h3><small>{job.location} · {recruitmentText(job.recruitment_source_note||'企业招聘入口待核验')}</small></div>
         <b>{job.match_score===null?'—':job.match_score+'/100'}</b>
        </div>
-       {job.score_basis&&<p><strong>评分依据：</strong>{job.score_basis}</p>}
-       <p><strong>推荐理由：</strong>{job.recommendation_reason||'暂无补充理由，请核对岗位详情。'}</p>
-       {!!job.evidence_sources?.length&&<details><summary>研究来源（{job.evidence_sources.length}）</summary><ul>{job.evidence_sources.map((source,index)=>{const url=safeJobUrl(source.url);return url?<li key={index}><a href={url} target="_blank" rel="noopener noreferrer">{url}</a></li>:null})}</ul></details>}
-       {job.requirements_basis&&<details><summary>保存的岗位要求</summary><p style={{whiteSpace:'pre-wrap'}}>{job.requirements_basis}</p></details>}
-       {job.evidence_excerpt&&<details><summary>保存的岗位原文依据</summary><p style={{whiteSpace:'pre-wrap'}}>{job.evidence_excerpt}</p></details>}
+       {job.score_basis&&<p><strong>评分依据：</strong>{recruitmentText(job.score_basis)}</p>}
+       <p><strong>推荐理由：</strong>{recruitmentText(job.recommendation_reason||'暂无补充理由，请核对岗位详情。')}</p>
+       {job.requirements_basis&&<details><summary>保存的岗位要求</summary><p style={{whiteSpace:'pre-wrap'}}>{recruitmentText(job.requirements_basis)}</p></details>}
+       {job.evidence_excerpt&&<details><summary>保存的岗位原文依据</summary><p style={{whiteSpace:'pre-wrap'}}>{recruitmentText(job.evidence_excerpt)}</p></details>}
+       <RecruitmentSourceLinks job={job}/>
        <div className="hhba-match-history-job-actions">
         {href&&<a href={href} target="_blank" rel="noopener noreferrer">查看原招聘页面（仍需确认在招） <ArrowRight size={14}/></a>}
         {view==='optimize'&&<button type="button" disabled={!original||busy||!job.jd_version_id||!job.jd_sha256}
