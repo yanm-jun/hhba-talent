@@ -120,7 +120,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
   </li>)}
  </ol>
  <section id={id} className="hhba-stage-report hhba-refined-stage" aria-label={stages[active].label+'报告'} data-stage={active}>
-  <header className="hhba-refined-header"><span className="hhba-refined-brand">HHBA</span><small>{stages[active].english}</small>{pending&&onFollow&&<button type="button" onClick={onFollow}>跟随进度</button>}</header>
+  {active!==2?<header className="hhba-refined-header"><span className="hhba-refined-brand">HHBA</span><small>{stages[active].english}</small>{pending&&onFollow&&<button type="button" onClick={onFollow}>跟随进度</button>}</header>:pending&&onFollow?<div className="hhba-refined-header"><button type="button" onClick={onFollow}>跟随进度</button></div>:null}
   {active===0&&<>
    <div className="hhba-refined-title"><span>01 / CAREER PROFILE</span><h2>个人职业分析报告</h2><p>{identified?'根据本次简历实际内容整理的职业画像。':pending?'正在识别简历，分析成果返回后自动呈现。':'本次历史记录没有保存简历分析报告。'}</p></div>
    {identified&&parsed?<>
@@ -158,8 +158,6 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
    </details>
   </>}
   {active===2&&<>
-   <div className="hhba-refined-title"><span>03 / SOURCE VERIFICATION</span><h2>官方招聘信息核验</h2><p>逐一核验全部候选岗位，未确认的来源不作为正式推荐。</p></div>
-   <div className="hhba-refined-metrics"><div><small>已核验官方 JD</small><strong>{verified.length}</strong></div><div><small>尚未确认官方 JD</small><strong>{Math.max(0,discovered-verified.length)}</strong></div><div><small>已完成证据评分</small><strong>{all.filter(scoreGrounded).length}</strong></div></div>
    {jdJob?<><ReportPager count={jdItems.length} index={currentJdIndex} onChange={setJdIndex}/><article className="hhba-verified-report">
     <div className="hhba-refined-job-head"><div><JobTitle job={jdJob}/></div><span className={confirmed(jdJob)?'hhba-source-confirmed':'hhba-source-pending'}>{confirmed(jdJob)?'官方 JD 已核验':'尚未确认'}</span></div>
     <dl className="hhba-verification-facts"><div><dt>招聘来源</dt><dd>{confirmed(jdJob)?'官方来源已核验':'尚未确认官方归属'}</dd></div><div><dt>完整岗位 JD</dt><dd>{confirmed(jdJob)?'已取得完整原文':jdJob.jd_research?.facts.length?'已取得公开资料（非完整官方 JD）':jdJob.jd_research?.inference?'已完成 AI 职业方向研究':jdJob.evidence_excerpt||jdJob.requirements_basis?'已有待核验资料':pending&&!jdJob.jd_research?'等待研究':'尚未取得可核验原文'}</dd></div><div><dt>工作地点</dt><dd>{jdJob.location||'未知'}</dd></div><div><dt>薪资</dt><dd>{jdJob.salary||'未取得可确认薪资'}</dd></div><div><dt>投递状态</dt><dd>{jdJob.availability_status==='OPEN_LISTED'?'页面显示开放，仍需确认':'仍需官网确认'}</dd></div>{(jdJob.jd_checked_at||jdJob.checked_at)&&<div><dt>核验时间</dt><dd>{jdJob.jd_checked_at||jdJob.checked_at}</dd></div>}</dl>
