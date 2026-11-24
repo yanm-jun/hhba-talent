@@ -250,3 +250,21 @@ test('mixed styles and duplicated split paragraphs cannot be merged into an unsa
   await assert.rejects(()=>editOriginalDocxStrict(input,[{original:'原始岗位描述',text:'真实改写'}],{allowExpansion:true}),/WORD_EDIT_AMBIGUOUS/);
  }
 });
+
+
+test('AI multiline expansion creates actual styled sibling Word paragraphs and keeps unrelated bytes',async()=>{
+ const source=fixture({method:8,split:true});
+ const before=parts(source);
+ const original='原始岗位描述',lines=['岗位职责与真实经历','虚构测试：新增数据整理段落','虚构测试：新增沟通段落'];
+ const info=await inspectOriginalDocxStrict(source,{allowParagraphRuns:true});
+ assert.ok(info.paragraph_text.includes(original));
+ const edited=await editOriginalDocxStrict(source,[{original,text:lines.join('\n')}],{allowExpansion:true});
+ const after=parts(edited),xml=after.get('word/document.xml').raw.toString();
+ assert.match(xml,/<\/w:p><w:p><w:r><w:rPr><w:b\/><w:color w:val="452786"\/>/);
+ for(const line of lines)assert.ok(xml.includes(line));
+ assert.equal((xml.match(/<w:p>/g)||[]).length,(before.get('word/document.xml').raw.toString().match(/<w:p>/g)||[]).length+2);
+ const inspected=await inspectOriginalDocxStrict(edited,{allowParagraphRuns:true});
+ for(const line of lines)assert.ok(inspected.editable_text.includes(line));
+ for(const [name,part] of before)if(name!=='word/document.xml')assert.deepEqual(after.get(name).compressed,part.compressed);
+ await assert.rejects(()=>editOriginalDocxStrict(fixture({mixed:true}),[{original:'原始岗位',text:'新内容\n额外内容'}],{allowExpansion:true}),/WORD_EDIT_AMBIGUOUS/);
+});

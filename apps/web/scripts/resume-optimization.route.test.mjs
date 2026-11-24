@@ -448,3 +448,50 @@ test('same repeated review state pauses without claiming completion and preserve
  assert.equal(calls,2);assert.equal(paused,true);assert.deepEqual(result,[]);
  assert.deepEqual(checkpoints.at(-1),{pending:['a'],suggestions:[],reviewFeedback:{a:'仍需核实事实'}});
 });
+
+
+test('V4 multiple ordered edits for one anchor are composed without dropping later edits',async()=>{
+ const {parseSuggestions,normalizeDocumentSuggestions}=await import('../functions/_lib/resume-ai-provider.js');
+ const block={id:'a',text:'整理销售数据并汇报。',paragraphEditable:true};
+ const parsed=parseSuggestions({suggestions:[
+  {blockId:'a',action:'replace',original:'整理销售数据',proposed:'使用 Excel 整理销售数据',rationale:'突出工具'},
+  {blockId:'a',action:'replace',original:'并汇报',proposed:'并向负责人汇报',rationale:'突出沟通'},
+  {blockId:'a',action:'append',proposed:'整理培训反馈。',sourceQuotes:['整理培训反馈。'],rationale:'同一经历补充'}
+ ]},['a'],{fullDocument:true});
+ assert.equal(parsed.length,3);
+ const [combined]=normalizeDocumentSuggestions([block],parsed);
+ assert.equal(combined.proposed,'使用 Excel 整理销售数据并向负责人汇报。整理培训反馈。');
+ assert.equal(combined.changeCount,3);
+ assert.deepEqual(combined.sourceQuotes,['整理培训反馈。']);
+ assert.match(combined.rationale,/突出沟通/);
+ const conflicting=normalizeDocumentSuggestions([block],[
+  {blockId:'a',action:'replace',original:block.text,proposed:'新的完整表达'},
+  {blockId:'a',action:'replace',original:block.text,proposed:'另一个表达'}
+ ]);
+ assert.deepEqual(conflicting,[],'conflicting edits must return to AI review rather than silently discard a proposal');
+});
+test('V4 cross-section numeric facts require actual full-document quotes and independent attribution review',async()=>{
+ const {auditTargetedResumeSuggestions}=await import('../functions/_lib/resume-rewrite-provider.js');
+ const env={HHBA_MATCH_V4_READY:'1',HHBA_AGENT_RELAY_API_KEY:'synthetic-placeholder-secret'};
+ const source='虚构甲公司：每周整理 50 条销售记录。';
+ const originalFetch=globalThis.fetch;let calls=0;
+ globalThis.fetch=async(_url,init)=>{
+  calls++;const req=JSON.parse(init.body),input=JSON.parse(req.input);
+  assert.deepEqual(input.blocks[0].sourceQuotes,[source]);
+  assert.match(req.instructions,/归属/);
+  return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify({
+   checks:[{blockId:'a',safe:true,needs_revision:false,concern:''}]
+  })}]}]});
+ };
+ try{
+  const base={env,blocks:[{id:'a',text:'具备数据整理经验。'}],job:{requirements:'数据统计'},
+   signal:new AbortController().signal,withCoverage:true,reviewContext:{text:'具备数据整理经验。\n'+source},reviewedIds:['a']};
+  const suggestion={blockId:'a',action:'replace',proposed:'具备数据整理经验，曾在甲公司每周整理 50 条销售记录。',sourceQuotes:[source]};
+  const accepted=await auditTargetedResumeSuggestions({...base,suggestions:[suggestion]});
+  assert.equal(accepted.suggestions.length,1);
+  assert.deepEqual(accepted.pendingIds,[]);
+  const invalid=await auditTargetedResumeSuggestions({...base,suggestions:[{...suggestion,sourceQuotes:['虚构记录 50 条。']}]});
+  assert.deepEqual(invalid.suggestions,[]);assert.deepEqual(invalid.pendingIds,['a']);
+  assert.equal(calls,1);
+ }finally{globalThis.fetch=originalFetch;}
+});

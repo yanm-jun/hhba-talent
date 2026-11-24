@@ -13,7 +13,7 @@ const blocks=[
  {id:'a',section:'experience',text:'负责门店日常运营，使用 Excel 汇总每周销售数据并向门店负责人汇报。'},
  {id:'b',section:'experience',text:'协助新员工熟悉客户接待流程，整理培训反馈并跟进待办事项。'},
  {id:'c',section:'skills',text:'具备 Excel 数据整理和跨部门沟通经验。'}
-];
+].map(block=>({...block,paragraphEditable:true}));
 const jd={id:'synthetic-only',company:'虚构测试企业',title:'区域运营督导',location:'上海',
  full_jd:'岗位职责：负责门店经营数据分析与运营报告；协助开展人员培训和客户服务流程优化。任职要求：熟悉 Excel 数据分析，具备沟通协调能力。'};
 const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
@@ -69,7 +69,7 @@ export async function runSyntheticResumeAcceptance({env,signal,optimize=optimize
    }else stalledStates.clear();
    wanted=pending;
   }
-  const edits=[...suggestions.values()].filter(s=>s.action==='replace'&&s.proposed!==s.original&&s.proposed.trim()&&!/[\r\n\t]/.test(s.proposed));
+  const edits=[...suggestions.values()].filter(s=>s.action==='replace'&&s.proposed!==s.original&&s.proposed.trim()&&!/[\r\t]/.test(s.proposed));
   if(!edits.length)fail('QA_NO_APPLICABLE_EDIT');
   stage='docx';
   const byId=new Map(edits.map(edit=>[edit.blockId,edit]));
@@ -90,7 +90,7 @@ export async function runSyntheticResumeAcceptance({env,signal,optimize=optimize
   const expected=blocks.map(b=>byId.get(b.id)?.proposed??b.text).join('\n');
   if(afterText!==expected||digest(source)!==originalHash||digest(edited)===originalHash)fail('QA_DOCX_CONTENT_MISMATCH');
   const inspection=await inspectOriginalDocxStrict(edited);
-  if(edits.some(edit=>!inspection.editable_text.includes(edit.proposed)))fail('QA_DOCX_ANCHOR_MISSING');
+  if(edits.some(edit=>edit.proposed.split('\n').some(line=>!inspection.editable_text.includes(line))))fail('QA_DOCX_ANCHOR_MISSING');
   summary.stages.docx={structure:'PASS',original_unchanged:true,edited_text_verified:true,applied_edits:applied.size,bytes:edited.length};
   emit();
   stage='reassessment';
