@@ -97,7 +97,7 @@ export async function requestWholeResumeRewrite(blocks:ResumeBlock[],
  try{
   response=await rewriteFetch(PATH,{method:'POST',credentials:'omit',cache:'no-store',signal,
    headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
-   body:JSON.stringify({consent_ai:true,blocks,job})});
+   body:JSON.stringify({consent_ai:true,blocks,job:v4Active()&&job.jd_version_id&&job.jd_sha256?{...job,requirements:''}:job})});
  }catch(e){
   if((e as Error)?.name==='AbortError')throw e;
   throw new WholeRewriteError('NETWORK_ERROR',503);
@@ -128,7 +128,7 @@ export async function continueWholeResumeRewrite(
   response=await rewriteFetch('/api/resume-rewrite-step',{
    method:'POST',credentials:'omit',cache:'no-store',signal,
    headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
-   body:JSON.stringify({consent_ai:true,blocks,job,draft,checkpoint})
+   body:JSON.stringify({consent_ai:true,blocks,job:v4Active()&&job.jd_version_id&&job.jd_sha256?{...job,requirements:''}:job,draft,checkpoint})
   });
  }catch(e){
   if((e as Error)?.name==='AbortError')throw e;

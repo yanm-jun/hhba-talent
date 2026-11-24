@@ -87,12 +87,13 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent}={}){
  if(provider.reasoningEffort!=='auto')return requestV4Response(fetcher,provider,payload,{signal,onEvent});
  const key=String(provider.baseUrl||BASE)+'\n'+provider.model;
  const efforts=['xhigh','high','medium','low',undefined];
- const prior=compatibleEffort.get(key);
+ const cached=compatibleEffort.get(key);
+ const prior=cached&&Date.now()-cached.checkedAt<3600000?cached.effort:undefined;
  const candidates=prior===undefined?efforts:efforts.slice(Math.max(0,efforts.indexOf(prior||undefined)));
  for(const effort of candidates){
   try{
    const result=await requestV4Response(fetcher,{...provider,reasoningEffort:effort},payload,{signal,onEvent});
-   compatibleEffort.set(key,effort||'');
+   if(!cached||cached.effort!==(effort||'')||prior===undefined)compatibleEffort.set(key,{effort:effort||'',checkedAt:Date.now()});
    console.info('HHBA_V4_PROVIDER_CAPABILITY',JSON.stringify({reasoning_effort:effort||'provider_default',stream_requested:provider.stream===true}));
    return result;
   }catch(e){if(e?.code!=='AI_PROVIDER_REASONING_UNSUPPORTED'||signal?.aborted||effort===undefined)throw e;}
@@ -175,7 +176,7 @@ async function resumeResearchIndex(fetcher,provider,resume,roleHint,signal){
 }
 export function v4GroundProfile(raw,resume){
  const profile=raw?.profile&&typeof raw.profile==='object'?raw.profile:raw||{};
- const exact=quote=>quote.length>=4&&norm(resume).includes(norm(quote));
+ const exact=quote=>Boolean(norm(quote))&&norm(resume).includes(norm(quote));
  const facts=(Array.isArray(profile.facts)?profile.facts:[])
   .map(x=>({kind:text(x?.kind,22),quote:text(x?.quote,500)}))
   .filter(x=>x.kind&&exact(x.quote))
@@ -294,8 +295,8 @@ function renderJob(x,url,verified,resume,toolLinked,index){
  const title=text(verified?.title||x?.title||x?.role,160)||'职位详情待核实';
  const location=text(verified?.location||x?.location||x?.city,120)||'工作地点待核实';
  const resumeQuote=text(x?.resume_quote,450),jdQuote=text(x?.jd_quote,450);
- const resumeGrounded=resumeQuote.length>=4&&norm(resume).includes(norm(resumeQuote));
- const jdGrounded=verified?.full_jd&&jdQuote.length>=4&&
+ const resumeGrounded=Boolean(norm(resumeQuote))&&norm(resume).includes(norm(resumeQuote));
+ const jdGrounded=verified?.full_jd&&Boolean(norm(jdQuote))&&
   norm(verified.full_jd).includes(norm(jdQuote));
  const rawScore=x?.match_score??x?.score;
  const n=Number(rawScore),numbered=rawScore!==null&&rawScore!==undefined&&

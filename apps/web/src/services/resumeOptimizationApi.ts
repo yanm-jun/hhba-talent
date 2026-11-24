@@ -91,7 +91,7 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
   try{
    response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
     headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
-    body:JSON.stringify({consent_ai:true,blocks:requestBlocks,job,
+    body:JSON.stringify({consent_ai:true,blocks:requestBlocks,job:MATCH_V4_PREVIEW&&job.jd_version_id&&job.jd_sha256?{...job,requirements:''}:job,
      ...(document?{full_document:{text:document.text,wanted:remaining?requestBlocks.map(b=>b.id):wanted}}:{})})});
   }catch(e){if(signal?.aborted)throw e;if(MATCH_V4_PREVIEW){await retry();continue;}throw new ResumeOptimizationError('NETWORK_ERROR',503);}
   const data=await response.json().catch(()=>({})) as {

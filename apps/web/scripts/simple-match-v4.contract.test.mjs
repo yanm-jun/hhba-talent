@@ -525,3 +525,22 @@ test('V4 context splitting retains every source character and all evidence categ
  const result=await v4Match(fetcher,provider,cv,'全国',{oneRound:true,skipEnrich:true});
  assert.equal(fullAttempts,1);assert.equal(segments.join(''),cv);assert.equal(result.profile.facts.length,2);
 });
+
+
+test('V4 editorial planning reads every source segment only after actual context overflow',async()=>{
+ const {adaptiveV4Plan,adaptiveV4BlockCall}=await import('../functions/_lib/resume-rewrite-provider.js');
+ const blocks=[{id:'a',text:'真实工作经历甲'},{id:'b',text:'真实工作经历乙'},{id:'c',text:'真实工作经历丙'}];
+ const read=[];
+ const mock=async(_provider,_system,input)=>{
+  if(input.blocks.length>1)throw Object.assign(Error('AI_PROVIDER_CONTEXT_EXCEEDED'),{code:'AI_PROVIDER_CONTEXT_EXCEEDED'});
+  read.push(input.blocks[0].id);
+  return {focus:[input.blocks[0].text],questions:[],recommended_order:[input.blocks[0].id]};
+ };
+ const plan=await adaptiveV4Plan(provider,'plan',{job:{title:'岗位',requirements:'JD'},blocks},undefined,mock);
+ assert.deepEqual(read,['a','b','c']);assert.equal(plan.focus.length,3);
+ const reviewed=await adaptiveV4BlockCall(provider,'audit',{blocks},undefined,6500,'checks',async(_p,_s,input)=>{
+  if(input.blocks.length>1)throw Object.assign(Error('AI_PROVIDER_CONTEXT_EXCEEDED'),{code:'AI_PROVIDER_CONTEXT_EXCEEDED'});
+  return {checks:[{blockId:input.blocks[0].id,safe:true}]};
+ });
+ assert.deepEqual(reviewed.checks.map(x=>x.blockId),['a','b','c']);
+});

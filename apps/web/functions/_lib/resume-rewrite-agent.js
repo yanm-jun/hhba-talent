@@ -44,7 +44,7 @@ export function modelDecision(raw,validIds,{unbounded=false}={}){
  for(const row of Array.isArray(raw.questions)?raw.questions:[]){
   if(!row||!allowed.has(row.blockId)||typeof row.question!=='string')continue;
   const question=row.question.trim();
-  if(question.length<6||(!unbounded&&question.length>500)||asked.has(row.blockId+question))continue;
+  if(question.length<(unbounded?1:6)||(!unbounded&&question.length>500)||asked.has(row.blockId+question))continue;
   asked.add(row.blockId+question);
   questions.push({blockId:row.blockId,question,
    reason:typeof row.reason==='string'?row.reason.slice(0,unbounded?undefined:400):'',
@@ -86,7 +86,7 @@ export async function runResumeEditorialAgent({
  const rewritten=new Map(draft.blocks.map(b=>[b.blockId,{...b}]));
  const questions=[...draft.questions];
  const warnings=[...draft.warnings];
- const maxRounds=Number.isFinite(Number(env?.HHBA_RESUME_AGENT_MAX_PASSES))?
+ const maxRounds=unbounded?1:Number.isFinite(Number(env?.HHBA_RESUME_AGENT_MAX_PASSES))?
   Math.max(1,Math.min(16,Math.floor(Number(env.HHBA_RESUME_AGENT_MAX_PASSES)))):4;
  let stop='model_finished';
  let previousSignature=typeof draft.autonomy?.previous_signature==='string'?

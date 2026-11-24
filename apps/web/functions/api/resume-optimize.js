@@ -110,8 +110,8 @@ export async function onRequestGet({env}){
  return send({kind:'HHBA_RESUME_OPTIMIZATION_V1',enabled:active(env)&&configured&&(isV4(env)||await dbReady(env.HHBA_PNVS_AUTH_DB)),
   full_document_enabled:active(env)&&configured&&(isV4(env)||await taskReady(env.HHBA_PNVS_AUTH_DB)),
   unlimited_product_quota:isV4(env),
-  configured,per_account_daily_limit:MAX_PERSONAL,global_daily_limit:MAX_GLOBAL,
-  per_account_daily_attempt_limit:MAX_PERSONAL_ATTEMPTS,global_daily_attempt_limit:MAX_GLOBAL_ATTEMPTS});
+  configured,per_account_daily_limit:isV4(env)?null:MAX_PERSONAL,global_daily_limit:isV4(env)?null:MAX_GLOBAL,
+  per_account_daily_attempt_limit:isV4(env)?null:MAX_PERSONAL_ATTEMPTS,global_daily_attempt_limit:isV4(env)?null:MAX_GLOBAL_ATTEMPTS});
 }
 export async function onRequestPost({request,env}){
  if(!sameOrigin(request))return fail('ORIGIN_REQUIRED',403);

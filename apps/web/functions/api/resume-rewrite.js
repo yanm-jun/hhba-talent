@@ -40,6 +40,7 @@ export async function onRequestPost({request,env}){
   // All requests remain explicit-consent, candidate-only and local to this
   // draft. The model may choose further editorial tools, not privileged I/O.
   const signal=env?.HHBA_MATCH_V4_READY==='1'?request.signal:AbortSignal.timeout(150000);
+  if(env?.HHBA_MATCH_V4_READY==='1'&&env?.HHBA_RESUME_AGENT_ENABLED!=='0'&&!rewriteContinuationActive(env))return reject('AI_CHECKPOINT_NOT_CONFIGURED',503);
   const base=await generateTailoredResume({
    env,blocks:body.blocks,job:trustedJob,signal
   });

@@ -1,6 +1,6 @@
 import {sha256Hex} from './real-auth.js';
 import {generateSuggestions,selectProvider} from './resume-ai-provider.js';
-import {auditTargetedResumeSuggestions,completeJson} from './resume-rewrite-provider.js';
+import {auditTargetedResumeSuggestions,completeJson,adaptiveV4Plan} from './resume-rewrite-provider.js';
 
 const BATCH_SIZE=12;
 const CONCURRENCY=3;
@@ -41,8 +41,7 @@ const editorialInstructions='你是岗位定向 Word 编辑。给出一份简洁
 export async function optimizeResumeDocument({env,blocks,context,job,signal,wanted},deps={}){
  const generate=deps.generate||generateSuggestions;
  const audit=deps.audit||auditTargetedResumeSuggestions;
- const plan=deps.plan||(input=>completeJson(selectProvider(env,'resume_rewrite'),editorialInstructions,input,
-  env?.HHBA_MATCH_V4_READY==='1'?signal:AbortSignal.any([signal,AbortSignal.timeout(55000)]),7000));
+ const plan=deps.plan||(input=>env?.HHBA_MATCH_V4_READY==='1'?adaptiveV4Plan(selectProvider(env,'resume_rewrite'),editorialInstructions,input,signal):completeJson(selectProvider(env,'resume_rewrite'),editorialInstructions,input,AbortSignal.any([signal,AbortSignal.timeout(55000)]),7000));
  let focus=[];
  try{
   const proposed=await plan({job,context,blocks});
@@ -50,7 +49,7 @@ export async function optimizeResumeDocument({env,blocks,context,job,signal,want
    .map(value=>env?.HHBA_MATCH_V4_READY==='1'?value.trim():value.trim().slice(0,360)).filter(Boolean);
   if(env?.HHBA_MATCH_V4_READY!=='1')focus=focus.slice(0,20);
  }catch(error){
-  if(terminal.has(error?.message)&&error.message!=='AI_PROVIDER_NOT_CONFIGURED')throw error;
+  if(env?.HHBA_MATCH_V4_READY==='1'||terminal.has(error?.message)&&error.message!=='AI_PROVIDER_NOT_CONFIGURED')throw error;
  }
  const chosen=wanted?new Set(wanted):null;
  const scoped=blocks.filter(block=>!chosen||chosen.has(block.id));

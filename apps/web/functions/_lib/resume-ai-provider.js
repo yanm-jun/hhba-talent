@@ -106,7 +106,7 @@ export async function generateSuggestions({env,blocks,job,signal,documentContext
   let suggestions=parseSuggestions(parsed,blocks.map(b=>b.id),{unbounded:true});
   const byId=new Map(blocks.map(b=>[b.id,b.text]));
   const comparable=text=>text.replace(/\s+/g,' ').trim();
-  if(job.verified)suggestions=suggestions.filter(s=>comparable(s.jobRequirement).length>=4&&comparable(job.requirements).includes(comparable(s.jobRequirement)));
+  if(job.verified)suggestions=suggestions.filter(s=>Boolean(comparable(s.jobRequirement))&&comparable(job.requirements).includes(comparable(s.jobRequirement)));
   return {provider:provider.name,suggestions:suggestions.map(s=>({...s,original:byId.get(s.blockId)}))};
  }
  if(provider.protocol==='anthropic'){
