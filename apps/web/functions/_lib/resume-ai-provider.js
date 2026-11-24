@@ -55,7 +55,7 @@ export function parseSuggestions(raw,allowedBlockIds,{unbounded=false}={}){
   if(!s||typeof s!=='object'||Array.isArray(s))continue;
   const namedId=asText(s.blockId)||asText(s.block_id)||asText(s.targetBlockId)||asText(s.target_block_id);
   const blockId=allowed.has(namedId)?namedId:(!namedId&&allowed.size===1?[...allowed][0]:'');
-  if(!allowed.has(blockId)||used.has(blockId))continue;
+  if(!allowed.has(blockId)||(!unbounded&&used.has(blockId)))continue;
   let action=asText(s.action)||asText(s.type)||asText(s.operation);
   action=synonyms[action.toLowerCase()]||action;
   const rawProposal=asText(s.proposed)||asText(s.optimizedText)||asText(s.suggestedText)||
@@ -70,9 +70,11 @@ export function parseSuggestions(raw,allowedBlockIds,{unbounded=false}={}){
    '请结合真实经历核实这条表达建议';
   const jobRequirement=asText(s.jobRequirement)||asText(s.job_requirement)||
    asText(s.requirement)||'岗位相关要求';
-  used.add(blockId);
+  const key=unbounded?JSON.stringify([blockId,action,proposed,jobRequirement]):blockId;
+  if(used.has(key))continue;
+  used.add(key);
   accepted.push({
-   id:clip(asText(s.id)||'suggestion-'+(index+1)+'-'+blockId,100),
+   id:unbounded?'suggestion-'+blockId+'-'+index:clip(asText(s.id)||'suggestion-'+(index+1)+'-'+blockId,100),
    blockId,action,original:unbounded?original:clip(original,1600),proposed:unbounded?proposed:clip(proposed,1600),
    rationale:unbounded?rationale:clip(rationale,600),jobRequirement:unbounded?jobRequirement:clip(jobRequirement,600),
    evidenceStatus:'needs_user_confirmation'
@@ -93,7 +95,7 @@ export async function generateSuggestions({env,blocks,job,signal,documentContext
  const input=JSON.stringify({blocks,job:{title:job.title,requirements:job.requirements},
   ...(documentContext?{document_context:documentContext}:{}),
   output_format_example:sample,
-  instructions:'严格输出符合示例字段名的JSON对象，不要复制示例建议内容；blockId必须是blocks中的id；一份段落至多一条建议。完整简历上下文用于理解结构，不能把其他段落里的经历、数字或资格写进当前段落。'});
+  instructions:'严格输出符合示例字段名的JSON对象，不要复制示例建议内容；blockId必须是blocks中的id；'+(provider.protocol==='responses'?'同一段落可以提出任意数量有价值、可独立选择的完整替代写法或补充问题，不要为凑数量重复。':'一份段落至多一条建议。')+'完整简历上下文用于理解结构，不能把其他段落里的经历、数字或资格写进当前段落。'});
  let url,headers,body;
  if(provider.protocol==='responses'){
   // Route legacy editing UI through the same V4 model, with no imposed output budget.
