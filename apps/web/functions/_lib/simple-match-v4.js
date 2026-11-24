@@ -167,10 +167,8 @@ function candidateUrl(x){
   x?.apply_url||x?.application_url||x?.source_url||x?.job_link);
 }
 function candidates(payload,response){
- const root=payload?.result&&typeof payload.result==='object'?payload.result:
-  payload?.data&&typeof payload.data==='object'?payload.data:payload;
- const data=[root?.jobs,root?.matches,root?.recommendations,root?.positions,
-  root?.job_recommendations,root?.job_list,root?.vacancies].filter(Array.isArray).flat();
+ const roots=[payload,payload?.result,payload?.data].filter(x=>x&&typeof x==='object'&&!Array.isArray(x));
+ const data=roots.flatMap(root=>[root.jobs,root.matches,root.recommendations,root.positions,root.job_recommendations,root.job_list,root.vacancies].filter(Array.isArray).flat());
  const rows=new Map();
  for(const x of data){
   if(!x||typeof x!=='object')continue;
@@ -191,7 +189,7 @@ async function toJson(fetcher,provider,response,{signal}={}){
    const formatted=await v4Call(fetcher,provider,{
     instructions:'只转换提供的求职研究文本为JSON，不联网、不补写、不发明岗位和链接。'
      +'输出对象：profile（summary,roles,skills,facts,education,education_evidence,experience_years,experience_evidence）'
-     +'以及 jobs 数组，每项 company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote。原样保留 research_action 和 research_actions，不发明工具请求。'
+     +'以及 jobs 数组，每项 company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote。原样保留 research_action 和 research_actions、reviewed_sources、source_leads，不发明工具请求或来源状态。'
      +'没有原文支持的字段使用 null。完整保留真实找到的岗位，不设置数量上限。'
      +'同时原样保留 research_complete、continue_search、completion_reason、search_strategy，以及每个岗位的 source_kind、site_name、employer_proof_url、employer_proof_urls、requirements、fit_summary。不得擅自缩减岗位或引用。',
     input:raw
@@ -607,7 +605,11 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(data.format_error)note('SEARCH_FORMAT_REPAIR_FAILED');
    if(response.status==='completed'&&!data.format_error){
     for(const u of pendingSources)submittedSources.add(u);
-    for(const r of Array.isArray(data.reviewed_sources)?data.reviewed_sources:[]){const u=curatedUrl(v4PublicJobUrl(r?.url));if(u&&sourceLeads.has(u)&&['job_found','no_job','official_entry'].includes(r.status)&&text(r.reason))reviewedSources.set(u,{status:r.status,reason:text(r.reason)});}
+    const availableEvidence=new Set([...v4ToolSources(response),...publicEvidence.map(r=>r.url)].map(v4PublicJobUrl).filter(Boolean).map(curatedUrl));
+    for(const r of Array.isArray(data.reviewed_sources)?data.reviewed_sources:[]){const u=curatedUrl(v4PublicJobUrl(r?.url));if(u&&sourceLeads.has(u)&&['job_found','no_job','official_entry'].includes(r.status)&&text(r.reason)){
+     if(availableEvidence.has(u)||rows.has(u))reviewedSources.set(u,{status:r.status,reason:text(r.reason)});
+     else note('SOURCE_REVIEW_UNSUPPORTED');
+    }}
    }
    for(const u of [...v4Sources(response),...(Array.isArray(data.source_leads)?data.source_leads:[])].map(v4PublicJobUrl).filter(Boolean))if(!isCommercialRecruitmentBoard(u))sourceLeads.add(curatedUrl(u));
   }
@@ -619,6 +621,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(excluded.has(url)||rejectedBoards.has(url)||(curated&&excluded.has(rawUrl)))continue;
    if(curated){
     const compact=candidateSummary(job,url);
+    for(const proof of [compact.employer_proof_url,...compact.employer_proof_urls].map(v4PublicJobUrl).filter(Boolean))if(!isCommercialRecruitmentBoard(proof))sourceLeads.add(curatedUrl(proof));
     if(!concreteCandidate(compact)&&(!compact.title||/^(待核实|职位详情待核实|招聘来源|招聘|职位详情|未知)$/i.test(compact.title))){sourceLeads.add(url);note('NON_JOB_LEAD');continue;}
     const prior=rows.get(url)||{};rows.set(url,{...prior,...Object.fromEntries(Object.entries(compact).filter(([,v])=>v!==null&&v!==''&&v!==undefined&&(!Array.isArray(v)||v.length)))});continue;
    }
@@ -805,7 +808,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   }
  };
  await Promise.all(Array.from({length:Math.min(4,entries.length)},worker));
- const revisedOrigins=new Set(matches.filter(j=>j.excluded_closed||j.excluded_board||j.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&j.source_type==='站外官方招聘').map(j=>j.research_candidate_url||j.official_url));
+ const revisedOrigins=new Set(matches.map(j=>j.research_candidate_url||j.official_url));
  const rawCombined=[...previousMatches.filter(j=>!curated||!revisedOrigins.has(j.research_candidate_url||j.official_url)),...matches].filter(j=>!j.excluded_board&&!j.excluded_closed&&!isCommercialRecruitmentBoard(j.official_url,j));
  const combined=curated?[...new Map(rawCombined.sort((a,b)=>(a.match_score??-1)-(b.match_score??-1)).map(j=>[j.official_url,j])).values()]:rawCombined;
  if(officialOnly)onPartial(reportMatches());

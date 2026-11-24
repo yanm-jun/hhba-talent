@@ -60,7 +60,10 @@ test('server accepts and validates only the current account original document as
 
 test('workbench no longer claims a past match implies a saved original file',()=>{
  assert.doesNotMatch(account,/尚未上传简历/);
- assert.match(account,/有匹配历史 · 原文件尚未保存/);
+ assert.match(account,/resumeCount===0\?'尚未保存原文件'/);
+ assert.match(account,/historyCount===0\?'暂无匹配记录'/);
+ assert.match(account,/resumeCount,setResumeCount/);
+ assert.match(account,/historyCount,setHistoryCount/);
  assert.match(account,/尚未保存简历/);
  assert.match(account,/listPrivateResumes\(\)/);
  assert.match(account,/listMatchHistory\(\)/);

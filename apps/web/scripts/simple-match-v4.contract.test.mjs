@@ -588,7 +588,7 @@ test('curated V4 retains all candidates beyond the 500 target and scores before 
   }
   const payload=JSON.parse(opts.body),input=JSON.parse(payload.input);
   if(payload.instructions.includes('公开招聘来源研究员'))return model({sources:[],research_complete:true,completion_reason:'无其他可靠来源'});
-  if(payload.instructions.includes('专业求职研究 AI')){searches++;return model({research_complete:true,completion_reason:'已充分覆盖',jobs:[board,generic,jobs[0],duplicate,...jobs.slice(1)]},jobs.map(j=>j.url));}
+  if(payload.instructions.includes('专业求职研究 AI')){searches++;const inspected=input.unclassified_public_sources?.includes(generic.url);return model({research_complete:true,completion_reason:'已充分覆盖',jobs:[board,generic,jobs[0],duplicate,...jobs.slice(1)],reviewed_sources:inspected?[{url:generic.url,status:'official_entry',reason:'企业招聘入口，不是具体岗位'}]:[]},[...jobs.map(j=>j.url),...(inspected?[generic.url]:[])]);}
   if(payload.instructions.includes('自主整理个人职业画像')){parsed++;return model({profile:{summary:'渠道运营经历',roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}});}
   const id=Number(input.job.title.replace('区域运营岗位',''));
   const score=id===498?99:id===497?98:70;
@@ -601,7 +601,7 @@ test('curated V4 retains all candidates beyond the 500 target and scores before 
  };
  const result=await v4Match(fetcher,provider,resume,'全国',{officialOnly:true,curated:true});
  assert.equal(parsed,1);assert.equal(searches,2);
- assert.equal(result.research_report.discovered,502);assert.equal(result.matches.length,50);
+ assert.equal(result.research_report.discovered,502);assert.equal(result.research_report.unresolved_source_count,0);assert.equal(result.matches.length,50);
  assert.equal(readIds.size,502);assert.equal(scoreIds.size,501);assert.equal(deep,51);
  assert.equal(reportIds[0],498);assert.equal(reportIds[1],497);
  assert.equal(result.native_search.jd_verification.scored,501);
@@ -841,4 +841,25 @@ test('V4 stage retains earlier public evidence while later tool results arrive',
   assert.equal(i.research_tool_results[0].text,'官方岗位原文');return {value:{score:85}};
  },{instructions:'test',input:JSON.stringify({resume_text:resume})},{parse:r=>r.value,sourceUrls:[url],resume,ledger,fetcher:async()=>new Response('官方岗位原文',{headers:{'content-type':'text/plain'}})});
  assert.equal(result.value.score,85);assert.equal(ledger.length,1);assert.equal(ledger[0].text,'官方岗位原文');
+});
+
+
+test('V4 stage can independently refresh a public source retained by an earlier stage',async()=>{
+ const {v4StageResearchCall}=await import('../functions/_lib/v4-research-tools.js');
+ const ledger=[{type:'read_page',mode:'static',url,offset:0,text:'older JD'}];let calls=0;
+ await v4StageResearchCall(async p=>{
+  const i=JSON.parse(p.input);calls++;
+  if(calls===1)return {value:{research_action:{type:'read_page',url,mode:'static'}}};
+  assert.equal(i.research_tool_results[0].ok,true);
+  assert.equal(i.research_tool_results[0].text,'updated JD');return {value:{score:85}};
+ },{instructions:'test',input:'{}'},{parse:r=>r.value,ledger,fetcher:async()=>new Response('updated JD',{headers:{'content-type':'text/plain'}})});
+ assert.equal(calls,2);assert.equal(ledger.length,2);
+});
+test('V4 preserves candidate groups both inside and outside a result wrapper',async()=>{
+ const extra={...row,title:'区域运营支持',url:url+'-extra'};let calls=0;
+ const result=await v4Match(async(u,options)=>{
+  if(!u.endsWith('/responses'))return new Response('blocked',{status:403});
+  calls++;return model({research_complete:true,jobs:[row],result:{positions:[extra]}},[url,extra.url]);
+ },provider,resume,'全国');
+ assert.equal(calls,1);assert.equal(result.matches.length,2);
 });
