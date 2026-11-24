@@ -4,7 +4,7 @@
  */
 import {v4Provider,v4Call,v4ParseJson,v4Sources} from '../functions/_lib/simple-match-v4.js';
 const label='HHBA_V4_LIVE_SMOKE=';
-if(!['feat/simple-resume-match-v4-20261124','fix/v4-open-job-discovery-20261124','fix/v4-direct-ai-recommend-20261124','fix/v4-autonomous-pipeline-20261124'].includes(process.env.CF_PAGES_BRANCH)){
+if(!['main','feat/simple-resume-match-v4-20261124','fix/v4-open-job-discovery-20261124','fix/v4-direct-ai-recommend-20261124','fix/v4-autonomous-pipeline-20261124'].includes(process.env.CF_PAGES_BRANCH)){
  console.log(label+JSON.stringify({status:'SKIPPED_OTHER_BRANCH'}));process.exit(0);
 }
 const provider=v4Provider(process.env);
@@ -45,11 +45,17 @@ try{
  }catch{report.format='JSON_INVALID'}
 }catch(e){report.web_search=e?.code||'PROVIDER_ERROR'}
 try{
- const streamed=await v4Call(fetch,{...provider,stream:true},{
+ let nativeSse=false;
+ const observeStream=async(url,init)=>{
+  const response=await fetch(url,init);
+  if((response.headers.get('content-type')||'').includes('text/event-stream'))nativeSse=true;
+  return response;
+ };
+ const streamed=await v4Call(observeStream,{...provider,stream:true},{
   instructions:'Only return JSON with the boolean field ok set to true.',
   input:'Synthetic streaming capability check. No applicant data.'
  },{signal:AbortSignal.timeout(180000)});
- report.native_stream=v4ParseJson(streamed).ok===true?'FINAL_RESPONSE_OK':'UNEXPECTED';
+ report.native_stream=v4ParseJson(streamed).ok===true?(nativeSse?'FINAL_RESPONSE_OK':'JSON_COMPATIBILITY_MODE'):'UNEXPECTED';
 }catch(e){report.native_stream=e?.code||'PROVIDER_ERROR'}
 report.status=report.responses==='JSON_OK'&&report.web_search==='TOOL_CALLED'&&report.format==='JSON_OK'&&report.model_job_rows>0?'READY':'PARTIAL';
 console.log(label+JSON.stringify(report));
