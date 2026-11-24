@@ -134,15 +134,20 @@ async function toJson(fetcher,provider,response,{signal}={}){
   // response and citations remain the evidence, not this formatting pass.
   const raw=v4OutputText(response);
   if(!raw)throw e;
-  const formatted=await v4Call(fetcher,provider,{
-   instructions:'只转换提供的求职研究文本为JSON，不联网、不补写、不发明岗位和链接。'
-    +'输出对象：profile（summary,roles,skills,facts,education,education_evidence,experience_years,experience_evidence）'
-    +'以及 jobs 数组，每项 company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote。'
-    +'没有原文支持的字段使用 null。完整保留真实找到的岗位，不设置数量上限。',
-   input:raw,max_output_tokens:9000
-  },{signal});
-  try{return v4ParseJson(formatted)}
-  catch{return {profile:{summary:text(raw,600),roles:[]},jobs:[]}}
+  try{
+   const formatted=await v4Call(fetcher,provider,{
+    instructions:'只转换提供的求职研究文本为JSON，不联网、不补写、不发明岗位和链接。'
+     +'输出对象：profile（summary,roles,skills,facts,education,education_evidence,experience_years,experience_evidence）'
+     +'以及 jobs 数组，每项 company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote。'
+     +'没有原文支持的字段使用 null。完整保留真实找到的岗位，不设置数量上限。',
+    input:raw,max_output_tokens:9000
+   },{signal});
+   return v4ParseJson(formatted);
+  }catch(e){
+   if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
+   // A formatting error must not discard already surfaced web-search sources.
+   return {profile:{summary:text(raw,600),roles:[]},jobs:[]};
+  }
  }
 }
 function sourceKind(url){
