@@ -501,8 +501,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   }
   const proposed=(suggestionDrafts[s.id]??s.proposed).trim();
   const original=version.blocks.find(b=>b.id===s.blockId)?.text||'';
-  if(!proposed||proposed.length>1600||
-   (s.action==='append'&&original.length+1+proposed.length>1600)){
+  if(!proposed||(!MATCH_V4_PREVIEW&&(proposed.length>1600||
+   (s.action==='append'&&original.length+1+proposed.length>1600)))){
    setNotice('建议文本超出单段 1600 字限制，请精简后再填充。');return;
   }
   try{
@@ -539,7 +539,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    setSuggestions(existing=>existing.filter(s=>s.blockId!==editingBlock));
    setEditingBlock(null);setManualText('');
    setNotice('简历原位置已更新文字。所有手动修改须以真实经历为准。');
-  }catch{setNotice('请输入有效内容，单个段落最多 1600 字。');}
+  }catch{setNotice(MATCH_V4_PREVIEW?'请输入有效内容。':'请输入有效内容，单个段落最多 1600 字。');}
  }
  function reset(){
   active.current?.abort();setBusy(false);setVersion(initial());setSuggestions([]);invalidateScore();
