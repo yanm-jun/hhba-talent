@@ -8,7 +8,7 @@ export async function continueDocumentOptimization({blockIds,wanted,request,wait
  const emit=()=>onCheckpoint?.({pending:[...pending],suggestions:[...suggestions.values()]});
  const paused=error=>{
   emit();
-  if(pending.length===initialCount)throw error;
+  if(pending.length===initialCount&&initialCount===ids.size)throw error;
   onPaused?.(error);
   return [...suggestions.values()];
  };
