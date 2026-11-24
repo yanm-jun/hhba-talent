@@ -111,16 +111,25 @@ export async function runResumeEditorialAgent({
   const digest=blocks.map(b=>{
    const now=rewritten.get(b.id);
    return {blockId:b.id,section:b.section,source:unbounded?redacted(b.text):excerpt(redacted(b.text)),
-    draft:unbounded?redacted(now?.proposed):excerpt(redacted(now?.proposed)),changed:now?.changed||false,
+    draft:unbounded?redacted(now?.proposed||b.text):excerpt(redacted(now?.proposed||b.text)),changed:now?.changed||false,
     status:now?.status||'missing'};
   });
-  const decisionRaw=await completeJson(provider,POLICY,{
+  const decisionInput={
    job:{title:redacted(job.title),requirements:redacted(job.requirements)},
    sections:digest,knownQuestions:questions.map(q=>({
     blockId:q.blockId,question:q.question
    })),inspectedSections:[...inspected].map(([blockId,source])=>({blockId,source})),
    previousActions:trace.map(t=>({action:t.action,sections:t.sections,accepted:t.accepted}))
-  },signal,4800);
+  };
+  let decisionRaw;
+  try{decisionRaw=await completeJson(provider,POLICY,decisionInput,signal,4800);}
+  catch(e){
+   if(!unbounded||e?.code!=='AI_PROVIDER_CONTEXT_EXCEEDED'||signal?.aborted)throw e;
+   // Compact planning index only after an actual provider rejection.
+   // The source map retains every original section for inspect/rewrite tools.
+   const compactInput={...decisionInput,sections:digest.map(section=>({...section,source:excerpt(section.source),draft:excerpt(section.draft)})),inspectedSections:[],context_note:'完整上下文超过模型容量。这里仅是可检索索引，不是完整原文。通过 inspect_source 和 rewrite_sections 逐段读取原文，不得根据摘要编造事实。'};
+   decisionRaw=await completeJson(provider,POLICY,compactInput,signal,4800);
+  }
   const decision=modelDecision(decisionRaw,blocks.map(b=>b.id),{unbounded});
   if(decision.action==='invalid')throw Error('AI_PROVIDER_RESPONSE_INVALID');
   if(decision.questions.length)questions.push(...decision.questions);
