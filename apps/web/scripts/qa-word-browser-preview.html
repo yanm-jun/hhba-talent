@@ -21,8 +21,10 @@ body{background:#e9edf3;font-family:Arial,sans-serif;margin:0;padding:12px;box-s
  </div>
 </div>
 <script type="module">
-import {renderBrowserWord,browserWordAnchors} from '/src/services/browserWordPreview.ts';
+import {renderBrowserWord,browserWordAnchors,paintBrowserWordSuggestions} from '/src/services/browserWordPreview.ts';
 const OLD='负责门店运营及日常数据整理工作';
+const SPLIT='虚构测试：多节点岗位运营经历';
+const PROPOSED='虚构测试：针对岗位优化后的运营经历';
 const status=document.getElementById('status');
 const root=document.getElementById('hhba-word-fixture');
 try{
@@ -30,9 +32,13 @@ try{
   if(!r.ok)throw Error('synthetic DOCX fixture missing');
   const bytes=new Uint8Array(await r.arrayBuffer());
   const pageCount=await renderBrowserWord(bytes,root);
-  const anchors=browserWordAnchors(root,[OLD]);
+  const anchors=browserWordAnchors(root,[OLD,SPLIT]);
+  paintBrowserWordSuggestions(root,[OLD,SPLIT],[{original:SPLIT,proposed:PROPOSED,state:'pending'}]);
+  const splitPreview=(root.textContent||'').includes(PROPOSED)&&browserWordAnchors(root,[OLD,SPLIT]).some(a=>a.text===SPLIT);
+  paintBrowserWordSuggestions(root,[OLD,SPLIT],[]);
+  const splitRestored=(root.textContent||'').includes(SPLIT)&&!(root.textContent||'').includes(PROPOSED);
   window.__HHBA_WORD_QA={
-   state:'ok',pageCount,anchors,
+   state:'ok',pageCount,anchors,splitPreview,splitRestored,
    text:root.textContent||'',
    images:root.querySelectorAll('img').length,
    scriptTags:root.querySelectorAll('script').length,

@@ -9,6 +9,6 @@ export declare function prepareVerifiedOriginalDocxExport(options:{
   changed_region:{page:number;x:number;y:number;width:number;height:number}
  }>
 }):Promise<{bytes:Uint8Array;verified:true;pageCount:number}>;
-export declare function inspectOriginalDocxStrict(raw:Uint8Array|ArrayBuffer):Promise<{
+export declare function inspectOriginalDocxStrict(raw:Uint8Array|ArrayBuffer,options?:{allowParagraphRuns?:boolean}):Promise<{
  mode:'strict_original_docx';editable_text:string[];entries:string[]
 }>;
