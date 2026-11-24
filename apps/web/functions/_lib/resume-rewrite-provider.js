@@ -74,7 +74,7 @@ export function validateAuthoring(block,proposal,quotes,numbers){
  if(typeof proposal!=='string'||!proposal.trim()||
   proposal.length>Math.max(12000,block.text.length*4))
   return 'INVALID_REWRITE_TEXT';
- if(!Array.isArray(quotes)||quotes.length===0||quotes.length>20)
+ if(!Array.isArray(quotes)||quotes.length===0)
   return 'MISSING_SOURCE_EVIDENCE';
  for(const q of quotes){
   if(typeof q!=='string'||q.trim().length<3||!block.text.includes(q.trim()))
@@ -236,7 +236,7 @@ export async function generateTailoredResume({env,blocks,job,signal}){
     evidenceQuotes:safe?quotes.map(compact):[],
     rationale:safe?compact(draft?.rationale).slice(0,750):'此段保留原文，需人工补充证据或重新审查。',
     jobRequirements:safe&&Array.isArray(draft?.jobRequirements)?
-     draft.jobRequirements.filter(x=>typeof x==='string').slice(0,12):[],
+     draft.jobRequirements.filter(x=>typeof x==='string'):[],
     status:safe?'needs_user_confirmation':'kept_original'
    });
   }
