@@ -154,7 +154,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
         已执行 {progressActivity.searches} 次检索 · 发现 {progressActivity.candidate_links??0} 条企业岗位线索 · 已阅读 {progressActivity.pages_read??0} 份岗位资料
        </span>}
        {researchReport&&<span>已发现 {researchReport.discovered} 条候选招聘来源 · 已排除 {researchReport.excluded_count} 条商业平台链接</span>}
-       {result.matches.length>0&&<span>已核验 {result.matches.length} 个官方岗位</span>}
+       {result.matches.length>0&&<span>已找到 {result.matches.length} 个岗位（官方来源已核验）</span>}
       </div>
       <span className="hhba-match-progress-time" aria-hidden="true">已用时 {elapsed} 秒</span>
      </div></>}
