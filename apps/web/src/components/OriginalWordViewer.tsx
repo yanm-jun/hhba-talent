@@ -195,7 +195,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      const mount=browserMount.current;
      await renderBrowserWord(raw,mount);
      if(!active)return;
-     const safeAnchors=browserWordAnchors(mount,info.editable_text||[]);
+     const safeAnchors=browserWordAnchors(mount,info.editable_text||[],MATCH_V4_PREVIEW);
      setEditable(info.editable_text||[]);
      setAnchors(safeAnchors);
      // AI edits may only target unique, visible Word text positions.
@@ -373,8 +373,8 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  useLayoutEffect(()=>{
   if(rendererEnabled||loading||ready!=='available'||!browserMount.current)return;
   const mount=browserMount.current;
-  paintBrowserWordSuggestions(mount,editable,visualSuggestions);
-  const next=browserWordAnchors(mount,editable);
+  paintBrowserWordSuggestions(mount,editable,visualSuggestions,MATCH_V4_PREVIEW);
+  const next=browserWordAnchors(mount,editable,MATCH_V4_PREVIEW);
   setAnchors(next);
   setPaperSize({width:mount.scrollWidth,height:mount.scrollHeight});
  },[rendererEnabled,loading,ready,editable,visualSuggestions,refresh]);
