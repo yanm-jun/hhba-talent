@@ -324,3 +324,16 @@ test('V4 OCR requires candidate authorization and explicit file-sharing consent;
   assert.equal(calls,1);
  }finally{globalThis.fetch=old}
 });
+
+
+test('V4 provider origin can be configured by the server only',()=>{
+ const custom=v4Provider({HHBA_AGENT_RELAY_API_KEY:key,HHBA_V4_BASE_URL:'https://api.example.net/v1/'});
+ assert.equal(custom.baseUrl,'https://api.example.net/v1');
+ assert.equal(v4Provider({HHBA_AGENT_RELAY_API_KEY:key,HHBA_V4_BASE_URL:'http://api.example.net/v1'}),null);
+});
+
+test('V4 suggestion parser preserves more than twelve distinct suggestions',async()=>{
+ const {parseSuggestions}=await import('../functions/_lib/resume-ai-provider.js');
+ const items=Array.from({length:20},(_,i)=>({id:'s'+i,blockId:'b'+i,action:'replace',original:'原文字',proposed:'真实经历'.repeat(450),rationale:'依据原文',jobRequirement:'岗位要求'}));
+ assert.equal(parseSuggestions({suggestions:items},items.map(x=>x.blockId),{unbounded:true}).length,20);
+});
