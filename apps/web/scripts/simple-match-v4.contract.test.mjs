@@ -883,3 +883,35 @@ test('curated V4 completed research can resume the same candidate pool and re-ra
  const next=await v4Match(fetcher,provider,resume,'全国',{curated:true,allowContinue:true,checkpoint:first.resume_checkpoint});
  assert.equal(profiles,1);assert.deepEqual(scored,[row.title,second.title]);assert.equal(reported.length,2);assert.equal(next.matches.length,2);assert.equal(next.matches[0].title,second.title);
 });
+
+
+test('fallback JD research keeps only independently read quotes, never promotes AI inference',async()=>{
+ const {groundJdResearch,mergeJobEvidence,nextVerificationBatch}=await import('../functions/_lib/v4-jd-research.js');
+ const {qualifiedReport}=await import('../functions/_lib/v4-curated-reports.js');
+ const {safeHistoryJobs}=await import('../functions/_lib/match-history.js');
+ const u='https://careers.new-employer.cn/roles/123';
+ const facts=[{url:u,quote:'负责门店运营与数据分析',context:'same_job'},{url:u,quote:'必须具备十年经验',context:'same_job'},{url:'https://www.zhipin.com/job_detail/123.html',quote:'负责门店运营与数据分析',context:'same_job'}];
+ const research=groundJdResearch({facts,inference:'可能需要沟通能力，具体要求尚待核实',unknowns:['学历未确认']},[{url:u,text:'岗位简介：负责门店运营与数据分析。'}],['JD_NOT_READ']);
+ assert.equal(research.facts.length,1);
+ const preview={...row,id:'preview',official_url:u,research_candidate_url:u,evidence_status:'SEARCH_SNIPPET_ONLY',match_score:null};
+ const partial={...preview,company:row.company,title:row.title,location:row.location,evidence_status:'PARTIAL_SOURCE',match_score:72,evidence_score_status:'AI_PARTIAL_SOURCE_SCORED',jd_research:research};
+ assert.equal(qualifiedReport(partial),false);
+ assert.equal(mergeJobEvidence([partial],[preview])[0].match_score,72);
+ const official={...partial,source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',evidence_status:'VERIFIED_FULL_JD',evidence_excerpt:'真实完整岗位原文',match_score:85};
+ assert.equal(mergeJobEvidence([official],[preview])[0].evidence_excerpt,official.evidence_excerpt);
+ assert.equal(mergeJobEvidence([official],[{...preview,excluded_closed:true}]).length,0);
+ const [saved]=safeHistoryJobs([{...partial,v4_source:true}]);
+ assert.deepEqual(saved.jd_research,research);
+ assert.equal(saved.evidence_score_status,'AI_PARTIAL_SOURCE_SCORED');
+ const [full]=safeHistoryJobs([{...official,v4_source:true}]);
+ assert.equal(full.jd_source_status,'VERIFIED_JD');
+ assert.equal(full.evidence_excerpt,official.evidence_excerpt);
+ assert.equal(nextVerificationBatch(1,false,50),2);
+ assert.equal(nextVerificationBatch(4,true,50),2);
+});
+test('JD report UI separates employer originals, public excerpts and inferred references',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const ui=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ for(const label of ['完整 JD 原文','公开资料研究整理','AI 职业方向分析（非企业已确认要求）','待进一步确认','初步参考分（非正式 JD 匹配分）'])assert.ok(ui.includes(label),label);
+ assert.match(ui,/JdResearchContent job=\{jdJob\}/);
+});
