@@ -32,11 +32,11 @@ function toOptimizerJob(job:HistoryMatchedJob,historyId:string,index:number):Mat
   location:job.location,official_url:job.official_url,
   platform:job.recruitment_source_kind||'UNVERIFIED',source:'MATCH_HISTORY',remote:false,
   reference_score:job.match_score??0,match_score:job.match_score,
-  matched:[],not_evidenced:[],needs_verification:[],
+  matched:job.matched||[],not_evidenced:job.not_evidenced||[],needs_verification:[],salary:job.salary,
   // These are the *saved* reasons, not a freshly fetched job description.
-  requirements_basis:(job.evidence_status==='PARTIAL_SOURCE'&&job.evidence_excerpt?
-   job.evidence_excerpt:[job.score_basis,job.recommendation_reason].filter(Boolean).join('\n')).slice(0,1800),
-  evidence_status:job.evidence_status,evidence_excerpt:job.evidence_excerpt,
+  requirements_basis:job.requirements_basis||(job.evidence_status==='PARTIAL_SOURCE'&&job.evidence_excerpt?
+   job.evidence_excerpt:[job.score_basis,job.recommendation_reason].filter(Boolean).join('\n')),
+  evidence_status:job.evidence_status,evidence_excerpt:job.evidence_excerpt,evidence_sources:job.evidence_sources,
   score_basis:job.score_basis,recommendation_reason:job.recommendation_reason,
   recruitment_source_note:job.recruitment_source_note,
   recruitment_source_kind:job.recruitment_source_kind==='EMPLOYER_ATS'?'EMPLOYER_ATS':
@@ -237,6 +237,9 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
        </div>
        {job.score_basis&&<p><strong>评分依据：</strong>{job.score_basis}</p>}
        <p><strong>推荐理由：</strong>{job.recommendation_reason||'暂无补充理由，请核对岗位详情。'}</p>
+       {!!job.evidence_sources?.length&&<details><summary>研究来源（{job.evidence_sources.length}）</summary><ul>{job.evidence_sources.map((source,index)=>{const url=safeJobUrl(source.url);return url?<li key={index}><a href={url} target="_blank" rel="noopener noreferrer">{url}</a></li>:null})}</ul></details>}
+       {job.requirements_basis&&<details><summary>保存的岗位要求</summary><p style={{whiteSpace:'pre-wrap'}}>{job.requirements_basis}</p></details>}
+       {job.evidence_excerpt&&<details><summary>保存的岗位原文依据</summary><p style={{whiteSpace:'pre-wrap'}}>{job.evidence_excerpt}</p></details>}
        <div className="hhba-match-history-job-actions">
         {href&&<a href={href} target="_blank" rel="noopener noreferrer">查看原招聘页面（仍需确认在招） <ArrowRight size={14}/></a>}
         {view==='optimize'&&<button type="button" disabled={!original||busy||!job.jd_version_id||!job.jd_sha256}
