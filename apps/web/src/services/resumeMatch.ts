@@ -82,7 +82,7 @@ export type MatchResponse = {
   improved_job_count?:number;
   can_continue?:boolean;
   research_pending?:boolean;
-  research_context?:{round:number;profile:MatchProfile;summary:string;employer_index_request?:{industries:string[];offset:number}|null};
+  research_context?:{round:number;profile:MatchProfile;summary:string};
   preview_synthetic?:boolean;
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];history_id?:string;recovery_jobs?:MatchedJob[];research_context?:MatchResponse['research_context']};
