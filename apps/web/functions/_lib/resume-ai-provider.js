@@ -36,7 +36,7 @@ export function selectProvider(env,task='resume_optimization',{reasoning=false}=
  return {name:requested,...PROVIDERS[requested],key,model:model.trim(),
   ...(requested==='deepseek'&&deepseekWriter?{reasoningEffort:effort}:{})};
 }
-export function parseSuggestions(raw,allowedBlockIds){
+export function parseSuggestions(raw,allowedBlockIds,{unbounded=false}={}){
  if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new Error('AI_PROVIDER_RESPONSE_INVALID');
  const candidates=[
   raw.suggestions,raw.optimizations,raw.recommendations,raw.changes,
@@ -50,7 +50,7 @@ export function parseSuggestions(raw,allowedBlockIds){
   modify:'replace',improve:'replace',add:'append',supplement:'append',
   ask_user:'request_evidence',request_details:'request_evidence'};
  const asText=value=>typeof value==='string'?value.trim():'';
- for(const [index,s] of list.slice(0,12).entries()){
+ for(const [index,s] of (unbounded?list:list.slice(0,12)).entries()){
   if(!s||typeof s!=='object'||Array.isArray(s))continue;
   const namedId=asText(s.blockId)||asText(s.block_id)||asText(s.targetBlockId)||asText(s.target_block_id);
   const blockId=allowed.has(namedId)?namedId:(!namedId&&allowed.size===1?[...allowed][0]:'');
@@ -63,7 +63,7 @@ export function parseSuggestions(raw,allowedBlockIds){
   if(!['replace','append','request_evidence'].includes(action))continue;
   const isEvidenceRequest=action==='request_evidence';
   const proposed=rawProposal||(isEvidenceRequest?'请补充你真实参与的相关工作、项目或成果。':'');
-  if(!proposed||proposed.length>1600)continue;
+  if(!proposed||(!unbounded&&proposed.length>1600))continue;
   const original=asText(s.original)||asText(s.before)||'原始段落内容由服务端核实';
   const rationale=asText(s.rationale)||asText(s.reason)||asText(s.explanation)||
    '请结合真实经历核实这条表达建议';
@@ -72,8 +72,8 @@ export function parseSuggestions(raw,allowedBlockIds){
   used.add(blockId);
   accepted.push({
    id:clip(asText(s.id)||'suggestion-'+(index+1)+'-'+blockId,100),
-   blockId,action,original:clip(original,1600),proposed:clip(proposed,1600),
-   rationale:clip(rationale,600),jobRequirement:clip(jobRequirement,600),
+   blockId,action,original:unbounded?original:clip(original,1600),proposed:unbounded?proposed:clip(proposed,1600),
+   rationale:unbounded?rationale:clip(rationale,600),jobRequirement:unbounded?jobRequirement:clip(jobRequirement,600),
    evidenceStatus:'needs_user_confirmation'
   });
  }
@@ -100,7 +100,7 @@ export async function generateSuggestions({env,blocks,job,signal,documentContext
   const output=v4OutputText(data);
   if(data.status!=='completed')throw Error('AI_PROVIDER_RESPONSE_TRUNCATED');
   const parsed=JSON.parse(output.replace(/^\s*```(?:json)?\s*|\s*```\s*$/g,''));
-  let suggestions=parseSuggestions(parsed,blocks.map(b=>b.id));
+  let suggestions=parseSuggestions(parsed,blocks.map(b=>b.id),{unbounded:true});
   const byId=new Map(blocks.map(b=>[b.id,b.text]));
   const comparable=text=>text.replace(/\s+/g,' ').trim();
   if(job.verified)suggestions=suggestions.filter(s=>comparable(s.jobRequirement).length>=4&&comparable(job.requirements).includes(comparable(s.jobRequirement)));
