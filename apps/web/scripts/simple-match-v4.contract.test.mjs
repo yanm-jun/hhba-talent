@@ -430,3 +430,19 @@ test('V4 searches from resume evidence without platform industry categories or a
  assert.equal(result.research_pending,false);
  assert.equal(result.matches[0].title,outlier.title);
 });
+
+
+test('V4 uses its own R2 archive without legacy D1, fixed city lists or mandatory JD headings',async()=>{
+ const {prepareV4JobForOptimization}=await import('../functions/_lib/v4-jd-bridge.js');
+ const {hydrateVerifiedJobRequirements,jdArchiveReady}=await import('../functions/_lib/job-jd-archive.js');
+ const files=new Map();
+ const env={HHBA_MATCH_V4_READY:'1',HHBA_JOB_JD_R2:{put:async(k,v)=>files.set(k,v),get:async k=>files.has(k)?{text:async()=>files.get(k)}:null}};
+ const description='协助实验室开展声景数据采集和分析。';
+ const html='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:'声景研究助理',hiringOrganization:{name:'测试研究机构',url:'https://careers.other-motors.cn'},jobLocation:{address:{addressCountry:'CN',addressLocality:'雄安新区'}},description})+'</script>';
+ const patch=await prepareV4JobForOptimization(env,url,{expectedTitle:'声景研究助理',fetcher:async()=>new Response(html,{headers:{'content-type':'text/html'}})});
+ assert.equal(await jdArchiveReady(env),true);
+ assert.equal(patch.location,'雄安新区');
+ const trusted=await hydrateVerifiedJobRequirements(env,{official_url:url,jd_version_id:patch.jd_version_id,jd_sha256:patch.jd_sha256});
+ assert.equal(trusted.requirements,description);
+ assert.equal(trusted.source_status,'VERIFIED_OFFICIAL_JD');
+});
