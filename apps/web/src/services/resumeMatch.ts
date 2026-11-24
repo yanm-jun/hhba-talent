@@ -287,7 +287,7 @@ type MatchStreamResponse=MatchResponse|MatchContinuation;
 async function matchTaskReference(text:string,opts:MatchOptions,resumeId?:string){
  const fingerprint=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([text,opts.role_hint,opts.exclude_urls||[],resumeId||null])));
  const key='hhba:v4:pending:'+Array.from(new Uint8Array(fingerprint),v=>v.toString(16).padStart(2,'0')).join('');
- let taskId=crypto.randomUUID();
+ let taskId:string=crypto.randomUUID();
  try{
   const saved=JSON.parse(localStorage.getItem(key)||'null');
   if(saved?.until>Date.now()&&/^[a-f0-9-]{36}$/.test(saved.id))taskId=saved.id;
