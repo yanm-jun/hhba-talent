@@ -36,7 +36,7 @@ export function modelDecision(raw,validIds){
  const sections=[],seen=new Set();
  for(const row of Array.isArray(raw.sections)?raw.sections:[]){
   if(!row||!allowed.has(row.blockId)||seen.has(row.blockId))continue;
-  const goal=typeof row.goal==='string'?row.goal.trim().slice(0,800):'';
+  const goal=typeof row.goal==='string'?row.goal.trim():'';
   if(!goal)continue;
   seen.add(row.blockId);sections.push({blockId:row.blockId,goal});
  }
@@ -109,8 +109,8 @@ export async function runResumeEditorialAgent({
   if(signal?.aborted)throw new Error('AI_PROVIDER_TIMEOUT');
   const digest=blocks.map(b=>{
    const now=rewritten.get(b.id);
-   return {blockId:b.id,section:b.section,source:excerpt(redacted(b.text)),
-    draft:excerpt(redacted(now?.proposed)),changed:now?.changed||false,
+   return {blockId:b.id,section:b.section,source:env?.HHBA_MATCH_V4_READY==='1'?redacted(b.text):excerpt(redacted(b.text)),
+    draft:env?.HHBA_MATCH_V4_READY==='1'?redacted(now?.proposed||''):excerpt(redacted(now?.proposed)),changed:now?.changed||false,
     status:now?.status||'missing'};
   });
   const decisionRaw=await completeJson(provider,POLICY,{
@@ -188,7 +188,7 @@ export async function runResumeEditorialAgent({
      rationale:typeof row.rationale==='string'?row.rationale.slice(0,750):
       current.rationale,
      jobRequirements:Array.isArray(row.jobRequirements)?
-      row.jobRequirements.filter(x=>typeof x==='string').slice(0,12):
+      row.jobRequirements.filter(x=>typeof x==='string'):
       current.jobRequirements});
     event.accepted++;
    }
