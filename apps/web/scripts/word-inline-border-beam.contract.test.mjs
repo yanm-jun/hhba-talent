@@ -8,7 +8,7 @@ const preview=file('../src/services/browserWordPreview.ts');
 const css=file('../src/styles/word-editor-minimal.css');
 
 test('browser Word AI text is painted on original run, not a guessed font overlay',()=>{
- assert.match(word,/paintBrowserWordSuggestions\(mount,editable,visualSuggestions\)/);
+ assert.match(word,/paintBrowserWordSuggestions\(mount,editable,visualSuggestions,MATCH_V4_PREVIEW\)/);
  assert.match(word,/const next=browserWordAnchors\(mount,editable\)/);
  assert.match(word,/visual&&rendererEnabled&&<span className="hhba-word-ai-preview"/);
  assert.match(preview,/node\.replaceChildren\(document\.createTextNode\(prefix\),mark,document\.createTextNode\(suffix\)\)/);
