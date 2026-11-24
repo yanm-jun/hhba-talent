@@ -1,0 +1,16 @@
+/* Scope to the recruitment source cards, including archived match reports. */
+.hhba-recruitment-sources{margin:20px 0 12px;padding:0;min-width:0;border:0}
+.hhba-recruitment-sources h4{margin:0 0 12px;color:#193653;font-size:14px;font-weight:650}
+.hhba-recruitment-source-list{display:grid;gap:9px}
+.hhba-recruitment-source-card{display:flex;align-items:center;gap:12px;min-width:0;box-sizing:border-box;padding:13px;border:1px solid #dfe7f0;border-radius:10px;background:#fff;text-decoration:none!important;color:#193653!important;text-align:left;transition:border-color .15s,background .15s}
+.hhba-recruitment-source-card:hover{border-color:#aac3e1;background:#f8fafc}
+.hhba-recruitment-source-card:focus-visible{outline:2px solid #1762b8;outline-offset:2px}
+.hhba-recruitment-source-icon{display:grid;place-items:center;flex:0 0 39px;height:39px;border-radius:9px;background:#edf3fa;color:#185abd}
+.hhba-recruitment-source-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px;overflow-wrap:anywhere}
+.hhba-recruitment-source-copy strong{color:#193653;font-size:13px;line-height:1.4}
+.hhba-recruitment-source-copy small{color:#6b7b8e;font-size:11px;line-height:1.4}
+.hhba-recruitment-source-copy .hhba-recruitment-source-verified{color:#247452}
+.hhba-recruitment-source-action{display:inline-flex;align-items:center;justify-content:center;gap:4px;flex-shrink:0;border-radius:7px;background:#edf3fa;color:#175bb5;padding:8px 10px;font-size:12px;font-weight:650;white-space:nowrap}
+@media(max-width:640px){.hhba-recruitment-source-card{padding:10px;gap:8px}.hhba-recruitment-source-icon{flex-basis:30px;height:30px}.hhba-recruitment-source-action{font-size:11px;padding:7px 6px}}
+@media(max-width:360px){.hhba-recruitment-source-card{flex-wrap:wrap}.hhba-recruitment-source-action{margin-left:auto}}
+@media(prefers-reduced-motion:reduce){.hhba-recruitment-source-card{transition:none}}
