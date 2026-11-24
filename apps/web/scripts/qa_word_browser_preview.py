@@ -65,6 +65,8 @@ with sync_playwright() as playwright:
         matches = [a for a in result["anchors"]
                    if a["text"] == "负责门店运营及日常数据整理工作"]
         assert len(matches) == 1, f"{name}: unique editable source text cannot be anchored"
+        assert sum(a["text"] == "虚构测试：多节点岗位运营经历" for a in result["anchors"]) == 1, f"{name}: split paragraph anchor missing"
+        assert result["splitPreview"] and result["splitRestored"], f"{name}: split paragraph Siri preview failed"
         assert len(external_requests) == 0, f"{name}: DOCX preview attempted unexpected external requests: {external_requests}"
         assert len(browser_errors) == 0, f"{name}: unhandled browser errors {browser_errors}"
         page.close()
