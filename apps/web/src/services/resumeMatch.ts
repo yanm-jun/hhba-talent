@@ -84,7 +84,8 @@ export type MatchResponse = {
   preview_synthetic?:boolean;
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
-const API='/api/match-next'; // Clean V2 backend. Legacy Agent is disconnected.
+const API=typeof window!=='undefined'&&window.location.hostname.endsWith('.hhba-talent.pages.dev')&&
+ window.location.hostname!=='hhba-talent.pages.dev'?'/api/match-v4':'/api/match-next'; // V4 preview only
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=3*1024*1024;
 const errorMap:Record<string,string>={
@@ -108,8 +109,8 @@ const errorMap:Record<string,string>={
   AI_PROVIDER_BALANCE_INSUFFICIENT:'AI 平台账户余额不足，请联系 HHBA 管理员充值。',
   AI_PROVIDER_RATE_LIMITED:'AI 平台当前请求较多，请稍后再试。',
   AI_PROVIDER_REQUEST_REJECTED:'AI 服务请求配置有误，HHBA 正在检查接口兼容性。',
-  AI_PROVIDER_UPSTREAM_ERROR:'DeepSeek 服务器暂时异常，请稍后再试。',
-  AI_PROVIDER_NETWORK_ERROR:'HHBA 暂时无法连接 DeepSeek，请稍后再试。',
+  AI_PROVIDER_UPSTREAM_ERROR:'AI 服务暂时异常，请稍后重试。',
+  AI_PROVIDER_NETWORK_ERROR:'HHBA 暂时无法连接 AI 服务，请稍后重试。',
   AI_PROVIDER_REDIRECT_BLOCKED:'AI 接口发生异常重定向，为保护密钥，已安全终止请求。',
   AI_PROVIDER_TIMEOUT:'DeepSeek 接口等待超时，尚未取得完整结果。',
   AI_PROVIDER_SLOW:'DeepSeek 请求超时且没有发现可展示岗位。',
@@ -125,12 +126,12 @@ const errorMap:Record<string,string>={
   AI_MATCH_REASON_TIMEOUT:'候选岗位已检索，但推荐理由生成超时；请稍后再试。',
   AI_MATCH_NO_VALID_JOBS:'本轮 AI 候选名单没有通过岗位信息核验，这不代表你的简历不符合国内招聘要求。请尝试重新搜索或填写具体岗位方向。',
   AI_EMPLOYER_JOBS_NOT_FOUND:'本轮已尝试补充搜索，但仍未找到信息足够明确的企业招聘岗位链接；并非你的简历不适合。请稍后重试或填写更具体的岗位方向。',
-  AI_PROVIDER_RESPONSE_INVALID:'DeepSeek 输出中断或格式异常，暂不展示不完整推荐。',
+  AI_PROVIDER_RESPONSE_INVALID:'AI 输出格式异常，未采用不完整推荐结果。',
   AI_PROFILE_INCOMPLETE:'AI 没有识别到可用于匹配的经历或技能。请核对简历文字，补充真实内容后重试。',
   MATCH_PERSONAL_LIMIT:'今天的个人免费体验次数已达上限。',
   MATCH_GLOBAL_LIMIT:'平台今天的 AI 体验额度已用完。',
   BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。',
-  AI_WEB_SEARCH_NOT_USED:'DeepSeek 本次没有执行联网搜索，未展示未经搜索证实的岗位，请重试。',
+  AI_WEB_SEARCH_NOT_USED:'AI 本轮未执行联网搜索，未展示未核实岗位。',
   AI_RESPONSE_INVALID:'DeepSeek 返回结果格式异常，请重试。',
   AI_PROVIDER_INCOMPLETE:'DeepSeek 搜索未能完成，没有返回不完整的岗位结果。'
 };
