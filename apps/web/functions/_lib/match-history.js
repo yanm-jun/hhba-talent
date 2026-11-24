@@ -45,7 +45,7 @@ export function safeHistoryJobs(matches){
   if(!company||!title||!location)continue;
   seen.add(item.official_url);
   out.push({id:text(item.id,75),company,title,location,
-   ...(item.v4_source===true?{v4_source:true,source_type:item.source_type==='站外官方招聘'?'站外官方招聘':'站外招聘职位',score_evidence_status:item.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'?'GROUNDED_JD_RESUME_QUOTES':undefined}:{}),
+   ...(item.v4_source===true?{v4_source:true,source_type:item.source_type==='站外官方招聘'?'站外官方招聘':'站外招聘职位',score_evidence_status:item.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'?'GROUNDED_JD_RESUME_QUOTES':undefined,research_detail:safeDetailedReport(item.research_detail)}:{}),
    official_url:item.official_url,match_score:score(item.match_score),
    score_basis:text(item.score_basis,v4?Infinity:360),
    recommendation_reason:text(!v4&&Array.isArray(item.jd_comparisons)?
@@ -122,6 +122,12 @@ export function historyTextSegments(data){
 }
 // Persist structured research outcomes, not raw resume or model reasoning.
 // Original resume quotations are shown in the active task only.
+// Store report conclusions and JD quotations, not confidential original CV quotes.
+function safeDetailedReport(d){
+ if(!d||typeof d!=='object'||!Array.isArray(d.comparisons))return undefined;
+ return {comparisons:d.comparisons.filter(c=>c&&['supported','partial','missing'].includes(c.status)).map(c=>({requirement:text(c.requirement),resume_evidence:null,status:c.status,analysis:text(c.analysis)})),
+  strengths:text(d.strengths),risks:text(d.risks),career_development:text(d.career_development),optimization_advice:text(d.optimization_advice),competition:text(d.competition),score_explanation:text(d.score_explanation),extra_sections:(Array.isArray(d.extra_sections)?d.extra_sections:[]).filter(x=>x&&typeof x.title==='string'&&typeof x.content==='string').map(x=>({title:text(x.title),content:text(x.content)}))};
+}
 export function safeResearchReport(report){
  if(!report||!Array.isArray(report.rounds)||!report.profile)return null;
  const p=report.profile,strings=v=>Array.isArray(v)?v.filter(x=>typeof x==='string'):[],num=v=>Number.isSafeInteger(v)&&v>=0?v:0;
@@ -130,7 +136,7 @@ export function safeResearchReport(report){
   summary:text(p.summary),skills:Array.isArray(p.skills)?p.skills.filter(s=>typeof s?.name==='string').map(s=>({name:s.name,evidence:''})):[],
   target_roles:strings(p.target_roles),warnings:['历史报告仅保留分析结论，不保存简历原文引文。']},
   rounds:report.rounds.map(r=>({round:num(r.round),queries:strings(r.queries),cited_count:num(r.cited_count),candidates:num(r.candidates),added:num(r.added),excluded_count:num(r.excluded_count)})),
-  excluded_count:num(report.excluded_count),discovered:num(report.discovered)};
+  excluded_count:num(report.excluded_count),discovered:num(report.discovered),...(report.candidate_target?{candidate_target:num(report.candidate_target),final_target:num(report.final_target)}:{})};
 }
 function unpackHistory(raw,row){
  const parsed=JSON.parse(raw);

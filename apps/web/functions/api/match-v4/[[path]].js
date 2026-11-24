@@ -5,6 +5,7 @@
  */
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
+import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
 import {v4Provider,v4Match} from '../../_lib/simple-match-v4.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
@@ -41,7 +42,7 @@ const checkpointEnv=env=>{
  const secret=env?.HHBA_MATCH_V4_CHECKPOINT_SECRET||env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET;
  return typeof secret==='string'&&secret.length>=32?{HHBA_RESUME_AGENT_CHECKPOINT_SECRET:'hhba-v4-match:'+secret}:null;
 };
-const checkpointArgs=(env,input,draft)=>({env:checkpointEnv(env),account:input.phone,blocks:[input.text],job:{role:input.role_hint,excludeUrls:input.excludeUrls,resume_id:input.resume_id},draft});
+const checkpointArgs=(env,input,draft)=>({env:checkpointEnv(env),account:input.phone,blocks:[input.text],job:{role:input.role_hint,excludeUrls:input.excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-v1'},draft});
 function events(env,request,input){
  const encoder=new TextEncoder();let closed=false,phase='preparing';
  const started=Date.now();
@@ -62,7 +63,7 @@ function events(env,request,input){
     send(kind+'_end',{count:matches.length});
    };
    const allowedJob=j=>j&&!j.excluded_board&&!isCommercialRecruitmentBoard(j.official_url,j);
-   const officialJob=j=>allowedJob(j)&&j.jd_source_status==='VERIFIED_JD'&&j.source_type==='站外官方招聘';
+   const officialJob=j=>allowedJob(j)&&qualifiedReport(j);
    const sendResearch=r=>{if(r)send('research_report',r);};
    const sendFinal=result=>{
     const matches=result.matches.filter(officialJob),leads=(result.research_leads||[]).filter(allowedJob);
@@ -87,7 +88,7 @@ function events(env,request,input){
      }
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
       signal:executionSignal,onProgress:progress,onActivity:activity,env,excludeUrls:input.excludeUrls,
-      stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,
+      stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,
       onResearch:sendResearch,
       onPartial:matches=>{sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
      if(executionSignal.aborted)throw Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
@@ -187,7 +188,7 @@ export async function onRequest({request,env}){
  const input={text:resume,role_hint:role,excludeUrls,phone:session.phone,resume_id:body.resume_id||null};
  if(checkpointStorageReady(env)&&body.task_id!==undefined){
   try{
-   input.taskKey=await matchTaskKey(env,session.phone,body.task_id,{text:resume,role,excludeUrls,resume_id:input.resume_id,policy:'official-only-v1'});
+   input.taskKey=await matchTaskKey(env,session.phone,body.task_id,{text:resume,role,excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-v1'});
    input.lease=await leaseMatchTask(db,input.taskKey);
    if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
    const saved=await readMatchTask(env,input.taskKey);

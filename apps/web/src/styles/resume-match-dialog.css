@@ -363,3 +363,24 @@
 .hhba-stage-report a{color:#1764b4;overflow-wrap:anywhere}
 .hhba-stage-empty{color:#68809b}
 @media(max-width:640px){.hhba-match-progress-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.hhba-stage-report{padding:12px}.hhba-stage-tab{padding:8px}}
+
+/* One report per screen; vertical reading never truncates report content. */
+.hhba-curated-list{display:block;min-width:0}
+.hhba-curated-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:14px 0;color:#52708e;font-size:13px}
+.hhba-curated-nav button{border:1px solid #dce7f4;border-radius:8px;background:#fff;color:#175bb5;padding:9px 14px;font:inherit;cursor:pointer}
+.hhba-curated-nav button:disabled{opacity:.4;cursor:default}
+.hhba-curated-nav strong{font-variant-numeric:tabular-nums;color:#183b65}
+.hhba-curated-card{width:100%;box-sizing:border-box;min-width:0;touch-action:pan-y;overflow-wrap:anywhere}
+.hhba-curated-report{font-size:14px;line-height:1.85;color:#314e6e}
+.hhba-curated-report section{border-top:1px solid #e5edf5;padding:18px 0}
+.hhba-curated-report h4{color:#193d68;font-size:15px;margin:0 0 10px;font-weight:700}
+.hhba-curated-report p{white-space:pre-wrap;overflow-wrap:anywhere;margin:6px 0}
+.hhba-curated-comparison-head,.hhba-curated-comparison-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:15px;padding:12px 0;border-bottom:1px solid #e6edf5;overflow-wrap:anywhere}
+.hhba-curated-comparison-head{font-size:12px;color:#52708e}
+.hhba-curated-status{font-size:12px;color:#315e8d}
+.hhba-curated-status.supported{color:#14754b}
+.hhba-curated-status.missing{color:#94621e}
+.hhba-curated-quote{color:#254b75;font-weight:550}
+.hhba-curated-report details{margin:8px 0 18px}
+.hhba-curated-report summary{cursor:pointer;font-weight:600;color:#175bb5}
+@media(max-width:640px){.hhba-curated-comparison-head,.hhba-curated-comparison-row{grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:8px;font-size:12px}.hhba-curated-report{font-size:13px}.hhba-curated-nav button{padding:8px}.hhba-curated-nav-bottom span{font-size:11px}}

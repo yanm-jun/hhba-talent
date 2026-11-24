@@ -37,7 +37,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
    {!!parsed.warnings?.length&&<p>{parsed.warnings.join('；')}</p>}
   </>:empty(pending?'AI 正在识别简历，实际分析成果产生后会显示在这里。':'本次记录没有保存简历分析报告。')}</>}
   {selected===1&&<>
-   {report&&<div className="hhba-stage-stats"><span>研究轮次 {report.rounds.length}</span><span>候选来源 {report.discovered}</span><span>已排除商业平台链接 {report.excluded_count}</span></div>}
+   {report&&<div className="hhba-stage-stats"><span>研究轮次 {report.rounds.length}</span><span>候选岗位 {report.discovered}{report.candidate_target?' / '+report.candidate_target:''}</span><span>已排除商业平台链接 {report.excluded_count}</span></div>}
    {report?.rounds.map(r=><details key={r.round}><summary>第 {r.round} 轮 · 新增 {r.added} 条候选 · {r.cited_count} 条非商业平台引用</summary>
     {r.queries.length?<ul>{r.queries.map((q,i)=><li key={i}>{q}</li>)}</ul>:<p>接口未返回本轮具体检索词。</p>}</details>)}
    <h4>已发现的招聘候选（不是最终推荐）</h4>
@@ -54,10 +54,11 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
    </details></li>)}</ul>:empty(pending?'等待岗位网页核验成果。':'未取得可核验的岗位 JD。')}
   </>}
   {selected===3&&<>
-   <div className="hhba-stage-stats"><span>正式推荐 {officialJobs.length}</span><span>证据支持评分 {officialJobs.filter(j=>j.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&j.match_score!=null).length}</span></div>
+   <div className="hhba-stage-stats"><span>正式推荐 {officialJobs.length}{report?.final_target?' / '+report.final_target:''}</span><span>证据支持评分 {officialJobs.filter(j=>j.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&j.match_score!=null).length}</span></div>
    {officialJobs.length?<ul className="hhba-stage-jobs">{officialJobs.map(job=><li key={job.official_url}><details><summary>{job.company} · {job.title_zh||job.title} · {job.match_score==null?'暂无可靠分数':job.match_score+'/100'}</summary>
     {job.score_basis&&<p>{job.score_basis}</p>}{job.recommendation_reason&&<p>{job.recommendation_reason}</p>}
     {!!job.matched?.length&&<><h4>匹配依据</h4><ul>{job.matched.map((v,i)=><li key={i}>{v}</li>)}</ul></>}
+    {job.research_detail&&<><h4>逐项对照</h4><ul>{job.research_detail.comparisons.map((c,i)=><li key={i}><strong>{c.requirement}</strong><p>{c.resume_evidence}</p><p>{c.analysis}</p></li>)}</ul><h4>核心优势</h4><p>{job.research_detail.strengths}</p><h4>风险</h4><p>{job.research_detail.risks}</p></>}
     {!!job.not_evidenced?.length&&<><h4>待补充证据</h4><ul>{job.not_evidenced.map((v,i)=><li key={i}>{v}</li>)}</ul></>}
    </details></li>)}</ul>:empty(pending?'取得并核验官方 JD 后展示评分结果。':'本轮没有满足官方来源条件的正式推荐。')}
   </>}
