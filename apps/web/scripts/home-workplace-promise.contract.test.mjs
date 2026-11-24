@@ -74,14 +74,14 @@ test('all public rights and legal knowledge URLs render independently, while pri
  assert.ok(dropdown.includes("path:'/candidate/account/legal-aid'"));
  for(const path of ["/rights","/rights/knowledge","/rights/support"])assert.ok(search.includes("path:'"+path+"'"));
 });
-test('public job and company browsing are not marked as private workspaces, and same-label job entries agree',()=>{
+test('public browsing remains available, while both homepage AI matching entrances share the login-aware destination',()=>{
  const home=read('../src/pages/HomePage.tsx');
  const shell=read('../src/components/Shell.tsx');
- assert.ok(home.includes("kind==='candidate'?'/candidate/jobs'"));
+ assert.ok(home.includes("kind==='candidate'?(candidateTarget||'/candidate/match')"));
  assert.ok(shell.includes("['我要应聘','/candidate/jobs']"));
  assert.ok(shell.includes("if(route==='/candidate')return signedIn?'candidate':'public'"));
  assert.ok(shell.includes("return 'public';"));
- assert.ok(home.includes("onClick={()=>navigate(user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch')}"),'signed-in users go directly to AI matching, others sign in with return destination');
+ assert.ok(home.includes("const matchTarget=user?.account_types?.includes('candidate')?'/candidate/match':'/candidate/login?next=%2Fcandidate%2Fmatch'")&&home.includes('onClick={()=>navigate(matchTarget)}')&&home.includes('candidateTarget={matchTarget}'),'signed-in users go directly to AI matching, others sign in with return destination');
 });
 
 test('homepage config exposes editorial commitment without a finance allocation promise',()=>{
