@@ -32,7 +32,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [saveBusy,setSaveBusy]=useState(false);
  const [saveNotice,setSaveNotice]=useState('');
  // The user chooses whether the ORIGINAL binary should be retained.
- const [storageChoice,setStorageChoice]=useState<'undecided'|'save'|'once'>('undecided');
+ const [storageChoice,setStorageChoice]=useState<'undecided'|'save'|'once'>('once');
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
@@ -100,7 +100,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   setOcrFile(null);setOcrBusy(false);setPreviewNote('');
   setSavedId(id);setFile(null);setResult(null);setPartialJobs([]);setOptimizationSource('');
   setError('');setSaveConsent(false);setSaveNotice('');
-  setStorageChoice('undecided');setSavedPickerOpen(false);
+  setStorageChoice('once');setSavedPickerOpen(false);
   const entry=savedFiles.find(item=>item.id===id);
   if(entry)void preview(entry);
  }
@@ -112,7 +112,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   setOcrFile(null);setOcrBusy(false);setPreviewNote('');
   setError('');setResult(null);setPartialJobs([]);setOptimizationSource('');setSaveConsent(false);setSaveNotice('');
   setSavedId('');
-  setStorageChoice('undecided');
+  setStorageChoice('once');
   if(!candidate){setFile(null);return}
   const format=resumeFileFormat(candidate.name);
   if(!format||candidate.size<30||candidate.size>maxResumeSize){
@@ -292,7 +292,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     {availability==='loading'&&<p className="hhba-ai-service-check"><LoaderCircle size={17} className="spin"/>正在检查平台智能匹配服务…</p>}
     {availability==='disabled'&&<div className="hhba-ai-admin-note" role="status">
        <LockKeyhole size={19}/><div><strong>岗位智能匹配后台正在重新开发。</strong>
-       <p>此前搜索无法稳定提供真实岗位，已暂停这项服务的公开使用。你的个人简历和账户资料不会因此被清空。</p>
+       <p>V4 智能匹配尚未通过预览验收，暂不向公众开放。你的个人简历和账户资料不会因此被清空。</p>
        <button type="button" onClick={()=>{setAvailability('loading');void matchServiceReady().then(ok=>setAvailability(ok?'ready':'disabled'))}}>重新检测服务状态</button>
        {preflightAvailable&&<div className="hhba-ai-preview-diagnostic">
         <p>预览验收专用：只检查 DeepSeek 接口能力，不读取你的简历，也不开放正式岗位匹配。</p>
@@ -436,7 +436,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 使用我的简历信息进行智能岗位匹配。</span>
+          <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 将脱敏后的简历文字发送给第三方 AI 中转服务进行岗位推荐；原文件不会因此上传给 AI。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
