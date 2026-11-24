@@ -140,7 +140,7 @@ async function toJson(fetcher,provider,response,{signal}={}){
      +'输出对象：profile（summary,roles,skills,facts,education,education_evidence,experience_years,experience_evidence）'
      +'以及 jobs 数组，每项 company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote。'
      +'没有原文支持的字段使用 null。完整保留真实找到的岗位，不设置数量上限。',
-    input:raw,max_output_tokens:9000
+    input:raw
    },{signal});
    return v4ParseJson(formatted);
   }catch(e){
@@ -253,7 +253,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   input:JSON.stringify({resume_text:resume,preferred_job_or_city:roleHint,
    country:'中国大陆',request:'简历分析及真实岗位推荐'}),
   tools:[{type:'web_search'}],tool_choice:'required',
-  include:['web_search_call.action.sources'],max_output_tokens:10500
+  include:['web_search_call.action.sources']
  },{signal});
  if(!response.output.some(x=>x?.type==='web_search_call'))throw fault('AI_WEB_SEARCH_NOT_USED');
  const json=await toJson(fetcher,provider,response,{signal});
