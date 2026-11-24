@@ -53,10 +53,11 @@ test('native results dialog never hides optimizer behind the optional match scor
  const {readFile}=await import('node:fs/promises');
  const ui=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(ui,/function visibleMatchScore\(/);
- assert.match(ui,/<button type="button" disabled=\{pending\|\|!parsedProfile\|\|!job\.jd_version_id\|\|!job\.jd_sha256\}/);
+ const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ assert.match(panels,/<button type="button" disabled=\{pending\|\|!optimizationAvailable\|\|!jdJob\.jd_version_id\|\|!jdJob\.jd_sha256\}/);
  assert.doesNotMatch(ui,/!pending&&Number\.isInteger\(job\.match_score\)/);
- assert.match(ui,/优化简历/);
- assert.match(ui,/暂无可靠分数/);
+ assert.match(panels,/优化简历/);
+ assert.match(panels,/暂无可靠分数/);
 });
 
 test('authorized resume OCR sends only an approved file to DeepSeek and keeps partial recognized text',async()=>{
@@ -369,7 +370,9 @@ test('frontend shows partial results without pretending network completion',asyn
  assert.match(page,/result\|\|partialJobs\.length>0/);
  assert.match(page,/setPartialJobs/);
  assert.match(dialog,/!pending&&activeJob&&parsedProfile/);
- assert.match(dialog,/已找到 \{result\.matches\.length\} 个岗位/);
+ assert.match(dialog,/已形成 \{result\.matches\.length\} 个正式推荐/);
+ const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ assert.match(panels,/已收到岗位/);
 });
 
 
