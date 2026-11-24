@@ -241,7 +241,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setPartialJobs(collected);
   try{
    const next=await submitExtractedResumeText(search.text,{...search.options,
-    exclude_urls:previous.matches.map(job=>job.official_url).slice(-50)},true,abort.signal,search.resumeId,
+    exclude_urls:previous.matches.map(job=>job.official_url)},true,abort.signal,search.resumeId,
     stage=>{if(!abort.signal.aborted)progress(stage);},
     jobs=>{if(!abort.signal.aborted){collected=combine(jobs);setPartialJobs(collected);}},
     detail=>{if(!abort.signal.aborted)setActivity(detail);});
@@ -292,7 +292,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     {availability==='loading'&&<p className="hhba-ai-service-check"><LoaderCircle size={17} className="spin"/>正在检查平台智能匹配服务…</p>}
     {availability==='disabled'&&<div className="hhba-ai-admin-note" role="status">
        <LockKeyhole size={19}/><div><strong>岗位智能匹配后台正在重新开发。</strong>
-       <p>V4 智能匹配尚未通过预览验收，暂不向公众开放。你的个人简历和账户资料不会因此被清空。</p>
+       <p>V4 智能匹配暂未就绪，请检查服务连接。你的个人简历和账户资料不会因此被清空。</p>
        <button type="button" onClick={()=>{setAvailability('loading');void matchServiceReady().then(ok=>setAvailability(ok?'ready':'disabled'))}}>重新检测服务状态</button>
        {preflightAvailable&&<div className="hhba-ai-preview-diagnostic">
         <p>预览验收专用：只检查 DeepSeek 接口能力，不读取你的简历，也不开放正式岗位匹配。</p>
