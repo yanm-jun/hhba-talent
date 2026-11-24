@@ -62,16 +62,26 @@ export async function runSyntheticResumeAcceptance({env,signal,optimize=optimize
   const edits=[...suggestions.values()].filter(s=>s.action==='replace'&&s.proposed!==s.original&&s.proposed.trim()&&!/[\r\n\t]/.test(s.proposed));
   if(!edits.length)fail('QA_NO_APPLICABLE_EDIT');
   stage='docx';
-  const first=edits[0],originalBlock=blocks.find(b=>b.id===first.blockId);
-  if(!originalBlock||first.original!==originalBlock.text)fail('QA_ANCHOR_MISMATCH');
-  const edited=await editOriginalDocxStrict(source,[{original:first.original,text:first.proposed}],{allowExpansion:true});
+  const byId=new Map(edits.map(edit=>[edit.blockId,edit]));
+  // Exercise every accepted change, in separate revisions just like the
+  // existing Siri editor. A successful first edit must not hide later failures.
+  let edited=source;
+  const applied=new Map();
+  for(const edit of edits){
+   const originalBlock=blocks.find(b=>b.id===edit.blockId);
+   if(!originalBlock||edit.original!==originalBlock.text)fail('QA_ANCHOR_MISMATCH');
+   edited=await editOriginalDocxStrict(edited,[{original:edit.original,text:edit.proposed}],{allowExpansion:true});
+   applied.set(edit.blockId,edit.proposed);
+   const intermediate=await extractDocxText(new Uint8Array(edited).buffer);
+   if(intermediate!==blocks.map(b=>applied.get(b.id)??b.text).join('\n'))fail('QA_DOCX_CONTENT_MISMATCH');
+  }
   const beforeText=await extractDocxText(new Uint8Array(source).buffer);
   const afterText=await extractDocxText(new Uint8Array(edited).buffer);
-  const expected=blocks.map(b=>b.id===first.blockId?first.proposed:b.text).join('\n');
+  const expected=blocks.map(b=>byId.get(b.id)?.proposed??b.text).join('\n');
   if(afterText!==expected||digest(source)!==originalHash||digest(edited)===originalHash)fail('QA_DOCX_CONTENT_MISMATCH');
   const inspection=await inspectOriginalDocxStrict(edited);
-  if(!inspection.editable_text.includes(first.proposed))fail('QA_DOCX_ANCHOR_MISSING');
-  summary.stages.docx={structure:'PASS',original_unchanged:true,edited_text_verified:true,bytes:edited.length};
+  if(edits.some(edit=>!inspection.editable_text.includes(edit.proposed)))fail('QA_DOCX_ANCHOR_MISSING');
+  summary.stages.docx={structure:'PASS',original_unchanged:true,edited_text_verified:true,applied_edits:applied.size,bytes:edited.length};
   emit();
   stage='reassessment';
   const scores=await reassess({env,jd,beforeBlocks:[{text:beforeText}],afterBlocks:[{text:afterText}],signal});

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {browserWordAnchors} from '../src/services/browserWordPreview.ts';
+import {browserWordAnchors,paintBrowserWordSuggestions} from '../src/services/browserWordPreview.ts';
 import {matchWordAnchors} from '../src/services/resumeWordAnchors.mjs';
 
 const text=Array.from({length:72},(_,i)=>'第'+String(i+1)+'段：虚构工作经历文字'+String(i+1));
@@ -89,4 +89,35 @@ test('PDF comparison normalizes Chinese punctuation but preserves the Word origi
  const viewer=readFileSync(new URL('../src/components/OriginalWordViewer.tsx',import.meta.url),'utf8');
  assert.match(viewer,/original\.normalize\('NFKC'\)/);
  assert.match(viewer,/counts\.get\(key\)===1/);
+});
+
+
+test('long editable Word run and long AI expansion remain visible and actionable',()=>{
+ const source='真实经历与工作过程。'.repeat(38);
+ const proposed=source+'结合目标岗位突出已有工作职责。'.repeat(10);
+ assert.ok(source.length>300&&proposed.length>300&&proposed.length<=1600);
+ const page={},attributes=new Map(),classes=new Set();
+ const node={textContent:source,querySelector:()=>null,closest:()=>page,
+  getAttribute:k=>attributes.get(k)??null,setAttribute:(k,v)=>attributes.set(k,v),
+  removeAttribute:k=>attributes.delete(k),
+  classList:{add:k=>classes.add(k),remove:k=>classes.delete(k)},
+  replaceChildren(...parts){this.textContent=parts.map(p=>p.textContent).join('');},
+  getBoundingClientRect:()=>({left:40,top:50,width:440,height:80})};
+ const mount={querySelectorAll:s=>s==='section.hhba-native-docx'?[page]:
+  s==='section.hhba-native-docx span'?[node]:[],
+  getBoundingClientRect:()=>({left:0,top:0,width:800,height:1200}),
+  offsetWidth:800,offsetHeight:1200,scrollWidth:800,scrollHeight:1200};
+ const oldStyle=globalThis.getComputedStyle,oldDocument=globalThis.document;
+ globalThis.getComputedStyle=()=>({fontFamily:'Arial'});
+ globalThis.document={createTextNode:textContent=>({textContent}),createElement:()=>({textContent:''})};
+ try{
+  assert.equal(browserWordAnchors(mount,[source])[0].text,source);
+  paintBrowserWordSuggestions(mount,[source],[{original:source,proposed,state:'pending'}]);
+  assert.equal(node.textContent,proposed);
+  assert.ok(classes.has('hhba-word-inline-suggestion'));
+  assert.equal(browserWordAnchors(mount,[source])[0].text,source,'save uses original even after rainbow preview');
+ }finally{
+  if(oldStyle===undefined)delete globalThis.getComputedStyle;else globalThis.getComputedStyle=oldStyle;
+  if(oldDocument===undefined)delete globalThis.document;else globalThis.document=oldDocument;
+ }
 });

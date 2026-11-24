@@ -76,3 +76,19 @@ test('AI append becomes a complete editable Word replacement, preserving origina
  assert.equal(result.stages.docx.edited_text_verified,true);
  assert.equal(result.stages.docx.original_unchanged,true);
 });
+
+
+test('all accepted edits must survive successive Word revisions before same-JD rescoring',async()=>{
+ const result=await runSyntheticResumeAcceptance({env,signal,
+  optimize:async({blocks})=>({pendingIds:[],suggestions:blocks.map(b=>({
+   blockId:b.id,action:'replace',original:b.text,proposed:b.text+'（虚构测试改写）'
+  }))}),
+  reassess:async({beforeBlocks,afterBlocks})=>{
+   assert.equal((beforeBlocks[0].text.match(/虚构测试改写/g)||[]).length,0);
+   assert.equal((afterBlocks[0].text.match(/虚构测试改写/g)||[]).length,3);
+   return {supported:true,original_score:80,updated_score:82,delta:2};
+  }});
+ assert.equal(result.status,'PASS');
+ assert.equal(result.stages.docx.applied_edits,3);
+ assert.equal(result.stages.docx.original_unchanged,true);
+});
