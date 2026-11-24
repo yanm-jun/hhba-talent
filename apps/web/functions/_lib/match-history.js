@@ -2,6 +2,7 @@
 // No raw CV text, document bytes, email/phone in returned JSON, telemetry or payload.
 // These are recommendations, NEVER applications and NEVER automatically monitored.
 import {allowedEmployerJobLink} from './match-employer-source.js';
+import {v4PublicJobUrl} from './v4-open-job-evidence.js';
 
 const text=(v,n)=>typeof v==='string'?v.replace(/[\u0000-\u001f]/g,' ').trim().slice(0,n):'';
 const score=v=>Number.isInteger(v)&&v>=0&&v<=100?v:null;
@@ -36,12 +37,13 @@ export function safeHistoryJobs(matches){
  if(!Array.isArray(matches))return [];
  const seen=new Set(),out=[];
  for(const item of matches){
-  if(!item||!isValidUrl(item.official_url)||seen.has(item.official_url))continue;
+  if(!item||!(item.v4_source===true?v4PublicJobUrl(item.official_url)===item.official_url:isValidUrl(item.official_url))||seen.has(item.official_url))continue;
   const company=text(item.company,110),title=text(item.title_zh||item.title,125);
   const location=text(item.location,80);
   if(!company||!title||!location)continue;
   seen.add(item.official_url);
   out.push({id:text(item.id,75),company,title,location,
+   ...(item.v4_source===true?{v4_source:true}:{}),
    official_url:item.official_url,match_score:score(item.match_score),
    score_basis:text(item.score_basis,360),
    recommendation_reason:text(Array.isArray(item.jd_comparisons)?
@@ -60,7 +62,7 @@ export function safeHistoryJobs(matches){
      ['EMPLOYER_PAGE_CANDIDATE','PUBLIC_ANNOUNCEMENT_CANDIDATE'].includes(s.kind))
     .map(s=>({url:s.url,kind:s.kind})),
    ...verifiedJdMeta(item)});
-  if(out.length===10)break;
+
  }
  return out;
 }
@@ -68,7 +70,7 @@ export function compareOpportunitySets(previous,current){
  const seen=new Set(),priorScore=new Map();
  for(const run of previous){
   for(const job of parsedJobs(run.jobs_json)){
-   if(!isValidUrl(job.official_url))continue;
+   if(!(job.v4_source===true?v4PublicJobUrl(job.official_url):isValidUrl(job.official_url)))continue;
    seen.add(job.official_url);
    const x=score(job.match_score);
    if(x!==null)priorScore.set(job.official_url,
@@ -107,7 +109,8 @@ export async function saveMatchHistory(db,phone,resumeId,roleHint,modelMatches){
  const delta=compareOpportunitySets(previous?.results||[],jobs);
  const best=jobs.reduce((v,x)=>x.match_score===null?v:Math.max(v,x.match_score),-1);
  const data=JSON.stringify(jobs);
- if(data.length>75000)throw Error('MATCH_HISTORY_TOO_LARGE');
+ // D1 row size is a platform constraint, never discard individual jobs.
+ if(new TextEncoder().encode(data).byteLength>1500000)throw Error('MATCH_HISTORY_STORAGE_TOO_LARGE');
  const id=crypto.randomUUID(),created=new Date().toISOString();
  const inserted=await db.prepare('INSERT INTO hhba_ai_match_history(id,phone,resume_id,resume_label,role_hint,created_at,job_count,best_score,new_job_count,improved_job_count,jobs_json) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
   .bind(id,phone,resume?.id||null,resume?text(resume.filename,150):'本次上传的简历（未保存）',
