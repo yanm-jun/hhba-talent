@@ -49,9 +49,10 @@ export async function uploadBackgroundPart(env,phone,id,index,request){
  if(!text.trim())throw Error('INVALID_BACKGROUND_PART');
  if(index<row.uploaded_parts){if(await get(env,id,'source/'+index)!==text)throw Error('BACKGROUND_PART_CONFLICT');return publicState(row);}
  // One sequential part at a time. R2 put precedes the monotonic D1 counter.
- await put(env,id,'source/'+index,text);
+ const stored=await bucketOf(env).put(key(id,'source/'+index),JSON.stringify(text),{onlyIf:{etagDoesNotMatch:'*'},httpMetadata:{contentType:'application/json'}});
+ if(!stored&&await get(env,id,'source/'+index)!==text)throw Error('BACKGROUND_PART_CONFLICT');
  const updated=await db.prepare("UPDATE hhba_v4_background_tasks SET uploaded_parts=uploaded_parts+1,updated_at=? WHERE id=? AND phone=? AND state='UPLOADING' AND uploaded_parts=?").bind(Date.now(),id,phone,index).run();
- if(!changed(updated)){const current=await owned(db,phone,id);if(!current||current.state!=='UPLOADING')await bucketOf(env).delete(key(id,'source/'+index));throw Error('BACKGROUND_PART_CONFLICT');}
+ if(!changed(updated)){const current=await owned(db,phone,id);if(current?.state==='UPLOADING'&&current.uploaded_parts>index)return publicState(current);if(!current||current.state==='CANCELLED')await bucketOf(env).delete(key(id,'source/'+index));throw Error('BACKGROUND_PART_CONFLICT');}
  return publicState(await owned(db,phone,id));
 }
 export async function queueBackground(env,phone,id,body){
@@ -114,6 +115,7 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
    await saveV4Round(db,phone,{taskId:id,resumeId:row.resume_id,roleHint:row.role_hint,matches:found.matches,researchPending:true,researchRound:found.research_context?.round});
    await put(env,id,'context/'+row.source_part,found.research_context);
    const round=found.research_context?.round||row.research_round+1;
+   if(found.native_search?.research_error&&!retryable(found.native_search.research_error))throw Error(found.native_search.research_error);
    if(found.research_pending){await update('SEARCH',row.source_part,round);return {state:'QUEUED',phase:'SEARCH'};}
    const next=row.source_part+1;
    await update(next<row.uploaded_parts?'SEARCH':'VERIFY',next<row.uploaded_parts?next:0,round);
@@ -164,7 +166,7 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
   return {state:'QUEUED'};
  }catch(e){
   const code=codeOf(e);
-  if(code==='BACKGROUND_CANCELLED'){await purgeBackgroundSource(env,id).catch(()=>{});return {state:'CANCELLED'};}
+  if(code==='BACKGROUND_CANCELLED'){const current=await owned(db,phone,id);if(!current||current.state==='CANCELLED'||current.state==='COMPLETE')await purgeBackgroundSource(env,id).catch(()=>{});return {state:'STALE_LEASE'};}
   try{await update(row.phase,row.source_part,row.research_round,retryable(code)?'QUEUED':'PAUSED',code,retryable(code)?Date.now()+60000:0);}catch{}
   return {state:retryable(code)?'RETRY':'PAUSED',error:code};
  }

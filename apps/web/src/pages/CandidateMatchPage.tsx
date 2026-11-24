@@ -6,6 +6,7 @@ import {Link} from '../router';
 import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDialog';
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume,getMatchHistory,historyJobsForContinuation} from '../services/matchHistory';
+import {backgroundMatchAvailable,startBackgroundMatch} from '../services/v4BackgroundMatch';
 import {getRealAuthToken} from '../services/realAuth';
 import {v4PostingKey,MATCH_V4_PREVIEW,matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
 import '../styles/resume-match.css';
@@ -36,6 +37,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [storageChoice,setStorageChoice]=useState<'undecided'|'save'|'once'>('undecided');
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
+ const [backgroundAvailable,setBackgroundAvailable]=useState(false),[backgroundConsent,setBackgroundConsent]=useState(false);
+ const [backgroundNotice,setBackgroundNotice]=useState('');
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
  const [preflightAvailable,setPreflightAvailable]=useState(false);
  const [preflightBusy,setPreflightBusy]=useState(false);
@@ -60,6 +63,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const identifiedCharacters=redactResumeTextLocally(previewText).replace(/\s/g,'').length;
  useEffect(()=>{
   const abort=new AbortController();
+  if(MATCH_V4_PREVIEW)void backgroundMatchAvailable(abort.signal).then(ok=>{if(!abort.signal.aborted)setBackgroundAvailable(ok)});
   void matchServiceReady(abort.signal).then(ok=>{if(!abort.signal.aborted)setAvailability(ok?'ready':'disabled')});
   void matchPreviewPreflightAvailable(abort.signal).then(ok=>{if(!abort.signal.aborted)setPreflightAvailable(ok)});
   return()=>{abort.abort();controller.current?.abort();previewController.current?.abort()};
@@ -216,6 +220,11 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     // A cancellation during upload may still leave an authorized file saved;
     // in that case do not start the AI request.
     if(abort.signal.aborted)throw new DOMException('Cancelled','AbortError');
+   }
+   if(backgroundAvailable&&backgroundConsent&&!historyPending.current){
+    const task=await startBackgroundMatch(redactResumeTextLocally(previewText),options.role_hint||'',matchResumeId||undefined,abort.signal);
+    setBackgroundNotice('后台任务已接受。可以关闭页面，在「历史查找」查看进度或取消。任务编号：'+task.id);
+    setConsent(false);setBackgroundConsent(false);window.dispatchEvent(new Event('hhba:match-history-changed'));return;
    }
    let priorJobs:MatchedJob[]=[],runOptions=options;
    if(MATCH_V4_PREVIEW&&historyPending.current&&matchResumeId){
@@ -451,6 +460,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
           onChange={e=>setConsent(e.target.checked)}/>
           <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 使用我的简历信息进行智能岗位匹配；并同意本次将脱敏后的简历文字发送至第三方 AI 中转服务，原文件不随之发送。</span>
         </label>
+        {backgroundAvailable&&!historyPending.current&&<label className="hhba-ai-consent"><input type="checkbox" checked={backgroundConsent} onChange={e=>setBackgroundConsent(e.target.checked)}/><span>允许后台持续匹配：关闭网页后继续执行，同意临时私有保存脱敏简历文字与研究进度；完成或取消后删除临时资料，可在历史记录中取消。</span></label>}
+        {backgroundNotice&&<p role="status" className="hhba-ai-notice">{backgroundNotice}</p>}
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
@@ -458,7 +469,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
            (file&&!savedId&&storageChoice==='undecided')||
            identifiedCharacters<(MATCH_V4_PREVIEW?1:30)||availability!=='ready'||!getRealAuthToken()}>
           {working?<><LoaderCircle className="spin" size={18}/> {saveBusy?'正在保存简历…':'正在匹配岗位…'}</>:
-           <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
+           <><BriefcaseBusiness size={17}/> {backgroundAvailable&&backgroundConsent?'开始后台匹配':'开始智能匹配'} <ArrowRight size={17}/></>}
         </button>
         {working&&<p className="hhba-ai-processing" role="status">智能搜索进度与已发现岗位已在弹窗中展示。</p>}
       </section>

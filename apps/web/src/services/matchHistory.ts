@@ -17,7 +17,7 @@ export type HistoryMatchedJob={
  evidence_excerpt?:string;
  evidence_score_status?:'AI_PARTIAL_SOURCE_SCORED'|'AI_DIRECTION_REFERENCE_SCORED';
  evidence_sources?:{url:string;kind:string}[];
- jd_source_status?:'VERIFIED_JD';jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'AI_VERIFIED_JD_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
+ jd_source_status?:'VERIFIED_JD';jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'AI_VERIFIED_JD_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE'|'BACKGROUND_UNVERIFIED';
  jd_proof_method?:'PUBLIC_EMPLOYER_ATS_V1'|'DIRECT_EMPLOYER_HTML_V1'|'V4_STRUCTURED_JOBPOSTING'|'V4_MODEL_SOURCE_GROUNDED'|null;
 };
 export type MatchHistoryDetail=MatchHistorySummary&{matches:HistoryMatchedJob[];research_checkpoint?:{round:number;search_complete:boolean}};
@@ -80,6 +80,6 @@ export function historyJobsForContinuation(detail:MatchHistoryDetail):MatchedJob
   availability_status:job.availability_status,evidence_status:job.evidence_status,
   evidence_score_status:job.evidence_score_status,evidence_excerpt:job.evidence_excerpt,
   jd_version_id:job.jd_version_id,jd_sha256:job.jd_sha256,jd_checked_at:job.jd_checked_at,
-  jd_source_status:job.jd_source_status,jd_score_status:job.jd_score_status,jd_proof_method:job.jd_proof_method||undefined
+  jd_source_status:job.jd_source_status,jd_score_status:job.jd_score_status==='BACKGROUND_UNVERIFIED'?undefined:job.jd_score_status,jd_proof_method:job.jd_proof_method||undefined
  }));
 }

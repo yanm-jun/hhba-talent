@@ -5,6 +5,7 @@ import {Link} from '../router';
 import {CandidateMatchNativeDialog} from './CandidateMatchNativeDialog';
 import {getMatchHistory,listMatchHistory,removeMatchHistory,linkMatchHistoryResume,
  type HistoryMatchedJob,type MatchHistoryDetail,type MatchHistorySummary} from '../services/matchHistory';
+import {getBackgroundMatch,cancelBackgroundMatch,resumeBackgroundMatch,type BackgroundState} from '../services/v4BackgroundMatch';
 import {listPrivateResumes,type PrivateResume} from '../services/privateResumes';
 import type {MatchedJob,MatchProfile} from '../services/resumeMatch';
 import '../styles/match-history.css';
@@ -28,7 +29,7 @@ const historyProfile:MatchProfile={
 const historyJobId=(historyId:string,index:number)=>'history-'+historyId+'-'+index;
 function toOptimizerJob(job:HistoryMatchedJob,historyId:string,index:number):MatchedJob{
  return {
-  id:historyJobId(historyId,index),company:job.company,title:job.title,title_zh:job.title,
+  id:historyJobId(historyId,index),posting_key:job.posting_key,company:job.company,title:job.title,title_zh:job.title,
   location:job.location,official_url:job.official_url,
   platform:job.recruitment_source_kind||'UNVERIFIED',source:'MATCH_HISTORY',remote:false,
   reference_score:job.match_score??0,match_score:job.match_score,
@@ -45,7 +46,7 @@ function toOptimizerJob(job:HistoryMatchedJob,historyId:string,index:number):Mat
   jd_version_id:job.jd_version_id,
   jd_sha256:job.jd_sha256,jd_checked_at:job.jd_checked_at,
   jd_source_status:job.jd_source_status,
-  jd_score_status:job.jd_score_status,
+  jd_score_status:job.jd_score_status==='BACKGROUND_UNVERIFIED'?undefined:job.jd_score_status,
   jd_proof_method:job.jd_proof_method||undefined
  };
 }
@@ -53,6 +54,7 @@ type HistoryView='details'|'optimize';
 
 export function CandidateMatchHistory({active=true}:{active?:boolean}){
  const [items,setItems]=useState<MatchHistorySummary[]>([]);
+ const [background,setBackground]=useState<Record<string,BackgroundState>>({});
  const [selected,setSelected]=useState<MatchHistoryDetail|null>(null);
  const [view,setView]=useState<HistoryView>('details');
  const [openingView,setOpeningView]=useState<HistoryView|null>(null);
@@ -105,10 +107,12 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
  useEffect(()=>{
   if(!active){closeModal();return;}
   let mounted=true;setLoading(true);setError('');
-  void listMatchHistory().then(rows=>{if(mounted)setItems(rows)})
+  const reload=async()=>{const rows=await listMatchHistory();if(!mounted)return;setItems(rows);const tasks=await Promise.all(rows.filter(x=>x.engine==='V4'&&x.research_pending).map(async row=>[row.id,await getBackgroundMatch(row.id)] as const));if(mounted)setBackground(Object.fromEntries(tasks.filter((x):x is readonly [string,BackgroundState]=>x[1]!==null)));};
+  void reload()
    .catch(e=>{if(mounted)setError(e instanceof Error?e.message:'历史记录读取失败')})
    .finally(()=>{if(mounted)setLoading(false)});
-  return()=>{mounted=false};
+  const timer=setInterval(()=>{void reload().catch(()=>{});},15000);
+  return()=>{mounted=false;clearInterval(timer)};
  },[active]);
  async function open(id:string,nextView:HistoryView='details'){
   if(busy)return;
@@ -189,7 +193,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
     <p>上传简历并完成一次 AI 推荐后，真实的岗位结果会自动保存到你的账户。历史记录不会被算作投递。</p>
     <Link to="/candidate/account/match">上传简历开始匹配</Link>
    </div>:<>
-    <p className="hhba-match-history-explain">你可以随时查看上一次为什么推荐这些岗位，或使用同一份已保存的简历再次查找。只有重新完成匹配，才会产生新岗位对比；目前不会在后台自动搜索或发送通知。</p>
+    <p className="hhba-match-history-explain">你可以随时查看上一次为什么推荐这些岗位，或使用同一份已保存的简历再次查找。只有重新完成匹配，才会产生新岗位对比；经明确授权的后台任务可以持续研究；不自动发送通知。</p>
     {modalOpen&&createPortal(
      <div className="hhba-match-history-overlay" role="presentation"
       onMouseDown={event=>{if(event.target===event.currentTarget&&!editingJobId)closeModal()}}>
@@ -248,7 +252,7 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
       </article>;
      })}
      <div className="hhba-match-history-actions">
-      {selected.resume_id?<Link to={'/candidate/account/match?resume='+encodeURIComponent(selected.resume_id)+(selected.engine==='V4'&&selected.research_pending?'&history='+encodeURIComponent(selected.id):'')}>{selected.engine==='V4'&&selected.research_pending?'恢复上次搜索':'用这份简历重新匹配'}</Link>:
+      {background[selected.id]&&['QUEUED','RUNNING','PAUSED'].includes(background[selected.id].state)?<span>后台研究尚未结束，请在历史列表管理任务。</span>:selected.resume_id?<Link to={'/candidate/account/match?resume='+encodeURIComponent(selected.resume_id)+(selected.engine==='V4'&&selected.research_pending?'&history='+encodeURIComponent(selected.id):'')}>{selected.engine==='V4'&&selected.research_pending?'恢复上次搜索':'用这份简历重新匹配'}</Link>:
        <Link to="/candidate/account/match">上传简历重新匹配</Link>}
       {view==='details'&&<button type="button" className="hhba-match-history-optimize-secondary"
        disabled={busy} onClick={()=>void open(selected.id,'optimize')}><Sparkles size={15}/> 优化历史岗位简历</button>}
@@ -266,9 +270,12 @@ export function CandidateMatchHistory({active=true}:{active?:boolean}){
        <strong>{item.role_hint?item.role_hint+' · AI 岗位匹配':'AI 智能岗位匹配'}</strong>
        <small><Clock3 size={13}/>{dateLabel(item.created_at)} · {item.resume_label}</small>
        <span>匹配 {item.job_count} 个岗位{item.best_score===null?'':' · 最高适配分 '+item.best_score}</span>
+       {background[item.id]&&<small>后台状态：{background[item.id].state==='PAUSED'?'待恢复':background[item.id].state==='RUNNING'?'执行中':background[item.id].state==='QUEUED'?'排队中':background[item.id].state} · 已完成 {background[item.id].research_round} 轮{background[item.id].error?' · '+background[item.id].error:''}</small>}
        {item.new_job_count>0&&<em>本次新发现 {item.new_job_count} 个之前未推荐的岗位</em>}
       </div>
       <div className="hhba-match-history-row-actions">
+       {background[item.id]&&['QUEUED','RUNNING','PAUSED'].includes(background[item.id].state)&&<button type="button" disabled={busy} onClick={()=>{if(window.confirm('取消后台任务并删除临时简历资料？已发现的岗位会保留。'))void cancelBackgroundMatch(item.id).then(()=>{setBackground(old=>({...old,[item.id]:{...old[item.id],state:'CANCELLED'}}));}).catch(e=>setError(e.message));}}>取消后台任务</button>}
+       {background[item.id]?.state==='PAUSED'&&<button type="button" disabled={busy} onClick={()=>void resumeBackgroundMatch(item.id).then(()=>setBackground(old=>({...old,[item.id]:{...old[item.id],state:'QUEUED',error:null}}))).catch(e=>setError(e.message))}>恢复后台任务</button>}
        <button type="button" disabled={busy} onClick={()=>void open(item.id)}>查看岗位与理由 <ArrowRight size={15}/></button>
        <button type="button" className="hhba-match-history-row-optimize" disabled={busy}
         onClick={()=>void open(item.id,'optimize')}><Sparkles size={14}/> 优化简历</button>
