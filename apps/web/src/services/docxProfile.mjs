@@ -26,8 +26,8 @@ export function cleanProfile(input){
  }
  return result;
 }
-async function unzipDocXml(buffer){
- if(!(buffer instanceof ArrayBuffer)||buffer.byteLength<50||buffer.byteLength>MAX_ZIP)throw Error('文件大小不符合要求');
+async function unzipDocXml(buffer,{unbounded=false,signal}={}){
+ if(!(buffer instanceof ArrayBuffer)||buffer.byteLength<50||(!unbounded&&buffer.byteLength>MAX_ZIP))throw Error('文件大小不符合要求');
  const view=new DataView(buffer),bytes=new Uint8Array(buffer);
  // ZIP EOCD may be followed by a small archive comment.
  let eocd=-1;
@@ -36,7 +36,7 @@ async function unzipDocXml(buffer){
  }
  if(eocd<0)throw Error('DOCX 文件尾部结构无效');
  const entries=read16(view,eocd+10),centralOffset=read32(view,eocd+16);
- if(entries<1||entries>1200||centralOffset>=eocd)throw Error('DOCX 文件目录不受支持');
+ if(entries<1||(!unbounded&&entries>1200)||centralOffset>=eocd)throw Error('DOCX 文件目录不受支持');
  let offset=centralOffset,record=null;
  for(let i=0;i<entries;i++){
   if(offset+46>eocd||read32(view,offset)!==0x02014b50)throw Error('DOCX 目录损坏');
@@ -49,8 +49,11 @@ async function unzipDocXml(buffer){
   }
   offset+=46+nameLen+extra+comment;
  }
- if(!record||record.flags&1||record.unpacked<10||record.unpacked>MAX_XML||
-   record.packed<5||record.packed>MAX_ZIP)throw Error('无法安全提取 DOCX 文本');
+ if(!record||record.flags&1||record.unpacked<10||(!unbounded&&record.unpacked>MAX_XML)||
+   record.packed<5||(!unbounded&&record.packed>MAX_ZIP))throw Error('无法安全提取 DOCX 文本');
+ // Reject deceptive ZIP expansion, even in the unrestricted matching path.
+ if(unbounded&&record.unpacked>Math.max(MAX_XML,record.packed*200))throw Error('DOCX 异常压缩比例');
+ if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
  const p=record.local;
  if(p+30>buffer.byteLength||read32(view,p)!==0x04034b50)throw Error('DOCX 文件数据损坏');
  const start=p+30+read16(view,p+26)+read16(view,p+28);
@@ -67,7 +70,8 @@ async function unzipDocXml(buffer){
    while(true){
     const part=await reader.read();if(part.done)break;
     size+=part.value.byteLength;
-    if(size>MAX_XML){await reader.cancel();throw Error('DOCX 解压内容超过安全限制')}
+    if(signal?.aborted){await reader.cancel();throw new DOMException('Cancelled','AbortError')}
+    if(size>record.unpacked||(!unbounded&&size>MAX_XML)){await reader.cancel();throw Error('DOCX 解压内容超过安全限制')}
     chunks.push(part.value);
    }
   }finally{reader.releaseLock()}
@@ -86,8 +90,8 @@ const xmlChars=s=>s.replace(/&(#x[0-9a-f]+|#[0-9]+|amp|lt|gt|quot|apos);/gi,(raw
  }
  return raw;
 });
-export function wordXmlToText(xml){
- if(typeof xml!=='string'||xml.length>MAX_XML||
+export function wordXmlToText(xml,{unbounded=false}={}){
+ if(typeof xml!=='string'||(!unbounded&&xml.length>MAX_XML)||
   /<!DOCTYPE|<!ENTITY|<\?xml-stylesheet/i.test(xml))throw Error('DOCX 含有不支持的 XML 声明');
  if(!/<w:document(?:\s|>)/.test(xml)||!/<w:body(?:\s|>)/.test(xml))throw Error('DOCX 不是有效正文');
  const paragraphs=[];
@@ -100,13 +104,13 @@ export function wordXmlToText(xml){
   }
   const line=bits.join('').replace(/[\u0000-\u0008\u000b-\u001f]/g,'').trim();
   if(line)paragraphs.push(line);
-  if(paragraphs.join('\n').length>MAX_TEXT)throw Error('简历文本超过本地提取上限');
+  if(!unbounded&&paragraphs.join('\n').length>MAX_TEXT)throw Error('简历文本超过本地提取上限');
  }
  if(!paragraphs.length)throw Error('DOCX 中未找到可复制文字');
  return paragraphs.join('\n');
 }
-export async function extractDocxText(buffer){
- return wordXmlToText(await unzipDocXml(buffer));
+export async function extractDocxText(buffer,options={}){
+ return wordXmlToText(await unzipDocXml(buffer,options),options);
 }
 export function inferProfileFromText(text){
  if(typeof text!=='string'||!text.trim())return cleanProfile({});
