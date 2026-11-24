@@ -163,14 +163,17 @@ const SYSTEM_AUDIT=`你是独立的 HHBA 简历事实审查员。对照原文与
 
 export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions,signal}){
  const originalById=new Map(blocks.map(block=>[block.id,block.text]));
- const draftBlocks=[];
- for(const suggestion of suggestions){
+ const unbounded=env?.HHBA_MATCH_V4_READY==='1';
+ const draftBlocks=[],auditIds=new Map();
+ for(const [index,suggestion] of suggestions.entries()){
   if(suggestion.action==='request_evidence')continue;
   const original=originalById.get(suggestion.blockId);
   if(!original)continue;
   const numbers=numberTokens(original);
   if([...numberTokens(suggestion.proposed)].some(token=>!numbers.has(token)))continue;
-  draftBlocks.push({blockId:suggestion.blockId,original,proposed:suggestion.proposed});
+  const auditId=unbounded?'alternative-'+index:suggestion.blockId;
+  auditIds.set(suggestion,auditId);
+  draftBlocks.push({blockId:auditId,original,proposed:suggestion.proposed});
  }
  if(!draftBlocks.length)return suggestions.filter(item=>item.action==='request_evidence');
  let reviewer;
@@ -185,7 +188,7 @@ export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions
   const rows=checks.filter(check=>check?.blockId===block.blockId);
   return rows.length===1&&rows[0].safe===true;
  }).map(block=>block.blockId));
- return suggestions.filter(item=>item.action==='request_evidence'||confirmed.has(item.blockId));
+ return suggestions.filter(item=>item.action==='request_evidence'||confirmed.has(auditIds.get(item)));
 }
 
 export async function generateTailoredResume({env,blocks,job,signal}){
