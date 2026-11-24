@@ -10,7 +10,7 @@ import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 import {safePublicAtsJobLocator,ATS_JD_PROOF} from './public-ats-jd.js';
 import {extractOfficialJdSections,MEITUAN_DETAIL_SOURCE,TENCENT_DETAIL_SOURCE} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
-import {readV4ArchivedJd} from './v4-jd-bridge.js';
+import {readV4ArchivedJd,v4ArchiveConfigured} from './v4-jd-bridge.js';
 import {recordJdPostingCheck,readJdPostingState,isUsablePosting} from './jd-posting-lifecycle.js';
 
 export const JD_ARCHIVE_KIND='HHBA_VERIFIED_JOB_JD_V1';
@@ -23,6 +23,7 @@ const tableForProof=proof=>proof===ATS_JD_PROOF?JD_TABLE_ATS:JD_TABLE_DIRECT;
 const text=value=>typeof value==='string'?value.trim():'';
 
 export function jdArchiveConfigured(env){
+ if(env?.HHBA_MATCH_V4_READY==='1')return v4ArchiveConfigured(env);
  // Explicit D1+R2 bindings opt the environment in; an optional '0' killswitch
  // disables the archive without touching any private resume integration.
  return env?.HHBA_JOB_JD_ARCHIVE_ENABLED!=='0'&&
@@ -32,6 +33,7 @@ export function jdArchiveConfigured(env){
 }
 export async function jdArchiveReady(env){
  if(!jdArchiveConfigured(env))return false;
+ if(env?.HHBA_MATCH_V4_READY==='1')return v4ArchiveConfigured(env);
  try{
   const row=await env.HHBA_JOB_JD_DB.prepare(
    "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('hhba_job_jd_versions','hhba_job_jd_fetch_attempts')"
@@ -82,6 +84,7 @@ function normalizeDocument(value){
 const safeDayIso=raw=>Number.isFinite(Date.parse(raw||''))?raw:null;
 export async function readJobJdById(env,id){
  if(!isJDVersionId(id)||!jdArchiveConfigured(env))return null;
+ if(env?.HHBA_MATCH_V4_READY==='1')return readV4ArchivedJd(env,id);
  const db=env.HHBA_JOB_JD_DB;
  let row=await db.prepare('SELECT * FROM '+JD_TABLE_DIRECT+' WHERE id=?').bind(id).first();
  if(!row){
