@@ -78,7 +78,7 @@ test('V4 sends résumé directly to AI web search and preserves credible job lea
    assert.equal(payload.tools[0].type,'web_search');
    assert.ok(payload.input.includes('汽车经销商渠道运营'));
    assert.ok(payload.instructions.includes('不要限制企业'));
-   return model({profile:{summary:'适合区域渠道运营',roles:['渠道运营']},jobs:[row]},[url]);
+   return model({research_complete:true,profile:{summary:'适合区域渠道运营',roles:['渠道运营']},jobs:[row]},[url]);
   }
   return new Response('blocked',{status:403});
  };
@@ -101,7 +101,7 @@ test('V4 does not silently cap recommendations at 10 or 20',async()=>{
   url:'https://recruitment.company'+i+'.cn/vacancies/'+i}));
  let modelCalls=0;
  const fetcher=async(u)=>{
-  if(u.endsWith('/responses')){modelCalls++;return model({profile:{roles:['区域督导']},jobs:rows});}
+  if(u.endsWith('/responses')){modelCalls++;return model({research_complete:true,profile:{roles:['区域督导']},jobs:rows});}
   return new Response('not accessible',{status:403});
  };
  const r=await v4Match(fetcher,provider,resume,'全国');
@@ -188,4 +188,63 @@ test('V4 frontend never rejects more than ten posts or cancels at the legacy fiv
  assert.match(service,/!MATCH_V4_PREVIEW&&data\.matches\.length>10/);
  assert.match(service,/MATCH_V4_PREVIEW\?undefined:setTimeout/);
  assert.match(service,/!MATCH_V4_PREVIEW\?\{limit:/);
+});
+
+test('V4 missing completion decision preserves leads and offers continuation, without claiming research is done',async()=>{
+ const r=await v4Match(async u=>u.endsWith('/responses')?model({jobs:[row]},[url]):new Response('blocked',{status:403}),provider,resume,'全国');
+ assert.equal(r.matches.length,1);
+ assert.equal(r.can_continue,true);
+ assert.equal(r.native_search.research_error,'AI_RESEARCH_COMPLETION_UNCONFIRMED');
+});
+test('V4 later round replaces placeholder and keeps prior profile evidence; excluded results do not reappear',async()=>{
+ const omitted='https://careers.omitted.cn/jobs/1';
+ let rounds=0;
+ const fetcher=async(u,options)=>{
+  if(!u.endsWith('/responses'))return new Response('blocked',{status:403});
+  rounds++;
+  const payload=JSON.parse(options.body);
+  assert.ok(payload.input.includes(omitted));
+  if(rounds===1)return model({research_complete:false,profile:{facts:[{kind:'work',quote:'汽车经销商渠道运营'}]},jobs:[{...row,url:omitted}]},[url,omitted]);
+  assert.ok(payload.input.includes('汽车经销商渠道运营'));
+  return model({research_complete:true,profile:{roles:['区域运营']},jobs:[row]},[url]);
+ };
+ const r=await v4Match(fetcher,provider,resume,'全国',{excludeUrls:[omitted]});
+ assert.equal(rounds,2);
+ assert.equal(r.matches.length,1);
+ assert.equal(r.matches[0].title,row.title);
+ assert.equal(r.matches[0].match_score,84);
+ assert.equal(r.profile.facts.length,1);
+});
+test('V4 production host uses V4 without a query parameter; final result can be streamed in parts',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const service=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ const route=await readFile(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ assert.doesNotMatch(service,/new URLSearchParams\(window\.location\.search\)\.get\('v4'\)==='1'/);
+ assert.match(service,/event==='final_job'/);
+ assert.match(service,/finalJobs\.length!==value\.match_count/);
+ assert.match(route,/sendJobs\('final',result\.matches\)/);
+});
+test('V4 repeats scoring after reading an independently obtained full JD',async()=>{
+ const html='<html><head><script type="application/ld+json">'+JSON.stringify({
+  '@context':'https://schema.org','@type':'JobPosting',title:'区域渠道运营',
+  hiringOrganization:{name:'其他汽车企业',url:'https://careers.other-motors.cn'},
+  jobLocation:{address:{addressLocality:'上海'}},
+  description:'<p>岗位职责</p><p>负责区域渠道运营和经销商业务流程的标准化管理和优化。</p>'+
+   '<p>负责区域销售人员培训和业务数据管理。</p>'+
+   '<p>任职要求</p><p>熟悉渠道运营和经销商业务流程，能够提供门店运营管理改善建议。</p>'+
+   '<p>具备项目沟通能力和业务数据分析能力。</p>'
+ })+'</script></head><body><h1>区域渠道运营</h1></body></html>';
+ let scoreCalls=0;
+ const r=await v4Match(async(u,options)=>{
+  if(!u.endsWith('/responses'))return new Response(html,{headers:{'content-type':'text/html'}});
+  const payload=JSON.parse(options.body);
+  if(payload.tools)return model({research_complete:true,jobs:[row]},[url]);
+  scoreCalls++;
+  assert.ok(payload.input.includes('具备项目沟通能力'));
+  return model({score:91,reason:'有明确渠道运营经验',resume_quote:'汽车经销商渠道运营',jd_quote:'渠道运营和经销商业务流程',matched:['渠道管理'],gaps:[]});
+ },provider,resume,'上海');
+ assert.equal(scoreCalls,1);
+ assert.equal(r.matches[0].match_score,91);
+ assert.equal(r.native_search.jd_verification.scored,1);
+ assert.equal(r.matches[0].score_evidence_status,'GROUNDED_JD_RESUME_QUOTES');
 });
