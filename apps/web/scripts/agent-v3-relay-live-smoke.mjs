@@ -17,7 +17,7 @@ if(!key||key.trim().length<16){
  process.exit(0);
 }
 const model=process.env.HHBA_AGENT_MODEL||'gpt-6.2-sol';
-const actor=process.env.HHBA_AGENT_ACTOR_AUTH||'';
+const actor=process.env.HHBA_AGENT_ACTOR_AUTH||'local-image-extension';
 if(!/^[A-Za-z0-9._-]{3,90}$/.test(model)||
  (actor&&!/^[A-Za-z0-9._-]{1,80}$/.test(actor))){
  console.log(label+JSON.stringify({status:'CONFIG_INVALID'}));
