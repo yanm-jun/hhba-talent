@@ -672,3 +672,11 @@ test('V4 verification retries defer individual jobs instead of sleeping inside a
  const {readFileSync}=await import('node:fs');const browser=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');const background=readFileSync(new URL('../functions/_lib/v4-background-match.js',import.meta.url),'utf8');
  assert.match(browser,/ready\.push\(\{job:merged,attempt:item\.attempt\+1,nextAt:/);assert.doesNotMatch(browser,/const retryVerification=async/);assert.match(background,/pending\.find\(j=>!\(deferred/);assert.match(background,/job\.jd_sha256!==verified\.jd_sha256/);
 });
+
+
+test('V4 final score aggregates every grounded segment and recovers actual context overflow',async()=>{
+ const {synthesizeV4Scores}=await import('../functions/_lib/v4-jd-score.js');
+ const items=Array.from({length:4},(_,i)=>({requirement:'requirement '+i,resume_evidence:'evidence '+i,status:'supported'}));const seen=[];
+ const fetcher=async(_u,opts)=>{const p=JSON.parse(opts.body),input=JSON.parse(p.input);if(input.comparisons?.length>1)return Response.json({error:{code:'context_length_exceeded'}},{status:400});if(input.comparisons){seen.push(...input.comparisons);return model({summary:input.comparisons.map(x=>x.resume_evidence).join(' ')});}assert.match(input.evidence_summaries.join(' '),/evidence 0/);assert.match(input.evidence_summaries.join(' '),/evidence 3/);return model({score:88,reason:'全局综合'});};
+ const result=await synthesizeV4Scores(fetcher,provider,'运营',items.map(c=>({jd_comparisons:[c]})));assert.equal(result.score,88);assert.deepEqual(seen,items);assert.deepEqual(result.comparisons,items);
+});

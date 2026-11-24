@@ -4,7 +4,7 @@
  */
 import {v4Provider,v4Call,v4ParseJson,v4Sources,v4OutputText} from '../functions/_lib/simple-match-v4.js';
 const label='HHBA_V4_LIVE_SMOKE=';
-if(!['feat/simple-resume-match-v4-20261124','fix/v4-open-job-discovery-20261124','fix/v4-direct-ai-recommend-20261124','fix/v4-remove-residual-matching-caps'].includes(process.env.CF_PAGES_BRANCH)){
+if(!['feat/simple-resume-match-v4-20261124','fix/v4-open-job-discovery-20261124','fix/v4-direct-ai-recommend-20261124','fix/v4-remove-residual-matching-caps','feat/v4-background-validation'].includes(process.env.CF_PAGES_BRANCH)){
  console.log(label+JSON.stringify({status:'SKIPPED_OTHER_BRANCH'}));process.exit(0);
 }
 const provider=v4Provider(process.env);
@@ -58,7 +58,7 @@ try{
 }catch(e){report.web_search=e?.code||'PROVIDER_ERROR'}
 // A synthetic image-only PDF, not a real applicant document, exercises
 // the same input_file path as scanned resumes.
-if(process.env.CF_PAGES_BRANCH==='fix/v4-remove-residual-matching-caps'){
+if(['fix/v4-remove-residual-matching-caps','feat/v4-background-validation'].includes(process.env.CF_PAGES_BRANCH)){
  const patterns={
   'H':['10001','10001','10001','11111','10001','10001','10001'],
   'B':['11110','10001','10001','11110','10001','10001','11110'],

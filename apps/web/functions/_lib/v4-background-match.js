@@ -5,7 +5,7 @@ import {v4Match,v4Provider,v4Call,v4ParseJson,resumeResearchIndex} from './simpl
 import {redactForModel} from './resume-match-core.js';
 import {saveV4Round,getV4History,patchV4Job,finishV4History} from './v4-match-history.js';
 import {prepareV4JobForOptimization,readV4ArchivedJd} from './v4-jd-bridge.js';
-import {scoreVerifiedV4Job} from './v4-jd-score.js';
+import {scoreVerifiedV4Job,synthesizeV4Scores} from './v4-jd-score.js';
 import {v4PostingKey} from '../../src/services/v4PostingIdentity.mjs';
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const PART_BYTES=512*1024;
@@ -181,16 +181,9 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
   if(findings.parts.length>1){
    // Combine all independently grounded evidence. Never average local scores
    // or accept a numerical score with no supporting source evidence.
-   const comparisons=findings.parts.flatMap(p=>p.jd_comparisons||[]);
-   const evidence=comparisons.some(c=>c.resume_evidence);
-   let value=null,reason='完整分段研究未发现足够的简历证据。';
-   if(evidence){
-    await live();
-    const r=await v4Call(guardedFetch,v4Provider(env),{instructions:'综合同一岗位与同一份简历所有分段的真实核验证据。不得平均局部分数，某段未发现证据不代表其他段没有。不能捏造资格。只返回 JSON {score:0至100整数或null,reason:解释}。',input:JSON.stringify({title:job.title,findings:findings.parts.map(p=>({score:p.match_score,reason:p.recommendation_reason,comparisons:p.jd_comparisons}))})});
-    if(r.status!=='completed')throw Error('AI_PROVIDER_INCOMPLETE');
-    const a=v4ParseJson(r);value=Number.isInteger(a.score)&&a.score>=0&&a.score<=100?a.score:null;reason=typeof a.reason==='string'?a.reason:reason;
-   }
-   final={match_score:value,reference_score:value??0,jd_score_status:value===null?'INSUFFICIENT_RESUME_EVIDENCE':'AI_VERIFIED_JD_SCORED',score_basis:'已逐段核验全部授权简历文本与同一岗位 JD。',recommendation_reason:reason};
+   const result=await synthesizeV4Scores(guardedFetch,v4Provider(env),job.title,findings.parts,{signal:controller.signal});
+   const value=Number.isInteger(result.score)&&result.score>=0&&result.score<=100&&result.comparisons.some(c=>c.resume_evidence)?result.score:null;
+   final={match_score:value,reference_score:value??0,jd_score_status:value===null?'INSUFFICIENT_RESUME_EVIDENCE':'AI_VERIFIED_JD_SCORED',score_basis:'已逐段核验全部授权简历文本与同一岗位 JD。',recommendation_reason:typeof result.reason==='string'?result.reason:'请核对岗位与简历原文。'};
   }
   await live();await patchV4Job(db,phone,id,job.official_url,final,posting);
   await bucketOf(env).delete(key(id,jobKey));delete deferred[posting];await put(env,id,'deferred',deferred);await update('VERIFY',0,row.research_round);
