@@ -189,7 +189,7 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  const company=meta(html,'property','og:site_name')||meta(html,'name','application-name');
  const city=htmlLocation(plain);
  const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
- if(!title||!company||GENERIC.test(company)||!city||!sections||requirements.length<18)
+ if(!title||!company||GENERIC.test(company)||!city||!sections||!requirements.trim())
   throw Error('V4_JOB_DETAILS_NOT_VERIFIED');
  return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
   canonical_url:canonical,company,title,location:city,

@@ -814,3 +814,31 @@ test('V4 stage pagination delivers all original pages before accepting a final a
  },{instructions:'test',input:JSON.stringify({resume_text:longResume,job:{full_jd:longJd}})},{parse:r=>r.value,resume:longResume,jd:longJd});
  assert.equal(r.value.score,85);assert.ok(seen.resume.length>=2&&seen.jd.length>=2);
 });
+
+
+test('V4 public evidence ledger retains old tool pages and exposes exact text by record index',async()=>{
+ const {v4RememberPublicResult,v4EvidencePage,v4EvidenceIndex}=await import('../functions/_lib/v4-research-tools.js');
+ const ledger=[];
+ const first={type:'read_page',ok:true,url,mode:'static',text:'第一轮招聘原文',offset:0};
+ v4RememberPublicResult(ledger,first);v4RememberPublicResult(ledger,first);
+ v4RememberPublicResult(ledger,{...first,text:'更新后的招聘原文'});
+ assert.equal(ledger.length,2);assert.equal(v4EvidenceIndex(ledger).length,2);
+ assert.equal(v4EvidencePage(ledger,{index:0,offset:0},1000).text,first.text);
+ assert.equal(v4EvidencePage(ledger,{index:1,offset:0},1000).text,'更新后的招聘原文');
+ v4RememberPublicResult(ledger,{type:'text_page',ok:true,collection:'resume',text:'私有原文'});
+ assert.equal(ledger.length,2);
+});
+
+
+test('V4 stage retains earlier public evidence while later tool results arrive',async()=>{
+ const {v4StageResearchCall}=await import('../functions/_lib/v4-research-tools.js');
+ const ledger=[];let calls=0;
+ const result=await v4StageResearchCall(async p=>{
+  const i=JSON.parse(p.input);calls++;
+  if(calls===1)return {value:{research_action:{type:'read_page',url,mode:'static'}}};
+  if(calls===2)return {value:{research_action:{type:'text_page',collection:'resume',offset:0}}};
+  if(calls===3){assert.equal(i.research_evidence.total,2);return {value:{research_action:{type:'evidence',index:0,offset:0}}};}
+  assert.equal(i.research_tool_results[0].text,'官方岗位原文');return {value:{score:85}};
+ },{instructions:'test',input:JSON.stringify({resume_text:resume})},{parse:r=>r.value,sourceUrls:[url],resume,ledger,fetcher:async()=>new Response('官方岗位原文',{headers:{'content-type':'text/plain'}})});
+ assert.equal(result.value.score,85);assert.equal(ledger.length,1);assert.equal(ledger[0].text,'官方岗位原文');
+});
