@@ -532,3 +532,12 @@
  .hhba-report-pager{font-size:16px}
 }
 @media(prefers-reduced-motion:reduce){.hhba-report-pager-side{transition:none}}
+
+/* Three-stage report. Keep source details and the score in one reading column. */
+.hhba-refined-steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+.hhba-unified-score{min-width:115px;flex:0 0 115px;align-items:flex-end;text-align:right}
+.hhba-unified-score>span{white-space:normal;line-height:1.4;text-align:right}
+.hhba-unified-score .hhba-native-optimize{white-space:nowrap}
+.hhba-refined-job-head>div:first-child>.hhba-source-confirmed,.hhba-refined-job-head>div:first-child>.hhba-source-pending{font-size:11px;font-weight:500;white-space:normal;color:#7f8d9c}
+.hhba-refined-job-head>div:first-child>.hhba-source-confirmed{color:#247452}
+@media(max-width:640px){.hhba-refined-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.hhba-refined-steps .hhba-stage-tab{padding:7px 5px;gap:4px}.hhba-refined-steps .hhba-step-copy{font-size:11px}.hhba-refined-steps .hhba-step-copy small{display:none}.hhba-unified-score{min-width:82px;flex-basis:82px}.hhba-unified-score>span{font-size:10px}.hhba-refined-stage[data-stage="2"]{padding:14px 10px}.hhba-refined-stage[data-stage="2"] .hhba-refined-metrics>div{padding-inline:6px}.hhba-refined-stage[data-stage="2"] .hhba-refined-metrics small{font-size:10px}}
