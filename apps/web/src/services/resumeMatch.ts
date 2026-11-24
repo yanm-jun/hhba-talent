@@ -540,44 +540,47 @@ export async function submitExtractedResumeText(
  onProgress?.('reading');
  // Verify one public JD per request, instead of spending the entire hosting
  // subrequest budget on all vacancies at once. No total job-count cap.
- const queue=[...collected.values()].filter(job=>!job.jd_version_id||job.jd_score_status!=='AI_VERIFIED_JD_SCORED');let cursor=0,checked=0;
+ const queue=[...collected.values()].filter(job=>!job.jd_version_id||job.jd_score_status!=='AI_VERIFIED_JD_SCORED');let checked=0;
  const pendingVerification=new Set<string>();
  const transientVerification=(e:unknown)=>{
   const err=e as MatchError;
   if(err.code)return ['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_STREAM_INTERRUPTED','AI_PROVIDER_RESPONSE_INVALID','V4_PAGE_TEMPORARILY_UNAVAILABLE','V4_SCORE_UNAVAILABLE','AI_PROVIDER_INCOMPLETE','JD_ARCHIVE_DISABLED'].includes(err.code);
   return e instanceof TypeError||[429,502,503,504].includes(err.status);
  };
- const retryVerification=async<T,>(work:()=>Promise<T>,job:MatchedJob):Promise<T>=>{
-  let delay=1000;
-  for(;;){
-   if(signal?.aborted)throw signal.reason;
-   try{return await work();}catch(e){
-    if(signal?.aborted||!transientVerification(e))throw e;
-    pendingVerification.add(v4PostingKey(job));
-    onActivity?.({stage:'reading',message:'岗位核验或评分服务暂时异常，保留已完成结果，正在恢复。'});
-    await pause(delay);delay=Math.min(delay*2,30000);
+ // Process a fair sweep of all ready jobs before revisiting transient failures.
+ // Failed jobs never occupy a worker while waiting for their next retry.
+ let ready=queue.map(job=>({job,attempt:0,nextAt:0}));
+ while(ready.length){
+  if(signal?.aborted)throw signal.reason;
+  const now=Date.now(),batch=ready.filter(item=>item.nextAt<=now);
+  if(!batch.length){await pause(Math.max(1,Math.min(...ready.map(item=>item.nextAt))-now));continue;}
+  ready=ready.filter(item=>item.nextAt>now);
+  let index=0;
+  const worker=async()=>{
+   while(index<batch.length){
+    if(signal?.aborted)throw signal.reason;
+    const item=batch[index++],job=item.job,key=v4PostingKey(job);
+    let merged=collected.get(key)||job;
+    try{
+     // Recheck the JD when absent; on a stale archive error refresh just
+     // this posting without repeating previously completed research.
+     if(!merged.jd_version_id||!merged.jd_sha256){const verified=await prepareV4Job(job.official_url,signal,job.title,historyId,key,job.location);merged={...merged,...verified};collected.set(key,merged);onPartial?.([...collected.values()]);}
+     const score=await scoreV4Job(merged,text,signal,historyId);collected.set(key,{...merged,...score});pendingVerification.delete(key);
+    }catch(e){
+     if(signal?.aborted)throw e;
+     const err=e as MatchError;
+     const stale=err.code==='JD_VERSION_STALE'||err.code==='JD_VERSION_NOT_AVAILABLE';
+     if(stale){merged={...merged,jd_version_id:undefined,jd_sha256:undefined};collected.set(key,merged);}
+     if(stale||transientVerification(e)){
+      pendingVerification.add(key);ready.push({job:merged,attempt:item.attempt+1,nextAt:Date.now()+Math.min(30000,1000*2**Math.min(item.attempt,5))});
+      onActivity?.({stage:'reading',message:'个别岗位暂时异常，已延后重试，继续核验其他岗位。'});
+     }else if(err.status!==422||merged.jd_version_id)pendingVerification.add(key);
+    }
+    checked++;onActivity?.({stage:'reading',message:'已检查 '+checked+' 次岗位来源（含重试）。',pages_read:checked});onPartial?.([...collected.values()]);
    }
-  }
- };
- const worker=async()=>{
-  while(cursor<queue.length){
-   if(signal?.aborted)throw signal.reason;
-   const job=queue[cursor++];
-   try{
-    const verified=await retryVerification(()=>prepareV4Job(job.official_url,signal,job.title,historyId,v4PostingKey(job),job.location),job);
-    const merged={...job,...verified};collected.set(v4PostingKey(job),merged);
-    onPartial?.([...collected.values()]);
-    try{const score=await retryVerification(()=>scoreV4Job(merged,text,signal,historyId),job);collected.set(v4PostingKey(job),{...merged,...score});pendingVerification.delete(v4PostingKey(job));}
-    catch(e){if(signal?.aborted)throw e;pendingVerification.add(v4PostingKey(job));}
-   }
-   catch(e){if(signal?.aborted)throw e;
-    const err=e as MatchError;if(err.status!==422)pendingVerification.add(v4PostingKey(job));
-   }
-   checked++;onActivity?.({stage:'reading',message:'已检查 '+checked+' / '+queue.length+' 条岗位来源。',pages_read:checked});
-   onPartial?.([...collected.values()]);
-  }
- };
- await Promise.all(Array.from({length:Math.min(3,queue.length)},()=>worker()));
+  };
+  await Promise.all(Array.from({length:Math.min(3,batch.length)},()=>worker()));
+ }
  const matches=[...collected.values()].sort((a,b)=>(b.match_score??-1)-(a.match_score??-1));
  if(last.history_status==='SAVED'&&!last.research_pending&&!pendingVerification.size){
   try{const done=await fetch('/api/match-v4/finish',{method:'POST',credentials:'same-origin',cache:'no-store',signal,headers:{'Content-Type':'application/json',Authorization:'Bearer '+session()},body:JSON.stringify({history_id:historyId})});if(!done.ok)last.history_status='UNAVAILABLE';}

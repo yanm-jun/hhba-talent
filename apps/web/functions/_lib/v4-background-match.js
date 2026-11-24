@@ -4,7 +4,7 @@
 import {v4Match,v4Provider,v4Call,v4ParseJson,resumeResearchIndex} from './simple-match-v4.js';
 import {redactForModel} from './resume-match-core.js';
 import {saveV4Round,getV4History,patchV4Job,finishV4History} from './v4-match-history.js';
-import {prepareV4JobForOptimization} from './v4-jd-bridge.js';
+import {prepareV4JobForOptimization,readV4ArchivedJd} from './v4-jd-bridge.js';
 import {scoreVerifiedV4Job} from './v4-jd-score.js';
 import {v4PostingKey} from '../../src/services/v4PostingIdentity.mjs';
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -84,7 +84,8 @@ export async function resumeBackground(env,phone,id){
  return changed(r);
 }
 const retryable=code=>/^(AI_PROVIDER_RATE_LIMITED|AI_PROVIDER_UPSTREAM_ERROR|AI_PROVIDER_NETWORK_ERROR|AI_PROVIDER_TIMEOUT|AI_PROVIDER_STREAM_INTERRUPTED|AI_PROVIDER_RESPONSE_INVALID|AI_PROVIDER_UNAVAILABLE|AI_PROVIDER_INCOMPLETE|V4_PAGE_TEMPORARILY_UNAVAILABLE)$/.test(code);
-const permanentJD=code=>/^(JD_NOT_COMPLETE_ENOUGH|JD_JOB_IDENTITY_MISMATCH|V4_UNSAFE_URL|V4_JOB_DETAILS_NOT_VERIFIED|V4_PAGE_UNAVAILABLE)$/.test(code);
+const permanentJD=code=>/^(JD_NOT_COMPLETE_ENOUGH|JD_JOB_IDENTITY_MISMATCH|V4_UNSAFE_URL|V4_JOB_DETAILS_NOT_VERIFIED|V4_PAGE_UNAVAILABLE|V4_JOB_CLOSED|V4_PAGE_REDIRECT_UNVERIFIED|V4_PAGE_REDIRECT_LOOP|V4_PAGE_NOT_HTML)$/.test(code);
+const deferredJD=code=>retryable(code)||['JD_VERSION_STALE','JD_VERSION_NOT_AVAILABLE','V4_PAGE_TOO_LARGE','AI_PROVIDER_CONTEXT_EXCEEDED'].includes(code);
 const codeOf=e=>typeof e?.code==='string'?e.code:typeof e?.message==='string'&&/^[A-Z0-9_]+$/.test(e.message)?e.message:e instanceof TypeError?'AI_PROVIDER_NETWORK_ERROR':'BACKGROUND_STEP_FAILED';
 export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
  const db=dbOf(env);
@@ -98,6 +99,7 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
  const claim=await db.prepare("UPDATE hhba_v4_background_tasks SET state='RUNNING',lease=?,lease_until=?,updated_at=? WHERE id=? AND state IN ('QUEUED','RUNNING') AND lease_until<=?").bind(lease,now+20*60000,now,row.id,now).run();
  if(!changed(claim))return {state:'BUSY'};
  const id=row.id,phone=row.phone;
+ let currentPosting=null;
  const controller=new AbortController();
  const live=async()=>{const current=await owned(db,phone,id);if(current?.state!=='RUNNING'||current.lease!==lease)throw Error('BACKGROUND_CANCELLED');
   if(!await db.prepare('SELECT id FROM hhba_v4_match_tasks WHERE id=? AND phone=?').bind(id,phone).first())throw Error('BACKGROUND_HISTORY_MISSING');
@@ -144,16 +146,24 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
   }
   // Verified jobs are scored against every source part, not just the first.
   // Public history stays unscored until all parts have been considered.
-  const candidate=matches.find(j=>!['AI_VERIFIED_JD_SCORED','INSUFFICIENT_RESUME_EVIDENCE','BACKGROUND_UNVERIFIED'].includes(j.jd_score_status));
+  const pending=matches.filter(j=>!['AI_VERIFIED_JD_SCORED','INSUFFICIENT_RESUME_EVIDENCE','BACKGROUND_UNVERIFIED'].includes(j.jd_score_status));
+  const deferred=await get(env,id,'deferred')||{};
+  const candidate=pending.find(j=>!(deferred[v4PostingKey(j)]?.nextAt>Date.now()));
+  if(!candidate&&pending.length){
+   const next=Math.min(...pending.map(j=>deferred[v4PostingKey(j)]?.nextAt||Date.now()));
+   await update('VERIFY',0,row.research_round,'QUEUED','WAITING_FOR_JOB_RETRY',next);return {state:'RETRY'};
+  }
   if(!candidate){
    await live();await finishV4History(db,phone,id);
    await update('DONE',0,row.research_round,'COMPLETE');
    await purgeBackgroundSource(env,id);return {state:'COMPLETE'};
   }
   const posting=v4PostingKey(candidate),jobKey='job/'+posting;
+  currentPosting=posting;
   let job=candidate;
-  if(!job.jd_version_id){
-   try{const verified=await prepareV4JobForOptimization(env,job.official_url,{fetcher:guardedFetch,signal:controller.signal,expectedTitle:job.title,expectedLocation:job.location});await live();await patchV4Job(db,phone,id,job.official_url,verified,posting);await update('VERIFY',0,row.research_round);return {state:'QUEUED'};}
+  const archive=job.jd_version_id?await readV4ArchivedJd(env,job.jd_version_id):null;
+  if(!archive?.fresh){
+   try{const verified=await prepareV4JobForOptimization(env,job.official_url,{fetcher:guardedFetch,signal:controller.signal,expectedTitle:job.title,expectedLocation:job.location});await live();await patchV4Job(db,phone,id,job.official_url,verified,posting);if(job.jd_sha256!==verified.jd_sha256)await bucketOf(env).delete(key(id,jobKey));await update('VERIFY',0,row.research_round);return {state:'QUEUED'};}
    catch(e){const code=codeOf(e);if(!permanentJD(code))throw e;await live();await patchV4Job(db,phone,id,job.official_url,{jd_score_status:'BACKGROUND_UNVERIFIED',match_score:null,score_basis:'未取得可靠的完整 JD，未提供匹配分。'},posting);await update('VERIFY',0,row.research_round);return {state:'QUEUED'};}
   }
   // One score part per invocation; retain intermediate evidence privately.
@@ -183,12 +193,15 @@ export async function advanceBackground(env,{fetcher=fetch,now=Date.now()}={}){
    final={match_score:value,reference_score:value??0,jd_score_status:value===null?'INSUFFICIENT_RESUME_EVIDENCE':'AI_VERIFIED_JD_SCORED',score_basis:'已逐段核验全部授权简历文本与同一岗位 JD。',recommendation_reason:reason};
   }
   await live();await patchV4Job(db,phone,id,job.official_url,final,posting);
-  await bucketOf(env).delete(key(id,jobKey));await update('VERIFY',0,row.research_round);
+  await bucketOf(env).delete(key(id,jobKey));delete deferred[posting];await put(env,id,'deferred',deferred);await update('VERIFY',0,row.research_round);
   return {state:'QUEUED'};
  }catch(e){
   const code=controller.signal.aborted?'BACKGROUND_CANCELLED':codeOf(e);
   if(['BACKGROUND_HISTORY_MISSING','BACKGROUND_RESUME_REMOVED'].includes(code)){await cancelBackground(env,phone,id);return {state:'CANCELLED'};}
   if(code==='BACKGROUND_CANCELLED'){const current=await owned(db,phone,id);if(!current||current.state==='CANCELLED'||current.state==='COMPLETE')await purgeBackgroundSource(env,id).catch(()=>{});return {state:'STALE_LEASE'};}
+  if(currentPosting&&deferredJD(code)){
+   try{await live();const deferred=await get(env,id,'deferred')||{};const attempt=(deferred[currentPosting]?.attempt||0)+1;deferred[currentPosting]={attempt,nextAt:Date.now()+Math.min(3600000,30000*2**Math.min(attempt,7)),code};await put(env,id,'deferred',deferred);await update('VERIFY',0,row.research_round,'QUEUED',code);return {state:'RETRY',error:code};}catch{}
+  }
   try{await update(row.phase,row.source_part,row.research_round,retryable(code)?'QUEUED':'PAUSED',code,retryable(code)?Date.now()+60000:0);}catch{}
   return {state:retryable(code)?'RETRY':'PAUSED',error:code};
  }finally{clearInterval(timer);}

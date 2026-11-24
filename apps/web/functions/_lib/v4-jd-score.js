@@ -15,7 +15,7 @@ function checkedComparisons(raw,resume,jd){
  }
  return comparisons;
 }
-function mergeComparisons(items){
+export function mergeComparisons(items){
  const groups=new Map();
  for(const item of items){
   const key=normalize(item.requirement),group=groups.get(key)||[];

@@ -666,3 +666,9 @@ test('V4 public JD research follows safe same-organization redirects and resolve
  assert.deepEqual(calls,[url,target]);assert.equal(job.location,'北京');assert.equal(job.full_jd,'负责北京渠道');assert.equal(job.resolved_url,target);
  await assert.rejects(()=>v4ReadEmployerJob(url,{fetcher:async()=>new Response(null,{status:302,headers:{Location:'https://localhost/private'}})}),/V4_PAGE_REDIRECT_UNVERIFIED/);
 });
+
+
+test('V4 verification retries defer individual jobs instead of sleeping inside all workers',async()=>{
+ const {readFileSync}=await import('node:fs');const browser=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');const background=readFileSync(new URL('../functions/_lib/v4-background-match.js',import.meta.url),'utf8');
+ assert.match(browser,/ready\.push\(\{job:merged,attempt:item\.attempt\+1,nextAt:/);assert.doesNotMatch(browser,/const retryVerification=async/);assert.match(background,/pending\.find\(j=>!\(deferred/);assert.match(background,/job\.jd_sha256!==verified\.jd_sha256/);
+});
