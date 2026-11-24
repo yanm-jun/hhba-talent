@@ -27,6 +27,14 @@ test('explicit relay isolation never falls back to official OpenAI production se
   HHBA_AGENT_BASE_URL:'https://api.openai.com/v1',HHBA_AGENT_OPENAI_API_KEY:token,
   HHBA_AGENT_ACTOR_AUTH:''}).name,'openai');
 });
+test('Cloudflare Free minimal configuration automatically uses relay without extra bindings',()=>{
+ const provider=resolveAgentProvider({HHBA_AGENT_RELAY_API_KEY:token});
+ assert.equal(provider.name,'relay');
+ assert.equal(provider.baseUrl,'https://api-c.reqtoken.com/v1');
+ assert.equal(provider.model,'gpt-6.2-sol');
+ assert.equal(provider.reviewModel,'gpt-6.2-sol');
+ assert.equal(provider.actor,'local-image-extension');
+});
 test('relay uses Responses only and forces store false; credentials stay server side',async()=>{
  const p=resolveAgentProvider(config);
  let seen={};
