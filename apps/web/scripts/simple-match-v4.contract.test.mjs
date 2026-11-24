@@ -924,8 +924,8 @@ test('job report source presentation extracts citations and does not falsely ver
  const body='要求2年以上汽车行业驻外销售经验。官网招聘公告链接到该岗位专属申请表。 ([dflzm.com.cn]('+primary+'))';
  assert.equal(recruitmentText(body),'要求2年以上汽车行业驻外销售经验。官网招聘公告链接到该岗位专属申请表。');
  assert.equal(recruitmentText('查看[招聘公告]('+alternate+')。'),'查看招聘公告。');
- assert.equal(recruitmentText('来源：'+alternate+'，具体条件待核验。'),'来源：，具体条件待核验。');
- const job={company:'示例企业',official_url:primary,source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',requirements_basis:body,recommendation_reason:'参考 '+alternate,evidence_sources:[{url:alternate}],research_detail:{extra_sections:[{title:'补充',content:'参考 https://careers.example.cn/job/(3)'}]},jd_research:{facts:[{url:alternate,quote:'岗位资料'}]}};
+ assert.equal(recruitmentText('来源：'+alternate+'，具体条件待核验。'),'来源：见下方来源，具体条件待核验。');
+ const job={company:'示例企业',official_url:primary,source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',requirements_basis:body,recommendation_reason:'参考 '+alternate,evidence_sources:[{url:alternate},{url:'https://www.dflzm.com.cn/index.php/recruit'}],research_detail:{extra_sections:[{title:'补充',content:'参考 https://careers.example.cn/job/(3)'}]},jd_research:{facts:[{url:alternate,quote:'岗位资料'}]}};
  const links=collectRecruitmentSources(job);
  assert.equal(links.length,3);
  assert.equal(links[0].url,primary);
