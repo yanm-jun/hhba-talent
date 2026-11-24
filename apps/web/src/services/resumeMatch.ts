@@ -85,8 +85,13 @@ export type MatchResponse = {
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[]};
 const API='/api/match-next'; // Original default preserved for production and V2 compatibility.
-const MATCH_V4_PREVIEW=typeof window!=='undefined'&&window.location.hostname.endsWith('.hhba-talent.pages.dev')&&
- window.location.hostname!=='hhba-talent.pages.dev';
+// V4 is an explicit opt-in trial, rather than replacing the default user journey.
+const MATCH_V4_PREVIEW=typeof window!=='undefined'&&
+ (window.location.hostname.endsWith('.hhba-talent.pages.dev')&&
+  window.location.hostname!=='hhba-talent.pages.dev'||
+  window.location.hostname==='hhba.work'||
+  window.location.hostname==='www.hhba.work')&&
+ new URLSearchParams(window.location.search).get('v4')==='1';
 const EFFECTIVE_API=MATCH_V4_PREVIEW?'/api/match-v4':API;
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=3*1024*1024;
