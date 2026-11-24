@@ -24,9 +24,10 @@ check('Candidate account remains the personal-center entry',()=>{
 });
 check('Footer contains the complete categorized navigation',()=>{
  for(const group of ['求职服务','职业机会','劳动者权益','关于汇方','服务与帮助'])assert.ok(shell.includes("title:'"+group+"'"),group);
- for(const path of ['/candidate/match','/candidate/account/resume','/candidate/account/applications','/candidate/account/apply-assistant','/candidate/account/career','/companies/library','/commitment','/vision','/join','/data-use','/membership/rules'])
+ for(const path of ['/candidate/match','/candidate/account/resume','/candidate/account/applications','/candidate/account/apply-assistant','/candidate/account/career','/commitment','/vision','/join','/data-use','/membership/rules'])
   assert.ok(shell.includes("['")&&shell.includes(path),path);
  assert.ok(shell.includes('<SiteFooter/>'));
+ assert.doesNotMatch(shell,/企业招聘导航|\/companies\/library/);
 });
 check('Footer is not a second product navigation system',()=>{
  assert.equal((shell.match(/function SiteFooter\(/g)||[]).length,1);

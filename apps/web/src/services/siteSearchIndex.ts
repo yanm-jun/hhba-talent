@@ -32,7 +32,6 @@ const staticPages:SiteSearchRecord[]=[
  {id:'winter-season',kind:'page',title:'2027 寒假实习季',description:'HHBA 寒假实习官方项目、企业和实习申请入口',path:'/winter-internship',tags:['寒假','实习','冬季实习','冬季','2027','企业','招聘']},
  {id:'job-market',kind:'page',title:'招聘市场',description:'搜索岗位、筛选专业、城市与招聘类别',path:'/candidate/jobs',tags:['工作','职位','岗位','校招','社招','实习','招聘']},
  {id:'employers',kind:'page',title:'企业发现',description:'查找 HHBA 已收录的企业档案及招聘渠道',path:'/companies/discover',tags:['公司','企业','行业','招聘']},
- {id:'industry-halls',kind:'page',title:'17 个行业馆 · 官方招聘入口',description:'按行业馆浏览企业官网招聘渠道，不提供企业入驻与站内职位发布',path:'/companies/library',tags:['行业馆','企业官网','招聘入口','企业导航']},
  {id:'talent',kind:'page',title:'人才政策与人才服务',description:'全国城市人才政策、人才公寓、住房补贴和申请指南',path:'/talent-service',tags:['政策','人才','落户','住房','申请','指南']},
  {id:'talent-city',kind:'page',title:'全国人才政策城市目录',description:'按地区查询城市人才政策和安居资料',path:'/talent-service/cities',tags:['城市','省份','政策','补贴','安居']},
  {id:'study',kind:'page',title:'留学机会',description:'留学国家、大学、研究生课程与海外发展规划',path:'/study-abroad',tags:['留学','海外','出国','学校','签证','大学']},

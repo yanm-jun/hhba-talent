@@ -56,7 +56,7 @@ test('all public rights and legal knowledge URLs render independently, while pri
  ])assert.ok(routes.includes(route),'public route missing: '+route);
  assert.ok(footer.includes("['会员与权益服务','/rights']"));
  assert.ok(footer.includes("['劳动权益知识','/rights/knowledge']"));
- assert.ok(home.includes("kind==='rights'?'/rights/knowledge'"));
+ assert.ok(home.includes(":'/rights/knowledge';"));
  assert.ok(rights.includes('embedded?"个人工作台":"HHBA 首页"'));
  assert.ok(rights.includes("embedded?'/candidate/account/legal-aid':'/rights/knowledge'"));
  assert.ok(knowledge.includes("embedded?'/candidate/account/legal-aid':'/rights/knowledge'"));
@@ -96,8 +96,8 @@ test('homepage promotes free rights, avoids legacy membership marketing and pres
  const component=read('../src/components/HomeWorkplacePromise.tsx');
  assert.ok(home.includes('一份工作，值得认真选择。'));
  assert.ok(home.includes('让机会与人才，找到彼此。'));
- for(const entry of ['title="求职与机会"','title="劳动权益"','title="企业招聘导航"'])assert.ok(home.includes(entry));
- assert.ok(home.includes("kind==='rights'?'/rights/knowledge'"));
+ for(const entry of ['title="求职与机会"','title="劳动权益"'])assert.ok(home.includes(entry));
+ assert.ok(home.includes(":'/rights/knowledge';"));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
  assert.ok(home.includes('<HomeCompanyMarquee/>'));
  assert.ok(home.includes('<HomeWorkplacePromise/>'));

@@ -30,9 +30,9 @@ test('mobile spacing and headline remain readable without horizontal overflow',(
    '100vw includes the Windows scrollbar gutter and causes unwanted horizontal scrolling');
  assert.ok(homeStyles.includes('.hhba-public-entry-grid.hhba-home-entry-grid{grid-template-columns:1fr;gap:11px}'));
 });
-test('home preserves job search, company directory and adds labor-rights support',()=>{
+test('home preserves job search, AI matching and labor-rights support',()=>{
  for(const t of ['让机会与人才，找到彼此。','一份工作，值得认真选择。','你来到这里，是为了什么？',
-    'title="求职与机会"','title="劳动权益"','title="企业招聘导航"','<UnifiedJobMarket compact/>']){
+    'title="求职与机会"','title="劳动权益"','<UnifiedJobMarket compact/>']){
   assert.ok(home.includes(t),'home content unexpectedly removed: '+t);
  }
  assert.ok(home.includes("kind==='candidate'?(candidateTarget||'/candidate/match')"),
@@ -40,9 +40,10 @@ test('home preserves job search, company directory and adds labor-rights support
  assert.ok(home.includes('candidateTarget={matchTarget}'));
  assert.ok(home.includes('onClick={()=>navigate(matchTarget)}'));
  assert.ok(home.includes('to={target}'), 'the whole card remains clickable');
- assert.ok(home.includes("kind==='rights'?'/rights/knowledge'"),
+ assert.ok(home.includes(":'/rights/knowledge';"),
    'public rights card must open a standalone explanation');
- assert.ok(home.includes(":'/companies/library'"),'company directory entry must lead to the 17 industry halls');
+ assert.doesNotMatch(home,/企业招聘导航|\/companies\/library/);
+ assert.match(homeStyles,/\.hhba-public-entry-grid\.hhba-home-entry-grid\{width:[^}]+grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
  assert.ok(home.includes('className="home-match-promo"'),'resume matching link changed');
  assert.ok(home.includes('<HomeWorkplacePromise/>'));
 });

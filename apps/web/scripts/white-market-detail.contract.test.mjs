@@ -7,9 +7,9 @@ const reader=readFileSync(new URL('../src/services/officialJd.ts',import.meta.ur
 const home=readFileSync(new URL('../src/pages/HomePage.tsx',import.meta.url),'utf8');
 const archive=readFileSync(new URL('../src/pages/CandidateJobsPage.tsx',import.meta.url),'utf8');
 
-test('white HHBA keeps job opportunity and enterprise navigation entrances',()=>{
+test('white HHBA keeps AI matching and labor rights entrances',()=>{
  assert.ok(home.includes('title="求职与机会"'));
- assert.ok(home.includes('title="企业招聘导航"'));
+ assert.ok(home.includes('title="劳动权益"'));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
 });
 test('job cards only link internally to the white detail page',()=>{

@@ -8,11 +8,11 @@ const model = read('../src/components/homeLiveMetricsPreview.ts');
 const css = read('../src/styles/home-live-drawer.css');
 const html = read('../../../previews/home-hover-drawer-20261109/index.html');
 
-test('stage 1 removes the live drawer and preserves the three public homepage entries',()=>{
+test('stage 1 removes the live drawer and preserves the two core homepage entries',()=>{
  assert.doesNotMatch(home, /HomeLiveDrawer|hhba-rail-trigger|我要招人/);
  for (const s of ['让机会与人才，找到彼此。','你来到这里，是为了什么？',
-  'title="求职与机会"','title="劳动权益"','title="企业招聘导航"','<UnifiedJobMarket compact/>',
-  '<HomeCompanyMarquee/>',"'/companies/library'","'/rights/knowledge'"]) assert.ok(home.includes(s),s);
+  'title="求职与机会"','title="劳动权益"','<UnifiedJobMarket compact/>',
+  '<HomeCompanyMarquee/>',"'/rights/knowledge'"]) assert.ok(home.includes(s),s);
  assert.doesNotMatch(home, /HomePeopleBanner/);
 });
 test('the right-side panel opens on hover and closes after leaving',()=>{

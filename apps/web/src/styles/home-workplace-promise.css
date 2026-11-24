@@ -4,7 +4,7 @@
 .hhba-home-brand-slogan{font-size:12px!important;line-height:1.5!important;letter-spacing:.08em;color:#60758F!important;margin:0 auto 7px!important}
 .hhba-public-hero .hhba-home-description{max-width:760px;font-size:14px;line-height:1.85;margin:12px auto 7px;color:#68788a}
 .hhba-public-hero .hhba-home-question{font-size:13px;line-height:1.5;margin:8px auto 0;color:#87919d}
-.hhba-public-entry-grid.hhba-home-entry-grid{width:calc(100% - 24px);max-width:1096px;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hhba-public-entry-grid.hhba-home-entry-grid{width:calc(100% - 24px);max-width:1096px;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .hhba-home-entry-grid .hhba-entry-card{min-height:160px}
 .hhba-home-entry-grid .hhba-entry-rights .entry-icon{background:#E7F0FC;color:#125EBC}
 .hhba-home-entry-grid .hhba-entry-rights .entry-footer{color:#125EBC}

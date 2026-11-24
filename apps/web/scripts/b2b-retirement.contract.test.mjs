@@ -46,9 +46,9 @@ test('official employer sources are still C-end resources, not recruitment clien
  const home=read('pages/HomePage.tsx');
  const market=read('components/UnifiedJobMarket.tsx');
  const shell=read('components/Shell.tsx');
- for(const label of ['求职与机会','劳动权益','企业招聘导航'])assert.ok(home.includes(label));
+ for(const label of ['求职与机会','劳动权益'])assert.ok(home.includes(label));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
- assert.ok(shell.includes("['企业招聘导航','/companies/library']"));
+ assert.doesNotMatch(shell,/企业招聘导航|\/companies\/library/);
  assert.ok(shell.includes('to="/candidate/jobs"'));
  assert.ok(market.includes('to="/companies"'));
  assert.doesNotMatch(market,/to="\/candidate\/employer-jobs"/);
@@ -56,7 +56,7 @@ test('official employer sources are still C-end resources, not recruitment clien
  assert.doesNotMatch(search,/path:'\/employer\//);
  assert.doesNotMatch(search,/title:'企业服务与治理'/);
  assert.match(search,/path:'\/companies\/discover'/);
- assert.match(search,/path:'\/companies\/library'/);
+ assert.doesNotMatch(search,/path:'\/companies\/library'/);
  const work=read('pages/WorkspacePage.tsx');
  assert.doesNotMatch(work,/to="\/employer"/);
  assert.match(work,/to="\/candidate\/account\/rights"/);
