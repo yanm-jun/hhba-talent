@@ -8,6 +8,7 @@ import {redactForModel} from '../../_lib/resume-match-core.js';
 import {v4Provider,v4Match} from '../../_lib/simple-match-v4.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {recognizeV4Resume} from '../../_lib/v4-resume-ocr.js';
+import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
 const reply=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
@@ -33,6 +34,11 @@ const sanitize=(raw)=>{
  const text=redactForModel(raw.trim(),Infinity);
  return text.replace(/\s/g,'').length>=30?text:null;
 };
+const checkpointEnv=env=>{
+ const secret=env?.HHBA_MATCH_V4_CHECKPOINT_SECRET||env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET;
+ return typeof secret==='string'&&secret.length>=32?{HHBA_RESUME_AGENT_CHECKPOINT_SECRET:'hhba-v4-match:'+secret}:null;
+};
+const checkpointArgs=(env,input,draft)=>({env:checkpointEnv(env),account:input.phone,blocks:[input.text],job:{role:input.role_hint,excludeUrls:input.excludeUrls,resume_id:input.resume_id},draft});
 function events(env,request,input){
  const encoder=new TextEncoder();let closed=false,phase='preparing';
  const started=Date.now();
@@ -57,7 +63,13 @@ function events(env,request,input){
     try{
      const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
       signal:request.signal,onProgress:progress,onActivity:activity,env,excludeUrls:input.excludeUrls,
+      stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,
       onPartial:matches=>sendJobs('partial',matches)});
+     if(result.status==='CONTINUE'){
+      const token=await issueCheckpoint(checkpointArgs(env,input,result.checkpoint));
+      send('complete',{status:'CONTINUE',continuation:{state:result.checkpoint,token}});
+      return;
+     }
      console.info('HHBA_V4_MATCH',JSON.stringify({result:'COMPLETE',
       found:result.matches.length,official:result.matched_official_jobs,
       duration_ms:Date.now()-started}));
@@ -92,7 +104,7 @@ export async function onRequest({request,env}){
  const suffix=path.slice('/api/match-v4'.length).replace(/\/$/,'')||'/';
  if(suffix==='/status'&&request.method==='GET')
   return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:enabled(env,request),
-   scope:'CN_MAINLAND_ONLY',formats:['pdf','docx']});
+   scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],resumable:!!checkpointEnv(env)});
  if(!['/resume','/ocr'].includes(suffix)||request.method!=='POST')return fail('NOT_FOUND',404);
  if(!enabled(env,request))return fail('MATCH_NOT_ENABLED',503);
  const origin=new URL(request.url).origin;
@@ -100,7 +112,7 @@ export async function onRequest({request,env}){
   request.headers.get('Sec-Fetch-Site')==='cross-site')return fail('ORIGIN_REQUIRED',403);
  if(suffix!=='/ocr'&&!(request.headers.get('Content-Type')||'').startsWith('application/json'))
   return fail('INVALID_REQUEST',415);
- if(suffix!=='/ocr'&&Number(request.headers.get('Content-Length')||0)>1200000)return fail('INVALID_RESUME_TEXT',413);
+ if(suffix!=='/ocr'&&Number(request.headers.get('Content-Length')||0)>8000000)return fail('INVALID_RESUME_TEXT',413);
  const db=env.HHBA_PNVS_AUTH_DB;
  let session;
  try{session=await sessionOfBearer(db,request,Date.now())}catch{return fail('SESSION_INVALID',401)}
@@ -115,7 +127,7 @@ export async function onRequest({request,env}){
  let body;
  try{
   const text=await request.text();
-  if(text.length>1200000)return fail('INVALID_RESUME_TEXT',413);
+  if(text.length>8000000)return fail('INVALID_RESUME_TEXT',413);
   body=JSON.parse(text);
  }catch{return fail('INVALID_REQUEST',400)}
  // The third-party relay is not OpenAI official infrastructure.
@@ -127,5 +139,13 @@ export async function onRequest({request,env}){
   body.options.role_hint.trim():'';
  const excludeUrls=Array.isArray(body?.options?.exclude_urls)?body.options.exclude_urls.filter(x=>typeof x==='string'):[];
  // Do not store raw resume, query, job results, or model output in server logs.
- return events(env,request,{text:resume,role_hint:role,excludeUrls,phone:session.phone,resume_id:body.resume_id||null});
+ const input={text:resume,role_hint:role,excludeUrls,phone:session.phone,resume_id:body.resume_id||null};
+ if(body.continuation!==undefined){
+  if(!checkpointEnv(env)||!body.continuation?.state||typeof body.continuation.token!=='string')return fail('AI_CHECKPOINT_INVALID',409);
+  try{
+   await verifyCheckpoint({...checkpointArgs(env,input,body.continuation.state),token:body.continuation.token});
+  }catch{return fail('AI_CHECKPOINT_INVALID',409)}
+  input.checkpoint=body.continuation.state;
+ }
+ return events(env,request,input);
 }
