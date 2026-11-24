@@ -66,13 +66,14 @@ function valid(body,env){
   (doc.feedback!==undefined&&typeof doc.feedback!=='string')||
   (doc.wanted!==undefined&&(!Array.isArray(doc.wanted)||!doc.wanted.length||
    doc.wanted.length>body.blocks.length))))return false;
+ if(doc?.review_feedback!==undefined&&(!doc.review_feedback||Array.isArray(doc.review_feedback)||typeof doc.review_feedback!=='object'||Object.values(doc.review_feedback).some(value=>typeof value!=='string')))return false;
  const ids=new Set();
  const blocksValid=body.blocks.every(b=>{
   if(!b||typeof b!=='object'||typeof b.id!=='string'||!/^[a-z0-9_-]{1,64}$/i.test(b.id)||
    typeof b.text!=='string'||!b.text.trim()||b.text.length>1600||ids.has(b.id))return false;
   ids.add(b.id);return ['experience','skills','summary','education','projects'].includes(b.section);
  });
- return blocksValid&&(!doc?.wanted||doc.wanted.every(id=>ids.has(id)));
+ return blocksValid&&(!doc?.wanted||doc.wanted.every(id=>ids.has(id)))&&(!doc?.review_feedback||Object.keys(doc.review_feedback).every(id=>ids.has(id)));
 }
 function redact(text){
  return text.replace(/[a-z\d._%+-]+@[a-z\d.-]+\.[a-z]{2,}/gi,'[邮箱已脱敏]')
@@ -158,7 +159,8 @@ export async function onRequestPost({request,env}){
   const signal=env?.HHBA_MATCH_V4_READY==='1'?request.signal:AbortSignal.any([request.signal,AbortSignal.timeout(input.full_document?180000:90000)]);
   const whole=input.full_document?await optimizeResumeDocument({
    env,blocks,context:redact(input.full_document.text),job,signal,wanted:input.full_document.wanted,
-   feedback:env?.HHBA_MATCH_V4_READY==='1'&&input.full_document.feedback?redact(input.full_document.feedback):undefined
+   feedback:env?.HHBA_MATCH_V4_READY==='1'&&input.full_document.feedback?redact(input.full_document.feedback):undefined,
+   reviewFeedback:env?.HHBA_MATCH_V4_READY==='1'?Object.fromEntries(Object.entries(input.full_document.review_feedback||{}).map(([id,value])=>[id,redact(value)])):{}
   }):null;
   const result=whole||await generateSuggestions({env,blocks,job,signal});
   const checked=job.verified&&!whole?await auditTargetedResumeSuggestions({
@@ -183,7 +185,7 @@ export async function onRequestPost({request,env}){
    pause_reason:whole.pauseReason||null
   }));
   return send({ok:true,kind:'HHBA_RESUME_OPTIMIZATION_V1',provider:result.provider,suggestions,
-   ...(whole?{pending_block_ids:whole.pendingIds,...(whole.pauseReason?{pause_reason:whole.pauseReason}:{})}:{}),
+   ...(whole?{pending_block_ids:whole.pendingIds,...(Object.keys(whole.reviewFeedback||{}).length?{review_feedback:whole.reviewFeedback}:{}),...(whole.pauseReason?{pause_reason:whole.pauseReason}:{})}:{}),
    jd_version_id:trustedJob.jd_version_id||null,jd_source_status:trustedJob.source_status,
    disclaimer:'建议仅用于优化表达，用户须逐条核实；不会修改原始简历或自动提高岗位匹配分。'});
  }catch(error){

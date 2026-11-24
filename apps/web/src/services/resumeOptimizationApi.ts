@@ -58,7 +58,7 @@ export async function getResumeOptimizationStatus(signal?:AbortSignal):Promise<R
  }catch{return null;}
 }
 type DocumentOptimization={
- text:string;wanted?:string[];feedback?:string;onPending?:(ids:string[])=>void;onQueued?:()=>void;
+ text:string;wanted?:string[];feedback?:string;reviewFeedback?:Record<string,string>;onPending?:(ids:string[])=>void;onQueued?:()=>void;
  onCheckpoint?:(checkpoint:OptimizationCheckpoint)=>void;onPaused?:(error:unknown)=>void;
 };
 function waitForOptimizationSlot(signal?:AbortSignal){
@@ -76,30 +76,30 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
  if(!realAuthReady)throw new ResumeOptimizationError('RESUME_OPTIMIZATION_NOT_ENABLED',503);
  const token=getRealAuthToken();
  if(!token)throw new ResumeOptimizationError('SESSION_INVALID',401);
- const submit=async(batch:ResumeBlock[],wanted?:string[])=>{
+ const submit=async(batch:ResumeBlock[],wanted?:string[],reviewFeedback?:Record<string,string>)=>{
   let response:Response;
   try{
    response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
     headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
     body:JSON.stringify({consent_ai:true,blocks:batch,job,
-     ...(document?{full_document:{text:document.text,wanted,feedback:document.feedback}}:{})})});
+     ...(document?{full_document:{text:document.text,wanted,feedback:document.feedback,review_feedback:reviewFeedback}}:{})})});
   }catch(error){
    if(signal?.aborted)throw signal.reason;
    throw new ResumeOptimizationError('NETWORK_ERROR',503);
   }
   const data=await response.json().catch(()=>({})) as {
-   ok?:boolean;error?:string;suggestions?:ResumeSuggestion[];pending_block_ids?:string[];pause_reason?:string;
+   ok?:boolean;error?:string;suggestions?:ResumeSuggestion[];pending_block_ids?:string[];review_feedback?:Record<string,string>;pause_reason?:string;
   };
   if(document&&data.error==='RESUME_OPTIMIZATION_QUEUED')return {queued:true};
   if(!response.ok||data.ok!==true||!Array.isArray(data.suggestions))
    throw new ResumeOptimizationError(data.error||'INVALID_RESPONSE',response.status);
-  return {suggestions:data.suggestions,pending:data.pending_block_ids,
+  return {suggestions:data.suggestions,pending:data.pending_block_ids,reviewFeedback:data.review_feedback,
    pauseError:data.pause_reason?new ResumeOptimizationError(data.pause_reason,response.status):undefined,
    invalidError:new ResumeOptimizationError('INVALID_RESPONSE',502)};
  };
  if(document)return continueDocumentOptimization({
-  blockIds:blocks.map(block=>block.id),wanted:document.wanted,signal,
-  request:wanted=>submit(blocks,wanted),wait:waitForOptimizationSlot,
+  blockIds:blocks.map(block=>block.id),wanted:document.wanted,reviewFeedback:document.reviewFeedback,signal,
+  request:(wanted,directions)=>submit(blocks,wanted,directions),wait:waitForOptimizationSlot,
   onCheckpoint:checkpoint=>{document.onPending?.(checkpoint.pending);document.onCheckpoint?.(checkpoint);},
   onQueued:document.onQueued,onPaused:document.onPaused
  });

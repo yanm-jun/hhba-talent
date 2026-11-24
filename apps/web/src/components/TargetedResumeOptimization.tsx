@@ -73,7 +73,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const [version,setVersion]=useState<ResumeVersion>(initial);
  const [suggestions,setSuggestions]=useState<ResumeSuggestion[]>([]);
  const [wordPromptBlocks,setWordPromptBlocks]=useState<ResumeBlock[]>([]);
- const previousOptimization=useRef<{key:string;suggestions:ResumeSuggestion[];pending:string[]}|null>(null);
+ const previousOptimization=useRef<{key:string;suggestions:ResumeSuggestion[];pending:string[];reviewFeedback?:Record<string,string>}|null>(null);
  const [ignored,setIgnored]=useState<string[]>([]);
  const [resolvedWordVisualIds,setResolvedWordVisualIds]=useState<string[]>([]);
  const [editedWordVisualIds,setEditedWordVisualIds]=useState<string[]>([]);
@@ -502,20 +502,21 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    const prior=full&&previousOptimization.current?.key===key&&previousOptimization.current.pending.length?
     previousOptimization.current:null;
    let pending:string[]=prior?.pending||[];
+   let reviewFeedback=prior?.reviewFeedback;
    let pauseMessage='';
    const mergeSuggestions=(incoming:ResumeSuggestion[])=>[...new Map([...(prior?.suggestions||[]),...incoming].map(item=>[item.blockId,item])).values()];
    const incoming=await requestResumeOptimization(currentBlocks,targetedJob,controller.signal,
-     full?{text:context,wanted:prior?.pending,feedback,
+     full?{text:context,wanted:prior?.pending,feedback,reviewFeedback,
       onCheckpoint:checkpoint=>{
-       pending=checkpoint.pending;
-       previousOptimization.current={key,suggestions:mergeSuggestions(checkpoint.suggestions),pending};
+       pending=checkpoint.pending;reviewFeedback=checkpoint.reviewFeedback;
+       previousOptimization.current={key,suggestions:mergeSuggestions(checkpoint.suggestions),pending,reviewFeedback};
        setNotice('已检查 '+(currentBlocks.length-pending.length)+' / '+currentBlocks.length+' 处可编辑内容，继续处理剩余段落…');
       },onPaused:error=>{pauseMessage=error instanceof Error?error.message:'本轮研究暂时中断。';},
       onQueued:()=>setNotice('简历优化正在等待可用服务，已确认的进度会保留。')}:undefined);
    if(controller.signal.aborted)return;
    if(sourceResume&&startingRevision!==lastWordRevisionKey.current)throw Error('Word 版本已变化，本轮建议未写入新版本，请重新优化。');
    const combined=mergeSuggestions(incoming);
-   if(full)previousOptimization.current={key,suggestions:combined,pending};
+   if(full)previousOptimization.current={key,suggestions:combined,pending,reviewFeedback};
    // Provider suggestion IDs are local to a batch. Distinct Word blocks may
    // legitimately receive the same provider ID, so deduplicate by block only.
    const usedBlocks=new Set<string>();

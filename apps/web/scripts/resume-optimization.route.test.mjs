@@ -395,3 +395,56 @@ test('same-JD reassessment feedback reaches full document planning and actual wr
  });
  assert.equal(planned,true);assert.equal(written,true);assert.deepEqual(r.pendingIds,[]);
 });
+
+
+test('V4 reviewer checks both proposed edits and keep decisions, returning specific revision directions',async()=>{
+ const {auditTargetedResumeSuggestions}=await import('../functions/_lib/resume-rewrite-provider.js');
+ const originalFetch=globalThis.fetch;
+ globalThis.fetch=async(_url,init)=>{
+  const request=JSON.parse(init.body),input=JSON.parse(request.input);
+  assert.match(request.instructions,/needs_revision/);
+  assert.equal(input.document_context.text,'完整虚构简历');
+  assert.equal(input.blocks[1].decision,'keep');
+  return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify({
+   checks:[{blockId:'a',safe:true,needs_revision:true,concern:'突出真实的销售数据整理工作'},
+    {blockId:'b',safe:true,needs_revision:true,concern:'此处原文可明确培训职责'}]
+  })}]}]});
+ };
+ try{
+  const result=await auditTargetedResumeSuggestions({
+   env:{HHBA_MATCH_V4_READY:'1',HHBA_AGENT_RELAY_API_KEY:'synthetic-placeholder-secret'},
+   blocks:[{id:'a',text:'整理销售数据。'},{id:'b',text:'协助培训。'}],
+   job:{requirements:'销售数据分析与人员培训'},suggestions:[{blockId:'a',action:'replace',proposed:'负责数据整理。'}],
+   signal:new AbortController().signal,withCoverage:true,reviewContext:{text:'完整虚构简历'},reviewedIds:['a','b']
+  });
+  assert.deepEqual(result.suggestions,[]);
+  assert.deepEqual(result.pendingIds,['a','b']);
+  assert.deepEqual(result.reviewFeedback,{a:'突出真实的销售数据整理工作',b:'此处原文可明确培训职责'});
+ }finally{globalThis.fetch=originalFetch;}
+});
+
+test('AI continuation follows distinct review feedback without fixed retry count and publishes only completed edits',async()=>{
+ const {continueDocumentOptimization}=await import('../src/services/resumeOptimizationContinuation.mjs');
+ const checkpoints=[];let calls=0;
+ const result=await continueDocumentOptimization({blockIds:['a'],request:async(ids,feedback)=>{
+  calls++;
+  assert.deepEqual(ids,['a']);
+  if(calls>1)assert.equal(feedback.a,'审查意见'+(calls-1));
+  if(calls<=5)return {pending:['a'],suggestions:[{blockId:'a',proposed:'未通过的草稿'}],reviewFeedback:{a:'审查意见'+calls}};
+  return {pending:[],suggestions:[{blockId:'a',proposed:'已完成的真实改写'}]};
+ },wait:async()=>{},onCheckpoint:c=>checkpoints.push(c)});
+ assert.equal(calls,6);
+ assert.deepEqual(result,[{blockId:'a',proposed:'已完成的真实改写'}]);
+ assert.equal(checkpoints[3].reviewFeedback.a,'审查意见3');
+ assert.ok(checkpoints.slice(0,-1).every(c=>c.suggestions.length===0));
+});
+
+test('same repeated review state pauses without claiming completion and preserves directions for resume',async()=>{
+ const {continueDocumentOptimization}=await import('../src/services/resumeOptimizationContinuation.mjs');
+ const checkpoints=[];let calls=0,paused=false;
+ const result=await continueDocumentOptimization({blockIds:['a'],request:async()=>{
+  calls++;return {pending:['a'],suggestions:[],reviewFeedback:{a:'仍需核实事实'}};
+ },wait:async()=>{},onCheckpoint:c=>checkpoints.push(c),onPaused:()=>{paused=true}});
+ assert.equal(calls,2);assert.equal(paused,true);assert.deepEqual(result,[]);
+ assert.deepEqual(checkpoints.at(-1),{pending:['a'],suggestions:[],reviewFeedback:{a:'仍需核实事实'}});
+});
