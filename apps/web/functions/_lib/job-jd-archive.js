@@ -10,6 +10,7 @@ import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 import {safePublicAtsJobLocator,ATS_JD_PROOF} from './public-ats-jd.js';
 import {extractOfficialJdSections,MEITUAN_DETAIL_SOURCE,TENCENT_DETAIL_SOURCE} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
+import {readV4ArchivedJd} from './v4-jd-bridge.js';
 import {recordJdPostingCheck,readJdPostingState,isUsablePosting} from './jd-posting-lifecycle.js';
 
 export const JD_ARCHIVE_KIND='HHBA_VERIFIED_JOB_JD_V1';
@@ -85,9 +86,9 @@ export async function readJobJdById(env,id){
  let row=await db.prepare('SELECT * FROM '+JD_TABLE_DIRECT+' WHERE id=?').bind(id).first();
  if(!row){
   try{row=await db.prepare('SELECT * FROM '+JD_TABLE_ATS+' WHERE id=?').bind(id).first()}
-  catch{return null}
+  catch{}
  }
- return readArchivedRow(env,row);
+ return row?readArchivedRow(env,row):readV4ArchivedJd(env,id);
 }
 async function readArchivedRow(env,row){
  if(!row||!isJDVersionId(row.id)||!row.object_key?.startsWith('official-jds/v1/'))return null;
@@ -182,7 +183,7 @@ export function publicJdPayload(saved,{includeText=true}={}){
   disclaimer:saved.fresh?
    (saved.proof_method===ATS_JD_PROOF?
     '企业专属公开 ATS 招聘接口核验的原文；招聘主体法定名称和是否仍在招以企业公告为准。':
-    '直接读取受支持企业官网并保存的岗位 JD；不保证此刻仍可投递。'):
+    saved.proof_method==='V4_STRUCTURED_JOBPOSTING'?'直接读取招聘网站公开结构化 JD 并核对招聘主体域名；实际企业身份及投递状态仍需确认。':'直接读取受支持企业官网并保存的岗位 JD；不保证此刻仍可投递。'):
    '这是历史岗位 JD 版本，可能已经过期；不能当作最新招聘条件。'
  };
 }
