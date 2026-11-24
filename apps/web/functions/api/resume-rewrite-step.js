@@ -23,7 +23,7 @@ function validContinuation(body){
   body.blocks.length>512||!body.job||typeof body.job!=='object'||
   typeof body.job.title!=='string'||!body.job.title.trim()||
   body.job.title.length>180||
-  typeof body.job.requirements!=='string'||body.job.requirements.length>16000)
+  typeof body.job.requirements!=='string'||body.job.requirements.length>250000)
   return false;
  const ids=new Set();
  if(!body.blocks.every(b=>b&&typeof b.id==='string'&&
