@@ -438,7 +438,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    if(controller.signal.aborted)return;
    const targetedJob={
     ...trustedJob,title:trustedJob.title.slice(0,120),
-    requirements:trustedJob.requirements.slice(0,16000)
+    requirements:trustedJob.requirements
    };
    const context=sourceResume?(wordDocumentText.current||sourceText||''):(sourceText||'');
    const full=requireVerifiedJd;
@@ -626,8 +626,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    .map(item=>({
     original:item.original,proposed:version.blocks.find(b=>b.id===item.blockId)?.text||''
    })).filter(({original,proposed})=>original!==proposed&&
-    original.length>1&&original.length<=300&&
-    proposed.length>1&&proposed.length<=300&&
+    original.length>1&&original.length<=1600&&
+    proposed.length>1&&proposed.length<=1600&&
     original===original.trim()&&proposed===proposed.trim()&&
     !/[\r\n\t]/.test(original+proposed));
   const occurrences=new Map<string,number>();
@@ -635,8 +635,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    occurrences.set(change.original,(occurrences.get(change.original)||0)+1);
   const approvedWhole=wholeApproved&&wholeDraft?
    wholeDraft.blocks.filter(b=>b.changed&&b.status==='needs_user_confirmation'&&
-    b.original.length>1&&b.original.length<=300&&
-    b.proposed.length>1&&b.proposed.length<=300&&
+    b.original.length>1&&b.original.length<=1600&&
+    b.proposed.length>1&&b.proposed.length<=1600&&
     !/[\r\n\t]/.test(b.original+b.proposed)).map(b=>({
      original:b.original,proposed:b.proposed
     })):[];
@@ -655,14 +655,14 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    state:version.acceptedSuggestionIds.includes(s.id)?'accepted' as const:'pending' as const
   }))
   .filter(s=>s.original.trim()&&s.proposed.trim()&&
-   s.original!==s.proposed&&s.proposed.length<=300&&
+   s.original!==s.proposed&&s.proposed.length<=1600&&
    !(wordRevisionSnapshot?.history||[])
     .slice(0,wordRevisionSnapshot?.revision||0)
     .some(saved=>saved.original===s.original&&saved.text===s.proposed))
   .concat((wholeDraft?.blocks||[])
    .slice(0,revealedWholeCount)
    .filter(b=>b.changed&&!resolvedWordVisualIds.includes('whole-'+b.blockId)&&
-     b.original.length<=300&&b.proposed.length<=300&&
+     b.original.length<=1600&&b.proposed.length<=1600&&
     b.proposed!==b.original)
    .map(b=>({
     id:'whole-'+b.blockId,original:b.original,proposed:b.proposed,
@@ -718,7 +718,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   const native=data.native_word_draft;
   setNativeWordTextDraft(native&&typeof native.original==='string'&&
    typeof native.text==='string'&&native.original.length>0&&
-   native.original.length<=300&&native.text.length<=300&&
+   native.original.length<=1600&&native.text.length<=1600&&
    Number.isInteger(native.revision)&&native.revision>=0&&native.revision<=8&&
    Number.isInteger(native.page)&&native.page>=1&&native.page<=20?
    {original:native.original,text:native.text,revision:native.revision,page:native.page}:null);
@@ -942,7 +942,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       // Never infer a writable Word location from a long ATS/search snippet.
       // Ignore contact-like text and only send visible, unique Word spans.
       const safe=[...new Set(segments)].filter(value=>
-       typeof value==='string'&&value.length>=6&&value.length<=300&&
+       typeof value==='string'&&value.length>=6&&value.length<=1600&&
        value===value.trim()&&!/[\r\n\t@]/.test(value)&&
        !/^\+?[\d\s()-]{7,}$/.test(value));
       wordDocumentText.current=documentText||'';
