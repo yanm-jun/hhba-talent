@@ -915,3 +915,24 @@ test('JD report UI separates employer originals, public excerpts and inferred re
  for(const label of ['完整 JD 原文','公开资料研究整理','AI 职业方向分析（非企业已确认要求）','待进一步确认','初步参考分（非正式 JD 匹配分）'])assert.ok(ui.includes(label),label);
  assert.match(ui,/JdResearchContent job=\{jdJob\}/);
 });
+
+
+test('job report source presentation extracts citations and does not falsely verify additional links',async()=>{
+ const {recruitmentText,collectRecruitmentSources}=await import('../src/services/recruitmentSourcePresentation.ts');
+ const primary='https://www.dflzm.com.cn/index.php/recruit?utm_source=openai';
+ const alternate='https://careers.example.cn/job/2';
+ const body='要求2年以上汽车行业驻外销售经验。官网招聘公告链接到该岗位专属申请表。 ([dflzm.com.cn]('+primary+'))';
+ assert.equal(recruitmentText(body),'要求2年以上汽车行业驻外销售经验。官网招聘公告链接到该岗位专属申请表。');
+ assert.equal(recruitmentText('查看[招聘公告]('+alternate+')。'),'查看招聘公告。');
+ assert.equal(recruitmentText('来源：'+alternate+'，具体条件待核验。'),'来源：，具体条件待核验。');
+ const job={company:'示例企业',official_url:primary,source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',requirements_basis:body,recommendation_reason:'参考 '+alternate,evidence_sources:[{url:alternate}],research_detail:{extra_sections:[{title:'补充',content:'参考 https://careers.example.cn/job/(3)'}]},jd_research:{facts:[{url:alternate,quote:'岗位资料'}]}};
+ const links=collectRecruitmentSources(job);
+ assert.equal(links.length,3);
+ assert.equal(links[0].url,primary);
+ assert.equal(links[0].verified,true);
+ assert.equal(links[1].verified,false);
+ assert.equal(links[2].url,'https://careers.example.cn/job/(3)');
+ assert.equal(job.requirements_basis,body);
+ assert.equal(collectRecruitmentSources({...job,jd_source_status:undefined})[0].verified,false);
+ assert.equal(collectRecruitmentSources({requirements_basis:'https://user:pass@careers.example.cn/job/2 http://careers.example.cn/jobs'}).length,0);
+});
