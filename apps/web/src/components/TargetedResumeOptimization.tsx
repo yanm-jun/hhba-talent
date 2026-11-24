@@ -479,12 +479,19 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     throw Error('整份简历优化任务暂未就绪，请稍后重试。');
    const key=JSON.stringify([targetedJob.jd_version_id,targetedJob.jd_sha256,currentBlocks,context]);
    const prior=full&&previousOptimization.current?.key===key?previousOptimization.current:null;
-   let pending:string[]=[];
+   let pending:string[]=prior?.pending||[];
+   let pauseMessage='';
+   const mergeSuggestions=(incoming:ResumeSuggestion[])=>[...new Map([...(prior?.suggestions||[]),...incoming].map(item=>[item.blockId,item])).values()];
    const incoming=prior&&!prior.pending.length?prior.suggestions:
     await requestResumeOptimization(currentBlocks,targetedJob,controller.signal,
-     full?{text:context,wanted:prior?.pending,onPending:ids=>{pending=ids;},
-      onQueued:()=>setNotice('简历优化正在排队，轮到后会继续。')}:undefined);
-   const combined=[...new Map([...(prior?.suggestions||[]),...incoming].map(item=>[item.blockId,item])).values()];
+     full?{text:context,wanted:prior?.pending,
+      onCheckpoint:checkpoint=>{
+       pending=checkpoint.pending;
+       previousOptimization.current={key,suggestions:mergeSuggestions(checkpoint.suggestions),pending};
+       setNotice('已检查 '+(currentBlocks.length-pending.length)+' / '+currentBlocks.length+' 处可编辑内容，继续处理剩余段落…');
+      },onPaused:error=>{pauseMessage=error instanceof Error?error.message:'本轮研究暂时中断。';},
+      onQueued:()=>setNotice('简历优化正在等待可用服务，已确认的进度会保留。')}:undefined);
+   const combined=mergeSuggestions(incoming);
    if(full)previousOptimization.current={key,suggestions:combined,pending};
    const unique=new Set<string>(),usedBlocks=new Set<string>();
    const accepted=combined.filter(s=>{
@@ -497,7 +504,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    const sourceNote=trustedJob.jd_version_id?
     '本次已依据企业官网核验的完整岗位 JD 生成建议。':
     '当前尚未接入可核验的完整 JD，本次仅依据已保存的岗位信息生成建议。';
-   setNotice(pending.length?('已保留本次建议。还有 '+pending.length+' 处待处理，再点优化可接着处理。'):
+   setNotice(pending.length?('已保留本次研究成果。还有 '+pending.length+' 处待处理，再点优化可接着处理。'+(pauseMessage?' '+pauseMessage:'')):
     (accepted.length?'建议已生成。请逐条核实真实性，再选择填充。':'本次 AI 未发现可以可靠润色的内容。')+sourceNote);
   }catch(error){
    if(controller.signal.aborted)return;
