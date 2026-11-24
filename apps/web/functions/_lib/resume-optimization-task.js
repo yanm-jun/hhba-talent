@@ -29,7 +29,7 @@ export async function reserveResumeOptimizationTask(db,accountHash,source){
  }};
 }
 
-const retryable=new Set(['AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR',
+const retryable=new Set(['AI_PROVIDER_TIMEOUT','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR',
  'AI_PROVIDER_RESPONSE_TRUNCATED','AI_PROVIDER_RESPONSE_JSON_INVALID',
  'AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_SUGGESTION_SCHEMA_INVALID']);
 const terminal=new Set(['AI_PROVIDER_NOT_CONFIGURED','AI_PROVIDER_KEY_REJECTED',
@@ -42,12 +42,13 @@ export async function optimizeResumeDocument({env,blocks,context,job,signal,want
  const generate=deps.generate||generateSuggestions;
  const audit=deps.audit||auditTargetedResumeSuggestions;
  const plan=deps.plan||(input=>completeJson(selectProvider(env,'resume_rewrite'),editorialInstructions,input,
-  AbortSignal.any([signal,AbortSignal.timeout(55000)]),7000));
+  env?.HHBA_MATCH_V4_READY==='1'?signal:AbortSignal.any([signal,AbortSignal.timeout(55000)]),7000));
  let focus=[];
  try{
   const proposed=await plan({job,context,blocks});
   if(Array.isArray(proposed?.focus))focus=proposed.focus.filter(value=>typeof value==='string')
-   .map(value=>value.trim().slice(0,360)).filter(Boolean).slice(0,20);
+   .map(value=>env?.HHBA_MATCH_V4_READY==='1'?value.trim():value.trim().slice(0,360)).filter(Boolean);
+  if(env?.HHBA_MATCH_V4_READY!=='1')focus=focus.slice(0,20);
  }catch(error){
   if(terminal.has(error?.message)&&error.message!=='AI_PROVIDER_NOT_CONFIGURED')throw error;
  }
