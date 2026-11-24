@@ -49,7 +49,6 @@ export function SiteFooter(){
   ]},
   {title:'职业机会',links:[
    ['招聘市场','/candidate/jobs'],
-   ['企业招聘导航','/companies/library'],
    ['海外发展','/study-abroad'],
    ['人才政策','/talent-service'],
   ]},
