@@ -1,13 +1,19 @@
 // V4: verify evidence on any public HTTPS employer page; no company or job-path whitelist.
 // Read-only public HTML only. Never treat a search snippet as an independently verified job.
-import {htmlToText as legacyHtmlToText,extractOfficialJdSections as legacyJdSections} from './official-job-evidence.js';
-import {findMainlandCity} from './mainland-job-location.js';
+import {htmlToText as legacyHtmlToText} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
 const LOCAL=/(?:^|\.)(?:localhost|local|internal|test|invalid|example|onion|nip\.io|sslip\.io|localtest\.me)$/i;
 const CLOSED=/(?:职位已关闭|岗位已下线|停止招聘|不再接受申请|职位已过期|招聘已结束|position (?:closed|expired)|job (?:closed|expired))/i;
 const GENERIC=/^(?:招聘|岗位详情|职位详情|职业机会|人才招聘|职位|招聘信息|job details|jobs|careers|recruitment|job opening)$/i;
 const htmlToText=html=>legacyHtmlToText(html,{unbounded:true});
-const extractOfficialJdSections=plain=>legacyJdSections(plain,{unbounded:true});
+// Only use actual source text. Section labels are optional display metadata,
+// not a requirement for a structured employer JobPosting to be accepted.
+export function v4SourceSections(plain){
+ if(typeof plain!=='string'||!plain.trim())return null;
+ const lines=plain.split('\n').map(x=>x.trim()).filter(Boolean);
+ const full_jd=lines.join('\n');
+ return {full_jd,sections:lines.map((text,i)=>({id:'JD-'+String(i+1).padStart(3,'0'),kind:'other',text})),content_status:'VERIFIED_SECTIONS'};
+}
 const trim=s=>typeof s==='string'?s.trim():'';
 export function v4PublicJobUrl(value){
  if(typeof value!=='string')return null;
@@ -73,17 +79,21 @@ function relatedDomains(jobUrl,companyUrl){
 }
 function postedLocation(j){
  const places=Array.isArray(j.jobLocation)?j.jobLocation:[j.jobLocation];
+ const values=[];
  for(const place of places){
   const a=place?.address||place;
-  for(const v of [a?.addressLocality,a?.addressRegion,a?.streetAddress]){
-   if(typeof v==='string'){const city=findMainlandCity(v);if(city)return city}
-  }
+  if(typeof a==='string'){if(a.trim())values.push(a.trim());continue;}
+  if(!a)continue;
+  const country=typeof a.addressCountry==='string'?a.addressCountry:a.addressCountry?.name;
+  if(country&&!/^(CN|CHN|中国|中国大陆|中华人民共和国|China|Mainland China)$/i.test(country.trim()))continue;
+  const parts=[a.addressRegion,a.addressLocality,a.streetAddress].filter(x=>typeof x==='string'&&x.trim());
+  if(parts.length)values.push([...new Set(parts)].join(' '));
  }
- return null;
+ return [...new Set(values)].join(' / ')||null;
 }
 function htmlLocation(plain){
- const m=plain.match(/(?:工作地点|工作城市|办公地点|工作地区|工作区域|Work Location|Location)\s*[：:\s]\s*([^\n]{2,80})/i);
- return m?findMainlandCity(m[1]):null;
+ const m=plain.match(/(?:工作地点|工作城市|办公地点|工作地区|工作区域|Work Location|Location)\s*[：:\s]\s*([^\n]+)/i);
+ return m?m[1].trim():null;
 }
 async function limitedRead(r){
  if(r.status===429||r.status>=500)throw Object.assign(Error('V4_PAGE_TEMPORARILY_UNAVAILABLE'),{code:'V4_PAGE_TEMPORARILY_UNAVAILABLE'});
@@ -117,13 +127,13 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
   const org=companyOf(j),title=trim(j.title);
   const city=postedLocation(j)||htmlLocation(plain),desc=htmlToText(trim(j.description),{unbounded:true});
   if(expected&&title.normalize('NFKC').replace(/\s+/g,'').toLowerCase()!==expected)continue;
-  if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city||desc.length<90)continue;
+  if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city||!desc.trim())continue;
   if(j.validThrough&&Number.isFinite(Date.parse(j.validThrough))&&Date.parse(j.validThrough)<now.getTime())continue;
   // A multinational's official careers host may differ from its corporate website.
   // Do not discard real JD content merely because the domains differ.
-  const sections=extractOfficialJdSections(desc,{unbounded:true});
-  const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
-  if(!sections||requirements.length<18)continue;
+  const sections=v4SourceSections(desc);
+  if(!sections)continue;
+  const requirements=sections.full_jd;
   return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
    canonical_url:canonical,company:org.name,title,
    location:city,requirements,full_jd:sections.full_jd,
@@ -131,11 +141,11 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
    source_confirmed:!!org.url&&relatedDomains(canonical,org.url),application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
  }
  // Chinese employer career sites often serve normal HTML without JSON-LD.
- const sections=extractOfficialJdSections(plain,{unbounded:true}),title=pageTitle(html);
+ const sections=v4SourceSections(plain),title=pageTitle(html);
  const company=meta(html,'property','og:site_name')||meta(html,'name','application-name');
  const city=htmlLocation(plain);
- const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
- if(!title||!company||GENERIC.test(company)||!city||!sections||requirements.length<18)
+ const requirements=sections?.full_jd||'';
+ if(!title||!company||GENERIC.test(company)||!city||!sections)
   throw Error('V4_JOB_DETAILS_NOT_VERIFIED');
  return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
   canonical_url:canonical,company,title,location:city,
