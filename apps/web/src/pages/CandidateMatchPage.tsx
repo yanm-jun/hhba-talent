@@ -222,7 +222,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
     const detail=await getMatchHistory(historyPending.current);
     if(detail.engine!=='V4'||detail.resume_id!==matchResumeId)throw Error('历史任务与当前简历不匹配，请重新选择。');
     priorJobs=historyJobsForContinuation(detail);
-    runOptions={...options,role_hint:detail.role_hint,history_id:detail.id,exclude_urls:priorJobs.map(job=>job.official_url)};
+    runOptions={...options,role_hint:detail.role_hint,history_id:detail.id,recovery_jobs:priorJobs,exclude_urls:priorJobs.map(job=>job.official_url)};
     setPartialJobs(priorJobs);
    }
    const combine=(jobs:MatchedJob[])=>[...new Map([...priorJobs,...jobs].map(job=>[job.official_url,job])).values()];
@@ -253,6 +253,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   try{
    const next=await submitExtractedResumeText(search.text,{...search.options,
     history_id:MATCH_V4_PREVIEW?previous.history_id||undefined:undefined,
+     recovery_jobs:MATCH_V4_PREVIEW?previous.matches:undefined,
      exclude_urls:MATCH_V4_PREVIEW?previous.matches.map(job=>job.official_url):previous.matches.map(job=>job.official_url).slice(-50)},true,abort.signal,search.resumeId,
     stage=>{if(!abort.signal.aborted)progress(stage);},
     jobs=>{if(!abort.signal.aborted){collected=combine(jobs);setPartialJobs(collected);}},
