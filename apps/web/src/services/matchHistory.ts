@@ -1,5 +1,6 @@
 // Private AI recommendation history: account-bound D1, never a job application.
 import {getRealAuthToken} from './realAuth';
+import type {MatchedJob} from './resumeMatch';
 
 export type MatchHistorySummary={
  id:string;resume_id:string|null;resume_label:string;role_hint:string;
@@ -14,6 +15,7 @@ export type HistoryMatchedJob={
  jd_version_id?:string;jd_sha256?:string;jd_checked_at?:string;
  evidence_status?:'VERIFIED_FULL_JD'|'PARTIAL_SOURCE'|'SEARCH_SNIPPET_ONLY'|'INSUFFICIENT_EVIDENCE';
  evidence_excerpt?:string;
+ evidence_score_status?:'AI_PARTIAL_SOURCE_SCORED'|'AI_DIRECTION_REFERENCE_SCORED';
  evidence_sources?:{url:string;kind:string}[];
  jd_source_status?:'VERIFIED_JD';jd_score_status?:'V2_JD_EVIDENCE_SCORED'|'AI_VERIFIED_JD_SCORED'|'INSUFFICIENT_RESUME_EVIDENCE';
  jd_proof_method?:'PUBLIC_EMPLOYER_ATS_V1'|'DIRECT_EMPLOYER_HTML_V1'|'V4_STRUCTURED_JOBPOSTING'|null;
@@ -64,4 +66,20 @@ export async function linkMatchHistoryResume(historyId:string,resumeId:string):P
  if(!/^[0-9a-f-]{36}$/i.test(historyId)||!/^[0-9a-f-]{36}$/i.test(resumeId))
   throw Error('简历或历史记录标识无效。');
  await request('/'+historyId+'/link','POST',{resume_id:resumeId});
+}
+
+export function historyJobsForContinuation(detail:MatchHistoryDetail):MatchedJob[]{
+ return detail.matches.map((job,i)=>({
+  id:job.id||'history-'+detail.id+'-'+i,company:job.company,title:job.title,title_zh:job.title,
+  location:job.location,official_url:job.official_url,platform:job.recruitment_source_kind||'招聘来源',
+  source:'MATCH_HISTORY',remote:false,reference_score:job.match_score??0,match_score:job.match_score,
+  matched:[],not_evidenced:[],needs_verification:[],requirements_basis:job.evidence_excerpt||'',
+  score_basis:job.score_basis,recommendation_reason:job.recommendation_reason,
+  recruitment_source_note:job.recruitment_source_note,
+  recruitment_source_kind:job.recruitment_source_kind==='EMPLOYER_ATS'?'EMPLOYER_ATS':job.recruitment_source_kind==='EMPLOYER_DOMAIN_CANDIDATE'?'EMPLOYER_DOMAIN_CANDIDATE':job.recruitment_source_kind==='THIRD_PARTY_BOARD'?'THIRD_PARTY_BOARD':'UNVERIFIED',
+  availability_status:job.availability_status,evidence_status:job.evidence_status,
+  evidence_score_status:job.evidence_score_status,evidence_excerpt:job.evidence_excerpt,
+  jd_version_id:job.jd_version_id,jd_sha256:job.jd_sha256,jd_checked_at:job.jd_checked_at,
+  jd_source_status:job.jd_source_status,jd_score_status:job.jd_score_status,jd_proof_method:job.jd_proof_method||undefined
+ }));
 }
