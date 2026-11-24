@@ -92,7 +92,7 @@ export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs}={
   if(signal?.aborted)throw abortError();
   if(!Number.isInteger(document.numPages)||document.numPages<1||
     document.numPages>PDF_MAX_PAGES)
-   throw new PDFResumeError("PDF_PAGES","PDF 简历最多支持 15 页，请精简后重试。");
+   throw new PDFResumeError("PDF_PAGES","PDF 简历最多支持 150 页，超过时请分段上传。");
   const pages=[];let chars=0,hasTextlessPages=false;
   for(let n=1;n<=document.numPages;n++){
    if(expired)throw new PDFResumeError("PDF_TIMEOUT","PDF 处理超时，请导出更简洁的文字版 PDF。");
