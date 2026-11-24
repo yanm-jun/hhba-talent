@@ -3,7 +3,7 @@ import {v4PostingKey} from './v4PostingIdentity.mjs';
 export {v4PostingKey} from './v4PostingIdentity.mjs';
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import {extractDocxText,inspectDocxContents} from './docxProfile.mjs';
-import {extractPdfText,PDFResumeError} from './pdfProfile.mjs';
+import {extractPdfText,PDFResumeError,readPdfVisualPages} from './pdfProfile.mjs';
 
 export type MatchProfile = {
   education:string|null;education_evidence:string|null;
@@ -257,6 +257,40 @@ export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Pro
  const token=session();
  const format=resumeFileFormat(file.name);
  if(!format||file.size<30||(!MATCH_V4_PREVIEW&&file.size>LIMIT))throw new MatchError(400,ocrErrors.OCR_INVALID_FILE);
+ if(MATCH_V4_PREVIEW&&format==='pdf'){
+  const pages=new Map<number,string>();let partial=false;
+  const recognize=async(blob:Blob)=>{
+   const r=await fetch(EFFECTIVE_API+'/ocr',{method:'POST',credentials:'same-origin',cache:'no-store',signal,
+    headers:{'Content-Type':'application/octet-stream',Authorization:'Bearer '+token,'X-HHBA-Resume-Format':'image','X-HHBA-Image-Mime':'image/jpeg','X-HHBA-OCR-Consent':'v4-resume-ocr-v1'},body:blob});
+   const value=await r.json().catch(()=>null);
+   if(!r.ok||value?.ok!==true||typeof value.text!=='string')throw new MatchError(r.status,ocrErrors[value?.error||'']||errorMap[value?.error||'']||'页面识别暂未完成。',value?.error);
+   return {text:value.text as string,partial:value.partial===true};
+  };
+  const merge=(primary:string,local:string)=>{
+   const normalized=(v:string)=>v.replace(/\s+/g,'');
+   const extra=local.split('\n').filter(line=>line.trim()&&!normalized(primary).includes(normalized(line)));
+   return [primary,...extra].filter(Boolean).join('\n');
+  };
+  await readPdfVisualPages(await file.arrayBuffer(),{signal,onPage:async page=>{
+   if(!page.blob){pages.set(page.number,page.localText);partial=true;return;}
+   let original='',failed=false;
+   try{
+    const result=await recognize(page.blob);original=result.text;failed=result.partial||(!original.trim()&&Boolean(page.localText.trim()));
+   }catch(e){if(signal?.aborted)throw e;failed=true;}
+   if(failed&&page.tiles){
+    try{
+     const pieces=await page.tiles();const recovered:string[]=[];let complete=pieces.length>0;
+     for(const piece of pieces){try{const result=await recognize(piece);recovered.push(result.text);complete=complete&&!result.partial;}catch(e){if(signal?.aborted)throw e;complete=false;}}
+     const joined=recovered.filter(Boolean).join('\n');
+     if(complete&&joined.trim()){original=merge(joined,original);failed=false;}else if(joined.trim())original=merge(original,joined);
+    }catch(e){if(signal?.aborted)throw e;}
+   }
+   pages.set(page.number,merge(original,page.localText));partial=partial||failed;
+  }});
+  const text=redactResumeTextLocally([...pages.entries()].sort((a,b)=>a[0]-b[0]).map(x=>x[1]).filter(Boolean).join('\n'));
+  if(!text)throw new MatchError(422,ocrErrors.OCR_NO_TEXT);
+  return {text,partial};
+ }
  if(MATCH_V4_PREVIEW&&format==='docx'){
   const doc=await inspectDocxContents(await file.arrayBuffer(),{signal,includeImages:true});
   const sections=[doc.text];let partial=doc.partial;

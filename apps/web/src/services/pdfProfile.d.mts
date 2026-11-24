@@ -9,3 +9,5 @@ export declare function extractPdfText(buffer:ArrayBuffer,options?:{
  unbounded?:boolean;
  loadPdfJs?:()=>Promise<{getDocument:(input:Record<string,unknown>)=>{promise:Promise<{numPages:number;getPage:(n:number)=>Promise<{getTextContent:(options?:unknown)=>Promise<{items:unknown[]}>;cleanup?:()=>void}>}>;destroy:()=>Promise<void>};GlobalWorkerOptions?:{workerSrc:string}}>;
 }):Promise<{text:string;pages:number;characters:number;hasTextlessPages:boolean}>;
+
+export declare function readPdfVisualPages(buffer:ArrayBuffer,options:{signal?:AbortSignal;onPage:(page:{number:number;total:number;localText:string;blob:Blob|null;tiles?:()=>Promise<Blob[]>;error?:boolean})=>Promise<void>}):Promise<void>;

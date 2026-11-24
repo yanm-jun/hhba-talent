@@ -121,3 +121,64 @@ export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs,un
   if(task)await task.destroy().catch(()=>{});
  }
 }
+
+
+// The caller must obtain explicit visual-processing consent before using this
+// path. Render and release one page at a time, never rasterize the entire PDF
+// in memory. Pixel budget protects browser memory, not document page count.
+export async function readPdfVisualPages(buffer,{signal,onPage,loadPdfJs=firstPartyPdfJs,createCanvas=()=>document.createElement('canvas')}={}){
+ assertPdfBytes(buffer,{unbounded:true});
+ if(typeof onPage!=='function')throw Error('PDF_PAGE_HANDLER_REQUIRED');
+ if(signal?.aborted)throw abortError();
+ let task,renderTask;
+ const abort=()=>{try{renderTask?.cancel()}catch{}if(task)void task.destroy().catch(()=>{});};
+ signal?.addEventListener('abort',abort,{once:true});
+ const canvasBlob=canvas=>new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('PDF_PAGE_RENDER_FAILED')),'image/jpeg',0.92));
+ try{
+  const pdf=await loadPdfJs();
+  task=pdf.getDocument({data:new Uint8Array(buffer.slice(0)),enableScripting:false,isEvalSupported:false,enableXfa:false,disableAutoFetch:true,disableStream:true,stopAtErrors:true,useSystemFonts:false});
+  const doc=await task.promise;
+  if(!Number.isInteger(doc.numPages)||doc.numPages<1)throw Error('PDF_INVALID');
+  for(let number=1;number<=doc.numPages;number++){
+   if(signal?.aborted)throw abortError();
+   const page=await doc.getPage(number);
+   let localText='',canvas;
+   try{
+    const content=await page.getTextContent({includeMarkedContent:false});
+    localText=pdfTextItemsToLines(content.items,{unbounded:true}).join('\n');
+    const base=page.getViewport({scale:1});
+    let scale=Math.min(2.5,Math.sqrt(6000000/Math.max(1,base.width*base.height)));
+    canvas=createCanvas();
+    let blob;
+    for(;;){
+     if(signal?.aborted)throw abortError();
+     const viewport=page.getViewport({scale});
+     canvas.width=Math.max(1,Math.ceil(viewport.width));canvas.height=Math.max(1,Math.ceil(viewport.height));
+     renderTask=page.render({canvas,canvasContext:canvas.getContext('2d',{alpha:false}),viewport,background:'#ffffff'});
+     await renderTask.promise;renderTask=null;
+     blob=await canvasBlob(canvas);
+     if(blob.size<=3*1024*1024)break;
+     if(canvas.width<=1&&canvas.height<=1)throw Error('PDF_PAGE_IMAGE_TOO_LARGE');
+     scale*=0.75;
+    }
+    // OCR may return partial text. The callback can request smaller visual
+    // tiles of this same page without asking the user to upload again.
+    const tiles=async()=>{
+     const result=[];
+     for(const [start,end] of [[0,Math.floor(canvas.height/2)],[Math.floor(canvas.height/2),canvas.height]]){
+      if(end<=start)continue;
+      const tile=createCanvas();tile.width=canvas.width;tile.height=end-start;
+      try{tile.getContext('2d',{alpha:false}).drawImage(canvas,0,start,canvas.width,end-start,0,0,tile.width,tile.height);result.push(await canvasBlob(tile));}
+      finally{tile.width=tile.height=0;}
+     }
+     return result;
+    };
+    await onPage({number,total:doc.numPages,localText,blob,tiles});
+   }catch(e){
+    if(signal?.aborted)throw abortError();
+    // Preserve extracted text and report page failure; don't skip it silently.
+    await onPage({number,total:doc.numPages,localText,blob:null,error:true});
+   }finally{if(canvas)canvas.width=canvas.height=0;page.cleanup?.();}
+  }
+ }finally{signal?.removeEventListener('abort',abort);if(task)await task.destroy().catch(()=>{});}
+}

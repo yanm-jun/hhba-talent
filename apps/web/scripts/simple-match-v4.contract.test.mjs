@@ -564,3 +564,14 @@ test('V4 persisted research progress is account-bound and contains no source res
  assert.equal(await readV4ResearchCheckpoint(db,'other',id),null);
  assert.equal(await readV4ResearchCheckpoint(db,'owner','invalid'),null);
 });
+
+
+test('V4 PDF visual reader processes every page in sequence and exposes recovery tiles',async()=>{
+ const {readPdfVisualPages}=await import('../src/services/pdfProfile.mjs');
+ const bytes=new TextEncoder().encode('%PDF-1.7\n'+('synthetic data '.repeat(5))+'\n%%EOF');
+ const visited=[],cleaned=[];
+ const createCanvas=()=>({width:1,height:1,getContext:()=>({drawImage(){}}),toBlob(callback){callback(new Blob(['synthetic'],{type:'image/jpeg'}));}});
+ const loadPdfJs=async()=>({getDocument:()=>({promise:Promise.resolve({numPages:18,getPage:async n=>({getTextContent:async()=>({items:[{str:'page '+n}]}),getViewport:({scale})=>({width:100*scale,height:150*scale}),render:()=>({promise:Promise.resolve(),cancel(){}}),cleanup(){cleaned.push(n)}})}),destroy:async()=>{}})});
+ await readPdfVisualPages(bytes.buffer,{loadPdfJs,createCanvas,onPage:async p=>{visited.push(p.number);assert.equal(p.localText,'page '+p.number);assert.equal((await p.tiles()).length,2);}});
+ assert.deepEqual(visited,Array.from({length:18},(_,i)=>i+1));assert.deepEqual(cleaned,visited);
+});
