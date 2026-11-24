@@ -45,18 +45,26 @@ const catalog=await request('/models',null,12000);
 summary.catalog=catalog.status==='HTTP_200'&&Array.isArray(catalog.data?.data)?
  catalog.data.data.some(x=>x?.id===model)?'MODEL_LISTED':'MODEL_NOT_LISTED':
  catalog.status;
-const text=await request('/responses',{
- instructions:'Return a short JSON object with exactly one property, ok, set to true.',
- input:'Anonymous API connectivity diagnostic. Return {"ok":true}.',
- text:{format:{type:'json_object'}},max_output_tokens:800
-},35000);
-const combined=(text.data?.output||[]).filter(x=>x?.type==='message')
- .flatMap(x=>(x.content||[]).filter(c=>c?.type==='output_text')
- .map(c=>c.text||'')).join('');
-let parsed;
-try{parsed=JSON.parse(combined)}catch{}
-summary.responses=text.status==='HTTP_200'&&text.data?.status==='completed'&&
- parsed?.ok===true?'JSON_OK':text.status==='HTTP_200'?'RESPONSE_UNEXPECTED':text.status;
+// Try format-enforced JSON, then model-generated plain JSON if the relay
+// cannot handle text.format. Never print model text or private data.
+const sample={instructions:'Return a short JSON object with exactly one property, ok, set to true.',
+ input:'Anonymous API connectivity diagnostic. Return {"ok":true}.',max_output_tokens:800};
+const checkJson=x=>{
+ const body=(x.data?.output||[]).filter(y=>y?.type==='message')
+  .flatMap(y=>(y.content||[]).filter(z=>z?.type==='output_text').map(z=>z.text||''))
+  .join('').trim();
+ try{return JSON.parse(body.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'')).ok===true}
+ catch{return false}
+};
+let text=await request('/responses',{...sample,text:{format:{type:'json_object'}}},35000);
+summary.json_format=text.status==='HTTP_200'&&checkJson(text)?'SUPPORTED':text.status;
+if(!checkJson(text)&&['HTTP_400','HTTP_404','HTTP_422','HTTP_500','HTTP_502','HTTP_503'].includes(text.status)){
+ text=await request('/responses',{...sample,instructions:sample.instructions+
+  ' Output strictly a JSON object. No Markdown.'},35000);
+ summary.json_fallback='ATTEMPTED';
+}
+summary.responses=text.status==='HTTP_200'&&text.data?.status==='completed'&&checkJson(text)?
+ 'JSON_OK':text.status==='HTTP_200'?'RESPONSE_UNEXPECTED':text.status;
 const search=await request('/responses',{
  instructions:'Use web_search to find an official public company careers site. Do not invent URLs. Keep output brief.',
  input:'Locate a public company recruitment page in mainland China. Synthetic smoke test only.',
