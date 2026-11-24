@@ -7,6 +7,7 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {v4Provider,v4Match,v4Call,v4OutputText} from '../../_lib/simple-match-v4.js';
 import {prepareV4JobForOptimization} from '../../_lib/v4-jd-bridge.js';
+import {scoreVerifiedV4Job} from '../../_lib/v4-jd-score.js';
 import {validateResumeBytes,RESUME_LIMIT_BYTES} from '../../_lib/private-resume-validation.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -84,7 +85,7 @@ export async function onRequest({request,env}){
  if(suffix==='/status'&&request.method==='GET')
   return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:enabled(env,request),
    scope:'CN_MAINLAND_ONLY',formats:['pdf','docx']});
- if(!['/resume','/jd','/ocr'].includes(suffix)||request.method!=='POST')return fail('NOT_FOUND',404);
+ if(!['/resume','/jd','/ocr','/score'].includes(suffix)||request.method!=='POST')return fail('NOT_FOUND',404);
  if(!enabled(env,request))return fail('MATCH_NOT_ENABLED',503);
  const origin=new URL(request.url).origin;
  if(request.headers.get('Origin')!==origin||
@@ -118,6 +119,13 @@ export async function onRequest({request,env}){
   const text=await request.text();
   body=JSON.parse(text);
  }catch{return fail('INVALID_REQUEST',400)}
+ if(suffix==='/score'){
+  if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
+  const resume=sanitize(body.text);if(!resume)return fail('INVALID_RESUME_TEXT',400);
+  if(!body.job?.jd_version_id||!body.job?.jd_sha256||!body.job?.official_url)return fail('JD_VERIFIED_VERSION_REQUIRED',422);
+  try{return reply({ok:true,score:await scoreVerifiedV4Job(env,body.job,resume,{signal:request.signal})});}
+  catch(e){return fail(e?.code||'V4_SCORE_UNAVAILABLE',502);}
+ }
  if(suffix==='/jd'){
   if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
   try{return reply({ok:true,job:await prepareV4JobForOptimization(env,body.official_url,{signal:request.signal,expectedTitle:typeof body.title==='string'?body.title:undefined})});}
