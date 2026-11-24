@@ -5,8 +5,9 @@ import type {ResumeBlock,ResumeSuggestion} from './targetedResumeOptimization';
 
 export type ResumeOptimizationStatus={
  kind:'HHBA_RESUME_OPTIMIZATION_V1';enabled:boolean;configured:boolean;
- per_account_daily_limit:number;global_daily_limit:number;
- per_account_daily_attempt_limit?:number;global_daily_attempt_limit?:number;
+ per_account_daily_limit:number|null;global_daily_limit:number|null;
+ per_account_daily_attempt_limit?:number|null;global_daily_attempt_limit?:number|null;
+ unlimited_product_quota?:boolean;
  full_document_enabled?:boolean;
 };
 const OPTIMIZATION_ERRORS:Record<string,string>={
@@ -109,7 +110,7 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
    if(wanted&&suggestions.size){document?.onPending?.(wanted);break;}
    throw new ResumeOptimizationError(data.error||'INVALID_RESPONSE',response.status);
   }
-  for(const item of data.suggestions)suggestions.set(item.blockId,item);
+  for(const item of data.suggestions)suggestions.set(MATCH_V4_PREVIEW?JSON.stringify([item.blockId,item.action,item.proposed,item.jobRequirement]):item.blockId,item);
   const pending=Array.isArray(data.pending_block_ids)?
    [...new Set(data.pending_block_ids.filter(id=>ids.has(id)&&(!wanted||wanted.includes(id))))]:[];
   if(remaining){
