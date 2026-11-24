@@ -13,7 +13,7 @@ const read32=(d,p)=>d.getUint32(p,true);
 const write16=(d,p,v)=>d.setUint16(p,v,true);
 const write32=(d,p,v)=>d.setUint32(p,v,true);
 const MAX_DOCX=3*1024*1024,MAX_XML=2*1024*1024,MAX_ENTRIES=1200;
-const textOnly=(s)=>typeof s==='string'&&s.length>1&&s.length<=300&&
+const textOnly=(s,unbounded=false)=>typeof s==='string'&&s.length>1&&(unbounded||s.length<=300)&&
  !/[\r\n\t\u0000-\u001f]/.test(s)&&s===s.trim();
 // The same lossless ZIP validation runs inside the browser and Workers Free.
 // A 256-entry lookup avoids an 8-round bitwise loop per source byte, which
@@ -134,14 +134,14 @@ function countWidth(s){
  }
  return units;
 }
-function editXml(xml,edits,{allowExpansion=false}={}){
+function editXml(xml,edits,{allowExpansion=false,unbounded=false}={}){
  requireValue(xml.includes('<w:document')&&xml.includes('<w:body')&&
   !/<!DOCTYPE|<!ENTITY|<\?xml-stylesheet/i.test(xml));
  const matches=[...xml.matchAll(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g)];
  requireValue(matches.length>0);
  const changed=new Map(),used=new Set();
  for(const edit of edits){
-  requireValue(edit&&textOnly(edit.original)&&textOnly(edit.text)&&
+  requireValue(edit&&textOnly(edit.original,unbounded)&&textOnly(edit.text,unbounded)&&
    edit.text!==edit.original,'WORD_EDIT_UNSAFE');
   // Only the opt-in DOCX-only mode may permit expansions, with an explicit
   // UNVERIFIED pagination label. Renderer-verified mode retains the older
@@ -205,7 +205,7 @@ function repack(pkg,name,replacement){
  return result;
 }
 export async function editOriginalDocxStrict(raw,edits,options={}){
- requireValue(Array.isArray(edits)&&edits.length>0&&edits.length<=20,'WORD_EDIT_UNSAFE');
+ requireValue(Array.isArray(edits)&&edits.length>0&&(options.unbounded||edits.length<=20),'WORD_EDIT_UNSAFE');
  const pkg=readPackage(raw),entry=pkg.entries.find(e=>e.name==='word/document.xml');
  const originalXml=dec.decode(await xmlBytes(pkg,entry));
  const rewritten=enc.encode(editXml(originalXml,edits,options));
@@ -239,11 +239,11 @@ export async function editOriginalDocxStrict(raw,edits,options={}){
 // have unchanged geometry outside the modified text. DO NOT substitute an
 // optimistic model score, a mocked front-end flag or ZIP validation for proof.
 export async function prepareVerifiedOriginalDocxExport({
- original,edits,verifyLayout
+ original,edits,verifyLayout,unbounded=false
 }){
  requireValue(typeof verifyLayout==='function','WORD_RENDERER_REQUIRED');
  requireValue(Array.isArray(edits)&&edits.length===1,'WORD_LAYOUT_NOT_VERIFIED');
- const docx=await editOriginalDocxStrict(original,edits);
+ const docx=await editOriginalDocxStrict(original,edits,{unbounded});
  let report;
  try{
   report=await verifyLayout({
@@ -262,11 +262,11 @@ export async function prepareVerifiedOriginalDocxExport({
  return {bytes:docx,verified:true,pageCount:report.page_count};
 }
 
-export async function inspectOriginalDocxStrict(raw){
+export async function inspectOriginalDocxStrict(raw,{unbounded=false}={}){
  const pkg=readPackage(raw),entry=pkg.entries.find(e=>e.name==='word/document.xml');
  const originalXml=dec.decode(await xmlBytes(pkg,entry));
  const paragraphs=[...originalXml.matchAll(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g)]
-  .map(m=>decodeXML(m[1])).filter(s=>textOnly(s));
+  .map(m=>decodeXML(m[1])).filter(s=>textOnly(s,unbounded));
  // Count occurrences across the ENTIRE document before marking a run editable.
  // Cutting off at 100 could hide later text and miss a duplicate beyond the
  // cutoff, breaking the promise that an anchor targets one unique Word run.
