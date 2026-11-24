@@ -59,6 +59,30 @@ test('json response parser is independent of client flags',async()=>{
   resolveAgentProvider(config),{instructions:'json',input:'hi'});
  assert.equal(parsed.hello,'world');
 });
+test('relay JSON format 502 falls back to plain Responses and validates actual JSON',async()=>{
+ const requests=[];
+ const parsed=await agentV3Json(async(_url,options)=>{
+  const body=JSON.parse(options.body);
+  requests.push(body);
+  if(body.text?.format?.type==='json_object')return new Response(null,{status:502});
+  return response({ok:true,from:'plain_responses'});
+ },resolveAgentProvider(config),{instructions:'json please',input:'anonymous diagnostic'});
+ assert.equal(parsed.from,'plain_responses');
+ assert.equal(requests.length,2);
+ assert.equal(requests[0].text.format.type,'json_object');
+ assert.equal(requests[1].text,undefined);
+ assert.equal(requests[0].store,false);
+ assert.equal(requests[1].store,false);
+});
+test('official OpenAI is never silently retried without JSON mode',async()=>{
+ let n=0;
+ await assert.rejects(()=>agentV3Json(async()=>{n++;return new Response(null,{status:502})},
+  resolveAgentProvider({...config,HHBA_AGENT_PROVIDER:'openai',
+   HHBA_AGENT_BASE_URL:'https://api.openai.com/v1',
+   HHBA_AGENT_OPENAI_API_KEY:token,HHBA_AGENT_ACTOR_AUTH:''}),
+  {instructions:'json',input:'hello'}),/AI_PROVIDER_UPSTREAM_ERROR/);
+ assert.equal(n,1);
+});
 test('capability check distinguishes fake/unsupported web search from simple JSON text',async()=>{
  const fetcher=async(url,options)=>{
   if(url.endsWith('/models'))return Response.json({data:[{id:'gpt-6.2-sol'}]});
