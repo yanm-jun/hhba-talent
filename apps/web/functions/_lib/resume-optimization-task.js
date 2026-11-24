@@ -86,6 +86,7 @@ export async function optimizeResumeDocument({env,blocks,context,job,signal,want
  if(terminalError&&!results.some(Boolean))throw terminalError;
  return {
   provider,
+  ...(terminalError?{pauseReason:terminalError.message}:{}),
   suggestions:results.flatMap(suggestions=>suggestions||[]),
   pendingIds:batches.flatMap((batch,index)=>results[index]?[]:batch.map(block=>block.id))
  };
