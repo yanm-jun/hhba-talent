@@ -6,6 +6,7 @@
  */
 import {v4PublicJobUrl,v4ReadEmployerJob} from './v4-open-job-evidence.js';
 import {directOfficialJobEvidence} from './official-job-evidence.js';
+import {normalizeEmployerIndexRequest} from './v4-employer-index-tool.js';
 
 const BASE='https://api-c.reqtoken.com/v1';
 const MODEL='gpt-6.2-sol';
@@ -290,6 +291,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  {signal,excludeUrls=[],researchContext=null,oneRound=false,skipEnrich=false,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{}}={}){
  const rows=new Map(),toolUrls=new Set(),excluded=new Set(excludeUrls.map(v4PublicJobUrl).filter(Boolean));
  let profile=v4GroundProfile(researchContext?.profile||{summary:'',roles:[]},resume);
+ let employerIndexRequest=null;
  let researchComplete=false,round=0,researchError=null,dataForContext=typeof researchContext?.summary==='string'?researchContext.summary:'';
  const previousRound=Number.isSafeInteger(researchContext?.round)&&researchContext.round>=0?researchContext.round:0;
  onProgress('parsing');
@@ -312,7 +314,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      +'不因为网页格式不同而丢弃实际找到的职位。'
      +'优先企业官网和官方投递链接；其他来源可作为明确待核验的线索，但不可伪称官网。'
      +'不要虚构职位、公司、地点、薪资、网址和能力。'
-     +'每轮返回一个有效 JSON 对象：'
+     +'你可按需调用 HHBA 企业目录：在每轮 JSON 中返回 employer_index_request:{industries:[行业ID],offset:0}，系统下一轮提供目录页及 next_offset；所有17个行业都可选，可按 next_offset 持续翻页，没有目录总量限制。目录只用于发现企业，不是实际职位。行业ID：automotive,finance,telecom,semiconductor,internet-ai,construction,aerospace,logistics,culture-media,agri-food,biomed,retail,chem-materials,manufacturing,energy,education-research,consumer-hardware。无需目录时返回 null。'+ '每轮返回一个有效 JSON 对象：'
      +'research_summary（总结已探索的方向、发现、尚未解决的问题，供下一轮使用），research_complete（布尔值：仍然值得联网继续查找时必须为 false；'
      +'研究充分或继续查找没有实际价值时才为 true），'
      +'profile:{summary,roles,skills:[{name,evidence}],facts:[{kind,quote}],'
@@ -388,7 +390,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   onActivity('searching','第 '+round+' 轮研究已完成，累计取得 '+rows.size+
    ' 条可追溯来源；AI 正在判断是否需要继续搜索。');
   // Only an explicit model decision completes research; a missing flag does not.
-  researchComplete=response.status==='completed'&&(data.research_complete===true||data.continue_search===false);
+  employerIndexRequest=normalizeEmployerIndexRequest(data.employer_index_request);
+  researchComplete=response.status==='completed'&&!employerIndexRequest&&(data.research_complete===true||data.continue_search===false);
   if(oneRound)break;
  }
  if(!skipEnrich){onProgress('reading');onActivity('reading','开始读取 '+rows.size+' 条公开岗位来源，核对可获取的 JD。');}
@@ -406,5 +409,5 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   native_search:{mode:'V4_SIMPLE_AI',searches:round,candidate_links:rows.size,
    page_reads:read,visible_jobs:matches.length,research_error:researchError||undefined,
    jd_verification:{eligible:rows.size,verified,failed:rows.size-read}},
-  research_pending:!researchComplete,research_context:{round:previousRound+round,profile,summary:typeof dataForContext==='string'?dataForContext:''},can_continue:true};
+  research_pending:!researchComplete,research_context:{round:previousRound+round,profile,summary:typeof dataForContext==='string'?dataForContext:'',employer_index_request:employerIndexRequest},can_continue:true};
 }
