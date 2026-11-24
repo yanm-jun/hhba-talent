@@ -30,9 +30,9 @@ const AUDIT=`你是独立事实审查员。用候选人该段真实原文审查 
 export function modelDecision(raw,validIds,{unbounded=false}={}){
  const allowed=new Set(validIds);
  if(!raw||typeof raw!=='object'||Array.isArray(raw))
-  return {action:'finish',reason:'模型没有给出有效的操作决定',sections:[],questions:[]};
+  return {action:unbounded?'invalid':'finish',reason:'模型没有给出有效的操作决定',sections:[],questions:[]};
  const action=['finish','inspect_source','rewrite_sections','ask_user'].includes(raw.action)?
-  raw.action:'finish';
+  raw.action:(unbounded?'invalid':'finish');
  const sections=[],seen=new Set();
  for(const row of Array.isArray(raw.sections)?raw.sections:[]){
   if(!row||!allowed.has(row.blockId)||seen.has(row.blockId))continue;
@@ -51,7 +51,7 @@ export function modelDecision(raw,validIds,{unbounded=false}={}){
    status:'user_input_needed'});
  }
  return {action:['inspect_source','rewrite_sections'].includes(action)&&
-  !sections.length?'finish':action,
+  !sections.length?(unbounded?'invalid':'finish'):action,
   reason:typeof raw.reason==='string'?raw.reason.slice(0,unbounded?undefined:700):'',
   sections,questions};
 }
@@ -110,8 +110,8 @@ export async function runResumeEditorialAgent({
   if(signal?.aborted)throw new Error('AI_PROVIDER_TIMEOUT');
   const digest=blocks.map(b=>{
    const now=rewritten.get(b.id);
-   return {blockId:b.id,section:b.section,source:excerpt(redacted(b.text)),
-    draft:excerpt(redacted(now?.proposed)),changed:now?.changed||false,
+   return {blockId:b.id,section:b.section,source:unbounded?redacted(b.text):excerpt(redacted(b.text)),
+    draft:unbounded?redacted(now?.proposed):excerpt(redacted(now?.proposed)),changed:now?.changed||false,
     status:now?.status||'missing'};
   });
   const decisionRaw=await completeJson(provider,POLICY,{
@@ -122,6 +122,7 @@ export async function runResumeEditorialAgent({
    previousActions:trace.map(t=>({action:t.action,sections:t.sections,accepted:t.accepted}))
   },signal,4800);
   const decision=modelDecision(decisionRaw,blocks.map(b=>b.id),{unbounded});
+  if(decision.action==='invalid')throw Error('AI_PROVIDER_RESPONSE_INVALID');
   if(decision.questions.length)questions.push(...decision.questions);
   const event={round:trace.length+1,action:decision.action,
    sections:decision.sections.map(s=>s.blockId),accepted:0,
@@ -137,12 +138,12 @@ export async function runResumeEditorialAgent({
     revealed++;
    }
    event.accepted=revealed;
-   if(!revealed){stop='repeated_identical_action';break;}
+   if(!revealed){stop=unbounded?'execution_round_guard':'repeated_identical_action';break;}
    if(round===maxRounds-1)stop='execution_round_guard';
    continue;
   }
   const signature=decision.sections.map(s=>s.blockId+':'+s.goal).join('|');
-  if(signature===previousSignature){
+  if(signature===previousSignature&&!unbounded){
    stop='repeated_identical_action';break;
   }
   previousSignature=signature;
@@ -178,7 +179,7 @@ export async function runResumeEditorialAgent({
    const verified=checked.get(id);
    if(issue||verified?.safe!==true){
     warnings.push({blockId:id,code:issue||'AI_AGENT_FACT_CHECK_REJECTED',
-     note:typeof verified?.concern==='string'?verified.concern.slice(0,350):''});
+     note:typeof verified?.concern==='string'?verified.concern.slice(0,unbounded?undefined:350):''});
     continue;
    }
    const current=rewritten.get(id);
@@ -186,7 +187,7 @@ export async function runResumeEditorialAgent({
     rewritten.set(id,{...current,proposed:row.text.trim(),
      changed:row.text.trim()!==source.text,status:'needs_user_confirmation',
      evidenceQuotes:row.sourceQuotes.map(q=>q.trim()),
-     rationale:typeof row.rationale==='string'?row.rationale.slice(0,750):
+     rationale:typeof row.rationale==='string'?row.rationale.slice(0,unbounded?undefined:750):
       current.rationale,
      jobRequirements:Array.isArray(row.jobRequirements)?
       row.jobRequirements.filter(x=>typeof x==='string').slice(0,unbounded?undefined:12):
