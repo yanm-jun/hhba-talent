@@ -117,8 +117,8 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
    </details>
   </>}
   {active===2&&<>
-   <div className="hhba-refined-title"><span>03 / SOURCE VERIFICATION</span><h2>官方招聘信息核验</h2><p>优先研究真实、适合的候选岗位，未确认的来源不作为正式推荐。</p></div>
-   <div className="hhba-refined-metrics"><div><small>已核验官方 JD</small><strong>{verified.length}</strong></div><div><small>尚未确认官方 JD</small><strong>{Math.max(0,discovered-verified.length)}</strong></div><div><small>已完成证据评分</small><strong>{officialJobs.filter(scoreGrounded).length}</strong></div></div>
+   <div className="hhba-refined-title"><span>03 / SOURCE VERIFICATION</span><h2>官方招聘信息核验</h2><p>逐一核验全部候选岗位，未确认的来源不作为正式推荐。</p></div>
+   <div className="hhba-refined-metrics"><div><small>已核验官方 JD</small><strong>{verified.length}</strong></div><div><small>尚未确认官方 JD</small><strong>{Math.max(0,discovered-verified.length)}</strong></div><div><small>已完成证据评分</small><strong>{all.filter(scoreGrounded).length}</strong></div></div>
    {jdJob?<><ReportPager count={jdItems.length} index={currentJdIndex} onChange={setJdIndex}/><article className="hhba-verified-report">
     <div className="hhba-refined-job-head"><div><JobTitle job={jdJob}/></div><span className={confirmed(jdJob)?'hhba-source-confirmed':'hhba-source-pending'}>{confirmed(jdJob)?'官方 JD 已核验':'尚未确认'}</span></div>
     <dl className="hhba-verification-facts"><div><dt>招聘来源</dt><dd>{confirmed(jdJob)?'官方来源已核验':'尚未确认官方归属'}</dd></div><div><dt>完整岗位 JD</dt><dd>{jdJob.jd_source_status==='VERIFIED_JD'?'已取得完整原文':'尚未取得完整原文'}</dd></div><div><dt>工作地点</dt><dd>{jdJob.location||'未知'}</dd></div><div><dt>薪资</dt><dd>{jdJob.salary||'未取得可确认薪资'}</dd></div><div><dt>投递状态</dt><dd>{jdJob.availability_status==='OPEN_LISTED'?'页面显示开放，仍需确认':'仍需官网确认'}</dd></div>{(jdJob.jd_checked_at||jdJob.checked_at)&&<div><dt>核验时间</dt><dd>{jdJob.jd_checked_at||jdJob.checked_at}</dd></div>}</dl>
@@ -129,8 +129,8 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
    </article></>:empty(pending?'等待官方 JD 核验结果。':'本次没有可核验的岗位资料。')}
   </>}
   {active===3&&<>
-   <div className="hhba-refined-title"><span>04 / MATCH REPORT</span><h2>精选岗位匹配报告</h2><p>逐项对照简历和官方 JD，一次只阅读一个岗位。</p></div>
-   <div className="hhba-refined-metrics hhba-score-metrics"><div><small>正式推荐</small><strong>{officialJobs.length}{report?.final_target?<em> / {report.final_target}</em>:null}</strong></div><div><small>原文证据支持评分</small><strong>{officialJobs.filter(scoreGrounded).length}</strong></div></div>
+   <div className="hhba-refined-title"><span>04 / MATCH REPORT</span><h2>精选岗位匹配报告</h2><p>全部有效岗位评分后按全局排名精选，一次只阅读一个岗位。</p></div>
+   <div className="hhba-refined-metrics hhba-score-metrics"><div><small>正式推荐</small><strong>{officialJobs.length}{report?.final_target?<em> / {report.final_target}</em>:null}</strong></div><div><small>全部候选证据评分</small><strong>{all.filter(scoreGrounded).length}</strong></div></div>
    {!externalScore&&(scoreJob?<><ReportPager count={officialJobs.length} index={currentScoreIndex} onChange={setScoreIndex}/><article className="hhba-verified-report hhba-curated-card" onTouchStart={e=>{reportSwipe.current={x:e.touches[0].clientX,y:e.touches[0].clientY}}} onTouchEnd={e=>{const start=reportSwipe.current;reportSwipe.current=null;if(!start)return;const dx=e.changedTouches[0].clientX-start.x,dy=e.changedTouches[0].clientY-start.y;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.3)changeScore(dx<0?1:-1)}}>
     <div className="hhba-refined-job-head"><div><JobTitle job={scoreJob}/></div><div className="hhba-refined-score">{scoreJob.match_score??'—'}<small>/100</small></div></div>
     {scoreJob.research_detail?<CuratedJobReport detail={scoreJob.research_detail} jd={scoreJob.evidence_excerpt}/>:<><p>{scoreJob.score_basis}</p><p>{scoreJob.recommendation_reason}</p>{!!scoreJob.matched?.length&&<ul>{scoreJob.matched.map((v,i)=><li key={i}>{v}</li>)}</ul>}{!!scoreJob.not_evidenced?.length&&<ul>{scoreJob.not_evidenced.map((v,i)=><li key={i}>{v}</li>)}</ul>}</>}

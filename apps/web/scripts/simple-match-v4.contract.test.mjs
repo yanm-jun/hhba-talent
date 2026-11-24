@@ -574,32 +574,43 @@ test('V4 excludes an unfamiliar commercial board discovered from the actual page
  await assert.rejects(v4ReadEmployerJob(u,{fetcher:async()=>new Response(html,{headers:{'content-type':'text/html'}})}),/V4_COMMERCIAL_BOARD_EXCLUDED/);
 });
 
-test('curated V4 stops at 500 concrete candidates, ranks by AI, backfills rejected reports and returns exactly 50 qualified reports',async()=>{
+test('curated V4 verifies all 500 candidates before generating globally highest scoring reports',async()=>{
  const jobs=Array.from({length:502},(_,i)=>({...row,company:'新企业'+(i+1),title:'区域运营岗位'+(i+1),url:'https://careers.new-employer.cn/roles/'+(i+1),fit_summary:'适合区域运营经验',requirements:'渠道运营和经销商业务流程'}));
  const board={...jobs[0],url:'https://www.zhipin.com/job_detail/123.html'},duplicate={...jobs[0],url:jobs[0].url+'?utm_source=search'},generic={company:'待核实',title:'职位详情待核实',location:'上海',url:'https://careers.new-employer.cn/'};
- let searches=0,rankings=0,deep=0,reads=0,parsed=0;
+ let searches=0,deep=0,parsed=0;const readIds=new Set(),scoreIds=new Set(),reportIds=[];
  const report={suitable:true,score:92,reason:'真实区域渠道经验与岗位需求对应，评分来自职责与实际简历逐项比较。',resume_quote:'汽车经销商渠道运营',jd_quote:'渠道运营和经销商业务流程',matched:['渠道运营'],gaps:['具体产品经验待核实'],comparisons:[{jd_quote:'渠道运营和经销商业务流程',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'有真实渠道运营经历，与招聘职责直接相关。'}],strengths:'具备实际渠道管理能力。',risks:'没有具体产品经验的证据。',career_development:'可迁移到区域运营方向。',optimization_advice:'突出原有的渠道管理经历。',competition:'已有直接相关经历，但不能推断录用概率。',extra_sections:[{title:'补充研究',content:'岗位具体业务以官网为准。'}]};
  const fetcher=async(u,opts)=>{
   if(!u.endsWith('/responses')){
-   reads++;const id=Number(new URL(u).pathname.split('/').pop());
+   const id=Number(new URL(u).pathname.split('/').pop());readIds.add(id);
    if(id===500)return new Response('closed',{status:403});
    const html='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:'区域运营岗位'+id,hiringOrganization:{name:'新企业'+id,url:'https://careers.new-employer.cn'},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责渠道运营和经销商业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
    return new Response(html,{headers:{'content-type':'text/html'}});
   }
   const payload=JSON.parse(opts.body),input=JSON.parse(payload.input);
   if(payload.tools){searches++;return model({research_complete:false,jobs:[board,generic,jobs[0],duplicate,...jobs.slice(1)]},jobs.map(j=>j.url));}
-  if(payload.instructions.includes('职业画像')&&!payload.instructions.includes('ordered_ids')){parsed++;return model({profile:{summary:'渠道运营经历',roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}});}
-  if(payload.instructions.includes('ordered_ids')){rankings++;assert.equal(input.candidates.length,500);assert.ok(input.candidates.every(j=>!j.url));return model({ordered_ids:input.candidates.map(j=>j.id).reverse()});}
-  deep++;return model(input.job.title==='区域运营岗位499'?{suitable:false}:report);
+  if(payload.instructions.includes('自主整理个人职业画像')){parsed++;return model({profile:{summary:'渠道运营经历',roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}});}
+  const id=Number(input.job.title.replace('区域运营岗位',''));
+  const score=id===498?99:id===497?98:70;
+  if(input.established_score!==undefined){
+   assert.equal(readIds.size,500,'every candidate attempted before reports');assert.equal(scoreIds.size,499,'every available JD scored before reports');
+   deep++;reportIds.push(id);assert.equal(input.established_score,score);
+   return model(id===497?{suitable:false,reason:'深度核验发现硬性差距'}:{...report,score});
+  }
+  scoreIds.add(id);return model({suitable:id!==499,score:id===499?40:score,reason:report.reason,resume_quote:report.resume_quote,jd_quote:report.jd_quote,matched:report.matched,gaps:report.gaps});
  };
  const result=await v4Match(fetcher,provider,resume,'全国',{officialOnly:true,curated:true});
- assert.equal(parsed,1);assert.equal(searches,1);assert.equal(rankings,1);
+ assert.equal(parsed,1);assert.equal(searches,1);
  assert.equal(result.research_report.discovered,500);assert.equal(result.matches.length,50);
- assert.equal(reads,52);assert.equal(deep,51);
+ assert.equal(readIds.size,500);assert.equal(scoreIds.size,499);assert.equal(deep,51);
+ assert.equal(reportIds[0],498);assert.equal(reportIds[1],497);
+ assert.equal(result.native_search.jd_verification.scored,499);
+ assert.equal(result.native_search.jd_verification.eligible,500);
+ assert.ok(result.research_leads.some(j=>j.title==='区域运营岗位497'&&j.match_score===98));
  assert.equal(result.matches[0].title,'区域运营岗位498');
  assert.ok(result.matches.every(j=>j.research_detail?.comparisons?.length&&j.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'));
  assert.equal(result.can_continue,false);
  assert.equal(result.research_leads.length,450);
+ assert.ok(result.research_leads.some(j=>j.title==='区域运营岗位499'&&j.match_score===40));
 });
 test('curated report rejects invented CV quotes and missing report sections, permits grounded detailed analysis',async()=>{
  const {validateCuratedReport,curatedUrl,candidateKey,concreteCandidate}=await import('../functions/_lib/v4-curated-reports.js');

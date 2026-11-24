@@ -49,3 +49,6 @@ export function rankCandidateUrls(payload,rows){
  return valid.length===keys.size?valid:null;
 }
 export function qualifiedReport(job){return job?.source_type==='站外官方招聘'&&job.jd_source_status==='VERIFIED_JD'&&job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&Number.isInteger(job.match_score)&&!!job.research_detail;}
+
+// Only independently verified, evidence-scored and suitable jobs enter the global report ranking.
+export function eligibleCuratedScore(job){return job?.curated_suitable===true&&job.source_type==='站外官方招聘'&&job.jd_source_status==='VERIFIED_JD'&&job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&Number.isInteger(job.match_score)&&job.match_score>=0&&job.match_score<=100&&!!str(job.evidence_excerpt);}
