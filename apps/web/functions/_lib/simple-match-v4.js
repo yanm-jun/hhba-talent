@@ -16,8 +16,8 @@ function providerBase(value){
 }
 const MODEL='gpt-6.2-sol';
 const fault=code=>Object.assign(new Error(code),{code});
-const text=(v,n=1200)=>typeof v==='string'?v.trim().slice(0,n):'';
-const texts=v=>Array.isArray(v)?v.filter(x=>typeof x==='string').map(s=>text(s,360)).filter(Boolean):[];
+const text=(v,n=Infinity)=>typeof v==='string'?v.trim().slice(0,n):'';
+const texts=v=>Array.isArray(v)?v.filter(x=>typeof x==='string').map(s=>text(s)).filter(Boolean):[];
 const norm=v=>String(v||'').replace(/\s+/g,' ').trim();
 
 export function v4Provider(env={}){
@@ -224,10 +224,10 @@ async function enrich(fetcher,rows,{signal,onActivity=()=>{}}={}){
  return {results,read};
 }
 function renderJob(x,url,verified,resume,toolLinked,index){
- const source=sourceKind(url),company=text(verified?.company||x?.company,120)||'企业待核实';
- const title=text(verified?.title||x?.title||x?.role,160)||'职位详情待核实';
- const location=text(verified?.location||x?.location||x?.city,120)||'工作地点待核实';
- const resumeQuote=text(x?.resume_quote,450),jdQuote=text(x?.jd_quote,450);
+ const source=sourceKind(url),company=text(verified?.company||x?.company)||'企业待核实';
+ const title=text(verified?.title||x?.title||x?.role)||'职位详情待核实';
+ const location=text(verified?.location||x?.location||x?.city)||'工作地点待核实';
+ const resumeQuote=text(x?.resume_quote),jdQuote=text(x?.jd_quote);
  const resumeGrounded=resumeQuote.length>=4&&norm(resume).includes(norm(resumeQuote));
  const jdGrounded=verified?.full_jd&&jdQuote.length>=4&&
   norm(verified.full_jd).includes(norm(jdQuote));
@@ -239,7 +239,7 @@ function renderJob(x,url,verified,resume,toolLinked,index){
  const independentlyRead=source!=='THIRD_PARTY_BOARD'&&(confirmed||verified?.source_confirmed===true||verified?.independently_read===true);
  const full=Boolean(verified?.full_jd);
  const status=full?(independentlyRead?'VERIFIED_FULL_JD':'PARTIAL_SOURCE'):'SEARCH_SNIPPET_ONLY';
- const reason=text(x?.reason||x?.recommendation_reason,600)||
+ const reason=text(x?.reason||x?.recommendation_reason)||
   (resumeGrounded?'根据简历中的相关经历，建议进一步查看该职位要求。':'这是 AI 搜索得到的职位线索，需打开原始页面核对。');
  const note=source==='THIRD_PARTY_BOARD'?
   '第三方网站岗位线索，尚未获得企业官方投递入口。':
@@ -252,11 +252,11 @@ function renderJob(x,url,verified,resume,toolLinked,index){
    confirmed?'EMPLOYER_DOMAIN_CANDIDATE':'UNVERIFIED',
   source_type:confirmed?'站外官方招聘':'站外招聘职位',
   recruitment_source_note:note,
-  source:new URL(url).hostname,remote:false,salary:text(x?.salary,100)||null,
+  source:new URL(url).hostname,remote:false,salary:text(x?.salary)||null,
   reference_score:score??0,match_score:score,
   matched:texts(x?.matched),not_evidenced:texts(x?.gaps||x?.not_evidenced),
   needs_verification:[note],
-  requirements_basis:text(verified?.requirements||x?.requirements,1500),
+  requirements_basis:text(verified?.requirements||x?.requirements),
   score_basis:score===null?'没有足够简历原文证据，不显示匹配分。':
     full&&jdGrounded?'有简历与招聘 JD 原文依据的 AI 参考分（非录用概率）':
     'AI 职业方向参考分；JD 尚未完全核验（非录用概率）',
@@ -265,7 +265,8 @@ function renderJob(x,url,verified,resume,toolLinked,index){
   evidence_status:status,
   evidence_score_status:score!==null&&!(full&&jdGrounded)?
    'AI_DIRECTION_REFERENCE_SCORED':undefined,
-  evidence_excerpt:text(verified?.full_jd||x?.jd_quote,400),
+  evidence_excerpt:text(verified?.full_jd||x?.jd_quote),
+  evidence_sources:[...new Map([url,...(Array.isArray(x?.evidence_sources)?x.evidence_sources.map(s=>typeof s==='string'?s:s?.url):[])].map(v4PublicJobUrl).filter(Boolean).map(u=>[u,{url:u,kind:u===url?'EMPLOYER_PAGE_CANDIDATE':'PUBLIC_ANNOUNCEMENT_CANDIDATE'}])).values()],
   checked_at:verified?.checked_at||null,
   score_evidence_status:full&&jdGrounded&&resumeGrounded?
    'GROUNDED_JD_RESUME_QUOTES':undefined,
@@ -320,7 +321,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      +'研究充分或继续查找没有实际价值时才为 true），'
      +'profile:{summary,roles,skills:[{name,evidence}],facts:[{kind,quote}],'
      +'education,education_evidence,experience_years,experience_evidence}，'
-     +'jobs:[{company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote}]。'
+     +'jobs:[{company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote,evidence_sources:[{url}]}]。'
      +'resume_quote 必须逐字来自简历，岗位有真实来源才填写。'
      +'如果已有来源不够好，请自行继续搜索新行业和新企业；不要只重复以前找到的网址。'
      +'本轮只报告真实搜索所得，返回具体 HTTPS 链接。',
