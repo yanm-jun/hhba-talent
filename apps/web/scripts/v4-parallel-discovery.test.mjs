@@ -479,3 +479,39 @@ test('stalled research consumes unread pages and alternate browser evidence with
  assert.equal(pick(ledger).mode,'browser');attempted.add(JSON.stringify([u,'browser',0]));
  assert.equal(pick(ledger),null);
 });
+
+test('large verification window yields under request pressure and resumes every untouched candidate',async()=>{
+ const provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const jobs=Array.from({length:12},(_,i)=>job(i+2000)),byUrl=new Map(jobs.map(j=>[j.url,j]));
+ const scoreCalls=new Map(),pageCalls=new Map();
+ const html=j=>'<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:j.title,hiringOrganization:{name:j.company,url:new URL(j.url).origin},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责汽车经销商渠道运营和业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
+ const fetcher=async(url,opts)=>{
+  if(!url.endsWith('/responses')){
+   const j=byUrl.get(url);assert.ok(j);pageCalls.set(url,(pageCalls.get(url)||0)+1);
+   return new Response(html(j),{headers:{'content-type':'text/html'}});
+  }
+  const input=JSON.parse(JSON.parse(opts.body).input),title=input.job.title;
+  const n=(scoreCalls.get(title)||0)+1;scoreCalls.set(title,n);
+  return model({suitable:true,score:88,reason:'独立评分 '+n,resume_quote:'汽车经销商渠道运营',jd_quote:n<=2?'无效引文 '+n:'汽车经销商渠道运营',matched:['渠道运营'],gaps:[]});
+ };
+ const options={curated:true,officialOnly:true,stepMode:true,parallelResearch:true};
+ let checkpoint={phase:'verification',next:0,rows:jobs.map(j=>[j.url,j]),profile,toolUrls:jobs.map(j=>j.url),verificationBatch:12};
+ const first=await v4Match(fetcher,provider,resume,'全国',{...options,checkpoint});
+ checkpoint=first.checkpoint;
+ assert.equal(checkpoint.phase,'verification');
+ assert.ok(checkpoint.next>=4&&checkpoint.next<12);
+ assert.equal(checkpoint.diagnostics.VERIFICATION_WINDOW_PRESSURE_PAUSE,1);
+ assert.equal(checkpoint.matches.length,checkpoint.next);
+ assert.equal(checkpoint.scored,checkpoint.next);
+ assert.ok(checkpoint.diagnostics.VERIFICATION_EXTERNAL_REQUESTS>=30);
+ const completed=new Set(checkpoint.matches.map(j=>j.official_url));
+ for(let i=0;i<12&&checkpoint.phase==='verification';i++){
+  const next=await v4Match(fetcher,provider,resume,'全国',{...options,checkpoint});
+  checkpoint=next.checkpoint;
+ }
+ assert.equal(checkpoint.phase,'reporting');
+ assert.equal(checkpoint.scored,12);
+ assert.equal(new Set(checkpoint.matches.map(j=>j.official_url)).size,12);
+ assert.ok(jobs.every(j=>scoreCalls.get(j.title)===3));
+ assert.ok([...completed].every(u=>pageCalls.get(u)===1));
+});
