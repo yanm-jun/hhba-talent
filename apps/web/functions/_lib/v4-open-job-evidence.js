@@ -420,6 +420,47 @@ export async function v4ReadDeclaredStructuredJob(parent,document,{fetcher=fetch
  }
  return null;
 }
+// Fixed browser code, never model-generated. Capture blocked runtime public GET
+// requests as research leads; do not send them until independently retrieved.
+// Isolate the context, block service workers, writes and websocket connections.
+export function v4RuntimeBrowserScript(target,exactUrls){
+ const config=JSON.stringify({target,exactUrls});
+ return 'async ({browser}) => {const cfg='+config+';'+
+  String.raw`
+   const exact=new Set(cfg.exactUrls),observed=new Map(),origin=new URL(cfg.target).origin;
+   let ctx;
+   const safe=raw=>{
+    try{
+     const u=new URL(raw),h=u.hostname.toLowerCase();
+     if(u.protocol!=='https:'||u.username||u.password||(u.port&&u.port!=='443')||!h.includes('.')||h.includes(':')||/^\d+\.\d+\.\d+\.\d+$/.test(h)||/(?:^|\.)(?:localhost|local|internal|test|invalid|example|onion|nip\.io|sslip\.io|localtest\.me)$/.test(h))return null;
+     if(/(?:^|[\/_-])(?:login|logout|signin|signout|delete|remove|update|submit|apply|checkout|oauth|auth|token)(?:[\/_-]|$)/i.test(u.pathname)||[...u.searchParams.keys()].some(k=>/token|secret|password|signature|authorization|api[_-]?key/i.test(k)))return null;
+     u.hash='';return u;
+    }catch{return null;}
+   };
+   try{
+    ctx=await browser.newContext({serviceWorkers:'block',acceptDownloads:false});
+    if(typeof ctx.routeWebSocket!=='function')return {unsupported:true};
+    await ctx.routeWebSocket('**/*',ws=>ws.close());
+    await ctx.route('**/*',async route=>{
+     const req=route.request(),u=safe(req.url()),type=req.resourceType();
+     if(!u||req.method()!=='GET'||!['document','script','stylesheet','xhr','fetch'].includes(type))return route.abort();
+     // Every cross-origin target must already be independently admitted.
+     if(u.origin!==origin&&!exact.has(u.href)){
+      if(['xhr','fetch','document','script','stylesheet'].includes(type))observed.set(u.href,{url:u.href,kind:type==='document'?'frame':type==='script'?'script':type==='stylesheet'?'style':'data'});
+      return route.abort();
+     }
+     // Do not replay request credentials. Only public navigation and resources.
+     const headers=Object.fromEntries(Object.entries(req.headers()).filter(([k])=>! /^(?:authorization|cookie|proxy-authorization|x-api-key|x-auth-token)$/i.test(k)));
+     return route.continue({headers});
+    });
+    const page=await ctx.newPage();
+    try{await page.goto(cfg.target,{waitUntil:'networkidle',timeout:20000});}catch{}
+    const finalUrl=page.url();
+    const html=finalUrl===cfg.target?await page.content():'';
+    return {html,finalUrl,observed:[...observed.values()]};
+   }finally{try{await ctx?.close()}finally{await browser.close().catch(()=>{})}}
+  `; 
+}
 export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHints=[],publicDataUrls=[]}={}){
  const target=v4PublicJobUrl(url);
  if(!target||isCommercialRecruitmentBoard(target))throw Error('V4_UNSAFE_URL');
@@ -428,6 +469,22 @@ export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHint
  const host=new URL(target).hostname.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&');
  const independentlyRead=new Set(publicDataUrls.map(v4PublicJobUrl).filter(Boolean));
  const exactAssets=resourceHints.filter(h=>(['script','style'].includes(h?.kind)||['data','frame'].includes(h?.kind)&&publicReadResourceUrl(h.url)&&independentlyRead.has(v4PublicJobUrl(h.url)))&&v4PublicJobUrl(h.url)&&!isCommercialRecruitmentBoard(h.url)).map(h=>'^'+h.url.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&')+'$');
+ let runtimeHints=[],runtimeHtml='';
+ if(typeof browser.script==='function'){
+  try{
+   const exactUrls=resourceHints.filter(h=>exactAssets.some(p=>new RegExp(p).test(h.url))).map(h=>h.url);
+   const result=await browser.script(v4RuntimeBrowserScript(target,exactUrls),{library:'playwright',timeout:30000,keepAlive:10000});
+   if(signal?.aborted)throw signal.reason;
+   if(result.status===429)throw Error('V4_BROWSER_QUOTA_OR_RATE_LIMIT');
+   const raw=await limitedRead(result,{allowJson:true,maxBytes:16*1024*1024}),parsed=JSON.parse(raw);
+   if(parsed?.success===true&&parsed.result?.finalUrl===target){
+    runtimeHtml=typeof parsed.result.html==='string'?parsed.result.html:'';
+    runtimeHints=(Array.isArray(parsed.result.observed)?parsed.result.observed:[]).filter(h=>['data','frame','script','style'].includes(h?.kind)&&publicReadResourceUrl(h.url)).map(h=>({url:v4PublicJobUrl(h.url),kind:h.kind,runtime_observed:true}));
+   }
+  }catch(e){if(signal?.aborted||e?.message==='V4_BROWSER_QUOTA_OR_RATE_LIMIT')throw e;}
+ }
+ let html=runtimeHtml;
+ if(!html){
  const response=await browser.quickAction('content',{
   url:target,allowRequestPattern:['^https://'+host+'(?::443)?(?:/|$)',...new Set(exactAssets)],
   rejectResourceTypes:['image','media','font'],
@@ -436,18 +493,19 @@ export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHint
  if(signal?.aborted)throw signal.reason;
  if(response.status===429)throw Error('V4_BROWSER_QUOTA_OR_RATE_LIMIT');
  const raw=await limitedRead(response,{allowJson:true,maxBytes:16*1024*1024});
- let html=raw;
+ html=raw;
  if((response.headers.get('content-type')||'').includes('json')){
   let parsed;try{parsed=JSON.parse(raw)}catch{throw Error('V4_BROWSER_RESPONSE_INVALID')}
   if(parsed?.success===false||typeof parsed?.result!=='string')throw Error('V4_BROWSER_RESPONSE_INVALID');
   html=parsed.result;
+ }
  }
  if(!html.trim())throw Error('V4_BROWSER_EMPTY');
  const site=meta(html,'property','og:site_name')||meta(html,'name','application-name'),title=pageTitle(html);
  if(isCommercialRecruitmentBoard(target,{site_name:site}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
  const plain=htmlToText(html,{maxChars:Infinity}).trim();
  if(CLOSED.test(title)||(plain.length<80&&CLOSED.test(plain)))throw Error('V4_JOB_CLOSED');
- return {url:target,plain,site,title,rendered:true,resource_hints:[...new Map([...resourceHints,...v4PublicResourceHints(html,target)].map(h=>[h.url,h])).values()]};
+ return {url:target,plain,site,title,rendered:true,resource_hints:[...new Map([...resourceHints,...runtimeHints,...v4PublicResourceHints(html,target)].map(h=>[h.url,h])).values()]};
 }
 
 
