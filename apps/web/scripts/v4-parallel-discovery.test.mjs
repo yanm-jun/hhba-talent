@@ -102,3 +102,33 @@ test('a fast independent JD is scored before a slow sibling page finishes',async
  assert.ok(fastScored&&slowFinished&&overlapObserved);
  }finally{clearTimeout(timer);releaseSlow();}
 });
+
+test('batch scoring keeps full JD, independent evidence and only valid unique IDs',async()=>{
+ const {batchScoringPayload,collectBatchAssessments,partitionReadyScores}=await import('../functions/_lib/v4-batch-scoring.js');
+ const items=[{id:'a',job:{full_jd:'区域运营岗位完整原文甲',title:'甲'}},{id:'b',job:{full_jd:'区域运营岗位完整原文乙',title:'乙'}},{id:'c',job:{full_jd:'区域运营岗位完整原文丙',title:'丙'}}];
+ const cv='真实汽车经销商渠道运营经历';
+ const value={suitable:true,score:85,reason:'具有真实经验',resume_quote:'汽车经销商渠道运营'};
+ const input=JSON.parse(batchScoringPayload(items,cv,'全国').input);
+ assert.deepEqual(input.jobs,items.map(x=>({id:x.id,...x.job})));
+ const results=collectBatchAssessments({assessments:[{...value,id:'a',jd_quote:'完整原文甲'},{...value,id:'b',jd_quote:'完整原文甲'},{...value,id:'c',jd_quote:'完整原文丙'},{...value,id:'c',jd_quote:'完整原文丙'},{...value,id:'fake',jd_quote:'完整原文乙'}]},items,cv);
+ assert.deepEqual([...results.keys()],['a']);
+ assert.deepEqual(partitionReadyScores(items,cv,1).flat(),items);
+});
+test('coalesced scoring makes one model request, sends invalid item alone to individual fallback',async()=>{
+ const {makeBatchScorer}=await import('../functions/_lib/v4-batch-scoring.js');
+ let calls=0;const notes=[];
+ const score=makeBatchScorer({resume:'真实渠道运营经验',roleHint:'全国',delay:0,parse:x=>x.data,note:x=>notes.push(x),call:async payload=>{
+  calls++;const input=JSON.parse(payload.input);assert.equal(input.jobs.length,2);
+  return {status:'completed',data:{assessments:[{id:'a',score:87,suitable:true,reason:'匹配',resume_quote:'渠道运营',jd_quote:'原文甲'},{id:'b',score:88,suitable:true,reason:'匹配',resume_quote:'渠道运营',jd_quote:'原文甲'}]}};
+ }});
+ const result=await Promise.all([score('a',{full_jd:'原文甲'}),score('b',{full_jd:'原文乙'})]);
+ assert.equal(calls,1);assert.equal(result[0].score,87);assert.equal(result[1],null);
+ assert.ok(notes.includes('AI_SCORE_BATCH_INDIVIDUAL_FALLBACK'));
+});
+test('batch provider rejection or incomplete response falls back without inventing completed scores',async()=>{
+ const {makeBatchScorer}=await import('../functions/_lib/v4-batch-scoring.js');
+ for(const call of [async()=>{throw Error('context too large')},async()=>({status:'incomplete',data:{assessments:[]}})]){
+  const score=makeBatchScorer({resume:'真实渠道运营经验',delay:0,parse:x=>x.data,call});
+  assert.deepEqual(await Promise.all([score('a',{full_jd:'原文甲'}),score('b',{full_jd:'原文乙'})]),[null,null]);
+ }
+});
