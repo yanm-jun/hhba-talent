@@ -3,6 +3,6 @@ export type OptimizationCheckpoint={pending:string[];suggestions:ResumeSuggestio
 export declare function continueDocumentOptimization(options:{
  blockIds:string[];wanted?:string[];reviewFeedback?:Record<string,string>;signal?:AbortSignal;
  request:(pending:string[],reviewFeedback:Record<string,string>)=>Promise<{queued?:boolean;suggestions?:ResumeSuggestion[];pending?:string[];reviewFeedback?:Record<string,string>;pauseError?:Error;invalidError?:Error}>;
- wait:(signal?:AbortSignal)=>Promise<void>;
+ wait:(signal?:AbortSignal,delay?:number)=>Promise<void>;
  onCheckpoint?:(checkpoint:OptimizationCheckpoint)=>void;onQueued?:()=>void;onPaused?:(error:unknown)=>void;
 }):Promise<ResumeSuggestion[]>;

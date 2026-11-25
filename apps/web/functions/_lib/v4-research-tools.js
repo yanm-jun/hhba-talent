@@ -110,6 +110,8 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
    if(typeof input.resume_text==='string')input.resume_text=textPage('resume').text;
    if(input.job&&typeof input.job.full_jd==='string')input.job={...input.job,full_jd:textPage('jd').text};
    if(typeof input.public_document==='string')input.public_document=textPage('document').text;
+   if(typeof input.before_resume==='string')input.before_resume=textPage('resume').text;
+   if(typeof input.after_resume==='string')input.after_resume=textPage('document').text;
    input.original_text_pages=Object.fromEntries(Object.entries(originals).map(([name,value])=>[name,{total_chars:value.length,next_offset:value.length>budget?budget:null}]));
   }
   if(results)input.research_tool_results=results;

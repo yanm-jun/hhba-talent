@@ -822,11 +822,17 @@ export async function v4Match(fetcher,provider,resume,roleHint,
       input:JSON.stringify({...discoveryLaneContext({profile,roleHint,round,lane,width,previousJobs:candidatePage.items,candidateTarget:CANDIDATE_TARGET,remainingCandidates:Math.max(0,CANDIDATE_TARGET-concreteCount())}),resume_text:resume,excluded_previously_recommended_urls:[...excluded],excluded_commercial_domains:[...commercialBoardDomains,...new Set([...rejectedBoards].map(u=>new URL(u).hostname))]}),
       tools:[{type:'web_search'}],tool_choice:'required',include:['web_search_call.action.sources']
      },{signal});
-     if(!laneResponse.output.some(x=>x?.type==='web_search_call')&&!v4ToolSources(laneResponse).length)throw fault('AI_WEB_SEARCH_NOT_USED');
+     const grounded=laneResponse.output.some(x=>x?.type==='web_search_call')||v4ToolSources(laneResponse).length>0;
      let laneData;
-     try{laneData=await toJson(fetcher,provider,laneResponse,{signal});}catch(e){if(signal?.aborted)throw e;laneData={jobs:[],format_error:true};note('PARALLEL_LANE_FORMAT_UNAVAILABLE');}
+     try{laneData=await toJson(fetcher,provider,laneResponse,{signal});}catch(e){if(signal?.aborted)throw e;laneData={jobs:recoverV4PartialJobs(v4OutputText(laneResponse)),format_error:true};note('PARALLEL_LANE_FORMAT_UNAVAILABLE');}
      const jobs=[...candidates(laneData,laneResponse)].map(([url,j])=>({...j,url}));
-     return {response:laneResponse,data:{jobs},sources:[...v4Sources(laneResponse),...(Array.isArray(laneData.source_leads)?laneData.source_leads:[])]};
+     const sources=[...v4Sources(laneResponse),...(Array.isArray(laneData.source_leads)?laneData.source_leads:[])];
+     if(!grounded){
+      if(!jobs.length&&!sources.length)throw fault('AI_WEB_SEARCH_NOT_USED');
+      // Preserve leads but do not count missing grounding as a successful web call.
+      note('PARALLEL_UNGROUNDED_LEADS_RETAINED');
+     }
+     return {response:laneResponse,data:{jobs},sources,grounded};
     };
     const wave=await runDiscoveryWave(()=>v4Call(fetcher,provider,coordinatorPayload,{signal,onEvent:providerActivity}),lane,width,signal);
     discoveryWidth=nextDiscoveryWidth(width,wave.codes,gemini?{maxConnections:checkpoint?.pipelineActive?4:6,elapsed:wave.elapsed,previousElapsed:checkpoint?.discoveryElapsed}:{});

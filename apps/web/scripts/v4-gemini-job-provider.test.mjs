@@ -221,3 +221,27 @@ test('alias review needs independent same requisition evidence across URLs',asyn
  assert.equal(validAliasIdentity(value,'中文运营 REQ54321','Operations REQ12345',false),false);
  assert.equal(validAliasIdentity({...value,same_job:false},'中文运营 REQ12345','Operations REQ12345',false),false);
 });
+
+test('resume optimization retries provider throttling without discarding accepted edits',async()=>{
+ const {continueDocumentOptimization}=await import('../src/services/resumeOptimizationContinuation.mjs');
+ let calls=0;const waits=[];
+ const error=Object.assign(Error('limited'),{code:'AI_PROVIDER_RATE_LIMITED',retryAfterMs:5000});
+ const result=await continueDocumentOptimization({blockIds:['a','b'],request:async pending=>{
+  calls++;if(calls===1)throw error;
+  if(calls===2)return {suggestions:[{blockId:'a'}],pending:['b'],pauseError:error};
+  assert.deepEqual(pending,['b']);return {suggestions:[{blockId:'b'}],pending:[]};
+ },wait:async(_signal,ms)=>waits.push(ms)});
+ assert.deepEqual(result.map(x=>x.blockId),['a','b']);assert.deepEqual(waits,[5000,5000]);
+});
+test('reassessment stage pages both resume versions when context is rejected',async()=>{
+ const {v4StageResearchCall}=await import('../functions/_lib/v4-research-tools.js');
+ const before='前'.repeat(50000),after='后'.repeat(50000),jd='要求'.repeat(25000);let first=true,seen=new Set();
+ const result=await v4StageResearchCall(async payload=>{
+  const v=JSON.parse(payload.input);
+  if(first){first=false;throw Object.assign(Error('context'),{code:'AI_PROVIDER_CONTEXT_TOO_LARGE'});}
+  assert.ok(v.before_resume.length<before.length);assert.ok(v.after_resume.length<after.length);
+  for(const p of v.research_tool_results||[])if(p.type==='text_page')seen.add(p.collection);
+  return {status:'completed',data:{before:{score:80},after:{score:81}}};
+ },{instructions:'compare',input:JSON.stringify({before_resume:before,after_resume:after,job:{full_jd:jd}})},{parse:r=>r.data,resume:before,document:after,jd});
+ assert.equal(result.data.after.score,81);assert.deepEqual([...seen].sort(),['document','jd','resume']);
+});

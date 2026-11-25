@@ -45,7 +45,7 @@ const OPTIMIZATION_ERRORS:Record<string,string>={
   AI_PROVIDER_SUGGESTION_SCHEMA_INVALID:'AI 的建议格式不符合安全要求，请稍后重试。'
 };
 export class ResumeOptimizationError extends Error{
- constructor(readonly code:string,readonly status:number){super(OPTIMIZATION_ERRORS[code]||'简历润色请求失败，请稍后再试。')}
+ constructor(readonly code:string,readonly status:number,readonly retryAfterMs?:number){super(OPTIMIZATION_ERRORS[code]||'简历润色请求失败，请稍后再试。')}
 }
 const PATH='/api/resume-optimize';
 export async function getResumeOptimizationStatus(signal?:AbortSignal):Promise<ResumeOptimizationStatus|null>{
@@ -62,13 +62,13 @@ type DocumentOptimization={
  text:string;wanted?:string[];feedback?:string;reviewFeedback?:Record<string,string>;onPending?:(ids:string[])=>void;onQueued?:()=>void;
  onCheckpoint?:(checkpoint:OptimizationCheckpoint)=>void;onPaused?:(error:unknown)=>void;
 };
-function waitForOptimizationSlot(signal?:AbortSignal){
+function waitForOptimizationSlot(signal?:AbortSignal,delay=2500){
  return new Promise<void>((resolve,reject)=>{
   if(signal?.aborted){reject(signal.reason);return;}
   const cancel=()=>{clearTimeout(timer);reject(signal?.reason);};
   const timer=setTimeout(()=>{
    signal?.removeEventListener('abort',cancel);resolve();
-  },2500);
+  },delay);
   signal?.addEventListener('abort',cancel,{once:true});
  });
 }
@@ -93,10 +93,13 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
    ok?:boolean;error?:string;suggestions?:ResumeSuggestion[];pending_block_ids?:string[];review_feedback?:Record<string,string>;pause_reason?:string;
   };
   if(document&&data.error==='RESUME_OPTIMIZATION_QUEUED')return {queued:true};
+  const retryHeader=response.headers.get('Retry-After');
+  const retryAfterMs=retryHeader===null?undefined:/^\d+$/.test(retryHeader)?Number(retryHeader)*1000:Math.max(0,Date.parse(retryHeader)-Date.now());
+  const retryDelay=Number.isFinite(retryAfterMs)?retryAfterMs:undefined;
   if(!response.ok||data.ok!==true||!Array.isArray(data.suggestions))
-   throw new ResumeOptimizationError(data.error||'INVALID_RESPONSE',response.status);
+   throw new ResumeOptimizationError(data.error||'INVALID_RESPONSE',response.status,retryDelay);
   return {suggestions:data.suggestions,pending:data.pending_block_ids,reviewFeedback:data.review_feedback,
-   pauseError:data.pause_reason?new ResumeOptimizationError(data.pause_reason,response.status):undefined,
+   pauseError:data.pause_reason?new ResumeOptimizationError(data.pause_reason,response.status,retryDelay):undefined,
    invalidError:new ResumeOptimizationError('INVALID_RESPONSE',502)};
  };
  if(document)return continueDocumentOptimization({
