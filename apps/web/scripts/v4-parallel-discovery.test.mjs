@@ -310,6 +310,12 @@ test('verification scheduler keeps useful concurrency during inexpensive JD reco
  assert.equal(nextVerificationBatch(3,true,100,{externalRequests:39,completed:3}),3);
  assert.equal(nextVerificationBatch(4,true,100,{externalRequests:48,completed:2}),1);
  assert.equal(nextVerificationBatch(3,false,1,{externalRequests:6,completed:3}),1);
+ assert.equal(nextVerificationBatch(4,false,100,{externalRequests:8,completed:4}),6);
+ assert.equal(nextVerificationBatch(6,false,100,{externalRequests:12,completed:6}),8);
+ assert.equal(nextVerificationBatch(12,false,100,{externalRequests:24,completed:12}),12);
+ assert.equal(nextVerificationBatch(8,true,100,{externalRequests:48,completed:8}),6);
+ assert.equal(nextVerificationBatch(8,false,2,{externalRequests:16,completed:8}),2);
+
 });
 
 test('activated production V4 OpenAI route can globally compare all eligible candidates',async()=>{
@@ -422,4 +428,34 @@ test('activated OpenAI global ranking receives every one of 502 eligible candida
  assert.equal(calls,1);assert.equal(result.checkpoint.globalOrder.length,502);
  assert.equal(result.checkpoint.globalRankState.done,true);
  assert.equal(new Set(result.checkpoint.globalOrder).size,502);
+});
+
+test('report scheduler refills an idle lane before a slow sibling and never exceeds transport width',async()=>{
+ const {runReadyWork}=await import('../functions/_lib/v4-parallel-discovery.js');
+ let releaseSlow;const slow=new Promise(r=>{releaseSlow=r;});
+ let active=0,peak=0,thirdBeforeSlow=false,slowDone=false;
+ const timeout=setTimeout(releaseSlow,1000);
+ try{
+  const results=await runReadyWork([0,1,2,3],2,async id=>{
+   active++;peak=Math.max(peak,active);
+   try{
+    if(id===0){await slow;slowDone=true;}
+    if(id===2){thirdBeforeSlow=!slowDone;releaseSlow();}
+    return id;
+   }finally{active--;}
+  });
+  assert.equal(peak,2);assert.ok(thirdBeforeSlow);
+  assert.deepEqual(results.map(r=>r.value),[0,1,2,3]);
+ }finally{clearTimeout(timeout);releaseSlow();}
+});
+test('report scheduler stops admitting work on pressure or rejection, preserving completed outcomes',async()=>{
+ const {runReadyWork}=await import('../functions/_lib/v4-parallel-discovery.js');
+ let pressure=0;
+ const limited=await runReadyWork([0,1,2,3],1,async id=>{pressure++;return id;},{canStart:()=>pressure<2});
+ assert.deepEqual(limited.map(r=>r.value),[0,1]);
+ const failure=await runReadyWork([0,1,2],1,async id=>{if(id===1)throw Error('upstream');return id;});
+ assert.deepEqual(failure.map(r=>r.status),['fulfilled','rejected']);
+ const controller=new AbortController();
+ const cancelled=await runReadyWork([0,1,2],1,async id=>{controller.abort();return id;},{signal:controller.signal});
+ assert.equal(cancelled.length,1);
 });
