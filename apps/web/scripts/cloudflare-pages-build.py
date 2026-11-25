@@ -33,6 +33,57 @@ def run(args: list[str] | str, *, cwd: Path, env: dict[str, str] | None = None) 
     subprocess.run(cmd, check=True, cwd=cwd, env=env)
 
 
+# A provider outage is not a code regression. Keep the strict diagnostic exit
+# code on dedicated acceptance branches, but don't hold unrelated account,
+# Word and storage fixes hostage to a transient external service failure.
+TRANSIENT_PROVIDER_ERRORS = {
+    "AI_PROVIDER_UPSTREAM_ERROR", "AI_PROVIDER_NETWORK_ERROR",
+    "AI_PROVIDER_TIMEOUT", "AI_PROVIDER_RATE_LIMITED",
+}
+
+def external_health_degraded(report: dict) -> bool:
+    if report.get("status") != "PARTIAL" or report.get("model_catalog") != "MODEL_LISTED":
+        return False
+    responses, search = report.get("responses"), report.get("web_search")
+    # Only known transient failures may be tolerated. Schema, auth, configuration,
+    # missing tool calls and malformed model output are still release failures.
+    if responses not in (TRANSIENT_PROVIDER_ERRORS | {"JSON_OK"}):
+        return False
+    if search not in (TRANSIENT_PROVIDER_ERRORS | {"TOOL_CALLED"}):
+        return False
+    if search == "TOOL_CALLED" and (
+        report.get("format") != "JSON_OK" or not isinstance(report.get("model_job_rows"), int)
+        or report["model_job_rows"] <= 0
+    ):
+        return False
+    if report.get("native_stream") not in (TRANSIENT_PROVIDER_ERRORS | {
+        "FINAL_RESPONSE_OK", "JSON_COMPATIBILITY_MODE"
+    }):
+        return False
+    return responses in TRANSIENT_PROVIDER_ERRORS or search in TRANSIENT_PROVIDER_ERRORS
+
+def live_match_health(*, allow_transient_outage: bool) -> None:
+    cmd = ["node", "scripts/simple-match-v4-live-smoke.mjs"]
+    print("HHBA_CLOUDFLARE_RUN apps/web: " + str(cmd), flush=True)
+    result = subprocess.run(cmd, cwd=WEB, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT, text=True, check=False)
+    print(result.stdout, end="", flush=True)
+    if result.returncode == 0:
+        return
+    reports = [line.removeprefix("HHBA_V4_LIVE_SMOKE=") for line in result.stdout.splitlines()
+               if line.startswith("HHBA_V4_LIVE_SMOKE=")]
+    if allow_transient_outage and result.returncode == 1 and len(reports) == 1:
+        try:
+            report = json.loads(reports[0])
+        except (ValueError, TypeError):
+            report = None
+        if isinstance(report, dict) and external_health_degraded(report):
+            print("HHBA_RELEASE_AI_HEALTH=DEGRADED_TRANSIENT_UPSTREAM; "
+                  "real AI acceptance NOT passed; continuing independent code release", flush=True)
+            return
+    raise subprocess.CalledProcessError(result.returncode, cmd)
+
+
 def main() -> None:
     if not WORKFLOW.exists():
         raise SystemExit("Missing canonical GitHub Pages workflow")
@@ -43,7 +94,7 @@ def main() -> None:
     # Results appear in build logs with only coarse status/error codes.
     if (os.environ.get('CF_PAGES_BRANCH') == 'main' and os.environ.get('HHBA_MATCH_V4_READY') == '1') or os.environ.get('CF_PAGES_BRANCH') in ('feat/simple-resume-match-v4-20261124', 'fix/v4-open-job-discovery-20261124', 'fix/v4-direct-ai-recommend-20261124', 'fix/v4-autonomous-pipeline-20261124'):
         run(['node', '--test', 'scripts/simple-match-v4.contract.test.mjs'], cwd=WEB)
-        run(['node', 'scripts/simple-match-v4-live-smoke.mjs'], cwd=WEB)
+        live_match_health(allow_transient_outage=os.environ.get('CF_PAGES_BRANCH') == 'main' and os.environ.get('HHBA_STRICT_AI_RELEASE_GATE') != '1')
 
     # Explicit diagnostic branch or opt-in setting only. No extra paid
     # optimization calls on ordinary production builds.
