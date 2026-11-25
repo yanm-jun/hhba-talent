@@ -10,7 +10,8 @@ import {splitChangedResumeText} from '../services/resumeChangedText.mjs';
 import {
  wordEditingCapabilities,wordEditableText,wordPreviewBytes,wordSourceBytes,saveOriginalWordEdit,
  shiftOriginalWordRevision,downloadOriginalWordEdited,downloadOriginalWordPdf,
- type WordHistoryEntry
+ requestWordPdfConversion,wordPdfConversionStatus,
+ type WordHistoryEntry,type WordRenderTaskStatus
 } from '../services/originalWordApi';
 import {renderBrowserWord,browserWordAnchors,paintBrowserWordSuggestions} from '../services/browserWordPreview';
 import '../styles/original-resume-viewer.css';
@@ -77,6 +78,8 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  const [history,setHistory]=useState<WordHistoryEntry[]>([]);
  const [refresh,setRefresh]=useState(0);
  const [message,setMessage]=useState('');
+ const [convertStatus,setConvertStatus]=useState<WordRenderTaskStatus>('idle');
+ const convertPolls=useRef(0);
  const [activeVisualId,setActiveVisualId]=useState<string|null>(null);
  const [inlineVisualEditor,setInlineVisualEditor]=useState<string|null>(null);
  const [inlineVisualSuggestionId,setInlineVisualSuggestionId]=useState<string|null>(null);
@@ -100,6 +103,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   // A previous job's saved revision must never leak into another job's toolbar.
   setSaved(false);setRevision(0);setTotalRevisions(0);setHistory([]);
   setPdfAvailable(false);setLayoutVerified(false);setReadOnlyTextFallback(false);
+  setConvertStatus('idle');convertPolls.current=0;
   renderedEntrance.current=false;
  },[resume.id,jobId]);
  useEffect(()=>{
@@ -187,6 +191,14 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     setHistory(inspectedHistory);
     setPdfAvailable(info.pdf_available===true);
     setLayoutVerified(info.layout_verified===true);
+    // A conversion started earlier keeps running on the server even if the
+    // page was left; resume watching it instead of starting a second one.
+    setConvertStatus('idle');
+    if(info.pdf_available===true)setConvertStatus('done');
+    else void wordPdfConversionStatus(resume.id,jobId).then(task=>{
+     if(!active)return;
+     setConvertStatus(task.status);
+    }).catch(()=>{/* a missing status is not a conversion failure */});
     onRevisionSnapshot?.({revision:Number.isInteger(info.revision)?info.revision:(wasSaved?1:0),
      history:inspectedHistory});
     if(!rendererEnabled){
@@ -264,6 +276,31 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   })();
   return()=>{active=false;doc.current=null;void task?.destroy().catch(()=>{});};
  },[resume.id,jobId,ready,rendererEnabled,refresh]);
+
+ useEffect(()=>{
+  if(convertStatus!=='pending'&&convertStatus!=='running')return;
+  const timer=setInterval(()=>{
+   if(convertPolls.current>=40){
+    clearInterval(timer);
+    setConvertStatus('failed');
+    setMessage('PDF 转换失败，请重试');
+    return;
+   }
+   convertPolls.current+=1;
+   void wordPdfConversionStatus(resume.id,jobId).then(task=>{
+    if(task.status==='done'){
+     setConvertStatus('done');setPdfAvailable(true);setLayoutVerified(true);
+     setMessage('PDF 生成成功');
+     window.dispatchEvent(new Event('hhba:word-versions-changed'));
+     setRefresh(n=>n+1);
+    }else if(task.status==='failed'){
+     setConvertStatus('failed');
+     setMessage('PDF 转换失败，请重试');
+    }else setConvertStatus(task.status);
+   }).catch(()=>{/* transient network error: keep polling until the cap */});
+  },3000);
+  return()=>clearInterval(timer);
+ },[convertStatus,resume.id,jobId]);
 
  useEffect(()=>{
   if(ready!=='available'||!rendererEnabled||loading||!surface.current||!doc.current)return;
@@ -431,6 +468,24 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   catch(error){setMessage(error instanceof Error?error.message:'PDF 下载失败，请重试。');}
   finally{setBusy(false);}
  }
+ async function convertSavedPdf(){
+  if(busy||loading||!saved||pdfAvailable||revision<=0)return;
+  setBusy(true);setConvertStatus('pending');convertPolls.current=0;
+  setMessage('正在生成专业排版 PDF');
+  try{
+   const task=await requestWordPdfConversion(resume.id,jobId);
+   setConvertStatus(task.status);
+   if(task.status==='done'){
+    setPdfAvailable(true);setLayoutVerified(true);
+    setMessage('PDF 生成成功');
+    window.dispatchEvent(new Event('hhba:word-versions-changed'));
+    setRefresh(n=>n+1);
+   }else if(task.status==='failed'){
+    setMessage('PDF 转换失败，请重试');
+   }
+  }catch(error){setConvertStatus('failed');setMessage(error instanceof Error?error.message:'PDF 转换失败，请重试');}
+  finally{setBusy(false);}
+ }
  async function save(){
   if(!selected||!confirmed||busy||loading||!draft.trim())return;
   rememberPosition();setBusy(true);setMessage('');
@@ -595,6 +650,12 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
       <button type="button" disabled={!pdfAvailable||busy||loading}
        title={pdfAvailable?'下载经渲染器校验的 PDF':'该版本未做专业分页校验，暂不能下载 PDF'}
        onClick={()=>void downloadSavedPdf()}>下载 PDF</button>
+      {saved&&!pdfAvailable&&rendererEnabled&&<button type="button"
+       disabled={busy||loading||convertStatus==='pending'||convertStatus==='running'}
+       title="为当前已保存版本生成专业排版 PDF"
+       onClick={()=>void convertSavedPdf()}>
+       {convertStatus==='pending'||convertStatus==='running'?'正在生成 PDF…':'生成 PDF'}
+      </button>}
      </div>
     </details>
     <details className="hhba-word-menu hhba-original-resume-version-menu">
@@ -741,6 +802,9 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     onClick={()=>void changeRevision('redo')}><Redo2 size={15}/> 重做</button>
    <button type="button" disabled={busy||loading||!pdfAvailable}
     onClick={()=>void downloadSavedPdf()}><Download size={15}/> 下载 PDF</button>
+   {saved&&!pdfAvailable&&rendererEnabled&&<button type="button"
+    disabled={busy||loading||convertStatus==='pending'||convertStatus==='running'}
+    onClick={()=>void convertSavedPdf()}><Download size={15}/> {convertStatus==='pending'||convertStatus==='running'?'正在生成…':'生成 PDF'}</button>}
   </div>}
  </section>;
 }

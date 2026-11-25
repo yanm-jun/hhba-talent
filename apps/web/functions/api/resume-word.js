@@ -71,11 +71,15 @@ async function quotaReady(db){
  ).first();
  return found?.name==='hhba_resume_word_attempts';
 }
+async function accountHash(env,phone){
+ const secret=wordLimitPepper(env);
+ if(typeof secret!=='string'||secret.length<24)return null;
+ return sha256Hex(secret+':word-layout:'+phone);
+}
 async function reserve(db,env,phone,action){
  const now=new Date(),date=now.toISOString().slice(0,10);
- const secret=wordLimitPepper(env);
- if(typeof secret!=='string'||secret.length<24)return false;
- const hash=await sha256Hex(secret+':word-layout:'+phone);
+ const hash=await accountHash(env,phone);
+ if(!hash)return false;
  const result=await db.prepare(
   'INSERT INTO hhba_resume_word_attempts(request_id,day_utc,account_hash,action,created_at) '+
   'SELECT ?,?,?,?,? WHERE (SELECT COUNT(*) FROM hhba_resume_word_attempts '+
@@ -191,6 +195,72 @@ function errorStatus(value){
   value==='WORD_REVISION_CORRUPT'?409:
   value==='WORD_REVISION_LOCK_UNAVAILABLE'?503:422;
 }
+async function tasksReady(db){
+ const found=await db.prepare(
+  "SELECT name FROM sqlite_master WHERE type='table' AND name='hhba_resume_word_render_tasks'"
+ ).first();
+ return found?.name==='hhba_resume_word_render_tasks';
+}
+async function readRenderTask(db,hash,resumeId,jobHash,entryId){
+ return db.prepare('SELECT status,error_code,attempts,updated_at FROM hhba_resume_word_render_tasks '+
+  'WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=?')
+  .bind(hash,resumeId,jobHash,entryId).first();
+}
+async function setRenderTask(db,hash,resumeId,jobHash,entryId,status,errorCode){
+ await db.prepare('UPDATE hhba_resume_word_render_tasks SET status=?,error_code=?,updated_at=? '+
+  'WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=?')
+  .bind(status,errorCode||null,new Date().toISOString(),hash,resumeId,jobHash,entryId).run();
+}
+async function openRenderTask(db,hash,resumeId,jobHash,entryId,now){
+ const existing=await readRenderTask(db,hash,resumeId,jobHash,entryId);
+ if(existing?.status==='failed'){
+  const result=await db.prepare('UPDATE hhba_resume_word_render_tasks SET status=?,error_code=NULL,attempts=attempts+1,updated_at=? '+
+   'WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=? AND status=?')
+   .bind('pending',now,hash,resumeId,jobHash,entryId,'failed').run();
+  return result?.success===true&&result?.meta?.changes===1;
+ }
+ if(existing?.status==='done'){
+  const result=await db.prepare('UPDATE hhba_resume_word_render_tasks SET status=?,error_code=NULL,attempts=0,updated_at=? '+
+   'WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=? AND status=?')
+   .bind('pending',now,hash,resumeId,jobHash,entryId,'done').run();
+  return result?.success===true&&result?.meta?.changes===1;
+ }
+ if(existing)return false;
+ const result=await db.prepare('INSERT INTO hhba_resume_word_render_tasks(account_hash,resume_id,job_scope_hash,entry_id,status,error_code,attempts,created_at,updated_at) '+
+  'SELECT ?,?,?,?,? ,NULL,0,?,? WHERE NOT EXISTS (SELECT 1 FROM hhba_resume_word_render_tasks '+
+  'WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=? AND status IN (\'pending\',\'running\'))')
+  .bind(hash,resumeId,jobHash,entryId,'pending',now,now,hash,resumeId,jobHash,entryId).run();
+ return result?.success===true&&result?.meta?.changes===1;
+}
+// A revision saved without a renderer can be converted later. The worker
+// re-reads the manifest first: an undone, redone or replaced revision must
+// never receive a PDF for a different revision. Verify runs before render,
+// exactly as at save time, so a late PDF is only published when the layout
+// check passes; the manifest entry then becomes layout_verified.
+async function runLateRender(db,bucket,env,phone,hash,row,jobId,jobHash,entry){
+ let pdfKey=null;
+ try{
+  await setRenderTask(db,hash,row.id,jobHash,entry.id,'running',null);
+  const fresh=await approved(bucket,row,jobId,env);
+  if(fresh.saved?.id!==entry.id)throw Error('WORD_REVISION_CONFLICT');
+  const original=await loadBytes(bucket,row);
+  const edited=await versionBytes(bucket,fresh.key,fresh.saved,'docx');
+  const report=await wordRequest(env,'verify',{original,edited,oldText:entry.original,newText:entry.text});
+  const pdf=await wordRequest(env,'render',{original:edited});
+  if(!await stillOwned(db,row,phone))throw Error('RESUME_NOT_FOUND');
+  pdfKey=revisionKey(fresh.key,entry,'pdf');
+  await bucket.put(pdfKey,pdf,{httpMetadata:{contentType:'application/pdf'}});
+  const pdfHash=await shaBytes(pdf);
+  const items=fresh.items.map(item=>item.id===entry.id?
+   {...item,verification:'layout_verified',page_count:report.page_count,
+    preview_sha256:pdfHash}:item);
+  await commitManifest(bucket,fresh,row,fresh.revision,items);
+  await setRenderTask(db,hash,row.id,jobHash,entry.id,'done',null);
+ }catch(error){
+  if(pdfKey)await bucket.delete(pdfKey).catch(()=>{});
+  await setRenderTask(db,hash,row.id,jobHash,entry.id,'failed',code(error)).catch(()=>{});
+ }
+}
 export async function onRequestGet({request,env}){
  const action=new URL(request.url).searchParams.get('action')||'preview';
  const renderer=configured(env),docxOnly=docxOnlyConfigured(env);
@@ -281,6 +351,21 @@ export async function onRequestGet({request,env}){
     word?'HHBA-resume-edited.docx':
      action==='download-pdf'?'HHBA-resume-edited.pdf':'HHBA-resume-edited-preview.pdf');
   }
+  if(action==='convert-status'){
+   const state=await approved(bucket,row,jobId,env);
+   if(!state.saved)return fail('WORD_NOT_EDITED',404);
+   const entry=state.saved;
+   if(entry.verification!=='docx_structure_only')
+    return json({ok:true,status:'done',pdf_available:true,attempts:0,updated_at:entry.updated_at||''});
+   const hash=await accountHash(env,candidate.phone);
+   if(!hash)return fail('WORD_DB_NOT_READY',503);
+   if(!await tasksReady(db))return fail('WORD_DB_NOT_READY',503);
+   const task=await readRenderTask(db,hash,row.id,state.jobHash??'',entry.id);
+   if(!task)return json({ok:true,status:'idle',pdf_available:false,attempts:0,updated_at:''});
+   return json({ok:true,status:task.status,pdf_available:false,
+    ...(task.error_code?{error_code:task.error_code}:{}),
+    attempts:task.attempts,updated_at:task.updated_at});
+  }
   if(action!=='preview')return fail('INVALID_REQUEST',400);
   if(!renderer)return fail('WORD_PDF_NOT_READY',422);
   const key=prefix(row)+'.source.pdf';
@@ -304,7 +389,7 @@ export async function onRequestGet({request,env}){
   return replyFile(rendered,'application/pdf','HHBA-resume-original-preview.pdf');
  }catch(error){const c=code(error);return fail(c,errorStatus(c));}
 }
-export async function onRequestPost({request,env}){
+export async function onRequestPost({request,env,waitUntil}){
  if(!sameOrigin(request))return fail('ORIGIN_REQUIRED',403);
  const renderer=configured(env),docxOnly=docxOnlyConfigured(env);
  if(!renderer&&!docxOnly)return fail('WORD_NOT_READY',503);
@@ -316,7 +401,7 @@ export async function onRequestPost({request,env}){
  try{body=await readSmall(request,v4(env)?2*1024*1024:LIMIT);}catch{return fail('INVALID_REQUEST',400);}
  const id=body?.resume_id,action=body?.action||'edit',jobId=body?.job_id;
  if(!ID.test(String(id||''))||!validJobId(jobId)||
-  !['edit','undo','redo'].includes(action)||
+  !['edit','undo','redo','convert-pdf'].includes(action)||
   body?.confirmed_real!==true||body?.consent_word_processing!==true||
   (body.expected_revision!==undefined&&
    (!Number.isInteger(body.expected_revision)||body.expected_revision<0||
@@ -335,6 +420,38 @@ export async function onRequestPost({request,env}){
   if(body.expected_revision!==undefined&&body.expected_revision!==state.revision)
    return fail('WORD_REVISION_CONFLICT',409);
   if(state.items.length&&!state.etag)return fail('WORD_REVISION_LOCK_UNAVAILABLE',503);
+  if(action==='convert-pdf'){
+   if(!state.saved)return fail('WORD_NOT_EDITED',404);
+   const entry=state.saved;
+   if(entry.verification!=='docx_structure_only')
+    return json({ok:true,status:'done',pdf_available:true,revision:state.revision,
+     total_revisions:state.items.length});
+   if(!renderer)return fail('WORD_RENDERER_REQUIRED',422);
+   const hash=await accountHash(env,candidate.phone);
+   if(!hash)return fail('WORD_DB_NOT_READY',503);
+   if(!await tasksReady(db))return fail('WORD_DB_NOT_READY',503);
+   const jobHash=state.jobHash??'';
+   const existing=await readRenderTask(db,hash,row.id,jobHash,entry.id);
+   if(existing&&(existing.status==='pending'||existing.status==='running'))
+    return json({ok:true,status:existing.status,pdf_available:false,
+     ...(existing.error_code?{error_code:existing.error_code}:{}),
+     attempts:existing.attempts,updated_at:existing.updated_at});
+   if(!v4(env)&&!await reserve(db,env,candidate.phone,'export'))
+    return fail('WORD_DAILY_LIMIT',429);
+   const now=new Date().toISOString();
+   const opened=await openRenderTask(db,hash,row.id,jobHash,entry.id,now);
+   if(!opened)return fail('WORD_BUSY',503);
+   // The conversion continues after the response when the platform offers
+   // background work, so leaving the page does not cancel it; otherwise it
+   // runs inline and the response carries the final status.
+   const work=runLateRender(db,bucket,env,candidate.phone,hash,row,jobId,jobHash,entry);
+   if(typeof waitUntil==='function')waitUntil(work.catch(()=>{}));
+   else await work;
+   const after=await readRenderTask(db,hash,row.id,jobHash,entry.id);
+   return json({ok:true,status:after?.status||'pending',pdf_available:false,
+    ...(after?.error_code?{error_code:after.error_code}:{}),
+    attempts:after?.attempts||0,updated_at:after?.updated_at||now});
+  }
   if(action==='undo'||action==='redo'){
    const next=state.revision+(action==='undo'?-1:1);
    if(next<0||next>state.items.length)return fail('WORD_REVISION_CONFLICT',409);
