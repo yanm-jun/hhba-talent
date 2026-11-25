@@ -1,4 +1,5 @@
-import {v4Provider,v4Call,v4OutputText} from './simple-match-v4.js';
+import {v4Provider,v4Call,v4OutputText,v4ParseJson} from './simple-match-v4.js';
+import {v4PrivateJsonCall} from './v4-research-tools.js';
 /**
  * Server-only AI provider routing. Never expose credentials to the browser.
  * Keep provider model names configurable; vendors change model availability.
@@ -159,7 +160,7 @@ export async function generateSuggestions({env,blocks,job,signal,documentContext
   instructions:explicitCoverage?'严格输出JSON；blockId来自blocks，同一段可有多项连续改动，按执行顺序排列，sourceQuotes引用完整简历真实原文；不改动事实归属。':'严格输出JSON；blockId来自blocks，原段落事实不得改变。'});
  let output;
  if(provider.protocol==='responses'){
-  const reply=await v4Call(fetch,provider,{instructions:system,input},{signal});
+  const reply=await v4PrivateJsonCall(p=>v4Call(fetch,provider,p,{signal}),{instructions:system,input},{parse:v4ParseJson,signal});
   if(reply.status!=='completed')throw new Error('AI_PROVIDER_RESPONSE_TRUNCATED');
   output=v4OutputText(reply);
  }else{

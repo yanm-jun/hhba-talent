@@ -510,3 +510,15 @@ test('planning rebinds historical report to current CV and JD, forwards only rea
  });
  assert.ok(written&&audited);assert.deepEqual(result.pendingIds,[]);
 });
+
+test('typed transient network error automatically resumes only unfinished optimization blocks',async()=>{
+ const {continueDocumentOptimization}=await import('../src/services/resumeOptimizationContinuation.mjs');
+ const seen=[];let attempt=0;
+ const result=await continueDocumentOptimization({blockIds:['a','b'],wait:async()=>{},request:async pending=>{
+  seen.push([...pending]);attempt++;
+  if(attempt===1)return {suggestions:[{blockId:'a'}],pending:['b']};
+  if(attempt===2)throw Object.assign(Error('temporary network error'),{code:'NETWORK_ERROR'});
+  return {suggestions:[{blockId:'b'}],pending:[]};
+ }});
+ assert.deepEqual(seen,[['a','b'],['b'],['b']]);assert.deepEqual(result.map(x=>x.blockId),['a','b']);
+});

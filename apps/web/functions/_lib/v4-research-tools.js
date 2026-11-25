@@ -88,10 +88,10 @@ export async function v4RunResearchActions(actions,opts){
  return out;
 }
 const stageGuide='可调用 research_actions 数组或 research_action 单项工具。除公开来源工具外，{type:"text_page",collection:"resume"|"jd"|"document",offset:字符偏移} 可读取当前任务原文的后续页。原文仅用于本次模型研究，禁止作为搜索词或传往网页工具。若输入显示分页，必须阅读全部相关原文并结合证据再判断。可用 research_notes 保留可核对的阶段研究发现，供后续阶段复用；不得在笔记中记录个人联系方式或复制完整简历，笔记仅为本任务的分析上下文；不能用摘要替代原文证据。当前阶段如需复查网页，使用 read_page；recheck只在全局搜索与复盘阶段执行，不直接改变已核验JD。';
-export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetcher,browser,signal,resume='',jd='',document='',collections={},ledger=[],taskNotes,note=()=>{}}={}){
+export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetcher,browser,signal,resume='',jd='',document='',collections={},ledger=[],taskNotes,note=()=>{},privateOnly=false,initialPaged=false}={}){
  const original=JSON.parse(payload.input);
  const knownUrls=new Set([...sourceUrls,...ledger.map(r=>r.url)].map(v4PublicJobUrl).filter(Boolean));
- const seen=new Set(),stageLedger=[...ledger],notes=Array.isArray(taskNotes)?[...taskNotes]:[];let budget=90000,paged=false,results=null,repeat=false,contextState=v4ContextState(null),evidenceCursor=0;
+ const seen=new Set(),stageLedger=[...ledger],notes=Array.isArray(taskNotes)?[...taskNotes]:[];let budget=90000,paged=initialPaged,results=null,repeat=false,contextState=v4ContextState(null),evidenceCursor=0;
  const originals={resume,jd,document};
  const delivered={resume:[],jd:[],document:[]};
  const remember=(name,start,end)=>{if(end<=start)return;const list=[...delivered[name],[start,end]].sort((a,b)=>a[0]-b[0]);delivered[name]=[];for(const part of list){const last=delivered[name].at(-1);if(last&&part[0]<=last[1])last[1]=Math.max(last[1],part[1]);else delivered[name].push(part);}};
@@ -110,6 +110,7 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
    if(typeof input.resume_text==='string')input.resume_text=textPage('resume').text;
    if(input.job&&typeof input.job.full_jd==='string')input.job={...input.job,full_jd:textPage('jd').text};
    if(typeof input.public_document==='string')input.public_document=textPage('document').text;
+   if(typeof input.private_document==='string')input.private_document=textPage('document').text;
    if(typeof input.before_resume==='string')input.before_resume=textPage('resume').text;
    if(typeof input.after_resume==='string')input.after_resume=textPage('document').text;
    input.original_text_pages=Object.fromEntries(Object.entries(originals).map(([name,value])=>[name,{total_chars:value.length,next_offset:value.length>budget?budget:null}]));
@@ -119,7 +120,7 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
   if(stageLedger.length)input.research_evidence={total:indexPage.total,cursor:indexPage.cursor,next_cursor:indexPage.next_cursor,items:indexPage.items};
   if(notes.length){const latest=v4ResearchMemoryPage([...notes].reverse(),0,Math.max(256,Math.floor(budget/3)));input.research_notes=latest.items.reverse();input.research_notes_index={total:notes.length,collection:'notes',order:'chronological'};}
   let response;
-  try{response=await call({...payload,instructions:payload.instructions+' '+V4_RESEARCH_TOOL_GUIDE+' '+stageGuide,input:JSON.stringify(input)})}
+  try{response=await call({...payload,instructions:payload.instructions+' '+(privateOnly?'本任务仅可访问私有输入分页 text_page（collection=document）、memory（notes/evidence）及 evidence。不得联网、读取URL或向外部工具发送文档。每页内容是原始JSON的一段，按照offset拼接理解；分段时先记录可核对的当前任务研究笔记，再请求未读页；可以回查精确原文，最终保留原任务输出JSON格式。':V4_RESEARCH_TOOL_GUIDE+' '+stageGuide),input:JSON.stringify(input)})}
   catch(e){
    if(e?.code!=='AI_PROVIDER_CONTEXT_TOO_LARGE'||budget<=256)throw e;
    contextState=v4ContextFeedback(contextState,{rejected:true});budget=contextState.budget;paged=true;results=null;seen.clear();note('AI_STAGE_CONTEXT_REPAGED');continue;
@@ -141,6 +142,7 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
   }
   let fresh=false;
   results=await v4RunResearchActions(actions,{collections:{...collections,evidence:v4EvidenceIndex(stageLedger),notes},ledger:stageLedger,knownUrls,fetcher,browser,signal,budget,onAction:async(action,run,limit)=>{
+   if(privateOnly&&!(action.type==='text_page'||action.type==='evidence'||(action.type==='memory'&&['notes','evidence'].includes(action.collection))))return {type:action.type,ok:false,error:'PRIVATE_TASK_LOCAL_TOOLS_ONLY'};
    const key=JSON.stringify([budget,action.type,action.collection,action.cursor,action.url,action.mode,action.offset,action.index,action.discover===true]);
    const repeated=seen.has(key);
    if(repeated&&!(action.type==='read_page'&&action.refresh===true))return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
@@ -153,6 +155,8 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
   }});
   if(fresh){repeat=false;continue;}
   if(repeat){
+   const unread=paged?Object.keys(originals).find(name=>missing(name)!==null):null;
+   if(unread){results=[textPage(unread,missing(unread))];stageLedger.push(results[0]);repeat=false;note('AI_STAGE_RECOVERED_UNREAD_PAGE');continue;}
    const alternatives={type:'research_recovery',ok:false,error:'REPEATED_UNCHANGED_REQUEST',guidance:'改用不同的公开来源、查询、分页偏移或已保存证据；无需重复完全相同的工具请求。'};
    if(results.some(r=>r?.type==='research_recovery'))throw Object.assign(new Error('AI_STAGE_REPEATED_TOOL_REQUEST'),{code:'AI_STAGE_REPEATED_TOOL_REQUEST'});
    if(repeat==='alternate')throw Object.assign(new Error('AI_STAGE_REPEATED_TOOL_REQUEST'),{code:'AI_STAGE_REPEATED_TOOL_REQUEST'});
@@ -160,4 +164,14 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
   }
   repeat=true;
  }
+}
+
+// Word/OCR-style private JSON analysis: preserve the normal request when the
+// provider accepts it. On an actual context rejection, expose the complete
+// original JSON through local pages; no web tool, logging or public ledger.
+// All final suggestions still pass the existing independent factual audit.
+export async function v4PrivateJsonCall(call,payload,{parse,signal,note=()=>{}}={}){
+ try{return await call(payload);}catch(e){if(e?.code!=='AI_PROVIDER_CONTEXT_TOO_LARGE')throw e;}
+ const original=payload.input;
+ return v4StageResearchCall(call,{...payload,tools:[],instructions:payload.instructions+' 原输入超过当前模型上下文容量。private_document 是原任务完整 JSON 的分页文本，不是网页。先阅读各页，再按原任务要求生成输出。',input:JSON.stringify({private_document:original})},{parse,signal,document:original,privateOnly:true,initialPaged:true,note});
 }

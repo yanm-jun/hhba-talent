@@ -371,7 +371,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   * summary-based behavior, explicitly labelled as incomplete evidence.
   */
  async function jobContextForAI(signal:AbortSignal):Promise<JdAwareJob>{
-  const title=(job.title_zh||job.title).slice(0,180);
+  const title=job.title_zh||job.title;
   if(!postingScope)throw Error('岗位官网地址无效，已阻止可能串岗的简历优化。');
   if(job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job.reference_jd?.trim()&&job.reference_jd_basis?.trim())return {title,requirements:job.reference_jd,official_url:job.official_url,reference_jd_kind:job.reference_jd_kind,reference_jd_basis:job.reference_jd_basis};
   if(requireVerifiedJd&&(!job.jd_version_id||!job.jd_sha256))
@@ -466,7 +466,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    const trustedJob=await jobContextForAI(controller.signal);
    if(controller.signal.aborted)return;
    const targetedJob={
-    ...trustedJob,title:trustedJob.title.slice(0,120),
+    ...trustedJob,title:trustedJob.title,
     requirements:trustedJob.requirements
    };
    // Use the authenticated current DOCX body as the full-document context, not
@@ -476,7 +476,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     if(!postingScope||!wordRevisionSnapshot)throw Error('请等待当前 Word 版本读取完成。');
     const revisionKey=lastWordRevisionKey.current;
     const current=await wordSourceBytes(sourceResume.id,wordRevisionSnapshot.revision,postingScope);
-    context=redactResumeTextLocally(await extractDocxText(new Uint8Array(current).buffer));
+    context=redactResumeTextLocally(await extractDocxText(new Uint8Array(current).buffer,{unrestricted:requireVerifiedJd}));
     if(controller.signal.aborted)return;
     if(revisionKey!==lastWordRevisionKey.current)throw Error('Word 版本已变化，请重新生成优化建议。');
     if(!context.trim())throw Error('当前 Word 正文为空，无法执行完整简历优化。');

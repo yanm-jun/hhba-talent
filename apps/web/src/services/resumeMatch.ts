@@ -239,7 +239,7 @@ export async function inspectResumeTextLocally(file:File,signal?:AbortSignal):Pr
   const buffer=await file.arrayBuffer();
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
   const pdf=format==='pdf'?await extractPdfText(buffer,{signal,unrestricted:MATCH_V4_PREVIEW}):null;
-  const value=pdf?.text??await extractDocxText(buffer);
+  const value=pdf?.text??await extractDocxText(buffer,{unrestricted:MATCH_V4_PREVIEW});
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
   const text=redactResumeTextLocally(value);
   return {text,needsOcr:pdf?.hasTextlessPages===true||text.replace(/\s/g,'').length<30};
