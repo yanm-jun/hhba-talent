@@ -78,7 +78,18 @@ export async function onRequest({request,env}){
  const [expiry,token]=raw.split(':');
  if(request.method!=='GET'||!token||token.length<48||!Number.isFinite(Number(expiry))||Date.now()>Number(expiry)||!await equal(request.headers.get('X-HHBA-Probe')||'',token))return reply({error:'NOT_FOUND'},404);
  const provider=geminiJobProvider(env);
- if(!provider)return reply({error:'AI_PROVIDER_NOT_CONFIGURED'},503);
+ if(!provider){
+  // Only reachable after the short-lived operator authentication above.
+  // Report boolean validation results, never credentials or their lengths.
+  const model=typeof env.GEMINI_MODEL==='string'?env.GEMINI_MODEL.trim():'';
+  let endpointValid=false;
+  try{const u=new URL(env.GOOGLE_GEMINI_BASE_URL||'https://api-c.reqtoken.com');endpointValid=u.protocol==='https:'&&!u.username&&!u.password&&!u.search&&!u.hash;}catch{}
+  return reply({ok:false,error:'AI_PROVIDER_NOT_CONFIGURED',configuration:{
+   key_present:typeof env.GEMINI_API_KEY==='string'&&!!env.GEMINI_API_KEY.trim(),
+   model_present:!!model,model_valid:!!model&&/^[-a-zA-Z0-9_.]+$/.test(model),
+   endpoint_valid:endpointValid
+  }},503);
+ }
  const phase=new URL(request.url).searchParams.get('phase')||'basic';
  if(!['basic','search','pipeline','stream','url_context','metadata','cache'].includes(phase))return reply({error:'INVALID_PROBE_PHASE'},400);
  const start=Date.now();
