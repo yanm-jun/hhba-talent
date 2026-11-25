@@ -18,6 +18,8 @@ const job={
  reference_score:76,match_score:76,
  jd_version_id:'jd_'+'a'.repeat(32),jd_sha256:'b'.repeat(64),
  jd_source_status:'VERIFIED_JD',jd_score_status:'AI_VERIFIED_JD_SCORED',
+ source_type:'站外官方招聘',evidence_status:'VERIFIED_FULL_JD',score_evidence_status:'GROUNDED_JD_RESUME_QUOTES',
+ evidence_excerpt:'岗位职责：负责门店运营、培训和数据分析。任职要求：具备门店运营经验。',requirements_basis:'具备门店运营经验。',
  matched:['曾负责门店运营及数据整理'],not_evidenced:[],
  needs_verification:[],score_basis:'合成测试用岗位，不代表真实招聘信息',
  recommendation_reason:'用于验证 Word 优化工作区的显示、编辑和隐私授权',

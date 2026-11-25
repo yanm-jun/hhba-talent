@@ -554,3 +554,19 @@
 .hhba-match-terminate{margin-left:auto;background:transparent;border:1px solid #ead4d9;border-radius:9px;color:#b42332;padding:10px 15px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
 .hhba-match-terminate:hover{background:#fff4f5;border-color:#e5b7c1}
 @media(max-width:640px){.hhba-match-modal-foot:has(.hhba-match-terminate)>span{display:none}.hhba-match-terminate{margin-left:0}.hhba-match-modal-foot:has(.hhba-match-terminate){justify-content:flex-end}}
+
+/* Stage 03: prioritize the actual JD, not the report masthead. */
+.hhba-refined-stage[data-stage="2"]{padding:12px 16px}
+.hhba-compact-report-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hhba-compact-report-head h2{margin:0;color:#162e48;font-size:17px;line-height:1.4;font-weight:650}
+.hhba-compact-report-head button{font-size:11px;color:#376a9d;white-space:nowrap;padding:3px 6px}
+.hhba-refined-stage[data-stage="2"] .hhba-score-metrics{margin:8px 0 4px;padding:7px 0}
+.hhba-refined-stage[data-stage="2"] .hhba-score-metrics small{margin:0;font-size:11px}
+.hhba-refined-stage[data-stage="2"] .hhba-score-metrics strong{font-size:22px;line-height:1.2}
+.hhba-refined-stage[data-stage="2"] .hhba-report-pager{margin:2px 0 6px;padding:0;gap:14px;color:#175bb5;font-size:13px}
+.hhba-refined-stage[data-stage="2"] .hhba-report-pager strong{color:#175bb5}
+.hhba-refined-stage[data-stage="2"] .hhba-report-pager-side{width:28px;height:28px}
+.hhba-refined-stage[data-stage="2"] .hhba-curated-card{margin:0;padding:14px 16px}
+.hhba-compact-disclaimer{margin:6px 0 0;font-size:11px}
+.hhba-unverified-records>details{padding:6px 0}
+@media(max-width:640px){.hhba-refined-stage[data-stage="2"]{padding:9px 8px}.hhba-compact-report-head h2{font-size:15px}.hhba-refined-stage[data-stage="2"] .hhba-score-metrics small{font-size:10px}.hhba-refined-stage[data-stage="2"] .hhba-curated-card{padding:12px 10px}}

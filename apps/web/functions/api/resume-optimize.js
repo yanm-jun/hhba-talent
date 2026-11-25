@@ -59,7 +59,7 @@ function valid(body,env){
  if(!body||Array.isArray(body)||typeof body!=='object'||body.consent_ai!==true||
   !Array.isArray(body.blocks)||body.blocks.length<1)return false;
  if(!body.job||typeof body.job!=='object'||typeof body.job.title!=='string'||
-  body.job.title.length<2||body.job.title.length>120||
+  !body.job.title.trim()||(env?.HHBA_MATCH_V4_READY!=='1'&&(body.job.title.length<2||body.job.title.length>120))||
   typeof body.job.requirements!=='string'||(env?.HHBA_MATCH_V4_READY!=='1'&&body.job.requirements.length>16000))return false;
  const doc=body.full_document;
  if(doc===undefined&&body.blocks.length>MAX_BLOCKS)return false;

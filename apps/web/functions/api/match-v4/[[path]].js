@@ -7,13 +7,13 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
-import {v4Provider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
+import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {recognizeV4Resume} from '../../_lib/v4-resume-ocr.js';
 import {checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint,matchTaskKey,saveMatchTask,readMatchTask} from '../../_lib/v4-match-checkpoint-storage.js';
 import {claimAiCheckpoint,leaseMatchTask} from '../../_lib/ai-checkpoint-claim.js';
 import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
-import {getSessionTask,updateSessionTask,assertSessionTaskActive} from '../../_lib/v4-session-match-task.js';
+import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSessionTask} from '../../_lib/v4-session-match-task.js';
 import {backgroundEnabled,scheduleBackgroundMatch,loadBackgroundMatch} from '../../_lib/v4-background-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -35,6 +35,7 @@ const allowedHost=request=>{
 const enabled=(env,request)=>allowedHost(request)&&env?.HHBA_MATCH_V4_READY==='1'&&
  Boolean(v4Provider(env))&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
+const matchEnabled=(env,request)=>enabled(env,request)&&Boolean(v4JobProvider(env));
 const sanitize=(raw)=>{
  if(typeof raw!=='string')return null;
  const text=redactForModel(raw.trim(),Infinity);
@@ -89,7 +90,7 @@ function events(env,request,input,waitUntil){
    // Managed tasks are not cancelled simply because a browser transport closes.
    // Pages waitUntil is best effort; durable checkpoints still provide recovery.
    const executionSignal=input.managed?leaseAbort.signal:input.lease?AbortSignal.any([request.signal,leaseAbort.signal]):request.signal;
-   const guard=async()=>{if(input.managed)await assertSessionTaskActive(env,input.session,input.taskId,input.generation);};
+   const guard=async()=>{if(input.managed)await renewActiveSessionTask(env,input.session,input.taskId,input.generation);};
    let guardBusy=false;
    const guardTimer=input.managed?setInterval(()=>{if(guardBusy)return;guardBusy=true;guard().catch(e=>leaseAbort.abort(e)).finally(()=>{guardBusy=false});},12000):null;
    async function releaseTask(){if(input.lease){const lease=input.lease;input.lease=null;await lease.release();}}
@@ -108,9 +109,9 @@ function events(env,request,input,waitUntil){
      // Keep one durable phase per Pages invocation. The hosting platform's
      // subrequest budget resets on the next continuation, not on a JS loop.
      await guard();
-     const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
+     const result=await v4Match(fetch,v4JobProvider(env),input.text,input.role_hint,{
       signal:executionSignal,onProgress:progress,onActivity:activity,env,excludeUrls:input.excludeUrls,
-      stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
+      stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,parallelResearch:env.HHBA_V4_PARALLEL_RESEARCH==='1'||(env.HHBA_V4_JOB_PROVIDER==='gemini'&&env.HHBA_V4_PARALLEL_RESEARCH!=='0'),allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
       onResearch:sendResearch,
       onPartial:matches=>{sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
      if(executionSignal.aborted)throw executionSignal.reason||Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
@@ -185,7 +186,7 @@ function events(env,request,input,waitUntil){
 // the browser. A second driver can never run the same leased phase in parallel.
 async function backgroundStep(env,request,waitUntil){
  if(!backgroundEnabled(env,request)||request.method!=='POST')return fail('NOT_FOUND',404);
- if(!enabled(env,request))return fail('MATCH_NOT_ENABLED',503);
+ if(!matchEnabled(env,request))return fail('MATCH_NOT_ENABLED',503);
  let ticket;
  try{const raw=await request.text();if(raw.length>256)return fail('INVALID_REQUEST',400);ticket=JSON.parse(raw)?.ticket;}catch{return fail('INVALID_REQUEST',400);}
  let input;
@@ -194,7 +195,7 @@ async function backgroundStep(env,request,waitUntil){
   input={managed:true,background:true,session,taskId:task.id,taskKey,generation:task.generation,text:task.text,role_hint:task.role,excludeUrls:task.excludeUrls,phone:session.phone,resume_id:task.resume_id};
   input.lease=await leaseMatchTask(env.HHBA_PNVS_AUTH_DB,taskKey);
   if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
-  const saved=await readMatchTask(env,taskKey);
+  const saved=await readMatchTask(env,taskKey,Date.now(),{renewGeneration:task.generation});
   if(saved?.generation===task.generation&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
   else if(saved?.generation===task.generation&&saved?.checkpoint)input.checkpoint=saved.checkpoint;
   else if(saved?.result?.status==='COMPLETE'&&saved.checkpoint&&saved.generation+1===task.generation){
@@ -209,7 +210,7 @@ export async function onRequest(context){
  const path=new URL(request.url).pathname;
  const suffix=path.slice('/api/match-v4'.length).replace(/\/$/,'')||'/';
  if(suffix==='/status'&&request.method==='GET')
-  return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:enabled(env,request),
+  return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:matchEnabled(env,request),
    scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],resumable:!!checkpointEnv(env),encrypted_checkpoint_storage:checkpointStorageReady(env),dynamic_page_reader:typeof env.BROWSER?.quickAction==='function'});
  if(suffix==='/background-step')return backgroundStep(env,request,waitUntil);
  const activeTaskRoute=suffix==='/active-task';
@@ -246,13 +247,15 @@ export async function onRequest(context){
   if(!checkpointStorageReady(env))return fail('AI_CHECKPOINT_DB_UNAVAILABLE',503);
   const action=body?.action;
   if(!['start','continue','close','cancel'].includes(action))return fail('INVALID_REQUEST',400);
-  if(action==='start'&&(!enabled(env,request)||body?.consent!==true||body?.recovery_consent!==true||body?.options?.country!=='CN'))return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
+  if(action==='start'&&!matchEnabled(env,request))return fail('AI_PROVIDER_NOT_CONFIGURED',503);
+  if(action==='start'&&(body?.consent!==true||body?.recovery_consent!==true||body?.options?.country!=='CN'))return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
   const text=action==='start'?sanitize(body.text):null;
   if(action==='start'&&!text)return fail('INVALID_RESUME_TEXT',400);
   const entry=action==='start'?{id:body.task_id,text,role:typeof body.options.role_hint==='string'?body.options.role_hint.trim():'',excludeUrls:[],resume_id:body.resume_id||null}:{id:body.task_id,generation:body.generation};
   try{const task=await updateSessionTask(env,session,action,entry);if(task&&backgroundEnabled(env,request))await scheduleBackgroundMatch(env,session,task);return reply({ok:true,task});}catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
  }
- // The third-party relay is not OpenAI official infrastructure.
+ if(!matchEnabled(env,request))return fail('AI_PROVIDER_NOT_CONFIGURED',503);
+ // The third-party relay is not OpenAI or Google official infrastructure.
  if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
  if(body?.options?.country!=='CN')return fail('INVALID_REQUEST',400);
  const resume=sanitize(body.text);
@@ -280,7 +283,7 @@ export async function onRequest(context){
    }
    input.lease=await leaseMatchTask(db,input.taskKey);
    if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
-   const saved=await readMatchTask(env,input.taskKey);
+   const saved=await readMatchTask(env,input.taskKey,Date.now(),input.managed?{renewGeneration:generation}:{});
    if(!Number.isSafeInteger(generation)||generation<0||generation>(saved?.generation||0)+1){await input.lease.release();return fail('AI_CHECKPOINT_INVALID',409);}
    input.generation=generation;
    if(generation===(saved?.generation||0)&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;

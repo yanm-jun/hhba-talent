@@ -6,6 +6,9 @@ export async function continueDocumentOptimization({blockIds,wanted,reviewFeedba
  const initialCount=pending.length, suggestions=new Map();
  let directions=Object.fromEntries(Object.entries(reviewFeedback).filter(([id,value])=>pending.includes(id)&&typeof value==='string'));
  const stalledStates=new Set();
+ let retryDelay=2500;
+ const rateLimited=error=>error?.code==='AI_PROVIDER_RATE_LIMITED';
+ const retry=async(error)=>{onQueued?.();await wait(signal,Math.max(retryDelay,error?.retryAfterMs||0));retryDelay=Math.min(60000,retryDelay*2);};
  const emit=()=>onCheckpoint?.({pending:[...pending],suggestions:[...suggestions.values()],...(Object.keys(directions).length?{reviewFeedback:{...directions}}:{})});
  const paused=error=>{
   emit();
@@ -18,7 +21,7 @@ export async function continueDocumentOptimization({blockIds,wanted,reviewFeedba
   if(signal?.aborted)throw signal.reason;
   let result;
   try{result=await request([...pending],{...directions});}
-  catch(error){if(signal?.aborted)throw signal.reason;return paused(error);}
+  catch(error){if(signal?.aborted)throw signal.reason;if(rateLimited(error)){await retry(error);continue;}return paused(error);}
   if(signal?.aborted)throw signal.reason;
   if(result.queued){
    onQueued?.();await wait(signal);continue;
@@ -40,7 +43,9 @@ export async function continueDocumentOptimization({blockIds,wanted,reviewFeedba
   }));
   pending=next;emit();
   if(!pending.length)break;
+  if(rateLimited(result.pauseError)){await retry(result.pauseError);continue;}
   if(result.pauseError){onPaused?.(result.pauseError);break;}
+  retryDelay=2500;
   if(stalled){
    const signature=JSON.stringify([...pending].sort().map(id=>[id,directions[id]||'']));
    if(stalledStates.has(signature)){

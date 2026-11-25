@@ -2,14 +2,16 @@
 // Mozilla PDF.js. Nothing is sent to AI, third-party CDNs, or the extension.
 // Parser and worker are bundled as first-party assets by Vite.
 export const PDF_MAX_BYTES=12*1024*1024;
+// Browser memory boundary for page-by-page processing, not an AI quota.
+export const PDF_PAGE_OCR_MAX_BYTES=64*1024*1024;
 export const PDF_MAX_PAGES=150;
 export const PDF_MAX_TEXT=250000;
 export class PDFResumeError extends Error{
  constructor(code,message){super(message);this.code=code;this.name="PDFResumeError";}
 }
-export function assertPdfBytes(buffer){
+export function assertPdfBytes(buffer,maxBytes=PDF_MAX_BYTES){
  if(!(buffer instanceof ArrayBuffer)||buffer.byteLength<32||
-  buffer.byteLength>PDF_MAX_BYTES)throw new PDFResumeError("PDF_SIZE","PDF 文件大小必须在 12 MB 以内。");
+  buffer.byteLength>maxBytes)throw new PDFResumeError("PDF_SIZE","PDF 文件超过当前本地解析容量。");
  const bytes=new Uint8Array(buffer,0,Math.min(1024,buffer.byteLength));
  let header=false;
  for(let i=0;i<=bytes.length-5;i++){
@@ -120,4 +122,46 @@ export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs}={
   if(signal)signal.removeEventListener("abort",abort);
   if(task)await task.destroy().catch(()=>{});
  }
+}
+
+// One real page at a time; never split PDF bytes into invalid documents.
+// The existing consent-gated OCR endpoint sees only the rendered page.
+export async function recognizePdfPages(buffer,{signal,recognize,loadPdfJs=firstPartyPdfJs}={}){
+ assertPdfBytes(buffer,PDF_PAGE_OCR_MAX_BYTES);
+ if(signal?.aborted)throw abortError();
+ const pdf=await loadPdfJs();
+ const task=pdf.getDocument({data:new Uint8Array(buffer.slice(0)),enableScripting:false,isEvalSupported:false,enableXfa:false,disableAutoFetch:true,disableStream:true,stopAtErrors:true,useSystemFonts:false});
+ const abort=()=>{void task.destroy().catch(()=>{});};
+ signal?.addEventListener('abort',abort,{once:true});
+ const texts=[];let partial=false;
+ try{
+  const document=await task.promise;
+  if(!Number.isInteger(document.numPages)||document.numPages<1)throw new PDFResumeError('PDF_INVALID','PDF 页数无效。');
+  for(let n=1;n<=document.numPages;n++){
+   if(signal?.aborted)throw abortError();
+   const page=await document.getPage(n);
+   const canvas=globalThis.document.createElement('canvas');
+   try{
+    const size=page.getViewport({scale:1});
+    // Bound the decoded image memory per page. Render sufficiently detailed
+    // images for ordinary CV pages; an unusually large page remains reviewable.
+    const scale=Math.min(3,Math.sqrt(12000000/(size.width*size.height)));
+    const viewport=page.getViewport({scale});
+    canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+    const ctx=canvas.getContext('2d',{alpha:false});
+    if(!ctx)throw Error('PDF_CANVAS_UNAVAILABLE');
+    await page.render({canvas,canvasContext:ctx,viewport}).promise;
+    if(signal?.aborted)throw abortError();
+    const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('PDF_PAGE_ENCODE_FAILED')),'image/jpeg',0.94));
+    const result=await recognize(blob,n);
+    if(typeof result?.text!=='string'||!result.text.trim())throw Error('OCR_NO_TEXT');
+    texts.push(result.text);partial=partial||result.partial===true;
+   }catch(e){
+    if(signal?.aborted)throw abortError();
+    if(!texts.length)throw e;
+    texts.push('[第 '+n+' 页尚未识别，请核对原件及剩余页面]');partial=true;break;
+   }finally{canvas.width=0;canvas.height=0;page.cleanup?.();}
+  }
+  return {text:texts.join('\n'),partial};
+ }finally{signal?.removeEventListener('abort',abort);await task.destroy().catch(()=>{});}
 }

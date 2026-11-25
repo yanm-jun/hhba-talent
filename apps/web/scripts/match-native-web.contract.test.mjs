@@ -372,7 +372,7 @@ test('frontend shows partial results without pretending network completion',asyn
  assert.match(dialog,/!pending&&activeJob&&parsedProfile/);
  assert.match(dialog,/已形成 \{result\.matches\.length\} 个正式推荐/);
  const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
- assert.match(panels,/已收到岗位/);
+ assert.match(panels,/已发现/);assert.match(panels,/官方 JD 已核验/);
 });
 
 

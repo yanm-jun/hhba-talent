@@ -25,7 +25,7 @@ export async function updateSessionTask(env,session,action,input){
    // Concurrent tabs attach to the existing task. They never replace its CV.
    if(current)return current;
    if(await readMatchTask(env,await cancelKey(env,session,input.id)))throw taskError('AI_AGENT_CANCELLED');
-   const task={...input,generation:0,started_at:Date.now()};
+   const task={...input,generation:0,started_at:Date.now(),renewed_at:Date.now()};
    await saveMatchTask(env,slot,task);
    return task;
   }
@@ -48,7 +48,7 @@ export async function updateSessionTask(env,session,action,input){
   if(action==='continue'){
    const saved=await readMatchTask(env,await researchTaskKey(env,session,current));
    if(saved?.generation!==current.generation||saved?.result?.status!=='COMPLETE'||!saved.result.can_continue||!saved.checkpoint)throw taskError('AI_CHECKPOINT_INVALID');
-   const next={...current,generation:current.generation+1};
+   const next={...current,generation:current.generation+1,renewed_at:Date.now()};
    await saveMatchTask(env,slot,next);
    return next;
   }
@@ -63,4 +63,20 @@ export async function assertSessionTaskActive(env,session,id,generation){
  const task=await getSessionTask(env,session);
  if(!task||task.id!==id||task.generation!==generation)throw taskError('AI_AGENT_CANCELLED');
  return task;
+}
+
+// Refresh only a still-authorized active slot under the same lease as cancel/close.
+// Login validity and abandoned/completed record expiry are never extended blindly.
+export async function renewActiveSessionTask(env,session,id,generation,now=Date.now()){
+ const active=await assertSessionTaskActive(env,session,id,generation);
+ if(now-(active.renewed_at||active.started_at||0)<3600000)return active;
+ const slot=await sessionTaskSlot(env,session),lease=await leaseMatchTask(env.HHBA_PNVS_AUTH_DB,slot);
+ if(!lease)return active;
+ try{
+  const current=await assertSessionTaskActive(env,session,id,generation);
+  if(now-(current.renewed_at||current.started_at||0)<3600000)return current;
+  const refreshed={...current,renewed_at:now};
+  await saveMatchTask(env,slot,refreshed,now);
+  return refreshed;
+ }finally{await lease.release();}
 }

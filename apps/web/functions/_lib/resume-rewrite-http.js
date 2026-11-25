@@ -27,19 +27,20 @@ export function rewriteOriginOK(request){
  return request.headers.get('Origin')===url.origin&&
   request.headers.get('Sec-Fetch-Site')!=='cross-site';
 }
-export async function rewriteRequestJson(request){
+export async function rewriteRequestJson(request,env){
+ const maxBody=env?.HHBA_MATCH_V4_READY==='1'?16*1024*1024:MAX_BODY;
  if(!/^application\/json(?:;|$)/i.test(request.headers.get('Content-Type')||''))
   throw Error('INVALID_REQUEST');
  const declared=request.headers.get('Content-Length');
  if(!request.body||declared!==null&&
-  (!/^\d+$/.test(declared)||Number(declared)>MAX_BODY))
+  (!/^\d+$/.test(declared)||Number(declared)>maxBody))
   throw Error('INVALID_REQUEST');
  const reader=request.body.getReader(),chunks=[];let total=0;
  try{
   for(;;){
    const chunk=await reader.read();if(chunk.done)break;
    total+=chunk.value.byteLength;
-   if(total>MAX_BODY){await reader.cancel();throw Error('INVALID_REQUEST');}
+   if(total>maxBody){await reader.cancel();throw Error('INVALID_REQUEST');}
    chunks.push(chunk.value);
   }
  }finally{reader.releaseLock();}

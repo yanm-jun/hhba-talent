@@ -30,7 +30,7 @@ export async function onRequestPost({request,env}){
  catch(e){return reject(e?.message==='FORBIDDEN'?'FORBIDDEN':'SESSION_INVALID',
   e?.message==='FORBIDDEN'?403:401);}
  let body;
- try{body=await boundedJson(request);}
+ try{body=await boundedJson(request,env);}
  catch{return reject('INVALID_REQUEST',400);}
  if(body?.consent_ai!==true)return reject('AI_CONSENT_REQUIRED',400);
  let trustedJob;
