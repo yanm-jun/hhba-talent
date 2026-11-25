@@ -77,6 +77,14 @@ def live_match_health(*, allow_transient_outage: bool) -> None:
             report = json.loads(reports[0])
         except (ValueError, TypeError):
             report = None
+        if isinstance(report, dict) and report == {"status": "MISSING_RELAY_KEY"}:
+            # Pages encrypted runtime secrets are not guaranteed to exist in
+            # the build process. Do not copy them into public build variables.
+            # Keep the existing provider unchanged until authenticated runtime
+            # acceptance; strict diagnostic builds still fail closed.
+            print("HHBA_RELEASE_AI_HEALTH=DEFERRED_RUNTIME_SECRET; "
+                  "real AI acceptance NOT passed; verify protected runtime probe", flush=True)
+            return
         if isinstance(report, dict) and external_health_degraded(report):
             print("HHBA_RELEASE_AI_HEALTH=DEGRADED_TRANSIENT_UPSTREAM; "
                   "real AI acceptance NOT passed; continuing independent code release", flush=True)
