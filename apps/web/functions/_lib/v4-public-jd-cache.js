@@ -4,7 +4,7 @@
 import {sha256Hex} from './real-auth.js';
 const FRESH=24*60*60*1000;
 const text=v=>typeof v==='string'?v.trim():'';
-const strong=v=>typeof v==='string'&&/^"[^"\\r\\n]+"$/.test(v)&&!v.startsWith('W/');
+const strong=v=>typeof v==='string'&&/^"[^"\r\n]+"$/.test(v)&&!v.startsWith('W/');
 const identity=(url,expected)=>JSON.stringify([url,text(expected?.company),text(expected?.title||expected?.role),text(expected?.location||expected?.city)]);
 const key=async(url,expected)=>'official-jds/v4-conditional/'+await sha256Hex(identity(url,expected))+'.json';
 const eligible=jd=>jd?.proof_method==='V4_STRUCTURED_JOBPOSTING'&&jd.source_confirmed===true&&jd.independently_read===true&&!!text(jd.full_jd)&&!!text(jd.company)&&!!text(jd.title)&&!!text(jd.location);
