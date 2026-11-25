@@ -226,3 +226,20 @@ test('reference score repairs missing evidence without dropping confirmed vacanc
  const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
  assert.equal(calls,2);assert.equal(result.checkpoint.matches[0].match_score,86);assert.equal(result.checkpoint.matches[0].reference_jd_kind,'AI_GENERATED_REFERENCE');
 });
+
+test('candidate research notes merge across parallel checkpoints without crossing candidate identity or revision',async()=>{
+ const {candidateResearchMemory,candidateRevision,mergeCandidateResearchMemory}=await import('../functions/_lib/v4-research-pipeline.js');
+ const a=job(1),b=job(2),rows=[[a.url,a],[b.url,b]];
+ const left=candidateResearchMemory();left.notes(a.url,candidateRevision(a)).push('official public source a');
+ left.notes(b.url,candidateRevision(b)).push('official public source b');
+ const right=candidateResearchMemory(structuredClone(left.snapshot()));
+ right.notes(a.url,candidateRevision(a),'analysisNotes').push('candidate a assessment');
+ assert.deepEqual(right.notes(a.url,candidateRevision(a)),['official public source a']);
+ assert.deepEqual(right.notes(b.url,candidateRevision(b),'analysisNotes'),['official public source b']);
+ const merged=candidateResearchMemory(mergeCandidateResearchMemory(left.snapshot(),right.snapshot(),rows));
+ assert.deepEqual(merged.notes(a.url,candidateRevision(a),'analysisNotes'),['official public source a','candidate a assessment']);
+ assert.deepEqual(merged.notes(b.url,candidateRevision(b),'analysisNotes'),['official public source b']);
+ const changed={...a,requirements:'updated requirements'};
+ assert.deepEqual(merged.notes(a.url,candidateRevision(changed),'analysisNotes'),[]);
+ assert.equal(mergeCandidateResearchMemory(left.snapshot(),right.snapshot(),[[a.url,changed],[b.url,b]]).length,1);
+});

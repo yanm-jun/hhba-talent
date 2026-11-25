@@ -91,7 +91,7 @@ const stageGuide='可调用 research_actions 数组或 research_action 单项工
 export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetcher,browser,signal,resume='',jd='',document='',collections={},ledger=[],taskNotes,note=()=>{},privateOnly=false,initialPaged=false}={}){
  const original=JSON.parse(payload.input);
  const knownUrls=new Set([...sourceUrls,...ledger.map(r=>r.url)].map(v4PublicJobUrl).filter(Boolean));
- const seen=new Set(),stageLedger=[...ledger],notes=Array.isArray(taskNotes)?[...taskNotes]:[];let budget=90000,paged=initialPaged,results=null,repeat=false,contextState=v4ContextState(null),evidenceCursor=0;
+ const seen=new Set(),stageLedger=[...ledger],notes=Array.isArray(taskNotes)?[...taskNotes]:[];let budget=90000,paged=initialPaged,results=null,repeat=false,contextState=v4ContextState(null),evidenceCursor=0,notesCursor=0;
  const originals={resume,jd,document};
  const delivered={resume:[],jd:[],document:[]};
  const remember=(name,start,end)=>{if(end<=start)return;const list=[...delivered[name],[start,end]].sort((a,b)=>a[0]-b[0]);delivered[name]=[];for(const part of list){const last=delivered[name].at(-1);if(last&&part[0]<=last[1])last[1]=Math.max(last[1],part[1]);else delivered[name].push(part);}};
@@ -118,7 +118,8 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
   if(results)input.research_tool_results=results;
   const indexPage=v4RotatingMemoryPage(v4EvidenceIndex(stageLedger),evidenceCursor,Math.max(256,Math.floor(budget/3)));
   if(stageLedger.length)input.research_evidence={total:indexPage.total,cursor:indexPage.cursor,next_cursor:indexPage.next_cursor,items:indexPage.items};
-  if(notes.length){const latest=v4ResearchMemoryPage([...notes].reverse(),0,Math.max(256,Math.floor(budget/3)));input.research_notes=latest.items.reverse();input.research_notes_index={total:notes.length,collection:'notes',order:'chronological'};}
+  const notesPage=v4RotatingMemoryPage(notes,notesCursor,Math.max(256,Math.floor(budget/3)));
+  if(notes.length){input.research_notes=notesPage.items;input.research_notes_index={total:notes.length,collection:'notes',order:'chronological',cursor:notesPage.cursor,next_cursor:notesPage.next_cursor};}
   let response;
   try{response=await call({...payload,instructions:payload.instructions+' '+(privateOnly?'本任务仅可访问私有输入分页 text_page（collection=document）、memory（notes/evidence）及 evidence。不得联网、读取URL或向外部工具发送文档。每页内容是原始JSON的一段，按照offset拼接理解；分段时先记录可核对的当前任务研究笔记，再请求未读页；可以回查精确原文，最终保留原任务输出JSON格式。':V4_RESEARCH_TOOL_GUIDE+' '+stageGuide),input:JSON.stringify(input)})}
   catch(e){
@@ -128,7 +129,7 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
   let data;try{data=parse(response)}catch{return response;}
   const actions=v4RequestedActions(data);
   if(paged){remember('resume',0,Math.min(resume.length,budget));remember('jd',0,Math.min(jd.length,budget));remember('document',0,Math.min(document.length,budget));for(const r of results||[])if(r.ok&&r.type==='text_page'&&Object.hasOwn(delivered,r.collection))remember(r.collection,r.offset,r.offset+r.text.length);}
-  if(response.status==='completed'){evidenceCursor=indexPage.next_cursor??0;contextState=v4ContextFeedback(contextState,{more:indexPage.next_cursor!==null});budget=contextState.budget;}
+  if(response.status==='completed'){evidenceCursor=indexPage.next_cursor??0;notesCursor=notesPage.next_cursor??0;contextState=v4ContextFeedback(contextState,{more:indexPage.next_cursor!==null});budget=contextState.budget;}
   if(typeof data.research_notes==='string'&&data.research_notes.trim()&&!notes.includes(data.research_notes.trim())){const n=data.research_notes.trim();notes.push(n);if(Array.isArray(taskNotes)&&!taskNotes.includes(n))taskNotes.push(n);}
   if(!actions.length){
    const next=paged?Object.keys(originals).filter(name=>missing(name)!==null):[];
