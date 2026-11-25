@@ -15,6 +15,9 @@ export type JobJdResearch={facts:{url:string;quote:string;context:'same_job'|'re
 export type MatchedJob = {
   jd_research?:JobJdResearch;
   research_detail?:MatchResearchDetail;
+  curated_suitable?:boolean;report_status?:'COMPLETE'|'DECLINED'|'UNAVAILABLE'|'RETRY_PENDING';
+  excluded_closed?:boolean;excluded_board?:boolean;
+  reference_jd?:string;reference_jd_basis?:string;reference_jd_kind?:'AI_GENERATED_REFERENCE';reference_vacancy_verified?:boolean;
   id:string;company:string;title:string;title_zh?:string|null;location:string;
   official_url:string;platform:string;source:string;remote:boolean;
   reference_score:number;matched:string[];not_evidenced:string[];
@@ -34,7 +37,7 @@ export type MatchedJob = {
   evidence_status?:'VERIFIED_FULL_JD'|'PARTIAL_SOURCE'|'SEARCH_SNIPPET_ONLY'|'INSUFFICIENT_EVIDENCE'|'RESEARCH_PENDING';
   evidence_excerpt?:string;
   evidence_sources?:{url:string;kind:string}[];
-  evidence_score_status?:'AI_PARTIAL_SOURCE_SCORED'|'AI_DIRECTION_REFERENCE_SCORED';
+  evidence_score_status?:'AI_PARTIAL_SOURCE_SCORED'|'AI_DIRECTION_REFERENCE_SCORED'|'AI_REFERENCE_JD_SCORED';
   score_evidence_status?:'GROUNDED_JD_RESUME_QUOTES';
   jd_proof_method?:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1'|'V4_STRUCTURED_JOBPOSTING'|'V4_EMPLOYER_HTML_JOB';
   jd_source_status?:'VERIFIED_JD';
@@ -60,7 +63,7 @@ export type MatchResponse = {
    search_failures?:number;rejected_links?:number;agent_exit_reason?:string;
    mode?:string;research_error?:string;search_result_links?:number;diagnostics?:Record<string,number>;
    opened_job_pages?:number;model_candidate_rows?:number;model_source_grounded?:number;
-   jd_verification?:{eligible?:number;verified?:number;scored?:number;failed?:number};
+   jd_verification?:{eligible?:number;verified?:number;scored?:number;failed?:number;reference_scored?:number;reference_selected?:number};
    native_error?:string|null;native_mode?:string|null;
    version?:string;stage?:string;queries?:number;fetch_attempted?:number;
    fetch_failures?:number;city_evidence_count?:number;extracted_jobs?:number;

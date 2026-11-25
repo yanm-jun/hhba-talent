@@ -47,10 +47,15 @@ export function rankCandidateUrls(payload,rows){
  const valid=ordered.filter(u=>keys.has(u)&&!seen.has(u)&&(seen.add(u),true));
  return valid.length===keys.size?valid:null;
 }
-export function qualifiedReport(job){return job?.curated_suitable!==false&&job?.source_type==='站外官方招聘'&&job.jd_source_status==='VERIFIED_JD'&&job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&Number.isInteger(job.match_score)&&!!job.research_detail;}
+export function qualifiedReport(job){return eligibleCuratedScore(job)&&job.report_status==='COMPLETE'&&!!str(job.research_detail?.score_explanation)&&Array.isArray(job.research_detail?.comparisons)&&!job.excluded_closed&&!job.excluded_board&&job.availability_status!=='CLOSED_LISTED'&&job.availability_status!=='POSSIBLY_CLOSED';}
 
 // Only independently verified, evidence-scored and suitable jobs enter the global report ranking.
-export function eligibleCuratedScore(job){return job?.curated_suitable===true&&job.source_type==='站外官方招聘'&&job.jd_source_status==='VERIFIED_JD'&&job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&Number.isInteger(job.match_score)&&job.match_score>=0&&job.match_score<=100&&!!str(job.evidence_excerpt);}
+export function eligibleCuratedScore(job){
+ if(job?.curated_suitable!==true||job.source_type!=='站外官方招聘'||!Number.isInteger(job.match_score)||job.match_score<0||job.match_score>100||job.excluded_closed||job.excluded_board||['CLOSED_LISTED','POSSIBLY_CLOSED'].includes(job.availability_status))return false;
+ const original=job.jd_source_status==='VERIFIED_JD'&&job.evidence_status==='VERIFIED_FULL_JD'&&job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&!!str(job.evidence_excerpt);
+ const reference=job.reference_vacancy_verified===true&&job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job.evidence_score_status==='AI_REFERENCE_JD_SCORED'&&!!str(job.reference_jd)&&!!str(job.reference_jd_basis)&&job.report_status==='COMPLETE'&&!!str(job.research_detail?.score_explanation)&&Array.isArray(job.research_detail?.comparisons);
+ return original||reference;
+}
 
 // The model must order every eligible candidate exactly once. No model-created
 // job or unverified candidate can enter the recommendation list.

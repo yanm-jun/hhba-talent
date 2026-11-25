@@ -23,6 +23,8 @@ const job={
  matched:['曾负责门店运营及数据整理'],not_evidenced:[],
  needs_verification:[],score_basis:'合成测试用岗位，不代表真实招聘信息',
  recommendation_reason:'用于验证 Word 优化工作区的显示、编辑和隐私授权',
+ curated_suitable:true,report_status:'COMPLETE',
+ research_detail:{comparisons:[{requirement:'具备门店运营经验。',resume_evidence:'负责门店运营及日常数据整理工作',status:'supported',analysis:'合成测试证据'}],strengths:'门店运营',risks:'无',career_development:'测试',optimization_advice:'保留真实内容',competition:'测试',score_explanation:'合成测试的原文评分依据',extra_sections:[]},
  availability_status:'UNKNOWN',
  recruitment_source_note:'Synthetic Playwright fixture'
 };

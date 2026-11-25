@@ -4,10 +4,13 @@ import {htmlToText,extractOfficialJdSections} from './official-job-evidence.js';
 import {findMainlandCity} from './mainland-job-location.js';
 import {sha256Hex} from './real-auth.js';
 import {isCommercialRecruitmentBoard} from './match-employer-source.js';
+import {readConditionalJd,canReuseConditionalJd,writeConditionalJd} from './v4-public-jd-cache.js';
+import {structuredJdParts,looksTruncatedJd} from './v4-jd-completeness.js';
 const LOCAL=/(?:^|\.)(?:localhost|local|internal|test|invalid|example|onion|nip\.io|sslip\.io|localtest\.me)$/i;
 const CLOSED=/(?:职位已关闭|岗位已下线|停止招聘|不再接受申请|职位已过期|招聘已结束|position (?:closed|expired)|job (?:closed|expired))/i;
 const GENERIC=/^(?:招聘|岗位详情|职位详情|职业机会|人才招聘|职位|招聘信息|job details|jobs|careers|recruitment|job opening)$/i;
 const trim=s=>typeof s==='string'?s.trim():'';
+const responseIsJson=r=>/json/i.test(r.headers.get('content-type')||'');
 export function v4PublicJobUrl(value){
  if(typeof value!=='string'||!value.trim())return null;
  try{
@@ -128,13 +131,15 @@ export async function v4EmployerAuthorization(jobUrl,company,proofUrl,{fetcher=f
   return true;
  }catch(e){if(signal?.aborted)throw e;return false;}
 }
-export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date(),expected}={}){
+export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date(),expected,cacheBucket,onCache=()=>{}}={}){
  let canonical=v4PublicJobUrl(url);
  if(!canonical)throw Error('V4_UNSAFE_URL');
  if(isCommercialRecruitmentBoard(canonical))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
  // No separate HHBA wall-clock deadline. Retry transient page errors.
  // Keep the public-HTTPS and response-size checks; never follow redirects blindly.
- let html;
+ const initial=canonical;
+ const cached=await readConditionalJd(cacheBucket,initial,expected,now.getTime());
+ let html,response;
  for(const retry of [false,true]){
   if(signal?.aborted)throw signal.reason;
   const timeout=signal;
@@ -142,7 +147,14 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
    let r;const visited=new Set();
    for(;;){
     if(visited.has(canonical))throw Error('V4_REPEATED_REDIRECT');visited.add(canonical);
-    r=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,application/json,text/plain;q=0.9'},...(timeout?{signal:timeout}:{})});
+    const conditional=!retry&&canonical===initial&&cached;
+    const headers={Accept:'text/html,application/json,text/plain;q=0.9',...(conditional?{'If-None-Match':cached.etag}:{})};
+    r=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',headers,...(timeout?{signal:timeout}:{})});
+    if(r.status===304){
+     if(conditional&&canReuseConditionalJd(cached,r,canonical,now.getTime())){onCache('JD_PUBLIC_CONDITIONAL_HIT');return {...cached.jd,checked_at:now.toISOString()};}
+     // Do not trust an unsolicited or mismatching 304. Read the actual page.
+     r=await fetcher(canonical,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:headers.Accept},...(timeout?{signal:timeout}:{})});
+    }
     if(![301,302,303,307,308].includes(r.status))break;
     const location=r.headers.get('location');await r.body?.cancel().catch(()=>{});
     const next=location?v4PublicJobUrl(new URL(location,canonical).href):null;
@@ -151,7 +163,7 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
    if([408,425,429,500,502,503,504].includes(r.status)){await r.body?.cancel().catch(()=>{});throw Error('V4_TRANSIENT_PAGE_ERROR');}
    // A larger, bounded transport budget is for real page bytes, never model output.
    // Larger documents still remain addressable through the window reader.
-   html=await limitedRead(r,{allowJson:true,maxBytes:16*1024*1024});break;
+   response=r;html=await limitedRead(r,{allowJson:true,maxBytes:16*1024*1024});break;
   }catch(e){
    if(signal?.aborted||retry||(!['AbortError','TimeoutError','TypeError'].includes(e?.name)&&e?.message!=='V4_TRANSIENT_PAGE_ERROR'))throw e;
   }
@@ -171,31 +183,37 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  if(explicitClosed&&!candidates.length)throw Error('V4_JOB_CLOSED');
  for(const j of candidates){
   const org=companyOf(j),title=trim(j.title);
-  const city=postedLocation(j)||htmlLocation(plain),desc=htmlToText(trim(j.description),{maxChars:Infinity});
-  if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city||!desc.trim())continue;
+  const city=postedLocation(j)||htmlLocation(plain),description=htmlToText(trim(j.description),{maxChars:Infinity});
+  const desc=structuredJdParts(j,value=>htmlToText(value,{maxChars:Infinity})).join('\n');
+  if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city)continue;
   if(explicitClosed||j.validThrough&&Number.isFinite(Date.parse(j.validThrough))&&Date.parse(j.validThrough)<now.getTime())throw Error('V4_JOB_CLOSED');
   // A multinational's official careers host may differ from its corporate website.
   // Do not discard real JD content merely because the domains differ.
   const sections=extractOfficialJdSections(desc,{full:true});
   const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
   // JobPosting itself identifies the published description; no required heading vocabulary.
-  if(!desc.trim())continue;
-  return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
+  const incomplete=!desc.trim()||looksTruncatedJd(description)||looksTruncatedJd(desc);
+  const jd={id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
    canonical_url:canonical,company:org.name,title,
-   location:city,requirements:requirements||desc,full_jd:desc,
+   location:city,requirements:incomplete?'':requirements||desc,full_jd:incomplete?'':desc,
+   vacancy_confirmed:!!org.url&&relatedDomains(canonical,org.url),...(incomplete?{partial_jd:desc,jd_incomplete:true}:{}),
    checked_at:now.toISOString(),proof_method:'V4_STRUCTURED_JOBPOSTING',
    source_confirmed:!!org.url&&relatedDomains(canonical,org.url),independently_read:true,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
+  if(!incomplete&&canonical===initial&&await writeConditionalJd(cacheBucket,initial,expected,response,jd,j.validThrough,now.getTime()))onCache('JD_PUBLIC_CONDITIONAL_STORED');
+  return jd;
  }
  // Chinese employer career sites often serve normal HTML without JSON-LD.
  const sections=extractOfficialJdSections(plain,{full:true}),title=pageTitle(html);
  const company=meta(html,'property','og:site_name')||meta(html,'name','application-name');
  const city=htmlLocation(plain);
  const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
- if(!title||!company||GENERIC.test(company)||!city||!sections||!requirements.trim())
+ if(!title||!company||GENERIC.test(company)||!city)
   throw Error('V4_JOB_DETAILS_NOT_VERIFIED');
+ const incomplete=!sections||!requirements.trim()||looksTruncatedJd(sections?.full_jd);
  return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
   canonical_url:canonical,company,title,location:city,
-  requirements,full_jd:sections.full_jd,
+  requirements:incomplete?'':requirements,full_jd:incomplete?'':sections.full_jd,
+  ...(incomplete?{partial_jd:sections?.full_jd||'',jd_incomplete:true}:{}),
   checked_at:now.toISOString(),proof_method:'V4_EMPLOYER_HTML_JOB',
   source_confirmed:false,independently_read:true,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
 }
@@ -218,7 +236,7 @@ export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal,maxBytes
   const raw=await limitedRead(r,{allowJson:true,maxBytes});
   const site=meta(raw,'property','og:site_name')||meta(raw,'name','application-name');
   if(isCommercialRecruitmentBoard(current,{site_name:site}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
-  const plain=htmlToText(raw,{maxChars:Infinity}).trim();
+  const plain=(responseIsJson(r)?raw:htmlToText(raw,{maxChars:Infinity})).trim();
   if(CLOSED.test(pageTitle(raw))||(plain.length<80&&CLOSED.test(plain)))throw Error('V4_JOB_CLOSED');
   return {url:current,plain,site,title:pageTitle(raw)};
  }
@@ -242,7 +260,7 @@ export async function v4RenderPublicJobDocument(url,{browser,signal}={}){
  });
  if(signal?.aborted)throw signal.reason;
  if(response.status===429)throw Error('V4_BROWSER_QUOTA_OR_RATE_LIMIT');
- const raw=await limitedRead(response,{allowJson:true});
+ const raw=await limitedRead(response,{allowJson:true,maxBytes:16*1024*1024});
  let html=raw;
  if((response.headers.get('content-type')||'').includes('json')){
   let parsed;try{parsed=JSON.parse(raw)}catch{throw Error('V4_BROWSER_RESPONSE_INVALID')}

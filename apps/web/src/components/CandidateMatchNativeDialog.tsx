@@ -2,6 +2,7 @@ import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEve
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,X,LoaderCircle} from 'lucide-react';
 import {MatchResearchPanels,matchStageIndex} from './MatchResearchPanels';
+import {isVerifiedMatchReport,verifiedMatchReports} from '../services/verifiedMatchPresentation.mjs';
 import type {MatchResponse,MatchResearchReport,MatchedJob,NativeMatchActivity,NativeMatchProgress} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
@@ -25,6 +26,9 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
   return reference;
  return null;
 }
+// Explicit history handoff may reopen a previously archived official JD.
+// The server revalidates the archive; generated reference JDs never qualify.
+const archivedHistoryJob=(job:MatchedJob)=>job.jd_source_status==='VERIFIED_JD'&&job.reference_jd_kind!=='AI_GENERATED_REFERENCE'&&/^jd_[a-f0-9]{32}$/.test(job.jd_version_id||'')&&/^[a-f0-9]{64}$/.test(job.jd_sha256||'');
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
 export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false,initialMinimized=false}:{
@@ -53,7 +57,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  },[hostRoute]);
  const [confirmTerminate,setConfirmTerminate]=useState(false);
  const [optimizedJobUrl,setOptimizedJobUrl]=useState<string|null>(()=>
-  [...result.matches,...researchJobs].find(job=>job.id===initialOptimizedJobId&&job.jd_version_id&&job.jd_sha256)?.official_url||null);
+  result.matches.find(job=>job.id===initialOptimizedJobId&&archivedHistoryJob(job))?.official_url||null);
  const [optimizationDirty,setOptimizationDirty]=useState(false);
  const [elapsed,setElapsed]=useState(0);
  useEffect(()=>{
@@ -86,10 +90,10 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
   if(viewport)viewport.scrollTop=0;
  };
  const matchListScroll=useRef(0);
- const activeJob=result.matches.find(job=>job.official_url===optimizedJobUrl)||researchJobs.find(job=>job.official_url===optimizedJobUrl);
+ const activeJob=verifiedMatchReports(result.matches).find(job=>job.official_url===optimizedJobUrl)||result.matches.find(job=>job.official_url===optimizedJobUrl&&job.id===initialOptimizedJobId&&archivedHistoryJob(job));
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
  function optimizeJob(job:MatchedJob){
-  if(pending||!parsedProfile||!job.jd_version_id||!job.jd_sha256)return;
+  if(pending||!parsedProfile||!isVerifiedMatchReport(job)||!job.jd_version_id||!job.jd_sha256)return;
   matchListScroll.current=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content')?.scrollTop||0;
   setSelectedJobUrl(job.official_url);setOptimizationDirty(false);setOptimizedJobUrl(job.official_url);
  }
@@ -195,7 +199,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
         已执行 {progressActivity.searches} 次检索 · 发现 {progressActivity.candidate_links??0} 条企业岗位线索 · 已阅读 {progressActivity.pages_read??0} 份岗位资料
        </span>}
        {researchReport&&<span>已发现 {researchReport.discovered} 条候选招聘来源 · 已排除 {researchReport.excluded_count} 条商业平台链接</span>}
-       {result.matches.length>0&&<span>已形成 {result.matches.length} 个正式推荐</span>}
+       {verifiedMatchReports(result.matches).length>0&&<span>已完成 {verifiedMatchReports(result.matches).length} 份可核验报告，最终排名待确认</span>}
       </div>
       <span className="hhba-match-progress-time" aria-hidden="true">已用时 {elapsed} 秒</span>
      </div></>}
@@ -235,7 +239,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
         data-hhba-recruitment-outbound="true">前往企业官网投递 <ArrowUpRight size={15}/></a>
       </section>:<>
      {showResults&&<>
-     {!pending&&result.native_search?.mode==='V4_SIMPLE_AI'&&<div className="hhba-match-disclaimer" role="status">本次发现 {result.native_search.candidate_links??0} 个候选，已核验 JD {result.native_search.jd_verification?.verified??0} 个，完成证据评分 {result.native_search.jd_verification?.scored??0} 个。{result.native_search.stage==='partial'?'研究未达到完整交付目标；未核验或证据不足的候选保留在研究记录，不代表没有适合的工作。':''}{result.native_search.research_error?' 研究中断原因：'+result.native_search.research_error:''}{result.native_search.diagnostics&&Object.keys(result.native_search.diagnostics).length>0?<details><summary>查看实际核验诊断</summary>{Object.entries(result.native_search.diagnostics).map(([code,count])=><span key={code}>{code}：{count}；</span>)}</details>:null}</div>}
+     {!pending&&result.native_search?.mode==='V4_SIMPLE_AI'&&<div className="hhba-match-disclaimer" role="status">本次发现 {result.native_search.candidate_links??0} 个候选，已核验 JD {result.native_search.jd_verification?.verified??0} 个，完成官方JD证据评分 {result.native_search.jd_verification?.scored??0} 个，AI参考评分 {result.native_search.jd_verification?.reference_scored??0} 个。{result.native_search.stage==='partial'?'研究未达到完整交付目标；未核验或证据不足的候选保留在研究记录，不代表没有适合的工作。':''}{result.native_search.research_error?' 研究中断原因：'+result.native_search.research_error:''}{result.native_search.diagnostics&&Object.keys(result.native_search.diagnostics).length>0?<details><summary>查看实际核验诊断</summary>{Object.entries(result.native_search.diagnostics).map(([code,count])=><span key={code}>{code}：{count}；</span>)}</details>:null}</div>}
      {!pending&&result.native_search?.mode==='HHBA_MATCH_CLEAN_V2'&&<p className="hhba-match-disclaimer" role="status">
       新版独立求职研究：搜索 {result.native_search.queries??0} 组关键词，
       取得 {result.native_search.candidate_links??0} 条企业职位来源，

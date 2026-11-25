@@ -51,7 +51,7 @@ export function recruitmentText(raw?:string|null){
  text+=raw.slice(cursor);
  return text.replace(/[ \t]+(?=[，。；、！？,.!?;])/g,'').replace(/[ \t]+$/gm,'').replace(/^[ \t]+/gm,'').trim();
 }
-type SourceInput={company?:string;official_url?:string;source_type?:string;jd_source_status?:string;requirements_basis?:string;score_basis?:string;recommendation_reason?:string;evidence_excerpt?:string;recruitment_source_note?:string;matched?:string[];not_evidenced?:string[];needs_verification?:string[];evidence_sources?:{url:string;kind?:string}[];jd_research?:{facts?:{url:string;quote:string}[];inference?:string;unknowns?:string[]};research_detail?:{comparisons?:{requirement:string;analysis:string}[];strengths?:string;risks?:string;competition?:string;career_development?:string;optimization_advice?:string;score_explanation?:string;extra_sections?:{title:string;content:string}[]};jd_comparisons?:{requirement:string}[]};
+type SourceInput={company?:string;official_url?:string;source_type?:string;jd_source_status?:string;reference_vacancy_verified?:boolean;requirements_basis?:string;score_basis?:string;recommendation_reason?:string;evidence_excerpt?:string;recruitment_source_note?:string;matched?:string[];not_evidenced?:string[];needs_verification?:string[];evidence_sources?:{url:string;kind?:string}[];jd_research?:{facts?:{url:string;quote:string}[];inference?:string;unknowns?:string[]};research_detail?:{comparisons?:{requirement:string;analysis:string}[];strengths?:string;risks?:string;competition?:string;career_development?:string;optimization_advice?:string;score_explanation?:string;extra_sections?:{title:string;content:string}[]};jd_comparisons?:{requirement:string}[]};
 export function collectRecruitmentSources(job:SourceInput,includePrimary=true):RecruitmentSource[]{
  const list=new Map<string,RecruitmentSource>();
  const sourceKey=(u:URL)=>{const copy=new URL(u.href);for(const k of [...copy.searchParams.keys()])if(/^(utm_.+|gclid|fbclid|msclkid)$/i.test(k))copy.searchParams.delete(k);return copy.href;};
@@ -61,7 +61,7 @@ export function collectRecruitmentSources(job:SourceInput,includePrimary=true):R
   list.set(key,{url:prior?.url||u.href,host:u.hostname,verified:verified||!!prior?.verified,label:prior?.label||label});
  };
  const primary=job.official_url?safeRecruitmentSource(job.official_url)?.href:undefined;
- const verified=job.source_type==='站外官方招聘'&&job.jd_source_status==='VERIFIED_JD';
+ const verified=job.source_type==='站外官方招聘'&&(job.jd_source_status==='VERIFIED_JD'||job.reference_vacancy_verified===true);
  if(includePrimary&&primary)add(primary,verified,job.company?job.company+'招聘页面':'岗位招聘页面');
  const addRelated=(raw:string,label='')=>{const u=safeRecruitmentSource(raw);if(u)add(raw,!!primary&&sourceKey(u)===sourceKey(new URL(primary))&&verified,label);};
  for(const source of job.evidence_sources||[])addRelated(source.url);

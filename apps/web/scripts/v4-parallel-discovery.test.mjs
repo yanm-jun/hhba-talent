@@ -69,3 +69,147 @@ test('candidate preview never claims a completed assessment or displays a search
  const preview=renderCandidatePreview(j,j.url,resume,true,0,new Set([j.url]));
  assert.equal(preview.evidence_status,'RESEARCH_PENDING');assert.equal(preview.match_score,null);assert.equal(preview.reference_score,0);assert.equal(preview.recommendation_reason,'');assert.deepEqual(preview.matched,[]);assert.match(preview.score_basis,/尚未完成/);assert.equal(preview.jd_source_status,undefined);
 });
+
+test('pipeline allocates idle transport slots to verification backlog without reducing research target',async()=>{
+ const {pipelineWidths,verificationSnapshot}=await import('../functions/_lib/v4-research-pipeline.js');
+ assert.deepEqual(pipelineWidths({discoveryWidth:4},1),{discovery:4,verification:1});
+ assert.deepEqual(pipelineWidths({discoveryWidth:4},5),{discovery:3,verification:2});
+ assert.deepEqual(pipelineWidths({discoveryWidth:4},100),{discovery:2,verification:3});
+ assert.deepEqual(pipelineWidths({discoveryWidth:4,pipelineVerificationWidth:1},100),{discovery:4,verification:1});
+ assert.equal(verificationSnapshot({},3).verificationBatch,3);
+});
+test('a fast independent JD is scored before a slow sibling page finishes',async()=>{
+ const provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const a=job(1),b=job(2);
+ let fastScored=false,slowFinished=false,overlapObserved=false,releaseSlow;
+ const slowGate=new Promise(resolve=>{releaseSlow=resolve;});
+ const timer=setTimeout(releaseSlow,2000);
+ const html=j=>'<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:j.title,hiringOrganization:{name:j.company,url:new URL(j.url).origin},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责汽车经销商渠道运营和业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
+ const fetcher=async(u,opts)=>{
+  if(!u.endsWith('/responses')){
+   const j=u===a.url?a:b;
+   if(j===b){await slowGate;slowFinished=true;}
+   return new Response(html(j),{headers:{'content-type':'text/html'}});
+  }
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.job?.title===a.title){fastScored=true;overlapObserved=!slowFinished;releaseSlow();}
+  return model({suitable:true,score:88,reason:'渠道经验匹配',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车经销商渠道运营',matched:['渠道运营'],gaps:[]});
+ };
+ try{
+ const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[a.url,a],[b.url,b]],profile,toolUrls:[a.url,b.url],verificationBatch:2}});
+ assert.equal(result.checkpoint.phase,'reporting');
+ assert.equal(result.checkpoint.scored,2);
+ assert.ok(fastScored&&slowFinished&&overlapObserved);
+ }finally{clearTimeout(timer);releaseSlow();}
+});
+
+test('batch scoring keeps full JD, independent evidence and only valid unique IDs',async()=>{
+ const {batchScoringPayload,collectBatchAssessments,partitionReadyScores}=await import('../functions/_lib/v4-batch-scoring.js');
+ const items=[{id:'a',job:{full_jd:'区域运营岗位完整原文甲',title:'甲'}},{id:'b',job:{full_jd:'区域运营岗位完整原文乙',title:'乙'}},{id:'c',job:{full_jd:'区域运营岗位完整原文丙',title:'丙'}}];
+ const cv='真实汽车经销商渠道运营经历';
+ const value={suitable:true,score:85,reason:'具有真实经验',resume_quote:'汽车经销商渠道运营'};
+ const input=JSON.parse(batchScoringPayload(items,cv,'全国').input);
+ assert.deepEqual(input.jobs,items.map(x=>({id:x.id,...x.job})));
+ const results=collectBatchAssessments({assessments:[{...value,id:'a',jd_quote:'完整原文甲'},{...value,id:'b',jd_quote:'完整原文甲'},{...value,id:'c',jd_quote:'完整原文丙'},{...value,id:'c',jd_quote:'完整原文丙'},{...value,id:'fake',jd_quote:'完整原文乙'}]},items,cv);
+ assert.deepEqual([...results.keys()],['a']);
+ assert.deepEqual(partitionReadyScores(items,cv,1).flat(),items);
+});
+test('coalesced scoring makes one model request, sends invalid item alone to individual fallback',async()=>{
+ const {makeBatchScorer}=await import('../functions/_lib/v4-batch-scoring.js');
+ let calls=0;const notes=[];
+ const score=makeBatchScorer({resume:'真实渠道运营经验',roleHint:'全国',delay:0,parse:x=>x.data,note:x=>notes.push(x),call:async payload=>{
+  calls++;const input=JSON.parse(payload.input);assert.equal(input.jobs.length,2);
+  return {status:'completed',data:{assessments:[{id:'a',score:87,suitable:true,reason:'匹配',resume_quote:'渠道运营',jd_quote:'原文甲'},{id:'b',score:88,suitable:true,reason:'匹配',resume_quote:'渠道运营',jd_quote:'原文甲'}]}};
+ }});
+ const result=await Promise.all([score('a',{full_jd:'原文甲'}),score('b',{full_jd:'原文乙'})]);
+ assert.equal(calls,1);assert.equal(result[0].score,87);assert.equal(result[1],null);
+ assert.ok(notes.includes('AI_SCORE_BATCH_INDIVIDUAL_FALLBACK'));
+});
+test('batch provider rejection or incomplete response falls back without inventing completed scores',async()=>{
+ const {makeBatchScorer}=await import('../functions/_lib/v4-batch-scoring.js');
+ for(const call of [async()=>{throw Error('context too large')},async()=>({status:'incomplete',data:{assessments:[]}})]){
+  const score=makeBatchScorer({resume:'真实渠道运营经验',delay:0,parse:x=>x.data,call});
+  assert.deepEqual(await Promise.all([score('a',{full_jd:'原文甲'}),score('b',{full_jd:'原文乙'})]),[null,null]);
+ }
+});
+
+test('conditional public JD cache reuses only matching strong origin validation, never applicant data',async()=>{
+ const {v4ReadEmployerJob}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const objects=new Map(),bucket={get:async k=>objects.has(k)?{text:async()=>objects.get(k)}:null,put:async(k,v)=>objects.set(k,v)};
+ const u='https://careers.cache-employer.cn/jobs/1',expected={company:'测试企业',title:'区域运营',location:'上海',resume:'must not persist'};
+ const body='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:'区域运营',hiringOrganization:{name:'测试企业',url:'https://careers.cache-employer.cn'},jobLocation:{address:{addressLocality:'上海'}},description:'<p>职责：渠道运营、经销商管理。</p><p>任职要求：真实业务分析经验。</p>'})+'</script>';
+ let calls=0,conditional=0,changed=false;
+ const fetcher=async(url,opts)=>{
+  calls++;
+  if(opts.headers['If-None-Match']){conditional++;assert.equal(opts.headers['If-None-Match'],'"v1"');if(!changed)return new Response(null,{status:304,headers:{etag:'"v1"'}});}
+  return new Response(changed?body.replace('真实业务分析经验','新的独立研究经验'):body,{headers:{'content-type':'text/html',etag:changed?'"v2"':'"v1"'}});
+ };
+ const first=await v4ReadEmployerJob(u,{fetcher,expected,cacheBucket:bucket});
+ const second=await v4ReadEmployerJob(u,{fetcher,expected,cacheBucket:bucket});
+ assert.equal(second.full_jd,first.full_jd);assert.equal(calls,2);assert.equal(conditional,1);
+ assert.ok([...objects.values()].every(x=>!x.includes('must not persist')));
+ changed=true;
+ const third=await v4ReadEmployerJob(u,{fetcher,expected,cacheBucket:bucket});
+ assert.notEqual(third.full_jd,first.full_jd);assert.equal(conditional,2);
+});
+test('reuse a completed same-task report only for exact unchanged evidence and score',async()=>{
+ const {preserveJobEvidence}=await import('../functions/_lib/v4-jd-research.js');
+ const common={company:'企业',title:'区域运营',location:'上海',official_url:'https://careers.employer.cn/jobs/1',source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',score_evidence_status:'GROUNDED_JD_RESUME_QUOTES',curated_suitable:true,evidence_excerpt:'完整JD',match_score:88};
+ const old={...common,report_status:'COMPLETE',research_detail:{reason:'完整研究'},recommendation_reason:'详细理由'};
+ assert.equal(preserveJobEvidence(old,{...common}).research_detail,old.research_detail);
+ assert.equal(preserveJobEvidence(old,{...common,match_score:89}).research_detail,undefined);
+ assert.equal(preserveJobEvidence(old,{...common,evidence_excerpt:'更新JD'}).research_detail,undefined);
+ assert.equal(preserveJobEvidence(old,{...common,excluded_closed:true}).excluded_closed,true);
+});
+
+test('structured JobPosting retains independent duties, qualifications and skills outside description',async()=>{
+ const {v4ReadEmployerJob}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const url='https://careers.split-employer.cn/jobs/100';
+ const posting={'@type':'JobPosting',title:'区域运营',hiringOrganization:{name:'企业',url:'https://careers.split-employer.cn'},jobLocation:{address:{addressLocality:'上海'}},description:'负责地区运营管理。',responsibilities:['负责渠道建设。','负责团队培训。'],qualifications:'具备业务管理经验。',skills:['数据分析','组织协调']};
+ const read=async value=>v4ReadEmployerJob(url,{fetcher:async()=>new Response(JSON.stringify(value),{headers:{'content-type':'application/json'}})});
+ const jd=await read(posting);
+ for(const value of ['负责地区运营管理。','负责渠道建设。','负责团队培训。','具备业务管理经验。','数据分析','组织协调'])assert.ok(jd.full_jd.includes(value),value);
+ assert.equal(jd.source_confirmed,true);
+ const partial=await read({...posting,description:'负责地区运营管理……'});
+ assert.equal(partial.full_jd,'');assert.equal(partial.vacancy_confirmed,true);assert.ok(partial.partial_jd.includes('负责地区运营管理'));
+});
+test('complex JD coverage reconstructs the contiguous original rather than dropping intervening requirements',async()=>{
+ const {completeJdSpan}=await import('../functions/_lib/v4-jd-completeness.js');
+ const doc='导航\n岗位职责：负责渠道运营。\n必须有团队培训经验。\n任职要求：数据分析能力。\n工作安排：全职。\n返回首页';
+ const parts=['岗位职责：负责渠道运营。','任职要求：数据分析能力。'];
+ const full=completeJdSpan(doc,parts,parts[0],'工作安排：全职。');
+ assert.equal(full,'岗位职责：负责渠道运营。\n必须有团队培训经验。\n任职要求：数据分析能力。\n工作安排：全职。');
+ assert.equal(completeJdSpan(doc,parts,parts[0],'必须有团队培训经验。'),null);
+ assert.equal(completeJdSpan(doc,parts,'虚构开头','工作安排：全职。'),null);
+ assert.equal(completeJdSpan(doc+'\n'+parts[0],parts,parts[0],'工作安排：全职。'),null);
+});
+
+test('a verified vacancy without a complete JD retains an AI reference assessment in global selection without official evidence promotion',async()=>{
+ const {eligibleCuratedScore,qualifiedReport}=await import('../functions/_lib/v4-curated-reports.js');
+ const {verifiedMatchReports}=await import('../src/services/verifiedMatchPresentation.mjs');
+ const {safeHistoryJobs}=await import('../functions/_lib/match-history.js');
+ const reference={company:'测试企业',title:'渠道运营',location:'上海',official_url:'https://careers.ref-employer.cn/jobs/7',source_type:'站外官方招聘',reference_vacancy_verified:true,reference_jd_kind:'AI_GENERATED_REFERENCE',reference_jd:'可能负责渠道管理。',reference_jd_basis:'依据岗位名称推断，非官方要求。',evidence_score_status:'AI_REFERENCE_JD_SCORED',match_score:86,curated_suitable:true,report_status:'COMPLETE',research_detail:{comparisons:[],score_explanation:'真实经历与推断方向匹配。'},v4_source:true};
+ assert.equal(eligibleCuratedScore(reference),true);assert.equal(qualifiedReport(reference),true);assert.deepEqual(verifiedMatchReports([reference]),[reference]);
+ assert.equal(qualifiedReport({...reference,reference_vacancy_verified:false}),false);
+ assert.equal(qualifiedReport({...reference,availability_status:'CLOSED_LISTED'}),false);
+ assert.equal(qualifiedReport({...reference,reference_jd:''}),false);
+ const saved=safeHistoryJobs([reference])[0];assert.equal(saved.reference_jd,reference.reference_jd);assert.equal(saved.jd_source_status,undefined);assert.equal(saved.score_evidence_status,undefined);assert.equal(saved.evidence_score_status,'AI_REFERENCE_JD_SCORED');
+});
+
+test('actual V4 verification keeps a confirmed vacancy with no JD, generates a reference report and skips official archive',async()=>{
+ const {qualifiedReport}=await import('../functions/_lib/v4-curated-reports.js');
+ const candidate=job(77),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ let providerCalls=0;
+ const fetcher=async(url,opts)=>{
+  if(url===candidate.url)return new Response(JSON.stringify({'@type':'JobPosting',title:candidate.title,hiringOrganization:{name:candidate.company,url:new URL(candidate.url).origin},jobLocation:{address:{addressLocality:'上海'}}}),{headers:{'content-type':'application/json'}});
+  if(url.endsWith('/responses')){
+   providerCalls++;const input=JSON.parse(JSON.parse(opts.body).input);
+   assert.equal(input.job.vacancy_confirmed,true);assert.equal(input.job.title,candidate.title);
+   return model({reference_jd:'可能负责汽车渠道运营及门店协作。',reference_basis:'岗位名称已确认，职责为AI职业方向推断。',suitable:true,score:87,reason:'简历有实际渠道运营经历，与推断方向相关。',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车渠道运营',matched:['渠道运营'],gaps:['实际资格待企业确认'],comparisons:[{jd_quote:'汽车渠道运营',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'真实经历对应推断方向'}],strengths:'渠道运营',risks:'实际职责尚未公开'});
+  }
+  throw Error('unexpected source '+url);
+ };
+ const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
+ assert.equal(result.checkpoint.phase,'reporting');const saved=result.checkpoint.matches[0];
+ assert.equal(providerCalls,1);assert.equal(saved.reference_vacancy_verified,true);assert.equal(saved.reference_jd_kind,'AI_GENERATED_REFERENCE');assert.equal(saved.match_score,87);assert.equal(saved.jd_source_status,undefined);assert.equal(saved.jd_version_id,undefined);assert.equal(saved.score_evidence_status,undefined);assert.equal(qualifiedReport(saved),true);assert.equal(result.checkpoint.scored,0);
+});

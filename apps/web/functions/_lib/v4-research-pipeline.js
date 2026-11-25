@@ -6,12 +6,20 @@ export function pendingVerification(checkpoint){
  const done=new Set(checkpoint.processedEarlier||[]),evidence=new Map(checkpoint.processedEvidence||[]),recheck=new Set(checkpoint.explicitRechecks||[]),rejected=new Set(checkpoint.rejectedBoards||[]);
  return (checkpoint.rows||[]).filter(([u,j])=>!rejected.has(u)&&(!done.has(u)||evidence.get(u)!==candidateRevision(j)||recheck.has(u)));
 }
-export function verificationSnapshot(checkpoint){
+export function pipelineWidths(checkpoint,pending){
+ // Reserve one of six simultaneous outgoing connections for storage/auth.
+ // Divide the remaining slots by actual backlog; no total job cap.
+ const width=Math.max(1,Math.min(4,checkpoint.discoveryWidth||3));
+ const desired=pending>=12?3:pending>=2?2:1;
+ const previous=Number.isSafeInteger(checkpoint.pipelineVerificationWidth)?checkpoint.pipelineVerificationWidth:desired;
+ const verification=Math.max(1,Math.min(pending,desired,previous));
+ return {verification,discovery:Math.max(1,Math.min(width,5-verification))};
+}
+export function verificationSnapshot(checkpoint,width=1){
  const prior=checkpoint.priorState||{};
  return {...structuredClone(checkpoint),phase:'verification',next:0,
-  // A single early verification slot shares the Workers connection budget
-  // with discovery. The final verification phase retains its adaptive batches.
-  verificationBatch:1,matches:structuredClone(prior.matches||[]),read:prior.read||0,scored:prior.scored||0,archived:prior.archived||0,scoreFailures:prior.scoreFailures||0,reportFailures:prior.reportFailures||0,priorState:null};
+  // Share transport slots with discovery; final verification has its own batches.
+  verificationBatch:width,matches:structuredClone(prior.matches||[]),read:prior.read||0,scored:prior.scored||0,archived:prior.archived||0,scoreFailures:prior.scoreFailures||0,reportFailures:prior.reportFailures||0,priorState:null};
 }
 const counters=['read','scored','archived','scoreFailures','reportFailures'];
 export function mergePipelineCheckpoint(original,discovery,verification,attempted,{verificationIncomplete=false}={}){

@@ -29,7 +29,7 @@ export function mergeJdResearch(a,b){
 }
 const origin=j=>j.research_candidate_url||j.official_url;
 const official=j=>j?.jd_source_status==='VERIFIED_JD'&&j.source_type==='站外官方招聘'&&!!text(j.evidence_excerpt);
-const strength=j=>official(j)?3:j?.evidence_status==='VERIFIED_FULL_JD'&&text(j.evidence_excerpt)?2:j?.evidence_status==='PARTIAL_SOURCE'&&text(j.evidence_excerpt)||j?.jd_research?.facts?.length?1:0;
+const strength=j=>official(j)?4:j?.reference_vacancy_verified===true&&j?.reference_jd_kind==='AI_GENERATED_REFERENCE'&&text(j.reference_jd)?3:j?.evidence_status==='VERIFIED_FULL_JD'&&text(j.evidence_excerpt)?2:j?.reference_jd_kind==='AI_GENERATED_REFERENCE'&&text(j.reference_jd)||j?.evidence_status==='PARTIAL_SOURCE'&&text(j.evidence_excerpt)||j?.jd_research?.facts?.length?1:0;
 export function preserveJobEvidence(previous,current){
  if(!previous)return current;
  if(!current)return previous;
@@ -37,7 +37,11 @@ export function preserveJobEvidence(previous,current){
  if(current.excluded_closed||current.excluded_board)return current;
  const older= strength(previous)>strength(current)||(strength(previous)>0&&strength(previous)===strength(current)&&norm(previous.evidence_excerpt)===norm(current.evidence_excerpt)&&Number.isInteger(previous.match_score)&&!Number.isInteger(current.match_score));
  const chosen=older?previous:current;
- return {...chosen,jd_research:mergeJdResearch(previous.jd_research,current.jd_research)};
+ // The merger is scoped to one matching task and one authorized resume.
+ // Preserve a completed report only for the exact same official job, full JD,
+ // eligibility and evidence-backed score. New content/score must be researched.
+ const reuseReport=!older&&previous.report_status==='COMPLETE'&&previous.research_detail&&official(previous)&&official(current)&&previous.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&current.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&previous.curated_suitable===true&&current.curated_suitable===true&&previous.official_url===current.official_url&&previous.company===current.company&&previous.title===current.title&&previous.location===current.location&&previous.evidence_excerpt===current.evidence_excerpt&&Number.isInteger(current.match_score)&&previous.match_score===current.match_score;
+ return {...chosen,...(reuseReport?{research_detail:previous.research_detail,jd_comparisons:previous.jd_comparisons,report_status:'COMPLETE',recommendation_reason:previous.recommendation_reason}:{}),jd_research:mergeJdResearch(previous.jd_research,current.jd_research)};
 }
 export function mergeJobEvidence(previous,current){
  const map=new Map(previous.map(j=>[origin(j),j]));
