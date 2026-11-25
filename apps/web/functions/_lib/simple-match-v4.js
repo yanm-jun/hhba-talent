@@ -454,6 +454,16 @@ async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,br
    if(coverage.length){report.ok=false;report.errors=coverage;note('JD_REFERENCE_COVERAGE_REVIEW');}
   }
   if(report.ok){
+   if(fullResearch){
+    const anchors=value.reference_source_anchors;
+    const explain=(key,label)=>{
+     const a=anchors[key];
+     if(a.kind==='title_direction')return label+'：依据岗位名称「'+job.title+'」整理求职准备建议，不代表企业已公布要求。';
+     const f=facts.find(f=>f.url===a.url&&norm(f.quote).includes(norm(a.quote)));
+     return label+'：'+(f?.context==='same_job'?'该岗位公开资料':'相关公开资料（非该岗位已确认要求）')+'「'+a.quote+'」。';
+    };
+    job.reference_jd_basis=[basis,explain('duties','职责整理依据'),explain('capabilities','能力方向依据')].join('\n');
+   }
    Object.assign(job,{match_score:value.score,reference_score:value.score,evidence_score_status:'AI_REFERENCE_JD_SCORED',score_evidence_status:undefined,curated_suitable:true,score_basis:'AI 参考JD适配分（依据真实简历与推断职责，不是官方JD匹配分或录用概率）',recommendation_reason:text(value.reason),matched:texts(value.matched),not_evidenced:texts(value.gaps),research_detail:report.report,report_status:'COMPLETE'});
    note(job.reference_vacancy_verified?'JD_REFERENCE_VERIFIED_VACANCY_SCORED':'JD_REFERENCE_UNVERIFIED_LEAD_SCORED');
    return;
