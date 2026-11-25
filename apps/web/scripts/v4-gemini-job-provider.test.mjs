@@ -507,3 +507,21 @@ test('minimal operator transport probes validate native responses and selected h
  const fake=await runGeminiProbe(v4JobProvider(env),'transport',{fetcher:async()=>Response.json({ok:true})});
  assert.equal(fake.ok,false);
 });
+
+test('OpenAI-compatible relay transport probe uses selected Gemini model and dedicated key',async()=>{
+ const {runGeminiProbe}=await import('../functions/api/match-v4-provider-probe.js');
+ const provider=v4JobProvider(env);
+ const result=await runGeminiProbe(provider,'transport_chat',{fetcher:async(url,opt)=>{
+  assert.equal(url,provider.baseUrl.replace(/\/v1$/,'')+'/v1/chat/completions');
+  assert.equal(opt.headers.authorization,'Bearer '+env.GEMINI_API_KEY);
+  assert.equal(opt.headers['x-goog-api-key'],undefined);
+  assert.equal(opt.redirect,'manual');
+  assert.deepEqual(JSON.parse(opt.body),{model:provider.model,messages:[{role:'user',content:'Reply only with OK.'}],stream:false});
+  return Response.json({model:provider.model,choices:[{finish_reason:'stop',message:{content:'OK'}}]});
+ }});
+ assert.deepEqual(result,{ok:true,upstream_http_status:200,chat_response:true,reported_model_matches:true,reported_model_present:true});
+ const unavailable=await runGeminiProbe(provider,'transport_chat',{fetcher:async()=>new Response('unavailable',{status:503})});
+ assert.equal(unavailable.ok,false);assert.equal(unavailable.upstream_http_status,503);
+ const fake=await runGeminiProbe(provider,'transport_chat',{fetcher:async()=>Response.json({ok:true})});
+ assert.equal(fake.ok,false);
+});
