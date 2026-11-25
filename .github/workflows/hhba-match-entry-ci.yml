@@ -7,6 +7,10 @@ on:
       - fix/candidate-match-direct-entry-20261121
   pull_request:
     paths:
+      - apps/web/src/components/MatchWorkspaceHost.tsx
+      - apps/web/src/components/CandidateMatchNativeDialog.tsx
+      - apps/web/scripts/qa-global-match-workspace.html
+      - apps/web/scripts/qa_global_match_workspace.*
       - apps/web/src/main.tsx
       - apps/web/src/pages/HomePage.tsx
       - apps/web/src/pages/PhoneAuthPage.tsx
@@ -26,9 +30,25 @@ jobs:
         with:
           node-version: '22'
       - name: Verify match routing and login return destination
-        run: node --test apps/web/scripts/match-entry.contract.test.mjs
+        run: node --test apps/web/scripts/match-entry.contract.test.mjs apps/web/scripts/unified-workspace-layout.contract.test.mjs
       - name: Build web UI
         working-directory: apps/web
         run: |
           npm ci --ignore-scripts
           npm run build
+
+      - name: Real Chromium navigation and task lifetime
+        working-directory: apps/web
+        env:
+          VITE_HHBA_REAL_AUTH_ENABLED: '1'
+        run: |
+          python3 -m pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
+          npm run dev -- --port 4173 --strictPort > /tmp/hhba-global-match-vite.log 2>&1 &
+          SERVER=$!
+          trap 'kill "$SERVER" 2>/dev/null || true' EXIT
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:4173/scripts/qa-global-match-workspace.html >/dev/null; then break; fi
+            sleep 1
+          done
+          python3 scripts/qa_global_match_workspace.py

@@ -498,12 +498,13 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
-          disabled={(!file&&!savedId)||!consent||working||saveBusy||wordVersionBusy||previewBusy||ocrBusy||!previewLoaded||
+          disabled={(!file&&!savedId)||!consent||working||saveBusy||wordVersionBusy||taskOpen.current||previewBusy||ocrBusy||!previewLoaded||
            (file&&!savedId&&storageChoice==='undecided')||
            identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()}>
           {working?<><LoaderCircle className="spin" size={18}/> {saveBusy?'正在保存简历…':'正在匹配岗位…'}</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>
+        {!working&&taskOpen.current&&<p role="status">本次研究结果仍在任务窗口中，请通过悬浮入口查看或关闭后再开始新匹配。</p>}
         {working&&<p className="hhba-ai-processing" role="status">智能研究正在进行。可通过研究窗口或右下角任务入口查看进度；收起窗口或切换站内页面不会取消搜索。</p>}
       </section>
       <aside className="hhba-ai-aside">

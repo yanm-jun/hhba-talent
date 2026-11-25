@@ -71,7 +71,7 @@ test('homepage and workspace use one matching component but distinct presentatio
 
 test('one session-owned portal survives route changes without duplicating the matcher',()=>{
  const host=read('../src/components/MatchWorkspaceHost.tsx');
- assert.match(app,/return <MatchWorkspaceHost key=\{String\(user\?\.id\|\|'guest'\)\+': '\+sessionEpoch\}/.source.includes("unused")?/never/:/return <MatchWorkspaceHost key=/);
+ assert.match(app,/return <MatchWorkspaceHost key=/);
  assert.equal((app.match(/<CandidateMatchPage user=/g)||[]).length,1);
  assert.match(app,/workspace=\{<CandidateMatchPage user=\{user\} embedded=\{route!=='\/candidate\/match'\} hosted hostRoute=\{route\}\/>\}/);
  assert.match(host,/createPortal\(<Suspense fallback=\{fallback\}>\{workspace\}<\/Suspense>,container\)/);
