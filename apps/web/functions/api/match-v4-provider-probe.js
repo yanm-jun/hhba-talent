@@ -29,6 +29,10 @@ export async function onRequest({request,env}){
   let independentlyRead=false;
   // Probe one real public job; not a cap on ordinary matching.
   if(jobs[0])try{const jd=await v4ReadEmployerJob(jobs[0].url,{signal,expected:jobs[0]});independentlyRead=Boolean(jd?.independently_read&&jd?.full_jd);}catch{}
-  return reply({ok:sources.length>0&&jobs.length>0,phase:'complete',model:provider.model,grounding_count:sources.length,job_count:jobs.length,independent_jd_read:independentlyRead,elapsed_ms:Date.now()-start});
+  // Test optional protocol capabilities separately, with no personal data.
+  const capabilities={stream:false,url_context:false};
+  try{const stream=await callGeminiJob(fetch,{...provider,stream:true},{instructions:'Return only JSON.',input:'Return {"ok":true}.'},{signal});capabilities.stream=v4ParseJson(stream).ok===true&&stream.native_stream===true;}catch{}
+  if(jobs[0])try{const ctx=await callGeminiJob(fetch,{...provider,urlContext:true},{instructions:'Use URL Context to read this public job URL. Return JSON only.',input:JSON.stringify({url:jobs[0].url}),tools:[{type:'web_search'}],publicUrlContext:true},{signal});capabilities.url_context=ctx.output.some(x=>x.type==='url_context_call');}catch{}
+  return reply({ok:sources.length>0&&jobs.length>0,phase:'complete',model:provider.model,grounding_count:sources.length,job_count:jobs.length,independent_jd_read:independentlyRead,capabilities,elapsed_ms:Date.now()-start});
  }catch(e){return reply({ok:false,phase,error:typeof e?.code==='string'&&/^[A-Z_]+$/.test(e.code)?e.code:'PROBE_FAILED'},502);}
 }

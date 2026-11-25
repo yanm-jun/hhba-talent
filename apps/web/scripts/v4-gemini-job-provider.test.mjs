@@ -24,9 +24,11 @@ test('native grounding maps to V4 response; no OpenAI credential, no model effor
  assert.equal(v4OutputText(answer),'{"jobs":[]}');
  assert.deepEqual(v4ToolSources(answer),['https://careers.other-motors.cn/recruitment/positions/9988']);
  assert.equal(answer.usage.total_tokens,120);
+ assert.deepEqual(answer.output[0].action.queries,['jobs']);
 });
 test('required search cannot claim success with no grounding',async()=>{
- await assert.rejects(v4Call(async()=>Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"jobs":[]}'}]}}]}),v4JobProvider(env),{input:'synthetic',tools:[{type:'web_search'}],tool_choice:'required'}),{code:'AI_PROVIDER_RESPONSE_INVALID'});
+ const reply=await v4Call(async()=>Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"jobs":[]}'}]}}]}),v4JobProvider(env),{input:'synthetic',tools:[{type:'web_search'}],tool_choice:'required'});
+ assert.equal(reply.status,'incomplete');assert.equal(reply.output.some(x=>x.type==='web_search_call'),false);assert.equal(v4OutputText(reply),'{"jobs":[]}');
 });
 test('ordinary non-search calls need no grounding; provider rate limit remains retryable',async()=>{
  const result=await v4Call(async()=>Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"score":90}'}]}}]}),v4JobProvider(env),{input:'synthetic'});
@@ -52,4 +54,17 @@ test('actual V4 first phase uses OpenAI, following discovery uses Gemini',async(
  try{await v4Match(fetcher,v4JobProvider(env),resume,'全国',{env,officialOnly:true,curated:true,stepMode:true,checkpoint:first.checkpoint});}catch{}
  assert.ok(calls.slice(1).some(u=>u==='https://relay.example/v1beta/models/gemini-test:generateContent'));
  assert.ok(calls.slice(1).every(u=>!u.endsWith('/responses')));
+});
+
+test('native SSE combines text fragments and actual query metadata without thought leakage',async()=>{
+ const events=[{candidates:[{content:{parts:[{thought:true,text:'SECRET THOUGHT'},{text:'{"jobs":'}]}}]},{candidates:[{content:{parts:[{text:'[]}'}]},groundingMetadata:{webSearchQueries:['alternate search'],groundingChunks:[{web:{uri:'https://careers.other-motors.cn/recruitment/positions/9988'}}]},finishReason:'STOP'}],usageMetadata:{totalTokenCount:70}}];
+ const result=await v4Call(async(url,opt)=>{assert.match(url,/:streamGenerateContent\?alt=sse$/);assert.equal(opt.headers.accept,'text/event-stream');return new Response(events.map(v=>'data: '+JSON.stringify(v)+'\r\n\r\n').join(''),{headers:{'content-type':'text/event-stream'}})},v4JobProvider({...env,GEMINI_STREAM:'1'}),{input:'synthetic',tools:[{type:'web_search'}],tool_choice:'required'});
+ assert.equal(v4OutputText(result),'{"jobs":[]}');assert.equal(result.status,'completed');assert.deepEqual(result.output[0].action.queries,['alternate search']);assert.equal(result.usage.total_tokens,70);
+});
+test('URL Context is opt-in and restricted to public job-source requests',async()=>{
+ const provider=v4JobProvider({...env,GEMINI_URL_CONTEXT:'1'});
+ for(const use of [false,true])await v4Call(async(_url,opt)=>{
+  assert.deepEqual(JSON.parse(opt.body).tools,use?[{google_search:{}},{url_context:{}}]:[{google_search:{}}]);
+  return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{}'}]}}]});
+ },provider,{input:'synthetic',tools:[{type:'web_search'}],publicUrlContext:use});
 });
