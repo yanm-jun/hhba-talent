@@ -252,3 +252,13 @@ $("pair-disconnect").addEventListener("click",async()=>{
  }
 });
 void refreshAccount();
+
+
+// User-triggered navigation only. No website login token or resume content is
+// transferred to the extension merely by opening the user's HHBA workspace.
+$("open-hhba-account").addEventListener("click",()=>{
+ chrome.tabs.create({url:"https://hhba.work/candidate/account/apply-assistant"});
+});
+$("open-hhba-resume").addEventListener("click",()=>{
+ chrome.tabs.create({url:"https://hhba.work/candidate/account/resume"});
+});

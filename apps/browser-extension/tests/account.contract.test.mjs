@@ -48,3 +48,23 @@ test('extension claim uses explicit one-time code and no website bearer',async()
  assert.equal(JSON.parse(req.options.body).code,'ABCDEFGHJKLM');
  await assert.rejects(()=>accountApi(fake,'/claim',null,{code:'123'}),/请输入正确/);
 });
+
+test('P0 shortcuts open HHBA first-party workspace; never read login tokens or auto-sync a private CV',()=>{
+ const html=readFileSync(new URL('../popup.html',import.meta.url),'utf8');
+ const popup=readFileSync(new URL('../popup.js',import.meta.url),'utf8');
+ for(const id of ['open-hhba-account','open-hhba-resume']){
+  assert.ok(html.includes('id="'+id+'"'));
+  assert.ok(popup.includes('$("'+id+'").addEventListener("click"'));
+ }
+ assert.ok(popup.includes('https://hhba.work/candidate/account/apply-assistant'));
+ assert.ok(popup.includes('https://hhba.work/candidate/account/resume'));
+ assert.ok(html.includes('不会自动导入到插件'));
+ assert.ok(!popup.includes('chrome.cookies'));
+});
+
+test('P0 extension displays first-party privacy policy without silently consenting',()=>{
+ const html=readFileSync(new URL('../popup.html',import.meta.url),'utf8');
+ assert.ok(html.includes('https://hhba.work/apply-extension-privacy.html'));
+ assert.ok(html.includes('自动解析与同步功能尚未开放'));
+ assert.ok(!html.includes('checked="checked"'));
+});
