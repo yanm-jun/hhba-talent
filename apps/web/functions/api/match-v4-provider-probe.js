@@ -96,5 +96,10 @@ export async function onRequest({request,env}){
  try{
   const result=await runGeminiProbe(provider,phase,{signal:request.signal});
   return reply({...result,phase,model:provider.model,elapsed_ms:Date.now()-start});
- }catch(e){return reply({ok:false,phase,error:typeof e?.code==='string'&&/^[A-Z_]+$/.test(e.code)?e.code:'PROBE_FAILED',elapsed_ms:Date.now()-start},502);}
+ }catch(e){
+  // The operator probe completed even when the upstream model failed.
+  // Keep its sanitized JSON visible instead of triggering an edge 502 HTML
+  // error page. The logical ok flag is the acceptance gate, never HTTP 200.
+  return reply({ok:false,phase,error:typeof e?.code==='string'&&/^[A-Z_]+$/.test(e.code)?e.code:'PROBE_FAILED',upstream_http_status:Number.isInteger(e?.upstreamStatus)?e.upstreamStatus:null,elapsed_ms:Date.now()-start});
+ }
 }
