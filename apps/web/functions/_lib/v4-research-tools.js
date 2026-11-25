@@ -14,6 +14,22 @@ export function v4ResearchMemoryPage(items,cursor=0,budget=90000){
  }
  return {items:page,cursor:start,next_cursor:i<all.length?i:null,total:all.length};
 }
+// Transport size is learned from the provider's actual acceptance, not a fixed research quota.
+// Grow only when there was omitted data; after a context rejection, learn a safe ceiling.
+export function v4ContextState(value,initial=90000){
+ const budget=Number.isSafeInteger(value?.budget)&&value.budget>=256?value.budget:initial;
+ return {budget,rejectedAt:Number.isSafeInteger(value?.rejectedAt)&&value.rejectedAt>budget?value.rejectedAt:null};
+}
+export function v4ContextFeedback(value,{rejected=false,more=false}={}){
+ const state=v4ContextState(value);
+ if(rejected)return {budget:Math.max(256,Math.floor(state.budget/2)),rejectedAt:state.budget};
+ if(!more)return state;
+ const grown=state.rejectedAt?Math.floor((state.budget+state.rejectedAt)/2):Math.ceil(state.budget*1.5);
+ return {...state,budget:Math.max(state.budget,grown)};
+}
+export function v4RotatingMemoryPage(items,cursor,budget){
+ return v4ResearchMemoryPage(items,Number.isSafeInteger(cursor)&&cursor>=0&&cursor<items.length?cursor:0,budget);
+}
 export function v4RememberPublicResult(ledger,result){
  if(!Array.isArray(ledger)||!result?.ok||result.type!=='read_page'||typeof result.text!=='string'||!v4PublicJobUrl(result.url))return;
  const record={type:'read_page',mode:result.mode,url:result.url,offset:result.offset??0,next_offset:result.next_offset??null,unit:result.unit||'characters',text:result.text};
@@ -73,7 +89,7 @@ const stageGuide='可调用 research_actions 数组或 research_action 单项工
 export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetcher,browser,signal,resume='',jd='',document='',collections={},ledger=[],note=()=>{}}={}){
  const original=JSON.parse(payload.input);
  const knownUrls=new Set([...sourceUrls,...ledger.map(r=>r.url)].map(v4PublicJobUrl).filter(Boolean));
- const seen=new Set(),stageLedger=[...ledger],notes=[];let budget=90000,paged=false,results=null,repeat=false;
+ const seen=new Set(),stageLedger=[...ledger],notes=[];let budget=90000,paged=false,results=null,repeat=false,contextState=v4ContextState(null),evidenceCursor=0;
  const originals={resume,jd,document};
  const delivered={resume:[],jd:[],document:[]};
  const remember=(name,start,end)=>{if(end<=start)return;const list=[...delivered[name],[start,end]].sort((a,b)=>a[0]-b[0]);delivered[name]=[];for(const part of list){const last=delivered[name].at(-1);if(last&&part[0]<=last[1])last[1]=Math.max(last[1],part[1]);else delivered[name].push(part);}};
@@ -95,15 +111,16 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
    input.original_text_pages=Object.fromEntries(Object.entries(originals).map(([name,value])=>[name,{total_chars:value.length,next_offset:value.length>budget?budget:null}]));
   }
   if(results)input.research_tool_results=results;
-  const indexPage=v4ResearchMemoryPage(v4EvidenceIndex(stageLedger),0,Math.max(256,Math.floor(budget/3)));
+  const indexPage=v4RotatingMemoryPage(v4EvidenceIndex(stageLedger),evidenceCursor,Math.max(256,Math.floor(budget/3)));
   if(stageLedger.length)input.research_evidence={total:indexPage.total,next_cursor:indexPage.next_cursor,items:indexPage.items};
   if(notes.length){const latest=v4ResearchMemoryPage([...notes].reverse(),0,Math.max(256,Math.floor(budget/3)));input.research_notes=latest.items.reverse();input.research_notes_index={total:notes.length,collection:'notes',order:'chronological'};}
   let response;
   try{response=await call({...payload,instructions:payload.instructions+' '+V4_RESEARCH_TOOL_GUIDE+' '+stageGuide,input:JSON.stringify(input)})}
   catch(e){
    if(e?.code!=='AI_PROVIDER_CONTEXT_TOO_LARGE'||budget<=256)throw e;
-   budget=Math.max(256,Math.floor(budget/2));paged=true;results=null;seen.clear();note('AI_STAGE_CONTEXT_REPAGED');continue;
+   contextState=v4ContextFeedback(contextState,{rejected:true});budget=contextState.budget;paged=true;results=null;seen.clear();note('AI_STAGE_CONTEXT_REPAGED');continue;
   }
+  if(response.status==='completed'){evidenceCursor=indexPage.next_cursor??0;contextState=v4ContextFeedback(contextState,{more:indexPage.next_cursor!==null});budget=contextState.budget;}
   let data;try{data=parse(response)}catch{return response;}
   const actions=v4RequestedActions(data);
   if(paged){remember('resume',0,Math.min(resume.length,budget));remember('jd',0,Math.min(jd.length,budget));remember('document',0,Math.min(document.length,budget));for(const r of results||[])if(r.ok&&r.type==='text_page'&&Object.hasOwn(delivered,r.collection))remember(r.collection,r.offset,r.offset+r.text.length);}

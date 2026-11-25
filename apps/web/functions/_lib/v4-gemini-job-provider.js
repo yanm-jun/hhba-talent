@@ -79,8 +79,8 @@ export async function callGeminiJob(fetcher,provider,payload,{signal,onEvent}={}
    if([401,403].includes(r.status))throw fault('AI_PROVIDER_KEY_REJECTED');
    if(r.status===402)throw fault('AI_PROVIDER_BALANCE_INSUFFICIENT');
    if(r.status===429)throw fault('AI_PROVIDER_RATE_LIMITED');
-   if(r.status>=500)throw fault('AI_PROVIDER_UPSTREAM_ERROR');
    if([400,404,405,422,501].includes(r.status)&&provider.stream){await r.body?.cancel().catch(()=>{});return callGeminiJob(fetcher,{...provider,stream:false},payload,{signal,onEvent});}
+   if(r.status>=500)throw fault('AI_PROVIDER_UPSTREAM_ERROR');
    if([400,422].includes(r.status)){
     let error;try{error=(await r.json())?.error}catch{}
     if(/context window|context length|input.*too long|token count.*exceed/i.test(error?.message||''))throw fault('AI_PROVIDER_CONTEXT_TOO_LARGE');

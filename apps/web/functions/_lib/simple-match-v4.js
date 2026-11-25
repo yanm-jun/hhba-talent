@@ -10,7 +10,7 @@ import {sha256Hex} from './real-auth.js';
 import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
 import {CANDIDATE_TARGET,FINAL_TARGET,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,eligibleCuratedScore,qualifiedReport} from './v4-curated-reports.js';
 import {findMainlandCity} from './mainland-job-location.js';
-import {v4ResearchMemoryPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex} from './v4-research-tools.js';
+import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex} from './v4-research-tools.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch} from './v4-jd-research.js';
 import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery} from './v4-parallel-discovery.js';
@@ -530,8 +530,10 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const explicitRechecks=new Set(checkpoint?.explicitRechecks||[]),recheckedEvidence=new Set(checkpoint?.recheckedEvidence||[]);
  const actionSeen=new Set(checkpoint?.actionSeen||[]);
  let researchToolResult=checkpoint?.researchToolResult||null;
- let researchContextBudget=checkpoint?.researchContextBudget||90000;
- let discoveryWidth=checkpoint?.discoveryWidth||initialDiscoveryWidth;
+ let researchContext=v4ContextState(checkpoint?.researchContext||{budget:checkpoint?.researchContextBudget||90000});
+ let researchContextBudget=researchContext.budget;
+ let memoryCursors={candidates:0,evidence:0,unresolved:0,...checkpoint?.memoryCursors};
+ let discoveryWidth=checkpoint?.discoveryWidth||initialDiscoveryWidth,discoveryElapsed=checkpoint?.discoveryElapsed||null;
  let searchResumePaged=!!checkpoint?.searchResumePaged,searchResumeOffset=checkpoint?.searchResumeOffset||0;
  const resumePageRef=(offset=0,budget=researchContextBudget)=>{const start=Number.isSafeInteger(offset)&&offset>=0?Math.min(offset,resume.length):0,end=Math.min(resume.length,start+budget);return {type:'text_page',ok:true,collection:'resume',offset:start,next_offset:end<resume.length?end:null,total_chars:resume.length,page_length:end-start};};
  // Never serialize private resume pages into task checkpoints. Materialize refs only for the current authorized model request.
@@ -545,7 +547,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  let completionReason=checkpoint?.completionReason||'';
  const note=code=>{diag[code]=(diag[code]||0)+1;};
  const publishResearch=()=>onResearch(report());
- const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],researchToolResult,researchContextBudget,discoveryWidth,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,pipelineActive:!!checkpoint?.pipelineActive,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],...extra}});
+ const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],researchToolResult,researchContextBudget,researchContext,memoryCursors,discoveryWidth,discoveryElapsed,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,pipelineActive:!!checkpoint?.pipelineActive,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],...extra}});
  onRecoveryState(()=>checkpoint?{...checkpoint,publicEvidence}:null);
  // This phase is reachable only after every candidate has completed a verification
  // attempt. Report generation cannot influence the initial score ranking.
@@ -554,7 +556,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   const rank=()=>combined.filter(eligibleCuratedScore).sort((a,b)=>b.match_score-a.match_score||a.official_url.localeCompare(b.official_url));
   const pendingReports=()=>rank().filter(j=>j.report_status!=='UNAVAILABLE').slice(0,FINAL_TARGET).filter(j=>!qualifiedReport(j));
   const needsReport=()=>pendingReports()[0];
-  let reportFailures=checkpoint.reportFailures||0;
+  let reportFailures=checkpoint.reportFailures||0,reportWidth=checkpoint.reportWidth||3;
   let delivered=rank().filter(qualifiedReport).length;
   onProgress('writing');
   // Independent reports can run concurrently; the global evidence score
@@ -596,15 +598,17 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    }
   };
   if(needsReport()){
-   const batch=pendingReports().slice(0,parallelResearch?3:1);
+   const width=parallelResearch?(provider?.kind==='gemini'?(checkpoint?.reportWidth||3):3):1;
+   const batch=pendingReports().slice(0,width);
    const settled=await Promise.allSettled(batch.map(generateReport));
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    const failures=settled.filter(x=>x.status==='rejected');
    if(failures.length===settled.length)throw failures[0].reason;
    if(failures.length)note('PARALLEL_REPORT_RETRY_RETAINED');
+   if(provider?.kind==='gemini'&&parallelResearch)reportWidth=nextDiscoveryWidth(width,failures.map(x=>x.reason?.code||'AI_PROVIDER_RESPONSE_INVALID'),{maxConnections:4});
    onPartial(combined);
   }
-  if(needsReport())return continuation('reporting',{matches:combined,read:checkpoint.read,scored:checkpoint.scored,archived:checkpoint.archived,scoreFailures:checkpoint.scoreFailures,reportFailures});
+  if(needsReport())return continuation('reporting',{matches:combined,read:checkpoint.read,scored:checkpoint.scored,archived:checkpoint.archived,scoreFailures:checkpoint.scoreFailures,reportFailures,reportWidth});
   const ranked=combined.slice().sort((a,b)=>(b.match_score??-1)-(a.match_score??-1)||a.official_url.localeCompare(b.official_url));
   const final=ranked.filter(qualifiedReport).slice(0,FINAL_TARGET);
   const candidateSetSignature=await sha256Hex(JSON.stringify({candidates:[...rows.entries()].map(([u,j])=>[u,candidateEvidence(j)]).sort(([a],[b])=>a.localeCompare(b)),outcomes:ranked.map(j=>[j.official_url,j.jd_source_status,j.match_score,j.report_status,j.curated_suitable]),reviewed:[...reviewedSources.keys()].sort(),sources:[...sourceLeads].sort()}));
@@ -663,8 +667,10 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   onActivity('searching','AI 正在进行第 '+round+' 轮联网研究，已保留 '+rows.size+
    (curated?' 个有效候选岗位，目标 '+CANDIDATE_TARGET+' 个。':' 条招聘来源；由 AI 自主决定是否继续。'));
   const allPendingSources=[...sourceLeads].filter(u=>!rows.has(u)&&!reviewedSources.has(u)&&!submittedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u));
-  const sourcePage=v4ResearchMemoryPage(allPendingSources,0,Math.min(70000,researchContextBudget)),pendingSources=sourcePage.items;
-  const candidatePage=v4ResearchMemoryPage(candidateMemory(),0,researchContextBudget),reviewPage=v4ResearchMemoryPage(unresolvedMemory(),0,researchContextBudget);
+  const sourcePage=v4ResearchMemoryPage(allPendingSources,0,provider?.kind==='gemini'?researchContextBudget:Math.min(70000,researchContextBudget)),pendingSources=sourcePage.items;
+  const gemini=provider?.kind==='gemini';
+  const candidatePage=v4RotatingMemoryPage(candidateMemory(),gemini?memoryCursors.candidates:0,researchContextBudget),reviewPage=v4RotatingMemoryPage(unresolvedMemory(),gemini?memoryCursors.unresolved:0,researchContextBudget);
+  const evidencePage=v4RotatingMemoryPage(v4EvidenceIndex(publicEvidence),gemini?memoryCursors.evidence:0,Math.max(256,Math.floor(researchContextBudget/3)));
   const activeResumePage=searchResumePaged?resumePageRef(searchResumeOffset<resume.length?searchResumeOffset:0):null;
   let response,independent=[],coordinatorFailed=false;
   try{
@@ -690,7 +696,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     input:JSON.stringify({resume_text:activeResumePage?resume.slice(activeResumePage.offset,activeResumePage.offset+activeResumePage.page_length):resume,preferred_job_or_city:roleHint,...(activeResumePage?{resume_page:{...activeResumePage,all_pages_sent:searchResumeOffset>=resume.length}}:{}),
      country:'中国大陆',previously_discovered_jobs:curated?candidatePage.items: [...rows.entries()].map(([url,j])=>({...j,url})),
      ...(curated?{candidate_target:CANDIDATE_TARGET,remaining_candidates:Math.max(0,CANDIDATE_TARGET-concreteCount())}:{}),
-     prior_profile:profile,...(curated?{unclassified_public_sources:pendingSources,research_memory:{candidates:{total:candidatePage.total,next_cursor:candidatePage.next_cursor},sources:{total:sourceLeads.size,pending:allPendingSources.length,pending_next_cursor:sourcePage.next_cursor},unresolved:{total:reviewPage.total,next_cursor:reviewPage.next_cursor}},research_tool_result:hydrateToolResult(researchToolResult),research_evidence:v4ResearchMemoryPage(v4EvidenceIndex(publicEvidence),0,Math.max(256,Math.floor(researchContextBudget/3))),context_page_budget:researchContextBudget,review_context:priorState?{verified_reports:priorState.matches.filter(qualifiedReport).length,unresolved:reviewPage.items}:null}:{}),excluded_previously_recommended_urls:[...excluded],research_round:round,recovery_hint:recoveryHint,excluded_commercial_domains:[...commercialBoardDomains,...new Set([...rejectedBoards].map(u=>new URL(u).hostname))]}),
+     prior_profile:profile,...(curated?{unclassified_public_sources:pendingSources,research_memory:{candidates:{total:candidatePage.total,cursor:candidatePage.cursor,next_cursor:candidatePage.next_cursor},sources:{total:sourceLeads.size,pending:allPendingSources.length,pending_next_cursor:sourcePage.next_cursor},unresolved:{total:reviewPage.total,cursor:reviewPage.cursor,next_cursor:reviewPage.next_cursor}},research_tool_result:hydrateToolResult(researchToolResult),research_evidence:evidencePage,context_page_budget:researchContextBudget,review_context:priorState?{verified_reports:priorState.matches.filter(qualifiedReport).length,unresolved:reviewPage.items}:null}:{}),excluded_previously_recommended_urls:[...excluded],research_round:round,recovery_hint:recoveryHint,excluded_commercial_domains:[...commercialBoardDomains,...new Set([...rejectedBoards].map(u=>new URL(u).hostname))]}),
     tools:[{type:'web_search'}],tool_choice:curated&&(researchToolResult||toolUrls.size||publicEvidence.length)?'auto':'required',
     include:['web_search_call.action.sources']
    };
@@ -713,7 +719,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      return {response:laneResponse,data:{jobs},sources:[...v4Sources(laneResponse),...(Array.isArray(laneData.source_leads)?laneData.source_leads:[])]};
     };
     const wave=await runDiscoveryWave(()=>v4Call(fetcher,provider,coordinatorPayload,{signal,onEvent:providerActivity}),lane,width,signal);
-    discoveryWidth=nextDiscoveryWidth(width,wave.codes);
+    discoveryWidth=nextDiscoveryWidth(width,wave.codes,gemini?{maxConnections:checkpoint?.pipelineActive?4:6,elapsed:wave.elapsed,previousElapsed:checkpoint?.discoveryElapsed}:{});
+    if(gemini)discoveryElapsed=wave.elapsed;
     for(const code of wave.codes)note('PARALLEL_'+code);
     independent=wave.independent.filter(x=>x.status==='fulfilled').map(x=>x.value);
     diag.PARALLEL_DISCOVERY_CALLS=(diag.PARALLEL_DISCOVERY_CALLS||0)+width;
@@ -726,7 +733,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    const code=e?.code||'AI_PROVIDER_UNAVAILABLE';
    if(curated&&code==='AI_PROVIDER_CONTEXT_TOO_LARGE'&&researchContextBudget>256){
-    researchContextBudget=Math.max(256,Math.floor(researchContextBudget/2));searchResumePaged=true;
+    researchContext=v4ContextFeedback(researchContext,{rejected:true});researchContextBudget=researchContext.budget;searchResumePaged=true;
     // Recompute only the transport view; the complete research store is untouched.
     if(researchToolResult?.type==='memory'&&researchToolResult.ok){const collection=researchToolResult.collection;const items=collection==='candidates'?candidateMemory():collection==='sources'?[...sourceLeads]:collection==='evidence'?v4EvidenceIndex(publicEvidence):unresolvedMemory();researchToolResult={type:'memory',collection,ok:true,...v4ResearchMemoryPage(items,researchToolResult.cursor,researchContextBudget)};}
     else if(researchToolResult?.type==='batch'){researchToolResult={type:'batch',ok:false,error:'CONTEXT_PAGE_TOO_LARGE',retry_with_budget:researchContextBudget};}
@@ -784,6 +791,11 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   if(curated){
    if(data.format_error)note('SEARCH_FORMAT_REPAIR_FAILED');
    if(response.status==='completed'&&!data.format_error){
+    if(gemini){
+     memoryCursors={candidates:candidatePage.next_cursor??0,evidence:evidencePage.next_cursor??0,unresolved:reviewPage.next_cursor??0};
+     researchContext=v4ContextFeedback(researchContext,{more:[candidatePage,evidencePage,reviewPage,sourcePage].some(x=>x.next_cursor!==null)});
+     researchContextBudget=researchContext.budget;
+    }
     for(const u of pendingSources)submittedSources.add(u);
     const availableEvidence=new Set([...coordinatorToolSources,...publicEvidence.map(r=>r.url)].map(v4PublicJobUrl).filter(Boolean).map(curatedUrl));
     for(const r of Array.isArray(data.reviewed_sources)?data.reviewed_sources:[]){const u=curatedUrl(v4PublicJobUrl(r?.url));if(u&&sourceLeads.has(u)&&['job_found','no_job','official_entry'].includes(r.status)&&text(r.reason)){
@@ -837,7 +849,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   const madeProgress=signature!==lastSignature;
   lastSignature=signature;
   if(madeProgress){stalledStrategy='';stalledSearches.clear();}
-  const strategySignature=await sha256Hex(JSON.stringify({candidates:signature,queries:[...queries].sort(),strategy:text(data.search_strategy),status:response.status}));
+  const strategySignature=await sha256Hex(JSON.stringify({candidates:signature,queries:[...queries].sort(),strategy:text(data.search_strategy),status:response.status,...(gemini?{memoryCursors}: {})}));
   const independentStallReview=(kind,key)=>{if(!curated)return false;const review=kind+':'+key;if(reviewedStalls.has(review))return false;reviewedStalls.add(review);note('AI_INDEPENDENT_SEARCH_REVIEW');recoveryHint='独立复盘：当前策略未带来新的可核验证据，但不代表已研究充分。请检查遗漏的职业方向、企业官方入口、尚未解决的来源或其他工具，选择不同的有效研究路径。若确已没有新增价值，请明确说明停止依据。';return true;};
   if(curated){
    const actions=v4RequestedActions(data);
@@ -886,7 +898,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   if(curated&&searchResumePaged&&searchResumeOffset<resume.length&&response.status==='completed'&&!data.format_error){recoveryHint='简历原文已分段提交，继续研究尚未送达的后续页；保留前面发现的职业方向及候选。';continue;}
   if(data.research_complete===true&&data.continue_search!==true){
    if(curated&&[...sourceLeads].some(u=>!rows.has(u)&&!submittedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u))){recoveryHint='请先研究尚未分类的真实公开引用，识别其中具体招聘岗位或明确说明无有效岗位，不把普通网页计入候选。';continue;}
-   if(curated&&provider?.kind==='gemini'&&concreteCount()<CANDIDATE_TARGET&&independentStallReview('gemini-explicit-completion',signature)){recoveryHint+=' 请独立检索尚未覆盖的企业、岗位别名和官方招聘入口，依据真实查询与证据决定是否结束。';continue;}
+   if(curated&&gemini&&concreteCount()<CANDIDATE_TARGET&&independentStallReview('gemini-explicit-completion',signature)){recoveryHint+=' 请独立检索尚未覆盖的企业、岗位别名和官方招聘入口，依据真实查询与证据决定是否结束。';continue;}
    if(curated&&concreteCount()<CANDIDATE_TARGET&&(madeProgress||!text(data.completion_reason))&&stalledStrategy!==signature){stalledStrategy=signature;recoveryHint='当前尚未达到500个具体候选。请独立复查新企业、职业方向与官方渠道；如果确无新增可靠岗位，明确返回research_complete=true及completion_reason，说明覆盖和停止依据。';continue;}
    researchComplete=true;researchError=curated&&concreteCount()<CANDIDATE_TARGET&&!text(data.completion_reason)?'AI_RESEARCH_COMPLETION_UNCONFIRMED':null;completionReason=text(data.completion_reason)||'AI 已声明研究完成；接口未提供详细停止理由。';
   }
@@ -898,7 +910,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    continue;
   }else if(!madeProgress){
    researchError='AI_RESEARCH_NO_NEW_EVIDENCE';
-   if(curated?stalledSearches.has(strategySignature):stalledStrategy===signature){if(independentStallReview('strategy',strategySignature))continue;note('REPEATED_SEARCH_NO_PROGRESS');researchError='AI_RESEARCH_NO_NEW_EVIDENCE';break;}
+   if(curated?stalledSearches.has(strategySignature):stalledStrategy===signature){if(independentStallReview('strategy',strategySignature))continue;
+    if(gemini&&[...sourceLeads].some(u=>!rows.has(u)&&!reviewedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u))&&independentStallReview('unresolved-source-review',signature)){recoveryHint='仍有未分类或尚未核验的公开来源。请读取这些来源、翻页或更换查询策略，不得把未处理当作研究完成。';continue;}note('REPEATED_SEARCH_NO_PROGRESS');researchError='AI_RESEARCH_NO_NEW_EVIDENCE';break;}
    stalledSearches.add(strategySignature);stalledStrategy=signature;
    recoveryHint='上一轮没有新增具体岗位。请换搜索策略：扩展真实可迁移技能对应的岗位名称、企业招聘渠道、地点和关键词组合，优先查找尚未出现的企业官网。若确实没有更多可靠证据，请明确 research_complete=true。';
    continue;
@@ -1007,7 +1020,15 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    onActivity('scoring','已对 '+scored+' 条岗位按完整 JD 重新评分，已存档 '+archived+' 条有原文依据的 JD。');
   }
  };
- await Promise.all(Array.from({length:Math.min(4,entries.length)},worker));
+ const settledWorkers=await Promise.allSettled(Array.from({length:Math.min(4,entries.length)},worker));
+ const workerFailure=settledWorkers.find(x=>x.status==='rejected');
+ if(workerFailure){
+  if(curated&&checkpoint&&isV4RetryableProviderError(workerFailure.reason?.code)&&!signal?.aborted){
+   const preserved=mergeJobEvidence(previousMatches,matches.filter(j=>!j.excluded_board&&!j.excluded_closed));
+   onRecoveryState(()=>continuation('verification',{next:offset,matches:preserved,read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures:checkpoint.reportFailures||0,verificationBatch:Math.max(1,Math.ceil(batchSize/2))}).checkpoint);
+  }
+  throw workerFailure.reason;
+ }
  const revisedOrigins=new Set(matches.map(j=>j.research_candidate_url||j.official_url));
  const rawCombined=[...previousMatches.filter(j=>!curated||!revisedOrigins.has(j.research_candidate_url||j.official_url)),...matches].filter(j=>!j.excluded_board&&!j.excluded_closed&&!isCommercialRecruitmentBoard(j.official_url,j));
  const combined=curated?mergeJobEvidence(previousMatches,matches).filter(j=>!isCommercialRecruitmentBoard(j.official_url,j)&&!rejectedBoards.has(j.research_candidate_url||j.official_url)):rawCombined;

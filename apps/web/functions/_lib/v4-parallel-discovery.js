@@ -3,11 +3,13 @@
 // The coordinator retains exclusive authority over research tools and stopping.
 const throttle=new Set(['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_CONTEXT_TOO_LARGE']);
 export const initialDiscoveryWidth=3;
-export function nextDiscoveryWidth(previous,codes=[]){
+export function nextDiscoveryWidth(previous,codes=[],{maxConnections=6,elapsed,previousElapsed}={}){
  const width=Number.isSafeInteger(previous)&&previous>0?previous:initialDiscoveryWidth;
  if(codes.some(c=>throttle.has(c)))return Math.max(1,Math.floor(width/2));
  if(codes.length)return width;
- return Math.min(6,width+1);
+ // Worker connection ceiling applies to an invocation, never to total research.
+ if(Number.isFinite(elapsed)&&Number.isFinite(previousElapsed)&&previousElapsed>0&&elapsed/width>1.5*previousElapsed/Math.max(1,width-1))return Math.max(1,Math.min(maxConnections,width-1));
+ return Math.min(maxConnections,width+1);
 }
 export function discoveryLaneContext({profile,roleHint,round,lane,width,previousJobs,candidateTarget,remainingCandidates}){
  const roles=Array.isArray(profile?.target_roles)?profile.target_roles.filter(x=>typeof x==='string'&&x.trim()):[];
@@ -18,11 +20,12 @@ export function discoveryLaneContext({profile,roleHint,round,lane,width,previous
   previously_discovered_jobs:previousJobs,candidate_target:candidateTarget,remaining_candidates:remainingCandidates};
 }
 export async function runDiscoveryWave(primary,extra,width,signal){
+ const started=Date.now();
  const calls=[Promise.resolve().then(primary)];
  for(let lane=1;lane<width;lane++)calls.push(Promise.resolve().then(()=>extra(lane)));
  const [coordinator,...independent]=await Promise.allSettled(calls);
  if(signal?.aborted)throw Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
- return {coordinator,independent,codes:[coordinator,...independent].filter(x=>x.status==='rejected').map(x=>x.reason?.code||'AI_PROVIDER_RESPONSE_INVALID')};
+ return {coordinator,independent,elapsed:Date.now()-started,codes:[coordinator,...independent].filter(x=>x.status==='rejected').map(x=>x.reason?.code||'AI_PROVIDER_RESPONSE_INVALID')};
 }
 // Keep the coordinator's tool actions and reviewed-source decisions isolated.
 // All lane leads and actual response output are retained for ordinary V4

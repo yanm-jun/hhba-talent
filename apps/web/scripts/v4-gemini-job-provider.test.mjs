@@ -86,3 +86,20 @@ test('interrupted Gemini stream retains partial research rather than falsely com
  const result=await v4Call(async()=>new Response(chunk+'data: broken\n\n',{headers:{'content-type':'text/event-stream'}}),v4JobProvider({...env,GEMINI_STREAM:'1'}),{input:'synthetic',tools:[{type:'web_search'}]});
  assert.equal(result.status,'incomplete');assert.equal(v4OutputText(result),'{"jobs":[]}');assert.deepEqual(result.output[0].action.queries,['jobs']);
 });
+
+test('Gemini context transport grows with actual omitted memory and learns rejection ceiling',async()=>{
+ const {v4ContextState,v4ContextFeedback,v4RotatingMemoryPage}=await import('../functions/_lib/v4-research-tools.js');
+ let state=v4ContextState(null);assert.equal(state.budget,90000);
+ state=v4ContextFeedback(state,{more:true});assert.equal(state.budget,135000);
+ state=v4ContextFeedback(state,{rejected:true});assert.equal(state.budget,67500);assert.equal(state.rejectedAt,135000);
+ state=v4ContextFeedback(state,{more:true});assert.ok(state.budget>67500&&state.budget<135000);
+ const items=Array.from({length:20},(_,i)=>({i,text:'x'.repeat(80)}));let cursor=0,all=[];
+ do{const page=v4RotatingMemoryPage(items,cursor,256);all.push(...page.items);cursor=page.next_cursor;}while(cursor!==null);
+ assert.deepEqual(all,items);assert.equal(v4RotatingMemoryPage(items,20,256).cursor,0);
+});
+test('adaptive concurrency respects hosting transport headroom and actual observed latency',async()=>{
+ const {nextDiscoveryWidth}=await import('../functions/_lib/v4-parallel-discovery.js');
+ assert.equal(nextDiscoveryWidth(3,[],{maxConnections:4,elapsed:100,previousElapsed:100}),4);
+ assert.equal(nextDiscoveryWidth(4,[],{maxConnections:4,elapsed:1000,previousElapsed:100}),3);
+ assert.equal(nextDiscoveryWidth(4,['AI_PROVIDER_RATE_LIMITED'],{maxConnections:4}),2);
+});
