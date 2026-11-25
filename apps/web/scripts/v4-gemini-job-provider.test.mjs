@@ -277,3 +277,69 @@ test('real search acceptance rejects ungrounded candidate claims',async()=>{
  const result=await runGeminiProbe(v4JobProvider(env),'search',{fetcher});
  assert.equal(result.ok,false);assert.equal(result.grounded,false);
 });
+
+test('explicit URL Context incompatibility preserves Gemini search and independent verification',async()=>{
+ const provider=v4JobProvider({...env,GEMINI_URL_CONTEXT:'1',GEMINI_STREAM:'1'});
+ const calls=[];
+ const result=await v4Call(async(url,opt)=>{
+  const tools=JSON.parse(opt.body).tools;calls.push(tools);
+  if(tools.some(x=>x.url_context))return Response.json({error:{message:'URL Context cannot be combined with Google Search on this relay'}},{status:400});
+  return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"jobs":[]}'}]},groundingMetadata:{webSearchQueries:['public positions']}}]});
+ },provider,{input:'public synthetic job search',tools:[{type:'web_search'}],tool_choice:'required',publicUrlContext:true});
+ assert.deepEqual(calls,[[{google_search:{}},{url_context:{}}],[{google_search:{}}]]);
+ assert.equal(result.status,'completed');assert.ok(result.output.some(x=>x.type==='web_search_call'));
+});
+test('Gemini context rejection is surfaced for adaptive paging rather than disabling optional tools',async()=>{
+ const provider=v4JobProvider({...env,GEMINI_URL_CONTEXT:'1',GEMINI_STREAM:'1'});let calls=0;
+ await assert.rejects(v4Call(async()=>{calls++;return Response.json({error:{message:'input context length exceeded'}},{status:400});},provider,{input:'synthetic',tools:[{type:'web_search'}],publicUrlContext:true}),{code:'AI_PROVIDER_CONTEXT_TOO_LARGE'});
+ assert.equal(calls,1);
+});
+
+test('long research notes remain fully readable with adaptive character cursors and escaped Unicode',async()=>{
+ const {v4NotesMemoryPage,v4RunResearchAction}=await import('../functions/_lib/v4-research-tools.js');
+ const notes=['引文"\\🙂'.repeat(2000),'后一份岗位研究'];
+ const exact=notes.join('\n\n');
+ let cursor=0,rebuilt='',pages=0;
+ do{
+  const budget=pages%2?256:511;
+  const p=await v4RunResearchAction({type:'memory',collection:'notes',cursor},{collections:{notes},budget});
+  assert.equal(p.ok,true);assert.equal(p.unit,'characters');assert.ok(JSON.stringify(p.items).length<=budget);
+  rebuilt+=p.items.join('');cursor=p.next_cursor;pages++;
+ }while(cursor!==null);
+ assert.equal(rebuilt,exact);assert.ok(pages>1);
+ assert.equal(v4NotesMemoryPage(notes,exact.length,256,{rotate:true}).cursor,0);
+});
+
+test('unavailable background scheduling returns fallback without losing authorized task identity',async()=>{
+ const {tryScheduleBackgroundMatch}=await import('../functions/_lib/v4-background-match.js');
+ const data=new Map(),env={HHBA_V4_BACKGROUND_ENABLED:'1',HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',HHBA_MATCH_V4_CHECKPOINT_SECRET:'synthetic-checkpoint-secret-long-enough',HHBA_PRIVATE_RESUMES:{async put(k,v){data.set(k,v)},async get(k){const v=data.get(k);return v?{arrayBuffer:async()=>v.buffer.slice(v.byteOffset,v.byteOffset+v.byteLength)}:null}},HHBA_MATCH_BACKGROUND:{async fetch(){return Response.json({ok:false},{status:409})}}};
+ const session={phone:'synthetic-account',token_hash:'synthetic-session'},task={id:'00000000-0000-4000-8000-000000000001',generation:0};
+ assert.equal(await tryScheduleBackgroundMatch(env,new Request('https://hhba.work/api/match-v4/resume'),session,task),false);
+ env.HHBA_MATCH_BACKGROUND.fetch=async()=>Response.json({ok:true});
+ assert.equal(await tryScheduleBackgroundMatch(env,new Request('https://hhba.work/api/match-v4/resume'),session,task),true);
+ assert.equal(data.size,1);
+});
+
+test('public employer HTML exposes resource hints, allows only exact declared external assets and separately reads data',async()=>{
+ const {v4ReadPublicJobDocument,v4RenderPublicJobDocument}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const {v4RunResearchAction,v4RememberPublicResult}=await import('../functions/_lib/v4-research-tools.js');
+ const url='https://careers.employer.cn/jobs/42',script='https://cdn.employer.cn/app.js?v=1',api='https://api.employer.cn/jobs/42.json';
+ const html='<html><head><script src="'+script+'"></script><link rel="preload" as="fetch" href="'+api+'"></head><body><div data-endpoint="'+api+'">运营职位</div><iframe src="http://127.0.0.1/private"></iframe><script src="https://localhost/app.js"></script></body></html>';
+ const fetcher=async(u)=>u===url?new Response(html,{headers:{'content-type':'text/html'}}):u===api?Response.json({title:'运营职位',description:'公开岗位职责'}):(()=>{throw Error('unexpected URL '+u)})();
+ const doc=await v4ReadPublicJobDocument(url,{fetcher});
+ assert.deepEqual(doc.resource_hints,[{url:script,kind:'script'},{url:api,kind:'data'}]);
+ let opts;
+ const browser={async quickAction(type,value){assert.equal(type,'content');opts=value;return new Response('<html><body>公开岗位职责</body></html>',{headers:{'content-type':'text/html'}})}};
+ const rendered=await v4RenderPublicJobDocument(url,{browser,resourceHints:doc.resource_hints});
+ assert.equal(rendered.rendered,true);
+ assert.ok(opts.allowRequestPattern.some(p=>new RegExp(p).test(script)));
+ assert.ok(!opts.allowRequestPattern.some(p=>new RegExp(p).test('https://cdn.employer.cn/unrelated.js')));
+ assert.ok(!opts.allowRequestPattern.some(p=>new RegExp(p).test(api)));
+ const knownUrls=new Set([url]),ledger=[];
+ const page=await v4RunResearchAction({type:'read_page',url},{collections:{},knownUrls,fetcher,browser,ledger});
+ assert.equal(page.ok,true);v4RememberPublicResult(ledger,page);
+ assert.ok(knownUrls.has(api));assert.deepEqual(ledger[0].resource_hints,doc.resource_hints);
+ const data=await v4RunResearchAction({type:'read_page',url:api},{collections:{},knownUrls,fetcher,browser,ledger});
+ assert.equal(data.ok,true);assert.match(data.text,/公开岗位职责/);
+ assert.equal(data.verified,undefined);
+});

@@ -54,8 +54,16 @@ export function mergeJobEvidence(previous,current){
  return [...byUrl.values()];
 }
 // This sizes durable Worker invocations, not the number of jobs researched.
-// Increase after uncomplicated batches; shrink after expensive recovery.
-export function nextVerificationBatch(previous,hadRecovery,remaining){
+// A JD recovery is not itself a reason to serialize research. Use observed
+// external request pressure to size the next invocation, not a model-call cap.
+export function nextVerificationBatch(previous,hadRecovery,remaining,{externalRequests,completed}={}){
  const size=Number.isSafeInteger(previous)&&previous>0?previous:1;
+ if(Number.isFinite(externalRequests)&&externalRequests>=0&&Number.isSafeInteger(completed)&&completed>0){
+  // Workers Free allows 50 external subrequests per invocation. Reserve
+  // headroom and predict next batch size; never interrupt an active job.
+  const perJob=Math.max(1,Math.ceil(externalRequests/completed));
+  const predicted=Math.max(1,Math.floor(40/perJob));
+  return Math.max(1,Math.min(remaining||1,size+1,predicted,4));
+ }
  return Math.max(1,Math.min(remaining||1,hadRecovery?Math.ceil(size/2):size+1,4));
 }

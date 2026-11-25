@@ -2,6 +2,28 @@
 // discovery/verification maps. Candidate input revisions determine whether
 // an earlier independent scoring attempt is reusable.
 export const candidateRevision=j=>JSON.stringify([j.company,j.title,j.location,j.employer_proof_url,j.employer_proof_urls,j.requirements]);
+// Scoped, revision-bound notes never cross vacancies. Public-source research
+// and CV-dependent assessment use separate channels. No raw resume pages.
+export function candidateResearchMemory(checkpoint=[]){
+ const records=new Map(checkpoint);
+ const notes=(url,revision,channel='publicNotes')=>{
+  let entry=records.get(url);
+  if(!entry||entry.revision!==revision){entry={revision,publicNotes:[],analysisNotes:[]};records.set(url,entry);}
+  if(channel==='analysisNotes')for(const n of entry.publicNotes)if(!entry.analysisNotes.includes(n))entry.analysisNotes.push(n);
+  return entry[channel];
+ };
+ return {notes,snapshot:()=>[...records]};
+}
+export function mergeCandidateResearchMemory(discovery=[],verification=[],rows=[]){
+ const current=new Map(rows.map(([url,j])=>[url,candidateRevision(j)]));
+ const merged=new Map();
+ for(const [url,entry] of [...discovery,...verification]){
+  if(!entry||current.get(url)!==entry.revision)continue;
+  const prev=merged.get(url);
+  merged.set(url,{revision:entry.revision,publicNotes:[...new Set([...(prev?.publicNotes||[]),...(entry.publicNotes||[])])],analysisNotes:[...new Set([...(prev?.analysisNotes||[]),...(entry.analysisNotes||[])])]});
+ }
+ return [...merged];
+}
 export function pendingVerification(checkpoint){
  const done=new Set(checkpoint.processedEarlier||[]),evidence=new Map(checkpoint.processedEvidence||[]),recheck=new Set(checkpoint.explicitRechecks||[]),rejected=new Set(checkpoint.rejectedBoards||[]);
  return (checkpoint.rows||[]).filter(([u,j])=>!rejected.has(u)&&(!done.has(u)||evidence.get(u)!==candidateRevision(j)||recheck.has(u)));
@@ -48,6 +70,7 @@ export function mergePipelineCheckpoint(original,discovery,verification,attempte
  for(const record of verification.publicEvidence||[]){const k=JSON.stringify([record.url,record.mode,record.offset,record.text]);if(!keys.has(k)){keys.add(k);ledger.push(record);}}
  next.publicEvidence=ledger;
  next.researchNotes=[...new Set([...(next.researchNotes||[]),...(verification.researchNotes||[])])];
+ next.candidateResearchMemory=mergeCandidateResearchMemory(next.candidateResearchMemory,verification.candidateResearchMemory,next.rows);
  const reads=new Map([...(next.verificationReads||[]),...(verification.verificationReads||[])]);
  for(const [u] of completed)reads.delete(u);
  next.verificationReads=[...reads];

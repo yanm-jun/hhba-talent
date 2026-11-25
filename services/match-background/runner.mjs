@@ -34,3 +34,14 @@ export async function driveBackgroundMatch(step,ticket,fetcher){
   if(state!=='CONTINUE')return {status:state};
  }
 }
+
+// Only return active on an accepted new instance or an existing instance
+// that is actually running/queued/waiting. A terminal workflow may have
+// persisted valid progress but must not be reported as still working.
+export async function scheduleWorkflowInstance(workflow,instance,ticket){
+ try{await workflow.create({id:instance,params:{ticket}});return true;}
+ catch(e){if(!(e instanceof Error)||!e.message.includes('(instance.already_exists)'))throw e;}
+ const existing=await workflow.get(instance);
+ const current=await existing.status();
+ return ['queued','running','waiting'].includes(current?.status);
+}

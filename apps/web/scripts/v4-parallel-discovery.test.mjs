@@ -226,3 +226,87 @@ test('reference score repairs missing evidence without dropping confirmed vacanc
  const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
  assert.equal(calls,2);assert.equal(result.checkpoint.matches[0].match_score,86);assert.equal(result.checkpoint.matches[0].reference_jd_kind,'AI_GENERATED_REFERENCE');
 });
+
+test('candidate research notes merge across parallel checkpoints without crossing candidate identity or revision',async()=>{
+ const {candidateResearchMemory,candidateRevision,mergeCandidateResearchMemory}=await import('../functions/_lib/v4-research-pipeline.js');
+ const a=job(1),b=job(2),rows=[[a.url,a],[b.url,b]];
+ const left=candidateResearchMemory();left.notes(a.url,candidateRevision(a)).push('official public source a');
+ left.notes(b.url,candidateRevision(b)).push('official public source b');
+ const right=candidateResearchMemory(structuredClone(left.snapshot()));
+ right.notes(a.url,candidateRevision(a),'analysisNotes').push('candidate a assessment');
+ assert.deepEqual(right.notes(a.url,candidateRevision(a)),['official public source a']);
+ assert.deepEqual(right.notes(b.url,candidateRevision(b),'analysisNotes'),['official public source b']);
+ const merged=candidateResearchMemory(mergeCandidateResearchMemory(left.snapshot(),right.snapshot(),rows));
+ assert.deepEqual(merged.notes(a.url,candidateRevision(a),'analysisNotes'),['official public source a','candidate a assessment']);
+ assert.deepEqual(merged.notes(b.url,candidateRevision(b),'analysisNotes'),['official public source b']);
+ const changed={...a,requirements:'updated requirements'};
+ assert.deepEqual(merged.notes(a.url,candidateRevision(changed),'analysisNotes'),[]);
+ assert.equal(mergeCandidateResearchMemory(left.snapshot(),right.snapshot(),[[a.url,changed],[b.url,b]]).length,1);
+});
+
+test('actual Gemini global ranking reaches provider and persists pool-scoped notes, without polluting discovery notes',async()=>{
+ const candidate=job(91),provider={kind:'gemini',key:'synthetic-only',baseUrl:'https://provider.invalid',model:'test'};
+ const match={company:candidate.company,title:candidate.title,location:candidate.location,official_url:candidate.url,source_type:'站外官方招聘',reference_vacancy_verified:true,reference_jd_kind:'AI_GENERATED_REFERENCE',reference_jd:'可能负责渠道管理。',reference_jd_basis:'方向推断',evidence_score_status:'AI_REFERENCE_JD_SCORED',match_score:86,curated_suitable:true,report_status:'COMPLETE',research_detail:{comparisons:[],score_explanation:'真实经历匹配'}};
+ let calls=0;
+ const result=await v4Match(async(url,opts)=>{
+  calls++;const input=JSON.parse(JSON.parse(opts.body).contents[0].parts[0].text);
+  assert.deepEqual(input.pending_ids,['j1']);
+  return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify({ordered_ids:['j1'],research_notes:'pool-only ranking observation'})}]}}]});
+ },provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,checkpoint:{phase:'reporting',rows:[[candidate.url,candidate]],profile,matches:[match],researchNotes:['discovery-only']}});
+ assert.equal(calls,1);assert.deepEqual(result.checkpoint.globalOrder,[candidate.url]);
+ assert.equal(result.checkpoint.globalRankState.done,true);assert.deepEqual(result.checkpoint.globalRankState.notes,['pool-only ranking observation']);assert.deepEqual(result.checkpoint.researchNotes,['discovery-only']);
+});
+
+test('Gemini reviews confirmed vacancy for complete JD before falling back to reference',async()=>{
+ const candidate=job(92),provider={kind:'gemini',key:'synthetic-only',baseUrl:'https://provider.invalid',model:'test'};
+ let recovery=0,assessment=0;
+ const fetcher=async(url,opts)=>{
+  if(url===candidate.url)return Response.json({'@type':'JobPosting',title:candidate.title,hiringOrganization:{name:candidate.company,url:new URL(candidate.url).origin},jobLocation:{address:{addressLocality:'上海'}}});
+  const input=JSON.parse(JSON.parse(opts.body).contents[0].parts[0].text);
+  let value;
+  if(input.original_url){recovery++;assert.equal(input.confirmed_vacancy,true);value={sources:[],research_complete:true,completion_reason:'公开原文未找到'};}
+  else {assessment++;assert.equal(input.job.vacancy_confirmed,true);value={reference_jd:'可能负责汽车渠道运营。',reference_basis:'方向推断。',suitable:true,score:86,reason:'相关经历',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车渠道运营',comparisons:[]};}
+  return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(value)}]}}]});
+ };
+ const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
+ assert.ok(recovery>=1);assert.equal(assessment,1);assert.equal(result.checkpoint.matches[0].reference_vacancy_verified,true);assert.equal(result.checkpoint.matches[0].match_score,86);
+});
+
+test('oversized memory records remain losslessly accessible in bounded JSON pages',async()=>{
+ const {v4ResearchMemoryPage,v4RunResearchAction}=await import('../functions/_lib/v4-research-tools.js');
+ const rows=[{url:'https://careers.company.cn/jobs/1',report:'职责🙂"\\'.repeat(1000)},{url:'second'}];
+ const first=v4ResearchMemoryPage(rows,0,256);
+ assert.equal(first.items[0].oversized_record,true);assert.equal(first.next_cursor,1);
+ let offset=0,rebuilt='';
+ do{
+  const part=await v4RunResearchAction({type:'memory',collection:'candidates',index:0,offset},{collections:{candidates:rows},budget:256});
+  assert.equal(part.ok,true);assert.ok(JSON.stringify([part.text]).length<=256);rebuilt+=part.text;offset=part.next_offset;
+ }while(offset!==null);
+ assert.deepEqual(JSON.parse(rebuilt),rows[0]);
+});
+
+test('Gemini global ranking switches to focused recovery rather than discarding unfinished pool',async()=>{
+ const candidate=job(93),provider={kind:'gemini',key:'synthetic-only',baseUrl:'https://provider.invalid',model:'test'};
+ const match={company:candidate.company,title:candidate.title,location:candidate.location,official_url:candidate.url,source_type:'站外官方招聘',reference_vacancy_verified:true,reference_jd_kind:'AI_GENERATED_REFERENCE',reference_jd:'可能负责渠道管理。',reference_jd_basis:'方向推断',evidence_score_status:'AI_REFERENCE_JD_SCORED',match_score:86,curated_suitable:true,report_status:'COMPLETE',research_detail:{comparisons:[],score_explanation:'真实经历匹配'}};
+ let calls=0;
+ const fetcher=async(url,opts)=>{
+  calls++;const input=JSON.parse(JSON.parse(opts.body).contents[0].parts[0].text);
+  const value=input.focus_id?{insertions:[{id:input.focus_id,after_id:null}]}:{ordered_ids:[]};
+  return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(value)}]}}]});
+ };
+ const opts={curated:true,officialOnly:true,stepMode:true};
+ let checkpoint={phase:'reporting',rows:[[candidate.url,candidate]],profile,matches:[match]};
+ for(const expected of ['insert','focused_insert','focused_insert']){
+  const result=await v4Match(fetcher,provider,resume,'全国',{...opts,checkpoint});
+  checkpoint=result.checkpoint;assert.equal(checkpoint.globalRankState.mode,expected);
+ }
+ assert.equal(calls,3);assert.equal(checkpoint.globalRankState.done,true);assert.deepEqual(checkpoint.globalOrder,[candidate.url]);
+});
+
+test('verification scheduler keeps useful concurrency during inexpensive JD recovery and backs off on observed pressure',async()=>{
+ const {nextVerificationBatch}=await import('../functions/_lib/v4-jd-research.js');
+ assert.equal(nextVerificationBatch(3,true,100,{externalRequests:18,completed:3}),4);
+ assert.equal(nextVerificationBatch(3,true,100,{externalRequests:39,completed:3}),3);
+ assert.equal(nextVerificationBatch(4,true,100,{externalRequests:48,completed:2}),1);
+ assert.equal(nextVerificationBatch(3,false,1,{externalRequests:6,completed:3}),1);
+});
