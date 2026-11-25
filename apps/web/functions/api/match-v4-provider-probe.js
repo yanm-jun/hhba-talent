@@ -97,7 +97,7 @@ export async function runGeminiProbe(provider,phase,{fetcher=fetch,signal}={}){
 // synthetic input. A returned reasoning-token count is an observation, not
 // proof that the relay applied a particular effort level.
 export async function runOpenAIProbe(provider,phase,{fetcher=fetch,signal}={}){
- const call=(payload,options={})=>v4Call(fetcher,{...provider,...options},payload,{signal});
+ const call=(payload,options={})=>v4Call(fetcher,{...provider,...options},payload,{signal,stage:'probe'});
  const usage=r=>({usage_present:Number.isFinite(r.usage?.total_tokens),reasoning_tokens:Number.isSafeInteger(r.usage?.output_tokens_details?.reasoning_tokens)?r.usage.output_tokens_details.reasoning_tokens:null});
  if(phase==='openai_basic'||phase==='openai_reasoning'){
   const reasoning=phase==='openai_reasoning';
