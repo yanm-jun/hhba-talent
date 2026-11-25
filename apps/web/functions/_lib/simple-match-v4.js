@@ -844,7 +844,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(actions.length){
     const knownUrls=new Set([...sourceLeads,...rows.keys()].map(v4PublicJobUrl).filter(Boolean));
     const results=await v4RunResearchActions(actions,{collections:{candidates:candidateMemory(),sources:[...sourceLeads],unresolved:unresolvedMemory(),evidence:v4EvidenceIndex(publicEvidence)},ledger:publicEvidence,knownUrls,fetcher,browser:env.BROWSER,signal,budget:researchContextBudget,onAction:async(action,run)=>{
-     const actionKey=await sha256Hex(JSON.stringify([signature,researchContextBudget,action.type,action.collection,action.cursor,action.url,action.mode,action.offset,action.index]));
+     const actionKey=await sha256Hex(JSON.stringify([signature,researchContextBudget,action.type,action.collection,action.cursor,action.url,action.mode,action.offset,action.index,action.discover===true]));
      const repeated=actionSeen.has(actionKey);
      if(repeated&&!(action.type==='read_page'&&action.refresh===true))return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
      actionSeen.add(actionKey);
@@ -855,7 +855,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
       // Grounding redirects are leads; the independently read final URL is a new source, not a verified JD.
       const resolved=v4PublicJobUrl(result.url);if(resolved&&!isCommercialRecruitmentBoard(resolved)){
        sourceLeads.add(curatedUrl(resolved));knownUrls.add(resolved);
-       const original=v4PublicJobUrl(action.url);if(original&&original!==resolved&&sourceLeads.has(curatedUrl(original))){reviewedSources.set(curatedUrl(original),{status:'official_entry',reason:'公开来源已解析为独立读取的落地链接，岗位及归属仍待核验。'});}
+       const original=v4PublicJobUrl(action.url);if(original&&original!==resolved&&sourceLeads.has(curatedUrl(original))){reviewedSources.set(curatedUrl(original),{status:'redirect_resolved',reason:'公开来源已解析为独立读取的落地链接，岗位及归属仍待核验。'});}
       }
      }
      if(result.ok&&action.type==='recheck'){

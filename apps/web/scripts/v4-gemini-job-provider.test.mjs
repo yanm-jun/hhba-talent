@@ -68,3 +68,21 @@ test('URL Context is opt-in and restricted to public job-source requests',async(
   return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{}'}]}}]});
  },provider,{input:'synthetic',tools:[{type:'web_search'}],publicUrlContext:use});
 });
+
+test('explicit new public lead and redirected landing are independently read and registered, not automatically verified',async()=>{
+ const {v4RunResearchAction}=await import('../functions/_lib/v4-research-tools.js');
+ const first='https://vertexaisearch.cloud.google.com/grounding-api-redirect/synthetic';
+ const final='https://careers.other-motors.cn/recruitment/positions/9988';
+ const knownUrls=new Set(),calls=[];
+ const fetcher=async(url,opt)=>{calls.push(url);assert.equal(opt.redirect,'manual');assert.equal(opt.headers?.authorization,undefined);return url===first?new Response(null,{status:302,headers:{location:final}}):new Response('<html><h1>公开招聘</h1>岗位要求</html>',{headers:{'content-type':'text/html'}})};
+ assert.equal((await v4RunResearchAction({type:'read_page',url:first},{collections:{},knownUrls,fetcher})).ok,false);
+ const got=await v4RunResearchAction({type:'read_page',url:first,discover:true},{collections:{},knownUrls,fetcher});
+ assert.equal(got.ok,true);assert.equal(got.url,final);assert.ok(knownUrls.has(final));assert.equal(got.verified,undefined);
+ assert.deepEqual(calls,[first,final]);
+ assert.equal((await v4RunResearchAction({type:'read_page',url:'https://127.0.0.1/admin',discover:true},{collections:{},knownUrls,fetcher})).ok,false);
+});
+test('interrupted Gemini stream retains partial research rather than falsely completing or discarding it',async()=>{
+ const chunk='data: '+JSON.stringify({candidates:[{content:{parts:[{text:'{"jobs":[]}'}]},groundingMetadata:{webSearchQueries:['jobs']}}]})+'\n\n';
+ const result=await v4Call(async()=>new Response(chunk+'data: broken\n\n',{headers:{'content-type':'text/event-stream'}}),v4JobProvider({...env,GEMINI_STREAM:'1'}),{input:'synthetic',tools:[{type:'web_search'}]});
+ assert.equal(result.status,'incomplete');assert.equal(v4OutputText(result),'{"jobs":[]}');assert.deepEqual(result.output[0].action.queries,['jobs']);
+});

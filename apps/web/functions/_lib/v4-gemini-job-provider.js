@@ -53,7 +53,7 @@ export async function readGeminiResponse(response,{signal,onEvent}={}){
    while((m=/\r?\n\r?\n/.exec(buffer))){frame(buffer.slice(0,m.index));buffer=buffer.slice(m.index+m[0].length);}
   }
   buffer+=decoder.decode();if(buffer.trim())frame(buffer);
- }catch(e){if(signal?.aborted||e?.code)throw e;if(!seen)throw fault('AI_PROVIDER_NETWORK_ERROR');}
+ }catch(e){if(signal?.aborted||e?.code==='AI_AGENT_CANCELLED')throw fault('AI_AGENT_CANCELLED');if(!seen)throw fault(e?.code||'AI_PROVIDER_NETWORK_ERROR');candidate.finishReason='STREAM_INTERRUPTED';}
  finally{await reader.cancel().catch(()=>{});reader.releaseLock();}
  if(!seen)throw fault('AI_PROVIDER_RESPONSE_INVALID');
  return {usageMetadata,candidates:[{...candidate,finishReason:candidate.finishReason||'STREAM_INTERRUPTED',groundingMetadata,urlContextMetadata}]};
