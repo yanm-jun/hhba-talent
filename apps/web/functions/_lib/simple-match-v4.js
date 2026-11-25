@@ -92,6 +92,8 @@ export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{}}={}
 export async function v4Call(fetcher,provider,payload,{signal,onEvent,stage=provider?.usageStage||'other'}={}){
  if(!provider||provider.kind==='gemini')return v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,stage});
  const effort=stageEffort(provider,stage), effective={...provider,...(effort?{reasoningEffort:effort}:{})};
+ // Explicit payload overrides are also normalized for normal GPT-6 business requests.
+ if(stage!=='probe'&&/^gpt-6(?:\.|-)/i.test(provider.model||'')&&payload.reasoning)payload={...payload,reasoning:{...payload.reasoning,effort:'medium'}};
  let data;
  try{data=await v4CallOpenAI(fetcher,effective,payload,{signal,onEvent,stage});return data;}
  finally{await recordAiUsage(provider.usageDb,{model:provider.model,stage,effort:payload.reasoning?.effort||effort,status:data?.status||'failed',usage:data?.usage});}
