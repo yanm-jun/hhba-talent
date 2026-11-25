@@ -1215,6 +1215,10 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const worker=async()=>{
   while(cursor<entries.length){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
+   // Large verification windows are admitted incrementally. Leave headroom
+   // for active research and storage; untouched entries remain in allEntries
+   // and are processed by the next durable invocation, never marked complete.
+   if(overlap&&batchSize>4&&cursor>=4&&verificationRequests>=30)return;
    const i=cursor++,[url,job]=entries[i];
    if(overlap){
     const got=await enrich(verificationFetcher,new Map([[url,job]]),readOptions);
@@ -1306,6 +1310,10 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  };
  const settledWorkers=await Promise.allSettled(Array.from({length:Math.min(4,entries.length)},worker));
  const workerFailure=settledWorkers.find(x=>x.status==='rejected');
+ if(overlap&&cursor<entries.length){
+  entries.splice(cursor);matches.splice(cursor);
+  note('VERIFICATION_WINDOW_PRESSURE_PAUSE');
+ }
  if(overlap){diag.VERIFICATION_BATCH_ELAPSED_MS=(diag.VERIFICATION_BATCH_ELAPSED_MS||0)+(Date.now()-began);diag.VERIFICATION_BATCH_ATTEMPTS=(diag.VERIFICATION_BATCH_ATTEMPTS||0)+entries.length;}
  if(workerFailure){
   if(curated&&checkpoint&&isV4RetryableProviderError(workerFailure.reason?.code)&&!signal?.aborted){
