@@ -277,3 +277,20 @@ test('real search acceptance rejects ungrounded candidate claims',async()=>{
  const result=await runGeminiProbe(v4JobProvider(env),'search',{fetcher});
  assert.equal(result.ok,false);assert.equal(result.grounded,false);
 });
+
+test('explicit URL Context incompatibility preserves Gemini search and independent verification',async()=>{
+ const provider=v4JobProvider({...env,GEMINI_URL_CONTEXT:'1',GEMINI_STREAM:'1'});
+ const calls=[];
+ const result=await v4Call(async(url,opt)=>{
+  const tools=JSON.parse(opt.body).tools;calls.push(tools);
+  if(tools.some(x=>x.url_context))return Response.json({error:{message:'URL Context cannot be combined with Google Search on this relay'}},{status:400});
+  return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"jobs":[]}'}]},groundingMetadata:{webSearchQueries:['public positions']}}]});
+ },provider,{input:'public synthetic job search',tools:[{type:'web_search'}],tool_choice:'required',publicUrlContext:true});
+ assert.deepEqual(calls,[[{google_search:{}},{url_context:{}}],[{google_search:{}}]]);
+ assert.equal(result.status,'completed');assert.ok(result.output.some(x=>x.type==='web_search_call'));
+});
+test('Gemini context rejection is surfaced for adaptive paging rather than disabling optional tools',async()=>{
+ const provider=v4JobProvider({...env,GEMINI_URL_CONTEXT:'1',GEMINI_STREAM:'1'});let calls=0;
+ await assert.rejects(v4Call(async()=>{calls++;return Response.json({error:{message:'input context length exceeded'}},{status:400});},provider,{input:'synthetic',tools:[{type:'web_search'}],publicUrlContext:true}),{code:'AI_PROVIDER_CONTEXT_TOO_LARGE'});
+ assert.equal(calls,1);
+});

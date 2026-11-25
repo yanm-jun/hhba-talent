@@ -79,12 +79,21 @@ export async function callGeminiJob(fetcher,provider,payload,{signal,onEvent}={}
    if([401,403].includes(r.status))throw fault('AI_PROVIDER_KEY_REJECTED');
    if(r.status===402)throw fault('AI_PROVIDER_BALANCE_INSUFFICIENT');
    if(r.status===429)throw fault('AI_PROVIDER_RATE_LIMITED');
-   if([400,404,405,422,501].includes(r.status)&&provider.stream){await r.body?.cancel().catch(()=>{});return callGeminiJob(fetcher,{...provider,stream:false},payload,{signal,onEvent});}
-   if(r.status>=500)throw fault('AI_PROVIDER_UPSTREAM_ERROR');
+   // Distinguish real context rejection from tool incompatibility: repage
+   // oversized inputs, and retain search when the relay explicitly rejects
+   // the optional URL Context combination. Never retry authentication or
+   // balance failures as a different model/provider.
    if([400,422].includes(r.status)){
     let error;try{error=(await r.json())?.error}catch{}
-    if(/context window|context length|input.*too long|token count.*exceed/i.test(error?.message||''))throw fault('AI_PROVIDER_CONTEXT_TOO_LARGE');
+    const message=String(error?.message||'');
+    if(/context window|context length|input.*too long|token count.*exceed/i.test(message))throw fault('AI_PROVIDER_CONTEXT_TOO_LARGE');
+    if(urlContext&&/url[ _-]?context|urlContext/i.test(message)&&/not supported|unsupported|not available|cannot be combined|incompatible|unknown (?:field|tool)|unrecognized/i.test(message)){
+     console.info('HHBA_V4_URL_CONTEXT_FALLBACK');
+     return callGeminiJob(fetcher,{...provider,urlContext:false},payload,{signal,onEvent});
+    }
    }
+   if([400,404,405,422,501].includes(r.status)&&provider.stream){await r.body?.cancel().catch(()=>{});return callGeminiJob(fetcher,{...provider,stream:false},payload,{signal,onEvent});}
+   if(r.status>=500)throw fault('AI_PROVIDER_UPSTREAM_ERROR');
    throw fault('AI_PROVIDER_REQUEST_REJECTED');
   }
   let data;try{data=await readGeminiResponse(r,{signal,onEvent})}catch(e){throw fault(e?.code||'AI_PROVIDER_RESPONSE_INVALID')}
