@@ -295,10 +295,17 @@ export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal,maxBytes
 
 /** Read-only dynamic-page fallback. No account, CV, cookie, authorization or
  * arbitrary script is passed to the browser. Restrict browser traffic to the
- * requested public origin; exact declared script/style assets may also load.
- * No blanket access to other origins. */
+ * requested public origin; exact declared script/style and independently read
+ * public data/frame URLs may also load. No blanket access to other origins. */
 // Walk only declared script dependencies already read as inert source. Do not
 // inherit unrelated candidate URLs or wildcard origins from the evidence ledger.
+function publicReadResourceUrl(value){
+ const url=v4PublicJobUrl(value);
+ if(!url||isCommercialRecruitmentBoard(url))return null;
+ const u=new URL(url);
+ if(/(?:^|[\/_-])(?:login|logout|signin|signout|delete|remove|update|submit|apply|checkout|oauth|auth|token)(?:[\/_-]|$)/i.test(u.pathname)||[...u.searchParams.keys()].some(k=>/token|secret|password|signature|authorization|api[_-]?key/i.test(k)))return null;
+ return url;
+}
 export function v4BrowserResourcePlan(url,resourceHints=[],ledger=[]){
  const target=v4PublicJobUrl(url),hints=new Map(),queue=[...resourceHints,...ledger.filter(r=>r.url===target&&!r.script_source).flatMap(r=>r.resource_hints||[])];
  while(queue.length){
@@ -307,19 +314,33 @@ export function v4BrowserResourcePlan(url,resourceHints=[],ledger=[]){
   hints.set(u,{url:u,kind:h.kind});
   if(h.kind==='script')for(const r of ledger)if(r.url===u&&r.script_source===true)queue.push(...(r.resource_hints||[]));
  }
- const publicDataUrls=[...hints.values()].filter(h=>['data','frame'].includes(h.kind)&&ledger.some(r=>r.url===h.url&&r.type==='read_page'&&r.mode==='static'&&!r.script_source&&r.offset===0&&r.next_offset===null&&r.text?.trim())).map(h=>h.url);
+ const publicDataUrls=[...hints.values()].filter(h=>['data','frame'].includes(h.kind)&&publicReadResourceUrl(h.url)&&ledger.some(r=>r.url===h.url&&r.type==='read_page'&&r.mode==='static'&&!r.script_source&&r.offset===0&&r.next_offset===null&&r.text?.trim())).map(h=>h.url);
  return {resourceHints:[...hints.values()],publicDataUrls};
 }
 // Automatic independent GET for declared public data/frame resources. Browser
 // admission needs the same exact URL and a successful public document read;
 // redirected or oversized results remain research leads, not allowed origins.
 export async function v4PreparePublicBrowserResources(url,{fetcher=fetch,signal,resourceHints=[],ledger=[],onDocument=()=>{}}={}){
- const initial=v4BrowserResourcePlan(url,resourceHints,ledger),records=[...ledger];
+ let initial=v4BrowserResourcePlan(url,resourceHints,ledger);
+ const records=[...ledger];
+ // If the HTML exposes only JS, inspect the next independently declared
+ // unread script in this browser pass. Further script dependencies remain
+ // addressable by the agent's existing read_page/window tools and later passes.
+ if(!initial.resourceHints.some(h=>['data','frame'].includes(h.kind))){
+  const hint=initial.resourceHints.find(h=>h.kind==='script'&&publicReadResourceUrl(h.url)&&!records.some(r=>r.url===h.url&&r.script_source));
+  if(hint)try{
+   const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal,scriptSource:true,documentUrl:url});
+   if(doc.url===hint.url&&doc.script_source){
+    const record={type:'read_page',ok:true,mode:'static',url:doc.url,offset:0,next_offset:null,text:doc.plain,script_source:true,document_url:url,resource_hints:doc.resource_hints||[]};
+    records.push(record);onDocument(record);
+    initial=v4BrowserResourcePlan(url,resourceHints,records);
+   }
+  }catch(e){if(signal?.aborted)throw e;}
+ }
  for(const hint of initial.resourceHints){
   if(signal?.aborted)throw signal.reason;
   if(!['data','frame'].includes(hint.kind)||initial.publicDataUrls.includes(hint.url))continue;
-  const u=new URL(hint.url);
-  if(/(?:^|[\/_-])(?:login|logout|signin|signout|delete|remove|update|submit|apply|checkout|oauth|auth|token)(?:[\/_-]|$)/i.test(u.pathname)||[...u.searchParams.keys()].some(k=>/token|secret|password|signature|authorization|api[_-]?key/i.test(k)))continue;
+  if(!publicReadResourceUrl(hint.url))continue;
   try{
    const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal});
    if(doc.url!==hint.url||!doc.plain.trim())continue;
@@ -336,7 +357,7 @@ export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHint
  if(signal?.aborted)throw signal.reason;
  const host=new URL(target).hostname.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&');
  const independentlyRead=new Set(publicDataUrls.map(v4PublicJobUrl).filter(Boolean));
- const exactAssets=resourceHints.filter(h=>(['script','style'].includes(h?.kind)||['data','frame'].includes(h?.kind)&&independentlyRead.has(v4PublicJobUrl(h.url)))&&v4PublicJobUrl(h.url)&&!isCommercialRecruitmentBoard(h.url)).map(h=>'^'+h.url.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&')+'$');
+ const exactAssets=resourceHints.filter(h=>(['script','style'].includes(h?.kind)||['data','frame'].includes(h?.kind)&&publicReadResourceUrl(h.url)&&independentlyRead.has(v4PublicJobUrl(h.url)))&&v4PublicJobUrl(h.url)&&!isCommercialRecruitmentBoard(h.url)).map(h=>'^'+h.url.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&')+'$');
  const response=await browser.quickAction('content',{
   url:target,allowRequestPattern:['^https://'+host+'(?::443)?(?:/|$)',...new Set(exactAssets)],
   rejectResourceTypes:['image','media','font'],
