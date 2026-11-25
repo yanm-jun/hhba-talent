@@ -327,7 +327,7 @@ export function v4BrowserResourcePlan(url,resourceHints=[],ledger=[]){
   // successful full static read of that exact frame may contribute children.
   if(h.kind==='script'||h.kind==='frame')for(const r of ledger)if(r.url===u&&r.type==='read_page'&&r.mode==='static'&&(h.kind==='script'?r.script_source===true:!r.script_source&&r.offset===0&&r.next_offset===null))queue.push(...(r.resource_hints||[]));
  }
- const publicDataUrls=[...hints.values()].filter(h=>['data','frame'].includes(h.kind)&&publicReadResourceUrl(h.url)&&ledger.some(r=>r.url===h.url&&r.type==='read_page'&&r.mode==='static'&&!r.script_source&&r.offset===0&&r.next_offset===null&&(r.text?.trim()||h.kind==='frame'&&r.resource_hints?.length))).map(h=>h.url);
+ const publicDataUrls=[...hints.values()].filter(h=>(['data','frame'].includes(h.kind)||h.kind==='script'&&h.runtime_observed)&&publicReadResourceUrl(h.url)&&ledger.some(r=>r.url===h.url&&r.type==='read_page'&&r.mode==='static'&&(h.kind==='script'?r.script_source===true:!r.script_source)&&r.offset===0&&r.next_offset===null&&(r.text?.trim()||h.kind==='frame'&&r.resource_hints?.length))).map(h=>h.url);
  return {resourceHints:[...hints.values()],publicDataUrls};
 }
 // Automatic independent GET for declared public data/frame resources. Browser
@@ -339,7 +339,7 @@ export async function v4PreparePublicBrowserResources(url,{fetcher=fetch,signal,
  // Bound automatic transport per browser pass, not the agent's research.
  // Remaining discovered URLs are returned as hints and can be read by the
  // existing static/window tools or subsequent browser passes.
- const resourceWindow=Math.max(1,Math.min(12,Math.ceil(initial.resourceHints.length/2)));
+ const resourceWindow=Math.max(6,Math.min(12,Math.ceil(initial.resourceHints.length/2)));
  while(attempted.size<resourceWindow){
   const pending=initial.resourceHints.filter(h=>!attempted.has(h.url)&&publicReadResourceUrl(h.url));
   const hint=pending.find(h=>['data','frame'].includes(h.kind)&&!initial.publicDataUrls.includes(h.url))||
@@ -471,7 +471,7 @@ export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHint
  if(signal?.aborted)throw signal.reason;
  const host=new URL(target).hostname.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&');
  const independentlyRead=new Set(publicDataUrls.map(v4PublicJobUrl).filter(Boolean));
- const exactAssets=resourceHints.filter(h=>(['script','style'].includes(h?.kind)||['data','frame'].includes(h?.kind)&&publicReadResourceUrl(h.url)&&independentlyRead.has(v4PublicJobUrl(h.url)))&&v4PublicJobUrl(h.url)&&!isCommercialRecruitmentBoard(h.url)).map(h=>'^'+h.url.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&')+'$');
+ const exactAssets=resourceHints.filter(h=>(['script','style'].includes(h?.kind)&&!h.runtime_observed||['data','frame','script','style'].includes(h?.kind)&&publicReadResourceUrl(h.url)&&independentlyRead.has(v4PublicJobUrl(h.url)))&&v4PublicJobUrl(h.url)&&!isCommercialRecruitmentBoard(h.url)).map(h=>'^'+h.url.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&')+'$');
  let runtimeHints=[],runtimeHtml='';
  if(typeof browser.script==='function'){
   try{
