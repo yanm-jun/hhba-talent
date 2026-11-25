@@ -1,6 +1,6 @@
 // Server-only native Gemini GenerateContent adapter for V4 job research.
 // Existing V4 response consumers retain their evidence and parsing contract.
-const fault=code=>Object.assign(new Error(code),{code});
+const fault=(code,upstreamStatus)=>Object.assign(new Error(code),{code,...(Number.isInteger(upstreamStatus)?{upstreamStatus}:{})});
 const DEFAULT_BASE='https://api-c.reqtoken.com';
 export function geminiJobProvider(env={}){
  const key=env.GEMINI_API_KEY?.trim(),model=env.GEMINI_MODEL?.trim();
@@ -75,10 +75,10 @@ export async function callGeminiJob(fetcher,provider,payload,{signal,onEvent}={}
   catch(e){throw fault(signal?.aborted?'AI_AGENT_CANCELLED':e?.name==='TimeoutError'?'AI_PROVIDER_TIMEOUT':'AI_PROVIDER_NETWORK_ERROR');}
   if(r.status>=300&&r.status<400)throw fault('AI_PROVIDER_REDIRECT_BLOCKED');
   if(!r.ok){
-   if(r.status===413)throw fault('AI_PROVIDER_CONTEXT_TOO_LARGE');
-   if([401,403].includes(r.status))throw fault('AI_PROVIDER_KEY_REJECTED');
-   if(r.status===402)throw fault('AI_PROVIDER_BALANCE_INSUFFICIENT');
-   if(r.status===429)throw fault('AI_PROVIDER_RATE_LIMITED');
+   if(r.status===413)throw fault('AI_PROVIDER_CONTEXT_TOO_LARGE',r.status);
+   if([401,403].includes(r.status))throw fault('AI_PROVIDER_KEY_REJECTED',r.status);
+   if(r.status===402)throw fault('AI_PROVIDER_BALANCE_INSUFFICIENT',r.status);
+   if(r.status===429)throw fault('AI_PROVIDER_RATE_LIMITED',r.status);
    // Distinguish real context rejection from tool incompatibility: repage
    // oversized inputs, and retain search when the relay explicitly rejects
    // the optional URL Context combination. Never retry authentication or
@@ -86,15 +86,15 @@ export async function callGeminiJob(fetcher,provider,payload,{signal,onEvent}={}
    if([400,422].includes(r.status)){
     let error;try{error=(await r.json())?.error}catch{}
     const message=String(error?.message||'');
-    if(/context window|context length|input.*too long|token count.*exceed/i.test(message))throw fault('AI_PROVIDER_CONTEXT_TOO_LARGE');
+    if(/context window|context length|input.*too long|token count.*exceed/i.test(message))throw fault('AI_PROVIDER_CONTEXT_TOO_LARGE',r.status);
     if(urlContext&&/url[ _-]?context|urlContext/i.test(message)&&/not supported|unsupported|not available|cannot be combined|incompatible|unknown (?:field|tool)|unrecognized/i.test(message)){
      console.info('HHBA_V4_URL_CONTEXT_FALLBACK');
      return callGeminiJob(fetcher,{...provider,urlContext:false},payload,{signal,onEvent});
     }
    }
    if([400,404,405,422,501].includes(r.status)&&provider.stream){await r.body?.cancel().catch(()=>{});return callGeminiJob(fetcher,{...provider,stream:false},payload,{signal,onEvent});}
-   if(r.status>=500)throw fault('AI_PROVIDER_UPSTREAM_ERROR');
-   throw fault('AI_PROVIDER_REQUEST_REJECTED');
+   if(r.status>=500)throw fault('AI_PROVIDER_UPSTREAM_ERROR',r.status);
+   throw fault('AI_PROVIDER_REQUEST_REJECTED',r.status);
   }
   let data;try{data=await readGeminiResponse(r,{signal,onEvent})}catch(e){throw fault(e?.code||'AI_PROVIDER_RESPONSE_INVALID')}
   const m=data?.usageMetadata;usage=m?{input_tokens:m.promptTokenCount,output_tokens:m.candidatesTokenCount,total_tokens:m.totalTokenCount,output_tokens_details:{reasoning_tokens:m.thoughtsTokenCount},input_tokens_details:{cached_tokens:m.cachedContentTokenCount}}:undefined;
@@ -121,9 +121,9 @@ export async function callGeminiJob(fetcher,provider,payload,{signal,onEvent}={}
 export async function inspectGeminiContextCapabilities(fetcher,provider,{signal}={}){
  const model=provider.baseUrl+'/v1beta/models/'+encodeURIComponent(provider.model);
  const headers={'x-goog-api-key':provider.key,'content-type':'application/json',accept:'application/json'};
- const result={model_metadata:false,input_token_limit:null,output_token_limit:null,count_tokens:false,cached_content_advertised:false};
+ const result={model_metadata:false,input_token_limit:null,output_token_limit:null,count_tokens:false,cached_content_advertised:false,metadata_http_status:null,count_tokens_http_status:null};
  const integer=x=>Number.isSafeInteger(x)&&x>0?x:null;
- try{const r=await fetcher(model,{headers,redirect:'manual',signal});if(r.ok){const m=await r.json();result.model_metadata=true;result.input_token_limit=integer(m.inputTokenLimit);result.output_token_limit=integer(m.outputTokenLimit);result.cached_content_advertised=(m.supportedGenerationMethods||[]).some(x=>typeof x==='string'&&/cache/i.test(x));}else await r.body?.cancel().catch(()=>{});}catch(e){if(signal?.aborted)throw e;}
- try{const r=await fetcher(model+':countTokens',{method:'POST',headers,redirect:'manual',signal,body:JSON.stringify({contents:[{role:'user',parts:[{text:'Synthetic public job search capability test.'}]}]})});if(r.ok){const m=await r.json();result.count_tokens=integer(m.totalTokens)!==null;}else await r.body?.cancel().catch(()=>{});}catch(e){if(signal?.aborted)throw e;}
+ try{const r=await fetcher(model,{headers,redirect:'manual',signal});result.metadata_http_status=r.status;if(r.ok){const m=await r.json();result.model_metadata=true;result.input_token_limit=integer(m.inputTokenLimit);result.output_token_limit=integer(m.outputTokenLimit);result.cached_content_advertised=(m.supportedGenerationMethods||[]).some(x=>typeof x==='string'&&/cache/i.test(x));}else await r.body?.cancel().catch(()=>{});}catch(e){if(signal?.aborted)throw e;}
+ try{const r=await fetcher(model+':countTokens',{method:'POST',headers,redirect:'manual',signal,body:JSON.stringify({contents:[{role:'user',parts:[{text:'Synthetic public job search capability test.'}]}]})});result.count_tokens_http_status=r.status;if(r.ok){const m=await r.json();result.count_tokens=integer(m.totalTokens)!==null;}else await r.body?.cancel().catch(()=>{});}catch(e){if(signal?.aborted)throw e;}
  return result;
 }
