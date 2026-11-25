@@ -3,13 +3,14 @@ import assert from 'node:assert/strict';
 import {stageEffort,usageCounts,recordAiUsage,readAiUsage} from '../functions/_lib/ai-token-usage.js';
 import {v4Call} from '../functions/_lib/simple-match-v4.js';
 const model='gpt-6.2-sol';
-test('stage reasoning is selective, explicit overrides and unknown models preserved',()=>{
- assert.equal(stageEffort({model},'format'),'low');
+test('all GPT-6 business stages use medium; probes and unknown models retain compatibility',()=>{
+ assert.equal(stageEffort({model},'format'),'medium');
  assert.equal(stageEffort({model},'discovery'),'medium');
- for(const s of ['profile','jd_coverage','score','rank','report','resume_optimization','resume_reassess'])assert.equal(stageEffort({model},s),'high');
- assert.equal(stageEffort({model,reasoningEffort:'xhigh'},'format'),'xhigh');
+ for(const s of ['profile','jd_coverage','score','rank','report','resume_optimization','resume_reassess'])assert.equal(stageEffort({model},s),'medium');
+ assert.equal(stageEffort({model,reasoningEffort:'xhigh'},'format'),'medium');
+ assert.equal(stageEffort({model,reasoningEffort:'high'},'probe'),'high');
  assert.equal(stageEffort({model:'test-model'},'format'),null);
- assert.equal(stageEffort({model},'unclassified'),null);
+ assert.equal(stageEffort({model},'unclassified'),'medium');
 });
 test('missing usage is unknown and reasoning/cache are subsets, not extra totals',()=>{
  assert.deepEqual(usageCounts({input_tokens:100,output_tokens:20,total_tokens:120,input_tokens_details:{cached_tokens:60},output_tokens_details:{reasoning_tokens:10}}),{input:100,output:20,total:120,reasoning:10,cached:60,known:true});
@@ -17,7 +18,7 @@ test('missing usage is unknown and reasoning/cache are subsets, not extra totals
 });
 test('records metadata only; database failures never reject model work',async()=>{
  const events=[];const db={prepare(sql){return {bind(...args){events.push({sql,args});return this},async run(){}}}};
- await recordAiUsage(db,{model,stage:'score',effort:'high',status:'completed',usage:{input_tokens:3,output_tokens:2,total_tokens:5},prompt:'PRIVATE'});
+ await recordAiUsage(db,{model,stage:'score',effort:'medium',status:'completed',usage:{input_tokens:3,output_tokens:2,total_tokens:5},prompt:'PRIVATE'});
  assert.equal(events.length,1);assert.equal(events[0].args[2],'score');assert.equal(events[0].args[5],1);
  assert.ok(!JSON.stringify(events).includes('PRIVATE'));
  await recordAiUsage({prepare(){throw Error('database unavailable')}},{model,stage:'score'});
