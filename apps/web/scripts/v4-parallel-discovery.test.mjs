@@ -408,3 +408,18 @@ test('a failed verification lane is moved behind fresh jobs, never removed from 
  assert.deepEqual(pendingVerification(next).map(([u])=>u),[b.url,c.url,a.url]);
  assert.equal(next.rows.length,3);
 });
+
+test('activated OpenAI global ranking receives every one of 502 eligible candidates, not only the 50 highest raw scores',async()=>{
+ const jobs=Array.from({length:502},(_,i)=>job(i+100)),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const matches=jobs.map((j,i)=>({company:j.company,title:j.title,location:j.location,official_url:j.url,source_type:'站外官方招聘',reference_vacancy_verified:true,reference_jd_kind:'AI_GENERATED_REFERENCE',reference_jd:'可能负责渠道管理。',reference_jd_basis:'方向推断',evidence_score_status:'AI_REFERENCE_JD_SCORED',match_score:60+i%40,curated_suitable:true,report_status:'COMPLETE',research_detail:{comparisons:[],score_explanation:'真实经历匹配'}}));
+ let calls=0;
+ const result=await v4Match(async(url,opt)=>{
+  calls++;assert.ok(url.endsWith('/responses'));const body=JSON.parse(opt.body),input=JSON.parse(body.input);
+  assert.equal(input.pending_ids.length,502);assert.equal(JSON.parse(input.public_document).length,502);
+  assert.equal(Object.hasOwn(body,'max_output_tokens'),false);
+  return model({ordered_ids:[...input.pending_ids].reverse(),research_notes:'full synthetic pool comparison'});
+ },provider,resume,'全国',{env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true,checkpoint:{phase:'reporting',rows:jobs.map(j=>[j.url,j]),profile,matches}});
+ assert.equal(calls,1);assert.equal(result.checkpoint.globalOrder.length,502);
+ assert.equal(result.checkpoint.globalRankState.done,true);
+ assert.equal(new Set(result.checkpoint.globalOrder).size,502);
+});
