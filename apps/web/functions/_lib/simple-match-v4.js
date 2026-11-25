@@ -209,7 +209,7 @@ async function toJson(fetcher,provider,response,{signal}={}){
 function sourceKind(url){
  return isCommercialRecruitmentBoard(url)?'THIRD_PARTY_BOARD':recruitmentSourceKind(url)==='EMPLOYER_ATS'?'EMPLOYER_ATS':'EMPLOYER_DOMAIN_CANDIDATE';
 }
-async function checkJob(fetcher,url,signal,job){
+async function checkJob(fetcher,url,signal,job,note=()=>{}){
  if(isCommercialRecruitmentBoard(url))return null;
  // Open research first, including unfamiliar employers. Known employer API
  // adapters are a fallback for JS shells, never the primary search scope.
@@ -224,8 +224,9 @@ async function checkJob(fetcher,url,signal,job){
   if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
   if(e?.message==='V4_COMMERCIAL_BOARD_EXCLUDED')return {excluded_board:true};
   if(e?.message==='V4_JOB_CLOSED')return {excluded_closed:true};
+  const code=e?.code||e?.message;note(typeof code==='string'&&/^[A-Z_]+$/.test(code)?code:'JD_DIRECT_READ_FAILED');
   try{return await directOfficialJobEvidence(url,{fetcher,signal,full:true})}
-  catch{return null}
+  catch(fallback){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');const reason=fallback?.code||fallback?.message;note(typeof reason==='string'&&/^[A-Z_]+$/.test(reason)?reason:'JD_FALLBACK_READ_FAILED');return null}
  }
 }
 
@@ -263,7 +264,7 @@ async function recoverEmployerJob(fetcher,provider,url,job,initial,{signal,onAct
    const authorization=chain.length?chain:proof;
    const key=target+'\n'+JSON.stringify(authorization);if(tried.has(key))continue;
    tried.add(key);added=true;
-   let jd=target===url&&initial?.full_jd?{...initial}:await checkJob(fetcher,target,signal,{...job,employer_proof_url:proof,employer_proof_urls:chain});
+   let jd=target===url&&initial?.full_jd?{...initial}:await checkJob(fetcher,target,signal,{...job,employer_proof_url:proof,employer_proof_urls:chain},note);
    if(jd?.excluded_board||jd?.excluded_closed){note(jd.excluded_closed?'RECOVERY_CLOSED':'RECOVERY_BOARD');continue;}
    if(jd?.full_jd&&sameIdentity(job.company,jd.company)&&sameIdentity(job.title,jd.title)&&sameCity(job.location,jd.location)){
     if(!isOfficialJd(jd)&&authorization&&await v4EmployerAuthorization(jd.canonical_url||target,jd.company,authorization,{fetcher,signal})){jd.source_confirmed=true;jd.employer_proof_url=chain[0]||proof;jd.employer_proof_urls=chain;}
@@ -353,7 +354,7 @@ async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=fa
    const url=urls[next++];
    const job=rows.get(url),diagnostics=[];
    const jobNote=code=>{diagnostics.push(code);note(code);};
-   let checked=await checkJob(fetcher,url,signal,job);
+   let checked=await checkJob(fetcher,url,signal,job,jobNote);
    if(curated&&!isOfficialJd(checked)&&!checked?.excluded_board&&!checked?.excluded_closed){
     jobNote('JD_RECOVERY_REQUIRED');
     checked=await recoverEmployerJob(fetcher,provider,url,job,checked,{signal,onActivity,note:jobNote,browser,ledger});
@@ -407,7 +408,7 @@ function renderJob(x,url,verified,resume,toolLinked,index,toolUrls=new Set()){
   matched:texts(x?.matched),not_evidenced:texts(x?.gaps||x?.not_evidenced),
   needs_verification:[note],
   requirements_basis:text(verified?.requirements||x?.requirements),
-  score_basis:score===null?'没有足够简历原文证据，不显示匹配分。':
+  score_basis:score===null?(verified?.full_jd?'尚未完成独立评分。':'尚未完成岗位资料核验与评分。'):
     full&&jdGrounded?'有简历与招聘 JD 原文依据的 AI 参考分（非录用概率）':
     'AI 职业方向参考分；JD 尚未完全核验（非录用概率）',
   recommendation_reason:reason,
@@ -427,6 +428,11 @@ function renderJob(x,url,verified,resume,toolLinked,index,toolUrls=new Set()){
   ...(verified?.excluded_closed?{excluded_closed:true,availability_status:'CLOSED_LISTED'}:{}),
   source_cited_by_tool:toolLinked
  };
+}
+// Discovery is not independent JD research or scoring. Never publish a search
+// model's guessed score/reason as the results of a completed assessment.
+export function renderCandidatePreview(job,url,resume,toolLinked,index,toolUrls){
+ return {...renderJob(job,url,null,resume,toolLinked,index,toolUrls),research_candidate_url:url,evidence_status:'RESEARCH_PENDING',match_score:null,reference_score:0,score_basis:'尚未完成岗位资料核验与评分。',recommendation_reason:'',matched:[],not_evidenced:[],evidence_score_status:undefined,score_evidence_status:undefined};
 }
 /**
  * The model, not a hard-coded step count, determines whether another
@@ -471,6 +477,12 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    }
    if(verified.status==='rejected')next.diagnostics={...next.diagnostics,PIPELINE_VERIFICATION_RETRY_RETAINED:(next.diagnostics?.PIPELINE_VERIFICATION_RETRY_RETAINED||0)+1};
    onActivity('searching','已保留本轮发现和核验成果；累计候选 '+next.rows.length+' 个，已尝试核验 '+(next.processedEarlier||[]).length+' 个。');
+   // Publish the merged snapshot, not just the discovery branch's stale previews.
+   const ready=next.priorState?.matches||next.matches||[];
+   const done=new Set(next.processedEarlier||[]);
+   const sources=new Set(next.toolUrls||[]);
+   const previews=(next.rows||[]).filter(([url])=>!done.has(url)).map(([url,job],i)=>renderCandidatePreview(job,url,resume,sources.has(url),i,sources));
+   onPartial(mergeJobEvidence(ready,previews));
    onRecoveryState(()=>next);
    return {status:'CONTINUE',checkpoint:next};
   }
@@ -785,7 +797,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   publishResearch();
   // Do not wait for every website scrape before showing model research.
   if(rows.size){
-   const previews=[...rows.entries()].map(([url,job],i)=>({...renderJob(job,url,null,resume,toolUrls.has(url),i,toolUrls),...(curated?{research_candidate_url:url}:{})}));
+   const previews=[...rows.entries()].map(([url,job],i)=>(curated?renderCandidatePreview(job,url,resume,toolUrls.has(url),i,toolUrls):renderJob(job,url,null,resume,toolUrls.has(url),i,toolUrls)));
    onPartial(curated?mergeJobEvidence((priorState?.matches||[]).filter(j=>!rejectedBoards.has(j.research_candidate_url||j.official_url)),previews):previews);
   }
   onActivity('searching','第 '+round+' 轮研究已完成，累计取得 '+rows.size+
@@ -878,7 +890,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   return candidate;
  });
  const reportMatches=()=>{
-  const previews=officialOnly?allEntries.slice(offset+entries.length).map(([u,j],i)=>({...renderJob(j,u,null,resume,toolUrls.has(u),offset+entries.length+i,toolUrls),...(curated?{research_candidate_url:u}:{})})):[];
+  const previews=officialOnly?allEntries.slice(offset+entries.length).map(([u,j],i)=>(curated?renderCandidatePreview(j,u,resume,toolUrls.has(u),offset+entries.length+i,toolUrls):renderJob(j,u,null,resume,toolUrls.has(u),offset+entries.length+i,toolUrls))):[];
   const visible=curated?mergeJobEvidence(previousMatches,[...matches,...previews]):[...previousMatches,...matches,...previews];
   return visible.filter(j=>!j.excluded_board&&!j.excluded_closed&&!isCommercialRecruitmentBoard(j.official_url,j));
  };
