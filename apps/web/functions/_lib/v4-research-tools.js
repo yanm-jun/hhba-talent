@@ -1,4 +1,4 @@
-import {v4PublicJobUrl,v4ReadPublicJobDocument,v4RenderPublicJobDocument,v4ReadPublicJobDocumentWindow,v4PreparePublicBrowserResources} from './v4-open-job-evidence.js';
+import {v4PublicJobUrl,v4ReadPublicJobDocument,v4RenderPublicJobDocument,v4ReadPublicJobDocumentWindow,v4PreparePublicBrowserResources,v4BrowserHasPendingResources,v4BrowserAvailable} from './v4-open-job-evidence.js';
 import {isCommercialRecruitmentBoard} from './match-employer-source.js';
 
 // A page is a transport unit, never a maximum number of stored jobs.
@@ -70,6 +70,15 @@ export function v4RememberPublicResult(ledger,result){
 // leads, not candidate jobs or proof of employer ownership.
 export function v4KnownPublicResearchUrls(urls=[],ledger=[]){
  return new Set([...urls,...ledger.filter(r=>r?.type==='read_page').flatMap(r=>[r.url,...(Array.isArray(r.resource_hints)?r.resource_hints.map(h=>h?.url):[])])].map(v4PublicJobUrl).filter(u=>u&&!isCommercialRecruitmentBoard(u)));
+}
+// Count actual research frontier changes, not repeated failure counters.
+export function v4ResearchEvidenceProgress(ledger=[]){
+ const failures=new Set();let reads=0,hints=0;
+ for(const r of ledger){if(r.type==='resource_attempt'){failures.add(JSON.stringify([r.document_url,r.url]));continue;}if(r.type==='read_page'){reads++;hints+=r.resource_hints?.length||0;}}
+ return [reads,hints,failures.size].join(':');
+}
+export function v4MayContinueBrowserRead(action,ledger,browser){
+ return action?.type==='read_page'&&action.mode==='browser'&&v4BrowserAvailable(browser)&&v4BrowserHasPendingResources(action.url,ledger);
 }
 export function v4EvidenceIndex(ledger){return ledger.map((r,index)=>({index,type:r.type,url:r.url,mode:r.mode,collection:r.collection,...(r.type==='resource_attempt'?{ok:false,error:r.error,document_url:r.document_url}:{}),offset:r.offset??0,next_offset:r.next_offset??null,chars:typeof r.text==='string'?r.text.length:0,...(r.script_source?{script_source:true}:{}),...(r.resource_hints?.length?{resource_hint_count:r.resource_hints.length}:{})}));}
 export function v4EvidencePage(ledger,action,budget){
@@ -145,7 +154,7 @@ export async function v4RunResearchActions(actions,opts){
 const stageGuide='memory 若返回 oversized_record:true，使用 {type:"memory",collection:对应集合,index:record_index,offset:0} 读取该原始JSON记录，按 next_offset 继续，不能把索引占位符当成完整记录。可调用 research_actions 数组或 research_action 单项工具。除公开来源工具外，{type:"text_page",collection:"resume"|"jd"|"document",offset:字符偏移} 可读取当前任务原文的后续页。原文仅用于本次模型研究，禁止作为搜索词或传往网页工具。若输入显示分页，必须阅读全部相关原文并结合证据再判断。可用 research_notes 保留可核对的阶段研究发现，供后续阶段复用；不得在笔记中记录个人联系方式或复制完整简历，笔记仅为本任务的分析上下文；不能用摘要替代原文证据。当前阶段如需复查网页，使用 read_page；recheck只在全局搜索与复盘阶段执行，不直接改变已核验JD。';
 export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetcher,browser,signal,resume='',jd='',document='',collections={},ledger=[],taskNotes,note=()=>{},privateOnly=false,initialPaged=false}={}){
  const original=JSON.parse(payload.input);
- const knownUrls=v4KnownPublicResearchUrls(sourceUrls,ledger);
+ const knownUrls=v4KnownPublicResearchUrls(sourceUrls,ledger),scopedSources=new Set(sourceUrls.map(v4PublicJobUrl).filter(Boolean)),autoReviewed=new Set();
  const seen=new Set(),stageLedger=[...ledger],notes=Array.isArray(taskNotes)?[...taskNotes]:[];let budget=90000,paged=initialPaged,results=null,repeat=false,contextState=v4ContextState(null),evidenceCursor=0,notesCursor=0;
  const originals={resume,jd,document};
  const delivered={resume:[],jd:[],document:[]};
@@ -194,26 +203,42 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
    const name=next[0];results=[textPage(name,missing(name))];stageLedger.push(results[0]);note('AI_STAGE_ORIGINAL_PAGE_REQUIRED');continue;
   }
   for(const x of response?.output||[]){
-   if(x?.type==='web_search_call'||x?.type==='url_context_call')for(const s of x.action?.sources||[]){const url=v4PublicJobUrl(s?.url);if(url)knownUrls.add(url);}
-   if(x?.type==='message')for(const y of x.content||[])for(const s of y.annotations||[]){const url=s?.type==='url_citation'?v4PublicJobUrl(s.url):null;if(url)knownUrls.add(url);}
+   if(x?.type==='web_search_call'||x?.type==='url_context_call')for(const s of x.action?.sources||[]){const url=v4PublicJobUrl(s?.url);if(url){knownUrls.add(url);scopedSources.add(url);}}
+   if(x?.type==='message')for(const y of x.content||[])for(const s of y.annotations||[]){const url=s?.type==='url_citation'?v4PublicJobUrl(s.url):null;if(url){knownUrls.add(url);scopedSources.add(url);}}
   }
   let fresh=false;
   results=await v4RunResearchActions(actions,{collections:{...collections,evidence:v4EvidenceIndex(stageLedger),notes},ledger:stageLedger,knownUrls,fetcher,browser,signal,budget,onIndependentDocument:r=>v4RememberPublicResult(ledger,r),onAction:async(action,run,limit)=>{
    if(privateOnly&&!(action.type==='text_page'||action.type==='evidence'||(action.type==='memory'&&['notes','evidence'].includes(action.collection))))return {type:action.type,ok:false,error:'PRIVATE_TASK_LOCAL_TOOLS_ONLY'};
    const key=JSON.stringify([budget,action.type,action.collection,action.cursor,action.url,action.mode,action.offset,action.index,action.discover===true]);
    const repeated=seen.has(key);
-   if(repeated&&!(action.type==='read_page'&&action.refresh===true))return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
+   if(repeated&&!(action.type==='read_page'&&action.refresh===true)&&!v4MayContinueBrowserRead(action,stageLedger,browser))return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
    seen.add(key);
+    const before=v4ResearchEvidenceProgress(stageLedger);
    const result=action.type==='text_page'?textPage(action.collection,action.offset,limit):action.type==='recheck'?{type:'recheck',ok:false,error:'USE_READ_PAGE_FOR_CURRENT_JOB_REVIEW'}:await run();
-   if(repeated&&(!result.ok||stageLedger.some(r=>r.type===result.type&&r.url===result.url&&r.mode===result.mode&&r.offset===result.offset&&r.text===result.text)))return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
+   const identical=stageLedger.some(r=>r.type===result.type&&r.url===result.url&&r.mode===result.mode&&r.offset===result.offset&&r.text===result.text);
+    if(result.ok&&result.type==='read_page'){v4RememberPublicResult(stageLedger,result);v4RememberPublicResult(ledger,result);}
+    const advanced=before!==v4ResearchEvidenceProgress(stageLedger);
+    if(repeated&&(!result.ok||identical)&&!advanced)return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
    fresh=true;
-   if(result.ok&&result.type!=='evidence'&&result.type!=='memory'){stageLedger.push(result);v4RememberPublicResult(ledger,result);}
+   if(result.ok&&result.type!=='read_page'&&result.type!=='evidence'&&result.type!=='memory'&&!identical)stageLedger.push(result);
    note(result.ok?'AI_STAGE_TOOL_USED':'AI_STAGE_TOOL_UNAVAILABLE');return result;
   }});
   if(fresh){repeat=false;continue;}
   if(repeat){
    const unread=paged?Object.keys(originals).find(name=>missing(name)!==null):null;
    if(unread){results=[textPage(unread,missing(unread))];stageLedger.push(results[0]);repeat=false;note('AI_STAGE_RECOVERED_UNREAD_PAGE');continue;}
+   // Recover unread scoped sources before exhausting a strategy.
+   if(!privateOnly){
+    const source=[...scopedSources].find(u=>knownUrls.has(u)&&!autoReviewed.has(u)&&!stageLedger.some(r=>r.type==='read_page'&&r.url===u));
+    const dynamic=[...scopedSources].find(u=>knownUrls.has(u)&&!autoReviewed.has('browser:'+u)&&v4MayContinueBrowserRead({type:'read_page',url:u,mode:'browser'},stageLedger,browser));
+    if(source||dynamic){
+     const url=source||dynamic,before=v4ResearchEvidenceProgress(stageLedger);if(source)autoReviewed.add(url);
+     const recovered=await v4RunResearchAction({type:'read_page',url,mode:source?'static':'browser'},{collections,knownUrls,fetcher,browser,signal,budget,ledger:stageLedger,onIndependentDocument:r=>v4RememberPublicResult(ledger,r)});
+     v4RememberPublicResult(stageLedger,recovered);v4RememberPublicResult(ledger,recovered);
+     if(!source&&before===v4ResearchEvidenceProgress(stageLedger))autoReviewed.add('browser:'+url);
+     results=[recovered];repeat=false;note('AI_STAGE_RECOVERED_PUBLIC_SOURCE');continue;
+    }
+   }
    const alternatives={type:'research_recovery',ok:false,error:'REPEATED_UNCHANGED_REQUEST',guidance:'改用不同的公开来源、查询、分页偏移或已保存证据；无需重复完全相同的工具请求。'};
    if(results.some(r=>r?.type==='research_recovery'))throw Object.assign(new Error('AI_STAGE_REPEATED_TOOL_REQUEST'),{code:'AI_STAGE_REPEATED_TOOL_REQUEST'});
    if(repeat==='alternate')throw Object.assign(new Error('AI_STAGE_REPEATED_TOOL_REQUEST'),{code:'AI_STAGE_REPEATED_TOOL_REQUEST'});

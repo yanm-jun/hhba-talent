@@ -10,7 +10,7 @@ import {sha256Hex} from './real-auth.js';
 import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
 import {CANDIDATE_TARGET,FINAL_TARGET,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,eligibleCuratedScore,qualifiedReport,validateGeminiGlobalOrder,applyGeminiGlobalOrder,mergeGeminiRankProgress,carryGeminiRankProgress} from './v4-curated-reports.js';
 import {findMainlandCity} from './mainland-job-location.js';
-import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4NotesMemoryPage,v4MemoryRecordPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex,v4KnownPublicResearchUrls} from './v4-research-tools.js';
+import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4NotesMemoryPage,v4MemoryRecordPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex,v4KnownPublicResearchUrls,v4ResearchEvidenceProgress,v4MayContinueBrowserRead} from './v4-research-tools.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch} from './v4-jd-research.js';
 import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery} from './v4-parallel-discovery.js';
@@ -655,7 +655,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  let completionReason=checkpoint?.completionReason||'';
  const note=code=>{diag[code]=(diag[code]||0)+1;};
  const publishResearch=()=>onResearch(report());
- const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,verificationReads:checkpoint?.verificationReads||[],rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],stallSourceReads:[...stallSourceReads],researchToolResult,researchNotes,candidateResearchMemory:jobMemory.snapshot(),researchContextBudget,researchContext,memoryCursors,discoveryWidth,discoveryElapsed,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,pipelineActive:!!checkpoint?.pipelineActive,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],scoreRecoveryKeys:checkpoint?.scoreRecoveryKeys||[],scoreRecoveryModes:checkpoint?.scoreRecoveryModes||[],globalOrder:checkpoint?.globalOrder||null,globalRankState:checkpoint?.globalRankState||null,globalRankError:checkpoint?.globalRankError||null,...extra}});
+ const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,verificationReads:checkpoint?.verificationReads||[],rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],stallSourceReads:[...stallSourceReads],researchToolResult,researchNotes,candidateResearchMemory:jobMemory.snapshot(),researchContextBudget,researchContext,memoryCursors,discoveryWidth,discoveryElapsed,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,verificationDeferred:checkpoint?.verificationDeferred||[],pipelineActive:!!checkpoint?.pipelineActive,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],scoreRecoveryKeys:checkpoint?.scoreRecoveryKeys||[],scoreRecoveryModes:checkpoint?.scoreRecoveryModes||[],globalOrder:checkpoint?.globalOrder||null,globalRankState:checkpoint?.globalRankState||null,globalRankError:checkpoint?.globalRankError||null,...extra}});
  onRecoveryState(()=>checkpoint?{...checkpoint,publicEvidence,researchNotes,candidateResearchMemory:jobMemory.snapshot()}:null);
  // This phase is reachable only after every candidate has completed a verification
  // attempt. Report generation cannot influence the initial score ranking.
@@ -1004,7 +1004,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      researchContextBudget=researchContext.budget;
     }
     for(const u of pendingSources)submittedSources.add(u);
-    const availableEvidence=new Set([...coordinatorToolSources,...publicEvidence.map(r=>r.url)].map(v4PublicJobUrl).filter(Boolean).map(curatedUrl));
+    const availableEvidence=new Set([...coordinatorToolSources,...publicEvidence.filter(r=>r.type==='read_page').map(r=>r.url)].map(v4PublicJobUrl).filter(Boolean).map(curatedUrl));
     for(const r of Array.isArray(data.reviewed_sources)?data.reviewed_sources:[]){const u=curatedUrl(v4PublicJobUrl(r?.url));if(u&&sourceLeads.has(u)&&['job_found','no_job','official_entry'].includes(r.status)&&text(r.reason)){
      if(availableEvidence.has(u)||rows.has(u))reviewedSources.set(u,{status:r.status,reason:text(r.reason)});
      else note('SOURCE_REVIEW_UNSUPPORTED');
@@ -1081,11 +1081,11 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     const results=await v4RunResearchActions(actions,{collections:{candidates:candidateMemory(),sources:[...sourceLeads],unresolved:unresolvedMemory(),evidence:v4EvidenceIndex(publicEvidence),history:rounds,notes:researchNotes},ledger:publicEvidence,knownUrls,fetcher,browser:env.BROWSER,signal,budget:researchContextBudget,parallelPublicReads:parallelResearch,onAction:async(action,run)=>{
      const actionKey=await sha256Hex(JSON.stringify([signature,researchContextBudget,action.type,action.collection,action.cursor,action.url,action.mode,action.offset,action.index,action.discover===true]));
      const repeated=actionSeen.has(actionKey);
-     if(repeated&&!(action.type==='read_page'&&action.refresh===true))return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
+     if(repeated&&!(action.type==='read_page'&&action.refresh===true)&&!v4MayContinueBrowserRead(action,publicEvidence,env.BROWSER))return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
      actionSeen.add(actionKey);
-     const before=publicEvidence.length;
+     const before=v4ResearchEvidenceProgress(publicEvidence);
      const result=action.type==='text_page'&&action.collection==='resume'?resumePageRef(action.offset,Math.max(256,Math.floor(researchContextBudget/actions.length))):await run();v4RememberPublicResult(publicEvidence,result);
-     if(repeated&&publicEvidence.length===before)return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
+     if(repeated&&v4ResearchEvidenceProgress(publicEvidence)===before)return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
      if(result.ok&&action.type==='read_page'){
       // Grounding redirects are leads; the independently read final URL is a new source, not a verified JD.
       const resolved=v4PublicJobUrl(result.url);if(resolved&&!isCommercialRecruitmentBoard(resolved)){
@@ -1144,7 +1144,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // gets the same full-JD verification and independent scoring attempt.
  if(stepMode&&checkpoint?.phase!=='verification'&&(curated||rows.size))return continuation('verification',{next:0,matches:priorState?.matches||[],read:priorState?.read||0,scored:priorState?.scored||0,archived:priorState?.archived||0,scoreFailures:priorState?.scoreFailures||0,reportFailures:priorState?.reportFailures||0,priorState:null});
  const offset=checkpoint?.phase==='verification'?checkpoint.next:0;
- const allEntries=pendingVerification({rows:[...rows],processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],rejectedBoards:[...rejectedBoards]});
+ const allEntries=pendingVerification({rows:[...rows],processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],rejectedBoards:[...rejectedBoards],verificationDeferred:checkpoint?.verificationDeferred||[]});
  // Process small batches across separate requests to keep provider, fetch, D1 and R2 calls within a Worker invocation.
  // The batch size is not a recommendation limit; every discovered entry is processed.
  const batchSize=curated?(checkpoint?.verificationBatch||(parallelResearch?3:1)):2;

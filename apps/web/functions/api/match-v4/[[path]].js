@@ -211,7 +211,7 @@ export async function onRequest(context){
  const suffix=path.slice('/api/match-v4'.length).replace(/\/$/,'')||'/';
  if(suffix==='/status'&&request.method==='GET')
   return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:matchEnabled(env,request),
-   scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],resumable:!!checkpointEnv(env),encrypted_checkpoint_storage:checkpointStorageReady(env),dynamic_page_reader:typeof env.BROWSER?.quickAction==='function'});
+   scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],resumable:!!checkpointEnv(env),encrypted_checkpoint_storage:checkpointStorageReady(env),dynamic_page_reader:typeof env.BROWSER?.quickAction==='function'||typeof env.BROWSER?.script==='function'});
  if(suffix==='/background-step')return backgroundStep(env,request,waitUntil);
  const activeTaskRoute=suffix==='/active-task';
  if(!(activeTaskRoute&&['GET','POST'].includes(request.method))&&(!['/resume','/ocr'].includes(suffix)||request.method!=='POST'))return fail('NOT_FOUND',404);

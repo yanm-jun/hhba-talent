@@ -26,7 +26,9 @@ export function mergeCandidateResearchMemory(discovery=[],verification=[],rows=[
 }
 export function pendingVerification(checkpoint){
  const done=new Set(checkpoint.processedEarlier||[]),evidence=new Map(checkpoint.processedEvidence||[]),recheck=new Set(checkpoint.explicitRechecks||[]),rejected=new Set(checkpoint.rejectedBoards||[]);
- return (checkpoint.rows||[]).filter(([u,j])=>!rejected.has(u)&&(!done.has(u)||evidence.get(u)!==candidateRevision(j)||recheck.has(u)));
+ const pending=(checkpoint.rows||[]).filter(([u,j])=>!rejected.has(u)&&(!done.has(u)||evidence.get(u)!==candidateRevision(j)||recheck.has(u)));
+ const deferred=new Set(checkpoint.verificationDeferred||[]);
+ return [...pending.filter(([u])=>!deferred.has(u)),...pending.filter(([u])=>deferred.has(u))];
 }
 export function pipelineWidths(checkpoint,pending){
  // Reserve one of six simultaneous outgoing connections for storage/auth.
@@ -52,6 +54,9 @@ export function mergePipelineCheckpoint(original,discovery,verification,attempte
  const originalRechecks=new Set(original.explicitRechecks||[]);
  const verifiedRevisions=new Map(verification.processedEvidence||[]);
  const completed=verificationIncomplete?attempted.filter(([u,j])=>(verification.processedEarlier||[]).includes(u)&&verifiedRevisions.get(u)===candidateRevision(j)):attempted;
+ const completedUrls=new Set(completed.map(([u])=>u)),deferred=new Set(next.verificationDeferred||[]);
+ for(const [u] of attempted){if(completedUrls.has(u))deferred.delete(u);else if(verificationIncomplete)deferred.add(u);}
+ next.verificationDeferred=[...deferred];
  for(const [u,j] of completed){
   processed.add(u);revisions.set(u,candidateRevision(j));
   // A request to recheck newly discovered during the concurrent search
