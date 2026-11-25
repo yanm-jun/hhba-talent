@@ -59,3 +59,15 @@ test('watchdog fairly resumes errored instances and never reopens terminal workf
  assert.deepEqual(result,{checked:5,restarted:1});assert.deepEqual(restarted,['1'.repeat(64)]);assert.equal(rows.size,2);
  assert.deepEqual(await inspectWatchdogInstances(db,workflow,{now:now+1}),{checked:0,restarted:0});
 });
+
+test('shared private cron calls matching watchdog even when Word recovery is disabled',async()=>{
+ const {default:scheduler}=await import('../../apps/web/ops/word-render-recovery-worker.mjs');
+ let calls=0;
+ const env={HHBA_WORD_RENDER_RECOVERY_ENABLED:'0',HHBA_MATCH_WATCHDOG:{async fetch(url,opts){
+  calls++;assert.equal(url,'https://hhba-internal.invalid/watchdog');assert.equal(opts.method,'POST');
+  return Response.json({ok:true,checked:3,restarted:1});
+ }}};
+ await scheduler.scheduled({},env);
+ assert.equal(calls,1);
+ assert.equal((await scheduler.fetch()).status,404);
+});
