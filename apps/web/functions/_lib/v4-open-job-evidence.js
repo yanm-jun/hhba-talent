@@ -236,7 +236,7 @@ export function v4ScriptResourceHints(source,documentUrl,scriptUrl=documentUrl){
   let url;try{url=v4PublicJobUrl(new URL(value,base).href)}catch{return;}
   if(!url||isCommercialRecruitmentBoard(url))return;
   const u=new URL(url);
-  if(kind==='data'&&!/(?:\/(?:api|graphql|recruit(?:ment)?|career[s]?|job[s]?|position[s]?|vacanc(?:y|ies)|opening[s]?)(?:[\/_.-]|$)|\.json$)/i.test(u.pathname))return;
+  if(kind==='data'&&(/\.(?:m?js|cjs|css)$/i.test(u.pathname)||!/(?:\/(?:api|graphql|recruit(?:ment)?|career[s]?|job[s]?|position[s]?|vacanc(?:y|ies)|opening[s]?)(?:[\/_.-]|$)|\.json$)/i.test(u.pathname)))return;
   if(kind==='script'&&!/\.(?:m?js)$/i.test(u.pathname))return;
   out.set(url,{url,kind});
  };
