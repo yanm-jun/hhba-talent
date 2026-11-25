@@ -17,7 +17,8 @@ test('the simpler result cards preserve the original Word editor and the selecte
  for(const value of ['匹配分用于求职参考，不是录用概率。','job.company','job.title_zh||job.title','job.location',"jdJob.availability_status==='OPEN_LISTED'",'job.match_score','<CuratedJobReport detail={jdJob.research_detail}','job.official_url'])assert.ok(panels.includes(value),'preserve unified result information: '+value);
  assert.match(dialog,/className=\{'hhba-match-modal'\+\(optimizedJobUrl\?' hhba-match-modal-editor':''\)\}/);
  assert.match(dialog,/verifiedMatchReports\(result\.matches\)\.find\(job=>job\.official_url===optimizedJobUrl\)/);
- assert.match(panels,/<button type="button" disabled=\{pending\|\|!optimizationAvailable\|\|!jdJob\.jd_version_id\|\|!jdJob\.jd_sha256\}/);
+ assert.match(panels,/<button type="button" disabled=\{pending\|\|!optimizationAvailable/);
+assert.match(panels,/jdJob\.reference_jd_kind==='AI_GENERATED_REFERENCE'/);
  assert.match(panels,/className="hhba-native-optimize"/);
  assert.match(panels,/> 优化简历/);
  assert.match(dialog,/onOptimize=\{optimizeJob\}/);

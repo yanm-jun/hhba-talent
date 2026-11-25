@@ -213,3 +213,16 @@ test('actual V4 verification keeps a confirmed vacancy with no JD, generates a r
  assert.equal(result.checkpoint.phase,'reporting');const saved=result.checkpoint.matches[0];
  assert.equal(providerCalls,1);assert.equal(saved.reference_vacancy_verified,true);assert.equal(saved.reference_jd_kind,'AI_GENERATED_REFERENCE');assert.equal(saved.match_score,87);assert.equal(saved.jd_source_status,undefined);assert.equal(saved.jd_version_id,undefined);assert.equal(saved.score_evidence_status,undefined);assert.equal(qualifiedReport(saved),true);assert.equal(result.checkpoint.scored,0);
 });
+
+test('reference score repairs missing evidence without dropping confirmed vacancy',async()=>{
+ const candidate=job(78),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ let calls=0;
+ const fetcher=async(url,opts)=>{
+  if(url===candidate.url)return new Response(JSON.stringify({'@type':'JobPosting',title:candidate.title,hiringOrganization:{name:candidate.company,url:new URL(candidate.url).origin},jobLocation:{address:{addressLocality:'上海'}}}),{headers:{'content-type':'application/json'}});
+  const input=JSON.parse(JSON.parse(opts.body).input);calls++;
+  if(calls>1)assert.ok(input.previous_validation_error);
+  return model({reference_jd:'可能负责汽车渠道运营。',reference_basis:'方向推断。',suitable:true,score:86,reason:'相关经历',resume_quote:calls===1?'虚构经历':'汽车经销商渠道运营',jd_quote:'汽车渠道运营',comparisons:[]});
+ };
+ const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
+ assert.equal(calls,2);assert.equal(result.checkpoint.matches[0].match_score,86);assert.equal(result.checkpoint.matches[0].reference_jd_kind,'AI_GENERATED_REFERENCE');
+});

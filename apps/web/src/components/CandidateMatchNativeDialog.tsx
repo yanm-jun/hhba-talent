@@ -93,7 +93,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  const activeJob=verifiedMatchReports(result.matches).find(job=>job.official_url===optimizedJobUrl)||result.matches.find(job=>job.official_url===optimizedJobUrl&&job.id===initialOptimizedJobId&&archivedHistoryJob(job));
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
  function optimizeJob(job:MatchedJob){
-  if(pending||!parsedProfile||!isVerifiedMatchReport(job)||!job.jd_version_id||!job.jd_sha256)return;
+  if(pending||!parsedProfile||!isVerifiedMatchReport(job)||(!(job.jd_version_id&&job.jd_sha256)&&!(job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job.reference_jd?.trim()&&job.reference_jd_basis?.trim())))return;
   matchListScroll.current=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content')?.scrollTop||0;
   setSelectedJobUrl(job.official_url);setOptimizationDirty(false);setOptimizedJobUrl(job.official_url);
  }
@@ -107,6 +107,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
    needs_verification:job.needs_verification||[],
    requirements_basis:job.requirements_basis||job.score_basis||'',
    jd_version_id:job.jd_version_id,jd_sha256:job.jd_sha256,
+   reference_jd:job.reference_jd,reference_jd_basis:job.reference_jd_basis,reference_jd_kind:job.reference_jd_kind,
    evidence_status:job.evidence_status,evidence_excerpt:job.evidence_excerpt
   };
  }

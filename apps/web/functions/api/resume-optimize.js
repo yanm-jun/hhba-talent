@@ -61,10 +61,11 @@ function valid(body,env){
  if(!body.job||typeof body.job!=='object'||typeof body.job.title!=='string'||
   !body.job.title.trim()||(env?.HHBA_MATCH_V4_READY!=='1'&&(body.job.title.length<2||body.job.title.length>120))||
   typeof body.job.requirements!=='string'||(env?.HHBA_MATCH_V4_READY!=='1'&&body.job.requirements.length>16000))return false;
+ const reference=env?.HHBA_MATCH_V4_READY==='1'&&body.job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&!body.job.jd_version_id&&!body.job.jd_sha256&&typeof body.job.official_url==='string'&&typeof body.job.reference_jd_basis==='string'&&body.job.reference_jd_basis.trim()&&body.job.requirements.trim();
  const doc=body.full_document;
  if(doc===undefined&&body.blocks.length>MAX_BLOCKS)return false;
  if(doc!==undefined&&(!doc||Array.isArray(doc)||typeof doc!=='object'||
-  !/^jd_[a-f0-9]{32}$/.test(body.job.jd_version_id||'')||!/^[a-f0-9]{64}$/.test(body.job.jd_sha256||'')||
+  (!reference&&(!/^jd_[a-f0-9]{32}$/.test(body.job.jd_version_id||'')||!/^[a-f0-9]{64}$/.test(body.job.jd_sha256||'')))||
   typeof doc.text!=='string'||(env?.HHBA_MATCH_V4_READY!=='1'&&doc.text.length>50000)||
   (doc.feedback!==undefined&&typeof doc.feedback!=='string')||
   (doc.wanted!==undefined&&(!Array.isArray(doc.wanted)||!doc.wanted.length||
@@ -130,7 +131,13 @@ export async function onRequestPost({request,env}){
  try{input=await readSmallJson(request,env);}catch(error){return error?.message==='OPTIMIZATION_PAYLOAD_TOO_LARGE'?fail('OPTIMIZATION_PAYLOAD_TOO_LARGE',413):fail('INVALID_REQUEST',400);}
  if(!valid(input,env))return fail('INVALID_OPTIMIZATION_INPUT',400);
  let trustedJob;
- try{trustedJob=await hydrateVerifiedJobRequirements(env,input.job);}
+ try{
+  if(env?.HHBA_MATCH_V4_READY==='1'&&input.job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&!input.job.jd_version_id&&!input.job.jd_sha256){
+   const url=new URL(input.job.official_url);if(url.protocol!=='https:'||url.username||url.password||url.port||!input.job.requirements.trim()||typeof input.job.reference_jd_basis!=='string'||!input.job.reference_jd_basis.trim())throw Error('JD_INVALID_JOB');
+   // Client-supplied reference is user-directed context only, never official evidence.
+   trustedJob={title:input.job.title,official_url:url.href,requirements:'以下是AI生成或用户提供的职业方向参考，不是企业实际招聘条件。不得将推断作为硬性资格或新增个人事实。\n参考依据：'+input.job.reference_jd_basis+'\n参考JD：\n'+input.job.requirements,source_status:'AI_REFERENCE_JD'};
+  }else trustedJob=await hydrateVerifiedJobRequirements(env,input.job);
+ }
  catch(e){
   const code=String(e?.message||'JD_VERSION_NOT_AVAILABLE');
   return fail(code,code==='JD_VERIFIED_VERSION_REQUIRED'||code==='JD_JOB_IDENTITY_MISMATCH'?422:409);
@@ -141,7 +148,7 @@ export async function onRequestPost({request,env}){
   if(input.full_document){
    if(!await taskReady(db))return fail('RESUME_OPTIMIZATION_TASK_DB_NOT_READY',503);
    lease=await reserveResumeOptimizationTask(db,hash,{
-    jd:trustedJob.jd_version_id,blocks:input.blocks,text:input.full_document.text
+    jd:trustedJob.jd_version_id||await sha256Hex(JSON.stringify([trustedJob.official_url,trustedJob.requirements])),blocks:input.blocks,text:input.full_document.text
    },{unrestricted:env?.HHBA_MATCH_V4_READY==='1'});
    if(lease?.duplicate)return fail('RESUME_OPTIMIZATION_IN_PROGRESS',409);
    if(!lease)return fail('RESUME_OPTIMIZATION_QUEUED',409);

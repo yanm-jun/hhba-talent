@@ -373,6 +373,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  async function jobContextForAI(signal:AbortSignal):Promise<JdAwareJob>{
   const title=(job.title_zh||job.title).slice(0,180);
   if(!postingScope)throw Error('岗位官网地址无效，已阻止可能串岗的简历优化。');
+  if(job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job.reference_jd?.trim()&&job.reference_jd_basis?.trim())return {title,requirements:job.reference_jd,official_url:job.official_url,reference_jd_kind:job.reference_jd_kind,reference_jd_basis:job.reference_jd_basis};
   if(requireVerifiedJd&&(!job.jd_version_id||!job.jd_sha256))
    throw Error('请先完成此岗位的 JD 核验，再优化简历。');
   if(job.jd_version_id){
@@ -485,7 +486,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
     throw Error('整份简历优化任务暂未就绪，请稍后重试。');
    // Never feed a rule-generated target back into model evidence or research.
    const feedback=undefined;
-   const key=JSON.stringify([targetedJob.jd_version_id,targetedJob.jd_sha256,currentBlocks,context,targetedJob.prior_match_analysis,feedback]);
+   const key=JSON.stringify([targetedJob.official_url,targetedJob.jd_version_id,targetedJob.jd_sha256,targetedJob.reference_jd_kind,targetedJob.requirements,currentBlocks,context,targetedJob.prior_match_analysis,feedback]);
    // Only resume unfinished work. An explicit new optimization after a full
    // review must invoke AI again, even if the document has not changed.
    const prior=full&&previousOptimization.current?.key===key&&previousOptimization.current.pending.length?
@@ -516,7 +517,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    setSuggestions(accepted);
    setActiveSuggestionId(accepted[0]?.id||null);
    setOpenSuggestionId(accepted[0]?.id||null);
-   const sourceNote=trustedJob.jd_version_id?
+   const sourceNote=trustedJob.reference_jd_kind==='AI_GENERATED_REFERENCE'?'本次依据AI参考JD优化真实经历，不代表企业已确认任职资格。':trustedJob.jd_version_id?
     '本次已依据企业官网核验的完整岗位 JD 生成建议。':
     '当前尚未接入可核验的完整 JD，本次仅依据已保存的岗位信息生成建议。';
    setNotice(pending.length?('已保留本次研究成果。还有 '+pending.length+' 处待处理，再点优化可接着处理。'+(pauseMessage?' '+pauseMessage:'')):

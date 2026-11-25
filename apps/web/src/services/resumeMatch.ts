@@ -238,7 +238,7 @@ export async function inspectResumeTextLocally(file:File,signal?:AbortSignal):Pr
  try{
   const buffer=await file.arrayBuffer();
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
-  const pdf=format==='pdf'?await extractPdfText(buffer,{signal}):null;
+  const pdf=format==='pdf'?await extractPdfText(buffer,{signal,unrestricted:MATCH_V4_PREVIEW}):null;
   const value=pdf?.text??await extractDocxText(buffer);
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
   const text=redactResumeTextLocally(value);

@@ -9,6 +9,7 @@ export type CandidateProfile = {
 import type {PriorMatchAnalysis} from './jobJdArchive';
 export type JobMatch={
  prior_match_analysis?:PriorMatchAnalysis;
+ reference_jd?:string;reference_jd_basis?:string;reference_jd_kind?:'AI_GENERATED_REFERENCE';
  id:string;company:string;title:string;title_zh:string|null;location:string;
  official_url:string;platform:string;remote:boolean;reference_score:number;
  matched:string[];not_evidenced:string[];needs_verification:string[];
