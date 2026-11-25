@@ -242,7 +242,7 @@ export function v4ScriptResourceHints(source,documentUrl,scriptUrl=documentUrl){
  for(const m of source.matchAll(/(?:\bimport\s*\(|\bfrom\s*|\bimport\s*)["']([^"'\r\n]+)["']/g))add(m[1],'script',scriptUrl);
  return [...out.values()];
 }
-export function v4PublicResourceHints(html,base){
+export function v4PublicResourceHints(html,base,{includeScriptHints=true}={}){
  const target=v4PublicJobUrl(base);if(!target)return [];
  const out=new Map();
  const add=(value,kind)=>{
@@ -267,7 +267,7 @@ export function v4PublicResourceHints(html,base){
    const href=attr(tag,'href');if(href&&/(?:job|career|recruit|vacanc|position|\.json(?:[?#]|$)|招聘|职位)/i.test(href))add(href,'link');
   }
  }
- for(const m of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi))for(const h of v4ScriptResourceHints(m[1],target))if(!out.has(h.url)&&h.url!==target)out.set(h.url,h);
+ if(includeScriptHints)for(const m of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi))for(const h of v4ScriptResourceHints(m[1],target))if(!out.has(h.url)&&h.url!==target)out.set(h.url,h);
  return [...out.values()];
 }
 export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal,maxBytes=2*1024*1024,scriptSource=false,documentUrl=url}={}){
@@ -287,7 +287,7 @@ export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal,maxBytes
   if(isCommercialRecruitmentBoard(current,{site_name:site}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
   const plain=(responseIsJson(r)?raw:htmlToText(raw,{maxChars:Infinity})).trim();
   if(CLOSED.test(pageTitle(raw))||(plain.length<80&&CLOSED.test(plain)))throw Error('V4_JOB_CLOSED');
-  return {url:current,plain,site,title:pageTitle(raw),resource_hints:responseIsJson(r)?[]:v4PublicResourceHints(raw,current)};
+  return {url:current,plain,site,title:pageTitle(raw),resource_hints:responseIsJson(r)?[]:v4PublicResourceHints(raw,current),declared_resource_hints:responseIsJson(r)?[]:v4PublicResourceHints(raw,current,{includeScriptHints:false}),document_kind:responseIsJson(r)?'json':'html'};
  }
  throw Error('V4_UNSAFE_OR_REPEATED_REDIRECT');
 }
@@ -350,6 +350,38 @@ export async function v4PreparePublicBrowserResources(url,{fetcher=fetch,signal,
  }
  return v4BrowserResourcePlan(url,initial.resourceHints,records);
 }
+// Read a separately hosted JSON JD even when browser CORS prevents the
+// employer application from rendering it. Ownership is inherited only from an
+// already independently confirmed vacancy and its fresh exact HTML declaration.
+// Require the structured posting itself to point to that same landing URL.
+export async function v4ReadDeclaredStructuredJob(parent,document,{fetcher=fetch,signal,onDocument=()=>{}}={}){
+ const target=v4PublicJobUrl(parent?.canonical_url);
+ if(!target||parent.source_confirmed!==true||parent.independently_read!==true||parent.vacancy_confirmed!==true||document?.url!==target||document.document_kind!=='html')return null;
+ const identity=v=>trim(v).normalize('NFKC').replace(/[^\p{L}\p{N}]/gu,'').toLowerCase();
+ for(const hint of document.declared_resource_hints||[]){
+  if(signal?.aborted)throw signal.reason;
+  if(hint.kind!=='data'||!publicReadResourceUrl(hint.url)||hint.url===target)continue;
+  try{
+   const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal,maxBytes:16*1024*1024});
+   if(doc.url!==hint.url||doc.document_kind!=='json')continue;
+   onDocument({type:'read_page',ok:true,mode:'static',url:doc.url,text:doc.plain,offset:0,next_offset:null,resource_hints:[]});
+   const all=postings(doc.plain);
+   const matches=all.filter(j=>{
+    const company=companyOf(j).name,city=postedLocation(j);
+    let landing;try{landing=v4PublicJobUrl(new URL(j.url,target).href)}catch{}
+    return typeof j.url==='string'&&landing===target&&!!city&&city===parent.location&&identity(company)===identity(parent.company)&&identity(j.title)===identity(parent.title);
+   });
+   if(matches.length!==1)continue;
+   const posting=matches[0];
+   if(posting.validThrough&&Number.isFinite(Date.parse(posting.validThrough))&&Date.parse(posting.validThrough)<Date.now())continue;
+   const desc=structuredJdParts(posting,v=>htmlToText(v,{maxChars:Infinity})).join('\n');
+   if(!desc.trim()||looksTruncatedJd(desc)||looksTruncatedJd(htmlToText(trim(posting.description),{maxChars:Infinity})))continue;
+   const sections=extractOfficialJdSections(desc,{full:true});
+   return {...parent,id:'v4-employer-'+(await sha256Hex(target)).slice(0,32),canonical_url:target,jd_source_url:doc.url,full_jd:desc,requirements:sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||desc,jd_incomplete:false,partial_jd:undefined,checked_at:new Date().toISOString(),proof_method:'V4_EMPLOYER_HTML_JOB'};
+  }catch(e){if(signal?.aborted)throw e;}
+ }
+ return null;
+}
 export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHints=[],publicDataUrls=[]}={}){
  const target=v4PublicJobUrl(url);
  if(!target||isCommercialRecruitmentBoard(target))throw Error('V4_UNSAFE_URL');
@@ -377,7 +409,7 @@ export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHint
  if(isCommercialRecruitmentBoard(target,{site_name:site}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
  const plain=htmlToText(html,{maxChars:Infinity}).trim();
  if(CLOSED.test(title)||(plain.length<80&&CLOSED.test(plain)))throw Error('V4_JOB_CLOSED');
- return {url:target,plain,site,title,rendered:true,resource_hints:v4PublicResourceHints(html,target)};
+ return {url:target,plain,site,title,rendered:true,resource_hints:[...new Map([...resourceHints,...v4PublicResourceHints(html,target)].map(h=>[h.url,h])).values()]};
 }
 
 
