@@ -47,7 +47,7 @@ def main() -> None:
 
     # Explicit diagnostic branch or opt-in setting only. No extra paid
     # optimization calls on ordinary production builds.
-    if os.environ.get("CF_PAGES_BRANCH", "").startswith("qa/v4-resume-live-acceptance-") or os.environ.get("HHBA_V4_RESUME_LIVE_QA") == "1":
+    if (os.environ.get("CF_PAGES_BRANCH", "").startswith("qa/v4-resume-live-acceptance-") or os.environ.get("CF_PAGES_BRANCH") == "feat/v4-resume-live-acceptance-20261125-final") or os.environ.get("HHBA_V4_RESUME_LIVE_QA") == "1":
         run(["node", "--test", "scripts/v4-resume-live-acceptance.contract.test.mjs",
              "scripts/resume-optimization.route.test.mjs"], cwd=WEB)
         run(["node", "scripts/v4-resume-live-acceptance.mjs"], cwd=WEB)
