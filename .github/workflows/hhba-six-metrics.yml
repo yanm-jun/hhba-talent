@@ -56,7 +56,7 @@ jobs:
           node --check functions/api/engagement/event.js
           node --check 'functions/api/saved/[[path]].js'
           node --check ../../apps/admin-preview/dashboard.js
-          node --test scripts/ai-token-usage.test.mjs
+          node --test scripts/ai-token-usage.test.mjs scripts/v4-token-efficiency.test.mjs
           node --test scripts/metrics-contract.test.mjs scripts/admin-original-dashboard.contract.test.mjs scripts/admin-access-audiences.test.mjs
           node --test ../../apps/admin-preview/tests/*.test.mjs
       - name: Build existing Vite frontend without new feature flags
