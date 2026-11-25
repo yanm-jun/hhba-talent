@@ -169,6 +169,8 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
   }
  }
  const siteName=meta(html,'property','og:site_name')||meta(html,'name','application-name');
+ const declaredHints=v4PublicResourceHints(html,canonical,{includeScriptHints:false});
+ const dynamicHints=declaredHints.filter(h=>['data','frame','script'].includes(h.kind));
  if(isCommercialRecruitmentBoard(canonical,{site_name:siteName}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
  const plain=htmlToText(html,{maxChars:Infinity});
  const all=postings(html);
@@ -196,7 +198,7 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
   const jd={id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
    canonical_url:canonical,company:org.name,title,
    location:city,requirements:incomplete?'':requirements||desc,full_jd:incomplete?'':desc,
-   vacancy_confirmed:!!org.url&&relatedDomains(canonical,org.url),...(incomplete?{partial_jd:desc,jd_incomplete:true}:{}),
+   vacancy_confirmed:!!org.url&&relatedDomains(canonical,org.url),...(incomplete?{partial_jd:desc,jd_incomplete:true,...(dynamicHints.length?{resource_hints:dynamicHints}:{})}:{}),
    checked_at:now.toISOString(),proof_method:'V4_STRUCTURED_JOBPOSTING',
    source_confirmed:!!org.url&&relatedDomains(canonical,org.url),independently_read:true,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
   if(!incomplete&&canonical===initial&&await writeConditionalJd(cacheBucket,initial,expected,response,jd,j.validThrough,now.getTime()))onCache('JD_PUBLIC_CONDITIONAL_STORED');
@@ -213,7 +215,7 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
   canonical_url:canonical,company,title,location:city,
   requirements:incomplete?'':requirements,full_jd:incomplete?'':sections.full_jd,
-  ...(incomplete?{partial_jd:sections?.full_jd||'',jd_incomplete:true}:{}),
+  ...(incomplete?{partial_jd:sections?.full_jd||'',jd_incomplete:true,...(dynamicHints.length?{resource_hints:dynamicHints}:{})}:{}),
   checked_at:now.toISOString(),proof_method:'V4_EMPLOYER_HTML_JOB',
   source_confirmed:false,independently_read:true,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
 }
