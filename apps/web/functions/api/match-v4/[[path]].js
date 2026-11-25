@@ -13,7 +13,7 @@ import {recognizeV4Resume} from '../../_lib/v4-resume-ocr.js';
 import {checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint,matchTaskKey,saveMatchTask,readMatchTask} from '../../_lib/v4-match-checkpoint-storage.js';
 import {claimAiCheckpoint,leaseMatchTask} from '../../_lib/ai-checkpoint-claim.js';
 import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
-import {getSessionTask,updateSessionTask,assertSessionTaskActive} from '../../_lib/v4-session-match-task.js';
+import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSessionTask} from '../../_lib/v4-session-match-task.js';
 import {backgroundEnabled,scheduleBackgroundMatch,loadBackgroundMatch} from '../../_lib/v4-background-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
@@ -90,7 +90,7 @@ function events(env,request,input,waitUntil){
    // Managed tasks are not cancelled simply because a browser transport closes.
    // Pages waitUntil is best effort; durable checkpoints still provide recovery.
    const executionSignal=input.managed?leaseAbort.signal:input.lease?AbortSignal.any([request.signal,leaseAbort.signal]):request.signal;
-   const guard=async()=>{if(input.managed)await assertSessionTaskActive(env,input.session,input.taskId,input.generation);};
+   const guard=async()=>{if(input.managed)await renewActiveSessionTask(env,input.session,input.taskId,input.generation);};
    let guardBusy=false;
    const guardTimer=input.managed?setInterval(()=>{if(guardBusy)return;guardBusy=true;guard().catch(e=>leaseAbort.abort(e)).finally(()=>{guardBusy=false});},12000):null;
    async function releaseTask(){if(input.lease){const lease=input.lease;input.lease=null;await lease.release();}}

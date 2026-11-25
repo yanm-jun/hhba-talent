@@ -368,7 +368,7 @@ async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,br
   }
  }catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(isV4RetryableProviderError(e?.code))throw e;note(e?.code||'JD_PARTIAL_REFERENCE_UNAVAILABLE');}
 }
-async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=false,note=()=>{},browser,ledger=[]}={}){
+async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=false,note=()=>{},browser,ledger=[],cachedResults=new Map(),onRead=()=>{}}={}){
  // A bounded concurrency pool protects third-party sites, not a count limit
  // on the number of positions the model is allowed to recommend.
  const urls=[...rows.keys()],results=new Map();
@@ -378,6 +378,7 @@ async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=fa
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    const url=urls[next++];
    const job=rows.get(url),diagnostics=[];
+   if(cachedResults.has(url)){const checked=cachedResults.get(url);results.set(url,checked);if(checked?.full_jd&&!checked.excluded_board&&!checked.excluded_closed)read++;onRead(url,checked);continue;}
    const jobNote=code=>{diagnostics.push(code);note(code);};
    let checked=await checkJob(fetcher,url,signal,job,jobNote);
    if(curated&&!isOfficialJd(checked)&&!checked?.excluded_board&&!checked?.excluded_closed){
@@ -393,10 +394,11 @@ async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=fa
    }
    if(checked?.full_jd&&!checked.excluded_board&&!checked.excluded_closed)read++;
    if(checked&&!checked.excluded_board&&!checked.excluded_closed)checked={...checked,jd_research:mergeJdResearch(checked.jd_research,{diagnostics,checked_at:new Date().toISOString()})};
-   results.set(url,checked);
+   results.set(url,checked);onRead(url,checked);
   }
  };
- await Promise.all(Array.from({length:Math.min(4,urls.length)},()=>run()));
+ const settled=await Promise.allSettled(Array.from({length:Math.min(4,urls.length)},()=>run()));
+ const failed=settled.find(x=>x.status==='rejected');if(failed)throw failed.reason;
  onActivity('reading','已查阅 '+urls.length+' 条岗位来源，其中 '+read+' 条取得了可核对的 JD。');
  return {results,read};
 }
@@ -929,7 +931,13 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const recoveryBefore=diag.JD_RECOVERY_REQUIRED||0;
  onProgress('reading');
  onActivity('reading',entries.length?'正在核对第 '+(processedEarlier.size+offset+1)+' 至 '+(processedEarlier.size+offset+entries.length)+' 条岗位来源，共 '+rows.size+' 条。':'没有新增待核验来源，正在整理已有研究成果。');
- const {results,read}=await enrich(fetcher,new Map(entries),{signal,onActivity,provider,curated,note,browser:env.BROWSER,ledger:publicEvidence});
+ // Retry cache is scoped to this exact authorized research and candidate revision.
+ // Cache only successfully read, independently verified complete JDs; unresolved
+ // sources are searched again and changed candidate revisions invalidate the entry.
+ const verificationReads=new Map((checkpoint?.verificationReads||[]).filter(([u,r])=>rows.has(u)&&r.revision===candidateEvidence(rows.get(u))&&isOfficialJd(r.jd)));
+ const cachedResults=new Map(entries.filter(([u])=>verificationReads.has(u)).map(([u])=>[u,verificationReads.get(u).jd]));
+ if(curated&&checkpoint)onRecoveryState(()=>continuation('verification',{next:offset,matches:checkpoint.matches||[],read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures:checkpoint.reportFailures||0,verificationReads:[...verificationReads],verificationBatch:batchSize}).checkpoint);
+ const {results,read}=await enrich(fetcher,new Map(entries),{signal,onActivity,provider,curated,note,browser:env.BROWSER,ledger:publicEvidence,cachedResults,onRead:(u,jd)=>{if(curated&&isOfficialJd(jd))verificationReads.set(u,{revision:candidateEvidence(rows.get(u)),jd});}});
  onProgress('scoring');
  const previousMatches=checkpoint?.phase==='verification'?(checkpoint.matches||[]).filter(j=>!isCommercialRecruitmentBoard(j.official_url,j)&&!j.excluded_board&&!rejectedBoards.has(j.official_url)):[];
  const matches=entries.map(([url,job],i)=>{
@@ -1024,8 +1032,11 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const workerFailure=settledWorkers.find(x=>x.status==='rejected');
  if(workerFailure){
   if(curated&&checkpoint&&isV4RetryableProviderError(workerFailure.reason?.code)&&!signal?.aborted){
-   const preserved=mergeJobEvidence(previousMatches,matches.filter(j=>!j.excluded_board&&!j.excluded_closed));
-   onRecoveryState(()=>continuation('verification',{next:offset,matches:preserved,read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures:checkpoint.reportFailures||0,verificationBatch:Math.max(1,Math.ceil(batchSize/2))}).checkpoint);
+   const completed=entries.filter(([u],i)=>matches[i].score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&Number.isInteger(matches[i].match_score)&&isOfficialJd(results.get(u)));
+   // Earlier offsets and completed scores must not be charged again on retry.
+   for(const [u,j] of [...allEntries.slice(0,offset),...completed]){processedEarlier.add(u);processedEvidence.set(u,candidateEvidence(j));explicitRechecks.delete(u);verificationReads.delete(u);}
+   const preserved=mergeJobEvidence(previousMatches,matches);
+   onRecoveryState(()=>continuation('verification',{next:0,matches:preserved,read:(checkpoint.read||0)+completed.length,scored:(checkpoint.scored||0)+completed.length,archived,scoreFailures:checkpoint.scoreFailures||0,reportFailures:checkpoint.reportFailures||0,verificationReads:[...verificationReads],verificationBatch:Math.max(1,Math.ceil(batchSize/2))}).checkpoint);
   }
   throw workerFailure.reason;
  }
@@ -1034,7 +1045,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const combined=curated?mergeJobEvidence(previousMatches,matches).filter(j=>!isCommercialRecruitmentBoard(j.official_url,j)&&!rejectedBoards.has(j.research_candidate_url||j.official_url)):rawCombined;
  if(officialOnly)onPartial(reportMatches());
  const readTotal=(checkpoint?.read||0)+read;
- if(stepMode&&offset+entries.length<allEntries.length)return continuation('verification',{next:offset+entries.length,verificationBatch:curated?nextVerificationBatch(batchSize,(diag.JD_RECOVERY_REQUIRED||0)>recoveryBefore,allEntries.length-offset-entries.length):2,matches:combined,read:readTotal,scored,archived,scoreFailures,reportFailures:checkpoint?.reportFailures||0});
+ for(const [u] of entries)verificationReads.delete(u);
+ if(stepMode&&offset+entries.length<allEntries.length)return continuation('verification',{next:offset+entries.length,verificationReads:[...verificationReads],verificationBatch:curated?nextVerificationBatch(batchSize,(diag.JD_RECOVERY_REQUIRED||0)>recoveryBefore,allEntries.length-offset-entries.length):2,matches:combined,read:readTotal,scored,archived,scoreFailures,reportFailures:checkpoint?.reportFailures||0});
  if(curated){
   return continuation('reporting',{matches:combined,read:readTotal,scored,archived,scoreFailures,reportFailures:checkpoint?.reportFailures||0});
  }

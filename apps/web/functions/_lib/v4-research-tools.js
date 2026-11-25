@@ -56,10 +56,12 @@ export async function v4RunResearchAction(action,{collections,knownUrls,fetcher,
  if(type!=='read_page')return {type,ok:false,error:'UNKNOWN_RESEARCH_ACTION'};
  try{
   const mode=action.mode==='browser'?'browser':action.mode==='window'?'window':'static';
-  const doc=mode==='browser'?await v4RenderPublicJobDocument(url,{browser,signal}):mode==='window'?await v4ReadPublicJobDocumentWindow(url,{fetcher,signal,offset:action.offset,maxBytes:Math.min(256*1024,Math.max(4096,budget))}):await v4ReadPublicJobDocument(url,{fetcher,signal});
+  let actualMode=mode,doc;
+  try{doc=mode==='browser'?await v4RenderPublicJobDocument(url,{browser,signal}):mode==='window'?await v4ReadPublicJobDocumentWindow(url,{fetcher,signal,offset:action.offset,maxBytes:Math.min(256*1024,Math.max(4096,budget))}):await v4ReadPublicJobDocument(url,{fetcher,signal});}
+  catch(error){if(error?.message!=='V4_PAGE_TOO_LARGE'||signal?.aborted||mode==='window')throw error;actualMode='window';doc=await v4ReadPublicJobDocumentWindow(url,{fetcher,signal,offset:0,maxBytes:Math.min(256*1024,Math.max(4096,budget))});}
   // Register only after a successful independent public read; redirects remain unverified leads.
   knownUrls.add(url);if(v4PublicJobUrl(doc.url))knownUrls.add(doc.url);
-  if(mode==='window')return {type,mode,ok:true,...doc};
+  if(actualMode==='window')return {type,mode:actualMode,ok:true,...doc,...(mode!=='window'?{fallback_from:mode}: {})};
   // A model can request further text pages instead of losing large documents.
   const offset=Number.isSafeInteger(action.offset)&&action.offset>=0?Math.min(action.offset,doc.plain.length):0;
   const end=Math.min(doc.plain.length,offset+budget);

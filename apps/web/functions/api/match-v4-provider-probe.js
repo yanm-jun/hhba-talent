@@ -1,6 +1,6 @@
 // Operator-only synthetic probe. Disabled unless a short-lived encrypted operator token is installed.
 // No user input, resume data, response text, credential, or redirect is returned.
-import {geminiJobProvider,callGeminiJob} from '../_lib/v4-gemini-job-provider.js';
+import {geminiJobProvider,callGeminiJob,inspectGeminiContextCapabilities} from '../_lib/v4-gemini-job-provider.js';
 import {v4ParseJson,v4ToolSources} from '../_lib/simple-match-v4.js';
 import {v4ReadEmployerJob,v4PublicJobUrl} from '../_lib/v4-open-job-evidence.js';
 import {isCommercialRecruitmentBoard} from '../_lib/match-employer-source.js';
@@ -30,7 +30,7 @@ export async function onRequest({request,env}){
   // Probe one real public job; not a cap on ordinary matching.
   if(jobs[0])try{const jd=await v4ReadEmployerJob(jobs[0].url,{signal,expected:jobs[0]});independentlyRead=Boolean(jd?.independently_read&&jd?.full_jd);}catch{}
   // Test optional protocol capabilities separately, with no personal data.
-  const capabilities={stream:false,url_context:false};
+  const capabilities={stream:false,url_context:false,...await inspectGeminiContextCapabilities(fetch,provider,{signal})};
   try{const stream=await callGeminiJob(fetch,{...provider,stream:true},{instructions:'Return only JSON.',input:'Return {"ok":true}.'},{signal});capabilities.stream=v4ParseJson(stream).ok===true&&stream.native_stream===true;}catch{}
   if(jobs[0])try{const ctx=await callGeminiJob(fetch,{...provider,urlContext:true},{instructions:'Use URL Context to read this public job URL. Return JSON only.',input:JSON.stringify({url:jobs[0].url}),tools:[{type:'web_search'}],publicUrlContext:true},{signal});capabilities.url_context=ctx.output.some(x=>x.type==='url_context_call');}catch{}
   return reply({ok:sources.length>0&&jobs.length>0,phase:'complete',model:provider.model,grounding_count:sources.length,job_count:jobs.length,independent_jd_read:independentlyRead,capabilities,elapsed_ms:Date.now()-start});

@@ -106,3 +106,15 @@ export async function callGeminiJob(fetcher,provider,payload,{signal,onEvent}={}
  }catch(e){status=e?.code||'AI_PROVIDER_RESPONSE_INVALID';throw e;}
  finally{logV4Usage(provider,usage,Date.now()-start,status);}
 }
+
+// Safe capability inspection: only model metadata and a synthetic token count.
+// Never create a remote cache or send private CV data during a probe.
+export async function inspectGeminiContextCapabilities(fetcher,provider,{signal}={}){
+ const model=provider.baseUrl+'/v1beta/models/'+encodeURIComponent(provider.model);
+ const headers={'x-goog-api-key':provider.key,'content-type':'application/json',accept:'application/json'};
+ const result={model_metadata:false,input_token_limit:null,output_token_limit:null,count_tokens:false,cached_content_advertised:false};
+ const integer=x=>Number.isSafeInteger(x)&&x>0?x:null;
+ try{const r=await fetcher(model,{headers,redirect:'manual',signal});if(r.ok){const m=await r.json();result.model_metadata=true;result.input_token_limit=integer(m.inputTokenLimit);result.output_token_limit=integer(m.outputTokenLimit);result.cached_content_advertised=(m.supportedGenerationMethods||[]).some(x=>typeof x==='string'&&/cache/i.test(x));}else await r.body?.cancel().catch(()=>{});}catch(e){if(signal?.aborted)throw e;}
+ try{const r=await fetcher(model+':countTokens',{method:'POST',headers,redirect:'manual',signal,body:JSON.stringify({contents:[{role:'user',parts:[{text:'Synthetic public job search capability test.'}]}]})});if(r.ok){const m=await r.json();result.count_tokens=integer(m.totalTokens)!==null;}else await r.body?.cancel().catch(()=>{});}catch(e){if(signal?.aborted)throw e;}
+ return result;
+}

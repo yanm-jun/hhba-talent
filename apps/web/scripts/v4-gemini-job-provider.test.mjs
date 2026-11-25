@@ -103,3 +103,17 @@ test('adaptive concurrency respects hosting transport headroom and actual observ
  assert.equal(nextDiscoveryWidth(4,[],{maxConnections:4,elapsed:1000,previousElapsed:100}),3);
  assert.equal(nextDiscoveryWidth(4,['AI_PROVIDER_RATE_LIMITED'],{maxConnections:4}),2);
 });
+
+test('large public page automatically falls back to addressable windows, never claims complete document',async()=>{
+ const {v4RunResearchAction}=await import('../functions/_lib/v4-research-tools.js');
+ const url='https://careers.other-motors.cn/recruitment/positions/9988',html='<html>'+('x'.repeat(2*1024*1024))+'</html>';
+ const result=await v4RunResearchAction({type:'read_page',url,discover:true},{collections:{},knownUrls:new Set(),fetcher:async()=>new Response(html,{headers:{'content-type':'text/html','content-length':String(html.length)}})});
+ assert.equal(result.ok,true);assert.equal(result.mode,'window');assert.equal(result.fallback_from,'static');assert.equal(result.complete_document,false);assert.ok(result.next_offset>0);
+});
+test('Gemini context capability probe exposes only model limits and synthetic token count',async()=>{
+ const {inspectGeminiContextCapabilities}=await import('../functions/_lib/v4-gemini-job-provider.js');
+ const provider=v4JobProvider(env),calls=[];
+ const got=await inspectGeminiContextCapabilities(async(url,opt)=>{calls.push(url);assert.equal(opt.redirect,'manual');assert.equal(opt.headers['x-goog-api-key'],env.GEMINI_API_KEY);
+ return url.endsWith(':countTokens')?Response.json({totalTokens:8}):Response.json({inputTokenLimit:1000000,outputTokenLimit:64000,supportedGenerationMethods:['generateContent','countTokens','createCachedContent']});},provider);
+ assert.equal(got.input_token_limit,1000000);assert.equal(got.output_token_limit,64000);assert.equal(got.count_tokens,true);assert.equal(got.cached_content_advertised,true);assert.equal(calls.length,2);
+});
