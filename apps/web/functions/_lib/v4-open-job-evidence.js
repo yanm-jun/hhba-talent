@@ -322,7 +322,7 @@ export function v4BrowserResourcePlan(url,resourceHints=[],ledger=[]){
  while(queue.length){
   const h=queue.shift(),u=v4PublicJobUrl(h?.url);
   if(!u||u===target||isCommercialRecruitmentBoard(u)||hints.has(u))continue;
-  hints.set(u,{url:u,kind:h.kind});
+  hints.set(u,{url:u,kind:h.kind,...(h.runtime_observed?{runtime_observed:true}:{})});
   // The next frame's own observed declarations are also reachable. Only a
   // successful full static read of that exact frame may contribute children.
   if(h.kind==='script'||h.kind==='frame')for(const r of ledger)if(r.url===u&&r.type==='read_page'&&r.mode==='static'&&(h.kind==='script'?r.script_source===true:!r.script_source&&r.offset===0&&r.next_offset===null))queue.push(...(r.resource_hints||[]));
@@ -339,7 +339,7 @@ export async function v4PreparePublicBrowserResources(url,{fetcher=fetch,signal,
  // Bound automatic transport per browser pass, not the agent's research.
  // Remaining discovered URLs are returned as hints and can be read by the
  // existing static/window tools or subsequent browser passes.
- const resourceWindow=6;
+ const resourceWindow=Math.max(1,Math.min(12,Math.ceil(initial.resourceHints.length/2)));
  while(attempted.size<resourceWindow){
   const pending=initial.resourceHints.filter(h=>!attempted.has(h.url)&&publicReadResourceUrl(h.url));
   const hint=pending.find(h=>['data','frame'].includes(h.kind)&&!initial.publicDataUrls.includes(h.url))||
@@ -451,7 +451,10 @@ export function v4RuntimeBrowserScript(target,exactUrls){
      }
      // Do not replay request credentials. Only public navigation and resources.
      const headers=Object.fromEntries(Object.entries(req.headers()).filter(([k])=>! /^(?:authorization|cookie|proxy-authorization|x-api-key|x-auth-token)$/i.test(k)));
-     return route.continue({headers});
+     // Never automatically follow redirects out of the approved request set.
+     const response=await route.fetch({headers,maxRedirects:0});
+     if(response.status()>=300&&response.status()<400)return route.abort();
+     return route.fulfill({response,headers:Object.fromEntries(Object.entries(response.headers()).filter(([k])=>!/^set-cookie$/i.test(k)))});
     });
     const page=await ctx.newPage();
     try{await page.goto(cfg.target,{waitUntil:'networkidle',timeout:20000});}catch{}
@@ -459,12 +462,12 @@ export function v4RuntimeBrowserScript(target,exactUrls){
     const html=finalUrl===cfg.target?await page.content():'';
     return {html,finalUrl,observed:[...observed.values()]};
    }finally{try{await ctx?.close()}finally{await browser.close().catch(()=>{})}}
-  `; 
+  }`; 
 }
 export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHints=[],publicDataUrls=[]}={}){
  const target=v4PublicJobUrl(url);
  if(!target||isCommercialRecruitmentBoard(target))throw Error('V4_UNSAFE_URL');
- if(typeof browser?.quickAction!=='function')throw Error('V4_BROWSER_UNAVAILABLE');
+ if(typeof browser?.quickAction!=='function'&&typeof browser?.script!=='function')throw Error('V4_BROWSER_UNAVAILABLE');
  if(signal?.aborted)throw signal.reason;
  const host=new URL(target).hostname.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&');
  const independentlyRead=new Set(publicDataUrls.map(v4PublicJobUrl).filter(Boolean));
@@ -485,6 +488,7 @@ export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHint
  }
  let html=runtimeHtml;
  if(!html){
+ if(typeof browser.quickAction!=='function')throw Error('V4_BROWSER_UNAVAILABLE');
  const response=await browser.quickAction('content',{
   url:target,allowRequestPattern:['^https://'+host+'(?::443)?(?:/|$)',...new Set(exactAssets)],
   rejectResourceTypes:['image','media','font'],
