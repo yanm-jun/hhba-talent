@@ -14,6 +14,7 @@ import {checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMa
 import {claimAiCheckpoint,leaseMatchTask} from '../../_lib/ai-checkpoint-claim.js';
 import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
 import {getSessionTask,updateSessionTask,assertSessionTaskActive} from '../../_lib/v4-session-match-task.js';
+import {backgroundEnabled,scheduleBackgroundMatch,loadBackgroundMatch} from '../../_lib/v4-background-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
 const reply=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
@@ -51,7 +52,7 @@ function events(env,request,input,waitUntil){
  const stream=new ReadableStream({
   start(controller){
    const send=(type,payload)=>{
-    if(closed)return;
+    if(closed||input.background&&!['heartbeat','complete','failure'].includes(type))return;
     try{
      const serialized=JSON.stringify(payload);
      if(serialized.length>500000&&type!=='heartbeat'){
@@ -63,16 +64,19 @@ function events(env,request,input,waitUntil){
    const heart=setInterval(()=>send('heartbeat',{stage:phase,
     elapsed_ms:Date.now()-started}),12000);
    const progress=stage=>{phase=stage;send('progress',{stage})};
-   const activity=(stage,message)=>send('activity',{stage,message});
+   const activity=(stage,message)=>{latestActivity={stage,message};send('activity',latestActivity);};
    const sendJobs=(kind,matches)=>{
+    if(input.background)return;
     send(kind+'_begin',{count:matches.length});
     for(const job of matches)send(kind+'_job',{job});
     send(kind+'_end',{count:matches.length});
    };
    const allowedJob=j=>j&&!j.excluded_board&&!isCommercialRecruitmentBoard(j.official_url,j);
    const officialJob=j=>allowedJob(j)&&qualifiedReport(j);
-   const sendResearch=r=>{if(r)send('research_report',r);};
+   let lastReport,latestActivity;
+   const sendResearch=r=>{if(r){lastReport=r;send('research_report',r);}};
    const sendFinal=result=>{
+    if(input.background){send('complete',{status:'COMPLETE'});return;}
     const matches=result.matches.filter(officialJob),leads=(result.research_leads||[]).filter(allowedJob);
     sendResearch(result.research_report);
     sendJobs('research',leads);
@@ -115,7 +119,7 @@ function events(env,request,input,waitUntil){
       console.info('HHBA_V4_STAGE',JSON.stringify({trace,phase:result.checkpoint.phase,round:result.checkpoint.round,candidates:result.checkpoint.rows?.length,processed:result.checkpoint.next,scored:result.checkpoint.scored,diagnostics:result.checkpoint.diagnostics}));
       if(input.taskKey){
        await input.lease.renew();
-       await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint,generation:input.generation||0});
+       await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint,generation:input.generation||0,progress:{stage:phase,activity:latestActivity,report:lastReport}});
        await releaseTask();
        send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});
        succeeded=true;return;
@@ -155,7 +159,8 @@ function events(env,request,input,waitUntil){
      if(input.taskKey&&input.lease&&isV4RetryableProviderError(code)&&!leaseAbort.signal.aborted){try{const state=input.recoveryState?.();if(state){await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:state,generation:input.generation||0});}}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
      console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,
       elapsed_ms:Date.now()-started}));
-     send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable:!!input.taskKey&&(isV4RetryableProviderError(code)||leaseAbort.signal.aborted&&!request.signal.aborted)});
+     const retryable=code!=='AI_AGENT_CANCELLED'&&!!input.taskKey&&(isV4RetryableProviderError(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
+     send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
     }finally{
      clearInterval(heart);if(leaseTimer)clearInterval(leaseTimer);if(guardTimer)clearInterval(guardTimer);
      await releaseTask().catch(()=>console.warn('HHBA_TASK_LEASE_RELEASE_FAILED'));
@@ -174,6 +179,30 @@ function events(env,request,input,waitUntil){
   'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
   'X-Robots-Tag':'noindex','X-Accel-Buffering':'no'}});
 }
+// Private orchestration entrypoint: a ticket can advance only the already
+// authorized active session and generation, and returns no research content.
+// Each invocation uses the exact same D1 lease and encrypted checkpoint as
+// the browser. A second driver can never run the same leased phase in parallel.
+async function backgroundStep(env,request,waitUntil){
+ if(!backgroundEnabled(env,request)||request.method!=='POST')return fail('NOT_FOUND',404);
+ if(!enabled(env,request))return fail('MATCH_NOT_ENABLED',503);
+ let ticket;
+ try{const raw=await request.text();if(raw.length>256)return fail('INVALID_REQUEST',400);ticket=JSON.parse(raw)?.ticket;}catch{return fail('INVALID_REQUEST',400);}
+ let input;
+ try{
+  const {session,task,taskKey}=await loadBackgroundMatch(env,ticket);
+  input={managed:true,background:true,session,taskId:task.id,taskKey,generation:task.generation,text:task.text,role_hint:task.role,excludeUrls:task.excludeUrls,phone:session.phone,resume_id:task.resume_id};
+  input.lease=await leaseMatchTask(env.HHBA_PNVS_AUTH_DB,taskKey);
+  if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
+  const saved=await readMatchTask(env,taskKey);
+  if(saved?.generation===task.generation&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
+  else if(saved?.generation===task.generation&&saved?.checkpoint)input.checkpoint=saved.checkpoint;
+  else if(saved?.result?.status==='COMPLETE'&&saved.checkpoint&&saved.generation+1===task.generation){
+   input.checkpoint=saved.checkpoint;await saveMatchTask(env,taskKey,{checkpoint:input.checkpoint,generation:task.generation});
+  }else if(task.generation>0){await input.lease.release();return fail('AI_CHECKPOINT_EXPIRED',409);}
+  return events(env,request,input,waitUntil);
+ }catch(e){if(input?.lease)await input.lease.release().catch(()=>{});return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
+}
 export async function onRequest(context){
  const {request,env}=context;
  const waitUntil=typeof context.waitUntil==='function'?context.waitUntil.bind(context):undefined;
@@ -182,6 +211,7 @@ export async function onRequest(context){
  if(suffix==='/status'&&request.method==='GET')
   return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:enabled(env,request),
    scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],resumable:!!checkpointEnv(env),encrypted_checkpoint_storage:checkpointStorageReady(env),dynamic_page_reader:typeof env.BROWSER?.quickAction==='function'});
+ if(suffix==='/background-step')return backgroundStep(env,request,waitUntil);
  const activeTaskRoute=suffix==='/active-task';
  if(!(activeTaskRoute&&['GET','POST'].includes(request.method))&&(!['/resume','/ocr'].includes(suffix)||request.method!=='POST'))return fail('NOT_FOUND',404);
  if(!enabled(env,request)&&!(activeTaskRoute&&allowedHost(request)&&typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function'))return fail('MATCH_NOT_ENABLED',503);
@@ -200,7 +230,7 @@ export async function onRequest(context){
  if(candidate?.role!=='candidate')return fail('FORBIDDEN',403);
  if(activeTaskRoute&&request.method==='GET'){
   if(!checkpointStorageReady(env))return fail('AI_CHECKPOINT_DB_UNAVAILABLE',503);
-  try{return reply({ok:true,task:await getSessionTask(env,session)});}catch{return fail('AI_CHECKPOINT_DB_UNAVAILABLE',503);}
+  try{const task=await getSessionTask(env,session);if(task&&backgroundEnabled(env,request))await scheduleBackgroundMatch(env,session,task);return reply({ok:true,task});}catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',503);}
  }
  if(suffix==='/ocr'){
   try{return reply({ok:true,...await recognizeV4Resume(request,v4Provider(env))});}
@@ -220,7 +250,7 @@ export async function onRequest(context){
   const text=action==='start'?sanitize(body.text):null;
   if(action==='start'&&!text)return fail('INVALID_RESUME_TEXT',400);
   const entry=action==='start'?{id:body.task_id,text,role:typeof body.options.role_hint==='string'?body.options.role_hint.trim():'',excludeUrls:[],resume_id:body.resume_id||null}:{id:body.task_id,generation:body.generation};
-  try{return reply({ok:true,task:await updateSessionTask(env,session,action,entry)});}catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
+  try{const task=await updateSessionTask(env,session,action,entry);if(task&&backgroundEnabled(env,request))await scheduleBackgroundMatch(env,session,task);return reply({ok:true,task});}catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
  }
  // The third-party relay is not OpenAI official infrastructure.
  if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
@@ -242,10 +272,15 @@ export async function onRequest(context){
  if(checkpointStorageReady(env)&&body.task_id!==undefined){
   try{
    input.taskKey=await matchTaskKey(env,session.phone,body.task_id,{text:resume,role,excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-research-v5'});
+   const generation=body.research_generation??0;
+   if(input.managed&&backgroundEnabled(env,request)){
+    const saved=await readMatchTask(env,input.taskKey);
+    if(saved?.generation===generation&&saved?.result?.status==='COMPLETE'){input.generation=generation;input.cachedResult=saved.result;return events(env,request,input,waitUntil);}
+    return reply({status:'PENDING',progress:saved?.generation===generation?saved.progress||null:null});
+   }
    input.lease=await leaseMatchTask(db,input.taskKey);
    if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
    const saved=await readMatchTask(env,input.taskKey);
-   const generation=body.research_generation??0;
    if(!Number.isSafeInteger(generation)||generation<0||generation>(saved?.generation||0)+1){await input.lease.release();return fail('AI_CHECKPOINT_INVALID',409);}
    input.generation=generation;
    if(generation===(saved?.generation||0)&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;

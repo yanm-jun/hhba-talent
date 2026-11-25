@@ -105,6 +105,7 @@ export const MATCH_TASK_SIGNAL='hhba:v4:session-task-signal';
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=12*1024*1024;
 const errorMap:Record<string,string>={
+  AI_BACKGROUND_SCHEDULE_UNAVAILABLE:'独立后台调度暂时不可用，已保留原研究任务。',
   AI_AGENT_CANCELLED:'该研究任务已经终止或当前会话已失效。',
   AI_CHECKPOINT_INVALID:'原研究任务状态已变化，请重新查看任务。',
   AI_CHECKPOINT_DB_UNAVAILABLE:'任务恢复存储暂时不可用，正在保留原任务。',
@@ -331,6 +332,7 @@ export async function closeSessionMatchTask(task:Pick<SessionMatchTask,'id'|'gen
 }
 type MatchContinuation={status:'CONTINUE';continuation:{state:unknown;token:string}};
 type MatchStreamResponse=MatchResponse|MatchContinuation;
+type PendingManagedMatch={status:'PENDING';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;report?:MatchResearchReport}|null};
 // Only an opaque ID and expiry are persisted locally; no raw CV, access
 // token, signed continuation or model output is written to localStorage.
 async function matchTaskReference(text:string,opts:MatchOptions,resumeId?:string){
@@ -547,12 +549,20 @@ export async function submitExtractedResumeText(
   const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
   if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。',response.status===429||response.status>=500);
   const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,onReceive,onResearch,onResearchJobs):
-   await response.json().catch(()=>({})) as (Partial<MatchResponse>|MatchContinuation)&{error?:string};
+   await response.json().catch(()=>({})) as (Partial<MatchResponse>|MatchContinuation|PendingManagedMatch)&{error?:string};
   if(!response.ok){
    const code=(data as {error?:string}).error||'';
    if(code==='AI_TASK_IN_PROGRESS')throw new MatchError(409,'上次任务正在处理当前阶段，正在等待原任务恢复。',true);
    if(code==='AI_CHECKPOINT_EXPIRED'){task?.clear();throw new MatchError(409,'已保存的研究状态已过期，请重新启动匹配。');}
    throw new MatchError(response.status,errorMap[code]||'智能匹配服务暂时不可用。',code==='AI_CHECKPOINT_DB_UNAVAILABLE'||(!code&&(response.status===429||response.status>=500)));
+  }
+  if(data.status==='PENDING'){
+   if(!opts.managed_task)throw new MatchError(502,'任务恢复状态异常。');
+   if(data.progress?.stage)onProgress?.(data.progress.stage);
+   if(data.progress?.activity)onActivity?.(data.progress.activity);
+   if(data.progress?.report)onResearch?.(data.progress.report);
+   await new Promise<void>((resolve,reject)=>{const stop=()=>{clearTimeout(timer);reject(requestSignal.reason)};const timer=setTimeout(()=>{requestSignal.removeEventListener('abort',stop);resolve()},4000);requestSignal.addEventListener('abort',stop,{once:true});});
+   continue;
   }
   if(data.status==='CONTINUE'){
    if(!MATCH_V4_PREVIEW||!data.continuation||typeof data.continuation.token!=='string'||!data.continuation.state)throw new MatchError(502,'AI 续接状态异常。');
