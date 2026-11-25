@@ -152,3 +152,19 @@ test('V4 independent public archive keeps a long nonstandard JD with exact hash 
  const saved=await saveV4PublicJobJd(env,{proof_method:'V4_STRUCTURED_JOBPOSTING',source_confirmed:true,independently_read:true,canonical_url:'https://careers.other-motors.cn/recruitment/positions/9988',company:'示例企业',title:'运营经理',location:'上海',full_jd});
  assert.ok(saved);assert.equal(saved.full_jd,full_jd);assert.equal(saved.sections.map(x=>x.text).join('\n'),full_jd);
 });
+
+test('incremental Gemini rank keeps completed positions and accepts only real pending IDs',async()=>{
+ const {mergeGeminiRankProgress}=await import('../functions/_lib/v4-curated-reports.js');
+ assert.deepEqual(mergeGeminiRankProgress({ordered_ids:['j2','j1']},['j1'],['j1','j2','j3']),['j2','j1']);
+ assert.deepEqual(mergeGeminiRankProgress({insertions:[{id:'j3',after_id:'j2'}]},['j2','j1'],['j1','j2','j3']),['j2','j3','j1']);
+ assert.equal(mergeGeminiRankProgress({ordered_ids:['j2']},['j1'],['j1','j2']),null);
+ assert.equal(mergeGeminiRankProgress({insertions:[{id:'invented',after_id:null}]},['j1'],['j1','j2']),null);
+ assert.equal(mergeGeminiRankProgress({ordered_ids:['j1','j1']},['j1'],['j1','j2']),null);
+});
+test('trusted www host can schedule the same authorized background workflow',async()=>{
+ const {backgroundEnabled}=await import('../functions/_lib/v4-background-match.js');
+ const env={HHBA_V4_BACKGROUND_ENABLED:'1',HHBA_MATCH_BACKGROUND:{fetch(){}}};
+ assert.equal(backgroundEnabled(env,new Request('https://www.hhba.work/api/match-v4/resume')),true);
+ assert.equal(backgroundEnabled(env,new Request('https://hhba.work/api/match-v4/resume')),true);
+ assert.equal(backgroundEnabled(env,new Request('https://other.example/api/match-v4/resume')),false);
+});

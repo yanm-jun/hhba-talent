@@ -64,3 +64,19 @@ export function applyGeminiGlobalOrder(jobs,order){
  const positions=new Map((order||[]).map((u,i)=>[u,i]));
  return [...jobs].sort((a,b)=>(positions.get(a.official_url)??Infinity)-(positions.get(b.official_url)??Infinity)||(b.match_score??-1)-(a.match_score??-1)||a.official_url.localeCompare(b.official_url));
 }
+
+// Accept durable rank progress without inventing IDs or losing earlier work.
+// Compact IDs are scoped to the exact pool snapshot, never used as public URLs.
+export function mergeGeminiRankProgress(value,prior,ids){
+ const allowed=new Set(ids),old=new Set(prior);
+ const proposed=value?.ordered_ids;
+ if(Array.isArray(proposed)&&proposed.length===new Set(proposed).size&&proposed.every(id=>allowed.has(id))&&prior.every(id=>proposed.includes(id))&&proposed.length>prior.length)return proposed;
+ const insertions=value?.insertions;
+ if(!Array.isArray(insertions)||!insertions.length)return null;
+ const next=[...prior],seen=new Set(old);
+ for(const item of insertions){
+  if(!item||!allowed.has(item.id)||seen.has(item.id)||(item.after_id!==null&&!seen.has(item.after_id)))return null;
+  next.splice(item.after_id===null?0:next.indexOf(item.after_id)+1,0,item.id);seen.add(item.id);
+ }
+ return next;
+}

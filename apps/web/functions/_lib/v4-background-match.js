@@ -4,7 +4,7 @@ import {matchTaskKey,readMatchTask,saveMatchTask} from './v4-match-checkpoint-st
 import {renewActiveSessionTask,researchTaskKey,taskError} from './v4-session-match-task.js';
 import {sha256Hex} from './real-auth.js';
 
-export const backgroundEnabled=(env,request)=>env?.HHBA_V4_BACKGROUND_ENABLED==='1'&&typeof env.HHBA_MATCH_BACKGROUND?.fetch==='function'&&new URL(request.url).origin==='https://hhba.work';
+export const backgroundEnabled=(env,request)=>env?.HHBA_V4_BACKGROUND_ENABLED==='1'&&typeof env.HHBA_MATCH_BACKGROUND?.fetch==='function'&&['https://hhba.work','https://www.hhba.work'].includes(new URL(request.url).origin);
 const validTicket=t=>typeof t==='string'&&/^[a-f0-9]{64}$/.test(t);
 export async function scheduleBackgroundMatch(env,session,task){
  const ticket=await matchTaskKey(env,session.phone,task.id,{scope:'workflow-ticket-v1',session_hash:session.token_hash,generation:task.generation});
