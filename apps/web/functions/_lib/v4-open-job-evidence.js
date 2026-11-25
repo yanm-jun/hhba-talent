@@ -222,6 +222,34 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  * Bounded bytes protect the Worker; unavailable documents are research leads,
  * not proof of a closed vacancy. Never send a CV to employer pages.
  */
+// Hints come from independently read public HTML; they are not ownership proof.
+export function v4PublicResourceHints(html,base){
+ const target=v4PublicJobUrl(base);if(!target)return [];
+ const out=new Map();
+ const add=(value,kind)=>{
+  if(!value)return;
+  let url;try{url=v4PublicJobUrl(new URL(value.replace(/&amp;/gi,'&'),target).href);}catch{return;}
+  if(!url||isCommercialRecruitmentBoard(url)||url===target)return;
+  if(!out.has(url)||kind==='script'||kind==='style')out.set(url,{url,kind});
+ };
+ const attr=(tag,name)=>new RegExp('(?:^|\\s)'+name+'\\s*=\\s*(?:"([^"]*)"|\\x27([^\\x27]*)\\x27|([^\\s>]+))','i').exec(tag)?.slice(1).find(x=>x!==undefined);
+ for(const m of html.matchAll(/<(script|link|iframe|a|div|section)\b[^>]*>/gi)){
+  const tag=m[0],name=m[1].toLowerCase();
+  if(name==='script')add(attr(tag,'src'),'script');
+  if(name==='link'){
+   const rel=(attr(tag,'rel')||'').toLowerCase(),as=(attr(tag,'as')||'').toLowerCase();
+   if(rel==='stylesheet')add(attr(tag,'href'),'style');
+   else if(rel==='modulepreload'||rel==='preload'&&as==='script')add(attr(tag,'href'),'script');
+   else if(rel==='preload'&&as==='fetch')add(attr(tag,'href'),'data');
+  }
+  if(name==='iframe')add(attr(tag,'src'),'frame');
+  for(const key of ['data-url','data-api','data-endpoint','data-src'])add(attr(tag,key),'data');
+  if(name==='a'){
+   const href=attr(tag,'href');if(href&&/(?:job|career|recruit|vacanc|position|\.json(?:[?#]|$)|招聘|职位)/i.test(href))add(href,'link');
+  }
+ }
+ return [...out.values()];
+}
 export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal,maxBytes=2*1024*1024}={}){
  let current=v4PublicJobUrl(url);const seen=new Set();
  while(current&&!seen.has(current)&&!isCommercialRecruitmentBoard(current)){
@@ -238,7 +266,7 @@ export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal,maxBytes
   if(isCommercialRecruitmentBoard(current,{site_name:site}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
   const plain=(responseIsJson(r)?raw:htmlToText(raw,{maxChars:Infinity})).trim();
   if(CLOSED.test(pageTitle(raw))||(plain.length<80&&CLOSED.test(plain)))throw Error('V4_JOB_CLOSED');
-  return {url:current,plain,site,title:pageTitle(raw)};
+  return {url:current,plain,site,title:pageTitle(raw),resource_hints:responseIsJson(r)?[]:v4PublicResourceHints(raw,current)};
  }
  throw Error('V4_UNSAFE_OR_REPEATED_REDIRECT');
 }
@@ -246,15 +274,17 @@ export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal,maxBytes
 
 /** Read-only dynamic-page fallback. No account, CV, cookie, authorization or
  * arbitrary script is passed to the browser. Restrict browser traffic to the
- * requested public origin; cross-origin redirects are not source evidence. */
-export async function v4RenderPublicJobDocument(url,{browser,signal}={}){
+ * requested public origin; exact declared script/style assets may also load.
+ * No blanket access to other origins. */
+export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHints=[]}={}){
  const target=v4PublicJobUrl(url);
  if(!target||isCommercialRecruitmentBoard(target))throw Error('V4_UNSAFE_URL');
  if(typeof browser?.quickAction!=='function')throw Error('V4_BROWSER_UNAVAILABLE');
  if(signal?.aborted)throw signal.reason;
  const host=new URL(target).hostname.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&');
+ const exactAssets=resourceHints.filter(h=>['script','style'].includes(h?.kind)&&v4PublicJobUrl(h.url)&&!isCommercialRecruitmentBoard(h.url)).map(h=>'^'+h.url.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&')+'$');
  const response=await browser.quickAction('content',{
-  url:target,allowRequestPattern:['^https://'+host+'(?::443)?(?:/|$)'],
+  url:target,allowRequestPattern:['^https://'+host+'(?::443)?(?:/|$)',...new Set(exactAssets)],
   rejectResourceTypes:['image','media','font'],
   gotoOptions:{waitUntil:'networkidle2'}
  });
@@ -272,7 +302,7 @@ export async function v4RenderPublicJobDocument(url,{browser,signal}={}){
  if(isCommercialRecruitmentBoard(target,{site_name:site}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
  const plain=htmlToText(html,{maxChars:Infinity}).trim();
  if(CLOSED.test(title)||(plain.length<80&&CLOSED.test(plain)))throw Error('V4_JOB_CLOSED');
- return {url:target,plain,site,title,rendered:true};
+ return {url:target,plain,site,title,rendered:true,resource_hints:v4PublicResourceHints(html,target)};
 }
 
 
