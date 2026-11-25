@@ -57,16 +57,16 @@ function recommendedOrder(proposed,blocks){
   return original;
  return proposed;
 }
-function safeQuestions(value,blocks){
+function safeQuestions(value,blocks,{v4=false}={}){
  const ids=new Set(blocks.map(x=>x.id)),out=[],used=new Set();
  for(const q of (Array.isArray(value)?value:[])){
   if(!q||typeof q!=='object')continue;
   const question=compact(q.question||q.prompt);
   const blockId=compact(q.blockId||q.block_id);
-  if(question.length<6||question.length>420||!ids.has(blockId)||used.has(blockId+question))continue;
+  if(question.length<6||(!v4&&question.length>420)||!ids.has(blockId)||used.has(blockId+question))continue;
   used.add(blockId+question);
   out.push({blockId,question,
-   reason:compact(q.reason).slice(0,400),status:'user_input_needed'});
+   reason:v4?compact(q.reason):compact(q.reason).slice(0,400),status:'user_input_needed'});
  }
  return out;
 }
@@ -208,7 +208,8 @@ export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions
 }
 
 export async function generateTailoredResume({env,blocks,job,signal}){
- if(!validRewriteInputs(blocks,job,{v4:env?.HHBA_MATCH_V4_READY==='1'}))error('INVALID_REWRITE_INPUT');
+ const v4=env?.HHBA_MATCH_V4_READY==='1';
+ if(!validRewriteInputs(blocks,job,{v4}))error('INVALID_REWRITE_INPUT');
  const provider=selectProvider(env,'resume_rewrite');
  let reviewer;
  try{reviewer=selectProvider(env,'resume_reviewer');}
@@ -219,7 +220,7 @@ export async function generateTailoredResume({env,blocks,job,signal}){
  // would allow "50 deals" from employer A to be attributed to employer B.
  // Planning reads every block; it does not contain a hard 5-item suggestion cap.
  const plan=await completeJson(provider,SYSTEM_PLAN,{job:safeJob,blocks:safeBlocks},signal,7000);
- const questions=safeQuestions(plan.questions,blocks);
+ const questions=safeQuestions(plan.questions,blocks,{v4});
  const order=recommendedOrder(plan.recommended_order,blocks);
  const rewritten=[],issues=[],groups=balancedGroups(safeBlocks);
  for(const group of groups){
@@ -228,7 +229,7 @@ export async function generateTailoredResume({env,blocks,job,signal}){
    blocks:group
   },signal,12000);
   const writers=Array.isArray(response.rewrites)?response.rewrites:[];
-  questions.push(...safeQuestions(response.questions,blocks));
+  questions.push(...safeQuestions(response.questions,blocks,{v4}));
   const keyed=new Map();
   for(const row of writers){
    if(!row||typeof row!=='object'||typeof row.blockId!=='string'||keyed.has(row.blockId))
@@ -255,13 +256,13 @@ export async function generateTailoredResume({env,blocks,job,signal}){
    const reason=problem||(!auditResult?'AUDIT_INCOMPLETE':!auditResult.safe?
     'AI_FACT_CHECK_REJECTED':null);
    if(!safe)issues.push({blockId:block.id,code:reason,
-    note:compact(auditResult?.concern).slice(0,350)});
+    note:v4?compact(auditResult?.concern):compact(auditResult?.concern).slice(0,350)});
    rewritten.push({
     blockId:block.id,section:block.section,original:raw.text,
     proposed:safe?proposal:raw.text,
     changed:safe&&proposal!==raw.text,
     evidenceQuotes:safe?quotes.map(compact):[],
-    rationale:safe?compact(draft?.rationale).slice(0,750):'此段保留原文，需人工补充证据或重新审查。',
+    rationale:safe?(v4?compact(draft?.rationale):compact(draft?.rationale).slice(0,750)):'此段保留原文，需人工补充证据或重新审查。',
     jobRequirements:safe&&Array.isArray(draft?.jobRequirements)?
      draft.jobRequirements.filter(x=>typeof x==='string'):[],
     status:safe?'needs_user_confirmation':'kept_original'

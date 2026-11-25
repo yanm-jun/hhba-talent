@@ -8,7 +8,7 @@ import {v4PublicJobUrl,v4ReadEmployerJob,v4EmployerAuthorization,v4ReadPublicJob
 import {directOfficialJobEvidence} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
 import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
-import {CANDIDATE_TARGET,FINAL_TARGET,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,eligibleCuratedScore,qualifiedReport,validateGeminiGlobalOrder,applyGeminiGlobalOrder,mergeGeminiRankProgress} from './v4-curated-reports.js';
+import {CANDIDATE_TARGET,FINAL_TARGET,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,eligibleCuratedScore,qualifiedReport,validateGeminiGlobalOrder,applyGeminiGlobalOrder,mergeGeminiRankProgress,carryGeminiRankProgress} from './v4-curated-reports.js';
 import {findMainlandCity} from './mainland-job-location.js';
 import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex} from './v4-research-tools.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
@@ -192,6 +192,26 @@ function candidates(payload,response){
  }
  return rows;
 }
+// Recover only syntactically complete job objects from truncated output.
+// Recovered objects remain unverified research leads.
+export function recoverV4PartialJobs(raw){
+ if(typeof raw!=='string')return [];
+ const start=raw.search(/"jobs"\s*:\s*\[/);
+ if(start<0)return [];
+ const jobs=[];let depth=0,quoted=false,escaped=false,begin=-1;
+ for(let i=raw.indexOf('[',start)+1;i<raw.length;i++){
+  const c=raw[i];
+  if(quoted){if(escaped)escaped=false;else if(c==='\\')escaped=true;else if(c==='"')quoted=false;continue;}
+  if(c==='"'){quoted=true;continue;}
+  if(c===']'&&depth===0)break;
+  if(c==='{'){if(depth===0)begin=i;depth++;continue;}
+  if(c==='}'&&depth>0&&--depth===0&&begin>=0){
+   try{const j=JSON.parse(raw.slice(begin,i+1));if(j&&typeof j==='object'&&!Array.isArray(j)&&candidateUrl(j))jobs.push(j);}catch{}
+   begin=-1;
+  }
+ }
+ return jobs;
+}
 async function toJson(fetcher,provider,response,{signal}={}){
  try{return v4ParseJson(response)}
  catch(e){
@@ -199,6 +219,7 @@ async function toJson(fetcher,provider,response,{signal}={}){
   // response and citations remain the evidence, not this formatting pass.
   const raw=v4OutputText(response);
   if(!raw)throw e;
+  const recovered=recoverV4PartialJobs(raw);
   try{
    const formatted=await v4Call(fetcher,provider,{
     instructions:'只转换提供的求职研究文本为JSON，不联网、不补写、不发明岗位和链接。'
@@ -208,12 +229,15 @@ async function toJson(fetcher,provider,response,{signal}={}){
      +'同时原样保留 research_complete、continue_search、completion_reason、search_strategy，以及每个岗位的 source_kind、site_name、employer_proof_url、employer_proof_urls、requirements、fit_summary。不得擅自缩减岗位或引用。',
     input:raw
    },{signal});
-   return v4ParseJson(formatted);
+   const parsed=v4ParseJson(formatted);
+   if(recovered.length){const found=new Map(recovered.map(j=>[candidateUrl(j),j]));for(const j of Array.isArray(parsed.jobs)?parsed.jobs:[]){const u=candidateUrl(j);if(u)found.set(u,{...found.get(u),...j});}parsed.jobs=[...found.values()];}
+   if(response.status!=='completed'||formatted.status!=='completed'){parsed.research_complete=false;parsed.continue_search=true;parsed.format_error=true;}
+   return parsed;
   }catch(e){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    // A formatting error must not discard already surfaced web-search sources.
-   if(isV4RetryableProviderError(e?.code))throw e;
-   return {profile:{},jobs:[],source_leads:v4Sources(response),format_error:true,research_complete:false};
+   if(isV4RetryableProviderError(e?.code)&&!recovered.length&&!v4Sources(response).length)throw e;
+   return {profile:{},jobs:recovered,source_leads:v4Sources(response),format_error:true,research_complete:false};
   }
  }
 }
@@ -287,7 +311,7 @@ async function recoverEmployerJob(fetcher,provider,url,job,initial,{signal,onAct
    for(const mode of ['static','browser']){
    if(mode==='browser'&&typeof browser?.quickAction!=='function'){note('V4_BROWSER_UNAVAILABLE');continue;}
    try{
-    const doc=mode==='static'?await v4ReadPublicJobDocument(target,{fetcher,signal}):await v4RenderPublicJobDocument(target,{browser,signal});
+    const doc=mode==='static'?await v4ReadPublicJobDocument(target,{fetcher,signal,maxBytes:16*1024*1024}):await v4RenderPublicJobDocument(target,{browser,signal});
     if(mode==='browser')note('V4_BROWSER_READ');
     v4RememberPublicResult(ledger,{ok:true,type:'read_page',mode,url:doc.url,text:doc.plain});
     const response=await v4StageResearchCall(p=>v4Call(fetcher,provider,p,{signal}),{
@@ -565,7 +589,11 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   const currentSelection=applyGeminiGlobalOrder(eligible,globalOrder).filter(j=>j.report_status!=='UNAVAILABLE').slice(0,FINAL_TARGET);
   const selectionComplete=currentSelection.every(qualifiedReport);
   if(provider?.kind==='gemini'&&eligible.length&&(!globalRankState||!globalRankState.done||(selectionComplete&&globalRankState.snapshot!==rankSnapshot))){
-   if(!globalRankState||globalRankState.snapshot!==rankSnapshot)globalRankState={snapshot:rankSnapshot,ids:[],mode:'order',done:false};
+   if(!globalRankState||globalRankState.snapshot!==rankSnapshot){
+    const revisions=await Promise.all(pool.map(async({id,...j})=>[j.url,await sha256Hex(JSON.stringify(j))]));
+    const ids=carryGeminiRankProgress(globalOrder,globalRankState?.revisions,pool,revisions);
+    globalRankState={snapshot:rankSnapshot,ids:ids.length===pool.length?[]:ids,revisions,mode:'order',done:false};
+   }
    const ids=pool.map(j=>j.id),prior=globalRankState.ids;
    const remaining=ids.filter(id=>!prior.includes(id));
    const document=JSON.stringify(pool);
@@ -815,7 +843,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   catch(e){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    if(curated&&isV4RetryableProviderError(e?.code)&&!independent.length)throw e;
-   data={research_complete:false,profile:{},jobs:[],source_leads:v4Sources(response),format_error:true};
+   data={research_complete:false,profile:{},jobs:recoverV4PartialJobs(v4OutputText(response)),source_leads:v4Sources(response),format_error:true};
    researchError=e?.code||'AI_PROVIDER_RESPONSE_INVALID';
   }
   const coordinatorToolSources=coordinatorFailed?[]:v4ToolSources(response);

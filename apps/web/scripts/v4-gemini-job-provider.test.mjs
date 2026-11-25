@@ -168,3 +168,15 @@ test('trusted www host can schedule the same authorized background workflow',asy
  assert.equal(backgroundEnabled(env,new Request('https://hhba.work/api/match-v4/resume')),true);
  assert.equal(backgroundEnabled(env,new Request('https://other.example/api/match-v4/resume')),false);
 });
+
+test('ranking carries unchanged URLs across pool revisions and remaps snapshot IDs',async()=>{
+ const {carryGeminiRankProgress}=await import('../functions/_lib/v4-curated-reports.js');
+ assert.deepEqual(carryGeminiRankProgress(['b','a','c'],[['a','old'],['b','same'],['c','old']],[{id:'j1',url:'a'},{id:'j2',url:'b'},{id:'j3',url:'d'}],[['a','new'],['b','same'],['d','new']]),['j2']);
+});
+test('recover complete candidate objects from interrupted Gemini JSON without inventing unfinished jobs',async()=>{
+ const {recoverV4PartialJobs}=await import('../functions/_lib/simple-match-v4.js');
+ const first={url:'https://careers.other-motors.cn/recruitment/positions/9988',company:'示例企业',title:'运营经理',location:'上海',reason:'含有括号 { 与 } 的文本'};
+ const raw='{"jobs":['+JSON.stringify(first)+',{"url":"https://careers.other-motors.cn/recruitment/positions/9999"';
+ assert.deepEqual(recoverV4PartialJobs(raw),[first]);
+ assert.deepEqual(recoverV4PartialJobs('{"profile":{}}'),[]);
+});

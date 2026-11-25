@@ -80,3 +80,8 @@ export function mergeGeminiRankProgress(value,prior,ids){
  }
  return next;
 }
+
+export function carryGeminiRankProgress(order,oldRevisions,pool,revisions){
+ const old=new Map(oldRevisions||[]),current=new Map(revisions),ids=new Map(pool.map(j=>[j.url,j.id]));
+ return [...new Set(order||[])].filter(url=>ids.has(url)&&old.has(url)&&old.get(url)===current.get(url)).map(url=>ids.get(url));
+}
