@@ -49,6 +49,7 @@ export function makeBatchScorer({call,parse,resume,roleHint,budget=90000,note=()
    if(group.length<2||signal?.aborted){for(const item of group)item.resolve(null);return;}
    try{
     note('AI_SCORE_BATCH_REQUESTS');
+    for(let i=1;i<group.length;i++)note('AI_SCORE_BATCH_SHARED_RESUME_INPUT');
     const response=await call(batchScoringPayload(group,resume,roleHint));
     // Incomplete output cannot be promoted to a final score. Invalid/missing
     // items alone fall back; accepted independent results are not recharged.
