@@ -69,3 +69,36 @@ test('candidate preview never claims a completed assessment or displays a search
  const preview=renderCandidatePreview(j,j.url,resume,true,0,new Set([j.url]));
  assert.equal(preview.evidence_status,'RESEARCH_PENDING');assert.equal(preview.match_score,null);assert.equal(preview.reference_score,0);assert.equal(preview.recommendation_reason,'');assert.deepEqual(preview.matched,[]);assert.match(preview.score_basis,/尚未完成/);assert.equal(preview.jd_source_status,undefined);
 });
+
+test('pipeline allocates idle transport slots to verification backlog without reducing research target',async()=>{
+ const {pipelineWidths,verificationSnapshot}=await import('../functions/_lib/v4-research-pipeline.js');
+ assert.deepEqual(pipelineWidths({discoveryWidth:4},1),{discovery:4,verification:1});
+ assert.deepEqual(pipelineWidths({discoveryWidth:4},5),{discovery:3,verification:2});
+ assert.deepEqual(pipelineWidths({discoveryWidth:4},100),{discovery:2,verification:3});
+ assert.deepEqual(pipelineWidths({discoveryWidth:4,pipelineVerificationWidth:1},100),{discovery:4,verification:1});
+ assert.equal(verificationSnapshot({},3).verificationBatch,3);
+});
+test('a fast independent JD is scored before a slow sibling page finishes',async()=>{
+ const provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const a=job(1),b=job(2);
+ let fastScored=false,slowFinished=false,overlapObserved=false,releaseSlow;
+ const slowGate=new Promise(resolve=>{releaseSlow=resolve;});
+ const timer=setTimeout(releaseSlow,2000);
+ const html=j=>'<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:j.title,hiringOrganization:{name:j.company,url:new URL(j.url).origin},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责汽车经销商渠道运营和业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
+ const fetcher=async(u,opts)=>{
+  if(!u.endsWith('/responses')){
+   const j=u===a.url?a:b;
+   if(j===b){await slowGate;slowFinished=true;}
+   return new Response(html(j),{headers:{'content-type':'text/html'}});
+  }
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.job?.title===a.title){fastScored=true;overlapObserved=!slowFinished;releaseSlow();}
+  return model({suitable:true,score:88,reason:'渠道经验匹配',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车经销商渠道运营',matched:['渠道运营'],gaps:[]});
+ };
+ try{
+ const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[a.url,a],[b.url,b]],profile,toolUrls:[a.url,b.url],verificationBatch:2}});
+ assert.equal(result.checkpoint.phase,'reporting');
+ assert.equal(result.checkpoint.scored,2);
+ assert.ok(fastScored&&slowFinished&&overlapObserved);
+ }finally{clearTimeout(timer);releaseSlow();}
+});
