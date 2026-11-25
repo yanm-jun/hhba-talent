@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {runDiscoveryWave,nextDiscoveryWidth,combineDiscovery,discoveryLaneContext} from '../functions/_lib/v4-parallel-discovery.js';
-import {v4Match} from '../functions/_lib/simple-match-v4.js';
+import {v4Match,renderCandidatePreview} from '../functions/_lib/simple-match-v4.js';
 const resume='本人负责汽车经销商渠道运营，区域销售督导、团队培训、销售数据分析、项目管理和客户服务。';
 const profile={summary:'汽车经销商渠道运营',roles:['区域销售督导','运营管理'],skills:[],facts:[],education:null};
 const job=i=>({url:'https://careers.employer'+i+'.cn/jobs/'+i,company:'企业'+i,title:'运营岗位'+i,location:'上海',source_kind:'employer_official'});
@@ -62,4 +62,10 @@ test('pipeline retains successful search when verification fails, and filters re
  assert.deepEqual(mergePipelineCheckpoint(old,discovery,null,[]),discovery);
  const result=mergePipelineCheckpoint(old,discovery,{rejectedBoards:[a.url],matches:[{official_url:a.url}],read:0},[[a.url,a]]);
  assert.equal(result.rows.length,1);assert.deepEqual(result.priorState.matches,[]);
+});
+
+test('candidate preview never claims a completed assessment or displays a search score',()=>{
+ const j={...job(7),score:99,resume_quote:resume,reason:'search hypothesis',matched:['unverified']};
+ const preview=renderCandidatePreview(j,j.url,resume,true,0,new Set([j.url]));
+ assert.equal(preview.evidence_status,'RESEARCH_PENDING');assert.equal(preview.match_score,null);assert.equal(preview.reference_score,0);assert.equal(preview.recommendation_reason,'');assert.deepEqual(preview.matched,[]);assert.match(preview.score_basis,/尚未完成/);assert.equal(preview.jd_source_status,undefined);
 });
