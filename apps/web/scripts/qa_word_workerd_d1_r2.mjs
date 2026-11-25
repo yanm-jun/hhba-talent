@@ -105,6 +105,10 @@ try{
   UNIQUE(phone,sha256)
  )`).run();
  await db.exec('CREATE TABLE hhba_resume_word_attempts (request_id TEXT PRIMARY KEY,day_utc TEXT,account_hash TEXT,action TEXT,created_at TEXT)');
+ const renderMigration=readFileSync(resolve('d1/0103_resume_word_render_tasks.sql'),'utf8')
+  .split('\n').filter(line=>!line.trimStart().startsWith('--')).join('\n');
+ for(const statement of renderMigration.split(';').map(s=>s.trim()).filter(Boolean))
+  await db.prepare(statement).run();
  const now=new Date(),date=now.toISOString();
  await db.prepare('INSERT INTO hhba_auth_users(phone,role,created_at) VALUES(?,?,?)')
   .bind(owner,'candidate',date).run();
@@ -150,6 +154,9 @@ try{
  assert.equal(inspectA.revision,1);
  assert.equal(inspectB.revision,1);
  assert.equal(inspectA.layout_verified,false);
+ const taskStatus=await expectResponse(await request('convert-status',{job:'role-A'}),200,'real D1 conversion status');
+ assert.equal(taskStatus.status,'idle');
+ assert.equal(taskStatus.pdf_available,false);
  assert.equal((await request('download-pdf',{job:'role-A'})).status,422,
   'unverified Word must not produce PDF');
  const bad=await request('edit',{job:'role-A',method:'POST',body:{
@@ -185,7 +192,9 @@ try{
   'real R2 source remains byte-identical');
 
  const row=await db.prepare("SELECT COUNT(*) AS n FROM hhba_resume_word_attempts WHERE action='export'").first();
- assert.equal(row.n,3,'two successful edits plus one rejected hash attempt consume quota');
+ assert.equal(row.n,0,'legacy daily export quota must not consume attempts');
+ assert.equal(inspectA.max_revisions,null);
+ assert.equal(inspectA.max_daily_edits,null);
  const list=await bucket.list({prefix:key+'.hhba-word-preserved-v1-'+dbSha});
  assert.ok(list.objects.some(x=>x.key.includes('.job-')),'job-scoped private manifests written');
  console.log('HHBA_LOCAL_WORKERD_R2_D1_PASS',JSON.stringify({

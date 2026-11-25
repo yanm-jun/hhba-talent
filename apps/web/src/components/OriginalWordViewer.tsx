@@ -10,7 +10,8 @@ import {splitChangedResumeText} from '../services/resumeChangedText.mjs';
 import {
  wordEditingCapabilities,wordEditableText,wordPreviewBytes,wordSourceBytes,saveOriginalWordEdit,
  shiftOriginalWordRevision,downloadOriginalWordEdited,downloadOriginalWordPdf,
- type WordHistoryEntry
+ requestWordPdfConversion,wordPdfConversionStatus,
+ type WordHistoryEntry,type WordRenderTaskStatus
 } from '../services/originalWordApi';
 import {renderBrowserWord,browserWordAnchors,paintBrowserWordSuggestions} from '../services/browserWordPreview';
 import '../styles/original-resume-viewer.css';
@@ -77,6 +78,12 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  const [history,setHistory]=useState<WordHistoryEntry[]>([]);
  const [refresh,setRefresh]=useState(0);
  const [message,setMessage]=useState('');
+ const [convertStatus,setConvertStatus]=useState<WordRenderTaskStatus>('idle');
+ const [pdfPreview,setPdfPreview]=useState(false);
+ const [savedEntryId,setSavedEntryId]=useState<string|undefined>();
+ const conversionScope=JSON.stringify([resume.id,jobId,revision,savedEntryId]);
+ const conversionScopeRef=useRef(conversionScope);
+ conversionScopeRef.current=conversionScope;
  const [activeVisualId,setActiveVisualId]=useState<string|null>(null);
  const [inlineVisualEditor,setInlineVisualEditor]=useState<string|null>(null);
  const [inlineVisualSuggestionId,setInlineVisualSuggestionId]=useState<string|null>(null);
@@ -100,6 +107,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   // A previous job's saved revision must never leak into another job's toolbar.
   setSaved(false);setRevision(0);setTotalRevisions(0);setHistory([]);
   setPdfAvailable(false);setLayoutVerified(false);setReadOnlyTextFallback(false);
+  setConvertStatus('idle');setPdfPreview(false);setSavedEntryId(undefined);
   renderedEntrance.current=false;
  },[resume.id,jobId]);
  useEffect(()=>{
@@ -178,7 +186,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     // the OOXML body but across every rendered page, including headers.
     // Otherwise the clicked visible region could be the WRONG occurrence.
     const wasSaved=Boolean(info.saved);
-    setSaved(wasSaved);
+    setSaved(wasSaved);setSavedEntryId(info.saved?.id);
     setRevision(Number.isInteger(info.revision)?info.revision:(wasSaved?1:0));
     setTotalRevisions(Number.isInteger(info.total_revisions)?info.total_revisions:(wasSaved?1:0));
     setMaxRevisions(info.max_revisions===null?null:Number.isInteger(info.max_revisions)?info.max_revisions:8);
@@ -187,9 +195,19 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     setHistory(inspectedHistory);
     setPdfAvailable(info.pdf_available===true);
     setLayoutVerified(info.layout_verified===true);
+    // A conversion started earlier keeps running on the server even if the
+    // page was left; resume watching it instead of starting a second one.
+    setConvertStatus('idle');
+    if(info.pdf_available===true)setConvertStatus('done');
+    else if(wasSaved&&rendererEnabled)void wordPdfConversionStatus(resume.id,jobId,undefined,Number.isInteger(info.revision)?info.revision:1,info.saved?.id).then(task=>{
+     if(!active)return;
+     setConvertStatus(task.status);
+    }).catch(()=>{/* a missing status is not a conversion failure */});
     onRevisionSnapshot?.({revision:Number.isInteger(info.revision)?info.revision:(wasSaved?1:0),
      history:inspectedHistory});
-    if(!rendererEnabled){
+    const usePdf=rendererEnabled&&(!wasSaved||info.pdf_available===true);
+    setPdfPreview(usePdf);
+    if(!usePdf){
      const currentRevision=Number.isInteger(info.revision)?info.revision:(wasSaved?1:0);
      const raw=await wordSourceBytes(resume.id,currentRevision,jobId);
      if(!active||!browserMount.current)return;
@@ -266,7 +284,34 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  },[resume.id,jobId,ready,rendererEnabled,refresh]);
 
  useEffect(()=>{
-  if(ready!=='available'||!rendererEnabled||loading||!surface.current||!doc.current)return;
+  if(convertStatus!=='pending'&&convertStatus!=='running')return;
+  if(!saved||revision<=0)return;
+  const controller=new AbortController();
+  let inFlight=false;
+  const poll=async()=>{
+   if(inFlight||controller.signal.aborted)return;
+   inFlight=true;
+   try{
+    const task=await wordPdfConversionStatus(resume.id,jobId,controller.signal,revision,savedEntryId);
+    if(controller.signal.aborted||conversionScopeRef.current!==conversionScope)return;
+    if(task.status==='done'){
+     setConvertStatus('done');setPdfAvailable(true);setLayoutVerified(true);
+     setMessage('PDF 生成成功');
+     window.dispatchEvent(new Event('hhba:word-versions-changed'));
+     setRefresh(n=>n+1);
+    }else if(task.status==='failed'){
+     setConvertStatus('failed');
+     setMessage('PDF 转换未完成，可以重试');
+    }else if(task.status!=='idle')setConvertStatus(task.status);
+   }catch{/* transient errors are not a server conversion failure */}
+   finally{inFlight=false;}
+  };
+  const timer=setInterval(()=>void poll(),3000);
+  return()=>{controller.abort();clearInterval(timer);};
+ },[convertStatus,resume.id,jobId,revision,saved,conversionScope,savedEntryId]);
+
+ useEffect(()=>{
+  if(ready!=='available'||!pdfPreview||loading||!surface.current||!doc.current)return;
   let active=true,task:any=null;
   setAnchors([]);
   void(async()=>{
@@ -311,7 +356,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    }
   })();
   return()=>{active=false;try{task?.cancel();}catch{}};
- },[page,ready,rendererEnabled,loading,editable,width,zoom,fitMode,saved,refresh]);
+ },[page,ready,pdfPreview,loading,editable,width,zoom,fitMode,saved,refresh]);
 
  useEffect(()=>{
   const el=paper.current;if(!el)return;
@@ -322,7 +367,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  // Default: first Word page completely in view. The document and its text
  // hit areas share one zoom transform; candidate can switch to width-fit.
  useEffect(()=>{
-  if(ready==='checking'||rendererEnabled||loading||readOnlyTextFallback||fitMode==='custom')return;
+  if(ready==='checking'||pdfPreview||loading||readOnlyTextFallback||fitMode==='custom')return;
   const container=paper.current,documentPage=browserMount.current
    ?.querySelector<HTMLElement>('section.hhba-native-docx');
   if(!container||!documentPage)return;
@@ -353,7 +398,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   window.addEventListener('resize',update);
   const animation=requestAnimationFrame(update);
   return()=>{observer.disconnect();window.removeEventListener('resize',update);cancelAnimationFrame(animation)};
- },[ready,rendererEnabled,loading,readOnlyTextFallback,fitMode,paperSize.width,paperSize.height]);
+ },[ready,pdfPreview,loading,readOnlyTextFallback,fitMode,paperSize.width,paperSize.height]);
  useEffect(()=>{
   const position=restorePosition.current;
   if(loading||!position||page!==position.page||!paper.current)return;
@@ -373,13 +418,13 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  // inherited font/size/line-height and natural paragraph wrapping.
  // The original bytes are unchanged until the candidate approves an edit.
  useLayoutEffect(()=>{
-  if(rendererEnabled||loading||ready!=='available'||!browserMount.current)return;
+  if(pdfPreview||loading||ready!=='available'||!browserMount.current)return;
   const mount=browserMount.current;
   paintBrowserWordSuggestions(mount,editable,visualSuggestions,duplicates);
   const next=browserWordAnchors(mount,editable,duplicates);
   setAnchors(next);
   setPaperSize({width:mount.scrollWidth,height:mount.scrollHeight});
- },[rendererEnabled,loading,ready,editable,visualSuggestions,refresh,duplicates]);
+ },[pdfPreview,loading,ready,editable,visualSuggestions,refresh,duplicates]);
 
  // Explicit candidate confirmation and verified private Word revision are
  // mandatory before any rainbow suggestion becomes actual document text.
@@ -430,6 +475,36 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    setMessage('已发起当前已确认版本的 PDF 下载。');}
   catch(error){setMessage(error instanceof Error?error.message:'PDF 下载失败，请重试。');}
   finally{setBusy(false);}
+ }
+ async function convertSavedPdf(){
+  if(busy||loading||!saved||pdfAvailable||revision<=0)return;
+  setConvertStatus('pending');
+  const scope=conversionScope;
+  setMessage('正在生成专业排版 PDF');
+  try{
+   const task=await requestWordPdfConversion(resume.id,jobId,undefined,revision,savedEntryId);
+   if(conversionScopeRef.current!==scope)return;
+   setConvertStatus(task.status);
+   if(task.status==='done'){
+    setPdfAvailable(true);setLayoutVerified(true);
+    setMessage('PDF 生成成功');
+    window.dispatchEvent(new Event('hhba:word-versions-changed'));
+    setRefresh(n=>n+1);
+   }else if(task.status==='failed'){
+    setMessage('PDF 转换失败，请重试');
+   }
+  }catch(error){
+   if(conversionScopeRef.current!==scope)return;
+   // A lost HTTP response does not prove the renderer failed. Reconcile with D1.
+   try{
+    const task=await wordPdfConversionStatus(resume.id,jobId,undefined,revision,savedEntryId);
+    if(conversionScopeRef.current!==scope)return;
+    if(task.status==='done'){setRefresh(n=>n+1);setConvertStatus('done');return;}
+    if(task.status==='pending'||task.status==='running'){setConvertStatus(task.status);return;}
+   }catch{/* allow retry when status cannot be recovered */}
+   if(conversionScopeRef.current!==scope)return;
+   setConvertStatus('failed');setMessage(error instanceof Error?error.message:'PDF 转换未完成，请重试');
+  }
  }
  async function save(){
   if(!selected||!confirmed||busy||loading||!draft.trim())return;
@@ -542,7 +617,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
         }}>
         {/* PDF remains a canvas; browser Word has its OWN native inline text
             and must never paint a second, incorrectly sized proposal above it. */}
-        {visual&&rendererEnabled&&<span className="hhba-word-ai-preview" aria-hidden="true">
+        {visual&&pdfPreview&&<span className="hhba-word-ai-preview" aria-hidden="true">
          <span className="hhba-word-ai-preview-text"
           style={{fontSize:Math.max(9,Math.min(19,(h/1000*paperSize.height)*.82))+'px',
            fontFamily:anchor.fontFamily||undefined}}>
@@ -595,6 +670,12 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
       <button type="button" disabled={!pdfAvailable||busy||loading}
        title={pdfAvailable?'下载经渲染器校验的 PDF':'该版本未做专业分页校验，暂不能下载 PDF'}
        onClick={()=>void downloadSavedPdf()}>下载 PDF</button>
+      {saved&&!pdfAvailable&&rendererEnabled&&<button type="button"
+       disabled={busy||loading||convertStatus==='pending'||convertStatus==='running'}
+       title="为当前已保存版本生成专业排版 PDF"
+       onClick={()=>void convertSavedPdf()}>
+       {convertStatus==='pending'||convertStatus==='running'?'正在生成 PDF…':'生成 PDF'}
+      </button>}
      </div>
     </details>
     <details className="hhba-word-menu hhba-original-resume-version-menu">
@@ -651,7 +732,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    <p>当前只能查看文字。要查看原来的样式，请下载原件打开。</p>
    <pre>{text}</pre>
   </div>}
-  {ready!=='checking'&&!rendererEnabled&&!previewError&&!readOnlyTextFallback&&<>
+  {ready!=='checking'&&!pdfPreview&&!previewError&&!readOnlyTextFallback&&<>
    <div className="hhba-original-resume-word-tools" role="group" aria-label="Word 浏览器预览缩放">
     <button type="button" aria-label="缩小 Word" disabled={zoom<=.3}
      onClick={()=>{setFitMode('custom');setZoom(v=>Math.max(.3,Math.round((v-.15)*100)/100))}}><ZoomOut size={15}/></button>
@@ -678,7 +759,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    {!loading&&ready==='available'&&anchors.length===0&&<p className="hhba-original-resume-note">
     此 Word 没有找到可唯一定位的原文，请下载原件检查。没有对它做任何修改。</p>}
   </>}
-  {!loading&&ready==='available'&&rendererEnabled&&!previewError&&<>
+  {!loading&&ready==='available'&&pdfPreview&&!previewError&&<>
    <div className="hhba-original-resume-word-tools" role="group" aria-label="Word 预览缩放">
     <button type="button" aria-label="缩小 Word" onClick={()=>setZoom(value=>Math.max(.75,Math.round((value-.25)*100)/100))}
      disabled={zoom<=.75}><ZoomOut size={15}/></button>
@@ -741,6 +822,9 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     onClick={()=>void changeRevision('redo')}><Redo2 size={15}/> 重做</button>
    <button type="button" disabled={busy||loading||!pdfAvailable}
     onClick={()=>void downloadSavedPdf()}><Download size={15}/> 下载 PDF</button>
+   {saved&&!pdfAvailable&&rendererEnabled&&<button type="button"
+    disabled={busy||loading||convertStatus==='pending'||convertStatus==='running'}
+    onClick={()=>void convertSavedPdf()}><Download size={15}/> {convertStatus==='pending'||convertStatus==='running'?'正在生成…':'生成 PDF'}</button>}
   </div>}
  </section>;
 }

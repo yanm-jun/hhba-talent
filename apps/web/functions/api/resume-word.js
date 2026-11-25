@@ -8,10 +8,10 @@ import {
 
 const ID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const DOCX_MIME='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-const LIMIT=65536,DAILY={preview:4,export:6},MAX_REVISIONS=8;
+const LIMIT=2*1024*1024;
 const v4=env=>env?.HHBA_MATCH_V4_READY==='1';
 // V4 is bounded by the actual request and OOXML package, not an arbitrary character count.
-const editLimit=env=>v4(env)?Infinity:300;
+// Request bytes and OOXML validity are the bounds, not legacy per-user quotas.
 const common={
  'Cache-Control':'private, no-store',
  'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
@@ -65,24 +65,10 @@ async function loadBytes(bucket,row){
   throw Error('RESUME_BYTES_MISMATCH');
  return bytes;
 }
-async function quotaReady(db){
- const found=await db.prepare(
-  "SELECT name FROM sqlite_master WHERE type='table' AND name='hhba_resume_word_attempts'"
- ).first();
- return found?.name==='hhba_resume_word_attempts';
-}
-async function reserve(db,env,phone,action){
- const now=new Date(),date=now.toISOString().slice(0,10);
+async function accountHash(env,phone){
  const secret=wordLimitPepper(env);
- if(typeof secret!=='string'||secret.length<24)return false;
- const hash=await sha256Hex(secret+':word-layout:'+phone);
- const result=await db.prepare(
-  'INSERT INTO hhba_resume_word_attempts(request_id,day_utc,account_hash,action,created_at) '+
-  'SELECT ?,?,?,?,? WHERE (SELECT COUNT(*) FROM hhba_resume_word_attempts '+
-  'WHERE day_utc=? AND account_hash=? AND action=?)<?'
- ).bind(crypto.randomUUID(),date,hash,action,now.toISOString(),
-  date,hash,action,DAILY[action]).run();
- return result?.success===true&&result?.meta?.changes===1;
+ if(typeof secret!=='string'||secret.length<24)return null;
+ return sha256Hex(secret+':word-layout:'+phone);
 }
 async function readSmall(request,limit=LIMIT){
  if(!/^application\/json(?:;|$)/i.test(request.headers.get('Content-Type')||''))
@@ -107,7 +93,7 @@ async function readSmall(request,limit=LIMIT){
 // conditional write (ETag compare-and-swap) so two tabs cannot silently race.
 function revisionKey(key,entry,format){
  return entry.id==='legacy'?key+(format==='docx'?'.docx':'.edited.pdf'):
-  key+'.revision-'+entry.id+(format==='docx'?'.docx':'.pdf');
+  key+'.revision-'+entry.id+(format==='docx'?'.docx':entry.pdf_object_id?'.'+entry.pdf_object_id+'.pdf':'.pdf');
 }
 const hashIsValid=s=>typeof s==='string'&&/^[0-9a-f]{64}$/.test(s);
 const vaultScope=/^vault-scope-v1-([0-9a-f]{64})$/;
@@ -116,7 +102,8 @@ function validEntry(entry){
  return entry&&
   (entry.id==='legacy'||typeof entry.id==='string'&&ID.test(entry.id))&&
   typeof entry.original==='string'&&typeof entry.text==='string'&&
-  hashIsValid(entry.docx_sha256)&&(
+  hashIsValid(entry.docx_sha256)&&
+  (entry.pdf_object_id===undefined||typeof entry.pdf_object_id==='string'&&ID.test(entry.pdf_object_id))&&(
    entry.verification==='docx_structure_only'?
     entry.preview_sha256===null&&entry.page_count===null:
     (entry.verification===undefined||entry.verification==='layout_verified')&&
@@ -141,7 +128,7 @@ async function approved(bucket,row,jobId,env){
   items=[legacy];revision=1;
  }else if(raw.schema==='HHBA_ORIGINAL_WORD_VERSIONS_V2'){
   items=raw.items;revision=raw.revision;
-  if(!Array.isArray(items)||items.length<1||(!v4(env)&&items.length>MAX_REVISIONS)||
+  if(!Array.isArray(items)||items.length<1||
    !Number.isInteger(revision)||revision<0||revision>items.length||
    items.some(x=>!validEntry(x))||
    new Set(items.map(x=>x.id)).size!==items.length)
@@ -190,6 +177,138 @@ function errorStatus(value){
   value==='RESUME_BYTES_MISMATCH'||value==='WORD_REVISION_CONFLICT'||
   value==='WORD_REVISION_CORRUPT'?409:
   value==='WORD_REVISION_LOCK_UNAVAILABLE'?503:422;
+}
+async function tasksReady(db){
+ const found=await db.prepare(
+  "SELECT name FROM sqlite_master WHERE type='table' AND name='hhba_resume_word_render_tasks'"
+ ).first();
+ return found?.name==='hhba_resume_word_render_tasks';
+}
+async function readRenderTask(db,hash,resumeId,jobHash,entryId){
+ return db.prepare('SELECT status,error_code,attempts,updated_at FROM hhba_resume_word_render_tasks '+
+  'WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=?')
+  .bind(hash,resumeId,jobHash,entryId).first();
+}
+// A stale lease is retryable; the attempt counter fences an old worker.
+const RENDER_LEASE_MS=5*60*1000;
+const liveRender=task=>Boolean(task&&['pending','running'].includes(task.status)&&
+ Number.isFinite(Date.parse(task.updated_at))&&Date.now()-Date.parse(task.updated_at)<RENDER_LEASE_MS);
+async function setRenderTask(db,hash,resumeId,jobHash,entryId,attempt,status,errorCode){
+ const result=await db.prepare('UPDATE hhba_resume_word_render_tasks SET status=?,error_code=?,updated_at=? '+
+  "WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=? AND attempts=? AND status IN ('pending','running')")
+  .bind(status,errorCode||null,new Date().toISOString(),hash,resumeId,jobHash,entryId,attempt).run();
+ return result?.success===true&&result?.meta?.changes===1;
+}
+async function openRenderTask(db,hash,resumeId,jobHash,entryId,now){
+ const existing=await readRenderTask(db,hash,resumeId,jobHash,entryId);
+ if(liveRender(existing))return null;
+ if(existing){
+  const previousAttempt=existing.attempts;
+  const result=await db.prepare('UPDATE hhba_resume_word_render_tasks SET status=?,error_code=NULL,attempts=attempts+1,updated_at=? '+
+   'WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=? AND status=? AND updated_at=? AND attempts=?')
+   .bind('pending',now,hash,resumeId,jobHash,entryId,existing.status,existing.updated_at,previousAttempt).run();
+  return result?.success===true&&result?.meta?.changes===1?previousAttempt+1:null;
+ }
+ const result=await db.prepare('INSERT OR IGNORE INTO hhba_resume_word_render_tasks(account_hash,resume_id,job_scope_hash,entry_id,status,error_code,attempts,created_at,updated_at) '+
+  'VALUES (?,?,?,?,?,NULL,0,?,?)')
+  .bind(hash,resumeId,jobHash,entryId,'pending',now,now).run();
+ return result?.success===true&&result?.meta?.changes===1?0:null;
+}
+function renderTaskPayload(task){
+ if(!task)return {ok:true,status:'idle',pdf_available:false,attempts:0,updated_at:''};
+ const interrupted=['pending','running'].includes(task.status)&&!liveRender(task);
+ return {ok:true,status:interrupted||task.status==='done'?'failed':task.status,pdf_available:false,
+  ...(interrupted?{error_code:'WORD_RENDER_INTERRUPTED'}:task.error_code?{error_code:task.error_code}:{}),
+  attempts:task.attempts,updated_at:task.updated_at};
+}
+// Each worker writes its own PDF object. A failed or superseded worker can
+// never remove another worker's PDF or a PDF already published by the manifest.
+async function runLateRender(db,bucket,env,phone,hash,row,jobId,jobHash,entry,attempt){
+ let pdfKey=null,published=false;
+ const setStatus=(status,error)=>setRenderTask(db,hash,row.id,jobHash,entry.id,attempt,status,error);
+ try{
+  if(!await setStatus('running',null))return;
+  const fresh=await approved(bucket,row,jobId,env);
+  if(fresh.saved?.id!==entry.id)throw Error('WORD_REVISION_CONFLICT');
+  const previous=fresh.items[fresh.revision-2];
+  const original=previous?await versionBytes(bucket,fresh.key,previous,'docx'):await loadBytes(bucket,row);
+  const edited=await versionBytes(bucket,fresh.key,fresh.saved,'docx');
+  const report=await wordRequest(env,'verify',{original,edited,oldText:entry.original,newText:entry.text});
+  if(!await setStatus('running',null))return;
+  const pdf=await wordRequest(env,'render',{original:edited});
+  if(!await stillOwned(db,row,phone))throw Error('RESUME_NOT_FOUND');
+  if(!await setStatus('running',null))return;
+  const nextEntry={...entry,pdf_object_id:crypto.randomUUID(),verification:'layout_verified',
+   page_count:report.page_count,preview_sha256:await shaBytes(pdf)};
+  pdfKey=revisionKey(fresh.key,nextEntry,'pdf');
+  await bucket.put(pdfKey,pdf,{httpMetadata:{contentType:'application/pdf'}});
+  // Re-read after rendering: the user may have switched or replaced revisions.
+  const latest=await approved(bucket,row,jobId,env);
+  if(latest.saved?.id!==entry.id||latest.saved.verification!=='docx_structure_only')
+   throw Error('WORD_REVISION_CONFLICT');
+  if(!await stillOwned(db,row,phone))throw Error('RESUME_NOT_FOUND');
+  await commitManifest(bucket,latest,row,latest.revision,latest.items.map(item=>item.id===entry.id?nextEntry:item));
+  published=true;
+  await setStatus('done',null);
+ }catch(error){
+  // A manifest write can have succeeded even if the response was lost.
+  // Never delete a published object on an ambiguous storage failure.
+  if(pdfKey&&!published){
+   try{
+    const latest=await approved(bucket,row,jobId,env);
+    if(!latest.items.some(item=>revisionKey(latest.key,item,'pdf')===pdfKey))
+     await bucket.delete(pdfKey);
+   }catch{/* leave private orphan for storage maintenance */}
+  }
+  await setStatus('failed',code(error)).catch(()=>{});
+ }
+}
+// D1 is the durable task record. A separate scheduled Worker can reclaim
+// stale tasks even when every browser and the original Pages request is gone.
+export async function recoverInterruptedWordRenders(env,{limit=4}={}){
+ if(!configured(env))throw Error('WORD_RENDERER_REQUIRED');
+ const db=env.HHBA_PNVS_AUTH_DB,bucket=env.HHBA_PRIVATE_RESUMES;
+ if(!await tasksReady(db))throw Error('WORD_DB_NOT_READY');
+ const cutoff=new Date(Date.now()-RENDER_LEASE_MS).toISOString();
+ const scan=await db.prepare("SELECT account_hash,resume_id,job_scope_hash,entry_id,status,attempts,updated_at "+
+  "FROM hhba_resume_word_render_tasks WHERE status IN ('pending','running') AND updated_at<=? ORDER BY updated_at LIMIT ?")
+  .bind(cutoff,Math.max(1,Math.min(10,limit))).all();
+ const results={checked:0,reclaimed:0,skipped:0,errors:0};
+ for(const task of scan.results||[]){
+  results.checked++;
+  const {account_hash:hash,resume_id:resumeId,job_scope_hash:jobHash,entry_id:entryId}=task;
+  const jobId=jobHash?'vault-scope-v1-'+jobHash:undefined;
+  let attempt=null;
+  try{
+   const identity=await db.prepare('SELECT phone FROM hhba_candidate_resumes WHERE id=?').bind(resumeId).first();
+   const phone=identity?.phone;
+   const user=phone?await getUserByPhone(db,phone):null;
+   const row=phone?await rowFor(db,resumeId,phone):null;
+   // Never render a deleted/transferred resume or a task with a stale owner.
+   if(!phone||user?.role!=='candidate'||await accountHash(env,phone)!==hash||!validRow(row)){
+    await setRenderTask(db,hash,resumeId,jobHash,entryId,task.attempts,'failed','RESUME_NOT_FOUND');
+    results.skipped++;continue;
+   }
+   const state=await approved(bucket,row,jobId,env);
+   if(state.saved?.id!==entryId){
+    await setRenderTask(db,hash,resumeId,jobHash,entryId,task.attempts,'failed','WORD_REVISION_CONFLICT');
+    results.skipped++;continue;
+   }
+   if(state.saved.verification!=='docx_structure_only'){
+    await setRenderTask(db,hash,resumeId,jobHash,entryId,task.attempts,'done',null);
+    results.skipped++;continue;
+   }
+   await loadBytes(bucket,row);
+   attempt=await openRenderTask(db,hash,resumeId,jobHash,entryId,new Date().toISOString());
+   if(attempt===null){results.skipped++;continue;}
+   results.reclaimed++;
+   await runLateRender(db,bucket,env,phone,hash,row,jobId,jobHash,state.saved,attempt);
+  }catch(error){
+   if(attempt!==null)await setRenderTask(db,hash,resumeId,jobHash,entryId,attempt,'failed',code(error)).catch(()=>{});
+   results.errors++;
+  }
+ }
+ return results;
 }
 export async function onRequestGet({request,env}){
  const action=new URL(request.url).searchParams.get('action')||'preview';
@@ -243,12 +362,12 @@ export async function onRequestGet({request,env}){
     await versionBytes(bucket,state.key,state.saved,'docx'):original;
    const data=await inspectOriginalDocxStrict(current,{allowParagraphRuns:v4(env)&&!renderer});
    return json({ok:true,editable_text:data.editable_text,paragraph_text:data.paragraph_text,duplicate_paragraphs:data.duplicate_paragraphs,
-    saved:state.saved?{original:state.saved.original,text:state.saved.text,
+    saved:state.saved?{id:state.saved.id,original:state.saved.original,text:state.saved.text,
      updated_at:state.saved.updated_at}:null,
     revision:state.revision,total_revisions:state.items.length,
     layout_verified:Boolean(state.saved&&state.saved.verification!=='docx_structure_only'),
     pdf_available:Boolean(state.saved&&state.saved.verification!=='docx_structure_only'),
-    max_revisions:v4(env)?null:MAX_REVISIONS,max_daily_edits:v4(env)?null:DAILY.export,
+    max_revisions:null,max_daily_edits:null,
     history:state.items.map((entry,index)=>({
      revision:index+1,original:entry.original,text:entry.text,
      updated_at:entry.updated_at||'',page_count:entry.page_count,
@@ -281,6 +400,20 @@ export async function onRequestGet({request,env}){
     word?'HHBA-resume-edited.docx':
      action==='download-pdf'?'HHBA-resume-edited.pdf':'HHBA-resume-edited-preview.pdf');
   }
+  if(action==='convert-status'){
+   const state=await approved(bucket,row,jobId,env);
+   if(!state.saved)return fail('WORD_NOT_EDITED',404);
+   const entry=state.saved;
+   const requested=params.get('revision'),entryId=params.get('entry_id');
+   if(requested!==null&&String(state.revision)!==requested||entryId!==null&&entry.id!==entryId)return fail('WORD_REVISION_CONFLICT',409);
+   if(entry.verification!=='docx_structure_only')
+    return json({ok:true,status:'done',pdf_available:true,attempts:0,updated_at:entry.updated_at||''});
+   const hash=await accountHash(env,candidate.phone);
+   if(!hash)return fail('WORD_DB_NOT_READY',503);
+   if(!await tasksReady(db))return fail('WORD_DB_NOT_READY',503);
+   const task=await readRenderTask(db,hash,row.id,state.jobHash??'',entry.id);
+   return json(renderTaskPayload(task));
+  }
   if(action!=='preview')return fail('INVALID_REQUEST',400);
   if(!renderer)return fail('WORD_PDF_NOT_READY',422);
   const key=prefix(row)+'.source.pdf';
@@ -290,9 +423,6 @@ export async function onRequestGet({request,env}){
    if(bytes.length>=500&&bytes.length<=12*1024*1024)
     return replyFile(bytes,'application/pdf','HHBA-resume-original-preview.pdf');
   }
-  if(!v4(env)&&!await quotaReady(db))return fail('WORD_DB_NOT_READY',503);
-  if(!v4(env)&&!await reserve(db,env,candidate.phone,'preview'))
-   return fail('WORD_DAILY_LIMIT',429);
   const original=await loadBytes(bucket,row);
   const rendered=await wordRequest(env,'render',{original});
   if(!await stillOwned(db,row,candidate.phone))return fail('RESUME_NOT_FOUND',404);
@@ -304,7 +434,25 @@ export async function onRequestGet({request,env}){
   return replyFile(rendered,'application/pdf','HHBA-resume-original-preview.pdf');
  }catch(error){const c=code(error);return fail(c,errorStatus(c));}
 }
-export async function onRequestPost({request,env}){
+// The private scheduler uses a dedicated 256-bit bearer token, never a
+// candidate credential or the renderer secret. It may only trigger a bounded
+// owner-checked recovery sweep and can never specify or read a resume.
+async function authorizedRecovery(request,env){
+ const token=env.HHBA_WORD_RECOVERY_TOKEN;
+ if(typeof token!=='string'||!(/^[a-f0-9]{64}$/).test(token))return false;
+ const supplied=request.headers.get('Authorization')||'';
+ if(!/^Bearer [a-f0-9]{64}$/.test(supplied))return false;
+ let difference=0;
+ for(let i=0;i<64;i++)difference|=token.charCodeAt(i)^supplied.charCodeAt(i+7);
+ return difference===0;
+}
+export async function onRequestPost({request,env,waitUntil}){
+ if(new URL(request.url).searchParams.get('action')==='recover-interrupted'){
+  if(!await authorizedRecovery(request,env))return fail('NOT_FOUND',404);
+  if(env.HHBA_WORD_RENDER_RECOVERY_ENABLED!=='1')return fail('WORD_RECOVERY_DISABLED',503);
+  try{return json({ok:true,...await recoverInterruptedWordRenders(env,{limit:1})});}
+  catch{return fail('WORD_RECOVERY_UNAVAILABLE',503);}
+ }
  if(!sameOrigin(request))return fail('ORIGIN_REQUIRED',403);
  const renderer=configured(env),docxOnly=docxOnlyConfigured(env);
  if(!renderer&&!docxOnly)return fail('WORD_NOT_READY',503);
@@ -313,16 +461,15 @@ export async function onRequestPost({request,env}){
  try{candidate=await owner(db,request);}catch{return fail('SESSION_INVALID',401);}
  if(candidate.error)return fail(candidate.error,candidate.status);
  let body;
- try{body=await readSmall(request,v4(env)?2*1024*1024:LIMIT);}catch{return fail('INVALID_REQUEST',400);}
+ try{body=await readSmall(request,LIMIT);}catch{return fail('INVALID_REQUEST',400);}
  const id=body?.resume_id,action=body?.action||'edit',jobId=body?.job_id;
  if(!ID.test(String(id||''))||!validJobId(jobId)||
-  !['edit','undo','redo'].includes(action)||
+  !['edit','undo','redo','convert-pdf'].includes(action)||
   body?.confirmed_real!==true||body?.consent_word_processing!==true||
   (body.expected_revision!==undefined&&
-   (!Number.isInteger(body.expected_revision)||body.expected_revision<0||
-    (!v4(env)&&body.expected_revision>MAX_REVISIONS)))||
+   (!Number.isSafeInteger(body.expected_revision)||body.expected_revision<0))||
   (action==='edit'&&(typeof body?.original!=='string'||
-   typeof body?.text!=='string'||body.original.length>editLimit(env)||body.text.length>editLimit(env))))
+   typeof body?.text!=='string')))
   return fail('INVALID_REQUEST',400);
  let row,created=[];
  try{
@@ -335,6 +482,41 @@ export async function onRequestPost({request,env}){
   if(body.expected_revision!==undefined&&body.expected_revision!==state.revision)
    return fail('WORD_REVISION_CONFLICT',409);
   if(state.items.length&&!state.etag)return fail('WORD_REVISION_LOCK_UNAVAILABLE',503);
+  if(action==='convert-pdf'){
+   if(!state.saved)return fail('WORD_NOT_EDITED',404);
+   const entry=state.saved;
+   if(body.expected_entry_id!==undefined&&body.expected_entry_id!==entry.id)return fail('WORD_REVISION_CONFLICT',409);
+   if(entry.verification!=='docx_structure_only')
+    return json({ok:true,status:'done',pdf_available:true,revision:state.revision,
+     total_revisions:state.items.length});
+   if(!renderer)return fail('WORD_RENDERER_REQUIRED',422);
+   const hash=await accountHash(env,candidate.phone);
+   if(!hash)return fail('WORD_DB_NOT_READY',503);
+   if(!await tasksReady(db))return fail('WORD_DB_NOT_READY',503);
+   const jobHash=state.jobHash??'';
+   const existing=await readRenderTask(db,hash,row.id,jobHash,entry.id);
+   if(liveRender(existing))return json(renderTaskPayload(existing));
+   const now=new Date().toISOString();
+   const attempt=await openRenderTask(db,hash,row.id,jobHash,entry.id,now);
+   if(attempt===null){
+    const concurrent=await readRenderTask(db,hash,row.id,jobHash,entry.id);
+    return liveRender(concurrent)?json(renderTaskPayload(concurrent)):fail('WORD_BUSY',503);
+   }
+   // The conversion continues after the response when the platform offers
+   // background work, so leaving the page does not cancel it; otherwise it
+   // runs inline and the response carries the final status.
+   const work=runLateRender(db,bucket,env,candidate.phone,hash,row,jobId,jobHash,entry,attempt);
+   if(typeof waitUntil==='function')waitUntil(work.catch(()=>{}));
+   // The current UI keeps this request alive while independently polling.
+   // Do not rely solely on the short post-response Pages waitUntil window.
+   if(typeof waitUntil!=='function'||body.await_completion===true)await work;
+   const latest=await approved(bucket,row,jobId,env);
+   if(latest.saved?.id===entry.id&&latest.saved.verification!=='docx_structure_only'){
+    const task=await readRenderTask(db,hash,row.id,jobHash,entry.id).catch(()=>null);
+    return json({ok:true,status:'done',pdf_available:true,attempts:task?.attempts??attempt,updated_at:latest.saved.updated_at||now});
+   }
+   return json(renderTaskPayload(await readRenderTask(db,hash,row.id,jobHash,entry.id)));
+  }
   if(action==='undo'||action==='redo'){
    const next=state.revision+(action==='undo'?-1:1);
    if(next<0||next>state.items.length)return fail('WORD_REVISION_CONFLICT',409);
@@ -345,11 +527,7 @@ export async function onRequestPost({request,env}){
    }
    return json({ok:true,saved:next>0,revision:next,total_revisions:state.items.length});
   }
-  if(!v4(env)&&state.revision>=MAX_REVISIONS) return fail('WORD_REVISION_LIMIT',422);
   if(!renderer&&!hashIsValid(body.client_docx_sha256))return fail('INVALID_REQUEST',400);
-  if(!v4(env)&&!await quotaReady(db))return fail('WORD_DB_NOT_READY',503);
-  if(!v4(env)&&!await reserve(db,env,candidate.phone,'export'))
-   return fail('WORD_DAILY_LIMIT',429);
   const current=state.saved?
    await versionBytes(bucket,state.key,state.saved,'docx'):original;
   if(body.occurrence!==undefined&&(!v4(env)||renderer||body.expected_revision===undefined||!Number.isSafeInteger(body.occurrence)||!Number.isSafeInteger(body.occurrenceCount)))return fail('INVALID_REQUEST',400);

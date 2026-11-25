@@ -1,7 +1,7 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import {editOriginalDocxStrict,type DuplicateWordParagraph} from './resumeDocxPreserve.mjs';
 
-type SavedWord={original:string;text:string;updated_at:string};
+type SavedWord={id?:string;original:string;text:string;updated_at:string};
 export type WordHistoryEntry={revision:number;original:string;text:string;updated_at:string;page_count:number|null;layout_verified?:boolean};
 export type WordInspect={ok:boolean;editable_text:string[];paragraph_text?:string[];duplicate_paragraphs?:DuplicateWordParagraph[];saved?:SavedWord|null;revision:number;total_revisions:number;max_revisions:number|null;max_daily_edits?:number|null;history?:WordHistoryEntry[];layout_verified?:boolean;pdf_available?:boolean};
 const messages:Record<string,string>={
@@ -22,6 +22,8 @@ const messages:Record<string,string>={
  WORD_EDIT_AMBIGUOUS:'无法安全定位这段文字或新增段落，请核对 Word 结构。',
  WORD_EDIT_UNSAFE:'这段修改暂时无法安全保存。',
  WORD_RENDER_FAILED:'暂时无法准确显示 Word 原始页面。',
+ WORD_RENDERER_REQUIRED:'转换服务暂未启用，请稍后再试。',
+ WORD_BUSY:'转换服务繁忙，请稍后再试。',
  WORD_PDF_NOT_READY:'当前版本尚未经过专业分页校验，可以先下载 Word，PDF 暂不可用。',
  WORD_FILE_UNSUPPORTED:'暂时无法处理这份 Word 的原始样式。',
  SESSION_INVALID:'请重新登录。',
@@ -153,6 +155,22 @@ export async function shiftOriginalWordRevision(id:string,action:'undo'|'redo',e
  const result=await response.json() as WordMutationResult;
  if(result.ok)window.dispatchEvent(new Event('hhba:word-versions-changed'));
  return result;
+}
+export type WordRenderTaskStatus='idle'|'pending'|'running'|'done'|'failed';
+export type WordRenderTask={ok:true;status:WordRenderTaskStatus;pdf_available?:boolean;
+ error_code?:string;attempts?:number;updated_at?:string};
+export async function requestWordPdfConversion(id:string,jobId?:string,signal?:AbortSignal,revision?:number,entryId?:string):Promise<WordRenderTask>{
+ const response=await send('/api/resume-word','POST',{
+  action:'convert-pdf',resume_id:id,...jobPayload(jobId),await_completion:true,
+  ...(revision===undefined?{}:{expected_revision:revision}),
+  ...(entryId?{expected_entry_id:entryId}:{}),
+  confirmed_real:true,consent_word_processing:true
+ },signal);
+ return response.json();
+}
+export async function wordPdfConversionStatus(id:string,jobId?:string,signal?:AbortSignal,revision?:number,entryId?:string):Promise<WordRenderTask>{
+ const response=await send(url(id,'convert-status',jobId)+(revision===undefined?'':'&revision='+revision)+(entryId?'&entry_id='+encodeURIComponent(entryId):''),'GET',undefined,signal);
+ return response.json();
 }
 async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf',jobId?:string,jobLabel?:string,revision?:number){
  // DOCX retains the original OOXML package. Only optional PDF originates from
