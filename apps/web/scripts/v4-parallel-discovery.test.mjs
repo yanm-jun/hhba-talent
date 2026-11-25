@@ -284,3 +284,21 @@ test('oversized memory records remain losslessly accessible in bounded JSON page
  }while(offset!==null);
  assert.deepEqual(JSON.parse(rebuilt),rows[0]);
 });
+
+test('Gemini global ranking switches to focused recovery rather than discarding unfinished pool',async()=>{
+ const candidate=job(93),provider={kind:'gemini',key:'synthetic-only',baseUrl:'https://provider.invalid',model:'test'};
+ const match={company:candidate.company,title:candidate.title,location:candidate.location,official_url:candidate.url,source_type:'站外官方招聘',reference_vacancy_verified:true,reference_jd_kind:'AI_GENERATED_REFERENCE',reference_jd:'可能负责渠道管理。',reference_jd_basis:'方向推断',evidence_score_status:'AI_REFERENCE_JD_SCORED',match_score:86,curated_suitable:true,report_status:'COMPLETE',research_detail:{comparisons:[],score_explanation:'真实经历匹配'}};
+ let calls=0;
+ const fetcher=async(url,opts)=>{
+  calls++;const input=JSON.parse(JSON.parse(opts.body).contents[0].parts[0].text);
+  const value=input.focus_id?{insertions:[{id:input.focus_id,after_id:null}]}:{ordered_ids:[]};
+  return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(value)}]}}]});
+ };
+ const opts={curated:true,officialOnly:true,stepMode:true};
+ let checkpoint={phase:'reporting',rows:[[candidate.url,candidate]],profile,matches:[match]};
+ for(const expected of ['insert','focused_insert','focused_insert']){
+  const result=await v4Match(fetcher,provider,resume,'全国',{...opts,checkpoint});
+  checkpoint=result.checkpoint;assert.equal(checkpoint.globalRankState.mode,expected);
+ }
+ assert.equal(calls,3);assert.equal(checkpoint.globalRankState.done,true);assert.deepEqual(checkpoint.globalOrder,[candidate.url]);
+});
