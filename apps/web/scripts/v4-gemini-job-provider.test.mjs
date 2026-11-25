@@ -557,3 +557,20 @@ test('repeated browser read advances unattempted resources rather than stopping 
  v4RememberPublicResult(ledger,failure);const before=v4ResearchEvidenceProgress(ledger);
  v4RememberPublicResult(ledger,{...failure,offset:2});assert.equal(v4ResearchEvidenceProgress(ledger),before);
 });
+
+test('OpenAI live acceptance uses selected Responses provider and no artificial output ceiling',async()=>{
+ const {runOpenAIProbe}=await import('../functions/api/match-v4-provider-probe.js');
+ const provider={...v4Provider(env),baseUrl:'https://relay.example/v1'};
+ const calls=[];
+ const fetcher=async(url,opt)=>{
+  assert.equal(url,'https://relay.example/v1/responses');assert.equal(opt.headers.authorization,'Bearer '+env.HHBA_AGENT_RELAY_API_KEY);
+  const body=JSON.parse(opt.body);calls.push(body);
+  assert.equal(Object.hasOwn(body,'max_output_tokens'),false);assert.equal(body.store,false);
+  const data=body.reasoning?.effort==='high'?{answer:190}:{ok:true};
+  return Response.json({status:'completed',usage:{total_tokens:11,output_tokens_details:{reasoning_tokens:3}},output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(data)}]}]});
+ };
+ assert.equal((await runOpenAIProbe(provider,'openai_basic',{fetcher})).ok,true);
+ const high=await runOpenAIProbe(provider,'openai_reasoning',{fetcher});assert.equal(high.ok,true);assert.equal(high.reasoning_tokens,3);assert.equal(high.requested_effort,'high');
+ assert.equal(calls[0].reasoning,undefined);assert.equal(calls[1].reasoning.effort,'high');
+ const fake=await runOpenAIProbe(provider,'openai_search',{fetcher});assert.equal(fake.ok,false);
+});
