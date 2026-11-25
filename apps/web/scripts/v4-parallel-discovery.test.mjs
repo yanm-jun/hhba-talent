@@ -514,3 +514,22 @@ test('invalid reference drafts never escape through progress or final candidate 
  assert.equal(saved.match_score,null);assert.notEqual(saved.report_status,'COMPLETE');
  assert.ok(visible.flat().every(j=>!j.reference_jd));
 });
+
+test('reviewed reference without a defensible score remains available as research only',async()=>{
+ const candidate=job(3101),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ let assessments=0;
+ const fetcher=async(url,opts)=>{
+  if(url===candidate.url)return Response.json({'@type':'JobPosting',title:candidate.title,hiringOrganization:{name:candidate.company,url:new URL(candidate.url).origin},jobLocation:{address:{addressLocality:'上海'}}});
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.original_url)return model({sources:[],research_complete:true,completion_reason:'公开原文未找到'});
+  assessments++;
+  const direction={kind:'title_direction',url:'',quote:input.job.title};
+  return model({reference_jd:'按岗位名称准备运营协调案例。建议准备业务流程分析案例。',reference_basis:'仅有岗位名称，具体职责未公开。',reference_source_anchors:{duties:direction,capabilities:direction},reference_coverage:{duties_quote:'运营协调案例',capabilities_quote:'业务流程分析案例'},quality_review:{status:'complete',explanation:'已说明职业准备方向及未知项',missing:[]},suitable:true,score:null,reason:'岗位职责未公布，无法可靠评分。',comparisons:[{jd_quote:'运营协调案例',status:'missing',analysis:'尚不能确认企业实际要求'}]});
+ };
+ const result=await v4Match(fetcher,provider,resume,'全国',{env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
+ const saved=result.checkpoint.matches[0];
+ assert.equal(assessments,2);assert.equal(saved.reference_jd_kind,'AI_GENERATED_REFERENCE');
+ assert.match(saved.reference_jd,/运营协调案例/);assert.equal(saved.match_score,null);
+ assert.equal(saved.report_status,'UNAVAILABLE');
+ assert.equal((await import('../functions/_lib/v4-curated-reports.js')).qualifiedReport(saved),false);
+});

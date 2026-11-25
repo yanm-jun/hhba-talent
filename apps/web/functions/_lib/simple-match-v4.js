@@ -470,11 +470,13 @@ async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,br
    note(job.reference_vacancy_verified?'JD_REFERENCE_VERIFIED_VACANCY_SCORED':'JD_REFERENCE_UNVERIFIED_LEAD_SCORED');
    return;
   }else if(value.suitable===false){job.curated_suitable=false;job.report_status='DECLINED';job.recommendation_reason=text(value.reason);return;}
-  else {const issue=JSON.stringify([report.errors,value]);if(seen.has(issue)){note('JD_REFERENCE_SCORE_UNCONFIRMED');return;}seen.add(issue);previous=value;repair='独立复核参考分析：'+report.errors.join(',')+'。根据真实企业资料补充具体职责、能力建议及逐项对照，核对reference_source_anchors，不把推断冒充官方要求；只有标题时提供明确标注的求职准备方向，保留可信内容与未知项；检查真实简历引文与参考文本引文；没有可靠依据允许null，不编造。';if(value.score===null&&seen.size>1){
-    // A reliable source-based reference can be useful without a reliable score.
-    if(fullResearch&&!coverage.length&&!(report.errors||[]).some(e=>e.startsWith('comparison_'))){publishReference();Object.assign(job,{match_score:null,reference_score:0,report_status:'UNAVAILABLE',score_basis:'参考岗位资料已整理；简历匹配证据不足，未给出分数。'});}
-    return;
-   }continue;}
+  else {const issue=JSON.stringify([report.errors,value]);const repeated=seen.has(issue);
+   // An explicitly unscored reference may be published after a second review;
+   // repeated invalid content must never leak to a candidate record.
+   if(value.score===null&&value.suitable===true&&fullResearch&&!coverage.length&&!(report.errors||[]).some(e=>e.startsWith('comparison_')||e==='reason')&&(repeated||seen.size>0)){
+    publishReference();Object.assign(job,{match_score:null,reference_score:0,report_status:'UNAVAILABLE',score_basis:'参考岗位资料已整理；简历匹配证据不足，未给出分数。'});note('JD_REFERENCE_MATERIAL_ONLY');return;
+   }
+   if(repeated){note('JD_REFERENCE_SCORE_UNCONFIRMED');return;}seen.add(issue);previous=value;repair='独立复核参考分析：'+report.errors.join(',')+'。根据真实企业资料补充具体职责、能力建议及逐项对照，核对reference_source_anchors，不把推断冒充官方要求；只有标题时提供明确标注的求职准备方向，保留可信内容与未知项；检查真实简历引文与参考文本引文；没有可靠依据允许null，不编造。';if(value.score===null&&seen.size>1)return;continue;}
  }catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(isV4RetryableProviderError(e?.code))throw e;const issue=e?.code||'JD_REFERENCE_UNAVAILABLE';if(seen.has(issue)){note(issue);return;}seen.add(issue);repair='重新组织完整参考JD及证据评分，修复 '+issue;}
  }
 }
