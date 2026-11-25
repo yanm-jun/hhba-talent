@@ -105,7 +105,10 @@ try{
   UNIQUE(phone,sha256)
  )`).run();
  await db.exec('CREATE TABLE hhba_resume_word_attempts (request_id TEXT PRIMARY KEY,day_utc TEXT,account_hash TEXT,action TEXT,created_at TEXT)');
- await db.exec(readFileSync(resolve('d1/0103_resume_word_render_tasks.sql'),'utf8'));
+ const renderMigration=readFileSync(resolve('d1/0103_resume_word_render_tasks.sql'),'utf8')
+  .split('\n').filter(line=>!line.trimStart().startsWith('--')).join('\n');
+ for(const statement of renderMigration.split(';').map(s=>s.trim()).filter(Boolean))
+  await db.prepare(statement).run();
  const now=new Date(),date=now.toISOString();
  await db.prepare('INSERT INTO hhba_auth_users(phone,role,created_at) VALUES(?,?,?)')
   .bind(owner,'candidate',date).run();
