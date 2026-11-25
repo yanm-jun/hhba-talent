@@ -86,11 +86,11 @@ const xmlChars=s=>s.replace(/&(#x[0-9a-f]+|#[0-9]+|amp|lt|gt|quot|apos);/gi,(raw
  }
  return raw;
 });
-export function wordXmlToText(xml){
+export function wordXmlToText(xml,{unrestricted=false}={}){
  if(typeof xml!=='string'||xml.length>MAX_XML||
   /<!DOCTYPE|<!ENTITY|<\?xml-stylesheet/i.test(xml))throw Error('DOCX 含有不支持的 XML 声明');
  if(!/<w:document(?:\s|>)/.test(xml)||!/<w:body(?:\s|>)/.test(xml))throw Error('DOCX 不是有效正文');
- const paragraphs=[];
+ const paragraphs=[];let chars=0;
  const paragraphPattern=/<w:p(?:\s[^>]*)?>([\s\S]*?)<\/w:p>/g;
  for(const p of xml.matchAll(paragraphPattern)){
   const bits=[];
@@ -99,14 +99,14 @@ export function wordXmlToText(xml){
    bits.push(token[1]!==undefined?xmlChars(token[1]):' ');
   }
   const line=bits.join('').replace(/[\u0000-\u0008\u000b-\u001f]/g,'').trim();
-  if(line)paragraphs.push(line);
-  if(paragraphs.join('\n').length>MAX_TEXT)throw Error('简历文本超过本地提取上限');
+  if(line){chars+=line.length+(paragraphs.length?1:0);paragraphs.push(line);}
+  if(!unrestricted&&chars>MAX_TEXT)throw Error('简历文本超过本地提取上限');
  }
  if(!paragraphs.length)throw Error('DOCX 中未找到可复制文字');
  return paragraphs.join('\n');
 }
-export async function extractDocxText(buffer){
- return wordXmlToText(await unzipDocXml(buffer));
+export async function extractDocxText(buffer,options={}){
+ return wordXmlToText(await unzipDocXml(buffer),options);
 }
 export function inferProfileFromText(text){
  if(typeof text!=='string'||!text.trim())return cleanProfile({});

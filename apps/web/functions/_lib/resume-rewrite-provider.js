@@ -9,6 +9,7 @@
  */
 import {selectProvider} from './resume-ai-provider.js';
 import {v4Call,v4ParseJson} from './simple-match-v4.js';
+import {v4PrivateJsonCall} from './v4-research-tools.js';
 
 export const REWRITE_KIND='HHBA_WHOLE_RESUME_REWRITE_V1';
 const GROUP_CHARS=8000,MAX_BLOCKS=512,MAX_TEXT_PER_BLOCK=8000;
@@ -88,7 +89,7 @@ export function validateAuthoring(block,proposal,quotes,numbers,{v4=false}={}){
 }
 export async function completeJson(provider,system,user,signal,maxTokens=9000){
  if(provider.protocol==='responses'){
-  const reply=await v4Call(fetch,provider,{instructions:system,input:JSON.stringify(user)},{signal});
+  const reply=await v4PrivateJsonCall(p=>v4Call(fetch,provider,p,{signal}),{instructions:system,input:JSON.stringify(user)},{parse:v4ParseJson,signal});
   if(reply.status!=='completed')error('AI_PROVIDER_RESPONSE_TRUNCATED');
   return v4ParseJson(reply);
  }

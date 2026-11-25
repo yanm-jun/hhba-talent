@@ -967,3 +967,24 @@ test('only complete grounded official reports enter the formal UI and preserve s
  for(const item of bad){assert.equal(qualifiedReport(item),false);assert.deepEqual(verifiedMatchReports([item]),[]);}
  assert.deepEqual(verifiedMatchReports([...bad,good,second,good]),[good,second]);
 });
+
+test('V4 private Word context overflow pages the exact complete JSON without public reads',async()=>{
+ const {v4PrivateJsonCall}=await import('../functions/_lib/v4-research-tools.js');
+ const doc=JSON.stringify({job:{title:'岗位',requirements:'参考要求'},context:'A'.repeat(120000)+'LAST-ORIGINAL-FACT'});
+ let calls=0,sawEnd=false;
+ const response=await v4PrivateJsonCall(async payload=>{
+  calls++;const input=JSON.parse(payload.input);
+  if(!input.original_text_pages)throw Object.assign(Error('context'),{code:'AI_PROVIDER_CONTEXT_TOO_LARGE'});
+  assert.equal(payload.tools.length,0);
+  if((input.research_tool_results||[]).some(x=>x.text?.includes('LAST-ORIGINAL-FACT')))sawEnd=true;
+  return {status:'completed',data:{answer:sawEnd?'complete':'premature'}};
+ },{instructions:'test',input:doc},{parse:r=>r.data});
+ assert.ok(calls>=3);assert.ok(sawEnd);assert.equal(response.data.answer,'complete');
+});
+test('V4 Word extraction keeps full text beyond legacy 250k guard',async()=>{
+ const {wordXmlToText}=await import('../src/services/docxProfile.mjs');
+ const body='原'.repeat(250001);
+ const xml='<w:document><w:body><w:p><w:r><w:t>'+body+'</w:t></w:r></w:p></w:body></w:document>';
+ assert.throws(()=>wordXmlToText(xml),/提取上限/);
+ assert.equal(wordXmlToText(xml,{unrestricted:true}),body);
+});
