@@ -58,7 +58,7 @@ test('existing deep-linked resume and local new upload still work independently'
  assert.match(match,/onDrop=\{\(e:DragEvent<HTMLLabelElement>\)=>\{e\.preventDefault\(\);setDrag\(false\);choose\(e\.dataTransfer\.files\?\.\[0\]\|\|null\)\}\}/);
  assert.match(match,/if\(\(!file&&!savedId\)\|\|!consent/);
  assert.match(match,/fetchPrivateResumeForLocalReview\(source,abort\.signal\)/);
- assert.match(match,/submitExtractedResumeText\(previewText,/);
+ assert.match(match,/submitExtractedResumeText\(searchText,/);
 });
 
 test('mobile chooser is compact and accessible without changing the rest of the job matching flow',()=>{

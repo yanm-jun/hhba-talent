@@ -29,6 +29,8 @@ import {
   verifyPassword,
 } from '../../_lib/real-auth.js';
 import { PNVS_SIGN_NAME, PNVS_TEMPLATE_CODE, createSmsProvider } from '../../_lib/sms-provider.js';
+import {getSessionTask,updateSessionTask} from '../../_lib/v4-session-match-task.js';
+import {checkpointStorageReady} from '../../_lib/v4-match-checkpoint-storage.js';
 
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data), {
@@ -240,7 +242,12 @@ export async function onRequest({ request, env }) {
     // ---- 退出：撤销当前 token ----
     if (request.method === 'POST' && tail === '/logout') {
       const body = await readBody(request);
+      let matchSession=null;
+      if(checkpointStorageReady(env))try{matchSession=await sessionOfBearer(db,request,nowMs);}catch{}
       await revokeBearer(db, request, body.token || null, nowMs);
+      // Revocation is authoritative; cleanup of the encrypted recovery input
+      // is best effort and must not prevent logout if storage is unavailable.
+      if(matchSession)try{const task=await getSessionTask(env,matchSession);if(task)await updateSessionTask(env,matchSession,'cancel',task);}catch{console.warn('HHBA_SESSION_MATCH_CLEANUP_UNAVAILABLE');}
       return json({ ok: true });
     }
 

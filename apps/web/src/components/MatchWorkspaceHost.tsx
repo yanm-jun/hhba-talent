@@ -8,14 +8,14 @@ export const isMatchWorkspaceRoute=(route:string)=>route==='/candidate/match'||r
 // Moving its DOM node does not unmount its React tree or cancel the request.
 // When away from both match pages, detach the form; the existing body portal
 // (task dock/result dialog) remains mounted and interactive.
-export function MatchWorkspaceHost({route,workspace,children,fallback=null}:{route:string;workspace:ReactNode;children:ReactNode;fallback?:ReactNode}){
+export function MatchWorkspaceHost({route,workspace,children,fallback=null,keepAlive=false}:{route:string;workspace:ReactNode;children:ReactNode;fallback?:ReactNode;keepAlive?:boolean}){
  const [container]=useState(()=>{const node=document.createElement('div');node.className='hhba-match-workspace-host';return node;});
  const [visited,setVisited]=useState(()=>isMatchWorkspaceRoute(route));
  const active=isMatchWorkspaceRoute(route);
  useLayoutEffect(()=>{if(active)setVisited(true);},[active]);
  return <WorkspaceContainer.Provider value={container}>
   {children}
-  {(visited||active)&&createPortal(<Suspense fallback={fallback}>{workspace}</Suspense>,container)}
+  {(visited||active||keepAlive)&&createPortal(<Suspense fallback={fallback}>{workspace}</Suspense>,container)}
  </WorkspaceContainer.Provider>;
 }
 export function MatchWorkspaceSlot(){

@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import {MatchWorkspaceHost,MatchWorkspaceSlot} from './components/MatchWorkspaceHost';
+import {sessionMatchRecoveryAvailable} from './services/resumeMatch';
 import {Shell} from './components/Shell';
 import './styles.css';
 import { api, ApiError, type User } from './services/api';
@@ -182,6 +183,7 @@ const logout=async()=>{
  }finally{clearRealAuthToken();setUser(null);navigate('/candidate/login');}
 };if(!ready)return <AppLoadingState/>;
  return <MatchWorkspaceHost key={String(user?.id||'guest')+':'+sessionEpoch} route={route}
+  keepAlive={sessionMatchRecoveryAvailable&&!!user?.account_types?.includes('candidate')&&!!getRealAuthToken()}
   workspace={<CandidateMatchPage user={user} embedded={route!=='/candidate/match'} hosted hostRoute={route}/>}
   fallback={<p role="status">正在加载智能匹配…</p>}>
   <Suspense fallback={<AppLoadingState/>}><AppRoutes route={route} user={user} setUser={setUser} logout={logout}/></Suspense>

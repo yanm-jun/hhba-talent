@@ -9,6 +9,7 @@ import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalRevi
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
 import {matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchResearchReport,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
+import {sessionMatchRecoveryAvailable,MATCH_TASK_SIGNAL,readSessionMatchTask,beginSessionMatchTask,advanceSessionMatchTask,closeSessionMatchTask,managedMatchOptions,type SessionMatchTask} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -63,6 +64,11 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
  const [result,setResult]=useState<MatchResponse|null>(null);
  const [taskFailure,setTaskFailure]=useState(false);
  const taskOpen=useRef(false);
+ const sessionTask=useRef<SessionMatchTask|null>(null);
+ const [restoringTask,setRestoringTask]=useState(false);
+ const [checkingTask,setCheckingTask]=useState(sessionMatchRecoveryAvailable&&!!user&&!!getRealAuthToken());
+ const closingTask=useRef(false);
+ const pendingStart=useRef<string|null>(null);
  const [optimizationSource,setOptimizationSource]=useState('');
  const controller=useRef<AbortController|null>(null);
  const lastSearch=useRef<{text:string;options:MatchOptions;resumeId?:string}|null>(null);
@@ -231,11 +237,68 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   }catch(e){setSaveNotice(e instanceof Error?e.message:'简历保存失败，请稍后重试。')}
   finally{setSaveBusy(false)}
  }
+ async function restoreTask(task:SessionMatchTask){
+  if(controller.current||closingTask.current)return;
+  const abort=new AbortController();controller.current=abort;
+  taskOpen.current=true;sessionTask.current=task;pendingStart.current=null;setRestoringTask(true);setTaskFailure(false);
+  setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
+  previewController.current?.abort();wordVersionRequest.current?.abort();setFile(null);setSavedId(task.resume_id||'');setPreviewText(task.text);setPreviewLoaded(true);setConsent(false);
+  const opts=managedMatchOptions(task);setOptions(opts);setOptimizationSource(task.text);
+  lastSearch.current={text:task.text,options:opts,resumeId:task.resume_id||undefined};
+  try{
+   const matched=await submitExtractedResumeText(task.text,opts,true,abort.signal,task.resume_id||undefined,
+    stage=>{if(!abort.signal.aborted)progress(stage);},jobs=>{if(!abort.signal.aborted)setPartialJobs(jobs);},
+    detail=>{if(!abort.signal.aborted)setActivity(detail);},report=>{if(!abort.signal.aborted)setResearchReport(report);},
+    jobs=>{if(!abort.signal.aborted)setResearchJobs(jobs);});
+   if(!abort.signal.aborted){setResult(matched);setPartialJobs([]);}
+  }catch(e){if(!abort.signal.aborted){setTaskFailure(true);setError(e instanceof Error?e.message:'原研究任务暂未恢复。');}}
+  finally{if(controller.current===abort){controller.current=null;setWorking(false);}}
+ }
+ function clearTaskLocally(){
+  controller.current?.abort();controller.current=null;taskOpen.current=false;sessionTask.current=null;pendingStart.current=null;
+  setTaskFailure(false);setRestoringTask(false);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);setResult(null);setWorking(false);
+ }
+ // Initial reload and other tabs only discover an authorized server task.
+ // They never re-submit a new CV or create a new task automatically.
+ useEffect(()=>{
+  if(!sessionMatchRecoveryAvailable||!user||!getRealAuthToken()){setCheckingTask(false);return;}
+  let disposed=false;const lookup=new AbortController();let timer:ReturnType<typeof setTimeout>|undefined;let generation=0;
+  const check=async()=>{
+   const current=++generation;
+   try{
+    const found=await readSessionMatchTask(lookup.signal);
+    if(disposed||current!==generation||closingTask.current)return;
+    setCheckingTask(false);
+    const local=sessionTask.current;
+    if(!found){if(local)clearTaskLocally();return;}
+    if(controller.current&&!local)return; // initial authorized start is in flight
+    if(local?.id===found.id&&local.generation===found.generation&&taskOpen.current)return;
+    if(local)clearTaskLocally();
+    if(!controller.current)void restoreTask(found);
+   }catch(e){if(!disposed&&current===generation){
+    if(e instanceof Error&&'status' in e&&(e.status===401||e.status===403)){setCheckingTask(false);return;}
+    timer=setTimeout(()=>void check(),5000);
+   }}
+  };
+  const sync=(e:StorageEvent)=>{if(e.key===MATCH_TASK_SIGNAL){clearTimeout(timer);void check();}};
+  const online=()=>{clearTimeout(timer);void check();};
+  void check();window.addEventListener('storage',sync);window.addEventListener('online',online);
+  return()=>{disposed=true;lookup.abort();clearTimeout(timer);window.removeEventListener('storage',sync);window.removeEventListener('online',online);};
+ },[user?.id]);
+ async function closeMatch(){
+  if(closingTask.current)return;
+  const task=sessionTask.current||(pendingStart.current?{id:pendingStart.current,generation:0}:null);
+  if(!task){clearTaskLocally();return;}
+  closingTask.current=true;
+  try{await closeSessionMatchTask(task,working||!!pendingStart.current);clearTaskLocally();}
+  catch(e){setError(e instanceof Error?e.message:'未确认服务器终止，请恢复网络后重试。');window.alert('服务器尚未确认结束任务，请恢复网络后再试。');}
+  finally{closingTask.current=false;}
+ }
  async function run(){
-  if((!file&&!savedId)||!consent||working||saveBusy||wordVersionBusy||taskOpen.current||controller.current||previewBusy||ocrBusy||!previewLoaded||
+  if((!file&&!savedId)||!consent||working||saveBusy||checkingTask||wordVersionBusy||taskOpen.current||controller.current||previewBusy||ocrBusy||!previewLoaded||
    identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()||
    (file&&!savedId&&storageChoice==='undecided'))return;
-  taskOpen.current=true;setTaskFailure(false);
+  taskOpen.current=true;setTaskFailure(false);setRestoringTask(false);
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
   const abort=new AbortController();
   controller.current=abort;
@@ -262,21 +325,30 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
     // in that case do not start the AI request.
     if(abort.signal.aborted)throw new DOMException('Cancelled','AbortError');
    }
-   const matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,matchResumeId||undefined,
+   // Consent includes encrypted temporary input recovery, not original-file retention.
+   if(sessionMatchRecoveryAvailable)pendingStart.current=crypto.randomUUID();
+   const registration=await beginSessionMatchTask(previewText,options,matchResumeId||undefined,abort.signal,pendingStart.current||undefined);
+   if(abort.signal.aborted)return;
+   if(registration)sessionTask.current=registration.task;
+   pendingStart.current=null;
+   const task=registration?.task;
+   const searchText=task?.text??previewText,searchOptions=task?managedMatchOptions(task):options;
+   if(task){matchResumeId=task.resume_id||'';if(registration?.attached){setFile(null);setSavedId(matchResumeId);setPreviewText(task.text);setOptions(searchOptions);}}
+   const matched=await submitExtractedResumeText(searchText,searchOptions,consent,abort.signal,matchResumeId||undefined,
     stage=>{if(!abort.signal.aborted)progress(stage);},
     jobs=>{if(!abort.signal.aborted)setPartialJobs(jobs);},
     detail=>{if(!abort.signal.aborted)setActivity(detail);},
     report=>{if(!abort.signal.aborted)setResearchReport(report);},
     jobs=>{if(!abort.signal.aborted)setResearchJobs(jobs);});
    if(abort.signal.aborted)return;
-   setOptimizationSource(redactResumeTextLocally(previewText));
-   lastSearch.current={text:previewText,options,resumeId:matchResumeId||undefined};
+   setOptimizationSource(redactResumeTextLocally(searchText));
+   lastSearch.current={text:searchText,options:searchOptions,resumeId:matchResumeId||undefined};
    setResult(matched);setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
    setConsent(false);
   }catch(e){
    if(!abort.signal.aborted){setTaskFailure(true);setError(e instanceof Error?e.message:'智能匹配暂时失败，请稍后再试。');}
-  }finally{setWorking(false);controller.current=null}
+  }finally{if(controller.current===abort){setWorking(false);controller.current=null;}}
  }
  async function continueSearch(){
   const previous=result,search=lastSearch.current;
@@ -289,7 +361,9 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setPartialJobs(collected);
   try{
    const durable=!!previous.research_task_id&&typeof previous.research_generation==='number';
-   const next=await submitExtractedResumeText(search.text,{...search.options,
+   const registered=sessionTask.current?await advanceSessionMatchTask(sessionTask.current,abort.signal):null;
+   if(registered){sessionTask.current=registered;lastSearch.current={text:registered.text,options:managedMatchOptions(registered),resumeId:registered.resume_id||undefined};}
+   const next=await submitExtractedResumeText(search.text,registered?managedMatchOptions(registered):{...search.options,
     ...(durable?{research_task_id:previous.research_task_id,research_generation:previous.research_generation!+1}:{exclude_urls:previous.matches.map(job=>job.official_url)})},true,abort.signal,search.resumeId,
     stage=>{if(!abort.signal.aborted)progress(stage);},
     jobs=>{if(!abort.signal.aborted){collected=durable?jobs:combine(jobs);setPartialJobs(collected);}},
@@ -305,7 +379,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
     setPartialJobs([]);
     setError(error instanceof Error?error.message:'继续搜索暂未完成，请重试。');
    }
-  }finally{setWorking(false);controller.current=null;}
+  }finally{if(controller.current===abort){setWorking(false);controller.current=null;}}
  }
  async function runPreviewPreflight(){
   if(preflightBusy||!preflightAvailable||!user||!getRealAuthToken())return;
@@ -493,17 +567,18 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我已阅读并同意 <a href={import.meta.env.BASE_URL+'privacy'} target="_blank" rel="noopener noreferrer" aria-label="隐私说明（新标签页打开）">《隐私说明》</a>，授权 HHBA 使用简历信息进行智能匹配，并将脱敏后的简历文字发送至第三方 AI 服务分析。</span>
+          <span>我已阅读并同意 <a href={import.meta.env.BASE_URL+'privacy'} target="_blank" rel="noopener noreferrer" aria-label="隐私说明（新标签页打开）">《隐私说明》</a>，授权 HHBA 使用简历信息进行智能匹配，并将脱敏后的简历文字发送至第三方 AI 服务分析。为恢复同一研究任务，脱敏文字与求职参数会在账户会话内加密临时保存，不因此保存原始文件。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
-          disabled={(!file&&!savedId)||!consent||working||saveBusy||wordVersionBusy||taskOpen.current||previewBusy||ocrBusy||!previewLoaded||
+          disabled={(!file&&!savedId)||!consent||working||saveBusy||checkingTask||wordVersionBusy||taskOpen.current||previewBusy||ocrBusy||!previewLoaded||
            (file&&!savedId&&storageChoice==='undecided')||
            identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()}>
           {working?<><LoaderCircle className="spin" size={18}/> {saveBusy?'正在保存简历…':'正在匹配岗位…'}</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>
+        {checkingTask&&<p role="status">正在检查是否存在需要恢复的原研究任务…</p>}
         {!working&&taskOpen.current&&<p role="status">本次研究结果仍在任务窗口中，请通过悬浮入口查看或关闭后再开始新匹配。</p>}
         {working&&<p className="hhba-ai-processing" role="status">智能研究正在进行。可通过研究窗口或右下角任务入口查看进度；收起窗口或切换站内页面不会取消搜索。</p>}
       </section>
@@ -516,7 +591,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
       </aside>
     </div>
     {((result||partialJobs.length>0)||working||researchJobs.length>0||taskFailure)&&<CandidateMatchNativeDialog
-      hostRoute={hostRoute} taskFailed={taskFailure}
+      hostRoute={hostRoute} taskFailed={taskFailure} initialMinimized={restoringTask||!!hostRoute&&!/\/candidate\/(?:account\/)?match$/.test(hostRoute)}
       result={result||{matches:partialJobs,profile:researchReport?.profile}}
       researchReport={result?.research_report||researchReport} researchJobs={result?.research_leads||researchJobs}
       pending={working&&!result} progressStage={stage} progressActivity={activity}
@@ -530,7 +605,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
         notice:saveNotice,onConsent:setSaveConsent,onSave:()=>void saveResume()
        }:result&&savedId?{available:false,saved:true,consent:false,saving:false,
         notice:saveNotice,onConsent:()=>{},onSave:()=>{}}:undefined}
-      onClose={()=>{if(working)controller.current?.abort();taskOpen.current=false;setTaskFailure(false);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);setResult(null);setWorking(false);}}/>}
+      onClose={()=>void closeMatch()}/>}
      <div className="hhba-ai-footer"><Link to="/candidate/jobs">不上传简历，直接搜索公开岗位 <ArrowRight size={15}/></Link></div>
   </section>
  </Shell>;

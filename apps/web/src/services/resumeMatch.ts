@@ -91,7 +91,7 @@ export type MatchResponse = {
   research_task_id?:string;
   preview_synthetic?:boolean;
 };
-export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];research_task_id?:string;research_generation?:number};
+export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];research_task_id?:string;research_generation?:number;managed_task?:boolean};
 const API='/api/match-next'; // Legacy diagnostic endpoints only; the user-facing matching path is V4.
 // V4 is the normal matching engine on the approved HHBA hosts.
 const MATCH_V4_PREVIEW=typeof window!=='undefined'&&
@@ -100,9 +100,14 @@ const MATCH_V4_PREVIEW=typeof window!=='undefined'&&
   window.location.hostname==='hhba.work'||
   window.location.hostname==='www.hhba.work');
 const EFFECTIVE_API=MATCH_V4_PREVIEW?'/api/match-v4':API;
+export const sessionMatchRecoveryAvailable=MATCH_V4_PREVIEW;
+export const MATCH_TASK_SIGNAL='hhba:v4:session-task-signal';
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=12*1024*1024;
 const errorMap:Record<string,string>={
+  AI_AGENT_CANCELLED:'该研究任务已经终止或当前会话已失效。',
+  AI_CHECKPOINT_INVALID:'原研究任务状态已变化，请重新查看任务。',
+  AI_CHECKPOINT_DB_UNAVAILABLE:'任务恢复存储暂时不可用，正在保留原任务。',
   MATCH_NOT_ENABLED:'智能匹配服务尚未开放，请稍后再试。',
   AI_NATIVE_DEEPSEARCH_DISABLED:'原生深度搜索试用暂时关闭，请选择常规搜索。',
   AI_NATIVE_DEEPSEARCH_TIMEOUT:'DeepSeek 原生深度搜索用时过长，本轮未完成，请尝试常规搜索。',
@@ -282,6 +287,48 @@ export type NativeMatchActivity={
  candidate_links?:number;rejected_links?:number;pages_read?:number;decisions?:number;
  search_failures?:number;elapsed_ms?:number
 };
+export type SessionMatchTask={id:string;text:string;role:string;excludeUrls:string[];resume_id:string|null;generation:number;started_at:number};
+export function managedMatchOptions(task:SessionMatchTask):MatchOptions{
+ return {country:'CN',remote_only:false,role_hint:task.role,limit:10,exclude_urls:task.excludeUrls,
+  research_task_id:task.id,research_generation:task.generation,managed_task:true};
+}
+function announceMatchTask(){try{localStorage.setItem(MATCH_TASK_SIGNAL,crypto.randomUUID());}catch{}}
+async function sessionTaskRequest(body?:Record<string,unknown>,signal?:AbortSignal):Promise<SessionMatchTask|null>{
+ if(!MATCH_V4_PREVIEW)return null;
+ const token=session();
+ for(;;){
+  if(signal?.aborted)throw signal.reason;
+  let response:Response;
+  try{
+   response=await fetch('/api/match-v4/active-task',{method:body?'POST':'GET',credentials:'same-origin',cache:'no-store',
+    signal,headers:{Authorization:'Bearer '+token,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})});
+  }catch(e){if(signal?.aborted)throw e;throw new MatchError(503,'暂时无法连接原任务，请恢复网络后重试。',true);}
+  const data=await response.json().catch(()=>null) as {ok?:boolean;task?:SessionMatchTask|null;error?:string}|null;
+  if(response.ok&&data?.ok)return data.task??null;
+  if(response.status===409&&data?.error==='AI_TASK_IN_PROGRESS'){
+   await new Promise<void>((resolve,reject)=>{const stop=()=>{clearTimeout(timer);reject(signal?.reason)};const timer=setTimeout(()=>{signal?.removeEventListener('abort',stop);resolve()},1000);signal?.addEventListener('abort',stop,{once:true});});
+   continue;
+  }
+  throw new MatchError(response.status,errorMap[data?.error||'']||'暂时无法读取或更新原任务。',response.status>=500||response.status===429);
+ }
+}
+export const readSessionMatchTask=(signal?:AbortSignal)=>sessionTaskRequest(undefined,signal);
+export async function beginSessionMatchTask(text:string,opts:MatchOptions,resumeId:string|undefined,signal:AbortSignal,id:string=crypto.randomUUID()){
+ if(!MATCH_V4_PREVIEW)return null;
+ const task=await sessionTaskRequest({action:'start',task_id:id,text:redactResumeTextLocally(text),
+  options:{country:'CN',role_hint:opts.role_hint},resume_id:resumeId||null,consent:true,recovery_consent:true},signal);
+ if(!task)throw new MatchError(503,'无法建立可恢复的研究任务。');
+ announceMatchTask();return {task,attached:task.id!==id};
+}
+export async function advanceSessionMatchTask(task:SessionMatchTask,signal:AbortSignal){
+ const next=await sessionTaskRequest({action:'continue',task_id:task.id,generation:task.generation},signal);
+ if(!next)throw new MatchError(409,'当前研究任务已结束。');
+ announceMatchTask();return next;
+}
+export async function closeSessionMatchTask(task:Pick<SessionMatchTask,'id'|'generation'>,terminate=false,signal?:AbortSignal){
+ await sessionTaskRequest({action:terminate?'cancel':'close',task_id:task.id,generation:task.generation},signal);
+ announceMatchTask();
+}
 type MatchContinuation={status:'CONTINUE';continuation:{state:unknown;token:string}};
 type MatchStreamResponse=MatchResponse|MatchContinuation;
 // Only an opaque ID and expiry are persisted locally; no raw CV, access
@@ -487,7 +534,7 @@ export async function submitExtractedResumeText(
   const response=await fetch(EFFECTIVE_API+'/resume',{
    method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
-   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,...(task?{task_id:task.id,research_generation:opts.research_generation??0}:{}),
+   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,...(task?{task_id:task.id,research_generation:opts.research_generation??0}:{}),...(opts.managed_task?{task_managed:true}:{}),
     options:{country:'CN',remote_only:false,
      role_hint:opts.role_hint,
      ...(!MATCH_V4_PREVIEW?{limit:Math.min(10,Math.max(1,opts.limit||10))}:{}),
