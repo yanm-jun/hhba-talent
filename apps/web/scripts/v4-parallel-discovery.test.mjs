@@ -76,6 +76,7 @@ test('pipeline allocates idle transport slots to verification backlog without re
  assert.deepEqual(pipelineWidths({discoveryWidth:4},5),{discovery:3,verification:2});
  assert.deepEqual(pipelineWidths({discoveryWidth:4},100),{discovery:2,verification:3});
  assert.deepEqual(pipelineWidths({discoveryWidth:4,pipelineVerificationWidth:1},100),{discovery:4,verification:1});
+ assert.deepEqual(pipelineWidths({discoveryWidth:4,pipelineVerificationWidth:4},100),{discovery:1,verification:4});
  assert.equal(verificationSnapshot({},3).verificationBatch,3);
 });
 test('a fast independent JD is scored before a slow sibling page finishes',async()=>{
