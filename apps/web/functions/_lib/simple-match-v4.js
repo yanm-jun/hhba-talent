@@ -1022,7 +1022,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   }
   if(activeResumePage&&response.status==='completed'&&!data.format_error&&searchResumeOffset<resume.length)searchResumeOffset=Math.min(resume.length,activeResumePage.offset+activeResumePage.page_length);
   if(curated&&typeof data.research_notes==='string'&&data.research_notes.trim()&&!researchNotes.includes(data.research_notes.trim()))researchNotes.push(data.research_notes.trim());
-  if(curated&&response.status==='completed'&&!data.format_error){researchDigest=v4AcceptResearchDigest(data,researchDigest,researchNotes);}
+  if(curated&&response.status==='completed'&&!data.format_error){researchDigest=v4AcceptResearchDigest(data,researchDigest,researchNotes);if(researchDigest)note('AI_RESEARCH_DIGEST_ACCEPTED');}
   const p=v4GroundProfile(data,resume);
   if(p.facts.length||p.target_roles.length||p.summary){
    const union=(a,b,key)=>[...new Map([...a,...b].map(x=>[key(x),x])).values()];
@@ -1121,7 +1121,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      if(repeated&&!(action.type==='read_page'&&action.refresh===true)&&!v4MayContinueBrowserRead(action,publicEvidence,env.BROWSER))return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
      actionSeen.add(actionKey);
      const before=v4ResearchEvidenceProgress(publicEvidence);
-     const result=action.type==='text_page'&&action.collection==='resume'?resumePageRef(action.offset,Math.max(256,Math.floor(researchContextBudget/actions.length))):await run();v4RememberPublicResult(publicEvidence,result);
+     const result=action.type==='text_page'&&action.collection==='resume'?resumePageRef(action.offset,Math.max(256,Math.floor(researchContextBudget/actions.length))):await run();v4RememberPublicResult(publicEvidence,result);if(result.reused_task_evidence)note('AI_TASK_PUBLIC_EVIDENCE_REUSED');
      if(repeated&&v4ResearchEvidenceProgress(publicEvidence)===before)return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
      if(result.ok&&action.type==='read_page'){
       // Grounding redirects are leads; the independently read final URL is a new source, not a verified JD.
@@ -1230,7 +1230,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    return continuation('verification',{next:0,processedEarlier:[...done],processedEvidence:[...revisions],explicitRechecks:[...rechecks],matches:mergeJobEvidence(previousMatches,accepted),read:(checkpoint?.read||0)+officialCompleted,scored:(checkpoint?.scored||0)+officialCompleted,archived:(checkpoint?.archived||0)+archivedCompleted,scoreFailures:checkpoint?.scoreFailures||0,reportFailures:checkpoint?.reportFailures||0,verificationReads:[...verificationReads].filter(([u])=>!urls.has(u)),verificationBatch:batch}).checkpoint;
   };
   if(curated&&checkpoint)onRecoveryState(()=>verificationRecovery());
- const batchScore=overlap&&(fullResearch||provider?.kind!=='gemini')&&entries.length>1?makeBatchScorer({call:p=>v4Call(verificationFetcher,provider,p,{signal,stage:'score'}),parse:v4ParseJson,resume,roleHint,budget:researchContextBudget,note,signal}):null;
+ const batchScore=curated&&(fullResearch||provider?.kind!=='gemini')&&entries.length>1?makeBatchScorer({call:p=>v4Call(verificationFetcher,provider,p,{signal,stage:'score'}),parse:v4ParseJson,resume,roleHint,budget:researchContextBudget,note,signal,delay:provider?.kind==='gemini'?80:250}):null;
  const worker=async()=>{
   while(cursor<entries.length){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
