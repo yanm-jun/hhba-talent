@@ -139,7 +139,8 @@ test('finance code and UI are isolated, do not autofetch D1, and preserve guarde
  assert.equal(advanced,false);
  const ui=readFileSync(new URL('../../admin-preview/finance.js',import.meta.url),'utf8');
  const html=readFileSync(new URL('../../admin-preview/index.html',import.meta.url),'utf8');
- assert.match(ui,/window\.hhbaFinance=\{open\(\)\{/);
+ assert.match(ui,/window\.hhbaFinance\s*=\s*\{\s*open\(\)\s*\{/);
+ assert.match(ui,/open\(\)\s*\{\s*\/\/ No automatic KV \/ D1 reads[^\n]*\n\s*\}/);
  assert.match(ui,/x-hhba-finance-request/i);
  assert.match(html,/id="view-finance"/);
  assert.match(html,/id="finance-evidence"/);
