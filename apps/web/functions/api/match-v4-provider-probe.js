@@ -18,6 +18,17 @@ const searchPayload={instructions:'Use actual Google Search to find several curr
 // check. All inputs are fixed synthetic data or independently read public JDs.
 export async function runGeminiProbe(provider,phase,{fetcher=fetch,signal}={}){
  const call=(payload,options={})=>callGeminiJob(fetcher,{...provider,...options},payload,{signal});
+ if(phase==='transport_chat'){
+  // Explicitly test the relay's OpenAI-compatible endpoint with the
+  // Gemini credential, selected model, and fixed public synthetic input.
+  // Never forward user data or follow redirects.
+  const base=provider.baseUrl.replace(/\/v1$/,'');
+  const r=await fetcher(base+'/v1/chat/completions',{method:'POST',redirect:'manual',headers:geminiRequestHeaders({...provider,authMode:'bearer'}),body:JSON.stringify({model:provider.model,messages:[{role:'user',content:'Reply only with OK.'}],stream:false}),signal});
+  let j;try{j=await r.json();}catch{}
+  const candidate=j?.choices?.[0],valid=r.ok&&candidate?.finish_reason==='stop'&&typeof candidate.message?.content==='string'&&candidate.message.content.trim()==='OK';
+  const reported=typeof j?.model==='string'?j.model:null;
+  return {ok:!!valid,upstream_http_status:r.status,chat_response:!!valid,reported_model_matches:reported===provider.model,reported_model_present:reported!==null};
+ }
  if(phase==='transport'||phase==='transport_bearer'){
   // Fixed synthetic request isolates route/authentication from complex prompts
   // and optional features. A successful HTTP status alone is insufficient.
@@ -100,7 +111,7 @@ export async function onRequest({request,env}){
   }},503);
  }
  const phase=new URL(request.url).searchParams.get('phase')||'basic';
- if(!['basic','search','pipeline','stream','url_context','metadata','cache','transport','transport_bearer'].includes(phase))return reply({error:'INVALID_PROBE_PHASE'},400);
+ if(!['basic','search','pipeline','stream','url_context','metadata','cache','transport','transport_bearer','transport_chat'].includes(phase))return reply({error:'INVALID_PROBE_PHASE'},400);
  const start=Date.now();
  try{
   const result=await runGeminiProbe(provider,phase,{signal:request.signal});
