@@ -1,0 +1,27 @@
+name: HHBA live Token efficiency synthetic acceptance
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/scripts/v4-token-live-acceptance.mjs'
+      - '.github/workflows/hhba-v4-token-live-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synthetic-live:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Three small real model requests using fictional inputs
+        working-directory: apps/web
+        env:
+          HHBA_AGENT_RELAY_API_KEY: ${{ secrets.HHBA_AGENT_RELAY_API_KEY }}
+          HHBA_AGENT_RELAY_BASE_URL: ${{ vars.HHBA_AGENT_RELAY_BASE_URL }}
+          HHBA_AGENT_RELAY_MODEL: ${{ vars.HHBA_AGENT_RELAY_MODEL }}
+          HHBA_AGENT_RELAY_STREAM: ${{ vars.HHBA_AGENT_RELAY_STREAM }}
+        run: node scripts/v4-token-live-acceptance.mjs
