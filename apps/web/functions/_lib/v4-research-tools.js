@@ -10,12 +10,20 @@ export function v4ResearchMemoryPage(items,cursor=0,budget=90000){
  for(;i<all.length;i++){
   const cost=JSON.stringify(all[i]).length+1;
   if(page.length&&size+cost>bytes)break;
+  if(!page.length&&size+cost>bytes){
+   page.push({oversized_record:true,record_index:i,total_chars:JSON.stringify(all[i]).length});i++;break;
+  }
   page.push(all[i]);size+=cost;
  }
  return {items:page,cursor:start,next_cursor:i<all.length?i:null,total:all.length};
 }
 // Transport size is learned from the provider's actual acceptance, not a fixed research quota.
 // Grow only when there was omitted data; after a context rejection, learn a safe ceiling.
+export function v4MemoryRecordPage(items,index,offset=0,budget=90000){
+ if(!Number.isSafeInteger(index)||index<0||index>=items.length)return {ok:false,error:'UNKNOWN_MEMORY_RECORD'};
+ const raw=JSON.stringify(items[index]),page=v4NotesMemoryPage([raw],offset,budget);
+ return {ok:true,record_index:index,offset:page.cursor,text:page.items.join(''),next_offset:page.next_cursor,total_chars:raw.length,unit:'characters',encoding:'json'};
+}
 export function v4ContextState(value,initial=90000){
  const budget=Number.isSafeInteger(value?.budget)&&value.budget>=256?value.budget:initial;
  return {budget,rejectedAt:Number.isSafeInteger(value?.rejectedAt)&&value.rejectedAt>budget?value.rejectedAt:null};
@@ -64,6 +72,7 @@ export async function v4RunResearchAction(action,{collections,knownUrls,fetcher,
  if(type==='memory'){
   const name=action.collection;
   if(!Object.hasOwn(collections,name))return {type,ok:false,error:'UNKNOWN_MEMORY_COLLECTION'};
+  if(Number.isSafeInteger(action.index)&&name!=='notes')return {type,collection:name,...v4MemoryRecordPage(collections[name],action.index,action.offset,budget)};
   return {type,collection:name,ok:true,...(name==='notes'?v4NotesMemoryPage(collections[name],action.cursor,budget):v4ResearchMemoryPage(collections[name],action.cursor,budget))};
  }
  const url=v4PublicJobUrl(action?.url);
@@ -103,7 +112,7 @@ export async function v4RunResearchActions(actions,opts){
  }
  return out;
 }
-const stageGuide='可调用 research_actions 数组或 research_action 单项工具。除公开来源工具外，{type:"text_page",collection:"resume"|"jd"|"document",offset:字符偏移} 可读取当前任务原文的后续页。原文仅用于本次模型研究，禁止作为搜索词或传往网页工具。若输入显示分页，必须阅读全部相关原文并结合证据再判断。可用 research_notes 保留可核对的阶段研究发现，供后续阶段复用；不得在笔记中记录个人联系方式或复制完整简历，笔记仅为本任务的分析上下文；不能用摘要替代原文证据。当前阶段如需复查网页，使用 read_page；recheck只在全局搜索与复盘阶段执行，不直接改变已核验JD。';
+const stageGuide='memory 若返回 oversized_record:true，使用 {type:"memory",collection:对应集合,index:record_index,offset:0} 读取该原始JSON记录，按 next_offset 继续，不能把索引占位符当成完整记录。可调用 research_actions 数组或 research_action 单项工具。除公开来源工具外，{type:"text_page",collection:"resume"|"jd"|"document",offset:字符偏移} 可读取当前任务原文的后续页。原文仅用于本次模型研究，禁止作为搜索词或传往网页工具。若输入显示分页，必须阅读全部相关原文并结合证据再判断。可用 research_notes 保留可核对的阶段研究发现，供后续阶段复用；不得在笔记中记录个人联系方式或复制完整简历，笔记仅为本任务的分析上下文；不能用摘要替代原文证据。当前阶段如需复查网页，使用 read_page；recheck只在全局搜索与复盘阶段执行，不直接改变已核验JD。';
 export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetcher,browser,signal,resume='',jd='',document='',collections={},ledger=[],taskNotes,note=()=>{},privateOnly=false,initialPaged=false}={}){
  const original=JSON.parse(payload.input);
  const knownUrls=new Set([...sourceUrls,...ledger.map(r=>r.url)].map(v4PublicJobUrl).filter(Boolean));
@@ -132,6 +141,7 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
    input.original_text_pages=Object.fromEntries(Object.entries(originals).map(([name,value])=>[name,{total_chars:value.length,next_offset:value.length>budget?budget:null}]));
   }
   if(results)input.research_tool_results=results;
+  const sentBudget=budget;
   const indexPage=v4RotatingMemoryPage(v4EvidenceIndex(stageLedger),evidenceCursor,Math.max(256,Math.floor(budget/3)));
   if(stageLedger.length)input.research_evidence={total:indexPage.total,cursor:indexPage.cursor,next_cursor:indexPage.next_cursor,items:indexPage.items};
   const notesPage=v4NotesMemoryPage(notes,notesCursor,Math.max(256,Math.floor(budget/3)),{rotate:true});
@@ -144,7 +154,7 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
   }
   let data;try{data=parse(response)}catch{return response;}
   const actions=v4RequestedActions(data);
-  if(paged){remember('resume',0,Math.min(resume.length,budget));remember('jd',0,Math.min(jd.length,budget));remember('document',0,Math.min(document.length,budget));for(const r of results||[])if(r.ok&&r.type==='text_page'&&Object.hasOwn(delivered,r.collection))remember(r.collection,r.offset,r.offset+r.text.length);}
+  if(paged){remember('resume',0,Math.min(resume.length,sentBudget));remember('jd',0,Math.min(jd.length,sentBudget));remember('document',0,Math.min(document.length,sentBudget));for(const r of results||[])if(r.ok&&r.type==='text_page'&&Object.hasOwn(delivered,r.collection))remember(r.collection,r.offset,r.offset+r.text.length);}
   if(response.status==='completed'){evidenceCursor=indexPage.next_cursor??0;notesCursor=notesPage.next_cursor??0;contextState=v4ContextFeedback(contextState,{more:indexPage.next_cursor!==null||notesPage.next_cursor!==null});budget=contextState.budget;}
   if(typeof data.research_notes==='string'&&data.research_notes.trim()&&!notes.includes(data.research_notes.trim())){const n=data.research_notes.trim();notes.push(n);if(Array.isArray(taskNotes)&&!taskNotes.includes(n))taskNotes.push(n);}
   if(!actions.length){
