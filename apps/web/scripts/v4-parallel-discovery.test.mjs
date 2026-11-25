@@ -423,3 +423,23 @@ test('activated OpenAI global ranking receives every one of 502 eligible candida
  assert.equal(result.checkpoint.globalRankState.done,true);
  assert.equal(new Set(result.checkpoint.globalOrder).size,502);
 });
+
+
+test('OpenAI and Gemini both default to parallel research and clamp transport slots',async()=>{
+ const {v4ParallelResearchEnabled,nextDiscoveryWidth}=await import('../functions/_lib/v4-parallel-discovery.js');
+ assert.equal(v4ParallelResearchEnabled({HHBA_V4_JOB_PROVIDER:'openai'}),true);
+ assert.equal(v4ParallelResearchEnabled({HHBA_V4_JOB_PROVIDER:'gemini'}),true);
+ assert.equal(v4ParallelResearchEnabled({}),true);
+ assert.equal(v4ParallelResearchEnabled({HHBA_V4_PARALLEL_RESEARCH:'0'}),false);
+ assert.equal(nextDiscoveryWidth(6,['AI_PROVIDER_RESPONSE_INVALID'],{maxConnections:4}),4);
+});
+test('stalled research consumes unread pages and alternate browser evidence without repeating failed actions',async()=>{
+ const {v4NextStallRead}=await import('../functions/_lib/v4-research-tools.js');
+ const u='https://careers.example.cn/job/1',attempted=new Set();
+ const pick=ledger=>v4NextStallRead([u],ledger,attempted,true);
+ assert.equal(pick([]).mode,'static');attempted.add(JSON.stringify([u,'static',0]));
+ const ledger=[{type:'read_page',url:u,mode:'static',offset:0,next_offset:200,text:'first'}];
+ assert.equal(pick(ledger).offset,200);attempted.add(JSON.stringify([u,'static',200]));
+ assert.equal(pick(ledger).mode,'browser');attempted.add(JSON.stringify([u,'browser',0]));
+ assert.equal(pick(ledger),null);
+});

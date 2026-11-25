@@ -1,0 +1,24 @@
+name: HHBA V4 capability regression
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/functions/_lib/v4-*.js'
+      - 'apps/web/functions/_lib/simple-match-v4.js'
+      - 'apps/web/functions/api/match-v4/**'
+      - 'apps/web/src/components/MatchResearchPanels.tsx'
+      - 'apps/web/scripts/v4-parallel-discovery.test.mjs'
+      - '.github/workflows/hhba-v4-capability-regression.yml'
+permissions:
+  contents: read
+jobs:
+  v4-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test apps/web/scripts/v4-parallel-discovery.test.mjs apps/web/scripts/simple-match-v4.contract.test.mjs apps/web/scripts/v4-session-match-task.test.mjs
+      - working-directory: apps/web
+        run: npm ci --ignore-scripts && npm run build

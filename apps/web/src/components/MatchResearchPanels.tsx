@@ -67,7 +67,7 @@ function JdResearchContent({job}:{job:MatchedJob}){
  const norm=(s:string)=>s.replace(/\s+/g,' ').trim();
  return <>
   {requirements&&excerpt&&norm(excerpt).includes(norm(requirements))&&norm(requirements)!==norm(excerpt)&&<section className="hhba-refined-section"><h3>岗位要求</h3><p>{recruitmentText(requirements)}</p></section>}
-  {excerpt&&<section className="hhba-refined-section"><h3>完整 JD 原文</h3><p>{recruitmentText(excerpt)}</p></section>}
+  {excerpt&&<section className="hhba-refined-section"><h3>{confirmed(job)?'完整 JD 原文':'已读取的公开资料片段 · 非完整官方JD'}</h3><p style={{whiteSpace:'pre-wrap'}}>{recruitmentText(excerpt)}</p></section>}
  </>;
 }
 export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=false,progressStage='preparing',activity,elapsed,selection,onSelectionChange,onFollow,selectedJobUrl,onJobChange,onOptimize,optimizationAvailable=false}:{
@@ -113,6 +113,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
  const verified=all.filter(confirmed);
  // Preserve backend global ranking; research leads never enter this pager.
  const jdItems=verifiedMatchReports(officialJobs);
+ const scoredPending=all.filter(j=>(confirmed(j)&&scoreGrounded(j)||j.reference_vacancy_verified===true&&j.evidence_score_status==='AI_REFERENCE_JD_SCORED')&&reportScore(j)!==null&&j.curated_suitable===true&&!j.excluded_closed&&!j.excluded_board&&j.availability_status!=='CLOSED_LISTED'&&j.availability_status!=='POSSIBLY_CLOSED'&&!jdItems.some(item=>item.official_url===j.official_url));
  const currentJdIndex=Math.max(0,jdItems.findIndex(j=>j.official_url===(selectedJobUrl??localJobUrl)));
  const jdJob=jdItems[currentJdIndex];
  const changeJob=(next:number)=>{
@@ -182,6 +183,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
     {jdJob.research_detail&&<CuratedJobReport detail={jdJob.research_detail} reference={jdJob.reference_jd_kind==='AI_GENERATED_REFERENCE'}/>}
     <RecruitmentSourceLinks job={jdJob}/>
    </article></>:empty(pending?'正在核验官方 JD 并完成证据评分。完整报告生成后自动展示。':'本次尚无完成岗位真实性核验和可靠适配报告的推荐，其他AI参考分析保留在搜索记录。')}
+   {scoredPending.length>0&&<details className="hhba-refined-details"><summary>已有可靠评分 · 待报告或全局排名（{scoredPending.length}）</summary><p className="hhba-refined-note">以下为独立评分研究成果，尚不是最终精选推荐。官方原文和 AI 参考JD分别标注。</p>{scoredPending.map(job=><details key={job.official_url}><summary>{job.company} · {job.title_zh||job.title} · {reportScore(job)} 分</summary><JobTitle job={job}/><p>{reportScoreLabel(job)}</p>{job.recommendation_reason&&<p>{job.recommendation_reason}</p>}{job.score_basis&&<p className="hhba-refined-note">{job.score_basis}</p>}<OfficialLink job={job}/><JdResearchContent job={job}/><RecruitmentSourceLinks job={job}/></details>)}</details>}
    {pendingCount>0&&<p className="hhba-refined-note" role="status">{pending?pendingCount+' 个候选仍在核验或研究中，尚未进入正式推荐。':pendingCount+' 个候选未取得可靠的官方证据，未纳入推荐。'}<button type="button" onClick={()=>{setSelected(1);onSelectionChange?.(1)}}>查看搜索记录</button></p>}
    <p className="hhba-refined-note hhba-compact-disclaimer">匹配分用于求职参考，不是录用概率。</p>
   </>}
