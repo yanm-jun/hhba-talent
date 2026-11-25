@@ -624,7 +624,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const reviewedSources=new Map(checkpoint?.reviewedSources||[]),publicEvidence=checkpoint?.publicEvidence||[];
  const processedEvidence=new Map(checkpoint?.processedEvidence||[]);
  const explicitRechecks=new Set(checkpoint?.explicitRechecks||[]),recheckedEvidence=new Set(checkpoint?.recheckedEvidence||[]);
- const actionSeen=new Set(checkpoint?.actionSeen||[]);
+ const actionSeen=new Set(checkpoint?.actionSeen||[]),stallSourceReads=new Set(checkpoint?.stallSourceReads||[]);
  let researchToolResult=checkpoint?.researchToolResult||null;
  const researchNotes=Array.isArray(checkpoint?.researchNotes)?[...checkpoint.researchNotes]:[];
  const jobMemory=candidateResearchMemory(checkpoint?.candidateResearchMemory||[]);
@@ -646,7 +646,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  let completionReason=checkpoint?.completionReason||'';
  const note=code=>{diag[code]=(diag[code]||0)+1;};
  const publishResearch=()=>onResearch(report());
- const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,verificationReads:checkpoint?.verificationReads||[],rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],researchToolResult,researchNotes,candidateResearchMemory:jobMemory.snapshot(),researchContextBudget,researchContext,memoryCursors,discoveryWidth,discoveryElapsed,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,pipelineActive:!!checkpoint?.pipelineActive,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],scoreRecoveryKeys:checkpoint?.scoreRecoveryKeys||[],globalOrder:checkpoint?.globalOrder||null,globalRankState:checkpoint?.globalRankState||null,globalRankError:checkpoint?.globalRankError||null,...extra}});
+ const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,verificationReads:checkpoint?.verificationReads||[],rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],stallSourceReads:[...stallSourceReads],researchToolResult,researchNotes,candidateResearchMemory:jobMemory.snapshot(),researchContextBudget,researchContext,memoryCursors,discoveryWidth,discoveryElapsed,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,pipelineActive:!!checkpoint?.pipelineActive,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],scoreRecoveryKeys:checkpoint?.scoreRecoveryKeys||[],globalOrder:checkpoint?.globalOrder||null,globalRankState:checkpoint?.globalRankState||null,globalRankError:checkpoint?.globalRankError||null,...extra}});
  onRecoveryState(()=>checkpoint?{...checkpoint,publicEvidence,researchNotes,candidateResearchMemory:jobMemory.snapshot()}:null);
  // This phase is reachable only after every candidate has completed a verification
  // attempt. Report generation cannot influence the initial score ranking.
@@ -1043,7 +1043,22 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   lastSignature=signature;
   if(madeProgress){stalledStrategy='';stalledSearches.clear();}
   const strategySignature=await sha256Hex(JSON.stringify({candidates:signature,queries:[...queries].sort(),strategy:text(data.search_strategy),status:response.status,...(adaptiveResearch?{memoryCursors}: {})}));
-  const independentStallReview=(kind,key)=>{if(!curated)return false;const review=kind+':'+key;if(reviewedStalls.has(review))return false;reviewedStalls.add(review);note('AI_INDEPENDENT_SEARCH_REVIEW');recoveryHint='独立复盘：当前策略未带来新的可核验证据，但不代表已研究充分。请检查遗漏的职业方向、企业官方入口、尚未解决的来源或其他工具，选择不同的有效研究路径。若确已没有新增价值，请明确说明停止依据。';return true;};
+  const independentStallReview=async(kind,key)=>{
+   if(!curated)return false;
+   const review=kind+':'+key;
+   if(!reviewedStalls.has(review)){
+    reviewedStalls.add(review);note('AI_INDEPENDENT_SEARCH_REVIEW');recoveryHint='独立复盘：当前策略未带来新的可核验证据，但不代表已研究充分。请检查遗漏的职业方向、企业官方入口、尚未解决的来源或其他工具，选择不同的有效研究路径。若确已没有新增价值，请明确说明停止依据。';return true;
+   }
+   if(!fullResearch)return false;
+   // Supply actual unread evidence rather than only repeating a prompt.
+   const u=[...sourceLeads].find(u=>!rows.has(u)&&!reviewedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u)&&!stallSourceReads.has(u)&&!publicEvidence.some(r=>r.url===u&&r.type==='read_page'));
+   if(!u)return false;
+   stallSourceReads.add(u);
+   researchToolResult=await v4RunResearchAction({type:'read_page',url:u},{collections:{},knownUrls:v4KnownPublicResearchUrls([u],publicEvidence),fetcher,browser:env.BROWSER,signal,budget:researchContextBudget,ledger:publicEvidence});
+   v4RememberPublicResult(publicEvidence,researchToolResult);note('AI_STALL_PUBLIC_SOURCE_REVIEW');
+   recoveryHint='独立复盘补充了此前未读的公开来源或实际读取失败信息，请依据工具结果判断具体岗位、查找可替代来源或说明无法继续的证据。';
+   return true;
+  };
   if(curated){
    const actions=v4RequestedActions(data);
    if(actions.length){
@@ -1080,7 +1095,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   }
   if(response.status==='incomplete'){
    researchError='AI_PROVIDER_INCOMPLETE';
-   if(!madeProgress&&stalledStrategy===signature){if(independentStallReview('incomplete',signature))continue;note('PROVIDER_INCOMPLETE_NO_PROGRESS');break;}
+   if(!madeProgress&&stalledStrategy===signature){if(await independentStallReview('incomplete',signature))continue;note('PROVIDER_INCOMPLETE_NO_PROGRESS');break;}
    stalledStrategy=signature;
    recoveryHint='上轮输出未完整结束，请从已有来源继续研究；分批输出完整JSON，不重复已收集内容。';
    continue;
@@ -1091,20 +1106,20 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   if(curated&&searchResumePaged&&searchResumeOffset<resume.length&&response.status==='completed'&&!data.format_error){recoveryHint='简历原文已分段提交，继续研究尚未送达的后续页；保留前面发现的职业方向及候选。';continue;}
   if(data.research_complete===true&&data.continue_search!==true){
    if(curated&&[...sourceLeads].some(u=>!rows.has(u)&&!submittedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u))){recoveryHint='请先研究尚未分类的真实公开引用，识别其中具体招聘岗位或明确说明无有效岗位，不把普通网页计入候选。';continue;}
-   if(curated&&concreteCount()<CANDIDATE_TARGET&&independentStallReview('candidate-target-completion',signature)){recoveryHint+=' 请独立检索尚未覆盖的企业、岗位别名和官方招聘入口，依据真实查询与证据决定是否结束。';continue;}
+   if(curated&&concreteCount()<CANDIDATE_TARGET&&await independentStallReview('candidate-target-completion',signature)){recoveryHint+=' 请独立检索尚未覆盖的企业、岗位别名和官方招聘入口，依据真实查询与证据决定是否结束。';continue;}
    if(curated&&concreteCount()<CANDIDATE_TARGET&&(madeProgress||!text(data.completion_reason))&&stalledStrategy!==signature){stalledStrategy=signature;recoveryHint='当前尚未达到500个具体候选。请独立复查新企业、职业方向与官方渠道；如果确无新增可靠岗位，明确返回research_complete=true及completion_reason，说明覆盖和停止依据。';continue;}
    researchComplete=true;researchError=curated&&concreteCount()<CANDIDATE_TARGET&&!text(data.completion_reason)?'AI_RESEARCH_COMPLETION_UNCONFIRMED':null;completionReason=text(data.completion_reason)||'AI 已声明研究完成；接口未提供详细停止理由。';
   }
   else if(data.research_complete!==false&&data.continue_search!==true){
    researchError='AI_RESEARCH_COMPLETION_UNCONFIRMED';
-   if(!madeProgress&&stalledStrategy===signature){if(independentStallReview('completion',signature))continue;note('COMPLETION_UNCONFIRMED');break;}
+   if(!madeProgress&&stalledStrategy===signature){if(await independentStallReview('completion',signature))continue;note('COMPLETION_UNCONFIRMED');break;}
    stalledStrategy=signature;
    recoveryHint='上轮未明确研究是否完成。请检查已有来源并继续有价值的研究，务必明确返回 research_complete。';
    continue;
   }else if(!madeProgress){
    researchError='AI_RESEARCH_NO_NEW_EVIDENCE';
-   if(curated?stalledSearches.has(strategySignature):stalledStrategy===signature){if(independentStallReview('strategy',strategySignature))continue;
-    if(adaptiveResearch&&[...sourceLeads].some(u=>!rows.has(u)&&!reviewedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u))&&independentStallReview('unresolved-source-review',signature)){recoveryHint='仍有未分类或尚未核验的公开来源。请读取这些来源、翻页或更换查询策略，不得把未处理当作研究完成。';continue;}note('REPEATED_SEARCH_NO_PROGRESS');researchError='AI_RESEARCH_NO_NEW_EVIDENCE';break;}
+   if(curated?stalledSearches.has(strategySignature):stalledStrategy===signature){if(await independentStallReview('strategy',strategySignature))continue;
+    if(adaptiveResearch&&[...sourceLeads].some(u=>!rows.has(u)&&!reviewedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u))&&await independentStallReview('unresolved-source-review',signature)){recoveryHint='仍有未分类或尚未核验的公开来源。请读取这些来源、翻页或更换查询策略，不得把未处理当作研究完成。';continue;}note('REPEATED_SEARCH_NO_PROGRESS');researchError='AI_RESEARCH_NO_NEW_EVIDENCE';break;}
    stalledSearches.add(strategySignature);stalledStrategy=signature;
    recoveryHint='上一轮没有新增具体岗位。请换搜索策略：扩展真实可迁移技能对应的岗位名称、企业招聘渠道、地点和关键词组合，优先查找尚未出现的企业官网。若确实没有更多可靠证据，请明确 research_complete=true。';
    continue;
