@@ -258,3 +258,22 @@ test('consented V4 page OCR passes a page image rather than invalid split PDF by
  });
  assert.equal(result.text,'本页真实文字');assert.equal(result.partial,false);
 });
+
+test('operator Gemini probe is disabled without a configured secret',async()=>{
+ const {onRequest}=await import('../functions/api/match-v4-provider-probe.js');
+ const response=await onRequest({request:new Request('https://hhba.work/api/match-v4-provider-probe?phase=basic'),env:{}});
+ assert.equal(response.status,404);
+});
+test('basic probe cannot report stream support from a buffered JSON fallback',async()=>{
+ const {runGeminiProbe}=await import('../functions/api/match-v4-provider-probe.js');
+ const fetcher=async()=>Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"ok":true}'}]}}]});
+ const provider=v4JobProvider(env);
+ assert.equal((await runGeminiProbe(provider,'basic',{fetcher})).ok,true);
+ assert.equal((await runGeminiProbe(provider,'stream',{fetcher})).ok,false);
+});
+test('real search acceptance rejects ungrounded candidate claims',async()=>{
+ const {runGeminiProbe}=await import('../functions/api/match-v4-provider-probe.js');
+ const fetcher=async()=>Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"jobs":[{"company":"Example","title":"Operations","location":"Shanghai","url":"https://careers.example.com/jobs/123"}]}'}]}}]});
+ const result=await runGeminiProbe(v4JobProvider(env),'search',{fetcher});
+ assert.equal(result.ok,false);assert.equal(result.grounded,false);
+});
