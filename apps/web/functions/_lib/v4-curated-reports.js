@@ -41,6 +41,42 @@ export function validateCuratedReport(value,resume,jd){
   strengths:str(value.strengths),risks:str(value.risks),career_development:str(value.career_development),optimization_advice:str(value.optimization_advice),competition:str(value.competition),score_explanation:str(value.reason),
   extra_sections:Array.isArray(value.extra_sections)?value.extra_sections.filter(x=>str(x?.title)&&str(x?.content)).map(x=>({title:str(x.title),content:str(x.content)})):[]}};
 }
+// Completeness is about meaningful coverage, not a word count or a fixed
+// number of bullets. The model reviews its own output against the full input;
+// evidence validation remains independent of that self-assessment.
+export function reportCoverageErrors(value,jd,{reference=false}={}){
+ if(value?.suitable!==true)return [];
+ const errors=[],review=value.quality_review;
+ if(!review||review.status!=='complete'||!str(review.explanation)||!Array.isArray(review.missing)||review.missing.length)errors.push('quality_review_incomplete');
+ if(!Array.isArray(value.comparisons)||!value.comparisons.length)errors.push('missing_requirement_comparisons');
+ if(reference){
+  const coverage=value.reference_coverage;
+  const duties=norm(coverage?.duties_quote),capabilities=norm(coverage?.capabilities_quote),original=norm(jd);
+  if(!duties||!capabilities||duties===capabilities||duties.includes(capabilities)||capabilities.includes(duties)||!original.includes(duties)||!original.includes(capabilities))errors.push('reference_duties_and_capabilities_coverage');
+ }
+ return errors;
+}
+
+// Reference duties/capability advice must point to actual inputs, not to
+// self-generated text. An exact role title is usable only as direction
+// evidence, never as proof of a specific employer requirement.
+export function referenceSourceErrors(value,job){
+ const facts=Array.isArray(job?.jd_research?.facts)?job.jd_research.facts:[];
+ const anchors=value?.reference_source_anchors;
+ const errors=[];
+ for(const field of ['duties','capabilities']){
+  const a=anchors?.[field],quote=norm(a?.quote);
+  const source=typeof a?.url==='string'?a.url:'';
+  const validFact=!!quote&&facts.some(f=>f.url===source&&norm(f.quote).includes(quote));
+  const validTitle=!!quote&&a?.kind==='title_direction'&&!source&&quote===norm(job?.title);
+  if(!((a?.kind==='public_excerpt'&&validFact)||validTitle))errors.push('reference_source_'+field);
+ }
+ // Where real excerpts are available, at least one must actually inform the
+ // output; title alone is a fallback, not a replacement for public material.
+ if(facts.length&&!['duties','capabilities'].some(k=>anchors?.[k]?.kind==='public_excerpt'&&!errors.includes('reference_source_'+k)))errors.push('reference_public_material_unused');
+ return errors;
+}
+
 export function rankCandidateUrls(payload,rows){
  const ordered=Array.isArray(payload?.ordered_urls)?payload.ordered_urls:[];
  const keys=new Set(rows.map(([url])=>url)),seen=new Set();

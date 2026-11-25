@@ -58,8 +58,8 @@ export function ReportPager({count,index,onChange,pending=false,inline=false}:{c
  </>;
 }
 function JdResearchContent({job}:{job:MatchedJob}){
- if(job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job.reference_jd)return <>
-  <section className="hhba-refined-section"><h3>AI 生成参考 JD</h3><p className="hhba-refined-note">根据真实岗位方向及已有资料推断，不是企业发布的招聘原文。实际职责、资格和薪资以企业确认信息为准。</p><p style={{whiteSpace:'pre-wrap'}}>{recruitmentText(job.reference_jd)}</p><h4>参考依据及不确定性</h4><p>{recruitmentText(job.reference_jd_basis||'')}</p></section>
+ if(job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job.reference_jd&&['COMPLETE','UNAVAILABLE'].includes(job.report_status||''))return <>
+  <section className="hhba-refined-section"><h3>{job.jd_research?.facts?.length?'依据公开资料整理的参考 JD':'依据岗位名称整理的求职参考 JD'}</h3><p className="hhba-refined-note">{job.jd_research?.facts?.length?'优先依据已核对的公开招聘资料整理，推导的能力方向属于求职建议，不是企业新增要求。':'企业具体职责和资格尚无可核对原文，以下为岗位方向的准备建议，并非企业招聘要求。'}</p><p style={{whiteSpace:'pre-wrap'}}>{recruitmentText(job.reference_jd)}</p>{job.report_status==='UNAVAILABLE'&&<p className="hhba-refined-note">岗位参考资料已整理，暂无可靠的简历匹配分，不属于正式推荐。</p>}<h4>整理依据及需要核实的事项</h4><p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{recruitmentText(job.reference_jd_basis||'')}</p></section>
   {!!job.jd_research?.facts.length&&<section className="hhba-refined-section"><h3>已独立读取的公开资料片段</h3>{job.jd_research.facts.map((f,i)=><p key={i}>{recruitmentText(f.quote)}</p>)}</section>}
  </>;
  const requirements=job.requirements_basis?.trim(),excerpt=job.evidence_excerpt?.trim();
@@ -67,7 +67,8 @@ function JdResearchContent({job}:{job:MatchedJob}){
  const norm=(s:string)=>s.replace(/\s+/g,' ').trim();
  return <>
   {requirements&&excerpt&&norm(excerpt).includes(norm(requirements))&&norm(requirements)!==norm(excerpt)&&<section className="hhba-refined-section"><h3>岗位要求</h3><p>{recruitmentText(requirements)}</p></section>}
-  {excerpt&&<section className="hhba-refined-section"><h3>{confirmed(job)?'完整 JD 原文':'已读取的公开资料片段 · 非完整官方JD'}</h3><p style={{whiteSpace:'pre-wrap'}}>{recruitmentText(excerpt)}</p></section>}
+  {!!job.jd_research?.facts?.length&&<section className="hhba-refined-section"><h3>已独立读取的公开资料片段</h3>{job.jd_research.facts.map((f,i)=><div key={i}><p>{recruitmentText(f.quote)}</p><small>{f.context==='same_job'?'该岗位资料':'相关背景 · 非本岗位要求'}</small></div>)}</section>}
+  {excerpt&&<section className="hhba-refined-section"><h3>{confirmed(job)?'完整 JD 原文':'现有岗位资料线索 · 尚非完整官方JD'}</h3><p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{recruitmentText(excerpt)}</p></section>}
  </>;
 }
 export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=false,progressStage='preparing',activity,elapsed,selection,onSelectionChange,onFollow,selectedJobUrl,onJobChange,onOptimize,optimizationAvailable=false}:{
@@ -165,7 +166,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
      {r.queries.length?<ul>{r.queries.map((q,i)=><li key={i}>{q}</li>)}</ul>:<p>接口未返回本轮具体检索词。</p>}</details>)}
    </details>
    <details className="hhba-refined-details"><summary>全部已收到候选岗位（{all.length}）</summary><label className="hhba-refined-filter"><span>筛选企业、岗位或地点</span><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="搜索本次候选记录"/></label>
-    {visible.length?visible.map(job=><div className="hhba-discovery-item" key={job.official_url}><div><JobTitle job={job}/><OfficialLink job={job}/>{job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job.reference_jd&&<details><summary>AI 参考JD · {job.reference_vacancy_verified?'岗位已核验':'岗位真实性待确认'}</summary><JdResearchContent job={job}/>{job.research_detail&&<CuratedJobReport detail={job.research_detail} reference/>}<RecruitmentSourceLinks job={job}/></details>}</div><small>{confirmed(job)||job.reference_vacancy_verified?'来源已核验':'待核验'}</small></div>):empty('没有对应的候选记录。')}
+    {visible.length?visible.map(job=><div className="hhba-discovery-item" key={job.official_url}><div><JobTitle job={job}/><OfficialLink job={job}/>{(job.reference_jd||job.jd_research?.facts?.length||job.evidence_excerpt)&&<details><summary>岗位资料 · {job.reference_vacancy_verified?'岗位已核验':'岗位来源待进一步核验'}</summary><JdResearchContent job={job}/>{job.report_status==='COMPLETE'&&job.research_detail&&<CuratedJobReport detail={job.research_detail} reference={job.reference_jd_kind==='AI_GENERATED_REFERENCE'}/>}<RecruitmentSourceLinks job={job}/></details>}</div><small>{confirmed(job)||job.reference_vacancy_verified?'来源已核验':'待核验'}</small></div>):empty('没有对应的候选记录。')}
    </details>
   </>}
   {active===2&&<>
