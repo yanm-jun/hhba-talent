@@ -187,7 +187,7 @@ export async function auditTargetedResumeSuggestions({env,blocks,job,suggestions
    if(error.message!=='AI_PROVIDER_NOT_CONFIGURED')throw error;
    reviewer=selectProvider(env);
   }
-  const instruction=autonomous?SYSTEM_AUDIT+'\\n同时独立审查当前段落（包括保留原文的决定）是否已经充分体现真实经历与目标JD的关联。对照完整简历上下文与编辑计划，核对跨段引用的事实归属、雇主、项目和日期，允许在摘要或同一经历内真实重组，拒绝错误归属与虚构，判断是否还有实质性且有真实依据的表达改善；如有，needs_revision:true，concern 写明具体可改善的位置、证据和方向；如没有，needs_revision:false。不要为了改动而改动或强制提高分数。缺少事实则建议提问，不可编造。每个检查项返回 blockId、safe、needs_revision、concern。':SYSTEM_AUDIT;
+  const instruction=autonomous?SYSTEM_AUDIT+'\\n同时独立审查当前段落（包括保留原文的决定）是否已经充分体现真实经历与目标JD的关联。对照完整简历上下文与编辑计划，若有 job.prior_match_analysis 则参考其全部岗位研究、评分理由及能力差距，独立重新判断，不能将其当作当前简历的事实证据或必须达到的分数；核对跨段引用的事实归属、雇主、项目和日期，允许在摘要或同一经历内真实重组，拒绝错误归属与虚构，判断是否还有实质性且有真实依据的表达改善；如有，needs_revision:true，concern 写明具体可改善的位置、证据和方向；如没有，needs_revision:false。不要为了改动而改动或强制提高分数。缺少事实则建议提问，不可编造。每个检查项返回 blockId、safe、needs_revision、concern。':SYSTEM_AUDIT;
   const audit=await completeJson(reviewer,instruction,{job,blocks:draftBlocks,...(autonomous?{document_context:reviewContext}:{})},signal,6500);
   checks=Array.isArray(audit.checks)?audit.checks:[];
  }

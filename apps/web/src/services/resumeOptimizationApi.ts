@@ -82,6 +82,7 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
    response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
     headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
     body:JSON.stringify({consent_ai:true,blocks:batch,job,
+     // job includes the selected prior match analysis; never reduce it to a JD summary.
      ...(document?{full_document:{text:document.text,wanted,feedback:document.feedback,review_feedback:reviewFeedback}}:{})})});
   }catch(error){
    if(signal?.aborted)throw signal.reason;

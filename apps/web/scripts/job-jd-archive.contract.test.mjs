@@ -397,3 +397,84 @@ test('V4 Word score and optimization reject stale revision responses and allow f
  assert.doesNotMatch(ui,/prior&&!prior\.pending\.length\?prior\.suggestions/);
  assert.match(ui,/scoreResult\.job_id===targetedJob\.jd_version_id/);
 });
+
+
+test('V4 selected match research reaches real optimization endpoint, planner, writer and independent reviewer',async()=>{
+ const {onRequestPost:optimize}=await import('../functions/api/resume-optimize.js');
+ const env=mockEnv(),saved=await saveVerifiedJobJd(env,baseline());
+ const fact='负责门店销售指标分析与月度复盘。';
+ const req=baseline().sections[1].text;
+ const report={
+  comparisons:[{requirement:req,resume_evidence:fact,status:'supported',analysis:'真实数据分析经验对应职责'}],
+  strengths:'运营与经营分析',risks:'缺乏跨部门协作的明确证据',
+  career_development:'区域运营方向',optimization_advice:'突出月度复盘',
+  competition:'如实陈述',score_explanation:'真实经历支持岗位要求',
+  extra_sections:[{title:'模型自主研究',content:'完整研究资料。'.repeat(2000)}]
+ };
+ const snapshot={official_url:URL,jd_version_id:saved.id,jd_sha256:saved.jd_sha256,match_score:83,
+  reference_score:83,score_basis:'依据真实经历',recommendation_reason:'运营经验匹配',
+  matched:['销售指标分析'],not_evidenced:['跨部门协作'],needs_verification:['联系邮箱 private@example.com'],
+  research_detail:report};
+ const db={prepare(sql){return {bind(){return this},async first(){
+  if(sql.includes('hhba_auth_sessions'))return {phone:'13800000000',revoked:0,expires_at:new Date(Date.now()+3600000).toISOString()};
+  if(sql.includes('hhba_auth_users'))return {role:'candidate'};
+  if(sql.includes("name='hhba_resume_optimization_tasks'"))return {name:'hhba_resume_optimization_tasks'};
+  return null;
+ },async run(){return {success:true,meta:{changes:1}}}}}};
+ Object.assign(env,{HHBA_MATCH_V4_READY:'1',HHBA_MATCH_RUNTIME_MODE:'production',
+  HHBA_AGENT_RELAY_API_KEY:'synthetic-placeholder-secret',HHBA_RESUME_OPTIMIZATION_ENABLED:'1',
+  HHBA_RESUME_OPTIMIZATION_LIMIT_PEPPER:'synthetic-optimization-pepper',HHBA_PNVS_AUTH_DB:db});
+ const calls=[],originalFetch=globalThis.fetch;
+ globalThis.fetch=async(_uri,init)=>{
+  const request=JSON.parse(init.body),input=JSON.parse(request.input);
+  const prior=input.job.prior_match_analysis;
+  assert.equal(input.job.requirements,baseline().full_jd);
+  assert.equal(prior.match_score,83);
+  assert.deepEqual(prior.research_detail,report,'no arbitrary report truncation or omitted sections');
+  assert.deepEqual(prior.not_evidenced,['跨部门协作']);
+  assert.equal(prior.jd_version_matches_current,true);
+  assert.equal(prior.provenance,'CLIENT_MATCH_SNAPSHOT_ADVISORY');
+  assert.ok(!request.input.includes('private@example.com'));
+  assert.ok(!('max_output_tokens' in request));
+  let answer;
+  if(request.instructions.includes('整体编辑计划')){
+   calls.push('plan');assert.equal(input.context,fact);
+   answer={focus:['突出真实复盘经验']};
+  }else if(request.instructions.includes('事实审查员')){
+   calls.push('review');assert.equal(input.document_context.text,fact);
+   answer={checks:[{blockId:'a',safe:true,needs_revision:false,concern:''}]};
+  }else{
+   calls.push('write');assert.equal(input.document_context.text,fact);
+   answer={suggestions:[{id:'s',blockId:'a',action:'replace',original:fact,
+    proposed:'开展销售指标分析，负责门店月度运营复盘。',rationale:'突出岗位相关真实职责',jobRequirement:req}],keep:[]};
+  }
+  return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(answer)}]}]});
+ };
+ try{
+  const result=await optimize({env,request:new Request('https://example.org/api/resume-optimize',{method:'POST',
+   headers:{Origin:'https://example.org',Authorization:'Bearer synthetic-token','Content-Type':'application/json'},
+   body:JSON.stringify({consent_ai:true,blocks:[{id:'a',section:'experience',text:fact}],
+    job:{title:'区域运营经理',requirements:'不可信的客户端摘要',official_url:URL,jd_version_id:saved.id,
+     jd_sha256:saved.jd_sha256,prior_match_analysis:snapshot},full_document:{text:fact}})})});
+  assert.equal(result.status,200,await result.clone().text());
+  const value=await result.json();
+  assert.deepEqual(calls,['plan','write','review']);
+  assert.equal(value.suggestions.length,1);
+  assert.deepEqual(value.pending_block_ids,[]);
+  assert.ok([...env.r2.objects.values()].every(value=>!value.includes(fact)),'shared JD archive stays free of private CV quotes');
+ }finally{globalThis.fetch=originalFetch;}
+});
+
+test('prior research is advisory, keeps same-posting historical versions, ignores other postings and does not invent scores',async()=>{
+ const {preparePriorMatchAnalysis}=await import('../functions/_lib/resume-match-analysis-handoff.js');
+ const job={official_url:URL,jd_version_id:'jd_current',jd_sha256:'current'};
+ const snapshot={official_url:URL,jd_version_id:'jd_old',jd_sha256:'old',match_score:null,reference_score:0,
+  research_detail:{optimization_advice:'历史资料'}}; 
+ const previous=preparePriorMatchAnalysis(snapshot,job,s=>s);
+ assert.equal(previous.jd_version_matches_current,false);
+ assert.equal(previous.match_score,null);
+ assert.equal(previous.reference_score,null);
+ assert.equal(previous.research_detail.optimization_advice,'历史资料');
+ assert.equal(preparePriorMatchAnalysis({...snapshot,official_url:'https://example.org/other'},job,s=>s),undefined);
+ assert.equal(preparePriorMatchAnalysis(snapshot,{official_url:URL},s=>s),undefined);
+});

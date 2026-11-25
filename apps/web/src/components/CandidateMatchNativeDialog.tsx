@@ -5,6 +5,7 @@ import {MatchResearchPanels,matchStageIndex} from './MatchResearchPanels';
 import type {MatchResponse,MatchResearchReport,MatchedJob,NativeMatchActivity,NativeMatchProgress} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
+import {capturePriorMatchAnalysis} from '../services/jobJdArchive';
 // Load Siri/Word only after a candidate explicitly chooses a job, so the
 // existing search-results dialog retains its original performance and look.
 const TargetedResumeOptimization=lazy(()=>import('./TargetedResumeOptimization')
@@ -85,6 +86,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  }
  function asTargetJob(job:MatchResponse['matches'][number]):JobMatch{
   return {
+   prior_match_analysis:capturePriorMatchAnalysis(job),
    id:job.id,company:job.company,title:job.title,title_zh:job.title_zh||null,
    location:job.location,official_url:job.official_url,platform:job.platform,
    remote:job.remote,reference_score:visibleMatchScore(job)??0,
