@@ -57,6 +57,26 @@ export function reportCoverageErrors(value,jd,{reference=false}={}){
  return errors;
 }
 
+// Reference duties/capability advice must point to actual inputs, not to
+// self-generated text. An exact role title is usable only as direction
+// evidence, never as proof of a specific employer requirement.
+export function referenceSourceErrors(value,job){
+ const facts=Array.isArray(job?.jd_research?.facts)?job.jd_research.facts:[];
+ const anchors=value?.reference_source_anchors;
+ const errors=[];
+ for(const field of ['duties','capabilities']){
+  const a=anchors?.[field],quote=norm(a?.quote);
+  const source=typeof a?.url==='string'?a.url:'';
+  const validFact=!!quote&&facts.some(f=>f.url===source&&norm(f.quote).includes(quote));
+  const validTitle=!!quote&&a?.kind==='title_direction'&&!source&&quote===norm(job?.title);
+  if(!((a?.kind==='public_excerpt'&&validFact)||validTitle))errors.push('reference_source_'+field);
+ }
+ // Where real excerpts are available, at least one must actually inform the
+ // output; title alone is a fallback, not a replacement for public material.
+ if(facts.length&&!['duties','capabilities'].some(k=>anchors?.[k]?.kind==='public_excerpt'&&!errors.includes('reference_source_'+k)))errors.push('reference_public_material_unused');
+ return errors;
+}
+
 export function rankCandidateUrls(payload,rows){
  const ordered=Array.isArray(payload?.ordered_urls)?payload.ordered_urls:[];
  const keys=new Set(rows.map(([url])=>url)),seen=new Set();
