@@ -598,7 +598,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    }
   };
   if(needsReport()){
-   const width=parallelResearch?(provider?.kind==='gemini'?(checkpoint?.reportWidth||3):3):1;
+   const width=parallelResearch?(provider?.kind==='gemini'?reportWidth:3):1;
    const batch=pendingReports().slice(0,width);
    const settled=await Promise.allSettled(batch.map(generateReport));
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');

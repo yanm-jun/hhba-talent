@@ -112,7 +112,7 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
   }
   if(results)input.research_tool_results=results;
   const indexPage=v4RotatingMemoryPage(v4EvidenceIndex(stageLedger),evidenceCursor,Math.max(256,Math.floor(budget/3)));
-  if(stageLedger.length)input.research_evidence={total:indexPage.total,next_cursor:indexPage.next_cursor,items:indexPage.items};
+  if(stageLedger.length)input.research_evidence={total:indexPage.total,cursor:indexPage.cursor,next_cursor:indexPage.next_cursor,items:indexPage.items};
   if(notes.length){const latest=v4ResearchMemoryPage([...notes].reverse(),0,Math.max(256,Math.floor(budget/3)));input.research_notes=latest.items.reverse();input.research_notes_index={total:notes.length,collection:'notes',order:'chronological'};}
   let response;
   try{response=await call({...payload,instructions:payload.instructions+' '+V4_RESEARCH_TOOL_GUIDE+' '+stageGuide,input:JSON.stringify(input)})}
@@ -120,10 +120,10 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
    if(e?.code!=='AI_PROVIDER_CONTEXT_TOO_LARGE'||budget<=256)throw e;
    contextState=v4ContextFeedback(contextState,{rejected:true});budget=contextState.budget;paged=true;results=null;seen.clear();note('AI_STAGE_CONTEXT_REPAGED');continue;
   }
-  if(response.status==='completed'){evidenceCursor=indexPage.next_cursor??0;contextState=v4ContextFeedback(contextState,{more:indexPage.next_cursor!==null});budget=contextState.budget;}
   let data;try{data=parse(response)}catch{return response;}
   const actions=v4RequestedActions(data);
   if(paged){remember('resume',0,Math.min(resume.length,budget));remember('jd',0,Math.min(jd.length,budget));remember('document',0,Math.min(document.length,budget));for(const r of results||[])if(r.ok&&r.type==='text_page'&&Object.hasOwn(delivered,r.collection))remember(r.collection,r.offset,r.offset+r.text.length);}
+  if(response.status==='completed'){evidenceCursor=indexPage.next_cursor??0;contextState=v4ContextFeedback(contextState,{more:indexPage.next_cursor!==null});budget=contextState.budget;}
   if(typeof data.research_notes==='string'&&data.research_notes.trim()&&!notes.includes(data.research_notes))notes.push(data.research_notes);
   if(!actions.length){
    const next=paged?Object.keys(originals).filter(name=>missing(name)!==null):[];
