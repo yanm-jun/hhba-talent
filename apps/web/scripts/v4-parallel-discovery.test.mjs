@@ -302,3 +302,11 @@ test('Gemini global ranking switches to focused recovery rather than discarding 
  }
  assert.equal(calls,3);assert.equal(checkpoint.globalRankState.done,true);assert.deepEqual(checkpoint.globalOrder,[candidate.url]);
 });
+
+test('verification scheduler keeps useful concurrency during inexpensive JD recovery and backs off on observed pressure',async()=>{
+ const {nextVerificationBatch}=await import('../functions/_lib/v4-jd-research.js');
+ assert.equal(nextVerificationBatch(3,true,100,{externalRequests:18,completed:3}),4);
+ assert.equal(nextVerificationBatch(3,true,100,{externalRequests:39,completed:3}),3);
+ assert.equal(nextVerificationBatch(4,true,100,{externalRequests:48,completed:2}),1);
+ assert.equal(nextVerificationBatch(3,false,1,{externalRequests:6,completed:3}),1);
+});
