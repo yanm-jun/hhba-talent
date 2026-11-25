@@ -33,3 +33,12 @@ test('existing terminated or failed workflow is not mistaken for a running sched
  }
  assert.equal(await scheduleWorkflowInstance({async create(){}},'id',ticket),true);
 });
+
+test('authorized scheduler restarts errored workflow only, never terminated or completed workflow',async()=>{
+ const {scheduleWorkflowInstance}=await import('./runner.mjs');
+ for(const status of ['errored','terminated','complete','paused']){
+  let restarted=0;
+  const binding={async create(){throw Error('(instance.already_exists)')},async get(){return {async status(){return {status}},async restart(){restarted++}}}};
+  assert.equal(await scheduleWorkflowInstance(binding,'id',ticket),status==='errored');assert.equal(restarted,status==='errored'?1:0);
+ }
+});
