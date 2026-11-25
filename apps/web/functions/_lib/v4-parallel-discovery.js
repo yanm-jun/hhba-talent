@@ -39,3 +39,21 @@ export function combineDiscovery(coordinator,lanes,{hasNewEvidence=false,coordin
  if(coordinatorFailed||hasNewEvidence){data.research_complete=false;data.continue_search=true;}
  return {data,response:{status:coordinator?.response?.status||'completed',output}};
 }
+
+ // A bounded durable work window is distinct from the number of open lanes.
+ // Idle lanes pull the next independent item immediately; no sibling barrier.
+ // On a rejected lane or transport pressure, finish in-flight work and leave
+ // unstarted items for the next checkpoint. Never discard or fake completion.
+export async function runReadyWork(items,width,work,{signal,canStart=()=>true}={}){
+ let cursor=0,paused=false;
+ const settled=[];
+ const lane=async()=>{
+  while(cursor<items.length&&!paused&&!signal?.aborted&&canStart()){
+   const index=cursor++;
+   try{const value=await work(items[index]);settled.push({index,status:'fulfilled',value});}
+   catch(reason){settled.push({index,status:'rejected',reason});paused=true;}
+  }
+ };
+ await Promise.all(Array.from({length:Math.min(Math.max(1,width),items.length)},lane));
+ return settled.sort((a,b)=>a.index-b.index);
+}
