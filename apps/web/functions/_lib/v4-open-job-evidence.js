@@ -241,6 +241,15 @@ export function v4ScriptResourceHints(source,documentUrl,scriptUrl=documentUrl){
   out.set(url,{url,kind});
  };
  for(const m of source.matchAll(/["']((?:https:\/\/|https:\\\/\\\/|\/\/|\/|\.\.?\/)[^"'<>\\\r\n]*(?:\\\/[^"'<>\\\r\n]*)*)["']/gi))add(m[1],'data',documentUrl);
+ // Handle only statically provable literal URL construction. No eval, no
+ // variable guessing, no executing downloaded scripts.
+ for(const m of source.matchAll(/\b(?:fetch|axios\.get)\s*\(\s*((?:"[^"\\\r\n]*"|'[^'\\\r\n]*')(?:\s*\+\s*(?:"[^"\\\r\n]*"|'[^'\\\r\n]*'))+)\s*(?=[,)])/g)){
+  const parts=[...m[1].matchAll(/"([^"\\\r\n]*)"|'([^'\\\r\n]*)'/g)].map(p=>p[1]??p[2]);
+  add(parts.join(''),'data',documentUrl);
+ }
+ for(const m of source.matchAll(/\bnew\s+URL\s*\(\s*(?:"([^"\\\r\n]*)"|'([^'\\\r\n]*)')\s*,\s*(?:"([^"\\\r\n]*)"|'([^'\\\r\n]*)')\s*\)/g)){
+  const base=v4PublicJobUrl(m[3]??m[4]);if(base)try{add(new URL(m[1]??m[2],base).href,'data',documentUrl)}catch{}
+ }
  for(const m of source.matchAll(/(?:\bimport\s*\(|\bfrom\s*|\bimport\s*)["']([^"'\r\n]+)["']/g))add(m[1],'script',scriptUrl);
  return [...out.values()];
 }
@@ -314,7 +323,9 @@ export function v4BrowserResourcePlan(url,resourceHints=[],ledger=[]){
   const h=queue.shift(),u=v4PublicJobUrl(h?.url);
   if(!u||u===target||isCommercialRecruitmentBoard(u)||hints.has(u))continue;
   hints.set(u,{url:u,kind:h.kind});
-  if(h.kind==='script')for(const r of ledger)if(r.url===u&&r.script_source===true)queue.push(...(r.resource_hints||[]));
+  // The next frame's own observed declarations are also reachable. Only a
+  // successful full static read of that exact frame may contribute children.
+  if(h.kind==='script'||h.kind==='frame')for(const r of ledger)if(r.url===u&&r.type==='read_page'&&r.mode==='static'&&(h.kind==='script'?r.script_source===true:!r.script_source&&r.offset===0&&r.next_offset===null))queue.push(...(r.resource_hints||[]));
  }
  const publicDataUrls=[...hints.values()].filter(h=>['data','frame'].includes(h.kind)&&publicReadResourceUrl(h.url)&&ledger.some(r=>r.url===h.url&&r.type==='read_page'&&r.mode==='static'&&!r.script_source&&r.offset===0&&r.next_offset===null&&r.text?.trim())).map(h=>h.url);
  return {resourceHints:[...hints.values()],publicDataUrls};
@@ -339,18 +350,26 @@ export async function v4PreparePublicBrowserResources(url,{fetcher=fetch,signal,
    }
   }catch(e){if(signal?.aborted)throw e;}
  }
- for(const hint of initial.resourceHints){
+ const attempted=new Set();
+ // Recompute after reading frames so nested frame dependencies are visible.
+ // Keep an invocation transport window, with all outstanding leads preserved
+ // in the result and ledger for later agent-driven reads.
+ const resourceWindow=6;
+ while(attempted.size<resourceWindow){
+  const hint=initial.resourceHints.find(h=>['data','frame'].includes(h.kind)&&!initial.publicDataUrls.includes(h.url)&&!attempted.has(h.url)&&publicReadResourceUrl(h.url));
+  if(!hint)break;
+  attempted.add(hint.url);
   if(signal?.aborted)throw signal.reason;
-  if(!['data','frame'].includes(hint.kind)||initial.publicDataUrls.includes(hint.url))continue;
   if(!publicReadResourceUrl(hint.url))continue;
   try{
    const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal});
    if(doc.url!==hint.url||!doc.plain.trim())continue;
    const record={type:'read_page',ok:true,mode:'static',url:doc.url,offset:0,next_offset:null,text:doc.plain,resource_hints:doc.resource_hints||[]};
    records.push(record);onDocument(record);
+   initial=v4BrowserResourcePlan(url,resourceHints,records);
   }catch(e){if(signal?.aborted)throw e;}
  }
- return v4BrowserResourcePlan(url,initial.resourceHints,records);
+ return v4BrowserResourcePlan(url,resourceHints,records);
 }
 // Read a separately hosted JSON JD even when browser CORS prevents the
 // employer application from rendering it. Ownership is inherited only from an
