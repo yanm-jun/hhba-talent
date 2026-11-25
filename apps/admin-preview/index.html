@@ -42,6 +42,7 @@
       <button type="button" class="nav-link" data-view="membership"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 6v6c0 5 3 8 8 10 5-2 8-5 8-10V6z"/><path d="m9 12 2 2 4-4"/></svg><span>会员与月度服务</span> <span class="nav-soon">未开售</span></button>
       <button type="button" class="nav-link" data-view="rights"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v17M4 7h16M6 7 3 12h6zM18 7l-3 5h6zM8 21h8"/></svg><span>权益支持案件</span> <span class="nav-soon">未开放</span></button>
       <p class="nav-caption nav-caption-secondary">经营与系统</p>
+      <button type="button" class="nav-link" data-view="ai-usage"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19h18M6 16v-5m6 5V5m6 11V9"/></svg><span>AI Token 消耗</span></button>
       <button type="button" class="nav-link" data-view="finance"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 10h8M8 14h8M12 6v12"/></svg><span>财务与透明公开</span></button>
       <button type="button" class="nav-link" data-view="operations"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12h5l3-6 4 12 3-6h5"/></svg><span>运营运行监测</span></button>
       <button type="button" class="nav-link" data-view="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg><span>系统与权限</span></button>
@@ -463,6 +464,12 @@
           </div>
           <p class="hhba-private-quality" id="health-message" role="status">点击「开始只读检查」查看当前连接状态。</p>
         </article>
+      </section>
+      <section class="page-view" id="view-ai-usage" hidden aria-labelledby="ai-usage-heading">
+        <div class="page-heading"><div><p class="eyebrow">AI USAGE · PRIVATE</p><h1 id="ai-usage-heading">AI Token 消耗监控中心</h1><p class="page-subtitle" id="ai-usage-state">等待已授权的真实用量数据</p></div><div class="heading-actions"><label for="ai-usage-period">统计周期</label><select id="ai-usage-period"><option value="today">今日</option><option value="7d">近7天</option><option value="30d" selected>近30天</option></select><button type="button" class="button-primary" id="ai-usage-refresh">读取真实用量</button></div></div>
+        <div class="investor-kpis"><article><span>已观察总 Token</span><strong id="ai-usage-total">—</strong><small>输入 + 输出（不重复加推理）</small></article><article><span>API 请求次数</span><strong id="ai-usage-calls">—</strong><small id="ai-usage-coverage">用量完整度待核验</small></article><article><span>缓存命中率</span><strong id="ai-usage-cache">—</strong><small>缓存输入 / 已知输入；缺失时不推算</small></article></div>
+        <article class="panel"><div class="panel-heading"><div><h2>阶段消耗与推理深度</h2><p>仅显示接口实际返回的用量；账单金额和搜索费用未对账，不估造金额。</p></div></div><div id="ai-usage-stages" class="quality-lines" aria-live="polite"></div></article>
+        <article class="panel"><div class="panel-heading"><div><h2>每日消耗（UTC）</h2><p>无记录不等同零消耗。</p></div></div><div id="ai-usage-days" class="quality-lines"></div></article>
       </section>
       <section class="page-view" id="view-finance" hidden aria-labelledby="finance-heading">
         <div class="page-heading">
