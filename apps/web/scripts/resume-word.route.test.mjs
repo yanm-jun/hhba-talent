@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createResumeDocx} from '../src/services/resumeDocx.ts';
 import {editOriginalDocxStrict} from '../src/services/resumeDocxPreserve.mjs';
-import {onRequestGet,onRequestPost} from '../functions/api/resume-word.js';
+import {onRequestGet,onRequestPost,recoverInterruptedWordRenders} from '../functions/api/resume-word.js';
 const origin='https://preview.hhba.example';
 const id='11111111-2222-4333-8444-555555555555';
 const store='candidate/test/'+id+'.docx';
@@ -62,14 +62,23 @@ function fixture({enabled=true,docxOnly=false,owner='account-A',role='candidate'
      };
      if(sql.includes('FROM hhba_auth_users'))return {phone:'account-A',role};
      if(sql.includes('FROM hhba_candidate_resumes')){
+      if(sql.startsWith('SELECT phone FROM'))return args[0]===id?{phone:owner}:null;
       if(args[0]!==id||args[1]!==owner)return null;
       return {id,media_type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
        size_bytes:original.byteLength,storage_key:store,sha256:sha};
      }
      if(sql.includes('FROM hhba_resume_word_render_tasks')){
-      return tasks.get(args.slice(0,4).join('|'))||null;
+      const task=tasks.get(args.slice(0,4).join('|'));
+      return task?{...task}:null;
      }
      throw Error('unsupported query '+sql);
+    },
+    async all(){
+     if(!sql.includes('FROM hhba_resume_word_render_tasks'))throw Error('unsupported scan '+sql);
+     return {results:[...tasks.entries()].filter(([,v])=>['pending','running'].includes(v.status)&&v.updated_at<=args[0]).slice(0,args[1]).map(([key,v])=>{
+      const [account_hash,resume_id,job_scope_hash,entry_id]=key.split('|');
+      return {account_hash,resume_id,job_scope_hash,entry_id,...v};
+     })};
     },
     async run(){
      if(sql.includes('hhba_resume_word_attempts'))return {
@@ -927,4 +936,43 @@ test('interrupted render lease is retryable and an obsolete worker cannot overwr
   assert.equal((await onRequestGet({request:req('download-pdf',{jobId:'role-A'}),env:x.env})).status,200);
   assert.equal([...x.tasks.values()][0].status,'done');
  }finally{release();globalThis.fetch=prior;}
+});
+
+test('scheduled recovery completes an interrupted Word render without a browser request',async()=>{
+ const x=fixture({enabled:false,docxOnly:true});
+ await saveLateTestRevision(x,original,'测试用户','岗位甲',0);
+ x.env.HHBA_WORD_RENDER_ENABLED='1';x.env.HHBA_WORD_DOCX_ONLY_ENABLED='0';
+ let release;
+ const gate=new Promise(resolve=>{release=resolve;});
+ let verification=0;
+ const prior=globalThis.fetch;
+ globalThis.fetch=async(url)=>{
+  if(url.endsWith('/v1/verify')){
+   if(++verification===1)await gate;
+   return lateReport();
+  }
+  return new Response(pdf,{headers:{'Content-Type':'application/pdf'}});
+ };
+ const background=[];
+ try{
+  assert.equal((await lateConvert(x,p=>background.push(p))).status,200);
+  [...x.tasks.values()][0].updated_at=new Date(Date.now()-6*60*1000).toISOString();
+  const report=await recoverInterruptedWordRenders(x.env);
+  assert.equal(report.reclaimed,1);assert.equal(report.errors,0);
+  assert.equal((await onRequestGet({request:req('download-pdf',{jobId:'role-A'}),env:x.env})).status,200);
+  release();await background[0];
+  assert.equal([...x.tasks.values()][0].status,'done');
+ }finally{release();globalThis.fetch=prior;}
+});
+test('Word revisions and exports no longer depend on legacy daily or revision quotas',async()=>{
+ const x=fixture({enabled:false,docxOnly:true});
+ let current=original,previous='测试用户';
+ for(let revision=0;revision<9;revision++){
+  const next='岗位'+String(revision+1);
+  current=await saveLateTestRevision(x,current,previous,next,revision);
+  previous=next;
+ }
+ const inspect=await (await onRequestGet({request:req('inspect',{jobId:'role-A'}),env:x.env})).json();
+ assert.equal(inspect.revision,9);assert.equal(inspect.max_revisions,null);
+ assert.equal(inspect.max_daily_edits,null);
 });
