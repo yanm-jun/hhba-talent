@@ -127,7 +127,7 @@ def main() -> None:
 
     # V4 preview: anonymous relay smoke test, never a real applicant resume.
     # Results appear in build logs with only coarse status/error codes.
-    if (os.environ.get('CF_PAGES_BRANCH') == 'main' and os.environ.get('HHBA_MATCH_V4_READY') == '1') or os.environ.get('CF_PAGES_BRANCH') in ('feat/simple-resume-match-v4-20261124', 'fix/v4-open-job-discovery-20261124', 'fix/v4-direct-ai-recommend-20261124', 'fix/v4-autonomous-pipeline-20261124'):
+    if (os.environ.get('CF_PAGES_BRANCH') == 'main' and os.environ.get('HHBA_MATCH_V4_READY') == '1') or os.environ.get('CF_PAGES_BRANCH') in ('feat/simple-resume-match-v4-20261124', 'fix/v4-open-job-discovery-20261124', 'fix/v4-direct-ai-recommend-20261124', 'fix/v4-autonomous-pipeline-20261124', 'perf/v4-work-conserving-batches-20261125'):
         match_contracts()
         live_match_health(allow_transient_outage=os.environ.get('CF_PAGES_BRANCH') == 'main' and os.environ.get('HHBA_STRICT_AI_RELEASE_GATE') != '1')
 

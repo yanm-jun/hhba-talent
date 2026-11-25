@@ -4,11 +4,12 @@
  */
 import {v4Provider,v4Call,v4ParseJson,v4Sources} from '../functions/_lib/simple-match-v4.js';
 const label='HHBA_V4_LIVE_SMOKE=';
-if(!['main','feat/simple-resume-match-v4-20261124','fix/v4-open-job-discovery-20261124','fix/v4-direct-ai-recommend-20261124','fix/v4-autonomous-pipeline-20261124'].includes(process.env.CF_PAGES_BRANCH)){
+if(!['main','feat/simple-resume-match-v4-20261124','fix/v4-open-job-discovery-20261124','fix/v4-direct-ai-recommend-20261124','fix/v4-autonomous-pipeline-20261124','perf/v4-work-conserving-batches-20261125'].includes(process.env.CF_PAGES_BRANCH)){
  console.log(label+JSON.stringify({status:'SKIPPED_OTHER_BRANCH'}));process.exit(0);
 }
 const provider=v4Provider(process.env);
 if(!provider){console.log(label+JSON.stringify({status:'MISSING_RELAY_KEY'}));process.exit(1)}
+const started=Date.now();
 const report={status:'PARTIAL',model:provider.model,model_catalog:'NOT_TESTED',
  responses:'NOT_TESTED',web_search:'NOT_TESTED',cited_official_links:0,model_job_rows:0,format:'NOT_TESTED'};
 try{
@@ -29,6 +30,7 @@ try{
  },{signal:AbortSignal.timeout(180000)});
  report.responses=v4ParseJson(d).ok===true?'JSON_OK':'JSON_UNEXPECTED';
 }catch(e){report.responses=e?.code||'PROVIDER_ERROR'}
+const searchStarted=Date.now();
 try{
  const d=await v4Call(fetch,provider,{
   instructions:'You help job seekers in China. Use web_search to find currently hiring, real employer job pages for automotive channel supervisor or dealer operations roles in China. Return ONE VALID JSON OBJECT with profile:{roles:[...]}, jobs:[{company,title,location,url,score,reason,resume_quote}]. Do not invent links. Find as many as the research actually supports; no company allowlist or numerical cap.',
@@ -44,6 +46,7 @@ try{
   report.model_job_rows=Array.isArray(value.jobs)?value.jobs.length:0;
  }catch{report.format='JSON_INVALID'}
 }catch(e){report.web_search=e?.code||'PROVIDER_ERROR'}
+report.search_elapsed_ms=Date.now()-searchStarted;
 try{
  let nativeSse=false;
  const observeStream=async(url,init)=>{
@@ -58,5 +61,6 @@ try{
  report.native_stream=v4ParseJson(streamed).ok===true?(nativeSse?'FINAL_RESPONSE_OK':'JSON_COMPATIBILITY_MODE'):'UNEXPECTED';
 }catch(e){report.native_stream=e?.code||'PROVIDER_ERROR'}
 report.status=report.responses==='JSON_OK'&&report.web_search==='TOOL_CALLED'&&report.format==='JSON_OK'&&report.model_job_rows>0?'READY':'PARTIAL';
+report.elapsed_ms=Date.now()-started;
 console.log(label+JSON.stringify(report));
 if(report.status!=='READY')process.exitCode=1;
