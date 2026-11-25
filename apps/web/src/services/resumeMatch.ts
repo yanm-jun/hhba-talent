@@ -313,7 +313,7 @@ async function sessionTaskRequest(body?:Record<string,unknown>,signal?:AbortSign
  }
 }
 export const readSessionMatchTask=(signal?:AbortSignal)=>sessionTaskRequest(undefined,signal);
-export async function beginSessionMatchTask(text:string,opts:MatchOptions,resumeId:string|undefined,signal:AbortSignal,id=crypto.randomUUID()){
+export async function beginSessionMatchTask(text:string,opts:MatchOptions,resumeId:string|undefined,signal:AbortSignal,id:string=crypto.randomUUID()){
  if(!MATCH_V4_PREVIEW)return null;
  const task=await sessionTaskRequest({action:'start',task_id:id,text:redactResumeTextLocally(text),
   options:{country:'CN',role_hint:opts.role_hint},resume_id:resumeId||null,consent:true,recovery_consent:true},signal);
