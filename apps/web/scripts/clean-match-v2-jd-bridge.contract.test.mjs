@@ -42,7 +42,8 @@ test('Clean V2 verified JD bridge unlocks original Word editor using immutable a
  assert.equal(result.matches[0].jd_comparisons[0].resume_evidence,profile.facts[0].quote);
  assert.ok(updates.length>0);
  const component=readFileSync(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
- assert.match(component,/!job\.jd_version_id\|\|!job\.jd_sha256/);
+ assert.match(component,/!\(job\.jd_version_id&&job\.jd_sha256\)/);
+ assert.match(component,/job\.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job\.reference_jd\?\.trim\(\)&&job\.reference_jd_basis\?\.trim\(\)/);
  const route=readFileSync(new URL('../functions/api/match-next/[[path]].js',import.meta.url),'utf8');
  assert.match(route,/archiveCleanMatchJobs/);
 });
