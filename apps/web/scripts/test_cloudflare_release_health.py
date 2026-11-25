@@ -31,6 +31,19 @@ class ReleaseHealthTests(unittest.TestCase):
             dict(web_search="TOOL_CALLED", format="JSON_OK", model_job_rows=0),
         ]:
             self.assertFalse(release.external_health_degraded({**self.report, **change}))
+    def test_missing_build_secret_defers_only_non_strict_release(self):
+        result = subprocess.CompletedProcess(["node"], 1, stdout='HHBA_V4_LIVE_SMOKE={"status":"MISSING_RELAY_KEY"}\n')
+        with patch.object(release.subprocess, "run", return_value=result):
+            release.live_match_health(allow_transient_outage=True)
+            with self.assertRaises(subprocess.CalledProcessError):
+                release.live_match_health(allow_transient_outage=False)
+
+    def test_contract_log_compaction_preserves_failure(self):
+        result = subprocess.CompletedProcess(["node"], 1, stdout="# HHBA_V4_MODEL_USAGE synthetic\nnot ok 1 - regression\n  AssertionError: mismatch\n# fail 1\n")
+        with patch.object(release.subprocess, "run", return_value=result):
+            with self.assertRaises(subprocess.CalledProcessError):
+                release.match_contracts()
+
     def test_missing_report_remains_blocking(self):
         result = subprocess.CompletedProcess(["node"], 1, stdout="unexpected crash\n")
         with patch.object(release.subprocess, "run", return_value=result):
