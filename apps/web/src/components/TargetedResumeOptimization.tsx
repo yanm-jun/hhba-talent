@@ -715,6 +715,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   .filter(s=>s.action==='replace'&&!ignored.includes(s.id)&&!resolvedWordVisualIds.includes(s.id))
   .map(s=>({
    id:s.id,original:s.original,
+   occurrence:version.blocks.find(b=>b.id===s.blockId)?.occurrence,
+   occurrenceCount:version.blocks.find(b=>b.id===s.blockId)?.occurrenceCount,
    proposed:version.acceptedSuggestionIds.includes(s.id)?
     (version.blocks.find(b=>b.id===s.blockId)?.text||s.proposed):
     (suggestionDrafts[s.id]??s.proposed),
@@ -1001,7 +1003,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
      }}
      onRevisionSnapshot={handleWordRevisionSnapshot}
      onDocumentReady={revealRenderedWord}
-     onEditableSegments={(segments,_documentText,paragraphText)=>{
+     onEditableSegments={(segments,_documentText,paragraphText,anchors)=>{
       // Never infer a writable Word location from a long ATS/search snippet.
       // Ignore contact-like text and only send visible, unique Word spans.
       const safe=[...new Set(segments)].filter(value=>
@@ -1009,17 +1011,23 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
        value===value.trim()&&!/[\r\n\t@]/.test(value)&&
        !/^\+?[\d\s()-]{7,}$/.test(value));
       const fullParagraphs=new Set(paragraphText||[]);
-      const next=safe.map((text,i)=>({id:'word-'+i,section:'experience' as const,text,paragraphEditable:fullParagraphs.has(text)}));
+      const next:ResumeBlock[]=safe.map((text,i)=>({id:'word-'+i,section:'experience' as const,text,paragraphEditable:fullParagraphs.has(text)}));
+      for(const anchor of anchors||[])if(anchor.occurrence!==undefined&&anchor.text.length>=2&&!/[\r\n\t@]/.test(anchor.text)&&!/^\+?[\d\s()-]{7,}$/.test(anchor.text))next.push({id:'repeat-'+next.length,section:'experience',text:anchor.text,paragraphEditable:true,occurrence:anchor.occurrence,occurrenceCount:anchor.occurrenceCount,wordContext:anchor.wordContext});
       setWordPromptBlocks(prev=>
-       prev.length===next.length&&prev.every((b,i)=>b.text===next[i].text&&b.paragraphEditable===next[i].paragraphEditable)?prev:next);
+       prev.length===next.length&&prev.every((b,i)=>b.text===next[i].text&&b.paragraphEditable===next[i].paragraphEditable&&b.occurrence===next[i].occurrence&&b.occurrenceCount===next[i].occurrenceCount)?prev:next);
      }}
      onPendingChange={setNativeWordPending}
      onVerifiedSave={change=>{
+      // A saved edit may change occurrence numbering or neighboring context.
+      // Never reuse an old duplicate-location suggestion after a revision.
+      const scopedIds=suggestions.filter(s=>version.blocks.find(b=>b.id===s.blockId)?.occurrence!==undefined).map(s=>s.id);
+      if(scopedIds.length)setResolvedWordVisualIds(prev=>[...new Set([...prev,...scopedIds])]);
       setVerifiedWordEdits(prev=>[...prev.filter(item=>item.original!==change.original),change]);
       invalidateScore();
      }}
      onVersionMoved={()=>{
       invalidateScore();setVerifiedWordEdits([]);setNativeWordTextDraft(null);
+      const scopedIds=suggestions.filter(s=>version.blocks.find(b=>b.id===s.blockId)?.occurrence!==undefined).map(s=>s.id);setResolvedWordVisualIds(prev=>[...new Set([...prev,...scopedIds])]);
      }}
      sessionWordDraft={nativeWordTextDraft}
      onSessionWordDraftChange={setNativeWordTextDraft}

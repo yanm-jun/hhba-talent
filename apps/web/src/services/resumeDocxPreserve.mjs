@@ -138,12 +138,13 @@ function countWidth(s){
 // runs and inherit the first affected run's style for replacement text.
 // Links, fields, breaks, drawings and tracked changes are not plain text runs.
 function paragraphRunGroups(xml,matches){
- const index=new Map(matches.map(m=>[m.index,m])),groups=[],paragraphs=[],paragraphCounts=new Map();
+ const index=new Map(matches.map(m=>[m.index,m])),groups=[],paragraphs=[],paragraphCounts=new Map(),bodyTexts=[];
  for(const p of xml.matchAll(/<w:p(?:\s[^>]*)?>([\s\S]*?)<\/w:p>/g)){
   const inner=p[1],offset=p.index+p[0].indexOf('>')+1;
   const nodes=[...inner.matchAll(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g)];
-  if(!nodes.length)continue;
   const text=nodes.map(m=>decodeXML(m[1])).join('');
+  const position=bodyTexts.push(text)-1;
+  if(!nodes.length)continue;
   paragraphCounts.set(text,(paragraphCounts.get(text)||0)+1);
   // A previously merged paragraph has one nonempty node and retained empty
   // styled nodes. Treat it as the ordinary unique text run, not two anchors.
@@ -168,9 +169,9 @@ function paragraphRunGroups(xml,matches){
   // Do not clone section breaks, tracked changes, or properties containing IDs.
   const style=[...styles][0]||'';
   if(!/<w:(?:sectPr|pPrChange|rPrChange|ins|del|bookmarkStart|bookmarkEnd)\b/.test(properties+style))
-   paragraphs.push({text,nodes:exact,start:p.index,end:p.index+p[0].length,properties,style});
+   paragraphs.push({text,nodes:exact,start:p.index,end:p.index+p[0].length,properties,style,mixed:styles.size>1,position});
  }
- return {groups,paragraphs,paragraphCounts};
+ return {groups,paragraphs,paragraphCounts,bodyTexts};
 }
 // Map a contiguous changed range onto the existing text runs. Unchanged
 // styled fragments are never moved. New wording inherits the affected run;
@@ -210,22 +211,28 @@ function editXml(xml,edits,{allowExpansion=false}={}){
    requireValue(countWidth(edit.text)<=countWidth(edit.original),'WORD_EDIT_TOO_LONG');
   const hits=matches.filter(m=>decodeXML(m[1])===edit.original);
   const combined=groups.filter(group=>group.text===edit.original);
-  requireValue(hits.length+combined.length===1&&
+  const candidates=paragraphs.filter(p=>p.text===edit.original);
+  const scoped=edit.occurrence!==undefined;
+  if(scoped)requireValue(allowExpansion&&Number.isSafeInteger(edit.occurrence)&&edit.occurrence>=0&&
+   Number.isSafeInteger(edit.occurrenceCount)&&edit.occurrenceCount>=2&&
+   candidates.length===edit.occurrenceCount&&paragraphCounts.get(edit.original)===candidates.length&&
+   edit.occurrence<candidates.length,'WORD_EDIT_AMBIGUOUS');
+  else requireValue(hits.length+combined.length===1&&
    (!combined.length||paragraphCounts.get(edit.original)===1),'WORD_EDIT_AMBIGUOUS');
   const lines=edit.text.split('\n');
-  const targets=combined.length?combined[0].nodes:hits;
+  const scopedParagraph=scoped?candidates[edit.occurrence]:undefined;
+  const targets=scopedParagraph?scopedParagraph.nodes:combined.length?combined[0].nodes:hits;
   if(lines.length>1){
-   const candidates=paragraphs.filter(p=>p.text===edit.original);
-   requireValue(candidates.length===1&&paragraphCounts.get(edit.original)===1&&
-    candidates[0].nodes.filter(n=>decodeXML(n[1])).every(n=>targets.includes(n)),'WORD_EDIT_AMBIGUOUS');
-   const paragraph=candidates[0];
+   const paragraph=scopedParagraph||candidates[0];
+   requireValue(paragraph&&(scoped||candidates.length===1&&paragraphCounts.get(edit.original)===1)&&
+    paragraph.nodes.filter(n=>decodeXML(n[1])).every(n=>targets.includes(n)),'WORD_EDIT_AMBIGUOUS');
    // Add actual sibling w:p elements, retaining paragraph and run style.
    // Fresh paragraph tags omit original IDs, revision attributes and bookmarks.
    const added=lines.slice(1).map(line=>'<w:p>'+paragraph.properties+'<w:r>'+paragraph.style+
     '<w:t xml:space="preserve">'+encodeXML(line)+'</w:t></w:r></w:p>').join('');
    insertions.push({index:paragraph.end,length:0,value:added});
   }
-  const values=combined[0]?.mixed?distributeStyledText(targets.map(hit=>decodeXML(hit[1])),lines[0]):targets.map((_,i)=>i===0?lines[0]:'');
+  const values=(scopedParagraph?.mixed||!scoped&&combined[0]?.mixed)?distributeStyledText(targets.map(hit=>decodeXML(hit[1])),lines[0]):targets.map((_,i)=>i===0?lines[0]:'');
   requireValue(values.join('')===lines[0],'WORD_EDIT_UNSAFE');
   for(const [i,hit] of targets.entries()){
    requireValue(!used.has(hit.index),'WORD_EDIT_AMBIGUOUS');
@@ -348,13 +355,17 @@ export async function inspectOriginalDocxStrict(raw,{allowParagraphRuns=false}={
  for(const m of matches){
   const value=decodeXML(m[1]);occurrences.set(value,(occurrences.get(value)||0)+1);
  }
- const {groups,paragraphs,paragraphCounts}=allowParagraphRuns?paragraphRunGroups(originalXml,matches):{groups:[],paragraphs:[],paragraphCounts:new Map()};
+ const {groups,paragraphs,paragraphCounts,bodyTexts}=allowParagraphRuns?paragraphRunGroups(originalXml,matches):{groups:[],paragraphs:[],paragraphCounts:new Map(),bodyTexts:[]};
  const eligible=groups.filter(g=>paragraphCounts.get(g.text)===1&&!occurrences.has(g.text));
  const covered=new Set(eligible.flatMap(g=>g.nodes.map(m=>m.index)));
  const unique=matches.filter(m=>!covered.has(m.index)).map(m=>decodeXML(m[1])).filter(value=>
   textOnly(value)&&occurrences.get(value)===1&&!groups.some(g=>g.text===value));
  unique.push(...eligible.map(g=>g.text));
- return {mode:'strict_original_docx',editable_text:unique,
+ const duplicate_paragraphs=[];
+ const repeated=new Map();
+ for(const p of paragraphs)if((paragraphCounts.get(p.text)||0)>1){const a=repeated.get(p.text)||[];a.push(p);repeated.set(p.text,a);}
+ for(const [text,ps] of repeated)if(ps.length===paragraphCounts.get(text))duplicate_paragraphs.push({text,count:ps.length,contexts:ps.map(p=>({paragraph:p.position,previous:bodyTexts[p.position-1]||'',next:bodyTexts[p.position+1]||''}))});
+ return {mode:'strict_original_docx',editable_text:unique,duplicate_paragraphs,
   paragraph_text:paragraphs.filter(p=>paragraphCounts.get(p.text)===1&&unique.includes(p.text)).map(p=>p.text),
   entries:pkg.entries.map(e=>e.name)};
 }

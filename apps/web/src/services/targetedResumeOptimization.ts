@@ -8,7 +8,7 @@ export type AiProvider = typeof AI_PROVIDERS[number];
 export type ResumeSection = 'summary'|'experience'|'education'|'skills'|'projects';
 export type SuggestionAction = 'replace'|'append'|'request_evidence';
 export type EvidenceStatus = 'verified'|'needs_user_confirmation';
-export interface ResumeBlock { id:string; section:ResumeSection; text:string; paragraphEditable?:boolean; }
+export interface ResumeBlock { id:string; section:ResumeSection; text:string; paragraphEditable?:boolean; occurrence?:number;occurrenceCount?:number;wordContext?:{paragraph:number;previous:string;next:string}; }
 export interface ResumeSuggestion {
  id:string; blockId:string; action:SuggestionAction; original:string; proposed:string;
  rationale:string; jobRequirement:string; evidenceStatus:EvidenceStatus; sourceQuotes?:string[];changeCount?:number;

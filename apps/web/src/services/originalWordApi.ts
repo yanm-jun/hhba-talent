@@ -1,9 +1,9 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
-import {editOriginalDocxStrict} from './resumeDocxPreserve.mjs';
+import {editOriginalDocxStrict,type DuplicateWordParagraph} from './resumeDocxPreserve.mjs';
 
 type SavedWord={original:string;text:string;updated_at:string};
 export type WordHistoryEntry={revision:number;original:string;text:string;updated_at:string;page_count:number|null;layout_verified?:boolean};
-export type WordInspect={ok:boolean;editable_text:string[];paragraph_text?:string[];saved?:SavedWord|null;revision:number;total_revisions:number;max_revisions:number|null;max_daily_edits?:number|null;history?:WordHistoryEntry[];layout_verified?:boolean;pdf_available?:boolean};
+export type WordInspect={ok:boolean;editable_text:string[];paragraph_text?:string[];duplicate_paragraphs?:DuplicateWordParagraph[];saved?:SavedWord|null;revision:number;total_revisions:number;max_revisions:number|null;max_daily_edits?:number|null;history?:WordHistoryEntry[];layout_verified?:boolean;pdf_available?:boolean};
 const messages:Record<string,string>={
  WORD_NOT_READY:'Word 原样式编辑暂未开放。',
  WORD_FONT_UNAVAILABLE:'原文件使用的字体在处理环境中不可用，为保留原样式，暂不修改这份简历。',
@@ -109,7 +109,7 @@ export async function wordSourceBytes(id:string,revision:number,jobId?:string){
   throw Error('原 Word 文件不完整。');
  return bytes;
 }
-export async function saveOriginalWordEdit(id:string,original:string,text:string,expectedRevision=0,jobId?:string):Promise<WordMutationResult>{
+export async function saveOriginalWordEdit(id:string,original:string,text:string,expectedRevision=0,jobId?:string,occurrence?:number,occurrenceCount?:number):Promise<WordMutationResult>{
  const capabilities=await wordEditingCapabilities();
  if(!capabilities.enabled)throw Error(messages.WORD_NOT_READY);
  let clientHash:undefined|string;
@@ -118,12 +118,13 @@ export async function saveOriginalWordEdit(id:string,original:string,text:string
   // The Cloudflare endpoint independently repeats and verifies the same patch
   // before publishing the private, job-scoped revision into R2.
   const source=await wordSourceBytes(id,expectedRevision,jobId);
-  const patched=await editOriginalDocxStrict(source,[{original,text}],{allowExpansion:true});
+  const patched=await editOriginalDocxStrict(source,[{original,text,occurrence,occurrenceCount}],{allowExpansion:true});
   const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',new Uint8Array(patched).buffer));
   clientHash=Array.from(digest,b=>b.toString(16).padStart(2,'0')).join('');
  }
  const response=await send('/api/resume-word','POST',{
   action:'edit',resume_id:id,...jobPayload(jobId),original,text,expected_revision:expectedRevision,
+  ...(occurrence!==undefined?{occurrence,occurrenceCount}:{}),
   ...(clientHash?{client_docx_sha256:clientHash}:{}),
   confirmed_real:true,consent_word_processing:true
  });

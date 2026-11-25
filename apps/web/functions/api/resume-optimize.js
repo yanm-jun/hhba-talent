@@ -155,7 +155,7 @@ export async function onRequestPost({request,env}){
   }
  }catch{return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);}
  // Mask common contact identifiers before third-party processing.
- const blocks=input.blocks.map(b=>({id:b.id,section:b.section,text:redact(b.text),...(b.paragraphEditable===true?{paragraphEditable:true}:{})}));
+ const blocks=input.blocks.map(b=>({id:b.id,section:b.section,text:redact(b.text),...(b.paragraphEditable===true?{paragraphEditable:true}:{}),...(Number.isSafeInteger(b.occurrence)&&Number.isSafeInteger(b.occurrenceCount)&&b.wordContext?{occurrence:b.occurrence,occurrenceCount:b.occurrenceCount,wordContext:{paragraph:b.wordContext.paragraph,previous:redact(String(b.wordContext.previous||'')),next:redact(String(b.wordContext.next||''))}}:{})}));
  const priorAnalysis=env?.HHBA_MATCH_V4_READY==='1'?preparePriorMatchAnalysis(input.job.prior_match_analysis,trustedJob,redact):undefined;
  const job={title:redact(trustedJob.title),requirements:redact(trustedJob.requirements),
   ...(priorAnalysis?{prior_match_analysis:priorAnalysis}:{}),

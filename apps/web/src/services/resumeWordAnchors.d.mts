@@ -1,2 +1,2 @@
-export type WordAnchor={id:string;text:string;page:number;bbox:[number,number,number,number];fontFamily?:string};
+export type WordAnchor={id:string;text:string;page:number;bbox:[number,number,number,number];fontFamily?:string;occurrence?:number;occurrenceCount?:number;wordContext?:{paragraph:number;previous:string;next:string}};
 export declare function matchWordAnchors(input:{editableText:string[];items:Array<{str:string;transform:number[];width:number;height:number;fontName?:string}>;styles?:Record<string,{fontFamily?:string}>;viewport:{width:number;height:number;transform:number[];convertToViewportPoint:(x:number,y:number)=>number[]};page:number}):WordAnchor[];

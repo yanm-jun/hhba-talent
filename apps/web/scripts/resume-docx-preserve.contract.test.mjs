@@ -280,3 +280,15 @@ test('mixed formatting paragraph supports local changes while preserving untouch
  for(const [name,part] of before)if(name!=='word/document.xml')assert.deepEqual(after.get(name).compressed,part.compressed);
  assert.ok((await inspectOriginalDocxStrict(edited,{allowParagraphRuns:true})).editable_text.includes('优化岗位描述'));
 });
+
+
+test('explicit repeated paragraph occurrence edits only the selected copy, and rejects stale counts',async()=>{
+ const source=fixture({duplicate:true,method:8}),before=parts(source);
+ const inspected=await inspectOriginalDocxStrict(source,{allowParagraphRuns:true});
+ const duplicate=inspected.duplicate_paragraphs.find(p=>p.text==='原始岗位描述');
+ assert.equal(duplicate.count,2);
+ const edited=await editOriginalDocxStrict(source,[{original:duplicate.text,text:'第二处岗位描述',occurrence:1,occurrenceCount:2}],{allowExpansion:true});
+ const xml=parts(edited).get('word/document.xml').raw.toString();
+ assert.equal(xml,before.get('word/document.xml').raw.toString().replace('<w:p><w:r><w:t>原始岗位描述</w:t></w:r></w:p>','<w:p><w:r><w:t>第二处岗位描述</w:t></w:r></w:p>'));
+ await assert.rejects(()=>editOriginalDocxStrict(edited,[{original:duplicate.text,text:'错误位置',occurrence:0,occurrenceCount:2}],{allowExpansion:true}),/WORD_EDIT_AMBIGUOUS/);
+});

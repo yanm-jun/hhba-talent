@@ -1,7 +1,7 @@
 // Local-only DOCX HTML preview; scripts are hosted by HHBA, never a CDN.
 // This is a visual aid, NOT an authoritative Word/LibreOffice page-layout check.
 import type {WordAnchor} from './resumeWordAnchors.mjs';
-import {distributeStyledText} from './resumeDocxPreserve.mjs';
+import {distributeStyledText,type DuplicateWordParagraph} from './resumeDocxPreserve.mjs';
 type DocxRenderer={renderAsync:(bytes:Uint8Array,body:HTMLElement,styles:HTMLElement,
  options:Record<string,unknown>)=>Promise<unknown>};
 type ZipFile={name:string;dir:boolean;_data?:{uncompressedSize?:number};
@@ -104,9 +104,41 @@ function browserParagraphRuns(mount:HTMLElement,allowed:Set<string>){
  }
  return groups;
 }
+// Match identical full paragraphs only within the document body, never headers,
+// footers or text boxes. Count and surrounding text must agree with OOXML.
+function browserRepeatedParagraphs(mount:HTMLElement,duplicates:DuplicateWordParagraph[]){
+ const body=Array.from(mount.querySelectorAll<HTMLElement>('section.hhba-native-docx > article p'));
+ const source=(p:HTMLElement)=>Array.from(p.children).map(s=>s.getAttribute('data-hhba-original-run')??s.textContent??'').join('');
+ const result:{text:string;paragraph:HTMLElement;spans:HTMLElement[];occurrence:number;occurrenceCount:number;wordContext:DuplicateWordParagraph['contexts'][number]}[]=[];
+ for(const entry of duplicates){
+  const hits=body.filter(p=>source(p)===entry.text&&Array.from(p.children).length>0&&Array.from(p.children).every(s=>s.tagName==='SPAN'&&(!s.querySelector('span')||s.hasAttribute('data-hhba-original-run'))));
+  if(hits.length!==entry.count||entry.contexts.length!==entry.count)continue;
+  const allMatch=hits.every((p,i)=>{const pos=body.indexOf(p),c=entry.contexts[i];return (pos===0?'':source(body[pos-1]))===c.previous&&(pos===body.length-1?'':source(body[pos+1]))===c.next;});
+  if(!allMatch)continue;
+  hits.forEach((p,i)=>result.push({text:entry.text,paragraph:p,spans:Array.from(p.children) as HTMLElement[],occurrence:i,occurrenceCount:entry.count,wordContext:entry.contexts[i]}));
+ }
+ return result;
+}
+function paintStyledParagraph(spans:HTMLElement[],proposal:string){
+ const attribute='data-hhba-original-run';
+ const source=spans.map(span=>span.textContent||'');
+ const revised=distributeStyledText(source,proposal);
+ spans.forEach((span,i)=>{
+  if(source[i]===revised[i])return;
+  span.setAttribute(attribute,source[i]);span.classList.add('hhba-word-inline-suggestion');
+  const mark=document.createElement('span');mark.className='hhba-word-ai-changed hhba-resume-siri-letters';
+  const before=source[i],after=revised[i];let start=0,end=0;
+  while(start<before.length&&start<after.length&&before[start]===after[start])start++;
+  while(end<before.length-start&&end<after.length-start&&before[before.length-1-end]===after[after.length-1-end])end++;
+  // Empty changed spans must not inject invisible characters into DOCX text.
+  mark.textContent=after.slice(start,after.length-end);
+  if(proposal.includes('\n'))mark.style.whiteSpace='pre-wrap';
+  span.replaceChildren(document.createTextNode(after.slice(0,start)),mark,document.createTextNode(after.slice(after.length-end)));
+ });
+}
 export function paintBrowserWordSuggestions(
  mount:HTMLElement,editableText:string[],
- suggestions:readonly {original:string;proposed:string;state:'pending'|'accepted'}[]
+ suggestions:readonly {original:string;proposed:string;state:'pending'|'accepted';occurrence?:number;occurrenceCount?:number}[],duplicates:DuplicateWordParagraph[]=[]
 ):void{
  const attribute='data-hhba-original-run';
  for(const node of mount.querySelectorAll<HTMLElement>('span[data-hhba-original-run]')){
@@ -125,9 +157,11 @@ export function paintBrowserWordSuggestions(
   grouped.set(source,[...(grouped.get(source)||[]),node]);
  }
  const paragraphs=browserParagraphRuns(mount,allowed);
+ const repeated=browserRepeatedParagraphs(mount,duplicates);
+ for(const group of repeated){const proposals=suggestions.filter(s=>s.state==='pending'&&s.original===group.text&&s.occurrence===group.occurrence&&s.occurrenceCount===group.occurrenceCount&&s.proposed.trim()&&s.proposed!==s.original);if(proposals.length===1)paintStyledParagraph(group.spans,proposals[0].proposed);}
  const proposals=new Map<string,string[]>();
  for(const suggestion of suggestions){
-  if(suggestion.state!=='pending'||!allowed.has(suggestion.original)||
+  if(suggestion.occurrence!==undefined||suggestion.state!=='pending'||!allowed.has(suggestion.original)||
    suggestion.proposed===suggestion.original||!suggestion.proposed.trim())continue;
   proposals.set(suggestion.original,[...(proposals.get(suggestion.original)||[]),
    suggestion.proposed]);
@@ -138,23 +172,7 @@ export function paintBrowserWordSuggestions(
   if(values.length!==1||nodes.length+joined.length!==1)continue;
   const group=joined[0];
   const node=group?group.spans[0]:nodes[0],proposal=values[0];
-  if(group){
-   const source=group.spans.map(span=>span.textContent||'');
-   const revised=distributeStyledText(source,proposal);
-   group.spans.forEach((span,i)=>{
-    if(source[i]===revised[i])return;
-    span.setAttribute(attribute,source[i]);
-    span.classList.add('hhba-word-inline-suggestion');
-    const mark=document.createElement('span');mark.className='hhba-word-ai-changed hhba-resume-siri-letters';
-    const before=source[i],after=revised[i];let start=0,end=0;
-    while(start<before.length&&start<after.length&&before[start]===after[start])start++;
-    while(end<before.length-start&&end<after.length-start&&before[before.length-1-end]===after[after.length-1-end])end++;
-    mark.textContent=after.slice(start,after.length-end)||'\u200b';
-    if(proposal.includes('\n'))mark.style.whiteSpace='pre-wrap';
-    span.replaceChildren(document.createTextNode(after.slice(0,start)),mark,document.createTextNode(after.slice(after.length-end)));
-   });
-   continue;
-  }
+  if(group){paintStyledParagraph(group.spans,proposal);continue;}
   const before=Array.from(original),after=Array.from(proposal);
   let start=0,end=0;
   while(start<before.length&&start<after.length&&before[start]===after[start])start++;
@@ -173,7 +191,7 @@ export function paintBrowserWordSuggestions(
  }
 }
 
-export function browserWordAnchors(mount:HTMLElement,editableText:string[]):WordAnchor[]{
+export function browserWordAnchors(mount:HTMLElement,editableText:string[],duplicates:DuplicateWordParagraph[]=[]):WordAnchor[]{
  const pages=[...mount.querySelectorAll<HTMLElement>('section.hhba-native-docx')];
  if(!pages.length)return [];
  const bounds=mount.getBoundingClientRect();
@@ -200,9 +218,10 @@ export function browserWordAnchors(mount:HTMLElement,editableText:string[]):Word
   const entries=found.get(group.text)||[];entries.push(group.paragraph);found.set(group.text,entries);
  }
  const result:WordAnchor[]=[];
- for(const [text,elements] of found){
-  if(elements.length!==1)continue;
-  const node=elements[0],rect=node.getBoundingClientRect();
+ const unique=[...found].filter(([,elements])=>elements.length===1).map(([text,elements])=>({text,node:elements[0],occurrence:undefined,occurrenceCount:undefined,wordContext:undefined}));
+ const repeated=browserRepeatedParagraphs(mount,duplicates).map(group=>({text:group.text,node:group.paragraph,occurrence:group.occurrence,occurrenceCount:group.occurrenceCount,wordContext:group.wordContext}));
+ for(const {text,node,occurrence,occurrenceCount,wordContext} of [...unique,...repeated]){
+  const rect=node.getBoundingClientRect();
   const scaleX=bounds.width/mount.offsetWidth,scaleY=bounds.height/mount.offsetHeight;
   const x=(rect.left-bounds.left)/scaleX/fullWidth*1000;
   const y=(rect.top-bounds.top)/scaleY/fullHeight*1000;
@@ -212,7 +231,7 @@ export function browserWordAnchors(mount:HTMLElement,editableText:string[]):Word
   const family=getComputedStyle(node).fontFamily;
   const page=Math.max(1,pages.indexOf(node.closest('section.hhba-native-docx') as HTMLElement)+1);
   result.push({id:'browser-word-'+result.length,text,page,
-   bbox:[x,y,w,h],fontFamily:family.length<=100?family:undefined});
+   bbox:[x,y,w,h],occurrence,occurrenceCount,wordContext,fontFamily:family.length<=100?family:undefined});
  }
  // Include every uniquely verifiable text run, including content after the
  // first screen and on later Word pages. No presentation-order truncation:

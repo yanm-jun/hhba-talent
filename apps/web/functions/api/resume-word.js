@@ -215,7 +215,7 @@ export async function onRequestGet({request,env}){
    const current=state.saved?
     await versionBytes(bucket,state.key,state.saved,'docx'):original;
    const data=await inspectOriginalDocxStrict(current,{allowParagraphRuns:v4(env)&&!renderer});
-   return json({ok:true,editable_text:data.editable_text,paragraph_text:data.paragraph_text,
+   return json({ok:true,editable_text:data.editable_text,paragraph_text:data.paragraph_text,duplicate_paragraphs:data.duplicate_paragraphs,
     saved:state.saved?{original:state.saved.original,text:state.saved.text,
      updated_at:state.saved.updated_at}:null,
     revision:state.revision,total_revisions:state.items.length,
@@ -325,7 +325,8 @@ export async function onRequestPost({request,env}){
    return fail('WORD_DAILY_LIMIT',429);
   const current=state.saved?
    await versionBytes(bucket,state.key,state.saved,'docx'):original;
-  const selected=[{original:body.original,text:body.text}];
+  if(body.occurrence!==undefined&&(!v4(env)||renderer||body.expected_revision===undefined||!Number.isSafeInteger(body.occurrence)||!Number.isSafeInteger(body.occurrenceCount)))return fail('INVALID_REQUEST',400);
+  const selected=[{original:body.original,text:body.text,occurrence:body.occurrence,occurrenceCount:body.occurrenceCount}];
   // Exact OOXML patching preserves the original ZIP members. A renderer-free
   // revision NEVER claims to preserve the visible Word page geometry.
   const result=renderer?await prepareVerifiedOriginalDocxExport({
