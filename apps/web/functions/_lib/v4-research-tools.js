@@ -123,6 +123,24 @@ export async function v4RunResearchAction(action,{collections,knownUrls,fetcher,
 }
 
 
+// Supply genuinely untried reads/pages before ending a stalled search.
+export function v4NextStallRead(urls,ledger=[],attempted=new Set(),browserAvailable=false){
+ const available=a=>!attempted.has(JSON.stringify([a.url,a.mode,a.offset||0]));
+ for(const url of urls){
+  const records=ledger.filter(r=>r.type==='read_page'&&r.url===url&&!r.script_source);
+  const initial={type:'read_page',url,mode:'static',offset:0};
+  if(!records.length&&!attempted.has(url)&&available(initial))return initial;
+  for(const r of records){
+   if(!Number.isSafeInteger(r.next_offset)||r.next_offset<=(r.offset||0)||records.some(p=>p.mode===r.mode&&p.offset===r.next_offset))continue;
+   const action={type:'read_page',url,mode:r.mode||'static',offset:r.next_offset};
+   if(available(action))return action;
+  }
+  const rendered={type:'read_page',url,mode:'browser',offset:0};
+  if(browserAvailable&&!records.some(r=>r.mode==='browser')&&available(rendered))return rendered;
+ }
+ return null;
+}
+
 export function v4RequestedActions(value){
  return [...(Array.isArray(value?.research_actions)?value.research_actions:[]),...(value?.research_action?[value.research_action]:[])].filter(x=>x&&typeof x==='object'&&typeof x.type==='string');
 }

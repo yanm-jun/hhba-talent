@@ -3,8 +3,10 @@
 // The coordinator retains exclusive authority over research tools and stopping.
 const throttle=new Set(['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_CONTEXT_TOO_LARGE']);
 export const initialDiscoveryWidth=3;
+// Full pipeline for both providers; zero is an explicit emergency rollback.
+export const v4ParallelResearchEnabled=(env={})=>env.HHBA_V4_PARALLEL_RESEARCH!=='0';
 export function nextDiscoveryWidth(previous,codes=[],{maxConnections=6,elapsed,previousElapsed}={}){
- const width=Number.isSafeInteger(previous)&&previous>0?previous:initialDiscoveryWidth;
+ const width=Math.min(maxConnections,Number.isSafeInteger(previous)&&previous>0?previous:initialDiscoveryWidth);
  if(codes.some(c=>throttle.has(c)))return Math.max(1,Math.floor(width/2));
  if(codes.length)return width;
  // Worker connection ceiling applies to an invocation, never to total research.

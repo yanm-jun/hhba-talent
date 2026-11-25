@@ -8,6 +8,7 @@ import {redactForModel} from '../../_lib/resume-match-core.js';
 import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
 import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
+import {v4ParallelResearchEnabled} from '../../_lib/v4-parallel-discovery.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {recognizeV4Resume} from '../../_lib/v4-resume-ocr.js';
 import {checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint,matchTaskKey,saveMatchTask,readMatchTask,startMatchPhaseHeartbeat} from '../../_lib/v4-match-checkpoint-storage.js';
@@ -118,7 +119,7 @@ function events(env,request,input,waitUntil){
      await guard();
      const result=await v4Match(fetch,v4JobProvider(env),input.text,input.role_hint,{
       signal:executionSignal,onProgress:progress,onActivity:activity,env,excludeUrls:input.excludeUrls,
-      stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,parallelResearch:env.HHBA_V4_PARALLEL_RESEARCH==='1'||(env.HHBA_V4_JOB_PROVIDER==='gemini'&&env.HHBA_V4_PARALLEL_RESEARCH!=='0'),allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
+      stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,parallelResearch:v4ParallelResearchEnabled(env),allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
       onResearch:sendResearch,
       onPartial:matches=>{sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
      await leaseHeartbeat?.stop();

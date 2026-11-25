@@ -10,7 +10,7 @@ import {sha256Hex} from './real-auth.js';
 import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
 import {CANDIDATE_TARGET,FINAL_TARGET,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,eligibleCuratedScore,qualifiedReport,validateGeminiGlobalOrder,applyGeminiGlobalOrder,mergeGeminiRankProgress,carryGeminiRankProgress} from './v4-curated-reports.js';
 import {findMainlandCity} from './mainland-job-location.js';
-import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4NotesMemoryPage,v4MemoryRecordPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex,v4KnownPublicResearchUrls,v4ResearchEvidenceProgress,v4MayContinueBrowserRead} from './v4-research-tools.js';
+import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4NotesMemoryPage,v4MemoryRecordPage,v4NextStallRead,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex,v4KnownPublicResearchUrls,v4ResearchEvidenceProgress,v4MayContinueBrowserRead} from './v4-research-tools.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch} from './v4-jd-research.js';
 import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery,runReadyWork} from './v4-parallel-discovery.js';
@@ -1084,10 +1084,11 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    }
    if(!fullResearch)return false;
    // Supply actual unread evidence rather than only repeating a prompt.
-   const u=[...sourceLeads].find(u=>!rows.has(u)&&!reviewedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u)&&!stallSourceReads.has(u)&&!publicEvidence.some(r=>r.url===u&&r.type==='read_page'));
-   if(!u)return false;
-   stallSourceReads.add(u);
-   researchToolResult=await v4RunResearchAction({type:'read_page',url:u},{collections:{},knownUrls:v4KnownPublicResearchUrls([u],publicEvidence),fetcher,browser:env.BROWSER,signal,budget:researchContextBudget,ledger:publicEvidence});
+   const pending=[...sourceLeads].filter(u=>!rows.has(u)&&!reviewedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u));
+    const action=v4NextStallRead(pending,publicEvidence,stallSourceReads,!!env.BROWSER);
+    if(!action)return false;
+    stallSourceReads.add(JSON.stringify([action.url,action.mode,action.offset||0]));
+    researchToolResult=await v4RunResearchAction(action,{collections:{},knownUrls:v4KnownPublicResearchUrls([action.url],publicEvidence),fetcher,browser:env.BROWSER,signal,budget:researchContextBudget,ledger:publicEvidence});
    v4RememberPublicResult(publicEvidence,researchToolResult);note('AI_STALL_PUBLIC_SOURCE_REVIEW');
    recoveryHint='独立复盘补充了此前未读的公开来源或实际读取失败信息，请依据工具结果判断具体岗位、查找可替代来源或说明无法继续的证据。';
    return true;
