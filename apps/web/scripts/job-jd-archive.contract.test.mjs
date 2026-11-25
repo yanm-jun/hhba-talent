@@ -371,33 +371,47 @@ test('private resume bucket is never referenced by public JD store',()=>{
 });
 
 
-test('full Word optimization and V4 reassessment use actual authenticated saved revisions',()=>{
+test('V4 uses actual saved DOCX for AI optimization, not a second AI score call',()=>{
  const ui=readFileSync(new globalThis.URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
  const source=readFileSync(new globalThis.URL('../functions/api/resume-word.js',import.meta.url),'utf8');
- assert.match(ui,/fetchPrivateResumeForLocalReview\(sourceResume\),wordSourceBytes\(sourceResume.id,revision,postingScope\)/);
- assert.match(ui,/beforeBlocks=sourceResumeBlocks\(redactResumeTextLocally\(originalText\),true\)/);
- assert.match(ui,/afterBlocks=sourceResumeBlocks\(redactResumeTextLocally\(editedText\),true\)/);
- assert.match(ui,/reassessResume\(scoreJobId,profile,beforeBlocks,afterBlocks,controller.signal,v4Reassessment\)/);
  assert.match(ui,/wordSourceBytes\(sourceResume.id,wordRevisionSnapshot.revision,postingScope\)/);
  assert.match(ui,/context=redactResumeTextLocally\(await extractDocxText/);
  assert.match(ui,/revisionKey!==lastWordRevisionKey.current/);
- assert.match(ui,/hasVerifiedWordRevision&&\(v4Reassessment\|\|verifiedWordScore.ok\)/);
  assert.match(source,/Number\(requested\)!==state.revision/);
- assert.match(ui,/!job.jd_version_id&&!hasAuditedAtsIdentity&&verifyStatus\?\.enabled/);
-});
-
-
-test('V4 Word score and optimization reject stale revision responses and allow fresh explicit research',()=>{
- const ui=readFileSync(new globalThis.URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
- assert.match(ui,/scoreRequest\.current\?\.abort\(\)/);
- assert.match(ui,/controller\.signal\.aborted\|\|scoreRequest\.current!==controller/);
- assert.match(ui,/result\.job_id!==scoreJobId/);
+ assert.match(ui,/if\(requireVerifiedJd\|\|!scoreStatus/);
+ assert.match(ui,/规则生成的目标分/);
+ assert.match(ui,/不是 AI 复评或实际提升/);
+ assert.match(ui,/wordRevisionSnapshot.history.some\(entry=>entry.original!==entry.text\)/);
+ assert.match(ui,/const feedback=undefined/);
  assert.match(ui,/startingRevision!==lastWordRevisionKey\.current/);
  assert.match(ui,/previousOptimization\.current\.pending\.length/);
  assert.doesNotMatch(ui,/prior&&!prior\.pending\.length\?prior\.suggestions/);
- assert.match(ui,/scoreResult\.job_id===targetedJob\.jd_version_id/);
 });
-
+test('V4 public reassessment is retired without invoking AI or reading resume body',async()=>{
+ const {onRequestGet,onRequestPost}=await import('../functions/api/resume-reassess.js');
+ const env={HHBA_MATCH_V4_READY:'1',HHBA_RESUME_REASSESS_ENABLED:'1'};
+ const status=await (await onRequestGet({env})).json();
+ assert.equal(status.enabled,false);
+ const response=await onRequestPost({env,request:new Request('https://hhba.work/api/resume-reassess',{method:'POST',headers:{Origin:'https://hhba.work'},body:'not a resume'})});
+ assert.equal(response.status,410);
+});
+test('randomized illustrative goal spans each band, is stable and never exceeds 100',async()=>{
+ const {resumeOptimizationTarget}=await import('../src/services/resumeOptimizationTarget.mjs');
+ for(const [score,lo,hi] of [[65,12,15],[75,10,12],[83,5,8],[92,2,4],[97,1,2],[99,1,1],[100,0,0]]){
+  const seen=new Set();
+  for(let i=0;i<128;i++){
+   const scope='fixture-'+i,r=resumeOptimizationTarget(score,scope);
+   assert.equal(r.kind,'RULE_GENERATED_TARGET_NOT_ASSESSED');
+   assert.equal(r.baseline,score);assert.equal(r.target,score+r.uplift);
+   assert.ok(r.uplift>=lo&&r.uplift<=hi&&r.target<=100);
+   assert.deepEqual(r,resumeOptimizationTarget(score,scope));
+   seen.add(r.uplift);
+  }
+  assert.equal(seen.size,hi-lo+1);
+ }
+ for(const score of [0,-1,101,83.5,NaN])assert.equal(resumeOptimizationTarget(score,'fixture'),null);
+ assert.equal(resumeOptimizationTarget(83,''),null);
+});
 
 test('V4 selected match research reaches real optimization endpoint, planner, writer and independent reviewer',async()=>{
  const {onRequestPost:optimize}=await import('../functions/api/resume-optimize.js');
