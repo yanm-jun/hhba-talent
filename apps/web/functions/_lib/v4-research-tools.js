@@ -46,7 +46,7 @@ export function v4RotatingMemoryPage(items,cursor,budget){
 export function v4AcceptResearchDigest(value,previous,notes){
  const candidate=typeof value?.research_digest==='string'?value.research_digest.trim():'';
  const raw=(notes||[]).join('\n\n');
- return candidate&&candidate.length<raw.length&&candidate.length<=Math.max(256,Math.floor(raw.length/2))?candidate:previous||'';
+ return candidate&&candidate.length<raw.length&&candidate.length<=Math.max(256,Math.floor(raw.length/2))?candidate:'';
 }
 export const V4_DIGEST_GUIDE='如已有 research_digest 或研究笔记，在正常JSON结果中同时返回 research_digest（合并此前摘要与新发现，精简重复内容，保留已核验的事实、关键来源/证据索引、未解决问题、已尝试策略和后续方向）。这是任务内导航摘要而非原文证据。原始 notes/evidence/candidates 均可按工具回查；不得凭摘要宣称已核验，不记录联系方式或复制完整简历。';
 export function v4NotesMemoryPage(notes,cursor=0,budget=90000,{rotate=false}={}){
@@ -227,7 +227,7 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
   if(paged){remember('resume',0,Math.min(resume.length,sentBudget));remember('jd',0,Math.min(jd.length,sentBudget));remember('document',0,Math.min(document.length,sentBudget));for(const r of results||[])if(r.ok&&r.type==='text_page'&&Object.hasOwn(delivered,r.collection))remember(r.collection,r.offset,r.offset+r.text.length);}
   if(response.status==='completed'){evidenceCursor=indexPage.next_cursor??0;notesCursor=notesPage.next_cursor??0;contextState=v4ContextFeedback(contextState,{more:indexPage.next_cursor!==null||notesPage.next_cursor!==null});budget=contextState.budget;}
   if(typeof data.research_notes==='string'&&data.research_notes.trim()&&!notes.includes(data.research_notes.trim())){const n=data.research_notes.trim();notes.push(n);if(Array.isArray(taskNotes)&&!taskNotes.includes(n))taskNotes.push(n);}
-  if(!privateOnly&&response.status==='completed')digest=v4AcceptResearchDigest(data,digest,notes);
+  if(!privateOnly&&response.status==='completed'){digest=v4AcceptResearchDigest(data,digest,notes);if(digest)note('AI_RESEARCH_DIGEST_ACCEPTED');}
   if(!actions.length){
    const next=paged?Object.keys(originals).filter(name=>missing(name)!==null):[];
    if(!next.length)return response;
@@ -253,6 +253,7 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
     if(repeated&&(!result.ok||identical)&&!advanced)return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
    fresh=true;
    if(result.ok&&result.type!=='read_page'&&result.type!=='evidence'&&result.type!=='memory'&&!identical)stageLedger.push(result);
+   if(result.reused_task_evidence)note('AI_TASK_PUBLIC_EVIDENCE_REUSED');
    note(result.ok?'AI_STAGE_TOOL_USED':'AI_STAGE_TOOL_UNAVAILABLE');return result;
   }});
   if(fresh){repeat=false;continue;}
