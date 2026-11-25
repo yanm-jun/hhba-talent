@@ -21,6 +21,7 @@ export type PriorMatchAnalysis=Pick<MatchedJob,
 export type JdAwareJob={
  title:string;requirements:string;official_url?:string;jd_version_id?:string;jd_sha256?:string;
  prior_match_analysis?:PriorMatchAnalysis;
+ reference_jd_kind?:'AI_GENERATED_REFERENCE';reference_jd_basis?:string;
 };
 // Preserve the complete selected report, including model-selected extra sections.
 // Do not use a placeholder 0 as a measured score.
