@@ -14,7 +14,7 @@ import {checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMa
 import {claimAiCheckpoint,leaseMatchTask} from '../../_lib/ai-checkpoint-claim.js';
 import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
 import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSessionTask} from '../../_lib/v4-session-match-task.js';
-import {backgroundEnabled,scheduleBackgroundMatch,loadBackgroundMatch} from '../../_lib/v4-background-match.js';
+import {backgroundEnabled,tryScheduleBackgroundMatch,loadBackgroundMatch} from '../../_lib/v4-background-match.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
 const reply=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
@@ -231,7 +231,7 @@ export async function onRequest(context){
  if(candidate?.role!=='candidate')return fail('FORBIDDEN',403);
  if(activeTaskRoute&&request.method==='GET'){
   if(!checkpointStorageReady(env))return fail('AI_CHECKPOINT_DB_UNAVAILABLE',503);
-  try{const task=await getSessionTask(env,session);if(task&&backgroundEnabled(env,request))await scheduleBackgroundMatch(env,session,task);return reply({ok:true,task});}catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',503);}
+  try{const task=await getSessionTask(env,session);const background_scheduled=await tryScheduleBackgroundMatch(env,request,session,task);return reply({ok:true,task,background_scheduled});}catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',503);}
  }
  if(suffix==='/ocr'){
   try{return reply({ok:true,...await recognizeV4Resume(request,v4Provider(env))});}
@@ -252,7 +252,7 @@ export async function onRequest(context){
   const text=action==='start'?sanitize(body.text):null;
   if(action==='start'&&!text)return fail('INVALID_RESUME_TEXT',400);
   const entry=action==='start'?{id:body.task_id,text,role:typeof body.options.role_hint==='string'?body.options.role_hint.trim():'',excludeUrls:[],resume_id:body.resume_id||null}:{id:body.task_id,generation:body.generation};
-  try{const task=await updateSessionTask(env,session,action,entry);if(task&&backgroundEnabled(env,request))await scheduleBackgroundMatch(env,session,task);return reply({ok:true,task});}catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
+  try{const task=await updateSessionTask(env,session,action,entry);const background_scheduled=await tryScheduleBackgroundMatch(env,request,session,task);return reply({ok:true,task,background_scheduled});}catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
  }
  if(!matchEnabled(env,request))return fail('AI_PROVIDER_NOT_CONFIGURED',503);
  // The third-party relay is not OpenAI or Google official infrastructure.
@@ -269,7 +269,7 @@ export async function onRequest(context){
   try{
    const task=await assertSessionTaskActive(env,session,body.task_id,body.research_generation??0);
    if(task.text!==resume||task.role!==role||task.resume_id!==input.resume_id||JSON.stringify(task.excludeUrls)!==JSON.stringify(excludeUrls))return fail('AI_CHECKPOINT_INVALID',409);
-   Object.assign(input,{managed:true,session,taskId:task.id});
+   Object.assign(input,{managed:true,session,taskId:task.id,sessionTask:task});
   }catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
  }
  if(checkpointStorageReady(env)&&body.task_id!==undefined){
@@ -279,7 +279,9 @@ export async function onRequest(context){
    if(input.managed&&backgroundEnabled(env,request)){
     const saved=await readMatchTask(env,input.taskKey);
     if(saved?.generation===generation&&saved?.result?.status==='COMPLETE'){input.generation=generation;input.cachedResult=saved.result;return events(env,request,input,waitUntil);}
-    return reply({status:'PENDING',progress:saved?.generation===generation?saved.progress||null:null});
+    if(await tryScheduleBackgroundMatch(env,request,session,input.sessionTask))return reply({status:'PENDING',progress:saved?.generation===generation?saved.progress||null:null});
+    // A missing, terminated, or unavailable independent driver must not strand
+    // the user in PENDING. Fall through to the same persisted task and lease.
    }
    input.lease=await leaseMatchTask(db,input.taskKey);
    if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);

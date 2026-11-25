@@ -309,3 +309,13 @@ test('long research notes remain fully readable with adaptive character cursors 
  assert.equal(rebuilt,exact);assert.ok(pages>1);
  assert.equal(v4NotesMemoryPage(notes,exact.length,256,{rotate:true}).cursor,0);
 });
+
+test('unavailable background scheduling returns fallback without losing authorized task identity',async()=>{
+ const {tryScheduleBackgroundMatch}=await import('../functions/_lib/v4-background-match.js');
+ const data=new Map(),env={HHBA_V4_BACKGROUND_ENABLED:'1',HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',HHBA_MATCH_V4_CHECKPOINT_SECRET:'synthetic-checkpoint-secret-long-enough',HHBA_PRIVATE_RESUMES:{async put(k,v){data.set(k,v)},async get(k){const v=data.get(k);return v?{arrayBuffer:async()=>v.buffer.slice(v.byteOffset,v.byteOffset+v.byteLength)}:null}},HHBA_MATCH_BACKGROUND:{async fetch(){return Response.json({ok:false},{status:409})}}};
+ const session={phone:'synthetic-account',token_hash:'synthetic-session'},task={id:'00000000-0000-4000-8000-000000000001',generation:0};
+ assert.equal(await tryScheduleBackgroundMatch(env,new Request('https://hhba.work/api/match-v4/resume'),session,task),false);
+ env.HHBA_MATCH_BACKGROUND.fetch=async()=>Response.json({ok:true});
+ assert.equal(await tryScheduleBackgroundMatch(env,new Request('https://hhba.work/api/match-v4/resume'),session,task),true);
+ assert.equal(data.size,1);
+});

@@ -24,3 +24,12 @@ test('lease conflict and interrupted response are retried, not treated as comple
  await assert.rejects(requestPhase(async()=>new Response(''),ticket),/BACKGROUND_PHASE_RETRY/);
  assert.equal(await requestPhase(async()=>event('failure',{error:'AI_PROVIDER_KEY_REJECTED'}),ticket),'FAILED');
 });
+
+test('existing terminated or failed workflow is not mistaken for a running scheduler',async()=>{
+ const {scheduleWorkflowInstance}=await import('./runner.mjs');
+ for(const status of ['queued','running','waiting','complete','errored','terminated','paused','unknown']){
+  const binding={async create(){throw Error('(instance.already_exists)')},async get(id){assert.equal(id,'id');return {async status(){return {status}}}}};
+  assert.equal(await scheduleWorkflowInstance(binding,'id',ticket),['queued','running','waiting'].includes(status));
+ }
+ assert.equal(await scheduleWorkflowInstance({async create(){}},'id',ticket),true);
+});
