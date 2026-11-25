@@ -659,7 +659,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   if(fullResearch)for(const j of combined){
    const url=j.research_candidate_url||j.official_url;
    if(!rows.has(url)||j.curated_suitable===false||j.excluded_closed||j.excluded_board||Number.isInteger(j.match_score)||!(j.jd_source_status==='VERIFIED_JD'||j.reference_vacancy_verified===true))continue;
-   const key=await sha256Hex(JSON.stringify([url,candidateEvidence(rows.get(url)),j.evidence_excerpt,j.reference_jd,j.jd_research?.facts||[]]));
+   const key=await sha256Hex(JSON.stringify([url,candidateEvidence(rows.get(url)),j.evidence_excerpt,j.jd_research?.facts||[]]));
    if(scoreRecoveryKeys.has(key))continue;
    scoreRecoveryKeys.add(key);scoreRechecks.push(url);
   }
@@ -1048,7 +1048,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    const actions=v4RequestedActions(data);
    if(actions.length){
     const knownUrls=v4KnownPublicResearchUrls([...sourceLeads,...rows.keys()],publicEvidence);
-    const results=await v4RunResearchActions(actions,{collections:{candidates:candidateMemory(),sources:[...sourceLeads],unresolved:unresolvedMemory(),evidence:v4EvidenceIndex(publicEvidence),history:rounds,notes:researchNotes},ledger:publicEvidence,knownUrls,fetcher,browser:env.BROWSER,signal,budget:researchContextBudget,onAction:async(action,run)=>{
+    const results=await v4RunResearchActions(actions,{collections:{candidates:candidateMemory(),sources:[...sourceLeads],unresolved:unresolvedMemory(),evidence:v4EvidenceIndex(publicEvidence),history:rounds,notes:researchNotes},ledger:publicEvidence,knownUrls,fetcher,browser:env.BROWSER,signal,budget:researchContextBudget,parallelPublicReads:parallelResearch,onAction:async(action,run)=>{
      const actionKey=await sha256Hex(JSON.stringify([signature,researchContextBudget,action.type,action.collection,action.cursor,action.url,action.mode,action.offset,action.index,action.discover===true]));
      const repeated=actionSeen.has(actionKey);
      if(repeated&&!(action.type==='read_page'&&action.refresh===true))return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
