@@ -67,7 +67,7 @@ function JdResearchContent({job}:{job:MatchedJob}){
  const norm=(s:string)=>s.replace(/\s+/g,' ').trim();
  return <>
   {requirements&&excerpt&&norm(excerpt).includes(norm(requirements))&&norm(requirements)!==norm(excerpt)&&<section className="hhba-refined-section"><h3>岗位要求</h3><p>{recruitmentText(requirements)}</p></section>}
-  {excerpt&&<section className="hhba-refined-section"><h3>完整 JD 原文</h3><p>{recruitmentText(excerpt)}</p></section>}
+  {excerpt&&<section className="hhba-refined-section"><h3>完整 JD 原文</h3><p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{recruitmentText(excerpt)}</p></section>}
  </>;
 }
 export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=false,progressStage='preparing',activity,elapsed,selection,onSelectionChange,onFollow,selectedJobUrl,onJobChange,onOptimize,optimizationAvailable=false}:{
