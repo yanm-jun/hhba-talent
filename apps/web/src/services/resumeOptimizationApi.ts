@@ -20,6 +20,7 @@ const OPTIMIZATION_ERRORS:Record<string,string>={
   RESUME_OPTIMIZATION_IN_PROGRESS:'这份简历已在处理同一岗位，可以回到已开始优化的窗口。',
   RESUME_OPTIMIZATION_QUEUED:'当前正在排队处理简历优化，请稍后重试。',
   AI_PROVIDER_NOT_CONFIGURED:'后台尚未配置简历润色 AI 模型。',
+  OPTIMIZATION_PAYLOAD_TOO_LARGE:'本次材料超过传输容量，未截断简历或岗位报告，也未执行修改。',
   INVALID_OPTIMIZATION_INPUT:'简历证据不完整，请先完成简历解析。',
   JD_VERIFIED_VERSION_REQUIRED:'当前岗位尚未取得核验过的完整 JD，不能进行严格定向优化。',
   JD_VERSION_NOT_AVAILABLE:'岗位 JD 档案读取失败，请重新获取该岗位的官方 JD。',
@@ -81,7 +82,7 @@ export async function requestResumeOptimization(blocks:ResumeBlock[],
   try{
    response=await fetch(PATH,{method:'POST',cache:'no-store',credentials:'omit',signal,
     headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
-    body:JSON.stringify({consent_ai:true,blocks:batch,job,
+    body:JSON.stringify({consent_ai:true,blocks:batch,job:document&&job.jd_version_id&&job.jd_sha256?{...job,requirements:''}:job,
      // job includes the selected prior match analysis; never reduce it to a JD summary.
      ...(document?{full_document:{text:document.text,wanted,feedback:document.feedback,review_feedback:reviewFeedback}}:{})})});
   }catch(error){

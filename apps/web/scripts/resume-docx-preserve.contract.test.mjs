@@ -243,8 +243,8 @@ test('same-style split text nodes become one editable paragraph and preserve XML
  assert.ok((await inspectOriginalDocxStrict(revised,{allowParagraphRuns:true})).editable_text.includes(second));
  assert.deepEqual(parts(revised).get('word/styles.xml').compressed,before.get('word/styles.xml').compressed);
 });
-test('mixed styles and duplicated split paragraphs cannot be merged into an unsafe anchor',async()=>{
- for(const input of [fixture({mixed:true}),fixture({split:true,splitDuplicate:true})]){
+test('duplicated split paragraphs cannot be merged into an unsafe anchor',async()=>{
+ for(const input of [fixture({split:true,splitDuplicate:true})]){
   const inspection=await inspectOriginalDocxStrict(input,{allowParagraphRuns:true});
   assert.ok(!inspection.editable_text.includes('原始岗位描述'));
   await assert.rejects(()=>editOriginalDocxStrict(input,[{original:'原始岗位描述',text:'真实改写'}],{allowExpansion:true}),/WORD_EDIT_AMBIGUOUS/);
@@ -267,4 +267,28 @@ test('AI multiline expansion creates actual styled sibling Word paragraphs and k
  for(const line of lines)assert.ok(inspected.editable_text.includes(line));
  for(const [name,part] of before)if(name!=='word/document.xml')assert.deepEqual(after.get(name).compressed,part.compressed);
  await assert.rejects(()=>editOriginalDocxStrict(fixture({mixed:true}),[{original:'原始岗位',text:'新内容\n额外内容'}],{allowExpansion:true}),/WORD_EDIT_AMBIGUOUS/);
+});
+
+
+test('mixed formatting paragraph supports local changes while preserving untouched styled suffix and package members',async()=>{
+ const source=fixture({mixed:true,method:8}),before=parts(source);
+ const info=await inspectOriginalDocxStrict(source,{allowParagraphRuns:true});
+ assert.ok(info.editable_text.includes('原始岗位描述'));
+ const edited=await editOriginalDocxStrict(source,[{original:'原始岗位描述',text:'优化岗位描述'}],{allowExpansion:true});
+ const after=parts(edited),xml=after.get('word/document.xml').raw.toString();
+ assert.equal(xml,before.get('word/document.xml').raw.toString().replace('<w:t>原始岗位</w:t>','<w:t>优化岗位</w:t>'));
+ for(const [name,part] of before)if(name!=='word/document.xml')assert.deepEqual(after.get(name).compressed,part.compressed);
+ assert.ok((await inspectOriginalDocxStrict(edited,{allowParagraphRuns:true})).editable_text.includes('优化岗位描述'));
+});
+
+
+test('explicit repeated paragraph occurrence edits only the selected copy, and rejects stale counts',async()=>{
+ const source=fixture({duplicate:true,method:8}),before=parts(source);
+ const inspected=await inspectOriginalDocxStrict(source,{allowParagraphRuns:true});
+ const duplicate=inspected.duplicate_paragraphs.find(p=>p.text==='原始岗位描述');
+ assert.equal(duplicate.count,2);
+ const edited=await editOriginalDocxStrict(source,[{original:duplicate.text,text:'第二处岗位描述',occurrence:1,occurrenceCount:2}],{allowExpansion:true});
+ const xml=parts(edited).get('word/document.xml').raw.toString();
+ assert.equal(xml,before.get('word/document.xml').raw.toString().replace('<w:p><w:r><w:t>原始岗位描述</w:t></w:r></w:p>','<w:p><w:r><w:t>第二处岗位描述</w:t></w:r></w:p>'));
+ await assert.rejects(()=>editOriginalDocxStrict(edited,[{original:duplicate.text,text:'错误位置',occurrence:0,occurrenceCount:2}],{allowExpansion:true}),/WORD_EDIT_AMBIGUOUS/);
 });

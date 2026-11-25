@@ -5,6 +5,7 @@ import type {PrivateResume} from '../services/privateResumes';
 import {downloadPrivateResume,fetchPrivateResumeForLocalReview} from '../services/privateResumes';
 import {extractDocxText} from '../services/docxProfile.mjs';
 import {matchWordAnchors,type WordAnchor} from '../services/resumeWordAnchors.mjs';
+import type {DuplicateWordParagraph} from '../services/resumeDocxPreserve.mjs';
 import {splitChangedResumeText} from '../services/resumeChangedText.mjs';
 import {
  wordEditingCapabilities,wordEditableText,wordPreviewBytes,wordSourceBytes,saveOriginalWordEdit,
@@ -21,7 +22,7 @@ import '../styles/siri-edge.css';
 // Downloaded DOCX preserves the original OOXML package, but without the
 // optional LibreOffice check its visual pagination is NOT verified.
 type PendingWordTextDraft={original:string;text:string;revision:number;page:number};
-export type WordVisualSuggestion={id:string;original:string;proposed:string;state:'pending'|'accepted'};
+export type WordVisualSuggestion={id:string;original:string;proposed:string;state:'pending'|'accepted';occurrence?:number;occurrenceCount?:number};
 export type WordRevisionSnapshot={revision:number;history:WordHistoryEntry[]};
 export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onVisualSuggestionAction,onRevisionSnapshot,onDocumentReady,onEditableSegments}:{
  resume:PrivateResume;jobId?:string;jobTitle?:string;onClose?:()=>void;
@@ -39,7 +40,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  onVisualSuggestionAction?:(id:string,action:'accepted'|'ignored'|'edited',text?:string,layoutVerified?:boolean)=>void;
  onRevisionSnapshot?:(snapshot:WordRevisionSnapshot)=>void;
  onDocumentReady?:()=>void;
- onEditableSegments?:(segments:string[],documentText?:string,paragraphText?:string[])=>void;
+ onEditableSegments?:(segments:string[],documentText?:string,paragraphText?:string[],anchors?:WordAnchor[])=>void;
 }){
  const surface=useRef<HTMLCanvasElement>(null);
  const paper=useRef<HTMLDivElement>(null);
@@ -63,6 +64,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  const [paperSize,setPaperSize]=useState({width:0,height:0});
  const [editable,setEditable]=useState<string[]>([]);
  const [anchors,setAnchors]=useState<WordAnchor[]>([]);
+ const [duplicates,setDuplicates]=useState<DuplicateWordParagraph[]>([]);
  const [selected,setSelected]=useState<WordAnchor|null>(null);
  const [draft,setDraft]=useState('');
  const [confirmed,setConfirmed]=useState(false);
@@ -194,11 +196,12 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      const mount=browserMount.current;
      await renderBrowserWord(raw,mount);
      if(!active)return;
-     const safeAnchors=browserWordAnchors(mount,info.editable_text||[]);
+     const repeated=info.duplicate_paragraphs||[];setDuplicates(repeated);
+     const safeAnchors=browserWordAnchors(mount,info.editable_text||[],repeated);
      setEditable(info.editable_text||[]);
      setAnchors(safeAnchors);
      // AI edits may only target unique, visible Word text positions.
-     onEditableSegments?.([...new Set(safeAnchors.map(item=>item.text))],mount.innerText,info.paragraph_text||[]);
+     onEditableSegments?.([...new Set(safeAnchors.filter(item=>item.occurrence===undefined).map(item=>item.text))],mount.innerText,info.paragraph_text||[],safeAnchors);
      setCount(1);setPage(1);
      setPaperSize({width:mount.scrollWidth,height:mount.scrollHeight});
      setLoading(false);
@@ -372,23 +375,23 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  useLayoutEffect(()=>{
   if(rendererEnabled||loading||ready!=='available'||!browserMount.current)return;
   const mount=browserMount.current;
-  paintBrowserWordSuggestions(mount,editable,visualSuggestions);
-  const next=browserWordAnchors(mount,editable);
+  paintBrowserWordSuggestions(mount,editable,visualSuggestions,duplicates);
+  const next=browserWordAnchors(mount,editable,duplicates);
   setAnchors(next);
   setPaperSize({width:mount.scrollWidth,height:mount.scrollHeight});
- },[rendererEnabled,loading,ready,editable,visualSuggestions,refresh]);
+ },[rendererEnabled,loading,ready,editable,visualSuggestions,refresh,duplicates]);
 
  // Explicit candidate confirmation and verified private Word revision are
  // mandatory before any rainbow suggestion becomes actual document text.
  async function acceptVisualWord(anchor:WordAnchor,visual:WordVisualSuggestion){
   if(ready!=='available'||busy||loading||visual.state!=='pending'||
-   !editable.includes(anchor.text)||!visual.proposed.trim()||
+   (anchor.occurrence===undefined&&!editable.includes(anchor.text))||!visual.proposed.trim()||
    visual.proposed===anchor.text)return;
   if(!confirmDiscardText())return;
   if(!window.confirm('请先核实这段文字符合真实经历。确认采纳并保存岗位专属 Word 修改？原上传文件不会被覆盖。'))return;
   rememberPosition();setBusy(true);setMessage('');
   try{
-   const result=await saveOriginalWordEdit(resume.id,anchor.text,visual.proposed.trim(),revision,jobId);
+   const result=await saveOriginalWordEdit(resume.id,anchor.text,visual.proposed.trim(),revision,jobId,anchor.occurrence,anchor.occurrenceCount);
    onSessionWordDraftChange?.(null);
    onVerifiedSave?.({original:anchor.text,text:visual.proposed.trim()});
    onVisualSuggestionAction?.(visual.id,'accepted',undefined,result.layout_verified===true);
@@ -432,7 +435,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   if(!selected||!confirmed||busy||loading||!draft.trim())return;
   rememberPosition();setBusy(true);setMessage('');
   try{
-   const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision,jobId);
+   const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision,jobId,selected.occurrence,selected.occurrenceCount);
    onSessionWordDraftChange?.(null);
    onVerifiedSave?.({original:selected.text,text:draft.trim()});
    if(inlineVisualEditor&&inlineVisualSuggestionId)
@@ -501,7 +504,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  const anchorsOverlay=anchors.map(anchor=>{
        const [x,y,w,h]=anchor.bbox;
        const candidates=visualSuggestions.filter(change=>
-        change.original===anchor.text&&change.proposed.trim()&&
+        change.original===anchor.text&&change.occurrence===anchor.occurrence&&change.occurrenceCount===anchor.occurrenceCount&&change.proposed.trim()&&
         change.proposed!==anchor.text);
        const visual=candidates.length===1?candidates[0]:null;
        const textFits=Boolean(visual&&Array.from(visual.proposed).length<=
@@ -524,11 +527,11 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
          // attached to the identical visible text, page and server revision.
          const replacing=Boolean(selected&&draft!==selected.text);
          if(replacing)onSessionWordDraftChange?.(null);
-         const restored=!replacing&&sessionWordDraft&&
+         const restored=anchor.occurrence===undefined&&!replacing&&sessionWordDraft&&
           sessionWordDraft.revision===revision&&sessionWordDraft.page===page&&
           sessionWordDraft.original===anchor.text&&
           sessionWordDraft.text.trim();
-         const matches=suggestedChanges.filter(change=>change.original===anchor.text&&
+         const matches=suggestedChanges.filter(change=>anchor.occurrence===undefined&&change.original===anchor.text&&
           change.proposed.trim());
          const candidate=restored?sessionWordDraft!.text:
           matches.length===1?matches[0].proposed:anchor.text;

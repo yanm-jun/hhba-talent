@@ -57,7 +57,7 @@ def exercise(browser,name,viewport):
             assert payload['consent_ai'] is True
             assert payload['job']['title'] and payload['blocks']
             assert payload['job']['jd_version_id']==JD_ID and payload['job']['jd_sha256']==JD_SHA
-            assert payload['job']['requirements']==JD
+            assert payload['job']['requirements']=='', 'verified JD is resolved by its version and hash, not duplicated in transport'
             text=payload['blocks'][0]['text']
             assert payload['blocks'][0]['id']=='word-0',('not anchored Word',payload['blocks'])
             assert text=='负责门店运营及日常数据整理工作',('AI received wrong original text',text)

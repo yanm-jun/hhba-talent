@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdtempSync,rmSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {inflateRawSync} from 'node:zlib';
 import {editOriginalDocxStrict,inspectOriginalDocxStrict} from '../src/services/resumeDocxPreserve.mjs';
 
@@ -78,4 +82,20 @@ test('genuine compressed DOCX enforces safe shortening/unique target restriction
  await assert.rejects(
   editOriginalDocxStrict(original,[{original:'并不存在的工作经历',text:'修改'}]),
   /WORD_EDIT_AMBIGUOUS/);
+});
+
+
+test('actual JS-expanded DOCX renders in LibreOffice and keeps all new text, without forcing same-page geometry',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'hhba-word-pagination-'));
+ try{
+  const lines=['虚构测试新增工作内容','虚构测试新增沟通事项'];
+  const edited=await editOriginalDocxStrict(original,[{original:OLD,text:OLD+'\n'+lines.join('\n')}],{allowExpansion:true});
+  const source=join(dir,'expanded.docx');writeFileSync(source,edited);
+  execFileSync('libreoffice',['-env:UserInstallation='+pathToFileURL(join(dir,'profile')).href,'--headless','--convert-to','pdf','--outdir',dir,source],{timeout:65000});
+  const pdf=join(dir,'expanded.pdf'),info=execFileSync('pdfinfo',[pdf],{encoding:'utf8'}),text=execFileSync('pdftotext',['-layout',pdf,'-'],{encoding:'utf8'}).replace(/\s/g,'');
+  assert.ok(Number(info.match(/Pages:\s+(\d+)/)?.[1])>=2);
+  for(const line of [OLD,...lines])assert.ok(text.includes(line));
+  // Exact pagination is measured, not promised or enforced as an AI limit.
+  console.log('HHBA_SYNTHETIC_LIBREOFFICE_EXPANSION='+JSON.stringify({pages:Number(info.match(/Pages:\s+(\d+)/)?.[1]),text_verified:true}));
+ }finally{rmSync(dir,{recursive:true,force:true});}
 });

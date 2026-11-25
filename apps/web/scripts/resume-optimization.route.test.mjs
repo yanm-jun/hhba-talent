@@ -495,3 +495,18 @@ test('V4 cross-section numeric facts require actual full-document quotes and ind
   assert.equal(calls,1);
  }finally{globalThis.fetch=originalFetch;}
 });
+
+
+test('planning rebinds historical report to current CV and JD, forwards only real current evidence',async()=>{
+ const context='真实门店运营经历。',job={requirements:'要求门店运营经验。',prior_match_analysis:{research_detail:{comparisons:[{resume_evidence:null}]}}};
+ const valid={jd_quote:'门店运营经验',resume_quote:'真实门店运营经历',analysis:'相关真实经历'};
+ const fake={...valid,resume_quote:'虚构经历'};
+ let written=false,audited=false;
+ const blocks=[{id:'a',section:'experience',text:context}];
+ const result=await optimizeResumeDocument({env:{HHBA_MATCH_V4_READY:'1'},blocks,context,job,signal:new AbortController().signal},{
+  plan:async()=>({focus:['门店运营'],evidence:[valid,fake]}),
+  generate:async input=>{assert.deepEqual(input.documentContext.current_evidence,[valid]);written=true;return {suggestions:[],reviewedIds:['a']};},
+  audit:async input=>{assert.deepEqual(input.reviewContext.current_evidence,[valid]);audited=true;return {suggestions:[],pendingIds:[]};}
+ });
+ assert.ok(written&&audited);assert.deepEqual(result.pendingIds,[]);
+});

@@ -22,6 +22,9 @@ body{background:#e9edf3;font-family:Arial,sans-serif;margin:0;padding:12px;box-s
 </div>
 <script type="module">
 import {renderBrowserWord,browserWordAnchors,paintBrowserWordSuggestions} from '/src/services/browserWordPreview.ts';
+import {inspectOriginalDocxStrict,editOriginalDocxStrict} from '/src/services/resumeDocxPreserve.mjs';
+const REPEAT='虚构测试：相同职责描述';
+const NEW_REPEAT='虚构测试：第二处独立职责';
 const OLD='负责门店运营及日常数据整理工作';
 const SPLIT='虚构测试：多节点岗位运营经历';
 const PROPOSED='虚构测试：针对岗位优化后的运营经历';
@@ -37,8 +40,18 @@ try{
   const splitPreview=(root.textContent||'').includes(PROPOSED)&&browserWordAnchors(root,[OLD,SPLIT]).some(a=>a.text===SPLIT);
   paintBrowserWordSuggestions(root,[OLD,SPLIT],[]);
   const splitRestored=(root.textContent||'').includes(SPLIT)&&!(root.textContent||'').includes(PROPOSED);
+  const info=await inspectOriginalDocxStrict(bytes,{allowParagraphRuns:true});
+  const repeated=info.duplicate_paragraphs.filter(x=>x.text===REPEAT);
+  const repeatAnchors=browserWordAnchors(root,[OLD,SPLIT],repeated).filter(a=>a.text===REPEAT);
+  paintBrowserWordSuggestions(root,[OLD,SPLIT],[{original:REPEAT,proposed:NEW_REPEAT,state:'pending',occurrence:1,occurrenceCount:2}],repeated);
+  const repeatPreview=(root.textContent||'').includes(NEW_REPEAT)&&(root.textContent||'').split(REPEAT).length===2&&browserWordAnchors(root,[OLD,SPLIT],repeated).filter(a=>a.text===REPEAT).length===2;
+  paintBrowserWordSuggestions(root,[OLD,SPLIT],[],repeated);
+  const repeatRestored=(root.textContent||'').split(REPEAT).length===3;
+  const revised=await editOriginalDocxStrict(bytes,[{original:REPEAT,text:NEW_REPEAT,occurrence:1,occurrenceCount:2}],{allowExpansion:true});
+  const probe=document.createElement('div');await renderBrowserWord(revised,probe);
+  const repeatSaved=(probe.textContent||'').split(REPEAT).length===2&&(probe.textContent||'').includes(NEW_REPEAT);
   window.__HHBA_WORD_QA={
-   state:'ok',pageCount,anchors,splitPreview,splitRestored,
+   state:'ok',pageCount,anchors,splitPreview,splitRestored,repeatAnchors,repeatPreview,repeatRestored,repeatSaved,
    text:root.textContent||'',
    images:root.querySelectorAll('img').length,
    scriptTags:root.querySelectorAll('script').length,

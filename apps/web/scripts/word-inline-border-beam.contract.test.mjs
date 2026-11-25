@@ -8,12 +8,14 @@ const preview=file('../src/services/browserWordPreview.ts');
 const css=file('../src/styles/word-editor-minimal.css');
 
 test('browser Word AI text is painted on original run, not a guessed font overlay',()=>{
- assert.match(word,/paintBrowserWordSuggestions\(mount,editable,visualSuggestions\)/);
- assert.match(word,/const next=browserWordAnchors\(mount,editable\)/);
+ assert.match(word,/paintBrowserWordSuggestions\(mount,editable,visualSuggestions,duplicates\)/);
+ assert.match(word,/const next=browserWordAnchors\(mount,editable,duplicates\)/);
  assert.match(word,/visual&&rendererEnabled&&<span className="hhba-word-ai-preview"/);
  assert.match(preview,/node\.replaceChildren\(document\.createTextNode\(prefix\),mark,document\.createTextNode\(suffix\)\)/);
  assert.match(preview,/node\.setAttribute\(attribute,group\?\(node\.textContent\|\|''\):original\)/);
  assert.match(preview,/nodes\.length\+joined\.length!==1/);
+ assert.match(preview,/s\.occurrence===group\.occurrence&&s\.occurrenceCount===group\.occurrenceCount/);
+ assert.match(preview,/hits\.length!==entry\.count/);
  assert.match(preview,/values\.length!==1/);
  assert.match(preview,/const value=original\?\?span\.textContent\?\?''/);
  assert.match(css,/\.hhba-browser-word-overlay \.hhba-original-resume-anchor\.has-ai-preview\{/);
