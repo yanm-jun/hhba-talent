@@ -76,6 +76,7 @@ test('pipeline allocates idle transport slots to verification backlog without re
  assert.deepEqual(pipelineWidths({discoveryWidth:4},5),{discovery:3,verification:2});
  assert.deepEqual(pipelineWidths({discoveryWidth:4},100),{discovery:2,verification:3});
  assert.deepEqual(pipelineWidths({discoveryWidth:4,pipelineVerificationWidth:1},100),{discovery:4,verification:1});
+ assert.deepEqual(pipelineWidths({discoveryWidth:4,pipelineVerificationWidth:4},100),{discovery:1,verification:4});
  assert.equal(verificationSnapshot({},3).verificationBatch,3);
 });
 test('a fast independent JD is scored before a slow sibling page finishes',async()=>{
@@ -386,4 +387,16 @@ test('discovery research overlaps independent public reads but preserves result 
   active++;peak=Math.max(peak,active);await new Promise(r=>setTimeout(r,u===a?25:5));active--;return Response.json({title:u});
  }});
  assert.equal(peak,2);assert.deepEqual(result.slice(0,2).map(r=>r.url),[a,b]);assert.equal(result[2].type,'memory');
+});
+
+test('score recovery switches evidence protocol for unchanged unresolved verified vacancy',async()=>{
+ const candidate=job(99),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const match={company:candidate.company,title:candidate.title,location:candidate.location,official_url:candidate.url,source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',evidence_status:'VERIFIED_FULL_JD',evidence_excerpt:'负责汽车经销商渠道运营',match_score:null};
+ const opts={env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true};
+ const never=async()=>{throw Error('must schedule before provider call')};
+ const first=await v4Match(never,provider,resume,'全国',{...opts,checkpoint:{phase:'reporting',rows:[[candidate.url,candidate]],profile,matches:[match]}});
+ assert.deepEqual(first.checkpoint.scoreRecoveryModes,[[candidate.url,'independent']]);
+ const second=await v4Match(never,provider,resume,'全国',{...opts,checkpoint:{...first.checkpoint,phase:'reporting'}});
+ assert.deepEqual(second.checkpoint.explicitRechecks,[candidate.url]);assert.deepEqual(second.checkpoint.scoreRecoveryModes,[[candidate.url,'anchors']]);
+ assert.equal(second.checkpoint.scoreRecoveryKeys.length,2);
 });

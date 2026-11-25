@@ -42,3 +42,20 @@ test('authorized scheduler restarts errored workflow only, never terminated or c
   assert.equal(await scheduleWorkflowInstance(binding,'id',ticket),status==='errored');assert.equal(restarted,status==='errored'?1:0);
  }
 });
+
+test('watchdog fairly resumes errored instances and never reopens terminal workflows',async()=>{
+ const {registerWatchdogInstance,inspectWatchdogInstances}=await import('./runner.mjs');
+ const rows=new Map(),now=1000,statuses=new Map(),restarted=[];
+ const db={prepare(sql){return {bind(...v){return {async run(){
+  if(sql.startsWith('INSERT'))rows.set(v[0],{instance_id:v[0],next_check:v[1],expires_at:v[2]});
+  else if(sql.startsWith('DELETE'))rows.delete(v[0]);
+  else rows.get(v[1]).next_check=v[0];
+ },async all(){return {results:[...rows.values()].filter(r=>r.next_check<=v[0]).slice(0,v[1])}}}}}}};
+ for(const [i,status] of ['errored','terminated','complete','running','paused'].entries()){
+  const id=String(i+1).repeat(64);statuses.set(id,status);await registerWatchdogInstance(db,id,now);
+ }
+ const workflow={async get(id){return {async status(){return {status:statuses.get(id)}},async restart(){restarted.push(id);statuses.set(id,'running')}}}};
+ const result=await inspectWatchdogInstances(db,workflow,{now,batch:20});
+ assert.deepEqual(result,{checked:5,restarted:1});assert.deepEqual(restarted,['1'.repeat(64)]);assert.equal(rows.size,2);
+ assert.deepEqual(await inspectWatchdogInstances(db,workflow,{now:now+1}),{checked:0,restarted:0});
+});

@@ -57,3 +57,31 @@ export async function scheduleWorkflowInstance(workflow,instance,ticket){
  }
  return false;
 }
+
+ // Registry stores only opaque workflow instance IDs, not tickets, CVs,
+ // applicant identities or session tokens. Restart uses the original workflow
+ // parameters and Pages independently checks the active authorization.
+export async function registerWatchdogInstance(db,instance,now=Date.now()){
+ if(!db||! /^[a-f0-9]{64}$/.test(instance))return;
+ await db.prepare('INSERT INTO match_watchdog_instances (instance_id,next_check,expires_at) VALUES (?,?,?) ON CONFLICT(instance_id) DO UPDATE SET expires_at=excluded.expires_at').bind(instance,now,now+24*3600000).run();
+}
+export async function inspectWatchdogInstances(db,workflow,{now=Date.now(),batch=20}={}){
+ if(!db||!workflow)return {checked:0,restarted:0};
+ // Fair, due-time pagination. A subsequent cron pass handles remaining rows.
+ const result=await db.prepare('SELECT instance_id,expires_at FROM match_watchdog_instances WHERE next_check<=? ORDER BY next_check,instance_id LIMIT ?').bind(now,batch).all();
+ let checked=0,restarted=0;
+ for(const row of result.results||[]){
+  const id=row.instance_id;checked++;
+  if(!/^[a-f0-9]{64}$/.test(id)||row.expires_at<=now){await db.prepare('DELETE FROM match_watchdog_instances WHERE instance_id=?').bind(id).run();continue;}
+  try{
+   const instance=await workflow.get(id),state=await instance.status();
+   if(state?.status==='errored'&&typeof instance.restart==='function'){
+    await instance.restart();restarted++;
+   }else if(['complete','terminated','paused'].includes(state?.status)){
+    await db.prepare('DELETE FROM match_watchdog_instances WHERE instance_id=?').bind(id).run();continue;
+   }
+  }catch{/* a temporary platform failure must not discard an authorized instance */}
+  await db.prepare('UPDATE match_watchdog_instances SET next_check=? WHERE instance_id=?').bind(now+5*60000,id).run();
+ }
+ return {checked,restarted};
+}

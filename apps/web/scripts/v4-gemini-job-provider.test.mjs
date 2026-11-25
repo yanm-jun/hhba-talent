@@ -448,3 +448,32 @@ test('lazy iframe and nested JavaScript module paths use the referring document 
  assert.deepEqual(reads,[frame,script,child,api]);assert.deepEqual(plan.publicDataUrls,[frame,api]);
  assert.equal(ledger.find(r=>r.url===child).document_url,frame);
 });
+
+test('runtime browser script is fixed, parseable and admits only independently read exact data URLs',async()=>{
+ const {v4RuntimeBrowserScript,v4RenderPublicJobDocument,v4PreparePublicBrowserResources}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const target='https://careers.employer.cn/jobs/42',api='https://data.employer.cn/jobs/42.json',blocked='https://localhost/private';
+ const ledger=[];let calls=0;
+ const browser={async script(code,options){
+  assert.equal(typeof Function('return ('+code+')')(),'function');
+  assert.equal(options.library,'playwright');assert.match(code,/routeWebSocket/);assert.match(code,/maxRedirects:0/);
+  calls++;
+  return Response.json({success:true,result:{html:'<h1>招聘详情</h1>',finalUrl:target,observed:[{url:api,kind:'data'},{url:blocked,kind:'data'}]}});
+ }};
+ const first=await v4RenderPublicJobDocument(target,{browser});
+ assert.equal(first.resource_hints.length,1);assert.equal(first.resource_hints[0].url,api);assert.equal(first.resource_hints[0].runtime_observed,true);
+ const plan=await v4PreparePublicBrowserResources(target,{resourceHints:first.resource_hints,ledger,fetcher:async u=>{assert.equal(u,api);return Response.json({description:'真实公开岗位职责'});},onDocument:r=>ledger.push(r)});
+ assert.deepEqual(plan.publicDataUrls,[api]);
+ await v4RenderPublicJobDocument(target,{browser,...plan});assert.equal(calls,2);
+ assert.match(v4RuntimeBrowserScript(target,[api]),/data\.employer\.cn/);
+});
+test('automatic public resource transport adapts to large pending sets and preserves remaining exact hints',async()=>{
+ const {v4PreparePublicBrowserResources}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const target='https://careers.employer.cn/jobs/42',hints=Array.from({length:20},(_,i)=>({kind:'data',url:'https://data.employer.cn/jobs/'+i+'.json'}));
+ const ledger=[],reads=[];
+ const fetcher=async u=>{reads.push(u);return Response.json({job:u});};
+ const first=await v4PreparePublicBrowserResources(target,{resourceHints:hints,ledger,fetcher,onDocument:r=>ledger.push(r)});
+ assert.ok(first.publicDataUrls.length>6);assert.equal(first.resourceHints.length,20);
+ const before=reads.length;
+ const next=await v4PreparePublicBrowserResources(target,{resourceHints:first.resourceHints,ledger,fetcher,onDocument:r=>ledger.push(r)});
+ assert.equal(next.publicDataUrls.length,20);assert.equal(new Set(reads).size,reads.length);assert.equal(reads.length-before,20-before);
+});

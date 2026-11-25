@@ -32,7 +32,7 @@ export function pipelineWidths(checkpoint,pending){
  // Reserve one of six simultaneous outgoing connections for storage/auth.
  // Divide the remaining slots by actual backlog; no total job cap.
  const width=Math.max(1,Math.min(4,checkpoint.discoveryWidth||3));
- const desired=pending>=12?3:pending>=2?2:1;
+ const desired=pending>=48&&checkpoint.pipelineVerificationWidth>=4?4:pending>=12?3:pending>=2?2:1;
  const previous=Number.isSafeInteger(checkpoint.pipelineVerificationWidth)?checkpoint.pipelineVerificationWidth:desired;
  const verification=Math.max(1,Math.min(pending,desired,previous));
  return {verification,discovery:Math.max(1,Math.min(width,5-verification))};
