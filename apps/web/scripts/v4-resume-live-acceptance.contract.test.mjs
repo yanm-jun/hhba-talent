@@ -55,7 +55,7 @@ test('AI append becomes a complete editable Word replacement, preserving origina
  const result=await runSyntheticResumeAcceptance({env,signal,report:r=>records.push(r),
   optimize:async({blocks})=>{
    const original=blocks[0].text;
-   const items=normalizeDocumentSuggestions(blocks,[
+   const items=normalizeDocumentSuggestions(blocks.map(b=>b.id==='b'?{...b,paragraphEditable:false}:b),[
     {blockId:'a',action:'append',original:'incorrect model excerpt',proposed:'负责整理门店运营记录。'},
     {blockId:'b',action:'append',proposed:'新增\n跨段文字'},
     {blockId:'c',action:'replace',proposed:blocks[2].text}
@@ -110,4 +110,33 @@ test('V4 keeps a complete long model proposal and writes it into actual DOCX wit
   }});
  assert.equal(result.status,'PASS');
  assert.equal(result.stages.docx.applied_edits,1);
+});
+
+
+test('full AI edit group creates new Word paragraphs before actual text extraction and rescoring',async()=>{
+ const {normalizeDocumentSuggestions,parseSuggestions}=await import('../functions/_lib/resume-ai-provider.js');
+ const result=await runSyntheticResumeAcceptance({env,signal,
+  optimize:async({blocks})=>{
+   const b=blocks[0],support=blocks[1].text;
+   const proposal=b.text+'\n'+support+'\n'+blocks[2].text;
+   const parsed=parseSuggestions({suggestions:[
+    {blockId:b.id,action:'replace',original:b.text,proposed:proposal,sourceQuotes:[support,blocks[2].text]},
+    {blockId:b.id,action:'replace',original:'协助新员工熟悉',proposed:'协助新员工学习'}
+   ]},[b.id],{fullDocument:true});
+   const suggestions=normalizeDocumentSuggestions(blocks,parsed);
+   assert.equal(suggestions[0].changeCount,2);
+   // Avoid duplicating another unchanged paragraph verbatim in the fixture:
+   // use distinct grounded summary wording for the new paragraph.
+   suggestions[0].proposed=suggestions[0].proposed.replace(blocks[2].text,'通过 Excel 整理数据，并具备跨部门沟通经验。');
+   return {suggestions,pendingIds:[]};
+  },
+  reassess:async({beforeBlocks,afterBlocks})=>{
+   assert.match(afterBlocks[0].text,/。\n协助新员工学习/);
+   assert.match(afterBlocks[0].text,/\n通过 Excel 整理数据/);
+   assert.equal(beforeBlocks[0].text.split('\n').length,3);
+   assert.equal(afterBlocks[0].text.split('\n').length,5);
+   return {supported:true,original_score:80,updated_score:80,delta:0};
+  }});
+ assert.equal(result.status,'PASS');
+ assert.equal(result.stages.docx.original_unchanged,true);
 });

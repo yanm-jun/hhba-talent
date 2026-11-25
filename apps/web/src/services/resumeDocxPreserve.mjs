@@ -139,7 +139,7 @@ function countWidth(s){
 // text boxes or mixed formatting may be merged. Keep every XML run and its
 // style tags intact; change text nodes only.
 function paragraphRunGroups(xml,matches){
- const index=new Map(matches.map(m=>[m.index,m])),groups=[],paragraphCounts=new Map();
+ const index=new Map(matches.map(m=>[m.index,m])),groups=[],paragraphs=[],paragraphCounts=new Map();
  for(const p of xml.matchAll(/<w:p(?:\s[^>]*)?>([\s\S]*?)<\/w:p>/g)){
   const inner=p[1],offset=p.index+p[0].indexOf('>')+1;
   const nodes=[...inner.matchAll(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g)];
@@ -148,10 +148,10 @@ function paragraphRunGroups(xml,matches){
   paragraphCounts.set(text,(paragraphCounts.get(text)||0)+1);
   // A previously merged paragraph has one nonempty node and retained empty
   // styled nodes. Treat it as the ordinary unique text run, not two anchors.
-  if(nodes.filter(m=>decodeXML(m[1]).length>0).length<2)continue;
   if(!textOnly(text))continue;
   // A leading pPr is allowed but must remain byte-identical.
-  const content=inner.replace(/^\s*<w:pPr(?:\s[^>]*)?>[\s\S]*?<\/w:pPr>/,'').trim();
+  const properties=inner.match(/^\s*<w:pPr(?:\s[^>]*)?>[\s\S]*?<\/w:pPr>/)?.[0]||'';
+  const content=inner.slice(properties.length).trim();
   const runs=[...content.matchAll(/<w:r(?:\s[^>]*)?>([\s\S]*?)<\/w:r>/g)];
   if(!runs.length||runs.map(m=>m[0]).join('')!==content.replace(/>\s+</g,'><'))continue;
   const styles=new Set();
@@ -165,19 +165,24 @@ function paragraphRunGroups(xml,matches){
   if(!valid||styles.size!==1)continue;
   const exact=nodes.map(m=>index.get(offset+m.index));
   if(exact.some(m=>!m))continue;
-  groups.push({text,nodes:exact});
+  if(nodes.filter(m=>decodeXML(m[1]).length>0).length>=2)groups.push({text,nodes:exact});
+  // Do not clone section breaks, tracked changes, or properties containing IDs.
+  const style=[...styles][0]||'';
+  if(!/<w:(?:sectPr|pPrChange|rPrChange|ins|del|bookmarkStart|bookmarkEnd)\b/.test(properties+style))
+   paragraphs.push({text,nodes:exact,start:p.index,end:p.index+p[0].length,properties,style});
  }
- return {groups,paragraphCounts};
+ return {groups,paragraphs,paragraphCounts};
 }
 function editXml(xml,edits,{allowExpansion=false}={}){
  requireValue(xml.includes('<w:document')&&xml.includes('<w:body')&&
   !/<!DOCTYPE|<!ENTITY|<\?xml-stylesheet/i.test(xml));
  const matches=[...xml.matchAll(/<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g)];
  requireValue(matches.length>0);
- const changed=new Map(),used=new Set();
- const {groups,paragraphCounts}=allowExpansion?paragraphRunGroups(xml,matches):{groups:[],paragraphCounts:new Map()};
+ const changed=new Map(),used=new Set(),insertions=[];
+ const {groups,paragraphs,paragraphCounts}=allowExpansion?paragraphRunGroups(xml,matches):{groups:[],paragraphs:[],paragraphCounts:new Map()};
  for(const edit of edits){
-  requireValue(edit&&textOnly(edit.original)&&textOnly(edit.text)&&
+  requireValue(edit&&textOnly(edit.original)&&typeof edit.text==='string'&&
+   (textOnly(edit.text)||(allowExpansion&&edit.text.includes('\n')&&edit.text.split('\n').every(line=>line.length>0&&line===line.trim()&&!/[\r\t\u0000-\u001f]/.test(line))))&&
    edit.text!==edit.original,'WORD_EDIT_UNSAFE');
   // Only the opt-in DOCX-only mode may permit expansions, with an explicit
   // UNVERIFIED pagination label. Renderer-verified mode retains the older
@@ -188,19 +193,30 @@ function editXml(xml,edits,{allowExpansion=false}={}){
   const combined=groups.filter(group=>group.text===edit.original);
   requireValue(hits.length+combined.length===1&&
    (!combined.length||paragraphCounts.get(edit.original)===1),'WORD_EDIT_AMBIGUOUS');
+  const lines=edit.text.split('\n');
   const targets=combined.length?combined[0].nodes:hits;
+  if(lines.length>1){
+   const candidates=paragraphs.filter(p=>p.text===edit.original);
+   requireValue(candidates.length===1&&paragraphCounts.get(edit.original)===1&&
+    candidates[0].nodes.filter(n=>decodeXML(n[1])).every(n=>targets.includes(n)),'WORD_EDIT_AMBIGUOUS');
+   const paragraph=candidates[0];
+   // Add actual sibling w:p elements, retaining paragraph and run style.
+   // Fresh paragraph tags omit original IDs, revision attributes and bookmarks.
+   const added=lines.slice(1).map(line=>'<w:p>'+paragraph.properties+'<w:r>'+paragraph.style+
+    '<w:t xml:space="preserve">'+encodeXML(line)+'</w:t></w:r></w:p>').join('');
+   insertions.push({index:paragraph.end,length:0,value:added});
+  }
   for(const [i,hit] of targets.entries()){
    requireValue(!used.has(hit.index),'WORD_EDIT_AMBIGUOUS');
    used.add(hit.index);
    const prefix=hit[0].slice(0,hit[0].indexOf('>')+1);
-   changed.set(hit.index,prefix+encodeXML(i===0?edit.text:'')+'</w:t>');
+   changed.set(hit.index,prefix+encodeXML(i===0?lines[0]:'')+'</w:t>');
   }
  }
  let patched=xml;
- for(const match of matches.slice().reverse()){
-  if(!changed.has(match.index))continue;
-  patched=patched.slice(0,match.index)+changed.get(match.index)+
-   patched.slice(match.index+match[0].length);
+ const patches=[...matches.filter(m=>changed.has(m.index)).map(m=>({index:m.index,length:m[0].length,value:changed.get(m.index)})),...insertions];
+ for(const patch of patches.sort((a,b)=>b.index-a.index)){
+  patched=patched.slice(0,patch.index)+patch.value+patched.slice(patch.index+patch.length);
  }
  requireValue(patched!==xml);
  return patched;
@@ -310,12 +326,13 @@ export async function inspectOriginalDocxStrict(raw,{allowParagraphRuns=false}={
  for(const m of matches){
   const value=decodeXML(m[1]);occurrences.set(value,(occurrences.get(value)||0)+1);
  }
- const {groups,paragraphCounts}=allowParagraphRuns?paragraphRunGroups(originalXml,matches):{groups:[],paragraphCounts:new Map()};
+ const {groups,paragraphs,paragraphCounts}=allowParagraphRuns?paragraphRunGroups(originalXml,matches):{groups:[],paragraphs:[],paragraphCounts:new Map()};
  const eligible=groups.filter(g=>paragraphCounts.get(g.text)===1&&!occurrences.has(g.text));
  const covered=new Set(eligible.flatMap(g=>g.nodes.map(m=>m.index)));
  const unique=matches.filter(m=>!covered.has(m.index)).map(m=>decodeXML(m[1])).filter(value=>
   textOnly(value)&&occurrences.get(value)===1&&!groups.some(g=>g.text===value));
  unique.push(...eligible.map(g=>g.text));
  return {mode:'strict_original_docx',editable_text:unique,
+  paragraph_text:paragraphs.filter(p=>paragraphCounts.get(p.text)===1&&unique.includes(p.text)).map(p=>p.text),
   entries:pkg.entries.map(e=>e.name)};
 }

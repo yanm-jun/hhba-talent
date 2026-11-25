@@ -152,7 +152,7 @@ export async function onRequestPost({request,env}){
   }
  }catch{return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);}
  // Mask common contact identifiers before third-party processing.
- const blocks=input.blocks.map(b=>({id:b.id,section:b.section,text:redact(b.text)}));
+ const blocks=input.blocks.map(b=>({id:b.id,section:b.section,text:redact(b.text),...(b.paragraphEditable===true?{paragraphEditable:true}:{})}));
  const job={title:redact(trustedJob.title),requirements:redact(trustedJob.requirements),
   verified:['VERIFIED_OFFICIAL_JD','VERIFIED_PUBLIC_JD'].includes(trustedJob.source_status)};
  try{

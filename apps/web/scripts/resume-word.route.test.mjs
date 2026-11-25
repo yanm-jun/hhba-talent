@@ -630,3 +630,23 @@ test('V4 accepts long confirmed Word text through authenticated save, inspect an
  assert.deepEqual(new Uint8Array(await download.arrayBuffer()),expected);
  assert.deepEqual(x.saved.get(store),original);
 });
+
+
+test('V4 saves new real Word paragraphs and returns the exact downloaded private revision',async()=>{
+ const x=fixture({enabled:false,docxOnly:true});x.env.HHBA_MATCH_V4_READY='1';
+ const target='测试用户',text='测试用户\n虚构工作内容新增段落\n虚构工作成果新增段落';
+ const info=await onRequestGet({request:req('inspect',{jobId:'multi-role'}),env:x.env});
+ assert.ok((await info.json()).paragraph_text.includes(target));
+ const expected=await editOriginalDocxStrict(original,[{original:target,text}],{allowExpansion:true});
+ const response=await onRequestPost({request:req('export',{method:'POST',jobId:'multi-role',body:{
+  resume_id:id,job_id:'multi-role',action:'edit',original:target,text,expected_revision:0,
+  client_docx_sha256:createHash('sha256').update(expected).digest('hex'),
+  confirmed_real:true,consent_word_processing:true
+ }}),env:x.env});
+ assert.equal(response.status,200,await response.clone().text());
+ const download=await onRequestGet({request:req('download',{jobId:'multi-role'}),env:x.env});
+ assert.deepEqual(new Uint8Array(await download.arrayBuffer()),expected);
+ assert.deepEqual(x.saved.get(store),original);
+ const inspect=await onRequestGet({request:req('inspect',{jobId:'multi-role'}),env:x.env});
+ assert.ok((await inspect.json()).editable_text.includes('虚构工作成果新增段落'));
+});
