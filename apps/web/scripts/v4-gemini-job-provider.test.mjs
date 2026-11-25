@@ -319,3 +319,27 @@ test('unavailable background scheduling returns fallback without losing authoriz
  assert.equal(await tryScheduleBackgroundMatch(env,new Request('https://hhba.work/api/match-v4/resume'),session,task),true);
  assert.equal(data.size,1);
 });
+
+test('public employer HTML exposes resource hints, allows only exact declared external assets and separately reads data',async()=>{
+ const {v4ReadPublicJobDocument,v4RenderPublicJobDocument}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const {v4RunResearchAction,v4RememberPublicResult}=await import('../functions/_lib/v4-research-tools.js');
+ const url='https://careers.employer.cn/jobs/42',script='https://cdn.employer.cn/app.js?v=1',api='https://api.employer.cn/jobs/42.json';
+ const html='<html><head><script src="'+script+'"></script><link rel="preload" as="fetch" href="'+api+'"></head><body><div data-endpoint="'+api+'">运营职位</div><iframe src="http://127.0.0.1/private"></iframe><script src="https://localhost/app.js"></script></body></html>';
+ const fetcher=async(u)=>u===url?new Response(html,{headers:{'content-type':'text/html'}}):u===api?Response.json({title:'运营职位',description:'公开岗位职责'}):(()=>{throw Error('unexpected URL '+u)})();
+ const doc=await v4ReadPublicJobDocument(url,{fetcher});
+ assert.deepEqual(doc.resource_hints,[{url:script,kind:'script'},{url:api,kind:'data'}]);
+ let opts;
+ const browser={async quickAction(type,value){assert.equal(type,'content');opts=value;return new Response('<html><body>公开岗位职责</body></html>',{headers:{'content-type':'text/html'}})}};
+ const rendered=await v4RenderPublicJobDocument(url,{browser,resourceHints:doc.resource_hints});
+ assert.equal(rendered.rendered,true);
+ assert.ok(opts.allowRequestPattern.some(p=>new RegExp(p).test(script)));
+ assert.ok(!opts.allowRequestPattern.some(p=>new RegExp(p).test('https://cdn.employer.cn/unrelated.js')));
+ assert.ok(!opts.allowRequestPattern.some(p=>new RegExp(p).test(api)));
+ const knownUrls=new Set([url]),ledger=[];
+ const page=await v4RunResearchAction({type:'read_page',url},{collections:{},knownUrls,fetcher,browser,ledger});
+ assert.equal(page.ok,true);v4RememberPublicResult(ledger,page);
+ assert.ok(knownUrls.has(api));assert.deepEqual(ledger[0].resource_hints,doc.resource_hints);
+ const data=await v4RunResearchAction({type:'read_page',url:api},{collections:{},knownUrls,fetcher,browser,ledger});
+ assert.equal(data.ok,true);assert.match(data.text,/公开岗位职责/);
+ assert.equal(data.verified,undefined);
+});
