@@ -387,3 +387,15 @@ test('discovery research overlaps independent public reads but preserves result 
  }});
  assert.equal(peak,2);assert.deepEqual(result.slice(0,2).map(r=>r.url),[a,b]);assert.equal(result[2].type,'memory');
 });
+
+test('score recovery switches evidence protocol for unchanged unresolved verified vacancy',async()=>{
+ const candidate=job(99),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const match={company:candidate.company,title:candidate.title,location:candidate.location,official_url:candidate.url,source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',evidence_status:'VERIFIED_FULL_JD',evidence_excerpt:'负责汽车经销商渠道运营',match_score:null};
+ const opts={env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true};
+ const never=async()=>{throw Error('must schedule before provider call')};
+ const first=await v4Match(never,provider,resume,'全国',{...opts,checkpoint:{phase:'reporting',rows:[[candidate.url,candidate]],profile,matches:[match]}});
+ assert.deepEqual(first.checkpoint.scoreRecoveryModes,[[candidate.url,'independent']]);
+ const second=await v4Match(never,provider,resume,'全国',{...opts,checkpoint:{...first.checkpoint,phase:'reporting'}});
+ assert.deepEqual(second.checkpoint.explicitRechecks,[candidate.url]);assert.deepEqual(second.checkpoint.scoreRecoveryModes,[[candidate.url,'anchors']]);
+ assert.equal(second.checkpoint.scoreRecoveryKeys.length,2);
+});
