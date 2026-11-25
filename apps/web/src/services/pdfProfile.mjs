@@ -23,7 +23,7 @@ const normalized=s=>s.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,"").re
 /** Preserve lines using PDF.js text item order and line positions.
  * Text evidence is presented for manual correction, never trusted as identity.
  */
-export function pdfTextItemsToLines(items){
+export function pdfTextItemsToLines(items,{unrestricted=false}={}){
  if(!Array.isArray(items))return [];
  const result=[];let line="",lastY=null;
  const flush=()=>{const value=normalized(line);if(value)result.push(value);line="";lastY=null;};
@@ -38,7 +38,7 @@ export function pdfTextItemsToLines(items){
    if(y!==null)lastY=y;
   }
   if(item.hasEOL)flush();
-  if(result.join("\n").length>PDF_MAX_TEXT)
+  if(!unrestricted&&result.join("\n").length>PDF_MAX_TEXT)
    throw new PDFResumeError("PDF_TEXT_LIMIT","PDF 可复制文字过长，请精简简历后重试。");
  }
  flush();
@@ -66,13 +66,13 @@ function abortError(){const err=new Error("本次 PDF 提取已取消。");err.n
 /** The injected loadPdfJs is only for unit tests; production always uses
  * firstPartyPdfJs, bundled locally. All work has an overall bounded timeout.
  */
-export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs}={}){
- assertPdfBytes(buffer);
+export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs,unrestricted=false}={}){
+ assertPdfBytes(buffer,unrestricted?PDF_PAGE_OCR_MAX_BYTES:PDF_MAX_BYTES);
  if(signal?.aborted)throw abortError();
  let task=null,expired=false;
  const abort=()=>{if(task)void task.destroy().catch(()=>{});};
  if(signal)signal.addEventListener("abort",abort,{once:true});
- const timer=setTimeout(()=>{expired=true;abort();},120000);
+ const timer=unrestricted?null:setTimeout(()=>{expired=true;abort();},120000);
  try{
   const pdf=await loadPdfJs();
   if(expired)throw new PDFResumeError("PDF_TIMEOUT","PDF 处理超时，请导出更简洁的文字版 PDF。");
@@ -93,7 +93,7 @@ export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs}={
   if(expired)throw new PDFResumeError("PDF_TIMEOUT","PDF 处理超时，请导出更简洁的文字版 PDF。");
   if(signal?.aborted)throw abortError();
   if(!Number.isInteger(document.numPages)||document.numPages<1||
-    document.numPages>PDF_MAX_PAGES)
+    (!unrestricted&&document.numPages>PDF_MAX_PAGES))
    throw new PDFResumeError("PDF_PAGES","PDF 简历最多支持 150 页，超过时请分段上传。");
   const pages=[];let chars=0,hasTextlessPages=false;
   for(let n=1;n<=document.numPages;n++){
@@ -101,11 +101,11 @@ export async function extractPdfText(buffer,{signal,loadPdfJs=firstPartyPdfJs}={
    if(signal?.aborted)throw abortError();
    const page=await document.getPage(n);
    const content=await page.getTextContent({includeMarkedContent:false});
-   const contentLines=pdfTextItemsToLines(content.items);
+   const contentLines=pdfTextItemsToLines(content.items,{unrestricted});
    const text=contentLines.join("\n");
    if(text.replace(/\s/g,"").length<12)hasTextlessPages=true;
    chars+=text.length;
-   if(chars>PDF_MAX_TEXT)throw new PDFResumeError("PDF_TEXT_LIMIT","PDF 文字超过安全提取上限，请精简后重试。");
+   if(!unrestricted&&chars>PDF_MAX_TEXT)throw new PDFResumeError("PDF_TEXT_LIMIT","PDF 文字超过安全提取上限，请精简后重试。");
    if(text)pages.push(text);
    page.cleanup?.();
   }

@@ -36,7 +36,7 @@ export function v4Provider(env={}){
  const baseUrl=providerBase(env.HHBA_AGENT_RELAY_BASE_URL);
  return typeof key==='string'&&key.trim().length>=16&&baseUrl?{key,baseUrl,stream:env.HHBA_AGENT_RELAY_STREAM==='1',model:env.HHBA_AGENT_RELAY_MODEL?.trim()||MODEL,...(env.HHBA_AGENT_REASONING_EFFORT?{reasoningEffort:env.HHBA_AGENT_REASONING_EFFORT}: {})}:null;
 }
-// Only the job route opts into Gemini; OCR, reassessment and Word editing keep v4Provider.
+// Job research and reassessment use the selected job model; OCR and Word editing keep v4Provider.
 export function v4JobProvider(env={}){
  const selected=env.HHBA_V4_JOB_PROVIDER?.trim().toLowerCase()||'openai';
  if(selected==='gemini')return geminiJobProvider(env);
@@ -425,24 +425,27 @@ async function researchIncompleteJd(fetcher,provider,url,job,checked,{signal,bro
 async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,browser,ledger,note}){
  const facts=job.jd_research?.facts||[];
  if(!concreteCandidate(job))return;
- try{
+ let repair='',previous=null;const seen=new Set();
+ for(;;){try{
   const reply=await v4StageResearchCall(p=>v4Call(fetcher,provider,p,{signal}),{
    instructions:'你是专业职业顾问。当前岗位的完整官方JD无法取得，但不能仅因缺少JD而放弃真实岗位。根据真实岗位名称、地点、已有独立公开资料及通用职业知识自主撰写一份实用参考JD，并直接比较真实简历。已读原文与AI推断必须严格分开；生成的职责和能力方向不是企业已发布要求，不得编造企业硬性学历、年限、证书、薪资、招聘状态、录用概率。自由选择分析维度、研究深度及篇幅，不设置固定权重。仅用公开企业和岗位关键词联网，不得搜索简历或个人数据。返回JSON {reference_jd:字符串（可能职责与能力方向的完整参考文本，非官网原文）,reference_basis:说明实际原文依据、推断范围及未知项,suitable:boolean,score:0至100整数或null,reason,matched,gaps,resume_quote,jd_quote（只能引用本次生成的reference_jd，并明确它是推断）,comparisons:[{jd_quote,resume_quote,status,analysis}],strengths,risks,career_development,optimization_advice,competition,extra_sections}。必须引用真实简历原文；不得把参考JD的引文当作官方证据。不能可靠评分时返回null，仍保留参考JD。未确认岗位真实性时只形成研究参考，不宣称真实在招。',
-   input:JSON.stringify({resume_text:resume,preferred_job_or_city:roleHint,job:{company:job.company,title:job.title,location:job.location,url:job.official_url,vacancy_confirmed:job.reference_vacancy_verified===true},independent_public_excerpts:facts,public_research_inference:job.jd_research?.inference||'',unknowns:job.jd_research?.unknowns||[]}),
+   input:JSON.stringify({resume_text:resume,preferred_job_or_city:roleHint,job:{company:job.company,title:job.title,location:job.location,url:job.official_url,vacancy_confirmed:job.reference_vacancy_verified===true},independent_public_excerpts:facts,public_research_inference:job.jd_research?.inference||'',unknowns:job.jd_research?.unknowns||[],...(repair?{previous_validation_error:repair,previous_reference_result:previous}:{})}),
    tools:[{type:'web_search'}],tool_choice:'auto',include:['web_search_call.action.sources']
   },{parse:v4ParseJson,sourceUrls:[job.official_url,...facts.map(f=>f.url)],fetcher,browser,signal,resume,ledger,note});
-  if(reply.status!=='completed')return;
   const value=v4ParseJson(reply),reference=text(value.reference_jd),basis=text(value.reference_basis);
-  if(!reference||!basis)return;
+  if(reference&&basis)Object.assign(job,{reference_jd:reference,reference_jd_basis:basis,reference_jd_kind:'AI_GENERATED_REFERENCE'});
+  if(reply.status!=='completed'||!reference||!basis){const issue=JSON.stringify([reply.status,reference,basis]);if(seen.has(issue)){note('JD_REFERENCE_NO_NEW_PROGRESS');return;}seen.add(issue);previous=value;repair='输出不完整或缺少参考JD及依据，请保留已完成内容并独立补全，分段使用研究工具，不必重新搜索完整官方JD。';continue;}
   Object.assign(job,{reference_jd:reference,reference_jd_basis:basis,reference_jd_kind:'AI_GENERATED_REFERENCE',score_basis:'AI 参考JD：非官方招聘原文，实际职责及资格以雇主为准。'});
   if(typeof value.score==='number'&&Number.isFinite(value.score)&&value.score>=0&&value.score<=100)value.score=Math.round(value.score);
   const report=validateCuratedReport(value,resume,reference);
   if(report.ok){
    Object.assign(job,{match_score:value.score,reference_score:value.score,evidence_score_status:'AI_REFERENCE_JD_SCORED',score_evidence_status:undefined,curated_suitable:true,score_basis:'AI 参考JD适配分（依据真实简历与推断职责，不是官方JD匹配分或录用概率）',recommendation_reason:text(value.reason),matched:texts(value.matched),not_evidenced:texts(value.gaps),research_detail:report.report,report_status:'COMPLETE'});
    note(job.reference_vacancy_verified?'JD_REFERENCE_VERIFIED_VACANCY_SCORED':'JD_REFERENCE_UNVERIFIED_LEAD_SCORED');
-  }else if(value.suitable===false){job.curated_suitable=false;job.report_status='DECLINED';job.recommendation_reason=text(value.reason);}
-  else note('JD_REFERENCE_SCORE_UNCONFIRMED');
- }catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(isV4RetryableProviderError(e?.code))throw e;note(e?.code||'JD_REFERENCE_UNAVAILABLE');}
+   return;
+  }else if(value.suitable===false){job.curated_suitable=false;job.report_status='DECLINED';job.recommendation_reason=text(value.reason);return;}
+  else {const issue=JSON.stringify([report.errors,value]);if(seen.has(issue)){note('JD_REFERENCE_SCORE_UNCONFIRMED');return;}seen.add(issue);previous=value;repair='独立复核参考分析：'+report.errors.join(',')+'。检查真实简历引文与参考文本引文；没有可靠依据允许null，不编造。';if(value.score===null&&seen.size>1)return;continue;}
+ }catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(isV4RetryableProviderError(e?.code))throw e;const issue=e?.code||'JD_REFERENCE_UNAVAILABLE';if(seen.has(issue)){note(issue);return;}seen.add(issue);repair='重新组织完整参考JD及证据评分，修复 '+issue;}
+ }
 }
 
 async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=false,note=()=>{},browser,ledger=[],cachedResults=new Map(),onRead=()=>{},cacheBucket}={}){
@@ -1059,7 +1062,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   if(curated&&searchResumePaged&&searchResumeOffset<resume.length&&response.status==='completed'&&!data.format_error){recoveryHint='简历原文已分段提交，继续研究尚未送达的后续页；保留前面发现的职业方向及候选。';continue;}
   if(data.research_complete===true&&data.continue_search!==true){
    if(curated&&[...sourceLeads].some(u=>!rows.has(u)&&!submittedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u))){recoveryHint='请先研究尚未分类的真实公开引用，识别其中具体招聘岗位或明确说明无有效岗位，不把普通网页计入候选。';continue;}
-   if(curated&&gemini&&concreteCount()<CANDIDATE_TARGET&&independentStallReview('gemini-explicit-completion',signature)){recoveryHint+=' 请独立检索尚未覆盖的企业、岗位别名和官方招聘入口，依据真实查询与证据决定是否结束。';continue;}
+   if(curated&&concreteCount()<CANDIDATE_TARGET&&independentStallReview('candidate-target-completion',signature)){recoveryHint+=' 请独立检索尚未覆盖的企业、岗位别名和官方招聘入口，依据真实查询与证据决定是否结束。';continue;}
    if(curated&&concreteCount()<CANDIDATE_TARGET&&(madeProgress||!text(data.completion_reason))&&stalledStrategy!==signature){stalledStrategy=signature;recoveryHint='当前尚未达到500个具体候选。请独立复查新企业、职业方向与官方渠道；如果确无新增可靠岗位，明确返回research_complete=true及completion_reason，说明覆盖和停止依据。';continue;}
    researchComplete=true;researchError=curated&&concreteCount()<CANDIDATE_TARGET&&!text(data.completion_reason)?'AI_RESEARCH_COMPLETION_UNCONFIRMED':null;completionReason=text(data.completion_reason)||'AI 已声明研究完成；接口未提供详细停止理由。';
   }
