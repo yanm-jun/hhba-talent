@@ -91,6 +91,7 @@ function renderDailyOperations(report){
  status.textContent=rows.length+' 天 · '+(report.collectorStartedAt?'运营事件起始于 '+report.collectorStartedAt.slice(0,10):'运营事件采集时间尚未核实');
 }
 function updateGrowth(){
+ renderAiUsage();
  showRealDataStatus();
  const t=growth?.traffic,b=growth?.devices,a=growth?.account,q=growth?.activity;
  setMetric('ov-pv',t?.quality==='collected'?t.pv:null);
@@ -161,7 +162,7 @@ async function refreshGrowth(){
 }
 
 const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',operations:'运营监控',
- finance:'财务成本',investor:'融资展示',settings:'系统设置'};
+ finance:'财务成本','ai-usage':'AI Token 消耗',investor:'融资展示',settings:'系统设置'};
 const details={
  users:['真实用户注册与业务操作','账号级行为追踪已停止；注册和收藏来自真实数据库，页面事件仅计次数。'],
  market:['企业和岗位质量分析','未来接入岗位状态、ATS 来源及招聘质量报表；当前公开索引汇总在数据总览。'],
@@ -173,7 +174,7 @@ function setView(view){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(['investor','overview','users'].includes(view)?view:'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users','ai-usage'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -187,6 +188,7 @@ function setView(view){
   byId('placeholder-subtitle').textContent=details[view][0];
   byId('placeholder-description').textContent=details[view][1];
  }
+ if(view==='ai-usage'){byId('ai-usage-period').value=['today','7d','30d'].includes(selectedPeriod)?selectedPeriod:'30d';choosePeriod(byId('ai-usage-period').value);renderAiUsage();}
  closeMenu();
  window.scrollTo(0,0);
 }
@@ -369,4 +371,30 @@ byId('mobile-menu').addEventListener('click',()=>{
 });
 byId('mobile-dim').addEventListener('click',closeMenu);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
+function renderAiUsage(){
+ const root=byId('ai-usage-stages'),daily=byId('ai-usage-days');
+ if(!root||!daily)return;
+ root.replaceChildren();daily.replaceChildren();
+ const data=growth?.aiUsage,rows=Array.isArray(data?.rows)?data.rows:[];
+ const sum=(items,key)=>items.reduce((a,r)=>a+(integer(r[key])??0),0);
+ const n=(v)=>fmt.format(v);
+ const set=(id,v)=>{byId(id).textContent=v};
+ const add=(target,label,value)=>{const row=document.createElement('div'),name=document.createElement('span'),stat=document.createElement('strong');name.textContent=label;stat.textContent=value;row.append(name,stat);target.append(row)};
+ const valid=data?.quality==='collected'&&rows.length>0;
+ const calls=sum(rows,'calls'),known=sum(rows,'usage_calls'),cacheKnown=sum(rows,'cache_known_calls'),input=sum(rows,'input_tokens');
+ set('ai-usage-state',valid?'统计区间：'+growth.period.start+' 至 '+growth.period.end+'（UTC）；仅已观察的 OpenAI Responses 请求。':data?.quality==='no_records'?'该区间尚无采集记录，不代表零消耗。':'数据未连接或未获管理员授权。');
+ set('ai-usage-total',valid&&known?n(sum(rows,'total_tokens'))+(known<calls?'（部分）':''):'—');
+ set('ai-usage-calls',valid?n(calls):'—');
+ set('ai-usage-coverage',valid?'完整用量 '+n(known)+' / '+n(calls):'用量完整度待核验');
+ set('ai-usage-cache',valid&&known===calls&&cacheKnown===calls&&input>0?(100*sum(rows,'cached_tokens')/input).toFixed(1)+'%':'—');
+ if(!valid)return;
+ const groups=new Map(),days=new Map();
+ for(const row of rows){const key=[row.stage,row.model,row.effort].join(' · ');if(!groups.has(key))groups.set(key,[]);groups.get(key).push(row);if(!days.has(row.day))days.set(row.day,[]);days.get(row.day).push(row)}
+ for(const [key,items] of [...groups].sort((a,b)=>sum(b[1],'total_tokens')-sum(a[1],'total_tokens'))){
+  const total=sum(items,'calls'),reported=sum(items,'usage_calls'),rk=sum(items,'reasoning_known_calls'),ck=sum(items,'cache_known_calls');
+  add(root,key,'请求 '+n(total)+' / 已知 '+n(reported)+' · 输入 '+(reported?n(sum(items,'input_tokens')):'—')+' · 输出 '+(reported?n(sum(items,'output_tokens')):'—')+' · 推理 '+(rk?n(sum(items,'reasoning_tokens'))+(rk<total?'（部分）':''):'—')+' · 缓存 '+(ck?n(sum(items,'cached_tokens'))+(ck<total?'（部分）':''):'—')+' · 未完成/失败 '+n(items.filter(r=>r.status!=='completed').reduce((a,r)=>a+(integer(r.calls)??0),0)));
+ }
+ for(const [day,items] of [...days].sort((a,b)=>b[0].localeCompare(a[0]))){const observed=sum(items,'usage_calls'),all=sum(items,'calls');add(daily,day,(observed?n(sum(items,'total_tokens')):'—')+' Token · '+n(observed)+' / '+n(all)+' 次返回完整用量')}
+}
+byId('ai-usage-period')?.addEventListener('change',e=>choosePeriod(e.target.value));
 choosePeriod('30d');updateOverview();updateGrowth();void refresh();
