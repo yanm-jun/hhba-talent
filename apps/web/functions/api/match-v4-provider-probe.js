@@ -1,6 +1,6 @@
 // Operator-only synthetic probe. Disabled unless a short-lived encrypted operator token is installed.
 // No user input, resume data, response text, credential, or redirect is returned.
-import {geminiJobProvider,callGeminiJob,inspectGeminiContextCapabilities} from '../_lib/v4-gemini-job-provider.js';
+import {geminiJobProvider,callGeminiJob,inspectGeminiContextCapabilities,geminiRequestHeaders} from '../_lib/v4-gemini-job-provider.js';
 import {v4ParseJson,v4ToolSources} from '../_lib/simple-match-v4.js';
 import {v4ReadEmployerJob,v4PublicJobUrl,v4EmployerAuthorization} from '../_lib/v4-open-job-evidence.js';
 import {isCommercialRecruitmentBoard} from '../_lib/match-employer-source.js';
@@ -18,6 +18,15 @@ const searchPayload={instructions:'Use actual Google Search to find several curr
 // check. All inputs are fixed synthetic data or independently read public JDs.
 export async function runGeminiProbe(provider,phase,{fetcher=fetch,signal}={}){
  const call=(payload,options={})=>callGeminiJob(fetcher,{...provider,...options},payload,{signal});
+ if(phase==='transport'||phase==='transport_bearer'){
+  // Fixed synthetic request isolates route/authentication from complex prompts
+  // and optional features. A successful HTTP status alone is insufficient.
+  const mode=phase==='transport_bearer'?'bearer':'native';
+  const r=await fetcher(provider.baseUrl+'/v1beta/models/'+encodeURIComponent(provider.model)+':generateContent',{method:'POST',redirect:'manual',headers:geminiRequestHeaders({...provider,authMode:mode}),body:JSON.stringify({contents:[{role:'user',parts:[{text:'Reply only with OK.'}]}]}),signal});
+  let j;try{j=await r.json();}catch{}
+  const candidate=j?.candidates?.[0],valid=r.ok&&candidate?.finishReason==='STOP'&&candidate.content?.parts?.some(p=>!p.thought&&typeof p.text==='string'&&p.text.trim().length>0);
+  return {ok:!!valid,upstream_http_status:r.status,native_response:!!valid,auth_mode:mode};
+ }
  if(phase==='basic'||phase==='stream'){
   const r=await call(basicPayload,{stream:phase==='stream'}),json=v4ParseJson(r);
   return {ok:r.status==='completed'&&json.ok===true&&(phase!=='stream'||r.native_stream===true),native_stream:r.native_stream===true,usage_present:Number.isFinite(r.usage?.total_tokens)};
@@ -91,7 +100,7 @@ export async function onRequest({request,env}){
   }},503);
  }
  const phase=new URL(request.url).searchParams.get('phase')||'basic';
- if(!['basic','search','pipeline','stream','url_context','metadata','cache'].includes(phase))return reply({error:'INVALID_PROBE_PHASE'},400);
+ if(!['basic','search','pipeline','stream','url_context','metadata','cache','transport','transport_bearer'].includes(phase))return reply({error:'INVALID_PROBE_PHASE'},400);
  const start=Date.now();
  try{
   const result=await runGeminiProbe(provider,phase,{signal:request.signal});
