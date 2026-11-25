@@ -265,15 +265,15 @@ export function v4PublicResourceHints(html,base,{includeScriptHints=true}={}){
  const attr=(tag,name)=>new RegExp('(?:^|\\s)'+name+'\\s*=\\s*(?:"([^"]*)"|\\x27([^\\x27]*)\\x27|([^\\s>]+))','i').exec(tag)?.slice(1).find(x=>x!==undefined);
  for(const m of html.matchAll(/<(script|link|iframe|a|div|section)\b[^>]*>/gi)){
   const tag=m[0],name=m[1].toLowerCase();
-  if(name==='script')add(attr(tag,'src'),'script');
+  if(name==='script'){add(attr(tag,'src'),'script');add(attr(tag,'data-src'),'script');}
   if(name==='link'){
    const rel=(attr(tag,'rel')||'').toLowerCase(),as=(attr(tag,'as')||'').toLowerCase();
    if(rel==='stylesheet')add(attr(tag,'href'),'style');
    else if(rel==='modulepreload'||rel==='preload'&&as==='script')add(attr(tag,'href'),'script');
    else if(rel==='preload'&&as==='fetch')add(attr(tag,'href'),'data');
   }
-  if(name==='iframe')add(attr(tag,'src'),'frame');
-  for(const key of ['data-url','data-api','data-endpoint','data-src'])add(attr(tag,key),'data');
+  if(name==='iframe'){add(attr(tag,'src'),'frame');add(attr(tag,'data-src'),'frame');add(attr(tag,'data-lazy-src'),'frame');}
+  for(const key of ['data-url','data-api','data-endpoint',...(['script','iframe'].includes(name)?[]:['data-src'])])add(attr(tag,key),'data');
   if(name==='a'){
    const href=attr(tag,'href');if(href&&/(?:job|career|recruit|vacanc|position|\.json(?:[?#]|$)|招聘|职位)/i.test(href))add(href,'link');
   }
@@ -335,36 +335,25 @@ export function v4BrowserResourcePlan(url,resourceHints=[],ledger=[]){
 // redirected or oversized results remain research leads, not allowed origins.
 export async function v4PreparePublicBrowserResources(url,{fetcher=fetch,signal,resourceHints=[],ledger=[],onDocument=()=>{}}={}){
  let initial=v4BrowserResourcePlan(url,resourceHints,ledger);
- const records=[...ledger];
- // If the HTML exposes only JS, inspect the next independently declared
- // unread script in this browser pass. Further script dependencies remain
- // addressable by the agent's existing read_page/window tools and later passes.
- if(!initial.resourceHints.some(h=>['data','frame'].includes(h.kind))){
-  const hint=initial.resourceHints.find(h=>h.kind==='script'&&publicReadResourceUrl(h.url)&&!records.some(r=>r.url===h.url&&r.script_source));
-  if(hint)try{
-   const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal,scriptSource:true,documentUrl:url});
-   if(doc.url===hint.url&&doc.script_source){
-    const record={type:'read_page',ok:true,mode:'static',url:doc.url,offset:0,next_offset:null,text:doc.plain,script_source:true,document_url:url,resource_hints:doc.resource_hints||[]};
-    records.push(record);onDocument(record);
-    initial=v4BrowserResourcePlan(url,resourceHints,records);
-   }
-  }catch(e){if(signal?.aborted)throw e;}
- }
- const attempted=new Set();
- // Recompute after reading frames so nested frame dependencies are visible.
- // Keep an invocation transport window, with all outstanding leads preserved
- // in the result and ledger for later agent-driven reads.
+ const records=[...ledger],attempted=new Set();
+ // Bound automatic transport per browser pass, not the agent's research.
+ // Remaining discovered URLs are returned as hints and can be read by the
+ // existing static/window tools or subsequent browser passes.
  const resourceWindow=6;
  while(attempted.size<resourceWindow){
-  const hint=initial.resourceHints.find(h=>['data','frame'].includes(h.kind)&&!initial.publicDataUrls.includes(h.url)&&!attempted.has(h.url)&&publicReadResourceUrl(h.url));
+  const pending=initial.resourceHints.filter(h=>!attempted.has(h.url)&&publicReadResourceUrl(h.url));
+  const hint=pending.find(h=>['data','frame'].includes(h.kind)&&!initial.publicDataUrls.includes(h.url))||
+   pending.find(h=>h.kind==='script'&&!records.some(r=>r.url===h.url&&r.script_source));
   if(!hint)break;
   attempted.add(hint.url);
   if(signal?.aborted)throw signal.reason;
-  if(!publicReadResourceUrl(hint.url))continue;
+  const script=hint.kind==='script';
+  const referring=records.find(r=>(r.resource_hints||[]).some(h=>h.url===hint.url&&h.kind==='script'));
+  const documentUrl=referring?.document_url||referring?.url||url;
   try{
-   const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal});
-   if(doc.url!==hint.url||!doc.plain.trim())continue;
-   const record={type:'read_page',ok:true,mode:'static',url:doc.url,offset:0,next_offset:null,text:doc.plain,resource_hints:doc.resource_hints||[]};
+   const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal,...(script?{scriptSource:true,documentUrl}:{})});
+   if(doc.url!==hint.url||!doc.plain.trim()||script&&!doc.script_source)continue;
+   const record={type:'read_page',ok:true,mode:'static',url:doc.url,offset:0,next_offset:null,text:doc.plain,...(script?{script_source:true,document_url:documentUrl}:{}),resource_hints:doc.resource_hints||[]};
    records.push(record);onDocument(record);
    initial=v4BrowserResourcePlan(url,resourceHints,records);
   }catch(e){if(signal?.aborted)throw e;}
