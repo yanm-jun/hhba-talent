@@ -313,9 +313,8 @@ async function sessionTaskRequest(body?:Record<string,unknown>,signal?:AbortSign
  }
 }
 export const readSessionMatchTask=(signal?:AbortSignal)=>sessionTaskRequest(undefined,signal);
-export async function beginSessionMatchTask(text:string,opts:MatchOptions,resumeId:string|undefined,signal:AbortSignal){
+export async function beginSessionMatchTask(text:string,opts:MatchOptions,resumeId:string|undefined,signal:AbortSignal,id=crypto.randomUUID()){
  if(!MATCH_V4_PREVIEW)return null;
- const id=crypto.randomUUID();
  const task=await sessionTaskRequest({action:'start',task_id:id,text:redactResumeTextLocally(text),
   options:{country:'CN',role_hint:opts.role_hint},resume_id:resumeId||null,consent:true,recovery_consent:true},signal);
  if(!task)throw new MatchError(503,'无法建立可恢复的研究任务。');
@@ -326,8 +325,8 @@ export async function advanceSessionMatchTask(task:SessionMatchTask,signal:Abort
  if(!next)throw new MatchError(409,'当前研究任务已结束。');
  announceMatchTask();return next;
 }
-export async function closeSessionMatchTask(task:SessionMatchTask,signal?:AbortSignal){
- await sessionTaskRequest({action:'close',task_id:task.id,generation:task.generation},signal);
+export async function closeSessionMatchTask(task:Pick<SessionMatchTask,'id'|'generation'>,terminate=false,signal?:AbortSignal){
+ await sessionTaskRequest({action:terminate?'cancel':'close',task_id:task.id,generation:task.generation},signal);
  announceMatchTask();
 }
 type MatchContinuation={status:'CONTINUE';continuation:{state:unknown;token:string}};

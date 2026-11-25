@@ -111,7 +111,7 @@ test('privacy-reviewed empty text never silently falls back to raw resume',async
  assert.match(ui,/identifiedCharacters=redactResumeTextLocally\(previewText\)\.replace\(\/\\s\/g,''\)\.length/);
  assert.match(ui,/!previewLoaded\|\|\s*identifiedCharacters<30/);
  assert.match(ui,/setPreviewLoaded\(false\);setPreviewError\(''\);setConsent\(false\);/);
- assert.match(ui,/await submitExtractedResumeText\(previewText,/);
+ assert.match(ui,/await submitExtractedResumeText\(searchText,/);
  assert.doesNotMatch(ui,/submitResumeForMatching/);
 });
 

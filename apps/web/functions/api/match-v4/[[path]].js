@@ -101,30 +101,16 @@ function events(env,request,input,waitUntil){
      }
      let recoveryState=()=>null;
      input.recoveryState=()=>recoveryState();
-     let result;
-     // Each finished phase is persisted before another paid phase begins.
-     // Keep driving server-side while connected; reattach via the same lease
-     // and checkpoint if the Pages isolate is interrupted.
-     for(;;){
+     // Keep one durable phase per Pages invocation. The hosting platform's
+     // subrequest budget resets on the next continuation, not on a JS loop.
      await guard();
-     result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
+     const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
       signal:executionSignal,onProgress:progress,onActivity:activity,env,excludeUrls:input.excludeUrls,
       stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
       onResearch:sendResearch,
       onPartial:matches=>{sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
      if(executionSignal.aborted)throw executionSignal.reason||Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
      await guard();
-     if(result.status==='CONTINUE'&&input.managed){
-      await input.lease.renew();
-      await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint,generation:input.generation||0});
-      input.checkpoint=result.checkpoint;
-      if(!closed)continue;
-      // On disconnect, do not begin an additional paid step that could outlive
-      // the Pages background grace period. The next client resumes this point.
-      succeeded=true;return;
-     }
-     break;
-     }
      if(result.status==='CONTINUE'){
       console.info('HHBA_V4_STAGE',JSON.stringify({trace,phase:result.checkpoint.phase,round:result.checkpoint.round,candidates:result.checkpoint.rows?.length,processed:result.checkpoint.next,scored:result.checkpoint.scored,diagnostics:result.checkpoint.diagnostics}));
       if(input.taskKey){
@@ -149,8 +135,9 @@ function events(env,request,input,waitUntil){
      const resumeCheckpoint=result.resume_checkpoint;delete result.resume_checkpoint;
      if(input.taskKey)result.research_generation=input.generation||0;
      // Persist completed research first. A history-service failure must not repeat paid model calls.
-     if(input.taskKey){await input.lease.renew();await saveMatchTask(env,input.taskKey,{result:{...result,history_status:'UNAVAILABLE'},checkpoint:resumeCheckpoint,generation:input.generation||0});}
+     if(input.taskKey){await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{result:{...result,history_status:'UNAVAILABLE'},checkpoint:resumeCheckpoint,generation:input.generation||0});}
      // Store only result metadata, never the resume or raw model prompt.
+     await guard();
      try{
       const saved=await saveMatchHistory(env.HHBA_PNVS_AUTH_DB,input.phone,input.resume_id,input.role_hint,result.matches.map(job=>({...job,v4_source:true})),result.research_report,(result.research_leads||[]).map(job=>({...job,v4_source:true})));
       Object.assign(result,saved?{history_status:'SAVED',history_id:saved.id,new_job_count:saved.new_job_count,improved_job_count:saved.improved_job_count}:{history_status:'EMPTY'});
@@ -187,7 +174,9 @@ function events(env,request,input,waitUntil){
   'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
   'X-Robots-Tag':'noindex','X-Accel-Buffering':'no'}});
 }
-export async function onRequest({request,env,waitUntil}){
+export async function onRequest(context){
+ const {request,env}=context;
+ const waitUntil=typeof context.waitUntil==='function'?context.waitUntil.bind(context):undefined;
  const path=new URL(request.url).pathname;
  const suffix=path.slice('/api/match-v4'.length).replace(/\/$/,'')||'/';
  if(suffix==='/status'&&request.method==='GET')
@@ -226,7 +215,7 @@ export async function onRequest({request,env,waitUntil}){
  if(activeTaskRoute){
   if(!checkpointStorageReady(env))return fail('AI_CHECKPOINT_DB_UNAVAILABLE',503);
   const action=body?.action;
-  if(!['start','continue','close'].includes(action))return fail('INVALID_REQUEST',400);
+  if(!['start','continue','close','cancel'].includes(action))return fail('INVALID_REQUEST',400);
   if(action==='start'&&(!enabled(env,request)||body?.consent!==true||body?.recovery_consent!==true||body?.options?.country!=='CN'))return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
   const text=action==='start'?sanitize(body.text):null;
   if(action==='start'&&!text)return fail('INVALID_RESUME_TEXT',400);

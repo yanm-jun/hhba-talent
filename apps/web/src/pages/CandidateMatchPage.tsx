@@ -68,6 +68,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
  const [restoringTask,setRestoringTask]=useState(false);
  const [checkingTask,setCheckingTask]=useState(sessionMatchRecoveryAvailable&&!!user&&!!getRealAuthToken());
  const closingTask=useRef(false);
+ const pendingStart=useRef<string|null>(null);
  const [optimizationSource,setOptimizationSource]=useState('');
  const controller=useRef<AbortController|null>(null);
  const lastSearch=useRef<{text:string;options:MatchOptions;resumeId?:string}|null>(null);
@@ -239,9 +240,9 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
  async function restoreTask(task:SessionMatchTask){
   if(controller.current||closingTask.current)return;
   const abort=new AbortController();controller.current=abort;
-  taskOpen.current=true;sessionTask.current=task;setRestoringTask(true);setTaskFailure(false);
+  taskOpen.current=true;sessionTask.current=task;pendingStart.current=null;setRestoringTask(true);setTaskFailure(false);
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
-  setFile(null);setSavedId(task.resume_id||'');setPreviewText(task.text);setPreviewLoaded(true);setConsent(false);
+  previewController.current?.abort();wordVersionRequest.current?.abort();setFile(null);setSavedId(task.resume_id||'');setPreviewText(task.text);setPreviewLoaded(true);setConsent(false);
   const opts=managedMatchOptions(task);setOptions(opts);setOptimizationSource(task.text);
   lastSearch.current={text:task.text,options:opts,resumeId:task.resume_id||undefined};
   try{
@@ -254,7 +255,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   finally{if(controller.current===abort){controller.current=null;setWorking(false);}}
  }
  function clearTaskLocally(){
-  controller.current?.abort();controller.current=null;taskOpen.current=false;sessionTask.current=null;
+  controller.current?.abort();controller.current=null;taskOpen.current=false;sessionTask.current=null;pendingStart.current=null;
   setTaskFailure(false);setRestoringTask(false);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);setResult(null);setWorking(false);
  }
  // Initial reload and other tabs only discover an authorized server task.
@@ -286,10 +287,10 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
  },[user?.id]);
  async function closeMatch(){
   if(closingTask.current)return;
-  const task=sessionTask.current;
+  const task=sessionTask.current||(pendingStart.current?{id:pendingStart.current,generation:0}:null);
   if(!task){clearTaskLocally();return;}
   closingTask.current=true;
-  try{await closeSessionMatchTask(task);clearTaskLocally();}
+  try{await closeSessionMatchTask(task,working||!!pendingStart.current);clearTaskLocally();}
   catch(e){setError(e instanceof Error?e.message:'未确认服务器终止，请恢复网络后重试。');window.alert('服务器尚未确认结束任务，请恢复网络后再试。');}
   finally{closingTask.current=false;}
  }
@@ -325,9 +326,11 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
     if(abort.signal.aborted)throw new DOMException('Cancelled','AbortError');
    }
    // Consent includes encrypted temporary input recovery, not original-file retention.
-   const registration=await beginSessionMatchTask(previewText,options,matchResumeId||undefined,abort.signal);
-   if(abort.signal.aborted){if(registration)void closeSessionMatchTask(registration.task).catch(()=>{});return;}
+   if(sessionMatchRecoveryAvailable)pendingStart.current=crypto.randomUUID();
+   const registration=await beginSessionMatchTask(previewText,options,matchResumeId||undefined,abort.signal,pendingStart.current||undefined);
+   if(abort.signal.aborted)return;
    if(registration)sessionTask.current=registration.task;
+   pendingStart.current=null;
    const task=registration?.task;
    const searchText=task?.text??previewText,searchOptions=task?managedMatchOptions(task):options;
    if(task){matchResumeId=task.resume_id||'';if(registration?.attached){setFile(null);setSavedId(matchResumeId);setPreviewText(task.text);setOptions(searchOptions);}}

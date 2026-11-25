@@ -13,7 +13,9 @@ export async function getSessionTask(env,session){
  const task=await readMatchTask(env,await sessionTaskSlot(env,session));
  return task?.id&&!task.closed?task:null;
 }
+const cancelKey=(env,session,id)=>matchTaskKey(env,session.phone,id,{scope:'cancelled-session-task-v1',session_hash:session.token_hash});
 export async function updateSessionTask(env,session,action,input){
+ if(!validId(input.id))throw taskError('AI_CHECKPOINT_INVALID',400);
  const slot=await sessionTaskSlot(env,session);
  const lease=await leaseMatchTask(env.HHBA_PNVS_AUTH_DB,slot);
  if(!lease)throw taskError('AI_TASK_IN_PROGRESS');
@@ -22,10 +24,16 @@ export async function updateSessionTask(env,session,action,input){
   if(action==='start'){
    // Concurrent tabs attach to the existing task. They never replace its CV.
    if(current)return current;
-   if(!validId(input.id))throw taskError('AI_CHECKPOINT_INVALID',400);
+   if(await readMatchTask(env,await cancelKey(env,session,input.id)))throw taskError('AI_AGENT_CANCELLED');
    const task={...input,generation:0,started_at:Date.now()};
    await saveMatchTask(env,slot,task);
    return task;
+  }
+  if(action==='cancel'){
+   // Explicit cancellation also fences a start that has not arrived yet.
+   await saveMatchTask(env,await cancelKey(env,session,input.id),{cancelled:true});
+   if(current?.id===input.id)await saveMatchTask(env,slot,{closed:true});
+   return null;
   }
   if(!current||current.id!==input.id||current.generation!==input.generation){
    if(action==='close')return null; // late close cannot affect a newer task
