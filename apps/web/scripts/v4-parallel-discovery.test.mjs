@@ -353,3 +353,37 @@ test('independently observed public API hints survive stage restart without beco
  },{instructions:'test',input:'{}'},{parse:r=>r.value,ledger,fetcher:async u=>{reads++;assert.equal(u,api);return Response.json({title:'岗位原文'});}});
  assert.equal(reads,1);assert.equal(result.value.done,true);
 });
+
+test('global rank failure remains incomplete and reopens evidence review instead of silently finishing',async()=>{
+ const candidate=job(96),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const match={company:candidate.company,title:candidate.title,location:candidate.location,official_url:candidate.url,source_type:'站外官方招聘',reference_vacancy_verified:true,reference_jd_kind:'AI_GENERATED_REFERENCE',reference_jd:'可能负责渠道管理。',reference_jd_basis:'方向推断',evidence_score_status:'AI_REFERENCE_JD_SCORED',match_score:86,curated_suitable:true,report_status:'COMPLETE',research_detail:{comparisons:[],score_explanation:'真实经历匹配'}};
+ const opts={env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true};
+ let checkpoint={phase:'reporting',rows:[[candidate.url,candidate]],profile,matches:[match]};
+ const fetcher=async()=>model({ordered_ids:[]});
+ for(const expected of ['insert','focused_insert','compare','compare']){
+  const result=await v4Match(fetcher,provider,resume,'全国',{...opts,checkpoint});
+  checkpoint=result.checkpoint;assert.equal(checkpoint.globalRankState.mode,expected);
+ }
+ assert.equal(checkpoint.globalRankState.done,false);assert.equal(checkpoint.globalRankState.exhausted,true);
+ assert.equal(checkpoint.globalRankError,'AI_GLOBAL_RANK_INCOMPLETE');
+ const review=await v4Match(fetcher,provider,resume,'全国',{...opts,checkpoint});
+ assert.equal(review.checkpoint.phase,'research');assert.equal(review.checkpoint.globalRankState.exhausted,false);assert.equal(review.checkpoint.globalRankState.done,false);
+ assert.equal(review.checkpoint.priorState.matches[0].match_score,86);
+});
+test('verified unresolved scores receive a durable independent recheck without repeating scored candidates',async()=>{
+ const a=job(97),b=job(98),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const make=j=>({company:j.company,title:j.title,location:j.location,official_url:j.url,source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',evidence_status:'VERIFIED_FULL_JD',evidence_excerpt:'负责汽车经销商渠道运营',match_score:null});
+ const good={...make(b),match_score:90,curated_suitable:true,score_evidence_status:'GROUNDED_JD_RESUME_QUOTES'};
+ const result=await v4Match(async()=>{throw Error('unexpected provider request before durable scheduling')},provider,resume,'全国',{env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true,checkpoint:{phase:'reporting',rows:[[a.url,a],[b.url,b]],profile,matches:[make(a),good],scoreFailures:1}});
+ assert.equal(result.checkpoint.phase,'verification');assert.deepEqual(result.checkpoint.explicitRechecks,[a.url]);assert.equal(result.checkpoint.scoreRecoveryKeys.length,1);
+ assert.equal(result.checkpoint.matches[1].match_score,90);
+});
+test('discovery research overlaps independent public reads but preserves result order and dependent actions',async()=>{
+ const {v4RunResearchActions}=await import('../functions/_lib/v4-research-tools.js');
+ const a='https://careers.alpha.cn/jobs/1',b='https://careers.beta.cn/jobs/2';
+ let active=0,peak=0;const ledger=[];
+ const result=await v4RunResearchActions([{type:'read_page',url:a},{type:'read_page',url:b},{type:'memory',collection:'sources',cursor:0}],{collections:{sources:[a,b]},knownUrls:new Set([a,b]),ledger,parallelPublicReads:true,fetcher:async u=>{
+  active++;peak=Math.max(peak,active);await new Promise(r=>setTimeout(r,u===a?25:5));active--;return Response.json({title:u});
+ }});
+ assert.equal(peak,2);assert.deepEqual(result.slice(0,2).map(r=>r.url),[a,b]);assert.equal(result[2].type,'memory');
+});
