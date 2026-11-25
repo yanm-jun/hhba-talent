@@ -4,7 +4,7 @@
  * and number of jobs. Independent page reading enriches results, NEVER erases
  * credible job leads because an employer uses an unfamiliar JD format.
  */
-import {v4PublicJobUrl,v4ReadEmployerJob,v4EmployerAuthorization,v4ReadPublicJobDocument,v4RenderPublicJobDocument,v4ReadPublicJobDocumentWindow,v4PreparePublicBrowserResources,v4ReadDeclaredStructuredJob} from './v4-open-job-evidence.js';
+import {v4PublicJobUrl,v4ReadEmployerJob,v4EmployerAuthorization,v4ReadPublicJobDocument,v4RenderPublicJobDocument,v4ReadPublicJobDocumentWindow,v4PreparePublicBrowserResources,v4ReadDeclaredStructuredJob,v4BrowserAvailable} from './v4-open-job-evidence.js';
 import {directOfficialJobEvidence} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
 import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
@@ -343,9 +343,9 @@ async function recoverEmployerJob(fetcher,provider,url,job,initial,{signal,onAct
    // Let evidence determine whether a dynamic-page fallback is needed.
    let resourceHints=[];
    for(const mode of ['static','browser']){
-   if(mode==='browser'&&typeof browser?.quickAction!=='function'){note('V4_BROWSER_UNAVAILABLE');continue;}
+   if(mode==='browser'&&!v4BrowserAvailable(browser)){note('V4_BROWSER_UNAVAILABLE');continue;}
    try{
-    const doc=mode==='static'?await v4ReadPublicJobDocument(target,{fetcher,signal,maxBytes:16*1024*1024}):await v4RenderPublicJobDocument(target,{browser,signal,...await v4PreparePublicBrowserResources(target,{fetcher,signal,resourceHints,ledger,onDocument:r=>{v4RememberPublicResult(ledger,r);note('V4_CROSS_ORIGIN_PUBLIC_READ');}})});
+    const doc=mode==='static'?await v4ReadPublicJobDocument(target,{fetcher,signal,maxBytes:16*1024*1024}):await v4RenderPublicJobDocument(target,{browser,signal,...await v4PreparePublicBrowserResources(target,{fetcher,signal,resourceHints,ledger,onDocument:r=>{v4RememberPublicResult(ledger,r);note(r.ok?'V4_CROSS_ORIGIN_PUBLIC_READ':'V4_PUBLIC_RESOURCE_ATTEMPT_FAILED');}})});
     resourceHints=[...new Map([...resourceHints,...(doc.resource_hints||[])].map(h=>[h.url,h])).values()];
     if(mode==='browser')note('V4_BROWSER_READ');
     v4RememberPublicResult(ledger,{ok:true,type:'read_page',mode,url:doc.url,text:doc.plain,resource_hints:resourceHints});

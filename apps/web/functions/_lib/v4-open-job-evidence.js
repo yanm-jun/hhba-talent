@@ -333,30 +333,40 @@ export function v4BrowserResourcePlan(url,resourceHints=[],ledger=[]){
 // Automatic independent GET for declared public data/frame resources. Browser
 // admission needs the same exact URL and a successful public document read;
 // redirected or oversized results remain research leads, not allowed origins.
-export async function v4PreparePublicBrowserResources(url,{fetcher=fetch,signal,resourceHints=[],ledger=[],onDocument=()=>{}}={}){
+export const v4BrowserAvailable=browser=>typeof browser?.quickAction==='function'||typeof browser?.script==='function';
+// Failed transport attempts are metadata, not independently read JD evidence.
+export async function v4PreparePublicBrowserResources(url,{fetcher=fetch,signal,resourceHints=[],ledger=[],onDocument=()=>{},retryFailed=false}={}){
  let initial=v4BrowserResourcePlan(url,resourceHints,ledger);
  const records=[...ledger],attempted=new Set();
+ const parent=v4PublicJobUrl(url),failures=new Map();
+ for(const r of records)if(r.type==='resource_attempt'&&r.document_url===parent)failures.set(r.url,Math.max(failures.get(r.url)||0,r.offset||1));
  // Bound automatic transport per browser pass, not the agent's research.
  // Remaining discovered URLs are returned as hints and can be read by the
  // existing static/window tools or subsequent browser passes.
  const resourceWindow=Math.max(6,Math.min(12,Math.ceil(initial.resourceHints.length/2)));
  while(attempted.size<resourceWindow){
-  const pending=initial.resourceHints.filter(h=>!attempted.has(h.url)&&publicReadResourceUrl(h.url));
-  const hint=pending.find(h=>['data','frame'].includes(h.kind)&&!initial.publicDataUrls.includes(h.url))||
-   pending.find(h=>h.kind==='script'&&!records.some(r=>r.url===h.url&&r.script_source));
+  const pending=initial.resourceHints.filter(h=>!attempted.has(h.url)&&publicReadResourceUrl(h.url)&&(!failures.has(h.url)||retryFailed))
+   .filter(h=>['data','frame'].includes(h.kind)?!initial.publicDataUrls.includes(h.url):h.kind==='script'&&!records.some(r=>r.url===h.url&&r.type==='read_page'&&r.script_source))
+   .sort((a,b)=>(failures.get(a.url)||0)-(failures.get(b.url)||0)||Number(b.kind!=='script')-Number(a.kind!=='script'));
+  const hint=pending[0];
   if(!hint)break;
   attempted.add(hint.url);
   if(signal?.aborted)throw signal.reason;
   const script=hint.kind==='script';
   const referring=records.find(r=>(r.resource_hints||[]).some(h=>h.url===hint.url&&h.kind==='script'));
   const documentUrl=referring?.document_url||referring?.url||url;
+  const recordFailure=()=>{
+   const count=(failures.get(hint.url)||0)+1;failures.set(hint.url,count);
+   const record={type:'resource_attempt',ok:false,mode:'browser_prepare',url:hint.url,document_url:parent,offset:count,error:'PUBLIC_RESOURCE_UNAVAILABLE'};
+   records.push(record);onDocument(record);
+  };
   try{
    const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal,...(script?{scriptSource:true,documentUrl}:{})});
-   if(doc.url!==hint.url||(!doc.plain.trim()&&!(hint.kind==='frame'&&doc.document_kind==='html'&&doc.resource_hints?.length))||script&&!doc.script_source)continue;
+   if(doc.url!==hint.url||(!doc.plain.trim()&&!(hint.kind==='frame'&&doc.document_kind==='html'&&doc.resource_hints?.length))||script&&!doc.script_source){recordFailure();continue;}
    const record={type:'read_page',ok:true,mode:'static',url:doc.url,offset:0,next_offset:null,text:doc.plain,...(script?{script_source:true,document_url:documentUrl}:{}),resource_hints:doc.resource_hints||[]};
    records.push(record);onDocument(record);
    initial=v4BrowserResourcePlan(url,resourceHints,records);
-  }catch(e){if(signal?.aborted)throw e;}
+  }catch(e){if(signal?.aborted)throw e;recordFailure();}
  }
  return v4BrowserResourcePlan(url,resourceHints,records);
 }
@@ -467,7 +477,7 @@ export function v4RuntimeBrowserScript(target,exactUrls){
 export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHints=[],publicDataUrls=[]}={}){
  const target=v4PublicJobUrl(url);
  if(!target||isCommercialRecruitmentBoard(target))throw Error('V4_UNSAFE_URL');
- if(typeof browser?.quickAction!=='function'&&typeof browser?.script!=='function')throw Error('V4_BROWSER_UNAVAILABLE');
+ if(!v4BrowserAvailable(browser))throw Error('V4_BROWSER_UNAVAILABLE');
  if(signal?.aborted)throw signal.reason;
  const host=new URL(target).hostname.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&');
  const independentlyRead=new Set(publicDataUrls.map(v4PublicJobUrl).filter(Boolean));

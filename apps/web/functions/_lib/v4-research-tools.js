@@ -55,7 +55,13 @@ export function v4NotesMemoryPage(notes,cursor=0,budget=90000,{rotate=false}={})
  return {items:end>start?[raw.slice(start,end)]:[],cursor:start,next_cursor:end<raw.length?end:null,total:all.length,total_chars:raw.length,unit:'characters'};
 }
 export function v4RememberPublicResult(ledger,result){
- if(!Array.isArray(ledger)||!result?.ok||result.type!=='read_page'||typeof result.text!=='string'||!v4PublicJobUrl(result.url))return;
+ if(!Array.isArray(ledger)||!result||!v4PublicJobUrl(result.url))return;
+ if(result.type==='resource_attempt'&&result.ok===false&&v4PublicJobUrl(result.document_url)&&Number.isSafeInteger(result.offset)&&result.offset>0){
+  const record={type:'resource_attempt',ok:false,mode:'browser_prepare',url:result.url,document_url:result.document_url,offset:result.offset,error:'PUBLIC_RESOURCE_UNAVAILABLE'};
+  if(!ledger.some(r=>r.type===record.type&&r.url===record.url&&r.document_url===record.document_url&&r.offset===record.offset))ledger.push(record);
+  return;
+ }
+ if(!result.ok||result.type!=='read_page'||typeof result.text!=='string')return;
  const record={type:'read_page',mode:result.mode,url:result.url,offset:result.offset??0,next_offset:result.next_offset??null,unit:result.unit||'characters',text:result.text,...(result.script_source===true?{script_source:true}:{}),...(result.document_url?{document_url:result.document_url}:{}),...(Array.isArray(result.resource_hints)?{resource_hints:result.resource_hints}:{})};
  const prior=ledger.find(r=>r.url===record.url&&r.mode===record.mode&&r.offset===record.offset&&r.text===record.text);
  if(!prior)ledger.push(record);else if(record.resource_hints?.length)prior.resource_hints=[...new Map([...(prior.resource_hints||[]),...record.resource_hints].map(h=>[h.url,h])).values()];
@@ -65,7 +71,7 @@ export function v4RememberPublicResult(ledger,result){
 export function v4KnownPublicResearchUrls(urls=[],ledger=[]){
  return new Set([...urls,...ledger.filter(r=>r?.type==='read_page').flatMap(r=>[r.url,...(Array.isArray(r.resource_hints)?r.resource_hints.map(h=>h?.url):[])])].map(v4PublicJobUrl).filter(u=>u&&!isCommercialRecruitmentBoard(u)));
 }
-export function v4EvidenceIndex(ledger){return ledger.map((r,index)=>({index,type:r.type,url:r.url,mode:r.mode,collection:r.collection,offset:r.offset??0,next_offset:r.next_offset??null,chars:typeof r.text==='string'?r.text.length:0,...(r.script_source?{script_source:true}:{}),...(r.resource_hints?.length?{resource_hint_count:r.resource_hints.length}:{})}));}
+export function v4EvidenceIndex(ledger){return ledger.map((r,index)=>({index,type:r.type,url:r.url,mode:r.mode,collection:r.collection,...(r.type==='resource_attempt'?{ok:false,error:r.error,document_url:r.document_url}:{}),offset:r.offset??0,next_offset:r.next_offset??null,chars:typeof r.text==='string'?r.text.length:0,...(r.script_source?{script_source:true}:{}),...(r.resource_hints?.length?{resource_hint_count:r.resource_hints.length}:{})}));}
 export function v4EvidencePage(ledger,action,budget){
  const index=action.index;if(!Number.isSafeInteger(index)||index<0||index>=ledger.length)return {type:'evidence',ok:false,error:'UNKNOWN_EVIDENCE_RECORD'};
  const r=ledger[index],raw=typeof r.text==='string'?r.text:JSON.stringify(r),offset=Number.isSafeInteger(action.offset)&&action.offset>=0?Math.min(action.offset,raw.length):0,end=Math.min(raw.length,offset+Math.max(256,budget||90000));
@@ -90,7 +96,7 @@ export async function v4RunResearchAction(action,{collections,knownUrls,fetcher,
   let actualMode=mode,doc;
   const parent=ledger.find(r=>(r.resource_hints||[]).some(h=>h.url===url&&h.kind==='script'));
   const scriptOptions=parent?{scriptSource:true,documentUrl:parent.document_url||parent.url}:{};
-  try{doc=mode==='browser'?await v4RenderPublicJobDocument(url,{browser,signal,...await v4PreparePublicBrowserResources(url,{fetcher,signal,ledger,onDocument:r=>{v4RememberPublicResult(ledger,r);onIndependentDocument(r);knownUrls.add(r.url);for(const h of r.resource_hints||[])if(v4PublicJobUrl(h.url)&&!isCommercialRecruitmentBoard(h.url))knownUrls.add(h.url);}})}):mode==='window'?await v4ReadPublicJobDocumentWindow(url,{fetcher,signal,offset:action.offset,maxBytes:Math.min(256*1024,Math.max(4096,budget)),...scriptOptions}):await v4ReadPublicJobDocument(url,{fetcher,signal,...scriptOptions});}
+  try{doc=mode==='browser'?await v4RenderPublicJobDocument(url,{browser,signal,...await v4PreparePublicBrowserResources(url,{fetcher,signal,ledger,retryFailed:action.refresh===true,onDocument:r=>{v4RememberPublicResult(ledger,r);onIndependentDocument(r);if(!r.ok)return;knownUrls.add(r.url);for(const h of r.resource_hints||[])if(v4PublicJobUrl(h.url)&&!isCommercialRecruitmentBoard(h.url))knownUrls.add(h.url);}})}):mode==='window'?await v4ReadPublicJobDocumentWindow(url,{fetcher,signal,offset:action.offset,maxBytes:Math.min(256*1024,Math.max(4096,budget)),...scriptOptions}):await v4ReadPublicJobDocument(url,{fetcher,signal,...scriptOptions});}
   catch(error){if(error?.message!=='V4_PAGE_TOO_LARGE'||signal?.aborted||mode==='window')throw error;actualMode='window';doc=await v4ReadPublicJobDocumentWindow(url,{fetcher,signal,offset:0,maxBytes:Math.min(256*1024,Math.max(4096,budget)),...scriptOptions});}
   // Register only after a successful independent public read; redirects remain unverified leads.
   knownUrls.add(url);if(v4PublicJobUrl(doc.url))knownUrls.add(doc.url);

@@ -525,3 +525,18 @@ test('OpenAI-compatible relay transport probe uses selected Gemini model and ded
  const fake=await runGeminiProbe(provider,'transport_chat',{fetcher:async()=>Response.json({ok:true})});
  assert.equal(fake.ok,false);
 });
+
+test('browser preparation rotates failed resources and allows later explicit recovery without false admission',async()=>{
+ const {v4PreparePublicBrowserResources,v4BrowserAvailable}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const {v4RememberPublicResult}=await import('../functions/_lib/v4-research-tools.js');
+ const root='https://careers.employer.cn/jobs/42',hints=Array.from({length:26},(_,i)=>({kind:'data',url:'https://data.employer.cn/jobs/'+i+'.json'})),ledger=[],calls=[];
+ let restored=false;
+ const fetcher=async u=>{calls.push(u);return Number(u.split('/').at(-1).split('.')[0])<12&&!restored?new Response('temporary',{status:503}):Response.json({job:u});};
+ const run=extra=>v4PreparePublicBrowserResources(root,{resourceHints:hints,ledger,fetcher,onDocument:r=>v4RememberPublicResult(ledger,r),...extra});
+ assert.equal(v4BrowserAvailable({script:async()=>{}}),true);
+ const first=await run();assert.equal(first.publicDataUrls.length,0);assert.equal(ledger.filter(r=>r.type==='resource_attempt').length,12);
+ const second=await run();assert.equal(second.publicDataUrls.length,12);assert.equal(new Set(calls).size,calls.length);
+ const third=await run();assert.equal(third.publicDataUrls.length,14);assert.equal(new Set(calls).size,26);
+ restored=true;
+ const fourth=await run({retryFailed:true});assert.equal(fourth.publicDataUrls.length,26);
+});
