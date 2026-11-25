@@ -206,7 +206,7 @@ test('actual V4 verification keeps a confirmed vacancy with no JD, generates a r
   if(url.endsWith('/responses')){
    providerCalls++;const input=JSON.parse(JSON.parse(opts.body).input);
    assert.equal(input.job.vacancy_confirmed,true);assert.equal(input.job.title,candidate.title);
-   return model({reference_jd:'可能负责汽车渠道运营及门店协作。',reference_basis:'岗位名称已确认，职责为AI职业方向推断。',suitable:true,score:87,reason:'简历有实际渠道运营经历，与推断方向相关。',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车渠道运营',matched:['渠道运营'],gaps:['实际资格待企业确认'],comparisons:[{jd_quote:'汽车渠道运营',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'真实经历对应推断方向'}],strengths:'渠道运营',risks:'实际职责尚未公开'});
+   return model({reference_jd:'可能负责汽车渠道运营及门店协作。可能需要渠道数据分析能力。',reference_basis:'岗位名称已确认，职责为AI职业方向推断。',reference_coverage:{duties_quote:'汽车渠道运营',capabilities_quote:'渠道数据分析能力'},quality_review:{status:'complete',explanation:'职责、能力和差距均已分析。',missing:[]},suitable:true,score:87,reason:'简历有实际渠道运营经历，与推断方向相关。',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车渠道运营',matched:['渠道运营'],gaps:['实际资格待企业确认'],comparisons:[{jd_quote:'汽车渠道运营',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'真实经历对应推断方向'}],strengths:'渠道运营',risks:'实际职责尚未公开'});
   }
   throw Error('unexpected source '+url);
  };
@@ -222,7 +222,7 @@ test('reference score repairs missing evidence without dropping confirmed vacanc
   if(url===candidate.url)return new Response(JSON.stringify({'@type':'JobPosting',title:candidate.title,hiringOrganization:{name:candidate.company,url:new URL(candidate.url).origin},jobLocation:{address:{addressLocality:'上海'}}}),{headers:{'content-type':'application/json'}});
   const input=JSON.parse(JSON.parse(opts.body).input);calls++;
   if(calls>1)assert.ok(input.previous_validation_error);
-  return model({reference_jd:'可能负责汽车渠道运营。',reference_basis:'方向推断。',suitable:true,score:86,reason:'相关经历',resume_quote:calls===1?'虚构经历':'汽车经销商渠道运营',jd_quote:'汽车渠道运营',comparisons:[]});
+  return model({reference_jd:'可能负责汽车渠道运营。可能需要渠道数据分析能力。',reference_basis:'方向推断。',reference_coverage:{duties_quote:'汽车渠道运营',capabilities_quote:'渠道数据分析能力'},quality_review:{status:'complete',explanation:'已覆盖可能职责、能力方向和真实经历差距；实际资格未知。',missing:[]},suitable:true,score:86,reason:'相关经历',resume_quote:calls===1?'虚构经历':'汽车经销商渠道运营',jd_quote:'汽车渠道运营',comparisons:[{jd_quote:'汽车渠道运营',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'真实经历对应推断职责'},{jd_quote:'渠道数据分析能力',status:'missing',analysis:'尚无直接数据分析证据'}]});
  };
  const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
  assert.equal(calls,2);assert.equal(result.checkpoint.matches[0].match_score,86);assert.equal(result.checkpoint.matches[0].reference_jd_kind,'AI_GENERATED_REFERENCE');
@@ -266,7 +266,7 @@ test('Gemini reviews confirmed vacancy for complete JD before falling back to re
   const input=JSON.parse(JSON.parse(opts.body).contents[0].parts[0].text);
   let value;
   if(input.original_url){recovery++;assert.equal(input.confirmed_vacancy,true);value={sources:[],research_complete:true,completion_reason:'公开原文未找到'};}
-  else {assessment++;assert.equal(input.job.vacancy_confirmed,true);value={reference_jd:'可能负责汽车渠道运营。',reference_basis:'方向推断。',suitable:true,score:86,reason:'相关经历',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车渠道运营',comparisons:[]};}
+  else {assessment++;assert.equal(input.job.vacancy_confirmed,true);value={reference_jd:'可能负责汽车渠道运营。可能需要渠道数据分析能力。',reference_basis:'方向推断。',reference_coverage:{duties_quote:'汽车渠道运营',capabilities_quote:'渠道数据分析能力'},quality_review:{status:'complete',explanation:'已覆盖可能职责、能力方向和真实经历差距；实际资格未知。',missing:[]},suitable:true,score:86,reason:'相关经历',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车渠道运营',comparisons:[{jd_quote:'汽车渠道运营',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'真实经历对应推断职责'},{jd_quote:'渠道数据分析能力',status:'missing',analysis:'尚无直接数据分析证据'}]};}
   return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(value)}]}}]});
  };
  const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
@@ -332,7 +332,7 @@ test('activated V4 OpenAI keeps researching confirmed vacancies before reference
   const input=JSON.parse(JSON.parse(opts.body).input);
   if(input.original_url){recovery++;assert.equal(input.confirmed_vacancy,true);return model({sources:[],research_complete:true,completion_reason:'公开原文未找到'});}
   assessment++;assert.equal(input.job.vacancy_confirmed,true);
-  return model({reference_jd:'可能负责汽车渠道运营。',reference_basis:'方向推断。',suitable:true,score:86,reason:'相关经历',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车渠道运营',comparisons:[]});
+  return model({reference_jd:'可能负责汽车渠道运营。可能需要渠道数据分析能力。',reference_basis:'方向推断。',reference_coverage:{duties_quote:'汽车渠道运营',capabilities_quote:'渠道数据分析能力'},quality_review:{status:'complete',explanation:'已覆盖可能职责、能力方向和真实经历差距；实际资格未知。',missing:[]},suitable:true,score:86,reason:'相关经历',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车渠道运营',comparisons:[{jd_quote:'汽车渠道运营',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'真实经历对应推断职责'},{jd_quote:'渠道数据分析能力',status:'missing',analysis:'尚无直接数据分析证据'}]});
  };
  const result=await v4Match(fetcher,provider,resume,'全国',{env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
  assert.ok(recovery>=1);assert.equal(assessment,1);assert.equal(result.checkpoint.matches[0].reference_vacancy_verified,true);assert.equal(result.checkpoint.matches[0].match_score,86);
@@ -422,4 +422,18 @@ test('activated OpenAI global ranking receives every one of 502 eligible candida
  assert.equal(calls,1);assert.equal(result.checkpoint.globalOrder.length,502);
  assert.equal(result.checkpoint.globalRankState.done,true);
  assert.equal(new Set(result.checkpoint.globalOrder).size,502);
+});
+
+test('activated V4 report coverage rejects empty comparisons, unresolved semantic review and duplicated reference evidence',async()=>{
+ const {reportCoverageErrors,validateCuratedReport}=await import('../functions/_lib/v4-curated-reports.js');
+ const jd='可能负责汽车渠道运营。可能需要渠道数据分析能力。';
+ const valid={suitable:true,score:86,reason:'渠道经历与推断职责有关，数据分析能力需验证。',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车渠道运营',comparisons:[{status:'supported',jd_quote:'汽车渠道运营',resume_quote:'汽车经销商渠道运营',analysis:'对应真实经历'},{status:'missing',jd_quote:'渠道数据分析能力',analysis:'暂无直接证据'}],quality_review:{status:'complete',explanation:'覆盖职责能力及未知项',missing:[]},reference_coverage:{duties_quote:'汽车渠道运营',capabilities_quote:'渠道数据分析能力'}};
+ assert.ok(validateCuratedReport(valid,resume,jd).ok);
+ assert.deepEqual(reportCoverageErrors(valid,jd,{reference:true}),[]);
+ assert.ok(reportCoverageErrors({...valid,comparisons:[]},jd,{reference:true}).includes('missing_requirement_comparisons'));
+ assert.ok(reportCoverageErrors({...valid,quality_review:{status:'revise',explanation:'遗漏能力',missing:['能力']}},jd,{reference:true}).includes('quality_review_incomplete'));
+ assert.ok(reportCoverageErrors({...valid,reference_coverage:{duties_quote:'汽车渠道运营',capabilities_quote:'汽车渠道运营'}},jd,{reference:true}).includes('reference_duties_and_capabilities_coverage'));
+ assert.ok(reportCoverageErrors({...valid,reference_coverage:{duties_quote:'汽车渠道运营',capabilities_quote:'编造证书'}},jd,{reference:true}).length);
+ assert.deepEqual(reportCoverageErrors({suitable:false},jd,{reference:true}),[]);
+ assert.deepEqual(reportCoverageErrors(valid,jd),[]);
 });
