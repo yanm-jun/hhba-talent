@@ -409,7 +409,7 @@ test('V4 selected match research reaches real optimization endpoint, planner, wr
   strengths:'运营与经营分析',risks:'缺乏跨部门协作的明确证据',
   career_development:'区域运营方向',optimization_advice:'突出月度复盘',
   competition:'如实陈述',score_explanation:'真实经历支持岗位要求',
-  extra_sections:[{title:'模型自主研究',content:'完整研究资料。'.repeat(2000)}]
+  extra_sections:[{title:'模型自主研究',content:'完整研究资料。'.repeat(120000)}]
  };
  const snapshot={official_url:URL,jd_version_id:saved.id,jd_sha256:saved.jd_sha256,match_score:83,
   reference_score:83,score_basis:'依据真实经历',recommendation_reason:'运营经验匹配',
@@ -454,7 +454,7 @@ test('V4 selected match research reaches real optimization endpoint, planner, wr
   const result=await optimize({env,request:new Request('https://example.org/api/resume-optimize',{method:'POST',
    headers:{Origin:'https://example.org',Authorization:'Bearer synthetic-token','Content-Type':'application/json'},
    body:JSON.stringify({consent_ai:true,blocks:[{id:'a',section:'experience',text:fact}],
-    job:{title:'区域运营经理',requirements:'不可信的客户端摘要',official_url:URL,jd_version_id:saved.id,
+    job:{title:'区域运营经理',requirements:'',official_url:URL,jd_version_id:saved.id,
      jd_sha256:saved.jd_sha256,prior_match_analysis:snapshot},full_document:{text:fact}})})});
   assert.equal(result.status,200,await result.clone().text());
   const value=await result.json();
