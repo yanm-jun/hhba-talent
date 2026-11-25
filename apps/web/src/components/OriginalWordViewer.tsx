@@ -80,7 +80,8 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  const [message,setMessage]=useState('');
  const [convertStatus,setConvertStatus]=useState<WordRenderTaskStatus>('idle');
  const [pdfPreview,setPdfPreview]=useState(false);
- const conversionScope=JSON.stringify([resume.id,jobId,revision]);
+ const [savedEntryId,setSavedEntryId]=useState<string|undefined>();
+ const conversionScope=JSON.stringify([resume.id,jobId,revision,savedEntryId]);
  const conversionScopeRef=useRef(conversionScope);
  conversionScopeRef.current=conversionScope;
  const [activeVisualId,setActiveVisualId]=useState<string|null>(null);
@@ -106,7 +107,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   // A previous job's saved revision must never leak into another job's toolbar.
   setSaved(false);setRevision(0);setTotalRevisions(0);setHistory([]);
   setPdfAvailable(false);setLayoutVerified(false);setReadOnlyTextFallback(false);
-  setConvertStatus('idle');setPdfPreview(false);
+  setConvertStatus('idle');setPdfPreview(false);setSavedEntryId(undefined);
   renderedEntrance.current=false;
  },[resume.id,jobId]);
  useEffect(()=>{
@@ -185,7 +186,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     // the OOXML body but across every rendered page, including headers.
     // Otherwise the clicked visible region could be the WRONG occurrence.
     const wasSaved=Boolean(info.saved);
-    setSaved(wasSaved);
+    setSaved(wasSaved);setSavedEntryId(info.saved?.id);
     setRevision(Number.isInteger(info.revision)?info.revision:(wasSaved?1:0));
     setTotalRevisions(Number.isInteger(info.total_revisions)?info.total_revisions:(wasSaved?1:0));
     setMaxRevisions(info.max_revisions===null?null:Number.isInteger(info.max_revisions)?info.max_revisions:8);
@@ -198,7 +199,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     // page was left; resume watching it instead of starting a second one.
     setConvertStatus('idle');
     if(info.pdf_available===true)setConvertStatus('done');
-    else if(wasSaved&&rendererEnabled)void wordPdfConversionStatus(resume.id,jobId,undefined,Number.isInteger(info.revision)?info.revision:1).then(task=>{
+    else if(wasSaved&&rendererEnabled)void wordPdfConversionStatus(resume.id,jobId,undefined,Number.isInteger(info.revision)?info.revision:1,info.saved?.id).then(task=>{
      if(!active)return;
      setConvertStatus(task.status);
     }).catch(()=>{/* a missing status is not a conversion failure */});
@@ -291,7 +292,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    if(inFlight||controller.signal.aborted)return;
    inFlight=true;
    try{
-    const task=await wordPdfConversionStatus(resume.id,jobId,controller.signal,revision);
+    const task=await wordPdfConversionStatus(resume.id,jobId,controller.signal,revision,savedEntryId);
     if(controller.signal.aborted||conversionScopeRef.current!==conversionScope)return;
     if(task.status==='done'){
      setConvertStatus('done');setPdfAvailable(true);setLayoutVerified(true);
@@ -307,7 +308,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   };
   const timer=setInterval(()=>void poll(),3000);
   return()=>{controller.abort();clearInterval(timer);};
- },[convertStatus,resume.id,jobId,revision,saved,conversionScope]);
+ },[convertStatus,resume.id,jobId,revision,saved,conversionScope,savedEntryId]);
 
  useEffect(()=>{
   if(ready!=='available'||!pdfPreview||loading||!surface.current||!doc.current)return;
@@ -481,7 +482,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   const scope=conversionScope;
   setMessage('正在生成专业排版 PDF');
   try{
-   const task=await requestWordPdfConversion(resume.id,jobId,undefined,revision);
+   const task=await requestWordPdfConversion(resume.id,jobId,undefined,revision,savedEntryId);
    if(conversionScopeRef.current!==scope)return;
    setConvertStatus(task.status);
    if(task.status==='done'){
@@ -493,6 +494,14 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     setMessage('PDF 转换失败，请重试');
    }
   }catch(error){
+   if(conversionScopeRef.current!==scope)return;
+   // A lost HTTP response does not prove the renderer failed. Reconcile with D1.
+   try{
+    const task=await wordPdfConversionStatus(resume.id,jobId,undefined,revision,savedEntryId);
+    if(conversionScopeRef.current!==scope)return;
+    if(task.status==='done'){setRefresh(n=>n+1);setConvertStatus('done');return;}
+    if(task.status==='pending'||task.status==='running'){setConvertStatus(task.status);return;}
+   }catch{/* allow retry when status cannot be recovered */}
    if(conversionScopeRef.current!==scope)return;
    setConvertStatus('failed');setMessage(error instanceof Error?error.message:'PDF 转换未完成，请重试');
   }

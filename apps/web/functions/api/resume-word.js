@@ -332,7 +332,7 @@ export async function onRequestGet({request,env}){
     await versionBytes(bucket,state.key,state.saved,'docx'):original;
    const data=await inspectOriginalDocxStrict(current,{allowParagraphRuns:v4(env)&&!renderer});
    return json({ok:true,editable_text:data.editable_text,paragraph_text:data.paragraph_text,duplicate_paragraphs:data.duplicate_paragraphs,
-    saved:state.saved?{original:state.saved.original,text:state.saved.text,
+    saved:state.saved?{id:state.saved.id,original:state.saved.original,text:state.saved.text,
      updated_at:state.saved.updated_at}:null,
     revision:state.revision,total_revisions:state.items.length,
     layout_verified:Boolean(state.saved&&state.saved.verification!=='docx_structure_only'),
@@ -374,8 +374,8 @@ export async function onRequestGet({request,env}){
    const state=await approved(bucket,row,jobId,env);
    if(!state.saved)return fail('WORD_NOT_EDITED',404);
    const entry=state.saved;
-   const requested=params.get('revision');
-   if(requested!==null&&String(state.revision)!==requested)return fail('WORD_REVISION_CONFLICT',409);
+   const requested=params.get('revision'),entryId=params.get('entry_id');
+   if(requested!==null&&String(state.revision)!==requested||entryId!==null&&entry.id!==entryId)return fail('WORD_REVISION_CONFLICT',409);
    if(entry.verification!=='docx_structure_only')
     return json({ok:true,status:'done',pdf_available:true,attempts:0,updated_at:entry.updated_at||''});
    const hash=await accountHash(env,candidate.phone);
@@ -441,6 +441,7 @@ export async function onRequestPost({request,env,waitUntil}){
   if(action==='convert-pdf'){
    if(!state.saved)return fail('WORD_NOT_EDITED',404);
    const entry=state.saved;
+   if(body.expected_entry_id!==undefined&&body.expected_entry_id!==entry.id)return fail('WORD_REVISION_CONFLICT',409);
    if(entry.verification!=='docx_structure_only')
     return json({ok:true,status:'done',pdf_available:true,revision:state.revision,
      total_revisions:state.items.length});

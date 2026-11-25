@@ -18,6 +18,7 @@ const data=Buffer.from(original).buffer.slice(
 function fixture({enabled=true,docxOnly=false,owner='account-A',role='candidate'}={}){
  const saved=new Map([[store,original]]);
  const tasks=new Map();
+ const faults={failDone:false};
  const env={
   HHBA_WORD_RENDER_ENABLED:enabled?'1':'0',
   HHBA_WORD_DOCX_ONLY_ENABLED:docxOnly?'1':'0',
@@ -104,6 +105,7 @@ function fixture({enabled=true,docxOnly=false,owner='account-A',role='candidate'
       const key=args.slice(3,7).join('|');
       const task=tasks.get(key);
       if(task&&task.attempts===args[7]&&['pending','running'].includes(task.status)){
+       if(args[0]==='done'&&faults.failDone)throw Error('synthetic D1 status write failure');
        task.status=args[0];task.error_code=args[1];task.updated_at=args[2];
        return {success:true,meta:{changes:1}};
       }
@@ -116,7 +118,7 @@ function fixture({enabled=true,docxOnly=false,owner='account-A',role='candidate'
    };}
   }}}
  };
- return {env,saved,tasks};
+ return {env,saved,tasks,faults};
 }
 const req=(action='status',{auth=true,method='GET',body=null,foreign=false,jobId}={})=>
  new Request(origin+'/api/resume-word?action='+action+'&resume_id='+id+
@@ -855,4 +857,74 @@ test('convert-status reports idle before any conversion and done once the PDF ex
  const idle=await (await onRequestGet({request:req('convert-status',{jobId:'role-A'}),env:x.env})).json();
  assert.equal(idle.status,'idle');
  assert.equal(idle.pdf_available,false);
+});
+
+async function saveLateTestRevision(x,bytes,oldText,newText,revision){
+ const patched=await editOriginalDocxStrict(bytes,[{original:oldText,text:newText}]);
+ const response=await onRequestPost({request:req('export',{method:'POST',jobId:'role-A',body:{
+  resume_id:id,job_id:'role-A',action:'edit',original:oldText,text:newText,
+  expected_revision:revision,client_docx_sha256:createHash('sha256').update(patched).digest('hex'),
+  confirmed_real:true,consent_word_processing:true
+ }}),env:x.env});
+ assert.equal(response.status,200,await response.clone().text());
+ return patched;
+}
+const lateReport=()=>Response.json({ok:true,verified:true,report:{passed:true,page_count:1,
+ changed_pixels:40,changed_region:{page:1,x:10,y:10,width:50,height:12}}});
+const lateConvert=(x,waitUntil)=>onRequestPost({request:req('export',{method:'POST',jobId:'role-A',body:{
+ resume_id:id,job_id:'role-A',action:'convert-pdf',confirmed_real:true,consent_word_processing:true
+}}),env:x.env,waitUntil});
+test('late conversion compares the immediate previous Word revision and preserves a published PDF if D1 status fails',async()=>{
+ const x=fixture({enabled:false,docxOnly:true});
+ const first=await saveLateTestRevision(x,original,'测试用户','岗位甲',0);
+ await saveLateTestRevision(x,first,'岗位甲','岗位乙',1);
+ x.env.HHBA_WORD_RENDER_ENABLED='1';x.env.HHBA_WORD_DOCX_ONLY_ENABLED='0';
+ x.faults.failDone=true;
+ const prior=globalThis.fetch;
+ globalThis.fetch=async(url,options)=>{
+  if(url.endsWith('/v1/verify')){
+   const body=JSON.parse(options.body);
+   assert.deepEqual(Buffer.from(body.original_b64,'base64'),Buffer.from(first));
+   assert.equal(body.old_text,'岗位甲');assert.equal(body.new_text,'岗位乙');
+   return lateReport();
+  }
+  return new Response(pdf,{headers:{'Content-Type':'application/pdf'}});
+ };
+ try{
+  const result=await (await lateConvert(x)).json();
+  assert.equal(result.status,'done');assert.equal(result.pdf_available,true);
+  const download=await onRequestGet({request:req('download-pdf',{jobId:'role-A'}),env:x.env});
+  assert.equal(download.status,200);
+  assert.deepEqual(Buffer.from(await download.arrayBuffer()),Buffer.from(pdf));
+ }finally{globalThis.fetch=prior;}
+});
+test('interrupted render lease is retryable and an obsolete worker cannot overwrite the new PDF',async()=>{
+ const x=fixture({enabled:false,docxOnly:true});
+ await saveLateTestRevision(x,original,'测试用户','岗位甲',0);
+ x.env.HHBA_WORD_RENDER_ENABLED='1';x.env.HHBA_WORD_DOCX_ONLY_ENABLED='0';
+ let release;
+ const gate=new Promise(resolve=>{release=resolve;});
+ let verification=0;
+ const prior=globalThis.fetch;
+ globalThis.fetch=async(url)=>{
+  if(url.endsWith('/v1/verify')){
+   if(++verification===1)await gate;
+   return lateReport();
+  }
+  return new Response(pdf,{headers:{'Content-Type':'application/pdf'}});
+ };
+ const background=[];
+ try{
+  const first=await lateConvert(x,p=>background.push(p));
+  assert.equal(first.status,200);
+  const task=[...x.tasks.values()][0];
+  task.updated_at=new Date(Date.now()-6*60*1000).toISOString();
+  const status=await (await onRequestGet({request:req('convert-status',{jobId:'role-A'}),env:x.env})).json();
+  assert.equal(status.status,'failed');assert.equal(status.error_code,'WORD_RENDER_INTERRUPTED');
+  const retried=await (await lateConvert(x)).json();
+  assert.equal(retried.status,'done');assert.equal(retried.attempts,1);
+  release();await background[0];
+  assert.equal((await onRequestGet({request:req('download-pdf',{jobId:'role-A'}),env:x.env})).status,200);
+  assert.equal([...x.tasks.values()][0].status,'done');
+ }finally{release();globalThis.fetch=prior;}
 });

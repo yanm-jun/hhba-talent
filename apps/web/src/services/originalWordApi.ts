@@ -1,7 +1,7 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import {editOriginalDocxStrict,type DuplicateWordParagraph} from './resumeDocxPreserve.mjs';
 
-type SavedWord={original:string;text:string;updated_at:string};
+type SavedWord={id?:string;original:string;text:string;updated_at:string};
 export type WordHistoryEntry={revision:number;original:string;text:string;updated_at:string;page_count:number|null;layout_verified?:boolean};
 export type WordInspect={ok:boolean;editable_text:string[];paragraph_text?:string[];duplicate_paragraphs?:DuplicateWordParagraph[];saved?:SavedWord|null;revision:number;total_revisions:number;max_revisions:number|null;max_daily_edits?:number|null;history?:WordHistoryEntry[];layout_verified?:boolean;pdf_available?:boolean};
 const messages:Record<string,string>={
@@ -159,16 +159,17 @@ export async function shiftOriginalWordRevision(id:string,action:'undo'|'redo',e
 export type WordRenderTaskStatus='idle'|'pending'|'running'|'done'|'failed';
 export type WordRenderTask={ok:true;status:WordRenderTaskStatus;pdf_available?:boolean;
  error_code?:string;attempts?:number;updated_at?:string};
-export async function requestWordPdfConversion(id:string,jobId?:string,signal?:AbortSignal,revision?:number):Promise<WordRenderTask>{
+export async function requestWordPdfConversion(id:string,jobId?:string,signal?:AbortSignal,revision?:number,entryId?:string):Promise<WordRenderTask>{
  const response=await send('/api/resume-word','POST',{
   action:'convert-pdf',resume_id:id,...jobPayload(jobId),await_completion:true,
   ...(revision===undefined?{}:{expected_revision:revision}),
+  ...(entryId?{expected_entry_id:entryId}:{}),
   confirmed_real:true,consent_word_processing:true
  },signal);
  return response.json();
 }
-export async function wordPdfConversionStatus(id:string,jobId?:string,signal?:AbortSignal,revision?:number):Promise<WordRenderTask>{
- const response=await send(url(id,'convert-status',jobId)+(revision===undefined?'':'&revision='+revision),'GET',undefined,signal);
+export async function wordPdfConversionStatus(id:string,jobId?:string,signal?:AbortSignal,revision?:number,entryId?:string):Promise<WordRenderTask>{
+ const response=await send(url(id,'convert-status',jobId)+(revision===undefined?'':'&revision='+revision)+(entryId?'&entry_id='+encodeURIComponent(entryId):''),'GET',undefined,signal);
  return response.json();
 }
 async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf',jobId?:string,jobLabel?:string,revision?:number){
