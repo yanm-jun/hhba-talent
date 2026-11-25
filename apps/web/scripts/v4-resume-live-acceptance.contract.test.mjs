@@ -20,7 +20,9 @@ test('isolated live acceptance runner patches actual DOCX then scores extracted 
   }});
  assert.equal(result.status,'PASS');
  assert.equal(result.stages.docx.original_unchanged,true);
- assert.equal(result.stages.reassessment.delta,-2);
+ assert.equal(result.stages.injected_document_check.delta,-2);
+ assert.equal(result.stages.optimization_target.ai_reassessment,false);
+ assert.equal(result.stages.optimization_target.kind,'RULE_GENERATED_TARGET_NOT_ASSESSED');
  assert.equal(result.layout,'NOT_PIXEL_VERIFIED');
  assert.equal(records.at(-1).status,'PASS');
 });
@@ -31,7 +33,7 @@ test('a model omission or missing applicable suggestion cannot pass the diagnost
  assert.equal(result.stages.optimization.error,'QA_NO_PROGRESS');
  assert.equal(calls,0);
 });
-test('same V4 production score engine checks evidence in both actual input documents',async()=>{
+test('retained offline diagnostic score engine rejects invented evidence',async()=>{
  const jd={id:'synthetic',company:'虚构',title:'督导',location:'上海',full_jd:'负责门店运营数据分析。'};
  const beforeBlocks=[{text:'负责日常门店运营。'}],afterBlocks=[{text:'整理门店运营记录。'}];
  const scores=await reassessV4Document({env,jd,beforeBlocks,afterBlocks,signal,fetcher:async(_url,init)=>{

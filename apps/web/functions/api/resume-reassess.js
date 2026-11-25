@@ -2,8 +2,6 @@
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
 import {validatedAuditedJob,validReassessmentInput,sameEngineReassessment,archivedJDToScoreJob} from '../_lib/resume-reassessment.js';
 import {readJobJdById,jdArchiveConfigured} from '../_lib/job-jd-archive.js';
-import {v4Provider} from '../_lib/simple-match-v4.js';
-import {reassessV4Document} from '../_lib/v4-resume-reassess.js';
 import {validatedCachedOfficialJob} from '../_lib/official-job-evidence.js';
 const LIMIT_BYTES=160*1024,PER_ACCOUNT=12,GLOBAL=400;
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
@@ -14,7 +12,7 @@ const bad=(code,status)=>json({ok:false,error:code},status);
 const isV4=env=>env?.HHBA_MATCH_V4_READY==='1';
 function active(env){return env?.HHBA_RESUME_REASSESS_ENABLED==='1'&&
  (env?.HHBA_AUTH_ROLLOUT==='preview'||env?.HHBA_MATCH_RUNTIME_MODE==='production')&&
- (isV4(env)?Boolean(v4Provider(env)):(typeof env?.HHBA_MATCH_LIMIT_PEPPER==='string'&&env.HHBA_MATCH_LIMIT_PEPPER.length>=24))&&
+ !isV4(env)&&typeof env?.HHBA_MATCH_LIMIT_PEPPER==='string'&&env.HHBA_MATCH_LIMIT_PEPPER.length>=24&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function'&&(isV4(env)||typeof env?.ASSETS?.fetch==='function');}
 function sameOrigin(request){return request.headers.get('Origin')===new URL(request.url).origin&&
  request.headers.get('Sec-Fetch-Site')!=='cross-site';}
@@ -66,6 +64,7 @@ export async function onRequestGet({env}){
 }
 export async function onRequestPost({request,env}){
  if(!sameOrigin(request))return bad('ORIGIN_REQUIRED',403);
+ if(isV4(env))return bad('REASSESSMENT_NOT_ENABLED',410);
  if(!active(env))return bad('REASSESSMENT_NOT_ENABLED',503);
  const db=env.HHBA_PNVS_AUTH_DB;
  if(!isV4(env)&&!await ready(db))return bad('REASSESSMENT_DB_NOT_READY',503);
@@ -79,15 +78,6 @@ export async function onRequestPost({request,env}){
  let input;
  try{input=await readBody(request,env);}catch{return bad('INVALID_REASSESSMENT_INPUT',400);}
  if(!validReassessmentInput(input,{v4:isV4(env)}))return bad('INVALID_REASSESSMENT_INPUT',400);
- if(isV4(env)){
-  if(input.consent_ai!==true)return bad('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
-  if(!/^jd_[a-f0-9]{32}$/.test(input.job_id))return bad('AUDITED_JOB_NOT_AVAILABLE',422);
-  try{
-   const jd=jdArchiveConfigured(env)?await readJobJdById(env,input.job_id):null;
-   if(!jd?.fresh||!jd.full_jd)return bad('AUDITED_JOB_NOT_AVAILABLE',422);
-   return json(await reassessV4Document({env,jd,beforeBlocks:input.before_blocks,afterBlocks:input.after_blocks,signal:request.signal}));
-  }catch(e){const code=e?.code||'REASSESSMENT_SOURCE_UNAVAILABLE';return bad(code,code==='AI_PROVIDER_RATE_LIMITED'?429:502);}
- }
  let job;
  try{
   if(/^jd_[a-f0-9]{32}$/.test(input.job_id)){

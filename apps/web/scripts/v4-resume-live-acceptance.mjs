@@ -5,7 +5,7 @@ import {createHash} from 'node:crypto';
 import {pathToFileURL} from 'node:url';
 import {v4Provider} from '../functions/_lib/simple-match-v4.js';
 import {optimizeResumeDocument} from '../functions/_lib/resume-optimization-task.js';
-import {reassessV4Document} from '../functions/_lib/v4-resume-reassess.js';
+import {resumeOptimizationTarget} from '../src/services/resumeOptimizationTarget.mjs';
 import {editOriginalDocxStrict,inspectOriginalDocxStrict} from '../src/services/resumeDocxPreserve.mjs';
 import {extractDocxText} from '../src/services/docxProfile.mjs';
 
@@ -39,7 +39,7 @@ function syntheticDocx(){
  ].join('\n');
  return new Uint8Array(execFileSync('python3',['-c',py],{input:JSON.stringify(blocks)}));
 }
-export async function runSyntheticResumeAcceptance({env,signal,optimize=optimizeResumeDocument,reassess=reassessV4Document,report=()=>{}}){
+export async function runSyntheticResumeAcceptance({env,signal,optimize=optimizeResumeDocument,reassess,report=()=>{}}){
  const summary={status:'PARTIAL',fixture:'SYNTHETIC_ONLY',provider_mode:'LIVE_CONFIGURED_RELAY',stages:{},layout:'NOT_PIXEL_VERIFIED'};
  let stage='optimization';
  const emit=()=>report({...summary,stages:{...summary.stages}});
@@ -93,10 +93,17 @@ export async function runSyntheticResumeAcceptance({env,signal,optimize=optimize
   if(edits.some(edit=>edit.proposed.split('\n').some(line=>!inspection.editable_text.includes(line))))fail('QA_DOCX_ANCHOR_MISSING');
   summary.stages.docx={structure:'PASS',original_unchanged:true,edited_text_verified:true,applied_edits:applied.size,bytes:edited.length};
   emit();
-  stage='reassessment';
-  const scores=await reassess({env,jd,beforeBlocks:[{text:beforeText}],afterBlocks:[{text:afterText}],signal});
-  if(!scores.supported||!Number.isInteger(scores.original_score)||!Number.isInteger(scores.updated_score)||scores.delta!==scores.updated_score-scores.original_score)fail('QA_SCORE_EVIDENCE_MISSING');
-  summary.stages.reassessment={status:'PASS',before:scores.original_score,after:scores.updated_score,delta:scores.delta};
+  // Optional injected fixture assertions only; no default model reassessment.
+  if(reassess){
+   stage='injected_document_check';
+   const scores=await reassess({env,jd,beforeBlocks:[{text:beforeText}],afterBlocks:[{text:afterText}],signal});
+   if(!scores.supported||!Number.isInteger(scores.original_score)||!Number.isInteger(scores.updated_score)||scores.delta!==scores.updated_score-scores.original_score)fail('QA_DOCUMENT_CHECK_FAILED');
+   summary.stages.injected_document_check={status:'PASS',delta:scores.delta};
+  }
+  stage='optimization_target';
+  const goal=resumeOptimizationTarget(job.prior_match_analysis.match_score,'synthetic-only');
+  if(!goal||goal.kind!=='RULE_GENERATED_TARGET_NOT_ASSESSED'||goal.target>100)fail('QA_TARGET_INVALID');
+  summary.stages.optimization_target={status:'PASS',...goal,ai_reassessment:false};
   summary.status='PASS';emit();
  }catch(error){summary.stages[stage]={...summary.stages[stage],status:'FAILED',error:errorCode(error)};emit();}
  return summary;
