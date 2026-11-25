@@ -1,16 +1,12 @@
 name: HHBA live Token efficiency synthetic acceptance
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'apps/web/scripts/v4-token-live-acceptance.mjs'
-      - '.github/workflows/hhba-v4-token-live-acceptance.yml'
+  # Deliberate opt-in: PR CI uses deterministic contracts; live billing uses the
+  # protected Cloudflare preview probe or this manually dispatched workflow.
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   synthetic-live:
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
