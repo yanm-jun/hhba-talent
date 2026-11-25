@@ -43,5 +43,17 @@ export async function scheduleWorkflowInstance(workflow,instance,ticket){
  catch(e){if(!(e instanceof Error)||!e.message.includes('(instance.already_exists)'))throw e;}
  const existing=await workflow.get(instance);
  const current=await existing.status();
- return ['queued','running','waiting'].includes(current?.status);
+ if(['queued','running','waiting'].includes(current?.status))return true;
+ // Only an authorized active ticket reaches this scheduler. Restart a
+ // genuinely errored instance; the Pages lease and persisted phase remain
+ // authoritative, so restarting the driver does not replay completed work.
+ // Never restart a user-terminated, paused, or successfully completed run.
+ if(current?.status==='errored'&&typeof existing.restart==='function'){
+  try{await existing.restart();return true;}
+  catch{
+   const refreshed=await existing.status();
+   return ['queued','running','waiting'].includes(refreshed?.status);
+  }
+ }
+ return false;
 }
