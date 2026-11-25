@@ -434,7 +434,25 @@ export async function onRequestGet({request,env}){
   return replyFile(rendered,'application/pdf','HHBA-resume-original-preview.pdf');
  }catch(error){const c=code(error);return fail(c,errorStatus(c));}
 }
+// The private scheduler uses a dedicated 256-bit bearer token, never a
+// candidate credential or the renderer secret. It may only trigger a bounded
+// owner-checked recovery sweep and can never specify or read a resume.
+async function authorizedRecovery(request,env){
+ const token=env.HHBA_WORD_RECOVERY_TOKEN;
+ if(typeof token!=='string'||!(/^[a-f0-9]{64}$/).test(token))return false;
+ const supplied=request.headers.get('Authorization')||'';
+ if(!/^Bearer [a-f0-9]{64}$/.test(supplied))return false;
+ let difference=0;
+ for(let i=0;i<64;i++)difference|=token.charCodeAt(i)^supplied.charCodeAt(i+7);
+ return difference===0;
+}
 export async function onRequestPost({request,env,waitUntil}){
+ if(new URL(request.url).searchParams.get('action')==='recover-interrupted'){
+  if(!await authorizedRecovery(request,env))return fail('NOT_FOUND',404);
+  if(env.HHBA_WORD_RENDER_RECOVERY_ENABLED!=='1')return fail('WORD_RECOVERY_DISABLED',503);
+  try{return json({ok:true,...await recoverInterruptedWordRenders(env,{limit:1})});}
+  catch{return fail('WORD_RECOVERY_UNAVAILABLE',503);}
+ }
  if(!sameOrigin(request))return fail('ORIGIN_REQUIRED',403);
  const renderer=configured(env),docxOnly=docxOnlyConfigured(env);
  if(!renderer&&!docxOnly)return fail('WORD_NOT_READY',503);

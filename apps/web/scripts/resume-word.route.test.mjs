@@ -976,3 +976,25 @@ test('Word revisions and exports no longer depend on legacy daily or revision qu
  assert.equal(inspect.revision,9);assert.equal(inspect.max_revisions,null);
  assert.equal(inspect.max_daily_edits,null);
 });
+
+test('scheduler recovery uses a dedicated credential and returns only aggregate counts',async()=>{
+ const x=fixture();
+ const secret='a'.repeat(64);
+ x.env.HHBA_WORD_RECOVERY_TOKEN=secret;
+ x.env.HHBA_WORD_RENDER_RECOVERY_ENABLED='1';
+ const invoke=(token,method='POST')=>onRequestPost({
+  request:new Request(origin+'/api/resume-word?action=recover-interrupted',{
+   method,headers:token?{Authorization:'Bearer '+token}:{}
+  }),env:x.env
+ });
+ assert.equal((await invoke()).status,404);
+ assert.equal((await invoke('synthetic-session')).status,404);
+ assert.equal((await invoke('b'.repeat(64))).status,404);
+ const valid=await invoke(secret);
+ assert.equal(valid.status,200,await valid.clone().text());
+ assert.deepEqual(await valid.json(),{ok:true,checked:0,reclaimed:0,skipped:0,errors:0});
+ x.env.HHBA_WORD_RENDER_RECOVERY_ENABLED='0';
+ assert.equal((await invoke(secret)).status,503);
+ delete x.env.HHBA_WORD_RECOVERY_TOKEN;
+ assert.equal((await invoke(secret)).status,404);
+});
