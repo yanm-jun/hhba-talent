@@ -13,7 +13,15 @@ export default {async scheduled(event,env){
  const summary=await inspectWatchdogInstances(env.MATCH_REGISTRY,env.MATCH_WORKFLOW);
  console.info('HHBA_MATCH_WATCHDOG',JSON.stringify(summary));
 },async fetch(request,env){
- if(new URL(request.url).origin!=='https://hhba-internal.invalid'||new URL(request.url).pathname!=='/start'||request.method!=='POST')return new Response('Not found',{status:404});
+ const url=new URL(request.url);
+ if(url.origin!=='https://hhba-internal.invalid'||request.method!=='POST')return new Response('Not found',{status:404});
+ if(url.pathname==='/watchdog'){
+  if(!env.MATCH_REGISTRY)return Response.json({ok:false},{status:503});
+  const summary=await inspectWatchdogInstances(env.MATCH_REGISTRY,env.MATCH_WORKFLOW);
+  console.info('HHBA_MATCH_WATCHDOG',JSON.stringify(summary));
+  return Response.json({ok:true,...summary});
+ }
+ if(url.pathname!=='/start')return new Response('Not found',{status:404});
  let body;try{body=await request.json();}catch{return new Response('Invalid',{status:400});}
  if(!hex64(body.instance)||!hex64(body.ticket))return new Response('Invalid',{status:400});
  const active=await scheduleWorkflowInstance(env.MATCH_WORKFLOW,body.instance,body.ticket);
