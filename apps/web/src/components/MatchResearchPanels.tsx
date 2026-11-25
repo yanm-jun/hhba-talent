@@ -59,7 +59,7 @@ export function ReportPager({count,index,onChange,pending=false,inline=false}:{c
 }
 function JdResearchContent({job}:{job:MatchedJob}){
  if(job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job.reference_jd)return <>
-  <section className="hhba-refined-section"><h3>AI 生成参考 JD</h3><p className="hhba-refined-note">根据真实岗位方向及已有资料推断，不是企业发布的招聘原文。实际职责、资格和薪资以企业确认信息为准。</p><p style={{whiteSpace:'pre-wrap'}}>{recruitmentText(job.reference_jd)}</p><h4>参考依据及不确定性</h4><p>{recruitmentText(job.reference_jd_basis||'')}</p></section>
+  <section className="hhba-refined-section"><h3>{job.jd_research?.facts.length?'依据公开资料整理的参考 JD':'依据岗位名称整理的求职参考 JD'}</h3><p className="hhba-refined-note">{job.jd_research?.facts.length?'优先依据已核对的公开招聘资料整理，推导的能力方向属于求职建议，不是企业新增要求。':'企业具体职责和资格尚无可核对原文，以下为岗位方向的准备建议，并非企业招聘要求。'}</p><p style={{whiteSpace:'pre-wrap'}}>{recruitmentText(job.reference_jd)}</p><h4>整理依据及需要核实的事项</h4><p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{recruitmentText(job.reference_jd_basis||'')}</p></section>
   {!!job.jd_research?.facts.length&&<section className="hhba-refined-section"><h3>已独立读取的公开资料片段</h3>{job.jd_research.facts.map((f,i)=><p key={i}>{recruitmentText(f.quote)}</p>)}</section>}
  </>;
  const requirements=job.requirements_basis?.trim(),excerpt=job.evidence_excerpt?.trim();
