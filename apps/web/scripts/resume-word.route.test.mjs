@@ -73,10 +73,10 @@ function fixture({enabled=true,docxOnly=false,owner='account-A',role='candidate'
     async run(){
      if(sql.includes('hhba_resume_word_attempts'))return {
       success:true,meta:{changes:1}};
-     if(sql.includes('INSERT INTO hhba_resume_word_render_tasks')){
+     if(sql.includes('INSERT OR IGNORE INTO hhba_resume_word_render_tasks')){
       const key=args.slice(0,4).join('|');
       const live=tasks.get(key);
-      if(live&&(live.status==='pending'||live.status==='running'))
+      if(live)
        return {success:true,meta:{changes:0}};
       tasks.set(key,{status:'pending',error_code:null,attempts:0,
        created_at:args[5],updated_at:args[6]});
@@ -86,7 +86,7 @@ function fixture({enabled=true,docxOnly=false,owner='account-A',role='candidate'
       if(sql.includes('attempts=attempts+1')){
        const key=args.slice(2,6).join('|');
        const task=tasks.get(key);
-       if(task?.status==='failed'){
+       if(task&&task.status===args[6]&&task.updated_at===args[7]&&task.attempts===args[8]){
         task.status='pending';task.error_code=null;task.attempts+=1;task.updated_at=args[1];
         return {success:true,meta:{changes:1}};
        }
@@ -103,7 +103,7 @@ function fixture({enabled=true,docxOnly=false,owner='account-A',role='candidate'
       }
       const key=args.slice(3,7).join('|');
       const task=tasks.get(key);
-      if(task){
+      if(task&&task.attempts===args[7]&&['pending','running'].includes(task.status)){
        task.status=args[0];task.error_code=args[1];task.updated_at=args[2];
        return {success:true,meta:{changes:1}};
       }

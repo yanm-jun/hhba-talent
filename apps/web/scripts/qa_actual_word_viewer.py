@@ -56,6 +56,9 @@ def exercise(browser,label,viewport):
                           'revision':active[job],'total_revisions':history[job],
                           'layout_verified':False,'pdf_available':False,'history':entries if history[job] else [],
                           'max_revisions':8,'max_daily_edits':6})
+        if action=='convert-status':
+            if not active[job]:return j(404,{'ok':False,'error':'WORD_NOT_EDITED'})
+            return j(200,{'ok':True,'status':'idle','pdf_available':False})
         if action=='source-docx':
             rev=query.get('revision',[str(active[job])])[0]
             if str(active[job])!=rev:return j(409,{'ok':False,'error':'WORD_REVISION_CONFLICT'})

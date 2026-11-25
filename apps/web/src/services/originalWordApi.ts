@@ -159,15 +159,16 @@ export async function shiftOriginalWordRevision(id:string,action:'undo'|'redo',e
 export type WordRenderTaskStatus='idle'|'pending'|'running'|'done'|'failed';
 export type WordRenderTask={ok:true;status:WordRenderTaskStatus;pdf_available?:boolean;
  error_code?:string;attempts?:number;updated_at?:string};
-export async function requestWordPdfConversion(id:string,jobId?:string,signal?:AbortSignal):Promise<WordRenderTask>{
+export async function requestWordPdfConversion(id:string,jobId?:string,signal?:AbortSignal,revision?:number):Promise<WordRenderTask>{
  const response=await send('/api/resume-word','POST',{
-  action:'convert-pdf',resume_id:id,...jobPayload(jobId),
+  action:'convert-pdf',resume_id:id,...jobPayload(jobId),await_completion:true,
+  ...(revision===undefined?{}:{expected_revision:revision}),
   confirmed_real:true,consent_word_processing:true
  },signal);
  return response.json();
 }
-export async function wordPdfConversionStatus(id:string,jobId?:string,signal?:AbortSignal):Promise<WordRenderTask>{
- const response=await send(url(id,'convert-status',jobId),'GET',undefined,signal);
+export async function wordPdfConversionStatus(id:string,jobId?:string,signal?:AbortSignal,revision?:number):Promise<WordRenderTask>{
+ const response=await send(url(id,'convert-status',jobId)+(revision===undefined?'':'&revision='+revision),'GET',undefined,signal);
  return response.json();
 }
 async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf',jobId?:string,jobLabel?:string,revision?:number){

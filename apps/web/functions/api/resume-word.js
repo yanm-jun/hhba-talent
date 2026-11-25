@@ -111,7 +111,7 @@ async function readSmall(request,limit=LIMIT){
 // conditional write (ETag compare-and-swap) so two tabs cannot silently race.
 function revisionKey(key,entry,format){
  return entry.id==='legacy'?key+(format==='docx'?'.docx':'.edited.pdf'):
-  key+'.revision-'+entry.id+(format==='docx'?'.docx':'.pdf');
+  key+'.revision-'+entry.id+(format==='docx'?'.docx':entry.pdf_object_id?'.'+entry.pdf_object_id+'.pdf':'.pdf');
 }
 const hashIsValid=s=>typeof s==='string'&&/^[0-9a-f]{64}$/.test(s);
 const vaultScope=/^vault-scope-v1-([0-9a-f]{64})$/;
@@ -120,7 +120,8 @@ function validEntry(entry){
  return entry&&
   (entry.id==='legacy'||typeof entry.id==='string'&&ID.test(entry.id))&&
   typeof entry.original==='string'&&typeof entry.text==='string'&&
-  hashIsValid(entry.docx_sha256)&&(
+  hashIsValid(entry.docx_sha256)&&
+  (entry.pdf_object_id===undefined||typeof entry.pdf_object_id==='string'&&ID.test(entry.pdf_object_id))&&(
    entry.verification==='docx_structure_only'?
     entry.preview_sha256===null&&entry.page_count===null:
     (entry.verification===undefined||entry.verification==='layout_verified')&&
@@ -206,59 +207,77 @@ async function readRenderTask(db,hash,resumeId,jobHash,entryId){
   'WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=?')
   .bind(hash,resumeId,jobHash,entryId).first();
 }
-async function setRenderTask(db,hash,resumeId,jobHash,entryId,status,errorCode){
- await db.prepare('UPDATE hhba_resume_word_render_tasks SET status=?,error_code=?,updated_at=? '+
-  'WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=?')
-  .bind(status,errorCode||null,new Date().toISOString(),hash,resumeId,jobHash,entryId).run();
+// A stale lease is retryable; the attempt counter fences an old worker.
+const RENDER_LEASE_MS=5*60*1000;
+const liveRender=task=>Boolean(task&&['pending','running'].includes(task.status)&&
+ Number.isFinite(Date.parse(task.updated_at))&&Date.now()-Date.parse(task.updated_at)<RENDER_LEASE_MS);
+async function setRenderTask(db,hash,resumeId,jobHash,entryId,attempt,status,errorCode){
+ const result=await db.prepare('UPDATE hhba_resume_word_render_tasks SET status=?,error_code=?,updated_at=? '+
+  "WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=? AND attempts=? AND status IN ('pending','running')")
+  .bind(status,errorCode||null,new Date().toISOString(),hash,resumeId,jobHash,entryId,attempt).run();
+ return result?.success===true&&result?.meta?.changes===1;
 }
 async function openRenderTask(db,hash,resumeId,jobHash,entryId,now){
  const existing=await readRenderTask(db,hash,resumeId,jobHash,entryId);
- if(existing?.status==='failed'){
+ if(liveRender(existing))return null;
+ if(existing){
   const result=await db.prepare('UPDATE hhba_resume_word_render_tasks SET status=?,error_code=NULL,attempts=attempts+1,updated_at=? '+
-   'WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=? AND status=?')
-   .bind('pending',now,hash,resumeId,jobHash,entryId,'failed').run();
-  return result?.success===true&&result?.meta?.changes===1;
+   'WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=? AND status=? AND updated_at=? AND attempts=?')
+   .bind('pending',now,hash,resumeId,jobHash,entryId,existing.status,existing.updated_at,existing.attempts).run();
+  return result?.success===true&&result?.meta?.changes===1?existing.attempts+1:null;
  }
- if(existing?.status==='done'){
-  const result=await db.prepare('UPDATE hhba_resume_word_render_tasks SET status=?,error_code=NULL,attempts=0,updated_at=? '+
-   'WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=? AND status=?')
-   .bind('pending',now,hash,resumeId,jobHash,entryId,'done').run();
-  return result?.success===true&&result?.meta?.changes===1;
- }
- if(existing)return false;
- const result=await db.prepare('INSERT INTO hhba_resume_word_render_tasks(account_hash,resume_id,job_scope_hash,entry_id,status,error_code,attempts,created_at,updated_at) '+
-  'SELECT ?,?,?,?,? ,NULL,0,?,? WHERE NOT EXISTS (SELECT 1 FROM hhba_resume_word_render_tasks '+
-  'WHERE account_hash=? AND resume_id=? AND job_scope_hash=? AND entry_id=? AND status IN (\'pending\',\'running\'))')
-  .bind(hash,resumeId,jobHash,entryId,'pending',now,now,hash,resumeId,jobHash,entryId).run();
- return result?.success===true&&result?.meta?.changes===1;
+ const result=await db.prepare('INSERT OR IGNORE INTO hhba_resume_word_render_tasks(account_hash,resume_id,job_scope_hash,entry_id,status,error_code,attempts,created_at,updated_at) '+
+  'VALUES (?,?,?,?,?,NULL,0,?,?)')
+  .bind(hash,resumeId,jobHash,entryId,'pending',now,now).run();
+ return result?.success===true&&result?.meta?.changes===1?0:null;
 }
-// A revision saved without a renderer can be converted later. The worker
-// re-reads the manifest first: an undone, redone or replaced revision must
-// never receive a PDF for a different revision. Verify runs before render,
-// exactly as at save time, so a late PDF is only published when the layout
-// check passes; the manifest entry then becomes layout_verified.
-async function runLateRender(db,bucket,env,phone,hash,row,jobId,jobHash,entry){
- let pdfKey=null;
+function renderTaskPayload(task){
+ if(!task)return {ok:true,status:'idle',pdf_available:false,attempts:0,updated_at:''};
+ const interrupted=['pending','running'].includes(task.status)&&!liveRender(task);
+ return {ok:true,status:interrupted||task.status==='done'?'failed':task.status,pdf_available:false,
+  ...(interrupted?{error_code:'WORD_RENDER_INTERRUPTED'}:task.error_code?{error_code:task.error_code}:{}),
+  attempts:task.attempts,updated_at:task.updated_at};
+}
+// Each worker writes its own PDF object. A failed or superseded worker can
+// never remove another worker's PDF or a PDF already published by the manifest.
+async function runLateRender(db,bucket,env,phone,hash,row,jobId,jobHash,entry,attempt){
+ let pdfKey=null,published=false;
+ const setStatus=(status,error)=>setRenderTask(db,hash,row.id,jobHash,entry.id,attempt,status,error);
  try{
-  await setRenderTask(db,hash,row.id,jobHash,entry.id,'running',null);
+  if(!await setStatus('running',null))return;
   const fresh=await approved(bucket,row,jobId,env);
   if(fresh.saved?.id!==entry.id)throw Error('WORD_REVISION_CONFLICT');
-  const original=await loadBytes(bucket,row);
+  const previous=fresh.items[fresh.revision-2];
+  const original=previous?await versionBytes(bucket,fresh.key,previous,'docx'):await loadBytes(bucket,row);
   const edited=await versionBytes(bucket,fresh.key,fresh.saved,'docx');
   const report=await wordRequest(env,'verify',{original,edited,oldText:entry.original,newText:entry.text});
+  if(!await setStatus('running',null))return;
   const pdf=await wordRequest(env,'render',{original:edited});
   if(!await stillOwned(db,row,phone))throw Error('RESUME_NOT_FOUND');
-  pdfKey=revisionKey(fresh.key,entry,'pdf');
+  if(!await setStatus('running',null))return;
+  const nextEntry={...entry,pdf_object_id:crypto.randomUUID(),verification:'layout_verified',
+   page_count:report.page_count,preview_sha256:await shaBytes(pdf)};
+  pdfKey=revisionKey(fresh.key,nextEntry,'pdf');
   await bucket.put(pdfKey,pdf,{httpMetadata:{contentType:'application/pdf'}});
-  const pdfHash=await shaBytes(pdf);
-  const items=fresh.items.map(item=>item.id===entry.id?
-   {...item,verification:'layout_verified',page_count:report.page_count,
-    preview_sha256:pdfHash}:item);
-  await commitManifest(bucket,fresh,row,fresh.revision,items);
-  await setRenderTask(db,hash,row.id,jobHash,entry.id,'done',null);
+  // Re-read after rendering: the user may have switched or replaced revisions.
+  const latest=await approved(bucket,row,jobId,env);
+  if(latest.saved?.id!==entry.id||latest.saved.verification!=='docx_structure_only')
+   throw Error('WORD_REVISION_CONFLICT');
+  if(!await stillOwned(db,row,phone))throw Error('RESUME_NOT_FOUND');
+  await commitManifest(bucket,latest,row,latest.revision,latest.items.map(item=>item.id===entry.id?nextEntry:item));
+  published=true;
+  await setStatus('done',null);
  }catch(error){
-  if(pdfKey)await bucket.delete(pdfKey).catch(()=>{});
-  await setRenderTask(db,hash,row.id,jobHash,entry.id,'failed',code(error)).catch(()=>{});
+  // A manifest write can have succeeded even if the response was lost.
+  // Never delete a published object on an ambiguous storage failure.
+  if(pdfKey&&!published){
+   try{
+    const latest=await approved(bucket,row,jobId,env);
+    if(!latest.items.some(item=>revisionKey(latest.key,item,'pdf')===pdfKey))
+     await bucket.delete(pdfKey);
+   }catch{/* leave private orphan for storage maintenance */}
+  }
+  await setStatus('failed',code(error)).catch(()=>{});
  }
 }
 export async function onRequestGet({request,env}){
@@ -355,16 +374,15 @@ export async function onRequestGet({request,env}){
    const state=await approved(bucket,row,jobId,env);
    if(!state.saved)return fail('WORD_NOT_EDITED',404);
    const entry=state.saved;
+   const requested=params.get('revision');
+   if(requested!==null&&String(state.revision)!==requested)return fail('WORD_REVISION_CONFLICT',409);
    if(entry.verification!=='docx_structure_only')
     return json({ok:true,status:'done',pdf_available:true,attempts:0,updated_at:entry.updated_at||''});
    const hash=await accountHash(env,candidate.phone);
    if(!hash)return fail('WORD_DB_NOT_READY',503);
    if(!await tasksReady(db))return fail('WORD_DB_NOT_READY',503);
    const task=await readRenderTask(db,hash,row.id,state.jobHash??'',entry.id);
-   if(!task)return json({ok:true,status:'idle',pdf_available:false,attempts:0,updated_at:''});
-   return json({ok:true,status:task.status,pdf_available:false,
-    ...(task.error_code?{error_code:task.error_code}:{}),
-    attempts:task.attempts,updated_at:task.updated_at});
+   return json(renderTaskPayload(task));
   }
   if(action!=='preview')return fail('INVALID_REQUEST',400);
   if(!renderer)return fail('WORD_PDF_NOT_READY',422);
@@ -432,25 +450,29 @@ export async function onRequestPost({request,env,waitUntil}){
    if(!await tasksReady(db))return fail('WORD_DB_NOT_READY',503);
    const jobHash=state.jobHash??'';
    const existing=await readRenderTask(db,hash,row.id,jobHash,entry.id);
-   if(existing&&(existing.status==='pending'||existing.status==='running'))
-    return json({ok:true,status:existing.status,pdf_available:false,
-     ...(existing.error_code?{error_code:existing.error_code}:{}),
-     attempts:existing.attempts,updated_at:existing.updated_at});
+   if(liveRender(existing))return json(renderTaskPayload(existing));
    if(!v4(env)&&!await reserve(db,env,candidate.phone,'export'))
     return fail('WORD_DAILY_LIMIT',429);
    const now=new Date().toISOString();
-   const opened=await openRenderTask(db,hash,row.id,jobHash,entry.id,now);
-   if(!opened)return fail('WORD_BUSY',503);
+   const attempt=await openRenderTask(db,hash,row.id,jobHash,entry.id,now);
+   if(attempt===null){
+    const concurrent=await readRenderTask(db,hash,row.id,jobHash,entry.id);
+    return liveRender(concurrent)?json(renderTaskPayload(concurrent)):fail('WORD_BUSY',503);
+   }
    // The conversion continues after the response when the platform offers
    // background work, so leaving the page does not cancel it; otherwise it
    // runs inline and the response carries the final status.
-   const work=runLateRender(db,bucket,env,candidate.phone,hash,row,jobId,jobHash,entry);
+   const work=runLateRender(db,bucket,env,candidate.phone,hash,row,jobId,jobHash,entry,attempt);
    if(typeof waitUntil==='function')waitUntil(work.catch(()=>{}));
-   else await work;
-   const after=await readRenderTask(db,hash,row.id,jobHash,entry.id);
-   return json({ok:true,status:after?.status||'pending',pdf_available:false,
-    ...(after?.error_code?{error_code:after.error_code}:{}),
-    attempts:after?.attempts||0,updated_at:after?.updated_at||now});
+   // The current UI keeps this request alive while independently polling.
+   // Do not rely solely on the short post-response Pages waitUntil window.
+   if(typeof waitUntil!=='function'||body.await_completion===true)await work;
+   const latest=await approved(bucket,row,jobId,env);
+   if(latest.saved?.id===entry.id&&latest.saved.verification!=='docx_structure_only'){
+    const task=await readRenderTask(db,hash,row.id,jobHash,entry.id).catch(()=>null);
+    return json({ok:true,status:'done',pdf_available:true,attempts:task?.attempts??attempt,updated_at:latest.saved.updated_at||now});
+   }
+   return json(renderTaskPayload(await readRenderTask(db,hash,row.id,jobHash,entry.id)));
   }
   if(action==='undo'||action==='redo'){
    const next=state.revision+(action==='undo'?-1:1);

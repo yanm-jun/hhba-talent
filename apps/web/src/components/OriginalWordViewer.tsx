@@ -79,7 +79,10 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  const [refresh,setRefresh]=useState(0);
  const [message,setMessage]=useState('');
  const [convertStatus,setConvertStatus]=useState<WordRenderTaskStatus>('idle');
- const convertPolls=useRef(0);
+ const [pdfPreview,setPdfPreview]=useState(false);
+ const conversionScope=JSON.stringify([resume.id,jobId,revision]);
+ const conversionScopeRef=useRef(conversionScope);
+ conversionScopeRef.current=conversionScope;
  const [activeVisualId,setActiveVisualId]=useState<string|null>(null);
  const [inlineVisualEditor,setInlineVisualEditor]=useState<string|null>(null);
  const [inlineVisualSuggestionId,setInlineVisualSuggestionId]=useState<string|null>(null);
@@ -103,7 +106,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   // A previous job's saved revision must never leak into another job's toolbar.
   setSaved(false);setRevision(0);setTotalRevisions(0);setHistory([]);
   setPdfAvailable(false);setLayoutVerified(false);setReadOnlyTextFallback(false);
-  setConvertStatus('idle');convertPolls.current=0;
+  setConvertStatus('idle');setPdfPreview(false);
   renderedEntrance.current=false;
  },[resume.id,jobId]);
  useEffect(()=>{
@@ -195,13 +198,15 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
     // page was left; resume watching it instead of starting a second one.
     setConvertStatus('idle');
     if(info.pdf_available===true)setConvertStatus('done');
-    else void wordPdfConversionStatus(resume.id,jobId).then(task=>{
+    else if(wasSaved&&rendererEnabled)void wordPdfConversionStatus(resume.id,jobId,undefined,Number.isInteger(info.revision)?info.revision:1).then(task=>{
      if(!active)return;
      setConvertStatus(task.status);
     }).catch(()=>{/* a missing status is not a conversion failure */});
     onRevisionSnapshot?.({revision:Number.isInteger(info.revision)?info.revision:(wasSaved?1:0),
      history:inspectedHistory});
-    if(!rendererEnabled){
+    const usePdf=rendererEnabled&&(!wasSaved||info.pdf_available===true);
+    setPdfPreview(usePdf);
+    if(!usePdf){
      const currentRevision=Number.isInteger(info.revision)?info.revision:(wasSaved?1:0);
      const raw=await wordSourceBytes(resume.id,currentRevision,jobId);
      if(!active||!browserMount.current)return;
@@ -279,15 +284,15 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
 
  useEffect(()=>{
   if(convertStatus!=='pending'&&convertStatus!=='running')return;
-  const timer=setInterval(()=>{
-   if(convertPolls.current>=40){
-    clearInterval(timer);
-    setConvertStatus('failed');
-    setMessage('PDF 转换失败，请重试');
-    return;
-   }
-   convertPolls.current+=1;
-   void wordPdfConversionStatus(resume.id,jobId).then(task=>{
+  if(!saved||revision<=0)return;
+  const controller=new AbortController();
+  let inFlight=false;
+  const poll=async()=>{
+   if(inFlight||controller.signal.aborted)return;
+   inFlight=true;
+   try{
+    const task=await wordPdfConversionStatus(resume.id,jobId,controller.signal,revision);
+    if(controller.signal.aborted||conversionScopeRef.current!==conversionScope)return;
     if(task.status==='done'){
      setConvertStatus('done');setPdfAvailable(true);setLayoutVerified(true);
      setMessage('PDF 生成成功');
@@ -295,15 +300,17 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
      setRefresh(n=>n+1);
     }else if(task.status==='failed'){
      setConvertStatus('failed');
-     setMessage('PDF 转换失败，请重试');
-    }else setConvertStatus(task.status);
-   }).catch(()=>{/* transient network error: keep polling until the cap */});
-  },3000);
-  return()=>clearInterval(timer);
- },[convertStatus,resume.id,jobId]);
+     setMessage('PDF 转换未完成，可以重试');
+    }else if(task.status!=='idle')setConvertStatus(task.status);
+   }catch{/* transient errors are not a server conversion failure */}
+   finally{inFlight=false;}
+  };
+  const timer=setInterval(()=>void poll(),3000);
+  return()=>{controller.abort();clearInterval(timer);};
+ },[convertStatus,resume.id,jobId,revision,saved,conversionScope]);
 
  useEffect(()=>{
-  if(ready!=='available'||!rendererEnabled||loading||!surface.current||!doc.current)return;
+  if(ready!=='available'||!pdfPreview||loading||!surface.current||!doc.current)return;
   let active=true,task:any=null;
   setAnchors([]);
   void(async()=>{
@@ -348,7 +355,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    }
   })();
   return()=>{active=false;try{task?.cancel();}catch{}};
- },[page,ready,rendererEnabled,loading,editable,width,zoom,fitMode,saved,refresh]);
+ },[page,ready,pdfPreview,loading,editable,width,zoom,fitMode,saved,refresh]);
 
  useEffect(()=>{
   const el=paper.current;if(!el)return;
@@ -359,7 +366,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  // Default: first Word page completely in view. The document and its text
  // hit areas share one zoom transform; candidate can switch to width-fit.
  useEffect(()=>{
-  if(ready==='checking'||rendererEnabled||loading||readOnlyTextFallback||fitMode==='custom')return;
+  if(ready==='checking'||pdfPreview||loading||readOnlyTextFallback||fitMode==='custom')return;
   const container=paper.current,documentPage=browserMount.current
    ?.querySelector<HTMLElement>('section.hhba-native-docx');
   if(!container||!documentPage)return;
@@ -390,7 +397,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   window.addEventListener('resize',update);
   const animation=requestAnimationFrame(update);
   return()=>{observer.disconnect();window.removeEventListener('resize',update);cancelAnimationFrame(animation)};
- },[ready,rendererEnabled,loading,readOnlyTextFallback,fitMode,paperSize.width,paperSize.height]);
+ },[ready,pdfPreview,loading,readOnlyTextFallback,fitMode,paperSize.width,paperSize.height]);
  useEffect(()=>{
   const position=restorePosition.current;
   if(loading||!position||page!==position.page||!paper.current)return;
@@ -410,13 +417,13 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  // inherited font/size/line-height and natural paragraph wrapping.
  // The original bytes are unchanged until the candidate approves an edit.
  useLayoutEffect(()=>{
-  if(rendererEnabled||loading||ready!=='available'||!browserMount.current)return;
+  if(pdfPreview||loading||ready!=='available'||!browserMount.current)return;
   const mount=browserMount.current;
   paintBrowserWordSuggestions(mount,editable,visualSuggestions,duplicates);
   const next=browserWordAnchors(mount,editable,duplicates);
   setAnchors(next);
   setPaperSize({width:mount.scrollWidth,height:mount.scrollHeight});
- },[rendererEnabled,loading,ready,editable,visualSuggestions,refresh,duplicates]);
+ },[pdfPreview,loading,ready,editable,visualSuggestions,refresh,duplicates]);
 
  // Explicit candidate confirmation and verified private Word revision are
  // mandatory before any rainbow suggestion becomes actual document text.
@@ -470,10 +477,12 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
  }
  async function convertSavedPdf(){
   if(busy||loading||!saved||pdfAvailable||revision<=0)return;
-  setBusy(true);setConvertStatus('pending');convertPolls.current=0;
+  setConvertStatus('pending');
+  const scope=conversionScope;
   setMessage('正在生成专业排版 PDF');
   try{
-   const task=await requestWordPdfConversion(resume.id,jobId);
+   const task=await requestWordPdfConversion(resume.id,jobId,undefined,revision);
+   if(conversionScopeRef.current!==scope)return;
    setConvertStatus(task.status);
    if(task.status==='done'){
     setPdfAvailable(true);setLayoutVerified(true);
@@ -483,8 +492,10 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    }else if(task.status==='failed'){
     setMessage('PDF 转换失败，请重试');
    }
-  }catch(error){setConvertStatus('failed');setMessage(error instanceof Error?error.message:'PDF 转换失败，请重试');}
-  finally{setBusy(false);}
+  }catch(error){
+   if(conversionScopeRef.current!==scope)return;
+   setConvertStatus('failed');setMessage(error instanceof Error?error.message:'PDF 转换未完成，请重试');
+  }
  }
  async function save(){
   if(!selected||!confirmed||busy||loading||!draft.trim())return;
@@ -597,7 +608,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
         }}>
         {/* PDF remains a canvas; browser Word has its OWN native inline text
             and must never paint a second, incorrectly sized proposal above it. */}
-        {visual&&rendererEnabled&&<span className="hhba-word-ai-preview" aria-hidden="true">
+        {visual&&pdfPreview&&<span className="hhba-word-ai-preview" aria-hidden="true">
          <span className="hhba-word-ai-preview-text"
           style={{fontSize:Math.max(9,Math.min(19,(h/1000*paperSize.height)*.82))+'px',
            fontFamily:anchor.fontFamily||undefined}}>
@@ -712,7 +723,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    <p>当前只能查看文字。要查看原来的样式，请下载原件打开。</p>
    <pre>{text}</pre>
   </div>}
-  {ready!=='checking'&&!rendererEnabled&&!previewError&&!readOnlyTextFallback&&<>
+  {ready!=='checking'&&!pdfPreview&&!previewError&&!readOnlyTextFallback&&<>
    <div className="hhba-original-resume-word-tools" role="group" aria-label="Word 浏览器预览缩放">
     <button type="button" aria-label="缩小 Word" disabled={zoom<=.3}
      onClick={()=>{setFitMode('custom');setZoom(v=>Math.max(.3,Math.round((v-.15)*100)/100))}}><ZoomOut size={15}/></button>
@@ -739,7 +750,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
    {!loading&&ready==='available'&&anchors.length===0&&<p className="hhba-original-resume-note">
     此 Word 没有找到可唯一定位的原文，请下载原件检查。没有对它做任何修改。</p>}
   </>}
-  {!loading&&ready==='available'&&rendererEnabled&&!previewError&&<>
+  {!loading&&ready==='available'&&pdfPreview&&!previewError&&<>
    <div className="hhba-original-resume-word-tools" role="group" aria-label="Word 预览缩放">
     <button type="button" aria-label="缩小 Word" onClick={()=>setZoom(value=>Math.max(.75,Math.round((value-.25)*100)/100))}
      disabled={zoom<=.75}><ZoomOut size={15}/></button>
