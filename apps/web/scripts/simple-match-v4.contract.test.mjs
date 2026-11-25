@@ -916,7 +916,8 @@ test('fallback JD research keeps only independently read quotes, never promotes 
 test('JD report UI separates employer originals, public excerpts and inferred references',async()=>{
  const {readFile}=await import('node:fs/promises');
  const ui=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
- for(const label of ['完整 JD 原文','公开资料研究整理','AI 职业方向分析（非企业已确认要求）','待进一步确认','初步参考分 · 部分资料'])assert.ok(ui.includes(label),label);
+ assert.ok(ui.includes('完整 JD 原文'));
+ assert.doesNotMatch(ui,/岗位要求线索（尚未确认）|AI 职业方向分析（非企业已确认要求）|待进一步确认/);
  assert.match(ui,/JdResearchContent job=\{jdJob\}/);
 });
 
@@ -946,12 +947,23 @@ test('the report separates verified JD from all candidate records even when form
  const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
  const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(panels,/for\(const job of \[\.\.\.jobs,\.\.\.officialJobs\]\)/);
- assert.match(panels,/const jdItems=\[\.\.\.verified\]\.sort/);
- assert.match(panels,/待核验及未通过核验记录/);
- assert.match(panels,/all\.filter\(j=>!confirmed\(j\)\)\.map/);
+ assert.match(panels,/const jdItems=verifiedMatchReports\(officialJobs\)/);
+ assert.match(panels,/尚未进入正式推荐/);
+ assert.doesNotMatch(panels,/all\.filter\(j=>!confirmed\(j\)\)\.map/);
  assert.match(panels,/reportScore\(jdJob\)\?\?'—'/);
  assert.match(panels,/onOptimize\(jdJob\)/);
  assert.match(dialog,/const showResults=selectedStage===2/);
  assert.doesNotMatch(dialog,/result\.matches\.map\(\(job,i\)/);
  assert.match(dialog,/selectedJobUrl=\{selectedJobUrl\}/);
+});
+
+test('only complete grounded official reports enter the formal UI and preserve server rank order',async()=>{
+ const {verifiedMatchReports}=await import('../src/services/verifiedMatchPresentation.mjs');
+ const {qualifiedReport}=await import('../functions/_lib/v4-curated-reports.js');
+ const good={...row,official_url:url,source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',evidence_status:'VERIFIED_FULL_JD',evidence_excerpt:'完整岗位原文',score_evidence_status:'GROUNDED_JD_RESUME_QUOTES',match_score:88,curated_suitable:true,report_status:'COMPLETE',research_detail:{score_explanation:'依据原文的理由',comparisons:[]}};
+ const second={...good,official_url:'https://careers.other-motors.cn/recruitment/positions/9989',match_score:99};
+ const bad=[{...good,evidence_excerpt:''},{...good,match_score:null},{...good,score_evidence_status:undefined},{...good,research_detail:undefined},{...good,report_status:'RETRY_PENDING'},{...good,curated_suitable:false},{...good,availability_status:'CLOSED_LISTED'},{...good,source_type:'站外招聘职位'}];
+ assert.ok(qualifiedReport(good));
+ for(const item of bad){assert.equal(qualifiedReport(item),false);assert.deepEqual(verifiedMatchReports([item]),[]);}
+ assert.deepEqual(verifiedMatchReports([...bad,good,second,good]),[good,second]);
 });

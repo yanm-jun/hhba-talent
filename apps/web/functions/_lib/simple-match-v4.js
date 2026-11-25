@@ -488,7 +488,7 @@ function renderJob(x,url,verified,resume,toolLinked,index,toolUrls=new Set()){
   reference_score:score??0,match_score:score,
   matched:texts(x?.matched),not_evidenced:texts(x?.gaps||x?.not_evidenced),
   needs_verification:[note],
-  requirements_basis:text(verified?.requirements||x?.requirements),
+  requirements_basis:confirmed?text(verified?.requirements):text(verified?.requirements||x?.requirements),
   score_basis:score===null?(verified?.full_jd?'尚未完成独立评分。':'尚未完成岗位资料核验与评分。'):
     full&&jdGrounded?'有简历与招聘 JD 原文依据的 AI 参考分（非录用概率）':
     'AI 职业方向参考分；JD 尚未完全核验（非录用概率）',

@@ -15,6 +15,8 @@ export type JobJdResearch={facts:{url:string;quote:string;context:'same_job'|'re
 export type MatchedJob = {
   jd_research?:JobJdResearch;
   research_detail?:MatchResearchDetail;
+  curated_suitable?:boolean;report_status?:'COMPLETE'|'DECLINED'|'UNAVAILABLE'|'RETRY_PENDING';
+  excluded_closed?:boolean;excluded_board?:boolean;
   id:string;company:string;title:string;title_zh?:string|null;location:string;
   official_url:string;platform:string;source:string;remote:boolean;
   reference_score:number;matched:string[];not_evidenced:string[];

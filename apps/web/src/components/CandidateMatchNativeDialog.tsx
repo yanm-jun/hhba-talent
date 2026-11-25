@@ -2,6 +2,7 @@ import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEve
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,X,LoaderCircle} from 'lucide-react';
 import {MatchResearchPanels,matchStageIndex} from './MatchResearchPanels';
+import {isVerifiedMatchReport,verifiedMatchReports} from '../services/verifiedMatchPresentation.mjs';
 import type {MatchResponse,MatchResearchReport,MatchedJob,NativeMatchActivity,NativeMatchProgress} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
@@ -53,7 +54,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  },[hostRoute]);
  const [confirmTerminate,setConfirmTerminate]=useState(false);
  const [optimizedJobUrl,setOptimizedJobUrl]=useState<string|null>(()=>
-  [...result.matches,...researchJobs].find(job=>job.id===initialOptimizedJobId&&job.jd_version_id&&job.jd_sha256)?.official_url||null);
+  verifiedMatchReports(result.matches).find(job=>job.id===initialOptimizedJobId&&job.jd_version_id&&job.jd_sha256)?.official_url||null);
  const [optimizationDirty,setOptimizationDirty]=useState(false);
  const [elapsed,setElapsed]=useState(0);
  useEffect(()=>{
@@ -86,10 +87,10 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
   if(viewport)viewport.scrollTop=0;
  };
  const matchListScroll=useRef(0);
- const activeJob=result.matches.find(job=>job.official_url===optimizedJobUrl)||researchJobs.find(job=>job.official_url===optimizedJobUrl);
+ const activeJob=verifiedMatchReports(result.matches).find(job=>job.official_url===optimizedJobUrl);
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
  function optimizeJob(job:MatchedJob){
-  if(pending||!parsedProfile||!job.jd_version_id||!job.jd_sha256)return;
+  if(pending||!parsedProfile||!isVerifiedMatchReport(job)||!job.jd_version_id||!job.jd_sha256)return;
   matchListScroll.current=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content')?.scrollTop||0;
   setSelectedJobUrl(job.official_url);setOptimizationDirty(false);setOptimizedJobUrl(job.official_url);
  }
@@ -195,7 +196,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
         已执行 {progressActivity.searches} 次检索 · 发现 {progressActivity.candidate_links??0} 条企业岗位线索 · 已阅读 {progressActivity.pages_read??0} 份岗位资料
        </span>}
        {researchReport&&<span>已发现 {researchReport.discovered} 条候选招聘来源 · 已排除 {researchReport.excluded_count} 条商业平台链接</span>}
-       {result.matches.length>0&&<span>已形成 {result.matches.length} 个正式推荐</span>}
+       {verifiedMatchReports(result.matches).length>0&&<span>已完成 {verifiedMatchReports(result.matches).length} 份可核验报告，最终排名待确认</span>}
       </div>
       <span className="hhba-match-progress-time" aria-hidden="true">已用时 {elapsed} 秒</span>
      </div></>}
