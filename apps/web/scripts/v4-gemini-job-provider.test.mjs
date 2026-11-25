@@ -294,3 +294,18 @@ test('Gemini context rejection is surfaced for adaptive paging rather than disab
  await assert.rejects(v4Call(async()=>{calls++;return Response.json({error:{message:'input context length exceeded'}},{status:400});},provider,{input:'synthetic',tools:[{type:'web_search'}],publicUrlContext:true}),{code:'AI_PROVIDER_CONTEXT_TOO_LARGE'});
  assert.equal(calls,1);
 });
+
+test('long research notes remain fully readable with adaptive character cursors and escaped Unicode',async()=>{
+ const {v4NotesMemoryPage,v4RunResearchAction}=await import('../functions/_lib/v4-research-tools.js');
+ const notes=['引文"\\🙂'.repeat(2000),'后一份岗位研究'];
+ const exact=notes.join('\n\n');
+ let cursor=0,rebuilt='',pages=0;
+ do{
+  const budget=pages%2?256:511;
+  const p=await v4RunResearchAction({type:'memory',collection:'notes',cursor},{collections:{notes},budget});
+  assert.equal(p.ok,true);assert.equal(p.unit,'characters');assert.ok(JSON.stringify(p.items).length<=budget);
+  rebuilt+=p.items.join('');cursor=p.next_cursor;pages++;
+ }while(cursor!==null);
+ assert.equal(rebuilt,exact);assert.ok(pages>1);
+ assert.equal(v4NotesMemoryPage(notes,exact.length,256,{rotate:true}).cursor,0);
+});

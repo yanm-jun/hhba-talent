@@ -10,7 +10,7 @@ import {sha256Hex} from './real-auth.js';
 import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
 import {CANDIDATE_TARGET,FINAL_TARGET,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,eligibleCuratedScore,qualifiedReport,validateGeminiGlobalOrder,applyGeminiGlobalOrder,mergeGeminiRankProgress,carryGeminiRankProgress} from './v4-curated-reports.js';
 import {findMainlandCity} from './mainland-job-location.js';
-import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex} from './v4-research-tools.js';
+import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4NotesMemoryPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex} from './v4-research-tools.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch} from './v4-jd-research.js';
 import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery} from './v4-parallel-discovery.js';
@@ -814,7 +814,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   const candidatePage=v4RotatingMemoryPage(candidateMemory(),gemini?memoryCursors.candidates:0,researchContextBudget),reviewPage=v4RotatingMemoryPage(unresolvedMemory(),gemini?memoryCursors.unresolved:0,researchContextBudget);
   const evidencePage=v4RotatingMemoryPage(v4EvidenceIndex(publicEvidence),gemini?memoryCursors.evidence:0,Math.max(256,Math.floor(researchContextBudget/3)));
   const historyPage=v4RotatingMemoryPage(rounds,gemini?memoryCursors.history:0,Math.max(256,Math.floor(researchContextBudget/3)));
-  const notesPage=v4RotatingMemoryPage(researchNotes,gemini?memoryCursors.notes:0,Math.max(256,Math.floor(researchContextBudget/3)));
+  const notesPage=v4NotesMemoryPage(researchNotes,memoryCursors.notes,Math.max(256,Math.floor(researchContextBudget/3)),{rotate:true});
   const activeResumePage=searchResumePaged?resumePageRef(searchResumeOffset<resume.length?searchResumeOffset:0):null;
   let response,independent=[],coordinatorFailed=false;
   try{
@@ -885,7 +885,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(curated&&code==='AI_PROVIDER_CONTEXT_TOO_LARGE'&&researchContextBudget>256){
     researchContext=v4ContextFeedback(researchContext,{rejected:true});researchContextBudget=researchContext.budget;searchResumePaged=true;
     // Recompute only the transport view; the complete research store is untouched.
-    if(researchToolResult?.type==='memory'&&researchToolResult.ok){const collection=researchToolResult.collection;const items=collection==='candidates'?candidateMemory():collection==='sources'?[...sourceLeads]:collection==='evidence'?v4EvidenceIndex(publicEvidence):collection==='history'?rounds:collection==='notes'?researchNotes:unresolvedMemory();researchToolResult={type:'memory',collection,ok:true,...v4ResearchMemoryPage(items,researchToolResult.cursor,researchContextBudget)};}
+    if(researchToolResult?.type==='memory'&&researchToolResult.ok){const collection=researchToolResult.collection;const items=collection==='candidates'?candidateMemory():collection==='sources'?[...sourceLeads]:collection==='evidence'?v4EvidenceIndex(publicEvidence):collection==='history'?rounds:collection==='notes'?researchNotes:unresolvedMemory();researchToolResult={type:'memory',collection,ok:true,...(collection==='notes'?v4NotesMemoryPage(items,researchToolResult.cursor,researchContextBudget):v4ResearchMemoryPage(items,researchToolResult.cursor,researchContextBudget))};}
     else if(researchToolResult?.type==='batch'){researchToolResult={type:'batch',ok:false,error:'CONTEXT_PAGE_TOO_LARGE',retry_with_budget:researchContextBudget};}
     else if(researchToolResult?.type==='text_page'&&researchToolResult.collection==='resume')researchToolResult=resumePageRef(researchToolResult.offset,researchContextBudget);
     else if(typeof researchToolResult?.text==='string'&&researchToolResult.text.length>researchContextBudget){researchToolResult={type:'read_page',ok:false,url:researchToolResult.url,error:'CONTEXT_PAGE_TOO_LARGE',suggested_mode:researchToolResult.mode,offset:researchToolResult.offset};}
