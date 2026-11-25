@@ -66,3 +66,18 @@
 /* AI matching is a navigation link: no implicit file upload or consent. */
 .hhba-private-resume-match{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border:1px solid #C5DBF8;border-radius:8px;padding:7px 10px;color:#125EBC;background:#F7F9FD;font-size:12px;text-decoration:none;font-weight:650;min-height:34px}
 .hhba-private-resume-match:hover,.hhba-private-resume-match:focus-visible{background:#E7F0FC;color:#102A5A}
+
+/* Account-owned optimized versions, collapsed by default and scoped per source. */
+.hhba-private-resume-group{min-width:0}
+.hhba-private-word-versions{margin:0 8px;padding:0 10px 0 15px;border-left:1px solid #dbe7ef;color:#526579}
+.hhba-private-word-versions summary{display:flex;align-items:center;gap:7px;list-style:none;padding:10px 0;cursor:pointer;font-size:12px}
+.hhba-private-word-versions summary::-webkit-details-marker{display:none}
+.hhba-private-word-versions summary svg{transform:rotate(-90deg)}
+.hhba-private-word-versions[open] summary svg{transform:none}
+.hhba-private-word-versions p{font-size:12px;margin:8px 0}
+.hhba-private-word-version-list{display:grid;gap:7px;padding-bottom:10px}
+.hhba-private-word-version{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid #e7edf4;border-radius:9px;background:#f9fbfc;min-width:0}
+.hhba-private-word-version>svg{flex:none;color:#125ebc}
+.hhba-private-word-dialog{width:min(1100px,96vw);max-width:96vw;height:min(90vh,980px);max-height:90vh;padding:16px;border:1px solid #dbe7ef;border-radius:14px;overflow:auto;background:white;color:#182b40}
+.hhba-private-word-dialog::backdrop{background:rgba(12,22,38,.45)}
+@media(max-width:740px){.hhba-private-word-version{flex-wrap:wrap}.hhba-private-word-version .hhba-private-resume-actions{padding-left:0}.hhba-private-word-dialog{width:98vw;max-width:98vw;padding:8px}}

@@ -54,7 +54,7 @@ async function edit(job,oldText,newText,expected=0){
  const edited=await editOriginalDocxStrict(source,[{original:oldText,text:newText}],{allowExpansion:true});
  const start=performance.now();
  const res=await request('edit',{job,method:'POST',body:{
-  action:'edit',resume_id:id,job_id:job,original:oldText,text:newText,
+  action:'edit',resume_id:id,job_id:job,job_label:'测试企业 · '+job,original:oldText,text:newText,
   client_docx_sha256:sha(edited),expected_revision:expected,
   confirmed_real:true,consent_word_processing:true
  }});
@@ -135,6 +135,16 @@ try{
  const a=await edit('role-A','测试用户','岗位甲真实经历',0);
  const b=await edit('role-B','测试用户','岗位乙真实经历',0);
  assert.notDeepEqual(a.edited,b.edited,'different jobs have different DOCX bytes');
+ const listed=await expectResponse(await request('versions'),200,'private vault lists saved variants');
+ assert.equal(listed.items.length,2);
+ const aliasA=listed.items.find(item=>item.jobLabel==='测试企业 · role-A');
+ const aliasB=listed.items.find(item=>item.jobLabel==='测试企业 · role-B');
+ assert.ok(aliasA&&aliasB&&aliasA.scope!==aliasB.scope);
+ assert.deepEqual(await originalDownload(aliasA.scope,'download'),a.edited);
+ assert.deepEqual(await originalDownload(aliasB.scope,'download'),b.edited);
+ assert.equal((await request('versions',{auth:false})).status,401);
+ assert.equal((await request('download',{job:'vault-scope-v1-'+'f'.repeat(64)})).status,404);
+ assert.equal((await request('versions',{resumeId:'ffffffff-2222-4333-8444-555555555555'})).status,404);
  const inspectA=await expectResponse(await request('inspect',{job:'role-A'}),200,'inspect A');
  const inspectB=await expectResponse(await request('inspect',{job:'role-B'}),200,'inspect B');
  assert.equal(inspectA.revision,1);
@@ -160,6 +170,8 @@ try{
  }});
  await expectResponse(undo,200,'A undo');
  assert.deepEqual(await originalDownload('role-A'),docx,'A undo restores original');
+ const afterUndo=await expectResponse(await request('versions'),200,'vault hides reverted original');
+ assert.equal(afterUndo.items.length,1);assert.equal(afterUndo.items[0].scope,aliasB.scope);
  assert.deepEqual(await originalDownload('role-B'),b.edited,'A undo leaves B unchanged');
  const redo=await request('redo',{job:'role-A',method:'POST',body:{
   action:'redo',resume_id:id,job_id:'role-A',expected_revision:0,
@@ -167,6 +179,8 @@ try{
  }});
  await expectResponse(redo,200,'A redo');
  assert.deepEqual(await originalDownload('role-A'),a.edited);
+ const afterRedo=await expectResponse(await request('versions'),200,'vault restores redone variant');
+ assert.equal(afterRedo.items.length,2);
  assert.deepEqual(new Uint8Array(await (await bucket.get(key)).arrayBuffer()),docx,
   'real R2 source remains byte-identical');
 

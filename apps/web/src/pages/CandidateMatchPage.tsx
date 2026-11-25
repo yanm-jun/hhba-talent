@@ -3,6 +3,7 @@ import {ArrowLeft,ArrowRight,BriefcaseBusiness,ChevronDown,FileText,FileUp,LockK
 import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
 import {Link} from '../router';
+import {listSavedWordVersions,wordSourceBytes,type SavedWordVersion} from '../services/originalWordApi';
 import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDialog';
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
@@ -17,8 +18,13 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [file,setFile]=useState<File|null>(null);
  const [savedFiles,setSavedFiles]=useState<PrivateResume[]>([]);
  const [savedId,setSavedId]=useState('');
+ const [wordVersions,setWordVersions]=useState<Array<{resume:PrivateResume;version:SavedWordVersion}>>([]);
+ const [wordVersionBusy,setWordVersionBusy]=useState(false);
+ const [wordVersionNotice,setWordVersionNotice]=useState('');
+ const wordVersionRequest=useRef<AbortController|null>(null);
  const [savedPickerOpen,setSavedPickerOpen]=useState(false);
  const deepLinkPending=useRef<string|null>(new URLSearchParams(window.location.search).get('resume'));
+ const wordDeepLink=useRef(new URLSearchParams(window.location.search));
  const [previewText,setPreviewText]=useState('');
  const [previewLoaded,setPreviewLoaded]=useState(false);
  const [previewBusy,setPreviewBusy]=useState(false);
@@ -63,39 +69,71 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   const abort=new AbortController();
   void matchServiceReady(abort.signal).then(ok=>{if(!abort.signal.aborted)setAvailability(ok?'ready':'disabled')});
   void matchPreviewPreflightAvailable(abort.signal).then(ok=>{if(!abort.signal.aborted)setPreflightAvailable(ok)});
-  return()=>{abort.abort();controller.current?.abort();previewController.current?.abort()};
+  return()=>{abort.abort();controller.current?.abort();previewController.current?.abort();wordVersionRequest.current?.abort()};
  },[]);
  useEffect(()=>{
-  let active=true;
+  let active=true;let generation=0;
   const reload=()=>{
+   const current=++generation;
    if(!privateResumeAvailable||!user||!getRealAuthToken()){
     previewController.current?.abort();
     if(active){setPreviewText('');setPreviewLoaded(false);setPreviewError('');setConsent(false);setOcrFile(null);setPreviewNote('');}
-    if(active){setSavedFiles([]);setSavedId('');}return;
+    wordVersionRequest.current?.abort();wordVersionRequest.current=null;
+    if(active){setSavedFiles([]);setSavedId('');setWordVersions([]);setWordVersionBusy(false);setWordVersionNotice('');}return;
    }
-   void listPrivateResumes().then(rows=>{if(active){
+   void listPrivateResumes().then(rows=>{if(active&&current===generation){
     setSavedFiles(rows);setVaultError('');
+    const versionGroups=Promise.all(rows.filter(item=>/\.docx$/i.test(item.name)).map(async resume=>{
+     try{return {items:(await listSavedWordVersions(resume.id)).map(version=>({resume,version})),failed:false};}
+     catch{return {items:[],failed:true};}
+    }));
+    void versionGroups.then(groups=>{if(active&&current===generation){setWordVersions(groups.flatMap(group=>group.items));setWordVersionNotice(groups.some(group=>group.failed)?'部分岗位版本暂无法读取，可继续选择原始简历。':'');}});
     setSavedId(previous=>previous&&rows.some(item=>item.id===previous)?previous:'');
     const requested=deepLinkPending.current;
     if(requested){
      deepLinkPending.current=null;
      const entry=rows.find(item=>item.id===requested);
      if(/^[0-9a-f-]{36}$/.test(requested)&&entry){
-      setSavedId(requested);
-      void preview(entry);
+      const scope=wordDeepLink.current.get('word_scope'),revision=Number(wordDeepLink.current.get('word_revision'));
+      if(scope&&/^vault-scope-v1-[a-f0-9]{64}$/.test(scope)&&Number.isInteger(revision)&&revision>0){
+       void versionGroups.then(groups=>{if(active&&current===generation){
+        const selected=groups.flatMap(group=>group.items).find(item=>item.resume.id===entry.id&&item.version.scope===scope&&item.version.revision===revision);
+        if(selected)void selectWordVersion(selected.resume,selected.version);else setVaultError('岗位简历版本已变化或不可用，请重新选择。');
+       }});
+      }else if(!scope){setSavedId(requested);void preview(entry);}
+      else setVaultError('岗位简历版本标识无效。');
      }else setVaultError('指定的简历不在当前账号，请从列表中选择。');
     }
    }})
     .catch(e=>{if(active){setSavedFiles([]);setVaultError(e instanceof Error?e.message:'私有简历暂时无法读取。');}});
   };
+  const routeSelection=()=>{if(!/\/candidate\/(?:account\/)?match\/?$/.test(window.location.pathname))return;
+   const query=new URLSearchParams(window.location.search);if(query.has('resume')){wordDeepLink.current=query;deepLinkPending.current=query.get('resume');reload();}};
   reload();
+  window.addEventListener('popstate',routeSelection);
+  window.addEventListener('hhba:word-versions-changed',reload);
   window.addEventListener('hhba:private-resumes-changed',reload);
   window.addEventListener('hhba:real-auth-changed',reload);
-  return()=>{active=false;window.removeEventListener('hhba:private-resumes-changed',reload);
+  return()=>{active=false;window.removeEventListener('popstate',routeSelection);window.removeEventListener('hhba:word-versions-changed',reload);window.removeEventListener('hhba:private-resumes-changed',reload);
    window.removeEventListener('hhba:real-auth-changed',reload);};
  },[user?.id]);
+ async function selectWordVersion(resume:PrivateResume,version:SavedWordVersion){
+  if(working||saveBusy||controller.current)return;
+  wordVersionRequest.current?.abort();const abort=new AbortController();wordVersionRequest.current=abort;
+  setWordVersionBusy(true);setVaultError('');
+  try{
+   const bytes=await wordSourceBytes(resume.id,version.revision,version.scope,abort.signal);
+   if(abort.signal.aborted||controller.current)return;
+   const name=version.jobLabel.replace(/[<>:"/\\|?*]/g,'').slice(0,80)||'岗位专属简历';
+   // A new input uses the exact optimized bytes, never the original file ID.
+   // The user may match once or explicitly save a new independent source.
+   choose(new File([new Uint8Array(bytes).buffer],name+'-已优化.docx',{type:resume.type}));
+  }catch(e){if(!abort.signal.aborted)setVaultError(e instanceof Error?e.message:'无法读取优化版本，请重新选择。');}
+  finally{if(wordVersionRequest.current===abort){wordVersionRequest.current=null;setWordVersionBusy(false);}}
+ }
  function selectSavedResume(id:string){
   if(working||saveBusy)return;
+  wordVersionRequest.current?.abort();wordVersionRequest.current=null;setWordVersionBusy(false);
   deepLinkPending.current=null;
   previewController.current?.abort();
   setPreviewText('');setPreviewLoaded(false);setPreviewError('');setConsent(false);
@@ -108,6 +146,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  }
  function choose(candidate:File|null){
   if(working||saveBusy)return;
+  wordVersionRequest.current?.abort();wordVersionRequest.current=null;setWordVersionBusy(false);
   deepLinkPending.current=null;
   setSavedPickerOpen(false);
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setPreviewError('');setConsent(false);
@@ -189,7 +228,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   finally{setSaveBusy(false)}
  }
  async function run(){
-  if((!file&&!savedId)||!consent||working||saveBusy||controller.current||previewBusy||ocrBusy||!previewLoaded||
+  if((!file&&!savedId)||!consent||working||saveBusy||wordVersionBusy||controller.current||previewBusy||ocrBusy||!previewLoaded||
    identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()||
    (file&&!savedId&&storageChoice==='undecided'))return;
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
@@ -375,6 +414,12 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
              </span>
             </label>)}
            </div>
+           {wordVersions.length>0&&<div className="hhba-ai-saved-word-options"><strong>已优化的岗位简历</strong>
+            {wordVersions.map(({resume,version})=><button type="button" className="hhba-ai-saved-picker-option" key={resume.id+':'+version.scope} disabled={working||saveBusy||wordVersionBusy} onClick={()=>void selectWordVersion(resume,version)}>
+             <FileText size={16}/><span className="hhba-ai-saved-picker-option-text"><strong>{version.jobLabel}</strong><small>来源：{resume.name} · 第 {version.revision} 版</small></span>
+            </button>)}</div>}
+           {wordVersionBusy&&<p role="status">正在读取岗位专属 Word…</p>}
+           {wordVersionNotice&&<p role="status">{wordVersionNotice}</p>}
            <button type="button" className="hhba-ai-saved-picker-clear" disabled={working}
             onClick={()=>selectSavedResume('')}>不使用已保存简历，改为上传新文件</button>
           </div>
@@ -448,7 +493,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
-          disabled={(!file&&!savedId)||!consent||working||saveBusy||previewBusy||ocrBusy||!previewLoaded||
+          disabled={(!file&&!savedId)||!consent||working||saveBusy||wordVersionBusy||previewBusy||ocrBusy||!previewLoaded||
            (file&&!savedId&&storageChoice==='undecided')||
            identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()}>
           {working?<><LoaderCircle className="spin" size={18}/> {saveBusy?'正在保存简历…':'正在匹配岗位…'}</>:

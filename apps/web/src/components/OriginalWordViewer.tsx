@@ -391,7 +391,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   if(!window.confirm('请先核实这段文字符合真实经历。确认采纳并保存岗位专属 Word 修改？原上传文件不会被覆盖。'))return;
   rememberPosition();setBusy(true);setMessage('');
   try{
-   const result=await saveOriginalWordEdit(resume.id,anchor.text,visual.proposed.trim(),revision,jobId,anchor.occurrence,anchor.occurrenceCount);
+   const result=await saveOriginalWordEdit(resume.id,anchor.text,visual.proposed.trim(),revision,jobId,anchor.occurrence,anchor.occurrenceCount,jobTitle);
    onSessionWordDraftChange?.(null);
    onVerifiedSave?.({original:anchor.text,text:visual.proposed.trim()});
    onVisualSuggestionAction?.(visual.id,'accepted',undefined,result.layout_verified===true);
@@ -435,7 +435,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
   if(!selected||!confirmed||busy||loading||!draft.trim())return;
   rememberPosition();setBusy(true);setMessage('');
   try{
-   const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision,jobId,selected.occurrence,selected.occurrenceCount);
+   const result=await saveOriginalWordEdit(resume.id,selected.text,draft.trim(),revision,jobId,selected.occurrence,selected.occurrenceCount,jobTitle);
    onSessionWordDraftChange?.(null);
    onVerifiedSave?.({original:selected.text,text:draft.trim()});
    if(inlineVisualEditor&&inlineVisualSuggestionId)

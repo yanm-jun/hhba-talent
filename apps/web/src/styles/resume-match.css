@@ -164,3 +164,5 @@
  .hhba-ai-page-embedded .hhba-ai-upload{padding:16px 13px}
  .hhba-ai-page-embedded .hhba-ai-drop{min-height:125px;padding:17px 11px}
 }
+
+.hhba-ai-saved-word-options{display:grid;gap:7px;margin-top:12px}.hhba-ai-saved-word-options>strong{font-size:12px;color:#526579}.hhba-ai-saved-word-options>button{text-align:left;font:inherit;cursor:pointer;width:100%}.hhba-ai-saved-word-options>button:disabled{opacity:.6;cursor:not-allowed}
