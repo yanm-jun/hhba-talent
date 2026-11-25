@@ -41,6 +41,22 @@ export function validateCuratedReport(value,resume,jd){
   strengths:str(value.strengths),risks:str(value.risks),career_development:str(value.career_development),optimization_advice:str(value.optimization_advice),competition:str(value.competition),score_explanation:str(value.reason),
   extra_sections:Array.isArray(value.extra_sections)?value.extra_sections.filter(x=>str(x?.title)&&str(x?.content)).map(x=>({title:str(x.title),content:str(x.content)})):[]}};
 }
+// Completeness is about meaningful coverage, not a word count or a fixed
+// number of bullets. The model reviews its own output against the full input;
+// evidence validation remains independent of that self-assessment.
+export function reportCoverageErrors(value,jd,{reference=false}={}){
+ if(value?.suitable!==true)return [];
+ const errors=[],review=value.quality_review;
+ if(!review||review.status!=='complete'||!str(review.explanation)||!Array.isArray(review.missing)||review.missing.length)errors.push('quality_review_incomplete');
+ if(!Array.isArray(value.comparisons)||!value.comparisons.length)errors.push('missing_requirement_comparisons');
+ if(reference){
+  const coverage=value.reference_coverage;
+  const duties=norm(coverage?.duties_quote),capabilities=norm(coverage?.capabilities_quote),original=norm(jd);
+  if(!duties||!capabilities||duties===capabilities||duties.includes(capabilities)||capabilities.includes(duties)||!original.includes(duties)||!original.includes(capabilities))errors.push('reference_duties_and_capabilities_coverage');
+ }
+ return errors;
+}
+
 export function rankCandidateUrls(payload,rows){
  const ordered=Array.isArray(payload?.ordered_urls)?payload.ordered_urls:[];
  const keys=new Set(rows.map(([url])=>url)),seen=new Set();
