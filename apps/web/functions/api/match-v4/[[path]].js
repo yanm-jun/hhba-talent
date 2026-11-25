@@ -7,7 +7,7 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
-import {v4Provider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
+import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {recognizeV4Resume} from '../../_lib/v4-resume-ocr.js';
 import {checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint,matchTaskKey,saveMatchTask,readMatchTask} from '../../_lib/v4-match-checkpoint-storage.js';
@@ -35,6 +35,7 @@ const allowedHost=request=>{
 const enabled=(env,request)=>allowedHost(request)&&env?.HHBA_MATCH_V4_READY==='1'&&
  Boolean(v4Provider(env))&&
  typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
+const matchEnabled=(env,request)=>enabled(env,request)&&Boolean(v4JobProvider(env));
 const sanitize=(raw)=>{
  if(typeof raw!=='string')return null;
  const text=redactForModel(raw.trim(),Infinity);
@@ -108,7 +109,7 @@ function events(env,request,input,waitUntil){
      // Keep one durable phase per Pages invocation. The hosting platform's
      // subrequest budget resets on the next continuation, not on a JS loop.
      await guard();
-     const result=await v4Match(fetch,v4Provider(env),input.text,input.role_hint,{
+     const result=await v4Match(fetch,v4JobProvider(env),input.text,input.role_hint,{
       signal:executionSignal,onProgress:progress,onActivity:activity,env,excludeUrls:input.excludeUrls,
       stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
       onResearch:sendResearch,
@@ -185,7 +186,7 @@ function events(env,request,input,waitUntil){
 // the browser. A second driver can never run the same leased phase in parallel.
 async function backgroundStep(env,request,waitUntil){
  if(!backgroundEnabled(env,request)||request.method!=='POST')return fail('NOT_FOUND',404);
- if(!enabled(env,request))return fail('MATCH_NOT_ENABLED',503);
+ if(!matchEnabled(env,request))return fail('MATCH_NOT_ENABLED',503);
  let ticket;
  try{const raw=await request.text();if(raw.length>256)return fail('INVALID_REQUEST',400);ticket=JSON.parse(raw)?.ticket;}catch{return fail('INVALID_REQUEST',400);}
  let input;
@@ -209,7 +210,7 @@ export async function onRequest(context){
  const path=new URL(request.url).pathname;
  const suffix=path.slice('/api/match-v4'.length).replace(/\/$/,'')||'/';
  if(suffix==='/status'&&request.method==='GET')
-  return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:enabled(env,request),
+  return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:matchEnabled(env,request),
    scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],resumable:!!checkpointEnv(env),encrypted_checkpoint_storage:checkpointStorageReady(env),dynamic_page_reader:typeof env.BROWSER?.quickAction==='function'});
  if(suffix==='/background-step')return backgroundStep(env,request,waitUntil);
  const activeTaskRoute=suffix==='/active-task';
@@ -246,13 +247,15 @@ export async function onRequest(context){
   if(!checkpointStorageReady(env))return fail('AI_CHECKPOINT_DB_UNAVAILABLE',503);
   const action=body?.action;
   if(!['start','continue','close','cancel'].includes(action))return fail('INVALID_REQUEST',400);
-  if(action==='start'&&(!enabled(env,request)||body?.consent!==true||body?.recovery_consent!==true||body?.options?.country!=='CN'))return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
+  if(action==='start'&&!matchEnabled(env,request))return fail('AI_PROVIDER_NOT_CONFIGURED',503);
+  if(action==='start'&&(body?.consent!==true||body?.recovery_consent!==true||body?.options?.country!=='CN'))return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
   const text=action==='start'?sanitize(body.text):null;
   if(action==='start'&&!text)return fail('INVALID_RESUME_TEXT',400);
   const entry=action==='start'?{id:body.task_id,text,role:typeof body.options.role_hint==='string'?body.options.role_hint.trim():'',excludeUrls:[],resume_id:body.resume_id||null}:{id:body.task_id,generation:body.generation};
   try{const task=await updateSessionTask(env,session,action,entry);if(task&&backgroundEnabled(env,request))await scheduleBackgroundMatch(env,session,task);return reply({ok:true,task});}catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
  }
- // The third-party relay is not OpenAI official infrastructure.
+ if(!matchEnabled(env,request))return fail('AI_PROVIDER_NOT_CONFIGURED',503);
+ // The third-party relay is not OpenAI or Google official infrastructure.
  if(body?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
  if(body?.options?.country!=='CN')return fail('INVALID_REQUEST',400);
  const resume=sanitize(body.text);
