@@ -185,21 +185,21 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
   const org=companyOf(j),title=trim(j.title);
   const city=postedLocation(j)||htmlLocation(plain),description=htmlToText(trim(j.description),{maxChars:Infinity});
   const desc=structuredJdParts(j,value=>htmlToText(value,{maxChars:Infinity})).join('\n');
-  if(looksTruncatedJd(description)||looksTruncatedJd(desc))throw Error('V4_JD_TRUNCATED_SOURCE');
-  if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city||!desc.trim())continue;
+  if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city)continue;
   if(explicitClosed||j.validThrough&&Number.isFinite(Date.parse(j.validThrough))&&Date.parse(j.validThrough)<now.getTime())throw Error('V4_JOB_CLOSED');
   // A multinational's official careers host may differ from its corporate website.
   // Do not discard real JD content merely because the domains differ.
   const sections=extractOfficialJdSections(desc,{full:true});
   const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
   // JobPosting itself identifies the published description; no required heading vocabulary.
-  if(!desc.trim())continue;
+  const incomplete=!desc.trim()||looksTruncatedJd(description)||looksTruncatedJd(desc);
   const jd={id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
    canonical_url:canonical,company:org.name,title,
-   location:city,requirements:requirements||desc,full_jd:desc,
+   location:city,requirements:incomplete?'':requirements||desc,full_jd:incomplete?'':desc,
+   vacancy_confirmed:!!org.url&&relatedDomains(canonical,org.url),...(incomplete?{partial_jd:desc,jd_incomplete:true}:{}),
    checked_at:now.toISOString(),proof_method:'V4_STRUCTURED_JOBPOSTING',
    source_confirmed:!!org.url&&relatedDomains(canonical,org.url),independently_read:true,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
-  if(canonical===initial&&await writeConditionalJd(cacheBucket,initial,expected,response,jd,j.validThrough,now.getTime()))onCache('JD_PUBLIC_CONDITIONAL_STORED');
+  if(!incomplete&&canonical===initial&&await writeConditionalJd(cacheBucket,initial,expected,response,jd,j.validThrough,now.getTime()))onCache('JD_PUBLIC_CONDITIONAL_STORED');
   return jd;
  }
  // Chinese employer career sites often serve normal HTML without JSON-LD.
@@ -207,11 +207,13 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  const company=meta(html,'property','og:site_name')||meta(html,'name','application-name');
  const city=htmlLocation(plain);
  const requirements=sections?.sections?.filter(x=>x.kind==='requirements').map(x=>x.text).join('\n')||'';
- if(!title||!company||GENERIC.test(company)||!city||!sections||!requirements.trim())
+ if(!title||!company||GENERIC.test(company)||!city)
   throw Error('V4_JOB_DETAILS_NOT_VERIFIED');
+ const incomplete=!sections||!requirements.trim()||looksTruncatedJd(sections?.full_jd);
  return {id:'v4-employer-'+(await sha256Hex(canonical)).slice(0,32),
   canonical_url:canonical,company,title,location:city,
-  requirements,full_jd:sections.full_jd,
+  requirements:incomplete?'':requirements,full_jd:incomplete?'':sections.full_jd,
+  ...(incomplete?{partial_jd:sections?.full_jd||'',jd_incomplete:true}:{}),
   checked_at:now.toISOString(),proof_method:'V4_EMPLOYER_HTML_JOB',
   source_confirmed:false,independently_read:true,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
 }

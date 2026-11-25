@@ -34,6 +34,7 @@ function toOptimizerJob(job:HistoryMatchedJob,historyId:string,index:number):Mat
   location:job.location,official_url:job.official_url,
   platform:job.recruitment_source_kind||'UNVERIFIED',source:'MATCH_HISTORY',remote:false,source_type:job.source_type,score_evidence_status:job.score_evidence_status,research_detail:job.research_detail,jd_research:job.jd_research,checked_at:job.checked_at,evidence_score_status:job.evidence_score_status,
   reference_score:job.match_score??0,match_score:job.match_score,
+  reference_jd:job.reference_jd,reference_jd_basis:job.reference_jd_basis,reference_jd_kind:job.reference_jd_kind,reference_vacancy_verified:job.reference_vacancy_verified,curated_suitable:job.curated_suitable,report_status:job.report_status,
   matched:job.matched||[],not_evidenced:job.not_evidenced||[],needs_verification:[],salary:job.salary,
   // These are the *saved* reasons, not a freshly fetched job description.
   requirements_basis:job.requirements_basis||(job.evidence_status==='PARTIAL_SOURCE'&&job.evidence_excerpt?job.evidence_excerpt:''),

@@ -17,6 +17,7 @@ export type MatchedJob = {
   research_detail?:MatchResearchDetail;
   curated_suitable?:boolean;report_status?:'COMPLETE'|'DECLINED'|'UNAVAILABLE'|'RETRY_PENDING';
   excluded_closed?:boolean;excluded_board?:boolean;
+  reference_jd?:string;reference_jd_basis?:string;reference_jd_kind?:'AI_GENERATED_REFERENCE';reference_vacancy_verified?:boolean;
   id:string;company:string;title:string;title_zh?:string|null;location:string;
   official_url:string;platform:string;source:string;remote:boolean;
   reference_score:number;matched:string[];not_evidenced:string[];
@@ -36,7 +37,7 @@ export type MatchedJob = {
   evidence_status?:'VERIFIED_FULL_JD'|'PARTIAL_SOURCE'|'SEARCH_SNIPPET_ONLY'|'INSUFFICIENT_EVIDENCE'|'RESEARCH_PENDING';
   evidence_excerpt?:string;
   evidence_sources?:{url:string;kind:string}[];
-  evidence_score_status?:'AI_PARTIAL_SOURCE_SCORED'|'AI_DIRECTION_REFERENCE_SCORED';
+  evidence_score_status?:'AI_PARTIAL_SOURCE_SCORED'|'AI_DIRECTION_REFERENCE_SCORED'|'AI_REFERENCE_JD_SCORED';
   score_evidence_status?:'GROUNDED_JD_RESUME_QUOTES';
   jd_proof_method?:'DIRECT_EMPLOYER_HTML_V1'|'PUBLIC_EMPLOYER_ATS_V1'|'V4_STRUCTURED_JOBPOSTING'|'V4_EMPLOYER_HTML_JOB';
   jd_source_status?:'VERIFIED_JD';

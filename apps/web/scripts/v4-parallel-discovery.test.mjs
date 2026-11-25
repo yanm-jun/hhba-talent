@@ -170,7 +170,8 @@ test('structured JobPosting retains independent duties, qualifications and skill
  const jd=await read(posting);
  for(const value of ['负责地区运营管理。','负责渠道建设。','负责团队培训。','具备业务管理经验。','数据分析','组织协调'])assert.ok(jd.full_jd.includes(value),value);
  assert.equal(jd.source_confirmed,true);
- await assert.rejects(()=>read({...posting,description:'负责地区运营管理……'}),/V4_JD_TRUNCATED_SOURCE/);
+ const partial=await read({...posting,description:'负责地区运营管理……'});
+ assert.equal(partial.full_jd,'');assert.equal(partial.vacancy_confirmed,true);assert.ok(partial.partial_jd.includes('负责地区运营管理'));
 });
 test('complex JD coverage reconstructs the contiguous original rather than dropping intervening requirements',async()=>{
  const {completeJdSpan}=await import('../functions/_lib/v4-jd-completeness.js');
@@ -181,4 +182,16 @@ test('complex JD coverage reconstructs the contiguous original rather than dropp
  assert.equal(completeJdSpan(doc,parts,parts[0],'必须有团队培训经验。'),null);
  assert.equal(completeJdSpan(doc,parts,'虚构开头','工作安排：全职。'),null);
  assert.equal(completeJdSpan(doc+'\n'+parts[0],parts,parts[0],'工作安排：全职。'),null);
+});
+
+test('a verified vacancy without a complete JD retains an AI reference assessment in global selection without official evidence promotion',async()=>{
+ const {eligibleCuratedScore,qualifiedReport}=await import('../functions/_lib/v4-curated-reports.js');
+ const {verifiedMatchReports}=await import('../src/services/verifiedMatchPresentation.mjs');
+ const {safeHistoryJobs}=await import('../functions/_lib/match-history.js');
+ const reference={company:'测试企业',title:'渠道运营',location:'上海',official_url:'https://careers.ref-employer.cn/jobs/7',source_type:'站外官方招聘',reference_vacancy_verified:true,reference_jd_kind:'AI_GENERATED_REFERENCE',reference_jd:'可能负责渠道管理。',reference_jd_basis:'依据岗位名称推断，非官方要求。',evidence_score_status:'AI_REFERENCE_JD_SCORED',match_score:86,curated_suitable:true,report_status:'COMPLETE',research_detail:{comparisons:[],score_explanation:'真实经历与推断方向匹配。'},v4_source:true};
+ assert.equal(eligibleCuratedScore(reference),true);assert.equal(qualifiedReport(reference),true);assert.deepEqual(verifiedMatchReports([reference]),[reference]);
+ assert.equal(qualifiedReport({...reference,reference_vacancy_verified:false}),false);
+ assert.equal(qualifiedReport({...reference,availability_status:'CLOSED_LISTED'}),false);
+ assert.equal(qualifiedReport({...reference,reference_jd:''}),false);
+ const saved=safeHistoryJobs([reference])[0];assert.equal(saved.reference_jd,reference.reference_jd);assert.equal(saved.jd_source_status,undefined);assert.equal(saved.score_evidence_status,undefined);assert.equal(saved.evidence_score_status,'AI_REFERENCE_JD_SCORED');
 });
