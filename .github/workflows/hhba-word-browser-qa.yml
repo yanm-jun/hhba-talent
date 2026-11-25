@@ -83,6 +83,10 @@ jobs:
           split=doc.add_paragraph()
           split.add_run('虚构测试：多节点')
           split.add_run('岗位运营经历')
+          doc.add_paragraph('虚构测试：相同职责描述')
+          doc.add_paragraph('两段经历之间的独立上下文')
+          doc.add_paragraph('虚构测试：相同职责描述')
+          doc.add_paragraph('第二段经历之后的上下文')
           table=doc.add_table(rows=2,cols=2)
           table.cell(0,0).text='岗位经历'
           table.cell(0,1).text='门店运营管理'

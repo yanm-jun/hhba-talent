@@ -358,6 +358,8 @@ export async function inspectOriginalDocxStrict(raw,{allowParagraphRuns=false}={
  const {groups,paragraphs,paragraphCounts,bodyTexts}=allowParagraphRuns?paragraphRunGroups(originalXml,matches):{groups:[],paragraphs:[],paragraphCounts:new Map(),bodyTexts:[]};
  const eligible=groups.filter(g=>paragraphCounts.get(g.text)===1&&!occurrences.has(g.text));
  const covered=new Set(eligible.flatMap(g=>g.nodes.map(m=>m.index)));
+ // Full duplicate paragraphs must not expose overlapping run anchors.
+ for(const p of paragraphs)if(paragraphCounts.get(p.text)>1&&paragraphs.filter(q=>q.text===p.text).length===paragraphCounts.get(p.text))for(const n of p.nodes)covered.add(n.index);
  const unique=matches.filter(m=>!covered.has(m.index)).map(m=>decodeXML(m[1])).filter(value=>
   textOnly(value)&&occurrences.get(value)===1&&!groups.some(g=>g.text===value));
  unique.push(...eligible.map(g=>g.text));

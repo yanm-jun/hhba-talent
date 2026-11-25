@@ -713,7 +713,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  const visualWordSuggestions=useMemo<WordVisualSuggestion[]>(()=>suggestions
   .slice(0,revealedSuggestionCount)
   .filter(s=>s.action==='replace'&&!ignored.includes(s.id)&&!resolvedWordVisualIds.includes(s.id))
-  .map(s=>({
+  .map((s):WordVisualSuggestion=>({
    id:s.id,original:s.original,
    occurrence:version.blocks.find(b=>b.id===s.blockId)?.occurrence,
    occurrenceCount:version.blocks.find(b=>b.id===s.blockId)?.occurrenceCount,
@@ -738,7 +738,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
  [suggestions,revealedSuggestionCount,ignored,resolvedWordVisualIds,version.acceptedSuggestionIds,
   version.blocks,suggestionDrafts,wordRevisionSnapshot,wholeDraft,wholeApproved,
   revealedWholeCount]);
- const pendingSuggestions=suggestions.filter(s=>!ignored.includes(s.id)&&
+ const pendingSuggestions=suggestions.filter(s=>!ignored.includes(s.id)&&!resolvedWordVisualIds.includes(s.id)&&
   !editedWordVisualIds.includes(s.id)&&!version.acceptedSuggestionIds.includes(s.id));
  const acceptedCount=suggestions.filter(s=>version.acceptedSuggestionIds.includes(s.id)||editedWordVisualIds.includes(s.id)).length;
  const pendingTextChanges=version.blocks.some(block=>{
@@ -1014,7 +1014,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       const next:ResumeBlock[]=safe.map((text,i)=>({id:'word-'+i,section:'experience' as const,text,paragraphEditable:fullParagraphs.has(text)}));
       for(const anchor of anchors||[])if(anchor.occurrence!==undefined&&anchor.text.length>=2&&!/[\r\n\t@]/.test(anchor.text)&&!/^\+?[\d\s()-]{7,}$/.test(anchor.text))next.push({id:'repeat-'+next.length,section:'experience',text:anchor.text,paragraphEditable:true,occurrence:anchor.occurrence,occurrenceCount:anchor.occurrenceCount,wordContext:anchor.wordContext});
       setWordPromptBlocks(prev=>
-       prev.length===next.length&&prev.every((b,i)=>b.text===next[i].text&&b.paragraphEditable===next[i].paragraphEditable&&b.occurrence===next[i].occurrence&&b.occurrenceCount===next[i].occurrenceCount)?prev:next);
+       prev.length===next.length&&prev.every((b,i)=>b.text===next[i].text&&b.paragraphEditable===next[i].paragraphEditable&&b.occurrence===next[i].occurrence&&b.occurrenceCount===next[i].occurrenceCount&&JSON.stringify(b.wordContext)===JSON.stringify(next[i].wordContext))?prev:next);
      }}
      onPendingChange={setNativeWordPending}
      onVerifiedSave={change=>{
