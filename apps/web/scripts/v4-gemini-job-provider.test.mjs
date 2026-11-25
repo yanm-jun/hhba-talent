@@ -245,3 +245,16 @@ test('reassessment stage pages both resume versions when context is rejected',as
  },{instructions:'compare',input:JSON.stringify({before_resume:before,after_resume:after,job:{full_jd:jd}})},{parse:r=>r.data,resume:before,document:after,jd});
  assert.equal(result.data.after.score,81);assert.deepEqual([...seen].sort(),['document','jd','resume']);
 });
+
+test('consented V4 page OCR passes a page image rather than invalid split PDF bytes',async()=>{
+ const {recognizeV4Resume,V4_OCR_CONSENT}=await import('../functions/_lib/v4-resume-ocr.js');
+ const bytes=new Uint8Array(32);bytes[0]=255;bytes[1]=216;bytes[30]=255;bytes[31]=217;
+ const request=new Request('https://hhba.work/api/match-v4/ocr',{method:'POST',headers:{'Content-Type':'application/octet-stream','X-HHBA-OCR-Consent':V4_OCR_CONSENT,'X-HHBA-Resume-Format':'page-jpeg'},body:bytes});
+ const result=await recognizeV4Resume(request,{baseUrl:'https://relay.example/v1',key:'synthetic-key',model:'synthetic'},async(_url,opt)=>{
+  const payload=JSON.parse(opt.body);
+  assert.equal(payload.input[0].content[0].type,'input_image');
+  assert.match(payload.input[0].content[0].image_url,/^data:image\/jpeg;base64,/);
+  return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:'本页真实文字'}]}]});
+ });
+ assert.equal(result.text,'本页真实文字');assert.equal(result.partial,false);
+});

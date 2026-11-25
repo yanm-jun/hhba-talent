@@ -1,7 +1,7 @@
 // HHBA same-origin Cloudflare AI matching. No provider key in the browser.
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import {extractDocxText} from './docxProfile.mjs';
-import {extractPdfText,PDFResumeError} from './pdfProfile.mjs';
+import {extractPdfText,PDFResumeError,recognizePdfPages,PDF_PAGE_OCR_MAX_BYTES} from './pdfProfile.mjs';
 
 export type MatchProfile = {
   education:string|null;education_evidence:string|null;
@@ -104,6 +104,7 @@ export const sessionMatchRecoveryAvailable=MATCH_V4_PREVIEW;
 export const MATCH_TASK_SIGNAL='hhba:v4:session-task-signal';
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.
 const LIMIT=12*1024*1024;
+export const resumeMatchFileLimit=(format:string|null)=>MATCH_V4_PREVIEW&&format==='pdf'?PDF_PAGE_OCR_MAX_BYTES:LIMIT;
 const errorMap:Record<string,string>={
   AI_BACKGROUND_SCHEDULE_UNAVAILABLE:'独立后台调度暂时不可用，已保留原研究任务。',
   AI_AGENT_CANCELLED:'该研究任务已经终止或当前会话已失效。',
@@ -228,8 +229,9 @@ export function resumeFileFormat(name:string){
 }
 export async function inspectResumeTextLocally(file:File,signal?:AbortSignal):Promise<{text:string;needsOcr:boolean}>{
  const format=resumeFileFormat(file.name);
- if(!format||file.size<30||file.size>LIMIT)
-  throw new MatchError(413,'请选择 12 MB 以内的 Word（DOCX）或 PDF 简历。');
+ if(!format||file.size<30||file.size>resumeMatchFileLimit(format))
+  throw new MatchError(413,'文件超过当前解析容量：Word 12 MB，V4 PDF 64 MB。');
+ if(MATCH_V4_PREVIEW&&format==='pdf'&&file.size>LIMIT)return {text:'',needsOcr:true};
  try{
   const buffer=await file.arrayBuffer();
   if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
@@ -258,7 +260,7 @@ const ocrErrors:Record<string,string>={
   OCR_FILE_PROVIDER_UNSUPPORTED:'当前模型接口不支持此文件识别方式，请尝试文字版 PDF 或粘贴简历原文。',
  OCR_INVALID_FILE:'这份文件无法读取。请在 Word 中另存为 DOCX，或重新导出 PDF。',
  OCR_UNSUPPORTED_FORMAT:'请选择 Word（DOCX）或 PDF 简历。',
- OCR_FILE_TOO_LARGE:'请选择 3 MB 以内的简历文件。',
+ OCR_FILE_TOO_LARGE:'单次文件识别超过传输容量；PDF 可按页识别，Word 可另存为较小的 DOCX。',
  OCR_TOO_MANY_PAGES:'简历最多支持 15 页，请精简后重试。',
  OCR_NO_TEXT:'暂时无法从文档中识别文字。请重新导出简历，或粘贴简历文字。',
  OCR_BUSY:'文档识别服务繁忙，请稍后重试。',
@@ -267,12 +269,13 @@ const ocrErrors:Record<string,string>={
 export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Promise<{text:string;partial:boolean}>{
  const token=session();
  const format=resumeFileFormat(file.name);
- if(!format||file.size<30||file.size>LIMIT)throw new MatchError(400,ocrErrors.OCR_INVALID_FILE);
+ if(!format||file.size<30||file.size>resumeMatchFileLimit(format))throw new MatchError(400,ocrErrors.OCR_INVALID_FILE);
+ const submit=async(body:Blob,kind:string)=>{
  const response=await fetch(EFFECTIVE_API+'/ocr',{
   method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/octet-stream',Authorization:'Bearer '+token,
-   'X-HHBA-Resume-Format':format,'X-HHBA-OCR-Consent':MATCH_V4_PREVIEW?'openai-relay-resume-ocr-v4':'deepseek-resume-ocr-v1'},
-  body:file
+   'X-HHBA-Resume-Format':kind,'X-HHBA-OCR-Consent':MATCH_V4_PREVIEW?'openai-relay-resume-ocr-v4':'deepseek-resume-ocr-v1'},
+  body
  }).catch(error=>{
   if(error?.name==='AbortError')throw error;
   throw new MatchError(503,'暂时连不上文档识别服务，请重试。');
@@ -281,6 +284,13 @@ export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Pro
  if(!response.ok||data?.ok!==true||typeof data.text!=='string')
   throw new MatchError(response.status,ocrErrors[data?.error||'']||'文档识别暂未完成，可以重试或粘贴简历文字。');
  return {text:redactResumeTextLocally(data.text),partial:data.partial===true};
+ };
+ if(MATCH_V4_PREVIEW&&format==='pdf'&&file.size>LIMIT)return recognizePdfPages(await file.arrayBuffer(),{signal,recognize:blob=>submit(blob,'page-jpeg')});
+ const whole=await submit(file,format);
+ if(MATCH_V4_PREVIEW&&format==='pdf'&&whole.partial){
+  try{return await recognizePdfPages(await file.arrayBuffer(),{signal,recognize:blob=>submit(blob,'page-jpeg')});}catch(error){if(signal?.aborted)throw signal.reason;return whole;}
+ }
+ return whole;
 }
 export type NativeMatchProgress='preparing'|'parsing'|'connected'|'planning'|'searching'|'reading'|'researching'|'writing'|'scoring'|'waiting';
 export type NativeMatchActivity={

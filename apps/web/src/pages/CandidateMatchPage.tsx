@@ -8,12 +8,11 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,redactResumeTextLocally,type MatchResponse,type MatchResearchReport,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
+import {matchServiceReady,matchPreviewPreflightAvailable,runMatchPreviewProviderCheck,runMatchPreviewSyntheticAcceptance,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,resumeMatchFileLimit,redactResumeTextLocally,type MatchResponse,type MatchResearchReport,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
 import {sessionMatchRecoveryAvailable,MATCH_TASK_SIGNAL,readSessionMatchTask,beginSessionMatchTask,advanceSessionMatchTask,closeSessionMatchTask,managedMatchOptions,type SessionMatchTask} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-const maxResumeSize=12*1024*1024;
 
 export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:{user:User|null;embedded?:boolean;hosted?:boolean;hostRoute?:string}){
  const [file,setFile]=useState<File|null>(null);
@@ -166,8 +165,8 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   setStorageChoice('undecided');
   if(!candidate){setFile(null);return}
   const format=resumeFileFormat(candidate.name);
-  if(!format||candidate.size<30||candidate.size>maxResumeSize){
-    setFile(null);setError('请选择 12 MB 以内的 Word（DOCX）或 PDF 简历。');return;
+  if(!format||candidate.size<30||candidate.size>resumeMatchFileLimit(format)){
+    setFile(null);setError('文件超过当前解析容量：Word 12 MB，V4 PDF 64 MB。');return;
   }
   setFile(candidate);
   void preview(candidate);
@@ -468,7 +467,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
        </div></div>}
     <div className="hhba-ai-layout">
       <section className="hhba-ai-upload">
-        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>支持 Word（DOCX）和 PDF，单次匹配最大 12 MB；私有原文件存储另有大小限制。</p></header>
+        <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>支持 Word（DOCX）和 PDF；大 PDF 可按页识别（本地容量 64 MB），Word 12 MB；私有原文件存储另有大小限制。</p></header>
         {user&&privateResumeAvailable&&savedFiles.length>0&&<div className="hhba-ai-saved-picker">
           <button type="button" className="hhba-ai-saved-picker-trigger"
            aria-expanded={savedPickerOpen} aria-controls="hhba-ai-existing-options"
