@@ -27,7 +27,7 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 }
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false}:{
+export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false,initialMinimized=false}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'profile'|'native_search'>>;
  onClose:()=>void;onContinue?:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
@@ -37,12 +37,12 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  sourceText?:string;sourceResume?:PrivateResume;accountScope?:string;
  // Match-history handoff enters the same existing editor without rerunning a search.
  initialOptimizedJobId?:string;
- hostRoute?:string;taskFailed?:boolean;
+ hostRoute?:string;taskFailed?:boolean;initialMinimized?:boolean;
 }){
  const ref=useRef<HTMLDivElement|null>(null);
  const confirmRef=useRef<HTMLDialogElement|null>(null);
  const dockRef=useRef<HTMLButtonElement|null>(null);
- const [minimized,setMinimized]=useState(false);
+ const [minimized,setMinimized]=useState(initialMinimized);
  const previousHostRoute=useRef(hostRoute);
  useEffect(()=>{
   if(previousHostRoute.current===hostRoute)return;

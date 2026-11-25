@@ -40,8 +40,8 @@ test('homepage & candidate workbench keep original matcher route and PDF/DOCX fl
  assert.match(page,/checked=\{storageChoice==='save'\}/);
  assert.match(page,/checked=\{storageChoice==='once'\}/);
  assert.match(page,/AI 为我寻找适合的工作|开始智能匹配/);
- assert.match(page,/matched=await submitExtractedResumeText\(previewText,options,consent,abort\.signal,matchResumeId\|\|undefined,/);
- assert.match(page,/setOptimizationSource\(redactResumeTextLocally\(previewText\)\)/);
+ assert.match(page,/matched=await submitExtractedResumeText\(searchText,searchOptions,consent,abort\.signal,matchResumeId\|\|undefined,/);
+ assert.match(page,/setOptimizationSource\(redactResumeTextLocally\(searchText\)\)/);
  assert.match(page,/sourceText=\{result\?optimizationSource:undefined\}/);
  assert.match(page,/sourceResume=\{result&&savedId\?savedFiles\.find/);
  assert.match(page,/embedded=\{embedded\|\|hosted\}/);
@@ -97,6 +97,6 @@ test('backdrop and close minimize directly; only explicit termination aborts the
  assert.match(dialog,/confirmTerminate&&pending&&<dialog/);
  assert.match(dialog,/dialog.showModal\(\)/);
  assert.match(dialog,/if\(!pending\)setConfirmTerminate\(false\)/);
- assert.match(page,/onClose=\{\(\)=>\{if\(working\)controller.current\?\.abort\(\)/);
+ assert.match(page,/onClose=\{\(\)=>void closeMatch\(\)\}/);
  assert.match(page,/\|\|working\|\|researchJobs\.length>0/);
 });
