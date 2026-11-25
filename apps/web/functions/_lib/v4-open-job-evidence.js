@@ -83,12 +83,12 @@ function htmlLocation(plain){
  const m=plain.match(/(?:工作地点|工作城市|办公地点|工作地区|工作区域|Work Location|Location)\s*[：:\s]\s*([^\n]{2,80})/i);
  return m?findMainlandCity(m[1]):null;
 }
-async function limitedRead(r,{allowJson=false}={}){
+async function limitedRead(r,{allowJson=false,maxBytes=2*1024*1024}={}){
  if(!r.ok||r.status===206)throw Error('V4_PAGE_UNAVAILABLE');
  const ct=(r.headers.get('content-type')||'').toLowerCase();
  if(!ct.includes('text/html')&&!ct.includes('text/plain')&&!(allowJson&&ct.includes('json')))throw Error('V4_PAGE_NOT_HTML');
- const max=2*1024*1024,cl=Number(r.headers.get('content-length')||0);
- if(cl>max||!r.body)throw Error('V4_PAGE_TOO_LARGE');
+ const max=maxBytes,cl=Number(r.headers.get('content-length')||0);
+ if(cl>max||!r.body){await r.body?.cancel().catch(()=>{});throw Error('V4_PAGE_TOO_LARGE');}
  const reader=r.body.getReader(),chunks=[];let len=0;
  try{for(;;){
   const chunk=await reader.read();if(chunk.done)break;
@@ -149,7 +149,9 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
     if(!next||isCommercialRecruitmentBoard(next))throw Error('V4_UNSAFE_REDIRECT');canonical=next;
    }
    if([408,425,429,500,502,503,504].includes(r.status)){await r.body?.cancel().catch(()=>{});throw Error('V4_TRANSIENT_PAGE_ERROR');}
-   html=await limitedRead(r,{allowJson:true});break;
+   // A larger, bounded transport budget is for real page bytes, never model output.
+   // Larger documents still remain addressable through the window reader.
+   html=await limitedRead(r,{allowJson:true,maxBytes:16*1024*1024});break;
   }catch(e){
    if(signal?.aborted||retry||(!['AbortError','TimeoutError','TypeError'].includes(e?.name)&&e?.message!=='V4_TRANSIENT_PAGE_ERROR'))throw e;
   }
@@ -202,7 +204,7 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  * Bounded bytes protect the Worker; unavailable documents are research leads,
  * not proof of a closed vacancy. Never send a CV to employer pages.
  */
-export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal}={}){
+export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal,maxBytes=2*1024*1024}={}){
  let current=v4PublicJobUrl(url);const seen=new Set();
  while(current&&!seen.has(current)&&!isCommercialRecruitmentBoard(current)){
   if(signal?.aborted)throw signal.reason;
@@ -213,7 +215,7 @@ export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal}={}){
    if(!next)throw Error('V4_REDIRECT_MISSING');
    current=v4PublicJobUrl(new URL(next,current).href);continue;
   }
-  const raw=await limitedRead(r,{allowJson:true});
+  const raw=await limitedRead(r,{allowJson:true,maxBytes});
   const site=meta(raw,'property','og:site_name')||meta(raw,'name','application-name');
   if(isCommercialRecruitmentBoard(current,{site_name:site}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
   const plain=htmlToText(raw,{maxChars:Infinity}).trim();

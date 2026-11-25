@@ -117,3 +117,21 @@ test('Gemini context capability probe exposes only model limits and synthetic to
  return url.endsWith(':countTokens')?Response.json({totalTokens:8}):Response.json({inputTokenLimit:1000000,outputTokenLimit:64000,supportedGenerationMethods:['generateContent','countTokens','createCachedContent']});},provider);
  assert.equal(got.input_token_limit,1000000);assert.equal(got.output_token_limit,64000);assert.equal(got.count_tokens,true);assert.equal(got.cached_content_advertised,true);assert.equal(calls.length,2);
 });
+
+test('large employer page retains exact structured JD after >2 MiB unrelated markup',async()=>{
+ const {v4ReadEmployerJob}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const url='https://careers.other-motors.cn/recruitment/positions/9988';
+ const description='<p>岗位职责：负责渠道运营。</p><p>任职要求：具有运营经验。</p>';
+ const posting={'@type':'JobPosting',title:'渠道运营经理',hiringOrganization:{name:'示例汽车企业',url:'https://careers.other-motors.cn'},jobLocation:{address:{addressLocality:'上海'}},description};
+ const html='<html><!--'+('x'.repeat(2*1024*1024))+'--><script type="application/ld+json">'+JSON.stringify(posting)+'</script></html>';
+ const result=await v4ReadEmployerJob(url,{fetcher:async()=>new Response(html,{headers:{'content-type':'text/html','content-length':String(html.length)}})});
+ assert.equal(result.source_confirmed,true);assert.match(result.full_jd,/负责渠道运营/);assert.match(result.full_jd,/具有运营经验/);
+});
+test('V4 legacy rewrite accepts long source blocks and JD without removing structural validation',async()=>{
+ const {validRewriteInputs}=await import('../functions/_lib/resume-rewrite-provider.js');
+ const blocks=Array.from({length:513},(_,i)=>({id:'b'+i,text:i===0?'原始经历'.repeat(2100):'真实经历',section:'experience'}));
+ const job={title:'岗位',requirements:'岗位要求'.repeat(65000)};
+ assert.equal(validRewriteInputs(blocks,job),false);
+ assert.equal(validRewriteInputs(blocks,job,{v4:true}),true);
+ assert.equal(validRewriteInputs([...blocks,blocks[0]],job,{v4:true}),false);
+});
