@@ -84,6 +84,33 @@ def live_match_health(*, allow_transient_outage: bool) -> None:
     raise subprocess.CalledProcessError(result.returncode, cmd)
 
 
+def match_contracts() -> None:
+    # Cloudflare's log API truncates large builds. Keep every test and its
+    # exit status, but summarize synthetic per-request usage noise.
+    cmd = ["node", "--test", "scripts/simple-match-v4.contract.test.mjs"]
+    print("HHBA_CLOUDFLARE_RUN apps/web: " + str(cmd), flush=True)
+    result = subprocess.run(cmd, cwd=WEB, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT, text=True, check=False)
+    lines = result.stdout.splitlines()
+    usage = [line for line in lines if line.startswith("# HHBA_V4_MODEL_USAGE ")]
+    visible = [line for line in lines if not line.startswith("# HHBA_V4_MODEL_USAGE ")]
+    if result.returncode:
+        # Always emit failed test detail and the runner summary before the
+        # remaining context, so the platform's log cap cannot hide them.
+        failed = set()
+        for i, line in enumerate(visible):
+            if re.match(r"^not ok\b", line) or "AssertionError" in line or "ERR_TEST_FAILURE" in line:
+                failed.update(range(max(0, i-2), min(len(visible), i+24)))
+        for i in sorted(failed):
+            print(visible[i], flush=True)
+        print("\n".join(visible[-120:]), flush=True)
+    else:
+        print("\n".join(line for line in visible if re.match(r"^# (?:tests|suites|pass|fail|cancelled|skipped|todo|duration_ms)\b", line)), flush=True)
+    print(f"HHBA_MATCH_CONTRACT_EXIT={result.returncode} SYNTHETIC_USAGE_LINES={len(usage)}", flush=True)
+    if result.returncode:
+        raise subprocess.CalledProcessError(result.returncode, cmd)
+
+
 def main() -> None:
     if not WORKFLOW.exists():
         raise SystemExit("Missing canonical GitHub Pages workflow")
@@ -93,7 +120,7 @@ def main() -> None:
     # V4 preview: anonymous relay smoke test, never a real applicant resume.
     # Results appear in build logs with only coarse status/error codes.
     if (os.environ.get('CF_PAGES_BRANCH') == 'main' and os.environ.get('HHBA_MATCH_V4_READY') == '1') or os.environ.get('CF_PAGES_BRANCH') in ('feat/simple-resume-match-v4-20261124', 'fix/v4-open-job-discovery-20261124', 'fix/v4-direct-ai-recommend-20261124', 'fix/v4-autonomous-pipeline-20261124'):
-        run(['node', '--test', 'scripts/simple-match-v4.contract.test.mjs'], cwd=WEB)
+        match_contracts()
         live_match_health(allow_transient_outage=os.environ.get('CF_PAGES_BRANCH') == 'main' and os.environ.get('HHBA_STRICT_AI_RELEASE_GATE') != '1')
 
     # Explicit diagnostic branch or opt-in setting only. No extra paid
