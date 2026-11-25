@@ -92,7 +92,7 @@ export function PrivateResumeVault(){
   </div></div>
   {loading?<p role="status">正在检查私有简历服务…</p>:!ready?<>
    <div className="hhba-account-upload"><CloudUpload size={29}/>
-    <h3>简历服务暂未启用</h3>
+    <h3>私有简历服务尚未启用</h3>
     <p>请稍后再试。</p>
    </div>
    {error&&<p className="hhba-personal-error" role="alert">{error}</p>}
@@ -143,7 +143,7 @@ export function PrivateResumeVault(){
      <div className="hhba-private-resume-consent-panel">
       <label className="hhba-private-resume-consent">
        <input type="checkbox" checked={consent} disabled={busy} onChange={e=>setConsent(e.target.checked)}/>
-       <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 保存本次简历。</span>
+       <span>我已知悉并单独同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 保存本次简历。</span>
       </label>
      </div>
      <div className="hhba-private-resume-upload-actions">

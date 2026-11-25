@@ -203,7 +203,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我已阅读并同意 <Link to="/candidate/account/privacy">《隐私说明》</Link>，授权 HHBA 使用我的简历信息进行智能岗位匹配。</span>
+          <span>我同意 HHBA 提取简历文本并发送给第三方 AI 服务进行本次智能岗位匹配；我已阅读 <Link to="/candidate/account/privacy">《隐私说明》</Link>。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}

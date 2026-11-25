@@ -59,9 +59,11 @@ jobs:
           test -s dist/admin-preview/dashboard.js
           test -s dist/admin-preview/market.js
           test -s dist/admin-preview/finance.js
-          grep -q '财务成本' dist/admin-preview/index.html
-          grep -q '岗位与企业' dist/admin-preview/index.html
+          grep -q 'data-view="finance"' dist/admin-preview/index.html
+          grep -q 'data-view="market"' dist/admin-preview/index.html
           test -s dist/admin-preview/index.html
-          grep -q '运营监控' dist/admin-preview/index.html
+          grep -q 'data-view="operations"' dist/admin-preview/index.html
+          grep -q 'data-view="ai-usage"' dist/admin-preview/index.html
+          grep -q 'id="view-ai-usage"' dist/admin-preview/index.html
           grep -q 'users-load-private' dist/admin-preview/index.html
           test -s dist/_routes.json

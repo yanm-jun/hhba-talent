@@ -1,0 +1,21 @@
+name: HHBA dedicated admin Token monitor
+on:
+  pull_request:
+    branches: [feat/admin-password-console-20261112]
+    paths:
+      - 'apps/admin-preview/**'
+      - 'apps/web/functions/**'
+      - 'apps/web/scripts/admin-token-monitor.test.mjs'
+      - '.github/workflows/hhba-admin-token-monitor.yml'
+permissions:
+  contents: read
+jobs:
+  admin-token:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check apps/admin-preview/dashboard.js
+      - run: node --test apps/web/scripts/admin-token-monitor.test.mjs

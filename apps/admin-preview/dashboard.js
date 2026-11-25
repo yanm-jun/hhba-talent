@@ -162,7 +162,7 @@ async function refreshGrowth(){
 }
 
 const titles={overview:'运营驾驶舱',users:'个人用户分析',market:'官方岗位索引',library:'17个行业馆',membership:'会员与月度服务',rights:'权益支持案件',operations:'运营运行监测',
- finance:'财务与透明公开',investor:'历史数据展示',settings:'系统与权限'};
+ finance:'财务与透明公开','ai-usage':'AI Token 消耗',investor:'历史数据展示',settings:'系统与权限'};
 const details={
  users:['真实用户注册与业务操作','账号级行为追踪已停止；注册和收藏来自真实数据库，页面事件仅计次数。'],
  market:['企业和岗位质量分析','未来接入岗位状态、ATS 来源及招聘质量报表；当前公开索引汇总在数据总览。'],
@@ -176,7 +176,7 @@ function setView(view,options={}){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(['investor','overview','users','market','library','membership','rights','operations','finance'].includes(view)?view:'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users','market','library','membership','rights','operations','finance','ai-usage'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -446,4 +446,45 @@ byId('mobile-menu').addEventListener('click',()=>{
 });
 byId('mobile-dim').addEventListener('click',closeMenu);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
+let aiUsageReport=null;
+function renderAiUsage(){
+ const root=byId('ai-usage-stages'),daily=byId('ai-usage-days');
+ if(!root||!daily)return;
+ root.replaceChildren();daily.replaceChildren();
+ const data=aiUsageReport?.aiUsage,rows=Array.isArray(data?.rows)?data.rows:[];
+ const sum=(items,key)=>items.reduce((a,r)=>a+(integer(r[key])??0),0);
+ const n=(v)=>fmt.format(v);
+ const set=(id,v)=>{byId(id).textContent=v};
+ const add=(target,label,value)=>{const row=document.createElement('div'),name=document.createElement('span'),stat=document.createElement('strong');name.textContent=label;stat.textContent=value;row.append(name,stat);target.append(row)};
+ const valid=data?.quality==='collected'&&rows.length>0;
+ const calls=sum(rows,'calls'),known=sum(rows,'usage_calls'),cacheKnown=sum(rows,'cache_known_calls'),input=sum(rows,'input_tokens');
+ set('ai-usage-state',valid?'统计区间：'+aiUsageReport.period.start+' 至 '+aiUsageReport.period.end+'（UTC）；仅已观察的 OpenAI Responses 请求。':data?.quality==='no_records'?'该区间尚无采集记录，不代表零消耗。':'数据未连接或未获管理员授权。');
+ set('ai-usage-total',valid&&known?n(sum(rows,'total_tokens'))+(known<calls?'（部分）':''):'—');
+ set('ai-usage-calls',valid?n(calls):'—');
+ set('ai-usage-coverage',valid?'完整用量 '+n(known)+' / '+n(calls):'用量完整度待核验');
+ set('ai-usage-cache',valid&&known===calls&&cacheKnown===calls&&input>0?(100*sum(rows,'cached_tokens')/input).toFixed(1)+'%':'—');
+ if(!valid)return;
+ const groups=new Map(),days=new Map();
+ for(const row of rows){const key=[row.stage,row.model,row.effort].join(' · ');if(!groups.has(key))groups.set(key,[]);groups.get(key).push(row);if(!days.has(row.day))days.set(row.day,[]);days.get(row.day).push(row)}
+ for(const [key,items] of [...groups].sort((a,b)=>sum(b[1],'total_tokens')-sum(a[1],'total_tokens'))){
+  const total=sum(items,'calls'),reported=sum(items,'usage_calls'),rk=sum(items,'reasoning_known_calls'),ck=sum(items,'cache_known_calls');
+  add(root,key,'请求 '+n(total)+' / 已知 '+n(reported)+' · 输入 '+(reported?n(sum(items,'input_tokens')):'—')+' · 输出 '+(reported?n(sum(items,'output_tokens')):'—')+' · 推理 '+(rk?n(sum(items,'reasoning_tokens'))+(rk<total?'（部分）':''):'—')+' · 缓存 '+(ck?n(sum(items,'cached_tokens'))+(ck<total?'（部分）':''):'—')+' · 未完成/失败 '+n(items.filter(r=>r.status!=='completed').reduce((a,r)=>a+(integer(r.calls)??0),0)));
+ }
+ for(const [day,items] of [...days].sort((a,b)=>b[0].localeCompare(a[0]))){const observed=sum(items,'usage_calls'),all=sum(items,'calls');add(daily,day,(observed?n(sum(items,'total_tokens')):'—')+' Token · '+n(observed)+' / '+n(all)+' 次返回完整用量')}
+}
+
+async function refreshAiUsage(){
+ const button=byId('ai-usage-refresh');if(button.disabled)return;
+ button.disabled=true;byId('ai-usage-state').textContent='正在读取真实用量…';
+ try{
+  const value=byId('ai-usage-period').value,days=value==='today'?'1':value.slice(0,-1);
+  const response=await fetch('/admin-preview/api/metrics?days='+encodeURIComponent(days),{cache:'no-store',credentials:'same-origin'});
+  if(!response.ok||!(response.headers.get('content-type')||'').includes('application/json'))throw Error('private metrics unavailable');
+  const report=await response.json();
+  if(report.kind!=='HHBA_CLOUDFLARE_PRIVATE_METRICS_V1')throw Error('invalid report');
+  aiUsageReport=report;
+ }catch{aiUsageReport=null;}finally{button.disabled=false;renderAiUsage();}
+}
+byId('ai-usage-refresh')?.addEventListener('click',()=>void refreshAiUsage());
+byId('ai-usage-period')?.addEventListener('change',()=>{aiUsageReport=null;renderAiUsage();});
 choosePeriod('30d');updateOverview();updateGrowth();void refresh();
