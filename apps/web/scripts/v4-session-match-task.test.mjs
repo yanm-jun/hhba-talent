@@ -83,3 +83,22 @@ test('phase heartbeat never saves after losing the exclusive research lease',asy
  let writes=0,errors=0;const hb=startMatchPhaseHeartbeat({renew:async()=>{throw Error('lease lost')},getCheckpoint:()=>({phase:'research'}),persist:async()=>{writes++},onError:()=>{errors++},interval:3600000});
  await hb.tick();await hb.tick();await hb.stop();assert.equal(writes,0);assert.equal(errors,1);
 });
+
+test('authorized long-running background phases renew only the opaque watchdog instance; revoked sessions do not renew',async()=>{
+ const {scheduleBackgroundMatch,loadBackgroundMatch}=await import('../functions/_lib/v4-background-match.js');
+ const {env,session,input,sql}=fixture(),s=session('13800000000','a'),task=await updateSessionTask(env,s,'start',input());
+ let ticket,instance,renewals=0;
+ env.HHBA_MATCH_BACKGROUND={async fetch(url,opt){
+  const data=JSON.parse(opt.body);
+  if(url.endsWith('/start')){ticket=data.ticket;instance=data.instance;}
+  else{assert.ok(url.endsWith('/renew-watchdog'));assert.deepEqual(data,{instance});renewals++;}
+  return Response.json({ok:true});
+ }};
+ await scheduleBackgroundMatch(env,s,task);
+ const record=await readMatchTask(env,ticket);await saveMatchTask(env,ticket,{...record,renewed_at:Date.now()-3600001});
+ assert.equal((await loadBackgroundMatch(env,ticket)).task.id,task.id);assert.equal(renewals,1);
+ await loadBackgroundMatch(env,ticket);assert.equal(renewals,1);
+ const refreshed=await readMatchTask(env,ticket);await saveMatchTask(env,ticket,{...refreshed,renewed_at:Date.now()-3600001});
+ sql.prepare('UPDATE hhba_auth_sessions SET revoked=1 WHERE token_hash=?').run(s.token_hash);
+ await assert.rejects(loadBackgroundMatch(env,ticket),{code:'AI_AGENT_CANCELLED'});assert.equal(renewals,1);
+});

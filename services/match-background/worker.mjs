@@ -21,6 +21,14 @@ export default {async scheduled(event,env){
   console.info('HHBA_MATCH_WATCHDOG',JSON.stringify(summary));
   return Response.json({ok:true,...summary});
  }
+ // Pages calls this only after checking the still-authorized session task.
+ if(url.pathname==='/renew-watchdog'){
+  if(!env.MATCH_REGISTRY)return Response.json({ok:false},{status:503});
+  let body;try{body=await request.json();}catch{return new Response('Invalid',{status:400});}
+  if(!hex64(body.instance))return new Response('Invalid',{status:400});
+  await registerWatchdogInstance(env.MATCH_REGISTRY,body.instance);
+  return Response.json({ok:true});
+ }
  if(url.pathname!=='/start')return new Response('Not found',{status:404});
  let body;try{body=await request.json();}catch{return new Response('Invalid',{status:400});}
  if(!hex64(body.instance)||!hex64(body.ticket))return new Response('Invalid',{status:400});

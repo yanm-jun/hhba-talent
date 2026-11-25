@@ -30,6 +30,15 @@ export async function loadBackgroundMatch(env,ticket){
  if(record?.kind!=='HHBA_V4_BACKGROUND_TICKET_V1')throw taskError('AI_BACKGROUND_TICKET_INVALID',403);
  const session={phone:record.phone,token_hash:record.session_hash};
  const task=await renewActiveSessionTask(env,session,record.task_id,record.generation);
- if(Date.now()-(record.renewed_at||0)>=3600000)await saveMatchTask(env,ticket,{...record,renewed_at:Date.now()});
+ if(Date.now()-(record.renewed_at||0)>=3600000){
+  // Renew the watchdog only for a freshly authorized active task. Its
+  // registry contains no session identifiers, resume data or credentials.
+  await saveMatchTask(env,ticket,{...record,renewed_at:Date.now()});
+  try{
+   const instance=await sha256Hex('hhba-workflow-instance:'+ticket);
+   const r=await env.HHBA_MATCH_BACKGROUND.fetch('https://hhba-internal.invalid/renew-watchdog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instance})});
+   if(!r.ok||(await r.json())?.ok!==true)throw Error('WATCHDOG_RENEW_FAILED');
+  }catch{console.warn('HHBA_MATCH_WATCHDOG_RENEW_FAILED');}
+ }
  return {session,task,taskKey:await researchTaskKey(env,session,task)};
 }
