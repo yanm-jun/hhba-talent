@@ -66,3 +66,21 @@ test('batch scoring shares one resume and preserves independent fallback',async(
  const [one,two]=await Promise.all([scorer('a',{full_jd:a}),scorer('b',{full_jd:b})]);
  assert.equal(calls,1);assert.equal(one.score,83);assert.equal(two,null);
 });
+
+test('protected synthetic probe uses medium and reports observed usage, never accepts missing evidence',async()=>{
+ const {runOpenAIProbe,onRequest}=await import('../functions/api/match-v4-provider-probe.js');
+ let calls=0;
+ const provider={model:'gpt-6.2-sol',key:'synthetic-key',baseUrl:'https://relay.example/v1'};
+ const fetcher=async(_url,opts)=>{
+  calls++;
+  const p=JSON.parse(opts.body),input=JSON.parse(p.input);
+  assert.equal(p.reasoning.effort,'medium');assert.equal(p.tools,undefined);assert.equal(p.store,false);
+  return Response.json({...reply({assessments:input.jobs.map(j=>({id:j.id,score:80,suitable:true,reason:'synthetic',resume_quote:'负责门店日常运营',jd_quote:j.full_jd}))}),usage:{input_tokens:100,output_tokens:20,total_tokens:120}});
+ };
+ const result=await runOpenAIProbe(provider,'openai_token_efficiency',{fetcher});
+ assert.equal(result.ok,true);assert.equal(calls,3);assert.equal(result.single_total,240);assert.equal(result.batch_total,120);
+ const bad=await runOpenAIProbe(provider,'openai_token_efficiency',{fetcher:async()=>Response.json(reply({assessments:[]}))});
+ assert.equal(bad.ok,false);
+ const unauthorized=await onRequest({request:new Request('https://hhba.work/api/match-v4-provider-probe?phase=openai_token_efficiency'),env:{}});
+ assert.equal(unauthorized.status,404);
+});
