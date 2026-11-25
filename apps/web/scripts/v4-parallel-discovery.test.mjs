@@ -336,3 +336,20 @@ test('activated V4 OpenAI keeps researching confirmed vacancies before reference
  const result=await v4Match(fetcher,provider,resume,'全国',{env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
  assert.ok(recovery>=1);assert.equal(assessment,1);assert.equal(result.checkpoint.matches[0].reference_vacancy_verified,true);assert.equal(result.checkpoint.matches[0].match_score,86);
 });
+
+test('independently observed public API hints survive stage restart without becoming verified jobs',async()=>{
+ const {v4KnownPublicResearchUrls,v4EvidencePage,v4StageResearchCall}=await import('../functions/_lib/v4-research-tools.js');
+ const parent='https://careers.real-employer.cn/jobs/12',api='https://api.real-employer.cn/positions/12';
+ const ledger=[{type:'read_page',mode:'static',url:parent,offset:0,text:'岗位页面',resource_hints:[{url:api,kind:'api'},{url:'http://localhost/private',kind:'api'}]}];
+ const known=v4KnownPublicResearchUrls([],ledger);
+ assert.ok(known.has(api));assert.ok(!known.has('http://localhost/private'));
+ assert.equal(v4EvidencePage(ledger,{index:0},256).resource_hints[0].url,api);
+ let calls=0,reads=0;
+ const result=await v4StageResearchCall(async payload=>{
+  calls++;const input=JSON.parse(payload.input);
+  if(calls===1)return {value:{research_action:{type:'read_page',url:api}}};
+  assert.equal(input.research_tool_results[0].ok,true);
+  return {value:{done:true}};
+ },{instructions:'test',input:'{}'},{parse:r=>r.value,ledger,fetcher:async u=>{reads++;assert.equal(u,api);return Response.json({title:'岗位原文'});}});
+ assert.equal(reads,1);assert.equal(result.value.done,true);
+});
