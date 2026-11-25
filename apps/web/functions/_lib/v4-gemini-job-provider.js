@@ -3,14 +3,20 @@
 const fault=(code,upstreamStatus)=>Object.assign(new Error(code),{code,...(Number.isInteger(upstreamStatus)?{upstreamStatus}:{})});
 const DEFAULT_BASE='https://api-c.reqtoken.com';
 export function geminiJobProvider(env={}){
- const key=env.GEMINI_API_KEY?.trim(),model=env.GEMINI_MODEL?.trim();
+ const key=env.GEMINI_API_KEY?.trim(),model=env.GEMINI_MODEL?.trim(),authMode=env.GEMINI_AUTH_MODE?.trim()||'native';
+ if(!['native','bearer'].includes(authMode))return null;
  if(!key||!model||!/^[-a-zA-Z0-9_.]+$/.test(model))return null;
  try{
   const u=new URL(env.GOOGLE_GEMINI_BASE_URL||DEFAULT_BASE);
   if(u.protocol!=='https:'||u.username||u.password||u.search||u.hash)return null;
   const baseUrl=u.href.replace(/\/+$/,'').replace(/\/v1beta$/,'');
-  return {kind:'gemini',key,model,baseUrl,...(env.GEMINI_STREAM==='1'?{stream:true}:{}),...(env.GEMINI_URL_CONTEXT==='1'?{urlContext:true}:{})};
+  return {kind:'gemini',key,model,baseUrl,...(authMode==='bearer'?{authMode}:{}),...(env.GEMINI_STREAM==='1'?{stream:true}:{}),...(env.GEMINI_URL_CONTEXT==='1'?{urlContext:true}:{})};
  }catch{return null;}
+}
+// Both schemes use only the separately configured Gemini credential at the
+// operator-selected Gemini endpoint. Never try another provider or key.
+export function geminiRequestHeaders(provider,accept='application/json'){
+ return {...(provider.authMode==='bearer'?{authorization:'Bearer '+provider.key}:{'x-goog-api-key':provider.key}),'content-type':'application/json',accept};
 }
 export function logV4Usage(provider,usage,elapsed,status){
  const number=v=>Number.isSafeInteger(v)&&v>=0?v:null;
@@ -71,7 +77,7 @@ export async function callGeminiJob(fetcher,provider,payload,{signal,onEvent}={}
   // A request is not proof that the provider executed a search.
   try{onEvent?.('response.in_progress')}catch{}
   let r;
-  try{r=await fetcher(provider.baseUrl+'/v1beta/models/'+encodeURIComponent(provider.model)+(provider.stream?':streamGenerateContent?alt=sse':':generateContent'),{method:'POST',redirect:'manual',headers:{'x-goog-api-key':provider.key,'content-type':'application/json',accept:provider.stream?'text/event-stream':'application/json'},body:JSON.stringify(body),...(signal?{signal}:{})});}
+  try{r=await fetcher(provider.baseUrl+'/v1beta/models/'+encodeURIComponent(provider.model)+(provider.stream?':streamGenerateContent?alt=sse':':generateContent'),{method:'POST',redirect:'manual',headers:geminiRequestHeaders(provider,provider.stream?'text/event-stream':'application/json'),body:JSON.stringify(body),...(signal?{signal}:{})});}
   catch(e){throw fault(signal?.aborted?'AI_AGENT_CANCELLED':e?.name==='TimeoutError'?'AI_PROVIDER_TIMEOUT':'AI_PROVIDER_NETWORK_ERROR');}
   if(r.status>=300&&r.status<400)throw fault('AI_PROVIDER_REDIRECT_BLOCKED');
   if(!r.ok){
@@ -120,7 +126,7 @@ export async function callGeminiJob(fetcher,provider,payload,{signal,onEvent}={}
 // Never create a remote cache or send private CV data during a probe.
 export async function inspectGeminiContextCapabilities(fetcher,provider,{signal}={}){
  const model=provider.baseUrl+'/v1beta/models/'+encodeURIComponent(provider.model);
- const headers={'x-goog-api-key':provider.key,'content-type':'application/json',accept:'application/json'};
+ const headers=geminiRequestHeaders(provider);
  const result={model_metadata:false,input_token_limit:null,output_token_limit:null,count_tokens:false,cached_content_advertised:false,metadata_http_status:null,count_tokens_http_status:null};
  const integer=x=>Number.isSafeInteger(x)&&x>0?x:null;
  try{const r=await fetcher(model,{headers,redirect:'manual',signal});result.metadata_http_status=r.status;if(r.ok){const m=await r.json();result.model_metadata=true;result.input_token_limit=integer(m.inputTokenLimit);result.output_token_limit=integer(m.outputTokenLimit);result.cached_content_advertised=(m.supportedGenerationMethods||[]).some(x=>typeof x==='string'&&/cache/i.test(x));}else await r.body?.cancel().catch(()=>{});}catch(e){if(signal?.aborted)throw e;}
