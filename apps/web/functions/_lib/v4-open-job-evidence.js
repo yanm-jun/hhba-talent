@@ -327,7 +327,7 @@ export function v4BrowserResourcePlan(url,resourceHints=[],ledger=[]){
   // successful full static read of that exact frame may contribute children.
   if(h.kind==='script'||h.kind==='frame')for(const r of ledger)if(r.url===u&&r.type==='read_page'&&r.mode==='static'&&(h.kind==='script'?r.script_source===true:!r.script_source&&r.offset===0&&r.next_offset===null))queue.push(...(r.resource_hints||[]));
  }
- const publicDataUrls=[...hints.values()].filter(h=>['data','frame'].includes(h.kind)&&publicReadResourceUrl(h.url)&&ledger.some(r=>r.url===h.url&&r.type==='read_page'&&r.mode==='static'&&!r.script_source&&r.offset===0&&r.next_offset===null&&r.text?.trim())).map(h=>h.url);
+ const publicDataUrls=[...hints.values()].filter(h=>['data','frame'].includes(h.kind)&&publicReadResourceUrl(h.url)&&ledger.some(r=>r.url===h.url&&r.type==='read_page'&&r.mode==='static'&&!r.script_source&&r.offset===0&&r.next_offset===null&&(r.text?.trim()||h.kind==='frame'&&r.resource_hints?.length))).map(h=>h.url);
  return {resourceHints:[...hints.values()],publicDataUrls};
 }
 // Automatic independent GET for declared public data/frame resources. Browser
@@ -352,7 +352,7 @@ export async function v4PreparePublicBrowserResources(url,{fetcher=fetch,signal,
   const documentUrl=referring?.document_url||referring?.url||url;
   try{
    const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal,...(script?{scriptSource:true,documentUrl}:{})});
-   if(doc.url!==hint.url||!doc.plain.trim()||script&&!doc.script_source)continue;
+   if(doc.url!==hint.url||(!doc.plain.trim()&&!(hint.kind==='frame'&&doc.document_kind==='html'&&doc.resource_hints?.length))||script&&!doc.script_source)continue;
    const record={type:'read_page',ok:true,mode:'static',url:doc.url,offset:0,next_offset:null,text:doc.plain,...(script?{script_source:true,document_url:documentUrl}:{}),resource_hints:doc.resource_hints||[]};
    records.push(record);onDocument(record);
    initial=v4BrowserResourcePlan(url,resourceHints,records);
