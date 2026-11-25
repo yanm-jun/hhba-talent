@@ -430,3 +430,21 @@ test('non-schema JSON requires explicit matching identity and full original duty
  }
  payload={data:[exact,exact]};assert.equal(await read(),null);
 });
+
+test('lazy iframe and nested JavaScript module paths use the referring document context',async()=>{
+ const {v4PublicResourceHints,v4PreparePublicBrowserResources}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const root='https://careers.employer.cn/jobs/42',frame='https://embed.employer.cn/job/42',script='https://cdn.employer.cn/module.js',child='https://cdn.employer.cn/child.js',api='https://embed.employer.cn/api/jobs/42';
+ const hints=v4PublicResourceHints('<iframe data-lazy-src="'+frame+'"></iframe>',root);
+ assert.deepEqual(hints,[{url:frame,kind:'frame'}]);
+ const reads=[],ledger=[];
+ const fetcher=async u=>{reads.push(u);
+  if(u===frame)return new Response('<script data-src="'+script+'"></script>',{headers:{'content-type':'text/html'}});
+  if(u===script)return new Response('import "./child.js";',{headers:{'content-type':'application/javascript'}});
+  if(u===child)return new Response('fetch("/api/jobs/42");',{headers:{'content-type':'application/javascript'}});
+  if(u===api)return Response.json({title:'真实岗位'});
+  throw Error('unexpected '+u);
+ };
+ const plan=await v4PreparePublicBrowserResources(root,{fetcher,resourceHints:hints,ledger,onDocument:r=>ledger.push(r)});
+ assert.deepEqual(reads,[frame,script,child,api]);assert.deepEqual(plan.publicDataUrls,[frame,api]);
+ assert.equal(ledger.find(r=>r.url===child).document_url,frame);
+});
