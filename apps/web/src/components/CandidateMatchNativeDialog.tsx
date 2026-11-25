@@ -27,7 +27,7 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 }
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId}:{
+export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'profile'|'native_search'>>;
  onClose:()=>void;onContinue?:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
@@ -37,11 +37,20 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  sourceText?:string;sourceResume?:PrivateResume;accountScope?:string;
  // Match-history handoff enters the same existing editor without rerunning a search.
  initialOptimizedJobId?:string;
+ hostRoute?:string;taskFailed?:boolean;
 }){
  const ref=useRef<HTMLDivElement|null>(null);
  const confirmRef=useRef<HTMLDialogElement|null>(null);
  const dockRef=useRef<HTMLButtonElement|null>(null);
  const [minimized,setMinimized]=useState(false);
+ const previousHostRoute=useRef(hostRoute);
+ useEffect(()=>{
+  if(previousHostRoute.current===hostRoute)return;
+  previousHostRoute.current=hostRoute;
+  // Browser Back, public navigation and workspace switches are visibility
+  // changes only. The owner retains the exact same request and result state.
+  if(hostRoute!==undefined){setConfirmTerminate(false);setMinimized(true);}
+ },[hostRoute]);
  const [confirmTerminate,setConfirmTerminate]=useState(false);
  const [optimizedJobUrl,setOptimizedJobUrl]=useState<string|null>(()=>
   [...result.matches,...researchJobs].find(job=>job.id===initialOptimizedJobId&&job.jd_version_id&&job.jd_sha256)?.official_url||null);
@@ -295,9 +304,9 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
     </footer>
    </div>
   </div>
-  {minimized&&<button ref={dockRef} type="button" className="hhba-match-task-dock" onClick={restoreSearch} aria-label={pending?'恢复正在运行的岗位研究':'查看岗位研究结果'}>
+  {minimized&&<button ref={dockRef} type="button" className="hhba-match-task-dock" onClick={restoreSearch} aria-label={pending?'恢复正在运行的岗位研究':taskFailed?'查看岗位研究异常':'查看岗位研究结果'}>
    <span className="hhba-match-task-icon">{pending?<LoaderCircle size={20} className="spin" aria-hidden="true"/>:<BriefcaseBusiness size={20} aria-hidden="true"/>}</span>
-   <span className="hhba-match-task-copy"><strong>{pending?'AI 正在研究岗位':'岗位研究已结束'}</strong><small>{pending?stageTitle[progressStage]+' · '+(researchReport?.discovered??researchJobs.length)+' 个候选':'点击查看已收到的研究结果'}</small></span>
+   <span className="hhba-match-task-copy"><strong>{pending?'AI 正在研究岗位':taskFailed?'岗位研究暂未完成':'岗位研究已结束'}</strong><small>{pending?stageTitle[progressStage]+' · '+(researchReport?.discovered??researchJobs.length)+' 个候选':taskFailed?'点击查看异常原因':'点击查看已收到的研究结果'}</small></span>
    <span className="hhba-match-task-action">{pending?'查看进度':'查看结果'}</span>
   </button>}
   {confirmTerminate&&pending&&<dialog ref={confirmRef} className="hhba-match-exit-dialog" aria-labelledby="hhba-match-exit-title" onCancel={e=>{e.preventDefault();setConfirmTerminate(false)}} onClick={e=>{if(e.target===e.currentTarget)e.preventDefault()}}>

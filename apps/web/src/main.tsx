@@ -1,5 +1,7 @@
 import { createRoot } from 'react-dom/client';
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import {MatchWorkspaceHost,MatchWorkspaceSlot} from './components/MatchWorkspaceHost';
+import {Shell} from './components/Shell';
 import './styles.css';
 import { api, ApiError, type User } from './services/api';
 import { useRoute, navigate } from './router';
@@ -142,6 +144,16 @@ function AppLoadingState(){
  </main>;
 }
 function App(){const route=useRoute();const [user,setUser]=useState<User|null>(null);const [ready,setReady]=useState(false);
+const [sessionEpoch,setSessionEpoch]=useState(0);
+const sessionToken=useRef(getRealAuthToken());
+useEffect(()=>{
+ // A logout/token replacement invalidates the old task even if the route
+ // or account object has not updated yet. Never share private task state.
+ const change=()=>{const token=getRealAuthToken();if(token!==sessionToken.current){sessionToken.current=token;setSessionEpoch(value=>value+1);}};
+ window.addEventListener('hhba:real-auth-changed',change);
+ window.addEventListener('storage',change);
+ return()=>{window.removeEventListener('hhba:real-auth-changed',change);window.removeEventListener('storage',change);};
+},[]);
 useEffect(()=>{
  let mounted=true;
  async function restore(){
@@ -169,6 +181,13 @@ const logout=async()=>{
   else if(employerApiReady)await api.logout();
  }finally{clearRealAuthToken();setUser(null);navigate('/candidate/login');}
 };if(!ready)return <AppLoadingState/>;
+ return <MatchWorkspaceHost key={String(user?.id||'guest')+':'+sessionEpoch} route={route}
+  workspace={<CandidateMatchPage user={user} embedded={route!=='/candidate/match'} hosted hostRoute={route}/>}
+  fallback={<p role="status">正在加载智能匹配…</p>}>
+  <Suspense fallback={<AppLoadingState/>}><AppRoutes route={route} user={user} setUser={setUser} logout={logout}/></Suspense>
+ </MatchWorkspaceHost>;
+}
+function AppRoutes({route,user,setUser,logout}:{route:string;user:User|null;setUser:(user:User|null)=>void;logout:()=>Promise<void>}){
  // Removed routes are indistinguishable from other unknown URLs in the public UI; Cloudflare edge responds 404.
  if(/^\/(?:recruiter|employer)(?:\/|$)/.test(route)||
     /^\/admin\/(?:recruitment|employer-[a-z-]+)$/.test(route)||
@@ -203,7 +222,7 @@ const logout=async()=>{
  if(route==='/companies/autumn/cn-autumn-011')return <BoyuCompactProfilePage user={user}/>;
  if(employerProfileByRoute.has(route))return <UnifiedV2CompanyPage user={user} id={route.split('/').pop()!}/>;if(/^\/companies\/autumn\/cn-autumn-[0-9]{3}$/.test(route))return <AutumnCompanyProfilePage user={user} id={route.split('/').pop()!}/>;if(route==='/companies/domestic/rel-huayu-004')return <HuayuVisionCompactProfilePage user={user}/>;if(route==='/companies/domestic/a-600909')return <HuaanSecuritiesCompactProfilePage user={user}/>;if(route==='/companies/domestic/a-000776')return <GuangfaSecuritiesCompactProfilePage user={user}/>;if(route==='/companies/domestic/a-600030')return <CiticsSecuritiesCompactProfilePage user={user}/>;if(/^\/companies\/domestic\/(?:a-[0-9]{6}|cn-B1-[0-9]{3}|spot-[^/]{2,100}|rel-[a-z]+-[0-9]{3}|group-geely|profile-[a-z0-9-]{3,150})$/.test(route))return <DomesticCompanyPage user={user} id={decodeURIComponent(route.split('/').pop()!)}/>;if(/^\/majors\/[a-z-]{3,80}$/.test(route))return <MajorCompaniesPage user={user} slug={route.split('/').pop()!}/>;if(route==='/companies')return <CompanyDirectoryPage user={user}/>;
   if(/^\/companies\/id\/[A-Za-z0-9_-]{12,600}$/.test(route))return <IndexedCompanyPage user={user} encodedId={route.split('/').pop()!}/>;
-  if(/^\/companies\/[a-z-]{2,60}$/.test(route))return <CompanyProfilePage user={user} slug={route.split('/').pop()!}/>;if(route==='/auth')return <PhoneAuthPage user={user} onUser={setUser} accountType="candidate" initialMode="login"/>;if(route==='/candidate/login'||route==='/candidate/register')return <PhoneAuthPage user={user} onUser={setUser} accountType="candidate" initialMode={route.endsWith('/register')?'register':'login'}/>;if(route==='/candidate/email-login'||route==='/candidate/email-register')return <AuthPage user={user} onUser={setUser} accountType="candidate" initialMode={route.endsWith('register')?'register':'login'}/>;if(route==='/candidate/official-outbound')return <OfficialRecruitmentContinuePage user={user}/>;if(route==='/candidate/match')return <CandidateMatchPage user={user}/>;const legalAidTopicMatch=route.match(/^\/candidate\/account\/legal-aid\/([a-z-]{5,60})$/);
+  if(/^\/companies\/[a-z-]{2,60}$/.test(route))return <CompanyProfilePage user={user} slug={route.split('/').pop()!}/>;if(route==='/auth')return <PhoneAuthPage user={user} onUser={setUser} accountType="candidate" initialMode="login"/>;if(route==='/candidate/login'||route==='/candidate/register')return <PhoneAuthPage user={user} onUser={setUser} accountType="candidate" initialMode={route.endsWith('/register')?'register':'login'}/>;if(route==='/candidate/email-login'||route==='/candidate/email-register')return <AuthPage user={user} onUser={setUser} accountType="candidate" initialMode={route.endsWith('register')?'register':'login'}/>;if(route==='/candidate/official-outbound')return <OfficialRecruitmentContinuePage user={user}/>;if(route==='/candidate/match')return <Shell user={user}><MatchWorkspaceSlot/></Shell>;const legalAidTopicMatch=route.match(/^\/candidate\/account\/legal-aid\/([a-z-]{5,60})$/);
  const isCandidateWorkspaceRoute=route==='/candidate'||route==='/candidate/account'||route==='/candidate/account/match'||route==='/candidate/saved'||route==='/candidate/account/rights'||route==='/candidate/account/legal-aid'||route==='/candidate/account/legal-aid/intervention'||!!legalAidTopicMatch||/^\/candidate\/account\/(profile|preferences|resume|applications|privacy|apply-assistant|career)$/.test(route);
  if(user?.account_types?.includes('candidate')&&isCandidateWorkspaceRoute){
   const section=route==='/candidate'||route==='/candidate/account'?'overview':
@@ -215,7 +234,7 @@ const logout=async()=>{
    legalAidTopicMatch?'legal-aid-topic':
    route.split('/').pop() as 'profile'|'preferences'|'resume'|'applications'|'privacy'|'apply-assistant'|'career';
   const externalSections={
-   match:<CandidateMatchPage user={user} embedded/>,
+   match:section==='match'?<MatchWorkspaceSlot/>:null,
    rights:<WorkplaceRightsPage user={user} embedded/>,
    'legal-aid':<LegalAidLandingPage user={user} embedded/>,
    'legal-aid-intervention':<LegalAidInterventionPage user={user} embedded/>,

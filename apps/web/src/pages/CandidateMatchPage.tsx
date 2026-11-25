@@ -14,7 +14,7 @@ import '../styles/resume-match.css';
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const maxResumeSize=12*1024*1024;
 
-export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedded?:boolean}){
+export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:{user:User|null;embedded?:boolean;hosted?:boolean;hostRoute?:string}){
  const [file,setFile]=useState<File|null>(null);
  const [savedFiles,setSavedFiles]=useState<PrivateResume[]>([]);
  const [savedId,setSavedId]=useState('');
@@ -61,6 +61,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
  const [error,setError]=useState('');
 
  const [result,setResult]=useState<MatchResponse|null>(null);
+ const [taskFailure,setTaskFailure]=useState(false);
+ const taskOpen=useRef(false);
  const [optimizationSource,setOptimizationSource]=useState('');
  const controller=useRef<AbortController|null>(null);
  const lastSearch=useRef<{text:string;options:MatchOptions;resumeId?:string}|null>(null);
@@ -88,16 +90,18 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
      catch{return {items:[],failed:true};}
     }));
     void versionGroups.then(groups=>{if(active&&current===generation){setWordVersions(groups.flatMap(group=>group.items));setWordVersionNotice(groups.some(group=>group.failed)?'部分岗位版本暂无法读取，可继续选择原始简历。':'');}});
-    setSavedId(previous=>previous&&rows.some(item=>item.id===previous)?previous:'');
+    if(!taskOpen.current)setSavedId(previous=>previous&&rows.some(item=>item.id===previous)?previous:'');
     const requested=deepLinkPending.current;
     if(requested){
      deepLinkPending.current=null;
+     if(taskOpen.current||controller.current){setVaultError('当前匹配任务仍保留，请先查看或结束本次任务，再选择其他简历。');return;}
      const entry=rows.find(item=>item.id===requested);
      if(/^[0-9a-f-]{36}$/.test(requested)&&entry){
       const scope=wordDeepLink.current.get('word_scope'),revision=Number(wordDeepLink.current.get('word_revision'));
       if(scope&&/^vault-scope-v1-[a-f0-9]{64}$/.test(scope)&&Number.isInteger(revision)&&revision>0){
        void versionGroups.then(groups=>{if(active&&current===generation){
         const selected=groups.flatMap(group=>group.items).find(item=>item.resume.id===entry.id&&item.version.scope===scope&&item.version.revision===revision);
+        if(taskOpen.current||controller.current)return;
         if(selected)void selectWordVersion(selected.resume,selected.version);else setVaultError('岗位简历版本已变化或不可用，请重新选择。');
        }});
       }else if(!scope){setSavedId(requested);void preview(entry);}
@@ -118,12 +122,12 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    window.removeEventListener('hhba:real-auth-changed',reload);};
  },[user?.id]);
  async function selectWordVersion(resume:PrivateResume,version:SavedWordVersion){
-  if(working||saveBusy||controller.current)return;
+  if(working||saveBusy||controller.current||taskOpen.current)return;
   wordVersionRequest.current?.abort();const abort=new AbortController();wordVersionRequest.current=abort;
   setWordVersionBusy(true);setVaultError('');
   try{
    const bytes=await wordSourceBytes(resume.id,version.revision,version.scope,abort.signal);
-   if(abort.signal.aborted||controller.current)return;
+   if(abort.signal.aborted||controller.current||taskOpen.current)return;
    const name=version.jobLabel.replace(/[<>:"/\\|?*]/g,'').slice(0,80)||'岗位专属简历';
    // A new input uses the exact optimized bytes, never the original file ID.
    // The user may match once or explicitly save a new independent source.
@@ -132,7 +136,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   finally{if(wordVersionRequest.current===abort){wordVersionRequest.current=null;setWordVersionBusy(false);}}
  }
  function selectSavedResume(id:string){
-  if(working||saveBusy)return;
+  if(working||saveBusy||taskOpen.current)return;
   wordVersionRequest.current?.abort();wordVersionRequest.current=null;setWordVersionBusy(false);
   deepLinkPending.current=null;
   previewController.current?.abort();
@@ -145,7 +149,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   if(entry)void preview(entry);
  }
  function choose(candidate:File|null){
-  if(working||saveBusy)return;
+  if(working||saveBusy||taskOpen.current)return;
   wordVersionRequest.current?.abort();wordVersionRequest.current=null;setWordVersionBusy(false);
   deepLinkPending.current=null;
   setSavedPickerOpen(false);
@@ -228,9 +232,10 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
   finally{setSaveBusy(false)}
  }
  async function run(){
-  if((!file&&!savedId)||!consent||working||saveBusy||wordVersionBusy||controller.current||previewBusy||ocrBusy||!previewLoaded||
+  if((!file&&!savedId)||!consent||working||saveBusy||wordVersionBusy||taskOpen.current||controller.current||previewBusy||ocrBusy||!previewLoaded||
    identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()||
    (file&&!savedId&&storageChoice==='undecided'))return;
+  taskOpen.current=true;setTaskFailure(false);
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
   const abort=new AbortController();
   controller.current=abort;
@@ -270,7 +275,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    // Keep selected file for return-to-edit. No automatic re-analysis.
    setConsent(false);
   }catch(e){
-   if(!abort.signal.aborted)setError(e instanceof Error?e.message:'智能匹配暂时失败，请稍后再试。');
+   if(!abort.signal.aborted){setTaskFailure(true);setError(e instanceof Error?e.message:'智能匹配暂时失败，请稍后再试。');}
   }finally{setWorking(false);controller.current=null}
  }
  async function continueSearch(){
@@ -326,7 +331,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
    setSyntheticError(e instanceof Error?e.message:'合成简历验收失败。');
   }finally{setSyntheticBusy(false)}
  }
- return <Shell user={user} embedded={embedded}>
+ return <Shell user={user} embedded={embedded||hosted}>
   <section className={embedded?'hhba-ai-page hhba-ai-page-embedded':'hhba-ai-page'}>
     {!embedded&&<nav className="hhba-ai-breadcrumb"><Link to="/candidate/account"><ArrowLeft size={15}/> 工作台</Link>
      <span>/</span><strong>简历智能匹配</strong></nav>}
@@ -493,13 +498,14 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
-          disabled={(!file&&!savedId)||!consent||working||saveBusy||wordVersionBusy||previewBusy||ocrBusy||!previewLoaded||
+          disabled={(!file&&!savedId)||!consent||working||saveBusy||wordVersionBusy||taskOpen.current||previewBusy||ocrBusy||!previewLoaded||
            (file&&!savedId&&storageChoice==='undecided')||
            identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()}>
           {working?<><LoaderCircle className="spin" size={18}/> {saveBusy?'正在保存简历…':'正在匹配岗位…'}</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>
-        {working&&<p className="hhba-ai-processing" role="status">智能研究正在进行。可通过研究窗口或右下角任务入口查看进度；收起窗口不会取消当前页面的搜索。</p>}
+        {!working&&taskOpen.current&&<p role="status">本次研究结果仍在任务窗口中，请通过悬浮入口查看或关闭后再开始新匹配。</p>}
+        {working&&<p className="hhba-ai-processing" role="status">智能研究正在进行。可通过研究窗口或右下角任务入口查看进度；收起窗口或切换站内页面不会取消搜索。</p>}
       </section>
       <aside className="hhba-ai-aside">
         <div className="hhba-ai-aside-card"><h3>只需三步</h3>
@@ -509,7 +515,8 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
          <p className="hhba-ai-aside-footnote">工作地点仅限中国大陆；招聘状态请以岗位原始网页为准。</p>
       </aside>
     </div>
-    {((result||partialJobs.length>0)||working||researchJobs.length>0)&&<CandidateMatchNativeDialog
+    {((result||partialJobs.length>0)||working||researchJobs.length>0||taskFailure)&&<CandidateMatchNativeDialog
+      hostRoute={hostRoute} taskFailed={taskFailure}
       result={result||{matches:partialJobs,profile:researchReport?.profile}}
       researchReport={result?.research_report||researchReport} researchJobs={result?.research_leads||researchJobs}
       pending={working&&!result} progressStage={stage} progressActivity={activity}
@@ -523,7 +530,7 @@ export function CandidateMatchPage({user,embedded=false}:{user:User|null;embedde
         notice:saveNotice,onConsent:setSaveConsent,onSave:()=>void saveResume()
        }:result&&savedId?{available:false,saved:true,consent:false,saving:false,
         notice:saveNotice,onConsent:()=>{},onSave:()=>{}}:undefined}
-      onClose={()=>{if(working)controller.current?.abort();setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);setResult(null);setWorking(false);}}/>}
+      onClose={()=>{if(working)controller.current?.abort();taskOpen.current=false;setTaskFailure(false);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);setResult(null);setWorking(false);}}/>}
      <div className="hhba-ai-footer"><Link to="/candidate/jobs">不上传简历，直接搜索公开岗位 <ArrowRight size={15}/></Link></div>
   </section>
  </Shell>;
