@@ -37,3 +37,29 @@ test('width adapts to provider health, no job or search round cap; roles are div
  assert.equal(nextDiscoveryWidth(3,[]),4);assert.equal(nextDiscoveryWidth(6,['AI_PROVIDER_RATE_LIMITED']),3);assert.equal(nextDiscoveryWidth(1,[]),2);
  assert.equal(discoveryLaneContext({profile:{target_roles:['运营','销售']},round:1,lane:2,width:3}).independent_direction_hint,'销售');
 });
+
+test('pipeline merges a completed verification, preserving search state and changed candidate rechecks',async()=>{
+ const {candidateRevision,pendingVerification,verificationSnapshot,mergePipelineCheckpoint}=await import('../functions/_lib/v4-research-pipeline.js');
+ const a=job(1),b=job(2),changed={...a,requirements:'new JD evidence'};
+ const old={phase:'research',rows:[[a.url,a],[b.url,b]],diagnostics:{A:1},publicEvidence:[{url:a.url,text:'old'}]};
+ const attempt=pendingVerification(old).slice(0,1);
+ const verify={...verificationSnapshot(old),phase:'verification',matches:[{official_url:a.url,research_candidate_url:a.url,match_score:88}],scored:1,read:1,diagnostics:{A:1,B:1},publicEvidence:[...old.publicEvidence,{url:b.url,text:'verified'}]};
+ const discover={...old,rows:[[a.url,changed],[b.url,b],[job(3).url,job(3)]],diagnostics:{A:2},publicEvidence:[...old.publicEvidence,{url:b.url,text:'search'}]};
+ const result=mergePipelineCheckpoint(old,discover,verify,attempt);
+ assert.equal(result.priorState.scored,1);
+ assert.equal(result.processedEvidence[0][1],candidateRevision(a));
+ assert.equal(pendingVerification(result).length,3,'changed evidence must still be verified');
+ assert.deepEqual(result.diagnostics,{A:2,B:1,PIPELINE_VERIFICATION_ATTEMPTS:1});
+ assert.equal(result.publicEvidence.length,3);assert.equal(result.publicEvidence[1].text,'search');
+ const next=mergePipelineCheckpoint(old,{...old,phase:'verification',next:0},verify,attempt);
+ assert.equal(next.matches[0].match_score,88);assert.equal(next.scored,1);assert.equal(pendingVerification(next).length,1);
+ assert.equal(old.processedEarlier,undefined);
+});
+test('pipeline retains successful search when verification fails, and filters rejected board results',async()=>{
+ const {mergePipelineCheckpoint}=await import('../functions/_lib/v4-research-pipeline.js');
+ const a=job(1),old={phase:'research',rows:[[a.url,a]]};
+ const discovery={...old,rows:[...old.rows,[job(2).url,job(2)]]};
+ assert.deepEqual(mergePipelineCheckpoint(old,discovery,null,[]),discovery);
+ const result=mergePipelineCheckpoint(old,discovery,{rejectedBoards:[a.url],matches:[{official_url:a.url}],read:0},[[a.url,a]]);
+ assert.equal(result.rows.length,1);assert.deepEqual(result.priorState.matches,[]);
+});

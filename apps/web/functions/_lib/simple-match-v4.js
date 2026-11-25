@@ -14,6 +14,7 @@ import {v4ResearchMemoryPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4Reques
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch} from './v4-jd-research.js';
 import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery} from './v4-parallel-discovery.js';
+import {candidateRevision,pendingVerification,verificationSnapshot,mergePipelineCheckpoint} from './v4-research-pipeline.js';
 
 const BASE='https://api-c.reqtoken.com/v1';
 function providerBase(value){
@@ -433,12 +434,46 @@ function renderJob(x,url,verified,resume,toolLinked,index,toolUrls=new Set()){
  * even if a later round or optional verification has an upstream failure.
  */
 export async function v4Match(fetcher,provider,resume,roleHint,
- {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},onResearch=()=>{},officialOnly=false,curated=false,env={},excludeUrls=[],checkpoint=null,stepMode=false,onRecoveryState=()=>{},allowContinue=false,parallelResearch=false}={}){
+ {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},onResearch=()=>{},officialOnly=false,curated=false,env={},excludeUrls=[],checkpoint=null,stepMode=false,onRecoveryState=()=>{},allowContinue=false,parallelResearch=false,pipelineChild=false}={}){
  // The real route uses durable checkpoints; the direct invocation path uses the same batches.
  if(curated&&!stepMode){
   let current=checkpoint,result;
   do{result=await v4Match(fetcher,provider,resume,roleHint,{signal,onProgress,onActivity,onPartial,onResearch,officialOnly:true,curated:true,env,excludeUrls,checkpoint:current,stepMode:true,onRecoveryState,allowContinue,parallelResearch});current=result.checkpoint;}while(result.status==='CONTINUE');
   return result;
+ }
+ // Run one existing verification phase alongside the next discovery phase.
+ // Use a separate snapshot and merge only completed branches; failures do not
+ // invalidate paid work completed by the other branch.
+ if(curated&&parallelResearch&&!pipelineChild&&checkpoint?.phase==='research'&&!checkpoint.backfillSignature&&(!checkpoint.priorState||checkpoint.pipelineActive)){
+  const eligible=pendingVerification(checkpoint);
+  if(eligible.length){
+   const attempted=eligible.slice(0,1),verify=verificationSnapshot(checkpoint);
+   const search=structuredClone(checkpoint);
+   // Reserve outgoing connection headroom for JD fetch/score work. Width
+   // applies to this transport wave only and is not a search-count limit.
+   search.discoveryWidth=Math.min(search.discoveryWidth||initialDiscoveryWidth,4);
+   const common={signal,officialOnly:true,curated:true,env,excludeUrls,stepMode:true,allowContinue,parallelResearch,pipelineChild:true};
+   onActivity('searching','AI 正在并行发现新岗位，同时核验并评分已收集的岗位。');
+   const [discovery,verified]=await Promise.allSettled([
+    v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:search,onProgress,onActivity,onPartial,onResearch}),
+    v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:verify,onActivity:(_stage,message)=>onActivity('searching',message)})
+   ]);
+   if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
+   if(discovery.status==='rejected'&&verified.status==='rejected')throw discovery.reason;
+   const searchState=discovery.status==='fulfilled'?discovery.value.checkpoint:search;
+   if(!searchState)throw fault('AI_PIPELINE_STATE_INVALID');
+   const verifyState=verified.status==='fulfilled'?verified.value.checkpoint:null;
+   const next=mergePipelineCheckpoint(checkpoint,searchState,verifyState,attempted);
+   next.pipelineActive=true;
+   if(discovery.status==='rejected'){
+    next.discoveryWidth=nextDiscoveryWidth(search.discoveryWidth,[discovery.reason?.code||'AI_PROVIDER_RESPONSE_INVALID']);
+    next.diagnostics={...next.diagnostics,PIPELINE_SEARCH_RETRY_RETAINED:(next.diagnostics?.PIPELINE_SEARCH_RETRY_RETAINED||0)+1};
+   }
+   if(verified.status==='rejected')next.diagnostics={...next.diagnostics,PIPELINE_VERIFICATION_RETRY_RETAINED:(next.diagnostics?.PIPELINE_VERIFICATION_RETRY_RETAINED||0)+1};
+   onActivity('searching','已保留本轮发现和核验成果；累计候选 '+next.rows.length+' 个，已尝试核验 '+(next.processedEarlier||[]).length+' 个。');
+   onRecoveryState(()=>next);
+   return {status:'CONTINUE',checkpoint:next};
+  }
  }
  // A checkpoint is accepted only after account/input-bound signature verification in the HTTP route.
  const rows=new Map((checkpoint?.rows||[]).filter(([u,j])=>!isCommercialRecruitmentBoard(u,j))),toolUrls=new Set((checkpoint?.toolUrls||[]).filter(u=>!isCommercialRecruitmentBoard(u))),excluded=new Set(excludeUrls.map(v4PublicJobUrl).filter(Boolean));
@@ -466,14 +501,14 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const hydrateToolResult=r=>r?.type==='batch'?{...r,results:r.results.map(hydrateToolResult)}:r?.type==='text_page'&&r.collection==='resume'?{...r,text:resume.slice(r.offset,r.offset+r.page_length)}:r;
  const candidateMemory=()=>[...rows.entries()].map(([url,j])=>({url,company:j.company,title:j.title,location:j.location}));
  const unresolvedMemory=()=>priorState?priorState.matches.filter(j=>j.jd_source_status!=='VERIFIED_JD'||j.source_type!=='站外官方招聘'||!Number.isInteger(j.match_score)||j.report_status==='UNAVAILABLE').map(j=>({url:j.research_candidate_url||j.official_url,official_url:j.official_url,company:j.company,title:j.title,location:j.location,score:j.match_score,reason:j.score_basis})):[];
- const candidateEvidence=j=>JSON.stringify([j.company,j.title,j.location,j.employer_proof_url,j.employer_proof_urls,j.requirements]);
+ const candidateEvidence=candidateRevision;
  const priorState=checkpoint?.priorState||null;
  const backfillSignature=checkpoint?.backfillSignature||'';
  const reviewedOutcomes=new Set(checkpoint?.reviewedOutcomes||[]);
  let completionReason=checkpoint?.completionReason||'';
  const note=code=>{diag[code]=(diag[code]||0)+1;};
  const publishResearch=()=>onResearch(report());
- const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],researchToolResult,researchContextBudget,discoveryWidth,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],...extra}});
+ const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],researchToolResult,researchContextBudget,discoveryWidth,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,pipelineActive:!!checkpoint?.pipelineActive,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],...extra}});
  onRecoveryState(()=>checkpoint?{...checkpoint,publicEvidence}:null);
  // This phase is reachable only after every candidate has completed a verification
  // attempt. Report generation cannot influence the initial score ranking.
@@ -545,7 +580,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(final.length<FINAL_TARGET)note('UNDERFILLED_EXPANSION');
    note('AI_FINAL_REVIEW');reviewedOutcomes.add(candidateSetSignature);
    onActivity('searching','AI 正在复盘候选覆盖与未完成核验的岗位，自主补充研究及官方证据。');
-   return continuation('research',{processedEarlier:[...rows.keys()],processedEvidence:[...rows.entries()].map(([u,j])=>[u,candidateEvidence(j)]),explicitRechecks:[],recheckedEvidence:[],actionSeen:[],submittedSources:[...reviewedSources.keys()],researchToolResult:null,backfillSignature:candidateSetSignature,priorState:{matches:combined,read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures},stalledStrategy:'',stalledSearches:[],providerRecovery:'',researchError:null,recoveryHint:'已尝试核验全部现有候选，当前有 '+final.length+' 份正式推荐，'+concreteCount()+' 个具体候选。请自主复盘搜索覆盖、失败原因及尚未解决的候选，可选择寻找新机会或补充旧岗位的新官方证据。不要重复无变化的候选，不凑数。若确无新增可信证据，请明确完成并说明原因。诊断：'+JSON.stringify(diag)});
+   return continuation('research',{pipelineActive:false,processedEarlier:[...rows.keys()],processedEvidence:[...rows.entries()].map(([u,j])=>[u,candidateEvidence(j)]),explicitRechecks:[],recheckedEvidence:[],actionSeen:[],submittedSources:[...reviewedSources.keys()],researchToolResult:null,backfillSignature:candidateSetSignature,priorState:{matches:combined,read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures},stalledStrategy:'',stalledSearches:[],providerRecovery:'',researchError:null,recoveryHint:'已尝试核验全部现有候选，当前有 '+final.length+' 份正式推荐，'+concreteCount()+' 个具体候选。请自主复盘搜索覆盖、失败原因及尚未解决的候选，可选择寻找新机会或补充旧岗位的新官方证据。不要重复无变化的候选，不凑数。若确无新增可信证据，请明确完成并说明原因。诊断：'+JSON.stringify(diag)});
   }
   const incomplete=!!researchError||(searchResumePaged&&searchResumeOffset<resume.length)||concreteCount()<CANDIDATE_TARGET||final.length<FINAL_TARGET||!!checkpoint.scoreFailures||reportFailures>0||[...sourceLeads].some(u=>!rows.has(u)&&!reviewedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u));
   if(!final.length)note('NO_FORMAL_RECOMMENDATIONS');
@@ -557,7 +592,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     +(rows.size<CANDIDATE_TARGET?' 本轮真实候选不足500个。':'')+(researchError?' 本轮联网研究未完整结束。':'')+(reportFailures?' 部分高分候选的深度报告未通过核验，已保留其评分并按顺序补位。':'')+(checkpoint.scoreFailures?' 部分岗位评分未通过原文证据核验，已保留线索与诊断。':''),
    native_search:{mode:'V4_SIMPLE_AI',stage:incomplete?'partial':'complete',diagnostics:{...diag},searches:round,candidate_links:rows.size,page_reads:checkpoint.read,visible_jobs:final.length,research_error:researchError||undefined,
     jd_verification:{eligible:rows.size,verified,failed:Math.max(0,rows.size-verified),scored:checkpoint.scored,archived:checkpoint.archived},score_failures:checkpoint.scoreFailures,report_failures:reportFailures},
-   can_continue:allowContinue,...(allowContinue?{resume_checkpoint:continuation('research',{processedEarlier:[...rows.keys()],processedEvidence:[...rows.entries()].map(([u,j])=>[u,candidateEvidence(j)]),explicitRechecks:[],recheckedEvidence:[],actionSeen:[],submittedSources:[...reviewedSources.keys()],researchToolResult:null,backfillSignature:'',priorState:{matches:combined,read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures},stalledStrategy:'',stalledSearches:[],reviewedStalls:[],reviewedOutcomes:[],providerRecovery:'',researchError:null,recoveryHint:'用户主动要求在已有研究成果上继续扩展。请自主探索新的官方招聘机会并复查未解决的来源；保留已有经核验评分和报告，按全部候选重新排序。'}).checkpoint}: {})};
+   can_continue:allowContinue,...(allowContinue?{resume_checkpoint:continuation('research',{pipelineActive:false,processedEarlier:[...rows.keys()],processedEvidence:[...rows.entries()].map(([u,j])=>[u,candidateEvidence(j)]),explicitRechecks:[],recheckedEvidence:[],actionSeen:[],submittedSources:[...reviewedSources.keys()],researchToolResult:null,backfillSignature:'',priorState:{matches:combined,read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures},stalledStrategy:'',stalledSearches:[],reviewedStalls:[],reviewedOutcomes:[],providerRecovery:'',researchError:null,recoveryHint:'用户主动要求在已有研究成果上继续扩展。请自主探索新的官方招聘机会并复查未解决的来源；保留已有经核验评分和报告，按全部候选重新排序。'}).checkpoint}: {})};
  }
  const startRound=round;
  let lastProviderEvent='';
@@ -621,7 +656,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    };
    // Keep tool-action/long-resume paging with the coordinator. Complementary
    // search lanes are useful during broad discovery, not repeated source review.
-   const canParallel=parallelResearch&&curated&&!activeResumePage&&!researchToolResult&&concreteCount()<CANDIDATE_TARGET&&!priorState;
+   const canParallel=parallelResearch&&curated&&!activeResumePage&&!researchToolResult&&concreteCount()<CANDIDATE_TARGET&&(!priorState||checkpoint?.pipelineActive&&!backfillSignature);
    if(canParallel){
     const width=discoveryWidth;
     onActivity('searching','主研究 Agent 与 '+(width-1)+' 个辅助 Agent 正在并行搜索企业官方岗位。');
@@ -754,7 +789,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    onPartial(curated?mergeJobEvidence((priorState?.matches||[]).filter(j=>!rejectedBoards.has(j.research_candidate_url||j.official_url)),previews):previews);
   }
   onActivity('searching','第 '+round+' 轮研究已完成，累计取得 '+rows.size+
-   (curated?' 个具体候选岗位，达到目标后全面核验及评分。':' 条可追溯来源；AI 正在判断是否需要继续搜索。'));
+   (curated?(parallelResearch?' 个候选岗位，持续发现并接续已收集岗位的核验评分。':' 个具体候选岗位，达到目标后全面核验及评分。'):' 条可追溯来源；AI 正在判断是否需要继续搜索。'));
   // Older compatible relay outputs may not contain the new boolean.
   // No numeric round/position threshold controls completion.
   // A different phrasing of an existing recommendation is not discovery.
@@ -825,7 +860,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // gets the same full-JD verification and independent scoring attempt.
  if(stepMode&&checkpoint?.phase!=='verification'&&(curated||rows.size))return continuation('verification',{next:0,matches:priorState?.matches||[],read:priorState?.read||0,scored:priorState?.scored||0,archived:priorState?.archived||0,scoreFailures:priorState?.scoreFailures||0,reportFailures:priorState?.reportFailures||0,priorState:null});
  const offset=checkpoint?.phase==='verification'?checkpoint.next:0;
- const allEntries=[...rows.entries()].filter(([u,j])=>!processedEarlier.has(u)||processedEvidence.get(u)!==candidateEvidence(j)||explicitRechecks.has(u));
+ const allEntries=pendingVerification({rows:[...rows],processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],rejectedBoards:[...rejectedBoards]});
  // Process small batches across separate requests to keep provider, fetch, D1 and R2 calls within a Worker invocation.
  // The batch size is not a recommendation limit; every discovered entry is processed.
  const batchSize=curated?(checkpoint?.verificationBatch||(parallelResearch?3:1)):2;
