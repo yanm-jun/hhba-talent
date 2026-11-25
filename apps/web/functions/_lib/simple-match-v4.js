@@ -10,7 +10,7 @@ import {sha256Hex} from './real-auth.js';
 import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
 import {CANDIDATE_TARGET,FINAL_TARGET,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,reportCoverageErrors,referenceSourceErrors,eligibleCuratedScore,qualifiedReport,validateGeminiGlobalOrder,applyGeminiGlobalOrder,mergeGeminiRankProgress,carryGeminiRankProgress} from './v4-curated-reports.js';
 import {findMainlandCity} from './mainland-job-location.js';
-import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4NotesMemoryPage,v4MemoryRecordPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex,v4KnownPublicResearchUrls,v4ResearchEvidenceProgress,v4MayContinueBrowserRead} from './v4-research-tools.js';
+import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4NotesMemoryPage,v4MemoryRecordPage,v4NextStallRead,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex,v4KnownPublicResearchUrls,v4ResearchEvidenceProgress,v4MayContinueBrowserRead} from './v4-research-tools.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch} from './v4-jd-research.js';
 import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery} from './v4-parallel-discovery.js';
@@ -444,16 +444,14 @@ async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,br
    tools:[{type:'web_search'}],tool_choice:'auto',include:['web_search_call.action.sources']
   },{parse:v4ParseJson,sourceUrls:[job.official_url,...facts.map(f=>f.url)],fetcher,browser,signal,resume,ledger,note,taskNotes});
   const value=v4ParseJson(reply),reference=text(value.reference_jd),basis=text(value.reference_basis);
-  if(reference&&basis)Object.assign(job,{reference_jd:reference,reference_jd_basis:basis,reference_jd_kind:'AI_GENERATED_REFERENCE'});
   if(reply.status!=='completed'||!reference||!basis){const issue=JSON.stringify([reply.status,reference,basis]);if(seen.has(issue)){note('JD_REFERENCE_NO_NEW_PROGRESS');return;}seen.add(issue);previous=value;repair='输出不完整或缺少参考JD及依据，请保留已完成内容并独立补全，分段使用研究工具，不必重新搜索完整官方JD。';continue;}
-  Object.assign(job,{reference_jd:reference,reference_jd_basis:basis,reference_jd_kind:'AI_GENERATED_REFERENCE',score_basis:'AI 参考JD：非官方招聘原文，实际职责及资格以雇主为准。'});
   if(typeof value.score==='number'&&Number.isFinite(value.score)&&value.score>=0&&value.score<=100)value.score=Math.round(value.score);
   const report=validateCuratedReport(value,resume,reference);
-  if(fullResearch&&report.ok){
-   const coverage=[...reportCoverageErrors(value,reference,{reference:true}),...referenceSourceErrors(value,job)];
-   if(coverage.length){report.ok=false;report.errors=coverage;note('JD_REFERENCE_COVERAGE_REVIEW');}
-  }
-  if(report.ok){
+  const coverage=fullResearch?[...reportCoverageErrors({...value,suitable:true},reference,{reference:true}),...referenceSourceErrors(value,job)]:[];
+  if(coverage.length){report.ok=false;report.errors=[...new Set([...(report.errors||[]),...coverage])];note('JD_REFERENCE_COVERAGE_REVIEW');}
+  // Drafts remain local to the repair loop; publish only reviewed material.
+  const publishReference=()=>{
+   let reviewedBasis=basis;
    if(fullResearch){
     const anchors=value.reference_source_anchors;
     const explain=(key,label)=>{
@@ -462,13 +460,21 @@ async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,br
      const f=facts.find(f=>f.url===a.url&&norm(f.quote).includes(norm(a.quote)));
      return label+'：'+(f?.context==='same_job'?'该岗位公开资料':'相关公开资料（非该岗位已确认要求）')+'「'+a.quote+'」。';
     };
-    job.reference_jd_basis=[basis,explain('duties','职责整理依据'),explain('capabilities','能力方向依据')].join('\n');
+    reviewedBasis=[basis,explain('duties','职责整理依据'),explain('capabilities','能力方向依据')].join('\n');
    }
+   Object.assign(job,{reference_jd:reference,reference_jd_basis:reviewedBasis,reference_jd_kind:'AI_GENERATED_REFERENCE'});
+  };
+  if(report.ok){
+   publishReference();
    Object.assign(job,{match_score:value.score,reference_score:value.score,evidence_score_status:'AI_REFERENCE_JD_SCORED',score_evidence_status:undefined,curated_suitable:true,score_basis:'AI 参考JD适配分（依据真实简历与推断职责，不是官方JD匹配分或录用概率）',recommendation_reason:text(value.reason),matched:texts(value.matched),not_evidenced:texts(value.gaps),research_detail:report.report,report_status:'COMPLETE'});
    note(job.reference_vacancy_verified?'JD_REFERENCE_VERIFIED_VACANCY_SCORED':'JD_REFERENCE_UNVERIFIED_LEAD_SCORED');
    return;
   }else if(value.suitable===false){job.curated_suitable=false;job.report_status='DECLINED';job.recommendation_reason=text(value.reason);return;}
-  else {const issue=JSON.stringify([report.errors,value]);if(seen.has(issue)){note('JD_REFERENCE_SCORE_UNCONFIRMED');return;}seen.add(issue);previous=value;repair='独立复核参考分析：'+report.errors.join(',')+'。根据真实企业资料补充具体职责、能力建议及逐项对照，核对reference_source_anchors，不把推断冒充官方要求；只有标题时提供明确标注的求职准备方向，保留可信内容与未知项；检查真实简历引文与参考文本引文；没有可靠依据允许null，不编造。';if(value.score===null&&seen.size>1)return;continue;}
+  else {const issue=JSON.stringify([report.errors,value]);if(seen.has(issue)){note('JD_REFERENCE_SCORE_UNCONFIRMED');return;}seen.add(issue);previous=value;repair='独立复核参考分析：'+report.errors.join(',')+'。根据真实企业资料补充具体职责、能力建议及逐项对照，核对reference_source_anchors，不把推断冒充官方要求；只有标题时提供明确标注的求职准备方向，保留可信内容与未知项；检查真实简历引文与参考文本引文；没有可靠依据允许null，不编造。';if(value.score===null&&seen.size>1){
+    // A reliable source-based reference can be useful without a reliable score.
+    if(fullResearch&&!coverage.length&&!(report.errors||[]).some(e=>e.startsWith('comparison_'))){publishReference();Object.assign(job,{match_score:null,reference_score:0,report_status:'UNAVAILABLE',score_basis:'参考岗位资料已整理；简历匹配证据不足，未给出分数。'});}
+    return;
+   }continue;}
  }catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(isV4RetryableProviderError(e?.code))throw e;const issue=e?.code||'JD_REFERENCE_UNAVAILABLE';if(seen.has(issue)){note(issue);return;}seen.add(issue);repair='重新组织完整参考JD及证据评分，修复 '+issue;}
  }
 }
@@ -1087,10 +1093,11 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    }
    if(!fullResearch)return false;
    // Supply actual unread evidence rather than only repeating a prompt.
-   const u=[...sourceLeads].find(u=>!rows.has(u)&&!reviewedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u)&&!stallSourceReads.has(u)&&!publicEvidence.some(r=>r.url===u&&r.type==='read_page'));
-   if(!u)return false;
-   stallSourceReads.add(u);
-   researchToolResult=await v4RunResearchAction({type:'read_page',url:u},{collections:{},knownUrls:v4KnownPublicResearchUrls([u],publicEvidence),fetcher,browser:env.BROWSER,signal,budget:researchContextBudget,ledger:publicEvidence});
+   const pending=[...sourceLeads].filter(u=>!rows.has(u)&&!reviewedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u));
+    const action=v4NextStallRead(pending,publicEvidence,stallSourceReads,!!env.BROWSER);
+    if(!action)return false;
+    stallSourceReads.add(JSON.stringify([action.url,action.mode,action.offset||0]));
+    researchToolResult=await v4RunResearchAction(action,{collections:{},knownUrls:v4KnownPublicResearchUrls([action.url],publicEvidence),fetcher,browser:env.BROWSER,signal,budget:researchContextBudget,ledger:publicEvidence});
    v4RememberPublicResult(publicEvidence,researchToolResult);note('AI_STALL_PUBLIC_SOURCE_REVIEW');
    recoveryHint='独立复盘补充了此前未读的公开来源或实际读取失败信息，请依据工具结果判断具体岗位、查找可替代来源或说明无法继续的证据。';
    return true;

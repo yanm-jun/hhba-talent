@@ -473,7 +473,9 @@ export function v4RuntimeBrowserScript(target,exactUrls){
      return route.fulfill({response,headers:Object.fromEntries(Object.entries(response.headers()).filter(([k])=>!/^set-cookie$/i.test(k)))});
     });
     const page=await ctx.newPage();
-    try{await page.goto(cfg.target,{waitUntil:'networkidle',timeout:20000});}catch{}
+    // Preserve DOM even when analytics or long polling prevent network idle.
+     try{await page.goto(cfg.target,{waitUntil:'domcontentloaded',timeout:20000});}catch{}
+     try{await page.waitForLoadState('networkidle',{timeout:5000});}catch{}
     const finalUrl=page.url();
     const html=finalUrl===cfg.target?await page.content():'';
     return {html,finalUrl,observed:[...observed.values()]};

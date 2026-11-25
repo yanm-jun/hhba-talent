@@ -477,3 +477,40 @@ test('reference source anchors distinguish actual employer excerpts from role-ti
  assert.deepEqual(referenceSourceErrors(v(direction,direction),{title}),[]);
  assert.ok(referenceSourceErrors(v({...direction,quote:'其他职位'},direction),{title}).length);
 });
+test('OpenAI and Gemini both default to parallel research and clamp transport slots',async()=>{
+ const {v4ParallelResearchEnabled,nextDiscoveryWidth}=await import('../functions/_lib/v4-parallel-discovery.js');
+ assert.equal(v4ParallelResearchEnabled({HHBA_V4_JOB_PROVIDER:'openai'}),true);
+ assert.equal(v4ParallelResearchEnabled({HHBA_V4_JOB_PROVIDER:'gemini'}),true);
+ assert.equal(v4ParallelResearchEnabled({}),true);
+ assert.equal(v4ParallelResearchEnabled({HHBA_V4_PARALLEL_RESEARCH:'0'}),false);
+ assert.equal(nextDiscoveryWidth(6,['AI_PROVIDER_RESPONSE_INVALID'],{maxConnections:4}),4);
+});
+test('stalled research consumes unread pages and alternate browser evidence without repeating failed actions',async()=>{
+ const {v4NextStallRead}=await import('../functions/_lib/v4-research-tools.js');
+ const u='https://careers.example.cn/job/1',attempted=new Set();
+ const pick=ledger=>v4NextStallRead([u],ledger,attempted,true);
+ assert.equal(pick([]).mode,'static');attempted.add(JSON.stringify([u,'static',0]));
+ const ledger=[{type:'read_page',url:u,mode:'static',offset:0,next_offset:200,text:'first'}];
+ assert.equal(pick(ledger).offset,200);attempted.add(JSON.stringify([u,'static',200]));
+ assert.equal(pick(ledger).mode,'browser');attempted.add(JSON.stringify([u,'browser',0]));
+ assert.equal(pick(ledger),null);
+});
+
+
+test('invalid reference drafts never escape through progress or final candidate records',async()=>{
+ const candidate=job(3100),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ let assessments=0;const visible=[];
+ const fetcher=async(url,opts)=>{
+  if(url===candidate.url)return Response.json({'@type':'JobPosting',title:candidate.title,hiringOrganization:{name:candidate.company,url:new URL(candidate.url).origin},jobLocation:{address:{addressLocality:'上海'}}});
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.original_url)return model({sources:[],research_complete:true,completion_reason:'公开原文未找到'});
+  assessments++;
+  return model({reference_jd:'虚构企业要求三年经验。',reference_basis:'无依据',suitable:true,score:90,reason:'不可靠',resume_quote:'汽车经销商渠道运营',jd_quote:'三年经验',comparisons:[]});
+ };
+ const result=await v4Match(fetcher,provider,resume,'全国',{env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true,parallelResearch:true,onPartial:jobs=>visible.push(JSON.parse(JSON.stringify(jobs))),checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
+ const saved=result.checkpoint.matches[0];
+ assert.ok(assessments>=2);assert.equal(saved.reference_vacancy_verified,true);
+ assert.equal(saved.reference_jd,undefined);assert.equal(saved.reference_jd_kind,undefined);
+ assert.equal(saved.match_score,null);assert.notEqual(saved.report_status,'COMPLETE');
+ assert.ok(visible.flat().every(j=>!j.reference_jd));
+});
