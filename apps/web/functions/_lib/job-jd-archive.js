@@ -187,7 +187,9 @@ function normalizeV4Public(raw){
  // original body; an unclassified section is preferable to deleting evidence.
  const parsed=extractOfficialJdSections(body,{full:true});
  const sections=parsed?.full_jd===body?parsed.sections:[{id:'JD-001',kind:'other',text:body}];
- return {canonical_url:raw.canonical_url,company,title,location,
+ const sourceUrl=raw.jd_source_url?v4PublicJobUrl(raw.jd_source_url):null;
+ if(raw.jd_source_url&&(!sourceUrl||sourceUrl!==raw.jd_source_url||recruitmentSourceKind(sourceUrl)==='THIRD_PARTY_BOARD'))return null;
+ return {canonical_url:raw.canonical_url,company,title,location,...(sourceUrl?{jd_source_url:sourceUrl}:{}),
   full_jd:body,sections,content_status:'VERIFIED_SECTIONS',
   proof_method:raw.proof_method,source_confirmed:raw.source_confirmed===true,
   independently_read:true};
@@ -229,7 +231,7 @@ export function publicJdPayload(saved,{includeText=true}={}){
  return {
   ok:true,kind:JD_ARCHIVE_KIND,verified:true,job_id:saved.id,
   company:saved.company,title:saved.title,location:saved.location,
-  canonical_url:saved.canonical_url,jd_sha256:saved.jd_sha256,
+  canonical_url:saved.canonical_url,...(saved.jd_source_url?{jd_source_url:saved.jd_source_url}:{}),jd_sha256:saved.jd_sha256,
   checked_at:saved.checked_at,fresh:saved.fresh,
   posting_status:saved.posting_status||'UNTRACKED',
   posting_closed_at:saved.posting_closed_at||null,
