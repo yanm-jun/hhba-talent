@@ -10,7 +10,7 @@ import {sha256Hex} from './real-auth.js';
 import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
 import {CANDIDATE_TARGET,FINAL_TARGET,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,eligibleCuratedScore,qualifiedReport,validateGeminiGlobalOrder,applyGeminiGlobalOrder,mergeGeminiRankProgress,carryGeminiRankProgress} from './v4-curated-reports.js';
 import {findMainlandCity} from './mainland-job-location.js';
-import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4NotesMemoryPage,v4MemoryRecordPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex} from './v4-research-tools.js';
+import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4NotesMemoryPage,v4MemoryRecordPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex,v4KnownPublicResearchUrls} from './v4-research-tools.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch} from './v4-jd-research.js';
 import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery} from './v4-parallel-discovery.js';
@@ -1030,7 +1030,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   if(curated){
    const actions=v4RequestedActions(data);
    if(actions.length){
-    const knownUrls=new Set([...sourceLeads,...rows.keys()].map(v4PublicJobUrl).filter(Boolean));
+    const knownUrls=v4KnownPublicResearchUrls([...sourceLeads,...rows.keys()],publicEvidence);
     const results=await v4RunResearchActions(actions,{collections:{candidates:candidateMemory(),sources:[...sourceLeads],unresolved:unresolvedMemory(),evidence:v4EvidenceIndex(publicEvidence),history:rounds,notes:researchNotes},ledger:publicEvidence,knownUrls,fetcher,browser:env.BROWSER,signal,budget:researchContextBudget,onAction:async(action,run)=>{
      const actionKey=await sha256Hex(JSON.stringify([signature,researchContextBudget,action.type,action.collection,action.cursor,action.url,action.mode,action.offset,action.index,action.discover===true]));
      const repeated=actionSeen.has(actionKey);
