@@ -110,6 +110,8 @@ function revisionKey(key,entry,format){
   key+'.revision-'+entry.id+(format==='docx'?'.docx':'.pdf');
 }
 const hashIsValid=s=>typeof s==='string'&&/^[0-9a-f]{64}$/.test(s);
+const vaultScope=/^vault-scope-v1-([0-9a-f]{64})$/;
+const safeJobLabel=value=>typeof value==='string'?value.replace(/[\u0000-\u001f\u007f]/g,' ').trim().slice(0,180):'';
 function validEntry(entry){
  return entry&&
   (entry.id==='legacy'||typeof entry.id==='string'&&ID.test(entry.id))&&
@@ -122,11 +124,12 @@ function validEntry(entry){
     entry.page_count>=1&&entry.page_count<=20);
 }
 async function approved(bucket,row,jobId,env){
- const jobHash=jobId===undefined?null:
+ const alias=typeof jobId==='string'?vaultScope.exec(jobId):null;
+ const jobHash=jobId===undefined?null:alias?alias[1]:
   await sha256Hex('hhba-word-target-job-v1:'+jobId);
  const key=prefix(row)+(jobHash?'.job-'+jobHash:'');
  const ref=await bucket.get(key+'.json');
- if(!ref)return {key,jobHash,etag:null,revision:0,items:[],saved:null};
+ if(!ref){if(alias)throw Error('RESUME_NOT_FOUND');return {key,jobHash,etag:null,revision:0,items:[],saved:null,jobLabel:''};}
  const raw=await ref.json();
  if(raw?.source_sha256!==row.sha256||
   (raw?.job_scope_sha256??null)!==jobHash)
@@ -144,7 +147,7 @@ async function approved(bucket,row,jobId,env){
    new Set(items.map(x=>x.id)).size!==items.length)
    throw Error('WORD_REVISION_CORRUPT');
  }else throw Error('WORD_REVISION_CORRUPT');
- return {key,jobHash,etag:ref.etag||null,revision,items,saved:revision>0?items[revision-1]:null};
+ return {key,jobHash,etag:ref.etag||null,revision,items,saved:revision>0?items[revision-1]:null,jobLabel:safeJobLabel(raw.job_label)};
 }
 async function versionBytes(bucket,key,entry,format){
  const file=await bucket.get(revisionKey(key,entry,format));
@@ -155,11 +158,11 @@ async function versionBytes(bucket,key,entry,format){
  if(await shaBytes(bytes)!==expected)throw Error('WORD_REVISION_CORRUPT');
  return bytes;
 }
-async function commitManifest(bucket,state,row,revision,items){
+async function commitManifest(bucket,state,row,revision,items,jobLabel=state.jobLabel){
  if(state.items.length&&!state.etag)throw Error('WORD_REVISION_LOCK_UNAVAILABLE');
  const newState={schema:'HHBA_ORIGINAL_WORD_VERSIONS_V2',
   source_sha256:row.sha256,
-  ...(state.jobHash?{job_scope_sha256:state.jobHash}:{}),
+  ...(state.jobHash?{job_scope_sha256:state.jobHash,job_label:safeJobLabel(jobLabel)}:{}),
   revision,items,updated_at:new Date().toISOString()};
  const written=await bucket.put(state.key+'.json',JSON.stringify(newState),{
   httpMetadata:{contentType:'application/json'},
@@ -209,6 +212,30 @@ export async function onRequestGet({request,env}){
   row=await rowFor(db,id,candidate.phone);
   if(!row)return fail('RESUME_NOT_FOUND',404);
   if(!validRow(row))return fail('WORD_INVALID_FILE',422);
+  if(action==='versions'){
+   if(jobs.length)return fail('INVALID_REQUEST',400);
+   const root=prefix(row)+'.job-',cursor=params.get('cursor')||undefined;
+   // Group all revisions of each posting by the first dot after the hash.
+   // Cursor pagination bounds storage requests, not the number of saved jobs.
+   const page=await bucket.list({prefix:root,delimiter:'.',limit:20,...(cursor?{cursor}:{})});
+   const groups=new Set((page.delimitedPrefixes||[]).map(key=>key.slice(root.length).replace(/\.$/,'')));
+   for(const object of page.objects||[]){
+    if(!object.key.startsWith(root))continue;
+    const suffix=object.key.slice(root.length).split('.')[0];if(hashIsValid(suffix))groups.add(suffix);
+   }
+   const items=[];
+   for(const hash of groups){
+    if(!hashIsValid(hash))continue;
+    const scope='vault-scope-v1-'+hash;
+    try{
+     const state=await approved(bucket,row,scope,env);
+     if(state.saved)items.push({scope,jobLabel:state.jobLabel||'岗位专属简历 · '+hash.slice(0,8),revision:state.revision,
+      updatedAt:state.saved.updated_at||'',pdfAvailable:state.saved.verification!=='docx_structure_only'});
+    }catch(error){if(error?.message==='RESUME_NOT_FOUND')continue;throw error;}
+   }
+   if(page.truncated&&!page.cursor)throw Error('WORD_PROCESSING_UNAVAILABLE');
+   return json({ok:true,items,nextCursor:page.truncated?page.cursor:null});
+  }
   if(action==='inspect'){
    const original=await loadBytes(bucket,row);
    const state=await approved(bucket,row,jobId,env);
@@ -352,7 +379,7 @@ export async function onRequestPost({request,env}){
   if(!await stillOwned(db,row,candidate.phone))throw Error('RESUME_NOT_FOUND');
   const dropped=state.items.slice(state.revision).filter(x=>x.id!=='legacy');
   const items=[...state.items.slice(0,state.revision),entry];
-  await commitManifest(bucket,state,row,items.length,items);
+  await commitManifest(bucket,state,row,items.length,items,state.jobLabel||safeJobLabel(body.job_label));
   created=[];
   // Branching after Undo discards unused future revisions, not the original.
   for(const item of dropped){

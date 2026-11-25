@@ -71,7 +71,7 @@ test('matching card layout untouched; only a small button and an active-only opt
 test('one job = one private Word revision scope; the original file is untouched',()=>{
  assert.match(optimizer,/jobId=\{postingScope\}/);
  assert.match(optimizer,/stablePostingScope\(job\.official_url\)/);
- assert.match(word,/saveOriginalWordEdit\(resume\.id,anchor\.text,visual\.proposed\.trim\(\),revision,jobId,anchor\.occurrence,anchor\.occurrenceCount\)/);
+ assert.match(word,/saveOriginalWordEdit\(resume\.id,anchor\.text,visual\.proposed\.trim\(\),revision,jobId,anchor\.occurrence,anchor\.occurrenceCount,jobTitle\)/);
  assert.match(word,/downloadOriginalWordEdited\(resume\.id,jobId,jobTitle,revision\)/);
  assert.match(backend,/hhba-word-target-job-v1:/);
  assert.match(backend,/job_scope_sha256/);

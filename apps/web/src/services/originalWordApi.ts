@@ -96,10 +96,22 @@ export async function wordPreviewBytes(id:string,edited=false,signal?:AbortSigna
   throw Error('简历预览文件不完整。');
  return buffer;
 }
+export type SavedWordVersion={scope:string;jobLabel:string;revision:number;updatedAt:string;pdfAvailable:boolean};
+export async function listSavedWordVersions(id:string,signal?:AbortSignal):Promise<SavedWordVersion[]>{
+ const result:SavedWordVersion[]=[];let cursor:string|null=null;const seen=new Set<string>();
+ do{
+  const response=await send(url(id,'versions')+(cursor?'&cursor='+encodeURIComponent(cursor):''),'GET',undefined,signal);
+  const page=await response.json() as {ok:boolean;items:SavedWordVersion[];nextCursor:string|null};
+  if(!page.ok||!Array.isArray(page.items))throw Error('岗位简历列表读取失败。');
+  result.push(...page.items);cursor=page.nextCursor;
+  if(cursor){if(seen.has(cursor))throw Error('岗位简历列表未完整读取。');seen.add(cursor);}
+ }while(cursor);
+ return [...new Map(result.map(item=>[item.scope,item])).values()].sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));
+}
 export type WordMutationResult={ok:true;saved:boolean;revision:number;total_revisions:number;
  page_count?:number|null;layout_verified?:boolean;pdf_available?:boolean};
-export async function wordSourceBytes(id:string,revision:number,jobId?:string){
- const response=await send(url(id,'source-docx',jobId)+'&revision='+revision);
+export async function wordSourceBytes(id:string,revision:number,jobId?:string,signal?:AbortSignal){
+ const response=await send(url(id,'source-docx',jobId)+'&revision='+revision,'GET',undefined,signal);
  if((response.headers.get('Content-Type')||'').split(';')[0].toLowerCase()!==
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
   throw Error('Word 文件格式不正确，请重试。');
@@ -109,7 +121,7 @@ export async function wordSourceBytes(id:string,revision:number,jobId?:string){
   throw Error('原 Word 文件不完整。');
  return bytes;
 }
-export async function saveOriginalWordEdit(id:string,original:string,text:string,expectedRevision=0,jobId?:string,occurrence?:number,occurrenceCount?:number):Promise<WordMutationResult>{
+export async function saveOriginalWordEdit(id:string,original:string,text:string,expectedRevision=0,jobId?:string,occurrence?:number,occurrenceCount?:number,jobLabel?:string):Promise<WordMutationResult>{
  const capabilities=await wordEditingCapabilities();
  if(!capabilities.enabled)throw Error(messages.WORD_NOT_READY);
  let clientHash:undefined|string;
@@ -124,18 +136,23 @@ export async function saveOriginalWordEdit(id:string,original:string,text:string
  }
  const response=await send('/api/resume-word','POST',{
   action:'edit',resume_id:id,...jobPayload(jobId),original,text,expected_revision:expectedRevision,
+  ...(jobLabel?{job_label:jobLabel}:{}),
   ...(occurrence!==undefined?{occurrence,occurrenceCount}:{}),
   ...(clientHash?{client_docx_sha256:clientHash}:{}),
   confirmed_real:true,consent_word_processing:true
  });
- return response.json();
+ const result=await response.json() as WordMutationResult;
+ if(result.ok)window.dispatchEvent(new Event('hhba:word-versions-changed'));
+ return result;
 }
 export async function shiftOriginalWordRevision(id:string,action:'undo'|'redo',expectedRevision:number,jobId?:string):Promise<WordMutationResult>{
  const response=await send('/api/resume-word','POST',{
   action,resume_id:id,...jobPayload(jobId),expected_revision:expectedRevision,
   confirmed_real:true,consent_word_processing:true
  });
- return response.json();
+ const result=await response.json() as WordMutationResult;
+ if(result.ok)window.dispatchEvent(new Event('hhba:word-versions-changed'));
+ return result;
 }
 async function downloadVerifiedWordResult(id:string,format:'docx'|'pdf',jobId?:string,jobLabel?:string,revision?:number){
  // DOCX retains the original OOXML package. Only optional PDF originates from
