@@ -66,8 +66,8 @@ export function mergePipelineCheckpoint(original,discovery,verification,attempte
  const totals=Object.fromEntries(counters.map(k=>[k,verification[k]||0]));
  // Keep discovery's evidence indices stable for its outstanding tool result.
  const ledger=next.publicEvidence||[];
- const keys=new Set(ledger.map(r=>JSON.stringify([r.url,r.mode,r.offset,r.text])));
- for(const record of verification.publicEvidence||[]){const k=JSON.stringify([record.url,record.mode,record.offset,record.text]);if(!keys.has(k)){keys.add(k);ledger.push(record);}}
+ const keys=new Set(ledger.map(r=>JSON.stringify([r.type,r.url,r.mode,r.document_url,r.offset,r.text])));
+ for(const record of verification.publicEvidence||[]){const k=JSON.stringify([record.type,record.url,record.mode,record.document_url,record.offset,record.text]);if(!keys.has(k)){keys.add(k);ledger.push(record);}}
  next.publicEvidence=ledger;
  next.researchNotes=[...new Set([...(next.researchNotes||[]),...(verification.researchNotes||[])])];
  next.candidateResearchMemory=mergeCandidateResearchMemory(next.candidateResearchMemory,verification.candidateResearchMemory,next.rows);
