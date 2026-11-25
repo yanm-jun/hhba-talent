@@ -63,7 +63,7 @@ export type MatchResponse = {
    search_failures?:number;rejected_links?:number;agent_exit_reason?:string;
    mode?:string;research_error?:string;search_result_links?:number;diagnostics?:Record<string,number>;
    opened_job_pages?:number;model_candidate_rows?:number;model_source_grounded?:number;
-   jd_verification?:{eligible?:number;verified?:number;scored?:number;failed?:number};
+   jd_verification?:{eligible?:number;verified?:number;scored?:number;failed?:number;reference_scored?:number;reference_selected?:number};
    native_error?:string|null;native_mode?:string|null;
    version?:string;stage?:string;queries?:number;fetch_attempted?:number;
    fetch_failures?:number;city_evidence_count?:number;extracted_jobs?:number;

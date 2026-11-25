@@ -195,3 +195,21 @@ test('a verified vacancy without a complete JD retains an AI reference assessmen
  assert.equal(qualifiedReport({...reference,reference_jd:''}),false);
  const saved=safeHistoryJobs([reference])[0];assert.equal(saved.reference_jd,reference.reference_jd);assert.equal(saved.jd_source_status,undefined);assert.equal(saved.score_evidence_status,undefined);assert.equal(saved.evidence_score_status,'AI_REFERENCE_JD_SCORED');
 });
+
+test('actual V4 verification keeps a confirmed vacancy with no JD, generates a reference report and skips official archive',async()=>{
+ const {qualifiedReport}=await import('../functions/_lib/v4-curated-reports.js');
+ const candidate=job(77),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ let providerCalls=0;
+ const fetcher=async(url,opts)=>{
+  if(url===candidate.url)return new Response(JSON.stringify({'@type':'JobPosting',title:candidate.title,hiringOrganization:{name:candidate.company,url:new URL(candidate.url).origin},jobLocation:{address:{addressLocality:'上海'}}}),{headers:{'content-type':'application/json'}});
+  if(url.endsWith('/responses')){
+   providerCalls++;const input=JSON.parse(JSON.parse(opts.body).input);
+   assert.equal(input.job.vacancy_confirmed,true);assert.equal(input.job.title,candidate.title);
+   return model({reference_jd:'可能负责汽车渠道运营及门店协作。',reference_basis:'岗位名称已确认，职责为AI职业方向推断。',suitable:true,score:87,reason:'简历有实际渠道运营经历，与推断方向相关。',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车渠道运营',matched:['渠道运营'],gaps:['实际资格待企业确认'],comparisons:[{jd_quote:'汽车渠道运营',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'真实经历对应推断方向'}],strengths:'渠道运营',risks:'实际职责尚未公开'});
+  }
+  throw Error('unexpected source '+url);
+ };
+ const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
+ assert.equal(result.checkpoint.phase,'reporting');const saved=result.checkpoint.matches[0];
+ assert.equal(providerCalls,1);assert.equal(saved.reference_vacancy_verified,true);assert.equal(saved.reference_jd_kind,'AI_GENERATED_REFERENCE');assert.equal(saved.match_score,87);assert.equal(saved.jd_source_status,undefined);assert.equal(saved.jd_version_id,undefined);assert.equal(saved.score_evidence_status,undefined);assert.equal(qualifiedReport(saved),true);assert.equal(result.checkpoint.scored,0);
+});

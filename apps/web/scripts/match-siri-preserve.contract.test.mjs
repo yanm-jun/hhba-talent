@@ -14,7 +14,7 @@ test('the simpler result cards preserve the original Word editor and the selecte
  const panels=read('../src/components/MatchResearchPanels.tsx');
  const preserved=['岗位匹配','hhba-match-history-confirm','data-hhba-recruitment-outbound="true"','保存到我的简历','完成查看'];
  for(const value of preserved)assert.ok(dialog.includes(value),'preserve result workflow: '+value);
- for(const value of ['匹配分用于求职参考，不是录用概率。','job.company','job.title_zh||job.title','job.location',"jdJob.availability_status==='OPEN_LISTED'",'job.match_score','<CuratedJobReport detail={jdJob.research_detail}/>','job.official_url'])assert.ok(panels.includes(value),'preserve unified result information: '+value);
+ for(const value of ['匹配分用于求职参考，不是录用概率。','job.company','job.title_zh||job.title','job.location',"jdJob.availability_status==='OPEN_LISTED'",'job.match_score','<CuratedJobReport detail={jdJob.research_detail}','job.official_url'])assert.ok(panels.includes(value),'preserve unified result information: '+value);
  assert.match(dialog,/className=\{'hhba-match-modal'\+\(optimizedJobUrl\?' hhba-match-modal-editor':''\)\}/);
  assert.match(dialog,/verifiedMatchReports\(result\.matches\)\.find\(job=>job\.official_url===optimizedJobUrl\)/);
  assert.match(panels,/<button type="button" disabled=\{pending\|\|!optimizationAvailable\|\|!jdJob\.jd_version_id\|\|!jdJob\.jd_sha256\}/);
