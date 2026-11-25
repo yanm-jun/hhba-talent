@@ -69,3 +69,15 @@ test('mobile chooser is compact and accessible without changing the rest of the 
  assert.match(match,/saveResume\(\)/);
  assert.match(match,/linkMatchHistoryResume\(/);
 });
+
+test('optimized Word variants are picked as exact new inputs without associating the original ID',()=>{
+ assert.match(match,/listSavedWordVersions\(resume.id\)/);
+ assert.match(match,/wordSourceBytes\(resume.id,version.revision,version.scope,abort.signal\)/);
+ assert.match(match,/choose\(new File\(\[new Uint8Array\(bytes\).buffer\]/);
+ assert.match(match,/wordVersionRequest.current\?\.abort\(\)/);
+ const ui=read('../src/components/PrivateResumeVault.tsx');
+ assert.match(ui,/hhba-private-word-versions/);
+ assert.match(ui,/jobId=\{editor.version.scope\}/);
+ assert.match(ui,/downloadOriginalWordEdited\(item.id,version.scope,version.jobLabel,version.revision\)/);
+ assert.match(ui,/word_scope=/);
+});
