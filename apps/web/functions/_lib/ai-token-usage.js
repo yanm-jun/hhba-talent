@@ -1,9 +1,10 @@
 import {metricDb,isoDay} from './metric-utils.js';
-export const STAGE_EFFORT=Object.freeze({format:'low',identity:'medium',jd_extract:'medium',jd_coverage:'high',jd_search:'medium',jd_reference:'high',profile:'high',discovery:'medium',score:'high',rank:'high',report:'high',resume_ocr:'medium',resume_optimization:'high',resume_reassess:'high',probe:null,other:null});
+export const STAGE_EFFORT=Object.freeze({format:'medium',identity:'medium',jd_extract:'medium',jd_coverage:'medium',jd_search:'medium',jd_reference:'medium',profile:'medium',discovery:'medium',score:'medium',rank:'medium',report:'medium',resume_ocr:'medium',resume_optimization:'medium',resume_reassess:'medium',probe:null,other:'medium'});
 export function usageStage(stage){return Object.hasOwn(STAGE_EFFORT,stage)?stage:'other'}
 export function stageEffort(provider,stage){
- // An explicit provider override wins; unclassified tasks retain provider defaults.
- return provider.reasoningEffort||(/^gpt-6(?:\.|-)/i.test(provider.model||'')?STAGE_EFFORT[usageStage(stage)]:null)||null;
+ // Normal GPT-6 business calls use medium, even if an old global high override remains.
+ // Capability probes and other models preserve their explicit configuration.
+ return (/^gpt-6(?:\.|-)/i.test(provider.model||'')?STAGE_EFFORT[usageStage(stage)]:null)||provider.reasoningEffort||null;
 }
 const integer=v=>Number.isSafeInteger(v)&&v>=0?v:null;
 export function usageCounts(usage){
