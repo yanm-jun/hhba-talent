@@ -674,8 +674,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    onRecoveryState(saveRank);
    try{
     const reply=await v4StageResearchCall(p=>v4Call(fetcher,provider,p,{signal}),{
-     instructions:'你是全局职业推荐研究员。所有入围候选的岗位真实性已核验，并已按官方JD或明确标注的AI参考JD评分。比较证据充分度、推断的不确定性与适配程度；不能将参考JD当作企业实际要求，不设固定权重或固定比例。比较完整候选池、真实职业经历、明确偏好、发展机会、竞争力及已有深度报告；分数不是唯一排序依据。可自主联网研究公开企业及职业信息，不得将个人资料或简历原文用于搜索；不得修改证据分或虚构岗位。使用输入中的短ID，不使用自造ID。已完成顺序是可调整的研究成果。'+(globalRankState.mode==='insert'?'本轮使用增量插入 JSON {insertions:[{id:待排序ID,after_id:已排序ID或null（最前）}]}，可连续插入多个。不要重复已排序ID。':'优先返回 JSON {ordered_ids:[按综合适合度排序的全部ID]}；若需分阶段，返回包含全部已排序ID及任意数量新ID的更新顺序，或用 insertions 增量插入。')+' 不遗漏真实候选；工具可用于查阅候选及证据原文。',
-     input:JSON.stringify({profile,preferred_job_or_city:roleHint,resume_text:resume,public_document:document,accepted_order:prior,pending_ids:remaining,prior_rank_error:globalRankState.problem||null}),tools:[{type:'web_search'}],tool_choice:'auto',include:['web_search_call.action.sources']
+     instructions:'你是全局职业推荐研究员。所有入围候选的岗位真实性已核验，并已按官方JD或明确标注的AI参考JD评分。比较证据充分度、推断的不确定性与适配程度；不能将参考JD当作企业实际要求，不设固定权重或固定比例。比较完整候选池、真实职业经历、明确偏好、发展机会、竞争力及已有深度报告；分数不是唯一排序依据。可自主联网研究公开企业及职业信息，不得将个人资料或简历原文用于搜索；不得修改证据分或虚构岗位。使用输入中的短ID，不使用自造ID。已完成顺序是可调整的研究成果。'+(globalRankState.mode==='focused_insert'?'独立复核：先选择一个尚未排序的真实候选（优先 focus_id），充分比较现有排序及证据，返回 JSON {insertions:[{id,after_id}]}，可以继续插入其他候选。不要放弃已排序结果。':globalRankState.mode==='insert'?'本轮使用增量插入 JSON {insertions:[{id:待排序ID,after_id:已排序ID或null（最前）}]}，可连续插入多个。不要重复已排序ID。':'优先返回 JSON {ordered_ids:[按综合适合度排序的全部ID]}；若需分阶段，返回包含全部已排序ID及任意数量新ID的更新顺序，或用 insertions 增量插入。')+' 不遗漏真实候选；工具可用于查阅候选及证据原文。',
+     input:JSON.stringify({profile,preferred_job_or_city:roleHint,resume_text:resume,public_document:document,accepted_order:prior,pending_ids:remaining,...(globalRankState.mode==='focused_insert'?{focus_id:remaining[0]}:{}),prior_rank_error:globalRankState.problem||null}),tools:[{type:'web_search'}],tool_choice:'auto',include:['web_search_call.action.sources']
     },{parse:v4ParseJson,sourceUrls:pool.map(j=>j.url),fetcher,browser:env.BROWSER,signal,resume,document,collections:{candidates:pool,history:rounds},ledger:publicEvidence,taskNotes:rankNotes,note});
     const value=v4ParseJson(reply);
     progress=mergeGeminiRankProgress(value,prior,ids);
@@ -684,13 +684,15 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     if(!progress)problem='AI_GLOBAL_RANK_NO_PROGRESS';
    }catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(isV4RetryableProviderError(e?.code))throw e;problem=e?.code||'AI_GLOBAL_RANK_INVALID';}
    if(progress){
-    globalRankState={...globalRankState,ids:progress,mode:'order',problem:null,done:progress.length===ids.length};
+    globalRankState={...globalRankState,ids:progress,mode:globalRankState.mode==='focused_insert'?'focused_insert':'order',problem:null,done:progress.length===ids.length};
     const byId=new Map(pool.map(j=>[j.id,j.url]));globalOrder=progress.map(id=>byId.get(id));
     globalRankError=globalRankState.done?null:'AI_GLOBAL_RANK_IN_PROGRESS';
     note(globalRankState.done?'AI_GLOBAL_RANK_COMPLETE':'AI_GLOBAL_RANK_PROGRESS');
-   }else if(globalRankState.mode!=='insert'){
-    // Switch protocol when no new ranked positions were produced, not on a fixed call count.
+   }else if(globalRankState.mode==='order'){
+    // Change protocol based on evidence of no progress, not a total call budget.
     globalRankState={...globalRankState,mode:'insert',problem};note('AI_GLOBAL_RANK_ALTERNATE');
+   }else if(globalRankState.mode==='insert'){
+    globalRankState={...globalRankState,mode:'focused_insert',problem};note('AI_GLOBAL_RANK_FOCUSED_RECOVERY');
    }else{
     globalRankState={...globalRankState,done:true,problem};globalRankError='AI_GLOBAL_RANK_INCOMPLETE';note(globalRankError);
    }
