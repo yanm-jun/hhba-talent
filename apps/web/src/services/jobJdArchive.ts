@@ -1,4 +1,5 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
+import type {MatchedJob} from './resumeMatch';
 
 export type ArchivedOfficialJd={
  ok:true;kind:'HHBA_VERIFIED_JOB_JD_V1';verified:true;job_id:string;
@@ -8,9 +9,39 @@ export type ArchivedOfficialJd={
  full_jd:string;sections:{id:string;kind:'responsibilities'|'requirements'|'other';text:string}[];
  disclaimer:string;from_cache?:boolean;
 };
+// Snapshot from the selected match, NOT a new verified qualification or JD.
+export type PriorMatchAnalysis=Pick<MatchedJob,
+ 'company'|'title'|'location'|'official_url'|'jd_version_id'|'jd_sha256'|'jd_checked_at'|
+ 'match_score'|'reference_score'|'score_evidence_status'|'evidence_score_status'|
+ 'score_basis'|'recommendation_reason'|'score_reasoning'|'matched'|'not_evidenced'|
+ 'needs_verification'|'requirements_basis'|'research_detail'|'jd_comparisons'|
+ 'jd_research'|'evidence_sources'|'score_breakdown'|'evidence_quality'|'ranking_version'|
+ 'salary'|'experience_requirement'|'required_skills'|'mandatory_skills'|'preferred_skills'|
+ 'minimum_education'|'professional_credential_requirements'|'availability_status'>;
 export type JdAwareJob={
  title:string;requirements:string;official_url?:string;jd_version_id?:string;jd_sha256?:string;
+ prior_match_analysis?:PriorMatchAnalysis;
 };
+// Preserve the complete selected report, including model-selected extra sections.
+// Do not use a placeholder 0 as a measured score.
+export function capturePriorMatchAnalysis(job:MatchedJob):PriorMatchAnalysis{
+ return {
+  company:job.company,title:job.title,location:job.location,official_url:job.official_url,
+  jd_version_id:job.jd_version_id,jd_sha256:job.jd_sha256,jd_checked_at:job.jd_checked_at,
+  match_score:typeof job.match_score==='number'?job.match_score:null,
+  reference_score:job.reference_score,score_evidence_status:job.score_evidence_status,
+  evidence_score_status:job.evidence_score_status,score_basis:job.score_basis,
+  recommendation_reason:job.recommendation_reason,score_reasoning:job.score_reasoning,
+  matched:job.matched,not_evidenced:job.not_evidenced,needs_verification:job.needs_verification,
+  requirements_basis:job.requirements_basis,research_detail:job.research_detail,
+  jd_comparisons:job.jd_comparisons,jd_research:job.jd_research,evidence_sources:job.evidence_sources,
+  score_breakdown:job.score_breakdown,evidence_quality:job.evidence_quality,ranking_version:job.ranking_version,
+  salary:job.salary,experience_requirement:job.experience_requirement,required_skills:job.required_skills,
+  mandatory_skills:job.mandatory_skills,preferred_skills:job.preferred_skills,
+  minimum_education:job.minimum_education,professional_credential_requirements:job.professional_credential_requirements,
+  availability_status:job.availability_status
+ };
+}
 export class JobJdArchiveError extends Error{
  constructor(readonly code:string,readonly status:number){
   const messages:Record<string,string>={

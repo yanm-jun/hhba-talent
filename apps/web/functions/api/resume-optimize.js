@@ -3,6 +3,7 @@
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../_lib/real-auth.js';
 import {generateSuggestions,selectProvider} from '../_lib/resume-ai-provider.js';
 import {hydrateVerifiedJobRequirements} from '../_lib/job-jd-archive.js';
+import {preparePriorMatchAnalysis} from '../_lib/resume-match-analysis-handoff.js';
 import {auditTargetedResumeSuggestions} from '../_lib/resume-rewrite-provider.js';
 import {optimizeResumeDocument,reserveResumeOptimizationTask} from '../_lib/resume-optimization-task.js';
 
@@ -153,7 +154,9 @@ export async function onRequestPost({request,env}){
  }catch{return fail('RESUME_OPTIMIZATION_DB_NOT_READY',503);}
  // Mask common contact identifiers before third-party processing.
  const blocks=input.blocks.map(b=>({id:b.id,section:b.section,text:redact(b.text),...(b.paragraphEditable===true?{paragraphEditable:true}:{})}));
+ const priorAnalysis=env?.HHBA_MATCH_V4_READY==='1'?preparePriorMatchAnalysis(input.job.prior_match_analysis,trustedJob,redact):undefined;
  const job={title:redact(trustedJob.title),requirements:redact(trustedJob.requirements),
+  ...(priorAnalysis?{prior_match_analysis:priorAnalysis}:{}),
   verified:['VERIFIED_OFFICIAL_JD','VERIFIED_PUBLIC_JD'].includes(trustedJob.source_status)};
  try{
   const signal=env?.HHBA_MATCH_V4_READY==='1'?request.signal:AbortSignal.any([request.signal,AbortSignal.timeout(input.full_document?180000:90000)]);

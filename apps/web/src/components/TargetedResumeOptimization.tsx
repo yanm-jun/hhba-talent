@@ -394,7 +394,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    if(!official.fresh)official=await ensureArchivedJobJd(job.official_url,signal,job.jd_version_id);
    if(!signal.aborted)setArchivedJdId(official.job_id);
    return {title:official.title,requirements:official.full_jd,official_url:official.canonical_url,
-    jd_version_id:official.job_id,jd_sha256:official.jd_sha256};
+    jd_version_id:official.job_id,jd_sha256:official.jd_sha256,prior_match_analysis:job.prior_match_analysis};
   }
   // An indexed employer page is NOT the same as a verified full job JD.
   const partial=job.evidence_status==='PARTIAL_SOURCE'&&
@@ -415,7 +415,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    const official=await ensureArchivedJobJd(job.official_url,signal);
    if(!signal.aborted)setArchivedJdId(official.job_id);
    return {title:official.title,requirements:official.full_jd,
-    official_url:official.canonical_url,jd_version_id:official.job_id,jd_sha256:official.jd_sha256};
+    official_url:official.canonical_url,jd_version_id:official.job_id,jd_sha256:official.jd_sha256,prior_match_analysis:job.prior_match_analysis};
   }catch(error){
    if(signal.aborted)throw error;
    if(partial)return partial;
@@ -495,8 +495,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    if(full&&status?.full_document_enabled===false)
     throw Error('整份简历优化任务暂未就绪，请稍后重试。');
    const feedback=v4Reassessment&&scoreResult?.supported&&scoreResult.job_id===targetedJob.jd_version_id?
-    scoreResult.after_reason:undefined;
-   const key=JSON.stringify([targetedJob.jd_version_id,targetedJob.jd_sha256,currentBlocks,context,feedback]);
+    JSON.stringify({original_score:scoreResult.original_score,updated_score:scoreResult.updated_score,delta:scoreResult.delta,before_reason:scoreResult.before_reason,after_reason:scoreResult.after_reason}):undefined;
+   const key=JSON.stringify([targetedJob.jd_version_id,targetedJob.jd_sha256,currentBlocks,context,targetedJob.prior_match_analysis,feedback]);
    // Only resume unfinished work. An explicit new optimization after a full
    // review must invoke AI again, even if the document has not changed.
    const prior=full&&previousOptimization.current?.key===key&&previousOptimization.current.pending.length?

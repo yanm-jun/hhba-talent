@@ -6,7 +6,9 @@ export type CandidateProfile = {
  experiences:{role:string;organization:string|null;period:string|null;evidence:string}[];
  warnings:string[];
 };
+import type {PriorMatchAnalysis} from './jobJdArchive';
 export type JobMatch={
+ prior_match_analysis?:PriorMatchAnalysis;
  id:string;company:string;title:string;title_zh:string|null;location:string;
  official_url:string;platform:string;remote:boolean;reference_score:number;
  matched:string[];not_evidenced:string[];needs_verification:string[];
