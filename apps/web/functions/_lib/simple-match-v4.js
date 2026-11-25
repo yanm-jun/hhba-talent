@@ -585,10 +585,15 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    search.discoveryWidth=plan.discovery;
    const common={signal,officialOnly:true,curated:true,env,excludeUrls,stepMode:true,allowContinue,parallelResearch,pipelineChild:true};
    onActivity('searching','AI 正在并行发现新岗位，同时核验并评分已收集的岗位。');
-   let searchRecovery=()=>search,verifyRecovery=()=>null;
+   let searchRecovery=()=>search,verifyRecovery=()=>null,verifyFinished=false;
+    // Persist completed branch progress without waiting for its sibling.
+    onRecoveryState(()=>{
+     const next=mergePipelineCheckpoint(checkpoint,searchRecovery()||search,verifyRecovery(),attempted,{verificationIncomplete:!verifyFinished});
+     next.pipelineActive=true;return next;
+    });
    const [discovery,verified]=await Promise.allSettled([
-    v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:search,onProgress,onActivity,onPartial,onResearch,onRecoveryState:get=>{searchRecovery=get;}}),
-    v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:verify,onActivity:(_stage,message)=>onActivity('searching',message),onRecoveryState:get=>{verifyRecovery=get;}})
+    v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:search,onProgress,onActivity,onPartial,onResearch,onRecoveryState:get=>{searchRecovery=get;}}).then(value=>{searchRecovery=()=>value.checkpoint;return value;}),
+    v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:verify,onActivity:(_stage,message)=>onActivity('searching',message),onRecoveryState:get=>{verifyRecovery=get;}}).then(value=>{verifyRecovery=()=>value.checkpoint;verifyFinished=true;return value;})
    ]);
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    const searchState=discovery.status==='fulfilled'?discovery.value.checkpoint:searchRecovery()||search;
@@ -1182,6 +1187,17 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   return visible.filter(j=>!j.excluded_board&&!j.excluded_closed&&!isCommercialRecruitmentBoard(j.official_url,j));
  };
  let cursor=0,scored=checkpoint?.scored||0,archived=checkpoint?.archived||0,scoreFailures=checkpoint?.scoreFailures||0;
+  const completedAssessmentEntries=()=>entries.filter(([u],i)=>(matches[i].score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&Number.isInteger(matches[i].match_score)&&isOfficialJd(results.get(u)))||(matches[i].reference_jd_kind==='AI_GENERATED_REFERENCE'&&matches[i].reference_jd&&['COMPLETE','DECLINED'].includes(matches[i].report_status)));
+  const verificationRecovery=(batch=batchSize)=>{
+   const completed=completedAssessmentEntries(),urls=new Set(completed.map(([u])=>u));
+   const done=new Set(processedEarlier),revisions=new Map(processedEvidence),rechecks=new Set(explicitRechecks);
+   for(const [u,j] of [...allEntries.slice(0,offset),...completed]){done.add(u);revisions.set(u,candidateEvidence(j));rechecks.delete(u);}
+   const officialCompleted=completed.filter(([u])=>isOfficialJd(results.get(u))).length;
+   const accepted=matches.filter((_,i)=>urls.has(entries[i][0]));
+   const archivedCompleted=accepted.filter(j=>j.jd_version_id).length;
+   return continuation('verification',{next:0,processedEarlier:[...done],processedEvidence:[...revisions],explicitRechecks:[...rechecks],matches:mergeJobEvidence(previousMatches,accepted),read:(checkpoint?.read||0)+officialCompleted,scored:(checkpoint?.scored||0)+officialCompleted,archived:(checkpoint?.archived||0)+archivedCompleted,scoreFailures:checkpoint?.scoreFailures||0,reportFailures:checkpoint?.reportFailures||0,verificationReads:[...verificationReads].filter(([u])=>!urls.has(u)),verificationBatch:batch}).checkpoint;
+  };
+  if(curated&&checkpoint)onRecoveryState(()=>verificationRecovery());
  const batchScore=overlap&&fullResearch&&entries.length>1?makeBatchScorer({call:p=>v4Call(verificationFetcher,provider,p,{signal}),parse:v4ParseJson,resume,roleHint,budget:researchContextBudget,note,signal}):null;
  const worker=async()=>{
   while(cursor<entries.length){
@@ -1280,14 +1296,9 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  if(overlap){diag.VERIFICATION_BATCH_ELAPSED_MS=(diag.VERIFICATION_BATCH_ELAPSED_MS||0)+(Date.now()-began);diag.VERIFICATION_BATCH_ATTEMPTS=(diag.VERIFICATION_BATCH_ATTEMPTS||0)+entries.length;}
  if(workerFailure){
   if(curated&&checkpoint&&isV4RetryableProviderError(workerFailure.reason?.code)&&!signal?.aborted){
-   const completed=entries.filter(([u],i)=>(matches[i].score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&Number.isInteger(matches[i].match_score)&&isOfficialJd(results.get(u)))||(matches[i].reference_jd_kind==='AI_GENERATED_REFERENCE'&&matches[i].reference_jd&&['COMPLETE','DECLINED'].includes(matches[i].report_status)));
-   const officialCompleted=completed.filter(([u])=>isOfficialJd(results.get(u))).length;
-   // Earlier offsets and completed scores must not be charged again on retry.
-   for(const [u,j] of [...allEntries.slice(0,offset),...completed]){processedEarlier.add(u);processedEvidence.set(u,candidateEvidence(j));explicitRechecks.delete(u);verificationReads.delete(u);}
-   const preserved=mergeJobEvidence(previousMatches,matches);
-   onRecoveryState(()=>continuation('verification',{next:0,matches:preserved,read:(checkpoint.read||0)+officialCompleted,scored:(checkpoint.scored||0)+officialCompleted,archived,scoreFailures:checkpoint.scoreFailures||0,reportFailures:checkpoint.reportFailures||0,verificationReads:[...verificationReads],verificationBatch:Math.max(1,Math.ceil(batchSize/2))}).checkpoint);
-  }
-  throw workerFailure.reason;
+   onRecoveryState(()=>verificationRecovery(Math.max(1,Math.ceil(batchSize/2))));
+   }
+   throw workerFailure.reason;
  }
  const revisedOrigins=new Set(matches.map(j=>j.research_candidate_url||j.official_url));
  const rawCombined=[...previousMatches.filter(j=>!curated||!revisedOrigins.has(j.research_candidate_url||j.official_url)),...matches].filter(j=>!j.excluded_board&&!j.excluded_closed&&!isCommercialRecruitmentBoard(j.official_url,j));

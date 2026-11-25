@@ -70,3 +70,24 @@ export async function readMatchTask(env,id,now=Date.now(),{renewGeneration}={}){
  if(Number.isSafeInteger(renewGeneration)&&data.value?.generation===renewGeneration&&data.value?.checkpoint&&!data.value?.result&&data.until-now<22*3600000)await saveMatchTask(env,id,data.value,now);
  return data.value;
 }
+
+ // Serialize lease renewals and in-phase progress writes. Drain before the
+ // terminal save so a stale heartbeat cannot overwrite newer research.
+ export function startMatchPhaseHeartbeat({renew,getCheckpoint,persist,onError=()=>{},onSaveError=()=>{},interval=60000}){
+  let active=true,pending=null,last=null;
+  const tick=()=>{
+   if(!active||pending)return pending||Promise.resolve();
+   pending=(async()=>{
+    try{await renew();}catch(e){active=false;onError(e);return;}
+    if(!active)return;
+    try{
+     const snapshot=getCheckpoint();if(!snapshot)return;
+     const serialized=JSON.stringify(snapshot);if(serialized===last)return;
+     await persist(JSON.parse(serialized));last=serialized;
+    }catch(e){onSaveError(e);}
+   })().finally(()=>{pending=null;});
+   return pending;
+  };
+  const timer=setInterval(tick,interval);
+  return {tick,async stop(){active=false;clearInterval(timer);if(pending)await pending;}};
+ }

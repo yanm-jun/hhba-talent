@@ -10,7 +10,7 @@ import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js'
 import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {recognizeV4Resume} from '../../_lib/v4-resume-ocr.js';
-import {checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint,matchTaskKey,saveMatchTask,readMatchTask} from '../../_lib/v4-match-checkpoint-storage.js';
+import {checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint,matchTaskKey,saveMatchTask,readMatchTask,startMatchPhaseHeartbeat} from '../../_lib/v4-match-checkpoint-storage.js';
 import {claimAiCheckpoint,leaseMatchTask} from '../../_lib/ai-checkpoint-claim.js';
 import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
 import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSessionTask} from '../../_lib/v4-session-match-task.js';
@@ -86,14 +86,21 @@ function events(env,request,input,waitUntil){
    };
    send('progress',{stage:'preparing'});
    const leaseAbort=new AbortController();
-   const leaseTimer=input.lease?setInterval(()=>input.lease.renew().catch(()=>leaseAbort.abort()),60000):null;
+   let leaseHeartbeat=null;
    // Managed tasks are not cancelled simply because a browser transport closes.
    // Pages waitUntil is best effort; durable checkpoints still provide recovery.
    const executionSignal=input.managed?leaseAbort.signal:input.lease?AbortSignal.any([request.signal,leaseAbort.signal]):request.signal;
    const guard=async()=>{if(input.managed)await renewActiveSessionTask(env,input.session,input.taskId,input.generation);};
    let guardBusy=false;
    const guardTimer=input.managed?setInterval(()=>{if(guardBusy)return;guardBusy=true;guard().catch(e=>leaseAbort.abort(e)).finally(()=>{guardBusy=false});},12000):null;
-   async function releaseTask(){if(input.lease){const lease=input.lease;input.lease=null;await lease.release();}}
+   if(input.lease)leaseHeartbeat=startMatchPhaseHeartbeat({
+     renew:()=>input.lease.renew(),
+     getCheckpoint:()=>input.taskKey&&!leaseAbort.signal.aborted?input.recoveryState?.():null,
+     persist:async state=>{await guard();if(!leaseAbort.signal.aborted)await saveMatchTask(env,input.taskKey,{checkpoint:state,generation:input.generation||0,progress:{stage:phase,activity:latestActivity,report:lastReport}});},
+     onError:e=>leaseAbort.abort(e),
+     onSaveError:e=>{if(e?.code==='AI_AGENT_CANCELLED')leaseAbort.abort(e);else console.warn('HHBA_V4_PERIODIC_PROGRESS_SAVE_FAILED');}
+    });
+    async function releaseTask(){await leaseHeartbeat?.stop();if(input.lease){const lease=input.lease;input.lease=null;await lease.release();}}
    const execution=(async()=>{
     let succeeded=false;
     try{
@@ -114,7 +121,8 @@ function events(env,request,input,waitUntil){
       stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,parallelResearch:env.HHBA_V4_PARALLEL_RESEARCH==='1'||(env.HHBA_V4_JOB_PROVIDER==='gemini'&&env.HHBA_V4_PARALLEL_RESEARCH!=='0'),allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
       onResearch:sendResearch,
       onPartial:matches=>{sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
-     if(executionSignal.aborted)throw executionSignal.reason||Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
+     await leaseHeartbeat?.stop();
+      if(executionSignal.aborted)throw executionSignal.reason||Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
      await guard();
      if(result.status==='CONTINUE'){
       console.info('HHBA_V4_STAGE',JSON.stringify({trace,phase:result.checkpoint.phase,round:result.checkpoint.round,candidates:result.checkpoint.rows?.length,processed:result.checkpoint.next,scored:result.checkpoint.scored,diagnostics:result.checkpoint.diagnostics}));
@@ -155,6 +163,7 @@ function events(env,request,input,waitUntil){
      sendFinal(result);
      succeeded=true;
     }catch(e){
+     await leaseHeartbeat?.stop();
      const reason=leaseAbort.signal.reason;
      const code=typeof reason?.code==='string'?reason.code:typeof e?.code==='string'?e.code:leaseAbort.signal.aborted?'AI_CHECKPOINT_LEASE_LOST':'AI_PROVIDER_UNAVAILABLE';
      if(input.taskKey&&input.lease&&isV4RetryableProviderError(code)&&!leaseAbort.signal.aborted){try{const state=input.recoveryState?.();if(state){await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:state,generation:input.generation||0});}}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
@@ -163,7 +172,7 @@ function events(env,request,input,waitUntil){
      const retryable=code!=='AI_AGENT_CANCELLED'&&!!input.taskKey&&(isV4RetryableProviderError(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
      send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
     }finally{
-     clearInterval(heart);if(leaseTimer)clearInterval(leaseTimer);if(guardTimer)clearInterval(guardTimer);
+     clearInterval(heart);if(guardTimer)clearInterval(guardTimer);
      await releaseTask().catch(()=>console.warn('HHBA_TASK_LEASE_RELEASE_FAILED'));
      if(input.claim&&(!succeeded||closed))await input.claim.release().catch(()=>console.warn('HHBA_CHECKPOINT_RELEASE_FAILED'));
      if(succeeded&&!closed&&input.pointer)await deleteMatchCheckpoint(env,input.pointer).catch(()=>console.warn('HHBA_CHECKPOINT_CLEANUP_FAILED'));

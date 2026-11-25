@@ -66,3 +66,20 @@ test('client uses opaque cross-tab signals, scoped session storage and explicit 
  assert.match(route,/waitUntil\(execution\)/);
  assert.match(route,/await guard\(\);/);
 });
+
+test('phase heartbeat serializes progress writes and drains before terminal checkpoint persistence',async()=>{
+ const {startMatchPhaseHeartbeat}=await import('../functions/_lib/v4-match-checkpoint-storage.js');
+ let state={phase:'verification',scored:1},renewals=0,release,started;
+ const entered=new Promise(r=>{started=r;}),gate=new Promise(r=>{release=r;}),writes=[];
+ const hb=startMatchPhaseHeartbeat({renew:async()=>{renewals++;},getCheckpoint:()=>state,persist:async snapshot=>{started();await gate;writes.push(snapshot);},interval:3600000});
+ const tick=hb.tick();await entered;state.scored=2;
+ const same=hb.tick();let stopped=false;const stop=hb.stop().then(()=>{stopped=true;});
+ await Promise.resolve();assert.equal(stopped,false);assert.equal(renewals,1);
+ release();await Promise.all([tick,same,stop]);
+ assert.deepEqual(writes,[{phase:'verification',scored:1}]);await hb.tick();assert.equal(renewals,1);
+});
+test('phase heartbeat never saves after losing the exclusive research lease',async()=>{
+ const {startMatchPhaseHeartbeat}=await import('../functions/_lib/v4-match-checkpoint-storage.js');
+ let writes=0,errors=0;const hb=startMatchPhaseHeartbeat({renew:async()=>{throw Error('lease lost')},getCheckpoint:()=>({phase:'research'}),persist:async()=>{writes++},onError:()=>{errors++},interval:3600000});
+ await hb.tick();await hb.tick();await hb.stop();assert.equal(writes,0);assert.equal(errors,1);
+});
