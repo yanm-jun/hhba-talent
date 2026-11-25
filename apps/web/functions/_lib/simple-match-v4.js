@@ -317,7 +317,16 @@ async function researchIncompleteJd(fetcher,provider,url,job,checked,{signal,bro
    tools:[{type:'web_search'}],tool_choice:'auto',include:['web_search_call.action.sources']
   },{parse:v4ParseJson,sourceUrls:publicUrls,fetcher,browser,signal,jd:checked?.full_jd||'',collections:{sources:publicUrls,candidates:[job]},ledger,note});
   if(reply.status!=='completed')throw fault('JD_RESEARCH_SUMMARY_INCOMPLETE');
-  const result=groundJdResearch(v4ParseJson(reply),ledger,diagnostics);
+  const proposed=v4ParseJson(reply);
+  // Web-search citations are discovery, not independent reads. Read newly cited
+  // public pages before rejecting otherwise useful exact excerpts.
+  const cited=new Set([...publicUrls,...v4ToolSources(reply)].map(v4PublicJobUrl).filter(Boolean));
+  const unread=[...new Set((Array.isArray(proposed.facts)?proposed.facts:[]).map(f=>v4PublicJobUrl(f?.url)).filter(u=>u&&cited.has(u)&&!isCommercialRecruitmentBoard(u)&&!ledger.some(r=>r.url===u&&r.text)))];
+  for(const source of unread){
+   try{const doc=await v4ReadPublicJobDocument(source,{fetcher,signal});v4RememberPublicResult(ledger,{ok:true,type:'read_page',mode:'static',url:doc.url,text:doc.plain});}
+   catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');note('JD_REFERENCE_DIRECT_READ_FAILED');}
+  }
+  const result=groundJdResearch(proposed,ledger,diagnostics);
   note(result.facts.length?'JD_RESEARCH_SOURCE_MATERIAL':result.inference?'JD_RESEARCH_DIRECTION_ONLY':'JD_RESEARCH_NO_MATERIAL');
   return result;
  }catch(e){
