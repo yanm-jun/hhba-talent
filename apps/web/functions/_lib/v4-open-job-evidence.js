@@ -297,6 +297,38 @@ export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal,maxBytes
  * arbitrary script is passed to the browser. Restrict browser traffic to the
  * requested public origin; exact declared script/style assets may also load.
  * No blanket access to other origins. */
+// Walk only declared script dependencies already read as inert source. Do not
+// inherit unrelated candidate URLs or wildcard origins from the evidence ledger.
+export function v4BrowserResourcePlan(url,resourceHints=[],ledger=[]){
+ const target=v4PublicJobUrl(url),hints=new Map(),queue=[...resourceHints,...ledger.filter(r=>r.url===target&&!r.script_source).flatMap(r=>r.resource_hints||[])];
+ while(queue.length){
+  const h=queue.shift(),u=v4PublicJobUrl(h?.url);
+  if(!u||u===target||isCommercialRecruitmentBoard(u)||hints.has(u))continue;
+  hints.set(u,{url:u,kind:h.kind});
+  if(h.kind==='script')for(const r of ledger)if(r.url===u&&r.script_source===true)queue.push(...(r.resource_hints||[]));
+ }
+ const publicDataUrls=[...hints.values()].filter(h=>['data','frame'].includes(h.kind)&&ledger.some(r=>r.url===h.url&&r.type==='read_page'&&r.mode==='static'&&!r.script_source&&r.offset===0&&r.next_offset===null&&r.text?.trim())).map(h=>h.url);
+ return {resourceHints:[...hints.values()],publicDataUrls};
+}
+// Automatic independent GET for declared public data/frame resources. Browser
+// admission needs the same exact URL and a successful public document read;
+// redirected or oversized results remain research leads, not allowed origins.
+export async function v4PreparePublicBrowserResources(url,{fetcher=fetch,signal,resourceHints=[],ledger=[],onDocument=()=>{}}={}){
+ const initial=v4BrowserResourcePlan(url,resourceHints,ledger),records=[...ledger];
+ for(const hint of initial.resourceHints){
+  if(signal?.aborted)throw signal.reason;
+  if(!['data','frame'].includes(hint.kind)||initial.publicDataUrls.includes(hint.url))continue;
+  const u=new URL(hint.url);
+  if(/(?:^|[\/_-])(?:login|logout|signin|signout|delete|remove|update|submit|apply|checkout|oauth|auth|token)(?:[\/_-]|$)/i.test(u.pathname)||[...u.searchParams.keys()].some(k=>/token|secret|password|signature|authorization|api[_-]?key/i.test(k)))continue;
+  try{
+   const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal});
+   if(doc.url!==hint.url||!doc.plain.trim())continue;
+   const record={type:'read_page',ok:true,mode:'static',url:doc.url,offset:0,next_offset:null,text:doc.plain,resource_hints:doc.resource_hints||[]};
+   records.push(record);onDocument(record);
+  }catch(e){if(signal?.aborted)throw e;}
+ }
+ return v4BrowserResourcePlan(url,initial.resourceHints,records);
+}
 export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHints=[],publicDataUrls=[]}={}){
  const target=v4PublicJobUrl(url);
  if(!target||isCommercialRecruitmentBoard(target))throw Error('V4_UNSAFE_URL');
@@ -331,7 +363,7 @@ export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHint
 // Read a bounded byte window from a large public document, not a truncated
 // substitute for a verified complete JD. Each next_offset is addressable.
 // The full response is streamed; only the requested window is retained.
-export async function v4ReadPublicJobDocumentWindow(url,{fetcher=fetch,signal,offset=0,maxBytes=256*1024}={}){
+export async function v4ReadPublicJobDocumentWindow(url,{fetcher=fetch,signal,offset=0,maxBytes=256*1024,scriptSource=false,documentUrl=url}={}){
  let current=v4PublicJobUrl(url);
  if(!Number.isSafeInteger(offset)||offset<0)offset=0;
  const seen=new Set(),windowBytes=Number.isSafeInteger(maxBytes)&&maxBytes>0?Math.min(256*1024,maxBytes):256*1024;
@@ -345,7 +377,7 @@ export async function v4ReadPublicJobDocumentWindow(url,{fetcher=fetch,signal,of
   }
   if(!r.ok||r.status===206||!r.body)throw Error('V4_PAGE_UNAVAILABLE');
   const ct=(r.headers.get('content-type')||'').toLowerCase();
-  if(!/text\/(html|plain)|json/.test(ct))throw Error('V4_PAGE_NOT_HTML');
+  if(!/text\/(html|plain)|json/.test(ct)&&!(scriptSource&&/javascript|ecmascript/i.test(ct)))throw Error('V4_PAGE_NOT_HTML');
   const reader=r.body.getReader(),out=new Uint8Array(windowBytes);let position=0,written=0,hasMore=false;
   try{
    for(;;){
@@ -362,7 +394,7 @@ export async function v4ReadPublicJobDocumentWindow(url,{fetcher=fetch,signal,of
   }finally{await reader.cancel().catch(()=>{});reader.releaseLock();}
   const raw=new TextDecoder().decode(out.subarray(0,written));
   // Include actual visible text and JSON text; do not mark a window as complete JD.
-  return {url:current,offset,next_offset:hasMore?offset+written:null,unit:'bytes',text:ct.includes('json')?raw:htmlToText(raw,{maxChars:Infinity}),complete_document:false};
+  return {url:current,offset,next_offset:hasMore?offset+written:null,unit:'bytes',text:scriptSource||ct.includes('json')?raw:htmlToText(raw,{maxChars:Infinity}),complete_document:false,...(scriptSource?{script_source:true,resource_hints:v4ScriptResourceHints(raw,documentUrl,current)}:{})};
  }
  throw Error('V4_UNSAFE_OR_REPEATED_REDIRECT');
 }
