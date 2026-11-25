@@ -86,10 +86,10 @@ function htmlLocation(plain){
  const m=plain.match(/(?:工作地点|工作城市|办公地点|工作地区|工作区域|Work Location|Location)\s*[：:\s]\s*([^\n]{2,80})/i);
  return m?findMainlandCity(m[1]):null;
 }
-async function limitedRead(r,{allowJson=false,maxBytes=2*1024*1024}={}){
+async function limitedRead(r,{allowJson=false,allowScript=false,maxBytes=2*1024*1024}={}){
  if(!r.ok||r.status===206)throw Error('V4_PAGE_UNAVAILABLE');
  const ct=(r.headers.get('content-type')||'').toLowerCase();
- if(!ct.includes('text/html')&&!ct.includes('text/plain')&&!(allowJson&&ct.includes('json')))throw Error('V4_PAGE_NOT_HTML');
+ if(!ct.includes('text/html')&&!ct.includes('text/plain')&&!(allowJson&&ct.includes('json'))&&!(allowScript&&/(?:javascript|ecmascript)/i.test(ct)))throw Error('V4_PAGE_NOT_HTML');
  const max=maxBytes,cl=Number(r.headers.get('content-length')||0);
  if(cl>max||!r.body){await r.body?.cancel().catch(()=>{});throw Error('V4_PAGE_TOO_LARGE');}
  const reader=r.body.getReader(),chunks=[];let len=0;
@@ -223,6 +223,25 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  * not proof of a closed vacancy. Never send a CV to employer pages.
  */
 // Hints come from independently read public HTML; they are not ownership proof.
+// Read source code as inert text, never execute it in the Worker. Only literal
+// recruitment/API paths are hints; templates, secrets and arbitrary hosts are
+// not synthesized. Relative browser fetch paths resolve against the document.
+export function v4ScriptResourceHints(source,documentUrl,scriptUrl=documentUrl){
+ const out=new Map();
+ const add=(raw,kind,base)=>{
+  const value=raw.replace(/\\\//g,'/').replace(/\\u002[fF]/g,'/').replace(/&amp;/gi,'&');
+  if(!/^(?:https:\/\/|\/\/|\/|\.\.?\/)/i.test(value)||/[{}<>\s\\]/.test(value))return;
+  let url;try{url=v4PublicJobUrl(new URL(value,base).href)}catch{return;}
+  if(!url||isCommercialRecruitmentBoard(url))return;
+  const u=new URL(url);
+  if(kind==='data'&&!/(?:\/(?:api|graphql|recruit(?:ment)?|career[s]?|job[s]?|position[s]?|vacanc(?:y|ies)|opening[s]?)(?:[\/_.-]|$)|\.json$)/i.test(u.pathname))return;
+  if(kind==='script'&&!/\.(?:m?js)$/i.test(u.pathname))return;
+  out.set(url,{url,kind});
+ };
+ for(const m of source.matchAll(/["']((?:https:\/\/|https:\\\/\\\/|\/\/|\/|\.\.?\/)[^"'<>\\\r\n]*(?:\\\/[^"'<>\\\r\n]*)*)["']/gi))add(m[1],'data',documentUrl);
+ for(const m of source.matchAll(/(?:\bimport\s*\(|\bfrom\s*|\bimport\s*)["']([^"'\r\n]+)["']/g))add(m[1],'script',scriptUrl);
+ return [...out.values()];
+}
 export function v4PublicResourceHints(html,base){
  const target=v4PublicJobUrl(base);if(!target)return [];
  const out=new Map();
@@ -248,20 +267,22 @@ export function v4PublicResourceHints(html,base){
    const href=attr(tag,'href');if(href&&/(?:job|career|recruit|vacanc|position|\.json(?:[?#]|$)|招聘|职位)/i.test(href))add(href,'link');
   }
  }
+ for(const m of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi))for(const h of v4ScriptResourceHints(m[1],target))if(!out.has(h.url)&&h.url!==target)out.set(h.url,h);
  return [...out.values()];
 }
-export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal,maxBytes=2*1024*1024}={}){
+export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal,maxBytes=2*1024*1024,scriptSource=false,documentUrl=url}={}){
  let current=v4PublicJobUrl(url);const seen=new Set();
  while(current&&!seen.has(current)&&!isCommercialRecruitmentBoard(current)){
   if(signal?.aborted)throw signal.reason;
   seen.add(current);
-  const r=await fetcher(current,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,application/json,text/plain'},signal});
+  const r=await fetcher(current,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:scriptSource?'application/javascript,text/javascript,text/plain,application/json':'text/html,application/json,text/plain'},signal});
   if([301,302,303,307,308].includes(r.status)){
    const next=r.headers.get('location');await r.body?.cancel().catch(()=>{});
    if(!next)throw Error('V4_REDIRECT_MISSING');
    current=v4PublicJobUrl(new URL(next,current).href);continue;
   }
-  const raw=await limitedRead(r,{allowJson:true,maxBytes});
+  const raw=await limitedRead(r,{allowJson:true,allowScript:scriptSource,maxBytes});
+  if(scriptSource&&/(?:javascript|ecmascript|text\/plain)/i.test(r.headers.get('content-type')||''))return {url:current,plain:raw,site:'',title:'',resource_hints:v4ScriptResourceHints(raw,documentUrl,current),script_source:true};
   const site=meta(raw,'property','og:site_name')||meta(raw,'name','application-name');
   if(isCommercialRecruitmentBoard(current,{site_name:site}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
   const plain=(responseIsJson(r)?raw:htmlToText(raw,{maxChars:Infinity})).trim();
@@ -276,13 +297,14 @@ export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal,maxBytes
  * arbitrary script is passed to the browser. Restrict browser traffic to the
  * requested public origin; exact declared script/style assets may also load.
  * No blanket access to other origins. */
-export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHints=[]}={}){
+export async function v4RenderPublicJobDocument(url,{browser,signal,resourceHints=[],publicDataUrls=[]}={}){
  const target=v4PublicJobUrl(url);
  if(!target||isCommercialRecruitmentBoard(target))throw Error('V4_UNSAFE_URL');
  if(typeof browser?.quickAction!=='function')throw Error('V4_BROWSER_UNAVAILABLE');
  if(signal?.aborted)throw signal.reason;
  const host=new URL(target).hostname.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&');
- const exactAssets=resourceHints.filter(h=>['script','style'].includes(h?.kind)&&v4PublicJobUrl(h.url)&&!isCommercialRecruitmentBoard(h.url)).map(h=>'^'+h.url.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&')+'$');
+ const independentlyRead=new Set(publicDataUrls.map(v4PublicJobUrl).filter(Boolean));
+ const exactAssets=resourceHints.filter(h=>(['script','style'].includes(h?.kind)||['data','frame'].includes(h?.kind)&&independentlyRead.has(v4PublicJobUrl(h.url)))&&v4PublicJobUrl(h.url)&&!isCommercialRecruitmentBoard(h.url)).map(h=>'^'+h.url.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&')+'$');
  const response=await browser.quickAction('content',{
   url:target,allowRequestPattern:['^https://'+host+'(?::443)?(?:/|$)',...new Set(exactAssets)],
   rejectResourceTypes:['image','media','font'],
