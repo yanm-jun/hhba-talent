@@ -540,3 +540,20 @@ test('browser preparation rotates failed resources and allows later explicit rec
  restored=true;
  const fourth=await run({retryFailed:true});assert.equal(fourth.publicDataUrls.length,26);
 });
+
+test('repeated browser read advances unattempted resources rather than stopping at the first window',async()=>{
+ const {v4StageResearchCall,v4ResearchEvidenceProgress,v4RememberPublicResult}=await import('../functions/_lib/v4-research-tools.js');
+ const root='https://careers.employer.cn/jobs/42',hints=Array.from({length:25},(_,i)=>({kind:'data',url:'https://data.employer.cn/jobs/'+i+'.json'}));
+ const ledger=[{type:'read_page',url:root,mode:'static',offset:0,next_offset:null,text:'招聘详情',resource_hints:hints}];
+ let calls=0,reads=0;
+ const browser={async quickAction(){return new Response('<h1>招聘详情</h1>',{headers:{'content-type':'text/html'}})}};
+ const fetcher=async()=>{reads++;return Response.json({description:'真实公开职责'});};
+ const result=await v4StageResearchCall(async()=>{
+  calls++;if(calls>6)throw Error('should have finished');
+  return {status:'completed',data:reads===25?{done:true}:{research_action:{type:'read_page',url:root,mode:'browser'}}};
+ },{instructions:'test',input:'{}'},{parse:x=>x.data,sourceUrls:[root],browser,fetcher,ledger});
+ assert.equal(result.data.done,true);assert.equal(reads,25);
+ const failure={type:'resource_attempt',ok:false,url:hints[0].url,document_url:root,offset:1};
+ v4RememberPublicResult(ledger,failure);const before=v4ResearchEvidenceProgress(ledger);
+ v4RememberPublicResult(ledger,{...failure,offset:2});assert.equal(v4ResearchEvidenceProgress(ledger),before);
+});

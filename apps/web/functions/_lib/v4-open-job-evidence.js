@@ -334,6 +334,12 @@ export function v4BrowserResourcePlan(url,resourceHints=[],ledger=[]){
 // admission needs the same exact URL and a successful public document read;
 // redirected or oversized results remain research leads, not allowed origins.
 export const v4BrowserAvailable=browser=>typeof browser?.quickAction==='function'||typeof browser?.script==='function';
+export function v4BrowserHasPendingResources(url,ledger=[]){
+ const target=v4PublicJobUrl(url);if(!target)return false;
+ const plan=v4BrowserResourcePlan(target,[],ledger);
+ const failed=new Set(ledger.filter(r=>r.type==='resource_attempt'&&r.document_url===target).map(r=>r.url));
+ return plan.resourceHints.some(h=>publicReadResourceUrl(h.url)&&!failed.has(h.url)&&(['data','frame'].includes(h.kind)?!plan.publicDataUrls.includes(h.url):h.kind==='script'&&!ledger.some(r=>r.url===h.url&&r.type==='read_page'&&r.script_source)));
+}
 // Failed transport attempts are metadata, not independently read JD evidence.
 export async function v4PreparePublicBrowserResources(url,{fetcher=fetch,signal,resourceHints=[],ledger=[],onDocument=()=>{},retryFailed=false}={}){
  let initial=v4BrowserResourcePlan(url,resourceHints,ledger);

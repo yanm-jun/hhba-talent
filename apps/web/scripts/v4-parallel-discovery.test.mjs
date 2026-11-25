@@ -400,3 +400,11 @@ test('score recovery switches evidence protocol for unchanged unresolved verifie
  assert.deepEqual(second.checkpoint.explicitRechecks,[candidate.url]);assert.deepEqual(second.checkpoint.scoreRecoveryModes,[[candidate.url,'anchors']]);
  assert.equal(second.checkpoint.scoreRecoveryKeys.length,2);
 });
+
+test('a failed verification lane is moved behind fresh jobs, never removed from research',async()=>{
+ const {pendingVerification,mergePipelineCheckpoint}=await import('../functions/_lib/v4-research-pipeline.js');
+ const a=job(1),b=job(2),c=job(3),old={phase:'research',rows:[[a.url,a],[b.url,b],[c.url,c]]};
+ const next=mergePipelineCheckpoint(old,old,{phase:'verification',matches:[],processedEarlier:[],processedEvidence:[]},[[a.url,a]],{verificationIncomplete:true});
+ assert.deepEqual(pendingVerification(next).map(([u])=>u),[b.url,c.url,a.url]);
+ assert.equal(next.rows.length,3);
+});
