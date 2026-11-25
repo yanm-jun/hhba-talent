@@ -343,3 +343,51 @@ test('public employer HTML exposes resource hints, allows only exact declared ex
  assert.equal(data.ok,true);assert.match(data.text,/公开岗位职责/);
  assert.equal(data.verified,undefined);
 });
+
+test('script-only employer shell independently discovers exact cross-origin API before rendering',async()=>{
+ const {v4ReadPublicJobDocument,v4PreparePublicBrowserResources,v4RenderPublicJobDocument}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const url='https://careers.employer.cn/jobs/42',script='https://cdn.employer.cn/app.js',api='https://api.employer.cn/jobs/42.json';
+ const denied='https://api.employer.cn/api/delete/42',other='https://api.employer.cn/jobs/99.json';
+ const calls=[],ledger=[];
+ const fetcher=async(u,o)=>{calls.push(u);assert.equal(o.method,'GET');assert.equal(o.headers.Authorization,undefined);
+  if(u===url)return new Response('<script src="'+script+'"></script>',{headers:{'content-type':'text/html'}});
+  if(u===script)return new Response('fetch("'+api+'"); fetch("'+denied+'");',{headers:{'content-type':'application/javascript'}});
+  if(u===api)return Response.json({title:'运营岗位',description:'实际公开职责'});
+  throw Error('unexpected '+u);
+ };
+ const parent=await v4ReadPublicJobDocument(url,{fetcher});
+ const plan=await v4PreparePublicBrowserResources(url,{fetcher,resourceHints:parent.resource_hints,ledger,onDocument:r=>ledger.push(r)});
+ assert.deepEqual(calls,[url,script,api]);assert.deepEqual(plan.publicDataUrls,[api]);
+ assert.equal(ledger.find(r=>r.url===script).script_source,true);
+ let opts;
+ const browser={async quickAction(type,value){opts=value;return new Response('<h1>运营岗位</h1><p>实际公开职责</p>',{headers:{'content-type':'text/html'}})}};
+ const rendered=await v4RenderPublicJobDocument(url,{browser,...plan});
+ assert.match(rendered.plain,/实际公开职责/);
+ for(const allowed of [script,api])assert.ok(opts.allowRequestPattern.some(p=>new RegExp(p).test(allowed)));
+ for(const blocked of [other,denied,'https://localhost/private','https://api.employer.cn/jobs/42.json?other=1'])assert.ok(!opts.allowRequestPattern.some(p=>new RegExp(p).test(blocked)));
+});
+test('public iframe admission requires successful exact public response; redirects are not wildcard authority',async()=>{
+ const {v4PreparePublicBrowserResources}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const parent='https://careers.employer.cn/jobs/1',frame='https://recruit.employer.cn/job/1',redirect='https://api.employer.cn/job/1',bad='https://api.employer.cn/auth/token';
+ const seen=[];
+ const plan=await v4PreparePublicBrowserResources(parent,{resourceHints:[{url:frame,kind:'frame'},{url:redirect,kind:'data'},{url:bad,kind:'data'}],fetcher:async u=>{
+  seen.push(u);
+  if(u===frame)return new Response('<h1>招聘岗位</h1>',{headers:{'content-type':'text/html'}});
+  if(u===redirect)return new Response(null,{status:302,headers:{location:'https://localhost/private'}});
+  throw Error('unexpected '+u);
+ }});
+ assert.deepEqual(seen,[frame,redirect]);assert.deepEqual(plan.publicDataUrls,[frame]);
+});
+test('linked structured JSON JD survives browser CORS failure without replacing original application link',async()=>{
+ const {v4ReadPublicJobDocument,v4ReadDeclaredStructuredJob}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const url='https://careers.employer.cn/jobs/42',api='https://api.employer.cn/jobs/42.json';
+ const parent={canonical_url:url,company:'测试企业',title:'渠道运营',location:'上海',source_confirmed:true,independently_read:true,vacancy_confirmed:true,full_jd:''};
+ let posting={'@type':'JobPosting',url,title:parent.title,hiringOrganization:{name:parent.company},jobLocation:{address:{addressLocality:'上海'}},description:'负责区域经销商运营管理与客户服务。',qualifications:'具有渠道运营经验，具备沟通协调能力。'};
+ const fetcher=async u=>u===url?new Response('<div data-api="'+api+'">岗位详情</div>',{headers:{'content-type':'text/html'}}):Response.json(posting);
+ const doc=await v4ReadPublicJobDocument(url,{fetcher});
+ const result=await v4ReadDeclaredStructuredJob(parent,doc,{fetcher});
+ assert.equal(result.canonical_url,url);assert.equal(result.jd_source_url,api);assert.match(result.full_jd,/区域经销商运营/);
+ assert.equal(await v4ReadDeclaredStructuredJob({...parent,source_confirmed:false},doc,{fetcher}),null);
+ posting={...posting,url:'https://careers.employer.cn/jobs/99'};
+ assert.equal(await v4ReadDeclaredStructuredJob(parent,doc,{fetcher}),null);
+});
