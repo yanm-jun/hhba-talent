@@ -198,7 +198,7 @@ test('native Top10 is in a focus-managed single dialog with reasons and direct U
  assert.match(dialog,/document\.body\.style\.overflow='hidden'/);
  const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
  const sources=await readFile(new URL('../src/components/RecruitmentSourceLinks.tsx',import.meta.url),'utf8');
- assert.match(panels,/jdJob\.recommendation_reason/);
+ assert.match(panels,/<CuratedJobReport detail=\{jdJob\.research_detail\}/);
  assert.match(panels,/<RecruitmentSourceLinks job=\{jdJob\}/);
  assert.match(sources,/href=\{source\.url\}/);
 });

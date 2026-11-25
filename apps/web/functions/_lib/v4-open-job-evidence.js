@@ -5,10 +5,12 @@ import {findMainlandCity} from './mainland-job-location.js';
 import {sha256Hex} from './real-auth.js';
 import {isCommercialRecruitmentBoard} from './match-employer-source.js';
 import {readConditionalJd,canReuseConditionalJd,writeConditionalJd} from './v4-public-jd-cache.js';
+import {structuredJdParts,looksTruncatedJd} from './v4-jd-completeness.js';
 const LOCAL=/(?:^|\.)(?:localhost|local|internal|test|invalid|example|onion|nip\.io|sslip\.io|localtest\.me)$/i;
 const CLOSED=/(?:职位已关闭|岗位已下线|停止招聘|不再接受申请|职位已过期|招聘已结束|position (?:closed|expired)|job (?:closed|expired))/i;
 const GENERIC=/^(?:招聘|岗位详情|职位详情|职业机会|人才招聘|职位|招聘信息|job details|jobs|careers|recruitment|job opening)$/i;
 const trim=s=>typeof s==='string'?s.trim():'';
+const responseIsJson=r=>/json/i.test(r.headers.get('content-type')||'');
 export function v4PublicJobUrl(value){
  if(typeof value!=='string'||!value.trim())return null;
  try{
@@ -181,7 +183,9 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  if(explicitClosed&&!candidates.length)throw Error('V4_JOB_CLOSED');
  for(const j of candidates){
   const org=companyOf(j),title=trim(j.title);
-  const city=postedLocation(j)||htmlLocation(plain),desc=htmlToText(trim(j.description),{maxChars:Infinity});
+  const city=postedLocation(j)||htmlLocation(plain),description=htmlToText(trim(j.description),{maxChars:Infinity});
+  const desc=structuredJdParts(j,value=>htmlToText(value,{maxChars:Infinity})).join('\n');
+  if(looksTruncatedJd(description)||looksTruncatedJd(desc))throw Error('V4_JD_TRUNCATED_SOURCE');
   if(!org.name||GENERIC.test(org.name)||!title||GENERIC.test(title)||!city||!desc.trim())continue;
   if(explicitClosed||j.validThrough&&Number.isFinite(Date.parse(j.validThrough))&&Date.parse(j.validThrough)<now.getTime())throw Error('V4_JOB_CLOSED');
   // A multinational's official careers host may differ from its corporate website.
@@ -230,7 +234,7 @@ export async function v4ReadPublicJobDocument(url,{fetcher=fetch,signal,maxBytes
   const raw=await limitedRead(r,{allowJson:true,maxBytes});
   const site=meta(raw,'property','og:site_name')||meta(raw,'name','application-name');
   if(isCommercialRecruitmentBoard(current,{site_name:site}))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
-  const plain=htmlToText(raw,{maxChars:Infinity}).trim();
+  const plain=(responseIsJson(r)?raw:htmlToText(raw,{maxChars:Infinity})).trim();
   if(CLOSED.test(pageTitle(raw))||(plain.length<80&&CLOSED.test(plain)))throw Error('V4_JOB_CLOSED');
   return {url:current,plain,site,title:pageTitle(raw)};
  }
@@ -254,7 +258,7 @@ export async function v4RenderPublicJobDocument(url,{browser,signal}={}){
  });
  if(signal?.aborted)throw signal.reason;
  if(response.status===429)throw Error('V4_BROWSER_QUOTA_OR_RATE_LIMIT');
- const raw=await limitedRead(response,{allowJson:true});
+ const raw=await limitedRead(response,{allowJson:true,maxBytes:16*1024*1024});
  let html=raw;
  if((response.headers.get('content-type')||'').includes('json')){
   let parsed;try{parsed=JSON.parse(raw)}catch{throw Error('V4_BROWSER_RESPONSE_INVALID')}

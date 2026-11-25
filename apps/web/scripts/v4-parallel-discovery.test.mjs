@@ -161,3 +161,24 @@ test('reuse a completed same-task report only for exact unchanged evidence and s
  assert.equal(preserveJobEvidence(old,{...common,evidence_excerpt:'更新JD'}).research_detail,undefined);
  assert.equal(preserveJobEvidence(old,{...common,excluded_closed:true}).excluded_closed,true);
 });
+
+test('structured JobPosting retains independent duties, qualifications and skills outside description',async()=>{
+ const {v4ReadEmployerJob}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const url='https://careers.split-employer.cn/jobs/100';
+ const posting={'@type':'JobPosting',title:'区域运营',hiringOrganization:{name:'企业',url:'https://careers.split-employer.cn'},jobLocation:{address:{addressLocality:'上海'}},description:'负责地区运营管理。',responsibilities:['负责渠道建设。','负责团队培训。'],qualifications:'具备业务管理经验。',skills:['数据分析','组织协调']};
+ const read=async value=>v4ReadEmployerJob(url,{fetcher:async()=>new Response(JSON.stringify(value),{headers:{'content-type':'application/json'}})});
+ const jd=await read(posting);
+ for(const value of ['负责地区运营管理。','负责渠道建设。','负责团队培训。','具备业务管理经验。','数据分析','组织协调'])assert.ok(jd.full_jd.includes(value),value);
+ assert.equal(jd.source_confirmed,true);
+ await assert.rejects(()=>read({...posting,description:'负责地区运营管理……'}),/V4_JD_TRUNCATED_SOURCE/);
+});
+test('complex JD coverage reconstructs the contiguous original rather than dropping intervening requirements',async()=>{
+ const {completeJdSpan}=await import('../functions/_lib/v4-jd-completeness.js');
+ const doc='导航\n岗位职责：负责渠道运营。\n必须有团队培训经验。\n任职要求：数据分析能力。\n工作安排：全职。\n返回首页';
+ const parts=['岗位职责：负责渠道运营。','任职要求：数据分析能力。'];
+ const full=completeJdSpan(doc,parts,parts[0],'工作安排：全职。');
+ assert.equal(full,'岗位职责：负责渠道运营。\n必须有团队培训经验。\n任职要求：数据分析能力。\n工作安排：全职。');
+ assert.equal(completeJdSpan(doc,parts,parts[0],'必须有团队培训经验。'),null);
+ assert.equal(completeJdSpan(doc,parts,'虚构开头','工作安排：全职。'),null);
+ assert.equal(completeJdSpan(doc+'\n'+parts[0],parts,parts[0],'工作安排：全职。'),null);
+});

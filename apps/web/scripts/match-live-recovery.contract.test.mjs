@@ -75,7 +75,7 @@ test('the modal shows current progress while SSE retains search metrics',()=>{
  const service=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
  const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
  assert.match(app,/stageTitle\[progressStage\]/);
- assert.match(app,/已形成 \{result\.matches\.length\} 个正式推荐/);
+ assert.match(app,/已完成 \{verifiedMatchReports\(result\.matches\)\.length\} 份可核验报告，最终排名待确认/);
  assert.doesNotMatch(app,/DeepSeek|候选来源/);
  assert.match(service,/event==='activity'/);
  assert.match(service,/onActivity\?\.\(/);
