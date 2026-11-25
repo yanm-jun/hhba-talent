@@ -310,3 +310,29 @@ test('verification scheduler keeps useful concurrency during inexpensive JD reco
  assert.equal(nextVerificationBatch(4,true,100,{externalRequests:48,completed:2}),1);
  assert.equal(nextVerificationBatch(3,false,1,{externalRequests:6,completed:3}),1);
 });
+
+test('activated production V4 OpenAI route can globally compare all eligible candidates',async()=>{
+ const candidate=job(94),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const match={company:candidate.company,title:candidate.title,location:candidate.location,official_url:candidate.url,source_type:'站外官方招聘',reference_vacancy_verified:true,reference_jd_kind:'AI_GENERATED_REFERENCE',reference_jd:'可能负责渠道管理。',reference_jd_basis:'方向推断',evidence_score_status:'AI_REFERENCE_JD_SCORED',match_score:86,curated_suitable:true,report_status:'COMPLETE',research_detail:{comparisons:[],score_explanation:'真实经历匹配'}};
+ let calls=0;
+ const result=await v4Match(async(url,opts)=>{
+  calls++;assert.ok(url.endsWith('/responses'));const body=JSON.parse(opts.body),input=JSON.parse(body.input);
+  assert.deepEqual(input.pending_ids,['j1']);assert.equal(body.store,false);
+  assert.equal(Object.hasOwn(body,'max_output_tokens'),false);
+  return model({ordered_ids:['j1'],research_notes:'OpenAI pool research'});
+ },provider,resume,'全国',{env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true,checkpoint:{phase:'reporting',rows:[[candidate.url,candidate]],profile,matches:[match]}});
+ assert.equal(calls,1);assert.deepEqual(result.checkpoint.globalOrder,[candidate.url]);assert.equal(result.checkpoint.globalRankState.done,true);
+});
+test('activated V4 OpenAI keeps researching confirmed vacancies before reference JD assessment',async()=>{
+ const candidate=job(95),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ let recovery=0,assessment=0;
+ const fetcher=async(url,opts)=>{
+  if(url===candidate.url)return Response.json({'@type':'JobPosting',title:candidate.title,hiringOrganization:{name:candidate.company,url:new URL(candidate.url).origin},jobLocation:{address:{addressLocality:'上海'}}});
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.original_url){recovery++;assert.equal(input.confirmed_vacancy,true);return model({sources:[],research_complete:true,completion_reason:'公开原文未找到'});}
+  assessment++;assert.equal(input.job.vacancy_confirmed,true);
+  return model({reference_jd:'可能负责汽车渠道运营。',reference_basis:'方向推断。',suitable:true,score:86,reason:'相关经历',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车渠道运营',comparisons:[]});
+ };
+ const result=await v4Match(fetcher,provider,resume,'全国',{env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
+ assert.ok(recovery>=1);assert.equal(assessment,1);assert.equal(result.checkpoint.matches[0].reference_vacancy_verified,true);assert.equal(result.checkpoint.matches[0].match_score,86);
+});
