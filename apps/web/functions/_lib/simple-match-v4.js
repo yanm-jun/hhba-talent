@@ -599,7 +599,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     onRecoveryState(()=>next);throw discovery.reason;
    }
    next.pipelineActive=true;
-   next.pipelineVerificationWidth=verified.status==='rejected'?Math.max(1,Math.floor(plan.verification/2)):Math.min(3,plan.verification+1);
+   const observedRequests=(verifyState?.diagnostics?.VERIFICATION_EXTERNAL_REQUESTS||0)-(checkpoint.diagnostics?.VERIFICATION_EXTERNAL_REQUESTS||0);
+   next.pipelineVerificationWidth=verified.status==='rejected'?Math.max(1,Math.floor(plan.verification/2)):Math.min(observedRequests>0&&observedRequests/Math.max(1,attempted.length)<=8&&eligible.length>=48?4:3,plan.verification+1);
    if(discovery.status==='rejected'){
     next.discoveryWidth=nextDiscoveryWidth(search.discoveryWidth,[discovery.reason?.code||'AI_PROVIDER_RESPONSE_INVALID']);
     next.diagnostics={...next.diagnostics,PIPELINE_SEARCH_RETRY_RETAINED:(next.diagnostics?.PIPELINE_SEARCH_RETRY_RETAINED||0)+1};
