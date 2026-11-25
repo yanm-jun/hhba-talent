@@ -111,7 +111,7 @@ function events(env,request,input,waitUntil){
      await guard();
      const result=await v4Match(fetch,v4JobProvider(env),input.text,input.role_hint,{
       signal:executionSignal,onProgress:progress,onActivity:activity,env,excludeUrls:input.excludeUrls,
-      stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
+      stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,parallelResearch:env.HHBA_V4_PARALLEL_RESEARCH==='1',allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
       onResearch:sendResearch,
       onPartial:matches=>{sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
      if(executionSignal.aborted)throw executionSignal.reason||Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});

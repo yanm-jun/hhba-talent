@@ -941,12 +941,14 @@ test('job report source presentation extracts citations and does not falsely ver
  assert.equal(collectRecruitmentSources({requirements_basis:'https://user:pass@careers.example.cn/job/2 http://careers.example.cn/jobs'}).length,0);
 });
 
-test('the merged report shows all received candidates even when formal recommendations are zero',async()=>{
+test('the report separates verified JD from all candidate records even when formal recommendations are zero',async()=>{
  const {readFile}=await import('node:fs/promises');
  const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
  const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(panels,/for\(const job of \[\.\.\.jobs,\.\.\.officialJobs\]\)/);
- assert.match(panels,/const jdItems=\[\.\.\.all\]\.sort/);
+ assert.match(panels,/const jdItems=\[\.\.\.verified\]\.sort/);
+ assert.match(panels,/待核验及未通过核验记录/);
+ assert.match(panels,/all\.filter\(j=>!confirmed\(j\)\)\.map/);
  assert.match(panels,/reportScore\(jdJob\)\?\?'—'/);
  assert.match(panels,/onOptimize\(jdJob\)/);
  assert.match(dialog,/const showResults=selectedStage===2/);
