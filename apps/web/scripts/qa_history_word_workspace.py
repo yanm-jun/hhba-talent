@@ -100,7 +100,7 @@ def exercise(browser,label,viewport,initial_linked,has_file=True):
             payload=req.post_data_json
             assert payload['consent_ai'] is True
             assert payload['job']['title']=='历史区域督导',payload
-            assert payload['job']['requirements']==JD,payload
+            assert payload['job']['requirements']=='', 'verified JD is resolved by its version and hash, not duplicated in transport'
             assert payload['job']['jd_version_id']==JOB_2['jd_version_id']
             assert payload['job']['jd_sha256']==JOB_2['jd_sha256']
             assert payload['blocks'][0]['text']=='负责门店运营及日常数据整理工作'
