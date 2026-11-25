@@ -8,7 +8,7 @@ import {v4PublicJobUrl,v4ReadEmployerJob,v4EmployerAuthorization,v4ReadPublicJob
 import {directOfficialJobEvidence} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
 import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
-import {CANDIDATE_TARGET,FINAL_TARGET,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,reportCoverageErrors,eligibleCuratedScore,qualifiedReport,validateGeminiGlobalOrder,applyGeminiGlobalOrder,mergeGeminiRankProgress,carryGeminiRankProgress} from './v4-curated-reports.js';
+import {CANDIDATE_TARGET,FINAL_TARGET,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,reportCoverageErrors,referenceSourceErrors,eligibleCuratedScore,qualifiedReport,validateGeminiGlobalOrder,applyGeminiGlobalOrder,mergeGeminiRankProgress,carryGeminiRankProgress} from './v4-curated-reports.js';
 import {findMainlandCity} from './mainland-job-location.js';
 import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4NotesMemoryPage,v4MemoryRecordPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex,v4KnownPublicResearchUrls,v4ResearchEvidenceProgress,v4MayContinueBrowserRead} from './v4-research-tools.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
@@ -439,7 +439,7 @@ async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,br
  let repair='',previous=null;const seen=new Set();
  for(;;){try{
   const reply=await v4StageResearchCall(p=>v4Call(fetcher,provider,p,{signal}),{
-   instructions:'你是专业职业顾问。当前岗位的完整官方JD无法取得，但不能仅因缺少JD而放弃真实岗位。根据真实岗位名称、地点、已有独立公开资料及通用职业知识自主撰写一份实用参考JD，并直接比较真实简历。已读原文与AI推断必须严格分开；生成的职责和能力方向不是企业已发布要求，不得编造企业硬性学历、年限、证书、薪资、招聘状态、录用概率。自由选择分析维度、研究深度及篇幅，不设置固定权重。仅用公开企业和岗位关键词联网，不得搜索简历或个人数据。返回JSON {reference_jd:字符串（可能职责与能力方向的完整参考文本，非官网原文）,reference_basis:说明实际原文依据、推断范围及未知项,suitable:boolean,score:0至100整数或null,reason,matched,gaps,resume_quote,jd_quote（只能引用本次生成的reference_jd，并明确它是推断）,comparisons:[{jd_quote,resume_quote,status,analysis}],strengths,risks,career_development,optimization_advice,competition,extra_sections}。必须引用真实简历原文；不得把参考JD的引文当作官方证据。不能可靠评分时返回null，仍保留参考JD。未确认岗位真实性时只形成研究参考，不宣称真实在招。'+(fullResearch?' 参考JD必须有清晰、具体且与该岗位相称的可能工作职责和能力要求；不可仅复述岗位名称、给通用短句或把猜测当作雇主要求。区分可从公开材料确认的内容与职业常识推断；未知的学历、年限、薪资等直接注明未确认。完成逐项对照与匹配理由后，主动复核实际覆盖面、差距、适配逻辑和可操作建议；按具体岗位自主决定详略，不规定篇幅、条数或固定权重。增加 reference_coverage:{duties_quote,capabilities_quote}（分别逐字引用参考JD中不同的职责与能力要求片段）及 quality_review:{status:complete或revise,explanation,missing:需要补充的实际遗漏数组}。真正未知的事实不是待编造的缺项；只有实质内容充分且不存在可修复遗漏才返回complete。':'') ,
+   instructions:'你是专业职业顾问。当前岗位的完整官方JD无法取得，但不能仅因缺少JD而放弃真实岗位。优先依据该企业实际公开的招聘内容、同一岗位资料及相关企业公开信息自主整理一份实用参考JD；同类岗位只能作为明确标注的比较背景，通用职业知识只能解释已有线索或提出准备建议，并直接比较真实简历。已读原文与AI推断必须严格分开；生成的职责和能力方向不是企业已发布要求，不得编造企业硬性学历、年限、证书、薪资、招聘状态、录用概率。自由选择分析维度、研究深度及篇幅，不设置固定权重。仅用公开企业和岗位关键词联网，不得搜索简历或个人数据。返回JSON {reference_jd:字符串（可能职责与能力方向的完整参考文本，非官网原文）,reference_basis:说明实际原文依据、推断范围及未知项,suitable:boolean,score:0至100整数或null,reason,matched,gaps,resume_quote,jd_quote（只能引用本次生成的reference_jd，并明确它是推断）,comparisons:[{jd_quote,resume_quote,status,analysis}],strengths,risks,career_development,optimization_advice,competition,extra_sections}。必须引用真实简历原文；不得把参考JD的引文当作官方证据。不能可靠评分时返回null，仍保留参考JD。未确认岗位真实性时只形成研究参考，不宣称真实在招。'+(fullResearch?' 参考JD必须有清晰、具体且与该岗位相称的可能工作职责和能力要求；不可仅复述岗位名称、给通用短句或把猜测当作雇主要求。以已独立核对的招聘资料为首要依据，逐项整理职责、能力方向、与真实经历的关系。企业未公布具体要求时，从实际职责推导建议准备的能力，并标为AI建议而非企业要求；若只有岗位名称，仍给出与该岗位方向相符的求职准备及简历分析，明确仅依据岗位名称，不声称是该企业职责或资格。不要用空白或单独的待确认占位代替可用分析。未公布的硬性资格、薪资等不猜测，说明已知依据及可操作核实方式。完成逐项对照与匹配理由后，主动复核实际覆盖面、差距、适配逻辑和可操作建议；按具体岗位自主决定详略，不规定篇幅、条数或固定权重。增加 reference_coverage:{duties_quote,capabilities_quote}（分别逐字引用参考JD中不同的职责与能力要求片段）及 reference_source_anchors:{duties:{kind:public_excerpt或title_direction,url,quote},capabilities:{kind:public_excerpt或title_direction,url,quote}}（public_excerpt必须引用independent_public_excerpts内对应URL的连续原文；title_direction只能逐字使用job.title且url为空，代表求职方向建议而非企业要求；有可用公开原文时必须实际引用，不能仅依据标题）及 quality_review:{status:complete或revise,explanation,missing:需要补充的实际遗漏数组}。真正未知的事实不是待编造的缺项；只有实质内容充分且不存在可修复遗漏才返回complete。':'') ,
    input:JSON.stringify({resume_text:resume,preferred_job_or_city:roleHint,job:{company:job.company,title:job.title,location:job.location,url:job.official_url,vacancy_confirmed:job.reference_vacancy_verified===true},independent_public_excerpts:facts,public_research_inference:job.jd_research?.inference||'',unknowns:job.jd_research?.unknowns||[],...(repair?{previous_validation_error:repair,previous_reference_result:previous}:{})}),
    tools:[{type:'web_search'}],tool_choice:'auto',include:['web_search_call.action.sources']
   },{parse:v4ParseJson,sourceUrls:[job.official_url,...facts.map(f=>f.url)],fetcher,browser,signal,resume,ledger,note,taskNotes});
@@ -450,7 +450,7 @@ async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,br
   if(typeof value.score==='number'&&Number.isFinite(value.score)&&value.score>=0&&value.score<=100)value.score=Math.round(value.score);
   const report=validateCuratedReport(value,resume,reference);
   if(fullResearch&&report.ok){
-   const coverage=reportCoverageErrors(value,reference,{reference:true});
+   const coverage=[...reportCoverageErrors(value,reference,{reference:true}),...referenceSourceErrors(value,job)];
    if(coverage.length){report.ok=false;report.errors=coverage;note('JD_REFERENCE_COVERAGE_REVIEW');}
   }
   if(report.ok){
@@ -458,7 +458,7 @@ async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,br
    note(job.reference_vacancy_verified?'JD_REFERENCE_VERIFIED_VACANCY_SCORED':'JD_REFERENCE_UNVERIFIED_LEAD_SCORED');
    return;
   }else if(value.suitable===false){job.curated_suitable=false;job.report_status='DECLINED';job.recommendation_reason=text(value.reason);return;}
-  else {const issue=JSON.stringify([report.errors,value]);if(seen.has(issue)){note('JD_REFERENCE_SCORE_UNCONFIRMED');return;}seen.add(issue);previous=value;repair='独立复核参考分析：'+report.errors.join(',')+'。根据实际遗漏补充具体职责、能力要求及逐项对照，保留可信内容与未知项；检查真实简历引文与参考文本引文；没有可靠依据允许null，不编造。';if(value.score===null&&seen.size>1)return;continue;}
+  else {const issue=JSON.stringify([report.errors,value]);if(seen.has(issue)){note('JD_REFERENCE_SCORE_UNCONFIRMED');return;}seen.add(issue);previous=value;repair='独立复核参考分析：'+report.errors.join(',')+'。根据真实企业资料补充具体职责、能力建议及逐项对照，核对reference_source_anchors，不把推断冒充官方要求；只有标题时提供明确标注的求职准备方向，保留可信内容与未知项；检查真实简历引文与参考文本引文；没有可靠依据允许null，不编造。';if(value.score===null&&seen.size>1)return;continue;}
  }catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(isV4RetryableProviderError(e?.code))throw e;const issue=e?.code||'JD_REFERENCE_UNAVAILABLE';if(seen.has(issue)){note(issue);return;}seen.add(issue);repair='重新组织完整参考JD及证据评分，修复 '+issue;}
  }
 }
