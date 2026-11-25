@@ -180,3 +180,22 @@ test('recover complete candidate objects from interrupted Gemini JSON without in
  assert.deepEqual(recoverV4PartialJobs(raw),[first]);
  assert.deepEqual(recoverV4PartialJobs('{"profile":{}}'),[]);
 });
+
+test('parallel research merges private stage notes without replacing completed evidence',async()=>{
+ const {mergePipelineCheckpoint}=await import('../functions/_lib/v4-research-pipeline.js');
+ const original={researchNotes:['shared']},discovery={phase:'research',rows:[],researchNotes:['shared','search']},verification={researchNotes:['shared','score']};
+ const next=mergePipelineCheckpoint(original,discovery,verification,[]);
+ assert.deepEqual(next.researchNotes,['shared','search','score']);
+});
+test('authorized checkpoint renewal extends only unfinished matching generation',async()=>{
+ const {saveMatchTask,readMatchTask}=await import('../functions/_lib/v4-match-checkpoint-storage.js');
+ const objects=new Map(),env={HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',HHBA_MATCH_V4_CHECKPOINT_SECRET:'test-only-checkpoint-secret-long-enough',HHBA_PRIVATE_RESUMES:{async put(k,v){objects.set(k,v)},async get(k){const v=objects.get(k);return v?{arrayBuffer:async()=>v.buffer.slice(v.byteOffset,v.byteOffset+v.byteLength)}:null}}};
+ const id='a'.repeat(64),hour=3600000;
+ await saveMatchTask(env,id,{generation:2,checkpoint:{phase:'research'}},0);
+ assert.ok(await readMatchTask(env,id,20*hour,{renewGeneration:1}));
+ assert.ok(await readMatchTask(env,id,21*hour,{renewGeneration:2}));
+ assert.ok(await readMatchTask(env,id,24*hour));
+ await saveMatchTask(env,id,{generation:2,result:{status:'COMPLETE'}},0);
+ await readMatchTask(env,id,21*hour,{renewGeneration:2});
+ assert.equal(await readMatchTask(env,id,24*hour),null);
+});

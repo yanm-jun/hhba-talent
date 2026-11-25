@@ -37,6 +37,7 @@ export function mergePipelineCheckpoint(original,discovery,verification,attempte
  const keys=new Set(ledger.map(r=>JSON.stringify([r.url,r.mode,r.offset,r.text])));
  for(const record of verification.publicEvidence||[]){const k=JSON.stringify([record.url,record.mode,record.offset,record.text]);if(!keys.has(k)){keys.add(k);ledger.push(record);}}
  next.publicEvidence=ledger;
+ next.researchNotes=[...new Set([...(next.researchNotes||[]),...(verification.researchNotes||[])])];
  const diag={...(next.diagnostics||{})};
  for(const [k,v] of Object.entries(verification.diagnostics||{})){const delta=v-(original.diagnostics?.[k]||0);if(delta>0)diag[k]=(diag[k]||0)+delta;}
  diag.PIPELINE_VERIFICATION_ATTEMPTS=(diag.PIPELINE_VERIFICATION_ATTEMPTS||0)+attempted.length;

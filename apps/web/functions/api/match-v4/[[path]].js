@@ -195,7 +195,7 @@ async function backgroundStep(env,request,waitUntil){
   input={managed:true,background:true,session,taskId:task.id,taskKey,generation:task.generation,text:task.text,role_hint:task.role,excludeUrls:task.excludeUrls,phone:session.phone,resume_id:task.resume_id};
   input.lease=await leaseMatchTask(env.HHBA_PNVS_AUTH_DB,taskKey);
   if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
-  const saved=await readMatchTask(env,taskKey);
+  const saved=await readMatchTask(env,taskKey,Date.now(),{renewGeneration:task.generation});
   if(saved?.generation===task.generation&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
   else if(saved?.generation===task.generation&&saved?.checkpoint)input.checkpoint=saved.checkpoint;
   else if(saved?.result?.status==='COMPLETE'&&saved.checkpoint&&saved.generation+1===task.generation){
@@ -283,7 +283,7 @@ export async function onRequest(context){
    }
    input.lease=await leaseMatchTask(db,input.taskKey);
    if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
-   const saved=await readMatchTask(env,input.taskKey);
+   const saved=await readMatchTask(env,input.taskKey,Date.now(),input.managed?{renewGeneration:generation}:{});
    if(!Number.isSafeInteger(generation)||generation<0||generation>(saved?.generation||0)+1){await input.lease.release();return fail('AI_CHECKPOINT_INVALID',409);}
    input.generation=generation;
    if(generation===(saved?.generation||0)&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;

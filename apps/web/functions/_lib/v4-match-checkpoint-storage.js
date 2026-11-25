@@ -57,12 +57,16 @@ export async function saveMatchTask(env,id,value,now=Date.now()){
  const packed=new Uint8Array(12+bytes.byteLength);packed.set(iv);packed.set(new Uint8Array(bytes),12);
  await env.HHBA_PRIVATE_RESUMES.put(PREFIX+'tasks/'+id,packed,{httpMetadata:{contentType:'application/octet-stream'}});
 }
-export async function readMatchTask(env,id,now=Date.now()){
+export async function readMatchTask(env,id,now=Date.now(),{renewGeneration}={}){
  if(!checkpointStorageReady(env)||! /^[a-f0-9]{64}$/.test(id))throw Error('AI_CHECKPOINT_INVALID');
  const object=await env.HHBA_PRIVATE_RESUMES.get(PREFIX+'tasks/'+id);
  if(!object)return null;
  const bytes=new Uint8Array(await object.arrayBuffer());
  const raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes.subarray(0,12),additionalData:enc.encode('task:'+id)},await key(env),bytes.subarray(12));
  const data=JSON.parse(dec.decode(raw));
- return data.until>=now?data.value:null;
+ if(data.until<now)return null;
+ // Callers may opt in only while owning the research lease and an authorized
+ // active generation. Completed/abandoned tasks retain ordinary expiry.
+ if(Number.isSafeInteger(renewGeneration)&&data.value?.generation===renewGeneration&&data.value?.checkpoint&&!data.value?.result&&data.until-now<22*3600000)await saveMatchTask(env,id,data.value,now);
+ return data.value;
 }

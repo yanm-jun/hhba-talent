@@ -87,11 +87,11 @@ export async function v4RunResearchActions(actions,opts){
  }
  return out;
 }
-const stageGuide='可调用 research_actions 数组或 research_action 单项工具。除公开来源工具外，{type:"text_page",collection:"resume"|"jd"|"document",offset:字符偏移} 可读取当前任务原文的后续页。原文仅用于本次模型研究，禁止作为搜索词或传往网页工具。若输入显示分页，必须阅读全部相关原文并结合证据再判断。可用 research_notes 保留简洁、可核对的阶段研究发现；不能用摘要替代原文证据。当前阶段如需复查网页，使用 read_page；recheck只在全局搜索与复盘阶段执行，不直接改变已核验JD。';
-export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetcher,browser,signal,resume='',jd='',document='',collections={},ledger=[],note=()=>{}}={}){
+const stageGuide='可调用 research_actions 数组或 research_action 单项工具。除公开来源工具外，{type:"text_page",collection:"resume"|"jd"|"document",offset:字符偏移} 可读取当前任务原文的后续页。原文仅用于本次模型研究，禁止作为搜索词或传往网页工具。若输入显示分页，必须阅读全部相关原文并结合证据再判断。可用 research_notes 保留可核对的阶段研究发现，供后续阶段复用；不得在笔记中记录个人联系方式或复制完整简历，笔记仅为本任务的分析上下文；不能用摘要替代原文证据。当前阶段如需复查网页，使用 read_page；recheck只在全局搜索与复盘阶段执行，不直接改变已核验JD。';
+export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetcher,browser,signal,resume='',jd='',document='',collections={},ledger=[],taskNotes,note=()=>{}}={}){
  const original=JSON.parse(payload.input);
  const knownUrls=new Set([...sourceUrls,...ledger.map(r=>r.url)].map(v4PublicJobUrl).filter(Boolean));
- const seen=new Set(),stageLedger=[...ledger],notes=[];let budget=90000,paged=false,results=null,repeat=false,contextState=v4ContextState(null),evidenceCursor=0;
+ const seen=new Set(),stageLedger=[...ledger],notes=Array.isArray(taskNotes)?[...taskNotes]:[];let budget=90000,paged=false,results=null,repeat=false,contextState=v4ContextState(null),evidenceCursor=0;
  const originals={resume,jd,document};
  const delivered={resume:[],jd:[],document:[]};
  const remember=(name,start,end)=>{if(end<=start)return;const list=[...delivered[name],[start,end]].sort((a,b)=>a[0]-b[0]);delivered[name]=[];for(const part of list){const last=delivered[name].at(-1);if(last&&part[0]<=last[1])last[1]=Math.max(last[1],part[1]);else delivered[name].push(part);}};
@@ -126,7 +126,7 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
   const actions=v4RequestedActions(data);
   if(paged){remember('resume',0,Math.min(resume.length,budget));remember('jd',0,Math.min(jd.length,budget));remember('document',0,Math.min(document.length,budget));for(const r of results||[])if(r.ok&&r.type==='text_page'&&Object.hasOwn(delivered,r.collection))remember(r.collection,r.offset,r.offset+r.text.length);}
   if(response.status==='completed'){evidenceCursor=indexPage.next_cursor??0;contextState=v4ContextFeedback(contextState,{more:indexPage.next_cursor!==null});budget=contextState.budget;}
-  if(typeof data.research_notes==='string'&&data.research_notes.trim()&&!notes.includes(data.research_notes))notes.push(data.research_notes);
+  if(typeof data.research_notes==='string'&&data.research_notes.trim()&&!notes.includes(data.research_notes.trim())){const n=data.research_notes.trim();notes.push(n);if(Array.isArray(taskNotes)&&!taskNotes.includes(n))taskNotes.push(n);}
   if(!actions.length){
    const next=paged?Object.keys(originals).filter(name=>missing(name)!==null):[];
    if(!next.length)return response;
