@@ -322,7 +322,7 @@ async function recoverEmployerJob(fetcher,provider,url,job,initial,{signal,onAct
   }catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(isV4RetryableProviderError(e?.code))throw e;note(e?.code||'JD_RESEARCH_PROVIDER_FAILED');const problem=e?.code||'JD_RESEARCH_PROVIDER_FAILED';if(seen.has(problem))return best;seen.add(problem);prior='返回未能解析的研究结果，重新组织公开来源证据并说明停止依据：'+problem;continue;}
   const sources=Array.isArray(data.sources)?data.sources:[];
   // Always give the original source a flexible independently-read extraction attempt.
-  const candidates=[...(initial?.vacancy_confirmed&&data.research_complete===true?[]:[{url,employer_proof_url:job.employer_proof_url,employer_proof_urls:job.employer_proof_urls}]),...sources];
+  const candidates=[...(initial?.vacancy_confirmed&&data.research_complete===true&&!initial.resource_hints?.length?[]:[{url,employer_proof_url:job.employer_proof_url,employer_proof_urls:job.employer_proof_urls}]),...sources];
   const signature=await sha256Hex(JSON.stringify({sources:candidates.map(s=>[s?.url,s?.employer_proof_url,s?.employer_proof_urls]),reason:text(data.completion_reason),complete:data.research_complete}));
   let added=false;
   for(const source of candidates){
