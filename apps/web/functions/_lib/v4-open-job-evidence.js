@@ -236,11 +236,20 @@ export function v4ScriptResourceHints(source,documentUrl,scriptUrl=documentUrl){
   let url;try{url=v4PublicJobUrl(new URL(value,base).href)}catch{return;}
   if(!url||isCommercialRecruitmentBoard(url))return;
   const u=new URL(url);
-  if(kind==='data'&&!/(?:\/(?:api|graphql|recruit(?:ment)?|career[s]?|job[s]?|position[s]?|vacanc(?:y|ies)|opening[s]?)(?:[\/_.-]|$)|\.json$)/i.test(u.pathname))return;
+  if(kind==='data'&&(/\.(?:m?js|cjs|css)$/i.test(u.pathname)||!/(?:\/(?:api|graphql|recruit(?:ment)?|career[s]?|job[s]?|position[s]?|vacanc(?:y|ies)|opening[s]?)(?:[\/_.-]|$)|\.json$)/i.test(u.pathname)))return;
   if(kind==='script'&&!/\.(?:m?js)$/i.test(u.pathname))return;
   out.set(url,{url,kind});
  };
  for(const m of source.matchAll(/["']((?:https:\/\/|https:\\\/\\\/|\/\/|\/|\.\.?\/)[^"'<>\\\r\n]*(?:\\\/[^"'<>\\\r\n]*)*)["']/gi))add(m[1],'data',documentUrl);
+ // Handle only statically provable literal URL construction. No eval, no
+ // variable guessing, no executing downloaded scripts.
+ for(const m of source.matchAll(/\b(?:fetch|axios\.get)\s*\(\s*((?:"[^"\\\r\n]*"|'[^'\\\r\n]*')(?:\s*\+\s*(?:"[^"\\\r\n]*"|'[^'\\\r\n]*'))+)\s*(?=[,)])/g)){
+  const parts=[...m[1].matchAll(/"([^"\\\r\n]*)"|'([^'\\\r\n]*)'/g)].map(p=>p[1]??p[2]);
+  add(parts.join(''),'data',documentUrl);
+ }
+ for(const m of source.matchAll(/\bnew\s+URL\s*\(\s*(?:"([^"\\\r\n]*)"|'([^'\\\r\n]*)')\s*,\s*(?:"([^"\\\r\n]*)"|'([^'\\\r\n]*)')\s*\)/g)){
+  const base=v4PublicJobUrl(m[3]??m[4]);if(base)try{add(new URL(m[1]??m[2],base).href,'data',documentUrl)}catch{}
+ }
  for(const m of source.matchAll(/(?:\bimport\s*\(|\bfrom\s*|\bimport\s*)["']([^"'\r\n]+)["']/g))add(m[1],'script',scriptUrl);
  return [...out.values()];
 }
@@ -256,15 +265,15 @@ export function v4PublicResourceHints(html,base,{includeScriptHints=true}={}){
  const attr=(tag,name)=>new RegExp('(?:^|\\s)'+name+'\\s*=\\s*(?:"([^"]*)"|\\x27([^\\x27]*)\\x27|([^\\s>]+))','i').exec(tag)?.slice(1).find(x=>x!==undefined);
  for(const m of html.matchAll(/<(script|link|iframe|a|div|section)\b[^>]*>/gi)){
   const tag=m[0],name=m[1].toLowerCase();
-  if(name==='script')add(attr(tag,'src'),'script');
+  if(name==='script'){add(attr(tag,'src'),'script');add(attr(tag,'data-src'),'script');}
   if(name==='link'){
    const rel=(attr(tag,'rel')||'').toLowerCase(),as=(attr(tag,'as')||'').toLowerCase();
    if(rel==='stylesheet')add(attr(tag,'href'),'style');
    else if(rel==='modulepreload'||rel==='preload'&&as==='script')add(attr(tag,'href'),'script');
    else if(rel==='preload'&&as==='fetch')add(attr(tag,'href'),'data');
   }
-  if(name==='iframe')add(attr(tag,'src'),'frame');
-  for(const key of ['data-url','data-api','data-endpoint','data-src'])add(attr(tag,key),'data');
+  if(name==='iframe'){add(attr(tag,'src'),'frame');add(attr(tag,'data-src'),'frame');add(attr(tag,'data-lazy-src'),'frame');}
+  for(const key of ['data-url','data-api','data-endpoint',...(['script','iframe'].includes(name)?[]:['data-src'])])add(attr(tag,key),'data');
   if(name==='a'){
    const href=attr(tag,'href');if(href&&/(?:job|career|recruit|vacanc|position|\.json(?:[?#]|$)|招聘|职位)/i.test(href))add(href,'link');
   }
@@ -314,9 +323,11 @@ export function v4BrowserResourcePlan(url,resourceHints=[],ledger=[]){
   const h=queue.shift(),u=v4PublicJobUrl(h?.url);
   if(!u||u===target||isCommercialRecruitmentBoard(u)||hints.has(u))continue;
   hints.set(u,{url:u,kind:h.kind});
-  if(h.kind==='script')for(const r of ledger)if(r.url===u&&r.script_source===true)queue.push(...(r.resource_hints||[]));
+  // The next frame's own observed declarations are also reachable. Only a
+  // successful full static read of that exact frame may contribute children.
+  if(h.kind==='script'||h.kind==='frame')for(const r of ledger)if(r.url===u&&r.type==='read_page'&&r.mode==='static'&&(h.kind==='script'?r.script_source===true:!r.script_source&&r.offset===0&&r.next_offset===null))queue.push(...(r.resource_hints||[]));
  }
- const publicDataUrls=[...hints.values()].filter(h=>['data','frame'].includes(h.kind)&&publicReadResourceUrl(h.url)&&ledger.some(r=>r.url===h.url&&r.type==='read_page'&&r.mode==='static'&&!r.script_source&&r.offset===0&&r.next_offset===null&&r.text?.trim())).map(h=>h.url);
+ const publicDataUrls=[...hints.values()].filter(h=>['data','frame'].includes(h.kind)&&publicReadResourceUrl(h.url)&&ledger.some(r=>r.url===h.url&&r.type==='read_page'&&r.mode==='static'&&!r.script_source&&r.offset===0&&r.next_offset===null&&(r.text?.trim()||h.kind==='frame'&&r.resource_hints?.length))).map(h=>h.url);
  return {resourceHints:[...hints.values()],publicDataUrls};
 }
 // Automatic independent GET for declared public data/frame resources. Browser
@@ -324,38 +335,63 @@ export function v4BrowserResourcePlan(url,resourceHints=[],ledger=[]){
 // redirected or oversized results remain research leads, not allowed origins.
 export async function v4PreparePublicBrowserResources(url,{fetcher=fetch,signal,resourceHints=[],ledger=[],onDocument=()=>{}}={}){
  let initial=v4BrowserResourcePlan(url,resourceHints,ledger);
- const records=[...ledger];
- // If the HTML exposes only JS, inspect the next independently declared
- // unread script in this browser pass. Further script dependencies remain
- // addressable by the agent's existing read_page/window tools and later passes.
- if(!initial.resourceHints.some(h=>['data','frame'].includes(h.kind))){
-  const hint=initial.resourceHints.find(h=>h.kind==='script'&&publicReadResourceUrl(h.url)&&!records.some(r=>r.url===h.url&&r.script_source));
-  if(hint)try{
-   const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal,scriptSource:true,documentUrl:url});
-   if(doc.url===hint.url&&doc.script_source){
-    const record={type:'read_page',ok:true,mode:'static',url:doc.url,offset:0,next_offset:null,text:doc.plain,script_source:true,document_url:url,resource_hints:doc.resource_hints||[]};
-    records.push(record);onDocument(record);
-    initial=v4BrowserResourcePlan(url,resourceHints,records);
-   }
-  }catch(e){if(signal?.aborted)throw e;}
- }
- for(const hint of initial.resourceHints){
+ const records=[...ledger],attempted=new Set();
+ // Bound automatic transport per browser pass, not the agent's research.
+ // Remaining discovered URLs are returned as hints and can be read by the
+ // existing static/window tools or subsequent browser passes.
+ const resourceWindow=6;
+ while(attempted.size<resourceWindow){
+  const pending=initial.resourceHints.filter(h=>!attempted.has(h.url)&&publicReadResourceUrl(h.url));
+  const hint=pending.find(h=>['data','frame'].includes(h.kind)&&!initial.publicDataUrls.includes(h.url))||
+   pending.find(h=>h.kind==='script'&&!records.some(r=>r.url===h.url&&r.script_source));
+  if(!hint)break;
+  attempted.add(hint.url);
   if(signal?.aborted)throw signal.reason;
-  if(!['data','frame'].includes(hint.kind)||initial.publicDataUrls.includes(hint.url))continue;
-  if(!publicReadResourceUrl(hint.url))continue;
+  const script=hint.kind==='script';
+  const referring=records.find(r=>(r.resource_hints||[]).some(h=>h.url===hint.url&&h.kind==='script'));
+  const documentUrl=referring?.document_url||referring?.url||url;
   try{
-   const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal});
-   if(doc.url!==hint.url||!doc.plain.trim())continue;
-   const record={type:'read_page',ok:true,mode:'static',url:doc.url,offset:0,next_offset:null,text:doc.plain,resource_hints:doc.resource_hints||[]};
+   const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal,...(script?{scriptSource:true,documentUrl}:{})});
+   if(doc.url!==hint.url||(!doc.plain.trim()&&!(hint.kind==='frame'&&doc.document_kind==='html'&&doc.resource_hints?.length))||script&&!doc.script_source)continue;
+   const record={type:'read_page',ok:true,mode:'static',url:doc.url,offset:0,next_offset:null,text:doc.plain,...(script?{script_source:true,document_url:documentUrl}:{}),resource_hints:doc.resource_hints||[]};
    records.push(record);onDocument(record);
+   initial=v4BrowserResourcePlan(url,resourceHints,records);
   }catch(e){if(signal?.aborted)throw e;}
  }
- return v4BrowserResourcePlan(url,initial.resourceHints,records);
+ return v4BrowserResourcePlan(url,resourceHints,records);
 }
 // Read a separately hosted JSON JD even when browser CORS prevents the
 // employer application from rendering it. Ownership is inherited only from an
 // already independently confirmed vacancy and its fresh exact HTML declaration.
 // Require the structured posting itself to point to that same landing URL.
+// Non-schema JSON can be accepted only when one object explicitly contains
+// the same landing URL, employer, role, city and actual description/requirements.
+// Never combine fields across different records or infer a missing identity.
+function explicitJsonJobs(raw){
+ let root;try{root=JSON.parse(raw)}catch{return []}
+ const found=[],stack=[root],scalar=v=>typeof v==='string'?v.trim():'';
+ const pick=(o,keys)=>{const values=[...new Set(keys.map(k=>scalar(o[k])).filter(Boolean))];return values.length===1?values[0]:'';};
+ const body=(o,keys)=>keys.flatMap(k=>typeof o[k]==='string'?[o[k]]:Array.isArray(o[k])&&o[k].every(x=>typeof x==='string')?o[k]:[]).filter(x=>x.trim());
+ while(stack.length){
+  const v=stack.pop();if(!v||typeof v!=='object')continue;
+  for(const child of Object.values(v))if(child&&typeof child==='object')stack.push(child);
+  if(Array.isArray(v)||v['@type'])continue;
+  const url=pick(v,['url','jobUrl','job_url','detailUrl','detail_url','applyUrl','apply_url']);
+  const title=pick(v,['title','jobTitle','job_title','positionName','position_name']);
+  const employer=pick(v,['company','companyName','company_name','employerName','employer_name']);
+  const location=pick(v,['city','workCity','work_city','location','workLocation','work_location']);
+  const descriptions=body(v,['description','jobDescription','job_description','responsibilities','jobResponsibilities']);
+  const qualifications=body(v,['requirements','jobRequirements','job_requirements','qualifications']);
+  if(!url||!title||!employer||!location||!descriptions.length||!qualifications.length)continue;
+  const statuses=[v.status,v.jobStatus,v.job_status,v.publishStatus].filter(x=>typeof x==='string');
+  if(v.active===false||v.isActive===false||v.closed===true||v.isClosed===true||v.expired===true||v.isPublished===false||statuses.some(s=>! /^(?:open|active|published|recruiting|online|在招|招聘中|已发布|开放)$/i.test(s.trim())))continue;
+  const expires=[v.validThrough,v.expiresAt,v.expireAt,v.expiryDate].filter(x=>x!==undefined&&x!==null);
+  if(expires.some(x=>!Number.isFinite(Date.parse(x))||Date.parse(x)<Date.now()))continue;
+  if([...descriptions,...qualifications].some(looksTruncatedJd))continue;
+  found.push({url,title,hiringOrganization:{name:employer},jobLocation:{address:{addressLocality:location}},description:descriptions,qualifications,non_schema:true});
+ }
+ return found;
+}
 export async function v4ReadDeclaredStructuredJob(parent,document,{fetcher=fetch,signal,onDocument=()=>{}}={}){
  const target=v4PublicJobUrl(parent?.canonical_url);
  if(!target||parent.source_confirmed!==true||parent.independently_read!==true||parent.vacancy_confirmed!==true||document?.url!==target||document.document_kind!=='html')return null;
@@ -367,7 +403,7 @@ export async function v4ReadDeclaredStructuredJob(parent,document,{fetcher=fetch
    const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal,maxBytes:16*1024*1024});
    if(doc.url!==hint.url||doc.document_kind!=='json')continue;
    onDocument({type:'read_page',ok:true,mode:'static',url:doc.url,text:doc.plain,offset:0,next_offset:null,resource_hints:[]});
-   const all=postings(doc.plain);
+   const all=[...postings(doc.plain),...explicitJsonJobs(doc.plain)];
    const matches=all.filter(j=>{
     const company=companyOf(j).name,city=postedLocation(j);
     let landing;try{landing=v4PublicJobUrl(new URL(j.url,target).href)}catch{}
@@ -375,7 +411,7 @@ export async function v4ReadDeclaredStructuredJob(parent,document,{fetcher=fetch
    });
    if(matches.length!==1)continue;
    const posting=matches[0];
-   if(posting.validThrough&&Number.isFinite(Date.parse(posting.validThrough))&&Date.parse(posting.validThrough)<Date.now())continue;
+   if(posting.validThrough&&(!Number.isFinite(Date.parse(posting.validThrough))||Date.parse(posting.validThrough)<Date.now()))continue;
    const desc=structuredJdParts(posting,v=>htmlToText(v,{maxChars:Infinity})).join('\n');
    if(!desc.trim()||looksTruncatedJd(desc)||looksTruncatedJd(htmlToText(trim(posting.description),{maxChars:Infinity})))continue;
    const sections=extractOfficialJdSections(desc,{full:true});
