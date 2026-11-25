@@ -70,9 +70,9 @@ function safeQuestions(value,blocks,{v4=false}={}){
  }
  return out;
 }
-export function validateAuthoring(block,proposal,quotes,numbers){
+export function validateAuthoring(block,proposal,quotes,numbers,{v4=false}={}){
  if(typeof proposal!=='string'||!proposal.trim()||
-  proposal.length>Math.max(12000,block.text.length*4))
+  (!v4&&proposal.length>Math.max(12000,block.text.length*4)))
   return 'INVALID_REWRITE_TEXT';
  if(!Array.isArray(quotes)||quotes.length===0)
   return 'MISSING_SOURCE_EVIDENCE';
@@ -250,7 +250,7 @@ export async function generateTailoredResume({env,blocks,job,signal}){
    const raw=blocks.find(x=>x.id===block.id),draft=keyed.get(block.id);
    const proposal=compact(draft?.text);
    const quotes=Array.isArray(draft?.sourceQuotes)?draft.sourceQuotes:[];
-   const problem=validateAuthoring(raw,proposal,quotes,numberTokens(raw.text));
+   const problem=validateAuthoring(raw,proposal,quotes,numberTokens(raw.text),{v4});
    const auditResult=checks.get(block.id);
    const safe=problem===null&&auditResult?.safe===true;
    const reason=problem||(!auditResult?'AUDIT_INCOMPLETE':!auditResult.safe?

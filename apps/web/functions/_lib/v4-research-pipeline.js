@@ -14,13 +14,15 @@ export function verificationSnapshot(checkpoint){
   verificationBatch:1,matches:structuredClone(prior.matches||[]),read:prior.read||0,scored:prior.scored||0,archived:prior.archived||0,scoreFailures:prior.scoreFailures||0,reportFailures:prior.reportFailures||0,priorState:null};
 }
 const counters=['read','scored','archived','scoreFailures','reportFailures'];
-export function mergePipelineCheckpoint(original,discovery,verification,attempted){
+export function mergePipelineCheckpoint(original,discovery,verification,attempted,{verificationIncomplete=false}={}){
  const next=structuredClone(discovery);
  if(!verification)return next;
  const processed=new Set(next.processedEarlier||[]),revisions=new Map(next.processedEvidence||[]);
  const rechecks=new Set(next.explicitRechecks||[]);
  const originalRechecks=new Set(original.explicitRechecks||[]);
- for(const [u,j] of attempted){
+ const verifiedRevisions=new Map(verification.processedEvidence||[]);
+ const completed=verificationIncomplete?attempted.filter(([u,j])=>(verification.processedEarlier||[]).includes(u)&&verifiedRevisions.get(u)===candidateRevision(j)):attempted;
+ for(const [u,j] of completed){
   processed.add(u);revisions.set(u,candidateRevision(j));
   // A request to recheck newly discovered during the concurrent search
   // is intentionally preserved; the next verification will handle it.
@@ -38,9 +40,12 @@ export function mergePipelineCheckpoint(original,discovery,verification,attempte
  for(const record of verification.publicEvidence||[]){const k=JSON.stringify([record.url,record.mode,record.offset,record.text]);if(!keys.has(k)){keys.add(k);ledger.push(record);}}
  next.publicEvidence=ledger;
  next.researchNotes=[...new Set([...(next.researchNotes||[]),...(verification.researchNotes||[])])];
+ const reads=new Map([...(next.verificationReads||[]),...(verification.verificationReads||[])]);
+ for(const [u] of completed)reads.delete(u);
+ next.verificationReads=[...reads];
  const diag={...(next.diagnostics||{})};
  for(const [k,v] of Object.entries(verification.diagnostics||{})){const delta=v-(original.diagnostics?.[k]||0);if(delta>0)diag[k]=(diag[k]||0)+delta;}
- diag.PIPELINE_VERIFICATION_ATTEMPTS=(diag.PIPELINE_VERIFICATION_ATTEMPTS||0)+attempted.length;
+ diag.PIPELINE_VERIFICATION_ATTEMPTS=(diag.PIPELINE_VERIFICATION_ATTEMPTS||0)+completed.length;
  next.diagnostics=diag;
  if(next.phase==='research')next.priorState={matches,...totals};
  else if(next.phase==='verification'){Object.assign(next,{matches,...totals,next:0,priorState:null});}

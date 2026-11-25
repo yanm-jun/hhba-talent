@@ -60,10 +60,10 @@ const uniqueQuestions=list=>list.filter((q,i,a)=>
 // The editor receives a compact document map; it can choose inspect_source
 // to read any full source section before making consequential rewrite calls.
 const excerpt=value=>String(value||'').slice(0,750);
-const validRewriteResult=(row,block,validateAuthoring,numberTokens)=>{
+const validRewriteResult=(row,block,validateAuthoring,numberTokens,v4)=>{
  if(!row||typeof row.text!=='string')return 'AI_AGENT_REWRITE_MISSING';
  const quotes=Array.isArray(row.sourceQuotes)?row.sourceQuotes:[];
- return validateAuthoring(block,row.text,quotes,numberTokens(block.text));
+ return validateAuthoring(block,row.text,quotes,numberTokens(block.text),{v4});
 };
 
 export async function runResumeEditorialAgent({
@@ -182,7 +182,7 @@ export async function runResumeEditorialAgent({
   }
   for(const section of decision.sections){
    const id=section.blockId,source=originalById.get(id),row=proposals.get(id);
-   const issue=validRewriteResult(row,source,validateAuthoring,numberTokens);
+   const issue=validRewriteResult(row,source,validateAuthoring,numberTokens,v4);
    const verified=checked.get(id);
    if(issue||verified?.safe!==true){
     warnings.push({blockId:id,code:issue||'AI_AGENT_FACT_CHECK_REJECTED',

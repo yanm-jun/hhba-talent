@@ -199,3 +199,25 @@ test('authorized checkpoint renewal extends only unfinished matching generation'
  await readMatchTask(env,id,21*hour,{renewGeneration:2});
  assert.equal(await readMatchTask(env,id,24*hour),null);
 });
+
+test('V4 rewrite does not reject a long real proposal solely because of length',async()=>{
+ const {validateAuthoring}=await import('../functions/_lib/resume-rewrite-provider.js');
+ const block={text:'真实区域运营经历'},proposal=block.text.repeat(2000);
+ assert.equal(validateAuthoring(block,proposal,[block.text],new Set()),'INVALID_REWRITE_TEXT');
+ assert.equal(validateAuthoring(block,proposal,[block.text],new Set(),{v4:true}),null);
+ assert.equal(validateAuthoring(block,proposal,['不存在的事实'],new Set(),{v4:true}),'SOURCE_QUOTE_NOT_FOUND');
+});
+test('incomplete parallel branch retains JD cache but never marks unscored candidate processed',async()=>{
+ const {mergePipelineCheckpoint,pendingVerification,candidateRevision}=await import('../functions/_lib/v4-research-pipeline.js');
+ const job={company:'示例企业',title:'运营经理',location:'上海'},u='https://careers.other-motors.cn/recruitment/positions/9988';
+ const original={rows:[[u,job]]},discovery={...original,phase:'research'},verification={...original,phase:'verification',verificationReads:[[u,{revision:candidateRevision(job),jd:{full_jd:'真实原文'}}]]};
+ const next=mergePipelineCheckpoint(original,discovery,verification,[[u,job]],{verificationIncomplete:true});
+ assert.deepEqual(pendingVerification(next),[[u,job]]);assert.equal(next.verificationReads.length,1);
+});
+test('alias review needs independent same requisition evidence across URLs',async()=>{
+ const {validAliasIdentity}=await import('../functions/_lib/simple-match-v4.js');
+ const value={same_job:true,reason:'双语岗位',shared_requisition_id:'REQ12345',original_identity_quote:'中文运营 REQ12345',target_identity_quote:'Operations REQ12345'};
+ assert.equal(validAliasIdentity(value,'中文运营 REQ12345','Operations REQ12345',false),true);
+ assert.equal(validAliasIdentity(value,'中文运营 REQ54321','Operations REQ12345',false),false);
+ assert.equal(validAliasIdentity({...value,same_job:false},'中文运营 REQ12345','Operations REQ12345',false),false);
+});
