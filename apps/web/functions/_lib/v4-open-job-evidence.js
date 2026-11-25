@@ -375,6 +375,34 @@ export async function v4PreparePublicBrowserResources(url,{fetcher=fetch,signal,
 // employer application from rendering it. Ownership is inherited only from an
 // already independently confirmed vacancy and its fresh exact HTML declaration.
 // Require the structured posting itself to point to that same landing URL.
+// Non-schema JSON can be accepted only when one object explicitly contains
+// the same landing URL, employer, role, city and actual description/requirements.
+// Never combine fields across different records or infer a missing identity.
+function explicitJsonJobs(raw){
+ let root;try{root=JSON.parse(raw)}catch{return []}
+ const found=[],stack=[root],scalar=v=>typeof v==='string'?v.trim():'';
+ const pick=(o,keys)=>{const values=[...new Set(keys.map(k=>scalar(o[k])).filter(Boolean))];return values.length===1?values[0]:'';};
+ const body=(o,keys)=>keys.flatMap(k=>typeof o[k]==='string'?[o[k]]:Array.isArray(o[k])&&o[k].every(x=>typeof x==='string')?o[k]:[]).filter(x=>x.trim());
+ while(stack.length){
+  const v=stack.pop();if(!v||typeof v!=='object')continue;
+  for(const child of Object.values(v))if(child&&typeof child==='object')stack.push(child);
+  if(Array.isArray(v)||v['@type'])continue;
+  const url=pick(v,['url','jobUrl','job_url','detailUrl','detail_url','applyUrl','apply_url']);
+  const title=pick(v,['title','jobTitle','job_title','positionName','position_name']);
+  const employer=pick(v,['company','companyName','company_name','employerName','employer_name']);
+  const location=pick(v,['city','workCity','work_city','location','workLocation','work_location']);
+  const descriptions=body(v,['description','jobDescription','job_description','responsibilities','jobResponsibilities']);
+  const qualifications=body(v,['requirements','jobRequirements','job_requirements','qualifications']);
+  if(!url||!title||!employer||!location||!descriptions.length||!qualifications.length)continue;
+  const statuses=[v.status,v.jobStatus,v.job_status,v.publishStatus].filter(x=>typeof x==='string');
+  if(v.active===false||v.isActive===false||v.closed===true||v.isClosed===true||v.expired===true||v.isPublished===false||statuses.some(s=>! /^(?:open|active|published|recruiting|online|在招|招聘中|已发布|开放)$/i.test(s.trim())))continue;
+  const expires=[v.validThrough,v.expiresAt,v.expireAt,v.expiryDate].filter(x=>x!==undefined&&x!==null);
+  if(expires.some(x=>!Number.isFinite(Date.parse(x))||Date.parse(x)<Date.now()))continue;
+  if([...descriptions,...qualifications].some(looksTruncatedJd))continue;
+  found.push({url,title,hiringOrganization:{name:employer},jobLocation:{address:{addressLocality:location}},description:descriptions,qualifications,non_schema:true});
+ }
+ return found;
+}
 export async function v4ReadDeclaredStructuredJob(parent,document,{fetcher=fetch,signal,onDocument=()=>{}}={}){
  const target=v4PublicJobUrl(parent?.canonical_url);
  if(!target||parent.source_confirmed!==true||parent.independently_read!==true||parent.vacancy_confirmed!==true||document?.url!==target||document.document_kind!=='html')return null;
@@ -386,7 +414,7 @@ export async function v4ReadDeclaredStructuredJob(parent,document,{fetcher=fetch
    const doc=await v4ReadPublicJobDocument(hint.url,{fetcher,signal,maxBytes:16*1024*1024});
    if(doc.url!==hint.url||doc.document_kind!=='json')continue;
    onDocument({type:'read_page',ok:true,mode:'static',url:doc.url,text:doc.plain,offset:0,next_offset:null,resource_hints:[]});
-   const all=postings(doc.plain);
+   const all=[...postings(doc.plain),...explicitJsonJobs(doc.plain)];
    const matches=all.filter(j=>{
     const company=companyOf(j).name,city=postedLocation(j);
     let landing;try{landing=v4PublicJobUrl(new URL(j.url,target).href)}catch{}
@@ -394,7 +422,7 @@ export async function v4ReadDeclaredStructuredJob(parent,document,{fetcher=fetch
    });
    if(matches.length!==1)continue;
    const posting=matches[0];
-   if(posting.validThrough&&Number.isFinite(Date.parse(posting.validThrough))&&Date.parse(posting.validThrough)<Date.now())continue;
+   if(posting.validThrough&&(!Number.isFinite(Date.parse(posting.validThrough))||Date.parse(posting.validThrough)<Date.now()))continue;
    const desc=structuredJdParts(posting,v=>htmlToText(v,{maxChars:Infinity})).join('\n');
    if(!desc.trim()||looksTruncatedJd(desc)||looksTruncatedJd(htmlToText(trim(posting.description),{maxChars:Infinity})))continue;
    const sections=extractOfficialJdSections(desc,{full:true});
