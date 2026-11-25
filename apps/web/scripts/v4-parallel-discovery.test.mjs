@@ -440,3 +440,24 @@ test('activated V4 report coverage rejects empty comparisons, unresolved semanti
  assert.deepEqual(reportCoverageErrors({suitable:false},jd,{reference:true}),[]);
  assert.deepEqual(reportCoverageErrors(valid,jd),[]);
 });
+
+test('activated V4 official report repairs inadequate comparisons before completion',async()=>{
+ const candidate=job(1000),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const jd='负责汽车经销商渠道运营，具备渠道数据分析能力。';
+ const match={company:candidate.company,title:candidate.title,location:candidate.location,official_url:candidate.url,source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',evidence_status:'VERIFIED_FULL_JD',evidence_excerpt:jd,score_evidence_status:'GROUNDED_JD_RESUME_QUOTES',match_score:86,curated_suitable:true};
+ const options={env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true};
+ let reports=0;
+ const fetcher=async(url,opts)=>{
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.pending_ids)return model({ordered_ids:input.pending_ids});
+  reports++;
+  const basic={suitable:true,score:86,reason:'渠道经历相关，分析能力证据不足。',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车经销商渠道运营'};
+  if(reports===1)return model({...basic,comparisons:[]});
+  assert.match(input.previous_validation_error,/quality_review_incomplete/);
+  return model({...basic,comparisons:[{jd_quote:'汽车经销商渠道运营',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'有相关经历'},{jd_quote:'渠道数据分析能力',status:'missing',analysis:'暂无直接证据'}],quality_review:{status:'complete',explanation:'职责和资格逐项覆盖，未知项如实标注。',missing:[]}});
+ };
+ const ranked=await v4Match(fetcher,provider,resume,'全国',{...options,checkpoint:{phase:'reporting',rows:[[candidate.url,candidate]],profile,matches:[match]}});
+ const done=await v4Match(fetcher,provider,resume,'全国',{...options,checkpoint:ranked.checkpoint});
+ const report=done.checkpoint.matches[0];
+ assert.equal(reports,2);assert.equal(report.report_status,'COMPLETE');assert.equal(report.research_detail.comparisons.length,2);assert.equal(report.evidence_excerpt,jd);
+});
