@@ -109,13 +109,28 @@ export async function v4RunResearchAction(action,{collections,knownUrls,fetcher,
 export function v4RequestedActions(value){
  return [...(Array.isArray(value?.research_actions)?value.research_actions:[]),...(value?.research_action?[value.research_action]:[])].filter(x=>x&&typeof x==='object'&&typeof x.type==='string');
 }
-// Ordered tool batches avoid uncontrolled simultaneous requests to employer sites.
+// Only already-discovered, independent static reads on distinct hosts may
+// overlap. Discovery, refresh, browser, local evidence indices and dependent
+// actions keep their order. Reserve connection headroom for verification.
 export async function v4RunResearchActions(actions,opts){
  const out=[],budget=Math.max(256,Math.floor((opts.budget||90000)/Math.max(1,actions.length)));
- for(const action of actions){
+ const runOne=async action=>{
   if(opts.signal?.aborted)throw opts.signal.reason;
   const run=()=>v4RunResearchAction(action,{...opts,budget});
-  out.push(opts.onAction?await opts.onAction(action,run,budget):await run());
+  return opts.onAction?await opts.onAction(action,run,budget):await run();
+ };
+ const independentHost=a=>{
+  if(!opts.parallelPublicReads||a?.type!=='read_page'||a.discover||a.refresh||a.mode==='browser'||a.mode==='window')return null;
+  const u=v4PublicJobUrl(a.url);
+  return u&&opts.knownUrls?.has(u)&&!isCommercialRecruitmentBoard(u)?new URL(u).hostname:null;
+ };
+ for(let i=0;i<actions.length;){
+  const a=actions[i++],host=independentHost(a),next=actions[i],other=independentHost(next);
+  if(host&&other&&host!==other){
+   i++;const pair=await Promise.allSettled([runOne(a),runOne(next)]);
+   const failed=pair.find(x=>x.status==='rejected');if(failed)throw failed.reason;
+   out.push(...pair.map(x=>x.value));
+  }else out.push(await runOne(a));
  }
  return out;
 }
