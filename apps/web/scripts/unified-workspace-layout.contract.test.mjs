@@ -59,7 +59,8 @@ test('tight right column, clear left groups and responsive mobile nav',()=>{
 test('all candidate sidebar destinations render inside one persistent workspace shell',()=>{
  assert.ok(routes.includes('isCandidateWorkspaceRoute'));
  for(const route of ["route==='/candidate/account/match'","route==='/candidate/account/rights'","route==='/candidate/account/legal-aid'","route==='/candidate/account/legal-aid/intervention'"]) assert.ok(routes.includes(route),route);
- for(const component of ['CandidateMatchPage','WorkplaceRightsPage','LegalAidLandingPage','LegalAidInterventionPage']) assert.ok(routes.includes(component+' user={user} embedded'),component+' must be embedded');
+ assert.match(routes,/match:section==='match'\?<MatchWorkspaceSlot\/>:null/);
+ for(const component of ['WorkplaceRightsPage','LegalAidLandingPage','LegalAidInterventionPage']) assert.ok(routes.includes(component+' user={user} embedded'),component+' must be embedded');
  assert.match(routes,/LegalAidTopicPage user=\{user\} slug=\{[^\n]+ embedded\/>/);
  assert.ok(personal.includes('externalSections&&Object.entries(externalSections)'));
  assert.ok(personal.includes("hasVisited('resume')"));
@@ -71,7 +72,7 @@ test('embedded service modules omit duplicate site shells and retain hidden modu
  assert.ok(shell.includes('embedded?: boolean'));
  assert.ok(shell.includes('if(embedded)return <>{children}</>'));
  for(const path of ['../src/pages/CandidateMatchPage.tsx','../src/pages/WorkplaceRightsPage.tsx','../src/pages/LegalAidLandingPage.tsx','../src/pages/LegalAidInterventionPage.tsx','../src/pages/LegalAidTopicPage.tsx']){
-  const source=read(path);assert.ok(source.includes('embedded=false'));assert.ok(source.includes('embedded={embedded}'));
+  const source=read(path);assert.ok(source.includes('embedded=false'));assert.ok(source.includes('embedded={embedded}')||source.includes('embedded={embedded||hosted}'));
  }
  assert.ok(css.includes('position:sticky'));
  for(const [path,signature] of [

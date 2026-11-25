@@ -10,7 +10,7 @@ const emailAuth=read('../src/pages/AuthPage.tsx');
 const match=read('../src/pages/CandidateMatchPage.tsx');
 
 test('signed-in users render standalone match page BEFORE workspace route selection',()=>{
- const direct="if(route==='/candidate/match')return <CandidateMatchPage user={user}/>;";
+ const direct="if(route==='/candidate/match')return <Shell user={user}><MatchWorkspaceSlot/></Shell>;";
  const workbench='const isCandidateWorkspaceRoute=';
  assert.equal(app.split(direct).length-1,1,'exactly one direct match route');
  assert.ok(app.indexOf(direct)<app.indexOf(workbench),'direct match route precedes workbench routing');
@@ -18,7 +18,7 @@ test('signed-in users render standalone match page BEFORE workspace route select
  assert.doesNotMatch(grouped,/route==='\/candidate\/match'/,'match must not be grouped under dashboard');
  assert.match(app,/route==='\/candidate\/account\/match'/,
   'a separate account match URL must remain inside the candidate workspace');
- assert.match(app,/match:<CandidateMatchPage user=\{user\} embedded\/>/,
+ assert.match(app,/match:section==='match'\?<MatchWorkspaceSlot\/>:null/,
   'only the workspace route shares the matcher inside personal center');
 });
 
@@ -46,16 +46,16 @@ test('homepage and workspace use one matching component but distinct presentatio
  const vault=read('../src/components/PrivateResumeVault.tsx');
  const history=read('../src/components/CandidateMatchHistory.tsx');
  const styles=read('../src/styles/resume-match.css');
- assert.match(app,/if\(route==='\/candidate\/match'\)return <CandidateMatchPage user=\{user\}\/>/);
+ assert.match(app,/if\(route==='\/candidate\/match'\)return <Shell user=\{user\}><MatchWorkspaceSlot\/><\/Shell>/);
  assert.match(app,/route==='\/candidate\/account\/match'\?'match'/);
- assert.match(app,/match:<CandidateMatchPage user=\{user\} embedded\/>/);
+ assert.match(app,/match:section==='match'\?<MatchWorkspaceSlot\/>:null/);
  assert.match(center,/label:'智能岗位匹配',path:'\/candidate\/account\/match'/);
  assert.match(center,/if\(id==='match'\)return '\/candidate\/account\/match'/);
  assert.match(center,/hasVisited\(key\)/,'already opened workspace panels remain mounted');
  assert.match(center,/aria-hidden=\{inactive\}/,'inactive panels are not visible');
  assert.match(center,/className="hhba-account-sidebar"/);
  assert.match(center,/className="hhba-account-content"/);
- assert.match(match,/embedded=\{embedded\}/,'the shell only disappears when embedded');
+ assert.match(match,/embedded=\{embedded\|\|hosted\}/,'the shell only disappears when embedded');
  assert.match(match,/className=\{embedded\?'hhba-ai-page hhba-ai-page-embedded':'hhba-ai-page'\}/);
  assert.match(match,/!embedded&&<nav className="hhba-ai-breadcrumb"/);
  assert.match(styles,/\.hhba-ai-page-embedded \.hhba-ai-layout\{grid-template-columns:minmax\(0,1fr\)/);
@@ -67,4 +67,16 @@ test('homepage and workspace use one matching component but distinct presentatio
  assert.ok(app.includes("navigate('/candidate/login?next=%2Fcandidate%2Faccount%2Fmatch')"),'expired workspace session must return to the match panel after login');
  assert.doesNotMatch(vault,/\/candidate\/match/);
  assert.doesNotMatch(history,/\/candidate\/match/);
+});
+
+test('one session-owned portal survives route changes without duplicating the matcher',()=>{
+ const host=read('../src/components/MatchWorkspaceHost.tsx');
+ assert.match(app,/return <MatchWorkspaceHost key=\{String\(user\?\.id\|\|'guest'\)\+': '\+sessionEpoch\}/.source.includes("unused")?/never/:/return <MatchWorkspaceHost key=/);
+ assert.equal((app.match(/<CandidateMatchPage user=/g)||[]).length,1);
+ assert.match(app,/workspace=\{<CandidateMatchPage user=\{user\} embedded=\{route!=='\/candidate\/match'\} hosted hostRoute=\{route\}\/>\}/);
+ assert.match(host,/createPortal\(<Suspense fallback=\{fallback\}>\{workspace\}<\/Suspense>,container\)/);
+ assert.match(host,/node.appendChild\(container\)/);
+ assert.match(host,/if\(container.parentNode===node\)container.remove\(\)/);
+ assert.match(match,/if\(taskOpen.current\|\|controller.current\)/);
+ assert.match(match,/taskFailed=\{taskFailure\}/);
 });

@@ -44,7 +44,7 @@ test('homepage & candidate workbench keep original matcher route and PDF/DOCX fl
  assert.match(page,/setOptimizationSource\(redactResumeTextLocally\(previewText\)\)/);
  assert.match(page,/sourceText=\{result\?optimizationSource:undefined\}/);
  assert.match(page,/sourceResume=\{result&&savedId\?savedFiles\.find/);
- assert.match(page,/embedded=\{embedded\}/);
+ assert.match(page,/embedded=\{embedded\|\|hosted\}/);
 });
 
 test('matching card layout untouched; only a small button and an active-only optimizer CSS section added',()=>{
