@@ -477,3 +477,33 @@ test('automatic public resource transport adapts to large pending sets and prese
  const next=await v4PreparePublicBrowserResources(target,{resourceHints:first.resourceHints,ledger,fetcher,onDocument:r=>ledger.push(r)});
  assert.equal(next.publicDataUrls.length,20);assert.equal(new Set(reads).size,reads.length);assert.equal(reads.length-before,20-before);
 });
+
+test('Gemini relay authorization is explicit and independent of OpenAI',async()=>{
+ const provider=v4JobProvider({...env,GEMINI_AUTH_MODE:'bearer'});
+ assert.equal(provider.authMode,'bearer');assert.equal(v4JobProvider({...env,GEMINI_AUTH_MODE:'unknown'}),null);
+ await v4Call(async(url,opt)=>{
+  assert.equal(url,'https://relay.example/v1beta/models/gemini-test:generateContent');
+  assert.equal(opt.headers.authorization,'Bearer '+env.GEMINI_API_KEY);
+  assert.equal(opt.headers['x-goog-api-key'],undefined);assert.equal(opt.redirect,'manual');
+  return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"ok":true}'}]}}]});
+ },provider,{input:'Synthetic test'});
+});
+test('Gemini upstream status survives without exposing response bodies',async()=>{
+ for(const [status,code] of [[401,'AI_PROVIDER_KEY_REJECTED'],[404,'AI_PROVIDER_REQUEST_REJECTED'],[502,'AI_PROVIDER_UPSTREAM_ERROR']]){
+  await assert.rejects(v4Call(async()=>new Response('private error content',{status}),v4JobProvider(env),{input:'Synthetic test'}),e=>e.code===code&&e.upstreamStatus===status&&!e.message.includes('private error content'));
+ }
+});
+test('minimal operator transport probes validate native responses and selected header only',async()=>{
+ const {runGeminiProbe}=await import('../functions/api/match-v4-provider-probe.js');
+ for(const [phase,mode] of [['transport','native'],['transport_bearer','bearer']]){
+  const out=await runGeminiProbe(v4JobProvider(env),phase,{fetcher:async(url,opt)=>{
+   assert.equal(opt.redirect,'manual');assert.equal(opt.headers[mode==='native'?'x-goog-api-key':'authorization'],mode==='native'?env.GEMINI_API_KEY:'Bearer '+env.GEMINI_API_KEY);
+   assert.equal(opt.headers[mode==='native'?'authorization':'x-goog-api-key'],undefined);
+   assert.deepEqual(Object.keys(JSON.parse(opt.body)),['contents']);
+   return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'OK'}]}}]});
+  }});
+  assert.deepEqual(out,{ok:true,upstream_http_status:200,native_response:true,auth_mode:mode});
+ }
+ const fake=await runGeminiProbe(v4JobProvider(env),'transport',{fetcher:async()=>Response.json({ok:true})});
+ assert.equal(fake.ok,false);
+});
