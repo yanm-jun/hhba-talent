@@ -134,10 +134,9 @@ function countWidth(s){
  }
  return units;
 }
-// Recognize paragraphs consisting ONLY of ordinary text runs with identical
-// run properties. No links, fields, breaks, drawings, tracked changes, nested
-// text boxes or mixed formatting may be merged. Keep every XML run and its
-// style tags intact; change text nodes only.
+// Plain text runs can carry different styles. Preserve unchanged prefix/suffix
+// runs and inherit the first affected run's style for replacement text.
+// Links, fields, breaks, drawings and tracked changes are not plain text runs.
 function paragraphRunGroups(xml,matches){
  const index=new Map(matches.map(m=>[m.index,m])),groups=[],paragraphs=[],paragraphCounts=new Map();
  for(const p of xml.matchAll(/<w:p(?:\s[^>]*)?>([\s\S]*?)<\/w:p>/g)){
@@ -153,7 +152,7 @@ function paragraphRunGroups(xml,matches){
   const properties=inner.match(/^\s*<w:pPr(?:\s[^>]*)?>[\s\S]*?<\/w:pPr>/)?.[0]||'';
   const content=inner.slice(properties.length).trim();
   const runs=[...content.matchAll(/<w:r(?:\s[^>]*)?>([\s\S]*?)<\/w:r>/g)];
-  if(!runs.length||runs.map(m=>m[0]).join('')!==content.replace(/>\s+</g,'><'))continue;
+  if(!runs.length||runs.map(m=>m[0]).join('').replace(/>\s+</g,'><')!==content.replace(/>\s+</g,'><'))continue;
   const styles=new Set();
   let valid=true;
   for(const run of runs){
@@ -162,16 +161,36 @@ function paragraphRunGroups(xml,matches){
    const rest=value.slice(props.length).trim();
    if(!/^(?:<w:t(?:\s[^>]*)?>[^<]*<\/w:t>\s*)+$/.test(rest)){valid=false;break;}
   }
-  if(!valid||styles.size!==1)continue;
+  if(!valid)continue;
   const exact=nodes.map(m=>index.get(offset+m.index));
   if(exact.some(m=>!m))continue;
-  if(nodes.filter(m=>decodeXML(m[1]).length>0).length>=2)groups.push({text,nodes:exact});
+  if(nodes.filter(m=>decodeXML(m[1]).length>0).length>=2)groups.push({text,nodes:exact,mixed:styles.size>1});
   // Do not clone section breaks, tracked changes, or properties containing IDs.
   const style=[...styles][0]||'';
   if(!/<w:(?:sectPr|pPrChange|rPrChange|ins|del|bookmarkStart|bookmarkEnd)\b/.test(properties+style))
    paragraphs.push({text,nodes:exact,start:p.index,end:p.index+p[0].length,properties,style});
  }
  return {groups,paragraphs,paragraphCounts};
+}
+// Map a contiguous changed range onto the existing text runs. Unchanged
+// styled fragments are never moved. New wording inherits the affected run;
+// a wholesale rewrite cannot infer semantic formatting of new words.
+export function distributeStyledText(originalRuns,replacement){
+ const source=originalRuns.join('');
+ let start=0,end=0;
+ while(start<source.length&&start<replacement.length&&source[start]===replacement[start])start++;
+ while(end<source.length-start&&end<replacement.length-start&&source[source.length-1-end]===replacement[replacement.length-1-end])end++;
+ const cut=source.length-end,insert=replacement.slice(start,replacement.length-end);
+ let offset=0,placed=false;
+ const first=originalRuns.findIndex(Boolean);
+ return originalRuns.map((run,i)=>{
+  const from=offset,to=offset+run.length;offset=to;
+  const prefix=run.slice(0,Math.max(0,Math.min(run.length,start-from)));
+  const suffix=run.slice(Math.max(0,Math.min(run.length,cut-from)));
+  const take=!placed&&((start<to&&start>=from)||(start===source.length&&i===originalRuns.length-1)||(first===-1&&i===0));
+  if(take)placed=true;
+  return prefix+(take?insert:'')+suffix;
+ });
 }
 function editXml(xml,edits,{allowExpansion=false}={}){
  requireValue(xml.includes('<w:document')&&xml.includes('<w:body')&&
@@ -206,11 +225,14 @@ function editXml(xml,edits,{allowExpansion=false}={}){
     '<w:t xml:space="preserve">'+encodeXML(line)+'</w:t></w:r></w:p>').join('');
    insertions.push({index:paragraph.end,length:0,value:added});
   }
+  const values=combined[0]?.mixed?distributeStyledText(targets.map(hit=>decodeXML(hit[1])),lines[0]):targets.map((_,i)=>i===0?lines[0]:'');
+  requireValue(values.join('')===lines[0],'WORD_EDIT_UNSAFE');
   for(const [i,hit] of targets.entries()){
    requireValue(!used.has(hit.index),'WORD_EDIT_AMBIGUOUS');
    used.add(hit.index);
-   const prefix=hit[0].slice(0,hit[0].indexOf('>')+1);
-   changed.set(hit.index,prefix+encodeXML(i===0?lines[0]:'')+'</w:t>');
+   let prefix=hit[0].slice(0,hit[0].indexOf('>')+1);
+   if(/^\s|\s$/.test(values[i])&&!/\bxml:space=/.test(prefix))prefix=prefix.slice(0,-1)+' xml:space="preserve">';
+   changed.set(hit.index,prefix+encodeXML(values[i])+'</w:t>');
   }
  }
  let patched=xml;

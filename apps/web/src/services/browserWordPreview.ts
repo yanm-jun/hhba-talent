@@ -1,6 +1,7 @@
 // Local-only DOCX HTML preview; scripts are hosted by HHBA, never a CDN.
 // This is a visual aid, NOT an authoritative Word/LibreOffice page-layout check.
 import type {WordAnchor} from './resumeWordAnchors.mjs';
+import {distributeStyledText} from './resumeDocxPreserve.mjs';
 type DocxRenderer={renderAsync:(bytes:Uint8Array,body:HTMLElement,styles:HTMLElement,
  options:Record<string,unknown>)=>Promise<unknown>};
 type ZipFile={name:string;dir:boolean;_data?:{uncompressedSize?:number};
@@ -87,7 +88,7 @@ export async function renderBrowserWord(bytes:Uint8Array,mount:HTMLElement){
  * Only unique editable leaf runs may be touched. Original run styling,
  * paragraph wrapping and the actual Word sheet layout remain authoritative.
  */
-// Server inspection advertises only uniquely editable, same-style paragraphs.
+// Server inspection advertises uniquely editable plain-text paragraphs.
 // Match rendered direct leaf spans, not guessed text or a rebuilt paragraph.
 function browserParagraphRuns(mount:HTMLElement,allowed:Set<string>){
  const groups:{text:string;paragraph:HTMLElement;spans:HTMLElement[]}[]=[];
@@ -138,9 +139,21 @@ export function paintBrowserWordSuggestions(
   const group=joined[0];
   const node=group?group.spans[0]:nodes[0],proposal=values[0];
   if(group){
-   for(const span of group.spans.slice(1)){
-    span.setAttribute(attribute,span.textContent||'');span.replaceChildren();
-   }
+   const source=group.spans.map(span=>span.textContent||'');
+   const revised=distributeStyledText(source,proposal);
+   group.spans.forEach((span,i)=>{
+    if(source[i]===revised[i])return;
+    span.setAttribute(attribute,source[i]);
+    span.classList.add('hhba-word-inline-suggestion');
+    const mark=document.createElement('span');mark.className='hhba-word-ai-changed hhba-resume-siri-letters';
+    const before=source[i],after=revised[i];let start=0,end=0;
+    while(start<before.length&&start<after.length&&before[start]===after[start])start++;
+    while(end<before.length-start&&end<after.length-start&&before[before.length-1-end]===after[after.length-1-end])end++;
+    mark.textContent=after.slice(start,after.length-end)||'\u200b';
+    if(proposal.includes('\n'))mark.style.whiteSpace='pre-wrap';
+    span.replaceChildren(document.createTextNode(after.slice(0,start)),mark,document.createTextNode(after.slice(after.length-end)));
+   });
+   continue;
   }
   const before=Array.from(original),after=Array.from(proposal);
   let start=0,end=0;

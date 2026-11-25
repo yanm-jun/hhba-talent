@@ -12,7 +12,7 @@ const send=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:
  'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex'
 }});
 const fail=(code,status)=>send({ok:false,error:code},status);
-const MAX_BODY=2*1024*1024,MAX_BLOCKS=12,MAX_GLOBAL=50,MAX_PERSONAL=3;
+const LEGACY_MAX_BODY=2*1024*1024,V4_TRANSPORT_BYTES=16*1024*1024,MAX_BLOCKS=12,MAX_GLOBAL=50,MAX_PERSONAL=3;
 const MAX_GLOBAL_ATTEMPTS=120,MAX_PERSONAL_ATTEMPTS=6;
 // Separate paid AI optimization quotas from unrelated matching services.
 // Preview still supports its existing shared secret until separately migrated.
@@ -43,12 +43,14 @@ function sameOrigin(request){
  const url=new URL(request.url);
  return request.headers.get('Origin')===url.origin&&request.headers.get('Sec-Fetch-Site')!=='cross-site';
 }
-async function readSmallJson(request){
+async function readSmallJson(request,env){
+ // Bound transport memory, not the model's research or response length.
+ const MAX_BODY=env?.HHBA_MATCH_V4_READY==='1'?V4_TRANSPORT_BYTES:LEGACY_MAX_BODY;
  const declared=request.headers.get('Content-Length');
- if(!request.body||declared!==null&&(!/^\d+$/.test(declared)||Number(declared)>MAX_BODY))throw Error('INVALID_REQUEST');
+ if(!request.body||declared!==null&&(!/^\d+$/.test(declared)||Number(declared)>MAX_BODY))throw Error('OPTIMIZATION_PAYLOAD_TOO_LARGE');
  const reader=request.body.getReader();let bytes=0;const chunks=[];
  try{for(;;){const x=await reader.read();if(x.done)break;bytes+=x.value.byteLength;
-  if(bytes>MAX_BODY){await reader.cancel();throw Error('INVALID_REQUEST');}chunks.push(x.value);}
+  if(bytes>MAX_BODY){await reader.cancel();throw Error('OPTIMIZATION_PAYLOAD_TOO_LARGE');}chunks.push(x.value);}
  }finally{reader.releaseLock();}
  const all=new Uint8Array(bytes);let pos=0;for(const c of chunks){all.set(c,pos);pos+=c.byteLength;}
  try{return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(all));}catch{throw Error('INVALID_REQUEST');}
@@ -58,12 +60,12 @@ function valid(body,env){
   !Array.isArray(body.blocks)||body.blocks.length<1)return false;
  if(!body.job||typeof body.job!=='object'||typeof body.job.title!=='string'||
   body.job.title.length<2||body.job.title.length>120||
-  typeof body.job.requirements!=='string'||body.job.requirements.length>(env?.HHBA_MATCH_V4_READY==='1'?250000:16000))return false;
+  typeof body.job.requirements!=='string'||(env?.HHBA_MATCH_V4_READY!=='1'&&body.job.requirements.length>16000))return false;
  const doc=body.full_document;
  if(doc===undefined&&body.blocks.length>MAX_BLOCKS)return false;
  if(doc!==undefined&&(!doc||Array.isArray(doc)||typeof doc!=='object'||
   !/^jd_[a-f0-9]{32}$/.test(body.job.jd_version_id||'')||!/^[a-f0-9]{64}$/.test(body.job.jd_sha256||'')||
-  typeof doc.text!=='string'||doc.text.length>(env?.HHBA_MATCH_V4_READY==='1'?250000:50000)||
+  typeof doc.text!=='string'||(env?.HHBA_MATCH_V4_READY!=='1'&&doc.text.length>50000)||
   (doc.feedback!==undefined&&typeof doc.feedback!=='string')||
   (doc.wanted!==undefined&&(!Array.isArray(doc.wanted)||!doc.wanted.length||
    doc.wanted.length>body.blocks.length))))return false;
@@ -125,7 +127,7 @@ export async function onRequestPost({request,env}){
   if(user?.role!=='candidate')return fail('FORBIDDEN',403);
  }catch{return fail('SESSION_INVALID',401);}
  let input;
- try{input=await readSmallJson(request);}catch{return fail('INVALID_REQUEST',400);}
+ try{input=await readSmallJson(request,env);}catch(error){return error?.message==='OPTIMIZATION_PAYLOAD_TOO_LARGE'?fail('OPTIMIZATION_PAYLOAD_TOO_LARGE',413):fail('INVALID_REQUEST',400);}
  if(!valid(input,env))return fail('INVALID_OPTIMIZATION_INPUT',400);
  let trustedJob;
  try{trustedJob=await hydrateVerifiedJobRequirements(env,input.job);}

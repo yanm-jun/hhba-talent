@@ -12,3 +12,5 @@ export declare function prepareVerifiedOriginalDocxExport(options:{
 export declare function inspectOriginalDocxStrict(raw:Uint8Array|ArrayBuffer,options?:{allowParagraphRuns?:boolean}):Promise<{
  mode:'strict_original_docx';editable_text:string[];paragraph_text:string[];entries:string[]
 }>;
+
+export declare function distributeStyledText(originalRuns:string[],replacement:string):string[];

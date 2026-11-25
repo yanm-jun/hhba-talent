@@ -44,7 +44,7 @@ export async function runSyntheticResumeAcceptance({env,signal,optimize=optimize
  let stage='optimization';
  const emit=()=>report({...summary,stages:{...summary.stages}});
  try{
-  const job={title:jd.title,requirements:jd.full_jd,verified:true};
+  const job={title:jd.title,requirements:jd.full_jd,verified:true,prior_match_analysis:{provenance:'SYNTHETIC_ONLY',match_score:82,score_basis:'虚构测试：具有真实文档中的Excel及运营经验，培训经历待表达完善。',research_detail:{comparisons:[{requirement:'熟悉 Excel 数据分析',resume_evidence:null,status:'partial',analysis:'历史报告缺原文，请重新从当前简历定位证据'}],optimization_advice:'突出真实销售数据汇总与培训反馈经历'}}};
   const source=syntheticDocx(),originalHash=digest(source);
   let wanted=blocks.map(b=>b.id),suggestions=new Map(),reviewFeedback={};
   const stalledStates=new Set();
