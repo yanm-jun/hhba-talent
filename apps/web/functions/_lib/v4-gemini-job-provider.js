@@ -22,7 +22,7 @@ export async function callGeminiJob(fetcher,provider,payload,{signal,onEvent}={}
  const start=Date.now(),search=(payload.tools||[]).some(t=>t.type==='web_search');
  if(typeof payload.input!=='string'||(payload.instructions!=null&&typeof payload.instructions!=='string')||(payload.tools||[]).some(t=>t.type!=='web_search'))throw fault('AI_PROVIDER_REQUEST_REJECTED');
  const instructions=(payload.instructions||'')+(search?'\n仅以公开职业、行业、地点、企业关键词调用联网搜索，不得将简历个人信息写入搜索查询。返回完整JSON及实际招聘网页URL，不要将搜索引擎跳转链接当作官网。':'')+(search&&payload.tool_choice==='required'?'\n本轮必须实际使用Google Search工具检索公开来源。':'');
- const body={systemInstruction:{parts:[{text:instructions}]},contents:[{role:'user',parts:[{text:payload.input}]}],store:false,...(search?{tools:[{google_search:{}}]}:{})};
+ const body={systemInstruction:{parts:[{text:instructions}]},contents:[{role:'user',parts:[{text:payload.input}]}],...(search?{tools:[{google_search:{}}]}:{})};
  let usage,status='AI_PROVIDER_RESPONSE_INVALID';
  try{
   if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');

@@ -18,11 +18,11 @@ test('native grounding maps to V4 response; no OpenAI credential, no model effor
   const b=JSON.parse(opt.body);
   assert.deepEqual(b.tools,[{google_search:{}}]);
   assert.equal(b.generationConfig,undefined);
-  assert.equal(b.store,false);
-  return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{thought:true,text:'private'},{text:'{"jobs":[]}'}]},groundingMetadata:{webSearchQueries:['jobs'],groundingChunks:[{web:{uri:'https://example.org/jobs/123'}}]}}],usageMetadata:{promptTokenCount:100,candidatesTokenCount:20,totalTokenCount:120}});
+  assert.equal(b.store,undefined);
+  return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{thought:true,text:'private'},{text:'{"jobs":[]}'}]},groundingMetadata:{webSearchQueries:['jobs'],groundingChunks:[{web:{uri:'https://careers.other-motors.cn/recruitment/positions/9988'}}]}}],usageMetadata:{promptTokenCount:100,candidatesTokenCount:20,totalTokenCount:120}});
  },v4JobProvider(env),{instructions:'synthetic',input:'synthetic',tools:[{type:'web_search'}],tool_choice:'required'});
  assert.equal(v4OutputText(answer),'{"jobs":[]}');
- assert.deepEqual(v4ToolSources(answer),['https://example.org/jobs/123']);
+ assert.deepEqual(v4ToolSources(answer),['https://careers.other-motors.cn/recruitment/positions/9988']);
  assert.equal(answer.usage.total_tokens,120);
 });
 test('required search cannot claim success with no grounding',async()=>{
