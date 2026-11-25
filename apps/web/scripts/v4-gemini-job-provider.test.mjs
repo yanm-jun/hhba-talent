@@ -135,3 +135,20 @@ test('V4 legacy rewrite accepts long source blocks and JD without removing struc
  assert.equal(validRewriteInputs(blocks,job,{v4:true}),true);
  assert.equal(validRewriteInputs([...blocks,blocks[0]],job,{v4:true}),false);
 });
+
+test('Gemini global ranking must include every eligible job once, without fabricated URLs',async()=>{
+ const {validateGeminiGlobalOrder,applyGeminiGlobalOrder}=await import('../functions/_lib/v4-curated-reports.js');
+ const jobs=[{official_url:'https://a.cn/job/1',match_score:96},{official_url:'https://b.cn/job/2',match_score:88}];
+ const order=jobs.map(j=>j.official_url).reverse();
+ assert.deepEqual(validateGeminiGlobalOrder({ordered_urls:order},jobs),order);
+ assert.deepEqual(applyGeminiGlobalOrder(jobs,order).map(j=>j.official_url),order);
+ assert.equal(validateGeminiGlobalOrder({ordered_urls:[order[0],order[0]]},jobs),null);
+ assert.equal(validateGeminiGlobalOrder({ordered_urls:[order[0]]},jobs),null);
+});
+test('V4 independent public archive keeps a long nonstandard JD with exact hash and no fixed headings',async()=>{
+ const {saveV4PublicJobJd}=await import('../functions/_lib/job-jd-archive.js');
+ const data=new Map(),env={HHBA_JOB_JD_DB:{prepare(){}},HHBA_JOB_JD_R2:{async put(k,v){data.set(k,v)},async get(k){return data.has(k)?{text:async()=>data.get(k)}:null}}};
+ const full_jd='负责区域运营。熟悉渠道业务。'.repeat(20000);
+ const saved=await saveV4PublicJobJd(env,{proof_method:'V4_STRUCTURED_JOBPOSTING',source_confirmed:true,independently_read:true,canonical_url:'https://careers.other-motors.cn/recruitment/positions/9988',company:'示例企业',title:'运营经理',location:'上海',full_jd});
+ assert.ok(saved);assert.equal(saved.full_jd,full_jd);assert.equal(saved.sections.map(x=>x.text).join('\n'),full_jd);
+});

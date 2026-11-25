@@ -61,17 +61,18 @@ export function extractOfficialJdSections(plain,{full=false}={}){
  }
  if(!seenDuty||!seenReq||blocks.length<4)return null;
  const full_jd=blocks.map(b=>b.text).join('\n');
- if(full_jd.length<80||full_jd.length>(full?240000:24000))return null;
+ if(full_jd.length<80||(!full&&full_jd.length>24000))return null;
  return {full_jd,sections:blocks,content_status:'VERIFIED_SECTIONS'};
 }
 
-async function readLimited(response){
+async function readLimited(response,{full=false}={}){
+ const transportBytes=full?16*1024*1024:MAX_RESPONSE;
  const declared=response.headers.get('Content-Length');
- if(declared!==null&&(!/^\d+$/.test(declared)||Number(declared)>MAX_RESPONSE))throw Error('OFFICIAL_PAGE_TOO_LARGE');
+ if(declared!==null&&(!/^\d+$/.test(declared)||Number(declared)>transportBytes))throw Error('OFFICIAL_PAGE_TOO_LARGE');
  if(!response.body)throw Error('OFFICIAL_PAGE_EMPTY');
  const reader=response.body.getReader(),chunks=[];let n=0;
  try{for(;;){const part=await reader.read();if(part.done)break;
-  n+=part.value.byteLength;if(n>MAX_RESPONSE){await reader.cancel();throw Error('OFFICIAL_PAGE_TOO_LARGE');}
+  n+=part.value.byteLength;if(n>transportBytes){await reader.cancel();throw Error('OFFICIAL_PAGE_TOO_LARGE');}
   chunks.push(part.value);
  }}finally{reader.releaseLock();}
  const bytes=new Uint8Array(n);let offset=0;
@@ -107,7 +108,7 @@ async function meituanOfficialJobEvidence(locator,{fetcher,now,signal,full=false
  });
  if(response.status!==200||!response.headers.get('Content-Type')?.includes('application/json'))
   throw Error('OFFICIAL_PAGE_UNAVAILABLE');
- const result=JSON.parse(await readLimited(response));
+ const result=JSON.parse(await readLimited(response,{full}));
  const job=result?.data;
  if(result?.status!==1||job?.jobUnionId!==jobUnionId||job?.jobStatus!=='000')
   throw Error('OFFICIAL_JD_NOT_VERIFIED');
@@ -125,7 +126,7 @@ async function tencentOfficialJobEvidence(locator,{fetcher,now,signal,full=false
  });
  if(response.status!==200||!response.headers.get('Content-Type')?.includes('application/json'))
   throw Error('OFFICIAL_PAGE_UNAVAILABLE');
- const result=JSON.parse(await readLimited(response)),job=result?.Data;
+ const result=JSON.parse(await readLimited(response,{full})),job=result?.Data;
  if(result?.Code!==200||job?.PostId!==postId)throw Error('OFFICIAL_JD_NOT_VERIFIED');
  return publicEmployerDetail(locator,{title:job.RecruitPostName,location:job.LocationName,
   duties:job.Responsibility,requirements:job.Requirement,workYear:job.RequireWorkYearsName},TENCENT_DETAIL_SOURCE,now,full);
@@ -150,7 +151,7 @@ export async function directOfficialJobEvidence(url,{fetcher=fetch,now=new Date(
  }
  const type=(response.headers.get('Content-Type')||'').toLowerCase();
  if(!type.includes('text/html')&&!type.includes('text/plain'))throw Error('OFFICIAL_PAGE_UNREADABLE');
- const raw=await readLimited(response);
+ const raw=await readLimited(response,{full});
  const plain=type.includes('text/html')?htmlToText(raw,{maxChars:full?Infinity:100000}):raw;
  const item=extractOfficialJob({url:locator.url},{content:plain},now);
  // The Tencent detail page may only contain its rendering shell. The

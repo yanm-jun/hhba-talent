@@ -150,7 +150,12 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
    note(result.ok?'AI_STAGE_TOOL_USED':'AI_STAGE_TOOL_UNAVAILABLE');return result;
   }});
   if(fresh){repeat=false;continue;}
-  if(repeat)throw Object.assign(new Error('AI_STAGE_REPEATED_TOOL_REQUEST'),{code:'AI_STAGE_REPEATED_TOOL_REQUEST'});
+  if(repeat){
+   const alternatives={type:'research_recovery',ok:false,error:'REPEATED_UNCHANGED_REQUEST',guidance:'改用不同的公开来源、查询、分页偏移或已保存证据；无需重复完全相同的工具请求。'};
+   if(results.some(r=>r?.type==='research_recovery'))throw Object.assign(new Error('AI_STAGE_REPEATED_TOOL_REQUEST'),{code:'AI_STAGE_REPEATED_TOOL_REQUEST'});
+   if(repeat==='alternate')throw Object.assign(new Error('AI_STAGE_REPEATED_TOOL_REQUEST'),{code:'AI_STAGE_REPEATED_TOOL_REQUEST'});
+   results=[...results,alternatives];repeat='alternate';continue;
+  }
   repeat=true;
  }
 }

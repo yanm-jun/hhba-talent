@@ -182,11 +182,13 @@ function normalizeV4Public(raw){
   v4PublicJobUrl(raw.canonical_url)!==raw.canonical_url||
   !raw.canonical_url||recruitmentSourceKind(raw.canonical_url)==='THIRD_PARTY_BOARD')return null;
  const body=text(raw.full_jd),company=text(raw.company),title=text(raw.title),location=text(raw.location);
- if(!company||!title||!location||body.length<80||body.length>240000)return null;
- const sections=extractOfficialJdSections(body,{full:true});
- if(!sections||sections.full_jd!==body)return null;
+ if(!company||!title||!location||!body)return null;
+ // A server-verified public source can use arbitrary headings. Keep its exact
+ // original body; an unclassified section is preferable to deleting evidence.
+ const parsed=extractOfficialJdSections(body,{full:true});
+ const sections=parsed?.full_jd===body?parsed.sections:[{id:'JD-001',kind:'other',text:body}];
  return {canonical_url:raw.canonical_url,company,title,location,
-  full_jd:body,sections:sections.sections,content_status:'VERIFIED_SECTIONS',
+  full_jd:body,sections,content_status:'VERIFIED_SECTIONS',
   proof_method:raw.proof_method,source_confirmed:raw.source_confirmed===true,
   independently_read:true};
 }

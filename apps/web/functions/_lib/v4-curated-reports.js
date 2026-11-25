@@ -51,3 +51,16 @@ export function qualifiedReport(job){return job?.curated_suitable!==false&&job?.
 
 // Only independently verified, evidence-scored and suitable jobs enter the global report ranking.
 export function eligibleCuratedScore(job){return job?.curated_suitable===true&&job.source_type==='站外官方招聘'&&job.jd_source_status==='VERIFIED_JD'&&job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&Number.isInteger(job.match_score)&&job.match_score>=0&&job.match_score<=100&&!!str(job.evidence_excerpt);}
+
+// The model must order every eligible candidate exactly once. No model-created
+// job or unverified candidate can enter the recommendation list.
+export function validateGeminiGlobalOrder(value,jobs){
+ const ids=new Set(jobs.map(j=>j.official_url));
+ const urls=value?.ordered_urls;
+ if(!Array.isArray(urls)||urls.length!==ids.size||new Set(urls).size!==ids.size||urls.some(u=>!ids.has(u)))return null;
+ return urls;
+}
+export function applyGeminiGlobalOrder(jobs,order){
+ const positions=new Map((order||[]).map((u,i)=>[u,i]));
+ return [...jobs].sort((a,b)=>(positions.get(a.official_url)??Infinity)-(positions.get(b.official_url)??Infinity)||(b.match_score??-1)-(a.match_score??-1)||a.official_url.localeCompare(b.official_url));
+}

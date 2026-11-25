@@ -8,7 +8,7 @@ import {v4PublicJobUrl,v4ReadEmployerJob,v4EmployerAuthorization,v4ReadPublicJob
 import {directOfficialJobEvidence} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
 import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
-import {CANDIDATE_TARGET,FINAL_TARGET,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,eligibleCuratedScore,qualifiedReport} from './v4-curated-reports.js';
+import {CANDIDATE_TARGET,FINAL_TARGET,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,eligibleCuratedScore,qualifiedReport,validateGeminiGlobalOrder,applyGeminiGlobalOrder} from './v4-curated-reports.js';
 import {findMainlandCity} from './mainland-job-location.js';
 import {v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex} from './v4-research-tools.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
@@ -555,7 +555,31 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // attempt. Report generation cannot influence the initial score ranking.
  if(curated&&checkpoint?.phase==='reporting'){
   const combined=checkpoint.matches||[];
-  const rank=()=>combined.filter(eligibleCuratedScore).sort((a,b)=>b.match_score-a.match_score||a.official_url.localeCompare(b.official_url));
+  let globalOrder=checkpoint.globalOrder||null,globalRankError=checkpoint.globalRankError||null;
+  const eligible=combined.filter(eligibleCuratedScore);
+  // One global model decision after every candidate has had an independent
+  // verification/score attempt. All eligible jobs are included, not just a
+  // fixed preliminary shortlist. Persist the result before report generation.
+  if(provider?.kind==='gemini'&&!checkpoint.globalRankAttempted&&eligible.length){
+   const pool=eligible.map(j=>({url:j.official_url,company:j.company,title:j.title,location:j.location,score:j.match_score,reason:j.recommendation_reason,matched:j.matched,gaps:j.not_evidenced}));
+   const document=JSON.stringify(pool);
+   let problem='';
+   for(const repair of [false,true]){
+    try{
+     const reply=await v4StageResearchCall(p=>v4Call(fetcher,provider,p,{signal}),{
+      instructions:'你是全局职业推荐研究员。所有候选已独立核验并评分；根据全部符合条件的候选、真实职业经历、明确偏好、发展机会和可迁移能力进行比较排序。分数是重要证据但不是唯一排序依据。不要修改评分、捏造岗位或排除列表成员。仅返回 JSON {ordered_urls:[按综合适合度排序的全部原始URL，每个恰好一次]}。'+(repair?' 上轮排序不完整：'+problem+'。逐一核对全部候选，不得漏项。':''),
+      input:JSON.stringify({profile,preferred_job_or_city:roleHint,resume_text:resume,public_document:document})
+     },{parse:v4ParseJson,sourceUrls:pool.map(j=>j.url),fetcher,browser:env.BROWSER,signal,resume,document,collections:{candidates:pool},ledger:publicEvidence,note});
+     globalOrder=reply.status==='completed'?validateGeminiGlobalOrder(v4ParseJson(reply),eligible):null;
+     if(globalOrder)break;
+     problem='排序遗漏或重复候选，或响应未完整返回';
+    }catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(isV4RetryableProviderError(e?.code))throw e;problem=e?.code||'AI_GLOBAL_RANK_INVALID';}
+   }
+   globalRankError=globalOrder?null:'AI_GLOBAL_RANK_INCOMPLETE';
+   if(globalRankError)note(globalRankError);else note('AI_GLOBAL_RANK_COMPLETE');
+   return continuation('reporting',{matches:combined,read:checkpoint.read,scored:checkpoint.scored,archived:checkpoint.archived,scoreFailures:checkpoint.scoreFailures,reportFailures:checkpoint.reportFailures,reportWidth:checkpoint.reportWidth,globalOrder,globalRankError,globalRankAttempted:true});
+  }
+  const rank=()=>applyGeminiGlobalOrder(combined.filter(eligibleCuratedScore),globalOrder);
   const pendingReports=()=>rank().filter(j=>j.report_status!=='UNAVAILABLE').slice(0,FINAL_TARGET).filter(j=>!qualifiedReport(j));
   const needsReport=()=>pendingReports()[0];
   let reportFailures=checkpoint.reportFailures||0,reportWidth=checkpoint.reportWidth||3;
@@ -565,7 +589,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   // ranking is recomputed after each durable batch, not after each network call.
   const generateReport=async job=>{
    onActivity('writing','全部候选已完成核验与评分处理，正在按全局排名生成第 '+(delivered+1)+' 份深度报告。');
-   let repair='',previousInvalid=null;const seen=new Set(),repairs=new Set();let independentReview=false;
+   let repair=job.report_status==='RETRY_PENDING'?'独立续接：上一阶段报告未通过，请重新定位完整原文、采用不同研究工具及报告结构，不沿用错误引文。':'',previousInvalid=null;const seen=new Set(),repairs=new Set();let independentReview=false;
    for(;;){
     if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
     try{
@@ -595,7 +619,9 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      if(['AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_RESPONSE_INVALID','AI_STAGE_REPEATED_TOOL_REQUEST'].includes(code)&&!repairs.has(code)){
       repairs.add(code);repair=code;continue;
      }
-     note(code);reportFailures++;job.report_status='UNAVAILABLE';job.score_basis+='；深度报告未通过核验，保留已核验评分。';break;
+     note(code);
+     if(provider?.kind==='gemini'&&job.report_status!=='RETRY_PENDING'){job.report_status='RETRY_PENDING';job.report_retry_reason=code;note('AI_REPORT_DURABLE_REVIEW');break;}
+     reportFailures++;job.report_status='UNAVAILABLE';job.report_retry_reason=code;job.score_basis+='；深度报告未通过核验，保留已核验评分。';break;
     }
    }
   };
@@ -610,8 +636,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(provider?.kind==='gemini'&&parallelResearch)reportWidth=nextDiscoveryWidth(width,failures.map(x=>x.reason?.code||'AI_PROVIDER_RESPONSE_INVALID'),{maxConnections:4});
    onPartial(combined);
   }
-  if(needsReport())return continuation('reporting',{matches:combined,read:checkpoint.read,scored:checkpoint.scored,archived:checkpoint.archived,scoreFailures:checkpoint.scoreFailures,reportFailures,reportWidth});
-  const ranked=combined.slice().sort((a,b)=>(b.match_score??-1)-(a.match_score??-1)||a.official_url.localeCompare(b.official_url));
+  if(needsReport())return continuation('reporting',{matches:combined,read:checkpoint.read,scored:checkpoint.scored,archived:checkpoint.archived,scoreFailures:checkpoint.scoreFailures,reportFailures,reportWidth,globalOrder,globalRankError,globalRankAttempted:true});
+  const ranked=applyGeminiGlobalOrder(combined,globalOrder);
   const final=ranked.filter(qualifiedReport).slice(0,FINAL_TARGET);
   const candidateSetSignature=await sha256Hex(JSON.stringify({candidates:[...rows.entries()].map(([u,j])=>[u,candidateEvidence(j)]).sort(([a],[b])=>a.localeCompare(b)),outcomes:ranked.map(j=>[j.official_url,j.jd_source_status,j.match_score,j.report_status,j.curated_suitable]),reviewed:[...reviewedSources.keys()].sort(),sources:[...sourceLeads].sort()}));
   // Insufficient verified recommendations are feedback for AI research, not a success signal.
@@ -625,11 +651,11 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    onActivity('searching','AI 正在复盘候选覆盖与未完成核验的岗位，自主补充研究及官方证据。');
    return continuation('research',{pipelineActive:false,processedEarlier:[...rows.keys()],processedEvidence:[...rows.entries()].map(([u,j])=>[u,candidateEvidence(j)]),explicitRechecks:[],recheckedEvidence:[],actionSeen:[],submittedSources:[...reviewedSources.keys()],researchToolResult:null,backfillSignature:candidateSetSignature,priorState:{matches:combined,read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures},stalledStrategy:'',stalledSearches:[],providerRecovery:'',researchError:null,recoveryHint:'已尝试核验全部现有候选，当前有 '+final.length+' 份正式推荐，'+concreteCount()+' 个具体候选。请自主复盘搜索覆盖、失败原因及尚未解决的候选，可选择寻找新机会或补充旧岗位的新官方证据。不要重复无变化的候选，不凑数。若确无新增可信证据，请明确完成并说明原因。诊断：'+JSON.stringify(diag)});
   }
-  const incomplete=!!researchError||(searchResumePaged&&searchResumeOffset<resume.length)||concreteCount()<CANDIDATE_TARGET||final.length<FINAL_TARGET||!!checkpoint.scoreFailures||reportFailures>0||[...sourceLeads].some(u=>!rows.has(u)&&!reviewedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u));
+  const incomplete=!!globalRankError||!!researchError||(searchResumePaged&&searchResumeOffset<resume.length)||concreteCount()<CANDIDATE_TARGET||final.length<FINAL_TARGET||!!checkpoint.scoreFailures||reportFailures>0||[...sourceLeads].some(u=>!rows.has(u)&&!reviewedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u));
   if(!final.length)note('NO_FORMAL_RECOMMENDATIONS');
   const verified=ranked.filter(j=>j.jd_source_status==='VERIFIED_JD'&&j.source_type==='站外官方招聘').length;
   return {status:'COMPLETE',profile,matches:final,matched_official_jobs:final.length,research_report:report(),research_leads:ranked.filter(j=>!final.includes(j)),
-   source:'AI 联网搜索与公开招聘网页',scoring:'AI 对全部有效候选独立评分后全局排序，匹配分不代表录用概率。',
+   source:'AI 联网搜索与公开招聘网页',scoring:globalOrder?'Gemini 对全部已核验且适合的候选综合排序，匹配分独立基于原文证据。':globalRankError?'全局模型排序未完成，暂按独立证据分展示，匹配分不代表录用概率。':'AI 对全部有效候选独立评分后全局排序，匹配分不代表录用概率。',
    privacy:'经明确授权向第三方 AI 中转服务发送脱敏简历文本；不发送原文件。',
    disclaimer:'已对全部已收集候选逐一尝试核验，正式推荐按经核验的全局评分择优生成。未确认来源、无法评分或不适合的候选不作为正式推荐。是否仍可投递请以官网为准。'
     +(rows.size<CANDIDATE_TARGET?' 本轮真实候选不足500个。':'')+(researchError?' 本轮联网研究未完整结束。':'')+(reportFailures?' 部分高分候选的深度报告未通过核验，已保留其评分并按顺序补位。':'')+(checkpoint.scoreFailures?' 部分岗位评分未通过原文证据核验，已保留线索与诊断。':''),
@@ -758,7 +784,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   if(!response.output.some(x=>x?.type==='web_search_call')&&!v4ToolSources(response).length&&!(curated&&(requestedAction||researchToolResult||toolUrls.size||publicEvidence.length||independent.length))){
    if(curated)for(const u of v4Sources(response))if(!isCommercialRecruitmentBoard(u))sourceLeads.add(curatedUrl(u));
    researchError='AI_WEB_SEARCH_NOT_USED';note(researchError);
-   if(curated&&providerRecovery!=='AI_WEB_SEARCH_NOT_USED'){providerRecovery='AI_WEB_SEARCH_NOT_USED';recoveryHint='请使用实际联网工具，保留已取得的候选来源。';continue;}
+   if(curated&&providerRecovery!=='AI_WEB_SEARCH_NOT_USED'&&providerRecovery!=='AI_WEB_SEARCH_ALTERNATE'){providerRecovery='AI_WEB_SEARCH_NOT_USED';recoveryHint='请使用实际联网工具，保留已取得的候选来源。';continue;}
+   if(curated&&provider?.kind==='gemini'&&providerRecovery==='AI_WEB_SEARCH_NOT_USED'){providerRecovery='AI_WEB_SEARCH_ALTERNATE';recoveryHint='联网记录未返回。改用不同的公开查询、官方入口发现或独立网页读取工具；实际证据未返回前不得宣称检索成功。';continue;}
    if(!rows.size&&!curated)throw fault('AI_WEB_SEARCH_NOT_USED');
    break;
   }
