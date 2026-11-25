@@ -132,3 +132,32 @@ test('batch provider rejection or incomplete response falls back without inventi
   assert.deepEqual(await Promise.all([score('a',{full_jd:'原文甲'}),score('b',{full_jd:'原文乙'})]),[null,null]);
  }
 });
+
+test('conditional public JD cache reuses only matching strong origin validation, never applicant data',async()=>{
+ const {v4ReadEmployerJob}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const objects=new Map(),bucket={get:async k=>objects.has(k)?{text:async()=>objects.get(k)}:null,put:async(k,v)=>objects.set(k,v)};
+ const u='https://careers.cache-employer.cn/jobs/1',expected={company:'测试企业',title:'区域运营',location:'上海',resume:'must not persist'};
+ const body='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:'区域运营',hiringOrganization:{name:'测试企业',url:'https://careers.cache-employer.cn'},jobLocation:{address:{addressLocality:'上海'}},description:'<p>职责：渠道运营、经销商管理。</p><p>任职要求：真实业务分析经验。</p>'})+'</script>';
+ let calls=0,conditional=0,changed=false;
+ const fetcher=async(url,opts)=>{
+  calls++;
+  if(opts.headers['If-None-Match']){conditional++;assert.equal(opts.headers['If-None-Match'],'"v1"');if(!changed)return new Response(null,{status:304,headers:{etag:'"v1"'}});}
+  return new Response(changed?body.replace('真实业务分析经验','新的独立研究经验'):body,{headers:{'content-type':'text/html',etag:changed?'"v2"':'"v1"'}});
+ };
+ const first=await v4ReadEmployerJob(u,{fetcher,expected,cacheBucket:bucket});
+ const second=await v4ReadEmployerJob(u,{fetcher,expected,cacheBucket:bucket});
+ assert.equal(second.full_jd,first.full_jd);assert.equal(calls,2);assert.equal(conditional,1);
+ assert.ok([...objects.values()].every(x=>!x.includes('must not persist')));
+ changed=true;
+ const third=await v4ReadEmployerJob(u,{fetcher,expected,cacheBucket:bucket});
+ assert.notEqual(third.full_jd,first.full_jd);assert.equal(conditional,2);
+});
+test('reuse a completed same-task report only for exact unchanged evidence and score',async()=>{
+ const {preserveJobEvidence}=await import('../functions/_lib/v4-jd-research.js');
+ const common={company:'企业',title:'区域运营',location:'上海',official_url:'https://careers.employer.cn/jobs/1',source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',score_evidence_status:'GROUNDED_JD_RESUME_QUOTES',curated_suitable:true,evidence_excerpt:'完整JD',match_score:88};
+ const old={...common,report_status:'COMPLETE',research_detail:{reason:'完整研究'},recommendation_reason:'详细理由'};
+ assert.equal(preserveJobEvidence(old,{...common}).research_detail,old.research_detail);
+ assert.equal(preserveJobEvidence(old,{...common,match_score:89}).research_detail,undefined);
+ assert.equal(preserveJobEvidence(old,{...common,evidence_excerpt:'更新JD'}).research_detail,undefined);
+ assert.equal(preserveJobEvidence(old,{...common,excluded_closed:true}).excluded_closed,true);
+});

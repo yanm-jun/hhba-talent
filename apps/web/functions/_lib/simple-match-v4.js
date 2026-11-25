@@ -245,12 +245,12 @@ async function toJson(fetcher,provider,response,{signal}={}){
 function sourceKind(url){
  return isCommercialRecruitmentBoard(url)?'THIRD_PARTY_BOARD':recruitmentSourceKind(url)==='EMPLOYER_ATS'?'EMPLOYER_ATS':'EMPLOYER_DOMAIN_CANDIDATE';
 }
-async function checkJob(fetcher,url,signal,job,note=()=>{}){
+async function checkJob(fetcher,url,signal,job,note=()=>{},cacheBucket){
  if(isCommercialRecruitmentBoard(url))return null;
  // Open research first, including unfamiliar employers. Known employer API
  // adapters are a fallback for JS shells, never the primary search scope.
  try{
-  const jd=await v4ReadEmployerJob(url,{fetcher,signal,expected:job});
+  const jd=await v4ReadEmployerJob(url,{fetcher,signal,expected:job,cacheBucket,onCache:note});
   if(!jd.source_confirmed&&(job?.employer_proof_url||job?.employer_proof_urls?.length)&&await v4EmployerAuthorization(jd.canonical_url||url,jd.company,job.employer_proof_urls?.length?job.employer_proof_urls:job.employer_proof_url,{fetcher,signal})){
    jd.source_confirmed=true;jd.employer_proof_url=v4PublicJobUrl(job.employer_proof_urls?.[0]||job.employer_proof_url);jd.employer_proof_urls=(job.employer_proof_urls||[]).map(v4PublicJobUrl).filter(Boolean);
   }
@@ -422,7 +422,7 @@ async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,br
   }
  }catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(isV4RetryableProviderError(e?.code))throw e;note(e?.code||'JD_PARTIAL_REFERENCE_UNAVAILABLE');}
 }
-async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=false,note=()=>{},browser,ledger=[],cachedResults=new Map(),onRead=()=>{}}={}){
+async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=false,note=()=>{},browser,ledger=[],cachedResults=new Map(),onRead=()=>{},cacheBucket}={}){
  // A bounded concurrency pool protects third-party sites, not a count limit
  // on the number of positions the model is allowed to recommend.
  const urls=[...rows.keys()],results=new Map();
@@ -434,7 +434,7 @@ async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=fa
    const job=rows.get(url),diagnostics=[];
    if(cachedResults.has(url)){const checked=cachedResults.get(url);results.set(url,checked);if(checked?.full_jd&&!checked.excluded_board&&!checked.excluded_closed)read++;onRead(url,checked);continue;}
    const jobNote=code=>{diagnostics.push(code);note(code);};
-   let checked=await checkJob(fetcher,url,signal,job,jobNote);
+   let checked=await checkJob(fetcher,url,signal,job,jobNote,curated?cacheBucket:undefined);
    if(curated&&!isOfficialJd(checked)&&!checked?.excluded_board&&!checked?.excluded_closed){
     jobNote('JD_RECOVERY_REQUIRED');
     checked=await recoverEmployerJob(fetcher,provider,url,job,checked,{signal,onActivity,note:jobNote,browser,ledger});
@@ -1070,7 +1070,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const verificationReads=new Map((checkpoint?.verificationReads||[]).filter(([u,r])=>rows.has(u)&&r.revision===candidateEvidence(rows.get(u))&&isOfficialJd(r.jd)));
  const cachedResults=new Map(entries.filter(([u])=>verificationReads.has(u)).map(([u])=>[u,verificationReads.get(u).jd]));
  if(curated&&checkpoint)onRecoveryState(()=>continuation('verification',{next:offset,matches:checkpoint.matches||[],read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures:checkpoint.reportFailures||0,verificationReads:[...verificationReads],verificationBatch:batchSize}).checkpoint);
- const readOptions={signal,onActivity,provider,curated,note,browser:env.BROWSER,ledger:publicEvidence,cachedResults,onRead:(u,jd)=>{if(curated&&isOfficialJd(jd))verificationReads.set(u,{revision:candidateEvidence(rows.get(u)),jd});}};
+ const readOptions={signal,onActivity,provider,curated,note,browser:env.BROWSER,ledger:publicEvidence,cachedResults,cacheBucket:jdArchiveConfigured(env)?env.HHBA_JOB_JD_R2:undefined,onRead:(u,jd)=>{if(curated&&isOfficialJd(jd))verificationReads.set(u,{revision:candidateEvidence(rows.get(u)),jd});}};
  // Each worker owns a read→score lane: a slow source cannot block the
  // scores of other jobs in this batch. Keep the old serial path intact.
  const overlap=curated&&parallelResearch;
