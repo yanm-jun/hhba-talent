@@ -1024,3 +1024,9 @@ test('V4 Word extraction keeps full text beyond legacy 250k guard',async()=>{
  assert.throws(()=>wordXmlToText(xml),/提取上限/);
  assert.equal(wordXmlToText(xml,{unrestricted:true}),body);
 });
+
+test('V4 recognition retains line-wrapped source evidence and rejects fabricated credentials',()=>{
+ const profile=v4GroundProfile({facts:[{kind:'work',quote:'负责门店 运营与数据整理'},{kind:'credential',quote:'持有从未写过的高级执照'}]},'真实工作经历：负责门店\n运营与数据整理');
+ assert.equal(profile.facts.length,1);
+ assert.match(profile.facts[0].quote,/负责门店\s+运营与数据整理/);
+});

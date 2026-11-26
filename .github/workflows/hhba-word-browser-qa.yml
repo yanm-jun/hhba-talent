@@ -28,7 +28,6 @@ on:
       - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
       - 'apps/web/src/pages/CandidateMatchPage.tsx'
       - 'apps/web/src/services/resumeMatch.ts'
-      - 'apps/web/functions/_lib/match-provider-preflight.js'
       - 'apps/web/scripts/qa-targeted-word-workspace.html'
       - 'apps/web/scripts/qa_targeted_word_workspace.tsx'
       - 'apps/web/scripts/qa_targeted_word_workspace.py'
