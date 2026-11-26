@@ -151,6 +151,9 @@ const errorMap:Record<string,string>={
   AI_EMPLOYER_JOBS_NOT_FOUND:'本轮已尝试补充搜索，但仍未找到信息足够明确的企业招聘岗位链接；并非你的简历不适合。请稍后重试或填写更具体的岗位方向。',
   AI_PROFILE_INCOMPLETE:'AI 暂未生成有效的职业分析报告，本次已停止后续岗位搜索。',
    AI_BACKGROUND_EXECUTION_FAILED:'后台任务未能完成，已停止自动重试。已保存的研究成果不会因此删除。',
+  AI_BACKGROUND_RECOVERING:'后台正在自动恢复原任务。',
+  AI_BACKGROUND_WORKFLOW_ROLLOVER:'后台正在接续下一段研究流程。',
+  AI_BACKGROUND_TASK_PAUSED:'后台任务已暂停。',
   AI_EDGE_RESOURCE_EXHAUSTED:'Cloudflare 单次执行资源不足，后台已保存能够恢复的研究成果。',
   AI_EDGE_DAILY_LIMIT:'Cloudflare 当日执行额度暂时不足，后台研究已暂停。',
   AI_BACKGROUND_TRANSPORT_INTERRUPTED:'后台连接中断，自动恢复未能成功。',
@@ -491,7 +494,7 @@ export async function submitExtractedResumeText(
    if(data.progress?.report)onResearch?.(data.progress.report);
    if(Array.isArray(data.progress?.jobs))onResearchJobs?.(data.progress.jobs);
    if(data.status==='FAILED')throw new MatchError(502,errorMap[data.failure?.error||'']||errorMap.AI_BACKGROUND_EXECUTION_FAILED,false);
-   if(data.failure?.retryable)onActivity?.({stage:'waiting',message:(errorMap[data.failure.error]||'后台连接暂时异常。')+' 正在恢复原任务，保留已有成果。'});
+   if(data.failure?.retryable)onActivity?.({stage:'waiting',message:(data.failure.error==='AI_EDGE_DAILY_LIMIT'?'Cloudflare 当日额度暂时不足，将在额度允许后继续。':data.failure.error==='AI_PROVIDER_RATE_LIMITED'?'AI 接口暂时限流，等待恢复。':data.failure.error==='AI_TASK_IN_PROGRESS'?'原任务仍在执行或释放任务锁。':data.failure.error==='AI_BACKGROUND_WORKFLOW_ROLLOVER'?'正在接续下一段后台工作。':'后台暂时等待或正在恢复。')+' 已保存的研究成果会保留，无需重新开始。'});
    else if(!data.progress)onActivity?.({stage:'preparing',message:'后台任务已登记，正在等待实际执行状态。'});
    await new Promise<void>((resolve,reject)=>{const stop=()=>{clearTimeout(timer);reject(requestSignal.reason)};const timer=setTimeout(()=>{requestSignal.removeEventListener('abort',stop);resolve()},4000);requestSignal.addEventListener('abort',stop,{once:true});});
    continue;
