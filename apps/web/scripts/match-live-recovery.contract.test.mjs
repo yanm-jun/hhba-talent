@@ -63,3 +63,41 @@ test('managed polling retains the complete report and uses the same report gate 
  assert.ok(dialog.includes('hasCompleteReport?2:'),'the first available report is shown without waiting for all candidates');
  assert.ok(panels.includes("pending||provisional?'已完成报告':'正式推荐'"),'unfinished global ranking must be identified as provisional');
 });
+
+
+test('browser receives individual candidate events immediately and reconciles snapshots without duplicate or fake jobs',async()=>{
+ const {createLiveCandidateReception}=await import('../src/services/liveCandidateReception.mjs');
+ const base='https://careers.employer.cn/jobs/1',second='https://careers.employer.cn/jobs/2',third='https://careers.employer.cn/jobs/3';
+ const event=(url,title='区域督导')=>({event_id:'discovery:'+url,candidate:{company:'企业',title,location:'上海',official_url:url,evidence_status:'RESEARCH_PENDING',match_score:null}});
+ const snapshots=[];const state=createLiveCandidateReception(jobs=>snapshots.push(jobs));
+ assert.equal(state.receive(event(base)),true);
+ assert.equal(snapshots.at(-1).length,1);
+ assert.equal(snapshots.at(-1)[0].match_score,null);
+ assert.equal(state.receive(event(base+'?utm_source=duplicate')),false);
+ assert.equal(state.receive(event('http://example.com/jobs/1')),false);
+ assert.equal(state.receive({...event(third),candidate:{...event(third).candidate,match_score:98}}),false);
+ assert.equal(state.receive(event(second)),true);
+ assert.deepEqual(snapshots.at(-1).map(j=>j.official_url),[base,second]);
+ const verified={...snapshots.at(-1)[0],match_score:88,evidence_status:'VERIFIED_FULL_JD',evidence_excerpt:'实际资料',research_detail:{score_explanation:'已核对'}};
+ state.snapshot([verified]);
+ assert.deepEqual(snapshots.at(-1).map(j=>j.official_url),[base,second],'stale aggregate cannot erase an unacknowledged event');
+ assert.equal(state.receive(event(base)),false);
+ assert.equal(snapshots.at(-1)[0].match_score,88);
+ const newJob={...event(third).candidate,id:'third'};
+ assert.equal(state.snapshot([newJob,verified,...snapshots.at(-1).filter(j=>j.official_url===second)]),1);
+ assert.deepEqual(snapshots.at(-1).map(j=>j.official_url),[base,second,third]);
+ state.snapshot([verified,newJob],{final:true});
+ assert.deepEqual(snapshots.at(-1).map(j=>j.official_url),[base,third]);
+});
+
+test('browser candidate reception uses direct SSE and actual managed snapshots; report delivery remains intact',()=>{
+ const service=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ const panels=readFileSync(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ assert.ok(service.includes("event==='discovery_candidate'"));
+ assert.ok(service.includes('liveCandidates.receive(event)'));
+ assert.ok(service.includes('addedCandidates=liveCandidates.snapshot(data.progress.jobs)'));
+ assert.ok(service.includes('data.failure?.retryable?15000:addedCandidates>0?3000:4000'));
+ assert.ok(service.includes('liveCandidates.snapshot(data.research_leads,{final:true})'));
+ assert.ok(service.includes('onPartial?.(verifiedMatchReports(data.progress.jobs))'));
+ assert.ok(panels.includes('Math.max(report?.discovered??0,jobs.length)'));
+});
