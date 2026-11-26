@@ -36,12 +36,8 @@ export function v4Provider(env={}){
  const baseUrl=providerBase(env.HHBA_AGENT_RELAY_BASE_URL);
  return typeof key==='string'&&key.trim().length>=16&&baseUrl?{key,baseUrl,stream:env.HHBA_AGENT_RELAY_STREAM==='1',model:env.HHBA_AGENT_RELAY_MODEL?.trim()||MODEL,...(env.HHBA_AGENT_REASONING_EFFORT?{reasoningEffort:env.HHBA_AGENT_REASONING_EFFORT}: {})}:null;
 }
-// Job research and reassessment use the selected job model; OCR and Word editing keep v4Provider.
-export function v4JobProvider(env={}){
- const selected=env.HHBA_V4_JOB_PROVIDER?.trim().toLowerCase()||'openai';
- if(selected==='gemini')return geminiJobProvider(env);
- return selected==='openai'?v4Provider(env):null;
-}
+// All V4 research, reassessment, OCR and Word editing use the same OpenAI Responses provider.
+export function v4JobProvider(env={}){return v4Provider(env);}
 export function v4OutputText(response){
  return (response?.output||[]).filter(x=>x?.type==='message')
   .flatMap(x=>(x.content||[]).filter(y=>y?.type==='output_text').map(y=>y.text||''))
