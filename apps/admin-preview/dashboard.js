@@ -488,3 +488,48 @@ async function refreshAiUsage(){
 byId('ai-usage-refresh')?.addEventListener('click',()=>void refreshAiUsage());
 byId('ai-usage-period')?.addEventListener('change',()=>{aiUsageReport=null;renderAiUsage();});
 choosePeriod('30d');updateOverview();updateGrowth();void refresh();
+
+// Match V4 operational metrics intentionally load only after a verified
+// administrator clicks. The private metrics API returns aggregate D1 rows.
+let v4OpsReport=null;
+const opsMs=n=>integer(n)===null?'—':n>=60000?(n/60000).toFixed(1)+' 分钟':(n/1000).toFixed(1)+' 秒';
+function renderV4Ops(){
+ const s=v4OpsReport?.v4Operations,valid=s?.quality==='collected'&&s.summary;
+ const set=(id,value)=>{const el=byId(id);if(el)el.textContent=value};
+ const formatRatio=n=>typeof n==='number'&&Number.isFinite(n)?n.toFixed(1)+'%':'—';
+ set('v4-ops-status',valid?'实际采集范围：'+v4OpsReport.period.start+' 至 '+v4OpsReport.period.end+'（UTC）。':s?.quality==='no_records'?'该日期范围内没有采集记录，不等于零失败或零耗时。':v4OpsReport?'当前统计不可用，不显示推测数据。':'尚未查询；管理员手动读取以节省数据库查询。');
+ set('v4-ops-attempts',valid?fmt.format(s.summary.attempts):'—');
+ set('v4-ops-failures',valid?formatRatio(s.summary.failureRate):'—');
+ set('v4-ops-recovery',valid?formatRatio(s.summary.recoveryCompletionRate):'—');
+ set('v4-ops-latency',valid?opsMs(s.summary.averageElapsedMs):'—');
+ const stages=byId('v4-ops-stages'),errors=byId('v4-ops-errors');
+ stages?.replaceChildren();errors?.replaceChildren();
+ if(!valid)return;
+ const add=(root,label,value)=>{
+  if(!root)return;
+  const row=document.createElement('div'),name=document.createElement('span'),number=document.createElement('strong');
+  name.textContent=label;number.textContent=value;row.append(name,number);root.append(row);
+ };
+ const labels={discovery:'岗位搜索',verification:'JD 核验与评分',reporting:'报告生成',mixed:'交错执行（旧版）'};
+ for(const lane of s.stages||[])add(stages,labels[lane.lane]||lane.lane,fmt.format(lane.attempts)+' 阶段 · 失败 '+formatRatio(lane.failureRate)+' · 平均 '+opsMs(lane.averageElapsedMs));
+ add(errors,'首次候选 / 首份 JD / 首份报告的阶段内耗时',[s.summary.firstCandidateMs,s.summary.firstJdMs,s.summary.firstReportMs].map(opsMs).join(' / '));
+ add(errors,'真实成果事件','候选 '+fmt.format(s.summary.candidates)+' · JD '+fmt.format(s.summary.jds)+' · 评分 '+fmt.format(s.summary.scores)+' · 报告 '+fmt.format(s.summary.reports));
+ for(const error of s.errors||[])add(errors,(labels[error.lane]||error.lane)+'：'+error.code,fmt.format(error.count)+' 次');
+}
+async function refreshV4Ops(){
+ const button=byId('v4-ops-refresh');
+ if(!button||button.disabled)return;
+ button.disabled=true;byId('v4-ops-status').textContent='正在核验管理员会话并读取真实阶段指标…';
+ try{
+  const p=byId('v4-ops-period')?.value||'30d',days=p==='today'?'1':p.slice(0,-1);
+  const response=await fetch('/admin-preview/api/metrics?days='+encodeURIComponent(days),{credentials:'same-origin',cache:'no-store'});
+  if(!response.ok||!(response.headers.get('content-type')||'').includes('application/json'))throw Error('PRIVATE_METRICS_UNAVAILABLE');
+  const data=await response.json();
+  if(data.kind!=='HHBA_CLOUDFLARE_PRIVATE_METRICS_V1')throw Error('PRIVATE_METRICS_INVALID');
+  v4OpsReport=data;
+ }catch{v4OpsReport={v4Operations:{quality:'unavailable'}};}
+ finally{button.disabled=false;renderV4Ops();}
+}
+byId('v4-ops-refresh')?.addEventListener('click',()=>void refreshV4Ops());
+byId('v4-ops-period')?.addEventListener('change',()=>{v4OpsReport=null;renderV4Ops()});
+renderV4Ops();
