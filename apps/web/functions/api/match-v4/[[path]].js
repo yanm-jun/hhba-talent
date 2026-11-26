@@ -22,6 +22,7 @@ import {createV4ProgressPublisher} from '../../_lib/v4-progress-publisher.js';
 import {createV4DeliveryTelemetry} from '../../_lib/v4-live-delivery-telemetry.js';
 import {v4DiscoveryCandidateKey} from '../../_lib/v4-discovery-candidate-events.js';
 import {discoveryRecoverySnapshot,restoreDiscoveryRecovery} from '../../_lib/v4-discovery-recovery.js';
+import {reportRecoverySnapshot,restoreReportRecovery} from '../../_lib/v4-report-recovery.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
 const reply=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
@@ -89,6 +90,8 @@ function events(env,request,input,waitUntil){
    const officialJob=j=>allowedJob(j)&&qualifiedReport(j);
    let lastReport=input.savedProgress?.report,latestActivity=input.savedProgress?.activity,lastJobs=input.savedProgress?.jobs||[];
    const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:[...lastJobs]});
+    let reportRecovery;
+    const captureTime=()=>Date.now();
    const seenResults={candidate:new Set(lastJobs.map(j=>j.official_url)),jd:new Set(lastJobs.filter(j=>j.jd_source_status==='VERIFIED_JD').map(j=>j.official_url)),score:new Set(lastJobs.filter(j=>Number.isInteger(j.match_score)).map(j=>j.official_url)),report:new Set(lastJobs.filter(officialJob).map(j=>j.official_url))};
    const observeResult=(kind,url)=>{if(url&&!seenResults[kind].has(url)){seenResults[kind].add(url);delivery.result(kind);}};
    async function publishProgress(status='PENDING',failure=null,kind=null){
@@ -101,7 +104,8 @@ function events(env,request,input,waitUntil){
      try{
       // The recovery supplement is private: polling exposes only .progress.
       const discovery_recovery=status==='PENDING'?discoveryRecoverySnapshot(input.checkpoint,input.recoveryState?.()):undefined;
-      await saveMatchProgress(env,input.taskKey,{generation:input.generation||0,status,progress:{...snapshotProgress(),delivery_stamp:write.stamp,delivery_summary:delivery.snapshot()},failure,discovery_recovery});write.finish(true);return true;}
+      if(status==='PENDING'&&kind==='report')reportRecovery=reportRecoverySnapshot(input.recoveryState?.(),replay?.snapshot(),captureTime())||reportRecovery;
+       await saveMatchProgress(env,input.taskKey,{generation:input.generation||0,status,progress:{...snapshotProgress(),delivery_stamp:write.stamp,delivery_summary:delivery.snapshot()},failure,discovery_recovery,...(status==='PENDING'&&reportRecovery?{report_recovery:reportRecovery}:{})});write.finish(true);return true;}
      catch(e){write.finish(false);console.warn('HHBA_V4_PROGRESS_WRITE_FAILED',JSON.stringify({trace,error:e?.code||'PROGRESS_WRITE_FAILED'}));return false;}
     }
    const publisher=createV4ProgressPublisher({
@@ -168,7 +172,7 @@ function events(env,request,input,waitUntil){
    const guardTimer=input.managed?setInterval(()=>{if(guardBusy)return;guardBusy=true;guard().catch(e=>leaseAbort.abort(e)).finally(()=>{guardBusy=false});},45000):null;
    if(input.lease)leaseHeartbeat=startMatchPhaseHeartbeat({
      renew:()=>{budget?.observe('lease');return input.lease.renew();},
-     getCheckpoint:()=>input.taskKey&&!leaseAbort.signal.aborted&&(!budget||budget.canPublish())?{checkpoint:input.recoveryState?.()||input.checkpoint||null,progress:snapshotProgress(),phaseReplay:replay?.snapshot()}:null,
+     getCheckpoint:()=>input.taskKey&&!leaseAbort.signal.aborted&&(!budget||budget.canPublish())?{checkpoint:input.recoveryState?.()||input.checkpoint||null,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime()}:null,
      persist:async state=>{if(!leaseAbort.signal.aborted){budget?.observe('checkpoint');await saveMatchTask(env,input.taskKey,{...state,generation:input.generation||0});}},
      onError:e=>leaseAbort.abort(e),
      onSaveError:e=>{if(e?.code==='AI_AGENT_CANCELLED')leaseAbort.abort(e);else console.warn('HHBA_V4_PERIODIC_PROGRESS_SAVE_FAILED');}
@@ -188,7 +192,11 @@ function events(env,request,input,waitUntil){
      input.recoveryState=()=>recoveryState();
      // Keep one durable phase per Pages invocation. The hosting platform's
      // subrequest budget resets on the next continuation, not on a JS loop.
-          const provider=v4JobProvider(researchEnv);if(provider)provider.deliveryTelemetry=delivery;if(provider&&replay){provider.phaseReplay=replay;provider.phaseResourceBudget=budget;provider.usageDb=env.HHBA_METRICS_DB;}
+          const provider=v4JobProvider(researchEnv);if(provider){provider.deliveryTelemetry=delivery;
+      // Request actual provider SSE by default on managed background research.
+      // Honor an explicit opt-out; the existing adapter handles JSON fallback.
+      if(input.background&&env.HHBA_AGENT_RELAY_STREAM!=='0')provider.stream=true;
+     }if(provider&&replay){provider.phaseReplay=replay;provider.phaseResourceBudget=budget;provider.usageDb=env.HHBA_METRICS_DB;}
       let profileCache=null;
       if(input.managed&&!input.checkpoint&&provider&&input.resume_id&&input.session?.token_hash&&budget?.canPublish()){
        const id=await matchProfileCacheKey(env,input.phone,input.session.token_hash,{resume_id:input.resume_id,text:input.text,role:input.role_hint,model:provider.model,base:provider.baseUrl,effort:provider.reasoningEffort||'medium'}).catch(()=>null);
@@ -210,7 +218,7 @@ function events(env,request,input,waitUntil){
       console.info('HHBA_V4_STAGE',JSON.stringify({trace,phase:result.checkpoint.phase,round:result.checkpoint.round,candidates:result.checkpoint.rows?.length,processed:result.checkpoint.next,scored:result.checkpoint.scored,diagnostics:result.checkpoint.diagnostics}));
       if(input.taskKey){
        await input.lease.renew();
-       await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint,generation:input.generation||0,progress:snapshotProgress()});
+       await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint,generation:input.generation||0,progress:snapshotProgress(),checkpoint_captured_at:captureTime()});
        await publishProgress();await releaseTask();
        send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});
        succeeded=true;return;
@@ -261,14 +269,14 @@ function events(env,request,input,waitUntil){
        const checkpoint=input.recoveryState?.()||input.checkpoint||null;
        if(checkpoint){checkpoint.diagnostics={...checkpoint.diagnostics,EDGE_RESOURCE_YIELDS:(checkpoint.diagnostics?.EDGE_RESOURCE_YIELDS||0)+1};}
        latestActivity={stage:phase,message:'已保存本段研究成果，正在接续下一段执行。'};
-       await saveMatchTask(env,input.taskKey,{checkpoint,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot()});
+       await saveMatchTask(env,input.taskKey,{checkpoint,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime()});
        await publishProgress();
         console.info('HHBA_V4_RESOURCE_YIELD',JSON.stringify({trace,stage:phase,...budget?.snapshot()}));
        await releaseTask();send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});succeeded=true;return;
       }catch(recoveryError){console.warn('HHBA_V4_RESOURCE_YIELD_SAVE_FAILED',JSON.stringify({trace,error:recoveryError?.code||'CHECKPOINT_SAVE_FAILED'}));}
      }
      const retryable=code!=='AI_AGENT_CANCELLED'&&!!input.taskKey&&(isV4RetryableProviderError(code)||isV4RetryableTaskFailure(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
-      if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&code!=='AI_AGENT_CANCELLED'){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:input.recoveryState?.()||input.checkpoint||null,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
+      if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&code!=='AI_AGENT_CANCELLED'){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:input.recoveryState?.()||input.checkpoint||null,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
       if(code!=='AI_AGENT_CANCELLED'&&!leaseAbort.signal.aborted)await publishProgress(retryable?'PENDING':'FAILED',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
        console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,elapsed_ms:Date.now()-started,resources:budget?.snapshot()}));
       send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
@@ -295,8 +303,10 @@ function events(env,request,input,waitUntil){
 // lease. It is account-bound by the same encrypted task key and generation.
 // An optional view read failing must not prevent normal checkpoint recovery.
 async function recoverSavedDiscovery(env,input,saved,view){
- if(saved?.checkpoint?.phase!=='research'||saved.generation!==input.generation||saved.result||saved.failure&&!saved.failure.retryable)return saved;
+ if(!saved?.checkpoint||saved.generation!==input.generation||saved.result||saved.failure&&!saved.failure.retryable)return saved;
  const record=view??await readMatchProgress(env,input.taskKey).catch(()=>null);
+ const reportRecovered=restoreReportRecovery(saved,record,input.generation);
+ if(reportRecovered){await saveMatchTask(env,input.taskKey,reportRecovered);saved=reportRecovered;console.info('HHBA_V4_REPORT_CHECKPOINT_RECOVERED');}
  const recovered=restoreDiscoveryRecovery(saved,record,input.generation,input.excludeUrls);
  if(recovered.restored||recovered.restoredSources){
   // Persist once before starting a new invocation. Otherwise a second

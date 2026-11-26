@@ -1458,3 +1458,16 @@ test('actual V4 provider call records first complete candidate before terminal r
   assert.doesNotMatch(JSON.stringify(logs),/private prompt|private resume|synthetic-only|careers\.employer/);
  }finally{clearTimeout(timer);try{controller.close();}catch{}await pending.catch(()=>{});}
 });
+
+ test('live report queue admits two independently, preserves sibling after failure and defers the rest',async()=>{
+ const {createLiveReportQueue}=await import('../functions/_lib/v4-research-pipeline.js');
+ let release,fail;const gate=new Promise(r=>{release=r;}),bad=new Promise((_,r)=>{fail=r;});
+ const started=[],complete=[];const q=createLiveReportQueue({width:2,keyOf:j=>j.url,run:async j=>{started.push(j.url);await (j.url==='a'?bad:gate);complete.push(j.url);}});
+ for(const url of ['a','b','c'])q.offer({url});await Promise.resolve();assert.deepEqual(started,['a','b']);
+ fail(Error('temporary'));await new Promise(r=>setTimeout(r,0));release();const result=await q.settle();
+ assert.equal(result.failure.message,'temporary');assert.deepEqual(complete,['b']);assert.equal(result.deferred,2);
+ });
+ test('phase report reserve does not reduce logical research allowance twice',async()=>{
+ const {phaseResourceBudget}=await import('../functions/_lib/v4-phase-budget.js');
+ const b=phaseResourceBudget({initial:22,soft:24,hard:34,progressReserve:4});const before=b.remainingResearch();assert.equal(b.tryProgress('report'),true);assert.equal(b.remainingResearch(),before);
+ });

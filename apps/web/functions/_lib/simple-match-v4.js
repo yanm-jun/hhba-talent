@@ -698,7 +698,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   };
   const coordinator=createLiveVerificationCoordinator({
    getDiscovery:()=>searchRecovery()||search,
-   signal,canStart:()=>!searchDone&&!resourceBudget.denied&&resourceBudget.snapshot().soft-resourceBudget.used>=6,
+   signal,canStart:()=>!searchDone&&!resourceBudget.denied&&resourceBudget.remainingResearch()>=6,
    choose:(base,count)=>{
     const lanes=eligible?2:1;
     const plan=managedWorkPlan(resourceBudget,base.managedVerification,count,{maxLanes:lanes,maxWindow:4,reserve:6,initialCost:8});
@@ -1121,7 +1121,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   const emitCitedJob=createV4DiscoveryCandidateEvents({round,lane:0,signal,onCandidate:acceptStreamed,allow:j=>acceptedLiveUrl(j.url)});
   // Speculative public reading uses spare hosting capacity only. It never
   // controls model output or replaces the full independent verification path.
-  const spareCitationRead=()=>!resourceBudget?.denied&&resourceBudget.snapshot().soft-resourceBudget.used>=8;
+  const spareCitationRead=()=>!resourceBudget?.denied&&resourceBudget.remainingResearch()>=8;
   const sourceReadAhead=fullResearch&&resourceBudget?discoveryReadAhead(async({url})=>{
    if(signal?.aborted||rows.has(url)||earlyRows.has(url)||!acceptedLiveUrl(url)||!spareCitationRead())return;
    const readSignal=signal?AbortSignal.any([signal,AbortSignal.timeout(5000)]):AbortSignal.timeout(5000);
@@ -1227,7 +1227,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
          note('JD_DISCOVERY_PREFETCH_READY');
         }
        }catch{/* a failed prefetch is not a failed vacancy; normal research follows */}
-      },{signal,canStart:()=>!resourceBudget.denied&&resourceBudget.snapshot().soft-resourceBudget.used>=6}):null;
+      },{signal,canStart:()=>!resourceBudget.denied&&resourceBudget.remainingResearch()>=6}):null;
      const stageReady=(value,index,remaining)=>{
       const reply=index===0?value:value.response;
       let result=index===0?null:value.data;
@@ -1572,7 +1572,10 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // occupies a verification/scoring worker. At the phase boundary, preserve
  // every scored job and finish any admitted report before checkpointing.
  const reportQueue=fullResearch&&parallelResearch&&resourceBudget?createLiveReportQueue({signal,
-  canStart:()=>!resourceBudget.denied&&resourceBudget.snapshot().soft-resourceBudget.used>=3,
+  // Two early report lanes leave connection headroom for concurrent discovery
+   // and JD verification; the separate final report phase can use four lanes.
+   width:active=>Math.min(2,active+Math.max(0,Math.floor((resourceBudget.remainingResearch()+1)/4))),
+   canStart:active=>!resourceBudget.denied&&resourceBudget.remainingResearch()>=3+active*2,
   run:maybeEarlyReport}):null;
  const submitEarlyReport=job=>{
   if(!eligibleCuratedScore(job)||qualifiedReport(job)||job.report_status)return;
