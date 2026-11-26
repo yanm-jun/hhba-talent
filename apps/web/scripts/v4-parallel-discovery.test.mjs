@@ -1032,7 +1032,7 @@ test('shared live discovery snapshot combines interleaved agents before either r
  try{
   await Promise.race([ready,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('agents not started')),1500);})]);clearTimeout(timer);
   delta(0,'{"jobs":['+JSON.stringify(a));
-  delta(1,'{"jobs":['+JSON.stringify(b));
+  delta(1,'{"jobs":['+JSON.stringify({...a,url:a.url+'?utm_source=second_lane'})+','+JSON.stringify(b));
   await Promise.race([merged,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('live merge waited for a completed agent')),1500);})]);clearTimeout(timer);
   assert.equal(finished,0);
   assert.deepEqual(snapshots[0],[a.url]);
