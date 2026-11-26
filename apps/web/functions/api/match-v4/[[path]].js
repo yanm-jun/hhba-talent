@@ -7,7 +7,6 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
 import {createAiUsageBuffer} from '../../_lib/ai-token-usage.js';
-import {preserveJobEvidence} from '../../_lib/v4-jd-research.js';
 import {mergeLiveJobProgress,createV4JobEventJournal} from '../../_lib/v4-job-progress.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
 import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
@@ -129,13 +128,12 @@ function events(env,request,input,waitUntil){
    const publishedCandidateKeys=new Set(lastJobs.map(j=>v4DiscoveryCandidateKey(j.official_url)).filter(Boolean));
    let currentCandidateKeys=new Set(publishedCandidateKeys);
    const rememberJobs=matches=>{
-    for(const j of matches.filter(allowedJob)){const u=j.official_url;observeResult('candidate',u);if(j.jd_source_status==='VERIFIED_JD')observeResult('jd',u);if(Number.isInteger(j.match_score))observeResult('score',u);if(officialJob(j))observeResult('report',u);}
+    for(const j of matches.filter(j=>allowedJob(j)&&!j.excluded_closed)){const u=j.official_url;observeResult('candidate',u);if(j.jd_source_status==='VERIFIED_JD')observeResult('jd',u);if(Number.isInteger(j.match_score))observeResult('score',u);if(officialJob(j))observeResult('report',u);}
     // The progress object is encrypted and bound to this authorized task.
     // Keep independently researched intermediate results as well as reports.
     // Merge same-task evidence only for a currently present identity; absent or
     // explicitly excluded records are not resurrected by the progress view.
-    const prior=new Map(lastJobs.map(j=>[j.research_candidate_url||j.official_url,j]));
-    const incoming=matches.filter(allowedJob).map(j=>preserveJobEvidence(prior.get(j.research_candidate_url||j.official_url),j)).filter(j=>allowedJob(j)&&!j.excluded_closed).map(j=>researchEvidence(j)?structuredClone(j):({
+    const incoming=matches.filter(j=>allowedJob(j)&&!j.excluded_closed).map(j=>researchEvidence(j)?structuredClone(j):({
      id:j.id,company:j.company,title:j.title,title_zh:j.title_zh,location:j.location,official_url:j.official_url,platform:j.platform,source:j.source,remote:j.remote,
      matched:[],not_evidenced:[],needs_verification:[],requirements_basis:'',salary:j.salary,source_status:j.source_status,
      source_type:j.source_type,jd_source_status:j.jd_source_status,evidence_status:j.evidence_status,reference_vacancy_verified:j.reference_vacancy_verified,
