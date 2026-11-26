@@ -6,7 +6,11 @@ const PREFIX='v4-match-continuations/';
 const enc=new TextEncoder(),dec=new TextDecoder();
 const TTL=60*60*1000;
 const refOK=ref=>typeof ref==='string'&&/^[a-f0-9-]{36}$/.test(ref);
-function secret(env){return env?.HHBA_MATCH_V4_CHECKPOINT_SECRET||env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET;}
+export function v4CheckpointSecret(env){
+ // A malformed primary binding must not shadow the existing usable fallback.
+ return [env?.HHBA_MATCH_V4_CHECKPOINT_SECRET,env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET].find(value=>typeof value==='string'&&value.length>=32);
+}
+const secret=v4CheckpointSecret;
 export function checkpointStorageReady(env){
  return env?.HHBA_V4_MATCH_CHECKPOINT_STORAGE==='1'&&typeof secret(env)==='string'&&secret(env).length>=32&&
   typeof env?.HHBA_PRIVATE_RESUMES?.put==='function'&&typeof env.HHBA_PRIVATE_RESUMES.get==='function';
