@@ -98,12 +98,14 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent,stage=prov
  const replayKey=provider.phaseReplay?await sha256Hex(JSON.stringify([provider.model,stage,effort,payload])):null;
  const prior=replayKey?provider.phaseReplay.take(replayKey):null;
  if(prior)return prior;
+ if(provider.usageDb)provider.phaseResourceBudget?.take('model_usage');
+ let failure;
  try{
   data=await v4CallOpenAI(fetcher,effective,payload,{signal,onEvent,stage});
   if(replayKey&&data.status==='completed')provider.phaseReplay.remember(replayKey,data);
   return data;
- }
- finally{await recordAiUsage(provider.usageDb,{model:provider.model,stage,effort:payload.reasoning?.effort||effort,status:data?.status||'failed',usage:data?.usage});}
+ }catch(e){failure=e;throw e;}
+ finally{if(failure?.code!=='AI_PHASE_RESOURCE_YIELD')await recordAiUsage(provider.usageDb,{model:provider.model,stage,effort:payload.reasoning?.effort||effort,status:data?.status||'failed',usage:data?.usage});}
 }
 async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,stage}={}){
  if(!provider)throw fault('AI_PROVIDER_NOT_CONFIGURED');
@@ -132,6 +134,7 @@ async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,stage}={}){
   if(provider.stream&&[400,422].includes(response.status)){
    await response.body?.cancel().catch(()=>{});
    await recordAiUsage(provider.usageDb,{model:provider.model,stage,effort:payload.reasoning?.effort||provider.reasoningEffort,status:'stream_rejected'});
+   if(provider.usageDb)provider.phaseResourceBudget?.take('model_usage');
    return v4CallOpenAI(fetcher,{...provider,stream:false},payload,{signal,onEvent,stage});
   }
   if(response.status===413)throw fault('AI_PROVIDER_CONTEXT_TOO_LARGE');
