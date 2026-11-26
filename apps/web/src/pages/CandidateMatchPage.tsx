@@ -10,6 +10,8 @@ import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
 import {matchServiceReady,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,resumeMatchFileLimit,redactResumeTextLocally,type MatchResponse,type MatchResearchReport,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
 import {sessionMatchRecoveryAvailable,MATCH_TASK_SIGNAL,readSessionMatchTask,beginSessionMatchTask,advanceSessionMatchTask,closeSessionMatchTask,managedMatchOptions,type SessionMatchTask} from '../services/resumeMatch';
+import {MatchPaymentPanel} from '../components/MatchPaymentPanel';
+import type {MatchPaymentOrder} from '../services/matchPayment';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -41,6 +43,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
  const [storageChoice,setStorageChoice]=useState<'undecided'|'save'|'once'>('undecided');
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
+ const [paymentRequired,setPaymentRequired]=useState(false),[paymentOrder,setPaymentOrder]=useState<MatchPaymentOrder|null>(null),[paymentRefresh,setPaymentRefresh]=useState(0);
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
  const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10});
  const [working,setWorking]=useState(false);
@@ -66,7 +69,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
  const identifiedCharacters=redactResumeTextLocally(previewText).replace(/\s/g,'').length;
  useEffect(()=>{
   const abort=new AbortController();
-  void matchServiceReady(abort.signal).then(ok=>{if(!abort.signal.aborted)setAvailability(ok?'ready':'disabled')});
+  void matchServiceReady(abort.signal,required=>{if(!abort.signal.aborted)setPaymentRequired(required)}).then(ok=>{if(!abort.signal.aborted)setAvailability(ok?'ready':'disabled')});
   return()=>{abort.abort();controller.current?.abort();previewController.current?.abort();wordVersionRequest.current?.abort()};
  },[]);
  useEffect(()=>{
@@ -280,7 +283,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   const task=sessionTask.current||(pendingStart.current?{id:pendingStart.current,generation:0}:null);
   if(!task){clearTaskLocally();return;}
   closingTask.current=true;
-  try{await closeSessionMatchTask(task,working||!!pendingStart.current);clearTaskLocally();}
+  try{await closeSessionMatchTask(task,working||!!pendingStart.current);clearTaskLocally();setPaymentOrder(null);setPaymentRefresh(n=>n+1);}
   catch(e){setError(e instanceof Error?e.message:'未确认服务器终止，请恢复网络后重试。');window.alert('服务器尚未确认结束任务，请恢复网络后再试。');}
   finally{closingTask.current=false;}
  }
@@ -288,6 +291,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   if((!file&&!savedId)||!consent||working||saveBusy||checkingTask||wordVersionBusy||taskOpen.current||controller.current||previewBusy||ocrBusy||!previewLoaded||
    identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()||
    (file&&!savedId&&storageChoice==='undecided'))return;
+  if(paymentRequired&&(paymentOrder?.status!=='paid'||paymentOrder.closed)){setError('请先完成并确认本次智能匹配支付。');return;}
   taskOpen.current=true;setTaskFailure(false);setRestoringTask(false);
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
   const abort=new AbortController();
@@ -316,8 +320,8 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
     if(abort.signal.aborted)throw new DOMException('Cancelled','AbortError');
    }
    // Consent includes encrypted temporary input recovery, not original-file retention.
-   if(sessionMatchRecoveryAvailable)pendingStart.current=crypto.randomUUID();
-   const registration=await beginSessionMatchTask(previewText,options,matchResumeId||undefined,abort.signal,pendingStart.current||undefined);
+   if(sessionMatchRecoveryAvailable)pendingStart.current=paymentRequired?paymentOrder!.id:(pendingStart.current||crypto.randomUUID());
+   const registration=await beginSessionMatchTask(previewText,options,matchResumeId||undefined,abort.signal,pendingStart.current||undefined,paymentRequired?paymentOrder?.id:undefined);
    if(abort.signal.aborted)return;
    if(registration)sessionTask.current=registration.task;
    pendingStart.current=null;
@@ -490,11 +494,12 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
           <span>我已阅读并同意 <a href={import.meta.env.BASE_URL+'privacy'} target="_blank" rel="noopener noreferrer" aria-label="隐私说明（新标签页打开）">《隐私说明》</a>，授权 HHBA 使用简历信息进行智能匹配，并将脱敏后的简历文字发送至第三方 AI 服务分析（可能经第三方中转至 OpenAI 兼容模型，处理简历及岗位匹配）。为恢复同一研究任务，脱敏文字与求职参数会在账户会话内加密临时保存，不因此保存原始文件。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
+        {paymentRequired&&<MatchPaymentPanel disabled={working||taskOpen.current} refreshKey={paymentRefresh} onOrder={setPaymentOrder}/>}
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
           disabled={(!file&&!savedId)||!consent||working||saveBusy||checkingTask||wordVersionBusy||taskOpen.current||previewBusy||ocrBusy||!previewLoaded||
            (file&&!savedId&&storageChoice==='undecided')||
-           identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()}>
+           identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()||(paymentRequired&&(paymentOrder?.status!=='paid'||paymentOrder.closed))}>
           {working?<><LoaderCircle className="spin" size={18}/> {saveBusy?'正在保存简历…':'正在匹配岗位…'}</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>

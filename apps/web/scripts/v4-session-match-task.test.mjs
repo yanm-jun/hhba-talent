@@ -186,3 +186,55 @@ test('optional gzip encrypts large checkpoint records, preserves exact data, and
  const bad=packed.slice();bad[bad.length-1]^=1;objects.set([...objects.keys()][0],bad);
  await assert.rejects(readMatchTask(gzipEnv,id,2000));
 });
+
+test('paid match order binds one exact research task, rejects pending, cross-owner and changed CV, closes without a second charge',async()=>{
+ const {env,sql,session,input}=fixture(),a=session('13800000000','a'),b=session('13900000000','b');
+ sql.exec(readFileSync(new URL('../d1/0091_v4_match_orders.sql',import.meta.url),'utf8'));
+ env.HHBA_MATCH_PAYMENT_REQUIRED='1';
+ const order=crypto.randomUUID(),taskInput={...input(),id:order,payment_order_id:order};
+ sql.prepare("INSERT INTO hhba_match_orders(id,phone,amount_fen,status,created_at) VALUES(?,?,1990,'pending',?)").run(order,a.phone,new Date().toISOString());
+ await assert.rejects(updateSessionTask(env,a,'start',taskInput),{code:'AI_MATCH_PAYMENT_REQUIRED'});
+ assert.equal(await getSessionTask(env,a),null);
+ sql.prepare("UPDATE hhba_match_orders SET status='paid',provider_trade_no='trade-test',paid_at=? WHERE id=?").run(new Date().toISOString(),order);
+ await assert.rejects(updateSessionTask(env,b,'start',taskInput),{code:'AI_MATCH_PAYMENT_REQUIRED'});
+ const task=await updateSessionTask(env,a,'start',taskInput);
+ assert.equal(task.id,order);assert.deepEqual(await updateSessionTask(env,a,'start',taskInput),task);
+ const {assertPaidMatchOrder}=await import('../functions/_lib/v4-match-payment.js');
+ await assert.rejects(assertPaidMatchOrder(env,a,{...task,text:'different resume'}),{code:'AI_MATCH_PAYMENT_REQUIRED'});
+ assert.equal((await assertSessionTaskActive(env,a,order,0)).id,order);
+ await updateSessionTask(env,a,'close',task);
+ assert.ok(sql.prepare('SELECT task_closed_at FROM hhba_match_orders WHERE id=?').get(order).task_closed_at);
+ await assert.rejects(updateSessionTask(env,a,'start',taskInput),{code:'AI_MATCH_PAYMENT_REQUIRED'});
+ assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM hhba_match_orders').get().n,1);
+});
+test('signed payment notification matches merchant, amount, order and remains idempotent',async()=>{
+ const {env,sql,session}=fixture(),a=session('13800000000','a'),order=crypto.randomUUID();
+ sql.exec(readFileSync(new URL('../d1/0091_v4_match_orders.sql',import.meta.url),'utf8'));
+ Object.assign(env,{HHBA_MATCH_PAYMENTS_ENABLED:'1',HHBA_MATCH_ALIPAY_NOTIFY_URL:'https://hhba.work/api/match-payment/alipay/notify',ALIPAY_APP_ID:'app-test',ALIPAY_SELLER_ID:'seller-test',ALIPAY_PRIVATE_KEY_PKCS8:'synthetic',ALIPAY_PUBLIC_KEY:'synthetic'});
+ sql.prepare("INSERT INTO hhba_match_orders(id,phone,amount_fen,status,created_at) VALUES(?,?,1990,'pending',?)").run(order,a.phone,new Date().toISOString());
+ const {acceptMatchPaymentNotification}=await import('../functions/_lib/v4-match-payment.js');
+ const form=new URLSearchParams({sign:'synthetic',sign_type:'RSA2',app_id:'app-test',seller_id:'seller-test',out_trade_no:order,total_amount:'19.90',trade_status:'TRADE_SUCCESS',trade_no:'trade-one'});
+ const wrong=new URLSearchParams(form);wrong.set('total_amount','0.01');
+ assert.equal(await acceptMatchPaymentNotification(env,wrong,async()=>true),false);
+ assert.equal(await acceptMatchPaymentNotification(env,form,async()=>false),false);
+ const dup=new URLSearchParams(form);dup.append('trade_no','trade-other');
+ assert.equal(await acceptMatchPaymentNotification(env,dup,async()=>true),false);
+ assert.equal(await acceptMatchPaymentNotification(env,form,async()=>true),true);
+ assert.equal(await acceptMatchPaymentNotification(env,form,async()=>true),true);
+ const changed=new URLSearchParams(form);changed.set('trade_no','trade-other');
+ assert.equal(await acceptMatchPaymentNotification(env,changed,async()=>true),false);
+ assert.equal(sql.prepare('SELECT provider_trade_no FROM hhba_match_orders WHERE id=?').get(order).provider_trade_no,'trade-one');
+});
+test('checkout retries reuse the same uncharged merchant order and provider reconciliation is amount-bound',async()=>{
+ const {env,sql,session}=fixture(),a=session('13800000000','a');
+ sql.exec(readFileSync(new URL('../d1/0091_v4_match_orders.sql',import.meta.url),'utf8'));
+ Object.assign(env,{HHBA_MATCH_PAYMENTS_ENABLED:'1',HHBA_MATCH_ALIPAY_NOTIFY_URL:'https://hhba.work/api/match-payment/alipay/notify',ALIPAY_APP_ID:'app-test',ALIPAY_SELLER_ID:'seller-test',ALIPAY_PRIVATE_KEY_PKCS8:'synthetic',ALIPAY_PUBLIC_KEY:'synthetic'});
+ const {createOrResumeMatchOrder,reconcileMatchOrder}=await import('../functions/_lib/v4-match-payment.js');
+ let merchantId;
+ await assert.rejects(createOrResumeMatchOrder(env,a.phone,async(_env,_method,biz)=>{merchantId=biz.out_trade_no;throw Error('synthetic network interruption');}));
+ const order=await createOrResumeMatchOrder(env,a.phone,async(_env,_method,biz)=>{assert.equal(biz.out_trade_no,merchantId);return {out_trade_no:merchantId,qr_code:'https://qr.alipay.com/test-only'};});
+ assert.equal(order.status,'pending');assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM hhba_match_orders').get().n,1);
+ await assert.rejects(reconcileMatchOrder(env,order,async()=>({out_trade_no:merchantId,seller_id:'seller-test',total_amount:'0.01',trade_status:'TRADE_SUCCESS',trade_no:'test-trade'})),{code:'MATCH_PAYMENT_GATEWAY_INVALID'});
+ const paid=await reconcileMatchOrder(env,order,async()=>({out_trade_no:merchantId,seller_id:'seller-test',total_amount:'19.90',trade_status:'TRADE_SUCCESS',trade_no:'test-trade'}));
+ assert.equal(paid.status,'paid');
+});

@@ -18,6 +18,7 @@ import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSess
 import {backgroundEnabled,tryScheduleBackgroundMatch,loadBackgroundMatch,isV4RetryableTaskFailure} from '../../_lib/v4-background-match.js';
 
 import {phaseResourceBudget,phaseModelReplay,PHASE_YIELD} from '../../_lib/v4-phase-budget.js';
+import {matchPaymentRequired,assertPaidMatchOrder} from '../../_lib/v4-match-payment.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
 const reply=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
@@ -56,7 +57,7 @@ function events(env,request,input,waitUntil){
  const replay=budget?phaseModelReplay(input.phaseReplay):null;
  const researchEnv=budget?budget.env(env):{...env};
  // Only a managed existing task can use the opt-in shared asset path.
- if(!input.managed)researchEnv.HHBA_V4_PUBLIC_ASSETS_ENABLED='0';
+ if(!input.managed||!matchPaymentRequired(env))researchEnv.HHBA_V4_PUBLIC_ASSETS_ENABLED='0';
  const trace=input.taskKey?input.taskKey.slice(0,16):crypto.randomUUID();
  const stream=new ReadableStream({
   start(controller){
@@ -111,7 +112,7 @@ function events(env,request,input,waitUntil){
    // Managed tasks are not cancelled simply because a browser transport closes.
    // Pages waitUntil is best effort; durable checkpoints still provide recovery.
    const executionSignal=input.managed?leaseAbort.signal:input.lease?AbortSignal.any([request.signal,leaseAbort.signal]):request.signal;
-   const guard=async()=>{if(input.managed){budget?.observe('authorization',2);await renewActiveSessionTask(env,input.session,input.taskId,input.generation);}};
+   const guard=async()=>{if(input.managed){budget?.observe('authorization',matchPaymentRequired(env)?3:2);await renewActiveSessionTask(env,input.session,input.taskId,input.generation);}};
    let guardBusy=false;
    const guardTimer=input.managed?setInterval(()=>{if(guardBusy)return;guardBusy=true;guard().catch(e=>leaseAbort.abort(e)).finally(()=>{guardBusy=false});},45000):null;
    if(input.lease)leaseHeartbeat=startMatchPhaseHeartbeat({
@@ -269,7 +270,7 @@ export async function onRequest(context){
   // Expose only coarse readiness flags, never credentials or user information.
   const readiness={host:allowedHost(request),service:env?.HHBA_MATCH_V4_READY==='1',provider:Boolean(v4Provider(env)),job_provider:Boolean(v4JobProvider(env)),database:typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function',checkpoint_key:!!checkpointEnv(env),checkpoint_storage:checkpointStorageReady(env)};
   return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:matchEnabled(env,request),
-   scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],resumable:readiness.checkpoint_key,encrypted_checkpoint_storage:readiness.checkpoint_storage,dynamic_page_reader:typeof env.BROWSER?.quickAction==='function'||typeof env.BROWSER?.script==='function',readiness});
+   payment_required:matchPaymentRequired(env),scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],resumable:readiness.checkpoint_key,encrypted_checkpoint_storage:readiness.checkpoint_storage,dynamic_page_reader:typeof env.BROWSER?.quickAction==='function'||typeof env.BROWSER?.script==='function',readiness});
  }
  if(suffix==='/background-step')return backgroundStep(env,request,waitUntil);
  const activeTaskRoute=suffix==='/active-task';
@@ -290,7 +291,7 @@ export async function onRequest(context){
  if(candidate?.role!=='candidate')return fail('FORBIDDEN',403);
  if(activeTaskRoute&&request.method==='GET'){
   if(!checkpointStorageReady(env))return fail('AI_CHECKPOINT_DB_UNAVAILABLE',503);
-  try{const task=await getSessionTask(env,session);const background_scheduled=await tryScheduleBackgroundMatch(env,request,session,task);return reply({ok:true,task,background_scheduled});}catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',503);}
+  try{const task=await getSessionTask(env,session);let background_scheduled=false;if(task){try{await assertPaidMatchOrder(env,session,task);background_scheduled=await tryScheduleBackgroundMatch(env,request,session,task);}catch(e){if(e?.code!=='AI_MATCH_PAYMENT_REQUIRED')throw e;}}return reply({ok:true,task,background_scheduled});}catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',503);}
  }
  if(suffix==='/ocr'){
   try{return reply({ok:true,...await recognizeV4Resume(request,v4Provider(env))});}
@@ -310,7 +311,7 @@ export async function onRequest(context){
   if(action==='start'&&(body?.consent!==true||body?.recovery_consent!==true||body?.options?.country!=='CN'))return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',403);
   const text=action==='start'?sanitize(body.text):null;
   if(action==='start'&&!text)return fail('INVALID_RESUME_TEXT',400);
-  const entry=action==='start'?{id:body.task_id,text,role:typeof body.options.role_hint==='string'?body.options.role_hint.trim():'',excludeUrls:[],resume_id:body.resume_id||null}:{id:body.task_id,generation:body.generation};
+  const entry=action==='start'?{id:body.task_id,text,role:typeof body.options.role_hint==='string'?body.options.role_hint.trim():'',excludeUrls:[],resume_id:body.resume_id||null,...(matchPaymentRequired(env)?{payment_order_id:body.payment_order_id}: {})}:{id:body.task_id,generation:body.generation};
   try{const task=await updateSessionTask(env,session,action,entry);const background_scheduled=await tryScheduleBackgroundMatch(env,request,session,task);return reply({ok:true,task,background_scheduled});}catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
  }
  if(!matchEnabled(env,request))return fail('AI_PROVIDER_NOT_CONFIGURED',503);
@@ -324,6 +325,7 @@ export async function onRequest(context){
  const excludeUrls=Array.isArray(body?.options?.exclude_urls)?body.options.exclude_urls.filter(x=>typeof x==='string'):[];
  // Do not store raw resume, query, job results, or model output in server logs.
  const input={text:resume,role_hint:role,excludeUrls,phone:session.phone,resume_id:body.resume_id||null};
+ if(matchPaymentRequired(env)&&body.task_managed!==true)return fail('AI_MATCH_PAYMENT_REQUIRED',402);
  if(body.task_managed===true){
   try{
    const task=await assertSessionTaskActive(env,session,body.task_id,body.research_generation??0);
