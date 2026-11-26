@@ -40,7 +40,7 @@ export function partitionReadyScores(items,resume,budget){
 }
 // A short coalescing window does not wait for slow sibling fetches. One
 // runnable group is awaited by its already occupied worker lanes.
-export function makeBatchScorer({call,parse,resume,roleHint,budget=90000,note=()=>{},signal,delay=80}){
+export function makeBatchScorer({call,parse,resume,roleHint,budget=90000,note=()=>{},signal,delay=80,maxReady=Infinity}){
  let pending=[],timer=null;
  async function flush(){
   timer=null;const queued=pending;pending=[];
@@ -68,6 +68,9 @@ export function makeBatchScorer({call,parse,resume,roleHint,budget=90000,note=()
  return (id,job)=>new Promise(resolve=>{
   if(signal?.aborted){resolve(null);return;}
   pending.push({id,job,resolve});
-  if(timer===null)timer=setTimeout(()=>{void flush();},delay);
+  // Once every available lane has supplied a ready JD, waiting longer
+  // cannot grow this batch. Flush now rather than adding artificial latency.
+  if(pending.length>=maxReady){if(timer!==null)clearTimeout(timer);void flush();}
+  else if(timer===null)timer=setTimeout(()=>{void flush();},delay);
  });
 }

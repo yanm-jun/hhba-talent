@@ -640,3 +640,40 @@ test('production-mode confirmed vacancy receives additional public research and 
  assert.equal(saved.reference_vacancy_verified,true);assert.equal(saved.report_status,'UNAVAILABLE');assert.equal(saved.match_score,null);assert.equal(saved.research_detail,undefined);assert.equal(qualifiedReport(saved),false);assert.equal(saved.jd_source_status,undefined);assert.match(saved.reference_jd,/门店运营支持/);assert.ok(saved.jd_research.facts.some(f=>f.quote===quote));
  const historical=safeHistoryJobs([{...saved,v4_source:true}])[0];assert.equal(historical.reference_jd,saved.reference_jd);assert.equal(historical.report_status,'UNAVAILABLE');assert.equal(historical.reference_vacancy_verified,true);assert.equal(historical.match_score,null);
 });
+
+test('pipeline window grows on measured inexpensive jobs without increasing concurrent sockets',async()=>{
+ const {pipelineVerificationWindow,verificationSnapshot,pipelineWidths}=await import('../functions/_lib/v4-research-pipeline.js');
+ const cp={discoveryWidth:4,pipelineVerificationWidth:4,pipelineVerificationCost:2};
+ const plan=pipelineWidths(cp,100);
+ assert.equal(plan.discovery+plan.verification,5);
+ assert.equal(pipelineVerificationWindow(cp,100,plan.verification),8);
+ const snapshot=verificationSnapshot(cp,plan.verification,8);
+ assert.equal(snapshot.verificationBatch,8);assert.equal(snapshot.verificationLaneWidth,4);
+ assert.equal(pipelineVerificationWindow({...cp,pipelineVerificationCost:6},100,4),4);
+ assert.equal(pipelineVerificationWindow({},100,4),4);
+ assert.equal(pipelineVerificationWindow(cp,2,4),2);
+});
+test('successful pressure yield keeps untouched pipeline jobs pending',async()=>{
+ const {candidateRevision,pendingVerification,mergePipelineCheckpoint}=await import('../functions/_lib/v4-research-pipeline.js');
+ const rows=Array.from({length:8},(_,i)=>['https://example.com/job/'+i,{company:'公司',title:'岗位'+i,location:'上海'}]);
+ const cp={phase:'research',rows};
+ const verify={phase:'verification',next:5,matches:[],diagnostics:{}};
+ const next=mergePipelineCheckpoint(cp,cp,verify,rows);
+ assert.deepEqual(next.processedEarlier,rows.slice(0,5).map(([u])=>u));
+ assert.deepEqual(pendingVerification(next),rows.slice(5));
+ assert.equal(next.diagnostics.PIPELINE_VERIFICATION_ATTEMPTS,5);
+ const [url,job]=rows[0],old={...cp,processedEarlier:[url],processedEvidence:[[url,candidateRevision(job)]],explicitRechecks:[url]};
+ const failed={phase:'verification',next:0,processedEarlier:[url],processedEvidence:old.processedEvidence,explicitRechecks:[url],matches:[]};
+ const resumed=mergePipelineCheckpoint(old,old,failed,[rows[0]],{verificationIncomplete:true});
+ assert.ok(pendingVerification(resumed).some(([u])=>u===url));
+});
+test('a full ready scoring group bypasses its coalescing timer',async()=>{
+ const {makeBatchScorer}=await import('../functions/_lib/v4-batch-scoring.js');
+ let calls=0;
+ const score=makeBatchScorer({resume:'真实工作经验',maxReady:2,delay:60000,parse:r=>r.data,call:async()=>{calls++;return {status:'completed',data:{assessments:[]}};}});
+ const first=score('a',{full_jd:'岗位甲'});
+ assert.equal(calls,0);
+ const second=score('b',{full_jd:'岗位乙'});
+ assert.equal(calls,1);
+ assert.deepEqual(await Promise.all([first,second]),[null,null]);
+});
