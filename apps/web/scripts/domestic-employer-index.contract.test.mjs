@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import {INDUSTRY_HALL_IDS,selectedIndexIndustries,fallbackIndexIndustries,
  buildIndexedEmployerQueries,indexedEmployerSearchHints}
  from '../functions/_lib/domestic-employer-index.js';
-import {runAgentOwnedMainlandMatch} from '../functions/_lib/ai-owned-job-research.js';
 import {readFileSync} from 'node:fs';
 
 const rows=[
@@ -68,47 +67,6 @@ test('read-only domestic D1 query accepts only industry enums and never sends pr
  const missing=await indexedEmployerSearchHints({},['区域督导'],['automotive']);
  assert.equal(missing.available,false);
  assert.deepEqual(missing.queries,[]);
-});
-
-test('the model-selected domestic enterprise hint causes a new public Search, never directly publishes an indexed vacancy',async()=>{
- const found={id:'j1',title:'星河汽车有限公司 区域督导 上海 招聘',
-  source:'星河汽车有限公司',url:'https://careers.xinghe-auto.cn/jobs/regional-supervisor-2026',
-  summary:'星河汽车有限公司社会招聘区域督导。工作地点：上海。岗位职责：负责区域门店流程管理及经销商辅导。',
-  content:'',availability:{status:'UNKNOWN'}};
- const searches=[],activities=[];
- let indexCalls=0;
- const result=await runAgentOwnedMainlandMatch('synthetic',
-  '脱敏简历中有汽车门店督导经历','',10,{
-   expandDetailed:false,resumeProfile:{target_roles:['汽车区域督导']},
-   employerIndex:async(roles,sectors)=>{
-    indexCalls++;
-    assert.ok(roles.includes('汽车区域督导'));
-    assert.ok(sectors.includes('automotive'));
-    return {available:true,considered:51,sectors,
-     queries:['星河汽车有限公司 区域督导 社会招聘 site:careers.xinghe-auto.cn']};
-   },
-   onActivity:x=>activities.push(x.message)
-  },{
-   plan:async()=>({queries:['汽车岗位 企业官网职位'],industry_ids:['automotive','retail']}),
-   search:async(_key,_resume,_hint,{queriesOverride})=>{
-    searches.push(...queriesOverride);
-    const seen=queriesOverride.some(x=>x.includes('星河汽车有限公司'));
-    return {hits:seen?[found]:[],diagnostic:{successful_searches:queriesOverride.length,
-     raw_results:seen?1:0,search_failures:0}};
-   },
-   decide:async()=>({actions:[{type:'finish'}]}),
-   select:async(_key,_resume,hits)=>({matches:[{
-    id:'job-verified-search',company:'星河汽车有限公司',title:'区域督导',location:'上海',
-    official_url:hits[0].url,match_score:84,score_basis:'简历有区域门店督导证据，但完整JD待核实。',
-    recommendation_reason:'搜索找到真实的企业招聘职位来源，仍需核对岗位条件。'
-   }]})
-  });
- assert.equal(indexCalls,1);
- assert.ok(searches.some(q=>q.includes('星河汽车有限公司')));
- assert.equal(result.diagnostic.employer_index.queries,1);
- assert.equal(result.diagnostic.employer_index.new_candidate_links,1);
- assert.ok(activities.some(x=>x.includes('国内企业馆')));
- assert.equal(result.matches[0].official_url,found.url);
 });
 
 test('legacy index helpers remain covered while V4 does not depend on them',()=>{

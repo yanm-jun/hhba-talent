@@ -3,8 +3,6 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createAccountResearchCheckpoint,sanitizePublicResearchCheckpoint,resumeFingerprint}
  from '../functions/_lib/ai-research-checkpoint.js';
-import {runAgentOwnedMainlandMatch}
- from '../functions/_lib/ai-owned-job-research.js';
 
 const valid={id:'j1',url:'https://careers.xinghai-cn.com/jobs/channels-2026',
  title:'星海汽车有限公司 渠道督导 上海 招聘',source:'星海汽车有限公司',
@@ -74,52 +72,6 @@ test('D1 checkpoint load/save/clear is user-scoped and survives a simulated reco
  await owner.clear();
  assert.equal(await owner.load(),null);
  assert.ok(sql.some(q=>q.includes('ON CONFLICT')));
-});
-test('Agent resumes public evidence, but replans when the old shortlist is insufficient',async()=>{
- let planned=false,searched=false,selected=[];
- const state=sanitizePublicResearchCheckpoint({pool:[valid],
-  usedQueries:['星海汽车有限公司 上海 渠道督导 官方招聘'],
-  history:[{type:'search',found:1}],shortlistIds:['j1']});
- const result=await runAgentOwnedMainlandMatch('synthetic','resume','',10,{
-  expandDetailed:false,checkpoint:{load:async()=>state,save:async()=>true}
- },{
-  plan:async()=>{planned=true;return {queries:['星海汽车 官网招聘 2026 新岗位']};},
-  search:async()=>{searched=true;return {hits:[],diagnostic:{successful_searches:1,raw_results:5}};},
-  decide:async()=>({actions:[{type:'finish'}],shortlist_ids:['j1']}),
-  select:async(k,cv,items)=>{
-   selected=items;
-   return {matches:[{
-    id:'search-j1',company:'星海汽车有限公司',title:'渠道督导',location:'上海',
-    official_url:items[0].url,match_score:80,
-    recommendation_reason:'根据公开来源和简历的具体岗位分析，企业任职细节需再核对。'
-   }]};
-  }
- });
- assert.equal(planned,true);
- assert.equal(searched,true);
- assert.equal(result.diagnostic.checkpoint_restored,true);
- assert.ok(result.diagnostic.provider_items>=5,'resume refresh may legitimately find more than one batch');
- assert.equal(selected[0].url,valid.url);
- assert.equal(result.matches[0].official_url,valid.url);
-});
-test('failed Fetch never becomes CLOSED_LISTED without independent closure evidence',async()=>{
- const result=await runAgentOwnedMainlandMatch('synthetic','resume','',10,{
-  expandDetailed:false
- },{
-  plan:async()=>({queries:['星海汽车 渠道督导 上海 招聘']}),
-  search:async()=>({hits:[valid],diagnostic:{successful_searches:1,raw_results:1}}),
-  decide:(()=>{let n=0;return async()=>++n===1?
-   {actions:[{type:'fetch',candidate_ids:['j1']}]}:
-   {actions:[{type:'finish'}]}})(),
-  fetchDetails:async()=>({hits:[],fetches:0}),
-  select:async(k,cv,items)=>{
-   assert.notEqual(items[0]?.availability?.status,'CLOSED_LISTED');
-   return {matches:[{id:'search-j1',company:'星海汽车有限公司',title:'渠道督导',
-    location:'上海',official_url:valid.url,match_score:null}]};
-  }
- });
- assert.equal(result.matches.length,1);
- assert.equal(result.matches[0].official_url,valid.url);
 });
 test('legacy migration remains non-destructive and V4 uses the encrypted task checkpoint',()=>{
  const sql=readFileSync(new URL('../d1/0030_ai_research_checkpoints.sql',import.meta.url),'utf8');

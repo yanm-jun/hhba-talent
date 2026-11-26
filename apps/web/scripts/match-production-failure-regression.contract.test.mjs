@@ -3,11 +3,10 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {isMainlandEmployerJobUrl,isDirectEmployerSourceHit,recruitmentSourceKind}
  from '../functions/_lib/match-employer-source.js';
-import {enrichCandidateDetails,normalizeHits,sourceOnlyJobPreviews}
- from '../functions/_lib/deepseek-search-match.js';
+import {normalizeHits,sourceOnlyJobPreviews} from './fixtures/retired-search-evidence.mjs';
 import {classifyJobAvailability,isRecommendationEligible}
  from '../functions/_lib/match-job-quality.js';
-import {runAgentOwnedMainlandMatch,targetedEmployerRecoveryQueries} from '../functions/_lib/ai-owned-job-research.js';
+import {targetedEmployerRecoveryQueries} from './fixtures/retired-research-decisions.mjs';
 import {sanitizePublicResearchCheckpoint} from '../functions/_lib/ai-research-checkpoint.js';
 import {mergeCandidateHits} from '../functions/_lib/match-search-growth.js';
 
@@ -67,36 +66,6 @@ test('an employer Fetch saying 当前职位无法投递 is a closure, not a vali
  assert.equal(searchState.status,'POSSIBLY_CLOSED');
 });
 
-test('a fetched closure retracts the early lead while official-domain recovery brings in other jobs',async()=>{
- const openJobs=[1,2].map(i=>({...employer,
-  title:`美团 区域运营${i===1?'专员':'经理'} 北京 招聘`,
-  url:`https://zhaopin.meituan.com/web/position/detail?jobUnionId=490000000${i}`,
-  summary:`美团招聘区域运营${i===1?'专员':'经理'}。工作地点：北京市。职责包括门店运营、区域协调和商户项目。`
- }));
- const closed={...employer,content:''};
- const events=[];
- const result=await runAgentOwnedMainlandMatch('synthetic-key',
-  '虚构测试简历：参与门店运营、区域协调和人员培训。','区域运营',10,
-  {expandDetailed:false,onPartial:jobs=>events.push(jobs)}, {
-   plan:async()=>({queries:['北京 区域运营 岗位详情']}),
-   search:async(key,resume,hint,options)=>({
-    hits:options.queriesOverride.some(q=>q.includes('企业自有招聘官网'))?openJobs:[closed],
-    diagnostic:{successful_searches:1,raw_results:3}
-   }),
-   decide:async()=>({actions:[{type:'finish'}]}),
-   fetchDetails:async(key,hits)=>enrichCandidateDetails(key,hits,{fetcher:async(uri,init)=>{
-    const url=JSON.parse(init.body).url;
-    return Response.json({content:url===closed.url?closedEmployer.content:''});
-   }}),
-   select:async()=>({matches:[]})
- });
- assert.equal(events[0][0].official_url,closed.url);
- assert.equal(events[0][0].evidence_status,'RESEARCH_PENDING');
- assert.ok(events.some(jobs=>jobs.length===2&&jobs.every(job=>job.official_url!==closed.url)));
- assert.deepEqual(result.matches.map(job=>job.official_url),openJobs.map(job=>job.url));
- assert.equal(result.diagnostic.underfilled_expansion_new,2);
- assert.ok(result.matches.every(job=>job.match_score===null));
-});
 test('corporate recruiting page with generic 职位详情 title recovers real role from indexed source text',()=>{
  const result=sourceOnlyJobPreviews([employer],10);
  assert.equal(result.length,1,'official company position should not be lost due to generic <title>');
@@ -109,26 +78,6 @@ test('corporate recruiting page with generic 职位详情 title recovers real ro
  const noCity=sourceOnlyJobPreviews([{...employer,summary:'督导经理社招-正式，任职地点未公开',snippet:'职位详情'}],10);
  assert.equal(noCity.length,0,'never guess a work city');
 });
-test('actual employer sources survive model shortlist timeouts, but disallowed and explicitly closed sources do not',async()=>{
- const actions=[];
- const result=await runAgentOwnedMainlandMatch('synthetic-key',
-  '虚构测试简历：曾参与门店运营、区域协调和人员培训。','',10,
-  {expandDetailed:false,onActivity:x=>actions.push(x)},{
-   plan:async()=>({queries:['企业官方招聘 区域督导']}),
-   search:async()=>({hits:[...aggregators.map((x,i)=>({...x,id:'j'+(i+1),
-      summary:'区域督导岗位 工作地点：上海'})),closedEmployer,employer],
-    diagnostic:{successful_searches:1,raw_results:20,search_failures:0}}),
-   decide:async()=>({actions:[{type:'finish'}]}),
-   fetchDetails:async()=>({hits:[],fetches:0}),
-   select:async()=>{const e=new Error('AI_MATCH_NO_VALID_JOBS');e.code=e.message;throw e;},
-   recover:async()=>[]
- });
- assert.equal(result.matches.length,1);
- assert.equal(result.matches[0].official_url,employer.url);
- assert.equal(result.matches[0].match_score,null);
- assert.ok(actions.some(x=>x.stage==='writing'));
- assert.equal(result.diagnostic.third_party_results_shown,0);
-});
 test('stale stored search checkpoints cannot reintroduce banned recruiter links',()=>{
  const input={pool:[{...employer,id:'j1'},...aggregators.map((x,i)=>({
   ...x,id:'j'+(i+2),summary:'招聘岗位公开页面'}))],
@@ -137,61 +86,6 @@ test('stale stored search checkpoints cannot reintroduce banned recruiter links'
  assert.equal(res.pool.length,1);
  assert.equal(res.pool[0].url,employer.url);
  assert.deepEqual(res.shortlistIds,['j1']);
-});
-
-test('when Search finds job-board postings, Agent receives only title hints and can target the actual employer domain',async()=>{
- const {searchPublicJobs}=await import('../functions/_lib/deepseek-search-match.js');
- const board=aggregators[7];
- const provider=await searchPublicJobs('synthetic','dummy text','',{
-  queriesOverride:['区域督导 企业招聘'],
-  fetcher:async()=>new Response(JSON.stringify({results:[
-   {title:board.title,url:board.url,site_name:board.source,summary:'第三方转发职位'},
-   {title:employer.title,url:employer.url,site_name:employer.source,
-    summary:employer.summary,snippet:employer.snippet}
-  ]}),{status:200}),
-  allowEmpty:true
- });
- assert.equal(provider.hits.length,1);
- assert.equal(provider.hits[0].url,employer.url);
- assert.ok(provider.diagnostic.rejected_title_hints.includes(board.title));
- assert.ok(!JSON.stringify(provider.hits).includes(board.url));
- const queryLog=[];
- let decisionCalls=0;
- const result=await runAgentOwnedMainlandMatch('synthetic','虚构测试简历：区域运营管理','',10,
-  {expandDetailed:false},{
-   plan:async()=>({queries:['区域督导']}),
-   search:async(key,cv,hint,{queriesOverride})=>{
-    queryLog.push(...queriesOverride);
-    if(queriesOverride.some(q=>q.includes('美团官网')))
-     return {hits:[employer],diagnostic:{successful_searches:1,raw_results:2}};
-    return {hits:[],diagnostic:{successful_searches:1,raw_results:12,
-     rejected_title_hints:['美团招聘督导经理','汽车渠道督导 - 第三方招聘平台'],rejected_links:12}};
-   },
-   decide:async(key,cv,hint,pool,queries,history)=>{
-    decisionCalls++;
-    if(decisionCalls===1){
-     assert.ok(history.some(h=>Array.isArray(h.rejected_title_hints)&&
-      h.rejected_title_hints.includes('美团招聘督导经理')));
-     return {actions:[{type:'search',queries:['美团官网 督导经理 工作地点 北京 招聘']}]};
-    }
-    return {actions:[{type:'finish'}]};
-   },
-   select:async()=>{const err=new Error('AI_MATCH_NO_VALID_JOBS');err.code=err.message;throw err},
-   recover:async()=>[]
-  });
- assert.ok(queryLog.some(q=>q.includes('美团官网')));
- assert.equal(result.matches.length,1);
- assert.equal(result.matches[0].official_url,employer.url);
- assert.equal(result.matches[0].match_score,null);
-});
-
-test('Agent must reserve real time for a shortlist rather than spending all 150 seconds iterating Search',()=>{
- const script=readFileSync(new URL('../functions/_lib/ai-owned-job-research.js',import.meta.url),'utf8');
- assert.match(script,/const reserve=Math\.max\(40000,reserveMs\)/);
- assert.match(script,/searchTool\(queries,\{reserveMs:85000\}\)/);
- assert.match(script,/searchTool\(next\.queries,\{reserveMs:44000\}\)/);
- assert.match(script,/while\(budget\(\)>67000&&\(!options\.verifiedCount\|\|discoveredCount\(\)<discoveryTarget\)\)/);
- assert.match(script,/modelTimeoutMs:Math\.min\(32000,Math\.max\(1000,budget\(\)-12500\)\)/);
 });
 
 test('source recovery queries use only public role clues, not private or invalid mirror URLs',()=>{
@@ -204,71 +98,6 @@ test('source recovery queries use only public role clues, not private or invalid
  assert.ok(queries.every(q=>q.includes('企业官网')&&q.includes('-site:zhipin.com')));
  assert.ok(queries.some(q=>q.includes('美团招聘督导经理')));
  assert.ok(queries.every(q=>!q.includes('15712345678')&&!q.includes('example.com')));
-});
-test('zero official sources must trigger bounded employer-domain discovery before a no-jobs failure',async()=>{
- const queries=[];
- const result=await runAgentOwnedMainlandMatch('synthetic-key',
-  '合成测试简历：参与过区域门店运营和商户项目协调。','',10,
-  {expandDetailed:false},{
-   plan:async()=>({queries:['区域督导 企业招聘 招聘岗位']}),
-   search:async(key,cv,hint,opts)=>{
-    queries.push(...opts.queriesOverride);
-    if(opts.queriesOverride.some(q=>q.includes('美团招聘督导经理')&&q.includes('企业官网')))
-     return {hits:[employer],diagnostic:{successful_searches:1,raw_results:3}};
-    return {hits:[],diagnostic:{successful_searches:1,raw_results:20,
-     rejected_title_hints:['美团招聘督导经理','B Capital Job Board'],
-     rejected_links:20}};
-   },
-   decide:async()=>({actions:[{type:'finish'}]}),
-   select:async()=>{const e=new Error('AI_MATCH_NO_VALID_JOBS');e.code=e.message;throw e},
-   recover:async()=>[]
-  });
- assert.ok(queries.some(q=>q.includes('美团招聘督导经理')&&q.includes('企业官网')));
- assert.equal(result.matches.length,1);
- assert.equal(result.matches[0].official_url,employer.url);
- assert.equal(result.matches[0].match_score,null);
- assert.equal(result.diagnostic.third_party_results_shown,0);
-});
-
-test('three cached job sources cannot finish with zero fresh Search when the shortlist is sparse',async()=>{
- const seen=[];
- const cached={pool:[employer,{...employer,id:'j14',
-   url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId=300001'},
-   {...employer,id:'j15',
-    url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId=300002'}],
-  usedQueries:['原有搜索方向 企业招聘'],history:[{type:'search',found:3}],shortlistIds:[]};
- const added={...employer,id:'j16',title:'区域运营专员',
-  url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId=300003',
-  summary:'美团招聘区域运营专员社招-正式。工作地点：北京市。岗位职责：门店巡查、区域运营和渠道协调。'};
- const r=await runAgentOwnedMainlandMatch('synthetic','虚构测试简历：负责门店运营','',10,{
-  expandDetailed:false,checkpoint:{load:async()=>cached,save:async()=>true}
- },{
-  plan:async()=>({queries:['新增跨行业 运营督导 企业官网 社招']}),
-  search:async(k,cv,hint,opts)=>{
-   seen.push(...opts.queriesOverride);
-   return {hits:[added],diagnostic:{successful_searches:1,raw_results:13}};
-  },
-  decide:async()=>({actions:[{type:'finish'}]}),
-  select:async()=>{const err=new Error('AI_MATCH_NO_VALID_JOBS');err.code=err.message;throw err;},
-  recover:async()=>[]
- });
- assert.equal(r.diagnostic.checkpoint_restored,true);
- assert.ok(seen.includes('新增跨行业 运营督导 企业官网 社招'));
- assert.ok(r.diagnostic.provider_items>=13,'fresh search metrics cannot be zero');
- assert.ok(r.diagnostic.candidate_links>=4);
-});
-
-test('one empty successful query cannot hide concurrent DeepSeek auth or quota failure',async()=>{
- const {searchPublicJobs}=await import('../functions/_lib/deepseek-search-match.js');
- const fetcher=async(url,{body})=>{
-  const query=JSON.parse(body).query;
-  if(query.includes('认证失败'))return new Response('{"error":"invalid key"}',{status:401});
-  return new Response(JSON.stringify({results:[]}),{status:200});
- };
- await assert.rejects(()=>searchPublicJobs('synthetic','synthetic','',{
-  queriesOverride:['认证失败的招聘查询','返回空结果的招聘查询'],
-  fetcher,allowEmpty:true
- }),{code:'AI_PROVIDER_KEY_REJECTED'});
 });
 test('duplicate official source refreshes search evidence without changing stable ID',()=>{
  const previous={...employer,id:'j1',summary:'较旧的公开搜索信息',
@@ -284,85 +113,8 @@ test('duplicate official source refreshes search evidence without changing stabl
   availability:{status:'POSSIBLY_CLOSED'}}],30);
  assert.equal(closed[0].availability.status,'POSSIBLY_CLOSED');
 });
-test('Agent cannot finish after a single employer role without trying a bounded final expansion',async()=>{
- const newRole={...employer,id:'j77',
-  url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId=70000077',
-  summary:'区域运营专员社招-正式 更新时间：2026/11/10 工作地点：上海市 岗位职责：门店运营和区域协调。',
-  snippet:'区域运营专员社招-正式 工作地点：上海市'};
- const queries=[];
- const out=await runAgentOwnedMainlandMatch('synthetic','测试简历：有区域门店运营经验','',10,
-  {expandDetailed:false},{
-   plan:async()=>({queries:['区域督导 企业招聘']}),
-   search:async(key,resume,hint,options)=>{
-    queries.push(...options.queriesOverride);
-    if(options.queriesOverride.some(q=>q.includes('在招岗位')||q.includes('官方招聘')))
-     return {hits:[newRole],diagnostic:{successful_searches:1,raw_results:10}};
-    return {hits:[employer],diagnostic:{successful_searches:1,raw_results:12}};
-   },
-   decide:async()=>({actions:[{type:'finish'}]}),
-   select:async()=>{const e=new Error('AI_MATCH_NO_VALID_JOBS');e.code=e.message;throw e;},
-   recover:async()=>[]
-  });
- assert.ok(out.diagnostic.underfilled_expansion_queries>0);
- assert.ok(out.diagnostic.candidate_links>=2);
- assert.ok(out.diagnostic.provider_items>=12);
- assert.ok(queries.some(q=>q.includes('在招岗位')||q.includes('官方招聘')));
- assert.ok(out.matches.every(job=>job.official_url.includes('zhaopin.meituan.com')));
-});
-
-test('many official URLs without city evidence still trigger follow-up research',async()=>{
- const weak=Array.from({length:8},(_,i)=>({...employer,
-  id:'j'+(i+1),url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId='+String(880000+i),
-  summary:'岗位内容待核实，招聘信息未展示具体工作城市。',
-  snippet:'招聘职位资料尚不完整',content:''}));
- const strong={...employer,id:'j99'};
- let searches=0;
- const result=await runAgentOwnedMainlandMatch('synthetic','模拟简历：门店区域运营','',10,
-  {expandDetailed:false},{
-   plan:async()=>({queries:['区域运营 企业招聘']}),
-   search:async(k,cv,hint,opts)=>{
-    searches++;
-    if(opts.queriesOverride.some(q=>q.includes('在招岗位')))
-     return {hits:[strong],diagnostic:{successful_searches:1,raw_results:5}};
-    return {hits:weak,diagnostic:{successful_searches:1,raw_results:12}};
-   },
-   decide:async()=>({actions:[{type:'finish'}]}),
-   select:async()=>{const e=new Error('AI_MATCH_NO_VALID_JOBS');e.code=e.message;throw e},
-   recover:async()=>[]
-  });
- assert.ok(searches>=2);
- assert.ok(result.diagnostic.underfilled_expansion_queries>0);
- assert.ok(result.matches.some(x=>x.official_url===strong.url));
-});
-test('suspected closure from Search is eligible for a fresh employer-page Fetch, not silently lost',async()=>{
- const candidate={...employer,availability:{status:'POSSIBLY_CLOSED'},
-  summary:'督导经理社招-正式 工作地点：北京市。搜索摘要可能指向已结束招聘的公告。'};
- let read=0,steps=0;
- const output=await runAgentOwnedMainlandMatch('synthetic','模拟简历：区域运营管理','',10,
-  {expandDetailed:false},{
-   plan:async()=>({queries:['督导经理 企业官网']}),
-   search:async()=>({hits:[candidate],diagnostic:{successful_searches:1,raw_results:1}}),
-   decide:async(k,cv,hits)=>{
-    steps++;
-    if(steps===1)return {actions:[{type:'fetch',candidate_ids:['j1']}]};
-    return {actions:[{type:'finish'}]};
-   },
-   fetchDetails:async(k,hits)=>{
-    read++;
-    return {hits:hits.map(h=>({...h,content:
-     '督导经理社招-正式。工作地点：北京市。该岗位正在招聘，开放申请，负责商户运营、门店督导、销售流程整改。',
-     availability:{status:'OPEN_LISTED'}})),fetches:1};
-   },
-   select:async()=>{const e=new Error('AI_MATCH_NO_VALID_JOBS');e.code=e.message;throw e},
-   recover:async()=>[]
-  });
- assert.ok(read>0);
- assert.ok(output.diagnostic.page_reads>0);
- assert.ok(output.matches.every(j=>j.availability_status!=='CLOSED_LISTED'));
-});
-
 test('employer discovery is occupation-neutral rather than limited to supervisors and managers',async()=>{
- const {targetedEmployerRecoveryQueries}=await import('../functions/_lib/ai-owned-job-research.js');
+ const {targetedEmployerRecoveryQueries}=await import('./fixtures/retired-research-decisions.mjs');
  const hints=['连锁餐厅厨师','花店高级花艺师','农场收割工','机械焊工','司机驾驶员'];
  const queries=targetedEmployerRecoveryQueries([{type:'search',rejected_title_hints:hints}],[]);
  assert.ok(queries.some(q=>q.includes('厨师')));
@@ -382,26 +134,7 @@ test('generic official job-page titles can recover explicitly labeled niche occu
  assert.equal(preview[0].match_score,null);
 });
 
-test('no-official-job error provides only source counts for troubleshooting',async()=>{
- let caught;
- try{
-  await runAgentOwnedMainlandMatch('synthetic',
-   '模拟私密简历 user-secret@example.com 13800138000','',10,
-   {expandDetailed:false},{
-    plan:async()=>({queries:['职场发展 企业招聘']}),
-    search:async()=>({hits:[],diagnostic:{successful_searches:1,raw_results:8,
-     search_failures:0,rejected_links:8}}),
-    decide:async()=>({actions:[{type:'finish'}]})
-   });
- }catch(e){caught=e}
- assert.equal(caught?.code,'AI_EMPLOYER_JOBS_NOT_FOUND');
- assert.ok(caught.diagnostic.searches>0);
- assert.ok(caught.diagnostic.provider_items>=8);
- assert.equal(caught.diagnostic.source_candidates,0);
- assert.equal(caught.diagnostic.explicit_city_sources,0);
- assert.ok(['source_discovery','shortlist_selection'].includes(caught.diagnostic.phase));
- assert.ok(!JSON.stringify(caught.diagnostic).includes('user-secret@example.com'));
- assert.ok(!JSON.stringify(caught.diagnostic).includes('13800138000'));
+test('V4 failure event never includes private resume data',()=>{
  const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  assert.match(route,/send\('failure',\{error:code,phase,elapsed_ms:/);
  assert.doesNotMatch(route,/send\('failure',\{[^}]*resume/);
