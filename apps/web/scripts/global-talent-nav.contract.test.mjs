@@ -14,7 +14,14 @@ check('Account shortcuts expose eight active destinations without retired member
  assert.ok(dropdown.includes("label:'账户设置',path:'/candidate/account/profile'"));
 });
 check('Top navigation keeps only high-value shortcuts',()=>{
- for(const text of ['海外发展','人才政策','招聘市场','加入我们','个人中心','登录 / 注册'])assert.ok(header.includes(text),text);
+ // These labels are rendered by accessible shared components, not repeated as
+ // literal text inside <header>; verify the real component and route wiring.
+ for(const text of ['招聘市场','加入我们','登录 / 注册'])assert.ok(header.includes(text),text);
+ assert.ok(header.includes('<StudyAbroadNavLink active='),'overseas development must render in the header');
+ assert.ok(header.includes('<TalentPolicyNavLink active='),'talent policies must render in the header');
+ assert.ok(header.includes('<CandidateAccountDropdown displayName='),'personal center must render when authenticated');
+ assert.match(shell,/function StudyAbroadNavLink\(/);
+ assert.match(shell,/function TalentPolicyNavLink\(/);
  assert.ok(header.includes('<HeaderSiteSearch/>'));
  assert.doesNotMatch(header,/企业招聘导航/);
  assert.doesNotMatch(header,/责任与透明/);
