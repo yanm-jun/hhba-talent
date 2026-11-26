@@ -885,18 +885,19 @@ test('public reference research excludes CV and reuses material but not score af
  const db={prepare:()=>({bind:()=>({run:async()=>({success:true})})})};
  const env={HHBA_MATCH_V4_READY:'1',HHBA_V4_PUBLIC_ASSETS_ENABLED:'1',HHBA_JOB_JD_DB:db,HHBA_JOB_JD_R2:bucket};
  const ref={reference_jd:'可能职责：企业业务涉及渠道门店运营支持。可能承担流程协调、销售数据跟踪及运营改进。能力方向：准备渠道数据分析能力，结合业务指标提出可实施的改进方案。',reference_basis:'依据企业公开业务；其他职责与能力为AI推断，非已公布要求。',reference_coverage:{duties_quote:'渠道门店运营支持',capabilities_quote:'渠道数据分析能力'},reference_source_anchors:{duties:{kind:'public_excerpt',url:proof,quote},capabilities:{kind:'title_direction',url:'',quote:j.title}},reference_material_review:{status:'complete',explanation:'已区分业务背景、可能职责与能力准备。',missing:[]}};
- let publicCalls=0,scoreCalls=0,liveReads=0;
+ let publicCalls=0,scoreCalls=0,liveReads=0,recoveryCalls=0;
  const fetcher=async(url,opts)=>{
   if(url===j.url){liveReads++;return Response.json({'@type':'JobPosting',title:j.title,hiringOrganization:{name:j.company,url:new URL(j.url).origin},jobLocation:{address:{addressLocality:'上海'}}});}
   if(url===proof)return new Response('<p>'+quote+'</p>',{headers:{'content-type':'text/html'}});
   const input=JSON.parse(JSON.parse(opts.body).input);
-  if(input.original_url)return model({sources:[],research_complete:true,completion_reason:'未公开完整正文'});
+  if(input.original_url){recoveryCalls++;return model({sources:[],research_complete:true,completion_reason:'未公开完整正文'});}
   if(input.public_sources){publicCalls++;assert.ok(!JSON.stringify(input).includes(resume));assert.equal(input.search_summary,'');return model({facts:[{url:proof,quote,context:'related_context'}],inference:'公开背景',unknowns:['实际任职资格未知'],...ref},[proof]);}
   scoreCalls++;assert.equal(input.public_reference_material.reference_jd,ref.reference_jd);
   return model({suitable:true,score:86,reason:'真实渠道经历',resume_quote:'汽车经销商渠道运营',jd_quote:'渠道门店运营支持',comparisons:[{jd_quote:'渠道门店运营支持',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'经历与参考方向一致'}],quality_review:{status:'complete',explanation:'匹配依据充分',missing:[]}});
  };
  const options={curated:true,officialOnly:true,stepMode:true,parallelResearch:true,env,checkpoint:{phase:'verification',next:0,rows:[[j.url,{...j,fit_summary:resume}]],profile,toolUrls:[j.url],verificationBatch:1}};
- for(let i=0;i<2;i++){const result=await v4Match(fetcher,provider,resume,'全国',options);assert.equal(result.checkpoint.matches[0].reference_jd,ref.reference_jd);assert.equal(result.checkpoint.matches[0].match_score,86);}
+ let firstRecoveryCalls=0;
+ for(let i=0;i<2;i++){const result=await v4Match(fetcher,provider,resume,'全国',options);assert.equal(result.checkpoint.matches[0].reference_jd,ref.reference_jd);assert.equal(result.checkpoint.matches[0].match_score,86);if(i===0){firstRecoveryCalls=recoveryCalls;assert.ok(firstRecoveryCalls>0);}else assert.equal(recoveryCalls,firstRecoveryCalls,'fresh reference must avoid repeating alternative-source research after a live vacancy check');}
  assert.equal(publicCalls,1);assert.equal(scoreCalls,2);assert.ok(liveReads>=2);
  assert.ok([...objects.entries()].filter(([k])=>k.includes('reference-assets-v1')).every(([,v])=>!v.includes(resume)));
 });

@@ -56,6 +56,8 @@ const counters=['read','scored','archived','scoreFailures','reportFailures'];
 export function mergePipelineCheckpoint(original,discovery,verification,attempted,{verificationIncomplete=false}={}){
  const next=structuredClone(discovery);
  if(!verification)return next;
+ // Each lane may have produced public-only records while storage was unavailable.
+ next.pendingPublicAssets=[...new Map([...(next.pendingPublicAssets||[]),...(verification.pendingPublicAssets||[])].map(r=>[r.identity.url+'|'+r.kind,r])).values()];
  const processed=new Set(next.processedEarlier||[]),revisions=new Map(next.processedEvidence||[]);
  const rechecks=new Set(next.explicitRechecks||[]);
  const originalRechecks=new Set(original.explicitRechecks||[]);
