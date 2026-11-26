@@ -513,6 +513,9 @@ test('classified Cloudflare invocation budget counts each D1 batch as one bindin
  assert.equal(observed.classes.storage,1);
  assert.equal(observed.classes.network,1);
  assert.equal(observed.classes.browser,1);
+ assert.equal(observed.external_subrequests.used,2);
+ assert.equal(observed.service_subrequests.used,3);
+ assert.ok(observed.used<14,'D1 and R2 requests must not consume full external-request pressure');
  assert.equal(observed.progress_reserve,4);
  for(let i=0;i<80&&budget.canStart();i++)await budget.fetch(async()=>new Response('ok'))('https://example.invalid');
  assert.equal(budget.canStart(),false);

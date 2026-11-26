@@ -3,12 +3,17 @@
 // release the task lease before the platform forcibly terminates the request.
 export const PHASE_YIELD='AI_PHASE_RESOURCE_YIELD';
 export function phaseResourceBudget({initial=8,soft=24,hard=34,progressReserve=0,mode='legacy'}={}){
- // Classified accounting records actual binding-call categories separately.
- // A single conservative aggregate admission ceiling remains: it protects
- // Cloudflare's shared request headroom and is never a whole-task limit.
+ // Cloudflare Free enforces separate per-invocation ceilings for external
+ // requests (50) and service subrequests (1000). Only an invocation has a
+ // budget, never the user's AI research. Weighted pressure remains a
+ // conservative short-phase CPU/recovery guard, not a platform quota.
  const classified=mode==='classified';
  let used=initial,denied=false;const counts={},groups={network:0,database:0,storage:0,browser:0,maintenance:0},extra={d1Statements:0};
  const category=kind=>kind==='fetch'?'network':kind==='d1'?'database':kind==='r2'?'storage':kind==='browser'?'browser':'maintenance';
+ const weight=kind=>!classified?1:kind==='d1'?0.2:kind==='r2'?0.3:kind==='progress'||kind==='checkpoint'||kind==='lease'?0.2:1;
+ const platformExternalCeiling=46,platformServiceCeiling=900;
+ const externalUsed=()=>groups.network+groups.browser;
+ const serviceUsed=()=>groups.database+groups.storage+groups.maintenance;
  // Explicit progress allowance is shared with the same physical hosting limit.
  // It is not a separate platform quota and cannot consume terminal headroom.
  const reserve=Math.max(0,Math.min(hard-soft,Math.floor(progressReserve)||0));
@@ -24,17 +29,20 @@ export function phaseResourceBudget({initial=8,soft=24,hard=34,progressReserve=0
   return kind==='report'?remainingReserve()>0:kind==='candidate'&&remainingReserve()>1;
  };
  const observe=(kind,n=1)=>{
-  used+=n;counts[kind]=(counts[kind]||0)+n;
+  used+=n*weight(kind);
+  counts[kind]=(counts[kind]||0)+n;
   if(classified)groups[category(kind)]+=n;
  };
  const availableFor=kind=>{
   if(!classified)return remainingResearch();
-  // Work classes have separate measured usage, not separate invented Cloudflare
-  // quotas; any idle class can consume the shared research headroom.
-  return Math.max(0,remainingResearch());
+  const available=remainingResearch()/weight(kind);
+  return Math.max(0,Math.min(available,kind==='fetch'||kind==='browser'?platformExternalCeiling-externalUsed():platformServiceCeiling-serviceUsed()));
  };
  const take=(kind,n=1)=>{
-  if(used+n>hard-remainingReserve()){denied=true;throw Object.assign(Error(PHASE_YIELD),{code:PHASE_YIELD,resource_kind:category(kind)});}
+  const external=kind==='fetch'||kind==='browser';
+  const hardReached=used+n*weight(kind)>hard-remainingReserve();
+  const classReached=classified&&(external?externalUsed()+n>platformExternalCeiling:serviceUsed()+n>platformServiceCeiling);
+  if(hardReached||classReached){denied=true;throw Object.assign(Error(PHASE_YIELD),{code:PHASE_YIELD,resource_kind:category(kind)});}
   observe(kind,n);
  };
  const statements=new WeakMap();
@@ -64,10 +72,10 @@ export function phaseResourceBudget({initial=8,soft=24,hard=34,progressReserve=0
  }});
  return {observe,take,remainingResearch,availableFor,canStart:()=>!denied&&remainingResearch()>0,canPublish:()=>!denied&&remainingResearch()>2,
   canPublishProgress,
-  tryProgress(kind){if(!canPublishProgress(kind))return false;if(used>=soft-2)reservedWrites++;observe('progress');return true;},
+  tryProgress(kind){if(!canPublishProgress(kind))return false;if(used>=soft-2)reservedWrites+=weight('progress');observe('progress');return true;},
   get denied(){return denied;},get used(){return used;},
   snapshot:()=>({used,soft,hard,counts:{...counts},denied,
-   ...(classified?{mode:'classified',classes:{...groups},operations:{...extra},remaining_by_class:{network:availableFor('fetch'),database:availableFor('d1'),storage:availableFor('r2'),browser:availableFor('browser')}}:{}),
+   ...(classified?{mode:'classified',classes:{...groups},operations:{...extra},external_subrequests:{used:externalUsed(),ceiling:platformExternalCeiling},service_subrequests:{used:serviceUsed(),ceiling:platformServiceCeiling},remaining_by_class:{network:availableFor('fetch'),database:availableFor('d1'),storage:availableFor('r2'),browser:availableFor('browser')}}:{}),
    ...(reserve?{progress_reserve:reserve,progress_remaining:remainingReserve(),research_used:researchUsed()}: {})}),
   fetch:fetcher=>(...args)=>{take('fetch');return fetcher(...args);},
   env:env=>{
