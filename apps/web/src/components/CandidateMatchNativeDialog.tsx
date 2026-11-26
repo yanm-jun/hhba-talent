@@ -192,6 +192,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
      </div>
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobUrl?'optimization':'matches'}>
+     {notice&&<p className="hhba-match-disclaimer" role="alert">{notice}{result.matches.length>0?' 已显示本次收到的岗位；请核对招聘原始页面。':''}</p>}
      {!optimizedJobUrl&&<MatchResearchPanels profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches} pending={pending} progressStage={progressStage} activity={progressActivity} elapsed={elapsed} selection={selectedStage} onSelectionChange={selectStage} onFollow={()=>selectStage(null)} selectedJobUrl={selectedJobUrl} onJobChange={setSelectedJobUrl} onOptimize={optimizeJob} optimizationAvailable={!!parsedProfile}/>}
      {pending&&selectedStage!==1&&<><div className="hhba-research-now" role="status">
       <LoaderCircle size={18} className="spin" aria-hidden="true"/>
@@ -279,7 +280,6 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       {(result.native_search.hybrid_fallback.candidate_links??0)>0&&(result.native_search.hybrid_fallback.source_previews??0)===0?
        '本轮仍未完成职位信息核实，不代表没有适合的岗位。':''}
      </p>}
-     {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {!pending&&result.history_status==='SAVED'&&<div className="hhba-match-history-confirm">
       <span>这次的真实推荐结果已保存到你账户的「匹配历史」，下次登录可以继续查看。</span>
       <Link to="/candidate/account/applications" onClick={onClose}>查看匹配历史</Link>
