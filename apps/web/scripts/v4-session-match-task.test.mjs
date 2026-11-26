@@ -255,3 +255,69 @@ test('progress publisher retains a later dirty snapshot after optional write fai
  assert.deepEqual(writes,[{kind:'candidate',jobs:1},{kind:'candidate',jobs:2}]);
  await publisher.stop();
 });
+
+
+test('encrypted progress restores new discovery leads after a hard interruption without modifying authoritative evidence',async()=>{
+ const {saveMatchProgress,readMatchProgress}=await import('../functions/_lib/v4-match-checkpoint-storage.js');
+ const {discoveryRecoverySnapshot,restoreDiscoveryRecovery}=await import('../functions/_lib/v4-discovery-recovery.js');
+ const {env,objects}=fixture(),id='d'.repeat(64);
+ const job=n=>({url:'https://careers.employer.cn/jobs/'+n,company:'测试企业',title:'运营'+n,location:'上海'});
+ const a=job(1),b=job(2),c=job(3);
+ const existing={...a,requirements:'authoritative evidence'};
+ const base={phase:'research',round:2,rows:[[a.url,existing]],sourceLeads:[a.url],
+  toolUrls:[a.url],processedEarlier:[a.url],processedEvidence:[[a.url,'original revision']],
+  priorState:{matches:[{official_url:a.url,match_score:88,research_detail:{score_explanation:'complete report'}}]}};
+ const current={...base,round:3,rows:[[a.url,{...a,requirements:'untrusted update'}],[b.url,{...b,score:98,fit_summary:'unverified score'}],[c.url,c]],
+  rejectedBoards:[c.url]};
+ const saved={generation:4,checkpoint:base,phaseReplay:[['existing',{status:'completed'}]]};
+ await saveMatchTask(env,id,saved);
+ const supplement=discoveryRecoverySnapshot(base,current);
+ assert.equal(supplement.round,3);assert.deepEqual(supplement.rows.map(([u])=>u),[b.url]);
+ assert.equal(supplement.rows[0][1].preliminary_score,undefined);
+ await saveMatchProgress(env,id,{generation:4,status:'PENDING',progress:{stage:'searching',jobs:[a,b]},discovery_recovery:supplement});
+ const view=await readMatchProgress(env,id);
+ const recovered=restoreDiscoveryRecovery(await readMatchTask(env,id),view,4);
+ assert.equal(recovered.restored,1);
+ const next=recovered.saved.checkpoint;
+ assert.equal(next.round,2,'unfinished round is not marked complete');
+ assert.deepEqual(next.rows.map(([u])=>u),[a.url,b.url]);
+ assert.deepEqual(next.rows[0][1],existing);
+ assert.deepEqual(next.toolUrls,base.toolUrls,'stream output is not verified source evidence');
+ assert.deepEqual(next.processedEvidence,base.processedEvidence);
+ assert.deepEqual(next.priorState,base.priorState);
+ assert.deepEqual(recovered.saved.phaseReplay,saved.phaseReplay);
+ assert.ok(next.sourceLeads.includes(b.url));
+ assert.equal(next.diagnostics.LIVE_DISCOVERY_RECOVERED,1);
+ // Persist the recovered base before a subsequent invocation overwrites
+ // its supplement; a second interruption must not lose the restored row.
+ await saveMatchTask(env,id,recovered.saved);
+ await saveMatchProgress(env,id,{generation:4,status:'PENDING',progress:{stage:'searching'}});
+ assert.deepEqual((await readMatchTask(env,id)).checkpoint.rows,next.rows);
+ for(const raw of objects.values())assert.ok(!new TextDecoder().decode(raw).includes('测试企业'));
+});
+
+test('discovery recovery rejects stale generation, terminal phases, excluded jobs and duplicate canonical URLs',async()=>{
+ const {restoreDiscoveryRecovery,discoveryRecoverySnapshot}=await import('../functions/_lib/v4-discovery-recovery.js');
+ const a={url:'https://careers.employer.cn/jobs/1',company:'企业',title:'运营',location:'上海'};
+ const b={...a,url:'https://careers.employer.cn/jobs/2'};
+ const saved={generation:1,checkpoint:{phase:'research',round:4,rows:[[a.url,a]],rejectedBoards:[]}};
+ const view={generation:1,status:'PENDING',discovery_recovery:{round:5,rows:[[a.url+'?utm_source=dup',a],[b.url,b]]}};
+ for(const bad of [{...view,generation:0},{...view,status:'COMPLETE'},{...view,discovery_recovery:{...view.discovery_recovery,round:2}},
+  {...view,discovery_recovery:{...view.discovery_recovery,round:7}}])assert.equal(restoreDiscoveryRecovery(saved,bad,1).restored,0);
+ assert.equal(restoreDiscoveryRecovery({...saved,result:{status:'COMPLETE'}},view,1).restored,0);
+ assert.equal(restoreDiscoveryRecovery({...saved,failure:{retryable:false}},view,1).restored,0);
+ assert.equal(restoreDiscoveryRecovery({...saved,checkpoint:{...saved.checkpoint,phase:'verification'}},view,1).restored,0);
+ assert.equal(restoreDiscoveryRecovery(saved,view,1,[b.url+'?utm_source=history']).restored,0);
+ assert.equal(discoveryRecoverySnapshot(saved.checkpoint,{...saved.checkpoint,phase:'reporting'}),undefined);
+ assert.equal(restoreDiscoveryRecovery(saved,view,1).restored,1);
+});
+
+test('route restores discovery supplements under existing leases and persists before starting another invocation',()=>{
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ assert.match(route,/discoveryRecoverySnapshot\(input\.checkpoint,input\.recoveryState\?\.\(\)\)/);
+ assert.match(route,/await saveMatchTask\(env,input\.taskKey,recovered\.saved\)/);
+ assert.match(route,/const saved=await recoverSavedDiscovery\(env,input,durable\)/);
+ assert.match(route,/const saved=await recoverSavedDiscovery\(env,input,durable,view\)/);
+ assert.match(route,/progress:view\.progress\|\|null/);
+ assert.doesNotMatch(route,/return reply\(\{[^}]*discovery_recovery/);
+});
