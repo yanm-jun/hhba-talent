@@ -171,7 +171,7 @@ function events(env,request,input,waitUntil){
       // Direct SSE exposes one observed candidate per event. The existing
       // background transport intentionally retains its normal progress path;
       // durable per-candidate delivery will be wired in a separate change.
-      onDiscoveryCandidate:input.background?undefined:event=>send('discovery_candidate',event),
+      onDiscoveryCandidate:event=>send('discovery_candidate',event),
       onPartial:matches=>{rememberJobs(matches);sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
      await stopProgress();await leaseHeartbeat?.stop();
       if(budget?.denied)throw Object.assign(Error(PHASE_YIELD),{code:PHASE_YIELD});
