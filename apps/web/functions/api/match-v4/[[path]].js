@@ -101,7 +101,7 @@ function events(env,request,input,waitUntil){
      try{
       // The recovery supplement is private: polling exposes only .progress.
       const discovery_recovery=status==='PENDING'?discoveryRecoverySnapshot(input.checkpoint,input.recoveryState?.()):undefined;
-      await saveMatchProgress(env,input.taskKey,{generation:input.generation||0,status,progress:{...snapshotProgress(),delivery_stamp:write.stamp},failure,discovery_recovery});write.finish(true);return true;}
+      await saveMatchProgress(env,input.taskKey,{generation:input.generation||0,status,progress:{...snapshotProgress(),delivery_stamp:write.stamp,delivery_summary:delivery.snapshot()},failure,discovery_recovery});write.finish(true);return true;}
      catch(e){write.finish(false);console.warn('HHBA_V4_PROGRESS_WRITE_FAILED',JSON.stringify({trace,error:e?.code||'PROGRESS_WRITE_FAILED'}));return false;}
     }
    const publisher=createV4ProgressPublisher({
