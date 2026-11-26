@@ -186,3 +186,72 @@ test('optional gzip encrypts large checkpoint records, preserves exact data, and
  const bad=packed.slice();bad[bad.length-1]^=1;objects.set([...objects.keys()][0],bad);
  await assert.rejects(readMatchTask(gzipEnv,id,2000));
 });
+
+
+// Deterministic fake clock: no wall-clock waits or actual Cloudflare requests.
+function progressClock(){
+ let t=100000,id=0;const timers=new Map();
+ return {now:()=>t,schedule:(fn,delay)=>{const key=++id;timers.set(key,{fn,at:t+delay});return key;},
+  cancel:key=>timers.delete(key),
+  async advance(ms){
+   const end=t+ms;
+   for(;;){
+    const next=[...timers].sort((a,b)=>a[1].at-b[1].at)[0];
+    if(!next||next[1].at>end)break;
+    t=next[1].at;timers.delete(next[0]);next[1].fn();
+    for(let i=0;i<12;i++)await Promise.resolve();
+   }
+   t=end;for(let i=0;i<12;i++)await Promise.resolve();
+  }};
+}
+
+test('background progress prioritizes actual new candidates and complete reports over routine activity',async()=>{
+ const {createV4ProgressPublisher}=await import('../functions/_lib/v4-progress-publisher.js');
+ const clock=progressClock(),writes=[];let jobs=0;
+ const publisher=createV4ProgressPublisher({...clock,publish:kind=>{writes.push({kind,jobs,time:clock.now()});}});
+ publisher.queue();await clock.advance(100);
+ jobs=1;publisher.queue('candidate');await clock.advance(0);
+ assert.deepEqual(writes.map(w=>[w.kind,w.jobs]),[['candidate',1]]);
+ jobs=2;publisher.queue('candidate');jobs=3;publisher.queue('candidate');publisher.queue();
+ await clock.advance(2999);assert.equal(writes.length,1);
+ await clock.advance(1);assert.deepEqual(writes.map(w=>[w.kind,w.jobs]),[['candidate',1],['candidate',3]]);
+ jobs=4;publisher.queue('candidate');publisher.queue('report');await clock.advance(999);assert.equal(writes.length,2);
+ await clock.advance(1);assert.deepEqual(writes.map(w=>[w.kind,w.jobs]),[['candidate',1],['candidate',3],['report',4]]);
+ publisher.queue();await clock.advance(19999);assert.equal(writes.length,3);
+ await clock.advance(1);assert.equal(writes[3].kind,'routine');
+ await publisher.stop();
+});
+
+test('background progress serializes in-flight writes, rechecks resource headroom and drains before terminal save',async()=>{
+ const {createV4ProgressPublisher}=await import('../functions/_lib/v4-progress-publisher.js');
+ const clock=progressClock(),writes=[];let allowed=true,jobs=1,finishFirst;
+ const publisher=createV4ProgressPublisher({...clock,canPublish:()=>allowed,publish:kind=>{
+  writes.push({kind,jobs});
+  if(writes.length===1)return new Promise(resolve=>{finishFirst=resolve;});
+ }});
+ publisher.queue('candidate');await clock.advance(0);assert.equal(writes.length,1);
+ jobs=2;publisher.queue('candidate');jobs=3;publisher.queue('report');
+ await clock.advance(10000);assert.equal(writes.length,1,'no overlapping writes');
+ finishFirst();await clock.advance(0);
+ await clock.advance(999);assert.equal(writes.length,1);
+ await clock.advance(1);assert.deepEqual(writes,[{kind:'candidate',jobs:1},{kind:'report',jobs:3}]);
+ jobs=4;publisher.queue('candidate');allowed=false;await clock.advance(3000);
+ assert.equal(writes.length,2,'resource reserve must be checked at actual write time');
+ allowed=true;publisher.queue('candidate');await clock.advance(0);
+ assert.deepEqual(writes[2],{kind:'candidate',jobs:4});
+ publisher.queue('report');await publisher.stop();await clock.advance(20000);
+ assert.equal(writes.length,3,'stopped optional progress cannot overwrite terminal state');
+});
+
+test('progress publisher retains a later dirty snapshot after optional write failure',async()=>{
+ const {createV4ProgressPublisher}=await import('../functions/_lib/v4-progress-publisher.js');
+ const clock=progressClock(),writes=[];let jobs=1;
+ const publisher=createV4ProgressPublisher({...clock,publish:kind=>{
+  writes.push({kind,jobs});
+  if(writes.length===1)throw Error('temporary R2 failure');
+ }});
+ publisher.queue('candidate');await clock.advance(0);
+ jobs=2;publisher.queue('candidate');await clock.advance(3000);
+ assert.deepEqual(writes,[{kind:'candidate',jobs:1},{kind:'candidate',jobs:2}]);
+ await publisher.stop();
+});
