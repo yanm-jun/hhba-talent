@@ -80,7 +80,7 @@ function events(env,request,input,waitUntil){
    const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:lastJobs});
    function queueProgress(){if(!input.background||!leaseHeartbeat||progressTimer)return;progressTimer=setTimeout(()=>{progressTimer=null;void leaseHeartbeat?.tick();},2000);}
    const sendResearch=r=>{if(r){lastReport=r;send('research_report',r);queueProgress();}};
-   const rememberJobs=matches=>{lastJobs=matches.filter(allowedJob).map(j=>({id:j.id,company:j.company,title:j.title,title_zh:j.title_zh,location:j.location,official_url:j.official_url,platform:j.platform,source:j.source,remote:j.remote,reference_score:0,matched:[],not_evidenced:[],needs_verification:[],requirements_basis:'',salary:j.salary,source_status:j.source_status}));queueProgress();};
+   const rememberJobs=matches=>{lastJobs=matches.filter(allowedJob).map(j=>({id:j.id,company:j.company,title:j.title,title_zh:j.title_zh,location:j.location,official_url:j.official_url,platform:j.platform,source:j.source,remote:j.remote,matched:[],not_evidenced:[],needs_verification:[],requirements_basis:'',salary:j.salary,source_status:j.source_status}));queueProgress();};
    const sendFinal=result=>{
     if(input.background){send('complete',{status:'COMPLETE'});return;}
     const matches=result.matches.filter(officialJob),leads=(result.research_leads||[]).filter(allowedJob);
@@ -295,8 +295,7 @@ export async function onRequest(context){
    const generation=body.research_generation??0;
    if(input.managed&&backgroundEnabled(env,request)){
     const saved=await readMatchTask(env,input.taskKey);
-    if(saved?.generation===generation&&saved?.result?.status==='COMPLETE'){input.generation=generation;
-    if(saved?.generation===generation){input.savedProgress=saved.progress;if(saved.failure&&!saved.failure.retryable){await input.lease.release();return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});}}input.cachedResult=saved.result;return events(env,request,input,waitUntil);}
+    if(saved?.generation===generation&&saved?.result?.status==='COMPLETE'){input.generation=generation;input.cachedResult=saved.result;return events(env,request,input,waitUntil);}
     if(saved?.generation===generation&&saved.failure&&!saved.failure.retryable)return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});
      const scheduled=await tryScheduleBackgroundMatch(env,request,session,input.sessionTask);
      if(scheduled==='FAILED')return reply({status:'FAILED',progress:saved?.generation===generation?saved.progress||null:null,failure:{error:saved?.failure?.error||'AI_BACKGROUND_EXECUTION_FAILED',retryable:false}});
@@ -309,6 +308,7 @@ export async function onRequest(context){
    const saved=await readMatchTask(env,input.taskKey,Date.now(),input.managed?{renewGeneration:generation}:{});
    if(!Number.isSafeInteger(generation)||generation<0||generation>(saved?.generation||0)+1){await input.lease.release();return fail('AI_CHECKPOINT_INVALID',409);}
    input.generation=generation;
+    if(saved?.generation===generation){input.savedProgress=saved.progress;if(saved.failure&&!saved.failure.retryable){await input.lease.release();return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});}}
    if(generation===(saved?.generation||0)&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
    else if(saved?.checkpoint&&generation===(saved.generation||0))input.checkpoint=saved.checkpoint;
    else if(saved?.result?.status==='COMPLETE'&&saved.checkpoint&&generation===(saved.generation||0)+1){input.checkpoint=saved.checkpoint;await saveMatchTask(env,input.taskKey,{checkpoint:input.checkpoint,generation});}
