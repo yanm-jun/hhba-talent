@@ -58,3 +58,21 @@ export function phaseModelReplay(entries=[]){
   snapshot:()=>[...new Map([...previous,...current])]
  };
 }
+
+ // Per-invocation admission based on measured resource cost; not a task cap.
+ export function managedWorkPlan(budget,history,pending,{maxLanes=4,maxWindow=8,reserve=0,initialCost=8}={}){
+  if(pending<=0)return {width:0,window:0};
+  const {used,soft}=budget.snapshot();
+  const cost=Number.isFinite(history?.cost)&&history.cost>0?history.cost:initialCost;
+  const capacity=Math.max(1,Math.floor(Math.max(0,soft-used-reserve)/Math.max(2,cost)));
+  const previous=Number.isSafeInteger(history?.width)&&history.width>0?history.width:2;
+  const width=Math.min(pending,maxLanes,capacity,history?.pressure?1:previous+1);
+  return {width:Math.max(1,width),window:Math.max(1,Math.min(pending,maxWindow,capacity,history?.pressure?1:width*2))};
+ }
+ export function managedWorkSample(previous,budget,start,completed,width,{pressure=false,initialCost=8}={}){
+  const spent=Math.max(0,budget.used-start);
+  const old=Number.isFinite(previous?.cost)&&previous.cost>0?previous.cost:initialCost;
+  const observed=completed>0?Math.max(2,spent/completed):old;
+  const cost=pressure?Math.max(old,observed,initialCost):Math.max(observed,old*0.5+observed*0.5);
+  return {cost,width:pressure?1:Math.max(1,width),pressure:!!pressure};
+ }

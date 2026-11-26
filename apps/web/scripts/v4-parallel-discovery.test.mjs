@@ -677,3 +677,21 @@ test('a full ready scoring group bypasses its coalescing timer',async()=>{
  assert.equal(calls,1);
  assert.deepEqual(await Promise.all([first,second]),[null,null]);
 });
+
+test('managed invocation plan expands cheap work and backs off after resource pressure',async()=>{
+ const {phaseResourceBudget,managedWorkPlan,managedWorkSample}=await import('../functions/_lib/v4-phase-budget.js');
+ const budget=phaseResourceBudget();
+ assert.deepEqual(managedWorkPlan(budget,undefined,50,{initialCost:4}),{width:3,window:4});
+ const start=budget.used;
+ budget.take('fetch',4);
+ const history=managedWorkSample(undefined,budget,start,2,2,{initialCost:4});
+ assert.equal(history.cost,3);
+ const fresh=phaseResourceBudget();
+ const expanded=managedWorkPlan(fresh,{...history,width:3},50,{initialCost:4});
+ assert.equal(expanded.width,4);
+ assert.equal(expanded.window,5);
+ const pressure=managedWorkSample(history,budget,start,0,3,{pressure:true,initialCost:4});
+ assert.deepEqual(managedWorkPlan(fresh,pressure,50,{initialCost:4}),{width:1,window:1});
+ assert.equal(managedWorkPlan(fresh,undefined,50,{maxLanes:2,reserve:6,initialCost:8}).width,1);
+ assert.equal(managedWorkPlan(fresh,undefined,0).width,0);
+});
