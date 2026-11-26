@@ -1028,7 +1028,45 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      }
      return {response:laneResponse,data:{jobs},sources,grounded};
     };
-    const wave=await runDiscoveryWave(()=>v4Call(fetcher,provider,coordinatorPayload,{signal,onEvent:providerActivity,stage:'discovery'}),lane,width,signal);
+    // Recovery overlay: keep completed candidates independently of a slow
+     // coordinator, without changing its authoritative final merge or stop logic.
+     const earlyRows=new Map(),earlySources=new Set(),earlyToolUrls=new Set();
+     const earlySnapshot=()=>{
+      const cp=continuation('research').checkpoint;
+      const merged=new Map(cp.rows);
+      for(const [url,j] of earlyRows)merged.set(url,{...merged.get(url),...j});
+      cp.rows=[...merged];cp.sourceLeads=[...new Set([...cp.sourceLeads,...earlySources])];
+      cp.toolUrls=[...new Set([...cp.toolUrls,...earlyToolUrls].filter(u=>merged.has(u)))];
+      return cp;
+     };
+     onRecoveryState(earlySnapshot);
+     const stageReady=(value,index)=>{
+      const reply=index===0?value:value.response;
+      let result=index===0?null:value.data;
+      if(index===0){try{result=v4ParseJson(reply);}catch{result={jobs:recoverV4PartialJobs(v4OutputText(reply))};}}
+      const cites=v4ToolSources(reply);
+      for(const raw of [...v4Sources(reply),...(Array.isArray(value.sources)?value.sources:[]),...(Array.isArray(result?.source_leads)?result.source_leads:[])].map(v4PublicJobUrl).filter(Boolean)){
+       const url=curatedUrl(raw);if(!isCommercialRecruitmentBoard(url)&&!excluded.has(url)&&!rejectedBoards.has(url))earlySources.add(url);
+      }
+      for(const [rawUrl,j] of candidates(result,reply)){
+       const url=curatedUrl(rawUrl);
+       if(!url||excluded.has(url)||excluded.has(rawUrl)||rejectedBoards.has(url)||isCommercialRecruitmentBoard(url,j))continue;
+       const compact=candidateSummary(j,url);
+       if(!concreteCandidate(compact)){earlySources.add(url);continue;}
+       const fields=Object.fromEntries(Object.entries(compact).filter(([,v])=>v!==null&&v!==''&&v!==undefined&&(!Array.isArray(v)||v.length)));
+       earlyRows.set(url,{...earlyRows.get(url),...fields});
+       for(const proof of [compact.employer_proof_url,...compact.employer_proof_urls].map(v4PublicJobUrl).filter(Boolean))if(!isCommercialRecruitmentBoard(proof))earlySources.add(curatedUrl(proof));
+      }
+      for(const raw of cites){const url=curatedUrl(raw);if(!isCommercialRecruitmentBoard(url)&&!excluded.has(url)&&!rejectedBoards.has(url))earlyToolUrls.add(url);}
+      if(!earlyRows.size&&!earlySources.size)return;
+      note('PARALLEL_DISCOVERY_LANE_READY');
+      const cp=earlySnapshot(),sources=new Set(cp.toolUrls);
+      const previews=cp.rows.filter(([url])=>!processedEarlier.has(url)).map(([url,j],i)=>renderCandidatePreview(j,url,resume,sources.has(url),i,sources));
+      onResearch({...report(),discovered:cp.rows.length,concrete_count:cp.rows.filter(([,j])=>concreteCandidate(j)).length});
+      onPartial(mergeJobEvidence(priorState?.matches||[],previews));
+      onActivity('searching','部分搜索 Agent 已返回，已暂存 '+cp.rows.length+' 个候选岗位，其他研究仍在进行。');
+     };
+     const wave=await runDiscoveryWave(()=>v4Call(fetcher,provider,coordinatorPayload,{signal,onEvent:providerActivity,stage:'discovery'}),lane,width,signal,stageReady);
     discoveryWidth=nextDiscoveryWidth(width,wave.codes,adaptiveResearch?{maxConnections:checkpoint?.pipelineActive?4:6,elapsed:wave.elapsed,previousElapsed:checkpoint?.discoveryElapsed}:{});
     if(adaptiveResearch)discoveryElapsed=wave.elapsed;
     for(const code of wave.codes)note('PARALLEL_'+code);
