@@ -2,6 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {onRequest} from '../functions/api/match-native/_middleware.js';
 import {onRequest as retiredV2} from '../functions/api/match-next/[[path]].js';
+import {onRequest as retiredNativeHandler} from '../functions/api/match-native/[[path]].js';
+import {onRequest as retiredInitial} from '../functions/api/match/[[path]].js';
+import {onRequest as retiredDiscover} from '../functions/api/match/discover.js';
 
 test('legacy status always reports maintenance instead of calling an expensive old Agent',async()=>{
  const r=await onRequest({request:new Request('https://hhba.work/api/match-native/status')});
@@ -53,5 +56,23 @@ test('candidate client contains no V2 route, old provider diagnostic, or old OCR
  for(const path of ['../src/services/resumeMatch.ts','../src/pages/CandidateMatchPage.tsx']){
   const code=readFileSync(new URL(path,import.meta.url),'utf8');
   assert.doesNotMatch(code,/\/api\/match-next|runMatchPreview|deepseek-resume-ocr-v1|DeepSeek/);
+ }
+});
+
+test('all retired matching and discovery handlers fail closed without reading bindings',async()=>{
+ const env=new Proxy({}, {get(){throw Error('retired route must never read bindings');}});
+ for(const [handler,path] of [[retiredNativeHandler,'/api/match-native'],[retiredInitial,'/api/match']]){
+  const status=await handler({request:new Request('https://hhba.work'+path+'/status'),env});
+  assert.equal(status.status,200);assert.equal((await status.json()).enabled,false);
+  for(const [tail,method] of [['/resume','POST'],['/ocr','POST'],['/provider-check','GET']]){
+   const response=await handler({request:new Request('https://hhba.work'+path+tail,{method}),env});
+   assert.equal(response.status,410);assert.equal((await response.json()).error,'MATCH_BACKEND_RETIRED');
+   assert.equal(response.headers.get('Cache-Control'),'private, no-store');
+  }
+ }
+ for(const method of ['GET','POST','PUT','DELETE']){
+  const response=await retiredDiscover({request:new Request('https://hhba.work/api/match/discover',{method}),env});
+  assert.equal(response.status,method==='GET'?200:410);
+  const value=await response.json();assert.equal(method==='GET'?value.enabled:value.error,method==='GET'?false:'MATCH_BACKEND_RETIRED');
  }
 });

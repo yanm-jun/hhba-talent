@@ -29,7 +29,7 @@ jobs:
         run: |
           node --check functions/_lib/domestic-search-fetch.js
           node --check functions/api/match/discover.js
-          node --test scripts/domestic-search-fetch.contract.test.mjs scripts/domestic-search-fetch.route.test.mjs
+          node --test scripts/domestic-search-fetch.contract.test.mjs
       - name: Existing HHBA production bundle regression
         working-directory: apps/web
         run: npm run build

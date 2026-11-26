@@ -301,11 +301,10 @@ test('default Agent also receives bounded company-first backup Search instead of
  assert.equal(result.matches.length,1);
  assert.equal(result.diagnostic.hybrid_fallback.index_companies_considered,120);
 });
-test('hybrid is wired to native trial, while normal AI-owned engine and authentic JD gates remain intact',()=>{
- const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
- assert.match(route,/runHybridMainlandJobResearch\(key,resume,roleHint,limit,options\)/);
- assert.match(route,/runAgentOwnedMainlandMatch\(key,resume,roleHint,limit/);
- assert.match(route,/createMatchJdReview/);
- assert.match(route,/researchDomesticJobEvidence/);
+test('V4 replaces the hybrid/native trial while keeping authentic JD and history gates',()=>{
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  assert.match(route,/saveMatchHistory/);
+ assert.match(route,/v4Match\(fetch,v4JobProvider\(env\)/);
+ assert.match(route,/officialOnly:true,curated:true/);
+ assert.doesNotMatch(route,/runHybridMainlandJobResearch|runAgentOwnedMainlandMatch/);
 });

@@ -111,18 +111,14 @@ test('model not available for planning falls back only for tool discovery, still
  assert.equal(out.diagnostic.agent_exit_reason,'agent_finished');
 });
 test('the real candidate route defaults to model-owned loop and preserves authenticated Word flow',()=>{
- const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  const word=readFileSync(new URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
- assert.match(route,/runAgentOwnedMainlandMatch/);
- assert.match(route,/HHBA_AI_OWNED_RESEARCH_ENABLED==='0'/);
- assert.match(route,/runCandidateResearch\(env,key,resume/);
- assert.match(route,/'AI_EMPLOYER_JOBS_NOT_FOUND'/);
- assert.match(route,/return runAgentOwnedMainlandMatch\(key,resume,roleHint,limit/);
- assert.doesNotMatch(route,/HHBA_AI_RESEARCH_RECOVERY/);
- assert.match(route,/domesticResearchPass/);
- assert.match(route,/candidateSession\(env,request\)/);
- assert.match(route,/redactForModel\(input\.text\)/);
  assert.match(word,/jobContextForAI/);
+ assert.match(route,/v4Match\(fetch,v4JobProvider\(env\)/);
+ assert.match(route,/officialOnly:true,curated:true/);
+ assert.match(route,/sessionOfBearer\(db,request,Date\.now\(\)\)/);
+ assert.match(route,/redactForModel\(raw\.trim\(\),Infinity\)/);
+ assert.doesNotMatch(route,/runAgentOwnedMainlandMatch|HHBA_MATCH_DEEPSEEK_KEY/);
 });
 
 test('first Search starts without waiting for autonomous planner, but planner directions still execute',async()=>{

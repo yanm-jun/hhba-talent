@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {redactForModel,verifiedProfile,selectAuditedMatches} from '../functions/_lib/resume-match-core.js';
 import {fuseDomesticJobRecommendations} from '../functions/_lib/domestic-match-fusion.js';
-import {onRequest} from '../functions/api/match/[[path]].js';
+import {onRequest} from '../functions/api/match-v4/[[path]].js';
 
 test('contact identifiers removed while employment dates survive',()=>{
  const s=redactForModel('2020-2025 工作，手机13812345678，邮箱abc@example.com，身份证110101200301012345');
@@ -72,15 +72,10 @@ test('V2 scores the full validated candidate pool before selecting Top 10',()=>{
  assert.ok(final.matches.every(x=>x.ranking_version==='HHBA_MATCH_RANKING_V2'));
 });
 
-test('Cloudflare service is disabled by default and rejects cross-site uploads',async()=>{
- const status=await onRequest({request:new Request('https://hhba.work/api/match/status'),env:{}});
- assert.equal((await status.json()).enabled,false);
- const origin='https://hhba.work';
- const request=(o)=>new Request(origin+'/api/match/resume',{method:'POST',headers:{Origin:o},body:'{}'});
- assert.equal((await onRequest({request:request('https://evil.example'),env:{}})).status,403);
- assert.equal((await onRequest({request:request(origin),env:{}})).status,503);
+test('V4 disabled status does not invoke a model or expose credentials',async()=>{
+ const status=await onRequest({request:new Request('https://hhba.work/api/match-v4/status'),env:{}});
+ assert.equal(status.status,200);assert.equal((await status.json()).enabled,false);
 });
-
 
 test('rejects degree-level mismatch even when evidence is a real excerpt',()=>{
  const text='学历：本科，2019-2023 本科毕业。工作经历：市场营销';

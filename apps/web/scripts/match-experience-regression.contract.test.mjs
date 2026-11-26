@@ -105,7 +105,7 @@ test('model returns separate specific reasons for multiple jobs; one broken batc
 test('real stage-aware modal mounts at click and preserves original scroll/results/Word workspace',()=>{
  const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  const modal=readFileSync(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
- const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  const svc=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
  const style=readFileSync(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
  assert.match(page,/\(result\|\|partialJobs\.length>0\)\|\|working/);
@@ -116,7 +116,7 @@ test('real stage-aware modal mounts at click and preserves original scroll/resul
  assert.match(modal,/终止匹配/);
  assert.match(modal,/确认终止本次匹配/);
  assert.match(style,/prefers-reduced-motion:reduce/);
- assert.match(route,/progress\('researching'\)/);
+ assert.match(route,/onProgress:progress,onActivity:activity/);
  assert.match(svc,/'researching'/);
  assert.match(svc,/'scoring'/);
  assert.match(modal,/TargetedResumeOptimization/);

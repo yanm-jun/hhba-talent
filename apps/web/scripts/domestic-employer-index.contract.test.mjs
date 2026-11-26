@@ -111,10 +111,11 @@ test('the model-selected domestic enterprise hint causes a new public Search, ne
  assert.equal(result.matches[0].official_url,found.url);
 });
 
-test('the authenticated matching route wires D1 index hints without sending raw applicant data to public Search',()=>{
- const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
+test('legacy index helpers remain covered while V4 does not depend on them',()=>{
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  const agent=readFileSync(new URL('../functions/_lib/ai-owned-job-research.js',import.meta.url),'utf8');
- assert.match(route,/employerIndex:\(roles,sectors\)=>indexedEmployerSearchHints\(env,roles,sectors/);
  assert.match(agent,/employerIndex\(roles,sectors\)/);
  assert.match(agent,/indexRowsConsidered/);
+ assert.match(route,/officialOnly:true,curated:true/);
+ assert.doesNotMatch(route,/indexedEmployerSearchHints|HHBA_MATCH_DEEPSEEK_KEY/);
 });

@@ -121,15 +121,15 @@ test('failed Fetch never becomes CLOSED_LISTED without independent closure evide
  assert.equal(result.matches.length,1);
  assert.equal(result.matches[0].official_url,valid.url);
 });
-test('migration and authenticated API integrate the checkpoint without saving CV text',()=>{
+test('legacy migration remains non-destructive and V4 uses the encrypted task checkpoint',()=>{
  const sql=readFileSync(new URL('../d1/0030_ai_research_checkpoints.sql',import.meta.url),'utf8');
- const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  assert.match(sql,/CREATE TABLE IF NOT EXISTS hhba_ai_research_checkpoints/);
  assert.match(sql,/REFERENCES hhba_auth_users\(phone\)/);
  assert.ok(!/resume_text|resume_json|raw_cv/i.test(sql));
- assert.match(route,/checkpointForCandidate\(env,candidate,resume,options\.role_hint\)/);
- assert.match(route,/compareMatchResumeToJd/);
- assert.match(route,/checkpoint\?\.clear\(\)/);
+ assert.match(route,/storeMatchCheckpoint\(env,result\.checkpoint\)/);
+ assert.match(route,/claimAiCheckpoint/);
+ assert.match(route,/saveMatchTask\(env,input\.taskKey/);
 });
 
 test('public source-clue titles survive a safe checkpoint, but failed page reads are retryable',()=>{

@@ -25,7 +25,6 @@ on:
       - 'apps/web/functions/_lib/domestic-search-fetch.js'
       - 'apps/web/src/services/resumeMatch.ts'
       - 'apps/web/src/components/CandidateMatchResultDialog.tsx'
-      - 'apps/web/scripts/domestic-search-preview-http.smoke.mjs'
       - '.github/workflows/hhba-domestic-match-fusion-v1.yml'
   workflow_dispatch:
 permissions:
@@ -57,7 +56,7 @@ jobs:
           node --check functions/_lib/mainland-job-location.js
           node --check functions/_lib/resume-role-evidence.js
           node --check functions/_lib/resume-tenure.js
-          node --test scripts/match-v5-credentials.contract.test.mjs scripts/match-v5-quality-evaluation.contract.test.mjs scripts/match-v4-cross-discipline.contract.test.mjs scripts/match-v3-calibration.contract.test.mjs scripts/match-audit-hardgates.contract.test.mjs scripts/job-skill-evidence.contract.test.mjs scripts/resume-tenure.contract.test.mjs scripts/match-ranking-v2.contract.test.mjs scripts/domestic-match-fusion.contract.test.mjs scripts/domestic-search-fetch.contract.test.mjs scripts/domestic-search-fetch.route.test.mjs
+          node --test scripts/match-v5-credentials.contract.test.mjs scripts/match-v5-quality-evaluation.contract.test.mjs scripts/match-v4-cross-discipline.contract.test.mjs scripts/match-v3-calibration.contract.test.mjs scripts/match-audit-hardgates.contract.test.mjs scripts/job-skill-evidence.contract.test.mjs scripts/resume-tenure.contract.test.mjs scripts/match-ranking-v2.contract.test.mjs scripts/domestic-match-fusion.contract.test.mjs scripts/domestic-search-fetch.contract.test.mjs
       - name: Check HHBA web production build
         working-directory: apps/web
         run: npm run build

@@ -171,14 +171,16 @@ test('missing documented qualifications yield NO made-up JD score',()=>{
  assert.equal(result.match_score,null);
 });
 test('verified JD version crosses search UI, history and Word without storing private resume in shared JD',()=>{
- const route=readFileSync(new globalThis.URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
+ const route=readFileSync(new globalThis.URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  const history=readFileSync(new globalThis.URL('../functions/_lib/match-history.js',import.meta.url),'utf8');
  const dialog=readFileSync(new globalThis.URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  const editor=readFileSync(new globalThis.URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
- assert.match(route,/verifiedJdPass\(/);
- assert.match(route,/withSavedHistory\(env,candidate,input,result\)/);
- assert.match(route,/domesticOnly:true/);
  assert.match(history,/verifiedJdMeta\(item\)/);
  assert.match(dialog,/jd_version_id:job\.jd_version_id/);
  assert.match(editor,/getArchivedJobJdVersion\(job\.jd_version_id/);
+ assert.match(route,/saveMatchHistory\(env\.HHBA_PNVS_AUTH_DB/);
+ assert.match(route,/officialOnly:true,curated:true/);
+ const core=readFileSync(new globalThis.URL('../functions/_lib/simple-match-v4.js',import.meta.url),'utf8');
+ assert.match(core,/saveV4PublicJobJd/);
+ assert.match(core,/jd_version_id:saved\.id/);
 });
