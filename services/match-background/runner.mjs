@@ -132,7 +132,7 @@ export async function restartRecoveredWorkflowOnAuthorizedStart(db,workflow,id,{
    .bind(now+5*60000,id,now,now).run();
   if(claim?.meta?.changes!==1)return false;
   await instance.restart();
-  console.info('HHBA_MATCH_AUTHORIZED_WORKFLOW_RESUME',JSON.stringify({id_prefix:id.slice(0,8),state:state.status}));
+  console.info('HHBA_MATCH_AUTHORIZED_WORKFLOW_RESUME',JSON.stringify({state:state.status}));
   return true;
  }catch{console.warn('HHBA_MATCH_AUTHORIZED_WORKFLOW_RESUME_DEFERRED');return false;}
 }
