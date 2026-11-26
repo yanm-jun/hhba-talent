@@ -1,7 +1,7 @@
 // Timing only: no prompts, model text, URLs, names, credentials or reasoning.
 // Store a bounded summary in the existing encrypted progress view; emit
 // aggregate operational logs without creating additional database writes.
-const stages=new Set(['discovery','profile','jd_search','identity','score','report','reference','format','rank','other','probe']);
+const stages=new Set(['discovery','profile','jd_search','jd_extract','jd_coverage','jd_reference','partial','identity','score','report','reference','format','rank','other','probe']);
 const milestones=new Set(['headers','first_chunk','first_frame','first_search_complete','first_text','first_source','first_candidate','terminal','fallback','replay']);
 const transports=new Set(['sse','json','unknown']);
 const resultStages=new Set(['candidate','jd','score','report','jd_engine','score_engine','report_engine']);
