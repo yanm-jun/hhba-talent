@@ -3,7 +3,7 @@
  * Provider-neutral: no API keys, HTML, or model-specific response assumptions.
  * A presentation score measures evidence visibility, not newly acquired qualifications.
  */
-export const AI_PROVIDERS = ['deepseek','openai','anthropic','gemini','qwen','zhipu','groq','openrouter'] as const;
+export const AI_PROVIDERS = ['deepseek','openai','anthropic','qwen','zhipu','groq','openrouter'] as const;
 export type AiProvider = typeof AI_PROVIDERS[number];
 export type ResumeSection = 'summary'|'experience'|'education'|'skills'|'projects';
 export type SuggestionAction = 'replace'|'append'|'request_evidence';
