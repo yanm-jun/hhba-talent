@@ -48,3 +48,16 @@ test('the modal shows current progress while SSE retains search metrics',()=>{
  assert.ok(!route.includes("send('progress',{stage:'waiting'})"),
   'heartbeat must not pretend to be a substantive progress stage');
 });
+
+test('managed polling retains the complete report and uses the same report gate as SSE',()=>{
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ const service=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ const dialog=readFileSync(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
+ const panels=readFileSync(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ assert.ok(route.includes('officialJob(j)?structuredClone(j)'),'completed reports must be preserved, not reduced to preview fields');
+ assert.ok(route.includes('queueProgress(changed)'),'report changes trigger an expedited durable publication');
+ assert.ok(route.includes('progressUrgent?1000:20000'),'ordinary heartbeat throttling must not delay a new report');
+ assert.ok(service.includes('onPartial?.(verifiedMatchReports(data.progress.jobs))'),'polling must feed the report pager, not just search results');
+ assert.ok(dialog.includes('hasCompleteReport?2:'),'the first available report is shown without waiting for all candidates');
+ assert.ok(panels.includes("pending||provisional?'已完成报告':'正式推荐'"),'unfinished global ranking must be identified as provisional');
+});

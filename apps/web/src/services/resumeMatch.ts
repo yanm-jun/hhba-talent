@@ -1,5 +1,6 @@
 // HHBA same-origin Cloudflare AI matching. No provider key in the browser.
 import {getRealAuthToken,realAuthReady} from './realAuth';
+import {verifiedMatchReports} from './verifiedMatchPresentation.mjs';
 import {extractDocxText} from './docxProfile.mjs';
 import {extractPdfText,PDFResumeError,recognizePdfPages,PDF_PAGE_OCR_MAX_BYTES} from './pdfProfile.mjs';
 
@@ -494,7 +495,11 @@ export async function submitExtractedResumeText(
    if(data.progress?.stage)onProgress?.(data.progress.stage);
    if(data.progress?.activity)onActivity?.(data.progress.activity);
    if(data.progress?.report)onResearch?.(data.progress.report);
-   if(Array.isArray(data.progress?.jobs))onResearchJobs?.(data.progress.jobs);
+   if(Array.isArray(data.progress?.jobs)){
+    onResearchJobs?.(data.progress.jobs);
+    // Managed polling and direct SSE must deliver the same validated reports.
+    onPartial?.(verifiedMatchReports(data.progress.jobs));
+   }
    if(data.status==='FAILED')throw new MatchError(502,errorMap[data.failure?.error||'']||errorMap.AI_BACKGROUND_EXECUTION_FAILED,false);
    if(data.failure?.retryable)onActivity?.({stage:'waiting',message:(data.failure.error==='AI_EDGE_DAILY_LIMIT'?'Cloudflare 当日额度暂时不足，将在额度允许后继续。':data.failure.error==='AI_PROVIDER_RATE_LIMITED'?'AI 接口暂时限流，等待恢复。':data.failure.error==='AI_TASK_IN_PROGRESS'?'原任务仍在执行或释放任务锁。':data.failure.error==='AI_BACKGROUND_WORKFLOW_ROLLOVER'?'正在接续下一段后台工作。':'后台暂时等待或正在恢复。')+' 已保存的研究成果会保留，无需重新开始。'});
    else if(!data.progress)onActivity?.({stage:'preparing',message:'后台任务已登记，正在等待实际执行状态。'});

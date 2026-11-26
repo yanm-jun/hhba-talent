@@ -83,20 +83,42 @@ function events(env,request,input,waitUntil){
    const allowedJob=j=>j&&!j.excluded_board&&!isCommercialRecruitmentBoard(j.official_url,j);
    const officialJob=j=>allowedJob(j)&&qualifiedReport(j);
    let lastReport=input.savedProgress?.report,latestActivity=input.savedProgress?.activity,lastJobs=input.savedProgress?.jobs||[];
-   let progressTimer=null,progressPending=null,progressClosed=false,lastProgressWrite=Date.now()-17000;
+   let progressTimer=null,progressPending=null,progressClosed=false,progressUrgent=false,lastProgressWrite=Date.now()-17000;
    const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:lastJobs});
    async function publishProgress(status='PENDING',failure=null){
      if(!input.background||!input.taskKey)return;
      try{budget?.observe('progress');await saveMatchProgress(env,input.taskKey,{generation:input.generation||0,status,progress:snapshotProgress(),failure});lastProgressWrite=Date.now();}
      catch(e){console.warn('HHBA_V4_PROGRESS_WRITE_FAILED',JSON.stringify({trace,error:e?.code||'PROGRESS_WRITE_FAILED'}));}
     }
-    function queueProgress(){
-     if(!input.background||progressClosed||!leaseHeartbeat||progressTimer||progressPending||!budget?.canPublish())return;
-     progressTimer=setTimeout(()=>{progressTimer=null;if(progressClosed||leaseAbort.signal.aborted||!budget.canPublish())return;progressPending=publishProgress().finally(()=>{progressPending=null;});},Math.max(0,20000-(Date.now()-lastProgressWrite)));
+    function queueProgress(urgent=false){
+     if(!input.background||progressClosed||!leaseHeartbeat||!budget?.canPublish())return;
+     if(urgent)progressUrgent=true;
+     if(progressPending)return;
+     if(progressTimer){if(!urgent)return;clearTimeout(progressTimer);progressTimer=null;}
+     // A completed, validated report is a user-visible result, not a
+     // heartbeat. Coalesce nearby arrivals without the ordinary 20s delay.
+     progressTimer=setTimeout(()=>{
+      progressTimer=null;if(progressClosed||leaseAbort.signal.aborted||!budget.canPublish())return;
+      progressUrgent=false;
+      progressPending=publishProgress().finally(()=>{progressPending=null;if(progressUrgent)queueProgress(true);});
+     },Math.max(0,(progressUrgent?1000:20000)-(Date.now()-lastProgressWrite)));
     }
     async function stopProgress(){progressClosed=true;if(progressTimer)clearTimeout(progressTimer);progressTimer=null;if(progressPending)await progressPending;}
    const sendResearch=r=>{if(r){lastReport=r;send('research_report',r);queueProgress();}};
-   const rememberJobs=matches=>{lastJobs=matches.filter(allowedJob).map(j=>({id:j.id,company:j.company,title:j.title,title_zh:j.title_zh,location:j.location,official_url:j.official_url,platform:j.platform,source:j.source,remote:j.remote,matched:[],not_evidenced:[],needs_verification:[],requirements_basis:'',salary:j.salary,source_status:j.source_status}));queueProgress();};
+   const reportSignature=jobs=>JSON.stringify(jobs.filter(officialJob).map(j=>[j.official_url,j.match_score,j.jd_sha256,j.research_detail,j.reference_jd]));
+   let lastReportSignature=reportSignature(lastJobs);
+   const rememberJobs=matches=>{
+    // The progress object is encrypted and bound to this authorized task.
+    // Keep complete reports lossless; compact only non-deliverable leads.
+    lastJobs=matches.filter(allowedJob).map(j=>officialJob(j)?structuredClone(j):({
+     id:j.id,company:j.company,title:j.title,title_zh:j.title_zh,location:j.location,official_url:j.official_url,platform:j.platform,source:j.source,remote:j.remote,
+     matched:[],not_evidenced:[],needs_verification:[],requirements_basis:'',salary:j.salary,source_status:j.source_status,
+     source_type:j.source_type,jd_source_status:j.jd_source_status,evidence_status:j.evidence_status,reference_vacancy_verified:j.reference_vacancy_verified,
+     availability_status:j.availability_status,report_status:j.report_status
+    }));
+    const signature=reportSignature(lastJobs),changed=signature!==lastReportSignature;lastReportSignature=signature;
+    queueProgress(changed);
+   };
    const sendFinal=result=>{
     if(input.background){send('complete',{status:'COMPLETE'});return;}
     const matches=result.matches.filter(officialJob),leads=(result.research_leads||[]).filter(allowedJob);
