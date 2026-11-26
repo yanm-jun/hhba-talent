@@ -197,3 +197,24 @@ test('a wake cancellation terminates dormant staged Workflow without performing 
  assert.deepEqual(await driveBackgroundMatch(step,ticket,async()=>{called=true;throw Error('should not fetch')},{lane:'reporting'}),{status:'COMPLETE'});
  assert.equal(called,false);
 });
+
+test('stage Workflow scheduler creates three dormant/active instances only after checking old ownership',async()=>{
+ const {startStageWorkflows,sendStageEvent,stageWorkflowId}=await import('./stages.mjs');
+ const base='b'.repeat(64),created=[],watchdog=[],status=new Map(),events=[];
+ const workflow={
+  async get(id){if(id===base)throw Error('no legacy instance');return {async status(){return status.get(id)||{status:'waiting'}},async sendEvent(ev){events.push({id,ev});}}}
+ };
+ const started=await startStageWorkflows(workflow,{},base,ticket,{register:async(_db,id)=>watchdog.push(id),schedule:async(_wf,id,_ticket,{lane})=>{created.push({id,lane});status.set(id,{status:'waiting'});return {status:'RECOVERING'};}});
+ assert.deepEqual(started,{ok:true,mode:'staged'});
+ assert.deepEqual(created.map(x=>x.lane),['verification','reporting','discovery']);
+ assert.equal(new Set(watchdog).size,3);
+ const verify=await sendStageEvent(workflow,base,{lane:'verification'});
+ assert.deepEqual(verify,{ok:true,delivered:1});
+ assert.equal(events[0].ev.type,'wake_verification');assert.deepEqual(events[0].ev.payload,{done:false});
+ assert.equal(events[0].id,await stageWorkflowId(base,'verification'));
+ const finished=await sendStageEvent(workflow,base,{finish:true});
+ assert.deepEqual(finished,{ok:true,delivered:3});
+ assert.ok(events.slice(1).every(x=>x.ev.payload.done===true));
+ const legacy={async get(){return {async status(){return {status:'running'}}}}};
+ assert.deepEqual(await startStageWorkflows(legacy,{},base,ticket,{register:async()=>assert.fail(),schedule:async()=>assert.fail()}),{ok:true,mode:'legacy'});
+});
