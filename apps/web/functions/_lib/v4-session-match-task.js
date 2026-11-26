@@ -3,6 +3,7 @@
 import {matchTaskKey,readMatchTask,saveMatchTask} from './v4-match-checkpoint-storage.js';
 import {leaseMatchTask} from './ai-checkpoint-claim.js';
 import {sessionValid} from './real-auth.js';
+import {bindPaidMatchOrder,assertPaidMatchOrder,closePaidMatchBinding} from './v4-match-payment.js';
 
 const SESSION_SLOT='00000000-0000-0000-0000-000000000000';
 const validId=id=>typeof id==='string'&&/^[a-f0-9-]{36}$/.test(id);
@@ -23,16 +24,17 @@ export async function updateSessionTask(env,session,action,input){
   const current=await getSessionTask(env,session);
   if(action==='start'){
    // Concurrent tabs attach to the existing task. They never replace its CV.
-   if(current)return current;
+   if(current){await assertPaidMatchOrder(env,session,current);return current;}
    if(await readMatchTask(env,await cancelKey(env,session,input.id)))throw taskError('AI_AGENT_CANCELLED');
    const task={...input,generation:0,started_at:Date.now(),renewed_at:Date.now()};
+   await bindPaidMatchOrder(env,session,task);
    await saveMatchTask(env,slot,task);
    return task;
   }
   if(action==='cancel'){
    // Explicit cancellation also fences a start that has not arrived yet.
    await saveMatchTask(env,await cancelKey(env,session,input.id),{cancelled:true});
-   if(current?.id===input.id)await saveMatchTask(env,slot,{closed:true});
+   if(current?.id===input.id){await closePaidMatchBinding(env,session,current);await saveMatchTask(env,slot,{closed:true});}
    return null;
   }
   if(!current||current.id!==input.id||current.generation!==input.generation){
@@ -42,10 +44,12 @@ export async function updateSessionTask(env,session,action,input){
   if(action==='close'){
    // An encrypted tombstone does not contain the input CV. Late workers
    // cannot recreate the session slot; only an explicit start can do so.
+   await closePaidMatchBinding(env,session,current);
    await saveMatchTask(env,slot,{closed:true});
    return null;
   }
   if(action==='continue'){
+   await assertPaidMatchOrder(env,session,current);
    const saved=await readMatchTask(env,await researchTaskKey(env,session,current));
    if(saved?.generation!==current.generation||saved?.result?.status!=='COMPLETE'||!saved.result.can_continue||!saved.checkpoint)throw taskError('AI_CHECKPOINT_INVALID');
    const next={...current,generation:current.generation+1,renewed_at:Date.now()};
@@ -62,6 +66,7 @@ export async function assertSessionTaskActive(env,session,id,generation){
  if(!sessionValid(row,Date.now())||row.phone!==session.phone)throw taskError('AI_AGENT_CANCELLED',401);
  const task=await getSessionTask(env,session);
  if(!task||task.id!==id||task.generation!==generation)throw taskError('AI_AGENT_CANCELLED');
+ await assertPaidMatchOrder(env,session,task);
  return task;
 }
 

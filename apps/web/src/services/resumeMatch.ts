@@ -108,6 +108,8 @@ export const MATCH_TASK_SIGNAL='hhba:v4:session-task-signal';
 const LIMIT=12*1024*1024;
 export const resumeMatchFileLimit=(format:string|null)=>MATCH_V4_PREVIEW&&format==='pdf'?PDF_PAGE_OCR_MAX_BYTES:LIMIT;
 const errorMap:Record<string,string>={
+  AI_MATCH_PAYMENT_REQUIRED:'智能匹配需要已到账并绑定本次任务的支付订单。请确认订单状态。',
+  AI_MATCH_PAYMENT_UNAVAILABLE:'支付授权暂时无法确认，请勿重复付款。',
   AI_BACKGROUND_SCHEDULE_UNAVAILABLE:'独立后台调度暂时不可用，已保留原研究任务。',
   AI_AGENT_CANCELLED:'该研究任务已经终止或当前会话已失效。',
   AI_CHECKPOINT_INVALID:'原研究任务状态已变化，请重新查看任务。',
@@ -181,12 +183,13 @@ function session(){
  if(!token)throw new MatchError(401,'请先登录求职者账号，再使用 AI 匹配。');
  return token;
 }
-export async function matchServiceReady(signal?:AbortSignal):Promise<boolean>{
+export async function matchServiceReady(signal?:AbortSignal,onPaymentRequired?:(required:boolean)=>void):Promise<boolean>{
  if(!realAuthReady)return false;
  try{
   const response=await fetch(EFFECTIVE_API+'/status',{method:'GET',credentials:'same-origin',cache:'no-store',signal});
   if(!response.ok||!(response.headers.get('content-type')||'').includes('json'))return false;
-  const data=await response.json() as {kind?:string;enabled?:boolean};
+  const data=await response.json() as {kind?:string;enabled?:boolean;payment_required?:boolean};
+  onPaymentRequired?.(data.payment_required===true);
   return data.kind==='HHBA_NATIVE_WEB_MATCH_V1'&&data.enabled===true;
  }catch{return false}
 }
@@ -300,9 +303,9 @@ async function sessionTaskRequest(body?:Record<string,unknown>,signal?:AbortSign
  }
 }
 export const readSessionMatchTask=(signal?:AbortSignal)=>sessionTaskRequest(undefined,signal);
-export async function beginSessionMatchTask(text:string,opts:MatchOptions,resumeId:string|undefined,signal:AbortSignal,id:string=crypto.randomUUID()){
+export async function beginSessionMatchTask(text:string,opts:MatchOptions,resumeId:string|undefined,signal:AbortSignal,id:string=crypto.randomUUID(),paymentOrderId?:string){
  if(!MATCH_V4_PREVIEW)return null;
- const task=await sessionTaskRequest({action:'start',task_id:id,text:redactResumeTextLocally(text),
+ const task=await sessionTaskRequest({action:'start',task_id:id,...(paymentOrderId?{payment_order_id:paymentOrderId}:{}),text:redactResumeTextLocally(text),
   options:{country:'CN',role_hint:opts.role_hint},resume_id:resumeId||null,consent:true,recovery_consent:true},signal);
  if(!task)throw new MatchError(503,'无法建立可恢复的研究任务。');
  announceMatchTask();return {task,attached:task.id!==id};
