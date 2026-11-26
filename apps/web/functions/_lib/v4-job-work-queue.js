@@ -60,7 +60,7 @@ export async function reconcileV4JobWork(db,taskKey,generation,checkpoint,{now=D
  const selected=updates.slice(0,changes);
  const deletions=stale.slice(0,Math.max(0,changes-selected.length));
  const queries=[...selected.map(r=>db.prepare(UPSERT).bind(taskKey,generation,r.lane,r.job_key,r.revision,r.state,now,now)),
-   ...deletions.map(r=>db.prepare('DELETE FROM hhba_v4_job_work_queue WHERE task_key=? AND generation=? AND lane=? AND job_key=? AND state!=?').bind(taskKey,generation,r.lane,r.job_key,'LEASED'))];
+   ...deletions.map(r=>db.prepare('DELETE FROM hhba_v4_job_work_queue WHERE task_key=? AND generation=? AND lane=? AND job_key=? AND (state!=? OR lease_until_ms<=?)').bind(taskKey,generation,r.lane,r.job_key,'LEASED',now))];
  if(queries.length)await db.batch(queries);
  return {available:true,work:desired.length,createdOrUpdated:selected.length,invalidated:deletions.length,remaining:Math.max(0,updates.length+stale.length-queries.length)};
 }
