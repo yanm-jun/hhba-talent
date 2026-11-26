@@ -106,20 +106,20 @@ export function eligibleCuratedScore(job){
 
 // The model must order every eligible candidate exactly once. No model-created
 // job or unverified candidate can enter the recommendation list.
-export function validateGeminiGlobalOrder(value,jobs){
+export function validateGlobalOrder(value,jobs){
  const ids=new Set(jobs.map(j=>j.official_url));
  const urls=value?.ordered_urls;
  if(!Array.isArray(urls)||urls.length!==ids.size||new Set(urls).size!==ids.size||urls.some(u=>!ids.has(u)))return null;
  return urls;
 }
-export function applyGeminiGlobalOrder(jobs,order){
+export function applyGlobalOrder(jobs,order){
  const positions=new Map((order||[]).map((u,i)=>[u,i]));
  return [...jobs].sort((a,b)=>(positions.get(a.official_url)??Infinity)-(positions.get(b.official_url)??Infinity)||(b.match_score??-1)-(a.match_score??-1)||a.official_url.localeCompare(b.official_url));
 }
 
 // Accept durable rank progress without inventing IDs or losing earlier work.
 // Compact IDs are scoped to the exact pool snapshot, never used as public URLs.
-export function mergeGeminiRankProgress(value,prior,ids){
+export function mergeGlobalRankProgress(value,prior,ids){
  const allowed=new Set(ids),old=new Set(prior);
  const proposed=value?.ordered_ids;
  if(Array.isArray(proposed)&&proposed.length===new Set(proposed).size&&proposed.every(id=>allowed.has(id))&&prior.every(id=>proposed.includes(id))&&proposed.length>prior.length)return proposed;
@@ -133,7 +133,7 @@ export function mergeGeminiRankProgress(value,prior,ids){
  return next;
 }
 
-export function carryGeminiRankProgress(order,oldRevisions,pool,revisions){
+export function carryGlobalRankProgress(order,oldRevisions,pool,revisions){
  const old=new Map(oldRevisions||[]),current=new Map(revisions),ids=new Map(pool.map(j=>[j.url,j.id]));
  return [...new Set(order||[])].filter(url=>ids.has(url)&&old.has(url)&&old.get(url)===current.get(url)).map(url=>ids.get(url));
 }

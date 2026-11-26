@@ -102,7 +102,8 @@ const MATCH_V4_PREVIEW=typeof window!=='undefined'&&
   window.location.hostname!=='hhba-talent.pages.dev'||
   window.location.hostname==='hhba.work'||
   window.location.hostname==='www.hhba.work');
-const EFFECTIVE_API=MATCH_V4_PREVIEW?'/api/match-v4':API;
+// Normal matching never falls back to the retired CV engine, including unapproved hosts.
+const EFFECTIVE_API='/api/match-v4';
 export const sessionMatchRecoveryAvailable=MATCH_V4_PREVIEW;
 export const MATCH_TASK_SIGNAL='hhba:v4:session-task-signal';
 const LEGACY_SEARCH_API='/api/match'; // Independent non-CV job discovery stays unchanged.

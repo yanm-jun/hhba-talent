@@ -1,5 +1,5 @@
 import test from 'node:test';
-import './v4-gemini-job-provider.test.mjs';
+import './v4-shared-capabilities.test.mjs';
 import assert from 'node:assert/strict';
 import {v4Provider,v4Call,v4ParseJson,v4GroundProfile,v4ToolSources,v4Sources,
  v4Match} from '../functions/_lib/simple-match-v4.js';
