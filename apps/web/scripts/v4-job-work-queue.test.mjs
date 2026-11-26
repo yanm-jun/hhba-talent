@@ -39,8 +39,8 @@ test('D1 job claims are atomic, generation fenced and expire for safe automatic 
  assert.equal(await finishV4JobWork(db,{...claim,owner:'other'},{now:1300}),false);
  assert.equal(await renewV4JobWork(db,claim,{now:1400,leaseMs:15000}),true);
  assert.equal(await claimV4JobWork(db,taskKey,1,'verification',{now:1600}),null);
- assert.equal(await claimV4JobWork(db,taskKey,0,'verification',{now:16401,owner:'owner-C'}),null);
- const recovered=await claimV4JobWork(db,taskKey,0,'verification',{now:16402,owner:'owner-C'});
+ assert.equal(await claimV4JobWork(db,taskKey,0,'verification',{now:16399,owner:'owner-C'}),null);
+ const recovered=await claimV4JobWork(db,taskKey,0,'verification',{now:16401,owner:'owner-C'});
  assert.ok(recovered);assert.equal(recovered.attempts,2);
  assert.equal(await finishV4JobWork(db,claim,{now:16403}),false);
  assert.equal(await finishV4JobWork(db,recovered,{now:16404}),true);
