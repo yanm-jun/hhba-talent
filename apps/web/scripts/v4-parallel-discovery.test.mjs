@@ -1510,7 +1510,7 @@ test('dedicated delivery continuation completes a discovered job before another 
 });
 
 test('live search source and commercial exclusion counts are published before any candidate object or terminal response', {timeout:5000},async()=>{
- const a=job(7650),p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test',stream:true'};
+ const a=job(7650),p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test',stream:true};
  let controller,release,finished=false;const received=new Promise(r=>{release=r;});const stats=[];
  const stream=new ReadableStream({start(c){controller=c;}}),send=e=>controller.enqueue(new TextEncoder().encode('data: '+JSON.stringify(e)+'\n\n'));
  const run=v4Match(async()=>new Response(stream,{headers:{'content-type':'text/event-stream'}}),p,resume,'全国',{
