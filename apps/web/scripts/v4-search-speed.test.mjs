@@ -88,7 +88,7 @@ test('the production matching route owns the actual milestone publication and pr
  const simple=readFileSync(new URL('../functions/_lib/simple-match-v4.js',import.meta.url),'utf8');
  const html=readFileSync(new URL('../../admin-preview/index.html',import.meta.url),'utf8');
  assert.match(route,/const searchSpeed=createV4SearchSpeedTracker\(/);
- assert.match(route,/searchSpeed:searchSpeed\.snapshot\(\)/);
+ assert.match(route,/search_speed:searchSpeed\.snapshot\(\)/);
  assert.match(route,/searchSpeed\.observe\(/);
  assert.match(route,/await recordV4SearchSpeed\(/);
  assert.match(api,/await verifyAdmin\(request,env\)/);
