@@ -1508,3 +1508,20 @@ test('dedicated delivery continuation completes a discovered job before another 
  assert.equal(result.checkpoint.rows.length,2);assert.equal(result.checkpoint.priorState.matches.find(j=>j.official_url===a.url).report_status,'COMPLETE');
  assert.deepEqual(result.checkpoint.processedEarlier,[a.url]);
 });
+
+test('live search source and commercial exclusion counts are published before any candidate object or terminal response', {timeout:5000},async()=>{
+ const a=job(7650),p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test',stream:true'};
+ let controller,release,finished=false;const received=new Promise(r=>{release=r;});const stats=[];
+ const stream=new ReadableStream({start(c){controller=c;}}),send=e=>controller.enqueue(new TextEncoder().encode('data: '+JSON.stringify(e)+'\n\n'));
+ const run=v4Match(async()=>new Response(stream,{headers:{'content-type':'text/event-stream'}}),p,resume,'全国',{
+  curated:true,officialOnly:true,stepMode:true,parallelResearch:false,checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles}},
+  onDiscoveryStats:s=>{stats.push(s);if(s.search_source_count===2&&s.excluded_count===1)release();}});
+ let timeout;try{
+  const tool={type:'web_search_call',action:{sources:[{url:a.url},{url:'https://www.zhipin.com/job_detail/a.html'},{url:a.url+'?utm_source=repeat'}]}};
+  send({type:'response.output_item.done',item:tool});
+  await Promise.race([received,new Promise((_,reject)=>{timeout=setTimeout(()=>reject(Error('source counts waited for model completion')),1500);})]);
+  assert.equal(finished,false);assert.equal(stats.at(-1).discovered,0);assert.equal(stats.at(-1).search_source_count,2);
+  finished=true;send({type:'response.completed',response:{status:'completed',output:[tool,{type:'message',content:[{type:'output_text',text:JSON.stringify({jobs:[a],research_complete:false})}]}]}});
+  const result=await run;assert.equal(result.checkpoint.observedSearchSources.length,2);assert.equal(result.checkpoint.rejectedBoards.length,1);
+ }finally{clearTimeout(timeout);try{controller.close();}catch{}await run.catch(()=>{});}
+});

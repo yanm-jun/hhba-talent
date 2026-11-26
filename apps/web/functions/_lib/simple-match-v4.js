@@ -66,7 +66,7 @@ export function v4ParseJson(response){
 // Native Responses SSE support is opt-in until the configured relay has
 // demonstrated a complete stream. Never forward model reasoning or CV text.
 export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{},onDiscoveryJob,onDiscoverySource,timing}={}){
- const observer=typeof onDiscoveryJob==='function'||typeof onDiscoverySource==='function'?createV4DiscoveryJobObserver((job,meta)=>{timing?.observe('first_candidate');onDiscoveryJob?.(job,meta);},(url,meta)=>{timing?.observe('first_source');onDiscoverySource?.(url,meta);}):null;
+ const observer=typeof onDiscoveryJob==='function'||typeof onDiscoverySource==='function'?createV4DiscoveryJobObserver((job,meta)=>{timing?.observe('first_candidate');onDiscoveryJob?.(job,meta);},(url,meta)=>{timing?.observe('first_source');onDiscoverySource?.(url,meta);},(url,meta)=>onDiscoverySource?.(url,meta)):null;
  if(!(response.headers.get('content-type')||'').includes('text/event-stream')){
   const data=await response.json();if(!signal?.aborted)observer?.response(data);timing?.observe('terminal');return data;
  }
@@ -116,7 +116,7 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent,onDiscover
  const timing=provider.deliveryTelemetry?.provider(stage);
  if(prior){
   timing?.observe('replay');timing?.finish('replayed');
-  if(stage==='discovery'&&(typeof onDiscoveryJob==='function'||typeof onDiscoverySource==='function')&&!signal?.aborted)createV4DiscoveryJobObserver(onDiscoveryJob,onDiscoverySource).response(prior);
+  if(stage==='discovery'&&(typeof onDiscoveryJob==='function'||typeof onDiscoverySource==='function')&&!signal?.aborted)createV4DiscoveryJobObserver(onDiscoveryJob,onDiscoverySource,onDiscoverySource).response(prior);
   return prior;
  }
  const callStarted=Date.now();let failure;
@@ -665,7 +665,7 @@ export function renderCandidatePreview(job,url,resume,toolLinked,index,toolUrls)
  * even if a later round or optional verification has an upstream failure.
  */
 export async function v4Match(fetcher,provider,resume,roleHint,
- {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},onResearch=()=>{},onDiscoveryCandidate,deferDiscoverySnapshots=false,officialOnly=false,curated=false,env={},excludeUrls=[],checkpoint=null,stepMode=false,onRecoveryState=()=>{},allowContinue=false,parallelResearch=false,pipelineChild=false,resourceBudget=null,profileCache=null}={}){
+ {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},onResearch=()=>{},onDiscoveryCandidate,onDiscoveryStats,deferDiscoverySnapshots=false,officialOnly=false,curated=false,env={},excludeUrls=[],checkpoint=null,stepMode=false,onRecoveryState=()=>{},allowContinue=false,parallelResearch=false,pipelineChild=false,resourceBudget=null,profileCache=null}={}){
  // The deployed curated V4 route exposes the full model-neutral research protocol.
  // Legacy direct consumers without the V4 activation flag retain their compatibility behavior.
  const fullResearch=curated&&env.HHBA_MATCH_V4_READY==='1';
@@ -696,7 +696,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // The real route uses durable checkpoints; the direct invocation path uses the same batches.
  if(curated&&!stepMode){
   let current=checkpoint,result;
-  do{result=await v4Match(fetcher,provider,resume,roleHint,{signal,onProgress,onActivity,onPartial,onResearch,onDiscoveryCandidate,deferDiscoverySnapshots,officialOnly:true,curated:true,env,excludeUrls,checkpoint:current,stepMode:true,onRecoveryState,allowContinue,parallelResearch,resourceBudget,profileCache});current=result.checkpoint;}while(result.status==='CONTINUE');
+  do{result=await v4Match(fetcher,provider,resume,roleHint,{signal,onProgress,onActivity,onPartial,onResearch,onDiscoveryCandidate,onDiscoveryStats,deferDiscoverySnapshots,officialOnly:true,curated:true,env,excludeUrls,checkpoint:current,stepMode:true,onRecoveryState,allowContinue,parallelResearch,resourceBudget,profileCache});current=result.checkpoint;}while(result.status==='CONTINUE');
   return result;
  }
  // Managed production searches receive new candidates while the provider is
@@ -736,7 +736,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   let discovered,discoveryFailure;
   try{
    discovered=await v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:search,onProgress,onActivity,onResearch,
-    deferDiscoverySnapshots,onRecoveryState:get=>{searchRecovery=get;coordinator.wake();},
+    deferDiscoverySnapshots,onDiscoveryStats,onRecoveryState:get=>{searchRecovery=get;coordinator.wake();},
     onDiscoveryCandidate:(event,meta)=>{onDiscoveryCandidate?.(event,meta);coordinator.wake();},
     onPartial:()=>{publishMerged(coordinator.snapshot());coordinator.wake();}});
    searchRecovery=()=>discovered.checkpoint;
@@ -794,7 +794,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      next.pipelineActive=true;const vs=verifyRecovery();if(vs?.managedVerification)next.managedVerification=vs.managedVerification;return next;
     });
    const [discovery,verified]=await Promise.allSettled([
-    v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:search,onProgress,onActivity,onPartial:publishLivePipeline,onResearch,onDiscoveryCandidate,deferDiscoverySnapshots,onRecoveryState:get=>{searchRecovery=get;}}).then(value=>{searchRecovery=()=>value.checkpoint;return value;}),
+    v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:search,onProgress,onActivity,onPartial:publishLivePipeline,onResearch,onDiscoveryCandidate,onDiscoveryStats,deferDiscoverySnapshots,onRecoveryState:get=>{searchRecovery=get;}}).then(value=>{searchRecovery=()=>value.checkpoint;return value;}),
     v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:verify,onActivity:(_stage,message)=>onActivity('searching',message),onPartial:publishLivePipeline,onRecoveryState:get=>{verifyRecovery=get;}}).then(value=>{verifyRecovery=()=>value.checkpoint;verifyFinished=true;return value;})
    ]);
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
@@ -832,7 +832,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  let lastSignature=checkpoint?.lastSignature||'';
  let stalledStrategy=checkpoint?.stalledStrategy||'',providerRecovery=checkpoint?.providerRecovery||'';
  const rejectedBoards=new Set(checkpoint?.rejectedBoards||[]),rounds=checkpoint?.rounds||[];
- const report=()=>({profile,rounds:[...rounds],excluded_count:rejectedBoards.size,discovered:rows.size,...(curated?{candidate_target:CANDIDATE_TARGET,final_target:FINAL_TARGET,concrete_count:concreteCount(),completion_reason:completionReason,unresolved_source_count:[...sourceLeads].filter(u=>!rows.has(u)&&!reviewedSources.has(u)&&!rejectedBoards.has(u)&&!excluded.has(u)).length,diagnostics:{...diag}}: {})});
+ const observedSearchSources=new Set(checkpoint?.observedSearchSources||[]);
+ const report=()=>({profile,rounds:[...rounds],excluded_count:rejectedBoards.size,discovered:rows.size,search_source_count:observedSearchSources.size,...(curated?{candidate_target:CANDIDATE_TARGET,final_target:FINAL_TARGET,concrete_count:concreteCount(),completion_reason:completionReason,unresolved_source_count:[...sourceLeads].filter(u=>!rows.has(u)&&!reviewedSources.has(u)&&!rejectedBoards.has(u)&&!excluded.has(u)).length,diagnostics:{...diag}}: {})});
  const concreteCount=()=>[...rows.values()].filter(concreteCandidate).length;
  const diag={...(checkpoint?.diagnostics||{})};
  const stalledSearches=new Set(checkpoint?.stalledSearches||[]),reviewedStalls=new Set(checkpoint?.reviewedStalls||[]);
@@ -866,7 +867,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  let completionReason=checkpoint?.completionReason||'';
  const note=code=>{diag[code]=(diag[code]||0)+1;};
  const publishResearch=()=>onResearch(report());
- const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,verificationReads:reusableReads(rows),rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],stallSourceReads:[...stallSourceReads],researchToolResult,researchNotes,researchDigest,candidateResearchMemory:jobMemory.snapshot(),researchContextBudget,researchContext,memoryCursors,liveDeliveryTurn:checkpoint?.liveDeliveryTurn,discoveryWidth,discoveryElapsed,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,verificationDeferred:checkpoint?.verificationDeferred||[],pipelineActive:!!checkpoint?.pipelineActive,pipelineVerificationWidth:checkpoint?.pipelineVerificationWidth,pipelineVerificationCost:checkpoint?.pipelineVerificationCost,managedVerification:checkpoint?.managedVerification,managedReport:checkpoint?.managedReport,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],scoreRecoveryKeys:checkpoint?.scoreRecoveryKeys||[],scoreRecoveryModes:checkpoint?.scoreRecoveryModes||[],globalOrder:checkpoint?.globalOrder||null,globalRankState:checkpoint?.globalRankState||null,globalRankError:checkpoint?.globalRankError||null,...extra}});
+ const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,verificationReads:reusableReads(rows),rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],observedSearchSources:[...observedSearchSources],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],stallSourceReads:[...stallSourceReads],researchToolResult,researchNotes,researchDigest,candidateResearchMemory:jobMemory.snapshot(),researchContextBudget,researchContext,memoryCursors,liveDeliveryTurn:checkpoint?.liveDeliveryTurn,discoveryWidth,discoveryElapsed,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,verificationDeferred:checkpoint?.verificationDeferred||[],pipelineActive:!!checkpoint?.pipelineActive,pipelineVerificationWidth:checkpoint?.pipelineVerificationWidth,pipelineVerificationCost:checkpoint?.pipelineVerificationCost,managedVerification:checkpoint?.managedVerification,managedReport:checkpoint?.managedReport,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],scoreRecoveryKeys:checkpoint?.scoreRecoveryKeys||[],scoreRecoveryModes:checkpoint?.scoreRecoveryModes||[],globalOrder:checkpoint?.globalOrder||null,globalRankState:checkpoint?.globalRankState||null,globalRankError:checkpoint?.globalRankError||null,...extra}});
  onRecoveryState(()=>checkpoint?{...checkpoint,publicEvidence,researchNotes,researchDigest,candidateResearchMemory:jobMemory.snapshot()}:null);
  const generateCompleteReport=async(job,reportFetcher,{early=false,onDone=()=>{},onFailure=()=>{}}={})=>{
    onActivity('writing',early?'已核验岗位正在生成完整匹配报告，最终排名仍待全量研究。':'正在按全局排名生成完整深度报告。');
@@ -1169,7 +1170,12 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    }catch{/* unread, ambiguous and deferred citations remain ordinary source leads */}
   },{signal,canStart:spareCitationRead}):null;
   const acceptStreamSource=(url,meta)=>{
-   if(!curated||signal?.aborted||meta?.source==='terminal'||!acceptedLiveUrl(url)||streamSources.has(url))return;
+   if(!curated||signal?.aborted)return;
+   const fresh=!observedSearchSources.has(url);observedSearchSources.add(url);
+   const commercial=meta?.excluded===true||isCommercialRecruitmentBoard(url);
+   const newExcluded=commercial&&!rejectedBoards.has(url);if(commercial)rejectedBoards.add(url);
+   if(fresh||newExcluded){const stats={search_source_count:observedSearchSources.size,excluded_count:rejectedBoards.size,discovered:liveKeys.size};if(onDiscoveryStats)onDiscoveryStats(stats);else onResearch({...report(),...stats});}
+   if(commercial||meta?.source==='terminal'||!acceptedLiveUrl(url)||streamSources.has(url))return;
    streamSources.add(url);earlySources.add(url);earlyToolUrls.add(url);
    // Citation URLs are evidence leads, not vacancies; do not increment job counts.
    note('LIVE_PUBLIC_SOURCE_RECEIVED');
@@ -1197,7 +1203,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      +'公司名与岗位名保留原招聘页面实际用语，不用自行翻译或拼接名称替代原文；优先返回可直接打开的单个职位详情网址（含岗位编号时保留编号），以及可查证的雇主归属路径，而不是集团招聘首页。' 
      +'为每个岗位如实填写 source_kind（employer_official、employer_authorized_ats、official_public_notice、unknown、third_party_board）和 site_name。不能确认的标记 unknown。'
      +'若官方招聘系统与企业域名不同，请自主查找能证明该岗位归属的真实公开链接路径，可提供直接证明 employer_proof_url 或逐级授权链接 employer_proof_urls。没有证据时留空。不要虚构职位、公司、地点、薪资、网址和能力。'
-     +'每轮返回一个有效 JSON 对象：'
+     +'每轮返回一个有效 JSON 对象：优先在 jobs 中逐条输出已完成的具体岗位对象，再输出其他研究字段；不需要等所有岗位研究完成才开始输出已取得的候选。'
      +'research_complete（布尔值：仍然值得联网继续查找时必须为 false；'
      +'研究充分或继续查找没有实际价值时才为 true），'
      +'profile:{summary,roles,skills:[{name,evidence}],facts:[{kind,quote}],'
@@ -1412,6 +1418,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   const cites=v4ToolSources(response);
   for(const rawUrl of cites){
    const url=curated?curatedUrl(rawUrl):rawUrl;
+   if(curated&&url)observedSearchSources.add(url);
    if(isCommercialRecruitmentBoard(url)||rejectedBoards.has(url)){rejectedBoards.add(url);continue;}
    if(excluded.has(url))continue;
    if(!curated||rows.has(url))toolUrls.add(url);

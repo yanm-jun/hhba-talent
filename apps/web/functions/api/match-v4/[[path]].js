@@ -115,7 +115,8 @@ function events(env,request,input,waitUntil){
    });
    const queueProgress=kind=>publisher.queue(kind);
    const stopProgress=()=>publisher.stop();
-   const sendResearch=r=>{if(r){lastReport={...r,discovered:Math.max(r.discovered||0,lastJobs.length),excluded_count:Math.max(r.excluded_count||0,lastReport?.excluded_count||0)};send('research_report',lastReport);queueProgress();}};
+   const sendResearch=r=>{if(r){lastReport={...r,discovered:Math.max(r.discovered||0,lastJobs.length,lastReport?.discovered||0),excluded_count:Math.max(r.excluded_count||0,lastReport?.excluded_count||0),search_source_count:Math.max(r.search_source_count||0,lastReport?.search_source_count||0)};send('research_report',lastReport);queueProgress();}};
+   const rememberDiscoveryStats=stats=>{if(!lastReport)return;lastReport={...lastReport,discovered:Math.max(lastReport.discovered||0,stats.discovered||0),excluded_count:Math.max(lastReport.excluded_count||0,stats.excluded_count||0),search_source_count:Math.max(lastReport.search_source_count||0,stats.search_source_count||0)};if(!input.background)send('research_report',lastReport);queueProgress('candidate');};
    const reportSignature=jobs=>JSON.stringify(jobs.filter(officialJob).map(j=>[j.official_url,j.match_score,j.jd_sha256,j.research_detail,j.reference_jd]));
    let lastReportSignature=reportSignature(lastJobs);
    const researchEvidence=j=>officialJob(j)||!!(j.evidence_excerpt||j.reference_jd||j.jd_research?.facts?.length||j.jd_research?.inference||j.reference_vacancy_verified||j.jd_source_status==='VERIFIED_JD'||Number.isInteger(j.match_score));
@@ -214,7 +215,7 @@ function events(env,request,input,waitUntil){
       const result=await v4Match(budget?budget.fetch(fetch):fetch,provider,input.text,input.role_hint,{
       signal:executionSignal,onProgress:progress,onActivity:activity,env:researchEnv,resourceBudget:budget,profileCache,excludeUrls:input.excludeUrls,
       stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,parallelResearch:v4ParallelResearchEnabled(env),allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
-      onResearch:sendResearch,
+      onResearch:sendResearch,onDiscoveryStats:rememberDiscoveryStats,
       // Managed background publication is compact and coalesced; direct SSE
       // retains the existing complete research callbacks.
       deferDiscoverySnapshots:!!input.background,onDiscoveryCandidate:rememberDiscovery,

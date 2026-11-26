@@ -120,7 +120,7 @@ export function normalizeV4StreamCandidate(raw){
 // One observer per discovery response, with independent JSON framing for
 // interleaved Responses output/content indexes and shared canonical URL
 // deduplication. Final text is a reconciliation path, not a second emission.
-export function createV4DiscoveryJobObserver(onCandidate=()=>{},onSource=()=>{}){
+export function createV4DiscoveryJobObserver(onCandidate=()=>{},onSource=()=>{},onRejectedSource=()=>{}){
  const seen=new Set(),channels=new Map(),sources=new Set();
  const accept=(raw,source)=>{
   const job=normalizeV4StreamCandidate(raw);
@@ -130,10 +130,11 @@ export function createV4DiscoveryJobObserver(onCandidate=()=>{},onSource=()=>{})
  };
  const acceptSource=(value,source)=>{
   const url=v4PublicJobUrl(value);
-  if(!url||isCommercialRecruitmentBoard(url))return;
+  if(!url)return;
   const key=curatedUrl(url);
   if(sources.has(key))return;
   sources.add(key);
+  if(isCommercialRecruitmentBoard(url)){try{onRejectedSource(key,{source,excluded:true});}catch{}return;}
   // A web citation is an evidence lead, not a discovered vacancy.
   try{onSource(key,{source});}catch{}
  };
