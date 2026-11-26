@@ -14,6 +14,7 @@ on:
       - "apps/web/scripts/metrics-contract.test.mjs"
       - "apps/web/scripts/v4-stage-ops-metrics.test.mjs"
       - "apps/web/d1/20261126_v4_phase_ops_daily.sql"
+      - "apps/web/d1/20261126_v4_phase_ops_resources.sql"
       - "apps/web/scripts/admin-access-audiences.test.mjs"
       - "apps/web/scripts/admin-original-dashboard.contract.test.mjs"
       - "apps/admin-preview/**"
@@ -41,10 +42,12 @@ jobs:
           db.executescript(Path('apps/web/d1/0003_cloudflare_metrics.sql').read_text())
           db.executescript(Path('apps/web/d1/20261125_ai_usage_daily.sql').read_text())
           db.executescript(Path('apps/web/d1/20261126_v4_phase_ops_daily.sql').read_text())
+          db.executescript(Path('apps/web/d1/20261126_v4_phase_ops_resources.sql').read_text())
           tables={x[0] for x in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
           assert {'hhba_metrics_metadata','hhba_traffic_events','hhba_device_saved','hhba_device_save_events'}<=tables
           assert 'hhba_ai_usage_daily' in tables
           assert 'hhba_v4_phase_ops_daily' in tables
+          assert 'resource_samples' in {r[1] for r in db.execute('PRAGMA table_info(hhba_v4_phase_ops_daily)')}
           assert 'hhba_auth_users' not in tables
           print('HHBA_CLOUDFLARE_METRICS_SCHEMA_OK')
           PY
