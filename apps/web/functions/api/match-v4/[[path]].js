@@ -459,7 +459,18 @@ export async function onRequest(context){
   const text=action==='start'?sanitize(body.text):null;
   if(action==='start'&&!text)return fail('INVALID_RESUME_TEXT',400);
   const entry=action==='start'?{id:body.task_id,text,role:typeof body.options.role_hint==='string'?body.options.role_hint.trim():'',excludeUrls:[],resume_id:body.resume_id||null}:{id:body.task_id,generation:body.generation};
-  try{const task=await updateSessionTask(env,session,action,entry);const background_scheduled=await tryScheduleBackgroundMatch(env,request,session,task);return reply({ok:true,task,background_scheduled});}catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
+  try{
+   const previous=action==='close'||action==='cancel'?await getSessionTask(env,session).catch(()=>null):null;
+   const task=await updateSessionTask(env,session,action,entry);
+   if(previous&&previous.id===entry.id&&previous.generation===entry.generation){
+    const ticket=await matchTaskKey(env,session.phone,previous.id,{scope:'workflow-ticket-v1',session_hash:session.token_hash,generation:previous.generation});
+    // Invalidated session task is the authority; this best-effort wake
+    // simply lets sleeping stage Workflows exit without doing AI work.
+    await stageWorkflowSignal(env,ticket,{finish:true}).catch(()=>false);
+   }
+   const background_scheduled=await tryScheduleBackgroundMatch(env,request,session,task);
+   return reply({ok:true,task,background_scheduled});
+  }catch(e){return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
  }
  if(!matchEnabled(env,request))return fail('AI_PROVIDER_NOT_CONFIGURED',503);
  // The third-party relay is not OpenAI or Google official infrastructure.

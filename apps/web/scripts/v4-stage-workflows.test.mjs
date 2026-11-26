@@ -40,3 +40,11 @@ test('fallback driver retains authorized task cleanup without adding an AI provi
  assert.match(runner,/staged_fallback:true/);
  assert.match(runner,/stagedFallback:stagedOrigin&&!currentLane/);
 });
+
+test('explicit user cancel/close finishes sleeping stages after invalidating their current generation',()=>{
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ assert.match(route,/const previous=action==='close'\|\|action==='cancel'\?/);
+ assert.match(route,/previous\.id===entry\.id&&previous\.generation===entry\.generation/);
+ assert.match(route,/const task=await updateSessionTask\(env,session,action,entry\)/);
+ assert.match(route,/await stageWorkflowSignal\(env,ticket,\{finish:true\}\)/);
+});
