@@ -159,6 +159,16 @@ test('V4 recovers only the same-relay historical OpenAI credential',()=>{
  assert.equal(v4Provider({HHBA_MATCH_OPENAI_API_KEY:'short'}),null);
 });
 
+test('V4 checkpoint recovery prefers a valid existing key and does not rotate either binding',async()=>{
+ const {v4CheckpointSecret,checkpointStorageReady}=await import('../functions/_lib/v4-match-checkpoint-storage.js');
+ const legacy='synthetic-existing-resume-checkpoint-secret';
+ const primary='synthetic-existing-match-checkpoint-secret';
+ assert.equal(v4CheckpointSecret({HHBA_MATCH_V4_CHECKPOINT_SECRET:'invalid',HHBA_RESUME_AGENT_CHECKPOINT_SECRET:legacy}),legacy);
+ assert.equal(v4CheckpointSecret({HHBA_MATCH_V4_CHECKPOINT_SECRET:primary,HHBA_RESUME_AGENT_CHECKPOINT_SECRET:legacy}),primary);
+ assert.equal(v4CheckpointSecret({HHBA_MATCH_V4_CHECKPOINT_SECRET:'short'}),undefined);
+ assert.equal(checkpointStorageReady({HHBA_MATCH_V4_CHECKPOINT_SECRET:'short',HHBA_RESUME_AGENT_CHECKPOINT_SECRET:legacy,HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',HHBA_PRIVATE_RESUMES:{get(){},put(){}}}),true);
+});
+
 test('V4 readiness distinguishes runtime configuration failures without exposing secrets',async()=>{
  const env={HHBA_AGENT_RELAY_API_KEY:key,HHBA_MATCH_V4_READY:'1',HHBA_MATCH_V4_CHECKPOINT_SECRET:'synthetic-key-for-readiness-tests-only',HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',HHBA_PNVS_AUTH_DB:{prepare(){}},HHBA_PRIVATE_RESUMES:{get(){},put(){}}};
  const read=async e=>(await onRequest({request:new Request('https://hhba.work/api/match-v4/status'),env:e})).json();
