@@ -16,18 +16,12 @@
 import {runJdLifecycleMaintenance,JD_MAINTENANCE_KIND}
  from '../functions/_lib/jd-lifecycle-maintenance.js';
 
-import {runPublicJdCatalog,PUBLIC_CATALOG_CRON} from '../functions/_lib/v4-public-jd-catalog.js';
 const DAILY='0 2 * * *';
 export default {
  async fetch(){
   return new Response('Not Found',{status:404,headers:{'Cache-Control':'no-store'}});
  },
  async scheduled(event,env){
-  if(event.cron===PUBLIC_CATALOG_CRON){
-   try{const result=await runPublicJdCatalog(env,{now:new Date(event.scheduledTime)});console.log('HHBA_PUBLIC_JD_CATALOG_V1',JSON.stringify(result));}
-   catch{console.error('HHBA_PUBLIC_JD_CATALOG_FAILED');}
-   return;
-  }
   if(event.cron!==DAILY||env?.HHBA_JD_MAINTENANCE_ENABLED!=='1'){
    console.log('HHBA_JD_MAINTENANCE_DISABLED');return;
   }

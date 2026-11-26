@@ -864,3 +864,39 @@ test('catalog collector rotates public entries, archives actual same-origin JD a
  const live=await v4ReadEmployerJob(j.url,{now,expected:j,cacheBucket:bucket,onCache:code=>notes.push(code),fetcher:async(u,opts)=>{assert.equal(opts.headers['If-None-Match'],'"catalog-v1"');conditional++;return new Response(null,{status:304,headers:{etag:'"catalog-v1"'}});}});
  assert.equal(conditional,1);assert.ok(live.full_jd);assert.ok(notes.includes('JD_PUBLIC_CONDITIONAL_HIT'));
 });
+
+test('public reference assets persist only public material and expire on time or changed vacancy identity',async()=>{
+ const {publicVacancyIdentity,normalizePublicReference,savePublicReferenceAsset,readPublicReferenceAsset}=await import('../functions/_lib/v4-public-job-assets.js');
+ const j=job(6101),jd={...j,canonical_url:j.url,source_confirmed:true,independently_read:true,vacancy_confirmed:true,partial_jd:'负责门店运营支持'};
+ const facts=[{url:j.url,quote:jd.partial_jd,context:'same_job'}];
+ const value={reference_jd:'可能负责门店运营支持，梳理业务流程并推动改进。建议准备渠道数据分析能力，解释指标变化及改进方案。',reference_basis:'公开职责片段与职业方向建议，非官方完整JD。',reference_coverage:{duties_quote:'门店运营支持',capabilities_quote:'渠道数据分析能力'},reference_source_anchors:{duties:{kind:'public_excerpt',url:j.url,quote:jd.partial_jd},capabilities:{kind:'title_direction',url:'',quote:j.title}},reference_material_review:{status:'complete',explanation:'已分开公开原文、建议与未知条件。',missing:[]},resume_text:'PRIVATE_DO_NOT_STORE',score:90};
+ const objects=new Map(),env={HHBA_V4_PUBLIC_ASSETS_ENABLED:'1',HHBA_JOB_JD_R2:{put:async(k,v)=>objects.set(k,v),get:async k=>objects.has(k)?{text:async()=>objects.get(k)}:null}};
+ const id=publicVacancyIdentity(jd),material=normalizePublicReference(value,id,facts);
+ assert.ok(material);assert.equal(normalizePublicReference(value,id,[]),null);assert.equal(publicVacancyIdentity({...jd,vacancy_confirmed:false}),null);
+ assert.equal(await savePublicReferenceAsset(env,id,material,1000),true);
+ assert.equal((await readPublicReferenceAsset(env,id,2000)).data.reference_jd,value.reference_jd);
+ assert.equal(await readPublicReferenceAsset(env,{...id,partial_jd:'changed'},2000),null);
+ assert.equal(await readPublicReferenceAsset(env,id,86401000),null);
+ assert.ok([...objects.values()].every(v=>!v.includes('PRIVATE_DO_NOT_STORE')&&!v.includes('"score"')));
+});
+test('public reference research excludes CV and reuses material but not score after current independent verification',async()=>{
+ const j=job(6201),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'},proof=new URL('/business',j.url).href,quote='企业公开介绍：为渠道门店提供运营支持。';
+ const objects=new Map(),bucket={put:async(k,v)=>objects.set(k,v),get:async k=>objects.has(k)?{text:async()=>objects.get(k)}:null};
+ const db={prepare:()=>({bind:()=>({run:async()=>({success:true})})})};
+ const env={HHBA_MATCH_V4_READY:'1',HHBA_V4_PUBLIC_ASSETS_ENABLED:'1',HHBA_JOB_JD_DB:db,HHBA_JOB_JD_R2:bucket};
+ const ref={reference_jd:'可能职责：企业业务涉及渠道门店运营支持。可能承担流程协调、销售数据跟踪及运营改进。能力方向：准备渠道数据分析能力，结合业务指标提出可实施的改进方案。',reference_basis:'依据企业公开业务；其他职责与能力为AI推断，非已公布要求。',reference_coverage:{duties_quote:'渠道门店运营支持',capabilities_quote:'渠道数据分析能力'},reference_source_anchors:{duties:{kind:'public_excerpt',url:proof,quote},capabilities:{kind:'title_direction',url:'',quote:j.title}},reference_material_review:{status:'complete',explanation:'已区分业务背景、可能职责与能力准备。',missing:[]}};
+ let publicCalls=0,scoreCalls=0,liveReads=0;
+ const fetcher=async(url,opts)=>{
+  if(url===j.url){liveReads++;return Response.json({'@type':'JobPosting',title:j.title,hiringOrganization:{name:j.company,url:new URL(j.url).origin},jobLocation:{address:{addressLocality:'上海'}}});}
+  if(url===proof)return new Response('<p>'+quote+'</p>',{headers:{'content-type':'text/html'}});
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.original_url)return model({sources:[],research_complete:true,completion_reason:'未公开完整正文'});
+  if(input.public_sources){publicCalls++;assert.ok(!JSON.stringify(input).includes(resume));assert.equal(input.search_summary,'');return model({facts:[{url:proof,quote,context:'related_context'}],inference:'公开背景',unknowns:['实际任职资格未知'],...ref},[proof]);}
+  scoreCalls++;assert.equal(input.public_reference_material.reference_jd,ref.reference_jd);
+  return model({suitable:true,score:86,reason:'真实渠道经历',resume_quote:'汽车经销商渠道运营',jd_quote:'渠道门店运营支持',comparisons:[{jd_quote:'渠道门店运营支持',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'经历与参考方向一致'}],quality_review:{status:'complete',explanation:'匹配依据充分',missing:[]}});
+ };
+ const options={curated:true,officialOnly:true,stepMode:true,parallelResearch:true,env,checkpoint:{phase:'verification',next:0,rows:[[j.url,{...j,fit_summary:resume}]],profile,toolUrls:[j.url],verificationBatch:1}};
+ for(let i=0;i<2;i++){const result=await v4Match(fetcher,provider,resume,'全国',options);assert.equal(result.checkpoint.matches[0].reference_jd,ref.reference_jd);assert.equal(result.checkpoint.matches[0].match_score,86);}
+ assert.equal(publicCalls,1);assert.equal(scoreCalls,2);assert.ok(liveReads>=2);
+ assert.ok([...objects.entries()].filter(([k])=>k.includes('reference-assets-v1')).every(([,v])=>!v.includes(resume)));
+});

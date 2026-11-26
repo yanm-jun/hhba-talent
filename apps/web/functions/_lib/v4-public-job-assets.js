@@ -1,0 +1,68 @@
+// Public assets accumulated within authorized matching tasks, never by a paid
+// background crawl. This module receives public evidence, not candidate data.
+import {sha256Hex} from './real-auth.js';
+import {v4PublicJobUrl} from './v4-open-job-evidence.js';
+import {isCommercialRecruitmentBoard} from './match-employer-source.js';
+import {referenceMaterialErrors} from './v4-curated-reports.js';
+const TTL=86400000;
+const text=v=>typeof v==='string'?v.trim():'';
+const url=v=>{const u=v4PublicJobUrl(v);return u&&!isCommercialRecruitmentBoard(u)?u:null;};
+const KIND='HHBA_PUBLIC_REFERENCE_ASSET_V1';
+export function publicAssetsEnabled(env){return env?.HHBA_V4_PUBLIC_ASSETS_ENABLED==='1'&&typeof env.HHBA_JOB_JD_R2?.get==='function'&&typeof env.HHBA_JOB_JD_R2?.put==='function';}
+export function publicVacancyIdentity(jd){
+ if(jd?.source_confirmed!==true||jd.independently_read!==true||jd.vacancy_confirmed!==true||jd.excluded_closed||jd.excluded_board||!url(jd.canonical_url)||!text(jd.company)||!text(jd.title)||!text(jd.location))return null;
+ return {url:url(jd.canonical_url),company:text(jd.company),title:text(jd.title),location:text(jd.location),partial_jd:text(jd.partial_jd)};
+}
+const key=async id=>'official-jds/reference-assets-v1/'+await sha256Hex(JSON.stringify(id))+'.json';
+const factRows=facts=>(Array.isArray(facts)?facts:[]).flatMap(f=>url(f?.url)&&text(f?.quote)?[{url:url(f.url),quote:text(f.quote),context:f.context==='same_job'?'same_job':'related_context'}]:[]);
+const anchor=a=>({kind:text(a?.kind),url:a?.url?url(a.url)||'':'',quote:text(a?.quote)});
+const review=r=>({status:text(r?.status),explanation:text(r?.explanation),missing:Array.isArray(r?.missing)?r.missing.map(text).filter(Boolean):[]});
+export function normalizePublicReference(value,job,facts){
+ // Only call on public-only model responses, with independently grounded facts.
+ const data={reference_jd:text(value?.reference_jd),reference_basis:text(value?.reference_basis),reference_coverage:{duties_quote:text(value?.reference_coverage?.duties_quote),capabilities_quote:text(value?.reference_coverage?.capabilities_quote)},reference_source_anchors:{duties:anchor(value?.reference_source_anchors?.duties),capabilities:anchor(value?.reference_source_anchors?.capabilities)},reference_material_review:review(value?.reference_material_review)};
+ const publicFacts=factRows(facts);
+ if(!publicFacts.length||referenceMaterialErrors(data,{title:job.title,jd_research:{facts:publicFacts}}).length)return null;
+ return {data,facts:publicFacts};
+}
+export async function readPublicReferenceAsset(env,id,now=Date.now()){
+ if(!publicAssetsEnabled(env)||!id)return null;
+ try{
+  const obj=await env.HHBA_JOB_JD_R2.get(await key(id));if(!obj)return null;
+  const rec=JSON.parse(await obj.text());
+  if(rec.kind!==KIND||JSON.stringify(rec.identity)!==JSON.stringify(id)||!Number.isFinite(rec.saved_at)||rec.saved_at>now||now-rec.saved_at>=TTL)return null;
+  if(rec.hash!==await sha256Hex(JSON.stringify([rec.identity,rec.saved_at,rec.material])))return null;
+  return normalizePublicReference(rec.material?.data,id,rec.material?.facts);
+ }catch{return null;}
+}
+export async function savePublicReferenceAsset(env,id,material,now=Date.now()){
+ if(!publicAssetsEnabled(env)||!id)return false;
+ const safe=normalizePublicReference(material?.data,id,material?.facts);if(!safe)return false;
+ const rec={kind:KIND,identity:id,saved_at:now,material:safe};
+ rec.hash=await sha256Hex(JSON.stringify([rec.identity,rec.saved_at,rec.material]));
+ try{await env.HHBA_JOB_JD_R2.put(await key(id),JSON.stringify(rec),{httpMetadata:{contentType:'application/json'}});return true;}catch{return false;}
+}
+export async function indexPublicJobAsset(env,jd,{reference=false,versionId=null,now=Date.now()}={}){
+ if(!publicAssetsEnabled(env)||!env.HHBA_JOB_JD_DB?.prepare)return false;
+ const canonical=url(jd?.canonical_url),company=text(jd?.company),title=text(jd?.title),location=text(jd?.location);
+ if(!canonical||!company||!title||!location||jd.source_confirmed!==true||jd.independently_read!==true||jd.excluded_closed||jd.excluded_board)return false;
+ if(reference?!publicVacancyIdentity(jd):!jd.full_jd||!/^jd_[a-f0-9]{32}$/.test(versionId||''))return false;
+ try{
+  const result=await env.HHBA_JOB_JD_DB.prepare("INSERT INTO hhba_v4_public_job_assets(url,company,title,location,kind,jd_version_id,checked_at) VALUES(?,?,?,?,?,?,?) ON CONFLICT(url) DO UPDATE SET company=excluded.company,title=excluded.title,location=excluded.location,kind=excluded.kind,jd_version_id=excluded.jd_version_id,checked_at=excluded.checked_at WHERE excluded.checked_at>=hhba_v4_public_job_assets.checked_at AND (excluded.kind='OFFICIAL' OR hhba_v4_public_job_assets.kind<>'OFFICIAL' OR hhba_v4_public_job_assets.checked_at<?)").bind(canonical,company,title,location,reference?'REFERENCE':'OFFICIAL',reference?null:versionId,new Date(now).toISOString(),new Date(now-TTL).toISOString()).run();
+  return result?.success===true;
+ }catch{return false;}
+}
+export async function publicAssetHints(env,profile,{now=Date.now(),limit=40}={}){
+ if(!publicAssetsEnabled(env)||!env.HHBA_JOB_JD_DB?.prepare)return [];
+ const roles=(Array.isArray(profile?.target_roles)?profile.target_roles:[]).filter(x=>typeof x==='string').map(x=>x.trim()).filter(x=>x.length>=2);
+ if(!roles.length)return [];
+ const terms=[...new Set(roles)].slice(0,8);
+ try{
+  const sql="SELECT url,company,title,location,kind,checked_at FROM hhba_v4_public_job_assets WHERE checked_at>=? AND checked_at<=? AND ("+terms.map(()=> "instr(title,?)>0").join(" OR ")+") ORDER BY checked_at DESC LIMIT ?";
+  const result=await env.HHBA_JOB_JD_DB.prepare(sql).bind(new Date(now-TTL).toISOString(),new Date(now).toISOString(),...terms,Math.min(40,limit)).all();
+  return (result?.results||[]).filter(j=>url(j.url)&&text(j.company)&&text(j.title)&&text(j.location)).map(j=>({url:j.url,company:j.company,title:j.title,location:j.location,checked_at:j.checked_at,material_kind:j.kind}));
+ }catch{return [];}
+}
+export async function removeClosedPublicAsset(env,raw){
+ const canonical=url(raw);if(!publicAssetsEnabled(env)||!canonical||!env.HHBA_JOB_JD_DB?.prepare)return;
+ try{await env.HHBA_JOB_JD_DB.prepare('DELETE FROM hhba_v4_public_job_assets WHERE url=?').bind(canonical).run();}catch{}
+}
