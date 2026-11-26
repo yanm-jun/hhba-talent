@@ -55,7 +55,7 @@ const checkpointArgs=(env,input,draft)=>({env:checkpointEnv(env),account:input.p
 function events(env,request,input,waitUntil){
  const encoder=new TextEncoder();let closed=false,phase=input.savedProgress?.stage||'preparing';
  const started=Date.now();
- const budget=input.managed?phaseResourceBudget():null;
+ const budget=input.managed?phaseResourceBudget({progressReserve:input.background?4:0}):null;
  const replay=budget?phaseModelReplay(input.phaseReplay):null;
  const researchEnv=budget?budget.env(env):{...env};
  // Only a managed existing task can use the opt-in shared asset path.
@@ -87,19 +87,21 @@ function events(env,request,input,waitUntil){
    const officialJob=j=>allowedJob(j)&&qualifiedReport(j);
    let lastReport=input.savedProgress?.report,latestActivity=input.savedProgress?.activity,lastJobs=input.savedProgress?.jobs||[];
    const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:[...lastJobs]});
-   async function publishProgress(status='PENDING',failure=null){
-     if(!input.background||!input.taskKey)return;
-     try{budget?.observe('progress');
+   async function publishProgress(status='PENDING',failure=null,kind=null){
+     if(!input.background||!input.taskKey)return false;
+     // Optional writes reserve capacity atomically at the actual write. A
+     // phase-end/terminal write uses the existing mandatory recovery headroom.
+     if(kind){if(leaseAbort.signal.aborted||!budget?.tryProgress(kind))return false;}
+     else budget?.observe('progress');
+     try{
       // The recovery supplement is private: polling exposes only .progress.
       const discovery_recovery=status==='PENDING'?discoveryRecoverySnapshot(input.checkpoint,input.recoveryState?.()):undefined;
-      await saveMatchProgress(env,input.taskKey,{generation:input.generation||0,status,progress:snapshotProgress(),failure,discovery_recovery});}
-     catch(e){console.warn('HHBA_V4_PROGRESS_WRITE_FAILED',JSON.stringify({trace,error:e?.code||'PROGRESS_WRITE_FAILED'}));}
+      await saveMatchProgress(env,input.taskKey,{generation:input.generation||0,status,progress:snapshotProgress(),failure,discovery_recovery});return true;}
+     catch(e){console.warn('HHBA_V4_PROGRESS_WRITE_FAILED',JSON.stringify({trace,error:e?.code||'PROGRESS_WRITE_FAILED'}));return false;}
     }
    const publisher=createV4ProgressPublisher({
-    publish:()=>publishProgress(),
-    canPublish:kind=>!!(input.background&&input.taskKey&&leaseHeartbeat&&!leaseAbort.signal.aborted&&budget?.canPublish()&&
-     // Candidate-only writes leave enough headroom for actual research.
-     (kind!=='candidate'||budget.snapshot().soft-budget.used>=8))
+    publish:kind=>publishProgress('PENDING',null,kind),
+    canPublish:kind=>!!(input.background&&input.taskKey&&leaseHeartbeat&&!leaseAbort.signal.aborted&&budget?.canPublishProgress(kind))
    });
    const queueProgress=kind=>publisher.queue(kind);
    const stopProgress=()=>publisher.stop();

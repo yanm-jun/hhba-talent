@@ -2,11 +2,24 @@
 // tokens, search rounds or candidate count. Reserve capacity to checkpoint and
 // release the task lease before the platform forcibly terminates the request.
 export const PHASE_YIELD='AI_PHASE_RESOURCE_YIELD';
-export function phaseResourceBudget({initial=8,soft=24,hard=34}={}){
+export function phaseResourceBudget({initial=8,soft=24,hard=34,progressReserve=0}={}){
  let used=initial,denied=false;const counts={};
+ // Explicit progress allowance is shared with the same physical hosting limit.
+ // It is not a separate platform quota and cannot consume terminal headroom.
+ const reserve=Math.max(0,Math.min(hard-soft,Math.floor(progressReserve)||0));
+ let reservedWrites=0;
+ const remainingReserve=()=>reserve-reservedWrites;
+ const researchUsed=()=>used-reservedWrites;
+ const canPublishProgress=kind=>{
+  if(used>=hard)return false;
+  if(used<soft-2)return true;
+  // Preserve the final reserved write for a validated report, not activity
+  // or repeated candidate bursts. Normal research can still continue.
+  return kind==='report'?remainingReserve()>0:kind==='candidate'&&remainingReserve()>1;
+ };
  const observe=(kind,n=1)=>{used+=n;counts[kind]=(counts[kind]||0)+n;};
  const take=(kind,n=1)=>{
-  if(used+n>hard){denied=true;throw Object.assign(Error(PHASE_YIELD),{code:PHASE_YIELD});}
+  if(used+n>hard-remainingReserve()){denied=true;throw Object.assign(Error(PHASE_YIELD),{code:PHASE_YIELD});}
   observe(kind,n);
  };
  const statements=new WeakMap();
@@ -27,9 +40,11 @@ export function phaseResourceBudget({initial=8,soft=24,hard=34}={}){
   const v=Reflect.get(target,key,target);if(typeof v!=='function')return v;
   return methods.includes(key)?(...args)=>{take(kind);return v.apply(target,args);}:v.bind(target);
  }});
- return {observe,take,canStart:()=>used<soft,canPublish:()=>used<soft-2,
+ return {observe,take,canStart:()=>researchUsed()<soft,canPublish:()=>researchUsed()<soft-2,
+  canPublishProgress,
+  tryProgress(kind){if(!canPublishProgress(kind))return false;if(used>=soft-2)reservedWrites++;observe('progress');return true;},
   get denied(){return denied;},get used(){return used;},
-  snapshot:()=>({used,soft,hard,counts:{...counts},denied}),
+  snapshot:()=>({used,soft,hard,counts:{...counts},denied,...(reserve?{progress_reserve:reserve,progress_remaining:remainingReserve(),research_used:researchUsed()}: {})}),
   fetch:fetcher=>(...args)=>{take('fetch');return fetcher(...args);},
   env:env=>{
    const scoped={...env};

@@ -349,7 +349,9 @@ test('background route consumes compact candidate events and preserves the exist
  assert.match(route,/lastJobs\.push\(/);
  assert.match(route,/queueProgress\('candidate'\)/);
  assert.match(route,/officialJob\(j\)\?structuredClone\(j\)/);
- assert.match(route,/kind!=='candidate'\|\|budget\.snapshot\(\)\.soft-budget\.used>=8/);
+ assert.match(route,/budget\?\.canPublishProgress\(kind\)/);
+ assert.match(route,/budget\?\.tryProgress\(kind\)/);
+ assert.doesNotMatch(route,/kind!=='candidate'\|\|budget\.snapshot\(\)\.soft-budget\.used>=8/);
  assert.match(route,/jobs:\[\.\.\.lastJobs\]/);
  assert.match(route,/await saveMatchTask\(env,input\.taskKey,\{checkpoint:result\.checkpoint/);
 });
@@ -368,4 +370,59 @@ test('citation-only progress survives interrupted research without becoming a ve
  assert.deepEqual(recovered.saved.checkpoint.rows,[]);assert.deepEqual(recovered.saved.checkpoint.toolUrls,[]);
  const replay=restoreDiscoveryRecovery(recovered.saved,{generation:2,status:'PENDING',discovery_recovery:supplement},2);
  assert.equal(replay.restoredSources,undefined);
+});
+
+
+test('urgent progress has reserved hosting allowance after normal research crosses its soft limit',async()=>{
+ const {phaseResourceBudget,PHASE_YIELD}=await import('../functions/_lib/v4-phase-budget.js');
+ const budget=phaseResourceBudget({initial:8,soft:24,hard:34,progressReserve:4});
+ budget.take('fetch',16);
+ assert.equal(budget.canStart(),false);
+ assert.equal(budget.canPublish(),false);
+ assert.equal(budget.tryProgress('routine'),false);
+ for(let i=0;i<3;i++)assert.equal(budget.tryProgress('candidate'),true);
+ assert.equal(budget.tryProgress('candidate'),false);
+ assert.equal(budget.snapshot().progress_remaining,1);
+ assert.equal(budget.tryProgress('report'),true);
+ assert.equal(budget.snapshot().progress_remaining,0);
+ assert.equal(budget.tryProgress('report'),false);
+ assert.equal(budget.used,28);
+ budget.take('fetch',6);
+ assert.throws(()=>budget.take('fetch'),{code:PHASE_YIELD});
+ assert.equal(budget.used,34);
+ // A new invocation restores the host allowance; no task/model call cap.
+ const next=phaseResourceBudget({progressReserve:4});
+ assert.equal(next.canStart(),true);
+ assert.equal(next.snapshot().progress_remaining,4);
+});
+
+test('research cannot spend a reserved report slot before actual progress publication',async()=>{
+ const {phaseResourceBudget,PHASE_YIELD}=await import('../functions/_lib/v4-phase-budget.js');
+ const budget=phaseResourceBudget({initial:8,soft:24,hard:34,progressReserve:4});
+ budget.take('fetch',22);
+ assert.throws(()=>budget.take('fetch'),{code:PHASE_YIELD});
+ assert.equal(budget.denied,true);
+ assert.equal(budget.tryProgress('report'),true,'already completed results may still be published after resource yield');
+ assert.equal(budget.used,31);
+ assert.equal(budget.snapshot().progress_remaining,3);
+ budget.observe('checkpoint',3);
+ assert.equal(budget.used,34);
+ assert.equal(budget.tryProgress('report'),false);
+});
+
+test('coalesced live publisher delivers real candidates and reports at exhausted research soft budget',async()=>{
+ const {phaseResourceBudget}=await import('../functions/_lib/v4-phase-budget.js');
+ const {createV4ProgressPublisher}=await import('../functions/_lib/v4-progress-publisher.js');
+ const budget=phaseResourceBudget({initial:24,progressReserve:4});
+ const clock=progressClock(),writes=[];let jobs=1;
+ const publisher=createV4ProgressPublisher({...clock,canPublish:kind=>budget.canPublishProgress(kind),
+  publish:kind=>{if(!budget.tryProgress(kind))return false;writes.push({kind,jobs});return true;}});
+ publisher.queue('routine');await clock.advance(20000);
+ assert.equal(writes.length,0);
+ publisher.queue('candidate');await clock.advance(0);
+ assert.deepEqual(writes,[{kind:'candidate',jobs:1}]);
+ jobs=2;publisher.queue('report');await clock.advance(1000);
+ assert.deepEqual(writes,[{kind:'candidate',jobs:1},{kind:'report',jobs:2}]);
+ assert.equal(budget.snapshot().progress_remaining,2);
+ await publisher.stop();
 });
