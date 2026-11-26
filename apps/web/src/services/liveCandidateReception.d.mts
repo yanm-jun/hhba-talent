@@ -1,5 +1,6 @@
 import type {MatchedJob} from './resumeMatch';
 export function createLiveCandidateReception(onJobs?: (jobs:MatchedJob[])=>void):{
+ jobs():MatchedJob[];
  receive(event:unknown):boolean;
  snapshot(jobs:MatchedJob[],options?:{final?:boolean}):number;
 };
