@@ -120,15 +120,36 @@ export function normalizeV4StreamCandidate(raw){
 // One observer per discovery response, with independent JSON framing for
 // interleaved Responses output/content indexes and shared canonical URL
 // deduplication. Final text is a reconciliation path, not a second emission.
-export function createV4DiscoveryJobObserver(onCandidate){
- const seen=new Set(),channels=new Map();
+export function createV4DiscoveryJobObserver(onCandidate=()=>{},onSource=()=>{}){
+ const seen=new Set(),channels=new Map(),sources=new Set();
  const accept=(raw,source)=>{
   const job=normalizeV4StreamCandidate(raw);
   if(!job||seen.has(job.url))return;
   seen.add(job.url);
   try{onCandidate(job,{source});}catch{}
  };
+ const acceptSource=(value,source)=>{
+  const url=v4PublicJobUrl(value);
+  if(!url||isCommercialRecruitmentBoard(url))return;
+  const key=curatedUrl(url);
+  if(sources.has(key))return;
+  sources.add(key);
+  // A web citation is an evidence lead, not a discovered vacancy.
+  try{onSource(key,{source});}catch{}
+ };
  const parseText=(text,source)=>createV4JobArrayParser(raw=>accept(raw,source)).push(text);
+ const part=(p,source)=>{
+  if(p?.type!=='output_text')return;
+  parseText(p.text,source);
+  for(const a of Array.isArray(p.annotations)?p.annotations:[])if(a?.type==='url_citation')acceptSource(a.url,source);
+ };
+ const item=(x,source)=>{
+  if(x?.type==='web_search_call'||x?.type==='url_context_call'){
+   for(const s of Array.isArray(x.action?.sources)?x.action.sources:[])acceptSource(s?.url,source);
+  }else if(x?.type==='message'&&x.role!=='user'&&x.role!=='system'&&x.role!=='developer'){
+   for(const p of Array.isArray(x.content)?x.content:[])part(p,source);
+  }
+ };
  return {
   event(event){
    if(event?.type==='response.output_text.delta'){
@@ -137,13 +158,19 @@ export function createV4DiscoveryJobObserver(onCandidate){
     channels.get(key).push(event.delta);
    }else if(event?.type==='response.output_text.done'){
     parseText(event.text,'done');
+   }else if(event?.type==='response.content_part.done'){
+    part(event.part,'done');
+   }else if(event?.type==='response.output_item.done'){
+    item(event.item,'done');
+   }else if(event?.type==='response.output_text.annotation.added'){
+    if(event.annotation?.type==='url_citation')acceptSource(event.annotation.url,'done');
+   }else if(event?.type==='response.web_search_call.completed'||event?.type==='response.url_context_call.completed'){
+    const action=event.item?.action||event.action;
+    for(const s of Array.isArray(action?.sources)?action.sources:[])acceptSource(s?.url,'done');
    }
   },
   response(response){
-   for(const item of response?.output||[]){
-    if(item?.type!=='message')continue;
-    for(const part of item.content||[])if(part?.type==='output_text')parseText(part.text,'terminal');
-   }
+   for(const x of response?.output||[])item(x,'terminal');
   }
  };
 }
