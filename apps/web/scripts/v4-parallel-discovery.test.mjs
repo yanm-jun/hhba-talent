@@ -1133,3 +1133,45 @@ test('serial discovery transport interruption retries the unfinished round while
  assert.deepEqual(result.checkpoint.rows.map(([u])=>u).sort(),[a.url,b.url].sort());
  assert.deepEqual(seen,[a.url,b.url]);
 });
+
+
+test('managed incremental discovery avoids full snapshot rebuilding for a 60-candidate streamed burst', {timeout:5000},async()=>{
+ const jobs=Array.from({length:60},(_,i)=>job(6800+i));
+ const p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test',stream:true};
+ const events=[],snapshots=[];let controller,resolveFirst,resolveAll,calls=0,recovery;
+ const first=new Promise(resolve=>{resolveFirst=resolve;});
+ const all=new Promise(resolve=>{resolveAll=resolve;});
+ const stream=new ReadableStream({start(c){controller=c;}});
+ const send=e=>controller.enqueue(new TextEncoder().encode('data: '+JSON.stringify(e)+'\n\n'));
+ const raw=JSON.stringify({jobs,research_complete:false});
+ const pending=v4Match(async()=>{calls++;return new Response(stream,{headers:{'content-type':'text/event-stream'}});},p,resume,'全国',{
+  curated:true,officialOnly:true,stepMode:true,parallelResearch:false,deferDiscoverySnapshots:true,
+  checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles}},
+  onRecoveryState:get=>{recovery=get;},onPartial:rows=>snapshots.push(rows),
+  onDiscoveryCandidate:(event,meta)=>{events.push({event,meta});if(events.length===1)resolveFirst();if(events.length===jobs.length)resolveAll();}
+ });
+ let timer;
+ try{
+  const firstEnd='{"jobs":['.length+JSON.stringify(jobs[0]).length;
+  send({type:'response.output_text.delta',delta:raw.slice(0,firstEnd)});
+  await Promise.race([first,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('missing first incremental event')),1500);})]);clearTimeout(timer);
+  assert.equal(events[0].meta.discovered,1);
+  assert.equal(events[0].meta.source,'delta');
+  assert.equal(snapshots.length,0);
+  send({type:'response.output_text.delta',delta:raw.slice(firstEnd)});
+  await Promise.race([all,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('missing streamed candidates')),1500);})]);clearTimeout(timer);
+  assert.equal(events.length,60);
+  assert.deepEqual(events.map(e=>e.meta.discovered),jobs.map((_,i)=>i+1));
+  assert.equal(snapshots.length,0,'no full snapshot per candidate');
+  assert.equal(recovery().rows.length,60);
+  assert.equal(recovery().toolUrls.length,0);
+  send({type:'response.completed',response:{status:'completed',output:[
+   {type:'web_search_call',action:{sources:jobs.map(j=>({url:j.url}))}},
+   {type:'message',content:[{type:'output_text',text:raw}]}]}});
+  const result=await pending;
+  assert.equal(calls,1);assert.equal(result.checkpoint.rows.length,60);
+  assert.equal(events.length,60);
+  assert.ok(snapshots.some(rows=>rows.length===60));
+  assert.ok(snapshots.length<5,'only aggregate reconciliation');
+ }finally{clearTimeout(timer);try{controller.close();}catch{}await pending.catch(()=>{});}
+});

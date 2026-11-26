@@ -86,7 +86,7 @@ function events(env,request,input,waitUntil){
    const allowedJob=j=>j&&!j.excluded_board&&!isCommercialRecruitmentBoard(j.official_url,j);
    const officialJob=j=>allowedJob(j)&&qualifiedReport(j);
    let lastReport=input.savedProgress?.report,latestActivity=input.savedProgress?.activity,lastJobs=input.savedProgress?.jobs||[];
-   const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:lastJobs});
+   const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:[...lastJobs]});
    async function publishProgress(status='PENDING',failure=null){
      if(!input.background||!input.taskKey)return;
      try{budget?.observe('progress');
@@ -107,6 +107,7 @@ function events(env,request,input,waitUntil){
    const reportSignature=jobs=>JSON.stringify(jobs.filter(officialJob).map(j=>[j.official_url,j.match_score,j.jd_sha256,j.research_detail,j.reference_jd]));
    let lastReportSignature=reportSignature(lastJobs);
    const publishedCandidateKeys=new Set(lastJobs.map(j=>v4DiscoveryCandidateKey(j.official_url)).filter(Boolean));
+   let currentCandidateKeys=new Set(publishedCandidateKeys);
    const rememberJobs=matches=>{
     // The progress object is encrypted and bound to this authorized task.
     // Keep complete reports lossless; compact only non-deliverable leads.
@@ -117,9 +118,28 @@ function events(env,request,input,waitUntil){
      availability_status:j.availability_status,report_status:j.report_status
     }));
     const signature=reportSignature(lastJobs),changed=signature!==lastReportSignature;lastReportSignature=signature;
+    currentCandidateKeys=new Set(lastJobs.map(j=>v4DiscoveryCandidateKey(j.official_url)).filter(Boolean));
     let newCandidate=false;
     for(const j of lastJobs){const key=v4DiscoveryCandidateKey(j.official_url);if(key&&!publishedCandidateKeys.has(key)){publishedCandidateKeys.add(key);newCandidate=true;}}
     queueProgress(changed?'report':newCandidate?'candidate':'routine');
+   };
+   // The authenticated background route can append one compact, unverified
+   // preview in O(1), leaving full evidence reconciliation to onPartial.
+   // Terminal-only provider responses still use their authoritative batch.
+   const rememberDiscovery=(event,meta)=>{
+    if(!input.background){send('discovery_candidate',event);return;}
+    if(!['delta','done'].includes(meta?.source))return;
+    const j=event?.candidate,key=v4DiscoveryCandidateKey(j?.official_url);
+    if(!key||!allowedJob(j)||currentCandidateKeys.has(key)||leaseAbort.signal.aborted)return;
+    currentCandidateKeys.add(key);publishedCandidateKeys.add(key);
+    lastJobs.push({
+     id:'v4-live:'+key,company:j.company,title:j.title,location:j.location,official_url:key,
+     platform:'招聘来源（企业官网待核实）',source:'AI搜索候选',remote:false,reference_score:0,match_score:null,
+     matched:[],not_evidenced:[],needs_verification:[],requirements_basis:'',
+     source_type:'站外招聘职位',source_status:'MODEL_SEARCH_REPORTED',evidence_status:'RESEARCH_PENDING',availability_status:'UNKNOWN'
+    });
+    if(lastReport&&Number.isSafeInteger(meta.discovered))lastReport={...lastReport,discovered:Math.max(lastReport.discovered||0,meta.discovered)};
+    queueProgress('candidate');
    };
    const sendFinal=result=>{
     if(input.background){send('complete',{status:'COMPLETE'});return;}
@@ -170,10 +190,9 @@ function events(env,request,input,waitUntil){
       signal:executionSignal,onProgress:progress,onActivity:activity,env:researchEnv,resourceBudget:budget,profileCache,excludeUrls:input.excludeUrls,
       stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,parallelResearch:v4ParallelResearchEnabled(env),allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
       onResearch:sendResearch,
-      // Direct SSE exposes one observed candidate per event. The existing
-      // background transport intentionally retains its normal progress path;
-      // durable per-candidate delivery will be wired in a separate change.
-      onDiscoveryCandidate:event=>send('discovery_candidate',event),
+      // Managed background publication is compact and coalesced; direct SSE
+      // retains the existing complete research callbacks.
+      deferDiscoverySnapshots:!!input.background,onDiscoveryCandidate:rememberDiscovery,
       onPartial:matches=>{rememberJobs(matches);sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
      await stopProgress();await leaseHeartbeat?.stop();
       if(budget?.denied)throw Object.assign(Error(PHASE_YIELD),{code:PHASE_YIELD});
