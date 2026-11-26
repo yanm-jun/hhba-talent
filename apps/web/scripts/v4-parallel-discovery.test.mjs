@@ -1175,3 +1175,50 @@ test('managed incremental discovery avoids full snapshot rebuilding for a 60-can
   assert.ok(snapshots.length<5,'only aggregate reconciliation');
  }finally{clearTimeout(timer);try{controller.close();}catch{}await pending.catch(()=>{});}
 });
+
+
+test('discovery delivery plan prioritizes first genuine jobs, adapts slow waves and retains tool review',async()=>{
+ const {discoveryDeliveryPlan,discoveryDeliveryInstructions}=await import('../functions/_lib/v4-discovery-delivery.js');
+ const first=discoveryDeliveryPlan({known:0,round:1,lane:1,width:3});
+ assert.equal(first.mode,'first_delivery');
+ assert.equal(first.global_target_is_not_request_target,true);
+ assert.equal(first.preserve_all_real_candidates,true);
+ assert.match(discoveryDeliveryInstructions(first),/首个或首批/);
+ assert.match(discoveryDeliveryInstructions(first),/jobs字段放在根对象的第一项/);
+ assert.match(discoveryDeliveryInstructions(first),/不按数量截断/);
+ assert.equal(discoveryDeliveryPlan({known:27,round:2,previousElapsed:208000}).mode,'focused_continuation');
+ assert.equal(discoveryDeliveryPlan({known:27,round:2,previousElapsed:20000}).mode,'continuous_discovery');
+ const review=discoveryDeliveryPlan({known:0,review:true});
+ assert.equal(review.mode,'source_review');
+ assert.match(discoveryDeliveryInstructions(review,{coordinator:true}),/工具动作、来源复查/);
+ assert.match(discoveryDeliveryInstructions(review,{coordinator:true}),/不能把本次交付单元结束当作全局研究完成/);
+});
+
+test('production discovery sends first-delivery protocol to existing lanes and preserves every returned concrete job',async()=>{
+ const p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test',stream:true};
+ const inputs=[],events=[],jobs=Array.from({length:36},(_,i)=>job(7100+i));
+ const result=await v4Match(async(_url,opts)=>{
+  const payload=JSON.parse(opts.body),input=JSON.parse(payload.input);
+  inputs.push({payload,input});
+  assert.ok(payload.tools.some(t=>t.type==='web_search'));
+  assert.match(payload.instructions,/增量交付协议/);
+  assert.match(payload.instructions,/jobs字段放在根对象的第一项/);
+  assert.match(payload.instructions,/不按数量截断/);
+  assert.equal(input.discovery_delivery.mode,'first_delivery');
+  assert.equal(input.candidate_target,500);
+  assert.equal(input.remaining_candidates,500);
+  const lane=input.parallel_lane||0;
+  assert.equal(input.discovery_delivery.lane,lane);
+  const own=jobs.slice(lane*12,lane*12+12);
+  return model({jobs:own,research_complete:false},own.map(j=>j.url));
+ },p,resume,'全国',{
+  curated:true,officialOnly:true,stepMode:true,parallelResearch:true,env:{HHBA_MATCH_V4_READY:'1'},
+  checkpoint:{phase:'research',round:0,rows:[],profile:{...profile,target_roles:profile.roles},discoveryWidth:3},
+  onDiscoveryCandidate:e=>events.push(e)
+ });
+ assert.equal(inputs.length,3,'reuse existing lanes, not additional model requests');
+ assert.equal(result.status,'CONTINUE');
+ assert.equal(result.checkpoint.rows.length,36,'no artificial per-delivery truncation');
+ assert.equal(events.length,36);
+ assert.ok(result.checkpoint.rows.every(([,j])=>j.match_score==null));
+});
