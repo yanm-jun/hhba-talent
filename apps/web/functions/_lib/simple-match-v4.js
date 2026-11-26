@@ -16,6 +16,7 @@ import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch}
 import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery,runReadyWork} from './v4-parallel-discovery.js';
 import {candidateRevision,candidateResearchMemory,pendingVerification,verificationSnapshot,mergePipelineCheckpoint,pipelineWidths,pipelineVerificationWindow,discoveryReadAhead} from './v4-research-pipeline.js';
 import {makeBatchScorer} from './v4-batch-scoring.js';
+import {createV4DiscoveryJobObserver} from './v4-stream-job-parser.js';
 import {publicCatalogHints} from './v4-public-jd-catalog.js';
 import {publicAssetsEnabled,publicVacancyIdentity,normalizePublicReference,readPublicReferenceAsset,savePublicReferenceAsset,indexPublicJobAsset,publicAssetHints,removeClosedPublicAsset} from './v4-public-job-assets.js';
 import {managedWorkPlan,managedWorkSample} from './v4-phase-budget.js';
@@ -63,16 +64,21 @@ export function v4ParseJson(response){
 }
 // Native Responses SSE support is opt-in until the configured relay has
 // demonstrated a complete stream. Never forward model reasoning or CV text.
-export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{}}={}){
- if(!(response.headers.get('content-type')||'').includes('text/event-stream'))return response.json();
+export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{},onDiscoveryJob}={}){
+ const observer=typeof onDiscoveryJob==='function'?createV4DiscoveryJobObserver(onDiscoveryJob):null;
+ if(!(response.headers.get('content-type')||'').includes('text/event-stream')){
+  const data=await response.json();if(!signal?.aborted)observer?.response(data);return data;
+ }
  if(!response.body)throw fault('AI_PROVIDER_RESPONSE_INVALID');
  const reader=response.body.getReader(),decoder=new TextDecoder();let buffer='',complete=null;
  function parse(frame){
-  const raw=frame.split('\n').filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trimStart()).join('\n');
+  const raw=frame.split(/\r?\n/).filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trimStart()).join('\n');
   if(!raw||raw==='[DONE]')return;
   let event;try{event=JSON.parse(raw)}catch{throw fault('AI_PROVIDER_RESPONSE_INVALID')}
   if(event.type==='error'||event.type==='response.failed')throw fault('AI_PROVIDER_UPSTREAM_ERROR');
+  if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
   if(event.type==='response.completed'||event.type==='response.incomplete')complete=event.response;
+  observer?.event(event);
   if(['response.in_progress','response.web_search_call.in_progress','response.web_search_call.searching','response.web_search_call.completed','response.output_text.delta'].includes(event.type)){
    try{onEvent(event.type)}catch{}
   }
@@ -81,17 +87,19 @@ export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{}}={}
   for(;;){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    const chunk=await reader.read();if(chunk.done)break;
-   buffer+=decoder.decode(chunk.value,{stream:true}).replace(/\r\n/g,'\n');
-   let index;
-   while((index=buffer.indexOf('\n\n'))>=0){parse(buffer.slice(0,index));buffer=buffer.slice(index+2);}
+   buffer+=decoder.decode(chunk.value,{stream:true});
+   // CRLF may itself be split across network chunks.
+   let boundary;
+   while((boundary=/\r?\n\r?\n/.exec(buffer))){parse(buffer.slice(0,boundary.index));buffer=buffer.slice(boundary.index+boundary[0].length);}
    if(complete)break;
   }
   if(!complete){buffer+=decoder.decode();if(buffer.trim())parse(buffer);}
  }finally{await reader.cancel().catch(()=>{});reader.releaseLock();}
  if(!complete)throw fault('AI_PROVIDER_RESPONSE_INVALID');
+ if(!signal?.aborted)observer?.response(complete);
  return complete;
 }
-export async function v4Call(fetcher,provider,payload,{signal,onEvent,stage=provider?.usageStage||'other'}={}){
+export async function v4Call(fetcher,provider,payload,{signal,onEvent,onDiscoveryJob,stage=provider?.usageStage||'other'}={}){
  if(!provider)throw fault('AI_PROVIDER_NOT_CONFIGURED');
  if(provider.kind&&provider.kind!=='openai')throw fault('AI_PROVIDER_UNSUPPORTED');
  const effort=stageEffort(provider,stage), effective={...provider,...(effort?{reasoningEffort:effort}:{})};
@@ -100,11 +108,14 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent,stage=prov
  let data;
  const replayKey=provider.phaseReplay?await sha256Hex(JSON.stringify([provider.model,stage,effort,payload])):null;
  const prior=replayKey?provider.phaseReplay.take(replayKey):null;
- if(prior)return prior;
+ if(prior){
+  if(stage==='discovery'&&typeof onDiscoveryJob==='function'&&!signal?.aborted)createV4DiscoveryJobObserver(onDiscoveryJob).response(prior);
+  return prior;
+ }
  if(provider.usageDb)provider.phaseResourceBudget?.take('model_usage');
  const callStarted=Date.now();let failure;
  try{
-  data=await v4CallOpenAI(fetcher,effective,payload,{signal,onEvent,stage});
+  data=await v4CallOpenAI(fetcher,effective,payload,{signal,onEvent,onDiscoveryJob:stage==='discovery'?onDiscoveryJob:undefined,stage});
   if(replayKey&&data.status==='completed')provider.phaseReplay.remember(replayKey,data);
   return data;
  }catch(e){failure=e;throw e;}
@@ -113,7 +124,7 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent,stage=prov
   if(failure?.code!=='AI_PHASE_RESOURCE_YIELD')await recordAiUsage(provider.usageDb,{model:provider.model,stage,effort:payload.reasoning?.effort||effort,status:data?.status||'failed',usage:data?.usage});
  }
 }
-async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,stage}={}){
+async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,onDiscoveryJob,stage}={}){
  if(!provider)throw fault('AI_PROVIDER_NOT_CONFIGURED');
 
  const started=Date.now();
@@ -141,7 +152,7 @@ async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,stage}={}){
    await response.body?.cancel().catch(()=>{});
    await recordAiUsage(provider.usageDb,{model:provider.model,stage,effort:payload.reasoning?.effort||provider.reasoningEffort,status:'stream_rejected'});
    if(provider.usageDb)provider.phaseResourceBudget?.take('model_usage');
-   return v4CallOpenAI(fetcher,{...provider,stream:false},payload,{signal,onEvent,stage});
+   return v4CallOpenAI(fetcher,{...provider,stream:false},payload,{signal,onEvent,onDiscoveryJob,stage});
   }
   if(response.status===413)throw fault('AI_PROVIDER_CONTEXT_TOO_LARGE');
   if([400,422].includes(response.status)){
@@ -155,7 +166,7 @@ async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,stage}={}){
   throw fault('AI_PROVIDER_REQUEST_REJECTED');
  }
  let data;
- try{data=await v4ReadProviderResponse(response,{signal,onEvent})}catch(e){throw fault(e?.code||'AI_PROVIDER_RESPONSE_INVALID')}
+ try{data=await v4ReadProviderResponse(response,{signal,onEvent,onDiscoveryJob})}catch(e){throw fault(e?.code||'AI_PROVIDER_RESPONSE_INVALID')}
  if(!Array.isArray(data?.output)||!['completed','incomplete'].includes(data.status))
   throw fault('AI_PROVIDER_RESPONSE_INVALID');
  logV4Usage(provider,data.usage,Date.now()-started,data.status);
