@@ -40,7 +40,7 @@ export function partitionReadyScores(items,resume,budget){
 }
 // A short coalescing window does not wait for slow sibling fetches. One
 // runnable group is awaited by its already occupied worker lanes.
-export function makeBatchScorer({call,parse,resume,roleHint,budget=90000,note=()=>{},signal,delay=80,maxReady=Infinity}){
+export function makeBatchScorer({call,parse,resume,roleHint,budget=90000,note=()=>{},signal,delay=80,maxReady=Infinity,yieldOnPressure=false}){
  let pending=[],timer=null;
  async function flush(){
   timer=null;const queued=pending;pending=[];
@@ -63,7 +63,7 @@ export function makeBatchScorer({call,parse,resume,roleHint,budget=90000,note=()
     note('AI_SCORE_BATCH_FAILED');
     // Shared transport pressure is not an invalid assessment. Let the durable
     // coordinator preserve completed work and retry rather than fan out calls.
-    if(['AI_PHASE_RESOURCE_YIELD','AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_TIMEOUT'].includes(e?.code)){
+    if(e?.code==='AI_PHASE_RESOURCE_YIELD'||yieldOnPressure&&['AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_TIMEOUT'].includes(e?.code)){
      for(const item of group)item.reject(e);
     }else for(const item of group)item.resolve(null);
    }

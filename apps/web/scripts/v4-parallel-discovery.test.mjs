@@ -745,3 +745,13 @@ test('shared batch transport pressure yields instead of multiplying retry reques
  const result=await Promise.allSettled([score('a',{full_jd:'岗位甲'}),score('b',{full_jd:'岗位乙'})]);
  assert.ok(result.every(r=>r.status==='rejected'&&r.reason.code==='AI_PHASE_RESOURCE_YIELD'));
 });
+
+test('managed rate-limit yields, legacy batch transport keeps individual fallback',async()=>{
+ const {makeBatchScorer}=await import('../functions/_lib/v4-batch-scoring.js');
+ const call=async()=>{throw Object.assign(Error('rate-limited'),{code:'AI_PROVIDER_RATE_LIMITED'});};
+ for(const managed of [false,true]){
+  const score=makeBatchScorer({resume:'渠道运营经验',maxReady:2,delay:100,parse:r=>r.data,call,yieldOnPressure:managed});
+  const out=await Promise.allSettled([score('a',{full_jd:'岗位甲'}),score('b',{full_jd:'岗位乙'})]);
+  assert.ok(out.every(r=>managed?r.status==='rejected'&&r.reason.code==='AI_PROVIDER_RATE_LIMITED':r.status==='fulfilled'&&r.value===null));
+ }
+});
