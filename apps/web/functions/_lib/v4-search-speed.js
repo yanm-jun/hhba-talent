@@ -27,9 +27,11 @@ export function createV4SearchSpeedTracker({previous=null,savedJobs=[],now=Date.
    const key=keyOf(job);
    if(!key||keys.has(key))return false;
    keys.add(key);
+   const beforeCount=observed;
    observed=Math.max(observed+1,keys.size);
    const ms=Math.max(0,now()-started);
-   for(const n of V4_SEARCH_MILESTONES)if(observed>=n&&!Object.hasOwn(milestoneMs,n))milestoneMs[n]=ms;
+   // Missing past observations stay unknown; never backdate historical milestones.
+   for(const n of V4_SEARCH_MILESTONES)if(beforeCount<n&&observed>=n&&!Object.hasOwn(milestoneMs,n))milestoneMs[n]=ms;
    return true;
   },
   snapshot:()=>({run_id:id,started_at_ms:started,observed_unique:observed,milestones:{...milestoneMs}})
