@@ -149,8 +149,9 @@ const errorMap:Record<string,string>={
   AI_MATCH_REASON_TIMEOUT:'候选岗位已检索，但推荐理由生成超时；请稍后再试。',
   AI_MATCH_NO_VALID_JOBS:'本轮 AI 候选名单没有通过岗位信息核验，这不代表你的简历不符合国内招聘要求。请尝试重新搜索或填写具体岗位方向。',
   AI_EMPLOYER_JOBS_NOT_FOUND:'本轮已尝试补充搜索，但仍未找到信息足够明确的企业招聘岗位链接；并非你的简历不适合。请稍后重试或填写更具体的岗位方向。',
-  AI_PROVIDER_RESPONSE_INVALID:'AI 输出格式异常，未采用不完整推荐结果。',
-  AI_PROFILE_INCOMPLETE:'AI 没有识别到可用于匹配的经历或技能。请核对简历文字，补充真实内容后重试。',
+  AI_PROFILE_INCOMPLETE:'AI 暂未生成有效的职业分析报告，本次已停止后续岗位搜索。',
+   AI_BACKGROUND_EXECUTION_FAILED:'后台任务执行失败，已停止自动重试。请结束本次任务后重新开始。',
+   AI_PROVIDER_RESPONSE_INVALID:'AI 输出格式异常，未采用不完整推荐结果。',
   MATCH_PERSONAL_LIMIT:'今天的个人免费体验次数已达上限。',
   MATCH_GLOBAL_LIMIT:'平台今天的 AI 体验额度已用完。',
   BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。',
@@ -305,7 +306,7 @@ export async function closeSessionMatchTask(task:Pick<SessionMatchTask,'id'|'gen
 }
 type MatchContinuation={status:'CONTINUE';continuation:{state:unknown;token:string}};
 type MatchStreamResponse=MatchResponse|MatchContinuation;
-type PendingManagedMatch={status:'PENDING';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;report?:MatchResearchReport}|null};
+type PendingManagedMatch={status:'PENDING'|'FAILED';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;report?:MatchResearchReport;jobs?:MatchedJob[]}|null;failure?:{error:string;retryable?:boolean}|null};
 // Only an opaque ID and expiry are persisted locally; no raw CV, access
 // token, signed continuation or model output is written to localStorage.
 async function matchTaskReference(text:string,opts:MatchOptions,resumeId?:string){
@@ -476,11 +477,15 @@ export async function submitExtractedResumeText(
    if(code==='AI_CHECKPOINT_EXPIRED'){task?.clear();throw new MatchError(409,'已保存的研究状态已过期，请重新启动匹配。');}
    throw new MatchError(response.status,errorMap[code]||'智能匹配服务暂时不可用。',code==='AI_CHECKPOINT_DB_UNAVAILABLE'||(!code&&(response.status===429||response.status>=500)));
   }
-  if(data.status==='PENDING'){
+  if(data.status==='PENDING'||data.status==='FAILED'){
    if(!opts.managed_task)throw new MatchError(502,'任务恢复状态异常。');
    if(data.progress?.stage)onProgress?.(data.progress.stage);
    if(data.progress?.activity)onActivity?.(data.progress.activity);
    if(data.progress?.report)onResearch?.(data.progress.report);
+   if(Array.isArray(data.progress?.jobs))onResearchJobs?.(data.progress.jobs);
+   if(data.status==='FAILED')throw new MatchError(502,errorMap[data.failure?.error||'']||errorMap.AI_BACKGROUND_EXECUTION_FAILED,false);
+   if(data.failure?.retryable)onActivity?.({stage:'waiting',message:(errorMap[data.failure.error]||'后台连接暂时异常。')+' 正在恢复原任务，保留已有成果。'});
+   else if(!data.progress)onActivity?.({stage:'preparing',message:'后台任务已登记，正在等待实际执行状态。'});
    await new Promise<void>((resolve,reject)=>{const stop=()=>{clearTimeout(timer);reject(requestSignal.reason)};const timer=setTimeout(()=>{requestSignal.removeEventListener('abort',stop);resolve()},4000);requestSignal.addEventListener('abort',stop,{once:true});});
    continue;
   }

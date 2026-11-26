@@ -511,7 +511,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
       </aside>
     </div>
     {((result||partialJobs.length>0)||working||researchJobs.length>0||taskFailure)&&<CandidateMatchNativeDialog
-      hostRoute={hostRoute} taskFailed={taskFailure} initialMinimized={restoringTask||!!hostRoute&&!/\/candidate\/(?:account\/)?match$/.test(hostRoute)}
+      hostRoute={hostRoute} taskStartedAt={sessionTask.current?.started_at} taskFailed={taskFailure} initialMinimized={restoringTask||!!hostRoute&&!/\/candidate\/(?:account\/)?match$/.test(hostRoute)}
       result={result||{matches:partialJobs,profile:researchReport?.profile}}
       researchReport={result?.research_report||researchReport} researchJobs={result?.research_leads||researchJobs}
       pending={working&&!result} progressStage={stage} progressActivity={activity}

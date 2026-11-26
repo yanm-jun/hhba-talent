@@ -15,7 +15,7 @@ test('actual V4 profile and discovery both use OpenAI despite retired provider s
   calls.push(url);
   assert.match(url,/\/responses$/);
   assert.equal(opt.headers.authorization,'Bearer '+env.HHBA_AGENT_RELAY_API_KEY);
-  if(calls.length===1)return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify({profile:{roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}})}]}]});
+  if(calls.length===1)return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify({profile:{summary:'汽车经销商渠道运营经验',roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}})}]}]});
   throw Object.assign(Error('synthetic network stop'),{name:'NetworkError'});
  };
  const first=await v4Match(fetcher,v4JobProvider(env),resume,'全国',{env,officialOnly:true,curated:true,stepMode:true});
@@ -449,4 +449,12 @@ test('OpenAI operator search rejects ungrounded candidate claims',async()=>{
  const {runOpenAIProbe}=await import('../functions/api/match-v4-provider-probe.js');
  const result=await runOpenAIProbe(v4Provider(env),'openai_search',{fetcher:async()=>Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify({jobs:[{company:'Example',title:'Operations',location:'上海',url:'https://careers.example.com/jobs/123'}]})}]}]})});
  assert.equal(result.ok,false);assert.equal(result.grounded,false);
+});
+
+
+test('a terminal background failure is not mistaken for temporary scheduling unavailability',async()=>{
+ const {tryScheduleBackgroundMatch}=await import('../functions/_lib/v4-background-match.js');
+ const data=new Map(),env={HHBA_V4_BACKGROUND_ENABLED:'1',HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',HHBA_MATCH_V4_CHECKPOINT_SECRET:'synthetic-checkpoint-secret-long-enough',HHBA_PRIVATE_RESUMES:{async put(k,v){data.set(k,v)},async get(k){const v=data.get(k);return v?{arrayBuffer:async()=>v.buffer.slice(v.byteOffset,v.byteOffset+v.byteLength)}:null}},HHBA_MATCH_BACKGROUND:{async fetch(){return Response.json({ok:false,terminal_failure:true},{status:422})}}};
+ const session={phone:'synthetic-account',token_hash:'test-session'},task={id:'12345678-1234-1234-1234-123456789abc',generation:0};
+ assert.equal(await tryScheduleBackgroundMatch(env,new Request('https://hhba.work/api/match-v4/resume'),session,task),'FAILED');
 });

@@ -1,14 +1,14 @@
 // Independent driver. The only retained step output is a control status;
 // every CV, research result and checkpoint remains in HHBA's private storage.
 export async function requestPhase(fetcher,ticket){
- const response=await fetcher('https://hhba.work/api/match-v4/background-step',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket})});
+ let response;try{response=await fetcher('https://hhba.work/api/match-v4/background-step',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket})});}catch(e){if(e instanceof TypeError&&/invalid redirect|invalid url|invalid header/i.test(e.message))return 'FAILED';throw e;}
  // Cloudflare Workers rejects redirect:'error'. Never forward the private ticket to a redirect target.
  if(response.status>=300&&response.status<400){await response.body?.cancel().catch(()=>{});return 'FAILED';}
  if(!response.ok){
   const body=await response.json().catch(()=>({}));
   if(['AI_AGENT_CANCELLED','AI_BACKGROUND_TICKET_INVALID','AI_CHECKPOINT_EXPIRED'].includes(body.error))return 'STOP';
   if(response.status===409&&body.error==='AI_TASK_IN_PROGRESS'||response.status===429||response.status>=500)throw Error('BACKGROUND_PHASE_RETRY');
-  throw Error('BACKGROUND_PHASE_REJECTED');
+  return 'FAILED';
  }
  // The endpoint deliberately emits no applicant/result data.
  const text=await response.text();
@@ -31,8 +31,8 @@ export async function requestPhase(fetcher,ticket){
 export async function driveBackgroundMatch(step,ticket,fetcher){
  for(let phase=0;;phase++){
   // One durable workflow step per already-checkpointed V4 phase. The retry
-  // count is the platform maximum, not a cap on AI searches or model calls.
-  const state=await step.do('resume-research-phase-'+phase,{retries:{limit:10000,delay:'15 seconds',backoff:'constant'},timeout:'30 minutes'},()=>requestPhase(fetcher,ticket));
+  // budget applies only to failed transport attempts, not successful AI research rounds.
+  let state;try{state=await step.do('resume-research-phase-'+phase,{retries:{limit:5,delay:'15 seconds',backoff:'exponential'},timeout:'30 minutes'},()=>requestPhase(fetcher,ticket));}catch(e){console.warn('HHBA_MATCH_PHASE_RETRY_EXHAUSTED',JSON.stringify({phase}));return {status:'FAILED'};}
   if(state!=='CONTINUE')return {status:state};
  }
 }

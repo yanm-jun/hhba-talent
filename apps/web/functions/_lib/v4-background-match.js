@@ -12,7 +12,7 @@ export async function scheduleBackgroundMatch(env,session,task){
  if(previous?.kind!=='HHBA_V4_BACKGROUND_TICKET_V1'||Date.now()-(previous.renewed_at||0)>=3600000)await saveMatchTask(env,ticket,{kind:'HHBA_V4_BACKGROUND_TICKET_V1',phone:session.phone,session_hash:session.token_hash,task_id:task.id,generation:task.generation,renewed_at:Date.now()});
  const instance=await sha256Hex('hhba-workflow-instance:'+ticket);
  const r=await env.HHBA_MATCH_BACKGROUND.fetch('https://hhba-internal.invalid/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instance,ticket})});
- if(!r.ok){await r.body?.cancel().catch(()=>{});throw taskError('AI_BACKGROUND_SCHEDULE_UNAVAILABLE',503);}
+ if(!r.ok){const data=await r.json().catch(()=>null);if(data?.terminal_failure===true)return 'FAILED';throw taskError('AI_BACKGROUND_SCHEDULE_UNAVAILABLE',503);}
  const result=await r.json().catch(()=>null);
  if(result?.ok!==true)throw taskError('AI_BACKGROUND_SCHEDULE_UNAVAILABLE',503);
  return true;

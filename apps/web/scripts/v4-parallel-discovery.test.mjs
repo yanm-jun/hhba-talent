@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {runDiscoveryWave,nextDiscoveryWidth,combineDiscovery,discoveryLaneContext} from '../functions/_lib/v4-parallel-discovery.js';
 import {v4Match,renderCandidatePreview} from '../functions/_lib/simple-match-v4.js';
 const resume='本人负责汽车经销商渠道运营，区域销售督导、团队培训、销售数据分析、项目管理和客户服务。';
-const profile={summary:'汽车经销商渠道运营',roles:['区域销售督导','运营管理'],skills:[],facts:[],education:null};
+const profile={summary:'汽车经销商渠道运营',roles:['区域销售督导','运营管理'],skills:[],facts:[{kind:'work',quote:'汽车经销商渠道运营'}],education:null};
 const job=i=>({url:'https://careers.employer'+i+'.cn/jobs/'+i,company:'企业'+i,title:'运营岗位'+i,location:'上海',source_kind:'employer_official'});
 const model=(value,urls=[])=>new Response(JSON.stringify({status:'completed',output:[...(urls.length?[{type:'web_search_call',action:{query:'企业官网运营岗位',sources:urls.map(url=>({url}))}}]:[]),{type:'message',content:[{type:'output_text',text:JSON.stringify(value)}]}]}),{headers:{'Content-Type':'application/json'}});
 test('actual V4 discovery overlaps three provider calls, deduplicates and preserves all successful lanes',async()=>{

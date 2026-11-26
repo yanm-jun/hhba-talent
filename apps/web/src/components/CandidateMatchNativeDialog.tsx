@@ -31,7 +31,7 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 const archivedHistoryJob=(job:MatchedJob)=>job.jd_source_status==='VERIFIED_JD'&&job.reference_jd_kind!=='AI_GENERATED_REFERENCE'&&/^jd_[a-f0-9]{32}$/.test(job.jd_version_id||'')&&/^[a-f0-9]{64}$/.test(job.jd_sha256||'');
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false,initialMinimized=false}:{
+export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false,initialMinimized=false,taskStartedAt}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'profile'|'native_search'>>;
  onClose:()=>void;onContinue?:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
@@ -41,7 +41,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  sourceText?:string;sourceResume?:PrivateResume;accountScope?:string;
  // Match-history handoff enters the same existing editor without rerunning a search.
  initialOptimizedJobId?:string;
- hostRoute?:string;taskFailed?:boolean;initialMinimized?:boolean;
+ hostRoute?:string;taskFailed?:boolean;initialMinimized?:boolean;taskStartedAt?:number;
 }){
  const ref=useRef<HTMLDivElement|null>(null);
  const confirmRef=useRef<HTMLDialogElement|null>(null);
@@ -62,11 +62,11 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  const [elapsed,setElapsed]=useState(0);
  useEffect(()=>{
   if(!pending)return;
-  const started=Date.now();
-  setElapsed(0);
-  const timer=window.setInterval(()=>setElapsed(Math.floor((Date.now()-started)/1000)),1000);
+  const started=taskStartedAt??Date.now();
+  const update=()=>setElapsed(Math.max(0,Math.floor((Date.now()-started)/1000)));
+  update();const timer=window.setInterval(update,1000);
   return()=>window.clearInterval(timer);
- },[pending]);
+ },[pending,taskStartedAt]);
  const stageTitle:Record<NativeMatchProgress,string>={
   preparing:'准备匹配',parsing:'识别简历经历和技能',connected:'准备搜索',
   planning:'研究职业方向',searching:'搜索企业岗位',
@@ -84,7 +84,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  useEffect(()=>{
   if(pending&&currentStage>=0)setFurthestStage(old=>Math.max(old,currentStage));
  },[pending,currentStage]);
- const selectedStage=manualStage??(pending?(followProgress?Math.max(furthestStage,currentStage):0):2);
+ const selectedStage=manualStage??(pending||taskFailed?(followProgress?Math.max(furthestStage,currentStage):0):2);
  const showResults=selectedStage===2;
  const selectStage=(next:number|null)=>{
   setManualStage(next);if(next===null)setFollowProgress(true);
@@ -192,6 +192,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
      </div>
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobUrl?'optimization':'matches'}>
+     {notice&&<p className="hhba-match-disclaimer" role="alert">{notice}{result.matches.length>0?' 已显示本次收到的岗位；请核对招聘原始页面。':''}</p>}
      {!optimizedJobUrl&&<MatchResearchPanels profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches} pending={pending} progressStage={progressStage} activity={progressActivity} elapsed={elapsed} selection={selectedStage} onSelectionChange={selectStage} onFollow={()=>selectStage(null)} selectedJobUrl={selectedJobUrl} onJobChange={setSelectedJobUrl} onOptimize={optimizeJob} optimizationAvailable={!!parsedProfile}/>}
      {pending&&selectedStage!==1&&<><div className="hhba-research-now" role="status">
       <LoaderCircle size={18} className="spin" aria-hidden="true"/>
@@ -279,7 +280,6 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       {(result.native_search.hybrid_fallback.candidate_links??0)>0&&(result.native_search.hybrid_fallback.source_previews??0)===0?
        '本轮仍未完成职位信息核实，不代表没有适合的岗位。':''}
      </p>}
-     {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {!pending&&result.history_status==='SAVED'&&<div className="hhba-match-history-confirm">
       <span>这次的真实推荐结果已保存到你账户的「匹配历史」，下次登录可以继续查看。</span>
       <Link to="/candidate/account/applications" onClick={onClose}>查看匹配历史</Link>
