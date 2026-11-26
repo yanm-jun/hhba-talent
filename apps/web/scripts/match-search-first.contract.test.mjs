@@ -3,8 +3,7 @@ import assert from 'node:assert/strict';
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from '../functions/_lib/match-job-quality.js';
 import {recruitmentSourceKind,sourceDisplay,sortEmployerFirst,employerLookupQuery,corroboratesEmployerPosting} from '../functions/_lib/match-employer-source.js';
 import {explicitPreferredCity,supplementalQueries,mergeCandidateHits,combineRecommended} from '../functions/_lib/match-search-growth.js';
-import {searchQueries,normalizeHits,selectedJobs,searchPublicJobs,
- enrichCandidateDetails,reasonAboutJobs,runSearchFirstMatch,preferEmployerPostingUrls,indexedJobWorkCity,recoverSearchGroundedShortlist,sourceOnlyJobPreviews} from '../functions/_lib/deepseek-search-match.js';
+import {searchQueries,normalizeHits,selectedJobs,indexedJobWorkCity,sourceOnlyJobPreviews} from './fixtures/retired-search-evidence.mjs';
 
 const cv='负责HHBA AI智能体、Agent RAG工作流产品，并管理名爵汽车经销商DCC与销售培训。';
 const posts=Array.from({length:12},(_,i)=>({
@@ -52,103 +51,6 @@ test('model selection cannot add new URL or overseas jobs',()=>{
  assert.equal(out[0].official_url,posts[0].url);
  assert.equal(out[1].location,'北京');
 });
-test('real Search API shape: parallel queries with query/count/need_content and optional Fetch',async()=>{
- const calls=[];
- const fetcher=async(url,options)=>{
-  calls.push({url,body:JSON.parse(options.body)});
-  return new Response(JSON.stringify(url.endsWith('/search')?{results:posts.slice(0,7)}:
-   {title:'职位',content:'职位详情：工作地点上海；需要产品规划、项目协调能力。'.repeat(10)}),{status:200});
- };
- const results=await searchPublicJobs('synthetic-secret-not-real',cv,'AI产品经理',{fetcher});
- assert.ok(calls.length>=3);
- assert.ok(calls.every(x=>x.url==='https://api.deepseek.com/v1/tools/search'));
- assert.ok(calls.every(x=>x.body.query.length<=128&&x.body.count===20&&x.body.need_content===false));
- assert.equal(results.hits.length,7);
- const fetched=await enrichCandidateDetails('synthetic-secret-not-real',
-  results.hits,{fetcher,maxFetch:2});
- assert.ok(fetched.fetches>0&&fetched.fetches<=8,'sample early candidate pages without unbounded reads');
- assert.ok(fetched.hits.every(h=>h.availability?.status==='UNKNOWN'));
- assert.equal(fetched.excluded_closed,0);
-});
-test('short Search summaries trigger bounded Fetch API only for candidate detail URLs',async()=>{
- let fetched=0;
- const hits=normalizeHits([{results:posts.slice(0,4).map(x=>({...x,summary:'招聘职位',snippet:'招聘职位'}))}]);
- const get=async(url,options)=>{
-  assert.equal(url,'https://api.deepseek.com/v1/tools/fetch');
-  assert.ok(posts.some(x=>x.url===JSON.parse(options.body).url));
-  fetched++;
-  return new Response(JSON.stringify({title:'招聘职位',content:'这是上海某公司产品经理招聘详情，职责包括跨团队协同和产品规划。'.repeat(12)}),{status:200});
- };
- const enriched=await enrichCandidateDetails('synthetic-secret-not-real',hits,{fetcher:get,maxFetch:2});
- assert.equal(fetched,2);
- assert.equal(enriched.fetches,2);
- assert.ok(enriched.hits[0].content.length>80);
-});
-test('V4 Pro reasons only about Search results; no tools are passed to model',async()=>{
- let called=0;
- const hits=normalizeHits([searchResults]);
- const text=JSON.stringify(resultRows(['j1','j2']));
- const cut=text.indexOf('},{')+1;
- assert.ok(cut>1);
- const eventStream=[
- {type:'response.created'},
- {type:'response.output_text.delta',delta:text.slice(0,cut)},
- {type:'response.output_text.delta',delta:text.slice(cut)},
- {type:'response.completed',response:response(resultRows(['j1','j2']))}
- ].map(e=>'event: '+e.type+'\ndata: '+JSON.stringify(e)+'\n\n').join('');
- const partial=[];
- const out=await reasonAboutJobs('synthetic-secret-not-real',cv,hits,10,{
-  fetcher:async(url,options)=>{
-   called++;
-   const body=JSON.parse(options.body);
-   assert.equal(url,'https://api.deepseek.com/responses');
-   assert.equal(body.model,'deepseek-v4-pro');
-   assert.equal(body.tools,undefined);
-   assert.equal(body.text.format.type,'json_object');
-   assert.equal(body.reasoning.effort,'high');
-   return new Response(eventStream,{headers:{'Content-Type':'text/event-stream'}});
-  },onPartial:x=>partial.push(x.length)
- });
- assert.equal(called,1);
- assert.equal(out.matches.length,2);
- assert.deepEqual(partial,[1,2]);
- assert.ok(out.matches[0].recommendation_reason.length>75);
- assert.equal(out.matches[0].official_url,posts[0].url);
-});
-test('end-to-end: Search then V4 Pro selects actual URLs, logs stage timing and outputs partial results',async()=>{
- const calls=[],stages=[],partials=[];
- const fetcher=async(url,options)=>{
-  calls.push(url);
-  if(url.endsWith('/v1/tools/search'))return new Response(JSON.stringify(searchResults),{status:200});
-  if(url.endsWith('/responses')){
-   return new Response([
-    {type:'response.output_text.delta',delta:JSON.stringify(resultRows(['j1','j2']))},
-    {type:'response.completed',response:response(resultRows(['j1','j2']))}
-   ].map(x=>'event: '+x.type+'\ndata: '+JSON.stringify(x)+'\n\n').join(''),
-    {status:200,headers:{'Content-Type':'text/event-stream'}});
-  }
-  throw Error('Unexpected network call: '+url);
- };
- const result=await runSearchFirstMatch('synthetic-secret-not-real',cv,'AI产品经理',10,{
-  fetcher,onProgress:s=>stages.push(s),onPartial:jobs=>partials.push(jobs.length),supplementalLimit:0,expandDetailed:false
- });
- assert.ok(stages.includes('searching')&&stages.includes('writing'));
- assert.equal(calls.filter(x=>x.endsWith('/search')).length,searchQueries(cv,'AI产品经理').length);
- assert.equal(calls.filter(x=>x.endsWith('/responses')).length,1);
- assert.equal(result.matches.length,2);
- assert.equal(result.diagnostic.mode,'search-first-staged');
- assert.ok(Number.isFinite(result.diagnostic.search_ms));
- assert.ok(Number.isFinite(result.diagnostic.model_ms));
- assert.ok(partials.length>=1);
-});
-test('failing Search API never continues to model, so key/balance errors surface precisely',async()=>{
- let calls=0;
- await assert.rejects(searchPublicJobs('synthetic-secret-not-real',cv,'AI产品经理',{
-  fetcher:async()=>{calls++;return new Response('no balance',{status:402});}
- }),/AI_PROVIDER_BALANCE_INSUFFICIENT/);
- assert.ok(calls>=2);
-});
-
 test('job availability remains unknown on Search results or on generic apply buttons',()=>{
  const search=classifyJobAvailability({summary:'上海岗位招聘，该公司显示立即申请招聘详情。'});
  assert.equal(search.status,'UNKNOWN');
@@ -170,27 +72,6 @@ test('explicit closed job on fetched page is rejected, but unknown job remains e
  const suspect=classifyJobAvailability({summary:'该职位已关闭。'});
  assert.equal(suspect.status,'POSSIBLY_CLOSED');
  assert.ok(!isRecommendationEligible({availability:suspect}));
-});
-test('bounded parallel Fetch verifies status, removes known closed postings, keeps unknowns',async()=>{
- const hits=normalizeHits([searchResults]);
- let calls=0,parallel=0,peak=0;
- const fetcher=async(url,opts)=>{
-  assert.ok(url.endsWith('/v1/tools/fetch'));
-  const id=Number(JSON.parse(opts.body).url.match(/-(\d+)-2026$/)?.[1]);
-  calls++;parallel++;peak=Math.max(peak,parallel);
-  await new Promise(resolve=>setTimeout(resolve,6));parallel--;
-  const content=id===1?'该职位已关闭，招聘结束，不再接受申请。'.repeat(7):
-    id===2?'本职位正在招聘，我们接受投递，具体岗位要求以官网为准。'.repeat(8):
-    '有关上海招聘岗位的职责、经验和待遇介绍，但未显示正式申请状态。'.repeat(8);
-  return new Response(JSON.stringify({content}),{status:200});
- };
- const result=await enrichCandidateDetails('synthetic-secret-not-real',hits,{fetcher,maxFetch:4});
- assert.equal(calls,4);assert.equal(peak,4);
- assert.equal(result.excluded_closed,1);
- assert.equal(result.hits.length,11);
- assert.equal(result.hits[0].availability.status,'OPEN_LISTED');
- assert.equal(result.hits[1].availability.status,'UNKNOWN');
- assert.ok(!result.hits.some(h=>h.url===posts[0].url));
 });
 test('availability filtering is applied even if model mentions a closed candidate ID',()=>{
  const hits=normalizeHits([searchResults]);
@@ -275,72 +156,6 @@ test('supplemental candidate merge keeps original IDs and drops repeated URLs',(
  ],10);
  assert.deepEqual(jobs.map(j=>j.company),['乙公司','丙公司','甲公司']);
 });
-test('5 shortlisted roles are shown before supplemental search, then 10 roles and longer reasons appear',async()=>{
- const stages=[],seen=[],urls=[],allResults=[...posts.slice(0,5),...posts.slice(5,10)];
- let shortlist=0,details=0,searches=0;
- const fetcher=async(url,options)=>{
-  urls.push(url);
-  const payload=JSON.parse(options.body);
-  if(url.endsWith('/v1/tools/search')){
-   searches++;
-   const extra=payload.query.includes('2026 社会招聘')||payload.query.includes('企业招聘 申请职位');
-   return new Response(JSON.stringify({results:extra?allResults.slice(5):allResults.slice(0,5)}),{status:200});
-  }
-  if(url.endsWith('/v1/tools/fetch')){
-   return new Response(JSON.stringify({content:'岗位详情：实际工作地上海，团队协作、产品方案实施、客户需求分析和项目交付均为岗位职责。'.repeat(4)}),{status:200});
-  }
-  if(url.endsWith('/responses')){
-   if(payload.stream===false){
-    details++;
-    const batch=JSON.parse(payload.input.split('已选真实岗位：\n')[1]);
-    return new Response(JSON.stringify(response({jobs:batch.map(item=>({
-     id:item.id,reason:'这份简历体现出岗位需要的真实业务沟通和数字产品规划经历，可以把已有的实际项目推进和客户需求梳理成果用于新职位；对应上海的企业数字化产品工作，需要将项目目标转换为落地方案，也应注意企业可能额外要求行业资历与技术背景，应对照岗位详情核验。'
-    }))})),{status:200});
-   }
-   shortlist++;
-   assert.ok(payload.instructions.includes('先快速生成岗位名单'));
-   assert.ok(payload.max_output_tokens>=12000,'shortlist model is no longer constrained to 3500 tokens');
-   assert.equal(payload.reasoning.effort,'high');
-   const candidates=JSON.parse(payload.input.split('可选真实职位：\n')[1]);
-   const roles=candidates.map((h,i)=>({
-    id:h.id,company:'模拟雇主'+h.id,title:'产品职位'+h.id,
-    location:'上海',match_score:90-i,
-    score_basis:'简历中的真实项目策划、门店业务分析以及数字产品执行经验与岗位要求相关，但需确认特定行业资质。',
-    reason:'简历中的项目协调和产品设计经验与这类岗位职责相关，建议重点核对企业要求。',
-    job_basis:'数字产品、业务沟通与协调'
-   }));
-   const raw=JSON.stringify({jobs:roles});
-   const events=[
-    {type:'response.output_text.delta',delta:raw},
-    {type:'response.completed',response:response({jobs:roles})}
-   ].map(x=>'event: '+x.type+'\ndata: '+JSON.stringify(x)+'\n\n').join('');
-   return new Response(events,{status:200,headers:{'Content-Type':'text/event-stream'}});
-  }
-  throw Error('unexpected '+url);
- };
- const result=await runSearchFirstMatch('synthetic-secret-not-real',cv,'AI产品经理',10,{
-  fetcher,autonomousPlanning:false,onProgress:x=>stages.push(x),onPartial:jobs=>seen.push({
-   count:jobs.length,expanded:jobs.filter(j=>j.reason_detail_complete).length,
-   urls:jobs.map(j=>j.official_url)
-  })
- });
- assert.equal(searches,searchQueries(cv,'AI产品经理').length+2);
- assert.equal(shortlist,2);
- assert.equal(details,2);
- assert.equal(result.matches.length,10);
- assert.equal(result.diagnostic.initial_visible,5);
- assert.equal(result.diagnostic.final_shortlisted,10);
- assert.equal(result.diagnostic.supplement_queries,2);
- assert.equal(result.diagnostic.details_expanded,10);
- assert.ok(result.diagnostic.primary_raw_hits>=5);
- assert.ok(result.diagnostic.primary_filtered_links>=0);
- assert.ok(seen.some(x=>x.count===5&&x.expanded===0),'initial 5 jobs are immediately available');
- assert.ok(seen.some(x=>x.count===10&&x.expanded===0),'supplement arrives without waiting for detailed prose');
- assert.ok(seen.some(x=>x.count===10&&x.expanded>0),'detailed reasons update asynchronously');
- assert.ok(result.matches.every(j=>j.match_score!==null&&j.reason_detail_complete));
- assert.ok(result.matches.every(j=>allResults.some(x=>x.url===j.official_url)),'no fabricated job URL');
-});
-
 test('recruitment sources distinguish mass boards, hosted employer ATS, and uncertain employer domain candidates',()=>{
  assert.equal(recruitmentSourceKind('https://www.zhipin.com/job_detail/abcd0001.html'),'THIRD_PARTY_BOARD');
  assert.equal(recruitmentSourceKind('https://jobs.51job.com/shanghai/co123456.html'),'THIRD_PARTY_BOARD');
@@ -371,70 +186,6 @@ test('employer site results survive limited search candidate slots even after ma
  assert.equal(found[0].url,employer.url);
  assert.equal(found[0].recruitment_source_kind,'EMPLOYER_DOMAIN_CANDIDATE');
  assert.equal(sortEmployerFirst(found,8)[0].url,employer.url);
-});
-test('Search-backed employer link replacement requires matching employer, role and Mainland city',async()=>{
- const board='https://www.zhipin.com/job_detail/brand-specialist-2026.html';
- const official='https://careers.stardust-cn.com/jobs/brand-specialist-2026';
- const job={id:'search-j1',company:'星云科技有限公司',title:'品牌督导',location:'上海',match_score:88,
-  recruitment_source_kind:'THIRD_PARTY_BOARD',recruitment_source_note:'第三方招聘平台',
-  official_url:board,availability_status:'UNKNOWN',recommendation_reason:'原有岗位描述'};
- const options=[],events=[];
- const hit={url:official,title:'星云科技有限公司 - 品牌督导 - 上海 职位招聘',
-  site_name:'星云科技有限公司',
-  summary:'星云科技有限公司招聘品牌督导，工作地点上海，负责区域门店培训。'.repeat(3),
-  snippet:'上海 品牌督导' };
- const resolved=await preferEmployerPostingUrls('synthetic-secret-not-real',[job],[],{
-  fetcher:async(url,init)=>{
-   assert.equal(url,'https://api.deepseek.com/v1/tools/search');
-   const body=JSON.parse(init.body);options.push(body);
-   return new Response(JSON.stringify({results:[hit]}),{status:200});
-  },onPartial:jobs=>events.push(jobs.map(j=>j.official_url))
- });
- assert.equal(resolved.lookups,1);
- assert.equal(resolved.replaced,1);
- assert.equal(resolved.matches[0].official_url,official);
- assert.equal(resolved.matches[0].match_score,88);
- assert.equal(resolved.matches[0].recruitment_source_kind,'EMPLOYER_DOMAIN_CANDIDATE');
- assert.equal(resolved.matches[0].availability_status,'UNKNOWN');
- assert.ok(resolved.matches[0].recruitment_source_note.includes('待核验'));
- assert.equal(resolved.hits.length,1);
- assert.deepEqual(events,[[official]]);
- assert.equal(options[0].count,12);
- assert.ok(options[0].query.includes('星云科技有限公司'));
- assert.ok(options[0].query.includes('品牌督导'));
- assert.ok(options[0].query.includes('企业官网'));
- assert.ok(!options[0].query.includes('原有岗位描述'),'no private resume content in a replacement lookup');
-});
-test('never replace a third-party URL with a guessed, mismatched or dead non-position page',async()=>{
- const job={id:'search-j1',company:'星云科技有限公司',title:'品牌督导',location:'上海',
-  official_url:'https://www.zhipin.com/job_detail/brand-specialist-2026.html',
-  recruitment_source_kind:'THIRD_PARTY_BOARD'};
- const searched=[
-  {url:'https://careers.other-cn.com/jobs/brand-specialist-2026',
-   title:'别家公司 品牌督导 上海',summary:'别家公司招聘品牌督导，上海'},
-  {url:'https://careers.stardust-cn.com/jobs/finance-director-2026',
-   title:'星云科技有限公司 财务总监 上海',summary:'星云科技有限公司招聘财务总监，上海'},
-  {url:'https://www.zhipin.com/job_detail/98765-2026.html',
-   title:'星云科技有限公司 品牌督导 上海',summary:'招聘该职位'},
-  {url:'https://careers.stardust-cn.com/',
-   title:'星云科技有限公司 品牌督导 上海',summary:'招聘信息首页'}
- ];
- const result=await preferEmployerPostingUrls('synthetic-secret-not-real',[job],[],{
-  fetcher:async()=>new Response(JSON.stringify({results:searched}),{status:200})
- });
- assert.equal(result.replaced,0);
- assert.equal(result.matches[0].official_url,job.official_url);
-});
-test('official company links are left untouched and never cost an extra Search request',async()=>{
- const job={id:'search-j1',company:'星云科技有限公司',title:'品牌督导',location:'上海',
-  official_url:'https://careers.stardust-cn.com/jobs/brand-specialist-2026',
-  recruitment_source_kind:'EMPLOYER_DOMAIN_CANDIDATE'};
- const res=await preferEmployerPostingUrls('synthetic-secret-not-real',[job],[],{
-  fetcher:()=>{throw Error('No extra provider search allowed')}
- });
- assert.equal(res.lookups,0);
- assert.equal(res.replaced,0);
- assert.equal(res.matches[0].official_url,job.official_url);
 });
 test('native cards point to employer recruitment pages without a third-party action',async()=>{
  const {readFile}=await import('node:fs/promises');
@@ -469,119 +220,6 @@ test('indexed employer work city is used only when the page explicitly labels a 
  assert.equal(indexedJobWorkCity({summary:'企业总部位于上海，但岗位工作地点尚未发布。'}),null);
  assert.equal(indexedJobWorkCity({summary:'企业北京总部发布岗位，工作地点：东京。'}),null);
 });
-test('zero initial shortlist triggers source-grounded AI recovery rather than aborting after search',async()=>{
- const publicPosting={
-  url:'https://careers.orbit-cn.com/jobs/supervisor-2026',
-  title:'星云科技 品牌督导 上海 招聘',
-  site_name:'星云科技',
-  summary:'星云科技2026年招聘品牌督导，工作地点：上海。岗位职责包括管理经销商门店、培训销售团队、进行销售数据复盘。任职要求有良好沟通能力及汽车渠道运营经验。'.repeat(2),
-  snippet:'星云科技品牌督导，工作地点上海'
- };
- const calls=[];
- const fetcher=async(url,options)=>{
-  const body=JSON.parse(options.body);calls.push({url,body});
-  if(url.endsWith('/v1/tools/search'))return new Response(JSON.stringify({results:[publicPosting]}),{status:200});
-  if(url.endsWith('/v1/tools/fetch'))return new Response(JSON.stringify({title:publicPosting.title,content:publicPosting.summary}),{status:200});
-  if(url.endsWith('/responses')&&body.stream===true){
-   const empty={jobs:[]};
-   const lines=[{type:'response.output_text.delta',delta:JSON.stringify(empty)},
-    {type:'response.completed',response:response(empty)}];
-   return new Response(lines.map(x=>'event: '+x.type+'\ndata: '+JSON.stringify(x)+'\n\n').join(''),
-    {status:200,headers:{'Content-Type':'text/event-stream'}});
-  }
-  if(url.endsWith('/responses')&&body.stream===false){
-   const fixed={jobs:[{id:'j1',company:'星云科技',title:'品牌督导',location:'',
-    reason:'我的汽车渠道督导、经销商培训和销售转化复盘实践，与这份公开的品牌督导岗位方向存在相关性。具体资格和经验年限仍须核对企业官网。'}]};
-   return new Response(JSON.stringify(response(fixed)),{status:200});
-  }
-  throw Error('Unexpected URL: '+url);
- };
- const partial=[];
- const out=await runSearchFirstMatch('fake-secret','曾做经销商品牌督导及销售培训','',10,{
-  fetcher,supplementalLimit:0,expandDetailed:false,onPartial:jobs=>partial.push(jobs)
- });
- assert.equal(out.matches.length,1);
- assert.equal(out.matches[0].company,'星云科技');
- assert.equal(out.matches[0].location,'上海');
- assert.equal(out.matches[0].official_url,publicPosting.url);
- assert.ok(partial.length>0);
- assert.equal(calls.filter(x=>x.url.endsWith('/responses')&&x.body.stream===false).length,1);
- assert.ok(calls.every(x=>!JSON.stringify(x.body).includes('www.zhipin.com')));
-});
-test('repair response cannot invent employers or reuse a candidate id for a mismatched role',async()=>{
- const hits=normalizeHits([{results:[{title:'星云科技 品牌督导 上海 招聘',
-  url:'https://careers.orbit-cn.com/jobs/supervisor-2026',
-  site_name:'星云科技',summary:'星云科技品牌督导，工作地点：上海。经销商门店运营和渠道管理招聘信息。'}]}]);
- const fake=await recoverSearchGroundedShortlist('fake-secret','经销商培训',hits,10,{
-  fetcher:async()=>new Response(JSON.stringify(response({jobs:[{
-   id:'j1',company:'另一家无关公司',title:'品牌督导',location:'上海',
-   reason:'虽然岗位名称相似，但是公司来源不明，因此不能直接认定本岗位归属真实企业。'
-  }]})),{status:200})
- });
- assert.equal(fake.length,0,'repair must not present unsupported company attribution');
-});
-test('only third-party sites: automatically searches employer domains, then shows no fabricated fallback',async()=>{
- const calls=[],platformHits={results:[{
-  url:'https://www.zhipin.com/job_detail/brand-role-2026.html',
-  title:'上海招聘品牌督导',summary:'品牌督导，工作地点上海，招聘中'.repeat(5)
- }]};
- const fetcher=async(url,options)=>{
-  calls.push(url);
-  if(url.endsWith('/v1/tools/search'))return new Response(JSON.stringify(platformHits),{status:200});
-  throw Error('Model and Fetch must never be called when only job boards exist: '+url);
- };
- await assert.rejects(
-  runSearchFirstMatch('synthetic-secret-not-real',cv,'品牌督导',10,{fetcher,autonomousPlanning:false}),
-  /AI_EMPLOYER_JOBS_NOT_FOUND/
- );
- assert.equal(calls.length,searchQueries(cv,'品牌督导').length+2);
- assert.ok(calls.every(u=>u.endsWith('/v1/tools/search')));
-});
-test('first Search is third-party only: official supplemental results can still return employer jobs, never board URLs',async()=>{
- const board={url:'https://www.zhipin.com/job_detail/brand-role-2026.html',
-  title:'招聘产品经理',summary:'上海招聘具体岗位，属于招聘平台。'.repeat(5)};
- const corporate={url:'https://careers.orbit-cn.com/jobs/brand-role-2026',
-  title:'星云科技 品牌督导 上海 招聘',
-  summary:'星云科技招聘上海品牌督导，负责渠道营销、终端门店管理及团队协调。'.repeat(5)};
- let calls=0;
- const mock=async(url,options)=>{
-  if(url.endsWith('/v1/tools/search')){
-   calls++;
-   const q=JSON.parse(options.body).query;
-   return new Response(JSON.stringify({results:q.includes('2026 社会招聘')||q.includes('企业招聘 申请职位')?[corporate]:[board]}),{status:200});
-  }
-  if(url.endsWith('/v1/tools/fetch'))return new Response(JSON.stringify({content:
-   '上海品牌督导招聘，负责经销商门店业务督导、跨部门培训、项目执行等。'.repeat(8)}),{status:200});
-  if(url.endsWith('/responses')){
-   const req=JSON.parse(options.body);
-   if(req.stream===false)return new Response(JSON.stringify(response({jobs:[{
-    id:'search-j1',reason:'简历包括实际参与经销商门店销售渠道、团队培训和业务运营管理的工作，掌握销售线索转化及日常执行流程，对企业招聘的品牌督导职位有直接相关经历；但还需要对照官网判断具体学历、工作年限及岗位技术能力是否达标。'
-   }]})),{status:200});
-   const rows={jobs:[{id:'j1',company:'星云科技',title:'品牌督导',location:'上海',
-    match_score:83,score_basis:'既有经销商督导、团队培训和终端运营经验，符合岗位相关的实践要求。',
-    reason:'简历包含经销商督导和销售团队运营经历，与该岗位要求存在关联。'}]};
-   const payload=[
-    {type:'response.output_text.delta',delta:JSON.stringify(rows)},
-    {type:'response.completed',response:response(rows)}
-   ].map(x=>'event: '+x.type+'\ndata: '+JSON.stringify(x)+'\n\n').join('');
-   return new Response(payload,{status:200,headers:{'Content-Type':'text/event-stream'}});
-  }
-  throw Error('Unexpected '+url);
- };
- const partial=[];
- const result=await runSearchFirstMatch('synthetic-secret-not-real',cv,'品牌督导',10,{
-  fetcher:mock,onPartial:jobs=>partial.push(jobs.map(j=>j.official_url))
- });
- assert.equal(result.matches.length,1);
- assert.equal(result.matches[0].official_url,corporate.url);
- assert.ok(calls>=3);
- assert.ok(partial.length>=1);
- assert.ok(partial.flat().every(url=>url===corporate.url));
- assert.equal(result.diagnostic.source_after.third_party_board,0);
- assert.equal(result.diagnostic.third_party_results_shown,0);
-});
-
-
 // Regression cases for explicit employer work-city evidence.
 const employer=(overrides={})=>({
  id:'j1',url:'https://careers.example.com/cn/job/R173207/region-sales',source:'Example Foods, Incorporated',
@@ -597,16 +235,6 @@ test('employer single-job header supplies Wuhu, not the sales territory in the r
  assert.equal(job?.match_score,null);
  assert.equal(job?.application_status,'NEEDS_OFFICIAL_CONFIRMATION');
 });
-test('Fetch preserves explicit country and site even after the excerpt limit',async()=>{
- const row=employer({url:'https://example.com/ph-en/careers/career-search/job/details/req-10090943-sales',
-  title:'地区经理',source:'Example Pharma',summary:'招聘信息。'});
- const full='Job ID: REQ-10090943\nJob Description: 区域销售和团队管理。\n'+'岗位职责：区域业务规划。'.repeat(350)+
- '\nLocation\n\nChina\n\nSite\n\nShanghai (Shanghai)\n\nCompany / Legal Entity\nExample Pharma Beijing\nApply to Job';
- const res=await enrichCandidateDetails('test',[row],{fetcher:async()=>new Response(JSON.stringify({content:full}))});
- assert.equal(res.hits.length,1);
- assert.equal(indexedJobWorkCity(res.hits[0]),'Shanghai (Shanghai)');
- assert.equal(sourceOnlyJobPreviews(res.hits)[0]?.title,'地区经理');
-});
 test('do not infer a city from a title alone, an ambiguous country, headquarters or market lists',()=>{
  assert.equal(indexedJobWorkCity(employer({title:'销售主管-铜陵'})),null);
  assert.equal(indexedJobWorkCity(employer({title:'销售主管 job in Washington, China | Jobs at Example'})),null);
@@ -618,12 +246,4 @@ test('do not infer a city from a title alone, an ambiguous country, headquarters
  assert.deepEqual(sourceOnlyJobPreviews([careerGrid]),[]);
  assert.deepEqual(sourceOnlyJobPreviews([employer({availability:{status:'CLOSED_LISTED'}})]),[]);
  assert.deepEqual(sourceOnlyJobPreviews([employer({url:'https://job.goodjob.cn/job963820.html',source:'俊才网'})]),[]);
-});
-test('a concrete employer listing preserves its Chinese location metadata late in the body',async()=>{
- const job=employer({url:'https://jobs.example.com/zh/detail-page/job-detail/REF99683M-p-1234abcd/',
-  title:'渠道销售经理',source:'示例公司官方招聘',summary:'工作职责与要求'});
- const full='岗位职责：渠道管理、经销商沟通。'.repeat(320)+'\n\n### 所在地\n北京市\n\n职位编号 REF99683M\n';
- const result=await enrichCandidateDetails('test',[job],{fetcher:async()=>new Response(JSON.stringify({content:full}))});
- assert.equal(indexedJobWorkCity(result.hits[0]),'北京市');
- assert.equal(sourceOnlyJobPreviews(result.hits)[0]?.title,'渠道销售经理');
 });

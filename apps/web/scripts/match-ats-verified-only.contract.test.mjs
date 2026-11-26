@@ -1,6 +1,5 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {searchPublicJobs} from '../functions/_lib/deepseek-search-match.js';
 import {createMatchJdReview} from '../functions/_lib/match-jd-review.js';
 import {safeHistoryJobs} from '../functions/_lib/match-history.js';
 
@@ -12,17 +11,6 @@ const searchRows=[GH,LEVER,BOARD].map(url=>({
  title:'Regional Operations Specialist - Shanghai, China - Official Job',
  url,site_name:'职位信息',summary:'Shanghai, China. Responsibilities: regional operations. Qualifications: retail operations experience.'
 }));
-
-test('foreign ATS and third-party boards never enter mainland Search candidates or JD verification queue',async()=>{
- const result=await searchPublicJobs('synthetic','脱敏简历','区域督导',{
-  queriesOverride:['区域督导 上海 企业招聘'],allowEmpty:true,
-  fetcher:async()=>Response.json({results:searchRows})
- });
- assert.deepEqual(result.hits,[]);
- assert.deepEqual(result.ats_posting_urls,[]);
- assert.equal(result.diagnostic.ats_verification_leads,0);
- assert.equal(result.diagnostic.rejected_links,3);
-});
 
 test('even fully scored and apparently verified foreign ATS links are not presented or persisted',async()=>{
  let fetched=0;

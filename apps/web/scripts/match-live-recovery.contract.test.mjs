@@ -3,10 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {isMainlandEmployerJobUrl,recruitmentSourceKind}
  from '../functions/_lib/match-employer-source.js';
-import {normalizeHits,sourceOnlyJobPreviews}
- from '../functions/_lib/deepseek-search-match.js';
-import {runAgentOwnedMainlandMatch}
- from '../functions/_lib/ai-owned-job-research.js';
+import {normalizeHits,sourceOnlyJobPreviews} from './fixtures/retired-search-evidence.mjs';
 
 const hit={
  id:'j1',title:'华东星海汽车有限公司 · 区域渠道督导 · 上海 招聘',
@@ -36,39 +33,6 @@ test('a Source-only preview needs real employer, distinct role, explicit Chinese
  assert.match(previews[0].recommendation_reason,/尚未得到足够的模型回复/);
  assert.deepEqual(sourceOnlyJobPreviews([{...hit,summary:'岗位不详',snippet:'公司总部在上海'}]),[]);
  assert.deepEqual(sourceOnlyJobPreviews([{...hit,url:'https://www.zhipin.com/job_detail/abc'}]),[]);
-});
-test('AI selection timeout preserves grounded positions instead of a false no-jobs verdict, while emitting actual activity',async()=>{
- const activity=[];
- const result=await runAgentOwnedMainlandMatch('fake-key','曾辅导经销商DCC运营，并培训区域销售团队','',10,{
-  expandDetailed:false,onActivity:x=>activity.push(x)
- },{
-  plan:async()=>({queries:['区域督导 渠道培训 上海 企业招聘']}),
-  search:async()=>({hits:[hit],diagnostic:{
-   successful_searches:1,raw_results:12,candidate_links:1,
-   rejected_links:11,search_failures:0}}),
-  decide:async()=>({actions:[{type:'finish'}],shortlist_ids:['j1']}),
-  select:async()=>{const err=new Error('AI_MATCH_REASON_TIMEOUT');err.code=err.message;throw err;}
- });
- assert.equal(result.matches.length,1);
- assert.equal(result.matches[0].official_url,hit.url);
- assert.equal(result.matches[0].match_score,null);
- assert.ok(result.diagnostic.selection_failures>=1);
- assert.equal(result.diagnostic.selection_rounds,2,'a sparse shortlist receives one independent follow-up comparison');
- assert.ok(activity.some(x=>x.searches===1&&x.raw_results===12&&x.candidate_links===1));
- assert.ok(activity.some(x=>x.stage==='writing'&&x.message.includes('待核实线索')),
-  'real sources remain visible as explicitly unscored research leads');
-});
-test('credential/usage problems are never swallowed and never misreported as a lack of suitable jobs',async()=>{
- for(const code of ['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT',
-  'AI_PROVIDER_RATE_LIMITED','AI_SEARCH_API_REJECTED','AI_SEARCH_UNAVAILABLE']){
-  await assert.rejects(runAgentOwnedMainlandMatch('fake-key','渠道运营简历','',10,{
-   expandDetailed:false
-  },{
-   plan:async()=>({queries:['企业渠道督导 上海 招聘']}),
-   search:async()=>{const e=new Error(code);e.code=code;throw e},
-   decide:async()=>{throw Error('should not wait for decision')}
-  }),e=>e.code===code);
- }
 });
 test('the modal shows current progress while SSE retains search metrics',()=>{
  const app=readFileSync(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');

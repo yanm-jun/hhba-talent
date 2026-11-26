@@ -6,7 +6,7 @@
  * The existing Search->independent JD->resume evidence gates still own results.
  */
 import {recruitmentSourceKind,isMainlandEmployerJobUrl} from './match-employer-source.js';
-import {normalizeAutonomousQueries} from './autonomous-mainland-search.js';
+import {normalizeAutonomousQueries} from './public-search-queries.js';
 
 export const INDUSTRY_HALL_IDS=Object.freeze([
  'automotive','finance','telecom','semiconductor','internet-ai','construction',

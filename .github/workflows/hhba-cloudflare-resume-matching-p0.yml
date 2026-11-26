@@ -41,8 +41,8 @@ jobs:
           node --check 'functions/api/match-native/[[path]].js'
           node --check functions/api/match-native/_middleware.js
           node --check 'functions/api/match-next/[[path]].js'
-          node --check functions/_lib/deepseek-native-match.js
-          node --check functions/_lib/deepseek-search-match.js
+          node --check functions/_lib/public-search-text.js
+          node --check functions/_lib/public-search-queries.js
           node --check functions/_lib/match-job-quality.js
           node --check functions/_lib/match-employer-source.js
           node --check functions/_lib/match-history.js

@@ -1,8 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {AGENT_VERSION,normalizeResearchDecision,runAgentOwnedMainlandMatch}
- from '../functions/_lib/ai-owned-job-research.js';
+import {normalizeResearchDecision} from './fixtures/retired-research-decisions.mjs';
 
 const resume='负责汽车经销商培训、区域业务分析和数字化项目运营，有真实销售过程管理经验。';
 const first={id:'j1',title:'星海汽车有限公司 区域渠道督导 上海 招聘',
@@ -32,84 +31,6 @@ test('AI action normalizer rejects invented URLs, IDs, PII queries and duplicate
  assert.equal(out.finish,true);
  assert.equal('url' in out,false);
 });
-test('model chooses research, then cross-industry search, then evidence-based finish',async()=>{
- const queryLog=[],progress=[],observed=[],chosen=[];
- let decisionCount=0;
- const result=await runAgentOwnedMainlandMatch('synthetic',resume,'',10,{
-  expandDetailed:false,onProgress:x=>progress.push(x),
-  onPartial:rows=>observed.push(rows.map(x=>x.official_url))
- },{
-  plan:async()=>({queries:['汽车区域督导 上海 企业官网招聘'],strategy:'start with direct'}),
-  search:async(k,cv,hint,options)=>{
-   assert.equal(k,'synthetic');
-   assert.ok(!options.queriesOverride.some(q=>q.includes('负责汽车经销商')));
-   queryLog.push(...options.queriesOverride);
-   return {hits:options.queriesOverride.some(q=>q.includes('跨行业'))?[adjacent]:[first],
-    diagnostic:{successful_searches:1,raw_results:1,search_failures:0}};
-  },
-  fetchDetails:async(k,hits,opts)=>({hits:hits.map(x=>({...x,
-   content:'工作地点上海。岗位职责：区域渠道督导，复盘销售漏斗数据并承担经销商培训。'})),fetches:1}),
-  decide:async(k,cv,hint,pool,queries,history)=>{
-   decisionCount++;
-   if(decisionCount===1)return {actions:[{type:'fetch',candidate_ids:['j1','j99']}]};
-   if(decisionCount===2)return {actions:[{type:'search',queries:['跨行业 数字化项目运营 杭州 企业招聘']}]};
-   return {actions:[{type:'finish'}],shortlist_ids:['j2']};
-  },
-  select:async(k,cv,hits,number,options)=>{
-   chosen.push(hits.map(x=>x.url));
-   return {matches:[jobOf(hits[0])]};
-  }
- });
- assert.equal(result.diagnostic.mode,AGENT_VERSION);
- assert.equal(result.diagnostic.agent_decisions,3);
- assert.equal(result.diagnostic.agent_reflections,2);
- assert.equal(result.diagnostic.agent_exit_reason,'agent_finished');
- assert.ok(result.diagnostic.page_reads>=1,'real source research must not be skipped');
- assert.ok(result.diagnostic.selection_rounds>=1);
- assert.ok(queryLog.includes('汽车区域督导 上海 企业官网招聘'));
- assert.ok(queryLog.includes('跨行业 数字化项目运营 杭州 企业招聘'));
- assert.equal(queryLog[0],'汽车区域督导 上海 企业官网招聘',
-  'AI directs the initial search when no resume-derived role was supplied');
- assert.equal(result.matches[0].official_url,adjacent.url);
- assert.equal(chosen[0][0],adjacent.url,'AI-selected research focus precedes original source');
- assert.ok(progress.includes('planning')&&progress.includes('researching')&&progress.includes('searching'));
- assert.equal(result.diagnostic.third_party_results_shown,0);
- assert.ok(observed.length>0);
-});
-test('a model-invented URL is never displayed, even when only a real source preview survives',async()=>{
- const out=await runAgentOwnedMainlandMatch('synthetic',resume,'',10,{
-  expandDetailed:false
- },{
-  plan:async()=>({queries:['汽车区域督导 上海 企业官网招聘']}),
-  search:async()=>({hits:[first],diagnostic:{successful_searches:1,raw_results:1}}),
-  decide:async()=>({actions:[{type:'finish'}],shortlist_ids:['j1']}),
-  select:async()=>({matches:[{...jobOf(first),
-   official_url:'https://careers.fictitious-company.com/jobs/invented'}]})
- });
- assert.ok(out.matches.every(job=>job.official_url!==
-  'https://careers.fictitious-company.com/jobs/invented'));
- assert.ok(out.matches.every(job=>job.official_url===first.url));
- assert.ok(out.matches.every(job=>job.match_score===null),
-  'if the model invented a URL, only a real, explicitly uns cored source preview may survive');
-});
-test('model not available for planning falls back only for tool discovery, still uses AI action loop',async()=>{
- const searched=[];
- const out=await runAgentOwnedMainlandMatch('synthetic',resume,'',10,{
-  expandDetailed:false,resumeProfile:{target_roles:['经销商培训']}
- },{
-  plan:async()=>{throw Error('planner unavailable')},
-  search:async(k,cv,hint,{queriesOverride})=>{
-   searched.push(...queriesOverride);
-   return {hits:[first],diagnostic:{successful_searches:queriesOverride.length,raw_results:1}};
-  },
-  decide:async()=>({actions:[{type:'finish'}]}),
-  select:async(k,cv,hits)=>({matches:[jobOf(hits[0])]})
- });
- assert.ok(searched.length>0,'fallback remains available when planning provider fails');
- assert.ok(searched.every(query=>query.includes('经销商培训')));
- assert.equal(out.matches.length,1);
- assert.equal(out.diagnostic.agent_exit_reason,'agent_finished');
-});
 test('the real candidate route defaults to model-owned loop and preserves authenticated Word flow',()=>{
  const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  const word=readFileSync(new URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
@@ -121,31 +42,3 @@ test('the real candidate route defaults to model-owned loop and preserves authen
  assert.doesNotMatch(route,/runAgentOwnedMainlandMatch|HHBA_MATCH_DEEPSEEK_KEY/);
 });
 
-test('first Search starts without waiting for autonomous planner, but planner directions still execute',async()=>{
- const observations=[];
- const src={id:'j1',title:'职位详情',
-  url:'https://zhaopin.meituan.com/web/position/detail?jobUnionId=980001',
-  source:'美团招聘',
-  summary:'区域督导经理社招-正式 工作地点：北京市。岗位职责：商家运营与督导。',
-  availability:{status:'UNKNOWN'}};
- const result=await runAgentOwnedMainlandMatch('synthetic',
-  '模拟简历：做过区域汽车门店督导管理','',10,{
-   expandDetailed:false,resumeProfile:{target_roles:['区域门店督导']}
-  },{
-   plan:async()=>{
-    assert.ok(observations.includes('search-started'),
-     'public Search should not be blocked on reasoning planning');
-    observations.push('planner');
-    return {queries:['DeepSeek自选 多行业 招聘渠道运营']};
-   },
-   search:async(k,resume,hint,opts)=>{
-    observations.push('search-started');
-    return {hits:[src],diagnostic:{successful_searches:opts.queriesOverride.length,raw_results:3}};
-   },
-   decide:async()=>({actions:[{type:'finish'}]}),
-   select:async()=>{const e=new Error('AI_MATCH_NO_VALID_JOBS');e.code=e.message;throw e;},
-   recover:async()=>[]
-  });
- assert.ok(result.matches.length>=1);
- assert.ok(result.diagnostic.searches>=1);
-});

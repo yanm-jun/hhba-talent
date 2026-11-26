@@ -1,11 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {assessDomesticEvidence,researchDomesticJobEvidence,DOMESTIC_EVIDENCE_PIPELINE,compactResearchResumeEvidence}
- from '../functions/_lib/domestic-job-research.js';
+import {assessDomesticEvidence,DOMESTIC_EVIDENCE_PIPELINE,compactResearchResumeEvidence} from './fixtures/retired-partial-evidence.mjs';
 import {allowedEmployerJobLink,isMainlandEmployerJobUrl}
  from '../functions/_lib/match-employer-source.js';
-import {normalizeHits} from '../functions/_lib/deepseek-search-match.js';
+import {normalizeHits} from './fixtures/retired-search-evidence.mjs';
 
 const URL='https://careers.xinghe-cn.com/jobs/regional-supervisor-2026';
 const REMOTE='https://careers.xinghe-cn.com/jobs/regional-supervisor-2027';
@@ -73,84 +72,6 @@ test('public WeChat article can corroborate but cannot masquerade as verified em
  assert.equal(x.evidence_status,'SEARCH_SNIPPET_ONLY');
  assert.equal(x.match_score,null);
 });
-test('bounded DeepSeek searches contain only public company/role/city; AI scores sourced partials',async()=>{
- const calls=[],redacted='本人负责汽车销售门店渠道运营、数据分析和经销商培训。';
- const fetcher=async(url,args)=>{
-  const body=JSON.parse(args.body);calls.push({url,body});
-  if(url.endsWith('/v1/tools/search'))
-   return new Response(JSON.stringify({results:[hit()]}),{status:200});
-  if(url.endsWith('/responses'))
-   return new Response(JSON.stringify({output:[{type:'message',content:[{
-    type:'output_text',text:JSON.stringify({jobs:[{id:'search-j1',match_score:82,
-     score_basis:'这份岗位公开职责包括区域门店经营分析与经销商培训，简历中的渠道运营和数据分析经验相关，但具体工作年限尚待官网确认。'}]})
-   }]}]}),{status:200});
-  throw Error('unexpected '+url);
- };
- const result=await researchDomesticJobEvidence('synthetic-key',redacted,[post()],{fetcher});
- assert.equal(result.diagnostic.mode,DOMESTIC_EVIDENCE_PIPELINE);
- assert.equal(result.diagnostic.scored,1);
- assert.equal(result.matches[0].match_score,82);
- assert.equal(result.matches[0].evidence_status,'PARTIAL_SOURCE');
- assert.equal(result.matches[0].evidence_score_status,'AI_PARTIAL_SOURCE_SCORED');
- assert.equal(calls.filter(x=>x.url.endsWith('/search')).length,1);
- assert.ok(calls[0].body.query.includes('区域督导'));
- assert.ok(!calls[0].body.query.includes('本人负责'), 'CV never goes to public Search');
- assert.equal(calls[0].body.need_content,false);
- assert.equal(calls[1].body.model,'deepseek-v4-pro');
-});
-test('failed search/model or explicit research killswitch does not revive unsupported model scores',async()=>{
- const failed=await researchDomesticJobEvidence('synthetic','redacted cv',[post()],{},
-  {search:async()=>{throw Error('not accessible')},score:async()=>{throw Error('provider down')}});
- assert.equal(failed.matches[0].match_score,null);
- assert.equal(failed.diagnostic.search_failures,1);
- const disabled=await researchDomesticJobEvidence('synthetic','redacted cv',[post()],
-  {enabled:false},{search:async()=>{throw Error('must not run')}});
- assert.equal(disabled.matches[0].match_score,null);
-});
-test('verified local employer JD keeps canonical hash/score and never triggers public research',async()=>{
- const pinned=post({jd_source_status:'VERIFIED_JD',jd_version_id:'jd_'+'a'.repeat(32),
-  jd_sha256:'f'.repeat(64),match_score:86,reference_score:86});
- const out=await researchDomesticJobEvidence('test','some cv',[pinned],{},
-  {search:async()=>{throw Error('verified JDs need no extra search')}});
- assert.equal(out.matches[0].evidence_status,'VERIFIED_FULL_JD');
- assert.equal(out.matches[0].match_score,86);
- assert.equal(out.matches[0].jd_version_id,pinned.jd_version_id);
-});
-
-test('AI role-direction fit remains preliminary; unsupported candidates never inherit shortlist scores',async()=>{
- const direction=post({
-  research_anchor:hit({summary:'星河汽车有限公司发布区域督导职位。工作地点：济南。详情和任职资格请查看官网。',
-   snippet:'星河汽车有限公司 区域督导 济南'})
- });
- const unknown=post({id:'search-j2',company:'另一家汽车公司',official_url:REMOTE,
-  match_score:97,reference_score:97,score_basis:'模型上游旧评分'});
- const fetcher=async(url,args)=>{
-  if(url.endsWith('/v1/tools/search'))
-   return new Response(JSON.stringify({results:[]}),{status:200});
-  const batch=JSON.parse(args.body).input;
-  assert.match(batch,/本人负责汽车零售门店/);
-  return new Response(JSON.stringify({output:[{type:'message',content:[{type:'output_text',
-   text:JSON.stringify({jobs:[
-    {id:'search-j1',match_score:78,
-     score_basis:'结合简历中的汽车零售门店运营经历，这个岗位名称与区域督导方向一致，但尚未核实企业公开的具体岗位职责与任职条件，只能作为方向参考。',
-     resume_evidence:'简历写明本人负责汽车零售门店的流程管理及销售培训。',
-     role_relation:'页面公开列有区域督导岗位，职业方向与过去门店督导工作有关联。',
-     unknowns:'工作年限、学历要求、薪酬以及实际日常职责都没有得到可靠确认。',
-     next_step:'打开企业招聘页面核对最新具体 JD 和官方申请状态。'},
-    {id:'search-j2',match_score:97,score_basis:'虽然简历经历相关，但该岗位并没有可靠的公开职责或公司归属证据，应当暂时留空。'}
-   ]})}]}]}),{status:200});
- };
- const result=await researchDomesticJobEvidence('test','本人负责汽车零售门店的流程管理及销售培训。',[direction,unknown],
-  {fetcher});
- assert.equal(result.matches.find(x=>x.id==='search-j1').evidence_status,'SEARCH_SNIPPET_ONLY');
- assert.equal(result.matches.find(x=>x.id==='search-j1').evidence_score_status,'AI_DIRECTION_REFERENCE_SCORED');
- assert.equal(result.matches.find(x=>x.id==='search-j1').match_score,78);
- assert.match(result.matches.find(x=>x.id==='search-j1').recommendation_reason,/待核实条件/);
- assert.equal(result.matches.find(x=>x.id==='search-j2').evidence_status,'INSUFFICIENT_EVIDENCE');
- assert.equal(result.matches.find(x=>x.id==='search-j2').match_score,null);
- assert.equal(result.diagnostic.scored,1);
-});
-
 test('original matching/history/Word path all use researched source evidence',()=>{
  const route=readFileSync(new globalThis.URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  const history=readFileSync(new globalThis.URL('../functions/_lib/match-history.js',import.meta.url),'utf8');

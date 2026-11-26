@@ -25,9 +25,9 @@ on:
       - 'apps/web/functions/api/resume-reassess.js'
       - 'apps/web/scripts/verified-jd-reassessment.contract.test.mjs'
       - 'apps/web/functions/_lib/match-jd-enrichment.js'
-      - 'apps/web/functions/_lib/domestic-job-research.js'
-      - 'apps/web/functions/_lib/autonomous-mainland-search.js'
-      - 'apps/web/functions/_lib/ai-owned-job-research.js'
+
+      - 'apps/web/functions/_lib/public-search-queries.js'
+
       - 'apps/web/functions/api/match-next/**'
       - 'apps/web/functions/_lib/domestic-employer-index.js'
       - 'apps/web/functions/_lib/ai-research-checkpoint.js'
@@ -44,7 +44,8 @@ on:
       - 'apps/web/scripts/match-production-failure-regression.contract.test.mjs'
       - 'apps/web/scripts/match-preflight-resilience.contract.test.mjs'
       - 'apps/web/scripts/autonomous-mainland-search.contract.test.mjs'
-      - 'apps/web/functions/_lib/deepseek-search-match.js'
+      - 'apps/web/functions/_lib/public-search-text.js'
+      - 'apps/web/scripts/fixtures/retired-*.mjs'
       - 'apps/web/functions/_lib/match-employer-source.js'
       - 'apps/web/scripts/domestic-job-research.contract.test.mjs'
       - 'apps/web/scripts/match-experience-regression.contract.test.mjs'
