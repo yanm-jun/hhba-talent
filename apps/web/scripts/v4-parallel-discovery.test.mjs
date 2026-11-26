@@ -1111,3 +1111,25 @@ test('task discovery deduplicates events across agent lanes and continuation rou
  assert.equal(new Map(second.checkpoint.rows).get(a.url).requirements,'第二轮补充证据');
  assert.equal(second.checkpoint.round,2);
 });
+
+
+test('serial discovery transport interruption retries the unfinished round while preserving complete candidate objects',async()=>{
+ const a=job(6701),b=job(6702),p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test',stream:true};
+ let recovery;const seen=[];
+ const opts={curated:true,officialOnly:true,stepMode:true,parallelResearch:false,onRecoveryState:get=>{recovery=get;},
+  onDiscoveryCandidate:e=>seen.push(e.candidate.official_url),
+  checkpoint:{phase:'research',round:1,rows:[],profile:{...profile,target_roles:profile.roles}}};
+ const partial='data: '+JSON.stringify({type:'response.output_text.delta',delta:'{"jobs":['+JSON.stringify(a)+',{"company":"incomplete'})+'\n\n';
+ await assert.rejects(v4Match(async()=>new Response(partial,{headers:{'content-type':'text/event-stream'}}),p,resume,'全国',opts),{code:'AI_PROVIDER_NETWORK_ERROR'});
+ const checkpoint=recovery();
+ assert.deepEqual(checkpoint.rows.map(([u])=>u),[a.url]);
+ assert.deepEqual(checkpoint.toolUrls,[]);
+ assert.deepEqual(seen,[a.url]);
+ const result=await v4Match(async(_u,req)=>{
+  const input=JSON.parse(JSON.parse(req.body).input);
+  assert.ok(input.previously_discovered_jobs.some(j=>j.url===a.url));
+  return model({jobs:[a,b],research_complete:false},[a.url,b.url]);
+ },p,resume,'全国',{...opts,checkpoint});
+ assert.deepEqual(result.checkpoint.rows.map(([u])=>u).sort(),[a.url,b.url].sort());
+ assert.deepEqual(seen,[a.url,b.url]);
+});
