@@ -14,7 +14,7 @@ import {v4AcceptResearchDigest,V4_DIGEST_GUIDE,v4ResearchMemoryPage,v4ContextSta
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch} from './v4-jd-research.js';
 import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery,runReadyWork} from './v4-parallel-discovery.js';
-import {candidateRevision,candidateResearchMemory,pendingVerification,verificationSnapshot,mergePipelineCheckpoint,pipelineWidths} from './v4-research-pipeline.js';
+import {candidateRevision,candidateResearchMemory,pendingVerification,verificationSnapshot,mergePipelineCheckpoint,pipelineWidths,pipelineVerificationWindow} from './v4-research-pipeline.js';
 import {makeBatchScorer} from './v4-batch-scoring.js';
 import {completeJdSpan,looksTruncatedJd} from './v4-jd-completeness.js';
 import {readPublicHtmlResearch,unchangedPublicHtmlResearch,writePublicHtmlResearch} from './v4-public-html-research-cache.js';
@@ -95,9 +95,14 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent,stage=prov
  const effort=stageEffort(provider,stage), effective={...provider,...(effort?{reasoningEffort:effort}:{})};
  // Explicit payload overrides are also normalized for normal GPT-6 business requests.
  if(stage!=='probe'&&/^gpt-6(?:\.|-)/i.test(provider.model||'')&&payload.reasoning)payload={...payload,reasoning:{...payload.reasoning,effort:'medium'}};
+ const callStarted=Date.now();let failureCode=null;
  let data;
  try{data=await v4CallOpenAI(fetcher,effective,payload,{signal,onEvent,stage});return data;}
- finally{await recordAiUsage(provider.usageDb,{model:provider.model,stage,effort:payload.reasoning?.effort||effort,status:data?.status||'failed',usage:data?.usage});}
+ catch(e){failureCode=e?.code||'AI_CALL_FAILED';throw e;}
+ finally{
+  console.info('HHBA_V4_STAGE_TIMING',JSON.stringify({stage,elapsed_ms:Date.now()-callStarted,status:data?.status||'failed',error:failureCode}));
+  await recordAiUsage(provider.usageDb,{model:provider.model,stage,effort:payload.reasoning?.effort||effort,status:data?.status||'failed',usage:data?.usage});
+ }
 }
 async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,stage}={}){
  if(!provider)throw fault('AI_PROVIDER_NOT_CONFIGURED');
@@ -638,7 +643,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   const eligible=pendingVerification(checkpoint);
   if(eligible.length){
    const plan=pipelineWidths(checkpoint,eligible.length);
-   const attempted=eligible.slice(0,plan.verification),verify=verificationSnapshot(checkpoint,plan.verification);
+   const window=pipelineVerificationWindow(checkpoint,eligible.length,plan.verification);
+    const attempted=eligible.slice(0,window),verify=verificationSnapshot(checkpoint,plan.verification,window);
    const search=structuredClone(checkpoint);
    // Allocate transport capacity by actual backlog, not by limiting research.
    search.discoveryWidth=plan.discovery;
@@ -664,7 +670,9 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    }
    next.pipelineActive=true;
    const observedRequests=(verifyState?.diagnostics?.VERIFICATION_EXTERNAL_REQUESTS||0)-(checkpoint.diagnostics?.VERIFICATION_EXTERNAL_REQUESTS||0);
-   next.pipelineVerificationWidth=verified.status==='rejected'?Math.max(1,Math.floor(plan.verification/2)):Math.min(observedRequests>0&&observedRequests/Math.max(1,attempted.length)<=8&&eligible.length>=48?4:3,plan.verification+1);
+    const completedCount=(next.diagnostics?.PIPELINE_VERIFICATION_ATTEMPTS||0)-(searchState.diagnostics?.PIPELINE_VERIFICATION_ATTEMPTS||0);
+    next.pipelineVerificationCost=verified.status==='fulfilled'&&observedRequests>0&&completedCount>0?observedRequests/completedCount:null;
+   next.pipelineVerificationWidth=verified.status==='rejected'?Math.max(1,Math.floor(plan.verification/2)):Math.min(observedRequests>0&&observedRequests/Math.max(1,completedCount)<=8&&eligible.length>=48?4:3,plan.verification+1);
    if(discovery.status==='rejected'){
     next.discoveryWidth=nextDiscoveryWidth(search.discoveryWidth,[discovery.reason?.code||'AI_PROVIDER_RESPONSE_INVALID']);
     next.diagnostics={...next.diagnostics,PIPELINE_SEARCH_RETRY_RETAINED:(next.diagnostics?.PIPELINE_SEARCH_RETRY_RETAINED||0)+1};
@@ -1258,6 +1266,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // Each worker owns a read→score lane: a slow source cannot block the
  // scores of other jobs in this batch. Keep the old serial path intact.
  const overlap=curated&&parallelResearch;
+  const laneWidth=Math.min(4,entries.length,Math.max(1,checkpoint?.verificationLaneWidth||4));
  const began=Date.now();
  const initial=overlap?{results:new Map(),read:0}:await enrich(verificationFetcher,new Map(entries),readOptions);
  const results=initial.results;let read=initial.read;
@@ -1287,14 +1296,14 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    return continuation('verification',{next:0,processedEarlier:[...done],processedEvidence:[...revisions],explicitRechecks:[...rechecks],matches:mergeJobEvidence(previousMatches,accepted),read:(checkpoint?.read||0)+officialCompleted,scored:(checkpoint?.scored||0)+officialCompleted,archived:(checkpoint?.archived||0)+archivedCompleted,scoreFailures:checkpoint?.scoreFailures||0,reportFailures:checkpoint?.reportFailures||0,verificationReads:[...verificationReads].filter(([u])=>!urls.has(u)),verificationBatch:batch}).checkpoint;
   };
   if(curated&&checkpoint)onRecoveryState(()=>verificationRecovery());
- const batchScore=curated&&entries.length>1?makeBatchScorer({call:p=>v4Call(verificationFetcher,provider,p,{signal,stage:'score'}),parse:v4ParseJson,resume,roleHint,budget:researchContextBudget,note,signal,delay:250}):null;
+ const batchScore=curated&&laneWidth>1?makeBatchScorer({call:p=>v4Call(verificationFetcher,provider,p,{signal,stage:'score'}),parse:v4ParseJson,resume,roleHint,budget:researchContextBudget,note,signal,delay:250,maxReady:laneWidth}):null;
  const worker=async()=>{
   while(cursor<entries.length){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    // Large verification windows are admitted incrementally. Leave headroom
    // for active research and storage; untouched entries remain in allEntries
    // and are processed by the next durable invocation, never marked complete.
-   if(overlap&&batchSize>4&&cursor>=4&&verificationRequests>=30)return;
+   if(overlap&&batchSize>laneWidth&&cursor>=laneWidth&&verificationRequests>=(pipelineChild?20:30))return;
    const i=cursor++,[url,job]=entries[i];
    if(overlap){
     const got=await enrich(verificationFetcher,new Map([[url,job]]),readOptions);
@@ -1384,7 +1393,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    onActivity('scoring','已对 '+scored+' 条岗位按完整 JD 重新评分，已存档 '+archived+' 条有原文依据的 JD。');
   }
  };
- const settledWorkers=await Promise.allSettled(Array.from({length:Math.min(4,entries.length)},worker));
+ const settledWorkers=await Promise.allSettled(Array.from({length:laneWidth},worker));
  const workerFailure=settledWorkers.find(x=>x.status==='rejected');
  if(overlap&&cursor<entries.length){
   entries.splice(cursor);matches.splice(cursor);
