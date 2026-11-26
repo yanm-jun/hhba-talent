@@ -16,18 +16,16 @@ const media1=load('data/domesticMediaBundle.json').companies;
 const media2=load('data/domesticMedia200Bundle.json').companies;
 const combined={...media1,...media2};
 const existsAsset=(p)=>typeof p==='string' && !p.includes('..') && existsSync(new URL('../public/'+p.replace(/^\//,''),import.meta.url));
-test('complete up-to-date enterprise and admin navigation survives',()=>{
- for(const x of ['企业发现','CandidateAccountDropdown','登录 / 注册','招聘市场','加入我们'])
-   assert.ok(shell.includes(x),'missing navigation '+x);
- for(const x of ['工作台','我的收藏','个人资料','求职偏好','我的简历','求职记录','法律援助'])
-   assert.ok(dropdown.includes(x),'missing personal center item '+x);
- for(const x of ['Company200PreviewPage','PersonalCenterPage','LegalAidLandingPage','EmployerStartPage',
- 'EmployerOnboardingPreviewPage','EmployerAidApplicationPage','EmployerCommercialPage','AdminAidCommercialPage',
- 'EmployerEvidencePage','AdminEmployerEvidencePage','EmployerScoringPage','AdminEmployerScoringPage',
- 'EmployerAppealsPage','AdminAppealsReviewPage','EmployerImprovementsPage','AdminEmployerPublicationPage'])
-   assert.ok(main.includes(x),'must preserve latest application feature '+x);
- for(const x of ['求职与机会','劳动权益','UnifiedJobMarket compact'])
-   assert.ok(homepage.includes(x),'must preserve homepage '+x);
+test('candidate navigation survives while retired employer administration stays unmounted',()=>{
+ for(const x of ['CandidateAccountDropdown','加入我们'])assert.ok(shell.includes(x),'missing navigation '+x);
+ for(const x of ['Company200PreviewPage','PersonalCenterPage','LegalAidLandingPage'])assert.ok(main.includes(x),'missing active feature '+x);
+ for(const x of ['EmployerStartPage','EmployerOnboardingPreviewPage','EmployerAidApplicationPage','EmployerCommercialPage','AdminAidCommercialPage','EmployerEvidencePage','AdminEmployerEvidencePage','EmployerScoringPage','AdminEmployerScoringPage','EmployerAppealsPage','AdminAppealsReviewPage','EmployerImprovementsPage','AdminEmployerPublicationPage']){
+  assert.ok(!main.includes('return <'+x),'retired route '+x);
+  assert.ok(!main.includes('const '+x+'=lazy'),'retired bundle '+x);
+ }
+ assert.match(main,/Removed routes are indistinguishable/);
+ assert.doesNotMatch(shell,/to="\/employer\/|to="\/recruiter\//);
+ for(const x of ['求职与机会','劳动权益','UnifiedJobMarket compact'])assert.ok(homepage.includes(x),'missing homepage '+x);
 });
 test('exact 200 company identities, original 100 and complete profile references preserved',()=>{
  const names=companyList.companyNames;

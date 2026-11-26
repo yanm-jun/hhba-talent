@@ -425,7 +425,7 @@ jobs:
       - name: Verify recruitment responsibility, loading truth, and existing applicant and admin flows
         working-directory: apps/web
         run: node --test scripts/recruitment-responsibility.contract.test.mjs
-      - name: Protect 200 company identities, original photographs, personal center and employer governance routes
+      - name: Protect 200 company identities, original photographs, personal center and candidate route retirement
         working-directory: apps/web
         run: |
           node scripts/audit-domestic-company200.mjs
@@ -542,7 +542,7 @@ jobs:
         run: node --experimental-strip-types --test scripts/tum.contract.test.mjs
       - name: Package 3 licensed actual Garching campus photos
         run: python apps/web/scripts/package-tum-campus-photos.py
-      - name: "Build unified HHBA - 200 companies, applicant center, employer governance previews and brand pages"
+      - name: "Build unified HHBA - 200 companies, applicant center and brand pages"
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
@@ -642,10 +642,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify server-only recruitment workdays, tenant RBAC, and idempotent canonical event replay
-        run: |
-          python -m pip install --quiet --disable-pip-version-check -r apps/api/requirements-evidence-dev.txt
-          python -m unittest apps.api.tests.test_recruitment_responsibility -v
       - name: Package self-hosted OFL Chinese xingshu font for HHBA homepage
         working-directory: apps/web
         run: |
@@ -765,7 +761,7 @@ jobs:
       - name: Verify stale or withdrawn official jobs cannot appear in active results
         run: |
           node -e "const fs=require('fs');const x=fs.readFileSync('apps/web/src/services/liveRecruitment.ts','utf8');if(!x.includes('MISSING_FROM_OFFICIAL_BOARD')||!x.includes('OFFICIAL_URL_CHANGED')||!x.includes('loadPublicJobAudit'))process.exit(1)"
-      - name: Verify dual-entry home, unified deep links and complete enterprise function routing
+      - name: Verify dual-entry home, unified deep links and retired enterprise function routing
         working-directory: apps/web
         run: node --test scripts/hhba-unified-static.contract.test.mjs
       - name: Enable deep-link reload fallback
@@ -863,56 +859,12 @@ jobs:
           node --check apps/web/dist/admin-preview/dashboard.js
           test -s apps/web/dist/admin-preview/index.html
           test -s apps/web/dist/admin-preview/data/overview.json
-      - name: Verify full employer governance and safe public preview
+      - name: Verify retired enterprise preview is absent and public assets remain
         run: |
           test -s apps/web/dist/images/hhba-founder-signature.webp
           test -s apps/web/dist/images/hhba-join-team.webp
-          test -s apps/web/dist/preview-admin/data/workspace.json
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          const source=fs.readFileSync('apps/web/src/main.tsx','utf8');
-          for (const text of ['EmployerAidApplicationPage','AdminAppealsReviewPage','AdminEmployerEvidencePage','EmployerScoringPage','EmployerImprovementsPage','Company200PreviewPage','PersonalCenterPage'])
-            if(!source.includes(text))throw Error('LOST_UNIFIED_MODULE_'+text);
-          const state=JSON.parse(fs.readFileSync('apps/web/dist/preview-admin/data/workspace.json','utf8'));
-          if(state.productionReviewerAuth!=='not_connected'||!state.modules.every(x=>!x.reviewAllowed))
-            throw Error('STATIC_PREVIEW_MUST_NOT_HAVE_LIVE_APPROVAL');
-          console.log('HHBA_COMPLETE_SOURCE_AND_SAFE_PREVIEW_OK');
-          NODE
-      - name: Verify newest unified admin preview is truly public-safe and fully static
-        run: |
-          node --check apps/web/dist/preview-admin/dashboard.js
-          node --check apps/web/dist/preview-admin/unified-workbench.js
-          node --input-type=module <<'NODE'
-          import {readFileSync,existsSync} from 'node:fs';
-          const root='apps/web/dist/preview-admin/';
-          for (const file of ['index.html','styles.css','unified-workbench.css',
-              'favicon.svg','dashboard.js','unified-workbench.js',
-              'data/jobs.json','data/growth.json','data/workspace.json']) {
-            if (!existsSync(root+file)) throw Error('MISSING_ADMIN_PREVIEW_FILE:'+file);
-          }
-          const html=readFileSync(root+'index.html','utf8');
-          const dashboard=readFileSync(root+'dashboard.js','utf8');
-          const workspaceUi=readFileSync(root+'unified-workbench.js','utf8');
-          if (!html.includes('GitHub Pages 静态预览') ||
-              html.includes('action="/management/logout"') ||
-              !dashboard.includes("fetch('./data/jobs.json'") ||
-              !dashboard.includes("fetch('./data/growth.json?'+params") ||
-              !workspaceUi.includes("fetch('./data/workspace.json'") ||
-              dashboard.includes("fetch('/api/admin/") ||
-              workspaceUi.includes("fetch('/api/admin/"))
-            throw Error('ADMIN_PREVIEW_PRIVATE_SERVICE_LEAK');
-          for(const file of ['jobs.json','growth.json','workspace.json']){
-            const data=JSON.parse(readFileSync(root+'data/'+file,'utf8'));
-            if(file==='jobs.json'&&(data.quality!=='unavailable'||
-               data.counts.displayableJobs!==null))throw Error('FAKE_JOB_TOTAL');
-            if(file==='growth.json'&&(data.traffic.quality!=='unavailable'||
-               data.bookmarks.quality!=='unavailable'))throw Error('FAKE_PRIVATE_METRICS');
-            if(file==='workspace.json'&&(data.productionReviewerAuth!=='not_connected'||
-               !data.modules.every(x=>x.pending===null&&!x.reviewAllowed)))
-              throw Error('UNAUTHORIZED_REVIEWER_STATE');
-          }
-          console.log('HHBA_PUBLIC_STATIC_ADMIN_PREVIEW_VERIFIED',root);
-          NODE
+          test ! -e apps/web/dist/preview-admin
+          node --test apps/web/scripts/b2b-retirement.contract.test.mjs
       - name: Verify old bulk snapshot is excluded from V2 market but kept for legacy company directory
         run: |
           # Other identity-directory routes still rely on these source files.

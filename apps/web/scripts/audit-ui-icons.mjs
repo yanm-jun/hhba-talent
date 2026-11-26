@@ -17,7 +17,6 @@ import { fileURLToPath } from 'node:url';
 const repo = resolve(fileURLToPath(new URL('../../../', import.meta.url)));
 const roots = [
   'apps/web/src',
-  'apps/web/public/preview-admin',
   'apps/admin-preview',
   'apps/browser-extension',
 ];
