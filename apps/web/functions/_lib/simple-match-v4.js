@@ -145,7 +145,7 @@ async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,stage}={}){
  logV4Usage(provider,data.usage,Date.now()-started,data.status);
  return data;
 }
-export const v4UsableProfile=profile=>Boolean(profile?.summary?.trim()&&(profile.facts?.length||profile.skills?.length||profile.target_roles?.length||profile.education_evidence||profile.experience_evidence));
+export const v4UsableProfile=profile=>Boolean(profile?.summary?.trim()&&profile.target_roles?.length&&(profile.facts?.length||profile.skills?.length||profile.education_evidence||profile.experience_evidence));
 export function v4GroundProfile(raw,resume){
  const profile=raw?.profile&&typeof raw.profile==='object'?raw.profile:raw||{};
  const exact=quote=>!!quote&&norm(resume).includes(norm(quote));
