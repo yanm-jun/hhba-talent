@@ -18,6 +18,8 @@ import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSess
 import {backgroundEnabled,tryScheduleBackgroundMatch,loadBackgroundMatch,isV4RetryableTaskFailure} from '../../_lib/v4-background-match.js';
 
 import {phaseResourceBudget,phaseModelReplay,PHASE_YIELD} from '../../_lib/v4-phase-budget.js';
+import {createV4ProgressPublisher} from '../../_lib/v4-progress-publisher.js';
+import {v4DiscoveryCandidateKey} from '../../_lib/v4-discovery-candidate-events.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
 const reply=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
@@ -83,30 +85,24 @@ function events(env,request,input,waitUntil){
    const allowedJob=j=>j&&!j.excluded_board&&!isCommercialRecruitmentBoard(j.official_url,j);
    const officialJob=j=>allowedJob(j)&&qualifiedReport(j);
    let lastReport=input.savedProgress?.report,latestActivity=input.savedProgress?.activity,lastJobs=input.savedProgress?.jobs||[];
-   let progressTimer=null,progressPending=null,progressClosed=false,progressUrgent=false,lastProgressWrite=Date.now()-17000;
    const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:lastJobs});
    async function publishProgress(status='PENDING',failure=null){
      if(!input.background||!input.taskKey)return;
-     try{budget?.observe('progress');await saveMatchProgress(env,input.taskKey,{generation:input.generation||0,status,progress:snapshotProgress(),failure});lastProgressWrite=Date.now();}
+     try{budget?.observe('progress');await saveMatchProgress(env,input.taskKey,{generation:input.generation||0,status,progress:snapshotProgress(),failure});}
      catch(e){console.warn('HHBA_V4_PROGRESS_WRITE_FAILED',JSON.stringify({trace,error:e?.code||'PROGRESS_WRITE_FAILED'}));}
     }
-    function queueProgress(urgent=false){
-     if(!input.background||progressClosed||!leaseHeartbeat||!budget?.canPublish())return;
-     if(urgent)progressUrgent=true;
-     if(progressPending)return;
-     if(progressTimer){if(!urgent)return;clearTimeout(progressTimer);progressTimer=null;}
-     // A completed, validated report is a user-visible result, not a
-     // heartbeat. Coalesce nearby arrivals without the ordinary 20s delay.
-     progressTimer=setTimeout(()=>{
-      progressTimer=null;if(progressClosed||leaseAbort.signal.aborted||!budget.canPublish())return;
-      progressUrgent=false;
-      progressPending=publishProgress().finally(()=>{progressPending=null;if(progressUrgent)queueProgress(true);});
-     },Math.max(0,(progressUrgent?1000:20000)-(Date.now()-lastProgressWrite)));
-    }
-    async function stopProgress(){progressClosed=true;if(progressTimer)clearTimeout(progressTimer);progressTimer=null;if(progressPending)await progressPending;}
+   const publisher=createV4ProgressPublisher({
+    publish:()=>publishProgress(),
+    canPublish:kind=>!!(input.background&&input.taskKey&&leaseHeartbeat&&!leaseAbort.signal.aborted&&budget?.canPublish()&&
+     // Candidate-only writes leave enough headroom for actual research.
+     (kind!=='candidate'||budget.snapshot().soft-budget.used>=8))
+   });
+   const queueProgress=kind=>publisher.queue(kind);
+   const stopProgress=()=>publisher.stop();
    const sendResearch=r=>{if(r){lastReport=r;send('research_report',r);queueProgress();}};
    const reportSignature=jobs=>JSON.stringify(jobs.filter(officialJob).map(j=>[j.official_url,j.match_score,j.jd_sha256,j.research_detail,j.reference_jd]));
    let lastReportSignature=reportSignature(lastJobs);
+   const publishedCandidateKeys=new Set(lastJobs.map(j=>v4DiscoveryCandidateKey(j.official_url)).filter(Boolean));
    const rememberJobs=matches=>{
     // The progress object is encrypted and bound to this authorized task.
     // Keep complete reports lossless; compact only non-deliverable leads.
@@ -117,7 +113,9 @@ function events(env,request,input,waitUntil){
      availability_status:j.availability_status,report_status:j.report_status
     }));
     const signature=reportSignature(lastJobs),changed=signature!==lastReportSignature;lastReportSignature=signature;
-    queueProgress(changed);
+    let newCandidate=false;
+    for(const j of lastJobs){const key=v4DiscoveryCandidateKey(j.official_url);if(key&&!publishedCandidateKeys.has(key)){publishedCandidateKeys.add(key);newCandidate=true;}}
+    queueProgress(changed?'report':newCandidate?'candidate':'routine');
    };
    const sendFinal=result=>{
     if(input.background){send('complete',{status:'COMPLETE'});return;}
@@ -244,7 +242,7 @@ function events(env,request,input,waitUntil){
        console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,elapsed_ms:Date.now()-started,resources:budget?.snapshot()}));
       send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
     }finally{
-     clearInterval(heart);if(guardTimer)clearInterval(guardTimer);if(progressTimer)clearTimeout(progressTimer);
+     clearInterval(heart);if(guardTimer)clearInterval(guardTimer);
      await releaseTask().catch(()=>console.warn('HHBA_TASK_LEASE_RELEASE_FAILED'));
      if(input.claim&&(!succeeded||closed))await input.claim.release().catch(()=>console.warn('HHBA_CHECKPOINT_RELEASE_FAILED'));
      if(succeeded&&!closed&&input.pointer)await deleteMatchCheckpoint(env,input.pointer).catch(()=>console.warn('HHBA_CHECKPOINT_CLEANUP_FAILED'));
