@@ -157,3 +157,18 @@ test('recovery diagnostics cannot be mistaken for terminal failures in the route
  assert.match(route,/if\(committedResult\)/);
  assert.match(client,/data\.failure\?\.retryable\?15000:4000/);
 });
+
+test('profile reuse key isolates session, account, exact resume revision, intent and model; expires without renewal',async()=>{
+ const {matchProfileCacheKey,readMatchProfileCache,saveMatchProfileCache}=await import('../functions/_lib/v4-match-checkpoint-storage.js');
+ const {env,objects}=fixture(),input={resume_id:'r1',text:'private resume A',role:'运营',model:'test',base:'https://provider.invalid',effort:'medium'};
+ const id=await matchProfileCacheKey(env,'13800000000','session-a',input);
+ for(const [account,session,revision] of [['13900000000','session-a',input],['13800000000','session-b',input],['13800000000','session-a',{...input,text:'new revision'}],['13800000000','session-a',{...input,role:'销售'}],['13800000000','session-a',{...input,model:'different'}]]){
+  assert.notEqual(id,await matchProfileCacheKey(env,account,session,revision));
+ }
+ assert.equal(await matchProfileCacheKey(env,'13800000000','session-a',{...input,resume_id:null}),null);
+ const p={summary:'private derived profile',target_roles:['运营']};
+ await saveMatchProfileCache(env,id,p,1000);
+ assert.deepEqual(await readMatchProfileCache(env,id,2000),p);
+ assert.equal(await readMatchProfileCache(env,id,3601001),null);
+ for(const raw of objects.values()){const text=new TextDecoder().decode(raw);assert.ok(!text.includes(input.text));assert.ok(!text.includes(p.summary));}
+});

@@ -105,3 +105,22 @@ const progressId=async id=>{
 };
 export async function saveMatchProgress(env,id,value){return saveMatchTask(env,await progressId(id),{...value,updated_at:Date.now()});}
 export async function readMatchProgress(env,id){return readMatchTask(env,await progressId(id));}
+
+// Short-lived exact-input profile reuse, isolated to one authenticated session.
+// Reuses encrypted task storage and existing lifecycle; no raw resume or prompt
+// is written. The HMAC covers all inputs that can change the career analysis.
+export async function matchProfileCacheKey(env,account,sessionHash,input){
+ if(!checkpointStorageReady(env)||typeof account!=='string'||!account||typeof sessionHash!=='string'||!sessionHash||!input?.resume_id||typeof input.text!=='string')return null;
+ const k=await crypto.subtle.importKey('raw',enc.encode(secret(env)),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+ const mac=await crypto.subtle.sign('HMAC',k,enc.encode(JSON.stringify(['v4-profile-cache-v1',account,sessionHash,input])));
+ return Array.from(new Uint8Array(mac),x=>x.toString(16).padStart(2,'0')).join('');
+}
+export async function readMatchProfileCache(env,id,now=Date.now()){
+ if(!id)return null;
+ const record=await readMatchTask(env,id,now);
+ return record?.kind==='V4_PROFILE_CACHE_V1'&&record.expires_at>now?record.profile:null;
+}
+export async function saveMatchProfileCache(env,id,profile,now=Date.now()){
+ if(!id||!profile)return;
+ await saveMatchTask(env,id,{kind:'V4_PROFILE_CACHE_V1',expires_at:now+3600000,profile},now);
+}

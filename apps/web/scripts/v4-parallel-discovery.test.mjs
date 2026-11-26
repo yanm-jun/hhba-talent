@@ -755,3 +755,34 @@ test('managed rate-limit yields, legacy batch transport keeps individual fallbac
   assert.ok(out.every(r=>managed?r.status==='rejected'&&r.reason.code==='AI_PROVIDER_RATE_LIMITED':r.status==='fulfilled'&&r.value===null));
  }
 });
+
+test('fast discovery lane publishes unscored recoverable leads before a slow coordinator completes',async()=>{
+ const provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const fast=job(4001),slow=job(4002);
+ let release,ready=false,checkpoint,observed=false;
+ const gate=new Promise(resolve=>{release=resolve;});
+ const timeout=setTimeout(release,2000);
+ const fetcher=async(url,opts)=>{
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.parallel_lane)return model({jobs:[fast]},[fast.url]);
+  await gate;return model({profile,jobs:[slow],research_complete:true,completion_reason:'test'},[slow.url]);
+ };
+ try{
+  const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles},discoveryWidth:2},
+   onRecoveryState:get=>{checkpoint=get;},onPartial:jobs=>{if(!ready&&jobs.some(j=>j.official_url===fast.url)){ready=true;observed=checkpoint().rows.some(([u])=>u===fast.url)&&!checkpoint().rows.some(([u])=>u===slow.url)&&jobs.every(j=>j.match_score===null);release();}}});
+  assert.equal(observed,true);assert.equal(result.checkpoint.rows.length,2);
+ }finally{clearTimeout(timeout);release();}
+});
+
+test('profile cache reuses only a usable profile grounded in the current resume',async()=>{
+ const provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ let calls=0,saved=null;
+ const fetcher=async()=>{calls++;return model({profile});};
+ const options={curated:true,officialOnly:true,stepMode:true,profileCache:{load:async()=>saved,save:async p=>{saved=p;}}};
+ const first=await v4Match(fetcher,provider,resume,'全国',options);
+ const second=await v4Match(fetcher,provider,resume,'全国',options);
+ assert.equal(calls,1);assert.equal(second.checkpoint.diagnostics.AI_PROFILE_CACHE_HIT,1);
+ assert.deepEqual(first.checkpoint.profile,second.checkpoint.profile);
+ saved={summary:'fake',target_roles:['fake'],facts:[{kind:'work',quote:'does not exist in resume'}]};
+ await v4Match(fetcher,provider,resume,'全国',options);assert.equal(calls,2);
+});

@@ -21,10 +21,13 @@ export function discoveryLaneContext({profile,roleHint,round,lane,width,previous
   independent_direction_hint:roleHintForLane,
   previously_discovered_jobs:previousJobs,candidate_target:candidateTarget,remaining_candidates:remainingCandidates};
 }
-export async function runDiscoveryWave(primary,extra,width,signal){
+export async function runDiscoveryWave(primary,extra,width,signal,onReady=()=>{}){
  const started=Date.now();
- const calls=[Promise.resolve().then(primary)];
- for(let lane=1;lane<width;lane++)calls.push(Promise.resolve().then(()=>extra(lane)));
+ // A completed lane is observable before the slowest sibling. Final merge
+ // and coordinator authority remain unchanged.
+ const run=(work,lane)=>Promise.resolve().then(work).then(value=>{if(!signal?.aborted){try{onReady(value,lane);}catch{/* observer cannot invalidate completed work */}}return value;});
+ const calls=[run(primary,0)];
+ for(let lane=1;lane<width;lane++)calls.push(run(()=>extra(lane),lane));
  const [coordinator,...independent]=await Promise.allSettled(calls);
  if(signal?.aborted)throw Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
  return {coordinator,independent,elapsed:Date.now()-started,codes:[coordinator,...independent].filter(x=>x.status==='rejected').map(x=>x.reason?.code||'AI_PROVIDER_RESPONSE_INVALID')};

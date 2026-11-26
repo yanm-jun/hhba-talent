@@ -635,14 +635,14 @@ export function renderCandidatePreview(job,url,resume,toolLinked,index,toolUrls)
  * even if a later round or optional verification has an upstream failure.
  */
 export async function v4Match(fetcher,provider,resume,roleHint,
- {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},onResearch=()=>{},officialOnly=false,curated=false,env={},excludeUrls=[],checkpoint=null,stepMode=false,onRecoveryState=()=>{},allowContinue=false,parallelResearch=false,pipelineChild=false,resourceBudget=null}={}){
+ {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},onResearch=()=>{},officialOnly=false,curated=false,env={},excludeUrls=[],checkpoint=null,stepMode=false,onRecoveryState=()=>{},allowContinue=false,parallelResearch=false,pipelineChild=false,resourceBudget=null,profileCache=null}={}){
  // The deployed curated V4 route exposes the full model-neutral research protocol.
  // Legacy direct consumers without the V4 activation flag retain their compatibility behavior.
  const fullResearch=curated&&env.HHBA_MATCH_V4_READY==='1';
  // The real route uses durable checkpoints; the direct invocation path uses the same batches.
  if(curated&&!stepMode){
   let current=checkpoint,result;
-  do{result=await v4Match(fetcher,provider,resume,roleHint,{signal,onProgress,onActivity,onPartial,onResearch,officialOnly:true,curated:true,env,excludeUrls,checkpoint:current,stepMode:true,onRecoveryState,allowContinue,parallelResearch,resourceBudget});current=result.checkpoint;}while(result.status==='CONTINUE');
+  do{result=await v4Match(fetcher,provider,resume,roleHint,{signal,onProgress,onActivity,onPartial,onResearch,officialOnly:true,curated:true,env,excludeUrls,checkpoint:current,stepMode:true,onRecoveryState,allowContinue,parallelResearch,resourceBudget,profileCache});current=result.checkpoint;}while(result.status==='CONTINUE');
   return result;
  }
  // Run one existing verification phase alongside the next discovery phase.
@@ -950,13 +950,16 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(!v4UsableProfile(parsed))throw fault('AI_PROFILE_INCOMPLETE');
    return parsed;
   };
-  try{profile=await analyze(false);}
+  let reusedProfile=false;
+  if(profileCache){try{const cached=await profileCache.load();const grounded=v4GroundProfile(cached,resume);if(v4UsableProfile(grounded)){profile=grounded;reusedProfile=true;note('AI_PROFILE_CACHE_HIT');}}catch{/* cache is optional; normal model analysis remains available */}}
+  try{if(!reusedProfile)profile=await analyze(false);}
   catch(e){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    if(!['AI_PROVIDER_RESPONSE_INVALID','AI_PROFILE_INCOMPLETE'].includes(e?.code))throw e;
    note('AI_PROFILE_REPAIR');onActivity('parsing','职业分析结果不完整，正在重新核对简历并补齐报告。');
    profile=await analyze(true);
   }
+  if(!reusedProfile&&profileCache&&!signal?.aborted){try{await profileCache.save(profile);}catch{/* cache write failure must not repeat paid analysis */}}
   publishResearch();
   if(curated&&stepMode)return continuation('research');
  }
@@ -1028,7 +1031,45 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      }
      return {response:laneResponse,data:{jobs},sources,grounded};
     };
-    const wave=await runDiscoveryWave(()=>v4Call(fetcher,provider,coordinatorPayload,{signal,onEvent:providerActivity,stage:'discovery'}),lane,width,signal);
+    // Recovery overlay: keep completed candidates independently of a slow
+     // coordinator, without changing its authoritative final merge or stop logic.
+     const earlyRows=new Map(),earlySources=new Set(),earlyToolUrls=new Set();
+     const earlySnapshot=()=>{
+      const cp=continuation('research').checkpoint;
+      const merged=new Map(cp.rows);
+      for(const [url,j] of earlyRows)merged.set(url,{...merged.get(url),...j});
+      cp.rows=[...merged];cp.sourceLeads=[...new Set([...cp.sourceLeads,...earlySources])];
+      cp.toolUrls=[...new Set([...cp.toolUrls,...earlyToolUrls].filter(u=>merged.has(u)))];
+      return cp;
+     };
+     onRecoveryState(earlySnapshot);
+     const stageReady=(value,index)=>{
+      const reply=index===0?value:value.response;
+      let result=index===0?null:value.data;
+      if(index===0){try{result=v4ParseJson(reply);}catch{result={jobs:recoverV4PartialJobs(v4OutputText(reply))};}}
+      const cites=v4ToolSources(reply);
+      for(const raw of [...v4Sources(reply),...(Array.isArray(value.sources)?value.sources:[]),...(Array.isArray(result?.source_leads)?result.source_leads:[])].map(v4PublicJobUrl).filter(Boolean)){
+       const url=curatedUrl(raw);if(!isCommercialRecruitmentBoard(url)&&!excluded.has(url)&&!rejectedBoards.has(url))earlySources.add(url);
+      }
+      for(const [rawUrl,j] of candidates(result,reply)){
+       const url=curatedUrl(rawUrl);
+       if(!url||excluded.has(url)||excluded.has(rawUrl)||rejectedBoards.has(url)||isCommercialRecruitmentBoard(url,j))continue;
+       const compact=candidateSummary(j,url);
+       if(!concreteCandidate(compact)){earlySources.add(url);continue;}
+       const fields=Object.fromEntries(Object.entries(compact).filter(([,v])=>v!==null&&v!==''&&v!==undefined&&(!Array.isArray(v)||v.length)));
+       earlyRows.set(url,{...earlyRows.get(url),...fields});
+       for(const proof of [compact.employer_proof_url,...compact.employer_proof_urls].map(v4PublicJobUrl).filter(Boolean))if(!isCommercialRecruitmentBoard(proof))earlySources.add(curatedUrl(proof));
+      }
+      for(const raw of cites){const url=curatedUrl(raw);if(!isCommercialRecruitmentBoard(url)&&!excluded.has(url)&&!rejectedBoards.has(url))earlyToolUrls.add(url);}
+      if(!earlyRows.size&&!earlySources.size)return;
+      note('PARALLEL_DISCOVERY_LANE_READY');
+      const cp=earlySnapshot(),sources=new Set(cp.toolUrls);
+      const previews=cp.rows.filter(([url])=>!processedEarlier.has(url)).map(([url,j],i)=>renderCandidatePreview(j,url,resume,sources.has(url),i,sources));
+      onResearch({...report(),discovered:cp.rows.length,concrete_count:cp.rows.filter(([,j])=>concreteCandidate(j)).length});
+      onPartial(mergeJobEvidence(priorState?.matches||[],previews));
+      onActivity('searching','部分搜索 Agent 已返回，已暂存 '+cp.rows.length+' 个候选岗位，其他研究仍在进行。');
+     };
+     const wave=await runDiscoveryWave(()=>v4Call(fetcher,provider,coordinatorPayload,{signal,onEvent:providerActivity,stage:'discovery'}),lane,width,signal,stageReady);
     discoveryWidth=nextDiscoveryWidth(width,wave.codes,adaptiveResearch?{maxConnections:checkpoint?.pipelineActive?4:6,elapsed:wave.elapsed,previousElapsed:checkpoint?.discoveryElapsed}:{});
     if(adaptiveResearch)discoveryElapsed=wave.elapsed;
     for(const code of wave.codes)note('PARALLEL_'+code);
