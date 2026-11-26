@@ -321,3 +321,35 @@ test('route restores discovery supplements under existing leases and persists be
  assert.match(route,/progress:view\.progress\|\|null/);
  assert.doesNotMatch(route,/return reply\(\{[^}]*discovery_recovery/);
 });
+
+
+test('candidate bursts reuse one progress timer and one coalesced write while reports retain priority',async()=>{
+ const {createV4ProgressPublisher}=await import('../functions/_lib/v4-progress-publisher.js');
+ const clock=progressClock(),writes=[];let timers=0,jobs=0;
+ const publisher=createV4ProgressPublisher({...clock,schedule:(fn,delay)=>{timers++;return clock.schedule(fn,delay);},
+  publish:kind=>writes.push({kind,jobs})});
+ for(let i=0;i<100;i++){jobs++;publisher.queue('candidate');publisher.queue('routine');}
+ assert.equal(timers,1);
+ await clock.advance(0);
+ assert.deepEqual(writes,[{kind:'candidate',jobs:100}]);
+ for(let i=0;i<100;i++){jobs++;publisher.queue('candidate');}
+ assert.equal(timers,2);
+ publisher.queue('report');
+ assert.equal(timers,3);
+ await clock.advance(1000);
+ assert.deepEqual(writes,[{kind:'candidate',jobs:100},{kind:'report',jobs:200}]);
+ await publisher.stop();
+});
+
+test('background route consumes compact candidate events and preserves the existing report and resource gates',()=>{
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ assert.match(route,/deferDiscoverySnapshots:!!input\.background,onDiscoveryCandidate:rememberDiscovery/);
+ assert.match(route,/if\(!input\.background\)\{send\('discovery_candidate',event\);return;\}/);
+ assert.match(route,/currentCandidateKeys\.has\(key\)/);
+ assert.match(route,/lastJobs\.push\(/);
+ assert.match(route,/queueProgress\('candidate'\)/);
+ assert.match(route,/officialJob\(j\)\?structuredClone\(j\)/);
+ assert.match(route,/kind!=='candidate'\|\|budget\.snapshot\(\)\.soft-budget\.used>=8/);
+ assert.match(route,/jobs:\[\.\.\.lastJobs\]/);
+ assert.match(route,/await saveMatchTask\(env,input\.taskKey,\{checkpoint:result\.checkpoint/);
+});
