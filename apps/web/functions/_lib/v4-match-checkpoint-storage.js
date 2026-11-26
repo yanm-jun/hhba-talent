@@ -95,3 +95,13 @@ export async function readMatchTask(env,id,now=Date.now(),{renewGeneration}={}){
   const timer=setInterval(tick,interval);
   return {tick,async stop(){active=false;clearInterval(timer);if(pending)await pending;}};
  }
+
+// Browser polling must not decrypt the entire growing research checkpoint.
+// A separately authenticated private record stores only the UI view and status.
+const progressId=async id=>{
+ if(!/^[a-f0-9]{64}$/.test(id))throw Error('AI_CHECKPOINT_INVALID');
+ const digest=await crypto.subtle.digest('SHA-256',enc.encode('hhba:v4:progress:'+id));
+ return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');
+};
+export async function saveMatchProgress(env,id,value){return saveMatchTask(env,await progressId(id),{...value,updated_at:Date.now()});}
+export async function readMatchProgress(env,id){return readMatchTask(env,await progressId(id));}

@@ -81,5 +81,14 @@ test('shared private cron calls matching watchdog even when Word recovery is dis
 test('deterministic invalid edge request stops without retry and exhausted transient phase is terminal',async()=>{
  let calls=0;assert.equal(await requestPhase(async()=>{calls++;throw new TypeError('Invalid redirect value');},ticket),'FAILED');assert.equal(calls,1);
  const state=await driveBackgroundMatch({async do(name,config,fn){assert.equal(config.retries.limit,5);assert.equal(config.retries.backoff,'exponential');return fn();}},ticket,async()=>new Response(null,{status:503}));
- assert.deepEqual(state,{status:'FAILED'});
+ assert.deepEqual(state,{status:'FAILED',error:'AI_BACKGROUND_HTTP_503'});
+});
+
+
+test('edge exhaustion and lease contention have distinct diagnostics; checkpoint yields are successful continuations',async()=>{
+ await assert.rejects(requestPhase(async()=>new Response('<h1>Error 1102</h1>',{status:503}),ticket),/AI_EDGE_RESOURCE_EXHAUSTED/);
+ await assert.rejects(requestPhase(async()=>Response.json({error:'AI_TASK_IN_PROGRESS'},{status:409}),ticket),/AI_TASK_IN_PROGRESS/);
+ const values=['CONTINUE','CONTINUE','COMPLETE'];let calls=0;
+ const result=await driveBackgroundMatch({async do(_name,_config,fn){return fn();}},ticket,async()=>{calls++;return event('complete',{status:values.shift()});});
+ assert.equal(calls,3);assert.deepEqual(result,{status:'COMPLETE'});
 });

@@ -102,3 +102,32 @@ test('authorized long-running background phases renew only the opaque watchdog i
  sql.prepare('UPDATE hhba_auth_sessions SET revoked=1 WHERE token_hash=?').run(s.token_hash);
  await assert.rejects(loadBackgroundMatch(env,ticket),{code:'AI_AGENT_CANCELLED'});assert.equal(renewals,1);
 });
+
+
+test('invocation admission reserves final checkpoint and lease operations without limiting the overall task',async()=>{
+ const {phaseResourceBudget,PHASE_YIELD}=await import('../functions/_lib/v4-phase-budget.js');
+ let calls=0;const budget=phaseResourceBudget({initial:8,soft:24,hard:34});const fetcher=budget.fetch(async()=>{calls++;return new Response('ok');});
+ for(let i=0;i<26;i++)await fetcher('https://example.com');
+ assert.equal(calls,26);assert.equal(budget.canStart(),false);assert.throws(()=>fetcher('https://example.com'),{code:PHASE_YIELD});
+ assert.equal(budget.denied,true);assert.equal(budget.used,34);budget.observe('checkpoint',3);assert.equal(budget.used,37);
+ const next=phaseResourceBudget();await next.fetch(async()=>{calls++;return new Response('ok');})('https://example.com');assert.equal(calls,27);assert.equal(next.denied,false);
+});
+test('D1 prepared statements, batches and R2 operations share the same budget',async()=>{
+ const {phaseResourceBudget}=await import('../functions/_lib/v4-phase-budget.js');
+ const budget=phaseResourceBudget({initial:0,soft:8,hard:10});let calls=0;
+ const prepared={bind(){return this;},async run(){calls++;return {success:true};}};
+ const env=budget.env({HHBA_JOB_JD_DB:{prepare(){return prepared;},async batch(list){assert.ok(list.every(s=>s===prepared));calls+=list.length;return [];}},HHBA_PRIVATE_RESUMES:{async get(){calls++;return null;}}});
+ await env.HHBA_JOB_JD_DB.prepare('SELECT 1').bind().run();await env.HHBA_JOB_JD_DB.batch([env.HHBA_JOB_JD_DB.prepare('SELECT 1'),env.HHBA_JOB_JD_DB.prepare('SELECT 2')]);await env.HHBA_PRIVATE_RESUMES.get('key');
+ assert.equal(calls,4);assert.deepEqual(budget.snapshot().counts,{d1:3,r2:1});
+});
+test('completed calls are replayed once only across a resource interruption, without reasoning output',async()=>{
+ const {phaseModelReplay}=await import('../functions/_lib/v4-phase-budget.js');const first=phaseModelReplay();
+ first.remember('hash',{status:'completed',output:[{type:'reasoning',summary:['private']},{type:'message',content:[{type:'output_text',text:'completed evidence'}]}]});
+ assert.equal(first.take('hash'),null);const resumed=phaseModelReplay(first.snapshot());assert.equal(resumed.take('hash').output.length,1);assert.equal(resumed.take('hash'),null);assert.equal(resumed.take('different'),null);
+});
+test('compact progress is separately encrypted and cannot replace the authoritative checkpoint',async()=>{
+ const {saveMatchProgress,readMatchProgress}=await import('../functions/_lib/v4-match-checkpoint-storage.js');const {env,objects}=fixture();const key='a'.repeat(64);
+ await saveMatchTask(env,key,{generation:0,checkpoint:{evidence:'large private evidence'}});await saveMatchProgress(env,key,{generation:0,status:'PENDING',progress:{stage:'searching'}});
+ assert.deepEqual((await readMatchTask(env,key)).checkpoint,{evidence:'large private evidence'});assert.equal((await readMatchProgress(env,key)).progress.stage,'searching');assert.equal(await readMatchProgress(env,'b'.repeat(64)),null);
+ assert.equal(objects.size,2);for(const bytes of objects.values())assert.ok(!new TextDecoder().decode(bytes).includes('private evidence'));
+});
