@@ -566,7 +566,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我已阅读并同意 <a href={import.meta.env.BASE_URL+'privacy'} target="_blank" rel="noopener noreferrer" aria-label="隐私说明（新标签页打开）">《隐私说明》</a>，授权 HHBA 使用简历信息进行智能匹配，并将脱敏后的简历文字发送至第三方 AI 服务分析（可能经 ReqToken 中转至 OpenAI 与 Gemini，分别处理简历与岗位匹配）。为恢复同一研究任务，脱敏文字与求职参数会在账户会话内加密临时保存，不因此保存原始文件。</span>
+          <span>我已阅读并同意 <a href={import.meta.env.BASE_URL+'privacy'} target="_blank" rel="noopener noreferrer" aria-label="隐私说明（新标签页打开）">《隐私说明》</a>，授权 HHBA 使用简历信息进行智能匹配，并将脱敏后的简历文字发送至第三方 AI 服务分析（可能经第三方中转至 OpenAI 兼容模型，处理简历及岗位匹配）。为恢复同一研究任务，脱敏文字与求职参数会在账户会话内加密临时保存，不因此保存原始文件。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/>简历仅用于生成岗位建议，不会自动向企业投递或公开。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}

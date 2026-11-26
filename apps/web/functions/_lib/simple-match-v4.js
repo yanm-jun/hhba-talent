@@ -35,16 +35,15 @@ const texts=v=>Array.isArray(v)?v.filter(x=>typeof x==='string').map(s=>text(s))
 const norm=v=>String(v||'').replace(/\s+/g,' ').trim();
 
 export function v4Provider(env={}){
- const key=env.HHBA_AGENT_RELAY_API_KEY;
  const baseUrl=providerBase(env.HHBA_AGENT_RELAY_BASE_URL);
- return typeof key==='string'&&key.trim().length>=16&&baseUrl?{key,baseUrl,stream:env.HHBA_AGENT_RELAY_STREAM==='1',model:env.HHBA_AGENT_RELAY_MODEL?.trim()||MODEL,...(metricDb(env)?{usageDb:metricDb(env)}:{}),...(env.HHBA_AGENT_REASONING_EFFORT?{reasoningEffort:env.HHBA_AGENT_REASONING_EFFORT}: {})}:null;
+ const validKey=value=>typeof value==='string'&&value.trim().length>=16;
+ // The older HHBA OpenAI binding was provisioned for this exact relay.
+ // Never forward that credential to a different operator-configured origin.
+ const key=validKey(env.HHBA_AGENT_RELAY_API_KEY)?env.HHBA_AGENT_RELAY_API_KEY:baseUrl===BASE&&validKey(env.HHBA_MATCH_OPENAI_API_KEY)?env.HHBA_MATCH_OPENAI_API_KEY:null;
+ return key&&baseUrl?{key:key.trim(),baseUrl,stream:env.HHBA_AGENT_RELAY_STREAM==='1',model:env.HHBA_AGENT_RELAY_MODEL?.trim()||MODEL,...(metricDb(env)?{usageDb:metricDb(env)}:{}),...(env.HHBA_AGENT_REASONING_EFFORT?{reasoningEffort:env.HHBA_AGENT_REASONING_EFFORT}: {})}:null;
 }
-// Job research and reassessment use the selected job model; OCR and Word editing keep v4Provider.
-export function v4JobProvider(env={}){
- const selected=env.HHBA_V4_JOB_PROVIDER?.trim().toLowerCase()||'openai';
- if(selected==='gemini')return geminiJobProvider(env);
- return selected==='openai'?v4Provider(env):null;
-}
+// All V4 research, reassessment, OCR and Word editing use the same OpenAI Responses provider.
+export function v4JobProvider(env={}){return v4Provider(env);}
 export function v4OutputText(response){
  return (response?.output||[]).filter(x=>x?.type==='message')
   .flatMap(x=>(x.content||[]).filter(y=>y?.type==='output_text').map(y=>y.text||''))

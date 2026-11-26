@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {v4Provider,v4JobProvider,v4Call,v4OutputText,v4ToolSources,v4Match} from '../functions/_lib/simple-match-v4.js';
+import {geminiJobProvider} from '../functions/_lib/v4-gemini-job-provider.js';
 const env={HHBA_AGENT_RELAY_API_KEY:'synthetic-openai-key-not-real',HHBA_V4_JOB_PROVIDER:'gemini',GEMINI_API_KEY:'synthetic-gemini-key-not-real',GEMINI_MODEL:'gemini-test',GOOGLE_GEMINI_BASE_URL:'https://relay.example'};
-test('job-only Gemini opt-in never changes resume provider or silently falls back',()=>{
- assert.equal(v4JobProvider(env).kind,'gemini');
- assert.equal(v4Provider(env).key,env.HHBA_AGENT_RELAY_API_KEY);
- assert.equal(v4JobProvider({...env,GEMINI_API_KEY:''}),null);
- assert.equal(v4JobProvider({...env,GOOGLE_GEMINI_BASE_URL:'http://relay.example'}),null);
- assert.equal(v4JobProvider({...env,HHBA_V4_JOB_PROVIDER:'openai'}).key,env.HHBA_AGENT_RELAY_API_KEY);
+test('V4 always selects OpenAI even when retired Gemini settings exist',()=>{
+ assert.equal(v4JobProvider(env).key,env.HHBA_AGENT_RELAY_API_KEY);
+ assert.equal(v4JobProvider(env).kind,undefined);
+ assert.equal(v4JobProvider({...env,HHBA_AGENT_RELAY_API_KEY:''}),null);
+ assert.equal(v4JobProvider({...env,GEMINI_API_KEY:'',GOOGLE_GEMINI_BASE_URL:'http://relay.example'}).key,env.HHBA_AGENT_RELAY_API_KEY);
 });
 test('native grounding maps to V4 response; no OpenAI credential, no model effort or output cap',async()=>{
  const answer=await v4Call(async(url,opt)=>{
@@ -20,49 +20,48 @@ test('native grounding maps to V4 response; no OpenAI credential, no model effor
   assert.equal(b.generationConfig,undefined);
   assert.equal(b.store,undefined);
   return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{thought:true,text:'private'},{text:'{"jobs":[]}'}]},groundingMetadata:{webSearchQueries:['jobs'],groundingChunks:[{web:{uri:'https://careers.other-motors.cn/recruitment/positions/9988'}}]}}],usageMetadata:{promptTokenCount:100,candidatesTokenCount:20,totalTokenCount:120}});
- },v4JobProvider(env),{instructions:'synthetic',input:'synthetic',tools:[{type:'web_search'}],tool_choice:'required'});
+ },geminiJobProvider(env),{instructions:'synthetic',input:'synthetic',tools:[{type:'web_search'}],tool_choice:'required'});
  assert.equal(v4OutputText(answer),'{"jobs":[]}');
  assert.deepEqual(v4ToolSources(answer),['https://careers.other-motors.cn/recruitment/positions/9988']);
  assert.equal(answer.usage.total_tokens,120);
  assert.deepEqual(answer.output[0].action.queries,['jobs']);
 });
 test('required search cannot claim success with no grounding',async()=>{
- const reply=await v4Call(async()=>Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"jobs":[]}'}]}}]}),v4JobProvider(env),{input:'synthetic',tools:[{type:'web_search'}],tool_choice:'required'});
+ const reply=await v4Call(async()=>Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"jobs":[]}'}]}}]}),geminiJobProvider(env),{input:'synthetic',tools:[{type:'web_search'}],tool_choice:'required'});
  assert.equal(reply.status,'incomplete');assert.equal(reply.output.some(x=>x.type==='web_search_call'),false);assert.equal(v4OutputText(reply),'{"jobs":[]}');
 });
 test('ordinary non-search calls need no grounding; provider rate limit remains retryable',async()=>{
- const result=await v4Call(async()=>Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"score":90}'}]}}]}),v4JobProvider(env),{input:'synthetic'});
+ const result=await v4Call(async()=>Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"score":90}'}]}}]}),geminiJobProvider(env),{input:'synthetic'});
  assert.equal(v4OutputText(result),'{"score":90}');
- await assert.rejects(v4Call(async()=>new Response(null,{status:429}),v4JobProvider(env),{input:'synthetic'}),{code:'AI_PROVIDER_RATE_LIMITED'});
+ await assert.rejects(v4Call(async()=>new Response(null,{status:429}),geminiJobProvider(env),{input:'synthetic'}),{code:'AI_PROVIDER_RATE_LIMITED'});
 });
 
-test('actual V4 first phase uses OpenAI, following discovery uses Gemini',async()=>{
+test('actual V4 profile and discovery both use OpenAI despite retired provider settings',async()=>{
  const calls=[];
  const resume='我负责汽车经销商渠道运营和门店销售流程管理。负责销售人员培训和运营数据分析。';
  const fetcher=async(url,opt)=>{
   calls.push(url);
-  if(url.endsWith('/responses'))return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify({profile:{roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}})}]}]});
-  // Stop after observing the real discovery request, without external network.
+  assert.match(url,/\/responses$/);
+  assert.equal(opt.headers.authorization,'Bearer '+env.HHBA_AGENT_RELAY_API_KEY);
+  if(calls.length===1)return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify({profile:{roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}})}]}]});
   throw Object.assign(Error('synthetic network stop'),{name:'NetworkError'});
  };
  const first=await v4Match(fetcher,v4JobProvider(env),resume,'全国',{env,officialOnly:true,curated:true,stepMode:true});
  assert.equal(first.status,'CONTINUE');
  assert.equal(first.checkpoint.phase,'research');
  assert.equal(calls.length,1);
- assert.match(calls[0],/\/responses$/);
- assert.equal(first.checkpoint.profile.facts[0].quote,'汽车经销商渠道运营');
  try{await v4Match(fetcher,v4JobProvider(env),resume,'全国',{env,officialOnly:true,curated:true,stepMode:true,checkpoint:first.checkpoint});}catch{}
- assert.ok(calls.slice(1).some(u=>u==='https://relay.example/v1beta/models/gemini-test:generateContent'));
- assert.ok(calls.slice(1).every(u=>!u.endsWith('/responses')));
+ assert.ok(calls.length>1);
+ assert.ok(calls.every(u=>u.endsWith('/responses')));
 });
 
 test('native SSE combines text fragments and actual query metadata without thought leakage',async()=>{
  const events=[{candidates:[{content:{parts:[{thought:true,text:'SECRET THOUGHT'},{text:'{"jobs":'}]}}]},{candidates:[{content:{parts:[{text:'[]}'}]},groundingMetadata:{webSearchQueries:['alternate search'],groundingChunks:[{web:{uri:'https://careers.other-motors.cn/recruitment/positions/9988'}}]},finishReason:'STOP'}],usageMetadata:{totalTokenCount:70}}];
- const result=await v4Call(async(url,opt)=>{assert.match(url,/:streamGenerateContent\?alt=sse$/);assert.equal(opt.headers.accept,'text/event-stream');return new Response(events.map(v=>'data: '+JSON.stringify(v)+'\r\n\r\n').join(''),{headers:{'content-type':'text/event-stream'}})},v4JobProvider({...env,GEMINI_STREAM:'1'}),{input:'synthetic',tools:[{type:'web_search'}],tool_choice:'required'});
+ const result=await v4Call(async(url,opt)=>{assert.match(url,/:streamGenerateContent\?alt=sse$/);assert.equal(opt.headers.accept,'text/event-stream');return new Response(events.map(v=>'data: '+JSON.stringify(v)+'\r\n\r\n').join(''),{headers:{'content-type':'text/event-stream'}})},geminiJobProvider({...env,GEMINI_STREAM:'1'}),{input:'synthetic',tools:[{type:'web_search'}],tool_choice:'required'});
  assert.equal(v4OutputText(result),'{"jobs":[]}');assert.equal(result.status,'completed');assert.deepEqual(result.output[0].action.queries,['alternate search']);assert.equal(result.usage.total_tokens,70);
 });
 test('URL Context is opt-in and restricted to public job-source requests',async()=>{
- const provider=v4JobProvider({...env,GEMINI_URL_CONTEXT:'1'});
+ const provider=geminiJobProvider({...env,GEMINI_URL_CONTEXT:'1'});
  for(const use of [false,true])await v4Call(async(_url,opt)=>{
   assert.deepEqual(JSON.parse(opt.body).tools,use?[{google_search:{}},{url_context:{}}]:[{google_search:{}}]);
   return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{}'}]}}]});
@@ -83,7 +82,7 @@ test('explicit new public lead and redirected landing are independently read and
 });
 test('interrupted Gemini stream retains partial research rather than falsely completing or discarding it',async()=>{
  const chunk='data: '+JSON.stringify({candidates:[{content:{parts:[{text:'{"jobs":[]}'}]},groundingMetadata:{webSearchQueries:['jobs']}}]})+'\n\n';
- const result=await v4Call(async()=>new Response(chunk+'data: broken\n\n',{headers:{'content-type':'text/event-stream'}}),v4JobProvider({...env,GEMINI_STREAM:'1'}),{input:'synthetic',tools:[{type:'web_search'}]});
+ const result=await v4Call(async()=>new Response(chunk+'data: broken\n\n',{headers:{'content-type':'text/event-stream'}}),geminiJobProvider({...env,GEMINI_STREAM:'1'}),{input:'synthetic',tools:[{type:'web_search'}]});
  assert.equal(result.status,'incomplete');assert.equal(v4OutputText(result),'{"jobs":[]}');assert.deepEqual(result.output[0].action.queries,['jobs']);
 });
 
@@ -112,7 +111,7 @@ test('large public page automatically falls back to addressable windows, never c
 });
 test('Gemini context capability probe exposes only model limits and synthetic token count',async()=>{
  const {inspectGeminiContextCapabilities}=await import('../functions/_lib/v4-gemini-job-provider.js');
- const provider=v4JobProvider(env),calls=[];
+ const provider=geminiJobProvider(env),calls=[];
  const got=await inspectGeminiContextCapabilities(async(url,opt)=>{calls.push(url);assert.equal(opt.redirect,'manual');assert.equal(opt.headers['x-goog-api-key'],env.GEMINI_API_KEY);
  return url.endsWith(':countTokens')?Response.json({totalTokens:8}):Response.json({inputTokenLimit:1000000,outputTokenLimit:64000,supportedGenerationMethods:['generateContent','countTokens','createCachedContent']});},provider);
  assert.equal(got.input_token_limit,1000000);assert.equal(got.output_token_limit,64000);assert.equal(got.count_tokens,true);assert.equal(got.cached_content_advertised,true);assert.equal(calls.length,2);
@@ -267,19 +266,19 @@ test('operator Gemini probe is disabled without a configured secret',async()=>{
 test('basic probe cannot report stream support from a buffered JSON fallback',async()=>{
  const {runGeminiProbe}=await import('../functions/api/match-v4-provider-probe.js');
  const fetcher=async()=>Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"ok":true}'}]}}]});
- const provider=v4JobProvider(env);
+ const provider=geminiJobProvider(env);
  assert.equal((await runGeminiProbe(provider,'basic',{fetcher})).ok,true);
  assert.equal((await runGeminiProbe(provider,'stream',{fetcher})).ok,false);
 });
 test('real search acceptance rejects ungrounded candidate claims',async()=>{
  const {runGeminiProbe}=await import('../functions/api/match-v4-provider-probe.js');
  const fetcher=async()=>Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"jobs":[{"company":"Example","title":"Operations","location":"Shanghai","url":"https://careers.example.com/jobs/123"}]}'}]}}]});
- const result=await runGeminiProbe(v4JobProvider(env),'search',{fetcher});
+ const result=await runGeminiProbe(geminiJobProvider(env),'search',{fetcher});
  assert.equal(result.ok,false);assert.equal(result.grounded,false);
 });
 
 test('explicit URL Context incompatibility preserves Gemini search and independent verification',async()=>{
- const provider=v4JobProvider({...env,GEMINI_URL_CONTEXT:'1',GEMINI_STREAM:'1'});
+ const provider=geminiJobProvider({...env,GEMINI_URL_CONTEXT:'1',GEMINI_STREAM:'1'});
  const calls=[];
  const result=await v4Call(async(url,opt)=>{
   const tools=JSON.parse(opt.body).tools;calls.push(tools);
@@ -290,7 +289,7 @@ test('explicit URL Context incompatibility preserves Gemini search and independe
  assert.equal(result.status,'completed');assert.ok(result.output.some(x=>x.type==='web_search_call'));
 });
 test('Gemini context rejection is surfaced for adaptive paging rather than disabling optional tools',async()=>{
- const provider=v4JobProvider({...env,GEMINI_URL_CONTEXT:'1',GEMINI_STREAM:'1'});let calls=0;
+ const provider=geminiJobProvider({...env,GEMINI_URL_CONTEXT:'1',GEMINI_STREAM:'1'});let calls=0;
  await assert.rejects(v4Call(async()=>{calls++;return Response.json({error:{message:'input context length exceeded'}},{status:400});},provider,{input:'synthetic',tools:[{type:'web_search'}],publicUrlContext:true}),{code:'AI_PROVIDER_CONTEXT_TOO_LARGE'});
  assert.equal(calls,1);
 });
@@ -479,8 +478,8 @@ test('automatic public resource transport adapts to large pending sets and prese
 });
 
 test('Gemini relay authorization is explicit and independent of OpenAI',async()=>{
- const provider=v4JobProvider({...env,GEMINI_AUTH_MODE:'bearer'});
- assert.equal(provider.authMode,'bearer');assert.equal(v4JobProvider({...env,GEMINI_AUTH_MODE:'unknown'}),null);
+ const provider=geminiJobProvider({...env,GEMINI_AUTH_MODE:'bearer'});
+ assert.equal(provider.authMode,'bearer');assert.equal(geminiJobProvider({...env,GEMINI_AUTH_MODE:'unknown'}),null);
  await v4Call(async(url,opt)=>{
   assert.equal(url,'https://relay.example/v1beta/models/gemini-test:generateContent');
   assert.equal(opt.headers.authorization,'Bearer '+env.GEMINI_API_KEY);
@@ -490,13 +489,13 @@ test('Gemini relay authorization is explicit and independent of OpenAI',async()=
 });
 test('Gemini upstream status survives without exposing response bodies',async()=>{
  for(const [status,code] of [[401,'AI_PROVIDER_KEY_REJECTED'],[404,'AI_PROVIDER_REQUEST_REJECTED'],[502,'AI_PROVIDER_UPSTREAM_ERROR']]){
-  await assert.rejects(v4Call(async()=>new Response('private error content',{status}),v4JobProvider(env),{input:'Synthetic test'}),e=>e.code===code&&e.upstreamStatus===status&&!e.message.includes('private error content'));
+  await assert.rejects(v4Call(async()=>new Response('private error content',{status}),geminiJobProvider(env),{input:'Synthetic test'}),e=>e.code===code&&e.upstreamStatus===status&&!e.message.includes('private error content'));
  }
 });
 test('minimal operator transport probes validate native responses and selected header only',async()=>{
  const {runGeminiProbe}=await import('../functions/api/match-v4-provider-probe.js');
  for(const [phase,mode] of [['transport','native'],['transport_bearer','bearer']]){
-  const out=await runGeminiProbe(v4JobProvider(env),phase,{fetcher:async(url,opt)=>{
+  const out=await runGeminiProbe(geminiJobProvider(env),phase,{fetcher:async(url,opt)=>{
    assert.equal(opt.redirect,'manual');assert.equal(opt.headers[mode==='native'?'x-goog-api-key':'authorization'],mode==='native'?env.GEMINI_API_KEY:'Bearer '+env.GEMINI_API_KEY);
    assert.equal(opt.headers[mode==='native'?'authorization':'x-goog-api-key'],undefined);
    assert.deepEqual(Object.keys(JSON.parse(opt.body)),['contents']);
@@ -504,13 +503,13 @@ test('minimal operator transport probes validate native responses and selected h
   }});
   assert.deepEqual(out,{ok:true,upstream_http_status:200,native_response:true,auth_mode:mode});
  }
- const fake=await runGeminiProbe(v4JobProvider(env),'transport',{fetcher:async()=>Response.json({ok:true})});
+ const fake=await runGeminiProbe(geminiJobProvider(env),'transport',{fetcher:async()=>Response.json({ok:true})});
  assert.equal(fake.ok,false);
 });
 
 test('OpenAI-compatible relay transport probe uses selected Gemini model and dedicated key',async()=>{
  const {runGeminiProbe}=await import('../functions/api/match-v4-provider-probe.js');
- const provider=v4JobProvider(env);
+ const provider=geminiJobProvider(env);
  const result=await runGeminiProbe(provider,'transport_chat',{fetcher:async(url,opt)=>{
   assert.equal(url,provider.baseUrl.replace(/\/v1$/,'')+'/v1/chat/completions');
   assert.equal(opt.headers.authorization,'Bearer '+env.GEMINI_API_KEY);

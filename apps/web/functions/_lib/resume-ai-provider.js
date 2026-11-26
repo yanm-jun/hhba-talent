@@ -8,7 +8,6 @@ export const PROVIDERS = Object.freeze({
  deepseek:{baseUrl:'https://api.deepseek.com',protocol:'openai'},
  openai:{baseUrl:'https://api.openai.com/v1',protocol:'openai'},
  anthropic:{baseUrl:'https://api.anthropic.com/v1',protocol:'anthropic'},
- gemini:{baseUrl:'https://generativelanguage.googleapis.com/v1beta/openai',protocol:'openai'},
  qwen:{baseUrl:'https://dashscope.aliyuncs.com/compatible-mode/v1',protocol:'openai'},
  zhipu:{baseUrl:'https://open.bigmodel.cn/api/paas/v4',protocol:'openai'},
  groq:{baseUrl:'https://api.groq.com/openai/v1',protocol:'openai'},
