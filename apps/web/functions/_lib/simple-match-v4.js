@@ -1096,7 +1096,10 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   };
   const acceptStreamed=(event,candidate,meta)=>{
    if(curated&&meta?.source!=='terminal'&&acceptedLiveUrl(candidate.url)&&!rows.has(candidate.url)&&!earlyRows.has(candidate.url)){
-    streamRows.set(candidate.url,candidate);earlyRows.set(candidate.url,candidate);
+    // Use the same meaningful-field representation as terminal reconciliation.
+    // Empty strings/arrays are not newly discovered evidence revisions.
+    const fields=Object.fromEntries(Object.entries(candidate).filter(([,v])=>v!==null&&v!==''&&v!==undefined&&(!Array.isArray(v)||v.length)));
+    streamRows.set(candidate.url,fields);earlyRows.set(candidate.url,fields);
     earlySources.add(candidate.url);liveKeys.add(candidate.url);note('LIVE_DISCOVERY_CANDIDATE_MERGED');
     // Managed progress consumes the single candidate directly. Avoid rebuilding
     // all candidate previews and reports for every JSON object in a burst.
