@@ -77,15 +77,17 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
 
  const [selectedJobUrl,setSelectedJobUrl]=useState<string|null>(optimizedJobUrl);
  const [manualStage,setManualStage]=useState<number|null>(null);
+ // Keep the initial career report in view while background search advances.
+ const [followProgress,setFollowProgress]=useState(false);
  const [furthestStage,setFurthestStage]=useState(0);
  const currentStage=matchStageIndex(progressStage);
  useEffect(()=>{
   if(pending&&currentStage>=0)setFurthestStage(old=>Math.max(old,currentStage));
  },[pending,currentStage]);
- const selectedStage=manualStage??(pending?Math.max(furthestStage,currentStage):2);
+ const selectedStage=manualStage??(pending?(followProgress?Math.max(furthestStage,currentStage):0):2);
  const showResults=selectedStage===2;
  const selectStage=(next:number|null)=>{
-  setManualStage(next);
+  setManualStage(next);if(next===null)setFollowProgress(true);
   const viewport=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content');
   if(viewport)viewport.scrollTop=0;
  };

@@ -7,10 +7,15 @@ test('independent runner advances persisted phases until terminal success, witho
  const outcomes=['CONTINUE','CONTINUE','COMPLETE'],calls=[],steps=[];
  const step={async do(name,config,fn){steps.push(name);return fn();}};
  const result=await driveBackgroundMatch(step,ticket,async(url,init)=>{
-  assert.equal(url,'https://hhba.work/api/match-v4/background-step');assert.deepEqual(JSON.parse(init.body),{ticket});calls.push(url);
+  assert.equal(init.redirect,'manual');assert.equal(url,'https://hhba.work/api/match-v4/background-step');assert.deepEqual(JSON.parse(init.body),{ticket});calls.push(url);
   return event('complete',{status:outcomes.shift()});
  });
  assert.deepEqual(result,{status:'COMPLETE'});assert.equal(calls.length,3);assert.equal(new Set(steps).size,3);
+});
+test('edge-compatible manual redirects never send ticket to another destination',async()=>{
+ let calls=0;
+ for(const status of [301,302,303,307,308])assert.equal(await requestPhase(async(url,init)=>{calls++;assert.equal(init.redirect,'manual');return new Response(null,{status,headers:{Location:'https://other.example/'}});},ticket),'FAILED');
+ assert.equal(calls,5);
 });
 test('explicit termination, revocation or expired ticket never starts another phase',async()=>{
  for(const error of ['AI_AGENT_CANCELLED','AI_BACKGROUND_TICKET_INVALID','AI_CHECKPOINT_EXPIRED']){
