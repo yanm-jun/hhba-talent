@@ -84,7 +84,10 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  useEffect(()=>{
   if(pending&&currentStage>=0)setFurthestStage(old=>Math.max(old,currentStage));
  },[pending,currentStage]);
- const selectedStage=manualStage??(pending||taskFailed?(followProgress?Math.max(furthestStage,currentStage):0):2);
+ const hasCompleteReport=verifiedMatchReports(result.matches).length>0;
+ // Show the first complete report as soon as it arrives, but never override
+ // a user's explicitly selected tab.
+ const selectedStage=manualStage??(pending||taskFailed?(hasCompleteReport?2:followProgress?Math.max(furthestStage,currentStage):0):2);
  const showResults=selectedStage===2;
  const selectStage=(next:number|null)=>{
   setManualStage(next);if(next===null)setFollowProgress(true);
@@ -193,7 +196,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobUrl?'optimization':'matches'}>
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice}{result.matches.length>0?' 已显示本次收到的岗位；请核对招聘原始页面。':''}</p>}
-     {!optimizedJobUrl&&<MatchResearchPanels profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches} pending={pending} progressStage={progressStage} activity={progressActivity} elapsed={elapsed} selection={selectedStage} onSelectionChange={selectStage} onFollow={()=>selectStage(null)} selectedJobUrl={selectedJobUrl} onJobChange={setSelectedJobUrl} onOptimize={optimizeJob} optimizationAvailable={!!parsedProfile}/>}
+     {!optimizedJobUrl&&<MatchResearchPanels profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches} pending={pending} provisional={taskFailed} progressStage={progressStage} activity={progressActivity} elapsed={elapsed} selection={selectedStage} onSelectionChange={selectStage} onFollow={()=>selectStage(null)} selectedJobUrl={selectedJobUrl} onJobChange={setSelectedJobUrl} onOptimize={optimizeJob} optimizationAvailable={!!parsedProfile}/>}
      {pending&&selectedStage!==1&&<><div className="hhba-research-now" role="status">
       <LoaderCircle size={18} className="spin" aria-hidden="true"/>
       <div className="hhba-match-progress-copy">
