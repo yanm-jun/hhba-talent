@@ -162,3 +162,59 @@ test('lock contention uses short paced recovery without excessive backoff',async
  assert.deepEqual([1,2,3,4,8,20].map(n=>recoveryDelaySeconds('AI_TASK_IN_PROGRESS',n)),[15,30,45,60,60,60]);
  assert.ok(recoveryDelaySeconds('AI_EDGE_DAILY_LIMIT',20)>=3600);
 });
+
+test('stage Workflow IDs are deterministic, isolated and opaque',async()=>{
+ const {stageWorkflowId,STAGE_LANES}=await import('./stages.mjs');
+ const instance='f'.repeat(64),ids=await Promise.all(STAGE_LANES.map(s=>stageWorkflowId(instance,s)));
+ assert.equal(ids.length,3);assert.equal(new Set(ids).size,3);
+ assert.ok(ids.every(x=>/^[a-f0-9]{64}$/.test(x)&&x!==instance));
+ assert.equal(await stageWorkflowId(instance,'verification'),ids[1]);
+ await assert.rejects(stageWorkflowId(instance,'untrusted'),/INVALID_STAGE_INSTANCE/);
+});
+test('three staged durable cloud instances remain asleep until their real saved checkpoint needs work',async()=>{
+ const lane='verification',payloads=[],waits=[];
+ const step={async do(n,conf,fn){return fn()},async waitForEvent(n,options){waits.push([n,options.type]);return undefined;}};
+ const statuses=['CONTINUE','HANDOFF','COMPLETE'];
+ const result=await driveBackgroundMatch(step,ticket,async(_url,init)=>{
+  const body=JSON.parse(init.body);payloads.push(body);
+  assert.equal(body.lane,lane);assert.equal(body.ticket,ticket);
+  return event('complete',{status:statuses.shift()});
+ },{lane});
+ assert.deepEqual(result,{status:'COMPLETE'});
+ assert.deepEqual(waits.map(x=>x[1]),['wake_verification','wake_verification']);
+ assert.equal(payloads.length,3);
+});
+test('one failed stage wake safely returns to the single-owner legacy driver',async()=>{
+ const bodies=[],step={async do(_n,_c,fn){return fn()},async waitForEvent(){throw Error('must not park after failed wake')}};
+ const response=[event('complete',{status:'CONTINUE',fallback:true}),event('complete',{status:'COMPLETE'})];
+ const result=await driveBackgroundMatch(step,ticket,async(_url,opts)=>{bodies.push(JSON.parse(opts.body));return response.shift()},{lane:'discovery'});
+ assert.deepEqual(result,{status:'COMPLETE'});
+ assert.equal(bodies[0].lane,'discovery');assert.equal(bodies[1].lane,undefined);
+});
+test('a wake cancellation terminates dormant staged Workflow without performing paid research',async()=>{
+ let called=false;
+ const step={async waitForEvent(){return {done:true}},async do(){called=true;throw Error('should not run')}};
+ assert.deepEqual(await driveBackgroundMatch(step,ticket,async()=>{called=true;throw Error('should not fetch')},{lane:'reporting'}),{status:'COMPLETE'});
+ assert.equal(called,false);
+});
+
+test('stage Workflow scheduler creates three dormant/active instances only after checking old ownership',async()=>{
+ const {startStageWorkflows,sendStageEvent,stageWorkflowId}=await import('./stages.mjs');
+ const base='b'.repeat(64),created=[],watchdog=[],status=new Map(),events=[];
+ const workflow={
+  async get(id){if(id===base)throw Error('no legacy instance');return {async status(){return status.get(id)||{status:'waiting'}},async sendEvent(ev){events.push({id,ev});}}}
+ };
+ const started=await startStageWorkflows(workflow,{},base,ticket,{register:async(_db,id)=>watchdog.push(id),schedule:async(_wf,id,_ticket,{lane})=>{created.push({id,lane});status.set(id,{status:'waiting'});return {status:'RECOVERING'};}});
+ assert.deepEqual(started,{ok:true,mode:'staged'});
+ assert.deepEqual(created.map(x=>x.lane),['verification','reporting','discovery']);
+ assert.equal(new Set(watchdog).size,3);
+ const verify=await sendStageEvent(workflow,base,{lane:'verification'});
+ assert.deepEqual(verify,{ok:true,delivered:1});
+ assert.equal(events[0].ev.type,'wake_verification');assert.deepEqual(events[0].ev.payload,{done:false});
+ assert.equal(events[0].id,await stageWorkflowId(base,'verification'));
+ const finished=await sendStageEvent(workflow,base,{finish:true});
+ assert.deepEqual(finished,{ok:true,delivered:3});
+ assert.ok(events.slice(1).every(x=>x.ev.payload.done===true));
+ const legacy={async get(){return {async status(){return {status:'running'}}}}};
+ assert.deepEqual(await startStageWorkflows(legacy,{},base,ticket,{register:async()=>assert.fail(),schedule:async()=>assert.fail()}),{ok:true,mode:'legacy'});
+});
