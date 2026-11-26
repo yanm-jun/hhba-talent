@@ -1040,3 +1040,22 @@ test('permanent profile provider rejection does not fall through to discovery',a
   let calls=0;await assert.rejects(v4Match(async()=>{calls++;return new Response(null,{status});},provider,resume,'全国',{officialOnly:true,curated:true,stepMode:true}),new RegExp(code));assert.equal(calls,1);
  }
 });
+
+test('employer proof page coalesces concurrent reads but verifies each link and identity independently',async()=>{
+ const {v4EmployerAuthorization,createEmployerProofCache}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const proof='https://brand-new-employer.cn/recruitment',a='https://new-ats.cn/roles/1',b='https://new-ats.cn/roles/2',c='https://new-ats.cn/roles/3';
+ let reads=0,clock=1000;
+ const proofCache=createEmployerProofCache({now:()=>clock});
+ const fetcher=async()=>{reads++;return new Response('<title>新企业集团</title><a href="'+a+'">a</a><a href="'+b+'">b</a>',{headers:{'content-type':'text/html'}});};
+ const check=(url,company='新企业集团')=>v4EmployerAuthorization(url,company,proof,{fetcher,proofCache});
+ assert.deepEqual(await Promise.all([check(a),check(b),check(c),check(a,'其他企业')]),[true,true,false,false]);
+ assert.equal(reads,1);clock+=61000;assert.equal(await check(a),true);assert.equal(reads,2);
+});
+test('nonpublic or failed employer proof reads are not retained',async()=>{
+ const {v4EmployerAuthorization,createEmployerProofCache}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const proof='https://brand-new-employer.cn/recruitment',target='https://new-ats.cn/roles/1';let reads=0;
+ const proofCache=createEmployerProofCache();
+ const fetcher=async()=>{reads++;if(reads===1)throw Error('temporary');return new Response('<title>新企业集团</title><a href="'+target+'">a</a>',{headers:{'content-type':'text/html','cache-control':'private'}});};
+ const check=()=>v4EmployerAuthorization(target,'新企业集团',proof,{fetcher,proofCache});
+ assert.equal(await check(),false);assert.equal(await check(),true);assert.equal(await check(),true);assert.equal(reads,3);
+});

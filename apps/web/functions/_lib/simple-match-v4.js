@@ -4,7 +4,7 @@
  * and number of jobs. Independent page reading enriches results, NEVER erases
  * credible job leads because an employer uses an unfamiliar JD format.
  */
-import {v4PublicJobUrl,v4ReadEmployerJob,v4EmployerAuthorization,v4ReadPublicJobDocument,v4RenderPublicJobDocument,v4ReadPublicJobDocumentWindow,v4PreparePublicBrowserResources,v4ReadDeclaredStructuredJob,v4BrowserAvailable} from './v4-open-job-evidence.js';
+import {v4PublicJobUrl,v4ReadEmployerJob,v4EmployerAuthorization,createEmployerProofCache,v4ReadPublicJobDocument,v4RenderPublicJobDocument,v4ReadPublicJobDocumentWindow,v4PreparePublicBrowserResources,v4ReadDeclaredStructuredJob,v4BrowserAvailable} from './v4-open-job-evidence.js';
 import {directOfficialJobEvidence} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
 import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
@@ -274,13 +274,13 @@ async function toJson(fetcher,provider,response,{signal}={}){
 function sourceKind(url){
  return isCommercialRecruitmentBoard(url)?'THIRD_PARTY_BOARD':recruitmentSourceKind(url)==='EMPLOYER_ATS'?'EMPLOYER_ATS':'EMPLOYER_DOMAIN_CANDIDATE';
 }
-async function checkJob(fetcher,url,signal,job,note=()=>{},cacheBucket){
+async function checkJob(fetcher,url,signal,job,note=()=>{},cacheBucket,proofCache){
  if(isCommercialRecruitmentBoard(url))return null;
  // Open research first, including unfamiliar employers. Known employer API
  // adapters are a fallback for JS shells, never the primary search scope.
  try{
   const jd=await v4ReadEmployerJob(url,{fetcher,signal,expected:job,cacheBucket,onCache:note});
-  if(!jd.source_confirmed&&(job?.employer_proof_url||job?.employer_proof_urls?.length)&&await v4EmployerAuthorization(jd.canonical_url||url,jd.company,job.employer_proof_urls?.length?job.employer_proof_urls:job.employer_proof_url,{fetcher,signal})){
+  if(!jd.source_confirmed&&(job?.employer_proof_url||job?.employer_proof_urls?.length)&&await v4EmployerAuthorization(jd.canonical_url||url,jd.company,job.employer_proof_urls?.length?job.employer_proof_urls:job.employer_proof_url,{fetcher,signal,proofCache})){
    jd.source_confirmed=true;jd.employer_proof_url=v4PublicJobUrl(job.employer_proof_urls?.[0]||job.employer_proof_url);jd.employer_proof_urls=(job.employer_proof_urls||[]).map(v4PublicJobUrl).filter(Boolean);
   }
   if(jd.source_confirmed&&jd.independently_read&&sameIdentity(job?.company,jd.company)&&sameIdentity(job?.title,jd.title)&&sameCity(job?.location,jd.location))jd.vacancy_confirmed=true;
@@ -329,7 +329,7 @@ async function reviewJobAlias(fetcher,provider,originalUrl,targetUrl,job,actual,
   return reply.status==='completed'&&validAliasIdentity(value,originalDoc,targetDoc,sameUrl);
  }catch(e){if(signal?.aborted||isV4RetryableProviderError(e?.code))throw e;note('JD_ALIAS_REVIEW_UNCONFIRMED');return false;}
 }
-async function recoverEmployerJob(fetcher,provider,url,job,initial,{signal,onActivity,note,browser,ledger=[],taskNotes,cacheBucket,fullResearch=false}){
+async function recoverEmployerJob(fetcher,provider,url,job,initial,{signal,onActivity,note,browser,ledger=[],taskNotes,cacheBucket,proofCache,fullResearch=false}){
  if(initial?.excluded_board||initial?.excluded_closed||isOfficialJd(initial))return initial;
  // Reuse only an exact same public document after live verification; any
  // change, unavailable page or failed authorization triggers full research.
@@ -338,7 +338,7 @@ async function recoverEmployerJob(fetcher,provider,url,job,initial,{signal,onAct
   if(!record||!identity(job.company)||!identity(job.title)||!sameIdentity(job.company,record.company)||!sameIdentity(job.title,record.title)||!sameCity(job.location,record.location))return null;
   try{
    const current=doc||await v4ReadPublicJobDocument(target,{fetcher,signal,maxBytes:16*1024*1024});
-   if(!await unchangedPublicHtmlResearch(record,current)||!await v4EmployerAuthorization(current.url,record.company,record.employer_proof_urls.length?record.employer_proof_urls:record.employer_proof_url,{fetcher,signal}))return null;
+   if(!await unchangedPublicHtmlResearch(record,current)||!await v4EmployerAuthorization(current.url,record.company,record.employer_proof_urls.length?record.employer_proof_urls:record.employer_proof_url,{fetcher,signal,proofCache}))return null;
    v4RememberPublicResult(ledger,{ok:true,type:'read_page',mode:'static',url:current.url,text:current.plain,resource_hints:current.resource_hints});
    note('JD_PUBLIC_HTML_RESEARCH_REUSED');
    const {version,document_hash,...verified}=record;
@@ -374,11 +374,11 @@ async function recoverEmployerJob(fetcher,provider,url,job,initial,{signal,onAct
    const authorization=chain.length?chain:proof;
    const key=target+'\n'+JSON.stringify(authorization);if(tried.has(key))continue;
    tried.add(key);added=true;
-   let jd=target===url&&initial?.full_jd?{...initial}:await checkJob(fetcher,target,signal,{...job,employer_proof_url:proof,employer_proof_urls:chain},note);
+   let jd=target===url&&initial?.full_jd?{...initial}:await checkJob(fetcher,target,signal,{...job,employer_proof_url:proof,employer_proof_urls:chain},note,cacheBucket,proofCache);
    if(jd?.excluded_board||jd?.excluded_closed){note(jd.excluded_closed?'RECOVERY_CLOSED':'RECOVERY_BOARD');continue;}
    if(jd?.vacancy_confirmed&&!jd.full_jd&&sameIdentity(job.company,jd.company)&&sameIdentity(job.title,jd.title)&&sameCity(job.location,jd.location)){note('JD_VACANCY_CONFIRMED_WITHOUT_FULL_TEXT');keepPartial(jd);}
    if(jd?.full_jd&&sameIdentity(job.company,jd.company)&&sameIdentity(job.title,jd.title)&&sameCity(job.location,jd.location)){
-    if(!isOfficialJd(jd)&&authorization&&await v4EmployerAuthorization(jd.canonical_url||target,jd.company,authorization,{fetcher,signal})){jd.source_confirmed=true;jd.employer_proof_url=chain[0]||proof;jd.employer_proof_urls=chain;}
+    if(!isOfficialJd(jd)&&authorization&&await v4EmployerAuthorization(jd.canonical_url||target,jd.company,authorization,{fetcher,signal,proofCache})){jd.source_confirmed=true;jd.employer_proof_url=chain[0]||proof;jd.employer_proof_urls=chain;}
     if(isOfficialJd(jd)){note('JD_RECOVERED');return {...jd,canonical_url:jd.canonical_url||target};}
     keepPartial(jd);
    }
@@ -407,7 +407,7 @@ async function recoverEmployerJob(fetcher,provider,url,job,initial,{signal,onAct
     const city=findMainlandCity(text(v.location_quote));
     const quotedIdentity=sameIdentity(v.company,v.company_quote)&&sameIdentity(v.title,v.title_quote);
     const candidateIdentity=sameIdentity(job.company,v.company)&&sameIdentity(job.title,v.title);
-    if(response.status==='completed'&&v.verified!==true&&v.vacancy_confirmed===true&&text(v.company)&&text(v.title)&&city&&quotedIdentity&&candidateIdentity&&sameCity(job.location,city)&&exactQuote(doc.plain,v.company_quote)&&exactQuote(doc.plain,v.title_quote)&&exactQuote(doc.plain,v.location_quote)&&authorization&&await v4EmployerAuthorization(doc.url,v.company,authorization,{fetcher,signal})){
+    if(response.status==='completed'&&v.verified!==true&&v.vacancy_confirmed===true&&text(v.company)&&text(v.title)&&city&&quotedIdentity&&candidateIdentity&&sameCity(job.location,city)&&exactQuote(doc.plain,v.company_quote)&&exactQuote(doc.plain,v.title_quote)&&exactQuote(doc.plain,v.location_quote)&&authorization&&await v4EmployerAuthorization(doc.url,v.company,authorization,{fetcher,signal,proofCache})){
      note('JD_VACANCY_CONFIRMED_WITHOUT_FULL_TEXT');keepPartial({canonical_url:doc.url,company:text(v.company),title:text(v.title),location:city,full_jd:'',partial_jd:parts.filter(p=>exactQuote(doc.plain,p)).join('\n'),vacancy_confirmed:true,jd_incomplete:true,source_confirmed:true,independently_read:true,checked_at:new Date().toISOString(),proof_method:'V4_EMPLOYER_HTML_JOB',employer_proof_url:chain[0]||proof,employer_proof_urls:chain});continue;
     }
     if(response.status!=='completed'||v.verified!==true||!text(v.company)||!text(v.title)||!parts.length||!parts.every(p=>exactQuote(doc.plain,p))||!city||
@@ -416,7 +416,7 @@ async function recoverEmployerJob(fetcher,provider,url,job,initial,{signal,onAct
      note('JD_EXTRACTION_UNCONFIRMED');issues.push('JD_EXTRACTION_UNCONFIRMED');continue;
     }
     // An AI's assertion of official ownership is not proof. Require an independently opened employer reference.
-    const confirmed=!!authorization&&await v4EmployerAuthorization(doc.url,v.company,authorization,{fetcher,signal});
+    const confirmed=!!authorization&&await v4EmployerAuthorization(doc.url,v.company,authorization,{fetcher,signal,proofCache});
     // A set of true excerpts is not proof of a complete JD. Independently
     // review boundaries and reconstruct the contiguous body from the source.
     const coverage=await v4StageResearchCall(p=>v4Call(fetcher,provider,p,{signal,stage:'jd_coverage'}),{
@@ -528,7 +528,7 @@ async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,br
  }
 }
 
-async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=false,note=()=>{},browser,ledger=[],cachedResults=new Map(),onRead=()=>{},cacheBucket,forceRefresh=new Set(),notesFor=()=>undefined,fullResearch=false}={}){
+async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=false,note=()=>{},browser,ledger=[],cachedResults=new Map(),onRead=()=>{},cacheBucket,proofCache,forceRefresh=new Set(),notesFor=()=>undefined,fullResearch=false}={}){
  // A bounded concurrency pool protects third-party sites, not a count limit
  // on the number of positions the model is allowed to recommend.
  const urls=[...rows.keys()],results=new Map();
@@ -540,10 +540,11 @@ async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=fa
    const job=rows.get(url),diagnostics=[];
    if(cachedResults.has(url)){const checked=cachedResults.get(url);results.set(url,checked);if(checked?.full_jd&&!checked.excluded_board&&!checked.excluded_closed)read++;onRead(url,checked);continue;}
    const jobNote=code=>{diagnostics.push(code);note(code);};
-   let checked=await checkJob(fetcher,url,signal,job,jobNote,curated?cacheBucket:undefined);
+   const refresh=forceRefresh.has(url);
+   let checked=await checkJob(fetcher,url,signal,job,jobNote,curated&&!refresh?cacheBucket:undefined,refresh?undefined:proofCache);
    if(curated&&!isOfficialJd(checked)&&(!checked?.vacancy_confirmed||fullResearch)&&!checked?.excluded_board&&!checked?.excluded_closed){
     jobNote('JD_RECOVERY_REQUIRED');
-    checked=await recoverEmployerJob(fetcher,provider,url,job,checked,{signal,onActivity,note:jobNote,browser,ledger,taskNotes:notesFor(url),cacheBucket:forceRefresh.has(url)?undefined:cacheBucket,fullResearch});
+    checked=await recoverEmployerJob(fetcher,provider,url,job,checked,{signal,onActivity,note:jobNote,browser,ledger,taskNotes:notesFor(url),cacheBucket:refresh?undefined:cacheBucket,proofCache:refresh?undefined:proofCache,fullResearch});
    }
    if(!checked?.full_jd)jobNote(checked?.excluded_closed?'JD_CLOSED':checked?.excluded_board?'JD_BOARD':'JD_NOT_READ');
    else if(!isOfficialJd(checked))jobNote('JD_OFFICIAL_UNCONFIRMED');
@@ -1341,7 +1342,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const verificationReads=new Map(reusableReads(rows).filter(([u,r])=>(isOfficialJd(r.jd)||r.jd?.vacancy_confirmed===true)&&(!r.prefetched||(Number.isFinite(Date.parse(r.jd.checked_at))&&Date.now()-Date.parse(r.jd.checked_at)>=0&&Date.now()-Date.parse(r.jd.checked_at)<10*60000))));
  const cachedResults=new Map(entries.filter(([u])=>verificationReads.has(u)&&!explicitRechecks.has(u)).map(([u])=>{const record=verificationReads.get(u);if(record.prefetched)note('JD_DISCOVERY_PREFETCH_REUSED');return [u,record.jd];}));
  if(curated&&checkpoint)onRecoveryState(()=>continuation('verification',{next:offset,matches:checkpoint.matches||[],read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures:checkpoint.reportFailures||0,verificationReads:[...verificationReads],verificationBatch:batchSize}).checkpoint);
- const readOptions={signal,onActivity,provider,curated,fullResearch,note,browser:env.BROWSER,ledger:publicEvidence,cachedResults,notesFor:jobNotes,forceRefresh:explicitRechecks,cacheBucket:jdArchiveConfigured(env)?env.HHBA_JOB_JD_R2:undefined,onRead:(u,jd)=>{if(curated&&(isOfficialJd(jd)||jd?.vacancy_confirmed===true)){const prior=verificationReads.get(u);verificationReads.set(u,{revision:candidateEvidence(rows.get(u)),jd,...(prior?.prefetched&&cachedResults.get(u)===jd?{prefetched:true}:{})});}}};
+ const readOptions={signal,onActivity,provider,curated,fullResearch,note,browser:env.BROWSER,ledger:publicEvidence,cachedResults,proofCache:curated?createEmployerProofCache():undefined,notesFor:jobNotes,forceRefresh:explicitRechecks,cacheBucket:jdArchiveConfigured(env)?env.HHBA_JOB_JD_R2:undefined,onRead:(u,jd)=>{if(curated&&(isOfficialJd(jd)||jd?.vacancy_confirmed===true)){const prior=verificationReads.get(u);verificationReads.set(u,{revision:candidateEvidence(rows.get(u)),jd,...(prior?.prefetched&&cachedResults.get(u)===jd?{prefetched:true}:{})});}}};
  // Each worker owns a read→score lane: a slow source cannot block the
  // scores of other jobs in this batch. Keep the old serial path intact.
  const overlap=curated&&parallelResearch;
