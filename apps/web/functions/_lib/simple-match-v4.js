@@ -1065,7 +1065,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     if(!acceptedLiveUrl(target)||rows.has(target)||earlyRows.has(target))return;
     const candidate={url:target,company:jd.company,title:jd.title,location:jd.location,source_kind:'employer_official',requirements:jd.requirements};
     if(!concreteCandidate(candidate))return;
-    earlyToolUrls.add(target);streamSources.add(target);earlySources.add(target);
+    // A redirect target is independently read, not itself a model tool citation.
+    earlySources.add(target);
     emitCitedJob(candidate,{source:'source_read'});
     if(earlyRows.has(target)){
      discoveryReads.set(target,{revision:candidateEvidence(earlyRows.get(target)),jd,prefetched:true});
