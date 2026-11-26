@@ -132,3 +132,8 @@ test('edge exhaustion and lease contention have distinct diagnostics; checkpoint
  const result=await driveBackgroundMatch({async do(_name,_config,fn){return fn();}},ticket,async()=>{calls++;return event('complete',{status:values.shift()});});
  assert.equal(calls,3);assert.deepEqual(result,{status:'COMPLETE'});
 });
+
+ test('known recoverable failures remain retryable even if older phase marked them terminal',async()=>{
+ for(const error of ['AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_INCOMPLETE','AI_CHECKPOINT_STORAGE_UNAVAILABLE','AI_PROVIDER_UNAVAILABLE'])await assert.rejects(requestPhase(async()=>event('failure',{error,retryable:false}),ticket),/BACKGROUND_PHASE_RETRY/);
+ assert.equal(await requestPhase(async()=>event('failure',{error:'AI_PROVIDER_KEY_REJECTED',retryable:true}),ticket),'FAILED');
+ });

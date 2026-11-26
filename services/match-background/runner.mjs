@@ -5,6 +5,7 @@ const retry=code=>Object.assign(Error('BACKGROUND_PHASE_RETRY:'+code),{code});
 const retryCode=e=>safeCode(e?.code||String(e?.message||'').match(/^BACKGROUND_PHASE_RETRY:([A-Z0-9_]+)$/)?.[1],'AI_BACKGROUND_TRANSPORT_INTERRUPTED');
 const stopCodes=new Set(['AI_AGENT_CANCELLED','AI_BACKGROUND_TICKET_INVALID','AI_CHECKPOINT_EXPIRED']);
 const permanentCodes=new Set(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT','AI_PROVIDER_NOT_CONFIGURED','AI_PROVIDER_UNSUPPORTED','AI_PROVIDER_REQUEST_REJECTED','AI_PROVIDER_REDIRECT_BLOCKED','AI_BACKGROUND_REQUEST_INVALID','AI_BACKGROUND_REDIRECT_BLOCKED','AI_CHECKPOINT_INVALID','AI_BACKGROUND_TASK_PAUSED']);
+const recoverableCodes=new Set(['AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UNAVAILABLE','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_RESPONSE_EMPTY','AI_PROVIDER_INCOMPLETE','AI_CHECKPOINT_DB_UNAVAILABLE','AI_CHECKPOINT_LEASE_LOST','AI_CHECKPOINT_STORAGE_UNAVAILABLE','AI_BACKGROUND_SCHEDULE_UNAVAILABLE','AI_EDGE_RESOURCE_EXHAUSTED','AI_EDGE_DAILY_LIMIT','AI_BACKGROUND_RESPONSE_INVALID','AI_BACKGROUND_TRANSPORT_INTERRUPTED','AI_BACKGROUND_RESPONSE_INCOMPLETE','AI_TASK_IN_PROGRESS']);
 const pending=(error)=>({status:'RECOVERING',error});
 export function recoveryDelaySeconds(code,streak=1){
  const ordinary=[15,30,60,120,300,600,1800][Math.min(6,Math.max(0,streak-1))];
@@ -23,7 +24,7 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false}={}){
   const code=safeCode(body.error,/\b1102\b|exceededResources|worker exceeded resource/i.test(raw)?'AI_EDGE_RESOURCE_EXHAUSTED':/\b1027\b/i.test(raw)?'AI_EDGE_DAILY_LIMIT':'AI_BACKGROUND_HTTP_'+response.status);
   if(stopCodes.has(code))return terminal('STOP',code);
   if(permanentCodes.has(code))return terminal('FAILED',code);
-  if((response.status===409&&code==='AI_TASK_IN_PROGRESS')||['AI_EDGE_RESOURCE_EXHAUSTED','AI_EDGE_DAILY_LIMIT'].includes(code)||response.status===429||response.status>=500)throw retry(code);
+  if(recoverableCodes.has(code)||response.status===429||response.status>=500)throw retry(code);
   return terminal('FAILED',code);
  }
  let text;try{text=await response.text();}catch{throw retry('AI_BACKGROUND_TRANSPORT_INTERRUPTED');}
@@ -37,7 +38,7 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false}={}){
    const code=safeCode(value?.error,'AI_BACKGROUND_EXECUTION_FAILED');
    if(stopCodes.has(code))return terminal('STOP',code);
    if(permanentCodes.has(code))return terminal('FAILED',code);
-   if(value?.retryable)throw retry(code);
+   if(value?.retryable||recoverableCodes.has(code))throw retry(code);
    return terminal('FAILED',code);
   }
   if(value?.status==='COMPLETE')return terminal('COMPLETE');

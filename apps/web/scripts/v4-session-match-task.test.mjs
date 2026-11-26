@@ -440,3 +440,14 @@ test('production route and browser correlate numeric publication stamps without 
  assert.match(browser,/key!==lastDeliveryStamp/);
  assert.match(browser,/onPartial\?\.\(reports\)/);
 });
+
+ test('report checkpoint recovery is generation-bound and cannot overwrite newer or terminal main state',async()=>{
+ const {reportRecoverySnapshot,restoreReportRecovery}=await import('../functions/_lib/v4-report-recovery.js');
+ const saved={generation:2,checkpoint:{phase:'verification',matches:[]},checkpoint_captured_at:10};
+ const recovery=reportRecoverySnapshot({phase:'verification',matches:[{id:'synthetic',report_status:'COMPLETE'}]},[],20);
+ const view={generation:2,status:'PENDING',report_recovery:recovery,progress:{jobs:[]}};
+ assert.equal(restoreReportRecovery(saved,view,2).checkpoint.matches[0].id,'synthetic');
+ assert.equal(restoreReportRecovery({...saved,checkpoint_captured_at:21},view,2),null);
+ assert.equal(restoreReportRecovery({...saved,result:{status:'COMPLETE'}},view,2),null);
+ assert.equal(restoreReportRecovery(saved,{...view,generation:1},2),null);
+ });

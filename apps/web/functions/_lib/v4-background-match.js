@@ -8,7 +8,7 @@ export const backgroundEnabled=(env,request)=>env?.HHBA_V4_BACKGROUND_ENABLED===
 const validTicket=t=>typeof t==='string'&&/^[a-f0-9]{64}$/.test(t);
 // Retry only known recoverable infrastructure errors; invalid tickets, revoked
 // sessions and incompatible configuration must remain explicit terminal states.
-export const isV4RetryableTaskFailure=code=>['AI_CHECKPOINT_DB_UNAVAILABLE','AI_CHECKPOINT_LEASE_LOST','AI_CHECKPOINT_STORAGE_UNAVAILABLE','AI_BACKGROUND_SCHEDULE_UNAVAILABLE','AI_EDGE_RESOURCE_EXHAUSTED','AI_EDGE_DAILY_LIMIT'].includes(code);
+export const isV4RetryableTaskFailure=code=>['AI_CHECKPOINT_DB_UNAVAILABLE','AI_CHECKPOINT_LEASE_LOST','AI_CHECKPOINT_STORAGE_UNAVAILABLE','AI_BACKGROUND_SCHEDULE_UNAVAILABLE','AI_EDGE_RESOURCE_EXHAUSTED','AI_EDGE_DAILY_LIMIT','AI_PROVIDER_UNAVAILABLE','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_RESPONSE_EMPTY','AI_PROVIDER_INCOMPLETE','AI_BACKGROUND_RESPONSE_INVALID','AI_BACKGROUND_TRANSPORT_INTERRUPTED','AI_BACKGROUND_RESPONSE_INCOMPLETE','AI_TASK_IN_PROGRESS'].includes(code);
 export async function scheduleBackgroundMatch(env,session,task,{diagnostic=false}={}){
  const ticket=await matchTaskKey(env,session.phone,task.id,{scope:'workflow-ticket-v1',session_hash:session.token_hash,generation:task.generation});
  const previous=await readMatchTask(env,ticket);

@@ -176,13 +176,18 @@ export function createLiveVerificationCoordinator({getDiscovery,choose,run,canSt
 // A separate report consumer takes only completed evidence assessments.
 // Admission is per hosting invocation; skipped work stays as a scored record
 // with no completed report and remains eligible for the durable next phase.
-export function createLiveReportQueue({run,keyOf=j=>j.official_url,canStart=()=>true,signal}){
- const pending=new Map(),seen=new Set();let active=null,failure=null,closing=false;
+export function createLiveReportQueue({run,keyOf=j=>j.official_url,canStart=()=>true,width=1,signal}){
+ const pending=new Map(),seen=new Set(),active=new Set();let failure=null,closing=false,failed=0;
  const pump=()=>{
-  if(active||failure||signal?.aborted||!canStart()||!pending.size)return;
-  const [key,job]=pending.entries().next().value;
-  pending.delete(key);seen.add(key);
-  active=Promise.resolve().then(()=>run(job)).catch(e=>{failure=e;}).finally(()=>{active=null;pump();});
+  if(failure||signal?.aborted)return;
+  const requested=typeof width==='function'?width(active.size):width;
+  const capacity=Number.isSafeInteger(requested)?Math.max(0,requested):1;
+  while(active.size<capacity&&pending.size&&canStart(active.size)&&!failure&&!signal?.aborted){
+   const [key,job]=pending.entries().next().value;
+   pending.delete(key);seen.add(key);
+   const work=Promise.resolve().then(()=>run(job)).catch(e=>{failed++;failure??=e;}).finally(()=>{active.delete(work);pump();});
+   active.add(work);
+  }
  };
  return {
   offer(job){
@@ -193,8 +198,8 @@ export function createLiveReportQueue({run,keyOf=j=>j.official_url,canStart=()=>
   },
   async settle(){
    closing=true;pump();
-   while(active)await active;
-   return {failure,deferred:pending.size};
+   while(active.size)await Promise.allSettled([...active]);
+   return {failure,deferred:pending.size+failed};
   }
  };
 }

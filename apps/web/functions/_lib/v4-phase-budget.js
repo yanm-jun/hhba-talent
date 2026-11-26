@@ -10,6 +10,7 @@ export function phaseResourceBudget({initial=8,soft=24,hard=34,progressReserve=0
  let reservedWrites=0;
  const remainingReserve=()=>reserve-reservedWrites;
  const researchUsed=()=>used-reservedWrites;
+ const remainingResearch=()=>Math.max(0,Math.min(soft-researchUsed(),hard-used-remainingReserve()));
  const canPublishProgress=kind=>{
   if(used>=hard)return false;
   if(used<soft-2)return true;
@@ -40,7 +41,7 @@ export function phaseResourceBudget({initial=8,soft=24,hard=34,progressReserve=0
   const v=Reflect.get(target,key,target);if(typeof v!=='function')return v;
   return methods.includes(key)?(...args)=>{take(kind);return v.apply(target,args);}:v.bind(target);
  }});
- return {observe,take,canStart:()=>researchUsed()<soft,canPublish:()=>researchUsed()<soft-2,
+ return {observe,take,remainingResearch,canStart:()=>!denied&&remainingResearch()>0,canPublish:()=>!denied&&remainingResearch()>2,
   canPublishProgress,
   tryProgress(kind){if(!canPublishProgress(kind))return false;if(used>=soft-2)reservedWrites++;observe('progress');return true;},
   get denied(){return denied;},get used(){return used;},
@@ -78,8 +79,9 @@ export function phaseModelReplay(entries=[]){
  export function managedWorkPlan(budget,history,pending,{maxLanes=4,maxWindow=8,reserve=0,initialCost=8}={}){
   if(pending<=0)return {width:0,window:0};
   const {used,soft}=budget.snapshot();
+ const available=typeof budget.remainingResearch==='function'?budget.remainingResearch():Math.max(0,soft-used);
   const cost=Number.isFinite(history?.cost)&&history.cost>0?history.cost:initialCost;
-  const capacity=Math.max(1,Math.floor(Math.max(0,soft-used-reserve)/Math.max(2,cost)));
+  const capacity=Math.max(1,Math.floor(Math.max(0,available-reserve)/Math.max(2,cost)));
   const previous=Number.isSafeInteger(history?.width)&&history.width>0?history.width:2;
   const width=Math.min(pending,maxLanes,capacity,history?.pressure?1:previous+1);
   return {width:Math.max(1,width),window:Math.max(1,Math.min(pending,maxWindow,capacity,history?.pressure?1:width*2))};
