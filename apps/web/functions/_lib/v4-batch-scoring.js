@@ -61,13 +61,17 @@ export function makeBatchScorer({call,parse,resume,roleHint,budget=90000,note=()
     }
    }catch(e){
     note('AI_SCORE_BATCH_FAILED');
-    for(const item of group)item.resolve(null);
+    // Shared transport pressure is not an invalid assessment. Let the durable
+    // coordinator preserve completed work and retry rather than fan out calls.
+    if(['AI_PHASE_RESOURCE_YIELD','AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_TIMEOUT'].includes(e?.code)){
+     for(const item of group)item.reject(e);
+    }else for(const item of group)item.resolve(null);
    }
   }));
  }
- return (id,job)=>new Promise(resolve=>{
+ return (id,job)=>new Promise((resolve,reject)=>{
   if(signal?.aborted){resolve(null);return;}
-  pending.push({id,job,resolve});
+  pending.push({id,job,resolve,reject});
   // Once every available lane has supplied a ready JD, waiting longer
   // cannot grow this batch. Flush now rather than adding artificial latency.
   if(pending.length>=maxReady){if(timer!==null)clearTimeout(timer);void flush();}

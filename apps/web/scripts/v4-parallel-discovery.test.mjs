@@ -695,3 +695,53 @@ test('managed invocation plan expands cheap work and backs off after resource pr
  assert.equal(managedWorkPlan(fresh,undefined,50,{maxLanes:2,reserve:6,initialCost:8}).width,1);
  assert.equal(managedWorkPlan(fresh,undefined,0).width,0);
 });
+
+test('managed verification invokes actual concurrent batch scoring and preserves measured state',async()=>{
+ const {phaseResourceBudget}=await import('../functions/_lib/v4-phase-budget.js');
+ const provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const jobs=[job(3001),job(3002)],byUrl=new Map(jobs.map(j=>[j.url,j]));
+ const html=j=>'<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:j.title,hiringOrganization:{name:j.company,url:new URL(j.url).origin},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责汽车经销商渠道运营和业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
+ let batches=0,pages=0,active=0,peak=0;
+ const budget=phaseResourceBudget();
+ const fetcher=budget.fetch(async(url,opts)=>{
+  if(!url.endsWith('/responses')){
+   pages++;active++;peak=Math.max(peak,active);
+   await new Promise(r=>setTimeout(r,15));active--;
+   return new Response(html(byUrl.get(url)),{headers:{'content-type':'text/html'}});
+  }
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  assert.equal(input.jobs.length,2);batches++;
+  return model({assessments:input.jobs.map(j=>({id:j.id,suitable:true,score:86,reason:'渠道运营匹配',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车经销商渠道运营',matched:['渠道运营'],gaps:[]}))});
+ });
+ const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,resourceBudget:budget,checkpoint:{phase:'verification',next:0,rows:jobs.map(j=>[j.url,j]),profile,toolUrls:jobs.map(j=>j.url)}});
+ assert.equal(result.checkpoint.phase,'reporting');assert.equal(result.checkpoint.scored,2);
+ assert.equal(batches,1);assert.equal(pages,2);assert.equal(peak,2);
+ assert.equal(result.checkpoint.managedVerification.width,2);assert.equal(budget.denied,false);
+});
+test('managed production reporting really runs multiple independent reports in parallel',async()=>{
+ const {phaseResourceBudget}=await import('../functions/_lib/v4-phase-budget.js');
+ const provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const jobs=Array.from({length:4},(_,i)=>job(3100+i)),jd='负责汽车经销商渠道运营，具备渠道数据分析能力。';
+ const matches=jobs.map(j=>({company:j.company,title:j.title,location:j.location,official_url:j.url,source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',evidence_status:'VERIFIED_FULL_JD',evidence_excerpt:jd,score_evidence_status:'GROUNDED_JD_RESUME_QUOTES',match_score:86,curated_suitable:true}));
+ const options={env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true,parallelResearch:true};
+ let reports=0,active=0,peak=0;
+ const fetcher=async(url,opts)=>{
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.pending_ids)return model({ordered_ids:input.pending_ids});
+  reports++;active++;peak=Math.max(peak,active);
+  await new Promise(r=>setTimeout(r,15));active--;
+  return model({suitable:true,score:86,reason:'渠道经历相关，分析能力证据不足。',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车经销商渠道运营',comparisons:[{jd_quote:'汽车经销商渠道运营',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'有相关经历'},{jd_quote:'渠道数据分析能力',status:'missing',analysis:'暂无直接证据'}],quality_review:{status:'complete',explanation:'职责和资格逐项覆盖，未知项如实标注。',missing:[]}});
+ };
+ let budget=phaseResourceBudget();
+ const ranked=await v4Match(budget.fetch(fetcher),provider,resume,'全国',{...options,resourceBudget:budget,checkpoint:{phase:'reporting',rows:jobs.map(j=>[j.url,j]),profile,matches}});
+ budget=phaseResourceBudget();
+ const done=await v4Match(budget.fetch(fetcher),provider,resume,'全国',{...options,resourceBudget:budget,checkpoint:ranked.checkpoint});
+ assert.equal(reports,4);assert.ok(peak>=2);assert.equal(done.checkpoint.matches.filter(j=>j.report_status==='COMPLETE').length,4);
+ assert.equal(done.checkpoint.managedReport.width,3);assert.equal(budget.denied,false);
+});
+test('shared batch transport pressure yields instead of multiplying retry requests',async()=>{
+ const {makeBatchScorer}=await import('../functions/_lib/v4-batch-scoring.js');
+ const score=makeBatchScorer({resume:'渠道运营经验',maxReady:2,delay:100,parse:r=>r.data,call:async()=>{throw Object.assign(Error('yield'),{code:'AI_PHASE_RESOURCE_YIELD'});}});
+ const result=await Promise.allSettled([score('a',{full_jd:'岗位甲'}),score('b',{full_jd:'岗位乙'})]);
+ assert.ok(result.every(r=>r.status==='rejected'&&r.reason.code==='AI_PHASE_RESOURCE_YIELD'));
+});
