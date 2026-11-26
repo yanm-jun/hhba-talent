@@ -14,7 +14,7 @@ import {v4AcceptResearchDigest,V4_DIGEST_GUIDE,v4ResearchMemoryPage,v4ContextSta
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch} from './v4-jd-research.js';
 import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery,runReadyWork} from './v4-parallel-discovery.js';
-import {candidateRevision,candidateResearchMemory,pendingVerification,verificationSnapshot,mergePipelineCheckpoint,pipelineWidths,pipelineVerificationWindow,discoveryReadAhead,createLiveVerificationCoordinator} from './v4-research-pipeline.js';
+import {candidateRevision,candidateResearchMemory,pendingVerification,verificationSnapshot,mergePipelineCheckpoint,pipelineWidths,pipelineVerificationWindow,discoveryReadAhead,createLiveVerificationCoordinator,createLiveReportQueue} from './v4-research-pipeline.js';
 import {makeBatchScorer} from './v4-batch-scoring.js';
 import {createV4DiscoveryJobObserver} from './v4-stream-job-parser.js';
 import {createV4DiscoveryCandidateEvents,createV4DiscoveryIdentityIndex,v4DiscoveryCandidateKey} from './v4-discovery-candidate-events.js';
@@ -1559,13 +1559,25 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    await generateCompleteReport(job,verificationFetcher,{early:true,onDone:()=>{note('LIVE_REPORT_COMPLETE');publishVerified();},onFailure:()=>{earlyReportFailures++;}});
   }finally{earlyInFlight.delete(job.official_url);}
  };
+ // Managed report generation has its own consumer: a slow report never
+ // occupies a verification/scoring worker. At the phase boundary, preserve
+ // every scored job and finish any admitted report before checkpointing.
+ const reportQueue=fullResearch&&parallelResearch&&resourceBudget?createLiveReportQueue({signal,
+  canStart:()=>!resourceBudget.denied&&resourceBudget.snapshot().soft-resourceBudget.used>=3,
+  run:maybeEarlyReport}):null;
+ const submitEarlyReport=job=>{
+  if(!eligibleCuratedScore(job)||qualifiedReport(job)||job.report_status)return;
+  if(reportQueue){reportQueue.offer(job);return;}
+  return maybeEarlyReport(job);
+ };
  // Resume a scored job whose report was deferred by resource pressure.
  if(fullResearch&&parallelResearch){
   const pending=previousMatches.filter(j=>{
    const u=j.research_candidate_url||j.official_url;
    return eligibleCuratedScore(j)&&!qualifiedReport(j)&&!j.report_status&&!explicitRechecks.has(u)&&rows.has(u)&&(!processedEvidence.has(u)||processedEvidence.get(u)===candidateEvidence(rows.get(u)));
   });
-  if(pending.length)await maybeEarlyReport(applyGlobalOrder(pending,null)[0]);
+  if(reportQueue){for(const job of applyGlobalOrder(pending,null))submitEarlyReport(job);}
+  else if(pending.length)await maybeEarlyReport(applyGlobalOrder(pending,null)[0]);
  }
  const worker=async()=>{
   while(cursor<entries.length){
@@ -1661,13 +1673,16 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     Object.assign(matches[i],{match_score:null,reference_score:0,score_basis:'完整 JD 已读取，但重新评分未取得可靠依据（'+code+'）；请核对岗位原文。',score_evidence_status:undefined});
     break;
    }}
-   if(curated){publishVerified();await maybeEarlyReport(matches[i]);publishVerified();}
+   if(curated){publishVerified();await submitEarlyReport(matches[i]);if(!reportQueue)publishVerified();}
    else onPartial(reportMatches());
    onActivity('scoring','已对 '+scored+' 条岗位按完整 JD 重新评分，已存档 '+archived+' 条有原文依据的 JD。');
   }
  };
  const settledWorkers=await Promise.allSettled(Array.from({length:laneWidth},worker));
- const workerFailure=settledWorkers.find(x=>x.status==='rejected');
+ const reportSettlement=await reportQueue?.settle();
+ if(reportSettlement?.deferred)diag.LIVE_REPORT_DEFERRED=(diag.LIVE_REPORT_DEFERRED||0)+reportSettlement.deferred;
+ if(reportSettlement?.failure)note('LIVE_REPORT_RETRY_RETAINED');
+ const workerFailure=settledWorkers.find(x=>x.status==='rejected')||(reportSettlement?.failure?{reason:reportSettlement.failure}:null);
  if(overlap&&cursor<entries.length){
   entries.splice(cursor);matches.splice(cursor);
   note('VERIFICATION_WINDOW_PRESSURE_PAUSE');
