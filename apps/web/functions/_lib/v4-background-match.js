@@ -4,6 +4,7 @@ import {matchTaskKey,readMatchTask,saveMatchTask} from './v4-match-checkpoint-st
 import {renewActiveSessionTask,researchTaskKey,taskError} from './v4-session-match-task.js';
 import {sha256Hex} from './real-auth.js';
 import {isV4RetryableTaskFailure} from './v4-task-failure-policy.js';
+import {stagedV4WorkflowsEnabled} from './v4-stage-workflows.js';
 export {isV4RetryableTaskFailure} from './v4-task-failure-policy.js';
 
 export const backgroundEnabled=(env,request)=>env?.HHBA_V4_BACKGROUND_ENABLED==='1'&&typeof env.HHBA_MATCH_BACKGROUND?.fetch==='function'&&['https://hhba.work','https://www.hhba.work'].includes(new URL(request.url).origin);
@@ -14,7 +15,7 @@ export async function scheduleBackgroundMatch(env,session,task,{diagnostic=false
  const previous=await readMatchTask(env,ticket);
  if(previous?.kind!=='HHBA_V4_BACKGROUND_TICKET_V1'||Date.now()-(previous.renewed_at||0)>=3600000)await saveMatchTask(env,ticket,{kind:'HHBA_V4_BACKGROUND_TICKET_V1',phone:session.phone,session_hash:session.token_hash,task_id:task.id,generation:task.generation,renewed_at:Date.now()});
  const instance=await sha256Hex('hhba-workflow-instance:'+ticket);
- const r=await env.HHBA_MATCH_BACKGROUND.fetch('https://hhba-internal.invalid/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instance,ticket})});
+ const r=await env.HHBA_MATCH_BACKGROUND.fetch('https://hhba-internal.invalid/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instance,ticket,...(stagedV4WorkflowsEnabled(env)?{mode:'staged'}:{})})});
  if(!r.ok){const data=await r.json().catch(()=>null);if(data?.terminal_failure===true){const error=typeof data.error==='string'&&/^AI_[A-Z0-9_]{3,90}$/.test(data.error)?data.error:'AI_BACKGROUND_EXECUTION_FAILED';
   // An older Workflow may have finished with a recoverable failure. Let the
   // authorized Pages driver continue under the existing exclusive lease.
@@ -45,7 +46,7 @@ export async function loadBackgroundMatch(env,ticket){
   await saveMatchTask(env,ticket,{...record,renewed_at:Date.now()});
   try{
    const instance=await sha256Hex('hhba-workflow-instance:'+ticket);
-   const r=await env.HHBA_MATCH_BACKGROUND.fetch('https://hhba-internal.invalid/renew-watchdog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instance})});
+   const r=await env.HHBA_MATCH_BACKGROUND.fetch('https://hhba-internal.invalid/renew-watchdog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instance,...(stagedV4WorkflowsEnabled(env)?{staged:true}:{})})});
    if(!r.ok||(await r.json())?.ok!==true)throw Error('WATCHDOG_RENEW_FAILED');
   }catch{console.warn('HHBA_MATCH_WATCHDOG_RENEW_FAILED');}
  }

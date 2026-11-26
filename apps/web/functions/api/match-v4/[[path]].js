@@ -8,6 +8,7 @@ import {redactForModel} from '../../_lib/resume-match-core.js';
 import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
 import {createAiUsageBuffer} from '../../_lib/ai-token-usage.js';
 import {v4PhaseMetricSample,recordV4PhaseOps} from '../../_lib/v4-phase-ops-metrics.js';
+import {v4CheckpointLane,isV4StageLane,stagedV4WorkflowsEnabled,stageWorkflowSignal} from '../../_lib/v4-stage-workflows.js';
 import {mergeLiveJobProgress,createV4JobEventJournal} from '../../_lib/v4-job-progress.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
 import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
@@ -120,6 +121,19 @@ function events(env,request,input,waitUntil){
    });
    const queueProgress=kind=>publisher.queue(kind);
    const stopProgress=()=>publisher.stop();
+   const stageCompleteOrHandoff=async checkpoint=>{
+    if(input.backgroundLane&&input.backgroundTicket&&stagedV4WorkflowsEnabled(env)){
+     const next=v4CheckpointLane(checkpoint);
+     if(next!==input.backgroundLane){
+      if(await stageWorkflowSignal(env,input.backgroundTicket,{lane:next})){send('complete',{status:'HANDOFF'});return;}
+      // If the new independent consumer cannot be awakened, the owning
+      // Workflow continues in proven-safe single-driver mode instead.
+      send('complete',{status:'CONTINUE',fallback:true});return;
+     }
+    }
+    send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});
+   };
+   const finishWorkflowStages=async()=>{if(input.backgroundLane&&input.backgroundTicket)await stageWorkflowSignal(env,input.backgroundTicket,{finish:true});};
    const sendResearch=r=>{if(r){lastReport={...r,discovered:Math.max(r.discovered||0,lastJobs.length,lastReport?.discovered||0),excluded_count:Math.max(r.excluded_count||0,lastReport?.excluded_count||0),search_source_count:Math.max(r.search_source_count||0,lastReport?.search_source_count||0)};send('research_report',lastReport);queueProgress();}};
    const rememberDiscoveryStats=stats=>{if(!lastReport)return;lastReport={...lastReport,discovered:Math.max(lastReport.discovered||0,stats.discovered||0),excluded_count:Math.max(lastReport.excluded_count||0,stats.excluded_count||0),search_source_count:Math.max(lastReport.search_source_count||0,stats.search_source_count||0)};if(!input.background)send('research_report',lastReport);queueProgress('candidate');};
    const reportSignature=jobs=>JSON.stringify(jobs.filter(officialJob).map(j=>[j.official_url,j.match_score,j.jd_sha256,j.research_detail,j.reference_jd]));
@@ -201,7 +215,7 @@ function events(env,request,input,waitUntil){
       metricOutcome='CACHED';
       const cached=input.cachedResult;
       await stopProgress();await publishProgress('COMPLETE');await releaseTask();
-      sendFinal(cached);
+      await finishWorkflowStages();sendFinal(cached);
       succeeded=true;return;
      }
      let recoveryState=()=>null;
@@ -244,7 +258,7 @@ function events(env,request,input,waitUntil){
        await input.lease.renew();
        await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint,generation:input.generation||0,progress:snapshotProgress(),checkpoint_captured_at:captureTime()});
        await publishProgress();await releaseTask();
-       send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});
+       await stageCompleteOrHandoff(result.checkpoint);
        succeeded=true;return;
       }
       // Store derived research state only when a private encrypted checkpoint
@@ -275,7 +289,7 @@ function events(env,request,input,waitUntil){
       await saveMatchTask(env,input.taskKey,{result,checkpoint:resumeCheckpoint,generation:input.generation||0});
       await publishProgress('COMPLETE');await releaseTask();
      }
-     sendFinal(result);
+     await finishWorkflowStages();sendFinal(result);
      succeeded=true;
     }catch(e){
      await stopProgress();await leaseHeartbeat?.stop();
@@ -288,7 +302,7 @@ function events(env,request,input,waitUntil){
       metricOutcome='COMPLETE';
       await releaseTask();
       if(code==='AI_AGENT_CANCELLED'){send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable:false});return;}
-      await publishProgress('COMPLETE');sendFinal(committedResult);succeeded=true;return;
+      await publishProgress('COMPLETE');await finishWorkflowStages();sendFinal(committedResult);succeeded=true;return;
      }
      if((code===PHASE_YIELD||budget?.denied)&&input.taskKey&&input.lease&&!leaseAbort.signal.aborted){
       try{
@@ -300,7 +314,7 @@ function events(env,request,input,waitUntil){
        await publishProgress();
         console.info('HHBA_V4_RESOURCE_YIELD',JSON.stringify({trace,stage:phase,...budget?.snapshot()}));
        metricOutcome='RESOURCE_YIELD';
-       await releaseTask();send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});succeeded=true;return;
+       await releaseTask();await stageCompleteOrHandoff(checkpoint);succeeded=true;return;
       }catch(recoveryError){console.warn('HHBA_V4_RESOURCE_YIELD_SAVE_FAILED',JSON.stringify({trace,error:recoveryError?.code||'CHECKPOINT_SAVE_FAILED'}));}
      }
      metricOutcome=code===PHASE_YIELD?'RESOURCE_YIELD':!isV4TerminalTaskFailure(code)&&!!input.taskKey?'RETRYABLE_FAILURE':'TERMINAL_FAILURE';metricError=code;
@@ -308,6 +322,7 @@ function events(env,request,input,waitUntil){
       if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&code!=='AI_AGENT_CANCELLED'){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:input.recoveryState?.()||input.checkpoint||null,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
       if(code!=='AI_AGENT_CANCELLED'&&!leaseAbort.signal.aborted)await publishProgress(retryable?'PENDING':'FAILED',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
        console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,elapsed_ms:Date.now()-started,resources:budget?.snapshot()}));
+      if(!retryable)await finishWorkflowStages();
       send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
     }finally{
      delivery.finish();
@@ -357,12 +372,13 @@ async function recoverSavedDiscovery(env,input,saved,view){
 async function backgroundStep(env,request,waitUntil){
  if(!backgroundEnabled(env,request)||request.method!=='POST')return fail('NOT_FOUND',404);
  if(!matchEnabled(env,request))return fail('MATCH_NOT_ENABLED',503);
- let ticket,recoveryHint;
- try{const raw=await request.text();if(raw.length>256)return fail('INVALID_REQUEST',400);const data=JSON.parse(raw);ticket=data?.ticket;recoveryHint=data?.recovery;}catch{return fail('INVALID_REQUEST',400);}
+ let ticket,recoveryHint,lane;
+ try{const raw=await request.text();if(raw.length>256)return fail('INVALID_REQUEST',400);const data=JSON.parse(raw);ticket=data?.ticket;recoveryHint=data?.recovery;lane=data?.lane;}catch{return fail('INVALID_REQUEST',400);}
  let input;
  try{
   const {session,task,taskKey}=await loadBackgroundMatch(env,ticket);
-  input={managed:true,background:true,session,taskId:task.id,taskKey,generation:task.generation,text:task.text,role_hint:task.role,excludeUrls:task.excludeUrls,phone:session.phone,resume_id:task.resume_id};
+  input={managed:true,background:true,session,taskId:task.id,taskKey,generation:task.generation,text:task.text,role_hint:task.role,excludeUrls:task.excludeUrls,phone:session.phone,resume_id:task.resume_id,
+   ...(stagedV4WorkflowsEnabled(env)&&isV4StageLane(lane)?{backgroundLane:lane,backgroundTicket:ticket}:{})};
   input.lease=await leaseMatchTask(env.HHBA_PNVS_AUTH_DB,taskKey);
   if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
   const durable=await readMatchTask(env,taskKey,Date.now(),{renewGeneration:task.generation});
@@ -375,6 +391,14 @@ async function backgroundStep(env,request,waitUntil){
   }else if(task.generation>0){await input.lease.release();return fail('AI_CHECKPOINT_EXPIRED',409);}
   input.resourceRecovery=v4RecoveredResourcePhase(recoveryHint)||v4RecoveredResourcePhase(saved?.failure?.error);
   if(input.resourceRecovery&&input.checkpoint?.phase==='research'&&input.checkpoint.rows?.length)input.checkpoint={...input.checkpoint,liveDeliveryTurn:'verification'};
+  if(input.backgroundLane&&!input.cachedResult){
+   const next=v4CheckpointLane(input.checkpoint);
+   if(next!==input.backgroundLane){
+    await input.lease.release();input.lease=null;
+    const signaled=await stageWorkflowSignal(env,ticket,{lane:next});
+    return new Response('event: complete\\ndata: '+JSON.stringify(signaled?{status:'HANDOFF'}:{status:'CONTINUE',fallback:true})+'\\n\\n',{headers:{'Content-Type':'text/event-stream','Cache-Control':'no-store'}});
+   }
+  }
   return events(env,request,input,waitUntil);
  }catch(e){if(input?.lease)await input.lease.release().catch(()=>{});return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
 }
