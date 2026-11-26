@@ -32,8 +32,20 @@ const auditPath='public/images/employer-profiles/cn-autumn-032/media-audit.json'
 const audit=JSON.parse(read(auditPath));
 assert.deepEqual(Object.keys(audit).sort(),['logo.webp','photo1.jpg','photo2.jpg']);
 assert(audit['logo.webp'].verified,'User-approved Logo lost');
-assert(audit['photo1.jpg'].verified&&audit['photo2.jpg'].verified,'WEIPU requires 2 real verified source photos, not placeholders');
-assert.notEqual(audit['photo1.jpg'].sha256,audit['photo2.jpg'].sha256);
+for(let i=1;i<=2;i++){
+ const key='photo'+i+'.jpg',entry=audit[key],photo=p.media.photos[i-1];
+ assert(entry&&typeof entry.verified==='boolean','Missing media verification outcome: '+key);
+ if(entry.verified){
+  assert(photo.path.endsWith('/'+key),'Sourced photograph must use locally verified JPEG');
+  assert(typeof entry.source==='string'&&entry.source.startsWith('https://')&&typeof entry.sha256==='string'&&/^[0-9a-f]{64}$/.test(entry.sha256),'Real photograph requires sourced hash');
+ }else{
+  assert(entry.editorialReplacement===true&&entry.fallbackAsset===photo.path,'Unverified asset must use a declared editorial replacement');
+  assert(photo.path.endsWith('/repair-photo'+i+'.svg'),'Unverified company image cannot be served as a photograph');
+  assert(/非微谱实景|非企业真实照片/.test(photo.alt+' '+photo.caption),'Editorial fallback must be labelled');
+  assert(/非企业实景|非官方照片/.test(p.photoNote),'Page summary must not present illustration as photography');
+ }
+}
+if(audit['photo1.jpg'].verified&&audit['photo2.jpg'].verified)assert.notEqual(audit['photo1.jpg'].sha256,audit['photo2.jpg'].sha256);
 console.log('WEIPU_032_V2_CONTRACT_OK',JSON.stringify({jobs:p.jobs.length,services:p.business.length,photos:2,template:'screenshot-approved',majorFilter:true}));
 
 /* Screenshot regression: enough descriptive content, no browser-default link row */

@@ -1,4 +1,4 @@
-name: WEIPU verified-photo recovery smoke test
+name: WEIPU photo provenance and honest fallback smoke test
 on:
   push:
     branches:
@@ -24,7 +24,7 @@ jobs:
         run: python -m pip install --quiet Pillow
       - name: Prepare real WEIPU photographs with pinned Pages backup
         run: python apps/web/scripts/prepare-weipu-media.py
-      - name: Fail if either source photo or the user's approved logo is not verified
+      - name: Fail on missing provenance or falsely labelled corporate photographs
         working-directory: apps/web
         run: |
           node scripts/weipu-v2.contract.test.mjs
@@ -32,7 +32,10 @@ jobs:
           import json
           from pathlib import Path
           a=json.loads(Path('public/images/employer-profiles/cn-autumn-032/media-audit.json').read_text())
-          assert all(a[x].get('verified') for x in ['logo.webp','photo1.jpg','photo2.jpg'])
-          assert a['photo1.jpg']['sha256']!=a['photo2.jpg']['sha256']
-          print('WEIPU_FALLBACK_PROVENANCE_OK',[(x,a[x].get('verifiedSourceMirror',a[x]['source'])) for x in ['photo1.jpg','photo2.jpg']])
+          assert a['logo.webp']['verified']
+          for x in ['photo1.jpg','photo2.jpg']:
+              assert a[x]['verified'] or (a[x].get('editorialReplacement') and a[x].get('fallbackAsset','').endswith('.svg'))
+          if a['photo1.jpg']['verified'] and a['photo2.jpg']['verified']:
+              assert a['photo1.jpg']['sha256'] != a['photo2.jpg']['sha256']
+          print('WEIPU_MEDIA_PROVENANCE_VALID',[(x,a[x]['verified']) for x in ['photo1.jpg','photo2.jpg']])
           PY

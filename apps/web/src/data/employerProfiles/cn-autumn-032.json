@@ -32,16 +32,16 @@
     "logo": "images/employer-profiles/cn-autumn-032/logo.webp",
     "photos": [
       {
-        "path": "images/employer-profiles/cn-autumn-032/photo1.jpg",
-        "caption": "微谱集团 · 医药分析实验室实景",
-        "alt": "微谱实验室技术人员操作高效液相色谱质谱仪",
-        "note": "照片来源：微谱药物及医疗器械实验室服务官网；为实际实验室场景，不是集团总部大楼。"
+        "path": "images/employer-profiles/cn-autumn-032/repair-photo1.svg",
+        "caption": "HHBA 原创业务示意图 1（非微谱实景）",
+        "alt": "HHBA 自制的业务方向示意图，非微谱集团真实照片，企业原始照片暂不可用",
+        "note": "素材未完成核验时展示的原创示意图，不属于企业官方素材，也不代表实际办公环境。"
       },
       {
-        "path": "images/employer-profiles/cn-autumn-032/photo2.jpg",
-        "caption": "微谱集团 · 企业科技展示空间",
-        "alt": "上海杨浦区政府报道中微谱集团的企业科技成果展示区",
-        "note": "照片来源：上海市杨浦区政府英文网站2024年企业调研报道，展示的是微谱集团企业展区。"
+        "path": "images/employer-profiles/cn-autumn-032/repair-photo2.svg",
+        "caption": "HHBA 原创业务示意图 2（非微谱实景）",
+        "alt": "HHBA 自制的业务方向示意图，非微谱集团真实照片，企业原始照片暂不可用",
+        "note": "素材未完成核验时展示的原创示意图，不属于企业官方素材，也不代表实际办公环境。"
       }
     ]
   },
@@ -75,7 +75,7 @@
     "会计学",
     "财务管理"
   ],
-  "photoNote": "企业Logo使用用户提供的WEIPU标志本地副本。两张独立企业照片来自微谱旗下实验室官网与上海市杨浦区政府公开报道，在GitHub Pages构建时打包为本地静态文件；图片无点击跳转。图片及商标权属各原权利人，HHBA不是微谱官方招聘代理。",
+  "photoNote": "HHBA 原创业务示意图（非企业实景、非官方照片）；企业真实影像仅在来源核验成功时于构建中使用。Logo 使用用户提供的本地副本。",
   "business": [
     {
       "title": "新材料与化学品分析",
