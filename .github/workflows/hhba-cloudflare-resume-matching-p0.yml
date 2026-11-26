@@ -29,6 +29,10 @@ jobs:
           node --check functions/_lib/resume-match-core.js
           node --check functions/_lib/resume-tenure.js
           node --check functions/_lib/mainland-job-location.js
+          node --check functions/_lib/v4-search-speed-read.js
+          node --check functions/api/admin/metrics.js
+          node --check ../../apps/admin-preview/dashboard.js
+          node --test scripts/v4-admin-search-speed.test.mjs
           node --check 'functions/api/match-native/[[path]].js'
           node --check functions/_lib/deepseek-native-match.js
           node --check functions/_lib/deepseek-search-match.js

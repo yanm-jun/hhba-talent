@@ -1,6 +1,7 @@
 import {json,bad,metricDb,isoDay} from '../../_lib/metric-utils.js';
 import {readAiUsage} from '../../_lib/ai-token-usage.js';
 import {readV4PhaseOps} from '../../_lib/v4-phase-ops-metrics.js';
+import {readV4SearchSpeed} from '../../_lib/v4-search-speed-read.js';
 import {verifyAdmin} from '../../_lib/admin-access.js';
 import {queryAccountGrowth} from '../../_lib/account-growth.js';
 const validDays=new Set([1,7,30,90]);
@@ -41,7 +42,7 @@ export async function onRequestGet({request,env}){
   const result={kind:'HHBA_CLOUDFLARE_PRIVATE_METRICS_V1',asOf:new Date().toISOString(),period:{start:since,end:until,days,timezone:'UTC'},collectorStartedAt:installed?.value||null,
    traffic:{quality:'collected',pv:sum('pv'),dailyUvSum:null,jobViews:sum('jobViews'),searches:sum('searches'),outboundClicks:sum('outboundClicks'),series,scope:'UNLINKED_AGGREGATE_EVENT_COUNTS_NO_UV'},
    devices:{quality:'collected',savedJobs:Number(saved?.n||0),devicesWithSavedJobs:Number(saved?.devices||0),added:counts.added||0,removed:counts.removed||0,scope:'CLOUDFLARE_DEVICE_COOKIE_ONLY_NOT_ACCOUNT_SAVES'},
-   account:accounts,activity,aiUsage:await readAiUsage(env,since,until),v4Operations:await readV4PhaseOps(db,since,until)
+   account:accounts,activity,aiUsage:await readAiUsage(env,since,until),v4Operations:await readV4PhaseOps(db,since,until),v4SearchSpeed:await readV4SearchSpeed(db,since,until)
   };
   return json(result);
  }catch(e){console.error('HHBA_METRICS_PRIVATE_QUERY_FAILED',e?.name||'error');return bad('PRIVATE_METRICS_QUERY_FAILED')}
