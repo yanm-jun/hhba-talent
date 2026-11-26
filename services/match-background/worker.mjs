@@ -33,6 +33,7 @@ export default {async scheduled(event,env){
  let body;try{body=await request.json();}catch{return new Response('Invalid',{status:400});}
  if(!hex64(body.instance)||!hex64(body.ticket))return new Response('Invalid',{status:400});
  const active=await scheduleWorkflowInstance(env.MATCH_WORKFLOW,body.instance,body.ticket);
+ if(!active){const previous=await env.MATCH_WORKFLOW.get(body.instance);const state=await previous.status();if(state?.status==='complete'&&state.output?.status==='FAILED')return Response.json({ok:false,terminal_failure:true},{status:422});}
  if(active)try{await registerWatchdogInstance(env.MATCH_REGISTRY,body.instance);}catch{console.warn('HHBA_MATCH_WATCHDOG_REGISTER_FAILED');}
  return Response.json({ok:active},{status:active?200:409});
 }};
