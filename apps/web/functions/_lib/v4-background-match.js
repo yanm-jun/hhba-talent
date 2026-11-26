@@ -6,22 +6,26 @@ import {sha256Hex} from './real-auth.js';
 
 export const backgroundEnabled=(env,request)=>env?.HHBA_V4_BACKGROUND_ENABLED==='1'&&typeof env.HHBA_MATCH_BACKGROUND?.fetch==='function'&&['https://hhba.work','https://www.hhba.work'].includes(new URL(request.url).origin);
 const validTicket=t=>typeof t==='string'&&/^[a-f0-9]{64}$/.test(t);
-export async function scheduleBackgroundMatch(env,session,task){
+// Retry only known recoverable infrastructure errors; invalid tickets, revoked
+// sessions and incompatible configuration must remain explicit terminal states.
+export const isV4RetryableTaskFailure=code=>['AI_CHECKPOINT_DB_UNAVAILABLE','AI_CHECKPOINT_LEASE_LOST','AI_CHECKPOINT_STORAGE_UNAVAILABLE','AI_BACKGROUND_SCHEDULE_UNAVAILABLE','AI_EDGE_RESOURCE_EXHAUSTED','AI_EDGE_DAILY_LIMIT'].includes(code);
+export async function scheduleBackgroundMatch(env,session,task,{diagnostic=false}={}){
  const ticket=await matchTaskKey(env,session.phone,task.id,{scope:'workflow-ticket-v1',session_hash:session.token_hash,generation:task.generation});
  const previous=await readMatchTask(env,ticket);
  if(previous?.kind!=='HHBA_V4_BACKGROUND_TICKET_V1'||Date.now()-(previous.renewed_at||0)>=3600000)await saveMatchTask(env,ticket,{kind:'HHBA_V4_BACKGROUND_TICKET_V1',phone:session.phone,session_hash:session.token_hash,task_id:task.id,generation:task.generation,renewed_at:Date.now()});
  const instance=await sha256Hex('hhba-workflow-instance:'+ticket);
  const r=await env.HHBA_MATCH_BACKGROUND.fetch('https://hhba-internal.invalid/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instance,ticket})});
- if(!r.ok){const data=await r.json().catch(()=>null);if(data?.terminal_failure===true)return 'FAILED';throw taskError('AI_BACKGROUND_SCHEDULE_UNAVAILABLE',503);}
+ if(!r.ok){const data=await r.json().catch(()=>null);if(data?.terminal_failure===true)return diagnostic?{status:'FAILED',error:typeof data.error==='string'&&/^AI_[A-Z0-9_]{3,90}$/.test(data.error)?data.error:'AI_BACKGROUND_EXECUTION_FAILED'}:'FAILED';throw taskError('AI_BACKGROUND_SCHEDULE_UNAVAILABLE',503);}
  const result=await r.json().catch(()=>null);
  if(result?.ok!==true)throw taskError('AI_BACKGROUND_SCHEDULE_UNAVAILABLE',503);
+ if(diagnostic&&result.recovering===true)return {status:'RECOVERING',error:typeof result.error==='string'&&/^AI_[A-Z0-9_]{3,90}$/.test(result.error)?result.error:'AI_BACKGROUND_RECOVERING'};
  return true;
 }
 // Fall back only to the existing authorized checkpoint driver. No duplicate
 // paid work: the same per-task DB lease fences both execution paths.
-export async function tryScheduleBackgroundMatch(env,request,session,task){
+export async function tryScheduleBackgroundMatch(env,request,session,task,options){
  if(!task||!backgroundEnabled(env,request))return false;
- try{return await scheduleBackgroundMatch(env,session,task);}
+ try{return await scheduleBackgroundMatch(env,session,task,options);}
  catch{console.warn('HHBA_V4_BACKGROUND_SCHEDULE_FALLBACK');return false;}
 }
 export async function loadBackgroundMatch(env,ticket){

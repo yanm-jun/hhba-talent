@@ -32,8 +32,18 @@ export default {async scheduled(event,env){
  if(url.pathname!=='/start')return new Response('Not found',{status:404});
  let body;try{body=await request.json();}catch{return new Response('Invalid',{status:400});}
  if(!hex64(body.instance)||!hex64(body.ticket))return new Response('Invalid',{status:400});
- const active=await scheduleWorkflowInstance(env.MATCH_WORKFLOW,body.instance,body.ticket);
- if(!active){const previous=await env.MATCH_WORKFLOW.get(body.instance);const state=await previous.status();if(state?.status==='complete'&&state.output?.status==='FAILED')return Response.json({ok:false,terminal_failure:true},{status:422});}
- if(active)try{await registerWatchdogInstance(env.MATCH_REGISTRY,body.instance);}catch{console.warn('HHBA_MATCH_WATCHDOG_REGISTER_FAILED');}
- return Response.json({ok:active},{status:active?200:409});
+ // Do not report a recoverable instance as active unless its watchdog is
+ // registered. Pages may fall back to the same leased checkpoint driver.
+ if(!env.MATCH_REGISTRY||!env.MATCH_WORKFLOW)return Response.json({ok:false},{status:503});
+ try{await registerWatchdogInstance(env.MATCH_REGISTRY,body.instance);}
+ catch{console.warn('HHBA_MATCH_WATCHDOG_REGISTER_FAILED');return Response.json({ok:false},{status:503});}
+ const active=await scheduleWorkflowInstance(env.MATCH_WORKFLOW,body.instance,body.ticket,{diagnostic:true});
+ if(active?.status==='RECOVERING')return Response.json({ok:true,recovering:true,error:active.error});
+ if(!active){
+  const previous=await env.MATCH_WORKFLOW.get(body.instance),state=await previous.status();
+  const safeError=typeof state?.output?.error==='string'&&/^AI_[A-Z0-9_]{3,90}$/.test(state.output.error)?state.output.error:null;
+  if(state?.status==='complete'&&['FAILED','STOP'].includes(state.output?.status))return Response.json({ok:false,terminal_failure:true,error:safeError||(state.output.status==='STOP'?'AI_AGENT_CANCELLED':'AI_BACKGROUND_EXECUTION_FAILED')},{status:422});
+  if(['terminated','paused','waitingForPause'].includes(state?.status))return Response.json({ok:false,terminal_failure:true,error:state.status==='terminated'?'AI_AGENT_CANCELLED':'AI_BACKGROUND_TASK_PAUSED'},{status:422});
+ }
+ return Response.json({ok:active===true},{status:active===true?200:409});
 }};

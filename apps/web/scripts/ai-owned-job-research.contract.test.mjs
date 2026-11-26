@@ -35,7 +35,7 @@ test('the real candidate route defaults to model-owned loop and preserves authen
  const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  const word=readFileSync(new URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
  assert.match(word,/jobContextForAI/);
- assert.match(route,/v4Match\(fetch,v4JobProvider\(env\)/);
+ assert.match(route,/v4Match\(budget\?budget\.fetch\(fetch\):fetch,provider,/);
  assert.match(route,/officialOnly:true,curated:true/);
  assert.match(route,/sessionOfBearer\(db,request,Date\.now\(\)\)/);
  assert.match(route,/redactForModel\(raw\.trim\(\),Infinity\)/);

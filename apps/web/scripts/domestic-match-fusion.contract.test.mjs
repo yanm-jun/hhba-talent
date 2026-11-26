@@ -153,7 +153,7 @@ test('automatic search is server-side and the modal has no extra search toggle',
  assert.doesNotMatch(component,/想看看更多国内企业吗|本次已搜索|补充站外官方岗位/);
  assert.doesNotMatch(component,/HHBA 站内|站外官方 · 待核实开放|Search.*Fetch/);
  // Only a sanitized job direction goes to external search, not the resume text.
- assert.match(api,/v4Match\(fetch,v4JobProvider\(env\)/);
+ assert.match(api,/v4Match\(budget\?budget\.fetch\(fetch\):fetch,provider,/);
  assert.match(api,/officialOnly:true,curated:true/);
  assert.doesNotMatch(api,/discoverExternalOfficialJobs|HHBA_MATCH_DEEPSEEK_KEY/);
 });
