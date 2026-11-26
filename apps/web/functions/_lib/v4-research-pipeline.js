@@ -114,3 +114,61 @@ export function discoveryReadAhead(read,{canStart=()=>true,signal}={}){
  return {offer(key,item){if(closed||seen.has(key))return;queue.set(key,item);pump();},
   async close(){closed=true;queue.clear();if(active)await active;}};
 }
+
+// Rolling verifier: work starts from the latest real discovery snapshot, not
+// from the set of jobs that happened to exist when the search request began.
+// One window owns its input revision and recovery callback. The next window
+// can start as soon as the previous one settles, even while discovery is open.
+// Hosting admission defers unstarted jobs; it never marks them processed.
+export function createLiveVerificationCoordinator({getDiscovery,choose,run,canStart=()=>true,signal,onChange=()=>{}}){
+ const finished=[],attemptedRevisions=new Set();let active=null,closing=false,scheduled=false,errors=[];
+ const key=([url,job])=>JSON.stringify([url,candidateRevision(job)]);
+ const snapshot=()=>{
+  let next=getDiscovery();
+  if(!next)return null;
+  for(const wave of [...finished,...(active?[active]:[])]){
+   const state=wave.state?.();
+   if(state)next=mergePipelineCheckpoint(wave.base,next,state,wave.attempted,{verificationIncomplete:!wave.success});
+  }
+  next={...next,pipelineActive:true};
+  const state=(active||finished.at(-1))?.state?.();
+  if(state?.managedVerification)next.managedVerification=state.managedVerification;
+  return next;
+ };
+ const notify=()=>{try{onChange();}catch{/* observer does not own the work */}};
+ const pump=()=>{
+  if(closing||active||signal?.aborted||!canStart())return;
+  const base=snapshot();
+  if(base?.phase!=='research')return;
+  const pending=pendingVerification(base).filter(item=>!attemptedRevisions.has(key(item)));
+  if(!pending.length)return;
+  const {width,window}=choose(base,pending.length);
+  const attempted=pending.slice(0,window);
+  if(!attempted.length)return;
+  // The existing verifier consumes the first pending rows of its checkpoint.
+  // Keep the exact admitted order even if some earlier rows were deferred.
+  const admitted=new Set(attempted.map(([u])=>u));
+  const verifyBase={...base,rows:[...attempted,...base.rows.filter(([u])=>!admitted.has(u))]};
+  const deferred=new Set(verifyBase.verificationDeferred||[]);
+  for(const [u] of attempted)deferred.delete(u);
+  for(const [u] of pendingVerification(base))if(!admitted.has(u))deferred.add(u);
+  verifyBase.verificationDeferred=[...deferred];
+  const wave={base,attempted,state:null,success:false,promise:null};
+  active=wave;
+  for(const item of attempted)attemptedRevisions.add(key(item));
+  wave.promise=Promise.resolve().then(()=>run(verificationSnapshot(verifyBase,width,attempted.length),{
+   onRecoveryState:get=>{wave.state=get;},
+   onPartial:()=>notify()
+  })).then(value=>{wave.state=()=>value.checkpoint;wave.success=true;},error=>{errors.push(error);closing=true;}).finally(()=>{
+   finished.push(wave);active=null;notify();wake();
+  });
+ };
+ const wake=()=>{
+  if(closing||scheduled||signal?.aborted)return;
+  scheduled=true;
+  // Allow the discovery callback to finish storing the candidate and any
+  // reusable independently-read JD before taking its verification snapshot.
+  queueMicrotask(()=>{scheduled=false;pump();});
+ };
+ return {snapshot,wake,async close(){closing=true;if(active)await active.promise;return {checkpoint:snapshot(),errors:[...errors],windows:finished.length};}};
+}
