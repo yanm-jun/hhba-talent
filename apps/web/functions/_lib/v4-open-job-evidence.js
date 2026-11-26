@@ -158,7 +158,7 @@ export async function v4EmployerAuthorization(jobUrl,company,proofUrl,{fetcher=f
   return true;
  }catch(e){if(signal?.aborted||e?.code==='AI_PHASE_RESOURCE_YIELD')throw e;return false;}
 }
-export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date(),expected,cacheBucket,onCache=()=>{},catalogWarm=false}={}){
+export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date(),expected,cacheBucket,onCache=()=>{},catalogWarm=false,requireSpecificPosting=false}={}){
  let canonical=v4PublicJobUrl(url);
  if(!canonical)throw Error('V4_UNSAFE_URL');
  if(isCommercialRecruitmentBoard(canonical))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
@@ -211,6 +211,9 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
  }
  if(explicitClosed&&!candidates.length)throw Error('V4_JOB_CLOSED');
  for(const j of candidates){
+  // Speculative discovery from a citation must identify the exact vacancy
+  // page, rather than a JobPosting embedded in a generic recruiting list.
+  if(requireSpecificPosting){let declared;try{declared=typeof j.url==='string'&&v4PublicJobUrl(new URL(j.url,canonical).href);}catch{}if(declared!==canonical)continue;}
   const org=companyOf(j),title=trim(j.title);
   const city=postedLocation(j)||htmlLocation(plain),description=htmlToText(trim(j.description),{maxChars:Infinity});
   const desc=structuredJdParts(j,value=>htmlToText(value,{maxChars:Infinity})).join('\n');
@@ -235,6 +238,7 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
   if(!incomplete&&canonical===initial&&(!catalogWarm||compact(expected?.company)===compact(jd.company))&&await writeConditionalJd(cacheBucket,initial,cacheIdentity,response,jd,j.validThrough,now.getTime()))onCache('JD_PUBLIC_CONDITIONAL_STORED');
   return jd;
  }
+ if(requireSpecificPosting)throw Error('V4_SPECIFIC_POSTING_NOT_CONFIRMED');
  // Chinese employer career sites often serve normal HTML without JSON-LD.
  const sections=extractOfficialJdSections(plain,{full:true}),title=pageTitle(html);
  const company=meta(html,'property','og:site_name')||meta(html,'name','application-name');

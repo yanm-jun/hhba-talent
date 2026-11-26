@@ -1050,11 +1050,38 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    // still finish and contribute their full evidence in normal reconciliation.
    if(typeof onDiscoveryCandidate==='function'&&discoveryIdentity.claim(candidate.url))onDiscoveryCandidate(event,{source:meta?.source,discovered:liveKeys.size});
   };
+  const emitCitedJob=createV4DiscoveryCandidateEvents({round,lane:0,signal,onCandidate:acceptStreamed,allow:j=>acceptedLiveUrl(j.url)});
+  // Speculative public reading uses spare hosting capacity only. It never
+  // controls model output or replaces the full independent verification path.
+  const spareCitationRead=()=>!resourceBudget?.denied&&resourceBudget.snapshot().soft-resourceBudget.used>=8;
+  const sourceReadAhead=fullResearch&&resourceBudget?discoveryReadAhead(async({url})=>{
+   if(signal?.aborted||rows.has(url)||earlyRows.has(url)||!acceptedLiveUrl(url)||!spareCitationRead())return;
+   const readSignal=signal?AbortSignal.any([signal,AbortSignal.timeout(5000)]):AbortSignal.timeout(5000);
+   try{
+    const optionalFetch=(...args)=>{if(!spareCitationRead()||readSignal.aborted)throw Error('V4_OPTIONAL_SOURCE_READ_DEFERRED');return fetcher(...args);};
+    const jd=await v4ReadEmployerJob(url,{fetcher:optionalFetch,signal:readSignal,requireSpecificPosting:true});
+    if(readSignal.aborted||!jd?.source_confirmed||!jd.independently_read||!jd.vacancy_confirmed||!isOfficialJd(jd))return;
+    const target=curatedUrl(jd.canonical_url);
+    if(!acceptedLiveUrl(target)||rows.has(target)||earlyRows.has(target))return;
+    const candidate={url:target,company:jd.company,title:jd.title,location:jd.location,source_kind:'employer_official',requirements:jd.requirements};
+    if(!concreteCandidate(candidate))return;
+    // A redirect target is independently read, not itself a model tool citation.
+    earlySources.add(target);
+    emitCitedJob(candidate,{source:'source_read'});
+    if(earlyRows.has(target)){
+     discoveryReads.set(target,{revision:candidateEvidence(earlyRows.get(target)),jd,prefetched:true});
+     note('LIVE_PUBLIC_SOURCE_JOB_EXTRACTED');
+    }
+   }catch{/* unread, ambiguous and deferred citations remain ordinary source leads */}
+  },{signal,canStart:spareCitationRead}):null;
   const acceptStreamSource=(url,meta)=>{
    if(!curated||signal?.aborted||meta?.source==='terminal'||!acceptedLiveUrl(url)||streamSources.has(url))return;
    streamSources.add(url);earlySources.add(url);earlyToolUrls.add(url);
    // Citation URLs are evidence leads, not vacancies; do not increment job counts.
    note('LIVE_PUBLIC_SOURCE_RECEIVED');
+   // Prefer likely detail routes for speculative reads; other URLs are kept
+   // for unrestricted model-led source review, not rejected by this hint.
+   if(/job|career|position|vacanc|recruit|hire|talent|detail|apply/i.test(new URL(url).pathname+new URL(url).search))sourceReadAhead?.offer(url,{url});
   };
   // Only fill candidates missing from the authoritative complete result.
   // Their status remains an unverified lead; final evidence always wins.
@@ -1170,7 +1197,9 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     else if(independent.length){coordinatorFailed=true;response=independent[0].response;note('PARALLEL_COORDINATOR_RECOVERY');}
     else throw wave.coordinator.reason;
    }else response=await v4Call(fetcher,provider,coordinatorPayload,{signal,onEvent:providerActivity,stage:'discovery',onDiscoveryJob:candidateEvents(0),onDiscoverySource:acceptStreamSource});
+   await sourceReadAhead?.close();
   }catch(e){
+   await sourceReadAhead?.close();
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    const code=e?.code||'AI_PROVIDER_UNAVAILABLE';
    if(curated)commitStreamed();
