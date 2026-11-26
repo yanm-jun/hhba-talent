@@ -656,14 +656,14 @@ export function renderCandidatePreview(job,url,resume,toolLinked,index,toolUrls)
  * even if a later round or optional verification has an upstream failure.
  */
 export async function v4Match(fetcher,provider,resume,roleHint,
- {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},onResearch=()=>{},onDiscoveryCandidate,officialOnly=false,curated=false,env={},excludeUrls=[],checkpoint=null,stepMode=false,onRecoveryState=()=>{},allowContinue=false,parallelResearch=false,pipelineChild=false,resourceBudget=null,profileCache=null}={}){
+ {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},onResearch=()=>{},onDiscoveryCandidate,deferDiscoverySnapshots=false,officialOnly=false,curated=false,env={},excludeUrls=[],checkpoint=null,stepMode=false,onRecoveryState=()=>{},allowContinue=false,parallelResearch=false,pipelineChild=false,resourceBudget=null,profileCache=null}={}){
  // The deployed curated V4 route exposes the full model-neutral research protocol.
  // Legacy direct consumers without the V4 activation flag retain their compatibility behavior.
  const fullResearch=curated&&env.HHBA_MATCH_V4_READY==='1';
  // The real route uses durable checkpoints; the direct invocation path uses the same batches.
  if(curated&&!stepMode){
   let current=checkpoint,result;
-  do{result=await v4Match(fetcher,provider,resume,roleHint,{signal,onProgress,onActivity,onPartial,onResearch,onDiscoveryCandidate,officialOnly:true,curated:true,env,excludeUrls,checkpoint:current,stepMode:true,onRecoveryState,allowContinue,parallelResearch,resourceBudget,profileCache});current=result.checkpoint;}while(result.status==='CONTINUE');
+  do{result=await v4Match(fetcher,provider,resume,roleHint,{signal,onProgress,onActivity,onPartial,onResearch,onDiscoveryCandidate,deferDiscoverySnapshots,officialOnly:true,curated:true,env,excludeUrls,checkpoint:current,stepMode:true,onRecoveryState,allowContinue,parallelResearch,resourceBudget,profileCache});current=result.checkpoint;}while(result.status==='CONTINUE');
   return result;
  }
  // Run one existing verification phase alongside the next discovery phase.
@@ -703,7 +703,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      next.pipelineActive=true;const vs=verifyRecovery();if(vs?.managedVerification)next.managedVerification=vs.managedVerification;return next;
     });
    const [discovery,verified]=await Promise.allSettled([
-    v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:search,onProgress,onActivity,onPartial:publishLivePipeline,onResearch,onDiscoveryCandidate,onRecoveryState:get=>{searchRecovery=get;}}).then(value=>{searchRecovery=()=>value.checkpoint;return value;}),
+    v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:search,onProgress,onActivity,onPartial:publishLivePipeline,onResearch,onDiscoveryCandidate,deferDiscoverySnapshots,onRecoveryState:get=>{searchRecovery=get;}}).then(value=>{searchRecovery=()=>value.checkpoint;return value;}),
     v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:verify,onActivity:(_stage,message)=>onActivity('searching',message),onPartial:publishLivePipeline,onRecoveryState:get=>{verifyRecovery=get;}}).then(value=>{verifyRecovery=()=>value.checkpoint;verifyFinished=true;return value;})
    ]);
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
@@ -1020,6 +1020,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   // so counters, continuation decisions and evidence revision checks stay valid.
   const earlyRows=new Map(),earlySources=new Set(),earlyToolUrls=new Set(),streamRows=new Map();
   const discoveryIdentity=createV4DiscoveryIdentityIndex(rows.keys());
+  const liveKeys=new Set(rows.keys());
+  const useIncrementalProgress=deferDiscoverySnapshots&&typeof onDiscoveryCandidate==='function';
   const acceptedLiveUrl=url=>!excluded.has(url)&&!rejectedBoards.has(url)&&!isCommercialRecruitmentBoard(url);
   const earlySnapshot=()=>{
    const cp=continuation('research').checkpoint;
@@ -1039,13 +1041,14 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   const acceptStreamed=(event,candidate,meta)=>{
    if(curated&&meta?.source!=='terminal'&&acceptedLiveUrl(candidate.url)&&!rows.has(candidate.url)&&!earlyRows.has(candidate.url)){
     streamRows.set(candidate.url,candidate);earlyRows.set(candidate.url,candidate);
-    earlySources.add(candidate.url);note('LIVE_DISCOVERY_CANDIDATE_MERGED');
-    // No citation or verified status is inferred from partial model output.
-    publishEarly();
+    earlySources.add(candidate.url);liveKeys.add(candidate.url);note('LIVE_DISCOVERY_CANDIDATE_MERGED');
+    // Managed progress consumes the single candidate directly. Avoid rebuilding
+    // all candidate previews and reports for every JSON object in a burst.
+    if(!useIncrementalProgress)publishEarly();
    }
    // The first observation alone emits a discovery event. Duplicate lanes
    // still finish and contribute their full evidence in normal reconciliation.
-   if(typeof onDiscoveryCandidate==='function'&&discoveryIdentity.claim(candidate.url))onDiscoveryCandidate(event);
+   if(typeof onDiscoveryCandidate==='function'&&discoveryIdentity.claim(candidate.url))onDiscoveryCandidate(event,{source:meta?.source,discovered:liveKeys.size});
   };
   // Only fill candidates missing from the authoritative complete result.
   // Their status remains an unverified lead; final evidence always wins.
@@ -1137,7 +1140,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
        const compact=candidateSummary(j,url);
        if(!concreteCandidate(compact)){earlySources.add(url);continue;}
        const fields=Object.fromEntries(Object.entries(compact).filter(([,v])=>v!==null&&v!==''&&v!==undefined&&(!Array.isArray(v)||v.length)));
-       earlyRows.set(url,{...earlyRows.get(url),...fields});
+       earlyRows.set(url,{...earlyRows.get(url),...fields});liveKeys.add(url);
         if(readAhead&&remaining>0&&!rows.has(url)&&!discoveryReads.has(url)&&!explicitRechecks.has(url)&&cites.map(curatedUrl).includes(url))readAhead.offer(url,{url,job:earlyRows.get(url)});
        for(const proof of [compact.employer_proof_url,...compact.employer_proof_urls].map(v4PublicJobUrl).filter(Boolean))if(!isCommercialRecruitmentBoard(proof))earlySources.add(curatedUrl(proof));
       }
