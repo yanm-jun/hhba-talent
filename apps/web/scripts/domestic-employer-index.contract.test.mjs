@@ -69,11 +69,12 @@ test('read-only domestic D1 query accepts only industry enums and never sends pr
  assert.deepEqual(missing.queries,[]);
 });
 
-test('legacy index helpers remain covered while V4 does not depend on them',()=>{
+test('legacy index helpers remain covered while V4 does not depend on them',async()=>{
  const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
- const agent=readFileSync(new URL('../functions/_lib/ai-owned-job-research.js',import.meta.url),'utf8');
- assert.match(agent,/employerIndex\(roles,sectors\)/);
- assert.match(agent,/indexRowsConsidered/);
+ const {existsSync}=await import('node:fs');
+ assert.equal(existsSync(new URL('../functions/_lib/ai-owned-job-research.js',import.meta.url)),false);
+ const index=readFileSync(new URL('../functions/_lib/domestic-employer-index.js',import.meta.url),'utf8');
+ assert.match(index,/public-search-queries\.js/);
  assert.match(route,/officialOnly:true,curated:true/);
  assert.doesNotMatch(route,/indexedEmployerSearchHints|HHBA_MATCH_DEEPSEEK_KEY/);
 });
