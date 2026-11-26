@@ -353,3 +353,19 @@ test('background route consumes compact candidate events and preserves the exist
  assert.match(route,/jobs:\[\.\.\.lastJobs\]/);
  assert.match(route,/await saveMatchTask\(env,input\.taskKey,\{checkpoint:result\.checkpoint/);
 });
+
+
+test('citation-only progress survives interrupted research without becoming a verified job',async()=>{
+ const {discoveryRecoverySnapshot,restoreDiscoveryRecovery}=await import('../functions/_lib/v4-discovery-recovery.js');
+ const a='https://careers.employer.cn/jobs/1',b='https://careers.employer.cn/jobs/2',excluded='https://www.zhipin.com/job_detail/123';
+ const base={phase:'research',round:1,rows:[],sourceLeads:[a],toolUrls:[]};
+ const current={...base,round:2,sourceLeads:[a,b,b+'?utm_source=test',excluded,'https://localhost/secret']};
+ const supplement=discoveryRecoverySnapshot(base,current);
+ assert.deepEqual(supplement.rows,[]);assert.deepEqual(supplement.sources,[b]);
+ const recovered=restoreDiscoveryRecovery({generation:2,checkpoint:base},{generation:2,status:'PENDING',discovery_recovery:supplement},2);
+ assert.equal(recovered.restored,0);assert.equal(recovered.restoredSources,1);
+ assert.deepEqual(recovered.saved.checkpoint.sourceLeads,[a,b]);
+ assert.deepEqual(recovered.saved.checkpoint.rows,[]);assert.deepEqual(recovered.saved.checkpoint.toolUrls,[]);
+ const replay=restoreDiscoveryRecovery(recovered.saved,{generation:2,status:'PENDING',discovery_recovery:supplement},2);
+ assert.equal(replay.restoredSources,undefined);
+});
