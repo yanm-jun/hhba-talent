@@ -60,49 +60,6 @@ test('native results dialog never hides optimizer behind the optional match scor
  assert.match(panels,/暂无可靠分数/);
 });
 
-test('semantic recognition retries on Flash and accepts line wraps in OCR evidence',async()=>{
- const {recognizeMatchResume}=await import('../functions/_lib/resume-jd-match-agent.js');
- const models=[];
- const data=await recognizeMatchResume('synthetic','工作经历：负责门店\n运营和数据整理','',{
-  fetcher:async(uri,init)=>{
-   const {model}=JSON.parse(init.body);
-   models.push(model);
-   const facts=model==='deepseek-v4-pro'?[]:[{kind:'work',quote:'负责门店运营和数据整理'},
-    {kind:'credential',quote:'持有从未写过的高级执照'}];
-   return Response.json({status:'completed',output:[
-    {type:'message',content:[{type:'output_text',text:JSON.stringify({facts})}]}]});
-  }
- });
- assert.deepEqual(models,['deepseek-v4-pro','deepseek-flash']);
- assert.deepEqual(data.facts,[{id:'CV-1',kind:'work',quote:'负责门店运营和数据整理'}]);
-});
-
-test('slow Pro recognition starts Flash before Pro times out and cancels redundant work',async()=>{
- const {recognizeMatchResume}=await import('../functions/_lib/resume-jd-match-agent.js');
- const models=[],quote='负责门店运营和数据整理';
- let proCancelled=false,startedBackup=false;
- const profile=await recognizeMatchResume('synthetic','工作经历：'+quote,'',{
-  fallbackDelayMs:3,onFallback:()=>{startedBackup=true;},
-  fetcher:async(uri,init)=>{
-   const {model}=JSON.parse(init.body);
-   models.push(model);
-   if(model==='deepseek-v4-pro')return new Promise((resolve,reject)=>{
-    init.signal.addEventListener('abort',()=>{
-     proCancelled=true;
-     reject(init.signal.reason);
-    },{once:true});
-   });
-   return Response.json({status:'completed',output:[{type:'message',content:[
-    {type:'output_text',text:JSON.stringify({facts:[{kind:'work',quote}]})}
-   ]}]});
-  }
- });
- assert.deepEqual(models,['deepseek-v4-pro','deepseek-flash']);
- assert.equal(startedBackup,true);
- assert.equal(proCancelled,true);
- assert.equal(profile.facts[0].quote,quote);
-});
-
 test('no search: never show invented jobs',()=>{
  const r={status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(answer)}]}],
  usage:{server_tool_use:{tool_search:0,tool_fetch:0}}};
