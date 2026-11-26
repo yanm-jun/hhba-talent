@@ -158,7 +158,7 @@ export async function v4EmployerAuthorization(jobUrl,company,proofUrl,{fetcher=f
   return true;
  }catch(e){if(signal?.aborted||e?.code==='AI_PHASE_RESOURCE_YIELD')throw e;return false;}
 }
-export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date(),expected,cacheBucket,onCache=()=>{}}={}){
+export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date(),expected,cacheBucket,onCache=()=>{},catalogWarm=false}={}){
  let canonical=v4PublicJobUrl(url);
  if(!canonical)throw Error('V4_UNSAFE_URL');
  if(isCommercialRecruitmentBoard(canonical))throw Error('V4_COMMERCIAL_BOARD_EXCLUDED');
@@ -228,7 +228,11 @@ export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date()
    vacancy_confirmed:!!org.url&&relatedDomains(canonical,org.url),...(incomplete?{partial_jd:desc,jd_incomplete:true,...(dynamicHints.length?{resource_hints:dynamicHints}:{})}:{}),
    checked_at:now.toISOString(),proof_method:'V4_STRUCTURED_JOBPOSTING',
    source_confirmed:!!org.url&&relatedDomains(canonical,org.url),independently_read:true,application_status:'NEEDS_OFFICIAL_CONFIRMATION'};
-  if(!incomplete&&canonical===initial&&await writeConditionalJd(cacheBucket,initial,expected,response,jd,j.validThrough,now.getTime()))onCache('JD_PUBLIC_CONDITIONAL_STORED');
+  // The collector starts from an employer entry rather than a known job title.
+  // Write the exact independently parsed job identity, not a company-only key,
+  // so subsequent foreground verification can safely revalidate the same JD.
+  const cacheIdentity=catalogWarm&&compact(expected?.company)===compact(jd.company)?{company:jd.company,title:jd.title,location:jd.location}:expected;
+  if(!incomplete&&canonical===initial&&(!catalogWarm||compact(expected?.company)===compact(jd.company))&&await writeConditionalJd(cacheBucket,initial,cacheIdentity,response,jd,j.validThrough,now.getTime()))onCache('JD_PUBLIC_CONDITIONAL_STORED');
   return jd;
  }
  // Chinese employer career sites often serve normal HTML without JSON-LD.

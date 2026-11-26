@@ -16,6 +16,7 @@ import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch}
 import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery,runReadyWork} from './v4-parallel-discovery.js';
 import {candidateRevision,candidateResearchMemory,pendingVerification,verificationSnapshot,mergePipelineCheckpoint,pipelineWidths,pipelineVerificationWindow,discoveryReadAhead} from './v4-research-pipeline.js';
 import {makeBatchScorer} from './v4-batch-scoring.js';
+import {publicCatalogHints} from './v4-public-jd-catalog.js';
 import {managedWorkPlan,managedWorkSample} from './v4-phase-budget.js';
 import {completeJdSpan,looksTruncatedJd} from './v4-jd-completeness.js';
 import {readPublicHtmlResearch,unchangedPublicHtmlResearch,writePublicHtmlResearch} from './v4-public-html-research-cache.js';
@@ -982,6 +983,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   const historyPage=v4RotatingMemoryPage(rounds,adaptiveResearch?memoryCursors.history:0,Math.max(256,Math.floor(researchContextBudget/3)));
   const notesPage=v4NotesMemoryPage(researchNotes,memoryCursors.notes,Math.max(256,Math.floor(researchContextBudget/3)),{rotate:true});
   const activeResumePage=searchResumePaged?resumePageRef(searchResumeOffset<resume.length?searchResumeOffset:0):null;
+  const catalogHints=fullResearch&&round===1&&(!resourceBudget||resourceBudget.canPublish())?(await publicCatalogHints(env,profile,roleHint)).filter(j=>!excluded.has(curatedUrl(j.url))&&!rows.has(curatedUrl(j.url))):[];
+  if(catalogHints.length)diag.PUBLIC_CATALOG_HINTS=catalogHints.length;
   let response,independent=[],coordinatorFailed=false;
   try{
    const coordinatorPayload={
@@ -1001,12 +1004,12 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      +'education,education_evidence,experience_years,experience_evidence}，'
      +(curated?'jobs:[{company,title,location,url,salary,score,fit_summary,requirements,source_kind,site_name,employer_proof_url,employer_proof_urls}]。':'jobs:[{company,title,location,url,salary,score,reason,matched,gaps,resume_quote,jd_quote,source_kind,site_name,employer_proof_url,evidence_sources:[{url}]}]。')
      +'resume_quote 必须逐字来自简历，岗位有真实来源才填写。'+(curated?V4_RESEARCH_TOOL_GUIDE+' '+V4_DIGEST_GUIDE:'')
-     +'如果已有来源不够好，请自行继续搜索新行业和新企业；不要只重复以前找到的网址。'
+     +'如果已有来源不够好，请自行继续搜索新行业和新企业；不要只重复以前找到的网址。'+(catalogHints.length?' public_catalog_hints 是过去独立读取的公开岗位线索，不代表仍在招、不限制搜索范围；自行选择合适线索，使用联网工具核验并继续发现其他岗位。不得直接把缓存当成本轮核验或评分。':'')
      +'若输入存在未分类的公开来源，先研究它们是否包含真实具体岗位或可继续发现岗位的官方入口；仅实际查阅后返回 reviewed_sources:[{url,status（job_found/no_job/official_entry/unresolved）,reason}]，未读的不要标记；只将具体岗位放入 jobs，不把入口或列表当成岗位。若发现旧岗位新增官方证明或JD信息，更新同一网址的候选。'+ '本轮只报告真实搜索所得，返回具体 HTTPS 链接。查询仅使用公开职业方向和岗位关键词，勿向搜索引擎发送个人简历原文、姓名或联系方式。',
     input:JSON.stringify({resume_text:activeResumePage?resume.slice(activeResumePage.offset,activeResumePage.offset+activeResumePage.page_length):resume,preferred_job_or_city:roleHint,...(activeResumePage?{resume_page:{...activeResumePage,all_pages_sent:searchResumeOffset>=resume.length}}:{}),
      country:'中国大陆',previously_discovered_jobs:curated?candidatePage.items: [...rows.entries()].map(([url,j])=>({...j,url})),
      ...(curated?{candidate_target:CANDIDATE_TARGET,remaining_candidates:Math.max(0,CANDIDATE_TARGET-concreteCount())}:{}),
-     prior_profile:profile,...(curated?{unclassified_public_sources:pendingSources,research_memory:{candidates:{total:candidatePage.total,cursor:candidatePage.cursor,next_cursor:candidatePage.next_cursor},sources:{total:sourceLeads.size,pending:allPendingSources.length,pending_next_cursor:sourcePage.next_cursor},unresolved:{total:reviewPage.total,cursor:reviewPage.cursor,next_cursor:reviewPage.next_cursor}},research_tool_result:hydrateToolResult(researchToolResult),research_evidence:evidencePage,previous_search_rounds:historyPage,previous_research_notes:researchDigest?{...notesPage,items:[]}:notesPage,research_digest:researchDigest||undefined,context_page_budget:researchContextBudget,review_context:priorState?{verified_reports:priorState.matches.filter(qualifiedReport).length,unresolved:reviewPage.items}:null}:{}),excluded_previously_recommended_urls:[...excluded],research_round:round,recovery_hint:recoveryHint,excluded_commercial_domains:[...commercialBoardDomains,...new Set([...rejectedBoards].map(u=>new URL(u).hostname))]}),
+     prior_profile:profile,...(catalogHints.length?{public_catalog_hints:catalogHints}:{}),...(curated?{unclassified_public_sources:pendingSources,research_memory:{candidates:{total:candidatePage.total,cursor:candidatePage.cursor,next_cursor:candidatePage.next_cursor},sources:{total:sourceLeads.size,pending:allPendingSources.length,pending_next_cursor:sourcePage.next_cursor},unresolved:{total:reviewPage.total,cursor:reviewPage.cursor,next_cursor:reviewPage.next_cursor}},research_tool_result:hydrateToolResult(researchToolResult),research_evidence:evidencePage,previous_search_rounds:historyPage,previous_research_notes:researchDigest?{...notesPage,items:[]}:notesPage,research_digest:researchDigest||undefined,context_page_budget:researchContextBudget,review_context:priorState?{verified_reports:priorState.matches.filter(qualifiedReport).length,unresolved:reviewPage.items}:null}:{}),excluded_previously_recommended_urls:[...excluded],research_round:round,recovery_hint:recoveryHint,excluded_commercial_domains:[...commercialBoardDomains,...new Set([...rejectedBoards].map(u=>new URL(u).hostname))]}),
     tools:[{type:'web_search'}],tool_choice:curated&&(researchToolResult||toolUrls.size||publicEvidence.length)?'auto':'required',
     include:['web_search_call.action.sources']
    };
