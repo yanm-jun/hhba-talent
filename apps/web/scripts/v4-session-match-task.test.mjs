@@ -131,3 +131,29 @@ test('compact progress is separately encrypted and cannot replace the authoritat
  assert.deepEqual((await readMatchTask(env,key)).checkpoint,{evidence:'large private evidence'});assert.equal((await readMatchProgress(env,key)).progress.stage,'searching');assert.equal(await readMatchProgress(env,'b'.repeat(64)),null);
  assert.equal(objects.size,2);for(const bytes of objects.values())assert.ok(!new TextDecoder().decode(bytes).includes('private evidence'));
 });
+
+test('background recovery preserves the original task, generation and private checkpoint',async()=>{
+ const {scheduleBackgroundMatch,loadBackgroundMatch,isV4RetryableTaskFailure}=await import('../functions/_lib/v4-background-match.js');
+ const {env,session,input}=fixture(),s=session('13800000000','a'),task=await updateSessionTask(env,s,'start',input());
+ const key=await researchTaskKey(env,s,task);await saveMatchTask(env,key,{generation:0,checkpoint:{phase:'research',round:3}});
+ let first=null,calls=0;env.HHBA_MATCH_BACKGROUND={async fetch(url,opt){
+  assert.ok(url.endsWith('/start'));const body=JSON.parse(opt.body);if(first)assert.deepEqual(body,first);else first=body;calls++;
+  return Response.json({ok:true,recovering:true,error:'AI_BACKGROUND_RECOVERING'});
+ }};
+ assert.deepEqual(await scheduleBackgroundMatch(env,s,task,{diagnostic:true}),{status:'RECOVERING',error:'AI_BACKGROUND_RECOVERING'});
+ assert.equal(await scheduleBackgroundMatch(env,s,task),true);assert.equal(calls,2);
+ const loaded=await loadBackgroundMatch(env,first.ticket);assert.equal(loaded.task.id,task.id);assert.equal(loaded.task.generation,0);assert.equal(loaded.taskKey,key);
+ assert.deepEqual((await readMatchTask(env,key)).checkpoint,{phase:'research',round:3});
+ await updateSessionTask(env,s,'cancel',task);await assert.rejects(loadBackgroundMatch(env,first.ticket),{code:'AI_AGENT_CANCELLED'});
+ for(const code of ['AI_CHECKPOINT_DB_UNAVAILABLE','AI_CHECKPOINT_LEASE_LOST','AI_EDGE_DAILY_LIMIT'])assert.equal(isV4RetryableTaskFailure(code),true);
+ for(const code of ['AI_AGENT_CANCELLED','AI_CHECKPOINT_INVALID','AI_CHECKPOINT_EXPIRED','AI_PROVIDER_KEY_REJECTED'])assert.equal(isV4RetryableTaskFailure(code),false);
+});
+test('recovery diagnostics cannot be mistaken for terminal failures in the route or poller',()=>{
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ const client=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ assert.match(route,/scheduled\?\.status==='RECOVERING'/);
+ assert.match(route,/error:scheduled\.error,retryable:true/);
+ assert.match(route,/isV4RetryableTaskFailure\(code\)/);
+ assert.match(route,/if\(committedResult\)/);
+ assert.match(client,/data\.failure\?\.retryable\?15000:4000/);
+});
