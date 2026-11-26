@@ -709,7 +709,7 @@ test('curated V4 recovers an inaccessible official lead and expands insufficient
    return new Response(html,{headers:{'content-type':'text/html'}});
   }
   const p=JSON.parse(opts.body),i=JSON.parse(p.input);
-  if(p.instructions.includes('自主整理个人职业画像'))return model({profile:{summary:'渠道运营经历'}});
+  if(p.instructions.includes('自主整理个人职业画像'))return model({profile:{summary:'渠道运营经历',roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}});
   if(p.instructions.includes('公开招聘来源研究员')){recovered++;return model({sources:[{url:alternate}],research_complete:true,completion_reason:'找到同一岗位的官方详情'},[alternate]);}
   if(p.instructions.includes('专业求职研究 AI')){
    searches++;
@@ -760,7 +760,7 @@ test('curated V4 performs final AI review even when initial search finds zero ca
  const fetcher=async(u,opts)=>{
   if(!u.endsWith('/responses'))return new Response(jd,{headers:{'content-type':'text/html'}});
   const p=JSON.parse(opts.body),input=JSON.parse(p.input);
-  if(p.instructions.includes('自主整理个人职业画像')){profileCalls++;return model({profile:{summary:'渠道运营经历'}});}
+  if(p.instructions.includes('自主整理个人职业画像')){profileCalls++;return model({profile:{summary:'渠道运营经历',roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}});}
   if(p.instructions.includes('专业求职研究 AI')){
    searches++;
    const review=input.review_context!==null;
@@ -827,7 +827,7 @@ test('V4 model-selected batches retain multiple candidate groups and support sco
   const p=JSON.parse(opts.body),i=JSON.parse(p.input);
   if(p.instructions.includes('自主整理个人职业画像')){
    if(!i.research_tool_results)return model({research_actions:[{type:'text_page',collection:'resume',offset:0}]});
-   profileTools=i.research_tool_results[0].text===resume;return model({profile:{summary:'渠道运营经验'}});
+   profileTools=i.research_tool_results[0].text===resume;return model({profile:{summary:'渠道运营经验',roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}});
   }
   if(p.instructions.includes('专业求职研究 AI')){
    search++;
@@ -911,7 +911,7 @@ test('curated V4 completed research can resume the same candidate pool and re-ra
  const fetcher=async(u,opts)=>{
   if(!u.endsWith('/responses'))return new Response('<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:u===second.url?second.title:row.title,hiringOrganization:{name:row.company,url:'https://careers.other-motors.cn'},jobLocation:{address:{addressLocality:'上海'}},description:jd})+'</script>',{headers:{'content-type':'text/html'}});
   const p=JSON.parse(opts.body),i=JSON.parse(p.input);
-  if(p.instructions.includes('自主整理个人职业画像')){profiles++;return model({profile:{summary:'渠道运营经验'}});}
+  if(p.instructions.includes('自主整理个人职业画像')){profiles++;return model({profile:{summary:'渠道运营经验',roles:['渠道运营'],facts:[{kind:'work',quote:'汽车经销商渠道运营'}]}});}
   if(p.instructions.includes('专业求职研究 AI'))return model({research_complete:true,completion_reason:'已完成覆盖',jobs:expanded?[second]:[row]},[expanded?second.url:url]);
   const assessment={suitable:true,score:i.job.title===second.title?98:85,reason:'原文支持',resume_quote:'汽车经销商渠道运营',jd_quote:'渠道运营和经销商业务流程'};
   if(i.established_score!==undefined)reported.push(i.job.title);else scored.push(i.job.title);
@@ -1029,4 +1029,14 @@ test('V4 recognition retains line-wrapped source evidence and rejects fabricated
  const profile=v4GroundProfile({facts:[{kind:'work',quote:'负责门店 运营与数据整理'},{kind:'credential',quote:'持有从未写过的高级执照'}]},'真实工作经历：负责门店\n运营与数据整理');
  assert.equal(profile.facts.length,1);
  assert.match(profile.facts[0].quote,/负责门店\s+运营与数据整理/);
+});
+
+
+test('empty career profile gets one targeted repair and never starts paid discovery if still invalid',async()=>{
+ let calls=0;await assert.rejects(v4Match(async()=>{calls++;return model({profile:{}});},provider,resume,'全国',{officialOnly:true,curated:true,stepMode:true}),/AI_PROFILE_INCOMPLETE/);assert.equal(calls,2);
+});
+test('permanent profile provider rejection does not fall through to discovery',async()=>{
+ for(const [status,code] of [[401,'AI_PROVIDER_KEY_REJECTED'],[402,'AI_PROVIDER_BALANCE_INSUFFICIENT'],[400,'AI_PROVIDER_REQUEST_REJECTED']]){
+  let calls=0;await assert.rejects(v4Match(async()=>{calls++;return new Response(null,{status});},provider,resume,'全国',{officialOnly:true,curated:true,stepMode:true}),new RegExp(code));assert.equal(calls,1);
+ }
 });
