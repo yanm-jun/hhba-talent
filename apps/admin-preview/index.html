@@ -464,6 +464,22 @@
           </div>
           <p class="hhba-private-quality" id="health-message" role="status">点击「开始只读检查」查看当前连接状态。</p>
         </article>
+        <article class="panel provenance" aria-labelledby="v4-ops-title" id="v4-ops-panel">
+          <div class="panel-heading">
+            <div><h2 id="v4-ops-title">AI 岗位匹配运行监控</h2><p>搜索、核验与报告的真实阶段执行数据；零记录不等于系统未运行。</p></div>
+            <div class="heading-actions"><label for="v4-ops-period">统计范围</label><select id="v4-ops-period"><option value="today">今日</option><option value="7d">近7天</option><option value="30d" selected>近30天</option></select><button class="button-primary" type="button" id="v4-ops-refresh">读取真实运行数据</button></div>
+          </div>
+          <p class="hhba-private-quality" id="v4-ops-status" role="status">尚未查询。只有管理员主动读取后才会查询 D1，未采集不显示假数据。</p>
+          <div class="investor-kpis">
+            <article><span>阶段执行次数</span><strong id="v4-ops-attempts">—</strong><small>实际 Cloudflare 调用阶段，不是任务总数</small></article>
+            <article><span>阶段失败率</span><strong id="v4-ops-failures">—</strong><small>临时失败与永久失败占比</small></article>
+            <article><span>恢复成功比例</span><strong id="v4-ops-recovery">—</strong><small>有恢复标记的执行阶段</small></article>
+            <article><span>平均阶段耗时</span><strong id="v4-ops-latency">—</strong><small>非整场匹配耗时</small></article>
+          </div>
+          <div id="v4-ops-stages" class="quality-lines" aria-live="polite"></div>
+          <div id="v4-ops-errors" class="quality-lines"></div>
+          <p class="kpi-foot muted">仅显示匿名汇总：不保存简历、候选岗位 URL、账号身份、模型输出或密钥。首次 JD/报告耗时仅在真实观察到时显示。</p>
+        </article>
       </section>
       <section class="page-view" id="view-ai-usage" hidden aria-labelledby="ai-usage-heading">
         <div class="page-heading"><div><p class="eyebrow">AI USAGE · PRIVATE</p><h1 id="ai-usage-heading">AI Token 消耗监控中心</h1><p class="page-subtitle" id="ai-usage-state">等待已授权的真实用量数据</p></div><div class="heading-actions"><label for="ai-usage-period">统计周期</label><select id="ai-usage-period"><option value="today">今日</option><option value="7d">近7天</option><option value="30d" selected>近30天</option></select><button type="button" class="button-primary" id="ai-usage-refresh">读取真实用量</button></div></div>
