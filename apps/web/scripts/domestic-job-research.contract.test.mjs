@@ -83,9 +83,9 @@ test('original matching/history/Word path all use researched source evidence',()
  assert.match(panels,/尚未取得可核验原文/);
  assert.match(panels,/方向参考分/);
  assert.match(panels,/初步参考分/);
- assert.match(route,/v4Match\(fetch,v4JobProvider\(env\)/);
+ assert.match(route,/v4Match\(budget\?budget\.fetch\(fetch\):fetch,provider,/);
  assert.match(route,/officialOnly:true,curated:true/);
  assert.match(route,/onPartial:matches=>/);
  assert.match(route,/onProgress:progress/);
- assert.match(route,/saveMatchHistory\(env\.HHBA_PNVS_AUTH_DB/);
+ assert.match(route,/saveMatchHistory\(researchEnv\.HHBA_PNVS_AUTH_DB/);
 });
