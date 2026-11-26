@@ -27,7 +27,7 @@ test('the matcher shows its current step and preserves original Word optimizatio
  assert.match(modal,/stageTitle\[progressStage\]/);
  assert.match(modal,/progressActivity\?\.message&&<span>/,'the live AI research explanation must be visible at every step');
  assert.doesNotMatch(modal,/progressStage==='parsing'&&progressActivity/,'do not hide search/research/analysis messages');
- assert.match(modal,/!pending&&activeJob&&parsedProfile/);
+ assert.match(modal,/activeJob&&parsedProfile/);
  assert.doesNotMatch(modal,/DeepSeek|researchTrail\.map/);
  assert.match(modal,/TargetedResumeOptimization/);
  assert.match(modal,/sourceResume=\{sourceResume\}/);

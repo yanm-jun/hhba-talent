@@ -49,7 +49,7 @@ test('real stage-aware modal mounts at click and preserves original scroll/resul
  assert.match(page,/\(result\|\|partialJobs\.length>0\)\|\|working/);
  assert.match(page,/progressStage=\{stage\}/);
  assert.match(modal,/stageTitle\[progressStage\]/);
- assert.match(modal,/!pending&&activeJob&&parsedProfile/);
+ assert.match(modal,/activeJob&&parsedProfile/);
  assert.match(modal,/识别简历经历和技能/);
  assert.match(modal,/终止匹配/);
  assert.match(modal,/确认终止本次匹配/);

@@ -125,7 +125,7 @@ test('frontend shows partial results without pretending network completion',asyn
  assert.match(svc,/onPartial\?\./);
  assert.match(page,/result\|\|partialJobs\.length>0/);
  assert.match(page,/setPartialJobs/);
- assert.match(dialog,/!pending&&activeJob&&parsedProfile/);
+ assert.match(dialog,/activeJob&&parsedProfile/);
  assert.match(dialog,/已完成 \{verifiedMatchReports\(result\.matches\)\.length\} 份可核验报告，最终排名待确认/);
  const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
  assert.match(panels,/已发现/);assert.match(panels,/官方 JD 已核验/);

@@ -61,7 +61,7 @@ test('managed polling retains the complete report and uses the same report gate 
  assert.ok(route.includes('budget?.canPublishProgress(kind)'),'publication checks the dedicated progress allowance');
  assert.ok(route.includes('budget?.tryProgress(kind)'),'actual writes atomically reserve counted capacity');
  assert.ok(route.includes('progressReserve:input.background?4:0'),'managed background progress has explicit reserved capacity');
- assert.ok(/const reports=verifiedMatchReports\(data\.progress\.jobs\);\s*onPartial\?\.\(reports\)/.test(service),'polling must feed the report pager, not just search results');
+ assert.ok(/const reports=verifiedMatchReports\(liveCandidates\.jobs\(\)\);\s*onPartial\?\.\(reports\)/.test(service),'polling must feed the report pager, not just search results');
  assert.ok(dialog.includes('hasCompleteReport?2:'),'the first available report is shown without waiting for all candidates');
  assert.ok(panels.includes("pending||provisional?'已完成报告':'正式推荐'"),'unfinished global ranking must be identified as provisional');
 });
@@ -100,7 +100,7 @@ test('browser candidate reception uses direct SSE and actual managed snapshots; 
  assert.ok(service.includes('addedCandidates=liveCandidates.snapshot(data.progress.jobs)'));
  assert.ok(service.includes('data.failure?.retryable?15000:addedCandidates>0?2000:3000'));
  assert.ok(service.includes('liveCandidates.snapshot(data.research_leads,{final:true})'));
- assert.ok(/const reports=verifiedMatchReports\(data\.progress\.jobs\);\s*onPartial\?\.\(reports\)/.test(service));
+ assert.ok(/const reports=verifiedMatchReports\(liveCandidates\.jobs\(\)\);\s*onPartial\?\.\(reports\)/.test(service));
  assert.ok(panels.includes('Math.max(report?.discovered??0,jobs.length)'));
 });
 
@@ -115,4 +115,45 @@ test('dedicated progress allowance cannot spend the final reserved report slot o
  assert.equal(budget.tryProgress('report'),true);
  assert.equal(budget.used,34);
  assert.equal(budget.tryProgress('report'),false);
+});
+
+test('incomplete snapshots retain individually verified vacancies without misleading fabricated score',async()=>{
+ const {mergeLiveJobProgress,createV4JobEventJournal}=await import('../functions/_lib/v4-job-progress.js');
+ const first='https://careers.example.cn/jobs/1',second='https://careers.example.cn/jobs/2';
+ const lead=(url,title='渠道运营')=>({official_url:url,company:'企业',title,location:'上海',match_score:null});
+ const grounded={...lead(first),source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',evidence_excerpt:'公开岗位原文',match_score:86,score_evidence_status:'GROUNDED_JD_RESUME_QUOTES'};
+ const all=mergeLiveJobProgress([], [grounded,lead(second)]);
+ const partial=mergeLiveJobProgress(all,[lead(second)]);
+ assert.equal(partial.length,2);assert.equal(partial[0].match_score,86);
+ assert.equal(mergeLiveJobProgress(all,[{...lead(first),excluded_closed:true}]).length,1,'explicitly closed job is removed');
+ assert.deepEqual(mergeLiveJobProgress(all,[lead(second)],{final:true}).map(x=>x.official_url),[second]);
+ assert.equal(mergeLiveJobProgress(all,[lead(first,'新岗位')])[0].title,'新岗位','changed vacancy identity cannot inherit old JD');
+ let clock=100;const journal=createV4JobEventJournal([],{limit:4,now:()=>++clock});
+ for(const kind of ['candidate','jd','score','report'])assert.equal(journal.record(kind,first),true);
+ assert.equal(journal.record('report',first),false);
+ const resumed=createV4JobEventJournal(journal.snapshot(),{limit:4,now:()=>999});
+ assert.equal(resumed.record('jd',first),false);
+ assert.equal(resumed.record('candidate',second),true);
+ assert.equal(resumed.snapshot().at(-1).seq,5);
+});
+test('browser cannot lose grounded evidence to an old partial snapshot',async()=>{
+ const {createLiveCandidateReception}=await import('../src/services/liveCandidateReception.mjs');
+ let shown=[];const state=createLiveCandidateReception(j=>{shown=j});
+ const u='https://careers.example.cn/jobs/1';
+ const preview={official_url:u,company:'真实企业',title:'渠道运营',location:'上海',match_score:null,evidence_status:'RESEARCH_PENDING'};
+ const report={...preview,match_score:86,jd_source_status:'VERIFIED_JD',evidence_excerpt:'原文岗位要求',report_status:'COMPLETE',research_detail:{score_explanation:'真实证据'}};
+ state.snapshot([report]);state.snapshot([preview]);assert.equal(shown[0].match_score,86);
+ state.snapshot([]);assert.equal(shown.length,1);
+ state.snapshot([{...preview,excluded_closed:true}]);assert.equal(shown.length,0);
+ state.snapshot([report]);state.snapshot([],{final:true});assert.equal(shown.length,0);
+});
+test('independently complete JD report can open optimizer without cancelling ongoing discovery',()=>{
+ const dialog=readFileSync(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
+ const panel=readFileSync(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ assert.ok(dialog.includes('if(!parsedProfile||!isVerifiedMatchReport(job)||'));
+ assert.ok(dialog.includes('{activeJob&&parsedProfile?'));
+ assert.ok(dialog.includes('if(pending){backToMatches();return;}'));
+ assert.ok(panel.includes('disabled={!optimizationAvailable||'));
+ assert.ok(page.includes('sourceText={optimizationSource||undefined}'));
 });
