@@ -219,3 +219,30 @@ test('stage Workflow scheduler creates three dormant/active instances only after
  const legacy={async get(){return {async status(){return {status:'running'}}}}};
  assert.deepEqual(await startStageWorkflows(legacy,{},base,ticket,{register:async()=>assert.fail(),schedule:async()=>assert.fail()}),{ok:true,mode:'legacy'});
 });
+
+test('authorized recovery request may restart only a due registered Workflow, exactly once under contention',async()=>{
+ const {restartRecoveredWorkflowOnAuthorizedStart,registerWatchdogInstance}=await import('./runner.mjs');
+ const {db}=registry(),now=2000,id='a'.repeat(64),statuses=new Map([[id,{status:'complete',output:{status:'RECOVERING',error:'AI_BACKGROUND_WORKFLOW_ROLLOVER'}}]]);
+ let restarted=0;
+ const workflow={async get(key){assert.equal(key,id);return {async status(){return statuses.get(id)},async restart(){restarted++;statuses.set(id,{status:'running'});}}}};
+ await registerWatchdogInstance(db,id,now);
+ const results=await Promise.all([restartRecoveredWorkflowOnAuthorizedStart(db,workflow,id,{now}),restartRecoveredWorkflowOnAuthorizedStart(db,workflow,id,{now})]);
+ assert.equal(results.filter(Boolean).length,1);
+ assert.equal(restarted,1);
+ assert.equal(await restartRecoveredWorkflowOnAuthorizedStart(db,workflow,id,{now:now+1}),false);
+ assert.equal(await restartRecoveredWorkflowOnAuthorizedStart(db,workflow,'invalid',{now}),false);
+});
+test('authorized recovery helper never restarts active, waiting or terminal workflows',async()=>{
+ const {restartRecoveredWorkflowOnAuthorizedStart,registerWatchdogInstance}=await import('./runner.mjs');
+ const {db}=registry(),now=5000,id='b'.repeat(64);
+ let state={status:'waiting'},restarted=0;
+ const workflow={async get(){return {async status(){return state},async restart(){restarted++}}}};
+ await registerWatchdogInstance(db,id,now);
+ for(const x of [{status:'waiting'},{status:'running'},{status:'complete',output:{status:'COMPLETE'}},{status:'complete',output:{status:'FAILED',error:'AI_PROVIDER_KEY_REJECTED'}},{status:'terminated'}]){
+  state=x;assert.equal(await restartRecoveredWorkflowOnAuthorizedStart(db,workflow,id,{now}),false);
+ }
+ assert.equal(restarted,0);
+ state={status:'errored'};
+ assert.equal(await restartRecoveredWorkflowOnAuthorizedStart(db,workflow,id,{now}),true,'due failure may now restart');
+ assert.equal(restarted,1);
+});

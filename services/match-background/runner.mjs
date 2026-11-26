@@ -102,8 +102,9 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
  return pending('AI_BACKGROUND_WORKFLOW_ROLLOVER');
 }
 
-// The scheduler never restarts a Workflow from an ordinary browser poll.
-// A registered watchdog owns restarts, including planned step-limit rollover.
+// The registered watchdog remains the primary recovery authority. An
+// explicitly authorized task request may also claim a due restart atomically,
+// so an interrupted research task need not wait for a scheduled cron tick.
 const recoverableInstance=state=>state?.status==='errored'||(state?.status==='complete'&&(state.output?.status==='RECOVERING'||state.output?.status==='FAILED'&&(!state.output?.error||recoverableCodes.has(state.output.error))));
 export async function scheduleWorkflowInstance(workflow,instance,ticket,{diagnostic=false,lane}={}){
  try{await workflow.create({id:instance,params:{ticket,...(validStageLane(lane)?{lane}:{})}});return true;}
@@ -119,6 +120,22 @@ export async function scheduleWorkflowInstance(workflow,instance,ticket,{diagnos
  // Registry stores only opaque workflow instance IDs, not tickets, CVs,
  // applicant identities or session tokens. Restart uses the original workflow
  // parameters and Pages independently checks the active authorization.
+// A due recoverable instance may be restarted when a Pages-authorized task
+// asks to resume. The same D1 compare-and-set as the cron watchdog fences
+// concurrent callers; Workflow itself never decides task authorization.
+export async function restartRecoveredWorkflowOnAuthorizedStart(db,workflow,id,{now=Date.now()}={}){
+ if(!db?.prepare||!workflow||! /^[a-f0-9]{64}$/.test(id))return false;
+ try{
+  const instance=await workflow.get(id),state=await instance.status();
+  if(!recoverableInstance(state)||typeof instance.restart!=='function')return false;
+  const claim=await db.prepare('UPDATE match_watchdog_instances SET next_check=? WHERE instance_id=? AND next_check<=? AND expires_at>?')
+   .bind(now+5*60000,id,now,now).run();
+  if(claim?.meta?.changes!==1)return false;
+  await instance.restart();
+  console.info('HHBA_MATCH_AUTHORIZED_WORKFLOW_RESUME',JSON.stringify({state:state.status}));
+  return true;
+ }catch{console.warn('HHBA_MATCH_AUTHORIZED_WORKFLOW_RESUME_DEFERRED');return false;}
+}
 export async function registerWatchdogInstance(db,instance,now=Date.now()){
  if(!db||! /^[a-f0-9]{64}$/.test(instance))return;
  const registered=await db.prepare('INSERT INTO match_watchdog_instances (instance_id,next_check,expires_at) VALUES (?,?,?) ON CONFLICT(instance_id) DO UPDATE SET expires_at=excluded.expires_at').bind(instance,now,now+24*3600000).run();
