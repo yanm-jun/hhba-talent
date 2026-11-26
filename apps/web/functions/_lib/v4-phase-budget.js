@@ -40,3 +40,21 @@ export function phaseResourceBudget({initial=8,soft=24,hard=34}={}){
   }
  };
 }
+
+// Only replay exact, already completed calls from an interrupted invocation.
+// Never store raw prompts, credentials or private reasoning. Within a live
+// invocation an intentional repeated call still goes to the provider.
+export function phaseModelReplay(entries=[]){
+ const previous=new Map(Array.isArray(entries)?entries:[]),current=new Map(),used=new Set();
+ return {
+  take(key){
+   if(used.has(key)||!previous.has(key))return null;
+   used.add(key);const value=previous.get(key);current.set(key,value);return value;
+  },
+  remember(key,response){
+   if(response?.status!=='completed'||!Array.isArray(response.output))return;
+   current.set(key,{status:'completed',output:response.output.filter(item=>item?.type!=='reasoning')});
+  },
+  snapshot:()=>[...new Map([...previous,...current])]
+ };
+}
