@@ -152,20 +152,19 @@ test('AI role-direction fit remains preliminary; unsupported candidates never in
 });
 
 test('original matching/history/Word path all use researched source evidence',()=>{
- const route=readFileSync(new globalThis.URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
+ const route=readFileSync(new globalThis.URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  const history=readFileSync(new globalThis.URL('../functions/_lib/match-history.js',import.meta.url),'utf8');
  const word=readFileSync(new globalThis.URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
  const dialog=readFileSync(new globalThis.URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
- assert.match(route,/researchDomesticJobEvidence/);
- assert.match(route,/domesticOnly:true/);
- assert.match(route,/onPartial\(provisionalPartial\(review\?review\.preview\(fresh\):fresh\)\)/);
  assert.match(history,/evidence_excerpt:/);
  assert.match(word,/job\.evidence_status==='PARTIAL_SOURCE'/);
- assert.match(route,/researchDomesticJobEvidence\(key,resume,result\.matches/);
- assert.match(route,/onProgress:progress/);
- assert.doesNotMatch(route,/score:false/);
  const panels=readFileSync(new globalThis.URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
  assert.match(panels,/尚未取得可核验原文/);
  assert.match(panels,/方向参考分/);
  assert.match(panels,/初步参考分/);
+ assert.match(route,/v4Match\(fetch,v4JobProvider\(env\)/);
+ assert.match(route,/officialOnly:true,curated:true/);
+ assert.match(route,/onPartial:matches=>/);
+ assert.match(route,/onProgress:progress/);
+ assert.match(route,/saveMatchHistory\(env\.HHBA_PNVS_AUTH_DB/);
 });

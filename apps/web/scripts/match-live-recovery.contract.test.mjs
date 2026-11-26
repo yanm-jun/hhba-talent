@@ -73,13 +73,13 @@ test('credential/usage problems are never swallowed and never misreported as a l
 test('the modal shows current progress while SSE retains search metrics',()=>{
  const app=readFileSync(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  const service=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
- const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  assert.match(app,/stageTitle\[progressStage\]/);
  assert.match(app,/已完成 \{verifiedMatchReports\(result\.matches\)\.length\} 份可核验报告，最终排名待确认/);
  assert.doesNotMatch(app,/DeepSeek|候选来源/);
  assert.match(service,/event==='activity'/);
  assert.match(service,/onActivity\?\.\(/);
- assert.match(route,/send\('activity',detail\)/);
+ assert.match(route,/send\('activity',latestActivity\)/);
  assert.match(route,/send\('heartbeat',/);
  assert.ok(!route.includes("send('progress',{stage:'waiting'})"),
   'heartbeat must not pretend to be a substantive progress stage');

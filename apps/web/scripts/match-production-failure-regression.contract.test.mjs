@@ -402,7 +402,7 @@ test('no-official-job error provides only source counts for troubleshooting',asy
  assert.ok(['source_discovery','shortlist_selection'].includes(caught.diagnostic.phase));
  assert.ok(!JSON.stringify(caught.diagnostic).includes('user-secret@example.com'));
  assert.ok(!JSON.stringify(caught.diagnostic).includes('13800138000'));
- const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  assert.match(route,/send\('failure',\{error:code,phase,elapsed_ms:/);
- assert.match(route,/const diagnostics=code==='AI_EMPLOYER_JOBS_NOT_FOUND'/);
+ assert.doesNotMatch(route,/send\('failure',\{[^}]*resume/);
 });

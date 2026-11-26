@@ -146,17 +146,16 @@ test('no source or no relevant external gives zero, never hallucinates padding',
 test('automatic search is server-side and the modal has no extra search toggle',async()=>{
  const {readFile}=await import('node:fs/promises');
  const component=await readFile(new URL('../src/components/CandidateMatchResultDialog.tsx',import.meta.url),'utf8');
- const api=await readFile(new URL('../functions/api/match/[[path]].js',import.meta.url),'utf8');
+ const api=await readFile(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  assert.match(component,/根据您的简历，为您匹配合适的工作/);
  assert.match(component,/item\.salary\|\|'薪资未公布'/);
  assert.match(component,/item\.experience_requirement\|\|'经验未注明'/);
  assert.doesNotMatch(component,/想看看更多国内企业吗|本次已搜索|补充站外官方岗位/);
  assert.doesNotMatch(component,/HHBA 站内|站外官方 · 待核实开放|Search.*Fetch/);
- assert.match(api,/autoDiscoveryCandidates\(env,db,session\.phone,profile,options\)/);
- assert.match(api,/fuseDomesticJobRecommendations\(/);
- assert.match(api,/discoverExternalOfficialJobs\(intent,env\.HHBA_MATCH_DEEPSEEK_KEY,\{expanded:true\}\)/);
  // Only a sanitized job direction goes to external search, not the resume text.
- assert.doesNotMatch(api.slice(api.indexOf('async function autoDiscoveryCandidates'),api.indexOf('async function aiExtract')),/cleaned|input\.text|resume_id/);
+ assert.match(api,/v4Match\(fetch,v4JobProvider\(env\)/);
+ assert.match(api,/officialOnly:true,curated:true/);
+ assert.doesNotMatch(api,/discoverExternalOfficialJobs|HHBA_MATCH_DEEPSEEK_KEY/);
 });
 
 test('3 years experience never matches a posting requiring at least 7 years',()=>{
