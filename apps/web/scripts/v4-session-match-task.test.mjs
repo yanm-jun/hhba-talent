@@ -186,3 +186,27 @@ test('optional gzip encrypts large checkpoint records, preserves exact data, and
  const bad=packed.slice();bad[bad.length-1]^=1;objects.set([...objects.keys()][0],bad);
  await assert.rejects(readMatchTask(gzipEnv,id,2000));
 });
+
+test('public asset outbox survives R2 or D1 failure, replays without model and closed tombstone wins',async()=>{
+ const {publicAssetRecord,publishPublicAsset,drainPublicAssetOutbox,removeClosedPublicAsset,publicAssetHints,readPublicAssetMetrics,savePublicEmployerResearch,publicEmployerSources}=await import('../functions/_lib/v4-public-job-assets.js');
+ const sql=new DatabaseSync(':memory:');
+ for(const name of ['0090_v4_public_job_assets.sql','0092_v4_public_asset_recovery.sql'])sql.exec(readFileSync(new URL('../d1/'+name,import.meta.url),'utf8'));
+ let dbDown=false,r2Down=false;
+ const db={prepare(q){if(dbDown)throw Error('DB offline');return {bind(...v){return {async run(){const r=sql.prepare(q).run(...v);return {success:true,meta:{changes:Number(r.changes)}}},async first(){return sql.prepare(q).get(...v)||null},async all(){return {results:sql.prepare(q).all(...v)}}}}}}};
+ const objects=new Map(),bucket={async put(k,v){if(r2Down)throw Error('R2 offline');objects.set(k,v)},async get(k){return objects.has(k)?{text:async()=>objects.get(k)}:null},async list({prefix,limit}){return {objects:[...objects.keys()].filter(k=>k.startsWith(prefix)).slice(0,limit).map(key=>({key}))}},async delete(k){objects.delete(k)}};
+ const env={HHBA_V4_PUBLIC_ASSETS_ENABLED:'1',HHBA_JOB_JD_DB:db,HHBA_JOB_JD_R2:bucket};
+ const jd={canonical_url:'https://careers.example.cn/jobs/1',company:'测试公司',title:'渠道运营',location:'上海',source_confirmed:true,independently_read:true,vacancy_confirmed:true,partial_jd:'负责渠道管理'};
+ const facts=[{url:'https://careers.example.cn/about',quote:'公司运营渠道网络',context:'related_context'}];
+ const material={facts,data:{reference_jd:'根据公开资料，可能负责渠道管理。建议准备销售数据分析能力。',reference_basis:'公共资料与AI建议',reference_coverage:{duties_quote:'渠道管理',capabilities_quote:'销售数据分析能力'},reference_source_anchors:{duties:{kind:'public_excerpt',url:facts[0].url,quote:facts[0].quote},capabilities:{kind:'title_direction',url:'',quote:jd.title}},reference_material_review:{status:'complete',explanation:'已区分事实及推断',missing:[]}}};
+ const record=publicAssetRecord(jd,{material});assert.ok(record);
+ r2Down=true;assert.equal(await publishPublicAsset(env,record),true);assert.equal(sql.prepare('SELECT COUNT(*) n FROM hhba_v4_public_asset_outbox').get().n,1);
+ r2Down=false;await drainPublicAssetOutbox(env);assert.equal(sql.prepare('SELECT COUNT(*) n FROM hhba_v4_public_asset_outbox').get().n,0);
+ assert.equal(sql.prepare('SELECT kind FROM hhba_v4_public_job_assets').get().kind,'REFERENCE');
+ dbDown=true;const lead=publicAssetRecord({...jd,canonical_url:'https://careers.example.cn/jobs/2'});assert.equal(await publishPublicAsset(env,lead),true);assert.ok([...objects.keys()].some(k=>k.includes('asset-outbox')));
+ dbDown=false;await drainPublicAssetOutbox(env);assert.equal(sql.prepare('SELECT COUNT(*) n FROM hhba_v4_public_job_leads').get().n,1);
+ assert.equal(await savePublicEmployerResearch(env,record.identity,facts),true);assert.deepEqual(await publicEmployerSources(env,record.identity),[facts[0].url]);
+ await removeClosedPublicAsset(env,jd.canonical_url);assert.equal(await publishPublicAsset(env,record),true);
+ const hints=await publicAssetHints(env,{target_roles:['渠道']});assert.equal(hints.length,1);assert.equal(hints[0].url,lead.identity.url);
+ const stats=await readPublicAssetMetrics(env,'2026-01-01','2027-01-01');assert.equal(stats.quality,'collected');assert.equal(stats.jobs,2);assert.equal(stats.fresh,1);assert.equal(stats.pendingD1,0);
+ dbDown=true;r2Down=true;assert.equal(await publishPublicAsset(env,record),false);
+});

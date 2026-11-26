@@ -91,7 +91,7 @@ function renderDailyOperations(report){
  status.textContent=rows.length+' 天 · '+(report.collectorStartedAt?'运营事件起始于 '+report.collectorStartedAt.slice(0,10):'运营事件采集时间尚未核实');
 }
 function updateGrowth(){
- renderAiUsage();
+ renderAiUsage();renderPublicAssets();
  showRealDataStatus();
  const t=growth?.traffic,b=growth?.devices,a=growth?.account,q=growth?.activity;
  setMetric('ov-pv',t?.quality==='collected'?t.pv:null);
@@ -162,7 +162,7 @@ async function refreshGrowth(){
 }
 
 const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',operations:'运营监控',
- finance:'财务成本','ai-usage':'AI Token 消耗',investor:'融资展示',settings:'系统设置'};
+ finance:'财务成本','ai-usage':'AI Token 消耗','public-assets':'数据资产中心',investor:'融资展示',settings:'系统设置'};
 const details={
  users:['真实用户注册与业务操作','账号级行为追踪已停止；注册和收藏来自真实数据库，页面事件仅计次数。'],
  market:['企业和岗位质量分析','未来接入岗位状态、ATS 来源及招聘质量报表；当前公开索引汇总在数据总览。'],
@@ -174,7 +174,7 @@ function setView(view){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(['investor','overview','users','ai-usage'].includes(view)?view:'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users','ai-usage','public-assets'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -371,6 +371,12 @@ byId('mobile-menu').addEventListener('click',()=>{
 });
 byId('mobile-dim').addEventListener('click',closeMenu);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
+function renderPublicAssets(){
+ const data=growth?.publicAssets,valid=data?.quality==='collected';
+ const fields={jobs:'jobs',companies:'companies',official:'official',reference:'reference',leads:'leads',fresh:'fresh',employers:'employers',pending:'pendingD1',hits:'referenceHits'};
+ for(const [id,key] of Object.entries(fields)){const el=byId('assets-'+id);if(el)el.textContent=valid&&integer(data[key])!==null?fmt.format(data[key]):'—';}
+ const state=byId('assets-state');if(state)state.textContent=valid?'累计资产索引 · '+growth.asOf+'；复用次数按所选统计周期，近期核验为过去24小时，不等于实时在招。':'尚未连接资产数据库或未获得管理员授权，不生成模拟数据。';
+}
 function renderAiUsage(){
  const root=byId('ai-usage-stages'),daily=byId('ai-usage-days');
  if(!root||!daily)return;
