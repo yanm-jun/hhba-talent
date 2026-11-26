@@ -27,5 +27,6 @@ test('old middleware has no database mutation, model call, branching or next() e
  assert.doesNotMatch(body,/\b(?:fetch|next|prepare|exec|delete|drop|insert|update)\s*\(/i);
  assert.doesNotMatch(body,/CF_PAGES_BRANCH|HHBA_MATCH_SERVICE_ENABLED/);
  const frontend=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
- assert.match(frontend,/const API='\/api\/match-next'/);
+ assert.match(frontend,/const EFFECTIVE_API='\/api\/match-v4'/);
+ assert.doesNotMatch(frontend,/EFFECTIVE_API\s*=\s*MATCH_V4_PREVIEW\s*\?/);
 });

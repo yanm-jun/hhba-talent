@@ -33,7 +33,7 @@ jobs:
           node --check scripts/simple-match-v4-live-smoke.mjs
           node --test scripts/v4-session-match-task.test.mjs
           node --test scripts/v4-parallel-discovery.test.mjs
-          node --test scripts/v4-gemini-job-provider.test.mjs
+          node --test scripts/v4-shared-capabilities.test.mjs
           node --check ../../services/match-background/worker.mjs
           node --test ../../services/match-background/runner.test.mjs
           node --check functions/_lib/resume-tenure.js

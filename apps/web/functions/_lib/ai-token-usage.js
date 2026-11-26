@@ -37,3 +37,10 @@ export async function readAiUsage(env,since,until){
   return {quality:rows.length?'collected':'no_records',rows,scope:'OBSERVED_OPENAI_RESPONSES_ONLY_NOT_BILLING'};
  }catch{return {quality:'unavailable'}}
 }
+
+export function logV4Usage(provider,usage,elapsed,status){
+ const number=v=>Number.isSafeInteger(v)&&v>=0?v:null;
+ // Never log prompts, queries, URLs, user identifiers, keys or response text.
+ console.info('HHBA_V4_MODEL_USAGE',JSON.stringify({provider:'openai',model:provider.model,status,elapsed_ms:elapsed,
+  input_tokens:number(usage?.input_tokens),output_tokens:number(usage?.output_tokens),total_tokens:number(usage?.total_tokens),reasoning_tokens:number(usage?.output_tokens_details?.reasoning_tokens),cached_tokens:number(usage?.input_tokens_details?.cached_tokens)}));
+}
