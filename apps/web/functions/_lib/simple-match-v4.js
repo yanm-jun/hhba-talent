@@ -1164,6 +1164,10 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    const code=e?.code||'AI_PROVIDER_UNAVAILABLE';
    if(curated)commitStreamed();
+   // A transport ended before its terminal response, but complete candidate
+   // objects were already observed. Retain them and retry the unfinished
+   // research round instead of proceeding to final ranking or failing forever.
+   if(curated&&code==='AI_PROVIDER_RESPONSE_INVALID'&&streamRows.size)throw fault('AI_PROVIDER_NETWORK_ERROR');
    if(curated&&code==='AI_PROVIDER_CONTEXT_TOO_LARGE'&&researchContextBudget>256){
     researchContext=v4ContextFeedback(researchContext,{rejected:true});researchContextBudget=researchContext.budget;searchResumePaged=true;
     // Recompute only the transport view; the complete research store is untouched.
