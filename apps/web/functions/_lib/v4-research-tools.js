@@ -41,6 +41,14 @@ export function v4RotatingMemoryPage(items,cursor,budget){
 // Notes can be arbitrarily long. Use an addressable character cursor instead
 // of allowing a single oversized array record to defeat context recovery.
 // The full original notes remain stored; each transport page is reversible.
+// The model produces a rolling digest alongside its normal research response.
+// Original notes and evidence remain independently addressable; no extra paid call.
+export function v4AcceptResearchDigest(value,previous,notes){
+ const candidate=typeof value?.research_digest==='string'?value.research_digest.trim():'';
+ const raw=(notes||[]).join('\n\n');
+ return candidate&&candidate.length<raw.length&&candidate.length<=Math.max(256,Math.floor(raw.length/2))?candidate:'';
+}
+export const V4_DIGEST_GUIDE='如已有 research_digest 或研究笔记，在正常JSON结果中同时返回 research_digest（合并此前摘要与新发现，精简重复内容，保留已核验的事实、关键来源/证据索引、未解决问题、已尝试策略和后续方向）。这是任务内导航摘要而非原文证据。原始 notes/evidence/candidates 均可按工具回查；不得凭摘要宣称已核验，不记录联系方式或复制完整简历。';
 export function v4NotesMemoryPage(notes,cursor=0,budget=90000,{rotate=false}={}){
  const all=Array.isArray(notes)?notes.filter(x=>typeof x==='string'):[];
  const raw=all.join('\n\n'),limit=Math.max(32,Number.isSafeInteger(budget)?budget:90000);
@@ -102,6 +110,11 @@ export async function v4RunResearchAction(action,{collections,knownUrls,fetcher,
  if(type!=='read_page')return {type,ok:false,error:'UNKNOWN_RESEARCH_ACTION'};
  try{
   const mode=action.mode==='browser'?'browser':action.mode==='window'?'window':'static';
+  if(mode==='static'&&action.refresh!==true){
+   const offset=Number.isSafeInteger(action.offset)&&action.offset>=0?action.offset:0;
+   const cached=[...ledger].reverse().find(r=>r.type==='read_page'&&r.url===url&&r.mode==='static'&&r.offset===0&&r.next_offset===null&&typeof r.text==='string'&&!r.script_source);
+   if(cached&&offset<=cached.text.length){const end=Math.min(cached.text.length,offset+budget);return {type,mode,ok:true,url,text:cached.text.slice(offset,end),offset,next_offset:end<cached.text.length?end:null,total_chars:cached.text.length,unit:'characters',...(offset===0&&cached.resource_hints?.length?{resource_hints:cached.resource_hints}:{}),reused_task_evidence:true};}
+  }
   let actualMode=mode,doc;
   const parent=ledger.find(r=>(r.resource_hints||[]).some(h=>h.url===url&&h.kind==='script'));
   const scriptOptions=parent?{scriptSource:true,documentUrl:parent.document_url||parent.url}:{};
@@ -173,7 +186,7 @@ const stageGuide='memory 若返回 oversized_record:true，使用 {type:"memory"
 export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetcher,browser,signal,resume='',jd='',document='',collections={},ledger=[],taskNotes,note=()=>{},privateOnly=false,initialPaged=false}={}){
  const original=JSON.parse(payload.input);
  const knownUrls=v4KnownPublicResearchUrls(sourceUrls,ledger),scopedSources=new Set(sourceUrls.map(v4PublicJobUrl).filter(Boolean)),autoReviewed=new Set();
- const seen=new Set(),stageLedger=[...ledger],notes=Array.isArray(taskNotes)?[...taskNotes]:[];let budget=90000,paged=initialPaged,results=null,repeat=false,contextState=v4ContextState(null),evidenceCursor=0,notesCursor=0;
+ const seen=new Set(),stageLedger=[...ledger],notes=Array.isArray(taskNotes)?[...taskNotes]:[];let budget=90000,paged=initialPaged,results=null,repeat=false,contextState=v4ContextState(null),evidenceCursor=0,notesCursor=0,digest='';
  const originals={resume,jd,document};
  const delivered={resume:[],jd:[],document:[]};
  const remember=(name,start,end)=>{if(end<=start)return;const list=[...delivered[name],[start,end]].sort((a,b)=>a[0]-b[0]);delivered[name]=[];for(const part of list){const last=delivered[name].at(-1);if(last&&part[0]<=last[1])last[1]=Math.max(last[1],part[1]);else delivered[name].push(part);}};
@@ -202,9 +215,9 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
   const indexPage=v4RotatingMemoryPage(v4EvidenceIndex(stageLedger),evidenceCursor,Math.max(256,Math.floor(budget/3)));
   if(stageLedger.length)input.research_evidence={total:indexPage.total,cursor:indexPage.cursor,next_cursor:indexPage.next_cursor,items:indexPage.items};
   const notesPage=v4NotesMemoryPage(notes,notesCursor,Math.max(256,Math.floor(budget/3)),{rotate:true});
-  if(notes.length){input.research_notes=notesPage.items;input.research_notes_index={total:notes.length,collection:'notes',order:'chronological',unit:notesPage.unit,total_chars:notesPage.total_chars,cursor:notesPage.cursor,next_cursor:notesPage.next_cursor};}
+  if(notes.length){input.research_notes=digest?[]:notesPage.items;if(digest)input.research_digest=digest;input.research_notes_index={total:notes.length,collection:'notes',order:'chronological',unit:notesPage.unit,total_chars:notesPage.total_chars,cursor:notesPage.cursor,next_cursor:notesPage.next_cursor};}
   let response;
-  try{response=await call({...payload,instructions:payload.instructions+' '+(privateOnly?'本任务仅可访问私有输入分页 text_page（collection=document）、memory（notes/evidence）及 evidence。不得联网、读取URL或向外部工具发送文档。每页内容是原始JSON的一段，按照offset拼接理解；分段时先记录可核对的当前任务研究笔记，再请求未读页；可以回查精确原文，最终保留原任务输出JSON格式。':V4_RESEARCH_TOOL_GUIDE+' '+stageGuide),input:JSON.stringify(input)})}
+  try{response=await call({...payload,instructions:payload.instructions+' '+(privateOnly?'本任务仅可访问私有输入分页 text_page（collection=document）、memory（notes/evidence）及 evidence。不得联网、读取URL或向外部工具发送文档。每页内容是原始JSON的一段，按照offset拼接理解；分段时先记录可核对的当前任务研究笔记，再请求未读页；可以回查精确原文，最终保留原任务输出JSON格式。':V4_RESEARCH_TOOL_GUIDE+' '+stageGuide+' '+V4_DIGEST_GUIDE),input:JSON.stringify(input)})}
   catch(e){
    if(e?.code!=='AI_PROVIDER_CONTEXT_TOO_LARGE'||budget<=256)throw e;
    contextState=v4ContextFeedback(contextState,{rejected:true});budget=contextState.budget;paged=true;results=null;seen.clear();note('AI_STAGE_CONTEXT_REPAGED');continue;
@@ -214,6 +227,7 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
   if(paged){remember('resume',0,Math.min(resume.length,sentBudget));remember('jd',0,Math.min(jd.length,sentBudget));remember('document',0,Math.min(document.length,sentBudget));for(const r of results||[])if(r.ok&&r.type==='text_page'&&Object.hasOwn(delivered,r.collection))remember(r.collection,r.offset,r.offset+r.text.length);}
   if(response.status==='completed'){evidenceCursor=indexPage.next_cursor??0;notesCursor=notesPage.next_cursor??0;contextState=v4ContextFeedback(contextState,{more:indexPage.next_cursor!==null||notesPage.next_cursor!==null});budget=contextState.budget;}
   if(typeof data.research_notes==='string'&&data.research_notes.trim()&&!notes.includes(data.research_notes.trim())){const n=data.research_notes.trim();notes.push(n);if(Array.isArray(taskNotes)&&!taskNotes.includes(n))taskNotes.push(n);}
+  if(!privateOnly&&response.status==='completed'){digest=v4AcceptResearchDigest(data,digest,notes);if(digest)note('AI_RESEARCH_DIGEST_ACCEPTED');}
   if(!actions.length){
    const next=paged?Object.keys(originals).filter(name=>missing(name)!==null):[];
    if(!next.length)return response;
@@ -239,6 +253,7 @@ export async function v4StageResearchCall(call,payload,{parse,sourceUrls=[],fetc
     if(repeated&&(!result.ok||identical)&&!advanced)return {type:action.type,ok:false,error:'REPEATED_UNCHANGED_REQUEST'};
    fresh=true;
    if(result.ok&&result.type!=='read_page'&&result.type!=='evidence'&&result.type!=='memory'&&!identical)stageLedger.push(result);
+   if(result.reused_task_evidence)note('AI_TASK_PUBLIC_EVIDENCE_REUSED');
    note(result.ok?'AI_STAGE_TOOL_USED':'AI_STAGE_TOOL_UNAVAILABLE');return result;
   }});
   if(fresh){repeat=false;continue;}

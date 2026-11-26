@@ -11,7 +11,7 @@ import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../..
 import {v4ParallelResearchEnabled} from '../../_lib/v4-parallel-discovery.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {recognizeV4Resume} from '../../_lib/v4-resume-ocr.js';
-import {checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint,matchTaskKey,saveMatchTask,readMatchTask,startMatchPhaseHeartbeat} from '../../_lib/v4-match-checkpoint-storage.js';
+import {v4CheckpointSecret,checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint,matchTaskKey,saveMatchTask,readMatchTask,startMatchPhaseHeartbeat} from '../../_lib/v4-match-checkpoint-storage.js';
 import {claimAiCheckpoint,leaseMatchTask} from '../../_lib/ai-checkpoint-claim.js';
 import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
 import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSessionTask} from '../../_lib/v4-session-match-task.js';
@@ -43,7 +43,7 @@ const sanitize=(raw)=>{
  return text.replace(/\s/g,'').length>=30?text:null;
 };
 const checkpointEnv=env=>{
- const secret=env?.HHBA_MATCH_V4_CHECKPOINT_SECRET||env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET;
+ const secret=v4CheckpointSecret(env);
  return typeof secret==='string'&&secret.length>=32?{HHBA_RESUME_AGENT_CHECKPOINT_SECRET:'hhba-v4-match:'+secret}:null;
 };
 const checkpointArgs=(env,input,draft)=>({env:checkpointEnv(env),account:input.phone,blocks:[input.text],job:{role:input.role_hint,excludeUrls:input.excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-research-v5'},draft});
@@ -219,9 +219,12 @@ export async function onRequest(context){
  const waitUntil=typeof context.waitUntil==='function'?context.waitUntil.bind(context):undefined;
  const path=new URL(request.url).pathname;
  const suffix=path.slice('/api/match-v4'.length).replace(/\/$/,'')||'/';
- if(suffix==='/status'&&request.method==='GET')
+ if(suffix==='/status'&&request.method==='GET'){
+  // Expose only coarse readiness flags, never credentials or user information.
+  const readiness={host:allowedHost(request),service:env?.HHBA_MATCH_V4_READY==='1',provider:Boolean(v4Provider(env)),job_provider:Boolean(v4JobProvider(env)),database:typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function',checkpoint_key:!!checkpointEnv(env),checkpoint_storage:checkpointStorageReady(env)};
   return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:matchEnabled(env,request),
-   scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],resumable:!!checkpointEnv(env),encrypted_checkpoint_storage:checkpointStorageReady(env),dynamic_page_reader:typeof env.BROWSER?.quickAction==='function'||typeof env.BROWSER?.script==='function'});
+   scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],resumable:readiness.checkpoint_key,encrypted_checkpoint_storage:readiness.checkpoint_storage,dynamic_page_reader:typeof env.BROWSER?.quickAction==='function'||typeof env.BROWSER?.script==='function',readiness});
+ }
  if(suffix==='/background-step')return backgroundStep(env,request,waitUntil);
  const activeTaskRoute=suffix==='/active-task';
  if(!(activeTaskRoute&&['GET','POST'].includes(request.method))&&(!['/resume','/ocr'].includes(suffix)||request.method!=='POST'))return fail('NOT_FOUND',404);

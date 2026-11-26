@@ -8,7 +8,6 @@ export const PROVIDERS = Object.freeze({
  deepseek:{baseUrl:'https://api.deepseek.com',protocol:'openai'},
  openai:{baseUrl:'https://api.openai.com/v1',protocol:'openai'},
  anthropic:{baseUrl:'https://api.anthropic.com/v1',protocol:'anthropic'},
- gemini:{baseUrl:'https://generativelanguage.googleapis.com/v1beta/openai',protocol:'openai'},
  qwen:{baseUrl:'https://dashscope.aliyuncs.com/compatible-mode/v1',protocol:'openai'},
  zhipu:{baseUrl:'https://open.bigmodel.cn/api/paas/v4',protocol:'openai'},
  groq:{baseUrl:'https://api.groq.com/openai/v1',protocol:'openai'},
@@ -20,7 +19,7 @@ export function selectProvider(env,task='resume_optimization',{reasoning=false}=
  if(env?.HHBA_MATCH_V4_READY==='1'){
   const relay=v4Provider(env);
   if(!relay)throw new Error('AI_PROVIDER_NOT_CONFIGURED');
-  return {...relay,name:'openai-relay',protocol:'responses'};
+  return {...relay,name:'openai-relay',protocol:'responses',usageStage:'resume_optimization'};
  }
  const requested=clip(env?.['HHBA_AI_'+task.toUpperCase()+'_PROVIDER']||env?.HHBA_AI_DEFAULT_PROVIDER||'deepseek',30).toLowerCase();
  if(!allowedKeys.has(requested))throw new Error('AI_PROVIDER_UNSUPPORTED');
