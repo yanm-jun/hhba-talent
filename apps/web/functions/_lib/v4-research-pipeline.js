@@ -135,6 +135,18 @@ export function createLiveVerificationCoordinator({getDiscovery,choose,run,canSt
   if(state?.managedVerification)next.managedVerification=state.managedVerification;
   return next;
  };
+ const liveJobs=()=>{
+  const current=new Map(getDiscovery()?.rows||[]);
+  const visible=new Map();
+  for(const wave of [...finished,...(active?[active]:[])]){
+   const admitted=new Map(wave.attempted.map(([u,j])=>[u,candidateRevision(j)]));
+   for(const j of wave.live||[]){
+    const u=j.research_candidate_url||j.official_url;
+    if(current.has(u)&&admitted.get(u)===candidateRevision(current.get(u)))visible.set(u,j);
+   }
+  }
+  return [...visible.values()];
+ };
  const notify=()=>{try{onChange();}catch{/* observer does not own the work */}};
  const pump=()=>{
   if(closing||active||signal?.aborted||!canStart())return;
@@ -158,7 +170,7 @@ export function createLiveVerificationCoordinator({getDiscovery,choose,run,canSt
   for(const item of attempted)attemptedRevisions.add(key(item));
   wave.promise=Promise.resolve().then(()=>run(verificationSnapshot(verifyBase,width,attempted.length),{
    onRecoveryState:get=>{wave.state=get;},
-   onPartial:()=>notify()
+   onPartial:jobs=>{wave.live=structuredClone(jobs||[]);notify();}
   })).then(value=>{wave.state=()=>value.checkpoint;wave.success=true;},error=>{errors.push(error);closing=true;}).finally(()=>{
    finished.push(wave);active=null;notify();wake();
   });
@@ -170,7 +182,7 @@ export function createLiveVerificationCoordinator({getDiscovery,choose,run,canSt
   // reusable independently-read JD before taking its verification snapshot.
   queueMicrotask(()=>{scheduled=false;pump();});
  };
- return {snapshot,wake,async close(){closing=true;if(active)await active.promise;return {checkpoint:snapshot(),errors:[...errors],windows:finished.length};}};
+ return {snapshot,liveJobs,wake,async close(){closing=true;if(active)await active.promise;return {checkpoint:snapshot(),errors:[...errors],windows:finished.length};}};
 }
 
 // A separate report consumer takes only completed evidence assessments.

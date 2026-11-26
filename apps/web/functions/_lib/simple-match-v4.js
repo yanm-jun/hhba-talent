@@ -506,7 +506,7 @@ async function researchIncompleteJd(fetcher,provider,url,job,checked,{signal,bro
   return groundJdResearch({unknowns:['未取得可独立核验的岗位职责与任职要求，需进一步核对招聘原始页面。']},ledger,[...diagnostics,code]);
  }
 }
-async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,browser,ledger,note,taskNotes,fullResearch=false,publicMaterial=null}){
+async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,browser,ledger,note,taskNotes,fullResearch=false,publicMaterial=null,onMaterial=()=>{}}){
  const facts=job.jd_research?.facts||[];
  if(!concreteCandidate(job))return;
  let repair='',previous=null,retainedMaterial=publicMaterial?{reference_jd:publicMaterial.reference_jd,reference_jd_basis:publicMaterial.reference_basis,reference_jd_kind:'AI_GENERATED_REFERENCE'}:null;const seen=new Set();
@@ -544,7 +544,7 @@ async function scoreIncompleteJd(fetcher,provider,resume,roleHint,job,{signal,br
    }
    return {reference_jd:reference,reference_jd_basis:reviewedBasis,reference_jd_kind:'AI_GENERATED_REFERENCE'};
   };
-  if(fullResearch&&!referenceMaterialErrors(value,job).length)retainedMaterial=material();
+  if(fullResearch&&!referenceMaterialErrors(value,job).length){retainedMaterial=material();Object.assign(job,retainedMaterial);onMaterial();}
   if(report.ok){
    Object.assign(job,material());
    Object.assign(job,{match_score:value.score,reference_score:value.score,evidence_score_status:'AI_REFERENCE_JD_SCORED',score_evidence_status:undefined,curated_suitable:true,score_basis:'AI 参考JD适配分（依据真实简历与推断职责，不是官方JD匹配分或录用概率）',recommendation_reason:text(value.reason),matched:texts(value.matched),not_evidenced:texts(value.gaps),research_detail:report.report,report_status:'COMPLETE'});
@@ -669,6 +669,30 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // The deployed curated V4 route exposes the full model-neutral research protocol.
  // Legacy direct consumers without the V4 activation flag retain their compatibility behavior.
  const fullResearch=curated&&env.HHBA_MATCH_V4_READY==='1';
+ // Give existing candidates a fresh hosting invocation even when discovery
+ // would consume all shared capacity. Alternate with unrestricted discovery.
+ // The verification snapshot is task-local and retains the whole candidate pool.
+ if(fullResearch&&parallelResearch&&!pipelineChild&&deferDiscoverySnapshots&&resourceBudget&&checkpoint?.phase==='research'&&!checkpoint.backfillSignature&&checkpoint.liveDeliveryTurn!=='search'){
+  const pending=pendingVerification(checkpoint);
+  const prior=checkpoint.priorState?.matches||[];
+  const reportPending=prior.filter(eligibleCuratedScore).some(j=>!qualifiedReport(j)&&(!j.report_status||j.report_status==='RETRY_PENDING'))&&prior.filter(qualifiedReport).length<FINAL_TARGET;
+  if(pending.length||reportPending){
+   const base=structuredClone(checkpoint);
+   const attempted=pending.slice(0,1);
+   const admitted=new Set(attempted.map(([u])=>u));
+   const verifyBase={...base,rows:[...attempted,...base.rows.filter(([u])=>!admitted.has(u))],verificationDeferred:pending.filter(([u])=>!admitted.has(u)).map(([u])=>u)};
+   let recover=()=>null,done=false;
+   const merged=()=>{const state=recover();const next=mergePipelineCheckpoint(base,base,state,attempted,{verificationIncomplete:!done});return {...next,pipelineActive:true,liveDeliveryTurn:'search',managedVerification:state?.managedVerification||base.managedVerification};};
+   onRecoveryState(merged);
+   onActivity('reading','正在独立研究已发现岗位：核验、JD、评分与报告逐条交付。');
+   const result=await v4Match(fetcher,provider,resume,roleHint,{signal,onProgress,onActivity,onPartial,onResearch,officialOnly:true,curated:true,env,excludeUrls,stepMode:true,allowContinue,parallelResearch,pipelineChild:true,resourceBudget,checkpoint:{...verificationSnapshot(verifyBase,1,1),liveDeliveryDedicated:true},onRecoveryState:get=>{recover=get;}});
+   recover=()=>result.checkpoint;done=true;
+   const next=merged();
+   next.diagnostics={...next.diagnostics,LIVE_DEDICATED_DELIVERY_PHASES:(next.diagnostics?.LIVE_DEDICATED_DELIVERY_PHASES||0)+1};
+   onRecoveryState(()=>next);
+   return {status:'CONTINUE',checkpoint:next};
+  }
+ }
  // The real route uses durable checkpoints; the direct invocation path uses the same batches.
  if(curated&&!stepMode){
   let current=checkpoint,result;
@@ -692,9 +716,10 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     const u=j.research_candidate_url||j.official_url;
     return current.has(u)&&revisions.get(u)===candidateRevision(current.get(u));
    });
-   const done=new Set(ready.map(j=>j.research_candidate_url||j.official_url)),sources=new Set(next.toolUrls||[]);
+   const visible=mergeJobEvidence(ready,coordinator.liveJobs());
+   const done=new Set(visible.map(j=>j.research_candidate_url||j.official_url)),sources=new Set(next.toolUrls||[]);
    const previews=(next.rows||[]).filter(([u])=>!done.has(u)).map(([u,j],i)=>renderCandidatePreview(j,u,resume,sources.has(u),i,sources));
-   onPartial(mergeJobEvidence(ready,previews));
+   onPartial(mergeJobEvidence(visible,previews));
   };
   const coordinator=createLiveVerificationCoordinator({
    getDiscovery:()=>searchRecovery()||search,
@@ -707,7 +732,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    run:(verify,callbacks)=>v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:verify,...callbacks,onActivity:(_stage,message)=>onActivity('searching',message)}),
    onChange:()=>publishMerged(coordinator.snapshot())
   });
-  onRecoveryState(()=>coordinator.snapshot());
+  onRecoveryState(()=>({...coordinator.snapshot(),liveDeliveryTurn:'verification'}));
   let discovered,discoveryFailure;
   try{
    discovered=await v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:search,onProgress,onActivity,onResearch,
@@ -720,6 +745,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   const settled=await coordinator.close();
   if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
   const next=settled.checkpoint;
+  if(next)next.liveDeliveryTurn='verification';
   if(!next)throw discoveryFailure||fault('AI_PIPELINE_STATE_INVALID');
   next.diagnostics={...next.diagnostics,LIVE_VERIFICATION_WINDOWS:(next.diagnostics?.LIVE_VERIFICATION_WINDOWS||0)+settled.windows};
   if(discoveryFailure)next.diagnostics.PIPELINE_SEARCH_RETRY_RETAINED=(next.diagnostics.PIPELINE_SEARCH_RETRY_RETAINED||0)+1;
@@ -840,7 +866,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  let completionReason=checkpoint?.completionReason||'';
  const note=code=>{diag[code]=(diag[code]||0)+1;};
  const publishResearch=()=>onResearch(report());
- const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,verificationReads:reusableReads(rows),rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],stallSourceReads:[...stallSourceReads],researchToolResult,researchNotes,researchDigest,candidateResearchMemory:jobMemory.snapshot(),researchContextBudget,researchContext,memoryCursors,discoveryWidth,discoveryElapsed,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,verificationDeferred:checkpoint?.verificationDeferred||[],pipelineActive:!!checkpoint?.pipelineActive,pipelineVerificationWidth:checkpoint?.pipelineVerificationWidth,pipelineVerificationCost:checkpoint?.pipelineVerificationCost,managedVerification:checkpoint?.managedVerification,managedReport:checkpoint?.managedReport,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],scoreRecoveryKeys:checkpoint?.scoreRecoveryKeys||[],scoreRecoveryModes:checkpoint?.scoreRecoveryModes||[],globalOrder:checkpoint?.globalOrder||null,globalRankState:checkpoint?.globalRankState||null,globalRankError:checkpoint?.globalRankError||null,...extra}});
+ const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,verificationReads:reusableReads(rows),rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],stallSourceReads:[...stallSourceReads],researchToolResult,researchNotes,researchDigest,candidateResearchMemory:jobMemory.snapshot(),researchContextBudget,researchContext,memoryCursors,liveDeliveryTurn:checkpoint?.liveDeliveryTurn,discoveryWidth,discoveryElapsed,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,verificationDeferred:checkpoint?.verificationDeferred||[],pipelineActive:!!checkpoint?.pipelineActive,pipelineVerificationWidth:checkpoint?.pipelineVerificationWidth,pipelineVerificationCost:checkpoint?.pipelineVerificationCost,managedVerification:checkpoint?.managedVerification,managedReport:checkpoint?.managedReport,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],scoreRecoveryKeys:checkpoint?.scoreRecoveryKeys||[],scoreRecoveryModes:checkpoint?.scoreRecoveryModes||[],globalOrder:checkpoint?.globalOrder||null,globalRankState:checkpoint?.globalRankState||null,globalRankError:checkpoint?.globalRankError||null,...extra}});
  onRecoveryState(()=>checkpoint?{...checkpoint,publicEvidence,researchNotes,researchDigest,candidateResearchMemory:jobMemory.snapshot()}:null);
  const generateCompleteReport=async(job,reportFetcher,{early=false,onDone=()=>{},onFailure=()=>{}}={})=>{
    onActivity('writing',early?'已核验岗位正在生成完整匹配报告，最终排名仍待全量研究。':'正在按全局排名生成完整深度报告。');
@@ -1503,7 +1529,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const allEntries=pendingVerification({rows:[...rows],processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],rejectedBoards:[...rejectedBoards],verificationDeferred:checkpoint?.verificationDeferred||[]});
  // Process small batches across separate requests to keep provider, fetch, D1 and R2 calls within a Worker invocation.
  // The batch size is not a recommendation limit; every discovered entry is processed.
- const managedPlan=resourceBudget?managedWorkPlan(resourceBudget,checkpoint?.managedVerification,Math.max(1,allEntries.length-offset),{maxLanes:parallelResearch?(pipelineChild?(checkpoint?.verificationLaneWidth||1):4):1,maxWindow:pipelineChild?(checkpoint?.verificationBatch||1):8,reserve:pipelineChild?6:0,initialCost:8}):null;
+ const managedPlan=resourceBudget?managedWorkPlan(resourceBudget,checkpoint?.managedVerification,Math.max(1,allEntries.length-offset),{maxLanes:parallelResearch?(pipelineChild?(checkpoint?.verificationLaneWidth||1):4):1,maxWindow:pipelineChild?(checkpoint?.verificationBatch||1):8,reserve:pipelineChild&&!checkpoint?.liveDeliveryDedicated?6:0,initialCost:8}):null;
  const batchSize=managedPlan?managedPlan.window:curated?(checkpoint?.verificationBatch||(parallelResearch?3:1)):2;
  const entries=stepMode?allEntries.slice(offset,offset+batchSize):allEntries;
  const recoveryBefore=diag.JD_RECOVERY_REQUIRED||0;
@@ -1560,7 +1586,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const earlyInFlight=new Set();
  const publishVerified=()=>onPartial(reportMatches());
  const maybeEarlyReport=async job=>{
-  if(!fullResearch||!parallelResearch||!eligibleCuratedScore(job)||qualifiedReport(job)||job.report_status||signal?.aborted)return;
+  if(!fullResearch||!parallelResearch||!eligibleCuratedScore(job)||qualifiedReport(job)||(job.report_status&&job.report_status!=='RETRY_PENDING')||signal?.aborted)return;
   const completed=mergeJobEvidence(previousMatches,matches).filter(qualifiedReport).length;
   if(completed+earlyInFlight.size>=FINAL_TARGET||earlyInFlight.has(job.official_url)||(resourceBudget&&!resourceBudget.canStart()))return;
   earlyInFlight.add(job.official_url);
@@ -1578,7 +1604,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    canStart:active=>!resourceBudget.denied&&resourceBudget.remainingResearch()>=3+active*2,
   run:maybeEarlyReport}):null;
  const submitEarlyReport=job=>{
-  if(!eligibleCuratedScore(job)||qualifiedReport(job)||job.report_status)return;
+  if(!eligibleCuratedScore(job)||qualifiedReport(job)||(job.report_status&&job.report_status!=='RETRY_PENDING'))return;
   if(reportQueue){reportQueue.offer(job);return;}
   return maybeEarlyReport(job);
  };
@@ -1586,7 +1612,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  if(fullResearch&&parallelResearch){
   const pending=previousMatches.filter(j=>{
    const u=j.research_candidate_url||j.official_url;
-   return eligibleCuratedScore(j)&&!qualifiedReport(j)&&!j.report_status&&!explicitRechecks.has(u)&&rows.has(u)&&(!processedEvidence.has(u)||processedEvidence.get(u)===candidateEvidence(rows.get(u)));
+   return eligibleCuratedScore(j)&&!qualifiedReport(j)&&(!j.report_status||j.report_status==='RETRY_PENDING')&&!explicitRechecks.has(u)&&rows.has(u)&&(!processedEvidence.has(u)||processedEvidence.get(u)===candidateEvidence(rows.get(u)));
   });
   if(reportQueue){for(const job of applyGlobalOrder(pending,null))submitEarlyReport(job);}
   else if(pending.length)await maybeEarlyReport(applyGlobalOrder(pending,null)[0]);
@@ -1608,9 +1634,10 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    }
    const jd=results.get(url);
    if(isOfficialJd(jd))provider.deliveryTelemetry?.result('jd_engine');
+   if(curated&&(isOfficialJd(jd)||matches[i].reference_vacancy_verified||matches[i].jd_research?.facts?.length))publishVerified();
    if(jd?.excluded_board){rejectedBoards.add(url);publishResearch();continue;}
    if(jd?.excluded_closed){if(!resourceBudget||resourceBudget.canPublish())await removeClosedPublicAsset(env,url);continue;}
-   if(curated&&!isOfficialJd(jd)){matches[i].score_basis='未取得完整官方 JD，继续生成AI参考JD及适配分析。';await scoreIncompleteJd(verificationFetcher,provider,resume,roleHint,matches[i],{signal,browser:env.BROWSER,ledger:publicEvidence,note,taskNotes:jobNotes(url,'analysisNotes'),fullResearch,publicMaterial:jd?.publicMaterial});publishVerified();continue;}
+   if(curated&&!isOfficialJd(jd)){matches[i].score_basis='未取得完整官方 JD，继续生成AI参考JD及适配分析。';await scoreIncompleteJd(verificationFetcher,provider,resume,roleHint,matches[i],{signal,browser:env.BROWSER,ledger:publicEvidence,note,taskNotes:jobNotes(url,'analysisNotes'),fullResearch,publicMaterial:jd?.publicMaterial,onMaterial:publishVerified});publishVerified();continue;}
    if(!jd?.full_jd)continue;
    if(officialOnly&&!curated&&matches[i].source_type!=='站外官方招聘')continue;
    const resolvedUrl=matches[i].official_url;

@@ -1471,3 +1471,16 @@ test('actual V4 provider call records first complete candidate before terminal r
  const {phaseResourceBudget}=await import('../functions/_lib/v4-phase-budget.js');
  const b=phaseResourceBudget({initial:22,soft:24,hard:34,progressReserve:4});const before=b.remainingResearch();assert.equal(b.tryProgress('report'),true);assert.equal(b.remainingResearch(),before);
  });
+
+
+test('live verifier exposes intermediate results for only its current admitted revision',async()=>{
+ const {createLiveVerificationCoordinator}=await import('../functions/_lib/v4-research-pipeline.js');
+ const u='https://example.com/jobs/1',j={company:'A',title:'运营',location:'上海',requirements:'经验'};
+ let cp={phase:'research',rows:[[u,j]],priorState:{matches:[]}};
+ let ready,release;const waiting=new Promise(r=>{release=r;});const started=new Promise(r=>{ready=r;});
+ const coordinator=createLiveVerificationCoordinator({getDiscovery:()=>cp,choose:()=>({width:1,window:1}),run:async(_verify,cb)=>{cb.onPartial([{official_url:u,research_candidate_url:u,jd_source_status:'VERIFIED_JD',evidence_excerpt:'原文'}]);ready();await waiting;return {checkpoint:{..._verify,phase:'reporting'}};}});
+ coordinator.wake();await started;
+ assert.equal(coordinator.liveJobs()[0].evidence_excerpt,'原文');
+ cp={...cp,rows:[[u,{...j,requirements:'新要求'}]]};assert.equal(coordinator.liveJobs().length,0);
+ release();await coordinator.close();
+});
