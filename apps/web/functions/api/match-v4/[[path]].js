@@ -22,7 +22,7 @@ import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSess
 import {backgroundEnabled,tryScheduleBackgroundMatch,loadBackgroundMatch,isV4RetryableTaskFailure} from '../../_lib/v4-background-match.js';
 import {isV4TerminalTaskFailure,terminalV4SavedFailure,retryableV4SavedFailure,normalizeV4RecoveryRecord,normalizeV4RecoveryView,v4RecoveredResourcePhase} from '../../_lib/v4-task-failure-policy.js';
 
-import {phaseResourceBudget,phaseModelReplay,PHASE_YIELD} from '../../_lib/v4-phase-budget.js';
+import {v4ManagedResourceBudget,phaseModelReplay,PHASE_YIELD} from '../../_lib/v4-phase-budget.js';
 import {createV4ProgressPublisher} from '../../_lib/v4-progress-publisher.js';
 import {createV4DeliveryTelemetry} from '../../_lib/v4-live-delivery-telemetry.js';
 import {v4DiscoveryCandidateKey} from '../../_lib/v4-discovery-candidate-events.js';
@@ -62,7 +62,7 @@ const checkpointArgs=(env,input,draft)=>({env:checkpointEnv(env),account:input.p
 function events(env,request,input,waitUntil){
  const encoder=new TextEncoder();let closed=false,phase=input.savedProgress?.stage||'preparing';
  const started=Date.now();
- const budget=input.managed?phaseResourceBudget({progressReserve:input.background?4:0,...(input.resourceRecovery?{initial:12,soft:22,hard:30}: {})}):null;
+ const budget=input.managed?v4ManagedResourceBudget({background:input.background,recovering:input.resourceRecovery}):null;
  const replay=budget?phaseModelReplay(input.phaseReplay):null;
  const researchEnv=budget?budget.env(env):{...env};
  // Only a managed existing task can use the opt-in shared asset path.

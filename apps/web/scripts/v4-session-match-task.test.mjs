@@ -491,3 +491,33 @@ test('recoverable legacy terminal records reopen only for the same authorized ge
   const blocked={...saved,failure:{error,retryable:true}};assert.equal(retryableV4SavedFailure(blocked.failure),false);assert.equal(normalizeV4RecoveryRecord(blocked,2),blocked);assert.equal(restoreDiscoveryRecovery(blocked,view,2).restored,0);
  }
 });
+
+test('classified Cloudflare invocation budget counts each D1 batch as one binding call without hiding statements',async()=>{
+ const {v4ManagedResourceBudget,PHASE_YIELD}=await import('../functions/_lib/v4-phase-budget.js');
+ const budget=v4ManagedResourceBudget({background:true}),samples=[];
+ const statement={bind(){return this;},async run(){return {success:true}}};
+ const env=budget.env({
+  HHBA_JOB_JD_DB:{prepare(){return statement},async batch(list){samples.push(list.length);return []}},
+  HHBA_JOB_JD_R2:{async get(){return null}},BROWSER:{async fetch(){return new Response('ok')}}
+ });
+ await env.HHBA_JOB_JD_DB.prepare('SELECT 1').bind().run();
+ await env.HHBA_JOB_JD_DB.batch([1,2,3,4,5].map(()=>env.HHBA_JOB_JD_DB.prepare('SELECT 1')));
+ await env.HHBA_JOB_JD_R2.get('fake');
+ await env.BROWSER.fetch('https://example.invalid');
+ await budget.fetch(async()=>new Response('ok'))('https://example.invalid');
+ const observed=budget.snapshot();
+ assert.equal(observed.mode,'classified');
+ assert.deepEqual(samples,[5]);
+ assert.equal(observed.classes.database,2,'batch must not cost five Cloudflare binding calls');
+ assert.equal(observed.operations.d1Statements,5,'statement volume remains visible');
+ assert.equal(observed.classes.storage,1);
+ assert.equal(observed.classes.network,1);
+ assert.equal(observed.classes.browser,1);
+ assert.equal(observed.progress_reserve,4);
+ for(let i=0;i<80&&budget.canStart();i++)await budget.fetch(async()=>new Response('ok'))('https://example.invalid');
+ assert.equal(budget.canStart(),false);
+ assert.throws(()=>budget.fetch(async()=>{})('https://example.invalid'),{code:PHASE_YIELD,resource_kind:'network'});
+ const recovery=v4ManagedResourceBudget({recovering:true});
+ assert.ok(recovery.snapshot().hard<observed.hard);
+ const resumed=v4ManagedResourceBudget({background:true});assert.equal(resumed.denied,false);
+});
