@@ -289,11 +289,11 @@ async function recoverSavedDiscovery(env,input,saved,view){
  if(saved?.checkpoint?.phase!=='research'||saved.generation!==input.generation||saved.result||saved.failure&&!saved.failure.retryable)return saved;
  const record=view??await readMatchProgress(env,input.taskKey).catch(()=>null);
  const recovered=restoreDiscoveryRecovery(saved,record,input.generation,input.excludeUrls);
- if(recovered.restored){
+ if(recovered.restored||recovered.restoredSources){
   // Persist once before starting a new invocation. Otherwise a second
   // crash could replace the progress supplement with an empty delta.
   await saveMatchTask(env,input.taskKey,recovered.saved);
-  console.info('HHBA_V4_DISCOVERY_RECOVERED',JSON.stringify({count:recovered.restored,round:saved.checkpoint.round}));
+  console.info('HHBA_V4_DISCOVERY_RECOVERED',JSON.stringify({count:recovered.restored,sources:recovered.restoredSources||0,round:saved.checkpoint.round}));
  }
  return recovered.saved;
 }
