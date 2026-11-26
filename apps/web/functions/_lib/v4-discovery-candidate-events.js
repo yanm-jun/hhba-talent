@@ -25,3 +25,31 @@ export function createV4DiscoveryCandidateEvents({round,lane=0,signal,onCandidat
   try{onCandidate(event,candidate,meta);}catch{}
  };
 }
+
+// The identity is scoped to the matching task's current candidate pool, not
+// a global cache. Seed from authoritative rows on each continuation so
+// rediscovery in another round or lane cannot inflate discovery events.
+// Distinct job URLs remain distinct even when company/title/city match:
+// those fields are not proof that two requisitions are the same.
+import {v4PublicJobUrl} from './v4-open-job-evidence.js';
+import {curatedUrl} from './v4-curated-reports.js';
+
+export function v4DiscoveryCandidateKey(value){
+ const url=v4PublicJobUrl(value);
+ return url?curatedUrl(url):null;
+}
+
+export function createV4DiscoveryIdentityIndex(previousUrls=[]){
+ const keys=new Set();
+ for(const url of previousUrls){
+  const key=v4DiscoveryCandidateKey(url);
+  if(key)keys.add(key);
+ }
+ return {
+  claim(url){
+   const key=v4DiscoveryCandidateKey(url);
+   if(!key||keys.has(key))return false;
+   keys.add(key);return true;
+  }
+ };
+}

@@ -1032,7 +1032,7 @@ test('shared live discovery snapshot combines interleaved agents before either r
  try{
   await Promise.race([ready,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('agents not started')),1500);})]);clearTimeout(timer);
   delta(0,'{"jobs":['+JSON.stringify(a));
-  delta(1,'{"jobs":['+JSON.stringify(b));
+  delta(1,'{"jobs":['+JSON.stringify({...a,url:a.url+'?utm_source=second_lane'})+','+JSON.stringify(b));
   await Promise.race([merged,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('live merge waited for a completed agent')),1500);})]);clearTimeout(timer);
   assert.equal(finished,0);
   assert.deepEqual(snapshots[0],[a.url]);
@@ -1066,4 +1066,48 @@ test('shared discovery retains closed objects from a failed agent as unverified 
  assert.equal(result.checkpoint.toolUrls.includes(b.url),false);
  assert.ok(snapshots.some(jobs=>jobs.some(j=>j.official_url===b.url&&j.match_score===null)));
  assert.ok(result.checkpoint.diagnostics.PARALLEL_AI_PROVIDER_RESPONSE_INVALID);
+});
+
+
+test('discovery identity collapses tracking and query order without conflating distinct requisitions',async()=>{
+ const {createV4DiscoveryIdentityIndex,v4DiscoveryCandidateKey}=await import('../functions/_lib/v4-discovery-candidate-events.js');
+ const base='https://careers.other-motors.cn/jobs/detail?jobId=101&city=shanghai';
+ const duplicate='https://careers.other-motors.cn/jobs/detail?utm_source=search&city=shanghai&jobId=101#apply';
+ const distinct='https://careers.other-motors.cn/jobs/detail?jobId=102&city=shanghai';
+ const otherCity='https://careers.other-motors.cn/jobs/detail?jobId=101&city=beijing';
+ assert.equal(v4DiscoveryCandidateKey(base),v4DiscoveryCandidateKey(duplicate));
+ assert.notEqual(v4DiscoveryCandidateKey(base),v4DiscoveryCandidateKey(distinct));
+ assert.notEqual(v4DiscoveryCandidateKey(base),v4DiscoveryCandidateKey(otherCity));
+ const index=createV4DiscoveryIdentityIndex([duplicate]);
+ assert.equal(index.claim(base),false);
+ assert.equal(index.claim(distinct),true);
+ assert.equal(index.claim(distinct+'&utm_medium=search'),false);
+ assert.equal(index.claim(otherCity),true);
+ assert.equal(index.claim('https://localhost/jobs/101'),false);
+});
+
+test('task discovery deduplicates events across agent lanes and continuation rounds, without losing final evidence',async()=>{
+ const a=job(6601),b={...a,url:'https://careers.employer6601.cn/jobs/6602'},c={...a,url:'https://careers.employer6601.cn/jobs/6603'};
+ const excluded=job(6604),p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const seen=[];let calls=0;
+ const options={curated:true,officialOnly:true,stepMode:true,excludeUrls:[excluded.url+'?utm_source=history'],
+  onDiscoveryCandidate:e=>seen.push(e.candidate.official_url)};
+ const first=await v4Match(async(_u,opts)=>{
+  calls++;const input=JSON.parse(JSON.parse(opts.body).input);
+  const jobs=input.parallel_lane?[{...a,url:a.url+'?utm_source=lane',requirements:'新增公开资料线索'},b,excluded]:[a];
+  return model({jobs,research_complete:false},jobs.filter(j=>j.url!==excluded.url).map(j=>j.url));
+ },p,resume,'全国',{...options,parallelResearch:true,checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles},discoveryWidth:2}});
+ assert.equal(calls,2);
+ assert.deepEqual([...seen].sort(),[a.url,b.url].sort());
+ assert.deepEqual(first.checkpoint.rows.map(([url])=>url).sort(),[a.url,b.url].sort());
+ assert.equal(new Map(first.checkpoint.rows).get(a.url).requirements,'新增公开资料线索');
+ assert.equal(first.checkpoint.round,1);
+ const second=await v4Match(async()=>{
+  calls++;return model({jobs:[{...a,url:a.url+'?utm_campaign=round2',requirements:'第二轮补充证据'},b,c,excluded],research_complete:false},[a.url,b.url,c.url]);
+ },p,resume,'全国',{...options,parallelResearch:false,checkpoint:first.checkpoint});
+ assert.equal(calls,3);
+ assert.deepEqual([...seen].sort(),[a.url,b.url,c.url].sort());
+ assert.deepEqual(second.checkpoint.rows.map(([url])=>url).sort(),[a.url,b.url,c.url].sort());
+ assert.equal(new Map(second.checkpoint.rows).get(a.url).requirements,'第二轮补充证据');
+ assert.equal(second.checkpoint.round,2);
 });
