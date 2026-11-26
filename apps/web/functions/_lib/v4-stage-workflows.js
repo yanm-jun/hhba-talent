@@ -19,7 +19,7 @@ export function v4CheckpointLane(cp){
  return 'discovery';
 }
 export async function stageWorkflowSignal(env,ticket,{lane,finish=false}={}){
- if(!stagedV4WorkflowsEnabled(env)||typeof ticket!=='string'||! /^[a-f0-9]{64}$/.test(ticket)||!finish&&!isV4StageLane(lane))return false;
+ if((!finish&&!stagedV4WorkflowsEnabled(env)||finish&&typeof env?.HHBA_MATCH_BACKGROUND?.fetch!=='function')||typeof ticket!=='string'||! /^[a-f0-9]{64}$/.test(ticket)||!finish&&!isV4StageLane(lane))return false;
  const instance=await sha256Hex('hhba-workflow-instance:'+ticket);
  try{
   const result=await env.HHBA_MATCH_BACKGROUND.fetch('https://hhba-internal.invalid/'+(finish?'finish':'wake'),{

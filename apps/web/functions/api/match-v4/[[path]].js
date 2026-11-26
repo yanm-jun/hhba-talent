@@ -133,7 +133,7 @@ function events(env,request,input,waitUntil){
     }
     send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});
    };
-   const finishWorkflowStages=async()=>{if(input.backgroundLane&&input.backgroundTicket)await stageWorkflowSignal(env,input.backgroundTicket,{finish:true});};
+   const finishWorkflowStages=async()=>{if(input.backgroundTicket)await stageWorkflowSignal(env,input.backgroundTicket,{finish:true});};
    const sendResearch=r=>{if(r){lastReport={...r,discovered:Math.max(r.discovered||0,lastJobs.length,lastReport?.discovered||0),excluded_count:Math.max(r.excluded_count||0,lastReport?.excluded_count||0),search_source_count:Math.max(r.search_source_count||0,lastReport?.search_source_count||0)};send('research_report',lastReport);queueProgress();}};
    const rememberDiscoveryStats=stats=>{if(!lastReport)return;lastReport={...lastReport,discovered:Math.max(lastReport.discovered||0,stats.discovered||0),excluded_count:Math.max(lastReport.excluded_count||0,stats.excluded_count||0),search_source_count:Math.max(lastReport.search_source_count||0,stats.search_source_count||0)};if(!input.background)send('research_report',lastReport);queueProgress('candidate');};
    const reportSignature=jobs=>JSON.stringify(jobs.filter(officialJob).map(j=>[j.official_url,j.match_score,j.jd_sha256,j.research_detail,j.reference_jd]));
@@ -300,7 +300,7 @@ function events(env,request,input,waitUntil){
      // completed result with an old checkpoint and repeat paid model calls.
      if(committedResult){
       metricOutcome='COMPLETE';
-      await releaseTask();
+      await releaseTask();await finishWorkflowStages();
       if(code==='AI_AGENT_CANCELLED'){send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable:false});return;}
       await publishProgress('COMPLETE');await finishWorkflowStages();sendFinal(committedResult);succeeded=true;return;
      }
@@ -378,7 +378,7 @@ async function backgroundStep(env,request,waitUntil){
  try{
   const {session,task,taskKey}=await loadBackgroundMatch(env,ticket);
   input={managed:true,background:true,session,taskId:task.id,taskKey,generation:task.generation,text:task.text,role_hint:task.role,excludeUrls:task.excludeUrls,phone:session.phone,resume_id:task.resume_id,
-   ...(stagedV4WorkflowsEnabled(env)&&isV4StageLane(lane)?{backgroundLane:lane,backgroundTicket:ticket}:{})};
+   ...(isV4StageLane(lane)?{backgroundTicket:ticket,...(stagedV4WorkflowsEnabled(env)?{backgroundLane:lane}:{})}:{})};
   input.lease=await leaseMatchTask(env.HHBA_PNVS_AUTH_DB,taskKey);
   if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
   const durable=await readMatchTask(env,taskKey,Date.now(),{renewGeneration:task.generation});

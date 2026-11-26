@@ -46,7 +46,7 @@ export default {async scheduled(event,env){
  if(!env.MATCH_REGISTRY||!env.MATCH_WORKFLOW)return Response.json({ok:false},{status:503});
  if(body.mode==='staged'){
    try{const status=await startStageWorkflows(env.MATCH_WORKFLOW,env.MATCH_REGISTRY,body.instance,body.ticket,{register:registerWatchdogInstance,schedule:scheduleWorkflowInstance});return Response.json(status,{status:status.ok?200:503});}
-   catch{console.warn('HHBA_STAGE_WORKFLOW_START_FAILED');return Response.json({ok:false},{status:503});}
+   catch{await sendStageEvent(env.MATCH_WORKFLOW,body.instance,{finish:true}).catch(()=>{});console.warn('HHBA_STAGE_WORKFLOW_START_FAILED');return Response.json({ok:false},{status:503});}
   }
   try{await registerWatchdogInstance(env.MATCH_REGISTRY,body.instance);}
  catch{console.warn('HHBA_MATCH_WATCHDOG_REGISTER_FAILED');return Response.json({ok:false},{status:503});}
