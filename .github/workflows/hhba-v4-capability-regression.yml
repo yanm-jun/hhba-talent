@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'apps/web/functions/_lib/v4-*.js'
+      - 'services/match-background/**'
       - 'apps/web/functions/_lib/simple-match-v4.js'
       - 'apps/web/functions/api/match-v4/**'
       - 'apps/web/src/components/MatchResearchPanels.tsx'
