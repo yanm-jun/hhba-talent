@@ -31,3 +31,12 @@ test('staged handoff always happens after encrypted checkpoint save and task lea
  assert.match(route,/if\(input\.backgroundLane&&!input\.cachedResult\)/);
  assert.match(route,/if\(next!==input\.backgroundLane\)/);
 });
+
+test('fallback driver retains authorized task cleanup without adding an AI provider call',()=>{
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ const runner=readFileSync(new URL('../../../services/match-background/runner.mjs',import.meta.url),'utf8');
+ assert.match(route,/stagedFallback=data\?\.staged_fallback===true/);
+ assert.match(route,/isV4StageLane\(lane\)\|\|stagedFallback/);
+ assert.match(runner,/staged_fallback:true/);
+ assert.match(runner,/stagedFallback:stagedOrigin&&!currentLane/);
+});
