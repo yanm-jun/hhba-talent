@@ -122,27 +122,27 @@ export function normalizeV4StreamCandidate(raw){
 // deduplication. Final text is a reconciliation path, not a second emission.
 export function createV4DiscoveryJobObserver(onCandidate){
  const seen=new Set(),channels=new Map();
- const accept=raw=>{
+ const accept=(raw,source)=>{
   const job=normalizeV4StreamCandidate(raw);
   if(!job||seen.has(job.url))return;
   seen.add(job.url);
-  try{onCandidate(job);}catch{}
+  try{onCandidate(job,{source});}catch{}
  };
- const parseText=text=>createV4JobArrayParser(accept).push(text);
+ const parseText=(text,source)=>createV4JobArrayParser(raw=>accept(raw,source)).push(text);
  return {
   event(event){
    if(event?.type==='response.output_text.delta'){
     const key=JSON.stringify([event.output_index??event.item_id??0,event.content_index??0]);
-    if(!channels.has(key))channels.set(key,createV4JobArrayParser(accept));
+    if(!channels.has(key))channels.set(key,createV4JobArrayParser(raw=>accept(raw,'delta')));
     channels.get(key).push(event.delta);
    }else if(event?.type==='response.output_text.done'){
-    parseText(event.text);
+    parseText(event.text,'done');
    }
   },
   response(response){
    for(const item of response?.output||[]){
     if(item?.type!=='message')continue;
-    for(const part of item.content||[])if(part?.type==='output_text')parseText(part.text);
+    for(const part of item.content||[])if(part?.type==='output_text')parseText(part.text,'terminal');
    }
   }
  };
