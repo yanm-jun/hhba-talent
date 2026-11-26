@@ -233,7 +233,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   taskOpen.current=true;sessionTask.current=task;pendingStart.current=null;setRestoringTask(true);setTaskFailure(false);
   setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
   previewController.current?.abort();wordVersionRequest.current?.abort();setFile(null);setSavedId(task.resume_id||'');setPreviewText(task.text);setPreviewLoaded(true);setConsent(false);
-  const opts=managedMatchOptions(task);setOptions(opts);setOptimizationSource(task.text);
+  const opts=managedMatchOptions(task);setOptions(opts);setOptimizationSource(redactResumeTextLocally(task.text));
   lastSearch.current={text:task.text,options:opts,resumeId:task.resume_id||undefined};
   try{
    const matched=await submitExtractedResumeText(task.text,opts,true,abort.signal,task.resume_id||undefined,
@@ -323,6 +323,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
    pendingStart.current=null;
    const task=registration?.task;
    const searchText=task?.text??previewText,searchOptions=task?managedMatchOptions(task):options;
+   setOptimizationSource(redactResumeTextLocally(searchText));
    if(task){matchResumeId=task.resume_id||'';if(registration?.attached){setFile(null);setSavedId(matchResumeId);setPreviewText(task.text);setOptions(searchOptions);}}
    const matched=await submitExtractedResumeText(searchText,searchOptions,consent,abort.signal,matchResumeId||undefined,
     stage=>{if(!abort.signal.aborted)progress(stage);},
@@ -517,8 +518,8 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
       pending={working&&!result} progressStage={stage} progressActivity={activity}
       onContinue={result?.can_continue?()=>void continueSearch():undefined}
       notice={working?'':error}
-      sourceText={result?optimizationSource:undefined}
-      sourceResume={result&&savedId?savedFiles.find(item=>item.id===savedId&&/\.docx$/i.test(item.name)):undefined}
+      sourceText={optimizationSource||undefined}
+      sourceResume={savedId?savedFiles.find(item=>item.id===savedId&&/\.docx$/i.test(item.name)):undefined}
       accountScope={String(user?.id||'')}
       resumeStorage={result&&file&&!savedId&&/\.docx$/i.test(file.name)?{
         available:true,saved:false,consent:saveConsent,saving:saveBusy,

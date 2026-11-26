@@ -321,7 +321,7 @@ export async function closeSessionMatchTask(task:Pick<SessionMatchTask,'id'|'gen
 type MatchContinuation={status:'CONTINUE';continuation:{state:unknown;token:string}};
 type MatchStreamResponse=MatchResponse|MatchContinuation;
 type DeliveryStamp={version:number;phase_started_at:number;prepared_at:number;candidates:number;reports:number};
-type PendingManagedMatch={status:'PENDING'|'FAILED';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;report?:MatchResearchReport;jobs?:MatchedJob[];delivery_stamp?:DeliveryStamp}|null;failure?:{error:string;retryable?:boolean}|null};
+type PendingManagedMatch={status:'PENDING'|'FAILED';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;report?:MatchResearchReport;jobs?:MatchedJob[];job_events?:{seq:number;kind:'candidate'|'jd'|'score'|'report';url:string;at:number}[];delivery_stamp?:DeliveryStamp}|null;failure?:{error:string;retryable?:boolean}|null};
 // Only an opaque ID and expiry are persisted locally; no raw CV, access
 // token, signed continuation or model output is written to localStorage.
 async function matchTaskReference(text:string,opts:MatchOptions,resumeId?:string){
@@ -506,7 +506,7 @@ export async function submitExtractedResumeText(
     const receivedAt=Date.now(),applyStarted=performance.now();
     addedCandidates=liveCandidates.snapshot(data.progress.jobs);
     // Managed polling and direct SSE must deliver the same validated reports.
-    const reports=verifiedMatchReports(data.progress.jobs);
+    const reports=verifiedMatchReports(liveCandidates.jobs());
     onPartial?.(reports);
     const stamp=data.progress.delivery_stamp;
     if(stamp&&[stamp.version,stamp.phase_started_at,stamp.prepared_at,stamp.candidates,stamp.reports].every(Number.isSafeInteger)){

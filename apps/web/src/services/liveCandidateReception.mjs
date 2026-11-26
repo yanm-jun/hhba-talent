@@ -9,6 +9,10 @@ function candidateKey(raw){
   u.searchParams.sort();return u.href;
  }catch{return null;}
 }
+const closed=j=>!!(j?.excluded_closed||j?.excluded_board||j?.availability_status==='CLOSED_LISTED');
+const identity=j=>JSON.stringify([j?.company,j?.title,j?.location]);
+const rank=j=>j?.report_status==='COMPLETE'&&j?.research_detail?5:Number.isInteger(j?.match_score)?4:j?.jd_source_status==='VERIFIED_JD'&&j?.evidence_excerpt?3:j?.reference_jd_kind==='AI_GENERATED_REFERENCE'&&j?.reference_jd?2:j?.jd_research?.facts?.length?1:0;
+const prefer=(previous,next)=>!previous||identity(previous)!==identity(next)||rank(next)>=rank(previous)?next:previous;
 function preview(event){
  const j=event?.candidate;
  if(!j||j.evidence_status!=='RESEARCH_PENDING'||j.match_score!==null||
@@ -25,6 +29,7 @@ export function createLiveCandidateReception(onJobs){
  let known=new Map(),unacknowledged=new Map();
  const publish=()=>onJobs?.([...known.values()]);
  return {
+  jobs:()=>[...known.values()],
   receive(event){
    const job=preview(event),key=job&&candidateKey(job.official_url);
    if(!key||known.has(key))return false;
@@ -32,12 +37,13 @@ export function createLiveCandidateReception(onJobs){
   },
   snapshot(jobs,{final=false}={}){
    if(!Array.isArray(jobs))return 0;
-   const next=new Map();
+   const next=final?new Map():new Map(known);
    for(const job of jobs){
     const key=candidateKey(job?.official_url);
     if(!key)continue;
     unacknowledged.delete(key);
-    if(!job.excluded_closed&&!job.excluded_board)next.set(key,job);
+    if(closed(job))next.delete(key);
+    else next.set(key,prefer(next.get(key),job));
    }
    // An incremental event can arrive before the authoritative batch that
    // includes it. Preserve those observed leads until reconciliation.
