@@ -1,7 +1,9 @@
 // Independent driver. The only retained step output is a control status;
 // every CV, research result and checkpoint remains in HHBA's private storage.
 export async function requestPhase(fetcher,ticket){
- const response=await fetcher('https://hhba.work/api/match-v4/background-step',{method:'POST',redirect:'error',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket})});
+ const response=await fetcher('https://hhba.work/api/match-v4/background-step',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket})});
+ // Cloudflare Workers rejects redirect:'error'. Never forward the private ticket to a redirect target.
+ if(response.status>=300&&response.status<400){await response.body?.cancel().catch(()=>{});return 'FAILED';}
  if(!response.ok){
   const body=await response.json().catch(()=>({}));
   if(['AI_AGENT_CANCELLED','AI_BACKGROUND_TICKET_INVALID','AI_CHECKPOINT_EXPIRED'].includes(body.error))return 'STOP';
