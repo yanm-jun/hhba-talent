@@ -768,7 +768,7 @@ test('fast discovery lane publishes unscored recoverable leads before a slow coo
   await gate;return model({profile,jobs:[slow],research_complete:true,completion_reason:'test'},[slow.url]);
  };
  try{
-  const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'research',rows:[],profile,discoveryWidth:2},
+  const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles},discoveryWidth:2},
    onRecoveryState:get=>{checkpoint=get;},onPartial:jobs=>{if(!ready&&jobs.some(j=>j.official_url===fast.url)){ready=true;observed=checkpoint().rows.some(([u])=>u===fast.url)&&!checkpoint().rows.some(([u])=>u===slow.url)&&jobs.every(j=>j.match_score===null);release();}}});
   assert.equal(observed,true);assert.equal(result.checkpoint.rows.length,2);
  }finally{clearTimeout(timeout);release();}
