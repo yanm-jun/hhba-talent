@@ -191,12 +191,12 @@ jobs:
           python apps/web/scripts/prepare-qizheng-media.py
           test -s apps/web/public/images/employer-profiles/cn-autumn-031/photo1.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-031/photo2.jpg
-      - name: Prepare WEIPU approved logo and two independently sourced corporate images
+      - name: Prepare WEIPU verified imagery or labelled and checked editorial alternatives
         run: |
           python apps/web/scripts/prepare-weipu-media.py
           test -s apps/web/public/images/employer-profiles/cn-autumn-032/logo.webp
-          test -s apps/web/public/images/employer-profiles/cn-autumn-032/photo1.jpg
-          test -s apps/web/public/images/employer-profiles/cn-autumn-032/photo2.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-032/repair-photo1.svg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-032/repair-photo2.svg
           test -s apps/web/public/images/employer-profiles/cn-autumn-032/media-audit.json
       - name: Verify Bodor Laser company logo and two separate official project photos
         run: |

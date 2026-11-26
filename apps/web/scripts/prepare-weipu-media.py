@@ -38,6 +38,16 @@ previous_pages_mirrors={
    'article':'https://english.shyp.gov.cn/ywb/Infocus/20240423/453190.html'
  }
 }
+catalog_path=Path(__file__).resolve().parents[1]/'src/data/employerProfiles/cn-autumn-032.json'
+catalog=json.loads(catalog_path.read_text(encoding='utf-8'))
+verified_media=[
+ {"path":"images/employer-profiles/cn-autumn-032/photo1.jpg","caption":"微谱集团 · 医药分析实验室实景","alt":"微谱实验室技术人员操作高效液相色谱质谱仪","note":"照片来源：微谱药物及医疗器械实验室服务官网；为实际实验室场景，不是集团总部大楼。"},
+ {"path":"images/employer-profiles/cn-autumn-032/photo2.jpg","caption":"微谱集团 · 企业科技展示空间","alt":"上海杨浦区政府报道中微谱集团的企业科技成果展示区","note":"照片来源：上海市杨浦区政府英文网站2024年企业调研报道，展示的是微谱集团企业展区。"}
+]
+editorial_media=[
+ {"path":"images/employer-profiles/cn-autumn-032/repair-photo1.svg","caption":"HHBA 原创业务示意图 1（非微谱实景）","alt":"HHBA 自制的业务方向示意图，非微谱集团真实照片，企业原始照片暂不可用","note":"素材未完成核验时展示的原创示意图，不属于企业官方素材，也不代表实际办公环境。"},
+ {"path":"images/employer-profiles/cn-autumn-032/repair-photo2.svg","caption":"HHBA 原创业务示意图 2（非微谱实景）","alt":"HHBA 自制的业务方向示意图，非微谱集团真实照片，企业原始照片暂不可用","note":"素材未完成核验时展示的原创示意图，不属于企业官方素材，也不代表实际办公环境。"}
+]
 photos=[
  ('photo1.jpg', [
   ('https://yanm-jun.github.io/hhba-talent/images/employer-profiles/cn-autumn-032/photo1.jpg','https://www.weipuyiyao.com/project/yiliaoqixieyanjiu/huaxuebiaozhengyanjiu'),
@@ -51,7 +61,7 @@ photos=[
  ])
 ]
 used={expected}
-for filename,candidates in photos:
+for index,(filename,candidates) in enumerate(photos):
  selected=None
  err=''
  for image_url,article_url in candidates:
@@ -92,20 +102,21 @@ for filename,candidates in photos:
        'verifiedOriginalSourceSha256':mirror['originalSourceSha256'],
        'mirrorBuildRun':41266911360} if mirror else {})
   }
+  catalog['media']['photos'][index]=verified_media[index]
   print('WEIPU_MEDIA_VERIFIED',filename,url,im.size)
  else:
-  im=Image.new('RGB',(1200,700),(241,245,248))
-  d=ImageDraw.Draw(im)
-  d.rectangle((0,0,1200,112),fill=(21,99,153))
-  f='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
-  title=ImageFont.truetype(f,42) if Path(f).exists() else ImageFont.load_default()
-  note=ImageFont.truetype(f,23) if Path(f).exists() else ImageFont.load_default()
-  d.text((53,42),'WEIPU / SOURCE MEDIA UNAVAILABLE',fill='white',font=note)
-  d.text((55,330),'OFFICIAL PHOTO UNAVAILABLE',fill=(55,72,89),font=title)
-  d.text((55,408),'Not a photograph of the company',fill=(90,99,108),font=note)
-  im.save(root/filename,'JPEG',quality=84)
-  audit[filename]={'verified':False,'sources':[x[0] for x in candidates],'reason':err,'note':'Clearly marked unavailable; not a real corporate photograph'}
-  print('WEIPU_MEDIA_UNAVAILABLE',filename,err)
- assert (root/filename).stat().st_size>1800
+  # Never manufacture a JPG presented as a corporate photograph.
+  # The original, explicitly labelled HHBA editorial SVG is tracked in Git.
+  fallback=root/('repair-photo'+str(index+1)+'.svg')
+  assert fallback.is_file() and '非企业真实照片' in fallback.read_text(encoding='utf-8')
+  (root/filename).unlink(missing_ok=True)
+  catalog['media']['photos'][index]=editorial_media[index]
+  audit[filename]={'verified':False,'sources':[x[0] for x in candidates],'reason':err,
+    'editorialReplacement':True,'fallbackAsset':editorial_media[index]['path'],
+    'note':'HHBA original business illustration, NOT an official company photograph'}
+  print('WEIPU_MEDIA_UNAVAILABLE_EDITORIAL',filename,err)
+ if selected:assert (root/filename).stat().st_size>1800
+catalog['photoNote']=('两张资料图片已核验来源并打包到本地；图片权属原作者。' if all(audit[f'photo{i}.jpg']['verified'] for i in (1,2)) else '部分企业真实照片来源无法核验，已使用明确标注的 HHBA 原创业务示意图替代；非企业实景。')
+catalog_path.write_text(json.dumps(catalog,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 (root/'media-audit.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 print('WEIPU_MEDIA_READY',len(audit),sum(x.get('verified',False) for x in audit.values()))
