@@ -1226,3 +1226,50 @@ test('actual search consumes streamed citations before terminal output while pre
   assert.equal(result.checkpoint.rows.length,1);assert.ok(result.checkpoint.sourceLeads.includes(b.url));
  }finally{clearTimeout(timer);try{controller.close();}catch{}await pending.catch(()=>{});}
 });
+
+
+test('managed discovery extracts a specific source-confirmed public vacancy before AI output without another model request', {timeout:8000},async()=>{
+ const {phaseResourceBudget}=await import('../functions/_lib/v4-phase-budget.js');
+ const a=job(7401),b=job(7402),p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test',stream:true};
+ let controller,recovery,resolveEvent,calls=0,pages=0;
+ const events=[],seen=new Promise(r=>{resolveEvent=r;});
+ const stream=new ReadableStream({start(c){controller=c;}});
+ const send=e=>controller.enqueue(new TextEncoder().encode('data: '+JSON.stringify(e)+'\n\n'));
+ const html='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',url:a.url,title:a.title,hiringOrganization:{name:a.company,url:new URL(a.url).origin},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责汽车经销商渠道运营和业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
+ const budget=phaseResourceBudget();
+ const pending=v4Match(budget.fetch(async(u,opts)=>{
+  if(u===a.url){pages++;return new Response(html,{headers:{'content-type':'text/html'}});}
+  if(u===b.url){pages++;return new Response('<html><h1>招聘列表</h1>'+html+'</html>',{headers:{'content-type':'text/html'}});}
+  calls++;assert.match(JSON.parse(opts.body).instructions,/不要限制企业、行业、岗位方向；搜索轮次不设人为上限/);
+  return new Response(stream,{headers:{'content-type':'text/event-stream'}});
+ }),p,resume,'全国',{
+  curated:true,officialOnly:true,stepMode:true,parallelResearch:false,env:{HHBA_MATCH_V4_READY:'1'},resourceBudget:budget,
+  checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles}},
+  onRecoveryState:get=>{recovery=get;},onDiscoveryCandidate:(e,m)=>{events.push({e,m});if(e.candidate.official_url===a.url)resolveEvent();}
+ });
+ let timer;
+ try{
+  send({type:'response.output_item.done',item:{type:'web_search_call',action:{sources:[{url:a.url},{url:b.url}]}}});
+  await Promise.race([seen,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('no independently extracted vacancy before AI completion')),2500);})]);clearTimeout(timer);
+  assert.equal(events.length,1);assert.equal(events[0].m.source,'source_read');
+  assert.equal(events[0].e.candidate.match_score,null);
+  assert.deepEqual(recovery().rows.map(([u])=>u),[a.url]);
+  assert.ok(recovery().sourceLeads.includes(b.url));
+  send({type:'response.completed',response:{status:'completed',output:[
+   {type:'web_search_call',action:{sources:[{url:a.url},{url:b.url}]}},
+   {type:'message',content:[{type:'output_text',text:JSON.stringify({jobs:[a],research_complete:false})}]}]}});
+  const result=await pending;assert.equal(calls,1);assert.ok(pages>=1);
+  assert.equal(events.length,1);assert.equal(result.checkpoint.rows.length,1);
+  assert.ok(result.checkpoint.sourceLeads.includes(b.url));assert.equal(budget.denied,false);
+ }finally{clearTimeout(timer);try{controller.close();}catch{}await pending.catch(()=>{});}
+});
+
+test('speculative citation read requires an exact structured vacancy URL, not a recruiting list or unrelated JobPosting',async()=>{
+ const {v4ReadEmployerJob}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const a=job(7410),list='https://careers.employer7410.cn/jobs';
+ const posting={'@type':'JobPosting',url:a.url,title:a.title,hiringOrganization:{name:a.company,url:new URL(a.url).origin},jobLocation:{address:{addressLocality:'上海'}},description:'负责销售运营和渠道管理。'};
+ const fetcher=async()=>new Response('<script type="application/ld+json">'+JSON.stringify(posting)+'</script>',{headers:{'content-type':'text/html'}});
+ assert.equal((await v4ReadEmployerJob(a.url,{fetcher,requireSpecificPosting:true})).canonical_url,a.url);
+ await assert.rejects(v4ReadEmployerJob(list,{fetcher,requireSpecificPosting:true}),/V4_SPECIFIC_POSTING_NOT_CONFIRMED/);
+ assert.equal((await v4ReadEmployerJob(list,{fetcher})).title,a.title,'ordinary verification behavior is unchanged');
+});
