@@ -1572,7 +1572,9 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // occupies a verification/scoring worker. At the phase boundary, preserve
  // every scored job and finish any admitted report before checkpointing.
  const reportQueue=fullResearch&&parallelResearch&&resourceBudget?createLiveReportQueue({signal,
-  width:active=>Math.min(4,active+Math.floor(resourceBudget.remainingResearch()/4)),
+  // Two early report lanes leave connection headroom for concurrent discovery
+   // and JD verification; the separate final report phase can use four lanes.
+   width:active=>Math.min(2,active+Math.max(0,Math.floor((resourceBudget.remainingResearch()+1)/4))),
    canStart:active=>!resourceBudget.denied&&resourceBudget.remainingResearch()>=3+active*2,
   run:maybeEarlyReport}):null;
  const submitEarlyReport=job=>{

@@ -451,3 +451,13 @@ test('production route and browser correlate numeric publication stamps without 
  assert.equal(restoreReportRecovery({...saved,result:{status:'COMPLETE'}},view,2),null);
  assert.equal(restoreReportRecovery(saved,{...view,generation:1},2),null);
  });
+
+ test('a failed optional report write retries without a later model event',async()=>{
+ const {createV4ProgressPublisher}=await import('../functions/_lib/v4-progress-publisher.js');
+ const clock=progressClock();let attempts=0;
+ const publisher=createV4ProgressPublisher({...clock,publish:()=>++attempts>1});
+ publisher.queue('report');await clock.advance(0);assert.equal(attempts,1);
+ await clock.advance(999);assert.equal(attempts,1);
+ await clock.advance(1);assert.equal(attempts,2);
+ await publisher.stop();
+ });

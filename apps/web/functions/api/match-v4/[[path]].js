@@ -192,7 +192,11 @@ function events(env,request,input,waitUntil){
      input.recoveryState=()=>recoveryState();
      // Keep one durable phase per Pages invocation. The hosting platform's
      // subrequest budget resets on the next continuation, not on a JS loop.
-          const provider=v4JobProvider(researchEnv);if(provider)provider.deliveryTelemetry=delivery;if(provider&&replay){provider.phaseReplay=replay;provider.phaseResourceBudget=budget;provider.usageDb=env.HHBA_METRICS_DB;}
+          const provider=v4JobProvider(researchEnv);if(provider){provider.deliveryTelemetry=delivery;
+      // Request actual provider SSE by default on managed background research.
+      // Honor an explicit opt-out; the existing adapter handles JSON fallback.
+      if(input.background&&env.HHBA_AGENT_RELAY_STREAM!=='0')provider.stream=true;
+     }if(provider&&replay){provider.phaseReplay=replay;provider.phaseResourceBudget=budget;provider.usageDb=env.HHBA_METRICS_DB;}
       let profileCache=null;
       if(input.managed&&!input.checkpoint&&provider&&input.resume_id&&input.session?.token_hash&&budget?.canPublish()){
        const id=await matchProfileCacheKey(env,input.phone,input.session.token_hash,{resume_id:input.resume_id,text:input.text,role:input.role_hint,model:provider.model,base:provider.baseUrl,effort:provider.reasoningEffort||'medium'}).catch(()=>null);

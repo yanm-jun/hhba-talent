@@ -21,8 +21,8 @@ export function createV4ProgressPublisher({publish,canPublish=()=>true,now=Date.
    if(closed||!dirty||!canPublish(dirty))return;
    const sending=dirty;dirty=null;
    pending=Promise.resolve().then(()=>publish(sending)).then(ok=>{
-    // Even a failed optional write is paced; a later observation or the
-    // mandatory phase-end checkpoint can deliver the current snapshot.
+    // Retry the latest dirty snapshot with paced backoff even when no new
+    // model event arrives; mandatory phase-end persistence still owns final state.
     lastWrite=now();if(ok===false){failures++;retain(sending);}else failures=0;
    },()=>{lastWrite=now();failures++;retain(sending);}).finally(()=>{pending=null;arm();});
   },Math.max(0,Math.max(interval[kind],failures?Math.min(15000,1000*2**Math.min(4,failures-1)):0)-(now()-lastWrite)));
