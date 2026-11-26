@@ -900,3 +900,39 @@ test('public reference research excludes CV and reuses material but not score af
  assert.equal(publicCalls,1);assert.equal(scoreCalls,2);assert.ok(liveReads>=2);
  assert.ok([...objects.entries()].filter(([k])=>k.includes('reference-assets-v1')).every(([,v])=>!v.includes(resume)));
 });
+
+test('first complete official report is published before a slow sibling JD and global ranking',async()=>{
+ const {qualifiedReport}=await import('../functions/_lib/v4-curated-reports.js');
+ const a=job(4101),b=job(4102),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ let releaseSlow,slowFinished=false,firstBeforeSlow=false,reportCalls=0,rankCalls=0;
+ const gate=new Promise(resolve=>{releaseSlow=resolve;});
+ const timer=setTimeout(releaseSlow,3000);
+ const byUrl=new Map([[a.url,a],[b.url,b]]);
+ const html=j=>'<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:j.title,hiringOrganization:{name:j.company,url:new URL(j.url).origin},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责汽车经销商渠道运营和业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
+ const score={suitable:true,score:86,reason:'汽车渠道经历与岗位职责匹配，需核对组织协调能力。',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车经销商渠道运营',matched:['渠道运营'],gaps:[]};
+ const report={...score,comparisons:[{jd_quote:'汽车经销商渠道运营',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'真实渠道经历匹配'},{jd_quote:'具备独立分析和组织协调能力',status:'missing',analysis:'尚无直接证据'}],quality_review:{status:'complete',explanation:'职责资格已逐项核查，未确认的能力如实标注。',missing:[]}};
+ const fetcher=async(url,opts)=>{
+  if(!url.endsWith('/responses')){
+   const j=byUrl.get(url);assert.ok(j);
+   if(j===b){await gate;slowFinished=true;}
+   return new Response(html(j),{headers:{'content-type':'text/html'}});
+  }
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.pending_ids){rankCalls++;assert.equal(input.pending_ids.length,2);return model({ordered_ids:input.pending_ids});}
+  if(input.jobs)return model({assessments:input.jobs.map(j=>({...score,id:j.id}))});
+  if(input.established_score!==undefined){reportCalls++;return model(report);}
+  return model(score);
+ };
+ const options={env:{HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true,parallelResearch:true};
+ try{
+  const result=await v4Match(fetcher,provider,resume,'全国',{...options,onPartial:jobs=>{
+   if(jobs.some(j=>j.official_url===a.url&&qualifiedReport(j))&&!slowFinished){firstBeforeSlow=true;releaseSlow();}
+  },checkpoint:{phase:'verification',next:0,rows:[[a.url,a],[b.url,b]],profile,toolUrls:[a.url,b.url],verificationBatch:2}});
+  assert.equal(result.checkpoint.phase,'reporting');
+  assert.equal(result.checkpoint.matches.filter(qualifiedReport).length,2);
+  assert.equal(reportCalls,2);assert.equal(rankCalls,0);assert.ok(firstBeforeSlow,'first full report must appear before the slow sibling finishes');
+  const ranked=await v4Match(fetcher,provider,resume,'全国',{...options,checkpoint:result.checkpoint});
+  assert.equal(ranked.status,'CONTINUE');assert.equal(rankCalls,1);assert.equal(reportCalls,2);
+  assert.equal(ranked.checkpoint.matches.filter(qualifiedReport).length,2);
+ }finally{clearTimeout(timer);releaseSlow();}
+});
