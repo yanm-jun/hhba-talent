@@ -30,8 +30,8 @@ test('keeps missing registered users and DAU/MAU as unknown; no fake counts',asy
  assert(js.includes("a?.quality==='collected'&&integer(a.dau)"));
  assert(js.includes('PRIVATE_METRICS_REQUIRE_AUTH'));
 });
-test('removed separate dashboard and restored other pre-existing preview',async()=>{
+test('retired duplicate dashboards are no longer shipped; canonical admin stays intact',async()=>{
  await assert.rejects(stat(new URL('../public/admin-metrics/index.html',import.meta.url)),/ENOENT/);
- const other=await readFile(new URL('../public/preview-admin/unified-workbench.js',import.meta.url),'utf8');
- assert(other.includes('招聘业务')&&other.includes('双评分'),'other existing independent preview preserved');
+ await assert.rejects(stat(new URL('../public/preview-admin',import.meta.url)),/ENOENT/);
+ assert((await read('index.html')).includes('Management Console'));
 });

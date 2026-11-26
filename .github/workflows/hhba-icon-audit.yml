@@ -4,7 +4,6 @@ on:
   pull_request:
     paths:
       - 'apps/web/src/**'
-      - 'apps/web/public/preview-admin/**'
       - 'apps/web/scripts/audit-ui-icons.mjs'
       - 'apps/admin-preview/**'
       - 'apps/browser-extension/**'
@@ -32,7 +31,6 @@ jobs:
         run: |
           grep -q "styles/icon-system.css" apps/web/src/main.tsx
           grep -q "icon-system.css" apps/admin-preview/index.html
-          grep -q "icon-system.css" apps/web/public/preview-admin/index.html
       - uses: actions/upload-artifact@v4
         with:
           name: hhba-frontend-icon-inventory

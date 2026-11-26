@@ -64,7 +64,7 @@ jobs:
         run: |
           npm ci --no-audit --no-fund
           npm run build
-          test -f dist/preview-admin/index.html
+          test ! -e dist/preview-admin
           test -f ../../apps/admin-preview/index.html
           test -f ../../apps/admin-preview/dashboard.js
           test ! -d dist/admin-metrics

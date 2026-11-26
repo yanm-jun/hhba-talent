@@ -67,11 +67,17 @@ test('legacy B2B paths respond with genuine Pages Functions HTTP 404',()=>{
   '../functions/recruiter/index.js','../functions/recruiter/[[path]].js',
   '../functions/employer/index.js','../functions/employer/[[path]].js',
   '../functions/admin/[[path]].js','../functions/candidate/employer-jobs/index.js',
-  '../functions/candidate/employer-jobs/[[path]].js','../functions/candidate/my-applications.js'
+  '../functions/candidate/employer-jobs/[[path]].js','../functions/candidate/my-applications.js',
+  '../functions/preview-admin/index.js','../functions/preview-admin/[[path]].js'
  ];
  for(const path of paths){
   const code=readFileSync(new URL(path,import.meta.url),'utf8');
   assert.match(code,/status:404/,path);
   assert.doesNotMatch(code,/企业招聘业务已停止提供|RetiredEnterprisePage/,path);
  }
+});
+
+test('retired enterprise preview assets do not ship with the candidate site',()=>{
+ assert.equal(existsSync(new URL('../public/preview-admin',import.meta.url)),false);
+ assert.equal(existsSync(new URL('../../../apps/admin-preview/index.html',import.meta.url)),true);
 });

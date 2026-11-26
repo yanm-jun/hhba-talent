@@ -48,7 +48,7 @@ jobs:
           if(data.jobs.length!==100||companies.size!==10)throw Error('CURATED_100_BROKEN');
           for(const j of data.jobs)if(!j.editorial?.responsibilities?.length||!j.editorial?.requirements?.length)
             throw Error('CURATED_JD_MISSING_'+j.id);
-          for(const file of ['dist/images/hhba-join-team.webp','dist/images/hhba-founder-signature.webp','dist/preview-admin/data/workspace.json']){
+          for(const file of ['dist/images/hhba-join-team.webp','dist/images/hhba-founder-signature.webp']){
             if(!fs.existsSync(file))throw Error('PUBLIC_ASSET_LOST_'+file);
           }
           console.log('OVERSEAS_CURATED_100_AND_DOMESTIC_PRESERVATION_OK');
