@@ -6,6 +6,7 @@
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
+import {createAiUsageBuffer} from '../../_lib/ai-token-usage.js';
 import {preserveJobEvidence} from '../../_lib/v4-jd-research.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
 import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
@@ -189,7 +190,7 @@ function events(env,request,input,waitUntil){
     });
     async function releaseTask(){await stopProgress();await leaseHeartbeat?.stop();if(input.lease){const lease=input.lease;input.lease=null;await lease.release().catch(()=>console.warn('HHBA_TASK_LEASE_RELEASE_FAILED'));}}
    const execution=(async()=>{
-    let succeeded=false,committedResult=null;
+    let succeeded=false,committedResult=null,usageBuffer=null;
     try{
      await guard();
      if(input.cachedResult){
@@ -206,7 +207,10 @@ function events(env,request,input,waitUntil){
       // Request actual provider SSE by default on managed background research.
       // Honor an explicit opt-out; the existing adapter handles JSON fallback.
       if(input.background&&env.HHBA_AGENT_RELAY_STREAM!=='0')provider.stream=true;
-     }if(provider&&replay){provider.phaseReplay=replay;provider.phaseResourceBudget=budget;provider.usageDb=env.HHBA_METRICS_DB;}
+     }if(provider&&replay){provider.phaseReplay=replay;provider.phaseResourceBudget=budget;provider.usageDb=env.HHBA_METRICS_DB;
+      if(provider.usageDb){usageBuffer=createAiUsageBuffer(provider.usageDb);provider.usageBuffer=usageBuffer;}
+      provider.transportState={jsonStages:new Set()};
+     }
       let profileCache=null;
       if(input.managed&&!input.checkpoint&&provider&&input.resume_id&&input.session?.token_hash&&budget?.canPublish()){
        const id=await matchProfileCacheKey(env,input.phone,input.session.token_hash,{resume_id:input.resume_id,text:input.text,role:input.role_hint,model:provider.model,base:provider.baseUrl,effort:provider.reasoningEffort||'medium'}).catch(()=>null);
@@ -296,6 +300,7 @@ function events(env,request,input,waitUntil){
      await releaseTask().catch(()=>console.warn('HHBA_TASK_LEASE_RELEASE_FAILED'));
      if(input.claim&&(!succeeded||closed))await input.claim.release().catch(()=>console.warn('HHBA_CHECKPOINT_RELEASE_FAILED'));
      if(succeeded&&!closed&&input.pointer)await deleteMatchCheckpoint(env,input.pointer).catch(()=>console.warn('HHBA_CHECKPOINT_CLEANUP_FAILED'));
+     await usageBuffer?.flush();
      if(!closed){closed=true;try{controller.close()}catch{}}
     }
    })();

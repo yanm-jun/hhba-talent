@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {stageEffort,usageCounts,recordAiUsage,readAiUsage} from '../functions/_lib/ai-token-usage.js';
+import {stageEffort,usageCounts,recordAiUsage,readAiUsage,createAiUsageBuffer} from '../functions/_lib/ai-token-usage.js';
 import {v4Call} from '../functions/_lib/simple-match-v4.js';
 const model='gpt-6.2-sol';
 test('all GPT-6 business stages use medium; probes and unknown models retain compatibility',()=>{
@@ -35,4 +35,28 @@ test('failed or missing usage never becomes a known zero; errors still propagate
  const events=[];const usageDb={prepare(){return {bind(...args){events.push(args);return this},async run(){}}}};
  await assert.rejects(v4Call(async()=>new Response('',{status:429}),{model,key:'synthetic',baseUrl:'https://example.test/v1',usageDb},{input:'test'},{stage:'score'}),/AI_PROVIDER_RATE_LIMITED/);
  assert.equal(events.length,1);assert.equal(events[0][4],'failed');assert.equal(events[0][5],0);
+});
+
+test('managed model usage is buffered without waiting for D1 and aggregates each real response',async()=>{
+ const writes=[];let release;const gate=new Promise(r=>{release=r;});
+ const usageDb={prepare(){return {bind(...args){writes.push(args);return this},async run(){await gate;}}}};
+ const usageBuffer=createAiUsageBuffer(usageDb),p={model,key:'synthetic',baseUrl:'https://example.test/v1',usageDb,usageBuffer};
+ const reply={status:'completed',output:[],usage:{input_tokens:10,output_tokens:5,total_tokens:15}};
+ const fetcher=async()=>Response.json(reply);
+ await v4Call(fetcher,p,{input:'one'},{stage:'score'});await v4Call(fetcher,p,{input:'two'},{stage:'score'});
+ assert.equal(writes.length,0,'no D1 write on the individual response critical path');
+ const flushing=usageBuffer.flush();assert.equal(writes.length,1);
+ assert.deepEqual(writes[0].slice(5),[2,2,20,10,30,0,0,0,0]);release();await flushing;
+ await usageBuffer.flush();assert.equal(writes.length,1);
+});
+test('confirmed non-discovery JSON fallback avoids repeated rejected stream requests, discovery remains live',async()=>{
+ const p={model,key:'synthetic',baseUrl:'https://example.test/v1',stream:true,transportState:{jsonStages:new Set()}};
+ const attempts=[],reply={status:'completed',output:[]};
+ const fetcher=async(_u,o)=>{const body=JSON.parse(o.body);attempts.push(body.stream);return body.stream?new Response('',{status:422}):Response.json(reply);};
+ await v4Call(fetcher,p,{input:'one'},{stage:'score'});
+ await v4Call(fetcher,p,{input:'two'},{stage:'score'});
+ await v4Call(fetcher,p,{input:'three'},{stage:'discovery'});
+ await v4Call(fetcher,p,{input:'four'},{stage:'discovery'});
+ assert.deepEqual(attempts,[true,false,false,true,false,true,false]);
+ assert.equal(p.transportState.jsonStages.has('discovery'),false);
 });

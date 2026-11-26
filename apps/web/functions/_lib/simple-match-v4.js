@@ -108,6 +108,9 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent,onDiscover
  if(!provider)throw fault('AI_PROVIDER_NOT_CONFIGURED');
  if(provider.kind&&provider.kind!=='openai')throw fault('AI_PROVIDER_UNSUPPORTED');
  const effort=stageEffort(provider,stage), effective={...provider,...(effort?{reasoningEffort:effort}:{})};
+ // Only non-discovery stages may reuse a successful JSON fallback in this
+ // invocation; discovery always retains the requested live event transport.
+ if(stage!=='discovery'&&provider.transportState?.jsonStages?.has(stage))effective.stream=false;
  // Explicit payload overrides are also normalized for normal GPT-6 business requests.
  if(stage!=='probe'&&/^gpt-6(?:\.|-)/i.test(provider.model||'')&&payload.reasoning)payload={...payload,reasoning:{...payload.reasoning,effort:'medium'}};
  let data;
@@ -129,7 +132,10 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent,onDiscover
  finally{
   timing?.finish(data?.status||'failed');
   console.info('HHBA_V4_STAGE_TIMING',JSON.stringify({stage,elapsed_ms:Date.now()-callStarted,status:data?.status||'failed',error:failure?(failure.code||'AI_CALL_FAILED'):null}));
-  if(failure?.code!=='AI_PHASE_RESOURCE_YIELD')await recordAiUsage(provider.usageDb,{model:provider.model,stage,effort:payload.reasoning?.effort||effort,status:data?.status||'failed',usage:data?.usage});
+  if(failure?.code!=='AI_PHASE_RESOURCE_YIELD'){
+   const entry={model:provider.model,stage,effort:payload.reasoning?.effort||effort,status:data?.status||'failed',usage:data?.usage};
+   if(provider.usageBuffer)provider.usageBuffer.add(entry);else await recordAiUsage(provider.usageDb,entry);
+  }
  }
 }
 async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,onDiscoveryJob,onDiscoverySource,stage,timing}={}){
@@ -159,10 +165,13 @@ async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,onDiscovery
   // explicit request rejection, not after a streamed job already started.
   if(provider.stream&&[400,422].includes(response.status)){
    await response.body?.cancel().catch(()=>{});
-   await recordAiUsage(provider.usageDb,{model:provider.model,stage,effort:payload.reasoning?.effort||provider.reasoningEffort,status:'stream_rejected'});
+   const rejected={model:provider.model,stage,effort:payload.reasoning?.effort||provider.reasoningEffort,status:'stream_rejected'};
+   if(provider.usageBuffer)provider.usageBuffer.add(rejected);else await recordAiUsage(provider.usageDb,rejected);
    if(provider.usageDb)provider.phaseResourceBudget?.take('model_usage');
    timing?.observe('fallback');
-   return v4CallOpenAI(fetcher,{...provider,stream:false},payload,{signal,onEvent,onDiscoveryJob,onDiscoverySource,stage,timing});
+   const fallback=await v4CallOpenAI(fetcher,{...provider,stream:false},payload,{signal,onEvent,onDiscoveryJob,onDiscoverySource,stage,timing});
+   if(stage!=='discovery'&&fallback.status==='completed')provider.transportState?.jsonStages?.add(stage);
+   return fallback;
   }
   if(response.status===413)throw fault('AI_PROVIDER_CONTEXT_TOO_LARGE');
   if([400,422].includes(response.status)){
