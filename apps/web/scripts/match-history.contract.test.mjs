@@ -144,7 +144,8 @@ test('UI shows the correct login -> upload -> history navigation and real manual
   assert.ok(login.includes('?next=%2Fcandidate%2Fmatch'));
   assert.ok(match.includes('/candidate/login?next=%2Fcandidate%2Fmatch'), 'default route still directs candidate to login');
  assert.ok(!match.includes('%3Fv4%3D1'), 'V4 is the default after candidate login');
- assert.match(read('services/resumeMatch.ts'),/const EFFECTIVE_API=MATCH_V4_PREVIEW\?'/);
+ assert.match(read('services/resumeMatch.ts'),/const EFFECTIVE_API='\/api\/match-v4'/);
+ assert.doesNotMatch(read('services/resumeMatch.ts'),/EFFECTIVE_API\s*=\s*MATCH_V4_PREVIEW\s*\?/);
  assert.match(home,/kind==='candidate'\?\(candidateTarget\|\|'\/candidate\/match'\)/);
  assert.match(login,/requested === '\/candidate\/match'/);
  assert.match(match,/uploadPrivateResume\(file,true\)/);
