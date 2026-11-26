@@ -10,21 +10,6 @@ const accountApiEnabled = import.meta.env.VITE_HHBA_ACCOUNT_API_ENABLED==='1';
 export const employerApiReady = accountApiEnabled && (configuredApiBase==='/api/v1' || /^https:\/\/[^\s/?#]+\/api\/v1\/?$/.test(configuredApiBase));
 // Do not send SMS from a public static site. Enable only after dedicated phone auth backend is verified.
 export const phoneAuthReady = employerApiReady && import.meta.env.VITE_HHBA_PHONE_AUTH_ENABLED==='1';
-// Evidence is an additional, independently activated capability. Existing employer API readiness is insufficient.
-export const recruitmentResponsibilityApiReady = employerApiReady && import.meta.env.VITE_HHBA_RECRUITMENT_RESPONSIBILITY_API_ENABLED==='1';
-export const evidenceApiReady = employerApiReady && import.meta.env.VITE_HHBA_EVIDENCE_API_ENABLED==='1';
-// Employee verification and protected feedback run on their own trusted service flag.
-export const employeeFeedbackApiReady = employerApiReady && import.meta.env.VITE_HHBA_EMPLOYEE_FEEDBACK_API_ENABLED==='1';
-// Scoring candidates are an independent reviewer-only capability; not public scores.
-export const scoringApiReady = employerApiReady && import.meta.env.VITE_HHBA_SCORING_API_ENABLED==='1';
-// Appeals require a separate trusted server-side enterprise/employee review service.
-export const appealsApiReady = employerApiReady && import.meta.env.VITE_HHBA_APPEALS_API_ENABLED==='1';
-// Real improvement submissions require verified employer accounts and independent reviewer backend.
-export const improvementsApiReady = employerApiReady && import.meta.env.VITE_HHBA_IMPROVEMENTS_API_ENABLED==='1';
-// Public score publication is controlled separately and remains off in static previews.
-export const publicationApiReady = employerApiReady && import.meta.env.VITE_HHBA_PUBLICATION_API_ENABLED==='1';
-// All commercial operations disabled until trusted review, buyer consent and approved policy exist.
-export const aidCommercialApiReady = employerApiReady && import.meta.env.VITE_HHBA_AID_COMMERCIAL_API_ENABLED==='1';
 const API = configuredApiBase || '/api/v1';
 function errorMessage(detail: unknown) {
   if (typeof detail === 'string') return detail;
@@ -42,7 +27,7 @@ export const legacyEnterpriseRecruitmentRetired = true;
 const retiredBusinessEndpoint = (path:string):boolean => {
   const route=path.split('?',1)[0];
   const prefixes=[
-    '/organizations','/recruiter','/employer','/public/employer-postings',
+    '/organizations','/recruiter','/employer','/employee','/employee-feedback','/public/employer-postings',
     '/public/organizations','/me/employer-applications','/me/recruitment-responsibilities',
     '/admin/verification','/admin/employer-postings','/admin/recruitment-responsibilities',
     '/admin/aid-applications','/admin/client-introductions','/admin/order-proofs',
@@ -158,95 +143,6 @@ export const api = {
   publicProfile: (slug: string) => request<{ display_name: string | null; headline?: string | null; skills: string[]; services: string[]; updated_at: string }>(`/public/profiles/${slug}`),
   consent: (type: string, granted: boolean) => request(`/me/consents/${type}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ granted }) }),
   consents: () => request<Consents>('/me/consents'),
-  organizations: () => request<{ organizations: Organization[] }>('/organizations'),
-  createOrganization: (legal_name: string) => request<{ id: string; status: string }>('/organizations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ legal_name }) }),
-  verification: (organizationId: string) => request<Verification>(`/recruiter/organizations/${organizationId}/verification`),
-  onboarding: () => request<{ applications: OnboardingApplication[] }>('/recruiter/onboarding'),
-  saveVerificationCompany: (organizationId: string, payload: { legal_name: string; credit_code: string; registered_location: string; recruitment_subject_type: 'employer' | 'agency' }) => request<Verification>(`/recruiter/organizations/${organizationId}/verification/company`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }),
-  saveVerificationRepresentative: (organizationId: string, payload: { real_name: string; job_title: string; relationship_type: 'legal_representative' | 'business_owner' | 'hr_lead' | 'hr_recruiter' | 'authorized_agent' }) => request<Verification>(`/recruiter/organizations/${organizationId}/verification/representative`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }),
-  saveVerification: (organizationId: string, payload: { legal_name: string; credit_code: string; registered_location: string; recruitment_subject_type: 'employer'; real_name: string; job_title: string }) => request<Verification>(`/recruiter/organizations/${organizationId}/verification`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }),
-  uploadVerificationDocument: (organizationId: string, documentType: 'business_license' | 'authorization_letter', file: File) => { const form=new FormData(); form.append('file',file); return request<{ id:string }>(`/recruiter/organizations/${organizationId}/verification/documents?document_type=${documentType}`,{method:'POST',body:form}); },
-  submitVerification: (organizationId: string) => request<{ status:string }>(`/recruiter/organizations/${organizationId}/verification/submit`,{method:'POST'}),
-  requirements: (organizationId: string) => request<{ items: Requirement[] }>(`/organizations/${organizationId}/hiring-requirements`),
-  createRequirement: (organizationId: string, payload: { title: string; description: string; location?: string | null; work_mode?: string | null }) => request<Requirement>(`/organizations/${organizationId}/hiring-requirements`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...payload, status: 'draft' }) }),
-  updateRequirement: (organizationId: string, requirementId: string, payload: Partial<Requirement>) => request<Requirement>(`/organizations/${organizationId}/hiring-requirements/${requirementId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }),
-  postings: (oid:string) => request<{items:EmployerPosting[]}>(`/organizations/${oid}/postings`),
-  createPosting: (oid:string,payload:EmployerPostingInput) => request<EmployerPosting>(`/organizations/${oid}/postings`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),
-  updatePosting: (oid:string,id:string,payload:EmployerPostingInput) => request<EmployerPosting>(`/organizations/${oid}/postings/${id.replace(/^employer-/,'')}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),
-  submitPosting: (oid:string,id:string) => request<{status:string}>(`/organizations/${oid}/postings/${id.replace(/^employer-/,'')}/submit`,{method:'POST'}),
-  closePosting: (oid:string,id:string) => request<{status:string}>(`/organizations/${oid}/postings/${id.replace(/^employer-/,'')}/close`,{method:'POST'}),
-  talentSearch: (oid:string,payload:TalentSearchInput) => request<TalentSearchResponse>(`/organizations/${oid}/talent-search`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),
-  issueEmployeeFeedbackTicket: (organization_id:string) => request<{ticket:string;period:string;notice:string}>('/employee-feedback/ticket',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id})}),
-  submitEmployeeFeedback: (organization_id:string,ticket:string,ratings:EmployeeFeedbackRatings) => request<{accepted:boolean;period:string;notice:string}>('/employee-feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,ticket,...ratings})}),
-  publicEmployeeFeedbackAggregate: (oid:string,period:string) => request<PublicFeedbackAggregate>(`/public/organizations/${encodeURIComponent(oid)}/employee-feedback/${encodeURIComponent(period)}`),
-  submitAidApplication: (oid:string,data:{service_type:string;business_summary:string;capacity_summary:string;capacity_evidence_id:string}) => request<HHBAAidApplication>(`/organizations/${encodeURIComponent(oid)}/aid-applications`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}),
-  employerAidApplications: (oid:string) => request<{items:HHBAAidApplication[]}>(`/organizations/${encodeURIComponent(oid)}/aid-applications`),
-  employerClientIntroductions: (oid:string) => request<{items:HHBAIntroduction[]}>(`/organizations/${encodeURIComponent(oid)}/client-introductions`),
-  adminAidQueue: () => request<{items:HHBAAidApplication[]}>('/admin/aid-applications'),
-  adminAidReview: (id:string,decision:'approved'|'needs_info'|'declined',reason:string) => request<HHBAAidApplication>(`/admin/aid-applications/${encodeURIComponent(id)}/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision,reason})}),
-  adminAidClose: (id:string,reason:string) => request<HHBAAidApplication>(`/admin/aid-applications/${encodeURIComponent(id)}/close`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision:'close',reason})}),
-  adminCreateIntroduction: (data:{application_id:string;organization_id:string;buyer_reference:string;buyer_sector:string;opportunity_type:string;purpose:string}) => request<HHBAIntroduction>('/admin/client-introductions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}),
-  adminVerifyBuyerConsent: (id:string,buyer_consent_reference:string) => request<HHBAIntroduction>(`/admin/client-introductions/${encodeURIComponent(id)}/verify-consent`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({buyer_consent_reference})}),
-  adminAdvanceIntroduction: (id:string,stage:string) => request<HHBAIntroduction>(`/admin/client-introductions/${encodeURIComponent(id)}/stage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stage})}),
-  adminSubmitOrderProof: (id:string,evidence_reference:string) => request<HHBAOrderClaim>(`/admin/client-introductions/${encodeURIComponent(id)}/order-proof`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({evidence_reference})}),
-  adminVerifyOrderProof: (id:string,accepted:boolean,reason:string) => request<HHBAOrderClaim>(`/admin/order-proofs/${encodeURIComponent(id)}/verify`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accepted,reason})}),
-  employerGrowthProfile: (oid:string) => request<HHBAPublicGrowthProfile>(`/public/organizations/${encodeURIComponent(oid)}/growth-profile`),
-  employerGrowthVersions: (oid:string) => request<{items:HHBAPublicVersion[]}>(`/public/organizations/${encodeURIComponent(oid)}/growth-profile/versions`),
-  adminPreparePublication: (organization_id:string,scoring_run_id:string) => request<HHBAPublicationCase>('/admin/publication/prepare',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,scoring_run_id})}),
-  adminPublicationQueue: () => request<{items:HHBAPublicationCase[]}>('/admin/publication/queue'),
-  adminPublicationDecision: (id:string,decision:'approve'|'reject',reason:string) => request<HHBAPublicationCase>(`/admin/publication/${encodeURIComponent(id)}/decision`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision,reason})}),
-  adminPublicationRevoke: (id:string,reason:string) => request<HHBAPublicationCase>(`/admin/publication/${encodeURIComponent(id)}/revoke`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason})}),
-  submitEmployerImprovement: (oid:string,data:{evidence_id:string;title:string;description:string;effective_date:string}) => request<HHBAImprovement>(`/organizations/${encodeURIComponent(oid)}/improvements`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}),
-  employerImprovements: (oid:string) => request<{items:HHBAImprovement[]}>(`/organizations/${encodeURIComponent(oid)}/improvements`),
-  publicEmployerImprovements: (oid:string) => request<{items:PublicHHBAImprovement[];notice:string}>(`/public/organizations/${encodeURIComponent(oid)}/improvements`),
-  clarifyEmployerImprovement: (oid:string,id:string,clarification:string) => request<HHBAImprovement>(`/organizations/${encodeURIComponent(oid)}/improvements/${encodeURIComponent(id)}/clarify`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clarification})}),
-  adminImprovementQueue: () => request<{items:HHBAImprovement[]}>('/admin/improvements'),
-  adminReviewImprovement: (id:string,body:{decision:'approved'|'needs_more_info'|'rejected';reason:string;public_summary:string|null;privacy_checked:boolean}) => request<HHBAImprovement>(`/admin/improvements/${encodeURIComponent(id)}/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),
-  adminRevokeImprovement: (id:string,reason:string) => request<HHBAImprovement>(`/admin/improvements/${encodeURIComponent(id)}/revoke`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason})}),
-  submitEmployerAppeal: (organization_id:string,target_type:'evidence'|'scoring_run',target_id:string,issue:string,explanation:string) => request<HHBAAppeal>('/employer/appeals',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,target_type,target_id,issue,explanation})}),
-  employerAppeals: (organization_id:string) => request<{items:HHBAAppeal[]}>(`/organizations/${encodeURIComponent(organization_id)}/appeals`),
-  clarifyEmployerAppeal: (organization_id:string,appeal_id:string,explanation:string) => request<HHBAAppeal>(`/organizations/${encodeURIComponent(organization_id)}/appeals/${encodeURIComponent(appeal_id)}/clarify`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({explanation})}),
-  submitEmployeePrivacyConcern: (organization_id:string,issue:string) => request<HHBAAppeal>('/employee/privacy-concerns',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,issue})}),
-  employeePrivacyConcerns: () => request<{items:HHBAAppeal[]}>('/employee/my-privacy-concerns'),
-  adminAppealsQueue: () => request<{items:HHBAAppeal[]}>('/admin/appeals'),
-  adminAppealsDecision: (id:string,decision:'needs_more_info'|'rejected'|'correction_required',reason:string) => request<HHBAAppeal>(`/admin/appeals/${encodeURIComponent(id)}/decisions`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision,reason})}),
-  publicEmployerScoreStatus: (oid:string) => request<{trust:{status:string;score:null};care:{status:string;score:null};rule_version:string;publication:string;notice:string}>(`/public/organizations/${encodeURIComponent(oid)}/scores`),
-  adminCreateScoreFinding: (organization_id:string,evidence_id:string,score:number,reason:string) => request<{id:string;category:string;assessed_score:number}>(`/admin/scoring/assessments`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,evidence_id,score,reason})}),
-  adminRecalculateScores: (oid:string) => request<PrivateScoringRun>(`/admin/scoring/organizations/${encodeURIComponent(oid)}/calculate`,{method:'POST'}),
-  adminLatestScoreRun: (oid:string) => request<PrivateScoringRun>(`/admin/scoring/organizations/${encodeURIComponent(oid)}/latest`),
-  employerEvidence: (oid:string) => request<{items:EmployerEvidence[]}>(`/organizations/${encodeURIComponent(oid)}/evidence`),
-  submitEmployerEvidence: (oid:string,category:EmployerEvidenceCategory,statement:string,file:File) => {
-    const body=new FormData();
-    body.append('category',category);
-    body.append('statement',statement);
-    body.append('file',file,file.name);
-    return request<EmployerEvidence>(`/organizations/${encodeURIComponent(oid)}/evidence`,{method:'POST',body});
-  },
-  adminPendingEmployerEvidence: () => request<{items:EmployerEvidence[]}>('/admin/evidence'),
-  adminReviewEvidence: (evidenceId:string,decision:'verified'|'needs_more_info'|'rejected',reason:string) => request<EmployerEvidence>(`/admin/evidence/${encodeURIComponent(evidenceId)}/reviews`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision,reason})}),
-  publicEmployerJobs: (search:string='',offset=0) => request<EmployerPublicJobs>(`/public/employer-postings?q=${encodeURIComponent(search)}&offset=${offset}&limit=20`),
-  applicationPreview: (postingId:string) => request<CandidateJobPreview>(`/me/employer-applications/preview/${encodeURIComponent(postingId.replace(/^employer-/,''))}`),
-  applyEmployerJob: (postingId:string,confirmed_share:boolean,cover_note:string) => request<{id:string;status:string;notice:string}>(`/me/employer-applications/${encodeURIComponent(postingId.replace(/^employer-/,''))}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirmed_share,cover_note})}),
-  myEmployerApplications: () => request<{items:CandidateJobApplication[]}>('/me/employer-applications'),
-  withdrawEmployerApplication: (id:string) => request<{id:string;status:string}>(`/me/employer-applications/${encodeURIComponent(id)}/withdraw`,{method:'POST'}),
-  employerRecruitmentResponsibilities: (oid:string,pid:string) => request<RecruitmentResponsibilityQueue>(`/organizations/${encodeURIComponent(oid)}/postings/${encodeURIComponent(pid.replace(/^employer-/,''))}/recruitment-responsibilities`),
-  myRecruitmentResponsibilities: () => request<RecruitmentResponsibilityQueue>('/me/recruitment-responsibilities'),
-  adminRecruitmentResponsibilities: () => request<RecruitmentResponsibilityQueue>('/admin/recruitment-responsibilities?view=overdue'),
-  employerJobApplications: (oid:string,postingId:string) => request<{items:EmployerJobApplication[]}>(`/organizations/${encodeURIComponent(oid)}/postings/${encodeURIComponent(postingId.replace(/^employer-/,''))}/applications`),
-  updateEmployerApplicationStatus: (oid:string,postingId:string,id:string,status:ApplicationStage,expected_status:ApplicationStage) => request<{id:string;status:string}>(`/organizations/${encodeURIComponent(oid)}/postings/${encodeURIComponent(postingId.replace(/^employer-/,''))}/applications/${encodeURIComponent(id)}/status`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status,expected_status})}),
-
-  publicEmployerJob: (id:string) => request<PublicEmployerJob>(`/public/employer-postings/${encodeURIComponent(id.replace(/^employer-/,''))}`),
-  adminPendingPostings: () => request<{items:EmployerPosting[]}>('/admin/employer-postings'),
-  adminPostingReview: (id:string,decision:'approved'|'rejected',reason_code:string) => request<{status:string}>(`/admin/employer-postings/${id.replace(/^employer-/,'')}/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision,reason_code})}),
-  adminOrgVerificationQueue: () => request<EmployerVerificationQueue>('/admin/verification/organizations?status=submitted'),
-  adminOrgVerificationDetail: (id:string) => request<EmployerVerificationAdminDetail>(`/admin/verification/organizations/${id}`),
-  adminMarkDocumentSecurity: (id:string,status:'clean'|'rejected',reason_code:string) => request<{id:string;security_status:string}>(`/admin/verification/documents/${id}/security-assessment`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status,reason_code})}),
-  adminReviewOrgVerification: (oid:string,body:{status:'need_more_info'|'approved'|'rejected';reason_code:string;expected_revision:number;evidence_snapshot_id:string;entity_verification:'manual_verified'|'not_verified';representative_verification:'manual_verified'|'not_verified';authorization_verification:'manual_verified'|'not_verified';valid_days:number}) => request<{status:string;organization_status:string}>(`/admin/verification/organizations/${oid}/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),
-
-  adminVerificationQueue: () => request<{items:{organization_id:string;legal_name:string;status:string;revision:number;submitted_at?:string;representative_name?:string;evidence_snapshot_id?:string}[]}>('/admin/verification/organizations'),
-  adminVerificationDetail: (oid:string) => request<{verification:Verification;evidence_snapshot:{id:string;evidence_version:number;manifest_sha256:string}|null;reviews:{outcome:string;reason_code:string}[]}>(`/admin/verification/organizations/${oid}`),
-  adminReviewPosting: (id:string,decision:'approved'|'rejected',reason_code:string) => request<{status:string}>(`/admin/employer-postings/${id.replace(/^employer-/,'')}/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision,reason_code})}),
-
 
 };
 
