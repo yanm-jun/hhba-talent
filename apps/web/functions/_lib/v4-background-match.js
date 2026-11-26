@@ -15,6 +15,7 @@ export async function scheduleBackgroundMatch(env,session,task,{diagnostic=false
  if(!r.ok){const data=await r.json().catch(()=>null);if(data?.terminal_failure===true)return diagnostic?{status:'FAILED',error:typeof data.error==='string'&&/^AI_[A-Z0-9_]{3,90}$/.test(data.error)?data.error:'AI_BACKGROUND_EXECUTION_FAILED'}:'FAILED';throw taskError('AI_BACKGROUND_SCHEDULE_UNAVAILABLE',503);}
  const result=await r.json().catch(()=>null);
  if(result?.ok!==true)throw taskError('AI_BACKGROUND_SCHEDULE_UNAVAILABLE',503);
+ if(diagnostic&&result.recovering===true)return {status:'RECOVERING',error:typeof result.error==='string'&&/^AI_[A-Z0-9_]{3,90}$/.test(result.error)?result.error:'AI_BACKGROUND_RECOVERING'};
  return true;
 }
 // Fall back only to the existing authorized checkpoint driver. No duplicate
