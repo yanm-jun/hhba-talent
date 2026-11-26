@@ -26,6 +26,7 @@ import {isV4TerminalTaskFailure,terminalV4SavedFailure,retryableV4SavedFailure,n
 import {v4ManagedResourceBudget,phaseModelReplay,PHASE_YIELD} from '../../_lib/v4-phase-budget.js';
 import {createV4ProgressPublisher} from '../../_lib/v4-progress-publisher.js';
 import {createV4DeliveryTelemetry} from '../../_lib/v4-live-delivery-telemetry.js';
+import {createV4SearchSpeedTracker,recordV4SearchSpeed} from '../../_lib/v4-search-speed.js';
 import {v4DiscoveryCandidateKey} from '../../_lib/v4-discovery-candidate-events.js';
 import {discoveryRecoverySnapshot,restoreDiscoveryRecovery} from '../../_lib/v4-discovery-recovery.js';
 import {reportRecoverySnapshot,restoreReportRecovery} from '../../_lib/v4-report-recovery.js';
@@ -96,8 +97,9 @@ function events(env,request,input,waitUntil){
    const officialJob=j=>allowedJob(j)&&qualifiedReport(j);
    let lastReport=input.savedProgress?.report,latestActivity=input.savedProgress?.activity,lastJobs=input.savedProgress?.jobs||[];
    const jobJournal=createV4JobEventJournal(input.savedProgress?.job_events);
+   const searchSpeed=createV4SearchSpeedTracker({previous:input.savedProgress?.search_speed,savedJobs:lastJobs});
    const initialEventSequence=Math.max(0,...(input.savedProgress?.job_events||[]).map(e=>Number.isSafeInteger(e?.seq)?e.seq:0));
-   const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:[...lastJobs],job_events:jobJournal.snapshot()});
+   const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:[...lastJobs],job_events:jobJournal.snapshot(),search_speed:searchSpeed.snapshot()});
     let reportRecovery;
     const captureTime=()=>Date.now();
    const seenResults={candidate:new Set(lastJobs.map(j=>j.official_url)),jd:new Set(lastJobs.filter(j=>j.jd_source_status==='VERIFIED_JD').map(j=>j.official_url)),score:new Set(lastJobs.filter(j=>Number.isInteger(j.match_score)).map(j=>j.official_url)),report:new Set(lastJobs.filter(officialJob).map(j=>j.official_url))};
@@ -145,7 +147,7 @@ function events(env,request,input,waitUntil){
    const publishedCandidateKeys=new Set(lastJobs.map(j=>v4DiscoveryCandidateKey(j.official_url)).filter(Boolean));
    let currentCandidateKeys=new Set(publishedCandidateKeys);
    const rememberJobs=matches=>{
-    for(const j of matches.filter(j=>allowedJob(j)&&!j.excluded_closed)){const u=j.official_url;observeResult('candidate',u);if(j.jd_source_status==='VERIFIED_JD')observeResult('jd',u);if(Number.isInteger(j.match_score))observeResult('score',u);if(officialJob(j))observeResult('report',u);}
+    for(const j of matches.filter(j=>allowedJob(j)&&!j.excluded_closed)){searchSpeed.observe(j);const u=j.official_url;observeResult('candidate',u);if(j.jd_source_status==='VERIFIED_JD')observeResult('jd',u);if(Number.isInteger(j.match_score))observeResult('score',u);if(officialJob(j))observeResult('report',u);}
     // The progress object is encrypted and bound to this authorized task.
     // Keep independently researched intermediate results as well as reports.
     // Merge same-task evidence only for a currently present identity; absent or
@@ -173,7 +175,7 @@ function events(env,request,input,waitUntil){
     if(!['delta','done','source_read'].includes(meta?.source))return;
     const j=event?.candidate,key=v4DiscoveryCandidateKey(j?.official_url);
     if(!key||!allowedJob(j)||currentCandidateKeys.has(key)||leaseAbort.signal.aborted)return;
-    currentCandidateKeys.add(key);publishedCandidateKeys.add(key);observeResult('candidate',key);
+    currentCandidateKeys.add(key);publishedCandidateKeys.add(key);searchSpeed.observe({...j,official_url:key});observeResult('candidate',key);
     lastJobs.push({
      id:'v4-live:'+key,company:j.company,title:j.title,location:j.location,official_url:key,
      platform:'招聘来源（企业官网待核实）',source:meta?.source==='source_read'?'公开招聘页读取候选':'AI搜索候选',remote:false,reference_score:0,match_score:null,
@@ -341,7 +343,10 @@ function events(env,request,input,waitUntil){
      if(input.claim&&(!succeeded||closed))await input.claim.release().catch(()=>console.warn('HHBA_CHECKPOINT_RELEASE_FAILED'));
      if(succeeded&&!closed&&input.pointer)await deleteMatchCheckpoint(env,input.pointer).catch(()=>console.warn('HHBA_CHECKPOINT_CLEANUP_FAILED'));
      await usageBuffer?.flush();
-     if(input.managed){const snapshot=delivery.snapshot();await recordV4PhaseOps(env.HHBA_METRICS_DB,v4PhaseMetricSample({started,lane:input.backgroundLane||'mixed',outcome:metricOutcome,error:metricError,recovering:!!input.recovering,first:snapshot.first,resources:budget?.snapshot(),events:jobJournal.snapshot().filter(e=>e.seq>initialEventSequence)}));}
+     if(input.managed){const snapshot=delivery.snapshot();await recordV4PhaseOps(env.HHBA_METRICS_DB,v4PhaseMetricSample({started,lane:input.backgroundLane||'mixed',outcome:metricOutcome,error:metricError,recovering:!!input.recovering,first:snapshot.first,resources:budget?.snapshot(),events:jobJournal.snapshot().filter(e=>e.seq>initialEventSequence)}));
+      // Privacy-preserving cross-invocation measurements; never part of a research admission gate.
+      await recordV4SearchSpeed(env.HHBA_METRICS_DB,searchSpeed.snapshot(),metricOutcome);
+     }
      if(!closed){closed=true;try{controller.close()}catch{}}
     }
    })();
