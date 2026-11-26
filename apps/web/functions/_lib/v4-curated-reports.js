@@ -77,6 +77,17 @@ export function referenceSourceErrors(value,job){
  return errors;
 }
 
+// Evaluate the material independently of the candidate's assessment. A good
+// public-source reference does not become invalid just because scoring failed.
+export function referenceMaterialErrors(value,job){
+ const reference=str(value?.reference_jd),basis=str(value?.reference_basis);
+ if(!reference||!basis)return ['reference_material_missing'];
+ const review=value.reference_material_review||value.quality_review;
+ // Reuse the existing exact duties/capabilities span and self-review checks;
+ // comparison evidence belongs to the separate score/report gate.
+ return [...reportCoverageErrors({...value,suitable:true,quality_review:review,comparisons:[{}]},reference,{reference:true}),...referenceSourceErrors(value,job)];
+}
+
 export function rankCandidateUrls(payload,rows){
  const ordered=Array.isArray(payload?.ordered_urls)?payload.ordered_urls:[];
  const keys=new Set(rows.map(([url])=>url)),seen=new Set();
