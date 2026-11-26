@@ -39,11 +39,18 @@ export function pipelineWidths(checkpoint,pending){
  const verification=Math.max(1,Math.min(pending,desired,previous));
  return {verification,discovery:Math.max(1,Math.min(width,5-verification))};
 }
-export function verificationSnapshot(checkpoint,width=1){
+// A window can refill idle lanes while the discovery sibling is still running.
+// Only grow on measured cheap work; connection width remains independently bounded.
+export function pipelineVerificationWindow(checkpoint,pending,width){
+ const cost=checkpoint.pipelineVerificationCost;
+ if(!Number.isFinite(cost)||cost<=0||cost>4||pending<=width)return Math.min(pending,width);
+ return Math.min(pending,width*2,Math.max(width,Math.floor(20/cost)));
+}
+export function verificationSnapshot(checkpoint,width=1,window=width){
  const prior=checkpoint.priorState||{};
  return {...structuredClone(checkpoint),phase:'verification',next:0,
   // Share transport slots with discovery; final verification has its own batches.
-  verificationBatch:width,matches:structuredClone(prior.matches||[]),read:prior.read||0,scored:prior.scored||0,archived:prior.archived||0,scoreFailures:prior.scoreFailures||0,reportFailures:prior.reportFailures||0,priorState:null};
+  verificationBatch:window,verificationLaneWidth:width,matches:structuredClone(prior.matches||[]),read:prior.read||0,scored:prior.scored||0,archived:prior.archived||0,scoreFailures:prior.scoreFailures||0,reportFailures:prior.reportFailures||0,priorState:null};
 }
 const counters=['read','scored','archived','scoreFailures','reportFailures'];
 export function mergePipelineCheckpoint(original,discovery,verification,attempted,{verificationIncomplete=false}={}){
@@ -53,7 +60,10 @@ export function mergePipelineCheckpoint(original,discovery,verification,attempte
  const rechecks=new Set(next.explicitRechecks||[]);
  const originalRechecks=new Set(original.explicitRechecks||[]);
  const verifiedRevisions=new Map(verification.processedEvidence||[]);
- const completed=verificationIncomplete?attempted.filter(([u,j])=>(verification.processedEarlier||[]).includes(u)&&verifiedRevisions.get(u)===candidateRevision(j)):attempted;
+ // A successful phase may yield before the whole window is admitted. Its next
+ // cursor is the actual completed prefix. A failed phase uses only durable
+ // evidence; explicit rechecks still pending must not be counted as completed.
+ const completed=verificationIncomplete?attempted.filter(([u,j])=>(verification.processedEarlier||[]).includes(u)&&verifiedRevisions.get(u)===candidateRevision(j)&&!(verification.explicitRechecks||[]).includes(u)):verification.phase==='verification'&&Number.isSafeInteger(verification.next)&&verification.next>0?attempted.slice(0,verification.next):attempted;
  const completedUrls=new Set(completed.map(([u])=>u)),deferred=new Set(next.verificationDeferred||[]);
  for(const [u] of attempted){if(completedUrls.has(u))deferred.delete(u);else if(verificationIncomplete)deferred.add(u);}
  next.verificationDeferred=[...deferred];
