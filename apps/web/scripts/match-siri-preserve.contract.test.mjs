@@ -44,7 +44,7 @@ test('homepage & candidate workbench keep original matcher route and PDF/DOCX fl
  assert.match(page,/matched=await submitExtractedResumeText\(searchText,searchOptions,consent,abort\.signal,matchResumeId\|\|undefined,/);
  assert.match(page,/setOptimizationSource\(redactResumeTextLocally\(searchText\)\)/);
  assert.match(page,/sourceText=\{optimizationSource\|\|undefined\}/);
- assert.match(page,/sourceResume=\{result&&savedId\?savedFiles\.find/);
+ assert.match(page,/sourceResume=\{savedId\?savedFiles\.find/);
  assert.match(page,/embedded=\{embedded\|\|hosted\}/);
 });
 
