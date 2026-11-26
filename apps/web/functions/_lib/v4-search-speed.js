@@ -16,6 +16,9 @@ export function createV4SearchSpeedTracker({previous=null,savedJobs=[],now=Date.
  const started=Number.isSafeInteger(previous?.started_at_ms)&&previous.started_at_ms>0?previous.started_at_ms:now();
  const id=typeof previous?.run_id==='string'&&/^[0-9a-f-]{36}$/i.test(previous.run_id)?previous.run_id:newId();
  const keys=new Set((savedJobs||[]).map(keyOf).filter(Boolean));
+ // An already-running task may predate the tracker. Its original start was
+ // never observed: retain task-local progress but exclude it from aggregates.
+ const partialAtStart=previous?.partial_at_start===true||(!previous&&keys.size>0);
  let observed=Math.max(keys.size,count(previous?.observed_unique));
  const milestoneMs={};
  for(const threshold of V4_SEARCH_MILESTONES){
@@ -34,13 +37,13 @@ export function createV4SearchSpeedTracker({previous=null,savedJobs=[],now=Date.
    for(const n of V4_SEARCH_MILESTONES)if(beforeCount<n&&observed>=n&&!Object.hasOwn(milestoneMs,n))milestoneMs[n]=ms;
    return true;
   },
-  snapshot:()=>({run_id:id,started_at_ms:started,observed_unique:observed,milestones:{...milestoneMs}})
+  snapshot:()=>({run_id:id,started_at_ms:started,observed_unique:observed,partial_at_start:partialAtStart,milestones:{...milestoneMs}})
  };
 }
 
 const column=n=>'milestone_'+n+'_ms';
 export async function recordV4SearchSpeed(db,snapshot,status,now=Date.now()){
- if(!db?.prepare||!snapshot||typeof snapshot.run_id!=='string')return false;
+ if(!db?.prepare||!snapshot||typeof snapshot.run_id!=='string'||snapshot.partial_at_start===true)return false;
  if(!/^[0-9a-f-]{36}$/i.test(snapshot.run_id))return false;
  try{
   const columns=['run_id','day','status','observed_unique',...V4_SEARCH_MILESTONES.map(column),'updated_at_ms'];
