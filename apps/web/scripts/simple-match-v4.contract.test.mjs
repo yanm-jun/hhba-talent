@@ -1059,3 +1059,119 @@ test('nonpublic or failed employer proof reads are not retained',async()=>{
  const check=()=>v4EmployerAuthorization(target,'新企业集团',proof,{fetcher,proofCache});
  assert.equal(await check(),false);assert.equal(await check(),true);assert.equal(await check(),true);assert.equal(reads,3);
 });
+
+
+test('V4 incremental discovery parses only complete direct job objects, across arbitrary JSON splits',async()=>{
+ const {createV4JobArrayParser,normalizeV4StreamCandidate}=await import('../functions/_lib/v4-stream-job-parser.js');
+ const first={...row,title:'区域运营「{门店}」"负责人"\\渠道',requirements:'岗位说明包含 }、[、"jobs": [，不应误判',meta:{nested:[{x:'}"\\'}]}};
+ const second={...row,title:'区域运营二',url:'https://careers.other-motors.cn/jobs/002'};
+ const found=[];
+ const p=createV4JobArrayParser(x=>found.push(x));
+ const prefix='   '+'{"notes":'+JSON.stringify('伪造的 "jobs": [{...}]')+',"irrelevant":{"jobs":['+JSON.stringify(second)+']},"data":{"jobs":[';
+ for(const c of prefix+JSON.stringify(first).slice(0,-1))p.push(c);
+ assert.equal(found.length,0);
+ p.push('}');
+ assert.deepEqual(found,[first]);
+ for(const c of ','+JSON.stringify(second)+']},"more":true}')p.push(c);
+ assert.deepEqual(found,[first,second]);
+ const normalized=normalizeV4StreamCandidate(first);
+ assert.equal(normalized.title,first.title);
+ assert.equal(normalized.url,first.url);
+ for(const name of ['score','preliminary_score','fit_summary','reason','resume_quote','jd_quote','matched','meta'])assert.equal(Object.hasOwn(normalized,name),false,name);
+ assert.equal(normalizeV4StreamCandidate({...first,location:''}),null);
+ assert.equal(normalizeV4StreamCandidate({...first,url:'https://localhost/jobs/1'}),null);
+ assert.equal(normalizeV4StreamCandidate({...first,url:'https://www.zhipin.com/job_detail/12345.html'}),null);
+});
+
+test('V4 incremental JSON grammar ignores nested and incomplete records and rejects malformed objects',async()=>{
+ const {createV4JobArrayParser}=await import('../functions/_lib/v4-stream-job-parser.js');
+ const found=[];
+ const p=createV4JobArrayParser(x=>found.push(x));
+ p.push('{"jobs":[null,42,["ignore",'+JSON.stringify(row)+'],{"company":"bad",}]');
+ assert.deepEqual(found,[]);
+ const q=createV4JobArrayParser(x=>found.push(x));
+ q.push('{"jobs":['+JSON.stringify(row)+',{"company":"incomplete');
+ assert.deepEqual(found,[row]);
+ const r=createV4JobArrayParser(x=>found.push(x));
+ r.push('{"result":{"job_list":['+JSON.stringify(row)+']}}');
+ assert.deepEqual(found,[row,row]);
+});
+
+test('V4 discovery observer isolates output channels and deduplicates terminal reconciliation',async()=>{
+ const {createV4DiscoveryJobObserver}=await import('../functions/_lib/v4-stream-job-parser.js');
+ const received=[],observer=createV4DiscoveryJobObserver(job=>received.push(job));
+ const other={...row,title:'岗位二',url:'https://careers.other-motors.cn/jobs/002'};
+ const a='{"jobs":['+JSON.stringify(row)+']}';
+ const b='{"jobs":['+JSON.stringify(other)+']}';
+ const delta=(output_index,content_index,text)=>observer.event({type:'response.output_text.delta',output_index,content_index,delta:text});
+ delta(0,0,a.slice(0,20));delta(1,0,b.slice(0,12));
+ observer.event({type:'response.reasoning_text.delta',delta:a});
+ delta(0,0,a.slice(20));
+ assert.deepEqual(received.map(j=>j.url),[url]);
+ delta(1,0,b.slice(12));
+ assert.deepEqual(received.map(j=>j.url),[url,other.url]);
+ observer.event({type:'response.output_text.done',output_index:0,content_index:0,text:a});
+ observer.response({output:[{type:'reasoning',content:[{type:'output_text',text:'{"jobs":['+JSON.stringify({...other,url:'https://careers.other-motors.cn/jobs/ignored'})+']}'}]},
+  {type:'message',content:[{type:'output_text',text:JSON.stringify({jobs:[{...row,url:url+'?utm_source=duplicate'},other]})}]}]});
+ assert.equal(received.length,2);
+});
+
+test('V4 discovery transport emits complete candidates before terminal SSE, with UTF-8 and CRLF split at every byte', {timeout:4000},async()=>{
+ const received=[],eventTypes=[];
+ const other={...row,title:'第二个岗位',url:'https://careers.other-motors.cn/jobs/002'};
+ const raw=JSON.stringify({jobs:[row,other]});
+ const firstEnd='{"jobs":['.length+JSON.stringify(row).length;
+ const final={status:'completed',output:[{type:'message',content:[{type:'output_text',text:raw}]}]};
+ const enc=new TextEncoder();
+ let controller;
+ const stream=new ReadableStream({start(c){controller=c;}});
+ const send=event=>{
+  const bytes=enc.encode('data: '+JSON.stringify(event)+'\r\n\r\n');
+  for(const byte of bytes)controller.enqueue(Uint8Array.of(byte));
+ };
+ let notifyFirst;const first=new Promise(resolve=>{notifyFirst=resolve;});
+ const pending=v4Call(async()=>new Response(stream,{headers:{'content-type':'text/event-stream'}}),
+  {...provider,stream:true},{input:'synthetic'},{stage:'discovery',onEvent:e=>eventTypes.push(e),onDiscoveryJob:j=>{received.push(j);if(received.length===1)notifyFirst();}});
+ let timer;
+ try{
+  send({type:'response.output_text.delta',output_index:0,content_index:0,delta:raw.slice(0,firstEnd-1)});
+  send({type:'response.output_text.delta',output_index:0,content_index:0,delta:raw.slice(firstEnd-1,firstEnd)});
+  await Promise.race([first,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('first job did not arrive before terminal event')),1500);})]);
+  assert.deepEqual(received.map(j=>j.url),[url]);
+  send({type:'response.output_text.delta',output_index:0,content_index:0,delta:raw.slice(firstEnd)});
+  send({type:'response.output_text.done',output_index:0,content_index:0,text:raw});
+  send({type:'response.completed',response:final});
+  assert.deepEqual(await pending,final);
+  assert.deepEqual(received.map(j=>j.url),[url,other.url]);
+  assert.ok(eventTypes.every(e=>typeof e==='string'));
+ }finally{clearTimeout(timer);try{controller.close();}catch{}await pending.catch(()=>{});}
+});
+
+test('V4 discovery transport reconciles JSON fallback and replay but does not emit other model stages',async()=>{
+ const received=[],attempts=[];
+ const p={...provider,stream:true};
+ const payload={input:'synthetic'};
+ const fallback=await v4Call(async(_u,opts)=>{
+  attempts.push(JSON.parse(opts.body).stream);
+  return attempts.length===1?new Response('stream not supported',{status:400}):model({jobs:[row,row]});
+ },p,payload,{stage:'discovery',onDiscoveryJob:j=>received.push(j)});
+ assert.deepEqual(attempts,[true,false]);assert.equal(received.length,1);
+ let replayCalls=0;
+ await v4Call(async()=>{replayCalls++;throw Error('replay should not call provider');},
+  {...p,phaseReplay:{take:()=>fallback}},payload,{stage:'discovery',onDiscoveryJob:j=>received.push(j)});
+ assert.equal(replayCalls,0);assert.equal(received.length,2);
+ await v4Call(async()=>model({jobs:[row]}),p,payload,{stage:'profile',onDiscoveryJob:j=>received.push(j)});
+ assert.equal(received.length,2);
+});
+
+test('V4 stream interruption retains emitted lead without accepting a truncated response as completed',async()=>{
+ const received=[];
+ const partial='{"jobs":['+JSON.stringify(row)+',{"company":"half';
+ const event='data: '+JSON.stringify({type:'response.output_text.delta',delta:partial})+'\n\n';
+ await assert.rejects(v4Call(async()=>new Response(event,{headers:{'content-type':'text/event-stream'}}),
+  {...provider,stream:true},{input:'synthetic'},{stage:'discovery',onDiscoveryJob:j=>received.push(j)}),/AI_PROVIDER_RESPONSE_INVALID/);
+ assert.deepEqual(received.map(j=>j.url),[url]);
+ const full={status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify({jobs:[row]})}]}]};
+ const result=await v4Call(async()=>Response.json(full),provider,{input:'synthetic'},{stage:'discovery',onDiscoveryJob:()=>{throw Error('observer failure');}});
+ assert.deepEqual(result,full);
+});
