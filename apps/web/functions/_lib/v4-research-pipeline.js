@@ -101,3 +101,16 @@ export function mergePipelineCheckpoint(original,discovery,verification,attempte
  else throw Error('PIPELINE_DISCOVERY_PHASE_INVALID');
  return next;
 }
+
+// Optional one-lane read-ahead. Pending jobs stay in the ordinary candidate
+// pool when admission closes. Never make this optimization a completion gate.
+export function discoveryReadAhead(read,{canStart=()=>true,signal}={}){
+ const queue=new Map(),seen=new Set();let active=null,closed=false;
+ function pump(){
+  if(active||closed||signal?.aborted||!canStart()||!queue.size)return;
+  const [key,item]=queue.entries().next().value;queue.delete(key);seen.add(key);
+  active=Promise.resolve().then(()=>read(item)).catch(()=>{}).finally(()=>{active=null;pump();});
+ }
+ return {offer(key,item){if(closed||seen.has(key))return;queue.set(key,item);pump();},
+  async close(){closed=true;queue.clear();if(active)await active;}};
+}

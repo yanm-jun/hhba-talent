@@ -14,7 +14,7 @@ import {v4AcceptResearchDigest,V4_DIGEST_GUIDE,v4ResearchMemoryPage,v4ContextSta
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch} from './v4-jd-research.js';
 import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery,runReadyWork} from './v4-parallel-discovery.js';
-import {candidateRevision,candidateResearchMemory,pendingVerification,verificationSnapshot,mergePipelineCheckpoint,pipelineWidths,pipelineVerificationWindow} from './v4-research-pipeline.js';
+import {candidateRevision,candidateResearchMemory,pendingVerification,verificationSnapshot,mergePipelineCheckpoint,pipelineWidths,pipelineVerificationWindow,discoveryReadAhead} from './v4-research-pipeline.js';
 import {makeBatchScorer} from './v4-batch-scoring.js';
 import {managedWorkPlan,managedWorkSample} from './v4-phase-budget.js';
 import {completeJdSpan,looksTruncatedJd} from './v4-jd-completeness.js';
@@ -737,13 +737,15 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const candidateMemory=()=>[...rows.entries()].map(([url,j])=>({url,company:j.company,title:j.title,location:j.location}));
  const unresolvedMemory=()=>priorState?priorState.matches.filter(j=>(!eligibleCuratedScore(j)&&j.curated_suitable!==false)||j.report_status==='UNAVAILABLE').map(j=>({url:j.research_candidate_url||j.official_url,official_url:j.official_url,company:j.company,title:j.title,location:j.location,score:j.match_score,reason:j.score_basis})):[];
  const candidateEvidence=candidateRevision;
+ const discoveryReads=new Map(checkpoint?.verificationReads||[]);
+ const reusableReads=sourceRows=>[...discoveryReads].filter(([u,r])=>sourceRows.has(u)&&!rejectedBoards.has(u)&&r.revision===candidateEvidence(sourceRows.get(u)));
  const priorState=checkpoint?.priorState||null;
  const backfillSignature=checkpoint?.backfillSignature||'';
  const reviewedOutcomes=new Set(checkpoint?.reviewedOutcomes||[]);
  let completionReason=checkpoint?.completionReason||'';
  const note=code=>{diag[code]=(diag[code]||0)+1;};
  const publishResearch=()=>onResearch(report());
- const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,verificationReads:checkpoint?.verificationReads||[],rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],stallSourceReads:[...stallSourceReads],researchToolResult,researchNotes,researchDigest,candidateResearchMemory:jobMemory.snapshot(),researchContextBudget,researchContext,memoryCursors,discoveryWidth,discoveryElapsed,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,verificationDeferred:checkpoint?.verificationDeferred||[],pipelineActive:!!checkpoint?.pipelineActive,pipelineVerificationWidth:checkpoint?.pipelineVerificationWidth,pipelineVerificationCost:checkpoint?.pipelineVerificationCost,managedVerification:checkpoint?.managedVerification,managedReport:checkpoint?.managedReport,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],scoreRecoveryKeys:checkpoint?.scoreRecoveryKeys||[],scoreRecoveryModes:checkpoint?.scoreRecoveryModes||[],globalOrder:checkpoint?.globalOrder||null,globalRankState:checkpoint?.globalRankState||null,globalRankError:checkpoint?.globalRankError||null,...extra}});
+ const continuation=(phase,extra={})=>({status:'CONTINUE',checkpoint:{phase,verificationReads:reusableReads(rows),rows:[...rows],toolUrls:[...toolUrls],profile,round,researchError,recoveryHint,lastSignature,stalledStrategy,providerRecovery,rejectedBoards:[...rejectedBoards],rounds,diagnostics:diag,stalledSearches:[...stalledSearches],reviewedStalls:[...reviewedStalls],completionReason,processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],recheckedEvidence:[...recheckedEvidence],actionSeen:[...actionSeen],stallSourceReads:[...stallSourceReads],researchToolResult,researchNotes,researchDigest,candidateResearchMemory:jobMemory.snapshot(),researchContextBudget,researchContext,memoryCursors,discoveryWidth,discoveryElapsed,searchResumePaged,searchResumeOffset,sourceLeads:[...sourceLeads],submittedSources:[...submittedSources],reviewedSources:[...reviewedSources],publicEvidence,priorState,verificationDeferred:checkpoint?.verificationDeferred||[],pipelineActive:!!checkpoint?.pipelineActive,pipelineVerificationWidth:checkpoint?.pipelineVerificationWidth,pipelineVerificationCost:checkpoint?.pipelineVerificationCost,managedVerification:checkpoint?.managedVerification,managedReport:checkpoint?.managedReport,backfillSignature,reviewedOutcomes:[...reviewedOutcomes],scoreRecoveryKeys:checkpoint?.scoreRecoveryKeys||[],scoreRecoveryModes:checkpoint?.scoreRecoveryModes||[],globalOrder:checkpoint?.globalOrder||null,globalRankState:checkpoint?.globalRankState||null,globalRankError:checkpoint?.globalRankError||null,...extra}});
  onRecoveryState(()=>checkpoint?{...checkpoint,publicEvidence,researchNotes,researchDigest,candidateResearchMemory:jobMemory.snapshot()}:null);
  // This phase is reachable only after every candidate has completed a verification
  // attempt. Report generation cannot influence the initial score ranking.
@@ -1040,10 +1042,23 @@ export async function v4Match(fetcher,provider,resume,roleHint,
       for(const [url,j] of earlyRows)merged.set(url,{...merged.get(url),...j});
       cp.rows=[...merged];cp.sourceLeads=[...new Set([...cp.sourceLeads,...earlySources])];
       cp.toolUrls=[...new Set([...cp.toolUrls,...earlyToolUrls].filter(u=>merged.has(u)))];
+       cp.verificationReads=reusableReads(merged);
       return cp;
      };
      onRecoveryState(earlySnapshot);
-     const stageReady=(value,index)=>{
+      // Use a freed discovery lane only in the managed production path.
+      // The short timeout applies to speculative reading, not normal research.
+      const readAhead=resourceBudget&&fullResearch?discoveryReadAhead(async({url,job})=>{
+       try{
+        const readSignal=signal?AbortSignal.any([signal,AbortSignal.timeout(8000)]):AbortSignal.timeout(8000);
+        const jd=await v4ReadEmployerJob(url,{fetcher,signal:readSignal,expected:job});
+        if(!signal?.aborted&&jd?.source_confirmed===true&&jd.independently_read===true&&isOfficialJd(jd)&&sameIdentity(job.company,jd.company)&&sameIdentity(job.title,jd.title)&&sameCity(job.location,jd.location)){
+         discoveryReads.set(url,{revision:candidateEvidence(job),jd:{...jd,vacancy_confirmed:true},prefetched:true});
+         note('JD_DISCOVERY_PREFETCH_READY');
+        }
+       }catch{/* a failed prefetch is not a failed vacancy; normal research follows */}
+      },{signal,canStart:()=>!resourceBudget.denied&&resourceBudget.snapshot().soft-resourceBudget.used>=6}):null;
+     const stageReady=(value,index,remaining)=>{
       const reply=index===0?value:value.response;
       let result=index===0?null:value.data;
       if(index===0){try{result=v4ParseJson(reply);}catch{result={jobs:recoverV4PartialJobs(v4OutputText(reply))};}}
@@ -1058,6 +1073,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
        if(!concreteCandidate(compact)){earlySources.add(url);continue;}
        const fields=Object.fromEntries(Object.entries(compact).filter(([,v])=>v!==null&&v!==''&&v!==undefined&&(!Array.isArray(v)||v.length)));
        earlyRows.set(url,{...earlyRows.get(url),...fields});
+        if(readAhead&&remaining>0&&!rows.has(url)&&!discoveryReads.has(url)&&!explicitRechecks.has(url)&&cites.map(curatedUrl).includes(url))readAhead.offer(url,{url,job:earlyRows.get(url)});
        for(const proof of [compact.employer_proof_url,...compact.employer_proof_urls].map(v4PublicJobUrl).filter(Boolean))if(!isCommercialRecruitmentBoard(proof))earlySources.add(curatedUrl(proof));
       }
       for(const raw of cites){const url=curatedUrl(raw);if(!isCommercialRecruitmentBoard(url)&&!excluded.has(url)&&!rejectedBoards.has(url))earlyToolUrls.add(url);}
@@ -1069,7 +1085,9 @@ export async function v4Match(fetcher,provider,resume,roleHint,
       onPartial(mergeJobEvidence(priorState?.matches||[],previews));
       onActivity('searching','部分搜索 Agent 已返回，已暂存 '+cp.rows.length+' 个候选岗位，其他研究仍在进行。');
      };
-     const wave=await runDiscoveryWave(()=>v4Call(fetcher,provider,coordinatorPayload,{signal,onEvent:providerActivity,stage:'discovery'}),lane,width,signal,stageReady);
+     let wave;
+      try{wave=await runDiscoveryWave(()=>v4Call(fetcher,provider,coordinatorPayload,{signal,onEvent:providerActivity,stage:'discovery'}),lane,width,signal,stageReady);}
+      finally{await readAhead?.close();}
     discoveryWidth=nextDiscoveryWidth(width,wave.codes,adaptiveResearch?{maxConnections:checkpoint?.pipelineActive?4:6,elapsed:wave.elapsed,previousElapsed:checkpoint?.discoveryElapsed}:{});
     if(adaptiveResearch)discoveryElapsed=wave.elapsed;
     for(const code of wave.codes)note('PARALLEL_'+code);
@@ -1320,10 +1338,10 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // Retry cache is scoped to this exact authorized research and candidate revision.
  // Cache only successfully read, independently verified complete JDs; unresolved
  // sources are searched again and changed candidate revisions invalidate the entry.
- const verificationReads=new Map((checkpoint?.verificationReads||[]).filter(([u,r])=>rows.has(u)&&r.revision===candidateEvidence(rows.get(u))&&(isOfficialJd(r.jd)||r.jd?.vacancy_confirmed===true)));
- const cachedResults=new Map(entries.filter(([u])=>verificationReads.has(u)&&!explicitRechecks.has(u)).map(([u])=>[u,verificationReads.get(u).jd]));
+ const verificationReads=new Map(reusableReads(rows).filter(([u,r])=>(isOfficialJd(r.jd)||r.jd?.vacancy_confirmed===true)&&(!r.prefetched||(Number.isFinite(Date.parse(r.jd.checked_at))&&Date.now()-Date.parse(r.jd.checked_at)>=0&&Date.now()-Date.parse(r.jd.checked_at)<10*60000))));
+ const cachedResults=new Map(entries.filter(([u])=>verificationReads.has(u)&&!explicitRechecks.has(u)).map(([u])=>{const record=verificationReads.get(u);if(record.prefetched)note('JD_DISCOVERY_PREFETCH_REUSED');return [u,record.jd];}));
  if(curated&&checkpoint)onRecoveryState(()=>continuation('verification',{next:offset,matches:checkpoint.matches||[],read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures:checkpoint.reportFailures||0,verificationReads:[...verificationReads],verificationBatch:batchSize}).checkpoint);
- const readOptions={signal,onActivity,provider,curated,fullResearch,note,browser:env.BROWSER,ledger:publicEvidence,cachedResults,notesFor:jobNotes,forceRefresh:explicitRechecks,cacheBucket:jdArchiveConfigured(env)?env.HHBA_JOB_JD_R2:undefined,onRead:(u,jd)=>{if(curated&&(isOfficialJd(jd)||jd?.vacancy_confirmed===true))verificationReads.set(u,{revision:candidateEvidence(rows.get(u)),jd});}};
+ const readOptions={signal,onActivity,provider,curated,fullResearch,note,browser:env.BROWSER,ledger:publicEvidence,cachedResults,notesFor:jobNotes,forceRefresh:explicitRechecks,cacheBucket:jdArchiveConfigured(env)?env.HHBA_JOB_JD_R2:undefined,onRead:(u,jd)=>{if(curated&&(isOfficialJd(jd)||jd?.vacancy_confirmed===true)){const prior=verificationReads.get(u);verificationReads.set(u,{revision:candidateEvidence(rows.get(u)),jd,...(prior?.prefetched&&cachedResults.get(u)===jd?{prefetched:true}:{})});}}};
  // Each worker owns a read→score lane: a slow source cannot block the
  // scores of other jobs in this batch. Keep the old serial path intact.
  const overlap=curated&&parallelResearch;
@@ -1481,7 +1499,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  for(const [u] of entries)verificationReads.delete(u);
  if(stepMode&&offset+entries.length<allEntries.length)return continuation('verification',{next:offset+entries.length,verificationReads:[...verificationReads],managedVerification,verificationBatch:curated?nextVerificationBatch(batchSize,(diag.JD_RECOVERY_REQUIRED||0)>recoveryBefore,allEntries.length-offset-entries.length,overlap?{externalRequests:verificationRequests,completed:entries.length}:undefined):2,matches:combined,read:readTotal,scored,archived,scoreFailures,reportFailures:checkpoint?.reportFailures||0});
  if(curated){
-  return continuation('reporting',{matches:combined,read:readTotal,scored,archived,scoreFailures,reportFailures:checkpoint?.reportFailures||0,managedVerification});
+  return continuation('reporting',{matches:combined,read:readTotal,scored,archived,scoreFailures,reportFailures:checkpoint?.reportFailures||0,managedVerification,verificationReads:[...verificationReads]});
  }
  combined.sort((a,b)=>(b.match_score??-1)-(a.match_score??-1));
  const verified=combined.filter(x=>x.jd_source_status==='VERIFIED_JD').length;
