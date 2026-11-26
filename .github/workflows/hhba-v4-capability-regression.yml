@@ -8,6 +8,8 @@ on:
       - 'apps/web/functions/api/match-v4/**'
       - 'apps/web/src/components/MatchResearchPanels.tsx'
       - 'apps/web/scripts/v4-parallel-discovery.test.mjs'
+      - 'apps/web/scripts/v4-job-work-queue.test.mjs'
+      - 'apps/web/d1/20261126_v4_job_work_queue.sql'
       - '.github/workflows/hhba-v4-capability-regression.yml'
 permissions:
   contents: read
@@ -19,6 +21,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test apps/web/scripts/v4-parallel-discovery.test.mjs apps/web/scripts/simple-match-v4.contract.test.mjs apps/web/scripts/v4-session-match-task.test.mjs apps/web/scripts/v4-stage-workflows.test.mjs services/match-background/runner.test.mjs
+      - run: node --test apps/web/scripts/v4-parallel-discovery.test.mjs apps/web/scripts/simple-match-v4.contract.test.mjs apps/web/scripts/v4-session-match-task.test.mjs apps/web/scripts/v4-stage-workflows.test.mjs apps/web/scripts/v4-job-work-queue.test.mjs services/match-background/runner.test.mjs
       - working-directory: apps/web
         run: npm ci --ignore-scripts && npm run build

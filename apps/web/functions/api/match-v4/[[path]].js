@@ -10,6 +10,7 @@ import {createAiUsageBuffer} from '../../_lib/ai-token-usage.js';
 import {v4PhaseMetricSample,recordV4PhaseOps} from '../../_lib/v4-phase-ops-metrics.js';
 import {v4CheckpointLane,isV4StageLane,stagedV4WorkflowsEnabled,stageWorkflowSignal} from '../../_lib/v4-stage-workflows.js';
 import {mergeLiveJobProgress,createV4JobEventJournal} from '../../_lib/v4-job-progress.js';
+import {v4JobWorkQueueEnabled,reconcileV4JobWork,clearV4JobWork} from '../../_lib/v4-job-work-queue.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
 import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
 import {v4ParallelResearchEnabled} from '../../_lib/v4-parallel-discovery.js';
@@ -18,7 +19,7 @@ import {recognizeV4Resume} from '../../_lib/v4-resume-ocr.js';
 import {v4CheckpointSecret,checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint,matchTaskKey,saveMatchTask,readMatchTask,startMatchPhaseHeartbeat,saveMatchProgress,readMatchProgress,matchProfileCacheKey,readMatchProfileCache,saveMatchProfileCache} from '../../_lib/v4-match-checkpoint-storage.js';
 import {claimAiCheckpoint,leaseMatchTask} from '../../_lib/ai-checkpoint-claim.js';
 import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
-import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSessionTask} from '../../_lib/v4-session-match-task.js';
+import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSessionTask,researchTaskKey} from '../../_lib/v4-session-match-task.js';
 import {backgroundEnabled,tryScheduleBackgroundMatch,loadBackgroundMatch,isV4RetryableTaskFailure} from '../../_lib/v4-background-match.js';
 import {isV4TerminalTaskFailure,terminalV4SavedFailure,retryableV4SavedFailure,normalizeV4RecoveryRecord,normalizeV4RecoveryView,v4RecoveredResourcePhase} from '../../_lib/v4-task-failure-policy.js';
 
@@ -257,6 +258,14 @@ function events(env,request,input,waitUntil){
       if(input.taskKey){
        await input.lease.renew();
        await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint,generation:input.generation||0,progress:snapshotProgress(),checkpoint_captured_at:captureTime()});
+       // The encrypted checkpoint is committed first. If optional queue sync
+       // fails, the authoritative research state and normal continuation
+       // remain intact; the next phase can retry idempotently.
+       if(input.background&&v4JobWorkQueueEnabled(env)){
+        try{const state=await reconcileV4JobWork(env.HHBA_PNVS_AUTH_DB,input.taskKey,input.generation||0,result.checkpoint);
+         console.info('HHBA_V4_JOB_QUEUE_SYNC',JSON.stringify({pendingOrDone:state.work,changed:state.createdOrUpdated,remaining:state.remaining}));
+        }catch{console.warn('HHBA_V4_JOB_QUEUE_SYNC_DEFERRED');}
+       }
        await publishProgress();await releaseTask();
        await stageCompleteOrHandoff(result.checkpoint);
        succeeded=true;return;
@@ -287,6 +296,7 @@ function events(env,request,input,waitUntil){
      if(input.taskKey){
       await input.lease.renew();
       await saveMatchTask(env,input.taskKey,{result,checkpoint:resumeCheckpoint,generation:input.generation||0});
+      if(v4JobWorkQueueEnabled(env))await clearV4JobWork(env.HHBA_PNVS_AUTH_DB,input.taskKey,input.generation||0).catch(()=>console.warn('HHBA_V4_JOB_QUEUE_CLEANUP_DEFERRED'));
       await publishProgress('COMPLETE');await releaseTask();
      }
      await finishWorkflowStages();sendFinal(result);
@@ -467,6 +477,11 @@ export async function onRequest(context){
     // Invalidated session task is the authority; this best-effort wake
     // simply lets sleeping stage Workflows exit without doing AI work.
     await stageWorkflowSignal(env,ticket,{finish:true}).catch(()=>false);
+    if(v4JobWorkQueueEnabled(env)){
+     try{const activeKey=await researchTaskKey(env,session,previous);
+      await clearV4JobWork(env.HHBA_PNVS_AUTH_DB,activeKey,previous.generation);}
+     catch{console.warn('HHBA_V4_JOB_QUEUE_CANCEL_CLEANUP_DEFERRED');}
+    }
    }
    const background_scheduled=await tryScheduleBackgroundMatch(env,request,session,task);
    return reply({ok:true,task,background_scheduled});
