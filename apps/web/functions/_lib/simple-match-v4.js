@@ -17,7 +17,7 @@ import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscove
 import {candidateRevision,candidateResearchMemory,pendingVerification,verificationSnapshot,mergePipelineCheckpoint,pipelineWidths,pipelineVerificationWindow,discoveryReadAhead} from './v4-research-pipeline.js';
 import {makeBatchScorer} from './v4-batch-scoring.js';
 import {createV4DiscoveryJobObserver} from './v4-stream-job-parser.js';
-import {createV4DiscoveryCandidateEvents} from './v4-discovery-candidate-events.js';
+import {createV4DiscoveryCandidateEvents,createV4DiscoveryIdentityIndex,v4DiscoveryCandidateKey} from './v4-discovery-candidate-events.js';
 import {publicCatalogHints} from './v4-public-jd-catalog.js';
 import {publicAssetsEnabled,publicVacancyIdentity,normalizePublicReference,readPublicReferenceAsset,savePublicReferenceAsset,indexPublicJobAsset,publicAssetHints,removeClosedPublicAsset} from './v4-public-job-assets.js';
 import {managedWorkPlan,managedWorkSample} from './v4-phase-budget.js';
@@ -735,7 +735,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   }
  }
  // A checkpoint is accepted only after account/input-bound signature verification in the HTTP route.
- const rows=new Map((checkpoint?.rows||[]).filter(([u,j])=>!isCommercialRecruitmentBoard(u,j))),toolUrls=new Set((checkpoint?.toolUrls||[]).filter(u=>!isCommercialRecruitmentBoard(u))),excluded=new Set(excludeUrls.map(v4PublicJobUrl).filter(Boolean));
+ const rows=new Map((checkpoint?.rows||[]).filter(([u,j])=>!isCommercialRecruitmentBoard(u,j))),toolUrls=new Set((checkpoint?.toolUrls||[]).filter(u=>!isCommercialRecruitmentBoard(u))),excluded=new Set(excludeUrls.map(curated?v4DiscoveryCandidateKey:v4PublicJobUrl).filter(Boolean));
  let profile=checkpoint?.profile||v4GroundProfile({summary:'',roles:[]},resume);
  let researchComplete=['verification','reporting'].includes(checkpoint?.phase),round=checkpoint?.round||0,researchError=checkpoint?.researchError||null,recoveryHint=checkpoint?.recoveryHint||'';
  let lastSignature=checkpoint?.lastSignature||'';
@@ -1019,6 +1019,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   // a record. Keep the authoritative rows untouched until normal reconciliation
   // so counters, continuation decisions and evidence revision checks stay valid.
   const earlyRows=new Map(),earlySources=new Set(),earlyToolUrls=new Set(),streamRows=new Map();
+  const discoveryIdentity=createV4DiscoveryIdentityIndex(rows.keys());
   const acceptedLiveUrl=url=>!excluded.has(url)&&!rejectedBoards.has(url)&&!isCommercialRecruitmentBoard(url);
   const earlySnapshot=()=>{
    const cp=continuation('research').checkpoint;
@@ -1042,7 +1043,9 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     // No citation or verified status is inferred from partial model output.
     publishEarly();
    }
-   if(typeof onDiscoveryCandidate==='function')onDiscoveryCandidate(event);
+   // The first observation alone emits a discovery event. Duplicate lanes
+   // still finish and contribute their full evidence in normal reconciliation.
+   if(typeof onDiscoveryCandidate==='function'&&discoveryIdentity.claim(candidate.url))onDiscoveryCandidate(event);
   };
   // Only fill candidates missing from the authoritative complete result.
   // Their status remains an unverified lead; final evidence always wins.
