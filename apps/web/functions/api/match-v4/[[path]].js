@@ -327,14 +327,14 @@ export async function onRequest(context){
     // decrypting the multi-hundred-KB evidence/replay checkpoint on each poll.
     let scheduled;
     if(view?.generation===generation&&view.status==='PENDING'){
-     scheduled=await tryScheduleBackgroundMatch(env,request,session,input.sessionTask);
+     scheduled=await tryScheduleBackgroundMatch(env,request,session,input.sessionTask,{diagnostic:true});
      if(scheduled===true)return reply({status:'PENDING',progress:view.progress||null,failure:view.failure||null});
     }
     const saved=await readMatchTask(env,input.taskKey);
     if(saved?.generation===generation&&saved?.result?.status==='COMPLETE'){input.generation=generation;input.cachedResult=saved.result;return events(env,request,input,waitUntil);}
     if(saved?.generation===generation&&saved.failure&&!saved.failure.retryable)return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});
-    if(scheduled===undefined)scheduled=await tryScheduleBackgroundMatch(env,request,session,input.sessionTask);
-    if(scheduled==='FAILED')return reply({status:'FAILED',progress:view?.generation===generation?view.progress||null:saved?.generation===generation?saved.progress||null:null,failure:{error:saved?.failure?.error||'AI_BACKGROUND_EXECUTION_FAILED',retryable:false}});
+    if(scheduled===undefined)scheduled=await tryScheduleBackgroundMatch(env,request,session,input.sessionTask,{diagnostic:true});
+    if(scheduled==='FAILED'||scheduled?.status==='FAILED')return reply({status:'FAILED',progress:view?.generation===generation?view.progress||null:saved?.generation===generation?saved.progress||null:null,failure:{error:saved?.failure?.error||scheduled?.error||'AI_BACKGROUND_EXECUTION_FAILED',retryable:false}});
     if(scheduled)return reply({status:'PENDING',progress:view?.generation===generation?view.progress||null:saved?.generation===generation?saved.progress||null:null,failure:saved?.generation===generation?saved.failure||null:null});
     // Fallback continues the same persisted task under its exclusive lease.
    }
