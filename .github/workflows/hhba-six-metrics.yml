@@ -12,6 +12,8 @@ on:
       - "apps/web/d1/0003_cloudflare_metrics.sql"
       - "apps/web/src/services/engagement.ts"
       - "apps/web/scripts/metrics-contract.test.mjs"
+      - "apps/web/scripts/v4-stage-ops-metrics.test.mjs"
+      - "apps/web/d1/20261126_v4_phase_ops_daily.sql"
       - "apps/web/scripts/admin-access-audiences.test.mjs"
       - "apps/web/scripts/admin-original-dashboard.contract.test.mjs"
       - "apps/admin-preview/**"
@@ -38,10 +40,11 @@ jobs:
           db=sqlite3.connect(':memory:')
           db.executescript(Path('apps/web/d1/0003_cloudflare_metrics.sql').read_text())
           db.executescript(Path('apps/web/d1/20261125_ai_usage_daily.sql').read_text())
-          db.executescript(Path('apps/web/d1/20261125_ai_usage_daily.sql').read_text())
+          db.executescript(Path('apps/web/d1/20261126_v4_phase_ops_daily.sql').read_text())
           tables={x[0] for x in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
           assert {'hhba_metrics_metadata','hhba_traffic_events','hhba_device_saved','hhba_device_save_events'}<=tables
           assert 'hhba_ai_usage_daily' in tables
+          assert 'hhba_v4_phase_ops_daily' in tables
           assert 'hhba_auth_users' not in tables
           print('HHBA_CLOUDFLARE_METRICS_SCHEMA_OK')
           PY
@@ -56,7 +59,7 @@ jobs:
           node --check functions/api/engagement/event.js
           node --check 'functions/api/saved/[[path]].js'
           node --check ../../apps/admin-preview/dashboard.js
-          node --test scripts/ai-token-usage.test.mjs scripts/v4-token-efficiency.test.mjs
+          node --test scripts/ai-token-usage.test.mjs scripts/v4-token-efficiency.test.mjs scripts/v4-stage-ops-metrics.test.mjs
           node --test scripts/metrics-contract.test.mjs scripts/admin-original-dashboard.contract.test.mjs scripts/admin-access-audiences.test.mjs
           node --test ../../apps/admin-preview/tests/*.test.mjs
       - name: Build existing Vite frontend without new feature flags

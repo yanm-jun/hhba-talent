@@ -7,6 +7,7 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
 import {createAiUsageBuffer} from '../../_lib/ai-token-usage.js';
+import {v4PhaseMetricSample,recordV4PhaseOps} from '../../_lib/v4-phase-ops-metrics.js';
 import {mergeLiveJobProgress,createV4JobEventJournal} from '../../_lib/v4-job-progress.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
 import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
@@ -93,6 +94,7 @@ function events(env,request,input,waitUntil){
    const officialJob=j=>allowedJob(j)&&qualifiedReport(j);
    let lastReport=input.savedProgress?.report,latestActivity=input.savedProgress?.activity,lastJobs=input.savedProgress?.jobs||[];
    const jobJournal=createV4JobEventJournal(input.savedProgress?.job_events);
+   const initialEventSequence=Math.max(0,...(input.savedProgress?.job_events||[]).map(e=>Number.isSafeInteger(e?.seq)?e.seq:0));
    const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:[...lastJobs],job_events:jobJournal.snapshot()});
     let reportRecovery;
     const captureTime=()=>Date.now();
@@ -192,10 +194,11 @@ function events(env,request,input,waitUntil){
     });
     async function releaseTask(){await stopProgress();await leaseHeartbeat?.stop();if(input.lease){const lease=input.lease;input.lease=null;await lease.release().catch(()=>console.warn('HHBA_TASK_LEASE_RELEASE_FAILED'));}}
    const execution=(async()=>{
-    let succeeded=false,committedResult=null,usageBuffer=null;
+    let succeeded=false,committedResult=null,usageBuffer=null,metricOutcome='RETRYABLE_FAILURE',metricError='AI_BACKGROUND_EXECUTION_FAILED';
     try{
      await guard();
      if(input.cachedResult){
+      metricOutcome='CACHED';
       const cached=input.cachedResult;
       await stopProgress();await publishProgress('COMPLETE');await releaseTask();
       sendFinal(cached);
@@ -235,6 +238,7 @@ function events(env,request,input,waitUntil){
       if(executionSignal.aborted)throw executionSignal.reason||Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
      await guard();
      if(result.status==='CONTINUE'){
+      metricOutcome='CONTINUE';
       console.info('HHBA_V4_STAGE',JSON.stringify({trace,phase:result.checkpoint.phase,round:result.checkpoint.round,candidates:result.checkpoint.rows?.length,processed:result.checkpoint.next,scored:result.checkpoint.scored,diagnostics:result.checkpoint.diagnostics}));
       if(input.taskKey){
        await input.lease.renew();
@@ -251,6 +255,7 @@ function events(env,request,input,waitUntil){
       succeeded=true;
       return;
      }
+     metricOutcome='COMPLETE';
      console.info('HHBA_V4_MATCH',JSON.stringify({trace,result:result.native_search?.stage==='partial'?'PARTIAL':'COMPLETE',
       found:result.matches.length,official:result.matched_official_jobs,candidates:result.native_search?.candidate_links,searches:result.native_search?.searches,verification:result.native_search?.jd_verification,diagnostics:result.native_search?.diagnostics,research_error:result.native_search?.research_error,
       duration_ms:Date.now()-started}));
@@ -280,6 +285,7 @@ function events(env,request,input,waitUntil){
      // A later history/progress failure must not replace an already committed
      // completed result with an old checkpoint and repeat paid model calls.
      if(committedResult){
+      metricOutcome='COMPLETE';
       await releaseTask();
       if(code==='AI_AGENT_CANCELLED'){send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable:false});return;}
       await publishProgress('COMPLETE');sendFinal(committedResult);succeeded=true;return;
@@ -293,9 +299,11 @@ function events(env,request,input,waitUntil){
        await saveMatchTask(env,input.taskKey,{checkpoint,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime()});
        await publishProgress();
         console.info('HHBA_V4_RESOURCE_YIELD',JSON.stringify({trace,stage:phase,...budget?.snapshot()}));
+       metricOutcome='RESOURCE_YIELD';
        await releaseTask();send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});succeeded=true;return;
       }catch(recoveryError){console.warn('HHBA_V4_RESOURCE_YIELD_SAVE_FAILED',JSON.stringify({trace,error:recoveryError?.code||'CHECKPOINT_SAVE_FAILED'}));}
      }
+     metricOutcome=code===PHASE_YIELD?'RESOURCE_YIELD':!isV4TerminalTaskFailure(code)&&!!input.taskKey?'RETRYABLE_FAILURE':'TERMINAL_FAILURE';metricError=code;
      const retryable=!isV4TerminalTaskFailure(code)&&!!input.taskKey&&(isV4RetryableProviderError(code)||isV4RetryableTaskFailure(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
       if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&code!=='AI_AGENT_CANCELLED'){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:input.recoveryState?.()||input.checkpoint||null,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
       if(code!=='AI_AGENT_CANCELLED'&&!leaseAbort.signal.aborted)await publishProgress(retryable?'PENDING':'FAILED',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
@@ -308,6 +316,7 @@ function events(env,request,input,waitUntil){
      if(input.claim&&(!succeeded||closed))await input.claim.release().catch(()=>console.warn('HHBA_CHECKPOINT_RELEASE_FAILED'));
      if(succeeded&&!closed&&input.pointer)await deleteMatchCheckpoint(env,input.pointer).catch(()=>console.warn('HHBA_CHECKPOINT_CLEANUP_FAILED'));
      await usageBuffer?.flush();
+     if(input.managed){const snapshot=delivery.snapshot();await recordV4PhaseOps(env.HHBA_METRICS_DB,v4PhaseMetricSample({started,lane:input.backgroundLane||'mixed',outcome:metricOutcome,error:metricError,recovering:!!input.recovering,first:snapshot.first,events:jobJournal.snapshot().filter(e=>e.seq>initialEventSequence)}));}
      if(!closed){closed=true;try{controller.close()}catch{}}
     }
    })();
@@ -358,7 +367,7 @@ async function backgroundStep(env,request,waitUntil){
   if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
   const durable=await readMatchTask(env,taskKey,Date.now(),{renewGeneration:task.generation});
    const saved=await recoverSavedDiscovery(env,input,durable);
-  if(saved?.generation===task.generation){input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;if(terminalV4SavedFailure(saved.failure)){await input.lease.release();return fail(saved.failure.error,422);}}
+  if(saved?.generation===task.generation){input.recovering=!!saved.failure;input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;if(terminalV4SavedFailure(saved.failure)){await input.lease.release();return fail(saved.failure.error,422);}}
   if(saved?.generation===task.generation&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
   else if(saved?.generation===task.generation&&saved?.checkpoint)input.checkpoint=saved.checkpoint;
   else if(saved?.result?.status==='COMPLETE'&&saved.checkpoint&&saved.generation+1===task.generation){
@@ -468,7 +477,7 @@ export async function onRequest(context){
    if(!Number.isSafeInteger(generation)||generation<0||generation>(durable?.generation||0)+1){await input.lease.release();return fail('AI_CHECKPOINT_INVALID',409);}
    input.generation=generation;
    const saved=await recoverSavedDiscovery(env,input,durable,view);
-    if(saved?.generation===generation){input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;if(terminalV4SavedFailure(saved.failure)){await input.lease.release();return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});}}
+    if(saved?.generation===generation){input.recovering=!!saved.failure;input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;if(terminalV4SavedFailure(saved.failure)){await input.lease.release();return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});}}
    if(generation===(saved?.generation||0)&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
    else if(saved?.checkpoint&&generation===(saved.generation||0))input.checkpoint=saved.checkpoint;
    else if(saved?.result?.status==='COMPLETE'&&saved.checkpoint&&generation===(saved.generation||0)+1){input.checkpoint=saved.checkpoint;await saveMatchTask(env,input.taskKey,{checkpoint:input.checkpoint,generation});}
