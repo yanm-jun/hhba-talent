@@ -172,3 +172,29 @@ export function createLiveVerificationCoordinator({getDiscovery,choose,run,canSt
  };
  return {snapshot,wake,async close(){closing=true;if(active)await active.promise;return {checkpoint:snapshot(),errors:[...errors],windows:finished.length};}};
 }
+
+// A separate report consumer takes only completed evidence assessments.
+// Admission is per hosting invocation; skipped work stays as a scored record
+// with no completed report and remains eligible for the durable next phase.
+export function createLiveReportQueue({run,keyOf=j=>j.official_url,canStart=()=>true,signal}){
+ const pending=new Map(),seen=new Set();let active=null,failure=null,closing=false;
+ const pump=()=>{
+  if(active||failure||signal?.aborted||!canStart()||!pending.size)return;
+  const [key,job]=pending.entries().next().value;
+  pending.delete(key);seen.add(key);
+  active=Promise.resolve().then(()=>run(job)).catch(e=>{failure=e;}).finally(()=>{active=null;pump();});
+ };
+ return {
+  offer(job){
+   if(closing||signal?.aborted)return false;
+   const key=keyOf(job);
+   if(!key||seen.has(key)||pending.has(key))return false;
+   pending.set(key,job);pump();return true;
+  },
+  async settle(){
+   closing=true;pump();
+   while(active)await active;
+   return {failure,deferred:pending.size};
+  }
+ };
+}

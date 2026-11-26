@@ -1343,3 +1343,52 @@ test('production managed search verifies and scores a newly streamed candidate b
   assert.equal(budget.denied,false);
  }finally{clearTimeout(timer);try{controller.close();}catch{}await pending.catch(()=>{});}
 });
+
+
+test('independent report queue leaves unadmitted assessments available for durable continuation',async()=>{
+ const {createLiveReportQueue}=await import('../functions/_lib/v4-research-pipeline.js');
+ const a=job(7601),b=job(7602);
+ let release,admitted=true;
+ const gate=new Promise(r=>{release=r;}),started=[];
+ const q=createLiveReportQueue({canStart:()=>admitted,keyOf:j=>j.url,run:async j=>{started.push(j.url);await gate;}});
+ assert.equal(q.offer(a),true);assert.equal(q.offer(a),false);assert.equal(q.offer(b),true);
+ await Promise.resolve();assert.deepEqual(started,[a.url]);
+ admitted=false;const settled=q.settle();release();
+ assert.deepEqual(await settled,{failure:null,deferred:1});
+ assert.deepEqual(started,[a.url]);
+});
+
+test('managed scoring advances the next official vacancy while the first complete report is still generating', {timeout:8000},async()=>{
+ const {phaseResourceBudget}=await import('../functions/_lib/v4-phase-budget.js');
+ const a=job(7610),b=job(7611),p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const html=j=>'<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',url:j.url,title:j.title,hiringOrganization:{name:j.company,url:new URL(j.url).origin},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责汽车经销商渠道运营和业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
+ let release,firstReportStarted=false,firstReportDone=false,secondScoredDuringReport=false,reports=0,scoreCalls=0;
+ const gate=new Promise(r=>{release=r;});
+ const timer=setTimeout(release,2000);
+ const assessments={suitable:true,score:86,reason:'渠道运营匹配',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车经销商渠道运营',matched:['渠道运营'],gaps:[]};
+ const budget=phaseResourceBudget();
+ try{
+ const result=await v4Match(budget.fetch(async(u,opts)=>{
+  if(u===a.url||u===b.url)return new Response(html(u===a.url?a:b),{headers:{'content-type':'text/html'}});
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.established_score!==undefined){
+   reports++;
+   if(input.job.title===a.title){firstReportStarted=true;await gate;firstReportDone=true;}
+   return model({...assessments,comparisons:[{jd_quote:'汽车经销商渠道运营',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'真实渠道运营经历与工作要求相关'}],quality_review:{status:'complete',explanation:'已对实际职责与要求完成分析',missing:[]}});
+  }
+  if(input.job){
+   scoreCalls++;
+   if(input.job.title===b.title){secondScoredDuringReport=firstReportStarted&&!firstReportDone;release();}
+   return model(assessments);
+  }
+  throw Error('unexpected model request');
+ }),p,resume,'全国',{
+  curated:true,officialOnly:true,stepMode:true,parallelResearch:true,pipelineChild:true,env:{HHBA_MATCH_V4_READY:'1'},resourceBudget:budget,
+  checkpoint:{phase:'verification',next:0,rows:[[a.url,a],[b.url,b]],profile,toolUrls:[a.url,b.url],verificationBatch:2,verificationLaneWidth:1,managedVerification:{cost:2,width:1}}
+ });
+ assert.equal(scoreCalls,2);assert.equal(reports,2);
+ assert.equal(secondScoredDuringReport,true);
+ assert.equal(result.checkpoint.matches.filter(j=>j.report_status==='COMPLETE').length,2);
+ assert.equal(budget.denied,false);
+ }finally{clearTimeout(timer);release();}
+});
