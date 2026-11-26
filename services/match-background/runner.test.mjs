@@ -76,3 +76,10 @@ test('shared private cron calls matching watchdog even when Word recovery is dis
  assert.equal(calls,1);
  assert.equal((await scheduler.fetch()).status,404);
 });
+
+
+test('deterministic invalid edge request stops without retry and exhausted transient phase is terminal',async()=>{
+ let calls=0;assert.equal(await requestPhase(async()=>{calls++;throw new TypeError('Invalid redirect value');},ticket),'FAILED');assert.equal(calls,1);
+ const state=await driveBackgroundMatch({async do(name,config,fn){assert.equal(config.retries.limit,5);assert.equal(config.retries.backoff,'exponential');return fn();}},ticket,async()=>new Response(null,{status:503}));
+ assert.deepEqual(state,{status:'FAILED'});
+});
