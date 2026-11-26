@@ -134,7 +134,7 @@ function events(env,request,input,waitUntil){
      input.recoveryState=()=>recoveryState();
      // Keep one durable phase per Pages invocation. The hosting platform's
      // subrequest budget resets on the next continuation, not on a JS loop.
-          const provider=v4JobProvider(researchEnv);if(provider&&replay)provider.phaseReplay=replay;
+          const provider=v4JobProvider(researchEnv);if(provider&&replay){provider.phaseReplay=replay;provider.phaseResourceBudget=budget;provider.usageDb=env.HHBA_METRICS_DB;}
       const result=await v4Match(budget?budget.fetch(fetch):fetch,provider,input.text,input.role_hint,{
       signal:executionSignal,onProgress:progress,onActivity:activity,env:researchEnv,resourceBudget:budget,excludeUrls:input.excludeUrls,
       stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,parallelResearch:v4ParallelResearchEnabled(env),allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
