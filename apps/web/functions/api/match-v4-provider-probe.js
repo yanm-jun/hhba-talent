@@ -134,29 +134,16 @@ export async function runOpenAIProbe(provider,phase,{fetcher=fetch,signal}={}){
  return {ok:grounded&&scored>=2&&!!order,grounded,grounding_count:sources.length,job_count:jobs.length,verified_count:verified,scored_count:scored,ranked_count:order?.length||0};
 }
 export async function onRequest({request,env}){
- const raw=env.HHBA_V4_GEMINI_PROBE_SECRET||'';
+ const raw=env.HHBA_V4_OPENAI_PROBE_SECRET||'';
  const [expiry,token]=raw.split(':');
  if(request.method!=='GET'||!token||token.length<48||!Number.isFinite(Number(expiry))||Date.now()>Number(expiry)||!await equal(request.headers.get('X-HHBA-Probe')||'',token))return reply({error:'NOT_FOUND'},404);
- const phase=new URL(request.url).searchParams.get('phase')||'basic';
- const openai=['openai_basic','openai_reasoning','openai_search','openai_pipeline'].includes(phase);
- const provider=openai?v4Provider(env):geminiJobProvider(env);
- if(!provider){
-  if(openai)return reply({ok:false,error:'AI_PROVIDER_NOT_CONFIGURED',phase});
-  // Only reachable after the short-lived operator authentication above.
-  // Report boolean validation results, never credentials or their lengths.
-  const model=typeof env.GEMINI_MODEL==='string'?env.GEMINI_MODEL.trim():'';
-  let endpointValid=false;
-  try{const u=new URL(env.GOOGLE_GEMINI_BASE_URL||'https://api-c.reqtoken.com');endpointValid=u.protocol==='https:'&&!u.username&&!u.password&&!u.search&&!u.hash;}catch{}
-  return reply({ok:false,error:'AI_PROVIDER_NOT_CONFIGURED',configuration:{
-   key_present:typeof env.GEMINI_API_KEY==='string'&&!!env.GEMINI_API_KEY.trim(),
-   model_present:!!model,model_valid:!!model&&/^[-a-zA-Z0-9_.]+$/.test(model),
-   endpoint_valid:endpointValid
-  }},503);
- }
- if(!openai&&!['basic','search','pipeline','stream','url_context','metadata','cache','transport','transport_bearer','transport_chat'].includes(phase))return reply({error:'INVALID_PROBE_PHASE'},400);
+ const phase=new URL(request.url).searchParams.get('phase')||'openai_basic';
+ if(!['openai_basic','openai_reasoning','openai_search','openai_pipeline'].includes(phase))return reply({error:'INVALID_PROBE_PHASE'},400);
+ const provider=v4Provider(env);
+ if(!provider)return reply({ok:false,error:'AI_PROVIDER_NOT_CONFIGURED',phase},503);
  const start=Date.now();
  try{
-  const result=await (openai?runOpenAIProbe:runGeminiProbe)(provider,phase,{signal:request.signal});
+  const result=await runOpenAIProbe(provider,phase,{signal:request.signal});
   return reply({...result,phase,model:provider.model,elapsed_ms:Date.now()-start});
  }catch(e){
   // The operator probe completed even when the upstream model failed.
