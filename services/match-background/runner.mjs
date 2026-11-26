@@ -8,8 +8,11 @@ const permanentCodes=new Set(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_IN
 const recoverableCodes=new Set(['AI_PHASE_RESOURCE_YIELD','AI_PIPELINE_STATE_INVALID','AI_BACKGROUND_EXECUTION_FAILED','AI_BACKGROUND_HTTP_408','AI_BACKGROUND_HTTP_425','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UNAVAILABLE','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_RESPONSE_EMPTY','AI_PROVIDER_INCOMPLETE','AI_CHECKPOINT_DB_UNAVAILABLE','AI_CHECKPOINT_LEASE_LOST','AI_CHECKPOINT_STORAGE_UNAVAILABLE','AI_BACKGROUND_SCHEDULE_UNAVAILABLE','AI_EDGE_RESOURCE_EXHAUSTED','AI_EDGE_DAILY_LIMIT','AI_BACKGROUND_RESPONSE_INVALID','AI_BACKGROUND_TRANSPORT_INTERRUPTED','AI_BACKGROUND_RESPONSE_INCOMPLETE','AI_TASK_IN_PROGRESS']);
 const pending=(error)=>({status:'RECOVERING',error});
 export function recoveryDelaySeconds(code,streak=1){
+ // A lease is released by its owner or expires after a few minutes. Do not
+ // turn temporary ownership contention into a half-hour research delay.
+ if(code==='AI_TASK_IN_PROGRESS')return Math.min(60,15*Math.max(1,streak));
  const ordinary=[15,30,60,120,300,600,1800][Math.min(6,Math.max(0,streak-1))];
- const minimum=code==='AI_EDGE_DAILY_LIMIT'?3600:code==='AI_EDGE_RESOURCE_EXHAUSTED'?180:['AI_TASK_IN_PROGRESS','AI_PROVIDER_RATE_LIMITED'].includes(code)?60:15;
+ const minimum=code==='AI_EDGE_DAILY_LIMIT'?3600:code==='AI_EDGE_RESOURCE_EXHAUSTED'?180:code==='AI_PROVIDER_RATE_LIMITED'?60:15;
  return Math.max(minimum,ordinary);
 }
 export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery}={}){
@@ -84,13 +87,13 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400}={}
 
 // The scheduler never restarts a Workflow from an ordinary browser poll.
 // A registered watchdog owns restarts, including planned step-limit rollover.
-const recoverableInstance=state=>state?.status==='errored'||(state?.status==='complete'&&(state.output?.status==='RECOVERING'||state.output?.status==='FAILED'&&recoverableCodes.has(state.output?.error)));
+const recoverableInstance=state=>state?.status==='errored'||(state?.status==='complete'&&(state.output?.status==='RECOVERING'||state.output?.status==='FAILED'&&(!state.output?.error||recoverableCodes.has(state.output.error))));
 export async function scheduleWorkflowInstance(workflow,instance,ticket,{diagnostic=false}={}){
  try{await workflow.create({id:instance,params:{ticket}});return true;}
  catch(e){if(!(e instanceof Error)||!e.message.includes('(instance.already_exists)'))throw e;}
  const existing=await workflow.get(instance),current=await existing.status();
  if(current?.status==='waiting'||recoverableInstance(current)){
-  const error=safeCode(current?.output?.error,'AI_BACKGROUND_RECOVERING');
+  const error=safeCode(current?.output?.error,current?.output?.status==='FAILED'?'AI_BACKGROUND_EXECUTION_FAILED':'AI_BACKGROUND_RECOVERING');
   return diagnostic?pending(error):true;
  }
  return ['queued','running'].includes(current?.status);

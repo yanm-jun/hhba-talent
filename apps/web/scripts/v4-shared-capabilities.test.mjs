@@ -452,9 +452,11 @@ test('OpenAI operator search rejects ungrounded candidate claims',async()=>{
 });
 
 
-test('a terminal background failure is not mistaken for temporary scheduling unavailability',async()=>{
+test('a genuinely permanent background failure stays terminal; legacy ambiguous failures allow leased recovery',async()=>{
  const {tryScheduleBackgroundMatch}=await import('../functions/_lib/v4-background-match.js');
- const data=new Map(),env={HHBA_V4_BACKGROUND_ENABLED:'1',HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',HHBA_MATCH_V4_CHECKPOINT_SECRET:'synthetic-checkpoint-secret-long-enough',HHBA_PRIVATE_RESUMES:{async put(k,v){data.set(k,v)},async get(k){const v=data.get(k);return v?{arrayBuffer:async()=>v.buffer.slice(v.byteOffset,v.byteOffset+v.byteLength)}:null}},HHBA_MATCH_BACKGROUND:{async fetch(){return Response.json({ok:false,terminal_failure:true},{status:422})}}};
+ let error='AI_PROVIDER_KEY_REJECTED';const data=new Map(),env={HHBA_V4_BACKGROUND_ENABLED:'1',HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',HHBA_MATCH_V4_CHECKPOINT_SECRET:'synthetic-checkpoint-secret-long-enough',HHBA_PRIVATE_RESUMES:{async put(k,v){data.set(k,v)},async get(k){const v=data.get(k);return v?{arrayBuffer:async()=>v.buffer.slice(v.byteOffset,v.byteOffset+v.byteLength)}:null}},HHBA_MATCH_BACKGROUND:{async fetch(){return Response.json({ok:false,terminal_failure:true,...(error?{error}:{})},{status:422})}}};
  const session={phone:'synthetic-account',token_hash:'test-session'},task={id:'12345678-1234-1234-1234-123456789abc',generation:0};
  assert.equal(await tryScheduleBackgroundMatch(env,new Request('https://hhba.work/api/match-v4/resume'),session,task),'FAILED');
+ error='AI_EDGE_RESOURCE_EXHAUSTED';assert.equal(await tryScheduleBackgroundMatch(env,new Request('https://hhba.work/api/match-v4/resume'),session,task),false);
+ error=null;assert.equal(await tryScheduleBackgroundMatch(env,new Request('https://hhba.work/api/match-v4/resume'),session,task),false);
 });

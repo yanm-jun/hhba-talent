@@ -274,7 +274,8 @@ function events(env,request,input,waitUntil){
     }catch(e){
      await stopProgress();await leaseHeartbeat?.stop();
      const reason=leaseAbort.signal.reason;
-     const code=typeof reason?.code==='string'?reason.code:typeof e?.code==='string'?e.code:leaseAbort.signal.aborted?'AI_CHECKPOINT_LEASE_LOST':/^[A-Z][A-Z0-9_]{5,80}$/.test(e?.message||'')?e.message:'AI_PROVIDER_UNAVAILABLE';
+     const rawCode=typeof reason?.code==='string'?reason.code:typeof e?.code==='string'?e.code:leaseAbort.signal.aborted?'AI_CHECKPOINT_LEASE_LOST':/^[A-Z][A-Z0-9_]{5,80}$/.test(e?.message||'')?e.message:'AI_PROVIDER_UNAVAILABLE';
+     const code=rawCode==='PIPELINE_DISCOVERY_PHASE_INVALID'?'AI_PIPELINE_STATE_INVALID':rawCode;
      // A later history/progress failure must not replace an already committed
      // completed result with an old checkpoint and repeat paid model calls.
      if(committedResult){
