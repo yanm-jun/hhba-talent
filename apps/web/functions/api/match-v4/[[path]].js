@@ -8,6 +8,7 @@ import {redactForModel} from '../../_lib/resume-match-core.js';
 import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
 import {createAiUsageBuffer} from '../../_lib/ai-token-usage.js';
 import {preserveJobEvidence} from '../../_lib/v4-jd-research.js';
+import {mergeLiveJobProgress,createV4JobEventJournal} from '../../_lib/v4-job-progress.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
 import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
 import {v4ParallelResearchEnabled} from '../../_lib/v4-parallel-discovery.js';
@@ -92,11 +93,12 @@ function events(env,request,input,waitUntil){
    const allowedJob=j=>j&&!j.excluded_board&&!isCommercialRecruitmentBoard(j.official_url,j);
    const officialJob=j=>allowedJob(j)&&qualifiedReport(j);
    let lastReport=input.savedProgress?.report,latestActivity=input.savedProgress?.activity,lastJobs=input.savedProgress?.jobs||[];
-   const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:[...lastJobs]});
+   const jobJournal=createV4JobEventJournal(input.savedProgress?.job_events);
+   const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:[...lastJobs],job_events:jobJournal.snapshot()});
     let reportRecovery;
     const captureTime=()=>Date.now();
    const seenResults={candidate:new Set(lastJobs.map(j=>j.official_url)),jd:new Set(lastJobs.filter(j=>j.jd_source_status==='VERIFIED_JD').map(j=>j.official_url)),score:new Set(lastJobs.filter(j=>Number.isInteger(j.match_score)).map(j=>j.official_url)),report:new Set(lastJobs.filter(officialJob).map(j=>j.official_url))};
-   const observeResult=(kind,url)=>{if(url&&!seenResults[kind].has(url)){seenResults[kind].add(url);delivery.result(kind);}};
+   const observeResult=(kind,url)=>{if(url&&!seenResults[kind].has(url)){seenResults[kind].add(url);jobJournal.record(kind,url);delivery.result(kind);}};
    async function publishProgress(status='PENDING',failure=null,kind=null){
      if(!input.background||!input.taskKey)return false;
      // Optional writes reserve capacity atomically at the actual write. A
@@ -133,12 +135,13 @@ function events(env,request,input,waitUntil){
     // Merge same-task evidence only for a currently present identity; absent or
     // explicitly excluded records are not resurrected by the progress view.
     const prior=new Map(lastJobs.map(j=>[j.research_candidate_url||j.official_url,j]));
-    lastJobs=matches.filter(allowedJob).map(j=>preserveJobEvidence(prior.get(j.research_candidate_url||j.official_url),j)).filter(j=>allowedJob(j)&&!j.excluded_closed).map(j=>researchEvidence(j)?structuredClone(j):({
+    const incoming=matches.filter(allowedJob).map(j=>preserveJobEvidence(prior.get(j.research_candidate_url||j.official_url),j)).filter(j=>allowedJob(j)&&!j.excluded_closed).map(j=>researchEvidence(j)?structuredClone(j):({
      id:j.id,company:j.company,title:j.title,title_zh:j.title_zh,location:j.location,official_url:j.official_url,platform:j.platform,source:j.source,remote:j.remote,
      matched:[],not_evidenced:[],needs_verification:[],requirements_basis:'',salary:j.salary,source_status:j.source_status,
      source_type:j.source_type,jd_source_status:j.jd_source_status,evidence_status:j.evidence_status,reference_vacancy_verified:j.reference_vacancy_verified,
      availability_status:j.availability_status,report_status:j.report_status
     }));
+    lastJobs=mergeLiveJobProgress(lastJobs,[...incoming,...matches.filter(j=>j?.excluded_closed||j?.excluded_board||j?.availability_status==='CLOSED_LISTED')]);
     const signature=reportSignature(lastJobs),changed=signature!==lastReportSignature;lastReportSignature=signature;
     const evidence=evidenceSignature(lastJobs),evidenceChanged=evidence!==lastEvidenceSignature;lastEvidenceSignature=evidence;
     if(lastReport)lastReport={...lastReport,discovered:Math.max(lastReport.discovered||0,lastJobs.length)};
