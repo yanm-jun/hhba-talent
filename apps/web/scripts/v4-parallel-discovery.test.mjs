@@ -818,5 +818,13 @@ test('managed discovery reads grounded new JD before coordinator completes and r
   const done=await v4Match(budget.fetch(fetcher),provider,resume,'全国',{...options,resourceBudget:budget,checkpoint:{...discovery.checkpoint,phase:'verification',next:0,verificationBatch:1}});
   assert.equal(pages,1);assert.equal(done.checkpoint.scored,1);assert.equal(done.checkpoint.diagnostics.JD_DISCOVERY_PREFETCH_REUSED,1);
   assert.equal(done.checkpoint.verificationReads.length,0);
+  const expired=structuredClone(discovery.checkpoint);expired.verificationReads[0][1].jd.checked_at=new Date(Date.now()-11*60000).toISOString();
+  budget=phaseResourceBudget();
+  const refreshed=await v4Match(budget.fetch(fetcher),provider,resume,'全国',{...options,resourceBudget:budget,checkpoint:{...expired,phase:'verification',next:0,verificationBatch:1}});
+  assert.equal(pages,2);assert.equal(refreshed.checkpoint.scored,1);assert.equal(refreshed.checkpoint.diagnostics.JD_DISCOVERY_PREFETCH_REUSED,undefined);
+  const revised=structuredClone(discovery.checkpoint);revised.rows[0][1].requirements='updated requirement';
+  budget=phaseResourceBudget();
+  const changed=await v4Match(budget.fetch(fetcher),provider,resume,'全国',{...options,resourceBudget:budget,checkpoint:{...revised,phase:'verification',next:0,verificationBatch:1}});
+  assert.equal(pages,3);assert.equal(changed.checkpoint.scored,1);assert.equal(changed.checkpoint.diagnostics.JD_DISCOVERY_PREFETCH_REUSED,undefined);
  }finally{clearTimeout(timer);release();}
 });

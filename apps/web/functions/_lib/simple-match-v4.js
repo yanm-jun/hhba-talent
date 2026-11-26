@@ -1058,7 +1058,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
         }
        }catch{/* a failed prefetch is not a failed vacancy; normal research follows */}
       },{signal,canStart:()=>!resourceBudget.denied&&resourceBudget.snapshot().soft-resourceBudget.used>=6}):null;
-     const stageReady=(value,index)=>{
+     const stageReady=(value,index,remaining)=>{
       const reply=index===0?value:value.response;
       let result=index===0?null:value.data;
       if(index===0){try{result=v4ParseJson(reply);}catch{result={jobs:recoverV4PartialJobs(v4OutputText(reply))};}}
@@ -1073,7 +1073,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
        if(!concreteCandidate(compact)){earlySources.add(url);continue;}
        const fields=Object.fromEntries(Object.entries(compact).filter(([,v])=>v!==null&&v!==''&&v!==undefined&&(!Array.isArray(v)||v.length)));
        earlyRows.set(url,{...earlyRows.get(url),...fields});
-        if(readAhead&&!rows.has(url)&&!discoveryReads.has(url)&&!explicitRechecks.has(url)&&cites.map(curatedUrl).includes(url))readAhead.offer(url,{url,job:earlyRows.get(url)});
+        if(readAhead&&remaining>0&&!rows.has(url)&&!discoveryReads.has(url)&&!explicitRechecks.has(url)&&cites.map(curatedUrl).includes(url))readAhead.offer(url,{url,job:earlyRows.get(url)});
        for(const proof of [compact.employer_proof_url,...compact.employer_proof_urls].map(v4PublicJobUrl).filter(Boolean))if(!isCommercialRecruitmentBoard(proof))earlySources.add(curatedUrl(proof));
       }
       for(const raw of cites){const url=curatedUrl(raw);if(!isCommercialRecruitmentBoard(url)&&!excluded.has(url)&&!rejectedBoards.has(url))earlyToolUrls.add(url);}
@@ -1341,7 +1341,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const verificationReads=new Map(reusableReads(rows).filter(([u,r])=>(isOfficialJd(r.jd)||r.jd?.vacancy_confirmed===true)&&(!r.prefetched||(Number.isFinite(Date.parse(r.jd.checked_at))&&Date.now()-Date.parse(r.jd.checked_at)>=0&&Date.now()-Date.parse(r.jd.checked_at)<10*60000))));
  const cachedResults=new Map(entries.filter(([u])=>verificationReads.has(u)&&!explicitRechecks.has(u)).map(([u])=>{const record=verificationReads.get(u);if(record.prefetched)note('JD_DISCOVERY_PREFETCH_REUSED');return [u,record.jd];}));
  if(curated&&checkpoint)onRecoveryState(()=>continuation('verification',{next:offset,matches:checkpoint.matches||[],read:checkpoint.read||0,scored:checkpoint.scored||0,archived:checkpoint.archived||0,scoreFailures:checkpoint.scoreFailures||0,reportFailures:checkpoint.reportFailures||0,verificationReads:[...verificationReads],verificationBatch:batchSize}).checkpoint);
- const readOptions={signal,onActivity,provider,curated,fullResearch,note,browser:env.BROWSER,ledger:publicEvidence,cachedResults,notesFor:jobNotes,forceRefresh:explicitRechecks,cacheBucket:jdArchiveConfigured(env)?env.HHBA_JOB_JD_R2:undefined,onRead:(u,jd)=>{if(curated&&(isOfficialJd(jd)||jd?.vacancy_confirmed===true))verificationReads.set(u,{revision:candidateEvidence(rows.get(u)),jd});}};
+ const readOptions={signal,onActivity,provider,curated,fullResearch,note,browser:env.BROWSER,ledger:publicEvidence,cachedResults,notesFor:jobNotes,forceRefresh:explicitRechecks,cacheBucket:jdArchiveConfigured(env)?env.HHBA_JOB_JD_R2:undefined,onRead:(u,jd)=>{if(curated&&(isOfficialJd(jd)||jd?.vacancy_confirmed===true)){const prior=verificationReads.get(u);verificationReads.set(u,{revision:candidateEvidence(rows.get(u)),jd,...(prior?.prefetched&&cachedResults.get(u)===jd?{prefetched:true}:{})});}}};
  // Each worker owns a read→score lane: a slow source cannot block the
  // scores of other jobs in this batch. Keep the old serial path intact.
  const overlap=curated&&parallelResearch;

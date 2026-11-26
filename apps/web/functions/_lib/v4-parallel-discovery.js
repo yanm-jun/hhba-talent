@@ -25,7 +25,8 @@ export async function runDiscoveryWave(primary,extra,width,signal,onReady=()=>{}
  const started=Date.now();
  // A completed lane is observable before the slowest sibling. Final merge
  // and coordinator authority remain unchanged.
- const run=(work,lane)=>Promise.resolve().then(work).then(value=>{if(!signal?.aborted){try{onReady(value,lane);}catch{/* observer cannot invalidate completed work */}}return value;});
+ let remaining=width;
+ const run=(work,lane)=>Promise.resolve().then(work).then(value=>{remaining--;if(!signal?.aborted){try{onReady(value,lane,remaining);}catch{/* observer cannot invalidate completed work */}}return value;},error=>{remaining--;throw error;});
  const calls=[run(primary,0)];
  for(let lane=1;lane<width;lane++)calls.push(run(()=>extra(lane),lane));
  const [coordinator,...independent]=await Promise.allSettled(calls);
