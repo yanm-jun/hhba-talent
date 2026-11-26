@@ -828,3 +828,35 @@ test('managed discovery reads grounded new JD before coordinator completes and r
   assert.equal(pages,3);assert.equal(changed.checkpoint.scored,1);assert.equal(changed.checkpoint.diagnostics.JD_DISCOVERY_PREFETCH_REUSED,undefined);
  }finally{clearTimeout(timer);release();}
 });
+
+test('catalog hints are optional, fresh, public only and never promote cached entries to verified jobs',async()=>{
+ const {publicCatalogHints,PUBLIC_CATALOG_KEY}=await import('../functions/_lib/v4-public-jd-catalog.js');
+ const now=Date.now(),fresh=job(5001),expired=job(5002),board={...job(5003),url:'https://www.zhipin.com/job_detail/a.html'};
+ const items=[{...fresh,checked_at:new Date(now-1000).toISOString(),private_field:'never returned'}, {...expired,checked_at:new Date(now-90000000).toISOString()},{...board,checked_at:new Date(now).toISOString()}];
+ const env={HHBA_PUBLIC_JD_CATALOG_READ:'1',HHBA_JOB_JD_R2:{get:async key=>{assert.equal(key,PUBLIC_CATALOG_KEY);return {text:async()=>JSON.stringify({version:1,offset:0,jobs:items})};}}};
+ const hints=await publicCatalogHints(env,{target_roles:['运营']},'上海',{now});
+ assert.equal(hints.length,1);assert.equal(hints[0].url,fresh.url);assert.equal(hints[0].private_field,undefined);
+ assert.deepEqual(await publicCatalogHints({...env,HHBA_PUBLIC_JD_CATALOG_READ:'0'},{},'',{now}),[]);
+ const provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ let used=false;const response=await v4Match(async(url,opts)=>{
+  const payload=JSON.parse(opts.body),input=JSON.parse(payload.input);
+  assert.equal(payload.tool_choice,'required');assert.equal(input.public_catalog_hints[0].url,fresh.url);assert.equal(input.previously_discovered_jobs.length,0);used=true;
+  return model({jobs:[fresh],research_complete:false},[fresh.url]);
+ },provider,resume,'全国',{env:{...env,HHBA_MATCH_V4_READY:'1'},curated:true,officialOnly:true,stepMode:true,checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles}}});
+ assert.ok(used);assert.equal(response.checkpoint.rows.length,1);assert.equal(response.checkpoint.matches,undefined);
+});
+test('catalog collector rotates public entries, archives actual same-origin JD and honors disabled switch',async()=>{
+ const {runPublicJdCatalog,PUBLIC_CATALOG_KEY}=await import('../functions/_lib/v4-public-jd-catalog.js');
+ const j=job(5101),entry=new URL(j.url).origin+'/careers',origin=new URL(entry).origin;
+ const map=new Map();const bucket={get:async k=>map.has(k)?{text:async()=>map.get(k)}:null,put:async(k,v)=>map.set(k,v)};
+ const db={prepare:()=>({bind:(limit,offset)=>({all:async()=>({results:offset?[]:[{enterprise:j.company,recruitment_url:entry}]})})})};
+ const env={HHBA_JOB_JD_DB:db,HHBA_JOB_JD_R2:bucket};
+ const now=new Date();const urls=[];
+ const html='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:j.title,hiringOrganization:{name:j.company,url:origin},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责汽车经销商渠道运营和业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
+ const fetcher=async u=>{urls.push(u);if(u.endsWith('/robots.txt'))return new Response('',{status:404});return new Response(u===entry?'<a href="'+j.url+'">岗位详情</a><a href="https://other.cn/job/1">other</a>':html,{headers:{'content-type':'text/html'}});};
+ assert.equal((await runPublicJdCatalog(env,{now,fetcher})).enabled,false);assert.equal(urls.length,0);
+ const result=await runPublicJdCatalog({...env,HHBA_PUBLIC_JD_CATALOG_COLLECT:'1'},{now,fetcher});
+ assert.equal(result.saved,1);assert.ok(urls.every(u=>new URL(u).origin===origin));
+ const stored=JSON.parse(map.get(PUBLIC_CATALOG_KEY));assert.equal(stored.offset,1);assert.equal(stored.jobs[0].url,j.url);assert.ok(stored.jobs[0].jd_version_id);
+ assert.equal(stored.jobs[0].full_jd,undefined);
+});
