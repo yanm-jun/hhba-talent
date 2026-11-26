@@ -150,6 +150,15 @@ test('V4 does not send a résumé if not authorized, cross-origin or unauthentic
  assert.equal(cross.status,403);
 });
 
+test('V4 recovers only the same-relay historical OpenAI credential',()=>{
+ const historical='synthetic-historical-openai-secret';
+ assert.equal(v4Provider({HHBA_MATCH_OPENAI_API_KEY:historical}).key,historical);
+ assert.equal(v4Provider({HHBA_AGENT_RELAY_API_KEY:'',HHBA_MATCH_OPENAI_API_KEY:historical,HHBA_AGENT_RELAY_BASE_URL:'https://api-c.reqtoken.com/v1'}).key,historical);
+ assert.equal(v4Provider({HHBA_MATCH_OPENAI_API_KEY:historical,HHBA_AGENT_RELAY_BASE_URL:'https://different.example/v1'}),null);
+ assert.equal(v4Provider({HHBA_AGENT_RELAY_API_KEY:key,HHBA_MATCH_OPENAI_API_KEY:historical}).key,key);
+ assert.equal(v4Provider({HHBA_MATCH_OPENAI_API_KEY:'short'}),null);
+});
+
 test('V4 readiness distinguishes runtime configuration failures without exposing secrets',async()=>{
  const env={HHBA_AGENT_RELAY_API_KEY:key,HHBA_MATCH_V4_READY:'1',HHBA_MATCH_V4_CHECKPOINT_SECRET:'synthetic-key-for-readiness-tests-only',HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',HHBA_PNVS_AUTH_DB:{prepare(){}},HHBA_PRIVATE_RESUMES:{get(){},put(){}}};
  const read=async e=>(await onRequest({request:new Request('https://hhba.work/api/match-v4/status'),env:e})).json();
