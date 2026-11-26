@@ -65,10 +65,10 @@ export function v4ParseJson(response){
 }
 // Native Responses SSE support is opt-in until the configured relay has
 // demonstrated a complete stream. Never forward model reasoning or CV text.
-export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{},onDiscoveryJob,onDiscoverySource}={}){
- const observer=typeof onDiscoveryJob==='function'||typeof onDiscoverySource==='function'?createV4DiscoveryJobObserver(onDiscoveryJob,onDiscoverySource):null;
+export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{},onDiscoveryJob,onDiscoverySource,timing}={}){
+ const observer=typeof onDiscoveryJob==='function'||typeof onDiscoverySource==='function'?createV4DiscoveryJobObserver((job,meta)=>{timing?.observe('first_candidate');onDiscoveryJob?.(job,meta);},(url,meta)=>{timing?.observe('first_source');onDiscoverySource?.(url,meta);}):null;
  if(!(response.headers.get('content-type')||'').includes('text/event-stream')){
-  const data=await response.json();if(!signal?.aborted)observer?.response(data);return data;
+  const data=await response.json();if(!signal?.aborted)observer?.response(data);timing?.observe('terminal');return data;
  }
  if(!response.body)throw fault('AI_PROVIDER_RESPONSE_INVALID');
  const reader=response.body.getReader(),decoder=new TextDecoder();let buffer='',complete=null;
@@ -76,9 +76,12 @@ export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{},onD
   const raw=frame.split(/\r?\n/).filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trimStart()).join('\n');
   if(!raw||raw==='[DONE]')return;
   let event;try{event=JSON.parse(raw)}catch{throw fault('AI_PROVIDER_RESPONSE_INVALID')}
+  timing?.observe('first_frame');
+  if(event.type==='response.web_search_call.completed')timing?.observe('first_search_complete');
+  if(event.type==='response.output_text.delta'||event.type==='response.output_text.done'||event.type==='response.content_part.done'&&event.part?.type==='output_text')timing?.observe('first_text');
   if(event.type==='error'||event.type==='response.failed')throw fault('AI_PROVIDER_UPSTREAM_ERROR');
   if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
-  if(event.type==='response.completed'||event.type==='response.incomplete')complete=event.response;
+  if(event.type==='response.completed'||event.type==='response.incomplete'){complete=event.response;timing?.observe('terminal');}
   observer?.event(event);
   if(['response.in_progress','response.web_search_call.in_progress','response.web_search_call.searching','response.web_search_call.completed','response.output_text.delta'].includes(event.type)){
    try{onEvent(event.type)}catch{}
@@ -88,6 +91,7 @@ export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{},onD
   for(;;){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    const chunk=await reader.read();if(chunk.done)break;
+   timing?.observe('first_chunk');
    buffer+=decoder.decode(chunk.value,{stream:true});
    // CRLF may itself be split across network chunks.
    let boundary;
@@ -109,23 +113,26 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent,onDiscover
  let data;
  const replayKey=provider.phaseReplay?await sha256Hex(JSON.stringify([provider.model,stage,effort,payload])):null;
  const prior=replayKey?provider.phaseReplay.take(replayKey):null;
+ const timing=provider.deliveryTelemetry?.provider(stage);
  if(prior){
+  timing?.observe('replay');timing?.finish('replayed');
   if(stage==='discovery'&&(typeof onDiscoveryJob==='function'||typeof onDiscoverySource==='function')&&!signal?.aborted)createV4DiscoveryJobObserver(onDiscoveryJob,onDiscoverySource).response(prior);
   return prior;
  }
- if(provider.usageDb)provider.phaseResourceBudget?.take('model_usage');
  const callStarted=Date.now();let failure;
  try{
-  data=await v4CallOpenAI(fetcher,effective,payload,{signal,onEvent,onDiscoveryJob:stage==='discovery'?onDiscoveryJob:undefined,onDiscoverySource:stage==='discovery'?onDiscoverySource:undefined,stage});
+  if(provider.usageDb)provider.phaseResourceBudget?.take('model_usage');
+  data=await v4CallOpenAI(fetcher,effective,payload,{signal,onEvent,onDiscoveryJob:stage==='discovery'?onDiscoveryJob:undefined,onDiscoverySource:stage==='discovery'?onDiscoverySource:undefined,stage,timing});
   if(replayKey&&data.status==='completed')provider.phaseReplay.remember(replayKey,data);
   return data;
  }catch(e){failure=e;throw e;}
  finally{
+  timing?.finish(data?.status||'failed');
   console.info('HHBA_V4_STAGE_TIMING',JSON.stringify({stage,elapsed_ms:Date.now()-callStarted,status:data?.status||'failed',error:failure?(failure.code||'AI_CALL_FAILED'):null}));
   if(failure?.code!=='AI_PHASE_RESOURCE_YIELD')await recordAiUsage(provider.usageDb,{model:provider.model,stage,effort:payload.reasoning?.effort||effort,status:data?.status||'failed',usage:data?.usage});
  }
 }
-async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,onDiscoveryJob,onDiscoverySource,stage}={}){
+async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,onDiscoveryJob,onDiscoverySource,stage,timing}={}){
  if(!provider)throw fault('AI_PROVIDER_NOT_CONFIGURED');
 
  const started=Date.now();
@@ -145,6 +152,7 @@ async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,onDiscovery
   throw fault(signal?.aborted?'AI_AGENT_CANCELLED':
    e?.name==='TimeoutError'?'AI_PROVIDER_TIMEOUT':'AI_PROVIDER_NETWORK_ERROR');
  }
+ timing?.observe('headers',(response.headers.get('content-type')||'').includes('text/event-stream')?'sse':'json');
  if(response.status>=300&&response.status<400)throw fault('AI_PROVIDER_REDIRECT_BLOCKED');
  if(!response.ok){
   // A relay may not implement streaming. Retry once without SSE only for
@@ -153,7 +161,8 @@ async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,onDiscovery
    await response.body?.cancel().catch(()=>{});
    await recordAiUsage(provider.usageDb,{model:provider.model,stage,effort:payload.reasoning?.effort||provider.reasoningEffort,status:'stream_rejected'});
    if(provider.usageDb)provider.phaseResourceBudget?.take('model_usage');
-   return v4CallOpenAI(fetcher,{...provider,stream:false},payload,{signal,onEvent,onDiscoveryJob,onDiscoverySource,stage});
+   timing?.observe('fallback');
+   return v4CallOpenAI(fetcher,{...provider,stream:false},payload,{signal,onEvent,onDiscoveryJob,onDiscoverySource,stage,timing});
   }
   if(response.status===413)throw fault('AI_PROVIDER_CONTEXT_TOO_LARGE');
   if([400,422].includes(response.status)){
@@ -167,7 +176,7 @@ async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,onDiscovery
   throw fault('AI_PROVIDER_REQUEST_REJECTED');
  }
  let data;
- try{data=await v4ReadProviderResponse(response,{signal,onEvent,onDiscoveryJob,onDiscoverySource})}catch(e){throw fault(e?.code||'AI_PROVIDER_RESPONSE_INVALID')}
+ try{data=await v4ReadProviderResponse(response,{signal,onEvent,onDiscoveryJob,onDiscoverySource,timing})}catch(e){throw fault(e?.code||'AI_PROVIDER_RESPONSE_INVALID')}
  if(!Array.isArray(data?.output)||!['completed','incomplete'].includes(data.status))
   throw fault('AI_PROVIDER_RESPONSE_INVALID');
  logV4Usage(provider,data.usage,Date.now()-started,data.status);
@@ -859,7 +868,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      }
      job.research_detail=detail.report;job.jd_comparisons=detail.report.comparisons;
      job.recommendation_reason=detail.report.score_explanation;job.match_score=value.score;job.reference_score=value.score;job.report_status='COMPLETE';
-     onDone();break;
+     provider.deliveryTelemetry?.result('report_engine');onDone();break;
     }catch(e){
      if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
      const code=e?.code||'AI_REPORT_UNKNOWN';
@@ -1595,6 +1604,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     onProgress('scoring');
    }
    const jd=results.get(url);
+   if(isOfficialJd(jd))provider.deliveryTelemetry?.result('jd_engine');
    if(jd?.excluded_board){rejectedBoards.add(url);publishResearch();continue;}
    if(jd?.excluded_closed){if(!resourceBudget||resourceBudget.canPublish())await removeClosedPublicAsset(env,url);continue;}
    if(curated&&!isOfficialJd(jd)){matches[i].score_basis='未取得完整官方 JD，继续生成AI参考JD及适配分析。';await scoreIncompleteJd(verificationFetcher,provider,resume,roleHint,matches[i],{signal,browser:env.BROWSER,ledger:publicEvidence,note,taskNotes:jobNotes(url,'analysisNotes'),fullResearch,publicMaterial:jd?.publicMaterial});publishVerified();continue;}
@@ -1656,7 +1666,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      if(!assessment.suitable)matches[i].score_basis+='；AI 判断不适合正式推荐。';
      const salaryQuote=text(assessment.salary_quote);matches[i].salary=salaryQuote&&norm(jd.full_jd).includes(norm(salaryQuote))?salaryQuote:null;
     }
-    scored++;break;
+    scored++;provider.deliveryTelemetry?.result('score_engine');break;
    }catch(e){
     if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
     // Repair a bad model answer, but don't endlessly repeat identical errors.

@@ -19,6 +19,7 @@ import {backgroundEnabled,tryScheduleBackgroundMatch,loadBackgroundMatch,isV4Ret
 
 import {phaseResourceBudget,phaseModelReplay,PHASE_YIELD} from '../../_lib/v4-phase-budget.js';
 import {createV4ProgressPublisher} from '../../_lib/v4-progress-publisher.js';
+import {createV4DeliveryTelemetry} from '../../_lib/v4-live-delivery-telemetry.js';
 import {v4DiscoveryCandidateKey} from '../../_lib/v4-discovery-candidate-events.js';
 import {discoveryRecoverySnapshot,restoreDiscoveryRecovery} from '../../_lib/v4-discovery-recovery.js';
 
@@ -61,6 +62,7 @@ function events(env,request,input,waitUntil){
  // Only a managed existing task can use the opt-in shared asset path.
  if(!input.managed)researchEnv.HHBA_V4_PUBLIC_ASSETS_ENABLED='0';
  const trace=input.taskKey?input.taskKey.slice(0,16):crypto.randomUUID();
+ const delivery=createV4DeliveryTelemetry({started,trace,log:(event,data)=>console.info('HHBA_V4_DELIVERY_'+event.toUpperCase(),JSON.stringify(data))});
  const stream=new ReadableStream({
   start(controller){
    const send=(type,payload)=>{
@@ -87,21 +89,24 @@ function events(env,request,input,waitUntil){
    const officialJob=j=>allowedJob(j)&&qualifiedReport(j);
    let lastReport=input.savedProgress?.report,latestActivity=input.savedProgress?.activity,lastJobs=input.savedProgress?.jobs||[];
    const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:[...lastJobs]});
+   const seenResults={candidate:new Set(lastJobs.map(j=>j.official_url)),jd:new Set(lastJobs.filter(j=>j.jd_source_status==='VERIFIED_JD').map(j=>j.official_url)),score:new Set(lastJobs.filter(j=>Number.isInteger(j.match_score)).map(j=>j.official_url)),report:new Set(lastJobs.filter(officialJob).map(j=>j.official_url))};
+   const observeResult=(kind,url)=>{if(url&&!seenResults[kind].has(url)){seenResults[kind].add(url);delivery.result(kind);}};
    async function publishProgress(status='PENDING',failure=null,kind=null){
      if(!input.background||!input.taskKey)return false;
      // Optional writes reserve capacity atomically at the actual write. A
      // phase-end/terminal write uses the existing mandatory recovery headroom.
-     if(kind){if(leaseAbort.signal.aborted||!budget?.tryProgress(kind))return false;}
+     if(kind){if(leaseAbort.signal.aborted||!budget?.tryProgress(kind)){delivery.blocked(kind);return false;}}
      else budget?.observe('progress');
+     const write=delivery.write(kind||'terminal',{candidateCount:lastJobs.length,reportCount:lastJobs.filter(officialJob).length});
      try{
       // The recovery supplement is private: polling exposes only .progress.
       const discovery_recovery=status==='PENDING'?discoveryRecoverySnapshot(input.checkpoint,input.recoveryState?.()):undefined;
-      await saveMatchProgress(env,input.taskKey,{generation:input.generation||0,status,progress:snapshotProgress(),failure,discovery_recovery});return true;}
-     catch(e){console.warn('HHBA_V4_PROGRESS_WRITE_FAILED',JSON.stringify({trace,error:e?.code||'PROGRESS_WRITE_FAILED'}));return false;}
+      await saveMatchProgress(env,input.taskKey,{generation:input.generation||0,status,progress:{...snapshotProgress(),delivery_stamp:write.stamp,delivery_summary:delivery.snapshot()},failure,discovery_recovery});write.finish(true);return true;}
+     catch(e){write.finish(false);console.warn('HHBA_V4_PROGRESS_WRITE_FAILED',JSON.stringify({trace,error:e?.code||'PROGRESS_WRITE_FAILED'}));return false;}
     }
    const publisher=createV4ProgressPublisher({
     publish:kind=>publishProgress('PENDING',null,kind),
-    canPublish:kind=>!!(input.background&&input.taskKey&&leaseHeartbeat&&!leaseAbort.signal.aborted&&budget?.canPublishProgress(kind))
+    canPublish:kind=>{const allowed=!!(input.background&&input.taskKey&&leaseHeartbeat&&!leaseAbort.signal.aborted&&budget?.canPublishProgress(kind));if(!allowed&&input.background)delivery.blocked(kind);return allowed;}
    });
    const queueProgress=kind=>publisher.queue(kind);
    const stopProgress=()=>publisher.stop();
@@ -111,6 +116,7 @@ function events(env,request,input,waitUntil){
    const publishedCandidateKeys=new Set(lastJobs.map(j=>v4DiscoveryCandidateKey(j.official_url)).filter(Boolean));
    let currentCandidateKeys=new Set(publishedCandidateKeys);
    const rememberJobs=matches=>{
+    for(const j of matches.filter(allowedJob)){const u=j.official_url;observeResult('candidate',u);if(j.jd_source_status==='VERIFIED_JD')observeResult('jd',u);if(Number.isInteger(j.match_score))observeResult('score',u);if(officialJob(j))observeResult('report',u);}
     // The progress object is encrypted and bound to this authorized task.
     // Keep complete reports lossless; compact only non-deliverable leads.
     lastJobs=matches.filter(allowedJob).map(j=>officialJob(j)?structuredClone(j):({
@@ -133,7 +139,7 @@ function events(env,request,input,waitUntil){
     if(!['delta','done','source_read'].includes(meta?.source))return;
     const j=event?.candidate,key=v4DiscoveryCandidateKey(j?.official_url);
     if(!key||!allowedJob(j)||currentCandidateKeys.has(key)||leaseAbort.signal.aborted)return;
-    currentCandidateKeys.add(key);publishedCandidateKeys.add(key);
+    currentCandidateKeys.add(key);publishedCandidateKeys.add(key);observeResult('candidate',key);
     lastJobs.push({
      id:'v4-live:'+key,company:j.company,title:j.title,location:j.location,official_url:key,
      platform:'招聘来源（企业官网待核实）',source:meta?.source==='source_read'?'公开招聘页读取候选':'AI搜索候选',remote:false,reference_score:0,match_score:null,
@@ -182,7 +188,7 @@ function events(env,request,input,waitUntil){
      input.recoveryState=()=>recoveryState();
      // Keep one durable phase per Pages invocation. The hosting platform's
      // subrequest budget resets on the next continuation, not on a JS loop.
-          const provider=v4JobProvider(researchEnv);if(provider&&replay){provider.phaseReplay=replay;provider.phaseResourceBudget=budget;provider.usageDb=env.HHBA_METRICS_DB;}
+          const provider=v4JobProvider(researchEnv);if(provider)provider.deliveryTelemetry=delivery;if(provider&&replay){provider.phaseReplay=replay;provider.phaseResourceBudget=budget;provider.usageDb=env.HHBA_METRICS_DB;}
       let profileCache=null;
       if(input.managed&&!input.checkpoint&&provider&&input.resume_id&&input.session?.token_hash&&budget?.canPublish()){
        const id=await matchProfileCacheKey(env,input.phone,input.session.token_hash,{resume_id:input.resume_id,text:input.text,role:input.role_hint,model:provider.model,base:provider.baseUrl,effort:provider.reasoningEffort||'medium'}).catch(()=>null);
@@ -267,6 +273,7 @@ function events(env,request,input,waitUntil){
        console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,elapsed_ms:Date.now()-started,resources:budget?.snapshot()}));
       send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
     }finally{
+     delivery.finish();
      clearInterval(heart);if(guardTimer)clearInterval(guardTimer);
      await releaseTask().catch(()=>console.warn('HHBA_TASK_LEASE_RELEASE_FAILED'));
      if(input.claim&&(!succeeded||closed))await input.claim.release().catch(()=>console.warn('HHBA_CHECKPOINT_RELEASE_FAILED'));

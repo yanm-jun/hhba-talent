@@ -1392,3 +1392,69 @@ test('managed scoring advances the next official vacancy while the first complet
  assert.equal(budget.denied,false);
  }finally{clearTimeout(timer);release();}
 });
+
+
+test('live delivery telemetry distinguishes provider output, engine results and durable publication without sensitive contents',async()=>{
+ const {createV4DeliveryTelemetry}=await import('../functions/_lib/v4-live-delivery-telemetry.js');
+ let t=1000;const logs=[];
+ const d=createV4DeliveryTelemetry({now:()=>t,trace:'test-trace',log:(event,record)=>logs.push({event,record})});
+ const provider=d.provider('discovery');
+ t+=20;provider.observe('headers','sse');
+ t+=10;provider.observe('first_chunk');provider.observe('first_frame');
+ t+=100;provider.observe('first_search_complete');provider.observe('first_source');
+ t+=200;provider.observe('first_text');provider.observe('first_candidate');
+ t+=5;provider.observe('first_candidate');provider.observe('private-resume-content','secret-key');
+ d.result('candidate');d.result('jd_engine');d.blocked('candidate');
+ t+=50;d.result('score_engine');d.result('report_engine');d.result('report');
+ const failed=d.write('report',{candidateCount:2,reportCount:1});t+=10;failed.finish(false);
+ assert.equal(d.snapshot().first.saved_report,undefined);
+ const written=d.write('report',{candidateCount:2,reportCount:1});t+=30;written.finish(true);
+ t+=5;provider.observe('terminal');provider.finish('completed');d.finish();
+ const summary=d.snapshot();
+ assert.equal(summary.first.provider_first_candidate,330);
+ assert.equal(summary.first.result_candidate,335);
+ assert.equal(summary.first.saved_report,425);
+ assert.equal(summary.counts.blocked_candidate,1);
+ assert.equal(summary.counts.write_failed,1);
+ assert.equal(summary.counts.write_ok,1);
+ assert.equal(summary.last_provider.transport,'sse');
+ assert.equal(summary.last_provider.counts.first_candidate,2);
+ assert.equal(written.stamp.version,2);
+ assert.equal(logs.filter(x=>x.event==='provider_milestone'&&x.record.name==='first_candidate').length,1);
+ assert.doesNotMatch(JSON.stringify({logs,summary}),/private-resume-content|secret-key/);
+});
+
+test('actual V4 provider call records first complete candidate before terminal response, and distinguishes JSON fallback', {timeout:5000},async()=>{
+ const {createV4DeliveryTelemetry}=await import('../functions/_lib/v4-live-delivery-telemetry.js');
+ const {v4Call}=await import('../functions/_lib/simple-match-v4.js');
+ const a=job(7701),logs=[];let t=2000,controller,resolveCandidate;
+ const observed=new Promise(r=>{resolveCandidate=r;});
+ const d=createV4DeliveryTelemetry({now:()=>t,log:(event,record)=>logs.push({event,record})});
+ const p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test',stream:true,deliveryTelemetry:d};
+ const stream=new ReadableStream({start(c){controller=c;}});
+ const send=e=>controller.enqueue(new TextEncoder().encode('data: '+JSON.stringify(e)+'\n\n'));
+ const payload={instructions:'private prompt never logged',input:'private resume never logged',tools:[{type:'web_search'}]};
+ const pending=v4Call(async()=>{t+=25;return new Response(stream,{headers:{'content-type':'text/event-stream'}});},p,payload,{
+  stage:'discovery',onDiscoveryJob:()=>resolveCandidate(),onDiscoverySource:()=>{}
+ });
+ let timer;
+ try{
+  t+=100;send({type:'response.output_item.done',item:{type:'web_search_call',action:{sources:[{url:a.url}]}}});
+  const raw=JSON.stringify({jobs:[a],research_complete:false});
+  t+=200;send({type:'response.output_text.delta',delta:raw});
+  await Promise.race([observed,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('candidate not observed before terminal')),1500);})]);clearTimeout(timer);
+  assert.ok(d.snapshot().first.provider_first_source>=0);
+  assert.ok(d.snapshot().first.provider_first_candidate>=0);
+  assert.equal(d.snapshot().last_provider,null);
+  assert.ok(logs.some(x=>x.event==='provider_milestone'&&x.record.name==='first_candidate'));
+  t+=500;send({type:'response.completed',response:{status:'completed',output:[{type:'message',content:[{type:'output_text',text:raw}]}]}});
+  await pending;
+  assert.equal(d.snapshot().last_provider.transport,'sse');
+  assert.ok(d.snapshot().last_provider.times.terminal>d.snapshot().last_provider.times.first_candidate);
+  let calls=0;
+  await v4Call(async()=>++calls===1?new Response('{}',{status:422,headers:{'content-type':'application/json'}}):model({jobs:[a]},[a.url]),p,payload,{stage:'discovery',onDiscoveryJob:()=>{}});
+  assert.equal(calls,2);assert.equal(d.snapshot().last_provider.transport,'json');
+  assert.equal(d.snapshot().last_provider.counts.fallback,1);
+  assert.doesNotMatch(JSON.stringify(logs),/private prompt|private resume|synthetic-only|careers\.employer/);
+ }finally{clearTimeout(timer);try{controller.close();}catch{}await pending.catch(()=>{});}
+});

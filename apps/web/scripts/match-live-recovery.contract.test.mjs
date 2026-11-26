@@ -58,8 +58,10 @@ test('managed polling retains the complete report and uses the same report gate 
  const publisher=readFileSync(new URL('../functions/_lib/v4-progress-publisher.js',import.meta.url),'utf8');
  assert.ok(route.includes("queueProgress(changed?'report':newCandidate?'candidate':'routine')"),'report and candidate changes trigger expedited durable publication');
  assert.ok(publisher.includes('routine:20000,candidate:3000,report:1000'),'ordinary heartbeat throttling must not delay new results');
- assert.ok(route.includes("kind!=='candidate'||budget.snapshot().soft-budget.used>=8"),'candidate-only progress cannot consume the research reserve');
- assert.ok(service.includes('onPartial?.(verifiedMatchReports(data.progress.jobs))'),'polling must feed the report pager, not just search results');
+ assert.ok(route.includes('budget?.canPublishProgress(kind)'),'publication checks the dedicated progress allowance');
+ assert.ok(route.includes('budget?.tryProgress(kind)'),'actual writes atomically reserve counted capacity');
+ assert.ok(route.includes('progressReserve:input.background?4:0'),'managed background progress has explicit reserved capacity');
+ assert.ok(/const reports=verifiedMatchReports\(data\.progress\.jobs\);\s*onPartial\?\.\(reports\)/.test(service),'polling must feed the report pager, not just search results');
  assert.ok(dialog.includes('hasCompleteReport?2:'),'the first available report is shown without waiting for all candidates');
  assert.ok(panels.includes("pending||provisional?'已完成报告':'正式推荐'"),'unfinished global ranking must be identified as provisional');
 });
@@ -98,6 +100,19 @@ test('browser candidate reception uses direct SSE and actual managed snapshots; 
  assert.ok(service.includes('addedCandidates=liveCandidates.snapshot(data.progress.jobs)'));
  assert.ok(service.includes('data.failure?.retryable?15000:addedCandidates>0?3000:4000'));
  assert.ok(service.includes('liveCandidates.snapshot(data.research_leads,{final:true})'));
- assert.ok(service.includes('onPartial?.(verifiedMatchReports(data.progress.jobs))'));
+ assert.ok(/const reports=verifiedMatchReports\(data\.progress\.jobs\);\s*onPartial\?\.\(reports\)/.test(service));
  assert.ok(panels.includes('Math.max(report?.discovered??0,jobs.length)'));
+});
+
+test('dedicated progress allowance cannot spend the final reserved report slot on candidates',async()=>{
+ const {phaseResourceBudget,PHASE_YIELD}=await import('../functions/_lib/v4-phase-budget.js');
+ const budget=phaseResourceBudget({initial:24,soft:24,hard:34,progressReserve:4});
+ assert.equal(budget.tryProgress('routine'),false);
+ for(let i=0;i<3;i++)assert.equal(budget.tryProgress('candidate'),true);
+ assert.equal(budget.tryProgress('candidate'),false);
+ budget.take('fetch',6);
+ assert.throws(()=>budget.take('fetch'),{code:PHASE_YIELD});
+ assert.equal(budget.tryProgress('report'),true);
+ assert.equal(budget.used,34);
+ assert.equal(budget.tryProgress('report'),false);
 });
