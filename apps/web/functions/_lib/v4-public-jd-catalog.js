@@ -50,7 +50,7 @@ export async function runPublicJdCatalog(env,{now=new Date(),fetcher=fetch}={}){
  const result={enabled:false,entries:0,checked:0,saved:0,failed:0};
  if(env?.HHBA_PUBLIC_JD_CATALOG_COLLECT!=='1'||!jdArchiveConfigured(env))return result;
  result.enabled=true;
- const bucket=env.HHBA_JOB_JD_R2,db=env.HHBA_JOB_JD_DB,old=await snapshot(bucket);
+ const bucket=env.HHBA_JOB_JD_R2,old=await snapshot(bucket);
  const budget=phaseResourceBudget({initial:4,soft:20,hard:28});
  const scoped=budget.env(env),fetchPublic=budget.fetch(fetcher);
  const jobs=new Map(old.jobs.filter(j=>validRow(j,now.getTime())).map(j=>[j.url,j]));
@@ -81,7 +81,7 @@ export async function runPublicJdCatalog(env,{now=new Date(),fetcher=fetch}={}){
    if(!budget.canStart()||signal.aborted)break;
    result.checked++;
    try{
-    const jd=await v4ReadEmployerJob(url,{fetcher:localFetch,signal,cacheBucket:scoped.HHBA_JOB_JD_R2,expected:{company:row.enterprise},now});
+    const jd=await v4ReadEmployerJob(url,{fetcher:localFetch,signal,cacheBucket:scoped.HHBA_JOB_JD_R2,expected:jobs.get(url)||{company:row.enterprise},now,catalogWarm:true});
     if(jd.proof_method!=='V4_STRUCTURED_JOBPOSTING'||jd.source_confirmed!==true||jd.independently_read!==true||!jd.full_jd||looksTruncatedJd(jd.full_jd)||norm(jd.company)!==norm(row.enterprise)||!goodUrl(jd.canonical_url)||!text(jd.title)||!text(jd.location))continue;
     const saved=await saveV4PublicJobJd(scoped,jd,{now});
     if(!saved?.id)continue;

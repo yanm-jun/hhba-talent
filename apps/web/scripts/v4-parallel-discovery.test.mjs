@@ -853,10 +853,14 @@ test('catalog collector rotates public entries, archives actual same-origin JD a
  const env={HHBA_JOB_JD_DB:db,HHBA_JOB_JD_R2:bucket};
  const now=new Date();const urls=[];
  const html='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:j.title,hiringOrganization:{name:j.company,url:origin},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责汽车经销商渠道运营和业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
- const fetcher=async u=>{urls.push(u);if(u.endsWith('/robots.txt'))return new Response('',{status:404});return new Response(u===entry?'<a href="'+j.url+'">岗位详情</a><a href="https://other.cn/job/1">other</a>':html,{headers:{'content-type':'text/html'}});};
+ const fetcher=async u=>{urls.push(u);if(u.endsWith('/robots.txt'))return new Response('',{status:404});return new Response(u===entry?'<a href="'+j.url+'">岗位详情</a><a href="https://other.cn/job/1">other</a>':html,{headers:{'content-type':'text/html',etag:'"catalog-v1"'}});};
  assert.equal((await runPublicJdCatalog(env,{now,fetcher})).enabled,false);assert.equal(urls.length,0);
  const result=await runPublicJdCatalog({...env,HHBA_PUBLIC_JD_CATALOG_COLLECT:'1'},{now,fetcher});
  assert.equal(result.saved,1);assert.ok(urls.every(u=>new URL(u).origin===origin));
  const stored=JSON.parse(map.get(PUBLIC_CATALOG_KEY));assert.equal(stored.offset,1);assert.equal(stored.jobs[0].url,j.url);assert.ok(stored.jobs[0].jd_version_id);
  assert.equal(stored.jobs[0].full_jd,undefined);
+ const {v4ReadEmployerJob}=await import('../functions/_lib/v4-open-job-evidence.js');
+ const notes=[];let conditional=0;
+ const live=await v4ReadEmployerJob(j.url,{now,expected:j,cacheBucket:bucket,onCache:code=>notes.push(code),fetcher:async(u,opts)=>{assert.equal(opts.headers['If-None-Match'],'"catalog-v1"');conditional++;return new Response(null,{status:304,headers:{etag:'"catalog-v1"'}});}});
+ assert.equal(conditional,1);assert.ok(live.full_jd);assert.ok(notes.includes('JD_PUBLIC_CONDITIONAL_HIT'));
 });
