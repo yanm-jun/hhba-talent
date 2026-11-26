@@ -426,3 +426,17 @@ test('coalesced live publisher delivers real candidates and reports at exhausted
  assert.equal(budget.snapshot().progress_remaining,2);
  await publisher.stop();
 });
+
+
+test('production route and browser correlate numeric publication stamps without extra network requests',()=>{
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ const browser=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ assert.match(route,/provider\.deliveryTelemetry=delivery/);
+ assert.match(route,/delivery_stamp:write\.stamp,delivery_summary:delivery\.snapshot\(\)/);
+ assert.match(route,/await saveMatchProgress\([^\n]+write\.finish\(true\)/);
+ assert.match(route,/write\.finish\(false\)/);
+ assert.match(browser,/data\.progress\.delivery_stamp/);
+ assert.match(browser,/HHBA_V4_DELIVERY_CLIENT_APPLIED/);
+ assert.match(browser,/key!==lastDeliveryStamp/);
+ assert.match(browser,/onPartial\?\.\(reports\)/);
+});
