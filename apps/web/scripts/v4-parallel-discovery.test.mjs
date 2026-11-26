@@ -1273,3 +1273,73 @@ test('speculative citation read requires an exact structured vacancy URL, not a 
  await assert.rejects(v4ReadEmployerJob(list,{fetcher,requireSpecificPosting:true}),/V4_SPECIFIC_POSTING_NOT_CONFIRMED/);
  assert.equal((await v4ReadEmployerJob(list,{fetcher})).title,a.title,'ordinary verification behavior is unchanged');
 });
+
+
+test('rolling live verifier replenishes windows while discovery is still open, retaining revisions and deferring pressure',async()=>{
+ const {createLiveVerificationCoordinator,pendingVerification,candidateRevision}=await import('../functions/_lib/v4-research-pipeline.js');
+ const a=job(7501),b=job(7502),c=job(7503);
+ let live={phase:'research',rows:[],toolUrls:[],profile,diagnostics:{}},admitted=true,done=0,resolveSecond;
+ const second=new Promise(r=>{resolveSecond=r;});
+ const observed=[];
+ const coordinator=createLiveVerificationCoordinator({
+  getDiscovery:()=>live,canStart:()=>admitted,choose:()=>({width:1,window:1}),
+  run:async cp=>{
+   const [[u,j]]=pendingVerification(cp);
+   observed.push(u);
+   return {status:'CONTINUE',checkpoint:{...cp,phase:'reporting',matches:[...cp.matches,{official_url:u,research_candidate_url:u,match_score:85}],read:cp.read+1,scored:cp.scored+1}};
+  },
+  onChange:()=>{done++;if(done===2)resolveSecond();}
+ });
+ live={...live,rows:[[a.url,a],[b.url,b]]};coordinator.wake();
+ let timer;
+ try{
+  await Promise.race([second,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('rolling verifier did not refill')),1500);})]);clearTimeout(timer);
+  admitted=false;
+  live={...live,rows:[[a.url,{...a,requirements:'new evidence'}],[b.url,b],[c.url,c]]};
+  coordinator.wake();
+  const result=await coordinator.close();
+  assert.deepEqual(observed,[a.url,b.url]);
+  assert.equal(result.windows,2);assert.equal(result.checkpoint.priorState.scored,2);
+  assert.equal(new Map(result.checkpoint.processedEvidence).get(a.url),candidateRevision(a));
+  assert.deepEqual(pendingVerification(result.checkpoint).map(([u])=>u),[a.url,c.url]);
+ }finally{clearTimeout(timer);await coordinator.close();}
+});
+
+test('production managed search verifies and scores a newly streamed candidate before the search response terminates', {timeout:10000},async()=>{
+ const {phaseResourceBudget}=await import('../functions/_lib/v4-phase-budget.js');
+ const a=job(7510),p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test',stream:true};
+ let controller,searchDone=false,searchCalls=0,scoreCalls=0,pages=0,resolveScored,liveRecovery;
+ const scored=new Promise(r=>{resolveScored=r;});
+ const stream=new ReadableStream({start(c){controller=c;}});
+ const send=e=>controller.enqueue(new TextEncoder().encode('data: '+JSON.stringify(e)+'\n\n'));
+ const html='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',url:a.url,title:a.title,hiringOrganization:{name:a.company,url:new URL(a.url).origin},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责汽车经销商渠道运营和业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
+ const budget=phaseResourceBudget();
+ const pending=v4Match(budget.fetch(async(u,opts)=>{
+  if(u===a.url){assert.equal(searchDone,false);pages++;return new Response(html,{headers:{'content-type':'text/html'}});}
+  const payload=JSON.parse(opts.body),input=JSON.parse(payload.input);
+  if(input.job){assert.equal(searchDone,false);scoreCalls++;return model({suitable:false,score:45,reason:'有渠道经历但岗位要求不完全相符',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车经销商渠道运营',matched:['渠道运营'],gaps:[]});}
+  searchCalls++;assert.match(payload.instructions,/不要限制企业、行业、岗位方向；搜索轮次不设人为上限/);
+  assert.equal(payload.max_tool_calls,undefined);assert.equal(payload.max_output_tokens,undefined);
+  return new Response(stream,{headers:{'content-type':'text/event-stream'}});
+ }),p,resume,'全国',{
+  curated:true,officialOnly:true,stepMode:true,parallelResearch:true,deferDiscoverySnapshots:true,env:{HHBA_MATCH_V4_READY:'1'},resourceBudget:budget,
+  checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles},discoveryWidth:1},
+  onRecoveryState:get=>{liveRecovery=get;},
+  onPartial:rows=>{if(rows.some(j=>j.official_url===a.url&&j.match_score===45))resolveScored();}
+ });
+ let timer;
+ try{
+  const raw=JSON.stringify({jobs:[a],research_complete:false});
+  send({type:'response.output_text.delta',output_index:0,content_index:0,delta:raw});
+  await Promise.race([scored,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('verification waited for terminal search response')),4000);})]);clearTimeout(timer);
+  assert.equal(searchDone,false);assert.equal(pages,1);assert.equal(scoreCalls,1);
+  assert.equal(liveRecovery().priorState.matches[0].match_score,45);
+  searchDone=true;
+  send({type:'response.completed',response:{status:'completed',output:[{type:'web_search_call',action:{sources:[{url:a.url}]}},{type:'message',content:[{type:'output_text',text:raw}]}]}});
+  const result=await pending;
+  assert.equal(searchCalls,1);assert.equal(result.checkpoint.rows.length,1);
+  assert.equal(result.checkpoint.priorState.scored,1);assert.equal(result.checkpoint.priorState.matches[0].match_score,45);
+  assert.equal(result.checkpoint.diagnostics.LIVE_VERIFICATION_WINDOWS,1);
+  assert.equal(budget.denied,false);
+ }finally{clearTimeout(timer);try{controller.close();}catch{}await pending.catch(()=>{});}
+});
