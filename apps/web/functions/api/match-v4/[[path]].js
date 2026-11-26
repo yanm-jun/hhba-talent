@@ -48,7 +48,7 @@ const checkpointEnv=env=>{
 };
 const checkpointArgs=(env,input,draft)=>({env:checkpointEnv(env),account:input.phone,blocks:[input.text],job:{role:input.role_hint,excludeUrls:input.excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-research-v5'},draft});
 function events(env,request,input,waitUntil){
- const encoder=new TextEncoder();let closed=false,phase='preparing';
+ const encoder=new TextEncoder();let closed=false,phase=input.savedProgress?.stage||'preparing';
  const started=Date.now();
  const trace=input.taskKey?input.taskKey.slice(0,16):crypto.randomUUID();
  const stream=new ReadableStream({
@@ -65,8 +65,8 @@ function events(env,request,input,waitUntil){
    };
    const heart=setInterval(()=>send('heartbeat',{stage:phase,
     elapsed_ms:Date.now()-started}),12000);
-   const progress=stage=>{phase=stage;send('progress',{stage})};
-   const activity=(stage,message)=>{latestActivity={stage,message};send('activity',latestActivity);};
+   const progress=stage=>{phase=stage;send('progress',{stage});queueProgress();};
+   const activity=(stage,message)=>{latestActivity={stage,message};send('activity',latestActivity);queueProgress();};
    const sendJobs=(kind,matches)=>{
     if(input.background)return;
     send(kind+'_begin',{count:matches.length});
@@ -75,8 +75,12 @@ function events(env,request,input,waitUntil){
    };
    const allowedJob=j=>j&&!j.excluded_board&&!isCommercialRecruitmentBoard(j.official_url,j);
    const officialJob=j=>allowedJob(j)&&qualifiedReport(j);
-   let lastReport,latestActivity;
-   const sendResearch=r=>{if(r){lastReport=r;send('research_report',r);}};
+   let lastReport=input.savedProgress?.report,latestActivity=input.savedProgress?.activity,lastJobs=input.savedProgress?.jobs||[];
+   let progressTimer=null;
+   const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:lastJobs});
+   function queueProgress(){if(!input.background||!leaseHeartbeat||progressTimer)return;progressTimer=setTimeout(()=>{progressTimer=null;void leaseHeartbeat?.tick();},2000);}
+   const sendResearch=r=>{if(r){lastReport=r;send('research_report',r);queueProgress();}};
+   const rememberJobs=matches=>{lastJobs=matches.filter(allowedJob).map(j=>({id:j.id,company:j.company,title:j.title,title_zh:j.title_zh,location:j.location,official_url:j.official_url,platform:j.platform,source:j.source,remote:j.remote,reference_score:0,matched:[],not_evidenced:[],needs_verification:[],requirements_basis:'',salary:j.salary,source_status:j.source_status}));queueProgress();};
    const sendFinal=result=>{
     if(input.background){send('complete',{status:'COMPLETE'});return;}
     const matches=result.matches.filter(officialJob),leads=(result.research_leads||[]).filter(allowedJob);
@@ -85,7 +89,7 @@ function events(env,request,input,waitUntil){
     sendJobs('final',matches);
     send('complete',{...result,research_leads:[],matches:[],matches_streamed:true,match_count:matches.length,research_leads_streamed:true,research_lead_count:leads.length});
    };
-   send('progress',{stage:'preparing'});
+   send('progress',{stage:phase});
    const leaseAbort=new AbortController();
    let leaseHeartbeat=null;
    // Managed tasks are not cancelled simply because a browser transport closes.
@@ -96,8 +100,8 @@ function events(env,request,input,waitUntil){
    const guardTimer=input.managed?setInterval(()=>{if(guardBusy)return;guardBusy=true;guard().catch(e=>leaseAbort.abort(e)).finally(()=>{guardBusy=false});},12000):null;
    if(input.lease)leaseHeartbeat=startMatchPhaseHeartbeat({
      renew:()=>input.lease.renew(),
-     getCheckpoint:()=>input.taskKey&&!leaseAbort.signal.aborted?input.recoveryState?.():null,
-     persist:async state=>{await guard();if(!leaseAbort.signal.aborted)await saveMatchTask(env,input.taskKey,{checkpoint:state,generation:input.generation||0,progress:{stage:phase,activity:latestActivity,report:lastReport}});},
+     getCheckpoint:()=>input.taskKey&&!leaseAbort.signal.aborted?{checkpoint:input.recoveryState?.()||input.checkpoint||null,progress:snapshotProgress()}:null,
+     persist:async state=>{await guard();if(!leaseAbort.signal.aborted)await saveMatchTask(env,input.taskKey,{...state,generation:input.generation||0});},
      onError:e=>leaseAbort.abort(e),
      onSaveError:e=>{if(e?.code==='AI_AGENT_CANCELLED')leaseAbort.abort(e);else console.warn('HHBA_V4_PERIODIC_PROGRESS_SAVE_FAILED');}
     });
@@ -121,7 +125,7 @@ function events(env,request,input,waitUntil){
       signal:executionSignal,onProgress:progress,onActivity:activity,env,excludeUrls:input.excludeUrls,
       stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,parallelResearch:v4ParallelResearchEnabled(env),allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
       onResearch:sendResearch,
-      onPartial:matches=>{sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
+      onPartial:matches=>{rememberJobs(matches);sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
      await leaseHeartbeat?.stop();
       if(executionSignal.aborted)throw executionSignal.reason||Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
      await guard();
@@ -129,7 +133,7 @@ function events(env,request,input,waitUntil){
       console.info('HHBA_V4_STAGE',JSON.stringify({trace,phase:result.checkpoint.phase,round:result.checkpoint.round,candidates:result.checkpoint.rows?.length,processed:result.checkpoint.next,scored:result.checkpoint.scored,diagnostics:result.checkpoint.diagnostics}));
       if(input.taskKey){
        await input.lease.renew();
-       await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint,generation:input.generation||0,progress:{stage:phase,activity:latestActivity,report:lastReport}});
+       await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint,generation:input.generation||0,progress:snapshotProgress()});
        await releaseTask();
        send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});
        succeeded=true;return;
@@ -167,13 +171,12 @@ function events(env,request,input,waitUntil){
      await leaseHeartbeat?.stop();
      const reason=leaseAbort.signal.reason;
      const code=typeof reason?.code==='string'?reason.code:typeof e?.code==='string'?e.code:leaseAbort.signal.aborted?'AI_CHECKPOINT_LEASE_LOST':'AI_PROVIDER_UNAVAILABLE';
-     if(input.taskKey&&input.lease&&isV4RetryableProviderError(code)&&!leaseAbort.signal.aborted){try{const state=input.recoveryState?.();if(state){await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:state,generation:input.generation||0});}}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
-     console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,
-      elapsed_ms:Date.now()-started}));
      const retryable=code!=='AI_AGENT_CANCELLED'&&!!input.taskKey&&(isV4RetryableProviderError(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
-     send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
+      if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&code!=='AI_AGENT_CANCELLED'){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:input.recoveryState?.()||input.checkpoint||null,generation:input.generation||0,progress:snapshotProgress(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
+      console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,elapsed_ms:Date.now()-started}));
+      send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
     }finally{
-     clearInterval(heart);if(guardTimer)clearInterval(guardTimer);
+     clearInterval(heart);if(guardTimer)clearInterval(guardTimer);if(progressTimer)clearTimeout(progressTimer);
      await releaseTask().catch(()=>console.warn('HHBA_TASK_LEASE_RELEASE_FAILED'));
      if(input.claim&&(!succeeded||closed))await input.claim.release().catch(()=>console.warn('HHBA_CHECKPOINT_RELEASE_FAILED'));
      if(succeeded&&!closed&&input.pointer)await deleteMatchCheckpoint(env,input.pointer).catch(()=>console.warn('HHBA_CHECKPOINT_CLEANUP_FAILED'));
@@ -206,6 +209,7 @@ async function backgroundStep(env,request,waitUntil){
   input.lease=await leaseMatchTask(env.HHBA_PNVS_AUTH_DB,taskKey);
   if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
   const saved=await readMatchTask(env,taskKey,Date.now(),{renewGeneration:task.generation});
+  if(saved?.generation===task.generation){input.savedProgress=saved.progress;if(saved.failure&&!saved.failure.retryable){await input.lease.release();return fail(saved.failure.error,422);}}
   if(saved?.generation===task.generation&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
   else if(saved?.generation===task.generation&&saved?.checkpoint)input.checkpoint=saved.checkpoint;
   else if(saved?.result?.status==='COMPLETE'&&saved.checkpoint&&saved.generation+1===task.generation){
@@ -291,8 +295,12 @@ export async function onRequest(context){
    const generation=body.research_generation??0;
    if(input.managed&&backgroundEnabled(env,request)){
     const saved=await readMatchTask(env,input.taskKey);
-    if(saved?.generation===generation&&saved?.result?.status==='COMPLETE'){input.generation=generation;input.cachedResult=saved.result;return events(env,request,input,waitUntil);}
-    if(await tryScheduleBackgroundMatch(env,request,session,input.sessionTask))return reply({status:'PENDING',progress:saved?.generation===generation?saved.progress||null:null});
+    if(saved?.generation===generation&&saved?.result?.status==='COMPLETE'){input.generation=generation;
+    if(saved?.generation===generation){input.savedProgress=saved.progress;if(saved.failure&&!saved.failure.retryable){await input.lease.release();return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});}}input.cachedResult=saved.result;return events(env,request,input,waitUntil);}
+    if(saved?.generation===generation&&saved.failure&&!saved.failure.retryable)return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});
+     const scheduled=await tryScheduleBackgroundMatch(env,request,session,input.sessionTask);
+     if(scheduled==='FAILED')return reply({status:'FAILED',progress:saved?.generation===generation?saved.progress||null:null,failure:{error:saved?.failure?.error||'AI_BACKGROUND_EXECUTION_FAILED',retryable:false}});
+     if(scheduled)return reply({status:'PENDING',progress:saved?.generation===generation?saved.progress||null:null,failure:saved?.generation===generation?saved.failure||null:null});
     // A missing, terminated, or unavailable independent driver must not strand
     // the user in PENDING. Fall through to the same persisted task and lease.
    }
