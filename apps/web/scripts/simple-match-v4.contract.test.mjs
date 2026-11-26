@@ -150,6 +150,23 @@ test('V4 does not send a résumé if not authorized, cross-origin or unauthentic
  assert.equal(cross.status,403);
 });
 
+test('V4 readiness distinguishes runtime configuration failures without exposing secrets',async()=>{
+ const env={HHBA_AGENT_RELAY_API_KEY:key,HHBA_MATCH_V4_READY:'1',HHBA_V4_MATCH_CHECKPOINT_SECRET:'synthetic-key-for-readiness-tests-only',HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',HHBA_PNVS_AUTH_DB:{prepare(){}},HHBA_PRIVATE_RESUMES:{get(){},put(){}}};
+ const read=async e=>(await onRequest({request:new Request('https://hhba.work/api/match-v4/status'),env:e})).json();
+ const ok=await read(env);
+ assert.equal(ok.enabled,true);
+ assert.ok(Object.values(ok.readiness).every(Boolean));
+ assert.ok(!JSON.stringify(ok).includes(key));
+ assert.ok(!JSON.stringify(ok).includes(env.HHBA_V4_MATCH_CHECKPOINT_SECRET));
+ const broken=await read({...env,HHBA_AGENT_RELAY_API_KEY:'',HHBA_V4_MATCH_CHECKPOINT_SECRET:''});
+ assert.equal(broken.enabled,false);
+ assert.equal(broken.readiness.provider,false);
+ assert.equal(broken.readiness.job_provider,false);
+ assert.equal(broken.readiness.checkpoint_key,false);
+ assert.equal(broken.readiness.database,true);
+ assert.equal(broken.readiness.checkpoint_storage,false);
+});
+
 test('V4 lets the model continue across independent web-search rounds with no fixed round count',async()=>{
  const makeLead=i=>({...row,company:'雇主'+i,
   url:'https://careers.industry'+i+'.cn/roles/'+i});
