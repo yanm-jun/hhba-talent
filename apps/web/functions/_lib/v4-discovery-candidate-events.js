@@ -5,7 +5,7 @@ import {normalizeV4StreamCandidate} from './v4-stream-job-parser.js';
 
 export function createV4DiscoveryCandidateEvents({round,lane=0,signal,onCandidate,allow=()=>true}={}){
  const seen=new Set();let sequence=0;
- return raw=>{
+ return (raw,meta)=>{
   if(signal?.aborted||typeof onCandidate!=='function')return;
   const candidate=normalizeV4StreamCandidate(raw);
   if(!candidate||!allow(candidate)||seen.has(candidate.url))return;
@@ -22,6 +22,6 @@ export function createV4DiscoveryCandidateEvents({round,lane=0,signal,onCandidat
    }
   };
   // An observer cannot fail the research request or trigger a second AI call.
-  try{onCandidate(event);}catch{}
+  try{onCandidate(event,candidate,meta);}catch{}
  };
 }
