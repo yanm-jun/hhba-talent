@@ -998,3 +998,72 @@ test('parallel search emits individual lane events while retaining the original 
  assert.deepEqual(result.checkpoint.rows.map(([url])=>url).sort(),[a.url,b.url].sort());
  assert.ok(received.every(e=>e.candidate.match_score===null&&e.sequence===1));
 });
+
+
+test('shared live discovery snapshot combines interleaved agents before either response completes', {timeout:5000},async()=>{
+ const a=job(6401),b=job(6402),c=job(6403);
+ const p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test',stream:true};
+ const controllers=new Map(),snapshots=[],events=[];
+ let calls=0,recovery,notifyReady,notifyMerged,finished=0;
+ const ready=new Promise(resolve=>{notifyReady=resolve;});
+ const merged=new Promise(resolve=>{notifyMerged=resolve;});
+ const fetcher=async(_url,opts)=>{
+  calls++;const input=JSON.parse(JSON.parse(opts.body).input);
+  const lane=input.parallel_lane||0;
+  return new Response(new ReadableStream({start(controller){
+   controllers.set(lane,controller);if(controllers.size===2)notifyReady();
+  }}),{headers:{'content-type':'text/event-stream'}});
+ };
+ const send=(lane,e)=>controllers.get(lane).enqueue(new TextEncoder().encode('data: '+JSON.stringify(e)+'\n\n'));
+ const delta=(lane,text)=>send(lane,{type:'response.output_text.delta',delta:text});
+ const finish=(lane,jobs)=>{
+  finished++;send(lane,{type:'response.completed',response:{status:'completed',output:[
+   {type:'web_search_call',action:{sources:jobs.map(j=>({url:j.url}))}},
+   {type:'message',content:[{type:'output_text',text:JSON.stringify({jobs,research_complete:true,completion_reason:'test'})}]}]}});
+ };
+ const pending=v4Match(fetcher,p,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,
+  checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles},discoveryWidth:2},
+  onRecoveryState:get=>{recovery=get;},onDiscoveryCandidate:e=>events.push(e),
+  onPartial:jobs=>{
+   snapshots.push(jobs.map(j=>j.official_url));
+   if(jobs.some(j=>j.official_url===a.url)&&jobs.some(j=>j.official_url===b.url)&&!finished)notifyMerged();
+  }});
+ let timer;
+ try{
+  await Promise.race([ready,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('agents not started')),1500);})]);clearTimeout(timer);
+  delta(0,'{"jobs":['+JSON.stringify(a));
+  delta(1,'{"jobs":['+JSON.stringify(b));
+  await Promise.race([merged,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('live merge waited for a completed agent')),1500);})]);clearTimeout(timer);
+  assert.equal(finished,0);
+  assert.deepEqual(snapshots[0],[a.url]);
+  assert.deepEqual(snapshots[1],[a.url,b.url]);
+  assert.deepEqual(recovery().rows.map(([url])=>url),[a.url,b.url]);
+  assert.deepEqual(recovery().toolUrls,[],'partial JSON is not independent evidence');
+  delta(0,','+JSON.stringify(c)+']}');
+  delta(1,']}');
+  finish(0,[{...a,title:'最终核对后的名称'},c]);finish(1,[b]);
+  const result=await pending;
+  assert.equal(calls,2);
+  assert.deepEqual(result.checkpoint.rows.map(([url])=>url).sort(),[a.url,b.url,c.url].sort());
+  assert.equal(new Map(result.checkpoint.rows).get(a.url).title,'最终核对后的名称');
+  assert.equal(events.length,3);
+  assert.equal(result.checkpoint.diagnostics.LIVE_DISCOVERY_CANDIDATE_MERGED,3);
+ }finally{clearTimeout(timer);for(const c of controllers.values())try{c.close();}catch{}await pending.catch(()=>{});}
+});
+
+test('shared discovery retains closed objects from a failed agent as unverified leads without claiming its citations',async()=>{
+ const a=job(6501),b=job(6502),p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test',stream:true};
+ const snapshots=[];
+ const result=await v4Match(async(_u,opts)=>{
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(!input.parallel_lane)return model({jobs:[a],research_complete:true,completion_reason:'test'},[a.url]);
+  const partial='data: '+JSON.stringify({type:'response.output_text.delta',delta:'{"jobs":['+JSON.stringify(b)})+'\n\n';
+  return new Response(partial,{headers:{'content-type':'text/event-stream'}});
+ },p,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,
+  checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles},discoveryWidth:2},
+  onPartial:jobs=>snapshots.push(jobs)});
+ assert.deepEqual(result.checkpoint.rows.map(([url])=>url).sort(),[a.url,b.url].sort());
+ assert.equal(result.checkpoint.toolUrls.includes(b.url),false);
+ assert.ok(snapshots.some(jobs=>jobs.some(j=>j.official_url===b.url&&j.match_score===null)));
+ assert.ok(result.checkpoint.diagnostics.PARALLEL_AI_PROVIDER_RESPONSE_INVALID);
+});
