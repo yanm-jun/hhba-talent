@@ -81,3 +81,15 @@ test('retired enterprise preview assets do not ship with the candidate site',()=
  assert.equal(existsSync(new URL('../public/preview-admin',import.meta.url)),false);
  assert.equal(existsSync(new URL('../../../apps/admin-preview/index.html',import.meta.url)),true);
 });
+
+test('unmounted enterprise API client methods and activation flags cannot be revived',()=>{
+ const api=read('services/api.ts');
+ for(const name of ['organizations','createOrganization','verification','postings','talentSearch','issueEmployeeFeedbackTicket','submitEmployeeFeedback','submitAidApplication','adminAidQueue','submitEmployeePrivacyConcern','applyEmployerJob','publicEmployerJobs','adminReviewPosting']){
+  assert.doesNotMatch(api,new RegExp('^  '+name+':','m'),name);
+ }
+ for(const name of ['recruitmentResponsibilityApiReady','evidenceApiReady','employeeFeedbackApiReady','scoringApiReady','appealsApiReady','improvementsApiReady','publicationApiReady','aidCommercialApiReady']){
+  assert.ok(!api.includes('export const '+name),name);
+ }
+ for(const route of ['/employee','/employee-feedback'])assert.ok(api.includes("'"+route+"'"),route);
+ for(const name of ['me','register','login','logout','upload','resumes','profile','saveProfile','consent','consents','publicProfile'])assert.match(api,new RegExp('^  '+name+':','m'),name);
+});
