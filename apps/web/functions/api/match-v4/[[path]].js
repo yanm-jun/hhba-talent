@@ -168,6 +168,10 @@ function events(env,request,input,waitUntil){
       signal:executionSignal,onProgress:progress,onActivity:activity,env:researchEnv,resourceBudget:budget,profileCache,excludeUrls:input.excludeUrls,
       stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,parallelResearch:v4ParallelResearchEnabled(env),allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
       onResearch:sendResearch,
+      // Direct SSE exposes one observed candidate per event. The existing
+      // background transport intentionally retains its normal progress path;
+      // durable per-candidate delivery will be wired in a separate change.
+      onDiscoveryCandidate:input.background?undefined:event=>send('discovery_candidate',event),
       onPartial:matches=>{rememberJobs(matches);sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
      await stopProgress();await leaseHeartbeat?.stop();
       if(budget?.denied)throw Object.assign(Error(PHASE_YIELD),{code:PHASE_YIELD});
