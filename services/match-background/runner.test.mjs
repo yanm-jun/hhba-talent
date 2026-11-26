@@ -137,3 +137,22 @@ test('edge exhaustion and lease contention have distinct diagnostics; checkpoint
  for(const error of ['AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_INCOMPLETE','AI_CHECKPOINT_STORAGE_UNAVAILABLE','AI_PROVIDER_UNAVAILABLE'])await assert.rejects(requestPhase(async()=>event('failure',{error,retryable:false}),ticket),/BACKGROUND_PHASE_RETRY/);
  assert.equal(await requestPhase(async()=>event('failure',{error:'AI_PROVIDER_KEY_REJECTED',retryable:true}),ticket),'FAILED');
  });
+
+test('old workflow terminal infrastructure result can recover, but authorization and credentials remain terminal',async()=>{
+ const {scheduleWorkflowInstance,registerWatchdogInstance,inspectWatchdogInstances}=await import('./runner.mjs');
+ for(const error of ['AI_PHASE_RESOURCE_YIELD','AI_BACKGROUND_EXECUTION_FAILED','AI_PIPELINE_STATE_INVALID','AI_EDGE_RESOURCE_EXHAUSTED','AI_CHECKPOINT_LEASE_LOST']){
+  await assert.rejects(requestPhase(async()=>event('failure',{error,retryable:false}),ticket),/BACKGROUND_PHASE_RETRY/);
+ }
+ for(const status of [408,425])await assert.rejects(requestPhase(async()=>new Response('',{status}),ticket),/BACKGROUND_PHASE_RETRY/);
+ const {db}=registry();const id='e'.repeat(64),now=1000;let restarted=0;
+ const instance={async status(){return {status:'complete',output:{status:'FAILED',error:'AI_EDGE_RESOURCE_EXHAUSTED'}}},async restart(){restarted++}};
+ const binding={async create(){throw Error('(instance.already_exists)')},async get(){return instance}};
+ assert.deepEqual(await scheduleWorkflowInstance(binding,id,ticket,{diagnostic:true}),{status:'RECOVERING',error:'AI_EDGE_RESOURCE_EXHAUSTED'});
+ await registerWatchdogInstance(db,id,now);assert.equal((await inspectWatchdogInstances(db,binding,{now})).restarted,1);assert.equal(restarted,1);
+ assert.equal(await requestPhase(async()=>event('failure',{error:'AI_CHECKPOINT_INVALID',retryable:true}),ticket),'FAILED');
+});
+test('resource failure continuation sends only the opaque ticket and sanitized recovery hint',async()=>{
+ const requests=[],responses=[new Response('Error 1102',{status:503}),event('complete',{status:'CONTINUE'}),event('complete',{status:'COMPLETE'})];
+ const state=await driveBackgroundMatch({async do(_n,_c,fn){return fn()},async sleep(){}},ticket,async(_u,init)=>{requests.push(JSON.parse(init.body));return responses.shift()});
+ assert.deepEqual(state,{status:'COMPLETE'});assert.deepEqual(requests,[{ticket},{ticket,recovery:'AI_EDGE_RESOURCE_EXHAUSTED'},{ticket}]);
+});

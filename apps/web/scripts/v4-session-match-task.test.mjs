@@ -472,3 +472,22 @@ test('live source counts and rejected links survive recovery even when no concre
  const restored=restoreDiscoveryRecovery({generation:2,checkpoint:base},{generation:2,status:'PENDING',discovery_recovery:supplement},2);
  assert.equal(restored.statsRestored,true);assert.deepEqual(restored.saved.checkpoint.observedSearchSources,[u,excluded]);assert.deepEqual(restored.saved.checkpoint.rejectedBoards,[excluded]);assert.deepEqual(restored.saved.checkpoint.rows,[]);
 });
+
+test('recoverable legacy terminal records reopen only for the same authorized generation, preserving candidates and reports',async()=>{
+ const {normalizeV4RecoveryRecord,normalizeV4RecoveryView,terminalV4SavedFailure,retryableV4SavedFailure}=await import('../functions/_lib/v4-task-failure-policy.js');
+ const {restoreDiscoveryRecovery}=await import('../functions/_lib/v4-discovery-recovery.js');
+ const {restoreReportRecovery}=await import('../functions/_lib/v4-report-recovery.js');
+ const u='https://careers.employer.cn/jobs/24',checkpoint={phase:'research',round:1,rows:[],sourceLeads:[]};
+ const saved={generation:2,checkpoint,checkpoint_captured_at:100,failure:{error:'AI_EDGE_RESOURCE_EXHAUSTED',retryable:false}};
+ const view={generation:2,status:'FAILED',failure:saved.failure,discovery_recovery:{round:2,rows:[[u,{url:u,company:'真实企业',title:'运营',location:'上海'}]]}};
+ assert.equal(terminalV4SavedFailure(saved.failure),false);
+ assert.equal(normalizeV4RecoveryRecord(saved,2).failure.retryable,true);
+ assert.equal(normalizeV4RecoveryRecord(saved,3),saved);
+ assert.equal(normalizeV4RecoveryView(view,2).status,'PENDING');
+ assert.equal(restoreDiscoveryRecovery(saved,view,2).restored,1);
+ const verified={phase:'verification',rows:[[u,{company:'真实企业',title:'运营',location:'上海'}]],matches:[{official_url:u,evidence_excerpt:'真实JD',match_score:85}]};
+ assert.deepEqual(restoreReportRecovery(saved,{...view,report_recovery:{checkpoint:verified,captured_at:101}},2).checkpoint,verified);
+ for(const error of ['AI_AGENT_CANCELLED','AI_BACKGROUND_TICKET_INVALID','AI_CHECKPOINT_EXPIRED','AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT','AI_CHECKPOINT_INVALID']){
+  const blocked={...saved,failure:{error,retryable:true}};assert.equal(retryableV4SavedFailure(blocked.failure),false);assert.equal(normalizeV4RecoveryRecord(blocked,2),blocked);assert.equal(restoreDiscoveryRecovery(blocked,view,2).restored,0);
+ }
+});

@@ -18,6 +18,7 @@ import {claimAiCheckpoint,leaseMatchTask} from '../../_lib/ai-checkpoint-claim.j
 import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
 import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSessionTask} from '../../_lib/v4-session-match-task.js';
 import {backgroundEnabled,tryScheduleBackgroundMatch,loadBackgroundMatch,isV4RetryableTaskFailure} from '../../_lib/v4-background-match.js';
+import {isV4TerminalTaskFailure,terminalV4SavedFailure,retryableV4SavedFailure,normalizeV4RecoveryRecord,normalizeV4RecoveryView,v4RecoveredResourcePhase} from '../../_lib/v4-task-failure-policy.js';
 
 import {phaseResourceBudget,phaseModelReplay,PHASE_YIELD} from '../../_lib/v4-phase-budget.js';
 import {createV4ProgressPublisher} from '../../_lib/v4-progress-publisher.js';
@@ -59,7 +60,7 @@ const checkpointArgs=(env,input,draft)=>({env:checkpointEnv(env),account:input.p
 function events(env,request,input,waitUntil){
  const encoder=new TextEncoder();let closed=false,phase=input.savedProgress?.stage||'preparing';
  const started=Date.now();
- const budget=input.managed?phaseResourceBudget({progressReserve:input.background?4:0}):null;
+ const budget=input.managed?phaseResourceBudget({progressReserve:input.background?4:0,...(input.resourceRecovery?{initial:12,soft:22,hard:30}: {})}):null;
  const replay=budget?phaseModelReplay(input.phaseReplay):null;
  const researchEnv=budget?budget.env(env):{...env};
  // Only a managed existing task can use the opt-in shared asset path.
@@ -225,7 +226,11 @@ function events(env,request,input,waitUntil){
       deferDiscoverySnapshots:!!input.background,onDiscoveryCandidate:rememberDiscovery,
       onPartial:matches=>{rememberJobs(matches);sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
      await stopProgress();await leaseHeartbeat?.stop();
-      if(budget?.denied)throw Object.assign(Error(PHASE_YIELD),{code:PHASE_YIELD});
+      // A fully returned continuation is newer than an earlier in-flight
+      // recovery closure. Persist it even when the invocation ran out of
+      // optional resource capacity; terminal storage has reserved headroom.
+      if(result.status==='CONTINUE')input.recoveryState=()=>result.checkpoint;
+      if(budget?.denied&&result.status!=='CONTINUE'&&result.status!=='COMPLETE')throw Object.assign(Error(PHASE_YIELD),{code:PHASE_YIELD});
       if(executionSignal.aborted)throw executionSignal.reason||Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
      await guard();
      if(result.status==='CONTINUE'){
@@ -289,7 +294,7 @@ function events(env,request,input,waitUntil){
        await releaseTask();send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});succeeded=true;return;
       }catch(recoveryError){console.warn('HHBA_V4_RESOURCE_YIELD_SAVE_FAILED',JSON.stringify({trace,error:recoveryError?.code||'CHECKPOINT_SAVE_FAILED'}));}
      }
-     const retryable=code!=='AI_AGENT_CANCELLED'&&!!input.taskKey&&(isV4RetryableProviderError(code)||isV4RetryableTaskFailure(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
+     const retryable=!isV4TerminalTaskFailure(code)&&!!input.taskKey&&(isV4RetryableProviderError(code)||isV4RetryableTaskFailure(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
       if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&code!=='AI_AGENT_CANCELLED'){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:input.recoveryState?.()||input.checkpoint||null,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
       if(code!=='AI_AGENT_CANCELLED'&&!leaseAbort.signal.aborted)await publishProgress(retryable?'PENDING':'FAILED',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
        console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,elapsed_ms:Date.now()-started,resources:budget?.snapshot()}));
@@ -318,8 +323,11 @@ function events(env,request,input,waitUntil){
 // lease. It is account-bound by the same encrypted task key and generation.
 // An optional view read failing must not prevent normal checkpoint recovery.
 async function recoverSavedDiscovery(env,input,saved,view){
- if(!saved?.checkpoint||saved.generation!==input.generation||saved.result||saved.failure&&!saved.failure.retryable)return saved;
- const record=view??await readMatchProgress(env,input.taskKey).catch(()=>null);
+ if(!saved||saved.generation!==input.generation||saved.result||terminalV4SavedFailure(saved.failure))return saved;
+ const normalized=normalizeV4RecoveryRecord(saved,input.generation);
+ if(normalized!==saved){await saveMatchTask(env,input.taskKey,normalized);saved=normalized;}
+ if(!saved.checkpoint)return saved;
+ const record=normalizeV4RecoveryView(view??await readMatchProgress(env,input.taskKey).catch(()=>null),input.generation);
  const reportRecovered=restoreReportRecovery(saved,record,input.generation);
  if(reportRecovered){await saveMatchTask(env,input.taskKey,reportRecovered);saved=reportRecovered;console.info('HHBA_V4_REPORT_CHECKPOINT_RECOVERED');}
  const recovered=restoreDiscoveryRecovery(saved,record,input.generation,input.excludeUrls);
@@ -338,8 +346,8 @@ async function recoverSavedDiscovery(env,input,saved,view){
 async function backgroundStep(env,request,waitUntil){
  if(!backgroundEnabled(env,request)||request.method!=='POST')return fail('NOT_FOUND',404);
  if(!matchEnabled(env,request))return fail('MATCH_NOT_ENABLED',503);
- let ticket;
- try{const raw=await request.text();if(raw.length>256)return fail('INVALID_REQUEST',400);ticket=JSON.parse(raw)?.ticket;}catch{return fail('INVALID_REQUEST',400);}
+ let ticket,recoveryHint;
+ try{const raw=await request.text();if(raw.length>256)return fail('INVALID_REQUEST',400);const data=JSON.parse(raw);ticket=data?.ticket;recoveryHint=data?.recovery;}catch{return fail('INVALID_REQUEST',400);}
  let input;
  try{
   const {session,task,taskKey}=await loadBackgroundMatch(env,ticket);
@@ -348,12 +356,14 @@ async function backgroundStep(env,request,waitUntil){
   if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
   const durable=await readMatchTask(env,taskKey,Date.now(),{renewGeneration:task.generation});
    const saved=await recoverSavedDiscovery(env,input,durable);
-  if(saved?.generation===task.generation){input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;if(saved.failure&&!saved.failure.retryable){await input.lease.release();return fail(saved.failure.error,422);}}
+  if(saved?.generation===task.generation){input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;if(terminalV4SavedFailure(saved.failure)){await input.lease.release();return fail(saved.failure.error,422);}}
   if(saved?.generation===task.generation&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
   else if(saved?.generation===task.generation&&saved?.checkpoint)input.checkpoint=saved.checkpoint;
   else if(saved?.result?.status==='COMPLETE'&&saved.checkpoint&&saved.generation+1===task.generation){
    input.checkpoint=saved.checkpoint;await saveMatchTask(env,taskKey,{checkpoint:input.checkpoint,generation:task.generation});
   }else if(task.generation>0){await input.lease.release();return fail('AI_CHECKPOINT_EXPIRED',409);}
+  input.resourceRecovery=v4RecoveredResourcePhase(recoveryHint)||v4RecoveredResourcePhase(saved?.failure?.error);
+  if(input.resourceRecovery&&input.checkpoint?.phase==='research'&&input.checkpoint.rows?.length)input.checkpoint={...input.checkpoint,liveDeliveryTurn:'verification'};
   return events(env,request,input,waitUntil);
  }catch(e){if(input?.lease)await input.lease.release().catch(()=>{});return fail(e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
 }
@@ -434,7 +444,7 @@ export async function onRequest(context){
    const generation=body.research_generation??0;
    let view;
    if(input.managed&&backgroundEnabled(env,request)){
-    view=await readMatchProgress(env,input.taskKey).catch(()=>null);
+    view=normalizeV4RecoveryView(await readMatchProgress(env,input.taskKey).catch(()=>null),generation);
     // While the driver is active, use the lightweight view rather than
     // decrypting the multi-hundred-KB evidence/replay checkpoint on each poll.
     let scheduled;
@@ -444,10 +454,10 @@ export async function onRequest(context){
     }
     const saved=await readMatchTask(env,input.taskKey);
     if(saved?.generation===generation&&saved?.result?.status==='COMPLETE'){input.generation=generation;input.cachedResult=saved.result;return events(env,request,input,waitUntil);}
-    if(saved?.generation===generation&&saved.failure&&!saved.failure.retryable)return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});
+    if(saved?.generation===generation&&terminalV4SavedFailure(saved.failure))return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});
     if(scheduled===undefined)scheduled=await tryScheduleBackgroundMatch(env,request,session,input.sessionTask,{diagnostic:true});
     if(scheduled==='FAILED'||scheduled?.status==='FAILED')return reply({status:'FAILED',progress:view?.generation===generation?view.progress||null:saved?.generation===generation?saved.progress||null:null,failure:{error:saved?.failure?.error||scheduled?.error||'AI_BACKGROUND_EXECUTION_FAILED',retryable:false}});
-    if(scheduled)return reply({status:'PENDING',progress:view?.generation===generation?view.progress||null:saved?.generation===generation?saved.progress||null:null,failure:scheduled?.status==='RECOVERING'?(saved?.generation===generation&&saved.failure?.retryable?saved.failure:{error:scheduled.error,retryable:true}):saved?.generation===generation?saved.failure||null:null});
+    if(scheduled)return reply({status:'PENDING',progress:view?.generation===generation?view.progress||null:saved?.generation===generation?saved.progress||null:null,failure:scheduled?.status==='RECOVERING'?(saved?.generation===generation&&saved.failure?.retryable?saved.failure:{error:scheduled.error,retryable:true}):saved?.generation===generation?(retryableV4SavedFailure(saved.failure)?{...saved.failure,retryable:true}:saved.failure||null):null});
     // Fallback continues the same persisted task under its exclusive lease.
    }
    input.lease=await leaseMatchTask(db,input.taskKey);
@@ -456,12 +466,14 @@ export async function onRequest(context){
    if(!Number.isSafeInteger(generation)||generation<0||generation>(durable?.generation||0)+1){await input.lease.release();return fail('AI_CHECKPOINT_INVALID',409);}
    input.generation=generation;
    const saved=await recoverSavedDiscovery(env,input,durable,view);
-    if(saved?.generation===generation){input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;if(saved.failure&&!saved.failure.retryable){await input.lease.release();return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});}}
+    if(saved?.generation===generation){input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;if(terminalV4SavedFailure(saved.failure)){await input.lease.release();return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});}}
    if(generation===(saved?.generation||0)&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
    else if(saved?.checkpoint&&generation===(saved.generation||0))input.checkpoint=saved.checkpoint;
    else if(saved?.result?.status==='COMPLETE'&&saved.checkpoint&&generation===(saved.generation||0)+1){input.checkpoint=saved.checkpoint;await saveMatchTask(env,input.taskKey,{checkpoint:input.checkpoint,generation});}
    else if(generation>0){await input.lease.release();return fail('AI_CHECKPOINT_EXPIRED',409);}
    else if(body.continuation!==undefined){await input.lease.release();return fail('AI_CHECKPOINT_EXPIRED',409);}
+   input.resourceRecovery=v4RecoveredResourcePhase(saved?.failure?.error);
+   if(input.resourceRecovery&&input.checkpoint?.phase==='research'&&input.checkpoint.rows?.length)input.checkpoint={...input.checkpoint,liveDeliveryTurn:'verification'};
   }catch(e){if(input.lease)await input.lease.release().catch(()=>{});return fail(e?.message==='AI_CHECKPOINT_INVALID'?'AI_CHECKPOINT_INVALID':'AI_CHECKPOINT_DB_UNAVAILABLE',503);}
   return events(env,request,input,waitUntil);
  }

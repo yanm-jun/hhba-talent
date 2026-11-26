@@ -4,6 +4,7 @@
 import {normalizeV4StreamCandidate} from './v4-stream-job-parser.js';
 import {v4DiscoveryCandidateKey} from './v4-discovery-candidate-events.js';
 import {isCommercialRecruitmentBoard} from './match-employer-source.js';
+import {terminalV4SavedFailure,normalizeV4RecoveryView} from './v4-task-failure-policy.js';
 
 const keys=values=>new Set((values||[]).map(v4DiscoveryCandidateKey).filter(Boolean));
 const isRound=v=>Number.isSafeInteger(v)&&v>=0;
@@ -29,11 +30,12 @@ export function discoveryRecoverySnapshot(base,current){
 }
 
 export function restoreDiscoveryRecovery(saved,view,generation,excludeUrls=[]){
+ view=normalizeV4RecoveryView(view,generation);
  const base=saved?.checkpoint,recovery=view?.discovery_recovery;
  // Never cross an account-bound task's generation, resurrect a terminal
  // result, or modify verification/reporting checkpoint evidence.
  if(saved?.generation!==generation||view?.generation!==generation||view?.status!=='PENDING'||
-  saved.result||saved.failure&&!saved.failure.retryable||base?.phase!=='research'||!recovery||
+  saved.result||terminalV4SavedFailure(saved.failure)||base?.phase!=='research'||!recovery||
   !isRound(base.round??0)||!isRound(recovery.round)||!Array.isArray(recovery.rows))return {saved,restored:0};
  const round=base.round??0;
  if(recovery.round<round||recovery.round>round+1)return {saved,restored:0};
