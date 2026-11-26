@@ -53,7 +53,7 @@ test('native results dialog never hides optimizer behind the optional match scor
  const ui=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(ui,/function visibleMatchScore\(/);
  const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
- assert.match(panels,/<button type="button" disabled=\{pending\|\|!optimizationAvailable\|\|\(!\(jdJob\.jd_version_id&&jdJob\.jd_sha256\)/);
+ assert.match(panels,/<button type="button" disabled=\{!optimizationAvailable\|\|\(!\(jdJob\.jd_version_id&&jdJob\.jd_sha256\)/);
  assert.match(panels,/jdJob\.reference_jd_kind==='AI_GENERATED_REFERENCE'&&jdJob\.reference_jd\?\.trim\(\)&&jdJob\.reference_jd_basis\?\.trim\(\)/);
  assert.doesNotMatch(ui,/!pending&&Number\.isInteger\(job\.match_score\)/);
  assert.match(panels,/优化简历/);
@@ -125,7 +125,7 @@ test('frontend shows partial results without pretending network completion',asyn
  assert.match(svc,/onPartial\?\./);
  assert.match(page,/result\|\|partialJobs\.length>0/);
  assert.match(page,/setPartialJobs/);
- assert.match(dialog,/!pending&&activeJob&&parsedProfile/);
+ assert.match(dialog,/activeJob&&parsedProfile/);
  assert.match(dialog,/已完成 \{verifiedMatchReports\(result\.matches\)\.length\} 份可核验报告，最终排名待确认/);
  const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
  assert.match(panels,/已发现/);assert.match(panels,/官方 JD 已核验/);

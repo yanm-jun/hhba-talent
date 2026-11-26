@@ -98,7 +98,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  const activeJob=verifiedMatchReports(result.matches).find(job=>job.official_url===optimizedJobUrl)||result.matches.find(job=>job.official_url===optimizedJobUrl&&job.id===initialOptimizedJobId&&archivedHistoryJob(job));
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
  function optimizeJob(job:MatchedJob){
-  if(pending||!parsedProfile||!isVerifiedMatchReport(job)||(!(job.jd_version_id&&job.jd_sha256)&&!(job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job.reference_jd?.trim()&&job.reference_jd_basis?.trim())))return;
+  if(!parsedProfile||!isVerifiedMatchReport(job)||(!(job.jd_version_id&&job.jd_sha256)&&!(job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job.reference_jd?.trim()&&job.reference_jd_basis?.trim())))return;
   matchListScroll.current=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content')?.scrollTop||0;
   setSelectedJobUrl(job.official_url);setOptimizationDirty(false);setOptimizedJobUrl(job.official_url);
  }
@@ -189,7 +189,8 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       {optimizedJobUrl&&sourceResume&&<span id="hhba-word-top-download" />}
       <button type="button" className="hhba-match-modal-close"
        onClick={optimizedJobUrl&&sourceResume?()=>{
-        if(!optimizationDirty||window.confirm('简历还有未保存的文字草稿，关闭后可能丢失。确定关闭吗？'))onClose();
+        if(pending){backToMatches();return;}
+         if(!optimizationDirty||window.confirm('简历还有未保存的文字草稿，关闭后可能丢失。确定关闭吗？'))onClose();
        }:handleClose}
        aria-label={optimizedJobUrl&&sourceResume?'关闭简历编辑':pending?'最小化研究窗口':'关闭推荐'}><X size={19}/></button>
      </div>
@@ -197,7 +198,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobUrl?'optimization':'matches'}>
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice}{result.matches.length>0?' 已显示本次收到的岗位；请核对招聘原始页面。':''}</p>}
      {!optimizedJobUrl&&<MatchResearchPanels profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches} pending={pending} provisional={taskFailed} progressStage={progressStage} activity={progressActivity} elapsed={elapsed} selection={selectedStage} onSelectionChange={selectStage} onFollow={()=>selectStage(null)} selectedJobUrl={selectedJobUrl} onJobChange={setSelectedJobUrl} onOptimize={optimizeJob} optimizationAvailable={!!parsedProfile}/>}
-     {pending&&selectedStage!==1&&<><div className="hhba-research-now" role="status">
+     {pending&&!optimizedJobUrl&&selectedStage!==1&&<><div className="hhba-research-now" role="status">
       <LoaderCircle size={18} className="spin" aria-hidden="true"/>
       <div className="hhba-match-progress-copy">
        <strong id="hhba-native-title">{stageTitle[progressStage]}…</strong>
@@ -210,8 +211,9 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       </div>
       <span className="hhba-match-progress-time" aria-hidden="true">已用时 {elapsed} 秒</span>
      </div></>}
-     {!pending&&activeJob&&parsedProfile?
+     {activeJob&&parsedProfile?
       <section className="hhba-match-workspace" aria-label="岗位专属简历优化">
+       {pending&&<p className="hhba-refined-note" role="status">其他岗位仍在后台搜索与研究，当前这份已完成可靠报告的岗位可以单独优化简历。</p>}
        {!sourceResume&&<><button type="button" className="hhba-match-workspace-back" onClick={backToMatches}>
         返回岗位匹配结果
        </button>
