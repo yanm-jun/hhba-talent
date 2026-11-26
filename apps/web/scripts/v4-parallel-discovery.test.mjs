@@ -786,3 +786,37 @@ test('profile cache reuses only a usable profile grounded in the current resume'
  saved={summary:'fake',target_roles:['fake'],facts:[{kind:'work',quote:'does not exist in resume'}]};
  await v4Match(fetcher,provider,resume,'全国',options);assert.equal(calls,2);
 });
+
+test('read-ahead starts before slow sibling and leaves unadmitted work for ordinary processing',async()=>{
+ const {discoveryReadAhead}=await import('../functions/_lib/v4-research-pipeline.js');
+ let release,started=[];const gate=new Promise(r=>{release=r});
+ const queue=discoveryReadAhead(async item=>{started.push(item);await gate;});
+ queue.offer('a','a');queue.offer('a','a');queue.offer('b','b');
+ await Promise.resolve();assert.deepEqual(started,['a']);
+ const done=queue.close();release();await done;assert.deepEqual(started,['a']);
+});
+test('managed discovery reads grounded new JD before coordinator completes and reuses it in verification',async()=>{
+ const {phaseResourceBudget}=await import('../functions/_lib/v4-phase-budget.js');
+ const provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const fast=job(4201);let release,readEarly=false,pages=0,slowDone=false;
+ const gate=new Promise(r=>{release=r});const timer=setTimeout(release,1500);
+ const html='<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',title:fast.title,hiringOrganization:{name:fast.company,url:new URL(fast.url).origin},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责汽车经销商渠道运营和业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
+ const fetcher=async(url,opts)=>{
+  if(url===fast.url){pages++;readEarly=!slowDone;release();return new Response(html,{headers:{'content-type':'text/html'}});}
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.parallel_lane)return model({jobs:[fast]},[fast.url]);
+  if(input.job)return model({suitable:true,score:86,reason:'渠道运营匹配',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车经销商渠道运营',matched:['渠道运营'],gaps:[]});
+  await gate;slowDone=true;return model({profile,jobs:[fast],research_complete:false,continue_search:true},[fast.url]);
+ };
+ const options={curated:true,officialOnly:true,stepMode:true,parallelResearch:true,env:{HHBA_MATCH_V4_READY:'1'}};
+ try{
+  let budget=phaseResourceBudget();
+  const discovery=await v4Match(budget.fetch(fetcher),provider,resume,'全国',{...options,resourceBudget:budget,checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles},discoveryWidth:2}});
+  assert.equal(readEarly,true);assert.equal(pages,1);assert.equal(discovery.checkpoint.diagnostics.JD_DISCOVERY_PREFETCH_READY,1);
+  assert.equal(discovery.checkpoint.verificationReads.length,1);
+  budget=phaseResourceBudget();
+  const done=await v4Match(budget.fetch(fetcher),provider,resume,'全国',{...options,resourceBudget:budget,checkpoint:{...discovery.checkpoint,phase:'verification',next:0,verificationBatch:1}});
+  assert.equal(pages,1);assert.equal(done.checkpoint.scored,1);assert.equal(done.checkpoint.diagnostics.JD_DISCOVERY_PREFETCH_REUSED,1);
+  assert.equal(done.checkpoint.verificationReads.length,0);
+ }finally{clearTimeout(timer);release();}
+});
