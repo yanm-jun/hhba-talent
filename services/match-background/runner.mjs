@@ -16,10 +16,10 @@ export function recoveryDelaySeconds(code,streak=1){
  const minimum=code==='AI_EDGE_DAILY_LIMIT'?3600:code==='AI_EDGE_RESOURCE_EXHAUSTED'?180:code==='AI_PROVIDER_RATE_LIMITED'?60:15;
  return Math.max(minimum,ordinary);
 }
-export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lane}={}){
+export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lane,stagedFallback=false}={}){
  const terminal=(status,error)=>diagnostic?{status,...(error?{error}: {})}:status;
  let response;
- try{response=await fetcher('https://hhba.work/api/match-v4/background-step',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket,...(recovery&&recoverableCodes.has(recovery)?{recovery}:{}),...(validStageLane(lane)?{lane}:{})})});}
+ try{response=await fetcher('https://hhba.work/api/match-v4/background-step',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket,...(recovery&&recoverableCodes.has(recovery)?{recovery}:{}),...(validStageLane(lane)?{lane}:{}),...(stagedFallback===true?{staged_fallback:true}:{})})});}
  catch(e){if(e instanceof TypeError&&/invalid redirect|invalid url|invalid header/i.test(e.message))return terminal('FAILED','AI_BACKGROUND_REQUEST_INVALID');throw retry('AI_BACKGROUND_TRANSPORT_INTERRUPTED');}
  if(response.status>=300&&response.status<400){await response.body?.cancel().catch(()=>{});return terminal('FAILED','AI_BACKGROUND_REDIRECT_BLOCKED');}
  if(!response.ok){
@@ -54,7 +54,7 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lan
 // Rotate before the free Workflow step ceiling; the Pages checkpoint, not
 // the Workflow step history, is authoritative. This is not a task-wide cap.
 export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lane}={}){
- let streak=0,recovery,currentLane=validStageLane(lane)?lane:null;
+ let streak=0,recovery,currentLane=validStageLane(lane)?lane:null,stagedOrigin=validStageLane(lane);
  // A sleeping stage consumes no new AI requests or repeated polling steps.
  // Cloudflare buffers an event even if it arrives before waitForEvent.
  if(currentLane&&currentLane!=='discovery'){
@@ -65,7 +65,7 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
   let state;
   try{
    state=await step.do('resume-research-phase-'+phase,{retries:{limit:5,delay:'15 seconds',backoff:'exponential'},timeout:'30 minutes'},async()=>{
-    try{return await requestPhase(fetcher,ticket,{diagnostic:true,recovery,lane:currentLane});}
+    try{return await requestPhase(fetcher,ticket,{diagnostic:true,recovery,lane:currentLane,stagedFallback:stagedOrigin&&!currentLane});}
     catch(e){
      const error=retryCode(e);
      // Expected transport/host/provider failure is a durable recovery outcome,

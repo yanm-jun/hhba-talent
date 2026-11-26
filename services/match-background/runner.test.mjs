@@ -190,6 +190,7 @@ test('one failed stage wake safely returns to the single-owner legacy driver',as
  const result=await driveBackgroundMatch(step,ticket,async(_url,opts)=>{bodies.push(JSON.parse(opts.body));return response.shift()},{lane:'discovery'});
  assert.deepEqual(result,{status:'COMPLETE'});
  assert.equal(bodies[0].lane,'discovery');assert.equal(bodies[1].lane,undefined);
+ assert.equal(bodies[1].staged_fallback,true,'fallen-back worker must still clean up dormant stage instances');
 });
 test('a wake cancellation terminates dormant staged Workflow without performing paid research',async()=>{
  let called=false;

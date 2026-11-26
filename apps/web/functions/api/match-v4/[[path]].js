@@ -372,13 +372,13 @@ async function recoverSavedDiscovery(env,input,saved,view){
 async function backgroundStep(env,request,waitUntil){
  if(!backgroundEnabled(env,request)||request.method!=='POST')return fail('NOT_FOUND',404);
  if(!matchEnabled(env,request))return fail('MATCH_NOT_ENABLED',503);
- let ticket,recoveryHint,lane;
- try{const raw=await request.text();if(raw.length>256)return fail('INVALID_REQUEST',400);const data=JSON.parse(raw);ticket=data?.ticket;recoveryHint=data?.recovery;lane=data?.lane;}catch{return fail('INVALID_REQUEST',400);}
+ let ticket,recoveryHint,lane,stagedFallback;
+ try{const raw=await request.text();if(raw.length>256)return fail('INVALID_REQUEST',400);const data=JSON.parse(raw);ticket=data?.ticket;recoveryHint=data?.recovery;lane=data?.lane;stagedFallback=data?.staged_fallback===true;}catch{return fail('INVALID_REQUEST',400);}
  let input;
  try{
   const {session,task,taskKey}=await loadBackgroundMatch(env,ticket);
   input={managed:true,background:true,session,taskId:task.id,taskKey,generation:task.generation,text:task.text,role_hint:task.role,excludeUrls:task.excludeUrls,phone:session.phone,resume_id:task.resume_id,
-   ...(isV4StageLane(lane)?{backgroundTicket:ticket,...(stagedV4WorkflowsEnabled(env)?{backgroundLane:lane}:{})}:{})};
+   ...(isV4StageLane(lane)||stagedFallback?{backgroundTicket:ticket,...(isV4StageLane(lane)&&stagedV4WorkflowsEnabled(env)?{backgroundLane:lane}:{})}:{})};
   input.lease=await leaseMatchTask(env.HHBA_PNVS_AUTH_DB,taskKey);
   if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
   const durable=await readMatchTask(env,taskKey,Date.now(),{renewGeneration:task.generation});
