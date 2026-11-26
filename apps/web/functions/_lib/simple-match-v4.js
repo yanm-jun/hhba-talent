@@ -635,14 +635,14 @@ export function renderCandidatePreview(job,url,resume,toolLinked,index,toolUrls)
  * even if a later round or optional verification has an upstream failure.
  */
 export async function v4Match(fetcher,provider,resume,roleHint,
- {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},onResearch=()=>{},officialOnly=false,curated=false,env={},excludeUrls=[],checkpoint=null,stepMode=false,onRecoveryState=()=>{},allowContinue=false,parallelResearch=false,pipelineChild=false,resourceBudget=null}={}){
+ {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},onResearch=()=>{},officialOnly=false,curated=false,env={},excludeUrls=[],checkpoint=null,stepMode=false,onRecoveryState=()=>{},allowContinue=false,parallelResearch=false,pipelineChild=false,resourceBudget=null,profileCache=null}={}){
  // The deployed curated V4 route exposes the full model-neutral research protocol.
  // Legacy direct consumers without the V4 activation flag retain their compatibility behavior.
  const fullResearch=curated&&env.HHBA_MATCH_V4_READY==='1';
  // The real route uses durable checkpoints; the direct invocation path uses the same batches.
  if(curated&&!stepMode){
   let current=checkpoint,result;
-  do{result=await v4Match(fetcher,provider,resume,roleHint,{signal,onProgress,onActivity,onPartial,onResearch,officialOnly:true,curated:true,env,excludeUrls,checkpoint:current,stepMode:true,onRecoveryState,allowContinue,parallelResearch,resourceBudget});current=result.checkpoint;}while(result.status==='CONTINUE');
+  do{result=await v4Match(fetcher,provider,resume,roleHint,{signal,onProgress,onActivity,onPartial,onResearch,officialOnly:true,curated:true,env,excludeUrls,checkpoint:current,stepMode:true,onRecoveryState,allowContinue,parallelResearch,resourceBudget,profileCache});current=result.checkpoint;}while(result.status==='CONTINUE');
   return result;
  }
  // Run one existing verification phase alongside the next discovery phase.
@@ -950,13 +950,16 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(!v4UsableProfile(parsed))throw fault('AI_PROFILE_INCOMPLETE');
    return parsed;
   };
-  try{profile=await analyze(false);}
+  let reusedProfile=false;
+  if(profileCache){try{const cached=await profileCache.load();const grounded=v4GroundProfile(cached,resume);if(v4UsableProfile(grounded)){profile=grounded;reusedProfile=true;note('AI_PROFILE_CACHE_HIT');}}catch{/* cache is optional; normal model analysis remains available */}}
+  try{if(!reusedProfile)profile=await analyze(false);}
   catch(e){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    if(!['AI_PROVIDER_RESPONSE_INVALID','AI_PROFILE_INCOMPLETE'].includes(e?.code))throw e;
    note('AI_PROFILE_REPAIR');onActivity('parsing','职业分析结果不完整，正在重新核对简历并补齐报告。');
    profile=await analyze(true);
   }
+  if(!reusedProfile&&profileCache&&!signal?.aborted){try{await profileCache.save(profile);}catch{/* cache write failure must not repeat paid analysis */}}
   publishResearch();
   if(curated&&stepMode)return continuation('research');
  }

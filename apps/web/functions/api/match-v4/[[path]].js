@@ -11,7 +11,7 @@ import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../..
 import {v4ParallelResearchEnabled} from '../../_lib/v4-parallel-discovery.js';
 import {saveMatchHistory} from '../../_lib/match-history.js';
 import {recognizeV4Resume} from '../../_lib/v4-resume-ocr.js';
-import {v4CheckpointSecret,checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint,matchTaskKey,saveMatchTask,readMatchTask,startMatchPhaseHeartbeat,saveMatchProgress,readMatchProgress} from '../../_lib/v4-match-checkpoint-storage.js';
+import {v4CheckpointSecret,checkpointStorageReady,storeMatchCheckpoint,loadMatchCheckpoint,deleteMatchCheckpoint,matchTaskKey,saveMatchTask,readMatchTask,startMatchPhaseHeartbeat,saveMatchProgress,readMatchProgress,matchProfileCacheKey,readMatchProfileCache,saveMatchProfileCache} from '../../_lib/v4-match-checkpoint-storage.js';
 import {claimAiCheckpoint,leaseMatchTask} from '../../_lib/ai-checkpoint-claim.js';
 import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
 import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSessionTask} from '../../_lib/v4-session-match-task.js';
@@ -135,8 +135,13 @@ function events(env,request,input,waitUntil){
      // Keep one durable phase per Pages invocation. The hosting platform's
      // subrequest budget resets on the next continuation, not on a JS loop.
           const provider=v4JobProvider(researchEnv);if(provider&&replay){provider.phaseReplay=replay;provider.phaseResourceBudget=budget;provider.usageDb=env.HHBA_METRICS_DB;}
+      let profileCache=null;
+      if(input.managed&&!input.checkpoint&&provider&&input.resume_id&&input.session?.token_hash&&budget?.canPublish()){
+       const id=await matchProfileCacheKey(env,input.phone,input.session.token_hash,{resume_id:input.resume_id,text:input.text,role:input.role_hint,model:provider.model,base:provider.baseUrl,effort:provider.reasoningEffort||'medium'}).catch(()=>null);
+       if(id)profileCache={load:async()=>{if(!budget.canPublish())return null;budget.observe('profile_cache');return readMatchProfileCache(env,id);},save:async profile=>{if(!budget.canPublish()||executionSignal.aborted)return;budget.observe('profile_cache');await saveMatchProfileCache(env,id,profile);}};
+      }
       const result=await v4Match(budget?budget.fetch(fetch):fetch,provider,input.text,input.role_hint,{
-      signal:executionSignal,onProgress:progress,onActivity:activity,env:researchEnv,resourceBudget:budget,excludeUrls:input.excludeUrls,
+      signal:executionSignal,onProgress:progress,onActivity:activity,env:researchEnv,resourceBudget:budget,profileCache,excludeUrls:input.excludeUrls,
       stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,parallelResearch:v4ParallelResearchEnabled(env),allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
       onResearch:sendResearch,
       onPartial:matches=>{rememberJobs(matches);sendJobs('research',matches.filter(allowedJob));sendJobs('partial',matches.filter(officialJob));}});
