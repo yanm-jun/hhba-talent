@@ -320,7 +320,8 @@ export async function closeSessionMatchTask(task:Pick<SessionMatchTask,'id'|'gen
 }
 type MatchContinuation={status:'CONTINUE';continuation:{state:unknown;token:string}};
 type MatchStreamResponse=MatchResponse|MatchContinuation;
-type PendingManagedMatch={status:'PENDING'|'FAILED';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;report?:MatchResearchReport;jobs?:MatchedJob[]}|null;failure?:{error:string;retryable?:boolean}|null};
+type DeliveryStamp={version:number;phase_started_at:number;prepared_at:number;candidates:number;reports:number};
+type PendingManagedMatch={status:'PENDING'|'FAILED';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;report?:MatchResearchReport;jobs?:MatchedJob[];delivery_stamp?:DeliveryStamp}|null;failure?:{error:string;retryable?:boolean}|null};
 // Only an opaque ID and expiry are persisted locally; no raw CV, access
 // token, signed continuation or model output is written to localStorage.
 async function matchTaskReference(text:string,opts:MatchOptions,resumeId?:string){
@@ -462,6 +463,7 @@ export async function submitExtractedResumeText(
  let task:Awaited<ReturnType<typeof matchTaskReference>>|undefined;
  if(MATCH_V4_PREVIEW){try{task=opts.research_task_id?{id:opts.research_task_id,touch(){},clear(){}}:await matchTaskReference(cleaned,opts,resumeId)}catch{}}
  const liveCandidates=createLiveCandidateReception(onResearchJobs);
+ let lastDeliveryStamp='';
  let reconnectDelay=1000;
  const reconnect=async()=>{
   if(requestSignal.aborted)throw requestSignal.reason;
@@ -501,9 +503,20 @@ export async function submitExtractedResumeText(
    if(data.progress?.report)onResearch?.(data.progress.report);
    let addedCandidates=0;
     if(Array.isArray(data.progress?.jobs)){
+    const receivedAt=Date.now(),applyStarted=performance.now();
     addedCandidates=liveCandidates.snapshot(data.progress.jobs);
     // Managed polling and direct SSE must deliver the same validated reports.
-    onPartial?.(verifiedMatchReports(data.progress.jobs));
+    const reports=verifiedMatchReports(data.progress.jobs);
+    onPartial?.(reports);
+    const stamp=data.progress.delivery_stamp;
+    if(stamp&&[stamp.version,stamp.phase_started_at,stamp.prepared_at,stamp.candidates,stamp.reports].every(Number.isSafeInteger)){
+     const key=stamp.phase_started_at+':'+stamp.version;
+     if(key!==lastDeliveryStamp){lastDeliveryStamp=key;
+      // Separate server and device clocks: no claim that subtracting them
+      // measures network latency. This records callback delivery, not paint.
+      console.info('HHBA_V4_DELIVERY_CLIENT_APPLIED',{version:stamp.version,phase_started_at:stamp.phase_started_at,prepared_at:stamp.prepared_at,received_at:receivedAt,callback_ms:Math.round(performance.now()-applyStarted),candidates:data.progress.jobs.length,reports:reports.length,added_candidates:addedCandidates});
+     }
+    }
    }
    if(data.status==='FAILED')throw new MatchError(502,errorMap[data.failure?.error||'']||errorMap.AI_BACKGROUND_EXECUTION_FAILED,false);
    if(data.failure?.retryable)onActivity?.({stage:'waiting',message:(data.failure.error==='AI_EDGE_DAILY_LIMIT'?'Cloudflare 当日额度暂时不足，将在额度允许后继续。':data.failure.error==='AI_PROVIDER_RATE_LIMITED'?'AI 接口暂时限流，等待恢复。':data.failure.error==='AI_TASK_IN_PROGRESS'?'原任务仍在执行或释放任务锁。':data.failure.error==='AI_BACKGROUND_WORKFLOW_ROLLOVER'?'正在接续下一段后台工作。':'后台暂时等待或正在恢复。')+' 已保存的研究成果会保留，无需重新开始。'});
