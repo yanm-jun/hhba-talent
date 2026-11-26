@@ -220,6 +220,13 @@ test('indexed employer work city is used only when the page explicitly labels a 
  assert.equal(indexedJobWorkCity({summary:'企业总部位于上海，但岗位工作地点尚未发布。'}),null);
  assert.equal(indexedJobWorkCity({summary:'企业北京总部发布岗位，工作地点：东京。'}),null);
 });
+// Regression cases for explicit employer work-city evidence.
+const employer=(overrides={})=>({
+ id:'j1',url:'https://careers.example.com/cn/job/R173207/region-sales',source:'Example Foods, Incorporated',
+ title:'零售区域销售主管-铜陵 job in Wuhu, Anhui, China | Sales jobs at Example Foods',
+ summary:'Job Description: 管理区域销售与经销商渠道。 Requirements: 三年销售经验。',
+ content:'',availability:{status:'UNKNOWN'},...overrides
+});
 test('employer single-job header supplies Wuhu, not the sales territory in the role title',()=>{
  const row=employer();
  assert.equal(indexedJobWorkCity(row),'Wuhu');
