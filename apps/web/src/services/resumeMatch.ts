@@ -1,6 +1,7 @@
 // HHBA same-origin Cloudflare AI matching. No provider key in the browser.
 import {getRealAuthToken,realAuthReady} from './realAuth';
 import {verifiedMatchReports} from './verifiedMatchPresentation.mjs';
+import {createLiveCandidateReception} from './liveCandidateReception.mjs';
 import {extractDocxText} from './docxProfile.mjs';
 import {extractPdfText,PDFResumeError,recognizePdfPages,PDF_PAGE_OCR_MAX_BYTES} from './pdfProfile.mjs';
 
@@ -338,7 +339,7 @@ async function consumeNativeMatchStream(
  response:Response,onProgress?:(stage:NativeMatchProgress)=>void,
  onPartial?:(jobs:MatchedJob[])=>void,
  onActivity?:(activity:NativeMatchActivity)=>void,onReceive?:()=>void,
- onResearch?:(report:MatchResearchReport)=>void,onResearchJobs?:(jobs:MatchedJob[])=>void
+ onResearch?:(report:MatchResearchReport)=>void,onResearchJobs?:(jobs:MatchedJob[])=>void,onDiscoveryCandidate?:(event:unknown)=>void
 ):Promise<MatchStreamResponse>{
  if(!response.body)throw new MatchError(502,'智能匹配连接没有返回可读取的结果。',true);
  const decoder=new TextDecoder(),reader=response.body.getReader();
@@ -379,7 +380,9 @@ async function consumeNativeMatchStream(
    }
   }else if(event==='research_report'){
    if(value?.profile&&Array.isArray(value.rounds)){researchReport=value as MatchResearchReport;onResearch?.(researchReport);}
-  }else if(event==='research_begin'){
+  }else if(event==='discovery_candidate'){
+    onDiscoveryCandidate?.(value);
+   }else if(event==='research_begin'){
    researchJobs=[];
   }else if(event==='research_job'){
    if(value?.job)researchJobs.push(value.job as MatchedJob);
@@ -458,6 +461,7 @@ export async function submitExtractedResumeText(
  let continuation:MatchContinuation['continuation']|undefined;
  let task:Awaited<ReturnType<typeof matchTaskReference>>|undefined;
  if(MATCH_V4_PREVIEW){try{task=opts.research_task_id?{id:opts.research_task_id,touch(){},clear(){}}:await matchTaskReference(cleaned,opts,resumeId)}catch{}}
+ const liveCandidates=createLiveCandidateReception(onResearchJobs);
  let reconnectDelay=1000;
  const reconnect=async()=>{
   if(requestSignal.aborted)throw requestSignal.reason;
@@ -482,7 +486,7 @@ export async function submitExtractedResumeText(
    throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。',true);});
   const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
   if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。',response.status===429||response.status>=500);
-  const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,undefined,onResearch,onResearchJobs):
+  const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,undefined,onResearch,jobs=>{liveCandidates.snapshot(jobs);},event=>{liveCandidates.receive(event);}):
    await response.json().catch(()=>({})) as (Partial<MatchResponse>|MatchContinuation|PendingManagedMatch)&{error?:string};
   if(!response.ok){
    const code=(data as {error?:string}).error||'';
@@ -495,15 +499,16 @@ export async function submitExtractedResumeText(
    if(data.progress?.stage)onProgress?.(data.progress.stage);
    if(data.progress?.activity)onActivity?.(data.progress.activity);
    if(data.progress?.report)onResearch?.(data.progress.report);
-   if(Array.isArray(data.progress?.jobs)){
-    onResearchJobs?.(data.progress.jobs);
+   let addedCandidates=0;
+    if(Array.isArray(data.progress?.jobs)){
+    addedCandidates=liveCandidates.snapshot(data.progress.jobs);
     // Managed polling and direct SSE must deliver the same validated reports.
     onPartial?.(verifiedMatchReports(data.progress.jobs));
    }
    if(data.status==='FAILED')throw new MatchError(502,errorMap[data.failure?.error||'']||errorMap.AI_BACKGROUND_EXECUTION_FAILED,false);
    if(data.failure?.retryable)onActivity?.({stage:'waiting',message:(data.failure.error==='AI_EDGE_DAILY_LIMIT'?'Cloudflare 当日额度暂时不足，将在额度允许后继续。':data.failure.error==='AI_PROVIDER_RATE_LIMITED'?'AI 接口暂时限流，等待恢复。':data.failure.error==='AI_TASK_IN_PROGRESS'?'原任务仍在执行或释放任务锁。':data.failure.error==='AI_BACKGROUND_WORKFLOW_ROLLOVER'?'正在接续下一段后台工作。':'后台暂时等待或正在恢复。')+' 已保存的研究成果会保留，无需重新开始。'});
    else if(!data.progress)onActivity?.({stage:'preparing',message:'后台任务已登记，正在等待实际执行状态。'});
-   await new Promise<void>((resolve,reject)=>{const stop=()=>{clearTimeout(timer);reject(requestSignal.reason)};const timer=setTimeout(()=>{requestSignal.removeEventListener('abort',stop);resolve()},data.failure?.retryable?15000:4000);requestSignal.addEventListener('abort',stop,{once:true});});
+   await new Promise<void>((resolve,reject)=>{const stop=()=>{clearTimeout(timer);reject(requestSignal.reason)};const timer=setTimeout(()=>{requestSignal.removeEventListener('abort',stop);resolve()},data.failure?.retryable?15000:addedCandidates>0?3000:4000);requestSignal.addEventListener('abort',stop,{once:true});});
    continue;
   }
   if(data.status==='CONTINUE'){
@@ -516,7 +521,7 @@ export async function submitExtractedResumeText(
   task?.clear();
   if(task&&data.can_continue&&typeof data.research_generation==='number')data.research_task_id=task.id;
   if(data.research_report)onResearch?.(data.research_report);
-  if(data.research_leads)onResearchJobs?.(data.research_leads);
+  if(data.research_leads)liveCandidates.snapshot(data.research_leads,{final:true});
   return data as MatchResponse;
   }catch(error){if(!MATCH_V4_PREVIEW||!task||!(error instanceof MatchError)||!error.retryable||requestSignal.aborted)throw error;await reconnect();}
   }

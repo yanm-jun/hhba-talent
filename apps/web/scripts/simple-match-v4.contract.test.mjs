@@ -679,7 +679,7 @@ test('refined stage workspace derives discovery animation solely from actual bac
  const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
  const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  const css=await readFile(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
- assert.match(panels,/discovered=report\?\.discovered\?\?all\.length/);
+ assert.match(panels,/discovered=pending\?Math\.max\(report\?\.discovered\?\?0,jobs\.length\):report\?\.discovered\?\?all\.length/);
  assert.match(panels,/key=\{discovered\}/);
  assert.match(panels,/width:ratio\+'%'/);
  assert.match(panels,/activity\?\.message/);

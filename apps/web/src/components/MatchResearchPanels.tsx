@@ -105,9 +105,12 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
   });
  },[all]);
  const byUrl=useMemo(()=>new Map(all.map(j=>[j.official_url,j])),[all]);
- const recent=(arrival.length?arrival.map(u=>byUrl.get(u)).filter((j):j is MatchedJob=>!!j):all).slice(-3).reverse();
+ const arrivalSet=new Set(arrival);
+ const recent=[...arrival.map(u=>byUrl.get(u)).filter((j):j is MatchedJob=>!!j),...all.filter(j=>!arrivalSet.has(j.official_url))].slice(-3).reverse();
  const identified=!!(parsed&&(parsed.summary||parsed.facts?.length||parsed.skills?.length||parsed.target_roles?.length||parsed.education));
- const discovered=report?.discovered??all.length;
+ // The candidate event can precede the aggregate report. Count actual received
+ // candidate rows immediately; final history still uses the authoritative total.
+ const discovered=pending?Math.max(report?.discovered??0,jobs.length):report?.discovered??all.length;
  const target=report?.candidate_target;
  const searching=pending&&actual===1;
  const ratio=target?Math.max(0,Math.min(100,discovered/target*100)):0;
@@ -162,7 +165,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
     <div className="hhba-search-meta"><span>研究轮次 <b>{report?.rounds.length??0}</b></span><span>已发现企业 <b>{companies}</b></span><span>排除商业来源 <b>{report?.excluded_count??0}</b></span>{pending&&elapsed!==undefined&&<span>已用时 <b>{elapsed}</b> 秒</span>}</div>
    </div>
    <section className="hhba-refined-section hhba-discovery-feed"><div className="hhba-refined-subhead"><h3>{pending?'最新发现':'候选岗位一览'}</h3><small>{pending?'LIVE DISCOVERY':'DISCOVERY'}</small></div>
-    {recent.length?recent.map(job=><div className="hhba-discovery-item" key={job.official_url}><div><JobTitle job={job}/></div><span className={confirmed(job)?'hhba-source-confirmed':'hhba-source-pending'}>{confirmed(job)?'来源已核验':'待核验'}</span></div>):empty(pending?'等待实际搜索返回首批候选岗位。':'本次没有保留候选岗位。')}
+    {recent.length?recent.map(job=><div className="hhba-discovery-item" key={job.official_url}><div><JobTitle job={job}/></div><span className={confirmed(job)?'hhba-source-confirmed':'hhba-source-pending'}>{confirmed(job)?'来源已核验':'待核验'}</span></div>):empty(pending?'等待实际搜索返回首个候选岗位。':'本次没有保留候选岗位。')}
    </section>
    <details className="hhba-refined-details"><summary>实际研究记录（{report?.rounds.length??0} 轮）</summary>
     {report?.rounds.map(r=><details key={r.round}><summary>第 {r.round} 轮 · 新增 {r.added} 个候选 · {r.cited_count} 条非商业平台引用</summary>

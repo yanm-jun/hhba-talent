@@ -155,7 +155,7 @@ test('recovery diagnostics cannot be mistaken for terminal failures in the route
  assert.match(route,/error:scheduled\.error,retryable:true/);
  assert.match(route,/isV4RetryableTaskFailure\(code\)/);
  assert.match(route,/if\(committedResult\)/);
- assert.match(client,/data\.failure\?\.retryable\?15000:4000/);
+ assert.match(client,/data\.failure\?\.retryable\?15000:addedCandidates>0\?3000:4000/);
 });
 
 test('profile reuse key isolates session, account, exact resume revision, intent and model; expires without renewal',async()=>{
