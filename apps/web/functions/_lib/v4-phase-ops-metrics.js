@@ -7,20 +7,27 @@ const stage=v=>lanes.has(v)?v:'mixed';
 const code=v=>typeof v==='string'&&/^[A-Z][A-Z0-9_]{2,72}$/.test(v)?v:'-';
 const millis=v=>Number.isFinite(v)&&v>=0?Math.min(Math.floor(v),86400000):0;
 const sample=v=>Number.isFinite(v)&&v>=0?Math.min(Math.floor(v),86400000):null;
-export function v4PhaseMetricSample({started,finished=Date.now(),lane,outcome,error,recovering=false,first={},events=[]}={}){
+export function v4PhaseMetricSample({started,finished=Date.now(),lane,outcome,error,recovering=false,first={},events=[],resources=null}={}){
  const counts={candidate:0,jd:0,score:0,report:0};
  for(const e of events)if(e&&Object.hasOwn(counts,e.kind))counts[e.kind]++;
  const seen={candidate:sample(first.result_candidate),jd:sample(first.result_jd),report:sample(first.result_report)};
  const success=['CONTINUE','COMPLETE','RESOURCE_YIELD','CACHED'].includes(outcome);
+ const observed=resources?.mode==='classified';
+ const number=x=>observed&&Number.isSafeInteger(Number(x))&&Number(x)>=0?Number(x):0;
+ const resourceCounts={resource_samples:observed?1:0,
+  external_calls:number(resources?.external_subrequests?.used),service_calls:number(resources?.service_subrequests?.used),
+  d1_calls:number(resources?.classes?.database),r2_calls:number(resources?.classes?.storage),
+  browser_calls:number(resources?.classes?.browser),maintenance_calls:number(resources?.classes?.maintenance),
+  d1_statements:number(resources?.operations?.d1Statements)};
  return {day:new Date(finished).toISOString().slice(0,10),lane:stage(lane),outcome:outcomes.has(outcome)?outcome:'RETRYABLE_FAILURE',
   error_code:outcome==='RETRYABLE_FAILURE'||outcome==='TERMINAL_FAILURE'?code(error):'-',
   executions:1,recovered_attempts:recovering?1:0,recovered_successes:recovering&&success?1:0,elapsed_ms_total:millis(finished-started),elapsed_ms_max:millis(finished-started),
   candidates:counts.candidate,jds:counts.jd,scores:counts.score,reports:counts.report,
   first_candidate_ms_total:seen.candidate??0,first_candidate_known:seen.candidate!==null?1:0,
   first_jd_ms_total:seen.jd??0,first_jd_known:seen.jd!==null?1:0,
-  first_report_ms_total:seen.report??0,first_report_known:seen.report!==null?1:0};
+  first_report_ms_total:seen.report??0,first_report_known:seen.report!==null?1:0,...resourceCounts};
 }
-const values=['day','lane','outcome','error_code','executions','recovered_attempts','recovered_successes','elapsed_ms_total','elapsed_ms_max','candidates','jds','scores','reports','first_candidate_ms_total','first_candidate_known','first_jd_ms_total','first_jd_known','first_report_ms_total','first_report_known'];
+const values=['day','lane','outcome','error_code','executions','recovered_attempts','recovered_successes','elapsed_ms_total','elapsed_ms_max','candidates','jds','scores','reports','first_candidate_ms_total','first_candidate_known','first_jd_ms_total','first_jd_known','first_report_ms_total','first_report_known','resource_samples','external_calls','service_calls','d1_calls','r2_calls','browser_calls','maintenance_calls','d1_statements'];
 export async function recordV4PhaseOps(db,sample){
  if(!db?.prepare||!sample)return false;
  try{
@@ -50,7 +57,10 @@ export async function readV4PhaseOps(db,since,until){
     firstCandidateMs:sampleMean(sum(records,'first_candidate_ms_total'),sum(records,'first_candidate_known')),
     firstJdMs:sampleMean(sum(records,'first_jd_ms_total'),sum(records,'first_jd_known')),
     firstReportMs:sampleMean(sum(records,'first_report_ms_total'),sum(records,'first_report_known')),
-    candidates:sum(records,'candidates'),jds:sum(records,'jds'),scores:sum(records,'scores'),reports:sum(records,'reports')};
+    candidates:sum(records,'candidates'),jds:sum(records,'jds'),scores:sum(records,'scores'),reports:sum(records,'reports'),
+    resourceSamples:sum(records,'resource_samples'),externalCalls:sum(records,'external_calls'),serviceCalls:sum(records,'service_calls'),
+    d1Calls:sum(records,'d1_calls'),r2Calls:sum(records,'r2_calls'),browserCalls:sum(records,'browser_calls'),
+    maintenanceCalls:sum(records,'maintenance_calls'),d1Statements:sum(records,'d1_statements')};
   };
   const stages=[...new Set(rows.map(x=>x.lane))].map(lane=>({lane,...calc(rows.filter(x=>x.lane===lane))}));
   const errors=rows.filter(x=>['RETRYABLE_FAILURE','TERMINAL_FAILURE'].includes(x.outcome)).reduce((all,row)=>{const key=row.lane+':'+row.error_code;all.set(key,(all.get(key)||0)+Number(row.executions||0));return all;},new Map());

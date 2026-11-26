@@ -390,6 +390,12 @@ function renderV4Operations(){
  }
  add('v4-ops-details','首次候选 / 首次 JD / 首份报告（单阶段观察）',[total.firstCandidateMs,total.firstJdMs,total.firstReportMs].map(fmtms).join(' / '));
  add('v4-ops-details','已接收真实成果','候选 '+fmt.format(total.candidates)+' · JD '+fmt.format(total.jds)+' · 评分 '+fmt.format(total.scores)+' · 报告 '+fmt.format(total.reports));
+ if(total.resourceSamples>0){
+  add('v4-ops-details','研究阶段外部请求 / Cloudflare 服务绑定','外部 '+fmt.format(total.externalCalls)+' · 服务 '+fmt.format(total.serviceCalls)+'（已观测阶段）');
+  add('v4-ops-details','D1 / R2 / 浏览器调用','D1 '+fmt.format(total.d1Calls)+' · R2 '+fmt.format(total.r2Calls)+' · 浏览器 '+fmt.format(total.browserCalls));
+  add('v4-ops-details','D1 批次内 SQL 语句',fmt.format(total.d1Statements)+' 条（绑定调用与 SQL 语句分别统计）');
+  add('v4-ops-details','分类资源采样覆盖',fmt.format(total.resourceSamples)+' 个执行阶段；程序代理计数，非 Cloudflare 账单');
+ }else add('v4-ops-details','分类资源调用','尚未采集到支持分类计量的执行阶段，不按 0 次展示');
  for(const e of s.errors||[])add('v4-ops-details',(labels[e.lane]||e.lane)+' · '+e.code,fmt.format(e.count)+' 次');
 }
 function renderAiUsage(){

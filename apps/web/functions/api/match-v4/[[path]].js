@@ -341,7 +341,7 @@ function events(env,request,input,waitUntil){
      if(input.claim&&(!succeeded||closed))await input.claim.release().catch(()=>console.warn('HHBA_CHECKPOINT_RELEASE_FAILED'));
      if(succeeded&&!closed&&input.pointer)await deleteMatchCheckpoint(env,input.pointer).catch(()=>console.warn('HHBA_CHECKPOINT_CLEANUP_FAILED'));
      await usageBuffer?.flush();
-     if(input.managed){const snapshot=delivery.snapshot();await recordV4PhaseOps(env.HHBA_METRICS_DB,v4PhaseMetricSample({started,lane:input.backgroundLane||'mixed',outcome:metricOutcome,error:metricError,recovering:!!input.recovering,first:snapshot.first,events:jobJournal.snapshot().filter(e=>e.seq>initialEventSequence)}));}
+     if(input.managed){const snapshot=delivery.snapshot();await recordV4PhaseOps(env.HHBA_METRICS_DB,v4PhaseMetricSample({started,lane:input.backgroundLane||'mixed',outcome:metricOutcome,error:metricError,recovering:!!input.recovering,first:snapshot.first,resources:budget?.snapshot(),events:jobJournal.snapshot().filter(e=>e.seq>initialEventSequence)}));}
      if(!closed){closed=true;try{controller.close()}catch{}}
     }
    })();

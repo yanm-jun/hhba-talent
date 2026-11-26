@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
 import {v4PhaseMetricSample,recordV4PhaseOps,readV4PhaseOps} from '../functions/_lib/v4-phase-ops-metrics.js';
-const sql=readFileSync(new URL('../d1/20261126_v4_phase_ops_daily.sql',import.meta.url),'utf8');
+const sql=readFileSync(new URL('../d1/20261126_v4_phase_ops_daily.sql',import.meta.url),'utf8')+readFileSync(new URL('../d1/20261126_v4_phase_ops_resources.sql',import.meta.url),'utf8');
 function database(){
  const db=new DatabaseSync(':memory:');db.exec(sql);
  return {db,cloud:{prepare(query){return {bind(...args){return {async run(){const r=db.prepare(query).run(...args);return {success:true,meta:{changes:Number(r.changes)}}},async all(){return {results:db.prepare(query).all(...args)}}}}}}}};
@@ -58,4 +58,29 @@ test('ops view reuses verified administrator API and does not expose applicant d
  assert.match(dashboard,/renderAiUsage\(\);renderV4Operations\(\)/);
  assert.match(metrics,/await verifyAdmin\(request,env\)/);
  assert.match(metrics,/v4Operations:await readV4PhaseOps\(db,since,until\)/);
+});
+
+test('classified cloud binding calls aggregate separately and absent samples do not appear as zero usage',async()=>{
+ const {cloud}=database(),start=Date.parse('2026-11-26T05:00:00.000Z');
+ const resources={mode:'classified',classes:{network:3,database:8,storage:2,browser:1,maintenance:4},
+  operations:{d1Statements:25},external_subrequests:{used:4,ceiling:46},service_subrequests:{used:14,ceiling:900}};
+ const sample=v4PhaseMetricSample({started:start,finished:start+12500,lane:'verification',outcome:'CONTINUE',resources});
+ assert.equal(sample.resource_samples,1);assert.equal(sample.external_calls,4);
+ assert.equal(sample.d1_calls,8);assert.equal(sample.d1_statements,25);
+ assert.ok(!JSON.stringify(sample).includes('ceiling'));
+ await recordV4PhaseOps(cloud,sample);
+ await recordV4PhaseOps(cloud,v4PhaseMetricSample({started:start,finished:start+20000,lane:'reporting',outcome:'COMPLETE'}));
+ const stat=await readV4PhaseOps(cloud,'2026-11-26','2026-11-26');
+ assert.equal(stat.summary.resourceSamples,1);
+ assert.equal(stat.summary.externalCalls,4);
+ assert.equal(stat.summary.serviceCalls,14);
+ assert.equal(stat.summary.d1Calls,8);
+ assert.equal(stat.summary.r2Calls,2);
+ assert.equal(stat.summary.browserCalls,1);
+ assert.equal(stat.summary.d1Statements,25);
+ assert.equal(stat.stages.find(x=>x.lane==='verification').resourceSamples,1);
+ assert.equal(stat.stages.find(x=>x.lane==='reporting').resourceSamples,0);
+ const dashboard=readFileSync(new URL('../../admin-preview/dashboard.js',import.meta.url),'utf8');
+ assert.match(dashboard,/if\(total\.resourceSamples>0\)/);
+ assert.match(dashboard,/程序代理计数，非 Cloudflare 账单/);
 });
