@@ -448,9 +448,9 @@ async function recoverEmployerJob(fetcher,provider,url,job,initial,{signal,onAct
 
 // Use the same unrestricted public research tools when the full employer JD
 // cannot be verified. This output is a research reference, never a verified JD.
-async function researchIncompleteJd(fetcher,provider,url,job,checked,{signal,browser,ledger,note,diagnostics,taskNotes,publicAssetEnv}){
+async function researchIncompleteJd(fetcher,provider,url,job,checked,{signal,browser,ledger,note,diagnostics,taskNotes,publicAssetEnv,precheckedReference}){
  const publicIdentity=publicAssetEnv&&publicVacancyIdentity(checked);
- if(publicIdentity){const cached=await readPublicReferenceAsset(publicAssetEnv,publicIdentity);if(cached){note('PUBLIC_REFERENCE_ASSET_HIT');await recordPublicAssetReuse(publicAssetEnv);return {facts:cached.facts,inference:'',unknowns:['近期公共研究参考；具体招聘条件以企业当前公告为准。'],checked_at:new Date().toISOString(),publicMaterial:cached.data};}}
+ if(publicIdentity){const cached=precheckedReference===undefined?await readPublicReferenceAsset(publicAssetEnv,publicIdentity):precheckedReference;if(cached){note('PUBLIC_REFERENCE_ASSET_HIT');await recordPublicAssetReuse(publicAssetEnv);return {facts:cached.facts,inference:'',unknowns:['近期公共研究参考；具体招聘条件以企业当前公告为准。'],checked_at:new Date().toISOString(),publicMaterial:cached.data};}}
  // Isolate shared generation from applicant-conditioned summaries and notes.
  const assetLedger=publicIdentity?[]:ledger;
  const subject=publicIdentity?{company:publicIdentity.company,title:publicIdentity.title,location:publicIdentity.location,url:publicIdentity.url}:job;
@@ -480,11 +480,13 @@ async function researchIncompleteJd(fetcher,provider,url,job,checked,{signal,bro
   if(publicIdentity){
    for(const record of assetLedger)v4RememberPublicResult(ledger,record);
    let material=normalizePublicReference(proposed,publicIdentity,result.facts);
-   if(!material&&result.facts.length){
+   if(!material){
     note('PUBLIC_REFERENCE_NEEDS_QUALITY_REVIEW');
+    try{
     // Reorganize verified facts without a new search or any applicant input.
     const fixed=await v4Call(fetcher,provider,{instructions:'你是公开职业资料研究员。依据已独立核实的公开资料和岗位名称，完善一份详细专业的AI参考JD。分清企业公开事实和推断；逐项展开工作对象、业务环节、可能职责、能力及对应案例、发展方向和具体待核实问题。不设置固定长度；不虚构薪资、学历、年限或企业要求。输出JSON reference_jd,reference_basis,reference_coverage:{duties_quote,capabilities_quote},reference_source_anchors:{duties:{kind:public_excerpt或title_direction,url,quote},capabilities:{kind:public_excerpt或title_direction,url,quote}},reference_material_review:{status:complete或revise,explanation,missing:[]}。引文严格来自已核实facts；title_direction仅引用岗位标题。独立审核是否过于简略或缺少重要细节。',input:JSON.stringify({job:publicIdentity,independent_public_excerpts:result.facts,previous_public_reference:proposed.reference_jd||'',previous_review:proposed.reference_material_review||null})},{signal,stage:'jd_search'});
     if(fixed.status==='completed')material=normalizePublicReference(v4ParseJson(fixed),publicIdentity,result.facts);
+    }catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(e?.code==='AI_PHASE_RESOURCE_YIELD')throw e;note('PUBLIC_REFERENCE_REPAIR_FALLBACK');}
    }
    if(material){result.publicMaterial=material.data;result.assetRecord=publicAssetRecord(checked,{material});}
   }
@@ -562,9 +564,16 @@ async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=fa
    const jobNote=code=>{diagnostics.push(code);note(code);};
    const refresh=forceRefresh.has(url);
    let checked=await checkJob(fetcher,url,signal,job,jobNote,curated&&!refresh?cacheBucket:undefined,refresh?undefined:proofCache);
-   if(curated&&!isOfficialJd(checked)&&(!checked?.vacancy_confirmed||fullResearch)&&!checked?.excluded_board&&!checked?.excluded_closed){
+   // A current independent read always wins. Recent same-identity reference
+   // material avoids repeating the expensive alternative-JD search only if
+   // this exact live vacancy still lacks complete original text.
+   const currentIdentity=!refresh&&publicAssetEnv&&!isOfficialJd(checked)?publicVacancyIdentity(checked):null;
+   let precheckedReference=currentIdentity?await readPublicReferenceAsset(publicAssetEnv,currentIdentity):undefined;
+   if(precheckedReference)jobNote('PUBLIC_REFERENCE_RECOVERY_REUSED');
+   if(!precheckedReference&&curated&&!isOfficialJd(checked)&&(!checked?.vacancy_confirmed||fullResearch)&&!checked?.excluded_board&&!checked?.excluded_closed){
     jobNote('JD_RECOVERY_REQUIRED');
     checked=await recoverEmployerJob(fetcher,provider,url,job,checked,{signal,onActivity,note:jobNote,browser,ledger,taskNotes:notesFor(url),cacheBucket:refresh?undefined:cacheBucket,proofCache:refresh?undefined:proofCache,fullResearch});
+    if(JSON.stringify(publicVacancyIdentity(checked))!==JSON.stringify(currentIdentity))precheckedReference=undefined;
    }
    if(!checked?.full_jd)jobNote(checked?.excluded_closed?'JD_CLOSED':checked?.excluded_board?'JD_BOARD':'JD_NOT_READ');
    else if(!isOfficialJd(checked))jobNote('JD_OFFICIAL_UNCONFIRMED');
@@ -573,7 +582,7 @@ async function enrich(fetcher,rows,{signal,onActivity=()=>{},provider,curated=fa
     // Preserve the actual partial text, and let production research investigate
     // additional public employer material even when the vacancy is confirmed.
     const seed=checked?.vacancy_confirmed&&checked?.source_confirmed&&checked?.independently_read?groundJdResearch({facts:checked.partial_jd?[{url:checked.canonical_url,quote:checked.partial_jd,context:'same_job'}]:[],unknowns:['官方完整职责与资格未取得']},checked.partial_jd?[{url:checked.canonical_url,text:checked.partial_jd}]:[],diagnostics):undefined;
-    const supplement=fullResearch||!checked?.vacancy_confirmed?await researchIncompleteJd(fetcher,provider,url,job,checked,{signal,browser,ledger,note:jobNote,diagnostics,taskNotes:notesFor(url),publicAssetEnv:refresh?undefined:publicAssetEnv}):undefined;
+    const supplement=fullResearch||!checked?.vacancy_confirmed?await researchIncompleteJd(fetcher,provider,url,job,checked,{signal,browser,ledger,note:jobNote,diagnostics,taskNotes:notesFor(url),publicAssetEnv:refresh?undefined:publicAssetEnv,precheckedReference}):undefined;
     const jd_research=mergeJdResearch(seed,supplement);
     if(jd_research)jd_research.unknowns=[...new Set([...(seed?.unknowns||[]),...jd_research.unknowns])];
     checked={...checked,jd_research,...(supplement?.publicMaterial?{publicMaterial:supplement.publicMaterial,assetRecord:supplement.assetRecord}:{})};

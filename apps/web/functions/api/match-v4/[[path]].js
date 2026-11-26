@@ -55,7 +55,7 @@ function events(env,request,input,waitUntil){
  const budget=input.managed?phaseResourceBudget():null;
  const replay=budget?phaseModelReplay(input.phaseReplay):null;
  const researchEnv=budget?budget.env(env):{...env};
- // Only a managed existing task can use the opt-in shared asset path.
+ // Only an authenticated managed matching task can accumulate assets; payment is deliberately not a dependency.
  if(!input.managed)researchEnv.HHBA_V4_PUBLIC_ASSETS_ENABLED='0';
  const trace=input.taskKey?input.taskKey.slice(0,16):crypto.randomUUID();
  const stream=new ReadableStream({

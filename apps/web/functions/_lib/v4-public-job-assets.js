@@ -59,7 +59,7 @@ export async function publicAssetHints(env,profile,{now=Date.now(),limit=40}={})
  if(!roles.length)return [];
  const terms=[...new Set(roles)].slice(0,8);
  try{
-  const sql="SELECT url,company,title,location,kind,checked_at FROM (SELECT url,company,title,location,kind,checked_at FROM hhba_v4_public_job_assets UNION ALL SELECT l.url,l.company,l.title,l.location,'LEAD',l.checked_at FROM hhba_v4_public_job_leads l WHERE NOT EXISTS(SELECT 1 FROM hhba_v4_public_job_assets a WHERE a.url=l.url AND a.checked_at>=l.checked_at)) a WHERE checked_at>=? AND checked_at<=? AND NOT EXISTS(SELECT 1 FROM hhba_v4_public_job_closed c WHERE c.url=a.url AND c.closed_at>=a.checked_at) AND ("+terms.map(()=> "instr(title,?)>0").join(" OR ")+") ORDER BY checked_at DESC LIMIT ?";
+  const sql="SELECT url,company,title,location,kind,checked_at FROM (SELECT url,company,title,location,kind,checked_at FROM hhba_v4_public_job_assets j WHERE NOT EXISTS(SELECT 1 FROM hhba_v4_public_job_leads l WHERE l.url=j.url AND l.checked_at>j.checked_at) UNION ALL SELECT l.url,l.company,l.title,l.location,'LEAD',l.checked_at FROM hhba_v4_public_job_leads l WHERE NOT EXISTS(SELECT 1 FROM hhba_v4_public_job_assets a WHERE a.url=l.url AND a.checked_at>=l.checked_at)) a WHERE checked_at>=? AND checked_at<=? AND NOT EXISTS(SELECT 1 FROM hhba_v4_public_job_closed c WHERE c.url=a.url AND c.closed_at>=a.checked_at) AND ("+terms.map(()=> "instr(title,?)>0").join(" OR ")+") ORDER BY checked_at DESC LIMIT ?";
   const result=await env.HHBA_JOB_JD_DB.prepare(sql).bind(new Date(now-TTL).toISOString(),new Date(now).toISOString(),...terms,Math.min(40,limit)).all();
   return (result?.results||[]).filter(j=>url(j.url)&&text(j.company)&&text(j.title)&&text(j.location)).map(j=>({url:j.url,company:j.company,title:j.title,location:j.location,checked_at:j.checked_at,material_kind:j.kind}));
  }catch{return [];}
@@ -128,7 +128,7 @@ export async function savePublicEmployerResearch(env,id,facts,now=Date.now()){
 export async function publicEmployerSources(env,id,now=Date.now()){
  if(!publicAssetsEnabled(env)||!id||!env.HHBA_JOB_JD_DB?.prepare)return [];
  try{const row=await env.HHBA_JOB_JD_DB.prepare('SELECT excerpts FROM hhba_v4_public_employer_research WHERE employer_key=? AND checked_at>=? AND checked_at<=?').bind(employerKey(id),iso(now-7*TTL),iso(now)).first();
- return [...new Set(factRows(JSON.parse(row?.excerpts||'[]')).filter(f=>new URL(f.url).origin===new URL(id.url).origin&&f.url!==id.url).map(f=>f.url))];
+ return [...new Set(factRows(JSON.parse(row?.excerpts||'[]')).filter(f=>new URL(f.url).origin===new URL(id.url).origin&&f.url!==id.url).map(f=>f.url))].slice(0,12);
  }catch{return [];}
 }
 export async function recordPublicAssetReuse(env,now=Date.now()){
