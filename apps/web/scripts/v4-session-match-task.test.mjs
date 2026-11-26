@@ -155,7 +155,7 @@ test('recovery diagnostics cannot be mistaken for terminal failures in the route
  assert.match(route,/error:scheduled\.error,retryable:true/);
  assert.match(route,/isV4RetryableTaskFailure\(code\)/);
  assert.match(route,/if\(committedResult\)/);
- assert.match(client,/data\.failure\?\.retryable\?15000:addedCandidates>0\?3000:4000/);
+ assert.match(client,/data\.failure\?\.retryable\?15000:addedCandidates>0\?2000:3000/);
 });
 
 test('profile reuse key isolates session, account, exact resume revision, intent and model; expires without renewal',async()=>{
@@ -348,7 +348,7 @@ test('background route consumes compact candidate events and preserves the exist
  assert.match(route,/currentCandidateKeys\.has\(key\)/);
  assert.match(route,/lastJobs\.push\(/);
  assert.match(route,/queueProgress\('candidate'\)/);
- assert.match(route,/officialJob\(j\)\?structuredClone\(j\)/);
+ assert.match(route,/researchEvidence\(j\)\?structuredClone\(j\)/);
  assert.match(route,/budget\?\.canPublishProgress\(kind\)/);
  assert.match(route,/budget\?\.tryProgress\(kind\)/);
  assert.doesNotMatch(route,/kind!=='candidate'\|\|budget\.snapshot\(\)\.soft-budget\.used>=8/);
@@ -461,3 +461,14 @@ test('production route and browser correlate numeric publication stamps without 
  await clock.advance(1);assert.equal(attempts,2);
  await publisher.stop();
  });
+
+test('live source counts and rejected links survive recovery even when no concrete vacancy has arrived',async()=>{
+ const {discoveryRecoverySnapshot,restoreDiscoveryRecovery}=await import('../functions/_lib/v4-discovery-recovery.js');
+ const u='https://careers.employer.cn/jobs/1',excluded='https://www.zhipin.com/job_detail/123';
+ const base={phase:'research',round:1,rows:[],sourceLeads:[],observedSearchSources:[],rejectedBoards:[]};
+ const next={...base,round:2,observedSearchSources:[u,excluded],rejectedBoards:[excluded]};
+ const supplement=discoveryRecoverySnapshot(base,next);
+ assert.deepEqual(supplement.rows,[]);assert.equal(supplement.observed.length,2);
+ const restored=restoreDiscoveryRecovery({generation:2,checkpoint:base},{generation:2,status:'PENDING',discovery_recovery:supplement},2);
+ assert.equal(restored.statsRestored,true);assert.deepEqual(restored.saved.checkpoint.observedSearchSources,[u,excluded]);assert.deepEqual(restored.saved.checkpoint.rejectedBoards,[excluded]);assert.deepEqual(restored.saved.checkpoint.rows,[]);
+});

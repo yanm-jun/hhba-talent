@@ -6,6 +6,7 @@
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
 import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
+import {preserveJobEvidence} from '../../_lib/v4-jd-research.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
 import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
 import {v4ParallelResearchEnabled} from '../../_lib/v4-parallel-discovery.js';
@@ -114,26 +115,35 @@ function events(env,request,input,waitUntil){
    });
    const queueProgress=kind=>publisher.queue(kind);
    const stopProgress=()=>publisher.stop();
-   const sendResearch=r=>{if(r){lastReport=r;send('research_report',r);queueProgress();}};
+   const sendResearch=r=>{if(r){lastReport={...r,discovered:Math.max(r.discovered||0,lastJobs.length,lastReport?.discovered||0),excluded_count:Math.max(r.excluded_count||0,lastReport?.excluded_count||0),search_source_count:Math.max(r.search_source_count||0,lastReport?.search_source_count||0)};send('research_report',lastReport);queueProgress();}};
+   const rememberDiscoveryStats=stats=>{if(!lastReport)return;lastReport={...lastReport,discovered:Math.max(lastReport.discovered||0,stats.discovered||0),excluded_count:Math.max(lastReport.excluded_count||0,stats.excluded_count||0),search_source_count:Math.max(lastReport.search_source_count||0,stats.search_source_count||0)};if(!input.background)send('research_report',lastReport);queueProgress('candidate');};
    const reportSignature=jobs=>JSON.stringify(jobs.filter(officialJob).map(j=>[j.official_url,j.match_score,j.jd_sha256,j.research_detail,j.reference_jd]));
    let lastReportSignature=reportSignature(lastJobs);
+   const researchEvidence=j=>officialJob(j)||!!(j.evidence_excerpt||j.reference_jd||j.jd_research?.facts?.length||j.jd_research?.inference||j.reference_vacancy_verified||j.jd_source_status==='VERIFIED_JD'||Number.isInteger(j.match_score));
+   const evidenceSignature=jobs=>JSON.stringify(jobs.filter(researchEvidence).map(j=>[j.official_url,j.jd_source_status,j.evidence_excerpt,j.reference_vacancy_verified,j.reference_jd,j.jd_research,j.match_score,j.score_basis,j.report_status]));
+   let lastEvidenceSignature=evidenceSignature(lastJobs);
    const publishedCandidateKeys=new Set(lastJobs.map(j=>v4DiscoveryCandidateKey(j.official_url)).filter(Boolean));
    let currentCandidateKeys=new Set(publishedCandidateKeys);
    const rememberJobs=matches=>{
     for(const j of matches.filter(allowedJob)){const u=j.official_url;observeResult('candidate',u);if(j.jd_source_status==='VERIFIED_JD')observeResult('jd',u);if(Number.isInteger(j.match_score))observeResult('score',u);if(officialJob(j))observeResult('report',u);}
     // The progress object is encrypted and bound to this authorized task.
-    // Keep complete reports lossless; compact only non-deliverable leads.
-    lastJobs=matches.filter(allowedJob).map(j=>officialJob(j)?structuredClone(j):({
+    // Keep independently researched intermediate results as well as reports.
+    // Merge same-task evidence only for a currently present identity; absent or
+    // explicitly excluded records are not resurrected by the progress view.
+    const prior=new Map(lastJobs.map(j=>[j.research_candidate_url||j.official_url,j]));
+    lastJobs=matches.filter(allowedJob).map(j=>preserveJobEvidence(prior.get(j.research_candidate_url||j.official_url),j)).filter(j=>allowedJob(j)&&!j.excluded_closed).map(j=>researchEvidence(j)?structuredClone(j):({
      id:j.id,company:j.company,title:j.title,title_zh:j.title_zh,location:j.location,official_url:j.official_url,platform:j.platform,source:j.source,remote:j.remote,
      matched:[],not_evidenced:[],needs_verification:[],requirements_basis:'',salary:j.salary,source_status:j.source_status,
      source_type:j.source_type,jd_source_status:j.jd_source_status,evidence_status:j.evidence_status,reference_vacancy_verified:j.reference_vacancy_verified,
      availability_status:j.availability_status,report_status:j.report_status
     }));
     const signature=reportSignature(lastJobs),changed=signature!==lastReportSignature;lastReportSignature=signature;
+    const evidence=evidenceSignature(lastJobs),evidenceChanged=evidence!==lastEvidenceSignature;lastEvidenceSignature=evidence;
+    if(lastReport)lastReport={...lastReport,discovered:Math.max(lastReport.discovered||0,lastJobs.length)};
     currentCandidateKeys=new Set(lastJobs.map(j=>v4DiscoveryCandidateKey(j.official_url)).filter(Boolean));
     let newCandidate=false;
     for(const j of lastJobs){const key=v4DiscoveryCandidateKey(j.official_url);if(key&&!publishedCandidateKeys.has(key)){publishedCandidateKeys.add(key);newCandidate=true;}}
-    queueProgress(changed?'report':newCandidate?'candidate':'routine');
+    queueProgress(changed||evidenceChanged?'report':newCandidate?'candidate':'routine');
    };
    // The authenticated background route can append one compact, unverified
    // preview in O(1), leaving full evidence reconciliation to onPartial.
@@ -205,7 +215,7 @@ function events(env,request,input,waitUntil){
       const result=await v4Match(budget?budget.fetch(fetch):fetch,provider,input.text,input.role_hint,{
       signal:executionSignal,onProgress:progress,onActivity:activity,env:researchEnv,resourceBudget:budget,profileCache,excludeUrls:input.excludeUrls,
       stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,parallelResearch:v4ParallelResearchEnabled(env),allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
-      onResearch:sendResearch,
+      onResearch:sendResearch,onDiscoveryStats:rememberDiscoveryStats,
       // Managed background publication is compact and coalesced; direct SSE
       // retains the existing complete research callbacks.
       deferDiscoverySnapshots:!!input.background,onDiscoveryCandidate:rememberDiscovery,
@@ -308,7 +318,7 @@ async function recoverSavedDiscovery(env,input,saved,view){
  const reportRecovered=restoreReportRecovery(saved,record,input.generation);
  if(reportRecovered){await saveMatchTask(env,input.taskKey,reportRecovered);saved=reportRecovered;console.info('HHBA_V4_REPORT_CHECKPOINT_RECOVERED');}
  const recovered=restoreDiscoveryRecovery(saved,record,input.generation,input.excludeUrls);
- if(recovered.restored||recovered.restoredSources){
+ if(recovered.restored||recovered.restoredSources||recovered.statsRestored){
   // Persist once before starting a new invocation. Otherwise a second
   // crash could replace the progress supplement with an empty delta.
   await saveMatchTask(env,input.taskKey,recovered.saved);

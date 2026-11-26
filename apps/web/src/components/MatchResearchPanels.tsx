@@ -15,6 +15,8 @@ const stages=[
 export const matchStageIndex=(stage:NativeMatchProgress)=>stages.findIndex(s=>s.stages.includes(stage));
 const safeLink=(raw:string)=>{try{const u=new URL(raw);return u.protocol==='https:'&&!u.username&&!u.password?u.href:null}catch{return null}};
 const confirmed=(job:MatchedJob)=>job.jd_source_status==='VERIFIED_JD'&&job.source_type==='站外官方招聘'&&!!job.evidence_excerpt?.trim();
+const sourceConfirmed=(job:MatchedJob)=>confirmed(job)||job.reference_vacancy_verified===true;
+const liveResearchLabel=(job:MatchedJob)=>job.report_status==='COMPLETE'&&job.research_detail?'报告已完成':Number.isInteger(job.match_score)?sourceConfirmed(job)?'评分已完成':'AI参考评分 · 来源待核验':confirmed(job)?'官方 JD 已核验':job.reference_jd?.trim()?'AI 参考 JD 已整理':sourceConfirmed(job)?'岗位来源已核验':job.jd_research?.facts?.length?'已有公开资料':'待核验';
 const scoreGrounded=(job:MatchedJob)=>job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&job.match_score!=null;
 function reportScore(job:MatchedJob){
  const value=job.match_score;
@@ -162,17 +164,17 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
     <p className="hhba-search-number-label">已发现候选岗位 · 尚需核验</p>
     {target&&<div className="hhba-search-progress" role="progressbar" aria-label="候选岗位收集进度" aria-valuemin={0} aria-valuemax={target} aria-valuenow={Math.min(discovered,target)}><div style={{width:ratio+'%'}}/></div>}
     <div className="hhba-search-activity" role="status"><span key={searching?activity?.message||'正在等待联网研究成果':pending?'正在处理后续研究阶段':'本次搜索记录已整理'}>{searching?activity?.message||'正在等待联网研究成果':pending?'正在处理后续研究阶段':'本次搜索记录已整理'}</span></div>
-    <div className="hhba-search-meta"><span>研究轮次 <b>{report?.rounds.length??0}</b></span><span>已发现企业 <b>{companies}</b></span><span>排除商业来源 <b>{report?.excluded_count??0}</b></span>{pending&&elapsed!==undefined&&<span>已用时 <b>{elapsed}</b> 秒</span>}</div>
+    <div className="hhba-search-meta"><span>研究轮次 <b>{report?.rounds.length??0}</b></span><span>已发现企业 <b>{companies}</b></span><span>已收到检索来源 <b>{report?.search_source_count??0}</b></span><span>排除商业来源 <b>{report?.excluded_count??0}</b></span>{pending&&elapsed!==undefined&&<span>已用时 <b>{elapsed}</b> 秒</span>}</div>
    </div>
    <section className="hhba-refined-section hhba-discovery-feed"><div className="hhba-refined-subhead"><h3>{pending?'最新发现':'候选岗位一览'}</h3><small>{pending?'LIVE DISCOVERY':'DISCOVERY'}</small></div>
-    {recent.length?recent.map(job=><div className="hhba-discovery-item" key={job.official_url}><div><JobTitle job={job}/></div><span className={confirmed(job)?'hhba-source-confirmed':'hhba-source-pending'}>{confirmed(job)?'来源已核验':'待核验'}</span></div>):empty(pending?'等待实际搜索返回首个候选岗位。':'本次没有保留候选岗位。')}
+    {recent.length?recent.map(job=><div className="hhba-discovery-item" key={job.official_url}><div><JobTitle job={job}/></div><span className={sourceConfirmed(job)?'hhba-source-confirmed':'hhba-source-pending'}>{liveResearchLabel(job)}</span></div>):empty(pending?'等待实际搜索返回首个候选岗位。':'本次没有保留候选岗位。')}
    </section>
    <details className="hhba-refined-details"><summary>实际研究记录（{report?.rounds.length??0} 轮）</summary>
     {report?.rounds.map(r=><details key={r.round}><summary>第 {r.round} 轮 · 新增 {r.added} 个候选 · {r.cited_count} 条非商业平台引用</summary>
      {r.queries.length?<ul>{r.queries.map((q,i)=><li key={i}>{q}</li>)}</ul>:<p>接口未返回本轮具体检索词。</p>}</details>)}
    </details>
    <details className="hhba-refined-details"><summary>全部已收到候选岗位（{all.length}）</summary><label className="hhba-refined-filter"><span>筛选企业、岗位或地点</span><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="搜索本次候选记录"/></label>
-    {visible.length?visible.map(job=><div className="hhba-discovery-item" key={job.official_url}><div><JobTitle job={job}/><OfficialLink job={job}/>{(job.reference_jd||job.jd_research?.facts?.length||job.jd_research?.inference||job.jd_research?.unknowns?.length||job.evidence_excerpt)&&<details><summary>岗位资料 · {job.reference_vacancy_verified?'岗位已核验':'岗位来源待进一步核验'}</summary><JdResearchContent job={job}/>{job.report_status==='COMPLETE'&&job.research_detail&&<CuratedJobReport detail={job.research_detail} reference={job.reference_jd_kind==='AI_GENERATED_REFERENCE'}/>}<RecruitmentSourceLinks job={job}/></details>}</div><small>{confirmed(job)||job.reference_vacancy_verified?'来源已核验':'待核验'}</small></div>):empty('没有对应的候选记录。')}
+    {visible.length?visible.map(job=><div className="hhba-discovery-item" key={job.official_url}><div><JobTitle job={job}/><OfficialLink job={job}/>{(job.reference_jd||job.jd_research?.facts?.length||job.jd_research?.inference||job.jd_research?.unknowns?.length||job.evidence_excerpt)&&<details><summary>岗位资料 · {job.reference_vacancy_verified?'岗位已核验':'岗位来源待进一步核验'}</summary><JdResearchContent job={job}/>{job.report_status==='COMPLETE'&&job.research_detail&&<CuratedJobReport detail={job.research_detail} reference={job.reference_jd_kind==='AI_GENERATED_REFERENCE'}/>}<RecruitmentSourceLinks job={job}/></details>}</div><small>{liveResearchLabel(job)}</small></div>):empty('没有对应的候选记录。')}
    </details>
   </>}
   {active===2&&<>
@@ -189,7 +191,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
     <JdResearchContent job={jdJob}/>
     {jdJob.research_detail&&<CuratedJobReport detail={jdJob.research_detail} reference={jdJob.reference_jd_kind==='AI_GENERATED_REFERENCE'}/>}
     <RecruitmentSourceLinks job={jdJob}/>
-   </article></>:empty(pending?'正在核验官方 JD 并完成证据评分。完整报告生成后自动展示。':'本次尚无完成岗位真实性核验和可靠适配报告的推荐，其他AI参考分析保留在搜索记录。')}
+   </article></>:empty(pending?'正在逐条研究已发现岗位；已取得的 JD 和评分会先展示，完整报告逐份送达。':'本次尚无完成岗位真实性核验和可靠适配报告的推荐，其他AI参考分析保留在搜索记录。')}
    {scoredPending.length>0&&<details className="hhba-refined-details"><summary>已有可靠评分 · 待报告或全局排名（{scoredPending.length}）</summary><p className="hhba-refined-note">以下为独立评分研究成果，尚不是最终精选推荐。官方原文和 AI 参考JD分别标注。</p>{scoredPending.map(job=><details key={job.official_url}><summary>{job.company} · {job.title_zh||job.title} · {reportScore(job)} 分</summary><JobTitle job={job}/><p>{reportScoreLabel(job)}</p>{job.recommendation_reason&&<p>{job.recommendation_reason}</p>}{job.score_basis&&<p className="hhba-refined-note">{job.score_basis}</p>}<OfficialLink job={job}/><JdResearchContent job={job}/><RecruitmentSourceLinks job={job}/></details>)}</details>}
    {materialOnly.length>0&&<details className="hhba-refined-details"><summary>岗位研究资料 · 非正式推荐（{materialOnly.length}）</summary><p className="hhba-refined-note">已整理的公开资料及 AI 求职方向单独保留；没有可靠匹配分时不显示数字，不计入最终精选岗位。</p>{materialOnly.map(job=><details key={job.official_url}><summary>{job.company} · {job.title_zh||job.title} · {reportScore(job)===null?'暂无可靠分数':'研究参考 · 非正式推荐'}</summary><JobTitle job={job}/><p className="hhba-refined-note">{confirmed(job)||job.reference_vacancy_verified?'官方岗位来源已核验':'岗位来源待核验'}{job.score_basis?' · '+job.score_basis:''}</p><OfficialLink job={job}/><JdResearchContent job={job}/><RecruitmentSourceLinks job={job}/></details>)}</details>}
    {pendingCount>0&&<p className="hhba-refined-note" role="status">{pending?pendingCount+' 个候选仍在核验或研究中，尚未进入正式推荐。':pendingCount+' 个候选未取得可靠的官方证据，未纳入推荐。'}<button type="button" onClick={()=>{setSelected(1);onSelectionChange?.(1)}}>查看搜索记录</button></p>}

@@ -205,7 +205,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
        {progressActivity?.searches!==undefined&&<span>
         已执行 {progressActivity.searches} 次检索 · 发现 {progressActivity.candidate_links??0} 条企业岗位线索 · 已阅读 {progressActivity.pages_read??0} 份岗位资料
        </span>}
-       {researchReport&&<span>已发现 {researchReport.discovered} 条候选招聘来源 · 已排除 {researchReport.excluded_count} 条商业平台链接</span>}
+       {researchReport&&<span>已收到 {researchReport.search_source_count??0} 条公开检索来源 · 已发现 {Math.max(researchReport.discovered,researchJobs.length)} 个候选岗位 · 已排除 {researchReport.excluded_count} 条商业平台链接</span>}
        {verifiedMatchReports(result.matches).length>0&&<span>已完成 {verifiedMatchReports(result.matches).length} 份可核验报告，最终排名待确认</span>}
       </div>
       <span className="hhba-match-progress-time" aria-hidden="true">已用时 {elapsed} 秒</span>
