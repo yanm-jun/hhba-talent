@@ -59,7 +59,7 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
  // Cloudflare buffers an event even if it arrives before waitForEvent.
  if(currentLane&&currentLane!=='discovery'){
   const wake=await step.waitForEvent('initial-'+currentLane,{type:'wake_'+currentLane,timeout:'24 hours'});
-  if(wake?.done)return {status:'COMPLETE'};
+  if(wake?.done||wake?.payload?.done)return {status:'COMPLETE'};
  }
  for(let phase=0;phase<maxSteps;phase++){
   let state;
@@ -87,7 +87,7 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
    if(result?.status==='HANDOFF'){
     if(!currentLane){streak=0;continue;}
     const wake=await step.waitForEvent('next-'+currentLane+'-'+phase,{type:'wake_'+currentLane,timeout:'24 hours'});
-    if(wake?.done)return {status:'COMPLETE'};
+    if(wake?.done||wake?.payload?.done)return {status:'COMPLETE'};
     streak=0;recovery=undefined;continue;
    }
   if(['COMPLETE','STOP','FAILED'].includes(result?.status))return result;

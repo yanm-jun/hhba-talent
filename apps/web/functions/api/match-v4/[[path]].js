@@ -396,7 +396,7 @@ async function backgroundStep(env,request,waitUntil){
    if(next!==input.backgroundLane){
     await input.lease.release();input.lease=null;
     const signaled=await stageWorkflowSignal(env,ticket,{lane:next});
-    return new Response('event: complete\\ndata: '+JSON.stringify(signaled?{status:'HANDOFF'}:{status:'CONTINUE',fallback:true})+'\\n\\n',{headers:{'Content-Type':'text/event-stream','Cache-Control':'no-store'}});
+    return new Response('event: complete\ndata: '+JSON.stringify(signaled?{status:'HANDOFF'}:{status:'CONTINUE',fallback:true})+'\n\n',{headers:{'Content-Type':'text/event-stream','Cache-Control':'no-store'}});
    }
   }
   return events(env,request,input,waitUntil);

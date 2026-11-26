@@ -49,7 +49,7 @@ export default {async scheduled(event,env){
  if(body.mode==='staged'){
    try{
     // An already-running pre-rollout Workflow stays the sole driver.
-    try{const old=await env.MATCH_WORKFLOW.get(body.instance),state=await old.status();if(['queued','running','waiting'].includes(state?.status))return Response.json({ok:true,mode:'legacy'});}catch{}
+    try{const old=await env.MATCH_WORKFLOW.get(body.instance),state=await old.status();if(['queued','running','waiting','errored'].includes(state?.status)||state?.status==='complete'&&state.output?.status==='RECOVERING')return Response.json({ok:true,mode:'legacy'});}catch{}
     // Create dormant verification/report instances before starting discovery.
     for(const lane of ['verification','reporting','discovery']){
      const id=await stageWorkflowId(body.instance,lane);
