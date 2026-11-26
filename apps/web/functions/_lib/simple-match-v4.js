@@ -91,6 +91,7 @@ export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{},onD
   for(;;){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
    const chunk=await reader.read();if(chunk.done)break;
+   timing?.observe('first_chunk');
    buffer+=decoder.decode(chunk.value,{stream:true});
    // CRLF may itself be split across network chunks.
    let boundary;
@@ -118,9 +119,9 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent,onDiscover
   if(stage==='discovery'&&(typeof onDiscoveryJob==='function'||typeof onDiscoverySource==='function')&&!signal?.aborted)createV4DiscoveryJobObserver(onDiscoveryJob,onDiscoverySource).response(prior);
   return prior;
  }
- if(provider.usageDb)provider.phaseResourceBudget?.take('model_usage');
  const callStarted=Date.now();let failure;
  try{
+  if(provider.usageDb)provider.phaseResourceBudget?.take('model_usage');
   data=await v4CallOpenAI(fetcher,effective,payload,{signal,onEvent,onDiscoveryJob:stage==='discovery'?onDiscoveryJob:undefined,onDiscoverySource:stage==='discovery'?onDiscoverySource:undefined,stage,timing});
   if(replayKey&&data.status==='completed')provider.phaseReplay.remember(replayKey,data);
   return data;
@@ -867,7 +868,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      }
      job.research_detail=detail.report;job.jd_comparisons=detail.report.comparisons;
      job.recommendation_reason=detail.report.score_explanation;job.match_score=value.score;job.reference_score=value.score;job.report_status='COMPLETE';
-     onDone();break;
+     provider.deliveryTelemetry?.result('report_engine');onDone();break;
     }catch(e){
      if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
      const code=e?.code||'AI_REPORT_UNKNOWN';
@@ -1603,6 +1604,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     onProgress('scoring');
    }
    const jd=results.get(url);
+   if(isOfficialJd(jd))provider.deliveryTelemetry?.result('jd_engine');
    if(jd?.excluded_board){rejectedBoards.add(url);publishResearch();continue;}
    if(jd?.excluded_closed){if(!resourceBudget||resourceBudget.canPublish())await removeClosedPublicAsset(env,url);continue;}
    if(curated&&!isOfficialJd(jd)){matches[i].score_basis='未取得完整官方 JD，继续生成AI参考JD及适配分析。';await scoreIncompleteJd(verificationFetcher,provider,resume,roleHint,matches[i],{signal,browser:env.BROWSER,ledger:publicEvidence,note,taskNotes:jobNotes(url,'analysisNotes'),fullResearch,publicMaterial:jd?.publicMaterial});publishVerified();continue;}
@@ -1664,7 +1666,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      if(!assessment.suitable)matches[i].score_basis+='；AI 判断不适合正式推荐。';
      const salaryQuote=text(assessment.salary_quote);matches[i].salary=salaryQuote&&norm(jd.full_jd).includes(norm(salaryQuote))?salaryQuote:null;
     }
-    scored++;break;
+    scored++;provider.deliveryTelemetry?.result('score_engine');break;
    }catch(e){
     if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
     // Repair a bad model answer, but don't endlessly repeat identical errors.
