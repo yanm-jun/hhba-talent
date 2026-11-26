@@ -896,7 +896,8 @@ test('public reference research excludes CV and reuses material but not score af
   return model({suitable:true,score:86,reason:'真实渠道经历',resume_quote:'汽车经销商渠道运营',jd_quote:'渠道门店运营支持',comparisons:[{jd_quote:'渠道门店运营支持',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'经历与参考方向一致'}],quality_review:{status:'complete',explanation:'匹配依据充分',missing:[]}});
  };
  const options={curated:true,officialOnly:true,stepMode:true,parallelResearch:true,env,checkpoint:{phase:'verification',next:0,rows:[[j.url,{...j,fit_summary:resume}]],profile,toolUrls:[j.url],verificationBatch:1}};
- for(let i=0;i<2;i++){const result=await v4Match(fetcher,provider,resume,'全国',options);assert.equal(result.checkpoint.matches[0].reference_jd,ref.reference_jd);assert.equal(result.checkpoint.matches[0].match_score,86);}
- assert.equal(publicCalls,1);assert.equal(scoreCalls,2);assert.ok(liveReads>=2);assert.equal(recoveryCalls,1);
+ let firstRecoveryCalls=0;
+ for(let i=0;i<2;i++){const result=await v4Match(fetcher,provider,resume,'全国',options);assert.equal(result.checkpoint.matches[0].reference_jd,ref.reference_jd);assert.equal(result.checkpoint.matches[0].match_score,86);if(i===0){firstRecoveryCalls=recoveryCalls;assert.ok(firstRecoveryCalls>0);}else assert.equal(recoveryCalls,firstRecoveryCalls,'fresh reference must avoid repeating alternative-source research after a live vacancy check');}
+ assert.equal(publicCalls,1);assert.equal(scoreCalls,2);assert.ok(liveReads>=2);
  assert.ok([...objects.entries()].filter(([k])=>k.includes('reference-assets-v1')).every(([,v])=>!v.includes(resume)));
 });
