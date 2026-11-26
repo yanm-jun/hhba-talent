@@ -266,6 +266,7 @@ test('Gemini reviews confirmed vacancy for complete JD before falling back to re
   const input=JSON.parse(JSON.parse(opts.body).contents[0].parts[0].text);
   let value;
   if(input.original_url){recovery++;assert.equal(input.confirmed_vacancy,true);value={sources:[],research_complete:true,completion_reason:'公开原文未找到'};}
+  else if(input.public_sources){assert.equal(input.job.vacancy_confirmed,true);value={facts:[],inference:'依据岗位方向准备渠道运营案例，非企业要求。',unknowns:['官方完整JD未取得']};}
   else {assessment++;assert.equal(input.job.vacancy_confirmed,true);value={reference_source_anchors:{duties:{kind:'title_direction',url:'',quote:input.job.title},capabilities:{kind:'title_direction',url:'',quote:input.job.title}},reference_jd:'可能负责汽车渠道运营。可能需要渠道数据分析能力。',reference_basis:'方向推断。',reference_coverage:{duties_quote:'汽车渠道运营',capabilities_quote:'渠道数据分析能力'},quality_review:{status:'complete',explanation:'已覆盖可能职责、能力方向和真实经历差距；实际资格未知。',missing:[]},suitable:true,score:86,reason:'相关经历',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车渠道运营',comparisons:[{jd_quote:'汽车渠道运营',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'真实经历对应推断职责'},{jd_quote:'渠道数据分析能力',status:'missing',analysis:'尚无直接数据分析证据'}]};}
   return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(value)}]}}]});
  };
@@ -336,6 +337,7 @@ test('activated V4 OpenAI keeps researching confirmed vacancies before reference
   if(url===candidate.url)return Response.json({'@type':'JobPosting',title:candidate.title,hiringOrganization:{name:candidate.company,url:new URL(candidate.url).origin},jobLocation:{address:{addressLocality:'上海'}}});
   const input=JSON.parse(JSON.parse(opts.body).input);
   if(input.original_url){recovery++;assert.equal(input.confirmed_vacancy,true);return model({sources:[],research_complete:true,completion_reason:'公开原文未找到'});}
+  if(input.public_sources){assert.equal(input.job.vacancy_confirmed,true);return model({facts:[],inference:'依据岗位名称准备运营案例，非企业要求。',unknowns:['具体岗位职责未公开']});}
   assessment++;assert.equal(input.job.vacancy_confirmed,true);
   if(assessment===1)return model({reference_jd:'可能负责汽车渠道运营。',reference_basis:'方向推断，实际资格未知。',suitable:true,score:86,reason:'相关经历',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车渠道运营',comparisons:[]});
   assert.match(input.previous_validation_error,/quality_review_incomplete/);
@@ -509,6 +511,7 @@ test('invalid reference drafts never escape through progress or final candidate 
   if(url===candidate.url)return Response.json({'@type':'JobPosting',title:candidate.title,hiringOrganization:{name:candidate.company,url:new URL(candidate.url).origin},jobLocation:{address:{addressLocality:'上海'}}});
   const input=JSON.parse(JSON.parse(opts.body).input);
   if(input.original_url)return model({sources:[],research_complete:true,completion_reason:'公开原文未找到'});
+  if(input.public_sources)return model({facts:[],inference:'',unknowns:['官方完整JD未取得']});
   assessments++;
   return model({reference_jd:'虚构企业要求三年经验。',reference_basis:'无依据',suitable:true,score:90,reason:'不可靠',resume_quote:'汽车经销商渠道运营',jd_quote:'三年经验',comparisons:[]});
  };
@@ -527,6 +530,7 @@ test('reviewed reference without a defensible score remains available as researc
   if(url===candidate.url)return Response.json({'@type':'JobPosting',title:candidate.title,hiringOrganization:{name:candidate.company,url:new URL(candidate.url).origin},jobLocation:{address:{addressLocality:'上海'}}});
   const input=JSON.parse(JSON.parse(opts.body).input);
   if(input.original_url)return model({sources:[],research_complete:true,completion_reason:'公开原文未找到'});
+  if(input.public_sources){assert.equal(input.job.vacancy_confirmed,true);return model({facts:[],inference:'依据岗位名称准备运营案例，非企业要求。',unknowns:['具体岗位职责未公开']});}
   assessments++;
   const direction={kind:'title_direction',url:'',quote:input.job.title};
   return model({reference_jd:'按岗位名称准备运营协调案例。建议准备业务流程分析案例。',reference_basis:'仅有岗位名称，具体职责未公开。',reference_source_anchors:{duties:direction,capabilities:direction},reference_coverage:{duties_quote:'运营协调案例',capabilities_quote:'业务流程分析案例'},quality_review:{status:'complete',explanation:'已说明职业准备方向及未知项',missing:[]},suitable:true,score:null,reason:'岗位职责未公布，无法可靠评分。',comparisons:[{jd_quote:'运营协调案例',status:'missing',analysis:'尚不能确认企业实际要求'}]});
@@ -603,4 +607,36 @@ test('large verification window yields under request pressure and resumes every 
  assert.equal(new Set(checkpoint.matches.map(j=>j.official_url)).size,12);
  assert.ok(jobs.every(j=>scoreCalls.get(j.title)===3));
  assert.ok([...completed].every(u=>pageCalls.get(u)===1));
+});
+
+test('reference material independent of score: validates source anchors and rejects an invalid review or unsupported source',async()=>{
+ const {referenceMaterialErrors,validateCuratedReport}=await import('../functions/_lib/v4-curated-reports.js');
+ const j={title:'渠道运营',jd_research:{facts:[{url:'https://example.cn/job',quote:'负责渠道管理',context:'same_job'}]}};
+ const value={reference_jd:'资料显示：负责渠道管理。建议准备数据分析能力。',reference_basis:'公开资料和求职建议分别标注。',reference_coverage:{duties_quote:'负责渠道管理',capabilities_quote:'数据分析能力'},reference_source_anchors:{duties:{kind:'public_excerpt',url:'https://example.cn/job',quote:'负责渠道管理'},capabilities:{kind:'title_direction',url:'',quote:'渠道运营'}},reference_material_review:{status:'complete',explanation:'已整理职责和建议，明确未知条件。',missing:[]},quality_review:{status:'revise',explanation:'评分待核实。',missing:['简历证据']},suitable:true,score:90,resume_quote:'不存在的简历内容'};
+ assert.deepEqual(referenceMaterialErrors(value,j),[]);
+ assert.equal(validateCuratedReport(value,resume,value.reference_jd).ok,false);
+ assert.ok(referenceMaterialErrors({...value,reference_material_review:{status:'revise',explanation:'遗漏',missing:['来源']}},j).length);
+ assert.ok(referenceMaterialErrors({...value,reference_source_anchors:{...value.reference_source_anchors,duties:{kind:'public_excerpt',url:'https://example.cn/job',quote:'不存在的招聘信息'}}},j).length);
+});
+test('production-mode confirmed vacancy receives additional public research and preserves reviewed reference when score cannot be grounded',async()=>{
+ const {qualifiedReport}=await import('../functions/_lib/v4-curated-reports.js');
+ const {safeHistoryJobs}=await import('../functions/_lib/match-history.js');
+ const candidate=job(193),provider={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'gpt-6.2-sol'};
+ const proof=new URL('/business',candidate.url).href;
+ let supplemented=0,assessments=0;
+ const quote='企业公开介绍：为渠道门店提供运营支持。';
+ const fetcher=async(url,opts)=>{
+  if(url===candidate.url)return Response.json({'@type':'JobPosting',title:candidate.title,hiringOrganization:{name:candidate.company,url:new URL(candidate.url).origin},jobLocation:{address:{addressLocality:'上海'}}});
+  if(url===proof)return new Response('<html><body><p>'+quote+'</p></body></html>',{headers:{'content-type':'text/html'}});
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.original_url)return model({sources:[],research_complete:true,completion_reason:'未公开完整正文'});
+  if(input.public_sources){supplemented++;assert.equal(input.job.vacancy_confirmed,true);return model({facts:[{url:proof,quote,context:'related_context'}],inference:'结合公开业务准备门店运营案例。',unknowns:['实际任职资格未公开']},[proof]);}
+  assessments++;assert.ok(input.independent_public_excerpts.some(f=>f.quote===quote));if(assessments>1)assert.ok(input.previous_validation_error);
+  return model({reference_jd:'企业公开业务涉及门店运营支持。建议准备渠道运营数据分析能力。',reference_basis:'企业公开业务属于相关背景；能力为求职建议。',reference_coverage:{duties_quote:'门店运营支持',capabilities_quote:'渠道运营数据分析能力'},reference_source_anchors:{duties:{kind:'public_excerpt',url:proof,quote},capabilities:{kind:'title_direction',url:'',quote:candidate.title}},reference_material_review:{status:'complete',explanation:'资料与建议分开，未知要求未编造。',missing:[]},quality_review:{status:'revise',explanation:'简历证据仍需核对。',missing:['简历引用']},suitable:true,score:88,reason:'不可靠的评分',resume_quote:'不存在的简历经历',jd_quote:'门店运营支持',comparisons:[{jd_quote:'门店运营支持',resume_quote:'不存在的简历经历',status:'supported',analysis:'不可核对'}]});
+ };
+ const result=await v4Match(fetcher,provider,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,env:{HHBA_MATCH_V4_READY:'1'},checkpoint:{phase:'verification',next:0,rows:[[candidate.url,candidate]],profile,toolUrls:[candidate.url],verificationBatch:1}});
+ const saved=result.checkpoint.matches[0];
+ assert.equal(supplemented,1);assert.equal(assessments,2);
+ assert.equal(saved.reference_vacancy_verified,true);assert.equal(saved.report_status,'UNAVAILABLE');assert.equal(saved.match_score,null);assert.equal(saved.research_detail,undefined);assert.equal(qualifiedReport(saved),false);assert.equal(saved.jd_source_status,undefined);assert.match(saved.reference_jd,/门店运营支持/);assert.ok(saved.jd_research.facts.some(f=>f.quote===quote));
+ const historical=safeHistoryJobs([{...saved,v4_source:true}])[0];assert.equal(historical.reference_jd,saved.reference_jd);assert.equal(historical.report_status,'UNAVAILABLE');assert.equal(historical.reference_vacancy_verified,true);assert.equal(historical.match_score,null);
 });
