@@ -221,10 +221,10 @@ test('V4 has no per-model-call timeout and respects explicit cancellation',async
 test('V4 frontend never rejects more than ten posts or cancels at the legacy five-minute deadline',async()=>{
  const {readFile}=await import('node:fs/promises');
  const service=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
- assert.match(service,/MATCH_V4_PREVIEW\|\|value\.matches\.length<=10/);
- assert.match(service,/!MATCH_V4_PREVIEW&&data\.matches\.length>10/);
- assert.match(service,/MATCH_V4_PREVIEW\?undefined:setTimeout/);
- assert.match(service,/!MATCH_V4_PREVIEW\?\{limit:/);
+ assert.match(service,/const EFFECTIVE_API='\/api\/match-v4'/);
+ assert.doesNotMatch(service, /matches\.length\s*(?:<=|>)\s*10|MATCH_V4_PREVIEW\?undefined:setTimeout|!MATCH_V4_PREVIEW\?\{limit:/);
+ assert.doesNotMatch(service, /\/api\/match-next|deepseek-resume-ocr-v1|300000|35000/);
+ assert.match(service,/const requestSignal=signal\?\?new AbortController\(\)\.signal/);
 });
 
 test('V4 missing completion decision preserves leads and offers continuation, without claiming research is done',async()=>{
