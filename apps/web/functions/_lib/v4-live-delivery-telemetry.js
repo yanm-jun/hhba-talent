@@ -2,9 +2,9 @@
 // Store a bounded summary in the existing encrypted progress view; emit
 // aggregate operational logs without creating additional database writes.
 const stages=new Set(['discovery','profile','jd_search','identity','score','report','reference','format','rank','other','probe']);
-const milestones=new Set(['headers','first_frame','first_search_complete','first_text','first_source','first_candidate','terminal','fallback','replay']);
+const milestones=new Set(['headers','first_chunk','first_frame','first_search_complete','first_text','first_source','first_candidate','terminal','fallback','replay']);
 const transports=new Set(['sse','json','unknown']);
-const resultStages=new Set(['candidate','jd','score','report']);
+const resultStages=new Set(['candidate','jd','score','report','jd_engine','score_engine','report_engine']);
 const kinds=new Set(['routine','candidate','report','terminal']);
 export function createV4DeliveryTelemetry({now=Date.now,started=now(),trace='',log=()=>{}}={}){
  let serial=0,version=0,first={},counts={},lastWrite=null,lastProvider=null;
@@ -22,7 +22,7 @@ export function createV4DeliveryTelemetry({now=Date.now,started=now(),trace='',l
     events[name]=(events[name]||0)+1;
     if(!Object.hasOwn(times,name))times[name]=Math.max(0,now()-began);
     if(stage==='discovery'){
-     if(name==='first_source'||name==='first_candidate'||name==='first_text'||name==='first_frame'||name==='headers'||name==='first_search_complete')mark('provider_'+name);
+     if(name==='first_source'||name==='first_candidate'||name==='first_text'||name==='first_frame'||name==='first_chunk'||name==='headers'||name==='first_search_complete')mark('provider_'+name);
      // First actual output is visible in logs even if the request stalls.
      if(events[name]===1)emit('provider_milestone',{id,stage,name,transport,elapsed_ms:elapsed(),call_elapsed_ms:times[name]});
     }
@@ -33,7 +33,7 @@ export function createV4DeliveryTelemetry({now=Date.now,started=now(),trace='',l
     emit('provider_complete',lastProvider);
    }};
   },
-  result(kind){if(resultStages.has(kind))mark('result_'+kind);},
+  result(kind){if(resultStages.has(kind)){const name='result_'+kind;const unseen=!Object.hasOwn(first,name);mark(name);if(unseen)emit('result_milestone',{kind,elapsed_ms:first[name]});}},
   blocked(kind){if(kinds.has(kind))count('blocked_'+kind);},
   write(kind,{candidateCount=0,reportCount=0}={}){
    kind=kinds.has(kind)?kind:'terminal';const id=++version,began=now();
