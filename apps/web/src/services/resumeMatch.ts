@@ -95,7 +95,6 @@ export type MatchResponse = {
   preview_synthetic?:boolean;
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number;exclude_urls?:string[];research_task_id?:string;research_generation?:number;managed_task?:boolean};
-const API='/api/match-next'; // Legacy diagnostic endpoints only; the user-facing matching path is V4.
 // V4 is the normal matching engine on the approved HHBA hosts.
 const MATCH_V4_PREVIEW=typeof window!=='undefined'&&
  (window.location.hostname.endsWith('.hhba-talent.pages.dev')&&
@@ -116,10 +115,10 @@ const errorMap:Record<string,string>={
   AI_CHECKPOINT_DB_UNAVAILABLE:'任务恢复存储暂时不可用，正在保留原任务。',
   MATCH_NOT_ENABLED:'智能匹配服务尚未开放，请稍后再试。',
   AI_NATIVE_DEEPSEARCH_DISABLED:'原生深度搜索试用暂时关闭，请选择常规搜索。',
-  AI_NATIVE_DEEPSEARCH_TIMEOUT:'DeepSeek 原生深度搜索用时过长，本轮未完成，请尝试常规搜索。',
-  AI_NATIVE_DEEPSEARCH_INCOMPLETE:'DeepSeek 原生深度搜索未完整结束，未使用不完整结果。',
-  AI_NATIVE_DEEPSEARCH_FAILED:'DeepSeek 原生深度搜索执行失败，可切换常规搜索重试。',
-  AI_NATIVE_DEEPSEARCH_INVALID_ANSWER:'DeepSeek 本轮未返回合格岗位结构，请改用常规搜索重试。',
+  AI_NATIVE_DEEPSEARCH_TIMEOUT:'AI 原生深度搜索用时过长，本轮未完成，请尝试常规搜索。',
+  AI_NATIVE_DEEPSEARCH_INCOMPLETE:'AI 原生深度搜索未完整结束，未使用不完整结果。',
+  AI_NATIVE_DEEPSEARCH_FAILED:'AI 原生深度搜索执行失败，可切换常规搜索重试。',
+  AI_NATIVE_DEEPSEARCH_INVALID_ANSWER:'AI 本轮未返回合格岗位结构，请改用常规搜索重试。',
   MATCH_DATABASE_NOT_READY:'智能匹配额度保护尚未配置，已停止分析以防产生费用。',
   SESSION_INVALID:'请登录 HHBA 求职账户后重试。',
   FORBIDDEN:'当前账户无权使用求职者匹配服务。',
@@ -137,17 +136,17 @@ const errorMap:Record<string,string>={
   AI_PROVIDER_UPSTREAM_ERROR:'AI 服务暂时异常，请稍后重试。',
   AI_PROVIDER_NETWORK_ERROR:'HHBA 暂时无法连接 AI 服务，请稍后重试。',
   AI_PROVIDER_REDIRECT_BLOCKED:'AI 接口发生异常重定向，为保护密钥，已安全终止请求。',
-  AI_PROVIDER_TIMEOUT:'DeepSeek 接口等待超时，尚未取得完整结果。',
-  AI_PROVIDER_SLOW:'DeepSeek 请求超时且没有发现可展示岗位。',
-  AI_SEARCH_TIMEOUT:'DeepSeek Search 搜索服务超时。',
-  AI_SEARCH_UNAVAILABLE:'DeepSeek Search 暂时不可用，未调用推荐模型。',
+  AI_PROVIDER_TIMEOUT:'AI 接口等待超时，尚未取得完整结果。',
+  AI_PROVIDER_SLOW:'AI 请求超时且没有发现可展示岗位。',
+  AI_SEARCH_TIMEOUT:'AI 搜索 搜索服务超时。',
+  AI_SEARCH_UNAVAILABLE:'AI 搜索 暂时不可用，未调用推荐模型。',
   AI_SEARCH_NO_DETAIL_JOBS:'搜索已完成，但未找到符合要求的具体岗位页面；没有编造职位。',
-  AI_SEARCH_API_REJECTED:'DeepSeek Search API 拒绝了请求，请检查账号权限或接口配置。',
-  AI_SEARCH_RESPONSE_INVALID:'DeepSeek Search 返回格式异常，请检查接口兼容性。',
-  AI_FETCH_TIMEOUT:'DeepSeek 网页读取服务响应超时，本次不视为岗位不存在。',
-  AI_FETCH_API_REJECTED:'DeepSeek Fetch 接口拒绝请求，需检查网页读取权限或接口配置。',
-  AI_FETCH_ACCESS_DENIED:'DeepSeek Fetch 的网页访问被安全策略限制，并非密钥一定失效。',
-  AI_FETCH_RESPONSE_INVALID:'DeepSeek Fetch 未返回有效网页正文，服务健康检查未通过。',
+  AI_SEARCH_API_REJECTED:'AI 搜索接口 拒绝了请求，请检查账号权限或接口配置。',
+  AI_SEARCH_RESPONSE_INVALID:'AI 搜索 返回格式异常，请检查接口兼容性。',
+  AI_FETCH_TIMEOUT:'AI 网页读取服务响应超时，本次不视为岗位不存在。',
+  AI_FETCH_API_REJECTED:'网页读取服务 接口拒绝请求，需检查网页读取权限或接口配置。',
+  AI_FETCH_ACCESS_DENIED:'网页读取服务 的网页访问被安全策略限制，并非密钥一定失效。',
+  AI_FETCH_RESPONSE_INVALID:'网页读取服务 未返回有效网页正文，服务健康检查未通过。',
   AI_MATCH_REASON_TIMEOUT:'候选岗位已检索，但推荐理由生成超时；请稍后再试。',
   AI_MATCH_NO_VALID_JOBS:'本轮 AI 候选名单没有通过岗位信息核验，这不代表你的简历不符合国内招聘要求。请尝试重新搜索或填写具体岗位方向。',
   AI_EMPLOYER_JOBS_NOT_FOUND:'本轮已尝试补充搜索，但仍未找到信息足够明确的企业招聘岗位链接；并非你的简历不适合。请稍后重试或填写更具体的岗位方向。',
@@ -158,8 +157,8 @@ const errorMap:Record<string,string>={
   BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。',
   AI_WEB_SEARCH_NOT_USED:'AI 本轮未执行联网搜索，未展示未核实岗位。',
   AI_RESEARCH_COMPLETION_UNCONFIRMED:'AI 未明确完成研究，已保留已取得的结果，可继续搜索。',
-  AI_RESPONSE_INVALID:'DeepSeek 返回结果格式异常，请重试。',
-  AI_PROVIDER_INCOMPLETE:'DeepSeek 搜索未能完成，没有返回不完整的岗位结果。'
+  AI_RESPONSE_INVALID:'AI 返回结果格式异常，请重试。',
+  AI_PROVIDER_INCOMPLETE:'AI 搜索未能完成，没有返回不完整的岗位结果。'
 };
 export class MatchError extends Error {
  constructor(public readonly status:number,message:string,public readonly retryable=false){super(message);this.name='MatchError'}
@@ -178,45 +177,6 @@ export async function matchServiceReady(signal?:AbortSignal):Promise<boolean>{
   const data=await response.json() as {kind?:string;enabled?:boolean};
   return data.kind==='HHBA_NATIVE_WEB_MATCH_V1'&&data.enabled===true;
  }catch{return false}
-}
-/** An authenticated, explicit-on-click provider probe for the isolated preview.
- * Never sends résumé data and never works from the public production hostname.
- */
-const isCleanV2PreviewHost=()=>typeof window!=='undefined'&&
- window.location.hostname.endsWith('.hhba-talent.pages.dev')&&
- window.location.hostname!=='hhba-talent.pages.dev';
-export async function matchPreviewPreflightAvailable(signal?:AbortSignal):Promise<boolean>{
- if(!isCleanV2PreviewHost()||!realAuthReady)return false;
- try{
-  const response=await fetch(API+'/status',{
-   method:'GET',credentials:'same-origin',cache:'no-store',signal
-  });
-  if(!response.ok)return false;
-  const data=await response.json() as {enabled?:boolean;preflight_available?:boolean};
-  return data.enabled===false&&data.preflight_available===true;
- }catch{return false}
-}
-export async function runMatchPreviewProviderCheck(signal?:AbortSignal):Promise<{
- status:'READY';capabilities:string[];fetch_content_verified:boolean
-}>{
- if(!isCleanV2PreviewHost())throw new MatchError(403,'只能在独立的 HHBA 预览环境中执行接口预检。');
- const token=session();
- const response=await fetch(API+'/provider-check',{
-  method:'GET',credentials:'same-origin',cache:'no-store',signal,
-  headers:{Authorization:'Bearer '+token}
- }).catch(error=>{
-  if(error?.name==='AbortError')throw error;
-  throw new MatchError(503,'预览环境暂时无法连接接口预检服务。');
- });
- const data=await response.json().catch(()=>null) as {
-  ok?:boolean;status?:string;capabilities?:string[];error?:string;
-  fetch_content_verified?:boolean
- }|null;
- if(!response.ok||data?.ok!==true||data?.status!=='READY'||
-  !Array.isArray(data.capabilities)||data.fetch_content_verified!==true)
-  throw new MatchError(response.status,errorMap[data?.error||'']||
-   'DeepSeek 接口预检未通过，请检查预览环境配置。');
- return {status:'READY',capabilities:data.capabilities,fetch_content_verified:true};
 }
 /** Best-effort browser redaction before submitting text to HHBA's server. */
 export function redactResumeTextLocally(text:string):string{
@@ -265,7 +225,7 @@ const ocrErrors:Record<string,string>={
  OCR_INVALID_FILE:'这份文件无法读取。请在 Word 中另存为 DOCX，或重新导出 PDF。',
  OCR_UNSUPPORTED_FORMAT:'请选择 Word（DOCX）或 PDF 简历。',
  OCR_FILE_TOO_LARGE:'单次文件识别超过传输容量；PDF 可按页识别，Word 可另存为较小的 DOCX。',
- OCR_TOO_MANY_PAGES:'简历最多支持 15 页，请精简后重试。',
+ OCR_TOO_MANY_PAGES:'文档识别暂未完成，请尝试按页识别。',
  OCR_NO_TEXT:'暂时无法从文档中识别文字。请重新导出简历，或粘贴简历文字。',
  OCR_BUSY:'文档识别服务繁忙，请稍后重试。',
  OCR_TIMEOUT:'文档识别超时，请重试。'
@@ -278,7 +238,7 @@ export async function recognizeResumeDocument(file:File,signal?:AbortSignal):Pro
  const response=await fetch(EFFECTIVE_API+'/ocr',{
   method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/octet-stream',Authorization:'Bearer '+token,
-   'X-HHBA-Resume-Format':kind,'X-HHBA-OCR-Consent':MATCH_V4_PREVIEW?'openai-relay-resume-ocr-v4':'deepseek-resume-ocr-v1'},
+   'X-HHBA-Resume-Format':kind,'X-HHBA-OCR-Consent':'openai-relay-resume-ocr-v4'},
   body
  }).catch(error=>{
   if(error?.name==='AbortError')throw error;
@@ -423,7 +383,7 @@ async function consumeNativeMatchStream(
    }else if(event==='final_job'){
     if(value?.job)finalJobs.push(value.job as MatchedJob);
    }else if(event==='partial'){
-   if(Array.isArray(value?.matches)&&(MATCH_V4_PREVIEW||value.matches.length<=10))
+   if(Array.isArray(value?.matches))
     onPartial?.(value.matches as MatchedJob[]);
   }else if(event==='failure'){
    const code=String(value?.error||'AI_PROVIDER_UNAVAILABLE');
@@ -469,45 +429,6 @@ async function consumeNativeMatchStream(
  return complete;
 }
 
-/**
- * Explicit-on-click real DeepSeek acceptance run with a fixed SERVER-SIDE
- * fake résumé. This endpoint cannot read or match the user's uploaded résumé,
- * never writes to their recommendation history and only runs in Pages preview.
- */
-export async function runMatchPreviewSyntheticAcceptance(
- signal?:AbortSignal,
- onProgress?:(stage:NativeMatchProgress)=>void,
- onActivity?:(activity:NativeMatchActivity)=>void
-):Promise<MatchResponse>{
- if(!isCleanV2PreviewHost())throw new MatchError(403,
-  '合成简历验收仅在独立预览环境开放。');
- const token=session();
- const deadline=AbortSignal.timeout(330000);
- const requestSignal=signal?AbortSignal.any([signal,deadline]):deadline;
- const response=await fetch(API+'/synthetic-check',{
-  method:'POST',credentials:'same-origin',cache:'no-store',
-  signal:requestSignal,
-  headers:{Authorization:'Bearer '+token,'Content-Type':'application/json',
-   Accept:'text/event-stream'},
-  body:JSON.stringify({consent:true,scenario:'automotive_operations_v1'})
- }).catch(error=>{
-  if(requestSignal.aborted)throw new MatchError(504,'合成简历验收等待超时或被取消。');
-  if(error?.name==='AbortError')throw error;
-  throw new MatchError(503,'暂时无法连接合成简历验收接口。');
- });
- if(!response.ok){
-  const data=await response.json().catch(()=>null) as {error?:string}|null;
-  throw new MatchError(response.status,
-   errorMap[data?.error||'']||'合成简历验收未能启动。');
- }
- if(!(response.headers.get('content-type')||'').includes('text/event-stream'))
-  throw new MatchError(502,'验收服务未返回流式岗位搜索进度。');
- const result=await consumeNativeMatchStream(response,onProgress,undefined,onActivity);
- if(result.status!=='COMPLETE'||result.preview_synthetic!==true)
-  throw new MatchError(502,'验收响应缺少合成简历标识，已停止展示结果。');
- return result;
-}
-
 export async function submitExtractedResumeText(
  text:string,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string,
  onProgress?:(stage:NativeMatchProgress)=>void,
@@ -519,20 +440,8 @@ export async function submitExtractedResumeText(
  const token=session();
  const cleaned=redactResumeTextLocally(text);
  if(cleaned.replace(/\s/g,'').length<30)throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
- const watchdog=new AbortController();
- const requestSignal=signal?AbortSignal.any([signal,watchdog.signal]):watchdog.signal;
- let idleTimer:ReturnType<typeof setTimeout>|undefined;
- const timeout=(message:string)=>watchdog.abort(new MatchError(504,message));
- // The server sends a heartbeat every 12 seconds, including during long AI calls.
- const onReceive=()=>{
-  // V4 research has no HHBA-imposed inactivity or overall deadline.
-  if(MATCH_V4_PREVIEW)return;
-  clearTimeout(idleTimer);
-  idleTimer=setTimeout(()=>timeout('一段时间没有收到匹配进度，已结束本次等待。可用当前简历重试。'),35000);
- };
- const deadline=MATCH_V4_PREVIEW?undefined:setTimeout(()=>
-  timeout('这次智能匹配用时过长，已结束本次等待。可用当前简历重试。'),300000);
- onReceive();
+ // V4 uses explicit cancellation and durable recovery, not the retired V2 client deadline.
+ const requestSignal=signal??new AbortController().signal;
  let continuation:MatchContinuation['continuation']|undefined;
  let task:Awaited<ReturnType<typeof matchTaskReference>>|undefined;
  if(MATCH_V4_PREVIEW){try{task=opts.research_task_id?{id:opts.research_task_id,touch(){},clear(){}}:await matchTaskReference(cleaned,opts,resumeId)}catch{}}
@@ -553,16 +462,14 @@ export async function submitExtractedResumeText(
    body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,...(task?{task_id:task.id,research_generation:opts.research_generation??0}:{}),...(opts.managed_task?{task_managed:true}:{}),
     options:{country:'CN',remote_only:false,
      role_hint:opts.role_hint,
-     ...(!MATCH_V4_PREVIEW?{limit:Math.min(10,Math.max(1,opts.limit||10))}:{}),
      exclude_urls:opts.exclude_urls
     },...(continuation?{continuation}:{})})
   }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
    if((e as Error)?.name==='AbortError')throw e;
    throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。',true);});
-  onReceive();
   const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
   if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。',response.status===429||response.status>=500);
-  const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,onReceive,onResearch,onResearchJobs):
+  const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,undefined,onResearch,onResearchJobs):
    await response.json().catch(()=>({})) as (Partial<MatchResponse>|MatchContinuation|PendingManagedMatch)&{error?:string};
   if(!response.ok){
    const code=(data as {error?:string}).error||'';
@@ -579,12 +486,11 @@ export async function submitExtractedResumeText(
    continue;
   }
   if(data.status==='CONTINUE'){
-   if(!MATCH_V4_PREVIEW||!data.continuation||typeof data.continuation.token!=='string'||!data.continuation.state)throw new MatchError(502,'AI 续接状态异常。');
+   if(!data.continuation||typeof data.continuation.token!=='string'||!data.continuation.state)throw new MatchError(502,'AI 续接状态异常。');
    continuation=data.continuation;task?.touch();reconnectDelay=1000;
    continue;
   }
-  if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||
-   (!MATCH_V4_PREVIEW&&data.matches.length>10))
+  if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches))
    throw new MatchError(502,errorMap.BAD_RESPONSE);
   task?.clear();
   if(task&&data.can_continue&&typeof data.research_generation==='number')data.research_task_id=task.id;
@@ -596,9 +502,6 @@ export async function submitExtractedResumeText(
  }catch(error){
   if(requestSignal.aborted)throw requestSignal.reason;
   throw error;
- }finally{
-  clearTimeout(idleTimer);
-  clearTimeout(deadline);
  }
 }
 
@@ -617,25 +520,6 @@ export async function submitResumeForMatching(
 }
 
 /** Preview-only free balance/key check, authenticated candidate, no resume content. */
-export async function checkMatchProviderConnection(signal?:AbortSignal):Promise<string>{
- const token=session();
- let response;
- try{
-  response=await fetch(API+'/provider-check',{
-   method:'GET',credentials:'same-origin',cache:'no-store',signal,
-   headers:{Authorization:'Bearer '+token}
-  });
- }catch(e){
-  if((e as Error)?.name==='AbortError')throw e;
-  throw new MatchError(503,'AI 服务连接检测失败，请稍后重试。');
- }
- const data=await response.json().catch(()=>({})) as {ok?:boolean;status?:string;error?:string};
- if(!response.ok)throw new MatchError(response.status,
-  errorMap[data.error||'']||'AI 服务检测暂时不可用。');
- if(data.ok!==true||data.status!=='READY')throw new MatchError(502,'AI 服务检测返回异常结果。');
- return 'DeepSeek 余额、Search 检索与 V4 Pro 模型 JSON 接口均通过检查。没有发送简历，也没有消耗匹配次数。';
-}
-
 /** Safe outbound detail URL for a fetched and independently reviewed mainland
  * enterprise posting. The frontend never trusts arbitrary URLs from AI.
  */

@@ -214,7 +214,7 @@ test('broken DeepSeek event stream still preserves real completed employer sourc
  assert.equal(err?.diagnostic?.candidate_links,1);
 });
 
-test('legacy native research remains archived but is not selectable in the clean V2 UI',()=>{
+test('legacy native research remains archived but is not selectable in the V4 UI',()=>{
  const route=readFileSync(new URL('../functions/api/match-native/[[path]].js',import.meta.url),'utf8');
  const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  const transport=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
@@ -225,6 +225,6 @@ test('legacy native research remains archived but is not selectable in the clean
  assert.match(route,/withSavedHistory/);
  assert.match(route,/EXPLICIT_AI_SHARING_CONSENT_REQUIRED/);
  assert.doesNotMatch(page,/DeepSeek 原生深度搜索 · 试用/);
- assert.match(transport,/const API='\/api\/match-next'/);
+ assert.match(transport,/const EFFECTIVE_API='\/api\/match-v4'/);
  assert.match(route,/HHBA_DEEPSEEK_NATIVE_TRIAL_ENABLED/);
 });
