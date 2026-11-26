@@ -494,6 +494,7 @@ choosePeriod('30d');updateOverview();updateGrowth();void refresh();
 let v4OpsReport=null;
 const opsMs=n=>integer(n)===null?'—':n>=60000?(n/60000).toFixed(1)+' 分钟':(n/1000).toFixed(1)+' 秒';
 function renderV4Ops(){
+ renderV4SearchSpeed();
  const s=v4OpsReport?.v4Operations,valid=s?.quality==='collected'&&s.summary;
  const set=(id,value)=>{const el=byId(id);if(el)el.textContent=value};
  const formatRatio=n=>typeof n==='number'&&Number.isFinite(n)?n.toFixed(1)+'%':'—';
@@ -515,6 +516,20 @@ function renderV4Ops(){
  add(errors,'首次候选 / 首份 JD / 首份报告的阶段内耗时',[s.summary.firstCandidateMs,s.summary.firstJdMs,s.summary.firstReportMs].map(opsMs).join(' / '));
  add(errors,'真实成果事件','候选 '+fmt.format(s.summary.candidates)+' · JD '+fmt.format(s.summary.jds)+' · 评分 '+fmt.format(s.summary.scores)+' · 报告 '+fmt.format(s.summary.reports));
  for(const error of s.errors||[])add(errors,(labels[error.lane]||error.lane)+'：'+error.code,fmt.format(error.count)+' 次');
+}
+function renderV4SearchSpeed(){
+ const data=v4OpsReport?.v4SearchSpeed,status=byId('v4-search-speed-status'),root=byId('v4-search-speed-milestones');
+ if(!status||!root)return;
+ root.replaceChildren();
+ const valid=data?.quality==='collected';
+ status.textContent=valid?'本期 '+fmt.format(data.runs)+' 个匿名任务；完成 '+fmt.format(data.completed)+' 个，单个任务最多观察到 '+fmt.format(data.maxObservedCandidates)+' 个候选岗位。':data?.quality==='no_records'?'暂无真实搜索里程碑数据；未达到的数量不按零耗时统计。':v4OpsReport?'数据暂不可用或新表尚未迁移。':'等待管理员手动读取真实数据。';
+ if(!valid)return;
+ for(const m of data.milestones||[]){
+  const item=document.createElement('div'),label=document.createElement('span'),value=document.createElement('strong');
+  label.textContent='第 '+m.target+' 个具体候选（'+fmt.format(m.samples)+' 个样本）';
+  value.textContent='平均 '+opsMs(m.averageMs)+' · P95 '+opsMs(m.p95Ms)+' · 达到率 '+(Number.isFinite(m.reachRatePct)?m.reachRatePct.toFixed(1)+'%':'—');
+  item.append(label,value);root.append(item);
+ }
 }
 async function refreshV4Ops(){
  const button=byId('v4-ops-refresh');
