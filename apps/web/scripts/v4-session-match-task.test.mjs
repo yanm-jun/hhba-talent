@@ -155,7 +155,7 @@ test('recovery diagnostics cannot be mistaken for terminal failures in the route
  assert.match(route,/error:scheduled\.error,retryable:true/);
  assert.match(route,/isV4RetryableTaskFailure\(code\)/);
  assert.match(route,/if\(committedResult\)/);
- assert.match(client,/data\.failure\?\.retryable\?15000:addedCandidates>0\?3000:4000/);
+ assert.match(client,/data\.failure\?\.retryable\?15000:addedCandidates>0\?2000:3000/);
 });
 
 test('profile reuse key isolates session, account, exact resume revision, intent and model; expires without renewal',async()=>{
@@ -348,7 +348,7 @@ test('background route consumes compact candidate events and preserves the exist
  assert.match(route,/currentCandidateKeys\.has\(key\)/);
  assert.match(route,/lastJobs\.push\(/);
  assert.match(route,/queueProgress\('candidate'\)/);
- assert.match(route,/officialJob\(j\)\?structuredClone\(j\)/);
+ assert.match(route,/researchEvidence\(j\)\?structuredClone\(j\)/);
  assert.match(route,/budget\?\.canPublishProgress\(kind\)/);
  assert.match(route,/budget\?\.tryProgress\(kind\)/);
  assert.doesNotMatch(route,/kind!=='candidate'\|\|budget\.snapshot\(\)\.soft-budget\.used>=8/);

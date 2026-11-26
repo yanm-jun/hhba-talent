@@ -16,7 +16,7 @@ export const matchStageIndex=(stage:NativeMatchProgress)=>stages.findIndex(s=>s.
 const safeLink=(raw:string)=>{try{const u=new URL(raw);return u.protocol==='https:'&&!u.username&&!u.password?u.href:null}catch{return null}};
 const confirmed=(job:MatchedJob)=>job.jd_source_status==='VERIFIED_JD'&&job.source_type==='站外官方招聘'&&!!job.evidence_excerpt?.trim();
 const sourceConfirmed=(job:MatchedJob)=>confirmed(job)||job.reference_vacancy_verified===true;
-const liveResearchLabel=(job:MatchedJob)=>job.report_status==='COMPLETE'&&job.research_detail?'报告已完成':Number.isInteger(job.match_score)?'评分已完成':confirmed(job)?'官方 JD 已核验':job.reference_jd?.trim()?'AI 参考 JD 已整理':sourceConfirmed(job)?'岗位来源已核验':job.jd_research?.facts?.length?'已有公开资料':'待核验';
+const liveResearchLabel=(job:MatchedJob)=>job.report_status==='COMPLETE'&&job.research_detail?'报告已完成':Number.isInteger(job.match_score)?sourceConfirmed(job)?'评分已完成':'AI参考评分 · 来源待核验':confirmed(job)?'官方 JD 已核验':job.reference_jd?.trim()?'AI 参考 JD 已整理':sourceConfirmed(job)?'岗位来源已核验':job.jd_research?.facts?.length?'已有公开资料':'待核验';
 const scoreGrounded=(job:MatchedJob)=>job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&job.match_score!=null;
 function reportScore(job:MatchedJob){
  const value=job.match_score;

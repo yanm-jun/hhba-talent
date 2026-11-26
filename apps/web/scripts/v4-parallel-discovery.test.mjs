@@ -1484,3 +1484,27 @@ test('live verifier exposes intermediate results for only its current admitted r
  cp={...cp,rows:[[u,{...j,requirements:'新要求'}]]};assert.equal(coordinator.liveJobs().length,0);
  release();await coordinator.close();
 });
+
+test('dedicated delivery continuation completes a discovered job before another search and preserves the remaining pool', {timeout:8000},async()=>{
+ const {phaseResourceBudget}=await import('../functions/_lib/v4-phase-budget.js');
+ const a=job(7630),b=job(7631),p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const html=j=>'<script type="application/ld+json">'+JSON.stringify({'@type':'JobPosting',url:j.url,title:j.title,hiringOrganization:{name:j.company,url:new URL(j.url).origin},jobLocation:{address:{addressLocality:'上海'}},description:'<p>岗位职责</p><p>负责汽车经销商渠道运营和业务流程管理及销售数据分析。</p><p>负责业务沟通和门店管理。</p><p>任职要求</p><p>熟悉渠道运营和经销商业务流程，具备项目沟通能力。</p><p>具备独立分析和组织协调能力。</p>'})+'</script>';
+ let reads=0,scored=0,reports=0,seenJd=false,seenScore=false,seenReport=false;
+ const assessment={suitable:true,score:86,reason:'渠道运营匹配',resume_quote:'汽车经销商渠道运营',jd_quote:'汽车经销商渠道运营',matched:['渠道运营'],gaps:[]};
+ const budget=phaseResourceBudget();
+ const result=await v4Match(budget.fetch(async(u,opts)=>{
+  if(u===a.url){reads++;return new Response(html(a),{headers:{'content-type':'text/html'}});}
+  if(u===b.url)throw Error('second candidate not admitted in this continuation');
+  const input=JSON.parse(JSON.parse(opts.body).input);
+  if(input.established_score!==undefined){assert.ok(seenScore);reports++;return model({...assessment,comparisons:[{jd_quote:'汽车经销商渠道运营',resume_quote:'汽车经销商渠道运营',status:'supported',analysis:'真实渠道运营经历与工作要求相关'}],quality_review:{status:'complete',explanation:'已对实际职责与要求完成分析',missing:[]}});}
+  if(input.job){assert.ok(seenJd);scored++;return model(assessment);}
+  throw Error('new discovery must wait for this dedicated delivery continuation');
+ }),p,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,deferDiscoverySnapshots:true,env:{HHBA_MATCH_V4_READY:'1'},resourceBudget:budget,
+  checkpoint:{phase:'research',rows:[[a.url,a],[b.url,b]],profile,toolUrls:[a.url,b.url],pipelineActive:true,liveDeliveryTurn:'verification'},
+  onPartial:jobs=>{const j=jobs.find(j=>j.official_url===a.url);if(j?.evidence_excerpt)seenJd=true;if(j?.match_score===86)seenScore=true;if(j?.report_status==='COMPLETE')seenReport=true;}
+ });
+ assert.equal(reads,1);assert.equal(scored,1);assert.equal(reports,1);assert.ok(seenJd&&seenScore&&seenReport);
+ assert.equal(result.checkpoint.phase,'research');assert.equal(result.checkpoint.liveDeliveryTurn,'search');
+ assert.equal(result.checkpoint.rows.length,2);assert.equal(result.checkpoint.priorState.matches.find(j=>j.official_url===a.url).report_status,'COMPLETE');
+ assert.deepEqual(result.checkpoint.processedEarlier,[a.url]);
+});
