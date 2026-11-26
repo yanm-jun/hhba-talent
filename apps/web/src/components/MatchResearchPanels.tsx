@@ -73,8 +73,8 @@ function JdResearchContent({job}:{job:MatchedJob}){
   {excerpt&&<section className="hhba-refined-section"><h3>{confirmed(job)?'完整 JD 原文':'现有岗位资料线索 · 尚非完整官方JD'}</h3><p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{recruitmentText(excerpt)}</p></section>}
  </>;
 }
-export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=false,progressStage='preparing',activity,elapsed,selection,onSelectionChange,onFollow,selectedJobUrl,onJobChange,onOptimize,optimizationAvailable=false}:{
- profile?:MatchProfile;report?:MatchResearchReport;jobs:MatchedJob[];officialJobs:MatchedJob[];pending?:boolean;progressStage?:NativeMatchProgress;
+export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=false,provisional=false,progressStage='preparing',activity,elapsed,selection,onSelectionChange,onFollow,selectedJobUrl,onJobChange,onOptimize,optimizationAvailable=false}:{
+ profile?:MatchProfile;report?:MatchResearchReport;jobs:MatchedJob[];officialJobs:MatchedJob[];pending?:boolean;provisional?:boolean;progressStage?:NativeMatchProgress;
  activity?:NativeMatchActivity|null;elapsed?:number;selection?:number;onSelectionChange?:(i:number)=>void;onFollow?:()=>void;selectedJobUrl?:string|null;onJobChange?:(url:string)=>void;onOptimize?:(job:MatchedJob)=>void;optimizationAvailable?:boolean;
 }){
  const id=useId();
@@ -174,11 +174,11 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
   </>}
   {active===2&&<>
    <div className="hhba-compact-report-head"><h2>岗位研究与匹配报告</h2>{pending&&onFollow&&<button type="button" onClick={onFollow}>跟随进度</button>}</div>
-   <div className="hhba-refined-metrics hhba-score-metrics"><div><small>已发现</small><strong>{all.length}</strong></div><div><small>官方 JD 已核验</small><strong>{verified.length}</strong></div><div><small>正式推荐</small><strong>{jdItems.length}{report?.final_target?<em> / {report.final_target}</em>:null}</strong></div></div>
+   <div className="hhba-refined-metrics hhba-score-metrics"><div><small>已发现</small><strong>{all.length}</strong></div><div><small>官方 JD 已核验</small><strong>{verified.length}</strong></div><div><small>{pending||provisional?'已完成报告':'正式推荐'}</small><strong>{jdItems.length}{report?.final_target?<em> / {report.final_target}</em>:null}</strong></div></div>
    {jdJob?<><ReportPager count={jdItems.length} index={currentJdIndex} onChange={changeJob} pending={pending} inline/><article className="hhba-verified-report hhba-curated-card" key={jdJob.official_url}
     onTouchStart={e=>{reportSwipe.current={x:e.touches[0].clientX,y:e.touches[0].clientY}}} onTouchEnd={e=>{const start=reportSwipe.current;reportSwipe.current=null;if(!start)return;const dx=e.changedTouches[0].clientX-start.x,dy=e.changedTouches[0].clientY-start.y;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.3)changeJob(currentJdIndex+(dx<0?1:-1))}}
     onWheel={e=>{if(Math.abs(e.deltaX)>50&&Math.abs(e.deltaX)>Math.abs(e.deltaY)*1.5)changeJob(currentJdIndex+(e.deltaX>0?1:-1))}}>
-    <div className="hhba-refined-job-head"><div><JobTitle job={jdJob}/><span className="hhba-source-confirmed">{jdJob.reference_jd_kind==='AI_GENERATED_REFERENCE'?'真实岗位 · AI参考JD':pending?'研究已完成 · 最终排名待确认':'正式推荐'}</span></div>
+    <div className="hhba-refined-job-head"><div><JobTitle job={jdJob}/><span className="hhba-source-confirmed">{jdJob.reference_jd_kind==='AI_GENERATED_REFERENCE'?(pending||provisional?'真实岗位 · AI参考JD · 排名待确认':'真实岗位 · AI参考JD'):pending||provisional?'研究已完成 · 最终排名待确认':'正式推荐'}</span></div>
     <div className="hhba-native-score hhba-unified-score" aria-label={reportScore(jdJob)===null?'暂无可靠分数':reportScoreLabel(jdJob)+' '+reportScore(jdJob)+' 分'}><strong>{reportScore(jdJob)??'—'}{reportScore(jdJob)!==null&&<small>/100</small>}</strong><span>{reportScore(jdJob)===null?(pending?'等待评分':'暂无可靠分数'):reportScoreLabel(jdJob)}</span>
     {onOptimize&&<button type="button" disabled={pending||!optimizationAvailable||(!(jdJob.jd_version_id&&jdJob.jd_sha256)&&!(jdJob.reference_jd_kind==='AI_GENERATED_REFERENCE'&&jdJob.reference_jd?.trim()&&jdJob.reference_jd_basis?.trim()))} className="hhba-native-optimize" title={jdJob.reference_jd_kind==='AI_GENERATED_REFERENCE'?'基于AI参考JD优化真实经历':!jdJob.jd_version_id||!jdJob.jd_sha256?'取得完整岗位 JD 后可优化':!optimizationAvailable?'请先关联简历':pending?'匹配完成后可优化':'针对所选岗位优化简历'} onClick={()=>onOptimize(jdJob)} aria-label={'针对'+(jdJob.title_zh||jdJob.title)+'优化简历'}><Sparkles size={13} aria-hidden="true"/> 优化简历</button>}
     </div></div>
