@@ -14,7 +14,7 @@ import {v4AcceptResearchDigest,V4_DIGEST_GUIDE,v4ResearchMemoryPage,v4ContextSta
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch} from './v4-jd-research.js';
 import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery,runReadyWork} from './v4-parallel-discovery.js';
-import {candidateRevision,candidateResearchMemory,pendingVerification,verificationSnapshot,mergePipelineCheckpoint,pipelineWidths,pipelineVerificationWindow,discoveryReadAhead} from './v4-research-pipeline.js';
+import {candidateRevision,candidateResearchMemory,pendingVerification,verificationSnapshot,mergePipelineCheckpoint,pipelineWidths,pipelineVerificationWindow,discoveryReadAhead,createLiveVerificationCoordinator} from './v4-research-pipeline.js';
 import {makeBatchScorer} from './v4-batch-scoring.js';
 import {createV4DiscoveryJobObserver} from './v4-stream-job-parser.js';
 import {createV4DiscoveryCandidateEvents,createV4DiscoveryIdentityIndex,v4DiscoveryCandidateKey} from './v4-discovery-candidate-events.js';
@@ -665,6 +665,62 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   let current=checkpoint,result;
   do{result=await v4Match(fetcher,provider,resume,roleHint,{signal,onProgress,onActivity,onPartial,onResearch,onDiscoveryCandidate,deferDiscoverySnapshots,officialOnly:true,curated:true,env,excludeUrls,checkpoint:current,stepMode:true,onRecoveryState,allowContinue,parallelResearch,resourceBudget,profileCache});current=result.checkpoint;}while(result.status==='CONTINUE');
   return result;
+ }
+ // Managed production searches receive new candidates while the provider is
+ // still working. Dispatch verification against those real snapshots without
+ // waiting for the response, and replenish independently when capacity allows.
+ // Keep the older direct/compatibility pipeline unchanged.
+ if(fullResearch&&parallelResearch&&!pipelineChild&&deferDiscoverySnapshots&&resourceBudget&&checkpoint?.phase==='research'&&!checkpoint.backfillSignature&&(!checkpoint.priorState||checkpoint.pipelineActive)){
+  const search=structuredClone(checkpoint);
+  const eligible=pendingVerification(checkpoint).length;
+  if(eligible)search.discoveryWidth=Math.min(search.discoveryWidth||initialDiscoveryWidth,2);
+  const common={signal,officialOnly:true,curated:true,env,excludeUrls,stepMode:true,allowContinue,parallelResearch,pipelineChild:true,resourceBudget};
+  let searchRecovery=()=>search,searchDone=false;
+  const publishMerged=next=>{
+   if(!next)return;
+   const revisions=new Map(next.processedEvidence||[]),current=new Map(next.rows||[]);
+   const ready=(next.priorState?.matches||next.matches||[]).filter(j=>{
+    const u=j.research_candidate_url||j.official_url;
+    return current.has(u)&&revisions.get(u)===candidateRevision(current.get(u));
+   });
+   const done=new Set(ready.map(j=>j.research_candidate_url||j.official_url)),sources=new Set(next.toolUrls||[]);
+   const previews=(next.rows||[]).filter(([u])=>!done.has(u)).map(([u,j],i)=>renderCandidatePreview(j,u,resume,sources.has(u),i,sources));
+   onPartial(mergeJobEvidence(ready,previews));
+  };
+  const coordinator=createLiveVerificationCoordinator({
+   getDiscovery:()=>searchRecovery()||search,
+   signal,canStart:()=>!searchDone&&!resourceBudget.denied&&resourceBudget.snapshot().soft-resourceBudget.used>=6,
+   choose:(base,count)=>{
+    const lanes=eligible?2:1;
+    const plan=managedWorkPlan(resourceBudget,base.managedVerification,count,{maxLanes:lanes,maxWindow:4,reserve:6,initialCost:8});
+    return {width:plan.width,window:Math.min(plan.window,pipelineVerificationWindow(base,count,plan.width))};
+   },
+   run:(verify,callbacks)=>v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:verify,...callbacks,onActivity:(_stage,message)=>onActivity('searching',message)}),
+   onChange:()=>publishMerged(coordinator.snapshot())
+  });
+  onRecoveryState(()=>coordinator.snapshot());
+  let discovered,discoveryFailure;
+  try{
+   discovered=await v4Match(fetcher,provider,resume,roleHint,{...common,checkpoint:search,onProgress,onActivity,onResearch,
+    deferDiscoverySnapshots,onRecoveryState:get=>{searchRecovery=get;coordinator.wake();},
+    onDiscoveryCandidate:(event,meta)=>{onDiscoveryCandidate?.(event,meta);coordinator.wake();},
+    onPartial:()=>{publishMerged(coordinator.snapshot());coordinator.wake();}});
+   searchRecovery=()=>discovered.checkpoint;
+  }catch(e){discoveryFailure=e;}
+  finally{searchDone=true;}
+  const settled=await coordinator.close();
+  if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
+  const next=settled.checkpoint;
+  if(!next)throw discoveryFailure||fault('AI_PIPELINE_STATE_INVALID');
+  next.diagnostics={...next.diagnostics,LIVE_VERIFICATION_WINDOWS:(next.diagnostics?.LIVE_VERIFICATION_WINDOWS||0)+settled.windows};
+  if(discoveryFailure)next.diagnostics.PIPELINE_SEARCH_RETRY_RETAINED=(next.diagnostics.PIPELINE_SEARCH_RETRY_RETAINED||0)+1;
+  if(settled.errors.length)next.diagnostics.PIPELINE_VERIFICATION_RETRY_RETAINED=(next.diagnostics.PIPELINE_VERIFICATION_RETRY_RETAINED||0)+settled.errors.length;
+  onRecoveryState(()=>next);
+  publishMerged(next);
+  if(resourceBudget.denied)throw fault('AI_PHASE_RESOURCE_YIELD');
+  if(discoveryFailure&&!settled.windows)throw discoveryFailure;
+  if(discoveryFailure&&settled.errors.length===settled.windows)throw discoveryFailure;
+  return {status:'CONTINUE',checkpoint:next};
  }
  // Run one existing verification phase alongside the next discovery phase.
  // Use a separate snapshot and merge only completed branches; failures do not
