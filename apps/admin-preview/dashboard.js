@@ -91,7 +91,7 @@ function renderDailyOperations(report){
  status.textContent=rows.length+' 天 · '+(report.collectorStartedAt?'运营事件起始于 '+report.collectorStartedAt.slice(0,10):'运营事件采集时间尚未核实');
 }
 function updateGrowth(){
- renderAiUsage();renderV4Operations();
+ renderAiUsage();renderV4Operations();renderV4SearchSpeed();
  showRealDataStatus();
  const t=growth?.traffic,b=growth?.devices,a=growth?.account,q=growth?.activity;
  setMetric('ov-pv',t?.quality==='collected'?t.pv:null);
@@ -397,6 +397,21 @@ function renderV4Operations(){
   add('v4-ops-details','分类资源采样覆盖',fmt.format(total.resourceSamples)+' 个执行阶段；程序代理计数，非 Cloudflare 账单');
  }else add('v4-ops-details','分类资源调用','尚未采集到支持分类计量的执行阶段，不按 0 次展示');
  for(const e of s.errors||[])add('v4-ops-details',(labels[e.lane]||e.lane)+' · '+e.code,fmt.format(e.count)+' 次');
+}
+function renderV4SearchSpeed(){
+ const data=growth?.v4SearchSpeed,root=byId('v4-search-speed-milestones'),state=byId('v4-search-speed-state');
+ if(!root||!state)return;
+ root.replaceChildren();
+ const valid=data?.quality==='collected';
+ state.textContent=valid?'已观察 '+fmt.format(data.runs)+' 个匿名研究任务，完成 '+fmt.format(data.completed)+' 个；最多实际发现 '+fmt.format(data.maxObservedCandidates)+' 个候选。未达到的里程碑不计入耗时均值。':data?.quality==='no_records'?'暂无真实任务测速记录；不能推算 500 个岗位需要的时间。':'测速数据暂不可用（或尚未完成数据库迁移）';
+ if(!valid)return;
+ const duration=ms=>typeof ms==='number'&&Number.isFinite(ms)?(ms>=60000?(ms/60000).toFixed(1)+' 分钟':(ms/1000).toFixed(1)+' 秒'):'—';
+ for(const m of data.milestones||[]){
+  const item=document.createElement('div'),label=document.createElement('span'),value=document.createElement('strong');
+  label.textContent='发现第 '+m.target+' 个岗位（'+fmt.format(m.samples)+' 个实际样本）';
+  value.textContent='平均 '+duration(m.averageMs)+' · P95 '+duration(m.p95Ms)+' · 达到率 '+(typeof m.reachRatePct==='number'?m.reachRatePct.toFixed(1)+'%':'—');
+  item.append(label,value);root.append(item);
+ }
 }
 function renderAiUsage(){
  const root=byId('ai-usage-stages'),daily=byId('ai-usage-days');
