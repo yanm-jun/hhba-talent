@@ -4,6 +4,7 @@ import {geminiJobProvider,callGeminiJob,inspectGeminiContextCapabilities,geminiR
 import {v4ParseJson,v4ToolSources,v4Provider,v4Call} from '../_lib/simple-match-v4.js';
 import {v4ReadEmployerJob,v4PublicJobUrl,v4EmployerAuthorization} from '../_lib/v4-open-job-evidence.js';
 import {isCommercialRecruitmentBoard} from '../_lib/match-employer-source.js';
+import {batchScoringPayload,collectBatchAssessments} from '../_lib/v4-batch-scoring.js';
 import {validateCuratedReport,validateGeminiGlobalOrder} from '../_lib/v4-curated-reports.js';
 const reply=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Robots-Tag':'noindex','Referrer-Policy':'no-referrer'}});
 const equal=async(a,b)=>{
@@ -97,7 +98,23 @@ export async function runGeminiProbe(provider,phase,{fetcher=fetch,signal}={}){
 // synthetic input. A returned reasoning-token count is an observation, not
 // proof that the relay applied a particular effort level.
 export async function runOpenAIProbe(provider,phase,{fetcher=fetch,signal}={}){
- const call=(payload,options={})=>v4Call(fetcher,{...provider,...options},payload,{signal});
+ if(phase==='openai_token_efficiency'){
+  const resume='虚构测试：负责门店日常运营，使用 Excel 汇总每周销售数据。协助培训新人。';
+  const items=[{id:'a',job:{company:'虚构公司甲',title:'运营',location:'上海',full_jd:'负责销售数据汇总，熟悉 Excel。'}},{id:'b',job:{company:'虚构公司乙',title:'培训',location:'上海',full_jd:'负责新员工培训，记录培训反馈。'}}];
+  const results=[];
+  for(const group of [[items[0]],[items[1]],items]){
+   const payload=batchScoringPayload(group,resume,'运营');
+   delete payload.tools;delete payload.tool_choice;delete payload.include;
+   let effort;
+   const r=await v4Call((url,opts)=>{effort=JSON.parse(opts.body).reasoning?.effort;return fetcher(url,opts);},provider,payload,{signal,stage:'score'});
+   const accepted=r.status==='completed'?collectBatchAssessments(v4ParseJson(r),group,resume).size:0;
+   const u=r.usage,known=['input_tokens','output_tokens','total_tokens'].every(k=>Number.isSafeInteger(u?.[k])&&u[k]>=0);
+   results.push({batch_size:group.length,requested_effort:effort,accepted,usage_present:known,input_tokens:known?u.input_tokens:null,output_tokens:known?u.output_tokens:null,total_tokens:known?u.total_tokens:null});
+   if(effort!=='medium'||accepted!==group.length||!known)return {ok:false,results,scope:'SYNTHETIC_ONLY'};
+  }
+  return {ok:true,results,single_input:results[0].input_tokens+results[1].input_tokens,batch_input:results[2].input_tokens,single_total:results[0].total_tokens+results[1].total_tokens,batch_total:results[2].total_tokens,scope:'SYNTHETIC_ONLY_NOT_500_TO_50'};
+ }
+ const call=(payload,options={})=>v4Call(fetcher,{...provider,...options},payload,{signal,stage:'probe'});
  const usage=r=>({usage_present:Number.isFinite(r.usage?.total_tokens),reasoning_tokens:Number.isSafeInteger(r.usage?.output_tokens_details?.reasoning_tokens)?r.usage.output_tokens_details.reasoning_tokens:null});
  if(phase==='openai_basic'||phase==='openai_reasoning'){
   const reasoning=phase==='openai_reasoning';
@@ -138,7 +155,7 @@ export async function onRequest({request,env}){
  const [expiry,token]=raw.split(':');
  if(request.method!=='GET'||!token||token.length<48||!Number.isFinite(Number(expiry))||Date.now()>Number(expiry)||!await equal(request.headers.get('X-HHBA-Probe')||'',token))return reply({error:'NOT_FOUND'},404);
  const phase=new URL(request.url).searchParams.get('phase')||'openai_basic';
- if(!['openai_basic','openai_reasoning','openai_search','openai_pipeline'].includes(phase))return reply({error:'INVALID_PROBE_PHASE'},400);
+ if(!['openai_basic','openai_reasoning','openai_search','openai_pipeline','openai_token_efficiency'].includes(phase))return reply({error:'INVALID_PROBE_PHASE'},400);
  const provider=v4Provider(env);
  if(!provider)return reply({ok:false,error:'AI_PROVIDER_NOT_CONFIGURED',phase},503);
  const start=Date.now();

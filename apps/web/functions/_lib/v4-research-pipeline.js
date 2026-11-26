@@ -74,7 +74,10 @@ export function mergePipelineCheckpoint(original,discovery,verification,attempte
  const keys=new Set(ledger.map(r=>JSON.stringify([r.type,r.url,r.mode,r.document_url,r.offset,r.text])));
  for(const record of verification.publicEvidence||[]){const k=JSON.stringify([record.type,record.url,record.mode,record.document_url,record.offset,record.text]);if(!keys.has(k)){keys.add(k);ledger.push(record);}}
  next.publicEvidence=ledger;
- next.researchNotes=[...new Set([...(next.researchNotes||[]),...(verification.researchNotes||[])])];
+ const discoveryNotes=next.researchNotes||[];
+ next.researchNotes=[...new Set([...discoveryNotes,...(verification.researchNotes||[])])];
+ // New notes from another lane must not disappear behind an older digest.
+ if(next.researchNotes.length!==discoveryNotes.length)next.researchDigest='';
  next.candidateResearchMemory=mergeCandidateResearchMemory(next.candidateResearchMemory,verification.candidateResearchMemory,next.rows);
  const reads=new Map([...(next.verificationReads||[]),...(verification.verificationReads||[])]);
  for(const [u] of completed)reads.delete(u);

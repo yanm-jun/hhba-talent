@@ -1,0 +1,23 @@
+name: HHBA live Token efficiency synthetic acceptance
+on:
+  # Deliberate opt-in: PR CI uses deterministic contracts; live billing uses the
+  # protected Cloudflare preview probe or this manually dispatched workflow.
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synthetic-live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Three small real model requests using fictional inputs
+        working-directory: apps/web
+        env:
+          HHBA_AGENT_RELAY_API_KEY: ${{ secrets.HHBA_AGENT_RELAY_API_KEY }}
+          HHBA_AGENT_RELAY_BASE_URL: ${{ vars.HHBA_AGENT_RELAY_BASE_URL }}
+          HHBA_AGENT_RELAY_MODEL: ${{ vars.HHBA_AGENT_RELAY_MODEL }}
+          HHBA_AGENT_RELAY_STREAM: ${{ vars.HHBA_AGENT_RELAY_STREAM }}
+        run: node scripts/v4-token-live-acceptance.mjs
