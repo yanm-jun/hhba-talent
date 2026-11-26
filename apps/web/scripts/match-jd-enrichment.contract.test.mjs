@@ -178,7 +178,7 @@ test('verified JD version crosses search UI, history and Word without storing pr
  assert.match(history,/verifiedJdMeta\(item\)/);
  assert.match(dialog,/jd_version_id:job\.jd_version_id/);
  assert.match(editor,/getArchivedJobJdVersion\(job\.jd_version_id/);
- assert.match(route,/saveMatchHistory\(env\.HHBA_PNVS_AUTH_DB/);
+ assert.match(route,/saveMatchHistory\(researchEnv\.HHBA_PNVS_AUTH_DB/);
  assert.match(route,/officialOnly:true,curated:true/);
  const core=readFileSync(new globalThis.URL('../functions/_lib/simple-match-v4.js',import.meta.url),'utf8');
  assert.match(core,/saveV4PublicJobJd/);
