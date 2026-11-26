@@ -152,7 +152,6 @@ const errorMap:Record<string,string>={
   AI_PROFILE_INCOMPLETE:'AI 暂未生成有效的职业分析报告，本次已停止后续岗位搜索。',
    AI_BACKGROUND_EXECUTION_FAILED:'后台任务执行失败，已停止自动重试。请结束本次任务后重新开始。',
    AI_PROVIDER_RESPONSE_INVALID:'AI 输出格式异常，未采用不完整推荐结果。',
-  AI_PROFILE_INCOMPLETE:'AI 没有识别到可用于匹配的经历或技能。请核对简历文字，补充真实内容后重试。',
   MATCH_PERSONAL_LIMIT:'今天的个人免费体验次数已达上限。',
   MATCH_GLOBAL_LIMIT:'平台今天的 AI 体验额度已用完。',
   BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。',
