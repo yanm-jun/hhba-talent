@@ -128,13 +128,13 @@ function events(env,request,input,waitUntil){
    // Terminal-only provider responses still use their authoritative batch.
    const rememberDiscovery=(event,meta)=>{
     if(!input.background){send('discovery_candidate',event);return;}
-    if(!['delta','done'].includes(meta?.source))return;
+    if(!['delta','done','source_read'].includes(meta?.source))return;
     const j=event?.candidate,key=v4DiscoveryCandidateKey(j?.official_url);
     if(!key||!allowedJob(j)||currentCandidateKeys.has(key)||leaseAbort.signal.aborted)return;
     currentCandidateKeys.add(key);publishedCandidateKeys.add(key);
     lastJobs.push({
      id:'v4-live:'+key,company:j.company,title:j.title,location:j.location,official_url:key,
-     platform:'招聘来源（企业官网待核实）',source:'AI搜索候选',remote:false,reference_score:0,match_score:null,
+     platform:'招聘来源（企业官网待核实）',source:meta?.source==='source_read'?'公开招聘页读取候选':'AI搜索候选',remote:false,reference_score:0,match_score:null,
      matched:[],not_evidenced:[],needs_verification:[],requirements_basis:'',
      source_type:'站外招聘职位',source_status:'MODEL_SEARCH_REPORTED',evidence_status:'RESEARCH_PENDING',availability_status:'UNKNOWN'
     });
