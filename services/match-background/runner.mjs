@@ -1,3 +1,4 @@
+import {validStageLane} from './stages.mjs';
 // Independent driver. Only sanitized control status and error codes are
 // persisted by the workflow; resumes, provider replies and tickets stay private.
 const safeCode=(v,fallback)=>typeof v==='string'&&/^(?:AI_[A-Z0-9_]{3,90}|BACKGROUND_[A-Z0-9_]{3,90})$/.test(v)?v:fallback;
@@ -15,10 +16,10 @@ export function recoveryDelaySeconds(code,streak=1){
  const minimum=code==='AI_EDGE_DAILY_LIMIT'?3600:code==='AI_EDGE_RESOURCE_EXHAUSTED'?180:code==='AI_PROVIDER_RATE_LIMITED'?60:15;
  return Math.max(minimum,ordinary);
 }
-export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery}={}){
+export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lane}={}){
  const terminal=(status,error)=>diagnostic?{status,...(error?{error}: {})}:status;
  let response;
- try{response=await fetcher('https://hhba.work/api/match-v4/background-step',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket,...(recovery&&recoverableCodes.has(recovery)?{recovery}:{})})});}
+ try{response=await fetcher('https://hhba.work/api/match-v4/background-step',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket,...(recovery&&recoverableCodes.has(recovery)?{recovery}:{}),...(validStageLane(lane)?{lane}:{})})});}
  catch(e){if(e instanceof TypeError&&/invalid redirect|invalid url|invalid header/i.test(e.message))return terminal('FAILED','AI_BACKGROUND_REQUEST_INVALID');throw retry('AI_BACKGROUND_TRANSPORT_INTERRUPTED');}
  if(response.status>=300&&response.status<400){await response.body?.cancel().catch(()=>{});return terminal('FAILED','AI_BACKGROUND_REDIRECT_BLOCKED');}
  if(!response.ok){
@@ -45,19 +46,26 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery}={}
    return terminal('FAILED',code);
   }
   if(value?.status==='COMPLETE')return terminal('COMPLETE');
-  if(value?.status==='CONTINUE')return terminal('CONTINUE');
+  if(value?.status==='HANDOFF')return terminal('HANDOFF');
+   if(value?.status==='CONTINUE')return value?.fallback===true&&diagnostic?{status:'CONTINUE',fallback:true}:terminal('CONTINUE');
  }
  throw retry('AI_BACKGROUND_RESPONSE_INCOMPLETE');
 }
 // Rotate before the free Workflow step ceiling; the Pages checkpoint, not
 // the Workflow step history, is authoritative. This is not a task-wide cap.
-export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400}={}){
- let streak=0,recovery;
+export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lane}={}){
+ let streak=0,recovery,currentLane=validStageLane(lane)?lane:null;
+ // A sleeping stage consumes no new AI requests or repeated polling steps.
+ // Cloudflare buffers an event even if it arrives before waitForEvent.
+ if(currentLane&&currentLane!=='discovery'){
+  const wake=await step.waitForEvent('initial-'+currentLane,{type:'wake_'+currentLane,timeout:'24 hours'});
+  if(wake?.done)return {status:'COMPLETE'};
+ }
  for(let phase=0;phase<maxSteps;phase++){
   let state;
   try{
    state=await step.do('resume-research-phase-'+phase,{retries:{limit:5,delay:'15 seconds',backoff:'exponential'},timeout:'30 minutes'},async()=>{
-    try{return await requestPhase(fetcher,ticket,{diagnostic:true,recovery});}
+    try{return await requestPhase(fetcher,ticket,{diagnostic:true,recovery,lane:currentLane});}
     catch(e){
      const error=retryCode(e);
      // Expected transport/host/provider failure is a durable recovery outcome,
@@ -72,7 +80,16 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400}={}
    const error=retryCode(e);console.warn('HHBA_MATCH_WORKFLOW_INTERRUPTED',JSON.stringify({phase,error}));throw retry(error);
   }
   const result=typeof state==='string'?{status:state}:state;
-  if(result?.status==='CONTINUE'){streak=0;recovery=undefined;continue;}
+  if(result?.status==='CONTINUE'){
+    if(result.fallback===true)currentLane=null;
+    streak=0;recovery=undefined;continue;
+   }
+   if(result?.status==='HANDOFF'){
+    if(!currentLane){streak=0;continue;}
+    const wake=await step.waitForEvent('next-'+currentLane+'-'+phase,{type:'wake_'+currentLane,timeout:'24 hours'});
+    if(wake?.done)return {status:'COMPLETE'};
+    streak=0;recovery=undefined;continue;
+   }
   if(['COMPLETE','STOP','FAILED'].includes(result?.status))return result;
   const error=safeCode(result?.error,'AI_BACKGROUND_RESPONSE_INVALID');
   recovery=error;
@@ -88,8 +105,8 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400}={}
 // The scheduler never restarts a Workflow from an ordinary browser poll.
 // A registered watchdog owns restarts, including planned step-limit rollover.
 const recoverableInstance=state=>state?.status==='errored'||(state?.status==='complete'&&(state.output?.status==='RECOVERING'||state.output?.status==='FAILED'&&(!state.output?.error||recoverableCodes.has(state.output.error))));
-export async function scheduleWorkflowInstance(workflow,instance,ticket,{diagnostic=false}={}){
- try{await workflow.create({id:instance,params:{ticket}});return true;}
+export async function scheduleWorkflowInstance(workflow,instance,ticket,{diagnostic=false,lane}={}){
+ try{await workflow.create({id:instance,params:{ticket,...(validStageLane(lane)?{lane}:{})}});return true;}
  catch(e){if(!(e instanceof Error)||!e.message.includes('(instance.already_exists)'))throw e;}
  const existing=await workflow.get(instance),current=await existing.status();
  if(current?.status==='waiting'||recoverableInstance(current)){
