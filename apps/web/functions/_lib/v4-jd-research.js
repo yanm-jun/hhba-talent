@@ -63,7 +63,10 @@ export function nextVerificationBatch(previous,hadRecovery,remaining,{externalRe
   // headroom and predict next batch size; never interrupt an active job.
   const perJob=Math.max(1,Math.ceil(externalRequests/completed));
   const predicted=Math.max(1,Math.floor(40/perJob));
-  return Math.max(1,Math.min(remaining||1,size+1,predicted,4));
+  // Batch size is a checkpoint work window, not socket concurrency. The four
+  // existing worker lanes pull successive jobs when ready. Grow only after
+  // measured inexpensive work; retain the same 40-request headroom estimate.
+  return Math.max(1,Math.min(remaining||1,size+(size>=4?2:1),predicted,12));
  }
  return Math.max(1,Math.min(remaining||1,hadRecovery?Math.ceil(size/2):size+1,4));
 }
