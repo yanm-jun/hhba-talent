@@ -21,7 +21,6 @@ import {readPublicHtmlResearch,unchangedPublicHtmlResearch,writePublicHtmlResear
 
 import {logV4Usage} from './ai-token-usage.js';
 import {stageEffort,recordAiUsage} from './ai-token-usage.js';
-import {metricDb} from './metric-utils.js';
 
 const BASE='https://api-c.reqtoken.com/v1';
 function providerBase(value){
@@ -29,7 +28,7 @@ function providerBase(value){
 }
 const MODEL='gpt-6.2-sol';
 const fault=code=>Object.assign(new Error(code),{code});
-export const isV4RetryableProviderError=code=>['AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RATE_LIMITED'].includes(code);
+export const isV4RetryableProviderError=code=>['AI_PHASE_RESOURCE_YIELD','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RATE_LIMITED'].includes(code);
 const text=(v,n=Infinity)=>typeof v==='string'?v.trim().slice(0,n):'';
 const texts=v=>Array.isArray(v)?v.filter(x=>typeof x==='string').map(s=>text(s)).filter(Boolean):[];
 const norm=v=>String(v||'').replace(/\s+/g,' ').trim();
@@ -40,7 +39,7 @@ export function v4Provider(env={}){
  // The older HHBA OpenAI binding was provisioned for this exact relay.
  // Never forward that credential to a different operator-configured origin.
  const key=validKey(env.HHBA_AGENT_RELAY_API_KEY)?env.HHBA_AGENT_RELAY_API_KEY:baseUrl===BASE&&validKey(env.HHBA_MATCH_OPENAI_API_KEY)?env.HHBA_MATCH_OPENAI_API_KEY:null;
- return key&&baseUrl?{key:key.trim(),baseUrl,stream:env.HHBA_AGENT_RELAY_STREAM==='1',model:env.HHBA_AGENT_RELAY_MODEL?.trim()||MODEL,...(metricDb(env)?{usageDb:metricDb(env)}:{}),...(env.HHBA_AGENT_REASONING_EFFORT?{reasoningEffort:env.HHBA_AGENT_REASONING_EFFORT}: {})}:null;
+ return key&&baseUrl?{key:key.trim(),baseUrl,stream:env.HHBA_AGENT_RELAY_STREAM==='1',model:env.HHBA_AGENT_RELAY_MODEL?.trim()||MODEL,...(typeof env.HHBA_METRICS_DB?.prepare==='function'?{usageDb:env.HHBA_METRICS_DB}:{}),...(env.HHBA_AGENT_REASONING_EFFORT?{reasoningEffort:env.HHBA_AGENT_REASONING_EFFORT}: {})}:null;
 }
 // All V4 research, reassessment, OCR and Word editing use the same OpenAI Responses provider.
 export function v4JobProvider(env={}){return v4Provider(env);}
@@ -96,7 +95,14 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent,stage=prov
  // Explicit payload overrides are also normalized for normal GPT-6 business requests.
  if(stage!=='probe'&&/^gpt-6(?:\.|-)/i.test(provider.model||'')&&payload.reasoning)payload={...payload,reasoning:{...payload.reasoning,effort:'medium'}};
  let data;
- try{data=await v4CallOpenAI(fetcher,effective,payload,{signal,onEvent,stage});return data;}
+ const replayKey=provider.phaseReplay?await sha256Hex(JSON.stringify([provider.model,stage,effort,payload])):null;
+ const prior=replayKey?provider.phaseReplay.take(replayKey):null;
+ if(prior)return prior;
+ try{
+  data=await v4CallOpenAI(fetcher,effective,payload,{signal,onEvent,stage});
+  if(replayKey&&data.status==='completed')provider.phaseReplay.remember(replayKey,data);
+  return data;
+ }
  finally{await recordAiUsage(provider.usageDb,{model:provider.model,stage,effort:payload.reasoning?.effort||effort,status:data?.status||'failed',usage:data?.usage});}
 }
 async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,stage}={}){
@@ -115,6 +121,7 @@ async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,stage}={}){
    ...(signal?{signal}:{} )
   });
  }catch(e){
+  if(e?.code==='AI_PHASE_RESOURCE_YIELD')throw e;
   throw fault(signal?.aborted?'AI_AGENT_CANCELLED':
    e?.name==='TimeoutError'?'AI_PROVIDER_TIMEOUT':'AI_PROVIDER_NETWORK_ERROR');
  }
@@ -621,14 +628,14 @@ export function renderCandidatePreview(job,url,resume,toolLinked,index,toolUrls)
  * even if a later round or optional verification has an upstream failure.
  */
 export async function v4Match(fetcher,provider,resume,roleHint,
- {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},onResearch=()=>{},officialOnly=false,curated=false,env={},excludeUrls=[],checkpoint=null,stepMode=false,onRecoveryState=()=>{},allowContinue=false,parallelResearch=false,pipelineChild=false}={}){
+ {signal,onProgress=()=>{},onActivity=()=>{},onPartial=()=>{},onResearch=()=>{},officialOnly=false,curated=false,env={},excludeUrls=[],checkpoint=null,stepMode=false,onRecoveryState=()=>{},allowContinue=false,parallelResearch=false,pipelineChild=false,resourceBudget=null}={}){
  // The deployed curated V4 route exposes the full model-neutral research protocol.
  // Legacy direct consumers without the V4 activation flag retain their compatibility behavior.
  const fullResearch=curated&&env.HHBA_MATCH_V4_READY==='1';
  // The real route uses durable checkpoints; the direct invocation path uses the same batches.
  if(curated&&!stepMode){
   let current=checkpoint,result;
-  do{result=await v4Match(fetcher,provider,resume,roleHint,{signal,onProgress,onActivity,onPartial,onResearch,officialOnly:true,curated:true,env,excludeUrls,checkpoint:current,stepMode:true,onRecoveryState,allowContinue,parallelResearch});current=result.checkpoint;}while(result.status==='CONTINUE');
+  do{result=await v4Match(fetcher,provider,resume,roleHint,{signal,onProgress,onActivity,onPartial,onResearch,officialOnly:true,curated:true,env,excludeUrls,checkpoint:current,stepMode:true,onRecoveryState,allowContinue,parallelResearch,resourceBudget});current=result.checkpoint;}while(result.status==='CONTINUE');
   return result;
  }
  // Run one existing verification phase alongside the next discovery phase.
@@ -638,11 +645,12 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   const eligible=pendingVerification(checkpoint);
   if(eligible.length){
    const plan=pipelineWidths(checkpoint,eligible.length);
+    if(resourceBudget){plan.verification=Math.min(plan.verification,1);plan.discovery=Math.min(plan.discovery,2);}
    const attempted=eligible.slice(0,plan.verification),verify=verificationSnapshot(checkpoint,plan.verification);
    const search=structuredClone(checkpoint);
    // Allocate transport capacity by actual backlog, not by limiting research.
    search.discoveryWidth=plan.discovery;
-   const common={signal,officialOnly:true,curated:true,env,excludeUrls,stepMode:true,allowContinue,parallelResearch,pipelineChild:true};
+   const common={signal,officialOnly:true,curated:true,env,excludeUrls,stepMode:true,allowContinue,parallelResearch,pipelineChild:true,resourceBudget};
    onActivity('searching','AI 正在并行发现新岗位，同时核验并评分已收集的岗位。');
    let searchRecovery=()=>search,verifyRecovery=()=>null,verifyFinished=false;
     // Persist completed branch progress without waiting for its sibling.
@@ -659,7 +667,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(!searchState)throw fault('AI_PIPELINE_STATE_INVALID');
    const verifyState=verified.status==='fulfilled'?verified.value.checkpoint:verifyRecovery();
    const next=mergePipelineCheckpoint(checkpoint,searchState,verifyState,attempted,{verificationIncomplete:verified.status==='rejected'});
-   if(discovery.status==='rejected'&&verified.status==='rejected'){
+   if(resourceBudget?.denied){onRecoveryState(()=>next);throw fault('AI_PHASE_RESOURCE_YIELD');}
+    if(discovery.status==='rejected'&&verified.status==='rejected'){
     onRecoveryState(()=>next);throw discovery.reason;
    }
    next.pipelineActive=true;
@@ -849,14 +858,14 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    }
   };
   if(needsReport()){
-   const width=parallelResearch?(fullResearch?Math.max(1,Math.min(4,reportWidth)):3):1;
+   const width=resourceBudget?1:parallelResearch?(fullResearch?Math.max(1,Math.min(4,reportWidth)):3):1;
    const rolling=fullResearch&&parallelResearch;
    // Two waves at most per durable invocation, not a total report limit.
    // Stop admitting new work when observed transport pressure increases.
    // Active independent report research may still finish normally.
-   const batch=pendingReports().slice(0,rolling?width*2:width);
+   const batch=pendingReports().slice(0,resourceBudget?1:rolling?width*2:width);
    const reportStarted=Date.now();
-   const settled=rolling?await runReadyWork(batch,width,generateReport,{signal,canStart:()=>reportRequests<24}):await Promise.allSettled(batch.map(generateReport));
+   const settled=rolling?await runReadyWork(batch,width,generateReport,{signal,canStart:()=>reportRequests<24&&(!resourceBudget||resourceBudget.canStart())}):await Promise.allSettled(batch.map(generateReport));
    diag.REPORT_BATCH_ELAPSED_MS=(diag.REPORT_BATCH_ELAPSED_MS||0)+(Date.now()-reportStarted);
    diag.REPORT_EXTERNAL_REQUESTS=(diag.REPORT_EXTERNAL_REQUESTS||0)+reportRequests;
    diag.REPORT_BATCH_ATTEMPTS=(diag.REPORT_BATCH_ATTEMPTS||0)+settled.length;
@@ -981,7 +990,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    // search lanes are useful during broad discovery, not repeated source review.
    const canParallel=parallelResearch&&curated&&!activeResumePage&&!researchToolResult&&(fullResearch||concreteCount()<CANDIDATE_TARGET)&&(!priorState||checkpoint?.pipelineActive&&!backfillSignature);
    if(canParallel){
-    const width=discoveryWidth;
+    const width=resourceBudget?Math.min(3,discoveryWidth):discoveryWidth;
     onActivity('searching','主研究 Agent 与 '+(width-1)+' 个辅助 Agent 正在并行搜索企业官方岗位。');
     const lane=async lane=>{
      const laneResponse=await v4Call(fetcher,provider,{
@@ -1241,7 +1250,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const allEntries=pendingVerification({rows:[...rows],processedEarlier:[...processedEarlier],processedEvidence:[...processedEvidence],explicitRechecks:[...explicitRechecks],rejectedBoards:[...rejectedBoards],verificationDeferred:checkpoint?.verificationDeferred||[]});
  // Process small batches across separate requests to keep provider, fetch, D1 and R2 calls within a Worker invocation.
  // The batch size is not a recommendation limit; every discovered entry is processed.
- const batchSize=curated?(checkpoint?.verificationBatch||(parallelResearch?3:1)):2;
+ const batchSize=resourceBudget?Math.min(2,checkpoint?.verificationBatch||(parallelResearch?2:1)):curated?(checkpoint?.verificationBatch||(parallelResearch?3:1)):2;
  const entries=stepMode?allEntries.slice(offset,offset+batchSize):allEntries;
  const recoveryBefore=diag.JD_RECOVERY_REQUIRED||0;
  let verificationRequests=0;
@@ -1294,7 +1303,8 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    // Large verification windows are admitted incrementally. Leave headroom
    // for active research and storage; untouched entries remain in allEntries
    // and are processed by the next durable invocation, never marked complete.
-   if(overlap&&batchSize>4&&cursor>=4&&verificationRequests>=30)return;
+   if(overlap&&cursor>0&&resourceBudget&&!resourceBudget.canStart())return;
+    if(overlap&&batchSize>4&&cursor>=4&&verificationRequests>=30)return;
    const i=cursor++,[url,job]=entries[i];
    if(overlap){
     const got=await enrich(verificationFetcher,new Map([[url,job]]),readOptions);
@@ -1391,6 +1401,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   note('VERIFICATION_WINDOW_PRESSURE_PAUSE');
  }
  if(overlap){diag.VERIFICATION_BATCH_ELAPSED_MS=(diag.VERIFICATION_BATCH_ELAPSED_MS||0)+(Date.now()-began);diag.VERIFICATION_BATCH_ATTEMPTS=(diag.VERIFICATION_BATCH_ATTEMPTS||0)+entries.length;}
+ if(resourceBudget?.denied&&curated&&checkpoint){onRecoveryState(()=>verificationRecovery(1));throw fault('AI_PHASE_RESOURCE_YIELD');}
  if(workerFailure){
   if(curated&&checkpoint&&isV4RetryableProviderError(workerFailure.reason?.code)&&!signal?.aborted){
    onRecoveryState(()=>verificationRecovery(Math.max(1,Math.ceil(batchSize/2))));
