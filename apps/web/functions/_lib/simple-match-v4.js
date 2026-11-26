@@ -321,11 +321,12 @@ async function checkJob(fetcher,url,signal,job,note=()=>{},cacheBucket,proofCach
  }
  catch(e){
   if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
+  if(e?.code==='AI_PHASE_RESOURCE_YIELD')throw e;
   if(e?.message==='V4_COMMERCIAL_BOARD_EXCLUDED')return {excluded_board:true};
   if(e?.message==='V4_JOB_CLOSED')return {excluded_closed:true};
   const code=e?.code||e?.message;note(typeof code==='string'&&/^[A-Z_]+$/.test(code)?code:'JD_DIRECT_READ_FAILED');
   try{return await directOfficialJobEvidence(url,{fetcher,signal,full:true})}
-  catch(fallback){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');const reason=fallback?.code||fallback?.message;note(typeof reason==='string'&&/^[A-Z_]+$/.test(reason)?reason:'JD_FALLBACK_READ_FAILED');return null}
+  catch(fallback){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(fallback?.code==='AI_PHASE_RESOURCE_YIELD')throw fallback;const reason=fallback?.code||fallback?.message;note(typeof reason==='string'&&/^[A-Z_]+$/.test(reason)?reason:'JD_FALLBACK_READ_FAILED');return null}
  }
 }
 
@@ -375,7 +376,7 @@ async function recoverEmployerJob(fetcher,provider,url,job,initial,{signal,onAct
    note('JD_PUBLIC_HTML_RESEARCH_REUSED');
    const {version,document_hash,...verified}=record;
    return {...verified,checked_at:new Date().toISOString()};
-  }catch(e){if(signal?.aborted)throw e;return null;}
+  }catch(e){if(signal?.aborted||e?.code==='AI_PHASE_RESOURCE_YIELD')throw e;return null;}
  };
  const existing=await reuse(url);if(existing)return existing;
  const seen=new Set(),tried=new Set(),issues=[];let best=initial,prior='';
@@ -502,7 +503,7 @@ async function researchIncompleteJd(fetcher,provider,url,job,checked,{signal,bro
   const unread=[...new Set((Array.isArray(proposed.facts)?proposed.facts:[]).map(f=>v4PublicJobUrl(f?.url)).filter(u=>u&&cited.has(u)&&!isCommercialRecruitmentBoard(u)&&!assetLedger.some(r=>r.url===u&&r.text)))];
   for(const source of unread){
    try{const doc=await v4ReadPublicJobDocument(source,{fetcher,signal});v4RememberPublicResult(assetLedger,{ok:true,type:'read_page',mode:'static',url:doc.url,text:doc.plain});}
-   catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');note('JD_REFERENCE_DIRECT_READ_FAILED');}
+   catch(e){if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');if(e?.code==='AI_PHASE_RESOURCE_YIELD')throw e;note('JD_REFERENCE_DIRECT_READ_FAILED');}
   }
   const result=groundJdResearch(proposed,assetLedger,diagnostics);
   if(publicIdentity){for(const record of assetLedger)v4RememberPublicResult(ledger,record);const material=normalizePublicReference(proposed,publicIdentity,result.facts);if(material){result.publicMaterial=material.data;if(await savePublicReferenceAsset(publicAssetEnv,publicIdentity,material)){note('PUBLIC_REFERENCE_ASSET_SAVED');if(await indexPublicJobAsset(publicAssetEnv,checked,{reference:true}))note('PUBLIC_JOB_ASSET_INDEXED');}}}

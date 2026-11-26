@@ -35,7 +35,7 @@ test('scheduler identifies waiting, errored and rollover workflows without resta
  for(const [state,active,recovering] of [
   [{status:'queued'},true,false],[{status:'running'},true,false],[{status:'waiting'},true,true],[{status:'errored'},true,true],
   [{status:'complete',output:{status:'RECOVERING',error:'AI_BACKGROUND_WORKFLOW_ROLLOVER'}},true,true],
-  [{status:'complete',output:{status:'COMPLETE'}},false,false],[{status:'complete',output:{status:'FAILED'}},false,false],
+  [{status:'complete',output:{status:'COMPLETE'}},false,false],[{status:'complete',output:{status:'FAILED',error:'AI_PROVIDER_KEY_REJECTED'}},false,false],[{status:'complete',output:{status:'FAILED'}},true,true],
   [{status:'complete',output:{status:'STOP'}},false,false],[{status:'terminated'},false,false],[{status:'paused'},false,false],[{status:'unknown'},false,false]
  ]){
   let restarted=0;
@@ -65,7 +65,7 @@ function registry(){
 test('watchdog restarts errored and rollover workflows, never completed, failed, stopped or paused workflows',async()=>{
  const {registerWatchdogInstance,inspectWatchdogInstances}=await import('./runner.mjs');
  const {rows,db}=registry(),now=1000,statuses=new Map(),restarted=[];
- const states=[{status:'errored'},{status:'terminated'},{status:'complete',output:{status:'COMPLETE'}},{status:'running'},{status:'paused'},{status:'complete',output:{status:'RECOVERING',error:'AI_BACKGROUND_WORKFLOW_ROLLOVER'}},{status:'complete',output:{status:'FAILED'}},{status:'complete',output:{status:'STOP'}}];
+ const states=[{status:'errored'},{status:'terminated'},{status:'complete',output:{status:'COMPLETE'}},{status:'running'},{status:'paused'},{status:'complete',output:{status:'RECOVERING',error:'AI_BACKGROUND_WORKFLOW_ROLLOVER'}},{status:'complete',output:{status:'FAILED',error:'AI_PROVIDER_KEY_REJECTED'}},{status:'complete',output:{status:'STOP'}}];
  for(const [i,state] of states.entries()){
   const id=String(i+1).repeat(64);statuses.set(id,state);await registerWatchdogInstance(db,id,now);
  }
@@ -137,3 +137,28 @@ test('edge exhaustion and lease contention have distinct diagnostics; checkpoint
  for(const error of ['AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_INCOMPLETE','AI_CHECKPOINT_STORAGE_UNAVAILABLE','AI_PROVIDER_UNAVAILABLE'])await assert.rejects(requestPhase(async()=>event('failure',{error,retryable:false}),ticket),/BACKGROUND_PHASE_RETRY/);
  assert.equal(await requestPhase(async()=>event('failure',{error:'AI_PROVIDER_KEY_REJECTED',retryable:true}),ticket),'FAILED');
  });
+
+test('old workflow terminal infrastructure result can recover, but authorization and credentials remain terminal',async()=>{
+ const {scheduleWorkflowInstance,registerWatchdogInstance,inspectWatchdogInstances}=await import('./runner.mjs');
+ for(const error of ['AI_PHASE_RESOURCE_YIELD','AI_BACKGROUND_EXECUTION_FAILED','AI_PIPELINE_STATE_INVALID','AI_EDGE_RESOURCE_EXHAUSTED','AI_CHECKPOINT_LEASE_LOST']){
+  await assert.rejects(requestPhase(async()=>event('failure',{error,retryable:false}),ticket),/BACKGROUND_PHASE_RETRY/);
+ }
+ for(const status of [408,425])await assert.rejects(requestPhase(async()=>new Response('',{status}),ticket),/BACKGROUND_PHASE_RETRY/);
+ const {db}=registry();const id='e'.repeat(64),now=1000;let restarted=0;
+ const instance={async status(){return {status:'complete',output:{status:'FAILED',error:'AI_EDGE_RESOURCE_EXHAUSTED'}}},async restart(){restarted++}};
+ const binding={async create(){throw Error('(instance.already_exists)')},async get(){return instance}};
+ assert.deepEqual(await scheduleWorkflowInstance(binding,id,ticket,{diagnostic:true}),{status:'RECOVERING',error:'AI_EDGE_RESOURCE_EXHAUSTED'});
+ await registerWatchdogInstance(db,id,now);assert.equal((await inspectWatchdogInstances(db,binding,{now})).restarted,1);assert.equal(restarted,1);
+ assert.equal(await requestPhase(async()=>event('failure',{error:'AI_CHECKPOINT_INVALID',retryable:true}),ticket),'FAILED');
+});
+test('resource failure continuation sends only the opaque ticket and sanitized recovery hint',async()=>{
+ const requests=[],responses=[new Response('Error 1102',{status:503}),event('complete',{status:'CONTINUE'}),event('complete',{status:'COMPLETE'})];
+ const state=await driveBackgroundMatch({async do(_n,_c,fn){return fn()},async sleep(){}},ticket,async(_u,init)=>{requests.push(JSON.parse(init.body));return responses.shift()});
+ assert.deepEqual(state,{status:'COMPLETE'});assert.deepEqual(requests,[{ticket},{ticket,recovery:'AI_EDGE_RESOURCE_EXHAUSTED'},{ticket}]);
+});
+
+test('lock contention uses short paced recovery without excessive backoff',async()=>{
+ const {recoveryDelaySeconds}=await import('./runner.mjs');
+ assert.deepEqual([1,2,3,4,8,20].map(n=>recoveryDelaySeconds('AI_TASK_IN_PROGRESS',n)),[15,30,45,60,60,60]);
+ assert.ok(recoveryDelaySeconds('AI_EDGE_DAILY_LIMIT',20)>=3600);
+});
