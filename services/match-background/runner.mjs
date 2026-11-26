@@ -47,7 +47,7 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false}={}){
 }
 // Rotate before the free Workflow step ceiling; the Pages checkpoint, not
 // the Workflow step history, is authoritative. This is not a task-wide cap.
-export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=900}={}){
+export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400}={}){
  let streak=0;
  for(let phase=0;phase<maxSteps;phase++){
   let state;
@@ -99,7 +99,8 @@ export async function scheduleWorkflowInstance(workflow,instance,ticket,{diagnos
  // parameters and Pages independently checks the active authorization.
 export async function registerWatchdogInstance(db,instance,now=Date.now()){
  if(!db||! /^[a-f0-9]{64}$/.test(instance))return;
- await db.prepare('INSERT INTO match_watchdog_instances (instance_id,next_check,expires_at) VALUES (?,?,?) ON CONFLICT(instance_id) DO UPDATE SET expires_at=excluded.expires_at').bind(instance,now,now+24*3600000).run();
+ const registered=await db.prepare('INSERT INTO match_watchdog_instances (instance_id,next_check,expires_at) VALUES (?,?,?) ON CONFLICT(instance_id) DO UPDATE SET expires_at=excluded.expires_at').bind(instance,now,now+24*3600000).run();
+ if(registered?.success!==true)throw Error('AI_BACKGROUND_WATCHDOG_UNAVAILABLE');
 }
 export async function inspectWatchdogInstances(db,workflow,{now=Date.now(),batch=8}={}){
  if(!db||!workflow)return {checked:0,restarted:0};
@@ -116,8 +117,8 @@ export async function inspectWatchdogInstances(db,workflow,{now=Date.now(),batch
   if(claim?.meta?.changes!==1)continue;
   try{
    const instance=await workflow.get(id),state=await instance.status();
-   if(recoverableInstance(state)&&typeof instance.restart==='function'){
-    await instance.restart();restarted++;
+   if(recoverableInstance(state)){
+    if(typeof instance.restart==='function'){await instance.restart();restarted++;}
    }else if(['complete','terminated','paused'].includes(state?.status)){
     await db.prepare('DELETE FROM match_watchdog_instances WHERE instance_id=?').bind(id).run();continue;
    }
