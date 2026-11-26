@@ -936,3 +936,65 @@ test('first complete official report is published before a slow sibling JD and g
   assert.equal(ranked.checkpoint.matches.filter(qualifiedReport).length,2);
  }finally{clearTimeout(timer);releaseSlow();}
 });
+
+
+test('single candidate event has stable replay identity, no fabricated score, and respects exclusions and cancellation',async()=>{
+ const {createV4DiscoveryCandidateEvents}=await import('../functions/_lib/v4-discovery-candidate-events.js');
+ const a=job(6101),b=job(6102),c=job(6103),controller=new AbortController(),received=[];
+ const config={round:4,lane:2,signal:controller.signal,allow:j=>j.url!==b.url,onCandidate:e=>received.push(e)};
+ const emit=createV4DiscoveryCandidateEvents(config);
+ emit({...a,score:98,reason:'private reason',resume_quote:resume,requirements:'unverified details'});
+ emit({...a,url:a.url+'?utm_source=duplicate'});emit(b);emit({...c,company:''});
+ assert.equal(received.length,1);
+ assert.deepEqual(received[0],{event_id:JSON.stringify([4,2,a.url]),round:4,lane:2,sequence:1,
+  candidate:{company:a.company,title:a.title,location:a.location,official_url:a.url,source_status:'MODEL_SEARCH_REPORTED',evidence_status:'RESEARCH_PENDING',match_score:null}});
+ const replay=createV4DiscoveryCandidateEvents(config);replay(a);
+ assert.equal(received[1].event_id,received[0].event_id);
+ controller.abort();emit(c);assert.equal(received.length,2);
+});
+
+test('actual V4 search emits individual SSE-derived candidate events before its response finishes, with no additional AI call', {timeout:5000},async()=>{
+ const a=job(6201),b=job(6202),excluded=job(6203);
+ const p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test',stream:true};
+ const raw=JSON.stringify({jobs:[a,b,excluded],research_complete:true,completion_reason:'test'});
+ const firstEnd='{"jobs":['.length+JSON.stringify(a).length;
+ const resultBody={status:'completed',output:[{type:'web_search_call',action:{sources:[a,b,excluded].map(j=>({url:j.url}))}},{type:'message',content:[{type:'output_text',text:raw}]}]};
+ let controller,calls=0,finished=false,early=false,releaseFirst;
+ const first=new Promise(resolve=>{releaseFirst=resolve;});
+ const received=[];
+ const stream=new ReadableStream({start(c){controller=c;}});
+ const send=e=>controller.enqueue(new TextEncoder().encode('data: '+JSON.stringify(e)+'\n\n'));
+ const pending=v4Match(async()=>{calls++;return new Response(stream,{headers:{'content-type':'text/event-stream'}});},p,resume,'全国',
+  {curated:true,officialOnly:true,stepMode:true,parallelResearch:false,excludeUrls:[excluded.url],
+   checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles}},
+   onDiscoveryCandidate:e=>{received.push(e);if(received.length===1){early=!finished;releaseFirst();}}});
+ let timer;
+ try{
+  send({type:'response.output_text.delta',delta:raw.slice(0,firstEnd)});
+  await Promise.race([first,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('candidate event waited for the terminal response')),1500);})]);
+  assert.equal(early,true);assert.equal(received.length,1);
+  assert.equal(received[0].candidate.official_url,a.url);
+  send({type:'response.output_text.delta',delta:raw.slice(firstEnd)});
+  finished=true;send({type:'response.completed',response:resultBody});
+  const result=await pending;
+  assert.equal(calls,1);assert.deepEqual(received.map(e=>e.candidate.official_url),[a.url,b.url]);
+  assert.deepEqual(received.map(e=>e.sequence),[1,2]);assert.ok(received.every(e=>e.round===1&&e.lane===0));
+  assert.deepEqual(result.checkpoint.rows.map(([url])=>url),[a.url,b.url]);
+ }finally{clearTimeout(timer);try{controller.close();}catch{}await pending.catch(()=>{});}
+});
+
+test('parallel search emits individual lane events while retaining the original authoritative merge',async()=>{
+ const a=job(6301),b=job(6302),p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test'};
+ const received=[];let calls=0;
+ const result=await v4Match(async(_url,opts)=>{
+  calls++;const input=JSON.parse(JSON.parse(opts.body).input);
+  return input.parallel_lane?model({jobs:[b]},[b.url]):model({jobs:[a],research_complete:true,completion_reason:'test'},[a.url]);
+ },p,resume,'全国',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,
+  checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles},discoveryWidth:2},
+  onDiscoveryCandidate:e=>received.push(e)});
+ assert.equal(calls,2);
+ assert.deepEqual(received.map(e=>e.lane).sort(),[0,1]);
+ assert.deepEqual(received.map(e=>e.candidate.official_url).sort(),[a.url,b.url].sort());
+ assert.deepEqual(result.checkpoint.rows.map(([url])=>url).sort(),[a.url,b.url].sort());
+ assert.ok(received.every(e=>e.candidate.match_score===null&&e.sequence===1));
+});
