@@ -318,7 +318,7 @@ async function recoverSavedDiscovery(env,input,saved,view){
  const reportRecovered=restoreReportRecovery(saved,record,input.generation);
  if(reportRecovered){await saveMatchTask(env,input.taskKey,reportRecovered);saved=reportRecovered;console.info('HHBA_V4_REPORT_CHECKPOINT_RECOVERED');}
  const recovered=restoreDiscoveryRecovery(saved,record,input.generation,input.excludeUrls);
- if(recovered.restored||recovered.restoredSources){
+ if(recovered.restored||recovered.restoredSources||recovered.statsRestored){
   // Persist once before starting a new invocation. Otherwise a second
   // crash could replace the progress supplement with an empty delta.
   await saveMatchTask(env,input.taskKey,recovered.saved);

@@ -461,3 +461,14 @@ test('production route and browser correlate numeric publication stamps without 
  await clock.advance(1);assert.equal(attempts,2);
  await publisher.stop();
  });
+
+test('live source counts and rejected links survive recovery even when no concrete vacancy has arrived',async()=>{
+ const {discoveryRecoverySnapshot,restoreDiscoveryRecovery}=await import('../functions/_lib/v4-discovery-recovery.js');
+ const u='https://careers.employer.cn/jobs/1',excluded='https://www.zhipin.com/job_detail/123';
+ const base={phase:'research',round:1,rows:[],sourceLeads:[],observedSearchSources:[],rejectedBoards:[]};
+ const next={...base,round:2,observedSearchSources:[u,excluded],rejectedBoards:[excluded]};
+ const supplement=discoveryRecoverySnapshot(base,next);
+ assert.deepEqual(supplement.rows,[]);assert.equal(supplement.observed.length,2);
+ const restored=restoreDiscoveryRecovery({generation:2,checkpoint:base},{generation:2,status:'PENDING',discovery_recovery:supplement},2);
+ assert.equal(restored.statsRestored,true);assert.deepEqual(restored.saved.checkpoint.observedSearchSources,[u,excluded]);assert.deepEqual(restored.saved.checkpoint.rejectedBoards,[excluded]);assert.deepEqual(restored.saved.checkpoint.rows,[]);
+});
