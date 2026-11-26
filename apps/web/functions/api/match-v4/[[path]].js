@@ -394,6 +394,12 @@ async function backgroundStep(env,request,waitUntil){
   if(input.backgroundLane&&!input.cachedResult){
    const next=v4CheckpointLane(input.checkpoint);
    if(next!==input.backgroundLane){
+    // A resource-recovery lane preference can differ from the persisted
+    // checkpoint. Commit it under the current D1 lease before waking the
+    // next independent Workflow, otherwise both lanes could ping-pong.
+    if(saved&&input.checkpoint&&input.checkpoint!==saved.checkpoint){
+     await saveMatchTask(env,taskKey,{...saved,checkpoint:input.checkpoint,generation:task.generation,checkpoint_captured_at:Date.now()});
+    }
     await input.lease.release();input.lease=null;
     const signaled=await stageWorkflowSignal(env,ticket,{lane:next});
     return new Response('event: complete\ndata: '+JSON.stringify(signaled?{status:'HANDOFF'}:{status:'CONTINUE',fallback:true})+'\n\n',{headers:{'Content-Type':'text/event-stream','Cache-Control':'no-store'}});
