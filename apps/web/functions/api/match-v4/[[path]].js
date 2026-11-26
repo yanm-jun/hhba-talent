@@ -20,6 +20,7 @@ import {backgroundEnabled,tryScheduleBackgroundMatch,loadBackgroundMatch,isV4Ret
 import {phaseResourceBudget,phaseModelReplay,PHASE_YIELD} from '../../_lib/v4-phase-budget.js';
 import {createV4ProgressPublisher} from '../../_lib/v4-progress-publisher.js';
 import {v4DiscoveryCandidateKey} from '../../_lib/v4-discovery-candidate-events.js';
+import {discoveryRecoverySnapshot,restoreDiscoveryRecovery} from '../../_lib/v4-discovery-recovery.js';
 
 const KIND='HHBA_NATIVE_WEB_MATCH_V1';
 const reply=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
@@ -88,7 +89,10 @@ function events(env,request,input,waitUntil){
    const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:lastJobs});
    async function publishProgress(status='PENDING',failure=null){
      if(!input.background||!input.taskKey)return;
-     try{budget?.observe('progress');await saveMatchProgress(env,input.taskKey,{generation:input.generation||0,status,progress:snapshotProgress(),failure});}
+     try{budget?.observe('progress');
+      // The recovery supplement is private: polling exposes only .progress.
+      const discovery_recovery=status==='PENDING'?discoveryRecoverySnapshot(input.checkpoint,input.recoveryState?.()):undefined;
+      await saveMatchProgress(env,input.taskKey,{generation:input.generation||0,status,progress:snapshotProgress(),failure,discovery_recovery});}
      catch(e){console.warn('HHBA_V4_PROGRESS_WRITE_FAILED',JSON.stringify({trace,error:e?.code||'PROGRESS_WRITE_FAILED'}));}
     }
    const publisher=createV4ProgressPublisher({
@@ -259,6 +263,16 @@ function events(env,request,input,waitUntil){
   'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
   'X-Robots-Tag':'noindex','X-Accel-Buffering':'no'}});
 }
+// Read the candidate recovery view only under the existing exclusive task
+// lease. It is account-bound by the same encrypted task key and generation.
+// An optional view read failing must not prevent normal checkpoint recovery.
+async function recoverSavedDiscovery(env,input,saved,view){
+ if(saved?.checkpoint?.phase!=='research'||saved.generation!==input.generation||saved.result||saved.failure&&!saved.failure.retryable)return saved;
+ const record=view??await readMatchProgress(env,input.taskKey).catch(()=>null);
+ const recovered=restoreDiscoveryRecovery(saved,record,input.generation,input.excludeUrls);
+ if(recovered.restored)console.info('HHBA_V4_DISCOVERY_RECOVERED',JSON.stringify({count:recovered.restored,round:saved.checkpoint.round}));
+ return recovered.saved;
+}
 // Private orchestration entrypoint: a ticket can advance only the already
 // authorized active session and generation, and returns no research content.
 // Each invocation uses the exact same D1 lease and encrypted checkpoint as
@@ -274,7 +288,8 @@ async function backgroundStep(env,request,waitUntil){
   input={managed:true,background:true,session,taskId:task.id,taskKey,generation:task.generation,text:task.text,role_hint:task.role,excludeUrls:task.excludeUrls,phone:session.phone,resume_id:task.resume_id};
   input.lease=await leaseMatchTask(env.HHBA_PNVS_AUTH_DB,taskKey);
   if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
-  const saved=await readMatchTask(env,taskKey,Date.now(),{renewGeneration:task.generation});
+  const durable=await readMatchTask(env,taskKey,Date.now(),{renewGeneration:task.generation});
+   const saved=await recoverSavedDiscovery(env,input,durable);
   if(saved?.generation===task.generation){input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;if(saved.failure&&!saved.failure.retryable){await input.lease.release();return fail(saved.failure.error,422);}}
   if(saved?.generation===task.generation&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
   else if(saved?.generation===task.generation&&saved?.checkpoint)input.checkpoint=saved.checkpoint;
@@ -359,8 +374,9 @@ export async function onRequest(context){
   try{
    input.taskKey=await matchTaskKey(env,session.phone,body.task_id,{text:resume,role,excludeUrls,resume_id:input.resume_id,policy:'curated-500-50-research-v5'});
    const generation=body.research_generation??0;
+   let view;
    if(input.managed&&backgroundEnabled(env,request)){
-    const view=await readMatchProgress(env,input.taskKey).catch(()=>null);
+    view=await readMatchProgress(env,input.taskKey).catch(()=>null);
     // While the driver is active, use the lightweight view rather than
     // decrypting the multi-hundred-KB evidence/replay checkpoint on each poll.
     let scheduled;
@@ -378,9 +394,10 @@ export async function onRequest(context){
    }
    input.lease=await leaseMatchTask(db,input.taskKey);
    if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
-   const saved=await readMatchTask(env,input.taskKey,Date.now(),input.managed?{renewGeneration:generation}:{});
-   if(!Number.isSafeInteger(generation)||generation<0||generation>(saved?.generation||0)+1){await input.lease.release();return fail('AI_CHECKPOINT_INVALID',409);}
+   const durable=await readMatchTask(env,input.taskKey,Date.now(),input.managed?{renewGeneration:generation}:{});
+   if(!Number.isSafeInteger(generation)||generation<0||generation>(durable?.generation||0)+1){await input.lease.release();return fail('AI_CHECKPOINT_INVALID',409);}
    input.generation=generation;
+   const saved=await recoverSavedDiscovery(env,input,durable,view);
     if(saved?.generation===generation){input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;if(saved.failure&&!saved.failure.retryable){await input.lease.release();return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});}}
    if(generation===(saved?.generation||0)&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
    else if(saved?.checkpoint&&generation===(saved.generation||0))input.checkpoint=saved.checkpoint;
