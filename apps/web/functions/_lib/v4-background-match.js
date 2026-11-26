@@ -6,6 +6,9 @@ import {sha256Hex} from './real-auth.js';
 
 export const backgroundEnabled=(env,request)=>env?.HHBA_V4_BACKGROUND_ENABLED==='1'&&typeof env.HHBA_MATCH_BACKGROUND?.fetch==='function'&&['https://hhba.work','https://www.hhba.work'].includes(new URL(request.url).origin);
 const validTicket=t=>typeof t==='string'&&/^[a-f0-9]{64}$/.test(t);
+// Retry only known recoverable infrastructure errors; invalid tickets, revoked
+// sessions and incompatible configuration must remain explicit terminal states.
+export const isV4RetryableTaskFailure=code=>['AI_CHECKPOINT_DB_UNAVAILABLE','AI_CHECKPOINT_LEASE_LOST','AI_CHECKPOINT_STORAGE_UNAVAILABLE','AI_BACKGROUND_SCHEDULE_UNAVAILABLE','AI_EDGE_RESOURCE_EXHAUSTED','AI_EDGE_DAILY_LIMIT'].includes(code);
 export async function scheduleBackgroundMatch(env,session,task,{diagnostic=false}={}){
  const ticket=await matchTaskKey(env,session.phone,task.id,{scope:'workflow-ticket-v1',session_hash:session.token_hash,generation:task.generation});
  const previous=await readMatchTask(env,ticket);
