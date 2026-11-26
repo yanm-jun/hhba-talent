@@ -126,7 +126,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
  };
  const pendingCount=all.filter(j=>!confirmed(j)&&!j.reference_vacancy_verified).length;
  const empty=(message:string)=><p className="hhba-stage-empty">{message}</p>;
- const status=(i:number)=>!pending?'':actual===i?'正在处理':actual>i?'可查看已有成果':'查看已有成果';
+ const status=(i:number)=>!pending?'':i===0&&identified?'分析已完成':actual===i?'正在处理':actual>i?'可查看已有成果':'等待处理';
  return <>
  <ol className="hhba-match-progress-steps hhba-refined-steps" aria-label="匹配进度及研究报告">
   {stages.map((step,i)=><li key={step.label} aria-current={pending&&actual===i?'step':undefined} data-selected={active===i}>
