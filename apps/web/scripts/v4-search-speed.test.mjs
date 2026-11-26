@@ -46,6 +46,7 @@ test('observed, deduplicated 1/50/100/300/500 milestones survive task continuati
 test('existing results have no invented first-milestone arrival time',()=>{
  const tracker=createV4SearchSpeedTracker({savedJobs:[job(1)],now:()=>30000,newId:()=>ID});
  assert.equal(tracker.snapshot().observed_unique,1);
+ assert.equal(tracker.snapshot().partial_at_start,true);
  assert.equal(tracker.snapshot().milestones[1],undefined);
  tracker.observe(job(2));
  assert.equal(tracker.snapshot().milestones[1],undefined);
@@ -54,6 +55,12 @@ test('existing results have no invented first-milestone arrival time',()=>{
  assert.equal(tracker.observe({...job(5),official_url:'http://localhost/x'}),false);
 });
 
+test('legacy in-flight matches are not benchmarked as full-task searches',async()=>{
+ const partial=createV4SearchSpeedTracker({savedJobs:[job(1)],now:()=>7000,newId:()=>ID});
+ for(let i=2;i<=50;i++)partial.observe(job(i));
+ assert.equal(partial.snapshot().milestones[50],0);
+ assert.equal(await recordV4SearchSpeed({prepare(){throw Error('must not write')}},partial.snapshot(),'CONTINUE',8000),false);
+});
 test('anonymous D1 task observations upsert idempotently and show no fake 500 timing',async()=>{
  const {raw,cloud}=database();
  const tracker=createV4SearchSpeedTracker({now:()=>1000,newId:()=>ID});
