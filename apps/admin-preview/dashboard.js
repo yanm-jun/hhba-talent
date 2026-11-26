@@ -91,7 +91,7 @@ function renderDailyOperations(report){
  status.textContent=rows.length+' 天 · '+(report.collectorStartedAt?'运营事件起始于 '+report.collectorStartedAt.slice(0,10):'运营事件采集时间尚未核实');
 }
 function updateGrowth(){
- renderAiUsage();
+ renderAiUsage();renderV4Operations();
  showRealDataStatus();
  const t=growth?.traffic,b=growth?.devices,a=growth?.account,q=growth?.activity;
  setMetric('ov-pv',t?.quality==='collected'?t.pv:null);
@@ -166,7 +166,7 @@ const titles={overview:'数据总览',users:'用户分析',market:'岗位与企�
 const details={
  users:['真实用户注册与业务操作','账号级行为追踪已停止；注册和收藏来自真实数据库，页面事件仅计次数。'],
  market:['企业和岗位质量分析','未来接入岗位状态、ATS 来源及招聘质量报表；当前公开索引汇总在数据总览。'],
- operations:['系统运行与数据同步','未来接入有权限的同步队列和异常日志；当前预览不读取服务器私有日志。'],
+ operations:['AI匹配阶段运行数据','仅显示具备管理员权限的 D1 汇总指标。'],
  finance:['成本、收入与经营效率','未来接入经核对的收支台账和 API 成本；无记录时不生成模拟营收。'],
  settings:['后台权限和统计配置','接入登录系统后，启用管理员 RBAC、投资人只读访问及指标口径管理。']
 };
@@ -174,7 +174,7 @@ function setView(view){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(['investor','overview','users','ai-usage'].includes(view)?view:'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users','ai-usage','operations'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -371,6 +371,27 @@ byId('mobile-menu').addEventListener('click',()=>{
 });
 byId('mobile-dim').addEventListener('click',closeMenu);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
+function renderV4Operations(){
+ const s=growth?.v4Operations,valid=s?.quality==='collected'&&s.summary;
+ const set=(id,v)=>{const e=byId(id);if(e)e.textContent=v;};
+ const total=s?.summary,fmtms=v=>integer(v)===null?'—':v>=60000?(v/60000).toFixed(1)+' 分钟':(v/1000).toFixed(1)+' 秒';
+ const ratio=v=>typeof v==='number'&&Number.isFinite(v)?v.toFixed(1)+'%':'—';
+ set('v4-ops-state',valid?'实际采集阶段：'+growth.period.start+' 至 '+growth.period.end+'（UTC）':s?.quality==='no_records'?'还没有采集记录，不等于零失败或零耗时':'数据暂不可用或未通过管理员验证');
+ set('v4-ops-attempts',valid?fmt.format(total.attempts):'—');
+ set('v4-ops-failure-rate',valid?ratio(total.failureRate):'—');
+ set('v4-ops-recovery',valid?ratio(total.recoveryCompletionRate):'—');
+ set('v4-ops-latency',valid?fmtms(total.averageElapsedMs):'—');
+ for(const id of ['v4-ops-stages','v4-ops-details'])byId(id)?.replaceChildren();
+ if(!valid)return;
+ const add=(id,name,value)=>{const root=byId(id),item=document.createElement('div'),a=document.createElement('span'),b=document.createElement('strong');a.textContent=name;b.textContent=value;item.append(a,b);root?.append(item);};
+ const labels={discovery:'岗位搜索',verification:'JD 核验与评分',reporting:'报告生成',mixed:'交错执行（未拆分阶段）'};
+ for(const stage of s.stages||[]){
+  add('v4-ops-stages',labels[stage.lane]||stage.lane,'阶段 '+fmt.format(stage.attempts)+' 次 · 失败 '+ratio(stage.failureRate)+' · 恢复完成 '+ratio(stage.recoveryCompletionRate)+' · 平均 '+fmtms(stage.averageElapsedMs));
+ }
+ add('v4-ops-details','首次候选 / 首次 JD / 首份报告（单阶段观察）',[total.firstCandidateMs,total.firstJdMs,total.firstReportMs].map(fmtms).join(' / '));
+ add('v4-ops-details','已接收真实成果','候选 '+fmt.format(total.candidates)+' · JD '+fmt.format(total.jds)+' · 评分 '+fmt.format(total.scores)+' · 报告 '+fmt.format(total.reports));
+ for(const e of s.errors||[])add('v4-ops-details',(labels[e.lane]||e.lane)+' · '+e.code,fmt.format(e.count)+' 次');
+}
 function renderAiUsage(){
  const root=byId('ai-usage-stages'),daily=byId('ai-usage-days');
  if(!root||!daily)return;
