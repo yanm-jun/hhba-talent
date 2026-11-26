@@ -516,7 +516,12 @@ test('classified Cloudflare invocation budget counts each D1 batch as one bindin
  assert.equal(observed.progress_reserve,4);
  for(let i=0;i<80&&budget.canStart();i++)await budget.fetch(async()=>new Response('ok'))('https://example.invalid');
  assert.equal(budget.canStart(),false);
- assert.throws(()=>budget.fetch(async()=>{})('https://example.invalid'),{code:PHASE_YIELD,resource_kind:'network'});
+ // Research is closed at the soft admission point. The physical hard
+ // boundary still reserves terminal operations and must fail before fetch.
+ for(let i=0;i<12&&!budget.denied;i++){
+  try{await budget.fetch(async()=>new Response('ok'))('https://example.invalid');}catch(e){assert.equal(e.code,PHASE_YIELD);assert.equal(e.resource_kind,'network');}
+ }
+ assert.equal(budget.denied,true);
  const recovery=v4ManagedResourceBudget({recovering:true});
  assert.ok(recovery.snapshot().hard<observed.hard);
  const resumed=v4ManagedResourceBudget({background:true});assert.equal(resumed.denied,false);
