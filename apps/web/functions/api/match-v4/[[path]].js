@@ -15,7 +15,7 @@ import {v4CheckpointSecret,checkpointStorageReady,storeMatchCheckpoint,loadMatch
 import {claimAiCheckpoint,leaseMatchTask} from '../../_lib/ai-checkpoint-claim.js';
 import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
 import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSessionTask} from '../../_lib/v4-session-match-task.js';
-import {backgroundEnabled,tryScheduleBackgroundMatch,loadBackgroundMatch} from '../../_lib/v4-background-match.js';
+import {backgroundEnabled,tryScheduleBackgroundMatch,loadBackgroundMatch,isV4RetryableTaskFailure} from '../../_lib/v4-background-match.js';
 
 import {phaseResourceBudget,phaseModelReplay,PHASE_YIELD} from '../../_lib/v4-phase-budget.js';
 
@@ -119,9 +119,9 @@ function events(env,request,input,waitUntil){
      onError:e=>leaseAbort.abort(e),
      onSaveError:e=>{if(e?.code==='AI_AGENT_CANCELLED')leaseAbort.abort(e);else console.warn('HHBA_V4_PERIODIC_PROGRESS_SAVE_FAILED');}
     });
-    async function releaseTask(){await stopProgress();await leaseHeartbeat?.stop();if(input.lease){const lease=input.lease;input.lease=null;await lease.release();}}
+    async function releaseTask(){await stopProgress();await leaseHeartbeat?.stop();if(input.lease){const lease=input.lease;input.lease=null;await lease.release().catch(()=>console.warn('HHBA_TASK_LEASE_RELEASE_FAILED'));}}
    const execution=(async()=>{
-    let succeeded=false;
+    let succeeded=false,committedResult=null;
     try{
      await guard();
      if(input.cachedResult){
@@ -168,7 +168,7 @@ function events(env,request,input,waitUntil){
      const resumeCheckpoint=result.resume_checkpoint;delete result.resume_checkpoint;
      if(input.taskKey)result.research_generation=input.generation||0;
      // Persist completed research first. A history-service failure must not repeat paid model calls.
-     if(input.taskKey){await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{result:{...result,history_status:'UNAVAILABLE'},checkpoint:resumeCheckpoint,generation:input.generation||0});}
+     if(input.taskKey){await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{result:{...result,history_status:'UNAVAILABLE'},checkpoint:resumeCheckpoint,generation:input.generation||0});committedResult={...result,history_status:'UNAVAILABLE'};}
      // Store only result metadata, never the resume or raw model prompt.
      await guard();
      try{
@@ -186,6 +186,13 @@ function events(env,request,input,waitUntil){
      await stopProgress();await leaseHeartbeat?.stop();
      const reason=leaseAbort.signal.reason;
      const code=typeof reason?.code==='string'?reason.code:typeof e?.code==='string'?e.code:leaseAbort.signal.aborted?'AI_CHECKPOINT_LEASE_LOST':/^[A-Z][A-Z0-9_]{5,80}$/.test(e?.message||'')?e.message:'AI_PROVIDER_UNAVAILABLE';
+     // A later history/progress failure must not replace an already committed
+     // completed result with an old checkpoint and repeat paid model calls.
+     if(committedResult){
+      await releaseTask();
+      if(code==='AI_AGENT_CANCELLED'){send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable:false});return;}
+      await publishProgress('COMPLETE');sendFinal(committedResult);succeeded=true;return;
+     }
      if((code===PHASE_YIELD||budget?.denied)&&input.taskKey&&input.lease&&!leaseAbort.signal.aborted){
       try{
        await guard();await input.lease.renew();
@@ -198,7 +205,7 @@ function events(env,request,input,waitUntil){
        await releaseTask();send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});succeeded=true;return;
       }catch(recoveryError){console.warn('HHBA_V4_RESOURCE_YIELD_SAVE_FAILED',JSON.stringify({trace,error:recoveryError?.code||'CHECKPOINT_SAVE_FAILED'}));}
      }
-     const retryable=code!=='AI_AGENT_CANCELLED'&&!!input.taskKey&&(isV4RetryableProviderError(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
+     const retryable=code!=='AI_AGENT_CANCELLED'&&!!input.taskKey&&(isV4RetryableProviderError(code)||isV4RetryableTaskFailure(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
       if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&code!=='AI_AGENT_CANCELLED'){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:input.recoveryState?.()||input.checkpoint||null,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
       if(code!=='AI_AGENT_CANCELLED'&&!leaseAbort.signal.aborted)await publishProgress(retryable?'PENDING':'FAILED',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
        console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,elapsed_ms:Date.now()-started,resources:budget?.snapshot()}));
