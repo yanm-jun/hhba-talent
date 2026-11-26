@@ -7,8 +7,16 @@ export function phaseResourceBudget({initial=8,soft=24,hard=34,progressReserve=0
  // Explicit progress allowance is shared with the same physical hosting limit.
  // It is not a separate platform quota and cannot consume terminal headroom.
  const reserve=Math.max(0,Math.min(hard-soft,Math.floor(progressReserve)||0));
- const remainingReserve=()=>Math.max(0,reserve-(counts.progress||0));
- const researchUsed=()=>used-Math.min(reserve,counts.progress||0);
+ let reservedWrites=0;
+ const remainingReserve=()=>reserve-reservedWrites;
+ const researchUsed=()=>used-reservedWrites;
+ const canPublishProgress=kind=>{
+  if(used>=hard)return false;
+  if(used<soft-2)return true;
+  // Preserve the final reserved write for a validated report, not activity
+  // or repeated candidate bursts. Normal research can still continue.
+  return kind==='report'?remainingReserve()>0:kind==='candidate'&&remainingReserve()>1;
+ };
  const observe=(kind,n=1)=>{used+=n;counts[kind]=(counts[kind]||0)+n;};
  const take=(kind,n=1)=>{
   if(used+n>hard-remainingReserve()){denied=true;throw Object.assign(Error(PHASE_YIELD),{code:PHASE_YIELD});}
@@ -33,8 +41,8 @@ export function phaseResourceBudget({initial=8,soft=24,hard=34,progressReserve=0
   return methods.includes(key)?(...args)=>{take(kind);return v.apply(target,args);}:v.bind(target);
  }});
  return {observe,take,canStart:()=>researchUsed()<soft,canPublish:()=>researchUsed()<soft-2,
-  canPublishProgress:kind=>kind==='routine'?used<soft-2:used<hard&&(used<soft-2||remainingReserve()>0),
-  tryProgress(kind){if(!this.canPublishProgress(kind))return false;observe('progress');return true;},
+  canPublishProgress,
+  tryProgress(kind){if(!canPublishProgress(kind))return false;if(used>=soft-2)reservedWrites++;observe('progress');return true;},
   get denied(){return denied;},get used(){return used;},
   snapshot:()=>({used,soft,hard,counts:{...counts},denied,...(reserve?{progress_reserve:reserve,progress_remaining:remainingReserve(),research_used:researchUsed()}: {})}),
   fetch:fetcher=>(...args)=>{take('fetch');return fetcher(...args);},
