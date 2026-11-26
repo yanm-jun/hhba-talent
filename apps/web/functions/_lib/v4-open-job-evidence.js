@@ -106,7 +106,39 @@ async function limitedRead(r,{allowJson=false,allowScript=false,maxBytes=2*1024*
 // An independently opened employer page may authorize a separate recruitment
 // host. Require the actual link and employer identity on the referring page,
 // never trust an ATS hostname or the model's assertion on its own.
-export async function v4EmployerAuthorization(jobUrl,company,proofUrl,{fetcher=fetch,signal}={}){
+// An invocation-local memo shares the same freshly opened public proof page
+// across different vacancies. It stores parsed evidence, not authorization
+// decisions; each company identity and each target link is checked separately.
+export function createEmployerProofCache({now=Date.now,ttl=60000}={}){
+ const entries=new Map();
+ return {async get(url,load){
+  const existing=entries.get(url);
+  if(existing&&existing.until>now())return existing.promise;
+  const entry={until:now()+ttl,promise:null};
+  entry.promise=Promise.resolve().then(load).then(value=>{
+   if(entries.get(url)===entry){
+    if(!value.reusable)entries.delete(url);
+    else entry.until=now()+ttl;
+   }
+   return value;
+  },error=>{if(entries.get(url)===entry)entries.delete(url);throw error;});
+  entries.set(url,entry);return entry.promise;
+ }};
+}
+async function readEmployerProof(proof,fetcher,signal){
+ const r=await fetcher(proof,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,text/plain;q=0.9'},signal});
+ const html=await limitedRead(r);
+ const site=meta(html,'property','og:site_name')||meta(html,'name','application-name');
+ const links=new Set();
+ for(const a of html.matchAll(/<a\b[^>]*\bhref\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>/gi)){
+  let resolved;try{resolved=v4PublicJobUrl(new URL((a[1]||a[2]).replace(/&amp;/gi,'&'),proof).href)}catch{continue}
+  if(resolved)links.add(resolved);
+ }
+ const control=r.headers.get('cache-control')||'';
+ const reusable=!/(?:^|,)\s*(?:private|no-store|no-cache)\b/i.test(control)&&!r.headers.has('set-cookie')&&(!r.headers.get('vary')||r.headers.get('vary').split(',').every(v=>['accept','accept-encoding'].includes(v.trim().toLowerCase())));
+ return {site,identityFields:[site,meta(html,'name','author'),tag(html,'title')],links,reusable};
+}
+export async function v4EmployerAuthorization(jobUrl,company,proofUrl,{fetcher=fetch,signal,proofCache}={}){
  const target=v4PublicJobUrl(jobUrl),chain=(Array.isArray(proofUrl)?proofUrl:[proofUrl]).map(v4PublicJobUrl);
  if(!target||!chain.length||!company||chain.some(u=>!u||u===target||isCommercialRecruitmentBoard(u))||new Set(chain).size!==chain.length||isCommercialRecruitmentBoard(target))return false;
  const normalize=v=>String(v||'').normalize('NFKC').replace(/[^\p{L}\p{N}]/gu,'').toLowerCase();
@@ -114,22 +146,17 @@ export async function v4EmployerAuthorization(jobUrl,company,proofUrl,{fetcher=f
  if(identity.length<2)return false;
  try{
   for(let i=0;i<chain.length;i++){
+   if(signal?.aborted)throw signal.reason;
    const proof=chain[i],next=chain[i+1]||target;
-   const r=await fetcher(proof,{method:'GET',redirect:'manual',cache:'no-store',headers:{Accept:'text/html,text/plain;q=0.9'},signal});
-   const html=await limitedRead(r);
-   const site=meta(html,'property','og:site_name')||meta(html,'name','application-name');
-   if(isCommercialRecruitmentBoard(proof,{site_name:site}))return false;
-   // Each step must be an actual public link, starting at a page bearing employer identity.
-   if(i===0&&![site,meta(html,'name','author'),tag(html,'title')].map(normalize).some(v=>v.includes(identity)))return false;
-   let linked=false;
-   for(const a of html.matchAll(/<a\b[^>]*\bhref\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>/gi)){
-    let resolved;try{resolved=v4PublicJobUrl(new URL((a[1]||a[2]).replace(/&amp;/gi,'&'),proof).href)}catch{continue}
-    if(resolved===next){linked=true;break;}
-   }
-   if(!linked)return false;
+   const load=()=>readEmployerProof(proof,fetcher,signal);
+   const page=proofCache?await proofCache.get(proof,load):await load();
+   if(signal?.aborted)throw signal.reason;
+   if(isCommercialRecruitmentBoard(proof,{site_name:page.site}))return false;
+   if(i===0&&!page.identityFields.map(normalize).some(v=>v.includes(identity)))return false;
+   if(!page.links.has(next))return false;
   }
   return true;
- }catch(e){if(signal?.aborted)throw e;return false;}
+ }catch(e){if(signal?.aborted||e?.code==='AI_PHASE_RESOURCE_YIELD')throw e;return false;}
 }
 export async function v4ReadEmployerJob(url,{fetcher=fetch,signal,now=new Date(),expected,cacheBucket,onCache=()=>{}}={}){
  let canonical=v4PublicJobUrl(url);

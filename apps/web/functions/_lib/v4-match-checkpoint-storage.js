@@ -6,6 +6,25 @@ const PREFIX='v4-match-continuations/';
 const enc=new TextEncoder(),dec=new TextDecoder();
 const TTL=60*60*1000;
 const refOK=ref=>typeof ref==='string'&&/^[a-f0-9-]{36}$/.test(ref);
+// Compress only before authenticated encryption. Existing JSON records remain
+// readable; opt-in writes permit a reader-first deployment and CPU validation.
+async function encodeCheckpoint(env,value){
+ const plain=enc.encode(JSON.stringify(value));
+ if(env?.HHBA_V4_CHECKPOINT_GZIP!=='1'||plain.byteLength<65536||typeof CompressionStream!=='function')return plain;
+ try{
+  const stream=new Blob([plain]).stream().pipeThrough(new CompressionStream('gzip'));
+  const packed=new Uint8Array(await new Response(stream).arrayBuffer());
+  return packed.byteLength+128<plain.byteLength?packed:plain;
+ }catch{return plain;}
+}
+async function decodeCheckpoint(raw){
+ let bytes=new Uint8Array(raw);
+ if(bytes[0]===0x1f&&bytes[1]===0x8b){
+  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  bytes=new Uint8Array(await new Response(stream).arrayBuffer());
+ }
+ return JSON.parse(dec.decode(bytes));
+}
 export function v4CheckpointSecret(env){
  // A malformed primary binding must not shadow the existing usable fallback.
  return [env?.HHBA_MATCH_V4_CHECKPOINT_SECRET,env?.HHBA_RESUME_AGENT_CHECKPOINT_SECRET].find(value=>typeof value==='string'&&value.length>=32);
@@ -23,7 +42,7 @@ export async function storeMatchCheckpoint(env,state,now=Date.now()){
  if(!checkpointStorageReady(env))throw Error('AI_CHECKPOINT_STORAGE_UNAVAILABLE');
  const ref=crypto.randomUUID(),iv=crypto.getRandomValues(new Uint8Array(12));
  const bytes=await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:enc.encode(ref)},await key(env),
-  enc.encode(JSON.stringify({until:now+TTL,state})));
+  await encodeCheckpoint(env,{until:now+TTL,state}));
  const packed=new Uint8Array(12+bytes.byteLength);packed.set(iv);packed.set(new Uint8Array(bytes),12);
  await env.HHBA_PRIVATE_RESUMES.put(PREFIX+ref,packed,{httpMetadata:{contentType:'application/octet-stream'}});
  return {ref};
@@ -35,7 +54,7 @@ export async function loadMatchCheckpoint(env,pointer,now=Date.now()){
  try{
   const bytes=new Uint8Array(await object.arrayBuffer());
   const raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes.subarray(0,12),additionalData:enc.encode(pointer.ref)},await key(env),bytes.subarray(12));
-  const value=JSON.parse(dec.decode(raw));
+  const value=await decodeCheckpoint(raw);
   if(!Number.isFinite(value.until)||value.until<now||!value.state)throw Error('AI_CHECKPOINT_EXPIRED');
   return value.state;
  }catch(e){throw Error(e?.message==='AI_CHECKPOINT_EXPIRED'?e.message:'AI_CHECKPOINT_INVALID');}
@@ -57,7 +76,7 @@ export async function saveMatchTask(env,id,value,now=Date.now()){
  if(!checkpointStorageReady(env)||! /^[a-f0-9]{64}$/.test(id))throw Error('AI_CHECKPOINT_INVALID');
  const iv=crypto.getRandomValues(new Uint8Array(12)),aad='task:'+id;
  const bytes=await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:enc.encode(aad)},await key(env),
-  enc.encode(JSON.stringify({until:now+23*3600000,value})));
+  await encodeCheckpoint(env,{until:now+23*3600000,value}));
  const packed=new Uint8Array(12+bytes.byteLength);packed.set(iv);packed.set(new Uint8Array(bytes),12);
  await env.HHBA_PRIVATE_RESUMES.put(PREFIX+'tasks/'+id,packed,{httpMetadata:{contentType:'application/octet-stream'}});
 }
@@ -67,7 +86,7 @@ export async function readMatchTask(env,id,now=Date.now(),{renewGeneration}={}){
  if(!object)return null;
  const bytes=new Uint8Array(await object.arrayBuffer());
  const raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes.subarray(0,12),additionalData:enc.encode('task:'+id)},await key(env),bytes.subarray(12));
- const data=JSON.parse(dec.decode(raw));
+ const data=await decodeCheckpoint(raw);
  if(data.until<now)return null;
  // Callers may opt in only while owning the research lease and an authorized
  // active generation. Completed/abandoned tasks retain ordinary expiry.

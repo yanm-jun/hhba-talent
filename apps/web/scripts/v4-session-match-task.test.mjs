@@ -172,3 +172,17 @@ test('profile reuse key isolates session, account, exact resume revision, intent
  assert.equal(await readMatchProfileCache(env,id,3601001),null);
  for(const raw of objects.values()){const text=new TextDecoder().decode(raw);assert.ok(!text.includes(input.text));assert.ok(!text.includes(p.summary));}
 });
+
+test('optional gzip encrypts large checkpoint records, preserves exact data, and reads legacy JSON',async()=>{
+ const {env,objects}=fixture(),id='c'.repeat(64);
+ const value={generation:0,checkpoint:{phase:'research',evidence:Array.from({length:500},(_,i)=>({url:'https://employer.cn/job/'+i,text:'公开岗位职责、任职条件和完整原文。'.repeat(25)}))}};
+ await saveMatchTask(env,id,value,1000);const original=[...objects.values()][0].byteLength;
+ const gzipEnv={...env,HHBA_V4_CHECKPOINT_GZIP:'1'};
+ assert.deepEqual(await readMatchTask(gzipEnv,id,2000),value);
+ await saveMatchTask(gzipEnv,id,value,1000);const packed=[...objects.values()][0];
+ assert.ok(packed.byteLength<original/4);
+ assert.deepEqual(await readMatchTask(env,id,2000),value);
+ assert.ok(!new TextDecoder().decode(packed).includes('公开岗位职责'));
+ const bad=packed.slice();bad[bad.length-1]^=1;objects.set([...objects.keys()][0],bad);
+ await assert.rejects(readMatchTask(gzipEnv,id,2000));
+});
