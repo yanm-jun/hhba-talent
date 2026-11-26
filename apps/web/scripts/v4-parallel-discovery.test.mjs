@@ -1175,3 +1175,54 @@ test('managed incremental discovery avoids full snapshot rebuilding for a 60-can
   assert.ok(snapshots.length<5,'only aggregate reconciliation');
  }finally{clearTimeout(timer);try{controller.close();}catch{}await pending.catch(()=>{});}
 });
+
+
+test('discovery observer consumes actual completed tool items and message parts without treating a citation as a job',async()=>{
+ const {createV4DiscoveryJobObserver}=await import('../functions/_lib/v4-stream-job-parser.js');
+ const a=job(7301),b=job(7302),sources=[],jobs=[];
+ const observer=createV4DiscoveryJobObserver((j,m)=>jobs.push({url:j.url,source:m.source}),(u,m)=>sources.push({url:u,source:m.source}));
+ const tool={type:'web_search_call',action:{sources:[{url:a.url},{url:a.url+'?utm_source=test'},{url:'https://www.zhipin.com/job_detail/a.html'},{url:'https://localhost/jobs/1'}]}};
+ observer.event({type:'response.output_item.done',item:tool});
+ assert.deepEqual(sources,[{url:a.url,source:'done'}]);
+ assert.equal(jobs.length,0);
+ observer.event({type:'response.content_part.done',part:{type:'output_text',text:JSON.stringify({jobs:[a]}),annotations:[{type:'url_citation',url:a.url}]}});
+ observer.event({type:'response.output_item.done',item:{type:'reasoning',content:[{type:'output_text',text:JSON.stringify({jobs:[b]})}]}});
+ assert.deepEqual(jobs,[{url:a.url,source:'done'}]);
+ observer.event({type:'response.output_item.done',item:{type:'message',role:'assistant',content:[{type:'output_text',text:JSON.stringify({jobs:[a,b]})}]}});
+ assert.deepEqual(jobs.map(j=>j.url),[a.url,b.url]);
+ observer.response({output:[tool,{type:'message',content:[{type:'output_text',text:JSON.stringify({jobs:[a,b]})}]}]});
+ assert.equal(jobs.length,2);assert.equal(sources.length,1);
+});
+
+test('actual search consumes streamed citations before terminal output while preserving the original search instructions', {timeout:5000},async()=>{
+ const a=job(7303),b=job(7304),p={key:'synthetic-only',baseUrl:'https://provider.invalid/v1',model:'test',stream:true};
+ let controller,recovery,resolveEvent,calls=0;
+ const seen=new Promise(r=>{resolveEvent=r;});
+ const stream=new ReadableStream({start(c){controller=c;}});
+ const send=e=>controller.enqueue(new TextEncoder().encode('data: '+JSON.stringify(e)+'\n\n'));
+ const pending=v4Match(async(_u,opts)=>{
+  calls++;
+  const payload=JSON.parse(opts.body);
+  assert.match(payload.instructions,/不要限制企业、行业、岗位方向；搜索轮次不设人为上限/);
+  assert.equal(payload.max_output_tokens,undefined);assert.equal(payload.max_tool_calls,undefined);
+  return new Response(stream,{headers:{'content-type':'text/event-stream'}});
+ },p,resume,'全国',{
+  curated:true,officialOnly:true,stepMode:true,parallelResearch:false,
+  checkpoint:{phase:'research',rows:[],profile:{...profile,target_roles:profile.roles}},
+  onRecoveryState:get=>{recovery=get;},onDiscoveryCandidate:e=>{if(e.candidate.official_url===a.url)resolveEvent();}
+ });
+ let timer;
+ try{
+  send({type:'response.output_item.done',item:{type:'web_search_call',action:{sources:[{url:a.url},{url:b.url}]}}});
+  send({type:'response.content_part.done',part:{type:'output_text',text:JSON.stringify({jobs:[a]})}});
+  await Promise.race([seen,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('completed item not consumed before terminal response')),1500);})]);clearTimeout(timer);
+  assert.deepEqual(recovery().rows.map(([u])=>u),[a.url]);
+  assert.ok(recovery().sourceLeads.includes(b.url));
+  assert.deepEqual(recovery().toolUrls,[a.url]);
+  send({type:'response.completed',response:{status:'completed',output:[
+   {type:'web_search_call',action:{sources:[{url:a.url},{url:b.url}]}},
+   {type:'message',content:[{type:'output_text',text:JSON.stringify({jobs:[a],research_complete:false})}]}]}});
+  const result=await pending;assert.equal(calls,1);
+  assert.equal(result.checkpoint.rows.length,1);assert.ok(result.checkpoint.sourceLeads.includes(b.url));
+ }finally{clearTimeout(timer);try{controller.close();}catch{}await pending.catch(()=>{});}
+});
