@@ -31,7 +31,7 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 const archivedHistoryJob=(job:MatchedJob)=>job.jd_source_status==='VERIFIED_JD'&&job.reference_jd_kind!=='AI_GENERATED_REFERENCE'&&/^jd_[a-f0-9]{32}$/.test(job.jd_version_id||'')&&/^[a-f0-9]{64}$/.test(job.jd_sha256||'');
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false,initialMinimized=false}:{
+export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false,initialMinimized=false,taskStartedAt}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'profile'|'native_search'>>;
  onClose:()=>void;onContinue?:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
@@ -41,7 +41,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  sourceText?:string;sourceResume?:PrivateResume;accountScope?:string;
  // Match-history handoff enters the same existing editor without rerunning a search.
  initialOptimizedJobId?:string;
- hostRoute?:string;taskFailed?:boolean;initialMinimized?:boolean;
+ hostRoute?:string;taskFailed?:boolean;initialMinimized?:boolean;taskStartedAt?:number;
 }){
  const ref=useRef<HTMLDivElement|null>(null);
  const confirmRef=useRef<HTMLDialogElement|null>(null);
@@ -62,11 +62,11 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  const [elapsed,setElapsed]=useState(0);
  useEffect(()=>{
   if(!pending)return;
-  const started=Date.now();
-  setElapsed(0);
-  const timer=window.setInterval(()=>setElapsed(Math.floor((Date.now()-started)/1000)),1000);
+  const started=taskStartedAt??Date.now();
+  const update=()=>setElapsed(Math.max(0,Math.floor((Date.now()-started)/1000)));
+  update();const timer=window.setInterval(update,1000);
   return()=>window.clearInterval(timer);
- },[pending]);
+ },[pending,taskStartedAt]);
  const stageTitle:Record<NativeMatchProgress,string>={
   preparing:'准备匹配',parsing:'识别简历经历和技能',connected:'准备搜索',
   planning:'研究职业方向',searching:'搜索企业岗位',
@@ -84,7 +84,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  useEffect(()=>{
   if(pending&&currentStage>=0)setFurthestStage(old=>Math.max(old,currentStage));
  },[pending,currentStage]);
- const selectedStage=manualStage??(pending?(followProgress?Math.max(furthestStage,currentStage):0):2);
+ const selectedStage=manualStage??(pending||taskFailed?(followProgress?Math.max(furthestStage,currentStage):0):2);
  const showResults=selectedStage===2;
  const selectStage=(next:number|null)=>{
   setManualStage(next);if(next===null)setFollowProgress(true);
