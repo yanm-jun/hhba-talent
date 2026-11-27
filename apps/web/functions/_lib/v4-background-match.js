@@ -15,7 +15,7 @@ export async function scheduleBackgroundMatch(env,session,task,{diagnostic=false
  const previous=await readMatchTask(env,ticket);
  if(previous?.kind!=='HHBA_V4_BACKGROUND_TICKET_V1'||Date.now()-(previous.renewed_at||0)>=3600000)await saveMatchTask(env,ticket,{kind:'HHBA_V4_BACKGROUND_TICKET_V1',phone:session.phone,session_hash:session.token_hash,task_id:task.id,generation:task.generation,renewed_at:Date.now()});
  const instance=await sha256Hex('hhba-workflow-instance:'+ticket);
- const r=await env.HHBA_MATCH_BACKGROUND.fetch('https://hhba-internal.invalid/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instance,ticket,...(stagedV4WorkflowsEnabled(env)?{mode:'staged'}:{})})});
+ const r=await env.HHBA_MATCH_BACKGROUND.fetch('https://hhba-internal.invalid/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instance,ticket,...(stagedV4WorkflowsEnabled(env)?{mode:'staged'}:{}),...(env.HHBA_V4_JOB_QUEUE_ENABLED==='1'&&env.HHBA_V4_JOB_EXECUTOR_ENABLED==='1'?{job_executor:true}:{})})});
  if(!r.ok){const data=await r.json().catch(()=>null);if(data?.terminal_failure===true){const error=typeof data.error==='string'&&/^AI_[A-Z0-9_]{3,90}$/.test(data.error)?data.error:'AI_BACKGROUND_EXECUTION_FAILED';
   // An older Workflow may have finished with a recoverable failure. Let the
   // authorized Pages driver continue under the existing exclusive lease.
