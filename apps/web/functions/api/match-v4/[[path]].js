@@ -87,6 +87,10 @@ function events(env,request,input,waitUntil){
    let lastWorkerSeenAt=Date.now(),lastEvidenceAt=Number(input.savedProgress?.execution?.last_result_at)||0;
    let inFlightAi=0,runtimeState='processing';
    // A live worker heartbeat is separate from actual research progress.
+   // Transport fallback is task-scoped, persisted alongside encrypted research
+   // state. It never changes the model's search breadth or reasoning policy.
+   const stampTransport=checkpoint=>input.background&&input.transportMode==='json'&&checkpoint?
+    {...checkpoint,transport_mode:'json'}:checkpoint;
    const workerSnapshot=()=>({state:runtimeState==='recovering'?'recovering':inFlightAi>0?'awaiting_ai':'processing',
     worker_seen_at:lastWorkerSeenAt,last_result_at:lastEvidenceAt,phase_started_at:started});
    const heart=setInterval(()=>{
@@ -220,7 +224,7 @@ function events(env,request,input,waitUntil){
    const guardTimer=input.managed?setInterval(()=>{if(guardBusy)return;guardBusy=true;guard().catch(e=>leaseAbort.abort(e)).finally(()=>{guardBusy=false});},45000):null;
    if(input.lease)leaseHeartbeat=startMatchPhaseHeartbeat({
      renew:()=>{budget?.observe('lease');return input.lease.renew();},
-     getCheckpoint:()=>input.taskKey&&!leaseAbort.signal.aborted&&(!budget||budget.canPublish())?{checkpoint:input.recoveryState?.()||input.checkpoint||null,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime()}:null,
+     getCheckpoint:()=>input.taskKey&&!leaseAbort.signal.aborted&&(!budget||budget.canPublish())?{checkpoint:stampTransport(input.recoveryState?.()||input.checkpoint||null),progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime()}:null,
      persist:async state=>{if(!leaseAbort.signal.aborted){budget?.observe('checkpoint');await saveMatchTask(env,input.taskKey,{...state,generation:input.generation||0});}},
      onError:e=>leaseAbort.abort(e),
      onSaveError:e=>{if(e?.code==='AI_AGENT_CANCELLED')leaseAbort.abort(e);else console.warn('HHBA_V4_PERIODIC_PROGRESS_SAVE_FAILED');}
@@ -249,7 +253,12 @@ function events(env,request,input,waitUntil){
        };
       // Request actual provider SSE by default on managed background research.
       // Honor an explicit opt-out; the existing adapter handles JSON fallback.
-      if(input.background&&env.HHBA_AGENT_RELAY_STREAM!=='0')provider.stream=true;
+      if(input.background){
+        // A failing SSE relay is bypassed on the next invocation using the
+        // original checkpoint, not by repeating a second paid call immediately.
+        provider.stream=input.transportMode==='json'?false:env.HHBA_AGENT_RELAY_STREAM!=='0';
+        if(input.transportMode==='json')console.info('HHBA_V4_PROVIDER_JSON_RECOVERY',JSON.stringify({stage:phase}));
+       }
      }if(provider&&replay){provider.phaseReplay=replay;provider.phaseResourceBudget=budget;provider.usageDb=env.HHBA_METRICS_DB;
       if(provider.usageDb){usageBuffer=createAiUsageBuffer(provider.usageDb);provider.usageBuffer=usageBuffer;}
       provider.transportState={jsonStages:new Set()};
@@ -278,7 +287,7 @@ function events(env,request,input,waitUntil){
       // A fully returned continuation is newer than an earlier in-flight
       // recovery closure. Persist it even when the invocation ran out of
       // optional resource capacity; terminal storage has reserved headroom.
-      if(result.status==='CONTINUE'){input.recoveryState=()=>result.checkpoint;runtimeState='recovering';}
+      if(result.status==='CONTINUE'){result.checkpoint=stampTransport(result.checkpoint);input.recoveryState=()=>result.checkpoint;runtimeState='recovering';}
       if(budget?.denied&&result.status!=='CONTINUE'&&result.status!=='COMPLETE')throw Object.assign(Error(PHASE_YIELD),{code:PHASE_YIELD});
       if(executionSignal.aborted)throw executionSignal.reason||Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
      await guard();
@@ -347,7 +356,7 @@ function events(env,request,input,waitUntil){
      if((code===PHASE_YIELD||budget?.denied)&&input.taskKey&&input.lease&&!leaseAbort.signal.aborted){
       try{
        await guard();await input.lease.renew();
-       const checkpoint=input.recoveryState?.()||input.checkpoint||null;
+       const checkpoint=stampTransport(input.recoveryState?.()||input.checkpoint||null);
        if(checkpoint){checkpoint.diagnostics={...checkpoint.diagnostics,EDGE_RESOURCE_YIELDS:(checkpoint.diagnostics?.EDGE_RESOURCE_YIELDS||0)+1};}
        latestActivity={stage:phase,message:'已保存本段研究成果，正在接续下一段执行。'};runtimeState='recovering';
        await saveMatchTask(env,input.taskKey,{checkpoint,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime()});
@@ -357,14 +366,18 @@ function events(env,request,input,waitUntil){
        await releaseTask();await stageCompleteOrHandoff(checkpoint);succeeded=true;return;
       }catch(recoveryError){console.warn('HHBA_V4_RESOURCE_YIELD_SAVE_FAILED',JSON.stringify({trace,error:recoveryError?.code||'CHECKPOINT_SAVE_FAILED'}));}
      }
-     metricOutcome=code===PHASE_YIELD?'RESOURCE_YIELD':!isV4TerminalTaskFailure(code)&&!!input.taskKey?'RETRYABLE_FAILURE':'TERMINAL_FAILURE';
+     if(input.background&&code==='AI_PROVIDER_UPSTREAM_ERROR'&&e?.upstreamKind==='SSE_FAILED'){
+       input.transportMode='json';
+       console.warn('HHBA_V4_SSE_RETRY_JSON',JSON.stringify({stage:phase}));
+      }
+      metricOutcome=code===PHASE_YIELD?'RESOURCE_YIELD':!isV4TerminalTaskFailure(code)&&!!input.taskKey?'RETRYABLE_FAILURE':'TERMINAL_FAILURE';
       // Aggregated diagnostics distinguish HTTP 5xx from a failed Responses
       // stream without changing the stable client/Workflow recovery error.
       const upstreamKind=String(e?.upstreamKind||'');
       metricError=code==='AI_PROVIDER_UPSTREAM_ERROR'&&/^(?:HTTP_5[0-9]{2}|SSE_FAILED)$/.test(upstreamKind)?'AI_PROVIDER_'+upstreamKind:code;
      const retryable=!isV4TerminalTaskFailure(code)&&!!input.taskKey&&(isV4RetryableProviderError(code)||isV4RetryableTaskFailure(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
       if(retryable)runtimeState='recovering';
-      if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&code!=='AI_AGENT_CANCELLED'){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:input.recoveryState?.()||input.checkpoint||null,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
+      if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&code!=='AI_AGENT_CANCELLED'){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:stampTransport(input.recoveryState?.()||input.checkpoint||null),generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable,...(e?.upstreamKind==='SSE_FAILED'?{upstream_kind:'SSE_FAILED'}:{})}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
       if(code!=='AI_AGENT_CANCELLED'&&!leaseAbort.signal.aborted)await publishProgress(retryable?'PENDING':'FAILED',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
        console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,upstream_kind:metricError!==code?upstreamKind:null,stage:phase,elapsed_ms:Date.now()-started,resources:budget?.snapshot()}));
       if(!retryable)await finishWorkflowStages();
@@ -440,7 +453,8 @@ async function backgroundStep(env,request,waitUntil){
   if(!input.lease)return fail('AI_TASK_IN_PROGRESS',409);
   const durable=await readMatchTask(env,taskKey,Date.now(),{renewGeneration:task.generation});
    const saved=await recoverSavedDiscovery(env,input,durable);
-  if(saved?.generation===task.generation){input.recovering=!!saved.failure;input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;if(terminalV4SavedFailure(saved.failure)){await input.lease.release();return fail(saved.failure.error,422);}}
+  if(saved?.generation===task.generation){input.recovering=!!saved.failure;input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;
+    input.transportMode=saved.checkpoint?.transport_mode==='json'||saved.failure?.upstream_kind==='SSE_FAILED'?'json':undefined;if(terminalV4SavedFailure(saved.failure)){await input.lease.release();return fail(saved.failure.error,422);}}
   if(saved?.generation===task.generation&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
   else if(saved?.generation===task.generation&&saved?.checkpoint)input.checkpoint=saved.checkpoint;
   else if(saved?.result?.status==='COMPLETE'&&saved.checkpoint&&saved.generation+1===task.generation){
