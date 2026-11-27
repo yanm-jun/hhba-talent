@@ -97,7 +97,7 @@ export async function readMatchTask(env,id,now=Date.now(),{renewGeneration}={}){
  // Serialize lease renewals and in-phase progress writes. Drain before the
  // terminal save so a stale heartbeat cannot overwrite newer research.
  export function startMatchPhaseHeartbeat({renew,getCheckpoint,persist,onError=()=>{},onSaveError=()=>{},interval=60000}){
-  let active=true,pending=null,last=null;
+  let active=true,pending=null;
   const tick=()=>{
    if(!active||pending)return pending||Promise.resolve();
    pending=(async()=>{
@@ -105,8 +105,12 @@ export async function readMatchTask(env,id,now=Date.now(),{renewGeneration}={}){
     if(!active)return;
     try{
      const snapshot=getCheckpoint();if(!snapshot)return;
-     const serialized=JSON.stringify(snapshot);if(serialized===last)return;
-     await persist(JSON.parse(serialized));last=serialized;
+     // A heartbeat is already a periodic checkpoint. The old JSON.stringify
+     // + JSON.parse pair traversed the entire (eventually 500-job) encrypted
+     // research state TWICE on every tick, burning Free-tier CPU before the
+     // essential R2 encryption. Clone once to fence concurrent mutations;
+     // saveMatchTask performs the single necessary JSON encoding later.
+     await persist(structuredClone(snapshot));
     }catch(e){onSaveError(e);}
    })().finally(()=>{pending=null;});
    return pending;
