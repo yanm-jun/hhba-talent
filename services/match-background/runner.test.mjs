@@ -320,3 +320,19 @@ test('split terminal SSE frames retain their result; EOF without terminal remain
  assert.equal(await requestPhase(async()=>new Response(stream),ticket),'HANDOFF');
  await assert.rejects(requestPhase(async()=>event('heartbeat',{}),ticket),/AI_BACKGROUND_RESPONSE_INCOMPLETE/);
 });
+
+
+test('early verifier processes independently queued JDs without waiting for discovery to finish',async()=>{
+ const values=[{status:'HANDOFF',next_lane:'discovery'},{status:'COMPLETE'}],calls=[],sleeps=[],waits=[];
+ const step={async waitForEvent(name){waits.push(name);return {payload:{done:false}};},async do(_name,_opts,fn){return fn();},async sleep(name,seconds){sleeps.push([name,seconds]);}};
+ const result=await driveBackgroundMatch(step,ticket,async(url)=>{
+  calls.push(url);
+  if(url.endsWith('/background-job-step'))return Response.json({status:'DONE'});
+  return event('complete',values.shift());
+ },{lane:'verification',jobsEnabled:true,maxSteps:3});
+ assert.deepEqual(result,{status:'COMPLETE'});
+ assert.ok(sleeps.some(([name,duration])=>name.startsWith('early-verification-')&&duration==='30 seconds'));
+ assert.equal(waits.length,1,'early JD work must not wait for a second wake event');
+ assert.equal(calls.filter(x=>x.endsWith('/background-job-step')).length,4);
+ assert.equal(calls.filter(x=>x.endsWith('/background-step')).length,2);
+});
