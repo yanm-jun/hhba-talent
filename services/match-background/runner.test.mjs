@@ -12,6 +12,19 @@ test('independent runner advances persisted phases until terminal success, witho
  });
  assert.deepEqual(result,{status:'COMPLETE'});assert.equal(calls.length,3);assert.equal(new Set(steps).size,3);
 });
+test('opt-in job worker dispatch starts four separately leased Pages invocations per Workflow phase',async()=>{
+ const calls=[],step={async do(_name,_options,fn){return fn();}};
+ const result=await driveBackgroundMatch(step,ticket,async(url,options)=>{
+  calls.push({url,body:JSON.parse(options.body),redirect:options.redirect});
+  return url.endsWith('/background-job-step')?Response.json({status:'DONE'}):event('complete',{status:'COMPLETE'});
+ },{jobsEnabled:true});
+ assert.deepEqual(result,{status:'COMPLETE'});
+ assert.equal(calls.length,5);
+ assert.equal(calls.filter(x=>x.url.endsWith('/background-job-step')).length,4);
+ assert.equal(calls.filter(x=>x.body.lane==='verification').length,3);
+ assert.equal(calls.filter(x=>x.body.lane==='reporting').length,1);
+ assert.ok(calls.every(x=>x.body.ticket===ticket&&x.redirect==='manual'));
+});
 test('edge-compatible manual redirects never send ticket to another destination',async()=>{
  let calls=0;
  for(const status of [301,302,303,307,308])assert.equal(await requestPhase(async(url,init)=>{calls++;assert.equal(init.redirect,'manual');return new Response(null,{status,headers:{Location:'https://other.example/'}});},ticket),'FAILED');

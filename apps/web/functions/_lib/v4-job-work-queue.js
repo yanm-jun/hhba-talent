@@ -4,11 +4,12 @@
 // digests and lease state. It cannot award a score or fabricate a report.
 import {sha256Hex} from './real-auth.js';
 import {candidateRevision,pendingVerification} from './v4-research-pipeline.js';
-import {eligibleCuratedScore,qualifiedReport} from './v4-curated-reports.js';
+import {eligibleCuratedScore,qualifiedReport,FINAL_TARGET} from './v4-curated-reports.js';
 
 const taskId=v=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
 const generationOk=v=>Number.isSafeInteger(v)&&v>=0;
 const laneOk=v=>v==='verification'||v==='reporting';
+export const reportWorkRevision=(candidate,scored)=>scored?JSON.stringify([candidateRevision(candidate),scored.match_score,scored.jd_sha256,scored.jd_version_id,scored.score_evidence_status,scored.reference_vacancy_verified]):null;
 const valid=(key,generation)=>taskId(key)&&generationOk(generation);
 export const v4JobWorkQueueEnabled=env=>env?.HHBA_V4_JOB_QUEUE_ENABLED==='1'&&typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 
@@ -19,6 +20,9 @@ export async function desiredV4JobWork(taskKey,generation,checkpoint){
   matches=[...(checkpoint.priorState?.matches||[]),...(checkpoint.matches||[])];
  const byUrl=new Map(matches.map(job=>[job.research_candidate_url||job.official_url,job]).filter(([u])=>typeof u==='string'));
  const pending=new Set(pendingVerification(checkpoint).map(([url])=>url));
+ // A long report is expensive: queue only the AI-confirmed global top 50,
+ // never every scored candidate or a provisional order during discovery.
+ const reportSelection=new Set(checkpoint.phase==='reporting'&&checkpoint.globalRankState?.done===true&&Array.isArray(checkpoint.globalOrder)?checkpoint.globalOrder.slice(0,FINAL_TARGET):[]);
  const digest=async(url,lane,revision)=>{
   const job_key=await sha256Hex('HHBA_V4_JOB_WORK:'+taskKey+':'+url);
   const rev=await sha256Hex('HHBA_V4_JOB_REV:'+revision);
@@ -31,8 +35,8 @@ export async function desiredV4JobWork(taskKey,generation,checkpoint){
   const task=await digest(url,'verification',version);
   if(task){task.state=!pending.has(url)&&completed.has(url)&&revisions.get(url)===version&&!rechecks.has(url)?'COMPLETED':'PENDING';results.push(task);}
   const scored=byUrl.get(url);
-  if(scored&&(eligibleCuratedScore(scored)||qualifiedReport(scored))){
-   const reportVersion=JSON.stringify([version,scored.match_score,scored.jd_sha256,scored.jd_version_id,scored.score_evidence_status,scored.reference_vacancy_verified]);
+  if(scored&&reportSelection.has(scored.official_url)&&(eligibleCuratedScore(scored)||qualifiedReport(scored))){
+   const reportVersion=reportWorkRevision(job,scored);
    const report=await digest(url,'reporting',reportVersion);
    if(report){report.state=qualifiedReport(scored)?'COMPLETED':'PENDING';results.push(report);}
   }
@@ -74,7 +78,7 @@ export async function claimV4JobWork(db,taskKey,generation,lane,{now=Date.now(),
  state='LEASED',lease_owner=?,lease_until_ms=?,attempts=attempts+1,updated_at_ms=?
  WHERE rowid=(SELECT rowid FROM hhba_v4_job_work_queue
  WHERE task_key=? AND generation=? AND lane=?
- AND (state='PENDING' OR state='LEASED' AND lease_until_ms<=?)
+ AND attempts<3 AND (state='PENDING' OR state='LEASED' AND lease_until_ms<=?)
  ORDER BY updated_at_ms,job_key LIMIT 1)
  RETURNING job_key,revision,attempts,lease_until_ms`;
  const result=await db.prepare(sql).bind(owner,until,now,taskKey,generation,lane,now).all();
@@ -89,14 +93,14 @@ export async function renewV4JobWork(db,claim,{now=Date.now(),leaseMs=120000}={}
  .bind(until,now,claim.task_key,claim.generation,claim.lane,claim.job_key,claim.revision,claim.owner,now).run();
  return r?.meta?.changes===1;
 }
-export async function finishV4JobWork(db,claim,{now=Date.now(),completed=true}={}){
+export async function finishV4JobWork(db,claim,{now=Date.now(),completed=true,continued=false}={}){
  if(!db?.prepare||!valid(claim?.task_key,claim?.generation)||!laneOk(claim?.lane))return false;
  const state=completed?'COMPLETED':'PENDING';
  const r=await db.prepare(`UPDATE hhba_v4_job_work_queue SET
- state=?,lease_owner=NULL,lease_until_ms=0,updated_at_ms=?
+ state=?,lease_owner=NULL,lease_until_ms=0,updated_at_ms=?,attempts=CASE WHEN ?=1 THEN MAX(0,attempts-1) ELSE attempts END
  WHERE task_key=? AND generation=? AND lane=? AND job_key=?
  AND revision=? AND state='LEASED' AND lease_owner=? AND lease_until_ms>?`)
- .bind(state,now,claim.task_key,claim.generation,claim.lane,claim.job_key,claim.revision,claim.owner,now).run();
+ .bind(state,now,continued?1:0,claim.task_key,claim.generation,claim.lane,claim.job_key,claim.revision,claim.owner,now).run();
  return r?.meta?.changes===1;
 }
 export async function clearV4JobWork(db,taskKey,generation){

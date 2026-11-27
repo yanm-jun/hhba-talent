@@ -21,7 +21,7 @@ function fixture(){
  return {local,db};
 }
 test('encrypted-checkpoint-derived work contains no plaintext employer or job URLs',async()=>{
- const checkpoint={phase:'verification',rows:[[url,source()]],processedEarlier:[],processedEvidence:[],matches:[scored()]};
+ const checkpoint={phase:'reporting',globalRankState:{done:true},globalOrder:[url],rows:[[url,source()]],processedEarlier:[],processedEvidence:[],matches:[scored()]};
  const tasks=await desiredV4JobWork(taskKey,0,checkpoint);
  assert.equal(tasks.length,2);
  assert.deepEqual(tasks.map(x=>x.lane),['verification','reporting']);
@@ -30,7 +30,7 @@ test('encrypted-checkpoint-derived work contains no plaintext employer or job UR
  assert.ok(!JSON.stringify(tasks).includes('测试企业'));
 });
 test('D1 job claims are atomic, generation fenced and expire for safe automatic pickup',async()=>{
- const {db,local}=fixture(),checkpoint={phase:'verification',rows:[[url,source()]],processedEarlier:[],processedEvidence:[],matches:[scored()]};
+ const {db,local}=fixture(),checkpoint={phase:'reporting',globalRankState:{done:true},globalOrder:[url],rows:[[url,source()]],processedEarlier:[],processedEvidence:[],matches:[scored()]};
  assert.deepEqual(await reconcileV4JobWork(db,taskKey,0,checkpoint,{now:1000}),{available:true,work:2,createdOrUpdated:2,invalidated:0,remaining:0});
  const claim=await claimV4JobWork(db,taskKey,0,'verification',{now:1100,owner:'owner-A',leaseMs:15000});
  assert.ok(claim);assert.equal(claim.attempts,1);
@@ -66,7 +66,7 @@ test('later source revisions invalidate an old lease without falsely carrying ov
  assert.equal(local.prepare('SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue').get().n,0);
 });
 test('queue synchronization is revision-aware, incremental and does not re-run unchanged jobs',async()=>{
- const {db,local}=fixture(),cp={phase:'verification',rows:[[url,source()]],processedEarlier:[],processedEvidence:[],matches:[scored()]};
+ const {db,local}=fixture(),cp={phase:'reporting',globalRankState:{done:true},globalOrder:[url],rows:[[url,source()]],processedEarlier:[],processedEvidence:[],matches:[scored()]};
  const first=await reconcileV4JobWork(db,taskKey,4,cp,{now:2000,maxChanges:1});
  assert.equal(first.remaining,1);
  const second=await reconcileV4JobWork(db,taskKey,4,cp,{now:2001,maxChanges:1});
@@ -83,4 +83,32 @@ test('queue remains disabled unless Cloudflare explicitly enables the migration-
  assert.match(route,/await saveMatchTask\(env,input\.taskKey,\{checkpoint:result\.checkpoint/);
  assert.match(route,/if\(input\.background&&v4JobWorkQueueEnabled\(env\)\)/);
  assert.match(route,/await reconcileV4JobWork\(env\.HHBA_PNVS_AUTH_DB,input\.taskKey,input\.generation\|\|0,result\.checkpoint\)/);
+});
+
+test('report queue cannot launch 500 long reports before global AI ranking confirms the top fifty',async()=>{
+ const {db}=fixture(),cp={phase:'verification',rows:[[url,source()]],processedEarlier:[],matches:[scored()]};
+ const preliminary=await desiredV4JobWork(taskKey,0,cp);
+ assert.deepEqual(preliminary.map(x=>x.lane),['verification']);
+ const selected=await desiredV4JobWork(taskKey,0,{...cp,phase:'reporting',globalRankState:{done:true},globalOrder:[url]});
+ assert.deepEqual(selected.map(x=>x.lane),['verification','reporting']);
+ await reconcileV4JobWork(db,taskKey,0,cp);
+ assert.equal(await claimV4JobWork(db,taskKey,0,'reporting'),null);
+});
+
+test('completed phase checkpoints do not exhaust the independent worker failure allowance',async()=>{
+ const {db,local}=fixture(),cp={phase:'verification',rows:[[url,source()]],processedEarlier:[],processedEvidence:[],matches:[]};
+ await reconcileV4JobWork(db,taskKey,0,cp);
+ for(let i=0;i<5;i++){
+  const claim=await claimV4JobWork(db,taskKey,0,'verification',{now:1000+i*100,owner:'worker-'+i});
+  assert.ok(claim,'continued model research should remain independently schedulable');
+  assert.equal(await finishV4JobWork(db,claim,{now:1001+i*100,completed:false,continued:true}),true);
+ }
+ assert.equal(local.prepare("SELECT attempts FROM hhba_v4_job_work_queue WHERE lane='verification'").get().attempts,0);
+ const broken=[];
+ for(let i=0;i<3;i++){
+  const claim=await claimV4JobWork(db,taskKey,0,'verification',{now:2000+i*100,owner:'error-'+i});assert.ok(claim);
+  broken.push(claim.attempts);await finishV4JobWork(db,claim,{now:2001+i*100,completed:false});
+ }
+ assert.deepEqual(broken,[1,2,3]);
+ assert.equal(await claimV4JobWork(db,taskKey,0,'verification',{now:3000}),null,'after genuine repeated failures the main V4 driver retains the fallback');
 });

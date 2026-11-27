@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import {stageEffort,usageCounts,recordAiUsage,readAiUsage,createAiUsageBuffer} from '../functions/_lib/ai-token-usage.js';
 import {v4Call} from '../functions/_lib/simple-match-v4.js';
 const model='gpt-6.2-sol';
-test('all GPT-6 business stages use medium; probes and unknown models retain compatibility',()=>{
- assert.equal(stageEffort({model},'format'),'medium');
- assert.equal(stageEffort({model},'discovery'),'medium');
- for(const s of ['profile','jd_coverage','score','rank','report','resume_optimization','resume_reassess'])assert.equal(stageEffort({model},s),'medium');
- assert.equal(stageEffort({model,reasoningEffort:'xhigh'},'format'),'medium');
+test('model reasoning uses provider defaults unless explicitly requested; no hidden medium clamp',()=>{
+ for(const stage of ['format','discovery','profile','jd_coverage','score','rank','report','resume_optimization','resume_reassess']){
+  assert.equal(stageEffort({model},stage),null);
+  assert.equal(stageEffort({model,reasoningEffort:'high'},stage),'high');
+ }
+ assert.equal(stageEffort({model,reasoningEffort:'xhigh'},'format'),'xhigh');
  assert.equal(stageEffort({model,reasoningEffort:'high'},'probe'),'high');
  assert.equal(stageEffort({model:'test-model'},'format'),null);
- assert.equal(stageEffort({model},'unclassified'),'medium');
 });
 test('missing usage is unknown and reasoning/cache are subsets, not extra totals',()=>{
  assert.deepEqual(usageCounts({input_tokens:100,output_tokens:20,total_tokens:120,input_tokens_details:{cached_tokens:60},output_tokens_details:{reasoning_tokens:10}}),{input:100,output:20,total:120,reasoning:10,cached:60,known:true});
@@ -27,9 +27,16 @@ test('records metadata only; database failures never reject model work',async()=
 test('Responses request applies stage effort and records exactly one successful usage',async()=>{
  const events=[];const usageDb={prepare(){return {bind(...args){events.push(args);return this},async run(){}}}};
  const reply={status:'completed',output:[],usage:{input_tokens:10,output_tokens:5,total_tokens:15}};
- const fetcher=async(_url,opts)=>{const body=JSON.parse(opts.body);assert.equal(body.reasoning.effort,'medium');assert.equal(body.store,false);assert.equal(body.max_output_tokens,undefined);return Response.json(reply)};
+ const fetcher=async(_url,opts)=>{const body=JSON.parse(opts.body);assert.equal(body.reasoning,undefined);assert.equal(body.store,false);assert.equal(body.max_output_tokens,undefined);return Response.json(reply)};
  const result=await v4Call(fetcher,{model,key:'synthetic',baseUrl:'https://example.test/v1',usageDb},{input:'synthetic'},{stage:'discovery'});
  assert.equal(result.usage.total_tokens,15);assert.equal(events.length,1);assert.equal(events[0][4],'completed');
+});
+test('explicit high and xhigh model reasoning survive stage handling and payload',async()=>{
+ const chosen=[];const fetcher=async(_url,opts)=>{chosen.push(JSON.parse(opts.body).reasoning?.effort);return Response.json({status:'completed',output:[]});};
+ const p={model,key:'synthetic',baseUrl:'https://example.test/v1',reasoningEffort:'high'};
+ await v4Call(fetcher,p,{input:'jd'},{stage:'jd_search'});
+ await v4Call(fetcher,p,{input:'rank',reasoning:{effort:'xhigh'}},{stage:'rank'});
+ assert.deepEqual(chosen,['high','xhigh']);
 });
 test('failed or missing usage never becomes a known zero; errors still propagate',async()=>{
  const events=[];const usageDb={prepare(){return {bind(...args){events.push(args);return this},async run(){}}}};

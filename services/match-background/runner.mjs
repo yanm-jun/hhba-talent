@@ -51,9 +51,21 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lan
  }
  throw retry('AI_BACKGROUND_RESPONSE_INCOMPLETE');
 }
+// Each job-step is a distinct Pages invocation with its own resource budget,
+// encrypted continuation and revision-fenced D1 lease. The Workflow carries
+// only an opaque ticket; no CV, job URL or model response leaves Pages.
+export async function requestIndependentJobPhase(fetcher,ticket,lane){
+ if(!['verification','reporting'].includes(lane))return {status:'INVALID'};
+ try{
+  const response=await fetcher('https://hhba.work/api/match-v4/background-job-step',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket,lane})});
+  if(!response.ok)return {status:'DEFERRED'};
+  const data=await response.json().catch(()=>null);
+  return {status:['DONE','CONTINUE','EMPTY','RETRY','STALE','DISABLED'].includes(data?.status)?data.status:'DEFERRED'};
+ }catch{return {status:'DEFERRED'};}
+}
 // Rotate before the free Workflow step ceiling; the Pages checkpoint, not
 // the Workflow step history, is authoritative. This is not a task-wide cap.
-export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lane}={}){
+export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lane,jobsEnabled=false}={}){
  let streak=0,recovery,currentLane=validStageLane(lane)?lane:null,stagedOrigin=validStageLane(lane);
  // A sleeping stage consumes no new AI requests or repeated polling steps.
  // Cloudflare buffers an event even if it arrives before waitForEvent.
@@ -65,7 +77,19 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
   let state;
   try{
    state=await step.do('resume-research-phase-'+phase,{retries:{limit:5,delay:'15 seconds',backoff:'exponential'},timeout:'30 minutes'},async()=>{
-    try{return await requestPhase(fetcher,ticket,{diagnostic:true,recovery,lane:currentLane,stagedFallback:stagedOrigin&&!currentLane});}
+    try{
+     const primary=requestPhase(fetcher,ticket,{diagnostic:true,recovery,lane:currentLane,stagedFallback:stagedOrigin&&!currentLane});
+     if(!jobsEnabled)return await primary;
+     // One main phase plus four independent job invocations: keep one of the
+     // six Worker outbound connection slots free for recovery and storage.
+     const jobs=['verification','verification','verification','reporting'];
+     const result=await Promise.allSettled([primary,...jobs.map(name=>requestIndependentJobPhase(fetcher,ticket,name))]);
+     const main=result[0];
+     if(main.status==='rejected')throw main.reason;
+     const completed=result.slice(1).filter(x=>x.status==='fulfilled'&&x.value.status==='DONE').length;
+     if(completed)console.info('HHBA_V4_INDEPENDENT_JOB_COMPLETED',JSON.stringify({count:completed}));
+     return main.value;
+    }
     catch(e){
      const error=retryCode(e);
      // Expected transport/host/provider failure is a durable recovery outcome,
@@ -106,8 +130,8 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
 // explicitly authorized task request may also claim a due restart atomically,
 // so an interrupted research task need not wait for a scheduled cron tick.
 const recoverableInstance=state=>state?.status==='errored'||(state?.status==='complete'&&(state.output?.status==='RECOVERING'||state.output?.status==='FAILED'&&(!state.output?.error||recoverableCodes.has(state.output.error))));
-export async function scheduleWorkflowInstance(workflow,instance,ticket,{diagnostic=false,lane}={}){
- try{await workflow.create({id:instance,params:{ticket,...(validStageLane(lane)?{lane}:{})}});return true;}
+export async function scheduleWorkflowInstance(workflow,instance,ticket,{diagnostic=false,lane,jobsEnabled=false}={}){
+ try{await workflow.create({id:instance,params:{ticket,...(validStageLane(lane)?{lane}:{}),...(jobsEnabled?{jobsEnabled:true}:{})}});return true;}
  catch(e){if(!(e instanceof Error)||!e.message.includes('(instance.already_exists)'))throw e;}
  const existing=await workflow.get(instance),current=await existing.status();
  if(current?.status==='waiting'||recoverableInstance(current)){
