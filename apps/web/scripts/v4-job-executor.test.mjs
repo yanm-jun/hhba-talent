@@ -108,3 +108,22 @@ test('job stream returns sanitized failures, not private JD evidence or full exc
  assert.match(route,/if\(data\.stream===true\)return streamV4JobControl\(execute\)/);
  assert.match(route,/const result=await execute\(\)/,'legacy caller has JSON fallback');
 });
+
+
+test('resumed isolated JD job uses a full safe phase budget instead of repeated narrow recovery budgets',async()=>{
+ const {v4ManagedResourceBudget,v4IndependentJobBudget}=await import('../functions/_lib/v4-phase-budget.js');
+ const full=v4IndependentJobBudget(),legacy=v4ManagedResourceBudget({background:true,recovering:true});
+ assert.equal(full.snapshot().soft,36);
+ assert.equal(full.snapshot().hard,44);
+ assert.equal(full.snapshot().progress_reserve,4);
+ assert.equal(legacy.snapshot().soft,29,'main discovery recovery keeps its conservative safety margin');
+ assert.equal(full.snapshot().external_subrequests.ceiling,46,'real Cloudflare external cap is still enforced');
+ assert.ok(full.remainingResearch()>legacy.remainingResearch(),'saved one-job continuation should have more room to finish real JD research');
+ for(let i=0;i<28;i++)full.take('fetch');
+ assert.equal(full.snapshot().external_subrequests.used,28);
+ assert.equal(full.canStart(),false,'phase yields before consuming reserved storage/cleanup capacity');
+ assert.throws(()=>full.take('fetch'),e=>e.code==='AI_PHASE_RESOURCE_YIELD');
+ const source=readFileSync(new URL('../functions/_lib/v4-job-executor.js',import.meta.url),'utf8');
+ assert.match(source,/const budget=v4IndependentJobBudget\(\)/);
+ assert.match(source,/HHBA_V4_INDEPENDENT_JOB_BUDGET_YIELD/);
+});
