@@ -121,7 +121,11 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
   console.info('HHBA_MATCH_RECOVERY_SCHEDULED',JSON.stringify({phase,error,streak,seconds}));
   // Durable sleep releases the execution slot. On wake, Pages re-checks
   // session authorization and acquires the same exclusive research lease.
-  await step.sleep('recover-research-phase-'+phase,seconds);
+  // Cloudflare WorkflowStep.sleep(number) interprets numbers as MILLISECONDS,
+  // while recoveryDelaySeconds deliberately computes SECONDS. An old 1800
+  // second backoff became a 1.8 second busy loop and exhausted recovery steps.
+  // Use the explicit duration string to preserve the intended pacing.
+  await step.sleep('recover-research-phase-'+phase,seconds+' seconds');
  }
  return pending('AI_BACKGROUND_WORKFLOW_ROLLOVER');
 }

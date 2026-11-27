@@ -125,12 +125,13 @@ test('temporary failures beyond five attempts still recover the original task wi
   return next==='retry'?new Response(null,{status:503}):event('complete',{status:next});
  });
  assert.deepEqual(result,{status:'COMPLETE'});assert.equal(calls.length,11);assert.ok(calls.every(t=>t===ticket));assert.equal(new Set(names).size,names.length);
- assert.deepEqual(sleeps,[15,30,60,120,300,600,1800,1800,15]);
+ assert.deepEqual(sleeps,['15 seconds','30 seconds','60 seconds','120 seconds','300 seconds','600 seconds','1800 seconds','1800 seconds','15 seconds']);
 });
 test('daily resource exhaustion waits, then an explicitly cancelled task does not call another paid phase',async()=>{
  const sleeps=[],calls=[];const values=[new Response('<h1>Error 1027</h1>',{status:429}),Response.json({error:'AI_AGENT_CANCELLED'},{status:401})];
  const state=await driveBackgroundMatch({async do(_name,_config,fn){return fn()},async sleep(_name,seconds){sleeps.push(seconds)}},ticket,async()=>{calls.push(1);return values.shift()});
- assert.deepEqual(state,{status:'STOP',error:'AI_AGENT_CANCELLED'});assert.deepEqual(sleeps,[3600]);assert.equal(calls.length,2);
+ assert.deepEqual(state,{status:'STOP',error:'AI_AGENT_CANCELLED'});assert.deepEqual(sleeps,['3600 seconds']);assert.equal(calls.length,2);
+ // Regression: numeric 1800 would be 1800ms on Cloudflare, not 1800s.
 });
 test('workflow runtime failure remains errored for watchdog and planned rollover remains recoverable',async()=>{
  await assert.rejects(driveBackgroundMatch({async do(){throw Error('runtime exhausted')}},ticket,async()=>assert.fail('must not call provider')),/BACKGROUND_PHASE_RETRY/);
