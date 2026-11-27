@@ -11,6 +11,7 @@ import {v4PhaseMetricSample,recordV4PhaseOps} from '../../_lib/v4-phase-ops-metr
 import {v4CheckpointLane,isV4StageLane,stagedV4WorkflowsEnabled,stageWorkflowSignal} from '../../_lib/v4-stage-workflows.js';
 import {mergeLiveJobProgress,createV4JobEventJournal} from '../../_lib/v4-job-progress.js';
 import {v4JobWorkQueueEnabled,reconcileV4JobWork,clearV4JobWork} from '../../_lib/v4-job-work-queue.js';
+import {v4JobExecutorEnabled,runIndependentV4Job,mergeIndependentV4Jobs} from '../../_lib/v4-job-executor.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
 import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
 import {v4ParallelResearchEnabled} from '../../_lib/v4-parallel-discovery.js';
@@ -238,6 +239,12 @@ function events(env,request,input,waitUntil){
        const id=await matchProfileCacheKey(env,input.phone,input.session.token_hash,{resume_id:input.resume_id,text:input.text,role:input.role_hint,model:provider.model,base:provider.baseUrl,effort:provider.reasoningEffort||'medium'}).catch(()=>null);
        if(id)profileCache={load:async()=>{if(!budget.canPublish())return null;budget.observe('profile_cache');return readMatchProfileCache(env,id);},save:async profile=>{if(!budget.canPublish()||executionSignal.aborted)return;budget.observe('profile_cache');await saveMatchProfileCache(env,id,profile);}};
       }
+      // Merge only revision-verified, independently completed job results.
+      if(input.background&&input.taskKey&&input.checkpoint&&v4JobExecutorEnabled(env)){
+       try{const merged=await mergeIndependentV4Jobs(env,input.taskKey,input.generation||0,input.checkpoint);
+        if(merged.count){input.checkpoint=merged.checkpoint;console.info('HHBA_V4_INDEPENDENT_JOB_MERGED',JSON.stringify({count:merged.count}));}
+       }catch{console.warn('HHBA_V4_INDEPENDENT_JOB_MERGE_DEFERRED');}
+      }
       const result=await v4Match(budget?budget.fetch(fetch):fetch,provider,input.text,input.role_hint,{
       signal:executionSignal,onProgress:progress,onActivity:activity,env:researchEnv,resourceBudget:budget,profileCache,excludeUrls:input.excludeUrls,
       stepMode:!!checkpointEnv(env),checkpoint:input.checkpoint||null,officialOnly:true,curated:true,parallelResearch:v4ParallelResearchEnabled(env),allowContinue:!!input.taskKey,onRecoveryState:get=>{recoveryState=get;},
@@ -384,6 +391,15 @@ async function recoverSavedDiscovery(env,input,saved,view){
 // authorized active session and generation, and returns no research content.
 // Each invocation uses the exact same D1 lease and encrypted checkpoint as
 // the browser. A second driver can never run the same leased phase in parallel.
+async function backgroundJobStep(env,request){
+ if(!backgroundEnabled(env,request)||request.method!=='POST')return fail('NOT_FOUND',404);
+ if(!v4JobExecutorEnabled(env)||!matchEnabled(env,request))return fail('AI_JOB_EXECUTOR_DISABLED',503);
+ let data;try{const raw=await request.text();if(raw.length>256)return fail('INVALID_REQUEST',400);data=JSON.parse(raw);}catch{return fail('INVALID_REQUEST',400);}
+ if(typeof data?.ticket!=='string'||! /^[a-f0-9]{64}$/.test(data.ticket)||!['verification','reporting'].includes(data.lane))return fail('INVALID_REQUEST',400);
+ try{return reply(await runIndependentV4Job(env,data.ticket,data.lane));}
+ catch(e){const code=typeof e?.code==='string'&&/^AI_[A-Z0-9_]{4,90}$/.test(e.code)?e.code:'AI_BACKGROUND_EXECUTION_FAILED';
+  console.warn('HHBA_V4_INDEPENDENT_JOB_FAILED',JSON.stringify({error:code}));return fail(code,503);}
+}
 async function backgroundStep(env,request,waitUntil){
  if(!backgroundEnabled(env,request)||request.method!=='POST')return fail('NOT_FOUND',404);
  if(!matchEnabled(env,request))return fail('MATCH_NOT_ENABLED',503);
@@ -435,6 +451,7 @@ export async function onRequest(context){
    scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],resumable:readiness.checkpoint_key,encrypted_checkpoint_storage:readiness.checkpoint_storage,dynamic_page_reader:typeof env.BROWSER?.quickAction==='function'||typeof env.BROWSER?.script==='function',readiness});
  }
  if(suffix==='/background-step')return backgroundStep(env,request,waitUntil);
+ if(suffix==='/background-job-step')return backgroundJobStep(env,request);
  const activeTaskRoute=suffix==='/active-task';
  if(!(activeTaskRoute&&['GET','POST'].includes(request.method))&&(!['/resume','/ocr'].includes(suffix)||request.method!=='POST'))return fail('NOT_FOUND',404);
  if(!enabled(env,request)&&!(activeTaskRoute&&allowedHost(request)&&typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function'))return fail('MATCH_NOT_ENABLED',503);
