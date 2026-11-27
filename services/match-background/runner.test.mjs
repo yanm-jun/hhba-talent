@@ -322,22 +322,39 @@ test('split terminal SSE frames retain their result; EOF without terminal remain
 });
 
 
-test('early verifier processes independently queued JDs without waiting for discovery to finish',async()=>{
- const values=[{status:'HANDOFF',next_lane:'discovery'},{status:'COMPLETE'}],calls=[],sleeps=[],waits=[];
+test('early verification never enters main search lock while discovery keeps running',async()=>{
+ const values=['DONE','CONTINUE','EMPTY','EMPTY','FINISHED','FINISHED'],calls=[],sleeps=[],waits=[];
  const step={async waitForEvent(name){waits.push(name);return {payload:{done:false}};},async do(_name,_opts,fn){return fn();},async sleep(name,seconds){sleeps.push([name,seconds]);}};
- const result=await driveBackgroundMatch(step,ticket,async(url)=>{
-  calls.push(url);
-  if(url.endsWith('/background-job-step'))return Response.json({status:'DONE'});
-  return event('complete',values.shift());
- },{lane:'verification',jobsEnabled:true,maxSteps:3});
+ const result=await driveBackgroundMatch(step,ticket,async(url,opt)=>{
+  calls.push({url,lane:JSON.parse(opt.body).lane});
+  if(url.endsWith('/background-step'))throw Error('verification must not acquire global research lease');
+  return Response.json({status:values.shift()});
+ },{lane:'verification',jobsEnabled:true,maxSteps:4});
  assert.deepEqual(result,{status:'COMPLETE'});
- assert.ok(sleeps.some(([name,duration])=>name.startsWith('early-verification-')&&duration==='30 seconds'));
- assert.equal(waits.length,1,'early JD work must not wait for a second wake event');
- assert.equal(calls.filter(x=>x.endsWith('/background-job-step')).length,4);
- assert.equal(calls.filter(x=>x.endsWith('/background-step')).length,2);
+ assert.equal(waits.length,1,'initial wake must be enough to begin early JD research');
+ assert.equal(calls.length,6);
+ assert.ok(calls.every(x=>x.url.endsWith('/background-job-step')&&x.lane==='verification'));
+ assert.deepEqual(sleeps,[['independent-verification-idle-1','30 seconds']]);
 });
-
-
+test('reporting stage owns only per-job leases and stops after real completion',async()=>{
+ const calls=[];
+ const step={async waitForEvent(){return {payload:{done:false}};},async do(_n,_o,fn){return fn();}};
+ const result=await driveBackgroundMatch(step,ticket,async(url,options)=>{
+  assert.ok(url.endsWith('/background-job-step'),'must never request the main research checkpoint');
+  calls.push(JSON.parse(options.body));
+  return Response.json({status:'FINISHED'});
+ },{lane:'reporting',jobsEnabled:true,maxSteps:2});
+ assert.deepEqual(result,{status:'COMPLETE'});assert.equal(calls.length,2);
+ assert.ok(calls.every(x=>x.lane==='reporting'&&x.ticket===ticket));
+});
+test('job-only stages stop on revoked authorization, never enter main research',async()=>{
+ const step={async waitForEvent(){return {payload:{done:false}};},async do(_n,_o,fn){return fn();}};
+ const result=await driveBackgroundMatch(step,ticket,async url=>{
+  assert.ok(url.endsWith('/background-job-step'));
+  return Response.json({error:'AI_AUTH_SESSION_EXPIRED'},{status:503});
+ },{lane:'verification',jobsEnabled:true});
+ assert.deepEqual(result,{status:'STOP',error:'AI_AUTH_SESSION_EXPIRED'});
+});
 test('workflow distinguishes live task lease from a stale one and respects the reported wait',async()=>{
  const response=()=>Response.json({ok:false,error:'AI_TASK_IN_PROGRESS',lease_state:'ACTIVE',retry_after_seconds:38},{status:409});
  assert.deepEqual(await requestPhase(async()=>response(),ticket,{diagnostic:true}),{status:'RECOVERING',error:'AI_TASK_IN_PROGRESS',retry_after_seconds:38,lease_state:'ACTIVE'});

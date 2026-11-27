@@ -79,11 +79,53 @@ export async function requestIndependentJobPhase(fetcher,ticket,lane){
  if(!['verification','reporting'].includes(lane))return {status:'INVALID'};
  try{
   const response=await fetcher('https://hhba.work/api/match-v4/background-job-step',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket,lane})});
-  if(!response.ok)return {status:'DEFERRED'};
+  if(!response.ok){
+   const body=await response.json().catch(()=>null),code=safeCode(body?.error,'AI_BACKGROUND_EXECUTION_FAILED');
+   if(stopCodes.has(code))return {status:'STOP',error:code};
+   if(permanentCodes.has(code))return {status:'FAILED',error:code};
+   return {status:'DEFERRED'};
+  }
   const data=await response.json().catch(()=>null);
-  return {status:['DONE','CONTINUE','EMPTY','RETRY','STALE','DISABLED'].includes(data?.status)?data.status:'DEFERRED'};
+  return {status:['DONE','CONTINUE','EMPTY','RETRY','STALE','DISABLED','FINISHED'].includes(data?.status)?data.status:'DEFERRED'};
  }catch{return {status:'DEFERRED'};}
 }
+// Dedicated verification and reporting Workflows MUST NEVER call
+// /background-step: it holds the discovery/master-checkpoint D1 lease.
+// They consume only revision-fenced per-job reservations, so a long AI
+// discovery call cannot block JD verification and neither side steals a lease.
+export async function driveIndependentJobLane(step,ticket,fetcher,{lane,maxSteps=400}={}){
+ if(!['verification','reporting'].includes(lane))return {status:'FAILED',error:'AI_BACKGROUND_REQUEST_INVALID'};
+ for(let phase=0;phase<maxSteps;phase++){
+  let state;
+  try{
+   state=await step.do('independent-'+lane+'-'+phase,{retries:{limit:5,delay:'15 seconds',backoff:'exponential'},timeout:'30 minutes'},async()=>{
+    const responses=await Promise.allSettled([requestIndependentJobPhase(fetcher,ticket,lane),requestIndependentJobPhase(fetcher,ticket,lane)]);
+    const values=responses.map(x=>x.status==='fulfilled'?x.value:{status:'DEFERRED'});
+    const stopping=values.find(x=>x.status==='STOP'||x.status==='FAILED');
+    if(stopping)return stopping;
+    if(values.some(x=>x.status==='FINISHED'))return {status:'COMPLETE'};
+    const completed=values.filter(x=>x.status==='DONE').length;
+    if(completed)console.info('HHBA_V4_INDEPENDENT_JOB_COMPLETED',JSON.stringify({count:completed,lane}));
+    if(values.some(x=>x.status==='DONE'||x.status==='CONTINUE'))return {status:'CONTINUE'};
+    if(values.every(x=>x.status==='DISABLED'))return {status:'FAILED',error:'AI_JOB_EXECUTOR_DISABLED'};
+    if(values.some(x=>x.status==='RETRY'||x.status==='DEFERRED'))return {status:'RETRY'};
+    return {status:'IDLE'};
+   });
+  }catch(e){
+   const error=retryCode(e);
+   console.warn('HHBA_V4_INDEPENDENT_LANE_RECOVERY',JSON.stringify({lane,phase,error}));
+   state={status:'RETRY'};
+  }
+  if(state?.status==='COMPLETE'||state?.status==='STOP'||state?.status==='FAILED')return state;
+  if(state?.status==='CONTINUE')continue;
+  // Empty or cooled-down job queues are not terminal. The next discovery
+  // checkpoint can enqueue more rows, so sleep durably and re-check the same
+  // authenticated ticket without any new main research invocation.
+  await step.sleep('independent-'+lane+'-idle-'+phase,state?.status==='RETRY'?'45 seconds':'30 seconds');
+ }
+ return pending('AI_BACKGROUND_WORKFLOW_ROLLOVER');
+}
+
 // Rotate before the free Workflow step ceiling; the Pages checkpoint, not
 // the Workflow step history, is authoritative. This is not a task-wide cap.
 export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lane,jobsEnabled=false}={}){
@@ -93,6 +135,7 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
  if(currentLane&&currentLane!=='discovery'){
   const wake=await step.waitForEvent('initial-'+currentLane,{type:'wake_'+currentLane,timeout:'24 hours'});
   if(wake?.done||wake?.payload?.done)return {status:'COMPLETE'};
+  if(jobsEnabled)return driveIndependentJobLane(step,ticket,fetcher,{lane:currentLane,maxSteps});
  }
  for(let phase=0;phase<maxSteps;phase++){
   let state;
