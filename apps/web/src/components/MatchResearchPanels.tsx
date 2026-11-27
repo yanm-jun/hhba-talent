@@ -13,10 +13,24 @@ const stages=[
  {label:'岗位研究与匹配',english:'MATCH REPORT',stages:['reading','researching','writing','scoring']}
 ];
 export const matchStageIndex=(stage:NativeMatchProgress)=>stages.findIndex(s=>s.stages.includes(stage));
-const safeLink=(raw:string)=>{try{const u=new URL(raw);return u.protocol==='https:'&&!u.username&&!u.password?u.href:null}catch{return null}};
+const safeLink=(raw:string)=>{
+ try{
+  const u=new URL(raw);
+  const host=u.hostname.toLowerCase().replace(/\.$/,'');
+  if(u.protocol!=='https:'||u.username||u.password||(u.port&&u.port!=='443')||
+     !host.includes('.')||/^(?:localhost|.*\.(?:local|internal|test|invalid|example|onion))$/i.test(host)||
+     /^\d+\.\d+\.\d+\.\d+$/.test(host))return null;
+  return u.href;
+ }catch{return null}
+};
 const confirmed=(job:MatchedJob)=>job.jd_source_status==='VERIFIED_JD'&&job.source_type==='站外官方招聘'&&!!job.evidence_excerpt?.trim();
-const sourceConfirmed=(job:MatchedJob)=>confirmed(job)||job.reference_vacancy_verified===true;
-const liveResearchLabel=(job:MatchedJob)=>job.report_status==='COMPLETE'&&job.research_detail?'报告已完成':Number.isInteger(job.match_score)?sourceConfirmed(job)?'评分已完成':'AI参考评分 · 来源待核验':confirmed(job)?'官方 JD 已核验':job.reference_jd?.trim()?'AI 参考 JD 已整理':sourceConfirmed(job)?'岗位来源已核验':job.jd_research?.facts?.length?'已有公开资料':'待核验';
+// Keep a single customer-facing action. Only independently confirmed employer
+// vacancies may open a destination; a model search citation is not ownership proof.
+const officialApplicationHref=(job:MatchedJob)=>{
+ if(job.excluded_board||job.excluded_closed||['CLOSED_LISTED','POSSIBLY_CLOSED'].includes(job.availability_status||'')||
+    job.source_type!=='站外官方招聘'||!(confirmed(job)||job.reference_vacancy_verified===true))return null;
+ return safeLink(job.official_url);
+};
 const scoreGrounded=(job:MatchedJob)=>job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&job.match_score!=null;
 function reportScore(job:MatchedJob){
  const value=job.match_score;
@@ -30,9 +44,18 @@ function reportScoreLabel(job:MatchedJob){
 function JobTitle({job}:{job:MatchedJob}){
  return <><strong>{job.company}</strong><span>{job.title_zh||job.title}</span><small><MapPin size={12} aria-hidden="true"/>{job.location}</small></>;
 }
+function OfficialApplyAction({job}:{job:MatchedJob}){
+ const href=officialApplicationHref(job);
+ const label='投递官网';
+ // Keep the one action visually stable as the existing job gains verified
+ // evidence. Do not fabricate an employer destination for unverified leads.
+ return href?
+  <a className="hhba-discovery-apply" href={href} target="_blank" rel="noopener noreferrer" aria-label={label+' · '+job.company+' · '+(job.title_zh||job.title)}>{label}<ArrowUpRight size={13} aria-hidden="true"/></a>:
+  <button type="button" className="hhba-discovery-apply" disabled aria-label={label}>{label}</button>;
+}
 function OfficialLink({job}:{job:MatchedJob}){
- const href=(confirmed(job)||job.reference_vacancy_verified===true)&&safeLink(job.official_url);
- return href?<a className="hhba-refined-source-link" href={href} target="_blank" rel="noopener noreferrer">查看官方招聘页面 <ArrowUpRight size={13}/></a>:null;
+ const href=officialApplicationHref(job);
+ return href?<a className="hhba-refined-source-link" href={href} target="_blank" rel="noopener noreferrer">投递官网 <ArrowUpRight size={13}/></a>:null;
 }
 export function ReportPager({count,index,onChange,pending=false,inline=false}:{count:number;index:number;onChange:(i:number)=>void;pending?:boolean;inline?:boolean}){
  const anchor=useRef<HTMLDivElement>(null);
@@ -169,14 +192,14 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
     <div className="hhba-search-meta"><span>研究轮次 <b>{report?.rounds.length??0}</b></span><span>已发现企业 <b>{companies}</b></span><span>已收到检索来源 <b>{report?.search_source_count??0}</b></span><span>排除商业来源 <b>{report?.excluded_count??0}</b></span>{pending&&elapsed!==undefined&&<span>已用时 <b>{elapsed}</b> 秒</span>}</div>
    </div>
    <section className="hhba-refined-section hhba-discovery-feed"><div className="hhba-refined-subhead"><h3>{pending?'最新发现':'候选岗位一览'}</h3><small>{pending?'LIVE DISCOVERY':'DISCOVERY'}</small></div>
-    {recent.length?recent.map(job=><div className="hhba-discovery-item" key={job.official_url}><div><JobTitle job={job}/></div><span className={sourceConfirmed(job)?'hhba-source-confirmed':'hhba-source-pending'}>{liveResearchLabel(job)}</span></div>):empty(pending?'等待实际搜索返回首个候选岗位。':'本次没有保留候选岗位。')}
+    {recent.length?recent.map(job=><div className="hhba-discovery-item" key={job.official_url}><div><JobTitle job={job}/></div><OfficialApplyAction job={job}/></div>):empty(pending?'等待实际搜索返回首个候选岗位。':'本次没有保留候选岗位。')}
    </section>
    <details className="hhba-refined-details"><summary>实际研究记录（{report?.rounds.length??0} 轮）</summary>
     {report?.rounds.map(r=><details key={r.round}><summary>第 {r.round} 轮 · 新增 {r.added} 个候选 · {r.cited_count} 条非商业平台引用</summary>
      {r.queries.length?<ul>{r.queries.map((q,i)=><li key={i}>{q}</li>)}</ul>:<p>接口未返回本轮具体检索词。</p>}</details>)}
    </details>
    <details className="hhba-refined-details"><summary>全部已收到候选岗位（{all.length}）</summary><label className="hhba-refined-filter"><span>筛选企业、岗位或地点</span><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="搜索本次候选记录"/></label>
-    {visible.length?visible.map(job=><div className="hhba-discovery-item" key={job.official_url}><div><JobTitle job={job}/><OfficialLink job={job}/>{(job.reference_jd||job.jd_research?.facts?.length||job.jd_research?.inference||job.jd_research?.unknowns?.length||job.evidence_excerpt)&&<details><summary>岗位资料 · {job.reference_vacancy_verified?'岗位已核验':'岗位来源待进一步核验'}</summary><JdResearchContent job={job}/>{job.report_status==='COMPLETE'&&job.research_detail&&<CuratedJobReport detail={job.research_detail} reference={job.reference_jd_kind==='AI_GENERATED_REFERENCE'}/>}<RecruitmentSourceLinks job={job}/></details>}</div><small>{liveResearchLabel(job)}</small></div>):empty('没有对应的候选记录。')}
+    {visible.length?visible.map(job=><div className="hhba-discovery-item" key={job.official_url}><div><JobTitle job={job}/>{(job.reference_jd||job.jd_research?.facts?.length||job.jd_research?.inference||job.jd_research?.unknowns?.length||job.evidence_excerpt)&&<details><summary>岗位资料</summary><JdResearchContent job={job}/>{job.report_status==='COMPLETE'&&job.research_detail&&<CuratedJobReport detail={job.research_detail} reference={job.reference_jd_kind==='AI_GENERATED_REFERENCE'}/>}</details>}</div><OfficialApplyAction job={job}/></div>):empty('没有对应的候选记录。')}
    </details>
   </>}
   {active===2&&<>

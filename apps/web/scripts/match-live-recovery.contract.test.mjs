@@ -60,7 +60,9 @@ test('managed polling retains the complete report and uses the same report gate 
  assert.ok(publisher.includes('routine:20000,candidate:3000,report:1000'),'ordinary heartbeat throttling must not delay new results');
  assert.ok(route.includes('budget?.canPublishProgress(kind)'),'publication checks the dedicated progress allowance');
  assert.ok(route.includes('budget?.tryProgress(kind)'),'actual writes atomically reserve counted capacity');
- assert.ok(route.includes('progressReserve:input.background?4:0'),'managed background progress has explicit reserved capacity');
+ const budgetSource=readFileSync(new URL('../functions/_lib/v4-phase-budget.js',import.meta.url),'utf8');
+ assert.ok(route.includes('v4ManagedResourceBudget({background:input.background,recovering:input.resourceRecovery})')&&
+  budgetSource.includes('progressReserve:background?4:0'),'managed background progress has explicit reserved capacity');
  assert.ok(/const reports=verifiedMatchReports\(liveCandidates\.jobs\(\)\);\s*onPartial\?\.\(reports\)/.test(service),'polling must feed the report pager, not just search results');
  assert.ok(dialog.includes('hasCompleteReport?2:'),'the first available report is shown without waiting for all candidates');
  assert.ok(panels.includes("pending||provisional?'已完成报告':'正式推荐'"),'unfinished global ranking must be identified as provisional');
@@ -156,4 +158,23 @@ test('independently complete JD report can open optimizer without cancelling ong
  assert.ok(dialog.includes('if(pending){backToMatches();return;}'));
  assert.ok(panel.includes('disabled={!optimizationAvailable||'));
  assert.ok(page.includes('sourceText={optimizationSource||undefined}'));
+});
+
+test('discovered vacancies present one official application action without customer-facing verification labels',()=>{
+ const panel=readFileSync(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ const css=readFileSync(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
+ assert.match(panel,/function OfficialApplyAction\(/);
+ assert.match(panel,/const label='投递官网'/);
+ assert.match(panel,/const href=officialApplicationHref\(job\)/);
+ assert.match(panel,/href=\{href\} target="_blank" rel="noopener noreferrer"/);
+ assert.match(panel,/<button type="button" className="hhba-discovery-apply" disabled/);
+ assert.match(panel,/recent\.map\(job=>[\s\S]*?<OfficialApplyAction job=\{job\}\/>/);
+ assert.match(panel,/visible\.map\(job=>[\s\S]*?<OfficialApplyAction job=\{job\}\/>/);
+ assert.doesNotMatch(panel,/liveResearchLabel\(job\)/,'discovery rows must not show technical verification statuses');
+ assert.doesNotMatch(panel,/查看招聘来源|查看官方招聘页面/,'discovery must have one action label');
+ assert.match(panel,/job\.source_type!=='站外官方招聘'/);
+ assert.match(panel,/job\.reference_vacancy_verified===true/);
+ assert.match(panel,/POSSIBLY_CLOSED/);
+ assert.match(panel,/job\.excluded_board\|\|job\.excluded_closed/);
+ assert.match(css,/\.hhba-discovery-apply:disabled/);
 });
