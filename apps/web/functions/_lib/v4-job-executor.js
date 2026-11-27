@@ -57,8 +57,15 @@ const errorCode=e=>typeof e?.code==='string'&&/^[A-Z][A-Z0-9_]{4,90}$/.test(e.co
 // discard the verified JD research or retry the same failing stream forever.
 // Persist this flag in the encrypted, revision-fenced job continuation so the
 // next invocation uses Responses JSON with identical model/search parameters.
-export const v4IndependentJobTransport=(previous,error,providerStream=true)=>
- previous?.transport_mode==='json'||providerStream===true&&error?.code==='AI_PROVIDER_UPSTREAM_ERROR'&&error?.upstreamKind==='SSE_FAILED'?'json':'configured';
+export const v4IndependentJobTransport=(previous,error,providerStream=true,attempts=0)=>
+ previous?.transport_mode==='json'||providerStream===true&&(
+ (error?.code==='AI_PROVIDER_UPSTREAM_ERROR'&&error?.upstreamKind==='SSE_FAILED')||
+ // Some relays sever the SSE connection before emitting response.failed,
+ // exposing only a generic NETWORK_ERROR. After a *second* attempt for the
+ // SAME revision-fenced job, persist an alternate JSON transport. This does
+ // not add a model call, shorten prompts or weaken the JD verification.
+ (error?.code==='AI_PROVIDER_NETWORK_ERROR'&&attempts>=2))
+ ?'json':'configured';
 
 // A claimed job runs with its own invocation budget and encrypted continuation.
 // It never owns the main task lease; only its own D1 job lease may be renewed.
@@ -140,7 +147,7 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
   }catch(e){
    if(e?.code==='AI_AGENT_CANCELLED')throw e;
    const snapshot=recovery();
-   const transportMode=v4IndependentJobTransport(vettedPrevious?previous:null,e,provider.stream);
+   const transportMode=v4IndependentJobTransport(vettedPrevious?previous:null,e,provider.stream,claim.attempts);
    if(transportMode==='json'&&jobTransport!=='json')console.warn('HHBA_V4_INDEPENDENT_JOB_SSE_FALLBACK_NEXT_STEP',JSON.stringify({lane}));
    if(snapshot&&!leaseLost&&await renewV4JobWork(db,claim,{leaseMs:300000})){
     await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,
