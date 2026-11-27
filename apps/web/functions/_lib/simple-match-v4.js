@@ -80,7 +80,7 @@ export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{},onD
   timing?.observe('first_frame');
   if(event.type==='response.web_search_call.completed')timing?.observe('first_search_complete');
   if(event.type==='response.output_text.delta'||event.type==='response.output_text.done'||event.type==='response.content_part.done'&&event.part?.type==='output_text')timing?.observe('first_text');
-  if(event.type==='error'||event.type==='response.failed')throw fault('AI_PROVIDER_UPSTREAM_ERROR');
+  if(event.type==='error'||event.type==='response.failed')throw Object.assign(fault('AI_PROVIDER_UPSTREAM_ERROR'),{upstreamKind:'SSE_FAILED'});
   if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
   if(event.type==='response.completed'||event.type==='response.incomplete'){complete=event.response;timing?.observe('terminal');}
   observer?.event(event);
@@ -201,11 +201,17 @@ async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,onDiscovery
   if([401,403].includes(response.status))throw fault('AI_PROVIDER_KEY_REJECTED');
   if(response.status===402)throw fault('AI_PROVIDER_BALANCE_INSUFFICIENT');
   if(response.status===429)throw fault('AI_PROVIDER_RATE_LIMITED');
-  if(response.status>=500)throw fault('AI_PROVIDER_UPSTREAM_ERROR');
+  if(response.status>=500)throw Object.assign(fault('AI_PROVIDER_UPSTREAM_ERROR'),{upstreamKind:'HTTP_'+response.status});
   throw fault('AI_PROVIDER_REQUEST_REJECTED');
  }
  let data;
- try{data=await v4ReadProviderResponse(response,{signal,onEvent,onDiscoveryJob,onDiscoverySource,timing,onStreamIdle:()=>transportAbort.abort()})}catch(e){throw fault(e?.code||'AI_PROVIDER_RESPONSE_INVALID')}
+ try{data=await v4ReadProviderResponse(response,{signal,onEvent,onDiscoveryJob,onDiscoverySource,timing,onStreamIdle:()=>transportAbort.abort()})}catch(e){
+  // Preserve only a structured failure category; never log model output or
+  // the relay response body. Workflow recovery still uses the stable code.
+  const failure=fault(e?.code||'AI_PROVIDER_RESPONSE_INVALID');
+  if(e?.upstreamKind)failure.upstreamKind=e.upstreamKind;
+  throw failure;
+ }
  if(!Array.isArray(data?.output)||!['completed','incomplete'].includes(data.status))
   throw fault('AI_PROVIDER_RESPONSE_INVALID');
  logV4Usage(provider,data.usage,Date.now()-started,data.status);
